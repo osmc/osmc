@@ -61,6 +61,7 @@ deb http://apt.osmc.tv jessie main
 
 # Performing chroot operation
 LOCAL_CHROOT_PKGS="osmc-appletv-darwinx"
+chroot ${DIR} wget -O - http://apt.osmc.tv/apt.key | apt-key add -
 chroot ${DIR} apt-get update
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
