@@ -58,9 +58,10 @@ deb http://security.debian.org/ jessie/updates main contrib
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
-
+LOCAL_CHROOT_PKGS="osmc-appletv-darwinx"
 chroot ${DIR} apt-get update
 chroot ${DIR} apt-get install $CHROOT_PKGS
+chroot ${DIR} apt-get install $LOCAL_CHROOT_PKGS
 
 # Perform filesystem cleanup
 
