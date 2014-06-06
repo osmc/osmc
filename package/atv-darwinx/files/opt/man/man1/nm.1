@@ -1,0 +1,195 @@
+.TH NM 1 "July 28, 2005" "Apple Computer, Inc."
+.SH NAME
+nm \- display name list (symbol table)
+.SH SYNOPSIS
+.B nm
+[
+.B \-agnoprumxjlfPA
+[
+.B s 
+.I segname sectname
+]]
+[
+.B \-
+] [
+.BI \-t " format"
+] [[
+.BI \-arch " arch_flag
+]...] [
+.IR file " ... ]"
+.SH DESCRIPTION
+.I Nm
+displays the name list (symbol table) of each object
+.I file
+in the argument list.  If an argument is an archive, a listing for each object
+file in the archive will be produced.  
+.I File
+can be of the form libx.a(x.o), in which case only symbols from that member of the
+object file are listed.  
+(The parentheses have to be quoted to get by the shell.)
+If no
+.I file
+is given, the symbols in 
+.I a.out 
+are listed.
+.PP
+Each symbol name is preceded by its value (blanks if undefined).
+Unless the
+.B \-m
+option is specified, this value is followed by one of the following
+characters, representing the symbol type:
+.SM
+.B U
+(undefined),
+.SM
+.B A
+(absolute),
+.SM
+.B  T
+(text section symbol),
+.SM
+.B D
+(data section symbol),
+.SM
+.B B
+(bss section symbol),
+.SM
+.B C
+(common symbol),
+.SM
+.B \-
+(for debugger symbol table entries; see
+.B \-a
+below),
+.SM
+.B S
+(symbol in a section other than those above),
+or
+.SM
+.B I
+(indirect symbol).
+If the symbol is local (non-external), the symbol's type is
+instead represented by the corresponding
+lowercase letter.  A lower case
+.B u
+in a dynamic shared library indicates a undefined reference to a private
+external in another module in the same library.
+.PP
+If the symbol is a Objective C method, the symbol name is
+.BI \(+-[ "Class_name(category_name)" " " "method:name:" "]\fR,"
+where `+' is for class methods, `\-' is for instance methods,
+and
+.I (category_name)
+is present only when the method is in a category.
+.PP
+The output is sorted alphabetically by default.
+.PP
+Options are:
+.TP
+.B  \-a
+Display all symbol table entries, 
+including those inserted for use by debuggers.
+.TP
+.B  \-g
+Display only global (external) symbols.
+.TP
+.B \-n
+Sort numerically rather than alphabetically.
+.TP
+.B  \-o
+Prepend file or archive element name to each output line, 
+rather than only once.
+.TP
+.B  \-p
+Don't sort; display in symbol-table order.
+.TP
+.B  \-r
+Sort in reverse order.
+.TP
+.B  \-u
+Display only undefined symbols.
+.TP
+.B  \-m
+Display the N_SECT type symbols (Mach-O symbols) as
+.RI ( "segment_name, section_name" )
+followed by either
+.I external
+or
+.I non-external
+and then the symbol name.
+Undefined, common, absolute and indirect symbols get displayed as
+.IR (undefined) ,
+.IR (common) ,
+.IR (absolute) ,
+and
+.IR (indirect) ,
+respectively.
+.TP
+.B \-x
+Display the symbol table entry's fields in hexadecimal,
+along with the name as a string.
+.TP
+.B \-j
+Just display the symbol names (no value or type).
+.TP
+.BI \-s " segname sectname"
+List only those symbols in the section
+.I (segname,sectname).
+.TP
+.B \-l
+List a pseudo symbol
+.I ".section_start"
+if no symbol has as its value the starting address of the section. 
+(This is used with the
+.B \-s
+option above.)
+.TP
+.BI \-arch " arch_type"
+Specifies the architecture,
+.I arch_type,
+of the file for
+.IR nm (1)
+to operate on when the file is a universal file (see
+.IR arch (3)
+for the currently known
+.IR arch_type s).
+The
+.I arch_type
+can be "all" to operate on all architectures in the file.
+The default is to display the symbols from only the host architecture,
+if the file contains it;
+otherwise, symbols for all architectures in the file
+are displayed.
+.TP
+.B \-f
+Display the symbol table of a dynamic library flat (as one file not separate
+modules).
+.TP
+.B \-A
+Write the pathname or library name of an object on each line.
+.TP
+.B \-P
+Write information in a portable output format.
+.TP
+.BI \-t " format"
+For the
+.B \-P
+output, write the numeric value in the specified format. The format shall be
+dependent on the single character used as the format option-argument:
+.TP
+.I d
+The value shall be written in decimal (default).
+.TP
+.I o
+The value shall be written in octal.
+.TP
+.I x
+The value shall be written in hexadecimal.
+.SH SEE ALSO
+ar(1), ar(5), Mach-O(5), stab(5), nlist(3)
+.SH BUGS
+Displaying Mach-O symbols with
+.B \-m
+is too verbose.  Without the 
+.BR \-m ,
+symbols in the Objective C sections get displayed as an `s'.

@@ -4,6 +4,8 @@
 #!/bin/bash
 
 . ../common/funcs.sh
+wd=$(pwd)
+tcstub="osmc-appletv-toolchain"
 
 check_platform
 verify_action
@@ -23,12 +25,12 @@ verify_action
 # Configure the target directory
 
 ARCH="i386"
-DIR="tc"
+DIR="opt/osmc-tc/${tcstub}"
 RLS="jessie"
 
 # Remove existing build
 
-remove_existing_filesystem
+remove_existing_filesystem "{$wd}/{$DIR}"
 verify_action
 mkdir -p $DIR
 
@@ -47,11 +49,18 @@ verify_action
 enable_nw_chroot "${DIR}"
 verify_action
 
+# Set up sources.list
+echo "deb http://ftp.uk.debian.org/debian testing main contrib
+
+deb http://ftp.debian.org/debian/ jessie-updates main contrib
+
+deb http://security.debian.org/ jessie/updates main contrib
+" > ${DIR}/etc/apt/sources.list
+
 # Performing chroot operation
 
-#cp -ar "chroot_build.sh" "${DIR}"
-#chroot "${DIR}" "/chroot_build.sh"
-#verify_action
+chroot ${DIR} apt-get update
+chroot ${DIR} apt-get install $CHROOT_PKGS
 
 # Perform filesystem cleanup
 
@@ -59,18 +68,12 @@ cleanup_filesystem "${DIR}"
 
 # Build Debian package
 
-wd=$(pwd)
-clean_debian_prep "${wd}"
 echo "Building Debian package"
-build_deb_package "${wd}"
+clean_debian_prep "${wd}" "${tcstub}"
+build_deb_package "${wd}" "${tcstub}"
 verify_action
-
-# Move package up
-mv ../*.deb ${wd}
 
 # Reclean
 
-clean_debian_prep "${wd}"
-remove_existing_filesystem
-
+clean_debian_prep "${wd}" "${tcstub}"
 echo -e "Build successful"

@@ -66,25 +66,30 @@ function cleanup_filesystem()
 
 function remove_existing_filesystem()
 {
-if [ -f "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
+	if [ -f "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
 }
 
 function clean_debian_prep()
 {
-pushd $1
-rm *.build > /dev/null 2>&1
-rm *.sources >/dev/null 2>&1
-rm *.changes >/dev/null 2>&1
-rm *.dsc > /dev/null 2>&1
-rm *.deb > /dev/null 2>&1
-rm *.tar.gz >/dev/null 2>&1
-popd
+	rm -rf $1/output
 }
 
 function build_deb_package()
 {
-	debuild -b $1 > /dev/null 2>&1
+	mkdir -p $1/output
+	cp -ar ${1}/DEBIAN ${1}/output
+	mv ${1}/opt ${1}/output
+	dpkg -b ${1}/output ${2}.deb
 }
+
+COMPILER_PKGS="build-essential git subversion wget nano kernel-package osmc-appletv-darwinx"
+FS_PKGS="parted kpartx"
+REMOTE_PKGS="libusb-dev"
+XBMC_PKGS=""
+BUILDROOT_PKGS="rsync texinfo libncurses-dev whois unzip"
+
+CHROOT_PKGS="${COMPILER_PKGS} ${FS_PKGS} ${XBMC_PKGS} ${BUILDROOT_PKGS}"
+export CHROOT_PKGS
 
 export -f update_sources
 export -f install_package

@@ -18,17 +18,10 @@ function verify_action()
 function enable_nw_chroot()
 {
 	echo -e "Enabling networking"
-	FILES="/etc/resolv.conf
-	/etc/network/interfaces"
-	for file in $FILES
-	do
-	if [ ! -f $file ]
-	then
-	echo "Couldn't find network file ${1}. \nchroot network support will likely fail"
-	else
-	cp $file $1
-	fi
-	done
+	cp /etc/resolv.conf $1/etc/
+	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
+	cp /etc/network/interfaces $1/etc/network
+	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
 }
 
 export -f check_platform

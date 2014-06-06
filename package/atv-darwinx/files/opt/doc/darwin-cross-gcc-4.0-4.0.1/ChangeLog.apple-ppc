@@ -1,0 +1,391 @@
+2006-06-04  Devang Patel  <dpatel@apple.com>
+
+	* README.Apple: Remove outdated info.
+
+2006-06-04  Devang Patel  <dpatel@apple.com>
+
+	* README.Apple: Update web links.
+
+2006-03-15  Devang Patel  <dpatel@apple.com>
+
+	Radar 4468705
+	* build_gcc (MACOSX_DEPLOYMENT_TARGET): Do not unset.
+
+2006-03-09  Devang Patel  <dpatel@apple.com>
+
+	Radar 4468705
+	* build_gcc (MACOSX_DEPLOYMENT_TARGET): Unset.
+
+2006-01-23  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 4332100
+	* build_gcc (CONFIGFLAGS): Add --with-slibdir.
+
+2006-01-17  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 4396225
+	* build_gcc: Copy dylibs before stripping.
+
+2005-10-24  Matthew Sachs  <msachs@apple.com>
+
+	Radar 4292858
+	* GNUmakefile: Take HOSTS and TARGETS from RC_ARCHS if it's set.
+
+2005-10-17  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 4278941
+	* build_gcc (CFLAGS): Just prepend to RC_NONARCH_CFLAGS.
+
+2005-10-07  Matthew Sachs  <msachs@apple.com>
+
+	Radar 4193453
+	* build_gcc: Link against gcc's copy of libiberty when building the
+	Darwin driver; build Darwin driver for hosts, not targets.
+
+2005-10-01  Geoffrey Keating  <geoffk@apple.com>
+
+	* build_gcc: Make strip and lipo target versions.  Update libgcc
+	names.  Don't strip stub libraries.
+
+2005-07-11  Geoffrey Keating  <geoffk@apple.com>
+
+	* libstdc++-v3: Remove all APPLE LOCAL markers.
+
+2005-07-08  Mike Stump  <mrs@apple.com>
+
+	* Merge from gcc_4_0_0_release to gcc_4_0_1_release.
+
+2005-07-16  Geoffrey Keating  <geoffk@apple.com>
+
+	* build_gcc (LIBSTDCXX_VERSION): New.
+	(Run the build): Don't build libstdc++.
+	(CONFIGFLAGS): Have program-transform-name change 'g++' too.
+	Change --with-gxx-include-dir to point to new libstdc++ location.
+	(Rearrange various libraries): Remove libstdc++-related stuff.
+	(bin): Find all the g++ drivers.
+	(lib): Explicitly name libgcc libraries.
+	Dramatically simplify installed-name logic.
+	(include): Don't do anything with c++ headers.
+	(Install man pages): Don't handle g++.1 specially.
+
+2005-07-05  Geoffrey Keating  <geoffk@apple.com>
+
+	* more-hdrs/stdint.h (WCHAR_MIN): Don't define if already defined.
+
+2005-06-19  Geoffrey Keating  <geoffk@apple.com>
+
+	* more-hdrs/stdint.h (INT32_C): Don't use ##L.
+	(UINT32_C): Likewise.
+
+2005-06-16  Geoffrey Keating  <geoffk@apple.com>
+
+	* build_gcc: Use -Werror when building with ourself.
+
+2005-06-01  Mike Stump  <mrs@apple.com>
+
+	Merge in chablis-branchpoint->chablis-merge-2005-06-01.
+
+2005-05-18  Mike Stump  <mrs@apple.com>
+
+	Radar 4110533
+	* build-gcc: Don't strip shell scripts, chgrp to wheel when done,
+	and rebuild less when doing a rebuild.
+
+2005-04-13  Geoff Keating  <dalej@apple.com>
+
+	Radar 4071716
+	* build_gcc (I386_CPU):  Make prescott the default.
+
+2005-04-11  Geoffrey Keating  <geoffk@apple.com>
+
+	* build_gcc: Use I386_CPU each time something is configured 
+	to target x86.
+	(I386_CPU): New.
+
+2005-02-28  Stan Shebs  <shebs@apple.com>
+	    Ian Ollmann <iano@apple.com>
+
+	Radar 3951637
+	* more-hdrs/ppc_intrinsic.h: Make 64-bit friendly:
+	(__lwbrx, __rlwnm, __rlwinm, __mulhw, __mulhwu): Use int
+	instead of long	for 32-bit values.
+	(__cntlzw, __cntlzd): Use existing builtins.
+	
+2005-01-24  Robert Bowdidge <bowdidge@apple.com>
+	Radar 3971437
+	* build_gcc: run nmedit on libcc_kext.a so that dependent kexts can
+        all have their own copy of (say) divdi3.  This returns libcc_kext.a to
+        how things were done in gcc-3.3.
+
+2005-01-18  Stuart Hastings  <stuart@apple.com>
+
+	Radar 3939868
+	* more-hdrs/stdint.h (intmax_t, unitmax_t): Derive from __INTMAX_TYPE__,
+	 __UINTMAX_TYPE__ if available.
+
+2004-12-16  Stan Shebs  <shebs@apple.com>
+
+	* build_gcc: Lipo in the ppc64 libstdc++ dylib if it exists.
+
+2004-12-16  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 3920294
+	* more-hdrs/float.h: Replace by stub for Metrowerks.
+	Radar 3920035
+	* more-hdrs/stdbool.h: Add Metrowerks stub-ness.
+
+2004-12-06  Mike Stump  <mrs@apple.com>
+
+	Radar 3891870
+	* more-hdrs/machine/limits.h: Instead of fixincluding files we own,
+	just fix it.
+	* build_gcc (more-hdrs): Fix up nested header support.
+	* fixincludes/fixinc.in: Add apple local markers, avoid 64bit hack
+	when possible.
+
+2004-11-27  Stan Shebs  <shebs@apple.com>
+
+	libstdc++-v3/configure.ac: Always treat Darwin 8.x targets as if they
+	were cross-compiling.
+	libstdc++-v3/configure: Regenerate.
+
+2004-11-23  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 3893528
+	* build_gcc: Don't install any header from more-hdrs 
+	that Libc has already provided.
+	
+	* fixincludes/inclhack.def (darwin_stdint_guards_intn): Remove
+	_DECLARED from end of guard macro names.
+	(darwin_stdint_guards_intptr): Likewise.
+	(darwin_stdint_guards_uintptr): Likewise.
+	* more-hdrs/stdint.h: Likewise.
+	* fixincludes/fixincl.x: Regenerate.
+
+2004-11-23  Stan Shebs  <shebs@apple.com>
+
+	* build_gcc: Detect Darwin version (7 vs 8), and append
+	version to all the "-apple-darwin" pathnames.
+	* libstdc++-v3/configure: Remove bringup hack.
+
+2004-11-13  Stan Shebs  <shebs@apple.com>
+
+	* fixincludes/fixinc.in: Revive 64-bit bandaid.
+
+2004-11-12  Matt Austern  <austern@apple.com>
+
+	* build_gcc: don't install more_hdrs/assert.h on Tiger systems.
+	
+2004-11-09  Geoffrey Keating  <geoffk@apple.com>
+
+	* build_gcc: lipo the libexec/.../install-tools files together.
+
+2004-11-08  Geoffrey Keating  <geoffk@apple.com>
+
+	* fixincludes/inclhack.def (darwin_macosx_deployment_target): New.
+	* fixincludes/fixincl.x: Regenerate.
+
+2004-11-05  Geoffrey Keating  <geoffk@apple.com>
+
+	* GNUmakefile: Say 'install' and 'clean' are phony targets.
+
+2004-11-02  Stan Shebs  <shebs@apple.com>
+
+	* configure.in: Disable target-libobjc on Darwin for now.
+	* configure: Likewise.
+
+2004-10-13  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 3476357
+	* more-hdrs/stdint.h: Don't include sys/types.h.  Define
+	int*_t, intptr_t, and uintptr_t here, with guards.  Define
+	WINT_{MIN,MAX} and SIG_ATOMIC_{MIN,MAX}.
+	* fixincludes/inclhack.def (darwin_stdint_guards_intn): New.
+	(darwin_stdint_guards_intptr): New.
+	(darwin_stdint_guards_uintptr): New.
+	* fixincludes/fixincl.x: Regenerate.
+
+2004-10-11  Devang Patel  <dpatel@apple.com>
+
+	Radar 3208244
+	* more-hdrs/ppc_intrinsics.h (__lwsync, __cntlzd, __dcbzl,
+	__fctidz, __fctid, __fcfid, __nop): New.
+
+2004-10-07  Robert Bowdidge <bowdidge@apple.com>
+
+        * build_gcc: remove directories /usr/libexec/gcc/darwin/arch/4.0  and
+        /usr/lib/gcc/darwin/arch/4.0 that are no longer needed.
+
+2004-10-07  Robert Bowdidge <bowdidge@apple.com>
+
+	* build_gcc: Remove earlier patch for copying cpp into 
+	/usr/libexec/blah.  /usr/bin/cpp will now use gcc -E to do preprocessing
+        rather than each compiler's cpp.
+
+2004-09-27  Robert Bowdidge <bowdidge@apple.com>
+
+	* build_gcc: change cp -r to cp -R to ensure we copy symbolic links
+       
+2004-09-27  Robert Bowdidge <bowdidge@apple.com>
+
+	* build_gcc: set install names and dependent library references
+        to the major name for each of the gcc-produced dylibs.
+
+2004-09-24  Stan Shebs  <shebs@apple.com>
+
+	* more-hdrs/ppc_intrinsics.h: Test __ppc64__ also.
+
+2004-09-23  Stan Shebs  <shebs@apple.com>
+
+	* build_gcc: Detect version 3.5.0, enable 64-bit bringup option
+	and disable dylib building, also manually copy ppc64 archives
+	to their preferred locations, and don't run strip on 64-bit
+	archives.
+	* libstdc++-v3/configure: Filter out -m64 option when configuring,
+	then add back for compilation proper.
+
+2004-09-23  Robert Bowdidge <bowdidge@apple.com>
+
+	Change build_gcc so it continues to put cpp in 
+        /usr/libexec/gcc/darwin/(architecture)/(version).
+	This is neeed so /usr/bin/cpp will continue to work when changing
+	to gcc-3.5 or gcc-4.0.  Radar 3763777.
+
+2004-09-23  Ziemowit Laski  <zlaski@apple.com>
+
+	Radar 3784876
+	Merge in updated ObjC/ObjC++ bits from mainline.
+
+2004-09-15  Mike Stump  <mrs@apple.com>
+
+	Merge in changes from mainline, from apple-ppc-merge-20040821
+	to apple-ppc-merge-20040907.
+
+2004-08-29  Andrew Pinski  <apinski@apple.com>
+
+	* more-hdrs/ppc_intrinsics.h (__mfspr): Put __extension
+	in front of the statement expression.
+
+2004-08-23  Mike Stump  <mrs@apple.com>
+
+	Merge in changes from mainline, from apple-ppc-mergepoint-20040816
+	to apple-ppc-merge-20040821.
+
+2004-08-19  Geoffrey Keating  <geoffk@apple.com>
+
+	Radar 3719364
+	* more-hdrs/inttypes.h: Update copyright notice, revise handling
+	of macros for which Jaguar doesn't support the C99 modifiers,
+	correct *FASTn for n < 32, correct *PTR.
+
+2004-08-19  Geoffrey Keating  <geoffk@apple.com>
+
+	* more-hdrs/stdint.h: Correct some typos in comments.
+
+2004-08-18  Matthew Sachs  <msachs@apple.com>
+
+	* Merge apple-ppc-branch 2004-08-17\ 03:07:00Z
+	  with -j lno-merge-20040718 -j apple-ppc-mergepoint-20040816 .
+	  The first tag is the point on mainline which LNO merged from right
+	  before our last merge with lno-branch; the second point is
+	  HEAD:2004-08-15T17:16:16Z
+
+2004-08-16  Matthew Sachs  <msachs@apple.com>
+
+	* Mark unmarked APPLE LOCAL changes and remove some ancient cruft
+
+2004-08-05  Robert Bowdidge <bowdidge@apple.com>
+
+	* Merge lno-branch as of 2004-07-19\ 00:00Z into
+	apple-ppc-branch.  The merged compiler is tagged as
+	after-lno-20040719-merge-to-apple-ppc. The pre-merge compiler is 
+	tagged as before-lno-20040719-merge-to-apple-ppc. The merge point
+	is tagged as apple-ppc-merge-20040719 on the lno-branch.
+
+	Merge lno-branch as of 2004:05:29 00:00 GMT into
+	apple-ppc-branch. Pre-merge apple-ppc-branch
+	is tagged as: before-lno-20040530-merge-to-apple-ppc
+
+2004-07-28  Matt Austern  <austern@apple.com>
+
+	Backport radar 3721776 patch from FSF mainline.
+	* config/darwin.c (darwin_one_byte_bool): New global variable.
+	* config/darwin.h (darwin_one_byte_bool): Declare.
+	(SUBTARGET_OPTIONS): Define macro.  (for -mone-byte-bool flag.)
+	* config/rs6000/darwin.h (BOOL_TYPE_SIZE): Conditionalize on
+	value of darwin_one_byte_bool.
+	* doc/invoke.texi: Document -mone-byte-bool flag.
+	* testsuite/gcc.dg/darwin-bool-1.c: New test.
+	* testsuite/gcc.dg/darwin-bool-2.c: New test.
+
+2004-07-26  Matt Austern  <austern@apple.com>
+
+        Radar 3739315 and 3739328
+	* Forward-port dead-code-stripping changes in config/darwin.[ch]
+	from 3.3.
+
+2004-07-13  Matt Austern  <austern@apple.com>
+
+	Radar 3278745, 3419910, 3432773
+	* Fix small problems in more-hdrs/stdint.h and more-hdrs/inttypes.h
+
+2004-06-25  Matthew Sachs  <msachs@apple.com>
+
+	Radar 3693177
+	* Clean up APPLE LOCAL markers.
+
+2004-06-17  Jon Ziegler  <jonz@apple.com>
+
+	Radar 3693664
+	* Update pointers to source code in documentation to reflect new location.
+
+2004-06-16  Jon Ziegler  <jonz@apple.com>
+
+	Radar 3619941
+	* Revert to apple-gcc-1762 plus Dorit/Devang's 2004-06-15 patch.
+
+2004-06-15  Jon Ziegler  <jonz@apple.com>
+
+	Radar 3646298
+	* build_gcc: run ranlib on archives after strip(1)
+
+2004-06-07  Jon Ziegler  <jonz@apple.com>
+
+	Radar 3678979
+	* build_gcc: Change directory for developer docs.
+
+2005-06-04  Fariborz Jahanian <fjahanian@apple.com>
+
+	Merge lno-branch as of 2004:05:29 00:00 GMT into
+	apple-ppc-branch. Pre-merge apple-ppc-branch
+	is tagged as: before-lno-20040530-merge-to-apple-ppc
+
+2004-05-11  Devang Patel  <dpatel@apple.com>
+
+	* build_gcc: Revert previous fix for g++ man page.
+	Fix name of installed g++ name page.
+
+2004-05-06  Mike Stump  <mrs@apple.com>
+
+	* build_gcc: Fix manual page name for g++.1.
+
+2004-04-29  Robert Bowdidge <bowdidge@apple.com>
+
+	Radar 3628023
+	* build_gcc: correctly lipo gcov
+
+2004-04-29  Devang Patel  <dpatel@apple.com>
+
+	Merge lno-branch as of 2004:04:18 00:00 into
+	apple-ppc-branch.
+
+2004-04-22  Devang Patel  <dpatel@apple.com>
+
+	Radar 3401402 and 3511029
+	* build_gcc: Add support to build darwin driver.
+
+2004-04-21  Robert Bowdidge <bowdidge@apple.com>
+
+	* build_gcc: Add --disable-libmudflap to the list of options to
+	configure.  Option needed to keep gcc building on recent internal
+	builds of the OS. [Radar 3630321]
