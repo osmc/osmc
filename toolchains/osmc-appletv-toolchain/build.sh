@@ -50,18 +50,20 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://ftp.uk.debian.org/debian testing main contrib
+echo "deb http://ftp.debian.org/debian testing main contrib
 
 deb http://ftp.debian.org/debian/ jessie-updates main contrib
 
 deb http://security.debian.org/ jessie/updates main contrib
+
+deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
 LOCAL_CHROOT_PKGS="osmc-appletv-darwinx"
 chroot ${DIR} apt-get update
-chroot ${DIR} apt-get install $CHROOT_PKGS
-chroot ${DIR} apt-get install $LOCAL_CHROOT_PKGS
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 
 # Perform filesystem cleanup
 

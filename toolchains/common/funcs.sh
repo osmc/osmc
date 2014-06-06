@@ -82,13 +82,13 @@ function build_deb_package()
 	dpkg -b ${1}/output ${2}.deb
 }
 
-COMPILER_PKGS="build-essential git subversion wget nano kernel-package osmc-appletv-darwinx"
+COMPILER_PKGS="build-essential git subversion wget nano kernel-package"
 FS_PKGS="parted kpartx"
 REMOTE_PKGS="libusb-dev"
 XBMC_PKGS=""
 BUILDROOT_PKGS="rsync texinfo libncurses-dev whois unzip"
 
-CHROOT_PKGS="${COMPILER_PKGS} ${FS_PKGS} ${XBMC_PKGS} ${BUILDROOT_PKGS}"
+CHROOT_PKGS="${COMPILER_PKGS} ${REMOTE_PKGS} ${FS_PKGS} ${XBMC_PKGS} ${BUILDROOT_PKGS}"
 export CHROOT_PKGS
 
 export -f update_sources
