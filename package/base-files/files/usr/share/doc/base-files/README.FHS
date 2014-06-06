@@ -1,0 +1,29 @@
+The FHS standard specifies /var/mail as the mail spool, but it also says
+/var/mail may be a symbolic link to another directory, and there is no
+requirement to physically move the mail spool to this location.
+
+Therefore, no package will move files around from one location to another
+on upgrades, and /var/mail will be the real directory only in newly
+installed systems.
+
+Since /var/spool/mail has been in use for several years now, we need
+also to provide backwards compatibility for some time yet.
+
+So, to summarize:
+
+* New systems (Debian 2.2 or later) will have /var/mail as a real
+directory and /var/spool/mail as a symlink to it.
+
+* Upgraded systems will have /var/spool/mail as the real directory
+and /var/mail as a symlink to it.
+
+
+People upgrading from previous releases who prefer the new physical
+location /var/mail over the old one may do the required changes in their
+systems if they do it with extreme care and know what they are doing. The
+packages in charge of ensuring that /var/mail exists (currently, libc6 and
+base-files) will not touch it at all if it already exists as a directory
+or a symlink.
+
+
+Santiago Vila <sanvila@debian.org>
