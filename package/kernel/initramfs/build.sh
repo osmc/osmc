@@ -2,6 +2,8 @@
 # email@samnazarko.co.uk
 
 #!/bin/bash
+if [ -f initramfs.tar ]; then rm initramfs.tar; fi
+
 BUSYBOX_VERSION="1.21.1"
 
 echo -e "Static build of /init"
@@ -13,9 +15,10 @@ echo -e "Static build of /usr/bin/splash"
 pushd ply-lite
 make clean
 make
+popd
 echo -e "Building BusyBox"
 pushd busybox-${BUSYBOX_VERSION}
-if [ -f _install ]; then rm -rf _install; fi
+make clean
 make -j4
 make install
 pushd _install
@@ -32,7 +35,7 @@ console::askfirst:/bin/login
 " > etc/inittab
 cp -ar ../../init/init init
 cp -ar ../../ply-lite/ply-image usr/bin/splash
+tar -cf ../../initramfs.tar *
 popd
-tar -cf ../initramfs.tar *
 popd
 echo Built initramfs.tar
