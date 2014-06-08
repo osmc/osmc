@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building libshairplay"
 out=$(pwd)/files
 if [ -f files/usr ]; then rm -rf files/usr; fi
@@ -16,5 +18,7 @@ if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd ../
 mkdir -p files-dev/usr
 mv files/usr/include  files-dev/usr/
+fix_arch_ctl "files/DEBIAN/control"
+fix_arch_ctl "files-dev/DEBIAN/control"
 dpkg -b files/ libshairplay.deb
 dpkg -b files-dev libshairplay-dev.deb
