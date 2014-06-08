@@ -73,7 +73,7 @@ verify_action
 echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
-chroot {DIR} umount /proc
+chroot ${DIR} umount /proc
 
 # Perform filesystem cleanup
 
