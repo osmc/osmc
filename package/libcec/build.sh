@@ -11,7 +11,8 @@ if [ -f files/usr ]; then rm -rf files/usr; fi
 if [ -f files-dev/usr ]; then rm -rf files-dev/usr; fi
 cd src
 make clean
-test $1 == gen && ./configure
+./bootstrap
+test $1 == gen && ./configure --prefix=/usr
 make
 make install DESTDIR=${out}
 cd ../
@@ -19,5 +20,5 @@ mkdir -p files-dev/usr
 mv files/usr/include  files-dev/usr/
 fix_arch_ctl "files/DEBIAN/control"
 fix_arch_ctl "files-dev/DEBIAN/control"
-dpkg -b files/ libafpclient.deb
-dpkg -b files-dev libafpclient-dev.deb
+dpkg -b files/ libcec.deb
+dpkg -b files-dev libcec.deb
