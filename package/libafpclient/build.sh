@@ -7,8 +7,8 @@
 
 echo -e "Building libafpclient"
 out=$(pwd)/files
-if [ -f files/usr ]; then rm -rf files/usr; fi
-if [ -f files-dev/usr ]; then rm -rf files-dev/usr; fi
+if [ -d files/usr ]; then rm -rf files/usr; fi
+if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 cd src
 make clean
 ./configure
