@@ -1,0 +1,623 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="could_not_connect_try_again" xml:space="preserve">
+    <value>Could not detect to any CEC adapter. Please check your configuration. Do you want to try again?</value>
+  </data>
+  <data name="app_name" xml:space="preserve">
+    <value>Pulse-Eight USB-CEC Adapter - libCECTray</value>
+  </data>
+  <data name="device_type_changed" xml:space="preserve">
+    <value>You have changed the device type. Persist the configuration, and restart the application to use the new setting.</value>
+  </data>
+  <data name="where_do_you_want_to_store_the_log" xml:space="preserve">
+    <value>Where do you want to store the log file?</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="action_activating_source" xml:space="preserve">
+    <value>Activating the source</value>
+  </data>
+  <data name="action_check_device_present" xml:space="preserve">
+    <value>Checking if {0} is present</value>
+  </data>
+  <data name="action_detecting_avr" xml:space="preserve">
+    <value>Detecting AVR device</value>
+  </data>
+  <data name="action_detecting_avr_vendor" xml:space="preserve">
+    <value>Detecting AVR vendor</value>
+  </data>
+  <data name="action_detecting_tv_vendor" xml:space="preserve">
+    <value>Detecting TV vendor</value>
+  </data>
+  <data name="action_opening_connection" xml:space="preserve">
+    <value>Opening connection</value>
+  </data>
+  <data name="action_polling_active_devices" xml:space="preserve">
+    <value>Polling active devices</value>
+  </data>
+  <data name="action_reading_device_configuration" xml:space="preserve">
+    <value>Reading device configuration</value>
+  </data>
+  <data name="action_refreshing_device_list" xml:space="preserve">
+    <value>Refreshing device list</value>
+  </data>
+  <data name="action_requesting_active_source_state" xml:space="preserve">
+    <value>Requesting active source state</value>
+  </data>
+  <data name="action_requesting_cec_version" xml:space="preserve">
+    <value>Requesting CEC version</value>
+  </data>
+  <data name="action_requesting_menu_language" xml:space="preserve">
+    <value>Requesting menu language</value>
+  </data>
+  <data name="action_requesting_osd_name" xml:space="preserve">
+    <value>Requesting OSD name</value>
+  </data>
+  <data name="action_requesting_physical_address" xml:space="preserve">
+    <value>Requesting physical address</value>
+  </data>
+  <data name="action_requesting_power_status" xml:space="preserve">
+    <value>Requesting power status</value>
+  </data>
+  <data name="action_requesting_vendor_id" xml:space="preserve">
+    <value>Requesting the vendor ID</value>
+  </data>
+  <data name="action_sending_command_to" xml:space="preserve">
+    <value>Sending the '{0}' command to {1}</value>
+  </data>
+  <data name="action_sending_power_on" xml:space="preserve">
+    <value>Sending power on commands</value>
+  </data>
+  <data name="action_setting_new_libcec_configuration" xml:space="preserve">
+    <value>Setting the new configuration</value>
+  </data>
+  <data name="action_showing_device_information" xml:space="preserve">
+    <value>Showing device information</value>
+  </data>
+  <data name="cannot_open_for_writing" xml:space="preserve">
+    <value>Cannot open '{0}' for writing</value>
+  </data>
+  <data name="command_not_acked" xml:space="preserve">
+    <value>The command '{0}' was not acked.</value>
+  </data>
+  <data name="command_sent_successfully" xml:space="preserve">
+    <value>Command sent successfully.</value>
+  </data>
+  <data name="device_audiosystem" xml:space="preserve">
+    <value>AVR</value>
+  </data>
+  <data name="device_playbackdevice" xml:space="preserve">
+    <value>Player</value>
+  </data>
+  <data name="device_recorder" xml:space="preserve">
+    <value>Recorder</value>
+  </data>
+  <data name="device_tuner" xml:space="preserve">
+    <value>Tuner</value>
+  </data>
+  <data name="device_tv" xml:space="preserve">
+    <value>TV</value>
+  </data>
+  <data name="log_stored_as" xml:space="preserve">
+    <value>The log file was stored as '{0}'.</value>
+  </data>
+  <data name="no" xml:space="preserve">
+    <value>no</value>
+  </data>
+  <data name="ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="yes" xml:space="preserve">
+    <value>yes</value>
+  </data>
+  <data name="application_windows_media_center" xml:space="preserve">
+    <value>Windows Media Center</value>
+  </data>
+  <data name="device_broadcast" xml:space="preserve">
+    <value>Broadcast</value>
+  </data>
+  <data name="device_free_use" xml:space="preserve">
+    <value>Free Use</value>
+  </data>
+  <data name="device_reserved" xml:space="preserve">
+    <value>Reserved</value>
+  </data>
+  <data name="autodetect" xml:space="preserve">
+    <value>- autodetect -</value>
+  </data>
+  <data name="cec_log_filename" xml:space="preserve">
+    <value>cec-log.txt</value>
+  </data>
+  <data name="cec_log_filter" xml:space="preserve">
+    <value>txt files (*.txt)|*.txt|All files (*.*)|*.*</value>
+  </data>
+  <data name="global_activate_source" xml:space="preserve">
+    <value>Make the media player the active source when starting</value>
+  </data>
+  <data name="global_advanced_mode" xml:space="preserve">
+    <value>Advanced mode</value>
+  </data>
+  <data name="global_connected_to_hdmi_device" xml:space="preserve">
+    <value>Connected to HDMI device</value>
+  </data>
+  <data name="global_device_type" xml:space="preserve">
+    <value>Device type</value>
+  </data>
+  <data name="global_override_physical_address" xml:space="preserve">
+    <value>Override physical address</value>
+  </data>
+  <data name="global_override_tv_vendor" xml:space="preserve">
+    <value>Override TV vendor</value>
+  </data>
+  <data name="global_physical_address" xml:space="preserve">
+    <value>Physical address</value>
+  </data>
+  <data name="global_standby_devices" xml:space="preserve">
+    <value>Standby when stopping</value>
+  </data>
+  <data name="global_start_hidden" xml:space="preserve">
+    <value>Minimise after connecting to the adapter</value>
+  </data>
+  <data name="global_tv_vendor" xml:space="preserve">
+    <value>TV vendor</value>
+  </data>
+  <data name="global_wake_devices" xml:space="preserve">
+    <value>Wake on startup</value>
+  </data>
+  <data name="about_libcec_version" xml:space="preserve">
+    <value>libCEC v{0} - client v{1}</value>
+  </data>
+  <data name="config_button_mapped_to" xml:space="preserve">
+    <value>Mapped to</value>
+  </data>
+  <data name="config_cec_button" xml:space="preserve">
+    <value>CEC Button</value>
+  </data>
+  <data name="action_type_close_controller_application" xml:space="preserve">
+    <value>close CECTray</value>
+  </data>
+  <data name="action_type_generic" xml:space="preserve">
+    <value>generic</value>
+  </data>
+  <data name="action_type_sendkey" xml:space="preserve">
+    <value>send key</value>
+  </data>
+  <data name="action_type_start_application" xml:space="preserve">
+    <value>start application</value>
+  </data>
+  <data name="add_new_application" xml:space="preserve">
+    <value>Add new application</value>
+  </data>
+  <data name="configure_application" xml:space="preserve">
+    <value>Configure '{0}'</value>
+  </data>
+  <data name="exe_file_filter" xml:space="preserve">
+    <value>Executables (*.exe)|*.exe|All files (*.*)|*.*</value>
+  </data>
+  <data name="select_exe_file" xml:space="preserve">
+    <value>Please select the file to be executed</value>
+  </data>
+  <data name="VK_ACCEPT" xml:space="preserve">
+    <value>IME accept</value>
+  </data>
+  <data name="VK_APPS" xml:space="preserve">
+    <value>applications</value>
+  </data>
+  <data name="VK_BACK" xml:space="preserve">
+    <value>backspace</value>
+  </data>
+  <data name="VK_CANCEL" xml:space="preserve">
+    <value>control+break</value>
+  </data>
+  <data name="VK_CAPITAL" xml:space="preserve">
+    <value>caps lock</value>
+  </data>
+  <data name="VK_CONTROL" xml:space="preserve">
+    <value>ctrl</value>
+  </data>
+  <data name="VK_CONVERT" xml:space="preserve">
+    <value>IME convert</value>
+  </data>
+  <data name="VK_DELETE" xml:space="preserve">
+    <value>del</value>
+  </data>
+  <data name="VK_DOWN" xml:space="preserve">
+    <value>down arrow</value>
+  </data>
+  <data name="VK_ESCAPE" xml:space="preserve">
+    <value>ESC</value>
+  </data>
+  <data name="VK_FINAL" xml:space="preserve">
+    <value>IME final mode</value>
+  </data>
+  <data name="VK_HANGUEL" xml:space="preserve">
+    <value>IME Hanguel mode</value>
+  </data>
+  <data name="VK_HANGUL" xml:space="preserve">
+    <value>IME Hangul mode</value>
+  </data>
+  <data name="VK_HANJA" xml:space="preserve">
+    <value>IME Hanja mode</value>
+  </data>
+  <data name="VK_INSERT" xml:space="preserve">
+    <value>ins</value>
+  </data>
+  <data name="VK_JUNJA" xml:space="preserve">
+    <value>IME Junja mode</value>
+  </data>
+  <data name="VK_KANA" xml:space="preserve">
+    <value>IME Kana mode</value>
+  </data>
+  <data name="VK_KANJI" xml:space="preserve">
+    <value>IME Kanji mode</value>
+  </data>
+  <data name="VK_LAUNCH_APP1" xml:space="preserve">
+    <value>start application 1</value>
+  </data>
+  <data name="VK_LAUNCH_APP2" xml:space="preserve">
+    <value>start application 2</value>
+  </data>
+  <data name="VK_LAUNCH_MAIL" xml:space="preserve">
+    <value>start mail</value>
+  </data>
+  <data name="VK_LAUNCH_MEDIA_SELECT" xml:space="preserve">
+    <value>select media</value>
+  </data>
+  <data name="VK_LBUTTON" xml:space="preserve">
+    <value>left mouse button</value>
+  </data>
+  <data name="VK_LCONTROL" xml:space="preserve">
+    <value>left control</value>
+  </data>
+  <data name="VK_LEFT" xml:space="preserve">
+    <value>left arrow</value>
+  </data>
+  <data name="VK_LMENU" xml:space="preserve">
+    <value>left menu</value>
+  </data>
+  <data name="VK_LSHIFT" xml:space="preserve">
+    <value>left shift</value>
+  </data>
+  <data name="VK_LWIN" xml:space="preserve">
+    <value>left Windows</value>
+  </data>
+  <data name="VK_MBUTTON" xml:space="preserve">
+    <value>middle mouse button</value>
+  </data>
+  <data name="VK_MEDIA_NEXT_TRACK" xml:space="preserve">
+    <value>next track</value>
+  </data>
+  <data name="VK_MEDIA_PLAY_PAUSE" xml:space="preserve">
+    <value>play/pause media</value>
+  </data>
+  <data name="VK_MEDIA_PREV_TRACK" xml:space="preserve">
+    <value>previous track</value>
+  </data>
+  <data name="VK_MEDIA_STOP" xml:space="preserve">
+    <value>stop media</value>
+  </data>
+  <data name="VK_MENU" xml:space="preserve">
+    <value>alt</value>
+  </data>
+  <data name="VK_MODECHANGE" xml:space="preserve">
+    <value>IME mode change request</value>
+  </data>
+  <data name="VK_NEXT" xml:space="preserve">
+    <value>page down</value>
+  </data>
+  <data name="VK_NONCONVERT" xml:space="preserve">
+    <value>IME nonconvert</value>
+  </data>
+  <data name="VK_NUMLOCK" xml:space="preserve">
+    <value>num lock</value>
+  </data>
+  <data name="VK_NUMPAD0" xml:space="preserve">
+    <value>numeric keypad 0</value>
+  </data>
+  <data name="VK_NUMPAD1" xml:space="preserve">
+    <value>numeric keypad 1</value>
+  </data>
+  <data name="VK_NUMPAD2" xml:space="preserve">
+    <value>numeric keypad 2</value>
+  </data>
+  <data name="VK_NUMPAD3" xml:space="preserve">
+    <value>numeric keypad 3</value>
+  </data>
+  <data name="VK_NUMPAD4" xml:space="preserve">
+    <value>numeric keypad 4</value>
+  </data>
+  <data name="VK_NUMPAD5" xml:space="preserve">
+    <value>numeric keypad 5</value>
+  </data>
+  <data name="VK_NUMPAD6" xml:space="preserve">
+    <value>numeric keypad 6</value>
+  </data>
+  <data name="VK_NUMPAD7" xml:space="preserve">
+    <value>numeric keypad 7</value>
+  </data>
+  <data name="VK_NUMPAD8" xml:space="preserve">
+    <value>numeric keypad 8</value>
+  </data>
+  <data name="VK_NUMPAD9" xml:space="preserve">
+    <value>numeric keypad 9</value>
+  </data>
+  <data name="VK_OEM_1" xml:space="preserve">
+    <value>:; key</value>
+  </data>
+  <data name="VK_OEM_2" xml:space="preserve">
+    <value>/? key</value>
+  </data>
+  <data name="VK_OEM_3" xml:space="preserve">
+    <value>`~ key</value>
+  </data>
+  <data name="VK_OEM_4" xml:space="preserve">
+    <value>[{ key</value>
+  </data>
+  <data name="VK_OEM_5" xml:space="preserve">
+    <value>\| key</value>
+  </data>
+  <data name="VK_OEM_6" xml:space="preserve">
+    <value>]} key</value>
+  </data>
+  <data name="VK_OEM_7" xml:space="preserve">
+    <value>'"" key</value>
+  </data>
+  <data name="VK_OEM_CLEAR" xml:space="preserve">
+    <value>clear</value>
+  </data>
+  <data name="VK_OEM_COMMA" xml:space="preserve">
+    <value>, key</value>
+  </data>
+  <data name="VK_OEM_MINUS" xml:space="preserve">
+    <value>- key</value>
+  </data>
+  <data name="VK_OEM_PERIOD" xml:space="preserve">
+    <value>. key</value>
+  </data>
+  <data name="VK_OEM_PLUS" xml:space="preserve">
+    <value>+ key</value>
+  </data>
+  <data name="VK_PACKET" xml:space="preserve">
+    <value>unicode packet</value>
+  </data>
+  <data name="VK_PRIOR" xml:space="preserve">
+    <value>page up</value>
+  </data>
+  <data name="VK_PROCESSKEY" xml:space="preserve">
+    <value>IME PROCESS</value>
+  </data>
+  <data name="VK_RBUTTON" xml:space="preserve">
+    <value>right mouse button</value>
+  </data>
+  <data name="VK_RCONTROL" xml:space="preserve">
+    <value>right control</value>
+  </data>
+  <data name="VK_RETURN" xml:space="preserve">
+    <value>enter</value>
+  </data>
+  <data name="VK_RIGHT" xml:space="preserve">
+    <value>right arrow</value>
+  </data>
+  <data name="VK_RMENU" xml:space="preserve">
+    <value>right menu</value>
+  </data>
+  <data name="VK_RSHIFT" xml:space="preserve">
+    <value>right shift</value>
+  </data>
+  <data name="VK_RWIN" xml:space="preserve">
+    <value>right Windows</value>
+  </data>
+  <data name="VK_SCROLL" xml:space="preserve">
+    <value>scroll lock</value>
+  </data>
+  <data name="VK_SNAPSHOT" xml:space="preserve">
+    <value>print screen</value>
+  </data>
+  <data name="VK_SPACE" xml:space="preserve">
+    <value>spacebar</value>
+  </data>
+  <data name="VK_UP" xml:space="preserve">
+    <value>up arrow</value>
+  </data>
+  <data name="VK_XBUTTON1" xml:space="preserve">
+    <value>X1 mouse button</value>
+  </data>
+  <data name="VK_XBUTTON2" xml:space="preserve">
+    <value>X2 mouse button</value>
+  </data>
+  <data name="application_xbmc" xml:space="preserve">
+    <value>XBMC</value>
+  </data>
+  <data name="app_inactive_source" xml:space="preserve">
+    <value>Send 'inactive source' when shutting down the application</value>
+  </data>
+  <data name="app_use_tv_language" xml:space="preserve">
+    <value>Use the TV's language setting</value>
+  </data>
+  <data name="cannot_open_file" xml:space="preserve">
+    <value>Cannot open file '{0}'</value>
+  </data>
+  <data name="settings_stored" xml:space="preserve">
+    <value>Settings were stored</value>
+  </data>
+  <data name="start_xbmc_exit_tray" xml:space="preserve">
+    <value>Starting XBMC will exit this application, as only one program can be using the adapter at a time. Are you sure you want to proceed?</value>
+  </data>
+  <data name="store_settings_where" xml:space="preserve">
+    <value>Where do you want to store the settings file?</value>
+  </data>
+  <data name="title_are_you_sure" xml:space="preserve">
+    <value>Are you sure you want to proceed?</value>
+  </data>
+  <data name="xml_file_filter" xml:space="preserve">
+    <value>xml files (*.xml)|*.xml|All files (*.*)|*.*</value>
+  </data>
+  <data name="app_send_inactive_source" xml:space="preserve">
+    <value>Send inactive source message when stopping the application</value>
+  </data>
+  <data name="app_standby_on_tv_standby" xml:space="preserve">
+    <value>Put this PC in standby mode when the TV is switched off</value>
+  </data>
+  <data name="app_standby_screensaver" xml:space="preserve">
+    <value>Put devices in standby mode when activating screensaver</value>
+  </data>
+  <data name="could_not_create_directory" xml:space="preserve">
+    <value>Couldn't create directory '{0}'</value>
+  </data>
+  <data name="error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="app_pause_playback_on_deactivate" xml:space="preserve">
+    <value>Pause playback when switching to another source</value>
+  </data>
+  <data name="alert_connection_lost" xml:space="preserve">
+    <value>The connection to the adapter was lost, probably because the device got unplugged.</value>
+  </data>
+  <data name="alert_permission_error" xml:space="preserve">
+    <value>No permission from the OS to access the adapter. Please check your permissions.</value>
+  </data>
+  <data name="alert_physical_address_error" xml:space="preserve">
+    <value>The physical address that is assigned to the adapter is already being used. Please check your settings.</value>
+  </data>
+  <data name="alert_port_busy" xml:space="preserve">
+    <value>The device is being used by another program.</value>
+  </data>
+  <data name="alert_service_device" xml:space="preserve">
+    <value>The device needs servicing. Please download and run the latest firmware upgrade from http://packages.pulse-eight.net/</value>
+  </data>
+  <data name="alert_tv_poll_failed" xml:space="preserve">
+    <value>The TV does not respond to CEC polls. This is caused by one of the following:
+a) the TV does not support CEC;
+b) CEC has been disabled in the TV's settings;
+c) the HDMI cable between the TV and adapter is faulty.
+
+CEC will not work (properly) if the TV does not support CEC, or has CEC disabled in it's settings.</value>
+  </data>
+  <data name="cec_alert" xml:space="preserve">
+    <value>Warning from libCEC</value>
+  </data>
+</root>

@@ -1,0 +1,89 @@
+; Copyright (c) 2012 Pulse-Eight Limited
+
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%MFGNAME%
+LayoutFile=layout.inf
+CatalogFile=%MFGFILENAME%.cat
+DriverVer=08/29/2012,1.1.0.0
+
+[Manufacturer]
+%MFGNAME%=DeviceList, NTamd64
+
+[DestinationDirs]
+FakeModemCopyFileSection=12
+DefaultDestDir=12
+
+
+;------------------------------------------------------------------------------
+;  Windows 2000/XP/Vista-32bit Sections
+;------------------------------------------------------------------------------
+
+[DriverInstall.nt]
+include   = mdmcpq.inf
+CopyFiles = FakeModemCopyFileSection
+AddReg    = DriverInstall.nt.AddReg
+
+[DriverInstall.nt.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,%DRIVERFILENAME%.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+HKR,,PortSubClass,1,01
+
+[DriverInstall.nt.Services]
+AddService = usbser, 0x00000002, DriverService.nt
+
+[DriverService.nt]
+DisplayName   = %SERVICE%
+ServiceType   = 1 ; SERVICE_KERNEL_DRIVER
+StartType     = 3 ; SERVICE_DEMAND_START
+ErrorControl  = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary = %12%\%DRIVERFILENAME%.sys
+LoadOrderGroup = Base
+
+;------------------------------------------------------------------------------
+;  Vista-64bit Sections
+;------------------------------------------------------------------------------
+
+[DriverInstall.NTamd64]
+include   = mdmcpq.inf
+CopyFiles = FakeModemCopyFileSection
+AddReg    = DriverInstall.NTamd64.AddReg
+
+[DriverInstall.NTamd64.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,%DRIVERFILENAME%.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+HKR,,PortSubClass,1,01
+
+[DriverInstall.NTamd64.Services]
+AddService = usbser, 0x00000002, DriverService.NTamd64
+
+[DriverService.NTamd64]
+DisplayName    = %SERVICE%
+ServiceType    = 1 ; SERVICE_KERNEL_DRIVER
+StartType      = 3 ; SERVICE_DEMAND_START
+ErrorControl   = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\%DRIVERFILENAME%.sys
+LoadOrderGroup = Base
+
+[SourceDisksFiles]
+[SourceDisksNames]
+[DeviceList]
+%DESCRIPTION2% = DriverInstall, USB\VID_2548&PID_1002&MI_00
+%DESCRIPTION%  = DriverInstall, USB\VID_2548&PID_1001
+
+[DeviceList.NTamd64]
+%DESCRIPTION2% = DriverInstall, USB\VID_2548&PID_1002&MI_00
+%DESCRIPTION%  = DriverInstall, USB\VID_2548&PID_1001
+
+[Strings]
+MFGFILENAME    = "p8usb-cec"
+DRIVERFILENAME = "usbser"
+MFGNAME        = "Pulse-Eight Limited"
+INSTDISK       = "Pulse-Eight USB-CEC Installation Disc"
+DESCRIPTION    = "Pulse-Eight USB to HDMI CEC Adapter"
+DESCRIPTION2   = "Pulse-Eight USB to HDMI CEC Adapter (rev.2)"
+SERVICE        = "USB to HDMI-CEC"

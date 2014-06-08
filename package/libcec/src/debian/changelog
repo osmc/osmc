@@ -1,0 +1,1521 @@
+libcec (2.1.4-2) unstable; urgency=low
+
+  * fixed:
+    * OS X build
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 18 Dec 2013 02:14:00 +0100
+
+libcec (2.1.4-1) unstable; urgency=low
+
+  * changed / added:
+    * set the vendor id of devices handled by libCEC to our vendor id
+    * added protection against standby without a notification from XBMC and
+      clock changes. issue #186
+    * update system audio mode when audio system devices are activated
+    * added vendor id and name 'Harman/Kardon'
+    * added vendor id and name 'Marantz'
+    * cec-tray: support for away mode
+    * cec-tray: support for screensaver events
+  * fixed:
+    * fixed potential crash when SendCommand returns NULL
+    * fixed crash when CCECProcessor::Transmit was called after
+      CCECProcessor::Close
+    * always call the SourceActivated() callback in
+      CCECBusDevice::MarkAsActiveSource(), even when we were already active,
+      and let clients handle dupes. this prevented the screensaver from
+      being cancelled in XBMC
+    * send our vendor id when the tv sends it's vendor id
+    * transmit our physical address when the TV sends it's physical address
+    * potential deadlock
+    * leak on exit in CWaitForResponse::Clear()
+    * also transmit an active source message as response to a set stream path
+      command when we were already marked as active. bugzid: 3116
+    * only send an active source message when receiving a routing change to an
+      address handled by libCEC. issue #56
+    * HandleVendorRemoteButtonUp -> HandleUserControlRelease for all vendors
+    * silence warning for xx:a0:00:09:b0:00:80:20. bugzid: 2559
+    * fixed comboKeyTimeout=0. closes #168
+    * Panasonic: doesn't request the active source status when powered up, but
+      it does send a vendor command. send an active source message when we're
+      marked as active source after receiving this command. issue #192
+    * possible crash when the tv does not respond to polls and the client isn't
+      registered yet. don't poll the tv in monitoring mode. closes #163
+    * Panasonic: standby command
+    * Panasonic: silence 'unmapped code' warning. bugzid: 2375
+    * LG: clean up and attempt to fix issue #176
+    * LG: newer firmwares don't send a second power status request after it's
+      been requested once and replied with 'standby -> on' like previous
+      versions. send an active source message in an attempt to fix this. issue:
+      #176
+    * Sharp: check whether the 'auto power on' option is disabled and tell the
+      user how to enable it
+    * Samsung: respond to vendor command 0x23 sent by samsung. attempt to fix
+      bugzid: 2164
+    * cec-client: try to reconnect when the connection was lost
+    * cec-tray: crash on load (MissingManifestResourceException)
+    * cec-tray: crash or deadlock on exit
+    * cec-tray: crash when the connection to the adapter was lost
+    * cec-tray: display TV not responding warning on top
+    * windows: build libCEC and cec-client against toolset v100 (VS2010)
+    * FreeBSD: proper the adapter detection. credits @fneufneu
+    * suppress mangling warning. credits @warped-rudi. closes #190
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sat, 13 Dec 2013 16:02:00 +0100
+
+libcec (2.1.3-1) unstable; urgency=low
+
+  * changed / added:
+    * ask users to send an email when receiving an unhandled vendor command
+    * toshiba: map top menu and dvd menu buttons. closes #148
+    * LibCecSharp: sync alert types
+    * LibCecSharp: added CurrentVersion to the version enum
+    * CecSharpClient: use CurrentVersion instead of a hardcoded version
+    * CecTray: power management
+    * CecTray: split up asyncform
+    * CecTray: try/catch xml exceptions when reading the xml config. bugzid:
+      2082
+    * CecTray: use CurrentVersion instead of a hardcoded version
+    * CecTray: display a warning if we can't poll the TV
+    * CecTray: display alerts from libCEC
+    * CecTray: don't use lazy loading for the main controller, but pass the
+      instance. bugzid: 2082
+    * windows: converted to vs2012
+  * fixed:
+    * toshiba: toshiba handler wasn't initialised, and toshiba uses more than
+      one vendor id
+    * libCEC marked itself as inactive source when the stream path changed to
+      a device with a different physical address. bugzid: 2157
+    * TDA995x: report proper firmware revision (credits: @warped-rudi)
+    * TDA995x: avoid callback when already stopped (credits: @warped-rudi)
+    * windows: fix resource files and backwards compat dll names
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sat, 11 May 2013 10:06:00 +0000
+
+libcec (2.1.1-1) unstable; urgency=low
+
+  * changed / added:
+    * send an alert when the TV does not respond to polls
+  * fixed:
+    * LG didn't switch sources after the TV powered up
+    * always poll a device when the status is unknown, and don't try to
+      determine whether it needs to be polled by checking the status of other
+      devices
+    * don't mark a device as inactive when receiving a routing change message,
+      only when another device was made acive. fixes the issue that rc
+      passthrough doesn't work when a tv sends a quick routing change to
+      another port before requesting the active source when coming out of
+      standby
+    * LibCecSharp: fixed 14 char long OSD name (wasn't \0 terminated)
+    * LibCecSharp: fixed return value of GetActiveDevices(). issue #131
+    * cec-tray: fixed index out of range exception in CECSettingNumeric.cs.
+      bugzid: 2082
+    * cec-tray: ensure that the tray app only initialises once. bugzid: 2082
+    * rpi: don't set the physical address to 1.0.0.0 when receiving
+      VC_HDMI_UNPLUGGED. it may wake up device when they were just sent to
+      standby. issue #142
+    * osx: use the correct dylib name in cecloader.h, used by cec-client
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 8 Mar 2013 17:21:00 +0100
+ 
+ libcec (2.1.0-1) unstable; urgency=low
+
+  * changed / added:
+    * added vendor id for Denon
+    * added DetectAdapters() method, that returns all device information for
+      detected adapters, not just the com port
+    * added new method PowerOnScreensaver. credits: @jmarcet
+    * LibCECTray: Added ability to send modifiers by nesting commands in
+      KeyInput.cs. credits: Nate Burr
+    * rpi: Added /opt/vc/include/interface/vmcs_host/linux to rpi_cflags to fix
+      building on 'next' firmware branch. credits: Nedim Lisica
+  * fixed:
+    * don't send two active source message sequences to philips. issue #118
+    * don't send deck status updates to philips when activating the source
+    * update the active source status correctly after a manual switch to
+      another source. closes #124
+    * rename cec_audio_status() to cec_audio_get_status() to avoid conflict
+      with the cec_audio_status enum.  This makes the C API compile again.
+      credits: Dave Chapman
+    * LibCECTray: Fixed bug with libcec adding the keyup for button commands
+      and making sure they are still executed. credits: Nate Burr
+    * rpi: register callback for HPD. re-read the physical address when we
+      received VC_HDMI_ATTACHED. issue #109
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 26 Feb 2013 23:06:00 +0100
+
+libcec (2.0.5-1) unstable; urgency=low
+
+  * changed:
+    * also try polls at least twice when it failed
+    * added methods to get the audiostatus and toggle the mute status from the
+      amplifier (if connected)
+    * added comboKey and iComboKeyTimeoutMs to libcec_configuration
+    * force cec_user_control_code_unknown to 0xFF
+  * fixed:
+    * check unsupported features properly
+    * only send an active source message when the stream path changed and we
+      weren't the active source yet
+    * don't mark as inactive source on routing changes
+    * press & hold
+    * never mark user control opcodes as unsupported
+    * report our OSD name to the TV, since some TVs don't request it
+    * initial audiostatus value
+    * don't log a no longer relevant FIXME
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 6 Dec 2012 20:58:00 +0100
+
+libcec (2.0.4-1) unstable; urgency=low
+
+  * changed:
+    * dropped obsolete cec-config
+    * added CEC_CLIENT_VERSION_CURRENT and CEC_SERVER_VERSION_CURRENT. closes
+      #88
+    * support colon separated data for the 'tx' command in cec-client
+    * mark the adapter as (in)active source for firmware v3+
+    * added 'is' command to cec-client, to mark libCEC as inactive source
+  * fixed:
+    * only change the handler of the primary device if the tv has a quirks mode
+      not for other devices
+    * send an active source message when the route was set to the physical
+      address that is handled by libCEC
+    * default double tap timeout wasn't set for panasonic
+    * philips TVs sometimes keep sending key presses without key releases
+    * philips TVs ignore 'image view on' right after they were sent into
+      standby. check the power status of the tv every 5 seconds, until it
+      reports to have powered on
+    * mark a device as powered on when receiving a stream path or routing
+      change
+    * update the active source status correctly on stream path changes
+    * ensure that we only send 'image view on' when needed
+    * mark the TV as 'in transition standby -> on' after sending
+      'image view on', so we don't spam the TV with 'image view on' command
+      while waiting for it to finish powering up. bugzid: 1603. bugzid: 1609.
+      bugzid: 1592
+    * request the active source before requesting device information in
+      cec-client, or it'll display incorrect information when called the first
+      time
+    * update the value of CCECProcessor::m_bMonitor when registering a client.
+      SetControlled() wasn't called on exit, so it took 30 seconds until it was
+      auto-enabled
+    * silence 'unused' warning properly. closes #86
+    * only change the type of the client to 'playback device' instead of
+      'recorder' for panasonic if the TV is a panasonic. issue #84
+    * always poll the TV if it's marked as not present. issue #83. issue #84
+    * only set m_iCurrentButton when the duration isn't known yet. fixes
+      duplicate key press for vendor remote codes. closes #81
+    * delete the right registry key
+    * send active source message when we received a routing change with a
+      device that is handled by libCEC as address. issue #89
+    * return value wasn't updated in GetLogicalAddresses()
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 15 Nov 2012 02:26:00 +0100
+
+libcec (2.0.3-1) unstable; urgency=low
+
+  * changed:
+    * log unhandled vendor remote keycodes in the log, so they get logged
+      without debugging enabled
+    * double tap timeout increased from 200ms to 250ms
+    * CuBox/NXP* renamed to TDA995x*
+  * fixed:
+    * handling of active route changes. github issue #56 and issue #58
+    * new combo key handling broke samsung's vendor specific remote buttons.
+      github issue #54
+    * don't try to set controlled mode when using firmware version 1 and crash.
+      github issue #76
+    * fix for LG models that send a vendor key up after a normal key down.
+      github issue #71
+    * some TVs send keypresses to us without making us the active source. mark
+      us as active source when this happens. github issue #71
+    * LG doesn't send routing changes, and marks the TV as active source when
+      switching to another source that's not been selected in the simplink menu
+      instead. this change keeps libCEC marked as powered on and keep the deck
+      state set to CEC_DECK_INFO_OTHER_STATUS_LG. fixes keypresses not working
+      after switching to another source and back to libCEC's hdmi port via the
+      source select menu instead of the simplink menu. github issue #71
+    * don't respond with an abort message when receiving a vendor remote button
+      command
+    * respond with CEC_ABORT_REASON_INVALID_OPERAND when receiving a keypress
+      without a parameter
+    * typo in stop+pause combo key that prevented one of the keys from working
+    * rpi: log what data we received exactly when we receive an response from
+      the pi's firmware that doesn't match any command that we sent. issue #77
+    * cubox: added adapter ID interface
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 31 Oct 2012 15:57:00 +0100
+
+libcec (2.0.2-2) unstable; urgency=medium
+
+  * fixed:
+    * updating the device status after a poll was broken and could reset the
+      status of devices that were marked as handled by libCEC to 'not
+      present'
+    * don't keep spamming the bus with a vendor command when an active source
+      switch is pending for panasonic, but only send it when needed
+    * reset CVLCommandHandler::m_bCapabilitiesSent when the TV goes to standby
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 15 Oct 2012 13:52:00 +0100
+
+libcec (2.0.2-1) unstable; urgency=low
+
+  * changed/added:
+    * missing from the previous changelog: added support for the CuBox TDA995x
+      credits: warped-rudi
+    * lower retry timeout for source switches
+    * cec-client: wait for the source switch to finish when cec-client is
+      called with the -s switch
+    * request the power status of the TV directly after registering a new
+      client
+  * fixed:
+    * don't keep trying to send 'image view on' commands to the TV when no TV
+      is connected, and just send the 'set active source' command. fixes source
+      switch and debug log spam for people without a TV connected
+    * don't keep waiting for an updated power status from the TV for Panasonic,
+      but request a status update once every 5 seconds, or we can possibly wait
+      forever for the tv to send it
+    * log what we received exactly when logging FIXME
+    * typo in CVLCommandHandler::VendorPreActivateSourceHook. bugzid: 1087
+    * if we failed to get the physical address of the device that we are
+      connected to in the config, then try to use the address that was
+      persisted in the eeprom before resetting to the default value, 1.0.0.0.
+      closes #50.
+    * don't update the device status of unregistered/broadcast
+    * log all device status changes
+    * CCECClient::IsLibCECActiveSource returns false now while the active
+      source command is pending
+    * log failed acks and other errors in the debug log again
+    * don't send 'image view on' when the TV is already powering up
+    * reset the delayed source switch timeout properly, so we don't spam
+      commands every second
+    * don't change the device status when sending a delayed source switch
+    * don't send out commands to a device that is marked as not present or
+      handled by libCEC
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 11 Oct 2012 15:48:00 +0100
+
+libcec (2.0.1-1) unstable; urgency=low
+
+  * changed/added:
+    * added Loewe support
+    * added signal handlers to client applications
+    * Documentation updated
+    * replaced cec-config-gui by libCEC tray
+    * log the exact data for failed transmissions, not the opcode
+    * don't log every frame, unless debugging was enabled in ./configure or
+      visual studio
+    * changed some log levels from NOTICE to DEBUG, so the non-debugging output
+      is less spammy
+  * interface changes:
+    * WARNING: breaking API changes
+    * clean up: deprecated methods and fields removed
+    * callback parameters changed to fix plain C compilation
+    * added GetAdapterProductId()+GetAdapterVendorId()/
+      cec_get_adapter_product_id()+cec_get_adapter_vendor_id()
+    * added iDoubleTapTimeoutMs to libcec_configuration
+    * remove all pre-v2.0 compatibility checks
+  * fixed:
+    * fix plain C compilation
+    * prevent sending directly addressed commands from being sent to broadcast
+    * don't wait for a response when sending a reply, so we don't block message
+      handling
+    * message response signaling and logging
+    * prevent double taps by not sending the same key press twice within 200ms
+    * fall back to the primary client when
+      CCECProcessor::HandleLogicalAddressLost() and no client could be found
+    * no more delay up to 2 seconds when exiting libCEC
+    * don't get caught in a loop in CVLCommandHandler when the source switch
+      was not allowed and no power status request was sent
+    * always send image view on to the tv, don't check the power status
+    * only respond to vendor commands for panasonic if we are the destination
+    * rpi: current firmware first sends a change to logical address 'broadcast'
+      and then signals us that the address was lost. libCEC then failed to
+      re-register, because it didn't know any client at this address
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 8 Oct 2012 21:30:00 +0100
+
+libcec (1.9.1-1) unstable; urgency=low
+
+  * changed/added:
+    * added the type of adapter to libcec_configuration,
+      and display the type in cec-client -l
+    * added device detection support for composite usb devices on windows.
+      needs the windows ddk, and it's expected to be found in
+      C:\WinDDK\7600.16385.1
+
+  * interface changes:
+    * adapter type was added to libcec_configuration
+    * moved cec_adapter_messagecode from cectypes.h to USBCECAdapterMessage.h
+
+  * fixed:
+    * retry m_port->Read(..) if an EINTR errror occurs instead of closing the
+      connection. credits @Obruni. closes #38
+    * make cec-client include cecloader.h from our project, not from system
+    * fixed duplicate entries check in CUSBCECAdapterDetection
+    * fixed missing cec_version updates in libcec_configuration
+    * transmit an active source message after <set stream path> to a device
+      that's handled by libCEC. closes #43
+    * rpi: handle vendor specific remote control presses. closes #42
+    * rpi: handle VC_CEC_LOGICAL_ADDR_LOST, sent by the Pi's firmware when
+      the logical address was taken while CEC was being reinitialised
+    * panasonic: send out an active source message when the tv started up
+      because it sometimes doesn't request this
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 5 Sep 2012 16:54:00 +0100
+
+libcec (1.8.2-1) unstable; urgency=low
+
+  * changed/added:
+    * p8: match to the response provided by the firmware when checking
+      responses (added in firmware v2 rev6)
+
+  * fixed:
+    * windows: update the error message when an error occurs while writing to
+      the serial port
+    * delayed source switch time was reset, resulting in an attempt every
+      second until it succeeded
+    * ensure that the vendor commands are always sent for panasonic, and that
+      the deck status for lg isn't reset. fixes some buttons not working after
+      a second or delayed source switch
+    * added guard so ReplaceHandler() doesn't accidently try to replace a
+      handler for the broadcast address
+    * wait until the commandhandler is replaced before registering a client,
+      so we don't register a client and replace it directly afterwards if the
+      tv doesn't support the device type
+    * ensure that the command handler of the tv is replaced before registering
+      a client, or it might result in a double eeprom write attempt
+    * p8: don't disable controlled mode when switching to monitoring mode
+    * p8: do delayed eeprom writes async or it'll block processing other input
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 3 Aug 2012 02:35:00 +0100
+
+libcec (1.8.1-1) unstable; urgency=low
+
+  * changed/added:
+    * added support for the Raspberry Pi.
+    * added cec-client -i / cec-client --info that calls GetLibInfo()
+    * header cleanups
+    * added CAdapterFactory, to create IAdapterCommunication instances
+    * added --debug to configure, to include -ggdb
+
+  * interface changes:
+    * added GetLibInfo()/cec_get_lib_info(), that shows how libCEC was compiled
+      and with which features included.
+    * added ToString(cec_user_control_code_key) to the interface
+
+  * fixed:
+    * disallow sending CEC_OPCODE_SET_STREAM_PATH - not allowed by the CEC spec
+    * persist the configuration in the eeprom after initialising the client.
+      fixes wrong/old settings being used in autonomous mode, which broke the
+      wake on cec funtion
+    * persist the new configuration when the hdmi port setting changed
+    * cleaned locks around callbacks
+    * always set controlled mode to false when unregistering the last client.
+      fixes 30 second timeout before controlled mode gets deactivated
+    * updated the cached device type setting properly when persisting new
+      settings. correct return value from WriteEEPROM(). lock a mutex when
+      updating the state
+    * LibCecSharp: set the primary LA in CecLogicalAddresses
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 25 Jul 2012 13:05:00 +0100
+
+libcec (1.7.2-1) unstable; urgency=low
+
+  * changed/added:
+    * display a warning message if libCEC was not compiled with adapter
+      detection for the target platform
+    * panasonic: added a vendor command for panasonic that will enable routing
+      of some more buttons on the remote (guide, text, ...)
+    * standby command won't be forwarded more than once every 10 seconds
+    * added vendor ids for Akai, AOC, Benq, Daewoo, Grundig, Medion, Sharp and
+      Vizio
+    * cec-client: don't display debug output by default in 'cec-client -l'
+
+  * interface changes:
+    * added a callback for clients that is called when a source is
+      (de)activated, so the client can respond to this action
+    * added cec_command::PushArray()
+
+  * fixed:
+    * command forwarding. fixes player not going into standby mode
+    * missing virtual keyword in CCECCommandHandler::
+      GetReplacementDeviceType()
+    * replace the handler (if needed) in GetHandler()
+    * reply with abort reason 'invalid operand' to vendor commands that we
+      don't understand
+    * changed all Handle...() commands to return a cec_abort_reason and send
+      the correct abort reason to the initiator as a response to directly
+      addressed messages
+    * changed 'couldn't change the ackmask: the connection is closed' into a
+      debug message
+    * don't send active source commands when the physical address is invalid or
+      unknown
+    * set the power status of a device to 'powered on' after it sends a stream
+      path change. can save an unneeded power state update request
+    * removed dupe code around delayed activate source commands. check for
+      delayed active source commands every 5 seconds instead of 15 seconds.
+    * panasonic: reset m_bPowerUpEventReceived in CVLCommandHandler when the
+      device lets us know it went into standby mode. fixes possibly failed
+      active source switches after it succeeded once
+    * panasonic: fixed delayed source switch for panasonic
+    * panasonic: mark the tv as powered up once it sends the audiomode request
+    * set the physical address of each device controlled by a CCECClient if
+      it's valid
+    * Windows could get stuck in a loop in case there an error occured while
+      reading registry entries
+    * ABI fixes (binary compat with v1.2 for Windows and v1.5.2 for others)
+    * replace the handler directly after getting the vendor id of a device when
+      registering a client
+    * copy the class member values of the old handler when creating a new
+      command handler, or a delayed activate source will get lost when the
+      handler is switched
+    * cec-client: wrong client version
+    * Makefile cleanups. don't link cec-client and cec-config against libudev
+      and liblockdev
+    * pin libcec to the same version as libcec1
+    * LibCecSharp: update the local configuration after connecting
+    * LibCecSharp: better handling of callbacks
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 27 Jun 2012 02:06:00 +0100
+
+libcec (1.7.1-1) unstable; urgency=low
+
+  * changed/added:
+    * added physical address detection via ADL for AMD graphics cards
+    * attempt to get the edid from nvidia's graphics card driver on linux via
+      /proc/acpi/video/NGFX/HDMI/EDID
+    * attempt to get the PA from the registry on windows if we fail to get the
+      physical address from the display driver
+    * changed the order in CCECClient::SetPhysicalAddress() so it first checks
+      whether a PA override is set in libcec_configuration.iPhysicalAddress,
+      then checks whether the address can be detected, and if both failed it'll
+      use the HDMI port + base device setting
+    * cec-client: only active the source when reconnecting if libcec was the
+      active source before closing the connection
+    * platform: added tcp server sockets for posix
+
+  * interface changes:
+    * libcec_configuration.bAutodetectAddress is now read-only, and will be set
+      to 1 by libCEC if the PA was autodetected
+    * LibCecSharp: don't use an int but a CecUserControlCode in a CecKeypress
+
+  * fixed:
+    * don't unregister clients in CLibCEC when disconnecting, but only in
+      CCECProcessor. fixes reconnect after close
+    * MSGCODE_TIMEOUT_ERROR is a response to a transmission
+    * retry 'activate source' every 10 seconds if it failed
+    * don't respond with a poll from the broadcast address when receiving
+      in CSLCommandHandler::HandleDeviceVendorId(), but use the primary LA of
+      the client as source instead
+    * hold a lock when changing the ackmask in
+      CUSBCECAdapterCommunication::Open
+    * don't respond with a feature abort to opcode play messages. bugzid: 873
+    * get the vendor id of the TV before allocating logical addresses, so we
+      can determine if the TV supports the requested device type directly
+    * TransmitImageViewOn() and TransmitActiveSource() always returned true,
+      even if sending the command failed, so the retry for failed source
+      activations was never triggered
+    * open libcec.so.1 instead of libcec.so in cecloader.h. credits @coling.
+      github issue #30.
+    * fixed missing firmware version and build date in cec-client -l /
+      GetDeviceInformation()
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sun, 10 Jun 2012 13:39:00 +0100
+
+libcec (1.6.1-5) unstable; urgency=low
+
+  * synced /debian directory with the one in precise (with a couple of changes)
+  * changed/added:
+    * serial port locking on linux
+    * cec-client: added -m/--monitor startup options, which will start a
+      monitor-only client. use 'mon 0' to switch to a normal client
+    * display an alert message when the firmware of the adapter can be upgraded
+    * added CEC 1.4 opcodes
+    * send a feature abort again for all unhandled commands
+    * refactored CLibCEC so a client registers itself within CCECProcessor,
+      which then allocates one or more logical addresses for it.
+
+  * interface changes:
+    * added a new setting, bMonitorOnly, which will start a monitor-only client
+
+  * fixed:
+    * ensure that we don't crash out when trying to stop a thread that hasn't
+      been started yet
+    * don't send a 'disconnected' alert when the close method is called
+    * use the correct source when transmitting an abort message as a reposonse
+      to a vendor command with id
+    * removed statics
+    * check the client version, not the server version in
+      libcec_configuration::operator==()
+    * cec-config: fix physical address detection
+    * LibCecSharp: fixed buffer overrun when copying libcec_configuration.
+      fixes crash when trying to save the configuration in the config gui.
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 14 May 2012 22:39:00 +0100
+
+libcec (1.6.1-2) unstable; urgency=low
+
+  * Build depends on pkg-config. (Closes: #669919)
+  * libudev-dev only optionally needed for Linux.
+
+ -- Andres Mejia <amejia@debian.org>  Sat, 21 Apr 2012 19:03:19 -0400
+
+libcec (1.6.1-1) unstable; urgency=low
+
+  [ Mario Limonciello ]
+  * New upstream version (LP: #982272)
+
+  [ Andres Mejia ]
+  * New release fixes build failure with GCC-4.7. (Closes: #667241)
+  * Bump to Standards-Version 3.9.3.
+
+ -- Andres Mejia <amejia@debian.org>  Sat, 21 Apr 2012 00:02:08 -0400
+
+libcec (1.3.2-3) unstable; urgency=low
+
+  * Make dpkg-source options default for packaging.
+
+ -- Andres Mejia <amejia@debian.org>  Tue, 10 Jan 2012 18:12:57 -0500
+
+libcec (1.3.2-2) unstable; urgency=low
+
+  * Add options to pass to dpkg-source.
+
+ -- Andres Mejia <amejia@debian.org>  Sun, 08 Jan 2012 22:59:34 -0500
+
+libcec (1.3.2-1) unstable; urgency=low
+
+  * Initial release. (Closes: #655143)
+
+ -- Andres Mejia <amejia@debian.org>  Sun, 08 Jan 2012 15:36:49 -0500
+
+libcec (1.6-3) unstable; urgency=low
+
+  * changed/added:
+    * cec-client: show the firmware build date if available in cec-client -l
+    * cec-client: don't activate the source when starting
+    * cec-client: group up the output of the 'scan' command, and add the
+      currently active source to the output
+    * log the libCEC version in the 'connected to the CEC adapter' log entry,
+      and add the firmware build date to the line if it's available, so all
+      relevant version info is available in 1 log line.
+    * async writes for CUSBCECAdapterCommunication. less locks and polls, more
+      speed
+    * added 'make docs' target, that updates the doxygen documentation
+
+  * interface changes:
+    * added operator == and != for libcec_configuration
+    * added GetResponseOpcode(cec_opcode opcode) to cec_command
+    * added the firmware build date to libcec_configuration, so it can be
+      displayed by the client too.
+    * added static CLibCEC::Alert() method and CEC_ALERT_CONNECTION_LOST value
+    * added a callback to handle menu state changes. if the callback method
+      returns 1, then the change is processed by the CCECBusDevice too. if 0,
+      then the CCECBusDevice will always have menu state 'activated', so
+      keypresses are routed. bugzid: 724
+    * added a default menu language to libcec_configuration and set this
+      language for devices controlled by libcec. bugzid: 69
+
+  * fixed
+    * CCECProcessor::IsActiveSource() - TV was never checked
+    * don't call the deprecated SetActiveView() method in cec-client
+    * request the active source if unknown in CCECProcessor::GetActiveSource()
+    * don't try to match a device with PA 0xFFFF.
+    * don't change the power status of a device when changing the stream path
+    * don't set the power status to 'powered off' when marking the source
+      managed by libcec as inactive, or the tv will might send a power control
+      keycode when making it active again, potentially shutting down the system
+    * potential segfault in CCECProcessor::GetDeviceByPhysicalAddress()
+    * stream path changes when changed to the TV source (PA 0)
+    * clear the unsupported features list in CCECBusDevice::ResetDeviceStatus()
+    * never mark vendor commands as unsupported (only some may be unsupported),
+      as well as some others that should never be marked unsupported
+    * don't retry in CCECCommandHandler if the command has been marked as
+      unsupported
+    * don't request the PA of devices when handling an incoming CEC command, or
+      it'll block things while waiting for a response. if that response never
+      comes, or comes late, then other incoming commands will be timed out
+      before they are handled
+    * optimisation - strip unneeded virtual keywords from top level
+      implementations
+    * use the vlcommandhandler for the primary device that is handled by libCEC
+      when a panasonic tv is detected, so delayed activate source commands are
+      using the correct handler. bugzid: 723
+    * set the power status of device controlled by libCEC to
+      CEC_POWER_STATUS_ON
+      instead of IN_TRANSITION_STANDBY_TO_ON. reset the device status of a
+      device if it was detected as removed. bugzid: 755
+    * potentially uninitialised values in cec_command
+    * delay the 'active source' command for panasonic, until the vendor command
+      that reports that the TV is powered on has been received. bugzid: 723
+    * only respond to Give Physical Address with Report Physical Address.
+      bugzid: 592
+      This fixes several reports of the TV improperly switching to the libcec
+      device after it has previously switched to another source. Fix confirmed
+      with Panasonic and also reported to be an issue with Samsung and
+      Philips.
+    * check whether callback methods are set to a valid ptr
+    * number of retries for polls
+    * win32: fix build in paths with spaces. bugzid: 730
+    * LibCecSharp: free the alert GC callback when cleaning up
+    * the wrong setting was being read when powering on devices
+    * close the connection when a comm error was detected, and notify the
+      client via an alert
+    * don't segfault when calling ThreadsWait() without a valid thread
+    * lib/platform: fixed memleak
+    * leak in CCECAdapterMessageQueue::Write
+    * don't send commands if we know them to be unsupported. bugzid: 725
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 18 Apr 2012 11:30:00 +0100
+
+libcec (1.6-2) unstable; urgency=low
+
+  * fixed:
+    * fixed typo in CUSBCECAdapterCommands::RequestSettings() that prevented
+      the settings from being read. the settings were still written, but never
+      read when bGetSettingsFromROM = 1.
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 18 Apr 2012 11:30:00 +0100
+
+libcec (1.6-1) unstable; urgency=medium
+
+  * changed/added:
+    * full firmware V2 support
+    * -o/--osdname argument for cec-client to set a custom osd name
+    * added the firmware version to cec-client's -l / --list-devices command.
+      bugzid: 631
+    * added power on command for Samsung AVR devices. bugzid: 361
+    * added buttoncode for 'channels list' on Samsung (0x96)
+    * don't check for the windows ddk when a prebuilt driver installer is
+      present
+    * respond to Get Menu Language. bugzid: 547. In the event that the menu
+      language is undefined in libcec (currently the default), the response
+      will be a feature abort.
+
+  * interface changes:
+    * added the firmware version to libcec_configuration (read-only). bumped
+      server version to 1.6.0. fixed 'unknown server version' message on
+      startup. bugzid: 631
+    * added a new setting to control whether to put the TV in standby when the
+      player is put in standby. added some missing bits (version numbers,
+      config) to LibCecSharp. bugzid: 558
+    * added an alert callback. bugzid: 462
+    * added bShutdownOnStandby to libcec_configuration. bugzid: 660. This
+      setting tells the client to shutdown when the TV switches off and is
+      complimentary to bPowerOffOnStandby, which tells the PC to suspend.
+      They are kept separate to maintain backwards compatability.
+
+  * fixed
+    * gcc 4.7 compilation
+    * poll doesn't have an opcode. bugzid: 591
+    * wait for MSGEND when data was received when opening the connection.
+      bugzid: 536
+    * mark the correct device as active source after a stream path change.
+      if the new address is not found, but the old address is, then mark the
+      old address as inactive. fixes TV switching back to the old active source
+      when it scans for devices. bugzid: 592
+    * ensure that the vendor ID is sent before trying to activate any SL device
+      bugzid: 574
+    * fixed possible crash when in CLibCEC::IsLibCECActiveSource() when libCEC
+      doesn't know which device is the active source. bugzid: 479
+    * correct handling CEC_USER_CONTROL_CODE_POWER. This ensures that the power
+      code always operates as a toggle, depending on the current state, and
+      that SetCurrentButton is always called for a valid user control code.
+      bugzid: 570
+    * frequency wasn't checked in GetTimeMs(), leading to incorrect wait times
+      on some windows systems
+    * refactored USB adapter communication. less locks, shorter locks, added
+      documentation, lots of clean ups and no more incoming messages that are
+      skipped
+    * the destructor of CSerialSocket didn't call Close()
+    * added guards in CSerialPort
+    * reset m_socket to INVALID_SERIAL_SOCKET_VALUE after closing the
+      connection
+    * always wait for thread exit in CThread's desctructor
+    * crash on exit after GetDeviceInformation()
+    * check whether the destination is valid before setting anything in
+      m_bWaitingForAck. fixes heap corruption and crash on exit. bugzid: 479
+    * bUseTVMenuLanguage from libcec_configuration wasn't copied in
+      SetConfiguration(), so this setting was reset to the default value
+      (enabled) every time. bugzid: 617
+    * request the vendor id of a device if needed when the device status is
+      changed into 'present'. bugzid: 361
+    * give priority to messages from the TV. removed the global lock in
+      CCECProcessor when sending. this is no longer needed. bugzid: 238
+    * add some bounds checking to the HDMI port number. bugzid: 508
+    * fixed usbser.sys copying in the driver .INF. bugzid: 503
+    * only update the physical address when it has actually changed. bugzid:
+      672
+    * moved the static variables in os-threads from the header to a separate
+      cpp file, or it could lead to problems when included multiple times
+    * don't send an active source command when the physical address couldn't be
+      set, or it might confuse other CEC devices
+    * serial socket timeouts. bugzid: 654
+    * fixed possible crash when trying to request a vendor id of a device when
+      the address of libCEC isn't known yet. bugzid: 654
+    * extra guard so no commands are transmitted without a valid initiator.
+      bugzid: 654
+    * moved the timed ping to a separate thread. bugzid: 654
+    * persist settings directly when they're changed, only persist settings
+      that actually changed, only instruct the device to persist the settings
+      in eeprom when something changed, and don't persist settings on exit.
+      bugzid: 715
+    * cec-config-gui: persist settings both in the eeprom and in the settings
+      xml file
+    * validate the input in CCECProcessor::IsActiveSource(). fixes potential
+      crash when the active source isn't known. bugzid: 671
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 16 Apr 2012 18:03:00 +0100
+
+libcec (1.5-4) unstable; urgency=low
+
+  * changed/added:
+    * OS-X installation requirements and pointer
+    * full v2 firmware support:
+      * ping the adapter every 15 seconds. bugzid: 541
+      * added v2 msgcodes. bugzid: 543
+      * implemented the write methods for the v2 configuration. bugzid: 543
+      * included the logical addresses in the persisted configuration for v2.
+        bugzid: 543
+      * persist the configuration before closing the connection. only try to
+        persist the configuration when talking to a v2 firmware. bugzid: 543
+      * added GetSetting() to CUSBCECAdapterCommunication. bugzid: 543
+      * read the persisted settings from the ROM, and update it in
+        libcec_configuration if found. bugzid: 543
+      * cec-client: set bGetSettingsFromROM to 1 in cec-client. bugzid: 543
+      * cec-client: only read persisted EEPROM settings when -r or --rom is
+        provided as cmdline arg. bugzid: 543
+      * call SetControlledMode(false) as last command when closing the
+        connection in v2. bugzid: 542
+      * initial FreeBSD support: simply try to use ttyU*
+
+  * fixed:
+    * set controlled mode and retry to send the previous command if it failed
+      with MSGCODE_COMMAND_REJECTED
+    * m_iLineTimeout was never initialised and used. fixes MSGCODE_REJECTED
+      when transmitting a message and incorrect line timeouts being used
+    * mac configure compile bugzid: 157
+    * cec-config-gui: fixed application exit when the user clicked 'no' when
+      asked to reconnect. bugzid: 556
+    * only wait for multiple 'command accepted' response when sending a
+      transmit command, and only to 1 in other cases. bugzid: 543
+    * set the correct logical address mask before switching to autonomous mode.
+      bugzid: 543
+    * re-added SetLineTimeout(). bugzid: 543
+    * CUSBCECAdapterCommunication::SetControlledMode checked for the wrong sent
+      state
+    * os-x: don't add 0.5 before dividing in GetTimeMs()
+    * os-x: struct timespec now values weren't set correctly
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 16 Mar 2012 10:12:00 +0100
+
+libcec (1.5-3) unstable; urgency=low
+
+  * fixed:
+    * OS-X compilation
+    * default to firmware version 1 after 3 tries. some versions didn't send a
+      version.
+    * fixed cec-config win32 compilation
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sat, 03 Mar 2012 15:21:00 +0100
+
+libcec (1.5-2) unstable; urgency=low
+
+  * changed/added:
+    * added Toshiba's vendor id, and set the device ID of the primary device to
+      Toshiba's and transmit it when starting
+    * lock in SyncedBuffer
+    * added a timeout to StopThread()
+    * also add commands to unsupported features when receiving
+      CEC_ABORT_REASON_REFUSED
+    * cec-config-gui: set cbPortNumber enabled when the physical address
+      override isn't checked instead
+    * cec-config-gui: added support for the new 'send inactive source' setting
+
+  * interface changes:
+    * added an 'send inactive source' option to libcec_configuration, only
+      supported by client/server 1.5.1 and up. bugzid: 439
+    * added a command to the interface to start the bootloader directly,
+      without going through all checks. bugzid: 218
+    * LibCecSharp: implemented support for the new 'send inactive source'
+      setting
+
+  * fixed:
+    * don't send an updated configuration when libCEC hasn't been initialised
+      fully. bugzid: 459
+    * don't send an updated configuration back when initialising. let the
+      client call the GetCurrentConfiguration() method. bugzid: 459
+    * configuration updates from libCEC. bugzid: 459
+    * fixed accidental double deref. the method parameter already does that.
+      github #24
+    * use CLOCK_MONOTONIC for timing info, since gettimeofday is affected by
+      ntp and by manually adjusting the system time
+    * the timeout value of pthread_cond_timedwait has to be referenced to
+      CLOCK_REALTIME
+    * don't add data to the input buffer in CUSBCECAdapterCommunication before
+      it's fully initialised
+    * fixed return value of CUSBCECAdapterCommunication::ParseMessage(). fixes
+      messages not being parsed in certain occasions
+    * don't try to transmit when the processor is being stopped
+    * set the server version in the LibCEC's constructor, since this is
+      checked by clients. fixes 'invalid libCEC version' popup when inserting
+      the adapter
+    * don't wait for the full timeout to pass in CCECProcessor::
+      OpenConnection(), but retry to connect 2 times. fixes 'port busy' errors
+      when initialising libCEC. bugzid: 436
+    * use the correct Sleep() method in CCECProcessor::OpenConnection(). the
+      thread hasn't been started there yet, so the sleep wasn't working. fixes
+      'device or resource busy' when plugging in the adapter. bugzid: 436
+    * check the adapter ping and firmware before starting the reader thread, so
+      we really leave the com port alone for a second when it fails because of
+      a busy error. bugzid: 436
+    * ensure that the connection is really closed before retrying to connect.
+      bugzid: 436
+    * LibCecSharp: recreate the delegates properly when (re)connecting to
+      LibCecSharp
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 28 Feb 2012 21:19:00 +0100
+
+libcec (1.5-1) unstable; urgency=low
+
+  * changed/added:
+    * a new libcec_configuration structs, which allows the client app to pass
+      a number of new options, like waking multiple devices on startup,
+      overriding the vendor id, etc.
+    * a new configuration GUI for Windows (.NET). this allows you to set
+      libCEC's configuration for XBMC in a convenient GUI.
+    * a CLI configuration tool (unfinished) for other platforms. will be
+      finished in an update.
+    * implemented power up for LG devices other than a TV
+    * win32: don't install libcec to the system directory by default, and
+      delete previous (testing) copies if present
+    * wait for multiple responses, not just for one at a time
+    * set the ackmask to 0 when closing the connection
+    * don't send 'image view on' when calling SetActiveSource()
+    * don't send power on, acitve source and standby commands by default in
+      cec-client
+    * platform: added CTryLockObject
+    * platform: added an Init() method in CTimeout, so it can be reset
+
+  * interface changes:
+    * added a new initialiser method: CecInitialise()/cec_initialise(), that
+      accepts a "libc_configuration" struct as parameter. this way, the
+      signature of the init method can stay the same when adding new options.
+      in LibCecSharp, the new method appears as a new constructor.
+    * added CanPersistConfiguration()/cec_can_persist_configuration()
+    * added PersistConfiguration()/cec_persist_configuration()
+    * added GetCurrentConfiguration()/cec_get_current_configuration()
+    * added SetConfiguration()/cec_set_configuration()
+    * added GetLogicalAddresses()/cec_get_logical_addresses(): returns the list
+      of addresses controlled by libCEC
+    * added RescanDevices()/cec_rescan_devices(): lets libCEC force polls to
+      all logical addresses.
+    * added a callback that is called when libCEC's configuration changed.
+    * moved the autodetect address api call to libcec_configuration. only send
+      power up commands to non-tv devices when the power state is not
+      on/transition->on. let players call the power up/power down command.
+    * return the anynet return keycode directly instead of translating it to
+      'return' for v1.5.0+ clients
+    * extracted CecSharpTypes.h in LibCecSharp. LibCecSharp is now in the
+      CecSharp namespace
+    * include the local cectypes.h in cec.h and cecc.h instead of system wide
+    * deprecated GetLibVersion() methods. use libcec_configuration instead
+    * removed deprecated CECCreate() method
+    
+  * fixed:
+    * fixed a lot of LG specific issues
+    * fixed OS-X compilation. credits: Dustin Cooper
+    * fixed a couple of possible deadlocks, e.g. when closing the connection
+      while receiving data
+    * cleaned up existing code
+    * libCEC no longer puts incoming data in a fifo buffer, but tries to
+      process it directly, which fixes issues like libCEC blocking processing
+      new commands while waiting for transmission acks.
+    * 'unsupported command' marking in CCECBusDevice
+    * ensure that the ackmask is always set to 0 when closing the connection
+      and that the call doesn't block the Close() call
+    * don't try to read or write in CUSBCECAdapterCommunication when the
+      connection has been closed
+    * LibCecSharp: added quotes to the linker statement for libcec.lib. fixes
+      compilation in paths with spaces. closes #20
+    * LibCecSharp: set the callback methods in libcec to NULL before closing
+      the connection, since these might already have been destroyed in .NET
+    * LibCecSharp: delete the internal callback struct when closing the
+      connection
+    * LibCecSharp: pass correctly formatted logical address lists
+    * ensure that the vendor id is requested first when requesting info from a
+      device, so we are using the correct handler
+    * keep the 'busy state' of the command handler in CCECBusDevice
+    * poll the next device when the current is handled by libCEC.
+    * check the vendor id of a device before sending a power on command
+    * ensure that there always is at least one device type set
+    * transmit a keypress and key release as power on command when the target
+      device isn't the TV
+    * don't do a full reinit when not needed
+    * fix active source switches for the standard CEC implementation
+    * ensure that we don't send data to ourself
+    * check whether the port is open, not whether libCEC is initialised in
+      Transmit()
+    * platform: fixed return value from CCondition::Wait()
+    * platform: don't broadcast but wake one thread in
+      CProtectedSocket::MarkReady()
+    * platform: include stdint.h in windows/os-types.h instead of typedef'ing
+      ints
+    * platform: fixed tcp socket error handling and return value.
+    * platform: fixed return values of socket operations in lib/platform
+    * platform: added predicate in CCondition
+    * deleted the signed driver from the tree, since that doesn't work. let the
+      installer create a new signed driver on the production build system
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 19 Feb 2012 01:04:00 +0100
+
+libcec (1.4-4) unstable; urgency=low
+
+  * changed/added:
+    * added tcp client sockets to lib/platform (WIP)
+    * clean up lib/platform
+    * added: set controlled mode on after opening a connection to the adapter
+      (for firmware v2)
+    * added an IAdapterCommunicationCallback interface an use a callback method
+      to pass newly received cec_commands to CCECProcessor
+    * added "driver only" and "driver + libcec" sections to the installer
+    * added a signed driver
+    * created a separate driver installer, which is included in the libCEC
+      installer. uninstalls the old unsigned version of libCEC and the driver
+      when it's found and installs the new one in C:\Program Files(x86)\
+      Pulse Eight\USB-CEC Adapter.
+    * don't sign development binaries with a temporary key. devs can do that
+      themselves when they want LibCecSharp in the GAC
+  * interface changes:
+    * added SetStreamPath()/cec_set_stream_path_logical()/
+      cec_set_stream_path_physical() to the interface, to send a
+      "set stream path" command over the CEC bus, used to activate another
+      source.
+  * fixed:
+    * transmit 'menu state activated' after the stream path has been set to a
+      device that is handled by libCEC. should fix remote commands not working
+      properly on Panasonic TVs and after another source has been active.
+      bugzid: 233
+    * set the ackmask to 0x0 when trying to find a free logical address
+    * keep trying to reconnect to the com port until the timeout runs out.
+      bugzid: 230
+    * wait 500 ms before trying to retransmit a command. always wait for the
+      result of a transmission in CCECCommandHandler::Transmit()
+    * receive and send full cec_commands, not CCECAdapterMessages in
+      CAdapterCommunication. extract an IAdapterCommunication interface. fixed
+      potentially missed data in CAdapterCommunication
+    * close and delete the connection when the processor thread ends. fixes
+      reconnect after standby (access denied / connection already opened)
+    * don't replace handlers when not initialised, or the primary device's
+      logical addres isn't known yet, which can lead to crashes. don't call
+      handlers directly in CCECProcessor without holding a lock on them
+    * fixed possible crash when command handler were switched while it was
+      being used
+    * keep the mutex locked when calling ReplaceHandlers() in CCECProcessor
+    * win32: also timeout when data is received in SocketRead()
+    * win32: fixed < vista runtime and compilation
+    * win32: ping the adapter and request the firmware version in
+      CUSBCECAdapterCommunication instead of CCECProcesssor. fixes failed
+      libCEC inits
+    * win32: fixed crash on exit in LibCecSharp
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 6 Feb 2012 14:26:00 +0100
+
+libcec (1.4-3) unstable; urgency=low
+
+  * fixed:
+    * try to ping the device and grab the firmware version until the connect
+      timeout runs out. fixes failed reconnect after standby, when the adapter
+      is still being initialised
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 27 Jan 2012 13:05:00 +0100
+
+libcec (1.4-2) unstable; urgency=low
+
+   * changed/added:
+     * added a firmware flash script for linux.
+       usage: ./support/cec-flash-device.sh /path/to/firware.hex
+     * refactored threading/locking - added windows native instead of
+       pthread-win32, so we can compile native x64 too
+     * check whether the adapter responds when connecting to it and report the
+       firmware version of the adapter after connecting
+     * moved create-installer.cmd to support/
+     * completely removed AM_SILENT_RULES
+   * interface changes:
+     * compile LibCecSharp against .NET framework 2.0 and sign the assembly
+   * fixed:
+    * only the key release events were sent, not keypresses, which appeared in
+      clients as laggy keypresses
+    * fixed reconnect after standby
+    * wait for active tranmission to finish when opening a connection to the
+      adapter. fixes initialisation errors
+    * set the default transmit timeout properly instead of using 0
+    * fixed possible deadlock because of a negative timeout in
+      CAdapterCommunication::WaitForTransmitSucceeded()
+    * fixed error message in cec-client (unable to open the device on port ...)
+    * exit cec-client after entering bootloader mode
+    * MSGCODE_START_BOOTLOADER doesn't respond with MSGCODE_COMMAND_ACCEPTED
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 25 Jan 2012 23:28:00 +0100
+ 
+libcec (1.4-1) unstable; urgency=low
+
+   * changed/added:
+     * added the vendor id for Sony
+     * always refresh the power state of a device when it hasn't been updated
+       for 30 seconds
+     * do silent builds by default
+   * interface changes:
+     * added optional callback methods to libCEC. enable them by calling
+       EnableCallbacks(ICECCallbacks *callbacks) /
+       cec_enable_callbacks(ICECCallbacks *callbacks). after this method is
+       called, the GetNext...() methods will not return any data
+     * added the same callbacks to LibCecSharp. implement CecCallbackMethods
+       and override the methods in there
+   * fixed:
+     * use the given timeout when trying to open a connection to the CEC
+       adapter
+     * resolved difference between method name in LibCECC.cpp and cecc.h.
+       credits: Doug Johnson
+     * don't transmit physical addresses while holding a lock in CCECProcessor
+     * don't hold a lock when sending an active source message.
+     * unload libCEC when the lib version is invalid
+     * "unused" warnings suppressed     
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 12 Jan 2012 19:06:00 +0100
+ 
+libcec (1.3-3) unstable; urgency=low
+
+   * changed/added:
+     * place in libudev include in an extern C block. fixes compilations on
+       older libudev versions (e.g. on Hardy). closes #2. credits @fbuenemann
+     * added pkg-config to the dependencies list. issue #15
+     * updated README. closes #14
+     * added a script that tests some basic functions of the CEC adapter:
+       /support/cec-test-device.sh
+   * fixed:
+     * don't make libCEC the active source when changing the physical address.
+       don't send active source messages on startup, when not the active source
+       fixes unwanted device power ups
+     * replace the command handler directly after receiving a changed vendor
+       id. change the primary type from recording device to playback device
+       for panasonic TVs
+     * don't send a deck status update when sending an active source message
+       for panasonic TVs
+     * only switch handlers once when using the generic handler
+     * don't switch handlers when not needed
+     * hold a lock in CCECProcessor::SetHDMIPort()
+     * don't send deck status updates when sending an active source message by
+       default
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 3 Jan 2012 22:48:00 +0100
+
+libcec (1.3-2) unstable; urgency=low
+
+   * changed/added:
+     * copy libcec.dll to the XBMC installation dir when XBMC is found
+     * disable background polling. let the client request this info when needed
+     * update the power status of a device when it's set to
+       CEC_POWER_STATUS_IN_TRANSITION_STANDBY_TO_ON
+     * wait for the correct response when requesting something, not just any
+       response
+     * don't keep trying the same command/request after receiving a feature
+       abort message
+   * interface changes:
+     * change the previously unused boolean parameter in volume control methods
+       to bSendRelease, and only send a key release when it's true. default to
+       true
+   * fixed:
+     * don't send the power up/down keypress to listeners when in the initial
+       device state (powered off). fixes unexpected shutdown in XBMC when
+       connecting to the CEC adapter.
+     * send a 'menu state activated' command when starting up. bugzid: 113
+     * don't wait for a response when not needed
+     * don't hold a lock while waiting for a response. fixes failed libCEC
+       inits and slow responses
+     * don't replace a command handler when it's being used. fixes possible
+       crash on startup
+     * don't try to do anything before the processor thread has started
+     * don't transmit active source messages when the physical address is
+       still 0xFFFF
+     * don't init the default handler before the physical address is known
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 29 Dec 2011 03:05:00 +0100
+
+libcec (1.3-1) unstable; urgency=low
+
+  * changed/added:
+    * make libudev optional. if libudev is not available on linux, adapter
+      autodetection will also not be available. fixes compilation on Hardy/ATV1
+    * added a C++ CLR wrapper for libCEC, so libCEC can be used by any .NET
+      language
+    * added vendor support for LG
+    * added vendor support for Philips
+    * added vendor support for Yamaha
+    * added vendor support for Onkyo
+    * added 'scan' command to cec-client, that displays info about devices on
+      the bus. made all ToString() methods available on the interface.
+    * added '-s' or '--single-command' to cec-client. starting cec-client with
+      this parameter executes a single command in cec-client and does not power
+      on devices on startup and power them off on exit. this way, you can use
+      cec-client in a shell script. since there's some handshaking involved at
+      startup, this is not very fast. to execute a command and only display the
+      result and any error/warning, execute it with
+      RESULT=`echo command | cec-client -s -d 3` (on linux/osx, win32 batch
+      files are a bit different)
+    * added HDMI port ('-p' or '--port') and base device ('-b' or '--base') to
+      cec-client's parameters
+    * handle image view on and text view on
+    * handle routing information and report physical address opcodes
+    * handle audio status updates
+    * send ping and bootloader commands via the output queue
+    * scan the CEC bus for devices when starting libcec
+    * pass all commands that are directed at libcec to listeners
+  * interface changes:
+    * added GetActiveSource()/cec_get_active_source()
+    * added IsActiveSource()/cec_is_active_source()
+    * added GetDevicePhysicalAddress()/cec_get_device_physical_address()
+    * added GetDeviceOSDName()/cec_get_osd_name()
+    * added SendKeypress()/cec_send_keypress() and SendKeyRelease()/
+      cec_send_key_release()
+    * added VolumeUp()/cec_volume_up(), VolumeDown()/cec_volume_down(),
+      MuteAudio()/cec_mute_audio()
+    * added GetActiveDevices()/cec_get_active_devices(), IsActiveDevice()/
+      cec_is_active_device(), IsActiveDeviceType()/cec_is_active_device_type().
+    * added SetHDMIPort()/cec_set_hdmi_port(). devices are now detected on load
+      and when a device with the same physical address is detected, libcec will
+      use the selected hdmi port on that device. should fix source selection on
+      other devices, like an amplifier
+    * added a hook in libcec for physical address autodetection
+  * fixed:
+    * don't request the physical address from the tv (it's always 0x0000)
+    * set the proper ackmask before doing anything else
+    * don't unlock the transmit mutex in CCECProcessor while waiting for an
+      answer
+    * fix device polling
+    * refactor CEC read/write. keep a single lock for all writes, not one per
+      device
+    * ignore other data while waiting for a response
+    * retry failed tranmissions
+    * don't delete a message before it's been sent when starting the bootloader
+    * or when sending a ping
+    * fixed possible segfault when switching the command handler after a vendor
+    * id changed
+    * handle audio opcodes correctly
+    * inactive source should be directly addressed at the TV
+    * don't report a changed physical address when it hasn't changed
+    * routing information sets the stream path, not the physical address
+    * don't scan the whole bus in CCECProcessor::IsActiveDeviceType()
+    * don't request the vendor id from devices that are handled by libcec
+    * mark device status as present when a command was received from a device
+    * always send a power on command in CCECBusDevice::PowerOn()
+    * don't request updates statusses unless needed
+    * report physical address sends 3 parameters, not 2. check whether the
+      device type is correct
+    * devices can send vendor commands from other vendors, so don't assume the
+      device is of a certain vendor when it sends commands with a vendor id
+    * thread safety fixes. bugzid: 19
+    * clear any previous input when opening a connection to the adapter.
+      bugzid: 54
+    * use the correct source address in CSLCommandHandler::HandleVendorCommand()
+    * uncorrected CEC_OPCODE_DEVICE_VENDOR_ID. closes #5
+    * renamed enum methods. fixes potential macro collision with isset().
+      thanks davilla
+    * don't change the active device when receiving stream path changed
+      messages. fixes wrong source selection when powering after the TV.
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 09 Dec 2011 12:16:00 +0100
+
+libcec (1.2-1) unstable; urgency=low
+
+  * bugfixes:
+    * pass the deck_control command to libcec listeners
+    * check whether the initiator is valid in CCECProcessor::ParseCommand().
+      fixes possible segfault when parsing invalid data
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sat, 12 Nov 2011 13:36:00 +0100
+
+libcec (1.1-3) unstable; urgency=low
+
+  * fixed return value in CCECProcessor::SetStreamPath(), which prevented
+    active source and menu state from being sent
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 11 Nov 2011 23:36:00 +0100
+
+libcec (1.1-2) unstable; urgency=low
+
+  * forgot to update the headers to v1.1
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 11 Nov 2011 18:56:00 +0100
+
+libcec (1.1-1) unstable; urgency=low
+
+  * interface changes:
+    * added logical address autodetection and let libcec handle multiple types
+      simultaniously. for logical address autodetection, you have to use
+      CECInit()/cec_init_typed() instead of CECCreate()/cec_init()
+    * added SetActiveSource()/cec_set_active_source() to the interface.
+      deprecated SetActiveView()/cec_set_active_view()
+    * added SetMenuState()
+    * added PollDevice()/cec_poll_device()
+    * removed duplicate method SetActiveSource() / SetActiveView()
+    * added SetDeckControlMode() and SetDeckInfo()
+  * fixed:
+    * added vendor detection for panasonic and broadcast active view and set
+      menu state when a panasonic device sets the stream path. thanks for the
+      pointer cptcoconut.
+    * added vendor code for pioneer
+    * osd string is 13 chars max. don't send more
+    * send the correct cec version for each device
+    * switch to panasonic specific cec implementation if a panasonic device was
+      detected
+    * send the correct device type in TransmitPhysicalAddress()
+    * send a reply from the correct device when the stream path is requested
+    * opcode 0x80 means the stream path changed, not the physical address
+    * don't poll for a vendor ID in monitoring mode
+    * fixed parameter parsing in SetVendorId()
+    * buffer up commands that are received while waiting for an ack. only send
+      'active source' message for the actual active source
+    * win32: prepend the com port path with '\\.\', so com ports > 9 can be
+      accessed. thanks smolesen
+    * audio systems cannot be an active source, so don't transmit active
+      source message from this device
+    * only send 'active source' when powered on
+    * only set the osd name for the primary device. use default values for
+      others
+    * increase physical address with 0x100 per device
+    * win32: removed unneeded afxres.h include in the resource files, which
+      is not present when using studio express. thanks Ghuron
+    * fixed C headers
+    * mark the active source as active and other devices as inactive
+    * set the power status to 'on' when receiving CEC_USER_CONTROL_CODE_POWER
+    * transmit the menu state as (active) when the stream path is set
+  * changed:
+    * changed copyright of boblight files with permission of the original
+      author
+    * partial handling of audio related opcodes
+    * more consistent log messages
+    * set a device type and name for each CCECBusDevice
+    * keep a power and menu state per device
+    * renamed all Broadcast...() and Report...() methods to Transmit...()
+    * renamed SetOSDString() to TransmitOSDString()
+    * changed debug level of 'did not receive ack' from error to debug
+    * only set the power status to 'on' for the primary device
+    * moved method decriptions from cecc.h to cec.h
+    * only send a power on command when a device isn't on already and set
+      the power state to CEC_POWER_STATUS_IN_TRANSITION_STANDBY_TO_ON while
+      powering on
+    * handle CEC_OPCODE_STANDBY
+    * handle CEC_OPCODE_ACTIVE_SOURCE
+    * always start in standby mode and let the tv (or other device) send the
+      power on command
+    * renamed the last few enums
+    * handle deck related opcodes.
+    * added TransmitVendorId(), but only transmit the id if it's not set to 'unknown'
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 11 Nov 2011 17:42:00 +0100
+
+libcec (1.0-1) unstable; urgency=low
+
+  * interface changes:
+    * set lib interface version back to 1.0 and rename GetLibVersion() to
+      GetLibVersionMajor() and GetMinVersion() to GetMinLibVersion()
+    * added GetLibVersionMinor()/cec_get_lib_version_minor() and set the minor
+      version number to 1
+  * fixed:
+    * samsung's vendor specific remote keypresses don't send key releases. added
+      call to AddKey() directly after the keypress
+    * always reset the button press time in CLibCEC::AddKey()
+    * always wait for a signal in CCECProcessor::Transmit()
+  * changed:
+    * drop shared_ptr and use a normal pointer. removed boost dependency
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 04 Nov 2011 00:14:00 +0100
+
+libcec (0.8-2) unstable; urgency=low
+
+  * added 'libboost-dev' to build deps
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 01 Nov 2011 23:31:00 +0100
+
+libcec (0.8-1) unstable; urgency=low
+
+  * interface changes:
+    * added GetDevicePowerStatus()/cec_get_device_power_status()
+    * added GetDeviceVendorId()/cec_get_device_vendor_id()
+    * added GetDeviceMenuLanguage()/cec_get_device_menu_language()
+    * added GetDeviceCecVersion()/cec_get_device_cec_version()
+    * added SwitchMonitoring()/cec_switch_monitoring() to the interface. when
+      monitoring is enabled, the device will only log the data it received,
+      but will not respond to any message
+    * removed timeout parameter in Transmit() and included the ack timeout in
+       the cec_command struct
+    * made the vendor id -> vendor name translation available
+    * made CEC_LOG levels powers of 2
+    * introduced CEC_LOG_TRAFFIC log level
+  * fixed:
+    * set the correct ackmask on startup
+    * wait for ack while keeping a lock
+    * wait for the processor thread to start before continueing on startup
+    * wait for messages to be transmitted before continueing in
+      CCECProcessor::Transmit()
+    * only set the logical address once when it has changed
+    * correct source for broadcast messages
+    * win32: create Release type installer
+  * changed:
+    * make all reads and write in CAdapterCommunication go through buffers.
+    * poll for a vendor ID of connected devices and switch to a non-standard
+      CEC implementation if needed.
+    * added vendor detection of Samsung and LG devices
+    * handle samsung remote command 'return'
+  * cec-client:
+    * added -la and --logical-address to the command line params
+    * added -d and --log-level params to cec-client
+    * added -sf and --short-log-file, which only log the actual messages, not
+      the level and timestamp
+    * added -f and --log-file parameters to cec-client
+    * added option to change the log level to cec-client
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 01 Nov 2011 22:58:00 +0100
+
+libcec (0.7-1) unstable; urgency=low
+
+  * send a keypress with 0 duration when a key is pressed and with a duration
+    set when it's released
+  * added SetOSDString() to the interface (not supported by all tvs)
+  * fixed: 'routing change' is a broadcast message. log routing changes, but
+    don't send a 'set active view' message, so the active input won't be
+    changed
+  * log keypresses in the debug log
+  * added 'pa' command to cec-client, to change the physical address
+  * added SetPhysicalAddress()/cec_set_physical_address() to the interface, so
+    the HDMI port number to use can be changed
+  * fixed: put the message processing code from WaitForAck() in ParseMessage().
+    fixes missing incoming message logging of non-data messages when not
+    waiting for an ACK
+  * added 'txn' command to cec-client. same as 'tx', but doesn't wait for ACK
+    before returning
+  * fixed: set initiator and destination first in cec_command::push_back().
+    fixes 'tx' command in cec-client
+  * fixed: keep trying to connect while iTimeout isn't reached (default 10
+    seconds). fixes exit with a 'permission denied' error when the device isn't
+    ready yet. remove CEC_SETTLE_DOWN_TIME
+  * fixed: don't call SetActiveView() when reporting the power status. fixes
+    loop which causes some TVs to report failed connections
+  * fixed: eom was not being parsed when receiving MSGCODE_FRAME_DATA. fixed.
+  * fixed: add the device type as parameter when sending the physical address.
+    thanks bobo1on1
+  * fixed: typo in libcec.pc.in
+  * added optional strLib parameter to LoadLibCec(), so the location of the
+    shared library can be specified
+  * only link cec-client against ld. use AC_SEARCH_LIBS instead of AC_CHECK_LIB
+  * use int instead of bool on the public C interface and remove stdbool.h include
+  * renamed: CECExports.h => cec.h, CECExportsC.h => cecc.h, CECLoader.h =>
+    cecloader.h, CECTypes.h => cectypes.h
+  * updated debian package. split up libcec and libcec-dev
+  * fixed: changed to use dlopen instead of static linkage. shuffled headers a
+    bit. bumped interface to version 7
+  * removed 'rt' from libraries. it's not needed (anymore)
+  * fixed: reset the active view after a routing change. issue #1
+  * fixed: changed attached license to be GPLv2 instead of GPLv3 this was an
+    error as libCEC is licensed GPLv2 not GPLv3 thanks @garbear
+  * added contributors link
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 14 Oct 2011 17:34:00 +0200
+
+libcec (0.6-1) unstable; urgency=low
+
+  * bumped interface version to 6
+  * fixed packet output (reporting the OSD name correctly now)
+  * refactored packet structs: split up in cec commands and adapter messages
+  * fixed i/o timings
+  * added Darwin support (thanks Davilla!)
+  * fixed WaitForAck()
+  * fixed possible deadlock when starting a new thread
+  * implemented vendor id and device class parsing. full detection will follow
+  * added "on" and "standby" commands to the test client
+  * retransmit packets if needed
+  * fix GetTimeMs() on linux
+  * added timestamp to log messages
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sun, 09 Oct 2011 15:15:00 +0200
+
+libcec (0.5-1) unstable; urgency=low
+
+  * bumped interface version to 5
+  * don't pass std::string and std::vector accross the interface
+  * fixed heap corruption crashes on windows
+  * fixed some memory leaks
+  * reset all structs to default values before doing with them
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 07 Oct 2011 22:00:00 +0200
+
+libcec (0.4-3) unstable; urgency=low
+
+  * fixed reconnect
+  * fixed some threading related bugs
+  * fixed deadlock on exit
+  * fixed wrongly reported physical address
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 06 Oct 2011 00:19:00 +0200
+
+libcec (0.4-2) unstable; urgency=low
+
+  * fixed int parameter sizes and some signed/unsigned warnings
+  * check whether m_port isn't NULL in ReadFromDevice
+  * stop the processor thread and delete the CSerialPort instance on exit
+  * added mutex in CSerialPort
+  * fix segfault on exit
+  * renamed libPlatform -> platform.
+  * stuck everything from libCEC in the CEC namespace to avoid namespace
+    polution
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 04 Oct 2011 23:45:00 +0200
+
+libcec (0.4-1) unstable; urgency=low
+
+  * bumped interface version to 4
+  * timeout parameter removed from Close()/cec_close(). return type changed to
+    void
+  * added cec_destroy() method
+  * removed timeout parameter from Transmit()
+  * change the default argument of PowerOnDevices() to CECDEVICE_TV
+  * removed PowerOffDevices(). use StandbyDevices() instead
+  * removed obsolete methods from the interface
+  * fixed bug: pthread_cond_wait was called without the mutex locked
+  * fixed possible deadlock: don't send messages and wait for an ack with the
+    mutex locked in CCECParser
+  * created a separate reader thread and fixed the 'lock timeout' bug
+  * testclient: use CECDEVICE_TV instead of the default argument
+    (CECDEVICE_BROADCAST) for PowerOnDevices() and PowerOffDevices()
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 04 Oct 2011 00:48:00 +0200
+
+libcec (0.3-1) unstable; urgency=low
+
+  * added device detection support for Windows
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sun, 02 Oct 2011 12:09:33 +0200
+
+libcec (0.2-1) unstable; urgency=low
+
+  * added a Close() method to the interface
+  * Added CEC command that were received by the adapter in a buffer that can be
+    read by a client with GetNextCommand()/cec_get_next_command(). added a
+    'help' command to the test client, that displays all available commands
+  * Fixed setting the ackmask. deprecated SetAckMask()/cec_set_ack_mask(). use
+    SetLogicalAddress()/cec_set_logical_address() instead. add 'la' command to
+    the testclient to set the logical address of the cec adapter
+  * Added optional logical and physical address parameters to
+    LoadLibCec()/cec_init() on the interface. fixed wrongly placed namespace
+    close tag in CECExports.h. updated interface documentation. bumped
+    interface version to 2.
+  * fixed hardcoded ackmask in SetAckMast(). set a shorter display name in the
+    test client. the previous one was too long and being rejected
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 28 Sep 2011 01:33:00 +0200
+
+libcec (0.1-1) unstable; urgency=low
+
+  * Initial release v0.1
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 28 Sep 2011 23:55:48 +0200
