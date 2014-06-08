@@ -60,7 +60,7 @@ deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
-LOCAL_CHROOT_PKGS="osmc-appletv-darwinx"
+LOCAL_CHROOT_PKGS="osmc-appletv-darwinx libcrystalhd-dev"
 add_apt_key "${DIR}"
 verify_action
 echo -e "Updating sources"
