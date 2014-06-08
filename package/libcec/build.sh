@@ -21,4 +21,4 @@ mv files/usr/include  files-dev/usr/
 fix_arch_ctl "files/DEBIAN/control"
 fix_arch_ctl "files-dev/DEBIAN/control"
 dpkg -b files/ libcec.deb
-dpkg -b files-dev libcec.deb
+dpkg -b files-dev libcec-dev.deb
