@@ -60,6 +60,7 @@ deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
+mount -t proc proc "${DIR}"/proc
 LOCAL_CHROOT_PKGS="osmc-appletv-darwinx libcrystalhd-dev"
 add_apt_key "${DIR}"
 verify_action
@@ -72,6 +73,7 @@ verify_action
 echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
+umount "{DIR}"/proc
 
 # Perform filesystem cleanup
 
