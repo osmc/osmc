@@ -83,7 +83,7 @@ function build_deb_package()
 }
 
 COMPILER_PKGS="build-essential git subversion wget nano kernel-package"
-FS_PKGS="parted kpartx"
+FS_PKGS="parted kpartx libblkid-dev"
 REMOTE_PKGS="libusb-dev"
 XBMC_PKGS=""
 BUILDROOT_PKGS="rsync texinfo libncurses-dev whois unzip"
