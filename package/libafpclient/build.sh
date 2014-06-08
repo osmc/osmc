@@ -11,7 +11,7 @@ if [ -d files/usr ]; then rm -rf files/usr; fi
 if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 cd src
 make clean
-./configure
+./configure --prefix=/usr
 make
 make install DESTDIR=${out}
 cd ../
