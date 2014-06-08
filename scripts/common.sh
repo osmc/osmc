@@ -24,6 +24,15 @@ function enable_nw_chroot()
 	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
 }
 
+function add_apt_key()
+{
+	echo -e "Adding apt key"
+	chroot ${1} wget http://apt.osmc.tv/apt.key -O /tmp/key
+	chroot ${1} apt-key add /tmp/key
+	rm ${1}/tmp/key > /dev/null 2>&1
+}
+
 export -f check_platform
 export -f verify_action
 export -f enable_nw_chroot
+export -f add_apt_key

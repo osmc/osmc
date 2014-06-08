@@ -61,10 +61,17 @@ deb http://apt.osmc.tv jessie main
 
 # Performing chroot operation
 LOCAL_CHROOT_PKGS="osmc-appletv-darwinx"
-chroot ${DIR} wget -O - http://apt.osmc.tv/apt.key | apt-key add -
+add_apt_key "${DIR}"
+verify_action
+echo -e "Updating sources"
 chroot ${DIR} apt-get update
+verify_action
+echo -e "Installing default chroot packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+verify_action
+echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
+verify_action
 
 # Perform filesystem cleanup
 
