@@ -1,0 +1,177 @@
+
+What is new in afpfs-ng-0.8.1, March 8, 2008
+--------------------------------------------
+
+1. Read only support
+
+You can mount volumes readonly with:
+mount_afp -o ro afp://username:password@hostname/volumename /mountpoint
+
+Per request from various people.
+
+2. @ and : in passwords and usernames
+
+For one @ in a password, use:
+p@@ssword
+
+For one : in a username, use:
+user::name
+
+Per request from Niclas Helbro.
+
+3. Fstab
+
+You can now automatically mount volumes in on boot with a line in fstab. 
+See docs/README, there are some simple but specific instructions.
+
+
+What is new in afpfs-ng-0.8, February 18, 2008
+----------------------------------------------
+
+1. New command line (non-FUSE) tools:
+
+a) batch mode of afpcmd
+
+This lets you do simple transfers, eg. 
+
+> afpcmd afp://user:pass@server/alexdevries/linux-2.6.14.tar.bz2
+Connected to server Cubalibre using UAM "DHX2"
+Connected to volume alexdevries
+    Getting file /linux-2.6.14.tar.bz2
+Transferred 39172170 bytes in 2.862 seconds. (13687 kB/s)
+
+b) interactive mode of afpcmd
+
+This is file transfer tool similiar to an ftp client.  Has (local) filename 
+completion and command history.
+
+c) get status tool, afpgetstatus
+
+A simple tool to get the status information of a server without logging in.
+
+
+2. FUSE client improvements
+
+Continuation of FUSE client development, including the introduction of a new tool
+called mount_afp, which has the same syntax as in Mac OS X.  Better status and 
+post-deployment debugging, proper forced or unforced exit and other bugs.
+
+
+3. Protocol fixes
+
+Many protocol enhancements and bug fixes, including: support for AFP 2.x, multiple 
+servers, session keys, signatures, meta information, chmod and chown fixes.  
+Tested against Mac OS X, OS9, Airport and netatalk.
+
+File transfer performance is now similiar or faster to Mac OS X.
+
+
+4. Development library
+
+The source code of afpfs-ng has now been changed to a library (libafpclient) and
+support for multiple clients (examples are FUSE, afpcmd, afpgetstatus).  With this
+library, more AFP clients (GIO, KIO) can be built with limited pain.  This API is
+not yet stabilized.
+
+5. Other
+
+FUSE client fully validated on Linux, builds on FreeBSD.
+Command line client builds and runs on Linux, runs but is weakly tested on FreeBSD 
+and Mac OS X.
+
+There are manpages.
+
+
+What is new in afpfs-ng-0.4.3, September 8, 2007
+------------------------------------------------
+
+New features in this release include:
+
+- UTF8 internationalization of filenames, volumes and servers, mostly written by Michael Ulbrich
+
+- proper uid/gid mapping to enable environments with a common or different user directory
+
+- DHX2 UAM from Derrik Pates
+
+- fixes to deal with the Apple Airport Extreme quirks
+
+- fixes to deal with netatalk quirks
+
+- improved status output for debugging
+
+- various small bug fixes (Paul Borman, Volker Grabsch)
+
+
+This is the last release before a rework that introduces libafpclient to 
+handle multiple clients.
+
+You can get afpfs-ng from http://afpfs-ng.sourceforge.net .
+
+
+
+
+
+
+
+What is new in afpfs-0.4, Feburary 11, 2007
+-------------------------------------------
+
+We're happy to release version 0.4 of afpfs-ng, the Apple Filing Protocol client
+for Linux with FUSE.
+
+New features include:
+
+- stability: afpfs-ng is reliable to the point of being usable for all but
+  the most strenuous IO loads
+
+- encrypted authentication mechanisms: now also supporting Randnum, 2-way
+  randnum, DHCAST128 and DHX2
+
+- performance: DID caching, enhanced DSI packet processing and other
+  improvements make afpfs-ng about half as fast as the Mac OS X client
+
+- ease of use: unmounting, SIGINT, easier logging, easier startup, better
+  docs, session suspension
+
+For more information and to download, see http://afpfs-ng.sf.net/.
+
+
+
+
+What is new in 0.3, Nov. 27, 2006
+---------------------------------
+* many, many memory leaks fixed with some help from valgrind and close inspection
+* fixed many segfaults from null pointer dereferencing
+* heap corruption fixed
+* server version matching works now (afpfs-ng speaks 3.2 by default)
+* more testing against 10.2, 10.3 and 10.4 and netatalk
+* some documentation
+* preliminary support for resource forks (although this is still incomplete and broken) 
+
+0.2 had a lot of problems with stability, mostly because of the complex and optimized DSI read code, which does zero-copy reads and handles quantums properly. This appears to be fixed now.
+
+Please, if you've tried afpfs-ng, let me know.  You can subscribe to the mailing list at http://sourceforge.net/projects/afpfs-ng, or mail me at alexthepuffin@gmail.com.
+
+
+What is new in 0.2, Nov. 20, 2006
+---------------------------------
+
+In version 0.2, the project has matured considerably.  You can mount a volume,
+see, read and write files with reasonable performance.
+
+* much better testing against 10.3 and 10.4 (speaking AFP 3.1, not 3.2)
+* better error handling
+* restructured into client/server
+* rewrote incoming reads to optimize for read performance.  It works!
+* lots and lots of other changes
+  - fixed rename, large dids, UTF8 names
+* dynamic quantum calculation
+* status
+* new logging mechanism, forking
+* autoconf (sigh)
+
+
+What is new in 0.1, Oct. 16, 2006
+---------------------------------
+* it compiles
+* it has worked for me, but probably nobody else

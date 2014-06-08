@@ -5,21 +5,21 @@
 
 . ../common.sh
 
-echo -e "Building libshairplay"
+echo -e "Building libafpclient"
 out=$(pwd)/files
 if [ -f files/usr ]; then rm -rf files/usr; fi
 if [ -f files-dev/usr ]; then rm -rf files-dev/usr; fi
 cd src
 make clean
-./autogen.sh
-./configure --prefix=/usr
+./configure
 make
 make install DESTDIR=${out}
-if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd ../
 mkdir -p files-dev/usr
+rm -rf files/usr/bin
+rm -rf files/usr/share
 mv files/usr/include  files-dev/usr/
 fix_arch_ctl "files/DEBIAN/control"
 fix_arch_ctl "files-dev/DEBIAN/control"
-dpkg -b files/ libshairplay.deb
-dpkg -b files-dev libshairplay-dev.deb
+dpkg -b files/ libafpclient.deb
+dpkg -b files-dev libafpclient-dev.deb

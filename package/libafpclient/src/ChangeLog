@@ -1,0 +1,372 @@
+March 11, 2008
+- added fstab support
+- release 0.8.1
+
+March 4, 2008
+- added support for @ in passwords
+
+January 16, 2008
+- lots of fixes
+
+January 12, 2008
+- redid logging
+- DSI wait times
+
+January 10, 2008
+- UAM handling
+- ask for a password
+
+January 8, 2008
+- added getpass() support
+- fixed up cmdline's disconnect
+
+January 4, 2008
+- fixed login messages
+- fixed up URL parsing
+
+January 3, 2008
+- lots of cleanup
+- replaced logging infrastructure
+
+December 31, 2007
+- now able to interrupt cmdline when transferring
+
+December 30, 2007
+- add a hack to the cmdline to handle ^c
+
+December 29, 2007
+- fixed afp_url parsing
+- added connect command
+
+December 27, 2007
+- added df support for cmdline
+
+December 26, 2007
+- move status around so it is part of the library
+
+December 23, 2007
+- fixing chmod
+- added cmdline's touch
+
+December 22, 2007
+- many, many changes.  
+
+November 9, 2007
+- rewrote readdir()
+- fixed up include files
+
+October 17, 2007
+- redo client code
+
+October 10, 2007
+- cleanup reconnect code, implement session tokens
+
+October 5, 2007
+- fixup include files
+
+October 1, 2007
+- add getsessiontoken
+
+September 23, 2007
+- made constant params in ml_ functions
+- wrote the entire midlevel code, stripped out the fuse_int.c code
+- implemented most of the afp commands
+
+September 11, 2007
+- simplify afp interface
+- start midlevel interface starting with readdir
+- cmdline now connects!
+
+September 10, 2007
+- rework of the entire tree; creation of lib/, fuse/ and cmdline
+
+September 3, 2007
+- really fixed up double .AppleDouble problem this time
+- redid getstatus_reply handling for optional requirements
+- UTF8 servernames work properly now
+- uprev to 0.4.3
+
+August 31, 2007
+- fixed up detection of .AppleDouble/*/.AppleDouble, these are invalid
+- fixed up signature handling
+
+August 25, 2007
+
+Added somewhat more correct gid handling.
+
+Fixed up mknod uid/gid handling.
+
+Some comments on uid/gid mapping.
+
+The following only matters for mapping login ids.
+
+gid handling seems to be handled somewhat differently between servers.  When
+doing a getuserinfo with the GROUPID bit set, you get:
+- 10.4.7 replies with the field, but it contains junk
+- Other mac os x and Airport 7.1.1 replies with an empty field
+- netatalk fills it in as expected
+
+Furthermore, it doesn't matter what you do with chgrp (or chmod or probably
+chown) on an Airport, all files are owned by 0.0, 0777.
+
+August 24, 2007
+- added up some uid/gid debugging
+
+August 18, 2007
+- solved setforkparms problem, which was blowing up Airports.
+- finally, sorted out strange problem whereby if you set the fuse servername
+  to have a special character, gnome-panel goes nuts.
+August 17, 2007
+- completed uid/gid mapping
+
+August 8, 2007
+- fixed gid/uid permissions problem in mknod
+- print out built-in UAMs in status output for support
+- added preliminary cleanup for netbsd
+
+August 1, 2007
+- rewrote all the code translation paths, so there are now simple hooks for
+adding UTF8-MAC support.
+- added hooks for volume name UTF8 support
+- Derrik has fixed up a lot of the crypto work to add dhx2
+- disabling the broken uid/gid translation for now
+- fixed up ordering of including fuse.h
+- took fixed start_afpfsd code from Volker Grabsch
+
+Mar 31, 2007
+- added Paul Borman's fix to ask for a password
+- blanked out the uid/gid mapping since it currently breaks situations where
+  the uid and gid of the client and server don't match
+- added a port option to the client (-o)
+- changed the default FUSE version to 25, should solve lots of compile probs
+
+Feb 11
+- fixed DHCAST128's definition
+
+Feb 9
+- afp_client now correctly startsup afpfsd, including locating afpfsd
+- backgrounding works properly now
+- fixed syslog problem
+- fuse only in debug mode when debug mode for afpfsd is on
+
+Feb 8
+- finally, fixed major memory leak
+
+Feb 7
+- now, you get a warning if you run afpfsd twice
+- mounting works okay if we don't have LIBGMP
+
+Feb 6
+- fixed exit command
+- fixed slow unmount problem
+
+Feb 5
+- fix of compiler warnings
+- trying to track down this damned memory leak...
+
+Feb 2
+- various valgrind problems fixed
+- fixed some problems with read around buffer splitting
+- added UAM field in status output
+- fixed chmodding on a directory
+- From Derrik Pates, added:
+  - fixup to UAMs infrastructure
+  - Randnum Exchange
+  - 2-Way Randnum
+  - DHCAST128
+- closed a few memory leaks
+
+Jan 31
+- added mutex around DSI requestid incrementing
+
+Jan 30
+- found and fixed problem with long reads with parallel builds/untars
+
+Jan 29
+- found and fixed problem with long reads with afpRead
+
+Jan 28
+- made ungranular locking
+- all dirid references are relative now
+- fixed afp_write
+- submitted fix for fc6's netatalk
+
+Jan 27
+- use attention quantum properly in opensession
+
+Jan 26
+- should be 64-bit safe
+- fixed unmount for real now
+- on server shutdown, server state is resume
+- fixed DSI_Attention packets
+- on control-c, afpfsd unmounts and correctly disconnects
+- if the server suddenly dies, we end up in a suspend mode
+- if we're in suspend mode, we try to reconnect
+- always free up in _release()
+
+Jan 22
+- fixed chmod behaviour if you have no ownership
+
+Jan 19
+- it's taken weeks, but signals and unmounting are finally fixed
+
+Jan 9
+- fixed nlink problem
+
+Jan 7
+- fixed slow mounting bugs
+
+Jan 5
+- completed did caching
+- can now do recursive ls perfectly
+
+Jan 4
+- you can now compile afpfs-ng on itself
+- wrote name/grp translation
+- wrote MapName and MapID for name translations
+
+Jan 3
+- chgrp and chown probably work now
+- start of generalized uid/gid translation hooks
+- fixed minor client parsing problem
+
+Jan 2
+- fixed loginmsg problem
+- start of automatic startup of afpfsd by the client
+
+Jan 1
+- fixed problem with large non-afpRead dsi packets, shown with large dir
+  entries against OS X
+- 
+
+Dec 23
+- fixed all the problems with get_dirid(), although it doesn't cache yet
+- fixed mv, including when mv does a replacement
+- you can now compile and configure afpfs-ng using afpfs-ng
+
+
+Dec 20
+- fixed .AppleDouble problem when removing an entire directory
+- multithreaded, stripped out debug messages
+- sorted out how to turn of debug messages
+- fixed up a problem with dropped DSI messages (difficult)
+
+Dec 19
+- fixed afp_utime(), afp_open(), afp_read()
+- fixed error messages for Connection refused
+- fixed problem with unlink
+
+Dec 15
+- rewrote get_dirent() 
+- some funcs work against 3.2, for real now
+
+Dec 14
+- simplification of unmount code
+- completed suspend/resume 
+
+Dec 9
+- unmount now works
+- completed rework for the threading model
+- reworked uam tables
+
+Dec 4
+- fixed problem with displaying large directories
+
+
+Nov 29, 2006
+- comments should work now
+- fixed symlink creation
+- resource read and write completed
+- handle runt packets properly
+- completed comment handling
+
+Nov 28, 2006
+- start of comment, icon, resource special files
+- start of symlinks (works)
+- start of extended attributes
+
+Nov 27, 2006
+- release 0.3
+- 
+
+Nov 23, 2006
+- new uams infrastructure for more uams
+- fixed many, many memory leaks
+- fixed heap corruption problems
+
+Nov 22, 2006
+- fixed version requested problem
+
+Nov 20, 2006
+- fixed logging format problem
+
+
+Nov 19, 2006
+- released 0.2
+- fixed problem with /bin/mount output
+- doc cleanup
+- autoconf
+Nov 18, 2006
+- fixed client printing problems
+- multiframe DSI packets
+- rewrote all of DSI packet handling to optimize for zero-copy reading and large buffer reading.  Can now play MP3s.
+- start of FUSE 2.6 compatibility
+
+Nov 12, 2006
+- dynamic quantum calculation
+
+Nov 11, 2006
+- fixed UTF8 names
+- fixed large dids
+
+Nov 10, 2006
+- fixed writes on non-netatalk servers
+
+Nov 9, 2006
+- separate afpfs daemon and client
+- daemon: handles multiple servers, multiple mounts
+- new client handles status, mount, unmount
+- handle unmount 
+
+Oct 18, 2006
+- fixed rename
+
+Oct 16, 2006
+- release afpfs-ng version 0.1
+
+Oct 13, 2006
+- implemented rename
+- fixed non-blocking AFP commands
+- read only volumes
+- volume passwords
+
+Oct 11
+- handle filename lengths
+- handle open flags better
+- completed general code cleanup, restructured some of the files
+- implemented afp_byterangelock
+
+Oct 8
+- general code cleanup; got rid of lots of stale code 
+
+Oct 2
+- wrote truncate
+
+Oct 1
+- got rid of KERNEL remnants
+- actually reply to attention requests
+- added cleartext passwords
+- really fixed chmod files with all netatalk exceptions
+- change the way we calculate volid
+
+Sep 30
+- figured out basic chmod stuff
+- rewrote version handling
+- rewrote volid handling
+
+Sep 29
+- fixed up threading problems, finally
+- wrote incoming packet aggregator, so multiple DSI packets can come in on the same read
+- moved DSI return codes to request
+
+

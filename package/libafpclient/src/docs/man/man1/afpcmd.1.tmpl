@@ -1,0 +1,55 @@
+.TH afpcmd 1 "13 Nov 2007" 0.5 afpfs-ng
+.SH NAME
+afpcmd \- Transfer files over the networking using the Apple Filing Protocol (AFP)
+.SH SYNOPSIS
+\fI:BINDIR:/afpcmd\fR [\fBafp url\fR]
+
+.SH DESCRIPTION
+\fiafpcmd\fR is a command-line tool to help transfer files to and from a server
+using AFP.  This is typically either Netatalk or Mac OS or Mac OS X.
+
+.SH OPTIONS
+
+\fBafp url\fR uses the standard AFP URL format.  See \fBafp(3)\fB fore more information.
+
+
+
+.SH 
+
+.SH AFP version support
+\fiafpcmd\fi uses afpclient, so look at libafpclient(3) for more information
+on support for AFP 2.x and 3.x.
+
+.SH 
+\fIapple_mv\fR is a perl script to move
+SOURCE to DEST or multiple SOURCE(s) to DIRECTORY. It also moves the file 
+specific metadata (including resource forks) to the .AppleDouble directory
+for DEST or DIRECTORY. If the .AppleDouble directory doesn't exist for 
+DEST or DIRECTORY it will create it.
+.SH EXAMPLES
+
+\fI:BINDIR:/afpcmd\fR afp://username:password@servername/volume
+
+connects to servername and volume using username and password.
+
+\fI:BINDIR:/afpcmd\fR afp://username:password@servername/
+
+connects to servername and shows the possible volumes.
+
+\fI:BINDIR:/afpcmd\fR afp://username:password@servername/volume/dir
+
+connects to servername, volume and changes to director dir.
+
+\fI:BINDIR:/afpcmd\fR afp://username:password@servername/volume/dir/file
+
+Connects to the server and volume, and retrieves 
+
+
+- filename completion
+- history
+
+.SH "REPORTING BUGS"
+Report bugs to the afpfs-ng-devel@sf.net mailing list.
+.SH "SEE ALSO"
+\fBafp\fR(3)
+

@@ -1,0 +1,27 @@
+.TH afpcmd 1 "4 Feb 2008" 0.8 afpfs-ng
+.SH NAME
+afpgetstatus \- Get simple status information from an AFP server without logging into it.
+.SH SYNOPSIS
+\fIafpgetstatus [afp_url|ipaddress[:port]]\R
+
+.SH DESCRIPTION
+\fiafpcmd\fR is a command-line tool that parses and prints the status information of an AFP server.  It does this without having to login to a server.  
+
+It is a response to the DSI GetStatus request (which is the same as the AFP FPGetSrvrInfo).
+
+It only handles IPv4 addresses.
+
+.SH OPTIONS
+
+\fBafp_url\fR an AFP url in the form of \fIafp://servername:port/\fR.  Any other AFP url fields (username, volume name, etc) are ignored.
+
+\fBipaddress\fR the IP address of the server
+
+\fBport\fR the TCP port to connect to (optional)
+
+.SH "REPORTING BUGS"
+
+Report bugs to the afpfs-ng-devel@sf.net mailing list.
+.SH "SEE ALSO"
+\fBafpcmd\fR(1)
+
