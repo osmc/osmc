@@ -27,12 +27,26 @@ function enable_nw_chroot()
 function add_apt_key()
 {
 	echo -e "Adding apt key"
-	chroot ${1} wget http://apt.osmc.tv/apt.key -O /tmp/key
+	chroot ${1} wget ${2} -O /tmp/key
 	chroot ${1} apt-key add /tmp/key
 	rm ${1}/tmp/key > /dev/null 2>&1
+}
+
+function emulate_arm()
+{
+	echo Copying ARM QEMU binary
+	cp /usr/bin/qemu-arm-static ${1}/usr/bin/qemu-arm-static
+}
+
+function remove_emulate_arm()
+{
+	echo Removing ARM QEMU binary
+	rm ${1}/usr/bin/qemu-arm-static
 }
 
 export -f check_platform
 export -f verify_action
 export -f enable_nw_chroot
 export -f add_apt_key
+export -f emulate_arm
+export -f remove_emulate_arm
