@@ -2,7 +2,7 @@ all:
 	echo -e "Specify a target:\nmake rbp\nmake gen"
 
 rbp:
-	#TBD
+	sudo bash build.sh "rbp"
 
 gen:
 	sudo bash build.sh "gen"
