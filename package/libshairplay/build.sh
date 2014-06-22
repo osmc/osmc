@@ -13,6 +13,8 @@ cd src
 make clean
 ./autogen.sh
 ./configure --prefix=/usr
+test $1 == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcecdev-osmc" >> files-dev/DEBIAN/control
+test $1 == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcecdev-osmc" >> files-dev/DEBIAN/control
 make
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
