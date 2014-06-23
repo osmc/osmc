@@ -9,14 +9,14 @@ echo -e "Building libshairplay"
 out=$(pwd)/files
 if [ -d files/usr ]; then rm -rf files/usr; fi
 if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
-cd src
-make clean
-./autogen.sh
-./configure --prefix=/usr
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 test $1 == gen && echo "Package: libshairplay-osmc" >> files/DEBIAN/control && echo "Package: libshairplaydev-osmc" >> files-dev/DEBIAN/control
 test $1 == rbp && echo "Package: rbp-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: rbp-libshairplaydev-osmc" >> files-dev/DEBIAN/control
+cd src
+make clean
+./autogen.sh
+./configure --prefix=/usr
 make
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
