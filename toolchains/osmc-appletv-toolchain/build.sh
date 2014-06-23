@@ -68,7 +68,7 @@ echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
 echo -e "Installing default chroot packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS $XBMC_MAN_PKGS
 verify_action
 echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
