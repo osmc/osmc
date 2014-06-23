@@ -92,8 +92,8 @@ BUILDROOT_PKGS="rsync texinfo libncurses-dev whois unzip"
 
 CHROOT_PKGS="${COMPILER_PKGS} ${REMOTE_PKGS} ${FS_PKGS} ${XBMC_PKGS} ${BUILDROOT_PKGS}"
 export CHROOT_PKGS
-export ${XBMC_MAN_PKGS}
-export ${XBMC_MAN_PKGS_RBP}
+export XBMC_MAN_PKGS
+export XBMC_MAN_PKGS_RBP
 
 export -f update_sources
 export -f install_package
