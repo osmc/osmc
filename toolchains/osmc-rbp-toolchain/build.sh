@@ -66,7 +66,7 @@ verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
-if [ ! -z $DISABLE_LOCAL_BUILDS ]
+if [ -z $DISABLE_LOCAL_BUILDS ]
 then
 echo -e "Installing default chroot packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS $XBMC_MAN_PKGS_RBP
@@ -76,7 +76,7 @@ echo -e "Installing default chroot packages without downstream"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 fi
-if [ ! -z $DISABLE_LOCAL_BUILDS ]
+if [ -z $DISABLE_LOCAL_BUILDS ]
 then
 echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
