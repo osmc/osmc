@@ -14,7 +14,6 @@ update_sources
 verify_action
 
 # Install packages needed to build filesystem for building
-
 install_package "debootstrap"
 verify_action
 install_package "dh-make"
@@ -24,20 +23,17 @@ verify_action
 install_package "qemu binfmt-support qemu-user-static"
 
 # Configure the target directory
-
 ARCH="armhf"
 DIR="opt/osmc-tc/${tcstub}"
 RLS="jessie"
 URL="http://archive.raspbian.org/raspbian"
 
 # Remove existing build
-
 remove_existing_filesystem "{$wd}/{$DIR}"
 verify_action
 mkdir -p $DIR
 
 # Debootstrap (foreign)
-
 fetch_filesystem "--no-check-gpg --arch=${ARCH} --foreign ${RLS} ${DIR} ${URL}"
 verify_action
 
@@ -48,7 +44,6 @@ configure_filesystem "${DIR}"
 verify_action
 
 # Enable networking
-
 enable_nw_chroot "${DIR}"
 verify_action
 
@@ -87,23 +82,20 @@ fi
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
-chroot ${DIR} umount /proc
 
 # Remove QEMU binary
 remove_emulate_arm "${DIR}"
 
 # Perform filesystem cleanup
-
+chroot ${DIR} umount /proc
 cleanup_filesystem "${DIR}"
 
 # Build Debian package
-
 echo "Building Debian package"
 clean_debian_prep "${wd}" "${tcstub}"
 build_deb_package "${wd}" "${tcstub}"
 verify_action
 
 # Reclean
-
 clean_debian_prep "${wd}" "${tcstub}"
 echo -e "Build successful"

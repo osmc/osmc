@@ -14,7 +14,6 @@ update_sources
 verify_action
 
 # Install packages needed to build filesystem for building
-
 install_package "debootstrap"
 verify_action
 install_package "dh-make"
@@ -40,12 +39,10 @@ fetch_filesystem "--arch=${ARCH} --foreign ${RLS} ${DIR}"
 verify_action
 
 # Configure filesystem (2nd stage)
-
 configure_filesystem "${DIR}"
 verify_action
 
 # Enable networking
-
 enable_nw_chroot "${DIR}"
 verify_action
 
@@ -88,20 +85,17 @@ fi
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
-chroot ${DIR} umount /proc
 
 # Perform filesystem cleanup
-
+chroot ${DIR} umount /proc
 cleanup_filesystem "${DIR}"
 
 # Build Debian package
-
 echo "Building Debian package"
 clean_debian_prep "${wd}" "${tcstub}"
 build_deb_package "${wd}" "${tcstub}"
 verify_action
 
 # Reclean
-
 clean_debian_prep "${wd}" "${tcstub}"
 echo -e "Build successful"
