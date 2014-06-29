@@ -86,7 +86,7 @@ function build_deb_package()
 
 function patchfs()
 {
-	cp ${1}../../../../patches/${2}
+	cp ${1}../../../../patches/${2} ${1}
 	chroot ${1} /usr/bin/patch ${2}
 }
 
@@ -94,7 +94,7 @@ function configure_ccache()
 {
 	chroot ${1} apt-get -y install --no-install-recommends ccache
 	chroot ${1} /usr/bin/ccache -M 20G
-	patchfs "${1}" "000-profile-enable-ccache.patch"
+	echo "/var/lib/ccache" >> /${1}/root/.bashrc
 	cp populate-osmc-cache ${1}/usr/bin
 	chmod +x ${1}/usr/bin/populate-osmc-cache
 }
