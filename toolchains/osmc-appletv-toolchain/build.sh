@@ -47,7 +47,7 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://ftp.debian.org/debian testing main contrib
+echo "deb http://ftp.debian.org/debian jessie main contrib
 
 deb http://ftp.debian.org/debian/ jessie-updates main contrib
 
