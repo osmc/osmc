@@ -19,8 +19,8 @@ make clean
 ./configure --prefix=/usr
 make
 make install DESTDIR=${out}
-strip_files "${out}"
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
+strip_files "${out}"
 cd ../
 mkdir -p files-dev/usr
 mv files/usr/include  files-dev/usr/
