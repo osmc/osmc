@@ -93,8 +93,10 @@ function patchfs()
 function configure_ccache()
 {
 	chroot ${1} apt-get -y install --no-install-recommends ccache
-	chroot ${1} /usr/bin/ccache -M 5G
+	chroot ${1} /usr/bin/ccache -M 20G
 	patchfs "${1}" "000-profile-enable-ccache.patch"
+	cp populate-osmc-cache ${1}/usr/bin
+	chmod +x ${1}/usr/bin/populate-osmc-cache
 }
 
 COMPILER_PKGS="build-essential git subversion wget nano kernel-package sudo"
