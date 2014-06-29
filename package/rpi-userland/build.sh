@@ -19,6 +19,8 @@ rm master.zip
 echo Moving files in to place
 mkdir -p files/opt/vc
 mkdir -p files-dev/opt/vc
+mkdir -p files/etc/ld.so.conf.d
+echo "/opt/vc/lib" > files/etc/ld.so.conf.d/rbp.conf
 cp -ar firmware-master/hardfp/opt/vc/bin/ files/opt/vc
 cp -ar firmware-master/hardfp/opt/vc/lib files/opt/vc
 cp -ar firmware-master/hardfp/opt/vc/include files-dev/opt/vc
