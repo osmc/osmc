@@ -71,14 +71,16 @@ function remove_existing_filesystem()
 
 function clean_debian_prep()
 {
-	rm -rf $1/output
+	rm -rf ${1}/output
 }
 
 function build_deb_package()
 {
-	mkdir -p $1/output
+	mkdir -p ${1}/output
 	cp -ar ${1}/DEBIAN ${1}/output
 	mv ${1}/opt ${1}/output
+	# Mark our FS
+	echo ${2} ${1}/output/tcver
 	dpkg -b ${1}/output ${2}.deb
 }
 
