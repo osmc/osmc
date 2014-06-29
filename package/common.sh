@@ -11,4 +11,12 @@ function fix_arch_ctl()
 	test $(arch)x == x86_x64 && echo "Architecture: amd64" >> $1
 }
 
+function strip_files()
+{
+	echo -e "Stripping binaries"
+	strip "${1}/usr/lib/*.so.*" > /dev/null 2>&1
+	strip "${1}/usr/bin/*" >/dev/null 2>&1
+}
+
 export -f fix_arch_ctl
+export -f strip_files
