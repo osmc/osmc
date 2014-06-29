@@ -1,0 +1,15 @@
+--- a/etc/profile	2014-06-29 15:33:15.875746068 +0100
++++ b/etc/profile	2014-06-29 15:34:14.076708190 +0100
+@@ -1,11 +1,7 @@
+ # /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+ # and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+ 
+-if [ "`id -u`" -eq 0 ]; then
+-  PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+-else
+-  PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+-fi
++PATH="/usr/lib/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ export PATH
+ 
+ if [ "$PS1" ]; then

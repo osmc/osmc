@@ -73,6 +73,9 @@ verify_action
 echo -e "Installing target specific packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
+echo -e "Configuring ccache"
+configure_ccache "${DIR}"
+verify_action
 chroot ${DIR} umount /proc
 
 # Perform filesystem cleanup

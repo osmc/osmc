@@ -82,6 +82,19 @@ function build_deb_package()
 	dpkg -b ${1}/output ${2}.deb
 }
 
+function patchfs()
+{
+	cp ${1}../../../../patches/${2}
+	chroot ${1} /usr/bin/patch ${2}
+}
+
+function configure_ccache()
+{
+	chroot ${1} apt-get -y install --no-install-recommends ccache
+	chroot ${1} /usr/bin/ccache -M 5G
+	patchfs "${1}" "000-profile-enable-ccache.patch"
+}
+
 COMPILER_PKGS="build-essential git subversion wget nano kernel-package sudo"
 FS_PKGS="parted kpartx libblkid-dev libfuse-dev libreadline-dev"
 REMOTE_PKGS="libusb-dev"
@@ -102,3 +115,4 @@ export -f cleanup_filesystem
 export -f remove_existing_filesystem
 export -f clean_debian_prep
 export -f build_deb_package
+export -f configure_ccache
