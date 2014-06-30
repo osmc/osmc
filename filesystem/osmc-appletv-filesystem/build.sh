@@ -27,7 +27,13 @@ remove_existing_filesystem "{$wd}/{$DIR}"
 verify_action
 mkdir -p $DIR
 
+# Debootstrap (foreign)
+
 fetch_filesystem "--arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR}"
+verify_action
+
+# Configure filesystem (2nd stage)
+configure_filesystem "${DIR}"
 verify_action
 
 # Enable networking

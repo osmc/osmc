@@ -7,7 +7,7 @@
 
 XBMC_MAN_PKGS="osmc-mediacenter"
 XBMC_MAN_PKGS_RBP="osmc-mediacenter-rbp"
-SYSTEM_PKGS="wget apt-key base-files"
+SYSTEM_PKGS="base-files"
 CHROOT_PKGS="{SYSTEM_PKGS}"
 
 export CHROOT_PKGS
