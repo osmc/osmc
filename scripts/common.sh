@@ -27,7 +27,7 @@ function enable_nw_chroot()
 function add_apt_key()
 {
 	echo -e "Adding apt key"
-	chroot ${1} wget ${2} -O /tmp/key
+	wget ${2} -O ${1}/tmp/key
 	chroot ${1} apt-key add /tmp/key
 	rm ${1}/tmp/key > /dev/null 2>&1
 }
