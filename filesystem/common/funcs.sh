@@ -8,7 +8,7 @@
 XBMC_MAN_PKGS="osmc-mediacenter"
 XBMC_MAN_PKGS_RBP="osmc-mediacenter-rbp"
 SYSTEM_PKGS="base-files"
-CHROOT_PKGS="{SYSTEM_PKGS}"
+CHROOT_PKGS="${SYSTEM_PKGS}"
 
 export CHROOT_PKGS
 export XBMC_MAN_PKGS
