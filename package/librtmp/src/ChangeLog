@@ -1,0 +1,288 @@
+RTMPDump
+Copyright 2008-2009 Andrej Stepanchuk; Distributed under the GPL v2
+Copyright 2009-2011 Howard Chu
+Copyright 2009 The Flvstreamer Team
+http://rtmpdump.mplayerhq.hu/
+
+20 July 2011
+- add NetStream.Authenticate.UsherToken for Justin.tv
+
+11 July 2011, v2.4
+- add RTMPE type 9 handshake support
+
+30 June 2010, v2.3
+- fix RC4 cleanup for GnuTLS/gcrypt
+- declare RTMP_Write buf as const
+- cleanup Makefile
+- replace all use of bool with int
+- add RTMP_Socket() and RTMP_Pause() APIs
+- add ping/pong message handling
+- add basic shared library support
+- fix RTMP_ParseURL extension skipping
+- fix bad switch() from -r477 in RTMP_Read
+- fix rtmpsrv to always use .flv extension on output
+- fix crash on socket failure while RTMP_Read() is reading header
+- fix RTMP_ReadPacket signed/unsigned chars for m_nChannel
+- license cleanup, use current FSF address
+- fix RTMP_SetupURL tcUrl generation
+- ignore multiple spaces between URL options
+- only send CheckBW request once per session
+
+29 May 2010, v2.2e
+- port to Xbox
+- add explicit URL scheme for rtmpts
+- fix rtmpt clientID NUL-termination
+- use BufferEmpty trick in rtmpdump but not by default in librtmp
+- add librtmp manpage
+- fix RTMP_Read, return 0 on EOF, not -1
+- change RTMP_Read to return 1 packet at a time, fix buffer mgmt
+- fix request/result queue, fix server compatibility for Publishing
+- add RTMP_EnableWrite to enable Publishing
+
+29 April 2010, v2.2d
+- add RTMP_Alloc, RTMP_Free APIs
+- add optional support for polarssl instead of OpenSSL
+- add option to build crypto support without SSL/TLS
+- tweak handshake offset checking
+- add RTMP set_playlist command
+- check for (and fix) broken timestamps in FLV packets
+- fix tcUrl and playpath parsing in rtmpsrv and rtmpsuck
+- change internal boolean flags to bitmasks
+
+14 April 2010, v2.2c
+- internal restructuring, fix #undef CRYPTO builds
+- add RTMP_SetupURL, RTMP_SetOpt APIs
+- add logging callback
+
+22 March 2010, v2.2b
+- fix v2.2a crashes in rtmpsrv/rtmpsuck
+- fix v2.2a .swfinfo location on Windows
+- fix typo for --auth parameter in manpages
+- add FP10 handshake support for rtmpsrv/rtmpsuck
+- avoid GNUMake vs BSDMake incompatibilities
+- add pkgconfig file for librtmp
+- more library cleanup
+
+20 March 2010, v2.2a
+- fix C++ compatibility for librtmp
+- misc library restructuring
+- add client support for tunneling: rtmpt, rtmpte, rtmps
+- fix rtmpdump/rtmpgw FLV header dataType
+- implement RTMP_Read() and RTMP_Write() to simplify library use
+- fix SendPacket timestamps
+- add optional support for GnuTLS/Gcrypt instead of OpenSSL
+- use $HOMEPATH on Windows instead of $HOME for .swfinfo
+
+4 March 2010, v2.2
+- move RTMP code into library librtmp
+- relicense RTMP code under LGPL v2.1
+- add rtmpdump manpage
+- fix AMF_LONG_STRING handling
+- more FlashPlayer 10 handshake support
+- in rtmpsrv fix Play Start/Stop messages
+- rename "streams" program to "rtmpgw"
+
+20 February 2010, v2.1d
+- extend .swfinfo file format, add --swfAge rtmpdump parameter
+  old file should be replaced or manually updated: copy the
+  "date:" line and rename it to "ctim:"
+
+- fix MacOSX builds - just use "make posix" now for all Unix-derived systems
+- more explicit error checks in HTTP_get()
+- in rtmpsrv spawn rtmpdump automatically
+- fix bug in retry/resume of audio-only streams
+- other minor misc. fixes
+
+9 January 2010, v2.1c
+- cleanup rtmpsrv output
+- fix crash in 2.1b hashswf
+- fix parseurl to url-decode PlayPath
+- fix parseurl to recognize extensions followed by URL params
+- fix Makefile, inadvertently dropped 'v' from version string
+- in rtmpdump try Reconnect if ToggleStream doesn't work on timeouts
+- in rtmpsuck use chunk-based I/O for better latency
+- in rtmpsuck support lists of streams
+- in rtmpsuck use raw client connect packet to workaround unsupported features
+- support arbitrary AMF data appended to connect requests
+
+4 January 2010, v2.1b
+- fix url matching in .swfinfo lookup
+- fix resume parsing in rtmpdump
+- minor code cleanup (CRYPTO dependencies, logging)
+- add getStreamLength recognition to rtmpsrv
+- add close processing in rtmpsuck
+
+1 January 2010, v2.1a
+- fix socket receive timeouts for WIN32
+- add streams description to README
+
+29 December 2009, v2.1
+- AMF cleanup: bounds checking for all encoders, moved AMF_EncodeNamed* from rtmp.c
+- added SecureToken support
+- added automatic SWF hash calculation
+- added server-side handshake processing
+- added rtmpsrv stub server example
+- added rtmpsuck proxy server
+- tweaks for logging
+- renamed more functions to cleanup namespace for library use
+- tweaks for server operation: objectEncoding, chunksize changes
+
+16 December 2009, v2.0
+- rewrote everything else in C, reorganized to make it usable again as a library
+- fixed more portability bugs
+- plugged memory leaks
+
+2 December 2009, v1.9a
+- fix auth string typo
+- handle FCUnsubscribe message
+- don't try retry on live streams
+- SIGPIPE portability fix
+- remove "not supported" comment for RTMPE
+
+13 November 2009, v1.9
+- Handle more signals to reduce risk of unresumable/corrupted partially streamed files
+- Fixed >2GB file handling
+- Added --hashes option for a hash progress bar instead of byte counter
+- Fix to allow win32 to use binary mode on stdout.
+- Added auto-unpause for buffer-limited streams
+
+1 November 2009, v1.7
+
+- added --subscribe option for subscribing to a stream
+- added --start / --stop options for specifying endpoints of a stream
+- added --debug / --quiet / --verbose options for controlling output
+
+- added SOCKS4 support (by Monsieur Video)
+
+- restructured to support auto-restart of timed-out streams
+
+- rewritten byteswapping, works on all platforms
+
+- fixed errors in command / result parsing
+
+- support functions rewritten in C to avoid g++ compiler bugs on ARM
+
+- support for 65600 channels instead of just 64
+
+- fixed signature buffer overruns
+
+17 May 2009, v1.6
+
+- big endian alignment fix, should fix sparc64 and others
+
+- moved timestamp handling into RTMP protocol innings, all packets have
+absolute timestamps now, when seeking the stream will start with timestamp 0
+even if seeked to a later position!
+
+- fixed a timestamp bug (should fix async audio/video problems)
+
+30 Apr 2009, v1.5a
+
+- fixed host name resolution bug (caused unexpected crashes if DNS resolution
+was not available)
+
+- also using the hostname in tcUrl instead of the IP turns out to give much
+better results
+
+27 Apr 2009, v1.5
+
+- RTMPE support (tested on Adobe 3.0.2,3.0.3,3.5.1, Wowza)
+
+- SWFVerification (tested on Adobe 3.0.2,3.0.3,3.5.1)
+
+- added AMF3 parsing support (experimental feauture, only some primitives, no references)
+
+- added -o - option which allows the stream to be dumped to stdout
+(debug/error messages go to stderr)
+
+- added --live option to enable download of live streams
+
+- added support for (Free)BSD and Mac (untested, so might need more fixing,
+especially for PPC/sparc64)
+
+- fixed a bug in url parsing
+
+- added a useful application: streams, it will start a streaming server and
+using a request like http://localhost/?r=rtmp://.... you can restream the
+content to your player over http
+
+11 Mar 2009, v1.4
+
+- fixed resume bug: when the server switches between audio/video packets and FLV
+chunk packets (why should a server want to do that? some actually do!) and rtmpdump
+was invoked with --resume the keyframe check prevented rtmpdump from continuing
+
+- fixed endianness
+
+- added win32 and arm support (you can cross-compile it onto your Windows box
+or even PDA)
+
+- removed libboost dependency, written a small parser for rtmp urls, but it is
+more of a heuristic one since the rtmp urls can be ambigous in some
+circumstances. The best way is to supply all prameters using the override
+options like --play, --app, etc.
+
+- fixed stream ids (from XBMC tree)
+
+19 Jan 2009, v1.3b
+
+- fixed segfault on Mac OS/BSDdue to times(0)
+
+- Makefile rewritten
+
+16 Jan 2009, v1.3a
+
+- fixed a bug introduced in v1.3 (wrong report bytes count), downloads won't
+hang anymore
+
+10 Jan 2009, v1.3
+
+- fixed audio only streams (rtmpdump now recognizes the stream and writes a
+correct tag, audio, video, audio+video)
+
+- improved resume function to wait till a the seek is executed by the server.
+The server might send playback data before seeking, so we ignore up to e.g. 50
+frames and keep waiting for a keyframe with a timestamp of zero.
+
+- nevertheless resuming does not always work since the server sometimes
+doesn't resend the keyframe, seeking in flash is unreliable
+
+02 Jan 2009, v1.2a
+
+- fixed non-standard rtmp urls (including characters + < > ; )
+
+- added small script get_hulu which can download hulu.com streams (US only)
+(many thanks to Richard Ablewhite for the help with hulu.com)
+
+01 Jan 2009, v1.2:
+
+- fixed FLV streams (support for resuming extended)
+
+- fixed hanging download at the end
+
+- several minor bugfixes
+
+- changed parameter behaviour: not supplied parameters are omitted from the
+connect packet, --auth is introduced (was automatically obtained from url
+before, but it is possible to have an auth in the tcurl/rtmp url only without
+an additional encoded string in the connect packet)
+
+28 Dec 2008, v1.1a:
+
+- fixed warnings, added -Wall to Makefile
+
+28 Dec 2008, v1.1:
+
+- fixed stucking downloads (the buffer time is set to the duration now,
+  so the server doesn't wait till the buffer is emptied
+
+ - added a --resume option to coninue incomplete downloads
+
+- added support for AMF_DATE (experimental, no stream to test so far)
+
+- fixed AMF parsing and several small bugs (works on 64bit platforms now)
+
+24 Dec 2008, v1.0:
+
+- First release
+

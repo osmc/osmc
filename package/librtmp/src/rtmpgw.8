@@ -1,0 +1,289 @@
+.TH RTMPGW 8 "2011-07-20" "RTMPDump v2.4"
+.\" Copyright 2011 Howard Chu.
+.\" Copying permitted according to the GNU General Public License V2.
+.SH NAME
+rtmpgw \- RTMP streaming media gateway
+.SH SYNOPSIS
+.B rtmpgw
+[\c
+.BI \-r \ url\fR]
+[\c
+.BI \-n \ hostname\fR]
+[\c
+.BI \-c \ port\fR]
+[\c
+.BI \-l \ protocol\fR]
+[\c
+.BI \-S \ host:port\fR]
+[\c
+.BI \-a \ app\fR]
+[\c
+.BI \-t \ tcUrl\fR]
+[\c
+.BI \-p \ pageUrl\fR]
+[\c
+.BI \-s \ swfUrl\fR]
+[\c
+.BI \-f \ flashVer\fR]
+[\c
+.BI \-u \ auth\fR]
+[\c
+.BI \-C \ conndata\fR]
+[\c
+.BI \-y \ playpath\fR]
+[\c
+.BR \-v ]
+[\c
+.BI \-d \ subscription\fR]
+[\c
+.BR \-e ]
+[\c
+.BI \-k \ skip\fR]
+[\c
+.BI \-A \ start\fR]
+[\c
+.BI \-B \ stop\fR]
+[\c
+.BI \-b \ buffer\fR]
+[\c
+.BI \-m \ timeout\fR]
+[\c
+.BI \-T \ key\fR]
+[\c
+.BI \-j \ JSON\fR]
+[\c
+.BI \-w \ swfHash\fR]
+[\c
+.BI \-x \ swfSize\fR]
+[\c
+.BI \-W \ swfUrl\fR]
+[\c
+.BI \-X \ swfAge\fR]
+[\c
+.BI \-D \ address\fR]
+[\c
+.BI \-g \ port\fR]
+[\c
+.BR \-q ]
+[\c
+.BR \-V ]
+[\c
+.BR \-z ]
+.br
+.B rtmpgw \-h
+.SH DESCRIPTION
+.B rtmpgw
+is a server for streaming media content from RTMP out to HTTP.
+.LP
+.B rtmpgw
+listens for HTTP requests that specify RTMP stream parameters and
+then returns the RTMP data in the HTTP response. The only valid
+HTTP request is "GET /" but additional options can be provided
+in URL-encoded fashion. Options specified on the command line will
+be used as defaults, which can be overridden by options in the HTTP
+request.
+.SH OPTIONS
+.SS "Network Parameters"
+These options define how to connect to the media server.
+.TP
+\fB\-\-rtmp		\-r\fP\ \fIurl\fP
+URL of the server and media content.
+.TP
+\fB\-\-host		\-n\fP\ \fIhostname\fP
+Overrides the hostname in the RTMP URL.
+.TP
+\fB\-\-port		\-c\fP\ \fIport\fP
+Overrides the port number in the RTMP URL.
+.TP
+\fB\-\-protocol	\-l\fP\ \fInumber\fP
+Overrides the protocol in the RTMP URL.
+.nf
+  0 = rtmp
+  1 = rtmpt
+  2 = rtmpe
+  3 = rtmpte
+  4 = rtmps
+  5 = rtmpts
+.fi
+.TP
+\fB\-\-socks		\-S\fP\ \fIhost:port\fP
+Use the specified SOCKS4 proxy.
+.SS "Connection Parameters"
+These options define the content of the RTMP Connect request packet.
+If correct values are not provided, the media server will reject the
+connection attempt.
+.TP
+\fB\-\-app		\-a\fP\ \fIapp\fP
+Name of application to connect to on the RTMP server. Overrides
+the app in the RTMP URL. Sometimes the rtmpdump URL parser cannot
+determine the app name automatically, so it must be given explicitly
+using this option.
+.TP
+\fB\-\-tcUrl		\-t\fP\ \fIurl\fP
+URL of the target stream. Defaults to rtmp[e]://host[:port]/app/playpath.
+.TP
+\fB\-\-pageUrl		\-p\fP\ \fIurl\fP
+URL of the web page in which the media was embedded. By default no
+value will be sent.
+.TP
+\fB\-\-swfUrl		\-s\fP\ \fIurl\fP
+URL of the SWF player for the media. By default no value will be sent.
+.TP
+\fB\-\-flashVer	\-f\fP\ \fIversion\fP
+Version of the Flash plugin used to run the SWF player. The
+default is "LNX 10,0,32,18".
+.TP
+\fB\-\-auth		\-u\fP\ \fIstring\fP
+An authentication string to be appended to the Connect message. Using
+this option will append a Boolean TRUE and then the specified string.
+This option is only used by some particular servers and is
+deprecated. The more general
+.B \-\-conn
+option should be used instead.
+.TP
+\fB\-\-conn		\-C\fP\ \fItype:data\fP
+Append arbitrary AMF data to the Connect message. The type
+must be B for Boolean, N for number, S for string, O for object, or Z
+for null. For Booleans the data must be either 0 or 1 for FALSE or TRUE,
+respectively. Likewise for Objects the data must be 0 or 1 to end or
+begin an object, respectively. Data items in subobjects may be named, by
+prefixing the type with 'N' and specifying the name before the value, e.g.
+NB:myFlag:1. This option may be used multiple times to construct arbitrary
+AMF sequences. E.g.
+.nf
+  \-C B:1 \-C S:authMe \-C O:1 \-C NN:code:1.23 \-C NS:flag:ok \-C O:0
+.fi
+.SS "Session Parameters"
+These options take effect after the Connect request has succeeded.
+.TP
+\fB\-\-playpath	\-y\fP\ \fIpath\fP
+Overrides the playpath parsed from the RTMP URL. Sometimes the
+rtmpdump URL parser cannot determine the correct playpath
+automatically, so it must be given explicitly using this option.
+.TP
+.B \-\-live		\-v
+Specify that the media is a live stream. No resuming or seeking in
+live streams is possible.
+.TP
+\fB\-\-subscribe	\-d\fP\ \fIstream\fP
+Name of live stream to subscribe to. Defaults to
+.IR playpath .
+.TP
+\fB\-\-start		\-A\fP\ \fInum\fP
+Start at
+.I num
+seconds into the stream. Not valid for live streams.
+.TP
+\fB\-\-stop		\-B\fP\ \fInum\fP
+Stop at
+.I num
+seconds into the stream.
+.TP
+\fB\-\-buffer		\-b\fP\ \fInum\fP
+Set buffer time to
+.I num
+milliseconds. The default is 20000.
+.TP
+\fB\-\-timeout		\-m\fP\ \fInum\fP
+Timeout the session after
+.I num
+seconds without receiving any data from the server. The default is 120.
+.SS "Security Parameters"
+These options handle additional authentication requests from the server.
+.TP
+\fB\-\-token		\-T\fP\ \fIkey\fP
+Key for SecureToken response, used if the server requires SecureToken
+authentication.
+.TP
+\fB\-\-jtv		\-j\fP\ \fIJSON\fP
+JSON token used by legacy Justin.tv servers. Invokes NetStream.Authenticate.UsherToken
+.TP
+\fB\-\-swfhash		\-w\fP\ \fIhexstring\fP
+SHA256 hash of the decompressed SWF file. This option may be needed if
+the server uses SWF Verification, but see the
+.B \-\-swfVfy
+option below. The hash is 32 bytes, and must be
+given in hexadecimal. The
+.B \-\-swfsize
+option must always be used with this option.
+.TP
+\fB\-\-swfsize		\-x\fP\ \fInum\fP
+Size of the decompressed SWF file. This option may be needed if the
+server uses SWF Verification, but see the
+.B \-\-swfVfy
+option below. The
+.B \-\-swfhash
+option must always be used with this option.
+.TP
+\fB\-\-swfVfy		\-W\fP\ \fIurl\fP
+URL of the SWF player for this media. This option replaces all three
+of the
+.BR \-\-swfUrl ,
+.BR \-\-swfhash ,
+and
+.B \-\-swfsize
+options. When this option is used, the SWF player is retrieved from the
+specified URL and the hash and size are computed automatically. Also
+the information is cached in a
+.I .swfinfo
+file in the user's home directory, so that it doesn't need to be retrieved
+and recalculated every time rtmpdump is run. The .swfinfo file records
+the URL, the time it was fetched, the modification timestamp of the SWF
+file, its size, and its hash. By default, the cached info will be used
+for 30 days before re-checking.
+.TP
+\fB\-\-swfAge		\-X\fP\ \fIdays\fP
+Specify how many days to use the cached SWF info before re-checking. Use
+0 to always check the SWF URL. Note that if the check shows that the
+SWF file has the same modification timestamp as before, it will not be
+retrieved again.
+.SS Miscellaneous
+.TP
+\fB\-\-device		\-D\fP\ \fIaddress\fP
+Listener IP address. The default is 0.0.0.0, i.e., any IP address.
+.TP
+\fB\-\-sport		\-g\fP\ \fIport\fP
+Listener port. The default is 80.
+.TP
+.B \-\-quiet		\-q
+Suppress all command output.
+.TP
+.B \-\-verbose		\-V
+Verbose command output.
+.TP
+.B \-\-debug		\-z
+Debug level output. Extremely verbose, including hex dumps of all packet data.
+.TP
+.B \-\-help		\-h
+Print a summary of command options.
+.SH EXAMPLES
+The HTTP request
+.nf
+	GET /?r=rtmp:%2f%2fserver%2fmyapp&y=somefile HTTP/1.0
+.fi
+is equivalent to the
+.BR rtrmpdump (1)
+invocation
+.nf
+	rtmpdump \-r rtmp://server/myapp \-y somefile
+.fi
+
+Note that only the shortform (single letter) options are supported.
+.SH ENVIRONMENT
+.TP
+.B HOME
+The value of
+.RB $ HOME
+is used as the location for the
+.I .swfinfo
+file.
+.SH FILES
+.TP
+.I $HOME/.swfinfo
+Cache of SWF Verification information
+.SH "SEE ALSO"
+.BR rtmpdump (1)
+.SH AUTHORS
+Andrej Stepanchuk, Howard Chu, The Flvstreamer Team
+.br
+<http://rtmpdump.mplayerhq.hu>

@@ -1,0 +1,395 @@
+<HTML>
+<HEAD>
+<title>RTMPGW(8): </title></head>
+<table>
+<thead>
+<tr><td>RTMPGW(8)<td align="center"><td align="right">RTMPGW(8)
+</thead>
+<tfoot>
+<tr><td>RTMPDump v2.4<td align="center">2011-07-20<td align="right">RTMPGW(8)
+</tfoot>
+<tbody><tr><td colspan="3"><br><br><ul>
+<!-- Copyright 2011 Howard Chu.
+ Copying permitted according to the GNU General Public License V2.-->
+</ul>
+
+<h3>NAME</h3><ul>
+rtmpgw &minus; RTMP streaming media gateway
+</ul>
+
+<h3>SYNOPSIS</h3><ul>
+<b>rtmpgw</b>
+[<b>&minus;r</b><i>&nbsp;url</i>]
+[<b>&minus;n</b><i>&nbsp;hostname</i>]
+[<b>&minus;c</b><i>&nbsp;port</i>]
+[<b>&minus;l</b><i>&nbsp;protocol</i>]
+[<b>&minus;S</b><i>&nbsp;host:port</i>]
+[<b>&minus;a</b><i>&nbsp;app</i>]
+[<b>&minus;t</b><i>&nbsp;tcUrl</i>]
+[<b>&minus;p</b><i>&nbsp;pageUrl</i>]
+[<b>&minus;s</b><i>&nbsp;swfUrl</i>]
+[<b>&minus;f</b><i>&nbsp;flashVer</i>]
+[<b>&minus;u</b><i>&nbsp;auth</i>]
+[<b>&minus;C</b><i>&nbsp;conndata</i>]
+[<b>&minus;y</b><i>&nbsp;playpath</i>]
+[<b>&minus;v</b>]
+[<b>&minus;d</b><i>&nbsp;subscription</i>]
+[<b>&minus;e</b>]
+[<b>&minus;k</b><i>&nbsp;skip</i>]
+[<b>&minus;A</b><i>&nbsp;start</i>]
+[<b>&minus;B</b><i>&nbsp;stop</i>]
+[<b>&minus;b</b><i>&nbsp;buffer</i>]
+[<b>&minus;m</b><i>&nbsp;timeout</i>]
+[<b>&minus;T</b><i>&nbsp;key</i>]
+[<b>&minus;j</b><i>&nbsp;JSON</i>]
+[<b>&minus;w</b><i>&nbsp;swfHash</i>]
+[<b>&minus;x</b><i>&nbsp;swfSize</i>]
+[<b>&minus;W</b><i>&nbsp;swfUrl</i>]
+[<b>&minus;X</b><i>&nbsp;swfAge</i>]
+[<b>&minus;D</b><i>&nbsp;address</i>]
+[<b>&minus;g</b><i>&nbsp;port</i>]
+[<b>&minus;q</b>]
+[<b>&minus;V</b>]
+[<b>&minus;z</b>]
+<br>
+<b>rtmpgw &minus;h</b>
+</ul>
+
+<h3>DESCRIPTION</h3><ul>
+<b>rtmpgw</b>
+is a server for streaming media content from RTMP out to HTTP.
+<p>
+<b>rtmpgw</b>
+listens for HTTP requests that specify RTMP stream parameters and
+then returns the RTMP data in the HTTP response. The only valid
+HTTP request is "GET /" but additional options can be provided
+in URL-encoded fashion. Options specified on the command line will
+be used as defaults, which can be overridden by options in the HTTP
+request.
+</ul>
+
+<h3>OPTIONS</h3><ul>
+</ul>
+
+<h4>Network Parameters</h4><ul>
+These options define how to connect to the media server.
+<p>
+<dl compact><dt>
+<b>&minus;&minus;rtmp		&minus;r</b>&nbsp;<i>url</i>
+<dd>
+URL of the server and media content.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;host		&minus;n</b>&nbsp;<i>hostname</i>
+<dd>
+Overrides the hostname in the RTMP URL.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;port		&minus;c</b>&nbsp;<i>port</i>
+<dd>
+Overrides the port number in the RTMP URL.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;protocol	&minus;l</b>&nbsp;<i>number</i>
+<dd>
+Overrides the protocol in the RTMP URL.
+<pre>
+  0 = rtmp
+  1 = rtmpt
+  2 = rtmpe
+  3 = rtmpte
+  4 = rtmps
+  5 = rtmpts
+</pre>
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;socks		&minus;S</b>&nbsp;<i>host:port</i>
+<dd>
+Use the specified SOCKS4 proxy.
+</dl>
+</ul>
+
+<h4>Connection Parameters</h4><ul>
+These options define the content of the RTMP Connect request packet.
+If correct values are not provided, the media server will reject the
+connection attempt.
+<p>
+<dl compact><dt>
+<b>&minus;&minus;app		&minus;a</b>&nbsp;<i>app</i>
+<dd>
+Name of application to connect to on the RTMP server. Overrides
+the app in the RTMP URL. Sometimes the rtmpdump URL parser cannot
+determine the app name automatically, so it must be given explicitly
+using this option.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;tcUrl		&minus;t</b>&nbsp;<i>url</i>
+<dd>
+URL of the target stream. Defaults to rtmp[e]://host[:port]/app/playpath.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;pageUrl		&minus;p</b>&nbsp;<i>url</i>
+<dd>
+URL of the web page in which the media was embedded. By default no
+value will be sent.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;swfUrl		&minus;s</b>&nbsp;<i>url</i>
+<dd>
+URL of the SWF player for the media. By default no value will be sent.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;flashVer	&minus;f</b>&nbsp;<i>version</i>
+<dd>
+Version of the Flash plugin used to run the SWF player. The
+default is "LNX 10,0,32,18".
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;auth		&minus;u</b>&nbsp;<i>string</i>
+<dd>
+An authentication string to be appended to the Connect message. Using
+this option will append a Boolean TRUE and then the specified string.
+This option is only used by some particular servers and is
+deprecated. The more general
+<b>&minus;&minus;conn</b>
+option should be used instead.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;conn		&minus;C</b>&nbsp;<i>type:data</i>
+<dd>
+Append arbitrary AMF data to the Connect message. The type
+must be B for Boolean, N for number, S for string, O for object, or Z
+for null. For Booleans the data must be either 0 or 1 for FALSE or TRUE,
+respectively. Likewise for Objects the data must be 0 or 1 to end or
+begin an object, respectively. Data items in subobjects may be named, by
+prefixing the type with 'N' and specifying the name before the value, e.g.
+NB:myFlag:1. This option may be used multiple times to construct arbitrary
+AMF sequences. E.g.
+<pre>
+  &minus;C B:1 &minus;C S:authMe &minus;C O:1 &minus;C NN:code:1.23 &minus;C NS:flag:ok &minus;C O:0
+</pre>
+</dl>
+</ul>
+
+<h4>Session Parameters</h4><ul>
+These options take effect after the Connect request has succeeded.
+<p>
+<dl compact><dt>
+<b>&minus;&minus;playpath	&minus;y</b>&nbsp;<i>path</i>
+<dd>
+Overrides the playpath parsed from the RTMP URL. Sometimes the
+rtmpdump URL parser cannot determine the correct playpath
+automatically, so it must be given explicitly using this option.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;live &minus;v</b>
+<dd>
+Specify that the media is a live stream. No resuming or seeking in
+live streams is possible.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;subscribe	&minus;d</b>&nbsp;<i>stream</i>
+<dd>
+Name of live stream to subscribe to. Defaults to
+<i>playpath</i>.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;start		&minus;A</b>&nbsp;<i>num</i>
+<dd>
+Start at
+<i>num</i>
+seconds into the stream. Not valid for live streams.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;stop		&minus;B</b>&nbsp;<i>num</i>
+<dd>
+Stop at
+<i>num</i>
+seconds into the stream.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;buffer		&minus;b</b>&nbsp;<i>num</i>
+<dd>
+Set buffer time to
+<i>num</i>
+milliseconds. The default is 20000.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;timeout		&minus;m</b>&nbsp;<i>num</i>
+<dd>
+Timeout the session after
+<i>num</i>
+seconds without receiving any data from the server. The default is 120.
+</dl>
+</ul>
+
+<h4>Security Parameters</h4><ul>
+These options handle additional authentication requests from the server.
+<p>
+<dl compact><dt>
+<b>&minus;&minus;token		&minus;T</b>&nbsp;<i>key</i>
+<dd>
+Key for SecureToken response, used if the server requires SecureToken
+authentication.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;jtv		&minus;j</b>&nbsp;<i>JSON</i>
+<dd>
+JSON token used by legacy Justin.tv servers. Invokes NetStream.Authenticate.UsherToken
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;swfhash		&minus;w</b>&nbsp;<i>hexstring</i>
+<dd>
+SHA256 hash of the decompressed SWF file. This option may be needed if
+the server uses SWF Verification, but see the
+<b>&minus;&minus;swfVfy</b>
+option below. The hash is 32 bytes, and must be
+given in hexadecimal. The
+<b>&minus;&minus;swfsize</b>
+option must always be used with this option.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;swfsize		&minus;x</b>&nbsp;<i>num</i>
+<dd>
+Size of the decompressed SWF file. This option may be needed if the
+server uses SWF Verification, but see the
+<b>&minus;&minus;swfVfy</b>
+option below. The
+<b>&minus;&minus;swfhash</b>
+option must always be used with this option.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;swfVfy		&minus;W</b>&nbsp;<i>url</i>
+<dd>
+URL of the SWF player for this media. This option replaces all three
+of the
+<b>&minus;&minus;swfUrl</b>,
+<b>&minus;&minus;swfhash</b>,
+and
+<b>&minus;&minus;swfsize</b>
+options. When this option is used, the SWF player is retrieved from the
+specified URL and the hash and size are computed automatically. Also
+the information is cached in a
+<i>.swfinfo</i>
+file in the user's home directory, so that it doesn't need to be retrieved
+and recalculated every time rtmpdump is run. The .swfinfo file records
+the URL, the time it was fetched, the modification timestamp of the SWF
+file, its size, and its hash. By default, the cached info will be used
+for 30 days before re-checking.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;swfAge		&minus;X</b>&nbsp;<i>days</i>
+<dd>
+Specify how many days to use the cached SWF info before re-checking. Use
+0 to always check the SWF URL. Note that if the check shows that the
+SWF file has the same modification timestamp as before, it will not be
+retrieved again.
+</dl>
+</ul>
+
+<h4>Miscellaneous</h4><ul>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;device		&minus;D</b>&nbsp;<i>address</i>
+<dd>
+Listener IP address. The default is 0.0.0.0, i.e., any IP address.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;sport		&minus;g</b>&nbsp;<i>port</i>
+<dd>
+Listener port. The default is 80.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;quiet &minus;q</b>
+<dd>
+Suppress all command output.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;verbose &minus;V</b>
+<dd>
+Verbose command output.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;debug &minus;z</b>
+<dd>
+Debug level output. Extremely verbose, including hex dumps of all packet data.
+</dl>
+<p>
+<dl compact><dt>
+<b>&minus;&minus;help &minus;h</b>
+<dd>
+Print a summary of command options.
+</dl>
+</ul>
+
+<h3>EXAMPLES</h3><ul>
+The HTTP request
+<pre>
+	GET /?r=rtmp:%2f%2fserver%2fmyapp&y=somefile HTTP/1.0
+</pre>
+is equivalent to the
+<a href="../man1/rtrmpdump.1"><b>rtrmpdump</b></a>(1)
+invocation
+<pre>
+	rtmpdump &minus;r rtmp://server/myapp &minus;y somefile
+</pre>
+<p>
+Note that only the shortform (single letter) options are supported.
+</ul>
+
+<h3>ENVIRONMENT</h3><ul>
+<p>
+<dl compact><dt>
+<b>HOME</b>
+<dd>
+The value of
+$<b>HOME</b>
+is used as the location for the
+<i>.swfinfo</i>
+file.
+</dl>
+</ul>
+
+<h3>FILES</h3><ul>
+<p>
+<dl compact><dt>
+<i>$HOME/.swfinfo</i>
+<dd>
+Cache of SWF Verification information
+</dl>
+</ul>
+
+<h3>SEE ALSO</h3><ul>
+<a href="../man1/rtmpdump.1"><b>rtmpdump</b></a>(1)
+</ul>
+
+<h3>AUTHORS</h3><ul>
+Andrej Stepanchuk, Howard Chu, The Flvstreamer Team
+<br>
+&lt;<a href="http://rtmpdump.mplayerhq.hu">http://rtmpdump.mplayerhq.hu</a>>
+</ul></tbody></table></html>
