@@ -5,7 +5,9 @@
 
 echo -e "Building armmem for Raspberry Pi"
 out=$(pwd)/files
+if [ -d files/usr ]; then rm -rf files/usr; fi
 cd src
+make clean
 make
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_libs
