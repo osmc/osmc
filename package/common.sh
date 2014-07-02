@@ -24,7 +24,8 @@ function strip_libs()
 	echo -e "Stripping libaries"
 	strip "*.so.*" > /dev/null 2>&1
 	strip "*.a" > /dev/null 2>&1
-}	
+}
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
