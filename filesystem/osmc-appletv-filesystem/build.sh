@@ -52,7 +52,7 @@ deb http://apt.osmc.tv jessie main
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS=""
+LOCAL_CHROOT_PKGS="atv-remote"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
 echo -e "Updating sources"
@@ -61,10 +61,27 @@ verify_action
 echo -e "Installing core packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
-echo -e "Installing mediacenter"
+chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
+echo -e "Configuring environment"
+echo -e "	* Adding user osmc"
+setup_osmc_user ${DIR}
+verify_action
+echo -e "	* Setting hostname"
+setup_hostname ${DIR}
+verify_action
+echo -e "	* Setting up hosts"
+setup_hosts
+verify_action
+echo -e "	* Holding back packages"
+prevent_pkg_install "${DIR}" "xbmc"
+verify_action
 
 # Perform filesystem cleanup
 chroot ${DIR} umount /proc
 cleanup_filesystem "${DIR}"
+
+# Create filesystem tarball
+create_fs_tarball "${DIR}" "{filestub}"
+verify_action
 
 echo -e "Build successful"
