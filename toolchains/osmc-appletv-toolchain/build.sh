@@ -13,6 +13,9 @@ verify_action
 update_sources
 verify_action
 
+set_lb
+verify_action
+
 # Install packages needed to build filesystem for building
 install_package "debootstrap"
 verify_action

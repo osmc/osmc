@@ -30,6 +30,11 @@ function configure_ccache()
 	chmod +x ${1}/usr/bin/populate-osmc-cache
 }
 
+function set_lb()
+{
+	[ -f /tmp/disable-lb ] && export DISABLE_LOCAL_BUILDS=1
+}
+
 COMPILER_PKGS="build-essential subversion wget nano kernel-package sudo"
 FS_PKGS="parted kpartx libblkid-dev libfuse-dev libreadline-dev"
 REMOTE_PKGS="libusb-dev"
@@ -46,3 +51,4 @@ export XBMC_MAN_PKGS_RBP
 export -f build_deb_package
 export -f patchfs
 export -f configure_ccache
+export -f set_lb
