@@ -1,0 +1,112 @@
+Name: libnfs
+Summary: NFS client library
+Vendor: Ronnie Sahlberg
+Packager: ronniesahlberg@gmail.com
+Version: @VERSION@
+Release: 1
+Epoch: 0
+License: GNU LGPL version 2.1
+Group: System Environment/Libraries
+URL: http://www.github.com/sahlberg/libnfs
+
+Source: libnfs-%{version}.tar.gz
+
+Provides: lib = %{version}
+
+Prefix: /usr
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+
+%description
+LibNFS is a NFS client library
+
+#######################################################################
+
+
+
+%prep
+%setup -q
+# setup the init script and sysconfig file
+%setup -T -D -n libnfs-%{version} -q
+
+%build
+
+## check for ccache
+if ccache -h >/dev/null 2>&1 ; then
+	CC="ccache gcc"
+else
+	CC="gcc"
+fi
+
+export CC
+
+## always run autogen.sh
+aclocal
+autoheader
+autoconf
+libtoolize -c -f -i
+automake --add-missing
+
+
+CFLAGS="$RPM_OPT_FLAGS $EXTRA -O0 -g -D_GNU_SOURCE" ./configure \
+	--prefix=%{_prefix} 
+
+%install
+# Clean up in case there is trash left from a previous build
+rm -rf $RPM_BUILD_ROOT
+
+# Create the target build directory hierarchy
+
+make DESTDIR=$RPM_BUILD_ROOT install
+
+# Remove "*.old" files
+find $RPM_BUILD_ROOT -name "*.old" -exec rm -f {} \;
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+#######################################################################
+## Files section                                                     ##
+#######################################################################
+
+%files
+%defattr(-,root,root)
+
+%{_libdir}/libnfs.so*
+
+%package devel
+Summary: Development libraries for LibNFS
+Group: Development
+
+%description devel
+development libraries for LibNFS
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/nfsc/libnfs.h
+%{_includedir}/nfsc/libnfs-raw.h
+%{_includedir}/nfsc/libnfs-raw-mount.h
+%{_includedir}/nfsc/libnfs-raw-nfs.h
+%{_includedir}/nfsc/libnfs-raw-portmap.h
+%{_includedir}/nfsc/libnfs-raw-rquota.h
+%{_libdir}/libnfs.a
+%{_libdir}/libnfs.la
+%{_libdir}/pkgconfig/libnfs.pc
+
+%changelog
+* Sat Mar 3 2012 : Version 1.3
+ - add set/unset to portmapper
+ - add mount v1
+ - try to rotate to find a free port better
+ - minor fixes
+* Tue Dec 6 2011 : Version 1.2
+ - Add support for MKNOD
+ - Add support for HaneWin NFS server
+ - Change all [s]size_t offset_t to be 64bit clean scalars
+* Sun Nov 27 2011 : Version 1.1
+ - Fix definition and use of AUTH
+ - Only call the "connect" callback if non-NULL
+ - make sure the callback for connect is only invoked once for the sync api
+ - make file offset bits 64 bits always
+* Sun Jul 31 2011 : Version 1.0
+ - Initial version

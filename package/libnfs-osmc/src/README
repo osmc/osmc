@@ -1,0 +1,67 @@
+LIBNFS is a client library for accessing NFS shares over a network.
+
+LIBNFS offers three different APIs, for different use :
+1, RAW : A fully async low level rpc library for nfs protocols
+This API is described in include/libnfs-raw.h
+it offers a fully async interface to raw XDR encoded blobs.
+This api provides very flexible and precice control of the RPC issued.
+
+examples/nfsclient-raw.c provides examples on how to use the raw API
+
+2, NFS ASYNC : A fully asynchronous library for high level vfs functions
+This API is described by the *_async() fucntions in include/libnfs.h.
+This API provides a fully async access to posix vfs like functions such as 
+stat(), read(), ...
+
+examples/nfsclient-async.c provides examples on how to use this API
+
+
+3, NFS SYNC : A synchronous library for high level vfs functions
+This API is described by the *_sync() fucntions in include/libnfs.h.
+This API provides access to posix vfs like functions such as 
+stat(), read(), ...
+
+examples/nfsclient-sync.c provides examples on how to use this API
+
+
+
+ROOT vs NON-ROOT
+================
+When running as root, libnfs tries to allocate a system port for its connection
+to the nfs server. When running as non-root it will use a normal 
+ephemeral port.
+Many NFS servers default to a mode where they do not allow non-system
+ports from connecting.
+These servers require you use the "insecure" export option in /etc/exports
+in order to allow libnfs clients to be able to connect.
+
+Some versions of Linux support special capabilities that can be assigned to
+programs to allow non-root users to bind to system ports.
+This is set up by running 
+    sudo setcap 'cap_net_bind_service=+ep' /path/to/executable
+When libnfs is linked against an executable with this special capability
+assigned to it, libnfs may be able to use system ports even when executing
+under the privilege of a non-root user account.
+
+This is highly non-portable so IF this works on your linux system, count
+yourself lucky.
+
+
+
+PLATFORM support
+=================
+As of now this is tested with linux, MacOSX and Apple iOS.
+
+Linux:  - tested with Ubuntu 10.04 - should work with others aswell
+Cygwin: - tested under 64bit win2k8.
+MacOSX: - tested with SDK 10.4 (under Snow Leopard) - should also work with later SDKs and 64Bit
+iOS:    - tested with iOS SDK 4.2 - running on iOS 4.3.x
+FreeBSD:- tested with 8.2
+OpenSolaris
+Windows:- tested on Windows 7 64 and Windows XP 32 using Visual Studio 10 (see README.win32.txt for build instructions)
+
+
+Cygwin
+------
+Configure with './configure --enable-tirpc' since cygwin only supports ti-rpc and not classic rpc.
+
