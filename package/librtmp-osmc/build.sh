@@ -7,7 +7,7 @@
 
 echo -e "Building librtmp"
 out=$(pwd)/files
-if [ -d files/usr/ ]; then rm -rf files/usr; fi
+if [ -d files/usr ]; then rm -rf files/usr; fi
 if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
