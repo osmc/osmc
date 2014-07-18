@@ -51,7 +51,7 @@ deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
-disable_init "{DIR}"
+disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
 LOCAL_CHROOT_PKGS="atv-remote"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
