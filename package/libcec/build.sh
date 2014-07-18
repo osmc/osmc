@@ -11,8 +11,8 @@ if [ -d files/usr ]; then rm -rf files/usr; fi
 if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
-test $1 == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcecdev-osmc" >> files-dev/DEBIAN/control 
-test $1 == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcecdev-osmc" >> files-dev/DEBIAN/control
+test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcecdev-osmc" >> files-dev/DEBIAN/control 
+test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcecdev-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
 ./bootstrap
