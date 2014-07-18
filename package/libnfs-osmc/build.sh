@@ -12,7 +12,7 @@ if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
-test "$1" == gen && echo "Package: libnfs-osmc" >> files/DEBIAN/control && echo "Package: libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libnfs-osmc" >> /files-dev/DEBIAN/control
+test "$1" == gen && echo "Package: libnfs-osmc" >> files/DEBIAN/control && echo "Package: libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libnfs-osmc" >> files-dev/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && echo "Package: rbp-libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libnfs-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
