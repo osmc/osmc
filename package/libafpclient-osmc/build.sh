@@ -16,6 +16,7 @@ test "$1" == gen && echo "Package: libafpclient-osmc" >> files/DEBIAN/control &&
 test "$1" == rbp && echo "Package: rbp-libafpclient-osmc" >> files/DEBIAN/control && echo "Package: rbp-libafpclientdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libafpclient-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
+./bootstrap
 ./configure
 make
 make install DESTDIR=${out}
