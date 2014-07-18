@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building atvclient for AppleTV"
 out=$(pwd)/files
 cd src
