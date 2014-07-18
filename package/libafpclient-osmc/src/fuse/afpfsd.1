@@ -1,0 +1,22 @@
+.TH afpfsd 1 "1 Feb 2008" 0.8 afpfs-ng
+.SH NAME
+afpfsd \- Daemon to manage AFP sessions for the afpfs-ng FUSE client.
+.SH SYNOPSIS
+\fIafpfsd\fR [\fB-l|logmethod=method\f] [\f-f|--foreground\f] [\f-d|--debug\f]
+
+.SH DESCRIPTION
+\fiafpfsd\fR is a daemon that manages AFP sessions.  Functions (like mounting, getting status, etc) can be performed using the afp_client(1) tool.  This client communicates with the daemon over a named pipe.
+
+afpfsd will not start if another instance is already running.  There needs to be one copy of afpfsd running per user.
+
+.SH OPTIONS
+
+\fB-l|--logmethod\fR sets the method used to log; values are stdout or syslog
+
+\fB-f|--foreground\fR doesn't fork the daemon
+
+\fB-f|--debug\fR puts the daemon in the foreground and dumps logs to stdout
+
+.SH "SEE ALSO"
+\fBafp_client\fR(1), \fBmount_afp\fR(1)
+

@@ -1,0 +1,36 @@
+
+These are known bugs in afpfs-ng 0.8:
+
+- if afpfsd isnt' running, and you run an 'afp_client exit', it restarts it
+  and then kills it
+
+- files with '/' in them can't be accessed
+
+- for the fuse client, when you have multiple servers that are connected, 
+  if you unmount anything other than the last one, you may ruin the 
+  other mounts.
+
+- If you're not using a common user directory, chgrp may have problems
+
+- On occasion, when doing a mount with the fuse client, there can be a 
+  delay of 10 seconds.
+
+- there are some locking problems with FUSE which can cause a halted
+  filesystem under heavy traffic loads
+
+- on Mac OS X, gcrypt 1.4.0 or later is required.  1.2.4 has a dynamic linker
+  bug which will break afpfs-ng whenver gcrypt functions are called.
+
+- on file get and put, we don't really pay attention to tx and rx quantums.
+  This can make for inefficient transfers.
+
+- FreeBSD has quite a few problems with it; the port is simply incomplete.
+  Among the problems:
+  - the fuse implementation is totaly untested, you will need to manually
+    start up the daemon (afpfsd) 
+  - there can be some long delays when initiating connections
+
+- on some clients, such as afpgetstatus, ^C won't work
+
+- file names are limited to 255 characters, whereas AFP >= 3.0 handles
+  infinite lengths

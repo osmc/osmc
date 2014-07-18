@@ -1,0 +1,132 @@
+.TH afpcmd 1 "13 Nov 2007" 0.5 afpfs-ng
+.SH NAME
+afpcmd \- Transfer files over the networking using the Apple Filing Protocol (AFP)
+.SH SYNOPSIS
+\fIafpcmd\fR [\fB-r\f] [\fBafp url\fR]
+
+.SH DESCRIPTION
+\fiafpcmd\fR is a command-line tool to help transfer files to and from a server
+using AFP.  This is typically either Netatalk or Mac OS or Mac OS X.
+
+This can be done as a non-root user. It offers either an interactive command-line
+(like a traditional FTP client) or for batch retrievals.
+
+Do not confuse this with the FUSE mounting tools (mount_afp, afpfsd, afp_client), 
+which offer the ability to mount an entire filesystem.
+
+.SH OPTIONS
+
+\fB-r\fR sets the recursive flag.
+
+\fBafp url\fR uses the standard AFP URL format.  
+
+.SH AFP version support
+Look at the afpfs-ng documentation for more information on specific AFP version 
+compatibility information.
+
+.SH Batch mode
+
+Batch file transfers can be done in one of two ways:
+
+\fIafpcmd -r [\fBafp url to directory\fR]
+
+This does a recursive transfer of all subdirectories and files locally.
+
+\fIafpcmd [\fBafp url to file\fR]
+
+This transfers just the file locally.
+
+After either of these is finished, the command exits.
+
+.SH Interactive mode
+
+If a URL is provided on the command line, afpcmd connects and enters the volume and
+directory specified.  
+
+Standard readline keystrokes are enabled.  Command line competion (using tab) and 
+history (using up and down arrows) is provided. Local filename completion is
+enabled.
+
+\fBMost common commands\fR
+
+\fIconnect\fR <afp URL>: Connect to server, change to volume and directory 
+
+\fIcd\fR: Change directories on the server
+
+\fIget\fR <filename>: retrieve file
+
+\fIget\fR -r <directory>: Recursively retrieve the directory
+
+\fIput\fR <filename>: Upload file
+
+\fIquit\fR: Quit
+
+\fBConect/disconnect commands\fR
+
+\fIdisconnect\fR: Disconnect from current server
+
+\fIpasswd\fR: Prompts for a new password without showing on screen
+
+\fIuser\fR <user>: Set the user
+
+\fIpasswd\fR: change the password on the server. Does not work.
+
+\fBRemote directory commands\fR
+
+\fIpwd\fR: Show current directory on server
+
+\fImkdir\fR <directory>: create new directory
+
+\fIrmdir\fR <directory: remove directory
+
+\fIls\fR or \fIdir\fR: show files in current directory
+
+\fBRemote file commands\fR
+
+\fImv\fR or \fIrename\fR old_file new_file: Rename <old file> to <new file>
+
+\fItouch\fR <filename>: Create a blank file
+
+\fIview\fR <filename>: Show file
+
+\fIchmod\fR: <file> <mode>: Change the mode of a file on the server
+
+\fIdelete\fR of \fIrm\fR: <file>: Remove file from the server
+
+\fBStatus commands\fR
+
+\fIstatus\fR: Show status of the connection and details.  For debugging.
+
+\fIdf\fR: Show the disk size and available blocks.
+
+\fBLocal commands\fR
+
+\fIlpwd\fR: Show current local
+
+\fIlcd\fR: Change local directory
+
+\fBOther commands\fR
+
+\fIhelp\fR or \fI?\fR: show help
+
+\fItestafp\fR: various tests for developers
+
+
+.SH AFP URLs
+
+
+A typical usage of afpcmd is:
+
+\fIafpcmd\fR afp://username:password@servername/volume
+
+The complete syntax of a URL is:
+
+afp://username;AUTH=authtype:password@server:port/volume/path
+
+If a password of "-" is provided, the user is prompted for a password.
+
+.SH "REPORTING BUGS"
+Report bugs to the afpfs-ng-devel@sf.net mailing list.
+.SH "SEE ALSO"
+\fBafpgetstatus\fR(1)
+
