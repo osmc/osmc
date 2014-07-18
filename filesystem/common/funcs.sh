@@ -63,6 +63,17 @@ function create_fs_tarball()
 	popd
 }
 
+function disable_init()
+{
+	echo "exit 101" >${1}/usr/sbin/policy-rc.d
+	chmod 0755 ${1}/usr/sbin/policy-rc.d
+}
+
+function enable_init()
+{
+	rm ${1}/usr/sbin/policy-rc.d
+}
+
 export CHROOT_PKGS
 export XBMC_MAN_ATV
 export XBMC_MAN_RBP
@@ -72,3 +83,5 @@ export -f setup_hostname
 export -f setup_hosts
 export -f prevent_pkg_install
 export -f create_fs_tarball
+export -f disable_init
+export -f enable_init

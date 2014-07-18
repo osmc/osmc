@@ -51,6 +51,7 @@ deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
+disable_init "{DIR}"
 chroot ${DIR} mount -t proc proc /proc
 LOCAL_CHROOT_PKGS="atv-remote"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
@@ -78,6 +79,7 @@ verify_action
 
 # Perform filesystem cleanup
 chroot ${DIR} umount /proc
+enable_init "{DIR}"
 cleanup_filesystem "${DIR}"
 
 # Create filesystem tarball
