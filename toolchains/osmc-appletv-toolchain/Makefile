@@ -1,6 +1,9 @@
 all:
-	[ ! -z "\$\DISABLE_LOCAL_BUILDS" ] && touch /tmp/disable-lb
-	sudo bash build.sh
+        sudo bash build.sh
+
+local:
+        touch /tmp/disable-lb
+        sudo bash build.sh
 
 clean:
-	sudo rm *.deb
+        sudo rm *.deb
