@@ -16,7 +16,7 @@ test "$1" == gen && echo "Package: libnfs-osmc" >> files/DEBIAN/control && echo 
 test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && echo "Package: rbp-libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libnfs-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
-./configue --prefix=/usr
+./configure --prefix=/usr
 make
 make install DESTDIR=${out}
 strip_files "${out}"
