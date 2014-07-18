@@ -1,0 +1,43 @@
+.TH CEC-CLIENT "1" "January 2012" "User Commands"
+.SH NAME
+cec\-client \- CEC connection client utility
+.SH DESCRIPTION
+cec\-client {\-h|\-\-help|\-l|\-\-list\-devices|[COM PORT]}
+.SS "parameters:"
+.TP
+\fB\-h\fR \fB\-\-help\fR
+Shows this help text
+.TP
+\fB\-l\fR \fB\-\-list\-devices\fR
+List all devices on this system
+.TP
+\fB\-t\fR \fB\-\-type\fR {p|r|t|a}
+The device type to use. More than one is possible.
+.TP
+\fB\-p\fR \fB\-\-port\fR {int}
+The HDMI port to use as active source.
+.TP
+\fB\-b\fR \fB\-\-base\fR {int}
+The logical address of the device to with this
+adapter is connected.
+.TP
+\fB\-f\fR \fB\-\-log\-file\fR {file}
+Writes all libCEC log message to a file
+.TP
+\fB\-sf\fR \fB\-\-short\-log\-file\fR {file} Writes all libCEC log message without timestamps
+and log levels to a file.
+.TP
+\fB\-d\fR \fB\-\-log\-level\fR {level}
+Sets the log level. See cectypes.h for values.
+.TP
+\fB\-s\fR \fB\-\-single\-command\fR
+Execute a single command and exit. Does not power
+on devices on startup and power them off on exit.
+.TP
+[COM PORT]
+The com port to connect to. If no COM
+port is given, the client tries to connect to the
+first device that is detected.
+.PP
+Type 'h' or 'help' and press enter after starting the client to display all
+available commands

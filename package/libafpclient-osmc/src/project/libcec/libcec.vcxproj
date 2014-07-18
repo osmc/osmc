@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\cec.h" />
+    <ClInclude Include="..\..\include\cecc.h" />
+    <ClInclude Include="..\..\include\cecloader.h" />
+    <ClInclude Include="..\..\include\cectypes.h" />
+    <ClInclude Include="..\..\src\lib\adapter\AdapterCommunication.h" />
+    <ClInclude Include="..\..\src\lib\adapter\AdapterFactory.h" />
+    <ClInclude Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterCommands.h" />
+    <ClInclude Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterCommunication.h" />
+    <ClInclude Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterDetection.h" />
+    <ClInclude Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterMessage.h" />
+    <ClInclude Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterMessageQueue.h" />
+    <ClInclude Include="..\..\src\lib\CECClient.h" />
+    <ClInclude Include="..\..\src\lib\CECInputBuffer.h" />
+    <ClInclude Include="..\..\src\lib\CECProcessor.h" />
+    <ClInclude Include="..\..\src\lib\CECTypeUtils.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECAudioSystem.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECBusDevice.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECDeviceMap.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECPlaybackDevice.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECRecordingDevice.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECTuner.h" />
+    <ClInclude Include="..\..\src\lib\devices\CECTV.h" />
+    <ClInclude Include="..\..\src\lib\implementations\ANCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\CECCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\PHCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\RLCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\SLCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\VLCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\RHCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\implementations\AQCommandHandler.h" />
+    <ClInclude Include="..\..\src\lib\LibCEC.h" />
+    <ClInclude Include="..\..\src\lib\platform\adl\adl-edid.h" />
+    <ClInclude Include="..\..\src\lib\platform\adl\adl_defines.h" />
+    <ClInclude Include="..\..\src\lib\platform\adl\adl_sdk.h" />
+    <ClInclude Include="..\..\src\lib\platform\adl\adl_structures.h" />
+    <ClInclude Include="..\..\src\lib\platform\nvidia\nv-edid.h" />
+    <ClInclude Include="..\..\src\lib\platform\os.h" />
+    <ClInclude Include="..\..\src\lib\platform\sockets\serialport.h" />
+    <ClInclude Include="..\..\src\lib\platform\sockets\socket.h" />
+    <ClInclude Include="..\..\src\lib\platform\sockets\tcp.h" />
+    <ClInclude Include="..\..\src\lib\platform\threads\mutex.h" />
+    <ClInclude Include="..\..\src\lib\platform\threads\threads.h" />
+    <ClInclude Include="..\..\src\lib\platform\util\baudrate.h" />
+    <ClInclude Include="..\..\src\lib\platform\util\buffer.h" />
+    <ClInclude Include="..\..\src\lib\platform\util\edid.h" />
+    <ClInclude Include="..\..\src\lib\platform\util\StdString.h" />
+    <ClInclude Include="..\..\src\lib\platform\util\timeutils.h" />
+    <ClInclude Include="..\..\src\lib\platform\windows\dlfcn-win32.h" />
+    <ClInclude Include="..\..\src\lib\platform\windows\os-socket.h" />
+    <ClInclude Include="..\..\src\lib\platform\windows\os-threads.h" />
+    <ClInclude Include="..\..\src\lib\platform\windows\os-types.h" />
+    <ClInclude Include="..\..\src\lib\platform\windows\stdint.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\lib\adapter\AdapterFactory.cpp" />
+    <ClCompile Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterCommands.cpp" />
+    <ClCompile Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterCommunication.cpp" />
+    <ClCompile Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterDetection.cpp" />
+    <ClCompile Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterMessage.cpp" />
+    <ClCompile Include="..\..\src\lib\adapter\Pulse-Eight\USBCECAdapterMessageQueue.cpp" />
+    <ClCompile Include="..\..\src\lib\CECClient.cpp" />
+    <ClCompile Include="..\..\src\lib\CECProcessor.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECAudioSystem.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECBusDevice.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECDeviceMap.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECPlaybackDevice.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECRecordingDevice.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECTuner.cpp" />
+    <ClCompile Include="..\..\src\lib\devices\CECTV.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\ANCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\CECCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\PHCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\RLCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\SLCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\VLCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\RHCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\implementations\AQCommandHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\LibCEC.cpp" />
+    <ClCompile Include="..\..\src\lib\LibCECC.cpp" />
+    <ClCompile Include="..\..\src\lib\LibCECDll.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\adl\adl-edid.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\nvidia\nv-edid.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\windows\dlfcn-win32.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\windows\os-edid.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\windows\os-threads.cpp" />
+    <ClCompile Include="..\..\src\lib\platform\windows\serialport.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libcec.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C04B0FB1-667D-4F1C-BDAE-A07CDFFAAAA0}</ProjectGuid>
+    <RootNamespace>libcec</RootNamespace>
+    <ProjectName>libcec</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\build\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\build\x64\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>libcec</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\win7\i386;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\win7\amd64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\build\</OutDir>
+    <TargetName>libcec</TargetName>
+    <IncludePath>$(SolutionDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\win7\i386;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\build\x64\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(SolutionDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\win7\amd64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>CEC_DEBUGGING;HAVE_P8_USB;_USE_32BIT_TIME_T;_DEBUG;_CRT_SECURE_NO_WARNINGS;_WINSOCKAPI_;__STDC_CONSTANT_MACROS;DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Version>
+      </Version>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>CEC_DEBUGGING;HAVE_P8_USB;_WIN64;_DEBUG;_CRT_SECURE_NO_WARNINGS;_WINSOCKAPI_;__STDC_CONSTANT_MACROS;DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <Version>
+      </Version>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_P8_USB;_USE_32BIT_TIME_T;_CRT_SECURE_NO_WARNINGS;_WINSOCKAPI_;__STDC_CONSTANT_MACROS;DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <Version>
+      </Version>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_P8_USB;_WIN64;_CRT_SECURE_NO_WARNINGS;_WINSOCKAPI_;__STDC_CONSTANT_MACROS;DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <Version>
+      </Version>
+    </Link>
+    <ProjectReference />
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+      <SubSystem>Windows</SubSystem>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,37 @@
+TOOLCHAIN_GIT="git://github.com/raspberrypi/tools.git"
+FIRMWARE_GIT="git://github.com/raspberrypi/firmware.git"
+TARBALL_LOCATION="http://sources.openelec.tv/devel/"
+LOCKDEV_TARBALL="lockdev-16b8996.tar.xz"
+
+_set_toolchain_path()
+{
+  echo "Setting toolchain path to: '$1'"
+
+  export TARGET_TOOLCHAIN_PATH="$1/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/bin"
+  export TARGET_TOOLCHAIN_LIB_PATH="$1/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/lib"
+  export TARGET_HOST="arm-bcm2708hardfp-linux-gnueabi"
+
+  export CC=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-gcc
+  export CXX=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-g++
+  export LD=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-ld
+  export AS=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-as
+  export AR=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-ar
+  export NM=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-nm
+  export RANLIB=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-ranlib
+  export OBJCOPY=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-objcopy
+  export OBJDUMP=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-objdump
+  export STRIP=${TARGET_TOOLCHAIN_PATH}/${TARGET_HOST}-strip
+
+  export CPPFLAGS="-I${SCRIPT_PATH}/deps/include"
+  export CFLAGS="-march=armv6 -mfpu=vfp -mfloat-abi=hard -Wno-psabi -Wa,-mno-warn-deprecated -O3 -fexcess-precision=fast -ffast-math -I${SCRIPT_PATH}/deps/include"
+  export CXXFLAGS="$CFLAGS"
+  export LDFLAGS="-march=armv6 -mtune=arm1176jzf-s -L${SCRIPT_PATH}/deps/lib"
+
+  #export PKG_CONFIG_PATH="$TARGET_PKG_CONFIG_PATH"
+  export PKG_CONFIG_LIBDIR="${SCRIPT_PATH}/deps/lib/pkgconfig:${SCRIPT_PATH}/deps/lib/share/pkgconfig"
+  export PKG_CONFIG_SYSROOT_DIR="${SCRIPT_PATH}/deps"
+
+  export PATH="$TARGET_TOOLCHAIN_PATH:$PATH"
+  export LD_LIBRARY_PATH="$TARGET_TOOLCHAIN_LIB_PATH:$LD_LIBRARY_PATH"
+}
+
