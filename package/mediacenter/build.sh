@@ -33,7 +33,7 @@ cd ../
 # PVR build
 PVR_SRC="git clone https://github.com/opdenkamp/xbmc-pvr-addons.git"
 PVR_BRANCH="Gotham"
-git clone $"{PVR_SRC}" -b "$PVR_BRANCH" src-b/
+git clone "${PVR_SRC}" -b "${PVR_BRANCH}" src-b/
 cd src-b
 sh ../patch-pvr-generic.sh
 ./bootstrap
