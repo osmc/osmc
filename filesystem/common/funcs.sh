@@ -48,7 +48,7 @@ function prevent_pkg_install()
 {
 	echo "Package: ${2}
 Pin: release \*
-Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${1}
+Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${2}
 }
 
 function configure_vchiq_udev()
