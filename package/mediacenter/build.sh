@@ -17,6 +17,8 @@ XBMC_SRC="https://github.com/xbmc/xbmc"
 git clone ${XBMC_SRC} src/
 if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
 cd src
+BRANCH="Gotham"
+git checkout "${BRANCH}"
 # Patch generic
 sh patch-generic.sh
 # Patch platform
