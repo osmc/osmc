@@ -14,7 +14,6 @@ CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
 function setup_osmc_user()
 {
 	# Sets user and password to 'osmc'
-	mkdir ${1}/home
 	chroot ${1} useradd -p \$1\$P.ZH6EFu\$L08/1ZYI6FdHu3aw0us.u0 osmc -k /etc/skel -d /home/osmc -m -s /bin/bash
 	# Locks root
 	chroot ${1} passwd -l root
