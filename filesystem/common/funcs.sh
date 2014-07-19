@@ -62,6 +62,7 @@ function create_fs_tarball()
 	pushd ${1}
 	tar -czf ../${2}.tar.gz *
 	popd
+	rm -rf ${1}
 }
 
 function disable_init()
