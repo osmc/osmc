@@ -108,11 +108,6 @@ function remove_existing_filesystem()
 	if [ -f "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
 }
 
-function clean_debian_prep()
-{
-	rm -rf ${1}/output
-}
-
 export -f check_platform
 export -f verify_action
 export -f enable_nw_chroot
@@ -124,4 +119,3 @@ export -f install_package
 export -f fetch_filesystem
 export -f cleanup_filesystem
 export -f remove_existing_filesystem
-export -f clean_debian_prep

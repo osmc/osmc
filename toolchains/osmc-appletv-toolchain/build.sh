@@ -94,10 +94,7 @@ cleanup_filesystem "${DIR}"
 
 # Build Debian package
 echo "Building Debian package"
-clean_debian_prep "${wd}" "${tcstub}"
 build_deb_package "${wd}" "${tcstub}"
 verify_action
 
-# Reclean
-clean_debian_prep "${wd}" "${tcstub}"
 echo -e "Build successful"
