@@ -34,7 +34,7 @@ cd src-b
 make clean >/dev/null 2>&1
 sh ../patch-pvr-generic.sh
 ./bootstrap
-./configure --prefix=/usr
+./configure --prefix=/usr --enable-addons-with-dependencies
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 make -j4
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
