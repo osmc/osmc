@@ -12,17 +12,14 @@ sed '/Package/d' -i files/DEBIAN/control
 sed /'Depends/d' -i files/DEBIAN/control
 test "$1" == atv && echo "Package: atv-osmc-mediacenter" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-osmc-mediacenter" >> files/DEBIAN/control
-# Check out XBMC source
 XBMC_SRC="https://github.com/xbmc/xbmc"
 XBMC_BRANCH="Gotham"
 git clone "${XBMC_SRC}" -b "${XBMC_BRANCH}" src-a/
 if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
 cd src-a
-# Patch generic
+make clean >/dev/null 2>&1
 sh ../patch-generic.sh
-# Patch platform
 sh ../patch-"${1}".sh
-# Build
 ./bootstrap
 test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure --prefix=/usr
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
@@ -30,11 +27,11 @@ make -j4
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 make install DESTDIR=${out}
 cd ../
-# PVR build
 PVR_SRC="git clone https://github.com/opdenkamp/xbmc-pvr-addons.git"
 PVR_BRANCH="Gotham"
 git clone "${PVR_SRC}" -b "${PVR_BRANCH}" src-b/
 cd src-b
+make clean >/dev/null 2>&1
 sh ../patch-pvr-generic.sh
 ./bootstrap
 ./configure --prefix=/usr
