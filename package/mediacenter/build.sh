@@ -16,9 +16,11 @@ test "$1" == atv && echo "Package: atv-osmc-mediacenter" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-osmc-mediacenter" >> files/DEBIAN/control
 XBMC_SRC="https://github.com/xbmc/xbmc"
 XBMC_BRANCH="Gotham"
+TAG="13.1-Gotham"
 git clone "${XBMC_SRC}" -b "${XBMC_BRANCH}" src-a/
 if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
 cd src-a
+git checkout "${TAG}"
 make clean >/dev/null 2>&1
 sh ../patch-generic.sh
 sh ../patch-"${1}".sh
@@ -31,8 +33,10 @@ make install DESTDIR=${out}
 cd ../
 PVR_SRC="https://github.com/opdenkamp/xbmc-pvr-addons"
 PVR_BRANCH="gotham"
+PVR_TAG="13.0-Gotham"
 git clone "${PVR_SRC}" -b "${PVR_BRANCH}" src-b/
 cd src-b
+git checkout "${TAG}"
 make clean >/dev/null 2>&1
 sh ../patch-pvr-generic.sh
 ./bootstrap
