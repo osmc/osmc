@@ -83,7 +83,7 @@ enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
 
 # Create filesystem tarball
-create_fs_tarball "${DIR}" "{filestub}"
+create_fs_tarball "${DIR}" "${filestub}"
 verify_action
 
 echo -e "Build successful"
