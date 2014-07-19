@@ -79,7 +79,7 @@ verify_action
 
 # Perform filesystem cleanup
 chroot ${DIR} umount /proc
-enable_init "{DIR}"
+enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
 
 # Create filesystem tarball
