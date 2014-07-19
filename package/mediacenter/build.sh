@@ -46,6 +46,6 @@ rm -rf ${out}/usr/share/xbmc/addons/service.xbmc.versioncheck
 strip ${out}/usr/lib/xbmc/xbmc.bin
 strip ${out}/usr/lib/xbmc/addons/*/*.so
 strip ${out}/usr/lib/xbmc/addons/pvr.*/*.pvr
-test "$1" == atv && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libpulse0,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libmicrohttpd10,libjasper1,libxrandr2,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libsdl-image1.2,libglew1.10,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libglu1-mesa" >> files/DEBIAN/control
+test "$1" == atv && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libpulse0,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libmicrohttpd10,libjasper1,libxrandr2,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libsdl-image1.2,libglew1.10,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libglu1-mesa,libcrystalhd3,firmware-crystalhd" >> files/DEBIAN/control
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ osmc-mediacenter.deb
