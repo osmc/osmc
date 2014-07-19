@@ -1,0 +1,4 @@
+#!/bin/bash
+
+grep /boot /proc/mounts -q
+if [ $? != 0 ]; then echo "/boot is not mounted!"; exit 1; fi
