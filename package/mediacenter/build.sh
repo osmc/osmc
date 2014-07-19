@@ -20,9 +20,9 @@ cd src
 BRANCH="Gotham"
 git checkout "${BRANCH}"
 # Patch generic
-sh patch-generic.sh
+sh ../patch-generic.sh
 # Patch platform
-sh patch-$"{1}".sh
+sh ../patch-"${1}".sh
 # Build
 ./bootstrap
 test "$1" == atv && ./configure --prefix=/usr
