@@ -25,7 +25,7 @@ sh ../patch-generic.sh
 sh ../patch-"${1}".sh
 # Build
 ./bootstrap
-test "$1" == atv && ./configure --prefix=/usr
+test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure --prefix=/usr
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 make -j4
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
