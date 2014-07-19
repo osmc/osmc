@@ -3,5 +3,27 @@
 
 #!/bin/bash
 
+makedirnb()
+{
+  # Git doesn't allow empty folders. Do at runtime.
+  if [ ! -f files/${1} ]; then mkdir files/${1}; fi
+}
+
 echo -e "Building base files for Jessie"
+makedirnb "proc"
+makedirnb "bin"
+makedirnb "tmp"
+makedirnb "usr"
+makedirnb "var"
+makedirnb "run"
+makedirnb "root"
+makedirnb "sys"
+makedirnb "lib"
+makedirnb "opt"
+makedirnb "home"
+makedirnb "lib64"
+makedirnb "mnt"
+makedirnb "selinux"
+makedirnb "boot"
+makedirnb "dev"
 dpkg -b files/ base-files.deb
