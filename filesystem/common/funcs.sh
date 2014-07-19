@@ -8,7 +8,7 @@
 XBMC_MAN_ATV="mediacenter-atv-osmc"
 XBMC_MAN_RBP="mediacenter-rbp-osmc"
 INIT_PKGS="systemd systemd-sysv"
-SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo"
+SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo module-init-tools"
 CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
 
 function setup_osmc_user()
