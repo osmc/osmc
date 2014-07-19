@@ -27,8 +27,8 @@ make -j4
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 make install DESTDIR=${out}
 cd ../
-PVR_SRC="https://github.com/opdenkamp/xbmc-pvr-addons.git"
-PVR_BRANCH="Gotham"
+PVR_SRC="https://github.com/opdenkamp/xbmc-pvr-addons"
+PVR_BRANCH="gotham"
 git clone "${PVR_SRC}" -b "${PVR_BRANCH}" src-b/
 cd src-b
 make clean >/dev/null 2>&1
