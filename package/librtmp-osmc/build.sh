@@ -21,8 +21,11 @@ if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd librtmp
 strip_libs
 mkdir -p $out/usr/lib
-cp -ar librtmp.so.* $out/usr/lib
+cp -ar librtmp.so.1 $out/usr/lib
 cp -ar librtmp.a $out/usr/lib
+pushd $out/usr/lib
+ln -s librtmp.so.1 librtmp.so
+popd
 cd ../../
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ librtmp-osmc.deb
