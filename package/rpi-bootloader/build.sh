@@ -10,14 +10,13 @@ start_x.elf
 fixup_x.dat
 bootcode.bin"
 
-if [ -f "${BOOT}" ]; then rm -rf "${BOOT}"
+if [ -f "${BOOT}" ]; then rm -rf "${BOOT}"; fi
 mkdir -p "${BOOT}"
 
-for file in "${FWFILES}"
+for file in $FWFILES
 do
-	wget --no-check-certificate https://raw.githubusercontent.com/raspberrypi/firmware/master/boot/"${file}" -O "${BOOT"}/"${file}"
+	wget --no-check-certificate https://raw.githubusercontent.com/raspberrypi/firmware/master/boot/"${file}" -O "${BOOT}"/"${file}"
 	if [ $? != 0 ]; then echo "Download failed" && exit 1; fi
 done
 
 dpkg -b files/ osmc-rpi-bootloader
-
