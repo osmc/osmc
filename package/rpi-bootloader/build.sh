@@ -19,4 +19,4 @@ do
 	if [ $? != 0 ]; then echo "Download failed" && exit 1; fi
 done
 
-dpkg -b files/ osmc-rpi-bootloader
+dpkg -b files/ osmc-rpi-bootloader.deb
