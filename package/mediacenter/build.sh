@@ -14,10 +14,10 @@ test "$1" == atv && echo "Package: atv-osmc-mediacenter" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-osmc-mediacenter" >> files/DEBIAN/control
 # Check out XBMC source
 XBMC_SRC="https://github.com/xbmc/xbmc"
-git clone ${XBMC_SRC} src/
+XBMC_BRANCH="Gotham"
+git clone "${XBMC_SRC}" -b "${XBMC_BRANCH}" src-a/
 if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
-cd src
-BRANCH="Gotham"
+cd src-a
 git checkout "${BRANCH}"
 # Patch generic
 sh ../patch-generic.sh
@@ -30,8 +30,20 @@ if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 make -j4
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 make install DESTDIR=${out}
+cd ../
 # PVR build
-#tbc
+PVR_SRC="git clone https://github.com/opdenkamp/xbmc-pvr-addons.git"
+PVR_BRANCH="Gotham"
+git clone $"{PVR_SRC}" -b "$PVR_BRANCH" src-b/
+cd src-b
+sh ../patch-pvr-generic.sh
+./bootstrap
+./configure --prefix=/usr
+if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
+make -j4
+if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
+make install DESTDIR=${out}
+cd ../
 # Set deps:
 test "$1" == atv && echo "Depends: libssh-4 libavahi-client3 python libsmbclient libpulse0 libtiff5 libjpeg8 libsqlite3-0 libflac8 libtinyxml2.6.2 libmicrohttpd10 libjasper1 libxrandr2 libyajl2 libmysqlclient18 libasound2 libxml2 libxslt1.1 libpng12-0 libsamplerate0 libtag1-vanilla libsdl-image1.2 libglew1.10 libfribidi0 liblzo2-2 libcdio13 libpcrecpp0" >> files/DEBIAN/control
 fix_arch_ctl "files/DEBIAN/control"
