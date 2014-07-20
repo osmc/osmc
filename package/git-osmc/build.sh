@@ -11,7 +11,10 @@ test $1 == rbp && echo "Package: rbp-git-osmc" >> files/DEBIAN/control
 cd src
 make clean
 ./configure --prefix=/usr --disable-pthreads
-make
+# Hack QEMU
+PATH="/tmp:"${PATH}
+ln -s /bin/true /tmp/msgfmt
+make NO_GETTEXT=YesPlease
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd ../
