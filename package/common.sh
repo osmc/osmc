@@ -26,6 +26,9 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
+cores=$(cat /proc/cpuinfo | grep processor | wc -l)
+alias make="make -j${cores}"
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
