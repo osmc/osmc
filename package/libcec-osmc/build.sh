@@ -19,7 +19,7 @@ make clean
 ./bootstrap
 test "$1" == gen && ./configure --prefix=/usr
 test "$1" == rbp && ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib
-make
+$BUILD
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"

@@ -17,7 +17,7 @@ test "$1" == rbp && echo "Package: rbp-libafpclient-osmc" >> files/DEBIAN/contro
 cd src
 make clean
 ./configure --prefix=/usr
-make
+$BUILD
 make install DESTDIR=${out}
 # We always error
 #if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi

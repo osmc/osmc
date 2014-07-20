@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building git for QEMU ARM"
 out=$(pwd)/files
 if [ -d files/usr ]; then rm -rf files/usr; fi
@@ -14,7 +16,7 @@ make clean
 # Hack QEMU
 PATH="/tmp:"${PATH}
 ln -s /bin/true /tmp/msgfmt
-make NO_GETTEXT=YesPlease
+$BUILD NO_GETTEXT=YesPlease
 if [ $? != 0 ]; then echo "Error occured during build" && rm /tmp/msgfmt && exit 1; fi
 rm /tmp/msgfmt
 make install DESTDIR=${out}

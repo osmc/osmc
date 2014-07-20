@@ -27,7 +27,7 @@ function strip_libs()
 }
 
 cores=$(cat /proc/cpuinfo | grep processor | wc -l)
-alias make="make -j${cores}"
+export BUILD="make -j${cores}"
 
 export -f fix_arch_ctl
 export -f strip_files

@@ -17,7 +17,7 @@ test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && e
 cd src
 make clean
 ./configure --prefix=/usr
-make
+$BUILD
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"

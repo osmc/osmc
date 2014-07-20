@@ -16,7 +16,7 @@ test "$1" == gen && echo "Package: librtmp-osmc" >> files/DEBIAN/control && echo
 test "$1" == rbp && echo "Package: rbp-librtmp-osmc" >> files/DEBIAN/control && echo "Package: rbp-librtmpdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-librtmp-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
-make sys=posix
+$BUILD sys=posix
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd librtmp
 strip_libs

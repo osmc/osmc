@@ -18,7 +18,7 @@ cd src
 make clean
 ./autogen.sh
 ./configure --prefix=/usr
-make
+$BUILD
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"
