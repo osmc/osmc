@@ -27,7 +27,7 @@ sh ../patch-"${1}".sh
 ./bootstrap
 test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure --prefix=/usr
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
-make -j4
+make
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 make install DESTDIR=${out}
 cd ../
@@ -42,7 +42,7 @@ sh ../patch-pvr-generic.sh
 ./bootstrap
 ./configure --prefix=/usr --enable-addons-with-dependencies
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
-make -j4
+make
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 make install DESTDIR=${out}
 cd ../
