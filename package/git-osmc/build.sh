@@ -16,6 +16,7 @@ PATH="/tmp:"${PATH}
 ln -s /bin/true /tmp/msgfmt
 make NO_GETTEXT=YesPlease
 make install DESTDIR=${out}
+rm /tmp/msgfmt
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd ../
 dpkg -b files/ git-osmc.deb
