@@ -15,8 +15,8 @@ make clean
 PATH="/tmp:"${PATH}
 ln -s /bin/true /tmp/msgfmt
 make NO_GETTEXT=YesPlease
-make install DESTDIR=${out}
+if [ $? != 0 ]; then echo "Error occured during build" && rm /tmp/msgfmt && exit 1; fi
 rm /tmp/msgfmt
-if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
+make install DESTDIR=${out}
 cd ../
 dpkg -b files/ git-osmc.deb
