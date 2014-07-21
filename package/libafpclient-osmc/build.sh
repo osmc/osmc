@@ -13,7 +13,7 @@ sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
 test "$1" == gen && echo "Package: libafpclient-osmc" >> files/DEBIAN/control && echo "Package: libafpclientdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libafpclient-osmc" >> files-dev/DEBIAN/control
-test "$1" == rbp && echo "Package: rbp-libafpclient-osmc" >> files/DEBIAN/control && echo "Package: rbp-libafpclientdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libafpclient-osmc" >> files-dev/DEBIAN/control
+test "$1" == rbp && echo "Package: rbp-libafpclient-osmc" >> files/DEBIAN/control && echo "Package: rbp-libafpclientdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libafpclient-osmc" >> files-dev/DEBIAN/control
 cd src
 make clean
 ./configure --prefix=/usr
