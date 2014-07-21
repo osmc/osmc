@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building armmem for Raspberry Pi"
 out=$(pwd)/files
 if [ -d files/usr ]; then rm -rf files/usr; fi
