@@ -44,7 +44,7 @@ function create_advancedsettings()
         <defaultplayer>omxplayer</defaultplayer>
         <defaultdvdplayer>dvdplayer</defaultdvdplayer>
     </video>
-</advancedsettings>' > ${2}/usr/xbmc/share/xbmc/system/advancedsettings.xml
+</advancedsettings>' > ${2}/usr/share/xbmc/system/advancedsettings.xml
     fi
    
 }
