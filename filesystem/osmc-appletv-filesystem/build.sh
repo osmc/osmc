@@ -72,7 +72,7 @@ echo -e "	* Setting hostname"
 setup_hostname ${DIR}
 verify_action
 echo -e "	* Setting up hosts"
-setup_hosts
+setup_hosts ${DIR}
 verify_action
 echo -e "	* Holding back packages"
 prevent_pkg_install "${DIR}" "xbmc"
