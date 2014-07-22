@@ -81,7 +81,6 @@ chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}"
 
 # Perform filesystem cleanup
-chroot ${DIR} umount /proc
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
 
