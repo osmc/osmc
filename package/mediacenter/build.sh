@@ -24,6 +24,27 @@ WantedBy = multi-user.target" > ${1}/lib/systemd/system/mediacenter.service
 	chmod +x ${1}/lib/systemd/system/mediacenter.service
 }
 
+function create_advancedsettings()
+{
+	if [ "$1" == "rbp" ]
+	then
+		echo '<?xml version="1.0" encoding="UTF-8"?>
+<advancedsettings>
+    <network>
+        <readbufferfactor>4.0</readbufferfactor>
+        <cachemembuffersize>0</cachemembuffersize>
+    </network>
+    <imageres>540</imageres>
+    <fanartres>720</fanartres>
+    <video>
+        <defaultplayer>omxplayer</defaultplayer>
+        <defaultdvdplayer>dvdplayer</defaultdvdplayer>
+    </video>
+</advancedsettings>' > ${2}
+    fi
+   
+}
+
 echo -e "Building XBMC"
 out=$(pwd)/files
 if [ -d files/usr ]; then rm -rf files/usr; fi
@@ -81,5 +102,6 @@ test "$1" == atv && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient
 test "$1" == rbp && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmicrohttpd10,libjasper1,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,rbp-libcec-osmc,rbp-libshairplay-osmc,rbp-libnfs-osmc,rbp-libafpclient-osmc,rbp-librtmpclient-osmc,rpiuserland" >> files/DEBIAN/control
 
 test "$1" == rbp && create_systemd_script "${out}" "/usr/lib/xbmc/xbmc.bin --standalone -fs"
+create_advancedsettings "$1" "${out}/usr/xbmc/share/xbmc/system/advancedsettings.xml"
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ osmc-mediacenter.deb
