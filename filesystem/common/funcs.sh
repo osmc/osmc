@@ -61,7 +61,7 @@ KERNEL=="js[0-9]*",             MODE="0660", GROUP="osmc"
 KERNEL=="tty[0-9]*",            MODE="0666"
 
 # vchiq
-SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}etc/udev/rules.d/10-permissions.rules
+SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}/etc/udev/rules.d/10-permissions.rules
 }
 
 function create_fs_tarball()
