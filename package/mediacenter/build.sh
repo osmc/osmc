@@ -27,7 +27,7 @@ sh ../patch-"${1}".sh
 ./bootstrap
 test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure \
 --prefix=/usr
-test "$1" == rbp && LIBRARY_PATH+=/opt/vc/lib CXXFLAGS="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" ./configure \
+test "$1" == rbp && LIBRARY_PATH+=/opt/vc/lib CXXFLAGS="-I/usr/include/afpfs-ng -I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" ./configure \
  	--enable-gles --disable-sdl --disable-x11 --disable-xrandr --disable-openmax \
 	--enable-optical-drive --enable-libbluray --enable-dvdcss --disable-joystick --disable-debug \
  	--disable-crystalhd --disable-vtbdecoder --disable-vaapi --disable-vdpau \
