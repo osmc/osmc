@@ -30,7 +30,7 @@ mkdir -p $DIR
 
 # Debootstrap (foreign)
 
-fetch_filesystem "--arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR} ${URL}"
+fetch_filesystem "--no-check-gpg --arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR} ${URL}"
 verify_action
 
 # Configure filesystem (2nd stage)
