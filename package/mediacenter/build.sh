@@ -41,8 +41,8 @@ if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
 cd src-a
 git checkout "${TAG}"
 make clean >/dev/null 2>&1
-sh ../patch-generic.sh
-sh ../patch-"${1}".sh
+sh ../patch.sh gen
+sh ../patch.sh "${1}"
 ./bootstrap
 test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure \
 --prefix=/usr
