@@ -52,7 +52,16 @@ Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${2}
 
 function configure_vchiq_udev()
 {
-	echo 'SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}etc/udev/rules.d/10-permissions.rules
+	echo '# input
+KERNEL=="mouse*|mice|event*",   MODE="0660", GROUP="input"
+KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="input"
+KERNEL=="js[0-9]*",             MODE="0660", GROUP="input"
+
+# tty
+KERNEL=="tty[0-9]*",            MODE="0666"
+
+# vchiq
+SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}etc/udev/rules.d/10-permissions.rules
 }
 
 function create_fs_tarball()
