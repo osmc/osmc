@@ -7,8 +7,10 @@
 
 function create_systemd_script()
 {
-	mkdir -p ${1}/lib/systemd/system
-	echo "[Unit]
+	mkdir -p ${2}/lib/systemd/system
+	if [ "$1" == "rbp" ]
+	then
+		echo "[Unit]
 Description = media center application
 After = remote-fs.target
 
@@ -16,12 +18,14 @@ After = remote-fs.target
 User = osmc
 Group = osmc
 Type = simple
-ExecStart = ${2}
+Environment=LD_PRELOAD=/usr/lib/libarmmem.so
+ExecStart = /usr/lib/xbmc/xbmc.bin --standalone -fs
 Restart = on-abort
 
 [Install]
-WantedBy = multi-user.target" > ${1}/lib/systemd/system/mediacenter.service
-	chmod +x ${1}/lib/systemd/system/mediacenter.service
+WantedBy = multi-user.target" > ${2}/lib/systemd/system/mediacenter.service
+fi
+chmod +x ${2}/lib/systemd/system/mediacenter.service
 }
 
 function create_advancedsettings()
@@ -40,7 +44,7 @@ function create_advancedsettings()
         <defaultplayer>omxplayer</defaultplayer>
         <defaultdvdplayer>dvdplayer</defaultdvdplayer>
     </video>
-</advancedsettings>' > ${2}
+</advancedsettings>' > ${2}/usr/xbmc/share/xbmc/system/advancedsettings.xml
     fi
    
 }
@@ -99,9 +103,9 @@ strip ${out}/usr/lib/xbmc/xbmc.bin
 strip ${out}/usr/lib/xbmc/addons/*/*.so
 strip ${out}/usr/lib/xbmc/addons/pvr.*/*.pvr
 test "$1" == atv && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libpulse0,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmicrohttpd10,libjasper1,libxrandr2,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libsdl-image1.2,libglew1.10,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,libglu1-mesa,libcec-osmc,libshairplay-osmc,libnfs-osmc,libafpclient-osmc,librtmpclient-osmc,libcrystalhd3,firmware-crystalhd" >> files/DEBIAN/control
-test "$1" == rbp && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmicrohttpd10,libjasper1,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,rbp-libcec-osmc,rbp-libshairplay-osmc,rbp-libnfs-osmc,rbp-libafpclient-osmc,rbp-librtmpclient-osmc,rpiuserland" >> files/DEBIAN/control
+test "$1" == rbp && echo "Depends: libssh-4,libavahi-client3,python,libsmbclient,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmicrohttpd10,libjasper1,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,rbp-libcec-osmc,rbp-libshairplay-osmc,rbp-libnfs-osmc,rbp-libafpclient-osmc,rbp-librtmpclient-osmc,rpiuserland,rpi-armmem-osmc" >> files/DEBIAN/control
 
-test "$1" == rbp && create_systemd_script "${out}" "/usr/lib/xbmc/xbmc.bin --standalone -fs"
-create_advancedsettings "$1" "${out}/usr/xbmc/share/xbmc/system/advancedsettings.xml"
+test "$1" == rbp && create_systemd_script "rbp" "${out}"
+create_advancedsettings "$1" "${out}"
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ osmc-mediacenter.deb
