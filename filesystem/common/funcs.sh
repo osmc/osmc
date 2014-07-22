@@ -21,7 +21,7 @@ function setup_osmc_user()
 	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc
 	chmod 0440 ${1}/etc/sudoers.d/osmc
 	# Groups for permissions
-	usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
+	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
 }
 
 function setup_hostname()
