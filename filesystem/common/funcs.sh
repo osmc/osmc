@@ -8,7 +8,7 @@
 XBMC_MAN_ATV="mediacenter-atv-osmc"
 XBMC_MAN_RBP="mediacenter-rbp-osmc"
 INIT_PKGS="systemd systemd-sysv"
-SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo module-init-tools connman"
+SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo module-init-tools connman net-tools ping wget nano ntp consolekit upower"
 CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
 
 function setup_osmc_user()
@@ -55,9 +55,9 @@ Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${2}
 function configure_vchiq_udev()
 {
 	echo '# input
-KERNEL=="mouse*|mice|event*",   MODE="0660", GROUP="input"
-KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="input"
-KERNEL=="js[0-9]*",             MODE="0660", GROUP="input"
+KERNEL=="mouse*|mice|event*",   MODE="0660", GROUP="osmc"
+KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="osmc"
+KERNEL=="js[0-9]*",             MODE="0660", GROUP="osmc"
 
 # tty
 KERNEL=="tty[0-9]*",            MODE="0666"
