@@ -22,6 +22,8 @@ function setup_osmc_user()
 	# Adds 'osmc' to sudoers with no password prompt
 	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc
 	chmod 0440 ${1}/etc/sudoers.d/osmc
+	# Groups for permissions
+	usermod -G disk,cdrom,lp,dialout,video,audio,adm
 }
 
 function setup_hostname()
