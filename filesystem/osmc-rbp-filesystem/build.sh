@@ -62,6 +62,7 @@ chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
+chroot ${DIR} apt-get -y install --no-install-recommends rbp-osmc-mediacenter
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}

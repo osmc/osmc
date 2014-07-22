@@ -5,8 +5,6 @@
 
 . ../../scripts/common.sh
 
-XBMC_MAN_ATV="mediacenter-atv-osmc"
-XBMC_MAN_RBP="mediacenter-rbp-osmc"
 INIT_PKGS="systemd systemd-sysv"
 SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo module-init-tools connman net-tools ping wget nano ntp consolekit upower"
 CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
@@ -87,8 +85,6 @@ function enable_init()
 }
 
 export CHROOT_PKGS
-export XBMC_MAN_ATV
-export XBMC_MAN_RBP
 
 export -f setup_osmc_user
 export -f setup_hostname
