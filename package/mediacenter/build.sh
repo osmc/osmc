@@ -25,7 +25,14 @@ make clean >/dev/null 2>&1
 sh ../patch-generic.sh
 sh ../patch-"${1}".sh
 ./bootstrap
-test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure --prefix=/usr
+test "$1" == atv && CXXFLAGS="-I/usr/include/afpfs-ng" ./configure \
+--prefix=/usr
+test "$1" == rbp && LIBRARY_PATH+=/opt/vc/lib CXXFLAGS="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" ./configure \
+ 	--enable-gles --disable-sdl --disable-x11 --disable-xrandr --disable-openmax \
+	--enable-optical-drive --enable-libbluray --enable-dvdcss --disable-joystick --disable-debug \
+ 	--disable-crystalhd --disable-vtbdecoder --disable-vaapi --disable-vdpau \
+ 	--disable-pulse --disable-projectm --with-platform=raspberry-pi --enable-optimizations \
+ 	--enable-libcec --enable-player=omxplayer
 if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 make
 if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
