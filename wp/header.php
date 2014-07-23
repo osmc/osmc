@@ -12,6 +12,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 		<title><?php bloginfo('name'); ?> <?php wp_title(); ?></title>
+		<meta name="description" content="<?php echo get_bloginfo ( 'description' );  ?>">
 
 		<?php // mobile meta (hooray!) ?>
 		<meta name="HandheldFriendly" content="True">
