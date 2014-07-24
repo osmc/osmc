@@ -22,6 +22,7 @@ make clean
 make -j4
 make install
 pushd _install
+rm -rf proc sys lib tmp var dev etc > /dev/null 2>&1
 mkdir proc sys lib tmp var dev etc
 chmod 777 tmp
 if [ ! -c dev/console ]; then mknod dev/console c 5 1; fi
@@ -39,6 +40,5 @@ fi
 cp -ar ../../init/init init
 cp -ar ../../ply-lite/ply-image usr/bin/splash
 tar -cf ../../initramfs.tar *
-popd
 popd
 echo Built initramfs.tar
