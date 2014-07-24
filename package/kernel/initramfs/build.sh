@@ -24,15 +24,18 @@ make install
 pushd _install
 mkdir proc sys lib tmp var dev etc
 chmod 777 tmp
-mknod dev/console c 5 1
-mknod dev/ttyS0 c 204 64
-echo "none /dev/pts devpts mode=0622 0 0" > etc/fstab
+if [ ! -c dev/console ]; then mknod dev/console c 5 1; fi
+if [ ! -c dev/ttyS0 ]; then mknod dev/ttyS0 c 204 64; fi
+if [ ! -f etc/fstab ]; then echo "none /dev/pts devpts mode=0622 0 0" > etc/fstab; fi
+if [ ! -f etc/inittab ]
+then
 echo "console::sysinit:/etc/init.d/rcS
 console::askfirst:/bin/login
 ::restart:/sbin/init
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
 " > etc/inittab
+fi
 cp -ar ../../init/init init
 cp -ar ../../ply-lite/ply-image usr/bin/splash
 tar -cf ../../initramfs.tar *
