@@ -30,23 +30,7 @@ chmod +x ${2}/lib/systemd/system/mediacenter.service
 
 function create_advancedsettings()
 {
-	if [ "$1" == "rbp" ]
-	then
-		echo '<?xml version="1.0" encoding="UTF-8"?>
-<advancedsettings>
-    <network>
-        <readbufferfactor>4.0</readbufferfactor>
-        <cachemembuffersize>0</cachemembuffersize>
-    </network>
-    <imageres>540</imageres>
-    <fanartres>720</fanartres>
-    <video>
-        <defaultplayer>omxplayer</defaultplayer>
-        <defaultdvdplayer>dvdplayer</defaultdvdplayer>
-    </video>
-</advancedsettings>' > ${2}/usr/share/xbmc/system/advancedsettings.xml
-    fi
-   
+	cp ${2}../patches/${1}-advancedsettings.xml ${2}/usr/share/xbmc/system/advancedsettings.xml
 }
 
 echo -e "Building XBMC"
