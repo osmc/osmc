@@ -1,0 +1,6 @@
+#include <QFile>
+
+namespace io
+{
+
+}
