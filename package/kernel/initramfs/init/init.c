@@ -5,7 +5,6 @@
  * email@samnazarko.co.uk
  */
 
-
 #include <stdio.h>
 #include <sys/mount.h>
 #include <string.h>
@@ -26,10 +25,10 @@ int parse_option(const char *line, const char *option, char *value, size_t size)
        p1 = p0 + strlen(p0);                                                                                                                                  
     len = p1 - p0;                                                                                                                                            
     if (len > size - 1)                                                                                                                                       
-        len = size - 1;                                                                                                                                       
-    memcpy(value, p0, len);                                                                                                                                   
-    value[len] = '\0';                                                                                                                                        
-    return len;                                                                                                                                               
+        len = size - 1;                                                                                                                     
+    memcpy(value, p0, len);                                                                                                                       
+    value[len] = '\0';                                                                                                                                   
+    return len;                                                                                                                                        
 }
 
 void get_cmdline_option(const char *option, char *value, size_t size)                                                                                         
@@ -53,32 +52,15 @@ void get_cmdline_option(const char *option, char *value, size_t size)
     if (line)                                                                                                                                                 
         free(line);
     return;                                                                                                                                                   
-}  
+}
 
 int main(int argc, char **argv)
 {
-	/* Mounts */
+	/* Basic mounts */
 	mount("none", "/proc", "proc", 0, "");
 	mount("none", "/sys", "sysfs", 0, "");
-	
-	/* Configure devices */
-	char mdev_cmd[32];
-	sprintf(mdev_cmd, "/sbin/mdev -s");
-	system(mdev_cmd);
-	
-	/* BusyBox symlinks */
-	char busybox_cmd[32];
-	sprintf(busybox_cmd, "/bin/busybox --install -s");
-	system(busybox_cmd);
-	
-	/* Clear rubbish */
-	char clear_cmd[32]; 
-	sprintf(clear_cmd, "/usr/bin/clear");
-	system(clear_cmd);
-	
 	/* Splash screen */
 	system("/usr/bin/splash /splash.png");
-	
 	/* Read /proc/cmdline */
 	int boot_type = 0; /* 0: /dev/XYZ; 1: UUID label */
 	char root_dir[32] = "/newroot";
@@ -139,5 +121,6 @@ int main(int argc, char **argv)
 			/* Do not let /init die to prevent a further kernel panic */
 			sleep(1);
 		}
+	
 }
 
