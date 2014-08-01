@@ -6,7 +6,7 @@
 . ../../scripts/common.sh
 
 INIT_PKGS="systemd systemd-sysv"
-SYSTEM_PKGS="base-files sysctl-osmc openssh-server sudo module-init-tools connman net-tools ntp consolekit upower"
+SYSTEM_PKGS="base-files apt-utils sysctl-osmc openssh-server sudo module-init-tools connman net-tools ntp consolekit upower"
 CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
 
 function setup_osmc_user()
