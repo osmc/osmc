@@ -84,6 +84,11 @@ function enable_init()
 	rm ${1}/usr/sbin/policy-rc.d
 }
 
+function create_base_fstab()
+{
+	>${1}/etc/fstab
+}
+
 export CHROOT_PKGS
 
 export -f setup_osmc_user
@@ -93,3 +98,4 @@ export -f prevent_pkg_install
 export -f create_fs_tarball
 export -f disable_init
 export -f enable_init
+export -f create_base_fstab

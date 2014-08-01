@@ -73,6 +73,9 @@ verify_action
 echo -e "	* Setting up hosts"
 setup_hosts ${DIR}
 verify_action
+echo -e "	* Configuring fstab"
+create_base_fstab ${DIR}
+verify_action
 echo -e "	* Holding back packages"
 prevent_pkg_install "${DIR}" "xbmc"
 verify_action
