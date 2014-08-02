@@ -58,10 +58,10 @@ KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="osmc"
 KERNEL=="js[0-9]*",             MODE="0660", GROUP="osmc"
 
 # tty
-KERNEL=="tty[0-9]*",            MODE="0666"
+SUBSYSTEM=="tty", KERNEL=="tty[0-9]*", GROUP="tty", MODE="0666"
 
 # vchiq
-SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}/etc/udev/rules.d/10-permissions.rules
+SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}/etc/udev/rules.d/99-permissions.rules
 }
 
 function create_fs_tarball()
