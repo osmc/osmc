@@ -1,0 +1,11 @@
+[Unit]
+Description=Sets up system for first time run
+After=remote-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ftr
+
+[Install]
+WantedBy = multi-user.target

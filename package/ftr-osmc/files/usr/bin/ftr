@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# (c) 2014 Sam Nazarko
+# email@samnazarko.co.uk
+
+if [ -f /.setup ]; then systemctl disable ftr.service >/dev/null 2>&1 && exit 1; fi
+
+ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa > /dev/null 2>&1
+ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa > /dev/null 2>&1
+depmod >/dev/null 2>&1
