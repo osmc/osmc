@@ -6,7 +6,7 @@
 makedirnb()
 {
   # Git doesn't allow empty folders. Do at runtime.
-  if [ ! -f files/${1} ]; then mkdir files/${1}; fi
+  if [ ! -d files/${1} ]; then mkdir files/${1}; fi
 }
 
 echo -e "Building base files for Jessie"
