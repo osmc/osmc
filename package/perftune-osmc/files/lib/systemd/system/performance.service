@@ -1,0 +1,11 @@
+[Unit]
+Description=Improves system performance tunables
+After=remote-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/performance_tuner
+
+[Install]
+WantedBy = multi-user.target
