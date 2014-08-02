@@ -12,7 +12,7 @@ ROOT="${ROOT%% *}"
 ROOT=$(echo $ROOT | cut -d / -f3 | tr -d 1-9p)
 ISHDD=$(cat /sys/block/${ROOT}/queue/rotational)
 
-if [ "$ISHDD" == 0 ]
+if [ "$ISHDD" -eq 0 ]
 then
 	echo 1024 > /sys/block/${ROOT}/queue/read_ahead_kb
 fi
@@ -22,7 +22,7 @@ MEMORY=$(cat /proc/meminfo | grep MemTotal | awk {'print $2'})
 
 if [ -f /enable_swap ]; then USE_SWAP=1; fi
 if [ "$MEMORY" -lt 262144 ]; then USE_SWAP=1; fi
-if [ "$USE_SWAP" == 1 ]
+if [ "$USE_SWAP" -eq 1 ]
 then
 	  if [ ! -f /swap ]
 	  then
