@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# (c) 2014 Sam Nazarko
+# email@samnazarko.co.uk
+echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor >/dev/null 2>&1
+echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+
+ISHDD=1
+ROOT=$(cat /proc/cmdline)
+ROOT="${c##*root=}"
+ROOT="${c%% *}"
+ROOT=$(echo $ROOT | cut -d / -f3 | tr -d 0-9)
+ROOT="sda"
+ISHDD=$(cat /sys/block/${ROOT}/queue/rotational)
+
+if [ "$ISHDD" == 0 ]
+then
+	echo 1024 > /sys/block/${ROOT}/queue/read_ahead_kb
+fi
+
+USE_SWAP=0
+MEMORY=$(cat /proc/meminfo | grep MemTotal | awk {'print $2'})
+
+if [ -f /enable_swap ]; then USE_SWAP=1; fi
+if [ "$MEMORY" -lt 262144 ]; then USE_SWAP=1; fi
+if [ "$USE_SWAP" == 1 ]
+then
+	  if [ ! -f /swap ]
+	  then
+		dd if=/dev/zero of=/swap bs=1M count=128
+		chmod 0600 /swap
+		mkswap /swap
+	  fi
+      NFS_ROOT=$(grep root=/dev/nfs /proc/cmdline)
+      if [ "$NFS_ROOT" != "" ]
+      then
+		losetup /dev/loop0 /swap
+		mkswap /dev/loop0
+        swapon /dev/loop0
+    else
+        swapon /swap
+    fi
+fi
