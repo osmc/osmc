@@ -7,10 +7,9 @@ echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
 
 ISHDD=1
 ROOT=$(cat /proc/cmdline)
-ROOT="${c##*root=}"
-ROOT="${c%% *}"
-ROOT=$(echo $ROOT | cut -d / -f3 | tr -d 0-9)
-ROOT="sda"
+ROOT="${ROOT##*root=}"
+ROOT="${ROOT%% *}"
+ROOT=$(echo $ROOT | cut -d / -f3 | tr -d 1-9p)
 ISHDD=$(cat /sys/block/${ROOT}/queue/rotational)
 
 if [ "$ISHDD" == 0 ]
