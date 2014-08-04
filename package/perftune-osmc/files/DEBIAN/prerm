@@ -1,2 +1,5 @@
 #!/bin/bash
+ischroot
+if [ $? == 0 ]; then exit 0; fi
 
+systemctl start performance.service
