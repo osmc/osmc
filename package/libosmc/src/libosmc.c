@@ -43,7 +43,7 @@ char *get_hostname()
 {
 	FILE *hostfile;
 	char *hostname = NULL;
-    size_t len = 0;
+	size_t len = 0;
 	hostfile = fopen("/etc/hostname", "r");
 	if (hostfile == NULL)
 		return NULL;
@@ -67,30 +67,4 @@ int *set_hostname(char *hostname)
    /* NB: update /etc/hosts in future */
    fclose(hostfile);
    return 0;
-}
-
-
-void enable_net_technology(int technology)
-{
-	
-}
-
-void disable_net_technology(int technology)
-{
-	
-}
-
-void is_active_technology(int technology)
-{
-	
-}
-
-void set_network_connection_setting(connection con, *char service)
-{
-	
-}
-
-connection get_network_connection(char *service)
-{
-	
 }
