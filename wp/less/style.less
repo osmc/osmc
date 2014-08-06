@@ -73,9 +73,10 @@ a:hover, a:focus {
 p {
   line-height: 1.5em;
 }
-li {
-	padding: 0.2em 0;
+ul, li {
+  color: @black;
 }
+
 #main section a {
 	color: @link;
 	text-decoration: none;
@@ -172,17 +173,9 @@ article {
 
 .boxpad {
 	padding: 0em;
-
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-
-		a {
-			color: @black;
-		}
-	}
 }
+
+
 #main {
   float: left;
 }
@@ -197,6 +190,8 @@ article {
 	padding: 0 0 0 0;
   
   ul {
+    padding: 0;
+    list-style: none;
     a:hover, a:focus {
       border-bottom: 2px solid @dark;
     }
