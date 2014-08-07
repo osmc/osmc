@@ -1,0 +1,11 @@
+--- a/get_dvb_firmware	2014-04-07 13:00:43.000000000 +0100
++++ b/get_dvb_firmware	2014-08-07 08:50:38.904143138 +0100
+@@ -904,6 +904,7 @@
+     @components = sort @components;
+     for($i=0; $i < scalar(@components); $i++) {
+ 	print STDERR "\t" . $components[$i] . "\n";
++	system("perl get_dvb_firmware " . $components[$i]);	
+     }
+     exit(1);
+ }
+
