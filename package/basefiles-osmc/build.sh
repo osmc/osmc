@@ -10,6 +10,7 @@ makedirnb()
 }
 
 echo -e "Building base files for Jessie"
+make clean
 makedirnb "proc"
 makedirnb "bin"
 makedirnb "tmp"

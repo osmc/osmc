@@ -2,4 +2,5 @@ all:
 	bash build.sh
 
 clean:
-	rm initramfs.tar
+	rm -f initramfs.tar > /dev/null 2>&1
+	rm -rf output > /dev/null 2>&1

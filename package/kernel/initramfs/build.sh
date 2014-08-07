@@ -2,9 +2,7 @@
 # email@samnazarko.co.uk
 
 #!/bin/bash
-if [ -f initramfs.tar ]; then rm initramfs.tar; fi
-if [ -d output ]; then rm -rf output; fi
-
+make clean
 echo -e "Static build of /init"
 pushd init
 make clean > /dev/null 2>&1

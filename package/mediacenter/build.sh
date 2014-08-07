@@ -35,9 +35,7 @@ function create_advancedsettings()
 
 echo -e "Building XBMC"
 out=$(pwd)/files
-if [ -d files/usr ]; then rm -rf files/usr; fi
-if [ -d src-a/ ]; then rm -rf src-a; fi
-if [ -d src-b/ ]; then rm -rf src-b; fi
+make clean
 sed '/Package/d' -i files/DEBIAN/control
 sed /'Depends/d' -i files/DEBIAN/control
 test "$1" == atv && echo "Package: atv-osmc-mediacenter" >> files/DEBIAN/control

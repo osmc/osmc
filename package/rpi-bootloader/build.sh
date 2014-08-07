@@ -9,8 +9,8 @@ FWFILES="LICENCE.broadcom
 start_x.elf
 fixup_x.dat
 bootcode.bin"
+make clean
 
-if [ -f "${BOOT}" ]; then rm -rf "${BOOT}"; fi
 mkdir -p "${BOOT}"
 
 for file in $FWFILES

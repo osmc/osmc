@@ -7,10 +7,7 @@
 
 echo -e "Building rpi-userland"
 out=$(pwd)/files
-if [ -d files/opt ]; then rm -rf files/opt; fi
-if [ -d files-dev/opt ]; then rm -rf files-dev/opt; fi
-if [ -d firmware-master ]; then rm -rf firmware-master; fi
-if [ -f master.zip ]; then rm master.zip; fi
+make clean
 echo Downloading userland
 wget --no-check-certificate "https://github.com/raspberrypi/firmware/archive/master.zip"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi

@@ -6,6 +6,7 @@
 . ../common.sh
 
 echo -e "Building atvclient for AppleTV"
+make clean
 out=$(pwd)/files
 cd src
 ./configure --prefix=/usr

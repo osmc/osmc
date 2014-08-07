@@ -9,3 +9,4 @@ clean:
 	sudo rm -f *.ashx* > /dev/null 2>&1
 	sudo rm -f *.mc > /dev/null 2>&1
 	sudo rm -f get_dvb_firmware > /dev/null 2>&1
+	rm -f files/lib/firmware > /dev/null 2>&1

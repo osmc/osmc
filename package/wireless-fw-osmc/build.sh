@@ -19,7 +19,7 @@ function install_fw()
 
 echo -e "Building package WiFi firmware"
 
-if [ -d files/lib/firmware ]; then echo "Removing old firmware" && rm -rf files/lib/firmware > /dev/null 2>&1; fi
+make clean
 
 RALINK_DEB="firmware-ralink_0.43_all.deb"
 REALTEK_DEB="firmware-realtek_0.43_all.deb"
