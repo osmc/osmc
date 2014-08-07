@@ -11,17 +11,12 @@ make clean > /dev/null 2>&1
 make
 popd
 echo -e "Static build of /usr/bin/splash"
-pushd ply-lite
-make clean > /dev/null 2>&1
-make
+#TBC, pull from Debian package
 popd
 mkdir output
 mkdir -p output/usr/bin
 pushd output
 cp -ar ../init/init .
-cp -ar ../ply-lite/ply-image usr/bin/splash
-cp -ar ../ply-lite/splash.png .
-cp -ar ../ply-lite/splash_sad.png .
 rm -rf proc sys lib tmp var dev etc > /dev/null 2>&1
 mkdir proc sys lib tmp var dev etc
 chmod 777 tmp
