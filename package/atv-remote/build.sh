@@ -9,6 +9,7 @@ echo -e "Building atvclient for AppleTV"
 make clean
 out=$(pwd)/files
 cd src
+make clean
 ./configure --prefix=/usr
 $BUILD
 make install DESTDIR=${out}
