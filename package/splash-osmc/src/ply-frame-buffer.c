@@ -149,6 +149,58 @@ flush_xrgb32 (ply_frame_buffer_t *buffer)
     }
 }
 
+static void
+flush_xbgr32 (ply_frame_buffer_t *buffer)
+{
+  unsigned long x1, y1, x2, y2, x, y;
+  char *dst, *src;
+
+  x1 = buffer->area_to_flush.x;
+  y1 = buffer->area_to_flush.y;
+  x2 = x1 + buffer->area_to_flush.width;
+  y2 = y1 + buffer->area_to_flush.height;
+
+  dst = &buffer->map_address[(y1 * buffer->row_stride + x1) * 4];
+  src = (char *) &buffer->shadow_buffer[y1 * buffer->area.width + x1];
+
+  for (y = y1; y < y2; y++)
+    {
+     for (x = x1; x < x2; x++)
+       {
+         dst[0] = src[2];
+         dst[1] = src[1];
+         dst[2] = src[0];
+         dst[3] = src[3];
+         dst += 4;
+         src += 4;
+       }
+    }
+}
+
+static void
+flush_rgb16 (ply_frame_buffer_t *buffer)
+{
+  unsigned long x1, y1, x2, y2, x, y;
+  unsigned short *dst; unsigned char *src;
+
+  x1 = buffer->area_to_flush.x;
+  y1 = buffer->area_to_flush.y;
+  x2 = x1 + buffer->area_to_flush.width;
+  y2 = y1 + buffer->area_to_flush.height;
+
+  dst = (unsigned short *)&buffer->map_address[(y1 * buffer->row_stride + x1) * 2];
+  src = (unsigned char *) &buffer->shadow_buffer[y1 * buffer->area.width + x1];
+
+  for (y = y1; y < y2; y++)
+    {
+     for (x = x1; x < x2; x++)
+       {
+         *dst++ = (src[0]>>3) << 0 | (src[1]>>2) << 5 | (src[2]>>3) << 11;
+         src += 4;
+       }
+    }
+}
+
 static const char const *p_visual(int visual)
 {
   static const char const *visuals[] =
@@ -260,11 +312,26 @@ ply_frame_buffer_query_device (ply_frame_buffer_t *buffer)
   buffer->dither_green = 0;
   buffer->dither_blue = 0;
 
+printf("%d,%d,%d,%d,%d,%d,%d\n", buffer->bytes_per_pixel,
+      buffer->red_bit_position, buffer->bits_for_red,
+      buffer->green_bit_position, buffer->bits_for_green,
+      buffer->blue_bit_position, buffer->bits_for_blue);
+
   if (buffer->bytes_per_pixel == 4 &&
       buffer->red_bit_position == 16 && buffer->bits_for_red == 8 &&
       buffer->green_bit_position == 8 && buffer->bits_for_green == 8 &&
       buffer->blue_bit_position == 0 && buffer->bits_for_blue == 8)
     buffer->flush = flush_xrgb32;
+  else if (buffer->bytes_per_pixel == 4 &&
+      buffer->red_bit_position == 0 && buffer->bits_for_red == 8 &&
+      buffer->green_bit_position == 8 && buffer->bits_for_green == 8 &&
+      buffer->blue_bit_position == 16 && buffer->bits_for_blue == 8)
+    buffer->flush = flush_xbgr32;
+  else if (buffer->bytes_per_pixel == 2 &&
+      buffer->red_bit_position == 11 && buffer->bits_for_red == 5 &&
+      buffer->green_bit_position == 5 && buffer->bits_for_green == 6 &&
+      buffer->blue_bit_position == 0 && buffer->bits_for_blue == 5)
+    buffer->flush = flush_rgb16;
   else
     buffer->flush = flush_generic;
 
