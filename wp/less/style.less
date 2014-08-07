@@ -41,6 +41,7 @@ html, body, button, input, select, textarea, .pure-g-r [class*="pure-u"] {
 
 body {
 background-color: @white;
+color: @dark;
 }
 input:focus {
     outline: none;
@@ -64,11 +65,12 @@ a,
 a:link,
 a:visited,
 a:active {
-	color: @black;
+	color: @link;
 	text-decoration: none;
 }
 a:hover, a:focus {
-  border-bottom: 2px solid @white;
+  color: @dark;
+  text-decoration: none;
 }
 p {
   line-height: 1.5em;
@@ -106,11 +108,14 @@ h1,h2,h3,h4,h5,h6,p {
 	a:visited,
 	a:active,
 	a {
-		color: @black;
+		color: @link;
 		text-decoration: none;
 		border-bottom: none;
     font-weight: 300;
 	}
+  a:hover, a:focus {
+    color: @dark;
+  }
 }
 .archive-title {
 	margin: 0 0 0.5em 0;
@@ -192,18 +197,11 @@ article {
   ul {
     padding: 0;
     list-style: none;
-    a:hover, a:focus {
-      border-bottom: 2px solid @dark;
-    }
   }
 }
 #sidebar1 .widget {
 	border-bottom: 1px solid @lgrey;
 	padding: 0 0 2em 0;
-	
-	a:hover {
-		.transition-duration(0.1s);
-	}
 }
 .boxpad div:first-child .widgettitle {
 	margin: 0 0 1.33em 0;
@@ -218,7 +216,8 @@ article {
 	a {
 		border-bottom: none;
     background-color: @lgrey;
-    padding: 0 0.2em;
+    padding: 0.2em 0.3em;
+    color: @dark;
 	}
   a:hover, a:focus {
     color: @link;
@@ -343,6 +342,7 @@ nav {
 	}
 	a:hover, a:focus {
 		.transition-duration(0.1s);
+    border-bottom: 2px solid @white;
 	}
 	.current-menu-item a {
 	border-bottom: 2px solid @white;
@@ -377,10 +377,17 @@ nav {
 	a {
 		color: #fff;
 	}
+  a:hover, a:focus {
+    border-bottom: 2px solid @white;
+  }
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+    
+    li {
+      margin: 0.2em 0;
+    }
 	}
 	.copyright {
 		margin: 2em 0 1em;
