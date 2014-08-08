@@ -8,7 +8,7 @@ atv:
 	sudo bash build.sh "atv"
 
 clean:
-	sudo rm *.deb
+	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files/usr > /dev/null 2>&1
 	sudo rm -rf src-a > /dev/null 2>&1
 	sudo rm -rf src-b > /dev/null 2>&1
