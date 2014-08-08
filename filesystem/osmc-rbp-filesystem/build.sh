@@ -81,6 +81,9 @@ verify_action
 echo -e "	* Holding back packages"
 prevent_pkg_install "${DIR}" "xbmc"
 verify_action
+echo -e "	* Configuring TTYs"
+conf_tty ${DIR}
+verify_action
 
 # Remove QEMU binary
 chroot ${DIR} umount /proc

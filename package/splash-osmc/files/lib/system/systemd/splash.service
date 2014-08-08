@@ -1,0 +1,9 @@
+[Unit]
+Description = Splash
+After = sysinit.target local-fs.target
+
+[Service]
+ExecStart = /usr/bin/ply-image /usr/splash.png
+
+[Install]
+WantedBy = basic.target

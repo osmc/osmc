@@ -89,6 +89,11 @@ function create_base_fstab()
 	>${1}/etc/fstab
 }
 
+function conf_tty()
+{
+	chroot ${1} systemctl disable getty\@tty1.service
+}
+
 export CHROOT_PKGS
 
 export -f setup_osmc_user
@@ -99,3 +104,4 @@ export -f create_fs_tarball
 export -f disable_init
 export -f enable_init
 export -f create_base_fstab
+export -f conf_tty
