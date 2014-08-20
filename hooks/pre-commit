@@ -1,0 +1,21 @@
+#!/bin/sh
+
+fixpkg()
+{
+   sed '/Package/d' -i $1/files/DEBIAN/control
+   sed '/Architecture/d' -i $1/files/DEBIAN/control
+}
+
+for package in $(ls package)
+do
+   grep -q fix_arch_ctl package/$package/build.sh > /dev/null 2>&1 
+   if [ $? -eq 0 ]
+   then
+       grep -q Package package/$package/files/DEBIAN/control
+       if [ $? -eq 0 ]
+       then
+           echo Removing package and architecture information from cross-platform package $package
+           fixpkg "package/$package"
+       fi
+   fi
+done
