@@ -6,4 +6,4 @@
 . ../common.sh
 
 echo -e "Building FTP server"
-dpkg -b files/ ftp-osmc.deb
+dpkg -b files/ osmc-ftp.deb
