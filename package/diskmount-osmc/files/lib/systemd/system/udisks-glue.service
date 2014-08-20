@@ -1,0 +1,12 @@
+[Unit]
+Description = mount disks automatically with standby
+After = remote-fs.target
+
+[Service]
+User = osmc
+Group = osmc
+Type = simple
+ExecStart = /usr/bin/udisks-glue                   
+
+[Install]
+WantedBy = multi-user.target
