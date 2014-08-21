@@ -1,5 +1,5 @@
 lib:
-	gcc -c -fpic libosmc.c
+	gcc -c -fpic services.c identity.c
 	gcc -shared -o libosmc.so libosmc.o
 	strip libosmc.so
 
