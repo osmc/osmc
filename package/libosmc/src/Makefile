@@ -1,6 +1,6 @@
 lib:
 	gcc -c -fpic services.c identity.c
-	gcc -shared -o libosmc.so libosmc.o
+	gcc -shared -o libosmc.so services.o identity.o
 	strip libosmc.so
 
 clean:
