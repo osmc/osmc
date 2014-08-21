@@ -6,4 +6,5 @@ local:
 		sudo bash build.sh
 
 clean:
-		sudo rm -f *.deb
+		sudo rm -f *.deb > /dev/null 2>&1
+		sudo rm -rf output > /dev/null 2>&1
