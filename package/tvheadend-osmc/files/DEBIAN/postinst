@@ -19,3 +19,10 @@ then
         "id": "1"
 	}' > /home/osmc/.hts/tvheadend/accesscontrol/1
 fi
+
+systemctl enable tvheadend.service
+
+ischroot
+if [ $? == 0 ]; then exit 0; fi
+
+systemctl start tvheadend.service
