@@ -14,9 +14,9 @@ int is_service_enabled(char *service_name)
 	asprintf(&service_file_path, "%s%s%s", "/etc/systemd/system/multi-user.target.wants/", service_name, ".service"); 
 	fflush(stdout); 
 	if (access(service_file_path, F_OK) != -1)
-		result = 1;
-	else
 		result = 0;
+	else
+		result = 1;
 	free(service_file_path);
 	return result;
 }
