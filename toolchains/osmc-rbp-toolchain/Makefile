@@ -6,4 +6,4 @@ local:
 		sudo bash build.sh
 
 clean:
-		sudo rm *.deb
+		sudo rm -f *.deb
