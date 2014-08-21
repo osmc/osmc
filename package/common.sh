@@ -26,7 +26,7 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
-cores=$(cat /proc/cpuinfo | grep processor | wc -l)
+cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
 export BUILD="make -j${cores}"
 
 export -f fix_arch_ctl
