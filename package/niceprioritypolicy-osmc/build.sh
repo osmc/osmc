@@ -1,0 +1,8 @@
+# (c) 2014 Sam Nazarko
+# email@samnazarko.co.uk
+
+#!/bin/bash
+
+echo -e "Building OSMC policy to allow NICE adjustment"
+make clean
+dpkg -b files/ osmc-niceprioritypolicy.deb
