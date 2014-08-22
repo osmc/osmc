@@ -19,9 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ls->move(QPoint(10,110));
 }
 
-void setLanguage(QString language, QString device)
+void MainWindow::setLanguage(QString language, QString device)
 {
-
         utils::writeLog("The user has selected " + language + " as their language");
         utils::writeLog("The user has selected " + device + "as their device");
         language = language;
