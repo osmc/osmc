@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QTranslator>
 #include <QApplication>
+#include <QMessageBox>
 
 namespace utils
 {
@@ -31,6 +32,15 @@ namespace utils
         QTranslator translator;
         translator.load(QString("osmc_") + locale);
         application->installTranslator(&translator);
+    }
+
+    void displayError(QString title, QString message)
+    {
+        QMessageBox *errorMessageBox = new QMessageBox();
+        errorMessageBox->setWindowTitle(title);
+        errorMessageBox->setText(message);
+        errorMessageBox->setStandardButtons(QMessageBox::Ok);
+        errorMessageBox->exec();
     }
 
 }

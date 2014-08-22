@@ -15,14 +15,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     utils.cpp \
-    io.cpp
+    io.cpp \
+    langselection.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
-    io.h
+    io.h \
+    langselection.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    langselection.ui
 
 VERSION = 1.0.0
 
-RESOURCES +=
+RESOURCES += \
+    assets.qrc

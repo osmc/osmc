@@ -1,6 +1,7 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "utils.h"
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -17,6 +18,8 @@ int main(int argc, char *argv[])
     QString locale = QLocale::system().name();
     utils::writeLog("Detected locale as " + locale);
     utils::loadTranslation(locale, &a);
+    QFontDatabase fontDatabase;
+    fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;
     w.show();
     
