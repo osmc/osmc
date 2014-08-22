@@ -10,9 +10,9 @@ Source code is available at https://github.com/samnazarko/osmc. You can clone th
 
 OSMC is a community led project and those who wish to contribute to the codebase are more than welcome to. You can get started by forking this project. Please create a new branch (based off master) before you commit changes. You can then send a pull request for review. 
 
-#### License ####
+#### License and acquisition ####
 
-OSMC is licensed under the GPLv2.
+OSMC is licensed under the GPLv2. Commits to the OSMC codebase become copyright of OSMC so that it can be maintained and relicensed if necessary without having to maintain contact with the author.
 
 #### Help and support ####
 
