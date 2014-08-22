@@ -7,6 +7,7 @@
 
 QString language;
 QString device;
+LangSelection *ls;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     this->setFixedSize(this->size());
     ui->setupUi(this);
-    LangSelection *ls = new LangSelection(this);
+    ls = new LangSelection(this);
     connect(ls, SIGNAL(languageSelected(QString, QString)), this, SLOT(setLanguage(QString, QString)));
     ls->move(QPoint(10,110));
 }
@@ -22,9 +23,13 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::setLanguage(QString language, QString device)
 {
         utils::writeLog("The user has selected " + language + " as their language");
-        utils::writeLog("The user has selected " + device + "as their device");
+        utils::writeLog("The user has selected " + device + " as their device");
         language = language;
         device = device;
+        QTranslator translator;
+        translator.load(QString("osmc_da.qm"));
+        qApp->installTranslator(&translator);
+        ls->hide();
 }
 
 MainWindow::~MainWindow()

@@ -28,5 +28,12 @@ FORMS    += mainwindow.ui \
 
 VERSION = 1.0.0
 
+TRANSLATIONS = osmc_da.ts \
+    osmc_de.ts \
+    osmc_es.ts \
+    osmc_fr.ts \
+    osmc_nl.ts \
+    osmc_ru.ts \
+
 RESOURCES += \
     assets.qrc
