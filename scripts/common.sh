@@ -5,14 +5,14 @@
 
 function check_platform()
 {
-#	platform=$(lsb_release -a | grep Debian)
-#	echo $platform | grep -q wheezy
-#	if [ $? != 0 ] 
-#	then
-#		echo $platform | grep -q trusty
-#		if [ $? != 0 ]; then echo -e "We are not running a supported platform" && return 1; else return 0; fi
-#	fi
-return 0
+    platform=$(lsb_release -c -s)
+    case $platform in
+        "wheezy" | "trusty" )
+            return 0
+            ;;
+        * )
+            return 1
+    esac
 }
 
 function verify_action()
