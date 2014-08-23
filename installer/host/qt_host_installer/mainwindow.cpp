@@ -41,7 +41,7 @@ void MainWindow::setLanguage(QString language, QString device)
             /* Remove because we may have already done the deed */
             qApp->removeTranslator(&translator);
         }
-        //ls->hide();
+        ls->hide();
 }
 
 void MainWindow::translate(QString locale)
