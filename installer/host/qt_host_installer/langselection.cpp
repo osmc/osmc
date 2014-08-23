@@ -2,7 +2,11 @@
 #include "ui_langselection.h"
 #include "utils.h"
 #include <QDir>
-#include <QStringList>
+#include <QList>
+#include "installabledevices.h"
+#include "device.h"
+#include <QPalette>
+#include <QColor>
 
 QStringList translationfileNames;
 
@@ -12,9 +16,11 @@ LangSelection::LangSelection(QWidget *parent) :
 {
     ui->setupUi(this);
     /* Set up list of devices */
-    QStringList supportedDevices;
-    supportedDevices << "Raspberry Pi";
-    ui->deviceSelectionBox->addItems(supportedDevices);
+    //QList<Device> supportedDevices = InstallableDevices::getDevices();
+    //for (Device dev : supportedDevices)
+    //{
+
+    //}
     /* Set up list of languages */
     ui->languageSelectionBox->addItem(tr("English"));
     QDir dir(QApplication::applicationDirPath());
@@ -27,6 +33,12 @@ LangSelection::LangSelection(QWidget *parent) :
         locale.remove(0, locale.indexOf('_') + 1);
         ui->languageSelectionBox->addItem(QLocale::languageToString(QLocale(locale).language()));
     }
+    /* Look less ugly */
+    QPalette boxPalette = ui->languageSelectionBox->palette();
+    boxPalette.setColor(QPalette::HighlightedText, QColor(240, 240, 240));
+    boxPalette.setColor(QPalette::Highlight, QColor(23, 57, 74));
+    ui->languageSelectionBox->setPalette(boxPalette);
+    ui->deviceSelectionBox->setPalette(boxPalette);
 }
 
 LangSelection::~LangSelection()

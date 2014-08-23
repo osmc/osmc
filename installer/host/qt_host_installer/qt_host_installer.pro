@@ -16,12 +16,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     utils.cpp \
     io.cpp \
-    langselection.cpp
+    langselection.cpp \
+    installabledevices.cpp \
+    device.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     io.h \
-    langselection.h
+    langselection.h \
+    installabledevices.h \
+    device.h
 
 FORMS    += mainwindow.ui \
     langselection.ui
