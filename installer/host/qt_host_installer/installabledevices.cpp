@@ -2,7 +2,7 @@
 #include "device.h"
 #include <QList>
 
-static void InstallableDevices::generateDeviceList()
+void InstallableDevices::generateDeviceList()
 {
     /* Generates all devices we support */
     deviceList = new QList<Device>();
@@ -11,4 +11,3 @@ static void InstallableDevices::generateDeviceList()
     Device RaspberryPi = new Device("Raspberry Pi", "rbp", 1);
     deviceList.insert(RaspberryPi);
 }
-
