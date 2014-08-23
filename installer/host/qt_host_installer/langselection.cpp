@@ -16,11 +16,7 @@ LangSelection::LangSelection(QWidget *parent) :
 {
     ui->setupUi(this);
     /* Set up list of devices */
-    //QList<Device> supportedDevices = InstallableDevices::getDevices();
-    //for (Device dev : supportedDevices)
-    //{
-
-    //}
+    QList<Device> supportedDevices = InstallableDevices::getDevices();
     /* Set up list of languages */
     ui->languageSelectionBox->addItem(tr("English"));
     QDir dir(QApplication::applicationDirPath());

@@ -5,9 +5,7 @@
 void InstallableDevices::generateDeviceList()
 {
     /* Generates all devices we support */
-    deviceList = new QList<Device>();
-    deviceCount = 0;
-    /* Raspberry Pi support */
-    Device RaspberryPi = new Device("Raspberry Pi", "rbp", 1);
-    deviceList.insert(RaspberryPi);
+    QList<Device> *deviceList = new QList<Device>();
+    Device *RaspberryPi = new Device("Raspberry Pi", "rbp", 1);
+    deviceList->append(*RaspberryPi);
 }

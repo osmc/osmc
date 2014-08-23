@@ -8,7 +8,6 @@ class InstallableDevices
 public:
     static void generateDeviceList();
     static QList<Device> getDevices() { return deviceList; }
-    static int deviceCount;
 
 private:
     static QList<Device> deviceList;
