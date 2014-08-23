@@ -10,6 +10,5 @@
 namespace utils
 {
     void writeLog(QString strLog);
-    void loadTranslation(QString locale, QApplication *application);
     void displayError(QString title, QString message);
 }

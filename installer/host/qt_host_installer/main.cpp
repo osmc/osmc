@@ -15,9 +15,6 @@ int main(int argc, char *argv[])
     #ifdef Q_OS_LINUX
     utils::writeLog("OSMC Installer running on Linux");
     #endif
-    QString locale = QLocale::system().name();
-    utils::writeLog("Detected locale as " + locale);
-    utils::loadTranslation(locale, &a);
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;

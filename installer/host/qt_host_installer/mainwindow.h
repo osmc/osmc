@@ -20,6 +20,7 @@ public slots:
     
 private:
     Ui::MainWindow *ui;
+    void translate(QString locale);
 };
 
 #endif // MAINWINDOW_H

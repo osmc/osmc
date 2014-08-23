@@ -27,13 +27,6 @@ namespace utils
         }
     }
 
-    void loadTranslation(QString locale, QApplication *application)
-    {
-        QTranslator translator;
-        translator.load(QString("osmc_") + locale);
-        application->installTranslator(&translator);
-    }
-
     void displayError(QString title, QString message)
     {
         QMessageBox *errorMessageBox = new QMessageBox();

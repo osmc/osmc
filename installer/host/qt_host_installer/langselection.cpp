@@ -3,7 +3,6 @@
 #include "utils.h"
 #include <QDir>
 #include <QStringList>
-#include <QDebug>
 
 QStringList translationfileNames;
 
@@ -17,7 +16,7 @@ LangSelection::LangSelection(QWidget *parent) :
     supportedDevices << "Raspberry Pi";
     ui->deviceSelectionBox->addItems(supportedDevices);
     /* Set up list of languages */
-    ui->languageSelectionBox->addItem("English");
+    ui->languageSelectionBox->addItem(tr("English"));
     QDir dir(QApplication::applicationDirPath());
     translationfileNames = dir.entryList(QStringList("osmc_*.qm"));
     for (int i = 0; i < translationfileNames.size(); ++i)
@@ -39,20 +38,22 @@ void LangSelection::on_languagenextButton_clicked()
 {
     if (ui->languageSelectionBox->currentIndex() != 0 && ui->deviceSelectionBox->currentIndex() != 0)
     {
-        for (int i = 0; i < translationfileNames.size(); ++i)
+        if (ui->languageSelectionBox->currentText() == tr("English"))
+            emit languageSelected(tr("English"), ui->deviceSelectionBox->currentText());
+        else
         {
-            QString locale;
-            locale = translationfileNames[i];
-            locale.truncate(locale.lastIndexOf('.'));
-            locale.remove(0, locale.indexOf('_') + 1);
-            if (QLocale::languageToString(QLocale(locale).language()) == ui->languageSelectionBox->currentText())
-                emit languageSelected(ui->languageSelectionBox->currentText(), ui->deviceSelectionBox->currentText());
-            else
+            for (int i = 0; i < translationfileNames.size(); ++i)
             {
-                //qDebug() << QLocale::languageToString(QLocale(locale).language() << " is not equal to " << ui->languageSelectionBox->currentText();
+                QString locale;
+                locale = translationfileNames[i];
+                locale.truncate(locale.lastIndexOf('.'));
+                locale.remove(0, locale.indexOf('_') + 1);
+                if (QLocale::languageToString(QLocale(locale).language()) == ui->languageSelectionBox->currentText())
+                    emit languageSelected(locale, ui->deviceSelectionBox->currentText());
             }
         }
     }
     else
         utils::displayError(tr("Error"), tr("You need to select an option!"));
 }
+
