@@ -49,7 +49,6 @@ bool UpdateNotification::isUpdateAvailable()
     if (!networkReply->error())
     {
         int latestBuild = networkReply->readAll().toInt();
-        utils::writeLog(networkReply->readAll());
         if (currentBuild < latestBuild)
         {
             utils::writeLog("A new update is available");
