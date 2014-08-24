@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 #include "utils.h"
 #include <QFontDatabase>
-#include "installabledevices.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,8 +17,6 @@ int main(int argc, char *argv[])
     #endif
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
-    utils::writeLog("Generating supported device list");
-    InstallableDevices::generateDeviceList();
     MainWindow w;
     w.show();
     

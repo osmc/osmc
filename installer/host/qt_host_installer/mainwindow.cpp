@@ -2,13 +2,18 @@
 #include "ui_mainwindow.h"
 #include "langselection.h"
 #include "ui_langselection.h"
+#include "updatenotification.h"
+#include "ui_updatenotification.h"
 #include "utils.h"
 #include <QString>
 #include <QTranslator>
+#define WIDGET_START QPoint(10,110)
 
 QString language;
 QString device;
+UpdateNotification *updater;
 LangSelection *ls;
+
 QTranslator translator;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -23,7 +28,21 @@ MainWindow::MainWindow(QWidget *parent) :
     translate(autolocale);
     ls = new LangSelection(this);
     connect(ls, SIGNAL(languageSelected(QString, QString)), this, SLOT(setLanguage(QString, QString)));
-    ls->move(QPoint(10,110));
+    ls->move(WIDGET_START);
+    /* Check if an update exists */
+    if (UpdateNotification::isUpdateAvailable())
+    {
+        updater = new UpdateNotification(this);
+        connect(updater, SIGNAL(ignoreUpdate()), this, SLOT(dismissUpdate()));
+        updater->move(WIDGET_START);
+        ls->hide();
+    }
+}
+
+void MainWindow::dismissUpdate()
+{
+    updater->hide();
+    ls->show();
 }
 
 void MainWindow::setLanguage(QString language, QString device)

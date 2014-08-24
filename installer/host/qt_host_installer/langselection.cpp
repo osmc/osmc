@@ -3,8 +3,6 @@
 #include "utils.h"
 #include <QDir>
 #include <QList>
-#include "installabledevices.h"
-#include "device.h"
 #include <QPalette>
 #include <QColor>
 
@@ -15,8 +13,6 @@ LangSelection::LangSelection(QWidget *parent) :
     ui(new Ui::LangSelection)
 {
     ui->setupUi(this);
-    /* Set up list of devices */
-    QList<Device> supportedDevices = InstallableDevices::getDevices();
     /* Set up list of languages */
     ui->languageSelectionBox->addItem(tr("English"));
     QDir dir(QApplication::applicationDirPath());

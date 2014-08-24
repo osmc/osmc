@@ -17,6 +17,7 @@ public:
 
 public slots:
     void setLanguage(QString, QString);
+    void dismissUpdate();
     
 private:
     Ui::MainWindow *ui;

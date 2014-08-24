@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 TARGET = qt_host_installer
 TEMPLATE = app
@@ -17,18 +17,17 @@ SOURCES += main.cpp\
     utils.cpp \
     io.cpp \
     langselection.cpp \
-    installabledevices.cpp \
-    device.cpp
+    updatenotification.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     io.h \
     langselection.h \
-    installabledevices.h \
-    device.h
+    updatenotification.h
 
 FORMS    += mainwindow.ui \
-    langselection.ui
+    langselection.ui \
+    updatenotification.ui
 
 VERSION = 1.0.0
 
