@@ -42,7 +42,7 @@ namespace utils
     {
         utils::writeLog("Enumerating supported devices");
         QList<SupportedDevice> *devices = new QList<SupportedDevice>();
-        SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true);
+        SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true, true, true, false);
         devices->append(*RBP);
         return devices;
     }
