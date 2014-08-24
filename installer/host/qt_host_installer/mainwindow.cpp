@@ -4,6 +4,8 @@
 #include "ui_langselection.h"
 #include "updatenotification.h"
 #include "ui_updatenotification.h"
+#include "versionselection.h"
+#include "ui_versionselection.h"
 #include "utils.h"
 #include <QString>
 #include <QTranslator>
@@ -13,8 +15,10 @@
 
 QString language;
 SupportedDevice *device;
+QString version;
 UpdateNotification *updater;
 LangSelection *ls;
+VersionSelection *vs;
 
 QTranslator translator;
 
@@ -64,7 +68,17 @@ void MainWindow::setLanguage(QString language, SupportedDevice *device)
             /* Remove because we may have already done the deed */
             qApp->removeTranslator(&translator);
         }
+        vs = new VersionSelection(this, device->getDeviceShortName());
+        connect(vs, SIGNAL(versionSelected(QString)), this, SLOT(setVersion(QString)));
+        vs->move(WIDGET_START);
+        vs->show();
         ls->hide();
+}
+
+void MainWindow::setVersion(QString version)
+{
+    utils::writeLog("The user has selected " + device->getDeviceName() + " build URL : " + version);
+    version = version;
 }
 
 void MainWindow::translate(QString locale)

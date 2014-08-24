@@ -18,18 +18,21 @@ SOURCES += main.cpp\
     io.cpp \
     langselection.cpp \
     updatenotification.cpp \
-    supporteddevice.cpp
+    supporteddevice.cpp \
+    versionselection.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     io.h \
     langselection.h \
     updatenotification.h \
-    supporteddevice.h
+    supporteddevice.h \
+    versionselection.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
-    updatenotification.ui
+    updatenotification.ui \
+    versionselection.ui
 
 VERSION = 1.0.0
 

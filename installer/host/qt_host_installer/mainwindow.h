@@ -18,6 +18,7 @@ public:
 
 public slots:
     void setLanguage(QString, SupportedDevice*);
+    void setVersion(QString);
     void dismissUpdate();
     
 private:
