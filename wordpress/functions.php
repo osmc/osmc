@@ -217,5 +217,12 @@ function bones_wpsearch($form) {
 	return $form;
 } // don't remove this bracket!
 
+function exclude_category($query) {
+if ( $query->is_home() ) {
+$query->set('cat', '-42');
+}
+return $query;
+}
+add_filter('pre_get_posts', 'exclude_category');
 
 ?>
