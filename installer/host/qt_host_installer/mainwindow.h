@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "supporteddevice.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,7 +17,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void setLanguage(QString, QString);
+    void setLanguage(QString, SupportedDevice*);
     void dismissUpdate();
     
 private:

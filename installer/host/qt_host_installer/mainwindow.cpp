@@ -7,10 +7,12 @@
 #include "utils.h"
 #include <QString>
 #include <QTranslator>
+#include "supporteddevice.h"
+#include <QList>
 #define WIDGET_START QPoint(10,110)
 
 QString language;
-QString device;
+SupportedDevice *device;
 UpdateNotification *updater;
 LangSelection *ls;
 
@@ -26,8 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QString autolocale = QLocale::system().name();
     utils::writeLog("Detected locale as " + autolocale);
     translate(autolocale);
-    ls = new LangSelection(this);
-    connect(ls, SIGNAL(languageSelected(QString, QString)), this, SLOT(setLanguage(QString, QString)));
+    /* Enumerating devices */
+    QList<SupportedDevice> *devices = utils::buildDeviceList();
+    ls = new LangSelection(this, devices);
+    connect(ls, SIGNAL(languageSelected(QString, SupportedDevice*)), this, SLOT(setLanguage(QString, SupportedDevice*)));
     ls->move(WIDGET_START);
     /* Check if an update exists */
     if (UpdateNotification::isUpdateAvailable())
@@ -45,10 +49,10 @@ void MainWindow::dismissUpdate()
     ls->show();
 }
 
-void MainWindow::setLanguage(QString language, QString device)
+void MainWindow::setLanguage(QString language, SupportedDevice *device)
 {
         utils::writeLog("The user has selected " + language + " as their language");
-        utils::writeLog("The user has selected " + device + " as their device");
+        utils::writeLog("The user has selected " + device->getDeviceName() + " as their device");
         language = language;
         device = device;
         if (language != tr("English"))

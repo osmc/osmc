@@ -7,6 +7,8 @@
 #include <QTranslator>
 #include <QApplication>
 #include <QMessageBox>
+#include "supporteddevice.h"
+#include <QList>
 
 namespace utils
 {
@@ -34,6 +36,15 @@ namespace utils
         errorMessageBox->setText(message);
         errorMessageBox->setStandardButtons(QMessageBox::Ok);
         errorMessageBox->exec();
+    }
+
+    QList<SupportedDevice> *buildDeviceList()
+    {
+        utils::writeLog("Enumerating supported devices");
+        QList<SupportedDevice> *devices = new QList<SupportedDevice>();
+        SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true);
+        devices->append(*RBP);
+        return devices;
     }
 
 }

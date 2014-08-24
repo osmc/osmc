@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     utils.cpp \
     io.cpp \
     langselection.cpp \
-    updatenotification.cpp
+    updatenotification.cpp \
+    supporteddevice.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     io.h \
     langselection.h \
-    updatenotification.h
+    updatenotification.h \
+    supporteddevice.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \

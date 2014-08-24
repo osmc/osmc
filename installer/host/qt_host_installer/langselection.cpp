@@ -3,16 +3,19 @@
 #include "utils.h"
 #include <QDir>
 #include <QList>
+#include "supporteddevice.h"
 #include <QPalette>
 #include <QColor>
 
 QStringList translationfileNames;
+QList<SupportedDevice> *devicesList;
 
-LangSelection::LangSelection(QWidget *parent) :
+LangSelection::LangSelection(QWidget *parent, QList<SupportedDevice> *devices) :
     QWidget(parent),
     ui(new Ui::LangSelection)
 {
     ui->setupUi(this);
+    devicesList = devices;
     /* Set up list of languages */
     ui->languageSelectionBox->addItem(tr("English"));
     QDir dir(QApplication::applicationDirPath());
@@ -24,6 +27,14 @@ LangSelection::LangSelection(QWidget *parent) :
         locale.truncate(locale.lastIndexOf('.'));
         locale.remove(0, locale.indexOf('_') + 1);
         ui->languageSelectionBox->addItem(QLocale::languageToString(QLocale(locale).language()));
+    }
+    /* Set up list of devices */
+    utils::writeLog("Added the following devices");
+    for (int i = 0; i < devicesList->count(); i++)
+    {
+        SupportedDevice dev = devicesList->at(i);
+        ui->deviceSelectionBox->addItem(dev.getDeviceName());
+        utils::writeLog(dev.getDeviceName());
     }
     /* Look less ugly */
     QPalette boxPalette = ui->languageSelectionBox->palette();
@@ -42,8 +53,21 @@ void LangSelection::on_languagenextButton_clicked()
 {
     if (ui->languageSelectionBox->currentIndex() != 0 && ui->deviceSelectionBox->currentIndex() != 0)
     {
+        SupportedDevice *device;
+        for (int i = 0; i < devicesList->count(); i++)
+        {
+            SupportedDevice dev = devicesList->at(i);
+            if (dev.getDeviceName() == ui->deviceSelectionBox->currentText())
+            {
+                device = &dev;
+            }
+            else
+            {
+                utils::writeLog(ui->deviceSelectionBox->currentText() + " does not match " + dev.getDeviceName());
+            }
+        }
         if (ui->languageSelectionBox->currentText() == tr("English"))
-            emit languageSelected(tr("English"), ui->deviceSelectionBox->currentText());
+            emit languageSelected(tr("English"), device);
         else
         {
             for (int i = 0; i < translationfileNames.size(); ++i)
@@ -53,7 +77,7 @@ void LangSelection::on_languagenextButton_clicked()
                 locale.truncate(locale.lastIndexOf('.'));
                 locale.remove(0, locale.indexOf('_') + 1);
                 if (QLocale::languageToString(QLocale(locale).language()) == ui->languageSelectionBox->currentText())
-                    emit languageSelected(locale, ui->deviceSelectionBox->currentText());
+                    emit languageSelected(locale, device);
             }
         }
     }

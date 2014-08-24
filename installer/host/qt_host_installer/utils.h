@@ -3,9 +3,10 @@
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
-#include <QTranslator>
 #include <QApplication>
+#include "supporteddevice.h"
+#include <QList>
+
 #define BUILD_NUMBER 001
 
 namespace utils
@@ -13,4 +14,5 @@ namespace utils
     void writeLog(QString strLog);
     void displayError(QString title, QString message);
     int inline getBuildNumber() { return BUILD_NUMBER; }
+    QList<SupportedDevice> *buildDeviceList();
 }
