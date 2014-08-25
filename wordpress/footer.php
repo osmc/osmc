@@ -28,9 +28,14 @@
 				<div class="copyright">
 				<img src="<?php echo get_template_directory_uri(); ?>/library/images/logo-l.png">
 				</div>
+                             <?php
+                                        /* base footer */
+                                        $LOGO_STRING = "Logo by Simon Brunton";
+                                        $DESIGN_STRING = "Designed by Mark Theis Madsen";
+                                ?>
 				<br>
-				<a href="http://simonbrunton.com" target="_blank" class="designed">Logo by Simon Brunton</a><br>
-				<a href="http://markthe.is" target="_blank" class="designed">Designed by Mark Theis Madsen</a>
+                                <a href="http://simonbrunton.com" target="_blank" class="designed"><?echo $LOGO_STRING;?></a><br>
+                                <a href="http://markthe.is" target="_blank" class="designed"><?echo $DESIGN_STRING;?></a>
 				</div> <?php // end #inner-footer ?>
 
 			</footer> <?php // end footer ?>
