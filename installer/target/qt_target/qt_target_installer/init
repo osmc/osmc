@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# OSMC init script
+#
+
+# Standard busybox init
+/bin/mount -t proc proc /proc
+/bin/mount -o remount,rw,noatime /
+/bin/mount -t sysfs sysfs /sys
+/bin/mount -t devtmpfs dev /dev
+/bin/hostname -F /etc/hostname
+
+/usr/bin/qt_target_installer -qws
