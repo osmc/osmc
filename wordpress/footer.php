@@ -32,6 +32,21 @@
                                         /* base footer */
                                         $LOGO_STRING = "Logo by Simon Brunton";
                                         $DESIGN_STRING = "Designed by Mark Theis Madsen";
+					$lang = array_shift(explode(".",$_SERVER['HTTP_HOST']));
+					switch ($lang)
+					{
+						case "fr":
+						$LOGO_STRING = "Logo réalisé par Simon Brunton";
+						$DESIGN_STRING = "Design réalisé par Mark Theis Madsen";
+						break;
+						case "da":
+						$LOGO_STRING = "Logo af Simon Brunton";
+						$DESIGN_STRING = "Designet af Mark Theis Madsen";
+						break;
+						case "se":
+						$LOGO_STRING = "Logga av Simon Brunton";
+						$DESIGN_STRING = "Designad av Mark Theis Madsen";
+					}
                                 ?>
 				<br>
                                 <a href="http://simonbrunton.com" target="_blank" class="designed"><?echo $LOGO_STRING;?></a><br>
