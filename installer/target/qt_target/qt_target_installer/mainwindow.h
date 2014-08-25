@@ -18,11 +18,11 @@ public:
 private:
     Ui::MainWindow *ui;
     void setLabelText(QString labelString);
-    bool installFailed = false;
-    bool installPartitioning = false;
-    bool installSD = false;
-    bool installUSB = false;
-    bool installNFS = false;
+    bool installFailed;
+    bool installPartitioning;
+    bool installSD;
+    bool installUSB;
+    bool installNFS;
 };
 
 #endif // MAINWINDOW_H

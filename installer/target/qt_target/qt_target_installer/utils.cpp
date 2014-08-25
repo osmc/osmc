@@ -2,6 +2,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
 #include <QDebug>
 
