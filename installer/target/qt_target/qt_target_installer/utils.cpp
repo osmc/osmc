@@ -25,13 +25,6 @@ namespace utils
         }
     }
 
-    void installResources()
-    {
-        /* Set up install video loop */
-        QFile::copy(":/assets/resources/BOOTLOOP.mp4", "BOOTLOOP.mp4");
-        QFile::copy(":/assets/resources/FAILLOOP.mp4", "FAILLOOP.mp4");
-    }
-
     void makeMountDirectories()
     {
         system("mkdir -p /mnt/boot");

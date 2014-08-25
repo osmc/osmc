@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMovie>
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,7 @@ private:
     bool installSD;
     bool installUSB;
     bool installNFS;
+    QMovie *movie;
 };
 
 #endif // MAINWINDOW_H

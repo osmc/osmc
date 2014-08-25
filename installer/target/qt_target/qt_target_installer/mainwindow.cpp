@@ -8,6 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setFixedSize(this->size());
+    movie = new QMovie(":/assets/resources/BOOTLOOP.gif");
+    ui->animationLabel->setMovie(movie);
+    movie->start();
     /* Perform installation to target */
 }
 
