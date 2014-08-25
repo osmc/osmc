@@ -5,6 +5,9 @@
 
 echo -e "Building target side installer"
 BUILDROOT_VERSION="2014.05"
+echo -e "Installing dependencies"
+apt-get update
+apt-get -y install build-essential rsync texinfo libncurses-dev whois unzip git subversion bc
 wget http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz -O buildroot.tar.gz
 if [ $? != 0 ]; then echo "Download failed" && exit 1; fi
 tar -xzvf buildroot.tar.gz
