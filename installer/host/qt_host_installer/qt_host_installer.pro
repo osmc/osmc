@@ -45,3 +45,5 @@ TRANSLATIONS = osmc_da.ts \
 
 RESOURCES += \
     assets.qrc
+
+CONFIG += static
