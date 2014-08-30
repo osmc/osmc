@@ -10,8 +10,9 @@ make clean
 out=$(pwd)/files
 sed '/Package/d' -i files/DEBIAN/control
 test $1 == rbp && echo "Package: rbp-git-osmc" >> files/DEBIAN/control
+pull_source "https://github.com/git/git" "$(pwd)"
 cd src
-make clean
+git checkout v2.0.4
 ./configure --prefix=/usr --disable-pthreads
 # Hack QEMU
 PATH="/tmp:"${PATH}
