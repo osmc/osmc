@@ -28,12 +28,12 @@ function strip_libs()
 
 function pull_source()
 {
-	if [ -d ${2}/src ]; then echo "Cleaning old source" && rm -rf ${2}/src; fi
+	if [ -d ${2}/src ]; then echo "Cleaning old source" && rm -rf ${2}; fi
 	echo $1 | grep -q git
 	if [ $? == 0 ]
 	then
 	echo -e "Detected Git source"
-	git clone ${1} ${2}/src
+	git clone ${1} ${2}
 	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
 	fi	
 }
