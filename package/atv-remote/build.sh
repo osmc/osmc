@@ -8,7 +8,7 @@
 echo -e "Building atvclient for AppleTV"
 make clean
 out=$(pwd)/files
-pull_source "https://github.com/samnazarko/atvclient" "$(pwd)"
+pull_source "https://github.com/samnazarko/atvclient" "$(pwd)/src"
 cd src
 ./configure --prefix=/usr
 $BUILD
