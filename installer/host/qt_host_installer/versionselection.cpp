@@ -6,6 +6,8 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include "utils.h"
+#include <QMap>
+#include <QDebug>
 
 VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName) :
     QWidget(parent),
@@ -13,19 +15,48 @@ VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName) :
 {
     ui->setupUi(this);
     /* List of available builds from the Internet */
-    QString downloadsURL = QString("http://download.osmc.tv/installers/versions_" + deviceShortName);
-    utils::writeLog("Attempting to download device versions file " + downloadsURL);
-    QNetworkAccessManager accessManager;
-    QNetworkRequest networkRequest(downloadsURL);
-    QNetworkReply *networkReply = accessManager.get(networkRequest);
-    while (networkReply->canReadLine())
+    QUrl downloadsURL = QUrl("http://download.osmc.tv/installers/versions_" + deviceShortName);
+    utils::writeLog("Attempting to download device versions file " + downloadsURL.toString());
+    accessManager = new QNetworkAccessManager(this);
+    connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    QNetworkRequest request(downloadsURL);
+    accessManager->get(request);
+}
+
+void VersionSelection::replyFinished(QNetworkReply *reply)
+{
+    QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    QUrl redirectURL = mirrorRedirectUrl.toUrl();
+    if (!redirectURL.isEmpty())
     {
-        ui->versionSelectionBox->addItem(networkReply->readLine());
+        utils::writeLog("Redirected to mirror file " + redirectURL.toString());
+        QNetworkRequest request(redirectURL);
+        this->accessManager->get(request);
     }
-    if (ui->versionSelectionBox->count() == 1)
+    else
     {
-        utils::writeLog("Could not enumerate the version selection dialog box. Likely a network error");
+        utils::writeLog("Acquired mirror file");
+        while (reply->canReadLine())
+        {
+            enumerateBuilds(reply->readLine());
+        }
     }
+    reply->deleteLater();
+}
+
+void VersionSelection::enumerateBuilds(QByteArray buildline)
+{
+    QString line = QString::fromUtf8(buildline);
+    QStringList splitline;
+    QString buildnameline;
+    splitline = line.split(QRegExp("\\ "));
+    for (int i = 0; i < (splitline.count() - 1); i++)
+    {
+       buildnameline = buildnameline + " " + splitline.at(i);
+    }
+    utils::writeLog("Found a build called " + buildnameline);
+    ui->versionSelectionBox->addItem(buildnameline);
+    buildMap.insert(buildnameline, splitline.at((splitline.count() -1)));
 }
 
 VersionSelection::~VersionSelection()
@@ -35,9 +66,20 @@ VersionSelection::~VersionSelection()
 
 void VersionSelection::on_versionnextButton_clicked()
 {
-    if (ui->versionSelectionBox->isEnabled() == false && ui->versionSelectionBox->currentIndex() == 0)
+    if (ui->versionSelectionBox->isEnabled() && ui->versionSelectionBox->currentIndex() == 0)
     {
         utils::displayError(tr("Select a version"), tr("Please select a version!"));
+    }
+    else
+    {
+        if (ui->useLocalBuildCheckbox->isChecked())
+        {
+            emit versionSelected(false, QUrl::fromLocalFile(buildName));
+        }
+        else
+        {
+            emit versionSelected(true, buildMap.value(ui->versionSelectionBox->currentText()));
+        }
     }
 }
 
@@ -46,10 +88,12 @@ void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
     if (ui->useLocalBuildCheckbox->isChecked())
     {
         /* Dialog for selecting custom build */
-        QString buildName = QFileDialog::getOpenFileName(this, "Select disk image", "", tr("OSMC Disk Images (*.*)"));
+        buildName = QString(); /* NULL it */
+        buildName = QFileDialog::getOpenFileName(this, "Select disk image", "", tr("OSMC Disk Images (*.img.gz)"));
         if (buildName == NULL)
         {
             utils::displayError(tr("Build selection error"), tr("You didn't select a custom build -- reverting to online builds"));
+            ui->useLocalBuildCheckbox->setChecked(false);
         }
         else
         {

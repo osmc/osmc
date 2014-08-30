@@ -11,11 +11,9 @@
 #include <QTranslator>
 #include "supporteddevice.h"
 #include <QList>
+#include <QDebug>
 #define WIDGET_START QPoint(10,110)
 
-QString language;
-SupportedDevice *device;
-QString version;
 UpdateNotification *updater;
 LangSelection *ls;
 VersionSelection *vs;
@@ -38,13 +36,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ls, SIGNAL(languageSelected(QString, SupportedDevice*)), this, SLOT(setLanguage(QString, SupportedDevice*)));
     ls->move(WIDGET_START);
     /* Check if an update exists */
-    if (UpdateNotification::isUpdateAvailable())
-    {
-        updater = new UpdateNotification(this);
-        connect(updater, SIGNAL(ignoreUpdate()), this, SLOT(dismissUpdate()));
-        updater->move(WIDGET_START);
-        ls->hide();
-    }
+    updater = new UpdateNotification(this);
+    updater->hide();
+    connect(updater, SIGNAL(hasUpdate()), this, SLOT(showUpdate()));
+    updater->isUpdateAvailable();
 }
 
 void MainWindow::dismissUpdate()
@@ -53,12 +48,20 @@ void MainWindow::dismissUpdate()
     ls->show();
 }
 
+void MainWindow::showUpdate()
+{
+    updater->show();
+    connect(updater, SIGNAL(ignoreUpdate()), this, SLOT(dismissUpdate()));
+    updater->move(WIDGET_START);
+    ls->hide();
+}
+
 void MainWindow::setLanguage(QString language, SupportedDevice *device)
 {
-        utils::writeLog("The user has selected " + language + " as their language");
-        utils::writeLog("The user has selected " + device->getDeviceName() + " as their device");
-        language = language;
-        device = device;
+        this->language = language;
+        this->device = device;
+        utils::writeLog("The user has selected " + this->language + " as their language");
+        utils::writeLog("The user has selected " + this->device->getDeviceName() + " as their device");
         if (language != tr("English"))
         {
             translate(language);
@@ -69,16 +72,25 @@ void MainWindow::setLanguage(QString language, SupportedDevice *device)
             qApp->removeTranslator(&translator);
         }
         vs = new VersionSelection(this, device->getDeviceShortName());
-        connect(vs, SIGNAL(versionSelected(QString)), this, SLOT(setVersion(QString)));
+        connect(vs, SIGNAL(versionSelected(bool, QUrl)), this, SLOT(setVersion(bool, QUrl)));
         vs->move(WIDGET_START);
         vs->show();
         ls->hide();
 }
 
-void MainWindow::setVersion(QString version)
+void MainWindow::setVersion(bool isOnline, QUrl image)
 {
-    utils::writeLog("The user has selected " + device->getDeviceName() + " build URL : " + version);
-    version = version;
+    if (isOnline)
+    {
+        utils::writeLog("The user has selected an online image for " + device->getDeviceName() + " build URL : " + image.toString());
+        this->isOnline = true;
+    }
+    else
+    {
+        utils::writeLog("The user has selected a local image for " + device->getDeviceName() + "file location: " + image.toString());
+        this->isOnline = false;
+    }
+    this->image = image;
 }
 
 void MainWindow::translate(QString locale)

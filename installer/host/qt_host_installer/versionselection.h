@@ -3,6 +3,10 @@
 
 #include <QWidget>
 #include "supporteddevice.h"
+#include <QtNetwork/QNetworkAccessManager>
+#include <QMap>
+#include <QUrl>
+#include <QString>
 
 namespace Ui {
 class VersionSelection;
@@ -17,16 +21,20 @@ public:
     ~VersionSelection();
 
 signals:
-    void versionSelected(QString version);
+    void versionSelected(bool isOnline, QUrl image);
 
 private slots:
     void on_versionnextButton_clicked();
-
+    void replyFinished(QNetworkReply* reply);
     void on_useLocalBuildCheckbox_stateChanged(int arg1);
 
 private:
     Ui::VersionSelection *ui;
     QString version;
+    QString buildName;
+    QNetworkAccessManager *accessManager;
+    void enumerateBuilds(QByteArray buildline);
+    QMap<QString,QString> buildMap;
 };
 
 #endif // VERSIONSELECTION_H

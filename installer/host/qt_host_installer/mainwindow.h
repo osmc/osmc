@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "supporteddevice.h"
+#include <QString>
+#include <QUrl>
 
 namespace Ui {
 class MainWindow;
@@ -18,12 +20,17 @@ public:
 
 public slots:
     void setLanguage(QString, SupportedDevice*);
-    void setVersion(QString);
+    void setVersion(bool, QUrl);
+    void showUpdate();
     void dismissUpdate();
     
 private:
     Ui::MainWindow *ui;
     void translate(QString locale);
+    QString language;
+    SupportedDevice *device;
+    bool isOnline;
+    QUrl image;
 };
 
 #endif // MAINWINDOW_H

@@ -2,8 +2,6 @@
 #include "ui_updatenotification.h"
 #include "utils.h"
 #include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 
 QString platform;
 
@@ -38,31 +36,41 @@ UpdateNotification::~UpdateNotification()
     delete ui;
 }
 
-bool UpdateNotification::isUpdateAvailable()
+void UpdateNotification::isUpdateAvailable()
 {
     utils::writeLog("Checking for updates");
     int currentBuild = utils::getBuildNumber();
     QString buildURL = QString("http://download.osmc.tv/installers/latest_" + platform);
-    QNetworkAccessManager accessManager;
-    QNetworkRequest networkRequest(buildURL);
-    QNetworkReply *networkReply = accessManager.get(networkRequest);
-    if (!networkReply->error())
+    utils::writeLog("Checking for updates by downloading " + buildURL);
+    accessManager = new QNetworkAccessManager(this);
+    connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    QNetworkRequest request(buildURL);
+    accessManager->get(request);
+}
+
+void UpdateNotification::replyFinished(QNetworkReply *reply)
+{
+    QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    QUrl redirectURL = mirrorRedirectUrl.toUrl();
+    if (!redirectURL.isEmpty())
     {
-        int latestBuild = networkReply->readAll().toInt();
-        if (currentBuild < latestBuild)
+        utils::writeLog("Redirected to mirror file " + redirectURL.toString());
+        QNetworkRequest request(redirectURL);
+        this->accessManager->get(request);
+    }
+    else
+    {
+        utils::writeLog("Acquired mirror file");
+        int latestBuild = QString::fromUtf8(reply->readAll()).toInt();
+        if (utils::getBuildNumber() < latestBuild)
         {
             utils::writeLog("A new update is available");
-            return 1;
+            emit hasUpdate();
         }
         else
         {
             utils::writeLog("No new update is available");
-            return 0;
         }
     }
-    else
-    {
-        utils::writeLog("Error occurred trying to download " + buildURL);
-        return 0;
-    }
+    reply->deleteLater();
 }
