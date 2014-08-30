@@ -26,6 +26,18 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
+function pull_source()
+{
+	if [ -d ${2}/src ]; then echo "Cleaning old source" && rm -rf ${2}/src; fi
+	echo $1 | grep -q git
+	if [ $? == 0 ]
+	then
+	echo -e "Detected Git source"
+	git clone ${1} ${2}/src
+	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
+	fi	
+}
+
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
 export BUILD="make -j${cores}"
 
