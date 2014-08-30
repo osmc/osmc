@@ -14,9 +14,9 @@ OSMC is a community led project and those who wish to contribute to the codebase
 
 A development blog is at http://blog.osmc.io. This blog gives insight in to what is up and coming, including challenges faced when developing OSMC.
 
-#### License and acquisition ####
+#### License ####
 
-OSMC is licensed under the GPLv2. Commits to the OSMC codebase become copyright of OSMC so that it can be maintained and relicensed if necessary without having to maintain contact with the author.
+OSMC is licensed under the GPLv2. Commits to the OSMC codebase become copyright of OSMC so that it can be maintained and relicensed (i.e. -> GPLv3) if necessary without having to maintain contact with the author. OSMC does not claim to own upstream code, and recommends you consult the license of those projects for further information.
 
 #### Help and support ####
 
