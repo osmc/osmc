@@ -2,9 +2,9 @@
 
 fixpkg()
 {
-   sed '/Package/d' -i $1/files/DEBIAN/control
-   sed '/Architecture/d' -i $1/files/DEBIAN/control
-   sed '/Depends/d' -i $1/files/DEBIAN/control
+   sed '/Package/d' -i $1/$2/DEBIAN/control
+   sed '/Architecture/d' -i $1/$2/DEBIAN/control
+   sed '/Depends/d' -i $1/$2/DEBIAN/control
 }
 
 for package in $(ls package)
