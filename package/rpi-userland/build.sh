@@ -9,7 +9,7 @@ echo -e "Building rpi-userland"
 out=$(pwd)/files
 make clean
 echo Downloading userland
-wget --no-check-certificate "https://github.com/raspberrypi/firmware/archive/master.zip"
+pull_source "https://github.com/raspberrypi/firmware" "$(pwd)/firmware-master"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 unzip master.zip
 rm master.zip
