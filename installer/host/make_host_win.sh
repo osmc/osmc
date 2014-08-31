@@ -38,4 +38,6 @@ pushd ${INSTALL}
 popd
 mv ${INSTALL}/osmc-installer.exe .
 rm -rf ${INSTALL}
+umount /qtbin >/dev/null 2>&1
+umount /mgwbin >/dev/null 2>&1
 echo Build complete
