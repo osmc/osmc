@@ -11,6 +11,7 @@ make clean
 sed '/Package/d' -i files/DEBIAN/control
 test "$1" == gen && echo "Package: osmc-splash" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-osmc-splash" >> files/DEBIAN/control
+pull_source "https://github.com/samnazarko/plymouth-lite" "$(pwd)/src"
 cd src
 make clean
 $BUILD
