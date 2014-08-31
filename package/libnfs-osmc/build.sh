@@ -14,8 +14,10 @@ sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
 test "$1" == gen && echo "Package: libnfs-osmc" >> files/DEBIAN/control && echo "Package: libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libnfs-osmc" >> files-dev/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && echo "Package: rbp-libnfsdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libnfs-osmc" >> files-dev/DEBIAN/control
+pull_source "https://github.com/sahlberg/libnfs/" "$(pwd)/src"
 cd src
-make clean
+git checkout libnfs-1.9.5
+./bootstrap
 ./configure --prefix=/usr
 $BUILD
 make install DESTDIR=${out}
