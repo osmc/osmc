@@ -15,7 +15,8 @@ do
        if [ $? -eq 0 ]
        then
            echo Removing package and architecture information from cross-platform package $package
-           fixpkg "package/$package"
+           fixpkg "package/$package" "files"
+	   if [ -d "package/$package/files-dev" ]; then fixpkg "package/$package" "files-dev"; fi
        fi
    fi
 done
