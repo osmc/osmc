@@ -35,7 +35,17 @@ function pull_source()
 	echo -e "Detected Git source"
 	git clone ${1} ${2}
 	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
-	fi	
+	fi
+	echo $1 | grep -q tar
+	if [ $? == 0 ]
+	then
+	echo -e "Detected tarball source"
+	mkdir ${2}
+	wget ${1} -O source.tar
+	if [ $? != 0 ]; then echo "Downloading tarball failed" && exit 1; fi
+	tar -xvf source.tar -C ${2}
+	rm source.tar
+	fi
 }
 
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
