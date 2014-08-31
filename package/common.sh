@@ -46,6 +46,16 @@ function pull_source()
 	tar -xvf source.tar -C ${2}
 	rm source.tar
 	fi
+	echo $1 | grep -q zip
+	if [ $? == 0 ]
+	then
+	echo -e "Detected ZIP source"
+	mkdir ${2}
+	wget ${1} -O source.zip
+	if [ $? != 0 ]; then echo "Downloading zip failed" && exit 1; fi
+	unzip source.zip -d ${2}
+	rm source.zip
+	fi
 }
 
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
