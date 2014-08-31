@@ -13,8 +13,8 @@ sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
 test "$1" == gen && echo "Package: librtmp-osmc" >> files/DEBIAN/control && echo "Package: librtmpdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: librtmp-osmc" >> files-dev/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-librtmp-osmc" >> files/DEBIAN/control && echo "Package: rbp-librtmpdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-librtmp-osmc" >> files-dev/DEBIAN/control
+pull_source "git://git.ffmpeg.org/rtmpdump" "$(pwd)/src"
 cd src
-make clean
 $BUILD sys=posix
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 cd librtmp
