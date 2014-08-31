@@ -8,8 +8,8 @@
 echo -e "Building armmem for Raspberry Pi"
 out=$(pwd)/files
 make clean
+pull_source "https://github.com/bavison/arm-mem" "$(pwd)/src"
 cd src
-make clean
 make
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_libs
