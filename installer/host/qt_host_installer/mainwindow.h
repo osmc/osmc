@@ -5,6 +5,8 @@
 #include "supporteddevice.h"
 #include <QString>
 #include <QUrl>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
 
 namespace Ui {
 class MainWindow;
@@ -23,14 +25,17 @@ public slots:
     void setVersion(bool, QUrl);
     void showUpdate();
     void dismissUpdate();
+    void replyFinished(QNetworkReply* reply);
     
 private:
     Ui::MainWindow *ui;
     void translate(QString locale);
     QString language;
+    QString mirrorURL;
     SupportedDevice *device;
     bool isOnline;
     QUrl image;
+    QNetworkAccessManager *accessManager;
 };
 
 #endif // MAINWINDOW_H

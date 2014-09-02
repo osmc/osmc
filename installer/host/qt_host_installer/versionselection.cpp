@@ -9,13 +9,13 @@
 #include <QMap>
 #include <QDebug>
 
-VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName) :
+VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName, QString mirrorURL) :
     QWidget(parent),
     ui(new Ui::VersionSelection)
 {
     ui->setupUi(this);
     /* List of available builds from the Internet */
-    QUrl downloadsURL = QUrl("http://download.osmc.tv/installers/versions_" + deviceShortName);
+    QUrl downloadsURL = QUrl(mirrorURL + "installers/versions_" + deviceShortName);
     utils::writeLog("Attempting to download device versions file " + downloadsURL.toString());
     accessManager = new QNetworkAccessManager(this);
     connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
@@ -25,21 +25,9 @@ VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName) :
 
 void VersionSelection::replyFinished(QNetworkReply *reply)
 {
-    QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    QUrl redirectURL = mirrorRedirectUrl.toUrl();
-    if (!redirectURL.isEmpty())
+    while (reply->canReadLine())
     {
-        utils::writeLog("Redirected to mirror file " + redirectURL.toString());
-        QNetworkRequest request(redirectURL);
-        this->accessManager->get(request);
-    }
-    else
-    {
-        utils::writeLog("Acquired mirror file");
-        while (reply->canReadLine())
-        {
-            enumerateBuilds(reply->readLine());
-        }
+        enumerateBuilds(reply->readLine());
     }
     reply->deleteLater();
 }

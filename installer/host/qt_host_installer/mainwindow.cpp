@@ -11,6 +11,8 @@
 #include <QTranslator>
 #include "supporteddevice.h"
 #include <QList>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #define WIDGET_START QPoint(10,110)
 
 UpdateNotification *updater;
@@ -34,11 +36,26 @@ MainWindow::MainWindow(QWidget *parent) :
     ls = new LangSelection(this, devices);
     connect(ls, SIGNAL(languageSelected(QString, SupportedDevice*)), this, SLOT(setLanguage(QString, SupportedDevice*)));
     ls->move(WIDGET_START);
-    /* Check if an update exists */
+    /* Resolve a mirror URL */
+    this->mirrorURL = "http://download.osmc.tv";
+    utils::writeLog("Resolving a mirror");
+    accessManager = new QNetworkAccessManager(this);
+    connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    QNetworkRequest request(this->mirrorURL);
+    accessManager->get(request);
     updater = new UpdateNotification(this);
     updater->hide();
     connect(updater, SIGNAL(hasUpdate()), this, SLOT(showUpdate()));
-    updater->isUpdateAvailable();
+}
+
+void MainWindow::replyFinished(QNetworkReply *reply)
+{
+    QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    this->mirrorURL = mirrorRedirectUrl.toString();
+    utils::writeLog("Resolved mirror to " + this->mirrorURL);
+    reply->deleteLater();
+    /* Check if an update exists */
+    updater->isUpdateAvailable(mirrorURL);
 }
 
 void MainWindow::dismissUpdate()
@@ -70,7 +87,7 @@ void MainWindow::setLanguage(QString language, SupportedDevice *device)
             /* Remove because we may have already done the deed */
             qApp->removeTranslator(&translator);
         }
-        vs = new VersionSelection(this, device->getDeviceShortName());
+        vs = new VersionSelection(this, device->getDeviceShortName(), this->mirrorURL);
         connect(vs, SIGNAL(versionSelected(bool, QUrl)), this, SLOT(setVersion(bool, QUrl)));
         vs->move(WIDGET_START);
         vs->show();

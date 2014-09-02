@@ -36,11 +36,11 @@ UpdateNotification::~UpdateNotification()
     delete ui;
 }
 
-void UpdateNotification::isUpdateAvailable()
-{
+void UpdateNotification::isUpdateAvailable(QString &baseURL)
+{   
     utils::writeLog("Checking for updates");
     int currentBuild = utils::getBuildNumber();
-    QString buildURL = QString("http://download.osmc.tv/installers/latest_" + platform);
+    QString buildURL = QString(baseURL + "/installers/latest_" + platform);
     utils::writeLog("Checking for updates by downloading " + buildURL);
     accessManager = new QNetworkAccessManager(this);
     connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
@@ -50,27 +50,16 @@ void UpdateNotification::isUpdateAvailable()
 
 void UpdateNotification::replyFinished(QNetworkReply *reply)
 {
-    QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    QUrl redirectURL = mirrorRedirectUrl.toUrl();
-    if (!redirectURL.isEmpty())
-    {
-        utils::writeLog("Redirected to mirror file " + redirectURL.toString());
-        QNetworkRequest request(redirectURL);
-        this->accessManager->get(request);
-    }
-    else
-    {
-        utils::writeLog("Acquired mirror file");
-        int latestBuild = QString::fromUtf8(reply->readAll()).toInt();
-        if (utils::getBuildNumber() < latestBuild)
-        {
-            utils::writeLog("A new update is available");
-            emit hasUpdate();
-        }
-        else
-        {
-            utils::writeLog("No new update is available");
-        }
-    }
-    reply->deleteLater();
+   utils::writeLog("Acquired mirror file");
+   int latestBuild = QString::fromUtf8(reply->readAll()).toInt();
+   if (utils::getBuildNumber() < latestBuild)
+   {
+       utils::writeLog("A new update is available");
+       emit hasUpdate();
+   }
+   else
+   {
+       utils::writeLog("No new update is available");
+   }
+   reply->deleteLater();
 }

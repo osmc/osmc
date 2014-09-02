@@ -17,7 +17,7 @@ class UpdateNotification : public QWidget
 public:
     explicit UpdateNotification(QWidget *parent = 0);
     ~UpdateNotification();
-    void isUpdateAvailable();
+    void isUpdateAvailable(QString &baseURL);
 
 private slots:
     void on_dismissButton_clicked() { emit ignoreUpdate(); }

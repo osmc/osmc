@@ -17,7 +17,7 @@ class VersionSelection : public QWidget
     Q_OBJECT
 
 public:
-    explicit VersionSelection(QWidget *parent = 0, QString deviceShortName = NULL);
+    explicit VersionSelection(QWidget *parent = 0, QString deviceShortName = NULL, QString mirrorURL = NULL);
     ~VersionSelection();
 
 signals:
