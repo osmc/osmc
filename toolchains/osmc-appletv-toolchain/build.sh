@@ -14,6 +14,7 @@ update_sources
 verify_action
 
 set_lb
+set_publish
 
 # Install packages needed to build filesystem for building
 install_package "debootstrap"

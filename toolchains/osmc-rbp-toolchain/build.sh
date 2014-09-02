@@ -14,6 +14,7 @@ update_sources
 verify_action
 
 set_lb
+set_publish
 
 # Install packages needed to build filesystem for building
 install_package "debootstrap"
@@ -66,7 +67,9 @@ verify_action
 if [ -z $DISABLE_LOCAL_BUILDS ]
 then
 echo -e "Installing default chroot packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS $XBMC_MAN_PKGS_RBP
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+verify_action
+handle_ds_deps "$DIR" "$XBMC_MAN_PKGS_RBP" "(echo $tcstub | cut -d - -f2)"
 verify_action
 else
 echo -e "Installing default chroot packages without downstream"

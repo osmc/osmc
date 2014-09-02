@@ -57,7 +57,6 @@ function update_sources()
 }
 
 function install_package()
-
 {
 	echo -e "Installing package ${1}..."
 	# Check if our package is installed

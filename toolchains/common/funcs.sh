@@ -35,6 +35,21 @@ function set_lb()
 	[ -f /tmp/disable-lb ] && export DISABLE_LOCAL_BUILDS=1
 }
 
+function set_publish()
+{
+	[ -f /tmp/publish-tc ] && export ENABLE_PUBLISH_BUILDS=1
+}
+
+function handle_ds_deps()
+{
+	git clone https://github.com/samnazarko/osmc ${1}/osmc
+	for dep in ${2}
+	do
+		chroot ${1} "/bin/bash -c \"echo Processing for $dep && if [ $(apt-cache search $dep --names-only | wc -l) == 1 ]; then echo Found package in apt already. && apt-get install $dep; else echo Could not find package in apt, going to try a local build && pushd /osmc/package/$(echo $1 | sed -e 's/$3-//') && make $3 && for d in $(ls *.deb); do dpkg -i $d; done && if [ -Z $ENABLE_PUBLISH_BUILDS ]; then mv *.deb /; fi; fi\""
+	done
+	rm -rf ${1}/osmc
+}
+
 COMPILER_PKGS="build-essential subversion wget nano kernel-package sudo"
 FS_PKGS="parted kpartx libblkid-dev libfuse-dev libreadline-dev"
 REMOTE_PKGS="libusb-dev"
