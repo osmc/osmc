@@ -11,7 +11,6 @@
 #include <QTranslator>
 #include "supporteddevice.h"
 #include <QList>
-#include <QDebug>
 #define WIDGET_START QPoint(10,110)
 
 UpdateNotification *updater;
@@ -82,12 +81,12 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
 {
     if (isOnline)
     {
-        utils::writeLog("The user has selected an online image for " + device->getDeviceName() + " build URL : " + image.toString());
+        utils::writeLog("The user has selected an online image for " + this->device->getDeviceName() + " build URL : " + image.toString());
         this->isOnline = true;
     }
     else
     {
-        utils::writeLog("The user has selected a local image for " + device->getDeviceName() + "file location: " + image.toString());
+        utils::writeLog("The user has selected a local image for " + this->device->getDeviceName() + "file location: " + image.toString());
         this->isOnline = false;
     }
     this->image = image;

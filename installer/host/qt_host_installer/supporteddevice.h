@@ -1,6 +1,5 @@
 #ifndef SUPPORTEDDEVICE_H
 #define SUPPORTEDDEVICE_H
-#define NUMBER_SUPPORTED 1
 #include <QString>
 
 class SupportedDevice
