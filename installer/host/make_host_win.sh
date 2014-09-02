@@ -24,6 +24,7 @@ if [ -f Makefile ]; then echo "Cleaning" && mingw32-make clean; fi
 echo Building installer
 qmake
 mingw32-make
+if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 strip release/${TARGET}.exe
 echo Packaging installer
 popd

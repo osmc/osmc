@@ -9,6 +9,7 @@ if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
 echo Building installer
 qmake
 make
+if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 strip ${TARGET}
 echo Packaging installer
 popd
