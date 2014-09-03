@@ -14,5 +14,5 @@ namespace utils
     void writeLog(QString strLog);
     void displayError(QString title, QString message);
     int inline getBuildNumber() { return BUILD_NUMBER; }
-    QList<SupportedDevice> *buildDeviceList();
+    QList<SupportedDevice *> buildDeviceList();
 }

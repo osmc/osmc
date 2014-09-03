@@ -1,6 +1,10 @@
 #include "supporteddevice.h"
 #include <QString>
 
+SupportedDevice::SupportedDevice()
+{
+}
+
 SupportedDevice::SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedPartitioning)
 {
     deviceName = dName;

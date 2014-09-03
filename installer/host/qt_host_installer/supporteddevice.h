@@ -5,6 +5,7 @@
 class SupportedDevice
 {
 public:
+    SupportedDevice();
     SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedPartitioning);
     QString getDeviceName() { return deviceName; }
     QString getDeviceShortName() { return deviceShortName; }

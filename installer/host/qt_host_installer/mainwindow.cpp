@@ -32,9 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     utils::writeLog("Detected locale as " + autolocale);
     translate(autolocale);
     /* Enumerating devices */
-    QList<SupportedDevice> *devices = utils::buildDeviceList();
+    QList<SupportedDevice *> devices = utils::buildDeviceList();
     ls = new LangSelection(this, devices);
-    connect(ls, SIGNAL(languageSelected(QString, SupportedDevice*)), this, SLOT(setLanguage(QString, SupportedDevice*)));
+    connect(ls, SIGNAL(languageSelected(QString, SupportedDevice)), this, SLOT(setLanguage(QString, SupportedDevice)));
     ls->move(WIDGET_START);
     /* Resolve a mirror URL */
     this->mirrorURL = "http://download.osmc.tv";
@@ -72,12 +72,12 @@ void MainWindow::showUpdate()
     ls->hide();
 }
 
-void MainWindow::setLanguage(QString language, SupportedDevice *device)
+void MainWindow::setLanguage(QString language, SupportedDevice device)
 {
         this->language = language;
         this->device = device;
         utils::writeLog("The user has selected " + this->language + " as their language");
-        utils::writeLog("The user has selected " + this->device->getDeviceName() + " as their device");
+        utils::writeLog("The user has selected " + this->device.getDeviceName() + " as their device");
         if (language != tr("English"))
         {
             translate(language);
@@ -87,7 +87,7 @@ void MainWindow::setLanguage(QString language, SupportedDevice *device)
             /* Remove because we may have already done the deed */
             qApp->removeTranslator(&translator);
         }
-        vs = new VersionSelection(this, device->getDeviceShortName(), this->mirrorURL);
+        vs = new VersionSelection(this, this->device.getDeviceShortName(), this->mirrorURL);
         connect(vs, SIGNAL(versionSelected(bool, QUrl)), this, SLOT(setVersion(bool, QUrl)));
         vs->move(WIDGET_START);
         vs->show();
@@ -98,12 +98,12 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
 {
     if (isOnline)
     {
-        utils::writeLog("The user has selected an online image for " + this->device->getDeviceName() + " build URL : " + image.toString());
+        utils::writeLog("The user has selected an online image for " + this->device.getDeviceName() + " with build URL : " + image.toString());
         this->isOnline = true;
     }
     else
     {
-        utils::writeLog("The user has selected a local image for " + this->device->getDeviceName() + "file location: " + image.toString());
+        utils::writeLog("The user has selected a local image for " + this->device.getDeviceName() + " with file location: " + image.toString());
         this->isOnline = false;
     }
     this->image = image;

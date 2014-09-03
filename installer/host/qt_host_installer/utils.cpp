@@ -38,12 +38,12 @@ namespace utils
         errorMessageBox->exec();
     }
 
-    QList<SupportedDevice> *buildDeviceList()
+    QList<SupportedDevice * > buildDeviceList()
     {
         utils::writeLog("Enumerating supported devices");
-        QList<SupportedDevice> *devices = new QList<SupportedDevice>();
+        QList<SupportedDevice * > devices;
         SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true, true, true, false);
-        devices->append(*RBP);
+        devices.append(RBP);
         return devices;
     }
 

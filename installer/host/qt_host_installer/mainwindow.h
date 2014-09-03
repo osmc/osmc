@@ -21,7 +21,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void setLanguage(QString, SupportedDevice*);
+    void setLanguage(QString, SupportedDevice);
     void setVersion(bool, QUrl);
     void showUpdate();
     void dismissUpdate();
@@ -32,7 +32,7 @@ private:
     void translate(QString locale);
     QString language;
     QString mirrorURL;
-    SupportedDevice *device;
+    SupportedDevice device = SupportedDevice();
     bool isOnline;
     QUrl image;
     QNetworkAccessManager *accessManager;
