@@ -7,7 +7,7 @@ NetworkSetup::NetworkSetup(QWidget *parent, bool allowWireless) :
 {
     ui->setupUi(this);
     if (!allowWireless)
-        ui->wiredconnectionradioButton->setEnabled(false);
+        ui->wirelessconnectionradioButton->setEnabled(false);
 }
 
 NetworkSetup::~NetworkSetup()

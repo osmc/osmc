@@ -136,7 +136,7 @@ void MainWindow::setPreseed(int installType)
     this->installType = installType;
     if (device.allowsPreseedingNetwork())
     {
-        ns = new NetworkSetup(this, device.allowsPreseedingNFS() ? false : true);
+        ns = new NetworkSetup(this, (this->installType == utils::INSTALL_NFS) ? false : true);
         connect(ns, SIGNAL(setNetworkOptionsInit(bool,bool)), this, SLOT(setNetworkInitial(bool,bool)));
         ns->move(WIDGET_START);
         ns->show();
