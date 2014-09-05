@@ -223,7 +223,7 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     nss->setWirelessSSID(ssid);
     nss->setWirelessKeyType(key_type);
     /* No point if open */
-    if (! nss->getWirelessKeyType() == 0)
+    if (! nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE)
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
     /* ADD CONNECT */

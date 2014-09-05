@@ -20,4 +20,7 @@ namespace utils
     static int INSTALL_USB = 2;
     static int INSTALL_NFS = 3;
     static int INSTALL_EMMC = 4;
+    static int WIRELESS_ENCRYPTION_NONE = 0;
+    static int WIRELESS_ENCRYPTION_WPAPSK = 1;
+    static int WIRELESS_ENCRYPTION_WEP = 2;
 }

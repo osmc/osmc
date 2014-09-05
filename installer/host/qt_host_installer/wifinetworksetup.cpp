@@ -1,5 +1,7 @@
 #include "wifinetworksetup.h"
 #include "ui_wifinetworksetup.h"
+#include "utils.h"
+
 WiFiNetworkSetup::WiFiNetworkSetup(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WiFiNetworkSetup)
@@ -20,7 +22,7 @@ void WiFiNetworkSetup::on_networkoptionsnextButton_clicked()
 {
     /* TODO: Add validation */
     int key_type;
-    key_type = (ui->keySelectionBox->currentText() == tr("Open Network")) ? 0 : (ui->keySelectionBox->currentText() == tr("WPA/WPA2 PSK")) ? 1 : 2;
+    key_type = (ui->keySelectionBox->currentText() == tr("Open Network")) ? utils::WIRELESS_ENCRYPTION_NONE : (ui->keySelectionBox->currentText() == tr("WPA/WPA2 PSK")) ? utils::WIRELESS_ENCRYPTION_WPAPSK : utils::WIRELESS_ENCRYPTION_WEP;
     emit wifiNetworkConfigured(ui->ssidnamelineEdit->text(), key_type, ui->keylineEdit->text());
 }
 
