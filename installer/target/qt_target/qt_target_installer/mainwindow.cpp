@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->animationLabel->setMovie(movie);
     movie->start();
     /* Perform installation to target */
+
 }
 
 void MainWindow::setLabelText(QString labelString)

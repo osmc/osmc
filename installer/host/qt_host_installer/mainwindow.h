@@ -37,7 +37,7 @@ private:
     void translate(QString locale);
     QString language;
     QString mirrorURL;
-    SupportedDevice device = SupportedDevice();
+    SupportedDevice device;
     bool isOnline;
     QUrl image;
     int installType;
