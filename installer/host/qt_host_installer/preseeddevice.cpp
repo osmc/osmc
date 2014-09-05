@@ -8,6 +8,11 @@ PreseedDevice::PreseedDevice(QWidget *parent, SupportedDevice dev) :
     ui(new Ui::PreseedDevice)
 {
     ui->setupUi(this);
+    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal())
+    {
+        utils::writeLog("This device does not support preseeding at all.");
+        emit preseedSelected(utils::INSTALL_USB);
+    }
     if (!dev.allowsPreseedingNFS())
     {
         utils::writeLog("Disabling NFS install for device " + dev.getDeviceName() + " as it does not support it");
