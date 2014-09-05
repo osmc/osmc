@@ -154,7 +154,11 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
     nss = new NetworkSettings();
     if (advanced)
     {
-        nss->setDHCP(true);
+        nss->setDHCP(false);
+        if (!useWireless)
+            nss->setWireless(false);
+        else
+            nss->setWireless(true);
         ans = new AdvancedNetworkSetup(this);
         connect(ans, SIGNAL(advancednetworkSelected(QString, QString, QString, QString, QString)), this, SLOT(setNetworkAdvanced(QString,QString,QString,QString,QString)));
         ans->move(WIDGET_START);
