@@ -15,4 +15,9 @@ namespace utils
     void displayError(QString title, QString message);
     int inline getBuildNumber() { return BUILD_NUMBER; }
     QList<SupportedDevice *> buildDeviceList();
+    static int INSTALL_NOPRESEED = -1;
+    static int INSTALL_SD = 1;
+    static int INSTALL_USB = 2;
+    static int INSTALL_NFS = 3;
+    static int INSTALL_EMMC = 4;
 }

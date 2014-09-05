@@ -6,10 +6,21 @@
 #include "ui_updatenotification.h"
 #include "versionselection.h"
 #include "ui_versionselection.h"
+#include "ui_preseeddevice.h"
+#include "preseeddevice.h"
+#include "ui_networksetup.h"
+#include "networksetup.h"
+#include "ui_deviceselection.h"
+#include "deviceselection.h"
 #include "utils.h"
 #include <QString>
 #include <QTranslator>
 #include "supporteddevice.h"
+#include "advancednetworksetup.h"
+#include "ui_advancednetworksetup.h"
+#include "wifinetworksetup.h"
+#include "ui_wifinetworksetup.h"
+#include "networksettings.h"
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -18,6 +29,11 @@
 UpdateNotification *updater;
 LangSelection *ls;
 VersionSelection *vs;
+PreseedDevice *ps;
+NetworkSetup *ns;
+DeviceSelection *ds;
+AdvancedNetworkSetup *ans;
+WiFiNetworkSetup *wss;
 
 QTranslator translator;
 
@@ -107,6 +123,106 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
         this->isOnline = false;
     }
     this->image = image;
+    /* We call the preseeder: even if we can't preseed, we use its callback to handle the rest of the application */
+    ps = new PreseedDevice(this, this->device);
+    connect(ps, SIGNAL(preseedSelected(int)), this, SLOT(setPreseed(int)));
+    ps->move(WIDGET_START);
+    ps->show();
+    vs->hide();
+}
+
+void MainWindow::setPreseed(int installType)
+{
+    this->installType = installType;
+    if (device.allowsPreseedingNetwork())
+    {
+        ns = new NetworkSetup(this, device.allowsPreseedingNFS() ? false : true);
+        connect(ns, SIGNAL(setNetworkOptionsInit(bool,bool)), this, SLOT(setNetworkInitial(bool,bool)));
+        ns->move(WIDGET_START);
+        ns->show();
+        ps->hide();
+    }
+    else
+    {
+        /* Straight to device selection */
+        ds = new DeviceSelection(this);
+    }
+}
+
+void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
+{
+    nss = new NetworkSettings();
+    if (advanced)
+    {
+        nss->setDHCP(true);
+        ans = new AdvancedNetworkSetup(this);
+        connect(ans, SIGNAL(advancednetworkSelected(QString, QString, QString, QString, QString)), this, SLOT(setNetworkAdvanced(QString,QString,QString,QString,QString)));
+        ans->move(WIDGET_START);
+        ans->show();
+        ns->hide();
+    }
+    if (!advanced && useWireless)
+    {
+        nss->setDHCP(true);
+        nss->setWireless(true);
+        wss = new WiFiNetworkSetup(this);
+        connect(wss, SIGNAL(wifiNetworkConfigured(QString,int,QString)), this, SLOT(setWiFiConfiguration(QString,int,QString)));
+        wss->move(WIDGET_START);
+        wss->show();
+        ns->hide();
+    }
+    if (!advanced && !useWireless)
+    {
+        nss->setDHCP(true);
+        nss->setWireless(false);
+        ds = new DeviceSelection(this);
+        /* ADD CONNECT */
+        ds->move(WIDGET_START);
+        ds->show();
+        ns->hide();
+    }
+}
+
+void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2)
+{
+    utils::writeLog("Setting custom non-DHCP networking settings");
+    utils::writeLog("Set up network with IP: " + ip + " subnet mask of: " + mask + " gateway of: " + gw + " Primary DNS: " + dns1 + " Secondary DNS: " + dns2);
+    nss->setIP(ip);
+    nss->setMask(mask);
+    nss->setGW(gw);
+    nss->setDNS1(dns1);
+    nss->setDNS2(dns2);
+    if (nss->hasWireless())
+    {
+        wss = new WiFiNetworkSetup(this);
+        connect(wss, SIGNAL(wifiNetworkConfigured(QString,int,QString)), this, SLOT(setWiFiConfiguration(QString,int,QString)));
+        wss->move(WIDGET_START);
+        wss->show();
+        ans->hide();
+    }
+    else
+    {
+        ds = new DeviceSelection(this);
+        /* ADD CONNECT */
+        ds->move(WIDGET_START);
+        ds->show();
+        ans->hide();
+    }
+}
+
+void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_value)
+{
+    utils::writeLog("Wireless network configured with SSID " + ssid + " key value " + key_value);
+    nss->setWirelessSSID(ssid);
+    nss->setWirelessKeyType(key_type);
+    /* No point if open */
+    if (! nss->getWirelessKeyType() == 0)
+        nss->setWirelessKeyValue(key_value);
+    ds = new DeviceSelection(this);
+    /* ADD CONNECT */
+    ds->move(WIDGET_START);
+    ds->show();
+    wss->hide();
 }
 
 void MainWindow::translate(QString locale)

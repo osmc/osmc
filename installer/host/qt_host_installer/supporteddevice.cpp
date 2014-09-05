@@ -5,12 +5,14 @@ SupportedDevice::SupportedDevice()
 {
 }
 
-SupportedDevice::SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedPartitioning)
+SupportedDevice::SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedInternal, bool preseedSD, bool preseedPartitioning)
 {
-    deviceName = dName;
-    deviceShortName = dsName;
-    preseedNetwork = preseedNetwork;
-    preseedNFS = preseedNFS;
-    preseedUSB = preseedUSB;
-    preseedPartitioning = preseedPartitioning;
+    this->deviceName = dName;
+    this->deviceShortName = dsName;
+    this->preseedNetwork = preseedNetwork;
+    this->preseedNFS = preseedNFS;
+    this->preseedUSB = preseedUSB;
+    this->preseedInternal = preseedInternal;
+    this->preseedSD = preseedSD;
+    this->preseedPartitioning = preseedPartitioning;
 }

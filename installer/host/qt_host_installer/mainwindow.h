@@ -7,6 +7,7 @@
 #include <QUrl>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include "networksettings.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,10 @@ public:
 public slots:
     void setLanguage(QString, SupportedDevice);
     void setVersion(bool, QUrl);
+    void setPreseed(int installType);
+    void setNetworkInitial(bool useWireless, bool advanced);
+    void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
+    void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
     void showUpdate();
     void dismissUpdate();
     void replyFinished(QNetworkReply* reply);
@@ -35,6 +40,8 @@ private:
     SupportedDevice device = SupportedDevice();
     bool isOnline;
     QUrl image;
+    int installType;
+    NetworkSettings *nss;
     QNetworkAccessManager *accessManager;
 };
 

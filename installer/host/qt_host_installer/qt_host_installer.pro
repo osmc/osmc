@@ -19,7 +19,15 @@ SOURCES += main.cpp\
     langselection.cpp \
     updatenotification.cpp \
     supporteddevice.cpp \
-    versionselection.cpp
+    versionselection.cpp \
+    preseeddevice.cpp \
+    licenseagreement.cpp \
+    networksetup.cpp \
+    deviceselection.cpp \
+    installprogress.cpp \
+    networksettings.cpp \
+    advancednetworksetup.cpp \
+    wifinetworksetup.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -27,12 +35,27 @@ HEADERS  += mainwindow.h \
     langselection.h \
     updatenotification.h \
     supporteddevice.h \
-    versionselection.h
+    versionselection.h \
+    preseeddevice.h \
+    licenseagreement.h \
+    networksetup.h \
+    deviceselection.h \
+    installprogress.h \
+    networksettings.h \
+    advancednetworksetup.h \
+    wifinetworksetup.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
     updatenotification.ui \
-    versionselection.ui
+    versionselection.ui \
+    preseeddevice.ui \
+    licenseagreement.ui \
+    networksetup.ui \
+    deviceselection.ui \
+    installprogress.ui \
+    advancednetworksetup.ui \
+    wifinetworksetup.ui
 
 VERSION = 1.0.0
 

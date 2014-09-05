@@ -6,12 +6,14 @@ class SupportedDevice
 {
 public:
     SupportedDevice();
-    SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedPartitioning);
+    SupportedDevice(QString dName, QString dsName, bool preseedNetwork, bool preseedNFS, bool preseedUSB, bool preseedInternal, bool preseedSD, bool preseedPartitioning);
     QString getDeviceName() { return deviceName; }
     QString getDeviceShortName() { return deviceShortName; }
     bool allowsPreseedingNetwork() { return preseedNetwork; }
     bool allowsPreseedingNFS() { return preseedNFS; }
     bool allowsPreseedingUSB() { return preseedUSB; }
+    bool allowsPreseedingInternal() { return preseedInternal; }
+    bool allowsPreseedingSD() { return preseedSD; }
     bool allowsPreseedingPartitioning() { return preseedPartitioning; }
 private:
     QString deviceName;
@@ -19,6 +21,8 @@ private:
     bool preseedNetwork;
     bool preseedNFS;
     bool preseedUSB;
+    bool preseedInternal;
+    bool preseedSD;
     bool preseedPartitioning;
 };
 
