@@ -4,6 +4,9 @@ all:
 linux:
 	bash make_host_linux.sh
 
+osx:
+	bash make_host_osx.sh
+
 win:
 	bash make_host_win.sh "C:/MinGW/qt/qt-everywhere-opensource-src-4.8.6/bin" "C:/MinGW/bin"
 
