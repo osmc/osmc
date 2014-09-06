@@ -51,6 +51,8 @@
 				<br>
                                 <a href="http://simonbrunton.com" target="_blank" class="designed"><?echo $LOGO_STRING;?></a><br>
                                 <a href="http://markthe.is" target="_blank" class="designed"><?echo $DESIGN_STRING;?></a>
+				<p class="designed">(c) 2014 OSMC </p>
+				<a href="http://osmc.tv/about/corporate" class="designed">Corporate</a>
 				</div> <?php // end #inner-footer ?>
 
 			</footer> <?php // end footer ?>
