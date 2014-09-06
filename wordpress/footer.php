@@ -50,9 +50,10 @@
                                 ?>
 				<br>
                                 <a href="http://simonbrunton.com" target="_blank" class="designed"><?echo $LOGO_STRING;?></a><br>
-                                <a href="http://markthe.is" target="_blank" class="designed"><?echo $DESIGN_STRING;?></a>
+                                <a href="http://markthe.is" target="_blank" class="designed"><?echo $DESIGN_STRING;?></a></br>
 				<p class="designed">(c) 2014 OSMC </p>
-				<a href="http://osmc.tv/about/corporate" class="designed">Corporate</a>
+				<br>
+				<a href="http://osmc.tv/about/corporate" class="designed">Corporate</a></br>
 				</div> <?php // end #inner-footer ?>
 
 			</footer> <?php // end footer ?>
