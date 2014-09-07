@@ -10,7 +10,7 @@ echo Building installer
 qmake
 make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
-macdeployqt ${TARGET}.app -dmg --no-plugins
+macdeployqt ${TARGET}.app -dmg -no-plugins
 echo Packaging installer
 popd
 mv ${TARGET}/${TARGET}.dmg osmc-installer.dmg
