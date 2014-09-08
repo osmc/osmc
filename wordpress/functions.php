@@ -7,6 +7,82 @@ function displayForumStaff()
 {
     echo "Mike F, Adam W";
 }
+function displaySocialWidget()
+{
+   $lang = array_shift(explode(".",$_SERVER['HTTP_HOST']));
+   $TITLE = "Social";
+   switch ($lang)
+   {
+   case "fr":
+			 $TITLE = "Réseaux sociaux";
+             break;
+   case "da":
+             $TITLE = "Social";
+             break;
+   case "se":
+             $TITLE = "Socialt";
+			 break;
+   case "de":
+             $TITLE = "Sozial";
+			 break;
+   case "nl":
+             $TITLE = "Social";
+			 break;
+   case "ru": 
+             $TITLE = "Мы в социальных сетях";
+			 break;
+   case "es":
+             $TITLE = "Sociales";
+			 break;
+   }
+   echo '<h4 class="widgettitle">' . $TITLE . '</h4>';	
+   echo '<br>';
+   echo '<a href="http://facebook.com/osmcproject" target="_blank"><img src="http://osmc.tv/wp-content/themes/osmc/fb.png" width="50" height=50"></a> <a href="http://twitter.com/SamNazarko" target="_blank"><img hspace="20" src="http://osmc.tv/wp-content/themes/osmc/twitter.png" width="60" height=60"></a>';
+}
+function displayDonationWidget()
+{
+   <h4 class="widgettitle">Recent Posts</h4>
+   $lang = array_shift(explode(".",$_SERVER['HTTP_HOST']));
+   $TITLE = "Donate";
+   $TEXT = "OSMC is a new and upcoming project that needs some support to make sure it lands on its feet.";
+   switch ($lang)
+   {
+   case "fr":
+			 $TITLE = "";
+			 $TEXT = "";
+             break;
+   case "da":
+			 $TITLE = "";
+			 $TEXT = "";
+             break;
+   case "se":
+			 $TITLE = "";
+			 $TEXT = "";
+			 break;
+   case "de":
+			 $TITLE = "";
+			 $TEXT = ""
+			 break;
+   case "nl":
+			 $TITLE = "";
+			 $TEXT = "";
+			 break;
+   case "ru":
+			 $TITLE = "пожертвовать";
+			 $TEXT = "OSMC - новый и развивающийся проект, которому требуется помощь для того, чтоб встать на ноги.";
+			 break;
+   case "es":
+			 $TITLE = "";
+			 $TEXT = "";
+			 break;
+   }
+   echo '<h4 class="widgettitle">' . $TITLE . '</h4';	 			 
+   echo '<br>';
+   echo $TEXT;
+   echo '<br>';
+   echo '<a href="http://osmc.tv/donate.php?code=osmc_dntn&amp;iname=OSMC%20Blog%20Donation"><img src="http://osmc.tv/wp-content/uploads/2014/09/btn_donate_LG.gif"></a>';
+}
+
 /*
 Author: Eddie Machado
 URL: htp://themble.com/bones/
