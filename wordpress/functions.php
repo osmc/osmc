@@ -14,26 +14,26 @@ function displaySocialWidget()
    switch ($lang)
    {
    case "fr":
-			 $TITLE = "Réseaux sociaux";
+	     $TITLE = "Réseaux sociaux";
              break;
    case "da":
              $TITLE = "Social";
              break;
    case "se":
              $TITLE = "Socialt";
-			 break;
+	     break;
    case "de":
              $TITLE = "Sozial";
-			 break;
+	     break;
    case "nl":
              $TITLE = "Social";
-			 break;
+	      break;
    case "ru": 
              $TITLE = "Мы в социальных сетях";
-			 break;
+	      break;
    case "es":
              $TITLE = "Sociales";
-			 break;
+	      break;
    }
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';	
    echo '<br>';
@@ -41,42 +41,41 @@ function displaySocialWidget()
 }
 function displayDonationWidget()
 {
-   <h4 class="widgettitle">Recent Posts</h4>
    $lang = array_shift(explode(".",$_SERVER['HTTP_HOST']));
    $TITLE = "Donate";
    $TEXT = "OSMC is a new and upcoming project that needs some support to make sure it lands on its feet.";
    switch ($lang)
    {
    case "fr":
-			 $TITLE = "";
-			 $TEXT = "";
+	     $TITLE = "";
+	     $TEXT = "";
              break;
    case "da":
-			 $TITLE = "";
-			 $TEXT = "";
+	     $TITLE = "";
+	     $TEXT = "";
              break;
    case "se":
-			 $TITLE = "";
-			 $TEXT = "";
-			 break;
+	     $TITLE = "";
+	     $TEXT = "";
+	     break;
    case "de":
-			 $TITLE = "";
-			 $TEXT = ""
-			 break;
+	     $TITLE = "";
+	     $TEXT = "";
+	     break;
    case "nl":
-			 $TITLE = "";
-			 $TEXT = "";
-			 break;
+	     $TITLE = "";
+	     $TEXT = "";
+	     break;
    case "ru":
-			 $TITLE = "пожертвовать";
-			 $TEXT = "OSMC - новый и развивающийся проект, которому требуется помощь для того, чтоб встать на ноги.";
-			 break;
+	     $TITLE = "пожертвовать";
+	     $TEXT = "OSMC - новый и развивающийся проект, которому требуется помощь для того, чтоб встать на ноги.";
+	     break;
    case "es":
-			 $TITLE = "";
-			 $TEXT = "";
-			 break;
+	     $TITLE = "";
+	     $TEXT = "";
+	     break;
    }
-   echo '<h4 class="widgettitle">' . $TITLE . '</h4';	 			 
+   echo '<h4 class="widgettitle">' . $TITLE . '</h4';
    echo '<br>';
    echo $TEXT;
    echo '<br>';
