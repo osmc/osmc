@@ -1,4 +1,8 @@
 <?php
+global $TRANSTAFF;
+global $FRMSTAFF;
+$TRANSTAFF = "Rene S";
+$FRMSTAFF = "Mike F, Adam W";
 /*
 Author: Eddie Machado
 URL: htp://themble.com/bones/
