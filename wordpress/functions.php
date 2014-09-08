@@ -35,6 +35,7 @@ function displaySocialWidget()
              $TITLE = "Sociales";
 	      break;
    }
+   echo '<br>';
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';	
    echo '<a href="http://facebook.com/osmcproject" target="_blank"><img src="http://osmc.tv/wp-content/themes/osmc/fb.png" width="50" height=50"></a> <a href="http://twitter.com/SamNazarko" target="_blank"><img hspace="20" src="http://osmc.tv/wp-content/themes/osmc/twitter.png" width="60" height=60"></a>';
 }
@@ -74,6 +75,7 @@ function displayDonationWidget()
 	     $TEXT = "";
 	     break;
    }
+   echo '<br>';
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';
    echo $TEXT;
    echo '<br><br>';
