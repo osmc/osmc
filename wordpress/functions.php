@@ -1,8 +1,12 @@
 <?php
-global $TRANSTAFF;
-global $FRMSTAFF;
-$TRANSTAFF = "Rene S";
-$FRMSTAFF = "Mike F, Adam W";
+function displayTranslators()
+{
+    echo "Rene S";
+}
+function displayForumStaff()
+{
+    echo "Mike F, Adam W";
+}
 /*
 Author: Eddie Machado
 URL: htp://themble.com/bones/
