@@ -75,7 +75,7 @@ function displayDonationWidget()
 	     $TEXT = "";
 	     break;
    }
-   echo '<h4 class="widgettitle">' . $TITLE . '</h4';
+   echo '<h4 class="widgettitle">' . $TITLE . '</h4>';
    echo '<br>';
    echo $TEXT;
    echo '<br>';
