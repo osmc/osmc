@@ -36,7 +36,6 @@ function displaySocialWidget()
 	      break;
    }
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';	
-   echo '<br>';
    echo '<a href="http://facebook.com/osmcproject" target="_blank"><img src="http://osmc.tv/wp-content/themes/osmc/fb.png" width="50" height=50"></a> <a href="http://twitter.com/SamNazarko" target="_blank"><img hspace="20" src="http://osmc.tv/wp-content/themes/osmc/twitter.png" width="60" height=60"></a>';
 }
 function displayDonationWidget()
@@ -76,7 +75,6 @@ function displayDonationWidget()
 	     break;
    }
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';
-   echo '<br>';
    echo $TEXT;
    echo '<br>';
    echo '<a href="http://osmc.tv/donate.php?code=osmc_dntn&amp;iname=OSMC%20Blog%20Donation"><img src="http://osmc.tv/wp-content/uploads/2014/09/btn_donate_LG.gif"></a>';
