@@ -76,7 +76,7 @@ function displayDonationWidget()
    }
    echo '<h4 class="widgettitle">' . $TITLE . '</h4>';
    echo $TEXT;
-   echo '<br>';
+   echo '<br><br>';
    echo '<a href="http://osmc.tv/donate.php?code=osmc_dntn&amp;iname=OSMC%20Blog%20Donation"><img src="http://osmc.tv/wp-content/uploads/2014/09/btn_donate_LG.gif"></a>';
 }
 
