@@ -2,4 +2,4 @@ all:
 	bash build.sh
 
 clean:
-	#tbc
+	rm -f skin.osmc.zip >/dev/null 2>&1
