@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype52">
+
+		<control type="group">
+			<visible>Control.IsVisible(52)</visible>
+
+			<!-- Wide list -->
+			<control type="fixedlist" id="52">
+				<left>0</left>
+				<top>120</top>
+				<width>1920</width>
+				<height>750</height>
+				<onup condition="!Skin.HasSetting(KioskMode)">3001</onup>
+				<ondown>61</ondown>
+				<onleft>52</onleft>
+				<onright>52</onright>
+				<pagecontrol>61</pagecontrol>
+				<preloaditems>4</preloaditems>
+				<focusposition>3</focusposition>
+				<orientation>horizontal</orientation>
+				<viewtype label="539">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons)</visible>
+
+				<itemlayout width="249" height="666">
+					<control type="image">
+						<left>23</left>
+						<top>135</top>
+						<width>225</width>
+						<height>333</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<colordiffuse>IconColor1</colordiffuse>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<control type="image">
+							<left>23</left>
+							<top>135</top>
+							<width>225</width>
+							<height>333</height>
+							<colordiffuse>DiffusePosterNF</colordiffuse>
+							<texture background="true">$INFO[ListItem.Thumb]</texture>
+							<aspectratio align="center">scale</aspectratio>
+						</control>
+						<!-- Watched status -->
+						<control type="image">
+							<left>177</left>
+							<top>452</top>
+							<width>35</width>
+							<height>49</height>
+							<texture>$VAR[StatusOverlayWide]</texture>
+							<visible>Skin.HasSetting(WatchedFlags)</visible>
+						</control>
+					</control>
+				</itemlayout>
+
+				<focusedlayout width="405" height="666">
+					<control type="image">
+						<left>11</left>
+						<top>0</top>
+						<width>405</width>
+						<height>600</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<colordiffuse>IconColor1</colordiffuse>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<animation effect="zoom" start="60" end="100" center="202,300" time="300" tween="back" easing="out" reversible="false">Focus</animation>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<animation effect="zoom" start="60" end="100" center="202,300" time="300" tween="back" easing="out" reversible="false">Focus</animation>
+						<control type="image">
+							<left>11</left>
+							<top>0</top>
+							<width>405</width>
+							<height>600</height>
+							<texture background="true">$INFO[ListItem.Thumb]</texture>
+							<aspectratio align="center">scale</aspectratio>
+						</control>
+						<!-- Watched status -->
+						<control type="image">
+							<left>290</left>
+							<top>585</top>
+							<width>35</width>
+							<height>49</height>
+							<texture>$VAR[StatusOverlayWide]</texture>
+							<visible>Skin.HasSetting(WatchedFlags)</visible>
+						</control>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+			<control type="group">
+				<centerleft>50%</centerleft>
+				<top>800</top>
+				<width>1920</width>
+				<height>100</height>
+
+				<!-- Title -->
+				<control type="label">
+					<left>90</left>
+					<top>0</top>
+					<width>1740</width>
+					<height>72</height>
+					<font>font72</font>
+					<align>center</align>
+					<textcolor>TextColorFO</textcolor>
+										<label>$INFO[ListItem.Label]</label>
+				</control>
+
+				<!-- Details -->
+				<control type="label">
+					<left>90</left>
+					<top>88</top>
+					<width>1740</width>
+					<height>27</height>
+					<font>font27</font>
+					<align>center</align>
+					<label>$VAR[Label2]</label>
+					<textcolor>TextColorFO</textcolor>
+									</control>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>

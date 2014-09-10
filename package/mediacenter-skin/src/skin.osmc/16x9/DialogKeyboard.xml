@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- virtualkeyboard -->
+	<defaultcontrol>300</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="311">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>font72</font>
+			<label>13406</label>
+		</control>
+
+		<!-- Left grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>228</top>
+			<width>360</width>
+			<height>660</height>
+			<itemgap>6</itemgap>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<!-- Shift -->
+			<control type="radiobutton" id="302">
+				<width>360</width>
+				<height>74</height>
+				<onleft>57</onleft>
+				<onright>48</onright>
+				<font>font48</font>
+				<label>20178</label>
+			</control>
+
+			<!-- Caps lock -->
+			<control type="radiobutton" id="303">
+				<width>360</width>
+				<height>74</height>
+				<onleft>74</onleft>
+				<onright>65</onright>
+				<font>font48</font>
+				<label>20179</label>
+			</control>
+
+			<!-- Symbols -->
+			<control type="radiobutton" id="304">
+				<width>360</width>
+				<height>74</height>
+				<onleft>84</onleft>
+				<onright>75</onright>
+				<font>font48</font>
+				<label>20180</label>
+			</control>
+
+			<!-- IP address -->
+			<control type="button" id="307">
+				<width>360</width>
+				<height>74</height>
+				<onleft>8</onleft>
+				<onright>85</onright>
+				<font>font48</font>
+				<label>1006</label>
+			</control>
+
+		</control>
+
+		<!-- Keys -->
+		<control type="group">
+			<left>600</left>
+			<top>228</top>
+
+			<!-- First row -->
+			<control type="grouplist" id="1000">
+				<left>0</left>
+				<top>0</top>
+				<width>1170</width>
+				<height>74</height>
+				<itemgap>0</itemgap>
+				<onleft>302</onleft>
+				<onright>302</onright>
+				<onup>noop</onup>
+				<orientation>horizontal</orientation>
+
+				<!-- '0' -->
+				<control type="button" id="48">
+					<ondown>65</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '1' -->
+				<control type="button" id="49">
+					<ondown>66</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '2' -->
+				<control type="button" id="50">
+					<ondown>67</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '3' -->
+				<control type="button" id="51">
+					<ondown>68</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '4' -->
+				<control type="button" id="52">
+					<ondown>69</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '5' -->
+				<control type="button" id="53">
+					<ondown>70</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '6' -->
+				<control type="button" id="54">
+					<ondown>71</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '7' -->
+				<control type="button" id="55">
+					<ondown>72</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '8' -->
+				<control type="button" id="56">
+					<ondown>73</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- '9' -->
+				<control type="button" id="57">
+					<ondown>74</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+
+			</control>
+
+			<!-- Second row -->
+			<control type="grouplist" id="2000">
+				<left>0</left>
+				<top>80</top>
+				<width>1170</width>
+				<height>74</height>
+				<itemgap>0</itemgap>
+				<onleft>303</onleft>
+				<onright>303</onright>
+				<orientation>horizontal</orientation>
+				<!-- 'A' -->
+				<control type="button" id="65">
+					<onup>48</onup>
+					<ondown>75</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'B' -->
+				<control type="button" id="66">
+					<onup>49</onup>
+					<ondown>76</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'C' -->
+				<control type="button" id="67">
+					<onup>50</onup>
+					<ondown>77</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'D' -->
+				<control type="button" id="68">
+					<onup>51</onup>
+					<ondown>78</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'E' -->
+				<control type="button" id="69">
+					<onup>52</onup>
+					<ondown>79</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'F' -->
+				<control type="button" id="70">
+					<onup>53</onup>
+					<ondown>80</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'G' -->
+				<control type="button" id="71">
+					<onup>54</onup>
+					<ondown>81</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'H' -->
+				<control type="button" id="72">
+					<onup>55</onup>
+					<ondown>82</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'I' -->
+				<control type="button" id="73">
+					<onup>56</onup>
+					<ondown>83</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'J' -->
+				<control type="button" id="74">
+					<onup>57</onup>
+					<ondown>84</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+
+			</control>
+
+			<!-- Third row -->
+			<control type="grouplist" id="3000">
+				<left>0</left>
+				<top>160</top>
+				<width>1170</width>
+				<height>74</height>
+				<itemgap>0</itemgap>
+				<onleft>304</onleft>
+				<onright>304</onright>
+				<orientation>horizontal</orientation>
+
+				<!-- 'K' -->
+				<control type="button" id="75">
+					<onup>65</onup>
+					<ondown>85</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'L' -->
+				<control type="button" id="76">
+					<onup>66</onup>
+					<ondown>86</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'M' -->
+				<control type="button" id="77">
+					<onup>67</onup>
+					<ondown>87</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'N' -->
+				<control type="button" id="78">
+					<onup>68</onup>
+					<ondown>88</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'O' -->
+				<control type="button" id="79">
+					<onup>69</onup>
+					<ondown>89</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'P' -->
+				<control type="button" id="80">
+					<onup>70</onup>
+					<ondown>90</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'Q' -->
+				<control type="button" id="81">
+					<onup>71</onup>
+					<ondown>8</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'R' -->
+				<control type="button" id="82">
+					<onup>72</onup>
+					<ondown>8</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'S' -->
+				<control type="button" id="83">
+					<onup>73</onup>
+					<ondown>8</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'T' -->
+				<control type="button" id="84">
+					<onup>74</onup>
+					<ondown>8</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+
+			</control>
+
+			<!-- Forth row -->
+			<control type="grouplist" id="4000">
+				<left>0</left>
+				<top>240</top>
+				<width>1170</width>
+				<height>74</height>
+				<itemgap>0</itemgap>
+				<onleft>307</onleft>
+				<onright>307</onright>
+				<orientation>horizontal</orientation>
+
+				<!-- 'U' -->
+				<control type="button" id="85">
+					<onup>75</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'V' -->
+				<control type="button" id="86">
+					<onup>76</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'W' -->
+				<control type="button" id="87">
+					<onup>77</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'X' -->
+				<control type="button" id="88">
+					<onup>78</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'Y' -->
+				<control type="button" id="89">
+					<onup>79</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- 'Z' -->
+				<control type="button" id="90">
+					<onup>80</onup>
+					<ondown>32</ondown>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- BACKSPACE -->
+				<control type="button" id="8">
+					<onup>81</onup>
+					<ondown>305</ondown>
+					<width>374</width>
+					<label>20181</label>
+					<include>KeyboardButtons</include>
+				</control>
+
+			</control>
+
+			<!-- Fifth row -->
+			<control type="grouplist" id="5000">
+				<left>0</left>
+				<top>320</top>
+				<width>1170</width>
+				<height>74</height>
+				<itemgap>0</itemgap>
+				<onleft>306</onleft>
+				<onright>32</onright>
+				<ondown>9001</ondown>
+				<orientation>horizontal</orientation>
+
+				<!-- SPACE -->
+				<control type="button" id="32">
+					<onup>85</onup>
+					<width>534</width>
+					<label>20182</label>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- Previous -->
+				<control type="button" id="305">
+					<onup>8</onup>
+					<width>174</width>
+					<label>&lt;</label>
+					<include>KeyboardButtons</include>
+				</control>
+				<!-- Next -->
+				<control type="button" id="306">
+					<onup>8</onup>
+					<width>174</width>
+					<label>&gt;</label>
+					<include>KeyboardButtons</include>
+				</control>
+
+			</control>
+
+			<!-- Edit Text background -->
+			<control type="image">
+				<top>480</top>
+				<width>1170</width>
+				<height>74</height>
+				<texture>dialogs/DialogTextBackground.png</texture>
+			</control>
+
+			<!-- Edit Text -->
+			<control type="label" id="310">
+				<left>20</left>
+				<top>480</top>
+				<width>1220</width>
+				<height>74</height>
+				<scroll>true</scroll>
+				<font>font48</font>
+				<textcolor>DialogColorFO</textcolor>
+			</control>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>5000</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- Done -->
+			<control type="button" id="300">
+				<width>400</width>
+				<label>20177</label>
+				<onclick>SetFocus(100)</onclick>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="301">
+				<width>400</width>
+				<label>222</label>
+			</control>
+
+		</control>
+	</controls>
+
+</window>

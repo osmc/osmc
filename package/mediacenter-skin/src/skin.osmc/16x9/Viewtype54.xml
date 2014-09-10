@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype54">
+
+		<control type="group">
+			<visible>Control.IsVisible(54)</visible>
+
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<colordiffuse>IconColor1</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
+			</control>
+
+			<!-- Song Info -->
+			<control type="group">
+				<left>120</left>
+				<top>440</top>
+				<visible>Container.Content(songs)</visible>
+				<!-- Album & Artist Info -->
+				<control type="label">
+					<left>0</left>
+					<top>314</top>
+					<width>500</width>
+					<height>45</height>
+					<font>font42</font>
+					<label>$INFO[ListItem.Album]</label>
+					<textcolor>TextColorFO</textcolor>
+				</control>
+				<control type="label">
+					<left>0</left>
+					<top>366</top>
+					<width>450</width>
+					<height>45</height>
+					<font>font33</font>
+					<textcolor>TextColorFO</textcolor>
+					<label>$INFO[ListItem.Artist]</label>
+				</control>
+			</control>
+
+			<!-- List -->
+			<control type="fixedlist" id="54">
+				<left>782</left>
+				<centertop>50%</centertop>
+				<width>1018</width>
+				<height>720</height>
+				<onup>54</onup>
+				<ondown>54</ondown>
+				<onleft>60</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>5</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>Container.Content(songs) | Window.IsVisible(pictures)</visible>
+
+				<itemlayout height="64" width="1018">
+					<control type="label">
+						<width>1018</width>
+						<height>64</height>
+						<font>font33</font>
+						<label>$VAR[SongLabel]</label>
+						<textcolor>TextColorNF</textcolor>
+					</control>
+				</itemlayout>
+
+				<focusedlayout height="80" width="1018">
+					<control type="label">
+						<width>1018</width>
+						<height>80</height>
+						<font>font48</font>
+						<label>$VAR[SongLabel]</label>
+						<textcolor>TextColorFO</textcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(54)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>

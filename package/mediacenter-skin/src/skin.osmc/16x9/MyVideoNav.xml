@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- videolibrary -->
+	<backgroundcolor>$VAR[BackgroundColour]</backgroundcolor>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<onload>Skin.Reset(OptionFO)</onload>
+	<onunload>Skin.Reset(OptionFO)</onunload>
+	<views>52,53,51,50</views>
+
+	<controls>
+
+		<!-- Fanart -->
+		<include>Fanart</include>
+
+		<!-- Main group -->
+		<control type="group">
+			<include>WindowFadeAnimation</include>
+
+			<!-- Views -->
+			<include>Viewtype50</include>
+			<include>Viewtype51</include>
+			<include>Viewtype52</include>
+			<include>Viewtype53</include>
+
+			<!-- Scrollbar (list) -->
+			<control type="scrollbar" id="60">
+				<left>690</left>
+				<centertop>50%</centertop>
+				<width>20</width>
+				<height>720</height>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+				<onright>50</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<colordiffuse>IconColor1</colordiffuse>
+				<texturesliderbackground border="11,1,1,1">common/ScrollBackground.png</texturesliderbackground>
+				<texturesliderbar border="11,1,1,1">common/ScrollbarGripNF.png</texturesliderbar>
+				<texturesliderbarfocus border="11,1,1,1">common/ScrollbarGripFO.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+				<visible>!Skin.HasSetting(Scrollbars) + [Control.IsVisible(50) | Control.IsVisible(51)]</visible>
+				<animation effect="fade" start="100" end="50" time="200" condition="!Control.HasFocus(60)">Conditional</animation>
+			</control>
+
+			<!-- Scrollbar (poster) -->
+			<control type="scrollbar" id="61">
+				<centerleft>50%</centerleft>
+				<top>766</top>
+				<width>1680</width>
+				<height>20</height>
+				<onup>50</onup>
+				<ondown condition="!Skin.HasSetting(KioskMode)">3001</ondown>
+				<showonepage>false</showonepage>
+				<orientation>horizontal</orientation>
+				<colordiffuse>IconColor1</colordiffuse>
+				<texturesliderbackground border="1,12,1,1">common/ScrollBackgroundHorizontal.png</texturesliderbackground>
+				<texturesliderbar border="1,12,1,1">common/ScrollbarGripHorizontalNF.png</texturesliderbar>
+				<texturesliderbarfocus border="1,12,1,1" colordiffuse="DialogIconColor1">common/ScrollbarGripHorizontalFO.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+				<visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(52)</visible>
+				<animation effect="fade" start="100" end="50" time="200" condition="!Control.HasFocus(61)">Conditional</animation>
+			</control>
+
+			<!-- Scrollbar (wall) -->
+			<control type="scrollbar" id="63">
+				<left>120</left>
+				<top>170</top>
+				<width>20</width>
+				<height>633</height>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+				<onright>50</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<colordiffuse>IconColor1</colordiffuse>
+				<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
+				<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
+				<texturesliderbarfocus border="8,1,6,1">common/ScrollbarGripFO.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+				<visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(53)</visible>
+				<animation effect="fade" start="100" end="50" time="200" condition="!Control.HasFocus(63)">Conditional</animation>
+			</control>
+
+			<!-- Item count -->
+			<include>ItemCount</include>
+
+		</control>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Options open button -->
+		<control type="button">
+			<left>-60</left>
+			<top>0</top>
+			<width>60</width>
+			<height>1080</height>
+			<label>-</label>
+			<font>-</font>
+			<onfocus>Skin.SetBool(OptionFO)</onfocus>
+			<texturenofocus colordiffuse="IconColor1">common/ArrowOptionsFO.png</texturenofocus>
+			<texturefocus colordiffuse="IconColor1">common/ArrowOptionsFO.png</texturefocus>
+			<animation effect="slide" start="0,0" end="60,0" time="400" delay="400" tween="cubic" easing="out" condition="!Skin.HasSetting(OptionFO)">Conditional</animation>
+			<animation effect="slide" start="0,0" end="-60,0" time="0" condition="Skin.HasSetting(OptionFO)">Conditional</animation>
+		</control>
+
+		<!-- Options close button -->
+		<control type="button">
+			<left>640</left>
+			<top>0</top>
+			<width>1280</width>
+			<height>1080</height>
+			<label>-</label>
+			<font>-</font>
+			<onfocus>Skin.Reset(OptionFO)</onfocus>
+			<texturenofocus>-</texturenofocus>
+			<texturefocus>-</texturefocus>
+			<visible>Skin.HasSetting(OptionFO)</visible>
+		</control>
+
+		<!-- Options -->
+		<control type="group">
+			<left>-640</left>
+			<top>0</top>
+			<width>640</width>
+			<height>1080</height>
+			<include>OptionsAnimation</include>
+			<visible allowhiddenfocus="true">Skin.HasSetting(OptionFO)</visible>
+
+			<!-- Background -->
+			<control type="image">
+				<right>0</right>
+				<top>0</top>
+				<width>640</width>
+				<height>1080</height>
+				<texture colordiffuse="IconColor1">dialogs/DialogBackground.png</texture>
+			</control>
+
+			<!-- Heading -->
+			<control type="label">
+				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+				<left>40</left>
+				<top>34</top>
+				<width>560</width>
+				<height>72</height>
+				<label>33063</label>
+				<font>font72</font>
+				<textcolor>DialogColorFO</textcolor>
+			</control>
+
+			<!-- Options -->
+			<control type="grouplist" id="3000">
+				<left>40</left>
+				<top>130</top>
+				<width>560</width>
+				<height>1080</height>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<onleft>noop</onleft>
+				<onright>Skin.Reset(OptionFO)</onright>
+				<onright>50</onright>
+				<itemgap>0</itemgap>
+				<scrolltime>200</scrolltime>
+				<orientation>vertical</orientation>
+				<defaultcontrol always="true">3001</defaultcontrol>
+
+				<!-- Dummy to set focus to top -->
+				<control type="button" id="3001">
+					<width>0</width>
+					<height>0</height>
+					<label>-</label>
+					<onfocus>Down</onfocus>
+					<onfocus>Skin.SetBool(OptionFO)</onfocus>
+				</control>
+				<!-- View -->
+				<control type="button" id="99">
+					<include>OptionButtons</include>
+					<label>$INFO[Container.ViewMode]</label>
+					<onclick>Container.NextViewMode</onclick>
+				</control>
+				<!-- Fanart -->
+				<control type="radiobutton" id="98">
+					<include>OptionButtons</include>
+					<label>20445</label>
+					<onclick>Skin.ToggleSetting(MovieFanart)</onclick>
+					<selected>Skin.HasSetting(MovieFanart)</selected>
+					<visible>Container.Content(Movies)</visible>
+				</control>
+				<!-- Fanart -->
+				<control type="radiobutton" id="97">
+					<include>OptionButtons</include>
+					<label>20445</label>
+					<onclick>Skin.ToggleSetting(TVFanart)</onclick>
+					<selected>Skin.HasSetting(TVFanart)</selected>
+					<visible>Container.Content(TVShows) | Container.Content(Seasons) | Container.Content(Episodes)</visible>
+				</control>
+				<!-- Watched status -->
+				<control type="radiobutton" id="95">
+					<include>OptionButtons</include>
+					<label>536</label>
+					<onclick>Skin.ToggleSetting(WatchedFlags)</onclick>
+					<selected>Skin.HasSetting(WatchedFlags)</selected>
+					<visible>Container.Content(Movies) | Container.Content(TVShows) | Container.Content(Seasons) | Container.Content(Episodes)</visible>
+				</control>
+				<!-- Scrollbars -->
+				<control type="radiobutton" id="94">
+					<include>OptionButtons</include>
+					<label>31005</label>
+					<onclick>Skin.ToggleSetting(Scrollbars)</onclick>
+					<selected>!Skin.HasSetting(Scrollbars)</selected>
+				</control>
+				<!-- Sort by -->
+				<control type="button" id="3">
+					<include>OptionButtons</include>
+					<label>103</label>
+					<visible>Control.IsEnabled(3)</visible>
+				</control>
+				<!-- Sort ascending/descending -->
+				<control type="togglebutton" id="4">
+					<include>OptionButtons</include>
+					<label>584</label>
+					<altlabel>585</altlabel>
+					<usealttexture>Container.SortDirection(Descending)</usealttexture>
+					<visible>Control.IsEnabled(4)</visible>
+				</control>
+				<!-- Watched toggle -->
+				<control type="radiobutton" id="14">
+					<include>OptionButtons</include>
+					<label>20367</label>
+					<visible>Control.IsEnabled(14)</visible>
+				</control>
+				<!-- Filter -->
+				<control type="edit" id="19">
+					<include>OptionButtons</include>
+					<label>587</label>
+					<visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>
+				</control>
+				<!-- Filter -->
+				<control type="radiobutton" id="93">
+					<include>OptionButtons</include>
+					<label>587</label>
+					<onclick>Right</onclick>
+					<onclick>Right</onclick>
+					<onclick>Filter</onclick>
+					<selected>Container.Filtered</selected>
+					<visible>Container.CanFilterAdvanced</visible>
+				</control>
+				<!-- Open playlist -->
+				<control type="button" id="91">
+					<include>OptionButtons</include>
+					<label>13350</label>
+					<onclick condition="!StringCompare(Playlist.Length(video),0)">ActivateWindow(videoplaylist)</onclick>
+					<visible>!StringCompare(Playlist.Length(video),0)</visible>
+				</control>
+				<!-- Update library -->
+				<control type="togglebutton" id="20">
+					<include>OptionButtons</include>
+					<label>653</label>
+					<altlabel>13353</altlabel>
+					<usealttexture>Library.IsScanningVideo</usealttexture>
+				</control>
+				<!-- Search -->
+				<control type="button" id="8">
+					<include>OptionButtons</include>
+					<label>137</label>
+					<visible>Control.IsEnabled(8)</visible>
+				</control>
+				<!-- PartyMode -->
+				<control type="radiobutton" id="16">
+					<include>OptionButtons</include>
+					<label>589</label>
+					<visible>Container.Content(MusicVideos)</visible>
+				</control>
+				<!-- Unlock Shares -->
+				<control type="radiobutton" id="11">
+					<include>OptionButtons</include>
+					<label>20336</label>
+					<onclick>XBMC.Mastermode</onclick>
+					<selected>System.IsMaster</selected>
+					<visible>System.HasLocks</visible>
+				</control>
+				<!-- Settings -->
+				<control type="button" id="92">
+					<include>OptionButtons</include>
+					<label>5</label>
+					<onclick>ActivateWindow(videossettings)</onclick>
+				</control>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

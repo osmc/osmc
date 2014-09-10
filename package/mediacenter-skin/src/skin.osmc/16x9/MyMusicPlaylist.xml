@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- musicplaylist -->
+	<backgroundcolor>$VAR[BackgroundColour]</backgroundcolor>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<onload>Skin.Reset(OptionFO)</onload>
+	<onunload>Skin.Reset(OptionFO)</onunload>
+	<views>50</views>
+
+	<controls>
+
+		<!-- Fanart -->
+		<include>Fanart</include>
+
+		<!-- Main group -->
+		<control type="group">
+			<include>WindowFadeAnimation</include>
+
+			<!-- Views -->
+			<include>Viewtype50</include>
+
+			<!-- Scrollbar (list) -->
+			<control type="scrollbar" id="60">
+				<left>690</left>
+				<centertop>50%</centertop>
+				<width>20</width>
+				<height>720</height>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+				<onright>50</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<colordiffuse>IconColor1</colordiffuse>
+				<texturesliderbackground border="9,1,6,1">common/ScrollBackground.png</texturesliderbackground>
+				<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
+				<texturesliderbarfocus border="8,1,6,1">common/ScrollbarGripFO.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+				<visible>!Skin.HasSetting(Scrollbars) + [Control.IsVisible(50) | Control.IsVisible(51)]</visible>
+				<animation effect="fade" start="100" end="50" time="200" condition="!Control.HasFocus(60)">Conditional</animation>
+			</control>
+
+			<!-- Item count -->
+			<include>ItemCount</include>
+
+		</control>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Options open button -->
+		<control type="button">
+			<left>-60</left>
+			<top>0</top>
+			<width>60</width>
+			<height>1080</height>
+			<label>-</label>
+			<font>-</font>
+			<onfocus>Skin.SetBool(OptionFO)</onfocus>
+			<texturenofocus colordiffuse="IconColor1">common/ArrowOptionsFO.png</texturenofocus>
+			<texturefocus colordiffuse="IconColor1">common/ArrowOptionsFO.png</texturefocus>
+			<animation effect="slide" start="0,0" end="60,0" time="400" delay="400" tween="cubic" easing="out" condition="!Skin.HasSetting(OptionFO)">Conditional</animation>
+			<animation effect="slide" start="0,0" end="-60,0" time="0" condition="Skin.HasSetting(OptionFO)">Conditional</animation>
+		</control>
+
+		<!-- Options close button -->
+		<control type="button">
+			<left>640</left>
+			<top>0</top>
+			<width>1280</width>
+			<height>1080</height>
+			<label>-</label>
+			<font>-</font>
+			<onfocus>Skin.Reset(OptionFO)</onfocus>
+			<texturenofocus>-</texturenofocus>
+			<texturefocus>-</texturefocus>
+			<visible>Skin.HasSetting(OptionFO)</visible>
+		</control>
+
+		<!-- Options -->
+		<control type="group">
+			<left>-640</left>
+			<top>0</top>
+			<width>640</width>
+			<height>1080</height>
+			<include>OptionsAnimation</include>
+			<visible allowhiddenfocus="true">Skin.HasSetting(OptionFO)</visible>
+
+			<!-- Background -->
+			<control type="image">
+				<right>0</right>
+				<top>0</top>
+				<width>640</width>
+				<height>1080</height>
+				<texture colordiffuse="IconColor1">dialogs/DialogBackground.png</texture>
+			</control>
+
+			<!-- Heading -->
+			<control type="label">
+				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+				<left>40</left>
+				<top>34</top>
+				<width>560</width>
+				<height>72</height>
+				<label>33063</label>
+				<font>font72</font>
+				<textcolor>DialogColorFO</textcolor>
+			</control>
+
+			<!-- Options -->
+			<control type="grouplist" id="3000">
+				<left>40</left>
+				<top>130</top>
+				<width>560</width>
+				<height>1080</height>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<onleft>noop</onleft>
+				<onright>Skin.Reset(OptionFO)</onright>
+				<onright>50</onright>
+				<itemgap>0</itemgap>
+				<scrolltime>200</scrolltime>
+				<orientation>vertical</orientation>
+				<defaultcontrol always="true">3001</defaultcontrol>
+
+				<!-- Dummy to set focus to top -->
+				<control type="button" id="3001">
+					<width>0</width>
+					<height>0</height>
+					<label>-</label>
+					<onfocus>Down</onfocus>
+					<onfocus>Skin.SetBool(OptionFO)</onfocus>
+				</control>
+				<!-- Filter -->
+				<control type="edit" id="19">
+					<include>OptionButtons</include>
+					<label>587</label>
+					<visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>
+				</control>
+				<!-- Filter -->
+				<control type="radiobutton" id="93">
+					<include>OptionButtons</include>
+					<label>587</label>
+					<onclick>right</onclick>
+					<onclick>Filter</onclick>
+					<selected>Container.Filtered</selected>
+					<visible>Container.CanFilterAdvanced</visible>
+				</control>
+				<!-- Shuffle -->
+				<control type="radiobutton" id="20">
+					<include>OptionButtons</include>
+					<label>191</label>
+					<visible>Control.IsEnabled(20)</visible>
+				</control>
+				<!-- Repeat -->
+				<control type="button" id="26">
+					<include>OptionButtons</include>
+					<label>-</label>
+					<visible>Control.IsEnabled(26)</visible>
+				</control>
+				<!-- Save -->
+				<control type="button" id="21">
+					<include>OptionButtons</include>
+					<label>190</label>
+					<visible>Control.IsEnabled(21)</visible>
+				</control>
+				<!-- Clear -->
+				<control type="button" id="22">
+					<include>OptionButtons</include>
+					<label>192</label>
+					<onclick>ReplaceWindow(music)</onclick>
+					<visible>Control.IsEnabled(22)</visible>
+				</control>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

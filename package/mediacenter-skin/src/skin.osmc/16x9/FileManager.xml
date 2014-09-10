@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- filemanager -->
+	<backgroundcolor>$VAR[BackgroundColour]</backgroundcolor>
+	<defaultcontrol always="true">20</defaultcontrol>
+
+	<controls>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Main group -->
+		<control type="group">
+
+			<!-- Heading -->
+			<control type="label">
+				<left>150</left>
+				<top>96</top>
+				<width>1620</width>
+				<height>72</height>
+				<font>font72</font>
+				<label>7</label>
+			</control>
+
+			<!-- Left group -->
+			<control type="group">
+				<left>150</left>
+				<top>228</top>
+
+				<!-- Root label -->
+				<control type="label" id="101">
+					<width>770</width>
+					<height>66</height>
+					<haspath>true</haspath>
+					<textcolor>TextColorFO</textcolor>
+				</control>
+
+				<!-- Seperator -->
+				<control type="image">
+					<top>66</top>
+					<width>770</width>
+					<height>20</height>
+					<texture border="1,12,1,1" colordiffuse="DialogIconColor1">common/ScrollBackgroundHorizontal.png</texture>
+				</control>
+
+				<!-- Left list -->
+				<control type="list" id="20">
+					<top>86</top>
+					<width>770</width>
+					<height>594</height>
+					<onleft>noop</onleft>
+					<onright>21</onright>
+					<onup>noop</onup>
+					<ondown>noop</ondown>
+
+					<itemlayout height="66" width="770">
+						<control type="label">
+							<width>770</width>
+							<textcolor>TextColorNF</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>770</left>
+							<width>770</width>
+							<align>right</align>
+							<textcolor>TextColorNF</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+
+					<focusedlayout height="66" width="770">
+						<control type="group">
+							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(20)">Conditional</animation>
+							<control type="label">
+								<width>770</width>
+								<textcolor>TextColorFO</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>770</left>
+								<width>770</width>
+								<align>right</align>
+								<textcolor>TextColorFO</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</control>
+					</focusedlayout>
+
+				</control>
+
+				<!-- Number label -->
+				<control type="grouplist">
+					<top>698</top>
+					<width>770</width>
+					<height>44</height>
+					<align>right</align>
+					<itemgap>6</itemgap>
+					<orientation>horizontal</orientation>
+					<usecontrolcoords>true</usecontrolcoords>
+					<control type="label">
+						<top>3</top>
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<font>font25</font>
+						<label>$INFO[Container(20).NumItems]</label>
+						<textcolor>TextColorFO</textcolor>
+					</control>
+					<control type="label">
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<label>31000</label>
+						<font>font33</font>
+						<textcolor>TextColorFO</textcolor>
+						<visible>!IntegerGreaterThan(Container(20).NumItems,1)</visible>
+					</control>
+					<control type="label">
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<label>31001</label>
+						<font>font33</font>
+						<textcolor>TextColorFO</textcolor>
+						<visible>IntegerGreaterThan(Container(20).NumItems,1)</visible>
+					</control>
+				</control>
+
+			</control>
+
+			<!-- Right group -->
+			<control type="group">
+				<left>1000</left>
+				<top>228</top>
+
+				<!-- Root label -->
+				<control type="label" id="102">
+					<width>770</width>
+					<height>66</height>
+					<haspath>true</haspath>
+					<textcolor>TextColorFO</textcolor>
+				</control>
+
+				<!-- Seperator -->
+				<control type="image">
+					<top>66</top>
+					<width>770</width>
+					<height>20</height>
+					<texture border="1,12,1,1" colordiffuse="DialogIconColor1">common/ScrollBackgroundHorizontal.png</texture>
+				</control>
+
+				<!-- Right list -->
+				<control type="list" id="21">
+					<top>86</top>
+					<width>770</width>
+					<height>594</height>
+					<onleft>20</onleft>
+					<onright>noop</onright>
+					<onup>noop</onup>
+					<ondown>noop</ondown>
+
+					<itemlayout height="66" width="770">
+						<control type="label">
+							<width>770</width>
+							<textcolor>TextColorNF</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>770</left>
+							<width>770</width>
+							<align>right</align>
+							<textcolor>TextColorNF</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+
+					<focusedlayout height="66" width="770">
+						<control type="group">
+							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(21)">Conditional</animation>
+							<control type="label">
+								<width>770</width>
+								<textcolor>TextColorFO</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>770</left>
+								<width>770</width>
+								<align>right</align>
+								<textcolor>TextColorFO</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</control>
+					</focusedlayout>
+
+				</control>
+
+				<!-- Number label -->
+				<control type="grouplist">
+					<top>698</top>
+					<width>770</width>
+					<height>44</height>
+					<align>right</align>
+					<itemgap>6</itemgap>
+					<orientation>horizontal</orientation>
+					<usecontrolcoords>true</usecontrolcoords>
+					<control type="label">
+						<top>3</top>
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<font>font25</font>
+						<label>$INFO[Container(21).NumItems]</label>
+						<textcolor>TextColorFO</textcolor>
+					</control>
+					<control type="label">
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<label>31000</label>
+						<font>font33</font>
+						<textcolor>TextColorFO</textcolor>
+						<visible>!IntegerGreaterThan(Container(21).NumItems,1)</visible>
+					</control>
+					<control type="label">
+						<width>auto</width>
+						<height>44</height>
+						<align>right</align>
+						<label>31001</label>
+						<font>font33</font>
+						<textcolor>TextColorFO</textcolor>
+						<visible>IntegerGreaterThan(Container(21).NumItems,1)</visible>
+					</control>
+				</control>
+
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

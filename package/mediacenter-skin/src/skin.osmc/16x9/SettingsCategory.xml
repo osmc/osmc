@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window>
+	<!-- settingscategory -->
+	<backgroundcolor>$VAR[BackgroundColour]</backgroundcolor>
+	<onload condition="IsEmpty(Window(settings).Property(ChangeSettingsLevel))">SetFocus(3)</onload>
+	<onload condition="!IsEmpty(Window(settings).Property(ChangeSettingsLevel))">SetFocus(20)</onload>
+	<onload condition="Window.Previous(skinsettings)">Right</onload>
+
+
+	<controls>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Main list -->
+		<control type="grouplist" id="3">
+			<left>380</left>
+			<top>244</top>
+			<width>1680</width>
+			<height>726</height>
+			<itemgap>34</itemgap>
+			<onleft>ActivateWindow(settings)</onleft>
+			<onright>5</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+		</control>
+
+		<!-- Main list indicator -->
+		<control type="image">
+			<left>342</left>
+			<top>248</top>
+			<width>20</width>
+			<height>60</height>
+			<colordiffuse>IconColor1</colordiffuse>
+			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
+		</control>
+
+		<!-- Sub list -->
+		<control type="grouplist" id="5">
+			<left>730</left>
+			<top>244</top>
+			<width>970</width>
+			<height>574</height>
+			<itemgap>34</itemgap>
+			<onleft>3</onleft>
+			<onright>998</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+		</control>
+
+		<!-- Sub list indicator -->
+		<control type="image">
+			<left>692</left>
+			<top>248</top>
+			<width>20</width>
+			<height>60</height>
+			<colordiffuse>IconColor1</colordiffuse>
+			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
+		</control>
+
+		<!-- Settings description -->
+		<control type="textbox" id="6">
+			<left>730</left>
+			<top>856</top>
+			<width>970</width>
+			<height>118</height>
+			<textcolor>TextColorFO</textcolor>
+			<visible>ControlGroup(5).HasFocus</visible>
+		</control>
+
+		<!-- Default group button -->
+		<control type="button" id="10">
+			<width>870</width>
+			<height>42</height>
+			<font>font33</font>
+			<onclick>SetFocus(5)</onclick>
+			<textcolor>TextColorNF</textcolor>
+			<focusedcolor>TextColorFO</focusedcolor>
+			<invalidcolor>TextColorFO</invalidcolor>
+			<disabledcolor>TextColorFO</disabledcolor>
+		</control>
+
+		<!-- Default button -->
+		<control type="button" id="7">
+			<width>870</width>
+			<height>42</height>
+			<font>font33</font>
+			<textwidth>900</textwidth>
+			<textcolor>TextColorNF</textcolor>
+			<focusedcolor>TextColorFO</focusedcolor>
+			<invalidcolor>TextColorFO</invalidcolor>
+			<disabledcolor>TextColorFO</disabledcolor>
+		</control>
+
+		<!-- Default radiobutton -->
+		<control type="radiobutton" id="8">
+			<width>870</width>
+			<height>42</height>
+			<font>font33</font>
+			<textwidth>900</textwidth>
+			<textcolor>TextColorNF</textcolor>
+			<focusedcolor>TextColorFO</focusedcolor>
+			<disabledcolor>TextColorFO</disabledcolor>
+		</control>
+
+		<!-- Default spincontrolex -->
+		<control type="spincontrolex" id="9">
+			<width>870</width>
+			<height>42</height>
+			<font>font33</font>
+			<textwidth>900</textwidth>
+			<textcolor>TextColorNF</textcolor>
+			<focusedcolor>TextColorFO</focusedcolor>
+			<disabledcolor>TextColorFO</disabledcolor>
+		</control>
+
+		<!-- Default image -->
+		<control type="image" id="11">
+			<width>870</width>
+			<height>-42</height>
+			<texture border="2">common/Divider.png</texture>
+		</control>
+
+	</controls>
+
+</window>

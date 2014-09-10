@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- loginscreen -->
+	<backgroundcolor>$VAR[BackgroundColour]</backgroundcolor>
+	<defaultcontrol always="true">52</defaultcontrol>
+
+	<controls>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Main group -->
+		<control type="group">
+			<include>WindowFadeAnimation</include>
+
+			<!-- Conq logo -->
+			<include condition="!Skin.HasSetting(HideConqLogo)">ConqLogo</include>
+
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>!SubString(ListItem.Icon,unknown-user)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>DefaultActor.png</texture>
+				<colordiffuse>IconColor1</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,unknown-user)</visible>
+			</control>
+
+			<!-- View -->
+			<control type="fixedlist" id="52">
+				<left>750</left>
+				<centertop>50%</centertop>
+				<width>1050</width>
+				<height>720</height>
+				<onup>52</onup>
+				<ondown>52</ondown>
+				<onleft>ActivateWindow(shutdownmenu)</onleft>
+				<onright>ActivateWindow(shutdownmenu)</onright>
+				<focusposition>3</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+
+				<itemlayout height="90" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>90</height>
+						<font>font36</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColorNF</textcolor>
+					</control>
+				</itemlayout>
+
+				<focusedlayout width="1242" height="156">
+					<control type="label">
+						<left>32</left>
+						<top>43</top>
+						<width>1018</width>
+						<height>48</height>
+						<font>font48</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColorFO</textcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(52)">Conditional</animation>
+					</control>
+					<control type="label">
+						<left>32</left>
+						<top>100</top>
+						<width>1018</width>
+						<height>27</height>
+						<font>font27</font>
+						<label>$INFO[ListItem.Label2]</label>
+						<textcolor>TextColorFO</textcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(52)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

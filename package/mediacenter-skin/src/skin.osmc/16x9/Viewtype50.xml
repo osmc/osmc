@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype50">
+
+		<control type="group">
+			<visible>Control.IsVisible(50)</visible>
+
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<colordiffuse>IconColor1</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
+			</control>
+
+			<!-- List -->
+			<control type="fixedlist" id="50">
+				<left>750</left>
+				<centertop>50%</centertop>
+				<width>1050</width>
+				<height>720</height>
+				<onup>50</onup>
+				<ondown>50</ondown>
+				<onleft>60</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>3</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>Window.IsVisible(musicfiles) | [Container.Content(songs) + Window.IsVisible(musicplaylist)] | [!Container.Content(movies) + !Container.Content(tvshows) + !Container.Content(seasons) + !Container.Content(episodes) + !Container.Content(albums) + !Container.Content(songs) + !Window.IsVisible(pictures)]</visible>
+
+				<itemlayout height="90" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>90</height>
+						<font>font36</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColorNF</textcolor>
+					</control>
+					<!-- Watched status -->
+					<control type="image">
+						<left>0</left>
+						<top>38</top>
+						<width>14</width>
+						<height>14</height>
+						<texture>$VAR[StatusOverlay]</texture>
+						<colordiffuse>IconColor1</colordiffuse>
+						<animation effect="fade" start="50" end="50" condition="true">Conditional</animation>
+					</control>
+				</itemlayout>
+
+				<focusedlayout height="180" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>180</height>
+						<font>font72</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColorFO</textcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
+					</control>
+					<!-- Watched status -->
+					<control type="image">
+						<left>0</left>
+						<top>61</top>
+						<width>14</width>
+						<height>14</height>
+						<texture>$VAR[StatusOverlay]</texture>
+						<colordiffuse>IconColor1</colordiffuse>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>
