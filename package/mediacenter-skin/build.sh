@@ -4,6 +4,7 @@
 #!/bin/bash
 
 echo "Building OSMC skin tarball"
+if [ ! -f /usr/bin/zip ]; then echo "Installing zip tools" && apt-get update && apt-get -y install zip; fi
 pushd src
 zip -r skin.osmc.zip *
 popd
