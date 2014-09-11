@@ -24,10 +24,13 @@ SOURCES += main.cpp\
     licenseagreement.cpp \
     networksetup.cpp \
     deviceselection.cpp \
-    installprogress.cpp \
     networksettings.cpp \
     advancednetworksetup.cpp \
-    wifinetworksetup.cpp
+    wifinetworksetup.cpp \
+    nixdiskdevice.cpp \
+    downloadprogress.cpp \
+    extractprogress.cpp \
+    successdialog.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -40,10 +43,13 @@ HEADERS  += mainwindow.h \
     licenseagreement.h \
     networksetup.h \
     deviceselection.h \
-    installprogress.h \
     networksettings.h \
     advancednetworksetup.h \
-    wifinetworksetup.h
+    wifinetworksetup.h \
+    nixdiskdevice.h \
+    downloadprogress.h \
+    extractprogress.h \
+    successdialog.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
@@ -53,9 +59,11 @@ FORMS    += mainwindow.ui \
     licenseagreement.ui \
     networksetup.ui \
     deviceselection.ui \
-    installprogress.ui \
     advancednetworksetup.ui \
-    wifinetworksetup.ui
+    wifinetworksetup.ui \
+    downloadprogress.ui \
+    extractprogress.ui \
+    successdialog.ui
 
 VERSION = 1.0.0
 

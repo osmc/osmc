@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DeviceSelection</class>
- <widget class="QWidget" name="DeviceSelection">
+ <class>SuccessDialog</class>
+ <widget class="QWidget" name="SuccessDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,34 +14,9 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #17394A</string>
+   <string notr="true">background-color:#17394A</string>
   </property>
-  <widget class="QLabel" name="deviceSelectionLabel">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>561</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Source Sans Pro</family>
-     <pointsize>24</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
-   </property>
-   <property name="text">
-    <string>device selection</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="deviceSelectionDescLabel">
+  <widget class="QLabel" name="successDescLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -60,13 +35,38 @@
     <string notr="true">color:rgb(240, 240, 240)</string>
    </property>
    <property name="text">
-    <string>where would you like to install OSMC?</string>
+    <string>you're ready for show time!</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="devicenextButton">
+  <widget class="QLabel" name="successTitleLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>561</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Source Sans Pro</family>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:rgb(240, 240, 240)</string>
+   </property>
+   <property name="text">
+    <string>congratulations</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="closeInstallerButton">
    <property name="geometry">
     <rect>
      <x>510</x>
@@ -85,48 +85,7 @@
     <string notr="true">color:rgb(240, 240, 240)</string>
    </property>
    <property name="text">
-    <string>-&gt;</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="refreshButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>210</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Source Sans Pro</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
-   </property>
-   <property name="text">
-    <string>refresh</string>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="devListWidget">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>110</y>
-     <width>301</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Source Sans Pro</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string>X</string>
    </property>
   </widget>
  </widget>

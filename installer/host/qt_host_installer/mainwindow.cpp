@@ -1,29 +1,27 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "langselection.h"
-#include "ui_langselection.h"
 #include "updatenotification.h"
-#include "ui_updatenotification.h"
 #include "versionselection.h"
-#include "ui_versionselection.h"
-#include "ui_preseeddevice.h"
 #include "preseeddevice.h"
-#include "ui_networksetup.h"
 #include "networksetup.h"
-#include "ui_deviceselection.h"
 #include "deviceselection.h"
 #include "utils.h"
 #include <QString>
 #include <QTranslator>
 #include "supporteddevice.h"
 #include "advancednetworksetup.h"
-#include "ui_advancednetworksetup.h"
 #include "wifinetworksetup.h"
-#include "ui_wifinetworksetup.h"
 #include "networksettings.h"
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include "io.h"
+#include "nixdiskdevice.h"
+#include "licenseagreement.h"
+#include "downloadprogress.h"
+#include <QMovie>
+
 #define WIDGET_START QPoint(10,110)
 
 UpdateNotification *updater;
@@ -34,6 +32,8 @@ NetworkSetup *ns;
 DeviceSelection *ds;
 AdvancedNetworkSetup *ans;
 WiFiNetworkSetup *wss;
+LicenseAgreement *la;
+DownloadProgress *dp;
 
 QTranslator translator;
 
@@ -47,12 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QString autolocale = QLocale::system().name();
     utils::writeLog("Detected locale as " + autolocale);
     translate(autolocale);
-    /* Enumerating devices */
-    QList<SupportedDevice *> devices = utils::buildDeviceList();
-    ls = new LangSelection(this, devices);
-    connect(ls, SIGNAL(languageSelected(QString, SupportedDevice)), this, SLOT(setLanguage(QString, SupportedDevice)));
-    ls->move(WIDGET_START);
     /* Resolve a mirror URL */
+    spinner = new QMovie(":/assets/resources/spinner.gif");
+    ui->spinnerLabel->setMovie(spinner);
+    spinner->start();
     this->mirrorURL = "http://download.osmc.tv";
     utils::writeLog("Resolving a mirror");
     accessManager = new QNetworkAccessManager(this);
@@ -64,28 +62,35 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(updater, SIGNAL(hasUpdate()), this, SLOT(showUpdate()));
 }
 
+void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget)
+{
+    oldWidget->hide();
+    newWidget->move(WIDGET_START);
+    newWidget->show();
+}
+
 void MainWindow::replyFinished(QNetworkReply *reply)
 {
     QVariant mirrorRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     this->mirrorURL = mirrorRedirectUrl.toString();
     utils::writeLog("Resolved mirror to " + this->mirrorURL);
     reply->deleteLater();
+    ui->spinnerLabel->hide();
+    /* Enumerating devices */
+    QList<SupportedDevice *> devices = utils::buildDeviceList();
+    ls = new LangSelection(this, devices);
+    ls->move(WIDGET_START);
+    ls->show();
     /* Check if an update exists */
     updater->isUpdateAvailable(mirrorURL);
 }
 
-void MainWindow::dismissUpdate()
-{
-    updater->hide();
-    ls->show();
-}
+void MainWindow::dismissUpdate() { rotateWidget(updater, ls); }
 
 void MainWindow::showUpdate()
 {
-    updater->show();
     connect(updater, SIGNAL(ignoreUpdate()), this, SLOT(dismissUpdate()));
-    updater->move(WIDGET_START);
-    ls->hide();
+    rotateWidget(ls, updater);
 }
 
 void MainWindow::setLanguage(QString language, SupportedDevice device)
@@ -105,9 +110,7 @@ void MainWindow::setLanguage(QString language, SupportedDevice device)
         }
         vs = new VersionSelection(this, this->device.getDeviceShortName(), this->mirrorURL);
         connect(vs, SIGNAL(versionSelected(bool, QUrl)), this, SLOT(setVersion(bool, QUrl)));
-        vs->move(WIDGET_START);
-        vs->show();
-        ls->hide();
+        rotateWidget(ls, vs);
 }
 
 void MainWindow::setVersion(bool isOnline, QUrl image)
@@ -129,9 +132,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
     /* We call the preseeder: even if we can't preseed, we use its callback to handle the rest of the application */
     ps = new PreseedDevice(this, this->device);
     connect(ps, SIGNAL(preseedSelected(int)), this, SLOT(setPreseed(int)));
-    ps->move(WIDGET_START);
-    ps->show();
-    vs->hide();
+    rotateWidget(vs, ps);
 }
 
 void MainWindow::setPreseed(int installType)
@@ -141,14 +142,14 @@ void MainWindow::setPreseed(int installType)
     {
         ns = new NetworkSetup(this, (this->installType == utils::INSTALL_NFS) ? false : true);
         connect(ns, SIGNAL(setNetworkOptionsInit(bool,bool)), this, SLOT(setNetworkInitial(bool,bool)));
-        ns->move(WIDGET_START);
-        ns->show();
-        ps->hide();
+        rotateWidget(ps, ns);
     }
     else
     {
         /* Straight to device selection */
         ds = new DeviceSelection(this);
+        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        rotateWidget(ps, ds);
     }
 }
 
@@ -164,9 +165,7 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
             nss->setWireless(true);
         ans = new AdvancedNetworkSetup(this);
         connect(ans, SIGNAL(advancednetworkSelected(QString, QString, QString, QString, QString)), this, SLOT(setNetworkAdvanced(QString,QString,QString,QString,QString)));
-        ans->move(WIDGET_START);
-        ans->show();
-        ns->hide();
+        rotateWidget(ns, ans);
     }
     if (!advanced && useWireless)
     {
@@ -174,19 +173,15 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
         nss->setWireless(true);
         wss = new WiFiNetworkSetup(this);
         connect(wss, SIGNAL(wifiNetworkConfigured(QString,int,QString)), this, SLOT(setWiFiConfiguration(QString,int,QString)));
-        wss->move(WIDGET_START);
-        wss->show();
-        ns->hide();
+        rotateWidget(ns, wss);
     }
     if (!advanced && !useWireless)
     {
         nss->setDHCP(true);
         nss->setWireless(false);
         ds = new DeviceSelection(this);
-        /* ADD CONNECT */
-        ds->move(WIDGET_START);
-        ds->show();
-        ns->hide();
+        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        rotateWidget(ns, ds);
     }
 }
 
@@ -203,17 +198,13 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
     {
         wss = new WiFiNetworkSetup(this);
         connect(wss, SIGNAL(wifiNetworkConfigured(QString,int,QString)), this, SLOT(setWiFiConfiguration(QString,int,QString)));
-        wss->move(WIDGET_START);
-        wss->show();
-        ans->hide();
+        rotateWidget(ans, wss);
     }
     else
     {
         ds = new DeviceSelection(this);
-        /* ADD CONNECT */
-        ds->move(WIDGET_START);
-        ds->show();
-        ans->hide();
+        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        rotateWidget(ans, ds);
     }
 }
 
@@ -226,10 +217,32 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     if (! nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE)
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
-    /* ADD CONNECT */
-    ds->move(WIDGET_START);
-    ds->show();
-    wss->hide();
+    connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+    rotateWidget(wss, ds);
+}
+
+void MainWindow::selectNixDevice(NixDiskDevice *nd)
+{
+    this->nd = nd;
+    la = new LicenseAgreement(this);
+    connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
+    rotateWidget(ds, la);
+}
+
+void MainWindow::acceptLicense()
+{
+    /* Move to Download widget, even if we aren't downloading */
+    if (this->isOnline)
+        dp = new DownloadProgress(this, this->image);
+    else
+        dp = new DownloadProgress(this, QUrl(NULL));
+    connect(dp, SIGNAL(downloadCompleted()), this, SLOT(completeDownload()));
+    rotateWidget(la, dp);
+}
+
+void MainWindow::completeDownload()
+{
+
 }
 
 void MainWindow::translate(QString locale)

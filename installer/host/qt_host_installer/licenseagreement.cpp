@@ -14,7 +14,7 @@ LicenseAgreement::~LicenseAgreement()
     delete ui;
 }
 
-void LicenseAgreement::on_networkoptionsnextButton_clicked()
+void LicenseAgreement::on_licenseAcceptNextButton_clicked()
 {
     if (! ui->datapolacceptcheckBox->isChecked() || !ui->gplacceptcheckBox->isChecked())
     {
@@ -23,5 +23,6 @@ void LicenseAgreement::on_networkoptionsnextButton_clicked()
     else
     {
         utils::writeLog("GPL licence and data collection policy has been accepted");
+        emit licenseAccepted();
     }
 }

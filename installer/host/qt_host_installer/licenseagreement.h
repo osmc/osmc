@@ -16,7 +16,11 @@ public:
     ~LicenseAgreement();
     
 private slots:
-    void on_networkoptionsnextButton_clicked();
+
+    void on_licenseAcceptNextButton_clicked();
+
+signals:
+    void licenseAccepted();
 
 private:
     Ui::LicenseAgreement *ui;

@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     #ifdef Q_OS_MAC
     utils::writeLog("OSMC Installer running on Mac OS X");
     #endif
-    #ifdef Q_OS_WIN32 || #ifdef Q_OS_WIN
+    #if defined(Q_OS_WIN32) || defined(Q_OS_WIN)
     utils::writeLog("OSMC Installer running on Windows");
     #endif
     #ifdef Q_OS_LINUX

@@ -17,7 +17,7 @@ UpdateNotification::UpdateNotification(QWidget *parent) :
     #ifdef Q_OS_MAC
     platform = QString("mac");
     #endif
-    #ifdef Q_OS_WIN32 || #ifdef Q_OS_WIN
+    #if defined(Q_OS_WIN32) || defined(Q_OS_WIN)
     platform = QString("windows");
     #endif
     #ifdef Q_OS_LINUX

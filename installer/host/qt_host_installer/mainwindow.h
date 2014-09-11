@@ -8,6 +8,8 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include "networksettings.h"
+#include "nixdiskdevice.h"
+#include <QMovie>
 
 namespace Ui {
 class MainWindow;
@@ -28,9 +30,13 @@ public slots:
     void setNetworkInitial(bool useWireless, bool advanced);
     void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
+    void selectNixDevice(NixDiskDevice *nd);
+    void acceptLicense();
+    void completeDownload();
     void showUpdate();
     void dismissUpdate();
     void replyFinished(QNetworkReply* reply);
+    void rotateWidget(QWidget *oldWidget, QWidget *newWidget);
     
 private:
     Ui::MainWindow *ui;
@@ -43,6 +49,8 @@ private:
     int installType;
     NetworkSettings *nss;
     QNetworkAccessManager *accessManager;
+    NixDiskDevice *nd;
+    QMovie *spinner;
 };
 
 #endif // MAINWINDOW_H
