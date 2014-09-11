@@ -79,6 +79,7 @@ void MainWindow::replyFinished(QNetworkReply *reply)
     /* Enumerating devices */
     QList<SupportedDevice *> devices = utils::buildDeviceList();
     ls = new LangSelection(this, devices);
+    connect(ls, SIGNAL(languageSelected(QString, SupportedDevice)), this, SLOT(setLanguage(QString, SupportedDevice)));
     ls->move(WIDGET_START);
     ls->show();
     /* Check if an update exists */
