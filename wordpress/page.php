@@ -29,7 +29,17 @@
 
 								<?php comments_template(); ?>
 
-							</article> <?php // end article ?>
+							</article><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+							<!-- OSMCBlogPageResponsive -->
+							<ins class="adsbygoogle"
+								 style="display:block"
+								 data-ad-client="ca-pub-3888734777526455"
+								 data-ad-slot="1342267196"
+								 data-ad-format="auto"></ins>
+							<script>
+							(adsbygoogle = window.adsbygoogle || []).push({});
+							</script> 
+							<?php // end article ?>
 
 							<?php endwhile; else : ?>
 
