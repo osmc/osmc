@@ -32,7 +32,7 @@ public slots:
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
     void selectNixDevice(NixDiskDevice *nd);
     void acceptLicense();
-    void completeDownload();
+    void completeDownload(QString fileName);
     void showUpdate();
     void dismissUpdate();
     void replyFinished(QNetworkReply* reply);
@@ -44,6 +44,7 @@ private:
     QString language;
     QString mirrorURL;
     SupportedDevice device;
+    QString installDevicePath;
     bool isOnline;
     QUrl image;
     int installType;

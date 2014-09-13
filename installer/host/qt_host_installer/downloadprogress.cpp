@@ -20,20 +20,20 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
     if (URL.isEmpty())
     {
         /* Emit and bail! */
-        emit downloadCompleted();
+        emit downloadCompleted(NULL);
         return;
     }
     utils::writeLog("Downloading " + URL.toString());
     QStringList urlSeg = URL.toString().split("/");
-    QString fileName = urlSeg.at((urlSeg.count() - 1));
-    /* Do we have the file or an uncompressed version ? */
+    fileName = urlSeg.at((urlSeg.count() - 1));
+    /* Do we have the file or an uncompressed version? */
     if (QFile(fileName).exists() || QFile(fileName.remove(".gz")).exists())
     {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::No)
         {
-            emit downloadCompleted();
+            emit downloadCompleted(NULL);
             return;
         }
     }
@@ -85,14 +85,11 @@ void DownloadProgress::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
          failDownload(true);
      } else {
          utils::writeLog("Download successful");
-         emit downloadCompleted();
+         emit downloadCompleted(fileName);
      }
  }
 
- void DownloadProgress::downloadReadyRead()
- {
-     output.write(currentDownload->readAll());
- }
+ void DownloadProgress::downloadReadyRead() { output.write(currentDownload->readAll()); }
 
  void DownloadProgress::failDownload(bool wasNetwork)
  {

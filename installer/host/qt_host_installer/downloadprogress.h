@@ -21,7 +21,7 @@ public:
     ~DownloadProgress();
 
 signals:
-    void downloadCompleted();
+    void downloadCompleted(QString);
 
 private slots:
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
@@ -34,6 +34,7 @@ private:
     QNetworkReply *currentDownload;
     QFile output;
     QTime downloadTime;
+    QString fileName;
     void failDownload(bool wasNetwork);
 };
 

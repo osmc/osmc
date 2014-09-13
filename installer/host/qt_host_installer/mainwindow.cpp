@@ -20,6 +20,7 @@
 #include "nixdiskdevice.h"
 #include "licenseagreement.h"
 #include "downloadprogress.h"
+#include "extractprogress.h"
 #include <QMovie>
 
 #define WIDGET_START QPoint(10,110)
@@ -34,6 +35,7 @@ AdvancedNetworkSetup *ans;
 WiFiNetworkSetup *wss;
 LicenseAgreement *la;
 DownloadProgress *dp;
+ExtractProgress *ep;
 
 QTranslator translator;
 
@@ -121,6 +123,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
         QString localImage = image.toString();
         localImage.replace("http://download.osmc.tv/", this->mirrorURL);
         localImage.remove("%0A"); /* Handle line issues */
+        localImage.remove("?");
         image = QUrl(localImage);
         utils::writeLog("The user has selected an online image for " + this->device.getDeviceName() + " with build URL : " + image.toString());
         this->isOnline = true;
@@ -229,6 +232,7 @@ void MainWindow::selectNixDevice(NixDiskDevice *nd)
     la = new LicenseAgreement(this);
     connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
     rotateWidget(ds, la);
+    this->installDevicePath = nd->getDiskPath();
 }
 
 void MainWindow::acceptLicense()
@@ -238,13 +242,17 @@ void MainWindow::acceptLicense()
         dp = new DownloadProgress(this, this->image);
     else
         dp = new DownloadProgress(this, QUrl(NULL));
-    connect(dp, SIGNAL(downloadCompleted()), this, SLOT(completeDownload()));
+    connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
     rotateWidget(la, dp);
 }
 
-void MainWindow::completeDownload()
+void MainWindow::completeDownload(QString fileName)
 {
-
+    /* If we downloaded an image, replace former URL with an actual image file */
+    if (fileName != NULL)
+        this->image = QUrl(fileName);
+    ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
+    rotateWidget(dp, ep);
 }
 
 void MainWindow::translate(QString locale)
