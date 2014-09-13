@@ -18,39 +18,39 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
 {
     ui->setupUi(this);
     if (URL.isEmpty())
+    {
         /* Emit and bail! */
         emit downloadCompleted();
+        return;
+    }
+    utils::writeLog("Downloading " + URL.toString());
+    QStringList urlSeg = URL.toString().split("/");
+    QString fileName = urlSeg.at((urlSeg.count() - 1));
+    /* Do we have the file or an uncompressed version ? */
+    if (QFile(fileName).exists() || QFile(fileName.remove(".gz")).exists())
+    {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::No)
+        {
+            emit downloadCompleted();
+            return;
+        }
+    }
+    output.setFileName(fileName);
+    if (!output.open(QIODevice::WriteOnly))
+    {
+        utils::writeLog("Can't open file for writing -- is it open by another process?");
+        failDownload(false);
+    }
     else
     {
-        utils::writeLog("Downloading " + URL.toString());
-        QStringList urlSeg = URL.toString().split("/");
-        QString fileName = urlSeg.at((urlSeg.count() - 1));
-        /* Do we have the file or an uncompressed version ? */
-        if (QFile(fileName).exists() || QFile(fileName.remove(".gz")).exists())
-        {
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
-            if (reply == QMessageBox::No)
-            {
-                emit downloadCompleted();
-                return;
-            }
-        }
-        output.setFileName(fileName);
-        if (!output.open(QIODevice::WriteOnly))
-        {
-            utils::writeLog("Can't open file for writing -- is it open by another process?");
-            failDownload(false);
-        }
-        else
-        {
-           QNetworkRequest request(URL);
-           currentDownload = manager.get(request);
-           connect(currentDownload, SIGNAL(downloadProgress(qint64,qint64)),SLOT(downloadProgress(qint64,qint64)));
-           connect(currentDownload, SIGNAL(finished()), SLOT(downloadFinished()));
-           connect(currentDownload, SIGNAL(readyRead()), SLOT(downloadReadyRead()));
-           downloadTime.start();
-        }
+        QNetworkRequest request(URL);
+        currentDownload = manager.get(request);
+        connect(currentDownload, SIGNAL(downloadProgress(qint64,qint64)),SLOT(downloadProgress(qint64,qint64)));
+        connect(currentDownload, SIGNAL(finished()), SLOT(downloadFinished()));
+        connect(currentDownload, SIGNAL(readyRead()), SLOT(downloadReadyRead()));
+        downloadTime.start();
     }
 }
 
