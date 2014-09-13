@@ -31,6 +31,7 @@ void DeviceSelection::showDevices()
     #endif
     #ifdef Q_OS_LINUX
     QList<NixDiskDevice *> nixdevices = io::enumerateDeviceLinux();
+    #endif
     for (int i = 0; i < nixdevices.count(); i++)
     {
         NixDiskDevice *device = nixdevices.at(i);
@@ -40,7 +41,6 @@ void DeviceSelection::showDevices()
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Unchecked);
     }
-    #endif
 }
 
 void DeviceSelection::on_refreshButton_clicked()
