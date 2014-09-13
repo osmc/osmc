@@ -67,7 +67,8 @@ namespace io
                QString line = stdoutStream.readLine().simplified(); //remove trailing and leading ws
                if (line.isNull())
                    break;
-               else if (line.startsWith("0:")) // the line holding the device always contains 0:
+               // the line holding the device is the only line always starting with 0:
+               else if (line.startsWith("0:"))
                {
                    lines << line;
                }
