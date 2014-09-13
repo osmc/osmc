@@ -64,27 +64,32 @@ namespace io
            QTextStream stdoutStream(process.readAllStandardOutput());
            while (true)
            {
-               QString line = stdoutStream.readLine();
+               QString line = stdoutStream.readLine().simplified(); //remove trailing and leading ws
                if (line.isNull())
                    break;
-               else
+               // the line holding the device is the only line always starting with 0:
+               else if (line.startsWith("0:"))
                {
-                   lines << line << "\n";
+                   lines << line;
                }
            }
            for (int i = 0; i < lines.count(); i++)
            {
                QString line = lines.at(i);
-               if (line.startsWith("/dev/disk"))
-               {
-                   QString devicePath = lines.at(i);
-                   line = lines.at(i + 4);
-                   QStringList deviceAttr = line.split(" "); // Bloody diskutil doesn't TAB \t properly
-                   QString deviceSpace = deviceAttr.at((deviceAttr.count() - 5)) + deviceAttr.at((deviceAttr.count() - 4));
-                   deviceSpace.remove("*");
-                   NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
-                   devices.append(nd);
-               }
+               QStringList deviceAttr = line.split(" ");
+               /**
+                * content is now:
+                * [0] 0:
+                * [1] <partition scheme name>
+                * [2] <total_size>
+                * [3] <size_unit>
+                * [4] device name (disk0, disk1, etc)
+                **/
+               QString deviceSpace = deviceAttr.at(2) + " " + deviceAttr.at(3);
+               deviceSpace.remove("*");
+               QString devicePath = "/dev/" + deviceAttr.at(4);
+               NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
+               devices.append(nd);
            }
        }
        return devices;

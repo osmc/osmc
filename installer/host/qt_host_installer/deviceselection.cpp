@@ -31,6 +31,7 @@ void DeviceSelection::showDevices()
     #endif
     #ifdef Q_OS_LINUX
     QList<NixDiskDevice *> nixdevices = io::enumerateDeviceLinux();
+    #endif
     for (int i = 0; i < nixdevices.count(); i++)
     {
         NixDiskDevice *device = nixdevices.at(i);
@@ -40,7 +41,6 @@ void DeviceSelection::showDevices()
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Unchecked);
     }
-    #endif
 }
 
 void DeviceSelection::on_refreshButton_clicked()
@@ -57,18 +57,22 @@ void DeviceSelection::on_devicenextButton_clicked()
     {
         if (checkCount > 1)
             break;
-        item = ui->devListWidget->takeItem(i);
+        item = ui->devListWidget->item(i);
         if (item->checkState())
         {
             checkCount++;
         }
     }
     if (checkCount == 0)
+    {
         utils::displayError(tr("Please select a device"), tr("You must select one device to image"));
-    if (checkCount > 1)
+    } else if (checkCount > 1)
+    {
         utils::displayError(tr("Please select one device"), tr("You can only select one device to image"));
-    #if defined(Q_OS_LINUX ) || defined(Q_OS_MAC)
-    utils::writeLog("Device selected: " + item->text());
-    emit nixDeviceSelected((nixdevMap.value(item->text())));
-    #endif
+    } else {
+        #if defined(Q_OS_LINUX ) || defined(Q_OS_MAC)
+        utils::writeLog("Device selected: " + item->text());
+        emit nixDeviceSelected((nixdevMap.value(item->text())));
+        #endif
+    }
 }
