@@ -33,25 +33,23 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
             if (reply == QMessageBox::No)
             {
                 emit downloadCompleted();
+                return;
             }
-            else
-            {
-                output.setFileName(fileName);
-                 if (!output.open(QIODevice::WriteOnly))
-                 {
-                     utils::writeLog("Can't open file for writing -- is it open by another process?");
-                     failDownload(false);
-                 }
-                 else
-                 {
-                    QNetworkRequest request(URL);
-                    currentDownload = manager.get(request);
-                    connect(currentDownload, SIGNAL(downloadProgress(qint64,qint64)),SLOT(downloadProgress(qint64,qint64)));
-                    connect(currentDownload, SIGNAL(finished()), SLOT(downloadFinished()));
-                    connect(currentDownload, SIGNAL(readyRead()), SLOT(downloadReadyRead()));
-                    downloadTime.start();
-                 }
-            }
+        }
+        output.setFileName(fileName);
+        if (!output.open(QIODevice::WriteOnly))
+        {
+            utils::writeLog("Can't open file for writing -- is it open by another process?");
+            failDownload(false);
+        }
+        else
+        {
+           QNetworkRequest request(URL);
+           currentDownload = manager.get(request);
+           connect(currentDownload, SIGNAL(downloadProgress(qint64,qint64)),SLOT(downloadProgress(qint64,qint64)));
+           connect(currentDownload, SIGNAL(finished()), SLOT(downloadFinished()));
+           connect(currentDownload, SIGNAL(readyRead()), SLOT(downloadReadyRead()));
+           downloadTime.start();
         }
     }
 }
