@@ -17,18 +17,12 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
     ui(new Ui::DownloadProgress)
 {
     ui->setupUi(this);
-
     if (URL.isEmpty())
     {
         /* Emit and bail! */
         emit downloadCompleted();
         return;
     }
-
-    // first, fix the URL. For some reasons, it may happen that there's a newline character appended
-    // use the naive approach to remove it (we wont rely on the origin of the URL to be consistent)
-    URL = QUrl(URL.toString().remove("%0A"));
-
     utils::writeLog("Downloading " + URL.toString());
     QStringList urlSeg = URL.toString().split("/");
     QString fileName = urlSeg.at((urlSeg.count() - 1));
