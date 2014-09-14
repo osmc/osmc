@@ -38,7 +38,7 @@ void DownloadProgress::download(QWidget *parent, QUrl URL)
         reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::No)
         {
-            emit downloadCompleted("local");
+            emit downloadCompleted(QDir::homePath() + "/" + fileName);
             return;
         }
     }
