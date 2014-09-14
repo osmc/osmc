@@ -17,7 +17,7 @@ mount $2 /mgwbin
 if [ ! -f "/mgwbin/mingw32-make.exe" ]; then echo "Can't find MinGW32 binaries" && exit 1; fi
 if [ ! -f /c/Program\ Files/WinRAR/Rar.exe ]; then echo "Can't find WinRAR -- maybe it is in x64 program files" && exit 1; fi
 echo -e "Updating PATH"
-PATH="/qtbin:/mgwbin:${PATH}"
+PATH="/qtbin:/mgwbin:/c/Program\ Files/Microsoft\ SDKs/Windows/v7.1/Bin:${PATH}"
 TARGET="qt_host_installer"
 pushd ${TARGET}
 if [ -f Makefile ]; then echo "Cleaning" && mingw32-make clean; fi
@@ -32,8 +32,10 @@ INSTALL="install"
 if [ -d ${INSTALL} ]; then echo "Cleaning old install directory " && rm -rf ${INSTALL}; fi
 mkdir -p ${INSTALL}
 cp ${TARGET}/release/${TARGET}.exe ${INSTALL}/
-cp ${TARGET}/*.qm ${INSTALL}/usr/bin/osmc/ > /dev/null 2>&1
+cp ${TARGET}/*.qm ${INSTALL}/ > /dev/null 2>&1
 cp ${TARGET}/winrar.sfx ${INSTALL}
+echo Building manifest
+mt.exe –manifest ${TARGET}/${TARGET}.exe.manifest -outputresource:${INSTALL}/${TARGET}.exe;1
 pushd ${INSTALL}
 /c/Program\ Files/WinRAR/Rar.exe a -r -sfx -z"winrar.sfx" osmc-installer qt_host_installer.exe *.qm >/dev/null 2>&1
 popd
