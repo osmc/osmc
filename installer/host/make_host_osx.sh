@@ -3,19 +3,35 @@
 
 #!/bin/bash
 echo Building host installer for OS X
+
 TARGET="qt_host_installer"
+RESOURCES=resources
+ICONDIR=${RESOURCES}/app.iconset
+ICONSET_NAME="logo.icns"
+
 pushd ${TARGET}
 if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
 echo Building installer
 qmake
 make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
-cp logo.icns ${TARGET}.app/Contents/Resources/
-cp Info.plist ${TARGET}.app/Contents/
-VERSION=$(cat ${TARGET}/${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
-sed -e s/VERVAL/${VERSION}/ -i ${TARGET}.app/Contents/Info.plist
-macdeployqt ${TARGET}.app -dmg -no-plugins
+
+cp ${RESOURCES}/Info.plist ${TARGET}.app/Contents/
+
+## handle application icons
+echo handling application icons
+rm ${RESOURCES}/${ICONSET_NAME}
+iconutil -c icns --output ${RESOURCES}/${ICONSET_NAME} ${ICONDIR}
+cp ${RESOURCES}/${ICONSET_NAME} ${TARGET}.app/Contents/Resources/
+sed -e s/ICON_HERE/${ICONSET_NAME}/ -i old ${TARGET}.app/Contents/Info.plist
+echo Placing Version
+
+## try to set version in plist
+VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
+sed -e s/VERVAL/${VERSION}/ -i old ${TARGET}.app/Contents/Info.plist
+
 echo Packaging installer
+macdeployqt ${TARGET}.app -dmg -no-plugins
 popd
 mv ${TARGET}/${TARGET}.dmg osmc-installer.dmg
 echo Build complete
