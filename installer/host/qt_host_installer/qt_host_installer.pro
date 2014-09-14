@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     nixdiskdevice.cpp \
     downloadprogress.cpp \
     extractprogress.cpp \
-    successdialog.cpp
+    successdialog.cpp \
+    preseeder.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     nixdiskdevice.h \
     downloadprogress.h \
     extractprogress.h \
-    successdialog.h
+    successdialog.h \
+    preseeder.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \

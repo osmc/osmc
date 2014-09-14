@@ -21,6 +21,7 @@
 #include "licenseagreement.h"
 #include "downloadprogress.h"
 #include "extractprogress.h"
+#include "preseeder.h"
 #include <QMovie>
 
 #define WIDGET_START QPoint(10,110)
@@ -258,6 +259,8 @@ void MainWindow::completeDownload(QString fileName)
     /* If we downloaded an image, replace former URL with an actual image file */
     if (fileName != NULL)
         this->image = QUrl(fileName);
+    utils::writeLog("Creating preseeder");
+    Preseeder *preseeder = new Preseeder();
     ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
     rotateWidget(dp, ep);
 }
