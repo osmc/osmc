@@ -1,12 +1,11 @@
 #include "extractprogress.h"
 #include "ui_extractprogress.h"
 #include <QString>
-#include <QByteArray>
-#include "zlib.h"
 #include "utils.h"
-#include "assert.h"
 #include "io.h"
-#define CHUNKSIZE 8192
+#include "extractworker.h"
+#include <QThread>
+
 #define SET_BINARY_MODE(file)
 
 ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString deviceImage):
@@ -38,71 +37,34 @@ bool ExtractProgress::doExtraction(QString deviceImage)
 {
     /* Based off http://www.zlib.net/zpipe.c */
     utils::writeLog("Extracting " + deviceImage);
-    int ret;
-    unsigned have;
-    z_stream strm;
-    unsigned char in[CHUNKSIZE];
-    unsigned char out[CHUNKSIZE];
-
-
     QFile sourceFile(deviceImage);
-    bool sourceopen = sourceFile.open(QIODevice::ReadOnly);
-    int sourceFileDescriptor = sourceFile.handle();
-    FILE *source = fdopen(sourceFileDescriptor, "rb");
-
     QFile targetFile(QString(deviceImage).remove(".gz"));
-    bool targetopen = targetFile.open(QIODevice::WriteOnly);
-    int targetFileDescriptor = targetFile.handle();
-    FILE *dest = fdopen(targetFileDescriptor, "wb");
 
-    strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
-    strm.opaque = Z_NULL;
-    strm.avail_in = 0;
-    strm.next_in = Z_NULL;
-    ret = inflateInit2(&strm,  47);
-    if (ret != Z_OK)
-        return ret;
+    QThread* thread = new QThread;
+    ExtractWorker *worker = new ExtractWorker(deviceImage, QString(deviceImage).remove(".gz"));
 
-    do
-    {
-        strm.avail_in = fread(in, 1, CHUNKSIZE, source);
-        if (ferror(source))
-        {
-            (void)inflateEnd(&strm);
-            return Z_ERRNO;
-        }
-        if (strm.avail_in == 0)
-            break;
-        strm.next_in = in;
+    worker->moveToThread(thread);
+    connect(worker, SIGNAL(error()), this, SLOT(extractError()));
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread->start();
+}
 
-        do
-        {
-            strm.avail_out = CHUNKSIZE;
-            strm.next_out = out;
-            ret = inflate(&strm, Z_NO_FLUSH);
-            assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-            switch (ret) {
-            case Z_NEED_DICT:
-                ret = Z_DATA_ERROR;     /* and fall through */
-            case Z_DATA_ERROR:
-            case Z_MEM_ERROR:
-                (void)inflateEnd(&strm);
-                return ret;
-         }
-            have = CHUNKSIZE - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest))
-            {
-                (void)inflateEnd(&strm);
-                return Z_ERRNO;
-            }
-         }
-        while (strm.avail_out == 0);
-    }
-    while (ret != Z_STREAM_END);
+void ExtractProgress::extractError()
+{
+    ui->extractProgressBar->setValue(0);
+    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!"));
+}
 
-    (void)inflateEnd(&strm);
-    return ret == Z_STREAM_END ? true : false;
+void ExtractProgress::setProgress(unsigned written)
+{
+    ui->extractProgressBar->setMaximum(0);
+    ui->extractProgressBar->setMinimum(0);
+    ui->extractProgressBar->setValue(0);
+    ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
 }
 
 ExtractProgress::~ExtractProgress()
