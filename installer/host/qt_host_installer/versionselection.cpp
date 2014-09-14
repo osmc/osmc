@@ -75,14 +75,7 @@ void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
 {
     if (ui->useLocalBuildCheckbox->isChecked())
     {
-        QString dir;
-
-        /* we need to step out of the .app directory in OSX */
-        #ifdef Q_OS_MAC
-        dir = "../..";
-        #else
-        dir = "";
-        #endif
+        QString dir = QDir::homePath();
 
         /* Dialog for selecting custom build */
         buildName = QString(); /* NULL it */

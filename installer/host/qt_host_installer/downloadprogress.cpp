@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QUrl>
 #include <QFile>
+#include <QDir>
 #include <QMessageBox>
 #include "utils.h"
 
@@ -31,7 +32,7 @@ void DownloadProgress::download(QWidget *parent, QUrl URL)
     QStringList urlSeg = URL.toString().split("/");
     fileName = urlSeg.at((urlSeg.count() - 1));
     /* Do we have the file or an uncompressed version? */
-    if (QFile(fileName).exists() || QFile(fileName.remove(".gz")).exists())
+    if (QFile(QDir::homePath() + "/" + fileName).exists() || QFile(QDir::homePath() + "/" + fileName.remove(".gz")).exists())
     {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
@@ -41,7 +42,7 @@ void DownloadProgress::download(QWidget *parent, QUrl URL)
             return;
         }
     }
-    output.setFileName(fileName);
+    output.setFileName(QDir::homePath() + "/" + fileName);
     if (!output.open(QIODevice::WriteOnly))
     {
         utils::writeLog("Can't open file for writing -- is it open by another process?");
@@ -85,7 +86,8 @@ void DownloadProgress::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
      output.close();
 
      if (currentDownload->error()) {
-         utils::writeLog("Error occured downloading file");
+         utils::writeLog("Error occured downloading file:");
+         utils::writeLog(currentDownload->errorString());
          failDownload(true);
      } else {
          utils::writeLog("Download successful");
