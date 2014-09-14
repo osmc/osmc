@@ -32,7 +32,7 @@ void DownloadProgress::download(QWidget *parent, QUrl URL)
     QStringList urlSeg = URL.toString().split("/");
     fileName = urlSeg.at((urlSeg.count() - 1));
     /* Do we have the file or an uncompressed version? */
-    if (QFile(QDir::homePath() + "/" + fileName).exists() || QFile(QDir::homePath() + "/" + fileName.remove(".gz")).exists())
+    if (QFile(QDir::homePath() + "/" + fileName).exists() || QFile(QDir::homePath() + "/" + QString(fileName.remove(".gz"))).exists())
     {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
