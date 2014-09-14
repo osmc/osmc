@@ -124,6 +124,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
         QString localImage = image.toString();
         localImage.replace("http://download.osmc.tv/", this->mirrorURL);
         localImage.remove("\n"); /* Handle line issues */
+        localImage.remove("%0A"); /* other platforms might see this */
         image = QUrl(localImage);
         utils::writeLog("The user has selected an online image for " + this->device.getDeviceName() + " with build URL : " + image.toString());
         this->isOnline = true;
