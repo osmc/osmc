@@ -20,6 +20,9 @@ public:
     explicit DownloadProgress(QWidget *parent = 0, QUrl URL = QUrl(NULL));
     ~DownloadProgress();
 
+public slots:
+    void download(QWidget *parent, QUrl URL);
+
 signals:
     void downloadCompleted(QString);
 

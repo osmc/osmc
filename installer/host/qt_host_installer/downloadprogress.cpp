@@ -17,10 +17,14 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
     ui(new Ui::DownloadProgress)
 {
     ui->setupUi(this);
-    if (URL.isEmpty())
+}
+
+void DownloadProgress::download(QWidget *parent, QUrl URL)
+{
+    if (URL.toString() == "local")
     {
         /* Emit and bail! */
-        emit downloadCompleted(NULL);
+        emit downloadCompleted("local");
         return;
     }
     utils::writeLog("Downloading " + URL.toString());
@@ -33,7 +37,7 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
         reply = QMessageBox::question(this, tr("Image found"), tr("Do you want to re-download this image?"),QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::No)
         {
-            emit downloadCompleted(NULL);
+            emit downloadCompleted("local");
             return;
         }
     }
