@@ -19,6 +19,7 @@ public:
 private:
     Ui::ExtractProgress *ui;
     bool doExtraction(QString deviceImage);
+    bool writeImageToDisc(QString devicePath, QString deviceImage);
 };
 
 #endif // EXTRACTPROGRESS_H

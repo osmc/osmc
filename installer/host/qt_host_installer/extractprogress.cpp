@@ -5,7 +5,9 @@
 #include "zlib.h"
 #include "utils.h"
 #include "assert.h"
+#include "io.h"
 #define CHUNKSIZE 8192
+#define SET_BINARY_MODE(file)
 
 ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString deviceImage):
     QWidget(parent),
@@ -18,10 +20,19 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
     if (extractSuccess)
     {
         /* Write the image to the block device */
+        //writeImageToDisc(devicePath, deviceImage);
 
     }
     /* Peform pre-seeding operations and final configuration */
 }
+
+bool ExtractProgress::writeImageToDisc(QString devicePath, QString deviceImage)
+{
+    #ifdef Q_OS_MAC
+    io::writeImageOSX(devicePath, deviceImage);
+    #endif
+}
+
 
 bool ExtractProgress::doExtraction(QString deviceImage)
 {
@@ -32,16 +43,24 @@ bool ExtractProgress::doExtraction(QString deviceImage)
     z_stream strm;
     unsigned char in[CHUNKSIZE];
     unsigned char out[CHUNKSIZE];
-    QByteArray strByteArray = deviceImage.toLocal8Bit();
-    FILE *source = fopen(strByteArray.data(), "w+");
-    strByteArray = deviceImage.remove(".gz").toLocal8Bit();
-    FILE *dest = fopen(strByteArray.data(), "w+");
+
+
+    QFile sourceFile(deviceImage);
+    bool sourceopen = sourceFile.open(QIODevice::ReadOnly);
+    int sourceFileDescriptor = sourceFile.handle();
+    FILE *source = fdopen(sourceFileDescriptor, "rb");
+
+    QFile targetFile(QString(deviceImage).remove(".gz"));
+    bool targetopen = targetFile.open(QIODevice::WriteOnly);
+    int targetFileDescriptor = targetFile.handle();
+    FILE *dest = fdopen(targetFileDescriptor, "wb");
+
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;
     strm.opaque = Z_NULL;
     strm.avail_in = 0;
     strm.next_in = Z_NULL;
-    ret = inflateInit(&strm);
+    ret = inflateInit2(&strm,  47);
     if (ret != Z_OK)
         return ret;
 
