@@ -42,7 +42,8 @@ void DownloadProgress::download(QWidget *parent, QUrl URL)
             return;
         }
     }
-    output.setFileName(QDir::homePath() + "/" + fileName);
+    fileName = QDir::homePath() + "/" + fileName;
+    output.setFileName(fileName);
     if (!output.open(QIODevice::WriteOnly))
     {
         utils::writeLog("Can't open file for writing -- is it open by another process?");
