@@ -75,9 +75,18 @@ void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
 {
     if (ui->useLocalBuildCheckbox->isChecked())
     {
+        QString dir;
+
+        /* we need to step out of the .app directory in OSX */
+        #ifdef Q_OS_MAC
+        dir = "../..";
+        #else
+        dir = "";
+        #endif
+
         /* Dialog for selecting custom build */
         buildName = QString(); /* NULL it */
-        buildName = QFileDialog::getOpenFileName(this, "Select disk image", "", tr("OSMC Disk Images (*.img.gz)"));
+        buildName = QFileDialog::getOpenFileName(this, "Select disk image", dir, tr("OSMC Disk Images (**.img.gz)"));
         if (buildName == NULL)
         {
             utils::displayError(tr("Build selection error"), tr("You didn't select a custom build -- reverting to online builds"));

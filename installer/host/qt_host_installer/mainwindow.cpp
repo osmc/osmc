@@ -238,12 +238,19 @@ void MainWindow::selectNixDevice(NixDiskDevice *nd)
 void MainWindow::acceptLicense()
 {
     /* Move to Download widget, even if we aren't downloading */
-    if (this->isOnline)
+    QUrl url;
+    if (this->isOnline) {
         dp = new DownloadProgress(this, this->image);
+        url = this->image;
+    }
     else
-        dp = new DownloadProgress(this, QUrl(NULL));
+    {
+        dp = new DownloadProgress(this, QUrl("local"));
+        url = QUrl("local");
+    }
     connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
     rotateWidget(la, dp);
+    dp->download(this, url);
 }
 
 void MainWindow::completeDownload(QString fileName)
