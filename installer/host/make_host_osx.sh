@@ -13,7 +13,7 @@ if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 cp logo.icns ${TARGET}.app/Contents/Resources/
 cp Info.plist ${TARGET}.app/Contents/
 VERSION=$(cat ${TARGET}/${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
-sed -e s/VERVAL/${VERSION} -i ${TARGET}.app/Contents/Info.plist
+sed -e s/VERVAL/${VERSION}/ -i ${TARGET}.app/Contents/Info.plist
 macdeployqt ${TARGET}.app -dmg -no-plugins
 echo Packaging installer
 popd
