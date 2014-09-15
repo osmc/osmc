@@ -120,21 +120,20 @@ namespace io
    }
 
    /*!
-       Read the last for bytes of the given file and interpret them
-       to be the size of the uncompressed gzip file.
-
-       This seems to be only an approximation.
+       Read the last four bytes of the given file and interpret them
+       to be the size in bytes of the uncompressed gzip file.
 
        This method does not test if the given filename denotes
        an actual gzip file.
 
        This method does not care about endianess.
 
-       returns -1 if the file could not be opened.
+       Return the size in bytes.
+       Returns -1 if the file could not be opened.
    */
    int getDecompressedSize(QString gzFilename)
    {
-       /* an approximate size of the uncompressed file can be found
+       /* size of the uncompressed file can be found
         * in the last four bytes. It doesn't seem to be too exact
         * http://www.abeel.be/content/determine-uncompressed-size-gzip-file
         */
