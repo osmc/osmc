@@ -11,6 +11,7 @@ class ExtractProgress;
 class ExtractProgress : public QWidget
 {
     Q_OBJECT
+    qint64 decompressedSize;
     
 public:
     explicit ExtractProgress(QWidget *parent = 0, QString devicePath = NULL, QString deviceImage = NULL );

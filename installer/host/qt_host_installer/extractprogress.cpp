@@ -13,6 +13,10 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
     ui(new Ui::ExtractProgress)
 {
     ui->setupUi(this);
+
+    ui->extractProgressBar->setMaximum(io::getDecompressedSize(deviceImage));
+    ui->extractProgressBar->setMinimum(0);
+
     bool extractSuccess = true; /* True as we only need to change if failed */
     if (deviceImage.contains(".gz"))
         extractSuccess = doExtraction(deviceImage);
@@ -37,8 +41,6 @@ bool ExtractProgress::doExtraction(QString deviceImage)
 {
     /* Based off http://www.zlib.net/zpipe.c */
     utils::writeLog("Extracting " + deviceImage);
-    QFile sourceFile(deviceImage);
-    QFile targetFile(QString(deviceImage).remove(".gz"));
 
     QThread* thread = new QThread;
     ExtractWorker *worker = new ExtractWorker(deviceImage, QString(deviceImage).remove(".gz"));
@@ -61,9 +63,7 @@ void ExtractProgress::extractError()
 
 void ExtractProgress::setProgress(unsigned written)
 {
-    ui->extractProgressBar->setMaximum(0);
-    ui->extractProgressBar->setMinimum(0);
-    ui->extractProgressBar->setValue(0);
+    ui->extractProgressBar->setValue(written);
     ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
 }
 
