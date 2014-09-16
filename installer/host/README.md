@@ -56,7 +56,9 @@ Ensure we don't get issues with missing libgcc or libstdc++ DLLs by adding this 
 
 Now, open a command prompt (cmd.exe). cd in to the C:\MinGW\qt\qt-everywhere-opensource-src-4.8.6 directory. Add MinGW binaries to your PATH:
 
-````PATH=%PATH%;C:\MinGW\bin````
+````
+PATH=%PATH%;C:\MinGW\bin
+````
 
 Now, let's configure:
 
