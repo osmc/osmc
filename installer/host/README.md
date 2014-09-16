@@ -3,7 +3,7 @@ This installer is run on the system that images the system on the target device.
 
 Builds are performed statically:
 
-* On Windows, Qt static builds are performed to remove any dependency issues. Qt libraries and MinGW32 C++ libraries are embedded in an SFX.
+* On Windows, Qt static builds are performed to remove any dependency issues. There are no external libraries.
 * On Linux, Qt libraries are embedded into the executable. However, there are some external libraries: verify with ldd.
 * On OSX: Qt libraries are embedded into the executable. However, again, some libraries are bundled externally.
 
@@ -54,9 +54,17 @@ Ensure we don't get issues with missing libgcc or libstdc++ DLLs by adding this 
 
 ````QMAKE_LFLAGS		= -static````
 
-````configure -release  -nomake examples -nomake demos -no-exceptions -no-stl -no-rtti -no-qt3support -no-scripttools -no-openssl -no-opengl -no-webkit -no-phonon -no-style-motif -no-style-cde -no-style-cleanlooks -no-style-plastique -no-sql-sqlite -static -platform win32-g++ -qt-libpng````
+Now, open a command prompt (cmd.exe). cd in to the C:\MinGW\qt\qt-everywhere-opensource-src-4.8.6 directory. Add MinGW binaries to your PATH:
 
-````make -j8````
+````PATH=%PATH%;C:\MinGW\bin````
+
+Now, let's configure:
+
+````configure.exe -release  -nomake examples -nomake demos -no-exceptions -no-stl -no-rtti -no-qt3support -no-scripttools -no-openssl -no-opengl -no-webkit -no-phonon -no-style-motif -no-style-cde -no-style-cleanlooks -no-style-plastique -no-sql-sqlite -static -platform win32-g++ -qt-libpng -opensource -confirm-license````
+
+Now, let's build:
+
+````mingw32-make -j8````
 
 Now, you have built Qt. Check make_host_win.sh to see where we expect everything to be in terms of PATHs, you may have to fix these.
 
