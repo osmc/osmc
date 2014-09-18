@@ -79,7 +79,11 @@ namespace io
            {
                QString line = lines.at(i);
                QStringList deviceAttr = line.split(" ");
+
                /**
+                * THE FOLLOWING LIST CHANGES IF THE DISK WAS NOT INITIALISED
+                * In that case, <partition schema name> is missing and the
+                * index for the following elements has to be adressed by n-1
                 * content is now:
                 * [0] 0:
                 * [1] <partition scheme name>
@@ -87,9 +91,25 @@ namespace io
                 * [3] <size_unit>
                 * [4] device name (disk0, disk1, etc)
                 **/
-               QString deviceSpace = deviceAttr.at(2) + " " + deviceAttr.at(3);
+
+               /* TODO when we refactor IO into platform specific implementations
+                * provide definitions for the fields for easy arithmetic on the indices
+                */
+               QString deviceSpace;
+               QString devicePath("/dev/");
+               if (deviceAttr.at(1).startsWith("*"))
+               {
+                   /* partition schema name was missing - uninitialised disk */
+                   deviceSpace = deviceAttr.at(1) + " " + deviceAttr.at(2);
+                   devicePath += deviceAttr.at(3);
+               } else
+               {
+                   deviceSpace = deviceAttr.at(2) + " " + deviceAttr.at(3);
+                   devicePath += deviceAttr.at(4);
+               }
+
                deviceSpace.remove("*");
-               QString devicePath = "/dev/" + deviceAttr.at(4);
+
                NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
                devices.append(nd);
            }
