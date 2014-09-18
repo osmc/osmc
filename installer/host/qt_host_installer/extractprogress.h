@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QProcess>
 
 namespace Ui {
 class ExtractProgress;
@@ -12,19 +13,27 @@ class ExtractProgress : public QWidget
 {
     Q_OBJECT
     qint64 decompressedSize;
+    QString devicePath;
+    QString deviceImage;
+    QProcess p;
     
 public:
     explicit ExtractProgress(QWidget *parent = 0, QString devicePath = NULL, QString deviceImage = NULL );
     ~ExtractProgress();
 
 public slots:
+    void extract();
     void extractError();
     void setProgress(unsigned);
-    
+    void finished();
+
 private:
     Ui::ExtractProgress *ui;
-    bool doExtraction(QString deviceImage);
-    bool writeImageToDisc(QString devicePath, QString deviceImage);
+    void doExtraction();
+    void writeImageToDisc();
+    bool userAllowsWrite();
+    bool unmountDisk();
+
 };
 
 #endif // EXTRACTPROGRESS_H

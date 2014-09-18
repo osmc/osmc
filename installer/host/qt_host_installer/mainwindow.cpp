@@ -275,6 +275,7 @@ void MainWindow::completeDownload(QString fileName)
     Preseeder *preseeder = new Preseeder();
     ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
     rotateWidget(dp, ep);
+    ep->extract();
 }
 
 void MainWindow::translate(QString locale)

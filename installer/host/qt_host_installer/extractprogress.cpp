@@ -5,6 +5,10 @@
 #include "io.h"
 #include "extractworker.h"
 #include <QThread>
+#include <QMessageBox>
+#include <QProcess>
+#include <QWidget>
+#include <QDebug>
 
 #define SET_BINARY_MODE(file)
 
@@ -17,27 +21,65 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
     ui->extractProgressBar->setMaximum(io::getDecompressedSize(deviceImage));
     ui->extractProgressBar->setMinimum(0);
 
-    bool extractSuccess = true; /* True as we only need to change if failed */
-    if (deviceImage.contains(".gz"))
-        extractSuccess = doExtraction(deviceImage);
-    if (extractSuccess)
-    {
-        /* Write the image to the block device */
-        //writeImageToDisc(devicePath, deviceImage);
+    this->devicePath = QString(devicePath);
+    this->deviceImage = QString(deviceImage);
 
-    }
-    /* Peform pre-seeding operations and final configuration */
 }
 
-bool ExtractProgress::writeImageToDisc(QString devicePath, QString deviceImage)
+void ExtractProgress::extract()
+{
+    if (deviceImage.endsWith(".gz"))
+    {
+        doExtraction();
+    }
+    else if (deviceImage.endsWith(".img"))
+    {
+        utils::writeLog("File claims to be already an 'img'. No need to extract.");
+    }
+
+}
+
+void ExtractProgress::writeImageToDisc()
+{
+    bool reallyDoIt = userAllowsWrite();
+
+    if (reallyDoIt == false)
+    {
+        utils::writeLog("User decided to abort before writing the image. Quitting ...");
+        QApplication::quit();
+    }
+    else
+    {
+        utils::writeLog("User allowed to write " + deviceImage + " to " + devicePath);
+        bool unmountSuccess = unmountDisk();
+
+        #ifdef Q_OS_MAC
+        //io::writeImageOSX(devicePath, deviceImage);
+        #endif
+    }
+}
+
+
+bool ExtractProgress::unmountDisk()
 {
     #ifdef Q_OS_MAC
-    io::writeImageOSX(devicePath, deviceImage);
+    //io::unmountDiskOSX(this->devicePath);
     #endif
+
+        /* now check if we are really unmounted. maybe a bit clumsy - feel free to find a better solution */
+}
+
+bool ExtractProgress::userAllowsWrite()
+{
+    QString message = "Do you really want to write the image to\n"+devicePath+"?\n(If not, the Installer will quit.)";
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("Please confirm"), message,QMessageBox::Yes|QMessageBox::No);
+
+    return reply == QMessageBox::Yes;
 }
 
 
-bool ExtractProgress::doExtraction(QString deviceImage)
+void ExtractProgress::doExtraction()
 {
     /* Based off http://www.zlib.net/zpipe.c */
     utils::writeLog("Extracting " + deviceImage);
@@ -52,6 +94,7 @@ bool ExtractProgress::doExtraction(QString deviceImage)
     connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), this, SLOT(finished()));
     thread->start();
 }
 
@@ -65,6 +108,17 @@ void ExtractProgress::setProgress(unsigned written)
 {
     ui->extractProgressBar->setValue(written);
     ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
+}
+
+/*!
+ * \brief ExtractProgress::finished
+ * Our worker has signalled finished. Now we can write the image.
+ *
+ */
+void ExtractProgress::finished()
+{
+    utils::writeLog("Finished extraction. Going to write image");
+    writeImageToDisc();
 }
 
 ExtractProgress::~ExtractProgress()
