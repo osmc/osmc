@@ -28,7 +28,7 @@ void ExtractWorker::process()
 
     int ret;
     unsigned have;
-    unsigned written;
+    unsigned written = 0;
     z_stream strm;
     unsigned char in[CHUNKSIZE];
     unsigned char out[CHUNKSIZE];
