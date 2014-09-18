@@ -30,14 +30,19 @@ namespace utils
         }
     }
 
-    void displayError(QString title, QString message)
+    void displayError(QString title, QString message, bool isCritical)
     {
         QMessageBox *errorMessageBox = new QMessageBox();
         errorMessageBox->setWindowTitle(title);
         errorMessageBox->setText(message);
         errorMessageBox->setStandardButtons(QMessageBox::Ok);
+        if (isCritical)
+        {
+            errorMessageBox->setIcon(QMessageBox::Critical);
+        }
         errorMessageBox->exec();
     }
+
 
     bool promptYesNo(QWidget *parent, QString title, QString question)
     {

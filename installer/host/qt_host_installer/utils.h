@@ -12,7 +12,7 @@
 namespace utils
 {
     void writeLog(QString strLog);
-    void displayError(QString title, QString message);
+    void displayError(QString title, QString message, bool isCritical = false);
     bool promptYesNo(QWidget *parent, QString title, QString question);
     int inline getBuildNumber() { return BUILD_NUMBER; }
     QList<SupportedDevice *> buildDeviceList();
