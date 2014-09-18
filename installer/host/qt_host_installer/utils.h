@@ -13,6 +13,7 @@ namespace utils
 {
     void writeLog(QString strLog);
     void displayError(QString title, QString message);
+    bool promptYesNo(QWidget *parent, QString title, QString question);
     int inline getBuildNumber() { return BUILD_NUMBER; }
     QList<SupportedDevice *> buildDeviceList();
     static int INSTALL_NOPRESEED = -1;

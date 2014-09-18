@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include "supporteddevice.h"
 #include <QList>
+#include <QMessageBox>
 
 namespace utils
 {
@@ -36,6 +37,16 @@ namespace utils
         errorMessageBox->setText(message);
         errorMessageBox->setStandardButtons(QMessageBox::Ok);
         errorMessageBox->exec();
+    }
+
+    bool promptYesNo(QWidget *parent, QString title, QString question)
+    {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(parent, title, question, QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::Yes)
+            return true;
+        else
+            return false;
     }
 
     QList<SupportedDevice * > buildDeviceList()

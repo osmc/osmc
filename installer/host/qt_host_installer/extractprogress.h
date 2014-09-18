@@ -30,8 +30,7 @@ public slots:
 private:
     Ui::ExtractProgress *ui;
     void doExtraction();
-    void writeImageToDisc();
-    bool userAllowsWrite();
+    void writeImageToDisk();
     bool unmountDisk();
 
 };

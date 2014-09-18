@@ -5,10 +5,7 @@
 #include "io.h"
 #include "extractworker.h"
 #include <QThread>
-#include <QMessageBox>
 #include <QProcess>
-#include <QWidget>
-#include <QDebug>
 
 #define SET_BINARY_MODE(file)
 
@@ -39,23 +36,21 @@ void ExtractProgress::extract()
 
 }
 
-void ExtractProgress::writeImageToDisc()
+void ExtractProgress::writeImageToDisk()
 {
-    bool reallyDoIt = userAllowsWrite();
-
-    if (reallyDoIt == false)
+    utils::writeLog("Requesting confirmation from user");
+    if (utils::promptYesNo(this, tr("Are you sure"), tr("Do you want to image the device? OSMC is not responsible for loss of personal data")))
     {
-        utils::writeLog("User decided to abort before writing the image. Quitting ...");
-        QApplication::quit();
-    }
-    else
-    {
-        utils::writeLog("User allowed to write " + deviceImage + " to " + devicePath);
+        utils::writeLog("User confirmed");
         bool unmountSuccess = unmountDisk();
-
         #ifdef Q_OS_MAC
         //io::writeImageOSX(devicePath, deviceImage);
         #endif
+    }
+    else
+    {
+        utils::writeLog("User decided not to write to the disk");
+        QApplication::quit();
     }
 }
 
@@ -68,16 +63,6 @@ bool ExtractProgress::unmountDisk()
 
         /* now check if we are really unmounted. maybe a bit clumsy - feel free to find a better solution */
 }
-
-bool ExtractProgress::userAllowsWrite()
-{
-    QString message = "Do you really want to write the image to\n"+devicePath+"?\n(If not, the Installer will quit.)";
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("Please confirm"), message,QMessageBox::Yes|QMessageBox::No);
-
-    return reply == QMessageBox::Yes;
-}
-
 
 void ExtractProgress::doExtraction()
 {
@@ -118,7 +103,7 @@ void ExtractProgress::setProgress(unsigned written)
 void ExtractProgress::finished()
 {
     utils::writeLog("Finished extraction. Going to write image");
-    writeImageToDisc();
+    writeImageToDisk();
 }
 
 ExtractProgress::~ExtractProgress()
