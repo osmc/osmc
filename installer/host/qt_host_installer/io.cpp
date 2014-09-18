@@ -120,6 +120,35 @@ namespace io
 
        return true;
    }
+
+   bool unmountDiskOSX(QString devicePath)
+   {
+       QString aScript ="do shell script \"diskutil unmountDisk "+ devicePath +"\" with administrator privileges";
+
+       QString osascript = "/usr/bin/osascript";
+       QStringList processArguments;
+       QProcess p;
+       processArguments << "-l" << "AppleScript";
+
+       p.start(osascript, processArguments);
+
+       p.write(aScript.toUtf8());
+       p.closeWriteChannel();
+       p.waitForReadyRead(-1);
+       p.waitForFinished(-1);
+       QByteArray stderrArray = p.readAllStandardError();
+
+       /* assume that a non empty stdErr means everything failed */
+       if (stderrArray.size() > 0)
+       {
+           utils::writeLog("Could not unmount " + devicePath + ". Message was: " + QString(stderrArray));
+           return false;
+       } else
+       {
+          /* hooray! */
+          return true;
+       }
+   }
 #endif
    /*!
        Read the last four bytes of the given file and interpret them

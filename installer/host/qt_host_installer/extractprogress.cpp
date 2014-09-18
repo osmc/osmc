@@ -32,6 +32,7 @@ void ExtractProgress::extract()
     else if (deviceImage.endsWith(".img"))
     {
         utils::writeLog("File claims to be already an 'img'. No need to extract.");
+        writeImageToDisk();
     }
 
 }
@@ -43,8 +44,20 @@ void ExtractProgress::writeImageToDisk()
     {
         utils::writeLog("User confirmed");
         bool unmountSuccess = unmountDisk();
+
+        if (unmountSuccess == false)
+        {
+            utils::displayError("Unmount failed!", "Could not unmount device " + devicePath + ". Check the log for error messages. Will have to quit now.", true);
+            QApplication::quit();
+        }
+
+        /*
+         * Ok, everything seems fine now.
+         * Should we do a double check if the device is really unmounted?
+         * Yes, I'm paranoid.
+         */
         #ifdef Q_OS_MAC
-        //io::writeImageOSX(devicePath, deviceImage);
+        io::writeImageOSX(devicePath, deviceImage);
         #endif
     }
     else
@@ -58,7 +71,7 @@ void ExtractProgress::writeImageToDisk()
 bool ExtractProgress::unmountDisk()
 {
     #ifdef Q_OS_MAC
-    //io::unmountDiskOSX(this->devicePath);
+    return io::unmountDiskOSX(this->devicePath);
     #endif
 
         /* now check if we are really unmounted. maybe a bit clumsy - feel free to find a better solution */
