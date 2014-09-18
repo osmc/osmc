@@ -74,7 +74,7 @@ void ExtractWorker::process()
                 return;
          }
             have = CHUNKSIZE - strm.avail_out;
-            written += CHUNKSIZE;
+            written += have;
 
             emit progressUpdate(written);
             if (fwrite(out, 1, have, dest) != have || ferror(dest))
