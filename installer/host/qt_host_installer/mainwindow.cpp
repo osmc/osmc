@@ -17,7 +17,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "io.h"
+#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 #include "nixdiskdevice.h"
+#endif
 #include "licenseagreement.h"
 #include "downloadprogress.h"
 #include "extractprogress.h"
@@ -154,7 +156,9 @@ void MainWindow::setPreseed(int installType)
     {
         /* Straight to device selection */
         ds = new DeviceSelection(this);
+        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        #endif
         rotateWidget(ps, ds);
     }
 }
@@ -186,7 +190,9 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
         nss->setDHCP(true);
         nss->setWireless(false);
         ds = new DeviceSelection(this);
+        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        #endif
         rotateWidget(ns, ds);
     }
 }
@@ -209,7 +215,9 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
     else
     {
         ds = new DeviceSelection(this);
+        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        #endif
         rotateWidget(ans, ds);
     }
 }
@@ -223,10 +231,13 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     if (! nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE)
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
+    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+    #endif
     rotateWidget(wss, ds);
 }
 
+#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 void MainWindow::selectNixDevice(NixDiskDevice *nd)
 {
     this->nd = nd;
@@ -235,6 +246,7 @@ void MainWindow::selectNixDevice(NixDiskDevice *nd)
     rotateWidget(ds, la);
     this->installDevicePath = nd->getDiskPath();
 }
+#endif
 
 void MainWindow::acceptLicense()
 {

@@ -9,6 +9,7 @@
 
 namespace io
 {
+#if defined(Q_OS_LINUX)
    QList<NixDiskDevice * > enumerateDeviceLinux()
     {
        QList<NixDiskDevice *> devices;
@@ -49,7 +50,8 @@ namespace io
         }
         return devices;
         }
-
+#endif
+#if defined(Q_OS_MAC)
    QList<NixDiskDevice *> enumerateDeviceOSX()
    {
        QList<NixDiskDevice *> devices;
@@ -118,7 +120,7 @@ namespace io
 
        return true;
    }
-
+#endif
    /*!
        Read the last four bytes of the given file and interpret them
        to be the size in bytes of the uncompressed gzip file.

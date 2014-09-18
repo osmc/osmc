@@ -2,7 +2,9 @@
 #include "ui_deviceselection.h"
 #include "utils.h"
 #include "io.h"
+#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 #include "nixdiskdevice.h"
+#endif
 #include <QListWidgetItem>
 #include <QMap>
 
@@ -32,6 +34,7 @@ void DeviceSelection::showDevices()
     #ifdef Q_OS_LINUX
     QList<NixDiskDevice *> nixdevices = io::enumerateDeviceLinux();
     #endif
+    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     for (int i = 0; i < nixdevices.count(); i++)
     {
         NixDiskDevice *device = nixdevices.at(i);
@@ -41,6 +44,7 @@ void DeviceSelection::showDevices()
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Unchecked);
     }
+    #endif
 }
 
 void DeviceSelection::on_refreshButton_clicked()

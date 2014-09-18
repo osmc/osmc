@@ -3,8 +3,12 @@
 
 namespace io
 {
+#if defined(Q_OS_LINUX)
      QList<NixDiskDevice *> enumerateDeviceLinux();
+#endif
+#if defined(Q_OS_MAC)
      QList<NixDiskDevice *> enumerateDeviceOSX();
      bool writeImageOSX(QString devicePath, QString deviceImage);
+#endif
      int getDecompressedSize(QString gzFilename);
 }
