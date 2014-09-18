@@ -97,9 +97,6 @@ namespace io
        return devices;
       }
 
-   /* TODO - not sure what has to be done here to make this concurrent so we can have a wait-spin-icon
-    * on the GUI
-    */
    bool writeImageOSX(QString devicePath, QString deviceImage)
    {
        QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m\" with administrator privileges";
@@ -113,9 +110,11 @@ namespace io
        p.write(aScript.toUtf8());
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
-       QByteArray result = p.readAll();
-       QString resultAsString(result); // if appropriate
-       qDebug() << "the result of the script is" << resultAsString;
+       QByteArray stdout = p.readAllStandardOutput();
+       QByteArray stderr = p.readAllStandardError();
+
+       qDebug() << "the stdout of the script is" << QString(stdout);
+       qDebug() << "the stderr of the script is" << QString(stderr);
        p.waitForFinished(-1);
 
        return true;
