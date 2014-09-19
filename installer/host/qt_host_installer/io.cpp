@@ -119,6 +119,7 @@ namespace io
 
    bool writeImageOSX(QString devicePath, QString deviceImage)
    {
+       //MAYBE THIS WORKS WHEN IN THE WIDGET?
        QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m\" with administrator privileges";
 
        QString osascript = "/usr/bin/osascript";
@@ -126,16 +127,24 @@ namespace io
        processArguments << "-l" << "AppleScript";
 
        QProcess p;
-       p.start(osascript, processArguments);
+       p.start(osascript);
+       p.waitForStarted();
        p.write(aScript.toUtf8());
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
+       p.waitForFinished(-1);
        QByteArray stdout = p.readAllStandardOutput();
        QByteArray stderr = p.readAllStandardError();
 
        qDebug() << "the stdout of the script is" << QString(stdout);
        qDebug() << "the stderr of the script is" << QString(stderr);
-       p.waitForFinished(-1);
+       qDebug() << "exitCode: " << p.exitCode();
+
+       if (p.exitStatus() == QProcess::NormalExit) {
+           qDebug("normal exit");
+       } else {
+           qDebug("crash exit");
+       }
 
        return true;
    }
@@ -168,7 +177,8 @@ namespace io
           return true;
        }
    }
-#endif
+#endif /* endif OSX */
+
    /*!
        Read the last four bytes of the given file and interpret them
        to be the size in bytes of the uncompressed gzip file.

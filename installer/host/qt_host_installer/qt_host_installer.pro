@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     extractprogress.cpp \
     successdialog.cpp \
     preseeder.cpp \
-    extractworker.cpp
+    extractworker.cpp \
+    writeimageworker.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -54,7 +55,8 @@ HEADERS  += mainwindow.h \
     extractprogress.h \
     successdialog.h \
     preseeder.h \
-    extractworker.h
+    extractworker.h \
+    writeimageworker.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
