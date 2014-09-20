@@ -11,8 +11,10 @@ ICONSET_NAME="logo.icns"
 
 pushd ${TARGET}
 if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
+rm Makefile 
+rm -rf ${TARGET}.app
 echo Building installer
-qmake
+qmake -spec macx-g++
 make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 
