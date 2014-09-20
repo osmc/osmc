@@ -151,14 +151,15 @@ namespace io
 
    bool unmountDiskOSX(QString devicePath)
    {
-       QString aScript ="do shell script \"diskutil unmountDisk "+ devicePath +"\" with administrator privileges";
+       //QString aScript ="do shell script \"diskutil unmountDisk "+ devicePath +"\" with administrator privileges";
+       QString aScript ="diskutil";
 
        QString osascript = "/usr/bin/osascript";
        QStringList processArguments;
        QProcess p;
-       processArguments << "-l" << "AppleScript";
+       processArguments << "unmountDisk" << devicePath;
 
-       p.start(osascript, processArguments);
+       p.start(aScript, processArguments);
 
        p.write(aScript.toUtf8());
        p.closeWriteChannel();
