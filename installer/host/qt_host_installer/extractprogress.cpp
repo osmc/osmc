@@ -28,6 +28,7 @@ void ExtractProgress::extract()
     if (deviceImage.endsWith(".gz"))
     {
         doExtraction();
+        deviceImage.remove(".gz");
     }
     else if (deviceImage.endsWith(".img"))
     {
