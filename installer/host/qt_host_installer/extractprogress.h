@@ -24,8 +24,10 @@ public:
 public slots:
     void extract();
     void extractError();
+    void writeError();
     void setProgress(unsigned);
     void finished();
+    void writeFinished();
 
 private:
     Ui::ExtractProgress *ui;

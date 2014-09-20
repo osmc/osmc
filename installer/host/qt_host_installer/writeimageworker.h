@@ -6,8 +6,13 @@
 class WriteImageWorker : public QObject
 {
     Q_OBJECT
+
+    QString deviceImage;
+    QString devicePath;
+
 public:
     explicit WriteImageWorker(QObject *parent = 0);
+    WriteImageWorker(QString deviceImage, QString devicePath);
 
 signals:
     void finished();
