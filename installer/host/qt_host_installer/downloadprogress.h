@@ -21,7 +21,7 @@ public:
     ~DownloadProgress();
 
 public slots:
-    void download(QWidget *parent, QUrl URL);
+    void download(QWidget *parent, QUrl URL, bool isOnline);
 
 signals:
     void downloadCompleted(QString);

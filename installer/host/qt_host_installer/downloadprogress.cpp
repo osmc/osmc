@@ -20,16 +20,23 @@ DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
     ui->setupUi(this);
 }
 
-void DownloadProgress::download(QWidget *parent, QUrl URL)
+void DownloadProgress::download(QWidget *parent, QUrl URL, bool isOnline)
 {
-    if (URL.toString() == "local")
+    QString filelocation(URL.toString());
+
+    if (isOnline == false)
     {
+        /* sanitize local filename */
+#ifdef Q_OS_MAC
+         filelocation.replace("file://","");
+#endif
         /* Emit and bail! */
-        emit downloadCompleted("local");
+        emit downloadCompleted(filelocation);
         return;
     }
-    utils::writeLog("Downloading " + URL.toString());
-    QStringList urlSeg = URL.toString().split("/");
+
+    utils::writeLog("Downloading " + filelocation);
+    QStringList urlSeg = filelocation.split("/");
     fileName = urlSeg.at((urlSeg.count() - 1));
     /* Do we have the file or an uncompressed version? */
     if (QFile(QDir::homePath() + "/" + fileName).exists() || QFile(QDir::homePath() + "/" + QString(fileName).remove(".gz")).exists())
