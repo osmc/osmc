@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include <QFile>
 #include "utils.h"
+#include <QDir>
 
 #define CHUNKSIZE 8192
 
@@ -18,7 +19,7 @@ void ExtractWorker::process()
 {
     QFile sourceFile(sourceName);
     QFile targetFile(destName);
-
+    QString home = QDir::homePath();
     bool sourceopen = sourceFile.open(QIODevice::ReadOnly);
     int sourceFileDescriptor = sourceFile.handle();
     FILE* source = fdopen(sourceFileDescriptor, "rb");
