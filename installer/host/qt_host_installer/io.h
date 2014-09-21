@@ -1,15 +1,13 @@
 #include <QString>
 #include "nixdiskdevice.h"
+#if defined(Q_OS_LINUX)
+#include "io_linux.h"
+#endif
+#if defined(Q_OS_MAC)
+#include "io_osx.h"
+#endif
 
 namespace io
 {
-#if defined(Q_OS_LINUX)
-     QList<NixDiskDevice *> enumerateDeviceLinux();
-#endif
-#if defined(Q_OS_MAC)
-     QList<NixDiskDevice *> enumerateDeviceOSX();
-     bool writeImageOSX(QString devicePath, QString deviceImage);
-     bool unmountDiskOSX(QString devicePath);
-#endif
      int getDecompressedSize(QString gzFilename);
 }

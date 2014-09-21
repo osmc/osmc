@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     successdialog.cpp \
     preseeder.cpp \
     extractworker.cpp \
-    writeimageworker.cpp
+    writeimageworker.cpp \
+    io_osx.cpp \
+    io_linux.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -56,7 +58,9 @@ HEADERS  += mainwindow.h \
     successdialog.h \
     preseeder.h \
     extractworker.h \
-    writeimageworker.h
+    writeimageworker.h \
+    io_osx.h \
+    io_linux.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
