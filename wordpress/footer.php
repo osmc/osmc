@@ -71,6 +71,8 @@
 				<p class="designed">(c) 2014 OSMC </p>
 				<br>
 				<a href="http://osmc.tv/about/corporate" class="designed">Corporate</a></br>
+				<br>
+				<a href="http://status.osmc.io" class="designed">System Status</a></br>
 				</div> <?php // end #inner-footer ?>
 
 			</footer> <?php // end footer ?>
