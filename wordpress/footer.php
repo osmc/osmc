@@ -43,7 +43,7 @@
 						$LOGO_STRING = "Logo af Simon Brunton";
 						$DESIGN_STRING = "Designet af Mark Theis Madsen";
 						break;
-						case "se":
+						case "sv":
 						$LOGO_STRING = "Logga av Simon Brunton";
 						$DESIGN_STRING = "Designad av Mark Theis Madsen";
 						case "de":

@@ -19,7 +19,7 @@ function displaySocialWidget()
    case "da":
              $TITLE = "Social";
              break;
-   case "se":
+   case "sv":
              $TITLE = "Socialt";
 	     break;
    case "de":
@@ -47,32 +47,32 @@ function displayDonationWidget()
    switch ($lang)
    {
    case "fr":
-	     $TITLE = "";
-	     $TEXT = "";
+	     $TITLE = "Spenden";
+	     $TEXT = "OSMC ist ein neues Projekt in den Startlöchern das eure Unterstützung braucht, um Wirklichkeit zu werden.";
              break;
    case "da":
-	     $TITLE = "";
-	     $TEXT = "";
+	     $TITLE = "Donér";
+	     $TEXT = "OSMC er et kommende nyt projekt der har brug for din støtte for at være sikker på at komme godt fra start.";
              break;
-   case "se":
-	     $TITLE = "";
-	     $TEXT = "";
+   case "sv":
+	     $TITLE = "Donera";
+	     $TEXT = "OSMC är ett nytt kommande projekt som behöver lite stöd för att säkerställa en bra grund att bygga på.";
 	     break;
    case "de":
 	     $TITLE = "";
 	     $TEXT = "";
 	     break;
    case "nl":
-	     $TITLE = "";
-	     $TEXT = "";
+	     $TITLE = "Doneren";
+	     $TEXT = "OSMC is een nieuw en opkomend project dat uw ondersteuning kan gebruiken om tot zijn recht te komen.";
 	     break;
    case "ru":
 	     $TITLE = "пожертвовать";
 	     $TEXT = "OSMC - новый и развивающийся проект, которому требуется помощь для того, чтоб встать на ноги.";
 	     break;
    case "es":
-	     $TITLE = "";
-	     $TEXT = "";
+	     $TITLE = "Donar";
+	     $TEXT = "OSMC es un nuevo y próximo proyecto que necesita algo de soporte para asegurar que caiga de pie.";
 	     break;
    }
    echo '<br>';
