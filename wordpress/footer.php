@@ -46,18 +46,23 @@
 						case "sv":
 						$LOGO_STRING = "Logga av Simon Brunton";
 						$DESIGN_STRING = "Designad av Mark Theis Madsen";
+						break;
 						case "de":
 						$LOGO_STRING = "Logo von Simon Brunton";
 						$DESIGN_STRING = "Design von Simon Brunton";
+						break;
 						case "nl":
 						$LOGO_STRING = "Logo ontworpen door Simon Brunton";
 						$DESIGN_STRING = "Ontworpen door Mark Theis Madsen";
+						break;
 						case "es":
 						$LOGO_STRING = "Logo por Simon Brunton";
 						$DESIGN_STRING = "Diseño por Mark Theis Madsen";
+						break;
 						case "ru":
 						$LOGO_STRING = "Логотип - Саймон Брантон";
 						$DESIGN_STRING = "Дизайн от Марка Т. Мэдсена";
+						break;
 					}
                                 ?>
 				<br>

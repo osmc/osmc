@@ -49,11 +49,11 @@ function displayDonationWidget()
    case "fr":
 	     $TITLE = "Spenden";
 	     $TEXT = "OSMC ist ein neues Projekt in den Startlöchern das eure Unterstützung braucht, um Wirklichkeit zu werden.";
-             break;
+         break;
    case "da":
 	     $TITLE = "Donér";
 	     $TEXT = "OSMC er et kommende nyt projekt der har brug for din støtte for at være sikker på at komme godt fra start.";
-             break;
+         break;
    case "sv":
 	     $TITLE = "Donera";
 	     $TEXT = "OSMC är ett nytt kommande projekt som behöver lite stöd för att säkerställa en bra grund att bygga på.";
