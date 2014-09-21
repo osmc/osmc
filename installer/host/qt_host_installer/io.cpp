@@ -50,6 +50,98 @@ namespace io
         }
         return devices;
         }
+
+   QStringList enumerateDevicePartitionsLinux(QString devicePath)
+   {
+       QStringList devices;
+       utils::writeLog("Enumerating partitions for Linux");
+       QProcess process;
+       QStringList lines;
+       //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l "+devicePath, QIODevice::ReadWrite | QIODevice::Text);
+       process.start("/sbin/fdisk", QStringList() << "-l" << devicePath, QIODevice::ReadWrite | QIODevice::Text);
+       if (! process.waitForFinished())
+           utils::writeLog("Could not execute fdisk to enumerate devices");
+       else
+       {
+           QTextStream stdoutStream(process.readAllStandardOutput());
+           while (true)
+           {
+               QString line = stdoutStream.readLine();
+               if (line.isNull())
+                   break;
+               else
+                   lines << line << "\n";
+           }
+           for (int i = 0; i < lines.count(); i++)
+           {
+               QString line = lines.at(i);
+               if (line.startsWith(devicePath))
+               {
+                   QStringList deviceAttr = line.split(" ");
+                   QString devicePath;
+                   devicePath = deviceAttr.at(0);
+                   devices.append(devicePath.trimmed());
+               }
+           }
+       }
+       return devices;
+   }
+
+   bool writeImageLinux(QString devicePath, QString deviceImage)
+   {
+       utils::writeLog("Writing image to device for Linux");
+       QProcess p;
+       p.start("/usr/bin/gksudo", QStringList() << "dd if="+deviceImage+" of="+devicePath+" bs=1m");
+       p.waitForReadyRead(-1);
+       p.waitForFinished(-1);
+       QByteArray stdout = p.readAllStandardOutput();
+       QByteArray stderr = p.readAllStandardError();
+
+       qDebug() << "the stdout of the script is" << QString(stdout);
+       qDebug() << "the stderr of the script is" << QString(stderr);
+       qDebug() << "exitCode: " << p.exitCode();
+
+       if (p.exitStatus() == QProcess::NormalExit) {
+           qDebug("normal exit");
+           return true;
+       } else {
+           qDebug("crash exit");
+       }
+
+       return false;
+   }
+
+   bool unmountDiskLinux(QString devicePath)
+   {
+       QStringList partitions = enumerateDevicePartitionsLinux(devicePath);
+       QStringListIterator it(partitions);
+       QProcess p;
+       bool failedUmount = false;
+       while(it.hasNext()) {
+           QString partition = it.next();
+           p.start("/usr/bin/gksudo", QStringList() << "umount "+partition);
+           p.waitForReadyRead(-1);
+           p.waitForFinished(-1);
+           QByteArray stdout = p.readAllStandardOutput();
+           QByteArray stderr = p.readAllStandardError();
+
+           qDebug() << "the stdout of the script is" << QString(stdout);
+           qDebug() << "the stderr of the script is" << QString(stderr);
+           qDebug() << "exitCode: " << p.exitCode();
+
+           if (p.exitStatus() == QProcess::NormalExit) {
+               qDebug("normal exit");
+           } else {
+               qDebug("crash exit");
+               failedUmount = true;
+           }
+       }
+       if(failedUmount) {
+           return false;
+       }
+       return true;
+   }
+
 #endif
 #if defined(Q_OS_MAC)
    QList<NixDiskDevice *> enumerateDeviceOSX()

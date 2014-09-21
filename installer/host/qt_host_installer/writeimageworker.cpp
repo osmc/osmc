@@ -20,6 +20,9 @@ void WriteImageWorker::process()
 #ifdef Q_OS_MAC
     success = io::writeImageOSX(this->devicePath, this->deviceImage);
 #endif
+#ifdef Q_OS_LINUX
+    success = io::writeImageLinux(this->devicePath, this->deviceImage);
+#endif
 
     if (success)
     {
