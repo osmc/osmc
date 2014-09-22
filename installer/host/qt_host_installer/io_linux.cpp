@@ -46,4 +46,14 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      }
      return devices;
      }
+bool writeImageLinux(QString devicePath, QString deviceImage)
+{
+
+}
+
+bool unmountDiskLinux(QString devicePath)
+{
+
+}
+
 }
