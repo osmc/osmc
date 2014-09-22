@@ -92,11 +92,13 @@ namespace io
 
        if (p.exitStatus() == QProcess::NormalExit) {
            utils::writeLog("Imaging was successful");
-       } else {
-           utils::writeLog("Imaging failed!");
+           return true;
        }
-
-       return true;
+       else
+       {
+           utils::writeLog("Imaging failed!");
+           return false;
+       }
    }
 
    bool unmountDiskOSX(QString devicePath)
@@ -121,10 +123,9 @@ namespace io
        {
            utils::writeLog("Could not unmount " + devicePath + ". Message was: " + QString(stderrArray));
            return false;
-       } else
-       {
-          return true;
        }
+       else
+          return true;
    }
 
 }
