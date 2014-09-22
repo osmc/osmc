@@ -9,7 +9,6 @@
 
 namespace io
 {
-#if defined(Q_OS_MAC)
    QList<NixDiskDevice *> enumerateDeviceOSX()
    {
        QList<NixDiskDevice *> devices;
@@ -24,10 +23,10 @@ namespace io
            QTextStream stdoutStream(process.readAllStandardOutput());
            while (true)
            {
-               QString line = stdoutStream.readLine().simplified(); //remove trailing and leading ws
+               QString line = stdoutStream.readLine().simplified(); /* Remove trailing and leading ws */
                if (line.isNull())
                    break;
-               // the line holding the device is the only line always starting with 0:
+               /* The line holding the device is the only line always starting with 0: */
                else if (line.startsWith("0:"))
                {
                    lines << line;
@@ -38,7 +37,7 @@ namespace io
                QString line = lines.at(i);
                QStringList deviceAttr = line.split(" ");
 
-               /**
+               /*
                 * THE FOLLOWING LIST CHANGES IF THE DISK WAS NOT INITIALISED
                 * In that case, <partition schema name> is missing and the
                 * index for the following elements has to be adressed by n-1
@@ -48,7 +47,7 @@ namespace io
                 * [2] <total_size>
                 * [3] <size_unit>
                 * [4] device name (disk0, disk1, etc)
-                **/
+                */
 
                /* TODO when we refactor IO into platform specific implementations
                 * provide definitions for the fields for easy arithmetic on the indices
@@ -77,7 +76,6 @@ namespace io
 
    bool writeImageOSX(QString devicePath, QString deviceImage)
    {
-       //MAYBE THIS WORKS WHEN IN THE WIDGET?
        QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m\" with administrator privileges";
 
        QString osascript = "/usr/bin/osascript";
@@ -91,17 +89,11 @@ namespace io
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);
-       QByteArray stdout = p.readAllStandardOutput();
-       QByteArray stderr = p.readAllStandardError();
-
-       qDebug() << "the stdout of the script is" << QString(stdout);
-       qDebug() << "the stderr of the script is" << QString(stderr);
-       qDebug() << "exitCode: " << p.exitCode();
 
        if (p.exitStatus() == QProcess::NormalExit) {
-           qDebug("normal exit");
+           utils::writeLog("Imaging was successful");
        } else {
-           qDebug("crash exit");
+           utils::writeLog("Imaging failed!");
        }
 
        return true;
@@ -109,7 +101,6 @@ namespace io
 
    bool unmountDiskOSX(QString devicePath)
    {
-       //QString aScript ="do shell script \"diskutil unmountDisk "+ devicePath +"\" with administrator privileges";
        QString aScript ="diskutil";
 
        QString osascript = "/usr/bin/osascript";
@@ -125,30 +116,15 @@ namespace io
        p.waitForFinished(-1);
        QByteArray stderrArray = p.readAllStandardError();
 
-       /* assume that a non empty stdErr means everything failed */
+       /* Non-empty stderr indicates failure */
        if (stderrArray.size() > 0)
        {
            utils::writeLog("Could not unmount " + devicePath + ". Message was: " + QString(stderrArray));
            return false;
        } else
        {
-          /* hooray! */
           return true;
        }
    }
-#endif /* endif OSX */
-
-   /*!
-       Read the last four bytes of the given file and interpret them
-       to be the size in bytes of the uncompressed gzip file.
-
-       This method does not test if the given filename denotes
-       an actual gzip file.
-
-       This method does not care about endianess.
-
-       Return the size in bytes.
-       Returns -1 if the file could not be opened.
-   */
 
 }

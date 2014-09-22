@@ -1,5 +1,4 @@
 #include <QString>
-#include "nixdiskdevice.h"
 #if defined(Q_OS_LINUX)
 #include "io_linux.h"
 #endif
