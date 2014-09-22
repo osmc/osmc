@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     this->setFixedSize(this->size());
     ui->setupUi(this);
+    ui->backButton->hide();
+    connect(ui->backButton, SIGNAL(clicked()), this, SLOT(goBack()));
+
     /* Attempt auto translation */
     QString autolocale = QLocale::system().name();
     utils::writeLog("Detected locale as " + autolocale);
@@ -69,6 +72,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget)
 {
+
+    if (this->widgetList.size() == 0)
+    {
+        this->widgetList.append(oldWidget);
+    }
+
+    this->widgetList.append(newWidget);
+
     oldWidget->hide();
     newWidget->move(WIDGET_START);
     newWidget->show();
@@ -116,7 +127,21 @@ void MainWindow::setLanguage(QString language, SupportedDevice device)
         }
         vs = new VersionSelection(this, this->device.getDeviceShortName(), this->mirrorURL);
         connect(vs, SIGNAL(versionSelected(bool, QUrl)), this, SLOT(setVersion(bool, QUrl)));
+        ui->backButton->show();
         rotateWidget(ls, vs);
+}
+
+void MainWindow::goBack()
+{
+
+    this->widgetList.last()->deleteLater();
+    this->widgetList.pop_back();
+    this->widgetList.last()->show();
+
+    if (this->widgetList.size() == 1)
+    {
+        ui->backButton->hide();
+    }
 }
 
 void MainWindow::setVersion(bool isOnline, QUrl image)

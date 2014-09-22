@@ -18,6 +18,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    QList<QWidget *> widgetList;
     
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -39,6 +40,7 @@ public slots:
     void dismissUpdate();
     void replyFinished(QNetworkReply* reply);
     void rotateWidget(QWidget *oldWidget, QWidget *newWidget);
+    void goBack();
     
 private:
     Ui::MainWindow *ui;
