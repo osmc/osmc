@@ -8,6 +8,7 @@ namespace io
 {
 QList<NixDiskDevice * > enumerateDeviceLinux()
  {
+    UpdateKernelTable();
     QList<NixDiskDevice *> devices;
      utils::writeLog("Enumerating imageable devices for Linux");
      QProcess process;
@@ -48,12 +49,19 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      }
 bool writeImageLinux(QString devicePath, QString deviceImage)
 {
-
+    UpdateKernelTable();
 }
 
 bool unmountDiskLinux(QString devicePath)
 {
 
+    UpdateKernelTable();
+}
+
+void UpdateKernelTable()
+{
+    utils::writeLog("Running partprobe to inform operating system about partition table changes");
+    system("/sbin/partprobe");
 }
 
 }
