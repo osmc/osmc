@@ -3,6 +3,8 @@
 #include <QStringList>
 #include "utils.h"
 #include "nixdiskdevice.h"
+#include <QFile>
+#include "sys/mount.h"
 
 namespace io
 {
@@ -54,7 +56,33 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
 
 bool unmountDiskLinux(QString devicePath)
 {
+    /* Read /proc/mounts and find out what partitions of the disk we are using are mounted */
+    QFile partitionsFile("/proc/mounts");
+    if(!partitionsFile.open(QIODevice::ReadOnly))
+        utils::writeLog("Can't read /proc/mounts!");
 
+    QTextStream input(&partitionsFile);
+
+    while(!input.atEnd()) {
+        QString line = input.readLine();
+        if (line.startsWith(devicePath))
+        {
+            QStringList devicePartition = line.split(" ");
+            utils::writeLog("Trying to unmount " + devicePartition.at(0));
+            if (umount(devicePartition.at(0).toLocal8Bit()))
+            {
+                utils::writeLog("Partition unmounted successfully, continuing!");
+                return true;
+            }
+            else
+            {
+                utils::writeLog("An error occured unmounting the partition");
+                return false;
+            }
+        }
+    }
+
+    partitionsFile.close();
     UpdateKernelTable();
 }
 
