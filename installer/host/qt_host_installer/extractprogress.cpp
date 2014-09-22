@@ -54,6 +54,7 @@ void ExtractProgress::writeImageToDisk()
         {
             utils::displayError("Unmount failed!", "Could not unmount device " + devicePath + ". Check the log for error messages. Will have to quit now.", true);
             QApplication::quit();
+            return;
         }
 
         /*
