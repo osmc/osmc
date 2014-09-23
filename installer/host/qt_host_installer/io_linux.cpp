@@ -52,9 +52,41 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      }
      return devices;
      }
+
 bool writeImageLinux(QString devicePath, QString deviceImage)
 {
+    QFile imageFile(deviceImage);
+    QFile deviceFile(devicePath);
+    bool imageOpen = imageFile.open(QIODevice::ReadOnly);
+    bool deviceOpen = deviceFile.open(QIODevice::WriteOnly);
+    if(!imageOpen) {
+        utils::writeLog("error opening image");
+        return false;
+    }
+    if(!deviceOpen) {
+        utils::writeLog("error opening device");
+        return false;
+    }
+    char buf[512*1024];
+    QDataStream in(&imageFile);
+    QDataStream out(&deviceFile);
+    int r = in.readRawData(buf,sizeof(buf));
+    int ret;
+    while(r>0) {
+        ret = out.writeRawData(buf, r);
+        if(ret = -1 || ret != r) {
+            imageFile.close();
+            deviceFile.close();
+            utils::writeLog("error writing to device");
+            return false;
+        }
+        r = in.readRawData(buf,sizeof(buf));
+    }
+    imageFile.close();
+    deviceFile.close();
+
     UpdateKernelTable();
+    return true;
 }
 
 bool unmountDiskLinux(QString devicePath)
