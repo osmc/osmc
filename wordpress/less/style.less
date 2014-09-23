@@ -308,20 +308,16 @@ width: 70%;
 			}
 		}
 		#logo-img {
-			float: left;
-			height: 100%;
-      
-      a:hover, a:focus {
-      border-bottom: none;
-      }
+		  float: left;
+		  height: 100%;
 		}
 		img {
 			height: auto;
-			max-height: 1.8em;
+			max-height: 1.5em;
 			position: relative;
 			display: inline-block;
 			vertical-align: middle;
-			padding: 0 0.5em 0.15em 0;
+			padding: 0 0.5em 0.2em 0;
 		}
 		.lt-ie9 img {
 			max-height: 100px;
@@ -380,48 +376,69 @@ nav {
   }
 }
 #inner-footer {
-	width: 100%;
-	max-width: @pagewidth;
-	margin: 0 auto;
-	background-color: @black;
-	color: #fff;
-	padding: 2em 0 2em 0;
-	text-align: center;
+  width: 100%;
+  max-width: @pagewidth;
+  margin: 0 auto;
+  background-color: @black;
+  color: #fff;
+  padding: 2em 0 2em 0;
+  text-align: center;
+  position: relative;
+  
   p {
     color: @white;
   }
-	a {
-		color: #fff;
-	}
+  a {
+      color: #fff;
+  }
   a:hover, a:focus {
     border-bottom: 2px solid @white;
   }
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-    
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
     li {
       margin: 0.2em 0;
     }
-	}
-	.copyright {
-		margin: 2em 0 1em;
-		display: inline-block;
-    width: 10em;
-	}
-	.designed {
-		font-size: 0.8em;
-		display: inline-block;
-		color: @lgrey;
+  }
+  .footerinfo {
+    color: @lgrey;
     font-weight: 300;
-	}
-	.designed:hover {
-			border-bottom: none;
+    font-size: 0.8em;
+    margin: 2em 0 0;
+    
+    a:hover {
+      text-decoration: underline;
+      border-bottom: none;
+    }
+    p,a {
+      margin: 0;
+      font-weight: 300;
+      color: @lgrey;
+    }
+    
+	img {
+      margin: 0 0 1em;
+      display: inline-block;
+      width: 10em;
 	}
 	.boxpad {
 		padding: 0 1em 0 1em;
 	}
+    .corporate {
+      position: absolute;
+      left: 1.5em;
+      bottom: 1.5em;
+      text-align: left;
+    }
+    .status {
+      position: absolute;
+      right: 1.5em;
+      bottom: 1.5em;
+    }
+  }
 }
 // FOOTER //
 
