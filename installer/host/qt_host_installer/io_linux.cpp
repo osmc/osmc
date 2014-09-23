@@ -61,13 +61,20 @@ bool unmountDiskLinux(QString devicePath)
 {
     /* Read /proc/mounts and find out what partitions of the disk we are using are mounted */
     QFile partitionsFile("/proc/mounts");
-    if(!partitionsFile.open(QIODevice::ReadOnly))
+    if(!partitionsFile.open(QIODevice::ReadOnly)) {
         utils::writeLog("Can't read /proc/mounts!");
+        return false;
+    }
 
-    QTextStream input(&partitionsFile);
+    QString input(partitionsFile.readAll());
+    partitionsFile.close();
 
-    while(!input.atEnd()) {
-        QString line = input.readLine();
+    QStringList lines = input.split("\n");
+    bool ret = true;
+
+    QListIterator<QString> i(lines);
+    while (i.hasNext()) {
+        QString line = i.next();
         if (line.startsWith(devicePath))
         {
             QStringList devicePartition = line.split(" ");
@@ -76,20 +83,19 @@ bool unmountDiskLinux(QString devicePath)
             if (umount(devicePartition.at(0).toLocal8Bit()))
             {
                 utils::writeLog("Partition unmounted successfully, continuing!");
-                return true;
             }
             else
             {
                 utils::writeLog("An error occured unmounting the partition");
-                return false;
+                ret = false;
             }
            #endif
                 return false;
         }
     }
 
-    partitionsFile.close();
     UpdateKernelTable();
+    return ret;
 }
 
 void UpdateKernelTable()
