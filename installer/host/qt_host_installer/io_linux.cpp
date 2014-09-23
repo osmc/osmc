@@ -4,7 +4,9 @@
 #include "utils.h"
 #include "nixdiskdevice.h"
 #include <QFile>
+#if defined(Q_OS_LINUX)
 #include "sys/mount.h"
+#endif
 
 namespace io
 {
@@ -69,6 +71,7 @@ bool unmountDiskLinux(QString devicePath)
         {
             QStringList devicePartition = line.split(" ");
             utils::writeLog("Trying to unmount " + devicePartition.at(0));
+            #if defined(Q_OS_LINUX)
             if (umount(devicePartition.at(0).toLocal8Bit()))
             {
                 utils::writeLog("Partition unmounted successfully, continuing!");
@@ -79,6 +82,8 @@ bool unmountDiskLinux(QString devicePath)
                 utils::writeLog("An error occured unmounting the partition");
                 return false;
             }
+           #endif
+                return false;
         }
     }
 
@@ -88,8 +93,10 @@ bool unmountDiskLinux(QString devicePath)
 
 void UpdateKernelTable()
 {
+    #if defined(Q_OS_LINUX)
     utils::writeLog("Running partprobe to inform operating system about partition table changes");
     system("/sbin/partprobe");
+    #endif
 }
 
 }

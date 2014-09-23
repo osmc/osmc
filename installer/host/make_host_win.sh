@@ -19,12 +19,21 @@ if [ ! -f /c/Program\ Files/WinRAR/Rar.exe ]; then echo "Can't find WinRAR -- ma
 echo -e "Updating PATH"
 PATH="/qtbin:/mgwbin:/c/Program\ Files/Microsoft\ SDKs/Windows/v7.1/Bin:${PATH}"
 TARGET="qt_host_installer"
+ZLIB_VER="1.2.8"
 pushd ${TARGET}
-if [ -f Makefile ]; then echo "Cleaning" && mingw32-make clean; fi
+if [ -f Makefile ]; then echo "Cleaning Qt project" && mingw32-make clean; fi
+pushd w32-lib/zlib-${ZLIB_VER}
+make -f win32/Makefile.gcc clean
+popd
+echo Building zlib version ${ZLIB_VER}
+pushd w32-lib/zlib-${ZLIB_VER}
+make -f win32/Makefile.gcc
+if [ $? != 0 ]; then echo "Building zlib failed" && exit 1; fi
+popd
 echo Building installer
 qmake
 mingw32-make
-if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
+if [ $? != 0 ]; then echo "Building project failed" && exit 1; fi
 strip release/${TARGET}.exe
 echo Packaging installer
 popd

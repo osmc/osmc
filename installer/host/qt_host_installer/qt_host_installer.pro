@@ -11,10 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 TARGET = qt_host_installer
 TEMPLATE = app
 
-LIBS += -lz
-
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     utils.cpp \
     io.cpp \
     langselection.cpp \
@@ -37,6 +35,14 @@ SOURCES += main.cpp\
     writeimageworker.cpp \
     io_osx.cpp \
     io_linux.cpp
+
+LIBS += -lz
+
+w32:
+{
+    INCLUDEPATH += "w32-lib/zlib-1.2.8"
+    LIBS += -L./w32-lib/zlib-1.2.8
+}
 
 HEADERS  += mainwindow.h \
     utils.h \
