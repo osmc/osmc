@@ -6,6 +6,7 @@
 #include <QFile>
 #if defined(Q_OS_LINUX)
 #include "sys/mount.h"
+#include <stdlib.h>
 #endif
 
 namespace io
