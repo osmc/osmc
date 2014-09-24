@@ -136,6 +136,7 @@ void MainWindow::goBack()
 
     this->widgetList.last()->deleteLater();
     this->widgetList.pop_back();
+    this->widgetList.last()->move(WIDGET_START);
     this->widgetList.last()->show();
 
     if (this->widgetList.size() == 1)
