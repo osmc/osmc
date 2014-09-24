@@ -144,6 +144,16 @@ void MainWindow::goBack()
     }
 }
 
+void MainWindow::disableBack()
+{
+    this->ui->backButton->setEnabled(false);
+}
+
+void MainWindow::enableBack()
+{
+    this->ui->backButton->setEnabled(true);
+}
+
 void MainWindow::setVersion(bool isOnline, QUrl image)
 {
     if (isOnline)

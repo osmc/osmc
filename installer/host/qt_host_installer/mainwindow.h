@@ -41,6 +41,8 @@ public slots:
     void replyFinished(QNetworkReply* reply);
     void rotateWidget(QWidget *oldWidget, QWidget *newWidget);
     void goBack();
+    void disableBack();
+    void enableBack();
     
 private:
     Ui::MainWindow *ui;
