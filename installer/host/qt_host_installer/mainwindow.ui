@@ -89,8 +89,8 @@
      <rect>
       <x>520</x>
       <y>350</y>
-      <width>51</width>
-      <height>41</height>
+      <width>65</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -100,7 +100,26 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">color:rgb(240, 240, 240)</string>
+     <string notr="true">QPushButton {
+color:rgb(240, 240, 240);
+background: qradialgradient(cx: 0.3, cy: -0.4,
+fx: 0.3, fy: -0.4,
+radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+border-radius: 11px;
+}
+
+QPushButton:hover {
+background: qradialgradient(cx: 0.4, cy: -0.1,
+fx: 0.3, fy: -0.4,
+radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+}
+
+QPushButton:pressed {
+background: qradialgradient(cx: 0.1, cy: -0.1,
+fx: 0.4, fy: -0.1,
+radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+}
+</string>
     </property>
     <property name="text">
      <string>&lt;-</string>
