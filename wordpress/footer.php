@@ -35,8 +35,8 @@
                       switch ($lang)
                       {
                           case "fr":
-                          $LOGO_STRING = "Logo réalisé par Simon Brunton";
-                          $DESIGN_STRING = "Design réalisé par Mark Theis Madsen";
+                          $LOGO_STRING = "Logo de Simon Brunton";
+                          $DESIGN_STRING = "Design par Mark Theis Madsen";
                           break;
                           case "da":
                           $LOGO_STRING = "Logo af Simon Brunton";

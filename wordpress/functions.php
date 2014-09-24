@@ -46,7 +46,7 @@ function displayDonationWidget()
    $TEXT = "OSMC is a new and upcoming project that needs some support to make sure it lands on its feet.";
    switch ($lang)
    {
-   case "fr":
+   case "de":
 	     $TITLE = "Spenden";
 	     $TEXT = "OSMC ist ein neues Projekt in den Startlöchern das eure Unterstützung braucht, um Wirklichkeit zu werden.";
          break;
@@ -58,9 +58,9 @@ function displayDonationWidget()
 	     $TITLE = "Donera";
 	     $TEXT = "OSMC är ett nytt kommande projekt som behöver lite stöd för att säkerställa en bra grund att bygga på.";
 	     break;
-   case "de":
-	     $TITLE = "";
-	     $TEXT = "";
+   case "fr":
+	     $TITLE = "Participer";
+	     $TEXT = "OSMC est un nouveau et futur projet qui nécessite votre aide afin d'être mené a terme";
 	     break;
    case "nl":
 	     $TITLE = "Doneren";
