@@ -74,7 +74,7 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
     int ret;
     while(r>0) {
         ret = out.writeRawData(buf, r);
-        if(ret = -1 || ret != r) {
+        if(ret == -1 || ret != r) {
             imageFile.close();
             deviceFile.close();
             utils::writeLog("error writing to device");
