@@ -70,8 +70,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(updater, SIGNAL(hasUpdate()), this, SLOT(showUpdate()));
 }
 
-void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget)
+void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton)
 {
+
+
+    this->ui->backButton->setEnabled(enableBackbutton);
+
+    // make sure we update the state of the BackButton
+    qApp->processEvents();
 
     if (this->widgetList.size() == 0)
     {
@@ -143,16 +149,6 @@ void MainWindow::goBack()
     {
         ui->backButton->hide();
     }
-}
-
-void MainWindow::disableBack()
-{
-    this->ui->backButton->setEnabled(false);
-}
-
-void MainWindow::enableBack()
-{
-    this->ui->backButton->setEnabled(true);
 }
 
 void MainWindow::setVersion(bool isOnline, QUrl image)
@@ -291,7 +287,8 @@ void MainWindow::acceptLicense()
     dp = new DownloadProgress(this, this->image);
     url = this->image;
     connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
-    rotateWidget(la, dp);
+    connect(dp, SIGNAL(enableBackButton(bool)), this, SLOT(setEnableBackbutton(bool)));
+    rotateWidget(la, dp, false);
     dp->download(this, url, this->isOnline);
 }
 
@@ -303,7 +300,7 @@ void MainWindow::completeDownload(QString fileName)
     utils::writeLog("Creating preseeder");
     Preseeder *preseeder = new Preseeder();
     ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
-    rotateWidget(dp, ep);
+    rotateWidget(dp, ep, false);
     ep->extract();
 }
 

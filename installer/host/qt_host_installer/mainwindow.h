@@ -39,10 +39,8 @@ public slots:
     void showUpdate();
     void dismissUpdate();
     void replyFinished(QNetworkReply* reply);
-    void rotateWidget(QWidget *oldWidget, QWidget *newWidget);
+    void rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton = true);
     void goBack();
-    void disableBack();
-    void enableBack();
     
 private:
     Ui::MainWindow *ui;
