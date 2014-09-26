@@ -300,13 +300,14 @@ function bones_wpsearch($form) {
 	return $form;
 } // don't remove this bracket!
 
+// Remove standard rss feed
+
+remove_action('wp_head', 'feed_links', 2);
+
 function exclude_category($query) {
-if ( $query->is_home() ) {
-$query->set('cat', '-42');
-}
-if ( $query->is_feed() ) {
-$query->set('cat', '-42');
-}
+  if ( $query->is_home() ) {
+  $query->set('cat', '-42');
+  }
 return $query;
 }
 add_filter('pre_get_posts', 'exclude_category');
