@@ -42,7 +42,7 @@
         <meta name="msapplication-wide310x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x150.png">
         
 		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="http://osmc.tv/feed?cat=-42" />
+		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
 		<?php wp_head(); ?>
 
 	</head>
