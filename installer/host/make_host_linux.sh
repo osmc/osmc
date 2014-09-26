@@ -17,8 +17,10 @@ INSTALL="install"
 if [ -d ${INSTALL} ]; then echo "Cleaning old install directory " && rm -rf ${INSTALL}; fi
 mkdir -p ${INSTALL}
 mkdir -p ${INSTALL}/usr/bin/osmc
+mkdir -p ${INSTALL}/usr/lib/osmc
 mkdir -p ${INSTALL}/usr/share/applications
 cp ${TARGET}/${TARGET} ${INSTALL}/usr/bin/osmc/
+for lib in $(ldd ${INSTALL}/usr/bin/osmc/${TARGET}); do echo $lib | grep -q "/lib" && echo Copying $lib && cp $lib ${INSTALL}/usr/lib/osmc; done
 cp ${TARGET}/*.qm ${INSTALL}/usr/bin/osmc/ > /dev/null 2>&1
 cp ${TARGET}/osmcinstaller.desktop ${INSTALL}/usr/share/applications/
 cp ${TARGET}/icon.png ${INSTALL}/usr/bin/osmc/icon.png
