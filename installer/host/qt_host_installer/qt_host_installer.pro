@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     extractworker.cpp \
     writeimageworker.cpp \
     io_osx.cpp \
-    io_linux.cpp
+    io_linux.cpp \
+    io_windows.cpp
 
 LIBS += -lz
 
@@ -66,7 +67,8 @@ HEADERS  += mainwindow.h \
     extractworker.h \
     writeimageworker.h \
     io_osx.h \
-    io_linux.h
+    io_linux.h \
+    io_windows.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
