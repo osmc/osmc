@@ -55,15 +55,18 @@ void DeviceSelection::on_refreshButton_clicked()
 void DeviceSelection::on_devicenextButton_clicked()
 {
     int numItems = ui->devListWidget->count();
-    QListWidgetItem *item;
+    QListWidgetItem *choosenItem=NULL;
     int checkCount = 0;
-    for (int i = 1; i <= (numItems - 1); i++)
+    for (int i = 0; i <= (numItems-1); i++)
     {
         if (checkCount > 1)
             break;
-        item = ui->devListWidget->item(i);
+        QListWidgetItem* item = ui->devListWidget->item(i);
         if (item->checkState())
         {
+            if(!choosenItem) {
+                choosenItem = item;
+            }
             checkCount++;
         }
     }
@@ -75,8 +78,8 @@ void DeviceSelection::on_devicenextButton_clicked()
         utils::displayError(tr("Please select one device"), tr("You can only select one device to image"));
     } else {
         #if defined(Q_OS_LINUX ) || defined(Q_OS_MAC)
-        utils::writeLog("Device selected: " + item->text());
-        emit nixDeviceSelected((nixdevMap.value(item->text())));
+        utils::writeLog("Device selected: " + choosenItem->text());
+        emit nixDeviceSelected((nixdevMap.value(choosenItem->text())));
         #endif
     }
 }
