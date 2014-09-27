@@ -31,9 +31,7 @@ public slots:
     void setNetworkInitial(bool useWireless, bool advanced);
     void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     void selectNixDevice(NixDiskDevice *nd);
-    #endif
     void acceptLicense();
     void completeDownload(QString fileName);
     void showUpdate();
