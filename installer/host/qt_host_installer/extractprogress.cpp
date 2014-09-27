@@ -45,7 +45,7 @@ void ExtractProgress::writeImageToDisk()
     ui->extractProgressBar->setMaximum(0);
     ui->extractDetailsLabel->setText("Unmounting " + this->devicePath);
     utils::writeLog("Requesting confirmation from user");
-    const char* message = "Do you want to image the device " + this->devicePath.toAscii() + "? OSMC is not responsible for loss of personal data";
+    const char* message = ("Do you want to image the device " + this->devicePath + "? OSMC is not responsible for loss of personal data").toUtf8().constData();
     if (utils::promptYesNo(this, tr("Are you sure"), tr(message)))
     {
         utils::writeLog("User confirmed");
