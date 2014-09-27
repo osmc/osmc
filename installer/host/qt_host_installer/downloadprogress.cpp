@@ -39,11 +39,27 @@ void DownloadProgress::download(QWidget *parent, QUrl URL, bool isOnline)
     QStringList urlSeg = filelocation.split("/");
     fileName = urlSeg.at((urlSeg.count() - 1));
     /* Do we have the file or an uncompressed version? */
-    if (QFile(QDir::homePath() + "/" + fileName).exists() || QFile(QDir::homePath() + "/" + QString(fileName).remove(".gz")).exists())
+    bool uncompressed = QFile(QDir::homePath() + "/" + fileName).exists();
+    bool decompressed = QFile(QDir::homePath() + "/" + QString(fileName).remove(".gz")).exists();
+    if (uncompressed)
     {
-        if (! utils::promptYesNo(this, tr("Image found"), tr("Do you want to re-download this image?")));
+        if (! utils::promptYesNo(this, tr("Image found"), tr("Do you want to re-download this image?")))
         {
+            if(decompressed) {
+                if (! utils::promptYesNo(this, tr("Image found"), tr("Do you want to extract again?")))
+                {
+                    emit downloadCompleted(QDir::homePath() + "/" + QString(fileName).remove(".gz"));
+                    return;
+                }
+            }
             emit downloadCompleted(QDir::homePath() + "/" + fileName);
+            return;
+        }
+    }
+    else if (decompressed) {
+        if (! utils::promptYesNo(this, tr("Uncompressed Image found"), tr("Do you want to re-download this image?")))
+        {
+            emit downloadCompleted(QDir::homePath() + "/" + QString(fileName).remove(".gz"));
             return;
         }
     }
