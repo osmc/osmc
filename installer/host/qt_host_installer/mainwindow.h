@@ -23,6 +23,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    SupportedDevice *getSupportedDevice();
+    int getInstallType();
 
 public slots:
     void setLanguage(QString, SupportedDevice);

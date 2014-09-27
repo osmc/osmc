@@ -321,3 +321,13 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+SupportedDevice* MainWindow::getSupportedDevice()
+{
+    return &device;
+}
+
+int MainWindow::getInstallType()
+{
+    return installType;
+}

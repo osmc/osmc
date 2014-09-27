@@ -19,7 +19,7 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      QProcess process;
      QStringList lines;
      //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l", QIODevice::ReadWrite | QIODevice::Text); /* To run in Qt */
-     process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadWrite | QIODevice::Text);
+     process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadOnly | QIODevice::Text);
      if (! process.waitForFinished())
          utils::writeLog("Could not execute fdisk to enumerate devices");
      else
@@ -45,7 +45,21 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
                  devicePath.remove(":");
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
-                 NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
+                 bool removable = false;
+                 QString device = devicePath;
+                 device.remove(0,5);
+                 process.start("cat", QStringList() << "/sys/block/"+device+"/removable", QIODevice::ReadOnly);
+                 if (process.waitForFinished())
+                 {
+                     QString out = process.readAllStandardOutput();
+                     if(out.simplified().compare("1")==0) {
+                         removable = true;
+                     }
+                 }
+                 // No way to check if usb or sd when device is sdX, so set both if the device is removable
+                 bool sdCard = devicePath.contains("mmc") || (removable && !devicePath.contains("usb"));
+                 bool usb = devicePath.contains("usb") || (removable && !devicePath.contains("mmc"));
+                 NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace, removable, sdCard, usb);
                  devices.append(nd);
              }
          }
