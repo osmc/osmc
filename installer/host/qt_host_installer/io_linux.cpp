@@ -8,6 +8,7 @@
 #include "sys/mount.h"
 #include <stdlib.h>
 #endif
+#include "writeimageworker.h"
 
 namespace io
 {
@@ -19,7 +20,7 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      QProcess process;
      QStringList lines;
      //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l", QIODevice::ReadWrite | QIODevice::Text); /* To run in Qt */
-     process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadWrite | QIODevice::Text);
+     process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadOnly | QIODevice::Text);
      if (! process.waitForFinished())
          utils::writeLog("Could not execute fdisk to enumerate devices");
      else
@@ -45,7 +46,21 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
                  devicePath.remove(":");
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
-                 NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
+                 bool removable = false;
+                 QString device = devicePath;
+                 device.remove(0,5);
+                 process.start("cat", QStringList() << "/sys/block/"+device+"/removable", QIODevice::ReadOnly);
+                 if (process.waitForFinished())
+                 {
+                     QString out = process.readAllStandardOutput();
+                     if(out.simplified().compare("1")==0) {
+                         removable = true;
+                     }
+                 }
+                 // No way to check if usb or sd when device is sdX, so set both if the device is removable
+                 bool sdCard = devicePath.contains("mmc") || (removable && !devicePath.contains("usb"));
+                 bool usb = devicePath.contains("usb") || (removable && !devicePath.contains("mmc"));
+                 NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace, removable, sdCard, usb);
                  devices.append(nd);
              }
          }
@@ -53,8 +68,14 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      return devices;
      }
 
-bool writeImageLinux(QString devicePath, QString deviceImage)
+bool writeImageLinux(QString devicePath, QString deviceImage, QObject *caller)
 {
+    WriteImageWorker* worker = NULL;
+    if(caller) {
+        if(! (worker = qobject_cast<WriteImageWorker*>(caller)) ) {
+            worker = NULL;
+        }
+    }
     QFile imageFile(deviceImage);
     QFile deviceFile(devicePath);
     bool imageOpen = imageFile.open(QIODevice::ReadOnly);
@@ -70,6 +91,7 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
     char buf[512*1024];
     QDataStream in(&imageFile);
     QDataStream out(&deviceFile);
+    unsigned total = 0;
     int r = in.readRawData(buf,sizeof(buf));
     int ret;
     while(r>0) {
@@ -79,6 +101,10 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
             deviceFile.close();
             utils::writeLog("error writing to device");
             return false;
+        }
+        total += r;
+        if(worker){
+            emit worker->progressUpdate(total);
         }
         r = in.readRawData(buf,sizeof(buf));
     }
