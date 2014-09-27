@@ -16,7 +16,7 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
 {
     ui->setupUi(this);
 
-    ui->extractProgressBar->setMaximum(io::getDecompressedSize(deviceImage));
+    ui->extractProgressBar->setMaximum(0);
     ui->extractProgressBar->setMinimum(0);
 
     this->devicePath = QString(devicePath);
@@ -28,6 +28,8 @@ void ExtractProgress::extract()
 {
     if (deviceImage.endsWith(".gz"))
     {
+        ui->extractProgressBar->setMaximum(io::getDecompressedSize(deviceImage));
+        ui->extractProgressBar->setMinimum(0);
         doExtraction();
         deviceImage.remove(".gz");
     }
@@ -41,8 +43,9 @@ void ExtractProgress::extract()
 
 void ExtractProgress::writeImageToDisk()
 {
+    status = WRITING_STATUS;
+    ui->extractProgressBar->setMaximum(io::getFileSize(deviceImage));
     ui->extractProgressBar->setMinimum(0);
-    ui->extractProgressBar->setMaximum(0);
     ui->extractDetailsLabel->setText("Unmounting " + this->devicePath);
     utils::writeLog("Requesting confirmation from user");
     const char* message = ("Do you want to image the device " + this->devicePath + "? OSMC is not responsible for loss of personal data").toUtf8().constData();
@@ -105,6 +108,7 @@ bool ExtractProgress::unmountDisk()
 
 void ExtractProgress::doExtraction()
 {
+    status = EXTRACTING_STATUS;
     utils::writeLog("Extracting " + deviceImage);
 
     QThread* thread = new QThread;
@@ -135,8 +139,14 @@ void ExtractProgress::writeError()
 
 void ExtractProgress::setProgress(unsigned written)
 {
-    ui->extractProgressBar->setValue(written);
-    ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
+    if(status = EXTRACTING_STATUS){
+        ui->extractProgressBar->setValue(written);
+        ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
+    }
+    if(status = WRITING_STATUS){
+        ui->extractProgressBar->setValue(written);
+        ui->extractDetailsLabel->setText("Written " + QString::number(written / 1024 / 1024) + "MB");
+    }
 }
 
 /*!
@@ -158,7 +168,6 @@ void ExtractProgress::writeFinished()
 
     utils::writeLog("Finished extraction. Going to write image");
     utils::writeLog("HOOOOOORAY!");
-    qDebug("HOOOOOOOORAY!");
 }
 
 ExtractProgress::~ExtractProgress()
