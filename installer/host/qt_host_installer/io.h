@@ -9,4 +9,5 @@
 namespace io
 {
      int getDecompressedSize(QString gzFilename);
+     qint64 getFileSize(QString filename);
 }

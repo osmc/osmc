@@ -8,6 +8,7 @@
 #include "sys/mount.h"
 #include <stdlib.h>
 #endif
+#include "writeimageworker.h"
 
 namespace io
 {
@@ -67,8 +68,14 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      return devices;
      }
 
-bool writeImageLinux(QString devicePath, QString deviceImage)
+bool writeImageLinux(QString devicePath, QString deviceImage, QObject *caller)
 {
+    WriteImageWorker* worker = NULL;
+    if(caller) {
+        if(! (worker = qobject_cast<WriteImageWorker*>(caller)) ) {
+            worker = NULL;
+        }
+    }
     QFile imageFile(deviceImage);
     QFile deviceFile(devicePath);
     bool imageOpen = imageFile.open(QIODevice::ReadOnly);
@@ -84,6 +91,7 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
     char buf[512*1024];
     QDataStream in(&imageFile);
     QDataStream out(&deviceFile);
+    unsigned total = 0;
     int r = in.readRawData(buf,sizeof(buf));
     int ret;
     while(r>0) {
@@ -93,6 +101,10 @@ bool writeImageLinux(QString devicePath, QString deviceImage)
             deviceFile.close();
             utils::writeLog("error writing to device");
             return false;
+        }
+        total += r;
+        if(worker){
+            emit worker->progressUpdate(total);
         }
         r = in.readRawData(buf,sizeof(buf));
     }

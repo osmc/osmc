@@ -21,7 +21,7 @@ void WriteImageWorker::process()
     success = io::writeImageOSX(this->devicePath, this->deviceImage);
 #endif
 #ifdef Q_OS_LINUX
-    success = io::writeImageLinux(this->devicePath, this->deviceImage);
+    success = io::writeImageLinux(this->devicePath, this->deviceImage, this);
 #endif
 
     if (success)

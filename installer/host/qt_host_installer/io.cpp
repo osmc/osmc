@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <QByteArray>
+#include <QFile>
 
 namespace io
 {
@@ -43,4 +44,14 @@ namespace io
 
         return val;
     }
+
+    qint64 getFileSize(QString filename)
+    {
+        QFile file(filename);
+        if(file.exists()) {
+            return file.size();
+        }
+        return 0;
+    }
+
 }
