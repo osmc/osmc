@@ -269,16 +269,16 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     rotateWidget(wss, ds);
 }
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 void MainWindow::selectNixDevice(NixDiskDevice *nd)
 {
+#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     this->nd = nd;
     la = new LicenseAgreement(this);
     connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
     rotateWidget(ds, la);
     this->installDevicePath = nd->getDiskPath();
-}
 #endif
+}
 
 void MainWindow::acceptLicense()
 {
