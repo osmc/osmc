@@ -44,14 +44,13 @@ SOURCES += \
     io_linux.cpp
 }
 
-w32 {
+win32 {
 SOURCES += \
     io_windows.cpp
 }
-
 LIBS += -lz
 
-w32 {
+win32 {
     INCLUDEPATH += "w32-lib/zlib-1.2.8"
     LIBS += -L./w32-lib/zlib-1.2.8
 }
@@ -75,7 +74,8 @@ HEADERS  += mainwindow.h \
     successdialog.h \
     preseeder.h \
     extractworker.h \
-    writeimageworker.h
+    writeimageworker.h \
+    io.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
