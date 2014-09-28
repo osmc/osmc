@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
+    <width>640</width>
     <height>240</height>
    </rect>
   </property>
@@ -14,14 +14,16 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #17394A</string>
+   <string notr="true">color: #17394A;
+background: rgb(240, 240, 240);
+</string>
   </property>
   <widget class="QLabel" name="networkoptionsdescriptionLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>80</y>
-     <width>561</width>
+     <width>621</width>
      <height>21</height>
     </rect>
    </property>
@@ -32,7 +34,9 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>set up your wireless connection</string>
@@ -46,7 +50,7 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>561</width>
+     <width>621</width>
      <height>41</height>
     </rect>
    </property>
@@ -57,7 +61,9 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>networking</string>
@@ -83,23 +89,23 @@
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
-color:rgb(240, 240, 240);
+color:#17394A;
 background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
 }
 
 QPushButton:hover {
 background: qradialgradient(cx: 0.4, cy: -0.1,
 fx: 0.3, fy: -0.4,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 }
 
 QPushButton:pressed {
 background: qradialgradient(cx: 0.1, cy: -0.1,
 fx: 0.4, fy: -0.1,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 }
 </string>
    </property>
@@ -123,7 +129,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>SSID:</string>
@@ -148,15 +156,17 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QComboBox" name="keySelectionBox">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>230</x>
      <y>200</y>
-     <width>171</width>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -167,7 +177,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240);
+</string>
    </property>
    <property name="frame">
     <bool>true</bool>
@@ -183,7 +195,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     <rect>
      <x>10</x>
      <y>160</y>
-     <width>561</width>
+     <width>621</width>
      <height>21</height>
     </rect>
    </property>
@@ -194,7 +206,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>is your network encrypted?</string>
@@ -206,7 +220,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLineEdit" name="keylineEdit">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>410</x>
      <y>120</y>
      <width>121</width>
      <height>21</height>
@@ -219,13 +233,15 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QLabel" name="keyLabel">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>350</x>
      <y>120</y>
      <width>51</width>
      <height>21</height>
@@ -238,7 +254,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>Key:</string>

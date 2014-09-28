@@ -5,11 +5,11 @@
 #include "nixdiskdevice.h"
 #include <QList>
 #include <QTextStream>
-#include "io.h"
+#include "io_osx.h"
 
 namespace io
 {
-   QList<NixDiskDevice *> enumerateDevice()
+   QList<NixDiskDevice *> enumerateDeviceOSX()
    {
        QList<NixDiskDevice *> devices;
        utils::writeLog("Enumerating imageable devices for OSX");
@@ -74,7 +74,7 @@ namespace io
        return devices;
       }
 
-   bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
+   bool writeImageOSX(QString devicePath, QString deviceImage)
    {
        QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m\" with administrator privileges";
 
@@ -101,7 +101,7 @@ namespace io
        }
    }
 
-   bool unmountDisk(QString devicePath)
+   bool unmountDiskOSX(QString devicePath)
    {
        QString aScript ="diskutil";
 

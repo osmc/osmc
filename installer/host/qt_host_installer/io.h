@@ -1,13 +1,16 @@
 #include <QString>
-
-class QObject;
-class NixDiskDevice;
+#if defined(Q_OS_LINUX)
+#include "io_linux.h"
+#endif
+#if defined(Q_OS_MAC)
+#include "io_osx.h"
+#endif
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN)
+#include "io_windows.h"
+#endif
 
 namespace io
 {
-    QList<NixDiskDevice *> enumerateDevice();
-    bool writeImage(QString devicePath, QString deviceImage, QObject* caller=NULL);
-    bool unmountDisk(QString devicePath);
-    int getDecompressedSize(QString gzFilename);
-    qint64 getFileSize(QString filename);
+     int getDecompressedSize(QString gzFilename);
+     qint64 getFileSize(QString filename);
 }

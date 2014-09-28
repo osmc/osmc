@@ -17,8 +17,11 @@ void WriteImageWorker::process()
 {
 
     bool success = false;
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    success = io::writeImage(this->devicePath, this->deviceImage, this);
+#ifdef Q_OS_MAC
+    success = io::writeImageOSX(this->devicePath, this->deviceImage);
+#endif
+#ifdef Q_OS_LINUX
+    success = io::writeImageLinux(this->devicePath, this->deviceImage, this);
 #endif
 
     if (success)

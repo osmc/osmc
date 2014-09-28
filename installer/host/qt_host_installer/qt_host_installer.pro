@@ -32,32 +32,22 @@ SOURCES += main.cpp\
     successdialog.cpp \
     preseeder.cpp \
     extractworker.cpp \
-    writeimageworker.cpp
-
-macx {
-SOURCES += \
-    io_osx.cpp
-}
-
-unix:!macx {
-SOURCES += \
-    io_linux.cpp
-}
-
-w32 {
-SOURCES += \
+    writeimageworker.cpp \
+    io_osx.cpp \
+    io_linux.cpp \
     io_windows.cpp
-}
 
 LIBS += -lz
 
-w32 {
+w32:
+{
     INCLUDEPATH += "w32-lib/zlib-1.2.8"
     LIBS += -L./w32-lib/zlib-1.2.8
 }
 
 HEADERS  += mainwindow.h \
     utils.h \
+    io.h \
     langselection.h \
     updatenotification.h \
     supporteddevice.h \
@@ -75,7 +65,10 @@ HEADERS  += mainwindow.h \
     successdialog.h \
     preseeder.h \
     extractworker.h \
-    writeimageworker.h
+    writeimageworker.h \
+    io_osx.h \
+    io_linux.h \
+    io_windows.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \
