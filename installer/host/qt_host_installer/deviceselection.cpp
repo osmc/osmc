@@ -34,15 +34,9 @@ void DeviceSelection::showDevices()
         }
     }
     QListWidgetItem *header = new QListWidgetItem(tr("Device ID     Device Path     Device Space"), ui->devListWidget);
-    #ifdef Q_OS_MAC
-    QList<NixDiskDevice *> nixdevices = io::enumerateDeviceOSX();
-    #endif
-    #if defined(Q_OS_WIN32) || defined(Q_OS_WIN)
-    #endif
-    #ifdef Q_OS_LINUX
-    QList<NixDiskDevice *> nixdevices = io::enumerateDeviceLinux();
-    #endif
+
     #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
+    QList<NixDiskDevice *> nixdevices = io::enumerateDevice();
     for (int i = 0; i < nixdevices.count(); i++)
     {
         NixDiskDevice *device = nixdevices.at(i);
