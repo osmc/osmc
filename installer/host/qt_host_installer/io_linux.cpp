@@ -1,18 +1,18 @@
-#include "io_linux.h"
+#include "io.h"
 #include <QProcess>
 #include <QStringList>
 #include "utils.h"
 #include "nixdiskdevice.h"
 #include <QFile>
-#if defined(Q_OS_LINUX)
 #include "sys/mount.h"
 #include <stdlib.h>
-#endif
 #include "writeimageworker.h"
 
 namespace io
 {
-QList<NixDiskDevice * > enumerateDeviceLinux()
+inline void UpdateKernelTable();
+
+QList<NixDiskDevice * > enumerateDevice()
  {
     UpdateKernelTable();
     QList<NixDiskDevice *> devices;
@@ -68,7 +68,7 @@ QList<NixDiskDevice * > enumerateDeviceLinux()
      return devices;
      }
 
-bool writeImageLinux(QString devicePath, QString deviceImage, QObject *caller)
+bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
 {
     WriteImageWorker* worker = NULL;
     if(caller) {
@@ -115,7 +115,7 @@ bool writeImageLinux(QString devicePath, QString deviceImage, QObject *caller)
     return true;
 }
 
-bool unmountDiskLinux(QString devicePath)
+bool unmountDisk(QString devicePath)
 {
     /* Read /proc/mounts and find out what partitions of the disk we are using are mounted */
     QFile partitionsFile("/proc/mounts");
@@ -156,7 +156,7 @@ bool unmountDiskLinux(QString devicePath)
     return ret;
 }
 
-void UpdateKernelTable()
+inline void UpdateKernelTable()
 {
     #if defined(Q_OS_LINUX)
     utils::writeLog("Running partprobe to inform operating system about partition table changes");

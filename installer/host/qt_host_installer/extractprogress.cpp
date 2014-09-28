@@ -98,11 +98,8 @@ void ExtractProgress::writeImageToDisk()
 
 bool ExtractProgress::unmountDisk()
 {
-#ifdef Q_OS_MAC
-    return io::unmountDiskOSX(this->devicePath);
-#endif
-#ifdef Q_OS_LINUX
-    return io::unmountDiskLinux(this->devicePath);
+#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
+    return io::unmountDisk(this->devicePath);
 #endif
 }
 
