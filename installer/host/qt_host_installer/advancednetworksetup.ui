@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
+    <width>640</width>
     <height>240</height>
    </rect>
   </property>
@@ -14,14 +14,16 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #17394A</string>
+   <string notr="true">color: #17394A;
+background: rgb(240, 240, 240);
+</string>
   </property>
   <widget class="QLabel" name="networkoptionsdescriptionLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>80</y>
-     <width>561</width>
+     <width>621</width>
      <height>21</height>
     </rect>
    </property>
@@ -32,7 +34,9 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>configure advanced networking options</string>
@@ -46,7 +50,7 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>561</width>
+     <width>621</width>
      <height>41</height>
     </rect>
    </property>
@@ -57,7 +61,9 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>networking</string>
@@ -83,24 +89,26 @@
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
-color:rgb(240, 240, 240);
+color:#17394A;
 background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
 }
 
 QPushButton:hover {
 background: qradialgradient(cx: 0.4, cy: -0.1,
 fx: 0.3, fy: -0.4,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 }
 
 QPushButton:pressed {
 background: qradialgradient(cx: 0.1, cy: -0.1,
 fx: 0.4, fy: -0.1,
-radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
+radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 }
+
+
 </string>
    </property>
    <property name="text">
@@ -110,7 +118,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLineEdit" name="gwlineEdit">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>260</x>
      <y>160</y>
      <width>121</width>
      <height>21</height>
@@ -123,13 +131,15 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QLabel" name="ipaddressLabel">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>120</y>
      <width>21</width>
      <height>21</height>
@@ -142,7 +152,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>ip:</string>
@@ -154,7 +166,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLabel" name="maskLabel">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>140</y>
      <width>51</width>
      <height>21</height>
@@ -167,7 +179,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>mask:</string>
@@ -179,7 +193,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLineEdit" name="dns2lineEdit">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>260</x>
      <y>200</y>
      <width>121</width>
      <height>21</height>
@@ -192,13 +206,15 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="masklineEdit">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>260</x>
      <y>140</y>
      <width>121</width>
      <height>21</height>
@@ -211,13 +227,15 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QLabel" name="primarydnsLabel">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>180</y>
      <width>41</width>
      <height>21</height>
@@ -230,7 +248,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>dns1:</string>
@@ -242,7 +262,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLabel" name="gatewayLabel">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>160</y>
      <width>31</width>
      <height>21</height>
@@ -255,7 +275,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>gw:</string>
@@ -267,7 +289,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLabel" name="secondaryDNSLabel">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>200</y>
      <width>41</width>
      <height>21</height>
@@ -280,7 +302,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
    <property name="text">
     <string>dns2:</string>
@@ -292,7 +316,7 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
   <widget class="QLineEdit" name="ipaddresslineEdit">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>260</x>
      <y>120</y>
      <width>121</width>
      <height>21</height>
@@ -305,13 +329,15 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="dns1lineEdit">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>260</x>
      <y>180</y>
      <width>121</width>
      <height>21</height>
@@ -324,7 +350,9 @@ radius: 1.35, stop: 0 #4A6E81, stop: 1 #1C3E50);
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 240, 240)</string>
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
    </property>
   </widget>
  </widget>
