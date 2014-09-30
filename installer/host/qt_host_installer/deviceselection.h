@@ -29,6 +29,7 @@ private:
     Ui::DeviceSelection *ui;
     void showDevices();
     QMap<QString, NixDiskDevice*>  nixdevMap;
+    bool installedWinImageTool;
 };
 
 #endif // DEVICESELECTION_H

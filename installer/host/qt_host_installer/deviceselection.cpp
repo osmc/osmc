@@ -72,6 +72,13 @@ void DeviceSelection::showDevices()
         item->setCheckState(Qt::Unchecked);
     }
     #endif
+    #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
+    if (installedWinImageTool = io::installImagingTool() == false) /* We only want to install the binary once, not every refresh */
+    {
+        utils::writeLog("Cannot proceed to enumerate devices");
+        return;
+    }
+    #endif
 }
 
 void DeviceSelection::on_refreshButton_clicked()

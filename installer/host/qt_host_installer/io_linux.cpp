@@ -164,4 +164,6 @@ inline void UpdateKernelTable()
     #endif
 }
 
+bool installImagingTool() { return true; }
+
 }

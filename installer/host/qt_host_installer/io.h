@@ -10,4 +10,5 @@ namespace io
     bool unmountDisk(QString devicePath);
     int getDecompressedSize(QString gzFilename);
     qint64 getFileSize(QString filename);
+    bool installImagingTool();
 }

@@ -128,4 +128,5 @@ namespace io
           return true;
    }
 
+   bool installImagingTool() { return true; }
 }
