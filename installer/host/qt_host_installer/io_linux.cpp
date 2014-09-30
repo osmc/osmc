@@ -104,7 +104,7 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
         }
         total += r;
         if(worker){
-            emit worker->progressUpdate(total);
+            worker->emitProgressUpdate(total);
         }
         r = in.readRawData(buf,sizeof(buf));
     }

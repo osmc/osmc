@@ -13,6 +13,7 @@ class WriteImageWorker : public QObject
 public:
     explicit WriteImageWorker(QObject *parent = 0);
     WriteImageWorker(QString deviceImage, QString devicePath);
+    void emitProgressUpdate(unsigned);
 
 signals:
     void finished();

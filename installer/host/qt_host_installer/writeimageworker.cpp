@@ -12,6 +12,10 @@ WriteImageWorker::WriteImageWorker(QString deviceImage, QString devicePath)
     this->devicePath = QString(devicePath);
 }
 
+void WriteImageWorker::emitProgressUpdate(unsigned progress)
+{
+    emit progressUpdate(progress);
+}
 
 void WriteImageWorker::process()
 {
