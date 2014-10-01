@@ -77,7 +77,7 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 
 		if (is_single() || is_page()) {
 			if (isset($post->ID) && $this->model->is_translated_post_type($post->post_type))
-				$language = $this->model->get_post_language((int)$post->ID);
+				$language = $this->model->get_language($this->links_model->get_language_from_url());
 		}
 		elseif (is_category() || is_tag() || is_tax()) {
 			$obj = $wp_query->get_queried_object();
@@ -92,9 +92,9 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 		// the language is not correctly set so let's redirect to the correct url for this object
 		if (!empty($language)) {
 			$requested_url  = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-			$redirect_url = $this->links_model->switch_language_in_link($requested_url, $language);
+			$redirect_url = $this->links->get_translation_url($language);
 
-			if ($requested_url != $redirect_url) {
+			if ($requested_url != $redirect_url && !empty($redirect_url)) {
 				wp_redirect($redirect_url, 301);
 				exit;
 			}
