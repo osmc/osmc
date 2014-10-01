@@ -1,0 +1,62 @@
+/*
+FIXME rules for WP 3.8+ only -> can be merged to admin.css once support of WP 3.7 is dropped
+*/
+.pll_icon_tick:before {
+	content: "\f147";
+}
+.pll_icon_add:before {
+	content: "\f132";
+}
+.pll_icon_edit:before {
+	content: "\f464";
+}
+
+[class^="pll_icon_"], #wpadminbar #wp-admin-bar-languages .ab-icon:before {
+	font: 16px/1 'dashicons';
+}
+
+/* admin bar */
+#wpadminbar #wp-admin-bar-languages .ab-icon:before {
+	font: 20px/1 'dashicons'; /* backward compatibility WP < 3.8 */
+	content: "\f326";
+	top: 1px;
+}
+
+@media screen and ( max-width: 782px ) {
+	/* strings translations table */
+	.stringstranslations .column-context,
+	.stringstranslations .column-name {
+		display: none;
+	}
+
+	/* translations tables should be kept as table */
+	#term-translations .term-translations th,
+	#term-translations .term-translations td {
+		display: table-cell;
+	}
+
+	/* admin bar */
+	#wpadminbar li#wp-admin-bar-languages {
+		display: block; /*shows our menu on mobile devices */
+	}
+
+	#wpadminbar #wp-admin-bar-languages > .ab-item {
+		width: 50px;
+		text-align: center;
+	}
+
+	#wpadminbar #wp-admin-bar-languages > .ab-item .ab-icon:before {
+		font: 32px/1 'dashicons';
+		top: -1px;
+	}
+
+	#wpadminbar #wp-admin-bar-languages > .ab-item img {
+		margin: 19px 0;
+	}
+
+	#wpadminbar #wp-admin-bar-languages #wp-admin-bar-all .ab-item .ab-icon {
+		margin-right: 6px;
+		font-size: 20px !important;
+		line-height: 20px !important;
+	}
+}
