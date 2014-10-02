@@ -89,15 +89,16 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 			$language = $this->model->get_post_language((int)$obj->ID);
 		}
 
-		// the language is not correctly set so let's redirect to the correct url for this object
-		if (!empty($language)) {
-			$requested_url  = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-			$redirect_url = $this->links->get_translation_url($language);
+		if (empty($language)) {
+			$language = $this->get_preferred_language();
+		}
 
-			if ($requested_url != $redirect_url && !empty($redirect_url)) {
-				wp_redirect($redirect_url, 301);
-				exit;
-			}
+		$requested_url  = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$redirect_url = $this->links->get_translation_url($language);
+
+		if ($requested_url != $redirect_url && !empty($redirect_url)) {
+			wp_redirect($redirect_url, 301);
+			exit;
 		}
 	}
 }
