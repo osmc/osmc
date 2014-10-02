@@ -96,6 +96,10 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 		$requested_url  = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$redirect_url = $this->links->get_translation_url($language);
 
+		if (empty($redirect_url)) {
+			$redirect_url = $this->links->get_translation_url($this->model->get_language('en'));
+		}
+
 		if ($requested_url != $redirect_url && !empty($redirect_url)) {
 			wp_redirect($redirect_url, 301);
 			exit;
