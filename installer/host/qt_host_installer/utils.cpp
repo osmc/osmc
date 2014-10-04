@@ -66,4 +66,18 @@ namespace utils
         return devices;
     }
 
+    bool validateIp(QString ip)
+    {
+        if (ip.isNull() || ip.isEmpty())
+            return false;
+
+        for (QString element : ip.split("\."))
+        {
+            if (element.isEmpty() || element.toInt() < 0 || element.toInt() > 255)
+                return false;
+        }
+
+        return true;
+    }
+
 }
