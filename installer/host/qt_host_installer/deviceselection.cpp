@@ -24,6 +24,8 @@ void DeviceSelection::showDevices()
     ui->devListWidget->clear();
     devMap.clear();
     QListWidgetItem *header = new QListWidgetItem(tr("Device ID     Device Path     Device Space"), ui->devListWidget);
+    header->setFlags(!(Qt::ItemIsSelectable));
+
 
 #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
     if (installedWinImageTool = io::installImagingTool() == false) /* We only want to install the binary once, not every refresh */
@@ -38,6 +40,8 @@ void DeviceSelection::showDevices()
         DiskDevice *device = devices.at(i);
         QString deviceStr = QString::number(device->getDiskID()) + "     " + device->getDiskPath() + "   " + device->getDiskSize();
         QListWidgetItem *item = new QListWidgetItem(deviceStr, ui->devListWidget);
+        item->setFlags(item->flags() ^ Qt::ItemIsUserCheckable);
+        item->setFlags(item->flags() | Qt::ItemIsSelectable);
         devMap.insert(deviceStr, device);
     }
 }
@@ -57,7 +61,7 @@ void DeviceSelection::on_devicenextButton_clicked()
         if (checkCount > 1)
             break;
         QListWidgetItem* item = ui->devListWidget->item(i);
-        if (item->checkState())
+        if (item->isSelected())
         {
             if(!choosenItem) {
                 choosenItem = item;
