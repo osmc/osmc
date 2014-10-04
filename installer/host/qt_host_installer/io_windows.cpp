@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QStringList>
 #include "diskdevice.h"
+#include "writeimageworker.h"
 
 namespace io
 {
