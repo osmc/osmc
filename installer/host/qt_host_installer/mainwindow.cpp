@@ -70,8 +70,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton)
 {
-
-
     this->ui->backButton->setEnabled(enableBackbutton);
 
     // make sure we update the state of the BackButton
