@@ -17,9 +17,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "io.h"
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-#include "nixdiskdevice.h"
-#endif
+#include "diskdevice.h"
 #include "licenseagreement.h"
 #include "downloadprogress.h"
 #include "extractprogress.h"
@@ -189,7 +187,7 @@ void MainWindow::setPreseed(int installType)
         /* Straight to device selection */
         ds = new DeviceSelection(this);
         #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         #endif
         rotateWidget(ps, ds);
     }
@@ -223,7 +221,7 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
         nss->setWireless(false);
         ds = new DeviceSelection(this);
         #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         #endif
         rotateWidget(ns, ds);
     }
@@ -248,7 +246,7 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
     {
         ds = new DeviceSelection(this);
         #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         #endif
         rotateWidget(ans, ds);
     }
@@ -264,12 +262,12 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
     #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
+    connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
     #endif
     rotateWidget(wss, ds);
 }
 
-void MainWindow::selectNixDevice(NixDiskDevice *nd)
+void MainWindow::selectDevice(DiskDevice *nd)
 {
 #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     this->nd = nd;
@@ -277,6 +275,7 @@ void MainWindow::selectNixDevice(NixDiskDevice *nd)
     connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
     rotateWidget(ds, la);
     this->installDevicePath = nd->getDiskPath();
+    this->installDeviceID = nd->getDiskID();
 #endif
 }
 
@@ -299,7 +298,13 @@ void MainWindow::completeDownload(QString fileName)
         this->image = QUrl(fileName);
     utils::writeLog("Creating preseeder");
     Preseeder *preseeder = new Preseeder();
-    ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
+#if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+        /* Windows: we actually want the device ID */
+        ep = new ExtractProgress(this, this->installDeviceID, this->image.toString());
+#endif
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+        ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
+#endif
     rotateWidget(dp, ep, false);
     ep->extract();
 }
@@ -320,11 +325,6 @@ void MainWindow::translate(QString locale)
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-SupportedDevice* MainWindow::getSupportedDevice()
-{
-    return &device;
 }
 
 int MainWindow::getInstallType()

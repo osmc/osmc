@@ -8,7 +8,7 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include "networksettings.h"
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 #include <QMovie>
 
 namespace Ui {
@@ -23,7 +23,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    SupportedDevice *getSupportedDevice();
     int getInstallType();
 
 public slots:
@@ -33,7 +32,7 @@ public slots:
     void setNetworkInitial(bool useWireless, bool advanced);
     void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
-    void selectNixDevice(NixDiskDevice *nd);
+    void selectDevice(DiskDevice *nd);
     void acceptLicense();
     void completeDownload(QString fileName);
     void showUpdate();
@@ -49,14 +48,13 @@ private:
     QString mirrorURL;
     SupportedDevice device;
     QString installDevicePath;
+    QString installDeviceID;
     bool isOnline;
     QUrl image;
     int installType;
     NetworkSettings *nss;
     QNetworkAccessManager *accessManager;
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    NixDiskDevice *nd;
-    #endif
+    DiskDevice *nd;
     QMovie *spinner;
 };
 

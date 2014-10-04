@@ -2,7 +2,7 @@
 #include <QProcess>
 #include <QStringList>
 #include "utils.h"
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 #include <QFile>
 #include "sys/mount.h"
 #include <stdlib.h>
@@ -12,10 +12,10 @@ namespace io
 {
 inline void UpdateKernelTable();
 
-QList<NixDiskDevice * > enumerateDevice()
+QList<DiskDevice * > enumerateDevice()
  {
     UpdateKernelTable();
-    QList<NixDiskDevice *> devices;
+    QList<DiskDevice *> devices;
      utils::writeLog("Enumerating imageable devices for Linux");
      QProcess process;
      QStringList lines;
@@ -46,21 +46,7 @@ QList<NixDiskDevice * > enumerateDevice()
                  devicePath.remove(":");
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
-                 bool removable = false;
-                 QString device = devicePath;
-                 device.remove(0,5);
-                 process.start("cat", QStringList() << "/sys/block/"+device+"/removable", QIODevice::ReadOnly);
-                 if (process.waitForFinished())
-                 {
-                     QString out = process.readAllStandardOutput();
-                     if(out.simplified().compare("1")==0) {
-                         removable = true;
-                     }
-                 }
-                 // No way to check if usb or sd when device is sdX, so set both if the device is removable
-                 bool sdCard = devicePath.contains("mmc") || (removable && !devicePath.contains("usb"));
-                 bool usb = devicePath.contains("usb") || (removable && !devicePath.contains("mmc"));
-                 NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace, removable, sdCard, usb);
+                 DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
                  devices.append(nd);
              }
          }

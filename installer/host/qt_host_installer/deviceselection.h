@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QMap>
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 
 namespace Ui {
 class DeviceSelection;
@@ -23,12 +23,12 @@ private slots:
     void on_devicenextButton_clicked();
 
 signals:
-    void nixDeviceSelected(NixDiskDevice *nd);
+    void DeviceSelected(DiskDevice *nd);
 
 private:
     Ui::DeviceSelection *ui;
     void showDevices();
-    QMap<QString, NixDiskDevice*>  nixdevMap;
+    QMap<QString, DiskDevice*> devMap;
     bool installedWinImageTool;
 };
 

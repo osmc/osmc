@@ -26,13 +26,13 @@ SOURCES += main.cpp\
     networksettings.cpp \
     advancednetworksetup.cpp \
     wifinetworksetup.cpp \
-    nixdiskdevice.cpp \
     downloadprogress.cpp \
     extractprogress.cpp \
     successdialog.cpp \
     preseeder.cpp \
     extractworker.cpp \
-    writeimageworker.cpp
+    writeimageworker.cpp \
+    diskdevice.cpp
 
 macx {
 SOURCES += \
@@ -68,14 +68,14 @@ HEADERS  += mainwindow.h \
     networksettings.h \
     advancednetworksetup.h \
     wifinetworksetup.h \
-    nixdiskdevice.h \
     downloadprogress.h \
     extractprogress.h \
     successdialog.h \
     preseeder.h \
     extractworker.h \
     writeimageworker.h \
-    io.h
+    io.h \
+    diskdevice.h
 
 FORMS    += mainwindow.ui \
     langselection.ui \

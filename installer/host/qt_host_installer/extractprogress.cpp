@@ -77,7 +77,6 @@ void ExtractProgress::writeImageToDisk()
 
         QThread* thread = new QThread;
         WriteImageWorker *worker = new WriteImageWorker(this->deviceImage, this->devicePath);
-
         worker->moveToThread(thread);
         connect(worker, SIGNAL(error()), this, SLOT(writeError()));
         connect(thread, SIGNAL(started()), worker, SLOT(process()));
@@ -100,6 +99,10 @@ bool ExtractProgress::unmountDisk()
 {
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
     return io::unmountDisk(this->devicePath);
+#endif
+#if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
+    /* Poor mans solution: trash MBR, which we do during write later */
+    return true;
 #endif
 }
 

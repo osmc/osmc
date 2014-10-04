@@ -2,16 +2,16 @@
 #include <QString>
 #include <QStringList>
 #include "utils.h"
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 #include <QList>
 #include <QTextStream>
 #include "io.h"
 
 namespace io
 {
-   QList<NixDiskDevice *> enumerateDevice()
+   QList<DiskDevice *> enumerateDevice()
    {
-       QList<NixDiskDevice *> devices;
+       QList<DiskDevice *> devices;
        utils::writeLog("Enumerating imageable devices for OSX");
        QProcess process;
        QStringList lines;
@@ -67,7 +67,7 @@ namespace io
 
                deviceSpace.remove("*");
 
-               NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
+               DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
                devices.append(nd);
            }
        }
