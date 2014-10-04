@@ -286,7 +286,6 @@ void MainWindow::acceptLicense()
     dp = new DownloadProgress(this, this->image);
     url = this->image;
     connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
-    connect(dp, SIGNAL(enableBackButton(bool)), this, SLOT(setEnableBackbutton(bool)));
     rotateWidget(la, dp, false);
     dp->download(this, url, this->isOnline);
 }
