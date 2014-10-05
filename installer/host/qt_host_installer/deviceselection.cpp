@@ -24,7 +24,7 @@ void DeviceSelection::showDevices()
     ui->devListWidget->clear();
     devMap.clear();
     QListWidgetItem *header = new QListWidgetItem(tr("Device ID     Device Path     Device Space"), ui->devListWidget);
-    header->setFlags(!(Qt::ItemIsSelectable));
+    header->setFlags(Qt::NoItemFlags);
 
 
 #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
