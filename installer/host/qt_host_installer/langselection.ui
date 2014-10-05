@@ -175,6 +175,9 @@ background: rgb(240, 240, 240);
      <pointsize>24</pointsize>
     </font>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 color:#17394A;
@@ -182,6 +185,10 @@ background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
+}
+
+QPushButton:focus {
+border: 1px solid #17394A;
 }
 
 QPushButton:hover {
@@ -194,14 +201,24 @@ QPushButton:pressed {
 background: qradialgradient(cx: 0.1, cy: -0.1,
 fx: 0.4, fy: -0.1,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
-}
-</string>
+}</string>
    </property>
    <property name="text">
     <string>-&gt;</string>
    </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>languageSelectionBox</tabstop>
+  <tabstop>deviceSelectionBox</tabstop>
+  <tabstop>languagenextButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -14,6 +14,7 @@ namespace utils
     void writeLog(QString strLog);
     void displayError(QString title, QString message, bool isCritical = false);
     bool promptYesNo(QWidget *parent, QString title, QString question);
+    bool validateIp(QString ip);
     int inline getBuildNumber() { return BUILD_NUMBER; }
     QList<SupportedDevice *> buildDeviceList();
     const static int INSTALL_NOPRESEED = -1;
