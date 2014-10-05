@@ -149,11 +149,11 @@ void ExtractProgress::writeError()
 
 void ExtractProgress::setProgress(unsigned written)
 {
-    if(status = EXTRACTING_STATUS){
+    if(status == EXTRACTING_STATUS){
         ui->extractProgressBar->setValue(written);
         ui->extractDetailsLabel->setText(tr("Extracting") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
-    if(status = WRITING_STATUS){
+    if(status == WRITING_STATUS){
         ui->extractProgressBar->setValue(written);
         ui->extractDetailsLabel->setText(tr("Written") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
