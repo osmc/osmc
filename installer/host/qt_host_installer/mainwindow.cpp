@@ -273,11 +273,11 @@ void MainWindow::acceptLicense()
 {
     /* Move to Download widget, even if we aren't downloading */
     QUrl url;
-    dp = new DownloadProgress(this, this->image);
+    dp = new DownloadProgress(this);
     url = this->image;
     connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
     rotateWidget(la, dp, false);
-    dp->download(this, url, this->isOnline);
+    dp->download(url, this->isOnline);
 }
 
 void MainWindow::completeDownload(QString fileName)

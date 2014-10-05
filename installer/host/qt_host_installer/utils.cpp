@@ -44,7 +44,7 @@ namespace utils
     }
 
 
-    bool promptYesNo(QWidget *parent, QString title, QString question)
+    bool promptYesNo(QString title, QString question)
     {
         QMessageBox *questionBox = new QMessageBox();
         questionBox->setWindowTitle(title);
@@ -71,7 +71,7 @@ namespace utils
         if (ip.isNull() || ip.isEmpty())
             return false;
 
-        QStringList elements = ip.split("\.");
+        QStringList elements = ip.split("\\.");
         for (int i = 0; i < elements.count(); i++)
         {
             QString element = elements.at(i);

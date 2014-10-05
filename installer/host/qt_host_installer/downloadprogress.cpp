@@ -13,14 +13,14 @@
 
 /* With thanks to http://qt-project.org/doc/qt-4.8/network-downloadmanager-downloadmanager-cpp.html */
 
-DownloadProgress::DownloadProgress(QWidget *parent, QUrl URL) :
+DownloadProgress::DownloadProgress(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DownloadProgress)
 {
     ui->setupUi(this);
 }
 
-void DownloadProgress::download(QWidget *parent, QUrl URL, bool isOnline)
+void DownloadProgress::download(QUrl URL, bool isOnline)
 {
     QString filelocation(URL.toString());
 
@@ -43,10 +43,10 @@ void DownloadProgress::download(QWidget *parent, QUrl URL, bool isOnline)
     bool decompressed = QFile(QDir::homePath() + "/" + QString(fileName).remove(".gz")).exists();
     if (uncompressed)
     {
-        if (! utils::promptYesNo(this, tr("Image found"), tr("Do you want to re-download this image?")))
+        if (! utils::promptYesNo(tr("Image found"), tr("Do you want to re-download this image?")))
         {
             if(decompressed) {
-                if (! utils::promptYesNo(this, tr("Image found"), tr("Do you want to extract again?")))
+                if (! utils::promptYesNo(tr("Image found"), tr("Do you want to extract again?")))
                 {
                     emit downloadCompleted(QDir::homePath() + "/" + QString(fileName).remove(".gz"));
                     return;
@@ -57,7 +57,7 @@ void DownloadProgress::download(QWidget *parent, QUrl URL, bool isOnline)
         }
     }
     else if (decompressed) {
-        if (! utils::promptYesNo(this, tr("Uncompressed Image found"), tr("Do you want to re-download this image?")))
+        if (! utils::promptYesNo(tr("Uncompressed Image found"), tr("Do you want to re-download this image?")))
         {
             emit downloadCompleted(QDir::homePath() + "/" + QString(fileName).remove(".gz"));
             return;
