@@ -21,6 +21,7 @@
 #include "licenseagreement.h"
 #include "downloadprogress.h"
 #include "extractprogress.h"
+#include "successdialog.h"
 #include "preseeder.h"
 #include <QMovie>
 
@@ -37,6 +38,7 @@ WiFiNetworkSetup *wss;
 LicenseAgreement *la;
 DownloadProgress *dp;
 ExtractProgress *ep;
+SuccessDialog *sd;
 
 QTranslator translator;
 
@@ -186,9 +188,7 @@ void MainWindow::setPreseed(int installType)
     {
         /* Straight to device selection */
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
-        #endif
         rotateWidget(ps, ds);
     }
 }
@@ -220,9 +220,7 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
         nss->setDHCP(true);
         nss->setWireless(false);
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
-        #endif
         rotateWidget(ns, ds);
     }
 }
@@ -245,9 +243,7 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
     else
     {
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
-        #endif
         rotateWidget(ans, ds);
     }
 }
@@ -261,22 +257,18 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     if (! nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE)
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
-    #endif
     rotateWidget(wss, ds);
 }
 
 void MainWindow::selectDevice(DiskDevice *nd)
 {
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     this->nd = nd;
     la = new LicenseAgreement(this);
     connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
     rotateWidget(ds, la);
     this->installDevicePath = nd->getDiskPath();
     this->installDeviceID = nd->getDiskID();
-#endif
 }
 
 void MainWindow::acceptLicense()
@@ -300,11 +292,12 @@ void MainWindow::completeDownload(QString fileName)
     Preseeder *preseeder = new Preseeder();
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
         /* Windows: we actually want the device ID */
-        ep = new ExtractProgress(this, this->installDeviceID, this->image.toString());
+        ep = new ExtractProgress(this, QString::number(this->installDeviceID), this->image.toString());
 #endif
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
         ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
 #endif
+    connect(ep, SIGNAL(finishedExtraction()), this, SLOT(showSuccessDialog()));
     rotateWidget(dp, ep, false);
     ep->extract();
 }
@@ -320,6 +313,12 @@ void MainWindow::translate(QString locale)
     }
     else
         utils::writeLog("Could not load translation!");
+}
+
+void MainWindow::showSuccessDialog()
+{
+    sd = new SuccessDialog(this);
+    rotateWidget(sd, ep, false);
 }
 
 MainWindow::~MainWindow()

@@ -76,9 +76,7 @@ void DeviceSelection::on_devicenextButton_clicked()
     {
         utils::displayError(tr("Please select one device"), tr("You can only select one device to image"));
     } else {
-        #if defined(Q_OS_LINUX ) || defined(Q_OS_MAC)
         utils::writeLog("Device selected: " + choosenItem->text());
         emit DeviceSelected((devMap.value(choosenItem->text())));
-        #endif
     }
 }

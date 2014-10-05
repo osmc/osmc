@@ -67,11 +67,11 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
     bool imageOpen = imageFile.open(QIODevice::ReadOnly);
     bool deviceOpen = deviceFile.open(QIODevice::WriteOnly);
     if(!imageOpen) {
-        utils::writeLog("error opening image");
+        utils::writeLog("Error opening image");
         return false;
     }
     if(!deviceOpen) {
-        utils::writeLog("error opening device");
+        utils::writeLog("Error opening device");
         return false;
     }
     char buf[512*1024];
@@ -85,7 +85,7 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
         if(ret == -1 || ret != r) {
             imageFile.close();
             deviceFile.close();
-            utils::writeLog("error writing to device");
+            utils::writeLog("Error writing to device");
             return false;
         }
         total += r;

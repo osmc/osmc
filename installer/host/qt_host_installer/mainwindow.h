@@ -40,6 +40,7 @@ public slots:
     void replyFinished(QNetworkReply* reply);
     void rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton = true);
     void goBack();
+    void showSuccessDialog();
     
 private:
     Ui::MainWindow *ui;
@@ -48,7 +49,7 @@ private:
     QString mirrorURL;
     SupportedDevice device;
     QString installDevicePath;
-    QString installDeviceID;
+    int installDeviceID;
     bool isOnline;
     QUrl image;
     int installType;

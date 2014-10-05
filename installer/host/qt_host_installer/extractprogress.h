@@ -33,6 +33,9 @@ public slots:
     void finished();
     void writeFinished();
 
+signals:
+    void finishedExtraction();
+
 private:
     Ui::ExtractProgress *ui;
     void doExtraction();

@@ -71,11 +71,19 @@ namespace io
                    worker = NULL;
                }
            }
-           process.start(QDir::temp().filePath("usbitcmd.exe"), QStringList() << "r" << devicePath << deviceImage << "/d" << "/s", QIODevice::ReadOnly | QIODevice::Text);
-           /* ToDo: read percentage and update progress; see if successful. We don't 'wait' for it to finish here but read line by line periodically
-           / Check for .startsWith("Error") and write that to log */
+           process.start(QDir::temp().filePath("usbitcmd.exe"), QStringList() << "r" << devicePath << deviceImage << "/d", QIODevice::ReadOnly | QIODevice::Text);
+           /* ToDo: read percentage and update progress; see if successful. We don't 'wait' for it to finish here but read line by line periodically. Check for .startsWith("Error") and write that to log */
+           /* SN 05-10-14: can't get progress with QTextStream on the proc and even "/s" invocation. */
+           if (! process.waitForFinished())
+           {
+               utils::writeLog("Could not invoke usbitcmd to write disk image");
+               return false;
+           }
+           else
+           {
+               return true;
+           }
        }
-       return true;
    }
 
    bool installImagingTool()
