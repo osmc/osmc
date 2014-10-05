@@ -59,7 +59,7 @@ void ExtractProgress::writeImageToDisk()
    const char *message = tr("Do you want to image the device you selected previously? OSMC is not responsible for loss of personal data").toUtf8().constData();
 #endif
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    const char *message = tr("Do you want to image the device ") + this->devicePath + "?" + tr("OSMC is not responsible for loss of personal data").toUtf8().constData();
+    const char *message = (tr("Do you want to image the device ") + this->devicePath + "?" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
 #endif
     if (utils::promptYesNo(this, tr("Are you sure"), tr(message)))
     {
