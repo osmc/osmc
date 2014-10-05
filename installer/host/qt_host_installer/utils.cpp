@@ -71,8 +71,10 @@ namespace utils
         if (ip.isNull() || ip.isEmpty())
             return false;
 
-        for (QString element : ip.split("\."))
+        QStringList elements = ip.split("\.");
+        for (int i = 0; i < elements.count(); i++)
         {
+            QString element = elements.at(i);
             if (element.isEmpty() || element.toInt() < 0 || element.toInt() > 255)
                 return false;
         }
