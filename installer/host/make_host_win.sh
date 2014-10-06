@@ -1,23 +1,17 @@
 # (c) 2014 Sam Nazarko
 # email@samnazarko.co.uk
 
-# Pass Qt bin path in $1 - C:/MinGW/qt/qt-everywhere-opensource-src-4.8.6/bin
-# Pass MinGW bin path in $2 - C:/MinGW/bin
 # Run make win from MSYS
 
 #!/bin/bash
 echo Building host installer for Windows via MSYS
-umount /qtbin >/dev/null 2>&1
-umount /mgwbin >/dev/null 2>&1
-echo -e "Mounting Qt binary directory..."
-mount $1 /qtbin
-if [ ! -f "/qtbin/qmake.exe" ]; then echo "Can't find Qt binaries!" && exit 1; fi
-echo -e "Mounting MinGW32 binary directory..."
-mount $2 /mgwbin
-if [ ! -f "/mgwbin/mingw32-make.exe" ]; then echo "Can't find MinGW32 binaries" && exit 1; fi
-if [ ! -f /c/Program\ Files/WinRAR/Rar.exe ]; then echo "Can't find WinRAR -- maybe it is in x64 program files" && exit 1; fi
+QT_VER="4.8.6"
+QT_PATH="c/MinGW/qt/qt-everywhere-opensource-src-${QT_VER}/bin"
+SDK_PATH="/c/Program Files/Microsoft SDKs/Windows/v7.1/Bin"
+RAR_PATH="/c/Program Files/WinRAR/"
+MINGW_PATH="c/MinGW/bin"
 echo -e "Updating PATH"
-PATH="/qtbin:/mgwbin:/c/Program\ Files/Microsoft\ SDKs/Windows/v7.1/Bin:${PATH}"
+PATH="${PATH}:${QT_PATH}:${SDK_PATH}:${RAR_PATH}:${MINGW_PATH}"
 TARGET="qt_host_installer"
 ZLIB_VER="1.2.8"
 pushd ${TARGET}
@@ -44,9 +38,9 @@ cp ${TARGET}/release/${TARGET}.exe ${INSTALL}/
 cp ${TARGET}/*.qm ${INSTALL}/ > /dev/null 2>&1
 cp ${TARGET}/winrar.sfx ${INSTALL}
 echo Building manifest
-mt.exe –manifest ${TARGET}/${TARGET}.exe.manifest -outputresource:${INSTALL}/${TARGET}.exe;1
+mt.exe -manifest qt_host_installer/qt_host_installer.exe.manifest -outputresource:install/qt_host_installer.exe
 pushd ${INSTALL}
-/c/Program\ Files/WinRAR/Rar.exe a -r -sfx -z"winrar.sfx" osmc-installer qt_host_installer.exe *.qm >/dev/null 2>&1
+Rar.exe a -r -sfx -z"winrar.sfx" osmc-installer qt_host_installer.exe *.qm >/dev/null 2>&1
 popd
 mv ${INSTALL}/osmc-installer.exe .
 rm -rf ${INSTALL}
