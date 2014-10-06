@@ -170,6 +170,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
     /* We call the preseeder: even if we can't preseed, we use its callback to handle the rest of the application */
     ps = new PreseedDevice(this, this->device);
     connect(ps, SIGNAL(preseedSelected(int)), this, SLOT(setPreseed(int)));
+    connect(ps, SIGNAL(preseedSelected(int, QString)), this, SLOT(setPreseed(int,QString)));
     rotateWidget(vs, ps);
 }
 
@@ -188,6 +189,19 @@ void MainWindow::setPreseed(int installType)
         ds = new DeviceSelection(this);
         connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         rotateWidget(ps, ds);
+    }
+}
+
+void MainWindow::setPreseed(int installType, QString nfsPath)
+{
+    this->installType = utils::INSTALL_NFS;
+    utils::writeLog("NFS installation to " + nfsPath + " selected");
+    this->nfsPath = nfsPath;
+    if (device.allowsPreseedingNetwork())
+    {
+        ns = new NetworkSetup(this, false);
+        connect(ns, SIGNAL(setNetworkOptionsInit(bool,bool)), this, SLOT(setNetworkInitial(bool,bool)));
+        rotateWidget(ps, ns);
     }
 }
 
@@ -321,9 +335,4 @@ void MainWindow::showSuccessDialog()
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-int MainWindow::getInstallType()
-{
-    return installType;
 }

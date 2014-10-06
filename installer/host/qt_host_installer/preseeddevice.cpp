@@ -2,6 +2,8 @@
 #include "ui_preseeddevice.h"
 #include "supporteddevice.h"
 #include "utils.h"
+#include <QInputDialog>
+#include <QString>
 
 PreseedDevice::PreseedDevice(QWidget *parent, SupportedDevice dev) :
     QWidget(parent),
@@ -55,7 +57,14 @@ void PreseedDevice::on_installoptionsnextButton_clicked()
     if (ui->nfsinstallradioButton->isChecked())
     {
         utils::writeLog("NFS installation selected");
-        emit preseedSelected(utils::INSTALL_NFS);
+        bool response;
+        QString nfsPath = QInputDialog::getText(this, tr("NFS install"), tr("Please specify path to NFS share"), QLineEdit::Normal, "", &response);
+        if (response && !nfsPath.isEmpty())
+            emit preseedSelected(utils::INSTALL_NFS, nfsPath);
+        else
+        {
+            ui->sdinstallradioButton->setChecked(true);
+        }
     }
     if (ui->emmcinstallradioButton->isChecked())
     {

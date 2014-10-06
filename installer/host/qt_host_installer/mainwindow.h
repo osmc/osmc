@@ -23,12 +23,14 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    int getInstallType();
+    int getInstallType() { return installType; }
+    QString getNFSPath() { return nfsPath; }
 
 public slots:
     void setLanguage(QString, SupportedDevice);
     void setVersion(bool, QUrl);
     void setPreseed(int installType);
+    void setPreseed(int installType, QString nfsPath);
     void setNetworkInitial(bool useWireless, bool advanced);
     void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
@@ -56,6 +58,7 @@ private:
     NetworkSettings *nss;
     QNetworkAccessManager *accessManager;
     DiskDevice *nd;
+    QString nfsPath;
     QMovie *spinner;
 };
 
