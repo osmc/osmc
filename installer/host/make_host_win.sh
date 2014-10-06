@@ -6,7 +6,7 @@
 #!/bin/bash
 echo Building host installer for Windows via MSYS
 QT_VER="4.8.6"
-QT_PATH="c/MinGW/qt/qt-everywhere-opensource-src-${QT_VER}/bin"
+QT_PATH="/c/MinGW/qt/qt-everywhere-opensource-src-${QT_VER}/bin"
 SDK_PATH="/c/Program Files/Microsoft SDKs/Windows/v7.1/Bin"
 RAR_PATH="/c/Program Files/WinRAR/"
 MINGW_PATH="c/MinGW/bin"
