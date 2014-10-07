@@ -101,12 +101,12 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
     return true;
 }
 
-bool mount(QString devicePath, QString mountDir)
+bool mount(QString diskPath, QString mountDir)
 {
     return mount(diskPath.toLocal8Bit(), mountDir.absolutePath().toLocal8Bit(), "vfat", 1, "");
 }
 
-bool unmount(QString devicePath, bool isDisk=false)
+bool unmount(QString devicePath, bool isDisk)
 {
     /* Read /proc/mounts and find out what partitions of the disk we are using are mounted */
     QFile partitionsFile("/proc/mounts");
