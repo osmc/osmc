@@ -141,6 +141,8 @@ void ExtractProgress::doExtraction()
 void ExtractProgress::extractError()
 {
     ui->extractProgressBar->setValue(0);
+    /* need to make sure progressBar is not idling */
+    ui->extractProgressBar->setMaximum(100);
     ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!")
                                      + tr("\nPlease consult the logfile."));
 }
@@ -158,17 +160,18 @@ void ExtractProgress::setProgress(unsigned written)
 {
     if(status == EXTRACTING_STATUS){
         ui->extractProgressBar->setValue(written);
-        ui->extractDetailsLabel->setText(tr("Extracting") + " " + QString::number(written / 1024 / 1024) + "MB");
+        ui->extractDetailsLabel_2->setText(tr("Extracting") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
     if(status == WRITING_STATUS){
         ui->extractProgressBar->setValue(written);
-        ui->extractDetailsLabel->setText(tr("Written") + " " + QString::number(written / 1024 / 1024) + "MB");
+        ui->extractDetailsLabel_2->setText(tr("Written") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
 }
 
 void ExtractProgress::finished()
 {
     utils::writeLog("Finished extraction. Going to write image");
+    ui->extractDetailsLabel_2->setText("");
     writeImageToDisk();
 }
 
