@@ -366,32 +366,34 @@ void MainWindow::showSuccessDialog()
     if (! mountDir.exists())
         mountDir.mkpath(mountDir.absolutePath());
 
-    /*
-     * the following umount may fail, just because the dir exists doesn't mean
-     * that it is actually mounted. be nice, don't check for errors.
-     */
-    if (mountDir.exists())
-        io::unmount(diskPath, false);
+    utils::writeLog("Trying to umount before we are remounting and writing the preseed.");
+
+    /* try both paths for umount, ignore errors */
+    io::unmount(diskPath, false);
+    io::unmount(nd->getDiskPath(), true);
+
     if (! io::mount(diskPath, mountDir.absolutePath()))
+    {
+        utils::writeLog("Could not mount filesystem!");
+        return;
+    }
+    else
+    {
+        utils::writeLog("Filesystem is mounted");
+        utils::writeLog("Writing the preseeder to filesystem");
+        QStringList preseedList = ps->getPreseed();
+        QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
+        preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&preseedFile);
+        for (int i = 0; i < preseedList.count(); i++)
         {
-            utils::writeLog("Could not mount filesystem!");
-            return;
+            out << preseedList.at(i) + "\n";
         }
-        else
-        {
-            utils::writeLog("Filesystem is mounted");
-            utils::writeLog("Writing the preseeder to filesystem");
-            QStringList preseedList = ps->getPreseed();
-            QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
-            preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
-            QTextStream out(&preseedFile);
-            for (int i = 0; i < preseedList.count(); i++)
-            {
-                out << preseedList.at(i) + "\n";
-            }
-            preseedFile.close();
-        }
-        io::unmount(diskPath, false);
+        preseedFile.close();
+    }
+    utils::writeLog("Finished. Unmount in any case...");
+    io::unmount(diskPath, false);
+    utils::writeLog("Final sync.");
 	system("/bin/sync");
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
