@@ -89,14 +89,24 @@ namespace io
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);       
+       p.waitForReadyRead(-1);
+       p.waitForFinished(-1);
+       QByteArray stdoutArray = p.readAllStandardOutput();
+       QByteArray stderrArray = p.readAllStandardError();
+       int exitCode = p.exitCode();
 
-       if (p.exitStatus() == QProcess::NormalExit) {
+
+
+       if (exitCode == 0 && p.exitStatus() == QProcess::NormalExit) {
            utils::writeLog("Imaging was successful");
            return true;
        }
        else
        {
            utils::writeLog("Imaging failed!");
+           utils::writeLog("Messages are:");
+           utils::writeLog("\t stdout: " + QString(stdoutArray));
+           utils::writeLog("\t stderr: " + QString(stderrArray));
            return false;
        }
    }

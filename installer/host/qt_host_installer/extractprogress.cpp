@@ -60,7 +60,7 @@ void ExtractProgress::writeImageToDisk()
    const char *message = tr("Do you want to image the device you selected previously? OSMC is not responsible for loss of personal data").toUtf8().constData();
 #endif
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    const char *message = (tr("Do you want to image the device ") + this->devicePath + "?" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
+    const char *message = (tr("Do you want to image the device ") + this->devicePath + "?\n" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
 #endif
     if (utils::promptYesNo(tr("Are you sure"), tr(message)))
     {
@@ -141,13 +141,17 @@ void ExtractProgress::doExtraction()
 void ExtractProgress::extractError()
 {
     ui->extractProgressBar->setValue(0);
-    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!"));
+    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!")
+                                     + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::writeError()
 {
     ui->extractProgressBar->setValue(0);
-    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!"));
+    /* need to make sure progressBar is not idling */
+    ui->extractProgressBar->setMaximum(100);
+    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!")
+                                        + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::setProgress(unsigned written)
