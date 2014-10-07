@@ -348,25 +348,31 @@ void MainWindow::showSuccessDialog()
     /* Write to the target */
     utils::writeLog("Writing preseeder");
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+    QString diskPath;
     #if defined (Q_OS_LINUX)
         utils::writeLog("Informing the kernel of updated partition table");
         system("/sbin/partprobe");
     #endif
-        /* Always first partition */
-        utils::writeLog("Mounting the first filesystem on " + nd->getDiskPath());
-        QDir mountDir = QDir(QDir::temp().absolutePath().append(QByteArray("/osmc_mnt")));
-        if (! mountDir.exists())
-            mountDir.mkpath("");
-        if (mountDir.exists())
-            umount(mountDir.absolutePath().toLocal8Bit());
-        QString diskPath;
     #if defined (Q_OS_LINUX)
         diskPath = nd->getDiskPath() + "1";
     #endif
     #if defined (Q_OS_MAC)
         diskPath = nd->getDiskPath() + "s1";
     #endif
-        if (! mount(diskPath.toLocal8Bit(), mountDir.absolutePath().toLocal8Bit(), "vfat", 1, ""))
+
+    /* Always first partition */
+    utils::writeLog("Mounting the first filesystem on " + nd->getDiskPath());
+    QDir mountDir = QDir(QDir::temp().absolutePath().append(QByteArray("/osmc_mnt")));
+    if (! mountDir.exists())
+        mountDir.mkpath(mountDir.absolutePath());
+
+    /*
+     * the following umount may fail, just because the dir exists doesn't mean
+     * that it is actually mounted. be nice, don't check for errors.
+     */
+    if (mountDir.exists())
+        io::unmount(diskPath, false);
+    if (! io::mount(diskPath, mountDir.absolutePath()))
         {
             utils::writeLog("Could not mount filesystem!");
             return;
@@ -376,7 +382,7 @@ void MainWindow::showSuccessDialog()
             utils::writeLog("Filesystem is mounted");
             utils::writeLog("Writing the preseeder to filesystem");
             QStringList preseedList = ps->getPreseed();
-            QFile preseedFile(QString(mountDir.absolutePath() + "preseed.cfg"));
+            QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
             preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
             QTextStream out(&preseedFile);
             for (int i = 0; i < preseedList.count(); i++)
@@ -385,7 +391,7 @@ void MainWindow::showSuccessDialog()
             }
             preseedFile.close();
         }
-        umount(mountDir.absolutePath().toLocal8Bit());
+        io::unmount(diskPath, false);
 	system("/bin/sync");
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
@@ -395,7 +401,7 @@ void MainWindow::showSuccessDialog()
       /* TODo: implement this AFTER we fix potential Windows imaging bug */
 #endif
     sd = new SuccessDialog(this);
-    rotateWidget(sd, ep, false);
+    rotateWidget(ep, sd, false);
 }
 
 MainWindow::~MainWindow()

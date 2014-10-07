@@ -47,7 +47,8 @@ void ExtractProgress::writeImageToDisk()
     ui->extractProgressBar->setMaximum(io::getFileSize(deviceImage));
     ui->extractProgressBar->setMinimum(0);
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath);
+    ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath
+                                     + tr("\n(This might take a few seconds!)"));
 #endif
 #if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
     ui->extractDetailsLabel->setText(tr("Unmounting device"));
@@ -73,7 +74,9 @@ void ExtractProgress::writeImageToDisk()
             return;
         }
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath);
+        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath
+                                         + tr("\n(This might take a few minutes!)")
+                                         + tr("\n(please be patient.)"));
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
         ui->extractDetailsLabel->setText(tr(("Writing image to your device")));
@@ -108,7 +111,7 @@ void ExtractProgress::writeImageToDisk()
 bool ExtractProgress::unmountDisk()
 {
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    return io::unmountDisk(this->devicePath);
+    return io::unmount(this->devicePath, true);
 #endif
 #if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
     /* Poor mans solution: trash MBR, which we do during write later */
