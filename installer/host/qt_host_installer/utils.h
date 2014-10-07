@@ -22,6 +22,7 @@ namespace utils
     const static int INSTALL_USB = 2;
     const static int INSTALL_NFS = 3;
     const static int INSTALL_EMMC = 4;
+    const static int INSTALL_PARTITIONER = 5;
     const static int WIRELESS_ENCRYPTION_NONE = 0;
     const static int WIRELESS_ENCRYPTION_WPAPSK = 1;
     const static int WIRELESS_ENCRYPTION_WEP = 2;

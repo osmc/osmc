@@ -59,6 +59,7 @@ private:
     QNetworkAccessManager *accessManager;
     DiskDevice *nd;
     QString nfsPath;
+    QString localeName;
     QMovie *spinner;
 };
 

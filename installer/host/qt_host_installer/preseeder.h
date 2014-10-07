@@ -3,13 +3,15 @@
 #include <QString>
 #include <QStringList>
 #include "networksettings.h"
+#include "mainwindow.h"
 
 class Preseeder
 {
 public:
     Preseeder();
-    void setLanguageString(QString language);
+    void setLanguageString(QString locale);
     void setNetworkSettings(NetworkSettings *ns);
+    void setTargetSettings(MainWindow *mw);
     QStringList getPreseed() { return preseedStringList; }
     static const int PRESEED_STRING = 0;
     static const int PRESEED_BOOL = 1;

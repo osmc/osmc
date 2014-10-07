@@ -13,7 +13,12 @@ PreseedDevice::PreseedDevice(QWidget *parent, SupportedDevice dev) :
     if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal())
     {
         utils::writeLog("This device does not support preseeding at all.");
-        emit preseedSelected(utils::INSTALL_USB);
+        emit preseedSelected(utils::INSTALL_NOPRESEED);
+    }
+    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal() && dev.allowsPreseedingPartitioning())
+    {
+        utils::writeLog("This device is a traditional partitionable target, i.e. desktop");
+        emit preseedSelected(utils::INSTALL_PARTITIONER);
     }
     if (!dev.allowsPreseedingNFS())
     {

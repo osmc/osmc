@@ -24,6 +24,10 @@
 #include "successdialog.h"
 #include "preseeder.h"
 #include <QMovie>
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+    #include <sys/mount.h>
+    #include <QDir>
+#endif
 
 #define WIDGET_START QPoint(10,110)
 
@@ -321,6 +325,7 @@ void MainWindow::translate(QString locale)
         utils::writeLog("Translation loaded successfully");
         qApp->installTranslator(&translator);
         ui->retranslateUi(this);
+        this->localeName = locale;
     }
     else
         utils::writeLog("Could not load translation!");
@@ -328,6 +333,66 @@ void MainWindow::translate(QString locale)
 
 void MainWindow::showSuccessDialog()
 {
+    /* Set up preseeder first */
+    utils::writeLog("Creating preseeder");
+    Preseeder *ps = new Preseeder();
+    if (this->device.allowsPreseedingNFS() || this->device.allowsPreseedingUSB() || this->device.allowsPreseedingSD() || this->device.allowsPreseedingInternal() || this->device.allowsPreseedingPartitioning() || this->device.allowsPreseedingNetwork())
+    {
+        ps->setLanguageString(this->localeName);
+        ps->setTargetSettings(this);
+        if (this->device.allowsPreseedingNetwork())
+        {
+            ps->setNetworkSettings(nss);
+        }
+    }
+    /* Write to the target */
+    utils::writeLog("Writing preseeder");
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+    #if defined (Q_OS_LINUX)
+        utils::writeLog("Informing the kernel of updated partition table");
+        system("/sbin/partprobe");
+    #endif
+        /* Always first partition */
+        utils::writeLog("Mounting the first filesystem on " + nd->getDiskPath());
+        QDir mountDir = QDir(QDir::temp().absolutePath().append(QByteArray("/osmc_mnt")));
+        if (! mountDir.exists())
+            mountDir.mkpath("");
+        if (mountDir.exists())
+            umount(mountDir.absolutePath().toLocal8Bit());
+        QString diskPath;
+    #if defined (Q_OS_LINUX)
+        diskPath = nd->getDiskPath() + "1";
+    #endif
+    #if defined (Q_OS_MAC)
+        diskPath = nd->getDiskPath() + "s1";
+    #endif
+        if (! mount(diskPath.toLocal8Bit(), mountDir.absolutePath().toLocal8Bit(), "vfat", 1, ""))
+        {
+            utils::writeLog("Could not mount filesystem!");
+            return;
+        }
+        else
+        {
+            utils::writeLog("Filesystem is mounted");
+            utils::writeLog("Writing the preseeder to filesystem");
+            QStringList preseedList = ps->getPreseed();
+            QFile preseedFile(QString(mountDir.absolutePath() + "preseed.cfg"));
+            preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
+            QTextStream out(&preseedFile);
+            for (int i = 0; i < preseedList.count(); i++)
+            {
+                out << preseedList.at(i) + "\n";
+            }
+            preseedFile.close();
+        }
+        umount(mountDir.absolutePath().toLocal8Bit());
+#endif
+#if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+      /* We don't need to mount a partition here, thanks Windows.
+       * But we might have not had a device path earlier due to no partition existing, so we need to re-run usbitcmd.exe and
+       * check for matching device ID */
+      /* TODo: implement this AFTER we fix potential Windows imaging bug */
+#endif
     sd = new SuccessDialog(this);
     rotateWidget(sd, ep, false);
 }
