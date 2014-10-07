@@ -21,4 +21,6 @@ void WriteImageWorker::process()
 {
     if (io::writeImage(this->devicePath, this->deviceImage, this))
         emit finished();
+    else
+        emit error();
 }
