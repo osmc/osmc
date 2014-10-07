@@ -386,6 +386,7 @@ void MainWindow::showSuccessDialog()
             preseedFile.close();
         }
         umount(mountDir.absolutePath().toLocal8Bit());
+	system("/bin/sync");
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
       /* We don't need to mount a partition here, thanks Windows.
