@@ -17,14 +17,17 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "io.h"
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-#include "nixdiskdevice.h"
-#endif
+#include "diskdevice.h"
 #include "licenseagreement.h"
 #include "downloadprogress.h"
 #include "extractprogress.h"
+#include "successdialog.h"
 #include "preseeder.h"
 #include <QMovie>
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+    #include <sys/mount.h>
+    #include <QDir>
+#endif
 
 #define WIDGET_START QPoint(10,110)
 
@@ -39,6 +42,7 @@ WiFiNetworkSetup *wss;
 LicenseAgreement *la;
 DownloadProgress *dp;
 ExtractProgress *ep;
+SuccessDialog *sd;
 
 QTranslator translator;
 
@@ -72,8 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton)
 {
-
-
     this->ui->backButton->setEnabled(enableBackbutton);
 
     // make sure we update the state of the BackButton
@@ -172,6 +174,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
     /* We call the preseeder: even if we can't preseed, we use its callback to handle the rest of the application */
     ps = new PreseedDevice(this, this->device);
     connect(ps, SIGNAL(preseedSelected(int)), this, SLOT(setPreseed(int)));
+    connect(ps, SIGNAL(preseedSelected(int, QString)), this, SLOT(setPreseed(int,QString)));
     rotateWidget(vs, ps);
 }
 
@@ -188,10 +191,21 @@ void MainWindow::setPreseed(int installType)
     {
         /* Straight to device selection */
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
-        #endif
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         rotateWidget(ps, ds);
+    }
+}
+
+void MainWindow::setPreseed(int installType, QString nfsPath)
+{
+    this->installType = utils::INSTALL_NFS;
+    utils::writeLog("NFS installation to " + nfsPath + " selected");
+    this->nfsPath = nfsPath;
+    if (device.allowsPreseedingNetwork())
+    {
+        ns = new NetworkSetup(this, false);
+        connect(ns, SIGNAL(setNetworkOptionsInit(bool,bool)), this, SLOT(setNetworkInitial(bool,bool)));
+        rotateWidget(ps, ns);
     }
 }
 
@@ -222,9 +236,7 @@ void MainWindow::setNetworkInitial(bool useWireless, bool advanced)
         nss->setDHCP(true);
         nss->setWireless(false);
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
-        #endif
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         rotateWidget(ns, ds);
     }
 }
@@ -247,9 +259,7 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
     else
     {
         ds = new DeviceSelection(this);
-        #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-        connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
-        #endif
+        connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
         rotateWidget(ans, ds);
     }
 }
@@ -260,36 +270,32 @@ void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_va
     nss->setWirelessSSID(ssid);
     nss->setWirelessKeyType(key_type);
     /* No point if open */
-    if (! nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE)
+    if (! (nss->getWirelessKeyType() == utils::WIRELESS_ENCRYPTION_NONE))
         nss->setWirelessKeyValue(key_value);
     ds = new DeviceSelection(this);
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    connect(ds, SIGNAL(nixDeviceSelected(NixDiskDevice*)), this, SLOT(selectNixDevice(NixDiskDevice*)));
-    #endif
+    connect(ds, SIGNAL(DeviceSelected(DiskDevice*)), this, SLOT(selectDevice(DiskDevice*)));
     rotateWidget(wss, ds);
 }
 
-void MainWindow::selectNixDevice(NixDiskDevice *nd)
+void MainWindow::selectDevice(DiskDevice *nd)
 {
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     this->nd = nd;
     la = new LicenseAgreement(this);
     connect(la, SIGNAL(licenseAccepted()), this, SLOT(acceptLicense()));
     rotateWidget(ds, la);
     this->installDevicePath = nd->getDiskPath();
-#endif
+    this->installDeviceID = nd->getDiskID();
 }
 
 void MainWindow::acceptLicense()
 {
     /* Move to Download widget, even if we aren't downloading */
     QUrl url;
-    dp = new DownloadProgress(this, this->image);
+    dp = new DownloadProgress(this);
     url = this->image;
     connect(dp, SIGNAL(downloadCompleted(QString)), this, SLOT(completeDownload(QString)));
-    connect(dp, SIGNAL(enableBackButton(bool)), this, SLOT(setEnableBackbutton(bool)));
     rotateWidget(la, dp, false);
-    dp->download(this, url, this->isOnline);
+    dp->download(url, this->isOnline);
 }
 
 void MainWindow::completeDownload(QString fileName)
@@ -299,7 +305,14 @@ void MainWindow::completeDownload(QString fileName)
         this->image = QUrl(fileName);
     utils::writeLog("Creating preseeder");
     Preseeder *preseeder = new Preseeder();
-    ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
+#if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+        /* Windows: we actually want the device ID */
+        ep = new ExtractProgress(this, QString::number(this->installDeviceID), this->image.toString());
+#endif
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+        ep = new ExtractProgress(this, this->installDevicePath, this->image.toString());
+#endif
+    connect(ep, SIGNAL(finishedExtraction()), this, SLOT(showSuccessDialog()));
     rotateWidget(dp, ep, false);
     ep->extract();
 }
@@ -312,22 +325,88 @@ void MainWindow::translate(QString locale)
         utils::writeLog("Translation loaded successfully");
         qApp->installTranslator(&translator);
         ui->retranslateUi(this);
+        this->localeName = locale;
     }
     else
         utils::writeLog("Could not load translation!");
 }
 
+void MainWindow::showSuccessDialog()
+{
+    /* Set up preseeder first */
+    utils::writeLog("Creating preseeder");
+    Preseeder *ps = new Preseeder();
+    if (this->device.allowsPreseedingNFS() || this->device.allowsPreseedingUSB() || this->device.allowsPreseedingSD() || this->device.allowsPreseedingInternal() || this->device.allowsPreseedingPartitioning() || this->device.allowsPreseedingNetwork())
+    {
+        ps->setLanguageString(this->localeName);
+        ps->setTargetSettings(this);
+        if (this->device.allowsPreseedingNetwork())
+        {
+            ps->setNetworkSettings(nss);
+        }
+    }
+    /* Write to the target */
+    utils::writeLog("Writing preseeder");
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+    QString diskPath;
+    #if defined (Q_OS_LINUX)
+        utils::writeLog("Informing the kernel of updated partition table");
+        system("/sbin/partprobe");
+    #endif
+    #if defined (Q_OS_LINUX)
+        diskPath = nd->getDiskPath() + "1";
+    #endif
+    #if defined (Q_OS_MAC)
+        diskPath = nd->getDiskPath() + "s1";
+    #endif
+
+    /* Always first partition */
+    utils::writeLog("Mounting the first filesystem on " + nd->getDiskPath());
+    QDir mountDir = QDir(QDir::temp().absolutePath().append(QByteArray("/osmc_mnt")));
+    if (! mountDir.exists())
+        mountDir.mkpath(mountDir.absolutePath());
+
+    utils::writeLog("Trying to umount before we are remounting and writing the preseed.");
+
+    /* try both paths for umount, ignore errors */
+    io::unmount(diskPath, false);
+    io::unmount(nd->getDiskPath(), true);
+
+    if (! io::mount(diskPath, mountDir.absolutePath()))
+    {
+        utils::writeLog("Could not mount filesystem!");
+        return;
+    }
+    else
+    {
+        utils::writeLog("Filesystem is mounted");
+        utils::writeLog("Writing the preseeder to filesystem");
+        QStringList preseedList = ps->getPreseed();
+        QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
+        preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&preseedFile);
+        for (int i = 0; i < preseedList.count(); i++)
+        {
+            out << preseedList.at(i) + "\n";
+        }
+        preseedFile.close();
+    }
+    utils::writeLog("Finished. Unmount in any case...");
+    io::unmount(diskPath, false);
+    utils::writeLog("Final sync.");
+	system("/bin/sync");
+#endif
+#if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+      /* We don't need to mount a partition here, thanks Windows.
+       * But we might have not had a device path earlier due to no partition existing, so we need to re-run usbitcmd.exe and
+       * check for matching device ID */
+      /* TODo: implement this AFTER we fix potential Windows imaging bug */
+#endif
+    sd = new SuccessDialog(this);
+    rotateWidget(ep, sd, false);
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-SupportedDevice* MainWindow::getSupportedDevice()
-{
-    return &device;
-}
-
-int MainWindow::getInstallType()
-{
-    return installType;
 }

@@ -87,6 +87,9 @@ background: rgb(240, 240, 240, 0);
      <pointsize>24</pointsize>
     </font>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 color:#17394A;
@@ -94,6 +97,9 @@ background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
+}
+QPushButton:focus {
+border: 1px solid #17394A;
 }
 
 QPushButton:hover {
@@ -112,13 +118,29 @@ radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 </string>
    </property>
    <property name="text">
-    <string>-&gt;</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="assets.qrc">
+     <normaloff>:/assets/resources/forward.png</normaloff>:/assets/resources/forward.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLineEdit" name="gwlineEdit">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>160</y>
      <width>121</width>
      <height>21</height>
@@ -139,7 +161,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLabel" name="ipaddressLabel">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>120</y>
      <width>21</width>
      <height>21</height>
@@ -166,7 +188,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLabel" name="maskLabel">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>140</y>
      <width>51</width>
      <height>21</height>
@@ -193,7 +215,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLineEdit" name="dns2lineEdit">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>200</y>
      <width>121</width>
      <height>21</height>
@@ -214,7 +236,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLineEdit" name="masklineEdit">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>140</y>
      <width>121</width>
      <height>21</height>
@@ -235,7 +257,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLabel" name="primarydnsLabel">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>180</y>
      <width>41</width>
      <height>21</height>
@@ -262,7 +284,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLabel" name="gatewayLabel">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>160</y>
      <width>31</width>
      <height>21</height>
@@ -289,7 +311,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLabel" name="secondaryDNSLabel">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>200</y>
      <width>41</width>
      <height>21</height>
@@ -316,7 +338,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLineEdit" name="ipaddresslineEdit">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>120</y>
      <width>121</width>
      <height>21</height>
@@ -337,7 +359,7 @@ background: rgb(240, 240, 240, 0);
   <widget class="QLineEdit" name="dns1lineEdit">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>180</y>
      <width>121</width>
      <height>21</height>
@@ -356,6 +378,16 @@ background: rgb(240, 240, 240, 0);
    </property>
   </widget>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>ipaddresslineEdit</tabstop>
+  <tabstop>masklineEdit</tabstop>
+  <tabstop>gwlineEdit</tabstop>
+  <tabstop>dns1lineEdit</tabstop>
+  <tabstop>dns2lineEdit</tabstop>
+  <tabstop>networkoptionsnextButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>

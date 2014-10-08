@@ -33,6 +33,9 @@ background: rgb(240, 240, 240);
      <pointsize>24</pointsize>
     </font>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 color:#17394A;
@@ -40,6 +43,9 @@ background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
+}
+QPushButton:focus {
+border: 1px solid #17394A;
 }
 
 QPushButton:hover {
@@ -56,7 +62,23 @@ radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 </string>
    </property>
    <property name="text">
-    <string>-&gt;</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="assets.qrc">
+     <normaloff>:/assets/resources/forward.png</normaloff>:/assets/resources/forward.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="installoptionsdescriptionLabel">
@@ -116,9 +138,9 @@ background: rgb(240, 240, 240, 0);
   <widget class="QGroupBox" name="radiobuttongroupBox">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>210</x>
      <y>100</y>
-     <width>181</width>
+     <width>221</width>
      <height>131</height>
     </rect>
    </property>
@@ -135,7 +157,7 @@ background: rgb(240, 240, 240, 0);
      <rect>
       <x>20</x>
       <y>70</y>
-      <width>151</width>
+      <width>191</width>
       <height>20</height>
      </rect>
     </property>
@@ -144,6 +166,9 @@ background: rgb(240, 240, 240, 0);
       <family>Sans Souce Pro</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
@@ -159,8 +184,8 @@ background: rgb(240, 240, 240, 0);
      <rect>
       <x>20</x>
       <y>40</y>
-      <width>151</width>
-      <height>20</height>
+      <width>191</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -168,6 +193,9 @@ background: rgb(240, 240, 240, 0);
       <family>Sans Souce Pro</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
@@ -183,7 +211,7 @@ background: rgb(240, 240, 240, 0);
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>151</width>
+      <width>191</width>
       <height>20</height>
      </rect>
     </property>
@@ -192,6 +220,9 @@ background: rgb(240, 240, 240, 0);
       <family>Sans Souce Pro</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
@@ -210,7 +241,7 @@ background: rgb(240, 240, 240, 0);
      <rect>
       <x>20</x>
       <y>100</y>
-      <width>151</width>
+      <width>191</width>
       <height>20</height>
      </rect>
     </property>
@@ -219,6 +250,9 @@ background: rgb(240, 240, 240, 0);
       <family>Sans Souce Pro</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
@@ -235,6 +269,15 @@ background: rgb(240, 240, 240, 0);
   <zorder>installoptionsdescriptionLabel</zorder>
   <zorder>installoptionsLabel</zorder>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>sdinstallradioButton</tabstop>
+  <tabstop>usbinstallradioButton</tabstop>
+  <tabstop>nfsinstallradioButton</tabstop>
+  <tabstop>emmcinstallradioButton</tabstop>
+  <tabstop>installoptionsnextButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>

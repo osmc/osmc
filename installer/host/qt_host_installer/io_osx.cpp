@@ -2,16 +2,16 @@
 #include <QString>
 #include <QStringList>
 #include "utils.h"
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 #include <QList>
 #include <QTextStream>
 #include "io.h"
 
 namespace io
 {
-   QList<NixDiskDevice *> enumerateDevice()
+   QList<DiskDevice *> enumerateDevice()
    {
-       QList<NixDiskDevice *> devices;
+       QList<DiskDevice *> devices;
        utils::writeLog("Enumerating imageable devices for OSX");
        QProcess process;
        QStringList lines;
@@ -67,7 +67,7 @@ namespace io
 
                deviceSpace.remove("*");
 
-               NixDiskDevice *nd = new NixDiskDevice(i, devicePath, deviceSpace);
+               DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
                devices.append(nd);
            }
        }
@@ -88,27 +88,70 @@ namespace io
        p.write(aScript.toUtf8());
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
+       p.waitForFinished(-1);       
+       p.waitForReadyRead(-1);
        p.waitForFinished(-1);
+       QByteArray stdoutArray = p.readAllStandardOutput();
+       QByteArray stderrArray = p.readAllStandardError();
+       int exitCode = p.exitCode();
 
-       if (p.exitStatus() == QProcess::NormalExit) {
+
+
+       if (exitCode == 0 && p.exitStatus() == QProcess::NormalExit) {
            utils::writeLog("Imaging was successful");
            return true;
        }
        else
        {
            utils::writeLog("Imaging failed!");
+           utils::writeLog("Messages are:");
+           utils::writeLog("\t stdout: " + QString(stdoutArray));
+           utils::writeLog("\t stderr: " + QString(stderrArray));
            return false;
        }
    }
 
-   bool unmountDisk(QString devicePath)
+   bool mount(QString devicePath, QString mountDir)
    {
        QString aScript ="diskutil";
 
-       QString osascript = "/usr/bin/osascript";
        QStringList processArguments;
        QProcess p;
-       processArguments << "unmountDisk" << devicePath;
+       processArguments << "mount" << "-mountPoint" << mountDir << devicePath;
+
+       p.start(aScript, processArguments);
+
+       p.closeWriteChannel();
+       p.waitForReadyRead(-1);
+       p.waitForFinished(-1);
+       QByteArray stdoutArray = p.readAllStandardOutput();
+       QByteArray stderrArray = p.readAllStandardError();
+       int exitCode = p.exitCode();
+
+       /* Non-0 exit code indicates failure */
+       if (exitCode != 0)
+       {
+           utils::writeLog("Could not mount "
+                           + devicePath + ". Messages are: stdErr: " + QString(stderrArray)
+                           + "\n stdOut: " + QString(stdoutArray));
+           return false;
+       }
+       else
+          return true;
+   }
+
+   bool unmount(QString devicePath, bool isDisk)
+   {
+       QString aScript ="diskutil";
+
+       QStringList processArguments;
+       QProcess p;
+       if (isDisk)
+           processArguments << "unmountDisk";
+       else
+           processArguments << "unmount";
+
+       processArguments << devicePath;
 
        p.start(aScript, processArguments);
 
@@ -116,12 +159,16 @@ namespace io
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);
+       QByteArray stdoutArray = p.readAllStandardOutput();
        QByteArray stderrArray = p.readAllStandardError();
+       int exitCode = p.exitCode();
 
-       /* Non-empty stderr indicates failure */
-       if (stderrArray.size() > 0)
+       /* Non-0 exit code indicates failure */
+       if (exitCode != 0)
        {
-           utils::writeLog("Could not unmount " + devicePath + ". Message was: " + QString(stderrArray));
+           utils::writeLog("Could not mount "
+                           + devicePath + ". Messages are: stdErr: " + QString(stderrArray)
+                           + "\n stdOut: " + QString(stdoutArray));
            return false;
        }
        else

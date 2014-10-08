@@ -8,7 +8,7 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include "networksettings.h"
-#include "nixdiskdevice.h"
+#include "diskdevice.h"
 #include <QMovie>
 
 namespace Ui {
@@ -23,17 +23,18 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    SupportedDevice *getSupportedDevice();
-    int getInstallType();
+    int getInstallType() { return installType; }
+    QString getNFSPath() { return nfsPath; }
 
 public slots:
     void setLanguage(QString, SupportedDevice);
     void setVersion(bool, QUrl);
     void setPreseed(int installType);
+    void setPreseed(int installType, QString nfsPath);
     void setNetworkInitial(bool useWireless, bool advanced);
     void setNetworkAdvanced(QString ip, QString mask, QString gw, QString dns1, QString dns2);
     void setWiFiConfiguration(QString ssid, int key_type, QString key_value);
-    void selectNixDevice(NixDiskDevice *nd);
+    void selectDevice(DiskDevice *nd);
     void acceptLicense();
     void completeDownload(QString fileName);
     void showUpdate();
@@ -41,6 +42,7 @@ public slots:
     void replyFinished(QNetworkReply* reply);
     void rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enableBackbutton = true);
     void goBack();
+    void showSuccessDialog();
     
 private:
     Ui::MainWindow *ui;
@@ -49,14 +51,15 @@ private:
     QString mirrorURL;
     SupportedDevice device;
     QString installDevicePath;
+    int installDeviceID;
     bool isOnline;
     QUrl image;
     int installType;
     NetworkSettings *nss;
     QNetworkAccessManager *accessManager;
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    NixDiskDevice *nd;
-    #endif
+    DiskDevice *nd;
+    QString nfsPath;
+    QString localeName;
     QMovie *spinner;
 };
 

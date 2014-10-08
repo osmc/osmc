@@ -19,14 +19,8 @@ void WriteImageWorker::emitProgressUpdate(unsigned progress)
 
 void WriteImageWorker::process()
 {
-
-    bool success = false;
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    success = io::writeImage(this->devicePath, this->deviceImage, this);
-#endif
-
-    if (success)
-    {
+    if (io::writeImage(this->devicePath, this->deviceImage, this))
         emit finished();
-    }
+    else
+        emit error();
 }

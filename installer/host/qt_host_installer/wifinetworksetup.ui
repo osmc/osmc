@@ -87,6 +87,9 @@ background: rgb(240, 240, 240, 0);
      <pointsize>24</pointsize>
     </font>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 color:#17394A;
@@ -94,6 +97,9 @@ background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
+}
+QPushButton:focus {
+border: 1px solid #17394A;
 }
 
 QPushButton:hover {
@@ -110,7 +116,23 @@ radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 </string>
    </property>
    <property name="text">
-    <string>-&gt;</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="assets.qrc">
+     <normaloff>:/assets/resources/forward.png</normaloff>:/assets/resources/forward.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="ssidnameLabel">
@@ -166,7 +188,7 @@ background: rgb(240, 240, 240, 0);
     <rect>
      <x>230</x>
      <y>200</y>
-     <width>181</width>
+     <width>191</width>
      <height>22</height>
     </rect>
    </property>
@@ -266,6 +288,14 @@ background: rgb(240, 240, 240, 0);
    </property>
   </widget>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>ssidnamelineEdit</tabstop>
+  <tabstop>keylineEdit</tabstop>
+  <tabstop>keySelectionBox</tabstop>
+  <tabstop>networkoptionsnextButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -46,38 +46,50 @@ void ExtractProgress::writeImageToDisk()
     status = WRITING_STATUS;
     ui->extractProgressBar->setMaximum(io::getFileSize(deviceImage));
     ui->extractProgressBar->setMinimum(0);
-    ui->extractDetailsLabel->setText("Unmounting " + this->devicePath);
+#if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
+    ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath
+                                     + tr("\n(This might take a few seconds!)"));
+#endif
+#if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
+    ui->extractDetailsLabel->setText(tr("Unmounting device"));
+#endif
     utils::writeLog("Requesting confirmation from user");
-    const char* message = ("Do you want to image the device " + this->devicePath + "? OSMC is not responsible for loss of personal data").toUtf8().constData();
-    if (utils::promptYesNo(this, tr("Are you sure"), tr(message)))
+    /* We don't always have drive letter on Windows, plus, we use ID not disk */
+
+#if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
+   const char *message = tr("Do you want to image the device you selected previously? OSMC is not responsible for loss of personal data").toUtf8().constData();
+#endif
+#if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
+    const char *message = (tr("Do you want to image the device ") + this->devicePath + "?\n" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
+#endif
+    if (utils::promptYesNo(tr("Are you sure"), tr(message)))
     {
         utils::writeLog("User confirmed");
         bool unmountSuccess = unmountDisk();
 
         if (unmountSuccess == false)
         {
-            utils::displayError("Unmount failed!", "Could not unmount device " + devicePath + ". Check the log for error messages. Will have to quit now.", true);
+            utils::displayError(tr("Unmount failed!"), tr("Could not unmount device ") + devicePath + "." + tr("Check the log for error messages. OSMC must exit now."), true);
             QApplication::quit();
             return;
         }
+#if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
+        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath
+                                         + tr("\n(This might take a few minutes!)")
+                                         + tr("\n(please be patient.)"));
+#endif
+#if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+        ui->extractDetailsLabel->setText(tr(("Writing image to your device")));
+#endif
 
-        /*
-         * Ok, everything seems fine now.
-         * Should we do a double check if the device is really unmounted?
-         * Well, I'm paranoid.
-         */
-
-        ui->extractDetailsLabel->setText("Writing image to " + this->devicePath);
-
-#ifdef Q_OS_MAC
-        /* At the moment, We can't provide a real progress bar on OSX, so set up a busy bar here */
+#if defined (Q_OS_MAC) || defined (Q_OS_WIN) || defined (Q_OS_WIN32)
+        /* At the moment, We can't provide a real progress bar on OSX or Windows, so set up a busy bar here */
         ui->extractProgressBar->setMaximum(0);
         ui->extractProgressBar->setMinimum(0);
 #endif
 
         QThread* thread = new QThread;
         WriteImageWorker *worker = new WriteImageWorker(this->deviceImage, this->devicePath);
-
         worker->moveToThread(thread);
         connect(worker, SIGNAL(error()), this, SLOT(writeError()));
         connect(thread, SIGNAL(started()), worker, SLOT(process()));
@@ -99,7 +111,11 @@ void ExtractProgress::writeImageToDisk()
 bool ExtractProgress::unmountDisk()
 {
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    return io::unmountDisk(this->devicePath);
+    return io::unmount(this->devicePath, true);
+#endif
+#if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
+    /* Poor mans solution: trash MBR, which we do during write later */
+    return true;
 #endif
 }
 
@@ -125,46 +141,44 @@ void ExtractProgress::doExtraction()
 void ExtractProgress::extractError()
 {
     ui->extractProgressBar->setValue(0);
-    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!"));
+    /* need to make sure progressBar is not idling */
+    ui->extractProgressBar->setMaximum(100);
+    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!")
+                                     + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::writeError()
 {
     ui->extractProgressBar->setValue(0);
-    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!"));
+    /* need to make sure progressBar is not idling */
+    ui->extractProgressBar->setMaximum(100);
+    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!")
+                                        + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::setProgress(unsigned written)
 {
-    if(status = EXTRACTING_STATUS){
+    if(status == EXTRACTING_STATUS){
         ui->extractProgressBar->setValue(written);
-        ui->extractDetailsLabel->setText("Unzipping " + QString::number(written / 1024 / 1024) + "MB");
+        ui->extractDetailsLabel_2->setText(tr("Extracting") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
-    if(status = WRITING_STATUS){
+    if(status == WRITING_STATUS){
         ui->extractProgressBar->setValue(written);
-        ui->extractDetailsLabel->setText("Written " + QString::number(written / 1024 / 1024) + "MB");
+        ui->extractDetailsLabel_2->setText(tr("Written") + " " + QString::number(written / 1024 / 1024) + "MB");
     }
 }
 
-/*!
- * \brief ExtractProgress::finished
- * Our worker has signalled finished. Now we can write the image.
- *
- */
 void ExtractProgress::finished()
 {
     utils::writeLog("Finished extraction. Going to write image");
+    ui->extractDetailsLabel_2->setText("");
     writeImageToDisk();
 }
 
 void ExtractProgress::writeFinished()
 {
-    /* HOOOOORAY! */
-    ui->extractDetailsLabel->setText("Finished");
-    ui->extractProgressBar->hide();
-
-    utils::writeLog("Finished extraction. Going to write image");
-    utils::writeLog("HOOOOOORAY!");
+    utils::writeLog("Image successfully written to device");
+    emit(finishedExtraction());
 }
 
 ExtractProgress::~ExtractProgress()

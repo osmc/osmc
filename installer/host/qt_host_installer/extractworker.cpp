@@ -7,7 +7,7 @@
 #include "utils.h"
 #include <QDir>
 
-#define CHUNKSIZE 8192
+#define CHUNKSIZE 32768
 
 ExtractWorker::ExtractWorker(QString sourcename, QString targetname)
 {

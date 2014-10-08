@@ -17,11 +17,11 @@ class DownloadProgress : public QWidget
     Q_OBJECT
     
 public:
-    explicit DownloadProgress(QWidget *parent = 0, QUrl URL = QUrl(NULL));
+    explicit DownloadProgress(QWidget *parent = 0);
     ~DownloadProgress();
 
 public slots:
-    void download(QWidget *parent, QUrl URL, bool isOnline);
+    void download(QUrl URL, bool isOnline);
 
 signals:
     void downloadCompleted(QString);

@@ -32,6 +32,9 @@ background: rgb(240, 240, 240);</string>
      <pointsize>24</pointsize>
     </font>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 color:#17394A;
@@ -39,6 +42,9 @@ background: qradialgradient(cx: 0.3, cy: -0.4,
 fx: 0.3, fy: -0.4,
 radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(210,210,210));
 border-radius: 11px;
+}
+QPushButton:focus {
+border: 1px solid #17394A;
 }
 
 QPushButton:hover {
@@ -55,7 +61,23 @@ radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
 </string>
    </property>
    <property name="text">
-    <string>-&gt;</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="assets.qrc">
+     <normaloff>:/assets/resources/forward.png</normaloff>:/assets/resources/forward.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="networkoptionsdescriptionLabel">
@@ -141,6 +163,9 @@ background: rgb(240, 240, 240, 0);</string>
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
+    </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
 background: rgb(240, 240, 240, 0);</string>
@@ -164,6 +189,9 @@ background: rgb(240, 240, 240, 0);</string>
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
+    </property>
     <property name="styleSheet">
      <string notr="true">color: #17394A;
 background: rgb(240, 240, 240, 0);</string>
@@ -181,7 +209,7 @@ background: rgb(240, 240, 240, 0);</string>
     <rect>
      <x>230</x>
      <y>200</y>
-     <width>191</width>
+     <width>261</width>
      <height>20</height>
     </rect>
    </property>
@@ -190,6 +218,9 @@ background: rgb(240, 240, 240, 0);</string>
      <family>Source Sans Pro</family>
      <pointsize>12</pointsize>
     </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::WheelFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">color: #17394A;
@@ -205,6 +236,14 @@ background: rgb(240, 240, 240, 0);</string>
   <zorder>networkoptionsLabel</zorder>
   <zorder>advancednetworkingcheckBox</zorder>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>wiredconnectionradioButton</tabstop>
+  <tabstop>wirelessconnectionradioButton</tabstop>
+  <tabstop>advancednetworkingcheckBox</tabstop>
+  <tabstop>networkoptionsnextButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,11 +1,8 @@
 #include "deviceselection.h"
 #include "ui_deviceselection.h"
-#include "mainwindow.h"
 #include "utils.h"
 #include "io.h"
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-#include "nixdiskdevice.h"
-#endif
+#include "diskdevice.h"
 #include <QListWidgetItem>
 #include <QMap>
 
@@ -25,60 +22,28 @@ DeviceSelection::~DeviceSelection()
 void DeviceSelection::showDevices()
 {
     ui->devListWidget->clear();
-    nixdevMap.clear();
-    int installType = -1;
-    if(this->parent()) {
-        MainWindow* mw;
-        if(mw =qobject_cast<MainWindow*>(parent())) {
-            installType = mw->getInstallType();
-        }
-    }
+    devMap.clear();
     QListWidgetItem *header = new QListWidgetItem(tr("Device ID     Device Path     Device Space"), ui->devListWidget);
+    header->setFlags(Qt::NoItemFlags);
 
-    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    QList<NixDiskDevice *> nixdevices = io::enumerateDevice();
-    for (int i = 0; i < nixdevices.count(); i++)
-    {
-        NixDiskDevice *device = nixdevices.at(i);
-        QString nixDeviceStr = QString::number(device->getDiskID()) + "     " + device->getDiskPath() + "   " + device->getDiskSize();
-        QListWidgetItem *item = new QListWidgetItem(nixDeviceStr, ui->devListWidget);
-        nixdevMap.insert(nixDeviceStr, device);
-        #ifdef Q_OS_LINUX
-        // only set the right devices checkable
-        switch(installType) {
-        case utils::INSTALL_SD:
-            if(device->sdCard){
-                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            }
-            else {
-                item->setFlags(item->flags() ^ Qt::ItemIsUserCheckable);
-            }
-            break;
-        case utils::INSTALL_USB:
-            if(device->usb){
-                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            }
-            else {
-                item->setFlags(item->flags() ^ Qt::ItemIsUserCheckable);
-            }
-            break;
-        default:
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            break;
-        }
-        #else
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        #endif
-        item->setCheckState(Qt::Unchecked);
-    }
-    #endif
-    #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
+
+#if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
     if (installedWinImageTool = io::installImagingTool() == false) /* We only want to install the binary once, not every refresh */
     {
         utils::writeLog("Cannot proceed to enumerate devices");
         return;
     }
-    #endif
+#endif
+    QList<DiskDevice *> devices = io::enumerateDevice();
+    for (int i = 0; i < devices.count(); i++)
+    {
+        DiskDevice *device = devices.at(i);
+        QString deviceStr = QString::number(device->getDiskID()) + "     " + device->getDiskPath() + "   " + device->getDiskSize();
+        QListWidgetItem *item = new QListWidgetItem(deviceStr, ui->devListWidget);
+        item->setFlags(item->flags() ^ Qt::ItemIsUserCheckable);
+        item->setFlags(item->flags() | Qt::ItemIsSelectable);
+        devMap.insert(deviceStr, device);
+    }
 }
 
 void DeviceSelection::on_refreshButton_clicked()
@@ -96,7 +61,7 @@ void DeviceSelection::on_devicenextButton_clicked()
         if (checkCount > 1)
             break;
         QListWidgetItem* item = ui->devListWidget->item(i);
-        if (item->checkState())
+        if (item->isSelected())
         {
             if(!choosenItem) {
                 choosenItem = item;
@@ -111,9 +76,7 @@ void DeviceSelection::on_devicenextButton_clicked()
     {
         utils::displayError(tr("Please select one device"), tr("You can only select one device to image"));
     } else {
-        #if defined(Q_OS_LINUX ) || defined(Q_OS_MAC)
         utils::writeLog("Device selected: " + choosenItem->text());
-        emit nixDeviceSelected((nixdevMap.value(choosenItem->text())));
-        #endif
+        emit DeviceSelected((devMap.value(choosenItem->text())));
     }
 }

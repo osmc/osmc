@@ -44,11 +44,14 @@ namespace utils
     }
 
 
-    bool promptYesNo(QWidget *parent, QString title, QString question)
+    bool promptYesNo(QString title, QString question)
     {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(parent, title, question, QMessageBox::Yes | QMessageBox::No);
-        if (reply == QMessageBox::Yes)
+        QMessageBox *questionBox = new QMessageBox();
+        questionBox->setWindowTitle(title);
+        questionBox->setText(question);
+        questionBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        if (questionBox->exec() == QMessageBox::Yes)
             return true;
         else
             return false;
@@ -61,6 +64,22 @@ namespace utils
         SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true, true, true, false, true, false);
         devices.append(RBP);
         return devices;
+    }
+
+    bool validateIp(QString ip)
+    {
+        if (ip.isNull() || ip.isEmpty())
+            return false;
+
+        QStringList elements = ip.split(".");
+        for (int i = 0; i < elements.count(); i++)
+        {
+            QString element = elements.at(i);
+            if (element.isEmpty() || element.toInt() < 0 || element.toInt() > 255)
+                return false;
+        }
+
+        return true;
     }
 
 }

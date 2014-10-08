@@ -21,6 +21,7 @@ private slots:
 
 signals:
     void preseedSelected(int installType);
+    void preseedSelected(int installType, QString nfsPath);
 
 private:
     Ui::PreseedDevice *ui;
