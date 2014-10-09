@@ -89,8 +89,6 @@ namespace io
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);       
-       p.waitForReadyRead(-1);
-       p.waitForFinished(-1);
        QByteArray stdoutArray = p.readAllStandardOutput();
        QByteArray stderrArray = p.readAllStandardError();
        int exitCode = p.exitCode();

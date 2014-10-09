@@ -74,11 +74,11 @@ namespace io
            process.start(QDir::temp().filePath("usbitcmd.exe"), QStringList() << "r" << devicePath << deviceImage << "/d", QIODevice::ReadOnly | QIODevice::Text);
            /* ToDo: read percentage and update progress; see if successful. We don't 'wait' for it to finish here but read line by line periodically. Check for .startsWith("Error") and write that to log */
            /* SN 05-10-14: can't get progress with QTextStream on the proc and even "/s" invocation. */
-           p.waitForReadyRead(-1);
-           p.waitForFinished(-1);
-           QByteArray stdoutArray = p.readAllStandardOutput();
-           QByteArray stderrArray = p.readAllStandardError();
-           int exitCode = p.exitCode();
+           process.waitForReadyRead(-1);
+           process.waitForFinished(-1);
+           QByteArray stdoutArray = process.readAllStandardOutput();
+           QByteArray stderrArray = process.readAllStandardError();
+           int exitCode = process.exitCode();
 
 
            if (exitCode != 0)
