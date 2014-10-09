@@ -47,8 +47,7 @@ void ExtractProgress::writeImageToDisk()
     ui->extractProgressBar->setMaximum(io::getFileSize(deviceImage));
     ui->extractProgressBar->setMinimum(0);
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath
-                                     + tr("\n(This might take a few seconds!)"));
+    ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath + tr("\n(This might take a few seconds!)"));
 #endif
 #if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
     ui->extractDetailsLabel->setText(tr("Unmounting device"));
@@ -74,9 +73,7 @@ void ExtractProgress::writeImageToDisk()
             return;
         }
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath
-                                         + tr("\n(This might take a few minutes!)")
-                                         + tr("\n(please be patient.)"));
+        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath + tr("\n(This might take a few minutes!)") + tr("\n(please be patient.)"));
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
         ui->extractDetailsLabel->setText(tr(("Writing image to your device")));
@@ -143,8 +140,7 @@ void ExtractProgress::extractError()
     ui->extractProgressBar->setValue(0);
     /* need to make sure progressBar is not idling */
     ui->extractProgressBar->setMaximum(100);
-    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!")
-                                     + tr("\nPlease consult the logfile."));
+    ui->extractDetailsLabel->setText(tr("An error occured extracting the archive!") + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::writeError()
@@ -152,8 +148,7 @@ void ExtractProgress::writeError()
     ui->extractProgressBar->setValue(0);
     /* need to make sure progressBar is not idling */
     ui->extractProgressBar->setMaximum(100);
-    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!")
-                                        + tr("\nPlease consult the logfile."));
+    ui->extractDetailsLabel->setText(tr("An error occured while writing the image!") + tr("\nPlease consult the logfile."));
 }
 
 void ExtractProgress::setProgress(unsigned written)

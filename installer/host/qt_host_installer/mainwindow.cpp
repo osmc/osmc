@@ -401,17 +401,15 @@ void MainWindow::showSuccessDialog()
       /* We don't need to mount a partition here, thanks Windows.
        * But we might have not had a device path earlier due to no partition existing, so we need to re-run usbitcmd.exe and
        * check for matching device ID */
-    int deviceId = nd->getDiskID();
-    utils::writeLog("Trying to find device with id " + deviceId);
+    int deviceID = nd->getDiskID();
+    utils::writeLog("Trying to find device with id " + deviceID);
     QList<DiskDevice *> devices = io::enumerateDevice();
     for (int i = 0; i < devices.count(); i++)
     {
-        /* TODO is this enough or do we also have to check for the correct volume number?
-         * may be required if the OS has visibility on linux filesystems
-         */
-        if (devices.at(i)->getDiskID() == deviceId)
+        if (devices.at(i)->getDiskID() == deviceID)
         {
-            utils::writeLog("found device. trying to create preseed.cfg at path " + devices.at(i)->getDiskPath());
+            utils::writeLog("Matched device to entry point " + devices.at(i)->getDiskPath());
+            utils::writeLog("Writing the preseeder to filesystem");
             QFile preseedFile(QString(devices.at(i)->getDiskPath() + "preseed.cfg"));
             preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
             QTextStream out(&preseedFile);
@@ -420,7 +418,7 @@ void MainWindow::showSuccessDialog()
                 out << preseedList.at(i) + "\n";
             }
             preseedFile.close();
-            utils::writeLog("Written pressed...");
+            utils::writeLog("Finished.");
         }
     }
 #endif
