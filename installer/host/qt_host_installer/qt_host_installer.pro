@@ -99,6 +99,7 @@ TRANSLATIONS = osmc_da.ts \
     osmc_fr.ts \
     osmc_nl.ts \
     osmc_ru.ts \
+    osmc_sv.ts \
 
 RESOURCES += \
     assets.qrc
