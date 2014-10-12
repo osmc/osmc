@@ -1,0 +1,20 @@
+--- a/package/rpi-firmware/rpi-firmware.mk	2014-05-31 08:52:49.000000000 +0100
++++ b/package/rpi-firmware/rpi-firmware.mk	2014-10-12 04:25:28.233268467 +0100
+@@ -10,11 +10,11 @@
+ RPI_FIRMWARE_LICENSE_FILES = boot/LICENCE.broadcom
+ 
+ define RPI_FIRMWARE_INSTALL_TARGET_CMDS
+-	$(INSTALL) -D -m 0644 $(@D)/boot/bootcode.bin $(BINARIES_DIR)/rpi-firmware/bootcode.bin
+-	$(INSTALL) -D -m 0644 $(@D)/boot/start$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).elf $(BINARIES_DIR)/rpi-firmware/start.elf
+-	$(INSTALL) -D -m 0644 $(@D)/boot/fixup$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).dat $(BINARIES_DIR)/rpi-firmware/fixup.dat
+-	$(INSTALL) -D -m 0644 package/rpi-firmware/config.txt $(BINARIES_DIR)/rpi-firmware/config.txt
+-	$(INSTALL) -D -m 0644 package/rpi-firmware/cmdline.txt $(BINARIES_DIR)/rpi-firmware/cmdline.txt
++	$(INSTALL) -D -m 0644 $(@D)/boot/bootcode.bin $(BINARIES_DIR)/INSTALLER/bootcode.bin
++	$(INSTALL) -D -m 0644 $(@D)/boot/start$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).elf $(BINARIES_DIR)/INSTALLER/start.elf
++	$(INSTALL) -D -m 0644 $(@D)/boot/fixup$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).dat $(BINARIES_DIR)/INSTALLER/fixup.dat
++	$(INSTALL) -D -m 0644 package/rpi-firmware/config.txt $(BINARIES_DIR)/INSTALLER/config.txt
++	$(INSTALL) -D -m 0644 package/rpi-firmware/cmdline.txt $(BINARIES_DIR)/INSTALLER/cmdline.txt
+ endef
+ 
+ $(eval $(generic-package))
+
