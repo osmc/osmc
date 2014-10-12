@@ -48,7 +48,7 @@ index 0000000..5158518
 +OSMC_SITE=$(TOPDIR)/../qt_target/qt_target_installer
 +OSMC_SITE_METHOD=local
 +OSMC_INSTALL_STAGING = NO
-+OSMC_DEPENDENCIES=qt
++OSMC_DEPENDENCIES=qt,parted,xz,dosfstools
 +
 +define OSMC_BUILD_CMDS
 +	(cd $(@D) ; $(QT_QMAKE))
