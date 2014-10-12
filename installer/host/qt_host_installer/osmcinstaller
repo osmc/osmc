@@ -6,7 +6,7 @@ elif command -v gksudo; then
 elif command -v kdesu; then
     kdesu ./qt_host_installer
 elif command -v xdg-su; then
-    kdesu ./qt_host_installer
+    xdg-su -c ./qt_host_installer
 else 
     sudo -i ./qt_host_installer
 fi
