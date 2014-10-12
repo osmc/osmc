@@ -8,13 +8,17 @@ TARGET="qt_host_installer"
 OUTPUT="obs"
 pushd ${TARGET}
 if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
-rm Makefile 
-echo Creating tarball
-tar -czvf src.tar.gz *
+rm Makefile >/dev/null 2>&1
 VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
 popd
 mkdir ${OUTPUT}
-cp ${TARGET}/src.tar.gz ${OUTPUT}
+mkdir ${OUTPUT}/src
+cp -ar ${TARGET}/* ${OUTPUT}/src/
+pushd ${OUTPUT}
+echo Creating tarball
+tar -czf src.tar.gz src/
+rm -rf src/
+popd
 cp ${TARGET}.spec ${OUTPUT}
 echo Updating RPM versioning
 sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/${TARGET}.spec
