@@ -15,7 +15,7 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-%define oscm_tar src
+%define osmc_tar src
 
 Summary: OSMC Installer for Linux
 Name: qt_host_installer
