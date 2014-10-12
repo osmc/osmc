@@ -21,9 +21,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>310</y>
-      <width>601</width>
-      <height>71</height>
+      <y>210</y>
+      <width>600</width>
+      <height>70</height>
      </rect>
     </property>
     <property name="font">
@@ -45,19 +45,40 @@
    <widget class="QLabel" name="animationLabel">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>621</width>
-      <height>181</height>
+      <x>50</x>
+      <y>70</y>
+      <width>541</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="text">
      <string/>
     </property>
+    <property name="pixmap">
+     <pixmap resource="assets.qrc">:/assets/resources/logo.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="statusProgressBar">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>320</y>
+      <width>600</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>0</number>
+    </property>
+    <property name="value">
+     <number>-1</number>
+    </property>
    </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>
