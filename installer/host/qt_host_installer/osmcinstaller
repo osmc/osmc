@@ -1,4 +1,21 @@
 #!/bin/bash
+OPTIND=1
+debug=0
+while getopts ":d" opt; do
+    case "$opt" in
+    d)
+        debug=1
+        ;;
+    esac
+done
+
+# When debuggin in QtCreator, don't change the working direcotry
+# Needs to be set with -d in projects tab
+if [ $debug -eq 0 ]; then
+    dir=$( dirname $0 )
+    cd "$dir"
+fi
+
 if [[ $EUID -eq 0 ]]; then
     ./qt_host_installer
 elif command -v gksudo; then
