@@ -23,5 +23,7 @@ cp ${TARGET}.spec ${OUTPUT}
 echo Updating RPM versioning
 sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/${TARGET}.spec
 echo Updating Debian versioning
-#TBC
+cp debian.changelog debian.control debian.dsc debian.rules debian_change_desktop.patch ${OUTPUT}
+sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/debian.changelog
+sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/debian.dsc
 echo Files are now ready for OBS
