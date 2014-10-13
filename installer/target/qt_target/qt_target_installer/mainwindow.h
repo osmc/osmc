@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMovie>
 
 namespace Ui {
 class MainWindow;
@@ -18,13 +17,6 @@ public:
     
 private:
     Ui::MainWindow *ui;
-    void setLabelText(QString labelString);
-    bool installFailed;
-    bool installPartitioning;
-    bool installSD;
-    bool installUSB;
-    bool installNFS;
-    QMovie *movie;
 };
 
 #endif // MAINWINDOW_H

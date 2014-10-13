@@ -1,0 +1,12 @@
+#!/bin/bash
+if [[ $EUID -eq 0 ]]; then
+    ./qt_host_installer
+elif command -v gksudo; then
+    gksu ./qt_host_installer
+elif command -v kdesu; then
+    kdesu ./qt_host_installer
+elif command -v xdg-su; then
+    xdg-su -c ./qt_host_installer
+else 
+    sudo -i ./qt_host_installer
+fi

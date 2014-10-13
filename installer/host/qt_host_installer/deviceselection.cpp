@@ -23,7 +23,7 @@ void DeviceSelection::showDevices()
 {
     ui->devListWidget->clear();
     devMap.clear();
-    QListWidgetItem *header = new QListWidgetItem(tr("Device ID     Device Path     Device Space"), ui->devListWidget);
+    QListWidgetItem *header = new QListWidgetItem(tr("Device ID Device Path Device Space"), ui->devListWidget);
     header->setFlags(Qt::NoItemFlags);
 
 
@@ -38,7 +38,11 @@ void DeviceSelection::showDevices()
     for (int i = 0; i < devices.count(); i++)
     {
         DiskDevice *device = devices.at(i);
-        QString deviceStr = QString::number(device->getDiskID()) + "     " + device->getDiskPath() + "   " + device->getDiskSize();
+        QString deviceStr;
+        if (device->getDiskPath() != "")
+            deviceStr = QString::number(device->getDiskID()) + " \t " + device->getDiskPath() + " \t " + device->getDiskSize();
+        else
+            deviceStr = QString::number(device->getDiskID()) + " \t \t \t " + device->getDiskSize();
         QListWidgetItem *item = new QListWidgetItem(deviceStr, ui->devListWidget);
         item->setFlags(item->flags() ^ Qt::ItemIsUserCheckable);
         item->setFlags(item->flags() | Qt::ItemIsSelectable);

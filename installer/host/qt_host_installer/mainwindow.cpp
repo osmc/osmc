@@ -345,6 +345,8 @@ void MainWindow::showSuccessDialog()
             ps->setNetworkSettings(nss);
         }
     }
+    QStringList preseedList = ps->getPreseed();
+
     /* Write to the target */
     utils::writeLog("Writing preseeder");
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
@@ -381,7 +383,6 @@ void MainWindow::showSuccessDialog()
     {
         utils::writeLog("Filesystem is mounted");
         utils::writeLog("Writing the preseeder to filesystem");
-        QStringList preseedList = ps->getPreseed();
         QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
         preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&preseedFile);
@@ -400,7 +401,26 @@ void MainWindow::showSuccessDialog()
       /* We don't need to mount a partition here, thanks Windows.
        * But we might have not had a device path earlier due to no partition existing, so we need to re-run usbitcmd.exe and
        * check for matching device ID */
-      /* TODo: implement this AFTER we fix potential Windows imaging bug */
+    int deviceID = nd->getDiskID();
+    utils::writeLog("Trying to find device with id " + deviceID);
+    QList<DiskDevice *> devices = io::enumerateDevice();
+    for (int i = 0; i < devices.count(); i++)
+    {
+        if (devices.at(i)->getDiskID() == deviceID)
+        {
+            utils::writeLog("Matched device to entry point " + devices.at(i)->getDiskPath());
+            utils::writeLog("Writing the preseeder to filesystem");
+            QFile preseedFile(QString(devices.at(i)->getDiskPath() + "preseed.cfg"));
+            preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
+            QTextStream out(&preseedFile);
+            for (int i = 0; i < preseedList.count(); i++)
+            {
+                out << preseedList.at(i) + "\n";
+            }
+            preseedFile.close();
+            utils::writeLog("Finished.");
+        }
+    }
 #endif
     sd = new SuccessDialog(this);
     rotateWidget(ep, sd, false);

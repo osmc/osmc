@@ -89,8 +89,6 @@ namespace io
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);       
-       p.waitForReadyRead(-1);
-       p.waitForFinished(-1);
        QByteArray stdoutArray = p.readAllStandardOutput();
        QByteArray stderrArray = p.readAllStandardError();
        int exitCode = p.exitCode();
@@ -166,9 +164,7 @@ namespace io
        /* Non-0 exit code indicates failure */
        if (exitCode != 0)
        {
-           utils::writeLog("Could not mount "
-                           + devicePath + ". Messages are: stdErr: " + QString(stderrArray)
-                           + "\n stdOut: " + QString(stdoutArray));
+           utils::writeLog("Could not mount " + devicePath + ". Messages are: stdErr: " + QString(stderrArray) + "\n stdOut: " + QString(stdoutArray));
            return false;
        }
        else

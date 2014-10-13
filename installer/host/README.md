@@ -4,10 +4,10 @@ This installer is run on the system that images the system on the target device.
 Builds are performed statically:
 
 * On Windows, Qt static builds are performed to remove any dependency issues. There are no external libraries.
-* On Linux, Qt libraries are embedded into the executable. However, there are some external libraries: verify with ldd.
+* On Linux, Qt libraries are embedded into the executable. However, there are some external libraries: verify with ldd. The best to deploy is using the OpenSUSE implementation of Open Build Service (http://build.opensuse.org). This allows us to target multiple distributions without issue.
 * On OSX: Qt libraries are embedded into the executable. However, again, some libraries are bundled externally.
 
-## Linux static Qt build
+## Linux static Qt build (for dev)
 
 On Ubuntu or Debian, we can get a minimal build of Qt 4.8.x with the following commands:
 
@@ -83,8 +83,8 @@ If you now have C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin, you don't need
 
 Now we can build any project by running 'make' followed by the platform name:
 
-* win
-* linux
-* osx
+* win - produces a Windows MinGW static build
+* osx - produces a OSX static DMG
+* obs - produces a source tarball and necessary files for Debian and RPM generation
 
-
+For Linux, we do packaging via OBS. However you can build a standard version with qmake && make. 
