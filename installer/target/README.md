@@ -8,8 +8,4 @@ The installer will extract the filesystem, configure the bootloader, configure a
 
 It is based on upstream [Buildroot] (http://buildroot.uclibc.org). The root filesystem embeds Qt 4 (leveraging QWS) which is embedded in to an initramfs. This allows us graphical applications without the heavy dependency of X.
 
-Simply run
-
-```make```
-
-for a list of supported targets.  
+Simply run makefor a list of supported targets.  
