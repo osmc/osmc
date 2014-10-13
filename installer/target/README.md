@@ -10,6 +10,6 @@ It is based on upstream [Buildroot] (http://buildroot.uclibc.org). The root file
 
 Simply run
 
-````make```` 
+```make```
 
 for a list of supported targets.  
