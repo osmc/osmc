@@ -16,9 +16,11 @@
 #
 
 %define osmc_tar src
+%define oscm_name qt_host_installer
+%define oscm_package qt-host-installer
 
 Summary: OSMC Installer for Linux
-Name: qt_host_installer
+Name: %{oscm_package}
 Version: 1
 Release: PLACEHOLDER
 Source: %{osmc_tar}.tar.gz
@@ -105,8 +107,8 @@ install -d %{buildroot}%{_libdir}/osmc
 install -d %{buildroot}/usr/share/applications
 
 #files
-install -m 755 %{name} %{buildroot}%{_bindir}/osmc/%{name}
-ln -s %{_bindir}/osmc/%{name} %{buildroot}%{_bindir}/%{name}
+install -m 755 %{oscm_name} %{buildroot}%{_bindir}/osmc/%{oscm_name}
+ln -s %{_bindir}/osmc/%{oscm_name} %{buildroot}%{_bindir}/%{oscm_name}
 
 #lenguage files for qt
 #install -m 644 *.qm %{buildroot}%{_bindir}/osmc/
@@ -146,8 +148,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0755)
 %{_bindir}/osmc
 %defattr(-,root,root)
-%{_bindir}/osmc/%{name}
-%{_bindir}/%{name}
+%{_bindir}/osmc/%{oscm_name}
+%{_bindir}/%{oscm_name}
 #%{_bindir}/osmc/*.qm
 /usr/share/applications/osmcinstaller.desktop
 %{_bindir}/osmc/icon.png
