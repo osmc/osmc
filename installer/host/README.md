@@ -87,10 +87,4 @@ Now we can build any project by running 'make' followed by the platform name:
 * osx - produces a OSX static DMG
 * obs - produces a source tarball and necessary files for Debian and RPM generation
 
-For Linux, we do packaging via OBS. However you may wish to build a local version:
-
-````cd qt_host_installer````
-
-````qmake````
-
-````make````
+For Linux, we do packaging via OBS. However you can build a standard version with qmake && make. 
