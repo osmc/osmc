@@ -102,17 +102,22 @@ if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 rm -rf %{buildroot}
 
 #foldes
-install -d %{buildroot}%{_bindir}/osmc
-install -d %{buildroot}%{_libdir}/osmc
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_datadir}/osmc
+#install -d %{buildroot}%{_libdir}/osmc
 install -d %{buildroot}/usr/share/applications
 
 #files
-install -m 755 %{oscm_name} %{buildroot}%{_bindir}/osmc/%{oscm_name}
-ln -s %{_bindir}/osmc/%{oscm_name} %{buildroot}%{_bindir}/%{oscm_name}
+install -m 755 %{oscm_name} %{buildroot}%{_datadir}/osmc/%{oscm_name}
+install -m 755 osmcinstaller %{buildroot}%{_datadir}/osmc/osmcinstaller
+#symlink for bin folder
+#ln -s %{_datadir}/osmc/%{oscm_name} %{buildroot}%{_bindir}/%{oscm_name}
+#ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/osmcinstaller
+ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/%{oscm_name}
 
 #lenguage files for qt
-#install -m 644 *.qm %{buildroot}%{_bindir}/osmc/
-#cp *.qm %{buildroot}%{_bindir}/osmc/ > /dev/null 2>&1
+#install -m 644 *.qm %{buildroot}%{_datadir}/osmc/
+#cp *.qm %{buildroot}%{_datadir}/osmc/ > /dev/null 2>&1
 
 #desktop icon
 %if 0%{?suse_version}
@@ -125,7 +130,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/osmcinstaller.desktop
 %endif
 
 #icon image
-install -m 644 icon.png %{buildroot}%{_bindir}/osmc/icon.png
+install -m 644 icon.png %{buildroot}%{_datadir}/osmc/icon.png
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -146,13 +151,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,0755)
-%{_bindir}/osmc
+%{_datadir}/osmc
 %defattr(-,root,root)
-%{_bindir}/osmc/%{oscm_name}
 %{_bindir}/%{oscm_name}
-#%{_bindir}/osmc/*.qm
+%{_datadir}/osmc/%{oscm_name}
+%{_datadir}/osmc/osmcinstaller
+#%{_datadir}/osmc/*.qm
 /usr/share/applications/osmcinstaller.desktop
-%{_bindir}/osmc/icon.png
+%{_datadir}/osmc/icon.png
 #%{_libdir}/osmc/*
 
 
