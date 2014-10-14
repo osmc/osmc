@@ -172,4 +172,5 @@ namespace io
    }
 
    bool installImagingTool() { return true; }
+   void updateKernelTable() { return; }
 }

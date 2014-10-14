@@ -114,4 +114,5 @@ namespace io
         }
     }
 
+   void updateKernelTable() { return; }
 }

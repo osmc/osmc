@@ -14,7 +14,7 @@ inline void UpdateKernelTable();
 
 QList<DiskDevice * > enumerateDevice()
  {
-    UpdateKernelTable();
+    updateKernelTable();
     QList<DiskDevice *> devices;
      utils::writeLog("Enumerating imageable devices for Linux");
      QProcess process;
@@ -97,7 +97,7 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
     imageFile.close();
     deviceFile.close();
 
-    UpdateKernelTable();
+    updateKernelTable();
     return true;
 }
 
@@ -143,11 +143,11 @@ bool unmount(QString devicePath, bool isDisk)
         }
     }
 
-    UpdateKernelTable();
+    updateKernelTable();
     return ret;
 }
 
-inline void UpdateKernelTable()
+void updateKernelTable()
 {
     #if defined(Q_OS_LINUX)
     utils::writeLog("Running partprobe to inform operating system about partition table changes");

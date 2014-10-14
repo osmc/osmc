@@ -352,8 +352,7 @@ void MainWindow::showSuccessDialog()
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
     QString diskPath;
     #if defined (Q_OS_LINUX)
-        utils::writeLog("Informing the kernel of updated partition table");
-        system("/sbin/partprobe");
+        io::updateKernelTable();
     #endif
     #if defined (Q_OS_LINUX)
         diskPath = nd->getDiskPath() + "1";
