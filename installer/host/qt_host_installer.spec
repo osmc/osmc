@@ -17,7 +17,7 @@
 
 %define osmc_tar src
 %define oscm_name qt_host_installer
-%define oscm_package qt-host-installer
+%define oscm_package osmc-installer
 
 Summary: OSMC Installer for Linux
 Name: %{oscm_package}

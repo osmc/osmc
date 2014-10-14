@@ -1,5 +1,5 @@
 Format: 1.0
-Source: osmcinstaller
+Source: osmc-installer
 Version: PLACEHOLDER
 Binary: osmcinstaller
 Maintainer: Sam G Nazarko <email@samnazarko.co.uk>
