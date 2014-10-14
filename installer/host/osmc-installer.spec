@@ -25,7 +25,7 @@ Version: 1
 Release: PLACEHOLDER
 Source: %{osmc_tar}.tar.gz
 URL: https://github.com/samnazarko/osmc
-License: GPL-2
+License: GPL-2.0
 Group: Multimedia
 %if 0%{?suse_version} == 1110
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -49,6 +49,7 @@ BuildRequires:	libqt4-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	gcc-c++
 
+%if !  0%{?suse_version}
 # Common dependencies
 Requires:       libjpeg8
 Requires:       libmng
@@ -57,6 +58,8 @@ Requires:       libpng12-0
 Requires: 		qt
 # Patch
 Requires:       patch
+%endif
+
 # Don't make this noarch although it is just a fetch script otherwise the following wont' work:
 
 # dep_postfix macro is used to append "-32bit" to dependencies for x86_64 on openSUSE
