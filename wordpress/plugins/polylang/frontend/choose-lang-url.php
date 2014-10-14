@@ -69,25 +69,11 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 	 * @since 0.9.6
 	 */
 	public function check_language_code_in_url() {
-		global $wp_query, $post;
-
 		// don't act for page and post previews as well as (unattached) attachments
 		if (isset($_GET['p']) || isset($_GET['page_id']) || isset($_GET['attachment_id']))
 			return;
 
-		if (is_single() || is_page()) {
-			if (isset($post->ID) && $this->model->is_translated_post_type($post->post_type))
-				$language = $this->model->get_language($this->links_model->get_language_from_url());
-		}
-		elseif (is_category() || is_tag() || is_tax()) {
-			$obj = $wp_query->get_queried_object();
-			if ($this->model->is_translated_taxonomy($obj->taxonomy))
-				$language = $this->model->get_term_language((int)$obj->term_id);
-		}
-		elseif ($wp_query->is_posts_page) {
-			$obj = $wp_query->get_queried_object();
-			$language = $this->model->get_post_language((int)$obj->ID);
-		}
+		$language = $this->model->get_language($this->links_model->get_language_from_url());
 
 		if (empty($language)) {
 			$language = $this->get_preferred_language();
@@ -98,6 +84,10 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 
 		if (empty($redirect_url)) {
 			$redirect_url = $this->links->get_translation_url($this->model->get_language('en'));
+		}
+
+		if (is_feed() && $this->links->using_permalinks) {
+			$redirect_url .= 'feed/';
 		}
 
 		if ($requested_url != $redirect_url && !empty($redirect_url)) {
