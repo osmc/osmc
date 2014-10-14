@@ -79,7 +79,7 @@ Requires:       libX11%{dep_postfix} >= 1.4.99.1
 
 
 %description
-OSMC Installer
+OSMC Installer allows you to install OSMC on a variety of devices
 
 %prep
 %setup -n %{osmc_tar}
