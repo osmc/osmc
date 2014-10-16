@@ -13,10 +13,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    utils.cpp
+    utils.cpp \
+    logger.cpp \
+    cmdlineparser.cpp
 
 HEADERS  += mainwindow.h \
-    utils.h
+    utils.h \
+    logger.h \
+    cmdlineparser.h \
+    filesystem.h
 
 FORMS    += mainwindow.ui
 

@@ -14,14 +14,14 @@
    <string>OSMC Installer</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #17394A</string>
+   <string notr="true">background: url(:/assets/resources/install.png)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>210</y>
+      <y>290</y>
       <width>600</width>
       <height>70</height>
      </rect>
@@ -31,6 +31,9 @@
       <family>Source Sans Pro</family>
       <pointsize>24</pointsize>
      </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">color:rgb(240, 240, 240)</string>
@@ -42,27 +45,11 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="animationLabel">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>70</y>
-      <width>541</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="assets.qrc">:/assets/resources/logo.png</pixmap>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="statusProgressBar">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>320</y>
+      <y>360</y>
       <width>600</width>
       <height>50</height>
      </rect>
@@ -77,8 +64,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="assets.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
