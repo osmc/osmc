@@ -37,13 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
     logger->addLine("Detecting device we are running on");
     dev = utils::getOSMCDev();
     if (! dev.isEmpty())
-    {
         logger->addLine(tr("Detected Device") + ": " + dev);
-    }
     else
     {
         logger->addLine("Could not determine device from /proc/cmdline");
         haltInstall("unsupported device"); /* No tr here as not got lang yet */
+        return;
     }
     /* Find partition location */
     logger->addLine("Trying to find boot partition");
@@ -61,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         logger->addLine("Could not resolve boot partition");
         haltInstall("cannot work out boot partition");
+        return;
     }
     /* Mount the filesystem */
     int mountStatus;
@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         logger->addLine("Mounting failed!");
         haltInstall("initial mount failed"); /* No tr here as not got lang yet */
+        return;
     }
     else
         logger->addLine("Successfully mounted boot partition");
@@ -87,13 +88,13 @@ MainWindow::MainWindow(QWidget *parent) :
     else
     {
         logger->addLine("No filesystem tarball was found");
-        haltInstall("No filesystem found!") /* No tr here as not got lang yet */
+        haltInstall("No filesystem found!"); /* No tr here as not got lang yet */
+        return;
     }
     #else
     logger->addLine("Faking filesystem in /mnt");
         /* Write a basic filesystem so we have something to play with */
     #endif
-
     /* Check for a preseeding file */
 
     /* Check for another language */
@@ -101,7 +102,6 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Make sure we have a filesystem */
 
     /* Check preseeding for our install type */
-
 }
 
 void MainWindow::haltInstall(QString errorMsg)
@@ -109,10 +109,6 @@ void MainWindow::haltInstall(QString errorMsg)
     ui->statusProgressBar->setMaximum(100);
     ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
-    while (1)
-    {
-
-    }
 }
 
 MainWindow::~MainWindow()
