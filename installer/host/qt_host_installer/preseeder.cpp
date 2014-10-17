@@ -44,7 +44,11 @@ void Preseeder::setTargetSettings(MainWindow *mw)
     if (mw->getInstallType() == utils::INSTALL_EMMC)
         writeOption("target", "storage", PRESEED_STRING, "emmc");
     if (mw->getInstallType() == utils::INSTALL_NFS)
+    {
         writeOption("target", "storage", PRESEED_STRING, "nfs");
+        MainWindow *mw = qobject_cast<MainWindow*>(mw);
+        writeOption("target", "storagePath", PRESEED_STRING, mw->getNFSPath());
+    }
     if (mw->getInstallType() == utils::INSTALL_NOPRESEED)
         writeOption("target", "storage", PRESEED_STRING, "nops");
     if (mw->getInstallType() == utils::INSTALL_PARTITIONER)
