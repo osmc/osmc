@@ -15,7 +15,6 @@
 #ifndef Q_WS_QWS
 #include "filesystem.h"
 #endif
-#define DUMMY
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
