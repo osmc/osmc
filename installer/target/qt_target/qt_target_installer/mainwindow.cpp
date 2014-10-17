@@ -7,6 +7,7 @@
 #include "sys/mount.h"
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #ifndef Q_WS_QWS
 #include "filesystem.h"
 #endif
@@ -81,9 +82,9 @@ MainWindow::MainWindow(QWidget *parent) :
     else
         logger->addLine("Successfully mounted boot partition");
     logger->addLine("Checking for filesystem tarball");
-    QFile *fsTarball = new QFile("/mnt/filesystem.tar.xz");
     #ifdef Q_WS_QWS
-    if (fsTarball->exists())
+    QFile fsTarball("/mnt/filesystem.tar.xz");
+    if (fsTarball.exists())
         logger->addLine("Filesystem tarball exists!");
     else
     {
@@ -92,8 +93,15 @@ MainWindow::MainWindow(QWidget *parent) :
         return;
     }
     #else
+    QFile fsTarball(QDir::homePath().append("/filesystem.tar.xz"));
     logger->addLine("Faking filesystem in /mnt");
-        /* Write a basic filesystem so we have something to play with */
+    /* Write a basic filesystem so we have something to play with */
+    QByteArray fsByteArray;
+    QDataStream fsDataStream(&fsByteArray, QIODevice::WriteOnly);
+    fsDataStream.writeRawData((const char*) randomfile_tar_xz, randomfile_tar_xz_len);
+    fsTarball.open(QIODevice::WriteOnly);
+    fsTarball.write(fsByteArray);
+    fsTarball.close();
     #endif
     /* Check for a preseeding file */
 
