@@ -338,7 +338,8 @@ void MainWindow::showSuccessDialog()
     Preseeder *ps = new Preseeder();
     if (this->device.allowsPreseedingNFS() || this->device.allowsPreseedingUSB() || this->device.allowsPreseedingSD() || this->device.allowsPreseedingInternal() || this->device.allowsPreseedingPartitioning() || this->device.allowsPreseedingNetwork())
     {
-        ps->setLanguageString(this->localeName);
+        if (!this->localeName.isEmpty())
+            ps->setLanguageString(this->localeName);
         ps->setTargetSettings(this);
         if (this->device.allowsPreseedingNetwork())
         {
