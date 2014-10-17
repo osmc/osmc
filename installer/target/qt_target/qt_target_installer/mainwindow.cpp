@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QGraphicsOpacityEffect *ope = new QGraphicsOpacityEffect(this);
     ope->setOpacity(0.5);
     ui->statusLabel->setGraphicsEffect(ope);
+    ui->copyrightLabel->setGraphicsEffect(ope);
     ui->statusProgressBar->setGraphicsEffect(ope);
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
