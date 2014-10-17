@@ -5,4 +5,4 @@ rbp:
 	sudo bash build.sh "rbp"
 
 clean:
-	sudo rm -rf buildroot* > /dev/null 2>&1
+	sudo rm -rf buildroot*/ > /dev/null 2>&1
