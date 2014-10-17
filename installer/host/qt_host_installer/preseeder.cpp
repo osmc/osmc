@@ -54,14 +54,14 @@ void Preseeder::setTargetSettings(MainWindow *mw)
 void Preseeder::writeOption(QString preseedSection, QString preseedOptionKey, int preseedOptionType, QString preseedOptionValue)
 {
     QString toWrite;
-    toWrite = "d-i" + preseedSection + "/" + preseedOptionKey;
+    toWrite = "d-i " + preseedSection + "/" + preseedOptionKey;
     switch (preseedOptionType)
     {
     case PRESEED_STRING:
-        toWrite += "string";
+        toWrite += " string ";
         break;
     case PRESEED_BOOL:
-        toWrite += "boolean";
+        toWrite += " boolean ";
         break;
     }
     toWrite += preseedOptionValue;
