@@ -9,5 +9,6 @@ int main(int argc, char *argv[])
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;
     w.show();
+    w.install();
     return a.exec();
 }

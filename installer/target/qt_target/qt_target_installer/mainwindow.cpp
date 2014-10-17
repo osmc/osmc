@@ -15,6 +15,7 @@
 #ifndef Q_WS_QWS
 #include "filesystem.h"
 #endif
+#define DUMMY
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -39,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusLabel->setGraphicsEffect(ope);
     ui->copyrightLabel->setGraphicsEffect(ope);
     ui->statusProgressBar->setGraphicsEffect(ope);
+}
+
+void MainWindow::install()
+{
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
     dev = utils::getOSMCDev();
@@ -174,6 +179,7 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     }
+
 }
 
 void MainWindow::haltInstall(QString errorMsg)
