@@ -16,7 +16,7 @@ new file mode 100644
 index 0000000..4c92bbc
 --- /dev/null
 +++ b/package/osmc/Config.in
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,10 @@
 +config BR2_PACKAGE_OSMC
 +        bool "OSMC Installer"
 +    select BR2_PACKAGE_QT
@@ -24,6 +24,7 @@ index 0000000..4c92bbc
 +    select BR2_PACKAGE_XZ
 +    select BR2_PACKAGE_DOSFSTOOLS
 +    select BR2_PACKAGE_E2FSPROGS
++    select BR2_PACKAGE_PV
 +        help
 +          OSMC device side installer
 diff --git a/package/osmc/interfaces b/package/osmc/interfaces
@@ -52,7 +53,7 @@ index 0000000..5158518
 +OSMC_SITE=$(TOPDIR)/../qt_target/qt_target_installer
 +OSMC_SITE_METHOD=local
 +OSMC_INSTALL_STAGING = NO
-+OSMC_DEPENDENCIES = qt parted xz dosfstools e2fsprogs
++OSMC_DEPENDENCIES = qt parted xz dosfstools e2fsprogs pv
 +
 +define OSMC_BUILD_CMDS
 +	(cd $(@D) ; $(QT_QMAKE))
