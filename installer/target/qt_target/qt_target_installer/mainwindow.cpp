@@ -8,6 +8,10 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QString>
+#include <QStringList>
+#include <QTextStream>
+#include <QTranslator>
 #ifndef Q_WS_QWS
 #include "filesystem.h"
 #endif
@@ -81,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     else
         logger->addLine("Successfully mounted boot partition");
+    /* Check we have a filesystem for target */
     logger->addLine("Checking for filesystem tarball");
     #ifdef Q_WS_QWS
     QFile fsTarball("/mnt/filesystem.tar.xz");
@@ -104,12 +109,70 @@ MainWindow::MainWindow(QWidget *parent) :
     fsTarball.close();
     #endif
     /* Check for a preseeding file */
-
+    QStringList preseedStringList;
+    #ifdef Q_WS_QWS
+    logger->addLine("Checking for a preseed file in /mnt")
+    QFile preseedFile("/mnt/preseed.cfg");
+    if (preseedFile.exists())
+    {
+        logger->addLine("Preseed file was found");
+        QTextStream preseedStream(&preseedFile);
+        QString preseedString
+        while (!preseedStream.atEnd())
+        {
+            preseedString = preseedStream.readAll();
+        }
+         preseedStringList = preseedString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    }
+    else
+        logger->addLine("Preseed file does not exist");
+    #else
+    logger->addLine("No preseed file as we are in Qt Creator, faking some preseeding");
+    //preseedStringList.append("...");
+    #endif
     /* Check for another language */
-
-    /* Make sure we have a filesystem */
-
+    for (int i = 0; i < preseedStringList.count(); i++)
+    {
+        QString pString = preseedStringList.at(i);
+        if (pString.contains("globe/storage"))
+        {
+            logger->addLine("Found a definition for a language");
+            QStringList localeStringList = pString.split(" ");
+            QString localeString = localeStringList.at(3);
+            logger->addLine("Desired string locale is " + localeString);
+            QTranslator translator;
+            if (translator.load(qApp->applicationDirPath() + "/osmc_" + localeString + ".qm"))
+            {
+                logger->addLine("Translation loaded successfully!");
+                qApp->installTranslator(&translator);
+                ui->retranslateUi(this);
+            }
+            else
+                logger->addLine("Could not load translation");
+        }
+    }
     /* Check preseeding for our install type */
+    bool checkNetwork = false;
+    bool useNFS = false;
+    QString nfsPath;
+    for (int i = 0; i < preseedStringList.count(); i++)
+    {
+        QString pString = preseedStringList.at(i);
+        if (pString.contains("target/storage"))
+        {
+            logger->addLine("Found a definition for storage");
+            QStringList storageStringList = pString.split(" ");
+            QString storageTypeString = storageStringList.at(3);
+            QString storagePathString;
+            /* Check for NFS */
+            if (storageTypeString == "nfs")
+            {
+                logger->addLine("Found a definition for NFS install");
+                logger->addLine("We need to check for network definitions");
+                checkNetwork = true;
+            }
+        }
+    }
 }
 
 void MainWindow::haltInstall(QString errorMsg)
