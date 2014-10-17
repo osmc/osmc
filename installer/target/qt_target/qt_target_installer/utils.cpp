@@ -19,7 +19,8 @@ void rebootSystem()
 {
     /* Only reboot on real system */
     #ifdef Q_WS_QWS
-
+    system("/bin/sh -c \"/bin/echo 1 > /proc/sys/kernel/sysrq\"");
+    system("/bin/sh -c \"/bin/echo b > /proc/sysrq-trigger\"");
     #endif
 }
 }
