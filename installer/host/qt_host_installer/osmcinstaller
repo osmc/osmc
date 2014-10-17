@@ -11,19 +11,20 @@ done
 
 # When debuggin in QtCreator, don't change the working direcotry
 # Needs to be set with -d in projects tab
+dir=$( pwd )
 if [ $debug -eq 0 ]; then
-    dir=$( dirname $0 )
+    dir=$(dirname "$(readlink -f $0)")
     cd "$dir"
 fi
 
 if [[ $EUID -eq 0 ]]; then
-    ./qt_host_installer
+    $dir/qt_host_installer
 elif command -v gksudo; then
-    gksu ./qt_host_installer
+    gksu $dir/qt_host_installer
 elif command -v kdesu; then
-    kdesu ./qt_host_installer
+    kdesu $dir/qt_host_installer
 elif command -v xdg-su; then
-    xdg-su -c ./qt_host_installer
+    xdg-su -c $dir/qt_host_installer
 else 
-    sudo -i ./qt_host_installer
+    sudo -i $dir/qt_host_installer
 fi
