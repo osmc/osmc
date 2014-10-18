@@ -15,13 +15,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     utils.cpp \
     logger.cpp \
-    cmdlineparser.cpp
+    cmdlineparser.cpp \
+    extractworker.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     logger.h \
     cmdlineparser.h \
-    filesystem.h
+    filesystem.h \
+    extractworker.h
 
 FORMS    += mainwindow.ui
 
