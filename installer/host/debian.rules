@@ -52,7 +52,7 @@ install: build
 	install -m 755 qt_host_installer $(INSTALL_BIN)/qt_host_installer
 	install -m 755 osmcinstaller $(INSTALL_BIN)/osmcinstaller
 	install -d $(INSTALL_ROOT)/usr/bin
-	ln -r $(INSTALL_BIN)/osmcinstaller $(INSTALL_ROOT)/usr/bin/osmcinstaller
+	ln -sr $(INSTALL_BIN)/osmcinstaller $(INSTALL_ROOT)/usr/bin/osmcinstaller
 	install -m 644 icon.png $(INSTALL_BIN)/icon.png
 	install -d $(INSTALL_BASE)/applications
 	install -m 644 osmcinstaller.desktop $(INSTALL_BASE)/applications/osmcinstaller.desktop
