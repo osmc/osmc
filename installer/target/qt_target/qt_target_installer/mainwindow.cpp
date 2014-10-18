@@ -225,9 +225,6 @@ void MainWindow::finished()
 
 void MainWindow::setProgress(unsigned value)
 {
-    #ifdef QT_DEBUG
-    qDebug() << "Receiving progress " << value;
-    #endif
     ui->statusProgressBar->setValue(value);
 }
 
