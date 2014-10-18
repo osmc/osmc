@@ -116,7 +116,7 @@ void MainWindow::install()
     fsTarball.open(QIODevice::WriteOnly);
     fsTarball.write(fsByteArray);
     fsTarball.close();
-
+/*
     QString mntPath = "/Users/srm/filesysTest/out";
 
     ui->statusProgressBar->setMinimum(0);
@@ -134,7 +134,7 @@ void MainWindow::install()
 
     logger->addLine("Starting extraction of " + fsTarball.fileName() + " to " + mntPath);
 
-    thread->start();
+    thread->start();*/
 
     #endif
 }
