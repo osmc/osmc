@@ -1,6 +1,7 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include <QFontDatabase>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +10,8 @@ int main(int argc, char *argv[])
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;
     w.show();
-    w.install();
+
+    // make sure our app installs only after starting the event loop
+    QTimer::singleShot(0, &w, SLOT(install()));
     return a.exec();
 }
