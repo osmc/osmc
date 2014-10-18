@@ -8,12 +8,16 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QProcess>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
+#include <QThread>
 #include <QTranslator>
+
 #ifndef Q_WS_QWS
 #include "filesystem.h"
+#include "extractworker.h"
 #endif
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -112,7 +116,31 @@ void MainWindow::install()
     fsTarball.open(QIODevice::WriteOnly);
     fsTarball.write(fsByteArray);
     fsTarball.close();
+
+    QString mntPath = "/Users/srm/filesysTest/out";
+
+    ui->statusProgressBar->setMinimum(0);
+    ui->statusProgressBar->setMaximum(100);
+    QThread* thread = new QThread;
+    ExtractWorker *worker = new ExtractWorker(fsTarball.fileName(), mntPath);
+    worker->moveToThread(thread);
+    connect(thread, SIGNAL(started()), worker, SLOT(extract()));
+    connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
+    connect(worker, SIGNAL(error(QString)), this, SLOT(haltInstall(QString)));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), this, SLOT(finished()));
+
+    logger->addLine("Starting extraction of " + fsTarball.fileName() + " to " + mntPath);
+
+    thread->start();
+
     #endif
+}
+
+void MainWindow::preseed()
+{
     /* Check for a preseeding file */
     QStringList preseedStringList;
     #ifdef Q_WS_QWS
@@ -178,14 +206,29 @@ void MainWindow::install()
             }
         }
     }
-
 }
+
 
 void MainWindow::haltInstall(QString errorMsg)
 {
+    logger->addLine("Halting Install. Error message was: " + errorMsg);
     ui->statusProgressBar->setMaximum(100);
     ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
+}
+
+void MainWindow::finished()
+{
+    logger->addLine("Extract finished.");
+    preseed();
+}
+
+void MainWindow::setProgress(unsigned value)
+{
+    #ifdef QT_DEBUG
+    qDebug() << "Receiving progress " << value;
+    #endif
+    ui->statusProgressBar->setValue(value);
 }
 
 MainWindow::~MainWindow()
