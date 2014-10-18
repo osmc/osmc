@@ -46,7 +46,6 @@ void Preseeder::setTargetSettings(MainWindow *mw)
     if (mw->getInstallType() == utils::INSTALL_NFS)
     {
         writeOption("target", "storage", PRESEED_STRING, "nfs");
-        //MainWindow *mw = qobject_cast<MainWindow*>(mw);
         writeOption("target", "storagePath", PRESEED_STRING, mw->getNFSPath());
     }
     if (mw->getInstallType() == utils::INSTALL_NOPRESEED)
