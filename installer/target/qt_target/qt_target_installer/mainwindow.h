@@ -22,13 +22,13 @@ public:
 public slots:
     void install();
     void setProgress(unsigned value);
+    void haltInstall(QString errorMsg);
     void finished();
 
 private:
     Ui::MainWindow *ui;
     Logger *logger;
     QString dev;
-    void haltInstall(QString errorMsg);
     void preseed();
 };
 #endif

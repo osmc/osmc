@@ -1,8 +1,8 @@
-#include <QDebug>
+#include <QFile>
 #include <QTextStream>
 #include "extractworker.h"
 
-QProcess *myProcess = NULL;
+QProcess *process = NULL;
 
 ExtractWorker::ExtractWorker(QString sourcename, QString targetname)
 {
@@ -11,32 +11,37 @@ ExtractWorker::ExtractWorker(QString sourcename, QString targetname)
 
 }
 
-void ExtractWorker::process()
+void ExtractWorker::extract()
 {
-    myProcess = new QProcess();
-    connect(myProcess, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
-    myProcess->setProcessChannelMode(QProcess::MergedChannels);
-    myProcess->start("/bin/sh -c \"pv -n " + sourceName + " | tar xJf - -C " + destName);
+    process = new QProcess();
+    connect(process, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
+    process->setProcessChannelMode(QProcess::MergedChannels);
+    process->start("/bin/sh -c \"pv -n " + sourceName + " | tar xJf - -C " + destName);
 
-    myProcess->waitForFinished(-1);
-    qDebug() << "exitCodePv: " << myProcess->exitCode();
-    qDebug() << myProcess->readAllStandardError();
-    qDebug() << myProcess->readAllStandardOutput();
+    process->waitForFinished(-1);
 
+    #ifdef QT_DEBUG
+    qDebug() << "exitCodePv: " << process->exitCode();
+    qDebug() << process->readAllStandardError();
+    qDebug() << process->readAllStandardOutput();
+    #endif
     emit finished();
 }
 
 void ExtractWorker::readFromProcess()
 {
-    QString value = myProcess->readAll();
+    QString value = process->readAllStandardOutput();
+    QString errorString = process->readAllStandardError();
+    #ifdef QT_DEBUG
     qDebug() << "signal to read value";
     qDebug() << "readAll: " << value;
     qDebug() << "assuming intvalue: " << value.toInt();
     qDebug() << "assuming longvalue: " << value.toLong();
-    qDebug() << "standartOut: " << myProcess->readAllStandardOutput();
-    if (myProcess->readAllStandardError().size() > 0)
+    qDebug() << "standartOut: " << process->readAllStandardOutput();
+    #endif
+    if (errorString.size() > 0)
     {
-        emit error();
+        emit error(errorString);
         return;
     }
 

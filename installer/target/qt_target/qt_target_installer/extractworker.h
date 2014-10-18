@@ -1,6 +1,10 @@
+#ifdef QT_DEBUG
+#include <QDebug>
+#endif
+
 #include <QObject>
-#include <QString>
 #include <QProcess>
+#include <QString>
 
 #ifndef EXTRACTWORKER_H
 #define EXTRACTWORKER_H
@@ -15,13 +19,13 @@ public:
     ExtractWorker(QString source, QString dest);
 
 public slots:
-    void process();
+    void extract();
     void readFromProcess();
 
 signals:
     void finished();
     void progressUpdate(unsigned);
-    void error();
+    void error(QString error);
 };
 
 #endif // EXTRACTWORKER_H
