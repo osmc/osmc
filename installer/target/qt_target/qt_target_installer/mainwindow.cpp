@@ -14,10 +14,10 @@
 #include <QTextStream>
 #include <QThread>
 #include <QTranslator>
+#include "extractworker.h"
 
 #ifndef Q_WS_QWS
 #include "filesystem.h"
-#include "extractworker.h"
 #endif
 
 MainWindow::MainWindow(QWidget *parent) :
