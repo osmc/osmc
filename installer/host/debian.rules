@@ -8,8 +8,9 @@
 # This is the debhelper compatibility version to use.
 export DH_COMPAT=6
 
-INSTALL_BASE := $(CURDIR)/debian/osmc-installer/usr/share
-INSTALL_BIN  := $(INSTALL_BASE)/osmcinstaller
+INSTALL_ROOT := $(CURDIR)/debian/osmcinstaller
+INSTALL_BASE := $(INSTALL_ROOT)/usr/share
+INSTALL_BIN  := $(INSTALL_BASE)/osmc
 
 CFLAGS = -g
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
@@ -46,15 +47,15 @@ install: build
 	# Add here commands to install the package into debian/gentoo.
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	# $(CURDIR)/debian/osmcinstaller
 	
 	install -d $(INSTALL_BIN)
 	install -m 755 qt_host_installer $(INSTALL_BIN)/qt_host_installer
 	install -m 755 osmcinstaller $(INSTALL_BIN)/osmcinstaller
+	install -d $(INSTALL_ROOT)/usr/bin
+	ln -r $(INSTALL_BIN)/osmcinstaller $(INSTALL_ROOT)/usr/bin/osmcinstaller
+	install -m 644 icon.png $(INSTALL_BIN)/icon.png
 	install -d $(INSTALL_BASE)/applications
-	install -m 755 osmcinstaller.desktop $(INSTALL_BASE)/applications/osmcinstaller.desktop
-	install -d $(INSTALL_BASE)/pixmaps
-	install -m 644 icon.png $(INSTALL_BASE)/pixmaps/osmcinstaller.png
+	install -m 644 osmcinstaller.desktop $(INSTALL_BASE)/applications/osmcinstaller.desktop
 	
 # Build architecture-independent files here.
 binary-indep: build install
