@@ -124,31 +124,9 @@ void MainWindow::install()
     fsTarball.open(QIODevice::WriteOnly);
     fsTarball.write(fsByteArray);
     fsTarball.close();
-/*
-    QString mntPath = "/Users/srm/filesysTest/out";
-
-    ui->statusProgressBar->setMinimum(0);
-    ui->statusProgressBar->setMaximum(100);
-    QThread* thread = new QThread;
-    ExtractWorker *worker = new ExtractWorker(fsTarball.fileName(), mntPath);
-    worker->moveToThread(thread);
-    connect(thread, SIGNAL(started()), worker, SLOT(extract()));
-    connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
-    connect(worker, SIGNAL(error(QString)), this, SLOT(haltInstall(QString)));
-    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), this, SLOT(finished()));
-
-    logger->addLine("Starting extraction of " + fsTarball.fileName() + " to " + mntPath);
-
-    thread->start();*/
-
     #endif
-}
 
-void MainWindow::preseed()
-{
+
     /* Check for a preseeding file */
     QStringList preseedStringList;
     #ifdef Q_WS_QWS
@@ -290,6 +268,31 @@ void MainWindow::preseed()
         /* We could add check here: like pinging gateway, but we know soon enough when we try mount */
         dumpLog();
     }
+
+    //now call the extraction
+}
+
+void MainWindow::extract()
+{
+    /*
+        QString mntPath = "/Users/srm/filesysTest/out";
+
+        ui->statusProgressBar->setMinimum(0);
+        ui->statusProgressBar->setMaximum(100);
+        QThread* thread = new QThread;
+        ExtractWorker *worker = new ExtractWorker(fsTarball.fileName(), mntPath);
+        worker->moveToThread(thread);
+        connect(thread, SIGNAL(started()), worker, SLOT(extract()));
+        connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
+        connect(worker, SIGNAL(error(QString)), this, SLOT(haltInstall(QString)));
+        connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+        connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+        connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+        connect(thread, SIGNAL(finished()), this, SLOT(finished()));
+
+        logger->addLine("Starting extraction of " + fsTarball.fileName() + " to " + mntPath);
+
+        thread->start();*/
 }
 
 
@@ -322,7 +325,7 @@ void MainWindow::dumpLog()
 void MainWindow::finished()
 {
     logger->addLine("Extract finished.");
-    preseed();
+
 }
 
 void MainWindow::setProgress(unsigned value)

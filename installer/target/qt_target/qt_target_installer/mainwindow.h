@@ -30,6 +30,6 @@ private:
     Ui::MainWindow *ui;
     Logger *logger;
     QString dev;
-    void preseed();
+    void extract();
 };
 #endif
