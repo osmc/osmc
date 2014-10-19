@@ -288,6 +288,7 @@ void MainWindow::preseed()
         ethProcess.waitForFinished();
         #endif
         /* We could add check here: like pinging gateway, but we know soon enough when we try mount */
+        dumpLog();
     }
 }
 
@@ -298,6 +299,11 @@ void MainWindow::haltInstall(QString errorMsg)
     ui->statusProgressBar->setMaximum(100);
     ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
+    dumpLog();
+}
+
+void MainWindow::dumpLog()
+{
     /* Attempts to write to /mnt; may not *actually* be mounted */
     /* Could check etc/mtab but it's irrelevant if it is mounted or not */
     #ifndef Q_WS_QWS
