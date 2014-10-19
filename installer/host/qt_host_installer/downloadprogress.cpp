@@ -10,6 +10,9 @@
 #include <QDir>
 #include <QMessageBox>
 #include "utils.h"
+#ifdef Q_OS_LINUX
+#include <unistd.h>
+#elif
 
 /* With thanks to http://qt-project.org/doc/qt-4.8/network-downloadmanager-downloadmanager-cpp.html */
 
@@ -72,6 +75,11 @@ void DownloadProgress::download(QUrl URL, bool isOnline)
     }
     else
     {
+#ifdef Q_OS_LINUX
+        // Set the owner and group the same as the home path
+        QFileInfo info(QDir::homePath());
+        fchown(output.handle(),info.ownerId(),info.groupId());
+#endif
         QNetworkRequest request(URL);
         currentDownload = manager.get(request);
         connect(currentDownload, SIGNAL(downloadProgress(qint64,qint64)),SLOT(downloadProgress(qint64,qint64)));

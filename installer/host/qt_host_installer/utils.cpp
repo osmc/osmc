@@ -2,6 +2,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QDebug>
 #include <QTranslator>
@@ -9,17 +10,26 @@
 #include <QMessageBox>
 #include "supporteddevice.h"
 #include <QList>
+#include <QDir>
 #include <QMessageBox>
+#ifdef Q_OS_LINUX
+#include <unistd.h>
+#endif
 
 namespace utils
 {
     void writeLog(QString strLog)
     {
-        QFile logFile("log.txt");
+        QFile logFile(QDir::homePath() + "/" + "log.txt");
         QDateTime timestamp = QDateTime::currentDateTime();
         logFile.open(QIODevice::Append);
         if (logFile.isOpen())
         {
+#ifdef Q_OS_LINUX
+            // Set the owner and group the same as the home path
+            QFileInfo info(QDir::homePath());
+            fchown(logFile.handle(),info.ownerId(),info.groupId());
+#endif
             QTextStream logStream(&logFile);
             logStream << timestamp.toString() << " " << strLog << '\n';
             logFile.close();

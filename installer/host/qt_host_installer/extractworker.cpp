@@ -6,6 +6,9 @@
 #include <QFile>
 #include "utils.h"
 #include <QDir>
+#ifdef Q_OS_LINUX
+#include <unistd.h>
+#endif
 
 #define CHUNKSIZE 32768
 
@@ -26,6 +29,11 @@ void ExtractWorker::process()
     bool targetopen = targetFile.open(QIODevice::WriteOnly);
     int targetFileDescriptor = targetFile.handle();
     FILE* dest = fdopen(targetFileDescriptor, "wb");
+#ifdef Q_OS_LINUX
+    // Set the owner and group the same as the home path
+    QFileInfo info(QDir::homePath());
+    chown(dest,info.ownerId(),info.groupId());
+#endif
 
     int ret;
     unsigned have;

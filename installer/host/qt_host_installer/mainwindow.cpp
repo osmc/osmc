@@ -28,6 +28,9 @@
     #include <sys/mount.h>
     #include <QDir>
 #endif
+#ifdef Q_OS_LINUX
+#include <unistd.h>
+#endif
 
 #define WIDGET_START QPoint(10,110)
 
@@ -385,6 +388,11 @@ void MainWindow::showSuccessDialog()
         utils::writeLog("Writing the preseeder to filesystem");
         QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
         preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
+#ifdef Q_OS_LINUX
+        // Set the owner and group the same as the home path
+        QFileInfo info(QDir::homePath());
+        fchown(preseedFile.handle(),info.ownerId(),info.groupId());
+#endif
         QTextStream out(&preseedFile);
         for (int i = 0; i < preseedList.count(); i++)
         {
