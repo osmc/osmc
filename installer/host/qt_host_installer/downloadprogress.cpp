@@ -12,7 +12,7 @@
 #include "utils.h"
 #ifdef Q_OS_LINUX
 #include <unistd.h>
-#elif
+#endif
 
 /* With thanks to http://qt-project.org/doc/qt-4.8/network-downloadmanager-downloadmanager-cpp.html */
 
