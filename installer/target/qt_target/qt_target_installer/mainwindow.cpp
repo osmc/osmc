@@ -148,6 +148,10 @@ void MainWindow::install()
     #else
     logger->addLine("No preseed file as we are in Qt Creator, faking some preseeding");
     //preseedStringList.append("...");
+    preseedStringList.append("d-i target/storage string nfs");
+    preseedStringList.append("d-i network/interface string eth");
+    preseedStringList.append("d-i network/auto boolean true");
+
     #endif
     /* Check preseeding for our install type */
     bool useNetwork = false;
@@ -187,36 +191,44 @@ void MainWindow::install()
             storageTypeString = valueString;
             if (valueString == "nfs")
                 useNetwork = true;
+
+            continue;
         }
         if (pString.contains("target/storagePath"))
         {
             logger->addLine("Found storage path definition: " + valueString);
             storagePathString = valueString;
+            continue;
         }
         if (pString.contains("network/ip"))
         {
             logger->addLine("Found IP address entry");
             ip = valueString;
+            continue;
         }
         if (pString.contains("network/mask"))
         {
             logger->addLine("Found netmask address entry");
             subnet = valueString;
+            continue;
         }
         if (pString.contains("network/dns1"))
         {
             logger->addLine("Found dns1 address entry");
             dns1 = valueString;
+            continue;
         }
         if (pString.contains("network/dns2"))
         {
             logger->addLine("Found dns2 address entry");
             dns2 = valueString;
+            continue;
         }
         if (pString.contains("network/gw"))
         {
             logger->addLine("Found gateway address entry");
             gw = valueString;
+            continue;
         }
     }
 
