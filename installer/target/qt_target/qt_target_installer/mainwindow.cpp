@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Set up logging */
     logger = new Logger();
     logger->addLine("Starting OSMC installer");
+    #ifndef Q_WS_QWS
+    ui->statusLabel->setText("WORKING IN DUMMY MODE!");
+    #endif
     /* UI set up */
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
@@ -260,7 +263,7 @@ void MainWindow::install()
         {
             logger->addLine(interfacesStringList->at(i));
         }
-        #ifndef Q_WS_QWS
+        #ifdef Q_WS_QWS
         QFile interfacesFile("/etc/network/interfaces");
         interfacesFile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream interfacesStream(&interfacesFile);
@@ -270,7 +273,7 @@ void MainWindow::install()
         }
         interfacesFile.close();
         #endif
-        #ifndef Q_WS_QWS
+        #ifdef Q_WS_QWS
         ui->statusLabel->setText(tr("Starting network"));
         logger->addLine("Bringing up eth0");
         QProcess ethProcess;
