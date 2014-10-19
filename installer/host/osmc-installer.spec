@@ -16,11 +16,11 @@
 #
 
 %define osmc_tar src
-%define oscm_name qt_host_installer
-%define oscm_package osmc-installer
+%define osmc_name qt_host_installer
+%define osmc_package osmc-installer
 
 Summary: OSMC Installer for Linux
-Name: %{oscm_package}
+Name: %{osmc_package}
 Version: 1
 Release: PLACEHOLDER
 Source: %{osmc_tar}.tar.gz
@@ -111,13 +111,12 @@ install -d %{buildroot}%{_datadir}/osmc
 install -d %{buildroot}/usr/share/applications
 
 #files
-install -m 755 %{oscm_name} %{buildroot}%{_datadir}/osmc/%{oscm_name}
+install -m 755 %{osmc_name} %{buildroot}%{_datadir}/osmc/%{osmc_name}
 install -m 755 osmcinstaller %{buildroot}%{_datadir}/osmc/osmcinstaller
 #symlink for bin folder
-#ln -s %{_datadir}/osmc/%{oscm_name} %{buildroot}%{_bindir}/%{oscm_name}
+#ln -s %{_datadir}/osmc/%{osmc_name} %{buildroot}%{_bindir}/%{osmc_name}
 #ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/osmcinstaller
-ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/%{oscm_name}
-
+ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/osmcinstaller
 #lenguage files for qt
 #install -m 644 *.qm %{buildroot}%{_datadir}/osmc/
 #cp *.qm %{buildroot}%{_datadir}/osmc/ > /dev/null 2>&1
@@ -156,8 +155,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0755)
 %{_datadir}/osmc
 %defattr(-,root,root)
-%{_bindir}/%{oscm_name}
-%{_datadir}/osmc/%{oscm_name}
+%{_bindir}/%{osmc_name}
+%{_datadir}/osmc/%{osmc_name}
 %{_datadir}/osmc/osmcinstaller
 #%{_datadir}/osmc/*.qm
 /usr/share/applications/osmcinstaller.desktop
