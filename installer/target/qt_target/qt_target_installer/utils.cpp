@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "cmdlineparser.h"
 #include <QString>
+#include <cstdlib>
 
 namespace utils
 {
