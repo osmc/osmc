@@ -80,9 +80,12 @@ void MainWindow::install()
     /* Mount the filesystem */
     int mountStatus;
     #ifdef Q_WS_QWS
-    logger->addLine("Attempting to mount partition: " + bootPart + " " + "as " + (mountRW == 1) ? "RW" : "RO");
-    if (bootFs = "vfat")
-        mountStatus = mount(bootPart, "/mnt" "vfat", 1, "");
+    if (mountRW)
+        logger->addLine("Attempting to mount partition: " + bootPart + " " + "as RW");
+    else
+        logger->addLine("Attempting to mount partition: " + bootPart + " " + "as RO");
+    if (bootFs == "vfat")
+        mountStatus = mount(bootPart.toLocal8Bit(), "/mnt", "vfat", 1, "");
     #else
     logger->addLine("Fake mounting as we are in Qt Creator");
     mountStatus = 0;
