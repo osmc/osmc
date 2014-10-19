@@ -36,7 +36,7 @@ class PLL_Admin_Filters_Columns {
 		// adds the language column in the 'Categories' and 'Post Tags' tables
 		foreach ($this->model->get_translated_taxonomies() as $tax) {
 			add_filter('manage_edit-'.$tax.'_columns', array(&$this, 'add_term_column'));
-			add_action('manage_'.$tax.'_custom_column', array(&$this, 'term_column'), 10, 3);
+			add_filter('manage_'.$tax.'_custom_column', array(&$this, 'term_column'), 10, 3);
 		}
 
 	}
@@ -195,26 +195,26 @@ class PLL_Admin_Filters_Columns {
 	 *
 	 * @since 0.1
 	 *
-	 * @param string $empty not used
+	 * @param string $out
 	 * @param string $column column name
 	 * @param int term_id
 	 */
-	public function term_column($empty, $column, $term_id) {
+	public function term_column($out, $column, $term_id) {
 		$inline = defined('DOING_AJAX') && $_REQUEST['action'] == 'inline-save-tax' && isset($_POST['inline_lang_choice']);
 		if (false === strpos($column, 'language_') || !($lang = $inline ? $this->model->get_language($_POST['inline_lang_choice']) : $this->model->get_term_language($term_id)))
-			return;
+			return $out;
 
 		$post_type = isset($GLOBALS['post_type']) ? $GLOBALS['post_type'] : $_REQUEST['post_type']; // 2nd case for quick edit
 		$taxonomy = isset($GLOBALS['taxonomy']) ? $GLOBALS['taxonomy'] : $_REQUEST['taxonomy'];
 		$language = $this->model->get_language(substr($column, 9));
 
 		if ($column == $this->get_first_language_column())
-			printf('<div class="hidden" id="lang_%d">%s</div>', esc_attr($term_id), esc_html($lang->slug));
+			$out = sprintf('<div class="hidden" id="lang_%d">%s</div>', esc_attr($term_id), esc_html($lang->slug));
 
 		$id = ($inline && $lang->slug != $_POST['old_lang']) ? ($language->slug == $lang->slug ? $term_id : 0) : $this->model->get_term($term_id, $language);
 		// link to edit term (or a translation)
 		if ($id && $term = get_term($id, $taxonomy)) {
-			printf('<a class="%1$s" title="%2$s" href="%3$s"></a>',
+			$out .= sprintf('<a class="%1$s" title="%2$s" href="%3$s"></a>',
 				$id == $term_id ? 'pll_icon_tick' : 'pll_icon_edit',
 				esc_attr($term->name),
 				esc_url(get_edit_term_link($id, $taxonomy, $post_type))
@@ -223,10 +223,12 @@ class PLL_Admin_Filters_Columns {
 
 		// link to add a new translation
 		else {
-			printf('<a class="pll_icon_add" title="%1$s" href="%2$s"></a>',
+			$out .= sprintf('<a class="pll_icon_add" title="%1$s" href="%2$s"></a>',
 				__('Add new translation', 'polylang'),
 				esc_url($this->links->get_new_term_translation_link($term_id, $taxonomy, $post_type, $language))
 			);
 		}
+
+		return $out;
 	}
 }

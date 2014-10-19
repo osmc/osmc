@@ -458,6 +458,10 @@ class PLL_Admin_Filters_Term {
 		if (!empty($args['pll_get_terms_not_translated']))
 			return $clauses;
 
+		// admin language filter for ajax paginate_links in taxonomies metabox in nav menus panel
+		if (!empty($_POST['action']) && !empty($this->curlang) && 'menu-get-metabox' == $_POST['action'])
+			return $this->model->terms_clauses($clauses, $this->curlang);
+
 		// The only ajax response I want to deal with is when changing the language in post metabox
 		if (isset($_POST['action']) && !in_array($_POST['action'], array('post_lang_choice', 'term_lang_choice', 'get-tagcloud')))
 			return $clauses;

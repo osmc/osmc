@@ -204,25 +204,6 @@ class PLL_Frontend_Links extends PLL_Links {
 	}
 
 	/*
-	 * checks if the current user can read the post
-	 *
-	 * @since 1.5
-	 *
-	 * @param int $post_id
-	 * @return bool
-	 */
-	public function current_user_can_read($post_id) {
-		$post = get_post($post_id);
-		if (in_array($post->post_status, get_post_stati(array('public' => true))))
-			return true;
-
-		$post_type_object = get_post_type_object($post->post_type);
-		$user = wp_get_current_user();
-		return is_user_logged_in() && (current_user_can($post_type_object->cap->read_private_posts) || $user->ID == $post->post_author);
-	}
-
-
-	/*
 	 * returns the url of the translation (if exists) of the current page
 	 *
 	 * @since 0.1
