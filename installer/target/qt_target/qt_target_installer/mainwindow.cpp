@@ -16,6 +16,8 @@
 #include <QTranslator>
 #include <QWSServer>
 #include "extractworker.h"
+#include <QDesktopWidget>
+#include <QApplication>
 
 #ifndef Q_WS_QWS
 #include "filesystem.h"
@@ -38,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
         server->setBackground(QBrush(Qt::black));
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
     #endif
+    this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     QGraphicsOpacityEffect *ope = new QGraphicsOpacityEffect(this);
