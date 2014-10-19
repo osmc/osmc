@@ -155,7 +155,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0755)
 %{_datadir}/osmc
 %defattr(-,root,root)
-%{_bindir}/%{osmc_name}
+%{_bindir}/osmcinstaller
 %{_datadir}/osmc/%{osmc_name}
 %{_datadir}/osmc/osmcinstaller
 #%{_datadir}/osmc/*.qm
