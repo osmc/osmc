@@ -32,7 +32,7 @@ void ExtractWorker::process()
 #ifdef Q_OS_LINUX
     // Set the owner and group the same as the home path
     QFileInfo info(QDir::homePath());
-    chown(dest,info.ownerId(),info.groupId());
+    fchown(fileno(dest),info.ownerId(),info.groupId());
 #endif
 
     int ret;
