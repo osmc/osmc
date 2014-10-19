@@ -20,11 +20,11 @@ fi
 if [[ $EUID -eq 0 ]]; then
     $dir/qt_host_installer
 elif command -v gksudo; then
-    gksu $dir/qt_host_installer
+    gksu -k $dir/qt_host_installer
 elif command -v kdesu; then
     kdesu $dir/qt_host_installer
 elif command -v xdg-su; then
     xdg-su -c $dir/qt_host_installer
-else 
-    sudo -i $dir/qt_host_installer
+else
+    sudo $dir/qt_host_installer
 fi
