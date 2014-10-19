@@ -14,6 +14,7 @@
 #include <QTextStream>
 #include <QThread>
 #include <QTranslator>
+#include <QWSServer>
 #include "extractworker.h"
 
 #ifndef Q_WS_QWS
@@ -144,13 +145,13 @@ void MainWindow::preseed()
     /* Check for a preseeding file */
     QStringList preseedStringList;
     #ifdef Q_WS_QWS
-    logger->addLine("Checking for a preseed file in /mnt")
+    logger->addLine("Checking for a preseed file in /mnt");
     QFile preseedFile("/mnt/preseed.cfg");
     if (preseedFile.exists())
     {
         logger->addLine("Preseed file was found");
         QTextStream preseedStream(&preseedFile);
-        QString preseedString
+        QString preseedString;
         while (!preseedStream.atEnd())
         {
             preseedString = preseedStream.readAll();
