@@ -36,9 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(server)
         server->setCursorVisible(false);
         server->setBackground(QBrush(Qt::black));
-        w->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
+        this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
     #endif
-    this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     QGraphicsOpacityEffect *ope = new QGraphicsOpacityEffect(this);
