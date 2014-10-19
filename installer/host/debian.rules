@@ -8,7 +8,7 @@
 # This is the debhelper compatibility version to use.
 export DH_COMPAT=6
 
-INSTALL_ROOT := $(CURDIR)/debian/osmcinstaller
+INSTALL_ROOT := $(CURDIR)/debian/osmc-installer
 INSTALL_BASE := $(INSTALL_ROOT)/usr/share
 INSTALL_BIN  := $(INSTALL_BASE)/osmc
 
@@ -52,7 +52,7 @@ install: build
 	install -m 755 qt_host_installer $(INSTALL_BIN)/qt_host_installer
 	install -m 755 osmcinstaller $(INSTALL_BIN)/osmcinstaller
 	install -d $(INSTALL_ROOT)/usr/bin
-	ln -s ../../bin/osmcinstaller $(INSTALL_ROOT)/usr/bin/smcinstaller
+	ln -s ../share/osmc/osmcinstaller $(INSTALL_ROOT)/usr/bin/osmcinstaller
 	install -m 644 icon.png $(INSTALL_BIN)/icon.png
 	install -d $(INSTALL_BASE)/applications
 	install -m 644 osmcinstaller.desktop $(INSTALL_BASE)/applications/osmcinstaller.desktop
