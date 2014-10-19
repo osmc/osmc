@@ -163,18 +163,30 @@ void MainWindow::preseed()
     logger->addLine("No preseed file as we are in Qt Creator, faking some preseeding");
     //preseedStringList.append("...");
     #endif
-    /* Check for another language */
+    /* Check preseeding for our install type */
+    bool useNetwork = false;
+    bool useNFS = false;
+    QString storageTypeString;
+    QString storagePathString;
+    bool useDHCP = true;
+    QString ip;
+    QString subnet;
+    QString gw;
+    QString dns1;
+    QString dns2;
     for (int i = 0; i < preseedStringList.count(); i++)
     {
         QString pString = preseedStringList.at(i);
-        if (pString.contains("globe/storage"))
+        QStringList pStringSplit = pString.split(" ");
+        QString valueString;
+        bool valueisBool;
+        valueisBool = (pStringSplit.at(2) == "bool") ? true : false;
+        valueString = pStringSplit.at(3);
+        if (pString.contains("globe/locale"))
         {
-            logger->addLine("Found a definition for a language");
-            QStringList localeStringList = pString.split(" ");
-            QString localeString = localeStringList.at(3);
-            logger->addLine("Desired string locale is " + localeString);
+            logger->addLine("Found a definition for globalisation: " + valueString);
             QTranslator translator;
-            if (translator.load(qApp->applicationDirPath() + "/osmc_" + localeString + ".qm"))
+            if (translator.load(qApp->applicationDirPath() + "/osmc_" + valueString + ".qm"))
             {
                 logger->addLine("Translation loaded successfully!");
                 qApp->installTranslator(&translator);
@@ -183,28 +195,91 @@ void MainWindow::preseed()
             else
                 logger->addLine("Could not load translation");
         }
-    }
-    /* Check preseeding for our install type */
-    bool checkNetwork = false;
-    bool useNFS = false;
-    QString nfsPath;
-    for (int i = 0; i < preseedStringList.count(); i++)
-    {
-        QString pString = preseedStringList.at(i);
         if (pString.contains("target/storage"))
         {
-            logger->addLine("Found a definition for storage");
-            QStringList storageStringList = pString.split(" ");
-            QString storageTypeString = storageStringList.at(3);
-            QString storagePathString;
-            /* Check for NFS */
-            if (storageTypeString == "nfs")
-            {
-                logger->addLine("Found a definition for NFS install");
-                logger->addLine("We need to check for network definitions");
-                checkNetwork = true;
-            }
+            logger->addLine("Found a definition for storage: " + valueString);
+            storageTypeString = valueString;
+            if (valueString == "nfs")
+                useNetwork = true;
         }
+        if (pString.contains("target/storagePath"))
+        {
+            logger->addLine("Found storage path definition: " + valueString);
+            storagePathString = valueString;
+        }
+        if (pString.contains("network/ip"))
+        {
+            logger->addLine("Found IP address entry");
+            ip = valueString;
+        }
+        if (pString.contains("network/mask"))
+        {
+            logger->addLine("Found netmask address entry");
+            subnet = valueString;
+        }
+        if (pString.contains("network/dns1"))
+        {
+            logger->addLine("Found dns1 address entry");
+            dns1 = valueString;
+        }
+        if (pString.contains("network/dns2"))
+        {
+            logger->addLine("Found dns2 address entry");
+            dns2 = valueString;
+        }
+        if (pString.contains("network/gw"))
+        {
+            logger->addLine("Found gateway address entry");
+            gw = valueString;
+        }
+    }
+
+    if (useNetwork)
+    {
+        QStringList *interfacesStringList = new QStringList();
+        interfacesStringList->append(QString("auto eth0"));
+        if (! ip.isEmpty() && ! subnet.isEmpty() && ! gw.isEmpty() && dns1.isEmpty() && dns2.isEmpty())
+        {
+            logger->addLine("All entries for manual IP configuration defined");
+            interfacesStringList->append("iface eth0 inet static");
+            interfacesStringList->append("\t address " + ip);
+            interfacesStringList->append("\t netmask " + subnet);
+            interfacesStringList->append("\t gateway " + gw);
+            QFile nameserversFile("/etc/resolv.conf");
+            nameserversFile.open(QIODevice::WriteOnly, QIODevice::Text);
+            QTextStream nameserversTextStream(&nameserversFile);
+            nameserversTextStream << "nameserver " + dns1;
+            nameserversTextStream << "nameserver " + dns2;
+            nameserversFile.close();
+        }
+        else
+        {
+            logger->addLine("No entries defined for manual IP, will use DHCP");
+            interfacesStringList->append(QString("iface eth0 inet dhcp"));
+        }
+        logger->addLine("Going to write the following to /etc/network/interfaces");
+        for (int i = 0; i < interfacesStringList->count(); i++)
+        {
+            logger->addLine(interfacesStringList->at(i));
+        }
+        #ifndef Q_WS_QWS
+        QFile interfacesFile("/etc/network/interfaces");
+        interfacesFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream interfacesStream(&interfacesFile);
+        for (int i = 0; i < interfacesStringList->count(); i++)
+        {
+            interfacesStream << interfacesStringList->at(i);
+        }
+        interfacesFile.close();
+        #endif
+        #ifndef Q_WS_QWS
+        ui->statusLabel->setText(tr("Starting network"));
+        logger->addLine("Bringing up eth0");
+        QProcess ethProcess;
+        ethProcess.start("ifup");
+        ethProcess.waitForFinished();
+        #endif
+        /* We could add check here: like pinging gateway, but we know soon enough when we try mount */
     }
 }
 
@@ -215,6 +290,19 @@ void MainWindow::haltInstall(QString errorMsg)
     ui->statusProgressBar->setMaximum(100);
     ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
+    /* Attempts to write to /mnt; may not *actually* be mounted */
+    /* Could check etc/mtab but it's irrelevant if it is mounted or not */
+    #ifndef Q_WS_QWS
+    QFile logFile("/mnt/install.log");
+    logFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream logStream(&logFile);
+    QStringList *logStringList = logger->getLog();
+    for (int i = 0; i < logStringList->count(); i++)
+    {
+        logStream << logStringList->at(i);
+    }
+    logFile.close();
+    #endif
 }
 
 void MainWindow::finished()

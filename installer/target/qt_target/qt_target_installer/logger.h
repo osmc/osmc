@@ -9,6 +9,7 @@ class Logger
 public:
     Logger();
     void addLine(QString line);
+    QStringList *getLog() { return log; }
 private:
     QStringList *log;
 };
