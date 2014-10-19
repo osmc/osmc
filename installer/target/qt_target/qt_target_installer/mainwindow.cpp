@@ -170,7 +170,7 @@ void MainWindow::install()
         QStringList pStringSplit = pString.split(" ");
         QString valueString;
         bool valueisBool;
-        valueisBool = (pStringSplit.at(2) == "bool") ? true : false;
+        valueisBool = (pStringSplit.at(2) == "boolean") ? true : false;
         valueString = pStringSplit.at(3);
         if (pString.contains("globe/locale"))
         {
