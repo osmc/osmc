@@ -392,7 +392,9 @@ void MainWindow::showSuccessDialog()
         }
         preseedFile.close();
     }
-    utils::writeLog("Finished. Unmount in any case...");
+    utils::writeLog("Finished. Syncing...");
+    system("/bin/sync");
+    utils::writeLog("Unmount in any case...");
     io::unmount(diskPath, false);
     utils::writeLog("Final sync.");
 	system("/bin/sync");
