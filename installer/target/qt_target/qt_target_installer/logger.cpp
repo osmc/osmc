@@ -15,4 +15,5 @@ void Logger::addLine(QString line)
     QDateTime timestamp = QDateTime::currentDateTime();
     qDebug() << line;
     log->append(timestamp.toString() + " " + line + "\n");
+    fflush(stdout);
 }
