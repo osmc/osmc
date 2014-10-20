@@ -90,9 +90,7 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 
 		if (is_feed() && $this->links->using_permalinks) {
 			$redirect_url .= 'feed/';
-		}
-
-		if (is_single()) {
+		} elseif (is_single()) {
 			$redirect_url = get_permalink($this->model->get_translation('post', $post->ID, $language));
 		}
 
