@@ -150,7 +150,6 @@ void MainWindow::install()
         logger->addLine("Preseed file does not exist");
     #else
     logger->addLine("No preseed file as we are in Qt Creator, faking some preseeding");
-    //preseedStringList.append("...");
     preseedStringList.append("d-i target/storage string nfs");
     preseedStringList.append("d-i network/interface string eth");
     preseedStringList.append("d-i network/auto boolean true");
