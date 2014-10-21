@@ -135,16 +135,17 @@ void MainWindow::install()
     #ifdef Q_WS_QWS
     logger->addLine("Checking for a preseed file in /mnt");
     QFile preseedFile("/mnt/preseed.cfg");
+
     if (preseedFile.exists())
     {
+        if (!preseedFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            haltInstall("Preseed file exists but could not be opened. Erros is " + preseedFile.errorString());
+
         logger->addLine("Preseed file was found");
         QTextStream preseedStream(&preseedFile);
-        QString preseedString;
-        while (!preseedStream.atEnd())
-        {
-            preseedString = preseedStream.readAll();
-        }
-         preseedStringList = preseedString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+        QString preseedString = preseedStream.readAll();
+        preseedFile.close();
+        preseedStringList = preseedString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     }
     else
         logger->addLine("Preseed file does not exist");
