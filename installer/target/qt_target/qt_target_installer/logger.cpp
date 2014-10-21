@@ -13,7 +13,7 @@ Logger::Logger()
 void Logger::addLine(QString line)
 {
     QDateTime timestamp = QDateTime::currentDateTime();
-    qDebug() << line;
+    qDebug() << timestamp.toString() << " " << line;
     log->append(timestamp.toString() + " " + line + "\n");
     fflush(stdout);
 }
