@@ -57,6 +57,7 @@ QList<DiskDevice * > enumerateDevice()
 
 bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
 {
+    utils::writeLog("Writing " + deviceImage + " to " + devicePath);
     WriteImageWorker* worker = NULL;
     if(caller) {
         if(! (worker = qobject_cast<WriteImageWorker*>(caller)) ) {
@@ -109,6 +110,7 @@ bool mount(QString diskPath, QString mountDir)
 
 bool unmount(QString devicePath, bool isDisk)
 {
+    utils::writeLog("Unmounting " + devicePath);
     /* Read /proc/mounts and find out what partitions of the disk we are using are mounted */
     QFile partitionsFile("/proc/mounts");
     if(!partitionsFile.open(QIODevice::ReadOnly)) {
@@ -153,10 +155,8 @@ bool unmount(QString devicePath, bool isDisk)
 
 void updateKernelTable()
 {
-    #if defined(Q_OS_LINUX)
     utils::writeLog("Running partprobe to inform operating system about partition table changes");
     system("/sbin/partprobe");
-    #endif
 }
 
 bool installImagingTool() { return true; }

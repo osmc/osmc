@@ -306,8 +306,6 @@ void MainWindow::completeDownload(QString fileName)
     /* If we downloaded an image, replace former URL with an actual image file */
     if (fileName != NULL)
         this->image = QUrl(fileName);
-    utils::writeLog("Creating preseeder");
-    Preseeder *preseeder = new Preseeder();
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
         /* Windows: we actually want the device ID */
         ep = new ExtractProgress(this, QString::number(this->installDeviceID), this->image.toString());
@@ -357,8 +355,6 @@ void MainWindow::showSuccessDialog()
     QString diskPath;
     #if defined (Q_OS_LINUX)
         io::updateKernelTable();
-    #endif
-    #if defined (Q_OS_LINUX)
         diskPath = nd->getDiskPath();
         if(diskPath.contains("mmcblk")) {
             diskPath += "p1";
@@ -383,9 +379,12 @@ void MainWindow::showSuccessDialog()
     io::unmount(diskPath, false);
     io::unmount(nd->getDiskPath(), true);
 
+    utils::writeLog("Mounting " + diskPath + " to " + mountDir.absolutePath());
     if (! io::mount(diskPath, mountDir.absolutePath()))
     {
         utils::writeLog("Could not mount filesystem!");
+        utils::displayError(tr("Mount failed!"), tr("Could not mount device ") + diskPath + ". " + tr("Check the log for error messages. OSMC must exit now."), true);
+        QApplication::quit();
         return;
     }
     else
@@ -394,11 +393,11 @@ void MainWindow::showSuccessDialog()
         utils::writeLog("Writing the preseeder to filesystem");
         QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
         preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
-#ifdef Q_OS_LINUX
+    #ifdef Q_OS_LINUX
         // Set the owner and group the same as the home path
         QFileInfo info(QDir::homePath());
         fchown(preseedFile.handle(),info.ownerId(),info.groupId());
-#endif
+    #endif
         QTextStream out(&preseedFile);
         for (int i = 0; i < preseedList.count(); i++)
         {
