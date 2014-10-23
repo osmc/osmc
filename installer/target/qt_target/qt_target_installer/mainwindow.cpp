@@ -324,7 +324,7 @@ void MainWindow::dumpLog()
 {
     /* Attempts to write to /mnt; may not *actually* be mounted */
     /* Could check etc/mtab but it's irrelevant if it is mounted or not */
-    #ifndef Q_WS_QWS
+    #ifdef Q_WS_QWS
     QFile logFile("/mnt/install.log");
     logFile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream logStream(&logFile);
