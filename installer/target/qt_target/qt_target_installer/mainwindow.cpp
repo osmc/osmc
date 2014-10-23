@@ -92,7 +92,7 @@ void MainWindow::install()
     else
         logger->addLine("Attempting to mount partition: " + bootPart + " " + "as RO");
     if (bootFs == "vfat")
-        mountStatus = mount(bootPart.toLocal8Bit(), "/mnt", "vfat", 1, "");
+        mountStatus = mount(bootPart.toLocal8Bit(), "/mnt", "vfat", 0, "");
     #else
     logger->addLine("Fake mounting as we are in Qt Creator");
     mountStatus = 0;
