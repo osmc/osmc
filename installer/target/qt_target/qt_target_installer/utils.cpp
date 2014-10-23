@@ -72,7 +72,7 @@ bool fmtpart(QString partition, QString fstype)
     else if (fstype == "vfat32")
         mkfsProcess.start("mkfs.vfat -F 32 " + partition);
     mkfsProcess.waitForFinished();
-    return mkfs.exitCode();
+    return mkfsProcess.exitCode();
     #else
     return true;
     #endif
