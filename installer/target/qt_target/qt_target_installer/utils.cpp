@@ -77,8 +77,8 @@ bool fmtpart(QString partition, QString fstype)
     return true;
     #endif
 }
-void writeToFile(QFile file, QStringList *strings, bool append)
-{
+void writeToFile(QFile &file, QStringList strings, bool append)
+{    
     if (append)
         file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
     else

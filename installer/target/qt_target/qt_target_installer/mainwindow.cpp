@@ -1,3 +1,4 @@
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utils.h"
@@ -26,6 +27,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
+
 {
     ui->setupUi(this);
     this->setFixedSize(this->size());
@@ -157,16 +159,7 @@ void MainWindow::install()
 
     #endif
     /* Check preseeding for our install type */
-    bool useNetwork = false;
-    bool useNFS = false;
-    QString storageTypeString;
-    QString storagePathString;
-    bool useDHCP = true;
-    QString ip;
-    QString subnet;
-    QString gw;
-    QString dns1;
-    QString dns2;
+
     for (int i = 0; i < preseedStringList.count(); i++)
     {
         QString pString = preseedStringList.at(i);
@@ -272,8 +265,6 @@ void MainWindow::install()
             interfacesStream << interfacesStringList->at(i) + "\n";
         }
         interfacesFile.close();
-        #endif
-        #ifdef Q_WS_QWS
         ui->statusLabel->setText(tr("Starting network"));
         logger->addLine("Bringing up eth0");
         QProcess ethProcess;
@@ -281,119 +272,118 @@ void MainWindow::install()
         ethProcess.waitForFinished();
         #endif
     }
-        #ifdef Q_WS_QWS
-        /* Create partitions if necessary (i.e. not NFS) */
-        if (storageTypeString != "nfs")
+
+    #ifdef Q_WS_QWS
+    /* Create partitions if necessary (i.e. not NFS) */
+    if (storageTypeString != "nfs")
+    {
+        ui->statusLabel->setText(tr("Partitioning device"));
+        logger->addLine("We are not installing to an NFS share. Partitioning required");
+        if (storageTypeString == "usb")
         {
-            ui->statusLabel->setText(tr("Partitioning device"));
-            logger->addLine("We are not installing to an NFS share. Partitioning required");
-            if (storageTypeString == "usb")
+            logger->addLine("USB install chosen. Will do some sanity checking");
+            /* ToDo: 1) check for two USB devices
+             * 2) display a warning for 60 secs that drive will be erased
+             */
+            if (dev == "rbp")
             {
-                logger->addLine("USB install chosen. Will do some sanity checking");
-                /* ToDo: 1) check for two USB devices
-                 * 2) display a warning for 60 secs that drive will be erased
-                 */
-                if (dev == "rbp")
+                logger->addLine("Raspberry Pi with USB install: will create msdos partition layout on /dev/sda with one ext4 partition");
+                utils::mklabel("/dev/sda", false);
+                utils::mkpart("/dev/sda", "ext4", "4096s", "100%");
+                utils::fmtpart("/dev/sda1", "ext4");
+            }
+        }
+        if (storageTypeString == "sd")
+        {
+            logger->addLine("SD card install chosen. Will do some sanity checking");
+            /* ToDo: check the size of the SD card, needs to be 2GB */
+            /* Already have a label, just mkpart */
+            if (dev == "rbp")
+            {
+                logger->addLine("Raspberry Pi with SD card install: will make second partition as ext4");
+                if (! utils::mkpart("/dev/mmcblk0p1", "ext4", "258 M", "100%"))
                 {
-                    logger->addLine("Raspberry Pi with USB install: will create msdos partition layout on /dev/sda with one ext4 partition");
-                    utils::mklabel("/dev/sda", false);
-                    utils::mkpart("/dev/sda", "ext4", "4096s", "100%");
-                    utils::fmtpart("/dev/sda1", "ext4");
+                    logger->addLine("mkpart failed!");
+                    haltInstall(tr("Error creating partition"));
+                }
+                else if (! utils::fmtpart("/dev/mmcblk0p2", "ext4"))
+                {
+                    logger->addLine("formatting /dev/mmcblk0p2 failed");
+                    haltInstall(tr("Error formatting partition"));
                 }
             }
-            if (storageTypeString == "sd")
-            {
-                logger->addLine("SD card install chosen. Will do some sanity checking");
-                /* ToDo: check the size of the SD card, needs to be 2GB */
-                /* Already have a label, just mkpart */
-                if (dev == "rbp")
-                {
-                    logger->addLine("Raspberry Pi with SD card install: will make second partition as ext4");
-                    if (! utils::mkpart("/dev/mmcblk0p1", "ext4", "258 M", "100%"))
-                    {
-                        logger->addLine("mkpart failed!");
-                        haltInstall(tr("Error creating partition"));
-                    }
-                    else
-                        if (! utils::fmtpart("/dev/mmcblk0p2", "ext4"))
-                        {
-                            logger->addLine("formatting /dev/mmcblk0p2 failed");
-                            haltInstall(tr("Error formatting partition"));
-                        }
-                    }
-                }
-            }
-        #endif
-        /* Mount our root filesystem */
-        #ifdef Q_WS_QWS
-        system("mkdir /rfs");
-        int successMount;
-        if (dev == "rbp" && storageTypeString == "sd")
-            successMount = mount("/dev/mmcblk0p2", "/rfs", "ext4", 0, "");
-        if (dev == "rbp" && storageTypeString == "usb");
-            successMount = mount("/dev/sda1", "/rfs", "ext4", 0, "");
-        if (successMount != 0)
-        {
-            logger->addLine("Mounting root filesystem failed!");
-            haltInstall(tr("Mounting root filesystem failed!"));
         }
-        #endif
-        /* Extract root filesystem to /rfs */
-        ui->statusLabel->setText(tr("Installing files"));
-        logger->addLine("Extracting files");
-        #ifdef Q_WS_QWS
-        ui->statusProgressBar->setMinimum(0);
-        ui->statusProgressBar->setMaximum(100);
-        QThread* thread = new QThread;
-        ExtractWorker *worker = new ExtractWorker(fsTarball.fileName(), "/rfs");
-        worker->moveToThread(thread);
-        connect(thread, SIGNAL(started()), worker, SLOT(extract()));
-        connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
-        connect(worker, SIGNAL(error(QString)), this, SLOT(haltInstall(QString)));
-        connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
-        connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-        connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-        connect(thread, SIGNAL(finished()), this, SLOT(finished()));
-        thread->start();
-        #endif
-        /* Set up the boot loader */
-        #ifdef Q_WS_QWS
-        ui->statusLabel->setText(tr("Configuring bootloader"));
-        logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
-        system("mv -ar /rfs/boot/* /mnt");
-        if (device == "rbp")
-        {
-            logger->addLine("Configuring cmdline.txt");
-            QFile cmdlineFile("/mnt/cmdline.txt");
-            QStringList cmdlineStringList;
-           if (storageTypeString == "sd")
-               cmdlineStringList << "root=" + "/dev/mmcblk0p2" + " rootfstype=ext4 rootwait quiet";
-           if (storageTypeString = "usb")
-               cmdlineStringList << "root=" + "/dev/sda1" + " rootfstype=ext4 rootwait quiet";
-            utils::writeToFile(cmdlineFile, cmdlineStringList, false);
-        }
-        #endif
-        #ifdef Q_WS_QWS
-        /* Set up /etc/fstab */
-        logger->addLine("Configuring /etc/fstab");
-        QFile fstabFile("/rfs/etc/fstab");
-        QStringList fstabStringList;
-        if (dev == "rbp")
-        {
-            fstabStringList.append("/dev/mmcblk0p1  /boot           vfat    defaults,noatime         0       0");
-            if (storageTypeString == "sd")
-                fstabStringList.append("/dev/mmcblk0p2  /               ext4    defaults,noatime 0       0");
-            if (storageTypeString = "usb")
-                fstabStringList.append("/dev/sda1  /               ext4    defaults,noatime 0       0"");
-        }
-        utils::writeToFile(fstabFile, fstabStringList, true);
-        #endif
-        /* Dump the log */
-        dumpLog();
-        /* Reboot */
-        #ifdef Q_WS_QWS
-        utils::rebootSystem();
-        #endif
+    }
+    /* Mount our root filesystem */
+    system("mkdir /rfs");
+    int successMount;
+    if (dev == "rbp" && storageTypeString == "sd")
+        successMount = mount("/dev/mmcblk0p2", "/rfs", "ext4", 0, "");
+    if (dev == "rbp" && storageTypeString == "usb");
+        successMount = mount("/dev/sda1", "/rfs", "ext4", 0, "");
+    if (successMount != 0)
+    {
+        logger->addLine("Mounting root filesystem failed!");
+        haltInstall(tr("Mounting root filesystem failed!"));
+    }
+    #endif
+    /* Extract root filesystem to /rfs */
+    ui->statusLabel->setText(tr("Installing files"));
+    logger->addLine("Extracting files");
+    #ifdef Q_WS_QWS
+    ui->statusProgressBar->setMinimum(0);
+    ui->statusProgressBar->setMaximum(100);
+    QThread* thread = new QThread;
+    ExtractWorker *worker = new ExtractWorker(fsTarball.fileName(), "/rfs");
+    worker->moveToThread(thread);
+    connect(thread, SIGNAL(started()), worker, SLOT(extract()));
+    connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
+    connect(worker, SIGNAL(error(QString)), this, SLOT(haltInstall(QString)));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), this, SLOT(finished()));
+    thread->start();
+
+}
+
+void MainWindow::setupBootLoader()
+{
+    /* Set up the boot loader */
+    ui->statusLabel->setText(tr("Configuring bootloader"));
+    logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
+    system("mv -ar /rfs/boot/* /mnt");
+    if (dev == "rbp")
+    {
+        logger->addLine("Configuring cmdline.txt");
+        QFile cmdlineFile("/mnt/cmdline.txt");
+        QStringList cmdlineStringList;
+        if (storageTypeString == "sd")
+            cmdlineStringList << "root=/dev/mmcblk0p2 rootfstype=ext4 rootwait quiet";
+        if (storageTypeString == "usb")
+            cmdlineStringList << "root=/dev/sda1 rootfstype=ext4 rootwait quiet";
+        utils::writeToFile(cmdlineFile, cmdlineStringList, false);
+    }
+    /* Set up /etc/fstab */
+    logger->addLine("Configuring /etc/fstab");
+    QFile fstabFile("/rfs/etc/fstab");
+    QStringList fstabStringList;
+    if (dev == "rbp")
+    {
+        fstabStringList.append("/dev/mmcblk0p1  /boot           vfat    defaults,noatime         0       0");
+        if (storageTypeString == "sd")
+            fstabStringList.append("/dev/mmcblk0p2  /               ext4    defaults,noatime 0       0");
+        if (storageTypeString == "usb")
+            fstabStringList.append("/dev/sda1  /               ext4    defaults,noatime 0       0");
+    }
+    utils::writeToFile(fstabFile, fstabStringList, true);
+    #endif
+    /* Dump the log */
+    dumpLog();
+    /* Reboot */
+    #ifdef Q_WS_QWS
+    utils::rebootSystem();
+    #endif
 }
 
 void MainWindow::haltInstall(QString errorMsg)
@@ -410,13 +400,16 @@ void MainWindow::dumpLog()
     /* Attempts to write to /mnt; may not *actually* be mounted */
     /* Could check etc/mtab but it's irrelevant if it is mounted or not */
     #ifdef Q_WS_QWS
-    utils::writeToFile("/mnt/install.log", logger->getLog(), false);
+    QFile logFile("/mnt/install.log");
+    utils::writeToFile(logFile, logger->getLog(), false);
     #endif
 }
 
 void MainWindow::finished()
 {
     logger->addLine("Extraction finished.");
+    logger->addLine("going to setup the bootloader");
+    setupBootLoader();
 }
 
 void MainWindow::setProgress(unsigned value)

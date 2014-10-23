@@ -11,7 +11,7 @@ namespace utils
     bool mklabel(QString device, bool isGPT);
     bool mkpart(QString device, QString fstype, QString start, QString end);
     bool fmtpart(QString partition, QString fstype);
-    void writeToFile(QFile file, QStringList *strings, bool append);
+    void writeToFile(QFile &file, QStringList strings, bool append);
 }
 
 #endif
