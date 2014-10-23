@@ -69,6 +69,8 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 	 * @since 0.9.6
 	 */
 	public function check_language_code_in_url() {
+		global $post;
+
 		// don't act for page and post previews as well as (unattached) attachments
 		if (isset($_GET['p']) || isset($_GET['page_id']) || isset($_GET['attachment_id']))
 			return;
@@ -88,6 +90,8 @@ class PLL_Choose_Lang_Url extends PLL_Choose_lang {
 
 		if (is_feed() && $this->links->using_permalinks) {
 			$redirect_url .= 'feed/';
+		} elseif (is_single()) {
+			$redirect_url = get_permalink($this->model->get_translation('post', $post->ID, $language));
 		}
 
 		if ($requested_url != $redirect_url && !empty($redirect_url)) {
