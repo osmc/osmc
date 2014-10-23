@@ -269,7 +269,7 @@ void MainWindow::install()
         QTextStream interfacesStream(&interfacesFile);
         for (int i = 0; i < interfacesStringList->count(); i++)
         {
-            interfacesStream << interfacesStringList->at(i);
+            interfacesStream << interfacesStringList->at(i) + "\n";
         }
         interfacesFile.close();
         #endif
