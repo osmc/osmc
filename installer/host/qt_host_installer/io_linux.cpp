@@ -7,6 +7,7 @@
 #include "sys/mount.h"
 #include <stdlib.h>
 #include "writeimageworker.h"
+#include <errno.h>
 
 namespace io
 {
@@ -103,7 +104,7 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
 
 bool mount(QString diskPath, QString mountDir)
 {
-    return mount(diskPath.toLocal8Bit(), mountDir.toLocal8Bit(), "vfat", 1, "");
+    return mount(diskPath.toLocal8Bit(), mountDir.toLocal8Bit(), "vfat", 0, "") == 0;
 }
 
 bool unmount(QString devicePath, bool isDisk)
@@ -127,14 +128,20 @@ bool unmount(QString devicePath, bool isDisk)
         if (line.startsWith(devicePath))
         {
             QStringList devicePartition = line.split(" ");
-            utils::writeLog("Trying to unmount " + devicePartition.at(0));
-            if (umount(devicePartition.at(0).toLocal8Bit()))
+            utils::writeLog("Trying to unmount " + devicePartition.at(0) + " at " + devicePartition.at(1));
+            int um = umount(devicePartition.at(1).toLocal8Bit());
+            if (um == 0)
             {
                 utils::writeLog("Partition unmounted successfully, continuing!");
             }
+            else if (um == -1)
+            {
+                utils::writeLog("An error occured unmounting the partition. ERROR: "+QString::number(errno));
+                ret = false;
+            }
             else
             {
-                utils::writeLog("An error occured unmounting the partition");
+                utils::writeLog("An error occured unmounting the partition. retVal: "+QString::number(um));
                 ret = false;
             }
         }
