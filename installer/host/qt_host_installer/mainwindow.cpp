@@ -359,7 +359,13 @@ void MainWindow::showSuccessDialog()
         io::updateKernelTable();
     #endif
     #if defined (Q_OS_LINUX)
-        diskPath = nd->getDiskPath() + "1";
+        diskPath = nd->getDiskPath();
+        if(diskPath.contains("mmcblk")) {
+            diskPath += "p1";
+        }
+        else {
+            diskPath += "1";
+        }
     #endif
     #if defined (Q_OS_MAC)
         diskPath = nd->getDiskPath() + "s1";
