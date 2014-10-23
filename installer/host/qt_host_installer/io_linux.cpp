@@ -128,7 +128,6 @@ bool unmount(QString devicePath, bool isDisk)
         {
             QStringList devicePartition = line.split(" ");
             utils::writeLog("Trying to unmount " + devicePartition.at(0));
-            #if defined(Q_OS_LINUX)
             if (umount(devicePartition.at(0).toLocal8Bit()))
             {
                 utils::writeLog("Partition unmounted successfully, continuing!");
@@ -138,8 +137,6 @@ bool unmount(QString devicePath, bool isDisk)
                 utils::writeLog("An error occured unmounting the partition");
                 ret = false;
             }
-           #endif
-                return false;
         }
     }
 
