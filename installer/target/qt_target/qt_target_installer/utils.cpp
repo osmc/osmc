@@ -84,9 +84,9 @@ void writeToFile(QFile &file, QStringList strings, bool append)
     else
         file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream stream(&file);
-    for (int i = 0; i < strings->count(); i++)
+    for (int i = 0; i < strings.count(); i++)
     {
-        stream << strings->at(i);
+        stream << strings.at(i);
     }
     file.close();
 }

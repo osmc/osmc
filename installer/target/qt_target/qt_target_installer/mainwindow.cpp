@@ -344,11 +344,12 @@ void MainWindow::install()
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), this, SLOT(finished()));
     thread->start();
-
+    #endif
 }
 
 void MainWindow::setupBootLoader()
 {
+    #ifdef Q_WS_QWS
     /* Set up the boot loader */
     ui->statusLabel->setText(tr("Configuring bootloader"));
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
