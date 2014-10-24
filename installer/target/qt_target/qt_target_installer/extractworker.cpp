@@ -20,11 +20,6 @@ void ExtractWorker::extract()
 
     process->waitForFinished(-1);
 
-    #ifdef QT_DEBUG
-    qDebug() << "exitCodePv: " << process->exitCode();
-    qDebug() << process->readAllStandardError();
-    qDebug() << process->readAllStandardOutput();
-    #endif
     emit finished();
 }
 
@@ -32,13 +27,6 @@ void ExtractWorker::readFromProcess()
 {
     QString value = process->readAllStandardOutput();
     QString errorString = process->readAllStandardError();
-    #ifdef QT_DEBUG
-    qDebug() << "signal to read value";
-    qDebug() << "readAll: " << value;
-    qDebug() << "assuming intvalue: " << value.toInt();
-    qDebug() << "assuming longvalue: " << value.toLong();
-    qDebug() << "standartOut: " << process->readAllStandardOutput();
-    #endif
     if (errorString.size() > 0)
     {
         emit error(errorString);

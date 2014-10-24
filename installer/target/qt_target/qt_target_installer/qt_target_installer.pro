@@ -24,7 +24,6 @@ HEADERS  += mainwindow.h \
     utils.h \
     logger.h \
     cmdlineparser.h \
-    filesystem.h \
     extractworker.h
 
 FORMS    += mainwindow.ui

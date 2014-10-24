@@ -1,4 +1,3 @@
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utils.h"
@@ -20,10 +19,6 @@
 #include <QDesktopWidget>
 #include <QApplication>
 
-#ifndef Q_WS_QWS
-#include "filesystem.h"
-#endif
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -34,9 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Set up logging */
     logger = new Logger();
     logger->addLine("Starting OSMC installer");
-    #ifndef Q_WS_QWS
-    ui->statusLabel->setText("WORKING IN DUMMY MODE!");
-    #endif
     /* UI set up */
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
@@ -88,17 +80,12 @@ void MainWindow::install()
     }
     /* Mount the filesystem */
     int mountStatus;
-    #ifdef Q_WS_QWS
     if (mountRW)
         logger->addLine("Attempting to mount partition: " + bootPart + " " + "as RW");
     else
         logger->addLine("Attempting to mount partition: " + bootPart + " " + "as RO");
     if (bootFs == "vfat")
         mountStatus = mount(bootPart.toLocal8Bit(), "/mnt", "vfat", 0, "");
-    #else
-    logger->addLine("Fake mounting as we are in Qt Creator");
-    mountStatus = 0;
-    #endif
     if (mountStatus != 0)
     {
         logger->addLine("Mounting failed!");
@@ -109,7 +96,6 @@ void MainWindow::install()
         logger->addLine("Successfully mounted boot partition");
     /* Check we have a filesystem for target */
     logger->addLine("Checking for filesystem tarball");
-    #ifdef Q_WS_QWS
     QFile fsTarball("/mnt/filesystem.tar.xz");
     if (fsTarball.exists())
         logger->addLine("Filesystem tarball exists!");
@@ -119,22 +105,8 @@ void MainWindow::install()
         haltInstall("No filesystem found!"); /* No tr here as not got lang yet */
         return;
     }
-    #else
-    QFile fsTarball(QDir::homePath().append("/filesystem.tar.xz"));
-    logger->addLine("Faking filesystem in /mnt");
-    /* Write a basic filesystem so we have something to play with */
-    QByteArray fsByteArray;
-    QDataStream fsDataStream(&fsByteArray, QIODevice::WriteOnly);
-    fsDataStream.writeRawData((const char*) randomfile_tar_xz, randomfile_tar_xz_len);
-    fsTarball.open(QIODevice::WriteOnly);
-    fsTarball.write(fsByteArray);
-    fsTarball.close();
-    #endif
-
-
     /* Check for a preseeding file */
     QStringList preseedStringList;
-    #ifdef Q_WS_QWS
     logger->addLine("Checking for a preseed file in /mnt");
     QFile preseedFile("/mnt/preseed.cfg");
 
@@ -151,13 +123,6 @@ void MainWindow::install()
     }
     else
         logger->addLine("Preseed file does not exist");
-    #else
-    logger->addLine("No preseed file as we are in Qt Creator, faking some preseeding");
-    preseedStringList.append("d-i target/storage string nfs");
-    preseedStringList.append("d-i network/interface string eth");
-    preseedStringList.append("d-i network/auto boolean true");
-
-    #endif
     /* Check preseeding for our install type */
 
     for (int i = 0; i < preseedStringList.count(); i++)
@@ -256,7 +221,6 @@ void MainWindow::install()
         {
             logger->addLine(interfacesStringList->at(i));
         }
-        #ifdef Q_WS_QWS
         QFile interfacesFile("/etc/network/interfaces");
         interfacesFile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream interfacesStream(&interfacesFile);
@@ -270,10 +234,7 @@ void MainWindow::install()
         QProcess ethProcess;
         ethProcess.start("ifup eth0");
         ethProcess.waitForFinished();
-        #endif
     }
-
-    #ifdef Q_WS_QWS
     /* Create partitions if necessary (i.e. not NFS) */
     if (storageTypeString != "nfs")
     {
@@ -326,11 +287,9 @@ void MainWindow::install()
         logger->addLine("Mounting root filesystem failed!");
         haltInstall(tr("Mounting root filesystem failed!"));
     }
-    #endif
     /* Extract root filesystem to /rfs */
     ui->statusLabel->setText(tr("Installing files"));
     logger->addLine("Extracting files");
-    #ifdef Q_WS_QWS
     ui->statusProgressBar->setMinimum(0);
     ui->statusProgressBar->setMaximum(100);
     QThread* thread = new QThread;
@@ -344,12 +303,10 @@ void MainWindow::install()
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), this, SLOT(finished()));
     thread->start();
-    #endif
 }
 
 void MainWindow::setupBootLoader()
 {
-    #ifdef Q_WS_QWS
     /* Set up the boot loader */
     ui->statusLabel->setText(tr("Configuring bootloader"));
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
@@ -378,13 +335,10 @@ void MainWindow::setupBootLoader()
             fstabStringList.append("/dev/sda1  /               ext4    defaults,noatime 0       0");
     }
     utils::writeToFile(fstabFile, fstabStringList, true);
-    #endif
     /* Dump the log */
     dumpLog();
     /* Reboot */
-    #ifdef Q_WS_QWS
     utils::rebootSystem();
-    #endif
 }
 
 void MainWindow::haltInstall(QString errorMsg)
@@ -400,10 +354,8 @@ void MainWindow::dumpLog()
 {
     /* Attempts to write to /mnt; may not *actually* be mounted */
     /* Could check etc/mtab but it's irrelevant if it is mounted or not */
-    #ifdef Q_WS_QWS
     QFile logFile("/mnt/install.log");
     utils::writeToFile(logFile, logger->getLog(), false);
-    #endif
 }
 
 void MainWindow::finished()
