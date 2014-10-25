@@ -39,7 +39,7 @@ private:
     PreseedParser *preseed;
     QString installTarget;
     QString locale;
-    bool useNFS;
+    bool useNFS = false;
     Network *nw;
     BootloaderConfig *bc;
     void extract();
