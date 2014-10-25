@@ -76,7 +76,7 @@ namespace io
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
    {
-       QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=fdatasync\" with administrator privileges";
+       QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync\" with administrator privileges";
 
        QString osascript = "/usr/bin/osascript";
        QStringList processArguments;
