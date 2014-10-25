@@ -162,7 +162,7 @@ void MainWindow::install()
                 haltInstall(tr("cannot work out partition size"));
                 return;
             }
-            logger->addLine("Determined" + QString::number(size) + " as end of first partition");
+            logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
             utils::mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
             utils::fmtpart(device->getRoot(), "ext4");
         }
