@@ -4,7 +4,8 @@
 
 QProcess *process = NULL;
 
-ExtractWorker::ExtractWorker(QString sourcename, QString targetname)
+ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* parent):
+    QObject(parent)
 {
     this->sourceName = QString(sourcename);
     this->destName = QString(targetname);

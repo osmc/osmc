@@ -3,7 +3,6 @@
 #include <QTextStream>
 #include <QStringList>
 #include "utils.h"
-#define PRESEED_FILE "/mnt/boot/preseed.cfg"
 
 PreseedParser::PreseedParser()
 {
@@ -20,8 +19,9 @@ PreseedParser::PreseedParser()
             this->preseedStringList = preseedString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
             this->hasPreseed = true;
         }
-        else
+        else {
             this->hasPreseed = false;
+        }
     }
 }
 
@@ -31,9 +31,11 @@ QString PreseedParser::getStringValue(QString desiredSetting)
     {
         QString pString = preseedStringList.at(i);
         QStringList pStringSplit = pString.split(" ");
-        if (pString.contains(desiredSetting))
+        if (pString.contains(desiredSetting)) {
             return pStringSplit.at(3);
+        }
     }
+    return QString();
 }
 
 bool PreseedParser::getBoolValue(QString desiredSetting)
@@ -42,7 +44,9 @@ bool PreseedParser::getBoolValue(QString desiredSetting)
     {
         QString pString = preseedStringList.at(i);
         QStringList pStringSplit = pString.split(" ");
-        if (pString.contains(desiredSetting))
+        if (pString.contains(desiredSetting)){
             return (pStringSplit.at(3) == "true") ? true : false;
+        }
     }
+    return false;
 }

@@ -16,7 +16,7 @@ class ExtractWorker : public QObject {
     QString destName;
 
 public:
-    ExtractWorker(QString source, QString dest);
+    ExtractWorker(QString source, QString dest, QObject* parent = NULL);
 
 public slots:
     void extract();

@@ -11,3 +11,13 @@ TargetList::TargetList()
     /* Add to map */
     targetMap.insert("rbp", RBP);
 }
+
+TargetList::~TargetList()
+{
+    QMapIterator<QString, Target*> i(targetMap);
+    while (i.hasNext()) {
+        i.next();
+        delete i.value();
+    }
+    targetMap.clear();
+}

@@ -2,6 +2,7 @@
 #define PRESEEDPARSER_H
 #include <QString>
 #include <QStringList>
+#define PRESEED_FILE "/mnt/boot/preseed.cfg"
 
 class PreseedParser
 {

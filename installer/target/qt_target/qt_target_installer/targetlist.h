@@ -8,7 +8,8 @@ class TargetList
 {
 public:
     TargetList();
-    Target *getTarget(QString deviceKey) { return targetMap.value(deviceKey); }
+    ~TargetList();
+    Target *getTarget(QString deviceKey) { return targetMap.value(deviceKey, NULL); }
 private:
     QMap<QString, Target*> targetMap;
 };

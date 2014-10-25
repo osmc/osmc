@@ -32,6 +32,8 @@ public slots:
     void finished();
 
 private:
+    void extract();
+
     Ui::MainWindow *ui;
     Logger *logger;
     TargetList *targetList;
@@ -42,6 +44,5 @@ private:
     bool useNFS = false;
     Network *nw;
     BootloaderConfig *bc;
-    void extract();
 };
 #endif

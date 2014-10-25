@@ -7,7 +7,9 @@
 #include "sys/mount.h"
 #include <QDesktopWidget>
 #include <QApplication>
+#ifdef Q_WS_QWS
 #include <QWSServer>
+#endif
 #include <QFile>
 #include "targetlist.h"
 #include "target.h"
@@ -17,7 +19,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow), device(NULL), preseed(NULL)
 
 {
     ui->setupUi(this);
@@ -28,10 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
     /* UI set up */
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
-    if(server)
+    if(server) {
         server->setCursorVisible(false);
         server->setBackground(QBrush(Qt::black));
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
+    }
     #endif
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;
@@ -64,7 +67,7 @@ void MainWindow::install()
         return;
     }
     /* Sanity check: need filesystem.tar.xz */
-    QFile fileSystem("/mnt/boot/filesystem.tar.xz");
+    QFile fileSystem(MNT_BOOT + "/filesystem.tar.xz");
     if (! fileSystem.exists())
     {
         haltInstall("no filesystem found");
@@ -130,7 +133,6 @@ void MainWindow::install()
             }
         }
     }
-
     else
     {
         logger->addLine("No preseed file was found");
@@ -141,10 +143,12 @@ void MainWindow::install()
     {
         logger->addLine("Creating root partition");
         QString rootBase = device->getRoot();
-        if (rootBase.contains("mmcblk"))
+        if (rootBase.contains("mmcblk")){
             rootBase.chop(2);
-        else
+        }
+        else{
             rootBase.chop(1);
+        }
         logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
         if (device->hasRootChanged())
         {
@@ -168,10 +172,12 @@ void MainWindow::install()
         }
     }
     /* Mount root filesystem */
-    if (useNFS)
+    if (useNFS){
         bc = new BootloaderConfig(device, nw);
-    else
+    }
+    else{
         bc = new BootloaderConfig(device, NULL);
+    }
     logger->addLine("Mounting root");
     if ( ! utils::mountPartition(device, MNT_ROOT))
     {
@@ -184,7 +190,7 @@ void MainWindow::install()
    logger->addLine("Extracting files to root filesystem");
    ui->statusProgressBar->setMinimum(0);
    ui->statusProgressBar->setMaximum(100);
-   QThread* thread = new QThread;
+   QThread* thread = new QThread(this);
    ExtractWorker *worker = new ExtractWorker("/mnt/boot/" + fileSystem.fileName(), MNT_ROOT);
    worker->moveToThread(thread);
    connect(thread, SIGNAL(started()), worker, SLOT(extract()));
@@ -199,18 +205,18 @@ void MainWindow::install()
 void MainWindow::setupBootLoader()
 {
     /* Set up the boot loader */
-       ui->statusLabel->setText(tr("Configuring bootloader"));
-       logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
-       bc->copyBootFiles();
-       logger->addLine("Configuring boot cmdline");
-       bc->configureCmdline();
-       logger->addLine("Configuring /etc/fstab");
-       bc->configureFstab();
-       /* Dump the log */
-       logger->addLine("Successful installation. Dumping log and rebooting system");
-       dumpLog();
-       /* Reboot */
-       utils::rebootSystem();
+    ui->statusLabel->setText(tr("Configuring bootloader"));
+    logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
+    bc->copyBootFiles();
+    logger->addLine("Configuring boot cmdline");
+    bc->configureCmdline();
+    logger->addLine("Configuring /etc/fstab");
+    bc->configureFstab();
+    /* Dump the log */
+    logger->addLine("Successful installation. Dumping log and rebooting system");
+    dumpLog();
+    /* Reboot */
+    utils::rebootSystem();
 }
 
 void MainWindow::haltInstall(QString errorMsg)
@@ -243,4 +249,10 @@ void MainWindow::setProgress(unsigned value)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete nw;
+    delete bc;
+    delete device;
+    delete logger;
+    delete this->targetList;
+    delete preseed;
 }
