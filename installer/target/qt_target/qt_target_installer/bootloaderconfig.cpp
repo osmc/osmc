@@ -1,5 +1,6 @@
 #include "bootloaderconfig.h"
 #include "target.h"
+#include <cstdlib>
 #include "network.h"
 #include "utils.h"
 #include <QStringList>
