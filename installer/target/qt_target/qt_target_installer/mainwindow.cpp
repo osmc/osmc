@@ -163,6 +163,7 @@ void MainWindow::install()
     {
         logger->addLine("Error occured trying to mount root of " + device->getRoot());
         haltInstall(tr("can't mount root"));
+        return;
     }
    /* Extract root filesystem */
    ui->statusLabel->setText(tr("Installing files"));
