@@ -5,7 +5,6 @@
 #include <QProcess>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <target.h>
 #include <sys/mount.h>
 

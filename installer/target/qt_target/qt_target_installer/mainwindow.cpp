@@ -155,10 +155,15 @@ void MainWindow::install()
         }
         else
         {
-            //TODO get this flying
-            int size = utils::getPartSize("/dev/mmcblk0", "fat32");
-            logger->addLine("Determined" + QString::number(size) + " as size of mmcblk0");
-            utils::mkpart(rootBase, "ext4", "258M", "100%");
+            int size = utils::getPartSize(rootBase, (device->getBootFS() == "vfat" ? "fat32" : "ext4"));
+            if (size == -1)
+            {
+                logger->addLine("Issue getting size of device");
+                haltInstall(tr("cannot work out partition size"));
+                return;
+            }
+            logger->addLine("Determined" + QString::number(size) + " as end of first partition");
+            utils::mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
             utils::fmtpart(device->getRoot(), "ext4");
         }
     }
