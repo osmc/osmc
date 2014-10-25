@@ -403,6 +403,8 @@ void MainWindow::showSuccessDialog()
         {
             out << preseedList.at(i) + "\n";
         }
+        out.flush();
+        preseedFile.flush();
         preseedFile.close();
     }
     utils::writeLog("Finished. Syncing...");

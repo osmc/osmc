@@ -62,7 +62,9 @@ namespace io
                } else
                {
                    deviceSpace = deviceAttr.at(2) + " " + deviceAttr.at(3);
-                   devicePath += deviceAttr.at(4);
+                   QString deviceName(deviceAttr.at(4));
+                   /* make the disk become a rdisk */
+                   devicePath += deviceName.replace(0, 1, "rd");
                }
 
                deviceSpace.remove("*");
@@ -76,7 +78,7 @@ namespace io
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
    {
-       QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync\" with administrator privileges";
+       QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync && sync\" with administrator privileges";
 
        QString osascript = "/usr/bin/osascript";
        QStringList processArguments;
@@ -92,8 +94,6 @@ namespace io
        QByteArray stdoutArray = p.readAllStandardOutput();
        QByteArray stderrArray = p.readAllStandardError();
        int exitCode = p.exitCode();
-
-
 
        if (exitCode == 0 && p.exitStatus() == QProcess::NormalExit) {
            utils::writeLog("Imaging was successful");
