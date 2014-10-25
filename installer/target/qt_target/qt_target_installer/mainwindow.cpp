@@ -140,22 +140,22 @@ void MainWindow::install()
     if (! useNFS)
     {
         logger->addLine("Creating root partition");
+        QString rootBase = device->getRoot();
+        if (rootBase.contains("mmcblk"))
+            rootBase.chop(2);
+        else
+            rootBase.chop(1);
+        logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
         if (device->hasRootChanged())
         {
             logger->addLine("Must mklabel as root fs is on another device");
-            QString rootBase = device->getRoot();
-            if (rootBase.contains("mmcblk"))
-                rootBase.chop(2);
-            else
-                rootBase.chop(1);
-            logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
             utils::mklabel(rootBase, false);
-            utils::mkpart(device->getRoot(), "ext4", "4096s", "100%");
+            utils::mkpart(rootBase, "ext4", "4096s", "100%");
             utils::fmtpart(device->getRoot(), "ext4");
         }
         else
         {
-            utils::mkpart(device->getRoot(), "ext4", "258M", "100%");
+            utils::mkpart(rootBase, "ext4", "258M", "100%");
             utils::fmtpart(device->getRoot(), "ext4");
         }
     }
