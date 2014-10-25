@@ -32,9 +32,9 @@ bool mklabel(QString device, bool isGPT)
 {
     QProcess partedProcess;
     if (isGPT)
-        partedProcess.start("parted -s" + device.toLocal8Bit() + "mklabel gpt");
+        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mklabel gpt");
     else
-        partedProcess.start("parted -s" + device.toLocal8Bit() + "mklabel msdos");
+        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mklabel msdos");
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
@@ -43,7 +43,7 @@ bool mklabel(QString device, bool isGPT)
 bool mkpart(QString device, QString fstype, QString start, QString end)
 {
     QProcess partedProcess;
-    partedProcess.start("parted -s " + device.toLocal8Bit() + "mkpart primary " + fstype + " " + start + " " + end);
+    partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mkpart primary " + fstype + " " + start + " " + end);
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
@@ -52,11 +52,9 @@ bool fmtpart(QString partition, QString fstype)
 {
     QProcess mkfsProcess;
     if (fstype == "ext4")
-        mkfsProcess.start("mkfs.ext4 " + partition);
+        mkfsProcess.start("/usr/sbin/mkfs.ext4 " + partition);
     else if (fstype == "vfat")
-        mkfsProcess.start("mkfs.vfat " + partition);
-    else if (fstype == "vfat32")
-        mkfsProcess.start("mkfs.vfat -F 32 " + partition);
+        mkfsProcess.start("/usr/sbin/mkfs.vfat -F 32 " + partition);
     mkfsProcess.waitForFinished();
     return mkfsProcess.exitCode();
 }
@@ -75,7 +73,7 @@ void writeToFile(QFile &file, QStringList strings, bool append)
 }
 bool mountPartition(Target *device, QString path)
 {
-    system("mkdir -p " + path.toLocal8Bit());
+    system("/bin/mkdir -p " + path.toLocal8Bit());
     if (path == MNT_BOOT)
     {
         return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
@@ -86,7 +84,7 @@ bool mountPartition(Target *device, QString path)
         {
             /* This is an NFS share, use BusyBox */
             QProcess mountProcess;
-            mountProcess.start("mount -t nfs -o nolock,noatime " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
+            mountProcess.start("/bin/mount -t nfs -o nolock,noatime " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
             if (mountProcess.exitCode() == 0)
                 return true;
             else
