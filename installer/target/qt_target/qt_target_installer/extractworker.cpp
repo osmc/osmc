@@ -16,7 +16,7 @@ void ExtractWorker::extract()
     process = new QProcess();
     connect(process, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
     process->setProcessChannelMode(QProcess::MergedChannels);
-    process->start("/bin/sh -c \"pv -n " + sourceName + " | tar xJf - -C " + destName);
+    process->start("/bin/sh -c \"pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
     process->waitForFinished(-1);
     emit finished();
 }

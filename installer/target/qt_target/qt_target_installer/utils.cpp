@@ -5,6 +5,7 @@
 #include <QProcess>
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 #include <target.h>
 #include <sys/mount.h>
 
@@ -38,6 +39,18 @@ bool mklabel(QString device, bool isGPT)
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
+}
+
+int getPartSize(QString device, QString fstype)
+{
+    QString command("parted -s " + device.toLocal8Bit() + "| grep " + fstype + "| awk {'print $4'} | tr -d MB";
+    QProcess partedProcess;
+    partedProcess.start("/bin/sh -c \"" + command + "\"");
+    partedProcess.waitForFinished();
+    int exitCode = partedProcess.exitCode();
+    if (exitCode != 0)
+        return -1;
+    return QString(partedProcess.readAll()).toInt();
 }
 
 bool mkpart(QString device, QString fstype, QString start, QString end)
