@@ -12,7 +12,7 @@ public:
     bool getBoolValue(QString desiredSetting);
 
 private:
-    bool hasPreseed;
+    bool hasPreseed = false;
     QStringList preseedStringList;
 };
 
