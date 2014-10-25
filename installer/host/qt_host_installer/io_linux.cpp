@@ -96,7 +96,13 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
         }
         r = in.readRawData(buf,sizeof(buf));
     }
+    if(worker){
+        worker->emitFlushingFS();
+    }
     imageFile.close();
+    if(!deviceFile.flush()) {
+        return false;
+    }
     deviceFile.close();
 
     updateKernelTable();

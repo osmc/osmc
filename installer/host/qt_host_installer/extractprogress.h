@@ -32,6 +32,7 @@ public slots:
     void setProgress(unsigned);
     void finished();
     void writeFinished();
+    void setFlushing();
 
 signals:
     void finishedExtraction();

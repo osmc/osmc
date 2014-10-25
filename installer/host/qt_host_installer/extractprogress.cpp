@@ -90,6 +90,7 @@ void ExtractProgress::writeImageToDisk()
         worker->moveToThread(thread);
         connect(worker, SIGNAL(error()), this, SLOT(writeError()));
         connect(thread, SIGNAL(started()), worker, SLOT(process()));
+        connect(worker, SIGNAL(flushingFS()), this, SLOT(setFlushing()));
         connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));
         connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
         connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
@@ -174,6 +175,14 @@ void ExtractProgress::writeFinished()
 {
     utils::writeLog("Image successfully written to device");
     emit(finishedExtraction());
+}
+
+void ExtractProgress::setFlushing()
+{
+    ui->extractProgressBar->setMinimum(0);
+    ui->extractProgressBar->setMaximum(0);
+    ui->extractDetailsLabel_2->setText("");
+    ui->extractDetailsLabel->setText(tr("Flushing") + " " + this->devicePath + tr("\n(This might take a minute or two!)"));
 }
 
 ExtractProgress::~ExtractProgress()

@@ -14,10 +14,12 @@ public:
     explicit WriteImageWorker(QObject *parent = 0);
     WriteImageWorker(QString deviceImage, QString devicePath);
     void emitProgressUpdate(unsigned);
+    void emitFlushingFS();
 
 signals:
     void finished();
     void progressUpdate(unsigned);
+    void flushingFS();
     void error();
 
 

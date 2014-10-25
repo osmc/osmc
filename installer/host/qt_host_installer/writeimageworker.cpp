@@ -17,6 +17,10 @@ void WriteImageWorker::emitProgressUpdate(unsigned progress)
     emit progressUpdate(progress);
 }
 
+void WriteImageWorker::emitFlushingFS() {
+    emit flushingFS();
+}
+
 void WriteImageWorker::process()
 {
     if (io::writeImage(this->devicePath, this->deviceImage, this))
