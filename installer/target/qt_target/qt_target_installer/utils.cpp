@@ -32,9 +32,9 @@ bool mklabel(QString device, bool isGPT)
 {
     QProcess partedProcess;
     if (isGPT)
-        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mklabel gpt");
+        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel gpt");
     else
-        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mklabel msdos");
+        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel msdos");
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
@@ -43,7 +43,7 @@ bool mklabel(QString device, bool isGPT)
 bool mkpart(QString device, QString fstype, QString start, QString end)
 {
     QProcess partedProcess;
-    partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + "mkpart primary " + fstype + " " + start + " " + end);
+    partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mkpart primary " + fstype + " " + start + " " + end);
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
