@@ -157,7 +157,7 @@ void MainWindow::install()
         {
             //TODO get this flying
             int size = utils::getPartSize("/dev/mmcblk0", "fat32");
-            logger->addLine("Determined" + size + " as size of mmcblk0");
+            logger->addLine("Determined" + QString::number(size) + " as size of mmcblk0");
             utils::mkpart(rootBase, "ext4", "258M", "100%");
             utils::fmtpart(device->getRoot(), "ext4");
         }
