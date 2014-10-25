@@ -7,6 +7,7 @@
 #include "sys/mount.h"
 #include <QDesktopWidget>
 #include <QApplication>
+#include <QWSServer>
 #include <QFile>
 #include "targetlist.h"
 #include "target.h"
