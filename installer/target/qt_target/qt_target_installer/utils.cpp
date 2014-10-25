@@ -96,7 +96,8 @@ void writeToFile(QFile &file, QStringList strings, bool append)
 
 bool mountPartition(Target *device, QString path)
 {
-    QDir::mkpath(path);
+    QDir pathdir;
+    pathdir.mkpath(path);
     if (path == MNT_BOOT)
     {
         return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;

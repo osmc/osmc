@@ -10,7 +10,7 @@ Network::Network()
 
 void Network::bringUp()
 {
-    QStringList interfacesStringList = new QStringList();
+    QStringList interfacesStringList = QStringList();
     interfacesStringList.append(QString("auto eth0"));
     /* If we aren't using DHCP */
     if (this->isDefined())

@@ -67,7 +67,7 @@ void MainWindow::install()
         return;
     }
     /* Sanity check: need filesystem.tar.xz */
-    QFile fileSystem(MNT_BOOT + "/filesystem.tar.xz");
+    QFile fileSystem(QString(MNT_BOOT) + "/filesystem.tar.xz");
     if (! fileSystem.exists())
     {
         haltInstall("no filesystem found");
