@@ -3,6 +3,10 @@
 
 #include <QString>
 #include <QFile>
+#include <target.h>
+
+#define MNT_BOOT "/mnt/boot"
+#define MNT_ROOT "/mnt/root"
 
 namespace utils
 {
@@ -12,6 +16,7 @@ namespace utils
     bool mkpart(QString device, QString fstype, QString start, QString end);
     bool fmtpart(QString partition, QString fstype);
     void writeToFile(QFile &file, QStringList strings, bool append);
+    bool mountPartition(Target *device, QString path);
 }
 
 #endif

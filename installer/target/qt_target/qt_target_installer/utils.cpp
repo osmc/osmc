@@ -5,6 +5,8 @@
 #include <QProcess>
 #include <QFile>
 #include <QTextStream>
+#include <target.h>
+#include <sys/mount.h>
 
 namespace utils
 {
@@ -40,15 +42,11 @@ bool mklabel(QString device, bool isGPT)
 
 bool mkpart(QString device, QString fstype, QString start, QString end)
 {
-    #ifdef Q_WS_QWS
     QProcess partedProcess;
     partedProcess.start("parted -s " + device.toLocal8Bit() + "mkpart primary " + fstype + " " + start + " " + end);
     partedProcess.waitForFinished();
     updateDevTable();
     return partedProcess.exitCode();
-    #else
-    return true;
-    #endif
 }
 bool fmtpart(QString partition, QString fstype)
 {
@@ -74,5 +72,30 @@ void writeToFile(QFile &file, QStringList strings, bool append)
         stream << strings.at(i);
     }
     file.close();
+}
+bool mountPartition(Target *device, QString path)
+{
+    system("mkdir -p " + path.toLocal8Bit());
+    if (path == MNT_BOOT)
+    {
+        return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+    }
+    else if (path == MNT_ROOT)
+    {
+        if (device->getRoot().contains(":/") && device->hasRootChanged())
+        {
+            /* This is an NFS share, use BusyBox */
+            QProcess mountProcess;
+            mountProcess.start("mount -t nfs -o nolock,noatime " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
+            if (mountProcess.exitCode() == 0)
+                return true;
+            else
+                return false;
+        }
+        else
+        {
+            return (mount(device->getRoot().toLocal8Bit(), MNT_ROOT, "ext4", 0, "") == 0) ? true : false;
+        }
+    }
 }
 }

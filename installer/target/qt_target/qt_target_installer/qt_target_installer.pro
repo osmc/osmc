@@ -18,13 +18,23 @@ SOURCES += main.cpp\
     utils.cpp \
     logger.cpp \
     cmdlineparser.cpp \
-    extractworker.cpp
+    extractworker.cpp \
+    preseedparser.cpp \
+    target.cpp \
+    targetlist.cpp \
+    network.cpp \
+    bootloaderconfig.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     logger.h \
     cmdlineparser.h \
-    extractworker.h
+    extractworker.h \
+    preseedparser.h \
+    target.h \
+    targetlist.h \
+    network.h \
+    bootloaderconfig.h
 
 FORMS    += mainwindow.ui
 

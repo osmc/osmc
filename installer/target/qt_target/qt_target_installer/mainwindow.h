@@ -5,6 +5,11 @@
 #include "utils.h"
 #include <QString>
 #include <QProcess>
+#include "targetlist.h"
+#include "target.h"
+#include "preseedparser.h"
+#include "network.h"
+#include "bootloaderconfig.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,18 +34,14 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Logger *logger;
-    QString dev;
-    bool useNetwork = false;
-    bool useNFS = false;
-    QString storageTypeString;
-    QString storagePathString;
-    bool useDHCP = true;
-    QString ip;
-    QString subnet;
-    QString gw;
-    QString dns1;
-    QString dns2;
-
+    TargetList *targetList;
+    Target *device;
+    PreseedParser *preseed;
+    QString installTarget;
+    QString locale;
+    bool useNFS;
+    Network *nw;
+    BootloaderConfig *bc;
     void extract();
 };
 #endif
