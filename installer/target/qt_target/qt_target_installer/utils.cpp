@@ -25,7 +25,7 @@ void rebootSystem()
 
 void inline updateDevTable()
 {
-    system("/sbin/partprobe");
+    system("/usr/sbin/partprobe");
 }
 
 bool mklabel(QString device, bool isGPT)
