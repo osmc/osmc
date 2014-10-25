@@ -42,7 +42,7 @@ bool mklabel(QString device, bool isGPT)
 
 int getPartSize(QString device, QString fstype)
 {
-    QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + (fstype == "vfat" ? "fat32" : "ext4") + " | awk {'print $4'} | tr -d MB");
+    QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
     QProcess partedProcess;
     partedProcess.start("/bin/sh -c \"" + command + "\"");
     partedProcess.waitForFinished();
