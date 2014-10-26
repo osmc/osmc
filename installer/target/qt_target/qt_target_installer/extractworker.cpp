@@ -9,7 +9,6 @@ ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* pa
 {
     this->sourceName = QString(sourcename);
     this->destName = QString(targetname);
-
 }
 
 void ExtractWorker::extract()
