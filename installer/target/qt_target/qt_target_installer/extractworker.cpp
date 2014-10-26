@@ -14,7 +14,8 @@ void ExtractWorker::extract()
 {
     logger->addLine("Starting extract progress...");
     process = new QProcess();
-    connect(process, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
+    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readFromStdOut()));
+    connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readFromStdErr()));
     process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
     process->waitForFinished(-1);
     if (process->exitCode() != 0)
@@ -23,12 +24,15 @@ void ExtractWorker::extract()
         emit finished();
 }
 
-void ExtractWorker::readFromProcess()
+void ExtractWorker::readFromStdOut()
 {
     QString value = process->readAllStandardOutput();
+    emit progressUpdate(value.toInt());
+}
+
+void ExtractWorker::readFromStdErr()
+{
     QString errorString = process->readAllStandardError();
     if (errorString.size() > 0)
         emit error(errorString);
-    else
-        emit progressUpdate(value.toInt());
 }

@@ -18,7 +18,8 @@ public:
 
 public slots:
     void extract();
-    void readFromProcess();
+    void readFromStdOut();
+    void readFromStdErr();
 
 signals:
     void finished();
