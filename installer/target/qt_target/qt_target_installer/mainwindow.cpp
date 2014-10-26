@@ -252,6 +252,7 @@ void MainWindow::setProgress(unsigned value)
 {
     ui->statusProgressBar->setValue(value);
     qApp->processEvents();
+    ui->statusProgressBar->update();
 }
 
 MainWindow::~MainWindow()
