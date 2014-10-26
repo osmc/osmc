@@ -182,7 +182,7 @@ void ExtractProgress::setFlushing()
     ui->extractProgressBar->setMinimum(0);
     ui->extractProgressBar->setMaximum(0);
     ui->extractDetailsLabel_2->setText("");
-    ui->extractDetailsLabel->setText(tr("Flushing") + " " + this->devicePath + tr("\n(This might take a minute or two!)"));
+    ui->extractDetailsLabel->setText(tr("Finalising") + " " + this->devicePath + tr("\n(This might take a minute or two!)"));
 }
 
 ExtractProgress::~ExtractProgress()
