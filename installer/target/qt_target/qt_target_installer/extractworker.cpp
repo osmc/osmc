@@ -32,7 +32,10 @@ void ExtractWorker::readFromStdOut()
 
 void ExtractWorker::readFromStdErr()
 {
-    QString errorString = process->readAllStandardError();
-    if (errorString.size() > 0)
+    QString value = process->readAllStandardError();
+    QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
+    if (re.exactMatch(somestr))
+        emit progressUpdate(value.toInt());
+    else
         emit error(errorString);
 }
