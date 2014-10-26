@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::install()
 {
-    qApp.processEvents();
+    qApp->processEvents();
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
     device = targetList->getTarget(utils::getOSMCDev());
