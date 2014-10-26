@@ -30,11 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     /* UI set up */
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
-    if(server) {
+    if(server)
         server->setCursorVisible(false);
         server->setBackground(QBrush(Qt::black));
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
-    }
     #endif
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;
@@ -143,12 +142,10 @@ void MainWindow::install()
     {
         logger->addLine("Creating root partition");
         QString rootBase = device->getRoot();
-        if (rootBase.contains("mmcblk")){
+        if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
-        }
-        else{
+        else
             rootBase.chop(1);
-        }
         logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
         if (device->hasRootChanged())
         {
@@ -172,12 +169,10 @@ void MainWindow::install()
         }
     }
     /* Mount root filesystem */
-    if (useNFS){
+    if (useNFS)
         bc = new BootloaderConfig(device, nw);
-    }
-    else{
+    else
         bc = new BootloaderConfig(device, NULL);
-    }
     logger->addLine("Mounting root");
     if ( ! utils::mountPartition(device, MNT_ROOT))
     {

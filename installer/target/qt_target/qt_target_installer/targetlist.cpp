@@ -15,7 +15,8 @@ TargetList::TargetList()
 TargetList::~TargetList()
 {
     QMapIterator<QString, Target*> i(targetMap);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
         i.next();
         delete i.value();
     }
