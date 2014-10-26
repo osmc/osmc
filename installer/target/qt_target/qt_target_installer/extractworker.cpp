@@ -1,5 +1,6 @@
 #include <QFile>
 #include <QTextStream>
+#include <QString>
 #include "extractworker.h"
 
 ExtractWorker::ExtractWorker(QString sourcename, QString targetname, Logger *logger, QObject* parent):
@@ -33,12 +34,15 @@ void ExtractWorker::readFromStdOut()
 void ExtractWorker::readFromStdErr()
 {
     QString value = process->readAllStandardError();
-    value = value.split("\n").at(0);
-
-    bool ok;
-    int i_value = value.toInt(&ok);
-    if (ok)
-        emit progressUpdate(i_value);
-    else
-        emit error(value);
+    QStringList values = value.split("\n");
+    QListIterator<QString> i(values);
+    while (i.hasNext()) {
+        QString l_value = i.next();
+        bool ok;
+        int i_value = l_value.toInt(&ok);
+        if (ok)
+            emit progressUpdate(i_value);
+        else
+            emit error(l_value);
+    }
 }
