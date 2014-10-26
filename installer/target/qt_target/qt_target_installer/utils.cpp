@@ -40,10 +40,10 @@ bool Utils::mklabel(QString device, bool isGPT)
         partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel gpt");
     else
         partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel msdos");
-    partedProcess.waitForFinished();
+    partedProcess.waitForFinished(-1);
     logger->addLine("mklabel finished with exitCode: " + partedProcess.exitCode());
     updateDevTable();
-    return partedProcess.exitCode();
+    return partedProcess.exitCode() == 0;
 }
 
 int Utils::getPartSize(QString device, QString fstype)
@@ -51,7 +51,7 @@ int Utils::getPartSize(QString device, QString fstype)
     QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
     QProcess partedProcess;
     partedProcess.start("/bin/sh -c \"" + command + "\"");
-    partedProcess.waitForFinished();
+    partedProcess.waitForFinished(-1);
     int exitCode = partedProcess.exitCode();
     if (exitCode != 0)
         return -1;
@@ -60,22 +60,36 @@ int Utils::getPartSize(QString device, QString fstype)
 
 bool Utils::mkpart(QString device, QString fstype, QString start, QString end)
 {
+    logger->addLine("Calling mkpart for device: " + device + " and fs: " + fstype + " with start " + start + " and end " + end);
     QProcess partedProcess;
     partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mkpart primary " + fstype + " " + start + " " + end);
-    partedProcess.waitForFinished();
+    partedProcess.waitForFinished(-1);
     updateDevTable();
-    return partedProcess.exitCode();
+    logger->addLine("mkpart exitCode: " + QString::number(partedProcess.exitCode()));
+    logger->addLine("stderr was " + QString(partedProcess.readAllStandardError()));
+    return partedProcess.exitCode() == 0;
 }
 
 bool Utils::fmtpart(QString partition, QString fstype)
 {
+   logger->addLine("Calling fmtpart for partition " + partition + " and fstype " + fstype);
     QProcess mkfsProcess;
     if (fstype == "ext4")
+    {
+        logger->addLine("Command would be /usr/sbin/mkfs.ext4 " + partition);
         mkfsProcess.start("/usr/sbin/mkfs.ext4 " + partition);
+    }
     else if (fstype == "vfat")
+    {
+        logger->addLine("Command would be /usr/sbin/mkfs.ext4 " + partition);
         mkfsProcess.start("/usr/sbin/mkfs.vfat -F 32 " + partition);
-    mkfsProcess.waitForFinished();
-    return mkfsProcess.exitCode();
+    }
+    mkfsProcess.waitForFinished(-1);
+    logger->addLine("fmtpart returned with " + QString::number(mkfsProcess.exitCode()));
+    logger->addLine("full output was: " + QString(mkfsProcess.readAll()));
+    logger->addLine("stderr was " + QString(mkfsProcess.readAllStandardError()));
+    logger->addLine("stdout was "  +QString(mkfsProcess.readAllStandardOutput()));
+    return mkfsProcess.exitCode() == 0;
 }
 
 void Utils::writeToFile(QFile &file, QStringList strings, bool append)
@@ -113,7 +127,7 @@ bool Utils::mountPartition(Target *device, QString path)
             /* This is an NFS share, use BusyBox */
             QProcess mountProcess;
             mountProcess.start("/bin/mount -t nfs -o nolock,noatime " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
-            mountProcess.waitForFinished();
+            mountProcess.waitForFinished(-1);
             if (mountProcess.exitCode() == 0)
                 return true;
             else
@@ -128,4 +142,3 @@ bool Utils::mountPartition(Target *device, QString path)
     logger->addLine("Unsupported mountpoint.");
     return false;
 }
-

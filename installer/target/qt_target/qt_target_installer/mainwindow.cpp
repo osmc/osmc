@@ -199,6 +199,7 @@ void MainWindow::install()
    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
    connect(thread, SIGNAL(finished()), this, SLOT(finished()));
+   thread->start();
 }
 
 void MainWindow::setupBootLoader()
@@ -243,6 +244,7 @@ void MainWindow::finished()
 void MainWindow::setProgress(unsigned value)
 {
     ui->statusProgressBar->setValue(value);
+    qApp->processEvents();
 }
 
 MainWindow::~MainWindow()

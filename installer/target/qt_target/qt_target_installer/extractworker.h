@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QString>
+#include "logger.h"
 
 #ifndef EXTRACTWORKER_H
 #define EXTRACTWORKER_H
@@ -12,11 +13,8 @@
 class ExtractWorker : public QObject {
     Q_OBJECT
 
-    QString sourceName;
-    QString destName;
-
 public:
-    ExtractWorker(QString source, QString dest, QObject* parent = NULL);
+    ExtractWorker(QString source, QString dest, QObject* parent = NULL, Logger *logger);
 
 public slots:
     void extract();
@@ -29,6 +27,10 @@ signals:
 
 private:
     QProcess *process = NULL;
+    QString sourceName;
+    QString destName;
+    Logger *logger;
+
 };
 
 #endif // EXTRACTWORKER_H

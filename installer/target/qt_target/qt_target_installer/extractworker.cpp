@@ -2,15 +2,17 @@
 #include <QTextStream>
 #include "extractworker.h"
 
-ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* parent):
+ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* parent, Logger *logger):
     QObject(parent)
 {
     this->sourceName = QString(sourcename);
     this->destName = QString(targetname);
+    this->logger = logger;
 }
 
 void ExtractWorker::extract()
 {
+    logger->addLine("Starting extract progress...");
     process = new QProcess();
     connect(process, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
     process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
