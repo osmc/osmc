@@ -4,12 +4,15 @@
 #include <QString>
 #include <QFile>
 #include <target.h>
+#include <logger.h>
 
 #define MNT_BOOT "/mnt/boot"
 #define MNT_ROOT "/mnt/root"
 
-namespace utils
+class Utils
 {
+public:
+    Utils(Logger *logger);
     QString getOSMCDev();
     void rebootSystem();
     bool mklabel(QString device, bool isGPT);
@@ -18,6 +21,10 @@ namespace utils
     void writeToFile(QFile &file, QStringList strings, bool append);
     bool mountPartition(Target *device, QString path);
     int getPartSize(QString device, QString fstype);
-}
+    void updateDevTable();
+
+private:
+    Logger *logger;
+};
 
 #endif

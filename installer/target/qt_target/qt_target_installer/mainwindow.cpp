@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusProgressBar->setGraphicsEffect(ope);
     /* Populate target list map */
     targetList = new TargetList();
+    utils = new Utils(logger);
 }
 
 
@@ -55,7 +56,7 @@ void MainWindow::install()
     qApp->processEvents();
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
-    device = targetList->getTarget(utils::getOSMCDev());
+    device = targetList->getTarget(utils->getOSMCDev());
     if (device == NULL)
     {
         haltInstall("unsupported device"); /* No tr here as not got lang yet */
@@ -63,7 +64,7 @@ void MainWindow::install()
     }
     /* Mount the BOOT filesystem */
     logger->addLine("Mounting boot filesystem");
-    if (! utils::mountPartition(device, MNT_BOOT))
+    if (! utils->mountPartition(device, MNT_BOOT))
     {
         haltInstall("could not mount bootfs");
         return;
@@ -112,7 +113,7 @@ void MainWindow::install()
             if (installTarget == "usb")
             {
                 /* Behaviour for handling USB installs */
-                if (utils::getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
+                if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
             }
         }
         /* Bring up network if using NFS */
@@ -153,13 +154,13 @@ void MainWindow::install()
         if (device->hasRootChanged())
         {
             logger->addLine("Must mklabel as root fs is on another device");
-            utils::mklabel(rootBase, false);
-            utils::mkpart(rootBase, "ext4", "4096s", "100%");
-            utils::fmtpart(device->getRoot(), "ext4");
+            utils->mklabel(rootBase, false);
+            utils->mkpart(rootBase, "ext4", "4096s", "100%");
+            utils->fmtpart(device->getRoot(), "ext4");
         }
         else
         {
-            int size = utils::getPartSize(rootBase, (device->getBootFS() == "vfat" ? "fat32" : "ext4"));
+            int size = utils->getPartSize(rootBase, (device->getBootFS() == "vfat" ? "fat32" : "ext4"));
             if (size == -1)
             {
                 logger->addLine("Issue getting size of device");
@@ -167,17 +168,17 @@ void MainWindow::install()
                 return;
             }
             logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
-            utils::mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
-            utils::fmtpart(device->getRoot(), "ext4");
+            utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
+            utils->fmtpart(device->getRoot(), "ext4");
         }
     }
     /* Mount root filesystem */
     if (useNFS)
-        bc = new BootloaderConfig(device, nw);
+        bc = new BootloaderConfig(device, nw, utils);
     else
-        bc = new BootloaderConfig(device, NULL);
+        bc = new BootloaderConfig(device, NULL, utils);
     logger->addLine("Mounting root");
-    if ( ! utils::mountPartition(device, MNT_ROOT))
+    if ( ! utils->mountPartition(device, MNT_ROOT))
     {
         logger->addLine("Error occured trying to mount root of " + device->getRoot());
         haltInstall(tr("can't mount root"));
@@ -214,7 +215,7 @@ void MainWindow::setupBootLoader()
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
     /* Reboot */
-    utils::rebootSystem();
+    utils->rebootSystem();
 }
 
 void MainWindow::haltInstall(QString errorMsg)
@@ -229,7 +230,7 @@ void MainWindow::haltInstall(QString errorMsg)
 void MainWindow::dumpLog()
 {
     QFile logFile("/mnt/boot/install.log");
-    utils::writeToFile(logFile, logger->getLog(), false);
+    utils->writeToFile(logFile, logger->getLog(), false);
 }
 
 void MainWindow::finished()

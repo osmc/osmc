@@ -38,6 +38,7 @@ private:
     Logger *logger;
     TargetList *targetList;
     Target *device;
+    Utils *utils;
     PreseedParser *preseed;
     QString installTarget;
     QString locale;
