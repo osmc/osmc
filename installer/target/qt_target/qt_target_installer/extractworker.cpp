@@ -2,8 +2,6 @@
 #include <QTextStream>
 #include "extractworker.h"
 
-QProcess *process = NULL;
-
 ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* parent):
     QObject(parent)
 {

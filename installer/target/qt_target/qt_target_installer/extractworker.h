@@ -26,6 +26,10 @@ signals:
     void finished();
     void progressUpdate(unsigned);
     void error(QString error);
+
+private:
+    QProcess *process = NULL;
+
 };
 
 #endif // EXTRACTWORKER_H
