@@ -33,6 +33,8 @@ void ExtractWorker::readFromStdOut()
 void ExtractWorker::readFromStdErr()
 {
     QString value = process->readAllStandardError();
+    value = value.split("\n").at(0);
+
     bool ok;
     int i_value = value.toInt(&ok);
     if (ok)
