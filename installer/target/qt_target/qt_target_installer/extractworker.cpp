@@ -1,6 +1,5 @@
 #include <QFile>
 #include <QTextStream>
-#include <QRegExp>
 #include "extractworker.h"
 
 ExtractWorker::ExtractWorker(QString sourcename, QString targetname, Logger *logger, QObject* parent):
@@ -34,9 +33,10 @@ void ExtractWorker::readFromStdOut()
 void ExtractWorker::readFromStdErr()
 {
     QString value = process->readAllStandardError();
-    QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
-    if (re.exactMatch(value))
-        emit progressUpdate(value.toInt());
+    bool ok;
+    int i_value = value.toInt(&ok);
+    if (ok)
+        emit progressUpdate(i_value);
     else
         emit error(value);
 }
