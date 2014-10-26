@@ -29,7 +29,6 @@ signals:
 
 private:
     QProcess *process = NULL;
-
 };
 
 #endif // EXTRACTWORKER_H

@@ -31,11 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
     if(server)
-    {
         server->setCursorVisible(false);
         server->setBackground(QBrush(Qt::black));
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
-    }
     #endif
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;
@@ -52,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::install()
 {
+    qApp.processEvents();
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
     device = targetList->getTarget(utils::getOSMCDev());
