@@ -73,7 +73,7 @@ void ExtractProgress::writeImageToDisk()
             return;
         }
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath + tr("\n(This might take a few minutes!)") + tr("\n(please be patient.)"));
+        ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath + "\n" + tr("Please be patient"));
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
         ui->extractDetailsLabel->setText(tr(("Writing image to your device")));
