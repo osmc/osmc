@@ -190,7 +190,7 @@ void MainWindow::install()
    ui->statusProgressBar->setMinimum(0);
    ui->statusProgressBar->setMaximum(100);
    QThread* thread = new QThread(this);
-   ExtractWorker *worker = new ExtractWorker(fileSystem.fileName(), MNT_ROOT);
+   ExtractWorker *worker = new ExtractWorker(fileSystem.fileName(), MNT_ROOT, logger);
    worker->moveToThread(thread);
    connect(thread, SIGNAL(started()), worker, SLOT(extract()));
    connect(worker, SIGNAL(progressUpdate(unsigned)), this, SLOT(setProgress(unsigned)));

@@ -2,7 +2,7 @@
 #include <QTextStream>
 #include "extractworker.h"
 
-ExtractWorker::ExtractWorker(QString sourcename, QString targetname, QObject* parent, Logger *logger):
+ExtractWorker::ExtractWorker(QString sourcename, QString targetname, Logger *logger, QObject* parent):
     QObject(parent)
 {
     this->sourceName = QString(sourcename);
