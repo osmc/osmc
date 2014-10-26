@@ -38,5 +38,5 @@ void ExtractWorker::readFromStdErr()
     if (re.exactMatch(value))
         emit progressUpdate(value.toInt());
     else
-        emit error(errorString);
+        emit error(value);
 }
