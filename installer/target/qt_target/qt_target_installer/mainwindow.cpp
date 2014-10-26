@@ -206,7 +206,7 @@ void MainWindow::setupBootLoader()
 {
     /* Set up the boot loader */
     ui->statusProgressBar->setMinimum(0);
-    ui->statusProgressBar->setMaximum(3);
+    ui->statusProgressBar->setMaximum(4);
     ui->statusLabel->setText(tr("Configuring bootloader"));
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
@@ -219,10 +219,11 @@ void MainWindow::setupBootLoader()
     ui->statusProgressBar->setValue(3);
 
     /* Dump the log */
-    ui->statusLabel->setText("Success! Rebooting system!");
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
+    ui->statusProgressBar->setValue(4);
     /* Reboot */
+    ui->statusLabel->setText("Success! Rebooting system!");
     utils->rebootSystem();
 }
 
