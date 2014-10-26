@@ -27,47 +27,10 @@
 				<div class="footerinfo pure-g-r">
                   <div class="middle pure-u-1">
                     <img src="<?php echo get_template_directory_uri(); ?>/library/images/logo-l.png">
-                      <?php
-                      /* base footer */
-                      $LOGO_STRING = "Logo by Simon Brunton";
-                      $DESIGN_STRING = "Designed by Mark Theis Madsen";
-                      $lang = array_shift(explode(".",$_SERVER['HTTP_HOST']));
-                      switch ($lang)
-                      {
-                          case "fr":
-                          $LOGO_STRING = "Logo de Simon Brunton";
-                          $DESIGN_STRING = "Design par Mark Theis Madsen";
-                          break;
-                          case "da":
-                          $LOGO_STRING = "Logo af Simon Brunton";
-                          $DESIGN_STRING = "Designet af Mark Theis Madsen";
-                          break;
-                          case "sv":
-                          $LOGO_STRING = "Logga av Simon Brunton";
-                          $DESIGN_STRING = "Designad av Mark Theis Madsen";
-                          break;
-                          case "de":
-                          $LOGO_STRING = "Logo von Simon Brunton";
-                          $DESIGN_STRING = "Design von Simon Brunton";
-                          break;
-                          case "nl":
-                          $LOGO_STRING = "Logo ontworpen door Simon Brunton";
-                          $DESIGN_STRING = "Ontworpen door Mark Theis Madsen";
-                          break;
-                          case "es":
-                          $LOGO_STRING = "Logo por Simon Brunton";
-                          $DESIGN_STRING = "Diseño por Mark Theis Madsen";
-                          break;
-                          case "ru":
-                          $LOGO_STRING = "Логотип - Саймон Брантон";
-                          $DESIGN_STRING = "Дизайн от Марка Т. Мэдсена";
-                          break;
-                      }
-                                  ?>
                     <br>
-                    <a href="http://simonbrunton.com" target="_blank" class="designed"><?echo $LOGO_STRING;?></a>
+                    <a href="http://simonbrunton.com" target="_blank" class="designed"><Logo by Simon Brunton></a>
                     <br>
-                    <a href="http://markthe.is" target="_blank" class="designed"><?echo $DESIGN_STRING;?></a>
+                    <a href="http://markthe.is" target="_blank" class="designed"><Designed by Mark Theis Maden></a>
                     <br><br>
                     <p>&#169; 2014 OSMC </p>
                     
