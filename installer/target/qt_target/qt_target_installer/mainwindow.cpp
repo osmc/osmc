@@ -174,9 +174,9 @@ void MainWindow::install()
     }
     /* Mount root filesystem */
     if (useNFS)
-        bc = new BootloaderConfig(device, nw, utils);
+        bc = new BootloaderConfig(device, nw, utils, logger);
     else
-        bc = new BootloaderConfig(device, NULL, utils);
+        bc = new BootloaderConfig(device, NULL, utils, logger);
     logger->addLine("Mounting root");
     if ( ! utils->mountPartition(device, MNT_ROOT))
     {
@@ -205,14 +205,21 @@ void MainWindow::install()
 void MainWindow::setupBootLoader()
 {
     /* Set up the boot loader */
+    ui->statusProgressBar->setMinimum(0);
+    ui->statusProgressBar->setMaximum(3);
     ui->statusLabel->setText(tr("Configuring bootloader"));
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
+    ui->statusProgressBar->setValue(1);
     logger->addLine("Configuring boot cmdline");
     bc->configureCmdline();
+    ui->statusProgressBar->setValue(2);
     logger->addLine("Configuring /etc/fstab");
     bc->configureFstab();
+    ui->statusProgressBar->setValue(3);
+
     /* Dump the log */
+    ui->statusLabel->setText("Success! Rebooting system!");
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
     /* Reboot */

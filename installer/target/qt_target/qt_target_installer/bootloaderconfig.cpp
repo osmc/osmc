@@ -4,11 +4,12 @@
 #include "network.h"
 #include <QStringList>
 
-BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils)
+BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger)
 {
     this->device = device;
     this->network = network;
     this->utils = utils;
+    this->logger = logger;
 }
 
 void BootloaderConfig::copyBootFiles()
