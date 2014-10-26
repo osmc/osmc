@@ -31,9 +31,11 @@ MainWindow::MainWindow(QWidget *parent) :
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
     if(server)
+    {
         server->setCursorVisible(false);
         server->setBackground(QBrush(Qt::black));
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
+    }
     #endif
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;

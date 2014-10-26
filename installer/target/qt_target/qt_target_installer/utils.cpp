@@ -85,6 +85,7 @@ void writeToFile(QFile &file, QStringList strings, bool append)
     {
         stream << strings.at(i);
     }
+    stream.flush();
     file.close();
 }
 
