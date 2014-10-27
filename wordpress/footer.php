@@ -28,9 +28,9 @@
                   <div class="middle pure-u-1">
                     <img src="<?php echo get_template_directory_uri(); ?>/library/images/logo-l.png">
                     <br>
-                    <a href="http://simonbrunton.com" target="_blank" class="designed"><Logo by Simon Brunton></a>
+                    <a href="http://simonbrunton.com" target="_blank" class="designed">Logo by Simon Brunton</a>
                     <br>
-                    <a href="http://markthe.is" target="_blank" class="designed"><Designed by Mark Theis Maden></a>
+                    <a href="http://markthe.is" target="_blank" class="designed">Designed by Mark Theis Maden</a>
                     <br><br>
                     <p>&#169; 2014 OSMC </p>
                     
