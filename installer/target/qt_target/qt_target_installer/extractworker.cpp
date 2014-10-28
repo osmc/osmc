@@ -37,15 +37,13 @@ void ExtractWorker::readFromStdOut()
 void ExtractWorker::readFromStdErr()
 {
     QString value = process->readAllStandardError();
-    QStringList values = value.split("\n");
-    QListIterator<QString> i(values);
-    while (i.hasNext()) {
-        QString l_value = i.next();
-        bool ok;
-        int i_value = l_value.toInt(&ok);
-        if (ok)
-            emit progressUpdate(i_value);
-        else
-            emit error(l_value);
-    }
+    value = value.split("\n").at(0);
+
+    bool ok;
+    int i_value = value.toInt(&ok);
+    if (ok)
+        emit progressUpdate(i_value);
+    else
+        emit error(value);
+
 }
