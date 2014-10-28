@@ -24,7 +24,7 @@ void Utils::rebootSystem()
 {
     /* Only reboot on real system */
     system("/bin/sh -c \"/bin/echo 1 > /proc/sys/kernel/sysrq\"");
-    system("/bin/sh -c \"/bin/echo b > /proc/sysrq-trigger\"");
+    system("/bin/sh -c \"/bin/sleep 10 && /bin/echo b > /proc/sysrq-trigger\"");
 }
 
 void inline Utils::updateDevTable()
