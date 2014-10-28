@@ -16,7 +16,7 @@ new file mode 100644
 index 0000000..4c92bbc
 --- /dev/null
 +++ b/package/osmc/Config.in
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,15 @@
 +config BR2_PACKAGE_OSMC
 +        bool "OSMC Installer"
 +    select BR2_PACKAGE_QT
@@ -25,6 +25,11 @@ index 0000000..4c92bbc
 +    select BR2_PACKAGE_DOSFSTOOLS
 +    select BR2_PACKAGE_E2FSPROGS
 +    select BR2_PACKAGE_PV
++    select BR2_PACKAGE_QT_LICENSE_APPROVED=y
++    select BR2_PACKAGE_QT_GIF=y
++    select BR2_PACKAGE_QT_QTJPEG=y
++    select BR2_PACKAGE_QT_QTPNG=y
++    select BR2_PACKAGE_FREETYPE=y
 +        help
 +          OSMC device side installer
 diff --git a/package/osmc/interfaces b/package/osmc/interfaces
