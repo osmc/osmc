@@ -217,13 +217,12 @@ void MainWindow::setupBootLoader()
     logger->addLine("Configuring /etc/fstab");
     bc->configureFstab();
     ui->statusProgressBar->setValue(3);
-
     /* Dump the log */
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
     ui->statusProgressBar->setValue(4);
     /* Reboot */
-    ui->statusLabel->setText("Success! Rebooting system!");
+    ui->statusLabel->setText(tr("Installation successful! Rebooting..."));
     utils->rebootSystem();
 }
 
