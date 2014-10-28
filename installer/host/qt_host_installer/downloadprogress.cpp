@@ -30,7 +30,7 @@ void DownloadProgress::download(QUrl URL, bool isOnline)
     if (isOnline == false)
     {
         /* sanitize local filename */
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
          filelocation.replace("file://","");
 #endif
         /* Emit and bail! */
