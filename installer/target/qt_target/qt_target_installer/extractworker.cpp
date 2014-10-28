@@ -20,7 +20,10 @@ void ExtractWorker::extract()
     process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
     process->waitForFinished(-1);
     if (process->exitCode() != 0)
+    {
         emit error("Extraction failed. Error: " + QString(process->readAllStandardError()));
+        return;
+    }
     else
         emit finished();
 }
