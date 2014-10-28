@@ -15,7 +15,7 @@ BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *util
 void BootloaderConfig::copyBootFiles()
 {
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
-    system("mv -ar /mnt/boot/* /mnt/root");
+    system("mv -ar /mnt/root/boot/* /mnt/boot");
 }
 
 void BootloaderConfig::configureFstab()
