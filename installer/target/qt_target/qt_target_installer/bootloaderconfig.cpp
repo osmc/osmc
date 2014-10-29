@@ -20,7 +20,7 @@ void BootloaderConfig::copyBootFiles()
 
 void BootloaderConfig::configureFstab()
 {
-    QFile fstabFile("/rfs/etc/fstab");
+    QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
     if (utils->getOSMCDev() == "rbp")
     {
