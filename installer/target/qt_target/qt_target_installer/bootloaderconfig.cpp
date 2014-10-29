@@ -24,12 +24,12 @@ void BootloaderConfig::configureFstab()
     QStringList fstabStringList;
     if (utils->getOSMCDev() == "rbp")
     {
-        fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0");
+        fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
-            fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0" );
+            fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
         else
             /* NFS install */
-            fstabStringList.append("/dev/nfs   /      auto       defaults,noatime    0   0");
+            fstabStringList.append("/dev/nfs   /      auto       defaults,noatime    0   0\n");
     }
     utils->writeToFile(fstabFile, fstabStringList, true);
 }
