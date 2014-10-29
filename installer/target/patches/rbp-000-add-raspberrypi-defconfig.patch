@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..d7f466e
 --- /dev/null
 +++ b/configs/osmc_rbp_defconfig
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +BR2_arm=y
 +BR2_arm1176jzf_s=y
 +BR2_CCACHE=y
@@ -23,7 +23,8 @@ index 0000000..d7f466e
 +BR2_LINUX_KERNEL_CUSTOM_GIT=y
 +BR2_LINUX_KERNEL_CUSTOM_REPO_URL="git://github.com/raspberrypi/linux.git"
 +BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="575bf990798cc924e04f6eb1c2030ee058dd7fa2"
-+BR2_LINUX_KERNEL_DEFCONFIG="bcmrpi_cutdown"
++BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
++BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="rpi.config"
 +BR2_LINUX_KERNEL_ZIMAGE=y
 +BR2_PACKAGE_OSMC=y
 +BR2_PACKAGE_RPI_FIRMWARE=y
