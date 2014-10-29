@@ -1,0 +1,31 @@
+--- a/package/qt/qt.mk	2014-10-29 01:14:26.000000000 +0000
++++ b/package/qt/qt.mk	2014-10-29 01:13:27.000000000 +0000
+@@ -261,27 +261,8 @@
+ endif
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_QT_QTJPEG),y)
+ QT_CONFIGURE_OPTS += -qt-libjpeg
+-else
+-ifeq ($(BR2_PACKAGE_QT_SYSTEMJPEG),y)
+-QT_CONFIGURE_OPTS += -system-libjpeg
+-QT_DEPENDENCIES   += jpeg
+-else
+-QT_CONFIGURE_OPTS += -no-libjpeg
+-endif
+-endif
+-
+-ifeq ($(BR2_PACKAGE_QT_QTPNG),y)
+ QT_CONFIGURE_OPTS += -qt-libpng
+-else
+-ifeq ($(BR2_PACKAGE_QT_SYSTEMPNG),y)
+-QT_CONFIGURE_OPTS += -system-libpng
+-QT_DEPENDENCIES   += libpng
+-else
+-QT_CONFIGURE_OPTS += -no-libpng
+-endif
+-endif
+ 
+ ifeq ($(BR2_PACKAGE_QT_QTTIFF),y)
+ QT_CONFIGURE_OPTS += -qt-libtiff
+
