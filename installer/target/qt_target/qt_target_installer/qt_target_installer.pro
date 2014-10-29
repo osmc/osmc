@@ -38,5 +38,14 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+TRANSLATIONS = osmc.ts
+    osmc_da.ts \
+    osmc_de.ts \
+    osmc_es.ts \
+    osmc_fr.ts \
+    osmc_nl.ts \
+    osmc_ru.ts \
+    osmc_sv.ts \
+
 RESOURCES += \
     assets.qrc
