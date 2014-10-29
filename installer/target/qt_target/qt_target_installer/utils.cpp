@@ -24,6 +24,7 @@ void Utils::rebootSystem()
 {
     /* Only reboot on real system */
     system("/bin/sh -c \"/bin/echo 1 > /proc/sys/kernel/sysrq\"");
+    system("/bin/sync");
     system("/bin/sh -c \"/bin/sleep 10 && /bin/echo b > /proc/sysrq-trigger\"");
 }
 
