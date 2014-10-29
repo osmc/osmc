@@ -93,7 +93,8 @@ FORMS    += mainwindow.ui \
 
 VERSION = 1.0.1
 
-TRANSLATIONS = osmc_da.ts \
+TRANSLATIONS = osmc.ts
+    osmc_da.ts \
     osmc_de.ts \
     osmc_es.ts \
     osmc_fr.ts \
