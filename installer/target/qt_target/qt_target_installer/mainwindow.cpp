@@ -114,6 +114,9 @@ void MainWindow::install()
             {
                 /* Behaviour for handling USB installs */
                 if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
+                ui->statusLabel->setText(tr("USB install: 60 seconds to remove device before data loss"));
+                qApp->processEvents();
+                system("/bin/sleep 60");
             }
         }
         /* Bring up network if using NFS */
@@ -145,6 +148,7 @@ void MainWindow::install()
     if (! useNFS)
     {
         logger->addLine("Creating root partition");
+        ui->statusLabel->setText(tr("Formatting device"));
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -223,6 +227,7 @@ void MainWindow::setupBootLoader()
     ui->statusProgressBar->setValue(4);
     /* Reboot */
     ui->statusLabel->setText(tr("Installation successful! Rebooting..."));
+    qApp->processEvents(); /* Force GUI update */
     utils->rebootSystem();
 }
 
