@@ -18,6 +18,10 @@ public:
 private slots:
     void on_closeInstallerButton_clicked();
 
+    void on_facebookButton_clicked();
+
+    void on_twitterButton_clicked();
+
 private:
     Ui::SuccessDialog *ui;
 };
