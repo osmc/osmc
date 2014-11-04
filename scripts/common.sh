@@ -117,21 +117,25 @@ function install_patch()
 	patches=$(find ${1} -name "${2}-*.patch" -printf '%P\n')
 	for patch in $patches
 	do
-		cp ../${1}/$PATCH .
-		echo Applying patch $PATCH
-		patch -p1 < $PATCH
-		rm $PATCH
+		cp ${1}/$patch .
+		echo Applying patch $patch
+		patch -p1 < $patch
+		rm $patch
 	done
 }
 
 function pull_source()
 {
-	if [ -d ${2} ]; then echo "Cleaning old source" && rm -rf ${2}; fi
-
+	if [ -d ${2} ]
+	then 
+		if [ "$2" != "." ]
+		then
+			echo "Cleaning old source" && rm -rf ${2}; fi
+		fi
 	if [[ $1 =~ \.zip$ ]]
 	then
 	echo -e "Detected ZIP source"
-	mkdir ${2}
+	if [ "$2" != "." ]; then mkdir ${2}; fi
 	wget ${1} -O source.zip
 	if [ $? != 0 ]; then echo "Downloading zip failed" && exit 1; fi
 	unzip source.zip -d ${2}
@@ -142,7 +146,7 @@ function pull_source()
 	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ ]]
 	then
 	echo -e "Detected tarball source"
-	mkdir ${2}
+	if [ "$2" != "." ]; then mkdir ${2}; fi
 	wget ${1} -O source.tar
 	if [ $? != 0 ]; then echo "Downloading tarball failed" && exit 1; fi
 	tar -xvf source.tar -C ${2}
