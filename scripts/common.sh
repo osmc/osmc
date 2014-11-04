@@ -161,6 +161,9 @@ function pull_source()
 	echo -e "No file type match found for URL"
 }
 
+cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
+export BUILD="make -j${cores}"
+
 export -f check_platform
 export -f verify_action
 export -f enable_nw_chroot

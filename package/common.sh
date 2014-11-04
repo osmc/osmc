@@ -26,11 +26,6 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
-
-
-cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
-export BUILD="make -j${cores}"
-
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
