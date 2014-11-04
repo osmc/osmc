@@ -56,10 +56,10 @@ void ExtractProgress::writeImageToDisk()
     /* We don't always have drive letter on Windows, plus, we use ID not disk */
 
 #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
-   const char *message = tr("Proceed to write OSMC to the device you selected? THIS WILL ERASE THE DEVICE! OSMC is not responsible for loss of personal data").toUtf8().constData();
+   const char *message = tr("Are you sure you want to install OSMC on the device you selected?") + "\n" + tr("OSMC is not responsible for loss of personal data").toUtf8().constData();
 #endif
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    const char *message = (tr("Proceed to write OSMC to the device you selected ") + this->devicePath + "?\n" + tr("THIS WILL ERASE THE DEVICE!") + "\n" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
+    const char *message = (tr("Are you sure you want to install OSMC on ") + this->devicePath + "?\n" + tr("OSMC is not responsible for loss of personal data")).toUtf8().constData();
 #endif
     if (utils::promptYesNo(tr("Are you sure"), tr(message)))
     {
