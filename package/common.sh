@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../scripts/common.sh
+
 function fix_arch_ctl()
 {
 	sed '/Architecture/d' -i $1
