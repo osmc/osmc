@@ -28,6 +28,12 @@ function configure_ccache()
 	echo -e "PATH=/usr/lib/ccache:\${PATH}" >> ${1}/root/.bashrc
 }
 
+function cleanup_buildcache()
+{
+	echo -e "Deleting ccache data"
+	rm -rf ${1}/root/.ccache
+}
+
 function set_lb()
 {
 	[ -f /tmp/disable-lb ] && export DISABLE_LOCAL_BUILDS=1
@@ -64,4 +70,5 @@ export XBMC_MAN_PKGS_RBP
 export -f build_deb_package
 export -f patchfs
 export -f configure_ccache
+export -f cleanup_buildcache
 export -f set_lb

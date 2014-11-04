@@ -92,6 +92,7 @@ verify_action
 # Perform filesystem cleanup
 chroot ${DIR} umount /proc
 cleanup_filesystem "${DIR}"
+cleanup_buildcache "${DIR}"
 
 # Build Debian package
 echo "Building Debian package"

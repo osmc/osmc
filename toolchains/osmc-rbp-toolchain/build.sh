@@ -94,6 +94,7 @@ remove_emulate_arm "${DIR}"
 
 # Perform filesystem cleanup
 cleanup_filesystem "${DIR}"
+cleanup_buildcache "${DIR}"
 
 # Build Debian package
 echo "Building Debian package"
