@@ -28,11 +28,6 @@ fi
 chmod +x ${2}/lib/systemd/system/mediacenter.service
 }
 
-function create_advancedsettings()
-{
-	cp ${2}/../patches/${1}-advancedsettings.xml ${2}/usr/share/xbmc/system/advancedsettings.xml
-}
-
 echo -e "Building XBMC"
 out=$(pwd)/files
 make clean
@@ -88,6 +83,5 @@ test "$1" == atv && echo "Depends: niceprioritypolicy-osmc,mediacenter-send-osmc
 test "$1" == rbp && echo "Depends: niceprioritypolicy-osmc,mediacenter-send-osmc,libssh-4,libavahi-client3,python,libsmbclient,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmad0,libmicrohttpd10,libjasper1,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,rbp-libcec-osmc,rbp-libshairplay-osmc,rbp-libnfs-osmc,rbp-libafpclient-osmc,rbp-librtmp-osmc,rpiuserland,rpi-armmem-osmc" >> files/DEBIAN/control
 cp ${out}/../splash.png ${out}/usr/share/xbmc/media/Splash.png
 test "$1" == rbp && create_systemd_script "rbp" "${out}"
-create_advancedsettings "$1" "${out}"
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ osmc-mediacenter.deb
