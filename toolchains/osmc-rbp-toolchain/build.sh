@@ -89,10 +89,10 @@ configure_ccache "${DIR}"
 verify_action
 
 # Remove QEMU binary
-chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}"
 
 # Perform filesystem cleanup
+chroot ${DIR} umount /proc
 cleanup_filesystem "${DIR}"
 cleanup_buildcache "${DIR}"
 
