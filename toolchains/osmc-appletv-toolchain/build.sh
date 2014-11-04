@@ -17,12 +17,14 @@ set_lb
 set_publish
 
 # Install packages needed to build filesystem for building
-install_package "debootstrap"
-verify_action
-install_package "dh-make"
-verify_action
-install_package "devscripts"
-verify_action
+packages="debootstrap
+dh-make
+devscripts"
+for package in $packages
+do
+	install_package $package
+	verify_action
+done
 
 # Configure the target directory
 

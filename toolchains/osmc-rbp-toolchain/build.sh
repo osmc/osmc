@@ -17,13 +17,17 @@ set_lb
 set_publish
 
 # Install packages needed to build filesystem for building
-install_package "debootstrap"
-verify_action
-install_package "dh-make"
-verify_action
-install_package "devscripts"
-verify_action
-install_package "qemu binfmt-support qemu-user-static"
+packages="debootstrap
+dh-make
+devscripts
+qemu
+binfmt-support
+qemu-user-static"
+for package in $packages
+do
+	install_package $package
+	verify_action
+done
 
 # Configure the target directory
 ARCH="armhf"
