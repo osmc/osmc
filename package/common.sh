@@ -26,42 +26,7 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
-function pull_source()
-{
-	if [ -d ${2} ]; then echo "Cleaning old source" && rm -rf ${2}; fi
 
-	if [[ $1 =~ \.zip$ ]]
-	then
-	echo -e "Detected ZIP source"
-	mkdir ${2}
-	wget ${1} -O source.zip
-	if [ $? != 0 ]; then echo "Downloading zip failed" && exit 1; fi
-	unzip source.zip -d ${2}
-	rm source.zip
-	return
-	fi
-
-	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ ]]
-	then
-	echo -e "Detected tarball source"
-	mkdir ${2}
-	wget ${1} -O source.tar
-	if [ $? != 0 ]; then echo "Downloading tarball failed" && exit 1; fi
-	tar -xvf source.tar -C ${2}
-	rm source.tar
-	return
-	fi
-
-	if [[ $1 =~ git ]]
-	then
-	echo -e "Detected Git source"
-	git clone ${1} ${2}
-	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
-	return
-	fi
-
-	echo -e "No file type match found for URL"
-}
 
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l)
 export BUILD="make -j${cores}"
