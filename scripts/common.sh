@@ -168,6 +168,9 @@ function pull_source()
 	echo -e "No file type match found for URL"
 }
 
+DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
+export DOWNLOAD_URL
+
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 export BUILD="make -j${cores}"
 
