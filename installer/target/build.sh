@@ -19,6 +19,7 @@ whois
 bc
 kpartx
 dosfstools
+parted
 cpio
 python"
 for package in $packages
