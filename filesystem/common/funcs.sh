@@ -68,7 +68,7 @@ function create_fs_tarball()
 {
 	echo -e "Creating filesystem tarball"
 	pushd ${1}
-	tar -cf - * | xz -9 -c - > ../${2}.tar.xz 
+	tar -cf - * | xz -9 -c - > ../${2}-$(date +%Y%m%d).tar.xz 
 	popd
 	rm -rf ${1}
 }
