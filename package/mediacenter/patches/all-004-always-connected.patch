@@ -1,0 +1,16 @@
+diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
+index a9acb44..5358ba9 100644
+--- a/xbmc/utils/SystemInfo.cpp
++++ b/xbmc/utils/SystemInfo.cpp
+@@ -1016,9 +1016,7 @@ int CSysInfo::GetXbmcBitness(void)
+ 
+ bool CSysInfo::HasInternet()
+ {
+-  if (m_info.internetState != CSysData::UNKNOWN)
+-    return m_info.internetState == CSysData::CONNECTED;
+-  return (m_info.internetState = CSysInfoJob::GetInternetState()) == CSysData::CONNECTED;
++    return true;
+ }
+ 
+ std::string CSysInfo::GetHddSpaceInfo(int drive, bool shortText)
+
