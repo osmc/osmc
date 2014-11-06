@@ -38,7 +38,7 @@ pushd buildroot-${BUILDROOT_VERSION}/output/images
 echo -e "Downloading latest filesystem"
 date=$(date +%Y%m%d)
 count=150
-while [ count > 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
+while [ count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
        if [ "$?" -eq 0 ]; then
 			wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
             break
