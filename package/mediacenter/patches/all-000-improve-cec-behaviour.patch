@@ -1,0 +1,100 @@
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index b4b5d2f..2521327 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -318,10 +318,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
+   // open the CEC adapter
+   CLog::Log(LOGDEBUG, "%s - opening a connection to the CEC adapter: %s", __FUNCTION__, m_strComPort.c_str());
+ 
+-  // scanning the CEC bus takes about 5 seconds, so display a notification to inform users that we're busy
+-  CStdString strMessage = StringUtils::Format(g_localizeStrings.Get(21336).c_str(), g_localizeStrings.Get(36000).c_str());
+-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), strMessage);
+-
+   bool bConnectionFailedDisplayed(false);
+ 
+   while (!m_bStop && !bIsOpen)
+@@ -551,63 +547,8 @@ bool CPeripheralCecAdapter::IsMuted(void)
+ 
+ void CPeripheralCecAdapter::SetMenuLanguage(const char *strLanguage)
+ {
+-  if (m_strMenuLanguage.Equals(strLanguage))
+-    return;
+-
+-  CStdString strGuiLanguage;
+-
+-  if (!strcmp(strLanguage, "bul"))
+-    strGuiLanguage = "Bulgarian";
+-  else if (!strcmp(strLanguage, "hrv"))
+-    strGuiLanguage = "Croatian";
+-  else if (!strcmp(strLanguage, "cze"))
+-    strGuiLanguage = "Czech";
+-  else if (!strcmp(strLanguage, "dan"))
+-    strGuiLanguage = "Danish";
+-  else if (!strcmp(strLanguage, "dut"))
+-    strGuiLanguage = "Dutch";
+-  else if (!strcmp(strLanguage, "eng"))
+-    strGuiLanguage = "English";
+-  else if (!strcmp(strLanguage, "fin"))
+-    strGuiLanguage = "Finnish";
+-  else if (!strcmp(strLanguage, "fre"))
+-    strGuiLanguage = "French";
+-  else if (!strcmp(strLanguage, "ger"))
+-    strGuiLanguage = "German";
+-  else if (!strcmp(strLanguage, "gre"))
+-    strGuiLanguage = "Greek";
+-  else if (!strcmp(strLanguage, "hun"))
+-    strGuiLanguage = "Hungarian";
+-  else if (!strcmp(strLanguage, "ita"))
+-    strGuiLanguage = "Italian";
+-  else if (!strcmp(strLanguage, "nor"))
+-    strGuiLanguage = "Norwegian";
+-  else if (!strcmp(strLanguage, "pol"))
+-    strGuiLanguage = "Polish";
+-  else if (!strcmp(strLanguage, "por"))
+-    strGuiLanguage = "Portuguese";
+-  else if (!strcmp(strLanguage, "rum"))
+-    strGuiLanguage = "Romanian";
+-  else if (!strcmp(strLanguage, "rus"))
+-    strGuiLanguage = "Russian";
+-  else if (!strcmp(strLanguage, "srp"))
+-    strGuiLanguage = "Serbian";
+-  else if (!strcmp(strLanguage, "slo"))
+-    strGuiLanguage = "Slovenian";
+-  else if (!strcmp(strLanguage, "spa"))
+-    strGuiLanguage = "Spanish";
+-  else if (!strcmp(strLanguage, "swe"))
+-    strGuiLanguage = "Swedish";
+-  else if (!strcmp(strLanguage, "tur"))
+-    strGuiLanguage = "Turkish";
+-
+-  if (!strGuiLanguage.empty())
+-  {
+-    CApplicationMessenger::Get().SetGUILanguage(strGuiLanguage);
+-    CLog::Log(LOGDEBUG, "%s - language set to '%s'", __FUNCTION__, strGuiLanguage.c_str());
+-  }
+-  else
+-    CLog::Log(LOGWARNING, "%s - TV menu language set to unknown value '%s'", __FUNCTION__, strLanguage);
++  CLog::Log(LOGDEBUG, "%s - we are not setting the menu language as this can be problematic", __FUNCTION__);
++  return;
+ }
+ 
+ int CPeripheralCecAdapter::CecCommand(void *cbParam, const cec_command command)
+@@ -1558,9 +1499,6 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+ 
+   m_adapter->m_bIsReady = true;
+ 
+-  // and let the gui know that we're done
+-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), strNotification);
+-
+   CSingleLock lock(m_critSection);
+   m_bIsUpdating = false;
+   return true;
+@@ -1606,8 +1544,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
+         UpdateAudioSystemStatus();
+       }
+ 
+-      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), g_localizeStrings.Get(bConfigSet ? 36023 : 36024));
+-
+       {
+         CSingleLock lock(m_critSection);
+         if ((bUpdate = m_bNextConfigurationScheduled) == true)
