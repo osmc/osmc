@@ -18,7 +18,9 @@ libncurses5-dev
 whois
 bc
 kpartx
-dosfstools"
+dosfstools
+cpio
+python"
 for package in $packages
 do
 	install_package $package
