@@ -62,8 +62,8 @@ mount /dev/mapper/loop0p1 /mnt
 if [ "$1" == "rbp" ]
 then
 	echo -e "Installing Pi files"
-	mv output/images/zImage /mnt
-	mv output/images/INSTALLER/* /mnt
+	mv zImage /mnt
+	mv INSTALLER/* /mnt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
