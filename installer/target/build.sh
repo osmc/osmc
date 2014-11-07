@@ -71,6 +71,6 @@ umount /mnt
 sync
 kpartx -d OSMC_TGT_${1}_${date}.img
 echo -e "Compressing image"
-gzip OSMC_TGT_PI_${date}.img
+gzip OSMC_TGT_${1}_${date}.img
 popd
 echo -e "Build completed"
