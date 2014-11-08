@@ -27,4 +27,4 @@ makedirnb "mnt"
 makedirnb "selinux"
 makedirnb "boot"
 makedirnb "dev"
-dpkg -b files/ base-files.deb
+dpkg -b files/ base-files-osmc.deb
