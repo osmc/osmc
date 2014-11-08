@@ -5,4 +5,4 @@
 
 echo -e "Building package Darwin-X for AppleTV"
 make clean
-dpkg -b files/ osmc-appletv-darwinx.deb
+dpkg -b files/ appletv-darwinx-osmc.deb

@@ -16,4 +16,4 @@ make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"
 cd ../
-dpkg -b files/ osmc-appletv-remote.deb
+dpkg -b files/ appletv-remote-osmc.deb
