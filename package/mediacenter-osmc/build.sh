@@ -33,8 +33,8 @@ out=$(pwd)/files
 make clean
 sed '/Package/d' -i files/DEBIAN/control
 sed /'Depends/d' -i files/DEBIAN/control
-test "$1" == atv && echo "Package: atv-osmc-mediacenter" >> files/DEBIAN/control
-test "$1" == rbp && echo "Package: rbp-osmc-mediacenter" >> files/DEBIAN/control
+test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
+test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 XBMC_SRC="https://github.com/xbmc/xbmc"
 XBMC_BRANCH="Gotham"
 TAG="13.1-Gotham"
@@ -84,4 +84,4 @@ test "$1" == rbp && echo "Depends: niceprioritypolicy-osmc,mediacenter-send-osmc
 cp ${out}/../splash.png ${out}/usr/share/xbmc/media/Splash.png
 test "$1" == rbp && create_systemd_script "rbp" "${out}"
 fix_arch_ctl "files/DEBIAN/control"
-dpkg -b files/ osmc-mediacenter.deb
+dpkg -b files/ mediacenter-osmc.deb
