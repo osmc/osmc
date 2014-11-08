@@ -5,4 +5,4 @@
 
 echo -e "Building mediacenter-send"
 make clean
-dpkg -b files/ osmc-mediacenter-send.deb
+dpkg -b files/ mediacenter-send-osmc.deb
