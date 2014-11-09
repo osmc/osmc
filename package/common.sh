@@ -28,6 +28,27 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
+function handle_dep()
+{
+	# Used by packages that need other packages to be built first
+	# Check dpkg -l for the existence of the package, try install, otherwise bail. 
+	packages=$(dpkg -l)
+	if ! echo $packages | grep -q ${1}
+	then
+		echo -e "Package ${1} is not found on the system, checking APT"
+		if ! apt-cache search ${1} > /dev/null 2>&1
+		then
+			echo -e "Can't find the package in APT repo. It needs to be built first or you need to wait for upstream to add it"
+		else
+			echo -e "Found in APT and will install"
+			install_package ${1}
+		fi
+	else
+		echo -e "Package ${1} is already installed in the environment"
+	fi
+}
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
+export -f handle_dep
