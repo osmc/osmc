@@ -51,7 +51,7 @@ deb http://apt.osmc.tv jessie main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="osmc-rbp-bootloader rbp-osmc-splash"
+LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
 echo -e "Updating sources"
@@ -62,7 +62,7 @@ chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends rbp-osmc-mediacenter
+chroot ${DIR} apt-get -y install --no-install-recommends rbp-mediacenter-osmc
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}

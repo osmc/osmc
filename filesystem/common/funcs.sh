@@ -6,7 +6,7 @@
 . ../../scripts/common.sh
 
 INIT_PKGS="systemd systemd-sysv"
-SYSTEM_PKGS="base-files perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils openssh-server sudo module-init-tools connman net-tools ntp locales"
+SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils openssh-server sudo module-init-tools connman net-tools ntp locales"
 CHROOT_PKGS="${INIT_PKGS} ${SYSTEM_PKGS}"
 
 function setup_osmc_user()
