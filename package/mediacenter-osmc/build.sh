@@ -5,29 +5,6 @@
 
 . ../common.sh
 
-function create_systemd_script()
-{
-	mkdir -p ${2}/lib/systemd/system
-	if [ "$1" == "rbp" ]
-	then
-		echo "[Unit]
-Description = media center application
-After = remote-fs.target
-
-[Service]
-User = osmc
-Group = osmc
-Type = simple
-Environment=LD_PRELOAD=/usr/lib/libarmmem.so
-ExecStart = /usr/lib/xbmc/xbmc.bin --standalone -fs
-Restart = on-abort
-
-[Install]
-WantedBy = multi-user.target" > ${2}/lib/systemd/system/mediacenter.service
-fi
-chmod +x ${2}/lib/systemd/system/mediacenter.service
-}
-
 echo -e "Building XBMC"
 out=$(pwd)/files
 make clean
@@ -81,7 +58,8 @@ strip ${out}/usr/lib/xbmc/addons/*/*.so
 strip ${out}/usr/lib/xbmc/addons/pvr.*/*.pvr
 test "$1" == atv && echo "Depends: niceprioritypolicy-osmc,mediacenter-send-osmc,libssh-4,libavahi-client3,python,libsmbclient,libpulse0,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmad0,libmicrohttpd10,libjasper1,libxrandr2,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libsdl-image1.2,libglew1.10,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,libglu1-mesa,libcec-osmc,libshairplay-osmc,libnfs-osmc,libafpclient-osmc,librtmp-osmc,libcrystalhd3,firmware-crystalhd" >> files/DEBIAN/control
 test "$1" == rbp && echo "Depends: niceprioritypolicy-osmc,mediacenter-send-osmc,libssh-4,libavahi-client3,python,libsmbclient,libtiff5,libjpeg8,libsqlite3-0,libflac8,libtinyxml2.6.2,libogg0,libmad0,libmicrohttpd10,libjasper1,libyajl2,libmysqlclient18,libasound2,libxml2,libxslt1.1,libpng12-0,libsamplerate0,libtag1-vanilla,libfribidi0,liblzo2-2,libcdio13,libpcrecpp0,libfreetype6,libvorbisenc2,libcurl3-gnutls,rbp-libcec-osmc,rbp-libshairplay-osmc,rbp-libnfs-osmc,rbp-libafpclient-osmc,rbp-librtmp-osmc,rpiuserland,rpi-armmem-osmc" >> files/DEBIAN/control
-cp ${out}/../splash.png ${out}/usr/share/xbmc/media/Splash.png
-test "$1" == rbp && create_systemd_script "rbp" "${out}"
+chmod +x ${out}/lib/systemd/system/mediacenter.service
+cp ${1}-watchdog ${out}/usr/bin/mediacenter
+chmod +x ${out}/usr/bin/mediacenter
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files/ mediacenter-osmc.deb

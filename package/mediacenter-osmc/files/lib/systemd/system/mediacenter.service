@@ -1,0 +1,13 @@
+[Unit]
+Description = media center application
+After = remote-fs.target
+
+[Service]
+User = osmc
+Group = osmc
+Type = simple
+ExecStart = /usr/bin/mediacenter
+Restart = on-abort
+
+[Install]
+WantedBy = multi-user.target
