@@ -6,6 +6,7 @@ class DiskDevice;
 namespace io
 {
     QList<DiskDevice *> enumerateDevice();
+    bool isUsbDevice(QString devicePath);
     bool writeImage(QString devicePath, QString deviceImage, QObject* caller=NULL);
     bool unmount(QString devicePath, bool isDisk = false);
     void updateKernelTable();

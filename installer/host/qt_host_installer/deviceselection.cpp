@@ -23,7 +23,7 @@ void DeviceSelection::showDevices()
 {
     ui->devListWidget->clear();
     devMap.clear();
-    QListWidgetItem *header = new QListWidgetItem(tr("Device ID Device Path Device Space"), ui->devListWidget);
+    QListWidgetItem *header = new QListWidgetItem(tr("Device ID\tDevice Path\tDevice Space"), ui->devListWidget);
     header->setFlags(Qt::NoItemFlags);
 
 
