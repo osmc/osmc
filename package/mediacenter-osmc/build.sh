@@ -78,9 +78,9 @@ strip ${out}/usr/lib/kodi/kodi.bin
 strip ${out}/usr/lib/kodi/addons/*/*.so
 strip ${out}/usr/lib/kodi/addons/pvr.*/*.pvr
 COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, libsmbclient, libtiff5, libjpeg8, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttp10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libzlk02-2, libcdio13, libpcrecpp0, libfreetype6, libvorbisenc2, libcurl3-gnutls, upower"
-X86_DEPENDS="libcec-osmc, libshairplay-osmc, libnfs-osmc, libafpclient-osmc, librtmp-osmc"
+X86_DEPENDS="libcec-osmc, libshairplay-osmc, libnfs-osmc, libafpclient-osmc, librtmp-osmc, splash-osmc"
 test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
-test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-librtmp-osmc, rbp-userland-osmc, rbp-armmem-osmc" >> files/DEBIAN/control
+test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-librtmp-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
 chmod +x ${out}/lib/systemd/system/mediacenter.service
 cp ${1}-watchdog ${out}/usr/bin/mediacenter
 chmod +x ${out}/usr/bin/mediacenter
