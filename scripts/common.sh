@@ -102,7 +102,6 @@ function cleanup_filesystem()
 	echo -e "Cleaning up filesystem"
 	rm -f ${1}/etc/resolv.conf
 	rm -f ${1}/etc/network/interfaces
-	rm -rf ${1}/usr/share/doc/*
 	rm -rf ${1}/usr/share/man/* 
 	rm -rf ${1}/var/cache/apt/archives/*
 }
