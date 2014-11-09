@@ -20,4 +20,4 @@ if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"
 cd ../
 fix_arch_ctl "files/DEBIAN/control"
-dpkg -b files/ tvheadend-osmc.deb
+dpkg -b files/ tvheadend-app-osmc.deb
