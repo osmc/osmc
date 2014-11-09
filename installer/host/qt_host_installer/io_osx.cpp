@@ -68,13 +68,46 @@ namespace io
                }
 
                deviceSpace.remove("*");
-
-               DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
-               devices.append(nd);
+               if (isUsbDevice(devicePath))
+               {
+                DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+                devices.append(nd);
+               } else
+                utils::writeLog("Ignoring non-usb device " + devicePath);
            }
        }
        return devices;
       }
+
+   bool isUsbDevice(QString devicePath)
+   {
+       QProcess process;
+       QStringList lines;
+       process.start("/usr/sbin/diskutil", QStringList() << "info" << devicePath, QIODevice::ReadWrite | QIODevice::Text);
+       if (! process.waitForFinished())
+           utils::writeLog("Could not execute diskutil to check protocol for device " + devicePath);
+       else
+       {
+           QTextStream stdoutStream(process.readAllStandardOutput());
+           QString protocol("NOT_FOUND");
+           while (true)
+           {
+               QString line = stdoutStream.readLine().simplified(); /* Remove trailing and leading ws */
+               if (line.isNull())
+                   break;
+               /* The line holding the device is the only line always starting with 0: */
+               else if (line.simplified().startsWith("Protocol:"))
+               {
+                   protocol = QString(line.split(" ").at(1));
+                   utils::writeLog("Determined " + protocol + " as protocol for " + devicePath);
+                   break;
+               }
+           }
+           if (0 ==  QString("usb").compare(protocol, Qt::CaseInsensitive))
+               return true;
+       }
+       return false;
+   }
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
    {
