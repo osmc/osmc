@@ -5,4 +5,4 @@
 
 echo -e "Building sysctl tweaks"
 make clean
-dpkg -b files/ osmc-sysctl.deb
+dpkg -b files/ sysctl-osmc.deb

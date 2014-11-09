@@ -11,8 +11,8 @@ make clean
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
-test $1 == gen && echo "Package: libshairplay-osmc" >> files/DEBIAN/control && echo "Package: libshairplaydev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libshairplay-osmc" >> files-dev/DEBIAN/control
-test $1 == rbp && echo "Package: rbp-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: rbp-libshairplaydev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libshairplay-osmc" >> files-dev/DEBIAN/control
+test $1 == gen && echo "Package: libshairplay-osmc" >> files/DEBIAN/control && echo "Package: libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libshairplay-osmc" >> files-dev/DEBIAN/control
+test $1 == rbp && echo "Package: rbp-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: rbp-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libshairplay-osmc" >> files-dev/DEBIAN/control
 pull_source "http://psg.mtu.edu/pub/xbmc/build-deps/sources/shairplay-139d5ef.tar.bz2" "$(pwd)/src"
 cd src/shairplay*
 ./autogen.sh
@@ -26,5 +26,5 @@ mkdir -p files-dev/usr
 mv files/usr/include  files-dev/usr/
 fix_arch_ctl "files/DEBIAN/control"
 fix_arch_ctl "files-dev/DEBIAN/control"
-dpkg -b files/ libshairplay.deb
-dpkg -b files-dev libshairplay-dev.deb
+dpkg -b files/ libshairplay-osmc.deb
+dpkg -b files-dev libshairplay-dev-osmc.deb

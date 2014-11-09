@@ -5,4 +5,4 @@
 
 echo -e "Building ftr"
 make clean
-dpkg -b files/ osmc-ftr.deb
+dpkg -b files/ ftr-osmc.deb

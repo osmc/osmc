@@ -28,4 +28,4 @@ mkdir -p files/lib/firmware
 install_fw ${RALINK_DEB}
 install_fw ${REALTEK_DEB}
 
-dpkg -b files/ osmc-wifi-firmware.deb
+dpkg -b files/ wireless-fiemware-osmc.deb

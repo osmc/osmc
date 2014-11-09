@@ -11,8 +11,8 @@ make clean
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
-test "$1" == gen && echo "Package: librtmp-osmc" >> files/DEBIAN/control && echo "Package: librtmpdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: librtmp-osmc" >> files-dev/DEBIAN/control
-test "$1" == rbp && echo "Package: rbp-librtmp-osmc" >> files/DEBIAN/control && echo "Package: rbp-librtmpdev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-librtmp-osmc" >> files-dev/DEBIAN/control
+test "$1" == gen && echo "Package: librtmp-osmc" >> files/DEBIAN/control && echo "Package: librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: librtmp-osmc" >> files-dev/DEBIAN/control
+test "$1" == rbp && echo "Package: rbp-librtmp-osmc" >> files/DEBIAN/control && echo "Package: rbp-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-librtmp-osmc" >> files-dev/DEBIAN/control
 pull_source "git://git.ffmpeg.org/rtmpdump" "$(pwd)/src"
 cd src
 $BUILD sys=posix
@@ -35,4 +35,4 @@ mkdir -p $out/usr/include/librtmp
 cp -ar *.h $out/usr/include/librtmp
 cd ../../
 fix_arch_ctl "files-dev/DEBIAN/control"
-dpkg -b files-dev librtmpdev-osmc.deb
+dpkg -b files-dev librtmp-dev-osmc.deb

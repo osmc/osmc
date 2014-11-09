@@ -8,8 +8,8 @@
 echo -e "Building TVHeadend"
 out=$(pwd)/files
 sed '/Package/d' -i files/DEBIAN/control
-test $1 == gen && echo "Package: tvheadend-osmc-app" >> files/DEBIAN/control
-test $1 == rbp && echo "Package: rbp-tvheadend-osmc-app" >> files/DEBIAN/control
+test $1 == gen && echo "Package: tvheadend-app-osmc" >> files/DEBIAN/control
+test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control
 pull_source "https://github.com/tvheadend/tvheadend" "$(pwd)/src"
 cd src
 git checkout v3.9

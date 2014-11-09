@@ -5,4 +5,4 @@
 
 echo -e "Building disk mounting package"
 make clean
-dpkg -b files/ osmc-diskmount.deb
+dpkg -b files/ diskmount-osmc.deb

@@ -16,4 +16,4 @@ patch -p1 < 000-pull_firmware_auto.patch
 mkdir -p files/lib/firmware
 mv *.fw files/lib/firmware
 
-dpkg -b files/ osmc-dvb-firmware.deb
+dpkg -b files/ dvb-firmware-osmc.deb

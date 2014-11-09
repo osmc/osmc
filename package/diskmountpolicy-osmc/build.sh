@@ -5,4 +5,4 @@
 
 echo -e "Building OSMC policy for udisks"
 make clean
-dpkg -b files/ osmc-diskmountpolicy.deb
+dpkg -b files/ diskmountpolicy-osmc.deb
