@@ -13,9 +13,6 @@ verify_action
 update_sources
 verify_action
 
-set_lb
-set_publish
-
 # Install packages needed to build filesystem for building
 packages="debootstrap
 dh-make
@@ -68,26 +65,9 @@ verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
-if [ -z $DISABLE_LOCAL_BUILDS ]
-then
-echo -e "Installing default chroot packages"
+echo -e "Installing packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
-handle_ds_deps "$DIR" "$XBMC_MAN_PKGS_RBP" "(echo $tcstub | cut -d - -f2)"
-verify_action
-else
-echo -e "Installing default chroot packages without downstream"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
-verify_action
-fi
-if [ -z $DISABLE_LOCAL_BUILDS ]
-then
-echo -e "Installing target specific packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
-verify_action
-else
-echo -e "Told not to install target specific packages"
-fi
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action

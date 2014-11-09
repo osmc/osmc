@@ -34,23 +34,10 @@ function cleanup_buildcache()
 	rm -rf ${1}/root/.ccache
 }
 
-function set_lb()
-{
-	[ -f /tmp/disable-lb ] && export DISABLE_LOCAL_BUILDS=1
-}
-
-function set_publish()
-{
-	[ -f /tmp/publish-tc ] && export ENABLE_PUBLISH_BUILDS=1
-}
-
 CHROOT_PKGS="build-essential nano sudo"
 export CHROOT_PKGS
-export XBMC_MAN_PKGS
-export XBMC_MAN_PKGS_RBP
 
 export -f build_deb_package
 export -f patchfs
 export -f configure_ccache
 export -f cleanup_buildcache
-export -f set_lb
