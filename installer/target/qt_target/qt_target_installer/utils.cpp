@@ -44,7 +44,7 @@ bool Utils::mklabel(QString device, bool isGPT)
     mklabelProcess.waitForFinished(-1);
     logger->addLine("mklabel finished with exitCode: " + mklabelProcess.exitCode());
     updateDevTable();
-    return partedProcess.exitCode() == 0;
+    return mklabelProcess.exitCode() == 0;
 }
 
 int Utils::getPartSize(QString device, QString fstype)
