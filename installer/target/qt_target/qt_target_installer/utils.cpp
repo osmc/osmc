@@ -35,14 +35,14 @@ void inline Utils::updateDevTable()
 
 bool Utils::mklabel(QString device, bool isGPT)
 {
-    QProcess partedProcess;
+    QProcess mklabelProcess;
     logger->addLine("Going to mklabel with device = " + device + " and isGPT " + isGPT);
     if (isGPT)
-        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel gpt");
+        mklabelProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel gpt");
     else
-        partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel msdos");
-    partedProcess.waitForFinished(-1);
-    logger->addLine("mklabel finished with exitCode: " + partedProcess.exitCode());
+        mklabelProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel msdos");
+    mklabelProcess.waitForFinished(-1);
+    logger->addLine("mklabel finished with exitCode: " + mklabelProcess.exitCode());
     updateDevTable();
     return partedProcess.exitCode() == 0;
 }
@@ -66,7 +66,7 @@ bool Utils::mkpart(QString device, QString fstype, QString start, QString end)
     partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mkpart primary " + fstype + " " + start + " " + end);
     partedProcess.waitForFinished(-1);
     updateDevTable();
-    logger->addLine("mkpart exitCode: " + QString::number(partedProcess.exitCode()));
+    logger->addLine("mkpart exitCode: " + partedProcess.exitCode());
     logger->addLine("stderr was " + QString(partedProcess.readAllStandardError()));
     return partedProcess.exitCode() == 0;
 }
