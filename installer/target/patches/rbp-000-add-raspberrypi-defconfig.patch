@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..d7f466e
 --- /dev/null
 +++ b/configs/osmc_rbp_defconfig
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,28 @@
 +BR2_arm=y
 +BR2_arm1176jzf_s=y
 +BR2_CCACHE=y
@@ -18,6 +18,7 @@ index 0000000..d7f466e
 +BR2_TARGET_GENERIC_HOSTNAME="osmc-installer"
 +BR2_TARGET_GENERIC_ISSUE=""
 +BR2_INIT_NONE=y
++BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV=y
 +# BR2_TARGET_GENERIC_GETTY is not set
 +BR2_LINUX_KERNEL=y
 +BR2_LINUX_KERNEL_CUSTOM_GIT=y
