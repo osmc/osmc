@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QProcess>
+#include <cstdlib>
 
 Network::Network()
 {
@@ -39,7 +40,5 @@ void Network::bringUp()
     }
     interfacesFile.close();
     /* And finally, bring up */
-    QProcess ethProcess;
-    ethProcess.start("ifup eth0");
-    ethProcess.waitForFinished();
+    system("/sbin/ifup eth0");
 }
