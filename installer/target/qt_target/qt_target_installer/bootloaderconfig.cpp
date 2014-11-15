@@ -45,7 +45,7 @@ void BootloaderConfig::configureCmdline()
         else
         {
             /* NFS install */
-            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + "ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + " rootwait quiet";
+            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + " rootwait quiet";
         }
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
     }
