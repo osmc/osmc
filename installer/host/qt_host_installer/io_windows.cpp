@@ -55,6 +55,12 @@ namespace io
        return devices;
    }
 
+   bool isUsbDevice(QString devicePath)
+   {
+       utils::writeLog("DUMMY IMPLEMENTATION: return true for isUsbDevice and devicePath: " + devicePath);
+       return true;
+   }
+
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller) /* We are really passing deviceID on Windows, but call it devicePath still */
    {
        utils::writeLog("Writing 512 bytes to erase MBR");
