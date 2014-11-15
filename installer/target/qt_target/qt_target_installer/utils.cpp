@@ -36,7 +36,7 @@ void inline Utils::updateDevTable()
 bool Utils::mklabel(QString device, bool isGPT)
 {
     QProcess mklabelProcess;
-    logger->addLine("Going to mklabel with device = " + device + " and isGPT " + isGPT);
+    logger->addLine("Going to mklabel with device: " + device + " with a label type of " + ((isGPT == true) ? "GPT" : "MSDOS"));
     if (isGPT)
         mklabelProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel gpt");
     else
