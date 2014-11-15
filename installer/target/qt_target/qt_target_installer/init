@@ -8,8 +8,10 @@
 /bin/mount -o remount,rw,noatime /
 /bin/mount -t sysfs sysfs /sys
 /bin/hostname -F /etc/hostname
-echo /sbin/mdev >/proc/sys/kernel/hotplug
-/sbin/mdev -s
+. /etc/udev/udev.conf
+printf '\000\000\000\000' > /proc/sys/kernel/hotplug
+/sbin/udevd -d
+udevadm trigger
 
 /sbin/getty -L ttyAMA0 115200 vt100 & # for diagnostic purposes
 
