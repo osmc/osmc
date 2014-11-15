@@ -27,7 +27,8 @@ void Network::bringUp()
         nameserversTextStream << "nameserver " + this->getDNS2();
         nameserversFile.close();
     }
-    else{
+    else
+    {
         interfacesStringList.append(QString("iface eth0 inet dhcp"));
     }
     /* Write to /etc/network/interfaces */
