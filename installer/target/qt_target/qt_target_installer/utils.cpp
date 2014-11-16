@@ -78,7 +78,7 @@ bool Utils::fmtpart(QString partition, QString fstype)
     if (fstype == "ext4")
     {
         logger->addLine("Command would be /usr/sbin/mkfs.ext4 " + partition);
-        mkfsProcess.start("/usr/sbin/mkfs.ext4 " + partition);
+        mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
     else if (fstype == "vfat")
     {
