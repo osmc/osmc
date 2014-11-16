@@ -104,6 +104,7 @@ function cleanup_filesystem()
 	rm -f ${1}/etc/network/interfaces
 	rm -rf ${1}/usr/share/man/* 
 	rm -rf ${1}/var/cache/apt/archives/*
+	rm -f ${1}/var/log/*.log
 }
 
 function remove_existing_filesystem()
