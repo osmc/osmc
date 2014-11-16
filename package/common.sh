@@ -32,8 +32,7 @@ function handle_dep()
 {
 	# Used by packages that need other packages to be built first
 	# Check dpkg -l for the existence of the package, try install, otherwise bail. 
-	packages=$(dpkg -l)
-	if ! echo $packages | grep -q ${1}
+	if ! dpkg -l ${1}
 	then
 		echo -e "Package ${1} is not found on the system, checking APT"
 		if ! apt-cache search ${1} > /dev/null 2>&1
