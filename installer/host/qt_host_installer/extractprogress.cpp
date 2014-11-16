@@ -175,6 +175,10 @@ void ExtractProgress::writeFinished()
 {
     utils::writeLog("Image successfully written to device");
     emit(finishedExtraction());
+    utils::writeLog("Deleting the uncompressed image to save space");
+    QFile uncompressedFile(QString(deviceImage).remove(".gz"));
+    if (uncompressedFile.exists())
+        uncompressedFile.remove();
 }
 
 void ExtractProgress::setFlushing()
