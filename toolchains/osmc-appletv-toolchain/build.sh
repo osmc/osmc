@@ -37,7 +37,7 @@ mkdir -p $DIR
 
 # Debootstrap (foreign)
 
-fetch_filesystem "--arch=${ARCH} --foreign ${RLS} ${DIR}"
+fetch_filesystem "--arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR}"
 verify_action
 
 # Configure filesystem (2nd stage)
