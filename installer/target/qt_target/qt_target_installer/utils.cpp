@@ -42,7 +42,6 @@ bool Utils::mklabel(QString device, bool isGPT)
     else
         mklabelProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mklabel msdos");
     mklabelProcess.waitForFinished(-1);
-    logger->addLine("mklabel finished with exitCode: " + mklabelProcess.exitCode());
     updateDevTable();
     return mklabelProcess.exitCode() == 0;
 }
@@ -66,8 +65,6 @@ bool Utils::mkpart(QString device, QString fstype, QString start, QString end)
     partedProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " mkpart primary " + fstype + " " + start + " " + end);
     partedProcess.waitForFinished(-1);
     updateDevTable();
-    logger->addLine("mkpart exitCode: " + partedProcess.exitCode());
-    logger->addLine("stderr was " + QString(partedProcess.readAllStandardError()));
     return partedProcess.exitCode() == 0;
 }
 
@@ -77,19 +74,14 @@ bool Utils::fmtpart(QString partition, QString fstype)
     QProcess mkfsProcess;
     if (fstype == "ext4")
     {
-        logger->addLine("Command would be /usr/sbin/mkfs.ext4 " + partition);
         mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
     else if (fstype == "vfat")
     {
-        logger->addLine("Command would be /usr/sbin/mkfs.ext4 " + partition);
         mkfsProcess.start("/usr/sbin/mkfs.vfat -F 32 " + partition);
     }
     mkfsProcess.waitForFinished(-1);
-    logger->addLine("fmtpart returned with " + QString::number(mkfsProcess.exitCode()));
-    logger->addLine("full output was: " + QString(mkfsProcess.readAll()));
-    logger->addLine("stderr was " + QString(mkfsProcess.readAllStandardError()));
-    logger->addLine("stdout was "  +QString(mkfsProcess.readAllStandardOutput()));
+    logger->addLine(QString(mkfsProcess.readAll()));
     return mkfsProcess.exitCode() == 0;
 }
 
