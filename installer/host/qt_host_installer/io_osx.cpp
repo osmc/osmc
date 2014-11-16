@@ -68,9 +68,11 @@ namespace io
                }
 
                deviceSpace.remove("*");
-
-               DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
-               devices.append(nd);
+               if ( ! (devicePath == "/dev/disk0" || devicePath = "/dev/rdisk0"))
+               {
+                   DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+                   devices.append(nd);
+               }
            }
        }
        return devices;
