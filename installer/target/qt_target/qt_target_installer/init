@@ -10,6 +10,15 @@
 /bin/mount -t devtmpfs dev /dev
 /bin/hostname -F /etc/hostname
 
+# Configure eudev
+
+. /etc/udev/udev.conf
+printf '\000\000\000\000' > /proc/sys/kernel/hotplug
+/sbin/udevd -d
+udevadm trigger
+
+sleep 3 # Wait for /dev population
+
 /sbin/getty -L ttyAMA0 115200 vt100 & # for diagnostic purposes
 
 /usr/bin/qt_target_installer -qws
