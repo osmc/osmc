@@ -38,7 +38,7 @@ QList<DiskDevice * > enumerateDevice()
          for (int i = 0; i < lines.count(); i++)
          {
              QString line = lines.at(i);
-             if (line.startsWith("Disk /dev") && ! (line.startsWith("Disk /dev/sda") || line.startsWith("Disk /dev/hda") || line.startsWith("Disk /dev/xvda")))
+             if ((line.startsWith("Disk /dev") || line.startsWith("Disque /dev")) && ! (line.startsWith("Disk /dev/sda") || line.startsWith("Disk /dev/hda") || line.startsWith("Disk /dev/xvda")))
              {
                  QStringList deviceAttr = line.split(" ");
                  QString devicePath;
@@ -47,7 +47,7 @@ QList<DiskDevice * > enumerateDevice()
                  devicePath.remove(":");
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
-                 DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+                 DiskDevice *nd = new DiskDevice(i, devicePath.trimmed(), deviceSpace);
                  devices.append(nd);
              }
          }
