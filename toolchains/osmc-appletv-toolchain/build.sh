@@ -7,6 +7,8 @@
 wd=$(pwd)
 tcstub="osmc-appletv-toolchain"
 
+make clean
+
 check_platform
 verify_action
 

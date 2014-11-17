@@ -7,6 +7,8 @@
 wd=$(pwd)
 tcstub="osmc-rbp-toolchain"
 
+make clean
+
 check_platform
 verify_action
 
