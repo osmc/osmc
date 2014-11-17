@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "writeimageworker.h"
 #include <errno.h>
+#include <QDebug>
 
 namespace io
 {
@@ -21,6 +22,9 @@ QList<DiskDevice * > enumerateDevice()
      QProcess process;
      QStringList lines;
      //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l", QIODevice::ReadWrite | QIODevice::Text); /* To run in Qt */
+     QStringList env = QProcess::systemEnvironment();
+     env << "LANG=C"; // Add an environment variable
+     process.setEnvironment(env);
      process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadOnly | QIODevice::Text);
      if (! process.waitForFinished())
          utils::writeLog("Could not execute fdisk to enumerate devices");
@@ -38,7 +42,7 @@ QList<DiskDevice * > enumerateDevice()
          for (int i = 0; i < lines.count(); i++)
          {
              QString line = lines.at(i);
-             if ((line.startsWith("Disk /dev") || line.startsWith("Disque /dev")) && ! (line.startsWith("Disk /dev/sda") || line.startsWith("Disk /dev/hda") || line.startsWith("Disk /dev/xvda")))
+             if (line.startsWith("Disk /dev") && ! (line.startsWith("Disk /dev/sda") || line.startsWith("Disk /dev/hda") || line.startsWith("Disk /dev/xvda")))
              {
                  QStringList deviceAttr = line.split(" ");
                  QString devicePath;
