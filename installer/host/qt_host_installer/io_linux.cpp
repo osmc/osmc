@@ -21,6 +21,9 @@ QList<DiskDevice * > enumerateDevice()
      QProcess process;
      QStringList lines;
      //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l", QIODevice::ReadWrite | QIODevice::Text); /* To run in Qt */
+     QStringList env = QProcess::systemEnvironment();
+     env << "LANG=C"; // Add an environment variable
+     process.setEnvironment(env);
      process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadOnly | QIODevice::Text);
      if (! process.waitForFinished())
          utils::writeLog("Could not execute fdisk to enumerate devices");
@@ -47,7 +50,7 @@ QList<DiskDevice * > enumerateDevice()
                  devicePath.remove(":");
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
-                 DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+                 DiskDevice *nd = new DiskDevice(i, devicePath.trimmed(), deviceSpace);
                  devices.append(nd);
              }
          }
