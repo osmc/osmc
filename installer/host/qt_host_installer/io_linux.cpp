@@ -21,6 +21,7 @@ QList<DiskDevice * > enumerateDevice()
      QProcess process;
      QStringList lines;
      //process.start("/usr/bin/gksudo", QStringList() << "/sbin/fdisk -l", QIODevice::ReadWrite | QIODevice::Text); /* To run in Qt */
+     process.setEnvironment(QStringList() << "LANG=C");
      process.start("/sbin/fdisk", QStringList() << "-l", QIODevice::ReadOnly | QIODevice::Text);
      if (! process.waitForFinished())
          utils::writeLog("Could not execute fdisk to enumerate devices");

@@ -15,6 +15,7 @@ namespace io
        utils::writeLog("Enumerating imageable devices for OSX");
        QProcess process;
        QStringList lines;
+       process.setEnvironment(QStringList() << "LANG=C");
        process.start("/usr/sbin/diskutil", QStringList() << "list", QIODevice::ReadWrite | QIODevice::Text);
        if (! process.waitForFinished())
            utils::writeLog("Could not execute diskutil to enumerate devices");
@@ -87,6 +88,7 @@ namespace io
        processArguments << "-l" << "AppleScript";
 
        QProcess p;
+       p.setEnvironment(QStringList() << "LANG=C");
        p.start(osascript);
        p.waitForStarted();
        p.write(aScript.toUtf8());
