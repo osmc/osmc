@@ -1,0 +1,12 @@
+[Unit]
+Description=Connection service
+
+[Service]
+Type=dbus
+BusName=net.connman
+Restart=on-failure
+ExecStart = /bin/sh -c "grep -q nfsroot /proc/cmdline && /usr/sbin/connmand -n -I eth0 || /usr/sbin/connmand -n"
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
