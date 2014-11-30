@@ -3,7 +3,7 @@ Description = Splash
 After = sysinit.target local-fs.target
 
 [Service]
-ExecStart = /bin/sh -c "grep -q quiet /proc/cmdline && /usr/bin/ply-image /usr/splash.png
+ExecStart = /bin/sh -c "grep -q quiet /proc/cmdline && /usr/bin/ply-image /usr/splash.png"
 
 [Install]
 WantedBy = basic.target
