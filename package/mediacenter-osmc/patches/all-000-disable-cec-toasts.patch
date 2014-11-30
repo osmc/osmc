@@ -1,5 +1,5 @@
 diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-index b4b5d2f..2521327 100644
+index b4b5d2f..669e67a 100644
 --- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 +++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 @@ -318,10 +318,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
@@ -13,7 +13,16 @@ index b4b5d2f..2521327 100644
    bool bConnectionFailedDisplayed(false);
  
    while (!m_bStop && !bIsOpen)
-@@ -1558,9 +1499,6 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+@@ -1262,8 +1258,6 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+              m_configuration.bPowerOffOnStandby == 1 ? 13011 :
+              m_configuration.bShutdownOnStandby == 1 ? 13005 : 36028);
+ 
+-  if (bChanged)
+-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), g_localizeStrings.Get(36023));
+ }
+ 
+ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+@@ -1558,9 +1552,6 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
  
    m_adapter->m_bIsReady = true;
  
@@ -23,7 +32,7 @@ index b4b5d2f..2521327 100644
    CSingleLock lock(m_critSection);
    m_bIsUpdating = false;
    return true;
-@@ -1606,8 +1544,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
+@@ -1606,8 +1597,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
          UpdateAudioSystemStatus();
        }
  
