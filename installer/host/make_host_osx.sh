@@ -5,8 +5,8 @@
 echo Building host installer for OS X
 
 TARGET="qt_host_installer"
-RESOURCES=resources
-ICONDIR=${RESOURCES}/app.iconset
+RESOURCES="resources"
+ICONDIR="${RESOURCES}/app.iconset"
 ICONSET_NAME="logo.icns"
 
 pushd ${TARGET}
@@ -20,9 +20,14 @@ if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 cp ${RESOURCES}/Info.plist ${TARGET}.app/Contents/
 
 ## handle application icons
-echo handling application icons
-rm ${RESOURCES}/${ICONSET_NAME}
-iconutil -c icns --output ${RESOURCES}/${ICONSET_NAME} ${ICONDIR}
+echo Generating icons
+if command -v iconutil >/dev/null 2>&1
+then
+    rm ${RESOURCES}/${ICONSET_NAME}
+    iconutil -c icns --output ${RESOURCES}/${ICONSET_NAME} ${ICONDIR}
+else
+    echo "This system does not have iconutil. Using old icons"
+fi
 cp ${RESOURCES}/${ICONSET_NAME} ${TARGET}.app/Contents/Resources/
 sed -e s/ICON_HERE/${ICONSET_NAME}/ -i old ${TARGET}.app/Contents/Info.plist
 echo Placing Version
