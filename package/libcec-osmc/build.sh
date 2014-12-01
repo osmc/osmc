@@ -8,11 +8,14 @@
 echo -e "Building libcec"
 out=$(pwd)/files
 make clean
+handle_dep "libusb-dev"
+handle_dep "libudev-dev"
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Package/d' -i files-dev/DEBIAN/control
 sed '/Depends/d' -i files-dev/DEBIAN/control
 test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libcec-osmc" >> files-dev/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
+echo Downloading sources
 pull_source "https://github.com/Pulse-Eight/libcec" "$(pwd)/src"
 cd src
 git checkout libcec-2.1.4-repack
