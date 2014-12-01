@@ -10,8 +10,8 @@ class BootloaderConfig
 public:
     BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger);
     void copyBootFiles();
-    void configureFstab();
-    void configureCmdline();
+    void configureMounts();
+    void configureEnvironment();
 
 private:
     Utils *utils;

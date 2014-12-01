@@ -18,7 +18,7 @@ void BootloaderConfig::copyBootFiles()
     system("mv /mnt/root/boot/* /mnt/boot");
 }
 
-void BootloaderConfig::configureFstab()
+void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
@@ -34,7 +34,7 @@ void BootloaderConfig::configureFstab()
     utils->writeToFile(fstabFile, fstabStringList, true);
 }
 
-void BootloaderConfig::configureCmdline()
+void BootloaderConfig::configureEnvironment()
 {
     if (utils->getOSMCDev() == "rbp")
     {
@@ -48,5 +48,9 @@ void BootloaderConfig::configureCmdline()
             cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + " rootwait quiet";
         }
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
+        QFile configFile("/mnt/boot/config.txt");
+        QStringList configStringList;
+        configStringList << "arm_freq=800\n" << "gpu_mem=128\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1";
+        utils->writeToFile(configFile, configStringList, false);
     }
 }
