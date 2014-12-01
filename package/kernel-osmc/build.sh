@@ -9,9 +9,9 @@ echo -e "Building Linux kernel"
 make clean
 sed '/Package/d' -i files/DEBIAN/control
 sed '/Depends/d' -i files/DEBIAN/control
-echo -e "Downloading kernel sources"
 handle_dep "kernel-package"
 handle_dep "liblz4-tool"
+echo -e "Downloading kernel sources"
 echo "maintainer := Sam G Nazarko
 email := email@samnazarko.co.uk
 priority := High" >/etc/kernel-pkg.conf
