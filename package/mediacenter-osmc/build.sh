@@ -14,6 +14,7 @@ test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 KODI_SRC="https://github.com/xbmc/xbmc"
 KODI_BRANCH="master"
+echo Downloading sources
 git clone "${KODI_SRC}" -b "${KODI_BRANCH}" Kodi/
 if [ $? != 0 ]; then echo -e "Checkout failed" && exit 1; fi
 cd Kodi/
