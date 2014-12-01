@@ -32,8 +32,8 @@ then
       NFS_ROOT=$(grep root=/dev/nfs /proc/cmdline)
       if [ "$NFS_ROOT" != "" ]
       then
-		losetup /dev/loop0 /swap
-		mkswap /dev/loop0
+	losetup /dev/loop0 /swap
+	mkswap /dev/loop0
         swapon /dev/loop0
     else
         swapon /swap
