@@ -86,6 +86,14 @@ handle_dep "libsamplerate-dev"
 handle_dep "libmp3lame-dev"
 handle_dep "libltdl-dev"
 handle_dep "cmake"
+if [ "$1" == "rbp" ]
+then
+	handle_dep "rbp-libcec-dev-osmc"
+	handle_dep "rbp-libshairplay-dev-osmc"
+	handle_dep "rbp-librtmp-dev-osmc"
+	handle_dep "rbp-libnfs-dev-osmc"
+	handle_dep "rbp-libafpclient-dev-osmc"
+fi
 sed '/Package/d' -i files/DEBIAN/control
 sed /'Depends/d' -i files/DEBIAN/control
 test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
