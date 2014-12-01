@@ -17,8 +17,9 @@ test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo 
 test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
 echo Downloading sources
 pull_source "https://github.com/Pulse-Eight/libcec" "$(pwd)/src"
-cd src
-git checkout libcec-2.1.4-repack
+pushd src
+git checkout release
+test "$1" == rbp && install_patch "../patches" "rbp"
 ./bootstrap
 test "$1" == gen && ./configure --prefix=/usr
 test "$1" == rbp && ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib
@@ -26,7 +27,7 @@ $BUILD
 make install DESTDIR=${out}
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 strip_files "${out}"
-cd ../
+popd
 mkdir -p files-dev/usr
 mv files/usr/include  files-dev/usr/
 fix_arch_ctl "files/DEBIAN/control"
