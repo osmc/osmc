@@ -11,8 +11,6 @@ make clean
 echo Downloading userland
 pull_source "https://github.com/raspberrypi/firmware" "$(pwd)/firmware-master"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
-unzip master.zip
-rm master.zip
 echo Moving files in to place
 mkdir -p files/opt/vc
 mkdir -p files-dev/opt/vc
