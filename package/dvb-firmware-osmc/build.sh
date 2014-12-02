@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building package DVB firmware"
 
 FW_SCRIPT="https://www.kernel.org/doc/Documentation/dvb/get_dvb_firmware"
