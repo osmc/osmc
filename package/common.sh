@@ -3,7 +3,7 @@
 
 #!/bin/bash
 
-. ../scripts/common.sh
+. ../../scripts/common.sh
 
 function fix_arch_ctl()
 {
