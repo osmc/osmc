@@ -21,7 +21,7 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
 
     this->devicePath = QString(devicePath);
 
-    // we might still get a local image here.
+    /* Windows appends file:// */
     this->deviceImage = QString(deviceImage).remove("file:///");
 
 }

@@ -35,10 +35,10 @@ void ExtractWorker::process()
     FILE* source = fdopen(sourceFileDescriptor, "rb");
 
     bool targetopen = targetFile.open(QIODevice::WriteOnly);
-    if (!targetopen)
+    if (! targetopen)
     {
-        utils::writeLog("Could not create/open targetfile " + destName);
-        utils::writeLog("Errorstring was " + targetFile.errorString());
+        utils::writeLog("Could not open target file " + destName);
+        utils::writeLog("Error string was " + targetFile.errorString());
         emit error();
         return;
     }
