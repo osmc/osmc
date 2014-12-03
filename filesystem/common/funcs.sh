@@ -5,7 +5,7 @@
 
 . ../../scripts/common.sh
 
-SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils ssh-app-osmc sudo module-init-tools network-osmc locales dialog console-setup nano"
+SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils ssh-app-osmc sudo module-init-tools network-osmc locales dialog console-setup nano unzip"
 CHROOT_PKGS="${SYSTEM_PKGS}"
 
 function setup_osmc_user()
