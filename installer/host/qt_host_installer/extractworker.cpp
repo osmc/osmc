@@ -26,7 +26,7 @@ void ExtractWorker::process()
     bool sourceopen = sourceFile.open(QIODevice::ReadOnly);
     if (!sourceopen)
     {
-        utils::writeLog("Could not open sourcefile " + sourceFile);
+        utils::writeLog("Could not open sourcefile " + sourceName);
         emit error();
         return;
     }
