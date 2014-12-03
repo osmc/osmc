@@ -24,6 +24,12 @@ void ExtractWorker::process()
     QFile targetFile(destName);
     QString home = QDir::homePath();
     bool sourceopen = sourceFile.open(QIODevice::ReadOnly);
+    if (!sourceopen)
+    {
+        utils::writeLog("Could not open sourcefile " + sourceFile);
+        emit error();
+        return;
+    }
     int sourceFileDescriptor = sourceFile.handle();
     FILE* source = fdopen(sourceFileDescriptor, "rb");
     bool targetopen = targetFile.open(QIODevice::WriteOnly);

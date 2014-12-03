@@ -20,7 +20,9 @@ ExtractProgress::ExtractProgress(QWidget *parent, QString devicePath, QString de
     ui->extractProgressBar->setMinimum(0);
 
     this->devicePath = QString(devicePath);
-    this->deviceImage = QString(deviceImage);
+
+    // we might still get a local image here.
+    this->deviceImage = QString(deviceImage).remove("file:///");
 
 }
 
@@ -174,11 +176,12 @@ void ExtractProgress::finished()
 void ExtractProgress::writeFinished()
 {
     utils::writeLog("Image successfully written to device");
-    emit(finishedExtraction());
     utils::writeLog("Deleting the uncompressed image to save space");
     QFile uncompressedFile(QString(deviceImage).remove(".gz"));
     if (uncompressedFile.exists())
         uncompressedFile.remove();
+
+    emit(finishedExtraction());
 }
 
 void ExtractProgress::setFlushing()

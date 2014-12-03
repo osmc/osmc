@@ -80,7 +80,6 @@ void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
         /* Dialog for selecting custom build */
         buildName = QString(); /* NULL it */
         buildName = QFileDialog::getOpenFileName(this, "Select disk image", dir, tr("OSMC Disk Images (**.img.gz)"));
-        buildName.remove("file://");
         if (buildName == NULL)
         {
             utils::displayError(tr("Build selection error"), tr("You didn't select a custom build -- reverting to online builds"));
