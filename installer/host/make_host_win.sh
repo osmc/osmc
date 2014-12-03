@@ -28,7 +28,7 @@ echo Building installer
 qmake
 mingw32-make
 if [ $? != 0 ]; then echo "Building project failed" && exit 1; fi
-strip release/${TARGET}.exe
+#strip release/${TARGET}.exe
 echo Packaging installer
 popd
 INSTALL="install"
