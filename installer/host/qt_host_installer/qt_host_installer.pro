@@ -105,4 +105,4 @@ TRANSLATIONS = osmc.ts \
 RESOURCES += \
     assets.qrc
 
-CONFIG += static debug
+CONFIG += static
