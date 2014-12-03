@@ -27,12 +27,21 @@ void ExtractWorker::process()
     if (!sourceopen)
     {
         utils::writeLog("Could not open sourcefile " + sourceName);
+        utils::writeLog("Errorstring was " + sourceFile.errorString());
         emit error();
         return;
     }
     int sourceFileDescriptor = sourceFile.handle();
     FILE* source = fdopen(sourceFileDescriptor, "rb");
+
     bool targetopen = targetFile.open(QIODevice::WriteOnly);
+    if (!targetopen)
+    {
+        utils::writeLog("Could not create/open targetfile " + destName);
+        utils::writeLog("Errorstring was " + targetFile.errorString());
+        emit error();
+        return;
+    }
     int targetFileDescriptor = targetFile.handle();
     FILE* dest = fdopen(targetFileDescriptor, "wb");
 #ifdef Q_OS_LINUX
