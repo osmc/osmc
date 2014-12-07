@@ -1,0 +1,69 @@
+--- /dev/null	2014-12-07 14:59:41.912007001 +0000
++++ a/drivers/media/rc/keymaps/rc-vero.c	2014-12-07 17:47:13.225345138 +0000
+@@ -0,0 +1,54 @@
++/* rc-vero.c - Keytable for Vero remote controller
++ *
++ * Copyright (c) 2014 Sam G Nazarko
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include <media/rc-map.h>
++#include <linux/module.h>
++
++static struct rc_map_table rc5_vero[] = {
++	/* Codes start with 0x02 */
++	{ 0x020F, KEY_HOME },								/* HOME icon */
++	{ 0x0210, KEY_INFO },								/* INFO icon */
++	{ 0x0211, KEY_UP },									/* UP icon */
++	{ 0x0212, KEY_RIGHT },								/* RIGHT icon */
++	{ 0x0213, KEY_DOWN },								/* DOWN icon */
++	{ 0x0214, KEY_SELECT },								/* OK icon */
++	{ 0x0215, KEY_LEFT },								/* LEFT icon */
++	{ 0x0216, KEY_BACK },								/* BACK icon */
++	{ 0x0217, KEY_CONTEXT_MENU },						/* CONTEXT icon */
++	{ 0x0218, KEY_PLAYPAUSE },							/* PLAY icon */
++	{ 0x0219, KEY_STOP },								/* STOP icon */
++	{ 0x021A, KEY_REWIND},								/* RW icon */
++	{ 0x021B, KEY_FASTFORWARD },						/* FW icon */
++};
++
++static struct rc_map_list rc5_vero_map = {
++	.map = {
++		.scan    = rc5_vero,
++		.size    = ARRAY_SIZE(rc5_vero),
++		.rc_type = RC_TYPE_RC5,
++		.name    = RC_MAP_VERO,
++	}
++};
++
++static int __init init_rc_map_rc5_vero(void)
++{
++	return rc_map_register(&rc5_vero_map);
++}
++
++static void __exit exit_rc_map_rc5_vero(void)
++{
++	rc_map_unregister(&rc5_vero_map);
++}
++
++module_init(init_rc_map_rc5_vero)
++module_exit(exit_rc_map_rc5_vero)
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Sam G Nazarko");
+
+--- a/include/media/rc-maph	2014-12-07 17:54:24.831142122 +0000
++++ b/include/media/rc-map.h	2014-12-07 17:55:08.993685655 +0000
+@@ -204,6 +204,7 @@
+ #define RC_MAP_TREKSTOR                  "rc-trekstor"
+ #define RC_MAP_TT_1500                   "rc-tt-1500"
+ #define RC_MAP_TWINHAN_VP1027_DVBS       "rc-twinhan1027"
++#define RC_MAP_VERO			 "rc-vero"
+ #define RC_MAP_VIDEOMATE_K100            "rc-videomate-k100"
+ #define RC_MAP_VIDEOMATE_S350            "rc-videomate-s350"
+ #define RC_MAP_VIDEOMATE_TV_PVR          "rc-videomate-tv-pvr"
+
