@@ -35,6 +35,7 @@ function build_in_env()
 	if [ $? == 0 ]; then return 0; fi
 	TCDIR="/opt/osmc-tc/${1}-toolchain-osmc"
 	handle_dep "${1}-toolchain-osmc"
+	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
 	mount -t proc proc "{$TCDIR}"/proc
 	mount --bind "${2}" "${TCDIR}"/mnt
 	chroot "${TCDIR}" /bin/make -C /mnt
@@ -52,12 +53,14 @@ function handle_dep()
 		if ! apt-cache search ${1} > /dev/null 2>&1
 		then
 			echo -e "Can't find the package in APT repo. It needs to be built first or you need to wait for upstream to add it"
+			return 1
 		else
 			echo -e "Found in APT and will install"
 			install_package ${1}
 		fi
 	else
 		echo -e "Package ${1} is already installed in the environment"
+		return 0
 	fi
 }
 
