@@ -30,7 +30,7 @@ function strip_libs()
 
 function configure_build_env()
 {
-	if [ ! -f "$1/etc/resolv.conf" ]
+	if [ ! -f "${1}/etc/resolv.conf" ]
 	then
 		if [ -f "/etc/resolv.conf" ]
 		then
@@ -38,7 +38,7 @@ function configure_build_env()
 		cp /etc/resolv.conf ${1}/etc/resolv.conf
 		fi
 	fi
-		if [ ! -f "$1/etc/network/interfaces" ]
+		if [ ! -f "${1}/etc/network/interfaces" ]
 	then
 		if [ -f "/etc/network/interfaces" ]
 		then
