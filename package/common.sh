@@ -28,27 +28,53 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
+function configure_build_env()
+{
+	if [ ! -f "$1/etc/resolv.conf" ]
+	then
+		if [ -f "/etc/resolv.conf" ]
+		then
+		echo -e "Installing /etc/resolv.conf"
+		cp /etc/resolv.conf ${1}/etc/resolv.conf
+		fi
+	fi
+		if [ ! -f "$1/etc/network/interfaces" ]
+	then
+		if [ -f "/etc/network/interfaces" ]
+		then
+		echo -e "Installing /etc/network/interfaces"
+		cp /etc/network/interfaces ${1}/etc/network/interfaces
+		fi
+	fi
+}
+
 function build_in_env()
 {
 	# Don't get stuck in an endless loop
 	ischroot
-	if [ $? == 0 ]; then return 0; fi
+	if [ $? == 2 ]; then return 0; fi
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	handle_dep "$1-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
+	configure_build_env "$TCDIR"
 	mount -t proc proc "$TCDIR"/proc >/dev/null 2>&1
-	umount /mnt >/dev/null 2>&1 # May be dirty
-	mount --bind "$2" "$TCDIR"/mnt
-	chroot "$TCDIR" /usr/bin/make -C /mnt
-	chroot /usr/bin/make -C /mnt && umount /mnt
+	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
+	mount --bind "$2/../../" "$TCDIR"/mnt
+	chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
 	return 1
+}
+
+function teardown_env()
+{
+	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
+	umount ${TCDIR}/mnt >/dev/null 2>&1
 }
 
 function handle_dep()
 {
 	# Used by packages that need other packages to be built first
 	# Check dpkg -l for the existence of the package, try install, otherwise bail. 
-	if ! dpkg -l ${1}
+	if ! dpkg -s ${1} >/dev/null 2>&1
 	then
 		echo -e "Package ${1} is not found on the system, checking APT"
 		if ! apt-cache search ${1} > /dev/null 2>&1
@@ -69,4 +95,5 @@ export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
 export -f build_in_env
+export -f teardown_env
 export -f handle_dep
