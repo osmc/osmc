@@ -60,7 +60,7 @@ function install_package()
 {
 	echo -e "Installing package ${1}..."
 	# Check if our package is installed
-	dpkg --status $1 > /dev/null 2>&1
+	dpkg -s $1 > /dev/null 2>&1 # Although this may seem duplicated in handle_dep. handle_dep is used for packages only, where as installers/ and other parts will call this function directly. handle_dep purely exists to tell us when we need to build first or add an apt repo.
 	if [ $? == 0 ]
 	then
 	echo -e "Package already installed."
