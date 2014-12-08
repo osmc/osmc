@@ -1,6 +1,6 @@
 #!/bin/bash
 ARM_BINARY="/opt/osmc-tc/osmc-rbp-toolchain/usr/bin"
 if [ -f "$ARM_BINARY" ]; then echo -e "Removing QEMU binary" && rm $ARM_BINARY; fi
-umount /opt/osmc-tc/osmc-rbp-toolchain/proc >/dev/null 2>&1
-umount /opt/osmc-tv/osmc-rbp-toolchain/mnt >/dev/null 2>&1
-rm -rf /opt/osmc-tc/osmc-rbp-toolchain/* >/dev/null 2>&1
+umount /opt/osmc-tc/rbp-toolchain-osmc/proc >/dev/null 2>&1
+umount /opt/osmc-tv/rbp-toolchain-osmc/mnt >/dev/null 2>&1
+rm -rf /opt/osmc-tc/rbp-toolchain-osmc/* >/dev/null 2>&1
