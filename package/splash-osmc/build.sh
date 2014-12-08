@@ -5,6 +5,10 @@
 
 . ../common.sh
 
+# Build in native environment
+build_in_env "{$1}" $(pwd)
+if [ $? == 1 ]; then exit 1; fi # Prevent recursive loop
+
 echo -e "Building splash for OSMC"
 out=$(pwd)/files
 make clean
