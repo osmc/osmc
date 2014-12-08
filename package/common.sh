@@ -33,12 +33,12 @@ function build_in_env()
 	# Don't get stuck in an endless loop
 	ischroot
 	if [ $? == 0 ]; then return 0; fi
-	TCDIR="/opt/osmc-tc/${1}-toolchain-osmc"
-	handle_dep "${1}-toolchain-osmc"
+	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
+	handle_dep "$1-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
-	mount -t proc proc "{$TCDIR}"/proc
-	mount --bind "${2}" "${TCDIR}"/mnt
-	chroot "${TCDIR}" /bin/make -C /mnt
+	mount -t proc proc "$TCDIR"/proc
+	mount --bind "$2" "$TCDIR"/mnt
+	chroot "$TCDIR" /bin/make -C /mnt
 	chroot /bin/make -C /make && umount /make 
 	return 1
 }
