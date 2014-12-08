@@ -39,7 +39,7 @@ function configure_build_env()
 		cp /etc/resolv.conf ${1}/etc/resolv.conf
 		fi
 	fi
-		if [ ! -f "${1}/etc/network/interfaces" ]
+	if [ ! -f "${1}/etc/network/interfaces" ]
 	then
 		if [ -f "/etc/network/interfaces" ]
 		then
@@ -47,6 +47,8 @@ function configure_build_env()
 		cp /etc/network/interfaces ${1}/etc/network/interfaces
 		fi
 	fi
+	HOSTNAME=$(cat /etc/hostname)
+	echo "127.0.0.1 $HOSTNAME" > ${1}/etc/hostname
 }
 
 function build_in_env()
