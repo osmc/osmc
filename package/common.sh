@@ -28,6 +28,20 @@ function strip_libs()
 	strip "*.a" > /dev/null 2>&1
 }
 
+function build_in_env()
+{
+	# Don't get stuck in an endless loop
+	ischroot
+	if [ $? == 0 ]; then return 0; fi
+	TCDIR="/opt/osmc-tc/${1}-toolchain-osmc"
+	handle_dep "${1}-toolchain-osmc"
+	mount -t proc proc "{$TCDIR}"/proc
+	mount --bind "${2}" "${TCDIR}"/mnt
+	chroot "${TCDIR}" /bin/make -C /mnt
+	chroot /bin/make -C /make && umount /make 
+	return 1
+}
+
 function handle_dep()
 {
 	# Used by packages that need other packages to be built first
@@ -50,4 +64,5 @@ function handle_dep()
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
+export -f build_in_env
 export -f handle_dep
