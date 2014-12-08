@@ -6,8 +6,8 @@
 . ../common.sh
 
 # Build in native environment
-build_in_env "${1}" $(pwd)
-if [ $? == 1 ]; then exit 1; fi # Prevent recursive loop
+build_in_env "${1}" $(pwd) "splash-osmc"
+if [ $? == 1 ]; then return 0; fi # Prevent recursive loop
 
 echo -e "Building splash for OSMC"
 out=$(pwd)/files
@@ -15,6 +15,8 @@ make clean
 sed '/Package/d' -i files/DEBIAN/control
 test "$1" == gen && echo "Package: splash-osmc" >> files/DEBIAN/control
 test "$1" == rbp && echo "Package: rbp-splash-osmc" >> files/DEBIAN/control
+echo "Depends: fbset" >> files/DEBIAN/control
+handle_dep "libpng12-dev"
 pull_source "https://github.com/samnazarko/plymouth-lite" "$(pwd)/src"
 cd src
 $BUILD
@@ -26,3 +28,4 @@ cp -ar splash_sad.png ${out}/usr
 cd ../
 fix_arch_ctl "files/DEBIAN/control"
 dpkg -b files splash-osmc.deb
+teardown_env "${1}"
