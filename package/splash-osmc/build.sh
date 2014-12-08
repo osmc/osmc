@@ -28,5 +28,5 @@ then
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files splash-osmc.deb
-	fi
+fi
 teardown_env "${1}"
