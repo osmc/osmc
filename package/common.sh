@@ -68,6 +68,7 @@ function teardown_env()
 {
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	umount ${TCDIR}/mnt >/dev/null 2>&1
+	return 0 # Fix Make error 32
 }
 
 function handle_dep()
