@@ -16,6 +16,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	test "$1" == gen && echo "Package: splash-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-splash-osmc" >> files/DEBIAN/control
+	echo "Depends: fbset" >> files/DEBIAN/control
 	handle_dep "libpng12-dev"
 	pushd src
 	$BUILD
