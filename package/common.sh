@@ -48,7 +48,7 @@ function configure_build_env()
 		fi
 	fi
 	HOSTNAME=$(cat /etc/hostname)
-	echo "127.0.0.1 $HOSTNAME" > ${1}/etc/hostname
+	echo "127.0.0.1 $HOSTNAME" > ${1}/etc/hosts
 }
 
 function build_in_env()
