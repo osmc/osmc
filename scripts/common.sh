@@ -150,7 +150,7 @@ function pull_source()
 	return
 	fi
 
-	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ ]]
+	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ || $1 =~ \.tar\.xz$ ]]
 	then
 	echo -e "Detected tarball source"
 	if [ "$2" != "." ]; then mkdir ${2}; fi
@@ -169,7 +169,7 @@ function pull_source()
 	return
 	fi
 
-	echo -e "No file type match found for URL"
+	echo -e "No file type match found for URL" && exit 1; fi
 }
 
 DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
