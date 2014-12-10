@@ -53,6 +53,7 @@ function configure_build_env()
 
 function build_in_env()
 {
+	export LANG=C
 	# Don't get stuck in an endless loop
 	ischroot
 	if [ $? == 2 ]; then return 0; fi
