@@ -82,7 +82,9 @@ function handle_dep()
 	if ! dpkg -s ${1} >/dev/null 2>&1
 	then
 		echo -e "Package ${1} is not found on the system, checking APT"
-		if ! apt-cache search ${1} > /dev/null 2>&1
+		# apt-cache search always returns 0. Ugh. 
+		packages=$(apt-cache search ${1} | wc -l)
+		if [ "$packages" -gt 0 ]
 		then
 			echo -e "Can't find the package in APT repo. It needs to be built first or you need to wait for upstream to add it"
 			return 1
