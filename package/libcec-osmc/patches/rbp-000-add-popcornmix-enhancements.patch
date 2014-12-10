@@ -1,31 +1,7 @@
-From 260df18aebb3a39aa392a91768719805de9c9001 Mon Sep 17 00:00:00 2001
-From: Lars Op den Kamp <lars@opdenkamp.eu>
-Date: Sat, 1 Nov 2014 17:53:20 +0100
-Subject: [PATCH 1/7] define USE_X11_RANDR to false on freebsd
-
----
- configure.ac | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/configure.ac b/configure.ac
-index 68b9856..fb92035 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -236,6 +236,9 @@ case "${host}" in
-     AM_CONDITIONAL(USE_X11_RANDR, false)
-     SUPPRESS_MANGLING_WARNINGS=""
-     ;;
-+  *-*-freebsd*)
-+    AM_CONDITIONAL(USE_X11_RANDR, false)
-+    ;;
- esac
- 
- ## define the build info
-
 From 5884c3b7b8379a5ec3e8016547f9fbe4c795b5f7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Oct 2014 13:45:21 +0100
-Subject: [PATCH 2/7] Make released key polling wait for exact time until key
+Subject: [PATCH 1/6] Make released key polling wait for exact time until key
  gets released
 
 ---
@@ -183,7 +159,7 @@ index 3a312c0..b7ac645 100644
 From 7deb63a0a8bb12e762ff83d16bda217c57b9ea59 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Oct 2014 13:51:34 +0100
-Subject: [PATCH 3/7] Keep track of time since initial button press and last
+Subject: [PATCH 2/6] Keep track of time since initial button press and last
  button update
 
 ---
@@ -337,7 +313,7 @@ index 88efbbb..3295aca 100644
 From f65b8d5a17d8d5b25dcc4eaff099a2f29d0b9515 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 00:09:18 +0000
-Subject: [PATCH 4/7] Support repeating button presses with configurable repeat
+Subject: [PATCH 3/6] Support repeating button presses with configurable repeat
  rate
 
 ---
@@ -637,7 +613,7 @@ index a89ebe6..932c54b 100644
 From aa77d2c06f3de95b5286f8248fdcebc7252675a7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 01:21:35 +0000
-Subject: [PATCH 5/7] Skip double press removal. It is handled through other
+Subject: [PATCH 4/6] Skip double press removal. It is handled through other
  means.
 
 ---
@@ -699,7 +675,7 @@ index 7f3d55d..f1ae09e 100644
 From aee196c6711bbab93fceb3dac08aa538a635064a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 3 Nov 2014 23:28:04 +0000
-Subject: [PATCH 6/7] Pass through duration on all button repeats
+Subject: [PATCH 5/6] Pass through duration on all button repeats
 
 ---
  src/lib/CECClient.cpp | 34 ++++++++++++++++++++++++----------
@@ -798,7 +774,7 @@ index abc1911..b218560 100644
 From 23a9be9093191f26cffea5366286eac7c595c6d7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 5 Nov 2014 21:04:25 +0000
-Subject: [PATCH 7/7] squash: Fix for stop needing to be pressed twice
+Subject: [PATCH 6/6] squash: Fix for stop needing to be pressed twice
 
 ---
  src/lib/CECClient.cpp | 17 ++++++++---------

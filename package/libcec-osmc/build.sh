@@ -26,7 +26,6 @@ then
 	test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libcec-osmc" >> files-dev/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src
-	git checkout release
 	test "$1" == rbp && install_patch "../patches" "rbp"
 	./bootstrap
 	test "$1" == gen && ./configure --prefix=/usr
