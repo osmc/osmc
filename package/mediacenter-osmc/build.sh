@@ -112,7 +112,7 @@ then
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 	pushd kodi/
-	test "$1"== rbp && git checkout helix_rbp_backports
+	test "$1" == rbp && git checkout helix_rbp_backports
 	install_patch "../patches" "all"
 	test "$1" == atv && install_patch "../patches" "atv"
 	test "$1" == rbp && install_patch "../patches" "rbp" && install_patch "../patches" "lpr"
