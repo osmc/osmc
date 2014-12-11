@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Pulse-Eight/libcec" "$(pwd)/src"
+pull_source "https://github.com/Pulse-Eight/libcec/archive/master.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
@@ -25,9 +25,8 @@ then
 	test "$1" == rbp && handle_dep "rbp-userland-dev-osmc"
 	test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libcec-osmc" >> files-dev/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
-	pushd src
-	git checkout master # default branch is release
-	test "$1" == rbp && install_patch "../patches" "rbp"
+	pushd src/libcec-master
+	test "$1" == rbp && install_patch "../../patches" "rbp"
 	./bootstrap
 	test "$1" == gen && ./configure --prefix=/usr
 	test "$1" == rbp && ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib
