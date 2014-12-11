@@ -62,7 +62,6 @@ function build_in_env()
 	handle_dep "$1-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
 	configure_build_env "$TCDIR"
-	chroot $TCDIR /bin/mount -t proc proc /proc
 	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
 	mount --bind "$2/../../" "$TCDIR"/mnt
 	chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
@@ -73,7 +72,6 @@ function teardown_env()
 {
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	umount ${TCDIR}/mnt >/dev/null 2>&1
-	chroot $TCDIR /bin/umount /proc
 	return 0 # Fix Make error 32
 }
 

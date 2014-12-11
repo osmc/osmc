@@ -21,6 +21,7 @@ then
 	echo -e "Building package Kodi"
 	out=$(pwd)/files
 	make clean
+	mount -t proc proc /proc >/dev/null 2>&1
 	update_sources
 	handle_dep "git" # Needed for branch checkouts
 	handle_dep "autopoint"
@@ -154,7 +155,8 @@ then
 		--enable-optimizations \
 		--enable-libcec \
 		--enable-player=omxplayer
-	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
+	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
+	umount /proc/ > /dev/null 2>&1
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
