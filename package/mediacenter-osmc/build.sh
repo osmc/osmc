@@ -7,12 +7,13 @@
 
 if [ "$1" == "rbp" ]
 then
-pull_source "https://github.com/popcornmix/xbmc" "kodi/"
+pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "kodi/"
+pushd kodi
 else
-pull_source "https://github.com/xbmc/xbmc" "kodi/"
+pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "kodi/"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
-pull_source "https://github.com/opdenkamp/xbmc-pvr-addons" "kodi-pvr/"
+pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "kodi-pvr/"
 if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "mediacenter-osmc"
@@ -23,7 +24,6 @@ then
 	make clean
 	mount -t proc proc /proc >/dev/null 2>&1
 	update_sources
-	handle_dep "git" # Needed for branch checkouts
 	handle_dep "autopoint"
 	handle_dep "automake"
 	handle_dep "bison"
@@ -115,7 +115,6 @@ then
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 	pushd kodi/
-	test "$1" == rbp && git checkout helix_rbp_backports
 	install_patch "../patches" "all"
 	test "$1" == atv && install_patch "../patches" "atv"
 	test "$1" == rbp && install_patch "../patches" "rbp" && install_patch "../patches" "lpr"
