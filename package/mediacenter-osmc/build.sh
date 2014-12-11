@@ -5,7 +5,12 @@
 
 . ../common.sh
 
+if [ "$1" == "rbp" ]
+then
+pull_source "https://github.com/popcornmix/xbmc" "kodi/"
+else
 pull_source "https://github.com/xbmc/xbmc" "kodi/"
+fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 pull_source "https://github.com/opdenkamp/xbmc-pvr-addons" "kodi-pvr/"
 if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
@@ -107,6 +112,7 @@ then
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 	pushd kodi/
+	test "$1"== rbp && git checkout helix_rbp_backports
 	install_patch "../patches" "all"
 	test "$1" == atv && install_patch "../patches" "atv"
 	test "$1" == rbp && install_patch "../patches" "rbp" && install_patch "../patches" "lpr"
@@ -115,33 +121,33 @@ then
 	test "$1" == atv && \
 	CXXFLAGS="-I/usr/include/afpfs-ng" ./configure \
 		--prefix=/usr \
-		--disable-vtbdecoder \ 
-		--disable-vaapi \ 
+		--disable-vtbdecoder \
+		--disable-vaapi \
 		--disable-vdpau \
-		--disable-pulse \ 
-		--disable-projectm 
+		--disable-pulse \
+		--disable-projectm
 	# Raspberry Pi Configuration
-	test "$1" == rbp && \ 
-	LIBRARY_PATH+=/opt/vc/lib \ 
+	test "$1" == rbp && \
+	LIBRARY_PATH+=/opt/vc/lib \
 	CXXFLAGS="-I/usr/include/afpfs-ng -I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux -L/opt/vc/lib" \ 
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
-		--disable-sdl \ 
-		--disable-x11 \ 
-		--disable-xrandr \ 
+		--disable-sdl \
+		--disable-x11 \
+		--disable-xrandr \
 		--disable-openmax \
-		--enable-optical-drive \ 
-		--enable-libbluray \ 
+		--enable-optical-drive \
+		--enable-libbluray \
 		--enable-dvdcss \
-		--disable-joystick \ 
+		--disable-joystick \
 		--disable-debug \
-		--disable-crystalhd \ 
-		--disable-vtbdecoder \ 
-		--disable-vaapi \ 
+		--disable-crystalhd \
+		--disable-vtbdecoder \
+		--disable-vaapi \
 		--disable-vdpau \
-		--disable-pulse \ 
-		--disable-projectm \ 
+		--disable-pulse \
+		--disable-projectm \
 		--with-platform=raspberry-pi \
 		--enable-optimizations \
 		--enable-libcec \
@@ -159,7 +165,7 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-	cd ../
+	popd
 	rm -rf ${out}/usr/share/xbmc/addons/service.kodi.versioncheck
 	strip ${out}/usr/lib/kodi/kodi.bin
 	strip ${out}/usr/lib/kodi/addons/*/*.so
