@@ -17,6 +17,7 @@ then
 	update_sources
 	handle_dep "pkg-config"
 	handle_dep "libssl-dev"
+	handle_dep "git" # for dvbscan info?
 	test $1 == gen && echo "Package: tvheadend-app-osmc" >> files/DEBIAN/control
 	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control
 	pushd src
