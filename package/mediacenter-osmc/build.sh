@@ -7,13 +7,12 @@
 
 if [ "$1" == "rbp" ]
 then
-pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "$(pwd)/kodi"
-pushd kodi
+pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "$(pwd)/src"
 else
-pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "kodi/"
+pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/src"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
-pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "$(pwd)/kodi-pvr"
+pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "mediacenter-osmc"
@@ -109,12 +108,18 @@ then
 		handle_dep "rbp-librtmp-dev-osmc"
 		handle_dep "rbp-libnfs-dev-osmc"
 		handle_dep "rbp-libafpclient-dev-osmc"
+		handle_dep "rbp-userland-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed /'Depends/d' -i files/DEBIAN/control
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
-	pushd kodi/
+	if [ "$1" == rbp ]
+	then
+		 pushd src/xbmc-helix*
+	else
+		pushd src/xbmc-master*
+	fi
 	install_patch "../patches" "all"
 	test "$1" == atv && install_patch "../patches" "atv"
 	test "$1" == rbp && install_patch "../patches" "rbp" && install_patch "../patches" "lpr"
@@ -160,7 +165,7 @@ then
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
 	popd
-	pushd kodi-pvr
+	pushd src/xbmc-pvr*
 	make clean >/dev/null 2>&1
 	./bootstrap
 	./configure --prefix=/usr --enable-addons-with-dependencies
