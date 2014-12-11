@@ -21,6 +21,7 @@ then
 	echo -e "Building package Kodi"
 	out=$(pwd)/files
 	make clean
+	update_sources
 	handle_dep "autopoint"
 	handle_dep "automake"
 	handle_dep "bison"
