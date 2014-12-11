@@ -32,8 +32,7 @@ then
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
 	popd
 	echo "Package: kernel-${1}-osmc" >> files/DEBIAN/control && echo "Depends: $1-image-${VERSION}-osmc" >> files-dev/DEBIAN/control
-	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ kernel-{$1}-osmc.deb
+	dpkg -b files/ kernel-${1}-osmc.deb
 	echo -e "Build complete"
 fi
 teardown_env "${1}"
