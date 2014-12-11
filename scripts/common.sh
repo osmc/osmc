@@ -115,7 +115,7 @@ function remove_existing_filesystem()
 
 function install_patch()
 {
-	patches=$(find ${1} -name "${2}-*.patch" -printf '%P\n')
+	patches=$(find ${1} -name "${2}-*.patch" -printf '%P\n' | sort)
 	for patch in $patches
 	do
 		cp ${1}/$patch .
