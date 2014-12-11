@@ -22,6 +22,7 @@ then
 	out=$(pwd)/files
 	make clean
 	update_sources
+	handle_dep "git" # Needed for branch checkouts
 	handle_dep "autopoint"
 	handle_dep "automake"
 	handle_dep "bison"
