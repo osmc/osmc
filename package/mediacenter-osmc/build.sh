@@ -39,7 +39,7 @@ then
 	handle_dep "libass-dev"
 	handle_dep "libboost-dev"
 	handle_dep "libboost-thread-dev"
-	handle_dep "libz2-dev"
+	handle_dep "libbz2-dev"
 	handle_dep "libcap-dev"
 	handle_dep "libcdio-dev"
 	handle_dep "libcurl3"
