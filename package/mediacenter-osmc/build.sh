@@ -7,12 +7,12 @@
 
 if [ "$1" == "rbp" ]
 then
-pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "$(pwd)/kodi"
 else
-pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
-pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "$(pwd)/kodi-pvr"
 if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "mediacenter-osmc"
@@ -116,9 +116,9 @@ then
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 	if [ "$1" == rbp ]
 	then
-		 pushd src/xbmc-helix*
+		 pushd kodi/xbmc-helix*
 	else
-		pushd src/xbmc-master*
+		pushd kodi/xbmc-master*
 	fi
 	install_patch "../patches" "all"
 	test "$1" == atv && install_patch "../patches" "atv"
@@ -165,8 +165,7 @@ then
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
 	popd
-	pushd src/xbmc-pvr*
-	make clean >/dev/null 2>&1
+	pushd kodi-pvr/xbmc-pvr*
 	./bootstrap
 	./configure --prefix=/usr --enable-addons-with-dependencies
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
