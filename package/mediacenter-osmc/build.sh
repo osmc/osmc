@@ -136,7 +136,8 @@ then
 	# Raspberry Pi Configuration
 	test "$1" == rbp && \
 	LIBRARY_PATH+=/opt/vc/lib \
-	CXXFLAGS="-I/usr/include/afpfs-ng -I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux -L/opt/vc/lib" \ 
+	CXXFLAGS="-I/usr/include/afpfs-ng -I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" \ 
+	LDFLAGS="-L/opt/vc/lib" \
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
