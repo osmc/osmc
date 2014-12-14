@@ -5,4 +5,4 @@
 
 echo -e "Building OSMC policy to allow NICE adjustment"
 make clean
-dpkg -b files/ osmc-niceprioritypolicy.deb
+dpkg -b files/ niceprioritypolicy-osmc.deb
