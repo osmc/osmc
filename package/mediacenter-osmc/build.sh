@@ -101,6 +101,7 @@ then
 	handle_dep "libmp3lame-dev"
 	handle_dep "libltdl-dev"
 	handle_dep "cmake"
+	handle_dep "libgnutls28-dev"
 	if [ "$1" == "rbp" ]
 	then
 		handle_dep "rbp-libcec-dev-osmc"
