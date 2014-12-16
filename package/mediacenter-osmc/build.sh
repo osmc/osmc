@@ -127,6 +127,7 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
+	export CFLAGS="-O3" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	./configure \
