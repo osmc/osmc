@@ -115,7 +115,6 @@ then
 	sed /'Depends/d' -i files/DEBIAN/control
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
-	export CFLAGS += "-O3"
 	if [ "$1" == rbp ]
 	then
 		 pushd kodi/xbmc-helix*

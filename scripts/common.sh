@@ -176,7 +176,7 @@ DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 
 export DOWNLOAD_URL
 
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
-export BUILD="make -j${cores}"
+export BUILD="export CFLAGS += "-O3" && make -j${cores}"
 
 export -f check_platform
 export -f verify_action
