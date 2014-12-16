@@ -172,11 +172,14 @@ function pull_source()
 	echo -e "No file type match found for URL" && exit 1
 }
 
-DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
-export DOWNLOAD_URL
+if [ ! -z $DOWNLOAD_URL ]
+then
+	DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
+	export DOWNLOAD_URL
+fi
 
 cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
-export BUILD="export CFLAGS += "-O3" && make -j${cores}"
+export BUILD="make -j${cores}"
 
 export -f check_platform
 export -f verify_action
