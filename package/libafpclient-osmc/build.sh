@@ -32,8 +32,8 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	mkdir -p files-dev/usr/include
-	cp src/afpfs-ng/include/* files-dev/usr/include
+	mkdir -p files-dev/usr/include/afpfs-ng/
+	cp src/afpfs-ng/include/* files-dev/usr/include/afpfs-ng
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files/ libafpclient-osmc.deb
