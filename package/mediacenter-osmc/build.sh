@@ -155,7 +155,6 @@ then
 		--enable-dvdcss \
 		--disable-joystick \
 		--disable-debug \
-		--disable-crystalhd \
 		--disable-vtbdecoder \
 		--disable-vaapi \
 		--disable-vdpau \
