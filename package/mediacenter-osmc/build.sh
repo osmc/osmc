@@ -115,11 +115,12 @@ then
 	sed /'Depends/d' -i files/DEBIAN/control
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
+	export CFLAGS += "-O3"
 	if [ "$1" == rbp ]
 	then
 		 pushd kodi/xbmc-helix*
 	else
-		pushd kodi/xbmc-master*
+		 pushd kodi/xbmc-master*
 	fi
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
@@ -127,7 +128,9 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	CXXFLAGS="-I/usr/include/afpfs-ng" ./configure \
+	export CXXFLAGS=$CFLAGS && \
+	export CPPFLAGS=$CFLAGS && \
+	./configure \
 		--prefix=/usr \
 		--disable-vtbdecoder \
 		--disable-vaapi \
@@ -136,9 +139,11 @@ then
 		--disable-projectm
 	# Raspberry Pi Configuration
 	test "$1" == rbp && \
-	LIBRARY_PATH+=/opt/vc/lib \
-	CXXFLAGS="-I/usr/include/afpfs-ng -I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" \ 
-	LDFLAGS="-L/opt/vc/lib" \
+	LIBRARY_PATH+=/opt/vc/lib && \
+	export CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
+	export CXXFLAGS=$CFLAGS && \
+	export CPPFLAGS=$CFLAGS && \
+	export LDFLAGS="-L/opt/vc/lib" && \
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
