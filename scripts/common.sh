@@ -172,7 +172,7 @@ function pull_source()
 	echo -e "No file type match found for URL" && exit 1
 }
 
-if [ ! -z $DOWNLOAD_URL ]
+if [ -z $DOWNLOAD_URL ]
 then
 	DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
 	export DOWNLOAD_URL
