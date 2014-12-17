@@ -28,7 +28,6 @@ then
 	./configure --prefix=/usr
 	$BUILD
 	make install DESTDIR=${out}
-	# We always error
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
