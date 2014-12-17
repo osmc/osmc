@@ -5,4 +5,4 @@
 
 echo -e "Building performancetuner"
 make clean
-dpkg -b files/ osmc-perftune.deb
+dpkg -b files/ perftune-osmc.deb
