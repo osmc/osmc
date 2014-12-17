@@ -176,8 +176,8 @@ then
 	./configure --prefix=/usr --enable-addons-with-dependencies
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 	$BUILD
-	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
+	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
 	rm -rf ${out}/usr/share/xbmc/addons/service.kodi.versioncheck
 	strip ${out}/usr/lib/kodi/kodi.bin
