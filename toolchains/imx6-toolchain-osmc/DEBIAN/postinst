@@ -1,0 +1,3 @@
+#!/bin/bash
+ARM_BINARY="/usr/bin/qemu-arm-static"
+if [ -f "$ARM_BINARY" ]; then echo -e "Copying QEMU binary" && cp $ARM_BINARY /opt/osmc-tc/rbp-toolchain-osmc/usr/bin; fi
