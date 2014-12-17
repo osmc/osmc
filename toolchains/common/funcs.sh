@@ -24,8 +24,6 @@ function patchfs()
 function configure_ccache()
 {
 	chroot ${1} apt-get -y install --no-install-recommends ccache
-	chroot ${1} /usr/bin/ccache -M 20G
-	echo -e "PATH=/usr/lib/ccache:\${PATH}" >> ${1}/root/.bashrc
 }
 
 function cleanup_buildcache()
