@@ -53,17 +53,30 @@ if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target"
 echo -e "Building disk image"
 if [ "$1" == "rbp" ]; then size=256; fi
 date=$(date +%Y%m%d)
-dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
-parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
-parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 1M 256M
-kpartx -a OSMC_TGT_${1}_${date}.img
-mkfs.vfat -F32 /dev/mapper/loop0p1
-mount /dev/mapper/loop0p1 /mnt
+if [ "$1" == "rbp" ] || if [ "$1" == "imx6" ]
+then
+	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
+	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
+	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 1M 256M
+	kpartx -a OSMC_TGT_${1}_${date}.img
+	mkfs.vfat -F32 /dev/mapper/loop0p1
+	mount /dev/mapper/loop0p1 /mnt
+fi
 if [ "$1" == "rbp" ]
 then
 	echo -e "Installing Pi files"
 	mv zImage /mnt
 	mv INSTALLER/* /mnt
+fi
+if [ "$1" == "imx6" ]
+then
+	echo -e "Installing i.MX6 files"
+	mv zImage /mnt
+	mv *.dtb /mnt
+	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init osmcdev=imx6 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
+	echo -e "Flashing bootloader"
+	cp u-boot.img /mnt
+	dd if=SPL of=/dev/loop0 bs=1K seek=1
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
