@@ -5,4 +5,4 @@
 
 echo -e "Building mediacenter-eventclients-common"
 make clean
-dpkg -b files/ osmc-mediacenter-eventclients-common-osmc.deb
+dpkg -b files/ mediacenter-eventclients-common-osmc.deb
