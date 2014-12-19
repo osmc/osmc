@@ -53,7 +53,7 @@ if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target"
 echo -e "Building disk image"
 if [ "$1" == "rbp" ]; then size=256; fi
 date=$(date +%Y%m%d)
-if [ "$1" == "rbp" ] || if [ "$1" == "imx6" ]
+if [ "$1" == "rbp" ] || [ "$1" == "imx6" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
