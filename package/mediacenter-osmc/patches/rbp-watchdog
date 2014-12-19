@@ -11,7 +11,7 @@ while [ "$EXIT" -ne 1 ]
 do
 echo 0 > /sys/class/vtconsole/vtcon1/bind
 setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
-LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs --no-splash
+LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs
 CODE="$?"
 echo 1 > /sys/class/vtconsole/vtcon1/bind
 fbset -depth 8 && fbset -depth 16
