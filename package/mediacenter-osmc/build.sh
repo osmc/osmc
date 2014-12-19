@@ -167,7 +167,7 @@ then
 		--enable-player=omxplayer
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	umount /proc/ > /dev/null 2>&1
-	test "$1" == rbp && sed -e '/-lX11/d' -i Makefile # Ugly hack. But --disable-x11 does not remove LD of -lX11.
+	#test "$1" == rbp && sed -e '/-lX11/d' -i Makefile # Ugly hack. But --disable-x11 does not remove LD of -lX11.
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
