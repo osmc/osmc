@@ -180,6 +180,7 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
 	rm -rf ${out}/usr/share/xbmc/addons/service.kodi.versioncheck
+	rm ${out}/usr/share/kodi/media/Splash.png
 	strip ${out}/usr/lib/kodi/kodi.bin
 	strip ${out}/usr/lib/kodi/addons/*/*.so
 	strip ${out}/usr/lib/kodi/addons/pvr.*/*.pvr
