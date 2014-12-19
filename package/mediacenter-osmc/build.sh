@@ -112,7 +112,7 @@ then
 		handle_dep "rbp-userland-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
-	sed /'Depends/d' -i files/DEBIAN/control
+	sed '/Depends/d' -i files/DEBIAN/control
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
 	if [ "$1" == rbp ]
