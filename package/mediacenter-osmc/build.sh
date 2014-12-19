@@ -167,7 +167,6 @@ then
 		--enable-player=omxplayer
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	umount /proc/ > /dev/null 2>&1
-	test "$1" == rbp && sed -e '/-lX11/d' -i Makefile # Ugly hack. But --disable-x11 does not remove LD of -lX11.
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
@@ -188,7 +187,7 @@ then
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, libsmbclient, libtiff5, libjpeg8, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbisenc2, libcurl3-gnutls, upower"
 	X86_DEPENDS="libcec-osmc, libshairplay-osmc, libnfs-osmc, libafpclient-osmc, librtmp-osmc, splash-osmc"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
-	test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-librtmp-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
+	test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-librtmp-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
 	chmod +x ${out}/lib/systemd/system/mediacenter.service
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	chmod +x ${out}/usr/bin/mediacenter
