@@ -23,7 +23,7 @@ then
 	test $1 == gen && echo "Package: libshairplay-osmc" >> files/DEBIAN/control && echo "Package: libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libshairplay-osmc" >> files-dev/DEBIAN/control
 	test $1 == rbp && echo "Package: rbp-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: rbp-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libshairplay-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*
-	install_patch "../../patches" "all"
+	#install_patch "../../patches" "all"
 	./autogen.sh
 	./configure --prefix=/usr
 	$BUILD
