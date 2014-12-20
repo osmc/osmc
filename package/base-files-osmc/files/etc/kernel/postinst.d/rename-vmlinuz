@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+if [ -f /boot/cmdline.txt ]; then echo "Renaming to kernel.img" && mv /boot/vmlinuz-${1} /boot/kernel.img; fi
