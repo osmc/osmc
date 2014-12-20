@@ -188,7 +188,6 @@ then
 	X86_DEPENDS="libcec-osmc, libshairplay-osmc, libnfs-osmc, libafpclient-osmc, librtmp-osmc, splash-osmc"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-libnfs-osmc, rbp-librtmp-osmc, rbp-libshairplay-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
-	chmod +x ${out}/lib/systemd/system/mediacenter.service
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
