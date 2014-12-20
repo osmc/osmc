@@ -25,6 +25,15 @@
 								<footer class="article-footer">
 									<?php the_tags( '<span class="tags">' . __( 'Tags:', 'bonestheme' ) . '</span> ', ', ', '' ); ?>
 
+									<?php
+										$url = $_SERVER['REQUEST_URI'];
+
+										if (strpos($url,'wiki/'))
+										{
+										    echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
+										}
+
+									?>
 								</footer> <?php // end article footer ?>
 
 								<?php comments_template(); ?>
