@@ -51,7 +51,7 @@ deb http://apt.osmc.tv jessie main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc rbp-kernel-osmc"
+LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
 echo -e "Updating sources"
@@ -63,6 +63,9 @@ verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends rbp-mediacenter-osmc
+verify_action
+chroot ${DIR} apt-get -y install --no-install-recommends rbp-kernel-osmc # This is separate because LOCAL_CHROOT_PKGS do not explicitly depend on this, but if we install it all in one line, the postinst rules of userland will not get to take effect
+verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}
