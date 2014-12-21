@@ -1,2 +1,2 @@
 #!/bin/bash
-dpkg-divert --remove --package diskmount-osmc --rename /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
+dpkg-divert --remove --package diskmount-osmc --rename --divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
