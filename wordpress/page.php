@@ -17,7 +17,7 @@
 									<?php
 										$url = $_SERVER['REQUEST_URI'];
 
-										if (strpos($url,'wiki/'))
+										if (strpos($url,'wiki/') && strcmp($url, 'help/wiki/') !== 0)
 										{
 										    echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
 										}
