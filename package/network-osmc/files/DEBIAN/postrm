@@ -1,2 +1,2 @@
 #!/bin/bash
-dpkg-divert --remove --package network-osmc --rename /lib/systemd/system/connman.service
+dpkg-divert --remove --package network-osmc --rename --divert /lib/systemd/system/connman.service.distributed /lib/systemd/system/connman.service
