@@ -1,2 +1,2 @@
 #!/bin/bash
-dpkg-divert --remove --package ftp-app-osmc --rename /etc/vsftpd.conf
+dpkg-divert --remove --package ftp-app-osmc --rename --divert /etc/vsftpd.conf.distributed /etc/vsftp.conf
