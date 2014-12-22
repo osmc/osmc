@@ -20,6 +20,7 @@ then
 	handle_dep "git" # for dvbscan info?
 	test $1 == gen && echo "Package: tvheadend-app-osmc" >> files/DEBIAN/control
 	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control
+	test $1 == armv7 && echo "Package: armv7-tvheadend-app-osmc" >> files/DEBIAN/control
 	pushd src
 	git checkout v3.9
 	./configure --prefix=/usr
