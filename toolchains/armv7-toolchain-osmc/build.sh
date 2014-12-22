@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-tcstub="imx6-toolchain-osmc"
+tcstub="armv7-toolchain-osmc"
 
 make clean
 
