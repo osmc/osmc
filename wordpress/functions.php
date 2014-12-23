@@ -144,8 +144,6 @@ function bones_register_sidebars() {
 // SCRIPTS //
 
 function custom_scripts() {
-wp_register_script( 'fastclick', get_template_directory_uri() . '/library/js/fastclick.min.js' , array( 'jquery' ) );
-wp_enqueue_script( 'fastclick' );
 wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css', array(), '4.0.3' );
 }
 add_action( 'wp_enqueue_scripts', 'custom_scripts' );
