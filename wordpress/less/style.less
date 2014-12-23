@@ -444,13 +444,41 @@ nav {
 // COMMENTS //
 
 .comments-area {
-  padding: 1em 0 1.5em;
+  font-size: 90%;
+  width: 90%;
   
-  .comment-reply-title {
+  .comments-title {
     font-weight: 400;
-    margin: 0;
-    display: inline;
-    border-bottom: 2px solid @link;
+  }
+  ol, ul {
+    padding: 0 0em;
+    list-style: none;
+  }
+  
+  .comment-body {
+    background-color: @lgrey;
+    padding: 1em;
+    margin: 0 0 1em;
+    
+    .comment-meta {
+      img {
+        display: none;
+      }
+      .fn {
+        font-size: 110%;
+      }
+      .says {
+        display: none;
+      }
+      .comment-metadata {
+        font-size: 90%;
+      }
+    }
+    .comment-content {
+      p {
+        line-height: 1.2em;
+      }
+    }
   }
 }
 

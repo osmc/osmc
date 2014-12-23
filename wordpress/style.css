@@ -1540,13 +1540,36 @@ nav li:last-child {
   bottom: 1.5em;
 }
 .comments-area {
-  padding: 1em 0 1.5em;
+  font-size: 90%;
+  width: 90%;
 }
-.comments-area .comment-reply-title {
+.comments-area .comments-title {
   font-weight: 400;
-  margin: 0;
-  display: inline;
-  border-bottom: 2px solid #51bc9b;
+}
+.comments-area ol,
+.comments-area ul {
+  padding: 0 0em;
+  list-style: none;
+}
+.comments-area .comment-body {
+  background-color: #d3d3d3;
+  padding: 1em;
+  margin: 0 0 1em;
+}
+.comments-area .comment-body .comment-meta img {
+  display: none;
+}
+.comments-area .comment-body .comment-meta .fn {
+  font-size: 110%;
+}
+.comments-area .comment-body .comment-meta .says {
+  display: none;
+}
+.comments-area .comment-body .comment-meta .comment-metadata {
+  font-size: 90%;
+}
+.comments-area .comment-body .comment-content p {
+  line-height: 1.2em;
 }
 .animated {
   -webkit-animation-fill-mode: both;
