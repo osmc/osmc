@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
-    this->setFixedSize(this->size());
+    this->setFixedSize(QApplication::desktop()->size());
     /* Set up logging */
     logger = new Logger();
     logger->addLine("Starting OSMC installer");
