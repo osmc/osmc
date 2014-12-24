@@ -1,1 +1,1 @@
-PATH="$PATH:/sbin"
+PATH="$PATH:/sbin:/usr/sbin"
