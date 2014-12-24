@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# (c) 2014 Sam Nazarko
+# email@samnazarko.co.uk
+
+if grep -q nfsroot /proc/cmdline
+then
+	nameservers=$(dmesg | grep nameserver | awk {'print $3'} | cut -d '=' -f 2)
+	>/etc/resolv.conf
+	for ns in $nameservers
+	do
+		echo "nameserver ${ns}" > /etc/resolv.conf
+	done
+	/usr/sbin/connmand -n -I eth0 --nodnsproxy
+else
+	/usr/sbin/connmand -n
+fi
+
