@@ -21,7 +21,7 @@ verify_action
 ARCH="armhf"
 DIR="$filestub/"
 RLS="jessie"
-URL="http://archive.raspbian.org/raspbian"
+URL="http://mirrordirector.raspbian.org//raspbian"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
@@ -44,7 +44,7 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://archive.raspbian.org/raspbian jessie main contrib non-free
+echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-free
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
@@ -53,6 +53,7 @@ disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
 LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
+add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
