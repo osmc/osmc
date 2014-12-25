@@ -38,7 +38,6 @@ def main():
 	filename = "/boot/preseed.cfg"
 	with open("/proc/cmdline") as cmdfile:
 		cmdline = cmdfile.read()
-if "nfs" not in line:
 	if os.path.isfile(filename):
 		syslog.syslog("Preseed parser initialised")
 		file = open(filename, 'r')
@@ -146,6 +145,5 @@ if "nfs" not in line:
 							syslog.syslog("Could not find SSID" + network["ssid"])
 	else:
 		syslog.syslog("No preseed file found")
-	return 0
 
 main()
