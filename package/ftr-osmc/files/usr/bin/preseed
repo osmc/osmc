@@ -25,7 +25,7 @@
 import syslog
 import os.path
 import dbus
-import subprocess
+import os
 import time
 
 def getvalue(valuestring):
@@ -126,13 +126,19 @@ def main():
 						if network["keytype"] == "0":
 							syslog.syslog("Open network does not need an agent. Attempting connection")
 							try:
+								syslog.syslog("Attempting connection now")
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
 						else:
 							syslog.syslog("Encrypted network: need to set up an agent")
-							subprocess.call(["/usr/bin/python", "/usr/bin/net-agent", "Passphrase=", network["keyvalue"]])
+							keyfile = open("/tmp/key", "wb")
+							keyfile.write(network["keyvalue"])
+							keyfile.close
+							os.system("/usr/bin/python /usr/bin/preseed-agent keyfile &")
+							time.sleep(5)
 							try:
+								syslog.syslog("Attempting connection now")
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect to network. Please check the key is correct")
