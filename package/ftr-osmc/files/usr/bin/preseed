@@ -132,10 +132,10 @@ def main():
 								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
 						else:
 							syslog.syslog("Encrypted network: need to set up an agent")
-							keyfile = open("/tmp/key", "wb")
+							keyfile = open("/tmp/key", "w")
 							keyfile.write(network["keyvalue"])
-							keyfile.close
-							os.system("/usr/bin/python /usr/bin/preseed-agent keyfile &")
+							keyfile.close()
+							os.system("/bin/sh -c \"/usr/bin/python /usr/bin/preseed-agent keyfile &\"")
 							time.sleep(5)
 							try:
 								syslog.syslog("Attempting connection now")
