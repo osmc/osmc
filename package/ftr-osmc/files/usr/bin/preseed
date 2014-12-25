@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
@@ -25,7 +26,8 @@
 import syslog
 import os.path
 import dbus
-import os
+import subprocess
+import time
 
 def getvalue(valuestring):
 	splitvalue = valuestring.split(' ')
@@ -108,10 +110,11 @@ def main():
 				technology = dbus.Interface(bus.get_object("net.connman", "/net/connman/technology/wifi"), "net.connman.Technology")
 				try:
 					technology.SetProperty("Powered", True)
-				except dbus.DbusException, error:
+				except dbus.DBusException, error:
 					syslog.syslog("Wireless connectivity is already enabled. If you are running this script again, you probably shouldn't be unless you know what you are doing")
 				syslog.syslog("Scanning for WiFi networks")
 				technology.Scan()
+				time.sleep(5)
 				syslog.syslog("Mapping SSID to service")
 				services = manager.GetServices()
 				for entry in services:
@@ -129,7 +132,11 @@ def main():
 								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
 						else:
 							syslog.syslog("Encrypted network: need to set up an agent")
-							os.system("/usr/bin/python /usr/bin/net-agent Passphrase=\"" + network["wlan_key"] + "\"&")
+							subprocess.call(["/usr/bin/python", "/usr/bin/net-agent", "Passphrase=", network["keyvalue"]])
+							try:
+								service.Connect(timeout=15000)
+							except dbus.DBusException, error:
+								syslog.syslog("Could not connect to network. Please check the key is correct")
 						if network["auto"] == "false":
 							syslog.syslog("Configuring static wireless connection")
 							properties = service.GetProperties()
@@ -141,8 +148,6 @@ def main():
 							ipv4_configuration["Netmask"] = make_variant(network["mask"])
 							ipv4_configuration["Gateway"] = make_variant(network["gw"])
 							service.SetProperty("IPv4.Configuration", ipv4_configuration)
-					else:
-							syslog.syslog("Could not find SSID" + network["ssid"])
 	else:
 		syslog.syslog("No preseed file found")
 
