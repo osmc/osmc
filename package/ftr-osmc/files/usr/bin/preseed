@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#  /usr/bin/preseed
+#
+#  Copyright 2014 Sam Nazarko <email@samnazarko.co.uk>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+import syslog
+import os.path
+import dbus
+import os
+
+def getvalue(valuestring):
+	splitvalue = valuestring.split(' ')
+	return splitvalue[3].replace("\n", "")
+
+def make_variant(string):
+	return dbus.String(string, variant_level=1)
+
+def main():
+	filename = "/boot/preseed.cfg"
+	with open("/proc/cmdline") as cmdfile:
+		cmdline = cmdfile.read()
+if "nfs" not in line:
+	if os.path.isfile(filename):
+		syslog.syslog("Preseed parser initialised")
+		file = open(filename, 'r')
+		network = {}
+		network["interface"] = "eth"
+		network["auto"] = "true"
+		bus = dbus.SystemBus()
+		manager = dbus.Interface(bus.get_object('net.connman', '/'), 'net.connman.Manager')
+		for line in file:
+			if line.startswith("d-i network/interface string"):
+				syslog.syslog("Detected interface definition of " + getvalue(line))
+				network["interface"] = getvalue(line)
+			if line.startswith("d-i network/auto boolean"):
+				syslog.syslog("DHCP is set to " + getvalue(line))
+				network["auto"] = getvalue(line)
+			if line.startswith("d-i network/ip string"):
+				syslog.syslog("IP address is set to " + getvalue(line))
+				network["ip"] = getvalue(line)
+			if line.startswith("d-i network/mask string"):
+				syslog.syslog("Subnet mask is set to " + getvalue(line))
+				network["mask"] = getvalue(line)
+			if line.startswith("d-i network/dns1 string"):
+				syslog.syslog("DNS1 is set to " + getvalue(line))
+				network["dns1"] = getvalue(line)
+			if line.startswith("d-i network/dns2 string"):
+				syslog.syslog("DNS2 is set to " + getvalue(line))
+				network["dns2"] = getvalue(line)
+			if line.startswith("d-i network/gw string"):
+				syslog.syslog("Gateway is set to " + getvalue(line))
+				network["gw"] = getvalue(line)
+			if line.startswith("d-i network/ssid string"):
+				syslog.syslog("SSID is set to " + getvalue(line))
+				network["ssid"] = getvalue(line)
+			if line.startswith("d-i network/wlan_keytype string"):
+				syslog.syslog("WLAN key type is set to " + getvalue(line))
+				network["keytype"] = getvalue(line)
+			if line.startswith("d-i network/wlan_key string"):
+				syslog.syslog("WLAN key is set to " + getvalue(line))
+				network["keyvalue"] = getvalue(line)
+		syslog.syslog("Parsing completed. Performing setup")
+		if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
+			syslog.syslog("Non-standard network setup specified")
+			if network["interface"] == "eth":
+				syslog.syslog("Configuring static Ethernet connection")
+				services = manager.GetServices()
+				for entry in services:
+					path = entry[0]
+					properties = entry[1]
+					svcname = properties["Name"]
+				if svcname == "Wired":
+					syslog.syslog("Ethernet device identified has entry point " + path)
+					syslog.syslog("Setting nameservers")
+					service = dbus.Interface(bus.get_object('net.connman', path), 'net.connman.Service')
+					properties = service.GetProperties()
+					dns = { network["dns1"], network["dns2"] }
+					service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+					syslog.syslog("Setting ip, mask and gateway")
+					ipv4_configuration = { "Method": make_variant("manual") }
+					ipv4_configuration["Address"] = make_variant(network["ip"])
+					ipv4_configuration["Netmask"] = make_variant(network["mask"])
+					ipv4_configuration["Gateway"] = make_variant(network["gw"])
+					service.SetProperty("IPv4.Configuration", ipv4_configuration)
+				else:
+					syslog.syslog("Cannot find a wired network adapter")
+			if network["interface"] == "wlan":
+				syslog.syslog("Configuring Wireless connection")
+				syslog.syslog("Enabling wireless connection")
+				technology = dbus.Interface(bus.get_object("net.connman", "/net/connman/technology/wifi"), "net.connman.Technology")
+				try:
+					technology.SetProperty("Powered", True)
+				except dbus.DbusException, error:
+					syslog.syslog("Wireless connectivity is already enabled. If you are running this script again, you probably shouldn't be unless you know what you are doing")
+				syslog.syslog("Scanning for WiFi networks")
+				technology.Scan()
+				syslog.syslog("Mapping SSID to service")
+				services = manager.GetServices()
+				for entry in services:
+					path = entry[0]
+					properties = entry[1]
+					svcname = properties["Name"]
+					if network["ssid"] == svcname:
+						syslog.syslog("Found SSID entry point of " + path)
+						service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
+						if network["keytype"] == "0":
+							syslog.syslog("Open network does not need an agent. Attempting connection")
+							try:
+								service.Connect(timeout=15000)
+							except dbus.DBusException, error:
+								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
+						else:
+							syslog.syslog("Encrypted network: need to set up an agent")
+							os.system("/usr/bin/python /usr/bin/net-agent Passphrase=\"" + network["wlan_key"] + "\"&")
+						if network["auto"] == "false":
+							syslog.syslog("Configuring static wireless connection")
+							properties = service.GetProperties()
+							dns = { network["dns1"], network["dns2"] }
+							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+							syslog.syslog("Setting ip, mask and gateway")
+							ipv4_configuration = { "Method": make_variant("manual") }
+							ipv4_configuration["Address"] = make_variant(network["ip"])
+							ipv4_configuration["Netmask"] = make_variant(network["mask"])
+							ipv4_configuration["Gateway"] = make_variant(network["gw"])
+							service.SetProperty("IPv4.Configuration", ipv4_configuration)
+					else:
+							syslog.syslog("Could not find SSID" + network["ssid"])
+	else:
+		syslog.syslog("No preseed file found")
+	return 0
+
+main()

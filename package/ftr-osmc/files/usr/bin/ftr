@@ -9,4 +9,5 @@ ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa > /dev/null 2>&1
 ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa > /dev/null 2>&1
 dbus-uuidgen > /var/lib/dbus/machine-id
 depmod >/dev/null 2>&1
+python /usr/bin/preseed >/dev/null 2>&1
 touch /.setup
