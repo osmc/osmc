@@ -21,6 +21,8 @@ html, body, button, input, select, textarea, .pure-g-r [class*="pure-u"] {
 @maincolor: @dark;
 @white: #F0F0F0;
 @lgrey: #D3D3D3;
+@lgrey2: #c9c9c9;
+@quote: #96e8cf;
 @link: #51bc9b;
 @back: @white;
 @dark: #17394A;
@@ -478,7 +480,28 @@ nav {
       p {
         line-height: 1.2em;
       }
+      
+      .quote {
+        background-color: @lgrey2;
+        border-left: 4px solid @link;
+        padding: 1em 1em 0.5em 0.5em;
+        margin-top: 0.5em;
+        font-size: 95%;
+        max-width: 90%;
+        .avatar {
+          display: none;
+        }
+        .title {
+          font-weight: 600;
+        }
+        blockquote {
+          margin: 0;
+        }
+      }
     }
+  }
+  .comment-reply-title {
+    font-weight: 400;
   }
 }
 
