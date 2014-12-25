@@ -14,7 +14,9 @@ BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *util
 
 void BootloaderConfig::copyBootFiles()
 {
+    system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
+    system("mv /tmp/preseed.cfg /mnt/boot/preseed.cfg");
     system("mv /mnt/root/boot/* /mnt/boot");
 }
 
