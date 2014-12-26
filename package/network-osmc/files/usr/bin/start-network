@@ -11,8 +11,8 @@ then
 	do
 		echo "nameserver ${ns}" > /etc/resolv.conf
 	done
-	/usr/sbin/connmand -n -I eth0 --nodnsproxy
+	/usr/sbin/connmand -n -I eth0 --nodnsproxy --config=/etc/connman.conf
 else
-	/usr/sbin/connmand -n
+	/usr/sbin/connmand -n --config=/etc/connman.conf
 fi
 
