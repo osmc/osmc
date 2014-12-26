@@ -112,6 +112,7 @@ def main():
 				except dbus.DBusException, error:
 					syslog.syslog("Wireless connectivity is already enabled. If you are running this script again, you probably shouldn't be unless you know what you are doing")
 				syslog.syslog("Scanning for WiFi networks")
+                                time.sleep(5)
 				technology.Scan()
 				time.sleep(5)
 				syslog.syslog("Mapping SSID to service")
