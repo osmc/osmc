@@ -5,19 +5,40 @@
 
 #TODo: Add check with 'read' to make sure we can exit
 
-EXIT=0
+fb_restore() {
+	[ -e /tmp/fb_resolution ] && /bin/fbset $(cat /tmp/fb_resolution)
+	/bin/fbset -depth 8 && /bin/fbset -depth 16
+	echo 1 | sudo tee /sys/class/vtconsole/vtcon1/bind >/dev/null
+}
 
-while [ "$EXIT" -ne 1 ]
-do
-echo 0 > /sys/class/vtconsole/vtcon1/bind
-setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
-LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs
-CODE="$?"
-echo 1 > /sys/class/vtconsole/vtcon1/bind
-fbset -depth 8 && fbset -depth 16
-if [ "$CODE" -eq 0 ]; then /usr/bin/ply-image /usr/splash.png; fi # User exit
-if [ "$CODE" -eq 64 ]; then /usr/bin/ply-image /usr/splash.png; fi # Shut down
-if [ "$CODE" -eq 65 ]; then sleep 1; fi # Warm reboot
-if [ "$CODE" -eq 66 ]; then /usr/bin/ply-image /usr/splash.png; fi # Reboot
-if [ "$CODE" -eq 1 ]; then /usr/bin/ply-image /usr/splash_sad.png; fi # Crash
+if [ "$1" == "stop" ]; then
+	fb_restore
+	exit
+fi
+
+if [ ! -e /tmp/fb_resolution ]; then
+	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' | sudo tee /tmp/fb_resolution >/dev/null
+fi
+
+EXIT=0
+while [ "$EXIT" -ne 1 ]; do
+
+	sudo setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
+	LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs
+	CODE="$?"
+	fb_restore
+
+	case $CODE in
+	0)	/usr/bin/ply-image /usr/splash.png # User exit
+		;;
+	64)	/usr/bin/ply-image /usr/splash.png # Shut down
+		;;
+	65)	sleep 1 # Warm reboot
+		;;
+	66)	/usr/bin/ply-image /usr/splash.png # Reboot
+		;;
+	1)	/usr/bin/ply-image /usr/splash_sad.png # Crash
+		;;
+	esac
+
 done
