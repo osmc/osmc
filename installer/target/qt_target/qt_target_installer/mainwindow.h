@@ -5,17 +5,22 @@
 #include "utils.h"
 #include <QString>
 #include <QProcess>
+#include <QLabel>
+#include <QProgressBar>
+#include <QVBoxLayout>
+#include <QSize>
 #include "targetlist.h"
 #include "target.h"
 #include "preseedparser.h"
 #include "network.h"
 #include "bootloaderconfig.h"
+#include <QFont>
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -33,8 +38,23 @@ public slots:
 
 private:
     void extract();
+    void setupSizeAndBackground();
+    QFont getFont(QString refString, QWidget* element, int refPointSize);
+    void setupStatusLabel();
+    void setupProgressBar();
+    void setupCopyrightLabel();
 
-    Ui::MainWindow *ui;
+    /* Ui */
+    int appWidth;
+    int appHeight;
+    QSize size;
+    QVBoxLayout* layout;
+    QLabel* placeholder;
+    QLabel* statusLabel;
+    QLabel* copyrightLabel;
+    QProgressBar* progressBar;
+
+    /* internal */
     Logger *logger;
     TargetList *targetList;
     Target *device;

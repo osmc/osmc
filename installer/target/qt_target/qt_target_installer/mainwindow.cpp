@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "utils.h"
 #include "logger.h"
 #include <QFontDatabase>
@@ -16,18 +15,18 @@
 #include <QTranslator>
 #include <QThread>
 #include "extractworker.h"
+#include <QStyle>
+#include <QFontInfo>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow), device(NULL), preseed(NULL)
+    QWidget(parent), device(NULL), preseed(NULL)
 
 {
-    ui->setupUi(this);
-    /* this->setFixedSize(QApplication::desktop()->size()); */
-    this->setFixedSize(this->size());
     /* Set up logging */
     logger = new Logger();
     logger->addLine("Starting OSMC installer");
+
     /* UI set up */
     #ifdef Q_WS_QWS
     QWSServer *server = QWSServer::instance();
@@ -38,19 +37,102 @@ MainWindow::MainWindow(QWidget *parent) :
         this->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint);
     }
     #endif
-    this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
-    QFontDatabase fontDatabase;
-    fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
-    QGraphicsOpacityEffect *ope = new QGraphicsOpacityEffect(this);
-    ope->setOpacity(0.5);
-    ui->statusLabel->setGraphicsEffect(ope);
-    ui->copyrightLabel->setGraphicsEffect(ope);
-    ui->statusProgressBar->setGraphicsEffect(ope);
+
+    setupSizeAndBackground();
+
+    layout = new QVBoxLayout(this);
+    layout->addSpacerItem(new QSpacerItem(appWidth, (int) (appHeight*0.7)));
+
+    setupStatusLabel();
+    setupProgressBar();
+    setupCopyrightLabel();
+
+    layout->addSpacerItem(new QSpacerItem(appWidth, (int) (appHeight*0.1)));
+    setLayout(layout);
     /* Populate target list map */
     targetList = new TargetList();
     utils = new Utils(logger);
 }
 
+void MainWindow::setupStatusLabel()
+{
+    statusLabel = new QLabel("Just a moment");
+    statusLabel->setStyleSheet("border-top-right-radius: 20px; border-top-left-radius: 20px; background-color: rgba(0,0,0,70); color:rgb(240, 240, 240);");
+    statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setMaximumWidth(appWidth*0.93);
+    statusLabel->setMinimumWidth(appWidth*0.93);
+    statusLabel->setMaximumHeight(appHeight*0.13);
+    statusLabel->setMinimumHeight(appWidth*0.13);
+    layout->addWidget(statusLabel, Qt::AlignCenter);
+    statusLabel->setFont(getFont("Status Label", statusLabel, 23));
+}
+
+void MainWindow::setupProgressBar()
+{
+    progressBar = new QProgressBar();
+    progressBar->setStyleSheet("border-radius: 0px; background-color: rgba(0,0,0,70); color:rgb(240, 240, 240);");
+    progressBar->setAlignment(Qt::AlignCenter);
+    progressBar->setMaximumWidth(appWidth*0.93);
+    progressBar->setMinimumWidth(appWidth*0.93);
+    progressBar->setMaximumHeight(appHeight*0.10);
+    progressBar->setMinimumHeight(appWidth*0.10);
+    layout->addWidget(progressBar, Qt::AlignCenter);
+    progressBar->setFont(getFont("42", progressBar, 15));
+}
+
+void MainWindow::setupCopyrightLabel()
+{
+    copyrightLabel = new QLabel("(c) 2014 OSMC");
+    copyrightLabel->setStyleSheet("border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; background-color: rgba(0,0,0,70); color:rgb(240, 240, 240);");
+    copyrightLabel->setAlignment(Qt::AlignCenter);
+    copyrightLabel->setMaximumWidth(appWidth*0.93);
+    copyrightLabel->setMinimumWidth(appWidth*0.93);
+    copyrightLabel->setMaximumHeight(appHeight*0.04);
+    copyrightLabel->setMinimumHeight(appWidth*0.04);
+    layout->addWidget(copyrightLabel, Qt::AlignCenter);
+    copyrightLabel->setFont(getFont("(c) 2014 OSMC", copyrightLabel, 10));
+}
+
+void MainWindow::setupSizeAndBackground()
+{
+    size = QApplication::desktop()->size();
+    appWidth = size.width();
+    appHeight = size.height();
+
+    setFixedSize(appWidth, appHeight);
+
+    QPalette palette;
+    QImage image(":/assets/resources/install.png");
+    image = image.scaled(QSize(appWidth, appHeight));
+    palette.setBrush(this->backgroundRole(), QBrush(image));
+
+    this->setPalette(palette);
+    //setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, qApp->desktop()->availableGeometry()));
+}
+
+/*
+ * stolen from http://www.qtforum.org/article/32092/dynamic-font-size-in-qlabel-based-on-text-length.html
+ */
+QFont MainWindow::getFont(QString refString, QWidget* element, int refPointSize) {
+    bool fits = false;
+    QFont* font = new QFont("Source Sans Pro", refPointSize);
+    element->repaint();
+    int refWidth = element->width();
+    int refHeight = element->height();
+    while (!fits)
+        {
+            QFontMetrics fm( *font );
+            QRect bound = fm.boundingRect(refString);
+            if (bound.width() <= refWidth && bound.height() <= refHeight)
+                fits = true;
+            else
+                font->setPointSize(font->pointSize() - 1);
+        }
+
+    QFontInfo fi(*font);
+    qDebug() << "determined font for " << refString << fi.family() << fi.pointSize();
+    return *font;
+}
 
 void MainWindow::install()
 {
@@ -91,8 +173,7 @@ void MainWindow::install()
             if (translator.load(qApp->applicationDirPath() + "/osmc_" + locale + ".qm"))
             {
                 logger->addLine("Translation loaded successfully!");
-                qApp->installTranslator(&translator);
-                ui->retranslateUi(this);
+                qApp->installTranslator(&translator);                
             }
             else
                 logger->addLine("Could not load translation");
@@ -115,7 +196,7 @@ void MainWindow::install()
             {
                 /* Behaviour for handling USB installs */
                 if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
-                ui->statusLabel->setText(tr("USB install: 60 seconds to remove device before data loss"));
+                statusLabel->setText(tr("USB install: 60 seconds to remove device before data loss"));
                 qApp->processEvents();
                 system("/bin/sleep 60");
             }
@@ -135,7 +216,7 @@ void MainWindow::install()
                 logger->addLine("Either network preseed definition incomplete, or user wants DHCP");
                 nw->setAuto();
                 logger->addLine("Attempting to bring up eth0");
-                ui->statusLabel->setText(tr("Configuring Network"));
+                statusLabel->setText(tr("Configuring Network"));
                 nw->bringUp();
             }
         }
@@ -145,11 +226,11 @@ void MainWindow::install()
         logger->addLine("No preseed file was found");
     }
     /* If !nfs, create necessary partitions */
-    ui->statusLabel->setText(tr("Partitioning device"));
+    statusLabel->setText(tr("Partitioning device"));
     if (! useNFS)
     {
         logger->addLine("Creating root partition");
-        ui->statusLabel->setText(tr("Formatting device"));
+        statusLabel->setText(tr("Formatting device"));
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -190,10 +271,10 @@ void MainWindow::install()
         return;
     }
    /* Extract root filesystem */
-   ui->statusLabel->setText(tr("Installing files"));
+   statusLabel->setText(tr("Installing files"));
    logger->addLine("Extracting files to root filesystem");
-   ui->statusProgressBar->setMinimum(0);
-   ui->statusProgressBar->setMaximum(100);
+   progressBar->setMinimum(0);
+   progressBar->setMaximum(100);
    QThread* thread = new QThread(this);
    ExtractWorker *worker = new ExtractWorker(fileSystem.fileName(), MNT_ROOT, logger);
    worker->moveToThread(thread);
@@ -210,24 +291,24 @@ void MainWindow::install()
 void MainWindow::setupBootLoader()
 {
     /* Set up the boot loader */
-    ui->statusProgressBar->setMinimum(0);
-    ui->statusProgressBar->setMaximum(4);
-    ui->statusLabel->setText(tr("Configuring bootloader"));
+    progressBar->setMinimum(0);
+    progressBar->setMaximum(4);
+    statusLabel->setText(tr("Configuring bootloader"));
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
-    ui->statusProgressBar->setValue(1);
+    progressBar->setValue(1);
     logger->addLine("Configuring boot cmdline");
     bc->configureEnvironment();
-    ui->statusProgressBar->setValue(2);
+    progressBar->setValue(2);
     logger->addLine("Configuring /etc/fstab");
     bc->configureMounts();
-    ui->statusProgressBar->setValue(3);
+    progressBar->setValue(3);
     /* Dump the log */
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
-    ui->statusProgressBar->setValue(4);
+    progressBar->setValue(4);
     /* Reboot */
-    ui->statusLabel->setText(tr("Installation successful! Rebooting..."));
+    statusLabel->setText(tr("Installation successful! Rebooting..."));
     qApp->processEvents(); /* Force GUI update */
     utils->rebootSystem();
 }
@@ -235,9 +316,9 @@ void MainWindow::setupBootLoader()
 void MainWindow::haltInstall(QString errorMsg)
 {
     logger->addLine("Halting Install. Error message was: " + errorMsg);
-    ui->statusProgressBar->setMaximum(100);
-    ui->statusProgressBar->setValue(0);
-    ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
+    progressBar->setMaximum(100);
+    progressBar->setValue(0);
+    statusLabel->setText(tr("Install failed: ") + errorMsg);
     dumpLog();
 }
 
@@ -256,12 +337,11 @@ void MainWindow::finished()
 
 void MainWindow::setProgress(unsigned value)
 {
-    ui->statusProgressBar->setValue(value);
+    progressBar->setValue(value);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     delete nw;
     delete bc;
     delete device;
