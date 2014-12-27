@@ -14,15 +14,6 @@
 
 									<h1 class="page-title" itemprop="headline"><?php the_title(); ?></h1>
 									<p class="byline vcard"></p>
-									<?php
-										$url = $_SERVER['REQUEST_URI'];
-
-										if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
-										{
-										    echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
-										}
-
-									?>
 
 								</header> <?php // end article header ?>
 
@@ -40,8 +31,16 @@
 							</article>
 							<?php // end article ?>
 
-							<?php endwhile; else : ?>
+							<?php endwhile; else if (! strpos($url,'wiki/') : ?>
+							<?php
+										$url = $_SERVER['REQUEST_URI'];
 
+										if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
+										{
+										    echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
+										}
+
+							?>
 									<article id="post-not-found" class="hentry clearfix">
 										<header class="article-header">
 											<h1><?php _e( 'Oops, Post Not Found!', 'bonestheme' ); ?></h1>
