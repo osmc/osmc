@@ -1,3 +1,18 @@
+<?php
+function parseWiki($url)
+{
+	$ch = curl_init();
+	$BASE_URL = "https://raw.githubusercontent.com/samnazarko/osmc-wiki/master/";
+	curl_setopt($ch, CURLOPT_URL, $BASE_URL . $url);
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , 10);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	$output = curl_exec($ch);
+	curl_close($ch);
+    echo $output;
+}
+?>
 <?php get_header(); ?>
 
 			<div id="content">
@@ -45,6 +60,39 @@
 									</article>
 
 							<?php endif; ?>
+							<?php>
+							$url = $_SERVER['REQUEST_URI'];
+							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
+							{
+								echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
+							}
+							if (strpos($url,'wiki/'))
+							{
+								echo '</br>';
+								if (strcmp($url, '/help/wiki/') == 0)
+								{
+									echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/main" target="_blank">Edit this page</a>';
+							    }
+								else
+								{
+								$string = "http://osmc.tv/help/wiki/";
+								$page = str_replace($string, "", $url);
+									echo '<a href="https://github.com/samnazarko/osmc-wiki/blog/master/pages/' . $page . '" target="_blank">Edit this page</a>';
+								}
+							}
+							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') == 0)
+							{
+								echo '</br>';
+								parseWiki("main");
+							}
+							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
+							{
+								echo '</br>';
+								$string = "http://osmc.tv/help/wiki/";
+								$page = str_replace($string, "", $url);
+								parseWiki($page);
+							}
+							?>
 						</div>
 						</div> <?php // end #main ?>
 						<?php get_sidebar(); ?>
