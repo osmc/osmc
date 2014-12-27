@@ -36,7 +36,7 @@ HEADERS  += mainwindow.h \
     network.h \
     bootloaderconfig.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 TRANSLATIONS = osmc.ts \
     osmc_da.ts \
