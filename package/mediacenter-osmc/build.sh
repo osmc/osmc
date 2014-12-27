@@ -123,7 +123,7 @@ then
 	fi
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
-	test "$1" == rbp && install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr"
+	test "$1" == rbp && install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr" && install_patch "../../patches/" "egl"
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
