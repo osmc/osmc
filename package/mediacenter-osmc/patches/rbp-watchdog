@@ -17,9 +17,5 @@ LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs
 CODE="$?"
 echo 1 > /sys/class/vtconsole/vtcon1/bind
 fbset -depth 8 && fbset -depth 16
-if [ "$CODE" -eq 0 ]; then /usr/bin/ply-image /usr/splash.png; fi # User exit
-if [ "$CODE" -eq 64 ]; then /usr/bin/ply-image /usr/splash.png; fi # Shut down
-if [ "$CODE" -eq 65 ]; then sleep 1; fi # Warm reboot
-if [ "$CODE" -eq 66 ]; then /usr/bin/ply-image /usr/splash.png; fi # Reboot
-if [ "$CODE" -eq 1 ]; then /usr/bin/ply-image /usr/splash_sad.png; fi # Crash
+/usr/bin/ply-image "$CODE"
 done
