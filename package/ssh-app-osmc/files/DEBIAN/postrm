@@ -1,4 +1,4 @@
 #!/bin/bash
 if [ "$1" == "remove" ]; then
-	dpkg-divert --remove --package ssh-app-osmc --rename --distributed /etc/ssh/sshd_config.distributed /etc/ssh/sshd_config
+	dpkg-divert --remove --package ssh-app-osmc --rename /etc/ssh/sshd_config.distributed /etc/ssh/sshd_config
 fi
