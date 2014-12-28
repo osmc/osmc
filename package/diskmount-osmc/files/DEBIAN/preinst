@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "preinst 1.0.11"
 if [ "$1" == "install" ]; then
 	dpkg-divert --add --package diskmount-osmc --rename --divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
 fi

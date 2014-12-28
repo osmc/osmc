@@ -1,2 +1,4 @@
 #!/bin/bash
-dpkg-divert --add --package network-osmc --rename --divert /lib/systemd/system/connman.service.distributed /lib/systemd/system/connman.service
+if [ "$1" == "install" ]; then
+	dpkg-divert --add --package network-osmc --rename --divert /lib/systemd/system/connman.service.distributed /lib/systemd/system/connman.service
+fi
