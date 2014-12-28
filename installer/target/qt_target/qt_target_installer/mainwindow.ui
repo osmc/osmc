@@ -27,7 +27,7 @@
     <string notr="true">border-image: url(:/assets/resources/install.png);
 </string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1,1,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="60,19,10,5,3">
     <item>
      <spacer name="verticalSpacer">
       <property name="orientation">
@@ -55,7 +55,9 @@
       <property name="styleSheet">
        <string notr="true">border-image: foo;
 color:rgb(240, 240, 240);
-background: rgba(0,0,0,50);</string>
+background: rgba(0,0,0,50);
+border-top-left-radius: 40px;
+border-top-right-radius: 40px;</string>
       </property>
       <property name="text">
        <string>just a moment</string>
@@ -67,6 +69,12 @@ background: rgba(0,0,0,50);</string>
     </item>
     <item>
      <widget class="QProgressBar" name="statusProgressBar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="styleSheet">
        <string notr="true">border-image: foo;
 color:rgb(240, 240, 240);
@@ -95,7 +103,9 @@ text-align: center;</string>
       <property name="styleSheet">
        <string notr="true">border-image: foo;
 color:rgb(240, 240, 240);
-background: rgba(0,0,0,50);</string>
+background: rgba(0,0,0,50);
+border-bottom-left-radius: 20px;
+border-bottom-right-radius: 20px;</string>
       </property>
       <property name="text">
        <string>(c) 2014 OSMC</string>
