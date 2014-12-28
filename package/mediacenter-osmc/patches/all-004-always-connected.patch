@@ -1,16 +1,13 @@
-diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index a9acb44..5358ba9 100644
---- a/xbmc/utils/SystemInfo.cpp
-+++ b/xbmc/utils/SystemInfo.cpp
-@@ -1016,9 +1016,7 @@ int CSysInfo::GetXbmcBitness(void)
- 
- bool CSysInfo::HasInternet()
+diff --git a/xbmc/filesystem/CurlFile.cpp b/xbmc/filesystem/CurlFile.cpp
+index 7a83564..811eb70 100644
+--- a/xbmc/filesystem/CurlFile.cpp
++++ b/xbmc/filesystem/CurlFile.cpp
+@@ -876,7 +876,7 @@ bool CCurlFile::Download(const std::string& strURL, const std::string& strFileNa
+ // Detect whether we are "online" or not! Very simple and dirty!
+ bool CCurlFile::IsInternet()
  {
--  if (m_info.internetState != CSysData::UNKNOWN)
--    return m_info.internetState == CSysData::CONNECTED;
--  return (m_info.internetState = CSysInfoJob::GetInternetState()) == CSysData::CONNECTED;
-+    return true;
- }
- 
- std::string CSysInfo::GetHddSpaceInfo(int drive, bool shortText)
+-  CURL url("http://www.google.com");
++  CURL url("http://www.msftncsi.com/ncsi.txt");
+   bool found = Exists(url);
+   Close();
 
