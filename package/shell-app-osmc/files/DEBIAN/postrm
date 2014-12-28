@@ -1,4 +1,4 @@
 #!/bin/bash
 if [ "$1" == "remove" ]; then
-	dpkg-divert --remove --package shell-app-osmc --rename --distributed /etc/default/shellinabox.distributed /etc/default/shellinabox
+	dpkg-divert --remove --package shell-app-osmc --rename /etc/default/shellinabox.distributed /etc/default/shellinabox
 fi
