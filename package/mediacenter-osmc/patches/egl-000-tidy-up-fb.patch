@@ -21,7 +21,7 @@
 +  FILE *fp;
 +  fp = fopen("/sys/class/vtconsole/vtcon1/bind", "w");
 +  fprintf(fp, "0");
-+  system("/bin/fbset -xres 1 -yres 1 -vxres 1 -vyres 1");
++  system("/usr/bin/sudo /bin/fbset -xres 1 -yres 1 -vxres 1 -vyres 1");
 +  #endif
  }
  
