@@ -1,5 +1,7 @@
---- a/xbmc/Application.cpp	2014-12-27 16:57:27.949692178 +0000
-+++ b/xbmc/Application.cpp	2014-12-27 20:03:02.521666634 +0000
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 48fa09b..840fd72 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
 @@ -351,6 +351,11 @@
  
  #include "cores/FFmpeg.h"
@@ -12,7 +14,7 @@
  using namespace std;
  using namespace ADDON;
  using namespace XFILE;
-@@ -1011,6 +1016,13 @@
+@@ -1011,6 +1016,17 @@ bool CApplication::CreateGUI()
    g_windowManager.Initialize();
  
    return true;
@@ -20,9 +22,12 @@
 +  #if defined(HAS_EGLFB)
 +  FILE *fp;
 +  fp = fopen("/sys/class/vtconsole/vtcon1/bind", "w");
-+  fprintf(fp, "0");
-+  system("/bin/fbset -xres 1 -yres 1 -vxres 1 -vyres 1");
++  if (fp != NULL)
++  {
++     fprintf(fp, "0");
++     fclose(fp);
++     system("/bin/fbset -xres 1 -yres 1 -vxres 1 -vyres 1");
++  }
 +  #endif
  }
- 
- bool CApplication::InitWindow()
+
