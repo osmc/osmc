@@ -1,2 +1,4 @@
 #!/bin/bash
-dpkg-divert --add --package ftp-app-osmc --rename --divert /etc/vsftpd.conf.distributed /etc/vsftpd.conf
+if [ "$1" == "install" ]; then
+	dpkg-divert --add --package ftp-app-osmc --rename --divert /etc/vsftpd.conf.distributed /etc/vsftpd.conf
+fi

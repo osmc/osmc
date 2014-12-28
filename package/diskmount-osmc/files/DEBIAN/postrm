@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "postrm 1.0.11"
 if [ "$1" == "remove" ]; then
 	dpkg-divert --remove --package diskmount-osmc --rename --divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
 fi

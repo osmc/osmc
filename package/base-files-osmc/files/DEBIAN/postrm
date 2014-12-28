@@ -1,6 +1,8 @@
 #!/bin/bash
-dpkg-divert --remove --package base-files-osmc --rename --divert /etc/issue.distributed /etc/issue
-dpkg-divert --remove --package base-files-osmc --rename --divert /etc/issue.net.distributed /etc/issue.net
-dpkg-divert --remove --package base-files-osmc --rename --divert /etc/os-release.distributed /etc/os-release
-dpkg-divert --remove --package base-files-osmc --rename --divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
-dpkg-divert --remove --package base-files-osmc --rename --divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
+if [ "$1" == "remove" ]; then
+	dpkg-divert --remove --package base-files-osmc --rename --divert /etc/issue.distributed /etc/issue
+	dpkg-divert --remove --package base-files-osmc --rename --divert /etc/issue.net.distributed /etc/issue.net
+	dpkg-divert --remove --package base-files-osmc --rename --divert /etc/os-release.distributed /etc/os-release
+	dpkg-divert --remove --package base-files-osmc --rename --divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
+	dpkg-divert --remove --package base-files-osmc --rename --divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
+fi
