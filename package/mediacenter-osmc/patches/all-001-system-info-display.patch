@@ -2,6 +2,15 @@ diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystem
 index 196a1c6..67c2e11 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
+@@ -124,8 +124,6 @@
+     SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
+     SetControlLabel(i++, "%s: %s", 13159, NETWORK_SUBNET_MASK);
+     SetControlLabel(i++, "%s: %s", 13160, NETWORK_GATEWAY_ADDRESS);
+-    SetControlLabel(i++, "%s: %s", 13161, NETWORK_DNS1_ADDRESS);
+-    SetControlLabel(i++, "%s: %s", 20307, NETWORK_DNS2_ADDRESS);
+     SetControlLabel(i++, "%s %s", 13295, SYSTEM_INTERNET_STATE);
+   }
+   else if (m_section == CONTROL_BT_VIDEO)
 @@ -57,8 +57,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
    case GUI_MSG_WINDOW_INIT:
      {
