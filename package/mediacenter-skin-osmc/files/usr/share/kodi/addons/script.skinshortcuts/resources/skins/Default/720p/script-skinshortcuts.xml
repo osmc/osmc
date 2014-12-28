@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<allowoverlay>no</allowoverlay>
+	<defaultcontrol always="true">100</defaultcontrol>
+	<coordinates>
+		<system>1</system>
+		<posx>0</posx>
+		<posy>0</posy>
+	</coordinates>
+	<animation type="WindowOpen" reversible="false">
+		<effect type="zoom" start="80" end="100" center="640,360" easing="out" tween="back" time="300" />
+		<effect type="fade" start="0" end="100" time="300" />
+	</animation>
+	<animation type="WindowClose" reversible="false">
+		<effect type="zoom" start="100" end="80" center="640,360" easing="in" tween="back" time="300" />
+		<effect type="fade" start="100" end="0" time="300" />
+	</animation>
+	<controls>
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1280</width>
+			<height>720</height>
+			<texture>black.png</texture>
+		</control>
+
+		<control type="group" id="200">
+			<left>40</left>
+			<top>10</top>
+			<!-- Background -->
+			<control type="image">
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>500</width>
+				<height>700</height>
+				<texture border="2">grey.png</texture>
+				<colordiffuse>4FFFFFFF</colordiffuse>
+				<selectedcolor>FF000000</selectedcolor>
+			</control>
+			<control type="image">
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>500</width>
+				<height>700</height>
+				<texture border="2">blue.png</texture>
+				<colordiffuse>4FFFFFFF</colordiffuse>
+				<selectedcolor>FF000000</selectedcolor>
+				<visible>ControlGroup(200).HasFocus</visible>
+			</control>
+
+			<!-- id 211 - Current shortcuts -->
+			<control type="list" id="211">
+				<top>50</top>
+				<left>10</left>
+				<width>450</width>
+				<height>650</height>
+				<onright>260</onright>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<preloaditems>2</preloaditems>
+				<pagecontrol>260</pagecontrol>
+				<itemlayout width="500" height="50">
+					<control type="image">
+						<posx>0</posx>
+						<posy>0</posy>
+						<width>50</width>
+						<height>50</height>
+						<texture background="true" fallback="DefaultShortcut.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>0</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label]</label>
+						<font>font18</font>
+						<textcolor>FFCCCCC</textcolor>
+						<selectedcolor>FF4DBAFF</selectedcolor>
+						<aligny>center</aligny>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>25</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label2]</label>
+						<font>font18</font>
+						<textcolor>FFCCCCC</textcolor>
+						<selectedcolor>FF4DBAFF</selectedcolor>
+						<aligny>center</aligny>
+					</control>
+				</itemlayout>
+				<focusedlayout width="500" height="50">
+					<control type="image">
+						<posx>0</posx>
+						<posy>0</posy>
+						<width>50</width>
+						<height>50</height>
+						<texture background="true" fallback="DefaultShortcut.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>0</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label]</label>
+						<font>font18</font>
+						<textcolor>FF4DBAFF</textcolor>
+						<selectedcolor>FF4DBAFF</selectedcolor>
+						<aligny>center</aligny>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>25</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label2]</label>
+						<font>font18</font>
+						<textcolor>FF4DBAFF</textcolor>
+						<selectedcolor>FF4DBAFF</selectedcolor>
+						<aligny>center</aligny>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<control type="scrollbar" id="260">
+				<top>50</top>
+				<left>470</left>
+				<width>20</width>
+				<height>650</height>
+				<texturesliderbackground border="0,10,0,10">scrollbar-back.png</texturesliderbackground>
+				<texturesliderbar border="0,10,0,10">scrollbar-front-nofocus.png</texturesliderbar>
+				<texturesliderbarfocus border="0,10,0,10">scrollbar-front.png</texturesliderbarfocus>
+				<textureslidernib>scrollbar-nib-nofocus.png</textureslidernib>
+				<textureslidernibfocus>scrollbar-nib.png</textureslidernibfocus>
+				<onleft>211</onleft>
+				<onright>300</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+			</control>
+		</control>
+
+		<control type="group" id="300">
+			<left>540</left>
+			<top>300</top>
+			<width>200</width>
+			<control type="button" id="301">
+				<description>Add a new shortcut</description>
+				<left>0</left>
+				<top>0</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<ondown>302</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32000]</label>
+			</control>
+			<control type="button" id="302">
+				<description>Delete shortcut</description>
+				<left>0</left>
+				<top>30</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>301</onup>
+				<ondown>303</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32001]</label>
+			</control>
+
+			<control type="button" id="303">
+				<description>Move shortcut up</description>
+				<left>0</left>
+				<top>80</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>302</onup>
+				<ondown>304</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32002]</label>
+			</control>
+			<control type="button" id="304">
+				<description>Move shortcut down</description>
+				<left>0</left>
+				<top>110</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>303</onup>
+				<ondown>305</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32003]</label>
+			</control>
+
+			<control type="button" id="305">
+				<description>Change shortcut label</description>
+				<left>0</left>
+				<top>140</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>304</onup>
+				<ondown>306</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32025]</label>
+			</control>
+			<control type="button" id="306">
+				<description>Change shortcut thumbnail</description>
+				<left>0</left>
+				<top>170</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>305</onup>
+				<ondown>307</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32026]</label>
+			</control>
+			<control type="button" id="307">
+				<description>Change shortcut action</description>
+				<left>0</left>
+				<top>200</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>306</onup>
+				<ondown>308</ondown>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32027]</label>
+			</control>
+
+			<control type="button" id="308">
+				<description>Reset shortcuts</description>
+				<left>0</left>
+				<top>230</top>
+				<width>200</width>
+				<height>30</height>
+				<font>font18</font>
+				<align>center</align>
+				<onup>307</onup>
+				<onleft>260</onleft>
+				<onright>111</onright>
+				<onclick>noop</onclick>
+				<label>$ADDON[script.skinshortcuts 32028]</label>
+			</control>
+		</control>
+
+		<control type="group" id="100">
+			<left>740</left>
+			<top>10</top>
+			<!-- Background -->
+			<control type="image">
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>500</width>
+				<height>700</height>
+				<texture border="2">grey.png</texture>
+				<colordiffuse>4FFFFFFF</colordiffuse>
+				<selectedcolor>FF000000</selectedcolor>
+			</control>
+			<control type="image">
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>500</width>
+				<height>700</height>
+				<texture border="2">blue.png</texture>
+				<colordiffuse>4FFFFFFF</colordiffuse>
+				<selectedcolor>FF000000</selectedcolor>
+				<visible>ControlGroup(100).HasFocus</visible>
+			</control>
+
+			<!-- id's 101, 102, 103 - label of current shortcut type, buttons to change shortcut type -->
+			<control type="label" id="101">
+				<left>10</left>
+				<top>10</top>
+				<width>400</width>
+				<height>30</height>
+			</control>
+			<control type="button" id="102">
+				<left>420</left>
+				<top>10</top>
+				<width>30</width>
+				<height>30</height>
+				<onclick>-</onclick>
+				<texturefocus>scroll-down-focus-2.png</texturefocus>
+				<texturenofocus>scroll-down-2.png</texturenofocus>
+				<onleft>300</onleft>
+				<onright>103</onright>
+				<ondown>111</ondown>
+			</control>
+			<control type="button" id="103">
+				<left>450</left>
+				<top>10</top>
+				<width>30</width>
+				<height>30</height>
+				<onclick>-</onclick>
+				<texturefocus>scroll-up-focus-2.png</texturefocus>
+				<texturenofocus>scroll-up-2.png</texturenofocus>
+				<onleft>102</onleft>
+				<ondown>111</ondown>
+			</control>
+
+			<!-- id 111 - List of available plugins -->
+			<control type="list" id="111">
+				<top>50</top>
+				<left>10</left>
+				<width>450</width>
+				<height>650</height>
+				<onleft>300</onleft>
+				<onright>160</onright>
+				<onup>103</onup>
+				<pagecontrol>160</pagecontrol>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<preloaditems>2</preloaditems>
+				<itemlayout width="450" height="50">
+					<control type="image">
+						<posx>0</posx>
+						<posy>0</posy>
+						<width>50</width>
+						<height>50</height>
+						<texture background="true" fallback="DefaultShortcut.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>0</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label]</label>
+						<font>font18</font>
+						<textcolor>FFCCCCC</textcolor>
+						<aligny>center</aligny>
+					</control>
+					<control type="label">
+						<posx>55</posx>
+						<posy>25</posy>
+						<width>445</width>
+						<height>25</height>
+						<label>$INFO[ListItem.Label2]</label>
+						<font>font18</font>
+						<textcolor>FFCCCCC</textcolor>
+						<aligny>center</aligny>
+					</control>
+				</itemlayout>
+				<focusedlayout width="450" height="50">
+					<control type="image">
+						<posx>0</posx>
+						<posy>0</posy>
+						<width>50</width>
+						<height>50</height>
+						<texture background="true" fallback="DefaultShortcut.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="group">
+						<control type="label">
+							<posx>55</posx>
+							<posy>0</posy>
+							<width>445</width>
+							<height>25</height>
+							<label>$INFO[ListItem.Label]</label>
+							<font>font18</font>
+							<textcolor>FF4DBAFF</textcolor>
+							<aligny>center</aligny>
+						</control>
+						<control type="label">
+							<posx>55</posx>
+							<posy>25</posy>
+							<width>445</width>
+							<height>25</height>
+							<label>$INFO[ListItem.Label2]</label>
+							<font>font18</font>
+							<textcolor>FF4DBAFF</textcolor>
+							<aligny>center</aligny>
+						</control>
+						<visible>Control.HasFocus(111)</visible>
+					</control>
+					<control type="group">
+						<control type="label">
+							<posx>55</posx>
+							<posy>0</posy>
+							<width>445</width>
+							<height>25</height>
+							<label>$INFO[ListItem.Label]</label>
+							<font>font18</font>
+							<textcolor>FFCCCCC</textcolor>
+							<aligny>center</aligny>
+						</control>
+						<control type="label">
+							<posx>55</posx>
+							<posy>25</posy>
+							<width>445</width>
+							<height>25</height>
+							<label>$INFO[ListItem.Label2]</label>
+							<font>font18</font>
+							<textcolor>FFCCCCC</textcolor>
+							<aligny>center</aligny>
+						</control>
+						<visible>!Control.HasFocus(111)</visible>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<control type="scrollbar" id="160">
+				<top>50</top>
+				<left>470</left>
+				<width>20</width>
+				<height>650</height>
+				<texturesliderbackground border="0,10,0,10">scrollbar-back.png</texturesliderbackground>
+				<texturesliderbar border="0,10,0,10">scrollbar-front-nofocus.png</texturesliderbar>
+				<texturesliderbarfocus border="0,10,0,10">scrollbar-front.png</texturesliderbarfocus>
+				<textureslidernib>scrollbar-nib-nofocus.png</textureslidernib>
+				<textureslidernibfocus>scrollbar-nib.png</textureslidernibfocus>
+				<onleft>111</onleft>
+				<onright>102</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+			</control>
+		</control>
+	</controls>
+</window>
