@@ -1,2 +1,3 @@
 #!/bin/bash
-dpkg-divert --add --package diskmount-osmc --rename --divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
+echo "preinst 1.0.10"
+dpkg-divert --add --package diskmount-osmc --divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
