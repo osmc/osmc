@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype53">
+
+		<control type="group">
+			<visible>Control.IsVisible(53)</visible>
+
+			<!-- Curve -->
+			<control type="image">
+				<left>20</left>
+				<top>20</top>
+				<width>1880</width>
+				<height>844</height>
+				<texture border="0,0,0,40">common/CurveHorz.png</texture>
+				<visible>Skin.HasSetting(ShowCurve)</visible>
+			</control>
+
+			<!-- Thumbs -->
+			<control type="panel" id="53">
+				<left>150</left>
+				<top>170</top>
+				<width>1620</width>
+				<height>666</height>
+				<onleft>63</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<onup>53</onup>
+				<ondown>53</ondown>
+				<pagecontrol>63</pagecontrol>
+				<preloaditems>4</preloaditems>
+				<viewtype label="Wall">icon</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>SubString(Container.FolderPath,videodb://movies/titles/) | SubString(Container.FolderPath,videodb://tvshows/titles/)</visible>
+
+				<itemlayout width="270" height="333">
+					<control type="image">
+						<left>34</left>
+						<width>202</width>
+						<height>300</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<colordiffuse>OverlayColorNF</colordiffuse>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>333</height>
+							<texture border="1,1,1,36">views/DropShadowSmall.png</texture>
+						</control>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>300</height>
+							<colordiffuse>DiffusePosterNF</colordiffuse>
+							<texture background="true">$INFO[ListItem.Thumb]</texture>
+							<aspectratio align="center">scale</aspectratio>
+						</control>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>300</height>
+							<texture>views/OverlayPosterNF.png</texture>
+							<visible>Skin.HasSetting(Overlays)</visible>
+						</control>
+						<!-- Watched status -->
+						<control type="image">
+							<left>170</left>
+							<top>286</top>
+							<width>30</width>
+							<height>42</height>
+							<texture>$VAR[StatusOverlayWide]</texture>
+							<visible>Skin.HasSetting(WatchedFlags)</visible>
+						</control>
+					</control>
+				</itemlayout>
+
+				<focusedlayout width="270" height="333">
+					<control type="image">
+						<left>34</left>
+						<width>202</width>
+						<height>300</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>333</height>
+							<texture border="1,1,1,36">views/DropShadowSmall.png</texture>
+						</control>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>300</height>
+							<texture background="true">$INFO[ListItem.Thumb]</texture>
+							<aspectratio align="center">scale</aspectratio>
+						</control>
+						<control type="image">
+							<left>34</left>
+							<width>202</width>
+							<height>300</height>
+							<texture>views/OverlayPosterNF.png</texture>
+							<visible>Skin.HasSetting(Overlays)</visible>
+						</control>
+						<!-- Watched status -->
+						<control type="image">
+							<left>170</left>
+							<top>286</top>
+							<width>30</width>
+							<height>42</height>
+							<texture>$VAR[StatusOverlayWide]</texture>
+							<visible>Skin.HasSetting(WatchedFlags)</visible>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<control type="group">
+				<centerleft>50%</centerleft>
+				<top>850</top>
+				<width>1920</width>
+				<height>100</height>
+
+				<!-- Title -->
+				<control type="label">
+					<left>90</left>
+					<top>0</top>
+					<width>1740</width>
+					<height>72</height>
+					<font>Font72</font>
+					<align>center</align>
+					<textcolor>TextColor1</textcolor>
+					<shadowcolor>ShadowColor</shadowcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+
+				<!-- Details -->
+				<control type="label">
+					<left>90</left>
+					<top>88</top>
+					<width>1740</width>
+					<height>27</height>
+					<font>Font27</font>
+					<align>center</align>
+					<label>$VAR[Label2]</label>
+					<textcolor>TextColor2</textcolor>
+					<shadowcolor>ShadowColor</shadowcolor>
+				</control>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>

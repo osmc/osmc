@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- filebrowser -->
+	<defaultcontrol always="true">450</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="411">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+		</control>
+
+		<!-- Image -->
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>!SubString(ListItem.Icon,Default) + !SubString(Control.GetLabel(416),*)</visible>
+		</control>
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture flipx="true">$INFO[ListItem.Icon]</texture>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>!SubString(ListItem.Icon,Default) + SubString(Control.GetLabel(416),*)</visible>
+		</control>
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>SubString(ListItem.Icon,Default)</visible>
+		</control>
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.FileNameAndPath]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>StringCompare(ListItem.Path,special://skin/extras/backgrounds/)</visible>
+		</control>
+
+		<!-- List -->
+		<control type="list" id="450">
+			<left>600</left>
+			<top>235</top>
+			<width>1170</width>
+			<height>580</height>
+			<onup>noop</onup>
+			<ondown>9000</ondown>
+			<onleft>9000</onleft>
+			<onright>9000</onright>
+			<orientation>vertical</orientation>
+			<viewtype label="list">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<width>1030</width>
+					<height>96</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(450)">Conditional</animation>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<width>1030</width>
+					<height>96</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- List -->
+
+		<control type="list" id="451">
+			<left>600</left>
+			<top>235</top>
+			<width>1170</width>
+			<height>576</height>
+			<onup>noop</onup>
+			<ondown>9000</ondown>
+			<onleft>9000</onleft>
+			<onright>9000</onright>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<width>1030</width>
+					<height>96</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(451)">Conditional</animation>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<width>1030</width>
+					<height>96</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>912</top>
+			<width>1620</width>
+			<height>66</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>450</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="413">
+				<width>324</width>
+				<height>66</height>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="414">
+				<width>324</width>
+				<height>66</height>
+				<label>222</label>
+			</control>
+
+			<!-- New folder -->
+			<control type="button" id="415">
+				<width>324</width>
+				<height>66</height>
+				<label>119</label>
+				<visible>Control.IsEnabled(415)</visible>
+			</control>
+
+			<!-- Mirror image -->
+			<control type="radiobutton" id="416">
+				<width>324</width>
+				<height>66</height>
+				<label>749</label>
+				<visible>Control.IsEnabled(416)</visible>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

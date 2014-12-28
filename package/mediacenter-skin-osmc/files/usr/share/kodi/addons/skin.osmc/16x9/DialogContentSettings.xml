@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- contentsettings -->
+	<defaultcontrol always="true">20</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>20333</label>
+		</control>
+
+		<!-- Image -->
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>!SubString(ListItem.Icon,Default)</visible>
+		</control>
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>SubString(ListItem.Icon,Default)</visible>
+		</control>
+
+		<!-- Content Picker -->
+		<control type="spincontrolex" id="20">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+			<height>66</height>
+			<textwidth>1120</textwidth>
+			<font>-</font>
+			<label>-</label>
+			<align>right</align>
+			<onup>noop</onup>
+			<ondown>21</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+		</control>
+
+		<!-- Content Picker Header (focused) -->
+		<control type="label">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+			<height>66</height>
+			<label>$LOCALIZE[20344]</label>
+			<visible>Control.HasFocus(20)</visible>
+		</control>
+
+		<!-- Content Picker Header (not focused) -->
+		<control type="label">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+			<height>66</height>
+			<label>$LOCALIZE[20344]</label>
+			<textcolor>DialogColor2</textcolor>
+			<visible>!Control.HasFocus(20)</visible>
+		</control>
+
+		<!-- Content Picker Label (focused) -->
+		<control type="label">
+			<right>192</right>
+			<top>228</top>
+			<width>600</width>
+			<height>66</height>
+			<align>right</align>
+			<label>$INFO[Control.GetLabel(20)]</label>
+			<visible>Control.HasFocus(20)</visible>
+		</control>
+
+		<!-- Content Picker Label (not focused) -->
+		<control type="label">
+			<right>192</right>
+			<top>228</top>
+			<width>600</width>
+			<height>66</height>
+			<align>right</align>
+			<textcolor>DialogColor2</textcolor>
+			<label>$INFO[Control.GetLabel(20)]</label>
+			<visible>!Control.HasFocus(20)</visible>
+		</control>
+
+		<!-- Scraper list -->
+		<control type="list" id="21">
+			<left>600</left>
+			<top>294</top>
+			<width>1200</width>
+			<height>264</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>20</onup>
+			<ondown>5</ondown>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1260" height="66">
+				<control type="label">
+					<width>1120</width>
+					<height>66</height>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1260" height="66">
+				<control type="label">
+					<width>1120</width>
+					<height>66</height>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(21)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- Control grouplist -->
+		<control type="grouplist" id="5">
+			<left>600</left>
+			<top>558</top>
+			<width>1200</width>
+			<height>330</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>21</onup>
+			<ondown>9001</ondown>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+		</control>
+
+		<!-- Default button -->
+		<control type="button" id="7">
+			<width>1200</width>
+			<height>66</height>
+		</control>
+
+		<!-- Default radiobutton -->
+		<control type="radiobutton" id="8">
+			<width>1200</width>
+			<height>66</height>
+			<textwidth>1120</textwidth>
+		</control>
+
+		<!-- Default divider -->
+		<control type="image">
+			<left>600</left>
+			<top>548</top>
+			<width>1200</width>
+			<height>20</height>
+			<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>5</onup>
+			<ondown>noop</ondown>
+			<defaultcontrol>28</defaultcontrol>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="28">
+				<width>400</width>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="29">
+				<width>400</width>
+				<label>222</label>
+			</control>
+
+			<!-- Settings Button -->
+			<control type="button" id="22">
+				<width>400</width>
+				<label>5</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

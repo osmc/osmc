@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- musicinformation -->
+	<defaultcontrol always="true">5</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>$VAR[MusicInfoLabel]</label>
+		</control>
+
+		<!-- Album image -->
+		<control type="group">
+			<visible>!SubString(ListItem.Icon,Default) + Container.Content(albums)</visible>
+			<control type="image">
+				<left>150</left>
+				<top>322</top>
+				<width>405</width>
+				<height>405</height>
+				<fadetime>200</fadetime>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">scale</aspectratio>
+			</control>
+			<control type="image">
+				<left>150</left>
+				<top>322</top>
+				<width>405</width>
+				<height>405</height>
+				<texture>views/OverlayAlbum.png</texture>
+				<visible>Skin.HasSetting(Overlays)</visible>
+			</control>
+		</control>
+
+		<!-- Artist image -->
+		<control type="group">
+			<visible>!SubString(ListItem.Icon,Default) + Container.Content(artists)</visible>
+			<control type="image">
+				<left>150</left>
+				<top>225</top>
+				<width>405</width>
+				<height>666</height>
+				<fadetime>200</fadetime>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+			</control>
+			<control type="image">
+				<left>150</left>
+				<top>225</top>
+				<width>405</width>
+				<height>666</height>
+				<texture>views/OverlayPosterFO.png</texture>
+				<visible>Skin.HasSetting(Overlays)</visible>
+			</control>
+		</control>
+
+		<!-- Default image -->
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio align="center" aligny="center">keep</aspectratio>
+			<visible>SubString(ListItem.Icon,Default)</visible>
+		</control>
+
+		<!-- Info -->
+		<control type="group">
+			<left>600</left>
+			<top>235</top>
+			<visible>!StringCompare(Control.GetLabel(5),$LOCALIZE[21887]) + !StringCompare(Control.GetLabel(5),$LOCALIZE[183])</visible>
+
+			<!-- Details -->
+			<control type="grouplist">
+				<width>1170</width>
+				<height>336</height>
+				<itemgap>12</itemgap>
+				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+
+				<!-- Artist -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>Container.Content(Albums) + !IsEmpty(ListItem.Artist)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>557</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Artist]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Year -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Year)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>562</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Year]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Genre -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Genre)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>515</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Genre]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Type -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Album_Type))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>146</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Album_Type)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Label -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Album_Label))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21899</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Album_Label)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Rating -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>Container.Content(albums) + [StringCompare(ListItem.StarRating,rating0.png) | StringCompare(ListItem.StarRating,rating1.png) | StringCompare(ListItem.StarRating,rating2.png) | StringCompare(ListItem.StarRating,rating3.png) | StringCompare(ListItem.StarRating,rating4.png) | StringCompare(ListItem.StarRating,rating5.png)]</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>31052</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="image" id="99">
+						<left>220</left>
+						<width>238</width>
+						<height>36</height>
+						<aspectratio align="left">keep</aspectratio>
+						<texture>$INFO[ListItem.StarRating]</texture>
+					</control>
+				</control>
+
+				<!-- Mood -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Album_Mood))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>175</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Album_Mood)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Style -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Album_Style))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>176</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Album_Style)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Theme -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Album_Theme))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21895</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Album_Theme)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Born -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Born))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21893</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Born)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Formed -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Formed))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21894</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Formed)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Mood -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Mood))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>175</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Mood)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Style -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Style))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>176</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Style)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Instrument -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Instrument))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21892</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Instrument)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Died -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_Died))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>21897</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_Died)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Years active -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Property(Artist_YearsActive))</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>652</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Property(Artist_YearsActive)]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+			</control>
+
+			<!-- Plot -->
+			<control type="textbox">
+				<top>370</top>
+				<width>1170</width>
+				<height>210</height>
+				<textcolor>DialogColor2</textcolor>
+				<label>$VAR[MusicInfoDescription]</label>
+			</control>
+
+		</control>
+
+		<!-- Tracks/Discography -->
+		<control type="list" id="50">
+			<left>600</left>
+			<top>235</top>
+			<width>1170</width>
+			<height>580</height>
+			<onup>noop</onup>
+			<ondown>9000</ondown>
+			<onleft>9000</onleft>
+			<onright>9000</onright>
+			<orientation>vertical</orientation>
+			<viewtype label="">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible allowhiddenfocus="true">StringCompare(Control.GetLabel(5),$LOCALIZE[21887]) | StringCompare(Control.GetLabel(5),$LOCALIZE[183])</visible>
+
+			<itemlayout width="1170" height="58">
+				<control type="label">
+					<width>1170</width>
+					<height>58</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$VAR[MusicInfoTracks]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1170" height="58">
+				<control type="label">
+					<width>1170</width>
+					<height>58</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$VAR[MusicInfoTracks]</label>
+					<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(50)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>912</top>
+			<width>1620</width>
+			<height>66</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup condition="StringCompare(Control.GetLabel(5),$LOCALIZE[21887]) | StringCompare(Control.GetLabel(5),$LOCALIZE[183])">50</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- Tracks/Discography Button -->
+			<control type="button" id="5">
+				<width>270</width>
+			</control>
+			<!-- Refresh Button -->
+			<control type="button" id="6">
+				<width>270</width>
+				<label>184</label>
+			</control>
+			<!-- Get Thumb Button -->
+			<control type="button" id="10">
+				<width>270</width>
+				<label>13511</label>
+			</control>
+			<!-- Fanart Button -->
+			<control type="button" id="12">
+				<width>270</width>
+				<label>20413</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

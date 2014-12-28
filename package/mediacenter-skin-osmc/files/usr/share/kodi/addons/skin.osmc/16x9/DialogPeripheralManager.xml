@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- peripherals -->
+	<defaultcontrol always="true">20</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="1">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>35000</label>
+		</control>
+
+		<control type="list" id="20">
+			<left>600</left>
+			<top>235</top>
+			<width>1200</width>
+			<height>576</height>
+			<onup>noop</onup>
+			<ondown>10</ondown>
+			<onleft>noop</onleft>
+			<onright>10</onright>
+			<orientation>vertical</orientation>
+			<viewtype label="535">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1200" height="112">
+				<control type="label">
+					<top>22</top>
+					<width>1220</width>
+					<height>36</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				<control type="label">
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35504]:[/COLOR] $INFO[ListItem.Property(Product)]</label>
+				</control>
+				<control type="label">
+					<left>430</left>
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35503]:[/COLOR] $INFO[ListItem.Property(Vendor)]</label>
+				</control>
+				<control type="label">
+					<left>840</left>
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35501]:[/COLOR] $INFO[ListItem.Property(Class)]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1260" height="112">
+				<control type="label">
+					<top>22</top>
+					<width>1220</width>
+					<height>36</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				<control type="label">
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35504]:[/COLOR] $INFO[ListItem.Property(Product)]</label>
+				</control>
+				<control type="label">
+					<left>430</left>
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35503]:[/COLOR] $INFO[ListItem.Property(Vendor)]</label>
+				</control>
+				<control type="label">
+					<left>840</left>
+					<top>70</top>
+					<width>390</width>
+					<height>30</height>
+					<font>Font30</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>[COLOR=DialogColor1]$LOCALIZE[35501]:[/COLOR] $INFO[ListItem.Property(Class)]</label>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- OK button -->
+		<control type="button" id="10">
+			<left>600</left>
+			<top>926</top>
+			<width>400</width>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>20</onup>
+			<ondown>noop</ondown>
+			<label>186</label>
+		</control>
+
+	</controls>
+
+</window>

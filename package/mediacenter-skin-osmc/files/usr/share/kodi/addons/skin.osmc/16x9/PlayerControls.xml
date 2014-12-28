@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- playercontrols -->
+	<defaultcontrol always="true">1</defaultcontrol>
+	<visible>Player.HasMedia + Window.IsActive(PlayerControls) + !VideoPlayer.IsFullscreen + !Window.IsActive(Visualisation)</visible>
+
+	<controls>
+
+		<control type="group">
+			<left>150</left>
+			<top>985</top>
+			<width>1620</width>
+			<height>60</height>
+			<animation type="WindowOpen">
+				<effect type="zoom" start="90" end="100" center="auto" tween="back" easing="out" time="200"/>
+				<effect type="fade" start="0" end="100" time="200"/>
+			</animation>
+			<animation type="WindowClose">
+				<effect type="zoom" start="100" end="90" center="auto" easing="in" time="200"/>
+				<effect type="fade" start="100" end="0" time="200"/>
+			</animation>
+
+			<!-- Background -->
+			<control type="image">
+				<width>1620</width>
+				<height>60</height>
+				<texture border="1">osd/OSDBack.png</texture>
+			</control>
+
+			<!-- Controls -->
+			<control type="grouplist">
+				<width>360</width>
+				<height>60</height>
+				<itemgap>0</itemgap>
+				<onleft>8</onleft>
+				<onright>7</onright>
+				<onup>Close</onup>
+				<ondown>Close</ondown>
+				<orientation>horizontal</orientation>
+
+				<!-- Play/Pause -->
+				<control type="togglebutton" id="1">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDPauseFO.png</texturefocus>
+					<texturenofocus>osd/OSDPauseNF.png</texturenofocus>
+					<usealttexture>Player.Paused | Player.Forwarding | Player.Rewinding</usealttexture>
+					<alttexturefocus>osd/OSDPlayFO.png</alttexturefocus>
+					<alttexturenofocus>osd/OSDPlayNF.png</alttexturenofocus>
+					<onclick>PlayerControl(Play)</onclick>
+				</control>
+				<!-- Stop -->
+				<control type="button" id="2">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDStopFO.png</texturefocus>
+					<texturenofocus>osd/OSDStopNF.png</texturenofocus>
+					<onclick>PlayerControl(Stop)</onclick>
+				</control>
+				<!-- Skip Back -->
+				<control type="button" id="3">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDPrevTrackFO.png</texturefocus>
+					<texturenofocus>osd/OSDPrevTrackNF.png</texturenofocus>
+					<onclick>PlayerControl(Previous)</onclick>
+				</control>
+				<!-- Rewind -->
+				<control type="button" id="4">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDRewindFO.png</texturefocus>
+					<texturenofocus>osd/OSDRewindNF.png</texturenofocus>
+					<onclick>PlayerControl(Rewind)</onclick>
+				</control>
+				<!-- Fast Forward -->
+				<control type="button" id="5">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDForwardFO.png</texturefocus>
+					<texturenofocus>osd/OSDForwardNF.png</texturenofocus>
+					<onclick>PlayerControl(Forward)</onclick>
+				</control>
+				<!-- Next -->
+				<control type="button" id="6">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDNextTrackFO.png</texturefocus>
+					<texturenofocus>osd/OSDNextTrackNF.png</texturenofocus>
+					<onclick>PlayerControl(Next)</onclick>
+				</control>
+
+			</control>
+
+			<!-- Options -->
+			<control type="grouplist">
+				<right>0</right>
+				<width>420</width>
+				<height>60</height>
+				<align>right</align>
+				<itemgap>0</itemgap>
+				<onleft>6</onleft>
+				<onright>1</onright>
+				<onup>Close</onup>
+				<ondown>Close</ondown>
+				<orientation>horizontal</orientation>
+
+				<!-- Repeat -->
+				<control type="button" id="7">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>-</texturefocus>
+					<texturenofocus>-</texturenofocus>
+					<onclick>PlayerControl(Repeat)</onclick>
+				</control>
+				<!-- Random -->
+				<control type="togglebutton" id="8">
+					<width>60</width>
+					<height>60</height>
+					<texturefocus>osd/OSDRandomOffFO.png</texturefocus>
+					<texturenofocus>osd/OSDRandomOffNF.png</texturenofocus>
+					<alttexturefocus>osd/OSDRandomOnFO.png</alttexturefocus>
+					<alttexturenofocus>osd/OSDRandomOnNF.png</alttexturenofocus>
+					<onclick>PlayerControl(Random)</onclick>
+				</control>
+
+			</control>
+
+			<!-- Repeat images -->
+			<control type="group">
+				<right>60</right>
+				<width>60</width>
+				<height>60</height>
+
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatNF.png</texture>
+					<visible>!Playlist.IsRepeat + !Playlist.IsRepeatOne</visible>
+					<visible>!Control.HasFocus(7)</visible>
+				</control>
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatFO.png</texture>
+					<visible>!Playlist.IsRepeat + !Playlist.IsRepeatOne</visible>
+					<visible>Control.HasFocus(7)</visible>
+				</control>
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatOneNF.png</texture>
+					<visible>Playlist.IsRepeatOne</visible>
+					<visible>!Control.HasFocus(7)</visible>
+				</control>
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatOneFO.png</texture>
+					<visible>Playlist.IsRepeatOne</visible>
+					<visible>Control.HasFocus(7)</visible>
+				</control>
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatAllNF.png</texture>
+					<visible>Playlist.IsRepeat</visible>
+					<visible>!Control.HasFocus(7)</visible>
+				</control>
+				<control type="image">
+					<width>60</width>
+					<height>60</height>
+					<texture>osd/OSDRepeatAllFO.png</texture>
+					<visible>Playlist.IsRepeat</visible>
+					<visible>Control.HasFocus(7)</visible>
+				</control>
+
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- home -->
+	<backgroundcolor>0xff18394a</backgroundcolor>
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<onload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onload>
+
+	<controls>
+
+		<!-- Fanart -->
+		<control type="group">
+			<control type="image">
+				<include>FullscreenDimensions</include>
+				<fadetime>200</fadetime>
+				<texture diffuse="special://skin/extras/fanart_overlay_2.png" background="true">$VAR[WidgetFanart]</texture>
+			</control>
+		</control>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Main controls -->
+		<control type="group">
+			<include>WindowFadeAnimation</include>
+
+			<!-- OSMC logo -->
+			<control type="image">
+				<left>50</left>
+				<top>50</top>
+				<width>146</width>
+				<height>26</height>
+				<texture>common/OSMC-Light.png</texture>
+			</control>
+
+			<!-- Main list -->
+			<control type="fixedlist" id="9000">
+				<left>150</left>
+				<top>282</top>
+				<width>328</width>
+				<height>506</height>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<onleft>noop</onleft>
+				<onright>9001</onright>
+				<focusposition>1</focusposition>
+				<defaultcontrol>2</defaultcontrol>
+				<orientation>vertical</orientation>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+
+				<itemlayout width="278" height="62">
+					<control type="label">
+						<left>88</left>
+						<top>0</top>
+						<width>240</width>
+						<height>62</height>
+						<font>Font26</font>
+						<textcolor>TextColorNF</textcolor>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					</control>
+				</itemlayout>
+
+				<focusedlayout width="278" height="72">
+					<control type="image">
+						<left>5</left>
+						<top>10</top>
+						<width>52</width>
+						<height>52</height>
+						<texture>$INFO[ListItem.Icon,home/]</texture>
+					</control>
+					<control type="label">
+						<left>88</left>
+						<top>0</top>
+						<width>240</width>
+						<height>72</height>
+						<font>Font38Semibold</font>
+						<textcolor>TextColorFO</textcolor>
+						<shadowcolor>ShadowColor</shadowcolor>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(9000)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+				<content>
+					<include>skinshortcuts-mainmenu</include>
+				</content>
+
+			</control>
+
+			<control type="group" id="9001">
+
+				<!-- Videos widget -->
+				<control type="fixedlist" id="9002">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">addons://sources/video</content>
+
+				</control>
+
+				<!-- Recent Movies widget -->
+				<control type="fixedlist" id="9003">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=recentmovies&amp;reload=$INFO[Window.Property(recentmovies)]</content>
+
+				</control>
+
+				<!-- Recommended Movies widget -->
+				<control type="fixedlist" id="9004">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=recommendedmovies&amp;reload=$INFO[Window.Property(recommendedmovies)]</content>
+
+				</control>
+
+				<!-- Random Movies widget -->
+				<control type="fixedlist" id="9005">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=randommovies&amp;reload=$INFO[Window.Property(randommovies)]</content>
+
+				</control>
+
+				<!-- Recent Episodes widget -->
+				<control type="fixedlist" id="9006">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=recentepisodes&amp;reload=$INFO[Window.Property(recentepisodes)]</content>
+
+				</control>
+
+				<!-- Recommended Episodes widget -->
+				<control type="fixedlist" id="9007">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=recommendedepisodes&amp;reload=$INFO[Window.Property(recommendedepisodes)]</content>
+
+				</control>
+
+				<!-- Random Episodes widget -->
+				<control type="fixedlist" id="9008">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Art(tvshow.poster)]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">plugin://service.library.data.provider?type=randomepisodes&amp;reload=$INFO[Window.Property(randomepisodes)]</content>
+
+				</control>
+
+				<!-- Music widget -->
+				<control type="fixedlist" id="9009">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">addons://sources/audio</content>
+
+				</control>
+
+				<!-- Picture widget -->
+				<control type="fixedlist" id="9010">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">addons://sources/image</content>
+
+				</control>
+
+				<!-- Program widget -->
+				<control type="fixedlist" id="9011">
+					<left>485</left>
+					<top>305</top>
+					<width>1615</width>
+					<height>400</height>
+					<onup>PageUp</onup>
+					<onup>PageUp</onup>
+					<onup>Control.Move(9000,-1)</onup>
+					<onup>9000</onup>
+					<ondown>PageUp</ondown>
+					<ondown>PageUp</ondown>
+					<ondown>Control.Move(9000,1)</ondown>
+					<ondown>9000</ondown>
+					<onleft>9000</onleft>
+					<onright>noop</onright>
+					<focusposition>1</focusposition>
+					<viewtype label="">list</viewtype>
+					<orientation>horizontal</orientation>
+					<defaultcontrol always="true">0</defaultcontrol>
+					<scrolltime tween="sine" easing="out">240</scrolltime>
+					<visible>StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons)</visible>
+
+					<itemlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture colordiffuse="66ffffff" background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="302" height="400">
+						<control type="image">
+							<left>13</left>
+							<top>0</top>
+							<width>280</width>
+							<height>400</height>
+							<aspectratio align="left" aligny="center">keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+					<content limit="10">addons://sources/executable</content>
+
+				</control>
+
+			</control>
+
+			<!-- Focused label -->
+			<control type="label">
+				<left>834</left>
+				<top>660</top>
+				<width>200</width>
+				<height>200</height>
+				<align>center</align>
+				<aligny>top</aligny>
+				<font>Font20Semibold</font>
+				<textcolor>TextColorFO</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$VAR[WidgetLabel]</label>
+				<animation effect="slide" start="0,0" end="0,60" time="0" condition="SubString(Container(9000).ListItem.Property(Widget),Movies,right) | SubString(Container(9000).ListItem.Property(Widget),Episodes,right)">conditional</animation>
+			</control>
+
+			<!-- RSS -->
+			<!--control type="rss" id="1">
+				<left>0</left>
+				<bottom>40</bottom>
+				<width>1920</width>
+				<height>30</height>
+				<font>Font30</font>
+				<textcolor>TextColor2</textcolor>
+				<headlinecolor>TextColor2</headlinecolor>
+				<titlecolor>TextColor2</titlecolor>
+				<urlset>1</urlset>
+			</control-->
+
+		</control>
+
+	</controls>
+
+</window>

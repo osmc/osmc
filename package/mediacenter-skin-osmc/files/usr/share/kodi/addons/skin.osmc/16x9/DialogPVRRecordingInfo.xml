@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- pvrrecordinginfo -->
+	<defaultcontrol always="true">10</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>19053</label>
+		</control>
+
+		<!-- Name -->
+		<control type="label">
+			<left>595</left>
+			<top>235</top>
+			<width>1175</width>
+			<height>36</height>
+			<font>Font36</font>
+			<textcolor>DialogColor1</textcolor>
+			<label>[B]$INFO[ListItem.Title][/B]</label>
+		</control>
+
+		<!-- Info -->
+		<control type="group">
+			<left>375</left>
+			<top>303</top>
+
+			<!-- Details -->
+			<control type="grouplist">
+				<width>1170</width>
+				<height>336</height>
+				<itemgap>12</itemgap>
+				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+
+				<!-- Start date -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>552</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.StartDate]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Start time -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.StartTime)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>142</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.StartTime]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Channel Name -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.ChannelName)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>19148</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.ChannelName]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Duration -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Duration)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>180</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Duration]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Genre -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Genre)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>135</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Genre]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Plot outline -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.PlotOutline)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>203</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.PlotOutline]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+			</control>
+
+			<!-- Plot -->
+			<control type="textbox" id="400">
+				<top>370</top>
+				<width>1170</width>
+				<height>210</height>
+				<label>$INFO[ListItem.Plot]</label>
+				<textcolor>DialogColor2</textcolor>
+			</control>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>912</top>
+			<width>1620</width>
+			<height>66</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="10">
+				<width>270</width>
+				<label>186</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

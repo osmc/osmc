@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- skinsettings -->
+	<backgroundcolor>0xff18394a</backgroundcolor>
+	<defaultcontrol always="true">9</defaultcontrol>
+	<onunload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onunload>
+
+	<controls>
+
+		<!-- Background -->
+		<include>WindowBackgroundImage</include>
+
+		<!-- Fanart -->
+		<include>Fanart</include>
+
+		<!-- Curve -->
+		<control type="image">
+			<right>20</right>
+			<top>20</top>
+			<width>1520</width>
+			<height>1040</height>
+			<texture border="40,0,0,0">common/Curve.png</texture>
+			<visible>Skin.HasSetting(ShowCurve)</visible>
+		</control>
+
+		<!-- Curve -->
+		<control type="image">
+			<right>20</right>
+			<top>20</top>
+			<width>1172</width>
+			<height>1040</height>
+			<texture border="40,0,0,0">common/Curve.png</texture>
+			<visible>Skin.HasSetting(ShowCurve)</visible>
+		</control>
+
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Dummy list -->
+		<control type="grouplist" id="9000">
+			<left>120</left>
+			<top>240</top>
+			<width>300</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<orientation>vertical</orientation>
+
+			<!-- Appearance -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>480</label>
+				<font>Font42</font>
+				<textcolor>TextColor1</textcolor>
+			</control>
+			<!-- Videos -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>3</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- Music -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>2</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- Pictures -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>1</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- Weather -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>8</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- System -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>13000</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- Service -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>14036</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- PVR -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>31015</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- System info -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>130</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- More -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>22082</label>
+				<font>Font42</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+
+		</control>
+
+		<!-- Dummy main list -->
+		<control type="grouplist">
+			<left>480</left>
+			<top>244</top>
+			<width>1680</width>
+			<height>726</height>
+			<itemgap>34</itemgap>
+			<orientation>vertical</orientation>
+
+			<!-- Skin -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>166</label>
+				<font>Font33</font>
+				<textcolor>TextColor1</textcolor>
+			</control>
+			<!-- International -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>14090</label>
+				<font>Font33</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- File lists -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>14081</label>
+				<font>Font33</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+			<!-- Screensaver -->
+			<control type="button">
+				<width>300</width>
+				<height>42</height>
+				<label>360</label>
+				<font>Font33</font>
+				<textcolor>TextColor3</textcolor>
+			</control>
+
+		</control>
+
+		<!-- Dummy main list indicator -->
+		<control type="image">
+			<left>442</left>
+			<top>248</top>
+			<width>20</width>
+			<height>60</height>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
+			<animation effect="fade" start="100" end="50" time="0" condition="true">Conditional</animation>
+		</control>
+
+		<!-- Dummy sub list -->
+		<control type="grouplist">
+			<left>830</left>
+			<top>244</top>
+			<width>970</width>
+			<height>574</height>
+			<itemgap>34</itemgap>
+			<onleft>3</onleft>
+			<onright>998</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			<usecontrolcoords>true</usecontrolcoords>
+
+			<!-- Skin -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>166</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>0</right>
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>OSMC</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+			</control>
+			<!-- Settings -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>- $LOCALIZE[21417]</label>
+					<textcolor>TextColor1</textcolor>
+				</control>
+			</control>
+			<!-- Theme -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>- $LOCALIZE[15111]</label>
+					<textcolor>TextColor4</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>15109</label>
+					<align>right</align>
+					<textcolor>TextColor4</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+			<!-- Colours -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>- $LOCALIZE[14078]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>15109</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+			<!-- Fonts -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>- $LOCALIZE[13303]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>13278</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+			<!-- Zoom -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>- $LOCALIZE[20109]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>0 %</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+			<!-- Start window -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>$LOCALIZE[512]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>513</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+			<!-- Navigation sounds -->
+			<control type="group">
+				<width>970</width>
+				<height>42</height>
+				<control type="label">
+					<width>970</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>$LOCALIZE[15108]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<right>75</right>
+					<width>900</width>
+					<height>42</height>
+					<font>Font33</font>
+					<label>15109</label>
+					<align>right</align>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<right>35</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowDownNF.png</texture>
+				</control>
+				<control type="image">
+					<right>0</right>
+					<top>-12</top>
+					<width>35</width>
+					<height>66</height>
+					<texture>common/ArrowUpNF.png</texture>
+				</control>
+			</control>
+
+		</control>
+
+		<!-- Sub list indicator -->
+		<control type="image">
+			<left>792</left>
+			<top>248</top>
+			<width>20</width>
+			<height>60</height>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
+		</control>
+
+		<!-- Settings description -->
+		<control type="textbox">
+			<left>830</left>
+			<top>856</top>
+			<width>970</width>
+			<height>118</height>
+			<label>36104</label>
+			<textcolor>TextColor1</textcolor>
+			<shadowcolor>TextColor4</shadowcolor>
+		</control>
+
+		<!-- Skin settings -->
+		<control type="group">
+			<include>DialogZoomAnimation</include>
+
+			<!-- Background -->
+			<include>DialogBackgroundImage</include>
+
+			<!-- Heading -->
+			<control type="label">
+				<left>150</left>
+				<top>96</top>
+				<width>1620</width>
+				<height>72</height>
+				<font>Font72</font>
+				<label>20077</label>
+			</control>
+
+			<!-- Left grouplist -->
+			<control type="grouplist" id="9">
+				<left>150</left>
+				<top>228</top>
+				<width>360</width>
+				<height>660</height>
+				<itemgap>0</itemgap>
+				<onleft>noop</onleft>
+				<onright>2</onright>
+				<onup>noop</onup>
+				<ondown>9001</ondown>
+				<orientation>vertical</orientation>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+
+				<!-- Home items-->
+				<control type="button" id="10">
+					<width>600</width>
+					<height>66</height>
+					<label>31021</label>
+					<textcolor>$VAR[SkinSettingButton10]</textcolor>
+				</control>
+
+				<!-- Background -->
+				<control type="button" id="11">
+					<width>600</width>
+					<height>66</height>
+					<label>31020</label>
+					<textcolor>$VAR[SkinSettingButton11]</textcolor>
+				</control>
+
+				<!-- General -->
+				<control type="button" id="12">
+					<width>600</width>
+					<height>66</height>
+					<label>128</label>
+					<textcolor>$VAR[SkinSettingButton12]</textcolor>
+				</control>
+			</control>
+
+			<!-- Right grouplist -->
+			<control type="grouplist" id="2">
+				<left>600</left>
+				<top>228</top>
+				<width>1240</width>
+				<height>660</height>
+				<itemgap>0</itemgap>
+				<onleft>9</onleft>
+				<onright>noop</onright>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+
+				<!-- Home items -->
+				<!-- Home submenu-->
+				<control type="button" id="1213">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31049</label>
+					<onclick>RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu)</onclick>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+				<!-- Hide submenu headings -->
+				<control type="radiobutton" id="1214">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31053</label>
+					<onclick>Skin.ToggleSetting(HideSubmenuHeading)</onclick>
+					<selected>Skin.HasSetting(HideSubmenuHeading)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+				<!-- Horizontal home -->
+				<control type="radiobutton" id="1002">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31061</label>
+					<onclick>Skin.ToggleSetting(HomeHorizontal)</onclick>
+					<selected>Skin.HasSetting(HomeHorizontal)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+				<!-- Hide OSMC logo -->
+				<control type="radiobutton" id="1112">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31040</label>
+					<onclick>Skin.ToggleSetting(HideOSMCLogo)</onclick>
+					<selected>Skin.HasSetting(HideOSMCLogo)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+
+				<!-- Background -->
+				<!-- Custom image -->
+				<control type="button" id="1000">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31064</label>
+					<onclick>Skin.SetFile(CustomBackgroundImage,,special://skin/extras/backgrounds/)</onclick>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Background video -->
+				<control type="radiobutton" id="1003">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31027</label>
+					<onclick>Skin.ToggleSetting(BackgroundVideo)</onclick>
+					<selected>Skin.HasSetting(BackgroundVideo)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Background visualisation -->
+				<control type="radiobutton" id="1004">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31028</label>
+					<onclick>Skin.ToggleSetting(BackgroundVisualisation)</onclick>
+					<selected>Skin.HasSetting(BackgroundVisualisation)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Enable artist slideshow -->
+				<control type="radiobutton" id="1005">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31034</label>
+					<onclick>Skin.ToggleSetting(EnableArtistFanart)</onclick>
+					<selected>Skin.HasSetting(EnableArtistFanart)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Fade artist slideshow -->
+				<control type="radiobutton" id="1006">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31014</label>
+					<onclick>Skin.ToggleSetting(FadeArtistFanart)</onclick>
+					<selected>Skin.HasSetting(FadeArtistFanart)</selected>
+					<visible>ControlGroup(9).HasFocus(11) + Skin.HasSetting(EnableArtistFanart)</visible>
+				</control>
+
+				<!-- General -->
+				<!-- Headings -->
+				<control type="radiobutton" id="1301">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31060</label>
+					<onclick>Skin.ToggleSetting(Headings)</onclick>
+					<selected>Skin.HasSetting(Headings)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Show curved segments -->
+				<control type="radiobutton" id="1007">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31030</label>
+					<onclick>Skin.ToggleSetting(ShowCurve)</onclick>
+					<selected>Skin.HasSetting(ShowCurve)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Hide 'Mouse' warning -->
+				<control type="radiobutton" id="1008">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31065</label>
+					<onclick>Skin.ToggleSetting(HideMouse)</onclick>
+					<selected>Skin.HasSetting(HideMouse)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Enable Debug Grid -->
+				<control type="radiobutton" id="1302">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31041</label>
+					<onclick>Skin.ToggleSetting(DebugGrid)</onclick>
+					<selected>Skin.HasSetting(DebugGrid)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Disable Debug Info -->
+				<control type="radiobutton" id="1303">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31042</label>
+					<onclick>Skin.ToggleSetting(DebugInfo)</onclick>
+					<selected>Skin.HasSetting(DebugInfo)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Kiosk mode -->
+				<control type="radiobutton" id="1304">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31057</label>
+					<onclick>Skin.ToggleSetting(KioskMode)</onclick>
+					<selected>Skin.HasSetting(KioskMode)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Reset skin's setting -->
+				<control type="button" id="1305">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31058</label>
+					<onclick>Skin.ResetSettings</onclick>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+
+			</control>
+
+		</control>
+
+		<!-- Hide settings warning -->
+		<control type="textbox">
+			<left>600</left>
+			<top>894</top>
+			<width>1240</width>
+			<height>132</height>
+			<label>31051</label>
+			<textcolor>DisabledColor</textcolor>
+			<visible>ControlGroup(9).HasFocus(11) + Skin.HasSetting(HideSettings)</visible>
+		</control>
+
+	</controls>
+
+</window>

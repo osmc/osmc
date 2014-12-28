@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- shutdownmenu -->
+	<defaultcontrol always="true">6001</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- List -->
+		<control type="grouplist" id="6000">
+			<left>120</left>
+			<top>120</top>
+			<width>1200</width>
+			<height>792</height>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<onleft>Close</onleft>
+			<onright>Close</onright>
+			<itemgap>38</itemgap>
+			<scrolltime>200</scrolltime>
+			<orientation>vertical</orientation>
+
+			<!-- Dummy to set focus to top -->
+			<control type="button" id="6001">
+				<width>0</width>
+				<height>-8</height>
+				<label>-</label>
+				<onfocus>Down</onfocus>
+			</control>
+			<control type="button" id="6002">
+				<include>ShutdownButtons</include>
+				<label>13012</label>
+				<onclick>XBMC.Quit()</onclick>
+				<visible>System.ShowExitButton</visible>
+			</control>
+			<control type="button" id="6003">
+				<include>ShutdownButtons</include>
+				<label>13016</label>
+				<onclick>XBMC.Powerdown()</onclick>
+				<visible>System.CanPowerDown</visible>
+			</control>
+			<control type="button" id="6004">
+				<include>ShutdownButtons</include>
+				<label>13011</label>
+				<onclick>XBMC.Suspend()</onclick>
+				<visible>System.CanSuspend</visible>
+			</control>
+			<control type="button" id="6005">
+				<include>ShutdownButtons</include>
+				<label>13010</label>
+				<onclick>XBMC.Hibernate()</onclick>
+				<visible>System.CanHibernate</visible>
+			</control>
+			<control type="button" id="6006">
+				<include>ShutdownButtons</include>
+				<label>13013</label>
+				<onclick>XBMC.Reset()</onclick>
+				<visible>System.CanReboot</visible>
+			</control>
+			<control type="button" id="6007">
+				<include>ShutdownButtons</include>
+				<label>$LOCALIZE[20126] $INFO[system.profilename]</label>
+				<onclick>dialog.close(all,true)</onclick>
+				<onclick>System.LogOff</onclick>
+				<visible>System.HasLoginScreen | IntegerGreaterThan(System.ProfileCount,1)</visible>
+				<visible>System.Loggedon</visible>
+			</control>
+			<control type="togglebutton" id="6008">
+				<include>ShutdownButtons</include>
+				<label>20046</label>
+				<altlabel>20045</altlabel>
+				<usealttexture>!System.IsMaster</usealttexture>
+				<onclick>xbmc.mastermode</onclick>
+				<visible>System.HasLocks</visible>
+			</control>
+			<control type="button" id="6009">
+				<include>ShutdownButtons</include>
+				<label>13017</label>
+				<onclick>XBMC.InhibitIdleShutdown(true)</onclick>
+				<visible>System.HasShutdown +!System.IsInhibit</visible>
+			</control>
+			<control type="button" id="6010">
+				<include>ShutdownButtons</include>
+				<label>13018</label>
+				<onclick>XBMC.InhibitIdleShutdown(false)</onclick>
+				<visible>System.HasShutdown + System.IsInhibit</visible>
+			</control>
+			<control type="button" id="6011">
+				<include>ShutdownButtons</include>
+				<label>20150</label>
+				<onclick>XBMC.AlarmClock(shutdowntimer,XBMC.Shutdown())</onclick>
+				<visible>!System.HasAlarm(shutdowntimer)</visible>
+				<visible>System.CanPowerDown | System.CanSuspend | System.CanHibernate</visible>
+			</control>
+			<control type="button" id="6012">
+				<include>ShutdownButtons</include>
+				<label>20151</label>
+				<onclick>XBMC.CancelAlarm(shutdowntimer)</onclick>
+				<visible>System.HasAlarm(shutdowntimer)</visible>
+			</control>
+			<control type="label" id="6013">
+				<include>ShutdownButtons</include>
+				<label>$INFO[System.Alarmpos,T-]</label>
+				<visible>System.HasAlarm(shutdowntimer)</visible>
+			</control>
+			<control type="button" id="6014">
+				<include>ShutdownButtons</include>
+				<label>5</label>
+				<onclick>ActivateWindow(Settings)</onclick>
+			</control>
+		</control>
+
+	</controls>
+
+</window>

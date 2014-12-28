@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- busydialog -->
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogFadeBackgroundImage</include>
+
+		<!-- Main group -->
+		<control type="group">
+			<include>DialogZoomAnimation</include>
+			<centerleft>50%</centerleft>
+			<centertop>50%</centertop>
+			<width>680</width>
+			<height>220</height>
+
+			<!-- Background -->
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<width>680</width>
+				<height>220</height>
+				<texture border="20">dialogs/DialogBackground.png</texture>
+			</control>
+
+			<!-- Heading -->
+			<control type="label">
+				<centerleft>50%</centerleft>
+				<top>40</top>
+				<width>600</width>
+				<height>48</height>
+				<align>center</align>
+				<font>Font48</font>
+				<textcolor>DialogColor1</textcolor>
+				<label>503</label>
+			</control>
+
+			<!-- Details -->
+			<control type="label">
+				<centerleft>50%</centerleft>
+				<top>96</top>
+				<width>600</width>
+				<height>42</height>
+				<align>center</align>
+				<font>Font42</font>
+				<textcolor>DialogColor2</textcolor>
+				<label>20186</label>
+			</control>
+
+			<!-- Scroll -->
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<top>152</top>
+				<width>176</width>
+				<height>20</height>
+				<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+			</control>
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<top>152</top>
+				<width>24</width>
+				<height>20</height>
+				<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripHorizontalFO.png</texture>
+				<animation effect="slide" start="-76,0" end="76,0" time="800" loop="true" tween="cubic" easing="out" condition="true">Conditional</animation>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- selectdialog -->
+	<defaultcontrol always="true">3</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+	<zorder>2</zorder>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="1">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+		</control>
+
+		<!-- Image -->
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[Container(6).ListItem.Icon]</texture>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>Control.IsVisible(6) + !SubString(Container(6).ListItem.Icon,Default)</visible>
+		</control>
+		<control type="image">
+			<left>150</left>
+			<top>225</top>
+			<width>405</width>
+			<height>600</height>
+			<texture>$INFO[Container(6).ListItem.Icon]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio aligny="center">keep</aspectratio>
+			<visible>Control.IsVisible(6) + SubString(Container(6).ListItem.Icon,Default)</visible>
+		</control>
+
+		<!-- List -->
+		<control type="list" id="3">
+			<left>150</left>
+			<top>235</top>
+			<width>1620</width>
+			<height>580</height>
+			<onup>noop</onup>
+			<ondown>5</ondown>
+			<onleft>5</onleft>
+			<onright>5</onright>
+			<orientation>vertical</orientation>
+			<viewtype label="list">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1620" height="58">
+				<control type="label">
+					<width>1620</width>
+					<height>58</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1620" height="58">
+				<control type="label">
+					<width>1620</width>
+					<height>58</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(3)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- List -->
+		<control type="list" id="6">
+			<left>600</left>
+			<top>235</top>
+			<width>1170</width>
+			<height>576</height>
+			<onup>noop</onup>
+			<ondown>5</ondown>
+			<onleft>5</onleft>
+			<onright>5</onright>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<top>10</top>
+					<width>1030</width>
+					<height>36</height>
+					<font>Font36</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="slide" end="0,18" condition="IsEmpty(ListItem.Property(Addon.Summary))">Conditional</animation>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<top>54</top>
+					<width>1030</width>
+					<height>27</height>
+					<font>Font27</font>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Property(Addon.Summary)]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1170" height="96">
+				<control type="image">
+					<width>96</width>
+					<height>96</height>
+					<bordersize>6</bordersize>
+					<aspectratio>scale</aspectratio>
+					<texture>$INFO[ListItem.Icon]</texture>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(6)">Conditional</animation>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<top>10</top>
+					<width>1030</width>
+					<height>36</height>
+					<font>Font36</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="slide" end="0,18" condition="IsEmpty(ListItem.Property(Addon.Summary))">Conditional</animation>
+				</control>
+				<control type="label">
+					<left>140</left>
+					<top>54</top>
+					<width>1030</width>
+					<height>27</height>
+					<font>Font27</font>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Property(Addon.Summary)]</label>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- Get more button -->
+		<control type="button" id="5">
+			<left>150</left>
+			<top>912</top>
+			<width>400</width>
+			<height>66</height>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>3</onup>
+			<ondown>noop</ondown>
+		</control>
+
+	</controls>
+
+</window>

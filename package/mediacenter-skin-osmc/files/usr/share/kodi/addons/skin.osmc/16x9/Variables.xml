@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<variable name="HomeWidgets">
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons)">addons://sources/video</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">plugin://service.library.data.provider?type=recentmovies&amp;reload=$INFO[Window.Property(recentmovies)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)">plugin://service.library.data.provider?type=recommendedmovies&amp;reload=$INFO[Window.Property(recommendedmovies)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">plugin://service.library.data.provider?type=randommovies&amp;reload=$INFO[Window.Property(randommovies)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)">plugin://service.library.data.provider?type=recentepisodes&amp;reload=$INFO[Window.Property(recentepisodes)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)">plugin://service.library.data.provider?type=recommendedepisodes&amp;reload=$INFO[Window.Property(recommendedepisodes)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">plugin://service.library.data.provider?type=randomepisodes&amp;reload=$INFO[Window.Property(randomepisodes)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons)">addons://sources/audio</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons)">addons://sources/image</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons)">addons://sources/executable</value>
+	</variable>
+
+	<variable name="WidgetLabel">
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons)">$INFO[Container(9002).ListItem.Label]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$INFO[Container(9003).ListItem.Label]$INFO[Container(9003).ListItem.Year, (,)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)">$INFO[Container(9004).ListItem.Label]$INFO[Container(9004).ListItem.Year, (,)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">$INFO[Container(9005).ListItem.Label]$INFO[Container(9005).ListItem.Year, (,)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)">$INFO[Container(9006).ListItem.TVshowTitle]$INFO[Container(9006).ListItem.Property(episodeno),[CR]]$INFO[Container(9006).ListItem.Label,[CR]]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)">$INFO[Container(9007).ListItem.TVshowTitle]$INFO[Container(9007).ListItem.Property(episodeno),[CR]]$INFO[Container(9007).ListItem.Label,[CR]]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">$INFO[Container(9008).ListItem.TVshowTitle]$INFO[Container(9008).ListItem.Property(episodeno),[CR]]$INFO[Container(9008).ListItem.Label,[CR]]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons)">$INFO[Container(9009).ListItem.Label]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons)">$INFO[Container(9010).ListItem.Label]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons)">$INFO[Container(9011).ListItem.Label]</value>
+	</variable>
+
+	<variable name="WidgetFanart">
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$INFO[Container(9003).ListItem.Art(fanart)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)">$INFO[Container(9004).ListItem.Art(fanart)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">$INFO[Container(9005).ListItem.Art(fanart)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)">$INFO[Container(9006).ListItem.Art(fanart)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)">$INFO[Container(9007).ListItem.Art(fanart)]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">$INFO[Container(9008).ListItem.Art(fanart)]</value>
+	</variable>
+
+	<variable name="HeadingLabel">
+		<value condition="Container.Content(movies) + Skin.HasSetting(Headings)">$LOCALIZE[342]</value>
+		<value condition="Container.Content(tvshows) + Skin.HasSetting(Headings)">$LOCALIZE[20343]</value>
+		<value condition="Container.Content(seasons) + Skin.HasSetting(Headings)">$LOCALIZE[3309002]</value>
+		<value condition="Container.Content(episodes) + Skin.HasSetting(Headings)">$LOCALIZE[20360]</value>
+		<value condition="Container.Content(musicvideos) + Skin.HasSetting(Headings)">$LOCALIZE[20389]</value>
+		<value condition="Container.Content(genres) + Skin.HasSetting(Headings)">$LOCALIZE[135]</value>
+		<value condition="Container.Content(years) + Skin.HasSetting(Headings)">$LOCALIZE[652]</value>
+		<value condition="Container.Content(actors) + Skin.HasSetting(Headings)">$LOCALIZE[344]</value>
+		<value condition="Container.Content(albums) + Skin.HasSetting(Headings)">$LOCALIZE[132]</value>
+		<value condition="Container.Content(artists) + Skin.HasSetting(Headings)">$LOCALIZE[133]</value>
+		<value condition="Container.Content(songs) + Skin.HasSetting(Headings)">$LOCALIZE[134]</value>
+		<value condition="Container.Content(playlists) + Skin.HasSetting(Headings)">$LOCALIZE[136]</value>
+		<value condition="Container.Content(studios) + Skin.HasSetting(Headings)">$LOCALIZE[20388]</value>
+		<value condition="Container.Content(directors) + Skin.HasSetting(Headings)">$LOCALIZE[20348]</value>
+		<value condition="Container.Content(countries) + Skin.HasSetting(Headings)">$LOCALIZE[20451]</value>
+		<value condition="Container.Content(Addons) + !Window.IsVisible(addonbrowser) + Skin.HasSetting(Headings)">$LOCALIZE[24001]</value>
+		<value condition="Container.Content(sets) + Skin.HasSetting(Headings)">$LOCALIZE[20434]</value>
+		<value condition="Container.Content(tags) + Skin.HasSetting(Headings)">$LOCALIZE[20459]</value>
+		<value condition="Window.IsVisible(TVChannels) + Skin.HasSetting(Headings)">$LOCALIZE[19020]: $LOCALIZE[19019]</value>
+		<value condition="Window.IsVisible(RadioChannels) + Skin.HasSetting(Headings)">$LOCALIZE[19021]: $LOCALIZE[19019]</value>
+		<value condition="Window.IsVisible(TVGuide) + Skin.HasSetting(Headings)">$LOCALIZE[19020]: $LOCALIZE[22020]</value>
+		<value condition="Window.IsVisible(RadioGuide) + Skin.HasSetting(Headings)">$LOCALIZE[19021]: $LOCALIZE[22020]</value>
+		<value condition="Window.IsVisible(TVRecordings) + Skin.HasSetting(Headings)">$LOCALIZE[19020]: $LOCALIZE[19017]</value>
+		<value condition="Window.IsVisible(RadioRecordings) + Skin.HasSetting(Headings)">$LOCALIZE[19021]: $LOCALIZE[19017]</value>
+		<value condition="Window.IsVisible(TVTimers) + Skin.HasSetting(Headings)">$LOCALIZE[19020]: $LOCALIZE[19040]</value>
+		<value condition="Window.IsVisible(RadioTimers) + Skin.HasSetting(Headings)">$LOCALIZE[19021]: $LOCALIZE[19040]</value>
+		<value condition="Window.IsVisible(TVSearch) + Skin.HasSetting(Headings)">$LOCALIZE[19020]: $LOCALIZE[137]</value>
+		<value condition="Window.IsVisible(RadioSearch) + Skin.HasSetting(Headings)">$LOCALIZE[19021]: $LOCALIZE[137]</value>
+		<value condition="[Window.IsVisible(musiclibrary) | Window.IsVisible(musicfiles)] + Skin.HasSetting(Headings)">$LOCALIZE[2]</value>
+		<value condition="Window.IsVisible(videolibrary) + Skin.HasSetting(Headings)">$LOCALIZE[3]</value>
+		<value condition="Window.IsVisible(pictures) + Skin.HasSetting(Headings)">$LOCALIZE[1]</value>
+		<value condition="Window.IsVisible(programs) + Skin.HasSetting(Headings)">$LOCALIZE[0]</value>
+		<value condition="[Window.IsVisible(settings) | Window.IsVisible(SettingsCategory.xml) | Window.IsVisible(skinsettings) | Window.IsVisible(systeminfo) | Window.IsVisible(addonbrowser) | Window.IsVisible(profiles) | Window.IsVisible(filemanager)] + Skin.HasSetting(Headings)">$LOCALIZE[5]</value>
+		<value condition="Window.IsVisible(weather) + Skin.HasSetting(Headings)">$LOCALIZE[8]</value>
+	</variable>
+
+	<variable name="PVRChannelIcon">
+		<value condition="ListItem.IsEncrypted">pvr/encrypted.png</value>
+		<value>$INFO[ListItem.Thumb]</value>
+	</variable>
+
+	<variable name="BackgroundImage">
+		<value condition="!IsEmpty(Skin.String(CustomBackgroundImage))">$INFO[Skin.String(CustomBackgroundImage)]</value>
+		<value>special://skin/extras/backgrounds/Blue.jpg</value>
+	</variable>
+
+	<variable name="SubMenuHeading">
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1037]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31031]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31032]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31054]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31035]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31036]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31055]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31038]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31039]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31056]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1038]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1039]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1043]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),Favourites) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1036]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),Playlist) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(Hide_Widget_Headings)">$INFO[Container(9002).ListItem.Label]</value>
+	</variable>
+
+	<variable name="SubMenuColor">
+		<value condition="!Control.HasFocus(9002)">TextColor2</value>
+		<value>TextColor1</value>
+	</variable>
+
+	<variable name="Plot">
+		<value condition="!IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
+		<value condition="!IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
+	</variable>
+
+	<variable name="Day0">
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day0.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day1">
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day1.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day2">
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day2.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day3">
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day3.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day4">
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day4.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day5">
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day5.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day6">
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day6.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="Day7">
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[11])">$LOCALIZE[41]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[12])">$LOCALIZE[42]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[13])">$LOCALIZE[43]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[14])">$LOCALIZE[44]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[15])">$LOCALIZE[45]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[16])">$LOCALIZE[46]</value>
+		<value condition="StringCompare(Window(Weather).Property(Day7.Title),$LOCALIZE[17])">$LOCALIZE[47]</value>
+	</variable>
+
+	<variable name="VideoPlayerPlot">
+		<value condition="!IsEmpty(VideoPlayer.PlotOutline)">$INFO[VideoPlayer.PlotOutline]</value>
+		<value condition="!IsEmpty(VideoPlayer.Plot)">$INFO[VideoPlayer.Plot]</value>
+		<value>$LOCALIZE[161]</value>
+	</variable>
+
+	<variable name="VideoPlayerTitle">
+		<value condition="!IntegerGreaterThan(VideoPlayer.Season,9) + !IntegerGreaterThan(VideoPlayer.Episode,9) + !SubString(VideoPlayer.Episode,s)">$INFO[VideoPlayer.TVShowTitle,, &#8226; ]$INFO[VideoPlayer.Season,S0,]$INFO[VideoPlayer.Episode,E0, &#8226; ]$INFO[Player.Title]</value>
+		<value condition="!IntegerGreaterThan(VideoPlayer.Season,9) + IntegerGreaterThan(VideoPlayer.Episode,9) + !SubString(VideoPlayer.Episode,s)">$INFO[VideoPlayer.TVShowTitle,, &#8226; ]$INFO[VideoPlayer.Season,S0,]$INFO[VideoPlayer.Episode,E, &#8226; ]$INFO[Player.Title]</value>
+		<value condition="IntegerGreaterThan(VideoPlayer.Season,9) + IntegerGreaterThan(VideoPlayer.Episode,9) + !SubString(VideoPlayer.Episode,s)">$INFO[VideoPlayer.TVShowTitle,, &#8226; ]$INFO[VideoPlayer.Season,S,]$INFO[VideoPlayer.Episode,E0, &#8226; ]$INFO[Player.Title]</value>
+		<value condition="SubString(VideoPlayer.Episode,s)">$INFO[VideoPlayer.TVShowTitle,, &#8226; ]$INFO[VideoPlayer.Episode,, &#8226; ]$INFO[Player.Title]</value>
+		<value>$INFO[Player.Title]</value>
+	</variable>
+
+	<variable name="StatusOverlay">
+		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/OverlayResumable.png</value>
+		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatched.png</value>
+	</variable>
+
+	<variable name="StatusOverlayWide">
+		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/OverlayResumableWide.png</value>
+		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatchedWide.png</value>
+	</variable>
+
+	<variable name="CustomMenuHeading">
+		<value condition="ControlGroup(4000).HasFocus()">$LOCALIZE[31004]</value>
+		<value condition="ControlGroup(5000).HasFocus()">$LOCALIZE[22082]</value>
+		<value>$LOCALIZE[31003]</value>
+	</variable>
+
+	<variable name="PlayerStatus">
+		<value condition="Player.Forwarding2x">[B]x2[/B]</value>
+		<value condition="Player.Forwarding4x">[B]x4[/B]</value>
+		<value condition="Player.Forwarding8x">[B]x8[/B]</value>
+		<value condition="Player.Forwarding16x">[B]x16[/B]</value>
+		<value condition="Player.Forwarding32x">[B]x32[/B]</value>
+		<value condition="Player.Rewinding2x">[B]x2[/B]</value>
+		<value condition="Player.Rewinding4x">[B]x4[/B]</value>
+		<value condition="Player.Rewinding8x">[B]x8[/B]</value>
+		<value condition="Player.Rewinding16x">[B]x16[/B]</value>
+		<value condition="Player.Rewinding32x">[B]x32[/B]</value>
+	</variable>
+
+	<variable name="SettingButtonFade">
+		<value condition="ControlGroup(5).HasFocus">TextColor3</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="MoreButtonFade">
+		<value condition="ControlGroup(8000).HasFocus">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SkinSettingButton10">
+		<value condition="ControlGroup(9).HasFocus(10)">DialogColor1</value>
+		<value>DialogColor2</value>
+	</variable>
+
+	<variable name="SkinSettingButton11">
+		<value condition="ControlGroup(9).HasFocus(11)">DialogColor1</value>
+		<value>DialogColor2</value>
+	</variable>
+
+	<variable name="SkinSettingButton12">
+		<value condition="ControlGroup(9).HasFocus(12)">DialogColor1</value>
+		<value>DialogColor2</value>
+	</variable>
+
+	<variable name="Label1">
+		<value condition="!IsEmpty(ListItem.Title)">$INFO[ListItem.Title]</value>
+		<value>$INFO[ListItem.Label]</value>
+	</variable>
+
+	<variable name="SongLabel">
+		<value condition="Container.Content(songs)">$INFO[ListItem.TrackNumber,,. ]$INFO[ListItem.Title]</value>
+		<value>$INFO[ListItem.Label]</value>
+	</variable>
+
+	<variable name="VideoInfoLabel">
+		<value condition="Container.Content(episodes) + !IntegerGreaterThan(ListItem.Season,9) + !IntegerGreaterThan(ListItem.Episode,9) + !SubString(ListItem.Episode,s)">$INFO[ListItem.TVShowTitle]$INFO[ListItem.Year, (,) &#8226; ]$INFO[ListItem.Season,S0,]$INFO[ListItem.Episode,E0, &#8226; ]$INFO[ListItem.Title]</value>
+		<value condition="Container.Content(episodes) + !IntegerGreaterThan(ListItem.Season,9) + IntegerGreaterThan(ListItem.Episode,9) + !SubString(ListItem.Episode,s)">$INFO[ListItem.TVShowTitle]$INFO[ListItem.Year, (,) &#8226; ]$INFO[ListItem.Season,S0,]$INFO[ListItem.Episode,E, &#8226; ]$INFO[ListItem.Title]</value>
+		<value condition="Container.Content(episodes) + IntegerGreaterThan(ListItem.Season,9) + IntegerGreaterThan(ListItem.Episode,9) + !SubString(ListItem.Episode,s)">$INFO[ListItem.TVShowTitle]$INFO[ListItem.Year, (,) &#8226; ]$INFO[ListItem.Season,S,]$INFO[ListItem.Episode,E0, &#8226; ]$INFO[ListItem.Title]</value>
+		<value condition="Container.Content(episodes) + SubString(ListItem.Episode,s)">$INFO[ListItem.TVShowTitle]$INFO[ListItem.Year, (,) &#8226; ]$INFO[ListItem.Episode,, &#8226; ]$INFO[ListItem.Title]</value>
+		<value>$INFO[ListItem.Title]$INFO[ListItem.Year, (,)]</value>
+	</variable>
+
+	<variable name="VideoInfoImage">
+		<value condition="!IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
+		<value condition="!IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
+		<value condition="!IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+		<value>$INFO[ListItem.Thumb]</value>
+	</variable>
+
+	<variable name="MusicInfoLabel">
+		<value condition="Container.Content(albums)">$INFO[ListItem.Album]</value>
+		<value>$INFO[ListItem.Artist]</value>
+	</variable>
+
+	<variable name="MusicInfoTracks">
+		<value condition="Container.Content(albums)">$INFO[ListItem.TrackNumber,,. ]$INFO[ListItem.Label]</value>
+		<value>$INFO[ListItem.Label]</value>
+	</variable>
+
+	<variable name="MusicInfoDescription">
+		<value condition="Container.Content(albums)">$INFO[ListItem.Property(Album_Description)]</value>
+		<value>$INFO[ListItem.Property(Artist_Description)]</value>
+	</variable>
+
+	<variable name="Label2">
+		<value condition="Container.Content(movies) + !IsEmpty(ListItem.Year) + !IsEmpty(ListItem.Genre)">$INFO[ListItem.Year] &#8226; $INFO[ListItem.Genre]</value>
+		<value condition="Container.Content(movies) + !IsEmpty(ListItem.Year) + IsEmpty(ListItem.Genre)">$INFO[ListItem.Year]</value>
+		<value condition="Container.Content(movies) + IsEmpty(ListItem.Year) + !IsEmpty(ListItem.Genre)">$INFO[ListItem.Genre]</value>
+		<value condition="[Container.Content(tvshows) | Container.Content(seasons)] + !IsEmpty(ListItem.Year) + StringCompare(ListItem.Property(UnWatchedEpisodes),1)">$INFO[ListItem.Year] &#8226; $INFO[ListItem.Property(UnWatchedEpisodes)] $LOCALIZE[16101] $LOCALIZE[20452]</value>
+		<value condition="[Container.Content(tvshows) | Container.Content(seasons)] + !IsEmpty(ListItem.Year) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),1)">$INFO[ListItem.Year] &#8226; $INFO[ListItem.Property(UnWatchedEpisodes)] $LOCALIZE[16101] $LOCALIZE[20453]</value>
+		<value condition="[Container.Content(tvshows) | Container.Content(seasons)] + !IsEmpty(ListItem.Year) + !IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),1)">$INFO[ListItem.Year]</value>
+		<value condition="[Container.Content(tvshows) | Container.Content(seasons)] + IsEmpty(ListItem.Year) + StringCompare(ListItem.Property(UnWatchedEpisodes),1)">$INFO[ListItem.Property(UnWatchedEpisodes)] $LOCALIZE[16101] $LOCALIZE[20452]</value>
+		<value condition="[Container.Content(tvshows) | Container.Content(seasons)] + IsEmpty(ListItem.Year) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),1)">$INFO[ListItem.Property(UnWatchedEpisodes)] $LOCALIZE[16101] $LOCALIZE[20453]</value>
+		<value condition="Container.Content(episodes) + !IsEmpty(ListItem.Season) + !IsEmpty(ListItem.Episode) + !IsEmpty(ListItem.Date)">$INFO[ListItem.Season,$LOCALIZE[20373] ] &#8226; $INFO[ListItem.Episode,$LOCALIZE[20359] ] &#8226; Aired on $INFO[ListItem.Date]</value>
+		<value condition="Container.Content(episodes) + !IsEmpty(ListItem.Season) + !IsEmpty(ListItem.Episode) + IsEmpty(ListItem.Date)">$INFO[ListItem.Season,$LOCALIZE[20373] ] &#8226; $INFO[ListItem.Episode,$LOCALIZE[20359] ]</value>
+		<value condition="Container.Content(episodes) + !IsEmpty(ListItem.Season) + !IsEmpty(ListItem.Episode) + !IsEmpty(ListItem.Date)">$INFO[ListItem.Season,$LOCALIZE[20373] ] &#8226; Aired on $INFO[ListItem.Date]</value>
+		<value condition="Container.Content(episodes) + IsEmpty(ListItem.Season) + IsEmpty(ListItem.Episode) + !IsEmpty(ListItem.Date)">$INFO[ListItem.Season,$LOCALIZE[20373] ]</value>
+		<value condition="Container.Content(episodes) + IsEmpty(ListItem.Season) + !IsEmpty(ListItem.Episode) + !IsEmpty(ListItem.Date)">$INFO[ListItem.Episode,$LOCALIZE[20359] ] &#8226; Aired on $INFO[ListItem.Date]</value>
+		<value condition="Container.Content(episodes) + IsEmpty(ListItem.Season) + IsEmpty(ListItem.Episode) + !IsEmpty(ListItem.Date)">Aired on $INFO[ListItem.Date]</value>
+		<value condition="Container.Content(albums) + !IsEmpty(ListItem.Year) + !IsEmpty(ListItem.Artist)">$INFO[ListItem.Year] &#8226; $INFO[ListItem.Artist]</value>
+		<value condition="Container.Content(albums) + !IsEmpty(ListItem.Year) + IsEmpty(ListItem.Artist)">$INFO[ListItem.Year]</value>
+		<value condition="Container.Content(albums) + IsEmpty(ListItem.Year) + !IsEmpty(ListItem.Artist)">$INFO[ListItem.Artist]</value>
+		<value condition="Container.Content(songs) + !IsEmpty(ListItem.Album) + !IsEmpty(ListItem.Artist)">$INFO[ListItem.Album] &#8226; $INFO[ListItem.Artist]</value>
+		<value condition="Container.Content(songs) + !IsEmpty(ListItem.Album) + IsEmpty(ListItem.Artist)">$INFO[ListItem.Album]</value>
+		<value condition="Container.Content(songs) + IsEmpty(ListItem.Album) + !IsEmpty(ListItem.Artist)">$INFO[ListItem.Artist]</value>
+	</variable>
+
+	<variable name="ContentType">
+		<value condition="Container.Content(movies) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20338]</value>
+		<value condition="Container.Content(movies) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[342]</value>
+		<value condition="Container.Content(tvshows) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20364]</value>
+		<value condition="Container.Content(tvshows) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20343]</value>
+		<value condition="Container.Content(seasons) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20373]</value>
+		<value condition="Container.Content(seasons) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[33054]</value>
+		<value condition="Container.Content(episodes) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20359]</value>
+		<value condition="Container.Content(episodes) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20360]</value>
+		<value condition="Container.Content(musicvideos) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20391]</value>
+		<value condition="Container.Content(musicvideos) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20389]</value>
+		<value condition="Container.Content(genres) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[515]</value>
+		<value condition="Container.Content(genres) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[135]</value>
+		<value condition="Container.Content(years) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[345]</value>
+		<value condition="Container.Content(years) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[652]</value>
+		<value condition="Container.Content(actors) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20337]</value>
+		<value condition="Container.Content(actors) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[344]</value>
+		<value condition="Container.Content(albums) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[558]</value>
+		<value condition="Container.Content(albums) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[132]</value>
+		<value condition="Container.Content(artists) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[557]</value>
+		<value condition="Container.Content(artists) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[133]</value>
+		<value condition="Container.Content(songs) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[179]</value>
+		<value condition="Container.Content(songs) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[134]</value>
+		<value condition="Container.Content(playlists) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[559]</value>
+		<value condition="Container.Content(playlists) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[136]</value>
+		<value condition="Container.Content(studios) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[572]</value>
+		<value condition="Container.Content(studios) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20388]</value>
+		<value condition="Container.Content(directors) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20339]</value>
+		<value condition="Container.Content(directors) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20348]</value>
+		<value condition="Container.Content(countries) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[574]</value>
+		<value condition="Container.Content(countries) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20451]</value>
+		<value condition="Container.Content(Addons) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[24000]</value>
+		<value condition="Container.Content(Addons) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[24001]</value>
+		<value condition="Container.Content(sets) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20141]</value>
+		<value condition="Container.Content(sets) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20434]</value>
+		<value condition="Container.Content(tags) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31002]</value>
+		<value condition="Container.Content(tags) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[20459]</value>
+		<value condition="Window.IsVisible(pvr) + Control.IsVisible(13) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19043]</value>
+		<value condition="Window.IsVisible(pvr) + Control.IsVisible(13) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19163]</value>
+		<value condition="Window.IsVisible(pvr) + [Control.IsVisible(14) | Control.IsVisible(17)] + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31000]</value>
+		<value condition="Window.IsVisible(pvr) + [Control.IsVisible(14) | Control.IsVisible(17)] + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31001]</value>
+		<value condition="Window.IsVisible(pvr) + !IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19029]</value>
+		<value condition="Window.IsVisible(pvr) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19019]</value>
+		<value condition="!IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31000]</value>
+		<value condition="IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31001]</value>
+	</variable>
+
+	<variable name="SystemInfoButton94">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(94)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SystemInfoButton95">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(95)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SystemInfoButton96">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(96)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SystemInfoButton97">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(97)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SystemInfoButton98">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(98)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+	<variable name="SystemInfoButton99">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(99)">TextColor1</value>
+		<value>TextColor2</value>
+	</variable>
+
+</includes>

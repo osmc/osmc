@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype54">
+
+		<control type="group">
+			<visible>Control.IsVisible(54)</visible>
+
+			<!-- Curve -->
+			<control type="image">
+				<right>20</right>
+				<top>20</top>
+				<width>1280</width>
+				<height>1040</height>
+				<texture border="40,0,0,0">common/Curve.png</texture>
+				<visible>Skin.HasSetting(ShowCurve)</visible>
+			</control>
+
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>666</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="1,1,1,69">views/DropShadow.png</bordertexture>
+				<bordersize>0,0,0,66</bordersize>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="21,21,21,150">views/OverlayEffect.png</bordertexture>
+				<visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<colordiffuse>OverlayColorFO</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
+			</control>
+
+			<!-- Song Info -->
+			<control type="group">
+				<left>120</left>
+				<top>440</top>
+				<visible>Container.Content(songs)</visible>
+				<!-- Album & Artist Info -->
+				<control type="label">
+					<left>0</left>
+					<top>314</top>
+					<width>500</width>
+					<height>45</height>
+					<font>Font42</font>
+					<label>$INFO[ListItem.Album]</label>
+					<textcolor>TextColor1</textcolor>
+				</control>
+				<control type="label">
+					<left>0</left>
+					<top>366</top>
+					<width>450</width>
+					<height>45</height>
+					<font>Font33</font>
+					<textcolor>TextColor2</textcolor>
+					<label>$INFO[ListItem.Artist]</label>
+				</control>
+			</control>
+
+			<!-- List -->
+			<control type="fixedlist" id="54">
+				<left>782</left>
+				<centertop>50%</centertop>
+				<width>1018</width>
+				<height>720</height>
+				<onup>54</onup>
+				<ondown>54</ondown>
+				<onleft>60</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>5</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>Container.Content(songs) | Window.IsVisible(pictures)</visible>
+
+				<itemlayout height="64" width="1018">
+					<control type="label">
+						<width>1018</width>
+						<height>64</height>
+						<font>Font33</font>
+						<label>$VAR[SongLabel]</label>
+						<textcolor>TextColor2</textcolor>
+					</control>
+				</itemlayout>
+
+				<focusedlayout height="80" width="1018">
+					<control type="label">
+						<width>1018</width>
+						<height>80</height>
+						<font>Font48</font>
+						<label>$VAR[SongLabel]</label>
+						<textcolor>TextColor1</textcolor>
+						<shadowcolor>ShadowColor</shadowcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(54)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>

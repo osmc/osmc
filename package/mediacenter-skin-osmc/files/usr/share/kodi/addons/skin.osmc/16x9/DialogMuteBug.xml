@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- mutebug -->
+	<zorder>2</zorder>
+
+	<controls>
+
+		<control type="group">
+			<centerleft>50%</centerleft>
+			<top>15</top>
+			<width>220</width>
+			<height>180</height>
+			<include>DialogZoomAnimation</include>
+			<animation effect="slide" start="0,0" end="470,0" time="100" condition="Window.IsActive(infodialog) | Window.IsActive(extendedprogressdialog)">Conditional</animation>
+
+			<!-- Background image -->
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>220</width>
+				<height>180</height>
+				<texture border="20">dialogs/DialogBackground.png</texture>
+			</control>
+
+			<!-- Heading -->
+			<control type="label">
+				<left>40</left>
+				<top>50</top>
+				<width>140</width>
+				<height>33</height>
+				<align>center</align>
+				<scroll>true</scroll>
+				<font>Font33</font>
+				<textcolor>DialogColor1</textcolor>
+				<label>13376</label>
+			</control>
+
+			<!-- Details -->
+			<control type="label">
+				<left>40</left>
+				<top>104</top>
+				<width>140</width>
+				<height>27</height>
+				<align>center</align>
+				<scroll>true</scroll>
+				<font>Font30</font>
+				<textcolor>DialogColor2</textcolor>
+				<label>31013</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

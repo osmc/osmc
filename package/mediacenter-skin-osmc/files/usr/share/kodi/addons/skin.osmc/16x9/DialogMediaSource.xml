@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- mediasource -->
+	<defaultcontrol always="true">10</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="0">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>1021</label>
+		</control>
+
+		<!-- Left grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>228</top>
+			<width>360</width>
+			<height>660</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>10</onright>
+			<onup>noop</onup>
+			<ondown>9001</ondown>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<!-- Browse -->
+			<control type="button" id="11">
+				<width>360</width>
+				<height>66</height>
+				<label>1024</label>
+			</control>
+
+			<!-- Add -->
+			<control type="button" id="13">
+				<width>360</width>
+				<height>66</height>
+				<label>15019</label>
+			</control>
+
+			<!-- Remove -->
+			<control type="button" id="14">
+				<width>360</width>
+				<height>66</height>
+				<label>1210</label>
+			</control>
+
+		</control>
+
+		<!-- Right grouplist -->
+		<control type="list" id="10">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+			<height>462</height>
+			<onleft>9000</onleft>
+			<onright>noop</onright>
+			<onup>noop</onup>
+			<ondown>12</ondown>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="1200" height="66">
+				<control type="label">
+					<left>25</left>
+					<width>1210</width>
+					<height>66</height>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="1200" height="66">
+				<control type="label">
+					<left>25</left>
+					<width>1200</width>
+					<height>66</height>
+					<scroll>true</scroll>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(10)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<!-- Name background -->
+		<control type="image">
+			<left>600</left>
+			<top>708</top>
+			<width>1170</width>
+			<height>66</height>
+			<texture>dialogs/DialogTextBackground.png</texture>
+		</control>
+
+		<!-- Name -->
+		<control type="edit" id="12">
+			<left>620</left>
+			<top>708</top>
+			<width>1130</width>
+			<height>66</height>
+			<onup>10</onup>
+			<onleft>9000</onleft>
+			<onright>noop</onright>
+			<ondown>9001</ondown>
+			<font>Font48</font>
+			<textcolor>DialogColor1</textcolor>
+		</control>
+
+		<!-- Name Label -->
+		<control type="label">
+			<left>600</left>
+			<top>794</top>
+			<width>1170</width>
+			<height>74</height>
+			<label>1022</label>
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>9000</onleft>
+			<onright>noop</onright>
+			<onup>12</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="18">
+				<width>400</width>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="19">
+				<width>400</width>
+				<label>222</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

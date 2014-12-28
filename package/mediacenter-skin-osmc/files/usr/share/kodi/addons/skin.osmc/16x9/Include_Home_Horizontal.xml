@@ -1,0 +1,1677 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="HomeHorizontal">
+
+		<!-- Main list -->
+		<control type="wraplist" id="9000">
+			<left>-70</left>
+			<top>470</top>
+			<width>2060</width>
+			<height>360</height>
+			<onup>noop</onup>
+			<ondown>9001</ondown>
+			<onleft>9000</onleft>
+			<onright>9000</onright>
+			<focusposition>2</focusposition>
+			<defaultcontrol>3</defaultcontrol>
+			<orientation>horizontal</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="400" height="120">
+				<control type="label">
+					<top>0</top>
+					<width>400</width>
+					<height>120</height>
+					<align>center</align>
+					<label>$INFO[ListItem.Label]</label>
+					<font>Font42</font>
+					<textcolor>HomeNF</textcolor>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="460" height="120">
+				<control type="label">
+					<top>0</top>
+					<width>460</width>
+					<height>120</height>
+					<align>center</align>
+					<label>$INFO[ListItem.Label]</label>
+					<font>Font72</font>
+					<textcolor>TextColor1</textcolor>
+					<shadowcolor>ShadowColor</shadowcolor>
+					<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(9000)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+			<content>
+				<include>skinshortcuts-mainmenu</include>
+			</content>
+
+		</control>
+
+		<!-- Sub menu -->
+		<control type="fixedlist" id="9001">
+			<left>-70</left>
+			<top>528</top>
+			<width>2060</width>
+			<height>360</height>
+			<onup>9000</onup>
+			<ondown>9002</ondown>
+			<onleft>9001</onleft>
+			<onright>9001</onright>
+			<focusposition>2</focusposition>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">1</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible allowhiddenfocus="true">Control.HasFocus(9001)</visible>
+			<animation type="Visible" reversible="false">
+				<effect type="fade" start="0" end="100" time="320" tween="sine" easing="in" />
+			</animation>
+
+			<itemlayout width="400" height="120">
+				<control type="label">
+					<top>0</top>
+					<width>400</width>
+					<height>120</height>
+					<align>center</align>
+					<label>$INFO[ListItem.Label]</label>
+					<font>Font30</font>
+					<textcolor>HomeNF</textcolor>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="460" height="120">
+				<control type="label">
+					<top>0</top>
+					<width>460</width>
+					<height>120</height>
+					<align>center</align>
+					<label>$INFO[ListItem.Label]</label>
+					<font>Font42</font>
+					<textcolor>TextColor1</textcolor>
+					<shadowcolor>ShadowColor</shadowcolor>
+					<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(9001)">Conditional</animation>
+				</control>
+			</focusedlayout>
+
+			<content>
+				<include>skinshortcuts-submenu</include>
+			</content>
+
+		</control>
+
+		<!-- Sub menu heading -->
+		<control type="label">
+			<top>636</top>
+			<left>120</left>
+			<width>1680</width>
+			<height>33</height>
+			<font>Font33</font>
+			<align>center</align>
+			<textcolor>$VAR[SubMenuColor]</textcolor>
+			<label>$INFO[Container(9002).ListItem.Label]</label>
+			<visible>Control.HasFocus(9002)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,90" time="0" condition="StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons) | StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons) | StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons) | StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons) | StringCompare(Container(9000).ListItem.Property(Widget),favourites) | StringCompare(Container(9000).ListItem.Property(Widget),PVR)">conditional</animation>
+		</control>
+
+		<!-- Sub menu label -->
+		<control type="label">
+			<top>636</top>
+			<left>120</left>
+			<width>1680</width>
+			<height>33</height>
+			<font>Font33</font>
+			<align>center</align>
+			<textcolor>$VAR[SubMenuColor]</textcolor>
+			<label>$VAR[SubMenuHeading]</label>
+			<visible>!Control.HasFocus(9002)</visible>
+			<visible>!Container(9000).OnNext + !Container(9000).OnPrevious</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,90" time="0" condition="StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons) | StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums) | StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons) | StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons) | StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons) | StringCompare(Container(9000).ListItem.Property(Widget),favourites) | StringCompare(Container(9000).ListItem.Property(Widget),PVR)">conditional</animation>
+		</control>
+
+		<!-- Weather sub menu -->
+		<control type="list" id="9003">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>339</height>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<orientation>horizontal</orientation>
+			<viewtype label="">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),WeatherWidget)</visible>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9003).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9003).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9003).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9003).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9003).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9003).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9003).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9003).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="339">
+				<control type="label">
+					<top>2</top>
+					<width>214</width>
+					<height>33</height>
+					<font>Font33</font>
+					<align>center</align>
+					<textcolor>TextColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>56</top>
+					<width>150</width>
+					<height>150</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+				</control>
+				<control type="label">
+					<top>249</top>
+					<width>214</width>
+					<height>25</height>
+					<font>Font25</font>
+					<align>center</align>
+					<textcolor>TextColor2</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="339">
+				<control type="label">
+					<top>2</top>
+					<width>214</width>
+					<height>33</height>
+					<font>Font33</font>
+					<align>center</align>
+					<label>$INFO[ListItem.Label]</label>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>56</top>
+					<width>150</width>
+					<height>150</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+				</control>
+				<control type="label">
+					<top>249</top>
+					<width>214</width>
+					<height>25</height>
+					<font>Font25</font>
+					<align>center</align>
+					<textcolor>TextColor2</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</focusedlayout>
+			<content>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day0]</label>
+					<label2>$INFO[Window(Weather).Property(Day0.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day0.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day0.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day0.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day1]</label>
+					<label2>$INFO[Window(Weather).Property(Day1.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day1.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day1.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day1.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day2]</label>
+					<label2>$INFO[Window(Weather).Property(Day2.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day2.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day2.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day2.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day3]</label>
+					<label2>$INFO[Window(Weather).Property(Day3.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day3.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day3.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day3.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day4]</label>
+					<label2>$INFO[Window(Weather).Property(Day4.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day4.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day4.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day4.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day5]</label>
+					<label2>$INFO[Window(Weather).Property(Day5.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day5.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day5.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day5.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day6]</label>
+					<label2>$INFO[Window(Weather).Property(Day6.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day6.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day6.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day6.Title))</visible>
+				</item>
+				<item>
+					<onclick>noop</onclick>
+					<label>$VAR[Day7]</label>
+					<label2>$INFO[Window(Weather).Property(Day7.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day7.HighTemp)]$INFO[System.TemperatureUnits]</label2>
+					<icon>$INFO[Window(Weather).Property(Day7.OutlookIcon)]</icon>
+					<visible>!IsEmpty(Window(Weather).Property(Day7.Title))</visible>
+				</item>
+			</content>
+
+		</control>
+
+		<!-- Video addons menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+					<bordertexture border="14,14,14,100">views/OverlayEffectSmall.png</bordertexture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">keep</aspectratio>
+					<bordertexture border="14,14,14,100">views/OverlayEffectSmall.png</bordertexture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content target="video">addons://sources/video</content>
+
+		</control>
+
+		<!-- Recent Movies sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)</visible>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecentMovies</include>
+			</content>
+
+		</control>
+
+		<!-- Recommended Movies sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)</visible>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecommendedMovies</include>
+			</content>
+
+		</control>
+
+		<!-- Random Movies sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)</visible>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RandomMovies</include>
+			</content>
+
+		</control>
+
+		<!-- Recent episodes -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecentEpisodes</include>
+			</content>
+
+		</control>
+
+		<!-- Recommended episodes -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecommendedEpisodes</include>
+			</content>
+
+		</control>
+
+		<!-- Random episodes -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RandomEpisodes</include>
+			</content>
+
+		</control>
+
+		<!-- Recent Albums -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>249</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecentAlbums</include>
+			</content>
+
+		</control>
+
+		<!-- Recommended Albums -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>249</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RecommendedAlbums</include>
+			</content>
+
+		</control>
+
+		<!-- Random Albums -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>249</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<include>RandomAlbums</include>
+			</content>
+
+		</control>
+
+		<!-- Music sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>216</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content target="music">addons://sources/audio</content>
+
+		</control>
+
+		<!-- Pictures sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>216</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content target="pictures">addons://sources/image</content>
+
+		</control>
+
+		<!-- Favourites sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>216</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),Favourites)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.1.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.1.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.1.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.1.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.2.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.2.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.2.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.2.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.3.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.3.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.3.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.3.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.4.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.4.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.4.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.4.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.5.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.5.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.5.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.5.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.6.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.6.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.6.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.6.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.7.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.7.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.7.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.7.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.8.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.8.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.8.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.8.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.9.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.9.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.9.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.9.name))</visible>
+				</item>
+				<item>
+					<label>$INFO[Window(home).Property(favourite.10.name)]</label>
+					<onclick>$INFO[Window(home).Property(favourite.10.path)]</onclick>
+					<thumb>$INFO[Window(home).Property(favourite.10.thumb)]</thumb>
+					<visible>!IsEmpty(Window(home).Property(favourite.10.name))</visible>
+				</item>
+			</content>
+
+		</control>
+
+		<!-- Programs sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>216</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>183</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content target="programs">addons://sources/executable</content>
+
+		</control>
+
+		<!-- Playlist menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>688</top>
+			<width>1712</width>
+			<height>306</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),Playlist)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="214" height="306">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture colordiffuse="88f1f1f1" background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>306</height>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center" aligny="bottom">scale</aspectratio>
+					<bordertexture border="1,1,1,36">views/DropShadowSmall.png</bordertexture>
+					<bordersize>0,0,0,33</bordersize>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>273</height>
+					<texture border="14,14,14,100">views/OverlayEffectSmall.png</texture>
+					<visible>Skin.HasSetting(Overlays)</visible>
+				</control>
+			</focusedlayout>
+			<content>$INFO[Container(9000).ListItem.Property(widgetPlaylist)]</content>
+
+		</control>
+
+		<!-- PVR sub menu -->
+		<control type="list" id="9002">
+			<left>-1894</left>
+			<top>778</top>
+			<width>1712</width>
+			<height>216</height>
+			<onup>9000</onup>
+			<ondown>noop</ondown>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<viewtype label="">list</viewtype>
+			<orientation>horizontal</orientation>
+			<defaultcontrol always="true">0</defaultcontrol>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<visible>StringCompare(Container(9000).ListItem.Property(Widget),TV) | StringCompare(Container(9000).ListItem.Property(Widget),Radio)</visible>
+			<animation effect="fade" start="100" end="0" time="0">Hidden</animation>
+			<animation effect="fade" start="0" end="100" time="200" delay="100" >Visible</animation>
+			<animation effect="slide" start="0,0" end="2749,0" time="0" condition="StringCompare(Container(9002).NumItems,1)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2642,0" time="0" condition="StringCompare(Container(9002).NumItems,2)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2535,0" time="0" condition="StringCompare(Container(9002).NumItems,3)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2428,0" time="0" condition="StringCompare(Container(9002).NumItems,4)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2321,0" time="0" condition="StringCompare(Container(9002).NumItems,5)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2214,0" time="0" condition="StringCompare(Container(9002).NumItems,6)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2107,0" time="0" condition="StringCompare(Container(9002).NumItems,7)">conditional</animation>
+			<animation effect="slide" start="0,0" end="2000,0" time="0" condition="IntegerGreaterThan(Container(9002).NumItems,7)">conditional</animation>
+
+			<itemlayout width="216" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<colordiffuse>OverlayColorNF</colordiffuse>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="216" height="216">
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<colordiffuse>OverlayColorNF</colordiffuse>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<visible>!Control.HasFocus(9002)</visible>
+				</control>
+				<control type="image">
+					<left>13</left>
+					<top>0</top>
+					<width>183</width>
+					<height>216</height>
+					<colordiffuse>OverlayColorFO</colordiffuse>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+					<aspectratio align="center">scale</aspectratio>
+					<visible>Control.HasFocus(9002)</visible>
+				</control>
+			</focusedlayout>
+
+			<content>
+				<include>skinshortcuts-submenu</include>
+			</content>
+
+		</control>
+
+	</include>
+
+</includes>

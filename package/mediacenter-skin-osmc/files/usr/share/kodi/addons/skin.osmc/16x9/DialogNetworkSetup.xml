@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- networksetup -->
+	<defaultcontrol always="true">10</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="2">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>1007</label>
+		</control>
+
+		<!-- Group -->
+		<control type="group">
+			<left>600</left>
+			<top>228</top>
+
+			<!-- Protocol -->
+			<control type="spincontrolex" id="10">
+				<width>1200</width>
+				<height>66</height>
+				<ondown>11</ondown>
+				<textwidth>1120</textwidth>
+				<label>1008</label>
+			</control>
+
+			<!-- Server Address -->
+			<control type="edit" id="11">
+				<top>66</top>
+				<width>1040</width>
+				<height>66</height>
+				<onup>10</onup>
+				<ondown>16</ondown>
+				<onright>12</onright>
+				<label>-</label>
+			</control>
+
+			<!-- Server Browse -->
+			<control type="button" id="12">
+				<left>1000</left>
+				<top>66</top>
+				<align>right</align>
+				<width>200</width>
+				<height>66</height>
+				<onup>10</onup>
+				<ondown>16</ondown>
+				<onleft>11</onleft>
+				<label>1024</label>
+			</control>
+
+			<!-- Remote -->
+			<control type="edit" id="16">
+				<top>132</top>
+				<width>1200</width>
+				<height>66</height>
+				<onup>11</onup>
+				<ondown>13</ondown>
+				<label>-</label>
+			</control>
+
+			<!-- Port -->
+			<control type="edit" id="13">
+				<top>198</top>
+				<width>1200</width>
+				<height>66</height>
+				<onup>16</onup>
+				<ondown>14</ondown>
+				<label>1013</label>
+			</control>
+
+			<!-- Username -->
+			<control type="edit" id="14">
+				<top>264</top>
+				<width>1200</width>
+				<height>66</height>
+				<onup>13</onup>
+				<ondown>15</ondown>
+				<label>1014</label>
+			</control>
+
+			<!-- Password -->
+			<control type="edit" id="15">
+				<top>330</top>
+				<width>1200</width>
+				<height>66</height>
+				<onup>14</onup>
+				<ondown>9001</ondown>
+				<label>15052</label>
+			</control>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>15</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="18">
+				<width>400</width>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="19">
+				<width>400</width>
+				<label>222</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

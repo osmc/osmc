@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- smartplaylistrule -->
+	<defaultcontrol always="true">15</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="0">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>21421</label>
+		</control>
+
+		<!-- Control group -->
+		<control type="group">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+
+			<!-- Rule match label -->
+			<control type="label">
+				<width>360</width>
+				<height>66</height>
+				<label>21422</label>
+				<textcolor>SelectedColor</textcolor>
+			</control>
+
+			<!-- Rule Field -->
+			<control type="spincontrolex" id="15">
+				<top>66</top>
+				<width>1200</width>
+				<font>-</font>
+				<onup>noop</onup>
+				<ondown>16</ondown>
+				<onright>noop</onright>
+				<onleft>noop</onleft>
+			</control>
+
+			<!-- Rule Field label -->
+			<control type="label">
+				<top>66</top>
+				<width>1200</width>
+				<height>66</height>
+				<textcolor>DialogColor1</textcolor>
+				<label>$INFO[Control.GetLabel(15)]</label>
+				<visible>Control.HasFocus(15)</visible>
+			</control>
+			<control type="label">
+				<top>66</top>
+				<width>1200</width>
+				<height>66</height>
+				<textcolor>DialogColor2</textcolor>
+				<label>$INFO[Control.GetLabel(15)]</label>
+				<visible>!Control.HasFocus(15)</visible>
+			</control>
+
+			<!-- Rule operator -->
+			<control type="spincontrolex" id="16">
+				<top>132</top>
+				<width>1200</width>
+				<font>-</font>
+				<onup>15</onup>
+				<ondown>17</ondown>
+				<onright>noop</onright>
+				<onleft>noop</onleft>
+			</control>
+
+			<!-- Rule Field label -->
+			<control type="label">
+				<top>132</top>
+				<width>1200</width>
+				<height>66</height>
+				<textcolor>DialogColor1</textcolor>
+				<label>$INFO[Control.GetLabel(16)]</label>
+				<visible>Control.HasFocus(16)</visible>
+			</control>
+			<control type="label">
+				<top>132</top>
+				<width>1200</width>
+				<height>66</height>
+				<textcolor>DialogColor2</textcolor>
+				<label>$INFO[Control.GetLabel(16)]</label>
+				<visible>!Control.HasFocus(16)</visible>
+			</control>
+
+			<!-- Value background -->
+			<control type="image">
+				<top>198</top>
+				<width>1200</width>
+				<height>66</height>
+				<texture>dialogs/DialogTextBackground.png</texture>
+			</control>
+
+			<!-- Value edit -->
+			<control type="edit" id="17">
+				<left>20</left>
+				<top>198</top>
+				<width>1160</width>
+				<label>-</label>
+				<onup>16</onup>
+				<ondown>20</ondown>
+				<onleft>noop</onleft>
+				<onright>noop</onright>
+			</control>
+
+			<!-- Browse Button -->
+			<control type="button" id="20">
+				<top>264</top>
+				<width>1200</width>
+				<label>1024</label>
+				<onup>17</onup>
+				<ondown>9001</ondown>
+				<onleft>noop</onleft>
+				<onright>noop</onright>
+			</control>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>20</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="18">
+				<width>420</width>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="19">
+				<width>420</width>
+				<label>222</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

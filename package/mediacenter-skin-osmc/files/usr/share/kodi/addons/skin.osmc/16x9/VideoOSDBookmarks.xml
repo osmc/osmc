@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- videobookmarks -->
+	<defaultcontrol always="true">2</defaultcontrol>
+
+	<controls>
+
+		<control type="list" id="11">
+			<left>150</left>
+			<top>610</top>
+			<width>1620</width>
+			<height>290</height>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<ondown>9001</ondown>
+			<onup>noop</onup>
+			<orientation>horizontal</orientation>
+			<viewtype label="535">list</viewtype>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout height="290" width="324">
+				<control type="image">
+					<width>324</width>
+					<height>242</height>
+					<texture border="1">osd/OSDBack.png</texture>
+				</control>
+				<control type="image">
+					<left>6</left>
+					<top>6</top>
+					<width>312</width>
+					<height>176</height>
+					<aspectratio aligny="top">keep</aspectratio>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+				</control>
+				<control type="label">
+					<left>10</left>
+					<top>190</top>
+					<width>304</width>
+					<height>44</height>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout height="290" width="324">
+				<control type="image">
+					<width>324</width>
+					<height>242</height>
+					<texture border="1">osd/OSDBack.png</texture>
+				</control>
+				<control type="image">
+					<width>324</width>
+					<height>242</height>
+					<texture border="1">osd/OSDBack.png</texture>
+				</control>
+				<control type="image">
+					<left>6</left>
+					<top>6</top>
+					<width>312</width>
+					<height>176</height>
+					<aspectratio aligny="top">keep</aspectratio>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+				</control>
+				<control type="label">
+					<left>10</left>
+					<top>190</top>
+					<width>304</width>
+					<height>44</height>
+					<textcolor>DialogColor1</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</focusedlayout>
+
+		</control>
+
+		<control type="group">
+			<left>150</left>
+			<top>945</top>
+			<width>1620</width>
+			<height>60</height>
+
+			<!-- Background -->
+			<control type="image">
+				<width>1620</width>
+				<height>60</height>
+				<texture border="1">osd/OSDBack.png</texture>
+			</control>
+
+			<!-- Button grouplist -->
+			<control type="grouplist" id="9001">
+				<left>20</left>
+				<top>-6</top>
+				<width>1600</width>
+				<height>60</height>
+				<itemgap>20</itemgap>
+				<onleft>noop</onleft>
+				<onright>noop</onright>
+				<onup>11</onup>
+				<ondown>close</ondown>
+				<orientation>horizontal</orientation>
+
+				<!-- Create Bookmark button -->
+				<control type="button" id="2">
+					<width>520</width>
+					<label>294</label>
+				</control>
+
+				<!-- Clear Bookmark button -->
+				<control type="button" id="3">
+					<width>520</width>
+					<label>296</label>
+				</control>
+
+				<!-- Use current for episode thumb -->
+				<control type="button" id="4">
+					<width>520</width>
+					<label>20406</label>
+				</control>
+
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

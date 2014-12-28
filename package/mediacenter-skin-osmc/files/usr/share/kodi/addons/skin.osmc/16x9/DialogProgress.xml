@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- progressdialog -->
+	<defaultcontrol always="true">10</defaultcontrol>
+	<controls>
+
+		<!-- Background -->
+		<include>DialogFadeBackgroundImage</include>
+
+		<!-- Main group -->
+		<control type="group">
+			<include>DialogZoomAnimation</include>
+			<centerleft>50%</centerleft>
+			<centertop>50%</centertop>
+			<width>720</width>
+			<height>360</height>
+
+			<!-- Background -->
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<width>720</width>
+				<height>440</height>
+				<texture border="20">dialogs/DialogBackground.png</texture>
+			</control>
+
+			<!-- Heading -->
+			<control type="label" id="1">
+				<centerleft>50%</centerleft>
+				<top>40</top>
+				<width>600</width>
+				<height>48</height>
+				<align>center</align>
+				<font>Font48</font>
+				<textcolor>DialogColor1</textcolor>
+			</control>
+
+			<!-- Details -->
+			<control type="textbox" id="9">
+				<centerleft>50%</centerleft>
+				<top>96</top>
+				<width>600</width>
+				<height>158</height>
+				<align>center</align>
+				<font>Font42</font>
+				<autoscroll>False</autoscroll>
+				<textcolor>DialogColor2</textcolor>
+			</control>
+
+			<!-- Scroll -->
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<top>280</top>
+				<width>176</width>
+				<height>20</height>
+				<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+			</control>
+			<control type="image">
+				<centerleft>50%</centerleft>
+				<top>280</top>
+				<width>24</width>
+				<height>20</height>
+				<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripHorizontalFO.png</texture>
+				<animation effect="slide" start="-76,0" end="76,0" time="800" loop="true" tween="cubic" easing="out" condition="true">Conditional</animation>
+			</control>
+
+			<!-- Cancel -->
+			<control type="button" id="10">
+				<centerleft>50%</centerleft>
+				<top>340</top>
+				<width>1200</width>
+				<height>36</height>
+				<align>center</align>
+				<label>106</label>
+				<font>Font36</font>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

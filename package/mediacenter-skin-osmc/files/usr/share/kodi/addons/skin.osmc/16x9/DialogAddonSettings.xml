@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- addonsettings -->
+	<defaultcontrol always="true">9</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label" id="20">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>$INFO[Window.Property(heading)]</label>
+		</control>
+
+		<!-- Left grouplist -->
+		<control type="grouplist" id="9">
+			<left>150</left>
+			<top>228</top>
+			<width>360</width>
+			<height>660</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>2</onright>
+			<onup>noop</onup>
+			<ondown>9001</ondown>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+		</control>
+
+		<!-- Default button -->
+		<control type="button" id="13">
+			<width>360</width>
+			<height>66</height>
+		</control>
+
+		<!-- Right grouplist -->
+		<control type="grouplist" id="2">
+			<left>600</left>
+			<top>228</top>
+			<width>1200</width>
+			<height>660</height>
+			<itemgap>0</itemgap>
+			<onleft>9</onleft>
+			<onright>9001</onright>
+			<onup>noop</onup>
+			<ondown>9001</ondown>
+			<orientation>vertical</orientation>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+		</control>
+
+		<!-- Default button -->
+		<control type="button" id="3">
+			<width>1200</width>
+			<height>66</height>
+		</control>
+
+		<!-- Default radiobutton -->
+		<control type="radiobutton" id="4">
+			<width>1200</width>
+			<height>66</height>
+			<textwidth>1120</textwidth>
+		</control>
+
+		<!-- Default spincontrolex -->
+		<control type="spincontrolex" id="5">
+			<width>1200</width>
+			<height>66</height>
+			<textwidth>1120</textwidth>
+		</control>
+
+		<!-- Default label -->
+		<control type="label" id="7">
+			<width>1200</width>
+			<height>66</height>
+			<label>-</label>
+		</control>
+
+		<!-- Default seperator -->
+		<control type="image" id="6">
+			<width>1200</width>
+			<height>20</height>
+			<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+		</control>
+
+		<!-- Default slider -->
+		<control type="sliderex" id="8">
+			<width>1200</width>
+			<height>66</height>
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>600</left>
+			<top>926</top>
+			<width>1200</width>
+			<itemgap>0</itemgap>
+			<onleft>9</onleft>
+			<onright>noop</onright>
+			<onup>9</onup>
+			<ondown>noop</ondown>
+			<defaultcontrol>10</defaultcontrol>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="10">
+				<width>400</width>
+				<label>186</label>
+			</control>
+
+			<!-- Cancel Button -->
+			<control type="button" id="11">
+				<width>400</width>
+				<label>222</label>
+			</control>
+
+			<!-- Defaults Button -->
+			<control type="button" id="12">
+				<width>400</width>
+				<label>409</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

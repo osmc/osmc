@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+
+	<include name="Viewtype50">
+
+		<control type="group">
+			<visible>Control.IsVisible(50)</visible>
+
+			<!-- Curve -->
+			<control type="image">
+				<right>20</right>
+				<top>20</top>
+				<width>1280</width>
+				<height>1040</height>
+				<texture border="40,0,0,0">common/Curve.png</texture>
+				<visible>Skin.HasSetting(ShowCurve)</visible>
+			</control>
+
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>666</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="1,1,1,69">views/DropShadow.png</bordertexture>
+				<bordersize>0,0,0,66</bordersize>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="21,21,21,150">views/OverlayEffect.png</bordertexture>
+				<visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<colordiffuse>OverlayColorFO</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
+			</control>
+
+			<!-- List -->
+			<control type="fixedlist" id="50">
+				<left>750</left>
+				<centertop>50%</centertop>
+				<width>1050</width>
+				<height>720</height>
+				<onup>50</onup>
+				<ondown>50</ondown>
+				<onleft>60</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>3</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<visible>Window.IsVisible(musicfiles) | [Container.Content(songs) + Window.IsVisible(musicplaylist)] | [!Container.Content(movies) + !Container.Content(tvshows) + !Container.Content(seasons) + !Container.Content(episodes) + !Container.Content(albums) + !Container.Content(songs) + !Window.IsVisible(pictures)]</visible>
+
+				<itemlayout height="90" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>90</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor2</textcolor>
+					</control>
+					<!-- Watched status -->
+					<control type="image">
+						<left>0</left>
+						<top>38</top>
+						<width>14</width>
+						<height>14</height>
+						<texture>$VAR[StatusOverlay]</texture>
+						<colordiffuse>OverlayColorNF</colordiffuse>
+						<animation effect="fade" start="50" end="50" condition="true">Conditional</animation>
+					</control>
+				</itemlayout>
+
+				<focusedlayout height="180" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>180</height>
+						<font>Font72</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor1</textcolor>
+						<shadowcolor>ShadowColor</shadowcolor>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
+					</control>
+					<!-- Watched status -->
+					<control type="image">
+						<left>0</left>
+						<top>61</top>
+						<width>14</width>
+						<height>14</height>
+						<texture>$VAR[StatusOverlay]</texture>
+						<colordiffuse>OverlayColorFO</colordiffuse>
+						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
+					</control>
+				</focusedlayout>
+
+			</control>
+
+		</control>
+
+	</include>
+
+</includes>

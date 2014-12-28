@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- pvrgroupmanager -->
+	<defaultcontrol always="true">13</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Hidden labels -->
+		<control type="label" id="21">
+			<font>-</font>
+		</control>
+		<control type="label" id="22">
+			<font>-</font>
+		</control>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>19143</label>
+		</control>
+
+		<!-- Name -->
+		<control type="label">
+			<left>150</left>
+			<top>228</top>
+			<width>526</width>
+			<height>36</height>
+			<font>Font36</font>
+			<textcolor>DialogColor1</textcolor>
+			<label>[B]$LOCALIZE[19146][/B]</label>
+		</control>
+
+		<!-- Groups list -->			
+		<control type="list" id="13">
+			<left>150</left>
+			<top>284</top>
+			<width>526</width>
+			<height>660</height>
+			<onup>noop</onup>
+			<ondown>29</ondown>
+			<onleft>noop</onleft>
+			<onright>11</onright>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+
+			</itemlayout>
+
+			<focusedlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<label>$INFO[ListItem.Label]</label>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(13)">Conditional</animation>
+				</control>
+
+			</focusedlayout>
+
+		</control>
+
+		<!-- Name -->
+		<control type="label">
+			<centerleft>960</centerleft>
+			<top>228</top>
+			<width>526</width>
+			<height>36</height>
+			<font>Font36</font>
+			<textcolor>DialogColor1</textcolor>
+			<label>[B]$INFO[Control.GetLabel(21)][/B]</label>
+		</control>
+
+		<!-- Grouped Channels list -->			
+		<control type="list" id="11">
+			<centerleft>960</centerleft>
+			<top>284</top>
+			<width>526</width>
+			<height>594</height>
+			<onup>noop</onup>
+			<ondown>29</ondown>
+			<onleft>13</onleft>
+			<onright>12</onright>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.ChannelNumber,(,) ]$INFO[ListItem.ChannelName]</label>
+				</control>
+
+			</itemlayout>
+
+			<focusedlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<label>$INFO[ListItem.ChannelNumber,(,) ]$INFO[ListItem.ChannelName]</label>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(11)">Conditional</animation>
+				</control>
+
+			</focusedlayout>
+
+		</control>
+
+		<!-- Name -->
+		<control type="label">
+			<right>150</right>
+			<top>228</top>
+			<width>526</width>
+			<height>36</height>
+			<font>Font36</font>
+			<textcolor>DialogColor1</textcolor>
+			<label>[B]$INFO[Control.GetLabel(22)][/B]</label>
+		</control>
+
+		<!-- Channels list -->			
+		<control type="list" id="12">
+			<right>150</right>
+			<top>284</top>
+			<width>526</width>
+			<height>594</height>
+			<onup>noop</onup>
+			<ondown>29</ondown>
+			<onleft>11</onleft>
+			<onright>noop</onright>
+			<scrolltime tween="sine" easing="out">240</scrolltime>
+
+			<itemlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<textcolor>DialogColor2</textcolor>
+					<label>$INFO[ListItem.ChannelNumber,(,) ]$INFO[ListItem.ChannelName]</label>
+				</control>
+
+			</itemlayout>
+
+			<focusedlayout width="526" height="66">
+
+				<control type="label">
+					<width>526</width>
+					<label>$INFO[ListItem.ChannelNumber,(,) ]$INFO[ListItem.ChannelName]</label>
+					<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(12)">Conditional</animation>
+				</control>
+
+			</focusedlayout>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9001">
+			<left>150</left>
+			<top>926</top>
+			<width>1620</width>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>13</onup>
+			<ondown>noop</ondown>
+			<defaultcontrol>29</defaultcontrol>
+			<orientation>horizontal</orientation>
+
+			<!-- OK Button -->
+			<control type="button" id="29">
+				<width>400</width>
+				<label>186</label>
+			</control>
+
+			<!-- Delete Button -->
+			<control type="button" id="28">
+				<width>400</width>
+				<label>$LOCALIZE[117] $LOCALIZE[19141]</label>
+			</control>
+
+			<!-- Rename Button -->
+			<control type="button" id="27">
+				<width>400</width>
+				<label>$LOCALIZE[118] $LOCALIZE[19141]</label>
+			</control>
+
+			<!-- Add Button -->
+			<control type="button" id="26">
+				<width>400</width>
+				<label>$LOCALIZE[15019] $LOCALIZE[19141]</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>

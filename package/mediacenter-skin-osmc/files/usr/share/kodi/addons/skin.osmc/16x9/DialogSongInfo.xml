@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- songinformation -->
+	<defaultcontrol always="true">14</defaultcontrol>
+	<include>DialogZoomAnimation</include>
+
+	<controls>
+
+		<!-- Background -->
+		<include>DialogBackgroundImage</include>
+
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			<font>Font72</font>
+			<label>658</label>
+		</control>
+
+		<!-- Image -->
+		<control type="group">
+			<visible>!SubString(ListItem.Icon,Default)</visible>
+			<control type="image">
+				<left>150</left>
+				<top>322</top>
+				<width>405</width>
+				<height>405</height>
+				<fadetime>200</fadetime>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">scale</aspectratio>
+			</control>
+			<control type="image">
+				<left>150</left>
+				<top>322</top>
+				<width>405</width>
+				<height>405</height>
+				<texture>views/OverlayAlbum.png</texture>
+				<visible>Skin.HasSetting(Overlays)</visible>
+			</control>
+		</control>
+
+		<!-- Default image -->
+		<control type="image">
+			<left>150</left>
+			<top>322</top>
+			<width>405</width>
+			<height>405</height>
+			<texture>$INFO[ListItem.Icon]</texture>
+			<colordiffuse>OverlayColorFO</colordiffuse>
+			<aspectratio align="center" aligny="center">keep</aspectratio>
+			<visible>SubString(ListItem.Icon,Default)</visible>
+		</control>
+
+		<!-- Info -->
+		<control type="group">
+			<left>600</left>
+			<top>235</top>
+
+			<!-- Details -->
+			<control type="grouplist">
+				<width>1170</width>
+				<height>336</height>
+				<itemgap>12</itemgap>
+				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+
+				<!-- Artist -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Artist)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>557</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Artist]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Album -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Album)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>558</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Album]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Year -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Year)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>562</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Year]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Genre -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.Genre)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>515</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.Genre]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Track Number -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>!IsEmpty(ListItem.TrackNumber)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>554</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						<font>Font36</font>
+						<label>$INFO[ListItem.TrackNumber]</label>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+				</control>
+
+				<!-- Rating -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<visible>StringCompare(ListItem.StarRating,rating0.png) | StringCompare(ListItem.StarRating,rating1.png) | StringCompare(ListItem.StarRating,rating2.png) | StringCompare(ListItem.StarRating,rating3.png) | StringCompare(ListItem.StarRating,rating4.png) | StringCompare(ListItem.StarRating,rating5.png)</visible>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						<font>Font36</font>
+						<label>563</label>
+						<textcolor>DialogColor2</textcolor>
+					</control>
+					<control type="image">
+						<left>220</left>
+						<width>238</width>
+						<height>36</height>
+						<aspectratio align="left">keep</aspectratio>
+						<texture>$INFO[ListItem.StarRating]</texture>
+					</control>
+				</control>
+
+			</control>
+
+			<!-- Comment -->
+			<control type="textbox">
+				<top>370</top>
+				<width>1170</width>
+				<height>210</height>
+				<label>$INFO[ListItem.Comment]</label>
+				<textcolor>DialogColor2</textcolor>
+			</control>
+
+		</control>
+
+		<!-- Button grouplist -->
+		<control type="grouplist" id="9000">
+			<left>150</left>
+			<top>912</top>
+			<width>1620</width>
+			<height>66</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+
+			<!-- Rate Down Button -->
+			<control type="button" id="14">
+				<width>270</width>
+				<label>31018</label>
+				<onclick>IncreaseRating</onclick>
+			</control>
+			<!-- Rate Up Button -->
+			<control type="button" id="15">
+				<width>270</width>
+				<label>31019</label>
+				<onclick>DecreaseRating</onclick>
+			</control>
+			<!-- OK Button -->
+			<control type="button" id="10">
+				<width>270</width>
+				<label>186</label>
+			</control>
+			<!-- Cancel Button -->
+			<control type="button" id="11">
+				<width>270</width>
+				<label>222</label>
+			</control>
+			<!-- Album Info button -->
+			<control type="button" id="12">
+				<width>270</width>
+				<label>10523</label>
+			</control>
+			<!-- Get Thumb Button -->
+			<control type="button" id="13">
+				<width>270</width>
+				<label>13405</label>
+			</control>
+
+		</control>
+
+	</controls>
+
+</window>
