@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
-    /* this->setFixedSize(QApplication::desktop()->size()); */
 
     /* Set up logging */
     logger = new Logger();
@@ -41,19 +40,29 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, this->size(), qApp->desktop()->availableGeometry()));
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
-    QGraphicsOpacityEffect *ope = new QGraphicsOpacityEffect(this);
-    ope->setOpacity(0.5);
-    ui->statusLabel->setGraphicsEffect(ope);
-    ui->copyrightLabel->setGraphicsEffect(ope);
-    ui->statusProgressBar->setGraphicsEffect(ope);
+
     /* Populate target list map */
     targetList = new TargetList();
     utils = new Utils(logger);
 }
 
+QFont MainWindow::getFont(QWidget* element, float ratio)
+{
+    QFont* font = new QFont("Source Sans Pro", 1);
+    int refHeight = element->height();
+
+    int fontSize = refHeight / ratio;
+    font->setPointSize(fontSize);
+
+    return *font;
+}
 
 void MainWindow::install()
 {
+    ui->statusLabel->setFont(getFont(ui->statusLabel, FONT_STATUSLABEL_RATIO));
+    ui->copyrightLabel->setFont(getFont(ui->copyrightLabel, FONT_COPYRIGHTLABEL_RATIO));
+    ui->statusProgressBar->setFont(getFont(ui->statusProgressBar, FONT_PROGRESSBAR_RATIO));
+
     qApp->processEvents();
     /* Find out what device we are running on */
     logger->addLine("Detecting device we are running on");
