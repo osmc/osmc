@@ -1,6 +1,7 @@
 [Unit]
 Description=Sets up system for first time run
-After=remote-fs.target
+After=local-fs.target
+Requires=connman.service
 
 [Service]
 Type=oneshot
