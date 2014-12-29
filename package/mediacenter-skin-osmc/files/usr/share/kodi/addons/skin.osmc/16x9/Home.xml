@@ -3,16 +3,20 @@
 	<!-- home -->
 	<backgroundcolor>0xff18394a</backgroundcolor>
 	<defaultcontrol always="true">9000</defaultcontrol>
+	<onload condition="System.HasAddon(script.favourites)">RunScript(script.favourites)</onload>
 	<onload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onload>
 
 	<controls>
+
+		<!-- Background -->
+		<include>WindowBackgroundImage</include>
 
 		<!-- Fanart -->
 		<control type="group">
 			<control type="image">
 				<include>FullscreenDimensions</include>
 				<fadetime>200</fadetime>
-				<texture diffuse="special://skin/extras/fanart_overlay_2.png" background="true">$VAR[WidgetFanart]</texture>
+				<texture colordiffuse="12ffffff" background="true">$VAR[WidgetFanart]</texture>
 			</control>
 		</control>
 
@@ -53,9 +57,9 @@
 						<top>0</top>
 						<width>240</width>
 						<height>62</height>
-						<font>Font26</font>
+						<font>Font26Caps</font>
 						<textcolor>TextColorNF</textcolor>
-						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+						<label>$INFO[ListItem.Label]</label>
 					</control>
 				</itemlayout>
 
@@ -72,10 +76,10 @@
 						<top>0</top>
 						<width>240</width>
 						<height>72</height>
-						<font>Font38Semibold</font>
+						<font>Font38CapsSemibold</font>
 						<textcolor>TextColorFO</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
-						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+						<label>$INFO[ListItem.Label]</label>
 						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(9000)">Conditional</animation>
 					</control>
 				</focusedlayout>

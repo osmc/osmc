@@ -23,28 +23,9 @@
 
 	<!-- Window background image -->
 	<include name="WindowBackgroundImage">
-		<control type="visualisation">
-			<include>FullscreenDimensions</include>
-			<visible>Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)</visible>
-		</control>
-		<control type="videowindow">
-			<include>FullscreenDimensions</include>
-			<visible>Player.HasVideo + Skin.HasSetting(BackgroundVideo)</visible>
-		</control>
-		<control type="multiimage">
-			<include>FullscreenDimensions</include>
-			<imagepath background="true">$INFO[Window(Visualisation).Property(ArtistSlideshow)]</imagepath>
-			<aspectratio>keep</aspectratio>
-			<timeperimage>10000</timeperimage>
-			<fadetime>2000</fadetime>
-			<randomize>true</randomize>
-			<visible>Player.HasAudio + System.HasAddon(script.artistslideshow) + Skin.HasSetting(EnableArtistFanart)</visible>
-			<animation effect="fade" start="100" end="50" time="0" condition="Skin.HasSetting(FadeArtistFanart)">Conditional</animation>
-		</control>
 		<control type="image">
 			<include>FullscreenDimensions</include>
-			<texture>$VAR[BackgroundImage]</texture>
-			<animation effect="fade" start="100" end="80" condition="[Player.HasVideo + Skin.HasSetting(BackgroundVideo)] | [Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)]">Conditional</animation>
+			<texture>special://skin/extras/Background.png</texture>
 		</control>
 	</include>
 
