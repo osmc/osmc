@@ -12,6 +12,7 @@ build_in_env "${1}" $(pwd) "libnfs-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building libnfs"
+	if [ ! -f /tcver ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	if [ -d files/usr ]; then rm -rf files/usr; fi
 	if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi

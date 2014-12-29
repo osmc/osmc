@@ -13,6 +13,7 @@ build_in_env "${1}" $(pwd) "kernel-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building Linux kernel"
+	if [ ! -f /tcver ]; then echo "Not in expected environment" && exit 1; fi
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control

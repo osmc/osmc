@@ -11,6 +11,7 @@ build_in_env "${1}" $(pwd) "splash-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building splash for OSMC"
+	if [ ! -f /tcver ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control

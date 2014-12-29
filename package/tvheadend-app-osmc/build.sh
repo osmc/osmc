@@ -12,6 +12,7 @@ build_in_env "${1}" $(pwd) "tvheadend-app-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building TVHeadend"
+	if [ ! -f /tcver ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	sed '/Package/d' -i files/DEBIAN/control
 	update_sources
