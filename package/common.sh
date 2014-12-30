@@ -54,11 +54,11 @@ function configure_build_env()
 function build_in_env()
 {
 	export LANG=C
-	ischroot #diagnostic
-	echo $? #diagnostic
 	# Don't get stuck in an endless loop
+	mount -t proc proc /proc >/dev/null 2>&1
 	ischroot
-	if [ $? == 2 ]; then return 0; fi
+	if [ $? == 2 ] || [ $? == 0 ]; then return 0; fi
+	umount -t proc proc /proc >/dev/null 2>&1
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	update_sources
 	handle_dep "$1-toolchain-osmc"
