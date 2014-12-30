@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/sahlberg/libnfs/" "$(pwd)/src"
+pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.6.tar.gz?attredirects=0&d=1" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libnfs-osmc"
@@ -26,7 +26,6 @@ then
 	test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && echo "Package: rbp-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libnfs-osmc" >> files-dev/DEBIAN/control
 	test "$1" == rbp && echo "Package: armv7-libnfs-osmc" >> files/DEBIAN/control && echo "Package: armv7-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: armv7-libnfs-osmc" >> files-dev/DEBIAN/control
 	pushd src
-	git checkout libnfs-1.9.5
 	./bootstrap
 	./configure --prefix=/usr
 	$BUILD
