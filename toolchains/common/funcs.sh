@@ -11,7 +11,7 @@ function build_deb_package()
 	cp -ar ${1}/DEBIAN ${1}/output
 	mv ${1}/opt ${1}/output
 	# Mark our FS
-	target=$(echo $t1 | cut -f 1 -d -)
+	target=$(echo $1 | cut -f 1 -d -)
 	echo ${2} >${1}/output/tcver.$target
 	dpkg -b ${1}/output ${2}.deb
 }
