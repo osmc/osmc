@@ -33,4 +33,3 @@ export CHROOT_PKGS
 export -f build_deb_package
 export -f patchfs
 export -f configure_ccache
-export -f cleanup_buildcache
