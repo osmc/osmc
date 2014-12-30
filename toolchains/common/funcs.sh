@@ -27,12 +27,6 @@ function configure_ccache()
 	chroot ${1} apt-get -y install --no-install-recommends ccache
 }
 
-function cleanup_buildcache()
-{
-	echo -e "Deleting ccache data"
-	rm -rf ${1}/root/.ccache
-}
-
 CHROOT_PKGS="build-essential nano sudo"
 export CHROOT_PKGS
 
