@@ -60,36 +60,21 @@ function parseWiki($url)
 									</article>
 
 							<?php endif; ?>
-							<?php>
+							<?php
 							$url = $_SERVER['REQUEST_URI'];
-							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
-							{
-								echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
-							}
-							if (strpos($url,'wiki/'))
-							{
-								echo '</br>';
-								if (strcmp($url, '/help/wiki/') == 0)
-								{
-									echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/main" target="_blank">Edit this page</a>';
-							    }
-								else
-								{
-								$string = "http://osmc.tv/help/wiki/";
-								$page = str_replace($string, "", $url);
-									echo '<a href="https://github.com/samnazarko/osmc-wiki/blog/master/pages/' . $page . '" target="_blank">Edit this page</a>';
+							if (strpos($url, 'wiki/')) {
+								$isMailWikiPage = (strcmp($url, '/help/wiki/') == 0);
+								$page = 'main';
+								if (!$isMailWikiPage) {
+									$page = 'pages/' . trim(str_replace('/help/wiki/', '', $url), '/');
 								}
-							}
-							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') == 0)
-							{
+
+								if (!$isMailWikiPage) {
+									echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
+								}
 								echo '</br>';
-								parseWiki("main");
-							}
-							if (strpos($url,'wiki/') && strcmp($url, '/help/wiki/') !== 0)
-							{
-								echo '</br>';
-								$string = "http://osmc.tv/help/wiki/";
-								$page = str_replace($string, "", $url);
+								echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/' . $page . '" target="_blank">Edit this page</a>';
+								echo '<br/>';
 								parseWiki($page);
 							}
 							?>
