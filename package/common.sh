@@ -58,7 +58,7 @@ function build_in_env()
 	mount -t proc proc /proc >/dev/null 2>&1
 	ischroot
 	if [ $? == 2 ] || [ $? == 0 ]; then return 0; fi
-	umount -t proc proc /proc >/dev/null 2>&1
+	umount /proc >/dev/null 2>&1
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	update_sources
 	handle_dep "$1-toolchain-osmc"
