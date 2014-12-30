@@ -12,7 +12,7 @@ function build_deb_package()
 	mv ${1}/opt ${1}/output
 	# Mark our FS
 	target=$(echo $1 | rev | cut -d / -f 1 | rev | cut -d - -f 1)
-	echo ${2} >${1}/output/opt/${target}-toolchain-osmc/tcver.${target}
+	echo ${2} >${1}/output/opt/osmc-tc/${target}-toolchain-osmc/tcver.${target}
 	dpkg -b ${1}/output ${2}.deb
 }
 
