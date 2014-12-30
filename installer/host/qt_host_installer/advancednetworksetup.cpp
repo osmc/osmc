@@ -7,11 +7,11 @@ AdvancedNetworkSetup::AdvancedNetworkSetup(QWidget *parent) :
     ui(new Ui::AdvancedNetworkSetup)
 {
     ui->setupUi(this);
-    ui->ipaddresslineEdit->setInputMask("000.000.000.000");
-    ui->masklineEdit->setInputMask("000.000.000.000");
-    ui->gwlineEdit->setInputMask("000.000.000.000");
-    ui->dns1lineEdit->setInputMask("000.000.000.000");
-    ui->dns2lineEdit->setInputMask("000.000.000.000");
+    ui->ipaddresslineEdit->setInputMask("000.000.000.000;_");
+    ui->masklineEdit->setInputMask("000.000.000.000;_");
+    ui->gwlineEdit->setInputMask("000.000.000.000;_");
+    ui->dns1lineEdit->setInputMask("000.000.000.000;_");
+    ui->dns2lineEdit->setInputMask("000.000.000.000;_");
 }
 
 AdvancedNetworkSetup::~AdvancedNetworkSetup()
