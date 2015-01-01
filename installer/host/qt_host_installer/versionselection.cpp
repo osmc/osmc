@@ -71,9 +71,9 @@ void VersionSelection::on_versionnextButton_clicked()
     }
 }
 
-void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
+void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int checkState)
 {
-    if (ui->useLocalBuildCheckbox->isChecked())
+    if (checkState == Qt::Checked)
     {
         QString dir = QDir::homePath();
 
@@ -83,12 +83,12 @@ void VersionSelection::on_useLocalBuildCheckbox_stateChanged(int arg1)
         if (buildName == NULL)
         {
             utils::displayError(tr("Build selection error"), tr("You didn't select a custom build -- reverting to online builds"));
-            ui->useLocalBuildCheckbox->setChecked(false);
+            ui->useLocalBuildCheckbox->setCheckState(Qt::Unchecked);
         }
         else
         {
             ui->versionSelectionBox->setEnabled(false);
-            ui->useLocalBuildCheckbox->setChecked(true);
+            ui->useLocalBuildCheckbox->setCheckState(Qt::Checked);
         }
     }
     else
