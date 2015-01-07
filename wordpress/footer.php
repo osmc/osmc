@@ -38,7 +38,7 @@
                       <a href="http://osmc.tv/about/corporate">Corporate</a>
                     </div>
                     <div class="status">
-                      <a target="_blank" href="http://status.osmc.io">System Status</a>
+                      <a target="_blank" href="http://stats.osmc.io">System Status</a>
                     </div>
                   </div>
                 </div>
