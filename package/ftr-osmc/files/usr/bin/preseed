@@ -20,13 +20,22 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-#
+
+# shell return codes
+# 0 = preseeding successful
+# 1 = reserved (python interpreter unhandled exception)
+# 2 = reserved (python interpreter file not found)
+# 3 = preseed.cfg not found
+# 4 = ethernet interface not connected
+# 5 = wireless network not found
+# 6 = wireless network found but could not connect
 
 import syslog
 import os.path
 import dbus
 import os
 import time
+import sys
 
 def getvalue(valuestring):
 	splitvalue = valuestring.split(' ')
@@ -36,7 +45,10 @@ def make_variant(string):
 	return dbus.String(string, variant_level=1)
 
 def main():
-	filename = "/boot/preseed.cfg"
+	if len(sys.argv) > 1:
+		filename = sys.argv[1]
+	else:
+		filename = "/boot/preseed.cfg"
 	with open("/proc/cmdline") as cmdfile:
 		cmdline = cmdfile.read()
 	if os.path.isfile(filename):
@@ -78,6 +90,7 @@ def main():
 			if line.startswith("d-i network/wlan_key string"):
 				syslog.syslog("WLAN key is set to " + getvalue(line))
 				network["keyvalue"] = getvalue(line)
+
 		syslog.syslog("Parsing completed. Performing setup")
 		if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
 			syslog.syslog("Non-standard network setup specified")
@@ -110,6 +123,8 @@ def main():
 
 				else:
 					syslog.syslog("Cannot find a wired network adapter")
+					sys.exit(4)
+
 			if network["interface"] == "wlan":
 				syslog.syslog("Configuring Wireless connection")
 				syslog.syslog("Enabling wireless connection")
@@ -131,6 +146,7 @@ def main():
 					except dbus.DBusException, error:
 						syslog.syslog("Second technology.Scan() failed.")
 				time.sleep(10)
+
 				syslog.syslog("Mapping SSID to service")
 				network_found = False
 				services = manager.GetServices()
@@ -157,6 +173,7 @@ def main():
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
+								sys.exit(6)
 						else:
 							syslog.syslog("Encrypted network: need to set up an agent")
 							keyfile = open("/tmp/key", "w")
@@ -169,6 +186,8 @@ def main():
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect to network. Please check the key is correct")
+								sys.exit(6)
+
 						if network["auto"] == "false":
 							syslog.syslog("Configuring static wireless connection")
 							properties = service.GetProperties()
@@ -188,8 +207,9 @@ def main():
 
 				if network_found is False:
 					syslog.syslog("Unable to find wireless network " + network ["ssid"])
+					sys.exit(5)
 
 	else:
 		syslog.syslog("No preseed file found")
-
+		sys.exit(3)
 main()
