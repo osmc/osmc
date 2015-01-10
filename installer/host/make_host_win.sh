@@ -1,4 +1,4 @@
-# (c) 2014 Sam Nazarko
+# (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
 # Run make win from MSYS
