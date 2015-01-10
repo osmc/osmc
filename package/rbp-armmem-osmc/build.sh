@@ -5,7 +5,7 @@
 
 . ../common.sh
 # Build in native environment
-pull_source "https://github.com/bavison/arm-mem" "$(pwd)/src"
+pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"
 build_in_env "${1}" $(pwd) "rbp-armmem-osmc"
 if [ $? == 0 ]
 then
@@ -13,7 +13,7 @@ then
         if [ ! -f /tcver.${1} ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	make clean
-	pushd src
+	pushd src/arm-mem-master
 	make
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_libs
