@@ -32,7 +32,7 @@
                     <br>
                     <a href="http://markthe.is" target="_blank" class="designed">Designed by Mark Theis Maden</a>
                     <br><br>
-                    <p>&#169; 2014 OSMC </p>
+                    <p>&#169; 2015 OSMC </p>
                     
                     <div class="corporate">
                       <a href="http://osmc.tv/about/corporate">Corporate</a>
