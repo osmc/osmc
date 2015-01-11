@@ -24,7 +24,7 @@
 								curl_close($ch);
 								$lines = explode("\n",$output);
 								echo '<article id="wiki-' . $page . '" class="hentry clearfix">';
-								echo '<header class="article-header">'
+								echo '<header class="article-header">';
 								echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
 								echo '<p class="byline vcard"></p>';
 								echo '</header>';
