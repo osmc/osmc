@@ -14,7 +14,7 @@
 									$page = 'pages/' . trim(str_replace('/help/wiki/', '', $url), '/');
 								}
 								$ch = curl_init();
-								$BASE_URL = "https://raw.githubusercontent.com/samnazarko/osmc/wiki/";
+								$BASE_URL = "https://raw.githubusercontent.com/samnazarko/osmc/master/wiki/";
 								curl_setopt($ch, CURLOPT_URL, $BASE_URL . $page);
 								curl_setopt($ch, CURLOPT_HEADER, 0);
 								curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -23,7 +23,7 @@
 								$output = curl_exec($ch);
 								curl_close($ch);
 								$lines = explode("\n",$output);
-								echo 'article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
+								echo '<article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
 								echo '<header class="article-header">';
 								echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
 								echo '<p class="byline vcard"></p>';
@@ -34,7 +34,7 @@
 									echo '<a href="http://osmc.tv/help/wiki">Back to Wiki</a>';
 								}
 								echo '<br>';
-								echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/' . $page . '" target="_blank">Edit this page</a>';
+								echo '<a href="https://github.com/samnazarko/osmc/blob/master/wiki/' . $page . '" target="_blank">Edit this page</a>';
 								echo '<br>';
 								echo '<br>';
 								echo '<section class="entry-content clearfix" itemprop="articleBody">';
