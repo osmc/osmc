@@ -51,13 +51,22 @@ BuildRequires:	gcc-c++
 
 %if !  0%{?suse_version}
 # Common dependencies
-Requires:       libjpeg8
 Requires:       libmng
-Requires:       libtiff5
-Requires:       libpng12-0
 Requires: 		qt
 # Patch
 Requires:       patch
+%endif
+
+%if 0%{?centos_version} == 700 || 0%{?rhel_version} == 700
+Requires: 	libjpeg-turbo
+Requires: 	libtiff
+Requires: 	libpng
+%else
+%if !  0%{?suse_version}
+Requires:	libjpeg8
+Requires:	libtiff5
+Requires:	libpng12-0
+%endif
 %endif
 
 # Don't make this noarch although it is just a fetch script otherwise the following wont' work:
