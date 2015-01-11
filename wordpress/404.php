@@ -14,7 +14,7 @@
 									$page = 'pages/' . trim(str_replace('/help/wiki/', '', $url), '/');
 								}
 								$ch = curl_init();
-								$BASE_URL = "https://raw.githubusercontent.com/samnazarko/osmc-wiki/master/";
+								$BASE_URL = "https://raw.githubusercontent.com/samnazarko/osmc/wiki/";
 								curl_setopt($ch, CURLOPT_URL, $BASE_URL . $page);
 								curl_setopt($ch, CURLOPT_HEADER, 0);
 								curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
