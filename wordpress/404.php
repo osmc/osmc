@@ -57,9 +57,8 @@
 							</section> <?php // end article section ?>
 
 						</article> <?php // end article ?>
-
-					</div> <?php // end #main ?>
 					<?php get_sidebar(); ?>
+					</div> <?php // end #main ?>
 
 				</div> <?php // end #inner-content ?>
 
