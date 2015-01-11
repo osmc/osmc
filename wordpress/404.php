@@ -33,7 +33,7 @@
 								echo '<br/>';
 								echo '<section class="entry-content">';
 								$count = count(lines);
-								for ($i = 1; $i < $count; i++)
+								for ($i = 1; $i < $count; $i++)
 								{
 									echo $lines[$i];
 								}
