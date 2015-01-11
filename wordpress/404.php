@@ -26,7 +26,7 @@
 								echo '<article id="wiki-' . $page . '" class="hentry clearfix">';
 								echo 'header class="article-header"><h1>' . $lines[0] . '</h1></header>';
 								if (!$isMailWikiPage) {
-									echo '<a href="http://osmc.tv/wiki">Back to Wiki</a>';
+									echo '<a href="http://osmc.tv/help/wiki">Back to Wiki</a>';
 								}
 								echo '</br>';
 								echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/' . $page . '" target="_blank">Edit this page</a>';
