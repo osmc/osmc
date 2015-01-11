@@ -23,7 +23,7 @@
 								$output = curl_exec($ch);
 								curl_close($ch);
 								$lines = explode("\n",$output);
-								echo '<article id="wiki-' . $page . '" class="hentry clearfix">';
+								echo 'article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
 								echo '<header class="article-header">';
 								echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
 								echo '<p class="byline vcard"></p>';
