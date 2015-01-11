@@ -38,7 +38,7 @@
 								echo '<br>';
 								echo '<br>';
 								echo '<section class="entry-content clearfix" itemprop="articleBody">';
-								$count = count(lines);
+								$count = count($lines);
 								for ($i = 1; $i <= $count; $i++)
 								{
 									echo $lines[$i];
