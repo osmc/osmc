@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+
+<category label="32001">
+<setting id="display_rotate" label="32003" type="enum" lvalues="32004|32005|32006|32007|32008" /> 
+<setting id="hdmi_safe" label="32009" type="bool" default="false"/>
+<setting label="32010" enable="false" visible="eq(-1,true)"/>
+<setting id="hdmi_ignore_edid" label="32011" type="bool" default="false"/>
+<setting id="store_hdmi_to_file" label="32012" type="bool" default="false"/>
+<setting label="32013" enable="false" visible="eq(-1,true)"/>
+<!-- <setting id="hdmi_edid_file" type="bool" default="false" visible='false'/>
+<setting id="hdmi_force_hotplug" type="bool" default="false" visible='false'/> -->
+<setting id="hdmi_ignore_cec" label="32014" type="bool" default="false"/>
+<setting id="hdmi_boost" label="32015" type="slider" default="0" range="0,1,7" option="int"/>
+<setting id="hdmi_group" label="32016" type="enum"  lvalues="32017|32018|32019" default="0" />
+<setting id="hdmi_mode" label="32020" type="slider" default="0" range="0,1,86" option="int" />
+<setting id="sdtv_mode" label="32021" type="enum" default="0" lvalues="32035|32022|32023|32024|32025" />
+<setting id="sdtv_aspect" label="32026" type="enum" default="0" lvalues="32035|32027|32028|32029" />
+<setting id="hdmi_ignore_cec_init" label="hdmi_ignore_cec_init" type="bool" default="false" visible="false"/>
+
+</category>
+
+<category label="32002">
+
+<setting id="serial" label="32068" type="text" enable="false" />
+<setting id="codec_check" label="32069" type="text" enable="false" />
+
+<setting id="decode_MPG2" label="32032" type="text"  />
+<setting id="decode_WVC1" label="32033" type="text"  />
+<!-- <setting id="wvc_check" label="WVC1 codec status:" type="text" enable="false" /> -->
+<setting id="mem_free" label="32071" type="text" enable="false" />
+<setting id="gpu_mem_256" label="32030" type="slider" default="64" range="16,1,192" option="int" />
+<setting id="gpu_mem_512" label="32031" type="slider" default="64" range="16,1,448" option="int" />
+<setting id="usb_max_current" label="32072" type="bool" default="false"/>
+<setting id="usb_max_current_warning" label="32073" type="lsep" visible="eq(-1,true)" enable="false" />
+</category>
+
+<category label="32070">
+<setting id="non_addon_settings" label="32034" type="action" option="close" action="RunScript($CWD/resources/osmc/config_editor.py)"/>
+<!-- <setting id="other_settings_string" type="text" visible="false" default=''/> -->
+</category>
+
+</settings>

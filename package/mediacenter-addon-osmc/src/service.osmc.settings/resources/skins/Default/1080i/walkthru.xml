@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">900</defaultcontrol>
+<controls>
+    <control description="BG" type="image">
+        <posx>0</posx>
+        <posy>0</posy>
+        <width>1920</width>
+        <height>1080</height>
+        <texture>bump_bg.png</texture>
+        <aspectratio>scale</aspectratio>
+    </control>
+    <control id="100" type="grouplist">
+        <posx>0</posx>
+        <posy>15</posy>
+        <width>230</width>
+        <height>315</height>
+        <itemgap>5</itemgap>
+        <onleft>900</onleft>
+        <onright>900</onright>
+        <onup>900</onup>
+        <ondown>900</ondown>
+        <control id="110" type="button">
+            <width>230</width>
+            <height>40</height>
+            <onleft>900</onleft>
+            <onright>900</onright>
+            <onup>900</onup>
+            <ondown>900</ondown>            
+            <align>center</align>
+            <focusedcolor>FF50e0c7</focusedcolor>
+            <texturefocus>selection_focus.png</texturefocus>
+            <texturenofocus>selection_unfocus.png</texturenofocus>
+            <textoffsetx>20</textoffsetx>
+        </control>
+    </control>
+<!--     <control id="900" type="grouplist">
+        <posx>660</posx>
+        <posy>860</posy>
+        <width>600</width>
+        <height>200</height>
+        <orientation>horizontal</orientation>
+        <itemgap>20</itemgap>
+        <control id="910" type="button">
+            <posx></posx>
+            <posy></posy>
+            <width></width>
+            <height></height>
+            <texturefocus>white_circle.png</texturefocus>
+            <texturenofocus>white_circle.png</texturenofocus>            
+    </control> -->
+
+
+    <control type="list" id="900">
+        <posx>772</posx>
+        <posy>960</posy>
+        <width>600</width>
+        <height>100</height>
+        <onleft>110</onleft>
+        <onright>110</onright>
+        <onup>110</onup>
+        <ondown>110</ondown> 
+        <!-- <scrolltime tween="sine" easing="out">1200</scrolltime> -->
+        <autoscroll>false</autoscroll>
+        <orientation>horizontal</orientation>
+        <viewtype label="536">icon</viewtype>
+        <!-- <pagecontrol>60</pagecontrol> -->
+        <itemlayout height="45" width="75">
+            <control type="image">
+                <posx>25</posx>
+                <posy>20</posy>
+                <width>25</width>
+                <height>25</height>
+                <texture>white_circle.png</texture>
+            </control>
+        </itemlayout>
+        <focusedlayout height="45" width="75">
+            <control type="image">
+                <posx>15</posx>
+                <posy>0</posy>
+                <width>45</width>
+                <height>45</height>
+                <texture>white_circle.png</texture>
+                <!-- <animation effect="slide" end="5,5" time="100">focus</animation> -->
+            </control>
+        </focusedlayout>
+    </control>
+
+</controls>
+</window>

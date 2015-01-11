@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">100</defaultcontrol>
+    <animation effect="fade" time="250">WindowOpen</animation>
+    <animation effect="fade" time="500">WindowClose</animation>
+    <controls>
+
+        <!-- background -->
+        <control description="BG" type="image">
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <texture>blueBG.png</texture>
+            <aspectratio>scale</aspectratio>
+        </control>
+
+        <!-- explanatory text window -->
+        <control id="2" type="textbox">
+            <description>Explanatory Text Box</description>
+            <posx>55</posx>
+            <posy>160</posy>
+            <width>563</width>
+            <height>800</height>
+            <visible>true</visible>
+            <!-- <colordiffuse>FFFFFFFF</colordiffuse> -->
+            <font>font13</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <!-- <pulseonselect>false</pulseonselect> -->
+            <!-- <pagecontrol>13</pagecontrol> -->
+            <!-- <scrolltime>200</scrolltime> -->
+             <!-- <autoscroll delay="3000" time="1000" repeat="10000">!Control.HasFocus(13)</autoscroll> -->
+            <label>Text to display goes here [CR] next line... </label>
+        </control>
+
+        <control description="alarm button control" type="image">
+            <posx>70</posx>
+            <posy>45</posy>
+            <width>533</width>
+            <height>100</height>
+            <texture>osmclight100.png</texture>
+        </control>
+        
+        <control description="osmc icon" type="image">
+            <posx>70</posx>
+            <posy>45</posy>
+            <width>533</width>
+            <height>100</height>
+            <texture>osmclight100.png</texture>
+        </control>
+
+        <control id="100" type="group">
+            <description>Controls Group</description>
+            <posx>780</posx>
+            <posy>0</posy>
+            <width>1140</width>
+            <height>1080</height>
+            <defaultcontrol>200</defaultcontrol>
+            <visible>true</visible>
+            <onup>100</onup>
+            <ondown>100</ondown>
+            <onleft>100</onleft>
+            <onright>100</onright>
+
+            <control id="200" type="group">
+                <description>Exit and turbos</description>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>240</width>
+                <height>1080</height>
+                <defaultcontrol>201</defaultcontrol>
+                <visible>true</visible>
+                <onup>200</onup>
+                <ondown>200</ondown>
+                <onleft>200</onleft>
+                <onright>300</onright>
+
+                <control id="201" type="button">
+                    <description>exit button</description>
+                    <posx>20</posx>
+                    <posy>40</posy>
+                    <width>200</width>
+                    <height>100</height>
+                    <visible>true</visible>
+                    <onup>201</onup>
+                    <ondown>202</ondown>
+                    <onleft>300</onleft>
+                    <onright>300</onright>
+                </control>
+
+                <control id="202" type="button">
+                    <description>turbo toggle</description>
+                    <posx>20</posx>
+                    <posy>240</posy>
+                    <width>200</width>
+                    <height>100</height>
+                    <visible>true</visible>
+                    <onup>201</onup>
+                    <ondown>203</ondown>
+                    <onleft>300</onleft>
+                    <onright>300</onright>
+                </control>
+
+                <control id="203" type="button">
+                    <description>turbo init toggle</description>
+                    <posx>20</posx>
+                    <posy>400</posy>
+                    <width>200</width>
+                    <height>100</height>
+                    <visible>true</visible>
+                    <onup>202</onup>
+                    <ondown>201</ondown>
+                    <onleft>300</onleft>
+                    <onright>300</onright>
+                </control>                
+
+            </control>
+
+            <control id="300" type="group">
+                <description>Profiles</description>
+                <posx>240</posx>
+                <posy>0</posy>
+                <width>900</width>
+                <height>180</height>
+                <visible>true</visible>
+                <onup>400</onup>
+                <ondown>400</ondown>
+                <onleft>200</onleft>
+                <onright>300</onright>
+
+                <control id="301" type="button">
+                    <description>profile 1</description>
+                    <posx>40</posx>
+                    <posy>30</posy>
+                    <width>175</width>
+                    <height>90</height>
+                    <visible>true</visible>
+                    <onup>400</onup>
+                    <ondown>400</ondown>
+                    <onleft>200</onleft>
+                    <onright>302</onright>
+                </control>                
+
+                <control id="302" type="button">
+                    <description>profile 2</description>
+                    <posx>255</posx>
+                    <posy>30</posy>
+                    <width>175</width>
+                    <height>90</height>
+                    <visible>true</visible>
+                    <onup>400</onup>
+                    <ondown>400</ondown>
+                    <onleft>301</onleft>
+                    <onright>303</onright>
+                </control>                
+
+                <control id="303" type="button">
+                    <description>profile 3</description>
+                    <posx>470</posx>
+                    <posy>30</posy>
+                    <width>175</width>
+                    <height>90</height>>
+                    <visible>true</visible>
+                    <onup>400</onup>
+                    <ondown>400</ondown>
+                    <onleft>302</onleft>
+                    <onright>304</onright>
+                </control>                
+
+                <control id="304" type="button">
+                    <description>profile custom</description>
+                    <posx>685</posx>
+                    <posy>30</posy>
+                    <width>175</width>
+                    <height>90</height>
+                    <visible>true</visible>
+                    <onup>400</onup>
+                    <ondown>400</ondown>
+                    <onleft>303</onleft>
+                    <onright>301</onright>
+                </control>                
+
+            </control>
+
+            <control id="400" type="group">
+                <description>variants</description>
+                <posx>240</posx>
+                <posy>180</posy>
+                <width>900</width>
+                <height>900</height>
+                <visible>true</visible>
+                <onup>300</onup>
+                <ondown>300</ondown>
+                <onleft>400</onleft>
+                <onright>400</onright>
+
+                <control type="spincontrolex" id="401">
+                      <description>core</description>
+                      <posx>80</posx>
+                      <posy>60</posy>
+                      <width>250</width>
+                      <height>200</height>
+                      <visible>true</visible>
+                      <colordiffuse>FFFFFFFF</colordiffuse>
+                      <texturefocus>oc_label_FO.png</texturefocus>
+                      <texturenofocus>oc_label_FX.png</texturenofocus>
+                      <textureup>oc_arrow_up_FX.png</textureup>
+                      <textureupfocus>oc_arrow_up_FO.png</textureupfocus>
+                      <texturedown>oc_arrow_dn_FX.png</texturedown>
+                      <texturedownfocus>oc_arrow_dn_F0.png</texturedownfocus>
+                      <label></label>
+                      <font>font12</font>
+                      <textcolor>FFFFFFFF</textcolor>
+                      <disabledcolor>80FFFFFF</disabledcolor>
+                      <align></align>
+                      <aligny></aligny>
+                      <textoffsetx></textoffsetx>
+                      <textoffsety></textoffsety>
+                      <pulseonselect></pulseonselect>
+                      <onup>300</onup>
+                      <ondown>400</ondown>
+                      <onleft>200</onleft>
+                      <onright></onright>
+                </control>
+
+            </control>
+
+        </control>
+    </controls>
+</window>

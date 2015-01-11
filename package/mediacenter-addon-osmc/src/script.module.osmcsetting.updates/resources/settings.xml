@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<!-- 32001: Update Schedule -->
+	<category label="32001">
+		<!-- 32002: How often do you want to check for updates? -->
+		<setting default="1" id="check_freq" label="32002" lvalues="32003|32004|32005|32006" type="enum"/>
+		<!-- 32003: Never, 32004: Daily, 32005: Weekly, 32006: Monthly -->
+		<!-- . -->
+		<!-- 32007: Day -->
+		<setting default="1" id="check_weekday" label="32007" lvalues="32008|32009|32010|32011|32012|32013|32014" subsetting="true" type="enum" visible="eq(-1,2)"/>
+		<!-- 32008: Monday ... 32014: Sunday -->
+		<!-- . -->
+		<!-- 32015: Days before/after month-end -->
+		<setting default="0" id="check_day" label="32015" option="int" range="-16,1,16" subsetting="true" type="slider" visible="eq(-2,3)"/>
+		<!-- 32016: Do you want to choose a specific time to check? -->
+		<setting default="0" id="check_time" label="32016" lvalues="32017|32018" subsetting="true" type="enum" visible="!eq(-3,0)"/>
+		<!-- 32017: random, 32018: specific -->
+		<!-- . -->
+		<!-- 32019: Hour -->
+		<setting default="12" id="check_hour" label="32019" option="int" range="0,1,23" subsetting="true" type="slider" visible="!eq(-4,0)+eq(-1,1)"/>
+		<!-- 32023: Minute -->
+		<setting default="0" id="check_minute" label="32023" option="int" range="0,1,59" subsetting="true" type="slider" visible="!eq(-5,0)+eq(-2,1)"/>
+		<!-- 32055: Check for updates on start up -->
+		<setting default="false" id="check_onboot" label="32055" type="bool"/>
+		<!-- 32071: Delay (minutes) -->
+		<setting default="10" id="check_boot_delay" label="32071" option="int" range="0,1,60" type="slider" visible="eq(-1,true)"/>
+		<!-- 32070: Do not check for updates while media is playing -->
+		<setting default="true" id="ban_update_media" label="    32070" type="bool"/>
+		<!-- 32069: Only check for updates if system is idle for 1 minute -->
+		<setting default="true" id="update_on_idle" label="32069" type="bool"/>
+	</category>
+	<category label="When Update Available">
+		<!-- 32064: Action when updates are found -->
+		<setting default="0" id="on_upd_detected" label="32064" lvalues="32057|32058|32059|32060|32061|32062" type="enum"/>
+		<!-- 32057: "Prompt for all actions" -->
+		<!-- 32058: "Display icon on home screen only" -->
+		<!-- 32059: "Download updates, then prompt" -->
+		<!-- 32060: "Download and display icon" -->
+		<!-- 32061: "Download, install, prompt if restart needed" -->
+		<!-- 32062: "Download, install, auto-restart if needed" -->
+		<!-- . -->
+
+		<!-- 32065: Only show prompts on the Home screen -->
+		<setting default="false" id="home_prompts_only" label="32065" type="bool" visible="eq(-1, 0)"/>
+		<!-- 32066: Icon Position X (% of screen) -->
+		<!-- <setting default="5" id="pos_x" label="32066" option="int" range="0,1,100" type="slider" visible="!eq(-2,0)"/> -->
+		<!-- 32067: Icon Position Y (% of screen) -->
+		<!-- <setting default="5" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-3,0)"/> -->
+		<!-- 32046: Suppress on-screen progress updates -->
+		<setting default="false" id="suppress_progress" label="32046" type="bool"/>
+		<!-- 32068: Do not show icon on home screen -->
+		<setting default="false" id="suppress_icon" label="32068" type="bool"/>
+	</category>
+	<category label="Manual Controls">
+		<!-- 32056: Scan for updates now -->
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
+		<!-- 32053: Install available updates Now -->
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, commit)" id="commit_now" label="32053" option="close" type="action"/>
+		<!-- 32053: Install downloaded updates -->
+		<setting action="RunScript($CWD/resources/lib/setting_exit_install_call.py)" id="exit_install_now" label="32054" option="close" type="action"/>
+	</category>
+</settings>
