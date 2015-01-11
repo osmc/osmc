@@ -1,0 +1,10 @@
+Uploading logs
+OSMC hosts its own Pastebin that is ad-free for users to upload logs to. You can find it at <a href="http://paste.osmc.io" target="_blank">http://paste.osmc.io</a>. Please use it responsibly.
+<h2>Uploading via the command line</h2>
+OSMC's Pastebin supports uploading via the command line. This allows you to upload logs directly from your device instead of having to transfer them to an intermediate device.
+
+After logging in to your device and <a href="http://osmc.tv/help/wiki/console">getting to the console</a>, you can 'pipe' most commands to paste to upload the output online.  For example:
+<pre>echo "Hello World" | paste</pre>
+will return a URL containing the above text. To upload a file called /home/osmc/somefile.log, you would run:
+<pre>cat /home/osmc/somefile.log | paste</pre>
+Please note that this may not work for larger logs.
