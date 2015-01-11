@@ -24,7 +24,7 @@
 								curl_close($ch);
 								$lines = explode("\n",$output);
 								echo '<article id="wiki-' . $page . '" class="hentry clearfix">';
-								echo 'header class="article-header"><h1>' . $lines[0] . '</h1></header>';
+								echo '<header class="article-header"><h1>' . $lines[0] . '</h1></header>';
 								if (!$isMailWikiPage) {
 									echo '<a href="http://osmc.tv/help/wiki">Back to Wiki</a>';
 								}
