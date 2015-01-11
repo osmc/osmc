@@ -28,12 +28,15 @@
 								echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
 								echo '<p class="byline vcard"></p>';
 								echo '</header>';
+								echo '<br>';
+								echo '<br>';
 								if (!$isMailWikiPage) {
 									echo '<a href="http://osmc.tv/help/wiki">Back to Wiki</a>';
 								}
-								echo '</br>';
+								echo '<br>';
 								echo '<a href="https://github.com/samnazarko/osmc-wiki/blob/master/' . $page . '" target="_blank">Edit this page</a>';
-								echo '<br/>';
+								echo '<br>';
+								echo '<br>';
 								echo '<section class="entry-content clearfix" itemprop="articleBody">';
 								$count = count(lines);
 								for ($i = 1; $i <= $count; $i++)
