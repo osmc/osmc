@@ -20,13 +20,22 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-#
+
+# shell return codes
+# 0 = preseeding successful
+# 1 = reserved (python interpreter unhandled exception)
+# 2 = reserved (python interpreter file not found)
+# 3 = preseed.cfg not found
+# 4 = ethernet interface not connected
+# 5 = wireless network not found
+# 6 = wireless network found but could not connect
 
 import syslog
 import os.path
 import dbus
 import os
 import time
+import sys
 
 def getvalue(valuestring):
 	splitvalue = valuestring.split(' ')
@@ -36,7 +45,10 @@ def make_variant(string):
 	return dbus.String(string, variant_level=1)
 
 def main():
-	filename = "/boot/preseed.cfg"
+	if len(sys.argv) > 1:
+		filename = sys.argv[1]
+	else:
+		filename = "/boot/preseed.cfg"
 	with open("/proc/cmdline") as cmdfile:
 		cmdline = cmdfile.read()
 	if os.path.isfile(filename):
@@ -78,6 +90,7 @@ def main():
 			if line.startswith("d-i network/wlan_key string"):
 				syslog.syslog("WLAN key is set to " + getvalue(line))
 				network["keyvalue"] = getvalue(line)
+
 		syslog.syslog("Parsing completed. Performing setup")
 		if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
 			syslog.syslog("Non-standard network setup specified")
@@ -87,22 +100,31 @@ def main():
 				for entry in services:
 					path = entry[0]
 					properties = entry[1]
-					svcname = properties["Name"]
-				if svcname == "Wired":
+					ethernet_found = path.startswith("/net/connman/service/ethernet")
+					if ethernet_found:
+						break
+
+				if ethernet_found:
 					syslog.syslog("Ethernet device identified has entry point " + path)
-					syslog.syslog("Setting nameservers")
 					service = dbus.Interface(bus.get_object('net.connman', path), 'net.connman.Service')
 					properties = service.GetProperties()
-					dns = { network["dns1"], network["dns2"] }
-					service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
 					syslog.syslog("Setting ip, mask and gateway")
 					ipv4_configuration = { "Method": make_variant("manual") }
 					ipv4_configuration["Address"] = make_variant(network["ip"])
 					ipv4_configuration["Netmask"] = make_variant(network["mask"])
 					ipv4_configuration["Gateway"] = make_variant(network["gw"])
 					service.SetProperty("IPv4.Configuration", ipv4_configuration)
+					time.sleep(2)
+					syslog.syslog("Setting nameservers")
+					dns = { network["dns1"], network["dns2"] }
+					# duplicate SetProperty message works around connman dns forwarder bug
+					service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+					service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+
 				else:
 					syslog.syslog("Cannot find a wired network adapter")
+					sys.exit(4)
+
 			if network["interface"] == "wlan":
 				syslog.syslog("Configuring Wireless connection")
 				syslog.syslog("Enabling wireless connection")
@@ -111,18 +133,38 @@ def main():
 					technology.SetProperty("Powered", True)
 				except dbus.DBusException, error:
 					syslog.syslog("Wireless connectivity is already enabled. If you are running this script again, you probably shouldn't be unless you know what you are doing")
+				time.sleep(2)
 				syslog.syslog("Scanning for WiFi networks")
-                                time.sleep(5)
-				technology.Scan()
-				time.sleep(5)
+				try:
+					technology.Scan()
+				except dbus.DBusException, error:
+					# technology.Scan() will sometimes time out if connman is "busy". Catch exception and retry.
+					syslog.syslog("First technology.Scan() failed, retrying...")
+					try:
+						time.sleep(2)
+						technology.Scan()
+					except dbus.DBusException, error:
+						syslog.syslog("Second technology.Scan() failed.")
+				time.sleep(10)
+
 				syslog.syslog("Mapping SSID to service")
+				network_found = False
 				services = manager.GetServices()
 				for entry in services:
 					path = entry[0]
 					properties = entry[1]
-					svcname = properties["Name"]
+					if path.startswith("/net/connman/service/wifi") is False:
+						continue
+					try:
+						svcname = properties["Name"]
+						syslog.syslog("Detected wireless network " + properties["Name"] + " during scan")
+					except:
+						# Hidden networks have no Name key in dictionary entry causing an exception.
+						syslog.syslog("Detected hidden wireless network during scan")
+						continue
 					if network["ssid"] == svcname:
-						syslog.syslog("Found SSID entry point of " + path)
+						syslog.syslog("Found SSID entry point for " + network["ssid"] + " at " + path)
+						network_found = True
 						service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
 						if network["keytype"] == "0":
 							syslog.syslog("Open network does not need an agent. Attempting connection")
@@ -131,6 +173,7 @@ def main():
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
+								sys.exit(6)
 						else:
 							syslog.syslog("Encrypted network: need to set up an agent")
 							keyfile = open("/tmp/key", "w")
@@ -143,18 +186,30 @@ def main():
 								service.Connect(timeout=15000)
 							except dbus.DBusException, error:
 								syslog.syslog("Could not connect to network. Please check the key is correct")
+								sys.exit(6)
+
 						if network["auto"] == "false":
 							syslog.syslog("Configuring static wireless connection")
 							properties = service.GetProperties()
-							dns = { network["dns1"], network["dns2"] }
-							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
 							syslog.syslog("Setting ip, mask and gateway")
 							ipv4_configuration = { "Method": make_variant("manual") }
 							ipv4_configuration["Address"] = make_variant(network["ip"])
 							ipv4_configuration["Netmask"] = make_variant(network["mask"])
 							ipv4_configuration["Gateway"] = make_variant(network["gw"])
 							service.SetProperty("IPv4.Configuration", ipv4_configuration)
+							time.sleep(2)
+							syslog.syslog("Setting nameservers")
+							dns = { network["dns1"], network["dns2"] }
+							# duplicate SetProperty message works around connman dns forwarder bug
+							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+						break
+
+				if network_found is False:
+					syslog.syslog("Unable to find wireless network " + network ["ssid"])
+					sys.exit(5)
+
 	else:
 		syslog.syslog("No preseed file found")
-
+		sys.exit(3)
 main()
