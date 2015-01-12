@@ -1,5 +1,4 @@
 #include "deviceselection.h"
-#include "ui_deviceselection.h"
 #include "utils.h"
 #include "io.h"
 #include "diskdevice.h"
@@ -21,6 +20,9 @@ DeviceSelection::~DeviceSelection()
 
 void DeviceSelection::showDevices()
 {
+    ui->devicenextButton->setEnabled(false);
+    ui->refreshButton->setEnabled(false);
+
     ui->devListWidget->clear();
     devMap.clear();
     QListWidgetItem *header = new QListWidgetItem(tr("Device ID Device Path Device Space"), ui->devListWidget);
@@ -48,6 +50,8 @@ void DeviceSelection::showDevices()
         item->setFlags(item->flags() | Qt::ItemIsSelectable);
         devMap.insert(deviceStr, device);
     }
+    ui->devicenextButton->setEnabled(true);
+    ui->refreshButton->setEnabled(true);
 }
 
 void DeviceSelection::on_refreshButton_clicked()
@@ -57,6 +61,9 @@ void DeviceSelection::on_refreshButton_clicked()
 
 void DeviceSelection::on_devicenextButton_clicked()
 {
+    ui->devicenextButton->setEnabled(false);
+    ui->refreshButton->setEnabled(false);
+
     int numItems = ui->devListWidget->count();
     QListWidgetItem *choosenItem=NULL;
     int checkCount = 0;
@@ -76,9 +83,13 @@ void DeviceSelection::on_devicenextButton_clicked()
     if (checkCount == 0)
     {
         utils::displayError(tr("Please select a device"), tr("You must select one device to image"));
+        ui->devicenextButton->setEnabled(true);
+        ui->refreshButton->setEnabled(true);
     } else if (checkCount > 1)
     {
         utils::displayError(tr("Please select one device"), tr("You can only select one device to image"));
+        ui->devicenextButton->setEnabled(true);
+        ui->refreshButton->setEnabled(true);
     } else {
         utils::writeLog("Device selected: " + choosenItem->text());
         emit DeviceSelected((devMap.value(choosenItem->text())));

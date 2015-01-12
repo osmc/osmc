@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMap>
 #include "diskdevice.h"
+#include "ui_deviceselection.h"
 
 namespace Ui {
 class DeviceSelection;
@@ -12,7 +13,13 @@ class DeviceSelection;
 class DeviceSelection : public QWidget
 {
     Q_OBJECT
-    
+
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->devicenextButton->setEnabled(true);
+        ui->refreshButton->setEnabled(true);
+    }
+
 public:
     explicit DeviceSelection(QWidget *parent = 0);
     ~DeviceSelection();

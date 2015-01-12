@@ -2,6 +2,7 @@
 #define NETWORKSETUP_H
 
 #include <QWidget>
+#include "ui_networksetup.h"
 
 namespace Ui {
 class NetworkSetup;
@@ -11,6 +12,11 @@ class NetworkSetup : public QWidget
 {
     Q_OBJECT
     
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->networkoptionsnextButton->setEnabled(true);
+    }
+
 public:
     explicit NetworkSetup(QWidget *parent = 0, bool allowWireless = 1);
     ~NetworkSetup();

@@ -1,5 +1,4 @@
 #include "licenseagreement.h"
-#include "ui_licenseagreement.h"
 #include "utils.h"
 
 LicenseAgreement::LicenseAgreement(QWidget *parent) :
@@ -16,9 +15,11 @@ LicenseAgreement::~LicenseAgreement()
 
 void LicenseAgreement::on_licenseAcceptNextButton_clicked()
 {
+    ui->licenseAcceptNextButton->setEnabled(false);
     if (! ui->datapolacceptcheckBox->isChecked() || !ui->gplacceptcheckBox->isChecked())
     {
         utils::displayError(tr("License agreement"), tr("You need to accept the license agreement and data collection policy to proceed"));
+        ui->licenseAcceptNextButton->setEnabled(true);
     }
     else
     {

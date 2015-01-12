@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include "supporteddevice.h"
+#include "ui_langselection.h"
 
 namespace Ui {
 class LangSelection;
@@ -12,6 +13,11 @@ class LangSelection;
 class LangSelection : public QWidget
 {
     Q_OBJECT
+
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->languagenextButton->setEnabled(true);
+    }
 
 public:
     explicit LangSelection(QWidget *parent = 0, QList<SupportedDevice *> devices = QList<SupportedDevice *>());
@@ -26,6 +32,7 @@ signals:
 private:
     Ui::LangSelection *ui;
     QList<SupportedDevice *> devicesList;
+
 };
 
 #endif // LANGSELECTION_H

@@ -1,5 +1,4 @@
 #include "langselection.h"
-#include "ui_langselection.h"
 #include "utils.h"
 #include <QDir>
 #include <QList>
@@ -42,6 +41,7 @@ LangSelection::LangSelection(QWidget *parent, QList<SupportedDevice *> devices) 
     boxPalette.setColor(QPalette::Highlight, QColor(23, 57, 74));
     ui->languageSelectionBox->setPalette(boxPalette);
     ui->deviceSelectionBox->setPalette(boxPalette);
+    ui->languagenextButton->setEnabled(true);
 }
 
 LangSelection::~LangSelection()
@@ -51,6 +51,7 @@ LangSelection::~LangSelection()
 
 void LangSelection::on_languagenextButton_clicked()
 {
+    ui->languagenextButton->setEnabled(false);
     if (ui->languageSelectionBox->currentIndex() != 0 && ui->deviceSelectionBox->currentIndex() != 0)
     {
         SupportedDevice *device;
@@ -76,6 +77,8 @@ void LangSelection::on_languagenextButton_clicked()
         }
     }
     else
+    {
         utils::displayError(tr("Error"), tr("You need to select an option!"));
+        ui->languagenextButton->setEnabled(true);
+    }
 }
-
