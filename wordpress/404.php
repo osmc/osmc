@@ -35,9 +35,6 @@
             echo '</div>';
             echo '</div>';
             echo '</header>';
-            echo '<br>';
-          echo '<br>';
-          echo '<br>';
             echo '<section class="entry-content clearfix" itemprop="articleBody">';
             $count = count($lines);
             for ($i = 1; $i <= $count; $i++)
