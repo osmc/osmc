@@ -25,17 +25,19 @@
             echo '<article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
             echo '<header class="article-header">';
             echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
-            echo '<p class="byline vcard"></p>';
+          
+            echo '<div class="byline vcard">';
+            if (!$isMailWikiPage) {
+              echo '<p><a href="http://osmc.tv/help/wiki">Back to Wiki</a></p>';
+            }
+            echo '<div class="cat">';
+            echo '<p><a href="https://github.com/samnazarko/osmc/blob/master/wiki/' . $page . '" target="_blank">Edit this page</a></p>';
+            echo '</div>';
+            echo '</div>';
             echo '</header>';
             echo '<br>';
-            echo '<br>';
-            if (!$isMailWikiPage) {
-                echo '<a href="http://osmc.tv/help/wiki">Back to Wiki</a>';
-            }
-            echo '<br>';
-            echo '<a href="https://github.com/samnazarko/osmc/blob/master/wiki/' . $page . '" target="_blank">Edit this page</a>';
-            echo '<br>';
-            echo '<br>';
+          echo '<br>';
+          echo '<br>';
             echo '<section class="entry-content clearfix" itemprop="articleBody">';
             $count = count($lines);
             for ($i = 1; $i <= $count; $i++)
