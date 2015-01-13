@@ -49,6 +49,8 @@ void BootloaderConfig::configureEnvironment()
             /* NFS install */
             cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + " rootwait quiet";
         }
+	/* Application Store identifier */
+	cmdlineStringList << " osmcdev=rbp";
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
