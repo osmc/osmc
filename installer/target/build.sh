@@ -85,5 +85,6 @@ sync
 kpartx -d OSMC_TGT_${1}_${date}.img
 echo -e "Compressing image"
 gzip OSMC_TGT_${1}_${date}.img
+md5sum OSMC_TGT_${1}_${date}.img > OSMC_TGT_${1}_${date}.md5
 popd
 echo -e "Build completed"
