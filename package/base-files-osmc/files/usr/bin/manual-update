@@ -7,6 +7,6 @@ systemctl stop mediacenter
 
 # Package downloads have been done in the addon, so let's get right to upgrade.
 
-debconf-apt-progress "apt-get dist-upgrade -y"
+debconf-apt-progress -- apt-get -y dist-upgrade
 
 if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; else systemctl start mediacenter; fi
