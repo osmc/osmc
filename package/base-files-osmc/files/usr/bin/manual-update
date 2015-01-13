@@ -9,4 +9,4 @@ systemctl stop mediacenter
 
 debconf-apt-progress apt-get -y dist-upgrade
 
-if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; else systemctl mediacenter start; fi
+if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; else systemctl start mediacenter; fi
