@@ -1,5 +1,4 @@
 #include "networksetup.h"
-#include "ui_networksetup.h"
 
 NetworkSetup::NetworkSetup(QWidget *parent, bool allowWireless) :
     QWidget(parent),
@@ -17,6 +16,7 @@ NetworkSetup::~NetworkSetup()
 
 void NetworkSetup::on_networkoptionsnextButton_clicked()
 {
+    ui->networkoptionsnextButton->setEnabled(false);
     if (ui->wirelessconnectionradioButton->isChecked())
         emit setNetworkOptionsInit(true, ui->advancednetworkingcheckBox->checkState());
     if (ui->wiredconnectionradioButton->isChecked())

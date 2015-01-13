@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QUrl>
 #include <QString>
+#include "ui_versionselection.h"
 
 namespace Ui {
 class VersionSelection;
@@ -15,6 +16,11 @@ class VersionSelection;
 class VersionSelection : public QWidget
 {
     Q_OBJECT
+
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->versionnextButton->setEnabled(true);
+    }
 
 public:
     explicit VersionSelection(QWidget *parent = 0, QString deviceShortName = NULL, QString mirrorURL = NULL);

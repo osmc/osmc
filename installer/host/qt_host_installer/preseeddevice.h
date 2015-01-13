@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "supporteddevice.h"
+#include "ui_preseeddevice.h"
 
 namespace Ui {
 class PreseedDevice;
@@ -12,6 +13,11 @@ class PreseedDevice : public QWidget
 {
     Q_OBJECT
     
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->installoptionsnextButton->setEnabled(true);
+    }
+
 public:
     explicit PreseedDevice(QWidget *parent = 0, SupportedDevice dev = SupportedDevice());
     ~PreseedDevice();

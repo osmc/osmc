@@ -1,5 +1,4 @@
 #include "wifinetworksetup.h"
-#include "ui_wifinetworksetup.h"
 #include "utils.h"
 
 WiFiNetworkSetup::WiFiNetworkSetup(QWidget *parent) :
@@ -20,9 +19,11 @@ WiFiNetworkSetup::~WiFiNetworkSetup()
 
 void WiFiNetworkSetup::on_networkoptionsnextButton_clicked()
 {
+    ui->networkoptionsnextButton->setEnabled(false);
     if (ui->keySelectionBox->currentText().startsWith("---"))
     {
         utils::displayError(tr("Networktype missing"), tr("You need to select the type of network encryption!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
@@ -45,6 +46,7 @@ void WiFiNetworkSetup::on_networkoptionsnextButton_clicked()
         if (key.isEmpty())
         {
             utils::displayError(tr("Missing Key"), tr("You need to provide a key!"), false);
+            ui->networkoptionsnextButton->setEnabled(true);
             return;
         }
     }

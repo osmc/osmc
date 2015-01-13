@@ -2,6 +2,7 @@
 #define LICENSEAGREEMENT_H
 
 #include <QWidget>
+#include "ui_licenseagreement.h"
 
 namespace Ui {
 class LicenseAgreement;
@@ -11,6 +12,11 @@ class LicenseAgreement : public QWidget
 {
     Q_OBJECT
     
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->licenseAcceptNextButton->setEnabled(true);
+    }
+
 public:
     explicit LicenseAgreement(QWidget *parent = 0);
     ~LicenseAgreement();

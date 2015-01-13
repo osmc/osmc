@@ -1,5 +1,4 @@
 #include "preseeddevice.h"
-#include "ui_preseeddevice.h"
 #include "supporteddevice.h"
 #include "utils.h"
 #include <QInputDialog>
@@ -49,6 +48,8 @@ PreseedDevice::~PreseedDevice()
 
 void PreseedDevice::on_installoptionsnextButton_clicked()
 {
+    ui->installoptionsnextButton->setEnabled(false);
+
     if (ui->sdinstallradioButton->isChecked())
     {
         utils::writeLog("SD installation selected");

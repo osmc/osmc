@@ -1,5 +1,4 @@
 #include "versionselection.h"
-#include "ui_versionselection.h"
 #include "supporteddevice.h"
 #include <QFileDialog>
 #include <QtNetwork/QNetworkAccessManager>
@@ -54,9 +53,11 @@ VersionSelection::~VersionSelection()
 
 void VersionSelection::on_versionnextButton_clicked()
 {
+    ui->versionnextButton->setEnabled(false);
     if (ui->versionSelectionBox->isEnabled() && ui->versionSelectionBox->currentIndex() == 0)
     {
         utils::displayError(tr("Select a version"), tr("Please select a version!"));
+        ui->versionnextButton->setEnabled(true);
     }
     else
     {

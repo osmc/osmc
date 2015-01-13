@@ -93,7 +93,7 @@ void MainWindow::rotateWidget(QWidget *oldWidget, QWidget *newWidget, bool enabl
 
     oldWidget->hide();
     newWidget->move(WIDGET_START);
-    newWidget->show();
+    newWidget->show();    
 }
 
 void MainWindow::replyFinished(QNetworkReply *reply)

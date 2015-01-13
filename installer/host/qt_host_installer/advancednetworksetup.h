@@ -2,6 +2,7 @@
 #define ADVANCEDNETWORKSETUP_H
 
 #include <QWidget>
+#include "ui_advancednetworksetup.h"
 
 namespace Ui {
 class AdvancedNetworkSetup;
@@ -10,6 +11,11 @@ class AdvancedNetworkSetup;
 class AdvancedNetworkSetup : public QWidget
 {
     Q_OBJECT
+
+    virtual void showEvent(QShowEvent *event) override
+    {
+        ui->networkoptionsnextButton->setEnabled(true);
+    }
     
 public:
     explicit AdvancedNetworkSetup(QWidget *parent = 0);

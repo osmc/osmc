@@ -1,5 +1,4 @@
 #include "advancednetworksetup.h"
-#include "ui_advancednetworksetup.h"
 #include "utils.h"
 
 AdvancedNetworkSetup::AdvancedNetworkSetup(QWidget *parent) :
@@ -12,6 +11,7 @@ AdvancedNetworkSetup::AdvancedNetworkSetup(QWidget *parent) :
     ui->gwlineEdit->setInputMask("000.000.000.000;_");
     ui->dns1lineEdit->setInputMask("000.000.000.000;_");
     ui->dns2lineEdit->setInputMask("000.000.000.000;_");
+    ui->networkoptionsnextButton->setEnabled(true);
 }
 
 AdvancedNetworkSetup::~AdvancedNetworkSetup()
@@ -21,7 +21,7 @@ AdvancedNetworkSetup::~AdvancedNetworkSetup()
 
 void AdvancedNetworkSetup::on_networkoptionsnextButton_clicked()
 {
-    /* TODO: Add validation */
+    ui->networkoptionsnextButton->setEnabled(false);
     QString ipAddress = ui->ipaddresslineEdit->text();
     QString mask = ui->masklineEdit->text();
     QString gateway = ui->gwlineEdit->text();
@@ -31,30 +31,35 @@ void AdvancedNetworkSetup::on_networkoptionsnextButton_clicked()
     if (!utils::validateIp(ipAddress))
     {
         utils::displayError(tr("Invalid IP"), tr("You need to provide a valid IP address!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
     if (!utils::validateIp(mask))
     {
         utils::displayError(tr("Invalid Networkmask"), tr("You need to provide a valid network mask!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
     if (!utils::validateIp(gateway))
     {
         utils::displayError(tr("Invalid Gateway-address"), tr("You need to provide a valid address for the gateway!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
     if (!utils::validateIp(dns1))
     {
         utils::displayError(tr("Invalid DNS IP"), tr("You need to provide a valid IP address for DNS-1!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
     if (!utils::validateIp(dns2))
     {
         utils::displayError(tr("Invalid DNS IP"), tr("You need to provide a valid IP address for DNS-2!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
