@@ -1,0 +1,20 @@
+{
+    "partitions": [
+        {
+            "label": "boot",
+            "filesystem_type": "FAT",
+            "partition_size_nominal": 80,
+            "want_maximised": false,
+            "mkfs_options": "-F32",
+            "uncompressed_tarball_size": 20
+        },
+        {
+            "label": "root",
+            "filesystem_type": "ext4",
+            "partition_size_nominal": 1500,
+            "uncompressed_tarball_size": 600,
+            "want_maximised": true,
+            "mkfs_options": "-F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096"
+        }
+    ]
+}
