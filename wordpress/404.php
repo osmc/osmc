@@ -25,7 +25,6 @@
             echo '<article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
             echo '<header class="article-header">';
             echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
-          
             echo '<div class="byline vcard">';
             if (!$isMailWikiPage) {
               echo '<p><a href="http://osmc.tv/help/wiki">Back to Wiki</a></p>';
@@ -42,6 +41,7 @@
                 echo $lines[$i];
             }
             http_response_code(200); // We aren't really 404ing. 
+            wp_title( "Wiki", "&raquo;", LEFT );
         }
         else
         {
