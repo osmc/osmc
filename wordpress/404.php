@@ -41,7 +41,6 @@
                 echo $lines[$i];
             }
             http_response_code(200); // We aren't really 404ing. 
-            wp_title( "Wiki", "&raquo;", LEFT );
         }
         else
         {
