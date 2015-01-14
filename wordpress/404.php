@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 <div id="content">
-  <div id="inner-content" class="wrap clearfix">
+  <div id="inner-content" class="wrap clearfix pure-g-r">
     <div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
       <div class="boxpad">
         <?php
