@@ -1,0 +1,24 @@
+diff --git a/xbmc/system.h b/xbmc/system.h
+index 41c1f5d..c236cf9 100644
+--- a/xbmc/system.h
++++ b/xbmc/system.h
+@@ -275,5 +275,5 @@
+ #if defined(HAS_TOUCH_SKIN) && defined(TARGET_DARWIN_IOS) && !defined(TARGET_DARWIN_IOS_ATV2)
+ #define DEFAULT_SKIN          "skin.re-touched"
+ #else
+-#define DEFAULT_SKIN          "skin.confluence"
++#define DEFAULT_SKIN          "skin.osmc"
+ #endif
+
+--- a/system/settings/settings.xml	2014-12-31 23:20:35.763722714 +0000
++++ b/system/settings/settings.xml	2015-01-10 16:48:48.916812499 +0000
+@@ -5,7 +5,7 @@
+       <group id="1">
+         <setting id="lookandfeel.skin" type="addon" label="166" help="36103">
+           <level>0</level>
+-          <default>skin.confluence</default>
++          <default>skin.osmc</default>
+           <constraints>
+             <addontype>xbmc.gui.skin</addontype>
+           </constraints>
+
