@@ -5,10 +5,6 @@
 
 . ../common.sh
 
-echo REPO $REPO
-echo REVISION $REVISION
-echo VERSION $VERSION
-
 if [ "$1" == "rbp" ]
 then
 if [ -z $REPO ] # Jenkins repo filler
