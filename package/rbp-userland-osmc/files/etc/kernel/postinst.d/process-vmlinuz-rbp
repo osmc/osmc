@@ -1,3 +1,6 @@
 #!/bin/sh -e
 
 if [ -f /boot/bootcode.bin ]; then echo "Renaming to kernel.img" && mv /boot/vmlinuz-${1} /boot/kernel.img; fi
+
+echo -e "Adding DTB support"
+/usr/bin/mkknlimg /boot/kernel.img /boot/kernel.img
