@@ -126,12 +126,7 @@ then
 	fi
 	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
-	if [ "$1" == rbp ]
-	then
-		 pushd kodi/xbmc-*
-	else
-		 pushd kodi/xbmc-master*
-	fi
+	pushd kodi/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
 	test "$1" == rbp && install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr" && install_patch "../../patches/" "egl"
