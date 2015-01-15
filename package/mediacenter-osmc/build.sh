@@ -19,7 +19,6 @@ build_in_env "${1}" $(pwd) "mediacenter-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building package Kodi"
-	if [ ! -f /tcver.${1} ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	make clean
 	mount -t proc proc /proc >/dev/null 2>&1

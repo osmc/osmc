@@ -12,7 +12,6 @@ build_in_env "${1}" $(pwd) "libafpclient-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building libafpclient"
-	if [ ! -f /tcver.${1} ]; then echo "Not in expected environment" && exit 1; fi
 	out=$(pwd)/files
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
