@@ -23,6 +23,7 @@ then
 	handle_dep "libudev-dev"
 	handle_dep "autoconf"
 	handle_dep "libtool"
+	handle_dep "pkg-config"
 	test "$1" == rbp && handle_dep "rbp-userland-dev-osmc"
 	test "$1" == gen && echo "Package: libcec-osmc" >> files/DEBIAN/control && echo "Package: libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libcec-osmc" >> files-dev/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
