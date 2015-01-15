@@ -93,7 +93,7 @@ class Main(object):
 								'update_now'				: self.update_now,
 								'user_update_now'			: self.user_update_now,
 								'kill_yourself'				: self.kill_yourself,
-								'call_child_script'			: self.call_child_script,
+								'settings_command'			: self.settings_command,
 
 							}
 
@@ -101,6 +101,8 @@ class Main(object):
 		self.parent_queue = Queue.Queue()
 
 		self.randomid = random.randint(0,1000)
+
+		self.REBOOT_REQUIRED = 0
 
 		# create socket, listen for comms
 		self.listener = comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.update.sockfile')
@@ -132,13 +134,22 @@ class Main(object):
 		self.window.addControl(self.update_image)
 		self.update_image.setVisibleCondition('[SubString(Window(Home).Property(OSMC_notification), true, left)]')
 
-		# this flag is present when updates have been downloaded but the user wants to reboot themselves manually via the settings
-		# it is deleted using the 'setting_exit_install.py' script.
-		self.block_update_file = '/var/tmp/.dont_install_downloaded_updates'
+		# this flag is present when updates have been downloaded but the user wants to choose when to install using
+		# the manual control in the settings
+		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
+		
+		# if the file is present, then suppress further update checks and show the notification
 		if os.path.isfile(self.block_update_file):
-			self.skip_update_check = True
+			self.skip_update_check = True 
+
+			# if the user has suppressed icon notification of updates and has chosen not to install the updates
+			# its their own damned fault if osmc never get updated
+			if not self.s['suppress_icon']:
+				self.window.setProperty('OSMC_notification', 'true')
+
 		else:
-			self.skip_update_check = False
+
+			self.skip_update_check =  False
 
 		# a preliminary check for updates (for testing only)
 		if self.s['check_onboot']:
@@ -201,6 +212,50 @@ class Main(object):
 		if (datetime.now() - self.service_start).total_seconds() > (self.s['check_boot_delay'] * 60):
 			self.function_holding_pattern = False
 			self.call_child_script('update')
+
+
+	# HOLDING PATTERN METHOD
+	def holding_pattern_fetched(self, bypass=False):
+
+		# stay in the holding pattern until the user returns to the Home screen
+		if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)') or bypass:
+
+			self.function_holding_pattern = False
+
+			if not self.REBOOT_REQUIRED:
+
+				install_now = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded and can be installed immediately.', 'Would you like to exit and install the updates now?')
+
+				if install_now:
+
+					self.call_child_script('commit')
+
+					return
+
+			else:
+
+				exit_install = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded, but Kodi will need to exit to install them.', 'Would you like to exit and install the updates now?')
+
+				if exit_install:
+
+					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])
+
+					return
+
+
+			# if the code reaches this far, the user has elected not to install right away
+			# so we will need to suppress further update checks until the update occurs
+			# we put a file there to make sure the suppression carries over after a reboot
+				
+			# create the file that will prevent further update checks until the updates have been installed
+			with open(self.block_update_file, 'w') as f:
+				f.write('d')
+
+			# trigger the flag to skip update checks
+			self.skip_update_check = True
+
+			if not self.s['suppress_icon']:
+				self.window.setProperty('OSMC_notification', 'true')
 
 
 	# MAIN METHOD
@@ -266,14 +321,17 @@ class Main(object):
 		''' Checks the users update conditions are met. '''
 
 		if self.s['ban_update_media']:
-			result = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
-			
+			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
+			result = json.loads(result_raw)
 			log(result, 'result of Player.GetActivePlayers')
 			players = result.get('result', False)
 			if players:
+				log('Update CONDITION : player playing')
 				return False
 
-		if self.s['update_on_idle'] and xbmc.getGlobalIdleTime() < 60:
+		idle = xbmc.getGlobalIdleTime()
+		if self.s['update_on_idle'] and idle < 60:
+			log('Update CONDITION : idle time = %s' % idle)
 			return False
 
 		return True
@@ -513,6 +571,12 @@ class Main(object):
 
 		self.window.setProperty('OSMC_notification', 'false')
 
+		# remove the file that blocks further update checks
+		try:
+			os.remove(self.block_update_file)
+		except:
+			pass
+			
 
 	# ACTION METHOD
 	def apt_fetch_complete(self):
@@ -523,6 +587,10 @@ class Main(object):
 		if self.s['on_upd_detected'] == 3:
 			
 			log('Download complete, leaving icon displayed')
+
+			# create the file that will prevent further update checks until the updates have been installed
+			with open(self.block_update_file, 'w') as f:
+				f.write('d')
 
 		else:
 			# Download updates, then prompt
@@ -538,56 +606,22 @@ class Main(object):
 				self.holding_pattern_fetched(bypass=True)
 
 
-	# HOLDING PATTERN METHOD
-	def holding_pattern_fetched(self, bypass=False):
+	# ACTION METHOD
+	def settings_command(self, action):
 
-		# stay in the holding pattern until the user returns to the Home screen
-		if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)') or bypass:
+		if action == 'update':
 
-			self.function_holding_pattern = False
+			self.call_child_script('update')
+
+		elif action == 'install':
 
 			if not self.REBOOT_REQUIRED:
 
-				install_now = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded and can be installed immediately.', 'Would you like to exit and install the updates now?')
-
-				if install_now:
-
-					self.call_child_script('commit')
-
-					return
+				self.call_child_script('commit')
 
 			else:
 
-				exit_install = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded, but Kodi will need to exit to install them.', 'Would you like to exit and install the updates now?')
-
-				if exit_install:
-
-					subprocess.Popen(['sudo', 'systemctl', 'start', 'update-manual'])
-
-					return
-
-			install_on_boot = DIALOG.yesno('OSMC Update Available', 'Would you like to install the updates automatically on the next reboot,', 'or do you want to manually call the install from the OSMC settings?', yeslabel="Auto", nolabel="Manual")
-
-			if install_on_boot:
-
-				try:
-					# remove the file that blocks updates on reboot if it is present
-					os.remove(self.block_update_file)
-
-				except:
-					pass
-
-			else: # install the updates only when the user choose to from the settings
-				
-				# create the file that will prevent the installation of downloaded updates until the user say so
-				with open(self.block_update_file, 'w') as f:
-					f.write('d')
-
-				# trigger the flag to skip update checks
-				self.skip_update_check = True
-
-			if not self.s['suppress_icon']:
-				self.window.setProperty('OSMC_notification', 'true')
+				subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])			
 
 
 	# ACTION METHOD
@@ -674,5 +708,12 @@ class Main(object):
 				else:
 
 					okey_dokey = DIALOG.ok('OSMC Update Available', 'Fair enough, then.', 'You can install them from within the OSMC settings later.')
+
+					# create the file that will prevent further update checks until the updates have been installed
+					with open(self.block_update_file, 'w') as f:
+						f.write('d')
+
+					# trigger the flag to skip update checks
+					self.skip_update_check = True
 
 

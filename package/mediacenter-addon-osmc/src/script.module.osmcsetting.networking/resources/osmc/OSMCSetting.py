@@ -114,8 +114,8 @@ class OSMCSettingClass(object):
 		self.me = xbmcaddon.Addon(self.addonid)
 
 		self.description = 	"""
-								This is the text that is shown on the OSG. It should describe what the settings module is for,
-								the settings it controls, and anything else you want, I suppose.
+								This is network settings, it contains settings for the network. 
+								MORE TEXT SHOULD GO HERE
 							"""
 
 		self.setting_data_method = 	{

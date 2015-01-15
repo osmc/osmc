@@ -5,6 +5,7 @@ import socket
 import sys
 from datetime import datetime
 import json
+import os
 
 t = datetime
 
@@ -55,6 +56,8 @@ class Main(object):
 		self.action = action
 
 		self.cache = apt.Cache()
+
+		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
 
 		self.action_to_method = {
 								'update' 		: self.update,
@@ -107,6 +110,12 @@ class Main(object):
 		# call the parent and kill the pDialog
 		call_parent('progress_bar', {'kill': True})
 		print '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
+
+		# remove the file that blocks further update checks
+		try:
+			os.remove(self.block_update_file)
+		except:
+			pass
 
 
 	def fetch(self):
@@ -197,7 +206,6 @@ class Install_Progress(apt.progress.base.InstallProgress):
 		print 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
 
-
 class Download_Progress(apt.progress.base.AcquireProgress):
 
 	def __init__(self):
@@ -271,9 +279,6 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 	def done(self, item):
 		''' Invoked when an item has finished downloading. '''
 		print 'Done ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-
-
-
 
 
 if __name__ == "__main__":

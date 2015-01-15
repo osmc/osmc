@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">100</defaultcontrol>
+    <animation effect="fade" time="250">WindowOpen</animation>
+    <animation effect="fade" time="500">WindowClose</animation>
+    <controls>
+
+        <!-- background -->
+        <control description="BG" type="image">
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <texture>blueBG.png</texture>
+            <aspectratio>scale</aspectratio>
+        </control>
+
+
+        <control id="100" type="group">
+            <description>Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)</description>
+            <posx>310</posx>
+            <posy>100</posy>
+            <width>180</width>
+            <height>70</height>
+
+            <control id="101" type="button">
+                <label>Wired Network</label>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>360</width>
+                <height>70</height>
+                <visible>true</visible>
+                <onup></onup>
+                <ondown>1010</ondown>
+                <onleft>103</onleft>
+                <onright>102</onright>
+                <texturefocus></texturefocus>
+                <texturenofocus></texturenofocus>
+                <font>font13</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>00adef</focusedcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <onclick>-</onclick>
+                <onfocus>-</onfocus>
+                <onunfocus>-</onunfocus>
+            </control>
+            <control id="102" type="button">
+                <label>Wireless Network</label>
+                <posx>470</posx>
+                <posy>0</posy>
+                <width>360</width>
+                <height>70</height>
+                <visible>true</visible>
+                <onup></onup>
+                <ondown>1020</ondown>
+                <onleft>101</onleft>
+                <onright>103</onright>
+                <texturefocus></texturefocus>
+                <texturenofocus></texturenofocus>
+                <font>font13</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>00adef</focusedcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <onclick>-</onclick>
+                <onfocus>-</onfocus>
+                <onunfocus>-</onunfocus>
+            </control>
+            <control id="103" type="button">
+                <label>Bluetooth</label>
+                <posx>940</posx>
+                <posy>0</posy>
+                <width>360</width>
+                <height>70</height>
+                <visible>true</visible>
+                <onup></onup>
+                <ondown>1030</ondown>
+                <onleft>102</onleft>
+                <onright>101</onright>
+                <texturefocus></texturefocus>
+                <texturenofocus></texturenofocus>
+                <font>font13</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>00adef</focusedcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <onclick>-</onclick>
+                <onfocus>-</onfocus>
+                <onunfocus>-</onunfocus>
+            </control>            
+        </control>
+
+        <control id="1010" type="group">
+            <description>Wired Network Panel</description>
+            <posx>310</posx>
+            <posy>180</posy>
+            <width>1080</width>
+            <height>900</height>
+            <onup>101</onup>
+            <ondown>101</ondown>
+            <onleft>1010</onleft>
+            <onright>1010</onright>
+
+        </control>
+
+        <control id="1020" type="group">
+            <description>Wireless Network Panel</description>
+            <posx>310</posx>
+            <posy>180</posy>
+            <width>1080</width>
+            <height>900</height>
+            <onup>102</onup>
+            <ondown>102</ondown>
+            <onleft>1020</onleft>
+            <onright>1020</onright>
+
+        </control>
+
+        <control id="1030" type="group">
+            <description>Bluetooth Panel</description>
+            <posx>310</posx>
+            <posy>180</posy>
+            <width>1080</width>
+            <height>900</height>
+            <onup>103</onup>
+            <ondown>103</ondown>
+            <onleft>1030</onleft>
+            <onright>1030</onright>
+
+        </control>
+
+    </controls>
+</window>

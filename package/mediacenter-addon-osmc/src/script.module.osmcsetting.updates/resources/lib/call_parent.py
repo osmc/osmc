@@ -10,7 +10,7 @@ if len(sys.argv) > 1:
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
 
-	message = ('call_child_script', {'action': msg})
+	message = ('settings_command', {'action': msg})
 
 	message = json.dumps(message)
 
@@ -21,3 +21,5 @@ if len(sys.argv) > 1:
 	sock.close()
 
 	print 'settings sent response, %s' % msg
+
+	
