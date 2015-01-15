@@ -1,0 +1,9 @@
+[Unit]
+Description=irqbalance
+After=sysinit.target
+ 
+[Service]
+ExecStart=/usr/sbin/irqbalance
+ 
+[Install]
+WantedBy=multi-user.target
