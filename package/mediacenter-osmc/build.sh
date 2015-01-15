@@ -12,7 +12,7 @@ else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
-pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/master.tar.gz" "$(pwd)/kodi-pvr"
+pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/helix.tar.gz" "$(pwd)/kodi-pvr"
 if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "mediacenter-osmc"
