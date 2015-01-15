@@ -5,8 +5,10 @@ Author URI: http://markthe.is
 Version: 1.0
 */
 
-@import "pure-min.less";
-@import "woocommerce.less";
+@import "compass";
+@import "lib/pure-min";
+@import "lib/woocommerce";
+
 html, body, button, input, select, textarea, .pure-g-r [class*="pure-u"] {
 	font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-weight: 400;
@@ -15,34 +17,38 @@ html, body, button, input, select, textarea, .pure-g-r [class*="pure-u"] {
 
 * {-webkit-font-smoothing:subpixel-antialiased;}
 
+$pagewidth: 68em;
+
 // COLOR //
 
-@maincolor: @dark;
-@white: #F0F0F0;
-@lgrey: #D3D3D3;
-@lgrey2: #c9c9c9;
-@quote: #96e8cf;
-@link: #51bc9b;
-@back: @white;
-@dark: #17394A;
-@dark-trans: rgba(23, 57, 74, 0.9);
-@black: @dark;
+$white: #F0F0F0;
+$lgrey: #D3D3D3;
+$lgrey2: #c9c9c9;
+$dgrey: #969696;
+$quote: #96e8cf;
+$link: #51bc9b;
+$back: $white;
+$dark: #17394A;
+$dark-trans: rgba(23, 57, 74, 0.9);
+$black: $dark;
+
+$maincolor: $dark;
 
 .pure-button-primary, .pure-button-selected, a.pure-button-primary, a.pure-button-selected {
-	background-color: @maincolor;
+	background-color: $maincolor;
 	font-size: 85%;
 }
 
 .pure-form input[type=text]:focus, .pure-form input[type=password]:focus, .pure-form input[type=email]:focus, .pure-form input[type=url]:focus, .pure-form input[type=date]:focus, .pure-form input[type=month]:focus, .pure-form input[type=time]:focus, .pure-form input[type=datetime]:focus, .pure-form input[type=datetime-local]:focus, .pure-form input[type=week]:focus, .pure-form input[type=number]:focus, .pure-form input[type=search]:focus, .pure-form input[type=tel]:focus, .pure-form input[type=color]:focus, .pure-form select:focus, .pure-form textarea:focus {
-	border-color: @maincolor;
+	border-color: $maincolor;
 }
 // COLOR //
 
 // MAIN //
 
 body {
-background-color: @white;
-color: @dark;
+background-color: $white;
+color: $dark;
 }
 input:focus {
     outline: none;
@@ -66,43 +72,40 @@ a,
 a:link,
 a:visited,
 a:active {
-	color: @link;
+	color: $link;
 	text-decoration: none;
 }
 a:hover, a:focus {
-  color: @dark;
+  color: $dark;
   text-decoration: none;
 }
 p {
   line-height: 1.5em;
 }
 ul, li {
-  color: @black;
+  color: $black;
+}
+li {
+  margin: 0.25em 0;
 }
 
 #main section a {
-	color: @link;
+	color: $link;
 	text-decoration: none;
 
 }
 #main section a:hover {
-  color: @dark;
+  color: $dark;
   border-bottom: none;
 }
 h1 {
-	font-size: 2.5em;
-	font-weight: 300;
-
 	a, a:visited {
-		color: @black;
+		color: $black;
 	}
 }
-h2 {
-	font-size: 1.5em;
-  font-weight: 300;
-}
 h1,h2,h3,h4,h5,h6,p {
-  color: @black;
+  color: $black;
+  font-weight: 400;
 }
 
 table {
@@ -123,13 +126,12 @@ table {
 	a:visited,
 	a:active,
 	a {
-		color: @dark;
+		color: $dark;
 		text-decoration: none;
 		border-bottom: none;
-    font-weight: 300;
 	}
   a:hover, a:focus {
-    color: @dark;
+    color: $dark;
   }
 }
 .archive-title {
@@ -143,17 +145,17 @@ table {
 .byline {
 	padding: 0 0 0.1em 0;
 	margin: 0.5em 0 0 0;
-	border-bottom: 2px solid @lgrey;
+	border-bottom: 2px solid $lgrey;
   float: left;
   width: 100%;
 
 	a {
-		color: @link;
+		color: $link;
 		border-bottom: none;
 		text-decoration: none;
 	}
   a:hover, a:focus {
-    color: @dark;
+    color: $dark;
   }
   p {
     margin: 0;
@@ -161,7 +163,7 @@ table {
   }
   .cat {
     float: right;
-    color: @link;
+    color: $link;
   }
 }
 
@@ -179,15 +181,15 @@ article {
 // CONTENT //
 #content {
 	padding: 7em 1em 0 1em;
-	max-width: @pagewidth;
+	max-width: $pagewidth;
 	margin: 0 auto;
 }
 #inner-content {
   padding: 0 0 1em 0;
 }
 .entry-content {
-	padding: 0 0 1em 0;
-	border-bottom: 0px solid @lgrey;
+  padding: 0 0 1em 0;
+  border-bottom: 0px solid $lgrey;
   float: left;
   width: 100%;
 }
@@ -216,7 +218,7 @@ article {
   }
 }
 #sidebar1 .widget {
-	border-bottom: 1px solid @lgrey;
+	border-bottom: 1px solid $lgrey;
 	padding: 0 0 2em 0;
 }
 .boxpad div:first-child .widgettitle {
@@ -231,24 +233,68 @@ article {
 #main .tags {
 	a {
 		border-bottom: none;
-    background-color: @lgrey;
+    background-color: $lgrey;
     padding: 0.2em 0.3em;
-    color: @dark;
+    color: $dark;
 	}
   a:hover, a:focus {
-    color: @link;
+    color: $link;
   }
 }
 nav.pagination {
 	width: 100%;
 	text-align: center;
 	margin: 0 auto;
-	color: @maincolor;
+	color: $maincolor;
 	padding: 1em 0;
 
 	li, li:last-child {
 	padding: 0 0.2em 0 0.2em;
 	}
+}
+
+
+// FORM //
+
+.contactform {
+  color: $black;
+  input {
+    width: 40%;
+    float: left;
+    margin: 0 1em 0 0;
+    padding: 0 0 0 0.1em;
+    background: none;
+  }
+  input, textarea {
+    text-transform: capitalize;
+    border: none;
+    color: $dark;
+    border-bottom: 1px solid $lgrey;
+    margin-top: 1em;
+    @include input-placeholder {
+      color: $dgrey;
+    }
+  }
+  
+  textarea {
+    width: 80%;
+    height: 10em;
+    border: 0px solid $lgrey;
+    padding: 0.5em;
+    margin: 2em 0 1.5em;
+  }
+}
+
+button {
+  background-color: $dark;
+  border: 0;
+  border-radius: 3px;
+  color: $white;
+  padding: 0.5em 0.7em;
+  @include transition-duration(0.5s);
+}
+button:hover {
+  background-color: $link;
 }
 
 
@@ -259,7 +305,7 @@ nav.pagination {
 .widget_search button {
 	border: 0;
 	background: none;
-	color: @maincolor;
+	color: $maincolor;
 	outline: none;
 }
 .pure-form button[type=submit] {
@@ -275,24 +321,23 @@ width: 70%;
 
 // HEADER //
 
-@pagewidth: 68em;
-@header: 4em;
-@header-res: 3em;
-@title-size: 1.4em;
-@title-size-res: 1.3em;
+$header: 4em;
+$header-res: 3em;
+$title-size: 1.4em;
+$title-size-res: 1.3em;
 
 #inner-header {
   z-index: 1;
 	position: fixed;
-	max-height: @header;
+	max-height: $header;
 	height: 100%;
-	background-color: @dark-trans;
+	background-color: $dark-trans;
 	width: 100%;
-	.drop-shadow;
+    @include box-shadow($lgrey 0px 1px 2px);
 	
 	#inner-header-content {
 		height: 100%;
-		max-width: @pagewidth;
+		max-width: $pagewidth;
 		margin: 0 auto;
 		padding: 0em 1em 0 1em;
 
@@ -300,12 +345,12 @@ width: 70%;
 			float: left;
 			height: 100%;
 			margin: 0;
-			font-size: @title-size;
+			font-size: $title-size;
 			font-weight: 300;
 
 			a {
-				color: @maincolor;
-				line-height: (@header / @title-size);
+				color: $maincolor;
+				line-height: ($header / $title-size);
 			}
 		}
 		#logo-img {
@@ -326,7 +371,7 @@ width: 70%;
 		a {
 			margin: 0px;
 			padding: 0px;
-			line-height: @header;
+			line-height: $header;
 			text-decoration: none;
 		}
 	}
@@ -336,13 +381,14 @@ nav {
 	list-style-type: none;
   
 	li {
-		display: inline;
-		padding: 0 1em 0 1em;
+      display: inline;
+      padding: 0 1em 0 1em;
+      margin: 0;
     
-    a {
-      font-weight: 300;
+      a {
+        font-weight: 300;
+      }
     }
-  }
 	li:last-child {
 		padding: 0 0em 0 1em;
 	}
@@ -351,14 +397,13 @@ nav {
 	margin: 0;
 
 	a {
-		color: @white;
+		color: $white;
 	}
 	a:hover, a:focus {
-		.transition-duration(0.1s);
-    border-bottom: 2px solid @white;
+    border-bottom: 2px solid $white;
 	}
 	.current-menu-item a {
-	border-bottom: 2px solid @white;
+	border-bottom: 2px solid $white;
 	}
 }
 
@@ -373,27 +418,27 @@ nav {
 	width: 100%;
   
   .widgettitle {
-    color: @white;
+    color: $white;
   }
 }
 #inner-footer {
   width: 100%;
-  max-width: @pagewidth;
+  max-width: $pagewidth;
   margin: 0 auto;
-  background-color: @black;
+  background-color: $black;
   color: #fff;
   padding: 2em 0 2em 0;
   text-align: center;
   position: relative;
   
   p {
-    color: @white;
+    color: $white;
   }
   a {
       color: #fff;
   }
   a:hover, a:focus {
-    border-bottom: 2px solid @white;
+    border-bottom: 2px solid $white;
   }
   ul {
     list-style: none;
@@ -405,7 +450,7 @@ nav {
     }
   }
   .footerinfo {
-    color: @lgrey;
+    color: $lgrey;
     font-weight: 300;
     font-size: 0.8em;
     margin: 2em 0 0;
@@ -417,7 +462,7 @@ nav {
     p,a {
       margin: 0;
       font-weight: 300;
-      color: @lgrey;
+      color: $lgrey;
     }
     
 	img {
@@ -457,7 +502,7 @@ nav {
   }
   
   .comment-body {
-    background-color: @lgrey;
+    background-color: $lgrey;
     padding: 1em;
     margin: 0 0 1em;
     
@@ -481,8 +526,8 @@ nav {
       }
       
       .quote {
-        background-color: @lgrey2;
-        border-left: 4px solid @link;
+        background-color: $lgrey2;
+        border-left: 4px solid $link;
         padding: 1em 1em 0.5em 0.5em;
         margin-top: 0.5em;
         font-size: 95%;
@@ -617,27 +662,6 @@ nav {
 	-o-animation-name: fadeOutRight;
 	animation-name: fadeOutRight;
 }
-// Animate.css //
-
-// ELEMENTS //
-.drop-shadow(@x-axis: 0, @y-axis: 1px, @blur: 2px, @alpha: 0.1) {
-  -webkit-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
-  -moz-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
-  box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
-}
-.transition-duration(@duration: 0.2s) {
-  -moz-transition-duration: @duration;
-  -webkit-transition-duration: @duration;
-  -o-transition-duration: @duration;
-  transition-duration: @duration;
-}
-.transition(@duration:0.2s, @ease:ease-out) {
-  -webkit-transition: all @duration @ease;
-  -moz-transition: all @duration @ease;
-  -o-transition: all @duration @ease;
-  transition: all @duration @ease;
-}
-//ELEMENTS//
 
 // IE //
 .lt-ie9 #inner-header {
@@ -656,26 +680,26 @@ nav {
 
   #content {
     padding: 5em 1em 0 1em;
-    max-width: @pagewidth;
+    max-width: $pagewidth;
     margin: 0 auto;
   }
 
   #inner-header {
-    height: @header-res;
+    height: $header-res;
 
     #inner-header-content {
 
       a {
-        line-height: @header-res;
+        line-height: $header-res;
       }
       img {
         max-height: 1.4em;
       }
       #logo-title {
-      font-size: @title-size-res;
+      font-size: $title-size-res;
 
         a {
-          line-height: (@header-res / @title-size-res);
+          line-height: ($header-res / $title-size-res);
         }
       }
     }
@@ -690,10 +714,10 @@ nav {
   #nav-res-toggle {
     line-height: 2em;
     display: block;
-    font-size: (@header-res / 2);
+    font-size: ($header-res / 2);
     float: right;
     height: 100%;
-    color: @white;
+    color: $white;
     position: relative;
     padding: 0 1em 0 1em;
     margin-right: -1em;
@@ -711,14 +735,14 @@ nav {
     position: absolute;
     font-size: 1em;
     padding: 3em 2em 0 2em;
-    background-color: @black;
+    background-color: $black;
     height: 1000em;
     width: auto;
     right: 0;
     top: 0;
 
     a {
-      color: @black;
+      color: $black;
     }
     li {
       float: right;
@@ -744,7 +768,7 @@ nav {
   #inner-footer .boxpad {
     padding: 1em 0;
     margin: 0 1em;
-    border-bottom: 1px solid @lgrey;
+    border-bottom: 1px solid $lgrey;
   }
   #sidebar1 {
     
@@ -753,7 +777,15 @@ nav {
     }
     .widget:first-child {
       padding: 1.33em 0 2em 0;
-      border-top: 1px solid @lgrey;
+      border-top: 1px solid $lgrey;
+    }
+  }
+  .contactform {
+    input {
+      width: 45%;
+    }
+    textarea {
+      width: 90%;
     }
   }
 }
