@@ -4,7 +4,7 @@
 # email@samnazarko.co.uk
 
 fb_restore() {
-	[ -e /tmp/fb_resolution ] && /bin/fbset $(cat /tmp/fb_resolution)
+	[ -e /var/run/fb_resolution ] && /bin/fbset $(cat /var/run/fb_resolution)
 	/bin/fbset -depth 8 && /bin/fbset -depth 16
 	echo 1 >/sys/class/vtconsole/vtcon1/bind
 }
@@ -25,8 +25,8 @@ if [ "$?" -ne 0 ]; then
 	sudo systemctl stop getty@tty1
 fi
 
-if [ ! -e /tmp/fb_resolution ]; then
-	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' | sudo tee /tmp/fb_resolution >/dev/null
+if [ ! -e /var/run/fb_resolution ]; then
+	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' | sudo tee /var/run/fb_resolution >/dev/null
 fi
 
 EXIT=0
