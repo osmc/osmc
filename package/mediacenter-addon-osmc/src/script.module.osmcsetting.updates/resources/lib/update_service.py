@@ -323,7 +323,8 @@ class Main(object):
 
 	# MAIN METHOD
 	def check_update_conditions(self, media_only=False):
-		''' Checks the users update conditions are met. '''
+		''' Checks the users update conditions are met. The media-only flag restricts the condition check to
+			only the media playing condition. '''
 
 		if self.s['ban_update_media']:
 			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
@@ -597,6 +598,11 @@ class Main(object):
 			with open(self.block_update_file, 'w') as f:
 				f.write('d')
 
+		elif self.s['on_upd_detected'] == 5:
+			# Download, install, auto-restart if needed
+
+			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
+
 		else:
 			# Download updates, then prompt
 			# Download, install, prompt if restart needed (restart is needed)
@@ -654,7 +660,6 @@ class Main(object):
 
 		log('The following packages have newer versions and are upgradable: ')
 
-
 		for pkg in available_updates:
 			if pkg.is_upgradable:
 
@@ -673,16 +678,16 @@ class Main(object):
 			# Display icon on home screen only
 			return
 
-		elif (self.s['on_upd_detected'] in [2, 3]) or (self.s['on_upd_detected'] == 4 and self.REBOOT_REQUIRED):
+		elif (self.s['on_upd_detected'] in [2, 3, 5]) or (self.s['on_upd_detected'] == 4 and self.REBOOT_REQUIRED):
 			# Download updates, then prompt
 			# Download and display icon
 			# Download, install, prompt if restart needed (restart is needed)
+			# Download, install, auto-restart if needed
 			self.call_child_script('fetch')
 			return
 
-		elif (self.s['on_upd_detected'] == 4 and not self.REBOOT_REQUIRED) or self.s['on_upd_detected'] == 5:
+		elif self.s['on_upd_detected'] == 4 and not self.REBOOT_REQUIRED:
 			# Download, install, prompt if restart needed (restart is not needed)
-			# Download, install, auto-restart if needed
 			self.call_child_script('commit')
 			return
 
