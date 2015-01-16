@@ -582,6 +582,34 @@ class Main(object):
 			os.remove(self.block_update_file)
 		except:
 			pass
+
+		if self.check_if_reboot_required():
+			# the files flagging that an installed package needs a reboot are present
+
+			if self.s['on_upd_detected'] == 5:
+				# Download, install, auto-restart if needed
+
+				xbmc.executebuiltin('Reboot')
+
+			else:
+
+				# 0 "Prompt for all actions" -- PROMPT
+				# 1 "Display icon on home screen only" -- PROMPT
+				# 2 "Download updates, then prompt" -- PROMPT
+				# 3 "Download and display icon" -- PROMPT
+				# 4 "Download, install, prompt if restart needed" -- PROMPT
+
+				# display dialogue saying that osmc needs to reboot
+				reboot = DIALOG.yesno('OSMC Update', 'Packages have been installed that require a reboot.', 'Would you like to reboot now?', yeslabel='Reboot Now', nolabel='Reboot Later')
+
+				if reboot:
+
+					xbmc.executebuiltin('Reboot')
+
+				else:
+					# skip further update checks until osmc has rebooted
+					self.skip_update_check = True 
+
 			
 
 	# ACTION METHOD
@@ -727,3 +755,12 @@ class Main(object):
 					self.skip_update_check = True
 
 
+	def check_if_reboot_required(self):
+		''' Checks for the existence of two specific files that indicate an installed package mandates a reboot. '''
+
+		flag_files = ['/tmp/reboot-needed', '/var/run/reboot-required']
+
+		if any([os.path.isfile(x) for x in flag_files]):
+			return True
+		else:
+			return False
