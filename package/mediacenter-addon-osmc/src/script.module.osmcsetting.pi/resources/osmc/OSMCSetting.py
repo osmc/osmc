@@ -102,7 +102,7 @@ addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','osmc')))
+sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
 import config_tools as ct

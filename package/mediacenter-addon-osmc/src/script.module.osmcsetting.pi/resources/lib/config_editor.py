@@ -17,6 +17,7 @@ scriptPath = __addon__.getAddonInfo('path')
 DIALOG     = xbmcgui.Dialog()
 IMAGE = os.path.join(scriptPath,'resources','osmc','FO_Icon.png')
 
+
 def lang(id):
     san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
     return san 
@@ -40,7 +41,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 		except:
 
-			# FOR TESTINGS
+			# FOR TESTING
 			self.config = '/home/kubkev/Documents/config.txt'
 
 			with open(self.config, 'r') as f:
@@ -93,13 +94,13 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 			ok = DIALOG.ok(lang(32051), lang(32065), lang(32066))
 
 
-
 	def onAction(self, action):
 
 		actionID = action.getId()
 		if (actionID in (ACTION_PREVIOUS_MENU, ACTION_NAV_BACK)):
 			print 'coooooooooooooonfigeditor: CLOSE'
 			self.close()
+
 
 	def onClick(self, controlID):
 		print 'coooooooooooooonfigeditor: ', controlID
@@ -183,7 +184,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 						d = DIALOG.input(lang(32063), currentlabel, type=xbmcgui.INPUT_ALPHANUM)
 
 						if d:
-							self.check_for_duplicates(d)
+							self.check_for_duplicates(d, edit=True)
 
 							item.setLabel(d)
 							self.changed = True
@@ -203,7 +204,8 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 					self.item_count += 1
 
-	def check_for_duplicates(self, d):
+
+	def check_for_duplicates(self, d, edit=False):
 
 		if '=' in d:
 			dupe_check_raw = self.grab_item_strings()
@@ -211,7 +213,8 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 			dupe = d.split('=')[0]
 
-			if dupe in dupe_check:
+			if (edit and dupe_check.count(dupe) > 1) or (not edit and dupe in dupe_check):
+
 				ok = DIALOG.ok(lang(32051), lang(32067), lang(32066))
 
 
