@@ -154,6 +154,7 @@ class Main(object):
 		# a preliminary check for updates (for testing only)
 		if self.s['check_onboot']:
 			if not self.skip_update_check:
+				self.boot_delay_passed = False
 				self.function_holding_pattern = self.holding_pattern_boot_update
 				log('boot update check put into holding pattern')
 
@@ -210,8 +211,12 @@ class Main(object):
 	def holding_pattern_boot_update(self):
 
 		if (datetime.now() - self.service_start).total_seconds() > (self.s['check_boot_delay'] * 60):
-			self.function_holding_pattern = False
-			self.call_child_script('update')
+			self.boot_delay_passed = True
+
+		if self.boot_delay_passed:
+			if self.check_update_conditions(media_only=True):
+				self.function_holding_pattern = False
+				self.call_child_script('update')
 
 
 	# HOLDING PATTERN METHOD
@@ -317,7 +322,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	def check_update_conditions(self):
+	def check_update_conditions(self, media_only=False):
 		''' Checks the users update conditions are met. '''
 
 		if self.s['ban_update_media']:
@@ -330,7 +335,7 @@ class Main(object):
 				return False
 
 		idle = xbmc.getGlobalIdleTime()
-		if self.s['update_on_idle'] and idle < 60:
+		if self.s['update_on_idle'] and idle < 60 and not media_only:
 			log('Update CONDITION : idle time = %s' % idle)
 			return False
 
