@@ -680,10 +680,10 @@ class Main(object):
 		del self.cache
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
-		# SUPPRESSED FOR TESTING
-		# if not any(['osmc' in x.shortname.lower() for x in available_updates]):
-		# 	log('There are no osmc packages')
-		# 	return
+		# SUPPRESS FOR TESTING
+		if not any(['osmc' in x.shortname.lower() for x in available_updates]):
+			log('There are no osmc packages')
+			return
 		if not available_updates: return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
 
 		log('The following packages have newer versions and are upgradable: ')
