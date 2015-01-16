@@ -3,8 +3,7 @@ Description=Updates system outside of mediacenter
 After=remote-fs.target
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
 ExecStart=/usr/bin/manual-update
 
 [Install]
