@@ -91,7 +91,7 @@ class Main(object):
 
 	def update(self):
 		print '%s %s updating cache' % (t.now(), 'apt_cache_action.py')
-		dprg = Download_Progress()
+		dprg = Download_Progress(partial_heading='Updating')
 		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
 
 		# call the parent and kill the pDialog
@@ -208,12 +208,14 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 class Download_Progress(apt.progress.base.AcquireProgress):
 
-	def __init__(self):
+	def __init__(self, partial_heading='Downloading'):
 		super(Download_Progress, self).__init__()
+		self.partial_heading = partial_heading
 
 	def start(self):
 		''' Invoked when the Acquire process starts running. '''
 		self.pulse_time = t.now()
+
 
 		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
@@ -229,7 +231,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		''' Invoked when an item is being fetched. '''
 
 		dsc = item.description.split('/')
-		self.fetching = 'Downloading: ' + dsc[-1]
+		self.fetching = self.partial_heading + ': ' + dsc[-1]
 		# call_parent('progress_bar',{'message': 'Downloading: ' + dsc[-1]})
 
 		print 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
