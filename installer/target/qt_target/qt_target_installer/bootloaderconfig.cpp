@@ -54,7 +54,7 @@ void BootloaderConfig::configureEnvironment()
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
-        configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_file=start_x.elf\n" << "fixup_file=fixup_x.dat";
+        configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
         utils->writeToFile(configFile, configStringList, false);
     }
 }
