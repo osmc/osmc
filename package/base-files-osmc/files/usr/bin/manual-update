@@ -5,16 +5,16 @@
 
 export TERM=linux
 systemctl stop getty@tty1
-clear >/dev/tty1
+clear > /dev/tty1
 chvt 1
 systemctl stop mediacenter
 
 # Package downloads have been done in the addon, so let's get right to upgrade.
 
-debconf-apt-progress -- apt-get -y dist-upgrade >/dev/tty1
+debconf-apt-progress -- apt-get -y dist-upgrade > /dev/tty1
 rm -f /var/tmp/.suppress_osmc_update_checks
 sleep 5
 
 if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; exit; fi
-clear >/dev/tty1
+clear > /dev/tty1
 systemctl start mediacenter
