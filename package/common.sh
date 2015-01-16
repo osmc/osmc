@@ -58,7 +58,6 @@ function build_in_env()
 	mount -t proc proc /proc >/dev/null 2>&1
 	ischroot
 	chrootval=$?
-	echo chrootval is $chrootval
 	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return 0; fi
 	umount /proc >/dev/null 2>&1
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
