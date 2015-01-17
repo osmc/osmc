@@ -93,11 +93,14 @@ addonid = "script.module.osmcsetting.pioverclock"
 __addon__  = xbmcaddon.Addon(addonid)
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','osmc')))
+sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
 import config_tools as ct
 from gui import overclock_gui
+
+def log(message):
+	xbmc.log('OSMC PI OVERCLOCK' + str(message), level=xbmc.LOGDEBUG)
 
 
 class OSMCSettingClass(object):
@@ -133,7 +136,7 @@ The module allows you to manually adjust:
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
 
-		print 'START'
+		log('START')
 
 
 	def open_settings_window(self):
@@ -145,7 +148,7 @@ The module allows you to manually adjust:
 			own user interfaces.
 		'''
 
-		print xbmcaddon.Addon("script.module.osmcsetting.pioverclock").getAddonInfo('id')
+		log(xbmcaddon.Addon("script.module.osmcsetting.pioverclock").getAddonInfo('id'))
 
 		me = xbmcaddon.Addon(self.addonid)
 		scriptPath = me.getAddonInfo('path')
@@ -175,10 +178,10 @@ The module allows you to manually adjust:
 		self.GUI.doModal()
 
 		self.new_settings = self.GUI.snapshot()
-		print 'self.new_settings'
-		print self.new_settings
-		print 'self.setting_values'
-		print self.setting_values
+		log('self.new_settings')
+		log(self.new_settings)
+		log('self.setting_values')
+		log(self.setting_values)
 
 		ct.write_config(self.test_config, self.new_settings)
 
@@ -188,7 +191,7 @@ The module allows you to manually adjust:
 			if s != self.setting_values.get(k, 'no setting available'):
 				self.reboot_required
 
-		print 'END'
+		log('END')
 
 
 	def apply_settings(self):

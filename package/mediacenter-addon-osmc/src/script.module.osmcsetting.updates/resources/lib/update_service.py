@@ -27,12 +27,12 @@ __setting__            	= __addon__.getSetting
 __image_file__         	= os.path.join(__scriptPath__,'resources','media','update_available.png')
 lang 					= __addon__.getLocalizedString
 
-DIALOG  = xbmcgui.Dialog()
+DIALOG = xbmcgui.Dialog()
 
 
 def log(message, label = ''):
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
-	xbmc.log(msg = logmsg)
+	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
 
 class Monitah(xbmc.Monitor):
@@ -271,13 +271,13 @@ class Main(object):
 		# del self.listener
 		# log('listener cleaned up')
 
-		del self.monitor
-		log('del self.monitor')
-		del self.update_image
-		log('del self.update_image')
+		# del self.monitor
+		# log('del self.monitor')
+		# del self.update_image
+		# log('del self.update_image')
 
-		del self.window 
-		log('del self.window')
+		# del self.window 
+		# log('del self.window')
 
 		# self.takedown_notification()
 		# log('notification control removed from window(10000)')

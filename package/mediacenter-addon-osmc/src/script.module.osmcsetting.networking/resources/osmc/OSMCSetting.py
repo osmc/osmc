@@ -95,6 +95,11 @@
 import xbmcaddon
 
 
+def log(message):
+	xbmc.log('OSMC NETWORKING' + str(message), level=xbmc.LOGDEBUG)
+
+
+
 class OSMCSettingClass(object):
 
 	''' 
@@ -110,7 +115,7 @@ class OSMCSettingClass(object):
 			setting_value has changed and the existing setting_value. 
 		'''
 
-		self.addonid = "script.module.osmcsetting.template"
+		self.addonid = "script.module.osmcsetting.networking"
 		self.me = xbmcaddon.Addon(self.addonid)
 
 		self.description = 	"""
@@ -144,9 +149,9 @@ class OSMCSettingClass(object):
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
 
-		print 'START'
+		log('START')
 		for x, k in self.setting_data_method.iteritems():
-			print "%s = %s" % (x, k.get('setting_value','farts'))
+			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 	def populate_setting_data_method(self):
@@ -189,9 +194,9 @@ class OSMCSettingClass(object):
 		# the code below ensures that the apply_settings method is called immediately after closing the settings window
 		self.apply_settings()
 
-		print 'END'
+		log('END')
 		for x, k in self.setting_data_method.iteritems():
-			print "%s = %s" % (x, k.get('setting_value','farts'))
+			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 	def apply_settings(self):
@@ -314,7 +319,7 @@ class OSMCSettingClass(object):
 
 		'''
 
-		print 'hells yeah!'
+		log('hells yeah!')
 
 	def translate_on_populate_X(self, data, reverse=False):
 

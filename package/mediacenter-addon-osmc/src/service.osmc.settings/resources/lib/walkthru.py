@@ -18,7 +18,7 @@ import sys
 # sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 def log(message):
-	xbmc.log(str(message))
+	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 class walkthru_gui(xbmcgui.WindowXMLDialog):
 

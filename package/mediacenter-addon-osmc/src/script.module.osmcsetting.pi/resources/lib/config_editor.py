@@ -23,6 +23,10 @@ def lang(id):
     return san 
 
 
+def log(message):
+	xbmc.log('OSMC PI OVERCLOCK' + str(message), level=xbmc.LOGDEBUG)
+
+
 class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 
@@ -47,7 +51,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 			with open(self.config, 'r') as f:
 				self.lines = f.readlines()
 
-		print 'coooooooooooooonfigeditor: ', self.lines
+		log('coooooooooooooonfigeditor: ', self.lines)
 
 		self.lines = [line.replace('\n','') for line in self.lines if line not in ['\n', '', '\t']]
 		
@@ -98,15 +102,15 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 		actionID = action.getId()
 		if (actionID in (ACTION_PREVIOUS_MENU, ACTION_NAV_BACK)):
-			print 'coooooooooooooonfigeditor: CLOSE'
+			log('coooooooooooooonfigeditor: CLOSE')
 			self.close()
 
 
 	def onClick(self, controlID):
-		print 'coooooooooooooonfigeditor: ', controlID
+		log('coooooooooooooonfigeditor: ', controlID)
 
 		if controlID == SAVE:
-			print 'coooooooooooooonfigeditor: SAVE'
+			log('coooooooooooooonfigeditor: SAVE')
 
 			if self.changed:
 
@@ -114,7 +118,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 				if final_action:
 
-					print 'coooooooooooooonfigeditor: final action'
+					log('coooooooooooooonfigeditor: final action')
 
 					new_config = self.grab_item_strings()
 
@@ -125,7 +129,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 					with open(tmp_loc,'w') as f:
 						for line in new_config:
 							f.write(line.replace(" = ","=") + '\n')
-							print 'coooooooooooooonfigeditor: ' + line
+							log('coooooooooooooonfigeditor: ' + line)
 
 					# backup existing config
 					suffix = '_' + str(time.time()).split('.')[0]
@@ -141,7 +145,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 					except:
 						pass
 
-					print 'coooooooooooooonfigeditor: writing ended'
+					log('coooooooooooooonfigeditor: writing ended')
 
 			self.close()
 
@@ -229,8 +233,6 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 			currentlabel = item.getLabel()
 
-			print currentlabel
-
 			if self.del_string not in currentlabel:
 				new_config.append(currentlabel)
 
@@ -239,14 +241,14 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 if __name__ == "__main__":
 
-	print 'coooooooooooooonfigeditor: OPEN'
+	log('coooooooooooooonfigeditor: OPEN')
 	CE = ConfigEditor("DialogSelect.xml", scriptPath, 'Default')
 	
 	CE.doModal()
 	
 	del CE
 
-	print 'coooooooooooooonfigeditor: CLOSED'
+	log('coooooooooooooonfigeditor: CLOSED')
 	
 	xbmc.sleep(150)
 

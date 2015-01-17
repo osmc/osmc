@@ -18,10 +18,10 @@ class Logger(object):
 		self.terminal.write(message)
 		self.log.write(message)
 
-# try:
-# 	sys.stdout = Logger("/home/kubkev/test.txt")
-# except:
-# 	pass
+try:
+	sys.stdout = Logger("/var/run/OSMC_python_apt_log.txt")
+except:
+	pass
 
 
 def call_parent(raw_message, data={}):

@@ -107,6 +107,8 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 # OSMC SETTING Modules
 import config_tools as ct
 
+def log(message):
+	xbmc.log('OSMC PI' + str(message), level=xbmc.LOGDEBUG)
 
 class OSMCSettingClass(object):
 
@@ -265,9 +267,9 @@ Overclock settings are set using the Pi Overclock module."""
 		except:
 			self.test_config = '/home/kubkev/Documents/config.txt'
 
-		print 'START'
+		log('START')
 		for x, k in self.pi_settings_dict.iteritems():
-			print "%s = %s" % (x, k.get('setting_value','farts'))
+			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 	def populate_pi_settings_dict(self):
@@ -331,7 +333,7 @@ Overclock settings are set using the Pi Overclock module."""
 		self.populate_pi_settings_dict()
 
 		for x, k in self.pi_settings_dict.iteritems():
-			print "%s = %s" % (x, k.get('setting_value','farts'))
+			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 		self.me.openSettings()
@@ -347,9 +349,9 @@ Overclock settings are set using the Pi Overclock module."""
 		# This stops it from being called twice, once when the settings are closed and another when the OSG is closed
 
 		''' FOR TESTING ONLY '''
-		print 'END'
+		log('END')
 		for x, k in self.pi_settings_dict.iteritems():
-			print "%s = %s" % (x, k.get('setting_value','farts'))
+			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 	def apply_settings(self):
@@ -588,11 +590,6 @@ Overclock settings are set using the Pi Overclock module."""
 			# set the pi_settings_dict and settings.xml values for these two settings
 			hdmi_edid_file     = self.translate_bool(self.config_settings.get('hdmi_edid_file', 0))
 			hdmi_force_hotplug = self.translate_bool(self.config_settings.get('hdmi_force_hotplug', 0))
-
-			print '=========================================================================='
-			print hdmi_edid_file
-			print hdmi_force_hotplug
-
 
 			# popcornmix says that if either of these settings are active, then both should be active
 			tethered_settings = all([hdmi_edid_file=='true' , hdmi_force_hotplug=='true'])

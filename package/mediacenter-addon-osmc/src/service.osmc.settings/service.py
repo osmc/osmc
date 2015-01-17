@@ -50,7 +50,7 @@ DIALOG           = xbmcgui.Dialog()
 
 
 def log(message):
-	xbmc.log(str(message))
+	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 class Main(object):
 
@@ -134,8 +134,6 @@ class Main(object):
 					# get the device id					
 					device_id = response[len('new_device:'):]
 
-					print device_id
-
 					# proceed only if the device_id is not null
 					if device_id:
 
@@ -185,30 +183,24 @@ class Main(object):
 
 		log('firstrun? %s' % __setting__('firstrun'))
 		
-		if __setting__('firstrun') == 'fartstrue':
+		log('Opening OSMC settings GUI')
 
-			log('Opening walkthru GUI')
+		try:
+			# try opening the gui
+			threading.Thread(target=self.stored_gui.open()).start()
+			self.gui_last_accessed = datetime.datetime.now()
+			self.skip_check = False
 
-		else:
+		except:
+			# if that doesnt work then it is probably because the gui was too old and has been deleted
+			# so recreate the gui and open it
 
-			log('Opening OSMC settings GUI')
+			self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+			self.gui_last_accessed = datetime.datetime.now()
+			self.skip_check = False
 
-			try:
-				# try opening the gui
-				threading.Thread(target=self.stored_gui.open()).start()
-				self.gui_last_accessed = datetime.datetime.now()
-				self.skip_check = False
-
-			except:
-				# if that doesnt work then it is probably because the gui was too old and has been deleted
-				# so recreate the gui and open it
-
-				self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
-				self.gui_last_accessed = datetime.datetime.now()
-				self.skip_check = False
-
-				threading.Thread(target=self.stored_gui.open()).start()
-			log('gui threading finished')
+			threading.Thread(target=self.stored_gui.open()).start()
+		log('gui threading finished')
 
 if __name__ == "__main__":
 

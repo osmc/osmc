@@ -29,7 +29,7 @@ scriptPath       = __addon__.getAddonInfo('path')
 
 
 def log(message):
-	xbmc.log('osmc_settings: ' + str(message))
+	xbmc.log('osmc_settings: ' + str(message), level=xbmc.LOGDEBUG)
 
 
 class OSMC_gui(xbmcgui.WindowXMLDialog):

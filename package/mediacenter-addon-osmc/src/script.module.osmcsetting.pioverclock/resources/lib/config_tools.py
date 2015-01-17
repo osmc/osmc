@@ -116,7 +116,7 @@ def write_config(config_location,  changes={}):
             f.write(line.replace(" = ","="))
 
     # copy over the temp config.txt to /boot/ as superuser
-    subprocess.call(["sudo", "mv",  tmp_loc, "/boot/config.txt"])
+    subprocess.call(["sudo", "mv",  tmp_loc, config_location])
 
 
 if ( __name__ == "__main__" ):
