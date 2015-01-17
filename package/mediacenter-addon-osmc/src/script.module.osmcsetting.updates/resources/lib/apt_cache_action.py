@@ -19,7 +19,7 @@ class Logger(object):
 		self.log.write(message)
 
 try:
-	sys.stdout = Logger("/var/run/OSMC_python_apt_log.txt")
+	sys.stdout = Logger("/var/tmp/OSMC_python_apt_log.txt")
 except:
 	pass
 

@@ -61,7 +61,7 @@ class Main(object):
 		self.parent_queue = Queue.Queue()
 
 		# create socket, listen for comms
-		self.listener = comms.communicator(self.parent_queue, socket_file='/var/run/osmc.settings.sockfile')
+		self.listener = comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.sockfile')
 		self.listener.start()
 
 		# the gui is created and stored in memory for quick access
