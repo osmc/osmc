@@ -93,10 +93,11 @@
 
 # XBMC Modules
 import xbmcaddon
+import xbmc
 
 
 def log(message):
-	xbmc.log('OSMC NETWORKING' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC NETWORKING ' + str(message), level=xbmc.LOGDEBUG)
 
 
 

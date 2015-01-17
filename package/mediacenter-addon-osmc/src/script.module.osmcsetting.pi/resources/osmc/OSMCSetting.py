@@ -108,7 +108,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 import config_tools as ct
 
 def log(message):
-	xbmc.log('OSMC PI' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
 
 class OSMCSettingClass(object):
 

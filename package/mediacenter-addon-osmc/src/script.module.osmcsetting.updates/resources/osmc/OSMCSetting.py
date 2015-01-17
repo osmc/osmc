@@ -86,10 +86,11 @@
 
 # XBMC Modules
 import xbmcaddon
+import xbmc
 
 
 def log(message):
-	xbmc.log(msg = message, level=xbmc.LOGDEBUG)
+	xbmc.log(msg = 'OSMC UPDATES ' + str(message), level=xbmc.LOGDEBUG)
 
 
 class OSMCSettingClass(object):
