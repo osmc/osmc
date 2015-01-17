@@ -161,6 +161,14 @@ function pull_source()
 	return
 	fi
 
+	if [[ $1 =~ svn ]]
+	then
+	echo -e "Detected SVN source"
+	svn co ${1} ${2}
+	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
+	return
+	fi
+
 	if [[ $1 =~ git ]]
 	then
 	echo -e "Detected Git source"
