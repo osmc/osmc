@@ -1,0 +1,25 @@
+diff --git a/drivers/video/console/fbcon.c b/drivers/video/console/fbcon.c
+index fdefa8f..31b9bd3 100644
+--- a/drivers/video/console/fbcon.c
++++ b/drivers/video/console/fbcon.c
+@@ -149,7 +149,7 @@ static int fbcon_set_origin(struct vc_data *);
+ #define CURSOR_DRAW_DELAY		(1)
+ 
+ static int vbl_cursor_cnt;
+-static int fbcon_cursor_noblink;
++static int fbcon_cursor_noblink = 1;
+ 
+ #define divides(a, b)	((!(a) || (b)%(a)) ? 0 : 1)
+ 
+@@ -1294,6 +1294,12 @@ static void fbcon_cursor(struct vc_data *vc, int mode)
+ 	int y;
+  	int c = scr_readw((u16 *) vc->vc_pos);
+ 
++	/* Hide H/W-cursor conditionally */
++	if (fbcon_cursor_noblink) {
++		ops->cursor(vc, info, mode, 0, 0, 0);
++		return;
++	}
++
+ 	if (fbcon_is_inactive(vc, info) || vc->vc_deccm != 1)
+ 		return;
