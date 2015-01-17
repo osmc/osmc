@@ -1,0 +1,50 @@
+################################################################################
+# An udev rules file for eventlircd to handle Sundtek DVB devices.
+#
+# This rules file does not start eventlircd. Many applications only check for
+# the lircd socket at application lauch. Therefore, it is better to start
+# eventlircd in an init script so that eventlircd creates the lircd socket
+# before any applications that use LIRC launch.
+################################################################################
+
+# eventlircd only does something for "add" and "remove" actions.
+ACTION!="add|remove", GOTO="end"
+
+# eventlircd only does something "input" subsystem devices.
+SUBSYSTEM!="input", GOTO="end"
+
+# eventlircd can only handle event devices.
+KERNEL!="event[0-9]*", GOTO="end"
+
+# eventlircd ignores devices created by eventlircd.
+ATTRS{name}=="eventlircd", GOTO="end"
+
+#-------------------------------------------------------------------------------
+# Ask eventlircd to handle input event devices created by Sundtek DVB devices.
+#-------------------------------------------------------------------------------
+ATTRS{name}=="Sundtek Ltd. Remote Control", \
+  ENV{eventlircd_enable}="true"
+
+ATTRS{name}=="TT6400 DVB IR receiver", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="tt6400ir.evmap"
+
+ATTRS{name}=="i2c IR (Hauppauge WinTV PVR-350", \
+  ENV{eventlircd_enable}="true"
+
+ATTRS{name}=="cx88 IR (TeVii S464 DVB-S/S2)", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="tevii.evmap"
+
+ATTRS{name}=="cx88 IR (Hauppauge WinTV-HVR400", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="nova_hd_s2.evmap" 
+
+ATTRS{name}=="iMON Panel, Knob and Mouse(*:*)", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="imon_knob_panel.evmap" 
+  
+ATTRS{name}=="PS3 Remote", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="ps3remote.evmap"
+LABEL="end"

@@ -1,0 +1,108 @@
+################################################################################
+# An example udev rules file for lircd.
+################################################################################
+
+# lircd_helper only does something for "add" and "remove" actions.
+ACTION!="add|remove|change", GOTO="end"
+
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0008", GOTO="begin"
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0006", GOTO="begin"
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0005", GOTO="begin"
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0004", GOTO="begin"
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0003", GOTO="begin"
+#SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bc7", ATTRS{idProduct}=="0002", GOTO="begin"
+
+
+
+#KERNEL=="hiddev[0-9]*", SUBSYSTEM=="usb",  SUBSYSTEMS=="usb", GOTO="begin"
+KERNEL=="lirc[0-9]*",   SUBSYSTEM=="lirc", SUBSYSTEMS=="i2c", GOTO="begin"
+KERNEL=="lirc[0-9]*",   SUBSYSTEM=="lirc", SUBSYSTEMS=="usb", GOTO="begin"
+KERNEL=="lirc[0-9]*",   SUBSYSTEM=="lirc", SUBSYSTEMS=="platform", GOTO="begin"
+KERNEL=="lirc[0-9]*",   SUBSYSTEM=="lirc", SUBSYSTEMS=="pnp", GOTO="begin"
+GOTO="end"
+LABEL="begin"
+
+#-------------------------------------------------------------------------------
+# Ask lircd_helper to lirc devices.
+#-------------------------------------------------------------------------------
+SUBSYSTEM=="lirc", \
+  ENV{lircd_driver}="default", \
+  ENV{lircd_conf}="/etc/lirc/lircd.conf"
+
+#-------------------------------------------------------------------------------
+# Ask lircd_helper to handle USB devices that do not show up as lirc devices
+# and are supported by lircd. Remote controls that are USB HID devices that show
+# up as event devices are not included as as they are handled by eventlircd.
+#-------------------------------------------------------------------------------
+SUBSYSTEMS=="usb", GOTO="begin-usb"
+SUBSYSTEMS=="usb", GOTO="begin-usb"
+GOTO="end-usb"
+LABEL="begin-usb"
+
+ENV{ID_USB_INTERFACES}=="", IMPORT{program}="usb_id --export %p"
+
+ENV{ID_VENDOR_ID}=="0fe9", ENV{ID_MODEL_ID}=="9010", \
+  ENV{lircd_driver}="dvicoo", \
+  ENV{lircd_conf}="/etc/lirc/dvicoo-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="0471", ENV{ID_MODEL_ID}=="0617", \
+  ENV{lircd_driver}="srm7500libusb", \
+  ENV{lircd_conf}="/etc/lirc/philips-srm-7500-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="0b48", ENV{ID_MODEL_ID}=="2003", \
+  ENV{lircd_driver}="default", \
+  ENV{lircd_conf}="/etc/lirc/ttusbir-lircd.conf" 
+
+ENV{ID_VENDOR_ID}=="0419", ENV{ID_MODEL_ID}=="0001", \
+  ENV{lircd_driver}="samsung", \
+  ENV{lircd_conf}="/etc/lirc/samsung-lircd.conf" 
+
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0008", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf" 
+
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0006", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf"
+
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0005", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf"
+
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0004", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0003", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="0bc7", ENV{ID_MODEL_ID}=="0002", \
+  ENV{lircd_driver}="atilibusb", \
+  ENV{lircd_conf}="/etc/lirc/atilibusb-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="0755", ENV{ID_MODEL_ID}=="2626", \
+  ENV{lircd_driver}="devinput", \
+  ENV{lircd_conf}="/etc/lirc/aureal-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="045e", ENV{ID_MODEL_ID}=="0284", \
+  ENV{lircd_conf}="/etc/lirc/xbox-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="040b", ENV{ID_MODEL_ID}=="6251", \
+  ENV{lircd_conf}="/etc/lirc/xbox-lircd.conf"
+
+ENV{ID_VENDOR_ID}=="ffff", ENV{ID_MODEL_ID}=="ffff", \
+  ENV{lircd_conf}="/etc/lirc/xbox-lircd.conf"
+
+# Enable wake-on-usb for the USB remotes.
+ENV{lircd_driver}=="?*", ENV{lircd_conf}=="?*", RUN+="wakeup_enable"
+
+LABEL="end-usb"
+
+ENV{lircd_driver}=="?*", ENV{lircd_conf}=="?*", RUN+="lircd_helper"
+
+LABEL="end"
