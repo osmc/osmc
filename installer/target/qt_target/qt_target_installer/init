@@ -20,7 +20,7 @@ udevadm trigger
 sleep 3 # Wait for /dev population
 
 # Play some music
-mpg123 --loop -1 /osmc.mp3&
+mpg123 --loop -1 /osmc.mp3 &
 
 /sbin/getty -L ttyAMA0 115200 vt100 & # for diagnostic purposes
 
