@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #define FONT_STATUSLABEL_RATIO 3.4

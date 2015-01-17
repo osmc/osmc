@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utils.h"

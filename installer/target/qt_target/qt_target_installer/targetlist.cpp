@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "targetlist.h"
 #include <target.h>
 #include <QString>

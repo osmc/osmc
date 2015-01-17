@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include <QProcess>
 #include <QString>
 #include <QStringList>

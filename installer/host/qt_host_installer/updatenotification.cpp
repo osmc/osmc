@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "updatenotification.h"
 #include "ui_updatenotification.h"
 #include "utils.h"

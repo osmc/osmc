@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "extractprogress.h"
 #include "ui_extractprogress.h"
 #include <QString>

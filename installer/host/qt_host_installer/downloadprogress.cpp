@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "downloadprogress.h"
 #include "ui_downloadprogress.h"
 #include <QFileInfo>

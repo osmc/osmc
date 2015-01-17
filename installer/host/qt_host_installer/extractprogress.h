@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #ifndef EXTRACTPROGRESS_H
 #define EXTRACTPROGRESS_H
 

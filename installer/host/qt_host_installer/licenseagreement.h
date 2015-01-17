@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #ifndef LICENSEAGREEMENT_H
 #define LICENSEAGREEMENT_H
 

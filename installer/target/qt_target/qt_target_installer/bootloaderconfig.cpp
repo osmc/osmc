@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #include "bootloaderconfig.h"
 #include "target.h"
 #include <cstdlib>

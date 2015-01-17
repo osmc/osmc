@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 #ifndef DISKDEVICE_H
 #define DISKDEVICE_H
 #include <QString>

@@ -1,3 +1,7 @@
+/*
+ * (c) 2014-2015 Sam Nazarko
+ * email@samnazarko.co.uk
+*/
 /* Thanks to http://stackoverflow.com/questions/10536261/how-to-know-where-i-am-booting-from */
 extern "C"
 {
