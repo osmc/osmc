@@ -51,7 +51,7 @@ deb http://apt.osmc.tv jessie main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc"
+LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc rbp-remote-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
 verify_action
