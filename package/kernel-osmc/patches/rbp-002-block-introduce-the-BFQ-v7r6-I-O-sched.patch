@@ -1,9 +1,9 @@
-From dbb7d28e3809638f3732490a48d414171fd4186d Mon Sep 17 00:00:00 2001
+From df04e0bc0d8b72775a74d45e355af9433f8e420e Mon Sep 17 00:00:00 2001
 From: Paolo Valente <paolo.valente@unimore.it>
 Date: Thu, 9 May 2013 19:10:02 +0200
-Subject: [PATCH 2/3] block: introduce the BFQ-v7r6 I/O sched for 3.17
+Subject: [PATCH 2/3] block: introduce the BFQ-v7r7 I/O sched for 3.18
 
-Add the BFQ-v7r6 I/O scheduler to 3.17.
+Add the BFQ-v7r7 I/O scheduler to 3.18.
 The general structure is borrowed from CFQ, as much of the code for
 handling I/O contexts. Over time, several useful features have been
 ported from CFQ as well (details in the changelog in README.BFQ). A
@@ -56,12 +56,12 @@ until it expires.
 Signed-off-by: Paolo Valente <paolo.valente@unimore.it>
 Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- block/bfq-cgroup.c  |  930 ++++++++++++
+ block/bfq-cgroup.c  |  936 ++++++++++++
  block/bfq-ioc.c     |   36 +
- block/bfq-iosched.c | 3887 +++++++++++++++++++++++++++++++++++++++++++++++++++
- block/bfq-sched.c   | 1207 ++++++++++++++++
- block/bfq.h         |  773 ++++++++++
- 5 files changed, 6833 insertions(+)
+ block/bfq-iosched.c | 3902 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/bfq-sched.c   | 1214 ++++++++++++++++
+ block/bfq.h         |  775 ++++++++++
+ 5 files changed, 6863 insertions(+)
  create mode 100644 block/bfq-cgroup.c
  create mode 100644 block/bfq-ioc.c
  create mode 100644 block/bfq-iosched.c
@@ -70,10 +70,10 @@ Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
 new file mode 100644
-index 0000000..eb140eb
+index 0000000..11e2f1d
 --- /dev/null
 +++ b/block/bfq-cgroup.c
-@@ -0,0 +1,930 @@
+@@ -0,0 +1,936 @@
 +/*
 + * BFQ: CGROUPS support.
 + *
@@ -154,6 +154,12 @@ index 0000000..eb140eb
 +		entity->new_weight = bfq_ioprio_to_weight(bgrp->ioprio);
 +		entity->new_ioprio = bgrp->ioprio;
 +	} else {
++		if (bgrp->weight < BFQ_MIN_WEIGHT ||
++		    bgrp->weight > BFQ_MAX_WEIGHT) {
++			printk(KERN_CRIT "bfq_group_init_entity: "
++					 "bgrp->weight %d\n", bgrp->weight);
++			BUG();
++		}
 +		entity->new_weight = bgrp->weight;
 +		entity->new_ioprio = bfq_weight_to_ioprio(bgrp->weight);
 +	}
@@ -1048,10 +1054,10 @@ index 0000000..7f6b000
 +}
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
 new file mode 100644
-index 0000000..b919b03
+index 0000000..97ee934
 --- /dev/null
 +++ b/block/bfq-iosched.c
-@@ -0,0 +1,3887 @@
+@@ -0,0 +1,3902 @@
 +/*
 + * Budget Fair Queueing (BFQ) disk scheduler.
 + *
@@ -3730,7 +3736,7 @@ index 0000000..b919b03
 +	switch (ioprio_class) {
 +	default:
 +		dev_err(bfqq->bfqd->queue->backing_dev_info.dev,
-+			"bfq: bad prio %x\n", ioprio_class);
++			"bfq: bad prio class %d\n", ioprio_class);
 +	case IOPRIO_CLASS_NONE:
 +		/*
 +		 * No prio set, inherit CPU scheduling settings.
@@ -3751,6 +3757,13 @@ index 0000000..b919b03
 +		bfqq->entity.new_ioprio = 7;
 +		bfq_clear_bfqq_idle_window(bfqq);
 +		break;
++	}
++
++	if (bfqq->entity.new_ioprio < 0 ||
++	    bfqq->entity.new_ioprio >= IOPRIO_BE_NR) {
++		printk(KERN_CRIT "bfq_init_prio_data: new_ioprio %d\n",
++				 bfqq->entity.new_ioprio);
++		BUG();
 +	}
 +
 +	bfqq->entity.ioprio_changed = 1;
@@ -3869,14 +3882,13 @@ index 0000000..b919b03
 +
 +		if (bfqq != NULL) {
 +			bfq_init_bfqq(bfqd, bfqq, current->pid, is_sync);
++			bfq_init_prio_data(bfqq, bic);
++			bfq_init_entity(&bfqq->entity, bfqg);
 +			bfq_log_bfqq(bfqd, bfqq, "allocated");
 +		} else {
 +			bfqq = &bfqd->oom_bfqq;
 +			bfq_log_bfqq(bfqd, bfqq, "using oom bfqq");
 +		}
-+
-+		bfq_init_prio_data(bfqq, bic);
-+		bfq_init_entity(&bfqq->entity, bfqg);
 +	}
 +
 +	if (new_bfqq != NULL)
@@ -4533,6 +4545,14 @@ index 0000000..b919b03
 +	 */
 +	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, 1, 0);
 +	atomic_inc(&bfqd->oom_bfqq.ref);
++	bfqd->oom_bfqq.entity.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
++	bfqd->oom_bfqq.entity.new_ioprio_class = IOPRIO_CLASS_BE;
++	/*
++	 * Trigger weight initialization, according to ioprio, at the
++	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
++	 * class won't be changed any more.
++	 */
++	bfqd->oom_bfqq.entity.ioprio_changed = 1;
 +
 +	bfqd->queue = q;
 +
@@ -4548,6 +4568,7 @@ index 0000000..b919b03
 +	}
 +
 +	bfqd->root_group = bfqg;
++	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
 +#ifdef CONFIG_CGROUP_BFQIO
 +	bfqd->active_numerous_groups = 0;
 +#endif
@@ -4923,7 +4944,7 @@ index 0000000..b919b03
 +	device_speed_thresh[1] = (R_fast[1] + R_slow[1]) / 2;
 +
 +	elv_register(&iosched_bfq);
-+	pr_info("BFQ I/O-scheduler version: v7r6");
++	pr_info("BFQ I/O-scheduler version: v7r7");
 +
 +	return 0;
 +}
@@ -4941,10 +4962,10 @@ index 0000000..b919b03
 +MODULE_LICENSE("GPL");
 diff --git a/block/bfq-sched.c b/block/bfq-sched.c
 new file mode 100644
-index 0000000..c4831b7
+index 0000000..2931563
 --- /dev/null
 +++ b/block/bfq-sched.c
-@@ -0,0 +1,1207 @@
+@@ -0,0 +1,1214 @@
 +/*
 + * BFQ: Hierarchical B-WF2Q+ scheduler.
 + *
@@ -5573,6 +5594,13 @@ index 0000000..c4831b7
 +		old_st->wsum -= entity->weight;
 +
 +		if (entity->new_weight != entity->orig_weight) {
++			if (entity->new_weight < BFQ_MIN_WEIGHT ||
++			    entity->new_weight > BFQ_MAX_WEIGHT) {
++				printk(KERN_CRIT "update_weight_prio: "
++						 "new_weight %d\n",
++					entity->new_weight);
++				BUG();
++			}
 +			entity->orig_weight = entity->new_weight;
 +			entity->ioprio =
 +				bfq_weight_to_ioprio(entity->orig_weight);
@@ -6154,12 +6182,12 @@ index 0000000..c4831b7
 +}
 diff --git a/block/bfq.h b/block/bfq.h
 new file mode 100644
-index 0000000..d4b9470
+index 0000000..649afe9
 --- /dev/null
 +++ b/block/bfq.h
-@@ -0,0 +1,773 @@
+@@ -0,0 +1,775 @@
 +/*
-+ * BFQ-v7r6 for 3.17.0: data structures and common functions prototypes.
++ * BFQ-v7r7 for 3.18.0: data structures and common functions prototypes.
 + *
 + * Based on ideas and code from CFQ:
 + * Copyright (C) 2003 Jens Axboe <axboe@kernel.dk>
@@ -6183,6 +6211,8 @@ index 0000000..d4b9470
 +
 +#define BFQ_MIN_WEIGHT	1
 +#define BFQ_MAX_WEIGHT	1000
++
++#define BFQ_DEFAULT_QUEUE_IOPRIO	4
 +
 +#define BFQ_DEFAULT_GRP_WEIGHT	10
 +#define BFQ_DEFAULT_GRP_IOPRIO	0
@@ -6932,5 +6962,5 @@ index 0000000..d4b9470
 +
 +#endif /* _BFQ_H */
 -- 
-2.1.2
+2.1.3
 

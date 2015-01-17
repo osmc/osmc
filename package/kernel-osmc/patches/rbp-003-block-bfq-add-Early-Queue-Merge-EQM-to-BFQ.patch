@@ -1,8 +1,8 @@
-From 596fb4db1452b42d366e54a1ac7902e9fb842643 Mon Sep 17 00:00:00 2001
+From b941be79912544b39141eff175bc1964568a5b1b Mon Sep 17 00:00:00 2001
 From: Mauro Andreolini <mauro.andreolini@unimore.it>
-Date: Sun, 19 Oct 2014 01:15:59 +0200
-Subject: [PATCH 3/3] block, bfq: add Early Queue Merge (EQM) to BFQ-v7r6 for
- 3.17.0
+Date: Thu, 18 Dec 2014 21:32:08 +0100
+Subject: [PATCH 3/3] block, bfq: add Early Queue Merge (EQM) to BFQ-v7r7 for
+ 3.18.0
 
 A set of processes may happen  to  perform interleaved reads, i.e.,requests
 whose union would give rise to a  sequential read  pattern.  There are two
@@ -27,20 +27,20 @@ EQM is  then simpler and  more compact than the  pair of mechanisms used in
 CFQ.
 
 Finally, EQM  also preserves the  typical low-latency properties of BFQ, by
-properly restoring the weight-raising state of  a queue when it gets back to
+properly restoring the weight-raising state of a queue when it gets back to
 a non-merged state.
 
 Signed-off-by: Mauro Andreolini <mauro.andreolini@unimore.it>
 Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@unimore.it>
 ---
- block/bfq-iosched.c | 743 +++++++++++++++++++++++++++++++++++++---------------
+ block/bfq-iosched.c | 751 +++++++++++++++++++++++++++++++++++++---------------
  block/bfq-sched.c   |  28 --
  block/bfq.h         |  54 +++-
- 3 files changed, 573 insertions(+), 252 deletions(-)
+ 3 files changed, 581 insertions(+), 252 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index b919b03..bbfb4e1 100644
+index 97ee934..328f33c 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
 @@ -571,6 +571,57 @@ static inline unsigned int bfq_wr_duration(struct bfq_data *bfqd)
@@ -349,7 +349,7 @@ index b919b03..bbfb4e1 100644
  	if (bfqq == NULL || bfqq == cur_bfqq)
  		return NULL;
  
-@@ -1332,6 +1337,307 @@ static struct bfq_queue *bfq_close_cooperator(struct bfq_data *bfqd,
+@@ -1332,6 +1337,315 @@ static struct bfq_queue *bfq_close_cooperator(struct bfq_data *bfqd,
  	return bfqq;
  }
  
@@ -419,6 +419,13 @@ index b919b03..bbfb4e1 100644
 + * or with a close queue among the scheduled queues.
 + * Return NULL if no merge was scheduled, a pointer to the shared bfq_queue
 + * structure otherwise.
++ *
++ * The OOM queue is not allowed to participate to cooperation: in fact, since
++ * the requests temporarily redirected to the OOM queue could be redirected
++ * again to dedicated queues at any time, the state needed to correctly
++ * handle merging with the OOM queue would be quite complex and expensive
++ * to maintain. Besides, in such a critical condition as an out of memory,
++ * the benefits of queue merging may be little relevant, or even negligible.
 + */
 +static struct bfq_queue *
 +bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
@@ -429,13 +436,14 @@ index b919b03..bbfb4e1 100644
 +	if (bfqq->new_bfqq)
 +		return bfqq->new_bfqq;
 +
-+	if (!io_struct)
++	if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
 +		return NULL;
 +
 +	in_service_bfqq = bfqd->in_service_queue;
 +
 +	if (in_service_bfqq == NULL || in_service_bfqq == bfqq ||
-+	    !bfqd->in_service_bic)
++	    !bfqd->in_service_bic ||
++	    unlikely(in_service_bfqq == &bfqd->oom_bfqq))
 +		goto check_scheduled;
 +
 +	if (bfq_class_idle(in_service_bfqq) || bfq_class_idle(bfqq))
@@ -462,7 +470,7 @@ index b919b03..bbfb4e1 100644
 +check_scheduled:
 +	new_bfqq = bfq_close_cooperator(bfqd, bfqq,
 +					bfq_io_struct_pos(io_struct, request));
-+	if (new_bfqq)
++	if (new_bfqq && likely(new_bfqq != &bfqd->oom_bfqq))
 +		return bfq_setup_merge(bfqq, new_bfqq);
 +
 +	return NULL;
@@ -657,7 +665,7 @@ index b919b03..bbfb4e1 100644
  /*
   * If enough samples have been computed, return the current max budget
   * stored in bfqd, which is dynamically updated according to the
-@@ -1475,61 +1781,6 @@ static struct request *bfq_check_fifo(struct bfq_queue *bfqq)
+@@ -1475,61 +1789,6 @@ static struct request *bfq_check_fifo(struct bfq_queue *bfqq)
  	return rq;
  }
  
@@ -719,7 +727,7 @@ index b919b03..bbfb4e1 100644
  static inline unsigned long bfq_bfqq_budget_left(struct bfq_queue *bfqq)
  {
  	struct bfq_entity *entity = &bfqq->entity;
-@@ -2263,7 +2514,7 @@ static inline bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
+@@ -2263,7 +2522,7 @@ static inline bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
   */
  static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
  {
@@ -728,7 +736,7 @@ index b919b03..bbfb4e1 100644
  	struct request *next_rq;
  	enum bfqq_expiration reason = BFQ_BFQQ_BUDGET_TIMEOUT;
  
-@@ -2273,17 +2524,6 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+@@ -2273,17 +2532,6 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
  
  	bfq_log_bfqq(bfqd, bfqq, "select_queue: already in-service queue");
  
@@ -746,7 +754,7 @@ index b919b03..bbfb4e1 100644
  	if (bfq_may_expire_for_budg_timeout(bfqq) &&
  	    !timer_pending(&bfqd->idle_slice_timer) &&
  	    !bfq_bfqq_must_idle(bfqq))
-@@ -2322,10 +2562,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+@@ -2322,10 +2570,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
  				bfq_clear_bfqq_wait_request(bfqq);
  				del_timer(&bfqd->idle_slice_timer);
  			}
@@ -758,7 +766,7 @@ index b919b03..bbfb4e1 100644
  		}
  	}
  
-@@ -2334,40 +2571,30 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+@@ -2334,40 +2579,30 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
  	 * in flight (possibly waiting for a completion) or is idling for a
  	 * new request, then keep it.
  	 */
@@ -806,7 +814,7 @@ index b919b03..bbfb4e1 100644
  			jiffies_to_msecs(bfqq->wr_cur_max_time),
  			bfqq->wr_coeff,
  			bfqq->entity.weight, bfqq->entity.orig_weight);
-@@ -2376,12 +2603,16 @@ static void bfq_update_wr_data(struct bfq_data *bfqd,
+@@ -2376,12 +2611,16 @@ static void bfq_update_wr_data(struct bfq_data *bfqd,
  		       entity->orig_weight * bfqq->wr_coeff);
  		if (entity->ioprio_changed)
  			bfq_log_bfqq(bfqd, bfqq, "WARN: pending prio change");
@@ -824,7 +832,7 @@ index b919b03..bbfb4e1 100644
  		    time_is_before_jiffies(bfqq->last_wr_start_finish +
  					   bfqq->wr_cur_max_time)) {
  			bfqq->last_wr_start_finish = jiffies;
-@@ -2390,11 +2621,13 @@ static void bfq_update_wr_data(struct bfq_data *bfqd,
+@@ -2390,11 +2629,13 @@ static void bfq_update_wr_data(struct bfq_data *bfqd,
  				     bfqq->last_wr_start_finish,
  				     jiffies_to_msecs(bfqq->wr_cur_max_time));
  			bfq_bfqq_end_wr(bfqq);
@@ -841,7 +849,7 @@ index b919b03..bbfb4e1 100644
  }
  
  /*
-@@ -2642,6 +2875,25 @@ static inline void bfq_init_icq(struct io_cq *icq)
+@@ -2642,6 +2883,25 @@ static inline void bfq_init_icq(struct io_cq *icq)
  	struct bfq_io_cq *bic = icq_to_bic(icq);
  
  	bic->ttime.last_end_request = jiffies;
@@ -867,7 +875,7 @@ index b919b03..bbfb4e1 100644
  }
  
  static void bfq_exit_icq(struct io_cq *icq)
-@@ -2655,6 +2907,13 @@ static void bfq_exit_icq(struct io_cq *icq)
+@@ -2655,6 +2915,13 @@ static void bfq_exit_icq(struct io_cq *icq)
  	}
  
  	if (bic->bfqq[BLK_RW_SYNC]) {
@@ -881,7 +889,7 @@ index b919b03..bbfb4e1 100644
  		bfq_exit_bfqq(bfqd, bic->bfqq[BLK_RW_SYNC]);
  		bic->bfqq[BLK_RW_SYNC] = NULL;
  	}
-@@ -2944,6 +3203,10 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
+@@ -2950,6 +3217,10 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
  	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq))
  		return;
  
@@ -892,7 +900,7 @@ index b919b03..bbfb4e1 100644
  	enable_idle = bfq_bfqq_idle_window(bfqq);
  
  	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
-@@ -2991,6 +3254,7 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -2997,6 +3268,7 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  	if (bfqq->entity.service > bfq_max_budget(bfqd) / 8 ||
  	    !BFQQ_SEEKY(bfqq))
  		bfq_update_idle_window(bfqd, bfqq, bic);
@@ -900,7 +908,7 @@ index b919b03..bbfb4e1 100644
  
  	bfq_log_bfqq(bfqd, bfqq,
  		     "rq_enqueued: idle_window=%d (seeky %d, mean %llu)",
-@@ -3051,13 +3315,49 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -3057,13 +3329,49 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  static void bfq_insert_request(struct request_queue *q, struct request *rq)
  {
  	struct bfq_data *bfqd = q->elevator->elevator_data;
@@ -951,7 +959,7 @@ index b919b03..bbfb4e1 100644
  	rq->fifo_time = jiffies + bfqd->bfq_fifo_expire[rq_is_sync(rq)];
  	list_add_tail(&rq->queuelist, &bfqq->fifo);
  
-@@ -3222,18 +3522,6 @@ static void bfq_put_request(struct request *rq)
+@@ -3228,18 +3536,6 @@ static void bfq_put_request(struct request *rq)
  	}
  }
  
@@ -970,7 +978,7 @@ index b919b03..bbfb4e1 100644
  /*
   * Returns NULL if a new bfqq should be allocated, or the old bfqq if this
   * was the last process referring to said bfqq.
-@@ -3242,6 +3530,9 @@ static struct bfq_queue *
+@@ -3248,6 +3544,9 @@ static struct bfq_queue *
  bfq_split_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq)
  {
  	bfq_log_bfqq(bfqq->bfqd, bfqq, "splitting queue");
@@ -980,7 +988,7 @@ index b919b03..bbfb4e1 100644
  	if (bfqq_process_refs(bfqq) == 1) {
  		bfqq->pid = current->pid;
  		bfq_clear_bfqq_coop(bfqq);
-@@ -3270,6 +3561,7 @@ static int bfq_set_request(struct request_queue *q, struct request *rq,
+@@ -3276,6 +3575,7 @@ static int bfq_set_request(struct request_queue *q, struct request *rq,
  	struct bfq_queue *bfqq;
  	struct bfq_group *bfqg;
  	unsigned long flags;
@@ -988,7 +996,7 @@ index b919b03..bbfb4e1 100644
  
  	might_sleep_if(gfp_mask & __GFP_WAIT);
  
-@@ -3287,25 +3579,26 @@ new_queue:
+@@ -3293,25 +3593,26 @@ new_queue:
  	if (bfqq == NULL || bfqq == &bfqd->oom_bfqq) {
  		bfqq = bfq_get_queue(bfqd, bfqg, is_sync, bic, gfp_mask);
  		bic_set_bfqq(bic, bfqq, is_sync);
@@ -1027,7 +1035,7 @@ index b919b03..bbfb4e1 100644
  	}
  
  	bfqq->allocated[rw]++;
-@@ -3316,6 +3609,26 @@ new_queue:
+@@ -3322,6 +3623,26 @@ new_queue:
  	rq->elv.priv[0] = bic;
  	rq->elv.priv[1] = bfqq;
  
@@ -1038,7 +1046,7 @@ index b919b03..bbfb4e1 100644
 +	 * queue has just been split, mark a flag so that the
 +	 * information is available to the other scheduler hooks.
 +	 */
-+	if (bfqq_process_refs(bfqq) == 1) {
++	if (likely(bfqq != &bfqd->oom_bfqq) && bfqq_process_refs(bfqq) == 1) {
 +		bfqq->bic = bic;
 +		if (split) {
 +			bfq_mark_bfqq_just_split(bfqq);
@@ -1055,10 +1063,10 @@ index b919b03..bbfb4e1 100644
  
  	return 0;
 diff --git a/block/bfq-sched.c b/block/bfq-sched.c
-index c4831b7..546a254 100644
+index 2931563..6764a7e 100644
 --- a/block/bfq-sched.c
 +++ b/block/bfq-sched.c
-@@ -1084,34 +1084,6 @@ static struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
+@@ -1091,34 +1091,6 @@ static struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
  	return bfqq;
  }
  
@@ -1094,10 +1102,10 @@ index c4831b7..546a254 100644
  {
  	if (bfqd->in_service_bic != NULL) {
 diff --git a/block/bfq.h b/block/bfq.h
-index d4b9470..0093084 100644
+index 649afe9..0767d75 100644
 --- a/block/bfq.h
 +++ b/block/bfq.h
-@@ -216,18 +216,21 @@ struct bfq_group;
+@@ -218,18 +218,21 @@ struct bfq_group;
   *                      idle @bfq_queue with no outstanding requests, then
   *                      the task associated with the queue it is deemed as
   *                      soft real-time (see the comments to the function
@@ -1125,7 +1133,7 @@ index d4b9470..0093084 100644
   * All the fields are protected by the queue lock of the containing bfqd.
   */
  struct bfq_queue {
-@@ -267,6 +270,7 @@ struct bfq_queue {
+@@ -269,6 +272,7 @@ struct bfq_queue {
  	unsigned int requests_within_timer;
  
  	pid_t pid;
@@ -1133,7 +1141,7 @@ index d4b9470..0093084 100644
  
  	/* weight-raising fields */
  	unsigned long wr_cur_max_time;
-@@ -296,12 +300,42 @@ struct bfq_ttime {
+@@ -298,12 +302,42 @@ struct bfq_ttime {
   * @icq: associated io_cq structure
   * @bfqq: array of two process queues, the sync and the async
   * @ttime: associated @bfq_ttime struct
@@ -1176,7 +1184,7 @@ index d4b9470..0093084 100644
  };
  
  enum bfq_device_speed {
-@@ -537,7 +571,7 @@ enum bfqq_state_flags {
+@@ -539,7 +573,7 @@ enum bfqq_state_flags {
  	BFQ_BFQQ_FLAG_prio_changed,	/* task priority has changed */
  	BFQ_BFQQ_FLAG_sync,		/* synchronous queue */
  	BFQ_BFQQ_FLAG_budget_new,	/* no completion with this budget */
@@ -1185,7 +1193,7 @@ index d4b9470..0093084 100644
  					 * bfqq has timed-out at least once
  					 * having consumed at most 2/10 of
  					 * its budget
-@@ -550,12 +584,13 @@ enum bfqq_state_flags {
+@@ -552,12 +586,13 @@ enum bfqq_state_flags {
  					 * bfqq has proved to be slow and
  					 * seeky until budget timeout
  					 */
@@ -1201,7 +1209,7 @@ index d4b9470..0093084 100644
  };
  
  #define BFQ_BFQQ_FNS(name)						\
-@@ -585,6 +620,7 @@ BFQ_BFQQ_FNS(in_large_burst);
+@@ -587,6 +622,7 @@ BFQ_BFQQ_FNS(in_large_burst);
  BFQ_BFQQ_FNS(constantly_seeky);
  BFQ_BFQQ_FNS(coop);
  BFQ_BFQQ_FNS(split_coop);
@@ -1210,5 +1218,5 @@ index d4b9470..0093084 100644
  #undef BFQ_BFQQ_FNS
  
 -- 
-2.1.2
+2.1.3
 
