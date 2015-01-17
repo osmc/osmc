@@ -1,6 +1,3 @@
 #!/bin/sh -e
 
-if [ -f /boot/bootcode.bin ]; then echo "Renaming to kernel.img" && cp /boot/vmlinuz-${1} /boot/kernel.img; fi
-
-echo -e "Adding DTB support"
-/usr/bin/mkknlimg /boot/kernel.img /boot/kernel.img
+if [ -f /boot/bootcode.bin]; then echo "Processing kernel image" && /usr/bin/mkknlimg --dtok /boot/vmlinuz-${1} /boot/kernel.img >/dev/null 2>&1; fi
