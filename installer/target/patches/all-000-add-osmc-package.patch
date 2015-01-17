@@ -58,7 +58,7 @@ index 0000000..5158518
 +define OSMC_INSTALL_TARGET_CMDS
 +        $(INSTALL) -m 0755 $(@D)/qt_target_installer $(TARGET_DIR)/usr/bin/qt_target_installer
 +        $(INSTALL) -m 0755 $(@D)/init $(TARGET_DIR)/init
-+        $(INSTALL) -m 0755 $(@D)/install_music $(TARGET_DIR)/osmc.mp3
++        $(INSTALL) -m 0644 $(@D)/install_music $(TARGET_DIR)/osmc.mp3
 +endef
 +
 +$(eval $(generic-package))
