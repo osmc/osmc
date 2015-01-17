@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 8f73b41..05c0c82 100644
+index 91cfe8d..b2d777d 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -297,8 +297,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
@@ -13,13 +13,11 @@ index 8f73b41..05c0c82 100644
  
  ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
  HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
-@@ -614,7 +614,7 @@ KBUILD_CFLAGS       += $(call cc-option,-fno-delete-null-pointer-checks,)
+@@ -614,7 +614,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS  += -Os $(call cc-disable-warning,maybe-uninitialized,)
+ KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
  else
--KBUILD_CFLAGS  += -O2
+-KBUILD_CFLAGS	+= -O2
 +KBUILD_CFLAGS  += -O3
  endif
  
- # Tell gcc to never replace conditional load with a non-conditional one
-
