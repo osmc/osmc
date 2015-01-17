@@ -4,7 +4,7 @@ After = sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart = /bin/sh -c "grep -q quiet /proc/cmdline && /usr/bin/ply-image"
+ExecStart = /bin/sh -c "/usr/bin/setterm --cursor off >/dev/tty1; grep -q quiet /proc/cmdline && /usr/bin/ply-image"
 
 [Install]
 WantedBy = basic.target
