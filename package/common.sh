@@ -20,6 +20,7 @@ function strip_files()
 	strip "${1}/usr/lib/*.so.*" > /dev/null 2>&1
 	strip "${1}/usr/lib/*.a" > /dev/null 2>&1
 	strip "${1}/usr/bin/*" >/dev/null 2>&1
+	strip "${1}/usr/sbin/*" >/dev/null 2>&1
 }
 
 function strip_libs()
