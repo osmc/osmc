@@ -16,7 +16,7 @@ new file mode 100644
 index 0000000..4c92bbc
 --- /dev/null
 +++ b/package/osmc/Config.in
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,12 @@
 +config BR2_PACKAGE_OSMC
 +        bool "OSMC Installer"
 +    select BR2_PACKAGE_QT
@@ -25,7 +25,6 @@ index 0000000..4c92bbc
 +    select BR2_PACKAGE_DOSFSTOOLS
 +    select BR2_PACKAGE_E2FSPROGS
 +    select BR2_PACKAGE_PV
-+    select BR2_PACKAGE_MPG123
 +    select BR2_PACKAGE_QT_LICENSE_APPROVED
 +    select BR2_PACKAGE_FREETYPE
 +        help
@@ -36,7 +35,7 @@ new file mode 100644
 index 0000000..5158518
 --- /dev/null
 +++ b/package/osmc/osmc.mk
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,25 @@
 +#############################################################
 +#
 +# osmc installer
@@ -48,7 +47,7 @@ index 0000000..5158518
 +OSMC_SITE=$(TOPDIR)/../qt_target/qt_target_installer
 +OSMC_SITE_METHOD=local
 +OSMC_INSTALL_STAGING = NO
-+OSMC_DEPENDENCIES = qt parted xz dosfstools e2fsprogs pv mpg123
++OSMC_DEPENDENCIES = qt parted xz dosfstools e2fsprogs pv
 +
 +define OSMC_BUILD_CMDS
 +	(cd $(@D) ; $(QT_QMAKE))
@@ -59,7 +58,6 @@ index 0000000..5158518
 +define OSMC_INSTALL_TARGET_CMDS
 +        $(INSTALL) -m 0755 $(@D)/qt_target_installer $(TARGET_DIR)/usr/bin/qt_target_installer
 +        $(INSTALL) -m 0755 $(@D)/init $(TARGET_DIR)/init
-+        $(INSTALL) -m 0644 $(@D)/install_music $(TARGET_DIR)/osmc.mp3
 +endef
 +
 +$(eval $(generic-package))
