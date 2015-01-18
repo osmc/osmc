@@ -57,6 +57,7 @@ input:focus, textarea:focus, select:focus {
 }
 img {
   max-width: 100%;
+  height: auto;
 }
 
 a {
@@ -134,8 +135,29 @@ article {
   .page-title {
     margin: 0 0 1em;
   }
+  .post-title {
+    margin: 0 0 0.5em;
+    a:visited,
+    a:active,
+    a {
+      color: $dark;
+      text-decoration: none;
+      border-bottom: none;
+    }
+    a:hover, a:focus {
+      color: $link;
+    }
+  }
+  
+  .byline {
+    margin: 0;
+  }
+  
+  article {
+    margin: 0 0 0.5em;
+  }
 }
-.search, .archive {
+.archive {
   .page-title {
     margin: 0 0 1em;
   }
@@ -460,6 +482,7 @@ footer {
   }
   a:hover, a:focus {
     border-bottom: 2px solid $white;
+    color: #fff;
   }
   ul {
     list-style: none;
@@ -477,7 +500,7 @@ footer {
     font-size: 0.8em;
     margin: 2em 0 0;
     
-    a:hover {
+    a:hover, a:focus {
       text-decoration: underline;
       border-bottom: none;
     }

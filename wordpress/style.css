@@ -147,6 +147,7 @@ input:focus, textarea:focus, select:focus {
 
 img {
   max-width: 100%;
+  height: auto;
 }
 
 a {
@@ -228,29 +229,46 @@ article {
 .search .page-title  {
   margin: 0 0 1em;
 }
-
-.search .page-title , .archive .page-title  {
-  margin: 0 0 1em;
-}
-.search .post-title, .archive .post-title {
+.search .post-title {
   margin: 0 0 0.5em;
 }
 .search .post-title a:visited,
 .search .post-title a:active,
-.search .post-title a, .archive .post-title a:visited,
+.search .post-title a {
+  color: #17394A;
+  text-decoration: none;
+  border-bottom: none;
+}
+.search .post-title a:hover, .search .post-title a:focus {
+  color: #51bc9b;
+}
+.search .byline {
+  margin: 0;
+}
+.search article  {
+  margin: 0 0 0.5em;
+}
+
+.archive .page-title  {
+  margin: 0 0 1em;
+}
+.archive .post-title {
+  margin: 0 0 0.5em;
+}
+.archive .post-title a:visited,
 .archive .post-title a:active,
 .archive .post-title a {
   color: #17394A;
   text-decoration: none;
   border-bottom: none;
 }
-.search .post-title a:hover, .search .post-title a:focus, .archive .post-title a:hover, .archive .post-title a:focus {
+.archive .post-title a:hover, .archive .post-title a:focus {
   color: #51bc9b;
 }
-.search .byline, .archive .byline {
+.archive .byline {
   margin: 0;
 }
-.search article , .archive article  {
+.archive article  {
   margin: 0 0 0.5em;
 }
 
@@ -532,6 +550,7 @@ footer a:active {
 }
 footer a:hover, footer a:focus {
   border-bottom: 2px solid #F0F0F0;
+  color: #fff;
 }
 footer ul {
   list-style: none;
@@ -548,7 +567,7 @@ footer .footerinfo {
   font-size: 0.8em;
   margin: 2em 0 0;
 }
-footer .footerinfo a:hover {
+footer .footerinfo a:hover, footer .footerinfo a:focus {
   text-decoration: underline;
   border-bottom: none;
 }
