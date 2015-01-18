@@ -4,7 +4,7 @@ processimage()
 {
     echo "Processing kernel image"
     # use mkknlimg to rename the kernel too
-    /usr/bin/mkknlimg --dtok /boot/vmlinuz-${1} /boot/kernel.img >/dev/null 2>&1
+    LANG=C /usr/bin/mkknlimg --dtok /boot/vmlinuz-${1} /boot/kernel.img >/dev/null 2>&1
 }
 
 if [ -f /boot/bootcode.bin ]; then processimage; fi
