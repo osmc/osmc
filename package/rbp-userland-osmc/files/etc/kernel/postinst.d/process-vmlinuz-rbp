@@ -1,3 +1,14 @@
 #!/bin/sh -e
 
-if [ -f /boot/bootcode.bin]; then echo "Processing kernel image" && /usr/bin/mkknlimg --dtok /boot/vmlinuz-${1} /boot/kernel.img >/dev/null 2>&1; fi
+function processimage()
+{
+    echo "Processing kernel image"
+    # use mkknlimg to rename the kernel too
+    /usr/bin/mkknlimg --dtok /boot/vmlinuz-${1} /boot/kernel.img >/dev/null 2>&1
+}
+
+if [ -f /boot/bootcode.bin ]; then processimage; fi
+
+# Handle filesystem building case
+ischroot
+if [ $? == 0 ]; then processimage; fi
