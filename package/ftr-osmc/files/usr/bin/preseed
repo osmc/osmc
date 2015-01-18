@@ -39,7 +39,8 @@ import sys
 
 def getvalue(valuestring):
 	splitvalue = valuestring.split(' ')
-	return splitvalue[3].replace("\n", "")
+	line = splitvalue[3].replace("\r", "")
+	return line.replace("\n", "")
 
 def make_variant(string):
 	return dbus.String(string, variant_level=1)
