@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 get_header( 'shop' ); ?>
 <div id="content">
   <div id="inner-content" class="wrap clearfix">
-      <div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
+      <div id="main" class="eightcol first clearfix pure-u-1" role="main">
         <div class="boxpad">
 
 
@@ -28,58 +28,13 @@ get_header( 'shop' ); ?>
             </header> <?php // end article header ?>
 
 		<?php endif; ?>
-
-		<?php do_action( 'woocommerce_archive_description' ); ?>
-
-		<?php if ( have_posts() ) : ?>
-
-			<?php woocommerce_product_loop_start(); ?>
-
-				<?php woocommerce_product_subcategories(); ?>
-
-				<?php while ( have_posts() ) : the_post(); ?>
-
-					<?php wc_get_template_part( 'content', 'product' ); ?>
-
-				<?php endwhile; // end of the loop. ?>
-
-			<?php woocommerce_product_loop_end(); ?>
-
-			<?php
-				/**
-				 * woocommerce_after_shop_loop hook
-				 *
-				 * @hooked woocommerce_pagination - 10
-				 */
-				do_action( 'woocommerce_after_shop_loop' );
-			?>
-
-		<?php elseif ( ! woocommerce_product_subcategories( array( 'before' => woocommerce_product_loop_start( false ), 'after' => woocommerce_product_loop_end( false ) ) ) ) : ?>
-
-			<?php wc_get_template( 'loop/no-products-found.php' ); ?>
-
-		<?php endif; ?>
-
-	<?php
-		/**
-		 * woocommerce_after_main_content hook
-		 *
-		 * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
-		 */
-		do_action( 'woocommerce_after_main_content' );
-	?>
-
-
-
-	<?php
-		/**
-		 * woocommerce_sidebar hook
-		 *
-		 * @hooked woocommerce_get_sidebar - 10
-		 */
-		do_action( 'woocommerce_sidebar' );
-	?>
-     
+		<div class="productfeature">
+		  <?php echo do_shortcode( '[featured_products per_page="1" columns="1"]' ); ?>
+		</div>
+		<div class="productlist">
+		  <?php echo do_shortcode( '[product_category category="products" orderby="menu_order" order="asc"]' ); ?>
+        </div>
+    
       </div>
     </div>
   </div>

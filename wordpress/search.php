@@ -1,12 +1,11 @@
 <?php get_header(); ?>
 
-			<div id="content">
+			<div class="row clearfix">
 
-				<div id="inner-content" class="wrap clearfix pure-g-r">
+				<div class="container">
 
-					<div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
-					<div class="boxpad">
-						<h1 class="archive-title page-title"><span><?php _e( 'Search Results for:', 'bonestheme' ); ?></span> <?php echo esc_attr(get_search_query()); ?></h1>
+					<div class="column three-fourths">
+						<h1 class="page-title"><span><?php _e( 'Search Results for:', 'bonestheme' ); ?></span> <?php echo esc_attr(get_search_query()); ?></h1>
 
 						<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
@@ -14,7 +13,7 @@
 
 								<header class="article-header">
 
-									<h3 class="search-title page-title post-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
+									<h3 class="post-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
 									<div class="byline vcard">
 									  <p><?php the_date(); ?></p>
 										<div class="cat"><?php the_category(', ') ?></div>
@@ -55,7 +54,6 @@
 									</article>
 
 							<?php endif; ?>
-						</div>
 						</div> <?php // end #main ?>
 
 							<?php get_sidebar(); ?>

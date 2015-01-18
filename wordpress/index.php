@@ -1,16 +1,13 @@
 <?php get_header(); ?>
 
-			<div id="content">
+			<div class="row clearfix">
 
-				<div id="inner-content" class="wrap clearfix pure-g-r">
+				<div class="container">
 
-						<div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
-						<div class="boxpad">
+						<div class="column three-fourths">
 							<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-
 							<article id="post-<?php the_ID(); ?>" <?php post_class( 'clearfix' ); ?> role="article">
 
-								<header class="article-header">
 
 									<h1 class="page-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1>
 									<div class="byline vcard">
@@ -18,11 +15,11 @@
 										<div class="cat"><?php the_category(', ') ?></div>
 								  </div>
 
-								</header> <?php // end article header ?>
-
 								<section class="entry-content clearfix">
-									<?php the_content(); ?>... <a href="<?php the_permalink() ?>">Read More</a>
+									<?php the_content(); ?>
 								</section> <?php // end article section ?>
+								
+								<a href="<?php the_permalink() ?>">- Read More</a>
 
 								<footer class="article-footer">
 
@@ -60,7 +57,6 @@
 									</article>
 
 							<?php endif; ?>
-						</div>
 						</div> <?php // end #main ?>
 
 						<?php get_sidebar(); ?>

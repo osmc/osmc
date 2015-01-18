@@ -159,8 +159,8 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 // the_content excerpt //
 add_action('the_content','limit_the_content');
 function limit_the_content($content){
-if( is_front_page() )
-  $word_limit =160;
+if( is_home() )
+  $word_limit =120;
   $words = explode(' ', $content);
   return implode(' ', array_slice($words, 0, $word_limit));
 }

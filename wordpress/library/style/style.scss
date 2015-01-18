@@ -6,18 +6,16 @@ Version: 1.0
 */
 
 @import "compass";
-@import "lib/pure-min";
+@import "lib/grid";
 @import "lib/woocommerce";
 
-html, body, button, input, select, textarea, .pure-g-r [class*="pure-u"] {
+html, body, button, input, select, textarea {
 	font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-weight: 400;
 	font-size: 100%;
 }
 
 * {-webkit-font-smoothing:subpixel-antialiased;}
-
-$pagewidth: 68em;
 
 // COLOR //
 
@@ -33,15 +31,6 @@ $dark-trans: rgba(23, 57, 74, 0.9);
 $black: $dark;
 
 $maincolor: $dark;
-
-.pure-button-primary, .pure-button-selected, a.pure-button-primary, a.pure-button-selected {
-	background-color: $maincolor;
-	font-size: 85%;
-}
-
-.pure-form input[type=text]:focus, .pure-form input[type=password]:focus, .pure-form input[type=email]:focus, .pure-form input[type=url]:focus, .pure-form input[type=date]:focus, .pure-form input[type=month]:focus, .pure-form input[type=time]:focus, .pure-form input[type=datetime]:focus, .pure-form input[type=datetime-local]:focus, .pure-form input[type=week]:focus, .pure-form input[type=number]:focus, .pure-form input[type=search]:focus, .pure-form input[type=tel]:focus, .pure-form input[type=color]:focus, .pure-form select:focus, .pure-form textarea:focus {
-	border-color: $maincolor;
-}
 // COLOR //
 
 // MAIN //
@@ -49,6 +38,7 @@ $maincolor: $dark;
 body {
 background-color: $white;
 color: $dark;
+margin: 0;
 }
 input:focus {
     outline: none;
@@ -68,8 +58,12 @@ input:focus, textarea:focus, select:focus {
 img {
   max-width: 100%;
 }
+
+a {
+  @include transition-duration(0.1s);
+}
+
 a,
-a:link,
 a:visited,
 a:active {
 	color: $link;
@@ -87,21 +81,6 @@ ul, li {
 }
 li {
   margin: 0.25em 0;
-}
-
-#main section a {
-	color: $link;
-	text-decoration: none;
-
-}
-#main section a:hover {
-  color: $dark;
-  border-bottom: none;
-}
-h1 {
-	a, a:visited {
-		color: $black;
-	}
 }
 h1,h2,h3,h4,h5,h6,p {
   color: $black;
@@ -121,136 +100,153 @@ table {
   
 }
 
-.page-title {
-	margin: 0;
-	a:visited,
-	a:active,
-	a {
-		color: $dark;
-		text-decoration: none;
-		border-bottom: none;
-	}
-  a:hover, a:focus {
-    color: $dark;
-  }
-}
-.archive-title {
-	margin: 0 0 0.5em 0;
-}
-.archive .page-title, .search .page-title {
-	a {
-		font-size: 1.5em;
-	}
-}
-.byline {
-	padding: 0 0 0.1em 0;
-	margin: 0.5em 0 0 0;
-	border-bottom: 2px solid $lgrey;
-  float: left;
-  width: 100%;
-
-	a {
-		color: $link;
-		border-bottom: none;
-		text-decoration: none;
-	}
-  a:hover, a:focus {
-    color: $dark;
-  }
-  p {
-    margin: 0;
-    float: left;
-  }
-  .cat {
-    float: right;
-    color: $link;
-  }
+pre, code {
+  font-weight: 300;
+  font-size: 110%;
 }
 
 abbr[title] {
 border-bottom: none;
 }
 
-// MAIN //
+// CONTENT //
 
 article {
-  float: left;
-  width: 100%;
+  margin: 0 0 3em;
 }
 
-// CONTENT //
-#content {
-	padding: 7em 1em 0 1em;
-	max-width: $pagewidth;
-	margin: 0 auto;
+.page-title {
+  font-weight: 300;
+  font-size: 2em;
+  margin: 0;
+  a:visited,
+  a:active,
+  a {
+    color: $dark;
+    text-decoration: none;
+    border-bottom: none;
+  }
+  a:hover, a:focus {
+    color: $dark;
+  }
+}
+.search {
+  .page-title {
+    margin: 0 0 1em;
+  }
+}
+.search, .archive {
+  .page-title {
+    margin: 0 0 1em;
+  }
+  .post-title {
+    margin: 0 0 0.5em;
+    a:visited,
+    a:active,
+    a {
+      color: $dark;
+      text-decoration: none;
+      border-bottom: none;
+    }
+    a:hover, a:focus {
+      color: $link;
+    }
+  }
+  
+  .byline {
+    margin: 0;
+  }
+  
+  article {
+    margin: 0 0 0.5em;
+  }
+}
+
+.byline {
+  padding: 0 0 0.1em 0;
+  margin: 0.5em 0 0 0;
+  border-bottom: 2px solid $lgrey;
+  float: left;
+  width: 100%;
+
+  a {
+    color: $link;
+    border-bottom: none;
+    text-decoration: none;
+  }
+  
+  a:hover, a:focus {
+    color: $dark;
+  }
+  
+  p {
+    margin: 0;
+    float: left;
+  }
+  
+  .cat {
+    float: right;
+    color: $link;
+  }
+}
+
+
+.row {
+  padding: 7em 0 0;
 }
 #inner-content {
   padding: 0 0 1em 0;
 }
 .entry-content {
-  padding: 0 0 1em 0;
+  padding: 0 0 0.5em 0;
   border-bottom: 0px solid $lgrey;
   float: left;
   width: 100%;
 }
 
-.boxpad {
-	padding: 0em;
-}
-
-
-#main {
-  float: left;
-}
-#main .boxpad {
-	margin: 0 2em 2em 0;
-}
-#sidebar1 {
+.sidebar {
   float: right;
   line-height: 1.5em;
-}
-#sidebar1 .boxpad {
-	padding: 0 0 0 0;
   
-  ul {
-    padding: 0;
-    list-style: none;
-  }
-}
-#sidebar1 .widget {
+  .widget {
 	border-bottom: 1px solid $lgrey;
 	padding: 0 0 2em 0;
-}
-.boxpad div:first-child .widgettitle {
-	margin: 0 0 1.33em 0;
-  font-size: 105%;
+  }
+  div:first-child .widgettitle {
+      margin: 0 0 1.33em 0;
+    font-size: 105%;
+  }
+  .widgettitle {
+    font-weight: 600;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
 }
 
-.boxpad .widgettitle {
-  font-weight: 600;
-}
-
-#main .tags {
-	a {
-		border-bottom: none;
+.tags {
+  a {
+    border-bottom: none;
     background-color: $lgrey;
     padding: 0.2em 0.3em;
     color: $dark;
-	}
+  }
   a:hover, a:focus {
     color: $link;
   }
 }
 nav.pagination {
-	width: 100%;
-	text-align: center;
-	margin: 0 auto;
-	color: $maincolor;
-	padding: 1em 0;
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+  color: $maincolor;
+  padding: 1em 0;
 
-	li, li:last-child {
-	padding: 0 0.2em 0 0.2em;
-	}
+  li, li:last-child {
+  padding: 0 0.2em 0 0.2em;
+  }
 }
 
 
@@ -290,9 +286,10 @@ button {
   border-radius: 3px;
   color: $white;
   padding: 0.5em 0.7em;
-  @include transition-duration(0.5s);
+  @include transition-duration(0.2s);
+  cursor: pointer;
 }
-button:hover {
+button:hover, button:focus {
   background-color: $link;
 }
 
@@ -301,14 +298,35 @@ button:hover {
 
 // SEARCH //
 
-.widget_search button {
+.widget_search {
+  border: 0;
+  
+  
+  input {
+    border: 0;
+    padding: 0.4em;
+    font-size: 80%;
+    border: 1px solid transparent;
+    color: $black;
+    border-radius: 2px;
+    @include transition-duration(0.1s);
+  }
+  
+  input:focus {
+    border: 1px solid $dgrey;
+  }
+  
+  button {
 	border: 0;
 	background: none;
 	color: $maincolor;
 	outline: none;
-}
-.pure-form button[type=submit] {
-margin: 0.4em 0 0;
+    padding: 0.4em 0 0.4em 0.6em;
+    cursor: pointer;
+  }
+  button:hover, button:focus {
+    color: $link;
+  }
 }
 
 #s {
@@ -320,60 +338,55 @@ width: 70%;
 
 // HEADER //
 
-$header: 4em;
+$header: 3.5em;
 $header-res: 3em;
-$title-size: 1.4em;
-$title-size-res: 1.3em;
+$title-size: 1.2em;
+$title-size-res: 1.2em;
 
-#inner-header {
+.header {
   z-index: 1;
-	position: fixed;
-	max-height: $header;
-	height: 100%;
-	background-color: $dark-trans;
-	width: 100%;
-    @include box-shadow($lgrey 0px 1px 2px);
+  position: fixed;
+  max-height: $header;
+  height: 100%;
+  background-color: $dark-trans;
+  width: 100%;
+  @include box-shadow($lgrey 0px 1px 2px);
 	
-	#inner-header-content {
-		height: 100%;
-		max-width: $pagewidth;
-		margin: 0 auto;
-		padding: 0em 1em 0 1em;
+  .container {
+    height: 100%;
+    
+    .column {
+      font-size: 95%;
+    }
 
-		#logo-title {
-			float: left;
-			height: 100%;
-			margin: 0;
-			font-size: $title-size;
-			font-weight: 300;
-
-			a {
-				color: $maincolor;
-				line-height: ($header / $title-size);
-			}
-		}
-		#logo-img {
-		  float: left;
-		  height: 100%;
-		}
-		img {
-			height: auto;
-			max-height: 1.5em;
-			position: relative;
-			display: inline-block;
-			vertical-align: middle;
-			padding: 0 0.5em 0.2em 0;
-		}
-		.lt-ie9 img {
-			max-height: 100px;
-		}
-		a {
-			margin: 0px;
-			padding: 0px;
-			line-height: $header;
-			text-decoration: none;
-		}
-	}
+    #logo-title {
+      float: left;
+      height: 100%;
+      margin: 0;
+      font-size: $title-size;
+      font-weight: 300;
+    }
+    #logo-img {
+      float: left;
+      height: 100%;
+    }
+    img {
+      height: auto;
+      max-height: 1.5em;
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .lt-ie9 img {
+      max-height: 100px;
+    }
+    a {
+      margin: 0px;
+      padding: 0px;
+      line-height: $header + 0.2;
+      text-decoration: none;
+    }
+  }
 }
 nav {
 	float: right;
@@ -412,29 +425,38 @@ nav {
 
 //FOOTER//
 
-.footer {
-	float: left;
-	width: 100%;
+footer {
+  text-align: center;
+  font-weight: 300;
+  
+  .row {
+    padding: 0;
+  }
+  .container {
+    position: relative;
+  }
+  .contentcontainer {
+    background-color: $black;
+    padding: 1.5em 0;
+  }
+  
+  .column {
+    font-size: 90%;
+  }
   
   .widgettitle {
     color: $white;
+    font-weight: 400;
+    font-size: 110%;
   }
-}
-#inner-footer {
-  width: 100%;
-  max-width: $pagewidth;
-  margin: 0 auto;
-  background-color: $black;
-  color: #fff;
-  padding: 2em 0 2em 0;
-  text-align: center;
-  position: relative;
   
   p {
     color: $white;
   }
-  a {
-      color: #fff;
+  a,
+  a:visited,
+  a:active {
+    color: #fff;
   }
   a:hover, a:focus {
     border-bottom: 2px solid $white;
@@ -446,6 +468,7 @@ nav {
 
     li {
       margin: 0.2em 0;
+      color: $white;
     }
   }
   .footerinfo {
@@ -458,19 +481,18 @@ nav {
       text-decoration: underline;
       border-bottom: none;
     }
-    p,a {
+    p,
+    a,
+    a:visited,
+    a:active {
       margin: 0;
       font-weight: 300;
       color: $lgrey;
     }
-    
 	img {
       margin: 0 0 1em;
       display: inline-block;
       width: 10em;
-	}
-	.boxpad {
-		padding: 0 1em 0 1em;
 	}
     .corporate {
       position: absolute;
@@ -675,18 +697,17 @@ nav {
 }
 // IE //
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 52em) {
 
-  #content {
-    padding: 5em 1em 0 1em;
-    max-width: $pagewidth;
+  .row {
+    padding: 5em 0 0;
     margin: 0 auto;
   }
 
-  #inner-header {
+  .header {
     height: $header-res;
 
-    #inner-header-content {
+    .container {
 
       a {
         line-height: $header-res;
@@ -711,15 +732,16 @@ nav {
     width: auto;
   }
   #nav-res-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
     line-height: 2em;
     display: block;
     font-size: ($header-res / 2);
     float: right;
     height: 100%;
     color: $white;
-    position: relative;
     padding: 0 1em 0 1em;
-    margin-right: -1em;
     cursor: pointer; cursor: hand;
     -webkit-user-select: none;  /* Chrome all / Safari all */
       -moz-user-select: none;     /* Firefox all */
@@ -753,27 +775,25 @@ nav {
       white-space: nowrap;
     }
   }
-  .boxpad {
-    padding: 0;
-    background: transparent;
-  }
-  #main .boxpad {
-    margin: 0;
-    padding: 0;
-  }
-  #inner-footer {
-    padding: 1em 0 2em 0;
-  }
-  #inner-footer .boxpad {
-    padding: 1em 0;
-    margin: 0 1em;
-    border-bottom: 1px solid $lgrey;
-  }
-  #sidebar1 {
+  footer {
+    padding: 1em 0 0;
     
-    .boxpad {
-    padding: 1em 0 0 0;
+    .container {
+      width: 100%;
     }
+    .row {
+      margin: 0 1em;
+    }
+    
+    .column {
+      padding: 1em 0;
+      border-bottom: 1px solid $lgrey;
+    }
+    .widgettitle {
+      margin-top: 0;
+    }
+  }
+  .sidebar {
     .widget:first-child {
       padding: 1.33em 0 2em 0;
       border-top: 1px solid $lgrey;

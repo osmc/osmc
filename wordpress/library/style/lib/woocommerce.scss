@@ -1,12 +1,46 @@
-body.woocommerce ul.products {
+body.woocommerce {
   text-align: center;
   
-  li.product {
-    float: none;
-    display: inline-block;
-    margin: 3em 2em;
-    width: 30%;
-    text-align: left;
+  
+  ul.products {
+    
+    li.product {
+    
+      a img {
+        @include box-shadow(transparent 0 0 0 0px);
+        @include transition-duration(0s);
+      }
+      a img:hover {
+        @include box-shadow(transparent 0 0 0 0px);
+      }
+    }
+    li.product:hover {
+    
+      a img {
+        @include box-shadow(transparent 0 0 0 0px);
+        @include transition-duration(0s);
+      }
+    }
+  }
+  
+  .productlist {
+    
+    li.product {
+      float: left;
+      margin: 0 2em 0 0;
+      width: 15%;
+      text-align: left;
+    }
+  }
+  
+  .productfeature {
+    
+    li.product.featured {
+      float: left;
+      margin: 0;
+      width: 30%;
+      text-align: left;
+    }
   }
    
 }

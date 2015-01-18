@@ -51,10 +51,9 @@
 
 		<div id="container">
 
-			<header class="header" role="banner">
-
-				<div id="inner-header" class="wrap clearfix">
-					<div id="inner-header-content">
+			<header class="header">
+				<div class="container">
+					<div class="column full">
 						<div id="logo-img"><a href="/"><img src="<?php echo get_template_directory_uri(); ?>/library/images/logo-l.png"></a></div>
 							<?php // if you'd like to use the site description you can un-comment it below ?>
 							<?php // bloginfo('description'); ?>

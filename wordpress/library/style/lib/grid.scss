@@ -1,0 +1,45 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 75em;
+  width: 92%;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  display: table;
+}
+ 
+.clearfix:after {
+  clear: both;
+}
+ 
+.clearfix {
+  *zoom: 1;
+}
+.column {
+  width: 100%;
+}
+
+
+@media (min-width: 52em) {
+  .column {
+    float: left;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  
+  .column.full { width: 100%; }
+  .column.three-fourths { width: 73%; }
+  .column.two-thirds { width: 66.7%; }
+  .column.half { width: 50%; }
+  .column.third { width: 33.3%; }
+  .column.fourth { width: 27%; }
+  .column.flow-opposite { float: right; }  
+}

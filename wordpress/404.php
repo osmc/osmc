@@ -1,9 +1,8 @@
 <?php get_header(); ?>
 
-<div id="content">
-  <div id="inner-content" class="wrap clearfix pure-g-r">
-    <div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
-      <div class="boxpad">
+<div class="row clearfix">
+  <div class="container">
+    <div class="column three-fourths">
         <?php
         $url = $_SERVER['REQUEST_URI'];
         if (strpos($url, 'wiki/')) {
@@ -53,7 +52,6 @@
 
           </section> <?php // end article section ?>
         </article> <?php // end article ?>
-      </div>
     </div> <?php // end #main ?>
     <?php get_sidebar(); ?>
   </div> <?php // end #inner-content ?>

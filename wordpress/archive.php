@@ -1,18 +1,17 @@
 <?php get_header(); ?>
 
-			<div id="content">
+			<div class="row clearfix">
 
-				<div id="inner-content" class="wrap clearfix pure-g-r">
+				<div class="container">
 
-						<div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
-						<div class="boxpad">
+						<div class="column three-fourths">
 							<?php if (is_category()) { ?>
-								<h1 class="archive-title page-title">
+								<h1 class="page-title">
 									<span><?php _e( '', 'bonestheme' ); ?></span><?php single_cat_title(); ?>
 								</h1>
 
 							<?php } elseif (is_tag()) { ?>
-								<h1 class="archive-title page-title">
+								<h1 class="page-title">
 									<span><?php _e( 'Posts Tagged:', 'bonestheme' ); ?></span> <?php single_tag_title(); ?>
 								</h1>
 
@@ -20,23 +19,23 @@
 								global $post;
 								$author_id = $post->post_author;
 							?>
-								<h1 class="archive-title page-title">
+								<h1 class="page-title">
 
 									<span><?php _e( 'Posts By:', 'bonestheme' ); ?></span> <?php the_author_meta('display_name', $author_id); ?>
 
 								</h1>
 							<?php } elseif (is_day()) { ?>
-								<h1 class="archive-title page-title">
+								<h1 class="page-title">
 									<span><?php _e( 'Daily Archives:', 'bonestheme' ); ?></span> <?php the_time('l, F j, Y'); ?>
 								</h1>
 
 							<?php } elseif (is_month()) { ?>
-									<h1 class="archive-title page-title">
+									<h1 class="page-title">
 										<span><?php _e( 'Monthly Archives:', 'bonestheme' ); ?></span> <?php the_time('F Y'); ?>
 									</h1>
 
 							<?php } elseif (is_year()) { ?>
-									<h1 class="archive-title page-title">
+									<h1 class="page-title">
 										<span><?php _e( 'Yearly Archives:', 'bonestheme' ); ?></span> <?php the_time('Y'); ?>
 									</h1>
 							<?php } ?>
@@ -47,7 +46,7 @@
 
 								<header class="article-header">
 
-									<h3 class="post-title page-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
+									<h3 class="post-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
 									<div class="byline vcard">
 									  <p><?php the_date(); ?></p>
 										<div class="cat"><?php the_category(', ') ?></div>
@@ -97,7 +96,6 @@
 									</article>
 
 							<?php endif; ?>
-						</div>
 						</div> <?php // end #main ?>
 
 						<?php get_sidebar(); ?>
