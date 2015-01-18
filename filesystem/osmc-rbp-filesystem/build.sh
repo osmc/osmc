@@ -28,7 +28,7 @@ done
 ARCH="armhf"
 DIR="$filestub/"
 RLS="jessie"
-URL="http://mirrordirector.raspbian.org//raspbian"
+URL="http://mirrordirector.raspbian.org/raspbian"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
