@@ -3,8 +3,6 @@ Description = eventlircd remote support
 After = remote-fs.target
 
 [Service]
-User = osmc
-Group = osmc
 Type = simple
 ExecStartPre = /bin/sh -c "if [ ! -d /var/run/lirc ]; then mkdir /var/run/lirc; else rm -rf /var/run/lirc*; fi"
 ExecStart = /usr/sbin/eventlircd --evmap=/etc/eventlircd.d --socket=/var/run/lirc/lircd --repeat-filter --release=_UP -f
