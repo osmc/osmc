@@ -51,7 +51,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 			with open(self.config, 'r') as f:
 				self.lines = f.readlines()
 
-		log('coooooooooooooonfigeditor: ', self.lines)
+		log('coooooooooooooonfigeditor: %s' % self.lines)
 
 		self.lines = [line.replace('\n','') for line in self.lines if line not in ['\n', '', '\t']]
 		

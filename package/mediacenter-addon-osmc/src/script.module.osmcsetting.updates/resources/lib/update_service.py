@@ -672,8 +672,18 @@ class Main(object):
 
 		log('apt_update_complete called')
 
-		self.cache.open(None)
-		self.cache.upgrade()
+		try:
+			self.cache.open(None)
+		except:
+			log('apt cache failed to open')
+			return
+
+		try:
+			self.cache.upgrade()
+		except:
+			log('apt cache failed to upgrade')
+			return
+
 
 		available_updates = self.cache.get_changes()
 
@@ -684,6 +694,7 @@ class Main(object):
 		if not any(['osmc' in x.shortname.lower() for x in available_updates]):
 			log('There are no osmc packages')
 			return
+			
 		if not available_updates: return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
 
 		log('The following packages have newer versions and are upgradable: ')
