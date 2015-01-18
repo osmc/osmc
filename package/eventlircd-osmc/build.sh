@@ -15,7 +15,6 @@ then
 	out=$(pwd)/files
 	make clean
 	update_sources
-	handle_dep "aclocal"
 	handle_dep "autoconf"
 	handle_dep "automake"
 	handle_dep "gawk"
