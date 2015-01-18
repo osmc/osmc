@@ -14,8 +14,15 @@ update_sources
 verify_action
 
 # Install packages needed to build filesystem for building
-install_package "debootstrap"
-verify_action
+packages="debootstrap
+qemu
+binfmt-support
+qemu-user-static"
+for package in $packages
+do
+	install_package $package
+	verify_action
+done
 
 # Configure the target directory
 ARCH="armhf"
