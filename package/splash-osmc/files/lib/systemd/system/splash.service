@@ -4,7 +4,7 @@ After = sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart = /bin/sh -c "export TERM=linux; /usr/bin/setterm --cursor off > /dev/tty1; grep -q quiet /proc/cmdline && /usr/bin/clear > /dev/tty1 && /usr/bin/ply-image"
+ExecStart = /bin/sh -c "export TERM=linux; /usr/bin/setterm --cursor off > /dev/tty1; grep -q quiet /proc/cmdline && /usr/bin/clear > /dev/tty1 && /usr/bin/ply-image; exit 0"
 
 [Install]
 WantedBy = basic.target
