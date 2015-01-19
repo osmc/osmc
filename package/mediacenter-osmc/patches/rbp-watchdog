@@ -29,8 +29,7 @@ if [ ! -e /var/run/fb_resolution ]; then
 	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' | sudo tee /var/run/fb_resolution >/dev/null
 fi
 
-EXIT=0
-while [ "$EXIT" -ne 1 ]; do
+while true; do
 	sudo setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
 	LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
@@ -44,25 +43,23 @@ while [ "$EXIT" -ne 1 ]; do
 		/usr/bin/ply-image "$CODE"
 	fi
 
-	if [ "$CODE" -eq 0 ]; then
-		if [ "$GETTY" -ne 0 ]; then
-			read -n 1 -s -t 10 key </dev/tty1
-		fi
-		if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
-			/bin/fbset -depth 8 && /bin/fbset -depth 16
-			/usr/bin/setterm --cursor on >/dev/tty1
-			sudo systemctl start getty@tty1
-			count=30
-			while [ $count -gt 0 ]; do
-				who | awk '{print $2}' | grep tty1 >/dev/null
-				if [ "$?" -eq 0 ]; then
-					count=5
-				else
-					let count=count-5
-				fi
-				sleep 5
-			done
-			sudo systemctl stop getty@tty1
-		fi
+	if [ "$GETTY" -ne 0 ]; then
+		read -n 1 -s -t 10 key </dev/tty1
+	fi
+	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
+		/bin/fbset -depth 8 && /bin/fbset -depth 16
+		/usr/bin/setterm --cursor on >/dev/tty1
+		sudo systemctl start getty@tty1
+		count=30
+		while [ $count -gt 0 ]; do
+			who | awk '{print $2}' | grep tty1 >/dev/null
+			if [ "$?" -eq 0 ]; then
+				count=5
+			else
+				let count=count-5
+			fi
+			sleep 5
+		done
+		sudo systemctl stop getty@tty1
 	fi
 done
