@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 
-			<div class="row clearfix">
+			<div class="row clearfix main">
 				<div class="container">
 					<div class="column three-fourths">
 						<?php if (have_posts()) : while (have_posts()) : the_post(); ?>

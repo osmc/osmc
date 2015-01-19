@@ -227,4 +227,6 @@ return $query;
 }
 add_filter('pre_get_posts', 'exclude_category');
 
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
+
 ?>

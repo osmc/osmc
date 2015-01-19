@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 
-			<div class="row clearfix">
+			<div class="row clearfix main">
 
 				<div class="container">
 

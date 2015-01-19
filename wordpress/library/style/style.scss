@@ -6,8 +6,6 @@ Version: 1.0
 */
 
 @import "compass";
-@import "lib/grid";
-@import "lib/woocommerce";
 
 html, body, button, input, select, textarea {
 	font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -20,6 +18,7 @@ html, body, button, input, select, textarea {
 // COLOR //
 
 $white: #F0F0F0;
+$wc-white: #f4f4e9;
 $lgrey: #D3D3D3;
 $lgrey2: #c9c9c9;
 $dgrey: #969696;
@@ -30,8 +29,16 @@ $dark: #17394A;
 $dark-trans: rgba(23, 57, 74, 0.9);
 $black: $dark;
 
+$dblue: #001F3F;
+$dblue2: #003b5a;
+
 $maincolor: $dark;
 // COLOR //
+
+$res: 52em;
+
+@import "lib/grid";
+@import "lib/woocommerce";
 
 // MAIN //
 
@@ -40,6 +47,7 @@ background-color: $white;
 color: $dark;
 margin: 0;
 }
+
 input:focus {
     outline: none;
 }
@@ -110,6 +118,18 @@ abbr[title] {
 border-bottom: none;
 }
 
+.vero-frame {
+  display: block;
+  height: 513em;
+  margin: 2em auto;
+  width: 90%;
+  overflow: hidden;
+  background-color: #fff;
+  
+  .nav {
+    display: none;
+  }
+}
 // CONTENT //
 
 article {
@@ -213,11 +233,8 @@ article {
 }
 
 
-.row {
-  padding: 7em 0 0;
-}
-#inner-content {
-  padding: 0 0 1em 0;
+.row.main {
+  padding: 7em 0 2em;
 }
 .entry-content {
   padding: 0 0 0.5em 0;
@@ -376,6 +393,7 @@ $title-size-res: 1.2em;
 	
   .container {
     height: 100%;
+    position: static;
     
     .column {
       font-size: 95%;
@@ -733,9 +751,9 @@ footer {
 }
 // IE //
 
-@media screen and (max-width: 52em) {
+@media screen and (max-width: $res) {
 
-  .row {
+  .row.main {
     padding: 5em 0 0;
     margin: 0 auto;
   }

@@ -12,37 +12,35 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 get_header( 'shop' ); ?>
-<div id="content">
-  <div id="inner-content" class="wrap clearfix">
-      <div id="main" class="eightcol first clearfix pure-u-3-4" role="main">
-        <div class="boxpad">
-
-
+<div class="row clearfix main single">
+  <div class="container">
+      <div class="column three-fourths">
+        <h1 class="page-title" itemprop="headline"><?php the_title(); ?></h1>
+        <div class="byline vcard">
+        </div>
 		<?php while ( have_posts() ) : the_post(); ?>
 
 			<?php wc_get_template_part( 'content', 'single-product' ); ?>
 
 		<?php endwhile; // end of the loop. ?>
-
-	<?php
-		/**
-		 * woocommerce_after_main_content hook
-		 *
-		 * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
-		 */
-		do_action( 'woocommerce_after_main_content' );
-	?>
-
-	<?php
-		/**
-		 * woocommerce_sidebar hook
-		 *
-		 * @hooked woocommerce_get_sidebar - 10
-		 */
-		do_action( 'woocommerce_sidebar' );
-	?>
-      </div>
     </div>
+    <?php
+          /**
+           * woocommerce_sidebar hook
+           *
+           * @hooked woocommerce_get_sidebar - 10
+           */
+          do_action( 'woocommerce_sidebar' );
+      ?>
+	<?php
+      /**
+       * woocommerce_after_main_content hook
+       *
+       * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
+       */
+      do_action( 'woocommerce_after_main_content' );
+	?>
+    
   </div>
 </div>
 
