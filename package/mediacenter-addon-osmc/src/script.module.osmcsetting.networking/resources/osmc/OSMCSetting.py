@@ -95,10 +95,18 @@
 import xbmcaddon
 import xbmc
 
+addonid = "script.module.osmcsetting.networking"
+__addon__  = xbmcaddon.Addon(addonid)
+
+# Custom modules
+sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
+
+# OSMC SETTING Modules
+from gui import networking_gui
+
 
 def log(message):
 	xbmc.log('OSMC NETWORKING ' + str(message), level=xbmc.LOGDEBUG)
-
 
 
 class OSMCSettingClass(object):
@@ -189,15 +197,18 @@ class OSMCSettingClass(object):
 			own user interfaces.
 		'''
 
-		self.me.openSettings()
+		log(xbmcaddon.Addon("script.module.osmcsetting.networking").getAddonInfo('id'))
 
-		# code placed here will run when the modules settings window is closed
-		# the code below ensures that the apply_settings method is called immediately after closing the settings window
-		self.apply_settings()
+		me = xbmcaddon.Addon(self.addonid)
+		scriptPath = me.getAddonInfo('path')
+
+		self.GUI = networking_gui("network_gui.xml", scriptPath, 'Default')
+
+		self.GUI.doModal()
+
+		del self.GUI
 
 		log('END')
-		for x, k in self.setting_data_method.iteritems():
-			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
 	def apply_settings(self):
