@@ -4,7 +4,7 @@
 # email@samnazarko.co.uk
 
 export TERM=linux
-export DEBIAN_FRONTEND=noninteractive
+export DEBCONF_NOWARNINGS=yes
 systemctl stop getty@tty1
 clear > /dev/tty1
 chvt 1
