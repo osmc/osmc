@@ -250,15 +250,8 @@ class OSMCGui(object):
 			Closes the gui, and deletes it from memory.
 		'''
 
-		try:
-			log('Closing GUI')
-			# self.GUI.close()
-			# log('Deleting GUI')
-			# del self.GUI
-			# log('GUI Deleted')
+		pass
 
-		except:
-			pass
 
 
 	def open(self):
@@ -303,8 +296,6 @@ class OSMCGui(object):
 		self.GUI.active_page = 1
 		self.GUI.next_prev_direction_changer()
 		self.GUI.setFocusId(105)		
-
-		# del self.GUI
 
 
 	def retrieve_modules(self):

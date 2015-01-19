@@ -94,6 +94,8 @@
 # XBMC Modules
 import xbmcaddon
 import xbmc
+import sys
+import os
 
 addonid = "script.module.osmcsetting.networking"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -102,7 +104,7 @@ __addon__  = xbmcaddon.Addon(addonid)
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-from gui import networking_gui
+from networking_gui import networking_gui
 
 
 def log(message):

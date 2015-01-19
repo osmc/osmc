@@ -55,12 +55,14 @@ def lang(id):
 
 
 def log(message):
-	xbmc.log(str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC ADDON MAIN ' + str(message), level=xbmc.LOGDEBUG)
 
 class Main(object):
 
 
 	def __init__(self):
+
+		log('main addon starting')
 
 		# queue for communication with the comm and Main
 		self.parent_queue = Queue.Queue()
@@ -99,12 +101,14 @@ class Main(object):
 					log('Deleting listener (in wait)')
 					del self.listener
 					log('Listener deleted.')
+
 				except:
 					log('Failed to stop/delete listener. (in wait)')	
 				
 				try:		
 					log('Closing gui')
 					self.stored_gui.close()
+					
 				except:
 					log('Failed to stop/delete stored_gui. (in wait)')	
 
@@ -210,9 +214,6 @@ class Main(object):
 if __name__ == "__main__":
 
 	m = Main()
-
-	log('Deleting Main')
-	# del Main
 
 	log('Exiting OSMC Settings')
 

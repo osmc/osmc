@@ -7,8 +7,7 @@ import xbmcgui
 import xbmc
 
 
-__addon__              	= xbmcaddon.Addon()
-__addonid__            	= __addon__.getAddonInfo('script.module.osmcsetting.networking')
+__addon__              	= xbmcaddon.Addon('script.module.osmcsetting.networking')
 
 
 def log(message):
@@ -55,7 +54,9 @@ gui_ids = { \
 
 }
 
-ip_controls = [10112,10113,10114,10115,10116,910112,910113,910114,910115,910116,10212,10213,10214,10215,10216,910212,910213,910214,910215,910216,]
+ip_controls 		= [10112,10113,10114,10115,10116,910112,910113,910114,910115,910116,10212,10213,10214,10215,10216,910212,910213,910214,910215,910216,]
+heading_controls 	= [101, 102, 103]
+panel_controls 		= [1010, 1020, 1030]
 
 
 class networking_gui(xbmcgui.WindowXMLDialog):
@@ -67,7 +68,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 	def onInit(self):
 
-		pass
+		for panel_id in panel_controls[1:]:
+
+			panel = self.getControl(panel_id)
+			panel.setVisible(False)
+
+
+		self.setFocusId(101)
 
 
 	def onClick(self, controlID):
@@ -86,7 +93,16 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		if actionID in (10, 92):
 			self.close() 
+		
+		if focused_control in heading_controls:
 
-		else:
+			for panel_id in panel_controls:
+
+				panel = self.getControl(panel_id)
+
+				if focused_control * 10 == panel_id:
+					panel.setVisible(True)
+				else:
+					panel.setVisible(False)
 
 			log('actionID = ' + str(actionID))

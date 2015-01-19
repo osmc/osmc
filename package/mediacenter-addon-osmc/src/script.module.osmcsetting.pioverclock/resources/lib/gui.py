@@ -6,8 +6,8 @@ import xbmcaddon
 import xbmcgui
 
 
-__addon__              	= xbmcaddon.Addon()
-__addonid__            	= __addon__.getAddonInfo('script.module.osmcsetting.pioverclock')
+__addon__              	= xbmcaddon.Addon('script.module.osmcsetting.pioverclock')
+# __addonid__            	= __addon__.getAddonInfo('script.module.osmcsetting.piovQQQerclock').getAddonInfo('id')
 
 
 def lang(id):
