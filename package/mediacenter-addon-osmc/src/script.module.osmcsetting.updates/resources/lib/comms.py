@@ -9,8 +9,10 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
+
 def log(message):
 	xbmc.log('osmc_comms: ' + str(message), level=xbmc.LOGDEBUG)
+
 
 class communicator(threading.Thread):
 

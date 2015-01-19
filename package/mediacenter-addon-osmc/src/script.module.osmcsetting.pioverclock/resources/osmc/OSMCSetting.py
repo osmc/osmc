@@ -99,6 +99,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 import config_tools as ct
 from gui import overclock_gui
 
+
 def log(message):
 	xbmc.log('OSMC PI OVERCLOCK ' + str(message), level=xbmc.LOGDEBUG)
 

@@ -49,6 +49,11 @@ __setting__      = __addon__.getSetting
 DIALOG           = xbmcgui.Dialog()
 
 
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
@@ -153,7 +158,7 @@ class Main(object):
 						# post dialogs to ask the user if they want to add the source, or ignore the device
 						if device_id not in ignore_list and device_id not in media_string:
 
-							d1 = DIALOG.yesno('OSMC', 'A new device has been detected.','Would you like to add it as a library source?')
+							d1 = DIALOG.yesno(lang(32002), lang(32003),lang(32004))
 
 							if d1:
 
@@ -161,7 +166,7 @@ class Main(object):
 
 							else:
 
-								d2 = DIALOG.yesno('OSMC', 'Would you like to ignore this device in the future?')
+								d2 = DIALOG.yesno(lang(32002), lang(32005))
 
 								if d2:
 									ignore_list.append(str(device_id))

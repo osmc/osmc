@@ -101,14 +101,19 @@ class Main(object):
 
 
 	def commit(self):
+
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 		self.cache.upgrade()
+
 		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
+
 		dprg = Download_Progress()
 		iprg = Install_Progress()
 		self.cache.commit(fetch_progress=dprg, install_progress=iprg)
+
 		# call the parent and kill the pDialog
 		call_parent('progress_bar', {'kill': True})
+
 		print '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
 
 		# remove the file that blocks further update checks
@@ -119,10 +124,15 @@ class Main(object):
 
 
 	def fetch(self):
+
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
-		self.cache.upgrade()		
+
+		self.cache.upgrade()
+
 		print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
+
 		dprg = Download_Progress()
+
 		self.cache.fetch_archives(progress=dprg)
 
 		# call the parent and kill the pDialog
@@ -208,18 +218,21 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 class Download_Progress(apt.progress.base.AcquireProgress):
 
+
 	def __init__(self, partial_heading='Downloading'):
 		super(Download_Progress, self).__init__()
 		self.partial_heading = partial_heading
 
+
 	def start(self):
 		''' Invoked when the Acquire process starts running. '''
-		self.pulse_time = t.now()
 
+		self.pulse_time = t.now()
 
 		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
 		print 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+
 
 	def stop(self):
 		''' Invoked when the Acquire process stops running. '''
@@ -227,14 +240,18 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		print 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
+
 	def fetch(self, item):
 		''' Invoked when an item is being fetched. '''
 
 		dsc = item.description.split('/')
+
 		self.fetching = self.partial_heading + ': ' + dsc[-1]
+
 		# call_parent('progress_bar',{'message': 'Downloading: ' + dsc[-1]})
 
 		print 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
+
 
 	def pulse(self, owner):
 		''' Periodically invoked as something is being downloaded. '''
@@ -280,7 +297,9 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 	def done(self, item):
 		''' Invoked when an item has finished downloading. '''
+
 		print 'Done ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+
 
 
 if __name__ == "__main__":

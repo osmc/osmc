@@ -5,6 +5,16 @@ from collections import namedtuple
 import xbmcaddon
 import xbmcgui
 
+
+__addon__              	= xbmcaddon.Addon()
+__addonid__            	= __addon__.getAddonInfo('script.module.osmcsetting.pioverclock')
+
+
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+
 class overclock_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
@@ -44,17 +54,17 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			}
 
 		self.descriptions = {
-			301  :  'Normal profile: returns to the default overclock settings. arm=%s, sdram=%s, core=%s, initial_turbo=%s, over_voltage=%s, over_voltage_sdram=%s, force_turbo=%s' % self.normal_profile,
-			302  :  'Medium profile: mild overclock settings. arm=%s, sdram=%s, core=%s, initial_turbo=%s, over_voltage=%s, over_voltage_sdram=%s, force_turbo=%s' % self.medium_profile,
-			303  :  'High profile: higher overclock settings. arm=%s, sdram=%s, core=%s, initial_turbo=%s, over_voltage=%s, over_voltage_sdram=%s, force_turbo=%s' % self.higher_profile,
-			304  :  'Custom profile: your custom overclock settings (click to revert changes). arm=%s, sdram=%s, core=%s, initial_turbo=%s, over_voltage=%s, over_voltage_sdram=%s, force_turbo=%s' % self.custom_profile,
-			403  :  'Frequency of ARM (cpu) in MHz. Default 700.',
-			503  :  'Frequency of SDRAM in MHz. Default 400.',
-			603  :  'Frequency of GPU processor core in MHz. It has an impact on ARM performance since it drives L2 cache. Also, note that SD card issues are usually affected by the core_freq, rather than the arm_freq. Default 250.',
-			703  :  'Enables turbo mode from boot for the given value in seconds (up to 60) or until cpu_freq sets a frequency. Default 0.',
-			803  :	'ARM/GPU core voltage adjust. [-16,8] equates to [0.8 V,1.4 V] with 0.025 V steps. Default is 0 (1.2 V). Values above 6 are only allowed when force_turbo or current_limit_override are specified (which voids the warranty).',
-			903  :  'Sets over_voltage_sdram_c, over_voltage_sdram_i, over_voltage_sdram_p together.',
-			1003 :  'Disables dynamic cpufreq driver and minimum settings below. Enables H.264/V3D/ISP overclock options. Default 0. May void the warranty.',
+			301  :  lang(32088) % self.normal_profile,
+			302  :  lang(32089) % self.medium_profile,
+			303  :  lang(32090) % self.higher_profile,
+			304  :  lang(32091) % self.custom_profile,
+			403  :  lang(32092),
+			503  :  lang(32093),
+			603  :  lang(32094),
+			703  :  lang(32095),
+			803  :	lang(32096),
+			903  :  lang(32097),
+			1003 :  lang(32098),
 			}
 
 		self.oc_factor = namedtuple('oc_factor', ['min', 'range', 'step', 'custom'])
@@ -216,7 +226,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 					self.descriptions.get(focused_control - 1)))
 
 			if desc and self.warning:
-				desc = desc + '[COLOR red] WARNING: the current configuration will void your warranty.[/COLOR]'
+				desc = desc + lang(32099)
 
 			if desc:
 				self.getControl(1102).setText(desc)

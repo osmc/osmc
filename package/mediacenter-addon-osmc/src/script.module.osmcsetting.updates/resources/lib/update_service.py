@@ -25,9 +25,12 @@ __addonid__            	= __addon__.getAddonInfo('id')
 __scriptPath__         	= __addon__.getAddonInfo('path')
 __setting__            	= __addon__.getSetting
 __image_file__         	= os.path.join(__scriptPath__,'resources','media','update_available.png')
-lang 					= __addon__.getLocalizedString
-
 DIALOG = xbmcgui.Dialog()
+
+
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
 
 
 def log(message, label = ''):
@@ -229,7 +232,7 @@ class Main(object):
 
 			if not self.REBOOT_REQUIRED:
 
-				install_now = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded and can be installed immediately.', 'Would you like to exit and install the updates now?')
+				install_now = DIALOG.yesno(lang(32072), lang(32073), lang(32074))
 
 				if install_now:
 
@@ -239,7 +242,7 @@ class Main(object):
 
 			else:
 
-				exit_install = DIALOG.yesno('OSMC Update Available', 'Updates have been downloaded, but Kodi will need to exit to install them.', 'Would you like to exit and install the updates now?')
+				exit_install = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
 				if exit_install:
 
@@ -520,7 +523,7 @@ class Main(object):
 			# on an AttributeError create the dialog and start showing it, the AttributeError will be raised if pDialog doesnt exist
 
 			self.pDialog = xbmcgui.DialogProgressBG()
-			self.pDialog.create('OSMC Update', 'Update Running.')
+			self.pDialog.create(lang(32077), lang(32078))
 
 			self.pDialog.update(**update_args)
 
@@ -600,7 +603,7 @@ class Main(object):
 				# 4 "Download, install, prompt if restart needed" -- PROMPT
 
 				# display dialogue saying that osmc needs to reboot
-				reboot = DIALOG.yesno('OSMC Update', 'Packages have been installed that require a reboot.', 'Would you like to reboot now?', yeslabel='Reboot Now', nolabel='Reboot Later')
+				reboot = DIALOG.yesno(lang(32077), lang(32079), lang(32080), yeslabel=lang(32081), nolabel=lang(32082))
 
 				if reboot:
 
@@ -746,7 +749,7 @@ class Main(object):
 
 				log("Updates are available, no reboot is required")			
 
-				install = DIALOG.yesno('OSMC Update Available', 'There are updates that are available for install.', 'Would you like to install them now?')
+				install = DIALOG.yesno(lang(32072), lang(32083), lang(32084))
 
 				if install:
 
@@ -756,7 +759,7 @@ class Main(object):
 
 				else:
 
-					okey_dokey = DIALOG.ok('OSMC Update Available', 'Fair enough, then.', 'You can install them from within the OSMC settings later.')
+					okey_dokey = DIALOG.ok(lang(32072), lang(32085), lang(32086))
 
 					# create the file that will prevent further update checks until the updates have been installed
 					with open(self.block_update_file, 'w') as f:
