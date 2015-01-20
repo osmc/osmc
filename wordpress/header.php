@@ -44,7 +44,10 @@
 		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
 		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
 		<?php wp_head(); ?>
-
+        <!-- inject:css -->
+        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-c1fb3a26.css">
+        <!-- endinject -->
+        
 	</head>
 
 	<body <?php body_class(); ?>>
