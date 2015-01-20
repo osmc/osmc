@@ -9,7 +9,7 @@ import xbmc
 
 
 __addon__      	= xbmcaddon.Addon('script.module.osmcsetting.networking')
-DIALOG 			= xbmcgui.dialog
+DIALOG 			= xbmcgui.dialog()
 
 
 def log(message):
@@ -68,10 +68,10 @@ panel_controls 		= [1010, 1020, 1030]
 
 class networking_gui(xbmcgui.WindowXMLDialog):
 
+
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
 		self.setting_values = kwargs.get('setting_values', {})
-
 
 
 	def onInit(self):
@@ -84,6 +84,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		# list containing listitems of all wifi networks
 		self.wifis = []
+
+		# connected SSID, the ssid we are currently connected to
+		self.conn_ssid = ''
+
 
 		# populate the heading control list (HCL)
 		for heading in heading_controls:
@@ -128,7 +132,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		log('actionID = ' + str(actionID))
 
 
-
 	def toggle_panel_visibility(self, focused_position):
 		''' Takes the focussed position in the Heading List Control and sets only the required panel to visible. '''
 
@@ -140,8 +143,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(panel_id).setVisible(True if target_panel == panel_id else False)
 
 
-
-
 	def edit_ip_address(self, controlID):
 
 		relevant_label_control 	= self.getControl(90000 + controlID)
@@ -150,13 +151,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		if current_label == '_ . _ . _ . _':
 			current_label = ''
 
-		user_input = xbmc.Keyboard(current_label, lang(32004))
+		user_input = DIALOG.input(lang(32004), default=current_label, type=xbmcgui.INPUT_IPADDRESS)
 
-		user_input.doModal()
+		if not user_input:
 
-		if not user_input.isConfirmed():
-
-			return
+			relevant_label_control.setLabel('_ . _ . _ . _')
 
 		else:
 			text = user_input.getText()
@@ -185,7 +184,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 							...
 					}
 
-
 		icons:
 				bar1_enc.png
 				bar2_enc.png
@@ -212,7 +210,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 				if info['encryption'] == True:
 
-					if st < 25:
+					if 0 < st < 25:
 						itm.setIconImage('bar1_enc.png')
 					elif st < 50:
 						itm.setIconImage('bar2_enc.png')
@@ -221,11 +219,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 					elif st <= 100:
 						itm.setIconImage('bar4_enc.png')
 					else:
-						continue
+						itm.setIconImage('bar0_enc.png')
 
 				else:
 
-					if st < 25:
+					if 0 < st < 25:
 						itm.setIconImage('bar1_opn.png')
 					elif st < 50:
 						itm.setIconImage('bar2_opn.png')
@@ -234,7 +232,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 					elif st <= 100:
 						itm.setIconImage('bar4_opn.png')
 					else:
-						continue
+						itm.setIconImage('bar0_opn.png')
 
 				itm.setProperty('strength', st)
 
@@ -246,6 +244,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		# remove everything from the existing panel
 		self.WFP.reset()
 
-		# add the new items to the panel
-		self.WFP.addItems(self.wifis)
+		# add the top 20 new items to the panel
+		self.WFP.addItems(self.wifis[:20])
+
+		# set the current connection as selected
+		for i, wifi in enumerate(self.wifis):
+			if wifi.getLabel == self.conn_ssid:
+				self.WFP.selectItem(i)
+
+
 
