@@ -1,1 +1,16 @@
 #!/bin/bash
+
+if ! grep osmcdev=rbp /proc/cmdline
+then
+    rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi >/dev/null 2>&1
+    rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pioverclock >/dev/null 2>&1
+fi
+pushd /usr/share/kodi/addons/service.osmc.settings
+pycompile . >/dev/null 2>&1
+popd
+for dir in $(ls /usr/share/kodi/addons | grep osmc | grep script)
+do
+    pushd $dir
+    pycompile . >/dev/null 2>&1
+    popd
+done
