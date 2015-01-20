@@ -1,6 +1,8 @@
 # Standard Modules
 from collections import namedtuple, OrderedDict
 import socket
+import random # farts, this is needed for testing only
+import string # farts, this is needed for testing only
 
 # XBMC Modules
 import xbmcaddon
@@ -9,7 +11,7 @@ import xbmc
 
 
 __addon__      	= xbmcaddon.Addon('script.module.osmcsetting.networking')
-DIALOG 			= xbmcgui.dialog()
+DIALOG 			= xbmcgui.Dialog()
 
 
 def log(message):
@@ -95,9 +97,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 			# farts insert conditional checking of heading necessity here
 
 			tmp = xbmcgui.ListItem(lang(heading.lang_id))
-			tmp.setProperty('panel_id', heading.panel_id)
+			tmp.setProperty('panel_id', str(heading.panel_id))
 
-			self.HCl.addItem(tmp)
+			self.HCL.addItem(tmp)
 
 
 		# set all the panels to invisible except the first one
@@ -119,24 +121,42 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		actionID = action.getId()
 		focused_control = self.getFocusId()
 
+		log('actionID = ' + str(actionID))
+		log('focused_control = %s,   %s' % (type(focused_control),focused_control))
+
 		if actionID in (10, 92):
 			self.close() 
 		
 		if focused_control == 1:
 			# change to the required settings panel
 
-			focused_position = xbmc.getInfoLabel(Container(1).Position)
+			try:
+				focused_position = int(xbmc.getInfoLabel('Container(1).Position'))
+			except:
+				focused_position = 0
+
+			log('focused_position = %s' % focused_position)
+
 			self.toggle_panel_visibility(focused_position)
 
+			if focused_position == 1:
 
-		log('actionID = ' + str(actionID))
+				self.populate_wifi_panel()
+
 
 
 	def toggle_panel_visibility(self, focused_position):
 		''' Takes the focussed position in the Heading List Control and sets only the required panel to visible. '''
+		target_panel = int(self.HCL.getListItem(focused_position).getProperty('panel_id'))
 
-		# get the required panel		
-		target_panel = self.HCL.getListItem(focused_position).getProperty('panel_id')
+		# get the required panel
+		try:		
+			target_panel = int(self.HCL.getListItem(focused_position).getProperty('panel_id'))
+
+		except:
+			target_panel = 0
+
+		log('target_panel = %s' % target_panel)
 
 		for panel_id in panel_controls:
 
@@ -145,21 +165,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 	def edit_ip_address(self, controlID):
 
-		relevant_label_control 	= self.getControl(90000 + controlID)
+		relevant_label_control 	= self.getControl(900000 + controlID)
 		current_label 			= relevant_label_control.getLabel()
 
-		if current_label == '_ . _ . _ . _':
+		if current_label == '___.___.___.___':
 			current_label = ''
 
-		user_input = DIALOG.input(lang(32004), default=current_label, type=xbmcgui.INPUT_IPADDRESS)
+		user_input = DIALOG.input(lang(32004), current_label, type=xbmcgui.INPUT_IPADDRESS)
 
 		if not user_input:
 
-			relevant_label_control.setLabel('_ . _ . _ . _')
+			relevant_label_control.setLabel('___.___.___.___')
 
 		else:
-			text = user_input.getText()
-
 			# validate ip_address format
 			try:
 				socket.inet_aton(user_input)
@@ -195,6 +213,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 				bar3_opn.png
 				bar4_opn.png
 		'''
+		wifi_dict = {}
+		for x in range(22):
+			word = self.randomword()
+			encryption = random.choice([True,False])
+			strength = random.randint(0,85)
+			wifi_dict[word] = {'encryption': encryption, 'strength': strength }
 
 		self.wifis = []
 
@@ -234,12 +258,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 					else:
 						itm.setIconImage('bar0_opn.png')
 
-				itm.setProperty('strength', st)
+				itm.setProperty('strength', str(st))
 
 				self.wifis.append(itm)
 
 		# sort the list of wifis based on signal strength
-		self.wifis.sort(key=lambda x: x.getProperty('strength'), ascending=False)
+		self.wifis.sort(key=self.sort_strength, reverse=True)
 
 		# remove everything from the existing panel
 		self.WFP.reset()
@@ -249,8 +273,24 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		# set the current connection as selected
 		for i, wifi in enumerate(self.wifis):
-			if wifi.getLabel == self.conn_ssid:
+			if wifi.getLabel() == self.conn_ssid:
 				self.WFP.selectItem(i)
 
 
+		self.WFP.getListItem(random.randint(0,10)).select(True)
 
+
+	def sort_strength(self, itm):
+
+		try:
+			metric = int(itm.getProperty('strength'))
+		except:
+			metric = 0
+
+		return metric
+
+	def randomword(self):
+
+		length = random.randint(0,25)
+
+		return ''.join(random.choice(string.letters+string.digits) for i in range(length))

@@ -13,12 +13,12 @@
             <texture>blueBG.png</texture>
             <aspectratio>scale</aspectratio>
         </control>
-        <control id="1" type="fixedlist">
+        <control id="1" type="list">
             <description>Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)</description>
             <posx>310</posx>
             <posy>100</posy>
             <width>1700</width>
-            <height>70</height>
+            <height>130</height>
             <visible>true</visible>
             <onup>100</onup>
             <ondown>100</ondown>
@@ -29,7 +29,7 @@
             <scrolltime easing="out" tween="sine">200</scrolltime>
             <autoscroll>false</autoscroll>
             <focusposition>0</focusposition>
-            <itemlayout height="130" width="1700">
+            <itemlayout height="130" width="360">
                 <control type="label">
                     <posx>0</posx>
                     <posy>30</posy>
@@ -42,7 +42,7 @@
                     <info>ListItem.Label</info>
                 </control>
             </itemlayout>
-            <focusedlayout height="130" width="1700">
+            <focusedlayout height="130" width="360">
                 <control type="image">
                     <posx>0</posx>
                     <posy>20</posy>
@@ -63,6 +63,13 @@
                 </control>
             </focusedlayout>
         </control>
+        <control type="image">
+            <posx>200</posx>
+            <posy>240</posy>
+            <width>1520</width>
+            <height>10</height>
+            <texture>white_bar.png</texture>
+        </control>
         <control id="100" type="group">
             <posx>0</posx>
             <posy>0</posy>
@@ -70,6 +77,8 @@
             <height>1080</height>
             <onup>1</onup>
             <ondown>1</ondown>
+            <onright>1</onright>
+            <onleft>1</onleft>
             <description>super-panel to hold all the other sub-panels, used for navigation between heading and panels</description>
             <control id="1010" type="group">
                 <description>Wired Network Panel</description>
@@ -93,7 +102,7 @@
                     <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
                     <align>left</align>
                     <aligny>center</aligny>
-                    <onup>1010</onup>
+                    <onup>1</onup>
                     <ondown>10112</ondown>
                 </control>
                 <control id="10112" type="button">
@@ -182,60 +191,60 @@
                     <ondown>1010</ondown>
                 </control>
                 <control id="910112" type="label">
-                    <posx>100</posx>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <posx>980</posx>
                     <posy>200</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>IP Address VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
                 </control>
                 <control id="910113" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>270</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Subnet Mask VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910114" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>340</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Default Gateway VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910115" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>410</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Primary DNS VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910116" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>480</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Secondary DNS VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
@@ -266,8 +275,9 @@
                     <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
                     <align>left</align>
                     <aligny>center</aligny>
-                    <onup>1020</onup>
+                    <onup>1</onup>
                     <ondown>10211</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10211" type="button">
                     <posx>100</posx>
@@ -285,6 +295,7 @@
                     <aligny>center</aligny>
                     <onup>10200</onup>
                     <ondown>10212</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10212" type="button">
                     <posx>100</posx>
@@ -302,6 +313,7 @@
                     <aligny>center</aligny>
                     <onup>10211</onup>
                     <ondown>10213</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10213" type="button">
                     <posx>100</posx>
@@ -319,6 +331,7 @@
                     <aligny>center</aligny>
                     <onup>10212</onup>
                     <ondown>10214</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10214" type="button">
                     <posx>100</posx>
@@ -336,6 +349,7 @@
                     <aligny>center</aligny>
                     <onup>10213</onup>
                     <ondown>10215</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10215" type="button">
                     <posx>100</posx>
@@ -353,6 +367,7 @@
                     <aligny>center</aligny>
                     <onup>10214</onup>
                     <ondown>10216</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="10216" type="button">
                     <posx>100</posx>
@@ -370,62 +385,63 @@
                     <aligny>center</aligny>
                     <onup>10215</onup>
                     <ondown>1020</ondown>
+                    <onright>5000</onright>
                 </control>
                 <control id="910212" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>300</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>IP Address VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910213" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>370</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Subnet Mask VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910214" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>440</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Default Gateway VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910215" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>510</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Primary DNS VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
                 <control id="910216" type="label">
-                    <posx>100</posx>
+                    <posx>980</posx>
                     <posy>580</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Secondary DNS VALUE</description>
-                    <label>_ . _ . _ . _</label>
+                    <label>___.___.___.___</label>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
@@ -433,68 +449,69 @@
                 </control>
                 <control id="5000" type="list">
                     <description>WIFI list</description>
-                    <posx>200</posx>
-                    <posy>700</posy>
-                    <width>600</width>
-                    <height>600</height>
+                    <posx>1080</posx>
+                    <posy>100</posy>
+                    <width>840</width>
+                    <height>780</height>
                     <visible>true</visible>
                     <onup>1</onup>
                     <ondown>1</ondown>
-                    <onleft>1020</onleft>
-                    <onright>1020</onright>
+                    <onleft>10200</onleft>
                     <orientation>vertical</orientation>
                     <autoscroll>false</autoscroll>
                     <scrolltime easing="out" tween="sine">200</scrolltime>
-                    <itemlayout height="70" width="600">
+                    <itemlayout height="70" width="840">
                         <control type="image">
                             <description>encryption + signal strength icon</description>
-                            <posx>15</posx>
-                            <posy>10</posy>
+                            <posx>10</posx>
+                            <posy>15</posy>
                             <width>150</width>
                             <height>40</height>
                             <info>ListItem.Icon</info>
                         </control>
                         <control type="label">
                             <description>network name</description>
-                            <posx>10</posx>
-                            <posy>160</posy>
-                            <width>430</width>
+                            <posx>185</posx>
+                            <posy>10</posy>
+                            <width>655</width>
                             <height>50</height>
                             <font>font13</font>
                             <align>left</align>
                             <aligny>center</aligny>
-                            <selectedcolor>9efff9</selectedcolor>
+                            <textcolor>FFFFFFFF</textcolor>
                             <info>ListItem.Label</info>
+                            <selectedcolor>FF8FF5EE</selectedcolor>
                         </control>
                     </itemlayout>
-                    <focusedlayout height="70" width="600">
+                    <focusedlayout height="70" width="840">
                         <control type="image">
                             <description>focused background</description>
                             <width>600</width>
                             <height>60</height>
-                            <posx>5</posx>
-                            <posy>0</posy>
+                            <posx>0</posx>
+                            <posy>5</posy>
                             <texture>myfocustexture.png</texture>
                         </control>
                         <control type="image">
                             <description>encryption + signal strength icon</description>
-                            <posx>15</posx>
-                            <posy>10</posy>
+                            <posx>10</posx>
+                            <posy>15</posy>
                             <width>150</width>
                             <height>40</height>
                             <info>ListItem.Icon</info>
                         </control>
                         <control type="label">
                             <description>network name</description>
-                            <posx>10</posx>
-                            <posy>160</posy>
-                            <width>430</width>
+                            <posx>185</posx>
+                            <posy>10</posy>
+                            <width>655</width>
                             <height>50</height>
                             <font>font13</font>
                             <align>left</align>
                             <aligny>center</aligny>
-                            <selectedcolor>9efff9</selectedcolor>
+                            <textcolor>FFFFFFFF</textcolor>
                             <info>ListItem.Label</info>
+                            <selectedcolor>FF8FF5EE</selectedcolor>
                         </control>
                     </focusedlayout>
                 </control>
@@ -509,9 +526,9 @@
                 <ondown>1</ondown>
                 <control type="label">
                     <description>bluetooth work in progress</description>
-                    <posx>505</posx>
-                    <posy>0</posy>
-                    <width>1920</width>
+                    <posx>100</posx>
+                    <posy>100</posy>
+                    <width>550</width>
                     <height>50</height>
                     <font>font13</font>
                     <align>center</align>
