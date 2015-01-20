@@ -13,490 +13,513 @@
             <texture>blueBG.png</texture>
             <aspectratio>scale</aspectratio>
         </control>
-        <control id="100" type="group">
+        <control id="1" type="fixedlist">
             <description>Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)</description>
             <posx>310</posx>
             <posy>100</posy>
-            <width>180</width>
+            <width>1700</width>
             <height>70</height>
-            <control id="101" type="button">
-                <label>Wired Network</label>
-                <posx>0</posx>
-                <posy>0</posy>
-                <width>360</width>
-                <height>70</height>
-                <visible>true</visible>
-                <ondown>1010</ondown>
-                <onleft>103</onleft>
-                <onright>102</onright>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control id="102" type="button">
-                <label>Wireless Network</label>
-                <posx>470</posx>
-                <posy>0</posy>
-                <width>360</width>
-                <height>70</height>
-                <visible>true</visible>
-                <ondown>1020</ondown>
-                <onleft>101</onleft>
-                <onright>103</onright>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control id="103" type="button">
-                <label>Bluetooth</label>
-                <posx>940</posx>
-                <posy>0</posy>
-                <width>360</width>
-                <height>70</height>
-                <visible>true</visible>
-                <ondown>1030</ondown>
-                <onleft>102</onleft>
-                <onright>101</onright>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
+            <visible>true</visible>
+            <onup>100</onup>
+            <ondown>100</ondown>
+            <onleft>1</onleft>
+            <onright>1</onright>
+            <orientation>horizontal</orientation>
+            <pagecontrol>25</pagecontrol>
+            <scrolltime easing="out" tween="sine">200</scrolltime>
+            <autoscroll>false</autoscroll>
+            <focusposition>0</focusposition>
+            <itemlayout height="130" width="1700">
+                <control type="label">
+                    <posx>0</posx>
+                    <posy>30</posy>
+                    <width>360</width>
+                    <height>70</height>
+                    <font>font13</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <selectedcolor>FFFFFFFF</selectedcolor>
+                    <info>ListItem.Label</info>
+                </control>
+            </itemlayout>
+            <focusedlayout height="130" width="1700">
+                <control type="image">
+                    <posx>0</posx>
+                    <posy>20</posy>
+                    <width>360</width>
+                    <height>90</height>
+                    <texture>myfocustexture.png</texture>
+                </control>
+                <control type="label">
+                    <posx>0</posx>
+                    <posy>30</posy>
+                    <width>360</width>
+                    <height>70</height>
+                    <font>font13</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <selectedcolor>FFFFFFFF</selectedcolor>
+                    <info>ListItem.Label</info>
+                </control>
+            </focusedlayout>
         </control>
-        <control id="1010" type="group">
-            <description>Wired Network Panel</description>
-            <posx>310</posx>
-            <posy>180</posy>
-            <width>1080</width>
-            <height>900</height>
-            <onup>101</onup>
-            <ondown>101</ondown>
-            <onleft>1010</onleft>
-            <onright>1010</onright>
-            <control id="10111" type="button">
-                <posx>100</posx>
-                <posy>100</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Automatically configure the network toggle</description>
-                <label>Try to auto-populate the fields below</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>1010</onup>
-                <ondown>10112</ondown>
+        <control id="100" type="group">
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <onup>1</onup>
+            <ondown>1</ondown>
+            <description>super-panel to hold all the other sub-panels, used for navigation between heading and panels</description>
+            <control id="1010" type="group">
+                <description>Wired Network Panel</description>
+                <posx>310</posx>
+                <posy>180</posy>
+                <width>1080</width>
+                <height>900</height>
+                <onup>1</onup>
+                <ondown>1</ondown>
+                <control id="10111" type="button">
+                    <posx>100</posx>
+                    <posy>100</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Automatically configure the network toggle</description>
+                    <label>Try to auto-populate the fields below</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>1010</onup>
+                    <ondown>10112</ondown>
+                </control>
+                <control id="10112" type="button">
+                    <posx>100</posx>
+                    <posy>200</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>IP Address</description>
+                    <label>IP Address</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10111</onup>
+                    <ondown>10113</ondown>
+                </control>
+                <control id="10113" type="button">
+                    <posx>100</posx>
+                    <posy>270</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Subnet Mask</description>
+                    <label>Subnet Mask</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10112</onup>
+                    <ondown>10114</ondown>
+                </control>
+                <control id="10114" type="button">
+                    <posx>100</posx>
+                    <posy>340</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Default Gateway</description>
+                    <label>Default Gateway</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10113</onup>
+                    <ondown>10115</ondown>
+                </control>
+                <control id="10115" type="button">
+                    <posx>100</posx>
+                    <posy>410</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Primary DNS</description>
+                    <label>Primary DNS</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10114</onup>
+                    <ondown>10116</ondown>
+                </control>
+                <control id="10116" type="button">
+                    <posx>100</posx>
+                    <posy>480</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Secondary DNS</description>
+                    <label>Secondary DNS</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10115</onup>
+                    <ondown>1010</ondown>
+                </control>
+                <control id="910112" type="label">
+                    <posx>100</posx>
+                    <posy>200</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>IP Address VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910113" type="label">
+                    <posx>100</posx>
+                    <posy>270</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Subnet Mask VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910114" type="label">
+                    <posx>100</posx>
+                    <posy>340</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Default Gateway VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910115" type="label">
+                    <posx>100</posx>
+                    <posy>410</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Primary DNS VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910116" type="label">
+                    <posx>100</posx>
+                    <posy>480</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Secondary DNS VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
             </control>
-            <control id="10112" type="button">
-                <posx>100</posx>
-                <posy>200</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address</description>
-                <label>IP Address</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10111</onup>
-                <ondown>10113</ondown>
+            <control id="1020" type="group">
+                <description>Wireless Network Panel</description>
+                <posx>50</posx>
+                <posy>180</posy>
+                <width>1080</width>
+                <height>900</height>
+                <onup>1</onup>
+                <ondown>1</ondown>
+                <onright>5000</onright>
+                <onleft>5000</onleft>
+                <control id="10200" type="button">
+                    <posx>100</posx>
+                    <posy>100</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Scan for connections</description>
+                    <label>Scan for connections</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>1020</onup>
+                    <ondown>10211</ondown>
+                </control>
+                <control id="10211" type="button">
+                    <posx>100</posx>
+                    <posy>200</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Automatically configure the network toggle</description>
+                    <label>Try to auto-populate the fields below</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10200</onup>
+                    <ondown>10212</ondown>
+                </control>
+                <control id="10212" type="button">
+                    <posx>100</posx>
+                    <posy>300</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>IP Address</description>
+                    <label>IP Address</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10211</onup>
+                    <ondown>10213</ondown>
+                </control>
+                <control id="10213" type="button">
+                    <posx>100</posx>
+                    <posy>370</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Subnet Mask</description>
+                    <label>Subnet Mask</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10212</onup>
+                    <ondown>10214</ondown>
+                </control>
+                <control id="10214" type="button">
+                    <posx>100</posx>
+                    <posy>440</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Default Gateway</description>
+                    <label>Default Gateway</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10213</onup>
+                    <ondown>10215</ondown>
+                </control>
+                <control id="10215" type="button">
+                    <posx>100</posx>
+                    <posy>510</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Primary DNS</description>
+                    <label>Primary DNS</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10214</onup>
+                    <ondown>10216</ondown>
+                </control>
+                <control id="10216" type="button">
+                    <posx>100</posx>
+                    <posy>580</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Secondary DNS</description>
+                    <label>Secondary DNS</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10215</onup>
+                    <ondown>1020</ondown>
+                </control>
+                <control id="910212" type="label">
+                    <posx>100</posx>
+                    <posy>300</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>IP Address VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910213" type="label">
+                    <posx>100</posx>
+                    <posy>370</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Subnet Mask VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910214" type="label">
+                    <posx>100</posx>
+                    <posy>440</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Default Gateway VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910215" type="label">
+                    <posx>100</posx>
+                    <posy>510</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Primary DNS VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="910216" type="label">
+                    <posx>100</posx>
+                    <posy>580</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Secondary DNS VALUE</description>
+                    <label>_ . _ . _ . _</label>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control id="5000" type="list">
+                    <description>WIFI list</description>
+                    <posx>200</posx>
+                    <posy>700</posy>
+                    <width>600</width>
+                    <height>600</height>
+                    <visible>true</visible>
+                    <onup>1</onup>
+                    <ondown>1</ondown>
+                    <onleft>1020</onleft>
+                    <onright>1020</onright>
+                    <orientation>vertical</orientation>
+                    <autoscroll>false</autoscroll>
+                    <scrolltime easing="out" tween="sine">200</scrolltime>
+                    <itemlayout height="70" width="600">
+                        <control type="image">
+                            <description>encryption + signal strength icon</description>
+                            <posx>15</posx>
+                            <posy>10</posy>
+                            <width>150</width>
+                            <height>40</height>
+                            <info>ListItem.Icon</info>
+                        </control>
+                        <control type="label">
+                            <description>network name</description>
+                            <posx>10</posx>
+                            <posy>160</posy>
+                            <width>430</width>
+                            <height>50</height>
+                            <font>font13</font>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <selectedcolor>9efff9</selectedcolor>
+                            <info>ListItem.Label</info>
+                        </control>
+                    </itemlayout>
+                    <focusedlayout height="70" width="600">
+                        <control type="image">
+                            <description>focused background</description>
+                            <width>600</width>
+                            <height>60</height>
+                            <posx>5</posx>
+                            <posy>0</posy>
+                            <texture>myfocustexture.png</texture>
+                        </control>
+                        <control type="image">
+                            <description>encryption + signal strength icon</description>
+                            <posx>15</posx>
+                            <posy>10</posy>
+                            <width>150</width>
+                            <height>40</height>
+                            <info>ListItem.Icon</info>
+                        </control>
+                        <control type="label">
+                            <description>network name</description>
+                            <posx>10</posx>
+                            <posy>160</posy>
+                            <width>430</width>
+                            <height>50</height>
+                            <font>font13</font>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <selectedcolor>9efff9</selectedcolor>
+                            <info>ListItem.Label</info>
+                        </control>
+                    </focusedlayout>
+                </control>
             </control>
-            <control id="10113" type="button">
-                <posx>100</posx>
-                <posy>270</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Subnet Mask</description>
-                <label>Subnet Mask</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10112</onup>
-                <ondown>10114</ondown>
+            <control id="1030" type="group">
+                <description>Bluetooth Panel</description>
+                <posx>310</posx>
+                <posy>180</posy>
+                <width>1080</width>
+                <height>900</height>
+                <onup>1</onup>
+                <ondown>1</ondown>
+                <control type="label">
+                    <description>bluetooth work in progress</description>
+                    <posx>505</posx>
+                    <posy>0</posy>
+                    <width>1920</width>
+                    <height>50</height>
+                    <font>font13</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <selectedcolor>9efff9</selectedcolor>
+                    <label>Work in Progress</label>
+                </control>
             </control>
-            <control id="10114" type="button">
-                <posx>100</posx>
-                <posy>340</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway</description>
-                <label>Default Gateway</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10113</onup>
-                <ondown>10115</ondown>
-            </control>
-            <control id="10115" type="button">
-                <posx>100</posx>
-                <posy>410</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS</description>
-                <label>Primary DNS</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10114</onup>
-                <ondown>10116</ondown>
-            </control>
-            <control id="10116" type="button">
-                <posx>100</posx>
-                <posy>480</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS</description>
-                <label>Secondary DNS</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10115</onup>
-                <ondown>1010</ondown>
-            </control>
-            <control id="910112" type="button">
-                <posx>100</posx>
-                <posy>200</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10111</onup>
-                <ondown>10113</ondown>
-            </control>
-            <control id="910113" type="button">
-                <posx>100</posx>
-                <posy>270</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Subnet Mask VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10112</onup>
-                <ondown>10114</ondown>
-            </control>
-            <control id="910114" type="button">
-                <posx>100</posx>
-                <posy>340</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10113</onup>
-                <ondown>10115</ondown>
-            </control>
-            <control id="910115" type="button">
-                <posx>100</posx>
-                <posy>410</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10114</onup>
-                <ondown>10116</ondown>
-            </control>
-            <control id="910116" type="button">
-                <posx>100</posx>
-                <posy>480</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10115</onup>
-                <ondown>1010</ondown>
-            </control>
-        </control>
-        <control id="1020" type="group">
-            <description>Wireless Network Panel</description>
-            <posx>310</posx>
-            <posy>180</posy>
-            <width>1080</width>
-            <height>900</height>
-            <onup>102</onup>
-            <ondown>102</ondown>
-            <onleft>1020</onleft>
-            <onright>1020</onright>
-            <control id="10200" type="button">
-                <posx>100</posx>
-                <posy>100</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Scan for connections</description>
-                <label>Scan for connections</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>1020</onup>
-                <ondown>10211</ondown>
-            </control>
-            <control id="10211" type="button">
-                <posx>100</posx>
-                <posy>200</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Automatically configure the network toggle</description>
-                <label>Try to auto-populate the fields below</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10200</onup>
-                <ondown>10212</ondown>
-            </control>
-            <control id="10212" type="button">
-                <posx>100</posx>
-                <posy>300</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address</description>
-                <label>IP Address</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10211</onup>
-                <ondown>10213</ondown>
-            </control>
-            <control id="10213" type="button">
-                <posx>100</posx>
-                <posy>370</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Subnet Mask</description>
-                <label>Subnet Mask</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10212</onup>
-                <ondown>10214</ondown>
-            </control>
-            <control id="10214" type="button">
-                <posx>100</posx>
-                <posy>440</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway</description>
-                <label>Default Gateway</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10213</onup>
-                <ondown>10215</ondown>
-            </control>
-            <control id="10215" type="button">
-                <posx>100</posx>
-                <posy>510</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS</description>
-                <label>Primary DNS</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10214</onup>
-                <ondown>10216</ondown>
-            </control>
-            <control id="10216" type="button">
-                <posx>100</posx>
-                <posy>580</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS</description>
-                <label>Secondary DNS</label>
-                <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>left</align>
-                <aligny>center</aligny>
-                <onup>10215</onup>
-                <ondown>1020</ondown>
-            </control>
-            <control id="910212" type="button">
-                <posx>100</posx>
-                <posy>300</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10211</onup>
-                <ondown>10213</ondown>
-            </control>
-            <control id="910213" type="button">
-                <posx>100</posx>
-                <posy>370</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Subnet Mask VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10212</onup>
-                <ondown>10214</ondown>
-            </control>
-            <control id="910214" type="button">
-                <posx>100</posx>
-                <posy>440</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10213</onup>
-                <ondown>10215</ondown>
-            </control>
-            <control id="910215" type="button">
-                <posx>100</posx>
-                <posy>510</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10214</onup>
-                <ondown>10216</ondown>
-            </control>
-            <control id="910216" type="button">
-                <posx>100</posx>
-                <posy>580</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS VALUE</description>
-                <label>_ . _ . _ . _</label>
-                <!-- <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>-->
-                <!-- <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>-->
-                <font>font13</font>
-                <textcolor>FFFFFFFF</textcolor>
-                <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                <align>right</align>
-                <aligny>center</aligny>
-                <onup>10215</onup>
-                <ondown>1020</ondown>
-            </control>
-        </control>
-        <control id="1030" type="group">
-            <description>Bluetooth Panel</description>
-            <posx>310</posx>
-            <posy>180</posy>
-            <width>1080</width>
-            <height>900</height>
-            <onup>103</onup>
-            <ondown>103</ondown>
-            <onleft>1030</onleft>
-            <onright>1030</onright>
         </control>
     </controls>
 </window>

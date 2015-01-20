@@ -1,5 +1,6 @@
 # Standard Modules
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
+import socket
 
 # XBMC Modules
 import xbmcaddon
@@ -7,7 +8,8 @@ import xbmcgui
 import xbmc
 
 
-__addon__              	= xbmcaddon.Addon('script.module.osmcsetting.networking')
+__addon__      	= xbmcaddon.Addon('script.module.osmcsetting.networking')
+DIALOG 			= xbmcgui.dialog
 
 
 def log(message):
@@ -21,10 +23,7 @@ def lang(id):
 
 gui_ids = { \
 
-100         :    'Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)',
-101         :    'Heading Wired',
-102         :    'Heading Wireless',
-103         :    'Heading Bluetooth',
+1           :    'Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)',
 1010        :    'Panel Wired Network',
 1020        :    'Panel Wireless Network',
 1030        :    'Panel Bluetooth',
@@ -51,11 +50,19 @@ gui_ids = { \
 910216      :    'Wireless - Secondary DNS VALUE',
 10213       :    'Wireless - Subnet Mask',
 910213      :    'Wireless - Subnet Mask VALUE',
+5000		:	 'WiFi panel',
 
 }
 
 ip_controls 		= [10112,10113,10114,10115,10116,910112,910113,910114,910115,910116,10212,10213,10214,10215,10216,910212,910213,910214,910215,910216,]
-heading_controls 	= [101, 102, 103]
+
+hdg    				= namedtuple('hdg', ['name', 'lang_id', 'panel_id'])
+heading_controls 	= [ 	
+						hdg('wired', 		32001, 		1010), 
+						hdg('wireless', 	32002, 		1020), 
+						hdg('bluetooth', 	32003, 		1030),
+					  ]
+
 panel_controls 		= [1010, 1020, 1030]
 
 
@@ -66,24 +73,41 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		self.setting_values = kwargs.get('setting_values', {})
 
 
+
 	def onInit(self):
 
-		for panel_id in panel_controls[1:]:
+		# heading control list (HCL)
+		self.HCL = self.getControl(1)
 
-			panel = self.getControl(panel_id)
-			panel.setVisible(False)
+		# wifi panel (WFP)
+		self.WFP = self.getControl(5000)
+
+		# list containing listitems of all wifi networks
+		self.wifis = []
+
+		# populate the heading control list (HCL)
+		for heading in heading_controls:
+
+			# farts insert conditional checking of heading necessity here
+
+			tmp = xbmcgui.ListItem(lang(heading.lang_id))
+			tmp.setProperty('panel_id', heading.panel_id)
+
+			self.HCl.addItem(tmp)
 
 
-		self.setFocusId(101)
+		# set all the panels to invisible except the first one
+		self.toggle_panel_visibility(0)
+
+		# set focus on the heading control list
+		self.setFocusId(1)
 
 
 	def onClick(self, controlID):
 
 		if controlID in ip_controls:
-			# display ip address subwindow
-
-			pass
-
+			
+			self.edit_ip_address(controlID)
 
 
 	def onAction(self, action):
@@ -94,15 +118,134 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		if actionID in (10, 92):
 			self.close() 
 		
-		if focused_control in heading_controls:
+		if focused_control == 1:
+			# change to the required settings panel
 
-			for panel_id in panel_controls:
+			focused_position = xbmc.getInfoLabel(Container(1).Position)
+			self.toggle_panel_visibility(focused_position)
 
-				panel = self.getControl(panel_id)
 
-				if focused_control * 10 == panel_id:
-					panel.setVisible(True)
+		log('actionID = ' + str(actionID))
+
+
+
+	def toggle_panel_visibility(self, focused_position):
+		''' Takes the focussed position in the Heading List Control and sets only the required panel to visible. '''
+
+		# get the required panel		
+		target_panel = self.HCL.getListItem(focused_position).getProperty('panel_id')
+
+		for panel_id in panel_controls:
+
+			self.getControl(panel_id).setVisible(True if target_panel == panel_id else False)
+
+
+
+
+	def edit_ip_address(self, controlID):
+
+		relevant_label_control 	= self.getControl(90000 + controlID)
+		current_label 			= relevant_label_control.getLabel()
+
+		if current_label == '_ . _ . _ . _':
+			current_label = ''
+
+		user_input = xbmc.Keyboard(current_label, lang(32004))
+
+		user_input.doModal()
+
+		if not user_input.isConfirmed():
+
+			return
+
+		else:
+			text = user_input.getText()
+
+			# validate ip_address format
+			try:
+				socket.inet_aton(user_input)
+
+			except:
+				ok = DIALOG.ok(lang(32004), lang(32005))
+
+				self.edit_ip_address(controlID)
+
+				return
+
+			relevant_label_control.setLabel(user_input)
+
+			return
+				
+
+	def populate_wifi_panel(self, wifi_dict={}):
+		''' Populates the wifi panel with the information provided in the wifi_dict.
+
+		wifi_dict = {
+						'ssid' : {'encryption': True|False, 'strength': percent::int },
+							...
+					}
+
+
+		icons:
+				bar1_enc.png
+				bar2_enc.png
+				bar3_enc.png
+				bar4_enc.png
+
+				bar1_opn.png
+				bar2_opn.png
+				bar3_opn.png
+				bar4_opn.png
+		'''
+
+		self.wifis = []
+
+		for ssid, info in wifi_dict.iteritems():
+
+			# hidden networks are ignored
+
+			if ssid:
+
+				itm = xbmcgui.ListItem(ssid)
+
+				st = info['strength']
+
+				if info['encryption'] == True:
+
+					if st < 25:
+						itm.setIconImage('bar1_enc.png')
+					elif st < 50:
+						itm.setIconImage('bar2_enc.png')
+					elif st < 75:
+						itm.setIconImage('bar3_enc.png')
+					elif st <= 100:
+						itm.setIconImage('bar4_enc.png')
+					else:
+						continue
+
 				else:
-					panel.setVisible(False)
 
-			log('actionID = ' + str(actionID))
+					if st < 25:
+						itm.setIconImage('bar1_opn.png')
+					elif st < 50:
+						itm.setIconImage('bar2_opn.png')
+					elif st < 75:
+						itm.setIconImage('bar3_opn.png')
+					elif st <= 100:
+						itm.setIconImage('bar4_opn.png')
+					else:
+						continue
+
+				itm.setProperty('strength', st)
+
+				self.wifis.append(itm)
+
+		# sort the list of wifis based on signal strength
+		self.wifis.sort(key=lambda x: x.getProperty('strength'), ascending=False)
+
+		# remove everything from the existing panel
+		self.WFP.reset()
+
+		# add the new items to the panel
+		self.WFP.addItems(self.wifis)
+
