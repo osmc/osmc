@@ -3,7 +3,6 @@
 # (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
-if [ -f /.setup ]; then systemctl disable ftr.service >/dev/null 2>&1 && exit 0; fi
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 if [ -f $DSA_KEY ]; then rm -f $DSA_KEY >/dev/null 2>&1; fi
@@ -15,5 +14,6 @@ if [ -f /boot/preseed.cfg ]; then python /usr/bin/preseed >/dev/null 2>&1; fi
 ssh-keygen -f $DSA_KEY -N '' -t dsa >/dev/null 2>&1
 ssh-keygen -f $RSA_KEY -N '' -t rsa >/dev/null 2>&1
 dbus-uuidgen > /var/lib/dbus/machine-id
-touch /.setup
+systemctl disable ftr.service >/dev/null 2>&1
+exit 0
 )&
