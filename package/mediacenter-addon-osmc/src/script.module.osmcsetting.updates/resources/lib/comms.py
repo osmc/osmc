@@ -11,7 +11,7 @@ import xbmcgui
 
 
 def log(message):
-	xbmc.log('osmc_comms: ' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC UPDATE COMMS: ' + str(message), level=xbmc.LOGDEBUG)
 
 
 class communicator(threading.Thread):
@@ -54,6 +54,8 @@ class communicator(threading.Thread):
 		''' Orderly shutdown of the socket, sends message to run loop
 			to exit. '''
 
+		log('Connection stop called')		
+
 		try:
 
 			log('Connection stopping.')
@@ -63,17 +65,13 @@ class communicator(threading.Thread):
 			sock.send('exit')
 			sock.close()
 			self.sock.close()
+
+			log('Exit message sent to socket.')
 				
 		except Exception, e:
 
 			log('Comms error trying to stop: {}'.format(e))
 
-		try:
-			os.remove(self.address)
-		except:
-			log('Comms error trying to delete socket: {}'.format(e))	
-
-		log('Connection stop called')		
 
 
 	def run(self):
@@ -95,7 +93,7 @@ class communicator(threading.Thread):
 			total_wait = 0
 			wait = 5
 
-			while not xbmc.abortRequested and not passed and total_wait < 100:
+			while not passed and total_wait < 100:
 				try:
 					data = conn.recv(81920)
 					passed = True
@@ -123,5 +121,11 @@ class communicator(threading.Thread):
 			self.parent_queue.put(data)
 
 			conn.close()
+
+		try:
+			os.remove(self.address)
+
+		except Exception, e:
+			log('Comms error trying to delete socket: {}'.format(e))	
 
 		log('Comms Ended')
