@@ -160,7 +160,7 @@ then
 		--enable-libbluray \
 		--enable-dvdcss \
 		--disable-joystick \
-		--disable-debug \
+		${DEBUG} \
 		--disable-vtbdecoder \
 		--disable-vaapi \
 		--disable-vdpau \
