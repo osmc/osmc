@@ -258,7 +258,7 @@ Overclock settings are set using the Pi Overclock module."""
 			serial_raw = subprocess.check_output(["cat", "/proc/cpuinfo"])
 
 			# grab just the serial number
-			serial = serial_raw[serial_raw.index('Serial') + len('Serial'):].replace('\n','').replace(':','').replace(' ','')
+			serial = serial_raw[serial_raw.index('Serial') + len('Serial'):].replace('\n','').replace(':','').replace(' ','').replace('\t','')
 
 			# load the values into the settings gui
 			__addon__.setSetting('codec_check', mpg.replace('\n','') + ', ' + wvc.replace('\n',''))
