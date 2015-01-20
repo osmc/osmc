@@ -2,9 +2,26 @@
   display: none;
 }
 
-body.woocommerce-page {
-  background-color: $white;
-  
+body.parent-pageid-942, body.woocommerce-page {
+  background-color: $white;  
+  .sidebar {
+    margin: 1em 0 0;
+  }
+  .header {
+    background-color: $dblue2;
+  }
+  footer .contentcontainer {
+    background-color: $dblue2;
+  }
+  button {
+    background-color: $dblue2;
+  }
+  button:hover, button:focus {
+    background-color: $link;
+  }
+}
+
+body.woocommerce-page {  
   .menu-item-1075 a {
     border-bottom: 2px solid $lgrey;
   }
@@ -26,10 +43,6 @@ body.woocommerce-page {
     a:hover, a:focus {
       color: $link;
     }
-  }
-  
-  .sidebar {
-    margin: 1em 0 0;
   }
   
   .woocommerce-message, .woocommerce-info {
@@ -77,19 +90,6 @@ body.woocommerce-page {
   
   .woocommerce-tabs {
     display: none;
-  }
-  
-  .header {
-    background-color: $dblue2;
-  }
-  footer .contentcontainer {
-    background-color: $dblue2;
-  }
-  button {
-    background-color: $dblue2;
-  }
-  button:hover, button:focus {
-    background-color: $link;
   }
   
   .onsale {
