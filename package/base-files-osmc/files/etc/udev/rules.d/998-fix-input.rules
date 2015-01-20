@@ -1,0 +1,7 @@
+# input
+KERNEL=="mouse*|mice|event*",   MODE="0660", GROUP="osmc"
+KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="osmc"
+KERNEL=="js[0-9]*",             MODE="0660", GROUP="osmc"
+
+# tty
+SUBSYSTEM=="tty", KERNEL=="tty[0-9]*", GROUP="tty", MODE="0666"

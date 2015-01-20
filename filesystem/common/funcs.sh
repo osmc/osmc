@@ -49,20 +49,6 @@ Pin: release \*
 Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${2}
 }
 
-function configure_vchiq_udev()
-{
-	echo '# input
-KERNEL=="mouse*|mice|event*",   MODE="0660", GROUP="osmc"
-KERNEL=="ts[0-9]*|uinput",      MODE="0660", GROUP="osmc"
-KERNEL=="js[0-9]*",             MODE="0660", GROUP="osmc"
-
-# tty
-SUBSYSTEM=="tty", KERNEL=="tty[0-9]*", GROUP="tty", MODE="0666"
-
-# vchiq
-SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"'>${1}/etc/udev/rules.d/99-permissions.rules
-}
-
 function create_fs_tarball()
 {
 	echo -e "Creating filesystem tarball"

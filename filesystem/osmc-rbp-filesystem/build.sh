@@ -78,8 +78,6 @@ echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}
 verify_action
-echo -e "	* Configuring VCHIQ"
-configure_vchiq_udev ${DIR}
 echo -e "	* Setting hostname"
 setup_hostname ${DIR}
 verify_action
