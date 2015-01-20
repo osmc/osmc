@@ -2,22 +2,21 @@
   display: none;
 }
 
-body.parent-pageid-942, body.woocommerce-page {
+body.woocommerce-page, body.parent-pageid-942 {
   background-color: $white;  
   .sidebar {
     margin: 1em 0 0;
   }
   .header {
-    background-color: $dblue2;
+    background-color: $shop;
   }
   footer .contentcontainer {
-    background-color: $dblue2;
+    background-color: $shop;
   }
   button {
-    background-color: $dblue2;
-  }
-  button:hover, button:focus {
-    background-color: $link;
+    &:hover, &:focus {
+      background-color: $link;
+    }
   }
 }
 
@@ -53,16 +52,13 @@ body.woocommerce-page {
     @include box-shadow(transparent 0px 0px 0px);
     text-shadow: none;
     
-    ::before {
+    &::before {
       display: none;
     }
   }
-  .woocommerce-message::before, .woocommerce-info::before {
-    display: none;
-  }
   .button, button.button.alt, input.button.alt {
     font-weight: 400;
-    background: $dark;
+    background: $shop;
     border: 0;
     border-radius: 3px;
     color: $white;
@@ -202,7 +198,7 @@ body.woocommerce-page {
         font-size: 2em;
 
         a {
-          color: $dblue2;
+          color: $shop2;
         }
         a:hover, a:focus {
           color: $link;
@@ -265,12 +261,18 @@ body.woocommerce-page {
         font-size: 80%;
       }
       
+      .buybutton {
+        margin: 0 0 0.5em 0;
+      }
+      
       .verolink {
         color: $dgrey;
-        font-size: 85%;
-      }
-      .verolink:hover, .verolink:focus {
-        color: $link;
+        font-size: 90%;
+        margin: 1em 0 0;
+        
+        &:hover, &:focus {
+          color: $link;
+        }
       }
     }
     .productlist {
@@ -309,7 +311,7 @@ body.woocommerce-page {
   body.woocommerce-page {
     
     .top-nav.nav-res {
-      background-color: $dblue2;
+      background-color: $shop2;
     }
     
     .wc-cart {

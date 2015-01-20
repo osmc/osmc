@@ -32,6 +32,10 @@ $black: $dark;
 $dblue: #001F3F;
 $dblue2: #003b5a;
 
+$shop: $dark-trans;
+$shop2: $dark;
+$shop3: $dblue2;
+
 $maincolor: $dark;
 // COLOR //
 
@@ -43,26 +47,26 @@ $res: 52em;
 // MAIN //
 
 body {
-background-color: $white;
-color: $dark;
-margin: 0;
+  background-color: $white;
+  color: $dark;
+  margin: 0;
 }
 
 
 input:focus {
-    outline: none;
+  outline: none;
 }
 textarea:focus {
-    outline: none;
+  outline: none;
 }
 select:focus {
-    outline: none;
+  outline: none;
 }
 input:focus, textarea:focus, select:focus {
-    outline: none;
+  outline: none;
 }
 :focus {
-    outline: none;
+  outline: none;
 }
 img {
   max-width: 100%;
@@ -321,16 +325,17 @@ nav.pagination {
 }
 
 button {
-  background-color: $dark;
+  background-color: $dark-trans;
   border: 0;
   border-radius: 3px;
   color: $white;
   padding: 0.5em 0.7em;
   @include transition-duration(0.2s);
   cursor: pointer;
-}
-button:hover, button:focus {
-  background-color: $link;
+  
+  &:hover, &:focus {
+    background-color: $link;
+  }
 }
 
 
@@ -363,9 +368,11 @@ button:hover, button:focus {
 	outline: none;
     padding: 0.4em 0 0.4em 0.6em;
     cursor: pointer;
-  }
-  button:hover, button:focus {
-    color: $link;
+    
+    &:hover, &:focus {
+      color: $link;
+      background-color: transparent;
+    }
   }
 }
 
@@ -450,11 +457,12 @@ nav {
 	margin: 0;
 
 	a {
-		color: $white;
-	}
-	a:hover, a:focus {
-    border-bottom: 2px solid $white;
-	}
+      color: $white;
+      
+	  &:hover, &:focus {
+        border-bottom: 2px solid $white;
+	  }
+    }
 	.current-menu-item a {
 	border-bottom: 2px solid $white;
 	}
@@ -498,10 +506,14 @@ footer {
   a:visited,
   a:active {
     color: #fff;
+    
+    &:hover, &:focus {
+      border-bottom: 2px solid $white;
+      color: #fff;
+    }
   }
-  a:hover, a:focus {
+  .current-menu-item a {
     border-bottom: 2px solid $white;
-    color: #fff;
   }
   ul {
     list-style: none;
@@ -558,9 +570,10 @@ footer {
   
   a {
     color: $link;
-  }
-  a:hover, a:focus {
-    border-bottom: 0px solid black;
+    
+    &:hover, &:focus {
+      border-bottom: 0px solid black;
+    }
   }
   
   .comments-title {
