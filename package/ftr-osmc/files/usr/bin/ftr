@@ -12,7 +12,7 @@ dbus-uuidgen > /var/lib/dbus/machine-id
 depmod
 if [ -f $PRESEED_FILE ]
 then
-    sed 's/^M$//' -i /boot/preseed.cfg
+    sed 's/^M$//' -i $PRESEED_FILE
     python /usr/bin/preseed &
 fi
 ssh-keygen -f $DSA_KEY -N '' -t dsa &
