@@ -107,7 +107,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 
 	def onClick(self, controlID):
-		log('coooooooooooooonfigeditor: ', controlID)
+		log('coooooooooooooonfigeditor: %s' % controlID)
 
 		if controlID == SAVE:
 			log('coooooooooooooonfigeditor: SAVE')
@@ -170,7 +170,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 						if d:
 
-							self.check_for_duplicates(d)
+							self.check_for_duplicates(d, True)
 
 							item.setLabel(d)
 							self.changed = True
