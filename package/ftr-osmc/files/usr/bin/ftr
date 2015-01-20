@@ -9,6 +9,6 @@ ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa > /dev/null 2>&1
 ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa > /dev/null 2>&1
 dbus-uuidgen > /var/lib/dbus/machine-id
 depmod >/dev/null 2>&1
-sed 's/^M$//' -i /boot/preseed.cfg # Remove Windows line endings
-python /usr/bin/preseed >/dev/null 2>&1
+sed 's/^M$//' -i /boot/preseed.cfg >/dev/null 2>&1 # Remove Windows line endings
+if [ -f /boot/preseed.cfg ]; then python /usr/bin/preseed >/dev/null 2>&1; fi
 touch /.setup
