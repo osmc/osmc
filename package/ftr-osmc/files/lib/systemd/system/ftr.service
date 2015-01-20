@@ -4,8 +4,7 @@ After=local-fs.target
 Requires=connman.service
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
 ExecStart=/usr/bin/ftr
 
 [Install]
