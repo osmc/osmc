@@ -123,8 +123,8 @@ then
 		sed '/Version/d' -i files/DEBIAN/control
 		echo "Version: $VERSION" > files/DEBIAN/control
 	fi
-	test "$1" == atv && echo "Package: atv-mediacenter-osmc" >> files/DEBIAN/control
-	test "$1" == rbp && echo "Package: rbp-mediacenter-osmc" >> files/DEBIAN/control
+	test "$1" == atv && echo "Package: atv-mediacenter-next-osmc" >> files/DEBIAN/control
+	test "$1" == rbp && echo "Package: rbp-mediacenter-next-osmc" >> files/DEBIAN/control
 	pushd kodi/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
