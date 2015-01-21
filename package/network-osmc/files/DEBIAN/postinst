@@ -2,6 +2,11 @@
 systemctl enable connman.service >/dev/null 2>&1
 
 ischroot
-if [ $? == 0 ]; then exit 0; fi
+if [ $? == 0 ]
+then
+    systemctl disable bluetooth.service # Don't enable bluetooth by default
+    exit 0
+fi
+ then exit 0; fi
 
 systemctl start connman.service
