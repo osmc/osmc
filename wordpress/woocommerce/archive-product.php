@@ -19,7 +19,7 @@ get_header( 'shop' ); ?>
   		<?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
         <h1 class="page-title" itemprop="headline"><?php woocommerce_page_title(); ?></h1>
             <div class="byline vcard">
-              <p>Buy all your shit right here!</p>
+              <p>Get everything you need to get up and running right here</p>
                 <div class="cat"></div>
             </div>
 		<?php endif; ?>
