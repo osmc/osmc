@@ -109,6 +109,7 @@ class Main(object):
 				self.skindir = xbmc.getSkinDir()
 
 				try:
+					log('skin changed, reloading gui')
 					del self.stored_gui
 				except:
 					pass
@@ -158,7 +159,7 @@ class Main(object):
 
 					# if the gui calls for its own refresh, then delete the existing one and open a new instance
 
-					del self.stored_gui
+					# del self.stored_gui
 
 					self.open_gui()
 

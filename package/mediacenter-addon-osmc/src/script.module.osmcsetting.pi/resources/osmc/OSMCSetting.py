@@ -128,6 +128,9 @@ class OSMCSettingClass(object):
 		self.addonid = addonid
 		self.me = xbmcaddon.Addon(self.addonid)
 
+		# this is what is displayed in the main settings gui
+		self.shortname = 'Pi Config'
+
 		self.description = 	"""This is the text that is shown on the OSG. [CR][CR]It should describe:[CR]   - what the settings module is for,[CR]   - the settings it controls,[CR]   - and anything else you want, I suppose."""
 
 		self.description = 	"""The Raspberry Pi doesn't have a conventional BIOS. System configuration parameters are stored in a "config.txt" file. For more detail, visit http://elinux.org/RPiconfig[CR]

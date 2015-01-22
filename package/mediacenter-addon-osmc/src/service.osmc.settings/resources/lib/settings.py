@@ -74,8 +74,13 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			# place the items into the gui
 			for i, module in enumerate(self.live_modules):
 
+				try:
+					shortname = module['SET'].shortname
+				except:
+					shortname = ''
+
 				# set the icon (texturefocus, texturenofocus)
-				list_item = xbmcgui.ListItem(label=module['id'], label2='', thumbnailImage = module['FX_Icon'])
+				list_item = xbmcgui.ListItem(label=shortname, label2='', thumbnailImage = module['FX_Icon'])
 				list_item.setProperty('FO_ICON', module['FO_Icon'])
 
 				# grab the modules description for display in the textbox
@@ -112,18 +117,13 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 		# log(action)
 
 		actionID = action.getId()
+		focused_control = self.getFocusId()
 
 		if (actionID in (10, 92)):
 			self.close()
 
+		elif focused_control == 4444:
 
-	def onClick(self, controlID):
-
-		if not (controlID - 5) % 100:
-
-			self.close()
-
-		elif controlID == 4444:
 			# previous menu
 			if self.active_page - 1 == 0:
 				new_page = self.number_of_pages
@@ -135,9 +135,11 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 			self.active_page = new_page
 
-			self.next_prev_direction_changer()
+			self.setFocusId((self.active_page * 100 ) + 5)
 
-		elif controlID == 6666:
+			# self.next_prev_direction_changer()
+
+		elif focused_control == 6666:
 			# next menu
 			if ( self.active_page + 1 ) > self.number_of_pages:
 				new_page = 1
@@ -149,7 +151,45 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 			self.active_page = new_page
 
-			self.next_prev_direction_changer()
+			self.setFocusId((self.active_page * 100 ) + 5)
+
+			# self.next_prev_direction_changer()
+
+
+
+	def onClick(self, controlID):
+
+		if not (controlID - 5) % 100:
+
+			self.close()
+
+			# elif controlID == 4444:
+			# 	# previous menu
+			# 	if self.active_page - 1 == 0:
+			# 		new_page = self.number_of_pages
+			# 	else:
+			# 		new_page = self.active_page - 1
+
+			# 	self.getControl(self.active_page * 100).setVisible(False)
+			# 	self.getControl(new_page * 100).setVisible(True)
+
+			# 	self.active_page = new_page
+
+			# 	self.next_prev_direction_changer()
+
+			# elif controlID == 6666:
+			# 	# next menu
+			# 	if ( self.active_page + 1 ) > self.number_of_pages:
+			# 		new_page = 1
+			# 	else:
+			# 		new_page = self.active_page + 1
+
+			# 	self.getControl(self.active_page * 100).setVisible(False)
+			# 	self.getControl(new_page * 100).setVisible(True)
+
+			# 	self.active_page = new_page
+
+			# 	self.next_prev_direction_changer()
 
 		else:
 

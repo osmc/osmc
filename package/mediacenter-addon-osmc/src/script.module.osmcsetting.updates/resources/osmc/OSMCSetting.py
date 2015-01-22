@@ -111,6 +111,9 @@ class OSMCSettingClass(object):
 		self.addonid = "script.module.osmcsetting.updates"
 		self.me = xbmcaddon.Addon(self.addonid)
 
+		# this is what is displayed in the main settings gui
+		self.shortname = 'Updates'
+
 		self.description = 	"""OSMC is contantly in development, with new features and up-stream bug fixes becoming available periodically.
 [CR]Keep an eye out for the 'Update Available' icon on the Home screen of Kodi.
 [CR]The primary purpose of this module is to allow you to set the time at which OSMC will check for updates.

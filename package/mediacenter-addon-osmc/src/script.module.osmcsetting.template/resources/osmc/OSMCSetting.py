@@ -118,6 +118,9 @@ class OSMCSettingClass(object):
 		self.addonid = "script.module.osmcsetting.template"
 		self.me = xbmcaddon.Addon(self.addonid)
 
+		# this is what is displayed in the main settings gui
+		self.shortname = 'template'
+
 		self.description = 	"""
 								This is the text that is shown on the OSG. It should describe what the settings module is for,
 								the settings it controls, and anything else you want, I suppose.

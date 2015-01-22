@@ -129,6 +129,9 @@ class OSMCSettingClass(object):
 		self.addonid = "script.module.osmcsetting.networking"
 		self.me = xbmcaddon.Addon(self.addonid)
 
+		# this is what is displayed in the main settings gui
+		self.shortname = 'Network'
+
 		self.description = 	"""
 								This is network settings, it contains settings for the network. 
 								MORE TEXT SHOULD GO HERE

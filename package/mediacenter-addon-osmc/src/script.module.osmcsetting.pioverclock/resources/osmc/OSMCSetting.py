@@ -121,6 +121,9 @@ class OSMCSettingClass(object):
 
 		self.addonid = "script.module.osmcsetting.pioverclock"
 
+		# this is what is displayed in the main settings gui
+		self.shortname = 'Overclock'
+		
 		self.description = 	"""The Raspberry Pi can often be overclocked to improve performance. Overclock configuration parameters are stored in the "config.txt" file. For more detail, visit http://elinux.org/RPiconfig[CR]
 This module provides three recommended overclocking profiles but also allows you to edit the overclock settings in your config.txt.
 
