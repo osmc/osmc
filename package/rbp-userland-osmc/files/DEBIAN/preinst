@@ -1,2 +1,9 @@
 #!/bin/bash
-dpkg-divert --add --package rbp-userland-osmc --rename --divert /etc/kernel-img.conf.distributed /etc/kernel-img.conf
+PATH_ORIG="/etc/kernel-img.conf"
+PATH_DIV="/etc/kernel-img.conf.distributed"
+PACKAGE="rbp-userland-osmc"
+
+dpkg-divert --listpackage "$PATH_ORIG" | grep -q "$PACKAGE"
+if [ $? -ne 0 ] && [ "$1" = "upgrade" -o "$1" = "install" ]; then
+        dpkg-divert --add --package "$PACKAGE" --rename --divert "$PATH_DIV" "$PATH_ORIG"
+fi

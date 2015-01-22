@@ -1,3 +1,9 @@
 #!/bin/bash
+PATH_ORIG="/etc/kernel-img.conf"
+PATH_DIV="/etc/kernel-img.conf.distributed"
+PACKAGE="rbp-userland-osmc"
 
-dpkg-divert --remove --package rbp-userland-osmc --rename --divert /etc/kernel-img.conf.distributed /etc/kernel-img.conf
+dpkg-divert --listpackage "$PATH_ORIG" | grep -q "$PACKAGE"
+if [ $? -eq 0 ] && [ "$1" = "remove" ]; then
+	dpkg-divert --remove --package "$PACKAGE" --rename --divert "$PATH_DIV" "$PATH_ORIG"
+fi
