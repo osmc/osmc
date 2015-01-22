@@ -1,2 +1,3 @@
 #!/bin/bash
-systemctl enable ftr.service
+ischroot
+if [ $? -eq 0 ]; then systemctl enable ftr.service; fi
