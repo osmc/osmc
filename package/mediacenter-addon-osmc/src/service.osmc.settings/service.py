@@ -73,12 +73,15 @@ class Main(object):
 
 		# the gui is created and stored in memory for quick access
 		# after a few hours, the gui should be removed from memory
-		self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+		self.create_gui()
 		self.gui_last_accessed = datetime.datetime.now()
 		self.skip_check = True
 
 		# monitor created to check for xbmc abort requests
 		self.monitor = xbmc.Monitor()
+
+		# current skin directory, used to detect when the user has changed skins and prompts a reconstruction of the gui
+		self.skindir = xbmc.getSkinDir()
 
 		# daemon
 		self._daemon()
@@ -86,11 +89,32 @@ class Main(object):
 		log('_daemon exited')
 
 
+	def create_gui(self):
+
+		self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+
+
 	def _daemon(self):
 
 		log('daemon started')
 
 		while True:
+
+
+			# Check the current skin directory, if it is different to the previous one, then 
+			# recreate the gui. This is required because reference in the gui left in memory
+			# do not survive a refresh of the skins textures (???)
+			if self.skindir != xbmc.getSkinDir():
+
+				self.skindir = xbmc.getSkinDir()
+
+				try:
+					del self.stored_gui
+				except:
+					pass
+
+				self.create_gui()
+
 			
 			# if xbmc is aborting
 			if self.monitor.waitForAbort(1):
@@ -124,7 +148,7 @@ class Main(object):
 		
 				if response == 'open':
 
-					del self.stored_gui
+					del self.stored_gui  	# TESTING: this will mean that the gui is populated and loaded every time it opens
 
 					self.open_gui()
 
@@ -153,13 +177,7 @@ class Main(object):
 						ignore_list = ignore_list_raw.split('|')
 
 						# get sources list
-						query = {"jsonrpc": "2.0","id": 1, "method": "Files.GetSources", "params": {}}
-						xbmc_request = json.dumps(query)
-						result_raw = xbmc.executeJSONRPC(xbmc_request)
-						result = json.loads(result_raw)
-						media_dict_raw = result.get('result', {}).get('sources', {})
-						media_list_raw = [v.get('file', '') for k, v in media_dict_raw.iteritems()]
-						media_string = ''.join(media_list_raw)
+						media_string = self.get_sources_list()
 
 						# post dialogs to ask the user if they want to add the source, or ignore the device
 						if device_id not in ignore_list and device_id not in media_string:
@@ -190,6 +208,19 @@ class Main(object):
 		log('_daemon exiting')
 
 
+	def get_sources_list(self):
+
+		query = {"jsonrpc": "2.0","id": 1, "method": "Files.GetSources", "params": {}}
+		xbmc_request = json.dumps(query)
+		result_raw = xbmc.executeJSONRPC(xbmc_request)
+		result = json.loads(result_raw)
+		media_dict_raw = result.get('result', {}).get('sources', {})
+		media_list_raw = [v.get('file', '') for k, v in media_dict_raw.iteritems()]
+		media_string = ''.join(media_list_raw)
+
+		return media_string
+
+
 	def open_gui(self):
 
 		log('firstrun? %s' % __setting__('firstrun'))
@@ -206,12 +237,13 @@ class Main(object):
 			# if that doesnt work then it is probably because the gui was too old and has been deleted
 			# so recreate the gui and open it
 
-			self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+			self.create_gui()
 			self.gui_last_accessed = datetime.datetime.now()
 			self.skip_check = False
 
 			threading.Thread(target=self.stored_gui.open()).start()
 		log('gui threading finished')
+
 
 if __name__ == "__main__":
 
