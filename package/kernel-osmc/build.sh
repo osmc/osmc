@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp && VERSION="3.18.3" && REV="2"
+test $1 == rbp && VERSION="3.18.3" && REV="3"
 if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 pull_source "https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz" "$(pwd)/src/"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
@@ -26,9 +26,9 @@ then
 	pushd src/linux-*
 	install_patch "../../patches" "all"
 	test "$1" == "rbp" && install_patch "../../patches" "rbp"
-	make-kpkg --stem $1 kernel_image --append-to-version -osmc --jobs $JOBS --revision $REV
+	make-kpkg --stem $1 kernel_image --append-to-version -$REV-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
-	make-kpkg --stem $1 kernel_headers --append-to-version -osmc --jobs $JOBS --revision $REV
+	make-kpkg --stem $1 kernel_headers --append-to-version -$REV-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
 	popd
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
