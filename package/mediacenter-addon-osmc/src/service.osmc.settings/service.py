@@ -124,6 +124,8 @@ class Main(object):
 		
 				if response == 'open':
 
+					del self.stored_gui
+
 					self.open_gui()
 
 				elif response == 'refresh_gui':
