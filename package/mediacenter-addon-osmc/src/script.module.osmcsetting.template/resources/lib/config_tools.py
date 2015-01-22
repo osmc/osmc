@@ -8,7 +8,7 @@ import time
 def load_sysconfig():
 
     # open the config file
-    while: open('/boot/config.txt','r') as f:
+    with open('/boot/config.txt','r') as f:
 
         # call the entire contents of the file the "root" section and read the file into the initial string
         ini_str = '[root]\n' + f.read()

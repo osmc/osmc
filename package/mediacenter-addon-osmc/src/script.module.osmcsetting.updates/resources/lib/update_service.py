@@ -56,14 +56,12 @@ class Monitah(xbmc.Monitor):
 
 
 	def onSettingsChanged(self):
-		log('settings changed!!!!!!!!!!!!!!!!!!!!!!!')
 
 		msg = json.dumps(('update_settings', {}))
 
 		self.parent_queue.put(msg)
 
 		log(self.parent_queue, 'self.parent_queue')
-
 
 
 class Main(object):
