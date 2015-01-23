@@ -127,7 +127,7 @@
 					<top>314</top>
 					<width>500</width>
 					<height>45</height>
-					<font>Font42</font>
+					<font>OLD_Font42</font>
 					<label>$INFO[ListItem.TVShowTitle]</label>
 					<textcolor>TextColor1</textcolor>
 				</control>
@@ -136,7 +136,7 @@
 					<top>366</top>
 					<width>450</width>
 					<height>45</height>
-					<font>Font33</font>
+					<font>OLD_Font33</font>
 					<textcolor>TextColor2</textcolor>
 					<label>$INFO[ListItem.Title]</label>
 				</control>
@@ -145,7 +145,7 @@
 					<top>420</top>
 					<width>450</width>
 					<height>45</height>
-					<font>Font30</font>
+					<font>OLD_Font30</font>
 					<textcolor>TextColor3</textcolor>
 					<label>$INFO[ListItem.Season,$LOCALIZE[20373] , / ]$INFO[ListItem.Episode,$LOCALIZE[20359] ]</label>
 				</control>
@@ -186,7 +186,7 @@
 						<top>0</top>
 						<width>1018</width>
 						<height>90</height>
-						<font>Font36</font>
+						<font>OLD_Font36</font>
 						<label>$VAR[Label1]</label>
 						<textcolor>TextColor2</textcolor>
 					</control>
@@ -199,7 +199,7 @@
 						<texture>$VAR[StatusOverlay]</texture>
 						<colordiffuse>OverlayColorNF</colordiffuse>
 						<animation effect="fade" start="50" end="50" condition="true">Conditional</animation>
-						<visible>Skin.HasSetting(WatchedFlags)</visible>
+						<visible>!Skin.HasSetting(HideWatchedIcons)</visible>
 					</control>
 				</itemlayout>
 
@@ -209,7 +209,7 @@
 						<top>43</top>
 						<width>1018</width>
 						<height>48</height>
-						<font>Font48</font>
+						<font>OLD_Font48</font>
 						<label>$VAR[Label1]</label>
 						<textcolor>TextColor1</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
@@ -220,7 +220,7 @@
 						<top>100</top>
 						<width>1018</width>
 						<height>27</height>
-						<font>Font27</font>
+						<font>OLD_Font27</font>
 						<label>$VAR[Label2]</label>
 						<textcolor>TextColor2</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
@@ -235,7 +235,7 @@
 						<texture>$VAR[StatusOverlay]</texture>
 						<colordiffuse>OverlayColorFO</colordiffuse>
 						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(51)">Conditional</animation>
-						<visible>Skin.HasSetting(WatchedFlags)</visible>
+						<visible>!Skin.HasSetting(HideWatchedIcons)</visible>
 					</control>
 				</focusedlayout>
 
