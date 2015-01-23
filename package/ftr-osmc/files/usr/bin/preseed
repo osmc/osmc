@@ -89,8 +89,14 @@ def main():
 				syslog.syslog("WLAN key type is set to " + getvalue(line))
 				network["keytype"] = getvalue(line)
 			if line.startswith("d-i network/wlan_key string"):
-				syslog.syslog("WLAN key is set to " + getvalue(line))
-				network["keyvalue"] = getvalue(line)
+				wlan_key = getvalue(line)
+				key_length = len(wlan_key)
+				if key_length > 2:
+					log_key = wlan_key[0] + ( key_length - 2 ) * '*' + wlan_key[-1]
+				else:
+					log_key = wlan_key
+				syslog.syslog("WLAN key is set to " + log_key)
+				network["keyvalue"] = wlan_key
 
 		syslog.syslog("Parsing completed. Performing setup")
 		if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
