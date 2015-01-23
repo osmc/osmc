@@ -1,8 +1,32 @@
 #!/bin/bash
-if [ "$1" == "install" ]; then
-	dpkg-divert --add --package base-files-osmc --rename --divert /etc/issue.distributed /etc/issue
-	dpkg-divert --add --package base-files-osmc --rename --divert /etc/issue.net.distributed /etc/issue.net
-	dpkg-divert --add --package base-files-osmc --rename --divert /etc/os-release.distributed /etc/os-release
-	dpkg-divert --add --package base-files-osmc --rename --divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
-	dpkg-divert --add --package base-files-osmc --rename --divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
+
+remove_divert ()
+{
+	if dpkg-divert --listpackage "$2" | grep -q "$DPKG_MAINTSCRIPT_PACKAGE"; then
+		dpkg-divert --remove --package "$DPKG_MAINTSCRIPT_PACKAGE" --rename --divert "$1" "$2"
+		EXIT=$?; [ $EXIT -ne 0 ] && exit $EXIT
+	fi
+}
+install_divert ()
+{
+	if ! dpkg-divert --listpackage "$2" | grep -q "$DPKG_MAINTSCRIPT_PACKAGE"; then
+		dpkg-divert --add --package "$DPKG_MAINTSCRIPT_PACKAGE" --rename --divert "$1" "$2"
+		EXIT=$?; [ $EXIT -ne 0 ] && exit $EXIT
+	fi
+}
+
+[ -z "$DPKG_MAINTSCRIPT_PACKAGE" ] && exit 1
+if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+
+	# remove all diverts that prior versions of this package added which are no longer needed:
+	# remove_divert PATH_DIV PATH_ORIG
+
+	# install all diverts needed by this version of the package:
+	# install_divert PATH_DIV PATH_ORIG
+
+	install_divert /etc/issue.distributed /etc/issue
+	install_divert /etc/issue.net.distributed /etc/issue.net
+	install_divert /etc/os-release.distributed /etc/os-release
+	install_divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
+	install_divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
 fi
