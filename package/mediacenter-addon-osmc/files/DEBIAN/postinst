@@ -6,9 +6,9 @@ then
     rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pioverclock >/dev/null 2>&1
 fi
 
-for dir in /usr/share/kodi/addons/service.osmc.settings /usr/share/kodi/addons/script.module.osmcsetting.*
+for dir in /usr/share/kodi/addons/service.osmc.settings /usr/share/kodi/addons/service.osmc.settings/resources/lib \
+           /usr/share/kodi/addons/script.module.osmcsetting.* /usr/share/kodi/addons/script.module.osmcsetting.*/resources/lib \
+           /usr/share/kodi/addons/script.module.osmcsetting.*/resources/osmc
 do
-    pushd $dir >/dev/null 2>&1
-    pycompile . >/dev/null 2>&1
-    popd >/dev/null 2>&1
+    pushd $dir >/dev/null 2>&1 && pycompile . >/dev/null 2>&1 && popd >/dev/null 2>&1
 done
