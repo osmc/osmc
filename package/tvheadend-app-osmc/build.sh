@@ -14,13 +14,15 @@ then
 	echo -e "Building TVHeadend"
 	out=$(pwd)/files
 	sed '/Package/d' -i files/DEBIAN/control
+	rm -f files/etc/osmc/apps.d/*tvheadend-app-osmc
 	update_sources
 	handle_dep "pkg-config"
 	handle_dep "libssl-dev"
 	handle_dep "git" # for dvbscan info?
-	test $1 == gen && echo "Package: tvheadend-app-osmc" >> files/DEBIAN/control
-	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control
-	test $1 == armv7 && echo "Package: armv7-tvheadend-app-osmc" >> files/DEBIAN/control
+	test $1 == gen && echo "Package: tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/tvheadend-app-osmc"
+	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE = "files/etc/osmc/apps.d/rbp-tvheadend-app-osmc"
+	test $1 == armv7 && echo "Package: armv7-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE = "files/etc/osmc/apps.d/armv7-tvheadend-app-osmc"
+        echo -e "TVHeadend Server\n/lib/systemd/system/tvheadend.service" > $APP_FILE
 	pushd src
 	./configure --prefix=/usr
 	$BUILD
