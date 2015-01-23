@@ -47,7 +47,9 @@ get_header( 'shop' ); ?>
             <?php the_post_thumbnail( 'medium' ); ?>
           </div>
           <div class="column half info">
-            <?php the_content(); ?>
+            <h3>
+              Vero is OSMC’s flagship device. Vero is the Italian word for true and it fits in well with open source principles. Current devices out there serve as vehicles for selling you online content.<br><br>Vero brings users what they really want: performance, connectivity, power in a small package and the freedom to enjoy your existing content library. Vero will play almost anything you throw at it.
+            </h3>
           </div>
 		</div>
 		<div class="row clearfix feature2">

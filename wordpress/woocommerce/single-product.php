@@ -20,8 +20,9 @@ get_header( 'shop' ); ?>
         </div>
 		<?php while ( have_posts() ) : the_post(); ?>
 
-			<?php wc_get_template_part( 'content', 'single-product' ); ?>
-
+        <?php wc_get_template_part( 'content', 'single-product' ); ?>
+			
+        <div class="content"><?php the_content(); ?></div>
 		<?php endwhile; // end of the loop. ?>
     </div>
     <?php
