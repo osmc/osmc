@@ -9,19 +9,17 @@ remove_divert ()
 }
 
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-#if [ "$1" = "configure" ]; then
+if [ "$1" = "configure" ]; then
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
-#fi
 
-systemctl enable connman.service >/dev/null 2>&1
+	systemctl enable connman.service >/dev/null 2>&1
 
-ischroot
-if [ $? == 0 ]
-then
-    systemctl disable bluetooth.service # Don't enable bluetooth by default
-    exit 0
+	ischroot
+	if [ $? -eq 0 ]; then
+		systemctl disable bluetooth.service # Don't enable bluetooth by default
+		exit 0
+	fi
+	systemctl restart connman.service
 fi
-
-systemctl start connman.service
