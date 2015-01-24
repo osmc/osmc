@@ -1,7 +1,1 @@
 #!/bin/bash
-systemctl disable connman.service >/dev/null 2>&1
-
-ischroot
-if [ $? == 0 ]; then exit 0; fi
-
-systemctl stop connman.service
