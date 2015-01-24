@@ -95,6 +95,7 @@ class Main(object):
 								'user_update_now'			: self.user_update_now,
 								'kill_yourself'				: self.kill_yourself,
 								'settings_command'			: self.settings_command,
+								'apt_error'					: self.apt_error,
 
 							}
 
@@ -469,6 +470,18 @@ class Main(object):
 			self.position_icon()
 
 		log(self.scheduler.trigger_time, 'trigger_time')
+
+
+	# ACTION METHOD
+	def apt_error(self, **kwargs):
+
+		log('apt_updater encountered and error: \nException : %s \nPackage : %s \nError : %s' % (kwargs.get('exception','not provided'),kwargs.get('package','not provided'),kwargs.get('error','not provided')))
+
+		# kill the progress bar
+		self.progress_bar(kill=True)
+
+		# notify the user that an error has occured with an update
+		ok = DIALOG.ok(lang(32087), lang(32088) % package, lang(32089))
 
 
 	# ACTION METHOD

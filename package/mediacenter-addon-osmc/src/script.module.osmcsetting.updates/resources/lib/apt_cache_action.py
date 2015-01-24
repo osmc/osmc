@@ -53,6 +53,9 @@ class Main(object):
 		print '==================================================================='
 		print '%s %s running' % (t.now(), 'apt_cache_action.py')
 
+		self.error_package = ''
+		self.error_message = ''
+
 		self.action = action
 
 		self.cache = apt.Cache()
@@ -69,7 +72,10 @@ class Main(object):
 			self.act()
 		except Exception as e:
 			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
-			print e
+			print '%s %s exception value' % (t.now(), 'apt_cache_action.py', e)
+
+			# send the error to the parent (parent will kill the progress bar)
+			call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': e})
 
 		self.respond()
 
@@ -162,6 +168,9 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 
 	def error(self, pkg, errormsg):
+
+		self.error_package = pkg.shortname
+		self.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
 
