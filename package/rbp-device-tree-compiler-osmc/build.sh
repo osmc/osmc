@@ -18,6 +18,8 @@ then
 	$BUILD PREFIX=/usr
 	make install DESTDIR=$out
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
+	# This is weird...
+	mv $out/root $out/usr
 	strip_files "${out}"
 	popd
 	dpkg -b files/ rbp-device-tree-compiler-osmc.deb
