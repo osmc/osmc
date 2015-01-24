@@ -1,3 +1,19 @@
 #!/bin/bash
+
+remove_divert ()
+{
+	if dpkg-divert --listpackage "$2" | grep -q "$DPKG_MAINTSCRIPT_PACKAGE"; then
+		dpkg-divert --remove --package "$DPKG_MAINTSCRIPT_PACKAGE" --rename --divert "$1" "$2"
+		EXIT=$?; [ $EXIT -ne 0 ] && exit $EXIT
+	fi
+}
+
+[ -z "$DPKG_MAINTSCRIPT_PACKAGE" ] && exit 1
+if [ "$1" = "configure" ]; then
+
+	# remove only diverts that prior versions of this package added which are no longer needed:
+	# remove_divert PATH_DIV PATH_ORIG
+fi
+
 chmod +x /etc/profile.d/videocore.sh
 chmod +x /etc/profile.d/disable-update.sh
