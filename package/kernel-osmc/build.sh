@@ -30,6 +30,9 @@ then
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
+	test "$1" == "rbp" && make bcm2708-rpi-b.dtb && make bcm2708-rpi-b-plus.dtb
+	mkdir -p files/boot
+	cp arch/arm/boot/dts/*.dtb files/boot
 	popd
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
