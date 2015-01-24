@@ -6,6 +6,7 @@
 . ../common.sh
 
 # Build in native environment
+pull_source "https://github.com/samnazarko/atvclient/archive/master.zip" "$(pwd)/src"
 build_in_env "${1}" $(pwd) "atv-remote-osmc"
 if [ $? == 0 ]
 then
