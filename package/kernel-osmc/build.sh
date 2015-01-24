@@ -19,7 +19,7 @@ then
 	update_sources
 	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
-	if [ "$1" != "rbp"]
+	if [ "$1" != "rbp" ]
 	then
 		handle_dep "device-tree-compiler"
 	else
