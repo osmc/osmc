@@ -26,19 +26,16 @@ do
 done
 
 # Configure the target directory
-
 ARCH="i386"
 DIR="opt/osmc-tc/${tcstub}"
 RLS="jessie"
 
 # Remove existing build
-
 remove_existing_filesystem "{$wd}/{$DIR}"
 verify_action
 mkdir -p $DIR
 
 # Debootstrap (foreign)
-
 fetch_filesystem "--arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR}"
 verify_action
 
@@ -62,14 +59,10 @@ deb http://apt.osmc.tv jessie main
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="appletv-darwinx-osmc libcrystalhd-dev"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
-verify_action
-echo -e "Installing packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
