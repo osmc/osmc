@@ -12,7 +12,7 @@ fb_restore() {
 export TERM=linux
 sudo chown osmc:osmc /sys/class/vtconsole/vtcon*/bind
 
-if [ "$1" == "stop" ]; then
+if [ "$1" = "stop" ]; then
 	fb_restore
 	exit
 fi
@@ -38,12 +38,10 @@ while true; do
 	sudo chmod a+rw /dev/tty1
 	sudo systemctl status getty@tty1 >/dev/null; GETTY=$?
 	if [ "$GETTY" -ne 0 ]; then
+		sudo chvt 1
 		/usr/bin/setterm --cursor off >/dev/tty1
 		/usr/bin/clear >/dev/tty1
 		/usr/bin/ply-image "$CODE"
-	fi
-
-	if [ "$GETTY" -ne 0 ]; then
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
