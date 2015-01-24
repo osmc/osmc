@@ -60,15 +60,11 @@ deb http://apt.osmc.tv jessie main
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="rbp-userland-dev-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
-verify_action
-echo -e "Installing packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
