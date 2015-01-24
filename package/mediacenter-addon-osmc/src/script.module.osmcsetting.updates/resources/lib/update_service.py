@@ -707,6 +707,8 @@ class Main(object):
 		# SUPPRESS FOR TESTING
 		if not any(['osmc' in x.shortname.lower() for x in available_updates]):
 			log('There are no osmc packages')
+			for y in available_updates:
+				log('package: %s' % y.shortname.lower())
 			return
 			
 		if not available_updates: return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
