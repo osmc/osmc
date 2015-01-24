@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-tcstub="osmc-appletv-toolchain"
+tcstub="atv-toolchain-osmc"
 
 make clean
 
