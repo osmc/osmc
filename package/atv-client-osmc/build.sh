@@ -7,10 +7,10 @@
 
 # Build in native environment
 pull_source "https://github.com/samnazarko/atvclient/archive/master.zip" "$(pwd)/src"
-build_in_env "${1}" $(pwd) "atv-remote-osmc"
+build_in_env "${1}" $(pwd) "atv-client-osmc"
 if [ $? == 0 ]
 then
-	echo -e "Building atv-remote"
+	echo -e "Building atvclient"
 	out=$(pwd)/files
 	make clean
 	update_sources
@@ -22,6 +22,6 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	dpkg -b files/ atv-remote-osmc.deb
+	dpkg -b files/ atv-client-osmc.deb
 fi
 teardown_env "${1}"
