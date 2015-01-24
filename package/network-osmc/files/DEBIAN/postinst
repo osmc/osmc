@@ -8,12 +8,12 @@ remove_divert ()
 	fi
 }
 
-[ -z "$DPKG_MAINTSCRIPT_PACKAGE" ] && exit 1
-if [ "$1" = "configure" ]; then
+if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
+#if [ "$1" = "configure" ]; then
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
-fi
+#fi
 
 systemctl enable connman.service >/dev/null 2>&1
 

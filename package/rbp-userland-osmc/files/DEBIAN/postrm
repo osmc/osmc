@@ -8,7 +8,7 @@ remove_divert ()
 	fi
 }
 
-[ -z "$DPKG_MAINTSCRIPT_PACKAGE" ] && exit 1
+if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
 if [ "$1" = "remove" ]; then
 
 	# remove all diverts that this version _and_ all prior versions of the package once added:
