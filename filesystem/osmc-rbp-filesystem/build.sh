@@ -87,9 +87,6 @@ verify_action
 echo -e "	* Configuring fstab"
 create_base_fstab ${DIR}
 verify_action
-echo -e "	* Holding back packages"
-prevent_pkg_install "${DIR}" "xbmc"
-verify_action
 echo -e "	* Configuring TTYs"
 conf_tty ${DIR}
 verify_action

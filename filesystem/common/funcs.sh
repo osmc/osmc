@@ -42,13 +42,6 @@ ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters">${1}/etc/hosts
 }
 
-function prevent_pkg_install()
-{
-	echo "Package: ${2}
-Pin: release \*
-Pin-Priority: -1" > ${1}/etc/apt/preferences.d/${2}
-}
-
 function create_fs_tarball()
 {
 	echo -e "Creating filesystem tarball"
@@ -84,7 +77,6 @@ export CHROOT_PKGS
 export -f setup_osmc_user
 export -f setup_hostname
 export -f setup_hosts
-export -f prevent_pkg_install
 export -f create_fs_tarball
 export -f disable_init
 export -f enable_init
