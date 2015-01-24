@@ -19,7 +19,12 @@ then
 	update_sources
 	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
-	handle_dep "device-tree-compiler"
+	if [ "$1" != "rbp"]
+	then
+		handle_dep "device-tree-compiler"
+	else
+		handle_dep "rbp-device-tree-compiler-osmc"
+	fi
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
 	priority := High" >/etc/kernel-pkg.conf
@@ -31,9 +36,28 @@ then
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
-	test "$1" == "rbp" && make bcm2708-rpi-b.dtb && make bcm2708-rpi-b-plus.dtb
-	mkdir -p files/boot
-	cp arch/arm/boot/dts/*.dtb files/boot
+	if [ "$1" == "rbp" ]
+	then
+		mkdir -p files/boot/overlays
+		make bcm2708-rpi-b.dtb
+		make bcm2708-rpi-b-plus.dtb
+		mv arch/arm/boot/dts/*.dtb files/boot
+		overlays = "hifiberry-dac-overlay
+		hifiberry-dacplus-overlay
+		hifiberry-digi-overlay
+		iqaudio-dac-overlay
+		iqaudio-dacplus-overlay
+		lirc-rpi-overlay
+		w1-gpio-overlay
+		w1-gpio-pullup-overlay"
+		pushd arch/arm/boot/dts
+		for dtb in $overlays
+		do
+			dtc -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
+		done
+		popd
+		mv arch/arm/boot/dts/*-overlay.dtb files/boot/overlays
+	fi
 	popd
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
