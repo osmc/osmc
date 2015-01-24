@@ -5,4 +5,4 @@
 
 echo -e "Building package Darwin Cross for AppleTV"
 make clean
-dpkg -b files/ appletv-darwin-cross-osmc.deb
+dpkg -b files/ atv-darwin-cross-osmc.deb
