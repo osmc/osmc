@@ -1,0 +1,48 @@
+#!/bin/sh
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=atvclient
+SCRIPTNAME=/etc/init.d/$NAME
+
+atvclient=/usr/local/sbin/atvclient
+pidfile=/tmp/atvclient.pid
+
+defaults="/etc/default/atvclient"
+
+ARGS=""
+
+if [ -f "$defaults" ]; then
+	. "$defaults"
+fi
+
+do_start()
+{
+	start-stop-daemon -b -m --pidfile "$pidfile" --exec "$atvclient" --start -- $OPTIONS
+	return 0
+}
+
+do_stop()
+{
+	start-stop-daemon --stop --pidfile "$pidfile"
+	return 0
+}
+
+case "$1" in
+  start)
+	do_start
+	;;
+  stop)
+	do_stop
+	;;
+  restart|reload|force-reload)
+	do_stop
+	sleep 5
+	do_start
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
+
+exit 0
