@@ -66,6 +66,9 @@ verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
+echo -e "Installing packages"
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+verify_action
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
