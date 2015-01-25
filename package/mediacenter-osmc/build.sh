@@ -7,7 +7,7 @@
 
 if [ "$1" == "rbp" ]
 then
-pull_source "https://github.com/popcornmix/xbmc/archive/helix_rbp_backports.tar.gz" "$(pwd)/kodi"
+pull_source "https://github.com/xbmc/xbmc/archive/14.0-Helix.tar.gz" "$(pwd)/kodi"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
