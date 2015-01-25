@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp && VERSION="3.18.3" && REV="7"
+test $1 == rbp && VERSION="3.18.3" && REV="8"
 if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 pull_source "https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz" "$(pwd)/src/"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
