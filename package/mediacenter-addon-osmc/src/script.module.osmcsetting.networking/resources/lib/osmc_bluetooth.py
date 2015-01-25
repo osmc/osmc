@@ -3,6 +3,7 @@ import bluetooth
 import subprocess
 import sys
 
+DEVICE_PATH = 'org.bluez.Device1' 
 PAIRING_AGENT = 'osmc_bluetooth_agent.py'
 
 
@@ -18,11 +19,11 @@ def toggle_bluetooth_state(state):
     connman.toggle_technology_state('bluetooth', state)
 
 
-def get_bluetooth_property(key):
+def get_adapter_property(key):
     return bluetooth.get_adapter_property(key)
 
 
-def set_bluetooth_property(key, value):
+def set_adapter_property(key, value):
     bluetooth.set_adapter_property(key, value)
 
 
@@ -100,8 +101,8 @@ def list_devices(filterkey=None, expectedvalue=None):
     devices = {}
     managed_objects = bluetooth.get_managed_objects()
     for path in managed_objects.keys():
-        if path.startswith('/org/bluez/hci') and 'org.bluez.Device1' in managed_objects[path].keys():
-                dbus_dict = managed_objects[path]['org.bluez.Device1']
+        if path.startswith('/org/bluez/hci') and DEVICE_PATH in managed_objects[path].keys():
+                dbus_dict = managed_objects[path][DEVICE_PATH]
                 device_dict = {}
                 # remove dbus.String from the key
                 for key in dbus_dict:
