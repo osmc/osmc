@@ -119,23 +119,8 @@ class Main(object):
 			
 			# if xbmc is aborting
 			if self.monitor.waitForAbort(1):
-				# try to kill the gui and comms
-				try:
-					log('Stopping listener (in wait)')
-					self.listener.stop()
-					log('Deleting listener (in wait)')
-					del self.listener
-					log('Listener deleted.')
-
-				except:
-					log('Failed to stop/delete listener. (in wait)')	
 				
-				try:		
-					log('Closing gui')
-					self.stored_gui.close()
-					
-				except:
-					log('Failed to stop/delete stored_gui. (in wait)')	
+				self.exit()
 
 				break
 
@@ -162,6 +147,11 @@ class Main(object):
 					# del self.stored_gui
 
 					self.open_gui()
+
+				elif response == 'exit':
+
+					self.exit()
+					break
 
 				elif 'new_device:' in response:
 
@@ -208,6 +198,26 @@ class Main(object):
 
 		log('_daemon exiting')
 
+
+	def exit(self):
+		
+		try:		
+			log('Closing gui')
+			self.stored_gui.close()
+		except:
+			log('Failed to stop/delete stored_gui. (in wait)')	
+			
+		# try to kill the gui and comms
+		try:
+			log('Stopping listener (in wait)')
+			self.listener.stop()
+			log('Deleting listener (in wait)')
+			del self.listener
+			log('Listener deleted.')
+
+		except:
+			log('Failed to stop/delete listener. (in wait)')	
+			
 
 	def get_sources_list(self):
 

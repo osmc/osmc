@@ -290,7 +290,7 @@ class OSMCGui(object):
 			Closes the gui, and deletes it from memory.
 		'''
 
-		pass
+		self.GUI.close()
 
 
 

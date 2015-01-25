@@ -109,7 +109,7 @@ class Main(object):
 	def commit(self):
 
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
-		self.cache.upgrade()
+		self.cache.upgrade(True)
 
 		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
 
@@ -133,7 +133,7 @@ class Main(object):
 
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 
-		self.cache.upgrade()
+		self.cache.upgrade(True)
 
 		print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
 

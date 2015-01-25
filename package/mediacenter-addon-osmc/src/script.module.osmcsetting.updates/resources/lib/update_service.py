@@ -7,6 +7,7 @@ import subprocess
 import Queue
 import random
 import json
+import socket
 
 # Kodi Modules
 import xbmc
@@ -36,6 +37,13 @@ def lang(id):
 def log(message, label = ''):
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
+
+def exit_osmc_settings_addon():
+	address = '/var/tmp/osmc.settings.sockfile'
+	sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+	sock.connect(address)
+	sock.sendall('exit')
+	sock.close()
 
 
 class Monitah(xbmc.Monitor):
@@ -244,6 +252,9 @@ class Main(object):
 				exit_install = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
 				if exit_install:
+
+					exit_osmc_settings_addon()
+					xbmc.sleep(1000)
 
 					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])
 
@@ -603,6 +614,9 @@ class Main(object):
 			if self.s['on_upd_detected'] == 5:
 				# Download, install, auto-restart if needed
 
+				exit_osmc_settings_addon()
+				xbmc.sleep(1000)
+
 				xbmc.executebuiltin('Reboot')
 
 			else:
@@ -618,6 +632,9 @@ class Main(object):
 
 				if reboot:
 
+					exit_osmc_settings_addon()
+					xbmc.sleep(1000)
+					
 					xbmc.executebuiltin('Reboot')
 
 				else:
@@ -642,6 +659,9 @@ class Main(object):
 
 		elif self.s['on_upd_detected'] == 5:
 			# Download, install, auto-restart if needed
+
+			exit_osmc_settings_addon()
+			xbmc.sleep(1000)
 
 			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
 
@@ -674,6 +694,9 @@ class Main(object):
 
 			else:
 
+				exit_osmc_settings_addon()
+				xbmc.sleep(1000)
+
 				subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])			
 
 
@@ -693,7 +716,7 @@ class Main(object):
 			return
 
 		try:
-			self.cache.upgrade()
+			self.cache.upgrade(True)
 		except:
 			log('apt cache failed to upgrade')
 			return
@@ -706,6 +729,7 @@ class Main(object):
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
 		if not any(['osmc' in x.shortname.lower() for x in available_updates]):
+			self.window.setProperty('OSMC_notification', 'false')
 			log('There are no osmc packages')
 			for y in available_updates:
 				log('package: %s' % y.shortname.lower())
