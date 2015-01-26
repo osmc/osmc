@@ -24,7 +24,7 @@ def lang(id):
 
 
 def log(message):
-	xbmc.log('OSMC PI OVERCLOCK' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC PI Config Editor' + str(message), level=xbmc.LOGDEBUG)
 
 
 class ConfigEditor(xbmcgui.WindowXMLDialog):
@@ -34,6 +34,9 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 		# give the settings enough time to be saved to the config.txt
 		xbmc.sleep(150)
+
+		# list of settings that are ignored in the duplicate check
+		self.ignore_list = ['dtoverlay', 'device_tree', 'device_tree_param', 'device_tree_overlay']
 
 		self.del_string = ' [' + lang(32056) + ']'
 
@@ -51,7 +54,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 			with open(self.config, 'r') as f:
 				self.lines = f.readlines()
 
-		log('coooooooooooooonfigeditor: %s' % self.lines)
+		log('lines = %s' % self.lines)
 
 		self.lines = [line.replace('\n','') for line in self.lines if line not in ['\n', '', '\t']]
 		
@@ -93,7 +96,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 		self.setFocus(self.list_control)
 
 		# check for duplications, warn the user if there are duplicates
-		dup_check = [x.split('=')[0] for x in self.grab_item_strings() if '=' in x]
+		dup_check = [y for y in [x.split('=')[0] for x in self.grab_item_strings() if '=' in x] if y not in self.ignore_list]
 		if len(dup_check) != len(set(dup_check)):
 			ok = DIALOG.ok(lang(32051), lang(32065), lang(32066))
 
@@ -102,15 +105,15 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 		actionID = action.getId()
 		if (actionID in (ACTION_PREVIOUS_MENU, ACTION_NAV_BACK)):
-			log('coooooooooooooonfigeditor: CLOSE')
+			log('CLOSE')
 			self.close()
 
 
 	def onClick(self, controlID):
-		log('coooooooooooooonfigeditor: %s' % controlID)
+		log('%s' % controlID)
 
 		if controlID == SAVE:
-			log('coooooooooooooonfigeditor: SAVE')
+			log('SAVE')
 
 			if self.changed:
 
@@ -118,7 +121,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 				if final_action:
 
-					log('coooooooooooooonfigeditor: final action')
+					log('final action')
 
 					new_config = self.grab_item_strings()
 
@@ -129,7 +132,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 					with open(tmp_loc,'w') as f:
 						for line in new_config:
 							f.write(line.replace(" = ","=") + '\n')
-							log('coooooooooooooonfigeditor: ' + line)
+							log('' + line)
 
 					# backup existing config
 					suffix = '_' + str(time.time()).split('.')[0]
@@ -145,7 +148,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 					except:
 						pass
 
-					log('coooooooooooooonfigeditor: writing ended')
+					log('writing ended')
 
 			self.close()
 
@@ -210,14 +213,16 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 
 	def check_for_duplicates(self, d, edit=False):
-
+		
+		
 		if '=' in d:
 			dupe_check_raw = self.grab_item_strings()
 			dupe_check = [x.split('=')[0] for x in dupe_check_raw]
 
 			dupe = d.split('=')[0]
 
-			if (edit and dupe_check.count(dupe) > 1) or (not edit and dupe in dupe_check):
+
+			if dupe not in self.ignore_list and ((edit and dupe_check.count(dupe) > 1) or (not edit and dupe in dupe_check)):
 
 				ok = DIALOG.ok(lang(32051), lang(32067), lang(32066))
 
@@ -241,14 +246,14 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 if __name__ == "__main__":
 
-	log('coooooooooooooonfigeditor: OPEN')
+	log('OPEN')
 	CE = ConfigEditor("DialogSelect.xml", scriptPath, 'Default')
 	
 	CE.doModal()
 	
 	del CE
 
-	log('coooooooooooooonfigeditor: CLOSED')
+	log('CLOSED')
 	
 	xbmc.sleep(150)
 

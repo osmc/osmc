@@ -233,6 +233,10 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': 'false',
 																		'translate': self.translate_bool,
 																	},
+									'dtoverlay':				{'setting_value' : '',
+																	'default': '',
+																		'translate': self.translate_dtoverlay,
+																	},																	
 									# 'other_settings_string': 	{'setting_value' : '',
 									# 								'default': '',
 									# 									'translate': self.translate_other_string
@@ -287,6 +291,8 @@ Overclock settings are set using the Pi Overclock module."""
 		# but I am going to set up my own process in addition to the xml one, I will be reading some
 		# settings from the config.txt, and getting the rest from the settings.xml
 		self.config_settings = ct.read_config(self.test_config)
+
+		log('Config settings received from the parser: %s' % self.config_settings)
 
 		# cycle through the pi_settings_dict dict, and populate with the settings values
 		for key in self.pi_settings_dict.keys():
@@ -580,6 +586,80 @@ Overclock settings are set using the Pi Overclock module."""
 	# 		self.unknown_setting_keys = list(new_unknown_settings_keys)
 
 	# 		return new_unknown_settings
+
+	def translate_dtoverlay(self, data, reverse=False):
+		'''
+			Parses the dtoverlay list. There can be multiple dtoverlays, so the config_tool puts them all into 
+			a single list.
+		'''
+
+		overlay_settings 		= 	{
+		'hifiberry-dac-overlay'		: {'dacplus': 'false', 'setting': ['soundcard_dac'], 'value': '1'},
+		'iqaudio-dac-overlay'		: {'dacplus': 'false', 'setting': ['soundcard_dac'], 'value': '2'},
+		'hifiberry-digi-overlay'	: {'dacplus': 'irr', 'setting': ['soundcard_dac', 'soundcard_dacplus'], 'value': '3'},
+		'hifiberry-dacplus-overlay'	: {'dacplus': 'true', 'setting': ['soundcard_dacplus'], 'value': '1'},
+		'iq-audio-dacplus-overlay'	: {'dacplus': 'true', 'setting': ['soundcard_dacplus'], 'value': '2'},
+		'w1-gpio-overlay'			: {'dacplus': 'irr', 'setting': ['w1gpio'], 'value': '1'},
+		'w1-gpio-pullup-overlay'	: {'dacplus': 'irr', 'setting': ['w1gpio'], 'value': '2'},
+		'lirc-rpi-overlay'			: {'dacplus': 'irr', 'setting': ['lirc-rpi-overlay'], 'value': 'true'}
+									}
+
+		dac 	= ['hifiberry-dac-overlay', 'iqaudio-dac-overlay', 'hifiberry-digi-overlay']
+		dacplus = ['hifiberry-dacplus-overlay','iq-audio-dacplus-overlay','hifiberry-digi-overlay']
+		w1gpio  = ['w1-gpio-overlay', 'w1-gpio-pullup-overlay']
+
+		datalist = data.split('\n')
+
+		if not reverse:
+			self.me.setSetting('dacplus', 'false')
+			self.me.setSetting('lirc-rpi-overlay', 'false')
+			self.me.setSetting('soundcard_dac', '0')
+			self.me.setSetting('soundcard_dacplus', '0')
+			self.me.setSetting('w1gpio', '0')
+			for overlay in datalist:
+				ovl = overlay_settings.get(overlay, {})
+				dcp = ovl.get('dacplus', 'irr')
+				stg = ovl.get('setting', [])
+				val = ovl.get('value'  , 'irr')
+				if dcp != 'irr':
+					self.me.setSetting('dacplus', dcp)
+				for group in stg:
+					self.me.setSetting(group, val)
+
+		else:
+			new_dtoverlay = []
+
+			dcp = self.me.getSetting('dacplus')
+			
+			if dcp == 'true':
+				pos = self.me.getSetting('soundcard_dacplus')
+				if pos != '0':
+					new_dtoverlay.append(dacplus[int(pos)-1])
+				else:
+					new_dtoverlay.extend([x + '[remove]' for x in dacplus])
+
+			else:
+				pos = self.me.getSetting('soundcard_dac')
+				if pos != '0':
+					new_dtoverlay.append(dac[int(pos)-1])
+				else:
+					new_dtoverlay.extend([x + '[remove]' for x in dac])
+
+			wgp = self.me.getSetting('w1gpio')
+
+			if wgp != '0':
+				new_dtoverlay.append(w1gpio[int(wgp)-1])
+			else:
+				new_dtoverlay.extend([x + '[remove]' for x in w1gpio])
+
+			rpi = self.me.getSetting('lirc-rpi-overlay')
+
+			if rpi == 'true':
+				new_dtoverlay.append('lirc-rpi-overlay')
+			else:
+				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
+
+			return new_dtoverlay
 
 
 	def translate_store_hdmi(self, data, reverse=False):
