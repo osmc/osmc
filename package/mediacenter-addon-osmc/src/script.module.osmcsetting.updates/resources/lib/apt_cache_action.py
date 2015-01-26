@@ -74,8 +74,10 @@ class Main(object):
 			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
 			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
+			deets = 'Error Type and Args: %s : %s' % (type(e).__name__, e.args)
+
 			# send the error to the parent (parent will kill the progress bar)
-			call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': e})
+			call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': deets})
 
 		self.respond()
 
@@ -169,7 +171,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 	def error(self, pkg, errormsg):
 
-		self.error_package = pkg.shortname
+		self.error_package = pkg.name
 		self.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''

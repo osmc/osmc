@@ -486,7 +486,9 @@ class Main(object):
 	# ACTION METHOD
 	def apt_error(self, **kwargs):
 
-		log('apt_updater encountered and error: \nException : %s \nPackage : %s \nError : %s' % (kwargs.get('exception','not provided'),kwargs.get('package','not provided'),kwargs.get('error','not provided')))
+		package = kwargs.get('package','not provided')
+
+		log('apt_updater encountered and error: \nException : %s \nPackage : %s \nError : %s' % (kwargs.get('exception','not provided'),package,kwargs.get('error','not provided')))
 
 		# kill the progress bar
 		self.progress_bar(kill=True)
