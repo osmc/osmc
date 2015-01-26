@@ -34,7 +34,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         # Populate the list frame
         self.name_list      = self.getControl(6)
-        sself.name_list.setEnabled(True)
+        self.name_list.setEnabled(True)
 
         # Set action when clicking right from the Save button
         self.ok.controlRight(self.name_list)
@@ -43,7 +43,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
         for i, service_tup in enumerate(self.service_list):
             # populate the random list
             service, status = service_tup
-            self.tmp = xbmcgui.ListItem(service)
+            self.tmp = xbmcgui.ListItem(label=service, label2=status)
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
