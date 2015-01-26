@@ -133,9 +133,10 @@ class Main(object):
 				self.parent_queue.task_done()
 		
 				if response == 'open':
-
-					del self.stored_gui  	# TESTING: this will mean that the gui is populated and loaded every time it opens
-
+					try:
+						del self.stored_gui  	# TESTING: this will mean that the gui is populated and loaded every time it opens
+					except:
+						pass
 					self.open_gui()
 
 				elif response == 'refresh_gui':
