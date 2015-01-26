@@ -72,7 +72,7 @@ class Main(object):
 			self.act()
 		except Exception as e:
 			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
-			print '%s %s exception value' % (t.now(), 'apt_cache_action.py', e)
+			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
 			# send the error to the parent (parent will kill the progress bar)
 			call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': e})
