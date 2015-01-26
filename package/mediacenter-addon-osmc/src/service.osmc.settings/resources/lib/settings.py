@@ -330,12 +330,15 @@ class OSMCGui(object):
 		log('Exiting GUI')
 
 		# set the GUI back to the default first page view
-		self.GUI.getControl(self.GUI.active_page * 100).setVisible(False)
-		self.GUI.getControl(100).setVisible(True)
+		try:
+			self.GUI.getControl(self.GUI.active_page * 100).setVisible(False)
+			self.GUI.getControl(100).setVisible(True)
 
-		self.GUI.active_page = 1
-		self.GUI.next_prev_direction_changer()
-		self.GUI.setFocusId(105)		
+			self.GUI.active_page = 1
+			self.GUI.next_prev_direction_changer()
+			self.GUI.setFocusId(105)		
+		except:
+			pass
 
 
 	def retrieve_modules(self):
