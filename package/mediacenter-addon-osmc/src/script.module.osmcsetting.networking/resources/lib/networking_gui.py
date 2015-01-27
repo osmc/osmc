@@ -84,6 +84,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		# wifi panel (WFP)
 		self.WFP = self.getControl(5000)
 
+		# bluetooth device panel (BTD)
+		self.BTD = self.getControl(6000)		
+
 		# list containing listitems of all wifi networks
 		self.wifis = []
 
@@ -143,6 +146,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 				self.populate_wifi_panel()
 
+			if focused_position == 2:
+
+				self.populate_bluetooth_panel()
+
 
 
 	def toggle_panel_visibility(self, focused_position):
@@ -197,21 +204,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 	def populate_wifi_panel(self, wifi_dict={}):
 		''' Populates the wifi panel with the information provided in the wifi_dict.
 
-		wifi_dict = {
-						'ssid' : {'encryption': True|False, 'strength': percent::int },
-							...
-					}
-
-		icons:
-				bar1_enc.png
-				bar2_enc.png
-				bar3_enc.png
-				bar4_enc.png
-
-				bar1_opn.png
-				bar2_opn.png
-				bar3_opn.png
-				bar4_opn.png
+			wifi_dict = {
+							'ssid' : {'encryption': True|False, 'strength': percent::int },
+								...
+						}
 		'''
 		wifi_dict = {}
 		for x in range(22):
@@ -233,7 +229,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 				st = info['strength']
 
 				# icon_tuple = (connected, encrypted, strength)
-				icon_image = self.get_icon(connected, info['encryption'], (int(st) / 25 ) + 1)
+				icon_image = self.get_wifi_icon(connected, info['encryption'], (int(st) / 25 ) + 1)
 
 				itm.setIconImage(icon_image)
 
@@ -258,8 +254,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		self.WFP.getListItem(random.randint(0,10)).select(True)
 
+	def populate_bluetooth_panel(self, bluetooth_dict={}):
+		'''
+			Populates the bluetooth panel with devices from the bluetooth_dict.
 
-	def get_icon(self, encrypted, strength, connected=False):
+			bluetooth_dict = {
+								Address : { alias: __, paired: bool, connected: bool}
+							}
+
+		'''
+
+
+	def get_wifi_icon(self, encrypted, strength, connected=False):
 
 		icon_tuple = (connected, encrypted, strength)
 
