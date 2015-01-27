@@ -55,6 +55,24 @@ echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-fr
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
+# Environment configuration
+echo -e "Configuring environment"
+echo -e "	* Adding user osmc"
+setup_osmc_user ${DIR}
+verify_action
+echo -e "	* Setting hostname"
+setup_hostname ${DIR}
+verify_action
+echo -e "	* Setting up hosts"
+setup_hosts ${DIR}
+verify_action
+echo -e "	* Configuring fstab"
+create_base_fstab ${DIR}
+verify_action
+echo -e "	* Configuring TTYs"
+conf_tty ${DIR}
+verify_action
+
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
@@ -73,22 +91,6 @@ verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends rbp-mediacenter-osmc
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends rbp-kernel-osmc # This is separate because LOCAL_CHROOT_PKGS do not explicitly depend on this, but if we install it all in one line, the postinst rules of userland will not get to take effect
-verify_action
-echo -e "Configuring environment"
-echo -e "	* Adding user osmc"
-setup_osmc_user ${DIR}
-verify_action
-echo -e "	* Setting hostname"
-setup_hostname ${DIR}
-verify_action
-echo -e "	* Setting up hosts"
-setup_hosts ${DIR}
-verify_action
-echo -e "	* Configuring fstab"
-create_base_fstab ${DIR}
-verify_action
-echo -e "	* Configuring TTYs"
-conf_tty ${DIR}
 verify_action
 
 # Remove QEMU binary

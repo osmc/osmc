@@ -50,20 +50,7 @@ deb http://security.debian.org/ jessie/updates main contrib non-free
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
-# Performing chroot operation
-disable_init "${DIR}"
-chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="appletv-remote-osmc splash-osmc"
-add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-verify_action
-echo -e "Updating sources"
-chroot ${DIR} apt-get update
-verify_action
-echo -e "Installing core packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
-verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
-verify_action
+# Environment configuration
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}
@@ -79,6 +66,21 @@ create_base_fstab ${DIR}
 verify_action
 echo -e "	* Configuring TTYs"
 conf_tty ${DIR}
+verify_action
+
+# Performing chroot operation
+disable_init "${DIR}"
+chroot ${DIR} mount -t proc proc /proc
+LOCAL_CHROOT_PKGS="appletv-remote-osmc splash-osmc"
+add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
+verify_action
+echo -e "Updating sources"
+chroot ${DIR} apt-get update
+verify_action
+echo -e "Installing core packages"
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+verify_action
+chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
 
 # Perform filesystem cleanup
