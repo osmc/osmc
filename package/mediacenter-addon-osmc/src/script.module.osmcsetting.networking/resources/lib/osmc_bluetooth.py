@@ -73,6 +73,10 @@ def pair_device(deviceAddress):
     return True
 
 
+def remove_device(deviceAddress):
+    bluetooth.remove_device(deviceAddress)
+
+
 def is_device_trusted(deviceAddress):
     return bluetooth.get_device_property(deviceAddress, 'Trusted')
 
