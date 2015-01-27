@@ -232,31 +232,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 				st = info['strength']
 
-				if info['encryption'] == True:
+				# icon_tuple = (connected, encrypted, strength)
+				icon_image = self.get_icon(connected, info['encryption'], (int(st) / 25 ) + 1)
 
-					if 0 < st < 25:
-						itm.setIconImage('bar1_enc.png')
-					elif st < 50:
-						itm.setIconImage('bar2_enc.png')
-					elif st < 75:
-						itm.setIconImage('bar3_enc.png')
-					elif st <= 100:
-						itm.setIconImage('bar4_enc.png')
-					else:
-						itm.setIconImage('bar0_enc.png')
-
-				else:
-
-					if 0 < st < 25:
-						itm.setIconImage('bar1_opn.png')
-					elif st < 50:
-						itm.setIconImage('bar2_opn.png')
-					elif st < 75:
-						itm.setIconImage('bar3_opn.png')
-					elif st <= 100:
-						itm.setIconImage('bar4_opn.png')
-					else:
-						itm.setIconImage('bar0_opn.png')
+				itm.setIconImage(icon_image)
 
 				itm.setProperty('strength', str(st))
 
@@ -280,6 +259,36 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		self.WFP.getListItem(random.randint(0,10)).select(True)
 
 
+	def get_icon(self, encrypted, strength, connected=False):
+
+		icon_tuple = (connected, encrypted, strength)
+
+		icons = {
+					(True,   True, 0) : 'bar0_ce.png',
+					(True,   True, 1) : 'bar1_ce.png',
+					(True,   True, 2) : 'bar2_ce.png',
+					(True,   True, 3) : 'bar3_ce.png',
+					(True,   True, 4) : 'bar4_ce.png',
+					(True,  False, 0) : 'bar0_cx.png',
+					(True,  False, 1) : 'bar1_cx.png',
+					(True,  False, 2) : 'bar2_cx.png',
+					(True,  False, 3) : 'bar3_cx.png',
+					(True,  False, 4) : 'bar4_cx.png',
+					(False,  True, 0) : 'bar0_xe.png',
+					(False,  True, 1) : 'bar1_xe.png',
+					(False,  True, 2) : 'bar2_xe.png',
+					(False,  True, 3) : 'bar3_xe.png',
+					(False,  True, 4) : 'bar4_xe.png',
+					(False, False, 0) : 'bar0_xx.png',
+					(False, False, 1) : 'bar1_xx.png',
+					(False, False, 2) : 'bar2_xx.png',
+					(False, False, 3) : 'bar3_xx.png',
+					(False, False, 4) : 'bar4_xx.png',
+				}
+
+		return icons.get(icon_tuple, 'bar0_xx.png')
+
+
 	def sort_strength(self, itm):
 
 		try:
@@ -288,6 +297,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 			metric = 0
 
 		return metric
+
 
 	def randomword(self):
 
