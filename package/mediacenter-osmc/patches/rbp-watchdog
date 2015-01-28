@@ -31,7 +31,7 @@ fi
 
 while true; do
 	sudo setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
-	LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
+	/usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
 	fb_restore
