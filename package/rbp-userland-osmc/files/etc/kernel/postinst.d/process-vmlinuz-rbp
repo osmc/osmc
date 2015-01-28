@@ -4,8 +4,13 @@ processimage()
 {
     echo "Processing kernel image"
     # use mkknlimg to rename the kernel too
-    LANG=C /usr/bin/mkknlimg --dtok ${1} /boot/kernel.img >/dev/null 2>&1
+    LANG=C /usr/bin/mkknlimg --dtok ${2} /boot/kernel.img >/dev/null 2>&1
+    EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+
+    echo "Copying dtb overlays"
+    rm -rf /boot/*.dtb /boot/overlays/
+    cp -af /boot/dtb-${1}/* /boot/
     EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
 }
 
-if [ -f /boot/bootcode.bin ]; then processimage $2; fi
+if [ -f /boot/bootcode.bin ]; then processimage $1 $2; fi
