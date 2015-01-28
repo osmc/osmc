@@ -6,7 +6,6 @@ TTY1="/dev/tty1"
 if grep -q quiet /proc/cmdline
 then
    /usr/bin/clear > $TTY1
-   /usr/bin/ply-image > $TTY1
+   /usr/bin/ply-image > /dev/null
 fi
-exec /sbin/init
-
+exec /sbin/init $*
