@@ -6,7 +6,6 @@
 . ../common.sh
 
 # Build in native environment
-pull_source "https://github.com/samnazarko/plymouth-lite" "$(pwd)/src"
 build_in_env "${1}" $(pwd) "splash-osmc"
 if [ $? == 0 ]
 then
