@@ -312,11 +312,6 @@ ply_frame_buffer_query_device (ply_frame_buffer_t *buffer)
   buffer->dither_green = 0;
   buffer->dither_blue = 0;
 
-printf("%d,%d,%d,%d,%d,%d,%d\n", buffer->bytes_per_pixel,
-      buffer->red_bit_position, buffer->bits_for_red,
-      buffer->green_bit_position, buffer->bits_for_green,
-      buffer->blue_bit_position, buffer->bits_for_blue);
-
   if (buffer->bytes_per_pixel == 4 &&
       buffer->red_bit_position == 16 && buffer->bits_for_red == 8 &&
       buffer->green_bit_position == 8 && buffer->bits_for_green == 8 &&
