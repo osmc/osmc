@@ -1,0 +1,12 @@
+#!/bin/sh
+mount -t proc proc /proc
+export TERM=linux
+TTY1="/dev/tty1"
+/usr/bin/setterm --cursor off > $TTY1
+if grep -q quiet /proc/cmdline
+then
+   /usr/bin/clear > $TTY1
+   /usr/bin/ply-image > $TTY1
+fi
+exec /sbin/init
+
