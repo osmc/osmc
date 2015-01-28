@@ -6,7 +6,7 @@
         <?php
         $url = $_SERVER['REQUEST_URI'];
         if (strpos($url, 'wiki/')) {
-            $isMailWikiPage = (strcmp($url, '/help/wiki/') == 0);
+            $isMailWikiPage = (strcmp($url, '/help/wiki/main') == 0);
             $page = 'main';
             if (!$isMailWikiPage) {
                 $page = 'pages/' . trim(str_replace('/help/wiki/', '', $url), '/');
