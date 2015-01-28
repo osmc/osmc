@@ -171,7 +171,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 	def error(self, pkg, errormsg):
 
-		self.error_package = pkg.name
+		self.error_package = os.path.basename(pkg)
 		self.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
