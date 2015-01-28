@@ -5,11 +5,7 @@ processimage()
     echo "Processing kernel image"
     # use mkknlimg to rename the kernel too
     LANG=C /usr/bin/mkknlimg --dtok ${1} /boot/kernel.img >/dev/null 2>&1
-    EXIT=$?; [ $EXIT -ne 0 ] && exit $EXIT
+    EXIT=$?; [ $EXIT -ne 0 ] && exit $EXIT || exit 0
 }
 
 if [ -f /boot/bootcode.bin ]; then processimage $2; fi
-
-# Handle filesystem building case
-ischroot
-if [ $? -eq 0 ]; then processimage $2; fi
