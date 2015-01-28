@@ -3,8 +3,15 @@
 # (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
+if [ $(basename $0) = "manual-update" ]; then
+        script=$(mktemp) && cp -f $0 $script && chmod u+x $script && exec $script
+	exit $?
+fi
+
 export TERM=linux
 export LANG=C
+failed=/var/tmp/.osmc_failed_update
+suppress=/var/tmp/.suppress_osmc_update_checks
 
 systemctl stop getty@tty1
 clear > /dev/tty1
@@ -13,13 +20,15 @@ systemctl stop mediacenter
 
 # Package downloads have been done in the addon, so let's get right to upgrade.
 
-tmp=$(tempfile)
+rm -f $failed
+tmp=$(mktemp)
 if ! debconf-apt-progress --logfile $tmp -- apt-get -y dist-upgrade > /dev/tty1; then
 	package=$(grep -A 1 "Errors were encountered while processing" $tmp | tail -n 1 | sed 's/.*\///' | awk -F"_" '{print $1" ("$2")"}')
-	dialog --title " OSMC Update Error " --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem in the OSMC forum. Attempting\n    to restart Kodi in 30 seconds.\n" 9 71 > /dev/tty1
+	dialog --title " OSMC Update Error " --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
+	echo $package > $failed; chown osmc:osmc $failed
 	sleep 30
 else
-	rm -f /var/tmp/.suppress_osmc_update_checks
+	rm -f $suppress
 	sleep 5
 fi
 
@@ -27,3 +36,4 @@ rm -f $tmp
 if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; exit; fi
 clear > /dev/tty1
 systemctl start mediacenter
+rm -f $0
