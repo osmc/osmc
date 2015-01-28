@@ -110,7 +110,7 @@ function cleanup_filesystem()
 
 function remove_existing_filesystem()
 {
-	if [ -f "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
+	if [ -d "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
 }
 
 function install_patch()
