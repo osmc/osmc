@@ -172,7 +172,11 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 	def error(self, pkg, errormsg):
 
-		self.parent.error_package = os.path.basename(pkg)
+		try:
+			pkgname = os.path.basename(pkg).split('_')
+			self.parent.error_package = pkgname[0] + ' (' + pkgname[1] + ')'
+		except:
+			self.parent.error_package = '(unknown package)'
 		self.parent.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
