@@ -174,7 +174,9 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		try:
 			pkgname = os.path.basename(pkg).split('_')
-			self.parent.error_package = pkgname[0] + ' (' + pkgname[1] + ')'
+			self.parent.error_package = pkgname[0]
+			if len(pkgname) > 1:
+				self.parent.error_package += ' (' + pkgname[1] + ')'
 		except:
 			self.parent.error_package = '(unknown package)'
 		self.parent.error_message = errormsg
