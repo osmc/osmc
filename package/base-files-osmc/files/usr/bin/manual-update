@@ -23,8 +23,10 @@ systemctl stop mediacenter
 rm -f $failed
 tmp=$(mktemp)
 if ! debconf-apt-progress --logfile $tmp -- apt-get -y dist-upgrade > /dev/tty1; then
-	package=$(grep -A 1 "Errors were encountered while processing" $tmp | tail -n 1 | sed 's/.*\///' | awk -F"_" '{print $1" ("$2")"}')
-	dialog --title " OSMC Update Error " --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
+	pkg=$(basename $(grep -i -A 1 "Errors were encountered while processing" $tmp | tail -n 1)); pkgarr=(${pkg//_/ })
+	package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
+	if [ -z "$package" ]; then package="(unknown package)"; fi
+	dialog --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
 	echo $package > $failed; chown osmc:osmc $failed
 	sleep 30
 else
