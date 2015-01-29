@@ -73,5 +73,4 @@ then
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ kernel-${1}-osmc.deb
 	echo -e "Build complete"
-fi
 teardown_env "${1}"
