@@ -7,7 +7,7 @@ index 321d0ce..ff15369 100644
                         execute_command, ret);
         }
 -       if (!try_to_run_init_process("/sbin/init") ||
-+       if (!try_to_run_init_process("/splash") ||
++       if (!try_to_run_init_process("/sbin/splash_early") ||
 +            !try_to_run_init_process("/sbin/init") ||
             !try_to_run_init_process("/etc/init") ||
             !try_to_run_init_process("/bin/init") ||
