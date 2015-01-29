@@ -62,7 +62,7 @@ then
 	if [ "$1" == "rbp" ]
 	then
 		# Disassemble kernel package to add overlays
-		mv src/{$1}-image*.deb .
+		mv src/${1}-image*.deb .
 		dpkg -x ${1}-image*.deb files-image/
 		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
 		rm ${1}-image*.deb
