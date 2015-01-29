@@ -116,7 +116,7 @@ class Main(object):
 		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
 
 		dprg = Download_Progress()
-		iprg = Install_Progress()
+		iprg = Install_Progress(self)
 		self.cache.commit(fetch_progress=dprg, install_progress=iprg)
 
 		# call the parent and kill the pDialog
@@ -165,14 +165,15 @@ class Operation_Progress(apt.progress.base.OpProgress):
 
 class Install_Progress(apt.progress.base.InstallProgress):
 
-	def __init__(self):
+	def __init__(self, parent):
+		self.parent = parent
 		super(Install_Progress, self).__init__()	
 
 
 	def error(self, pkg, errormsg):
 
-		self.error_package = os.path.basename(pkg)
-		self.error_message = errormsg
+		self.parent.error_package = os.path.basename(pkg)
+		self.parent.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
 
