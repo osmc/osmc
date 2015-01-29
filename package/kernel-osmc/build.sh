@@ -38,10 +38,10 @@ then
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
 	if [ "$1" == "rbp" ]
 	then
-		mkdir -p ../../files/boot/overlays
+		mkdir -p ../../files-image/boot/overlays
 		make bcm2708-rpi-b.dtb
 		make bcm2708-rpi-b-plus.dtb
-		mv arch/arm/boot/dts/*.dtb ../../files/boot
+		mv arch/arm/boot/dts/*.dtb ../../files-image/boot
 		overlays="hifiberry-dac-overlay
 		hifiberry-dacplus-overlay
 		hifiberry-digi-overlay
@@ -56,9 +56,18 @@ then
 			dtc -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
 		done
 		popd
-		mv arch/arm/boot/dts/*-overlay.dtb ../../files/boot/overlays
+		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/overlays
 	fi
 	popd
+	if [ "$1" == "rbp" ]
+	then
+		# Disassemble kernel package to add overlays
+		mv src/{$1}-image*.deb .
+		dpkg -x ${1}-image*.deb files-image/
+		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
+		rm ${1}-image*.deb
+		dpkg -b files-image ${1}-image-osmc.deb; fi
+	fi
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
