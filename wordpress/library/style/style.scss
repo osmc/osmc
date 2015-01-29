@@ -120,7 +120,6 @@ pre, code {
   white-space: pre-wrap;
   max-height: 400px;
   overflow: auto;
-  background-color: $lgrey2;
 }
 
 abbr[title] {
@@ -639,8 +638,14 @@ footer {
         height: 20px;
         width: 20px;
       }
+      pre {
+        border-left: 4px solid #51bc9b;
+        padding-left: 1em;
+      }
       pre, code {
         font-size: 100%;
+        background-color: $lgrey2;
+        display: inline-block;
       }
     }
   }
