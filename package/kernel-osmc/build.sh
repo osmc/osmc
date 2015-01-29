@@ -38,10 +38,10 @@ then
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
 	if [ "$1" == "rbp" ]
 	then
-		mkdir -p ../../files-image/boot-${VERSION}-${REV}-osmc/overlays
+		mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 		make bcm2708-rpi-b.dtb
 		make bcm2708-rpi-b-plus.dtb
-		mv arch/arm/boot/dts/*.dtb ../../files-image/boot-${VERSION}-${REV}-osmc
+		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
 		overlays="hifiberry-dac-overlay
 		hifiberry-dacplus-overlay
 		hifiberry-digi-overlay
@@ -56,7 +56,7 @@ then
 			dtc -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
 		done
 		popd
-		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot-${VERSION}-${REV}-osmc/overlays
+		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 	fi
 	popd
 	if [ "$1" == "rbp" ]
