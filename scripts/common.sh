@@ -121,6 +121,7 @@ function install_patch()
 		cp ${1}/$patch .
 		echo Applying patch $patch
 		patch -p1 < $patch
+		verify_action
 		rm $patch
 	done
 }
