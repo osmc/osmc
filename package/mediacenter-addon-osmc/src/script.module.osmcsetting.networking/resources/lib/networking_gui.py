@@ -67,6 +67,8 @@ heading_controls 	= [
 
 panel_controls 		= [1010, 1020, 1030]
 
+password_buttons 	= [10117, 10217]
+
 
 class networking_gui(xbmcgui.WindowXMLDialog):
 
@@ -74,6 +76,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
 		self.setting_values = kwargs.get('setting_values', {})
+
+		# this stores the wifi password for sending to connman (or equivalent)
+		# [ wired password, wireless password]
+		self.password = ['','']
 
 
 	def onInit(self):
@@ -117,6 +123,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		if controlID in ip_controls:
 			
 			self.edit_ip_address(controlID)
+
+		elif controlID in [10117, 10217]:
+
+			# ask the user to enter the password, keyboard pops up, entry is hidden
+			pwd = DIALOG.input(lang(32013), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+
+			if pwd:
+				# save the password in memory for sending to connman
+				self.password[password_buttons.index(controlID)] = pwd
+
+				# change the password label control to display asterisks
+				self.getControl(90000 + controlID).setLabel('*********')
+
 
 
 	def onAction(self, action):
