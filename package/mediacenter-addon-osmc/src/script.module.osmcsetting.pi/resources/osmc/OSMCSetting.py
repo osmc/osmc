@@ -610,13 +610,21 @@ Overclock settings are set using the Pi Overclock module."""
 
 		datalist = data.split('\n')
 
+		log('datalist = %s' % datalist)
+
 		if not reverse:
+			if len(datalist) != len(filter(None, datalist)):
+				# first check is there is a blank dtoverlay setting
+				self.me.setSetting('suppress_dtoverlay', 'true')
+				
 			self.me.setSetting('dacplus', 'false')
 			self.me.setSetting('lirc-rpi-overlay', 'false')
 			self.me.setSetting('soundcard_dac', '0')
 			self.me.setSetting('soundcard_dacplus', '0')
 			self.me.setSetting('w1gpio', '0')
+
 			for overlay in datalist:
+
 				ovl = overlay_settings.get(overlay, {})
 				dcp = ovl.get('dacplus', 'irr')
 				stg = ovl.get('setting', [])
@@ -658,6 +666,11 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.append('lirc-rpi-overlay')
 			else:
 				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
+
+			if self.me.getSetting('suppress_dtoverlay') == 'true':
+				new_dtoverlay.append('')
+			else:
+				new_dtoverlay.append('[remove]')
 
 			return new_dtoverlay
 
