@@ -4,11 +4,13 @@ processimage()
 {
     # use mkknlimg to rename the kernel too
     LANG=C /usr/bin/mkknlimg --dtok ${2} /boot/kernel.img >/dev/null 2>&1
-    EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+    EXIT=$?; if [ $EXIT -ne 0 ]; then cp -f ${2} /boot/kernel.img; exit $EXIT; fi
 
     rm -rf /boot/*.dtb /boot/overlays/
     cp -af /boot/dtb-${1}/* /boot/
     EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+
+    rm -rf /lib/modules/${1}_kernel_*
 }
 
 if [ -f /boot/bootcode.bin ]; then processimage $1 $2; fi
