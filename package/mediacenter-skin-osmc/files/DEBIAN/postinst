@@ -1,3 +1,9 @@
 #!/bin/bash
 
+ischroot
+if [ $? -eq 0 ]; then
+    chown -R 1000:1000 /usr/share/kodi/addons/skin.osmc
+    exit 0
+fi
+
 chown -R osmc:osmc /usr/share/kodi/addons/skin.osmc
