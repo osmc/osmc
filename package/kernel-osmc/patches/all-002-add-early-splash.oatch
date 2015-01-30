@@ -1,5 +1,5 @@
 diff --git a/init/main.c b/init/main.c
-index 321d0ce..ff15369 100644
+index 321d0ce..150b9ba 100644
 --- a/init/main.c
 +++ b/init/main.c
 @@ -962,7 +962,8 @@ static int __ref kernel_init(void *unused)
@@ -8,7 +8,7 @@ index 321d0ce..ff15369 100644
         }
 -       if (!try_to_run_init_process("/sbin/init") ||
 +       if (!try_to_run_init_process("/sbin/splash_early") ||
-+            !try_to_run_init_process("/sbin/init") ||
++           !try_to_run_init_process("/sbin/init") ||
             !try_to_run_init_process("/etc/init") ||
             !try_to_run_init_process("/bin/init") ||
             !try_to_run_init_process("/bin/sh"))
