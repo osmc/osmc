@@ -55,6 +55,21 @@ echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-fr
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
+# Performing chroot operation
+disable_init "${DIR}"
+chroot ${DIR} mount -t proc proc /proc
+LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc rbp-remote-osmc"
+add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
+add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
+verify_action
+echo -e "Updating sources"
+chroot ${DIR} apt-get update
+verify_action
+echo -e "Installing core packages"
+chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+verify_action
+chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
+verify_action
 # Environment configuration
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
@@ -71,22 +86,6 @@ create_base_fstab ${DIR}
 verify_action
 echo -e "	* Configuring TTYs"
 conf_tty ${DIR}
-verify_action
-
-# Performing chroot operation
-disable_init "${DIR}"
-chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc rbp-remote-osmc"
-add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
-verify_action
-echo -e "Updating sources"
-chroot ${DIR} apt-get update
-verify_action
-echo -e "Installing core packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
-verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends rbp-mediacenter-osmc
 verify_action
