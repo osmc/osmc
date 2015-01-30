@@ -1,18 +1,8 @@
 #!/bin/bash
 
-
-ischroot
-if [ $? == 0 ]
+if ! grep -q osmcdev=rbp /boot/cmdline.txt
 then
-    if ! grep -q osmcdev=rbp /boot/cmdline.txt
-    then
-        rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1
-    fi
-else
-    if ! grep -q osmcdev=rbp /proc/cmdline
-    then
-        rm -rf /usr/share/kodi/addons/script.module.osmc.setting.pi* >/dev/null 2>&1
-    fi
+    rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1
 fi
 
 for dir in /usr/share/kodi/addons/service.osmc.settings/ /usr/share/kodi/addons/script.module.osmcsetting.*/
