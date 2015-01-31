@@ -716,9 +716,16 @@ class Main(object):
 
 
 	# ACTION METHOD
-	def apt_update_complete(self):
+	def apt_update_complete(self, skip_dpkg_journal_check=False):
 
 		self.cache = apt.Cache()
+
+		# check that the dpkg journal isnt dirty
+		if not skip_dpkg_journal_check:
+			if self.cache.dpkg_journal_dirty:
+				log('dpkg_journal_dirty')
+				subprocess.Popen(['sudo', 'dpkg', '--configure', '-a'])
+				xbmc.sleep(3000)
 
 		self.REBOOT_REQUIRED = 0
 
@@ -739,32 +746,25 @@ class Main(object):
 
 		# available_updates = self.cache.get_changes()
 
-		# del self.cache
+		available_updates = []
+
+		log('The following packages have newer versions and are upgradable: ')
+		for pkg in self.cache:
+			if pkg.is_upgradable:
+				log('is upgradeable', pkg.shortname)
+				available_updates.append(pkg.shortname.lower())
+		
+		del self.cache
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
-		if not any(['osmc' in x.shortname.lower() for x in self.cache]):
+		if not any(['osmc' in x for x in available_updates]):
 			self.window.setProperty('OSMC_notification', 'false')
 			log('There are no osmc packages')
-			for y in available_updates:
-				log('package: %s' % y.shortname.lower())
-			del self.cache
 			return
-			
-		if not available_updates: 
-			del self.cache
-			return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
 
-		log('The following packages have newer versions and are upgradable: ')
-
-		for pkg in self.cache:
-			if pkg.is_upgradable:
-
-				log('is upgradeable', pkg.shortname)
-
-				if "mediacenter" in pkg.shortname:
-					self.REBOOT_REQUIRED = 1
-		 del self.cache
+		if any(["mediacenter" in x for x in available_updates]):
+			self.REBOOT_REQUIRED = 1
 
 		# display update available notification
 		if not self.s['suppress_icon']:

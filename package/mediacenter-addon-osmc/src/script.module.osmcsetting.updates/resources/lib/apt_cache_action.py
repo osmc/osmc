@@ -6,6 +6,8 @@ import sys
 from datetime import datetime
 import json
 import os
+import time
+import subprocess
 
 t = datetime
 
@@ -60,6 +62,12 @@ class Main(object):
 
 		self.cache = apt.Cache()
 
+		# check that the dpkg journal isnt dirty
+		if self.cache.dpkg_journal_dirty:
+			print '============== dpkg_journal_dirty =============='
+			subprocess.Popen(['sudo', 'dpkg', '--configure', '-a'])
+			time.sleep(3000)
+
 		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
 
 		self.action_to_method = {
@@ -109,6 +117,13 @@ class Main(object):
 
 
 	def commit(self):
+
+		# check whether any packages are broken, if they are then the install needs to take place outside of Kodi
+
+		for pkg in self.cache:
+			if pkg.is_inst_broken or pkg.is_now_broken:
+				print "%s is BROKEN, cannot proceed with commit" % pkg.shortname
+				return
 
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 		self.cache.upgrade(True)
