@@ -2,29 +2,22 @@
 
 function is_rbp()
 {
-	ischroot
-	if [ $? == 0 ]
+	if ischroot
 	then
 		dpkg -l | grep -q "rbp-bootloader-osmc"
-		if [ $? == 0 ]
-		then
-			return 0
-		else
-			return 1
-		fi
+		return
 	else
-		if grep -q osmcdev=rbp /boot/cmdline.txt > /dev/null 2>&1
-		then
-			return 0
-		else
-			return 1
-		fi
+		grep -q osmcdev=rbp /proc/cmdline > /dev/null 2>&1
+		return
 	fi
 }
 
-is_rbp
-if [ $? == 1 ]; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1; fi
-for dir in /usr/share/kodi/addons/service.osmc.settings/ /usr/share/kodi/addons/script.module.osmcsetting.*/
-do
-    if pushd $dir >/dev/null 2>&1; then pycompile . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
-done
+if [ "$1" = "configure" ]
+then
+	if ! is_rbp; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1; fi
+
+	for dir in /usr/share/kodi/addons/service.osmc.settings/ /usr/share/kodi/addons/script.module.osmcsetting.*/
+	do
+		if pushd $dir >/dev/null 2>&1; then pycompile . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
+	done
+fi
