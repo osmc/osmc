@@ -25,6 +25,7 @@ then
         echo -e "TVHeadend Server\n/lib/systemd/system/tvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
 	./configure --prefix=/usr
+	sed -e "s/-Werror//" -i Makefile
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
