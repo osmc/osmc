@@ -5,7 +5,7 @@
     <div class="column three-fourths">
         <?php
         $url = $_SERVER['REQUEST_URI'];
-        if (strpos($url, 'wiki/')) {
+        if (strpos($url, 'wiki')) {
             $isMailWikiPage = (strcmp($url, '/help/wiki') == 0 || strcmp($url, '/help/wiki/') == 0);
             $page = 'main';
             if (!$isMailWikiPage) {
