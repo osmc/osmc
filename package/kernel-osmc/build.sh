@@ -47,9 +47,9 @@ then
 		hifiberry-digi-overlay
 		iqaudio-dac-overlay
 		iqaudio-dacplus-overlay
-		lirc-rpi-overlay"
-#		w1-gpio-overlay
-#		w1-gpio-pullup-overlay
+		lirc-rpi-overlay
+		w1-gpio-overlay
+		w1-gpio-pullup-overlay"
 		pushd arch/arm/boot/dts
 		for dtb in $overlays
 		do
