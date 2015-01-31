@@ -18,7 +18,8 @@ clear > /dev/tty1
 chvt 1
 systemctl stop mediacenter
 
-dpkg --configure -a
+err=$(dpkg --configure -a 2>&1)
+if [ -n "$err" ]; then dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "$err\n\nContinuing in 10 seconds..." 0 0 >/dev/tty1; sleep 10; fi
 
 # Package downloads have been done in the addon, so let's get right to upgrade.
 
@@ -30,7 +31,7 @@ then
 	package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
 	if [ -z "$package" ]; then package="(unknown package)"; fi
 
-	dialog --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
+	dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
 	echo $package > $failed; chown osmc:osmc $failed
 	sleep 30
 else
