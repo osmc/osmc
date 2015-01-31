@@ -140,7 +140,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
-            if status:
+            if enabled:
                 self.name_list.getListItem(item_pos).select(True)
 
             item_pos += 1
