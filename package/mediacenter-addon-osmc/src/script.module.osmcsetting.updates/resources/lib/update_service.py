@@ -166,7 +166,7 @@ class Main(object):
 		if os.path.isfile(fail_check_file):
 			with open(fail_check_file, 'r') as f:
 				package = f.readline()
-				
+
 			ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
 
 			try:
@@ -737,30 +737,34 @@ class Main(object):
 			return
 
 
-		available_updates = self.cache.get_changes()
+		# available_updates = self.cache.get_changes()
 
-		del self.cache
+		# del self.cache
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
-		if not any(['osmc' in x.shortname.lower() for x in available_updates]):
+		if not any(['osmc' in x.shortname.lower() for x in self.cache]):
 			self.window.setProperty('OSMC_notification', 'false')
 			log('There are no osmc packages')
 			for y in available_updates:
 				log('package: %s' % y.shortname.lower())
+			del self.cache
 			return
 			
-		if not available_updates: return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
+		if not available_updates: 
+			del self.cache
+			return 		# dont bother doing anything else if there are no updates FOR TESTING ONLY
 
 		log('The following packages have newer versions and are upgradable: ')
 
-		for pkg in available_updates:
+		for pkg in self.cache:
 			if pkg.is_upgradable:
 
 				log('is upgradeable', pkg.shortname)
 
 				if "mediacenter" in pkg.shortname:
 					self.REBOOT_REQUIRED = 1
+		 del self.cache
 
 		# display update available notification
 		if not self.s['suppress_icon']:
