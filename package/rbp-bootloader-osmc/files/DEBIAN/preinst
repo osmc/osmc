@@ -1,19 +1,12 @@
 #!/bin/bash
 
-ischroot
-if [ $? == 0 ]; then exit 0; fi
+if [ "$1" = "install" -o "$1" = "upgrade" ]
+then
+	if ischroot; then exit 0; fi
 
-grep /boot /proc/mounts -q
-if [ $? != 0 ]; then echo "/boot is not mounted!"; exit 1; fi
+	if ! grep /boot /proc/mounts -q; then echo "/boot is not mounted!"; exit 1; fi
 
-# This prevents vfat symlink errors
+	# This prevents vfat symlink errors
 
-FWFILES="LICENCE.broadcom
-start_x.elf
-fixup_x.dat
-bootcode.bin"
-
-for file in $FWFILES
-do
-	rm -f /boot/$file
-done
+	rm -rf /boot/LICENCE.broadcom /boot/start_x.elf /boot/fixup_x.dat /boot/bootcode.bin
+fi
