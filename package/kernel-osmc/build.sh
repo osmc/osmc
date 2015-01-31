@@ -72,5 +72,5 @@ then
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ kernel-${1}-osmc.deb
-	echo -e "Build complete"
+fi
 teardown_env "${1}"
