@@ -161,6 +161,19 @@ class Main(object):
 
 			self.skip_update_check =  False
 
+		# check for the external update failed
+		fail_check_file = '/var/tmp/.osmc_failed_update'
+		if os.path.isfile(fail_check_file):
+			with open(fail_check_file, 'r') as f:
+				package = f.readline()
+				
+			ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
+
+			try:
+				os.remove(fail_check_file)
+			except:
+				pass
+
 		# a preliminary check for updates (for testing only)
 		if self.s['check_onboot']:
 			if not self.skip_update_check:
