@@ -21,7 +21,8 @@ class MaitreD(object):
 
     def poll_services(self):
         full_paths = glob.glob('/etc/systemd/system/*.wants/*')
-        self.active_services = [os.path.basename(x) for x in full_paths]
+        self.log('full paths from glob = %s' % full_paths)
+        self.active_services = [os.path.basename(x).replace('\n','') for x in full_paths]
 
     def enable_service(self, s_entry):
         self.log("MaitreD: Enabling " + s_entry)
@@ -64,14 +65,12 @@ class MaitreD(object):
                     self.log("MaitreD: Service Friendly Name: " + s_name)
                     self.log("MaitreD: Service Entry Point: " + s_entry)
 
-                    enabled = self.is_enabled(service_name)
-                    running = ''
-                    if enabled:
-                        r = self.is_running(s_entry)
-                        if r:
-                            running = " (running)"
-                        else:
-                            running = " (stopped)"
+                    enabled     = self.is_enabled(service_name)
+                    runcheck    = self.is_running(s_entry)
+                    if runcheck:
+                        running = " (running)"
+                    else:
+                        running = " (stopped)"
 
                     svcs[s_name] = ( s_entry, service_name, running, enabled )
                                     
