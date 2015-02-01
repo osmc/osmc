@@ -36,6 +36,7 @@ class MaitreD(object):
     def is_running(self, service_name):
         p = subprocess.Popen(["sudo", "/bin/systemctl", "status", service_name], stdout=subprocess.PIPE)
         out, err = p.communicate()
+        self.log('%s is running: %s' % (service_name, 'running' in out))
 
         return True if 'running' in out else False
 
@@ -82,7 +83,7 @@ class MaitreD(object):
     def process_services(self, user_selection):
         ''' User selection is a list of tuples (s_name::str, enable::bool) '''
 
-        self.log('MaireD: process_services = %s' % user_selection)
+        self.log('MaitreD: process_services = %s' % user_selection)
 
         for service_name, status in user_selection:
             if status != self.services[service_name][-1]:
@@ -136,7 +137,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
         for s_name, service_tup in self.service_list.iteritems():
             # populate the list
             entry, service_name, running, enabled = service_tup
-            self.tmp = xbmcgui.ListItem(label=s_name + running, label2=str(enabled))
+            self.tmp = xbmcgui.ListItem(label=s_name + running, label2=service_name)
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
@@ -175,7 +176,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         for x in range(sz):
             line = self.name_list.getListItem(x)
-            processing_list.append((line.getLabel().replace(' (running)','').replace(' (stopped)',''), line.isSelected()))
+            processing_list.append((line.getLabel2().replace('\n','').replace(' (stopped)',''), line.isSelected()))
 
         self.garcon.process_services(processing_list)
 
