@@ -38,9 +38,9 @@ class MaitreD(object):
         p = subprocess.Popen(["sudo", "/bin/systemctl", "status", s_entry], stdout=subprocess.PIPE)
         out, err = p.communicate()
         self.log('MaitreD out = %s' % out)
-        self.log('%s is running: %s' % (s_entry, '0' in out))
+        self.log('%s is running: %s' % (s_entry, 'running' in out))
 
-        return True if '0' in out else False
+        return True if 'running' in out else False
 
     def is_enabled(self, s_entry):
 
