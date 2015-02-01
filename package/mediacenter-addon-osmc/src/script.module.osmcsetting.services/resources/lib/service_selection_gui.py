@@ -35,12 +35,16 @@ class MaitreD(object):
         os.system("sudo /bin/systemctl stop " + s_entry)
 
     def is_running(self, s_entry):
-        p = subprocess.Popen(["sudo", "/bin/systemctl", "status", s_entry], stdout=subprocess.PIPE)
-        out, err = p.communicate()
-        self.log('MaitreD out = %s' % out)
-        self.log('%s is running: %s' % (s_entry, 'running' in out))
 
-        return True if 'running' in out else False
+        p = subprocess.call(["sudo", "/bin/systemctl", "is-active", s_entry])
+
+        if p == 0:
+            self.log('%s is running' % s_entry )
+
+            return True
+
+        self.log('%s is NOT running' % s_entry )
+        return False
 
     def is_enabled(self, s_entry):
 
