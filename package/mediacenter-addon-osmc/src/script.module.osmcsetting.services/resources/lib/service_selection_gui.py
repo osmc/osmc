@@ -25,8 +25,8 @@ class MaitreD(object):
 
     def enable_service(self, service_name):
         self.log("MaitreD: Enabling " + service_name)
-        os.system("sudo /bin/systemctl enable " + servicename)
-        os.system("sudo /bin/systemctl start " + servicename)
+        os.system("sudo /bin/systemctl enable " + service_name)
+        os.system("sudo /bin/systemctl start " + service_name)
         
     def disable_service(self, service_name):
         self.log("MaitreD: Disabling " + service_name)
