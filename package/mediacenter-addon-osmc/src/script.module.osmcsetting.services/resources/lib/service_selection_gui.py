@@ -17,12 +17,12 @@ class MaitreD(object):
     def __init__(self, logger):
         self.log = logger
         self.services = {}
-        self.poll_services()
+        # self.poll_services()
 
-    def poll_services(self):
-        full_paths = glob.glob('/etc/systemd/system/*.wants/*')
-        self.log('full paths from glob = %s' % full_paths)
-        self.active_services = [os.path.basename(x).replace('\n','') for x in full_paths]
+    # def poll_services(self):
+    #     full_paths = glob.glob('/etc/systemd/system/*.wants/*')
+    #     self.log('full paths from glob = %s' % full_paths)
+    #     self.active_services = [os.path.basename(x).replace('\n','') for x in full_paths]
 
     def enable_service(self, s_entry):
         self.log("MaitreD: Enabling " + s_entry)
@@ -46,14 +46,28 @@ class MaitreD(object):
         self.log('%s is NOT running' % s_entry )
         return False
 
+
     def is_enabled(self, s_entry):
 
-        if s_entry in self.active_services:
-            self.log("%s is currently enabled" % s_entry)  
+        p = subprocess.call(["sudo", "/bin/systemctl", "is-enabled", s_entry])
+
+        if p == 0:
+            self.log('%s is enabled' % s_entry )
+
             return True
-        else:
-            self.log("%s is currently disabled" % s_entry)
-            return False
+
+        self.log('%s is NOT enabled' % s_entry )
+        return False
+
+
+    # def is_enabled(self, s_entry):
+
+    #     if s_entry in self.active_services:
+    #         self.log("%s is currently enabled" % s_entry)  
+    #         return True
+    #     else:
+    #         self.log("%s is currently disabled" % s_entry)
+    #         return False
 
     def all_services(self):
         ''' Returns a dict of service tuples. {s_name: (entry, service_name, running, enabled)} '''
