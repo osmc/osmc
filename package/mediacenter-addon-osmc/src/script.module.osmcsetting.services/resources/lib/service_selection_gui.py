@@ -81,12 +81,12 @@ class MaitreD(object):
         return self.services
 
     def process_services(self, user_selection):
-        ''' User selection is a list of tuples (s_name::str, enable::bool) '''
+        ''' User selection is a list of tuples (s_name::str, service_name::str, enable::bool) '''
 
         self.log('MaitreD: process_services = %s' % user_selection)
 
-        for service_name, status in user_selection:
-            if status != self.services[service_name][-1]:
+        for s_name, service_name, status in user_selection:
+            if status != self.services[s_name][-1]:
                 if status == True:
                     self.enable_service(service_name)
                 else:
@@ -176,7 +176,9 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         for x in range(sz):
             line = self.name_list.getListItem(x)
-            processing_list.append((line.getLabel2().replace('\n','').replace(' (stopped)',''), line.isSelected()))
+            l1 = line.getLabel().replace(' (running)','').replace(' (stopped)','').replace('\n','')
+            l2 = line.getLabel2().replace('\n','')
+            processing_list.append((l1, l2, line.isSelected()))
 
         self.garcon.process_services(processing_list)
 
