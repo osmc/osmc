@@ -52,14 +52,14 @@ class MaitreD(object):
     def all_services(self):
         ''' Returns a dict of service tuples. {s_name: (entry, service_name, running, enabled)} '''
 
-        svcs = OrderedDict()
+        svcs = {}
 
         for service_name in os.listdir("/etc/osmc/apps.d"):
             service_name = service_name.replace('\n','')
             if os.path.isfile("/etc/osmc/apps.d/" + service_name):
                 with open ("/etc/osmc/apps.d/" + service_name) as f:
-                    s_name = f.readline()
-                    s_entry = f.readline()
+                    s_name = f.readline().replace('\n','')
+                    s_entry = f.readline().replace('\n','')
 
                     self.log("MaitreD: Service Friendly Name: " + s_name)
                     self.log("MaitreD: Service Entry Point: " + s_entry)
@@ -77,7 +77,9 @@ class MaitreD(object):
                                     
 
         # this last part creates a dictionary ordered by the services friendly name
-        self.services = OrderedDict([(k, svcs[k]) for k in sorted(svcs.keys())])
+        self.services = OrderedDict()
+        for key in sorted(svcs.keys()):
+            self.services[key] = svcs[key]
         self.log('MaitreD: service list = %s' % self.services)
         return self.services
 
