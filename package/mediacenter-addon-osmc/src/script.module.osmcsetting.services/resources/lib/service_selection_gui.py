@@ -84,8 +84,8 @@ class MaitreD(object):
 
         self.log('MaireD: process_services = %s' % user_selection)
 
-        for service, status in user_selection:
-            if status != self.services[service][-1]:
+        for service_name, status in user_selection:
+            if status != self.services[service_name][-1]:
                 if status == True:
                     self.enable_service(service_name)
                 else:
