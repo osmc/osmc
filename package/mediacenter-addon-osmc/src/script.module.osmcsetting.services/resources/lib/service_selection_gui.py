@@ -55,6 +55,7 @@ class MaitreD(object):
         svcs = OrderedDict()
 
         for service_name in os.listdir("/etc/osmc/apps.d"):
+            service_name = service_name.replace('\n','')
             if os.path.isfile("/etc/osmc/apps.d/" + service_name):
                 with open ("/etc/osmc/apps.d/" + service_name) as f:
                     s_name = f.readline()
