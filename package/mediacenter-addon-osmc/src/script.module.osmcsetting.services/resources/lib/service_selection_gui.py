@@ -37,6 +37,7 @@ class MaitreD(object):
     def is_running(self, s_entry):
         p = subprocess.Popen(["sudo", "/bin/systemctl", "status", s_entry], stdout=subprocess.PIPE)
         out, err = p.communicate()
+        self.log('MaitreD out = %s' % out)
         self.log('%s is running: %s' % (s_entry, '0' in out))
 
         return True if '0' in out else False
