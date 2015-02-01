@@ -41,13 +41,13 @@ class MaitreD(object):
 
         return True if '0' in out else False
 
-    def is_enabled(self, service_name):
+    def is_enabled(self, s_entry):
 
-        if service_name in self.active_services:
-            self.log("%s is currently enabled" % service_name)  
+        if s_entry in self.active_services:
+            self.log("%s is currently enabled" % s_entry)  
             return True
         else:
-            self.log("%s is currently enabled" % service_name)
+            self.log("%s is currently enabled" % s_entry)
             return False
 
     def all_services(self):
@@ -65,7 +65,7 @@ class MaitreD(object):
                     self.log("MaitreD: Service Friendly Name: " + s_name)
                     self.log("MaitreD: Service Entry Point: " + s_entry)
 
-                    enabled     = self.is_enabled(service_name)
+                    enabled     = self.is_enabled(s_entry)
                     runcheck    = self.is_running(s_entry)
                     if runcheck:
                         running = " (running)"
