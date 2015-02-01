@@ -52,7 +52,7 @@ class MaitreD(object):
             self.log("%s is currently enabled" % s_entry)  
             return True
         else:
-            self.log("%s is currently enabled" % s_entry)
+            self.log("%s is currently disabled" % s_entry)
             return False
 
     def all_services(self):
