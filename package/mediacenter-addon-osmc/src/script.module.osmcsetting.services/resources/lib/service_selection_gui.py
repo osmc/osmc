@@ -23,20 +23,20 @@ class MaitreD(object):
         full_paths = glob.glob('/etc/systemd/system/*.wants/*')
         self.active_services = [os.path.basename(x) for x in full_paths]
 
-    def enable_service(self, service_name):
-        self.log("MaitreD: Enabling " + service_name)
-        os.system("sudo /bin/systemctl enable " + service_name)
-        os.system("sudo /bin/systemctl start " + service_name)
+    def enable_service(self, s_entry):
+        self.log("MaitreD: Enabling " + s_entry)
+        os.system("sudo /bin/systemctl enable " + s_entry)
+        os.system("sudo /bin/systemctl start " + s_entry)
         
-    def disable_service(self, service_name):
-        self.log("MaitreD: Disabling " + service_name)
-        os.system("sudo /bin/systemctl disable " + service_name)
-        os.system("sudo /bin/systemctl stop " + service_name)
+    def disable_service(self, s_entry):
+        self.log("MaitreD: Disabling " + s_entry)
+        os.system("sudo /bin/systemctl disable " + s_entry)
+        os.system("sudo /bin/systemctl stop " + s_entry)
 
-    def is_running(self, service_name):
-        p = subprocess.Popen(["sudo", "/bin/systemctl", "status", service_name], stdout=subprocess.PIPE)
+    def is_running(self, s_entry):
+        p = subprocess.Popen(["sudo", "/bin/systemctl", "status", s_entry], stdout=subprocess.PIPE)
         out, err = p.communicate()
-        self.log('%s is running: %s' % (service_name, 'running' in out))
+        self.log('%s is running: %s' % (s_entry, 'running' in out))
 
         return True if 'running' in out else False
 
@@ -67,7 +67,7 @@ class MaitreD(object):
                     enabled = self.is_enabled(service_name)
                     running = ''
                     if enabled:
-                        r = self.is_running(service_name)
+                        r = self.is_running(s_entry)
                         if r:
                             running = " (running)"
                         else:
@@ -88,12 +88,12 @@ class MaitreD(object):
 
         self.log('MaitreD: process_services = %s' % user_selection)
 
-        for s_name, service_name, status in user_selection:
+        for s_name, s_entry, status in user_selection:
             if status != self.services[s_name][-1]:
                 if status == True:
-                    self.enable_service(service_name)
+                    self.enable_service(s_entry)
                 else:
-                    self.disable_service(service_name)
+                    self.disable_service(s_entry)
 
 
 
@@ -139,8 +139,8 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         for s_name, service_tup in self.service_list.iteritems():
             # populate the list
-            entry, service_name, running, enabled = service_tup
-            self.tmp = xbmcgui.ListItem(label=s_name + running, label2=service_name)
+            s_entry, service_name, running, enabled = service_tup
+            self.tmp = xbmcgui.ListItem(label=s_name + running, label2=s_entry)
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
@@ -179,9 +179,10 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         for x in range(sz):
             line = self.name_list.getListItem(x)
-            l1 = line.getLabel().replace(' (running)','').replace(' (stopped)','').replace('\n','')
-            l2 = line.getLabel2().replace('\n','')
-            processing_list.append((l1, l2, line.isSelected()))
+            s_name = line.getLabel().replace(' (running)','').replace(' (stopped)','').replace('\n','')
+            s_entry = line.getLabel2().replace('\n','')
+            issel = True if line.isSelected() == 1 else False
+            processing_list.append((s_name, s_entry, line.isSelected()))
 
         self.garcon.process_services(processing_list)
 
