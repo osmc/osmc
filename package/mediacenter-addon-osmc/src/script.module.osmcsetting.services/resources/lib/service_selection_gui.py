@@ -112,7 +112,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         # Save button
         self.ok = self.getControl(SAVE)
-        self.ok.setLabel('Exit')
+        self.ok.setLabel('Apply')
 
         # Heading
         self.hdg = self.getControl(HEADING)
