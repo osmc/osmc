@@ -223,6 +223,9 @@ Overclock settings are set using the Pi Overclock module."""
 									'gpu_mem_512': 				{'setting_value' : '',
 																	'default': '128',
 																	},
+									'gpu_mem_1024': 			{'setting_value' : '',
+																	'default': '192',
+																	},																	
 									'decode_MPG2': 				{'setting_value' : '',
 																	'default': '',
 																	},
@@ -740,8 +743,20 @@ Overclock settings are set using the Pi Overclock module."""
 			self.remove_list.append('gpu_mem')
 
 			# get the values for the other memory setting variants
-			mem512 = self.config_settings.get('gpu_mem_512', False)
-			mem256 = self.config_settings.get('gpu_mem_256', False)
+			mem1024 = self.config_settings.get('gpu_mem_1024', False)
+			mem512  = self.config_settings.get('gpu_mem_512',  False)
+			mem256  = self.config_settings.get('gpu_mem_256',  False)
+
+			if mem1024:
+
+				return 'remove'
+
+			elif memgpu:
+
+				# set the value in the pi_settings_dict and the settings.xml for display
+				val512 = min(768, int(memgpu))
+				self.me.setSetting('gpu_mem_1024', str(val1024))
+				self.pi_settings_dict['gpu_mem_1024']['setting_value'] = val1024
 
 			# if gpu_mem_512 is in the config, then use that, otherwise use gpu_mem, otherwise use default
 			if mem512:
