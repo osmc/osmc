@@ -38,7 +38,7 @@ import time
 import sys
 
 def getvalue(valuestring):
-	splitvalue = valuestring.split(' ')
+	splitvalue = valuestring.split(' ',3)
 	line = splitvalue[3].replace("\r", "")
 	return line.replace("\n", "")
 
