@@ -69,7 +69,7 @@ class MaitreD(object):
     #         self.log("%s is currently disabled" % s_entry)
     #         return False
 
-    def all_services(self):
+    def discover_services(self):
         ''' Returns a dict of service tuples. {s_name: (entry, service_name, running, enabled)} '''
 
         svcs = {}
@@ -101,10 +101,10 @@ class MaitreD(object):
         self.log('MaitreD: service list = %s' % self.services)
         return self.services
 
-    def process_services(self, user_selection):
+    def process_user_changes(self, user_selection):
         ''' User selection is a list of tuples (s_name::str, service_name::str, enable::bool) '''
 
-        self.log('MaitreD: process_services = %s' % user_selection)
+        self.log('MaitreD: process_user_changes = %s' % user_selection)
 
         for s_name, s_entry, status in user_selection:
             if status != self.services[s_name][-1]:
@@ -124,7 +124,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
         self.log = kwargs.get('logger', self.dummy)
 
         self.garcon = MaitreD(self.log)
-        self.service_list = self.garcon.all_services()
+        self.service_list = self.garcon.discover_services()
 
 
     def dummy(self):
@@ -202,5 +202,5 @@ class service_selection(xbmcgui.WindowXMLDialog):
             issel = True if line.isSelected() == 1 else False
             processing_list.append((s_name, s_entry, line.isSelected()))
 
-        self.garcon.process_services(processing_list)
+        self.garcon.process_user_changes(processing_list)
 
