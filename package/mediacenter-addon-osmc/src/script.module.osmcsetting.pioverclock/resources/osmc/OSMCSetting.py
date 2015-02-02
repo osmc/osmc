@@ -140,6 +140,15 @@ The module allows you to manually adjust:
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
 
+		with open('/proc/cpuinfo', 'r') as f:
+			lines = f.readlines()
+			cores = sum(1 for i in lines if i.startswith('processor'))
+			if cores == 1:
+				self.pimodel = 'PiB'
+			else:
+				self.pimodel = 'Pi2'
+		log('Model = %s' % self.pimodel)
+		
 		log('START')
 
 
@@ -177,7 +186,7 @@ The module allows you to manually adjust:
 
 		# setting_values = {'core_freq': 500, 'arm_freq': 800, 'sdram_freq': 700, 'initial_turbo': 60, 'over_voltage': 2, 'over_voltage_sdram': 6, 'force_turbo' : 0}
 
-		self.GUI = overclock_gui("oc_gui.xml", scriptPath, 'Default', setting_values=self.setting_values)
+		self.GUI = overclock_gui("oc_gui.xml", scriptPath, 'Default', setting_values=self.setting_values, model=self.pimodel)
 
 		self.GUI.doModal()
 

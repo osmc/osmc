@@ -20,6 +20,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
 		self.setting_values = kwargs['setting_values']
+		self.model = kwargs['model']
 
 		self.warning = False
 
@@ -28,20 +29,66 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
 		self.oc_profile = namedtuple('Profile', 'arm_freq sdram_freq core_freq initial_turbo over_voltage over_voltage_sdram force_turbo')
 
-		self.normal_profile = self.oc_profile(850, 400, 375, 0, 0, 0, 0)
-		self.medium_profile = self.oc_profile(900, 400, 375, 0, 0, 0, 0)
-		self.higher_profile = self.oc_profile(950, 450, 450, 0, 6, 0, 0)
-		self.custom_profile = self.oc_profile(
-			self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
-			self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
-			self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
-			self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
-			self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
-			self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
-			self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
-			)
+		if self.model != 'Pi2':
+			self.normal_profile = self.oc_profile(850, 400, 375, 0, 0, 0, 0)
+			self.medium_profile = self.oc_profile(900, 400, 375, 0, 0, 0, 0)
+			self.higher_profile = self.oc_profile(950, 450, 450, 0, 6, 0, 0)
+			self.custom_profile = self.oc_profile(
+				self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
+				self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
+				self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
+				self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
+				self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
+				self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
+				self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
+				)
 
-		self.overclock_profiles = [self.normal_profile, self.medium_profile, self.higher_profile, self.custom_profile]
+			self.overclock_profiles = [self.normal_profile, self.medium_profile, self.higher_profile, self.custom_profile]
+
+			self.descriptions = {
+				301  :  lang(32088) % self.normal_profile,
+				302  :  lang(32089) % self.medium_profile,
+				303  :  lang(32090) % self.higher_profile,
+				304  :  lang(32091) % self.custom_profile,
+				403  :  lang(32092),
+				503  :  lang(32093),
+				603  :  lang(32094),
+				703  :  lang(32095),
+				803  :	lang(32096),
+				903  :  lang(32097),
+				1003 :  lang(32098),
+				}
+
+
+		else:
+			# raspberry Pi2 profiles, there is not higher, only normal and turbo
+			self.normal_profile = self.oc_profile(900, 450, 450, 0, 0, 0, 0)
+			self.medium_profile = self.oc_profile(1000, 500, 500, 0, 2, 0, 0)
+			self.custom_profile = self.oc_profile(
+				self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
+				self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
+				self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
+				self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
+				self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
+				self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
+				self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
+				)
+
+			self.overclock_profiles = [self.normal_profile, self.medium_profile, 'nothing', self.custom_profile]
+
+			self.descriptions = {
+				301  :  lang(32088) % self.normal_profile,
+				302  :  lang(32089) % self.medium_profile,
+				304  :  lang(32091) % self.custom_profile,
+				403  :  lang(32092),
+				503  :  lang(32093),
+				603  :  lang(32094),
+				703  :  lang(32095),
+				803  :	lang(32096),
+				903  :  lang(32097),
+				1003 :  lang(32098),
+				}
+
 
 		self.control_matching = {
 			'arm_freq'				: 403,
@@ -53,19 +100,6 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			'force_turbo'			: 1002,
 			}
 
-		self.descriptions = {
-			301  :  lang(32088) % self.normal_profile,
-			302  :  lang(32089) % self.medium_profile,
-			303  :  lang(32090) % self.higher_profile,
-			304  :  lang(32091) % self.custom_profile,
-			403  :  lang(32092),
-			503  :  lang(32093),
-			603  :  lang(32094),
-			703  :  lang(32095),
-			803  :	lang(32096),
-			903  :  lang(32097),
-			1003 :  lang(32098),
-			}
 
 		self.oc_factor = namedtuple('oc_factor', ['min', 'range', 'step', 'custom'])
 
@@ -84,6 +118,19 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
 
 	def onInit(self):
+
+		if self.model == 'Pi2':
+			frame = self.getControl(1303)
+			frame.setEnabled(False)
+			frame.setVisible(False)
+			hbutton = self.getControl(303)
+			hbutton.setEnabled(False)
+			hbutton.setVisible(False)
+			mbutton = self.getControl(302)
+			mbutton.setLabel('Turbo')
+			cbutton = self.getControl(304)
+			mbutton.controlRight(cbutton)
+			cbutton.controlLeft(mbutton)
 
 		# apply the users current settings (custom)
 		self.apply_profile(304)
@@ -117,7 +164,6 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		self.check_for_profile()
 
 
-
 	def apply_profile(self, control):
 		''' Applies specific profile to the controls '''
 
@@ -134,6 +180,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 				ctl.setLabel(str(pfl[k]))
 
 		self.check_for_profile()
+
 
 	def snapshot(self):
 		''' Returns the current settings in a dictionary. '''
