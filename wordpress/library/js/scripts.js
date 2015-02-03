@@ -95,7 +95,7 @@ jQuery(".donationwidget form").submit(function(e) {
 function stripe(am, cur) {
   var handler = StripeCheckout.configure({
     key: 'pk_live_HEfJk95fTFmjEBYMYVTxWFZk',
-    image: 'wp-content/themes/osmc/library/images/favicons/apple-touch-icon-180x180.png'
+    image: '/wp-content/themes/osmc/library/images/favicons/apple-touch-icon-180x180.png'
   });
     
   // Open Checkout with further options
