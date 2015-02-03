@@ -565,6 +565,40 @@ footer {
   }
 }
 
+// NEWSLETTER //
+
+.newsletter_subscribe {
+  text-align: center;
+  font-size: 95%;
+  .email {
+    background-color: $white;
+    color: $black;
+    display: block;
+    margin: 1em auto;
+    width: 100%;
+    max-width: 15em;
+    border: 0px;
+    font-weight: 400;
+    padding: 0.3em;
+    @include input-placeholder {
+      color: $dgrey;
+    }
+  }
+  .newsletter-submit {
+    text-align: center;
+    background-color: $dgrey;
+  }
+  .newsletter-submit:hover, .newsletter-submit:focus {
+    background-color: $link;
+  }
+}
+
+.newsletter_subscribe.success {
+  .email {
+    text-align: center;
+  }
+}
+
 // COMMENTS //
 
 .comments-area {

@@ -23,3 +23,31 @@ jQuery(window).resize(function(){
 		jQuery(".top-nav.nav-res").removeClass("animated fadeInRight fadeOutRight")
 	}
 });
+
+jQuery(".newsletter_subscribe").submit(function(e) {
+  
+  e.preventDefault();
+  
+  var form = jQuery(this);
+  var button = form.find("button");
+  
+  form.removeClass("wait success error");
+  
+  form.addClass("wait");
+  
+  button.prop('disabled', true);
+  button.text("loading");
+  
+  jQuery.ajax({
+    
+    url: jQuery(this).attr("action"),
+    type: "POST",
+    data: jQuery(this).serialize(),
+    success: function(response) {
+      button.prop('disabled', false);
+      button.text("Subscribe");
+      form.find(".email").val("You are now subscribed!");
+      form.removeClass("wait").addClass("success");
+    }
+  });
+});
