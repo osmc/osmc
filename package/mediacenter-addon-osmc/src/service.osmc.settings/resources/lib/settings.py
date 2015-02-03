@@ -287,7 +287,7 @@ class OSMCGui(object):
 	
 	def close(self):
 		'''
-			Closes the gui, and deletes it from memory.
+			Closes the gui
 		'''
 
 		self.GUI.close()

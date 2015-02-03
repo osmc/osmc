@@ -202,13 +202,16 @@ class Main(object):
 
 	def exit(self):
 		
-		try:		
-			log('Closing gui')
-			self.stored_gui.close()
-		except:
-			log('Failed to stop/delete stored_gui. (in wait)')	
-			
 		# try to kill the gui and comms
+		# try:		
+		# 	log('Closing gui')
+
+		# 	# self.stored_gui.close()
+		# 	# del self.stored_gui
+			
+		# except:
+		# 	log('Failed to stop/delete stored_gui. (in wait)')	
+			
 		try:
 			log('Stopping listener (in wait)')
 			self.listener.stop()

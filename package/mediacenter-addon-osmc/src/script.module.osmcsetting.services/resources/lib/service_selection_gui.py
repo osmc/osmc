@@ -1,6 +1,7 @@
 import os
 import subprocess
 import xbmcgui
+import xbmc
 from collections import OrderedDict
 import glob
 from comprehensive_function_logger import comprehensive_logger as clog
@@ -12,28 +13,31 @@ HEADING              = 1
 ACTION_SELECT_ITEM   = 7
 
 
+def KodiLogger(message):
+    xbmc.log('OSMC SERVICES ' + str(message), level=xbmc.LOGDEBUG)
+
+
 class MaitreD(object):
 
-    def __init__(self, logger):
-        self.log = logger
+    def __init__(self):
         self.services = {}
 
 
-    @clog(self.log)
+    @clog(KodiLogger)
     def enable_service(self, s_entry):
         
         os.system("sudo /bin/systemctl enable " + s_entry)
         os.system("sudo /bin/systemctl start " + s_entry)
     
 
-    @clog(self.log)
+    @clog(KodiLogger)
     def disable_service(self, s_entry):
         
         os.system("sudo /bin/systemctl disable " + s_entry)
         os.system("sudo /bin/systemctl stop " + s_entry)
 
 
-    @clog(self.log)
+    @clog(KodiLogger)
     def is_running(self, s_entry):
 
         p = subprocess.call(["sudo", "/bin/systemctl", "is-active", s_entry])
@@ -41,7 +45,7 @@ class MaitreD(object):
         return True if p == 0 else False
 
 
-    @clog(self.log)
+    @clog(KodiLogger)
     def is_enabled(self, s_entry):
 
         p = subprocess.call(["sudo", "/bin/systemctl", "is-enabled", s_entry])
@@ -49,7 +53,7 @@ class MaitreD(object):
         return True if p == 0 else False
 
 
-    @clog(self.log, max_length=500)
+    @clog(KodiLogger, maxlength=500)
     def discover_services(self):
         ''' Returns a dict of service tuples. {s_name: (entry, service_name, running, enabled)} '''
 
@@ -62,8 +66,8 @@ class MaitreD(object):
                     s_name = f.readline().replace('\n','')
                     s_entry = f.readline().replace('\n','')
 
-                    self.log("MaitreD: Service Friendly Name: " + s_name)
-                    self.log("MaitreD: Service Entry Point: " + s_entry)
+                    KodiLogger("MaitreD: Service Friendly Name: " + s_name)
+                    KodiLogger("MaitreD: Service Entry Point: " + s_entry)
 
                     enabled     = self.is_enabled(s_entry)
                     runcheck    = self.is_running(s_entry)
@@ -83,7 +87,7 @@ class MaitreD(object):
         return self.services
 
 
-    @clog(self.log, max_length=250)
+    @clog(KodiLogger, maxlength=250)
     def process_user_changes(self, user_selection):
         ''' User selection is a list of tuples (s_name::str, service_name::str, enable::bool) '''
 
@@ -102,9 +106,8 @@ class service_selection(xbmcgui.WindowXMLDialog):
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
         self.service_list = kwargs.get('service_list', [])
-        self.log = kwargs.get('logger', self.dummy)
 
-        self.garcon = MaitreD(self.log)
+        self.garcon = MaitreD()
         self.service_list = self.garcon.discover_services()
 
 
