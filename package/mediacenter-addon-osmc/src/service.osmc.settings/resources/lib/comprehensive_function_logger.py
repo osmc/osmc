@@ -4,27 +4,48 @@ from functools import wraps
 TEST_LOG_BOOL = True
 
 def test_logger(msg):
-	print msg
+	print 'test-' + msg
 
-def comprehensive_logger(logger, logging=False, max_length=25):
+
+def comprehensive_logger(logger=None, logging=True, maxlength=25, nowait=False):
 	'''
 		Decorator to log the inputs and outputs of functions, as well as the time taken
 		to run the function.
+		Requires: time, functools
+		logger: 	[opt] logging function, if not provided print is used
+		logging: 	[opt] boolean, turn logging on and off, default is True
+		maxlength:	[opt] integer, sets the maximum length an argument or returned variable cant take, default 25
+		nowait:		[opt] boolean, instructs the logger not to wait for the function to finish, default is False
 	'''
+
+	def default_logger(msg):
+
+		print msg
+
+
+	if logger == None:
+
+		logger = default_logger
+
 
 	def get_args(*args, **kwargs):
 
 		all_args = []
 
 		for i, arg in enumerate(args):
-			itm = 'pos' + str(i) + ": " + str(arg)[:max_length]
+
+			itm = 'pos' + str(i) + ": " + str(arg)[:maxlength]
+
 			all_args.append(itm)
 
 		for k, v in kwargs.iteritems():
-			itm = str(k) + ": " + str(v)[:max_length]
+
+			itm = str(k) + ": " + str(v)[:maxlength]
+
 			all_args.append(itm)
 
 		return all_args
+
 
 	def decorater(func):
 
@@ -32,31 +53,46 @@ def comprehensive_logger(logger, logging=False, max_length=25):
 		def wrapper(*args, **kwargs):
 
 			if logging and logger != None:
+			
 				logger(func.__module__ + '.' + func.__name__ + " received: " + ", ".join(get_args(*args, **kwargs)))
 
-			start 	= time.time()
+			if nowait:
+				
+				func(*args, **kwargs)
 
-			# @@@@@@@@@@@@ FUNCTION @@@@@@@@@@@@
-			result 	= func(*args, **kwargs)
-			# @@@@@@@@@@@@ FUNCTION @@@@@@@@@@@@
+				logger(func.__module__ + '.' + func.__name__ + " -nowait")
 
-			end 	= time.time()
+				return
 
-			if logging and logger != None:
-				logger(func.__module__ + '.' + func.__name__ + " [" + str(end-start) + "] " + ' returns: ' + str(result)[:max_length])
+			else:
+	
+				start 	= time.time()
+				
+				result 	= func(*args, **kwargs)
 
-			return result
+				end 	= time.time()
+
+				if logging and logger != None:
+				
+					logger(func.__module__ + '.' + func.__name__ + " [" + str(end-start) + "] " + ' returns: ' + str(result)[:maxlength])
+
+				return result
 
 		return wrapper
 
 	return decorater
 
+
 clog = comprehensive_logger
 
-@clog(test_logger, TEST_LOG_BOOL)
+
+@clog(logging=TEST_LOG_BOOL)
 def arg_tester(a, b, cdef):
+
 	print 'a: ' + str(a)
+	
 	print 'b: ' + str(b)
+	
 	print 'cdef: ' + str(cdef)
 
 

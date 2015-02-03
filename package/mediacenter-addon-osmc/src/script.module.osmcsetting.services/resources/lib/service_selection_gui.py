@@ -3,7 +3,7 @@ import subprocess
 import xbmcgui
 from collections import OrderedDict
 import glob
-
+from comprehensive_function_logger import comprehensive_logger as clog
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK      = 92
@@ -17,58 +17,39 @@ class MaitreD(object):
     def __init__(self, logger):
         self.log = logger
         self.services = {}
-        # self.poll_services()
 
-    # def poll_services(self):
-    #     full_paths = glob.glob('/etc/systemd/system/*.wants/*')
-    #     self.log('full paths from glob = %s' % full_paths)
-    #     self.active_services = [os.path.basename(x).replace('\n','') for x in full_paths]
 
+    @clog(self.log)
     def enable_service(self, s_entry):
-        self.log("MaitreD: Enabling " + s_entry)
+        
         os.system("sudo /bin/systemctl enable " + s_entry)
         os.system("sudo /bin/systemctl start " + s_entry)
-        
+    
+
+    @clog(self.log)
     def disable_service(self, s_entry):
-        self.log("MaitreD: Disabling " + s_entry)
+        
         os.system("sudo /bin/systemctl disable " + s_entry)
         os.system("sudo /bin/systemctl stop " + s_entry)
 
+
+    @clog(self.log)
     def is_running(self, s_entry):
 
         p = subprocess.call(["sudo", "/bin/systemctl", "is-active", s_entry])
 
-        if p == 0:
-            self.log('%s is running' % s_entry )
-
-            return True
-
-        self.log('%s is NOT running' % s_entry )
-        return False
+        return True if p == 0 else False
 
 
+    @clog(self.log)
     def is_enabled(self, s_entry):
 
         p = subprocess.call(["sudo", "/bin/systemctl", "is-enabled", s_entry])
 
-        if p == 0:
-            self.log('%s is enabled' % s_entry )
-
-            return True
-
-        self.log('%s is NOT enabled' % s_entry )
-        return False
+        return True if p == 0 else False
 
 
-    # def is_enabled(self, s_entry):
-
-    #     if s_entry in self.active_services:
-    #         self.log("%s is currently enabled" % s_entry)  
-    #         return True
-    #     else:
-    #         self.log("%s is currently disabled" % s_entry)
-    #         return False
-
+    @clog(self.log, max_length=500)
     def discover_services(self):
         ''' Returns a dict of service tuples. {s_name: (entry, service_name, running, enabled)} '''
 
@@ -98,13 +79,13 @@ class MaitreD(object):
         self.services = OrderedDict()
         for key in sorted(svcs.keys()):
             self.services[key] = svcs[key]
-        self.log('MaitreD: service list = %s' % self.services)
+        
         return self.services
 
+
+    @clog(self.log, max_length=250)
     def process_user_changes(self, user_selection):
         ''' User selection is a list of tuples (s_name::str, service_name::str, enable::bool) '''
-
-        self.log('MaitreD: process_user_changes = %s' % user_selection)
 
         for s_name, s_entry, status in user_selection:
             if status != self.services[s_name][-1]:
@@ -129,6 +110,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
     def dummy(self):
         print('logger not provided')
+
 
     def onInit(self):
 
