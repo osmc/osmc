@@ -62,12 +62,6 @@ class Main(object):
 
 		self.cache = apt.Cache()
 
-		# check that the dpkg journal isnt dirty
-		if self.cache.dpkg_journal_dirty:
-			print '============== dpkg_journal_dirty =============='
-			subprocess.Popen(['sudo', 'dpkg', '--configure', '-a'])
-			time.sleep(3000)
-
 		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
 
 		self.action_to_method = {

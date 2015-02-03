@@ -112,7 +112,7 @@ class Main(object):
 
 		self.randomid = random.randint(0,1000)
 
-		self.REBOOT_REQUIRED = 0
+		self.EXTERNAL_UPDATE_REQUIRED = 0
 
 		# create socket, listen for comms
 		self.listener = comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.update.sockfile')
@@ -250,7 +250,7 @@ class Main(object):
 
 			self.function_holding_pattern = False
 
-			if not self.REBOOT_REQUIRED:
+			if not self.EXTERNAL_UPDATE_REQUIRED:
 
 				install_now = DIALOG.yesno(lang(32072), lang(32073), lang(32074))
 
@@ -703,31 +703,32 @@ class Main(object):
 
 		elif action == 'install':
 
-			if not self.REBOOT_REQUIRED:
+			check = self.check_for_legit_updates()
+
+			if check ==' bail':
+				return
+
+			if not self.EXTERNAL_UPDATE_REQUIRED:
 
 				self.call_child_script('commit')
 
 			else:
 
-				exit_osmc_settings_addon()
-				xbmc.sleep(1000)
+				ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
-				subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])			
+				if ans:
+					exit_osmc_settings_addon()
+					xbmc.sleep(1000)
+
+					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])			
 
 
 	# ACTION METHOD
-	def apt_update_complete(self, skip_dpkg_journal_check=False):
+	def check_for_legit_updates(self, skip_dpkg_journal_check=False):
+
+		self.EXTERNAL_UPDATE_REQUIRED = 0
 
 		self.cache = apt.Cache()
-
-		# check that the dpkg journal isnt dirty
-		if not skip_dpkg_journal_check:
-			if self.cache.dpkg_journal_dirty:
-				log('dpkg_journal_dirty')
-				subprocess.Popen(['sudo', 'dpkg', '--configure', '-a'])
-				xbmc.sleep(3000)
-
-		self.REBOOT_REQUIRED = 0
 
 		log('apt_update_complete called')
 
@@ -735,14 +736,13 @@ class Main(object):
 			self.cache.open(None)
 		except:
 			log('apt cache failed to open')
-			return
+			return 'bail'
 
 		try:
 			self.cache.upgrade(True)
 		except:
 			log('apt cache failed to upgrade')
-			return
-
+			return 'bail'
 
 		# available_updates = self.cache.get_changes()
 
@@ -753,22 +753,34 @@ class Main(object):
 			if pkg.is_upgradable:
 				log('is upgradeable', pkg.shortname)
 				available_updates.append(pkg.shortname.lower())
-		
-		del self.cache
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
 		if not any(['osmc' in x for x in available_updates]):
 			self.window.setProperty('OSMC_notification', 'false')
 			log('There are no osmc packages')
-			return
+			return 'bail'
 
 		if any(["mediacenter" in x for x in available_updates]):
-			self.REBOOT_REQUIRED = 1
+			self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# display update available notification
 		if not self.s['suppress_icon']:
 			self.window.setProperty('OSMC_notification', 'true')
+		
+		# check that the dpkg journal isnt dirty
+		if not skip_dpkg_journal_check:
+			if self.cache.dpkg_journal_dirty:
+				log('dpkg_journal_dirty')
+				self.EXTERNAL_UPDATE_REQUIRED = 1
+
+
+	# ACTION METHOD
+	def apt_update_complete(self, skip_dpkg_journal_check=False):
+		
+		check = self.check_for_legit_updates()
+		if check == 'bail':
+			return
 
 		# The following section implements the procedure that the user has chosen to take place when updates are detected
 
@@ -776,7 +788,7 @@ class Main(object):
 			# Display icon on home screen only
 			return
 
-		elif (self.s['on_upd_detected'] in [2, 3, 5]) or (self.s['on_upd_detected'] == 4 and self.REBOOT_REQUIRED):
+		elif (self.s['on_upd_detected'] in [2, 3, 5]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
 			# Download updates, then prompt
 			# Download and display icon
 			# Download, install, prompt if restart needed (restart is needed)
@@ -784,7 +796,7 @@ class Main(object):
 			self.call_child_script('fetch')
 			return
 
-		elif self.s['on_upd_detected'] == 4 and not self.REBOOT_REQUIRED:
+		elif self.s['on_upd_detected'] == 4 and not self.EXTERNAL_UPDATE_REQUIRED:
 			# Download, install, prompt if restart needed (restart is not needed)
 			self.call_child_script('commit')
 			return
@@ -792,7 +804,7 @@ class Main(object):
 		elif self.s['on_upd_detected'] == 0:
 			# show all prompts (default)
 
-			if self.REBOOT_REQUIRED == 1:
+			if self.EXTERNAL_UPDATE_REQUIRED == 1:
 
 				log("We can't upgrade from within Kodi as it needs updating itself")
 
