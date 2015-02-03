@@ -93,12 +93,16 @@ namespace io
 
        QProcess p;
        p.setEnvironment(QStringList() << "LANG=C");
+       utils::writeLog("going to start osa");
        p.start(osascript);
        p.waitForStarted();
+       utils::writeLog("pasting admin script to process " + aScript);
        p.write(aScript.toUtf8());
        p.closeWriteChannel();
+       utils::writeLog("waiting for finish");
        p.waitForReadyRead(-1);
-       p.waitForFinished(-1);       
+       p.waitForFinished(-1);
+       utils::writeLog("osa claims to be done...collect output and verify");
        QByteArray stdoutArray = p.readAllStandardOutput();
        QByteArray stderrArray = p.readAllStandardError();
        int exitCode = p.exitCode();
