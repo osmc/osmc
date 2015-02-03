@@ -751,8 +751,11 @@ class Main(object):
 		log('The following packages have newer versions and are upgradable: ')
 		for pkg in self.cache:
 			if pkg.is_upgradable:
-				log('is upgradeable', pkg.shortname)
+				log(' is upgradeable', pkg.shortname)
 				available_updates.append(pkg.shortname.lower())
+
+			if pkg.is_now_broken:
+				log(' IS BORKENED!!!', pkg.shortname)
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
