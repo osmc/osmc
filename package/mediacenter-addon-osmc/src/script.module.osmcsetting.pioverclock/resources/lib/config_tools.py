@@ -13,7 +13,17 @@ class MultiOrderedDict(OrderedDict):
         and the addition of new multiple entries on write.
     '''
 
+
     def __setitem__(self, key, value):
+
+        alias = {      'device_tree_overlay'   :   'dtoverlay', 
+                            'device_tree_param'     :   'dtparam',
+                            'device_tree_params'    :   'dtparams'
+                        }
+
+        if key in alias:
+            key = alias[key]
+            
         #print 'mod: key value provided, \n\t%s = %s' % (key, value)
         if isinstance(value, list) and key in self:
             #print 'mod: instance is list and key in self'

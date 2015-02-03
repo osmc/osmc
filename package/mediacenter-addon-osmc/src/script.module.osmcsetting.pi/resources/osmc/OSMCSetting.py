@@ -239,7 +239,11 @@ Overclock settings are set using the Pi Overclock module."""
 									'dtoverlay':				{'setting_value' : '',
 																	'default': '',
 																		'translate': self.translate_dtoverlay,
-																	},																	
+																	},
+									'device_tree':				{'setting_value' : '',
+																	'default': '',
+																		'translate': self.translate_device_tree,
+																	},																																			
 									# 'other_settings_string': 	{'setting_value' : '',
 									# 								'default': '',
 									# 									'translate': self.translate_other_string
@@ -590,6 +594,27 @@ Overclock settings are set using the Pi Overclock module."""
 
 	# 		return new_unknown_settings
 
+
+	def translate_device_tree(self, data, reverse=False):
+		'''
+			Checks for the presence of an empty device_tree setting, which disables device tree overlays.
+		'''
+
+		datalist = data.split('\n')
+
+		if not reverse:
+
+			if 'device_tree' in self.config_settings and '' in datalist:
+				self.me.setSetting('suppress_dtoverlay', 'true')
+			else:
+				self.me.setSetting('suppress_dtoverlay', 'false')
+
+		else:
+			if self.me.getSetting('suppress_dtoverlay') == 'true':
+				return ['']
+			else:
+				return ['[remove]']
+
 	def translate_dtoverlay(self, data, reverse=False):
 		'''
 			Parses the dtoverlay list. There can be multiple dtoverlays, so the config_tool puts them all into 
@@ -616,9 +641,6 @@ Overclock settings are set using the Pi Overclock module."""
 		log('datalist = %s' % datalist)
 
 		if not reverse:
-			if len(datalist) != len(filter(None, datalist)):
-				# first check is there is a blank dtoverlay setting
-				self.me.setSetting('suppress_dtoverlay', 'true')
 				
 			self.me.setSetting('dacplus', 'false')
 			self.me.setSetting('lirc-rpi-overlay', 'false')
@@ -669,11 +691,6 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.append('lirc-rpi-overlay')
 			else:
 				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
-
-			if self.me.getSetting('suppress_dtoverlay') == 'true':
-				new_dtoverlay.append('')
-			else:
-				new_dtoverlay.append('[remove]')
 
 			return new_dtoverlay
 
