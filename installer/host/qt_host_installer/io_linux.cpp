@@ -43,7 +43,7 @@ QList<DiskDevice * > enumerateDevice()
          for (int i = 0; i < lines.count(); i++)
          {
              QString line = lines.at(i);
-             if (line.startsWith("Disk /dev") && ! (line.startsWith("Disk /dev/sda") || line.startsWith("Disk /dev/hda") || line.startsWith("Disk /dev/xvda")))
+             if (line.startsWith("Disk /dev"))
              {
                  QStringList deviceAttr = line.split(" ");
                  QString devicePath;
@@ -171,5 +171,11 @@ void updateKernelTable()
 }
 
 bool installImagingTool() { return true; }
+
+DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
+{
+    diskDevice->setIsWritable(true);
+    return diskDevice;
+}
 
 }

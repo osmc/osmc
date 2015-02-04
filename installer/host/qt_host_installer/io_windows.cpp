@@ -119,4 +119,11 @@ namespace io
     }
 
    void updateKernelTable() { return; }
+
+   DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
+   {
+       /* IMPLEMENT YOUR LOGIC HERE AND CALL IT WHERE NEEDED*/
+       diskDevice->setIsWritable(true);
+       return diskDevice;
+   }
 }

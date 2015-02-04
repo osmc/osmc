@@ -10,6 +10,7 @@
 #include <QList>
 #include <QTextStream>
 #include "io.h"
+#include <QDebug>
 
 namespace io
 {
@@ -53,17 +54,13 @@ namespace io
                 * [3] <size_unit>
                 * [4] device name (disk0, disk1, etc)
                 */
-
-               /* TODO when we refactor IO into platform specific implementations
-                * provide definitions for the fields for easy arithmetic on the indices
-                */
                QString deviceSpace;
                QString devicePath("/dev/");
                if (deviceAttr.at(1).startsWith("*"))
                {
                    /* partition schema name was missing - uninitialised disk */
                    deviceSpace = deviceAttr.at(1) + " " + deviceAttr.at(2);
-                   devicePath += deviceAttr.at(3);
+                   devicePath += (new QString(deviceAttr.at(3)))->replace(0, 1, "rd");
                } else
                {
                    deviceSpace = deviceAttr.at(2) + " " + deviceAttr.at(3);
@@ -73,15 +70,14 @@ namespace io
                }
 
                deviceSpace.remove("*");
-               if ( ! (devicePath == "/dev/disk0" || devicePath == "/dev/rdisk0"))
-               {
-                   DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+               DiskDevice *nd = io::addAdditionalInfo(new DiskDevice(i, devicePath, deviceSpace));
+
+               if (nd->getIsWritable())
                    devices.append(nd);
-               }
            }
        }
        return devices;
-      }
+   }
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
    {
@@ -185,4 +181,63 @@ namespace io
 
    bool installImagingTool() { return true; }
    void updateKernelTable() { return; }
+
+   DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
+   {
+       QProcess process;
+       QString diskPath = diskDevice->getDiskPath();
+       process.start("/usr/sbin/diskutil", QStringList() << "info" << diskPath, QIODevice::ReadWrite | QIODevice::Text);
+       if (! process.waitForFinished())
+           utils::writeLog("Could not execute diskutil to check protocol for device " + diskPath);
+       else
+       {
+           QTextStream stdoutStream(process.readAllStandardOutput());
+           QString line = stdoutStream.readLine();
+           bool isEjectable = false;
+           bool isDmg = false;
+           bool isReadOnly = false;
+           while (!line.isNull())
+           {
+               line = line.simplified(); /* Remove trailing and leading ws */
+               /* The line holding the device is the only line always starting with 0: */
+               qDebug() << "reading line " << line;
+               if (line.simplified().startsWith("Ejectable:"))
+               {
+                   QString ejectable = QString(line.split(":").at(1).simplified());
+                   if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive))
+                       isEjectable = true;
+                   utils::writeLog("Determined " + ejectable + " as ejactableProperty for " + diskPath);
+               }
+               else if (line.simplified().startsWith("Protocol:"))
+               {
+                   QString protocol = QString(line.split(":").at(1).simplified());
+                   if (0 == QString("Disk Image").compare(protocol, Qt::CaseInsensitive))
+                       isDmg = true;
+                   utils::writeLog("Determined " + protocol + " as protocol for " + diskPath);
+                   utils::writeLog("Decided to be a DMG? " + isDmg);
+               }
+               else if (line.simplified().startsWith("Read-Only Media:"))
+               {
+                   QString readOnlyMedia = QString(line.split(":").at(1).simplified());
+                   if (0 == QString("Yes").compare(readOnlyMedia, Qt::CaseInsensitive))
+                       isReadOnly = true;
+                   utils::writeLog("Determined " + readOnlyMedia + " as readOnlyMedia for " + diskPath);
+                   utils::writeLog("Decided to be r/o? " + isReadOnly);
+               }
+               else if (line.simplified().contains("Media Name"))
+               {
+                   QString label = QString(line.split(":").at(1).simplified());
+                   diskDevice->setLabel(label);
+               }
+               if (isEjectable && (!isDmg && !isReadOnly))
+                  diskDevice->setIsWritable(true);
+               else
+                   utils::writeLog("Decided that " + diskPath + " is not writable to us");
+
+               /* advance to next line */
+               line = stdoutStream.readLine();
+           }
+       }
+       return diskDevice;
+   }
 }
