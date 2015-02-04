@@ -793,6 +793,8 @@ class Main(object):
 
 					self.EXTERNAL_UPDATE_REQUIRED = 1
 
+					return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
+
 		except:
 
 			return 'bail', 'check for partially installed packages failed'
@@ -811,6 +813,14 @@ class Main(object):
 			return check, msg 
 
 		self.cache = apt.Cache()
+
+		try:
+
+			self.cache.open(None)
+
+		except:
+
+			return 'bail', 'apt cache failed to open'
 
 		try:
 
