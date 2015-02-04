@@ -425,7 +425,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log)
+	@clog(log, maxlength=1000)
 	def update_settings(self):
 
 		''' Updates the settings for the service while the service is still running '''
@@ -771,15 +771,17 @@ class Main(object):
 
 		self.EXTERNAL_UPDATE_REQUIRED = 0
 
-		self.cache = apt.Cache()
-
 		try:
+			
+			apt_pkg.init_config()
 
-			self.cache.open(None)
+			apt_pkg.init_system()
+
+			self.cache = apt_pkg.Cache()
 
 		except:
 
-			return 'bail', 'apt cache failed to open'
+			return 'bail', 'apt_pkg cache failed to open'
 
 		try:
 
@@ -789,10 +791,10 @@ class Main(object):
 
 			return 'bail', 'apt cache failed to upgrade'
 
-		# available_updates = self.cache.get_changes()
-
 		available_updates = []
 
+		self.dirty_states = {apt_pkg.CURSTATE_HALF_CONFIGURED, apt_pkg.CURSTATE_HALF_INSTALLED, apt_pkg.CURSTATE_UNPACKED}
+		
 		log('The following packages have newer versions and are upgradable: ')
 
 		for pkg in self.cache:
@@ -803,9 +805,11 @@ class Main(object):
 
 				available_updates.append(pkg.shortname.lower())
 
-			if pkg.is_now_broken:
+			if pkg.current_state in self.dirty_states:
 
-				log(' IS BORKENED!!!', pkg.shortname)
+				log(' found in a partially installed state', pkg.name)
+
+				self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
