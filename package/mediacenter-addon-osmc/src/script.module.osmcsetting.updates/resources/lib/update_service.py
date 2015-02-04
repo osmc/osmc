@@ -378,11 +378,13 @@ class Main(object):
 			
 				log('Update CONDITION : player playing')
 			
-				return False, 'Update CONDITION : player playing')
+				return False, 'Update CONDITION : player playing'
 
 		idle = xbmc.getGlobalIdleTime()
 
 		if self.s['update_on_idle'] and idle < 60 and not media_only:
+
+			msg = 'Update CONDITION : idle time = %s' % idle
 
 			return False, 'Update CONDITION : idle time = %s' % idle
 
