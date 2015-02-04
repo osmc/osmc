@@ -19,7 +19,7 @@ __libpath__ = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('pa
 sys.path.append(__libpath__)
 import comms
 import simple_scheduler as sched
-
+from CompLogger import comprehensive_logger as clog
 
 __addon__              	= xbmcaddon.Addon()
 __addonid__            	= __addon__.getAddonInfo('id')
@@ -38,12 +38,15 @@ def log(message, label = ''):
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
+@clog(log)
 def exit_osmc_settings_addon():
 	address = '/var/tmp/osmc.settings.sockfile'
 	sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	sock.connect(address)
 	sock.sendall('exit')
 	sock.close()
+
+	return 'OSMC Settings addon called to exit'
 
 
 class Monitah(xbmc.Monitor):
@@ -53,23 +56,19 @@ class Monitah(xbmc.Monitor):
 
 		self.parent_queue = kwargs['parent_queue']
 
-
+	@clog(log)
 	def onAbortRequested(self):
-
-		log('killing self')
 
 		msg = json.dumps(('kill_yourself', {}))
 
 		self.parent_queue.put(msg)
 
-
+	@clog(log)
 	def onSettingsChanged(self):
 
 		msg = json.dumps(('update_settings', {}))
 
 		self.parent_queue.put(msg)
-
-		log(self.parent_queue, 'self.parent_queue')
 
 
 class Main(object):
@@ -186,9 +185,8 @@ class Main(object):
 
 
 	# MAIN METHOD
+	@clog(log, nowait=True)
 	def _daemon(self):
-
-		log('_daemon started')
 
 		self.keep_alive = True
 
@@ -223,26 +221,38 @@ class Main(object):
 
 
 	# HOLDING PATTERN METHOD
+	@clog(log, nowait=True)
 	def holding_pattern_update(self):
 
-		if self.check_update_conditions():
+		check, _ = self.check_update_conditions()
+
+		if check:
+
 			self.function_holding_pattern = False
+			
 			self.user_update_now()
 
 
 	# HOLDING PATTERN METHOD
+	@clog(log, nowait=True)
 	def holding_pattern_boot_update(self):
 
 		if (datetime.now() - self.service_start).total_seconds() > (self.s['check_boot_delay'] * 60):
 			self.boot_delay_passed = True
 
 		if self.boot_delay_passed:
-			if self.check_update_conditions(media_only=True):
+
+			check, _ = self.check_update_conditions(media_only=True)
+
+			if check:
+
 				self.function_holding_pattern = False
+
 				self.call_child_script('update')
 
 
 	# HOLDING PATTERN METHOD
+	@clog(log)
 	def holding_pattern_fetched(self, bypass=False):
 
 		# stay in the holding pattern until the user returns to the Home screen
@@ -258,7 +268,7 @@ class Main(object):
 
 					self.call_child_script('commit')
 
-					return
+					return 'Called child script - commit'
 
 			else:
 
@@ -271,7 +281,7 @@ class Main(object):
 
 					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])
 
-					return
+					return 'Running external update proceedure'
 
 
 			# if the code reaches this far, the user has elected not to install right away
@@ -288,8 +298,11 @@ class Main(object):
 			if not self.s['suppress_icon']:
 				self.window.setProperty('OSMC_notification', 'true')
 
+			return 'skip_update_check= %s' % self.skip_update_check
+
 
 	# MAIN METHOD
+	@clog(log)
 	def exit_procedure(self):
 
 		# stop the listener
@@ -307,8 +320,6 @@ class Main(object):
 
 		# self.takedown_notification()
 		# log('notification control removed from window(10000)')
-
-		log('XBMC Aborting')
 
 
 	# MAIN METHOD
@@ -348,30 +359,39 @@ class Main(object):
 
 
 	# MAIN METHOD
+	@clog(log)
 	def check_update_conditions(self, media_only=False):
 		''' Checks the users update conditions are met. The media-only flag restricts the condition check to
 			only the media playing condition. '''
 
 		if self.s['ban_update_media']:
+
 			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
+
 			result = json.loads(result_raw)
+			
 			log(result, 'result of Player.GetActivePlayers')
+			
 			players = result.get('result', False)
+			
 			if players:
+			
 				log('Update CONDITION : player playing')
-				return False
+			
+				return False, 'Update CONDITION : player playing')
 
 		idle = xbmc.getGlobalIdleTime()
-		if self.s['update_on_idle'] and idle < 60 and not media_only:
-			log('Update CONDITION : idle time = %s' % idle)
-			return False
 
-		return True
+		if self.s['update_on_idle'] and idle < 60 and not media_only:
+
+			return False, 'Update CONDITION : idle time = %s' % idle
+
+		return True, ''
 
 
 	# MAIN METHOD
+	@clog(log)
 	def takedown_notification(self):
-		log('taking down notification')
 
 		try:
 			self.window.removeControl(self.update_image)
@@ -380,9 +400,9 @@ class Main(object):
 
 
 	# MAIN METHOD
+	@clog(log)
 	def call_child_script(self, action):
-		
-		log(action, 'calling child, action ')
+
 		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, action])
 
 
@@ -403,11 +423,10 @@ class Main(object):
 
 
 	# MAIN METHOD
+	@clog(log)
 	def update_settings(self):
 
 		''' Updates the settings for the service while the service is still running '''
-
-		log('Updating Settings...')
 
 		if self.first_run:
 
@@ -441,9 +460,7 @@ class Main(object):
 			self.s['update_on_idle']	= True if 		__setting__('update_on_idle') 		== 'true' else False
 			self.s['home_prompts_only']	= True if 		__setting__('home_prompts_only') 	== 'true' else False
 
-			log(self.s, 'Initial Settings')
-
-			return
+			return "initial run", self.s
 
 		else:
 
@@ -495,6 +512,8 @@ class Main(object):
 
 		log(self.scheduler.trigger_time, 'trigger_time')
 
+		return self.s
+
 
 	# ACTION METHOD
 	def apt_error(self, **kwargs):
@@ -511,6 +530,7 @@ class Main(object):
 
 
 	# ACTION METHOD
+	@clog(log, maxlength=250)
 	def progress_bar(self, **kwargs):
 
 		''' Controls the creation and updating of the background prgress bar in kodi.
@@ -523,8 +543,6 @@ class Main(object):
 		# return immediately if the user has suppressed on-screen progress updates or kwargs is empty
 		if self.s['suppress_progress'] or not kwargs: return
 
-		log(kwargs, 'kwargs')
-
 		# check for kill order in kwargs
 		kill = kwargs.get('kill', False)
 
@@ -534,10 +552,10 @@ class Main(object):
 			try:
 				self.pDialog.close()
 				del self.pDialog
+				return 'Killed pDialog'
 			except:
 				pass
-
-			return
+				return 'Failed to kill pDialog'
 
 		# retrieve the necessary data for the progress dialog, if the data isnt supplied, then use 'nix' in its place
 		# the progress dialog update has 3 optional arguments
@@ -573,18 +591,21 @@ class Main(object):
 			try:
 				self.pDialog.close()
 				del self.pDialog
+				return 'Killed pDialog'
 			except:
-				# a name error here is not interesting
 				pass
+				return 'Failed to kill pDialog'
 
 
 	# ACTION METHOD
+	@clog(log)
 	def kill_yourself(self):
 
 		self.keep_alive = False 
 
 
 	# ACTION METHOD
+	@clog(log, nowait=True)
 	def update_now(self):
 		''' Calls for an update check via the external script. This method checks if media is playing or whether the system has 
 			been idle for two minutes before allowing the update. If an update is requested, but media is playing or the system
@@ -594,7 +615,9 @@ class Main(object):
 		# do not do anything while there is something in the holding pattern
 		if self.function_holding_pattern: return
 
-		if self.check_update_conditions():
+		check, _ = self.check_update_conditions()
+
+		if check:
 
 			self.call_child_script('update')
 		
@@ -604,6 +627,7 @@ class Main(object):
 
 
 	# ACTION METHOD
+	@clog(log)
 	def user_update_now(self):
 		''' Similar to update_now, but as this is a users request, forego all the player and idle checks. '''
 
@@ -611,6 +635,7 @@ class Main(object):
 
 
 	# ACTION METHOD
+	@clog(log)
 	def apt_commit_complete(self):
 
 		# on commit complete, remove the notification from the Home window
@@ -659,18 +684,17 @@ class Main(object):
 			
 
 	# ACTION METHOD
+	@clog(log)
 	def apt_fetch_complete(self):
-
-		log('apt_fetch_complete called')
 
 		# Download and display icon
 		if self.s['on_upd_detected'] == 3:
-			
-			log('Download complete, leaving icon displayed')
 
 			# create the file that will prevent further update checks until the updates have been installed
 			with open(self.block_update_file, 'w') as f:
 				f.write('d')
+			
+			return 'Download complete, leaving icon displayed'
 
 		elif self.s['on_upd_detected'] == 5:
 			# Download, install, auto-restart if needed
@@ -680,6 +704,8 @@ class Main(object):
 
 			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
 
+			return 'Download complete, running external updater'
+
 		else:
 			# Download updates, then prompt
 			# Download, install, prompt if restart needed (restart is needed)
@@ -687,138 +713,173 @@ class Main(object):
 
 
 			if self.s['home_prompts_only']:
-				log('Download complete, putting into holding pattern')
+
 				self.function_holding_pattern = self.holding_pattern_fetched
+
+				return 'Download complete, putting into holding pattern'
+
 			else:
-				log('Download complete, prompting user')
+
 				self.holding_pattern_fetched(bypass=True)
+
+				return 'Download complete, prompting user'
 
 
 	# ACTION METHOD
+	@clog(log)
 	def settings_command(self, action):
 
 		if action == 'update':
 
 			self.call_child_script('update')
 
+			return 'Called child action - update'
+
 		elif action == 'install':
 
-			check = self.check_for_legit_updates()
+			check, _ = self.check_for_legit_updates()
 
-			if check ==' bail':
-				return
+			if check == 'bail':
+
+				return  'Update not legit, bail'
 
 			if not self.EXTERNAL_UPDATE_REQUIRED:
 
 				self.call_child_script('commit')
+
+				return 'Called child action - commit'
 
 			else:
 
 				ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
 				if ans:
+
 					exit_osmc_settings_addon()
 					xbmc.sleep(1000)
 
-					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])			
+					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
+
+					return "Calling external update"
 
 
 	# ACTION METHOD
+	@clog(log)
 	def check_for_legit_updates(self, skip_dpkg_journal_check=False):
 
 		self.EXTERNAL_UPDATE_REQUIRED = 0
 
 		self.cache = apt.Cache()
 
-		log('apt_update_complete called')
-
 		try:
+
 			self.cache.open(None)
+
 		except:
-			log('apt cache failed to open')
-			return 'bail'
+
+			return 'bail', 'apt cache failed to open'
 
 		try:
+
 			self.cache.upgrade(True)
+
 		except:
-			log('apt cache failed to upgrade')
-			return 'bail'
+
+			return 'bail', 'apt cache failed to upgrade'
 
 		# available_updates = self.cache.get_changes()
 
 		available_updates = []
 
 		log('The following packages have newer versions and are upgradable: ')
+
 		for pkg in self.cache:
+
 			if pkg.is_upgradable:
+
 				log(' is upgradeable', pkg.shortname)
+
 				available_updates.append(pkg.shortname.lower())
 
 			if pkg.is_now_broken:
+
 				log(' IS BORKENED!!!', pkg.shortname)
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		# SUPPRESS FOR TESTING
 		if not any(['osmc' in x for x in available_updates]):
+
 			self.window.setProperty('OSMC_notification', 'false')
-			log('There are no osmc packages')
-			return 'bail'
+
+			return 'bail', 'There are no osmc packages'
 
 		if any(["mediacenter" in x for x in available_updates]):
+
 			self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# display update available notification
 		if not self.s['suppress_icon']:
+
 			self.window.setProperty('OSMC_notification', 'true')
 		
 		# check that the dpkg journal isnt dirty
 		if not skip_dpkg_journal_check:
+
 			if self.cache.dpkg_journal_dirty:
-				log('dpkg_journal_dirty')
+
 				self.EXTERNAL_UPDATE_REQUIRED = 1
+
+				return 'bail', 'dpkg_journal_dirty'
 
 
 	# ACTION METHOD
+	@clog(log)
 	def apt_update_complete(self, skip_dpkg_journal_check=False):
 		
-		check = self.check_for_legit_updates()
+		check, _ = self.check_for_legit_updates()
+		
 		if check == 'bail':
-			return
+			
+			return 'Updates not legit, bail'
 
 		# The following section implements the procedure that the user has chosen to take place when updates are detected
 
 		if self.s['on_upd_detected'] == 1: 
 			# Display icon on home screen only
-			return
+
+			return 'Displaying icon on home screen only'
 
 		elif (self.s['on_upd_detected'] in [2, 3, 5]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
 			# Download updates, then prompt
 			# Download and display icon
 			# Download, install, prompt if restart needed (restart is needed)
 			# Download, install, auto-restart if needed
+
 			self.call_child_script('fetch')
-			return
+
+			return 'Downloading updates'
 
 		elif self.s['on_upd_detected'] == 4 and not self.EXTERNAL_UPDATE_REQUIRED:
 			# Download, install, prompt if restart needed (restart is not needed)
+
 			self.call_child_script('commit')
-			return
+			
+			return 'Download, install, prompt if restart needed'
 
 		elif self.s['on_upd_detected'] == 0:
 			# show all prompts (default)
 
 			if self.EXTERNAL_UPDATE_REQUIRED == 1:
 
-				log("We can't upgrade from within Kodi as it needs updating itself")
-
 				# Downloading all the debs at once require su access. So we call an external script to download the updates 
 				# to the default apt_cache. That other script provides a progress update to this parent script, 
 				# which is displayed as a background progress bar
+
 				self.call_child_script('fetch')
 
-			else:
+				return "We can't upgrade from within Kodi as it needs updating itself"
 
-				log("Updates are available, no reboot is required")			
+			else:
 
 				install = DIALOG.yesno(lang(32072), lang(32083), lang(32084))
 
@@ -839,7 +900,9 @@ class Main(object):
 					# trigger the flag to skip update checks
 					self.skip_update_check = True
 
+				return "Updates are available, no reboot is required"
 
+	@clog(log)
 	def check_if_reboot_required(self):
 		''' Checks for the existence of two specific files that indicate an installed package mandates a reboot. '''
 

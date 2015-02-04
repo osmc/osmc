@@ -244,7 +244,7 @@ class OSMCGui(object):
 
 		self.create_gui()
 
-
+	@clog(log)
 	def create_gui(self):
 		# known modules is a list of tuples detailing all the known and permissable modules and services
 		# (module name, order): the order is the hierarchy of addons (which is used to 
@@ -340,7 +340,7 @@ class OSMCGui(object):
 		except:
 			pass
 
-
+	@clog(log)
 	def retrieve_modules(self):
 		'''
 			Checks to see whether the module exists and is active. If it doesnt exist (or is set to inactive)

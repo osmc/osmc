@@ -8,6 +8,7 @@ import json
 import os
 import time
 import subprocess
+from comprehensive_function_logger import comprehensive_logger as clog
 
 t = datetime
 
@@ -26,6 +27,7 @@ except:
 	pass
 
 
+@clog(maxlength=50)
 def call_parent(raw_message, data={}):
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
@@ -37,15 +39,20 @@ def call_parent(raw_message, data={}):
 	message = json.dumps(message)
 
 	try:
+
 		sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
 		sock.connect(address)
+		
 		sock.sendall(message) 
+		
 		sock.close()
 
 	except Exception as e:
-		print '%s %s failed to connect to parent - %s' % (t.now(), 'apt_cache_action.py', e)
 
-	print '%s %s response sent' % (t.now(), 'apt_cache_action.py')
+		return '%s %s failed to connect to parent - %s' % (t.now(), 'apt_cache_action.py', e)
+
+	return 'response sent'
 
 
 class Main(object):
@@ -56,6 +63,7 @@ class Main(object):
 		print '%s %s running' % (t.now(), 'apt_cache_action.py')
 
 		self.error_package = ''
+		
 		self.error_message = ''
 
 		self.action = action
@@ -71,9 +79,13 @@ class Main(object):
 								}
 
 		try:
+		
 			self.act()
+		
 		except Exception as e:
+		
 			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
+		
 			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
 			deets = 'Error Type and Args: %s : %s' % (type(e).__name__, e.args)
@@ -95,54 +107,63 @@ class Main(object):
 	def act(self):
 
 		action = self.action_to_method.get(self.action, False)
+
 		if action:
+		
 			action()
 
-
+	@clog()
 	def update(self):
-		print '%s %s updating cache' % (t.now(), 'apt_cache_action.py')
+
 		dprg = Download_Progress(partial_heading='Updating')
+
 		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
 
 		# call the parent and kill the pDialog
 		call_parent('progress_bar', {'kill': True})
 
-		print '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
+		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
-
+	@clog()
 	def commit(self):
 
 		# check whether any packages are broken, if they are then the install needs to take place outside of Kodi
 
 		for pkg in self.cache:
+		
 			if pkg.is_inst_broken or pkg.is_now_broken:
-				print "%s is BROKEN, cannot proceed with commit" % pkg.shortname
-				return
+		
+				return "%s is BROKEN, cannot proceed with commit" % pkg.shortname
 
 		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
+		
 		self.cache.upgrade(True)
 
 		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
 
 		dprg = Download_Progress()
+		
 		iprg = Install_Progress(self)
+		
 		self.cache.commit(fetch_progress=dprg, install_progress=iprg)
 
 		# call the parent and kill the pDialog
 		call_parent('progress_bar', {'kill': True})
 
-		print '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
-
 		# remove the file that blocks further update checks
+		
 		try:
+		
 			os.remove(self.block_update_file)
+		
 		except:
-			pass
+		
+			return 'Failed to remove block_update_file'
 
+		return '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
 
+	@clog()
 	def fetch(self):
-
-		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 
 		self.cache.upgrade(True)
 
@@ -155,7 +176,7 @@ class Main(object):
 		# call the parent and kill the pDialog
 		call_parent('progress_bar', {'kill': True})
 
-		print '%s %s all packages fetched' % (t.now(), 'apt_cache_action.py')
+		return '%s %s all packages fetched' % (t.now(), 'apt_cache_action.py')
 
 
 class Operation_Progress(apt.progress.base.OpProgress):
@@ -175,19 +196,27 @@ class Operation_Progress(apt.progress.base.OpProgress):
 class Install_Progress(apt.progress.base.InstallProgress):
 
 	def __init__(self, parent):
+
 		self.parent = parent
+		
 		super(Install_Progress, self).__init__()	
 
-
+	@clog()
 	def error(self, pkg, errormsg):
 
 		try:
 			pkgname = os.path.basename(pkg).split('_')
+
 			self.parent.error_package = pkgname[0]
+
 			if len(pkgname) > 1:
+
 				self.parent.error_package += ' (' + pkgname[1] + ')'
+
 		except:
+
 			self.parent.error_package = '(unknown package)'
+
 		self.parent.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
@@ -210,23 +239,24 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	# The following methods should be overridden to implement progress reporting for run() calls 
 	# with an apt_pkg.PackageManager object as their parameter:
 
+	@clog()
 	def status_change(self, pkg, percent, status):
 		''' This method implements progress reporting for package installation by APT and may be extended to 
 			dpkg at a later time. This method takes two parameters: The parameter percent is a float value 
 			describing the overall progress and the parameter status is a string describing the current status 
 			in an human-readable manner. '''
 
-		print 'status_change !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-
 		diff = t.now() - self.pulse_time
+
 		if (diff.total_seconds() * 10) < 12:
+
 			return True
 
 		self.pulse_time = t.now()
 
 		call_parent('progress_bar', {'percent': int(percent),  'heading': 'Installing Update', 'message': status})
 
-
+	@clog()
 	def start_update(self):
 		''' This method is called before the installation of any package starts. '''
 
@@ -234,13 +264,13 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		# call_parent('progress_bar', {'percent': 0,  'heading': 'Installing Update', 'message':'Starting Installation'})
 
-		print 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-
+	@clog()
 	def finish_update(self):
 		''' This method is called when all changes have been applied. '''
 
-		print 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+		return 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
 
 class Download_Progress(apt.progress.base.AcquireProgress):
@@ -250,7 +280,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		super(Download_Progress, self).__init__()
 		self.partial_heading = partial_heading
 
-
+	@clog()
 	def start(self):
 		''' Invoked when the Acquire process starts running. '''
 
@@ -258,16 +288,15 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
-		print 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-
+	@clog()
 	def stop(self):
 		''' Invoked when the Acquire process stops running. '''
 
+		return 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-		print 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-
-
+	@clog()
 	def fetch(self, item):
 		''' Invoked when an item is being fetched. '''
 
@@ -277,20 +306,25 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		# call_parent('progress_bar',{'message': 'Downloading: ' + dsc[-1]})
 
-		print 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
+		return 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
 
-
+	@clog()
 	def pulse(self, owner):
 		''' Periodically invoked as something is being downloaded. '''
 
 		# if the pulse is less than one second since the last one then ignore the pulse
 		# this needs to be done as the parents _daemon only checks the queue once a second
+		
 		diff = t.now() - self.pulse_time
+		
 		if (diff.total_seconds() * 10) < 11:
+		
 			return True
 
 		else:
+		
 			self.pulse_time = t.now()
+		
 			print 'Pulse ==========================================='
 			print 'current_items', self.current_items
 			print 'total_items', self.total_items 
@@ -305,8 +339,11 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 			cps = self.current_cps / 1024.0
 
 			if cps > 1024:
+			
 				cps = '{0:.2f} MBps'.format(cps / 1024)
+			
 			else:
+			
 				cps = '{0:.0f} kBps'.format(cps)
 
 			cmb = self.current_bytes / 1048576.0
@@ -321,11 +358,11 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return True
 
-
+	@clog()
 	def done(self, item):
 		''' Invoked when an item has finished downloading. '''
 
-		print 'Done ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+		return 'Done ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
 
 

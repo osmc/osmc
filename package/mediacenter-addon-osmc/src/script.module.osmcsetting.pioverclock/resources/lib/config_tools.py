@@ -5,6 +5,7 @@ import ConfigParser
 import subprocess
 from collections import OrderedDict
 import re
+from comprehensive_function_logger import comprehensive_logger as clog
 
 
 class MultiOrderedDict(OrderedDict):
@@ -91,7 +92,7 @@ def grab_configtxt(config_location):
     return parser
 
 
-
+@clog()
 def read_config(config_location, parser_provided=False, return_the_parser=False):
 
     '''
@@ -120,7 +121,7 @@ def read_config(config_location, parser_provided=False, return_the_parser=False)
 
         return settings
 
-
+@clog()
 def write_config(config_location,  changes={}):
 
     '''

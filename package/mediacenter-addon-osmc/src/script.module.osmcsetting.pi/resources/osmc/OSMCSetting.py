@@ -106,6 +106,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 
 # OSMC SETTING Modules
 import config_tools as ct
+from comprehensive_function_logger import comprehensive_logger as clog
 
 def log(message):
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
@@ -285,7 +286,7 @@ Overclock settings are set using the Pi Overclock module."""
 		for x, k in self.pi_settings_dict.iteritems():
 			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
-
+	@clog(log)
 	def populate_pi_settings_dict(self):
 
 		'''
@@ -334,7 +335,7 @@ Overclock settings are set using the Pi Overclock module."""
 			# also set the value in the settings.xml
 			self.me.setSetting(key, str(setting_value))
 
-
+	@clog(log, nowait=True)
 	def open_settings_window(self):
 
 		'''
@@ -369,7 +370,7 @@ Overclock settings are set using the Pi Overclock module."""
 		for x, k in self.pi_settings_dict.iteritems():
 			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
-
+	@clog(log)
 	def apply_settings(self):
 
 		'''
@@ -381,7 +382,7 @@ Overclock settings are set using the Pi Overclock module."""
 		# this prevents the method running when called by the OSG. Rather, the method is only being run when the settings
 		# window is closed.
 		if not self.apply_permitted:
-			return
+			return 'apply not permitted'
 
 		# retrieve the current settings from the settings.xml (this is where the user has made changes)
 		new_settings = self.settings_retriever_xml()
@@ -453,7 +454,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		'''	
 
-
+	@clog(log)
 	def final_method(self):
 
 		''' 
@@ -594,7 +595,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 	# 		return new_unknown_settings
 
-
+	@clog(log)
 	def translate_device_tree(self, data, reverse=False):
 		'''
 			Checks for the presence of an empty device_tree setting, which disables device tree overlays.
@@ -615,6 +616,7 @@ Overclock settings are set using the Pi Overclock module."""
 			else:
 				return ['[remove]']
 
+	@clog(log)
 	def translate_dtoverlay(self, data, reverse=False):
 		'''
 			Parses the dtoverlay list. There can be multiple dtoverlays, so the config_tool puts them all into 
@@ -694,7 +696,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 			return new_dtoverlay
 
-
+	@clog(log)
 	def translate_store_hdmi(self, data, reverse=False):
 
 		''' 
@@ -739,7 +741,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 				return 'remove'
 			
-
+	@clog(log)
 	def translate_gpu_mem(self, data, reverse=False):
 
 		''' 
