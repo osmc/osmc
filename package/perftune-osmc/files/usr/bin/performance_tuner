@@ -5,7 +5,7 @@
 curgov=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)
 if [ ! -f /safe_mode ]
 then
-    test "$curgov" != "performance" && echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor >/dev/null 2>&1 && echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+    test "$curgov" != "performance" && echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor >/dev/null 2>&1 && echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold && echo 100000 | tee /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate && echo 50 | tee /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
 else
     echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 fi
