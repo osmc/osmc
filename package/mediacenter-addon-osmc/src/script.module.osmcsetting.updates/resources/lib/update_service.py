@@ -764,24 +764,53 @@ class Main(object):
 
 					return "Calling external update"
 
-
-	# ACTION METHOD
+	#ACTION METHOD
 	@clog(log)
-	def check_for_legit_updates(self, skip_dpkg_journal_check=False):
-
-		self.EXTERNAL_UPDATE_REQUIRED = 0
+	def check_for_broken_installs(self):
 
 		try:
 			
-			apt_pkg.init_config()
+			apt.apt_pkg.init_config()
 
-			apt_pkg.init_system()
+			apt.apt_pkg.init_system()
 
-			self.cache = apt_pkg.Cache()
+			self.cache = apt.apt_pkg.Cache()
 
 		except:
 
 			return 'bail', 'apt_pkg cache failed to open'
+
+
+		dirty_states = {apt_pkg.CURSTATE_HALF_CONFIGURED, apt_pkg.CURSTATE_HALF_INSTALLED, apt_pkg.CURSTATE_UNPACKED}
+
+		try:
+
+			for pkg in self.cache.packages:
+
+				if pkg.current_state in dirty_states:
+
+					log(' found in a partially installed state', pkg.name)
+
+					self.EXTERNAL_UPDATE_REQUIRED = 1
+
+		except:
+
+			return 'bail', 'check for partially installed packages failed'
+
+
+	# ACTION METHOD
+	@clog(log)
+	def check_for_legit_updates(self):
+
+		self.EXTERNAL_UPDATE_REQUIRED = 0
+
+		check, msg = self.check_for_broken_installs()
+
+		if check == 'bail':
+			
+			return check, msg 
+
+		self.cache = apt.Cache()
 
 		try:
 
@@ -793,8 +822,6 @@ class Main(object):
 
 		available_updates = []
 
-		self.dirty_states = {apt_pkg.CURSTATE_HALF_CONFIGURED, apt_pkg.CURSTATE_HALF_INSTALLED, apt_pkg.CURSTATE_UNPACKED}
-		
 		log('The following packages have newer versions and are upgradable: ')
 
 		for pkg in self.cache:
@@ -805,14 +832,7 @@ class Main(object):
 
 				available_updates.append(pkg.shortname.lower())
 
-			if pkg.current_state in self.dirty_states:
-
-				log(' found in a partially installed state', pkg.name)
-
-				self.EXTERNAL_UPDATE_REQUIRED = 1
-
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
-		# SUPPRESS FOR TESTING
 		if not any(['osmc' in x for x in available_updates]):
 
 			self.window.setProperty('OSMC_notification', 'false')
@@ -827,20 +847,11 @@ class Main(object):
 		if not self.s['suppress_icon']:
 
 			self.window.setProperty('OSMC_notification', 'true')
-		
-		# check that the dpkg journal isnt dirty
-		if not skip_dpkg_journal_check:
-
-			if self.cache.dpkg_journal_dirty:
-
-				self.EXTERNAL_UPDATE_REQUIRED = 1
-
-				return 'bail', 'dpkg_journal_dirty'
 
 
 	# ACTION METHOD
 	@clog(log)
-	def apt_update_complete(self, skip_dpkg_journal_check=False):
+	def apt_update_complete(self):
 		
 		check, _ = self.check_for_legit_updates()
 		
