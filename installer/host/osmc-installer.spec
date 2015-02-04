@@ -57,7 +57,7 @@ Requires: 		qt
 Requires:       patch
 %endif
 
-%if 0%{?centos_version} == 700 || 0%{?rhel_version} == 700
+%if 0%{?fedora} || 0%{?centos_version} == 700 || 0%{?rhel_version} == 700
 Requires: 	libjpeg-turbo
 Requires: 	libtiff
 Requires: 	libpng
@@ -85,7 +85,7 @@ Requires:	libpng12-0
 %if 0%{?suse_version}
 Requires:       libX11-6%{dep_postfix} >= 1.4.99.1
 %endif
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
 Requires:       libX11%{dep_postfix} >= 1.4.99.1
 %endif
 
@@ -99,7 +99,7 @@ OSMC Installer allows you to install OSMC on a variety of devices
 %build
 if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
 echo Building installer
-%if 0%{?fedora_version} || 0%{?rhel_version} || 0%{?centos_version}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
 qmake-qt4
 %else
 qmake
@@ -135,7 +135,7 @@ ln -s %{_datadir}/osmc/osmcinstaller %{buildroot}%{_bindir}/osmcinstaller
 %suse_update_desktop_file -i osmcinstaller
 %endif
 
-%if 0%{?fedora_version} || 0%{?rhel_version} || 0%{?centos_version}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
 desktop-file-install --dir=${RPM_BUILD_ROOT}%{_datadir}/applications osmcinstaller.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/osmcinstaller.desktop
 %endif
