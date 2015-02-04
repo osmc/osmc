@@ -576,8 +576,10 @@ footer {
     .amount {
       border: 0;
       padding: 0.2em 0.2em;
-      width: 3em;
-      margin: 0 1em 0 0;
+      width: 15%;
+      max-width: 3em;
+      min-width: 2.2em;
+      margin: 0 5% 0 0;
       text-align: center;
     }
     
@@ -588,6 +590,7 @@ footer {
       cursor: pointer;
       background-color: $lgrey;
       padding: 0.2em 0.4em;
+      font-size: 95%;
       border-radius: 2px;
       @include transition-duration(0.1s);
     }
@@ -596,13 +599,15 @@ footer {
     }
     
     .options {
-      margin: 2em 0 0;
+      margin: 1.5em 0 0;
       
       button {
         background-color: $lgrey;
-        width: 8em;
-        height: 2.9em;
-        padding: 0.4em;
+        width: 35%;
+        max-width: 8em;
+        height: 2.6em;
+        padding: 0.4em 0.5em;
+        vertical-align: middle;
         
         &:hover, &:focus {
           background-color: $link;
@@ -614,7 +619,7 @@ footer {
       img {
         max-height: 100%;
         max-width: 100%;
-        height: 100%;
+        vertical-align: middle;
       }
       .paypal {
         img {
