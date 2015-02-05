@@ -86,8 +86,6 @@ class communicator(threading.Thread):
 				# wait here for a connection
 				conn, addr = self.sock.accept()
 			except socket.timeout:
-				# if the connection times out, add 3 seconds to the timeout and try again
-				log('Connection attempt has timed out, retrying.')
 				continue
 			except:
 				log('An error occured while waiting for a connection.')
