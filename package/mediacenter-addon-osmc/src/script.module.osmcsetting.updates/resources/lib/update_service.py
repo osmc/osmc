@@ -862,6 +862,8 @@ class Main(object):
 
 			self.window.setProperty('OSMC_notification', 'true')
 
+		return 'passed', 'legit updates available'
+
 
 	# ACTION METHOD
 	@clog(log)
