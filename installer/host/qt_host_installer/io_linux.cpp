@@ -177,6 +177,13 @@ bool installImagingTool() { return true; }
 DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
 {
     QStringList entryPathSplit = diskDevice->getDiskPath().split("/");
+    if (entryPathSplit[2].startsWith("mmcblk"))
+    {
+        /* Ugly hack: drivers/mmc/card/block.c considers all mmcblks unremovable, but
+         * it seems that SD card readers can be registered as this */
+        diskDevice->setIsWritable(true);
+        return diskDevice;
+    }
     QFile removeFile("/sys/block/" + entryPathSplit[2] + "/removable");
     if(!removeFile.open(QIODevice::ReadOnly)) {
         utils::writeLog("Can't open /sys/block/ " + entryPathSplit[2] + "/removable");
