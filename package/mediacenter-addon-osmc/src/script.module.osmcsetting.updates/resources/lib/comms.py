@@ -44,6 +44,8 @@ class communicator(threading.Thread):
 
 		# allows the address to be reused (helpful with testing)
 		self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.timeout = 3
+		self.sock.settimeout(self.timeout)
 		self.sock.bind(self.address)
 		self.sock.listen(1)
 		
@@ -80,8 +82,18 @@ class communicator(threading.Thread):
 
 		while not xbmc.abortRequested and not self.stopped:
 
-			# wait here for a connection
-			conn, addr = self.sock.accept()
+			try:
+				# wait here for a connection
+				conn, addr = self.sock.accept()
+			except socket.timeout:
+				# if the connection times out, add 3 seconds to the timeout and try again
+				if self.timeout < 20:
+					self.timeout += 3
+					self.sock.settimeout(self.timeout)
+					continue
+				else:
+					log('Connection attempt has timed out.')
+					break
 
 			log('Connection active.')
 
