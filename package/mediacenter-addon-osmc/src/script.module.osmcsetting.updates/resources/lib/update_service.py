@@ -781,7 +781,7 @@ class Main(object):
 			return 'bail', 'apt_pkg cache failed to open'
 
 
-		dirty_states = {apt_pkg.CURSTATE_HALF_CONFIGURED, apt_pkg.CURSTATE_HALF_INSTALLED, apt_pkg.CURSTATE_UNPACKED}
+		dirty_states = {apt.apt_pkg.CURSTATE_HALF_CONFIGURED, apt.apt_pkg.CURSTATE_HALF_INSTALLED, apt.apt_pkg.CURSTATE_UNPACKED}
 
 		try:
 
