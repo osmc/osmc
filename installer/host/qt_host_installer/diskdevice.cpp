@@ -12,4 +12,5 @@ DiskDevice::DiskDevice(int diskID, QString diskPath, QString diskSize, QString d
     this->diskPath = diskPath;
     this->diskSize = diskSize;
     this->diskLabel = diskLabel;
+    this->isWritable = false;
 }

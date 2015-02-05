@@ -23,7 +23,7 @@ private:
     QString diskPath;
     QString diskSize;
     QString diskLabel;
-    bool isWritable = false;
+    bool isWritable;
 };
 
 #endif // DISKDEVICE_H
