@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "writeimageworker.h"
 #include <errno.h>
+#include <QDebug>
 
 namespace io
 {
@@ -53,7 +54,9 @@ QList<DiskDevice * > enumerateDevice()
                  deviceSpace = deviceAttr.at(2) + deviceAttr.at(3);
                  deviceSpace.remove(",");
                  DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
-                 devices.append(nd);
+                 nd = addAdditionalInfo(nd);
+                 if (nd->getIsWritable())
+                     devices.append(nd);
              }
          }
      }
@@ -174,7 +177,19 @@ bool installImagingTool() { return true; }
 
 DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
 {
-    diskDevice->setIsWritable(true);
+    QStringList entryPathSplit = diskDevice->getDiskPath().split("/");
+    QFile removeFile("/sys/block/" + entryPathSplit[2] + "/removable");
+    if(!removeFile.open(QIODevice::ReadOnly)) {
+        utils::writeLog("Can't open /sys/block/ " + entryPathSplit[2] + "/removable");
+        diskDevice->setIsWritable(false);
+        return diskDevice;
+    }
+    QString input = removeFile.readLine();
+    if (input.startsWith("1"))
+        diskDevice->setIsWritable(true);
+    else
+        diskDevice->setIsWritable(false);
+    removeFile.close();
     return diskDevice;
 }
 

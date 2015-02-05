@@ -50,7 +50,10 @@ namespace io
                QString devicePath = QString(deviceAttr.at(deviceAttr.count() - 2)).remove(" ");
                QString deviceSpace = QString(deviceAttr.at(deviceAttr.count() - 1)).remove(" ");
                DiskDevice *nd = new DiskDevice(deviceID, devicePath, deviceSpace);
-               devices.append(nd);
+               nd = addAdditionalInfo(nd);
+               if (nd->getIsWritable())
+                   devices.append(nd);
+
            }
            }
            else
@@ -122,7 +125,6 @@ namespace io
 
    DiskDevice* addAdditionalInfo(DiskDevice* diskDevice)
    {
-       /* IMPLEMENT YOUR LOGIC HERE AND CALL IT WHERE NEEDED*/
        diskDevice->setIsWritable(true);
        return diskDevice;
    }

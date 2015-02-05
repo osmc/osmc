@@ -10,7 +10,6 @@
 #include <QList>
 #include <QTextStream>
 #include "io.h"
-#include <QDebug>
 
 namespace io
 {
@@ -70,7 +69,8 @@ namespace io
                }
 
                deviceSpace.remove("*");
-               DiskDevice *nd = io::addAdditionalInfo(new DiskDevice(i, devicePath, deviceSpace));
+               DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+               nd = addAdditionalInfo(nd);
 
                if (nd->getIsWritable())
                    devices.append(nd);
@@ -200,7 +200,6 @@ namespace io
            {
                line = line.simplified(); /* Remove trailing and leading ws */
                /* The line holding the device is the only line always starting with 0: */
-               qDebug() << "reading line " << line;
                if (line.simplified().startsWith("Ejectable:"))
                {
                    QString ejectable = QString(line.split(":").at(1).simplified());
