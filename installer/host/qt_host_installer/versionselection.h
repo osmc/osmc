@@ -21,7 +21,7 @@ class VersionSelection : public QWidget
 {
     Q_OBJECT
 
-    virtual void showEvent(QShowEvent *event) override
+    virtual void showEvent(QShowEvent *event)
     {
         ui->versionnextButton->setEnabled(true);
     }

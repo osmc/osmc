@@ -18,7 +18,7 @@ class DeviceSelection : public QWidget
 {
     Q_OBJECT
 
-    virtual void showEvent(QShowEvent *event) override
+    virtual void showEvent(QShowEvent *event)
     {
         ui->devicenextButton->setEnabled(true);
         ui->refreshButton->setEnabled(true);

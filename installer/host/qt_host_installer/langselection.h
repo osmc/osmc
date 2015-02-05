@@ -18,7 +18,7 @@ class LangSelection : public QWidget
 {
     Q_OBJECT
 
-    virtual void showEvent(QShowEvent *event) override
+    virtual void showEvent(QShowEvent *event)
     {
         ui->languagenextButton->setEnabled(true);
     }
