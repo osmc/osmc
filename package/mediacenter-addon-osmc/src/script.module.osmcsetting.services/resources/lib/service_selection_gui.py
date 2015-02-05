@@ -4,7 +4,7 @@ import xbmcgui
 import xbmc
 from collections import OrderedDict
 import glob
-from comprehensive_function_logger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK      = 92

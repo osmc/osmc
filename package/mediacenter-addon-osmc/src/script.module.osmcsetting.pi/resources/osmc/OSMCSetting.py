@@ -106,7 +106,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 
 # OSMC SETTING Modules
 import config_tools as ct
-from comprehensive_function_logger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 def log(message):
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)

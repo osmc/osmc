@@ -8,7 +8,7 @@ import json
 import os
 import time
 import subprocess
-from comprehensive_function_logger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 t = datetime
 
