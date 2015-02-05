@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include "writeimageworker.h"
 #include <errno.h>
-#include <QDebug>
 
 namespace io
 {
