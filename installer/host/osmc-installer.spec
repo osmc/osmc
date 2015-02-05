@@ -53,6 +53,7 @@ BuildRequires:	gcc-c++
 # Common dependencies
 Requires:       libmng
 Requires: 		qt
+Requires: 	parted
 # Patch
 Requires:       patch
 %endif
