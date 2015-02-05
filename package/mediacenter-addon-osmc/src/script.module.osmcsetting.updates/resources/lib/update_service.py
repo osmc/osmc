@@ -795,6 +795,10 @@ class Main(object):
 
 					return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
 
+			else:
+
+				return 'passed', 'no broken packages found'
+
 		except:
 
 			return 'bail', 'check for partially installed packages failed'
