@@ -160,7 +160,7 @@ def pair_device(deviceAddress, scriptBasePath = ''):
     return True
 
 def handleAgentInteraction(deviceAddress, command , messages):
-    supported_commands = ['OK_DIALOGUE', 'YESNO_INPUT', 'NUMERIC_INPUT']
+    supported_commands = ['NOTIFICATION', 'YESNO_INPUT', 'NUMERIC_INPUT']
     if not command in supported_commands:
         return None
 
@@ -176,8 +176,8 @@ def handleAgentInteraction(deviceAddress, command , messages):
     if messages[0] == 'CONFIRM_PASSKEY':
         message = 'Confirm passkey ' +messages[0] + ' for ' + deviceAddress
 
-    if command == 'OK_DIALOGUE':
-        dialog.ok(heading, message)
+    if command == 'NOTIFICATION':
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "10000"))
     if command == 'YESNO_DIALOGUE':
         if dialog.yesno(heading, message):
             return 'YES'

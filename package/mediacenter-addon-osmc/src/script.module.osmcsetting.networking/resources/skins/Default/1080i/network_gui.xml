@@ -576,27 +576,102 @@
             </control>
             <control id="1030" type="group">
                 <description>Bluetooth Panel</description>
-                <posx>310</posx>
+                <posx>200</posx>
                 <posy>180</posy>
                 <width>1080</width>
                 <height>900</height>
                 <onup>1</onup>
                 <ondown>1</ondown>
+		<control id="10300" type="button">
+                    <posx>100</posx>
+                    <posy>100</posy>
+                    <width>300</width>
+                    <height>70</height>
+                    <description>Refresh</description>
+		    <!--                    <label>$ADDON[script.module.osmcsetting.networking 32012]</label> -->
+                    <label> Refresh</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>1</onup>
+                    <ondown>10301</ondown>
+                    <onright>6000</onright>
+                </control>
+                <control id="10301" type="radiobutton">
+                    <posx>100</posx>
+                    <posy>200</posy>
+                    <width>300</width>
+                    <height>70</height>
+                    <description>Enable Adapter</description>
+		    <!--                    <label>$ADDON[script.module.osmcsetting.networking 32012]</label> -->
+                    <label> Enable adapter</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10300</onup>
+                    <ondown>10302</ondown>
+                    <onright>6000</onright>
+                </control>
+               <control id="10302" type="radiobutton">
+                    <posx>100</posx>
+                    <posy>300</posy>
+                    <width>300</width>
+                    <height>70</height>
+                    <description>Enable service</description>
+		    <!--                    <label>$ADDON[script.module.osmcsetting.networking 32012]</label> -->
+                    <label> Enable service</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10301</onup>
+                    <ondown>10303</ondown>
+                    <onright>6000</onright>
+                </control>
+               <control id="10303" type="radiobutton">
+                    <posx>100</posx>
+                    <posy>400</posy>
+                    <width>300</width>
+                    <height>70</height>
+                    <description>Start/Stop Discovery</description>
+		    <!--                    <label>$ADDON[script.module.osmcsetting.networking 32012]</label> -->
+                    <label> Discovery</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>10300</onup>
+                    <onright>6000</onright>
+                </control>
                 <control type="label">
                     <description>Paired Devices</description>
-                    <posx>100</posx>
+                    <posx>500</posx>
                     <posy>100</posy>
                     <width>815</width>
                     <height>50</height>
                     <font>font13</font>
-                    <align>center</align>
+                    <align>centre</align>
                     <aligny>center</aligny>
                     <selectedcolor>9efff9</selectedcolor>
                     <label>Paired Devices</label>
                 </control>
                 <control type="label">
                     <description>Available Devices</description>
-                    <posx>1005</posx>
+                    <posx>750</posx>
                     <posy>100</posy>
                     <width>815</width>
                     <height>50</height>
@@ -608,31 +683,32 @@
                 </control>
                 <control id="6000" type="list">
                     <description>Bluetooth paired list</description>
-                    <posx>100</posx>
+                    <posx>500</posx>
                     <posy>200</posy>
-                    <width>815</width>
+                    <width>500</width>
                     <height>780</height>
                     <visible>true</visible>
                     <onup>1</onup>
                     <ondown>1</ondown>
-                    <onleft>10200</onleft>
+                    <onleft>10300</onleft>
+                    <onright>7000</onright>
                     <orientation>vertical</orientation>
                     <autoscroll>false</autoscroll>
                     <scrolltime easing="out" tween="sine">200</scrolltime>
-                    <itemlayout height="70" width="815">
+                    <itemlayout height="70" width="500">
                         <control type="image">
                             <description>paired and trusted icons</description>
                             <posx>0</posx>
-                            <posy>15</posy>
-                            <width>200</width>
+                            <posy>5</posy>
+                            <width>30</width>
                             <height>40</height>
                             <info>ListItem.Icon</info>
                         </control>
                         <control type="label">
                             <description>device name</description>
-                            <posx>215</posx>
+                            <posx>35</posx>
                             <posy>10</posy>
-                            <width>600</width>
+                            <width>450</width>
                             <height>50</height>
                             <font>font13</font>
                             <align>left</align>
@@ -642,28 +718,28 @@
                             <selectedcolor>FF8FF5EE</selectedcolor>
                         </control>
                     </itemlayout>
-                    <focusedlayout height="70" width="815">
+                    <focusedlayout height="70" width="500">
                         <control type="image">
                             <description>focused background</description>
-                            <width>815</width>
+                            <width>500</width>
                             <height>60</height>
                             <posx>0</posx>
                             <posy>5</posy>
                             <texture>myfocustexture.png</texture>
                         </control>
                         <control type="image">
-                            <description>paired and trusted icons</description>
+                            <description>paired and connected icons</description>
                             <posx>0</posx>
                             <posy>15</posy>
-                            <width>200</width>
+                            <width>45</width>
                             <height>40</height>
                             <info>ListItem.Icon</info>
                         </control>
                         <control type="label">
                             <description>device name</description>
-                            <posx>215</posx>
+                            <posx>50</posx>
                             <posy>10</posy>
-                            <width>600</width>
+                            <width>450</width>
                             <height>50</height>
                             <font>font13</font>
                             <align>left</align>
@@ -676,62 +752,46 @@
                 </control>
                 <control id="7000" type="list">
                     <description>Bluetooth available list</description>
-                    <posx>1005</posx>
+                    <posx>1050</posx>
                     <posy>200</posy>
-                    <width>815</width>
+                    <width>500</width>
                     <height>780</height>
                     <visible>true</visible>
                     <onup>1</onup>
                     <ondown>1</ondown>
-                    <onleft>10200</onleft>
+                    <onleft>6000</onleft>
                     <orientation>vertical</orientation>
                     <autoscroll>false</autoscroll>
                     <scrolltime easing="out" tween="sine">200</scrolltime>
-                    <itemlayout height="70" width="815">
-                        <control type="image">
-                            <description>paired and trusted icons</description>
-                            <posx>0</posx>
-                            <posy>15</posy>
-                            <width>200</width>
-                            <height>40</height>
-                            <info>ListItem.Icon</info>
-                        </control>
+                    <itemlayout height="70" width="500">
                         <control type="label">
                             <description>device name</description>
-                            <posx>215</posx>
+                            <posx>50</posx>
                             <posy>10</posy>
-                            <width>600</width>
+                            <width>45000</width>
                             <height>50</height>
                             <font>font13</font>
-                            <align>left</align>
+                            <align>centre</align>
                             <aligny>center</aligny>
                             <textcolor>FFFFFFFF</textcolor>
                             <info>ListItem.Label</info>
                             <selectedcolor>FF8FF5EE</selectedcolor>
                         </control>
                     </itemlayout>
-                    <focusedlayout height="70" width="815">
+                    <focusedlayout height="70" width="500">
                         <control type="image">
                             <description>focused background</description>
-                            <width>815</width>
+                            <width>500</width>
                             <height>60</height>
                             <posx>0</posx>
                             <posy>5</posy>
                             <texture>myfocustexture.png</texture>
                         </control>
-                        <control type="image">
-                            <description>paired and trusted icons</description>
-                            <posx>0</posx>
-                            <posy>15</posy>
-                            <width>200</width>
-                            <height>40</height>
-                            <info>ListItem.Icon</info>
-                        </control>
                         <control type="label">
                             <description>device name</description>
-                            <posx>215</posx>
+                            <posx>50</posx>
                             <posy>10</posy>
-                            <width>600</width>
+                            <width>500</width>
                             <height>50</height>
                             <font>font13</font>
                             <align>left</align>
