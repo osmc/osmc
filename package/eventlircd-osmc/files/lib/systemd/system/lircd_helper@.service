@@ -1,0 +1,10 @@
+[Unit]
+Description = Instanced lircd Daemon
+BindsTo = eventlircd.service
+
+[Service]
+Type = forking
+PIDFile = /var/run/lirc/lircd-%I.pid
+ExecStart = /bin/sh -c "/var/run/lirc/lircd-%I.sh"
+ExecStartPost = /bin/sh -c "rm -f /var/run/lirc/lircd-%I.sh"
+ExecStopPost = /bin/sh -c "rm -f /var/run/lirc/lircd-%I.pid /var/run/lirc/lircd-%I"
