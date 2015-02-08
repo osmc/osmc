@@ -248,7 +248,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 				st = info['strength']
 
 				# icon_tuple = (connected, encrypted, strength)
-				icon_image = self.get_wifi_icon(connected, info['encryption'], (int(st) / 25 ) + 1)
+				icon_image = self.get_wifi_icon(info['encryption'], (int(st) / 25 ) + 1, False)
 
 				itm.setIconImage(icon_image)
 
