@@ -66,7 +66,7 @@ case "${ACTION}" in
             daemon="${daemon} ${lircd_conf}"
             echo "${daemon}" > "/var/run/lirc/lircd-${devname_instance}.sh"
             chmod a+x "/var/run/lirc/lircd-${devname_instance}.sh"
-            systemctl start lircd_helper@${devname_instance}.service
+            systemctl restart lircd_helper@${devname_instance}.service
             logger -t "lircd_helper" add/change DEVLINKS ${DEVLINKS}
             for devlink in ${DEVLINKS} ; do
                 devlink_instance=`echo ${devlink} | /bin/sed -e 's/\/\+/~/g' -e 's/^~dev~//'`
@@ -93,6 +93,7 @@ case "${ACTION}" in
                 rm -f "/var/run/lirc/lircd-${devlink_instance}"
             done
         fi
+        rm -f "/var/run/lirc/lircd-${instance}.sh"
         ;;
 esac
 
