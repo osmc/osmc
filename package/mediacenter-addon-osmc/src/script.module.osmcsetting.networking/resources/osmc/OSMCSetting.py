@@ -100,17 +100,12 @@ import os
 addonid = "script.module.osmcsetting.networking"
 __addon__  = xbmcaddon.Addon(addonid)
 
-
-lib_path = xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib'))
 # Custom modules
-sys.path.append(lib_path)
+sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
 from networking_gui import networking_gui
 
-import osmc_bluetooth
-import time
-import traceback
 
 def log(message):
 	xbmc.log('OSMC NETWORKING ' + str(message), level=xbmc.LOGDEBUG)
@@ -219,40 +214,6 @@ class OSMCSettingClass(object):
 		del self.GUI
 
 		log('END')
-
-                if False:
-                        log('Bluetooth module Demo')
-                        if not osmc_bluetooth.is_bluetooth_available():
-                                log('BT not detected - Bluetooth tab should be disabled and maybe have a message to say why')
-                        else:
-                                if not osmc_bluetooth.is_bluetooth_enabled():
-                                        log('BT not enabled enabling')
-                                        osmc_bluetooth.toggle_bluetooth_state(True);
-                                log('BT enabled starting discovery')
-                                osmc_bluetooth.start_discovery()
-                                time.sleep(2);
-                                
-                                devices = osmc_bluetooth.list_discovered_devices()
-                                if devices.keys():
-                                        for address in devices.keys():
-                                                log('Device Address: ' + address)
-                                                log('Device Alias: ' + devices[address]['Alias'])
-                                                # or
-                                                log('Device Alias second way: ' + osmc_bluetooth.get_device_property(address, 'Alias'))
-
-                                        # attempt to pair device
-                                        address = str(devices.keys()[0])
-                                        log('Attempting to pair with: ' + address)
-                                        try:
-                                                paired =osmc_bluetooth.pair_device(address, lib_path + os.path.sep)
-                                                log(paired)
-                                        except:
-                                                log('Error pairing')
-                                                log(traceback.format_exc())
-                                else:
-                                        log('No Bluetooth devices discovered')
-                                osmc_bluetooth.stop_discovery()
-                                
 
 
 	def apply_settings(self):
