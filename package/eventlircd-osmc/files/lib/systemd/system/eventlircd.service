@@ -4,7 +4,7 @@ After = remote-fs.target
 
 [Service]
 Type = simple
-ExecStartPre = mkdir -p /var/run/lirc
+ExecStartPre = /bin/mkdir -p /var/run/lirc
 ExecStart = /usr/sbin/eventlircd --evmap=/etc/eventlircd.d --socket=/var/run/lirc/lircd --repeat-filter --release=_UP -f
 Restart = on-abort
 
