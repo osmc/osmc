@@ -6,6 +6,7 @@ After = remote-fs.target
 Type = simple
 ExecStartPre = /bin/mkdir -p /var/run/lirc
 ExecStart = /usr/sbin/eventlircd --evmap=/etc/eventlircd.d --socket=/var/run/lirc/lircd --repeat-filter --release=_UP -f
+ExecStartPost = /bin/sh -c "for f in /var/run/lirc/lircd-*.sh; do if [ -e $f ]; then s=$(basename $f .sh | sed 's/lircd-//g'); systemctl start lircd_helper@$s; fi; done"
 Restart = on-abort
 
 [Install]
