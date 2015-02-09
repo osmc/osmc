@@ -4,12 +4,16 @@
 #!/bin/bash
 
 . ../common.sh
-
-echo -e "Building remote package"
-make clean
-sed '/Package/d' -i files/DEBIAN/control
-sed '/Depends/d' -i files/DEBIAN/control
-test "$1" == rbp && echo "Package: rbp-remote-osmc" >> files/DEBIAN/control
-test "$1" == rbp && echo "Depends: lirc, rbp-eventlircd-osmc" >> files/DEBIAN/control
-fix_arch_ctl "files/DEBIAN/control"
-dpkg -b files/ remote-osmc.deb
+build_in_env "${1}" $(pwd) "remote-osmc"
+if [ $? == 0 ]
+then
+	echo -e "Building remote package"
+	make clean
+	sed '/Package/d' -i files/DEBIAN/control
+	sed '/Depends/d' -i files/DEBIAN/control
+	test "$1" == rbp && echo "Package: rbp-remote-osmc" >> files/DEBIAN/control
+	test "$1" == rbp && echo "Depends: lirc, rbp-eventlircd-osmc" >> files/DEBIAN/control
+	fix_arch_ctl "files/DEBIAN/control"
+	dpkg -b files/ remote-osmc.deb
+fi
+teardown_env "${1}"
