@@ -50,7 +50,7 @@
 -            ${daemon}
 +            echo "${daemon}" > "/var/run/lirc/lircd-${devname_instance}.sh"
 +            chmod a+x "/var/run/lirc/lircd-${devname_instance}.sh"
-+            systemctl restart lircd_helper@${devname_instance}.service
++            systemctl start lircd_helper@${devname_instance}.service
 +            logger -t "lircd_helper" add/change DEVLINKS ${DEVLINKS}
              for devlink in ${DEVLINKS} ; do
                  devlink_instance=`echo ${devlink} | /bin/sed -e 's/\/\+/~/g' -e 's/^~dev~//'`
