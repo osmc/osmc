@@ -14,7 +14,7 @@ if [ "$1" = "configure" ]; then
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
 
-	if [ ! -L /etc/lirc/lircd.conf -a ! -e /etc/lirc/lircd.conf ]; ln -s /home/osmc/lircd.conf /etc/lirc/lircd.conf; fi
+	if [ ! -L /etc/lirc/lircd.conf -a ! -e /etc/lirc/lircd.conf ]; then ln -s /home/osmc/lircd.conf /etc/lirc/lircd.conf; fi
 	systemctl disable lirc.service
 	exit 0
 fi
