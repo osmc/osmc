@@ -12,8 +12,10 @@ RUNNING_IN_KODI = True
 try:
     import xbmc
     import xbmcgui
+    import xbmcaddon
 except:
     RUNNING_IN_KODI = False
+
 
 DEVICE_PATH = 'org.bluez.Device1' 
 PAIRING_AGENT = 'osmc_bluetooth_agent.py'
@@ -148,7 +150,8 @@ def pair_device(deviceAddress, scriptBasePath = ''):
             if return_value == 'DEVICE_NOT_FOUND':
                 return False  # return early no need to call remove_device()
             if RUNNING_IN_KODI:
-                returnValue = handleAgentInteraction(deviceAddress, return_value , messages)
+                deviceAlias = get_device_property(deviceAddress, 'Alias')
+                returnValue = handleAgentInteraction(deviceAlias, return_value , messages)
                 if returnValue:
                     sendStr = encode_return('RETURN_VALUE', [ returnValue ])
                     child.sendline(sendStr)
@@ -159,25 +162,30 @@ def pair_device(deviceAddress, scriptBasePath = ''):
         return False
     return True
 
-def handleAgentInteraction(deviceAddress, command , messages):
+def handleAgentInteraction(deviceAlias, command , messages):
     supported_commands = ['NOTIFICATION', 'YESNO_INPUT', 'NUMERIC_INPUT']
     if not command in supported_commands:
         return None
-
+    
+    # This method is only called when we are running in Kodi 
     dialog = xbmcgui.Dialog()
-    # Needs translation strings
-    heading = 'Bluetooth Pairing'
+    #         'Bluetooth Pairing'
+    heading = lang(32026)
     if messages[0] == 'ENTER_PIN':
-        message = 'Please enter the following on the device ' + messages[1]
+        #         'Please enter the following on the device'
+        message = lang(32027) + ' ' + messages[1]
     if messages[0] == 'AUTHORIZE_SERVICE':
-        message = 'Authorize Sevice ' + messages[0] + ' on device ' + deviceAddress
+        #         'Authorize Service '                 ' on device ' 
+        message = lang(32027) + ' ' + messages[0] + ' ' + lang(32029) + ' ' + deviceAddress
     if messages[0] == 'REQUEST_PIN':
-        message = 'Enter PIN to Pair With ' + deviceAddress
+        #         'Enter PIN to Pair with'
+        message = lang(32030) + ' ' + deviceAlias
     if messages[0] == 'CONFIRM_PASSKEY':
-        message = 'Confirm passkey ' +messages[0] + ' for ' + deviceAddress
+#                 'Confirm passkey'                      'for'
+        message = lang(32031)+ ' '  +messages[0] + ' ' + lang(32032) + ' ' + deviceAlias
 
     if command == 'NOTIFICATION':
-        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "10000"))
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (heading, message, "10000"))
     if command == 'YESNO_DIALOGUE':
         if dialog.yesno(heading, message):
             return 'YES'
@@ -186,3 +194,9 @@ def handleAgentInteraction(deviceAddress, command , messages):
         return  dialog.numeric(0, message)
                     
     return None
+
+def lang(id):
+    addon = xbmcaddon.Addon('script.module.osmcsetting.networking')
+    san =addon.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+    return san 
+

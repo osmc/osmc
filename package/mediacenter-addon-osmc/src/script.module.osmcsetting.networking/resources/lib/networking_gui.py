@@ -15,13 +15,12 @@ import xbmcaddon
 import xbmcgui
 import xbmc
 
-addonid = 'script.module.osmcsetting.networking'
-__addon__      	= xbmcaddon.Addon(addonid)
-DIALOG 			= xbmcgui.Dialog()
+__addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
+DIALOG 	 = xbmcgui.Dialog()
 
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
+sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources','lib')))
 
 import osmc_bluetooth
 
@@ -71,8 +70,8 @@ gui_ids = { \
 10302       :    'Bluetooth - Toggle Bluetooth Service',
 10303       :    'Bluetooth - Toogle Discovery',
 5000	    :	 'WiFi panel',
-6000        :    'Bluetooth paired devices pannel',
-7000        :    'Bluetooth discoverd devices pannel'
+6000        :    'Bluetooth paired devices panel',
+7000        :    'Bluetooth discoverd devices panel'
 
 }
 
@@ -227,22 +226,27 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         item = self.BTP.getSelectedItem()
                         address = item.getProperty('address')
                         alias = item.getProperty('alias')
-                        if DIALOG.yesno('Bluetooth', 'Remove device ' + alias + '?' ):
+                        #              'Bluetooth' , 'Remove Device' 
+                        if DIALOG.yesno(lang(32020), lang(32021) + ' ' + alias + '?' ):
                                 osmc_bluetooth.remove_device(address)
                                 
                 if control_id == 7000: # Discovred devices
                         item = self.BTD.getSelectedItem()
                         address = item.getProperty('address')
                         alias = item.getProperty('alias')
-                        if DIALOG.yesno('Bluetooth', 'Pair with  device ' + alias + '?' ):
+                        #              'Bluetooth' , 'Pair with Device' 
+                        if DIALOG.yesno(lang(32020), lang(32022) + ' ' + alias + '?' ):
                                 script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources','lib') + '/'
                                 log(script_base_path)
                                 result =  osmc_bluetooth.pair_device(address, script_base_path)
                                 if result:
-                                        message = 'Paired Sucessfully with ' + alias
+                                #          'Paired Sucessfully with'
+                                        message = lang(32023) + ' ' + alias
                                 else:
-                                        message = 'Pairing with ' + alias + ' failed'
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "2500"))
+                                #      'Pairing with'         'failed'
+                                        message = lang(32024) + alias + lang(320025)
+                                # 'Bluetooth'
+                                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500")) 
 
                         
 	def toggle_panel_visibility(self, focused_position):
