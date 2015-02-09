@@ -1,6 +1,12 @@
 # Standard Modules
 from collections import namedtuple, OrderedDict
 import socket
+import sys
+import os
+import os.path
+import subprocess
+import time
+
 import random # farts, this is needed for testing only
 import string # farts, this is needed for testing only
 
@@ -9,9 +15,16 @@ import xbmcaddon
 import xbmcgui
 import xbmc
 
-
-__addon__      	= xbmcaddon.Addon('script.module.osmcsetting.networking')
+addonid = 'script.module.osmcsetting.networking'
+__addon__      	= xbmcaddon.Addon(addonid)
 DIALOG 			= xbmcgui.Dialog()
+
+
+# Custom modules
+sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
+
+import osmc_bluetooth
+
 
 
 def log(message):
@@ -40,6 +53,7 @@ gui_ids = { \
 910116      :    'Wired - Secondary DNS VALUE',
 10113       :    'Wired - Subnet Mask',
 910113      :    'Wired - Subnet Mask VALUE',
+10200       :    'Wireless - Scan for connections',
 10211       :    'Wireless - Automatically configure the network toggle',
 10214       :    'Wireless - Default Gateway',
 910214      :    'Wireless - Default Gateway VALUE',
@@ -52,7 +66,13 @@ gui_ids = { \
 910216      :    'Wireless - Secondary DNS VALUE',
 10213       :    'Wireless - Subnet Mask',
 910213      :    'Wireless - Subnet Mask VALUE',
-5000		:	 'WiFi panel',
+10300       :    'Bluetooth - Refresh',
+10301       :    'Bluetooth - Toggle Bluetooth Adapter',
+10302       :    'Bluetooth - Toggle Bluetooth Service',
+10303       :    'Bluetooth - Toogle Discovery',
+5000	    :	 'WiFi panel',
+6000        :    'Bluetooth paired devices pannel',
+7000        :    'Bluetooth discoverd devices pannel'
 
 }
 
@@ -69,6 +89,9 @@ panel_controls 		= [1010, 1020, 1030]
 
 password_buttons 	= [10117, 10217]
 
+bluetooth_controls = [10300, 10301, 10302, 10303, 6000, 7000]
+
+bluetooth_service_button = 10302
 
 class networking_gui(xbmcgui.WindowXMLDialog):
 
@@ -90,14 +113,23 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 		# wifi panel (WFP)
 		self.WFP = self.getControl(5000)
 
-		# bluetooth device panel (BTD)
-		self.BTD = self.getControl(6000)		
+		# bluetooth paierd device panel (BTP)
+		self.BTP = self.getControl(6000)
+
+                # bluetooth discovered device panel (BTD)
+		self.BTD = self.getControl(7000)		
 
 		# list containing listitems of all wifi networks
 		self.wifis = []
 
 		# connected SSID, the ssid we are currently connected to
 		self.conn_ssid = ''
+
+                # list containing listitems of all paired bluetooth devices
+		self.pairedbluetooths = []
+                
+		# list containing listitems of all descovered bluetooth devices
+		self.discoveredbluetooths = []
 
 
 		# populate the heading control list (HCL)
@@ -107,7 +139,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 			tmp = xbmcgui.ListItem(lang(heading.lang_id))
 			tmp.setProperty('panel_id', str(heading.panel_id))
-
+                        
 			self.HCL.addItem(tmp)
 
 
@@ -169,8 +201,50 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 				self.populate_bluetooth_panel()
 
+                if actionID == 7: # Selected
+                        self.handle_selection(focused_control)
 
+                        if focused_control in bluetooth_controls:
+                                self.populate_bluetooth_panel()
+                        
+        def handle_selection(self, control_id):
+                if control_id == 10200: # Scan
+                        self.populate_wifi_panel()
+                # 10300 - No Action Here - Refresh - populate_bluetooth_panel() will be called by calling code
+                if control_id == 10301: # Enable Adapter 
+                        osmc_bluetooth.toggle_bluetooth_state(not osmc_bluetooth.is_bluetooth_enabled())
+                        
+                if control_id == 10302: # Enable Service 
+                        self.toggle_bluetooth_service(not self.is_bluetooth_running())
+                        
+                if control_id == 10303: # Discovery 
+                        if  not osmc_bluetooth.is_discovering():
+                                osmc_bluetooth.start_discovery()
+                        else:
+                                osmc_bluetooth.stop_discovery()
+                                
+                if control_id == 6000: # paired devices
+                        item = self.BTP.getSelectedItem()
+                        address = item.getProperty('address')
+                        alias = item.getProperty('alias')
+                        if DIALOG.yesno('Bluetooth', 'Remove device ' + alias + '?' ):
+                                osmc_bluetooth.remove_device(address)
+                                
+                if control_id == 7000: # Discovred devices
+                        item = self.BTD.getSelectedItem()
+                        address = item.getProperty('address')
+                        alias = item.getProperty('alias')
+                        if DIALOG.yesno('Bluetooth', 'Pair with  device ' + alias + '?' ):
+                                script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources','lib') + '/'
+                                log(script_base_path)
+                                result =  osmc_bluetooth.pair_device(address, script_base_path)
+                                if result:
+                                        message = 'Paired Sucessfully with ' + alias
+                                else:
+                                        message = 'Pairing with ' + alias + ' failed'
+                                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "2500"))
 
+                        
 	def toggle_panel_visibility(self, focused_position):
 		''' Takes the focussed position in the Heading List Control and sets only the required panel to visible. '''
 		target_panel = int(self.HCL.getListItem(focused_position).getProperty('panel_id'))
@@ -248,7 +322,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 				st = info['strength']
 
 				# icon_tuple = (connected, encrypted, strength)
-				icon_image = self.get_wifi_icon(connected, info['encryption'], (int(st) / 25 ) + 1)
+				icon_image = self.get_wifi_icon(info['encryption'], (int(st) / 25 ) + 1, False)
 
 				itm.setIconImage(icon_image)
 
@@ -273,16 +347,105 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		self.WFP.getListItem(random.randint(0,10)).select(True)
 
-	def populate_bluetooth_panel(self, bluetooth_dict={}):
+	def populate_bluetooth_panel(self, bluetooth_paired_dict={}, bluetooth_discovered_dict = {}):
 		'''
 			Populates the bluetooth panel with devices from the bluetooth_dict.
 
-			bluetooth_dict = {
-								Address : { alias: __, paired: bool, connected: bool}
-							}
+			bluetooth_paired_dict = {
+                                   Address : { alias: __, paired: bool, connected: bool}
+				}
 
 		'''
+                # clear discovred and paired lists
+                self.BTD.reset()
+                self.BTP.reset()
 
+
+                # enable all controls
+                self.toggle_controls(True, bluetooth_controls)
+                # disbale all if bluetooth is not detected
+                if  not osmc_bluetooth.is_bluetooth_available():
+                        self.toggle_controls(False, bluetooth_controls)
+                        return
+                else:
+                        # disable all but the enable service buttom
+                        if not self.is_bluetooth_running():
+                                controls_to_disable = list(bluetooth_controls)
+                                controls_to_disable.remove(bluetooth_service_button)
+                                self.toggle_controls(False, controls_to_disable)
+                                return
+                        
+                adapterRadioButton = self.getControl(10301)
+                adapterRadioButton.setSelected(osmc_bluetooth.is_bluetooth_enabled())
+                serviceRadioButton = self.getControl(10302)
+                serviceRadioButton.setSelected(self.is_bluetooth_running())
+                discoveryRadioButton = self.getControl(10303)
+                discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
+
+                bluetooth_paired_dict = self.populate_bluetooth_dict(True)
+                bluetooth_discovered_dict = self.populate_bluetooth_dict(False)
+
+                # add paired devices to the list
+                self.pairedbluetooths = list(self.create_bluetooth_items(bluetooth_paired_dict))
+                # sort the list of paired based on alias
+                self.pairedbluetooths.sort(key=self.sort_alias)
+                # remove everything from the existing panel
+                self.BTP.reset()
+                # add the paired devices
+                self.BTP.addItems(self.pairedbluetooths)
+                        
+                # add discovered devices to the list
+                self.discoveredbluetooths = list(self.create_bluetooth_items(bluetooth_discovered_dict))
+                # sort the list of discovered based on alias
+                self.discoveredbluetooths.sort(key=self.sort_alias)
+                # remove everything from the existing panel
+                self.BTD.reset()
+                # add the paired devices
+                self.BTD.addItems(self.discoveredbluetooths)
+
+                
+        def toggle_controls(self,enabled, control_ids):
+                for id in control_ids:
+                        control = self.getControl(id)
+                        control.setEnabled(enabled)
+
+                        
+        def create_bluetooth_items(self, bluetooth_dict):
+                items = []
+                for address, info in bluetooth_dict.iteritems():
+                        label = address
+                        if info['alias']:
+                                label = info['alias']
+                        itm = xbmcgui.ListItem(label)
+                        icon_image = self.get_bluetooth_icon(info['connected'])
+                        itm.setIconImage(icon_image)
+                        itm.setProperty('address', address)
+                        itm.setProperty('alias', info['alias'])
+                        items.append(itm)
+                return items
+
+
+        def populate_bluetooth_dict(self, paired):
+                devices = {}
+                if paired:
+                        devices = osmc_bluetooth.list_paired_devices()
+                else:
+                        devices = osmc_bluetooth.list_discovered_devices()
+                bluetooth_dict = {}
+                for address in devices.keys():
+                        alias     = str(osmc_bluetooth.get_device_property(address, 'Alias'))
+                        paired    = osmc_bluetooth.get_device_property(address, 'Paired')
+                        connected = osmc_bluetooth.get_device_property(address, 'Connected')
+                        bluetooth_dict[address] = {'alias' : alias, 'paired' : paired, 'connected' : connected}
+                        log(bluetooth_dict[address])
+                return bluetooth_dict
+
+        def get_bluetooth_icon(self, connected):
+                if connected:
+                        return 'bluetooth_c.png'
+                return 'bluetooth_x.png'
+
+        
 
 	def get_wifi_icon(self, encrypted, strength, connected=False):
 
@@ -323,9 +486,45 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 		return metric
 
+        def sort_alias(self, itm):
+
+		try:
+			metric = int(itm.getProperty('alias'))
+		except:
+			metric = 0
+
+		return metric
+
 
 	def randomword(self):
 
 		length = random.randint(0,25)
 
 		return ''.join(random.choice(string.letters+string.digits) for i in range(length))
+        
+        # NOTE - Maybe this should come out into a new module so we use the same code for
+        #        Services addon and Bluetooth?
+        def is_bluetooth_running(self):
+                p = subprocess.call(['sudo', '/bin/systemctl', 'is-enabled', 'bluetooth.service'])
+                if p == 0:
+                       enabled = True
+                else:
+                       enabled = False
+                p = subprocess.call(['sudo', '/bin/systemctl', 'is-active', 'bluetooth.service'])
+                if p == 0:
+                       active = True
+                else:
+                       active = False
+                return enabled and active
+
+        def toggle_bluetooth_service(self,enable):
+                message = ''
+                if enable:
+                        subprocess.call(['sudo', '/bin/systemctl', 'enable', 'bluetooth.service'])
+                        subprocess.call(['sudo', '/bin/systemctl', 'start', 'bluetooth.service'])
+                        message = 'Bluetooth Service Enabled'
+                else:
+                        subprocess.call(['sudo', '/bin/systemctl', 'disable', 'bluetooth.service'])
+                        subprocess.call(['sudo', '/bin/systemctl', 'stop', 'bluetooth.service'])
+                        message = 'Bluetooth Service Disabled'
+                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "2500"))

@@ -2,10 +2,31 @@ import connman
 import bluetooth
 import subprocess
 import sys
+import pexpect
+import os.path
+import json
+
+RUNNING_IN_KODI = True
+
+# XBMC Modules
+try:
+    import xbmc
+    import xbmcgui
+except:
+    RUNNING_IN_KODI = False
 
 DEVICE_PATH = 'org.bluez.Device1' 
 PAIRING_AGENT = 'osmc_bluetooth_agent.py'
 
+PEXPECT_SOL = 'SOL@'
+PEXPECT_EOL = '@EOL'
+
+def log(message):
+    msg_str='OSMC_BLUETOOTH -  ' + str(message)
+    if RUNNING_IN_KODI:
+        xbmc.log(msg_str, level=xbmc.LOGDEBUG)
+    else:
+        print(msg_str)
 
 def is_bluetooth_available():
     return connman.is_technology_available('bluetooth')
@@ -60,19 +81,6 @@ def is_device_paired(deviceAddress):
     return bluetooth.get_device_property(deviceAddress, 'Paired')
 
 
-def pair_device(deviceAddress):
-    try:
-        exit_status = subprocess.call([sys.executable, PAIRING_AGENT,deviceAddress])
-    except:
-        bluetooth.remove_device(deviceAddress)
-        return False
-    if not exit_status == 0:
-        # if we have had issues connecting remove the device
-        bluetooth.remove_device(deviceAddress)
-        return False
-    return True
-
-
 def remove_device(deviceAddress):
     bluetooth.remove_device(deviceAddress)
 
@@ -115,3 +123,66 @@ def list_devices(filterkey=None, expectedvalue=None):
                     devices[str(device_dict['Address'])] = device_dict
     return devices
 
+def encode_return(result, messages):
+    return_value = {result : messages}
+    return PEXPECT_SOL+ json.dumps(return_value) + PEXPECT_EOL
+
+def pair_device(deviceAddress, scriptBasePath = ''):
+    script_path = scriptBasePath + PAIRING_AGENT
+    script = str.join(' ', [sys.executable, script_path,deviceAddress])
+    child = pexpect.spawn(script)
+    paired = False
+    while True:
+        try:
+            index = child.expect(['@EOL'], timeout=None)
+            split = child.before.split('SOL@')
+            if len(split[0]) >0:
+                log('Output From Pairing Agent ' + split[0])
+            d = json.loads(split[1])
+            return_value = d.keys()[0]
+            messages = d.values()[0]
+            log(['return_value = '+ return_value, 'Messages = ' + str(messages)])
+            if return_value == 'PAIRING_OK':
+                paired =  True
+                break
+            if return_value == 'DEVICE_NOT_FOUND':
+                return False  # return early no need to call remove_device()
+            if RUNNING_IN_KODI:
+                returnValue = handleAgentInteraction(deviceAddress, return_value , messages)
+                if returnValue:
+                    sendStr = encode_return('RETURN_VALUE', [ returnValue ])
+                    child.sendline(sendStr)
+        except pexpect.EOF:
+            break
+    if not paired:
+        bluetooth.remove_device(deviceAddress)
+        return False
+    return True
+
+def handleAgentInteraction(deviceAddress, command , messages):
+    supported_commands = ['NOTIFICATION', 'YESNO_INPUT', 'NUMERIC_INPUT']
+    if not command in supported_commands:
+        return None
+
+    dialog = xbmcgui.Dialog()
+    # Needs translation strings
+    heading = 'Bluetooth Pairing'
+    if messages[0] == 'ENTER_PIN':
+        message = 'Please enter the following on the device ' + messages[1]
+    if messages[0] == 'AUTHORIZE_SERVICE':
+        message = 'Authorize Sevice ' + messages[0] + ' on device ' + deviceAddress
+    if messages[0] == 'REQUEST_PIN':
+        message = 'Enter PIN to Pair With ' + deviceAddress
+    if messages[0] == 'CONFIRM_PASSKEY':
+        message = 'Confirm passkey ' +messages[0] + ' for ' + deviceAddress
+
+    if command == 'NOTIFICATION':
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "10000"))
+    if command == 'YESNO_DIALOGUE':
+        if dialog.yesno(heading, message):
+            return 'YES'
+        return 'NO'
+    if command == 'NUMERIC_INPUT':
+        return  dialog.numeric(0, message)
+                    
+    return None
