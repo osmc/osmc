@@ -21,7 +21,6 @@ then
 	handle_dep "libudev-dev"
 	handle_dep "pkg-config"
 	sed '/Package/d' -i files/DEBIAN/control
-	sed '/Depends/d' -i files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-eventlircd-osmc" >> files/DEBIAN/control
 	pushd src
 	sed -i 's/\s\-Werror//' configure.ac # Disable warnings being errors
