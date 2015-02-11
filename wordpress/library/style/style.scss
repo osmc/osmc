@@ -349,7 +349,6 @@ button {
 .widget_search {
   border: 0;
   
-  
   input {
     border: 0;
     padding: 0.4em;
@@ -365,16 +364,31 @@ button {
   }
   
   button {
-	border: 0;
-	background: none;
 	color: $maincolor;
-	outline: none;
-    padding: 0.4em 0 0.4em 0.6em;
-    cursor: pointer;
+    padding: 0.2em 0.7em 0;
+    height: 28px;
+    vertical-align: middle;
+    background-color: transparent;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+      
+      path {
+        @include transition-duration(0.1s);
+        fill: $dark;
+      }
+    }
     
     &:hover, &:focus {
       color: $link;
       background-color: transparent;
+      
+      svg {
+        path {
+          fill: $link;
+        }
+      }
     }
   }
 }
