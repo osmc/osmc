@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="32001">
+		<setting action="RunScript($CWD/resources/lib/grablogs.py)" id="5" label="32012" option="close" type="action"/>
+		<setting default="false" type="bool" label="32002" id="all"/>
+		<setting default="false" type="bool" label="32003" id="kodi" visible="eq(-1,false)"/>
+		<setting default="false" type="bool" label="32004" id="config" visible="eq(-2,false)"/>
+		<setting default="false" type="bool" label="32005" id="packages" visible="eq(-3,false)"/>
+		<setting default="false" type="bool" label="32006" id="apt" visible="eq(-4,false)"/>
+		<setting default="0" id="mode" label="32007" lvalues="32008|32009|32010" type="enum"/>
+		<setting id="email" label="32011" type="text" visible="eq(-1,1)|eq(-1,2)"/>
+	</category>
+</settings>
