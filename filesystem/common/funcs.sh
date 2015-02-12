@@ -17,7 +17,8 @@ function setup_osmc_user()
 	# Makes 'osmc' username and password never expire
 	chroot ${1} chage -I -1 -m 0 -M 99999 -E -1 osmc
 	# Adds 'osmc' to sudoers with no password prompt
-	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc
+	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc-no-sudo-password
+	echo "Defaults        !secure_path" >${1}/etc/sudoers.d/osmc-no-secure-path
 	chmod 0440 ${1}/etc/sudoers.d/osmc
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
