@@ -128,6 +128,7 @@ void MainWindow::install()
             {
                 /* Behaviour for handling USB installs */
                 if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
+                if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 for (int i = 0; i <= 60; i++)
                 {
                     ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
