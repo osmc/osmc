@@ -42,7 +42,7 @@ class Main(object):
 
 		log(type(action))
 
-		if email == '':
+		if self.email == '':
 			action = '0'
 
 		if grab_all:
@@ -67,11 +67,17 @@ class Main(object):
 		with open(self.tmp_log_location, 'w') as f:
 			f.writelines(self.log_list)
 
-		self.url = ''
+		with os.popen('curl -X POST -s -T "/var/tmp/uploadlog.txt" http://paste.osmc.io/documents') as f:
+			line = f.readline()
+			key = line.replace('{"key":"','').replace('"}','')
+
+		self.url = 'http://paste.osmc.io/%s' % key
+
+		log(self.url)
 
 		if action == '0':
 
-			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % url)
+			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
 
 		elif action == '1':
 
@@ -88,35 +94,34 @@ class Main(object):
 
 	def send_email(self, item):
 
-		recipient = 'subliminal.karnage@gmail.com'
+		try:
+			recipient = 'subliminal.karnage@gmail.com'
 
-		body = '<table border="1">'
+			body = '<table border="1">'
 
-		if item == 'log':
+			if item == 'log':
 
-			body += '\n'.join(self.log_list)
+				body += '\n'.join(self.log_list)
 
-		else:
-			body += self.url
+			else:
+				body += self.url
 
-		body += '</table>'
+			body += '</table>'
 
-		msg = MIMEText(body, 'html')
-		msg['Subject'] = 'OSMC Log Uploader'
-		msg['From'] = 'OSMC'
-		msg['To'] = self.email
-		msg['X-Mailer'] = 'OSMC Log Uploader'
+			msg = MIMEText(body, 'html')
+			msg['Subject'] = 'OSMC Log Uploader'
+			msg['From'] = 'OSMC'
+			msg['To'] = self.email
+			msg['X-Mailer'] = 'OSMC Log Uploader'
 
-		smtp = smtplib.SMTP('alt4.gmail-smtp-in.l.google.com')
+			smtp = smtplib.SMTP('alt4.gmail-smtp-in.l.google.com')
 
-		smtp.sendmail(msg['From'], msg['To'], msg.as_string(9))
-		smtp.quit()
+			smtp.sendmail(msg['From'], msg['To'], msg.as_string())
+			smtp.quit()
+		
+		except:
 
-
-_addon_ = xbmcaddon.Addon('script.lazytv')
-_addon_.setSetting(id="shout",value='true')
-
-
+			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
 
 	def grab_kodi_logs(self):
 
