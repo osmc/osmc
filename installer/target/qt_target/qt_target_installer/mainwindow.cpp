@@ -128,9 +128,12 @@ void MainWindow::install()
             {
                 /* Behaviour for handling USB installs */
                 if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
-                ui->statusLabel->setText(tr("USB install: 60 seconds to remove device before data loss"));
-                qApp->processEvents();
-                system("/bin/sleep 60");
+                for (int i = 0; i <= 60; i++)
+                {
+                    ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
+                    qApp->processEvents();
+                    system("/bin/sleep 1");
+                }
             }
         }
         /* Bring up network if using NFS */
