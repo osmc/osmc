@@ -17,6 +17,7 @@ You will need an NFS server that properly implements POSIX as OSMC relies on the
 When configuring an NFS share you should ensure you use the following 'export' options:
 <pre>rw,async,no_root_squash,no_subtree_check,insecure</pre>
 </p>
+<h2>Hanewin</h2>
 <p>
-OSMC cannot run on non-POSIX NFS services such as <a href="https://osmc.tv/help/wiki/nfs-hanewin">Hanewin</a>. 
+OSMC cannot run on non-POSIX NFS services such as Hanewin. Unfortunately Hanewin does not properly implement NFS and POSIX sufficiently to allow an NFS boot. We have contacted Hanewin about this and it seems that this is unlikely to come in a future version of the software. For now, only *nix based operating systems seem to allow OSMC to boot from an NFS share. Some examples of working operating systems for hosting an NFS share are Ubuntu and FreeNAS. 
 </p>
