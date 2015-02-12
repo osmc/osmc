@@ -1,0 +1,22 @@
+Booting from NFS
+<p>
+Some OSMC platforms support booting from an NFS share. This can be useful as it makes backups easier and can also result in faster IO as the SD card is no longer a limiting factor. NFS installations must be configured using the OSMC installer available <a href="https://osmc.tv/download">here</a>. 
+</p>
+<p>
+You will need an NFS server that properly implements POSIX as OSMC relies on the ability to correctly set up UNIX file permissions. Users have in the past reported success with a variety of operating systems and NAS devices:
+<ul>
+<li>Ubuntu</li>
+<li>Debian</li>
+<li>CentOS</li>
+<li>FreeBSD</li>
+<li>QNAP NAS</li>
+<li>Synology NAS</li>
+</ul>
+</p>
+<p>
+When configuring an NFS share you should ensure you use the following 'export' options:
+<pre>rw,async,no_root_squash,no_subtree_check,insecure</pre>
+</p>
+<p>
+OSMC cannot run on non-POSIX NFS services such as <a href="https://osmc.tv/help/wiki/nfs-hanewin">Hanewin</a>. 
+</p>
