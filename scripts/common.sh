@@ -129,7 +129,8 @@ function install_patch()
 function pull_source()
 {
 	ischroot
-	if [ $? == 2 ]; then return; fi # Prevent recursive loop
+	chrootval=$?
+	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return; fi # Prevent recursive loop
 	if ! command -v unzip >/dev/null 2>&1; then update_sources && verify_action && install_package "unzip" && verify_action; fi
 	if ! command -v git >/dev/null 2>&1; then update_sources && verify_action && install_package "git" && verify_action; fi
 	if ! command -v svn >/dev/null 2>&1; then update_sources && verify_action && install_package "subversion" && verify_action; fi
