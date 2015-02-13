@@ -1,0 +1,96 @@
+diff --git a/package/rpi-firmware-osmc/Config.in b/package/rpi-firmware-osmc/Config.in
+new file mode 100644
+index 0000000..3bc006e
+--- /dev/null
++++ b/package/rpi-firmware-osmc/Config.in
+@@ -0,0 +1,48 @@
++config BR2_PACKAGE_RPI_FIRMWARE_OSMC
++	bool "package/rpi-firmware-osmc"
++	depends on BR2_arm
++	help
++	  RaspberryPi Firmware
++	  Pre-compiled binaries of the current bootloader and GPU firmware
++
++	  https://github.com/raspberrypi/firmware
++
++if BR2_PACKAGE_RPI_FIRMWARE_OSMC
++
++choice
++	bool "Firmware to boot"
++	default BR2_PACKAGE_RPI_FIRMWARE_OSMC_DEFAULT
++	help
++	  There are three different firmware files:
++	    - the default firmware, that enables standard GPU features;
++	    - the extended firmware, that enables additional GPU features
++	      (eg. more audio/video codecs);
++	    - the cut-down firmware, for emergency situations, with only
++	      features required to boot a Linux kernel.
++
++config BR2_PACKAGE_RPI_FIRMWARE_OSMC_DEFAULT
++	bool "default"
++	help
++	  The default firmware, that enables standard GPU features.
++
++config BR2_PACKAGE_RPI_FIRMWARE_OSMC_X
++	bool "extended ('x', more codecs)"
++	help
++	  The extended firmware, that enables additional GPU features
++	  (eg. more audio/video codecs).
++
++config BR2_PACKAGE_RPI_FIRMWARE_OSMC_CD
++	bool "cut-down ('cd', emergency)"
++	help
++	  The cut-down firmware, for emergency situations, with only
++	  features required to boot a Linux kernel.
++
++endchoice
++
++config BR2_PACKAGE_RPI_FIRMWARE_OSMC_BOOT
++	string
++	default ""      if BR2_PACKAGE_RPI_FIRMWARE_OSMC_DEFAULT
++	default "_x"    if BR2_PACKAGE_RPI_FIRMWARE_OSMC_X
++	default "_cd"   if BR2_PACKAGE_RPI_FIRMWARE_OSMC_CD
++
++endif # BR2_PACKAGE_RPI_FIRMWARE_OSMC
+diff --git a/package/rpi-firmware-osmc/cmdline.txt b/package/rpi-firmware-osmc/cmdline.txt
+new file mode 100644
+index 0000000..10f6b4d
+--- /dev/null
++++ b/package/rpi-firmware-osmc/cmdline.txt
+@@ -0,0 +1 @@
++dwc_otg.fiq_fix_enable=1 sdhci-bcm2708.sync_after_dma=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/ram0 quiet init=/init osmcdev=rbp loglevel=1
+diff --git a/package/rpi-firmware-osmc/config.txt b/package/rpi-firmware-osmc/config.txt
+new file mode 100644
+index 0000000..8d6f2ed
+--- /dev/null
++++ b/package/rpi-firmware-osmc/config.txt
+@@ -0,0 +1,3 @@
++kernel=zImage
++disable_overscan=1
++framebuffer_depth=32
+diff --git a/package/rpi-firmware-osmc/package/rpi-firmware.mk b/package/rpi-firmware-osmc/package/rpi-firmware.mk
+new file mode 100644
+index 0000000..6a3a63b
+--- /dev/null
++++ b/package/rpi-firmware-osmc/package/rpi-firmware.mk
+@@ -0,0 +1,20 @@
++################################################################################
++#
++# package/rpi-firmware
++#
++################################################################################
++
++RPI_FIRMWARE_VERSION = c8881991d9181779aee9637d6f4b215f108021a3
++RPI_FIRMWARE_SITE = $(call github,raspberrypi,firmware,$(RPI_FIRMWARE_VERSION))
++RPI_FIRMWARE_LICENSE = BSD-3c
++RPI_FIRMWARE_LICENSE_FILES = boot/LICENCE.broadcom
++
++define RPI_FIRMWARE_INSTALL_TARGET_CMDS
++	$(INSTALL) -D -m 0644 $(@D)/boot/bootcode.bin $(BINARIES_DIR)/INSTALLER/bootcode.bin
++	$(INSTALL) -D -m 0644 $(@D)/boot/start$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).elf $(BINARIES_DIR)/INSTALLER/start.elf
++	$(INSTALL) -D -m 0644 $(@D)/boot/fixup$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).dat $(BINARIES_DIR)/INSTALLER/fixup.dat
++	$(INSTALL) -D -m 0644 package/package/rpi-firmware/config.txt $(BINARIES_DIR)/INSTALLER/config.txt
++	$(INSTALL) -D -m 0644 package/package/rpi-firmware/cmdline.txt $(BINARIES_DIR)/INSTALLER/cmdline.txt
++endef
++
++$(eval $(generic-package))

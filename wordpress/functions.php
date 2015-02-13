@@ -143,10 +143,7 @@ function bones_register_sidebars() {
 
 // SCRIPTS //
 
-function custom_scripts() {
-wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css', array(), '4.0.3' );
-}
-add_action( 'wp_enqueue_scripts', 'custom_scripts' );
+add_action( 'wp_enqueue_scripts' );
 
 
 // EXCERPT //
@@ -210,7 +207,7 @@ function bones_comments( $comment, $args, $depth ) {
 function bones_wpsearch($form) {
 	$form = '<form role="search" method="get" id="searchform" class="pure-form" action="' . home_url( '/' ) . '" >
 	<input type="text" value="' . get_search_query() . '" name="s" id="s" placeholder="' . esc_attr__( 'Search the Site...', 'bonestheme' ) . '" />
-	<button type="submit" id="searchsubmit" class="fa fa-search" value="' . esc_attr__( 'Search' ) .'" ></button>
+	<button type="submit" id="searchsubmit" value="' . esc_attr__( 'Search' ) .'" ><svg width="2048" height="2048" viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg"><path d="M1344 960q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z"/></svg></button>
 	</form>';
 	return $form;
 } // don't remove this bracket!

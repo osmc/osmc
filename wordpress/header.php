@@ -45,7 +45,7 @@
 		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
 		<?php wp_head(); ?>
         <!-- inject:css -->
-        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-66171e76.css">
+        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-26e43cb9.css">
         <!-- endinject -->
         
 	</head>
@@ -64,7 +64,9 @@
 							<nav role="navigation" class="pure-menu-horizontal nav-header">
 								<?php bones_main_nav(); ?>
 							</nav>
-							<i class="fa fa-bars" id="nav-res-toggle"></i>
+							<div class="bars" id="nav-res-toggle">
+							  <img src="https://osmc.tv/wp-content/themes/osmc/library/images/menu.png">
+							</div>
 					</div>
 				</div> <?php // end #inner-header ?>
 

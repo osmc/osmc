@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ "$1" = "remove" ]; then
+	systemctl stop lircd_helper@*
+	exit 0
+fi

@@ -80,6 +80,9 @@ verify_action
 echo -e "	* Configuring TTYs"
 conf_tty ${DIR}
 verify_action
+echo -e "	* Configuring BusyBox symlinks"
+setup_busybox_links ${DIR}
+verify_action
 
 # Perform filesystem cleanup
 chroot ${DIR} umount /proc

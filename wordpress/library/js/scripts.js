@@ -24,6 +24,8 @@ jQuery(window).resize(function(){
 	}
 });
 
+// NEWSLETTER FORM //
+
 jQuery(".newsletter_subscribe").submit(function(e) {
   
   e.preventDefault();
@@ -91,7 +93,6 @@ jQuery(".donationwidget form").submit(function(e) {
 
 // STRIPE //
 
-
 function stripe(am, cur) {
   var handler = StripeCheckout.configure({
     key: 'pk_live_HEfJk95fTFmjEBYMYVTxWFZk',
@@ -118,6 +119,23 @@ jQuery(window).on('popstate', function() {
   handler.close();
 });
 
+// JS TABLE //
+
+function imgtable(device) {
+  
+  var imglist = "http://173.255.206.49/osmc/download/installers/versions_RBP";
+  
+  jQuery.ajax({
+    
+    url: imglist,
+    type: "GET",
+    data: jQuery(this).serialize(),
+    success: function(response) {
+      console.log(response);
+    }
+  });
+  
+};
 
 
 

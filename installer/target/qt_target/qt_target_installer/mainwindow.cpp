@@ -128,9 +128,13 @@ void MainWindow::install()
             {
                 /* Behaviour for handling USB installs */
                 if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
-                ui->statusLabel->setText(tr("USB install: 60 seconds to remove device before data loss"));
-                qApp->processEvents();
-                system("/bin/sleep 60");
+                if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
+                for (int i = 0; i <= 60; i++)
+                {
+                    ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
+                    qApp->processEvents();
+                    system("/bin/sleep 1");
+                }
             }
         }
         /* Bring up network if using NFS */
@@ -158,11 +162,11 @@ void MainWindow::install()
         logger->addLine("No preseed file was found");
     }
     /* If !nfs, create necessary partitions */
-    ui->statusLabel->setText(tr("Partitioning device"));
     if (! useNFS)
     {
         logger->addLine("Creating root partition");
         ui->statusLabel->setText(tr("Formatting device"));
+        qApp->processEvents(); /* Force GUI update */
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -240,7 +244,7 @@ void MainWindow::setupBootLoader()
     dumpLog();
     ui->statusProgressBar->setValue(4);
     /* Reboot */
-    ui->statusLabel->setText(tr("Installation successful! Rebooting..."));
+    ui->statusLabel->setText(tr("OSMC installed successfully"));
     qApp->processEvents(); /* Force GUI update */
     utils->rebootSystem();
 }

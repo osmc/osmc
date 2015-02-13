@@ -68,7 +68,7 @@ void PreseedDevice::on_installoptionsnextButton_clicked()
     {
         utils::writeLog("NFS installation selected");
         bool response;
-        QString nfsPath = QInputDialog::getText(this, tr("NFS install"), tr("Please specify path to NFS share"), QLineEdit::Normal, "", &response);
+        QString nfsPath = QInputDialog::getText(this, tr("NFS install"), tr("Please specify path to NFS share"), QLineEdit::Normal, "192.168.1.100:/osmc", &response);
         if (response && !nfsPath.isEmpty())
             emit preseedSelected(utils::INSTALL_NFS, nfsPath);
         else

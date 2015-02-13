@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+
+	systemctl stop eventlircd.service >/dev/null 2>&1
+	systemctl stop lircd_helper@* >/dev/null 2>&1
+	exit 0
+fi

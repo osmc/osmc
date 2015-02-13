@@ -5,7 +5,7 @@
 
 . ../../scripts/common.sh
 
-SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils ssh-app-osmc sudo module-init-tools network-osmc locales dialog nano unzip less"
+SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils ssh-app-osmc sudo module-init-tools network-osmc locales dialog nano"
 CHROOT_PKGS="${SYSTEM_PKGS}"
 
 function setup_osmc_user()
@@ -17,7 +17,8 @@ function setup_osmc_user()
 	# Makes 'osmc' username and password never expire
 	chroot ${1} chage -I -1 -m 0 -M 99999 -E -1 osmc
 	# Adds 'osmc' to sudoers with no password prompt
-	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc
+	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc-no-sudo-password
+	echo "Defaults        !secure_path" >${1}/etc/sudoers.d/osmc-no-secure-path
 	chmod 0440 ${1}/etc/sudoers.d/osmc
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
@@ -72,6 +73,16 @@ function conf_tty()
 	chroot ${1} systemctl disable getty\@tty1.service
 }
 
+function setup_busybox_links()
+{
+	chroot ${1} ln -s /bin/busybox /bin/more
+	chroot ${1} ln -s /bin/busybox /bin/vi
+	chroot ${1} ln -s /bin/busybox /bin/less
+	chroot ${1} ln -s /bin/busybox /bin/ping
+	chroot ${1} ln -s /bin/busybox /bin/wget
+	chroot ${1} ln -s /bin/busybox /bin/unzip
+}
+
 export CHROOT_PKGS
 
 export -f setup_osmc_user
@@ -82,3 +93,4 @@ export -f disable_init
 export -f enable_init
 export -f create_base_fstab
 export -f conf_tty
+export -f setup_busybox_links

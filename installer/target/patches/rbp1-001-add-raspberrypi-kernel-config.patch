@@ -1,9 +1,9 @@
---- /dev/null	2015-01-22 13:51:51.104007953 +0000
-+++ a/rpi.config	2015-01-22 23:35:41.938629631 +0000
-@@ -0,0 +1,3140 @@
+--- /dev/null	2015-02-12 22:04:46.048007676 +0000
++++ a/rpi.config	2015-02-13 00:09:40.594021958 +0000
+@@ -0,0 +1,3132 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
-+# Linux/arm 3.18.3 Kernel Configuration
++# Linux/arm 3.18.7 Kernel Configuration
 +#
 +CONFIG_ARM=y
 +CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -278,8 +278,6 @@
 +CONFIG_IOSCHED_NOOP=y
 +# CONFIG_IOSCHED_DEADLINE is not set
 +# CONFIG_IOSCHED_CFQ is not set
-+# CONFIG_DEFAULT_DEADLINE is not set
-+# CONFIG_DEFAULT_CFQ is not set
 +CONFIG_DEFAULT_NOOP=y
 +CONFIG_DEFAULT_IOSCHED="noop"
 +CONFIG_UNINLINE_SPIN_UNLOCK=y
@@ -322,6 +320,7 @@
 +# CONFIG_ARCH_S3C64XX is not set
 +# CONFIG_ARCH_DAVINCI is not set
 +# CONFIG_ARCH_OMAP1 is not set
++# CONFIG_ARCH_BCM2709 is not set
 +
 +#
 +# Broadcom BCM2708 Implementations
@@ -456,11 +455,6 @@
 +# CPU Frequency scaling
 +#
 +# CONFIG_CPU_FREQ is not set
-+# CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE is not set
-+# CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE is not set
-+# CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE is not set
-+# CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND is not set
-+# CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVE is not set
 +
 +#
 +# CPU Idle
@@ -1847,9 +1841,6 @@
 +# CONFIG_POWER_AVS is not set
 +# CONFIG_HWMON is not set
 +# CONFIG_THERMAL is not set
-+# CONFIG_THERMAL_DEFAULT_GOV_STEP_WISE is not set
-+# CONFIG_THERMAL_DEFAULT_GOV_FAIR_SHARE is not set
-+# CONFIG_THERMAL_DEFAULT_GOV_USER_SPACE is not set
 +# CONFIG_WATCHDOG is not set
 +CONFIG_SSB_POSSIBLE=y
 +
@@ -2400,6 +2391,7 @@
 +#
 +CONFIG_LEDS_TRIGGER_TRANSIENT=m
 +CONFIG_LEDS_TRIGGER_CAMERA=m
++# CONFIG_LEDS_TRIGGER_INPUT is not set
 +# CONFIG_ACCESSIBILITY is not set
 +# CONFIG_EDAC is not set
 +CONFIG_RTC_LIB=y

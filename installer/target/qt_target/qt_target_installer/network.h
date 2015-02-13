@@ -15,12 +15,12 @@ public:
     QString getDNS1() { return dns1; }
     QString getDNS2() { return dns2; }
     QString getGW() { return gw; }
-    void setIP(QString ip) { ip = ip; }
-    void setMask(QString mask) { mask = mask; }
-    void setDNS1(QString dns1) { dns1 = dns1; }
-    void setDNS2(QString dns2) { dns2 = dns2; }
-    void setGW(QString gw) { gw = gw; }
-    void setAuto() { dhcp = true; }
+    void setIP(QString ip) { this->ip = ip; }
+    void setMask(QString mask) { this->mask = mask; }
+    void setDNS1(QString dns1) { this->dns1 = dns1; }
+    void setDNS2(QString dns2) { this->dns2 = dns2; }
+    void setGW(QString gw) { this->gw = gw; }
+    void setAuto() { this->dhcp = true; }
     void bringUp();
     bool isDefined() { return (! ip.isEmpty() && !mask.isEmpty() && ! dns1.isEmpty() & ! dns2.isEmpty() && ! gw.isEmpty()) ? true : false; }
 private:

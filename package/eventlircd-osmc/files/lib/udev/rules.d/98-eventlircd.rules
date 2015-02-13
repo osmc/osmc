@@ -19,6 +19,10 @@ KERNEL!="event[0-9]*", GOTO="end"
 # eventlircd ignores devices created by eventlircd.
 ATTRS{name}=="eventlircd", GOTO="end"
 
+# change remote name sent by eventlircd to kodi from devinput to linux-input-layer
+# for optimal button mapping with the default kodi Lircmap.xml
+ENV{eventlircd_remote}="linux-input-layer"
+
 #-------------------------------------------------------------------------------
 # Ask eventlircd to handle input event devices created by lircd. For this to
 # work, lircd must be configured to output Linux input events and must be
