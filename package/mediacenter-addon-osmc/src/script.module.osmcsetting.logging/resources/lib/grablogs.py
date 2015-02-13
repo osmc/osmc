@@ -42,6 +42,7 @@ class Main(object):
 		advancedsettings 	= True if __addon__.getSetting('advancedsettings') == 'true' else False
 		sources 			= True if __addon__.getSetting('sources') == 'true' else False
 		keyboard 			= True if __addon__.getSetting('keyboard') == 'true' else False
+		system 				= True if __addon__.getSetting('system') == 'true' else False
 
 
 		if grab_all:
@@ -55,6 +56,7 @@ class Main(object):
 			self.grab_sources()
 			self.grab_keyboard()
 			self.grab_kodi_logs()
+			self.grab_system_logs()
 
 		else:
 			if kodi:
@@ -75,6 +77,8 @@ class Main(object):
 				self.grab_fstab()
 			if sources:
 				self.grab_sources()
+			if system:
+				self.grab_system_logs()
 
 		self.tmp_log_location = '/var/tmp/uploadlog.txt'
 
@@ -100,15 +104,14 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				lines = f.readlines
-				self.log_list.extend(lines[len(lines)-500:])
+				self.log_list.extend(f.readlines)
 		except:
 			self.log_list.extend(['kodi logs not found'])
 
 
 	def grab_config(self):
 
-		self.log_list.extend(['\n====================== Pi Config ======================\n'])
+		self.log_list.extend(['\n====================== Pi config.txt ======================\n'])
 
 		location = '/boot/config.txt'
 
@@ -142,7 +145,7 @@ class Main(object):
 
 	def grab_cmdline(self):
 
-		self.log_list.extend(['\n====================== Pi Cmdline ======================\n'])
+		self.log_list.extend(['\n====================== Pi cmdline.txt ======================\n'])
 
 		location = '/boot/cmdline.txt'
 
@@ -161,7 +164,6 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				lines = f.readlines
 				self.log_list.extend(f.readlines)
 		except:
 			self.log_list.extend(['advanced settings not found'])
@@ -175,7 +177,6 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				lines = f.readlines
 				self.log_list.extend(f.readlines)
 		except:
 			self.log_list.extend(['sources.xml not found'])
@@ -202,10 +203,19 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				lines = f.readlines
 				self.log_list.extend(f.readlines)
 		except:
 			self.log_list.extend(['keyboard.xml not found'])
+
+	def grab_system_logs(self):
+
+		self.log_list.extend(['\n====================== System Log ======================\n'])
+
+		try:
+			with os.popen('sudo journalctl') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['system log not found'])
 
 
 if __name__ == "__main__":
