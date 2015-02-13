@@ -104,7 +104,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['kodi logs not found'])
 
@@ -117,7 +117,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['config.txt not found'])
 
@@ -138,7 +138,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['apt log not found'])
 
@@ -151,7 +151,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['cmdline.txt not found'])
 
@@ -164,7 +164,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['advanced settings not found'])
 
@@ -177,7 +177,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['sources.xml not found'])
 
@@ -190,7 +190,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['fstab not found'])
 
@@ -203,7 +203,7 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines)
+				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['keyboard.xml not found'])
 
