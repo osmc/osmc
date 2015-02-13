@@ -81,6 +81,8 @@ namespace io
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller)
    {
+       devicePath.replace(" ", "\\ ");
+       deviceImage.replace(" ", "\\ ");
        QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync && sync\" with administrator privileges";
 
        QString osascript = "/usr/bin/osascript";
