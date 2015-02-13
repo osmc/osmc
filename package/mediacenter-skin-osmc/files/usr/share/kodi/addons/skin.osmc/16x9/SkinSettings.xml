@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- skinsettings -->
-	<backgroundcolor>WindowBackgroundColor</backgroundcolor>
+	<backgroundcolor>Skin.String(CustomWindowBackgroundColor, WindowBackgroundColor)</backgroundcolor>
 	<defaultcontrol always="true">9</defaultcontrol>
 	<onunload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onunload>
 
@@ -518,6 +518,15 @@
 					<label>128</label>
 					<textcolor>$VAR[SkinSettingButton12]</textcolor>
 				</control>
+
+				<!-- Colors -->
+				<control type="button" id="13">
+					<width>600</width>
+					<height>66</height>
+					<label>31029</label>
+					<textcolor>$VAR[SkinSettingButton13]</textcolor>
+				</control>
+
 			</control>
 
 			<!-- Right grouplist -->
@@ -699,6 +708,34 @@
 					<label>31058</label>
 					<onclick>Skin.ResetSettings</onclick>
 					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Preview CustomWindowBackgroundColor if defined,
+				otherwise preview WindowBackgroundColor instead. -->
+				<control type="label" id="1306">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31062</label>
+					<textcolor>Skin.String(CustomWindowBackgroundColor, WindowBackgroundColor)</textcolor>
+					<visible>ControlGroup(9).HasFocus(13)</visible>
+				</control>
+				<!-- Set CustomWindowBackgroundColor -->
+				<control type="button" id="1307">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31033</label>
+					<onclick>Skin.SetString(CustomWindowBackgroundColor)</onclick>
+					<visible>ControlGroup(9).HasFocus(13)</visible>
+				</control>
+				<!-- Reload Skin -->
+				<control type="button" id="1308">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31037</label>
+					<onclick>ReloadSkin()</onclick>
+					<visible>ControlGroup(9).HasFocus(13)</visible>
 				</control>
 
 			</control>
