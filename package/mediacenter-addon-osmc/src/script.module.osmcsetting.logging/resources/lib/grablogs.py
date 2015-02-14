@@ -13,18 +13,20 @@ addonid = "script.module.osmcsetting.logging"
 __addon__  = xbmcaddon.Addon(addonid)
 
 
-
 # OSMC SETTING Modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 from CompLogger import comprehensive_logger as clog
 
+
 def log(message):
 	xbmc.log('OSMC LOGGING ' + str(message), level=xbmc.LOGDEBUG)
+
 
 def lang(id):
 	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
 	return san 
 	
+
 class Main(object):
 
 
@@ -33,67 +35,147 @@ class Main(object):
 		self.log_list = []
 
 		grab_all 			= True if __addon__.getSetting('all') == 'true' else False
-		kodi 				= True if __addon__.getSetting('kodi') == 'true' else False
-		config 				= True if __addon__.getSetting('config') == 'true' else False
-		packages 			= True if __addon__.getSetting('packages') == 'true' else False
-		apt 				= True if __addon__.getSetting('apt') == 'true' else False
-		cmdline 			= True if __addon__.getSetting('cmdline') == 'true' else False
-		fstab 				= True if __addon__.getSetting('fstab') == 'true' else False
-		advancedsettings 	= True if __addon__.getSetting('advancedsettings') == 'true' else False
-		sources 			= True if __addon__.getSetting('sources') == 'true' else False
-		keyboard 			= True if __addon__.getSetting('keyboard') == 'true' else False
-		system 				= True if __addon__.getSetting('system') == 'true' else False
+
+		sets =	{
+				'kodi' 				: {'function': self.grab_kodi_logs, 			'setting': False},
+				'kodiold' 			: {'function': self.grab_kodiold_logs, 			'setting': False},
+				'config' 			: {'function': self.grab_config, 				'setting': False},
+				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False},
+				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False},
+				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False},
+				'cmdline' 			: {'function': self.grab_cmdline, 				'setting': False},
+				'fstab' 			: {'function': self.grab_fstab, 				'setting': False},
+				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False},
+				'sources' 			: {'function': self.grab_sources, 				'setting': False},
+				'keyboard' 			: {'function': self.grab_keyboard, 				'setting': False},
+				'system' 			: {'function': self.grab_system_logs, 			'setting': False},
+				'lirc' 				: {'function': self.grab_lirc_conf, 			'setting': False},
+				'boot' 				: {'function': self.grab_boot_contents,			'setting': False},
+				'uname' 			: {'function': self.grab_uname,					'setting': False},
+				'initd' 			: {'function': self.grab_initd,					'setting': False},
+				'systemd' 			: {'function': self.grab_systemd,				'setting': False},
+				'mem' 				: {'function': self.grab_mem,					'setting': False},
+				'diskspace' 		: {'function': self.grab_diskspace,				'setting': False},
+				}
+
+		keys = [
+				'uname',
+				'config',
+				'cmdline',
+				'advancedsettings',
+				'keyboard',
+				'sources',
+				'fstab',
+				'packages',
+				'allothers',
+				'apt',
+				'system',
+				'lirc',
+				'initd',
+				'systemd',
+				'mem',
+				'diskspace',
+				'boot',
+				'kodi',
+				'kodiold',
+				]	
 
 
-		if grab_all:
+		for key in keys:
+			if grab_all and key not in ['kodiold']:
+				sets[key]['setting'] = True
+			else:
+				sets[key]['setting'] = True if __addon__.getSetting(key) == 'true' else False
 
-			self.grab_config()
-			self.grab_cmdline()
-			self.grab_package_list()
-			self.grab_apt_logs()
-			self.grab_fstab()
-			self.grab_advancedsettings()
-			self.grab_sources()
-			self.grab_keyboard()
-			self.grab_kodi_logs()
-			self.grab_system_logs()
+		self.number_of_actions = sum(1 for key in keys if sets.get(key, {}).get('setting', False))
 
-		else:
-			if kodi:
-				self.grab_kodi_logs()
-			if config:
-				self.grab_config()
-			if cmdline:
-				self.grab_cmdline()
-			if packages:
-				self.grab_package_list()
-			if apt:
-				self.grab_apt_logs()
-			if advancedsettings:
-				self.grab_advancedsettings()
-			if keyboard:
-				self.grab_keyboard()
-			if fstab:
-				self.grab_fstab()
-			if sources:
-				self.grab_sources()
-			if system:
-				self.grab_system_logs()
+		log(self.number_of_actions)
+
+		self.pDialog = xbmcgui.DialogProgressBG()
+		self.pDialog.create(lang(32024), lang(32025))
+
+		count =0
+		for key in keys:
+
+			if sets.get(key,{}).get('setting',False):
+				count += 1
+				pct = int(100.0 * float(count) / float(self.number_of_actions))
+				self.pDialog.update(percent=pct, message=lang(32036) % key)
+				sets.get(key,{})['function']()
 
 		self.tmp_log_location = '/var/tmp/uploadlog.txt'
 
+		self.pDialog.update(percent=100, message=lang(32027))
+
 		with open(self.tmp_log_location, 'w') as f:
+
 			f.writelines(self.log_list)
 
+		self.pDialog.update(percent=100, message=lang(32026))
+
 		with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_log_location) as f:
+
 			line = f.readline()
+			
 			key = line.replace('{"key":"','').replace('"}','')
+			
+			log('pastio key: %s' % key)
 
-		self.url = 'http://paste.osmc.io/%s' % key
+		self.pDialog.close()
 
-		log(self.url)
+		if not key:
 
-		ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
+			ok = xbmcgui.Dialog().ok(lang(32013), lang(32023))
+
+		else:
+
+			self.url = 'http://paste.osmc.io/%s' % key
+
+			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
+
+
+	def grab_mem(self):
+
+		self.log_list.extend(['\n====================== Memory ======================\n'])
+
+		with os.popen('free -m') as f:
+			self.log_list.extend(f.readlines())		
+
+
+	def grab_diskspace(self):
+
+		self.log_list.extend(['\n====================== Diskspace ======================\n'])
+
+		with os.popen('df -h') as f:
+			self.log_list.extend(f.readlines())	
+
+
+	def grab_initd(self):
+
+		self.log_list.extend(['\n====================== init.d ======================\n'])
+
+		location = '/etc/init.d'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+
+			self.log_list.extend(['initd not found'])
+
+
+	def grab_systemd(self):
+
+		self.log_list.extend(['\n====================== systemd ======================\n'])
+
+		location = '/lib/system/systemd'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+
+			self.log_list.extend(['systemd not found'])
 
 
 	def grab_kodi_logs(self):
@@ -106,7 +188,35 @@ class Main(object):
 			with open (location, 'r') as f:
 				self.log_list.extend(f.readlines())
 		except:
+
 			self.log_list.extend(['kodi logs not found'])
+
+
+	def grab_kodiold_logs(self):
+
+		self.log_list.extend(['\n====================== Kodi Old Logs ======================\n'])
+
+		location = '/home/osmc/.kodi/temp/kodi.old.log'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+
+			self.log_list.extend(['kodi old logs not found'])
+
+
+	def grab_lirc_conf(self):
+
+		self.log_list.extend(['\n====================== lirc.conf ======================\n'])
+
+		location = '/etc/lirc/lircd.conf'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['lirc.conf not found'])
 
 
 	def grab_config(self):
@@ -122,11 +232,27 @@ class Main(object):
 			self.log_list.extend(['config.txt not found'])
 
 
-	def grab_package_list(self):
+	def grab_osmc_packages(self):
 
 		self.log_list.extend(['\n====================== OSMC Packages ======================\n'])
 
 		with os.popen('dpkg -l | grep osmc') as f:
+			self.log_list.extend(f.readlines())
+
+
+	def grab_uname(self):
+
+		self.log_list.extend(['\n====================== UNAME ======================\n'])
+
+		with os.popen('uname -a') as f:
+			self.log_list.extend(f.readlines())
+
+
+	def grab_all_other_packages(self):
+
+		self.log_list.extend(['\n====================== All Other Packages ======================\n'])
+
+		with os.popen('dpkg -l | grep -v osmc') as f:
 			self.log_list.extend(f.readlines())
 
 
@@ -138,7 +264,8 @@ class Main(object):
 
 		try:
 			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines())
+				lines = f.readlines()
+				self.log_list.extend(lines[len(lines)-300:])
 		except:
 			self.log_list.extend(['apt log not found'])
 
@@ -207,6 +334,7 @@ class Main(object):
 		except:
 			self.log_list.extend(['keyboard.xml not found'])
 
+
 	def grab_system_logs(self):
 
 		self.log_list.extend(['\n====================== System Log ======================\n'])
@@ -216,6 +344,22 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['system log not found'])
+
+
+	def grab_boot_contents(self):
+
+		self.log_list.extend(['\n====================== /boot Contents ======================\n'])
+
+		try:
+			tmp = []
+			for root, _, filenames in os.walk('/boot'):
+				for filename in filenames:
+					tmp.append(str(os.path.join(root, filename)) + '\n')
+			tmp.sort()
+			self.log_list.extend(tmp)
+
+		except:
+			pass
 
 
 if __name__ == "__main__":
