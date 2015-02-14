@@ -1,0 +1,13 @@
+[Unit]
+Description=Wait for Network to be Configured
+Requisite=connman.service
+After=connman.service
+Before=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq online; then break; fi; sleep 1; let count-=1; done; exit 0"
+
+[Install]
+WantedBy=network-online.target
+
