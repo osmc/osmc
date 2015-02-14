@@ -1,5 +1,9 @@
 [Unit]
 Description=Connection service
+Requires=dbus.socket
+After=dbus.socket
+Wants=network.target
+Before=remote-fs.target
 
 [Service]
 Type=dbus
