@@ -200,6 +200,8 @@ class Install_Progress(apt.progress.base.InstallProgress):
 		self.parent = parent
 		
 		super(Install_Progress, self).__init__()	
+		
+		call_parent('progress_bar', {'percent': 0,  'heading': 'Installing Update', 'message':'Starting Installation'})
 
 	@clog()
 	def error(self, pkg, errormsg):
@@ -262,7 +264,6 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		self.pulse_time = t.now()
 
-		# call_parent('progress_bar', {'percent': 0,  'heading': 'Installing Update', 'message':'Starting Installation'})
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
@@ -279,6 +280,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 	def __init__(self, partial_heading='Downloading'):
 		super(Download_Progress, self).__init__()
 		self.partial_heading = partial_heading
+		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
 	@clog()
 	def start(self):
@@ -286,7 +288,6 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		self.pulse_time = t.now()
 
-		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
