@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone='no'?>
+ <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+ <service-group>
+   <name replace-wildcards="yes">%h</name>
+   <service>
+     <type>_sftp-ssh._tcp</type>
+     <port>22</port>
+     <txt-record>path=/path/to/be/accessed</txt-record>
+     <txt-record>u=osmc</txt-record>
+   </service>
+ </service-group>
