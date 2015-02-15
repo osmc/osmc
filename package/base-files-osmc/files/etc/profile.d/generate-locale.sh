@@ -7,4 +7,5 @@ then
     fi
 else
     export LANG=C
+    export LC_ALL=C
 fi
