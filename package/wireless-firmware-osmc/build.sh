@@ -3,11 +3,12 @@
 
 #!/bin/bash
 
-function install_fw()
+WD="/tmp/fw-dump"
+
+function install_fw_from_deb()
 {
 	DEB_BASE="http://ftp.debian.org/debian/pool/non-free/f/firmware-nonfree/"
 	if [ -d $WD ]; then rm -rf $WD > /dev/null 2>&1; fi
-	WD="/tmp/fw-dump"
 	mkdir -p $WD
 	pushd $WD
 	wget ${DEB_BASE}$1
@@ -23,9 +24,11 @@ make clean
 
 RALINK_DEB="firmware-ralink_0.43_all.deb"
 REALTEK_DEB="firmware-realtek_0.43_all.deb"
+ATHEROS_DEB="firmware-atheros_0.43_all.deb"
 
 mkdir -p files/lib/firmware
-install_fw ${RALINK_DEB}
-install_fw ${REALTEK_DEB}
+install_fw_from_deb ${RALINK_DEB}
+install_fw_from_deb ${REALTEK_DEB}
+install_fw_from_deb ${ATHEROS_DEB}
 
 dpkg -b files/ wireless-firmware-osmc.deb
