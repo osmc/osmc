@@ -161,6 +161,7 @@ function diskimages(device, title) {
           var md5adr = citm + (adrsplit.substr(0, adrsplit.length-7)) + ".md5";
           
           jQuery.ajax({
+            async: false,
             url: md5adr,
             type: "GET",
             success: function(response) {
