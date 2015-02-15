@@ -8,14 +8,19 @@ You will need an NFS server that properly implements POSIX as OSMC relies on the
 <li>Ubuntu</li>
 <li>Debian</li>
 <li>CentOS</li>
+<li>Mac OS X</li>
 <li>FreeBSD</li>
 <li>QNAP NAS</li>
 <li>Synology NAS</li>
 </ul>
 </p>
 <p>
-When configuring an NFS share you should ensure you use the following 'export' options:
+When configuring an NFS share on Linux you should ensure you use the following 'export' options:
 <pre>rw,async,no_root_squash,no_subtree_check,insecure</pre>
+</p>
+<p>
+When configuring an NFS share on OS X you should ensure you use the following 'export' options:
+<pre>-maproot=root:wheel</pre>
 </p>
 <h2>Hanewin</h2>
 <p>
