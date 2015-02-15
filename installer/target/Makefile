@@ -5,7 +5,7 @@ rbp:
 	sudo bash build.sh "rbp"
 
 rbp2:
-        sudo bash build.sh "rbp2"
+	sudo bash build.sh "rbp2"
 
 imx6:
 	sudo bash build.sh "imx6"
