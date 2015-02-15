@@ -41,6 +41,8 @@ $maincolor: $dark;
 
 $res: 52em;
 
+$res2: 33em;
+
 @import "lib/grid";
 @import "lib/woocommerce";
 
@@ -112,6 +114,34 @@ table {
     padding: 0.5em;
   }
   
+}
+
+.disktables {
+  margin: 1em 0 0;
+  .row {
+    float: left;
+  }
+  .table {
+    float: left;
+    margin: 1em 0;
+    
+    h3 {
+      margin: 0 0 0.5em;
+      display: inline-block;
+      border-bottom: 2px solid $lgrey;
+    }
+    table {
+      width: auto;
+      
+      th, td {
+        padding: 0.4em 0.7em;
+        padding-left: 0;
+      }
+    }
+    &:nth-child(odd) {
+      padding: 0 3em 0 0;
+    }
+  }
 }
 
 pre, code {
@@ -441,6 +471,25 @@ width: 70%;
         }
       }
     }
+  }
+}
+
+.diskline {
+  svg {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.2em;
+    vertical-align: middle;
+    display: inline-block;
+    
+    line, circle {
+      stroke-width: 4;
+      stroke: $dark;
+    }
+  }
+  p {
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 
@@ -1061,6 +1110,17 @@ footer {
     }
     textarea {
       width: 90%;
+    }
+  }
+}
+
+@media screen and (max-width: $res2) {
+  .disktables {
+    .table {
+
+      &:nth-child(odd) {
+        padding: 0;
+      }
     }
   }
 }

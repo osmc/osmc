@@ -56,7 +56,6 @@ jQuery(".newsletter_subscribe").submit(function(e) {
 
 // DONATION //
 
-
 jQuery('.donationwidget button').click(function(){
     jQuery('.donationwidget button').removeClass("clicked");
     jQuery(this).addClass("clicked");
@@ -121,28 +120,60 @@ jQuery(window).on('popstate', function() {
 
 // JS TABLE //
 
-function imgtable(device) {
+var tablecount = 0;
+var tableclass = "";
+
+function diskimages(device, title) {
   
-  var imglist = "http://173.255.206.49/osmc/download/installers/versions_RBP";
+  tablecount = tablecount + 1;
+
+  var url = "https://osmc.tv/citm.php?citm=installers/versions_" + device;
+  var citm = "https://osmc.tv/citm.php?citm=";
+  var div = jQuery(".disktables");
+  
+  if (tablecount % 2 == 0) {
+  
+    div.find("." + tableclass).append("<div class='table'><h3>" + title + "</h3><table class='" + device + "'><tr><th>Release</th><th>Checksum (MD5)</th></table></div>");
+  
+  } else {
+  
+    tableclass = "column" + tablecount;
+    
+    div.append("<div class='row " + tableclass + "'><div class='table'><h3>" + title + "</h3><table class='" + device + "'><tr><th>Release</th><th>Checksum (MD5)</th></table></div></div>");
+  }
+  
+  var table = div.find("." + device);
   
   jQuery.ajax({
-    
-    url: imglist,
+    url: url,
     type: "GET",
-    data: jQuery(this).serialize(),
     success: function(response) {
-      console.log(response);
+      
+      var array = response.split("\n");
+      
+      jQuery.each(array, function(index, value) {
+        
+        if ( value.length > 2 ) {
+        
+          var name = value.substr(0, value.indexOf(" "));
+          var address = value.split(" ").pop();
+          var adrsplit = address.split("http://download.osmc.tv/").pop();
+          var md5adr = citm + (adrsplit.substr(0, adrsplit.length-7)) + ".md5";
+          
+          jQuery.ajax({
+            url: md5adr,
+            type: "GET",
+            success: function(response) {
+              
+              var md5 = response.slice(0, response.indexOf(" "));
+              table.append("<tr><td><a href='" + address + "'>" + name + "</a></td><td>" + md5 + "</td></tr>");
+              
+            }
+          });
+        }
+        
+      });
     }
   });
   
 };
-
-
-
-
-
-
-
-
-
-
