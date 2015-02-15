@@ -154,6 +154,8 @@ function diskimages(device, title) {
       jQuery.each(array, function(index, value) {
         
         if ( value.length > 2 ) {
+          
+          table.append("<tr class='tr" + index + "'>");
         
           var name = value.substr(0, value.indexOf(" "));
           var address = value.split(" ").pop();
@@ -161,13 +163,12 @@ function diskimages(device, title) {
           var md5adr = citm + (adrsplit.substr(0, adrsplit.length-7)) + ".md5";
           
           jQuery.ajax({
-            async: false,
             url: md5adr,
             type: "GET",
             success: function(response) {
               
               var md5 = response.slice(0, response.indexOf(" "));
-              table.append("<tr><td><a href='" + address + "'>" + name + "</a></td><td>" + md5 + "</td></tr>");
+              table.find(".tr" + index).append("<td><a href='" + address + "'>" + name + "</a></td><td>" + md5 + "</td>");
               
             }
           });
