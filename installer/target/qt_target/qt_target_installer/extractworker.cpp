@@ -48,6 +48,9 @@ void ExtractWorker::readFromStdErr()
     if (ok)
         emit progressUpdate(i_value);
     else
+    {
+        process->kill();
         emit error(value);
+    }
 
 }
