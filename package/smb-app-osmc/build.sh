@@ -1,0 +1,9 @@
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+#!/bin/bash
+
+. ../common.sh
+
+echo -e "Building package smb-app-osmc"
+dpkg -b files/ smb-app-osmc.deb
