@@ -80,12 +80,12 @@ index 0000000..6a3a63b
 +#
 +################################################################################
 +
-+RPI_FIRMWARE_VERSION = c8881991d9181779aee9637d6f4b215f108021a3
-+RPI_FIRMWARE_SITE = $(call github,raspberrypi,firmware,$(RPI_FIRMWARE_VERSION))
-+RPI_FIRMWARE_LICENSE = BSD-3c
-+RPI_FIRMWARE_LICENSE_FILES = boot/LICENCE.broadcom
++RPI_FIRMWARE_OSMC_VERSION = c8881991d9181779aee9637d6f4b215f108021a3
++RPI_FIRMWARE_OSMC_SITE = $(call github,raspberrypi,firmware,$(RPI_FIRMWARE_OSMC_VERSION))
++RPI_FIRMWARE_OSMC_LICENSE = BSD-3c
++RPI_FIRMWARE_OSMC_LICENSE_FILES = boot/LICENCE.broadcom
 +
-+define RPI_FIRMWARE_INSTALL_TARGET_CMDS
++define RPI_FIRMWARE_OSMC_INSTALL_TARGET_CMDS
 +	$(INSTALL) -D -m 0644 $(@D)/boot/bootcode.bin $(BINARIES_DIR)/INSTALLER/bootcode.bin
 +	$(INSTALL) -D -m 0644 $(@D)/boot/start$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).elf $(BINARIES_DIR)/INSTALLER/start.elf
 +	$(INSTALL) -D -m 0644 $(@D)/boot/fixup$(BR2_PACKAGE_RPI_FIRMWARE_BOOT).dat $(BINARIES_DIR)/INSTALLER/fixup.dat
