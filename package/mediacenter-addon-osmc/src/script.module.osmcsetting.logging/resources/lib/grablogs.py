@@ -248,13 +248,10 @@ class Main(object):
 
 		self.log_list.extend(['\n====================== APT Logs ===========================\n'])
 
-		location = '/var/log/apt/term.log'
-
-		try:
-			with open (location, 'r') as f:
-				lines = f.readlines()
-				self.log_list.extend(lines[len(lines)-300:])
-		except:
+		if os.path.isfile('/var/log/apt/term.log'):
+			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log') as f:
+				self.log_list.extend(f.readlines())
+		else:
 			self.log_list.extend(['apt log not found'])
 
 
@@ -273,7 +270,7 @@ class Main(object):
 
 	def grab_advancedsettings(self):
 
-		self.log_list.extend(['\n====================== Advanced Settings ==================\n'])
+		self.log_list.extend(['\n====================== advancedsettings.xml ===============\n'])
 
 		location = '/home/osmc/.kodi/userdata/advancedsettings.xml'
 
@@ -325,7 +322,7 @@ class Main(object):
 
 	def grab_system_logs(self):
 
-		self.log_list.extend(['\n====================== System Log ========================\n'])
+		self.log_list.extend(['\n====================== System Journal ====================\n'])
 
 		try:
 			with os.popen('sudo journalctl') as f:
