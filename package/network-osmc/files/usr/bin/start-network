@@ -16,7 +16,8 @@ then
 			echo $hostline >> /etc/hosts
 		fi
 	else
-		nameservers=$(dmesg | egrep -o 'nameserver[0-9][0-9]* *= *[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' | awk -F= '{print $NF}') >/etc/resolv.conf
+		nameservers=$(dmesg | egrep -o 'nameserver[0-9][0-9]* *= *[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' | awk -F= '{print $NF}') 
+		>/etc/resolv.conf
 		for ns in ${nameservers[@]}
 		do
 			if ! grep -w "$ns" /etc/resolv.conf
