@@ -115,6 +115,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     setting_changed = False
 
+    reboot_required_file = '/tmp/.reboot-needed'
+
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
         self.setting_values = kwargs.get('setting_values', {})
 
@@ -295,6 +297,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def populate_wired_panel(self):
+        if os.path.isfile(self.reboot_required_file):
+            # 'NFS Network Settings'
+            # 'The displayed network configuration may be out dated - A reboot is recommended before proceeding'
+            DIALOG.ok(lang(32036), lang(32038))
         self.current_network_config = self.get_wired_config()
         log(self.current_network_config)
         if self.current_network_config: 
@@ -324,7 +330,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def update_manual_DHCP_button(self, button_id):
         manualDHCPButton = self.getControl(button_id)
-        if self.current_network_config['Method'] == 'dhcp':
+        if 'dhcp' in self.current_network_config['Method']:
             # 'Configure Network Using DHCP'
             manualDHCPButton.setLabel(lang(32006))
             # if configuration is by DHCP disable controls
@@ -369,8 +375,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if control_id == wired_dhcp_manual_button: # Manual / DHCP Button
             if self.current_network_config['Method'] == 'dhcp':
                 self.current_network_config['Method'] = 'manual'
-            else:
+            elif self.current_network_config['Method'] == 'manual':
                 self.current_network_config['Method'] = 'dhcp'
+            elif self.current_network_config['Method'] == 'nfs_dhcp':
+                self.current_network_config['Method'] = 'nfs_manual'
+            elif self.current_network_config['Method'] == 'nfs_manual':
+                self.current_network_config['Method'] = 'nfs_dhcp'
             self.update_manual_DHCP_button(wired_dhcp_manual_button)
             self.setting_changed = True
 
@@ -382,7 +392,15 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if control_id == wired_apply_button:
             osmc_network.apply_network_changes(self.current_network_config)
-            self.populate_wired_panel()
+            if self.current_network_config['Method'] in ['nfs_dhcp', 'nfs_manual']:
+                with open(self.reboot_required_file, 'w') as f:
+                    f.write('d')
+                # 'NFS Network Settings'
+                # 'Your Settings will not take effect until you reboot. Reboot Now?''
+                if DIALOG.yesno(lang(32036), lang(32037)):
+                    xbmc.executebuiltin('Reboot')
+            else:
+                self.populate_wired_panel()
 
         if control_id in wired_ip_labels:
             self.update_current_ip_settings(wired_ip_controls)
