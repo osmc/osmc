@@ -5,13 +5,7 @@
 
 if grep -q nfsroot /proc/cmdline
 then
-	nameservers=$(dmesg | egrep -o 'nameserver[0-9][0-9]* *= *[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' | awk -F= '{print $NF}')
-	>/etc/resolv.conf
-	for ns in ${nameservers[@]}; do
-		if ! grep -w "$ns" /etc/resolv.conf; then
-			echo "nameserver ${ns}" >> /etc/resolv.conf
-		fi
-	done
+	cp /proc/net/pnp /etc/resolv.conf
 	exec /usr/sbin/connmand -n -I eth0 --nodnsproxy --config=/etc/connman.conf
 else
 	exec /usr/sbin/connmand -n --config=/etc/connman.conf
