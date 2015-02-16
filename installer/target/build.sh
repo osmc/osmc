@@ -34,7 +34,7 @@ pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
 test "$1" == rbp1 && install_patch "../patches" "rbp1"
 test "$1" == rbp2 && install_patch "../patches" "rbp2"
-if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 	install_patch "../patches" "rbp"
 	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
