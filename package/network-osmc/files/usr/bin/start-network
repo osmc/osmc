@@ -6,6 +6,13 @@
 if grep -q nfsroot /proc/cmdline
 then
 	cp /proc/net/pnp /etc/resolv.conf
+	cp /proc/sys/kernel/hostname /etc/hostname
+	hostname=$(cat /etc/hostname)
+	hostline="127.0.0.1		${hostname}"
+	if ! grep -q $hostline /etc/hosts
+	then
+		echo $hostline >> /etc/hosts
+	fi
 	exec /usr/sbin/connmand -n -I eth0 --nodnsproxy --config=/etc/connman.conf
 else
 	exec /usr/sbin/connmand -n --config=/etc/connman.conf
