@@ -249,7 +249,7 @@ class Main(object):
 		self.log_list.extend(['\n====================== APT Logs ===========================\n'])
 
 		if os.path.isfile('/var/log/apt/term.log'):
-			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log') as f:
+			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500') as f:
 				self.log_list.extend(f.readlines())
 		else:
 			self.log_list.extend(['apt log not found'])
