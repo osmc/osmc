@@ -33,7 +33,7 @@ verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
 test "$1" == rbp1 && install_patch "../patches" "rbp1"
-test "$1" == rbp1 && install_patch "../patches" "rbp2"
+test "$1" == rbp2 && install_patch "../patches" "rbp2"
 if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
 then
 	install_patch "../patches" "rbp"
