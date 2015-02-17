@@ -2,6 +2,8 @@
 # KODI modules
 import xbmc
 import xbmcaddon
+
+# Standard modules
 import sys
 import os
 import hashlib
@@ -22,7 +24,7 @@ USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data ',
 
 
 def log(message):
-	xbmc.log('OSMC APFStore APF' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC APFStore class : ' + str(message), level=xbmc.LOGDEBUG)
 
 
 def lang(id):
@@ -93,7 +95,9 @@ class APF_obj(object):
 
 		else:
 
-			current_icon = os.path.isfile(os.path.join(USERART, 'default.png'))
+			current_icon = os.path.join(ADDONART, 'Default.jpg')
+
+		log(current_icon)
 
 		# get the hash
 		icon_hash = hashlib.md5(open(current_icon).read()).hexdigest()

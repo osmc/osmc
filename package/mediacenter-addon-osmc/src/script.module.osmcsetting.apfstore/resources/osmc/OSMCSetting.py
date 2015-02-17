@@ -106,6 +106,8 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 
 # OSMC SETTING Modules
 from CompLogger import comprehensive_logger as clog
+from apf_store import APF_STORE
+
 
 def log(message):
 	xbmc.log('OSMC APFStore ' + str(message), level=xbmc.LOGDEBUG)
@@ -145,7 +147,7 @@ class OSMCSettingClass(object):
 			own user interfaces.
 		'''
 
-		self.me.openSettings()
+		me = APF_STORE()
 
 
 	@clog(log)

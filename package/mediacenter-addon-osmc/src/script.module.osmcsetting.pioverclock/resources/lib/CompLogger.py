@@ -7,7 +7,7 @@ def test_logger(msg):
 	print 'test-' + msg
 
 
-def comprehensive_logger(logger=None, logging=True, maxlength=25, nowait=False):
+def comprehensive_logger(logger=None, logging=True, maxlength=250, nowait=False):
 	'''
 		Decorator to log the inputs and outputs of functions, as well as the time taken
 		to run the function.

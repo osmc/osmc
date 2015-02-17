@@ -2,6 +2,8 @@
 # KODI modules
 import xbmc
 import xbmcaddon
+
+# Standard modules
 import sys
 import os
 import hashlib
@@ -22,13 +24,14 @@ sys.path.append(os.path.join(__path__, 'resources','lib'))
 # OSMC SETTING Modules
 from CompLogger import comprehensive_logger as clog
 from apf_class import APF_obj
+from apf_gui import apf_GUI
 
 ADDONART = os.path.join(__path__, 'resources','skins', 'Default', 'media')
 USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data ', addonid)
 
 
 def log(message):
-	xbmc.log('OSMC APFStore APF' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('OSMC APFStore store : ' + str(message), level=xbmc.LOGDEBUG)
 
 
 def lang(id):
@@ -74,8 +77,8 @@ class APF_STORE(object):
 
 
 
-	@clog(logger=log)
-	def generate_apf_dict(self):
+	@clog(logger=log, maxlength=1000)
+	def generate_apf_dict(self, json_req):
 
 		apf_list = json_req.get('application', [])
 
@@ -85,9 +88,27 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def get_list_from_sam(self):
 
-		r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
+		# r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
 
-		return r.json()
+		# r.json()
+
+		r	= {
+				"application": [
+					{
+						"id": "ssh-app-osmc",
+						"name": "SSH Server",
+						"shortdesc": "This allows you to connect to your OSMC device via SSH",
+						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
+						"maintained-by": "OSMC",
+						"version": "1.0.0",
+						"lastupdated": "2015-01-23",
+						"iconurl": "http://vignette1.wikia.nocookie.net/parksandrecreation/images/3/36/Jim_OHeir.jpg",
+						"iconhash": 0,
+					}
+				]
+			}
+
+		return r
 
 
 	@clog(logger=log)
@@ -102,10 +123,11 @@ class APF_STORE(object):
 				thread_queue.put(apf.iconurl)
 
 		# spawn some workers
-		for i in range(3):
+		# for i in range(1):
 
-			t = threading.Thread(target=self.grab_icon_from_sam, args=(thread_queue))
-			t.start()
+		t = threading.Thread(target=self.grab_icon_from_sam, args=(thread_queue,))
+		t.daemon = True
+		t.start()
 
 
 	@clog(logger=log)
@@ -142,5 +164,5 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def create_apf_store_gui(self, apf_list):
 
-		return apf_GUI("AddonBrowser.xml", scriptPath, 'Default', apf_list=apf_list)
+		return apf_GUI("AddonBrowser.xml", __path__, 'Default', apf_list=apf_list)
 
