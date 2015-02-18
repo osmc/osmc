@@ -16,7 +16,7 @@ then
 			echo $hostline >> /etc/hosts
 		fi
 	else
-		domain=$(dmesg | egrep -o 'domain=[a-zA-Z.]+' | awk -F= '{print $NF}')
+		domain=$(dmesg | egrep -o 'domain=[0-9a-zA-Z][0-9a-zA-Z.-]*[0-9a-zA-Z]' | awk -F= '{print $NF}')
 		nameservers=$(dmesg | sed 's/\,/\n/g' | egrep -o 'nameserver[0-9]+=[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' | awk -F= '{print $NF}')
 
 		echo "domain ${domain}" >/etc/resolv.conf
