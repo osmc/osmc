@@ -65,7 +65,7 @@ function install_package()
 	then
 	echo -e "Package already installed."
 	else
-		apt-get -y install $1
+		apt-get -y --no-install-recommends install $1
 		if [ $? != 0 ]; then echo -e "Failed to install" && return 1; else echo -e "Package installed successfully" && return 0; fi
 	fi
 }
