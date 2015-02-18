@@ -10,7 +10,7 @@ then
 		cp /proc/net/pnp /etc/resolv.conf
 		cp /proc/sys/kernel/hostname /etc/hostname
 		hostname=$(cat /etc/hostname)
-		hostline="127.0.0.1		${hostname}"
+		hostline="127.0.1.1		${hostname}"
 		if ! grep -q $hostline /etc/hosts
 		then
 			echo $hostline >> /etc/hosts
