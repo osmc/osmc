@@ -206,6 +206,8 @@ void MainWindow::install()
         haltInstall(tr("can't mount root"));
         return;
     }
+    if (useNFS)
+        system("rm -rf /mnt/root/*"); /* BusyBox tar does not like overwrites. Clear nfsroot first */
    /* Extract root filesystem */
    ui->statusLabel->setText(tr("Installing files"));
    logger->addLine("Extracting files to root filesystem");
