@@ -26,8 +26,9 @@ from CompLogger import comprehensive_logger as clog
 from apf_class import APF_obj
 from apf_gui import apf_GUI
 
+
 ADDONART = os.path.join(__path__, 'resources','skins', 'Default', 'media')
-USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data ', addonid)
+USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data', addonid)
 
 
 def log(message):
@@ -65,6 +66,8 @@ class APF_STORE(object):
 
 	def __init__(self):
 
+		self.touch_addon_data_folder()
+
 		json_req = self.get_list_from_sam()
 
 		self.apf_dict = self.generate_apf_dict(json_req)
@@ -76,13 +79,14 @@ class APF_STORE(object):
 		self.apf_GUI.doModal()
 
 
-
 	@clog(logger=log, maxlength=1000)
 	def generate_apf_dict(self, json_req):
 
 		apf_list = json_req.get('application', [])
 
-		return { x['id']: APF_obj(x) for x in apf_list if x['id'] }
+		obj_list = [APF_obj() for x in apf_list if x['id']]
+
+		return { x['id']: obj_list[i-1].populate(x) for i, x in enumerate(apf_list) if x['id'] }
 
 
 	@clog(logger=log)
@@ -102,7 +106,18 @@ class APF_STORE(object):
 						"maintained-by": "OSMC",
 						"version": "1.0.0",
 						"lastupdated": "2015-01-23",
-						"iconurl": "http://vignette1.wikia.nocookie.net/parksandrecreation/images/3/36/Jim_OHeir.jpg",
+						"iconurl": "http://getvero.tv/assets/img/interface/int1.jpg",
+						"iconhash": 0,
+					},
+					{
+						"id": "test only",
+						"name": "test tezter",
+						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
+						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
+						"maintained-by": "Jesus",
+						"version": "6.6.6",
+						"lastupdated": "2015-12-25",
+						"iconurl": "http://maxprint.pl/kodi/kod7.png",
 						"iconhash": 0,
 					}
 				]
@@ -139,6 +154,8 @@ class APF_STORE(object):
 				# grabs the item from the queue
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
 				q_item = thread_queue.get(True, 1)
+				
+				thread_queue.task_done()
 
 				# download the icon and save it in USERART
 
@@ -146,13 +163,12 @@ class APF_STORE(object):
 
 				icon_name = q_item.split('/')[-1]
 
-				with open(icon_name, 'wb') as out_file:
+				with open(os.path.join(USERART, icon_name), 'wb') as out_file:
 
 				    shutil.copyfileobj(response.raw, out_file)
 
 				del response
 
-				thread_queue.task_done()
 
 			except Queue.Empty:
 
@@ -162,7 +178,16 @@ class APF_STORE(object):
 
 
 	@clog(logger=log)
-	def create_apf_store_gui(self, apf_list):
+	def touch_addon_data_folder(self):
 
-		return apf_GUI("AddonBrowser.xml", __path__, 'Default', apf_list=apf_list)
+		if not os.path.isdir(USERART):
+			os.makedirs(USERART)
+
+		return USERART
+
+
+	@clog(logger=log)
+	def create_apf_store_gui(self, apf_dict):
+
+		return apf_GUI("AddonBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
 

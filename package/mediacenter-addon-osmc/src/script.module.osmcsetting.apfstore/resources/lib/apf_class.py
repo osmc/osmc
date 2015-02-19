@@ -2,6 +2,7 @@
 # KODI modules
 import xbmc
 import xbmcaddon
+import xbmcgui
 
 # Standard modules
 import sys
@@ -53,22 +54,48 @@ APF JSON STRUCTURE
 '''
 
 
-class APF_obj(object):
+class APF_obj(xbmcgui.ListItem):
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self):
 
-		self.id 			= kwargs.get('id', 'none')
-		self.name 			= kwargs.get('name', 'none')
-		self.shortdesc 		= kwargs.get('shortdesc', '')
-		self.longdesc 		= kwargs.get('longdesc', '')
-		self.maintainedby 	= kwargs.get('maintainedby', '')
-		self.version 		= kwargs.get('version', '')
-		self.lastupdated 	= kwargs.get('lastupdated', '')
-		self.iconurl 		= kwargs.get('iconurl', '/none')
-		self.iconhash 		= kwargs.get('iconhash', 0)
+		xbmcgui.ListItem.__init__(self)
+
+	def populate(self, data):
+
+		self.id 			= data.get('id', 'none')
+		self.name 			= data.get('name', 'none')
+		self.shortdesc 		= data.get('shortdesc', '')
+		self.longdesc 		= data.get('longdesc', '')
+		self.maintainedby 	= data.get('maintainedby', '')
+		self.version 		= data.get('version', '')
+		self.lastupdated 	= data.get('lastupdated', '')
+		self.iconurl 		= data.get('iconurl', '/none')
+		self.iconhash 		= data.get('iconhash', 0)
 		self.retrieve_icon  = False
 		self.current_icon   = self.check_icon(self.iconurl)
 
+		self.setLabel(self.name)
+		self.setLabel2(self.id)
+		self.setProperty('Addon.Description', self.longdesc)
+		self.setProperty('Addon.Creator', self.maintainedby)
+		self.setProperty('Addon.Name', self.name)
+		self.setProperty('Addon.Version', self.version)
+
+		self.setArt(
+			{
+			'thumb':self.current_icon,
+			'poster':self.current_icon,
+			'banner':self.current_icon,
+			'fanart':self.current_icon,
+			'clearart':self.current_icon,
+			'clearlogo':self.current_icon,
+			'landscape':self.current_icon,
+			})
+
+		self.setIconImage(self.current_icon)
+		self.setThumbnailImage(self.current_icon)
+
+		return self
 		
 
 	@clog(logger=log)
@@ -95,9 +122,9 @@ class APF_obj(object):
 
 		else:
 
-			current_icon = os.path.join(ADDONART, 'Default.jpg')
+			current_icon = os.path.join(ADDONART, 'osmc_logo.png')
 
-		log(current_icon)
+		log('current icon = %s' % current_icon)
 
 		# get the hash
 		icon_hash = hashlib.md5(open(current_icon).read()).hexdigest()

@@ -35,9 +35,38 @@ def lang(id):
 
 class apf_GUI(xbmcgui.WindowXMLDialog):
 
-	def __init__(self, strXMLname, strFallbackPath, strDefaultName, apf_list):
+	def __init__(self, strXMLname, strFallbackPath, strDefaultName, apf_dict):
 
-		pass
+		self.apf_dict = apf_dict
 
+
+	def onInit(self):
+
+		self.list = self.getControl(50)
+		for x, y in self.apf_dict.iteritems():
+			self.current_icon = '/home/kubkev/.kodi/addons/script.module.osmcsetting.apfstore/resources/skins/Default/media/osmc_logo.png'
+
+			self.list.addItem(y)
+
+			y.setArt(
+				{
+				'thumb':self.current_icon,
+				'poster':self.current_icon,
+				'banner':self.current_icon,
+				'fanart':self.current_icon,
+				'clearart':self.current_icon,
+				'clearlogo':self.current_icon,
+				'landscape':self.current_icon,
+				})
+
+			y.setIconImage(self.current_icon)
+			y.setThumbnailImage(self.current_icon)
+			
+
+		self.getControl(3).setLabel('Exit')
+		self.getControl(3).setEnabled(True)
+		self.getControl(5).setVisible(False)
+		self.getControl(6).setVisible(False)
+		self.getControl(7).setLabel('Permit Install')
 
 
