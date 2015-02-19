@@ -18,6 +18,6 @@ then
 
 	for dir in /usr/share/kodi/addons/service.osmc.settings/ /usr/share/kodi/addons/script.module.osmcsetting.*/
 	do
-		if pushd $dir >/dev/null 2>&1; then pycompile . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
+		if pushd $dir >/dev/null 2>&1; then pycompile -O . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
 	done
 fi
