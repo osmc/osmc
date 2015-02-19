@@ -186,6 +186,7 @@ then
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-libnfs-osmc, rbp-librtmp-osmc, rbp-libshairplay-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
+	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ mediacenter-osmc.deb
