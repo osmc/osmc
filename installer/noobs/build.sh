@@ -25,11 +25,28 @@ function build_fs_image()
 	rm -rf filesystem.tar.xz
 	pushd output
 	pushd boot
+	if [ $1 == 1 ]
+	then
+		# Add Pi1 config.txt
+		echo "arm_freq=850
+		core_freq=375
+		gpu_mem_256=112
+		gpu_mem_512=144
+		hdmi_ignore_cec_init=1
+		disable_overscan=1
+		start_x=1" > config.txt
+	else
+		# Add Pi2 config.txt
+		echo "gpu_mem_1024=256
+		hdmi_ignore_cec_init=1
+		disable_overscan=1
+		start_x=1" > config.txt
+	fi
 	tar -cf - * | xz -9 -c - > boot${1}.tar.xz
 	mv boot${1}.tar.xz ../../
 	rm *
 	popd
-	# NOOBS modifications, i.e. future 'health' script would be in ../
+	# NOOBS modifications, i.e. future 'health' script would be in .
 	tar -cf - * | xz -9 -c - > root${1}.tar.xz
 	mv root${1}.tar.xz ../../
 	popd
