@@ -1,0 +1,13 @@
+diff --git a/xbmc/addons/AddonInstaller.cpp b/xbmc/addons/AddonInstaller.cpp
+index c61da1b..854f705 100644
+--- a/xbmc/addons/AddonInstaller.cpp
++++ b/xbmc/addons/AddonInstaller.cpp
+@@ -91,6 +91,8 @@ void CAddonInstaller::OnJobComplete(unsigned int jobID, bool success, CJob* job)
+ 
+   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
+   g_windowManager.SendThreadMessage(msg);
++  system("/usr/bin/pycompile -O /home/osmc/.kodi/addons");
++  system("/usr/bin/pycompile -O /usr/share/kodi/addons");
+ }
+ 
+ void CAddonInstaller::OnJobProgress(unsigned int jobID, unsigned int progress, unsigned int total, const CJob *job)
