@@ -174,6 +174,8 @@ then
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
+	gcc addon-compiler.c -o addon-compiler
+	mv addon-compiler ${out}/usr/bin
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	rm ${out}/usr/share/kodi/media/Splash.png
 	strip ${out}/usr/lib/kodi/kodi.bin
