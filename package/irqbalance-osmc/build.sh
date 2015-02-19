@@ -19,7 +19,6 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
-	test "$1" == gen && echo "Package: irqbalance-osmc" >> files/DEBIAN/control
 	test "$1" == armv7 && echo "Package: armv7-irqbalance-osmc" >> files/DEBIAN/control
 	pushd src/irqbalance-master
 	./autogen.sh

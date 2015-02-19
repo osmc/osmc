@@ -20,7 +20,6 @@ then
 	update_sources
 	handle_dep "autoconf"
 	handle_dep "libtool"
-	test $1 == gen && echo "Package: libshairplay-osmc" >> files/DEBIAN/control && echo "Package: libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: libshairplay-osmc" >> files-dev/DEBIAN/control
 	test $1 == rbp && echo "Package: rbp-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: rbp-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libshairplay-osmc" >> files-dev/DEBIAN/control
         test $1 == armv7 && echo "Package: armv7-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: armv7-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: armv7-libshairplay-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*

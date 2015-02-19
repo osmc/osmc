@@ -13,7 +13,6 @@ then
 	out=$(pwd)/files
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
-	test "$1" == gen && echo "Package: splash-osmc" >> files/DEBIAN/control
 	test "$1" == rbp && echo "Package: rbp-splash-osmc" >> files/DEBIAN/control
 	test "$1" == armv7 && echo "Package: armv7-splash-osmc" >> files/DEBIAN/control
 	echo "Depends: fbset" >> files/DEBIAN/control
