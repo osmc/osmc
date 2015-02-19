@@ -92,7 +92,7 @@
                 <control id="10117" type="list">
                     <description>Wired Network list</description>
                     <posx>350</posx>
-                    <posy>100</posy>
+                    <posy>50</posy>
                     <width>250</width>
                     <height>100</height>
                     <visible>true</visible>
@@ -153,7 +153,24 @@
                             <selectedcolor>FF8FF5EE</selectedcolor>
                         </control>
                     </focusedlayout>
-		</control>
+		        </control>
+                <control id="10120" type="radiobutton">
+                    <posx>100</posx>
+                    <posy>125</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Enable Adapter</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <onup>1</onup>
+                    <ondown>10111</ondown>
+                </control>
                 <control id="10111" type="button">
                     <posx>100</posx>
                     <posy>200</posy>
@@ -168,7 +185,7 @@
                     <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
                     <align>center</align>
                     <aligny>center</aligny>
-                    <onup>1</onup>
+                    <onup>10120</onup>
                     <ondown>10112</ondown>
                 </control>
                 <control id="10112" type="button">

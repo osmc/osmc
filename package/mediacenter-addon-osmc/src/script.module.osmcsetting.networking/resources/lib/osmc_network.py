@@ -16,6 +16,13 @@ PREESEED_LOCATION = '/boot/preseed.cfg'
 
 manager = connman.get_manager_interface()
 
+def is_ethernet_enabled():
+    return connman.is_technology_enabled('ethernet')
+
+
+def toggle_ethernet_state(state):
+    connman.toggle_technology_state('ethernet', state)
+
 
 def get_network_settings():
     for entry in manager.GetServices():
