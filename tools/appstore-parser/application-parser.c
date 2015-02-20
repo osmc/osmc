@@ -1,7 +1,7 @@
 /*
  * application-parser.c
  *
- * Copyright 2014-2015 Sam Nazarko
+ * (c) 2014-2015 Sam Nazarko
  * email@samnazarko.co.uk
  *
  */
