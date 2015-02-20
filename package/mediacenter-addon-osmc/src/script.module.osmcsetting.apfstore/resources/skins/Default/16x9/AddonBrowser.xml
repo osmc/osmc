@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- addonbrowser -->
+	<backgroundcolor>0xff18394a</backgroundcolor>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<views>50,500</views>
+	<controls>
+		<!-- Background -->
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1920</width>
+			<height>1080</height>
+			<texture>background.png</texture>
+		</control>
+		<!-- Fanart -->
+<!-- 		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1920</width>
+			<height>1080</height>
+			<animation effect="fade" end="100" start="0" time="200">Visible</animation>
+			<animation effect="fade" end="0" start="100" time="200">Hidden</animation>
+			<fadetime>400</fadetime>
+			<colordiffuse>FanartDiffuse</colordiffuse>
+			<texture background="true">$INFO[ListItem.Art(fanart)]</texture>
+			<animation condition="[Player.HasVideo + Skin.HasSetting(BackgroundVideo)] | [Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)]" effect="fade" end="0" start="100">Conditional</animation>
+			<visible>[Skin.HasSetting(MovieFanart) + Container.Content(Movies)] | [Skin.HasSetting(TVFanart) + [Container.Content(TVShows) | Container.Content(Seasons) | Container.Content(Episodes)]] | [Skin.HasSetting(MusicFanart) + Window.IsVisible(musiclibrary)] | [Skin.HasSetting(WeatherFanart) + Window.IsVisible(weather)] | [Skin.HasSetting(AddonFanart) + [Container.Content(Addons) | Window.IsVisible(addonbrowser)]]</visible>
+		</control> -->
+		<!-- Curve -->
+		<control type="image">
+			<right>20</right>
+			<top>20</top>
+			<width>1520</width>
+			<height>1040</height>
+			<texture border="40,0,0,0">Curve.png</texture>
+			<visible>Skin.HasSetting(ShowCurve) + Control.IsVisible(50)</visible>
+		</control>
+		<!-- Curve -->
+		<control type="image">
+			<right>20</right>
+			<top>20</top>
+			<width>1172</width>
+			<height>1040</height>
+			<texture border="40,0,0,0">Curve.png</texture>
+			<visible>Skin.HasSetting(ShowCurve) + Control.IsVisible(50)</visible>
+		</control>
+		<!-- Curve -->
+		<control type="image">
+			<right>20</right>
+			<top>20</top>
+			<width>1280</width>
+			<height>1040</height>
+			<texture border="40,0,0,0">Curve.png</texture>
+			<visible>Skin.HasSetting(ShowCurve) + !Control.IsVisible(50)</visible>
+		</control>
+		<control type="group">
+			<animation condition="!Control.IsVisible(50)" effect="fade" end="0" start="100" time="0">Conditional</animation>
+			<!-- Dummy list -->
+			<control id="9000" type="grouplist">
+				<left>120</left>
+				<top>240</top>
+				<width>300</width>
+				<height>870</height>
+				<itemgap>34</itemgap>
+				<orientation>vertical</orientation>
+				<!-- Appearance -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>480</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Videos -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>3</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Music -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>2</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Pictures -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>1</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Weather -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>8</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- System -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>13000</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Service -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>14036</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- PVR -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>31015</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- System info -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>130</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- More -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>22082</label>
+					<font>OLD_Font42</font>
+					<textcolor>TextColor1</textcolor>
+				</control>
+			</control>
+			<!-- Dummy main list -->
+			<control type="grouplist">
+				<left>480</left>
+				<top>244</top>
+				<width>1680</width>
+				<height>726</height>
+				<itemgap>34</itemgap>
+				<orientation>vertical</orientation>
+				<!-- Addons -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>24001</label>
+					<font>OLD_Font33</font>
+					<textcolor>TextColor1</textcolor>
+				</control>
+				<!-- Profiles -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>13200</label>
+					<font>OLD_Font33</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- File manager -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>7</label>
+					<font>OLD_Font33</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+				<!-- Settings level -->
+				<control type="button">
+					<width>300</width>
+					<height>42</height>
+					<label>31016</label>
+					<font>OLD_Font33</font>
+					<textcolor>TextColor3</textcolor>
+				</control>
+			</control>
+			<!-- Dummy main list indicator -->
+			<control type="image">
+				<left>442</left>
+				<top>248</top>
+				<width>20</width>
+				<height>60</height>
+				<colordiffuse>OverlayColorFO</colordiffuse>
+				<texture border="6,1,8,1">ScrollBackground.png</texture>
+				<animation condition="true" effect="fade" end="50" start="100" time="0">Conditional</animation>
+			</control>
+			<!-- Default list -->
+			<control id="50" type="list">
+				<left>830</left>
+				<top>226</top>
+				<width>970</width>
+				<height>726</height>
+				<onleft>ReplaceWindow(settings)</onleft>
+				<onright>noop</onright>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<animation condition="!Control.IsVisible(50)" effect="fade" end="0" start="100" time="200">Conditional</animation>
+				<visible>IsEmpty(Container.FolderPath)</visible>
+				<itemlayout height="76" width="900">
+					<control type="label">
+						<width>900</width>
+						<height>76</height>
+						<font>OLD_Font33</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor2</textcolor>
+					</control>
+				</itemlayout>
+				<focusedlayout height="76" width="900">
+					<control type="label">
+						<width>900</width>
+						<height>76</height>
+						<font>OLD_Font33</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor1</textcolor>
+					</control>
+				</focusedlayout>
+			</control>
+			<!-- Sub list indicator -->
+			<control type="image">
+				<left>792</left>
+				<top>248</top>
+				<width>20</width>
+				<height>60</height>
+				<colordiffuse>OverlayColorFO</colordiffuse>
+				<texture border="6,1,8,1">ScrollBackground.png</texture>
+			</control>
+		</control>
+		<control type="group">
+			<visible>!Control.HasFocus(50)</visible>
+			<animation effect="fade" end="100" start="0" time="0">Visible</animation>
+			<!-- Image -->
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>666</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="1,1,1,69">DropShadow.png</bordertexture>
+				<bordersize>0,0,0,66</bordersize>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+				<bordertexture border="21,21,21,150">OverlayEffect.png</bordertexture>
+				<visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible>
+			</control>
+			<control type="image">
+				<left>120</left>
+				<top>225</top>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<colordiffuse>OverlayColorFO</colordiffuse>
+				<aspectratio aligny="center">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<!-- List -->
+			<control id="500" type="fixedlist">
+				<left>750</left>
+				<centertop>50%</centertop>
+				<width>1050</width>
+				<height>720</height>
+				<onup>500</onup>
+				<ondown>500</ondown>
+				<onleft>60</onleft>
+				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>3</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				<visible>!IsEmpty(Container.FolderPath)</visible>
+				<itemlayout height="90" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>90</height>
+						<font>OLD_Font36</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor2</textcolor>
+					</control>
+				</itemlayout>
+				<focusedlayout height="180" width="1050">
+					<control type="label">
+						<left>32</left>
+						<top>0</top>
+						<width>1018</width>
+						<height>180</height>
+						<font>OLD_Font72</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>TextColor1</textcolor>
+						<shadowcolor>ShadowColor</shadowcolor>
+						<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+						<visible>IsEmpty(ListItem.Label2)</visible>
+					</control>
+					<control type="group">
+						<visible>!IsEmpty(ListItem.Label2)</visible>
+						<control type="label">
+							<left>32</left>
+							<top>43</top>
+							<width>1018</width>
+							<height>48</height>
+							<font>OLD_Font48</font>
+							<label>$VAR[Label1]</label>
+							<textcolor>TextColor1</textcolor>
+							<shadowcolor>ShadowColor</shadowcolor>
+							<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+						</control>
+						<control type="label">
+							<left>32</left>
+							<top>100</top>
+							<width>1018</width>
+							<height>27</height>
+							<font>OLD_Font27</font>
+							<label>$INFO[ListItem.Label2]</label>
+							<textcolor>TextColor2</textcolor>
+							<shadowcolor>ShadowColor</shadowcolor>
+							<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+			<!-- Scrollbar (list) -->
+			<control id="60" type="scrollbar">
+				<left>690</left>
+				<centertop>50%</centertop>
+				<width>20</width>
+				<height>720</height>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+				<onright>50</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<colordiffuse>OverlayColorNF</colordiffuse>
+				<texturesliderbackground border="9,1,6,1">ScrollBackground.png</texturesliderbackground>
+				<texturesliderbar border="8,1,6,1">ScrollbarGripNF.png</texturesliderbar>
+				<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">ScrollbarGripFO.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+				<visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(500)</visible>
+			</control>
+			<!-- Item count -->
+			<control type="grouplist">
+				<right>120</right>
+				<bottom>110</bottom>
+				<width>800</width>
+				<height>44</height>
+				<itemgap>6</itemgap>
+				<align>right</align>
+				<orientation>horizontal</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+				<visible>IntegerGreaterThan(Container.NumItems,0)</visible>
+				<control type="label">
+					<top>3</top>
+					<width>auto</width>
+					<height>44</height>
+					<align>right</align>
+					<label>$INFO[Container.NumItems]</label>
+					<font>OLD_Font25</font>
+					<textcolor>TextColor2</textcolor>
+				</control>
+				<control type="label">
+					<width>auto</width>
+					<height>44</height>
+					<align>right</align>
+					<label>$VAR[ContentType]</label>
+					<font>OLD_Font33</font>
+					<textcolor>TextColor2</textcolor>
+				</control>
+			</control>
+			<!-- Options -->
+			<control type="group">
+				<animation type="Visible">
+					<effect center="auto" easing="inout" end="100" start="70" time="300" tween="back" type="zoom"/>
+					<effect end="100" start="0" time="300" type="fade"/>
+				</animation>
+				<animation type="Hidden">
+					<effect center="auto" end="70" start="100" time="100" type="zoom"/>
+					<effect end="0" start="100" time="100" type="fade"/>
+				</animation>
+				<visible allowhiddenfocus="true">ControlGroup(3000).HasFocus() | ControlGroup(4000).HasFocus() | ControlGroup(5000).HasFocus()</visible>
+				<!-- Background -->
+				<control type="image">
+					<left>0</left>
+					<top>0</top>
+					<width>1920</width>
+					<height>1080</height>
+					<texture border="20">OptionsBackground.png</texture>
+				</control>
+				<!-- Main group -->
+				<control type="group">
+					<left>85</left>
+					<top>297</top>
+					<!-- Scroll -->
+					<control type="image">
+						<left>0</left>
+						<top>0</top>
+						<width>72</width>
+						<height>20</height>
+						<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">ScrollBackgroundHorizontal.png</texture>
+					</control>
+					<control type="image">
+						<left>0</left>
+						<top>0</top>
+						<width>24</width>
+						<height>20</height>
+						<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">ScrollbarGripHorizontalFO.png</texture>
+						<animation condition="ControlGroup(4000).HasFocus()" effect="slide" end="24" start="0" time="200">Conditional</animation>
+						<animation condition="ControlGroup(5000).HasFocus()" effect="slide" end="48" start="0" time="200">Conditional</animation>
+					</control>
+					<!-- Heading -->
+					<control type="label">
+						<animation effect="fade" end="100" start="0" time="200">Visible</animation>
+						<left>0</left>
+						<top>34</top>
+						<width>1200</width>
+						<height>72</height>
+						<label>$VAR[CustomMenuHeading]</label>
+						<font>OLD_Font72</font>
+						<textcolor>DialogColor1</textcolor>
+					</control>
+					<!-- Grouplist -->
+					<control id="3000" type="grouplist">
+						<left>0</left>
+						<top>130</top>
+						<width>1200</width>
+						<height>600</height>
+						<onup>noop</onup>
+						<ondown>noop</ondown>
+						<onleft>50</onleft>
+						<onright>4001</onright>
+						<itemgap>8</itemgap>
+						<scrolltime>200</scrolltime>
+						<orientation>vertical</orientation>
+						<defaultcontrol always="true">3001</defaultcontrol>
+						<visible allowhiddenfocus="true">ControlGroup(3000).HasFocus()</visible>
+						<!-- Dummy to set focus to top -->
+						<control id="3001" type="button">
+							<width>0</width>
+							<height>-8</height>
+							<label>-</label>
+							<onfocus>Down</onfocus>
+						</control>
+						<!-- View -->
+						<control id="99" type="button">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>$INFO[Container.ViewMode]</label>
+							<onclick>Container.NextViewMode</onclick>
+						</control>
+						<!-- Fanart -->
+						<control id="98" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>20445</label>
+							<onclick>Skin.ToggleSetting(AddonFanart)</onclick>
+							<selected>Skin.HasSetting(AddonFanart)</selected>
+						</control>
+						<!-- Overlays -->
+						<control id="96" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>31006</label>
+							<onclick>Skin.ToggleSetting(Overlays)</onclick>
+							<selected>Skin.HasSetting(Overlays)</selected>
+						</control>
+						<!-- Scrollbars -->
+						<control id="94" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>31005</label>
+							<onclick>Skin.ToggleSetting(Scrollbars)</onclick>
+							<selected>!Skin.HasSetting(Scrollbars)</selected>
+						</control>
+					</control>
+					<!-- Grouplist -->
+					<control id="4000" type="grouplist">
+						<left>0</left>
+						<top>130</top>
+						<width>1200</width>
+						<height>600</height>
+						<onup>noop</onup>
+						<ondown>noop</ondown>
+						<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+						<onright>5001</onright>
+						<itemgap>8</itemgap>
+						<scrolltime>200</scrolltime>
+						<orientation>vertical</orientation>
+						<defaultcontrol always="true">4001</defaultcontrol>
+						<visible allowhiddenfocus="true">ControlGroup(4000).HasFocus()</visible>
+						<!-- Dummy to set focus to top -->
+						<control id="4001" type="button">
+							<width>0</width>
+							<height>-8</height>
+							<label>-</label>
+							<onfocus>Down</onfocus>
+						</control>
+						<!-- Sort by -->
+						<control id="3" type="button">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>103</label>
+							<visible>Control.IsEnabled(3)</visible>
+						</control>
+						<!-- Sort ascending/descending -->
+						<control id="4" type="togglebutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>584</label>
+							<altlabel>585</altlabel>
+							<usealttexture>Container.SortDirection(Descending)</usealttexture>
+							<visible>Control.IsEnabled(4)</visible>
+						</control>
+						<!-- Filter -->
+						<control id="19" type="edit">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>587</label>
+							<visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>
+						</control>
+						<!-- Filter -->
+						<control id="93" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>587</label>
+							<onclick>right</onclick>
+							<onclick>Filter</onclick>
+							<selected>Container.Filtered</selected>
+							<visible>Container.CanFilterAdvanced</visible>
+						</control>
+					</control>
+					<!-- Grouplist -->
+					<control id="5000" type="grouplist">
+						<left>0</left>
+						<top>130</top>
+						<width>1200</width>
+						<height>600</height>
+						<onup>noop</onup>
+						<ondown>noop</ondown>
+						<onleft>4001</onleft>
+						<onright>50</onright>
+						<itemgap>8</itemgap>
+						<scrolltime>200</scrolltime>
+						<orientation>vertical</orientation>
+						<defaultcontrol always="true">5001</defaultcontrol>
+						<visible allowhiddenfocus="true">ControlGroup(5000).HasFocus()</visible>
+						<!-- Dummy to set focus to top -->
+						<control id="5001" type="button">
+							<width>0</width>
+							<height>-8</height>
+							<label>-</label>
+							<onfocus>Down</onfocus>
+						</control>
+						<!-- Auto update -->
+						<control id="5" type="button">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>24063</label>
+							<visible>Control.IsEnabled(5)</visible>
+						</control>
+						<!-- Notifications -->
+						<control id="6" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>25000</label>
+							<visible>Control.IsEnabled(6)</visible>
+						</control>
+						<!-- Language -->
+						<control id="7" type="radiobutton">
+							<width>480</width>
+							<height>54</height>
+							<font>OLD_Font48</font>
+							<textcolor>DialogColor2</textcolor>
+							<focusedcolor>DialogColor1</focusedcolor>
+							<label>25001</label>
+							<visible>Control.IsEnabled(7)</visible>
+						</control>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>
