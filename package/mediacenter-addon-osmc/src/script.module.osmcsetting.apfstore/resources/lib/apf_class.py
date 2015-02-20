@@ -108,6 +108,10 @@ class APF_obj(xbmcgui.ListItem):
 					use existing in meantime
 		'''
 
+		if self.iconhash == 'NA':
+
+			return os.path.join(ADDONART, 'osmc_logo.png')
+
 		icon_name = iconurl.split('/')[-1]
 
 		if os.path.isfile(os.path.join(USERART, icon_name)):
