@@ -213,6 +213,7 @@ Overclock settings are set using the Pi Overclock module."""
 																	},
 									'sdtv_aspect': 				{'setting_value' : '',
 																	'default': '0',
+																		'translate': self.translate_sdtv_aspect
 																	},																																		
 									'gpu_mem':					{'setting_value' : '',
 																	'default': 'false',
@@ -529,6 +530,24 @@ Overclock settings are set using the Pi Overclock module."""
 	''' 
 		Methods beyond this point are for specific settings. 
 	'''
+
+	def translate_sdtv_aspect(self, data, reverse=False):
+
+		''' Method to translate the sdtv_aspect from 0 based index to 1 based '''
+
+		if not reverse:
+
+			if data:
+	
+				return int(data) - 1
+
+			else:
+
+				return 0
+
+		else:
+
+			return int(data) + 1
 
 
 	def translate_bool(self, data, reverse=False):
