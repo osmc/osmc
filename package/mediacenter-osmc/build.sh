@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-
+set -x
 if [ "$1" == "rbp" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/b5dbdb57db04a8628c78fecfa7002eac04820797.tar.gz" "$(pwd)/kodi"
