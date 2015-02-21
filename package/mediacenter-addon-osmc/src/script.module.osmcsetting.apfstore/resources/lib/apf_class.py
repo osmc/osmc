@@ -8,6 +8,7 @@ import xbmcgui
 import sys
 import os
 import hashlib
+import random
 
 
 addonid 	= "script.module.osmcsetting.apfstore"
@@ -21,7 +22,7 @@ sys.path.append(os.path.join(__path__, 'resources','lib'))
 from CompLogger import comprehensive_logger as clog
 
 ADDONART = os.path.join(__path__, 'resources','skins', 'Default', 'media')
-USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data ', addonid)
+USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data', addonid)
 
 
 def log(message):
@@ -75,28 +76,28 @@ class APF_obj(xbmcgui.ListItem):
 		self.current_icon   = self.check_icon(self.iconurl)
 
 		self.setLabel(self.name)
-		self.setLabel2(self.id)
+		self.installed = self.check_installed()
+		if self.installed: self.setLabel2('Installed')
 		self.setProperty('Addon.Description', self.longdesc)
 		self.setProperty('Addon.Creator', self.maintainedby)
 		self.setProperty('Addon.Name', self.name)
 		self.setProperty('Addon.Version', self.version)
 
-		self.setArt(
-			{
-			'thumb':self.current_icon,
-			'poster':self.current_icon,
-			'banner':self.current_icon,
-			'fanart':self.current_icon,
-			'clearart':self.current_icon,
-			'clearlogo':self.current_icon,
-			'landscape':self.current_icon,
-			})
-
 		self.setIconImage(self.current_icon)
-		self.setThumbnailImage(self.current_icon)
 
 		return self
 		
+
+	def check_installed(self):
+
+		if random.randint(0,1):
+
+			return True
+		
+		else:
+
+			return False
+
 
 	@clog(logger=log)
 	def check_icon(self, iconurl):

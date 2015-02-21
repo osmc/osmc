@@ -55,6 +55,8 @@ APF JSON STRUCTURE
            "maintained-by": "OSMC",
            "version": "1.0.0",
            "lastupdated": "2015-01-23",
+           "iconurl": "http://blah",
+           "iconhash": 0,
        }
    ]
 }
@@ -106,7 +108,7 @@ class APF_STORE(object):
 						"maintained-by": "OSMC",
 						"version": "1.0.0",
 						"lastupdated": "2015-01-23",
-						"iconurl": "http://getvero.tv/assets/img/interface/int1.jpg",
+						"iconurl": "http://www.raspbmc.com/wp-content/uploads/2014/11/1.png",
 						"iconhash": 0,
 					},
 					{
@@ -119,7 +121,73 @@ class APF_STORE(object):
 						"lastupdated": "2015-12-25",
 						"iconurl": "http://maxprint.pl/kodi/kod7.png",
 						"iconhash": 0,
-					}
+					},
+					{
+						"id": "ssh-app-osmc3",
+						"name": "SSH Server",
+						"shortdesc": "This allows you to connect to your OSMC device via SSH",
+						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
+						"maintained-by": "OSMC",
+						"version": "1.0.0",
+						"lastupdated": "2015-01-23",
+						"iconurl": "http://static.tumblr.com/rrzdptb/KKKm6z6ki/cool-icon.png",
+						"iconhash": 0,
+					},
+					{
+						"id": "test only3",
+						"name": "test tezter",
+						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
+						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
+						"maintained-by": "Jesus",
+						"version": "6.6.6",
+						"lastupdated": "2015-12-25",
+						"iconurl": "http://pomma89.altervista.org/troschuetz/logo.256.png",
+						"iconhash": 0,
+					},
+					{
+						"id": "ssh-app-osmc2",
+						"name": "SSH Server",
+						"shortdesc": "This allows you to connect to your OSMC device via SSH",
+						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
+						"maintained-by": "OSMC",
+						"version": "1.0.0",
+						"lastupdated": "2015-01-23",
+						"iconurl": "http://randomapplications.com/images/TuneSpanIcon.png",
+						"iconhash": 0,
+					},
+					{
+						"id": "test only2",
+						"name": "test tezter",
+						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
+						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
+						"maintained-by": "Jesus",
+						"version": "6.6.6",
+						"lastupdated": "2015-12-25",
+						"iconurl": "http://glenhartle.ca/NON_WP_IMAGES/Button-Refresh-icon.png",
+						"iconhash": 0,
+					},
+					{
+						"id": "ssh-app-osmc1",
+						"name": "SSH Server",
+						"shortdesc": "This allows you to connect to your OSMC device via SSH",
+						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
+						"maintained-by": "OSMC",
+						"version": "1.0.0",
+						"lastupdated": "2015-01-23",
+						"iconurl": "http://fc03.deviantart.net/fs70/f/2013/124/d/1/princess_twilight_after_effects_cs6_icon_by_lpsfreak-d642kuz.png",
+						"iconhash": 0,
+					},
+					{
+						"id": "test only1",
+						"name": "test tezter",
+						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
+						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
+						"maintained-by": "Jesus",
+						"version": "6.6.6",
+						"lastupdated": "2015-12-25",
+						"iconurl": "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/yellow-road-sign-icons-signs/096944-yellow-road-sign-icon-signs-bomb1.png",
+						"iconhash": 0,
+					},															
 				]
 			}
 
@@ -189,5 +257,5 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def create_apf_store_gui(self, apf_dict):
 
-		return apf_GUI("AddonBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
+		return apf_GUI("APFBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
 

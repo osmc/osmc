@@ -39,34 +39,123 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 		self.apf_dict = apf_dict
 
+		self.apf_order_list = []
+
+
+		self.action_dict = {}
+
 
 	def onInit(self):
 
-		self.list = self.getControl(50)
+		self.list = self.getControl(500)
+		self.list.setVisible(True)
 		for x, y in self.apf_dict.iteritems():
-			self.current_icon = '/home/kubkev/.kodi/addons/script.module.osmcsetting.apfstore/resources/skins/Default/media/osmc_logo.png'
+			# self.current_icon = '/home/kubkev/.kodi/addons/script.module.osmcsetting.apfstore/resources/skins/Default/media/osmc_logo.png'
 
 			self.list.addItem(y)
+			self.apf_order_list.append(x)
 
-			y.setArt(
-				{
-				'thumb':self.current_icon,
-				'poster':self.current_icon,
-				'banner':self.current_icon,
-				'fanart':self.current_icon,
-				'clearart':self.current_icon,
-				'clearlogo':self.current_icon,
-				'landscape':self.current_icon,
-				})
+		try:
+			self.getControl(50).setVisible(False)
+		except:
+			pass
 
-			y.setIconImage(self.current_icon)
-			y.setThumbnailImage(self.current_icon)
+		# self.getControl(3).setLabel('Exit')
+		# self.getControl(3).setEnabled(True)
+		# self.getControl(5).setVisible(False)
+		# self.getControl(6).setVisible(False)
+		# self.getControl(7).setLabel('Permit Install')
+
+
+	@clog(logger=log)
+	def onClick(self, controlID):
+
+		if controlID == 500:
+
+			try:
+
+				starting_action = sel_item.installed
+
+			except:
+
+				starting_action = False
+
+			container = self.getControl(500)
+
+			sel_pos = container.getSelectedPosition()
+
+			sel_item = self.apf_dict[self.apf_order_list[sel_pos]]
+
+			# create addon info window (prepare this so it loads faster)
+			self.addon_gui = addon_info_gui("APFAddonInfo.xml", __path__, 'Default', sel_item=sel_item)
 			
+			self.addon_gui.doModal()
 
-		self.getControl(3).setLabel('Exit')
-		self.getControl(3).setEnabled(True)
-		self.getControl(5).setVisible(False)
-		self.getControl(6).setVisible(False)
-		self.getControl(7).setLabel('Permit Install')
+			ending_action = self.addon_gui.action
+
+			if ending_action != starting_action:
+
+				if ending_action == 'Install':
+
+					self.action_dict[sel_item.id] = 'Install' 
+
+				else:
+					
+					self.action_dict[sel_item.id] = 'Remove' 
+
+			del self.addon_gui
+
+			log(self.action_dict)
+
+
+
+class addon_info_gui(xbmcgui.WindowXMLDialog):
+
+	'''
+	Controls
+	==============================
+	50001	Shortdesc
+	50002	Longdesc
+	50003	Version
+	50004	Maintainer
+	50005	LastUpdated
+	50006	Icon
+	50007	Name
+	'''
+
+	def __init__(self, strXMLname, strFallbackPath, strDefaultName, sel_item):
+
+		self.action = ''
+
+		self.sel_item = sel_item
+
+
+	def onInit(self):
+
+		self.getControl(50001).setLabel(self.sel_item.shortdesc)
+		self.getControl(50002).setText(self.sel_item.longdesc)
+		self.getControl(50003).setLabel(self.sel_item.version)
+		self.getControl(50004).setLabel(self.sel_item.maintainedby)
+		self.getControl(50005).setLabel(self.sel_item.lastupdated)
+		self.getControl(50006).setImage(self.sel_item.current_icon, True)
+		self.getControl(50007).setLabel(self.sel_item.name)
+
+
+	def onClick(self, controlID):
+
+		if controlID == 6:
+
+			lbl = self.getControl(6).getLabel()
+
+			if lbl == 'Install':
+				self.action = 'Install'
+			else:
+				self.action = 'Remove'
+
+			self.close()
+
+		elif controlID == 7:
+
+			self.close()
 
 
