@@ -6,4 +6,5 @@
 . ../common.sh
 
 echo -e "Building package smb-app-osmc"
+publish_applications_any $(pwd)
 dpkg -b files/ smb-app-osmc.deb
