@@ -4,7 +4,6 @@
 #!/bin/bash
 
 . ../common.sh
-
 pull_source "https://github.com/tvheadend/tvheadend/archive/v3.9.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -18,6 +17,9 @@ then
 	update_sources
 	handle_dep "pkg-config"
 	handle_dep "libssl-dev"
+	handle_dep "libavahi-client-dev"
+	handle_dep "libcurl3"
+	handle_dep "libcurl4-gnutls-dev"
 	handle_dep "git" # for dvbscan info?
 	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/rbp-tvheadend-app-osmc"
 	test $1 == armv7 && echo "Package: armv7-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/armv7-tvheadend-app-osmc"
@@ -31,6 +33,7 @@ then
 	strip_files "${out}"
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
+	publish_applications_targeted "$(pwd)" "$1"
 	dpkg -b files/ tvheadend-app-osmc.deb
 fi
 teardown_env "${1}"
