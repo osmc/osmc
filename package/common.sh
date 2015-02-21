@@ -102,9 +102,31 @@ function handle_dep()
 	fi
 }
 
+function publish_applications_any()
+{
+	# Used by applications that are architecture independent. These are usually metapackages with some configuration files shipped.
+	PKG_TARGETS="rbp"
+	for TARGET in $PKG_TARGETS
+	do
+		echo -e "Publishing application for platform ${TARGET}"
+		# No need to change id. Architecture is Any. 
+		cp ${1}/app.json ${1}/${TARGET}-app.json
+	done
+}
+
+function publish_applications_targeted()
+{
+	# Used by applications that are architecture dependent. 
+	echo -e "Publishing application for platform ${TARGET}"
+	cp ${1}/app.json ${1}/${2}-app.json
+	sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${2}-app.json # set the correct package id
+}
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
 export -f build_in_env
 export -f teardown_env
 export -f handle_dep
+export -f publish_applications_any
+export -f publish_applications_targeted
