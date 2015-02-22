@@ -123,7 +123,7 @@ bool Utils::mountPartition(Target *device, QString path)
             logger->addLine("Assuming NFS mount.");
             /* This is an NFS share, use BusyBox */
             QProcess mountProcess;
-            mountProcess.start("/bin/mount -t nfs -o nolock,noatime " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
+            mountProcess.start("/bin/mount -t nfs -o nolock,noatime,vers=3 " + device->getRoot().toLocal8Bit() + " " +  MNT_ROOT);
             mountProcess.waitForFinished(-1);
             if (mountProcess.exitCode() == 0)
                 return true;

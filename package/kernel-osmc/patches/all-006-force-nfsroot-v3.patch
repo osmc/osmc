@@ -1,0 +1,14 @@
+diff --git a/fs/nfs/nfsroot.c b/fs/nfs/nfsroot.c
+index cd3c910..19fcc63 100644
+--- a/fs/nfs/nfsroot.c
++++ b/fs/nfs/nfsroot.c
+@@ -216,7 +216,7 @@ static int __init root_nfs_parse_options(char *incoming, char *exppath,
+  */
+ static int __init root_nfs_data(char *cmdline)
+ {
+-       char mand_options[sizeof("nolock,addr=") + INET_ADDRSTRLEN + 1];
++       char mand_options[sizeof("vers=3,nolock,addr=") + INET_ADDRSTRLEN + 1];
+        int len, retval = -1;
+        char *tmp = NULL;
+        const size_t tmplen = sizeof(nfs_export_path);
+
