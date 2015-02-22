@@ -103,6 +103,7 @@ class Main(object):
 								'kill_yourself'				: self.kill_yourself,
 								'settings_command'			: self.settings_command,
 								'apt_error'					: self.apt_error,
+								'action_list'				: self.action_list,
 
 							}
 
@@ -202,7 +203,7 @@ class Main(object):
 			count += 1 											# FOR TESTING ONLY
 			# FOR TESTING ONLY
 
-			# check the aciton queue
+			# check the action queue
 			self.check_action_queue()
 
 			# check the holding pattern, call item in holding pattern
@@ -532,6 +533,12 @@ class Main(object):
 
 
 	# ACTION METHOD
+	def action_list(self,  action):
+
+		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
+
+
+	# ACTION METHOD
 	@clog(log, maxlength=250)
 	def progress_bar(self, **kwargs):
 
@@ -763,6 +770,7 @@ class Main(object):
 					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
 
 					return "Calling external update"
+
 
 	#ACTION METHOD
 	@clog(log)

@@ -13,7 +13,6 @@
 			<height>1080</height>
 			<texture>background.png</texture>
 		</control>
-
 		<!-- Curve -->
 		<control type="image">
 			<right>20</right>
@@ -22,7 +21,6 @@
 			<height>1040</height>
 			<texture border="40,0,0,0">Curve.png</texture>
 		</control>
-
 		<control type="group">
 			<animation effect="fade" end="100" start="0" time="0">Visible</animation>
 			<!-- Image -->
@@ -35,7 +33,7 @@
 				<aspectratio aligny="center">keep</aspectratio>
 				<bordertexture border="1,1,1,69">DropShadow.png</bordertexture>
 				<bordersize>0,0,0,66</bordersize>
-				<!-- <visible>!SubString(ListItem.Icon,Default)</visible> -->
+				<!-- <visible>!SubString(ListItem.Icon,Default)</visible>-->
 			</control>
 			<control type="label">
 				<left>120</left>
@@ -46,26 +44,8 @@
 				<label>$INFO[ListItem.Icon]</label>
 				<textcolor>66ffffff</textcolor>
 			</control>
-<!-- 			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>600</height>
-				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
-				<aspectratio aligny="center">keep</aspectratio>
-				<bordertexture border="21,21,21,150">OverlayEffect.png</bordertexture>
-				<visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible>
-			</control> -->
-<!-- 			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>600</height>
-				<texture>$INFO[ListItem.Icon]</texture>
-				<colordiffuse>ffffffff</colordiffuse>
-				<aspectratio aligny="center">keep</aspectratio>
-				<visible>SubString(ListItem.Icon,Default)</visible>
-			</control> -->
+			<!-- 			<control type="image"><left>120</left><top>225</top><width>405</width><height>600</height><texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture><aspectratio aligny="center">keep</aspectratio><bordertexture border="21,21,21,150">OverlayEffect.png</bordertexture><visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible></control>-->
+			<!-- 			<control type="image"><left>120</left><top>225</top><width>405</width><height>600</height><texture>$INFO[ListItem.Icon]</texture><colordiffuse>ffffffff</colordiffuse><aspectratio aligny="center">keep</aspectratio><visible>SubString(ListItem.Icon,Default)</visible></control>-->
 			<!-- List -->
 			<control id="500" type="fixedlist">
 				<left>750</left>
@@ -75,13 +55,13 @@
 				<onup>500</onup>
 				<ondown>500</ondown>
 				<onleft>60</onleft>
-				<onright>500</onright>
+				<onright>7</onright>
 				<pagecontrol>60</pagecontrol>
 				<focusposition>3</focusposition>
 				<orientation>vertical</orientation>
 				<viewtype label="535">list</viewtype>
 				<scrolltime easing="out" tween="sine">240</scrolltime>
-				<!-- <visible>!IsEmpty(Container.FolderPath)</visible> -->
+				<!-- <visible>!IsEmpty(Container.FolderPath)</visible>-->
 				<itemlayout height="90" width="1050">
 					<control type="label">
 						<left>32</left>
@@ -126,7 +106,7 @@
 							<height>27</height>
 							<font>font13</font>
 							<label>$INFO[ListItem.Label2]</label>
-							<!-- <textcolor>66ffffff</textcolor> -->
+							<!-- <textcolor>66ffffff</textcolor>-->
 							<textcolor>88f0f0f0</textcolor>
 							<shadowcolor>44000000</shadowcolor>
 							<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
@@ -150,38 +130,53 @@
 				<texturesliderbarfocus border="8,1,6,1" colordiffuse="ffffffff">ScrollbarGripFO.png</texturesliderbarfocus>
 				<textureslidernib>-</textureslidernib>
 				<textureslidernibfocus>-</textureslidernibfocus>
-				<!-- <visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(500)</visible> -->
+				<!-- <visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(500)</visible>-->
 			</control>
-			<!-- Item count -->
-			<control type="grouplist">
+			<!-- Button grouplist -->
+			<control id="9000" type="grouplist">
 				<right>120</right>
 				<bottom>110</bottom>
-				<width>800</width>
-				<height>44</height>
+				<width>250</width>
+				<height>600</height>
 				<itemgap>6</itemgap>
 				<align>right</align>
-				<orientation>horizontal</orientation>
-				<usecontrolcoords>true</usecontrolcoords>
-				<visible>IntegerGreaterThan(Container.NumItems,0)</visible>
-				<control type="label">
-					<top>3</top>
-					<width>auto</width>
+				<onleft>500</onleft>
+				<onright>noop</onright>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<orientation>vertical</orientation>
+				<!-- Install/UnInstall Addon button -->
+				<control id="6" type="button">
+					<width>231</width>
 					<height>44</height>
-					<align>right</align>
-					<label>$INFO[Container.NumItems]</label>
+					<label>Commit</label>
+					<!-- <visible>False</visible>-->
+				</control>
+				<!-- install count -->
+				<control id="61" type="label">
+					<width>231</width>
+					<height>44</height>
+					<label>Install Item Count</label>
+					<!-- <visible>False</visible>-->
 					<font>font13</font>
 					<textcolor>66ffffff</textcolor>
 				</control>
-				<control type="label">
-					<width>auto</width>
+				<!-- remove count -->
+				<control id="62" type="label">
+					<width>231</width>
 					<height>44</height>
-					<align>right</align>
-					<label>items</label>
+					<label>Remove Item Count</label>
+					<!-- <visible>False</visible>-->
 					<font>font13</font>
 					<textcolor>66ffffff</textcolor>
+				</control>
+				<!-- Exit button -->
+				<control id="7" type="button">
+					<width>231</width>
+					<height>44</height>
+					<label>Exit</label>
 				</control>
 			</control>
-
 		</control>
 	</controls>
 </window>

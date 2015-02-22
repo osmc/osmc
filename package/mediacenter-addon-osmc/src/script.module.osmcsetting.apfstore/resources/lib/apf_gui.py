@@ -7,6 +7,8 @@ import xbmcgui
 # Standard modules
 import sys
 import os
+import socket
+import json
 
 
 addonid 	= "script.module.osmcsetting.apfstore"
@@ -60,11 +62,54 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 		except:
 			pass
 
-		# self.getControl(3).setLabel('Exit')
-		# self.getControl(3).setEnabled(True)
-		# self.getControl(5).setVisible(False)
-		# self.getControl(6).setVisible(False)
-		# self.getControl(7).setLabel('Permit Install')
+
+		self.check_action_dict()
+
+
+	@clog(logger=log)
+	def check_action_dict(self):
+
+		install = 0
+		removal = 0
+
+		for x, y in self.action_dict.iteritems():
+
+			if y == 'Install':
+
+				install += 1
+
+			elif y == 'Uninstall':
+
+				removal += 1
+
+		if not install and not removal:
+
+			self.getControl(6).setVisible(False)
+			self.getControl(61).setVisible(False)
+			self.getControl(62).setVisible(False)
+
+			return
+
+		if install:
+
+			self.getControl(61).setLabel('Install: %s' % install)
+			self.getControl(6).setVisible(True)
+			self.getControl(61).setVisible(True)
+
+		else:
+			
+			self.getControl(61).setVisible(False)			
+
+		if removal:
+
+			self.getControl(62).setLabel('Uninstall: %s' % removal)
+			self.getControl(6).setVisible(True)
+			self.getControl(62).setVisible(True)			
+
+		else:
+			
+			self.getControl(62).setVisible(False)			
+
 
 
 	@clog(logger=log)
@@ -72,41 +117,67 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 		if controlID == 500:
 
-			try:
-
-				starting_action = sel_item.installed
-
-			except:
-
-				starting_action = False
-
 			container = self.getControl(500)
 
 			sel_pos = container.getSelectedPosition()
 
 			sel_item = self.apf_dict[self.apf_order_list[sel_pos]]
 
-			# create addon info window (prepare this so it loads faster)
 			self.addon_gui = addon_info_gui("APFAddonInfo.xml", __path__, 'Default', sel_item=sel_item)
-			
+
 			self.addon_gui.doModal()
 
 			ending_action = self.addon_gui.action
 
-			if ending_action != starting_action:
+			if ending_action == 'Install':
 
-				if ending_action == 'Install':
+				self.action_dict[sel_item.id] = 'Install' 
 
-					self.action_dict[sel_item.id] = 'Install' 
+			elif ending_action == 'Uninstall':
+				
+				self.action_dict[sel_item.id] = 'Uninstall' 
 
-				else:
+			elif sel_item.id in self.action_dict:
 					
-					self.action_dict[sel_item.id] = 'Remove' 
+				del self.action_dict[sel_item.id]
+
+			self.check_action_dict()
 
 			del self.addon_gui
 
 			log(self.action_dict)
 
+		elif controlID == 7:
+
+			self.close()
+
+		elif controlID == 6:
+
+			# send install and removal list to Update Service
+
+			action_list = ['install_' + k if v == 'Install' else 'removal_' + k for k, v in self.action_dict.iteritems()]
+
+			action_string = '|=|'.join(action_list)
+
+			self.contact_update_service(action_string)
+
+			self.close()
+
+
+	@clog(logger=log)
+	def contact_update_service(self, action_string):
+
+		address = '/var/tmp/osmc.settings.update.sockfile'
+
+		message = ('action_list', {'action': action_string})
+
+		message = json.dumps(message)
+
+		sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+		sock.connect(address)
+
+		sock.sendall(message) 
+		sock.close()
 
 
 class addon_info_gui(xbmcgui.WindowXMLDialog):
@@ -125,7 +196,7 @@ class addon_info_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, sel_item):
 
-		self.action = ''
+		self.action = False
 
 		self.sel_item = sel_item
 
@@ -140,6 +211,15 @@ class addon_info_gui(xbmcgui.WindowXMLDialog):
 		self.getControl(50006).setImage(self.sel_item.current_icon, True)
 		self.getControl(50007).setLabel(self.sel_item.name)
 
+		if self.sel_item.installed:
+
+			self.getControl(6).setLabel('Uninstall')
+
+		else:
+
+			self.getControl(6).setLabel('Install')
+			
+
 
 	def onClick(self, controlID):
 
@@ -150,7 +230,7 @@ class addon_info_gui(xbmcgui.WindowXMLDialog):
 			if lbl == 'Install':
 				self.action = 'Install'
 			else:
-				self.action = 'Remove'
+				self.action = 'Uninstall'
 
 			self.close()
 

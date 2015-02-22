@@ -67,7 +67,7 @@ class APF_obj(xbmcgui.ListItem):
 		self.name 			= data.get('name', 'none')
 		self.shortdesc 		= data.get('shortdesc', '')
 		self.longdesc 		= data.get('longdesc', '')
-		self.maintainedby 	= data.get('maintainedby', '')
+		self.maintainedby 	= data.get('maintained-by', '')
 		self.version 		= data.get('version', '')
 		self.lastupdated 	= data.get('lastupdated', '')
 		self.iconurl 		= data.get('iconurl', '/none')

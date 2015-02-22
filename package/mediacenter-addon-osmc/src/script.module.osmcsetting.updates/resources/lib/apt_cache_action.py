@@ -76,6 +76,7 @@ class Main(object):
 								'update' 		: self.update,
 								'commit' 		: self.commit,
 								'fetch'  		: self.fetch,
+								'action_list'	: self.action_list,
 								}
 
 		try:
@@ -112,6 +113,68 @@ class Main(object):
 		
 			action()
 
+		else:
+
+			print 'Action not in action_to_method dict'
+
+
+	@clog()
+	def action_list(self):
+
+		''' This method processes a list sent in argv[2], and either installs or remove packages. 
+
+			The list is sent as a string:
+
+					install_packageid1|=|install_packageid2|=|removal_packageid3'''
+
+		action_string = sys.argv[2]
+
+		action_dict = self.parse_argv2(action_string)
+
+		self.update()
+
+		for pkg in self.cache:
+
+			# mark packages as install or remove
+
+			if pkg.shortname in action_dict['install']:
+
+				pkg.mark_install()
+
+			if pkg.shortname in action_dict['removal']:
+
+				pkg.mark_delete()
+
+			if action_dict['removal'] and pkg.is_auto_removable:
+				# if there were removals then remove the packages that arent needed any more
+
+				pkg.mark_delete()
+
+		# commit
+		self.commit_action()
+
+
+	@clog()
+	def parse_argv2(self, action_string):
+
+		install = []
+		removal = []
+
+		actions = action_string.split('|=|')
+
+		for action in actions:
+
+			if action.startswith('install_'):
+
+				install.append(action[len('install_'):])
+
+			elif action.startswith('removal_'):
+
+				removal.append(action[len('removal_'):])
+
+		return {'install': install, 'removal': removal}
+
+
 	@clog()
 	def update(self):
 
@@ -140,6 +203,12 @@ class Main(object):
 		self.cache.upgrade(True)
 
 		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
+
+		self.commit_action()
+
+
+	@clog()
+	def commit_action(self):
 
 		dprg = Download_Progress()
 		
