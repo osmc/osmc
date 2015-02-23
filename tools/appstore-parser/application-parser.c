@@ -37,12 +37,15 @@ int main(int argc, char **argv)
 			{
 				if (fgets(line, sizeof(line), fp) != NULL)
 				{
-					if (lines_processed != 1 && lines_processed != 2 && lines_processed != 3 && lines_processed != (line_count -3) && lines_processed != (line_count - 2) && lines_processed != (line_count - 1))
+					if (lines_processed != 1 && lines_processed != 2 && lines_processed != 3 && lines_processed != (line_count - 2) && lines_processed != (line_count - 1) && lines_processed != (line_count - 0))
 						asprintf(&json_buffer, "%s\t\t%s", json_buffer, line);
 					lines_processed++;
 				}
 			}
-			asprintf(&json_buffer, "%s\t%s\n", json_buffer, "}");
+			if (i != (json_count - 1))
+				asprintf(&json_buffer, "%s\t%s\n", json_buffer, "},");
+			else
+				asprintf(&json_buffer, "%s\t%s\n", json_buffer, "}");
 			fclose(fp);
 		}
 		else
