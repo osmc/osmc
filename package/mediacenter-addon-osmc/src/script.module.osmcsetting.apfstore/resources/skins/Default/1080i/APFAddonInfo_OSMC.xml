@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<!-- addoninformation -->
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<animation type="WindowOpen">
+		<effect center="auto" easing="inout" end="100" start="70" time="300" tween="back" type="zoom"/>
+		<effect end="100" start="0" time="300" type="fade"/>
+	</animation>
+	<animation type="WindowClose">
+		<effect center="auto" end="70" start="100" time="100" type="zoom"/>
+		<effect end="0" start="100" time="100" type="fade"/>
+	</animation>
+	<controls>
+		<!-- Background -->
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1920</width>
+			<height>1080</height>
+			<texture border="20">DialogBackground.png</texture>
+		</control>
+		<!-- Heading -->
+		<control type="label">
+			<left>150</left>
+			<top>96</top>
+			<width>1620</width>
+			<height>72</height>
+			 <font>OLD_Font72</font>
+			<!-- <font>font13</font> -->
+			<textcolor>ffffffff</textcolor>
+			<label>APF Information</label>
+		</control>
+		<!-- Name -->
+		<control id="50007" type="label">
+			<left>150</left>
+			<top>235</top>
+			<width>430</width>
+			<height>36</height>
+			 <font>OLD_Font36</font>
+			<!-- <font>font13</font> -->
+			<textcolor>ffffffff</textcolor>
+			<label>[B]Name[/B]</label>
+		</control>
+		<!-- Image -->
+		<control type="group">
+			<control id="50006" type="image">
+				<left>150</left>
+				<top>322</top>
+				<width>405</width>
+				<height>405</height>
+				<texture>ICON</texture>
+				<aspectratio aligny="center">keep</aspectratio>
+			</control>
+		</control>
+		<!-- Info -->
+		<control type="group">
+			<left>600</left>
+			<top>235</top>
+			<!-- Details -->
+			<control type="grouplist">
+				<width>1170</width>
+				<height>336</height>
+				<itemgap>12</itemgap>
+				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+				<!-- Type -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Last Updated</label>
+						<textcolor>66ffffff</textcolor>
+					</control>
+					<control id="50005" type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>lastupdated</label>
+						<textcolor>ffffffff</textcolor>
+					</control>
+				</control>
+				<!-- Author -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Maintainer</label>
+						<textcolor>66ffffff</textcolor>
+					</control>
+					<control type="label" id="50004">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Maintainer</label>
+						<textcolor>ffffffff</textcolor>
+					</control>
+				</control>
+				<!-- Version -->
+				<control type="group">
+					<height>36</height>
+					<width>1170</width>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Version</label>
+						<textcolor>66ffffff</textcolor>
+					</control>
+					<control id="50003" type="label">
+						<left>220</left>
+						<width>950</width>
+						<height>36</height>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Version</label>
+						<textcolor>ffffffff</textcolor>
+					</control>
+				</control>
+				<!-- Rating -->
+				<!--control type="group"><height>36</height><width>1170</width><visible>!IsEmpty(ListItem.Property(Addon.Rating))</visible><control type="label"><width>200</width><height>36</height><align>right</align><font>OLD_Font36</font><label>563</label><textcolor>66ffffff</textcolor></control><control type="label"><left>220</left><width>950</width><height>36</height><font>OLD_Font36</font><label fallback="416">$INFO[ListItem.Property(Addon.Rating)]</label><textcolor>ffffffff</textcolor></control></control-->
+				<!-- Summary -->
+				<control type="group">
+					<height>112</height>
+					<width>1170</width>
+					<control type="label">
+						<width>200</width>
+						<height>36</height>
+						<align>right</align>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<label>Summary</label>
+						<textcolor>66ffffff</textcolor>
+					</control>
+					<control id="50001" type="label">
+						<top>-6</top>
+						<left>220</left>
+						<width>950</width>
+						<height>112</height>
+						 <font>OLD_Font36</font>
+						<!-- <font>font13</font> -->
+						<aligny>top</aligny>
+						<wrapmultiline>true</wrapmultiline>
+						<label>ShortDesc</label>
+						<textcolor>ffffffff</textcolor>
+					</control>
+				</control>
+			</control>
+			<!-- Description -->
+			<control id="50002" type="textbox">
+				<top>370</top>
+				<width>950</width>
+				<height>210</height>
+				<textcolor>66ffffff</textcolor>
+				<label>LongDesc</label>
+			</control>
+		</control>
+		<!-- Button grouplist -->
+		<control id="9000" type="grouplist">
+			<left>150</left>
+			<top>912</top>
+			<width>1620</width>
+			<height>66</height>
+			<itemgap>0</itemgap>
+			<onleft>noop</onleft>
+			<onright>noop</onright>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>horizontal</orientation>
+			<!-- Install/UnInstall Addon button -->
+			<control id="6" type="button">
+				<width>231</width>
+				<label>Install</label>
+				<texture></texture>
+			</control>
+			<!-- Exit button -->
+			<control id="7" type="button">
+				<width>231</width>
+				<texture></texture>
+				<label>Cancel</label>
+			</control>
+		</control>
+	</controls>
+</window>
