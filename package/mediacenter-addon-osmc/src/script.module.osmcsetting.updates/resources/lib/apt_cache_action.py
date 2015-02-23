@@ -146,7 +146,7 @@ class Main(object):
 
 			if pkg.shortname in action_dict['removal']:
 
-				pkg.mark_delete()
+				pkg.mark_delete(purge=True)
 
 			if action_dict['removal'] and pkg.is_auto_removable:
 				# if there were removals then remove the packages that arent needed any more
