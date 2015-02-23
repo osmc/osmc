@@ -118,7 +118,7 @@ function publish_applications_targeted()
 {
 	# Used by applications that are architecture dependent. 
 	echo -e "Publishing application for platform ${TARGET}"
-	cp ${1}/app.json ${1}/${2}-app.json
+	cp ${1}/app.json ${1}/${2}-${3}.json
 	sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${2}-${3}.json # set the correct package id
 }
 
