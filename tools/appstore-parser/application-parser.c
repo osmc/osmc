@@ -52,6 +52,6 @@ int main(int argc, char **argv)
 		}
 	}
 	asprintf(&json_buffer, "%s\t\n%s\n", json_buffer, "]");
-	printf("%s", json_buffer);
+	printf("%s\n%s", json_buffer, "}");
 	return 0;
 }
