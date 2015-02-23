@@ -61,6 +61,7 @@ class APF_obj(xbmcgui.ListItem):
 
 		xbmcgui.ListItem.__init__(self)
 
+
 	def populate(self, data):
 
 		self.id 			= data.get('id', 'none')
@@ -75,9 +76,9 @@ class APF_obj(xbmcgui.ListItem):
 		self.retrieve_icon  = False
 		self.current_icon   = self.check_icon(self.iconurl)
 
+		self.installed 		= False
+
 		self.setLabel(self.name)
-		self.installed = self.check_installed()
-		if self.installed: self.setLabel2('Installed')
 		self.setProperty('Addon.Description', self.longdesc)
 		self.setProperty('Addon.Creator', self.maintainedby)
 		self.setProperty('Addon.Name', self.name)
@@ -88,15 +89,12 @@ class APF_obj(xbmcgui.ListItem):
 		return self
 		
 
-	def check_installed(self):
+	def set_installed(self, status):
 
-		if random.randint(0,1):
+		if status == True:
 
-			return True
-		
-		else:
-
-			return False
+			self.installed = True
+			self.setLabel2('Installed')
 
 
 	def refresh_icon(self):

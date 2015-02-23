@@ -784,32 +784,37 @@ class Main(object):
 
 			self.cache = apt.apt_pkg.Cache()
 
+		except apt.cache.LockFailedException:
+
+			return 'bail', 'global lock placed on package system'
+
 		except:
 
 			return 'bail', 'apt_pkg cache failed to open'
 
-
 		dirty_states = {apt.apt_pkg.CURSTATE_HALF_CONFIGURED, apt.apt_pkg.CURSTATE_HALF_INSTALLED, apt.apt_pkg.CURSTATE_UNPACKED}
 
-		try:
+		with apt.apt_pkg.SystemLock():
 
-			for pkg in self.cache.packages:
+			try:
 
-				if pkg.current_state in dirty_states:
+				for pkg in self.cache.packages:
 
-					log(' found in a partially installed state', pkg.name)
+					if pkg.current_state in dirty_states:
 
-					self.EXTERNAL_UPDATE_REQUIRED = 1
+						log(' found in a partially installed state', pkg.name)
 
-					return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
+						self.EXTERNAL_UPDATE_REQUIRED = 1
 
-			else:
+						return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
 
-				return 'passed', 'no broken packages found'
+				else:
 
-		except:
+					return 'passed', 'no broken packages found'
 
-			return 'bail', 'check for partially installed packages failed'
+			except:
+
+				return 'bail', 'check for partially installed packages failed'
 
 
 	# ACTION METHOD
@@ -824,53 +829,59 @@ class Main(object):
 			
 			return check, msg 
 
-		self.cache = apt.Cache()
-
 		try:
+	
+			self.cache = apt.Cache()
 
 			self.cache.open(None)
+
+		except apt.cache.LockFailedException:
+
+			return 'bail', 'global lock placed on package system'
 
 		except:
 
 			return 'bail', 'apt cache failed to open'
 
-		try:
+		with apt.apt_pkg.SystemLock():
 
-			self.cache.upgrade(True)
+			try:
 
-		except:
+				self.cache.upgrade(True)
 
-			return 'bail', 'apt cache failed to upgrade'
+			except:
 
-		available_updates = []
+				return 'bail', 'apt cache failed to upgrade'
 
-		log('The following packages have newer versions and are upgradable: ')
+			available_updates = []
 
-		for pkg in self.cache:
+			log('The following packages have newer versions and are upgradable: ')
 
-			if pkg.is_upgradable:
+			for pkg in self.cache:
 
-				log(' is upgradeable', pkg.shortname)
+				if pkg.is_upgradable:
 
-				available_updates.append(pkg.shortname.lower())
+					log(' is upgradeable', pkg.shortname)
 
-		# if 'osmc' isnt in the name of any available updates, then return without doing anything
-		if not any(['osmc' in x for x in available_updates]):
+					available_updates.append(pkg.shortname.lower())
 
-			self.window.setProperty('OSMC_notification', 'false')
+			# if 'osmc' isnt in the name of any available updates, then return without doing anything
+			if not any(['osmc' in x for x in available_updates]):
 
-			return 'bail', 'There are no osmc packages'
+				self.window.setProperty('OSMC_notification', 'false')
 
-		if any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x for x in available_updates]):
+				return 'bail', 'There are no osmc packages'
 
-			self.EXTERNAL_UPDATE_REQUIRED = 1
+			if any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x for x in available_updates]):
 
-		# display update available notification
-		if not self.s['suppress_icon']:
+				self.EXTERNAL_UPDATE_REQUIRED = 1
 
-			self.window.setProperty('OSMC_notification', 'true')
+			# display update available notification
+			if not self.s['suppress_icon']:
 
-		return 'passed', 'legit updates available'
+				self.window.setProperty('OSMC_notification', 'true')
+
+			return 'passed', 'legit updates available'
 
 
 	# ACTION METHOD

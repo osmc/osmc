@@ -59,45 +59,48 @@ class Main(object):
 
 	def __init__(self, action):
 
-		print '==================================================================='
-		print '%s %s running' % (t.now(), 'apt_cache_action.py')
+		with apt.apt_pkg.SystemLock():
+			# implements a lock on the package system, so that nothing else can alter packages
 
-		self.error_package = ''
-		
-		self.error_message = ''
+			print '==================================================================='
+			print '%s %s running' % (t.now(), 'apt_cache_action.py')
 
-		self.action = action
+			self.error_package = ''
+			
+			self.error_message = ''
 
-		self.cache = apt.Cache()
+			self.action = action
 
-		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
+			self.cache = apt.Cache()
 
-		self.action_to_method = {
-								'update' 		: self.update,
-								'commit' 		: self.commit,
-								'fetch'  		: self.fetch,
-								'action_list'	: self.action_list,
-								}
+			self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
 
-		try:
-		
-			self.act()
-		
-		except Exception as e:
-		
-			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
-		
-			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
+			self.action_to_method = {
+									'update' 		: self.update,
+									'commit' 		: self.commit,
+									'fetch'  		: self.fetch,
+									'action_list'	: self.action_list,
+									}
 
-			deets = 'Error Type and Args: %s : %s' % (type(e).__name__, e.args)
+			try:
+			
+				self.act()
+			
+			except Exception as e:
+			
+				print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
+			
+				print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
-			# send the error to the parent (parent will kill the progress bar)
-			call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': deets})
+				deets = 'Error Type and Args: %s : %s' % (type(e).__name__, e.args)
 
-		self.respond()
+				# send the error to the parent (parent will kill the progress bar)
+				call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': deets})
 
-		print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
-		print '==================================================================='
+			self.respond()
+
+			print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
+			print '==================================================================='
 
 
 	def respond(self):

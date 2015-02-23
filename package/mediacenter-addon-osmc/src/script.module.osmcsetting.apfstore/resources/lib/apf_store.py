@@ -12,6 +12,7 @@ import json
 import requests
 import Queue
 import shutil
+import apt
 
 
 addonid 	= "script.module.osmcsetting.apfstore"
@@ -70,6 +71,8 @@ class APF_STORE(object):
 
 		self.touch_addon_data_folder()
 
+		self.install_status_cache = {x.split('=')[0] : x.split('=')[1] for x in __addon__.getSetting('install_status_cache').split(':_:') if '=' in x}
+
 		json_req = self.get_list_from_sam()
 
 		if json_req == 'failed':
@@ -87,6 +90,8 @@ class APF_STORE(object):
 		self.apf_dict = self.generate_apf_dict(json_req)
 
 		self.apf_GUI = self.create_apf_store_gui(self.apf_dict)
+
+		self.retrieve_install_status()
 
 		self.retrieve_icons()
 
@@ -180,6 +185,75 @@ class APF_STORE(object):
 				del response
 
 				q_item.refresh_icon()
+
+			except Queue.Empty:
+
+				log('Queue.Empty error')
+
+				break
+
+
+	@clog(logger=log)
+	def retrieve_install_status(self):
+
+		try:
+			self.cache = apt.Cache()
+			self.cache.open()
+
+			with apt.apt_pkg.SystemLock():
+
+				thread_queue = Queue.Queue()
+
+				for ident, apf in self.apf_dict.iteritems():
+
+					if apf.retrieve_icon:
+
+						thread_queue.put(apf)
+
+				# spawn some workers
+				# for i in range(1):
+
+				t = threading.Thread(target=self.grab_install_status, args=(thread_queue,))
+				t.daemon = True
+
+				# reset all cached install status
+				__addon__.setSetting('install_status_cache', '')
+
+				t.start()
+
+		except apt.cache.LockFailedException:
+
+			# if the cache is locked then use the stored version of the install status
+
+			for idee, apf in self.apf_dict.iteritems():
+
+				if self.install_status_cache.get(idee, False):
+
+					apf.set_installed(True)
+
+
+	@clog(logger=log)
+	def grab_install_status(self, thread_queue):
+
+		while True:
+
+			try:
+				# grabs the item from the queue
+				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
+				q_item = thread_queue.get(True, 1)
+				
+				thread_queue.task_done()
+
+				# download the icon and save it in USERART
+				pkg = self.cache[q_item.id]
+
+				if pkg.is_installed:
+
+					q_item.set_installed(True)
+
+					tmp = __addon__.getSetting('install_status_cache') + q_item.id + '=installed'
+
+					__addon__.setSetting('install_status_cache', tmp)
 
 			except Queue.Empty:
 
