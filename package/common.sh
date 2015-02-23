@@ -110,7 +110,7 @@ function publish_applications_any()
 	do
 		echo -e "Publishing application for platform ${TARGET}"
 		# No need to change id. Architecture is Any. 
-		cp ${1}/app.json ${1}/${TARGET}-app.json
+		cp ${1}/app.json ${1}/${TARGET}-${2}.json
 	done
 }
 
@@ -119,7 +119,7 @@ function publish_applications_targeted()
 	# Used by applications that are architecture dependent. 
 	echo -e "Publishing application for platform ${TARGET}"
 	cp ${1}/app.json ${1}/${2}-app.json
-	sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${2}-app.json # set the correct package id
+	sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${2}-${3}.json # set the correct package id
 }
 
 export -f fix_arch_ctl

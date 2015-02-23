@@ -33,7 +33,7 @@ then
 	strip_files "${out}"
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	publish_applications_targeted "$(pwd)" "$1"
+	publish_applications_targeted "$(pwd)" "$1" "tvheadend-app-osmc"
 	dpkg -b files/ tvheadend-app-osmc.deb
 fi
 teardown_env "${1}"

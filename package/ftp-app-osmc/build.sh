@@ -6,5 +6,5 @@
 . ../common.sh
 
 echo -e "Building package ftp-app-osmc"
-publish_applications_any $(pwd)
+publish_applications_any $(pwd) "ftp-app-osmc"
 dpkg -b files/ ftp-app-osmc.deb
