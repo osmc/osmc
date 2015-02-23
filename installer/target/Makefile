@@ -1,7 +1,7 @@
 all:
 	echo -e "Specify a target:\nmake rbp\nmake imx6"
 
-rbp1:
+rbp:
 	sudo bash build.sh "rbp"
 
 imx6:
