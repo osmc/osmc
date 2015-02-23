@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	char *json_buffer;
-	asprintf(&json_buffer, "%s\n\t%s\n", "{", "\"application\":");
+	asprintf(&json_buffer, "%s\n\t%s\n\t%s\n", "{", "\"application\":","[");
 	int json_count = argc - 1;
 	int i;
 	for (i = 0; i < json_count; i++)
@@ -27,9 +27,7 @@ int main(int argc, char **argv)
 		fp = fopen(argv[i+1], "r");
 		if (fp)
 		{
-			if (i < json_count && i != 0)
-				asprintf(&json_buffer, "%s%s\n", json_buffer, ",");
-			asprintf(&json_buffer, "%s\t%s\n", json_buffer, "[");
+			asprintf(&json_buffer, "%s\t%s\n", json_buffer, "{");
 			char line[512];
 			while (!feof(fp))
 				if (fgets(line, sizeof(line), fp) != NULL)
@@ -39,12 +37,12 @@ int main(int argc, char **argv)
 			{
 				if (fgets(line, sizeof(line), fp) != NULL)
 				{
-					if (lines_processed != 1 && lines_processed != 2 && lines_processed != 3 && lines_processed != (line_count - 2) && lines_processed != (line_count - 1))
+					if (lines_processed != 1 && lines_processed != 2 && lines_processed != 3 && lines_processed != (line_count -3) && lines_processed != (line_count - 2) && lines_processed != (line_count - 1))
 						asprintf(&json_buffer, "%s\t\t%s", json_buffer, line);
 					lines_processed++;
 				}
 			}
-			asprintf(&json_buffer, "%s\t%s", json_buffer, "]");
+			asprintf(&json_buffer, "%s\t%s\n", json_buffer, "}");
 			fclose(fp);
 		}
 		else
@@ -53,7 +51,7 @@ int main(int argc, char **argv)
 			return -1;
 		}
 	}
-	asprintf(&json_buffer, "%s\t\n%s\n", json_buffer, "}");
+	asprintf(&json_buffer, "%s\t\n%s\n", json_buffer, "]");
 	printf("%s", json_buffer);
 	return 0;
 }
