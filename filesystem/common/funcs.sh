@@ -22,6 +22,12 @@ function setup_osmc_user()
 	chmod 0440 ${1}/etc/sudoers.d/osmc
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
+	# Default storage directories
+	for dir in "Pictures Music Movies TV\ Shows"
+	do
+	mkdir -p $dir
+	chown osmc:osmc $dir
+	done
 }
 
 function setup_hostname()
