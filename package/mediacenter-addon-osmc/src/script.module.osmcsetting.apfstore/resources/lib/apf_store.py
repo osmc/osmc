@@ -251,7 +251,7 @@ class APF_STORE(object):
 
 					q_item.set_installed(True)
 
-					tmp = __addon__.getSetting('install_status_cache') + q_item.id + '=installed'
+					tmp = __addon__.getSetting('install_status_cache') + ':_:' + q_item.id + '=installed'
 
 					__addon__.setSetting('install_status_cache', tmp)
 
