@@ -111,28 +111,38 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def get_list_from_sam(self):
 
-		# generate the URL
-		with open('/proc/cmdline', 'r') as f:
+		try: 
 
-			line = f.readline()
+			# generate the URL
+			with open('/proc/cmdline', 'r') as f:
 
-			settings = line.split(' ')
+				line = f.readline()
 
-			suffix = None
+				settings = line.split(' ')
 
-			for setting in settings:
+				suffix = None
 
-				if setting.startswith('osmcdev='):
+				for setting in settings:
 
-					self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='=):]
+					if setting.startswith('osmcdev='):
 
-					log('APF data URL: %s' % self.URL)
+						self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='=):]
 
-					break
+						log('APF data URL: %s' % self.URL)
 
-			finally:
+						break
 
-				return 'failed'
+				finally:
+
+					# this is for testing only
+					self.URL = 'http://download.osmc.tv/apps/rbp'
+
+					return 'failed'
+
+		except:
+
+			self.URL = 'http://download.osmc.tv/apps/rbp'
+			
 
 		r = requests.get(self.URL)
 
