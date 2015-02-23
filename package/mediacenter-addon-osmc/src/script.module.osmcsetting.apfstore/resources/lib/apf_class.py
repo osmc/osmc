@@ -99,6 +99,13 @@ class APF_obj(xbmcgui.ListItem):
 			return False
 
 
+	def refresh_icon(self):
+
+		self.current_icon = self.check_icon(self.iconurl)
+
+		self.setIconImage(self.current_icon)
+
+
 	@clog(logger=log)
 	def check_icon(self, iconurl):
 		''' Checks the addon data folder for the icon,

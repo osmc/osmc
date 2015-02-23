@@ -72,6 +72,18 @@ class APF_STORE(object):
 
 		json_req = self.get_list_from_sam()
 
+		if json_req == 'failed':
+
+			log('Failed to retrieve osmcdev= from /proc/cmdline')
+
+			return
+
+		elif not json_req:
+
+			log('Failed to retrieve data from %s' % self.URL)
+
+			return
+
 		self.apf_dict = self.generate_apf_dict(json_req)
 
 		self.apf_GUI = self.create_apf_store_gui(self.apf_dict)
@@ -81,7 +93,7 @@ class APF_STORE(object):
 		self.apf_GUI.doModal()
 
 
-	@clog(logger=log, maxlength=1000)
+	@clog(logger=log, maxlength=10000)
 	def generate_apf_dict(self, json_req):
 
 		apf_list = json_req.get('application', [])
@@ -94,102 +106,32 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def get_list_from_sam(self):
 
-		# r = requests.get('https://api.github.com/user', auth=('user', 'pass'))
+		# generate the URL
+		with open('/proc/cmdline', 'r') as f:
 
-		# r.json()
+			line = f.readline()
 
-		r	= {
-				"application": [
-					{
-						"id": "ssh-app-osmc",
-						"name": "SSH Server",
-						"shortdesc": "This allows you to connect to your OSMC device via SSH",
-						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
-						"maintained-by": "OSMC",
-						"version": "1.0.0",
-						"lastupdated": "2015-01-23",
-						"iconurl": "http://www.raspbmc.com/wp-content/uploads/2014/11/1.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "test only",
-						"name": "test tezter",
-						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
-						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
-						"maintained-by": "Jesus",
-						"version": "6.6.6",
-						"lastupdated": "2015-12-25",
-						"iconurl": "http://maxprint.pl/kodi/kod7.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "ssh-app-osmc3",
-						"name": "SSH Server",
-						"shortdesc": "This allows you to connect to your OSMC device via SSH",
-						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
-						"maintained-by": "OSMC",
-						"version": "1.0.0",
-						"lastupdated": "2015-01-23",
-						"iconurl": "http://static.tumblr.com/rrzdptb/KKKm6z6ki/cool-icon.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "test only3",
-						"name": "test tezter",
-						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
-						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
-						"maintained-by": "Jesus",
-						"version": "6.6.6",
-						"lastupdated": "2015-12-25",
-						"iconurl": "http://pomma89.altervista.org/troschuetz/logo.256.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "ssh-app-osmc2",
-						"name": "SSH Server",
-						"shortdesc": "This allows you to connect to your OSMC device via SSH",
-						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
-						"maintained-by": "OSMC",
-						"version": "1.0.0",
-						"lastupdated": "2015-01-23",
-						"iconurl": "http://randomapplications.com/images/TuneSpanIcon.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "test only2",
-						"name": "test tezter",
-						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
-						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
-						"maintained-by": "Jesus",
-						"version": "6.6.6",
-						"lastupdated": "2015-12-25",
-						"iconurl": "http://glenhartle.ca/NON_WP_IMAGES/Button-Refresh-icon.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "ssh-app-osmc1",
-						"name": "SSH Server",
-						"shortdesc": "This allows you to connect to your OSMC device via SSH",
-						"longdesc": "This installs an OpenSSH server on your OSMC device allowing you to log in to your device remotely as well as transfer files via SCP.",
-						"maintained-by": "OSMC",
-						"version": "1.0.0",
-						"lastupdated": "2015-01-23",
-						"iconurl": "http://fc03.deviantart.net/fs70/f/2013/124/d/1/princess_twilight_after_effects_cs6_icon_by_lpsfreak-d642kuz.png",
-						"iconhash": 0,
-					},
-					{
-						"id": "test only1",
-						"name": "test tezter",
-						"shortdesc": "TtestTtestTtestT testTtestTtestTtes tTtestTtestTtest",
-						"longdesc": "TtestTtestTtestTtestTtestT testTtestTtestTtestTte stTtestTtestTtestTtes tTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTte  stTtestTtestTtestTtestTtestTtestTtestTt estTtestTtestTtestTt estTtestTtestTtestTtestTtestTtestTtestTtestTte stTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtestTtestTtestTtestTtestT testTtestTtestTtestTtestTtes tTtestTtestTtest",
-						"maintained-by": "Jesus",
-						"version": "6.6.6",
-						"lastupdated": "2015-12-25",
-						"iconurl": "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/yellow-road-sign-icons-signs/096944-yellow-road-sign-icon-signs-bomb1.png",
-						"iconhash": 0,
-					},															
-				]
-			}
+			settings = line.split(' ')
+
+			suffix = None
+
+			for setting in settings:
+
+				if setting.startswith('osmcdev='):
+
+					self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='=):]
+
+					log('APF data URL: %s' % self.URL)
+
+					break
+
+			finally:
+
+				return 'failed'
+
+		r = requests.get(self.URL)
+
+		r.json()
 
 		return r
 
@@ -203,7 +145,7 @@ class APF_STORE(object):
 
 			if apf.retrieve_icon:
 
-				thread_queue.put(apf.iconurl)
+				thread_queue.put(apf)
 
 		# spawn some workers
 		# for i in range(1):
@@ -227,9 +169,9 @@ class APF_STORE(object):
 
 				# download the icon and save it in USERART
 
-				response = requests.get(q_item, stream=True)
+				response = requests.get(q_item.iconurl, stream=True)
 
-				icon_name = q_item.split('/')[-1]
+				icon_name = q_item.iconurl.split('/')[-1]
 
 				with open(os.path.join(USERART, icon_name), 'wb') as out_file:
 
@@ -237,6 +179,7 @@ class APF_STORE(object):
 
 				del response
 
+				q_item.refresh_icon()
 
 			except Queue.Empty:
 
