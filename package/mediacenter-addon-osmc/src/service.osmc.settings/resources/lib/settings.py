@@ -398,7 +398,7 @@ class OSMCGui(object):
 			log('OSMCSetting __ %s __ failed to import' % sub_folder)
 			log(exc_type)
 			log(exc_value)
-			log(exc_traceback)
+			log(traceback.format_exc())
 			return
 
 		# success!

@@ -8,6 +8,7 @@ import json
 import os
 import time
 import subprocess
+import traceback
 from CompLogger import comprehensive_logger as clog
 
 t = datetime
@@ -27,7 +28,7 @@ except:
 	pass
 
 
-@clog(maxlength=50)
+@clog(maxlength=1500)
 def call_parent(raw_message, data={}):
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
@@ -83,7 +84,7 @@ class Main(object):
 									}
 
 			try:
-			
+				
 				self.act()
 			
 			except Exception as e:
@@ -92,7 +93,7 @@ class Main(object):
 			
 				print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
-				deets = 'Error Type and Args: %s : %s' % (type(e).__name__, e.args)
+				deets = 'Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc())
 
 				# send the error to the parent (parent will kill the progress bar)
 				call_parent('apt_error', {'error': self.error_message, 'package': self.error_package, 'exception': deets})
