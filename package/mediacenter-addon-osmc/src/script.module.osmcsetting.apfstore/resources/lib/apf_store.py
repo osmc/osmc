@@ -126,18 +126,18 @@ class APF_STORE(object):
 
 					if setting.startswith('osmcdev='):
 
-						self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='=):]
+						self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='):]
 
 						log('APF data URL: %s' % self.URL)
 
 						break
 
-				finally:
+				else:
 
 					# this is for testing only
 					self.URL = 'http://download.osmc.tv/apps/rbp'
 
-					return 'failed'
+					# return 'failed'
 
 		except:
 
@@ -146,9 +146,9 @@ class APF_STORE(object):
 
 		r = requests.get(self.URL)
 
-		r.json()
+		q = r.json()
 
-		return r
+		return q
 
 
 	@clog(logger=log)
@@ -210,26 +210,25 @@ class APF_STORE(object):
 			self.cache = apt.Cache()
 			self.cache.open()
 
-			with apt.apt_pkg.SystemLock():
 
-				thread_queue = Queue.Queue()
+			thread_queue = Queue.Queue()
 
-				for ident, apf in self.apf_dict.iteritems():
+			for ident, apf in self.apf_dict.iteritems():
 
-					if apf.retrieve_icon:
+				if apf.retrieve_icon:
 
-						thread_queue.put(apf)
+					thread_queue.put(apf)
 
-				# spawn some workers
-				# for i in range(1):
+			# spawn some workers
+			# for i in range(1):
 
-				t = threading.Thread(target=self.grab_install_status, args=(thread_queue,))
-				t.daemon = True
+			t = threading.Thread(target=self.grab_install_status, args=(thread_queue,))
+			t.daemon = True
 
-				# reset all cached install status
-				__addon__.setSetting('install_status_cache', '')
+			# reset all cached install status
+			__addon__.setSetting('install_status_cache', '')
 
-				t.start()
+			t.start()
 
 		except apt.cache.LockFailedException:
 

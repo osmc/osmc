@@ -794,27 +794,25 @@ class Main(object):
 
 		dirty_states = {apt.apt_pkg.CURSTATE_HALF_CONFIGURED, apt.apt_pkg.CURSTATE_HALF_INSTALLED, apt.apt_pkg.CURSTATE_UNPACKED}
 
-		with apt.apt_pkg.SystemLock():
+		try:
 
-			try:
+			for pkg in self.cache.packages:
 
-				for pkg in self.cache.packages:
+				if pkg.current_state in dirty_states:
 
-					if pkg.current_state in dirty_states:
+					log(' found in a partially installed state', pkg.name)
 
-						log(' found in a partially installed state', pkg.name)
+					self.EXTERNAL_UPDATE_REQUIRED = 1
 
-						self.EXTERNAL_UPDATE_REQUIRED = 1
+					return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
 
-						return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
+			else:
 
-				else:
+				return 'passed', 'no broken packages found'
 
-					return 'passed', 'no broken packages found'
+		except:
 
-			except:
-
-				return 'bail', 'check for partially installed packages failed'
+			return 'bail', 'check for partially installed packages failed'
 
 
 	# ACTION METHOD
@@ -843,45 +841,43 @@ class Main(object):
 
 			return 'bail', 'apt cache failed to open'
 
-		with apt.apt_pkg.SystemLock():
+		try:
 
-			try:
+			self.cache.upgrade(True)
 
-				self.cache.upgrade(True)
+		except:
 
-			except:
+			return 'bail', 'apt cache failed to upgrade'
 
-				return 'bail', 'apt cache failed to upgrade'
+		available_updates = []
 
-			available_updates = []
+		log('The following packages have newer versions and are upgradable: ')
 
-			log('The following packages have newer versions and are upgradable: ')
+		for pkg in self.cache:
 
-			for pkg in self.cache:
+			if pkg.is_upgradable:
 
-				if pkg.is_upgradable:
+				log(' is upgradeable', pkg.shortname)
 
-					log(' is upgradeable', pkg.shortname)
+				available_updates.append(pkg.shortname.lower())
 
-					available_updates.append(pkg.shortname.lower())
+		# if 'osmc' isnt in the name of any available updates, then return without doing anything
+		if not any(['osmc' in x for x in available_updates]):
 
-			# if 'osmc' isnt in the name of any available updates, then return without doing anything
-			if not any(['osmc' in x for x in available_updates]):
+			self.window.setProperty('OSMC_notification', 'false')
 
-				self.window.setProperty('OSMC_notification', 'false')
+			return 'bail', 'There are no osmc packages'
 
-				return 'bail', 'There are no osmc packages'
+		if any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x for x in available_updates]):
 
-			if any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x for x in available_updates]):
+			self.EXTERNAL_UPDATE_REQUIRED = 1
 
-				self.EXTERNAL_UPDATE_REQUIRED = 1
+		# display update available notification
+		if not self.s['suppress_icon']:
 
-			# display update available notification
-			if not self.s['suppress_icon']:
+			self.window.setProperty('OSMC_notification', 'true')
 
-				self.window.setProperty('OSMC_notification', 'true')
-
-			return 'passed', 'legit updates available'
+		return 'passed', 'legit updates available'
 
 
 	# ACTION METHOD
