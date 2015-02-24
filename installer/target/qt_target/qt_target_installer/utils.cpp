@@ -140,7 +140,7 @@ bool Utils::mountPartition(Target *device, QString path)
     return false;
 }
 
-int utils::getCoreCount()
+int Utils::getCoreCount()
 {
     int coreCount = 0;
     QFile cpuFile("/proc/cpuinfo");
