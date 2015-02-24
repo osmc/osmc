@@ -43,7 +43,6 @@ then
 	if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 	popd
 	mv buildroot-${BUILDROOT_VERSION}/output/images/zImage kernel.img
-	mv buildroot-${BUILDROOT_VERSION}/output/images/INSTALLER .
 	rm -rf buildroot-${BUILDROOT_VERSION}
 	# Build for Pi 2
 	pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz" "."
@@ -90,8 +89,7 @@ then
 	mv zImage /mnt/kernel_v7.img
 	mv INSTALLER/* /mnt
 	# Pi 1 files
-	mv ../../../../kernel.img /mnt
-	mv ../../../../INSTALLER /mnt
+	mv ../../../kernel.img /mnt
 fi
 if [ "$1" == "imx6" ]
 then
