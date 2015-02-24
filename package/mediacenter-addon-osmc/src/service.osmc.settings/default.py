@@ -9,10 +9,10 @@ DIALOG           = xbmcgui.Dialog()
 
 def lang(id):
 	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
 
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
-	return san 
 
 
 log('default started')
