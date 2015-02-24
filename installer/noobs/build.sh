@@ -41,6 +41,6 @@ mv boot.tar.xz ../../
 popd
 # NOOBS modifications, i.e. future 'health' script would be in .
 tar -cf - * | xz -9 -c - > root.tar.xz
-mv root.tar.xz ../../
+mv root.tar.xz ../
 popd
 echo -e "Build completed"
