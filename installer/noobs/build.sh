@@ -36,13 +36,11 @@ echo "gpu_mem_1024=256
 hdmi_ignore_cec_init=1
 disable_overscan=1
 start_x=1" > config2.txt
-tar -cf - * | xz -9 -c - > boot${1}.tar.xz
-mv boot${1}.tar.xz ../../
-rm *
+tar -cf - * | xz -9 -c - > boot.tar.xz
+mv boot.tar.xz ../../
 popd
 # NOOBS modifications, i.e. future 'health' script would be in .
-tar -cf - * | xz -9 -c - > root${1}.tar.xz
-mv root${1}.tar.xz ../../
+tar -cf - * | xz -9 -c - > root.tar.xz
+mv root.tar.xz ../../
 popd
-}
 echo -e "Build completed"
