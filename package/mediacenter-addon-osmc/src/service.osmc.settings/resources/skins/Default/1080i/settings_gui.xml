@@ -4,14 +4,21 @@
     <animation effect="fade" time="250">WindowOpen</animation>
     <animation effect="fade" time="500">WindowClose</animation>
     <controls>
-        <!-- background -->
-        <control description="BG" type="image">
-            <posx>0</posx>
-            <posy>0</posy>
+        <!-- Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
             <width>1920</width>
             <height>1080</height>
-            <texture>segment_BG.png</texture>
-            <aspectratio>scale</aspectratio>
+            <texture>background.png</texture>
+        </control>
+        <!-- Curve -->
+        <control type="image">
+            <right>20</right>
+            <top>20</top>
+            <width>1280</width>
+            <height>1040</height>
+            <texture border="40,0,0,0">Curve.png</texture>
         </control>
         <!-- explanatory text window -->
         <control id="2" type="textbox">
@@ -20,7 +27,7 @@
             <posy>175</posy>
             <width>563</width>
             <height>800</height>
-            <visible>true</visible>
+            <visible>false</visible>
             <!-- <colordiffuse>FFFFFFFF</colordiffuse>-->
             <font>font13</font>
             <textcolor>FFFFFFFF</textcolor>
@@ -37,12 +44,13 @@
             <posy>45</posy>
             <width>533</width>
             <height>100</height>
+            <visible>false</visible>
             <texture>osmclight100.png</texture>
             <!-- <aspectratio>scale</aspectratio>-->
         </control>
         <control id="4444" type="button">
             <description>previous menu</description>
-            <posx>780</posx>
+            <posx>300</posx>
             <posy>465</posy>
             <width>70</width>
             <height>150</height>
@@ -59,7 +67,7 @@
         </control>
         <control id="6666" type="button">
             <description>next menu</description>
-            <posx>1780</posx>
+            <posx>1620</posx>
             <posy>465</posy>
             <width>70</width>
             <height>150</height>
@@ -78,7 +86,7 @@
             <control id="100" type="group">
                 <description>Nine Box Grid Group</description>
                 <animation effect="fade" time="5000">VisibleChange</animation>
-                <posx>780</posx>
+                <posx>420</posx>
                 <posy>0</posy>
                 <width>1080</width>
                 <height>1080</height>
@@ -527,7 +535,7 @@
             <control id="200" type="group">
                 <description>Nine Box Grid Group two</description>
                 <animation effect="fade" time="5000">VisibleChange</animation>
-                <posx>780</posx>
+                <posx>420</posx>
                 <posy>0</posy>
                 <width>1080</width>
                 <height>1080</height>
