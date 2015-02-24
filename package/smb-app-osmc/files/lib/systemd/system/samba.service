@@ -1,0 +1,12 @@
+[Unit]
+Description = Samba Server
+After = network.target
+
+[Service]
+Type = oneshot
+RemainAfterExit = yes
+ExecStart = /etc/init.d/samba.distributed start
+ExecStop = /etc/init.d/samba.distributed stop
+
+[Install]
+WantedBy = multi-user.target

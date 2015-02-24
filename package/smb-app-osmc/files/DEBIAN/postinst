@@ -15,5 +15,12 @@ if [ "$1" = "configure" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	# only do this for first install not upgrade
-	if [ -z "$2" ]; then (echo osmc; echo osmc) | smbpasswd -a osmc; fi
+	if [ -z "$2" ]
+	then
+		(echo osmc; echo osmc) | smbpasswd -a osmc
+		systemctl disable smbd.service
+		systemctl disable nmbd.service
+		systemctl enable samba.service
+	fi
+	if systemctl is-enabled samba.service >/dev/null; then systemctl start samba.service; fi
 fi

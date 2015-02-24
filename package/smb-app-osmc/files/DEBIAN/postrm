@@ -15,4 +15,6 @@ if [ "$1" = "remove" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	remove_divert /etc/samba/smb.conf.distributed /etc/samba/smb.conf
+        remove_divert /etc/init.d/samba.distributed /etc/init.d/samba
+        remove_divert /lib/systemd/system/samba.service.distributed /lib/systemd/system/samba.service
 fi
