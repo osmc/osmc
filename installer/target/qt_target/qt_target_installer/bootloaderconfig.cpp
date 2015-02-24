@@ -42,7 +42,7 @@ void BootloaderConfig::configureMounts()
 
 void BootloaderConfig::configureEnvironment()
 {
-    if (utils->getOSMCDev() == "rbp" || utils->getOSMCDev() == "rbp2")
+    if (utils->getOSMCDev() == "rbp")
     {
         QFile cmdlineFile("/mnt/boot/cmdline.txt");
         QStringList cmdlineStringList;
@@ -58,9 +58,9 @@ void BootloaderConfig::configureEnvironment()
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
-        if (utils->getOSMCDev() == "rbp")
+        if (utils->getCoreCount() == 1)
             configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
-        if (utils->getOSMCDev() == "rbp2")
+        if (utils->getCoreCount() == 4)
             configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
         utils->writeToFile(configFile, configStringList, false);
     }

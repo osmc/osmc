@@ -26,6 +26,7 @@ public:
     bool mountPartition(Target *device, QString path);
     int getPartSize(QString device, QString fstype);
     void updateDevTable();
+    int getCoreCount();
 
 private:
     Logger *logger;
