@@ -142,7 +142,7 @@ radius: 1.35, stop: 0 rgb(240,240,240), stop: 1 rgb(180,180,180));
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>120</y>
+     <y>170</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -169,7 +169,7 @@ background: rgb(240, 240, 240, 0);
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>120</y>
+     <y>170</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -186,11 +186,59 @@ background: rgb(240, 240, 240, 0);
 </string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="keylineEdit">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>170</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Source Sans Pro</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="keyLabel">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>170</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Source Sans Pro</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #17394A;
+background: rgb(240, 240, 240, 0);
+</string>
+   </property>
+   <property name="text">
+    <string>Key:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
   <widget class="QComboBox" name="keySelectionBox">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>200</y>
+     <x>240</x>
+     <y>140</y>
      <width>191</width>
      <height>22</height>
     </rect>
@@ -218,8 +266,8 @@ background: rgb(240, 240, 240);
   <widget class="QLabel" name="networkoptionsdescriptionLabel_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>160</y>
+     <x>20</x>
+     <y>110</y>
      <width>621</width>
      <height>21</height>
     </rect>
@@ -242,59 +290,10 @@ background: rgb(240, 240, 240, 0);
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="keylineEdit">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>120</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Source Sans Pro</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: #17394A;
-background: rgb(240, 240, 240, 0);
-</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="keyLabel">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>120</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Source Sans Pro</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: #17394A;
-background: rgb(240, 240, 240, 0);
-</string>
-   </property>
-   <property name="text">
-    <string>Key:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>ssidnamelineEdit</tabstop>
   <tabstop>keylineEdit</tabstop>
-  <tabstop>keySelectionBox</tabstop>
   <tabstop>networkoptionsnextButton</tabstop>
  </tabstops>
  <resources>
