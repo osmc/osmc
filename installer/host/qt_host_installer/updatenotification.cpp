@@ -27,7 +27,7 @@ UpdateNotification::UpdateNotification(QWidget *parent) :
     #ifdef Q_OS_LINUX
     platform = QString("linux");
     #endif
-    QString appendURL = "<a href=\"http://osmc.tv/download/" + platform + "\"><span style=\" text-decoration: underline; color:#f0f0f0;\">http://osmc.tv/download/" + platform + "</span></a></p></body></html>";
+    QString appendURL = "<a href=\"http://osmc.tv/download/" + platform + "\"><span style=\" text-decoration: underline; color:#51BC9B;\">http://osmc.tv/download/" + platform + "</span></a></p></body></html>";
     ui->downloadLinkLabel->setText(QString(ui->downloadLinkLabel->text() + appendURL));
     #ifdef Q_OS_LINUX
     /*TODO: Only display if /usr/bin/apt-get exists */
