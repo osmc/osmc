@@ -6,6 +6,7 @@
 #include "ui_updatenotification.h"
 #include "utils.h"
 #include <QtNetwork/QNetworkReply>
+#include <QFile>
 
 QString platform;
 
@@ -17,7 +18,6 @@ UpdateNotification::UpdateNotification(QWidget *parent) :
     ui->downloadLinkLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     ui->downloadLinkLabel->setOpenExternalLinks(true);
     /* Add link here, not in designer, so our translators don't need to touch HTML */
-
     #ifdef Q_OS_MAC
     platform = QString("mac");
     #endif
@@ -31,7 +31,12 @@ UpdateNotification::UpdateNotification(QWidget *parent) :
     ui->downloadLinkLabel->setText(QString(ui->downloadLinkLabel->text() + appendURL));
     #ifdef Q_OS_LINUX
     /*TODO: Only display if /usr/bin/apt-get exists */
-    ui->platformtipLabel->setText(QString("You can also do this with \"apt-get upgrade\""));
+    QFile aptFile("/usr/bin/apt-get");
+    QFile yumFile("/usr/bin.yum");
+    if (aptFile.exists())
+        ui->platformtipLabel->setText(QString("You can also do this with \"apt-get update && apt-get upgrade\""));
+    if (yumFile.exists())
+        ui->platformtipLabel->setText(QString("You can also do this with \"yum update\""));
     #endif
 }
 
