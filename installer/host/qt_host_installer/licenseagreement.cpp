@@ -27,7 +27,7 @@ void LicenseAgreement::on_licenseAcceptNextButton_clicked()
     }
     else
     {
-        utils::writeLog("GPLv2 licence has been accepted");
+        utils::writeLog("EULA has been accepted");
         emit licenseAccepted();
     }
 }
