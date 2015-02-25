@@ -100,7 +100,8 @@ class Main(object):
 
 		if __setting__('firstrun'):
 
-			walkthru.open_gui()
+			pass
+			# walkthru.open_gui()
 
 		while True:
 

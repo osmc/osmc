@@ -144,11 +144,20 @@ class APF_STORE(object):
 			self.URL = 'http://download.osmc.tv/apps/rbp'
 			
 
-		r = requests.get(self.URL)
+		r = requests.get(self.URL.replace('\n','').replace('\t','').replace('\n',''))
 
-		q = r.json()
+		try:
 
-		return q
+			q = r.json()
+
+			return q
+			
+		except:
+
+			log('JSON couldnt be read: %s' % r.text)
+
+			return 'failed'
+
 
 
 	@clog(logger=log)
