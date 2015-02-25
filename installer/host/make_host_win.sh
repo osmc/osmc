@@ -15,6 +15,7 @@ PATH="${PATH}:${QT_PATH}:${SDK_PATH}:${RAR_PATH}:${MINGW_PATH}"
 TARGET="qt_host_installer"
 ZLIB_VER="1.2.8"
 pushd ${TARGET}
+VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
 if [ -f Makefile ]; then echo "Cleaning Qt project" && mingw32-make clean; fi
 pushd w32-lib/zlib-${ZLIB_VER}
 make -f win32/Makefile.gcc clean
@@ -46,4 +47,6 @@ mv ${INSTALL}/osmc-installer.exe .
 rm -rf ${INSTALL}
 umount /qtbin >/dev/null 2>&1
 umount /mgwbin >/dev/null 2>&1
+# Update on server
+echo ${VERSION} > latest_windows
 echo Build complete

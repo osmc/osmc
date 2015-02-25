@@ -26,4 +26,6 @@ echo Updating Debian versioning
 cp debian.changelog debian.control debian.dsc debian.rules ${OUTPUT}
 sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/debian.changelog
 sed -e s/PLACEHOLDER/${VERSION}/ -i ${OUTPUT}/debian.dsc
+# Update on server
+echo ${VERSION} > latest_linux
 echo Files are now ready for OBS
