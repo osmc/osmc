@@ -98,6 +98,10 @@ class Main(object):
 
 		log('daemon started')
 
+		if __setting__('firstrun'):
+
+			walkthru.open_gui()
+
 		while True:
 
 
@@ -239,7 +243,7 @@ class Main(object):
 	def open_gui(self):
 
 		log('firstrun? %s' % __setting__('firstrun'))
-		
+
 		log('Opening OSMC settings GUI')
 
 		try:

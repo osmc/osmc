@@ -1,90 +1,648 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-    <defaultcontrol always="true">900</defaultcontrol>
-<controls>
-    <control description="BG" type="image">
-        <posx>0</posx>
-        <posy>0</posy>
-        <width>1920</width>
-        <height>1080</height>
-        <texture>bump_bg.png</texture>
-        <aspectratio>scale</aspectratio>
-    </control>
-    <control id="100" type="grouplist">
-        <posx>0</posx>
-        <posy>15</posy>
-        <width>230</width>
-        <height>315</height>
-        <itemgap>5</itemgap>
-        <onleft>900</onleft>
-        <onright>900</onright>
-        <onup>900</onup>
-        <ondown>900</ondown>
-        <control id="110" type="button">
-            <width>230</width>
-            <height>40</height>
-            <onleft>900</onleft>
-            <onright>900</onright>
-            <onup>900</onup>
-            <ondown>900</ondown>            
-            <align>center</align>
-            <focusedcolor>FF50e0c7</focusedcolor>
-            <texturefocus>selection_focus.png</texturefocus>
-            <texturenofocus>selection_unfocus.png</texturenofocus>
-            <textoffsetx>20</textoffsetx>
+    <defaultcontrol always="true">1002</defaultcontrol>
+    <controls>
+        <control id="92000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
         </control>
-    </control>
-<!--     <control id="900" type="grouplist">
-        <posx>660</posx>
-        <posy>860</posy>
-        <width>600</width>
-        <height>200</height>
-        <orientation>horizontal</orientation>
-        <itemgap>20</itemgap>
-        <control id="910" type="button">
-            <posx></posx>
-            <posy></posy>
-            <width></width>
-            <height></height>
-            <texturefocus>white_circle.png</texturefocus>
-            <texturenofocus>white_circle.png</texturenofocus>            
-    </control> -->
-
-
-    <control type="list" id="900">
-        <posx>772</posx>
-        <posy>960</posy>
-        <width>600</width>
-        <height>100</height>
-        <onleft>110</onleft>
-        <onright>110</onright>
-        <onup>110</onup>
-        <ondown>110</ondown> 
-        <!-- <scrolltime tween="sine" easing="out">1200</scrolltime> -->
-        <autoscroll>false</autoscroll>
-        <orientation>horizontal</orientation>
-        <viewtype label="536">icon</viewtype>
-        <!-- <pagecontrol>60</pagecontrol> -->
-        <itemlayout height="45" width="75">
-            <control type="image">
-                <posx>25</posx>
-                <posy>20</posy>
-                <width>25</width>
-                <height>25</height>
-                <texture>white_circle.png</texture>
+        <control id="93000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
+        <control id="94000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
+        <control id="95000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
+        <!-- Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture>background.png</texture>
+        </control>
+        <!-- Curve -->
+        <control type="image">
+            <right>20</right>
+            <top>20</top>
+            <width>1280</width>
+            <height>1040</height>
+            <texture border="40,0,0,0">Curve.png</texture>
+        </control>
+        <!-- List -->
+        <control id="1000" type="grouplist">
+            <left>120</left>
+            <top>240</top>
+            <width>300</width>
+            <height>870</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <!-- Language -->
+            <control id="1002" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Language</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <onright>2000</onright>
             </control>
-        </itemlayout>
-        <focusedlayout height="45" width="75">
-            <control type="image">
-                <posx>15</posx>
-                <posy>0</posy>
-                <width>45</width>
-                <height>45</height>
-                <texture>white_circle.png</texture>
-                <!-- <animation effect="slide" end="5,5" time="100">focus</animation> -->
+            <!-- Timezone -->
+            <control id="1003" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Timezone</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <onright>3000</onright>
             </control>
-        </focusedlayout>
-    </control>
-
-</controls>
+            <!-- T&C -->
+            <control id="1004" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Terms</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <onright>3000</onright>
+            </control>
+            <!-- Apply -->
+            <control id="1005" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Apply</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <onright>3000</onright>
+            </control>
+        </control>
+        <!-- Language sub menu -->
+        <control id="2000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1050</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <visible>Control.IsVisible(92000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control id="20010" type="wraplist">
+                <left>480</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>20010</onup>
+                <ondown>20010</ondown>
+                <onleft>1002</onleft>
+                <onright>noop</onright>
+                <focusposition>0</focusposition>
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+        </control>
+        <!-- Terms sub menu -->
+        <control id="4000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1000</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <visible>Control.IsVisible(94000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <visible>Control.IsVisible(94000)</visible>
+            <control id="555" type="textbox">
+                <description>terms and conditions</description>
+                <posx>480</posx>
+                <posy>200</posy>
+                <width>1000</width>
+                <height>800</height>
+                <visible>true</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+                <font>OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <pagecontrol>13</pagecontrol>
+                <scrolltime>75</scrolltime>
+                <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
+            </control>
+        </control>
+        <!-- Timezone sub menu -->
+        <control id="3000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>400</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(93000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <!-- Africa -->
+            <control id="3001" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Africa</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- America -->
+            <control id="3002" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>America</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Asia -->
+            <control id="3003" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Asia</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Atlantic -->
+            <control id="3004" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Atlantic</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Australia -->
+            <control id="3005" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Australia</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Europe -->
+            <control id="3006" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Europe</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Indian -->
+            <control id="3007" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Indian</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- Pacific -->
+            <control id="3008" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Pacific</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+            <!-- UTC -->
+            <control id="3009" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>UTC</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
+            </control>
+        </control>
+        <control id="9999" type="group">
+            <visible>Control.IsVisible(93000)</visible>
+            <description>timezone sub sub menu holder</description>
+            <control id="30010" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30010</onup>
+                <ondown>30010</ondown>
+                <onleft>3001</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30020" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30020</onup>
+                <ondown>30020</ondown>
+                <onleft>3002</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30030" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30030</onup>
+                <ondown>30030</ondown>
+                <onleft>3003</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30040" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30040</onup>
+                <ondown>30040</ondown>
+                <onleft>3004</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30050" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30050</onup>
+                <ondown>30050</ondown>
+                <onleft>3005</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30060" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30060</onup>
+                <ondown>30060</ondown>
+                <onleft>3006</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30070" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30070</onup>
+                <ondown>30070</ondown>
+                <onleft>3007</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30080" type="wraplist">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30080</onup>
+                <ondown>30080</ondown>
+                <onleft>3008</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control id="30090" type="list">
+                <left>880</left>
+                <top>200</top>
+                <width>1050</width>
+                <height>726</height>
+                <onup>30090</onup>
+                <ondown>3000</ondown>
+                <onleft>3009</onleft>
+                <onright>noop</onright>
+                <!-- <focusposition>1</focusposition>-->
+                <orientation>vertical</orientation>
+                <scrolltime easing="out" tween="sine">240</scrolltime>
+                <itemlayout height="90" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>90</height>
+                        <font>OLD_Font36</font>
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="180" width="1050">
+                    <control type="label">
+                        <left>32</left>
+                        <top>0</top>
+                        <width>1018</width>
+                        <height>180</height>
+                        <font>OLD_Font72</font>
+                        <!-- <font>font13</font>-->
+                        <label>$INFO[ListItem.Label]</label>
+                        <textcolor>ffffffff</textcolor>
+                        <shadowcolor>44000000</shadowcolor>
+                        <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+                    </control>
+                </focusedlayout>
+            </control>
+        </control>
+    </controls>
 </window>
