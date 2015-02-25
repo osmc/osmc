@@ -89,6 +89,23 @@
                 <height>900</height>
                 <onup>1</onup>
                 <ondown>1</ondown>
+                <control id="10120" type="radiobutton">
+                    <posx>100</posx>
+                    <posy>125</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Enable Adapter</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <onup>1</onup>
+                    <ondown>10111</ondown>
+                </control>
                 <control id="10117" type="list">
                     <description>Wired Network list</description>
                     <posx>350</posx>
@@ -154,23 +171,6 @@
                         </control>
                     </focusedlayout>
 		        </control>
-                <control id="10120" type="radiobutton">
-                    <posx>100</posx>
-                    <posy>125</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <description>Enable Adapter</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
-                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                    <font>font13</font>
-                    <textcolor>FFFFFFFF</textcolor>
-                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                    <align>center</align>
-                    <aligny>center</aligny>
-                    <onup>1</onup>
-                    <ondown>10111</ondown>
-                </control>
                 <control id="10111" type="button">
                     <posx>100</posx>
                     <posy>200</posy>
@@ -375,9 +375,27 @@
                 <ondown>1</ondown>
                 <onright>5000</onright>
                 <onleft>5000</onleft>
-                <control id="10200" type="button">
+                 <control id="10217" type="radiobutton">
                     <posx>100</posx>
                     <posy>100</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <description>Enable Adapter</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onup>1</onup>
+                    <ondown>10200</ondown>
+                    <onright>5000</onright>
+                </control>
+                <control id="10200" type="button">
+                    <posx>100</posx>
+                    <posy>200</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Scan for connections</description>
@@ -389,13 +407,13 @@
                     <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
                     <align>left</align>
                     <aligny>center</aligny>
-                    <onup>1</onup>
+                    <onup>10217</onup>
                     <ondown>10211</ondown>
                     <onright>5000</onright>
                 </control>
                 <control id="10211" type="button">
                     <posx>100</posx>
-                    <posy>200</posy>
+                    <posy>300</posy>
                     <width>880</width>
                     <height>70</height>
                     <description>Automatically configure the network toggle</description>
@@ -408,25 +426,8 @@
                     <align>left</align>
                     <aligny>center</aligny>
                     <onup>10200</onup>
-                    <ondown>10217</ondown>
+                    <ondown>10212</ondown>
                     <onright>5000</onright>
-                </control>
-                <control id="10217" type="button">
-                    <posx>100</posx>
-                    <posy>300</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <description>Password</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32013]</label>
-                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
-                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
-                    <font>font13</font>
-                    <textcolor>FFFFFFFF</textcolor>
-                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <onup>10212</onup>
-                    <ondown>10211</ondown>
                 </control>
                 <control id="10212" type="button">
                     <posx>100</posx>
@@ -442,7 +443,7 @@
                     <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
                     <align>left</align>
                     <aligny>center</aligny>
-                    <onup>10217</onup>
+                    <onup>10211</onup>
                     <ondown>10213</ondown>
                     <onright>5000</onright>
                 </control>
@@ -515,7 +516,7 @@
                     <align>left</align>
                     <aligny>center</aligny>
                     <onup>10215</onup>
-                    <ondown>1020</ondown>
+                    <ondown>10218</ondown>
                     <onright>5000</onright>
                 </control>
                 <control id="910217" type="label">
@@ -590,6 +591,41 @@
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
+                <control id="10218" type="button">
+		            <posx>100</posx>
+                    <posy>800</posy>
+                    <width>200</width>
+                    <height>70</height>
+                    <description>Apply</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <onright>10219</onright>
+		            <onup>10216</onup>
+                </control>
+		        <control id="10219" type="button">
+		            <posx>775</posx>
+                    <posy>800</posy>
+                    <width>200</width>
+                    <height>70</height>
+                    <description>Reset</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
+                    <texturefocus colordiffuse="FFFFAAFF">myfocustexture.png</texturefocus>
+                    <texturenofocus colordiffuse="FFFFAAFF">mynormaltexture.png</texturenofocus>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <!--<focusedcolor>FFFFFFFF</focusedcolor>-->
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <onleft>10218</onleft>
+		            <onup>10216</onup>
+                    <onright>5000</onright>
+                </control>
                 <control id="5000" type="list">
                     <description>WIFI list</description>
                     <posx>1080</posx>
@@ -599,7 +635,7 @@
                     <visible>true</visible>
                     <onup>1</onup>
                     <ondown>1</ondown>
-                    <onleft>10200</onleft>
+                    <onleft>10217</onleft>
                     <orientation>vertical</orientation>
                     <autoscroll>false</autoscroll>
                     <scrolltime easing="out" tween="sine">200</scrolltime>
