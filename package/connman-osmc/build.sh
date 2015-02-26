@@ -1,0 +1,39 @@
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+#!/bin/bash
+
+. ../common.sh
+VERSION="1.28"
+pull_source "https://www.kernel.org/pub/linux/network/connman/connman-${VERSION}.tar.gz" "$(pwd)/src"
+if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
+# Build in native environment
+build_in_env "${1}" $(pwd) "connman-osmc"
+if [ $? == 0 ]
+then
+	echo -e "Building package connman"
+	out=$(pwd)/files
+	make clean
+	update_sources
+	handle_dep "xtables-addons-source"
+	handle_dep "libreadline-dev"
+	handle_dep "libdbus-1-dev"
+	handle_dep "wpasupplicant"
+	handle_dep "iptables"
+	handle_dep "libgnutls28-dev"
+	handle_dep "libglib2.0-dev"
+	sed '/Package/d' -i files/DEBIAN/control
+	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
+	pushd src/connman-$VERSION
+    install_patch "../../patches" "all"
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
+	$BUILD
+	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
+	make install DESTDIR=${out}
+	popd
+	strip_files "${out}"
+	fix_arch_ctl "files/DEBIAN/control"
+	dpkg -b files/ connman-osmc.deb
+fi
+teardown_env "${1}"

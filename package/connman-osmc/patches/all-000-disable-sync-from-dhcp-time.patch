@@ -1,0 +1,12 @@
+--- a/src/timeserver.c	2015-02-26 06:08:29.104800306 +0000
++++ b/src/timeserver.c	2015-02-26 06:08:42.996414837 +0000
+@@ -187,8 +187,7 @@
+ 	char **fallback_ts;
+ 	int index, i;
+ 
+-	if (__connman_clock_timeupdates() == TIME_UPDATES_MANUAL)
+-		return NULL;
++	return NULL;
+ 
+ 	service_ts_config = connman_service_get_timeservers_config(service);
+ 
