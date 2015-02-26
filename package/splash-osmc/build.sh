@@ -13,8 +13,7 @@ then
 	out=$(pwd)/files
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
-	test "$1" == rbp && echo "Package: rbp-splash-osmc" >> files/DEBIAN/control
-	test "$1" == armv7 && echo "Package: armv7-splash-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-splash-osmc" >> files/DEBIAN/control
 	echo "Depends: fbset" >> files/DEBIAN/control
 	update_sources
 	handle_dep "libpng12-dev"
