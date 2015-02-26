@@ -19,8 +19,7 @@ then
 	sed '/Depends/d' -i files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libssl-dev"
-	test "$1" == rbp && echo "Package: rbp-librtmp-osmc" >> files/DEBIAN/control && echo "Package: rbp-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-librtmp-osmc" >> files-dev/DEBIAN/control
-	test "$1" == armv7 && echo "Package: armv7-librtmp-osmc" >> files/DEBIAN/control && echo "Package: armv7-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: armv7-librtmp-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-librtmp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-librtmp-osmc" >> files-dev/DEBIAN/control
 	pushd src
 	$BUILD sys=posix
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
