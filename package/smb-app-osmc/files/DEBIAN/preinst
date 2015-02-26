@@ -18,3 +18,4 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	install_divert /etc/init.d/samba.distributed /etc/init.d/samba
 	install_divert /lib/systemd/system/samba.service.distributed /lib/systemd/system/samba.service
 fi
+if [ "$1" = "install" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; fi

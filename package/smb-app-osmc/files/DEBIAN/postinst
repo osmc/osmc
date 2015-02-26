@@ -17,9 +17,10 @@ if [ "$1" = "configure" ]; then
 	# work around for: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762080
 	mkdir -p /var/log/samba
 
-	# only do this for first install not upgrade
-	if [ -z "$2" ]
+	# only do this for install not upgrade
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]
 	then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
 		(echo osmc; echo osmc) | smbpasswd -a osmc
 		systemctl disable smbd.service
 		systemctl disable nmbd.service
