@@ -1,0 +1,48 @@
+diff --git a/configure.in b/configure.in
+index dbca6ae..a001a3b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -714,9 +714,9 @@ fi
+ case $use_platform in
+   raspberry-pi)
+      target_platform=target_raspberry_pi
+-     use_neon=no
++     use_neon=yes
+      use_arch="arm"
+-     use_cpu=arm1176jzf-s
++     use_cpu=cortex-a7
+      use_hardcoded_tables="yes"
+      ARCH="arm"
+      AC_DEFINE(HAS_EGLGLES, [1], [Define if supporting EGL based GLES Framebuffer])
+diff --git a/tools/depends/configure.in b/tools/depends/configure.in
+index 08a9205..5213f14 100644
+--- a/tools/depends/configure.in
++++ b/tools/depends/configure.in
+@@ -289,9 +289,9 @@ if test "$use_platform" = "raspberry-pi"; then
+   else
+     AC_MSG_ERROR([Raspberry Pi firmware not found])
+   fi
+-  use_neon=no
++  use_neon=yes
+   use_arch="arm"
+-  use_cpu="arm1176jzf-s"
++  use_cpu="cortex-a7"
+   use_hardcoded_tables="yes"
+   use_alsa="no"
+   ARCH="arm"
+@@ -299,13 +299,11 @@ if test "$use_platform" = "raspberry-pi"; then
+   cross_compiling="yes"
+   use_host="arm-linux-gnueabihf"
+   deps_dir="$use_host"
+-  platform_cflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard \
+-   -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated \
++  platform_cflags="-pipe -Wno-psabi -Wa,-mno-warn-deprecated \
+    -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
+    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
+    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
+-  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s \
+-   -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
++  platform_cxxflags="-pipe -Wno-psabi \
+    -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
+    -isystem${use_firmware}/opt/vc/include \
+    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
