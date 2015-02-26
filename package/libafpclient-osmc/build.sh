@@ -21,8 +21,7 @@ then
 	handle_dep "libfuse-dev"
 	handle_dep "libreadline-dev"
 	handle_dep "libncurses5-dev"
-	test "$1" == rbp && echo "Package: rbp-libafpclient-osmc" >> files/DEBIAN/control && echo "Depends: libfuse2" >> files/DEBIAN/control && echo "Package: rbp-libafpclient-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libafpclient-osmc, libfuse-dev" >> files-dev/DEBIAN/control
-	test "$1" == armv7 && echo "Package: armv7-libafpclient-osmc" >> files/DEBIAN/control && echo "Depends: libfuse2" >> files/DEBIAN/control && echo "Package: armv7-libafpclient-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: armv7-libafpclient-osmc, libfuse-dev" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libafpclient-osmc" >> files/DEBIAN/control && echo "Depends: libfuse2" >> files/DEBIAN/control && echo "Package: ${1}-libafpclient-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libafpclient-osmc, libfuse-dev" >> files-dev/DEBIAN/control
 	pushd src/afpfs-ng
 	chmod +x configure
 	./configure --prefix=/usr
