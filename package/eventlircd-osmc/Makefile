@@ -1,5 +1,5 @@
 all:
-	echo -e "Specify a target:\nmake rbp1\nmake armv7\nmake atv\n"
+	echo -e "Specify a target:\nmake rbp1\nmake armv7\nmake i386\n"
 
 rbp:
 	sudo bash build.sh "rbp1"
@@ -7,8 +7,8 @@ rbp:
 armv7:
 	sudo bash build.sh "armv7"
 
-atv:
-	sudo bash build.sh "atv"
+i386:
+	sudo bash build.sh "i386"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
