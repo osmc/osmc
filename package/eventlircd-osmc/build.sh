@@ -22,7 +22,7 @@ then
 	handle_dep "pkg-config"
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
-	test "$1" == rbp && echo "Package: rbp-eventlircd-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-eventlircd-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-lirc-osmc, udev" >> files/DEBIAN/control
 	pushd src
 	sed -i 's/\s\-Werror//' configure.ac # Disable warnings being errors
