@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-tcstub="atv-toolchain-osmc"
+tcstub="i386-toolchain-osmc"
 
 make clean
 
