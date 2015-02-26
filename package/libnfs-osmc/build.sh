@@ -21,8 +21,7 @@ then
 	update_sources
 	handle_dep "autoconf"
 	handle_dep "libtool"
-	test "$1" == rbp && echo "Package: rbp-libnfs-osmc" >> files/DEBIAN/control && echo "Package: rbp-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libnfs-osmc" >> files-dev/DEBIAN/control
-	test "$1" == armv7 && echo "Package: armv7-libnfs-osmc" >> files/DEBIAN/control && echo "Package: armv7-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: armv7-libnfs-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libnfs-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libnfs-osmc" >> files-dev/DEBIAN/control
 	pushd src/libnfs-*
 	./bootstrap
 	./configure --prefix=/usr
