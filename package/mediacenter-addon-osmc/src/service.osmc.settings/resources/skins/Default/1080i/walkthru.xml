@@ -92,18 +92,18 @@
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
                 <onclick>noop</onclick>
-                <onright>3000</onright>
+                <onright>40010</onright>
             </control>
-            <!-- Apply -->
+            <!-- Exit -->
             <control id="1005" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Apply</label>
+                <label>Exit</label>
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
                 <onclick>noop</onclick>
-                <onright>3000</onright>
+                <onright>noop</onright>
             </control>
         </control>
         <!-- Language sub menu -->
@@ -158,31 +158,43 @@
             </control>
         </control>
         <!-- Terms sub menu -->
-        <control id="4000" type="grouplist">
+        <control id="4000" type="group">
             <left>480</left>
             <top>244</top>
             <width>1000</width>
             <height>726</height>
-            <itemgap>34</itemgap>
             <onleft>1000</onleft>
             <visible>Control.IsVisible(94000)</visible>
             <onup>noop</onup>
             <ondown>noop</ondown>
-            <orientation>vertical</orientation>
             <visible>Control.IsVisible(94000)</visible>
             <control id="555" type="textbox">
                 <description>terms and conditions</description>
-                <posx>480</posx>
-                <posy>200</posy>
-                <width>1000</width>
-                <height>800</height>
-                <visible>true</visible>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>900</width>
+                <height>700</height>
+                <wraptext>true</wraptext>
                 <colordiffuse>FFFFFFFF</colordiffuse>
                 <font>OLD_Font36</font>
                 <textcolor>66ffffff</textcolor>
                 <pagecontrol>13</pagecontrol>
                 <scrolltime>75</scrolltime>
                 <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
+            </control>
+            <!-- I Agree -->
+            <control id="40010" type="button">
+                <left>1200</left>
+                <top>200</top>
+                <width>300</width>
+                <height>42</height>
+                <label>I Agree</label>
+                <font>OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <onclick>noop</onclick>
+                <onleft>1004</onleft>
+                <onright>noop</onright>
             </control>
         </control>
         <!-- Timezone sub menu -->

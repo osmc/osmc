@@ -159,6 +159,10 @@ class Main(object):
 					self.exit()
 					break
 
+				elif response == 'walkthru':
+
+					walkthru.open_gui()
+
 				elif 'new_device:' in response:
 
 					# a usb device is attached to the hardware
