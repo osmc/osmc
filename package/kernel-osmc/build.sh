@@ -19,11 +19,11 @@ then
 	update_sources
 	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
-	if [ "$1" != "rbp" ]
+	if [ "$1" != "rbp1" ] && | [ "$1" != "rbp2" ]
 	then
 		handle_dep "device-tree-compiler"
 	else
-		handle_dep "rbp-device-tree-compiler-osmc"
+		handle_dep "rbp1-device-tree-compiler-osmc" # We don't need a Pi2 / ARMv7 version as we don't deploy this. No performance gain
 	fi
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
@@ -31,16 +31,20 @@ then
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/linux-*
 	install_patch "../../patches" "all"
-	test "$1" == "rbp" && install_patch "../../patches" "rbp"
+	if [ "$1" == "rbp1" ] || | [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
-	if [ "$1" == "rbp" ]
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
+	if [ "$1" == "rbp1" ]
 	then
-		mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 		make bcm2708-rpi-b.dtb
 		make bcm2708-rpi-b-plus.dtb
+	fi
+	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb; fi
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
 		overlays="hifiberry-dac-overlay
 		hifiberry-dacplus-overlay
@@ -57,10 +61,7 @@ then
 		done
 		popd
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
-	fi
 	popd
-	if [ "$1" == "rbp" ]
-	then
 		# Disassemble kernel package to add overlays
 		mv src/${1}-image*.deb .
 		dpkg -x ${1}-image*.deb files-image/

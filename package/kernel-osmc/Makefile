@@ -1,8 +1,11 @@
 all:
-	echo -e "Specify a target:\nmake rbp"
+	echo -e "Specify a target:\nmake rbp1"
 
-rbp:
-	sudo bash build.sh "rbp"
+rbp1:
+	sudo bash build.sh "rbp1"
+
+rbp2:
+	sudo bash build.sh "rbp2"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
