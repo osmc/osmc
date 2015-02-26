@@ -42,7 +42,7 @@ void BootloaderConfig::configureMounts()
 
 void BootloaderConfig::configureEnvironment()
 {
-    if (utils->getOSMCDev() == "rbp")
+    if (utils->getOSMCDev() == "rbp" || utils->getOSMCDev() == "rbp2")
     {
         QFile cmdlineFile("/mnt/boot/cmdline.txt");
         QStringList cmdlineStringList;
@@ -53,15 +53,19 @@ void BootloaderConfig::configureEnvironment()
             /* NFS install */
             cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet";
         }
-        /* Application Store identifier */
-        cmdlineStringList << "osmcdev=rbp";
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
-        if (utils->getCoreCount() == 1)
+        if (utils->getOSMCDev() == "rbp1")
+        {
             configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
-        if (utils->getCoreCount() == 4)
+            cmdlineStringList << "osmcdev=rbp1";
+        }
+        if (utils->getOSMCDev() == "rbp2")
+        {
             configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
+            cmdlineStringList << "osmcdev=rbp2";
+        }
         utils->writeToFile(configFile, configStringList, false);
     }
 }

@@ -139,24 +139,3 @@ bool Utils::mountPartition(Target *device, QString path)
     logger->addLine("Unsupported mountpoint.");
     return false;
 }
-
-int Utils::getCoreCount()
-{
-    int coreCount = 0;
-    QFile cpuFile("/proc/cpuinfo");
-    if (!cpuFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        return 1;
-    else
-    {
-        QTextStream cpuStream(&cpuFile);
-        QString cpuLine = cpuStream.readLine();
-        while (!cpuLine.isNull())
-        {
-            if (cpuLine.contains("processor\t")) /* TAB to be safer */
-                coreCount++;
-            cpuLine = cpuStream.readLine();
-        }
-        cpuFile.close();
-        return coreCount == 0 ? 1 : coreCount;
-    }
-}

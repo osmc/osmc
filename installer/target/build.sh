@@ -32,31 +32,18 @@ pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION
 verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
-if [ "$1" == "rbp" ]
+test "$1" == rbp1 && install_patch "../patches" "rbp1"
+test "$1" == rbp2 && install_patch "../patches" "rbp2"
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
-	# Build for Pi 1
 	install_patch "../patches" "rbp"
-	install_patch "../patches" "rbp1"
 	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
+	echo "dwc_otg.fiq_fix_enable=1 sdhci-bcm2708.sync_after_dma=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/ram0 quiet init=/init osmcdev=${1}" > package/rpi-firmware-osmc/cmdline.txt
 	make osmc_rbp_defconfig
-	make
-	if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
-	popd
-	mv buildroot-${BUILDROOT_VERSION}/output/images/zImage kernel.img
-	rm -rf buildroot-${BUILDROOT_VERSION}
-	# Build for Pi 2
-	pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz" "."
-	verify_action
-	pushd buildroot-${BUILDROOT_VERSION}
-	install_patch "../patches" "all"
-	install_patch "../patches" "rbp"
-	install_patch "../patches" "rbp2"
-	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
-	make osmc_rbp_defconfig
-	make
-	if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
-	popd
 fi
+make
+if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
+popd
 pushd buildroot-${BUILDROOT_VERSION}/output/images
 echo -e "Downloading latest filesystem"
 date=$(date +%Y%m%d)
@@ -71,9 +58,9 @@ while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1
 done
 if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then size=256; fi
 date=$(date +%Y%m%d)
-if [ "$1" == "rbp" ] || [ "$1" == "imx6" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "imx6" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
@@ -82,14 +69,11 @@ then
 	mkfs.vfat -F32 /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt
 fi
-if [ "$1" == "rbp" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 	echo -e "Installing Pi files"
-	# Pi 2 was built last and is in Buildroot images directory already
-	mv zImage /mnt/kernel_v7.img
+	mv zImage /mnt/kernel.img
 	mv INSTALLER/* /mnt
-	# Pi 1 files
-	mv ../../../kernel.img /mnt
 fi
 if [ "$1" == "imx6" ]
 then
