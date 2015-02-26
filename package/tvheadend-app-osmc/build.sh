@@ -4,7 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-pull_source "https://github.com/tvheadend/tvheadend/archive/v3.9.tar.gz" "$(pwd)/src"
+VERSION="v3.9"
+pull_source "https://github.com/tvheadend/tvheadend/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "tvheadend-app-osmc"
@@ -27,6 +28,7 @@ then
 	pushd src/tvheadend*
 	./configure --prefix=/usr
 	sed -e "s/-Werror//" -i Makefile
+	sed -e "s/0.0.0~unknown/${VERSION}~osmc/" -i support/version
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
