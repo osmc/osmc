@@ -1,8 +1,8 @@
 all:
-	echo "Usage: make rbp"
+	echo "Usage: make rbp1"
 
-rbp:
-	sudo bash build.sh rbp
+rbp1:
+	sudo bash build.sh rbp1
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
