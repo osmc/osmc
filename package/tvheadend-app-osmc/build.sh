@@ -22,9 +22,8 @@ then
 	handle_dep "libcurl3"
 	handle_dep "libcurl4-gnutls-dev"
 	handle_dep "git" # for dvbscan info?
-	test $1 == rbp && echo "Package: rbp-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/rbp-tvheadend-app-osmc"
-	test $1 == armv7 && echo "Package: armv7-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/armv7-tvheadend-app-osmc"
-        echo -e "TVHeadend Server\n/lib/systemd/system/tvheadend.service" > $APP_FILE
+	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
+    echo -e "TVHeadend Server\n/lib/systemd/system/tvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
 	./configure --prefix=/usr
 	sed -e "s/-Werror//" -i Makefile
