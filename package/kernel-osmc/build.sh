@@ -32,6 +32,8 @@ then
 	pushd src/linux-*
 	install_patch "../../patches" "all"
 	if [ "$1" == "rbp1" ] || | [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
+	test "$1" == rbp1 && install_patch "../../patches" "rbp1"
+	test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
