@@ -74,11 +74,12 @@ void PreseedDevice::on_installoptionsnextButton_clicked()
         else
         {
             ui->sdinstallradioButton->setChecked(true);
+            ui->installoptionsnextButton->setEnabled(true);
         }
     }
     if (ui->emmcinstallradioButton->isChecked())
     {
         utils::writeLog("Internal storage install selected");
         emit preseedSelected(utils::INSTALL_EMMC);
-    }
+    }        
 }
