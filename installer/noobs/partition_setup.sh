@@ -9,14 +9,6 @@ mkdir -p /tmp/mount
 # Fix the cmdline.txt
 mount $part1 /tmp/mount
 echo "root=$part2 osmcdev=rbp rootfstype=ext4 rootwait quiet" > /tmp/mount/cmdline.txt
-# Set the right config.txt
-cores=$(cat /proc/cpuinfo | grep cores | wc -l)
-if [ $cores == 4 ]
-then
-mv /tmp/mount/config2.txt /tmp/mount/config.txt && rm /tmp/mount/config1.txt
-else
-mv /tmp/mount/config1.txt /tmp/mount/config.txt && rm /tmp/mount/config2.txt
-fi
 umount /tmp/mount
 # Wait
 sync
