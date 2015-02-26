@@ -23,12 +23,12 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
-	test "$1" == rbp && handle_dep "rbp-userland-dev-osmc"
-	test "$1" == rbp && echo "Package: rbp-libcec-osmc" >> files/DEBIAN/control && echo "Package: rbp-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: rbp-libcec-osmc" >> files-dev/DEBIAN/control
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
+	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src/libcec-master
-	test "$1" == rbp && install_patch "../../patches" "rbp"
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	./bootstrap
-	test "$1" == rbp && ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then && ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib; fi
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
