@@ -61,9 +61,11 @@ function build_in_env()
 	chrootval=$?
 	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return 0; fi
 	umount /proc >/dev/null 2>&1
-	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	update_sources
-	handle_dep "$1-toolchain-osmc"
+	DEP=${1}
+	test $DEP == rbp2 && DEP="armv7"
+	TCDIR="/opt/osmc-tc/$DEP-toolchain-osmc"
+	handle_dep "$DEP-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
 	configure_build_env "$TCDIR"
 	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
