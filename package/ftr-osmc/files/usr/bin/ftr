@@ -20,13 +20,6 @@ ssh-keygen -f $RSA_KEY -N '' -t rsa &
 # This has to go here at boot instead of at build because otherwise QEMU gets broken
 # and it is not beneficial on Pi2.
 MEM_OPTIM="/usr/lib/libarmmem.so"
-if [ -f $MEM_OPTIM ]
-then
-    $cores=$(cat /proc/cpuinfo | grep cores | wc -l)
-    if [ "$cores" == "1" ]
-    then
-        echo ${MEM_OPTIM} > /etc/ld.so.preload
-    fi
-fi
+if [ -f $MEM_OPTIM ]; then echo ${MEM_OPTIM} > /etc/ld.so.preload; fi
 wait
 systemctl disable ftr.service
