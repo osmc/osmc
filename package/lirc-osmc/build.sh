@@ -17,7 +17,7 @@ then
 	update_sources
 	handle_dep "libusb-dev"
 	handle_dep "autoconf"
-	test "$1" == rbp && echo "Package: rbp-lirc-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-lirc-osmc" >> files/DEBIAN/control
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
 	./configure --prefix=/usr --without-x --with-driver=userspace

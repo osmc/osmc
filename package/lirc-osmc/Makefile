@@ -1,11 +1,11 @@
 all:
-	echo -e "Specify a target:\nmake rbp\nmake gen"
+	echo -e "Specify a target:\nmake rbp1\nmake armv7"
 
-rbp:
-	sudo bash build.sh "rbp"
+rbp1:
+	sudo bash build.sh "rbp1"
 
-gen:
-	sudo bash build.sh "gen"
+armv7:
+	sudo bash build.sh "armv7"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
