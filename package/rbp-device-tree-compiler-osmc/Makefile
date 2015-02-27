@@ -1,3 +1,5 @@
+# We don't need an RBP2 version because we don't deploy this. If it runs on build infrastructure that's good enough. 
+
 all:
 	echo "Usage: make rbp1"
 
