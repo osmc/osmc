@@ -2,20 +2,6 @@
 <includes>
 	<include name="skinshortcuts-mainmenu">
 		<item id="1">
-			<label>$LOCALIZE[137]</label>
-			<label2>Custom shortcut</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">script.globalsearch</property>
-			<property name="defaultID">script.globalsearch</property>
-			<onclick>RunScript(script.globalsearch)</onclick>
-			<property name="path">RunScript(script.globalsearch)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">script-globalsearch</property>
-			<property name="group">mainmenu</property>
-			<property name="hasSubmenu">False</property>
-		</item>
-		<item id="2">
 			<label>$LOCALIZE[342]</label>
 			<label2>Common Shortcut</label2>
 			<icon>DefaultMovies.png</icon>
@@ -28,9 +14,11 @@
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="submenuVisibility">movies</property>
 			<property name="group">mainmenu</property>
+			<property name="widget">RecentMovies</property>
+			<property name="widgetName">Recent movies</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="3">
+		<item id="2">
 			<label>$LOCALIZE[20343]</label>
 			<label2>Common Shortcut</label2>
 			<icon>DefaultTVShows.png</icon>
@@ -43,23 +31,11 @@
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="submenuVisibility">tvshows</property>
 			<property name="group">mainmenu</property>
+			<property name="widget">RecentEpisodes</property>
+			<property name="widgetName">Recent episodes</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="4">
-			<label>$LOCALIZE[1036]</label>
-			<label2>Common Shortcut</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">1036</property>
-			<property name="defaultID">favourites</property>
-			<onclick>ActivateWindow(favourites)</onclick>
-			<property name="path">ActivateWindow(favourites)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">num-1036</property>
-			<property name="group">mainmenu</property>
-			<property name="hasSubmenu">False</property>
-		</item>
-		<item id="5">
+		<item id="3">
 			<label>$LOCALIZE[10006]</label>
 			<label2>Common Shortcut</label2>
 			<icon>DefaultVideo.png</icon>
@@ -71,9 +47,11 @@
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="submenuVisibility">videos</property>
 			<property name="group">mainmenu</property>
+			<property name="widget">VideoAddons</property>
+			<property name="widgetName">Video addons</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="6">
+		<item id="4">
 			<label>$LOCALIZE[10005]</label>
 			<label2>Common Shortcut</label2>
 			<icon>DefaultMusicAlbums.png</icon>
@@ -85,55 +63,106 @@
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="submenuVisibility">music</property>
 			<property name="group">mainmenu</property>
+			<property name="widget">MusicAddons</property>
+			<property name="widgetName">Music addons</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="7">
-			<label>Apps</label>
-			<label2>Custom shortcut</label2>
-			<icon>DefaultProgram.png</icon>
-			<thumb />
-			<property name="labelID">31101</property>
-			<property name="defaultID">apps</property>
-			<onclick>ActivateWindow(Programs,return)</onclick>
-			<property name="path">ActivateWindow(Programs,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">num-31101</property>
-			<property name="group">mainmenu</property>
-			<property name="hasSubmenu">False</property>
-		</item>
-		<item id="8">
-			<label>Photos</label>
+		<item id="5">
+			<label>$LOCALIZE[10002]</label>
 			<label2>Common Shortcut</label2>
 			<icon>DefaultPicture.png</icon>
 			<thumb />
-			<property name="labelID">31100</property>
+			<property name="labelID">pictures</property>
 			<property name="defaultID">pictures</property>
 			<onclick>ActivateWindow(Pictures)</onclick>
 			<property name="path">ActivateWindow(Pictures)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">num-31100</property>
+			<property name="submenuVisibility">pictures</property>
 			<property name="group">mainmenu</property>
+			<property name="widget">PictureAddons</property>
+			<property name="widgetName">Pictures addons</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="9">
-			<label>$LOCALIZE[12600]</label>
-			<label2>Common Shortcut</label2>
-			<icon>DefaultShortcut.png</icon>
+		<item id="6">
+			<label>My OSMC</label>
+			<label2>Custom shortcut</label2>
+			<icon>home/DefaultOSMC.png</icon>
 			<thumb />
-			<property name="labelID">weather</property>
-			<property name="defaultID">weather</property>
-			<visible>!IsEmpty(Weather.Plugin)</visible>
-			<onclick>ActivateWindow(Weather)</onclick>
-			<property name="path">ActivateWindow(Weather)</property>
+			<property name="labelID">service.osmc.settings</property>
+			<property name="defaultID">myosmc</property>
+			<onclick>RunScript(service.osmc.settings)</onclick>
+			<property name="path">RunScript(service.osmc.settings)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">weather</property>
+			<property name="submenuVisibility">service-osmc-settings</property>
+			<property name="group">mainmenu</property>
+			<property name="hasSubmenu">False</property>
+		</item>
+		<item id="7">
+			<label>$LOCALIZE[1036]</label>
+			<label2>Common Shortcut</label2>
+			<icon>home/DefaultFavourites.png</icon>
+			<thumb />
+			<property name="labelID">1036</property>
+			<property name="defaultID">1036</property>
+			<onclick>ActivateWindow(Favourites)</onclick>
+			<property name="path">ActivateWindow(Favourites)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="submenuVisibility">num-1036</property>
+			<property name="group">mainmenu</property>
+			<property name="widget">Favourites</property>
+			<property name="widgetName">Favourites</property>
+			<property name="hasSubmenu">False</property>
+		</item>
+		<item id="8">
+			<label>$LOCALIZE[10001]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultProgram.png</icon>
+			<thumb />
+			<property name="labelID">programs</property>
+			<property name="defaultID">programs</property>
+			<onclick>ActivateWindow(Programs,Addons,return)</onclick>
+			<property name="path">ActivateWindow(Programs,Addons,return)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="submenuVisibility">programs</property>
+			<property name="group">mainmenu</property>
+			<property name="widget">ProgramAddons</property>
+			<property name="widgetName">Program addons</property>
+			<property name="hasSubmenu">False</property>
+		</item>
+		<item id="9">
+			<label>$ADDON[script.skinshortcuts 32022]</label>
+			<label2>Common Shortcut</label2>
+			<icon>home/DefaultLiveTV.png</icon>
+			<thumb />
+			<property name="labelID">livetv</property>
+			<property name="defaultID">livetv</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVGuide)</onclick>
+			<property name="path">ActivateWindow(TVGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="submenuVisibility">livetv</property>
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">True</property>
 		</item>
 		<item id="10">
+			<label>$ADDON[script.skinshortcuts 32087]</label>
+			<label2>Common Shortcut</label2>
+			<icon>home/DefaultRadio.png</icon>
+			<thumb />
+			<property name="labelID">radio</property>
+			<property name="defaultID">radio</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioGuide)</onclick>
+			<property name="path">ActivateWindow(RadioGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="submenuVisibility">radio</property>
+			<property name="group">mainmenu</property>
+			<property name="hasSubmenu">True</property>
+		</item>
+		<item id="11">
 			<label>$LOCALIZE[10004]</label>
 			<label2>Common Shortcut</label2>
-			<icon>DefaultSettings.png</icon>
+			<icon>home/DefaultSettings.png</icon>
 			<thumb />
 			<property name="labelID">settings</property>
 			<property name="defaultID">settings</property>
@@ -144,18 +173,17 @@
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="11">
-			<label>$LOCALIZE[13012]</label>
-			<label2>Kodi Command</label2>
-			<icon>DefaultShortcut.png</icon>
+		<item id="12">
+			<label>$LOCALIZE[33060]</label>
+			<label2>Common Shortcut</label2>
+			<icon>home/DefaultPower.png</icon>
 			<thumb />
-			<property name="labelID">13012</property>
-			<property name="defaultID">exit</property>
-			<visible>System.ShowExitButton</visible>
-			<onclick>Quit</onclick>
-			<property name="path">Quit</property>
+			<property name="labelID">33060</property>
+			<property name="defaultID">power</property>
+			<onclick>ActivateWindow(shutdownmenu)</onclick>
+			<property name="path">ActivateWindow(shutdownmenu)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="submenuVisibility">num-13012</property>
+			<property name="submenuVisibility">num-33060</property>
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">False</property>
 		</item>
@@ -163,169 +191,112 @@
 	<include />
 	<include name="skinshortcuts-submenu">
 		<item id="1">
-			<label>Recent movies</label>
+			<label>Year</label>
 			<label2>Videos</label2>
-			<icon>DefaultRecentlyAddedMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31031</property>
-			<property name="defaultID">31031</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="2">
-			<label>Recommended movies</label>
+			<label>Genres</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31032</property>
-			<property name="defaultID">31032</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="3">
-			<label>Random movies</label>
+			<label>Actors</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31054</property>
-			<property name="defaultID">31054</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[20434]</label>
-			<label2>Movies</label2>
+			<label>Directors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20434</property>
-			<property name="defaultID">20434</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieSets,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieSets,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[135]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieGenres,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieGenres,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="6">
-			<label>$LOCALIZE[562]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieYears,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieYears,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="7">
-			<label>$LOCALIZE[344]</label>
-			<label2>Movies</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieActors,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieActors,return)</property>
+			<property name="labelID">directors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/directors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/directors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="1">
-			<label>$LOCALIZE[20387]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
-			<icon>DefaultRecentlyAddedEpisodes.png</icon>
+			<label>Year</label>
+			<label2>Videos</label2>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20387</property>
-			<property name="defaultID">20387</property>
-			<visible>Library.HasContent(TVShows)</visible>
-			<onclick>ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="2">
-			<label>$LOCALIZE[369]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Genres</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">369</property>
-			<property name="defaultID">369</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/titles/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/titles/,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="3">
-			<label>$LOCALIZE[135]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Actors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/genres/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/genres/,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[562]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Studios</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/years/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/years/,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),tvshows)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">tvshows</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[344]</label>
-			<label2>$LOCALIZE[20343]</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/actors/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/actors/,return)</property>
+			<property name="labelID">studios</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="1">
 			<label>$LOCALIZE[1037]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultAddonVideo.png</icon>
 			<thumb />
 			<property name="labelID">1037</property>
@@ -337,28 +308,27 @@
 			<property name="group">videos</property>
 		</item>
 		<item id="2">
+			<label>$LOCALIZE[20389]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultMusicVideos.png</icon>
+			<thumb />
+			<property name="labelID">musicvideos</property>
+			<property name="defaultID">musicvideos</property>
+			<onclick>ActivateWindow(Videos,videodb://musicvideos/titles/,return)</onclick>
+			<property name="path">ActivateWindow(Videos,videodb://musicvideos/titles/,return)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),videos)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">videos</property>
+		</item>
+		<item id="3">
 			<label>$LOCALIZE[744]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultFolder.png</icon>
 			<thumb />
 			<property name="labelID">744</property>
 			<property name="defaultID">744</property>
 			<onclick>ActivateWindow(Videos,Files,return)</onclick>
 			<property name="path">ActivateWindow(Videos,Files,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),videos)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">videos</property>
-		</item>
-		<item id="3">
-			<label>$LOCALIZE[20389]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultMusicVideos.png</icon>
-			<thumb />
-			<property name="labelID">musicvideos</property>
-			<property name="defaultID">musicvideos</property>
-			<visible>Library.HasContent(MusicVideos)</visible>
-			<onclick>ActivateWindow(MusicLibrary,MusicVideos,return)</onclick>
-			<property name="path">ActivateWindow(MusicLibrary,MusicVideos,return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),videos)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">videos</property>
@@ -455,52 +425,153 @@
 			<property name="defaultID">1039</property>
 			<onclick>ActivateWindow(Pictures,Addons,return)</onclick>
 			<property name="path">ActivateWindow(Pictures,Addons,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),num-31100)]</visible>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),pictures)]</visible>
 			<property name="isSubmenu">True</property>
-			<property name="group">31100</property>
+			<property name="group">pictures</property>
 		</item>
 		<item id="1">
-			<label>$LOCALIZE[10004]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultSettings.png</icon>
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
 			<thumb />
-			<property name="labelID">settings</property>
-			<property name="defaultID">settings</property>
-			<onclick>ActivateWindow(Settings)</onclick>
-			<property name="path">ActivateWindow(Settings)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),weather)]</visible>
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVChannels)</onclick>
+			<property name="path">ActivateWindow(TVChannels)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),livetv)]</visible>
 			<property name="isSubmenu">True</property>
-			<property name="group">weather</property>
-		</item>
-		<item id="1">
-			<label>$LOCALIZE[7]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultFolder.png</icon>
-			<thumb />
-			<property name="labelID">7</property>
-			<property name="defaultID">7</property>
-			<onclick>ActivateWindow(FileManager)</onclick>
-			<property name="path">ActivateWindow(FileManager)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),settings)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">settings</property>
+			<property name="group">livetv</property>
 		</item>
 		<item id="2">
-			<label>$LOCALIZE[13200]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultShortcut.png</icon>
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
 			<thumb />
-			<property name="labelID">13200</property>
-			<property name="defaultID">13200</property>
-			<onclick>ActivateWindow(Profiles)</onclick>
-			<property name="path">ActivateWindow(Profiles)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),settings)]</visible>
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVGuide)</onclick>
+			<property name="path">ActivateWindow(TVGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),livetv)]</visible>
 			<property name="isSubmenu">True</property>
-			<property name="group">settings</property>
+			<property name="group">livetv</property>
 		</item>
 		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVRecordings)</onclick>
+			<property name="path">ActivateWindow(TVRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVTimers)</onclick>
+			<property name="path">ActivateWindow(TVTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVSearch)</onclick>
+			<property name="path">ActivateWindow(TVSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="1">
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioChannels)</onclick>
+			<property name="path">ActivateWindow(RadioChannels)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="2">
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioGuide)</onclick>
+			<property name="path">ActivateWindow(RadioGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioRecordings)</onclick>
+			<property name="path">ActivateWindow(RadioRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioTimers)</onclick>
+			<property name="path">ActivateWindow(RadioTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioSearch)</onclick>
+			<property name="path">ActivateWindow(RadioSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="1">
 			<label>$LOCALIZE[10007]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
+			<label2>Common Shortcut</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
 			<property name="labelID">10007</property>
@@ -511,191 +582,132 @@
 			<property name="isSubmenu">True</property>
 			<property name="group">settings</property>
 		</item>
+		<item id="2">
+			<label>$LOCALIZE[7]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultFolder.png</icon>
+			<thumb />
+			<property name="labelID">7</property>
+			<property name="defaultID">7</property>
+			<onclick>ActivateWindow(FileManager)</onclick>
+			<property name="path">ActivateWindow(FileManager)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),settings)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">settings</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[13200]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultShortcut.png</icon>
+			<thumb />
+			<property name="labelID">13200</property>
+			<property name="defaultID">13200</property>
+			<onclick>ActivateWindow(Profiles)</onclick>
+			<property name="path">ActivateWindow(Profiles)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Container(9000).ListItem.Property(submenuVisibility),settings)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">settings</property>
+		</item>
 	</include>
-	<include name="skinshortcuts-group-script-globalsearch" />
-	<include name="skinshortcuts-group-alt-script-globalsearch" />
 	<include name="skinshortcuts-group-movies">
 		<item id="1">
-			<label>Recent movies</label>
+			<label>Year</label>
 			<label2>Videos</label2>
-			<icon>DefaultRecentlyAddedMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31031</property>
-			<property name="defaultID">31031</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">movies</property>
 		</item>
 		<item id="2">
-			<label>Recommended movies</label>
+			<label>Genres</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31032</property>
-			<property name="defaultID">31032</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">movies</property>
 		</item>
 		<item id="3">
-			<label>Random movies</label>
+			<label>Actors</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31054</property>
-			<property name="defaultID">31054</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">movies</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[20434]</label>
-			<label2>Movies</label2>
+			<label>Directors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20434</property>
-			<property name="defaultID">20434</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieSets,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieSets,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">movies</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[135]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieGenres,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieGenres,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">movies</property>
-		</item>
-		<item id="6">
-			<label>$LOCALIZE[562]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieYears,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieYears,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">movies</property>
-		</item>
-		<item id="7">
-			<label>$LOCALIZE[344]</label>
-			<label2>Movies</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieActors,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieActors,return)</property>
+			<property name="labelID">directors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/directors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/directors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">movies</property>
 		</item>
 	</include>
 	<include name="skinshortcuts-group-alt-movies">
 		<item id="1">
-			<label>Recent movies</label>
+			<label>Year</label>
 			<label2>Videos</label2>
-			<icon>DefaultRecentlyAddedMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31031</property>
-			<property name="defaultID">31031</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recentmovies,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="2">
-			<label>Recommended movies</label>
+			<label>Genres</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31032</property>
-			<property name="defaultID">31032</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=recommendedmovies,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="3">
-			<label>Random movies</label>
+			<label>Actors</label>
 			<label2>Videos</label2>
-			<icon>DefaultMovies.png</icon>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">31054</property>
-			<property name="defaultID">31054</property>
-			<onclick>ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</onclick>
-			<property name="path">ActivateWindow(Videos,plugin://service.library.data.provider?type=randommovies,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[20434]</label>
-			<label2>Movies</label2>
+			<label>Directors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20434</property>
-			<property name="defaultID">20434</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieSets,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieSets,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[135]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieGenres,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieGenres,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="6">
-			<label>$LOCALIZE[562]</label>
-			<label2>Movies</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieYears,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieYears,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">movies</property>
-		</item>
-		<item id="7">
-			<label>$LOCALIZE[344]</label>
-			<label2>Movies</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<visible>Library.HasContent(Movies)</visible>
-			<onclick>ActivateWindow(Videos,MovieActors,return)</onclick>
-			<property name="path">ActivateWindow(Videos,MovieActors,return)</property>
+			<property name="labelID">directors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/movies/directors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/movies/directors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),movies)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">movies</property>
@@ -703,141 +715,112 @@
 	</include>
 	<include name="skinshortcuts-group-tvshows">
 		<item id="1">
-			<label>$LOCALIZE[20387]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
-			<icon>DefaultRecentlyAddedEpisodes.png</icon>
+			<label>Year</label>
+			<label2>Videos</label2>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20387</property>
-			<property name="defaultID">20387</property>
-			<visible>Library.HasContent(TVShows)</visible>
-			<onclick>ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="2">
-			<label>$LOCALIZE[369]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Genres</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">369</property>
-			<property name="defaultID">369</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/titles/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/titles/,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="3">
-			<label>$LOCALIZE[135]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Actors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/genres/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/genres/,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[562]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Studios</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/years/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/years/,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">tvshows</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[344]</label>
-			<label2>$LOCALIZE[20343]</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/actors/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/actors/,return)</property>
+			<property name="labelID">studios</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">tvshows</property>
 		</item>
 	</include>
 	<include name="skinshortcuts-group-alt-tvshows">
 		<item id="1">
-			<label>$LOCALIZE[20387]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
-			<icon>DefaultRecentlyAddedEpisodes.png</icon>
+			<label>Year</label>
+			<label2>Videos</label2>
+			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">20387</property>
-			<property name="defaultID">20387</property>
-			<visible>Library.HasContent(TVShows)</visible>
-			<onclick>ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://recentlyaddedepisodes/,return)</property>
+			<property name="labelID">year</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/years.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="2">
-			<label>$LOCALIZE[369]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Genres</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">369</property>
-			<property name="defaultID">369</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/titles/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/titles/,return)</property>
+			<property name="labelID">genres</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/genres.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="3">
-			<label>$LOCALIZE[135]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Actors</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">135</property>
-			<property name="defaultID">135</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/genres/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/genres/,return)</property>
+			<property name="labelID">actors</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/actors.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 		<item id="4">
-			<label>$LOCALIZE[562]</label>
-			<label2>$LOCALIZE[20343]</label2>
+			<label>Studios</label>
+			<label2>Videos</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
-			<property name="labelID">562</property>
-			<property name="defaultID">562</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/years/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/years/,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),tvshows)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">tvshows</property>
-		</item>
-		<item id="5">
-			<label>$LOCALIZE[344]</label>
-			<label2>$LOCALIZE[20343]</label2>
-			<icon>DefaultActor.png</icon>
-			<thumb />
-			<property name="labelID">344</property>
-			<property name="defaultID">344</property>
-			<onclick>ActivateWindow(Videos,videodb://tvshows/actors/,return)</onclick>
-			<property name="path">ActivateWindow(Videos,videodb://tvshows/actors/,return)</property>
+			<property name="labelID">studios</property>
+			<property name="defaultID" />
+			<onclick>ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</onclick>
+			<property name="path">ActivateWindow(10025,"library://video/tvshows/studios.xml/",return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),tvshows)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">tvshows</property>
 		</item>
 	</include>
-	<include name="skinshortcuts-group-1036" />
-	<include name="skinshortcuts-group-alt-1036" />
 	<include name="skinshortcuts-group-videos">
 		<item id="1">
 			<label>$LOCALIZE[1037]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultAddonVideo.png</icon>
 			<thumb />
 			<property name="labelID">1037</property>
@@ -848,27 +831,26 @@
 			<property name="group">videos</property>
 		</item>
 		<item id="2">
+			<label>$LOCALIZE[20389]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultMusicVideos.png</icon>
+			<thumb />
+			<property name="labelID">musicvideos</property>
+			<property name="defaultID">musicvideos</property>
+			<onclick>ActivateWindow(Videos,videodb://musicvideos/titles/,return)</onclick>
+			<property name="path">ActivateWindow(Videos,videodb://musicvideos/titles/,return)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">videos</property>
+		</item>
+		<item id="3">
 			<label>$LOCALIZE[744]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultFolder.png</icon>
 			<thumb />
 			<property name="labelID">744</property>
 			<property name="defaultID">744</property>
 			<onclick>ActivateWindow(Videos,Files,return)</onclick>
 			<property name="path">ActivateWindow(Videos,Files,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">videos</property>
-		</item>
-		<item id="3">
-			<label>$LOCALIZE[20389]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultMusicVideos.png</icon>
-			<thumb />
-			<property name="labelID">musicvideos</property>
-			<property name="defaultID">musicvideos</property>
-			<visible>Library.HasContent(MusicVideos)</visible>
-			<onclick>ActivateWindow(MusicLibrary,MusicVideos,return)</onclick>
-			<property name="path">ActivateWindow(MusicLibrary,MusicVideos,return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">videos</property>
 		</item>
@@ -876,7 +858,7 @@
 	<include name="skinshortcuts-group-alt-videos">
 		<item id="1">
 			<label>$LOCALIZE[1037]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultAddonVideo.png</icon>
 			<thumb />
 			<property name="labelID">1037</property>
@@ -888,28 +870,27 @@
 			<property name="group">videos</property>
 		</item>
 		<item id="2">
+			<label>$LOCALIZE[20389]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultMusicVideos.png</icon>
+			<thumb />
+			<property name="labelID">musicvideos</property>
+			<property name="defaultID">musicvideos</property>
+			<onclick>ActivateWindow(Videos,videodb://musicvideos/titles/,return)</onclick>
+			<property name="path">ActivateWindow(Videos,videodb://musicvideos/titles/,return)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),videos)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">videos</property>
+		</item>
+		<item id="3">
 			<label>$LOCALIZE[744]</label>
-			<label2>$ADDON[script.skinshortcuts 32014]</label2>
+			<label2>Videos</label2>
 			<icon>DefaultFolder.png</icon>
 			<thumb />
 			<property name="labelID">744</property>
 			<property name="defaultID">744</property>
 			<onclick>ActivateWindow(Videos,Files,return)</onclick>
 			<property name="path">ActivateWindow(Videos,Files,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),videos)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">videos</property>
-		</item>
-		<item id="3">
-			<label>$LOCALIZE[20389]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultMusicVideos.png</icon>
-			<thumb />
-			<property name="labelID">musicvideos</property>
-			<property name="defaultID">musicvideos</property>
-			<visible>Library.HasContent(MusicVideos)</visible>
-			<onclick>ActivateWindow(MusicLibrary,MusicVideos,return)</onclick>
-			<property name="path">ActivateWindow(MusicLibrary,MusicVideos,return)</property>
 			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),videos)]</visible>
 			<property name="isSubmenu">True</property>
 			<property name="group">videos</property>
@@ -1079,9 +1060,7 @@
 			<property name="group">music</property>
 		</item>
 	</include>
-	<include name="skinshortcuts-group-31101" />
-	<include name="skinshortcuts-group-alt-31101" />
-	<include name="skinshortcuts-group-31100">
+	<include name="skinshortcuts-group-pictures">
 		<item id="1">
 			<label>$LOCALIZE[1039]</label>
 			<label2>$ADDON[script.skinshortcuts 32020]</label2>
@@ -1092,10 +1071,10 @@
 			<onclick>ActivateWindow(Pictures,Addons,return)</onclick>
 			<property name="path">ActivateWindow(Pictures,Addons,return)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">31100</property>
+			<property name="group">pictures</property>
 		</item>
 	</include>
-	<include name="skinshortcuts-group-alt-31100">
+	<include name="skinshortcuts-group-alt-pictures">
 		<item id="1">
 			<label>$LOCALIZE[1039]</label>
 			<label2>$ADDON[script.skinshortcuts 32020]</label2>
@@ -1105,44 +1084,311 @@
 			<property name="defaultID">1039</property>
 			<onclick>ActivateWindow(Pictures,Addons,return)</onclick>
 			<property name="path">ActivateWindow(Pictures,Addons,return)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),num-31100)]</visible>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),pictures)]</visible>
 			<property name="isSubmenu">True</property>
-			<property name="group">31100</property>
+			<property name="group">pictures</property>
 		</item>
 	</include>
-	<include name="skinshortcuts-group-weather">
+	<include name="skinshortcuts-group-service-osmc-settings" />
+	<include name="skinshortcuts-group-alt-service-osmc-settings" />
+	<include name="skinshortcuts-group-1036" />
+	<include name="skinshortcuts-group-alt-1036" />
+	<include name="skinshortcuts-group-programs" />
+	<include name="skinshortcuts-group-alt-programs" />
+	<include name="skinshortcuts-group-livetv">
 		<item id="1">
-			<label>$LOCALIZE[10004]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultSettings.png</icon>
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
 			<thumb />
-			<property name="labelID">settings</property>
-			<property name="defaultID">settings</property>
-			<onclick>ActivateWindow(Settings)</onclick>
-			<property name="path">ActivateWindow(Settings)</property>
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVChannels)</onclick>
+			<property name="path">ActivateWindow(TVChannels)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">weather</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="2">
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVGuide)</onclick>
+			<property name="path">ActivateWindow(TVGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">livetv</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVRecordings)</onclick>
+			<property name="path">ActivateWindow(TVRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">livetv</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVTimers)</onclick>
+			<property name="path">ActivateWindow(TVTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">livetv</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVSearch)</onclick>
+			<property name="path">ActivateWindow(TVSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">livetv</property>
 		</item>
 	</include>
-	<include name="skinshortcuts-group-alt-weather">
+	<include name="skinshortcuts-group-alt-livetv">
 		<item id="1">
-			<label>$LOCALIZE[10004]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultSettings.png</icon>
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
 			<thumb />
-			<property name="labelID">settings</property>
-			<property name="defaultID">settings</property>
-			<onclick>ActivateWindow(Settings)</onclick>
-			<property name="path">ActivateWindow(Settings)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),weather)]</visible>
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVChannels)</onclick>
+			<property name="path">ActivateWindow(TVChannels)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),livetv)]</visible>
 			<property name="isSubmenu">True</property>
-			<property name="group">weather</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="2">
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVGuide)</onclick>
+			<property name="path">ActivateWindow(TVGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVRecordings)</onclick>
+			<property name="path">ActivateWindow(TVRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVTimers)</onclick>
+			<property name="path">ActivateWindow(TVTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32017]</label2>
+			<icon>DefaultTVShows.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasTVChannels</visible>
+			<onclick>ActivateWindow(TVSearch)</onclick>
+			<property name="path">ActivateWindow(TVSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),livetv)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">livetv</property>
+		</item>
+	</include>
+	<include name="skinshortcuts-group-radio">
+		<item id="1">
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioChannels)</onclick>
+			<property name="path">ActivateWindow(RadioChannels)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">radio</property>
+		</item>
+		<item id="2">
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioGuide)</onclick>
+			<property name="path">ActivateWindow(RadioGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">radio</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioRecordings)</onclick>
+			<property name="path">ActivateWindow(RadioRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">radio</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioTimers)</onclick>
+			<property name="path">ActivateWindow(RadioTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">radio</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioSearch)</onclick>
+			<property name="path">ActivateWindow(RadioSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">radio</property>
+		</item>
+	</include>
+	<include name="skinshortcuts-group-alt-radio">
+		<item id="1">
+			<label>$LOCALIZE[19019]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19019</property>
+			<property name="defaultID">19019</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioChannels)</onclick>
+			<property name="path">ActivateWindow(RadioChannels)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="2">
+			<label>$LOCALIZE[22020]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">22020</property>
+			<property name="defaultID">22020</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioGuide)</onclick>
+			<property name="path">ActivateWindow(RadioGuide)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[19163]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19163</property>
+			<property name="defaultID">19163</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioRecordings)</onclick>
+			<property name="path">ActivateWindow(RadioRecordings)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="4">
+			<label>$LOCALIZE[19040]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">19040</property>
+			<property name="defaultID">19040</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioTimers)</onclick>
+			<property name="path">ActivateWindow(RadioTimers)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
+		</item>
+		<item id="5">
+			<label>$LOCALIZE[137]</label>
+			<label2>$ADDON[script.skinshortcuts 32087]</label2>
+			<icon>DefaultAudio.png</icon>
+			<thumb />
+			<property name="labelID">137</property>
+			<property name="defaultID">137</property>
+			<visible>PVR.HasRadioChannels</visible>
+			<onclick>ActivateWindow(RadioSearch)</onclick>
+			<property name="path">ActivateWindow(RadioSearch)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),radio)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">radio</property>
 		</item>
 	</include>
 	<include name="skinshortcuts-group-settings">
 		<item id="1">
+			<label>$LOCALIZE[10007]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultShortcut.png</icon>
+			<thumb />
+			<property name="labelID">10007</property>
+			<property name="defaultID">10007</property>
+			<onclick>ActivateWindow(SystemInfo)</onclick>
+			<property name="path">ActivateWindow(SystemInfo)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="group">settings</property>
+		</item>
+		<item id="2">
 			<label>$LOCALIZE[7]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
+			<label2>Common Shortcut</label2>
 			<icon>DefaultFolder.png</icon>
 			<thumb />
 			<property name="labelID">7</property>
@@ -1152,61 +1398,23 @@
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">settings</property>
 		</item>
-		<item id="2">
+		<item id="3">
 			<label>$LOCALIZE[13200]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
+			<label2>Common Shortcut</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
 			<property name="labelID">13200</property>
 			<property name="defaultID">13200</property>
 			<onclick>ActivateWindow(Profiles)</onclick>
 			<property name="path">ActivateWindow(Profiles)</property>
-			<visible>StringCompare(System.ProfileName,Master user)</visible>
-			<property name="group">settings</property>
-		</item>
-		<item id="3">
-			<label>$LOCALIZE[10007]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">10007</property>
-			<property name="defaultID">10007</property>
-			<onclick>ActivateWindow(SystemInfo)</onclick>
-			<property name="path">ActivateWindow(SystemInfo)</property>
 			<visible>StringCompare(System.ProfileName,Master user)</visible>
 			<property name="group">settings</property>
 		</item>
 	</include>
 	<include name="skinshortcuts-group-alt-settings">
 		<item id="1">
-			<label>$LOCALIZE[7]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultFolder.png</icon>
-			<thumb />
-			<property name="labelID">7</property>
-			<property name="defaultID">7</property>
-			<onclick>ActivateWindow(FileManager)</onclick>
-			<property name="path">ActivateWindow(FileManager)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),settings)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">settings</property>
-		</item>
-		<item id="2">
-			<label>$LOCALIZE[13200]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
-			<icon>DefaultShortcut.png</icon>
-			<thumb />
-			<property name="labelID">13200</property>
-			<property name="defaultID">13200</property>
-			<onclick>ActivateWindow(Profiles)</onclick>
-			<property name="path">ActivateWindow(Profiles)</property>
-			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),settings)]</visible>
-			<property name="isSubmenu">True</property>
-			<property name="group">settings</property>
-		</item>
-		<item id="3">
 			<label>$LOCALIZE[10007]</label>
-			<label2>$ADDON[script.skinshortcuts 32034]</label2>
+			<label2>Common Shortcut</label2>
 			<icon>DefaultShortcut.png</icon>
 			<thumb />
 			<property name="labelID">10007</property>
@@ -1217,7 +1425,33 @@
 			<property name="isSubmenu">True</property>
 			<property name="group">settings</property>
 		</item>
+		<item id="2">
+			<label>$LOCALIZE[7]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultFolder.png</icon>
+			<thumb />
+			<property name="labelID">7</property>
+			<property name="defaultID">7</property>
+			<onclick>ActivateWindow(FileManager)</onclick>
+			<property name="path">ActivateWindow(FileManager)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),settings)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">settings</property>
+		</item>
+		<item id="3">
+			<label>$LOCALIZE[13200]</label>
+			<label2>Common Shortcut</label2>
+			<icon>DefaultShortcut.png</icon>
+			<thumb />
+			<property name="labelID">13200</property>
+			<property name="defaultID">13200</property>
+			<onclick>ActivateWindow(Profiles)</onclick>
+			<property name="path">ActivateWindow(Profiles)</property>
+			<visible>StringCompare(System.ProfileName,Master user) + [StringCompare(Window(10000).Property(submenuVisibility),settings)]</visible>
+			<property name="isSubmenu">True</property>
+			<property name="group">settings</property>
+		</item>
 	</include>
-	<include name="skinshortcuts-group-13012" />
-	<include name="skinshortcuts-group-alt-13012" />
+	<include name="skinshortcuts-group-33060" />
+	<include name="skinshortcuts-group-alt-33060" />
 </includes>

@@ -2,18 +2,43 @@
 <window>
 	<!-- extendedprogressdialog -->
 	<zorder>2</zorder>
+	<animation effect="fade" start="0" end="100" time="100">WindowOpen</animation>
+	<animation effect="fade" start="100" end="0" time="100">WindowClose</animation>
 
 	<controls>
 
-		<!-- Details -->
+		<!-- Heading -->
 		<control type="label" id="30">
-			<left>50</left>
-			<bottom>49</bottom>
+			<right>190</right>
+			<bottom>124</bottom>
 			<width>720</width>
-			<height>15</height>
+			<height>30</height>
 			<haspath>true</haspath>
-			<font>OLD_Font15Caps</font>
-			<textcolor>TextColorFO</textcolor>
+			<font>Font30</font>
+			<align>right</align>
+			<textcolor>ColorFO</textcolor>
+		</control>
+
+		<!-- Details -->
+		<control type="label" id="31">
+			<right>190</right>
+			<bottom>88</bottom>
+			<width>720</width>
+			<height>30</height>
+			<haspath>true</haspath>
+			<font>Font30</font>
+			<align>right</align>
+			<textcolor>ColorFO</textcolor>
+		</control>
+		
+		<!-- Busy -->
+		<control type="image">
+			<right>114</right>
+			<bottom>90</bottom>
+			<width>58</width>
+			<height>58</height>
+			<texture>dialogs/busy.png</texture>
+			<animation effect="rotate" end="360" center="auto" time="1120" loop="true" reversible="false" condition="true">Conditional</animation>
 		</control>
 
 	</controls>

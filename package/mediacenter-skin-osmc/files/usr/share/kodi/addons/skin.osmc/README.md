@@ -1,17 +1,10 @@
 #OSMC skin
 
-This is a Kodi skin which provides the OSMC look and feel. The initial skin was done by Hitcher -- based off of a Plex skin called Conq. Further improvements are maintained by the community.
+This is a Kodi skin which provides the OSMC look and feel.
 
-##Changelog
+Developed by Simon Brunton and Kevin Goffe
 
-Versioning continues from v1.0.1 of Conq.
-
-1.0.2: 12th September 2014
-
-* Add light and dark logos
-* Make dark appearance default
-* Remove references to 'skin.conq'
-* Updated metadata descriptions
+See changelog.txt for details
 
 ##License
 

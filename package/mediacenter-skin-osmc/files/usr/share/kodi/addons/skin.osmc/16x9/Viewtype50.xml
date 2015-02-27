@@ -6,112 +6,137 @@
 		<control type="group">
 			<visible>Control.IsVisible(50)</visible>
 
-			<!-- Curve -->
+			<!-- Background -->
 			<control type="image">
-				<right>20</right>
-				<top>20</top>
-				<width>1280</width>
-				<height>1040</height>
-				<texture border="40,0,0,0">common/Curve.png</texture>
-				<visible>Skin.HasSetting(ShowCurve)</visible>
+				<left>656</left>
+				<width>1264</width>
+				<height>1080</height>
+				<texture>common/blue.png</texture>
+				<colordiffuse>ccffffff</colordiffuse>
 			</control>
 
-			<!-- Image -->
-			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>666</height>
-				<texture>$INFO[ListItem.Icon]</texture>
-				<aspectratio aligny="center">keep</aspectratio>
-				<bordertexture border="1,1,1,69">views/DropShadow.png</bordertexture>
-				<bordersize>0,0,0,66</bordersize>
-				<visible>!SubString(ListItem.Icon,Default)</visible>
-			</control>
-			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>600</height>
-				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
-				<aspectratio aligny="center">keep</aspectratio>
-				<bordertexture border="21,21,21,150">views/OverlayEffect.png</bordertexture>
-				<visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible>
-			</control>
-			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>600</height>
-				<texture>$INFO[ListItem.Icon]</texture>
-				<colordiffuse>OverlayColorFO</colordiffuse>
-				<aspectratio aligny="center">keep</aspectratio>
-				<visible>SubString(ListItem.Icon,Default)</visible>
-			</control>
+			<control type="group">
+				<visible>!ControlGroup(3000).HasFocus</visible>
+				<animation effect="fade" start="0" end="100" time="200" delay="200" tween="cubic" easing="out" reversible="false">Visible</animation>
 
-			<!-- List -->
-			<control type="fixedlist" id="50">
-				<left>750</left>
-				<centertop>50%</centertop>
-				<width>1050</width>
-				<height>720</height>
-				<onup>50</onup>
-				<ondown>50</ondown>
-				<onleft>60</onleft>
-				<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
-				<pagecontrol>60</pagecontrol>
-				<focusposition>3</focusposition>
-				<orientation>vertical</orientation>
-				<viewtype label="535">list</viewtype>
-				<scrolltime tween="sine" easing="out">240</scrolltime>
-				<visible>Window.IsVisible(musicfiles) | [Container.Content(songs) + Window.IsVisible(musicplaylist)] | [!Container.Content(movies) + !Container.Content(tvshows) + !Container.Content(seasons) + !Container.Content(episodes) + !Container.Content(albums) + !Container.Content(songs) + !Window.IsVisible(pictures)]</visible>
+				<control type="group">
+					<visible>!Container(50).OnNext + !Container(50).OnPrevious</visible>
+					<animation effect="fade" start="0" end="100" time="200" delay="50">Visible</animation>
 
-				<itemlayout height="90" width="1050">
-					<control type="label">
-						<left>32</left>
-						<top>0</top>
-						<width>1018</width>
-						<height>90</height>
-						<font>OLD_Font36</font>
-						<label>$INFO[ListItem.Label]</label>
-						<textcolor>TextColor2</textcolor>
-					</control>
-					<!-- Watched status -->
+					<!-- Image -->
 					<control type="image">
-						<left>0</left>
-						<top>38</top>
-						<width>14</width>
-						<height>14</height>
-						<texture>$VAR[StatusOverlay]</texture>
-						<colordiffuse>OverlayColorNF</colordiffuse>
-						<animation effect="fade" start="50" end="50" condition="true">Conditional</animation>
+						<left>100</left>
+						<top>250</top>
+						<width>516</width>
+						<height>516</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<aspectratio aligny="center">keep</aspectratio>
 					</control>
-				</itemlayout>
 
-				<focusedlayout height="180" width="1050">
-					<control type="label">
-						<left>32</left>
-						<top>0</top>
-						<width>1018</width>
-						<height>180</height>
-						<font>OLD_Font72</font>
-						<label>$INFO[ListItem.Label]</label>
-						<textcolor>TextColor1</textcolor>
-						<shadowcolor>ShadowColor</shadowcolor>
-						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
+					<!-- Plot -->
+					<control type="textbox">
+						<left>100</left>
+						<top>783</top>
+						<width>516</width>
+						<height>152</height>
+						<font>Font30</font>
+						<textcolor>ColorFO</textcolor>
+						<label>$VAR[Plot]</label>
 					</control>
-					<!-- Watched status -->
-					<control type="image">
-						<left>0</left>
-						<top>61</top>
-						<width>14</width>
-						<height>14</height>
-						<texture>$VAR[StatusOverlay]</texture>
-						<colordiffuse>OverlayColorFO</colordiffuse>
-						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
-					</control>
-				</focusedlayout>
 
+				</control>
+
+			</control>
+
+			<control type="group">
+				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(50)">Conditional</animation>
+
+				<!-- Heading -->
+				<control type="label">
+					<left>702</left>
+					<top>166</top>
+					<width>1118</width>
+					<height>200</height>
+					<font>Font40</font>
+					<textcolor>ColorFO</textcolor>
+					<label fallback="3">$INFO[Container.FolderName]</label>
+				</control>
+
+				<!-- Previous item -->
+				<control type="image">
+					<left>702</left>
+					<top>332</top>
+					<width>40</width>
+					<height>4</height>
+					<texture>common/white.png</texture>
+					<colordiffuse>ColorNF</colordiffuse>
+					<visible>Container(50).HasPrevious</visible>
+				</control>
+
+				<!-- Sub menu list -->
+				<control type="list" id="50">
+					<left>702</left>
+					<top>358</top>
+					<width>1118</width>
+					<height>532</height>
+					<onup>9100</onup>
+					<ondown>noop</ondown>
+					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
+					<onright>noop</onright>
+					<orientation>vertical</orientation>
+					<viewtype label="535">list</viewtype>
+					<scrolltime tween="sine" easing="out">200</scrolltime>
+
+					<itemlayout width="1118" height="82">
+						<control type="label">
+							<width>1118</width>
+							<height>82</height>
+							<font>Font40</font>
+							<textcolor>ColorNF</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</itemlayout>
+
+					<focusedlayout width="1118" height="118">
+						<control type="label">
+							<top>21</top>
+							<width>1118</width>
+							<height>40</height>
+							<font>Font40</font>
+							<textcolor>ColorFO</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<animation effect="slide" end="0,19" condition="StringCompare(Control.GetLabel(999),empty)">Conditional</animation>
+						</control>
+						<control type="label">
+							<top>66</top>
+							<width>1118</width>
+							<height>30</height>
+							<font>Font30</font>
+							<textcolor>ColorFO</textcolor>
+							<label>$VAR[Label2]</label>
+							<visible>!StringCompare(Control.GetLabel(999),empty)</visible>
+						</control>
+					</focusedlayout>
+
+				</control>
+
+				<!-- Next item -->
+				<control type="image">
+					<left>702</left>
+					<top>926</top>
+					<width>40</width>
+					<height>4</height>
+					<texture>common/white.png</texture>
+					<colordiffuse>ColorNF</colordiffuse>
+					<visible>Container(50).HasNext</visible>
+				</control>
+
+			</control>
+
+			<!-- Hidden label2 -->
+			<control type="label" id="999">
+				<font>-</font>
+				<label>$VAR[Label2]</label>
 			</control>
 
 		</control>

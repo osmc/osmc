@@ -21,6 +21,17 @@
 		<height>1080</height>
 	</include>
 
+	<!-- OSMC logo -->
+	<include name="Logo">
+		<control type="image">
+			<left>100</left>
+			<top>100</top>
+			<width>247</width>
+			<height>44</height>
+			<texture>common/logo.png</texture>
+		</control>
+	</include>
+
 	<!-- Window background image -->
 	<include name="WindowBackgroundImage">
 		<control type="image">
@@ -61,25 +72,139 @@
 			<include>FullscreenDimensions</include>
 			<include>VisibleFadeAnimation</include>
 			<fadetime>400</fadetime>
-			<colordiffuse>FanartDiffuse</colordiffuse>
-			<texture background="true">$INFO[ListItem.Art(fanart)]</texture>
-			<animation effect="fade" start="100" end="0" condition="[Player.HasVideo + Skin.HasSetting(BackgroundVideo)] | [Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)]">Conditional</animation>
-			<visible>[Skin.HasSetting(MovieFanart) + Container.Content(Movies)] | [Skin.HasSetting(TVFanart) + [Container.Content(TVShows) | Container.Content(Seasons) | Container.Content(Episodes)]] | [Skin.HasSetting(MusicFanart) + Window.IsVisible(musiclibrary)] | [Skin.HasSetting(WeatherFanart) + Window.IsVisible(weather)] | [Skin.HasSetting(AddonFanart) + [Container.Content(Addons) | Window.IsVisible(addonbrowser)]]</visible>
+			<texture colordiffuse="12ffffff" background="true">$INFO[ListItem.Art(fanart)]</texture>
+			<visible>[Skin.HasSetting(Fanart)]</visible>
 		</control>
 	</include>
 
 	<!-- Time -->
 	<include name="Time">
 		<control type="label">
-			<right>44</right>
-			<top>44</top>
+			<right>100</right>
+			<top>95</top>
 			<width>800</width>
-			<height>30</height>
+			<height>40</height>
 			<align>right</align>
 			<label>$INFO[System.Time]</label>
-			<font>Font30</font>
-			<textcolor>TextColorFO</textcolor>
+			<font>Font40</font>
+			<textcolor>ColorFO</textcolor>
 		</control>
+	</include>
+
+	<!-- Home widgets list -->
+	<include name="HomeWidgetsList">
+		<left>702</left>
+		<top>320</top>
+		<width>1510</width>
+		<height>384</height>
+		<onup>9000</onup>
+		<ondown>9001</ondown>
+		<onleft>9000</onleft>
+		<onright>noop</onright>
+		<focusposition>0</focusposition>
+		<viewtype label="">list</viewtype>
+		<orientation>horizontal</orientation>
+		<defaultcontrol always="true">0</defaultcontrol>
+		<scrolltime tween="sine" easing="out">300</scrolltime>
+		<itemlayout width="276" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">
+			<control type="image">
+				<top>0</top>
+				<width>256</width>
+				<height>384</height>
+				<texture>common/blue.png</texture>
+			</control>
+			<control type="image">
+				<top>0</top>
+				<width>256</width>
+				<height>384</height>
+				<aspectratio align="center" aligny="top">stretch</aspectratio>
+				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+			</control>
+		</itemlayout>
+		<focusedlayout width="276" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">
+			<control type="group">
+				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+				<control type="image">
+					<top>0</top>
+					<width>256</width>
+					<height>384</height>
+					<texture>common/blue.png</texture>
+				</control>
+				<control type="image">
+					<top>0</top>
+					<width>256</width>
+					<height>384</height>
+					<aspectratio align="center" aligny="top">stretch</aspectratio>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+				</control>
+			</control>
+		</focusedlayout>
+		<itemlayout width="703" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
+			<control type="image">
+				<top>0</top>
+				<width>683</width>
+				<height>384</height>
+				<texture>common/blue.png</texture>
+			</control>
+			<control type="image">
+				<top>0</top>
+				<width>683</width>
+				<height>384</height>
+				<aspectratio align="center" aligny="top">scale</aspectratio>
+				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+			</control>
+		</itemlayout>
+		<focusedlayout width="703" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
+			<control type="group">
+				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+				<control type="image">
+					<top>0</top>
+					<width>683</width>
+					<height>384</height>
+					<texture>common/blue.png</texture>
+				</control>
+				<control type="image">
+					<top>0</top>
+					<width>683</width>
+					<height>384</height>
+					<aspectratio align="center" aligny="top">scale</aspectratio>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+				</control>
+			</control>
+		</focusedlayout>
+		<itemlayout width="404" height="384" condition="!StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
+			<control type="image">
+				<top>0</top>
+				<width>384</width>
+				<height>384</height>
+				<texture>common/blue.png</texture>
+			</control>
+			<control type="image">
+				<top>0</top>
+				<width>384</width>
+				<height>384</height>
+				<aspectratio align="center" aligny="top">keep</aspectratio>
+				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+			</control>
+		</itemlayout>
+		<focusedlayout width="404" height="384" condition="!StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
+			<control type="group">
+				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+				<control type="image">
+					<top>0</top>
+					<width>384</width>
+					<height>384</height>
+					<texture>common/blue.png</texture>
+				</control>
+				<control type="image">
+					<top>0</top>
+					<width>384</width>
+					<height>384</height>
+					<aspectratio align="center" aligny="top">keep</aspectratio>
+					<texture background="true">$INFO[ListItem.Icon]</texture>
+				</control>
+			</control>
+		</focusedlayout>
 	</include>
 
 	<!-- Window animation -->
@@ -133,11 +258,11 @@
 
 	<!-- Options buttons -->
 	<include name="OptionButtons">
-		<width>480</width>
-		<height>54</height>
-		<font>OLD_Font48</font>
-		<textcolor>DialogColor2</textcolor>
-		<focusedcolor>DialogColor1</focusedcolor>
+		<width>516</width>
+		<height>76</height>
+		<font>Font40</font>
+		<textcolor>ColorNF</textcolor>
+		<focusedcolor>ColorFO</focusedcolor>
 	</include>
 
 	<!-- Keyboard buttons -->
