@@ -1,0 +1,1 @@
+DPkg::Post-Invoke {"if systemctl is-enabled samba >/dev/null 2>&1 && ! systemctl is-active smbd >/dev/null 2>&1; then systemctl restart samba; fi; exit 0";};
