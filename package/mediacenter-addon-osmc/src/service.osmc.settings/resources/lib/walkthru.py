@@ -4,22 +4,15 @@ import xbmcgui
 import xbmcaddon
 
 # STANDARD library modules
-import ast
-import datetime
-import json
 import os
-import pickle
-import Queue
-import select
-import socket
-import threading
-import time
 import sys
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
 import timezones
+import LICENSE
 
+EULA = LICENSE.license
 
 
 def log(message):
@@ -49,18 +42,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 						'UTC'		: 30090,
 						}
 
-		with open('/usr/share/kodi/language/Afrikaans/strings.po', 'r') as f:
-
-			lines = f.readlines()
-
-			self.licence = ''.join(lines)
-
 		self.selected_language = None
 		self.selected_region   = None
 		self.selected_country  = None
 
 
 	def onInit(self):
+
+		global EULA
 
 		#hide all timezone, TandC and Apply buttons
 		for hide_this in [1003, 1004, 1005]:
@@ -98,7 +87,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(20010).addItem(self.tmp)
 
 		# populate the terms and conditions
-		self.getControl(555).setText(self.licence)
+		self.getControl(555).setText(EULA)
 
 
 	def onClick(self, controlID):
@@ -127,9 +116,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				log('users timezone: %s' % users_timezone)
 
-				# with open('/etc/timezone', 'w') as f:
-
-				# 	f.writeline(users_timezone)
+				os.system('echo %s | sudo tee /etc/timezone' % users_timezone)
 
 			self.close()
 
@@ -157,7 +144,15 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(94000).setVisible(False)
 			self.getControl(95000).setVisible(True)
 			self.getControl(1005).setVisible(True)
-			self.setFocusId(1005)	
+			self.setFocusId(1005)
+
+		elif controlID == 40020:
+
+			self.getControl(555).scroll(10)
+
+		elif controlID == 40030:
+
+			self.getControl(555).scroll(-10)
 
 
 	# def onAction(self, action):

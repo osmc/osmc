@@ -160,27 +160,60 @@
         <!-- Terms sub menu -->
         <control id="4000" type="group">
             <left>480</left>
-            <top>244</top>
+            <top>144</top>
             <width>1000</width>
             <height>726</height>
             <onleft>1000</onleft>
             <visible>Control.IsVisible(94000)</visible>
             <onup>noop</onup>
             <ondown>noop</ondown>
-            <visible>Control.IsVisible(94000)</visible>
-            <control id="555" type="textbox">
-                <description>terms and conditions</description>
+            <control type="image">
+                <description>text background</description>
                 <posx>0</posx>
                 <posy>0</posy>
                 <width>900</width>
+                <height>800</height>
+                <texture>TextShade.png</texture>
+            </control>
+<!-- scroll up button -->
+<!-- <control type="button" id="40030">
+      <posx>482</posx>
+      <posy>0</posy>
+      <width>36</width>
+      <height>66</height>
+      <colordiffuse>FFFFFFFF</colordiffuse>
+      <texturefocus>ArrowUpFO.png</texturefocus>
+      <texturenofocus>ArrowUpNF.png</texturenofocus>
+      <onleft>1004</onleft>
+      <onright>40010</onright>
+      <ondown>40020</ondown>
+</control>    -->   
+<!-- scroll down button -->
+<!-- <control type="button" id="40020">
+      <posx>482</posx>
+      <posy>734</posy>
+      <width>36</width>
+      <height>66</height>
+      <colordiffuse>FFFFFFFF</colordiffuse>
+      <texturefocus>ArrowDownFO.png</texturefocus>
+      <texturenofocus>ArrowDownNF.png</texturenofocus>
+      <onleft>1004</onleft>
+      <onright>40010</onright>
+      <onup>40030</onup>
+</control>   -->          
+            <control id="555" type="textbox">
+                <description>terms and conditions</description>
+                <posx>50</posx>
+                <posy>50</posy>
+                <width>800</width>
                 <height>700</height>
                 <wraptext>true</wraptext>
                 <colordiffuse>FFFFFFFF</colordiffuse>
-                <font>OLD_Font36</font>
+                <font>OLD_Font28</font>
                 <textcolor>66ffffff</textcolor>
-                <pagecontrol>13</pagecontrol>
                 <scrolltime>75</scrolltime>
                 <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
+                <!-- <autoscroll delay="3000" repeat="10000" time="1000">false</autoscroll> -->
             </control>
             <!-- I Agree -->
             <control id="40010" type="button">
