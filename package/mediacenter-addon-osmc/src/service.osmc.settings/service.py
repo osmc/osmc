@@ -98,7 +98,7 @@ class Main(object):
 
 		log('daemon started')
 
-		if __setting__('firstrun'):
+		if __setting__('firstrun') == 'true':
 
 			walkthru.open_gui()
 
