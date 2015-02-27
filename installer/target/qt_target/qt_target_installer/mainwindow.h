@@ -6,7 +6,6 @@
 #define MAINWINDOW_H
 #define FONT_STATUSLABEL_RATIO 3.4
 #define FONT_PROGRESSBAR_RATIO 3.6
-#define FONT_COPYRIGHTLABEL_RATIO 2.2
 #include <QMainWindow>
 #include "logger.h"
 #include "utils.h"

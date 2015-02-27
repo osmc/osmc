@@ -64,7 +64,6 @@ QFont MainWindow::getFont(QWidget* element, float ratio)
 void MainWindow::install()
 {
     ui->statusLabel->setFont(getFont(ui->statusLabel, FONT_STATUSLABEL_RATIO));
-    ui->copyrightLabel->setFont(getFont(ui->copyrightLabel, FONT_COPYRIGHTLABEL_RATIO));
     ui->statusProgressBar->setFont(getFont(ui->statusProgressBar, FONT_PROGRESSBAR_RATIO));
 
     qApp->processEvents();
