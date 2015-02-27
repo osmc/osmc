@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-tcstub="rbp1-toolchain-osmc"
+tcstub="armv6l-toolchain-osmc"
 
 make clean
 
