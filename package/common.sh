@@ -64,6 +64,7 @@ function build_in_env()
 	update_sources
 	DEP=${1}
 	test $DEP == rbp2 && DEP="armv7"
+	test $DEP == rbp1 && DEP="armv6l"
 	TCDIR="/opt/osmc-tc/$DEP-toolchain-osmc"
 	handle_dep "$DEP-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
