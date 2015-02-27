@@ -1,7 +1,4 @@
 all:
-	echo "Usage: make atv"
-
-atv:
 	sudo bash build.sh atv
 
 clean:
