@@ -99,8 +99,6 @@ def apply_network_changes(settings_dict):
                               'Netmask': make_variant(settings_dict['Netmask'])}
         if 'Gateway' in settings_dict:
             ipv4_configuration['Gateway'] = make_variant(settings_dict['Gateway'])
-        print settings_dict
-        print ipv4_configuration
         service.SetProperty('IPv4.Configuration', ipv4_configuration)
         time.sleep(2)
         dns = []
@@ -251,7 +249,7 @@ def wifi_connect(path, password=None):
         keyfile.close()
         process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'keyfile'])
         time.sleep(2)
-    print ('attempting connection to ' + path )
+    print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
     try:
         service.Connect(timeout=15000)
@@ -292,8 +290,10 @@ def has_internet_connection():
 
 
 def update_preseed_file(settings_dict):
-    print 'update preseed'
-    print settings_dict
+    filtered_settings_dict = settings_dict
+    if 'Password' in filtered_settings_dict:
+        filtered_settings_dict['Password'] = '********'
+    print filtered_settings_dict
     wireless_password_line = None
     # reed the current data in
     preseed_file = open(PREESEED_LOCATION, 'r')

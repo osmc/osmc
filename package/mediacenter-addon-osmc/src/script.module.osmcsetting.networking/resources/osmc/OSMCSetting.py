@@ -137,24 +137,7 @@ class OSMCSettingClass(object):
 								MORE TEXT SHOULD GO HERE
 							"""
 
-		self.setting_data_method = 	{
-
-									'mercury': 	{
-														'setting_value' : '',
-														'apply'			: self.method_to_apply_changes_X,
-														'translate'		: self.translate_on_populate_X,
-														},
-
-									'venus': 	{'setting_value' : ''},
-									'earth': 	{'setting_value' : ''},
-									'mars': 	{'setting_value' : ''},
-									'jupiter': 	{'setting_value' : ''},
-									'saturn': 	{'setting_value' : ''},
-									'uranus': 	{'setting_value' : ''},
-									'neptune': 	{'setting_value' : ''},
-									'pluto': 	{'setting_value' : ''},									
-
-									}
+		self.setting_data_method = 	{ }
 
 		# populate the settings data in the setting_data_method
 		self.populate_setting_data_method()
