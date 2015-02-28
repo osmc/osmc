@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-if [ "$1" == "rbp" ]
+if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/b5dbdb57db04a8628c78fecfa7002eac04820797.tar.gz" "$(pwd)/kodi"
 else
@@ -99,14 +99,17 @@ then
 	handle_dep "libltdl-dev"
 	handle_dep "cmake"
 	handle_dep "libgnutls28-dev"
+	if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
+	then
+		handle_dep "rbp-userland-dev-osmc"
+	fi
 	if [ "$1" == "rbp" ]
 	then
 		handle_dep "rbp-libcec-dev-osmc"
-		handle_dep "rbp-libshairplay-dev-osmc"
-		handle_dep "rbp-librtmp-dev-osmc"
-		handle_dep "rbp-libnfs-dev-osmc"
-		handle_dep "rbp-libafpclient-dev-osmc"
-		handle_dep "rbp-userland-dev-osmc"
+		handle_dep "armv6l-libshairplay-dev-osmc"
+		handle_dep "armv6l-librtmp-dev-osmc"
+		handle_dep "armv6l-libnfs-dev-osmc"
+		handle_dep "armv6l-libafpclient-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
 	then
@@ -115,7 +118,6 @@ then
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libafpclient-dev-osmc"
-		handle_dep "rbp-userland-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
@@ -125,8 +127,8 @@ then
 	test "$1" == atv && install_patch "../../patches" "atv"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-	install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr"
-	test "$1" == rbp2 && install_patch "../../patches" "rbp2"
+		install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr"
+		test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	fi
 	./bootstrap
 	# Apple TV configuration
@@ -194,8 +196,8 @@ then
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbisenc2, libass5, libcurl3-gnutls, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc, mediacenter-skin-osmc"
 	X86_DEPENDS="libcec-osmc, libshairplay-osmc, libnfs-osmc, libafpclient-osmc, librtmp-osmc, splash-osmc"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp-libcec-osmc, rbp-libafpclient-osmc, rbp-libnfs-osmc, rbp-librtmp-osmc, rbp-libshairplay-osmc, rbp-userland-osmc, rbp-armmem-osmc, rbp-splash-osmc" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp2-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
+	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp-libcec-osmc, armv6l-libafpclient-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, rbp1-armmem-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
+	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp2-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
