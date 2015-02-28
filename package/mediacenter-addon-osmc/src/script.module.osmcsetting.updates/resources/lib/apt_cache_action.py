@@ -137,6 +137,8 @@ class Main(object):
 
 		self.update()
 
+		self.cache.open()
+
 		for pkg in self.cache:
 
 			# mark packages as install or remove
