@@ -1,8 +1,8 @@
 all:
-	echo -e "Specify a target:\nmake rbp1\nmake armv7\nmake i386"
+	echo -e "Specify a target:\nmake armv6l\nmake armv7\nmake i386"
 
-rbp:
-	sudo bash build.sh "rbp1"
+armv6l:
+	sudo bash build.sh "armv6l"
 
 armv7:
 	sudo bash build.sh "armv7"
