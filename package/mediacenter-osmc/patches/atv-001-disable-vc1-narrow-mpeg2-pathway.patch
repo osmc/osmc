@@ -13,7 +13,7 @@ index ab0959e..f91e799 100644
            if (hint.codec == AV_CODEC_ID_H264 && hint.ptsinvalid)
              break;
 -          if (hint.codec == AV_CODEC_ID_MPEG2VIDEO && hint.width <= 720)
-+          if (hint.codec == AV_CODEC_ID_MPEG2VIDEO && (hint.width == 576 || hint.width = 480))
++          if (hint.codec == AV_CODEC_ID_MPEG2VIDEO && (hint.width == 576 || hint.width == 480))
              break;
            if ( (pCodec = OpenCodec(new CDVDVideoCodecCrystalHD(), hint, options)) ) return pCodec;
          break;
