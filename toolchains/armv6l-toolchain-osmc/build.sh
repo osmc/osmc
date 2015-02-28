@@ -12,7 +12,8 @@ make clean
 check_platform
 verify_action
 
-update_sources # Don't verify_action because we do not have any packages in apt.osmc.tv on a fresh platform
+update_sources
+verify_action
 
 # Install packages needed to build filesystem for building
 packages="debootstrap
