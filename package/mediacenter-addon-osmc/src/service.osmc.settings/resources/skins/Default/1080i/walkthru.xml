@@ -69,6 +69,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>2000</onright>
             </control>
@@ -80,6 +84,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>3000</onright>
             </control>
@@ -91,6 +99,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>40010</onright>
             </control>
@@ -102,6 +114,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>noop</onright>
             </control>
@@ -175,32 +191,10 @@
                 <height>800</height>
                 <texture>TextShade.png</texture>
             </control>
-<!-- scroll up button -->
-<!-- <control type="button" id="40030">
-      <posx>482</posx>
-      <posy>0</posy>
-      <width>36</width>
-      <height>66</height>
-      <colordiffuse>FFFFFFFF</colordiffuse>
-      <texturefocus>ArrowUpFO.png</texturefocus>
-      <texturenofocus>ArrowUpNF.png</texturenofocus>
-      <onleft>1004</onleft>
-      <onright>40010</onright>
-      <ondown>40020</ondown>
-</control>    -->   
-<!-- scroll down button -->
-<!-- <control type="button" id="40020">
-      <posx>482</posx>
-      <posy>734</posy>
-      <width>36</width>
-      <height>66</height>
-      <colordiffuse>FFFFFFFF</colordiffuse>
-      <texturefocus>ArrowDownFO.png</texturefocus>
-      <texturenofocus>ArrowDownNF.png</texturenofocus>
-      <onleft>1004</onleft>
-      <onright>40010</onright>
-      <onup>40030</onup>
-</control>   -->          
+            <!-- scroll up button -->
+            <!-- <control type="button" id="40030"><posx>482</posx><posy>0</posy><width>36</width><height>66</height><colordiffuse>FFFFFFFF</colordiffuse><texturefocus>ArrowUpFO.png</texturefocus><texturenofocus>ArrowUpNF.png</texturenofocus><onleft>1004</onleft><onright>40010</onright><ondown>40020</ondown></control>-->
+            <!-- scroll down button -->
+            <!-- <control type="button" id="40020"><posx>482</posx><posy>734</posy><width>36</width><height>66</height><colordiffuse>FFFFFFFF</colordiffuse><texturefocus>ArrowDownFO.png</texturefocus><texturenofocus>ArrowDownNF.png</texturenofocus><onleft>1004</onleft><onright>40010</onright><onup>40030</onup></control>-->
             <control id="555" type="textbox">
                 <description>terms and conditions</description>
                 <posx>50</posx>
@@ -213,7 +207,7 @@
                 <textcolor>66ffffff</textcolor>
                 <scrolltime>75</scrolltime>
                 <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
-                <!-- <autoscroll delay="3000" repeat="10000" time="1000">false</autoscroll> -->
+                <!-- <autoscroll delay="3000" repeat="10000" time="1000">false</autoscroll>-->
             </control>
             <!-- I Agree -->
             <control id="40010" type="button">
@@ -225,6 +219,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onleft>1004</onleft>
                 <onright>noop</onright>
@@ -251,6 +249,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -262,6 +264,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -273,6 +279,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -284,6 +294,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -295,6 +309,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -306,6 +324,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -317,6 +339,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -328,6 +354,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
@@ -339,6 +369,10 @@
                 <font>OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>
             </control>
