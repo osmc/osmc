@@ -13,7 +13,7 @@ import requests
 import Queue
 import shutil
 import apt
-
+import traceback
 
 addonid 	= "script.module.osmcsetting.apfstore"
 __addon__  	= xbmcaddon.Addon(addonid)
@@ -219,14 +219,16 @@ class APF_STORE(object):
 			self.cache = apt.Cache()
 			self.cache.open()
 
+			for pkg in self.cache:
+
+				log(pkg.shortname)
+
 
 			thread_queue = Queue.Queue()
 
 			for ident, apf in self.apf_dict.iteritems():
 
-				if apf.retrieve_icon:
-
-					thread_queue.put(apf)
+				thread_queue.put(apf)
 
 			# spawn some workers
 			# for i in range(1):
@@ -260,12 +262,15 @@ class APF_STORE(object):
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
 				q_item = thread_queue.get(True, 1)
 				
-				thread_queue.task_done()
 
-				# download the icon and save it in USERART
+				# check the install status of this package
 				pkg = self.cache[q_item.id]
 
+				log('package = %s' % pkg.shortname)
+
 				if pkg.is_installed:
+
+					log('%s IS Installed' % pkg.shortname)
 
 					q_item.set_installed(True)
 
@@ -273,9 +278,21 @@ class APF_STORE(object):
 
 					__addon__.setSetting('install_status_cache', tmp)
 
+				else:
+
+					log('%s is NOT Installed' % pkg.shortname)
+				
+				thread_queue.task_done()
+
 			except Queue.Empty:
 
 				log('Queue.Empty error')
+
+				break
+
+			except Exception as e:
+
+				log(traceback.format_exc())
 
 				break
 
