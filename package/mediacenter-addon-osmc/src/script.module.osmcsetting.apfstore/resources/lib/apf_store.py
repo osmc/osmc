@@ -219,9 +219,9 @@ class APF_STORE(object):
 			self.cache = apt.Cache()
 			self.cache.open()
 
-			for pkg in self.cache:
+			# for pkg in self.cache:
 
-				log(pkg.shortname)
+			# 	log(pkg.shortname)
 
 
 			thread_queue = Queue.Queue()
