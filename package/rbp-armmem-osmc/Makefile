@@ -1,7 +1,7 @@
 all:
 	echo "Usage: make rbp1"
 
-rbp:
+rbp1:
 	sudo bash build.sh rbp1
 
 clean:
