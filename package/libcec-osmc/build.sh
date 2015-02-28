@@ -29,7 +29,7 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	./bootstrap
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib; fi
-	if [ "$1" == "i386" ]; then ./configure --prefix=/usr
+	if [ "$1" == "i386" ]; then ./configure --prefix=/usr; fi
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
