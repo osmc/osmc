@@ -71,7 +71,6 @@ gui_ids = { \
     10219: 'Wireless - Reset',
     10300: 'Bluetooth - Refresh',
     10301: 'Bluetooth - Toggle Bluetooth Adapter',
-    10302: 'Bluetooth - Toggle Bluetooth Service',
     10303: 'Bluetooth - Toggle Discovery',
     5000: 'WiFi panel',
     6000: 'Bluetooth paired devices panel',
@@ -91,10 +90,9 @@ heading_controls = [
 
 panel_controls = [1010, 1020, 1030]
 
+BLUETOOTH_CONTROLS = [10300, 10301, 10303, 6000, 7000]
 
-BLUETOOTH_CONTROLS = [10300, 10301, 10302, 10303, 6000, 7000]
-
-BLUETOOTH_SERVICE_BUTTON = 10302
+BLUETOOTH_ENABLE_TOGGLE = 10301
 
 ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10117, 10118, 10119, 10120, 910112, 910113, 910114,
                       910115, 910116]
@@ -688,17 +686,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_controls(False, BLUETOOTH_CONTROLS)
             return
         else:
-            # disable all but the enable service button
-            if not self.is_bluetooth_running():
+            if not osmc_bluetooth.is_bluetooth_enabled():
                 controls_to_disable = list(BLUETOOTH_CONTROLS)
-                controls_to_disable.remove(BLUETOOTH_SERVICE_BUTTON)
+                controls_to_disable.remove(BLUETOOTH_ENABLE_TOGGLE)
                 self.toggle_controls(False, controls_to_disable)
                 return
 
-        adapterRadioButton = self.getControl(10301)
-        adapterRadioButton.setSelected(osmc_bluetooth.is_bluetooth_enabled())
-        serviceRadioButton = self.getControl(10302)
-        serviceRadioButton.setSelected(self.is_bluetooth_running())
+        bluetoothRadioButton = self.getControl(10301)
+        bluetoothRadioButton.setSelected(osmc_bluetooth.is_bluetooth_enabled())
         discoveryRadioButton = self.getControl(10303)
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
 
@@ -725,11 +720,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def handle_bluetooth_selection(self, control_id):
         # 10300 - No Action Here - Refresh - populate_bluetooth_panel() will be called by calling code
-        if control_id == 10301:  # Enable Adapter
+        if control_id == 10301:  # Enable Bluetooth
             osmc_bluetooth.toggle_bluetooth_state(not osmc_bluetooth.is_bluetooth_enabled())
-
-        if control_id == 10302:  # Enable Service
-            self.toggle_bluetooth_service(not self.is_bluetooth_running())
 
         if control_id == 10303:  # Discovery
             if not osmc_bluetooth.is_discovering():
@@ -801,32 +793,3 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         return metric
 
-        # NOTE - Maybe this should come out into a new module so we use the same code for
-        # Services addon and Bluetooth?
-
-
-    def is_bluetooth_running(self):
-        p = subprocess.call(['sudo', '/bin/systemctl', 'is-enabled', 'bluetooth.service'])
-        if p == 0:
-            enabled = True
-        else:
-            enabled = False
-        p = subprocess.call(['sudo', '/bin/systemctl', 'is-active', 'bluetooth.service'])
-        if p == 0:
-            active = True
-        else:
-            active = False
-        return enabled and active
-
-
-    def toggle_bluetooth_service(self, enable):
-        message = ''
-        if enable:
-            subprocess.call(['sudo', '/bin/systemctl', 'enable', 'bluetooth.service'])
-            subprocess.call(['sudo', '/bin/systemctl', 'start', 'bluetooth.service'])
-            message = 'Bluetooth Service Enabled'
-        else:
-            subprocess.call(['sudo', '/bin/systemctl', 'disable', 'bluetooth.service'])
-            subprocess.call(['sudo', '/bin/systemctl', 'stop', 'bluetooth.service'])
-            message = 'Bluetooth Service Disabled'
-        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('Bluetoooth', message, "2500"))

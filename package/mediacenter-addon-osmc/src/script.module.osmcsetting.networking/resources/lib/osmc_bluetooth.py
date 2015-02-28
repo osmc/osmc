@@ -1,5 +1,6 @@
 import connman
 import bluetooth
+import systemd
 import subprocess
 import sys
 import pexpect
@@ -20,6 +21,8 @@ except:
 DEVICE_PATH = 'org.bluez.Device1' 
 PAIRING_AGENT = 'osmc_bluetooth_agent.py'
 
+BLUETOOTH_SERVICE = 'bluetooth.service'
+
 PEXPECT_SOL = 'SOL@'
 PEXPECT_EOL = '@EOL'
 
@@ -35,12 +38,13 @@ def is_bluetooth_available():
 
 
 def is_bluetooth_enabled():
-    return connman.is_technology_enabled('bluetooth')
-
+    connman_status = connman.is_technology_enabled('bluetooth')
+    service_status = systemd.is_service_running(BLUETOOTH_SERVICE)
+    return connman_status and service_status
 
 def toggle_bluetooth_state(state):
     connman.toggle_technology_state('bluetooth', state)
-
+    systemd.toggle_service('bluetooth.service', state)
 
 def get_adapter_property(key):
     return bluetooth.get_adapter_property(key)
