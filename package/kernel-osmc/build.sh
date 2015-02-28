@@ -20,6 +20,7 @@ then
 	update_sources
 	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
+	handle_dep "cpio"
 	if [ "$1" != "rbp1" ] && [ "$1" != "rbp2" ]
 	then
 		handle_dep "device-tree-compiler"
