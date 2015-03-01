@@ -21,6 +21,7 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "libltdl-dev"
+	handle_dep "automake"
 	echo "Package: ${1}-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libshairplay-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*
 	./autogen.sh
