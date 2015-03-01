@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/b5dbdb57db04a8628c78fecfa7002eac04820797.tar.gz" "$(pwd)/kodi"
 else
@@ -99,13 +99,13 @@ then
 	handle_dep "libltdl-dev"
 	handle_dep "cmake"
 	handle_dep "libgnutls28-dev"
-	if [ "$1" == "rbp" ] || [ "$1" == "rbp2" ]
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
 	fi
-	if [ "$1" == "rbp" ]
+	if [ "$1" == "rbp1" ]
 	then
-		handle_dep "rbp-libcec-dev-osmc"
+		handle_dep "rbp1-libcec-dev-osmc"
 		handle_dep "armv6l-libshairplay-dev-osmc"
 		handle_dep "armv6l-librtmp-dev-osmc"
 		handle_dep "armv6l-libnfs-dev-osmc"
