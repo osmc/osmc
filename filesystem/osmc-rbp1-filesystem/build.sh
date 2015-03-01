@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-filestub="osmc-rbp-filesystem"
+filestub="osmc-rbp1-filesystem"
 
 check_platform
 verify_action
@@ -58,7 +58,6 @@ deb http://apt.osmc.tv jessie main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="rbp-bootloader-osmc rbp-splash-osmc rbp-armmem-osmc rbp-userland-osmc rbp-remote-osmc fake-hwclock"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
 verify_action
@@ -66,13 +65,10 @@ echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
 echo -e "Installing core packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+# We have to set up userland first for kernel postinst rules
+chroot ${DIR} apt-get -y install --no-install-recommends rbp-userland-osmc
 verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
-verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends rbp-mediacenter-osmc
-verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends rbp-kernel-osmc # This is separate because LOCAL_CHROOT_PKGS do not explicitly depend on this, but if we install it all in one line, the postinst rules of userland will not get to take effect
+chroot ${DIR} apt-get -y install --no-install-recommends rbp1-device-osmc
 verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"

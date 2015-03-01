@@ -5,9 +5,6 @@
 
 . ../../scripts/common.sh
 
-SYSTEM_PKGS="base-files-osmc perftune-osmc sysctl-osmc ftr-osmc diskmount-osmc apt-utils ssh-app-osmc sudo module-init-tools network-osmc locales dialog nano"
-CHROOT_PKGS="${SYSTEM_PKGS}"
-
 function setup_osmc_user()
 {
 	# Sets user and password to 'osmc'
@@ -88,8 +85,6 @@ function setup_busybox_links()
 	chroot ${1} ln -s /bin/busybox /bin/wget
 	chroot ${1} ln -s /bin/busybox /bin/unzip
 }
-
-export CHROOT_PKGS
 
 export -f setup_osmc_user
 export -f setup_hostname
