@@ -8,7 +8,7 @@ armv7:
 	sudo bash build.sh "armv7"
 
 i386:
-	sudo bash build.sh "gen"
+	sudo bash build.sh "i386"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
