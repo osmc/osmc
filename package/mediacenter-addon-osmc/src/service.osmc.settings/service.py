@@ -119,28 +119,30 @@ class Main(object):
 
 				log('New Skin: %s' % self.skindir)
 
-				try:
-					resp = ubiquifonts.import_osmc_fonts()
+				if 'osmc' not in self.skindir.lower():
 
-					log('Ubiquifonts result: %s' % resp)
+					try:
+						resp = ubiquifonts.import_osmc_fonts()
 
-					if resp == 'reload_please':
+						log('Ubiquifonts result: %s' % resp)
 
-						while True:
+						if resp == 'reload_please':
 
-							xbmc.sleep(1000)
+							while True:
 
-							xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
+								xbmc.sleep(1000)
 
-							if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
+								xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
 
-								xbmc.executebuiltin('ReloadSkin()')
-								
-								break
-				
-				except Exception as e:
+								if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
 
-					log(traceback.format_exc())
+									xbmc.executebuiltin('ReloadSkin()')
+									
+									break
+					
+					except Exception as e:
+
+						log(traceback.format_exc())
 
 				try:
 					log('skin changed, reloading gui')
