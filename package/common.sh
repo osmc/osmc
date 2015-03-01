@@ -122,8 +122,19 @@ function publish_applications_targeted()
 {
 	# Used by applications that are architecture dependent. 
 	echo -e "Publishing application for platform ${TARGET}"
-	cp ${1}/app.json ${1}/${2}-${3}.json
-	sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${2}-${3}.json # set the correct package id
+	# This is a tad hacky. Architecture specific, platform independent
+	if [ "$2" == "armv6l" ]; then devices="rbp1"; fi
+	if [ "$2" == "armv7" ]; then devices="rbp2"; fi
+	if [ "$2" == "i386" ]; then devices="atv"; fi
+	# Architecture specific, platform specific
+	if [ "$2" == "rbp1"; then devices="rbp1"; fi
+	if [ "$2" == "rbp2"; then devices="rbp2"; fi
+	if [ "$2" == "atv1"; then devices="atv1"; fi
+	for device in $devices
+	do
+	    cp ${1}/app.json ${1}/${device}-${3}.json
+	    sed -e s/\"id\":\ \"/\"id\":\ \"${device}-/ -i ${device}-${3}.json # set the correct package id
+	done
 }
 
 export -f fix_arch_ctl
