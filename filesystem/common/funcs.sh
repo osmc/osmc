@@ -23,8 +23,8 @@ function setup_osmc_user()
 	# Default storage directories
 	for dir in "Pictures Music Movies TV\ Shows"
 	do
-	mkdir -p ${1}/home/osmc/$dir
-	chown osmc:osmc ${1}/home/osmc/$dir
+	mkdir -p ${1}/home/osmc/${dir}
+	chroot ${1} chown osmc:osmc /home/osmc/${dir}
 	done
 }
 
