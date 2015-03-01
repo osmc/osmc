@@ -14,7 +14,7 @@ then
 	fix_arch_ctl "files/DEBIAN/control"
 	pushd files
 	test "$1" == rbp1 && install_patch "../patches" "rbp1"
-	test "$1" == rbp2 && install_patch "../patches" "rbp1"
+	test "$1" == rbp2 && install_patch "../patches" "rbp2"
 	test "$1" == atv && install_patch "../patches" "atv"
 	popd
 	dpkg -b files/ ftr-osmc.deb
