@@ -10,9 +10,9 @@
 -			         ((previous->repeat_count == 3) && (time_delta <  200000)) ||
 -			         ((previous->repeat_count == 4) && (time_delta <  150000)) ||
 -			         ((previous->repeat_count >= 5) && (time_delta <  100000))) {
-+			     if (((previous->repeat_count == 0) && (time_delta <  700000)) ||
++			     if (((previous->repeat_count == 0) && (time_delta <  250000)) ||
 +			         ((previous->repeat_count >= 1) && (previous->repeat_count < 15) && (time_delta <  180000)) ||
-+			         ((previous->repeat_count >= 15) && (time_delta <  30000))) {
++			         ((previous->repeat_count >= 15) && (time_delta <  35000))) {
  				     memset(&(device->current.event_out), 0, sizeof(struct input_event));
  				     device->current.event_out.type = EVENTLIRCD_EV_NULL;
  				     device->current.repeat_count = 0;
