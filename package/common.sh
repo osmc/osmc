@@ -109,7 +109,7 @@ function handle_dep()
 function publish_applications_any()
 {
 	# Used by applications that are architecture independent. These are usually metapackages with some configuration files shipped.
-	PKG_TARGETS="rbp1 rbp2"
+	PKG_TARGETS="rbp1 rbp2 atv"
 	for TARGET in $PKG_TARGETS
 	do
 		echo -e "Publishing application for platform ${TARGET}"
