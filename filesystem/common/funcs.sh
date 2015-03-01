@@ -16,7 +16,8 @@ function setup_osmc_user()
 	# Adds 'osmc' to sudoers with no password prompt
 	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc-no-sudo-password
 	echo "Defaults        !secure_path" >${1}/etc/sudoers.d/osmc-no-secure-path
-	chmod 0440 ${1}/etc/sudoers.d/osmc
+	chmod 0440 ${1}/etc/sudoers.d/osmc-no-sudo-password
+	chmod 0440 ${1}/etc/sudoers.d/osmc-no-secure-path
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
 	# Default storage directories
