@@ -22,7 +22,6 @@ then
 	handle_dep "libtool"
 	echo "Package: ${1}-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libshairplay-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libshairplay-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*
-	install_patch "../../patches" "all"
 	./autogen.sh
 	./configure --prefix=/usr
 	$BUILD
