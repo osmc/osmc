@@ -50,7 +50,12 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-free
+echo "deb http://ftp.debian.org/debian jessie main contrib non-free
+
+deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
+
+deb http://security.debian.org/ jessie/updates main contrib non-free
+
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
