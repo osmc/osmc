@@ -30,6 +30,7 @@ import Queue
 import os
 import threading
 import datetime
+import traceback
 
 # XBMC modules
 import xbmc
@@ -41,6 +42,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('
 import walkthru
 import settings
 import comms
+import ubiquifonts
 
 
 __addon__        = xbmcaddon.Addon()
@@ -104,17 +106,41 @@ class Main(object):
 
 			__addon__.setSetting('firstrun', 'false')
 
-
-
 		while True:
-
 
 			# Check the current skin directory, if it is different to the previous one, then 
 			# recreate the gui. This is required because reference in the gui left in memory
 			# do not survive a refresh of the skins textures (???)
 			if self.skindir != xbmc.getSkinDir():
 
+				log('Old Skin: %s' % self.skindir)
+
 				self.skindir = xbmc.getSkinDir()
+
+				log('New Skin: %s' % self.skindir)
+
+				try:
+					resp = ubiquifonts.import_osmc_fonts()
+
+					log('Ubiquifonts result: %s' % resp)
+
+					if resp == 'reload_please':
+
+						while True:
+
+							xbmc.sleep(1000)
+
+							xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
+
+							if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
+
+								xbmc.executebuiltin('ReloadSkin()')
+								
+								break
+				
+				except Exception as e:
+
+					log(traceback.format_exc())
 
 				try:
 					log('skin changed, reloading gui')
@@ -123,7 +149,6 @@ class Main(object):
 					pass
 
 				self.create_gui()
-
 			
 			# if xbmc is aborting
 			if self.monitor.waitForAbort(1):
