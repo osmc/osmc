@@ -34,6 +34,14 @@
             <height>1</height>
             <label/>
         </control>
+        <control id="96000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
         <!-- Background -->
         <control type="image">
             <left>0</left>
@@ -105,6 +113,21 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>40010</onright>
+            </control>  
+            <!-- Networking -->
+            <control id="1006" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Networking</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>60010</onright>
             </control>       
             <!-- Exit -->
             <control id="1005" type="button">
@@ -119,13 +142,13 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <onright>noop</onright>
+                <onright>5000</onright>
             </control>
         </control>
         <!-- Language sub menu -->
         <control id="2000" type="grouplist">
             <left>480</left>
-            <top>244</top>
+            <top>185</top>
             <width>1050</width>
             <height>726</height>
             <itemgap>34</itemgap>
@@ -136,7 +159,7 @@
             <orientation>vertical</orientation>
             <control id="20010" type="wraplist">
                 <left>480</left>
-                <top>200</top>
+                <!-- <top>200</top> -->
                 <width>1050</width>
                 <height>726</height>
                 <onup>20010</onup>
@@ -229,12 +252,52 @@
             </control>
         </control>
 
+        <!-- Networking -->
+        <control id="6000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>400</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(96000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control id="60010" type="button">
+                <width>1000</width>
+                <height>42</height>
+                <label>Click here to open Networking options</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="60090" type="button">
+                <width>1000</width>
+                <height>42</height>
+                <label>skip</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
 
         <!-- Newsletter & Exit sub menu -->
         <control id="5000" type="grouplist">
             <left>480</left>
             <top>244</top>
-            <width>400</width>
+            <width>1400</width>
             <height>726</height>
             <itemgap>34</itemgap>
             <onleft>1000</onleft>
@@ -244,7 +307,7 @@
             <ondown>noop</ondown>
             <orientation>vertical</orientation>
             <control id="50001" type="button">
-                <width>1000</width>
+                <width>1400</width>
                 <height>42</height>
                 <label>Click here to sign up to the OSMC newsletter</label>
                 <font>osmc_addon_OLD_Font42</font>

@@ -7,6 +7,7 @@ import xbmcaddon
 import os
 import sys
 import requests
+from threading import Thread
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
@@ -19,9 +20,45 @@ def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 
+class Networking_caller(Thread):
+	def __init__(self, parent):
+		super(Networking_caller, self).__init__()
+		self.daemon = True
+		self.cancelled = False
+		self.parent = parent
+		# instantiate Barkers interface class
+		# self.networking_interface = NETWORKING.Barkersinterface()
+
+	def run(self):
+		"""Calls Barkers method to check for internet connection"""
+
+		# while not self.cancelled:
+
+		# 	self.check_status()
+		# 	xbmc.sleep(1000)
+
+	def check_status(self):
+		''' Checks the status of the internet connection '''
+		pass
+		# self.parent.internet_connected = self.networking_interface.check_internet()
+
+	def cancel(self):
+		''' Shut it down. '''
+		self.cancelled = True
+
+
+
+
+
 class walkthru_gui(xbmcgui.WindowXMLDialog):
 
-	def __init__(self, strXMLname, strFallbackPath, strDefaultName):
+	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance):
+
+		# switch that identifies whether the internet is connected
+		self.internet_connected = False
+
+		#start a new thread that begins checking for an internet connection
+		self.net_call = networking_instance
 
 		# edit the timezone in /etc/timezone
 		self.timezones = timezones.get_timezones()
@@ -55,7 +92,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global EULA
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1004, 1005]:
+		for hide_this in [1003, 1004, 1005, 1006]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -73,7 +110,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
-		for visibility_control in [93000,94000,95000]:
+		for visibility_control in [93000,94000,95000, 96000]:
 
 			self.getControl(visibility_control).setVisible(False)
 
@@ -96,6 +133,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 	def onClick(self, controlID):
 
 		if controlID == 1005:
+			# Exit control
 
 			if self.selected_language != None:
 
@@ -124,6 +162,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.close()
 
 		elif controlID == 20010:
+			# language container
 
 			self.selected_language = self.getControl(controlID).getSelectedItem().getLabel()
 
@@ -133,6 +172,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.setFocusId(1003)
 
 		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]:
+			# timezone containers
 
 			# user has clicked on a timezone
 			self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
@@ -143,31 +183,62 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.setFocusId(1004)
 
 		elif controlID == 40010:
+			# terms and conditions I Agree button
 
-			self.getControl(94000).setVisible(False)
-			self.getControl(95000).setVisible(True)
-			self.getControl(1005).setVisible(True)
-			self.setFocusId(1005)
+			# check if internet is connected
+			if self.internet_connected:
+				# skip the Networking setup menu item
+				self.getControl(94000).setVisible(False)
+				self.getControl(95000).setVisible(True)
+				self.getControl(1005).setVisible(True)
+				self.setFocusId(1005)
+			else:
+				# display the Networking panel
+				self.getControl(94000).setVisible(False)
+				self.getControl(96000).setVisible(True)
+				self.getControl(1006).setVisible(True)
+				self.setFocusId(1006)				
+
 
 		elif controlID == 40020:
+			# unused scroll bar for TandC
 
 			self.getControl(555).scroll(10)
 
 		elif controlID == 40030:
+			#unused scroll bar for TandC
 
 			self.getControl(555).scroll(-10)
 
 		elif controlID == 50001:
-
-			# sign up for newsletter
+			# sign up for newsletter button
 
 			# show keyboard
 			kb = xbmc.Keyboard(self.email, 'Please enter your email')
 			kb.doModal()
 			if kb.isConfirmed():
 				self.email = kb.getText()
-				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': email})
+				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
 				self.setFocusId(1005)
+
+		elif controlID == 60090:
+			# skip networking button
+
+			# display the Exit panel
+			self.getControl(96000).setVisible(False)
+			self.getControl(95000).setVisible(True)
+			self.getControl(1005).setVisible(True)
+			self.setFocusId(1005)	
+
+		elif controlID == 60010:
+			# open networking gui
+			self.net_call.open_settings_window()
+
+			# display the Exit panel
+			self.getControl(96000).setVisible(False)
+			self.getControl(95000).setVisible(True)
+			self.getControl(1005).setVisible(True)
+			self.setFocusId(1005)	
 
 	# def onAction(self, action):
 
@@ -182,7 +253,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def onFocus(self, controlID):
 
-		main_controls = [1002, 1003, 1004]
+		main_controls = [1002, 1003, 1004, 1005, 1006]
 
 		tz_controls = [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 
@@ -219,13 +290,13 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 
 
-def open_gui():
+def open_gui(networking_instance):
 
 	__addon__        = xbmcaddon.Addon()
 	scriptPath       = __addon__.getAddonInfo('path')
 	xmlfile = 'walkthru.xml'
 
-	GUI = walkthru_gui(xmlfile, scriptPath, 'Default')
+	GUI = walkthru_gui(xmlfile, scriptPath, 'Default', networking_instance=networking_instance)
 
 	GUI.doModal()
 

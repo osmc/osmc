@@ -102,9 +102,19 @@ class Main(object):
 
 		if __setting__('firstrun') == 'true':
 
-			walkthru.open_gui()
+			for module in self.stored_gui.live_modules:
+				if 'id' in module:
+					if module['id'] == "script.module.osmcsetting.networking":
+						networking_instance = module['SET']
 
-			__addon__.setSetting('firstrun', 'false')
+						walkthru.open_gui(networking_instance)
+
+						__addon__.setSetting('firstrun', 'false')
+						
+						break
+			
+			else:
+				log('Networking module not found')
 
 		while True:
 
@@ -191,7 +201,18 @@ class Main(object):
 
 				elif response == 'walkthru':
 
-					walkthru.open_gui()
+					for module in self.stored_gui.live_modules:
+						if 'id' in module:
+							log(module['id'])
+							if module['id'] == "script.module.osmcsetting.networking":
+								networking_instance = module['SET']
+
+								walkthru.open_gui(networking_instance)
+
+								break
+			
+					else:
+						log('Networking module not found')
 
 				elif 'new_device:' in response:
 
