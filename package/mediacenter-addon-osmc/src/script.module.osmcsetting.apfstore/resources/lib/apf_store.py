@@ -14,10 +14,12 @@ import Queue
 import shutil
 import apt
 import traceback
+import datetime as dt
 
 addonid 	= "script.module.osmcsetting.apfstore"
 __addon__  	= xbmcaddon.Addon(addonid)
 __path__ 	= xbmc.translatePath(xbmcaddon.Addon(addonid).getAddonInfo('path'))
+__setting__ = __addon__.getSetting
 
 # Custom module path
 sys.path.append(os.path.join(__path__, 'resources','lib'))
@@ -69,25 +71,23 @@ class APF_STORE(object):
 
 	def __init__(self):
 
+		self.CACHETIMEOUT = 6
+
+		self.TIME_STRING_PATTERN = '%Y/%m/%d %H:%M:%S'
+
 		self.touch_addon_data_folder()
 
-		self.install_status_cache = {x.split('=')[0] : x.split('=')[1] for x in __addon__.getSetting('install_status_cache').split(':_:') if '=' in x}
+		self.install_status_cache 	= {x.split('=')[0] : x.split('=')[1] for x in __setting__('install_status_cache').split(':_:') if '=' in x}
 
-		json_req = self.get_list_from_sam()
+		json_data = self.get_apf_data()
 
-		if json_req == 'failed':
+		if json_data == 'failed':
 
-			log('Failed to retrieve osmcdev= from /proc/cmdline')
-
-			return
-
-		elif not json_req:
-
-			log('Failed to retrieve data from %s' % self.URL)
+			log('Failed to retrieve JSON apf data')
 
 			return
 
-		self.apf_dict = self.generate_apf_dict(json_req)
+		self.apf_dict = self.generate_apf_dict(json_data)
 
 		self.apf_GUI = self.create_apf_store_gui(self.apf_dict)
 
@@ -98,6 +98,88 @@ class APF_STORE(object):
 		self.apf_GUI.doModal()
 
 
+	def get_apf_data(self):
+
+		self.use_cache = self.check_lastupdated()
+
+		if self.use_cache == True:
+
+			cache = self.read_jsoncache()
+
+			if cache == 'failed':
+
+				return self.get_remote_json()
+
+			else:
+
+				return cache
+
+
+		else:
+
+			return self.get_remote_json()
+
+
+	def get_remote_json(self):
+
+		json_req = self.get_list_from_sam()
+
+		if json_req == 'failed':
+
+			log('Failed to retrieve osmcdev= from /proc/cmdline')
+
+			return 'failed'
+
+		elif not json_req:
+
+			log('Failed to retrieve data from %s' % self.URL)
+
+			return 'failed'
+
+		else:
+
+			return json_req
+
+
+	def read_jsoncache(self):
+
+		self.json_cache = __setting__('json_cache')
+
+		if self.json_cache == 'empty': return 'failed'
+
+		try:
+
+			return json.loads(self.json_cache)
+
+		except:
+
+			return 'failed'
+
+
+	def check_lastupdated(self):
+
+		current_time = self.get_current_time()
+
+		if current_time == 'failed': return False
+
+		self.json_lastupdated_record = __setting__('json_lastupdated')
+
+		if self.json_lastupdated_record == 'never': return False
+
+		try:
+			date_object = dt.strptime(self.json_lastupdated_record, self.TIME_STRING_PATTERN)
+		except:
+			return False
+
+		trigger = date_object + dt.timedelta(hours=self.CACHETIMEOUT)
+
+		if trigger > current_time:
+			log('JSON Cache is fresh')
+			return True
+
+		return False
+
+
 	@clog(logger=log, maxlength=10000)
 	def generate_apf_dict(self, json_req):
 
@@ -106,6 +188,22 @@ class APF_STORE(object):
 		obj_list = [APF_obj() for x in apf_list if x['id']]
 
 		return { x['id']: obj_list[i-1].populate(x) for i, x in enumerate(apf_list) if x['id'] }
+
+
+	def get_current_time(self):
+
+		# this method is necessary as datetime.now() has issues with the GIL and throws an error at random
+
+		for x in range(50):
+
+			try:
+				return dt.datetime.now()
+			except:
+				pass
+
+		else:
+			log('retrieving current time failed')
+			return 'failed'
 
 
 	@clog(logger=log)
@@ -143,12 +241,19 @@ class APF_STORE(object):
 
 			self.URL = 'http://download.osmc.tv/apps/rbp'
 			
-
 		r = requests.get(self.URL.replace('\n','').replace('\t','').replace('\n',''))
 
 		try:
 
 			q = r.json()
+
+			__addon__.setSetting('json_cache', json.dumps(q))
+
+			current_time = self.get_current_time()
+
+			if current_time != 'failed':
+
+				__addon__.setSetting('json_lastupdated', current_time.strftime(self.TIME_STRING_PATTERN))
 
 			return q
 			
@@ -157,7 +262,6 @@ class APF_STORE(object):
 			log('JSON couldnt be read: %s' % r.text)
 
 			return 'failed'
-
 
 
 	@clog(logger=log)
