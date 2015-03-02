@@ -1,4 +1,12 @@
 SMB (Samba) Shares
+<h2>Issues connecting</h2>
 <p>
 Sometimes you may have difficulties in connecting to these shares. This is usually due to issues with DNS resolution. If possible, use the IP address of the server you are connecting to, rather than the hostname. This will stop OSMC having to resolve the device name to an IP address each time and will be more reliable as well as faster.
+</p>
+<h2>Issues authenticating</h2>
+<p>
+It may seem you are entering the correct username and password but you are still being prompted for the username and password and cannot connect to the share. On Windows systems, it is important you specify the domain of the system in the username. This is often the computer name itself. For example if your computer name was sam-study and your username is sam, then you should enter the following in the username dialog:
+<pre>\\sam-study\sam</pre>
+</br>
+Please note that this is case sensitive
 </p>
