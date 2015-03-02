@@ -1,11 +1,9 @@
-diff --git a/configs/osmc_rbp_defconfig b/configs/osmc_rbp_defconfig
-new file mode 100644
-index 0000000..d7f466e
---- /dev/null
-+++ b/configs/osmc_rbp_defconfig
-@@ -0,0 +1,26 @@
+--- /dev/null	2015-02-12 22:04:46.048007676 +0000
++++ a/configs/osmc_defconfig	2015-02-13 00:34:25.758259466 +0000
+@@ -0,0 +1,27 @@
 +BR2_arm=y
-+BR2_arm1176jzf_s=y
++BR2_cortex_a7=y
++BR2_ARM_FPU_VFPV2=y
 +BR2_CCACHE=y
 +BR2_TOOLCHAIN_BUILDROOT_VENDOR="osmc"
 +BR2_KERNEL_HEADERS_3_12=y
@@ -30,4 +28,3 @@ index 0000000..d7f466e
 +BR2_TARGET_ROOTFS_CPIO_GZIP=y
 +BR2_TARGET_ROOTFS_INITRAMFS=y
 +# BR2_TARGET_ROOTFS_TAR is not set
-
