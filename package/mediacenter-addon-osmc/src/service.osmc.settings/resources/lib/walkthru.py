@@ -6,6 +6,7 @@ import xbmcaddon
 # STANDARD library modules
 import os
 import sys
+import requests
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
@@ -13,7 +14,6 @@ import timezones
 import LICENSE
 
 EULA = LICENSE.license
-
 
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
@@ -25,6 +25,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# edit the timezone in /etc/timezone
 		self.timezones = timezones.get_timezones()
+
+		# newsletter email address
+		self.email = ''
 
 		# get the languages
 		self.languages = [folder for folder in os.listdir('/usr/share/kodi/language/')]
@@ -154,6 +157,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			self.getControl(555).scroll(-10)
 
+		elif controlID == 50001:
+
+			# sign up for newsletter
+
+			# show keyboard
+			kb = xbmc.Keyboard(self.email, 'Please enter your email')
+			kb.doModal()
+			if kb.isConfirmed():
+				self.email = kb.getText()
+				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': email})
+				self.setFocusId(1005)
 
 	# def onAction(self, action):
 
@@ -201,6 +215,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				else:
 
 					ctl.setVisible(False)
+
+	def signup(self):
+
+
 
 
 def open_gui():

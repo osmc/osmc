@@ -105,7 +105,7 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>40010</onright>
-            </control>
+            </control>       
             <!-- Exit -->
             <control id="1005" type="button">
                 <width>300</width>
@@ -228,6 +228,37 @@
                 <onright>noop</onright>
             </control>
         </control>
+
+
+        <!-- Newsletter & Exit sub menu -->
+        <control id="5000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>400</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(95000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control id="50001" type="button">
+                <width>1000</width>
+                <height>42</height>
+                <label>Click here to sign up to the OSMC newsletter</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
+
+
         <!-- Timezone sub menu -->
         <control id="3000" type="grouplist">
             <left>480</left>
