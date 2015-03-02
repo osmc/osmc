@@ -40,7 +40,7 @@
 				<top>500</top>
 				<width>1018</width>
 				<height>90</height>
-				<font>font13</font>
+				<font>osmc_addon_font13</font>
 				<label>$INFO[ListItem.Icon]</label>
 				<textcolor>66ffffff</textcolor>
 			</control>
@@ -68,8 +68,8 @@
 						<top>0</top>
 						<width>1018</width>
 						<height>90</height>
-						<font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -80,12 +80,12 @@
 						<top>0</top>
 						<width>1018</width>
 						<height>180</height>
-						<font>OLD_Font72</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font72</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>ffffffff</textcolor>
 						<shadowcolor>44000000</shadowcolor>
-						<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+						<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						<visible>IsEmpty(ListItem.Label2)</visible>
 					</control>
 					<control type="group">
@@ -95,25 +95,25 @@
 							<top>43</top>
 							<width>1018</width>
 							<height>48</height>
-							<font>OLD_Font48</font>
-							<!-- <font>font13</font> -->
+							<font>osmc_addon_OLD_Font48</font>
+							<!-- <font>osmc_addon_font13</font>-->
 							<label>$INFO[ListItem.Label]</label>
 							<textcolor>ffffffff</textcolor>
 							<shadowcolor>44000000</shadowcolor>
-							<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+							<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						</control>
 						<control type="label">
 							<left>32</left>
 							<top>100</top>
 							<width>1018</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<!-- <font>font13</font> -->
+							<font>osmc_addon_OLD_Font27</font>
+							<!-- <font>osmc_addon_font13</font>-->
 							<label>$INFO[ListItem.Label2]</label>
 							<!-- <textcolor>66ffffff</textcolor>-->
 							<textcolor>88f0f0f0</textcolor>
 							<shadowcolor>44000000</shadowcolor>
-							<animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>
+							<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						</control>
 					</control>
 				</focusedlayout>
@@ -154,17 +154,23 @@
 					<width>231</width>
 					<height>44</height>
 					<label>Commit</label>
-					<font>OLD_Font33</font>
+					<font>osmc_addon_OLD_Font33</font>
 					<!-- <visible>False</visible>-->
+					<texturefocus>TextShade.png</texturefocus>
+					<texturenofocus>single_pixel.png</texturenofocus>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<textcolor>66ffffff</textcolor>
+					<align>center</align>
 				</control>
 				<!-- install count -->
 				<control id="61" type="label">
 					<width>231</width>
 					<height>44</height>
+					<align>center</align>
 					<label>Install Item Count</label>
 					<!-- <visible>False</visible>-->
-					<font>OLD_Font33</font>
-					<!-- <font>font13</font> -->
+					<font>osmc_addon_OLD_Font33</font>
+					<!-- <font>osmc_addon_font13</font>-->
 					<textcolor>66ffffff</textcolor>
 				</control>
 				<!-- remove count -->
@@ -173,16 +179,22 @@
 					<height>44</height>
 					<label>Remove Item Count</label>
 					<!-- <visible>False</visible>-->
-					<font>OLD_Font33</font>
-					<!-- <font>font13</font> -->
+					<font>osmc_addon_OLD_Font33</font>
+					<!-- <font>osmc_addon_font13</font>-->
 					<textcolor>66ffffff</textcolor>
+					<align>center</align>
 				</control>
 				<!-- Exit button -->
 				<control id="7" type="button">
 					<width>231</width>
 					<height>44</height>
 					<label>Exit</label>
-					<font>OLD_Font33</font>
+					<font>osmc_addon_OLD_Font33</font>
+					<texturefocus>TextShade.png</texturefocus>
+					<texturenofocus>single_pixel.png</texturenofocus>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<textcolor>66ffffff</textcolor>
+					<align>center</align>
 				</control>
 			</control>
 		</control>

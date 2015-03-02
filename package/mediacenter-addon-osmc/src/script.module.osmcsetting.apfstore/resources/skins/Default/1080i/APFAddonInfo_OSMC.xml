@@ -25,8 +25,8 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			 <font>OLD_Font72</font>
-			<!-- <font>font13</font> -->
+			<font>osmc_addon_OLD_Font72</font>
+			<!-- <font>osmc_addon_font13</font>-->
 			<textcolor>ffffffff</textcolor>
 			<label>APF Information</label>
 		</control>
@@ -36,8 +36,8 @@
 			<top>235</top>
 			<width>430</width>
 			<height>36</height>
-			 <font>OLD_Font36</font>
-			<!-- <font>font13</font> -->
+			<font>osmc_addon_OLD_Font36</font>
+			<!-- <font>osmc_addon_font13</font>-->
 			<textcolor>ffffffff</textcolor>
 			<label>[B]Name[/B]</label>
 		</control>
@@ -71,8 +71,8 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Last Updated</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -80,8 +80,8 @@
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>lastupdated</label>
 						<textcolor>ffffffff</textcolor>
 					</control>
@@ -94,17 +94,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Maintainer</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
-					<control type="label" id="50004">
+					<control id="50004" type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Maintainer</label>
 						<textcolor>ffffffff</textcolor>
 					</control>
@@ -117,8 +117,8 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Version</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -126,14 +126,14 @@
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Version</label>
 						<textcolor>ffffffff</textcolor>
 					</control>
 				</control>
 				<!-- Rating -->
-				<!--control type="group"><height>36</height><width>1170</width><visible>!IsEmpty(ListItem.Property(Addon.Rating))</visible><control type="label"><width>200</width><height>36</height><align>right</align><font>OLD_Font36</font><label>563</label><textcolor>66ffffff</textcolor></control><control type="label"><left>220</left><width>950</width><height>36</height><font>OLD_Font36</font><label fallback="416">$INFO[ListItem.Property(Addon.Rating)]</label><textcolor>ffffffff</textcolor></control></control-->
+				<!--control type="group"><height>36</height><width>1170</width><visible>!IsEmpty(ListItem.Property(Addon.Rating))</visible><control type="label"><width>200</width><height>36</height><align>right</align><font>osmc_addon_OLD_Font36</font><label>563</label><textcolor>66ffffff</textcolor></control><control type="label"><left>220</left><width>950</width><height>36</height><font>osmc_addon_OLD_Font36</font><label fallback="416">$INFO[ListItem.Property(Addon.Rating)]</label><textcolor>ffffffff</textcolor></control></control-->
 				<!-- Summary -->
 				<control type="group">
 					<height>112</height>
@@ -142,8 +142,8 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<label>Summary</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -152,8 +152,8 @@
 						<left>220</left>
 						<width>950</width>
 						<height>112</height>
-						 <font>OLD_Font36</font>
-						<!-- <font>font13</font> -->
+						<font>osmc_addon_OLD_Font36</font>
+						<!-- <font>osmc_addon_font13</font>-->
 						<aligny>top</aligny>
 						<wrapmultiline>true</wrapmultiline>
 						<label>ShortDesc</label>
@@ -186,12 +186,18 @@
 			<control id="6" type="button">
 				<width>231</width>
 				<label>Install</label>
-				<texture></texture>
+				<texturefocus>TextShade.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<focusedcolor>FFFFFFFF</focusedcolor>
+				<textcolor>66ffffff</textcolor>
 			</control>
 			<!-- Exit button -->
 			<control id="7" type="button">
 				<width>231</width>
-				<texture></texture>
+				<texturefocus>TextShade.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<focusedcolor>FFFFFFFF</focusedcolor>
+				<textcolor>66ffffff</textcolor>
 				<label>Cancel</label>
 			</control>
 		</control>

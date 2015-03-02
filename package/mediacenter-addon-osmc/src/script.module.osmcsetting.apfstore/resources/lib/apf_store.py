@@ -413,11 +413,11 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def create_apf_store_gui(self, apf_dict):
 
-		if 'osmc' in xbmc.getSkinDir().lower():
+		# if 'osmc' in xbmc.getSkinDir().lower():
 
-			return apf_GUI("APFBrowser_OSMC.xml", __path__, 'Default', apf_dict=apf_dict)
+		return apf_GUI("APFBrowser_OSMC.xml", __path__, 'Default', apf_dict=apf_dict)
 
-		else:
+		# else:
 
-			return apf_GUI("APFBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
+		# 	return apf_GUI("APFBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
 
