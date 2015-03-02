@@ -226,20 +226,20 @@ class APF_STORE(object):
 
 						self.URL = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='):]
 
-						log('APF data URL: %s' % self.URL)
-
 						break
 
 				else:
 
 					# this is for testing only
-					self.URL = 'http://download.osmc.tv/apps/rbp'
+					self.URL = 'http://download.osmc.tv/apps/rbp2'
 
 					# return 'failed'
 
 		except:
 
-			self.URL = 'http://download.osmc.tv/apps/rbp'
+			self.URL = 'http://download.osmc.tv/apps/rbp2'
+
+		log('APF data URL: %s' % self.URL)
 			
 		r = requests.get(self.URL.replace('\n','').replace('\t','').replace('\n',''))
 
