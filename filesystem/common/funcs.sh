@@ -24,8 +24,8 @@ function setup_osmc_user()
 	for dir in "Pictures Music Movies TV\ Shows"
 	do
 	mkdir -p ${1}/home/osmc/${dir}
-	chroot ${1} chown osmc:osmc /home/osmc/${dir}
 	done
+	chroot ${1} chown -R osmc:osmc /home/osmc/
 }
 
 function setup_hostname()
