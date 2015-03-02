@@ -216,8 +216,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 					ctl.setVisible(False)
 
-	def signup(self):
-
 
 
 
