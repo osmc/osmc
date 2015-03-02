@@ -79,7 +79,6 @@ function conf_tty()
 
 function setup_busybox_links()
 {
-	chroot ${1} ln -s /bin/busybox /bin/more
 	chroot ${1} ln -s /bin/busybox /bin/vi
 	chroot ${1} ln -s /bin/busybox /bin/less
 	chroot ${1} ln -s /bin/busybox /bin/ping
