@@ -79,8 +79,8 @@
 					<top>358</top>
 					<width>1118</width>
 					<height>532</height>
-					<onup>9100</onup>
-					<ondown>noop</ondown>
+					<onup>50</onup>
+					<ondown>50</ondown>
 					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
 					<onright>noop</onright>
 					<orientation>vertical</orientation>
@@ -99,13 +99,13 @@
 
 					<focusedlayout width="1118" height="118">
 						<control type="label">
-							<top>21</top>
+							<top>40</top>
 							<width>1118</width>
 							<height>40</height>
 							<font>Font40</font>
 							<textcolor>ColorFO</textcolor>
 							<label>$INFO[ListItem.Label]</label>
-							<animation effect="slide" end="0,19" condition="StringCompare(Control.GetLabel(999),empty)">Conditional</animation>
+							<animation effect="slide" end="0,-19" condition="!IsEmpty(ListItem.Label2)">Conditional</animation>
 						</control>
 						<control type="label">
 							<top>66</top>
@@ -114,7 +114,7 @@
 							<font>Font30</font>
 							<textcolor>ColorFO</textcolor>
 							<label>$VAR[Label2]</label>
-							<visible>!StringCompare(Control.GetLabel(999),empty)</visible>
+							<visible>!IsEmpty(ListItem.Label2)</visible>
 						</control>
 					</focusedlayout>
 
@@ -131,12 +131,6 @@
 					<visible>Container(50).HasNext</visible>
 				</control>
 
-			</control>
-
-			<!-- Hidden label2 -->
-			<control type="label" id="999">
-				<font>-</font>
-				<label>$VAR[Label2]</label>
 			</control>
 
 		</control>
