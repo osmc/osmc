@@ -42,7 +42,7 @@ index 08a9205..5213f14 100644
     -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
 -  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s \
 -   -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
-+  platform_cxxflags="-pipe -Wno-psabi \
++  platform_cxxflags="-pipe -Wno-psabi -mfpu=neon \
     -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
     -isystem${use_firmware}/opt/vc/include \
     -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
