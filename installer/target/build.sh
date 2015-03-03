@@ -38,7 +38,7 @@ if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 	install_patch "../patches" "rbp"
 	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
-	echo "dwc_otg.fiq_fix_enable=1 sdhci-bcm2708.sync_after_dma=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/ram0 quiet init=/init osmcdev=${1}" > package/rpi-firmware-osmc/cmdline.txt
+	echo "dwc_otg.fiq_fix_enable=1 sdhci-bcm2708.sync_after_dma=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=${1}" > package/rpi-firmware-osmc/cmdline.txt
 	make osmc_defconfig
 fi
 make
