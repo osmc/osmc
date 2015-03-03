@@ -105,6 +105,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 
 # OSMC SETTING Modules
 from networking_gui import networking_gui
+import osmc_network
 
 
 def log(message):
@@ -176,7 +177,7 @@ class OSMCSettingClass(object):
 			self.setting_data_method[key]['setting_value'] = setting_value
 
 
-	def open_settings_window(self):
+	def open_settings_window(self, usePreseed = False):
 
 		'''
 			The method that determines what happens when the item is clicked in the settings GUI.
@@ -191,7 +192,7 @@ class OSMCSettingClass(object):
 		scriptPath = me.getAddonInfo('path')
 
 		self.GUI = networking_gui("network_gui.xml", scriptPath, 'Default')
-
+		self.GUI.setUsePreseed(usePreseed)
 		self.GUI.doModal()
 
 		del self.GUI
@@ -262,6 +263,8 @@ class OSMCSettingClass(object):
 
 		return latest_settings
 
+	def check_internet(self):
+		return osmc_network.has_internet_connection()
 
 	##############################################################################################################################
 	#																															 #

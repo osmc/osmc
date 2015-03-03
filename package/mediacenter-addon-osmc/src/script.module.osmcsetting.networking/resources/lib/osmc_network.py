@@ -5,6 +5,7 @@ import subprocess
 import re
 import sys
 import os
+import os.path
 
 WIRELESS_AGENT = '/usr/bin/preseed-agent'
 
@@ -39,17 +40,8 @@ def get_ethernet_settings():
             return eth_settings
 
     # if we are here we have not detected a ethernet connection check for NFS
-    cmdline_data = open(RUNNING_NETWORK_DETAILS_FILE, 'r').read()
-    nfs_found = False
-    ip_value = None
-    for cmdline_value in cmdline_data.split(' '):
-        if cmdline_value == 'root=/dev/nfs':
-            nfs_found = True
-        # grab the ip= value from cmdline
-        if cmdline_value.startswith('ip='):
-            ip_value = cmdline_value[3:]
-
-    if nfs_found:
+    ip_value = get_nfs_ip_cmdline_value()
+    if ip_value:
         if ip_value == 'dhcp':
             nfs_settings = get_non_connman_connection_details()
             nfs_settings['Method'] = 'nfs_dhcp'
@@ -65,6 +57,18 @@ def get_ethernet_settings():
         return nfs_settings
 
     return None
+
+
+def get_nfs_ip_cmdline_value():
+    ip_value = None
+    cmdline_data = open(RUNNING_NETWORK_DETAILS_FILE, 'r').read()
+    for cmdline_value in cmdline_data.split(' '):
+        if 'root=/dev/nfs' in cmdline_value:
+            return True
+        # grab the ip= value from cmdline
+        if cmdline_value.startswith('ip='):
+            ip_value = cmdline_value[3:]
+    return ip_value
 
 
 def extract_network_properties(dbus_properties):
@@ -283,66 +287,102 @@ def wifi_remove(path):
 
 def has_internet_connection():
     try:
-        subprocess.Popen(['/bin/ping', '-c1', '-w2', '8.8.8.8'], stdout=subprocess.PIPE).stdout.read()
+        subprocess.Popen(['/bin/ping', '-c1', '-w5', '8.8.8.8'], stdout=subprocess.PIPE).stdout.read()
         return True
     except:
         return False
 
 
 def update_preseed_file(settings_dict):
-    filtered_settings_dict = settings_dict
-    if 'Password' in filtered_settings_dict:
-        filtered_settings_dict['Password'] = '********'
-    print filtered_settings_dict
-    wireless_password_line = None
-    # reed the current data in
-    preseed_file = open(PREESEED_LOCATION, 'r')
-    preseed_data = preseed_file.read()
-    preseed_file.close()
-    # re-open file for writing
-    preseed_file = open(PREESEED_TEMP_LOCATION, 'w')
-    # copy everything except the network entries to a temp file
-    for entry in preseed_data.split("\n"):
-        if not entry.startswith('d-i network/') and len(entry.strip()) > 0:
-            # write this entry back to the file as is
-            preseed_file.write(entry + "\n")
-        if entry.startswith('d-i network/wlan_key'):
-            wireless_password_line =  entry;
+    if os.path.isfile(PREESEED_LOCATION):
+        filtered_settings_dict = settings_dict.copy()
+        if 'Password' in filtered_settings_dict:
+            filtered_settings_dict['Password'] = '********'
+        print filtered_settings_dict
+        wireless_password_line = None
+        # reed the current data in
+        preseed_file = open(PREESEED_LOCATION, 'r')
+        preseed_data = preseed_file.read()
+        preseed_file.close()
+        # re-open file for writing
+        preseed_file = open(PREESEED_TEMP_LOCATION, 'w')
+        # copy everything except the network entries to a temp file
+        for entry in preseed_data.split("\n"):
+            if not entry.startswith('d-i network/') and len(entry.strip()) > 0:
+                # write this entry back to the file as is
+                preseed_file.write(entry + "\n")
+            if entry.startswith('d-i network/wlan_key'):
+                wireless_password_line =  entry;
 
-    # write the required network options to the temp file
-    if settings_dict:
-        if 'eth' in settings_dict['path'] or settings_dict['path'] == 'nfs':
-            preseed_file.write('d-i network/interface string eth\n')
-        elif 'wifi' in settings_dict['path']:
-            preseed_file.write('d-i network/interface string wlan\n')
-            preseed_file.write('d-i network/ssid string ' + settings_dict['SSID'] + '\n')
-            if 'Security' in settings_dict:
-                if settings_dict['Security'] in ('wpa', 'wpa2', 'pak'):
-                    preseed_file.write('d-i network/wlan_keytype string 1\n')
-                elif settings_dict['Security'] in ('wep'):
-                    preseed_file.write('d-i network/wlan_keytype string 2\n')
-                if wireless_password_line: # preserve the password as we may not always get it from the GUI
-                    preseed_file.write(wireless_password_line + '\n')
+        # write the required network options to the temp file
+        if settings_dict:
+            if 'eth' in settings_dict['path'] or settings_dict['path'] == 'nfs':
+                preseed_file.write('d-i network/interface string eth\n')
+            elif 'wifi' in settings_dict['path']:
+                preseed_file.write('d-i network/interface string wlan\n')
+                preseed_file.write('d-i network/ssid string ' + settings_dict['SSID'] + '\n')
+                if 'Security' in settings_dict:
+                    if settings_dict['Security'] in ('wpa', 'wpa2', 'pak'):
+                        preseed_file.write('d-i network/wlan_keytype string 1\n')
+                    elif settings_dict['Security'] in ('wep'):
+                        preseed_file.write('d-i network/wlan_keytype string 2\n')
+                    if wireless_password_line: # preserve the password as we may not always get it from the GUI
+                        preseed_file.write(wireless_password_line + '\n')
+                    else:
+                        preseed_file.write('d-i network/wlan_key string ' + settings_dict['Password'] + '\n')
                 else:
-                    preseed_file.write('d-i network/wlan_key string ' + settings_dict['Password'] + '\n')
-            else:
-                preseed_file.write('d-i network/wlan_keytype string 0\n')
+                    preseed_file.write('d-i network/wlan_keytype string 0\n')
 
-        if 'dhcp' in settings_dict['Method']:
+            if 'dhcp' in settings_dict['Method']:
+                preseed_file.write('d-i network/auto boolean true\n')
+            if 'manual' in settings_dict['Method']:
+                preseed_file.write('d-i network/auto boolean false\n')
+                preseed_file.write('d-i network/ip string ' + settings_dict['Address'] + '\n')
+                preseed_file.write('d-i network/mask string ' + settings_dict['Netmask'] + '\n')
+                if 'Gateway' in settings_dict:
+                    preseed_file.write('d-i network/gw string ' + settings_dict['Gateway'] + '\n')
+                if 'DNS_1' in settings_dict:
+                    preseed_file.write('d-i network/dns1 string ' + settings_dict['DNS_1'] + '\n')
+                if 'DNS_2' in settings_dict:
+                    preseed_file.write('d-i network/dns2 string ' + settings_dict['DNS_2'] + '\n')
+        else: # empty dict passed - we have just disconnected from wifi - create auto wired as a fell back
+            preseed_file.write('d-i network/interface string eth\n')
             preseed_file.write('d-i network/auto boolean true\n')
-        if 'manual' in settings_dict['Method']:
-            preseed_file.write('d-i network/auto boolean false\n')
-            preseed_file.write('d-i network/ip string ' + settings_dict['Address'] + '\n')
-            preseed_file.write('d-i network/mask string ' + settings_dict['Netmask'] + '\n')
-            if 'Gateway' in settings_dict:
-                preseed_file.write('d-i network/gw string ' + settings_dict['Gateway'] + '\n')
-            if 'DNS_1' in settings_dict:
-                preseed_file.write('d-i network/dns1 string ' + settings_dict['DNS_1'] + '\n')
-            if 'DNS_2' in settings_dict:
-                preseed_file.write('d-i network/dns2 string ' + settings_dict['DNS_2'] + '\n')
-    else: # empty dict passed - we have just disconnected from wifi - create auto wired as a fell back
-        preseed_file.write('d-i network/interface string eth\n')
-        preseed_file.write('d-i network/auto boolean true\n')
-    preseed_file.close()
-    subprocess.call(['sudo', 'mv', PREESEED_TEMP_LOCATION, PREESEED_LOCATION])
+        preseed_file.close()
+        subprocess.call(['sudo', 'mv', PREESEED_TEMP_LOCATION, PREESEED_LOCATION])
 
+
+def parse_preseed():
+    network_settings = None
+    if os.path.isfile(PREESEED_LOCATION):
+        preseed_file = open(PREESEED_LOCATION, 'r')
+        preseed_data = preseed_file.read()
+        preseed_file.close()
+        preseed_info = {}
+        for entry in preseed_data.split("\n"):
+            if entry.startswith('d-i network/') and len(entry.strip()) > 0:
+                string = entry.replace('d-i network/', '')
+                key = string[:string.find(' ')]
+                string = string[string.find(' ')+1:]
+                type = string[:string.find(' ')]
+                value = string[string.find(' ')+1:]
+                preseed_info[key] = value
+        # convert preseed format into the same format we are using in the rest of the code
+        network_settings = {'Interface': preseed_info['interface']}
+        if 'wlan' in preseed_info['interface']:
+            network_settings['SSID'] = preseed_info['ssid']
+            if 'wlan_key' in preseed_info:
+                network_settings['Password'] = preseed_info['wlan_key']
+        if 'true' in preseed_info['auto']:
+            network_settings['Method'] = 'dhcp'
+        else:
+            network_settings['Method'] = 'Manual'
+            network_settings['Address'] = preseed_info['ip']
+            network_settings['Netmask'] = preseed_info['mask']
+            if 'gw' in preseed_info:
+                network_settings['Gateway'] = preseed_info['gw']
+            if 'dns1' in preseed_info:
+                network_settings['DNS_1'] = preseed_info['dns1']
+            if 'dns2' in preseed_info:
+                network_settings['DNS_1'] = preseed_info['dns1']
+    return network_settings
