@@ -150,10 +150,10 @@ void MainWindow::install()
             {
                 logger->addLine("Either network preseed definition incomplete, or user wants DHCP");
                 nw->setAuto();
-                logger->addLine("Attempting to bring up eth0");
-                ui->statusLabel->setText(tr("Configuring Network"));
-                nw->bringUp();
             }
+            logger->addLine("Attempting to bring up eth0");
+            ui->statusLabel->setText(tr("Configuring Network"));
+            nw->bringUp();
         }
     }
     else
