@@ -23,13 +23,13 @@
         <!-- explanatory text window -->
         <control id="2" type="textbox">
             <description>Explanatory Text Box</description>
-            <posx>55</posx>
-            <posy>175</posy>
+            <left>55</left>
+            <top>175</top>
             <width>563</width>
             <height>800</height>
             <visible>false</visible>
             <!-- <colordiffuse>FFFFFFFF</colordiffuse>-->
-            <font>font13</font>
+            <font>osmc_addon_Font26</font>
             <textcolor>FFFFFFFF</textcolor>
             <!-- <pulseonselect>false</pulseonselect>-->
             <!-- <pagecontrol>13</pagecontrol>-->
@@ -40,8 +40,8 @@
         <!-- 9 box grid grouping -->
         <!-- grouping like this is necessary to be able to have the middle item selected by default, only group has this option -->
         <control description="osmc icon" type="image">
-            <posx>70</posx>
-            <posy>45</posy>
+            <left>70</left>
+            <top>45</top>
             <width>533</width>
             <height>100</height>
             <visible>false</visible>
@@ -50,8 +50,8 @@
         </control>
         <control id="4444" type="button">
             <description>previous menu</description>
-            <posx>300</posx>
-            <posy>465</posy>
+            <left>300</left>
+            <top>465</top>
             <width>70</width>
             <height>150</height>
             <texturefocus>back_FO.png</texturefocus>
@@ -67,8 +67,8 @@
         </control>
         <control id="6666" type="button">
             <description>next menu</description>
-            <posx>1620</posx>
-            <posy>465</posy>
+            <left>1620</left>
+            <top>465</top>
             <width>70</width>
             <height>150</height>
             <texturefocus>fwrd_FO.png</texturefocus>
@@ -82,12 +82,59 @@
                 <effect center="auto" delay="50" end="100" start="200" time="200" type="zoom"/>
             </animation>
         </control>
+
+<control id="4915" type="label">
+        <description>left module name label</description>
+
+                    <animation type="Visible">
+                        <effect time="200" type="fade"/>
+                    </animation>
+                    <animation type="Hidden">
+                        <effect time="100" type="fade"/>
+                    </animation>
+
+        <left>40</left>
+        <top>60</top>
+        <width>340</width>
+        <align>center</align>
+        <aligny>center</aligny>
+        <scroll>false</scroll>
+        <label>Temporary</label>
+        <font>osmc_addon_Font40</font>
+        <textcolor>ffffffff</textcolor>
+        <shadowcolor>ff000000</shadowcolor>
+</control>
+
+<control id="4916" type="label">
+        <description>second left module name label</description>
+
+                    <animation type="Visible">
+                        <effect time="200" type="fade"/>
+                    </animation>
+                    <animation type="Hidden">
+                        <effect time="100" type="fade"/>
+                    </animation>
+
+        <left>40</left>
+        <top>60</top>
+        <width>340</width>
+        <align>center</align>
+        <aligny>center</aligny>
+        <scroll>false</scroll>
+        <label>Second Temporary</label>
+        <font>osmc_addon_Font40</font>
+        <textcolor>ffffffff</textcolor>
+        <shadowcolor>ff000000</shadowcolor>
+</control>
+
+
+
         <control id="999" type="group">
             <control id="100" type="group">
                 <description>Nine Box Grid Group</description>
                 <animation effect="fade" time="5000">VisibleChange</animation>
-                <posx>420</posx>
-                <posy>0</posy>
+                <left>420</left>
+                <top>0</top>
                 <width>1080</width>
                 <height>1080</height>
                 <defaultcontrol>105</defaultcontrol>
@@ -98,8 +145,8 @@
                 <onright>100</onright>
                 <!-- button 1 - top left -->
                 <control id="101" type="panel">
-                    <posx>190</posx>
-                    <posy>190</posy>
+                    <left>190</left>
+                    <top>190</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>107</onup>
@@ -117,8 +164,8 @@
                     <viewtype label="1011">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -126,20 +173,20 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
@@ -147,8 +194,8 @@
                 </control>
                 <!-- button 2 - top middle -->
                 <control id="102" type="panel">
-                    <posx>450</posx>
-                    <posy>140</posy>
+                    <left>450</left>
+                    <top>140</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>108</onup>
@@ -166,8 +213,8 @@
                     <viewtype label="1021">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -175,20 +222,20 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
@@ -196,8 +243,8 @@
                 </control>
                 <!-- button 1 - top right -->
                 <control id="103" type="panel">
-                    <posx>710</posx>
-                    <posy>190</posy>
+                    <left>710</left>
+                    <top>190</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>109</onup>
@@ -215,8 +262,8 @@
                     <viewtype label="1031">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -224,20 +271,20 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
@@ -245,8 +292,8 @@
                 </control>
                 <!-- button 1 - middle left -->
                 <control id="104" type="panel">
-                    <posx>140</posx>
-                    <posy>450</posy>
+                    <left>140</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>101</onup>
@@ -264,8 +311,8 @@
                     </animation>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -273,28 +320,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="105" type="panel">
-                    <posx>450</posx>
-                    <posy>450</posy>
+                    <left>450</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>102</onup>
@@ -304,8 +351,8 @@
                     <viewtype label="1051">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>OSMC_icon_line.png</texture>
@@ -319,28 +366,28 @@
                             <animation type="Unfocus">
                                 <effect center="auto" end="140, 5" start="140, 140" time="100" type="zoom"/>
                             </animation>
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>OSMC_icon_white.png</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="106" type="panel">
-                    <posx>760</posx>
-                    <posy>450</posy>
+                    <left>760</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>103</onup>
@@ -358,8 +405,8 @@
                     <viewtype label="1061">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -367,28 +414,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="107" type="panel">
-                    <posx>190</posx>
-                    <posy>710</posy>
+                    <left>190</left>
+                    <top>710</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>104</onup>
@@ -406,8 +453,8 @@
                     <viewtype label="1071">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -415,28 +462,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="108" type="panel">
-                    <posx>450</posx>
-                    <posy>760</posy>
+                    <left>450</left>
+                    <top>760</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>105</onup>
@@ -454,8 +501,8 @@
                     <viewtype label="1081">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -463,28 +510,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="109" type="panel">
-                    <posx>710</posx>
-                    <posy>710</posy>
+                    <left>710</left>
+                    <top>710</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>106</onup>
@@ -502,8 +549,8 @@
                     <viewtype label="1091">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -511,20 +558,20 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
@@ -535,8 +582,8 @@
             <control id="200" type="group">
                 <description>Nine Box Grid Group two</description>
                 <animation effect="fade" time="5000">VisibleChange</animation>
-                <posx>420</posx>
-                <posy>0</posy>
+                <left>420</left>
+                <top>0</top>
                 <width>1080</width>
                 <height>1080</height>
                 <defaultcontrol>105</defaultcontrol>
@@ -546,8 +593,8 @@
                 <onleft>200</onleft>
                 <onright>200</onright>
                 <control id="201" type="panel">
-                    <posx>190</posx>
-                    <posy>190</posy>
+                    <left>190</left>
+                    <top>190</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>207</onup>
@@ -565,8 +612,8 @@
                     <viewtype label="2011">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -574,28 +621,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="202" type="panel">
-                    <posx>450</posx>
-                    <posy>140</posy>
+                    <left>450</left>
+                    <top>140</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>208</onup>
@@ -613,8 +660,8 @@
                     <viewtype label="2021">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -622,28 +669,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="203" type="panel">
-                    <posx>710</posx>
-                    <posy>190</posy>
+                    <left>710</left>
+                    <top>190</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>209</onup>
@@ -661,8 +708,8 @@
                     <viewtype label="2031">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -670,28 +717,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="204" type="panel">
-                    <posx>140</posx>
-                    <posy>450</posy>
+                    <left>140</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>201</onup>
@@ -709,8 +756,8 @@
                     </animation>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -718,28 +765,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="205" type="panel">
-                    <posx>450</posx>
-                    <posy>450</posy>
+                    <left>450</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>202</onup>
@@ -749,8 +796,8 @@
                     <viewtype label="2051">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>OSMC_icon_line.png</texture>
@@ -764,28 +811,28 @@
                             <animation type="Unfocus">
                                 <effect center="auto" end="140, 5" start="140, 140" time="100" type="zoom"/>
                             </animation>
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>OSMC_icon_white.png</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="206" type="panel">
-                    <posx>760</posx>
-                    <posy>450</posy>
+                    <left>760</left>
+                    <top>450</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>203</onup>
@@ -803,8 +850,8 @@
                     <viewtype label="2061">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -812,28 +859,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="207" type="panel">
-                    <posx>190</posx>
-                    <posy>710</posy>
+                    <left>190</left>
+                    <top>710</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>204</onup>
@@ -851,8 +898,8 @@
                     <viewtype label="2071">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -860,28 +907,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="208" type="panel">
-                    <posx>450</posx>
-                    <posy>760</posy>
+                    <left>450</left>
+                    <top>760</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>205</onup>
@@ -899,8 +946,8 @@
                     <viewtype label="2081">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -908,28 +955,28 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
                     </focusedlayout>
                 </control>
                 <control id="209" type="panel">
-                    <posx>710</posx>
-                    <posy>710</posy>
+                    <left>710</left>
+                    <top>710</top>
                     <width>180</width>
                     <height>180</height>
                     <onup>206</onup>
@@ -947,8 +994,8 @@
                     <viewtype label="2091">icon</viewtype>
                     <itemlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <info>ListItem.Icon</info>
@@ -956,20 +1003,20 @@
                     </itemlayout>
                     <focusedlayout height="180" width="180">
                         <control type="image">
-                            <posx>0</posx>
-                            <posy>0</posy>
+                            <left>0</left>
+                            <top>0</top>
                             <width>180</width>
                             <height>180</height>
                             <texture>$INFO[ListItem.Property(FO_ICON)]</texture>
                         </control>
                         <control type="label">
-                            <posx>0</posx>
-                            <posy>140</posy>
+                            <left>0</left>
+                            <top>140</top>
                             <width>180</width>
                             <height>40</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font13</font>
+                            <font>osmc_addon_Font26</font>
                             <textcolor>FF8FF5EE</textcolor>
                             <info>ListItem.Label</info>
                         </control>
