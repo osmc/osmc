@@ -126,7 +126,7 @@ void MainWindow::install()
             if (installTarget == "usb")
             {
                 /* Behaviour for handling USB installs */
-                if (utils->getOSMCDev() == "rbp") { device->setRoot("/dev/sda1"); }
+                if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 for (int i = 0; i <= 60; i++)
                 {
