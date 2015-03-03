@@ -66,6 +66,12 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 				except:
 					break
 
+			# hide the left labels
+			self.getControl(4915).setLabel('OSMC')
+			self.getControl(4915).setVisible(True)
+			self.visible_left_label = 4915
+			self.getControl(4916).setVisible(False)
+
 			# hide next and prev if they arent needed
 			if self.number_of_pages < 2:
 				self.getControl(4444).setVisible(False)
@@ -204,6 +210,26 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
 
+	def left_label_toggle(self, controlID):
+
+		# toggles the left label which displayes the focussed module name
+		one = self.getControl(4915)
+		two = self.getControl(4916)
+		new_label = self.getControl(controlID).getListItem(0).getLabel()
+
+		if self.visible_left_label == 4915:
+			two.setLabel(new_label)
+			two.setVisible(True)
+			one.setVisible(False)
+			self.visible_left_label = 4916
+		else:
+			one.setLabel(new_label)
+			one.setVisible(True)
+			two.setVisible(False)
+			self.visible_left_label = 4915
+
+
+
 	def onFocus(self, controlID):
 
 		# update the textbox 'description'
@@ -211,6 +237,12 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(2).setText(self.getControl(controlID).getSelectedItem().getProperty('description'))
 		except:
 			pass
+
+		module_icons = [101, 102, 103, 104, 105, 106, 107, 108, 109,
+						201, 202, 203, 204, 205, 206, 207, 208, 209,]
+
+		if controlID in module_icons:
+			self.left_label_toggle(controlID)
 
 
 	def next_prev_direction_changer(self):

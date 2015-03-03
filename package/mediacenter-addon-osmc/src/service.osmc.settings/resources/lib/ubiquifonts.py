@@ -24,10 +24,6 @@ def import_osmc_fonts():
 
 	alien_fonts_folder = os.path.join(alien_skin_folder, 'fonts/')
 
-	if os.path.exists(os.path.join(alien_fonts_folder,'backup_Font.xml')):
-
-		return 'ubiquited'
-
 	possible_xml_locations = ['1080i', '720p', '1080p','16x9']
 
 	for pos_loc in possible_xml_locations:
@@ -59,6 +55,15 @@ def import_osmc_fonts():
 	print 'ACTUAL XML LOCATION = %s' % alien_xml_folder
 
 	print 'alien_font_xml = %s' % alien_font_xml
+
+	# check whether the fonts are already in the font xml, if they are then simply return.
+	# the previous solution of checking for a backup fonts file is pointless as an update of the skin
+	# would overwrite the Font.xml and leave the backup in place
+	with open(alien_font_xml, 'r') as f:
+		lines = f.readlines()
+		for line in lines:
+			if 'osmc_addon_OLD_Font72' in line:
+				return 'ubiquited'
 
 	# copy fonts to skins font folder 
 	unique_files = set(os.listdir(FONT_FOLDER)) - alien_fonts

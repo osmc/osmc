@@ -85,6 +85,13 @@ class Main(object):
 		# current skin directory, used to detect when the user has changed skins and prompts a reconstruction of the gui
 		self.skindir = xbmc.getSkinDir()
 
+		# run the ubiquifonts script to import the needed fonts into the Font.xml
+		response = ubiquifonts.import_osmc_fonts()
+
+		if response == 'reload_please':
+
+			xbmc.executebuiltin('ReloadSkin()')
+			
 		# daemon
 		self._daemon()
 
@@ -129,30 +136,28 @@ class Main(object):
 
 				log('New Skin: %s' % self.skindir)
 
-				if 'osmc' not in self.skindir.lower():
+				try:
+					resp = ubiquifonts.import_osmc_fonts()
 
-					try:
-						resp = ubiquifonts.import_osmc_fonts()
+					log('Ubiquifonts result: %s' % resp)
 
-						log('Ubiquifonts result: %s' % resp)
+					if resp == 'reload_please':
 
-						if resp == 'reload_please':
+						while True:
 
-							while True:
+							xbmc.sleep(1000)
 
-								xbmc.sleep(1000)
+							xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
 
-								xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
+							if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
 
-								if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
+								xbmc.executebuiltin('ReloadSkin()')
+								
+								break
+				
+				except Exception as e:
 
-									xbmc.executebuiltin('ReloadSkin()')
-									
-									break
-					
-					except Exception as e:
-
-						log(traceback.format_exc())
+					log(traceback.format_exc())
 
 				try:
 					log('skin changed, reloading gui')
