@@ -21,32 +21,19 @@ def log(message):
 
 
 class Networking_caller(Thread):
-	def __init__(self, parent):
+	def __init__(self, parent, net_call):
 		super(Networking_caller, self).__init__()
 		self.daemon = True
 		self.cancelled = False
-		self.parent = parent
+		self.parent = paren
+		self.net_call = net_call
 		# instantiate Barkers interface class
 		# self.networking_interface = NETWORKING.Barkersinterface()
 
 	def run(self):
 		"""Calls Barkers method to check for internet connection"""
 
-		# while not self.cancelled:
-
-		# 	self.check_status()
-		# 	xbmc.sleep(1000)
-
-	def check_status(self):
-		''' Checks the status of the internet connection '''
-		pass
-		# self.parent.internet_connected = self.networking_interface.check_internet()
-
-	def cancel(self):
-		''' Shut it down. '''
-		self.cancelled = True
-
-
+		self.parent.internet_connected = self.net_call.check_internet()
 
 
 
@@ -59,6 +46,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		#start a new thread that begins checking for an internet connection
 		self.net_call = networking_instance
+
+		self.internet_check = Networking_caller(self, self.net_call)
 
 		# edit the timezone in /etc/timezone
 		self.timezones = timezones.get_timezones()
@@ -232,7 +221,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID == 60010:
 			# open networking gui
-			self.net_call.open_settings_window()
+			self.net_call.open_settings_window(True)
 
 			# display the Exit panel
 			self.getControl(96000).setVisible(False)
