@@ -90,6 +90,8 @@ class Main(object):
 
 		if response == 'reload_please':
 
+			log('Skin reload requested')
+
 			xbmc.executebuiltin('ReloadSkin()')
 			
 		# daemon
@@ -151,6 +153,8 @@ class Main(object):
 
 							if xml not in ['DialogYesNo.xml', 'Dialogyesno.xml', 'DialogYesno.xml', 'DialogyesNo.xml', 'dialogyesno.xml']: 
 
+								log('Skin reload requested')
+								
 								xbmc.executebuiltin('ReloadSkin()')
 								
 								break

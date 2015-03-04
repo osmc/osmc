@@ -88,6 +88,8 @@ heading_controls = [
     hdg('bluetooth', 32003, 1030),
 ]
 
+MAIN_MENU = [101, 102, 103]
+
 panel_controls = [1010, 1020, 1030]
 
 BLUETOOTH_CONTROLS = [10300, 10301, 10303, 6000, 7000]
@@ -197,7 +199,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.HCL = self.getControl(1)
 
         # Wired Network List (of one a way of showing connected icon )
-        self.WDP = self.getControl(10117)
+        self.WDP = self.getControl(81000)
+        self.WDP.setLabel('Status: checking...')
 
         # wifi panel (WFP)
         self.WFP = self.getControl(5000)
@@ -218,7 +221,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.HCL.addItem(tmp)
 
         # set focus on the heading control list
-        self.setFocusId(1)
+        self.setFocusId(101)
 
         panel_to_show = 0 # default to first panel
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
@@ -299,27 +302,23 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if actionID in (10, 92):
             self.close()
 
-        if focused_control == 1:
+        if focused_control in MAIN_MENU:
             # change to the required settings panel
 
-            try:
-                focused_position = int(xbmc.getInfoLabel('Container(1).Position'))
-            except:
-                focused_position = 0
+            for ctl in MAIN_MENU:
+                self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False) 
 
-            log('focused_position = %s' % focused_position)
+            if focused_control != self.current_panel:
 
-            self.toggle_panel_visibility(focused_position)
+                self.current_panel = focused_control
 
-            if focused_position != self.current_panel: # we have changed panel
-                self.current_panel = focused_position
-                if focused_position == 0:
+                if focused_control == 101:
                     self.populate_wired_panel()
 
-                if focused_position == 1:
+                elif focused_control == 102:
                     self.populate_wifi_panel()
 
-                if focused_position == 2:
+                elif focused_control == 103:
                  self.populate_bluetooth_panel()
 
         if actionID == 7:  # Selected
@@ -353,7 +352,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         relevant_label_control = self.getControl(900000 + controlID)
         current_label = relevant_label_control.getLabel()
 
-        if current_label == '___.___.___.___':
+        if current_label == '___ : ___ : ___ : ___':
             current_label = ''
 
         user_input = DIALOG.input(lang(32004), current_label, type=xbmcgui.INPUT_IPADDRESS)
@@ -374,7 +373,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.edit_ip_address(controlID)
 
                 return
-            relevant_label_control.setLabel(user_input)
+
+            ip_string = ' : '.join(str(user_input).split('.'))
+            relevant_label_control.setLabel(ip_string)
 
             return
 
@@ -392,32 +393,35 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             # 'The displayed network configuration may be out dated - A reboot is recommended before proceeding'
             DIALOG.ok(lang(32036), lang(32038))
         # Clear wired network Panel
-        self.WDP.reset()
+        self.WDP.setLabel('Status: checking...')
         if osmc_network.is_ethernet_enabled():
             self.current_network_config = self.get_wired_config()
             log(self.current_network_config)
             if self.current_network_config:
                 self.toggle_controls(True, ALL_WIRED_CONTROLS)
-                itm = xbmcgui.ListItem(self.current_network_config['Interface'])
-                icon_image = 'disconnected.png'
+
+                interface = self.current_network_config['Interface']
+
                 if self.current_network_config['State'] in ('online'):
-                    icon_image = 'connected.png'
-                if self.current_network_config['State'] in ('ready'):
-                    icon_image = 'no_internet.png'
-                itm.setIconImage(icon_image)
+                    status = 'Status ' + interface + ' (connected)'
+                elif self.current_network_config['State'] in ('ready'):
+                    status = 'Status ' + interface + ' (no internet)'
+                else:
+                    status = 'Status ' + interface
+
                 self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
+
                 self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
+
                 # enable reset and apply button
                 self.toggle_controls(False, [WIRED_RESET_BUTTON, WIRED_APPLY_BUTTON])
+
             else:  # no wired connection
-                self.setFocusId(1)
                 self.toggle_controls(False, ALL_WIRED_CONTROLS)
-                itm = xbmcgui.ListItem('eth0')
-                icon_image = 'disconnected.png'
-                itm.setIconImage(icon_image)
 
+                status = 'Status: No wired connection'
 
-            self.WDP.addItem(itm)
+            self.WDP.setLabel(status)
 
         adapterRadioButton = self.getControl(WIRED_ADAPTER_TOGGLE)
         adapterRadioButton.setSelected(osmc_network.is_ethernet_enabled())
@@ -523,10 +527,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.update_apply_reset_button('WIRED')
 
     def toggle_ethernet(self):
-        self.WDP.reset()
+        self.WDP.setLabel('Status: checking...')
         item = xbmcgui.ListItem(lang(32016))
         self.toggle_controls(False, ALL_WIRED_CONTROLS)
-        self.WDP.addItem(item)
+        self.WDP.setLabel('Status: Configuring...')
         osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
         # 5 second wait to allow connman to make the changes before refreshing
         time.sleep(5)
