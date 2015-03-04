@@ -25,7 +25,7 @@ class Networking_caller(Thread):
 		super(Networking_caller, self).__init__()
 		self.daemon = True
 		self.cancelled = False
-		self.parent = paren
+		self.parent = parent
 		self.net_call = net_call
 		# instantiate Barkers interface class
 		# self.networking_interface = NETWORKING.Barkersinterface()
