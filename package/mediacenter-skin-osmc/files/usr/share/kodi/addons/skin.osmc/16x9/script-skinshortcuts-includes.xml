@@ -130,6 +130,23 @@
 			<property name="hasSubmenu">False</property>
 		</item>
 		<item id="9">
+			<label>$LOCALIZE[12600]</label>
+			<label2>Common Shortcut</label2>
+			<icon>home/DefaultWeather.png</icon>
+			<thumb />
+			<property name="labelID">weather</property>
+			<property name="defaultID">weather</property>
+			<visible>!IsEmpty(Weather.Plugin)</visible>
+			<onclick>ActivateWindow(Weather)</onclick>
+			<property name="path">ActivateWindow(Weather)</property>
+			<visible>StringCompare(System.ProfileName,Master user)</visible>
+			<property name="submenuVisibility">weather</property>
+			<property name="group">mainmenu</property>
+			<property name="widgetName">Weather</property>
+			<property name="widget">Weather</property>
+			<property name="hasSubmenu">False</property>
+		</item>
+		<item id="10">
 			<label>$ADDON[script.skinshortcuts 32022]</label>
 			<label2>Common Shortcut</label2>
 			<icon>home/DefaultLiveTV.png</icon>
@@ -144,7 +161,7 @@
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="10">
+		<item id="11">
 			<label>$ADDON[script.skinshortcuts 32087]</label>
 			<label2>Common Shortcut</label2>
 			<icon>home/DefaultRadio.png</icon>
@@ -159,7 +176,7 @@
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="11">
+		<item id="12">
 			<label>$LOCALIZE[10004]</label>
 			<label2>Common Shortcut</label2>
 			<icon>home/DefaultSettings.png</icon>
@@ -173,7 +190,7 @@
 			<property name="group">mainmenu</property>
 			<property name="hasSubmenu">True</property>
 		</item>
-		<item id="12">
+		<item id="13">
 			<label>$LOCALIZE[33060]</label>
 			<label2>Common Shortcut</label2>
 			<icon>home/DefaultPower.png</icon>
@@ -1095,6 +1112,8 @@
 	<include name="skinshortcuts-group-alt-1036" />
 	<include name="skinshortcuts-group-programs" />
 	<include name="skinshortcuts-group-alt-programs" />
+	<include name="skinshortcuts-group-weather" />
+	<include name="skinshortcuts-group-alt-weather" />
 	<include name="skinshortcuts-group-livetv">
 		<item id="1">
 			<label>$LOCALIZE[19019]</label>
