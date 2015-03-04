@@ -47,7 +47,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		#start a new thread that begins checking for an internet connection
 		self.net_call = networking_instance
 
-		self.internet_check = Networking_caller(self, self.net_call)
+		self.internet_check = False
+		self.internet_checker = Networking_caller(self, self.net_call)
+		self.internet_checker.start()
 
 		# edit the timezone in /etc/timezone
 		self.timezones = timezones.get_timezones()
