@@ -31,6 +31,7 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
+	cp -ar src/connman-dbus.conf ${out}/etc/dbus-1/system.d
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
