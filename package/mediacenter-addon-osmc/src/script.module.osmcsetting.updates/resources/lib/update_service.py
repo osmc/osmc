@@ -539,7 +539,7 @@ class Main(object):
 		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
 
 
-	def self.action_list_complete(self, data):
+	def action_list_complete(self):
 
 		# notify the user that the installation or uninstall of their desirec apfs has completed successfully
 		ok = DIALOG.ok(lang(32090), lang(32091))

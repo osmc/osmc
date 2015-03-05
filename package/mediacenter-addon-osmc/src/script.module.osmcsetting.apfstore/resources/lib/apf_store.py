@@ -345,13 +345,13 @@ class APF_STORE(object):
 				apf = thread_queue.get(True, 1)
 				
 				if apf.id in self.package_list:
-					log('%s IS Installed' % apf.shortname)
+					log('%s IS Installed' % apf.name)
 
 					apf.set_installed(True)
 
 				else:
 
-					log('%s is NOT Installed' % apf.shortname)
+					log('%s is NOT Installed' % apf.name)
 				
 				thread_queue.task_done()
 
