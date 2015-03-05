@@ -35,10 +35,10 @@ def lang(id):
 
 gui_ids = { \
  \
-    1: 'Headings -- Wired Network - Wireless Network - Bluetooth - Tethering(X) - VPN(X)',
-    1010: 'Panel Wired Network',
-    1020: 'Panel Wireless Network',
-    1030: 'Panel Bluetooth',
+    1000: 'Header Group list',
+    101: 'Wired Network',
+    102: 'Wireless Network',
+    103: 'Bluetooth',
     10111: 'Wired - Manual/ DHCP toggle',
     10112: 'Wired - IP Address',
     910112: 'Wired - IP Address VALUE',
@@ -50,11 +50,10 @@ gui_ids = { \
     910115: 'Wired - Primary DNS VALUE',
     10116: 'Wired - Secondary DNS',
     910116: 'Wired - Secondary DNS VALUE',
-    10117: 'Wired - Network panel',
     10118: 'Wired - Apply',
     10119: 'Wired - Reset',
     10120: 'Wired - Enable Adapter',
-    10200: 'Wireless - Scan for connections',
+    10220: 'Wireless - Scan for connections',
     10211: 'Wireless - Automatically configure the network toggle',
     10212: 'Wireless - IP Address',
     910212: 'Wireless - IP Address VALUE',
@@ -81,22 +80,21 @@ gui_ids = { \
 ip_controls = [10112, 10113, 10114, 10115, 10116, 910112, 910113, 910114, 910115, 910116, 10212, 10213, 10214, 10215
     , 10216, 910212, 910213, 910214, 910215, 910216, ]
 
-hdg = namedtuple('hdg', ['name', 'lang_id', 'panel_id'])
-heading_controls = [
-    hdg('wired', 32001, 1010),
-    hdg('wireless', 32002, 1020),
-    hdg('bluetooth', 32003, 1030),
-]
 
-MAIN_MENU = [101, 102, 103]
+WIRED_NETWORK_SELECTOR = 101
+WIRELESS_NETWORK_SELECTOR = 102
+BLUETOOTH_SELECTOR = 103
+MAIN_MENU = [WIRED_NETWORK_SELECTOR, WIRELESS_NETWORK_SELECTOR, BLUETOOTH_SELECTOR]
 
-panel_controls = [1010, 1020, 1030]
+#panel_controls = [1010, 1020, 1030]
+
+STATUS_LABEL = 81000
 
 BLUETOOTH_CONTROLS = [10300, 10301, 10303, 6000, 7000]
 
 BLUETOOTH_ENABLE_TOGGLE = 10301
 
-ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10117, 10118, 10119, 10120, 910112, 910113, 910114,
+ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10118, 10119, 10120, 910112, 910113, 910114,
                       910115, 910116]
 
 WIRED_IP_VALUES = [910112, 910113, 910114, 910115, 910116]
@@ -122,13 +120,13 @@ WIRED_RESET_BUTTON = 10119
 WIRED_DHCP_MANUAL_BUTTON = 10111
 
 ALL_WIRELESS_CONTROLS = [5000, 910212, 910213, 910214, 910215, 910216, 10211, 10212, 10213, 10214, 10215, 10216, 10217,
-                         10218, 10219, 10200]
+                         10218, 10219, 10220]
 
 WIRELESS_IP_VALUES = [910212, 910213, 910214, 910215, 910216]
 
 WIRELESS_IP_LABELS = [10212, 10213, 10214, 10215, 10216]
 
-WIRELESS_SCAN_BUTTON = 10200
+WIRELESS_SCAN_BUTTON = 10220
 
 WIRELESS_ADAPTER_TOGGLE = 10217
 
@@ -156,13 +154,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
         self.setting_values = kwargs.get('setting_values', {})
 
-
-
         # this stores the wifi password for sending to connman (or equivalent)
         self.wireless_password = None
-
-        # heading control list (HCL)
-        self.HCL = None
 
         # current panel we are on
         self.current_panel = -1
@@ -194,13 +187,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.preseed_data = None
 
     def onInit(self):
-
-        # heading control list (HCL)
-        self.HCL = self.getControl(1)
-
-        # Wired Network List (of one a way of showing connected icon )
-        self.WDP = self.getControl(81000)
-        self.WDP.setLabel('Status: checking...')
+         # Wired Network Label
+        self.status_label = self.getControl(STATUS_LABEL);
 
         # wifi panel (WFP)
         self.WFP = self.getControl(5000)
@@ -211,33 +199,22 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # bluetooth discovered device panel (BTD)
         self.BTD = self.getControl(7000)
 
-        # populate the heading control list (HCL)
-        for heading in heading_controls:
-            # farts insert conditional checking of heading necessity here
-
-            tmp = xbmcgui.ListItem(lang(heading.lang_id))
-            tmp.setProperty('panel_id', str(heading.panel_id))
-
-            self.HCL.addItem(tmp)
-
-        # set focus on the heading control list
-        self.setFocusId(101)
-
-        panel_to_show = 0 # default to first panel
+        panel_to_show = WIRED_NETWORK_SELECTOR
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.preseed_data = osmc_network.parse_preseed()
             if self.preseed_data:
                 if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
-                    panel_to_show = 1
+                    panel_to_show = WIRELESS_NETWORK_SELECTOR
                 else:
-                    panel_to_show = 0
+                    panel_to_show = WIRED_NETWORK_SELECTOR
 
         # set all the panels to invisible except the first one
-        self.toggle_panel_visibility(panel_to_show)
-        if panel_to_show == 0:
+        for ctl in MAIN_MENU:
+                self.getControl(ctl * 10).setVisible(True if ctl == panel_to_show else False)
+        if panel_to_show == WIRED_NETWORK_SELECTOR:
             self.populate_wired_panel()
-        if panel_to_show == 1:
-            self.populate_wifi_panel()
+        if panel_to_show == WIRELESS_NETWORK_SELECTOR:
+            self.populate_wifi_panel(False)
 
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.setup_networking_from_preseed()
@@ -332,22 +309,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if focused_control in ALL_WIRELESS_CONTROLS:
                 self.handle_wireless_selection(focused_control)
 
-    def toggle_panel_visibility(self, focused_position):
-        ''' Takes the focused position in the Heading List Control and sets only the required panel to visible. '''
-        target_panel = 0
-
-        # get the required panel
-        try:
-            target_panel = int(self.HCL.getListItem(focused_position).getProperty('panel_id'))
-
-        except:
-            target_panel = 0
-
-        log('target_panel = %s' % target_panel)
-
-        for panel_id in panel_controls:
-            self.getControl(panel_id).setVisible(True if target_panel == panel_id else False)
-
     def edit_ip_address(self, controlID):
         relevant_label_control = self.getControl(900000 + controlID)
         current_label = relevant_label_control.getLabel()
@@ -374,8 +335,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
                 return
 
-            ip_string = ' : '.join(str(user_input).split('.'))
-            relevant_label_control.setLabel(ip_string)
+            #ip_string = ' : '.join(str(user_input).split('.'))
+            relevant_label_control.setLabel(user_input)
 
             return
 
@@ -393,7 +354,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             # 'The displayed network configuration may be out dated - A reboot is recommended before proceeding'
             DIALOG.ok(lang(32036), lang(32038))
         # Clear wired network Panel
-        self.WDP.setLabel('Status: checking...')
+        self.status_label.setLabel('Status: checking...')
         if osmc_network.is_ethernet_enabled():
             self.current_network_config = self.get_wired_config()
             log(self.current_network_config)
@@ -408,7 +369,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     status = 'Status ' + interface + ' (no internet)'
                 else:
                     status = 'Status ' + interface
-
+                self.status_label.setLabel(status)
                 self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
 
                 self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
@@ -418,10 +379,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             else:  # no wired connection
                 self.toggle_controls(False, ALL_WIRED_CONTROLS)
-
                 status = 'Status: No wired connection'
-
-            self.WDP.setLabel(status)
+                self.status_label.setLabel(status)
 
         adapterRadioButton = self.getControl(WIRED_ADAPTER_TOGGLE)
         adapterRadioButton.setSelected(osmc_network.is_ethernet_enabled())
@@ -527,10 +486,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.update_apply_reset_button('WIRED')
 
     def toggle_ethernet(self):
-        self.WDP.setLabel('Status: checking...')
-        item = xbmcgui.ListItem(lang(32016))
+        self.status_label.setLabel('Status: checking...')
         self.toggle_controls(False, ALL_WIRED_CONTROLS)
-        self.WDP.setLabel('Status: Configuring...')
+        self.status_label.setLabel('Status : ' + lang(32016))
         osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
         # 5 second wait to allow connman to make the changes before refreshing
         time.sleep(5)
@@ -573,7 +531,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
                 self.setFocusId(WIRELESS_SCAN_BUTTON)
             else:
-                self.setFocusId(1)
+                self.setFocusId(WIRELESS_ADAPTER_TOGGLE)
 
             adapterRadioButton = self.getControl(WIRELESS_ADAPTER_TOGGLE)
             adapterRadioButton.setSelected(osmc_network.is_wifi_enabled())
