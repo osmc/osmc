@@ -162,14 +162,20 @@ class Main(object):
 
 			self.cache.open()
 
+			removals = False
+
 			for pkg in self.cache:
 
 				if pkg.is_auto_removable:
 
 					pkg.mark_delete()
 
-			# commit
-			self.commit_action()
+					removals = True
+
+			if removals:
+				
+				# commit
+				self.commit_action()
 
 
 	@clog()
