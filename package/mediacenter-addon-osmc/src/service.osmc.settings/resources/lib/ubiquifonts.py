@@ -70,7 +70,7 @@ def import_osmc_fonts():
 	unique_files = set(os.listdir(FONT_FOLDER)) - alien_fonts
 
 	for filename in unique_files:
-		subprocess.call(["sudo", "mv", os.path.join(FONT_FOLDER, filename), os.path.join(alien_fonts_folder, filename)])
+		subprocess.call(["sudo", "cp", os.path.join(FONT_FOLDER, filename), alien_fonts_folder])
 
 	with open(FONT_PARTIALS, 'r') as f:
 		osmc_lines = f.readlines()
@@ -80,9 +80,13 @@ def import_osmc_fonts():
 
 	new_lines = []
 
+	count = 0
+
 	for line in alien_lines:
 
-		if '</fontset>' in line:
+		if '</fontset>' in line and count == 0:
+
+			count += 1
 
 			for l in osmc_lines:
 
@@ -104,7 +108,7 @@ def import_osmc_fonts():
 	with open('/tmp/Font.xml', 'w') as bf:
 		bf.writelines(new_lines)
 
-		subprocess.call(["sudo", "mv", '/tmp/Font.xml', alien_font_xml])
+	subprocess.call(["sudo", "mv", '/tmp/Font.xml', alien_font_xml])
 
 	return 'reload_please'
 
