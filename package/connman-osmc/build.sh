@@ -33,7 +33,7 @@ then
 	make install DESTDIR=${out}
 	mkdir -p ${out}/etc/dbus-1/system.d
 	mkdir -p ${out}/usr/share/polkit-1/actions
-	cp -ar src/connman-dbus.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
+	cp -ar src/connman-dbus-osmc.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
 	cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
 	cp -ar client/connmanctl ${out}/sbin/connmanctl
 	popd
