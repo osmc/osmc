@@ -53,7 +53,6 @@ void BootloaderConfig::configureEnvironment()
             /* NFS install */
             cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet";
         }
-        utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
         if (utils->getOSMCDev() == "rbp1")
@@ -67,5 +66,8 @@ void BootloaderConfig::configureEnvironment()
             cmdlineStringList << "osmcdev=rbp2";
         }
         utils->writeToFile(configFile, configStringList, false);
+        utils->writeToFile(cmdlineFile, cmdlineStringList, false);
+        configFile.close();
+        cmdlineFile.close();
     }
 }
