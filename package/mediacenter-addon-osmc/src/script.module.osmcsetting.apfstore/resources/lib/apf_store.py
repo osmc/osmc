@@ -319,41 +319,19 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def retrieve_install_status(self):
 
-		try:
-			self.cache = apt.Cache()
-			self.cache.open()
+		with os.popen('dpkg -l') as f:
+			self.package_list = f.readlines()
 
-			# for pkg in self.cache:
+		thread_queue = Queue.Queue()
 
-			# 	log(pkg.shortname)
+		for ident, apf in self.apf_dict.iteritems():
 
+			thread_queue.put(apf)
 
-			thread_queue = Queue.Queue()
+		t = threading.Thread(target=self.grab_install_status, args=(thread_queue,))
+		t.daemon = True
 
-			for ident, apf in self.apf_dict.iteritems():
-
-				thread_queue.put(apf)
-
-			# spawn some workers
-			# for i in range(1):
-
-			t = threading.Thread(target=self.grab_install_status, args=(thread_queue,))
-			t.daemon = True
-
-			# reset all cached install status
-			__addon__.setSetting('install_status_cache', '')
-
-			t.start()
-
-		except apt.cache.LockFailedException:
-
-			# if the cache is locked then use the stored version of the install status
-
-			for idee, apf in self.apf_dict.iteritems():
-
-				if self.install_status_cache.get(idee, False):
-
-					apf.set_installed(True)
+		t.start()
 
 
 	@clog(logger=log)
@@ -364,32 +342,16 @@ class APF_STORE(object):
 			try:
 				# grabs the item from the queue
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
-				q_item = thread_queue.get(True, 1)
+				apf = thread_queue.get(True, 1)
 				
-				try:
-					# check the install status of this package
-					pkg = self.cache[q_item.id]
+				if apf.id in self.package_list:
+					log('%s IS Installed' % apf.shortname)
 
-				except KeyError:
-					log('package: %s not in cache' % q_item.id)
-					continue
-
-
-				log('package: %s is in cache' % pkg.shortname)
-
-				if pkg.is_installed:
-
-					log('%s IS Installed' % pkg.shortname)
-
-					q_item.set_installed(True)
-
-					tmp = __addon__.getSetting('install_status_cache') + ':_:' + q_item.id + '=installed'
-
-					__addon__.setSetting('install_status_cache', tmp)
+					apf.set_installed(True)
 
 				else:
 
-					log('%s is NOT Installed' % pkg.shortname)
+					log('%s is NOT Installed' % apf.shortname)
 				
 				thread_queue.task_done()
 
@@ -418,11 +380,5 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def create_apf_store_gui(self, apf_dict):
 
-		# if 'osmc' in xbmc.getSkinDir().lower():
-
 		return apf_GUI("APFBrowser_OSMC.xml", __path__, 'Default', apf_dict=apf_dict)
-
-		# else:
-
-		# 	return apf_GUI("APFBrowser.xml", __path__, 'Default', apf_dict=apf_dict)
 
