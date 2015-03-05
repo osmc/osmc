@@ -2,6 +2,7 @@
 import os
 import shutil
 import sys
+import subprocess
 
 # XBMC modules
 import xbmc
@@ -69,7 +70,7 @@ def import_osmc_fonts():
 	unique_files = set(os.listdir(FONT_FOLDER)) - alien_fonts
 
 	for filename in unique_files:
-		shutil.copy(os.path.join(FONT_FOLDER, filename), os.path.join(alien_fonts_folder, filename))
+		subprocess.call(["sudo", "mv", os.path.join(FONT_FOLDER, filename), os.path.join(alien_fonts_folder, filename)])
 
 	with open(FONT_PARTIALS, 'r') as f:
 		osmc_lines = f.readlines()
@@ -97,12 +98,13 @@ def import_osmc_fonts():
 	backup_file = os.path.join(alien_fonts_folder,'backup_Font.xml')
 	
 	print 'BACKUP FILE: %s' % backup_file
-	
-	shutil.copyfile(alien_font_xml, backup_file)
 
-	with open(alien_font_xml, 'w') as bf:
+	subprocess.call(["sudo", "cp", alien_font_xml, backup_file])
+	
+	with open('/tmp/Font.xml', 'w') as bf:
 		bf.writelines(new_lines)
 
+		subprocess.call(["sudo", "mv", '/tmp/Font.xml', alien_font_xml])
 
 	return 'reload_please'
 

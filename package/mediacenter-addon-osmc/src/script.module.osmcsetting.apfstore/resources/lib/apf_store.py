@@ -371,7 +371,7 @@ class APF_STORE(object):
 					pkg = self.cache[q_item.id]
 
 				except KeyError:
-					log('package: %s not in cache')
+					log('package: %s not in cache' % q_item.id)
 					continue
 
 
