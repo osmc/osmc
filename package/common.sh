@@ -133,7 +133,7 @@ function publish_applications_targeted()
 	for device in $devices
 	do
 	    cp ${1}/app.json ${1}/${device}-${3}.json
-	    sed -e s/\"id\":\ \"/\"id\":\ \"${device}-/ -i ${device}-${3}.json # set the correct package id
+	    sed -e s/\"id\":\ \"/\"id\":\ \"${2}-/ -i ${device}-${3}.json # set the correct package id
 	done
 }
 
