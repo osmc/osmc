@@ -366,11 +366,16 @@ class APF_STORE(object):
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
 				q_item = thread_queue.get(True, 1)
 				
+				try:
+					# check the install status of this package
+					pkg = self.cache[q_item.id]
 
-				# check the install status of this package
-				pkg = self.cache[q_item.id]
+				except KeyError:
+					log('package: %s not in cache')
+					continue
 
-				log('package = %s' % pkg.shortname)
+
+				log('package: %s is in cache' % pkg.shortname)
 
 				if pkg.is_installed:
 
