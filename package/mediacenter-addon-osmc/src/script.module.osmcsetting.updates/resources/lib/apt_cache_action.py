@@ -151,13 +151,25 @@ class Main(object):
 
 				pkg.mark_delete(purge=True)
 
-			if action_dict['removal'] and pkg.is_auto_removable:
-				# if there were removals then remove the packages that arent needed any more
-
-				pkg.mark_delete()
 
 		# commit
 		self.commit_action()
+
+		if action_dict['removal']:
+			# if there were removals then remove the packages that arent needed any more
+
+			self.update()
+
+			self.cache.open()
+
+			for pkg in self.cache:
+
+				if pkg.is_auto_removable:
+
+					pkg.mark_delete()
+
+			# commit
+			self.commit_action()
 
 
 	@clog()

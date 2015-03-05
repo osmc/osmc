@@ -93,17 +93,18 @@ class Main(object):
 		# dictionary containing the permissable actions (communicated from the child apt scripts) 
 		# and the corresponding methods in the parent
 		self.action_dict = 	{
-								'apt_cache update complete' : self.apt_update_complete,
-								'apt_cache commit complete' : self.apt_commit_complete,
-								'apt_cache fetch complete'  : self.apt_fetch_complete,
-								'progress_bar'				: self.progress_bar,
-								'update_settings'			: self.update_settings,
-								'update_now'				: self.update_now,
-								'user_update_now'			: self.user_update_now,
-								'kill_yourself'				: self.kill_yourself,
-								'settings_command'			: self.settings_command,
-								'apt_error'					: self.apt_error,
-								'action_list'				: self.action_list,
+								'apt_cache update complete' 		: self.apt_update_complete,
+								'apt_cache commit complete'			: self.apt_commit_complete,
+								'apt_cache fetch complete'			: self.apt_fetch_complete,
+								'progress_bar'						: self.progress_bar,
+								'update_settings'					: self.update_settings,
+								'update_now'						: self.update_now,
+								'user_update_now'					: self.user_update_now,
+								'kill_yourself'						: self.kill_yourself,
+								'settings_command'					: self.settings_command,
+								'apt_error'							: self.apt_error,
+								'action_list'						: self.action_list,
+								'apt_cache action_list complete'	: self.action_list_complete,
 
 							}
 
@@ -537,6 +538,11 @@ class Main(object):
 
 		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
 
+
+	def self.action_list_complete(self, data):
+
+		# notify the user that the installation or uninstall of their desirec apfs has completed successfully
+		ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
 	@clog(log, maxlength=250)
