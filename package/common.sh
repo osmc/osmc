@@ -127,9 +127,9 @@ function publish_applications_targeted()
 	if [ "$2" == "armv7" ]; then devices="rbp2"; fi
 	if [ "$2" == "i386" ]; then devices="atv"; fi
 	# Architecture specific, platform specific
-	if [ "$2" == "rbp1"; then devices="rbp1"; fi
-	if [ "$2" == "rbp2"; then devices="rbp2"; fi
-	if [ "$2" == "atv1"; then devices="atv"; fi
+	if [ "$2" == "rbp1" ]; then devices="rbp1"; fi
+	if [ "$2" == "rbp2" ]; then devices="rbp2"; fi
+	if [ "$2" == "atv1" ]; then devices="atv"; fi
 	for device in $devices
 	do
 	    cp ${1}/app.json ${1}/${device}-${3}.json
