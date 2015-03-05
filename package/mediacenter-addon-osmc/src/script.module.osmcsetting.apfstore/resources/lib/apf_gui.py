@@ -123,13 +123,7 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 			sel_item = self.apf_dict[self.apf_order_list[sel_pos]]
 
-			if 'osmc' in xbmc.getSkinDir().lower():
-
-				self.addon_gui = addon_info_gui("APFAddonInfo_OSMC.xml", __path__, 'Default', sel_item=sel_item)
-
-			else:
-
-				self.addon_gui = addon_info_gui("APFAddonInfo.xml", __path__, 'Default', sel_item=sel_item)
+			self.addon_gui = addon_info_gui("APFAddonInfo_OSMC.xml", __path__, 'Default', sel_item=sel_item)
 
 			self.addon_gui.doModal()
 
