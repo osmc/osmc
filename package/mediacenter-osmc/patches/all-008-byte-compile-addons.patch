@@ -32,7 +32,7 @@ index c61da1b..36acd90 100644
  
    CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
    g_windowManager.SendThreadMessage(msg);
-+  system("/usr/bin/addon-compiler");
++  system("/usr/bin/sudo /usr/bin/addon-compiler");
  }
  
  void CAddonInstaller::OnJobProgress(unsigned int jobID, unsigned int progress, unsigned int total, const CJob *job)
