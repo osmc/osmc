@@ -31,7 +31,10 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-	cp -ar src/connman-dbus.conf ${out}/etc/dbus-1/system.d
+	mkdir -p ${out}/etc/dbus-1/system.d
+	mkdir -p ${out}/usr/share/polkit-1/actions
+	cp -ar src/connman-dbus.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
+	cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
