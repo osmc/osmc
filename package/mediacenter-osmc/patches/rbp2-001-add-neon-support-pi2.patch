@@ -1,0 +1,14 @@
+diff --git a/configure.in b/configure.in
+index 3a60c0c..1982f35 100644
+--- a/configure.in
++++ b/configure.in
+@@ -815,6 +815,9 @@ if test "$host_vendor" = "apple" ; then
+ elif test "$target_platform" = "target_raspberry_pi"; then
+   ARCH="arm"
+   use_arch="arm"
++  use_neon="yes"
++  CFLAGS="$CFLAGS -mfpu=neon-vfpv4"
++  CXXFLAGS="$CXXFLAGS -mfpu=neon-vfpv4"
+ elif test "$use_arch" = "arm"; then
+   CFLAGS="$CFLAGS -mno-apcs-stack-check"
+   CXXFLAGS="$CXXFLAGS -mno-apcs-stack-check"
