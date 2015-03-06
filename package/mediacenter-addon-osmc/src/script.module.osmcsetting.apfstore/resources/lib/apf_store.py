@@ -320,7 +320,7 @@ class APF_STORE(object):
 	def retrieve_install_status(self):
 
 		with os.popen('dpkg -l') as f:
-			self.package_list = f.readlines()
+			self.package_list = ''.join(f.readlines())
 
 		thread_queue = Queue.Queue()
 
