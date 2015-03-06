@@ -12,7 +12,7 @@ index b4ffd13..be3db0b 100644
 +    FILE *fp = fopen("/tmp/timezone", "w");
 +    if (fp)
 +    {
-+		fprintf(fp, "%s", timezoneName.c_str());
++		fprintf(fp, "%s\n", timezoneName.c_str());
 +		fclose(fp);
 +		system("/usr/bin/sudo /bin/mv /tmp/timezone /etc/timezone"); /* We need this to update a root owned file */
 +		char *command;
