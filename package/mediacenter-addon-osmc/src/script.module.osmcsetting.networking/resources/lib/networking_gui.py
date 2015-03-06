@@ -186,6 +186,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.preseed_data = None
 
+        self.status_label = None
+
     def onInit(self):
          # Wired Network Label
         self.status_label = self.getControl(STATUS_LABEL);
@@ -354,7 +356,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             # 'The displayed network configuration may be out dated - A reboot is recommended before proceeding'
             DIALOG.ok(lang(32036), lang(32038))
         # Clear wired network Panel
-        self.status_label.setLabel('Status: checking...')
+        #                           'Status'             'Checking...'
+        self.status_label.setLabel(lang(32044) + ': ' + lang(32045))
         if osmc_network.is_ethernet_enabled():
             self.current_network_config = self.get_wired_config()
             log(self.current_network_config)
@@ -364,11 +367,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 interface = self.current_network_config['Interface']
 
                 if self.current_network_config['State'] in ('online'):
-                    status = 'Status ' + interface + ' (connected)'
+                    #         'Status'                               'Connected'
+                    status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
                 elif self.current_network_config['State'] in ('ready'):
-                    status = 'Status ' + interface + ' (no internet)'
+                    #         'Status'                               'No internet'
+                    status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
                 else:
-                    status = 'Status ' + interface
+                    #                 'Status'
+                    status = status = lang(32044) + ' ' + interface
                 self.status_label.setLabel(status)
                 self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
 
@@ -379,7 +385,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             else:  # no wired connection
                 self.toggle_controls(False, ALL_WIRED_CONTROLS)
-                status = 'Status: No wired connection'
+                status = lang(32044) + ': ' + lang(32048)
                 self.status_label.setLabel(status)
 
         adapterRadioButton = self.getControl(WIRED_ADAPTER_TOGGLE)
@@ -486,9 +492,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.update_apply_reset_button('WIRED')
 
     def toggle_ethernet(self):
-        self.status_label.setLabel('Status: checking...')
+        #                           'Status'             'Checking...'
+        self.status_label.setLabel(lang(32044) + ': ' + lang(32045))
         self.toggle_controls(False, ALL_WIRED_CONTROLS)
-        self.status_label.setLabel('Status : ' + lang(32016))
+        #                          'Status'              'Configuring...'
+        self.status_label.setLabel(lang(32044) + ' : ' + lang(32016))
         osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
         # 5 second wait to allow connman to make the changes before refreshing
         time.sleep(5)
@@ -659,7 +667,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.toggle_controls(False, [WIRED_DHCP_MANUAL_BUTTON])
         osmc_network.update_preseed_file(self.current_network_config)
         self.populate_wifi_networks(False)
-
 
     def connect_to_wifi(self, ssid, encrypted, password=None, scan=False):
         self.WFP.reset()
