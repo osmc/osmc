@@ -12,3 +12,37 @@ index 3a60c0c..1982f35 100644
  elif test "$use_arch" = "arm"; then
    CFLAGS="$CFLAGS -mno-apcs-stack-check"
    CXXFLAGS="$CXXFLAGS -mno-apcs-stack-check"
+
+diff --git a/xbmc/utils/CPUInfo.cpp b/xbmc/utils/CPUInfo.cpp
+index 71aa745..b73d471 100644
+--- a/xbmc/utils/CPUInfo.cpp
++++ b/xbmc/utils/CPUInfo.cpp
+@@ -919,15 +919,8 @@ void CCPUInfo::ReadCPUFeatures()
+
+ bool CCPUInfo::HasNeon()
+ {
+-  static int has_neon = -1;
+-#if defined (TARGET_ANDROID)
+-  if (has_neon == -1)
+-    has_neon = (CAndroidFeatures::HasNeon()) ? 1 : 0;
+-
+-#elif defined(TARGET_DARWIN_IOS)
+-  has_neon = 1;
++  static int has_neon;
+
+-#elif defined(TARGET_LINUX) && defined(__ARM_NEON__)
+   if (has_neon == -1)
+   {
+     has_neon = 0;
+@@ -949,9 +942,7 @@ bool CCPUInfo::HasNeon()
+     }
+   }
+
+-#endif
+-
+-  return has_neon == 1;
++ return has_neon == 1;
+ }
+
+ CCPUInfo g_cpuInfo;
+
