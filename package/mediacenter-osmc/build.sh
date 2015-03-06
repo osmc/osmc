@@ -181,6 +181,10 @@ then
     mv addon-compiler ${out}/usr/bin
 	popd
 	pushd kodi-pvr/xbmc-pvr*
+	# Reset CFLAGS here! Add some optimisation
+	export CFLAGS="-O3 -fomit-frame-pointer" && \
+	export CXXFLAGS=$CFLAGS && \
+	export CPPFLAGS=$CFLAGS
 	./bootstrap
 	./configure --prefix=/usr --enable-addons-with-dependencies
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
