@@ -133,7 +133,7 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	export CFLAGS="-I/usr/include/afpfs-ng -O3 -fomit-frame-pointer" && \
+	export CFLAGS="-I/usr/include/afpfs-ng" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	./configure \
@@ -146,7 +146,7 @@ then
 	# Raspberry Pi Configuration
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
-	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux -O3 -fomit-frame-pointer" && \
+	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vc/lib" && \
