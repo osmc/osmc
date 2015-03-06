@@ -59,7 +59,7 @@
 					<height>200</height>
 					<font>Font40</font>
 					<textcolor>ColorFO</textcolor>
-					<label fallback="3">$INFO[Container.FolderName]</label>
+					<label>$VAR[Heading]</label>
 				</control>
 
 				<!-- Previous item -->
@@ -74,7 +74,7 @@
 				</control>
 
 				<!-- Sub menu list -->
-				<control type="list" id="50">
+				<control type="fixedlist" id="50">
 					<left>702</left>
 					<top>358</top>
 					<width>1118</width>
@@ -83,9 +83,10 @@
 					<ondown>50</ondown>
 					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
 					<onright>noop</onright>
+					<focusposition>0</focusposition>
 					<orientation>vertical</orientation>
 					<viewtype label="535">list</viewtype>
-					<scrolltime tween="sine" easing="out">200</scrolltime>
+					<scrolltime tween="sine" easing="out">300</scrolltime>
 
 					<itemlayout width="1118" height="82">
 						<control type="label">

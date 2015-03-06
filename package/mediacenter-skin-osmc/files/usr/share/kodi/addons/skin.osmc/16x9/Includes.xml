@@ -36,7 +36,7 @@
 	<include name="WindowBackgroundImage">
 		<control type="image">
 			<include>FullscreenDimensions</include>
-			<texture>special://skin/extras/Background.png</texture>
+			<texture>special://skin/extras/background.png</texture>
 		</control>
 	</include>
 
@@ -89,122 +89,6 @@
 			<font>Font40</font>
 			<textcolor>ColorFO</textcolor>
 		</control>
-	</include>
-
-	<!-- Home widgets list -->
-	<include name="HomeWidgetsList">
-		<left>702</left>
-		<top>320</top>
-		<width>1510</width>
-		<height>384</height>
-		<onup>9000</onup>
-		<ondown>9001</ondown>
-		<onleft>9000</onleft>
-		<onright>noop</onright>
-		<focusposition>0</focusposition>
-		<viewtype label="">list</viewtype>
-		<orientation>horizontal</orientation>
-		<defaultcontrol always="true">0</defaultcontrol>
-		<scrolltime tween="sine" easing="out">300</scrolltime>
-		<itemlayout width="276" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">
-			<control type="image">
-				<top>0</top>
-				<width>256</width>
-				<height>384</height>
-				<texture>common/blue.png</texture>
-			</control>
-			<control type="image">
-				<top>0</top>
-				<width>256</width>
-				<height>384</height>
-				<aspectratio align="center" aligny="top">stretch</aspectratio>
-				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
-			</control>
-		</itemlayout>
-		<focusedlayout width="276" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)">
-			<control type="group">
-				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
-				<control type="image">
-					<top>0</top>
-					<width>256</width>
-					<height>384</height>
-					<texture>common/blue.png</texture>
-				</control>
-				<control type="image">
-					<top>0</top>
-					<width>256</width>
-					<height>384</height>
-					<aspectratio align="center" aligny="top">stretch</aspectratio>
-					<texture background="true">$INFO[ListItem.Icon]</texture>
-				</control>
-			</control>
-		</focusedlayout>
-		<itemlayout width="703" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
-			<control type="image">
-				<top>0</top>
-				<width>683</width>
-				<height>384</height>
-				<texture>common/blue.png</texture>
-			</control>
-			<control type="image">
-				<top>0</top>
-				<width>683</width>
-				<height>384</height>
-				<aspectratio align="center" aligny="top">scale</aspectratio>
-				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
-			</control>
-		</itemlayout>
-		<focusedlayout width="703" height="384" condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
-			<control type="group">
-				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
-				<control type="image">
-					<top>0</top>
-					<width>683</width>
-					<height>384</height>
-					<texture>common/blue.png</texture>
-				</control>
-				<control type="image">
-					<top>0</top>
-					<width>683</width>
-					<height>384</height>
-					<aspectratio align="center" aligny="top">scale</aspectratio>
-					<texture background="true">$INFO[ListItem.Icon]</texture>
-				</control>
-			</control>
-		</focusedlayout>
-		<itemlayout width="404" height="384" condition="!StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
-			<control type="image">
-				<top>0</top>
-				<width>384</width>
-				<height>384</height>
-				<texture>common/blue.png</texture>
-			</control>
-			<control type="image">
-				<top>0</top>
-				<width>384</width>
-				<height>384</height>
-				<aspectratio align="center" aligny="top">keep</aspectratio>
-				<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
-			</control>
-		</itemlayout>
-		<focusedlayout width="404" height="384" condition="!StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)">
-			<control type="group">
-				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
-				<control type="image">
-					<top>0</top>
-					<width>384</width>
-					<height>384</height>
-					<texture>common/blue.png</texture>
-				</control>
-				<control type="image">
-					<top>0</top>
-					<width>384</width>
-					<height>384</height>
-					<aspectratio align="center" aligny="top">keep</aspectratio>
-					<texture background="true">$INFO[ListItem.Icon]</texture>
-				</control>
-			</control>
-		</focusedlayout>
 	</include>
 
 	<!-- Window animation -->

@@ -1,0 +1,116 @@
+v0.0.29
+- Fix script error on XBMC Helix due to empty array
+
+v0.0.27
+- Fix setting properties reload on settings change
+
+v0.0.26
+- Updated language files from Transifex
+- clear all Title properties on settings changed and get fresh data
+
+v0.0.25
+- Added *Episode.%d.Art(tvshow.characterart)
+- Added *Episode.%d.mpaa
+- Added *Movies.%d.OriginalTitle
+- Added *MusicVideo.d%.DBID
+- Added *MusicVideo.d%.Resume
+- Added *MusicVideo.d%.PercentPlayed
+- Added *MusicVideo.d%.Watched
+- Added *Albums.d%.Theme
+- Added *Albums.d%.Mood
+- Added *Albums.d%.Style
+- Added *Albums.d%.Type
+- Added *Artist.d%.Born
+- Added *Artist.d%.Died
+- Added *Artist.d%.Formed
+- Added *Artist.d%.Disbanded
+- Added *Artist.d%.YearsActive
+- Added *Artist.d%.Style
+- Added *Artist.d%.Mood
+- Added *Artist.d%.Instrument
+- Added *Artist.d%.
+
+v0.0.24
+- Added *Episode.%d.Watched
+- Added *Episode.%d.DBID
+- Added *Movie.%d.Country
+- Added *Movie.%d.DBID
+- Added resume=false param for the play command
+  (thx phil65)
+
+v0.0.23
+- Fix premiered property for episodes
+
+v0.0.22
+- Fix keyerror
+
+v0.0.21
+- Add option to hide plot for unwatched items
+
+v0.0.20
+- Use proper Runtime
+- Catch bad JSON results
+- Fix bad default value for randomize time
+- Add new labels
+	RecentMovie.%d.Director
+	RandomMovie.%d.Director
+	RecentEpisode.%d.Premiered
+	RecentEpisode.%d.Runtime
+	RandomEpisode.%d.Premiered
+	RandomEpisode.%d.Runtime
+
+v0.0.19
+- Properly listen to shutdown command in each section since it can take quite some time for them to run
+
+v0.0.18
+- Clean classes on exit
+- fix devide by zero on percentage played
+- fix missing variable when playing small videos (<1s)
+
+v0.0.17
+- Try to break all skins
+- Updated language files from Transifex
+
+v0.0.16
+- Bump dependency versions to prevent being marked as broken
+
+v0.0.15
+- Fix runtime after changes in XBMC 12.0
+
+v0.0.14
+- Always resume episodes and movies
+
+v0.0.10
+- Drop old artwork labels for tvshows and movies
+- Add update label for recent items
+- Add non native artwork support. Needs Artwork Downloader 12.0.2 or up
+
+v0.0.9
+- Added streamdetails for all video related items
+- use foo.Art(bar) for artwork related
+
+v0.0.7
+- Prefer new database 'Art' field over old 'thumb' and use local files as backup
+- Add Resolution label for movies
+
+v0.0.6
+- Fixes calling recent episode multiple times
+
+v0.0.5
+- Add missing trailer property
+- Fixed some wrong labels
+- Added Recent Items
+
+v0.0.4
+- Fix missing import
+- Fix typo in clearproperty
+- Add SetProperty(SkinWidgets_RandomItems_Update,true) to trigger update on all randomitems
+
+v0.0.3
+- Fix wrong recommeded movies JSON-RPC request
+
+v0.0.2
+- Add option for randomitems to use the timer or on database update
+
+v0.0.1
+- Initial version that bring Watchlist and RandomItems in one service script
