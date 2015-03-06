@@ -35,7 +35,7 @@ then
 	mkdir -p ${out}/usr/share/polkit-1/actions
 	cp -ar src/connman-dbus-osmc.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
 	cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
-	cp -ar client/connmanctl ${out}/sbin/connmanctl
+	cp -ar client/connmanctl ${out}/usr/sbin/connmanctl
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
