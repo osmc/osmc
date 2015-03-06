@@ -40,6 +40,7 @@ public slots:
 private:
     void extract();
     QFont getFont(QWidget* element, float ratio);
+    QString constructGradient(unsigned value);
 
     Ui::MainWindow *ui;
     Logger *logger;
@@ -52,5 +53,13 @@ private:
     bool useNFS = false;
     Network *nw;
     BootloaderConfig *bc;
+
+    static const QString CSS_PROGRESS_IMAGE;
+    static const QString CSS_PROGRESS_BORDER_STYLE;
+    static const QString CSS_PROGRESS_BORDER_WIDTH;
+    static const QString CSS_PROGRESS_BORDER_RADIUS;
+    static const QString CSS_PROGRESS_BORDER_RGBA;
+    static const QString CSS_PROGRESS_BACKGROUND_RGBA;
+    static const QString CSS_PROGRESS_BAR_RGBA;
 };
 #endif
