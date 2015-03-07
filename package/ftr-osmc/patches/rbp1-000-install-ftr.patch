@@ -1,6 +1,6 @@
 --- /dev/null	2015-03-01 20:49:21.784006367 +0000
 +++ a/usr/bin/ftr	2015-03-01 21:48:28.996467135 +0000
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,25 @@
 +#!/bin/sh
 +
 +# (c) 2014-2015 Sam Nazarko
@@ -24,4 +24,5 @@
 +MEM_OPTIM="/usr/lib/libarmmem.so"
 +echo ${MEM_OPTIM} > /etc/ld.so.preload
 +wait
++touch /tmp/NO_UPDATE
 +systemctl disable ftr.service
