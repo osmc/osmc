@@ -19,6 +19,13 @@
  http://www.gnu.org/copyleft/gpl.html
 '''
 
+# XBMC modules
+import xbmcgui
+WINDOW = xbmcgui.Window(10000)
+WINDOW.setProperty("walkthough_is_running", 'any_value')
+import xbmc
+import xbmcaddon
+
 # Standard modules
 import os
 import shutil
@@ -32,11 +39,6 @@ import threading
 import datetime
 import traceback
 import subprocess
-
-# XBMC modules
-import xbmc
-import xbmcaddon
-import xbmcgui
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
