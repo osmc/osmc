@@ -128,12 +128,12 @@ class Main(object):
 
 						with open('/tmp/walkthrough_completed', 'w+') as f:
 							pass
+							
 						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
 						
+						xbmc.executebuiltin('ReloadSkin()')
+						
 						break
-
-			xbmc.executebuiltin('ReloadSkin()')
-			
 			else:
 				log('Networking module not found')
 
