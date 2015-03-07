@@ -67,7 +67,7 @@ class Main(object):
 		log('main addon starting')
 
 		# create the no_update file to block skin shortcuts from reload the skin
-		if __setting__('firstrun') == 'true':
+		if not os.path.isfile('/walkthrough_completed'):
 			with open('/tmp/NO_UPDATE', 'w+') as f:
 				pass
 
@@ -114,7 +114,7 @@ class Main(object):
 
 		log('daemon started')
 
-		if __setting__('firstrun') == 'true':
+		if not os.path.isfile('/walkthrough_completed'):
 
 			for module in self.stored_gui.live_modules:
 				if 'id' in module:
@@ -123,7 +123,9 @@ class Main(object):
 
 						walkthru.open_gui(networking_instance)
 
-						__addon__.setSetting('firstrun', 'false')
+						with open('/tmp/walkthrough_completed', 'w+') as f:
+							pass
+						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
 						
 						break
 			
