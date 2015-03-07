@@ -50,6 +50,7 @@ function build_fs_image()
 	tar -cf - * | xz -9 -c - > root${1}.tar.xz
 	mv root${1}.tar.xz ../
 	popd
+	rm -rf output
 }
 echo -e "Building NOOBS filesystem image"
 build_fs_image "1" # Pi 1
