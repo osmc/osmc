@@ -48,6 +48,7 @@ class Main(object):
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False},
 				'keyboard' 			: {'function': self.grab_keyboard, 				'setting': False},
+				'remote' 			: {'function': self.grab_remote, 				'setting': False},
 				'system' 			: {'function': self.grab_system_logs, 			'setting': False},
 				'lirc' 				: {'function': self.grab_lirc_conf, 			'setting': False},
 				'boot' 				: {'function': self.grab_boot_contents,			'setting': False},
@@ -64,6 +65,7 @@ class Main(object):
 				'cmdline',
 				'advancedsettings',
 				'keyboard',
+				'remote',
 				'sources',
 				'fstab',
 				'packages',
@@ -318,6 +320,19 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['keyboard.xml not found'])
+
+
+	def grab_remote(self):
+
+		self.log_list.extend(['\n====================== remote.xml =======================\n'])
+
+		location = '/home/osmc/.kodi/userdata/remote.xml'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['remote.xml not found'])			
 
 
 	def grab_system_logs(self):
