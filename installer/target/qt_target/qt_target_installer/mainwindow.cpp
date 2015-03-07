@@ -32,6 +32,7 @@ const QString MainWindow::CSS_PROGRESS_BORDER_RADIUS = "border-radius: 5px;";
 const QString MainWindow::CSS_PROGRESS_BORDER_RGBA = "border-color: rgba(0,0,0,0);";
 const QString MainWindow::CSS_PROGRESS_BACKGROUND_RGBA = "rgba(209,210,209, 255)";
 const QString MainWindow::CSS_PROGRESS_BAR_RGBA = "rgba(24, 45, 81, 255)";
+int lastProgress = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -290,6 +291,9 @@ void MainWindow::finished()
 
 void MainWindow::setProgress(unsigned value)
 {
+    /* Stop constant redrawing */
+    if (value == lastProgress)
+        return;
     QString styleSheet = "";
 
     styleSheet.append(CSS_PROGRESS_BORDER_RGBA)
@@ -300,6 +304,7 @@ void MainWindow::setProgress(unsigned value)
             .append(getProgressbarGradient(value));
 
     ui->statusProgressBar->setStyleSheet(styleSheet);
+    lastProgress = value;
 }
 
 QString MainWindow::getProgressbarGradient(unsigned value)
