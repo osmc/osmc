@@ -40,7 +40,7 @@ public slots:
 private:
     void extract();
     QFont getFont(QWidget* element, float ratio);
-    QString constructGradient(unsigned value);
+    QString getProgressbarGradient(unsigned value);
 
     Ui::MainWindow *ui;
     Logger *logger;

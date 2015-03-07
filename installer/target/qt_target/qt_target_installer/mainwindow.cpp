@@ -23,6 +23,7 @@
 #include <QTimer>
 
 /* required definitions to construct the css for our pseudo-progressbar */
+/* CSS_PROGRESS_IMAGE is used to reset potential other border-images, repeated on that component */
 const QString MainWindow::CSS_PROGRESS_IMAGE = "border-image: foo;";
 const QString MainWindow::CSS_PROGRESS_BORDER_STYLE = "border-style: outset;";
 const QString MainWindow::CSS_PROGRESS_BORDER_WIDTH = "border-width: 2px;";
@@ -296,12 +297,12 @@ void MainWindow::setProgress(unsigned value)
             .append(CSS_PROGRESS_BORDER_STYLE)
             .append(CSS_PROGRESS_BORDER_WIDTH)
             .append(CSS_PROGRESS_IMAGE)
-            .append(constructGradient(value));
+            .append(getProgressbarGradient(value));
 
     ui->statusProgressBar->setStyleSheet(styleSheet);
 }
 
-QString MainWindow::constructGradient(unsigned value)
+QString MainWindow::getProgressbarGradient(unsigned value)
 {
     float actualValue = value / 100.0;
     if (value == 100)
