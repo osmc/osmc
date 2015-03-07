@@ -47,7 +47,7 @@ void BootloaderConfig::configureEnvironment()
         QFile cmdlineFile("/mnt/boot/cmdline.txt");
         QStringList cmdlineStringList;
         if (! device->getRoot().contains(":/"))
-            cmdlineStringList << "root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet";
+            cmdlineStringList << "root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet ";
         else
         {
             /* NFS install */
