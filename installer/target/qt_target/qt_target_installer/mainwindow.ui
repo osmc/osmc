@@ -14,7 +14,7 @@
    <string>OSMC Installer</string>
   </property>
   <property name="autoFillBackground">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="styleSheet">
    <string notr="true">border-image: url(:/assets/resources/install.png);</string>
@@ -26,9 +26,9 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="60,19,10,18">
-    <item>
-     <spacer name="verticalSpacer">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="5,2,1,2" columnstretch="12,76,12">
+    <item row="3" column="1">
+     <spacer name="verticalSpacer_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
@@ -40,7 +40,26 @@
       </property>
      </spacer>
     </item>
-    <item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="statusProgressBar">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-image: foo;
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(24, 45, 81, 255), stop:0.5 rgba(24, 45, 81, 255), stop:0.5001 rgba(209,210,209, 255), stop:1 rgba(209,210,209, 255));
+border-style: outset;
+     border-width: 2px;
+     border-radius: 5px;
+	border-color: rgba(0,0,0,0);
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <widget class="QLabel" name="statusLabel">
       <property name="font">
        <font>
@@ -64,27 +83,8 @@ color:rgb(240, 240, 240);
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QLabel" name="statusProgressBar">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-image: foo;
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(24, 45, 81, 255), stop:0.5 rgba(24, 45, 81, 255), stop:0.5001 rgba(209,210,209, 255), stop:1 rgba(209,210,209, 255));
-border-style: outset;
-     border-width: 2px;
-     border-radius: 5px;
-	border-color: rgba(0,0,0,0);
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer_2">
+    <item row="0" column="1">
+     <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
@@ -92,6 +92,32 @@ border-style: outset;
        <size>
         <width>20</width>
         <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="0">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="2">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
        </size>
       </property>
      </spacer>
