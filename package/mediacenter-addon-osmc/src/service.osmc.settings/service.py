@@ -31,6 +31,7 @@ import os
 import threading
 import datetime
 import traceback
+import subprocess
 
 # XBMC modules
 import xbmc
