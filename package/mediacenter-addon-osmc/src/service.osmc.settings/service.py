@@ -66,6 +66,11 @@ class Main(object):
 
 		log('main addon starting')
 
+		# create the no_update file to block skin shortcuts from reload the skin
+		if __setting__('firstrun') == 'true':
+			with open('/tmp/NO_UPDATE', 'w+') as f:
+				pass
+
 		# queue for communication with the comm and Main
 		self.parent_queue = Queue.Queue()
 
