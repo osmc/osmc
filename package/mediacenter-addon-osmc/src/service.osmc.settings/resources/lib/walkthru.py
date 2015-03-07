@@ -41,6 +41,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance):
 
+
+		# show timezone switch
+		self.showtimezone = False
+
 		# switch that identifies whether the internet is connected
 		self.internet_connected = False
 
@@ -52,7 +56,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.internet_checker.start()
 
 		# edit the timezone in /etc/timezone
-		self.timezones = timezones.get_timezones()
+		if self.showtimezone:
+			self.timezones = timezones.get_timezones()
 
 		# newsletter email address
 		self.email = ''
@@ -87,18 +92,19 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			self.getControl(hide_this).setVisible(False)
 
-		# populate the timezone controls
-		for region, countries in self.timezones.iteritems():
+		if self.showtimezone:
+			# populate the timezone controls
+			for region, countries in self.timezones.iteritems():
 
-			for country in countries:
+				for country in countries:
 
-				ctl_id = self.tz_control_map.get(region, False)
+					ctl_id = self.tz_control_map.get(region, False)
 
-				if not ctl_id: continue
+					if not ctl_id: continue
 
-				self.tmp = xbmcgui.ListItem(label=country, label2='', thumbnailImage='')
+					self.tmp = xbmcgui.ListItem(label=country, label2='', thumbnailImage='')
 
-				self.getControl(ctl_id).addItem(self.tmp)
+					self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
 		for visibility_control in [93000,94000,95000, 96000]:
@@ -157,10 +163,21 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			self.selected_language = self.getControl(controlID).getSelectedItem().getLabel()
 
-			self.getControl(92000).setVisible(False)
-			self.getControl(93000).setVisible(True)
-			self.getControl(1003).setVisible(True)
-			self.setFocusId(1003)
+			if self.showtimezone:
+
+				self.getControl(92000).setVisible(False)
+				self.getControl(93000).setVisible(True)
+				self.getControl(1003).setVisible(True)
+				self.setFocusId(1003)
+
+			else:
+
+				self.getControl(92000).setVisible(False)
+				self.getControl(94000).setVisible(True)
+				self.getControl(1004).setVisible(True)
+				self.setFocusId(1004)
+				self.getControl(1004).controlUp(self.getControl(1002))
+				self.getControl(1002).controlDown(self.getControl(1004))
 
 		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]:
 			# timezone containers
