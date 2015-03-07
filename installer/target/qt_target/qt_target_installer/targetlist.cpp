@@ -12,9 +12,9 @@ TargetList::TargetList()
     /* Populate supported devices */
     /* Raspberry Pi */
     Target *RBP = new Target("/dev/mmcblk0p1", "vfat", true, "/dev/mmcblk0p2");
-    Target *RBP2 = new Target("/dev/mmcblk0p1", "vfat", true, "/dev/mmcblk0p2");
     /* Add to map */
-    targetMap.insert("rbp", RBP);
+    /* We can use the same Target for both Pis, identical entries */
+    targetMap.insert("rbp1", RBP);
     targetMap.insert("rbp2", RBP);
 }
 
