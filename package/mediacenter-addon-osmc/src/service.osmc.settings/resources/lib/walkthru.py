@@ -7,6 +7,7 @@ import xbmcaddon
 import os
 import sys
 import requests
+import subprocess
 from threading import Thread
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
@@ -131,6 +132,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		if controlID == 1005:
 			# Exit control
+
+			# delete skin update block file
+			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
 
 			if self.selected_language != None:
 
