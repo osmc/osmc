@@ -65,7 +65,7 @@
 					<control type="group">
 						<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(9000)">Conditional</animation>
 						<control type="image">
-							<top>26</top>
+							<top>28</top>
 							<width>66</width>
 							<height>66</height>
 							<texture>$INFO[ListItem.Icon,home/]</texture>
@@ -119,153 +119,472 @@
 						<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
 					</control>
 
-					<!-- Videos widget -->
-					<control type="fixedlist" id="9002">
-						<include>HomeWidgetsList</include>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),VideoAddons)</visible>
-						<content target="video" limit="10">addons://sources/video</content>
-
-					</control>
-
 					<!-- Recent Movies widget -->
-					<control type="fixedlist" id="9003">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9002">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="276" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">stretch</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="276" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">stretch</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecentMovies</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=recentmovies&amp;reload=$INFO[Window.Property(recentmovies)]</content>
-
 					</control>
 
 					<!-- Recommended Movies widget -->
-					<control type="fixedlist" id="9004">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9003">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="276" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">stretch</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="276" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">stretch</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecommendedMovies</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=recommendedmovies&amp;reload=$INFO[Window.Property(recommendedmovies)]</content>
-
 					</control>
 
 					<!-- Random Movies widget -->
-					<control type="fixedlist" id="9005">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9004">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="276" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>256</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">stretch</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="276" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>256</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">stretch</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RandomMovies</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=randommovies&amp;reload=$INFO[Window.Property(randommovies)]</content>
-
 					</control>
 
 					<!-- Recent Episodes widget -->
-					<control type="fixedlist" id="9006">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9005">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="703" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">scale</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="703" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">scale</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecentEpisodes</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=recentepisodes&amp;reload=$INFO[Window.Property(recentepisodes)]</content>
-
 					</control>
 
 					<!-- Recommended Episodes widget -->
-					<control type="fixedlist" id="9007">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9006">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="703" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">scale</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="703" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">scale</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecommendedEpisodes</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=recommendedepisodes&amp;reload=$INFO[Window.Property(recommendedepisodes)]</content>
-
 					</control>
 
 					<!-- Random Episodes widget -->
-					<control type="fixedlist" id="9008">
-						<include>HomeWidgetsList</include>
+					<control type="fixedlist" id="9007">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="703" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>683</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">scale</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="703" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>683</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">scale</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RandomEpisodes</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)</visible>
-						<content limit="10">plugin://service.library.data.provider?type=randomepisodes&amp;reload=$INFO[Window.Property(randomepisodes)]</content>
-
 					</control>
 
-					<!-- Music widget -->
+					<!-- Recent Album widget -->
+					<control type="fixedlist" id="9008">
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="404" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">keep</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="404" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">keep</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecentAlbums</include>
+						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums)</visible>
+					</control>
+
+					<!-- Recommended Album widget -->
 					<control type="fixedlist" id="9009">
-						<include>HomeWidgetsList</include>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons)</visible>
-						<content target="music" limit="10">addons://sources/audio</content>
-
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="404" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">keep</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="404" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">keep</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RecommendedAlbums</include>
+						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums)</visible>
 					</control>
 
-					<!-- Picture widget -->
+					<!-- Random Album widget -->
 					<control type="fixedlist" id="9010">
-						<include>HomeWidgetsList</include>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons)</visible>
-						<content limit="10">addons://sources/image</content>
-
-					</control>
-
-					<!-- Program widget -->
-					<control type="fixedlist" id="9011">
-						<include>HomeWidgetsList</include>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons)</visible>
-						<content target="programs" limit="10">addons://sources/executable</content>
-
-					</control>
-
-					<!-- Favourites widget -->
-					<control type="fixedlist" id="9012">
-						<include>HomeWidgetsList</include>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),Favourites)</visible>
-						<content>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.1.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.1.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.1.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.1.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.2.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.2.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.2.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.2.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.3.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.3.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.3.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.3.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.4.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.4.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.4.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.4.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.5.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.5.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.5.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.5.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.6.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.6.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.6.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.6.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.7.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.7.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.7.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.7.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.8.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.8.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.8.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.8.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.9.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.9.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.9.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.9.name))</visible>
-							</item>
-							<item>
-								<label>$INFO[Window(home).Property(favourite.10.name)]</label>
-								<onclick>$INFO[Window(home).Property(favourite.10.path)]</onclick>
-								<thumb>$INFO[Window(home).Property(favourite.10.thumb)]</thumb>
-								<visible>!IsEmpty(Window(home).Property(favourite.10.name))</visible>
-							</item>
-						</content>
-
+						<left>702</left>
+						<top>320</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9001</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="404" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<texture>common/blue.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">keep</aspectratio>
+								<texture colordiffuse="4dffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="404" height="384">
+							<control type="group">
+								<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<texture>common/blue.png</texture>
+								</control>
+								<control type="image">
+									<top>0</top>
+									<width>384</width>
+									<height>384</height>
+									<aspectratio align="center" aligny="top">keep</aspectratio>
+									<texture background="true">$INFO[ListItem.Icon]</texture>
+								</control>
+							</control>
+						</focusedlayout>
+						<include>RandomAlbums</include>
+						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums)</visible>
 					</control>
 
 					<!-- Focused label -->
@@ -281,55 +600,17 @@
 						<label>$VAR[WidgetLabel]</label>
 						<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="true" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
 					</control>
-					<!--control type="textbox">
-						<centerleft>830</centerleft>
-						<top>712</top>
-						<width>256</width>
-						<height>100</height>
-						<align>center</align>
-						<aligny>top</aligny>
-						<font>Font26</font>
-						<textcolor>ColorFO</textcolor>
-						<autoscroll>false</autoscroll>
-						<label>$VAR[WidgetLabel]</label>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) | StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies)</visible>
-					</control>
-					<control type="textbox">
-						<centerleft>1044</centerleft>
-						<top>712</top>
-						<width>703</width>
-						<height>100</height>
-						<align>center</align>
-						<aligny>top</aligny>
-						<font>Font26</font>
-						<textcolor>ColorFO</textcolor>
-						<autoscroll>false</autoscroll>
-						<label>$VAR[WidgetLabel]</label>
-						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) | StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)</visible>
-					</control>
-					<control type="textbox">
-						<centerleft>894</centerleft>
-						<top>712</top>
-						<width>384</width>
-						<height>100</height>
-						<align>center</align>
-						<aligny>top</aligny>
-						<font>Font26</font>
-						<textcolor>ColorFO</textcolor>
-						<autoscroll>false</autoscroll>
-						<label>$VAR[WidgetLabel]</label>
-						<visible>!StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomMovies) + !StringCompare(Container(9000).ListItem.Property(Widget),RecentEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RecommendedEpisodes) + !StringCompare(Container(9000).ListItem.Property(Widget),RandomEpisodes)</visible>
-					</control-->
 
 				</control>
 
 				<control type="group">
 					<animation effect="slide" start="0,0" end="0,-592" time="400" tween="cubic" easing="inout" reversible="true" condition="Control.HasFocus(9001) + !IsEmpty(Container(9000).ListItem.Property(Widget))">Conditional</animation>
+					<animation effect="slide" start="0,0" end="0,-592" time="0" tween="cubic" easing="inout" reversible="true" condition="IsEmpty(Container(9000).ListItem.Property(Widget))">Conditional</animation>
 
 					<!-- Previous item -->
 					<control type="image">
 						<left>702</left>
-						<top>210</top>
+						<top>802</top>
 						<width>40</width>
 						<height>4</height>
 						<texture>common/white.png</texture>
@@ -350,7 +631,6 @@
 						<onright>noop</onright>
 						<orientation>vertical</orientation>
 						<scrolltime tween="sine" easing="out">300</scrolltime>
-						<animation effect="slide" start="0,0" end="0,-592" time="0" tween="cubic" easing="inout" reversible="true" condition="IsEmpty(Container(9000).ListItem.Property(Widget))">Conditional</animation>
 
 						<itemlayout width="640" height="81">
 							<control type="label">

@@ -52,7 +52,7 @@
 			<onright>304</onright>
 			<onup>noop</onup>
 			<ondown>9001</ondown>
-			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<scrolltime tween="sine" easing="out">300</scrolltime>
 
 			<itemlayout width="360" height="66">
 				<control type="label">
@@ -118,7 +118,7 @@
 			<ondown>9001</ondown>
 			<orientation>vertical</orientation>
 			<usecontrolcoords>true</usecontrolcoords>
-			<scrolltime tween="sine" easing="out">240</scrolltime>
+			<scrolltime tween="sine" easing="out">300</scrolltime>
 
 			<!-- Change shortcut -->
 			<control type="button" id="401">
@@ -156,6 +156,7 @@
 				<label>$ADDON[script.skinshortcuts 32044]</label>
 				<label2>$INFO[Container(211).ListItem.Property(widgetName)]</label2>
 				<visible>StringCompare(Window.Property(groupname), mainmenu)</visible>
+				<visible>StringCompare(Container(211).ListItem.Label,$LOCALIZE[342]) | StringCompare(Container(211).ListItem.Label,$LOCALIZE[20343]) | StringCompare(Container(211).ListItem.Label,$LOCALIZE[2])</visible>
 			</control>
 
 			<!-- Remove -->
