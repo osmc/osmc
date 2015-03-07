@@ -176,7 +176,7 @@ class Main(object):
 				pass
 
 		# a preliminary check for updates (for testing only)
-		if self.s['check_onboot']:
+		if self.s['check_onboot'] == 'true':
 			if not self.skip_update_check:
 				self.boot_delay_passed = False
 				self.function_holding_pattern = self.holding_pattern_boot_update
