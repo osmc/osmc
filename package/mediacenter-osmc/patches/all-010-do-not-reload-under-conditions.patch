@@ -1,0 +1,19 @@
+diff --git a/xbmc/interfaces/Builtins.cpp b/xbmc/interfaces/Builtins.cpp
+index d99f047..77f02fd 100644
+--- a/xbmc/interfaces/Builtins.cpp
++++ b/xbmc/interfaces/Builtins.cpp
+@@ -818,7 +818,13 @@ int CBuiltins::Execute(const std::string& execString)
+   else if (execute == "reloadskin")
+   {
+     //  Reload the skin
+-    g_application.ReloadSkin(!params.empty() && StringUtils::EqualsNoCase(params[0], "confirm"));
++    FILE *fp;
++    fp = fopen("/tmp/NO_UPDATE", "r")
++    if (fp)
++    {
++		g_application.ReloadSkin(!params.empty() && StringUtils::EqualsNoCase(params[0], "confirm"));
++		fclose(fp)
++    }
+   }
+   else if (execute == "unloadskin")
+   {
