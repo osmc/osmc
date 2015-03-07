@@ -269,7 +269,7 @@ void MainWindow::setupBootLoader()
 void MainWindow::haltInstall(QString errorMsg)
 {
     logger->addLine("Halting Install. Error message was: " + errorMsg);
-    setProgress(50);
+    setProgress(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
     dumpLog();
 }
