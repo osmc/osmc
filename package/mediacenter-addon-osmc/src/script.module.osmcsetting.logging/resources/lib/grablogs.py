@@ -38,7 +38,6 @@ class Main(object):
 
 		sets =	{
 				'kodi' 				: {'function': self.grab_kodi_logs, 			'setting': False},
-				'kodiold' 			: {'function': self.grab_kodiold_logs, 			'setting': False},
 				'config' 			: {'function': self.grab_config, 				'setting': False},
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False},
@@ -79,12 +78,11 @@ class Main(object):
 				'diskspace',
 				'boot',
 				'kodi',
-				'kodiold',
 				]	
 
 
 		for key in keys:
-			if grab_all and key not in ['kodiold']:
+			if grab_all and key not in []:
 				sets[key]['setting'] = True
 			else:
 				sets[key]['setting'] = True if __addon__.getSetting(key) == 'true' else False
@@ -170,20 +168,6 @@ class Main(object):
 
 	def grab_kodi_logs(self):
 
-		self.log_list.extend(['\n====================== Kodi Log =======================\n'])
-
-		location = '/home/osmc/.kodi/temp/kodi.log'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines())
-		except:
-
-			self.log_list.extend(['kodi logs not found'])
-
-
-	def grab_kodiold_logs(self):
-
 		self.log_list.extend(['\n====================== Kodi Old Log ======================\n'])
 
 		location = '/home/osmc/.kodi/temp/kodi.old.log'
@@ -194,6 +178,17 @@ class Main(object):
 		except:
 
 			self.log_list.extend(['kodi old logs not found'])
+
+		self.log_list.extend(['\n====================== Kodi Log =======================\n'])
+
+		location = '/home/osmc/.kodi/temp/kodi.log'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+
+			self.log_list.extend(['kodi logs not found'])
 
 
 	def grab_lirc_conf(self):
