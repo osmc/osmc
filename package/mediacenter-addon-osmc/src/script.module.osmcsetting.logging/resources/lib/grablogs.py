@@ -232,6 +232,16 @@ class Main(object):
 		with os.popen('uname -a') as f:
 			self.log_list.extend(f.readlines())
 
+		self.log_list.extend(['\n====================== cmdline.txt =====================\n'])
+
+		location = '/proc/cmdline.txt'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['cmdline.txt not found'])
+
 
 	def grab_all_other_packages(self):
 
@@ -250,19 +260,6 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		else:
 			self.log_list.extend(['apt log not found'])
-
-
-	def grab_cmdline(self):
-
-		self.log_list.extend(['\n====================== Pi cmdline.txt =====================\n'])
-
-		location = '/boot/cmdline.txt'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines())
-		except:
-			self.log_list.extend(['cmdline.txt not found'])
 
 
 	def grab_advancedsettings(self):
