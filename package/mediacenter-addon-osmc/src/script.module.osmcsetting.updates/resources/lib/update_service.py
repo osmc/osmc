@@ -414,7 +414,7 @@ class Main(object):
 			self.scheduler_settings = ['check_freq', 'check_weekday', 'check_day', 'check_time', 'check_hour', 'check_minute']
 			# self.icon_settings		= ['pos_x', 'pos_y']
 
-			self.on_upd = [lang(x) for x in [32057,32058,32059,32060,32061,32062]]
+			self.on_upd = [lang(x) for x in [32057,32058,32059,32060,32061]]
 			
 			self.s = {}
 
@@ -633,35 +633,26 @@ class Main(object):
 		if self.check_if_reboot_required():
 			# the files flagging that an installed package needs a reboot are present
 
-			if self.s['on_upd_detected'] == 5:
-				# Download, install, auto-restart if needed
+
+			# 0 "Prompt for all actions" -- PROMPT
+			# 1 "Display icon on home screen only" -- PROMPT
+			# 2 "Download updates, then prompt" -- PROMPT
+			# 3 "Download and display icon" -- PROMPT
+			# 4 "Download, install, prompt if restart needed" -- PROMPT
+
+			# display dialogue saying that osmc needs to reboot
+			reboot = DIALOG.yesno(lang(32077), lang(32079), lang(32080), yeslabel=lang(32081), nolabel=lang(32082))
+
+			if reboot:
 
 				exit_osmc_settings_addon()
 				xbmc.sleep(1000)
-
+				
 				xbmc.executebuiltin('Reboot')
 
 			else:
-
-				# 0 "Prompt for all actions" -- PROMPT
-				# 1 "Display icon on home screen only" -- PROMPT
-				# 2 "Download updates, then prompt" -- PROMPT
-				# 3 "Download and display icon" -- PROMPT
-				# 4 "Download, install, prompt if restart needed" -- PROMPT
-
-				# display dialogue saying that osmc needs to reboot
-				reboot = DIALOG.yesno(lang(32077), lang(32079), lang(32080), yeslabel=lang(32081), nolabel=lang(32082))
-
-				if reboot:
-
-					exit_osmc_settings_addon()
-					xbmc.sleep(1000)
-					
-					xbmc.executebuiltin('Reboot')
-
-				else:
-					# skip further update checks until osmc has rebooted
-					self.skip_update_check = True 
+				# skip further update checks until osmc has rebooted
+				self.skip_update_check = True 
 
 			
 
@@ -677,16 +668,6 @@ class Main(object):
 				f.write('d')
 			
 			return 'Download complete, leaving icon displayed'
-
-		elif self.s['on_upd_detected'] == 5:
-			# Download, install, auto-restart if needed
-
-			exit_osmc_settings_addon()
-			xbmc.sleep(1000)
-
-			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
-
-			return 'Download complete, running external updater'
 
 		else:
 			# Download updates, then prompt
@@ -870,7 +851,7 @@ class Main(object):
 
 			return 'Displaying icon on home screen only'
 
-		elif (self.s['on_upd_detected'] in [2, 3, 5]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
+		elif (self.s['on_upd_detected'] in [2, 3]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
 			# Download updates, then prompt
 			# Download and display icon
 			# Download, install, prompt if restart needed (restart is needed)
