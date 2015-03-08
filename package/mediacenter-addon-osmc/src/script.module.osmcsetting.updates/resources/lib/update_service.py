@@ -341,21 +341,19 @@ class Main(object):
 		''' Checks the users update conditions are met. The media-only flag restricts the condition check to
 			only the media playing condition. '''
 
-		if self.s['ban_update_media']:
+		result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
 
-			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
-
-			result = json.loads(result_raw)
-			
-			log(result, 'result of Player.GetActivePlayers')
-			
-			players = result.get('result', False)
-			
-			if players:
-			
-				log('Update CONDITION : player playing')
-			
-				return False, 'Update CONDITION : player playing'
+		result = json.loads(result_raw)
+		
+		log(result, 'result of Player.GetActivePlayers')
+		
+		players = result.get('result', False)
+		
+		if players:
+		
+			log('Update CONDITION : player playing')
+		
+			return False, 'Update CONDITION : player playing'
 
 		idle = xbmc.getGlobalIdleTime()
 
@@ -433,7 +431,6 @@ class Main(object):
 			# self.s['pos_y']				= int(float(	__setting__('pos_y')				))
 			self.s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
 			self.s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
-			self.s['ban_update_media']	= True if 		__setting__('ban_update_media') 	== 'true' else False
 			self.s['update_on_idle']	= True if 		__setting__('update_on_idle') 		== 'true' else False
 			self.s['home_prompts_only']	= True if 		__setting__('home_prompts_only') 	== 'true' else False
 
@@ -456,7 +453,6 @@ class Main(object):
 			# tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
 			tmp_s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
 			tmp_s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
-			tmp_s['ban_update_media']	= True if 		__setting__('ban_update_media') 	== 'true' else False
 			tmp_s['update_on_idle']		= True if 		__setting__('update_on_idle') 		== 'true' else False
 			tmp_s['home_prompts_only']	= True if 		__setting__('home_prompts_only') 	== 'true' else False
 
