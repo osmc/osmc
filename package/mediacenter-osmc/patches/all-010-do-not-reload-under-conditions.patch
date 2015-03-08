@@ -1,19 +1,18 @@
-diff --git a/xbmc/interfaces/Builtins.cpp b/xbmc/interfaces/Builtins.cpp
-index d99f047..d10ba0d 100644
---- a/xbmc/interfaces/Builtins.cpp
-+++ b/xbmc/interfaces/Builtins.cpp
-@@ -818,7 +818,13 @@ int CBuiltins::Execute(const std::string& execString)
-   else if (execute == "reloadskin")
-   {
-     //  Reload the skin
--    g_application.ReloadSkin(!params.empty() && StringUtils::EqualsNoCase(params[0], "confirm"));
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index fc3464d..eb22a90 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -1841,6 +1841,13 @@ bool CApplication::OnSettingsSaving() const
+ 
+ void CApplication::ReloadSkin(bool confirm/*=false*/)
+ {
 +    FILE *fp;
 +    fp = fopen("/tmp/NO_UPDATE", "r");
 +    if (fp)
 +    {
-+		g_application.ReloadSkin(!params.empty() && StringUtils::EqualsNoCase(params[0], "confirm"));
 +		fclose(fp);
++		return;
 +    }
-   }
-   else if (execute == "unloadskin")
-   {
+   std::string oldSkin = g_SkinInfo ? g_SkinInfo->ID() : "";
+ 
+   CGUIMessage msg(GUI_MSG_LOAD_SKIN, -1, g_windowManager.GetActiveWindow());
