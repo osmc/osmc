@@ -19,6 +19,9 @@
  http://www.gnu.org/copyleft/gpl.html
 '''
 
+# OS module
+import os
+
 # XBMC modules
 import xbmcgui
 if not os.path.isfile('/walkthrough_completed'):
@@ -28,14 +31,12 @@ import xbmc
 import xbmcaddon
 
 # Standard modules
-import os
 import shutil
 import time
 import re
 import sys
 import json
 import Queue
-import os
 import threading
 import datetime
 import traceback
