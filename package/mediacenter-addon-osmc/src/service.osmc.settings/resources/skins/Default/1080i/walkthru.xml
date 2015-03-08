@@ -58,14 +58,12 @@
             <height>1040</height>
             <texture border="40,0,0,0">Curve.png</texture>
         </control>
-                <control description="osmc icon" type="image">
-            <left>60</left>
-            <top>60</top>
-            <width>533</width>
-            <height>100</height>
-            <visible>true</visible>
-            <texture>osmclight100.png</texture>
-            <!-- <aspectratio>scale</aspectratio>-->
+        <control type="image">
+            <left>100</left>
+            <top>100</top>
+            <width>247</width>
+            <height>44</height>
+            <texture>logo.png</texture>
         </control>
         <!-- List -->
         <control id="1000" type="grouplist">
@@ -122,7 +120,7 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>40010</onright>
-            </control>  
+            </control>
             <!-- Networking -->
             <control id="1006" type="button">
                 <width>300</width>
@@ -137,7 +135,7 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>60010</onright>
-            </control>       
+            </control>
             <!-- Exit -->
             <control id="1005" type="button">
                 <width>300</width>
@@ -168,7 +166,7 @@
             <orientation>vertical</orientation>
             <control id="20010" type="wraplist">
                 <left>480</left>
-                <!-- <top>200</top> -->
+                <!-- <top>200</top>-->
                 <width>1300</width>
                 <height>726</height>
                 <onup>20010</onup>
@@ -200,7 +198,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -260,7 +258,6 @@
                 <onright>noop</onright>
             </control>
         </control>
-
         <!-- Networking -->
         <control id="6000" type="grouplist">
             <left>480</left>
@@ -301,7 +298,6 @@
                 <onclick>noop</onclick>
             </control>
         </control>
-
         <!-- Newsletter & Exit sub menu -->
         <control id="5000" type="grouplist">
             <left>480</left>
@@ -329,8 +325,6 @@
                 <onclick>noop</onclick>
             </control>
         </control>
-
-
         <!-- Timezone sub menu -->
         <control id="3000" type="grouplist">
             <left>480</left>
@@ -357,7 +351,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- America -->
             <control id="3002" type="button">
@@ -372,7 +366,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Asia -->
             <control id="3003" type="button">
@@ -387,7 +381,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Atlantic -->
             <control id="3004" type="button">
@@ -402,7 +396,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Australia -->
             <control id="3005" type="button">
@@ -417,7 +411,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Europe -->
             <control id="3006" type="button">
@@ -432,7 +426,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Indian -->
             <control id="3007" type="button">
@@ -447,7 +441,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- Pacific -->
             <control id="3008" type="button">
@@ -462,7 +456,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
             <!-- UTC -->
             <control id="3009" type="button">
@@ -477,7 +471,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation> -->
+                <!-- <animation condition="!ControlGroup(1002).HasFocus" effect="fade" end="70" start="100" time="0">Conditional</animation>-->
             </control>
         </control>
         <control id="9999" type="group">
@@ -517,7 +511,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -555,7 +549,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -593,7 +587,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -631,7 +625,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -669,7 +663,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -707,7 +701,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -745,7 +739,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -783,7 +777,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
@@ -821,7 +815,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffffffff</textcolor>
                         <shadowcolor>44000000</shadowcolor>
-                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation> -->
+                        <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                     </control>
                 </focusedlayout>
             </control>
