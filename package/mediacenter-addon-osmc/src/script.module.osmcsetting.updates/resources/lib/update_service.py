@@ -175,13 +175,6 @@ class Main(object):
 			except:
 				pass
 
-		# a preliminary check for updates (for testing only)
-		if self.s['check_onboot'] == 'true':
-			if not self.skip_update_check:
-				self.boot_delay_passed = False
-				self.function_holding_pattern = self.holding_pattern_boot_update
-				log('boot update check put into holding pattern')
-
 		# keep alive method
 		self._daemon()
 
@@ -233,24 +226,6 @@ class Main(object):
 			self.function_holding_pattern = False
 			
 			self.user_update_now()
-
-
-	# HOLDING PATTERN METHOD
-	@clog(log, nowait=True)
-	def holding_pattern_boot_update(self):
-
-		if (datetime.now() - self.service_start).total_seconds() > (self.s['check_boot_delay'] * 60):
-			self.boot_delay_passed = True
-
-		if self.boot_delay_passed:
-
-			check, _ = self.check_update_conditions(media_only=True)
-
-			if check:
-
-				self.function_holding_pattern = False
-
-				self.call_child_script('update')
 
 
 	# HOLDING PATTERN METHOD
@@ -454,10 +429,8 @@ class Main(object):
 			self.s['check_time'] 		= int(float(	__setting__('check_time')			))
 			self.s['check_hour'] 		= int(float(	__setting__('check_hour')			))
 			self.s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			self.s['check_boot_delay']	= int(float(	__setting__('check_boot_delay')		))
 			# self.s['pos_x']				= int(float(	__setting__('pos_x')				))
 			# self.s['pos_y']				= int(float(	__setting__('pos_y')				))
-			self.s['check_onboot']		= True if 		__setting__('check_onboot') 		== 'true' else False
 			self.s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
 			self.s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
 			self.s['ban_update_media']	= True if 		__setting__('ban_update_media') 	== 'true' else False
@@ -479,10 +452,8 @@ class Main(object):
 			tmp_s['check_time'] 		= int(float(	__setting__('check_time')			))
 			tmp_s['check_hour'] 		= int(float(	__setting__('check_hour')			))
 			tmp_s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			tmp_s['check_boot_delay']	= int(float(	__setting__('check_boot_delay')		))
 			# tmp_s['pos_x']				= int(float(	__setting__('pos_x')				))
 			# tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
-			tmp_s['check_onboot']		= True if 		__setting__('check_onboot') 		== 'true' else False
 			tmp_s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
 			tmp_s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
 			tmp_s['ban_update_media']	= True if 		__setting__('ban_update_media') 	== 'true' else False
