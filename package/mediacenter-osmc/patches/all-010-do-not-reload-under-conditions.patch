@@ -1,8 +1,8 @@
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index fc3464d..eb22a90 100644
+index fc3464d..754124e 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -1841,6 +1841,13 @@ bool CApplication::OnSettingsSaving() const
+@@ -1841,6 +1841,14 @@ bool CApplication::OnSettingsSaving() const
  
  void CApplication::ReloadSkin(bool confirm/*=false*/)
  {
@@ -10,6 +10,7 @@ index fc3464d..eb22a90 100644
 +    fp = fopen("/tmp/NO_UPDATE", "r");
 +    if (fp)
 +    {
++		CLog::Log(LOGINFO, "Skin reload suppression caused by /tmp/NO_UPDATE");
 +		fclose(fp);
 +		return;
 +    }
