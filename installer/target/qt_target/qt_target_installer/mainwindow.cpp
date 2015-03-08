@@ -22,18 +22,6 @@
 #include "extractworker.h"
 #include <QTimer>
 
-/* required definitions to construct the css for our pseudo-progressbar */
-/* CSS_PROGRESS_IMAGE is used to reset potential other border-images, repeated on that component */
-const QString MainWindow::CSS_PROGRESS_IMAGE = "border-image: foo;";
-const QString MainWindow::CSS_PROGRESS_BORDER_STYLE = "border-style: outset;";
-const QString MainWindow::CSS_PROGRESS_BORDER_WIDTH = "border-width: 2px;";
-const QString MainWindow::CSS_PROGRESS_BORDER_RADIUS = "border-radius: 5px;";
-/* this one is funny. need the border or the radius isn't displayed. so make it fully transparent */
-const QString MainWindow::CSS_PROGRESS_BORDER_RGBA = "border-color: rgba(0,0,0,0);";
-const QString MainWindow::CSS_PROGRESS_BACKGROUND_RGBA = "rgba(209,210,209, 255)";
-const QString MainWindow::CSS_PROGRESS_BAR_RGBA = "rgba(24, 45, 81, 255)";
-int lastProgress = 0;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), device(NULL), preseed(NULL)
@@ -223,6 +211,8 @@ void MainWindow::install()
    /* Extract root filesystem */
    ui->statusLabel->setText(tr("Installing files"));
    logger->addLine("Extracting files to root filesystem");
+   ui->statusProgressBar->setMinimum(0);
+   ui->statusProgressBar->setMaximum(100);
 
    QThread* thread = new QThread(this);
    ExtractWorker *worker = new ExtractWorker(fileSystem.fileName(), MNT_ROOT, logger);
@@ -271,7 +261,8 @@ void MainWindow::setupBootLoader()
 void MainWindow::haltInstall(QString errorMsg)
 {
     logger->addLine("Halting Install. Error message was: " + errorMsg);
-    setProgress(0);
+    ui->statusProgressBar->setMaximum(100);
+    ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
     dumpLog();
 }
@@ -291,42 +282,7 @@ void MainWindow::finished()
 
 void MainWindow::setProgress(unsigned value)
 {
-    /* Stop constant redrawing */
-    if (value == lastProgress)
-        return;
-    QString styleSheet = "";
-
-    styleSheet.append(CSS_PROGRESS_BORDER_RGBA)
-            .append(CSS_PROGRESS_BORDER_RADIUS)
-            .append(CSS_PROGRESS_BORDER_STYLE)
-            .append(CSS_PROGRESS_BORDER_WIDTH)
-            .append(CSS_PROGRESS_IMAGE)
-            .append(getProgressbarGradient(value));
-
-    ui->statusProgressBar->setStyleSheet(styleSheet);
-    lastProgress = value;
-}
-
-QString MainWindow::getProgressbarGradient(unsigned value)
-{
-    float actualValue = value / 100.0;
-    if (value == 100)
-        actualValue = 0.999999;
-    QString stopValue = QString::number(actualValue, 'g');
-
-    /* required offset or the gradient will "flip" The more decimal places the sharper the cut between the two colors */
-    QString stopValue2 = QString::number(actualValue + 0.000001, 'g');
-
-    QString result = "background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, ";
-    result.append("stop:0 ").append(CSS_PROGRESS_BAR_RGBA);
-    result.append(", ");
-    result.append("stop:").append(stopValue).append(" ").append(CSS_PROGRESS_BAR_RGBA);
-    result.append(", ");
-    result.append("stop:").append(stopValue2).append(" ").append(CSS_PROGRESS_BACKGROUND_RGBA);
-    result.append(", ");
-    result.append("stop:1 ").append(CSS_PROGRESS_BACKGROUND_RGBA).append(");");
-
-    return result;
+    ui->statusProgressBar->setValue(value);
 }
 
 MainWindow::~MainWindow()

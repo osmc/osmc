@@ -26,7 +26,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="5,2,1,2" columnstretch="12,76,12">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="10,6,3,5" columnstretch="12,76,12">
     <item row="3" column="1">
      <spacer name="verticalSpacer_2">
       <property name="orientation">
@@ -39,25 +39,6 @@
        </size>
       </property>
      </spacer>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="statusProgressBar">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-image: foo;
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(24, 45, 81, 255), stop:0.5 rgba(24, 45, 81, 255), stop:0.5001 rgba(209,210,209, 255), stop:1 rgba(209,210,209, 255));
-border-style: outset;
-     border-width: 2px;
-     border-radius: 5px;
-	border-color: rgba(0,0,0,0);
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </item>
     <item row="1" column="1">
      <widget class="QLabel" name="statusLabel">
@@ -121,6 +102,37 @@ color:rgb(240, 240, 240);
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="2" column="1">
+     <widget class="QProgressBar" name="statusProgressBar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QProgressBar {
+     border-image: foo;
+	border-style: outset;
+	 border-color: rgba(24, 45, 81, 255);
+     border-width: 2px;
+	border-radius: 8px;
+	 text-align: center;
+ }
+
+ QProgressBar::chunk {
+     background-color: rgba(24, 45, 81, 255);
+     width: 20px;
+ }</string>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+      <property name="textVisible">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
