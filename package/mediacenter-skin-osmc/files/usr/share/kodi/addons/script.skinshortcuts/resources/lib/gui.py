@@ -1213,6 +1213,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 
                 if custom_image:
                     listitem.setThumbnailImage( custom_image )
+                    listitem.setProperty( "thumbnail", custom_image )
                 else:
                     # User cancelled
                     return
@@ -1220,7 +1221,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             else:
                 # User has selected a normal thumbnail
                 listitem.setThumbnailImage( thumbnail[ selectedThumbnail ] )
-            
+                listitem.setProperty( "thumbnail", thumbnail[ selectedThumbnail ] )
             self.changeMade = True
         
         if controlID == 401:

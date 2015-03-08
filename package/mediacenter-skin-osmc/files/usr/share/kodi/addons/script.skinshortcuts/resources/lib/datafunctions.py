@@ -610,7 +610,7 @@ class DataFunctions():
         elif action == "powerdown()" or action == "powerdown":
             return "System.CanPowerDown"
         elif action == "alarmclock(shutdowntimer,shutdown())":
-            return "!System.HasAlarm(shutdowntimer) + (System.CanPowerDown | System.CanSuspend | System.CanHibernate)"
+            return "!System.HasAlarm(shutdowntimer) + [System.CanPowerDown | System.CanSuspend | System.CanHibernate]"
         elif action == "cancelalarm(shutdowntimer)":
             return "System.HasAlarm(shutdowntimer)"
         elif action == "suspend()" or action == "suspend":
@@ -620,7 +620,7 @@ class DataFunctions():
         elif action == "reset()" or action == "reset":
             return "System.CanReboot"
         elif action == "system.logoff":
-            return "(System.HasLoginScreen | IntegerGreaterThan(System.ProfileCount,1)) + System.Loggedon"
+            return "[System.HasLoginScreen | IntegerGreaterThan(System.ProfileCount,1)] + System.Loggedon"
         elif action == "mastermode":
             return "System.HasLocks"
         elif action == "inhibitidleshutdown(true)":
