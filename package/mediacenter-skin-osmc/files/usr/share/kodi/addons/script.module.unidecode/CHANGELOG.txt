@@ -1,0 +1,88 @@
+2014-05-11	unidecode 0.04.16
+
+	* Corrected ChangeLog.
+
+2014-05-11	unidecode 0.04.15
+
+	* Fixed transliteration of Chinese character "Yi". (thanks to Yao Zuo)
+	* Transliterate Euro sign as "EUR". (thanks to Dave Smith)
+	
+2013-09-20	unidecode 0.04.14
+
+	* Revert transliteration for Latin characters with umlauts back
+	  to language-neutral, unaccented characters.
+	* Added transliterations for circled numbers, letters and ordinals.
+	* Minor fixes to rarely used punctuation characters.
+
+2013-05-30	unidecode 0.04.13
+
+	* Use German transliteration for Latin characters with umlauts.
+	  (thanks to Geoffrey Teale)
+	* Fixed transliteration for several rarely used punctuation
+	  characters.
+	* Add transliteration for trademark and similar signs. (thanks to
+	  Ovanes Markaryan)
+
+2013-01-28	unidecode 0.04.12
+
+	* Tests now pass on Python 2.7.
+	* Make argument type warning refer to unidecode()'s caller.
+
+2013-01-17	unidecode 0.04.11
+
+	* Issue a warning on Python 2.x if an object that is not an instance of
+	  unicode class is passed to unidecode().
+	* Fixed unit tests for Python 2.5.
+
+2012-12-01	unidecode 0.04.10
+
+	* Added trove classifiers.
+
+2011-09-23	unidecode 0.04.9
+
+	* Fixed Python 2.5 installation issue.
+
+2011-09-22	unidecode 0.04.8
+
+	* License change to GPL to fit better with other Python modules and
+	  to remove the issue of depending on Perl for licensing terms.
+	* Always return a string object on Python 2.x. Before this patch,
+	  unidecode() returned a unicode object on Python 2.x if the input
+	  was a unicode object that contained ASCII characters. Behaviour
+	  on Python 3.x remains unchanged. (thanks to Wesley Yarde)
+
+2011-04-04	unidecode 0.04.7
+
+	* Unit test fixes for Python builds using 16-bit Unicode
+	  representation (see PEP 261)
+
+2011-02-16	unidecode 0.04.6
+
+	* Support for a lot of various less common variants of Latin
+	  letters and digraphs.
+	* Fixes to Czech pangram transliteration (thanks to Jan Killian)
+
+2010-10-15	unidecode 0.04.5
+
+	* Unit test fixes.
+
+2010-10-12	unidecode 0.04.4
+
+	* Unit tests for Python 3 and simplified transliteration
+	  code (thanks to Thomas Kluyver)
+	* Support for mathematical versions of Latin and Greek alphabets 
+	  and digits.
+
+2010-01-12	unidecode 0.04.3
+
+	* Corrected transliteration for Cyrillic alphabet
+	  (thanks to Ruslan Grokhovetskiy)
+
+2009-08-27	unidecode 0.04.2
+
+	* Corrected replacements for Japanese Kana characters 
+	  (thanks to Michel Albert)
+
+2009-01-25	unidecode 0.04.1
+
+	* First public release
