@@ -26,7 +26,7 @@ import os
 import xbmcgui
 if not os.path.isfile('/walkthrough_completed'):
 	WINDOW = xbmcgui.Window(10000)
-	WINDOW.setProperty("walkthough_is_running", 'any_value')
+	WINDOW.setProperty("walkthrough_is_running", 'any_value')
 import xbmc
 import xbmcaddon
 
@@ -133,7 +133,7 @@ class Main(object):
 							
 						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
 
-						WINDOW.clearProperty('walkthough_is_running')
+						WINDOW.clearProperty('walkthrough_is_running')
 						
 						xbmc.executebuiltin('ReloadSkin()')
 						
