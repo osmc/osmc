@@ -1,48 +1,176 @@
+From cf54c3ebf7f180d0b9167159231051ac5f02806a Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Sat, 7 Mar 2015 22:46:21 +0000
+Subject: [PATCH] configure: Add raspberry-pi2 platform
+
+---
+ configure.in                                      | 14 +++++++--
+ m4/xbmc_arch.m4                                   |  8 ++---
+ tools/depends/Makefile.include.in                 |  2 +-
+ tools/depends/configure.in                        | 38 ++++++++++++++++-------
+ tools/depends/target/Toolchain.cmake.in           |  2 +-
+ tools/depends/target/Toolchain_binaddons.cmake.in |  2 +-
+ 6 files changed, 44 insertions(+), 22 deletions(-)
+
 diff --git a/configure.in b/configure.in
-index dbca6ae..a001a3b 100644
+index 6966554..7f5920a 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -714,9 +714,9 @@ fi
- case $use_platform in
+@@ -732,8 +732,17 @@ case $use_platform in
    raspberry-pi)
       target_platform=target_raspberry_pi
--     use_neon=no
+      use_neon=no
+-     use_arch="arm"
+      use_cpu=arm1176jzf-s
++     ;;
++  raspberry-pi2)
++     target_platform=target_raspberry_pi
 +     use_neon=yes
-      use_arch="arm"
--     use_cpu=arm1176jzf-s
 +     use_cpu=cortex-a7
++     ;;
++esac
++
++if test "$target_platform" = "target_raspberry_pi" ; then
++     use_arch="arm"
       use_hardcoded_tables="yes"
       ARCH="arm"
       AC_DEFINE(HAS_EGLGLES, [1], [Define if supporting EGL based GLES Framebuffer])
+@@ -741,8 +750,7 @@ case $use_platform in
+      USE_MMAL=1; AC_DEFINE([HAS_MMAL],[1],["Define to 1 if MMAL libs is enabled"])
+      CFLAGS="$CFLAGS"
+      CXXFLAGS="$CXXFLAGS"
+-     ;;
+-esac
++fi
+ 
+ XBMC_SETUP_ARCH_DEFINES()
+ 
+diff --git a/m4/xbmc_arch.m4 b/m4/xbmc_arch.m4
+index 0b66a82..adb8e97 100644
+--- a/m4/xbmc_arch.m4
++++ b/m4/xbmc_arch.m4
+@@ -77,9 +77,7 @@ if test "$target_platform" = "target_android" ; then
+   AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -DTARGET_ANDROID")
+ fi
+ 
+-case $use_platform in
+-  raspberry-pi)
+-     AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
+-     ;;
+-esac
++if test "$target_platform" = "target_raspberry_pi" ; then
++  AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
++fi
+ ])
+diff --git a/tools/depends/Makefile.include.in b/tools/depends/Makefile.include.in
+index e1ac05c..d60cccf 100644
+--- a/tools/depends/Makefile.include.in
++++ b/tools/depends/Makefile.include.in
+@@ -20,7 +20,7 @@ NATIVE_OS=@build_os@
+ CROSS_COMPILING=@cross_compiling@
+ ARCH_DEFINES=@ARCH_DEFINES@
+ NATIVE_ARCH_DEFINES=@NATIVE_ARCH_DEFINES@
+-TARGET_PLATFORM=@use_platform@
++TARGET_PLATFORM=@target_platform@
+ XCODE_VERSION=@use_xcode@
+ AAPT=@AAPT@
+ DX=@DX@
 diff --git a/tools/depends/configure.in b/tools/depends/configure.in
-index 08a9205..5213f14 100644
+index 4a05536..260d2c4 100644
 --- a/tools/depends/configure.in
 +++ b/tools/depends/configure.in
-@@ -289,9 +289,9 @@ if test "$use_platform" = "raspberry-pi"; then
+@@ -17,7 +17,8 @@ AC_ARG_WITH([toolchain],
+ AC_ARG_WITH([platform],
+   [AS_HELP_STRING([--with-platform],
+   [target platform [auto]])],
+-  [use_platform=$withval])
++  [use_platform=$withval],
++  [target_platform=$withval])
+ 
+ AC_ARG_WITH([firmware],
+   [AS_HELP_STRING([--with-firmware],
+@@ -305,34 +306,49 @@ case $host in
+     AC_MSG_ERROR(unsupported host ($use_host))
+ esac
+ 
+-if test "$use_platform" = "raspberry-pi"; then
++case $use_platform in
++  raspberry-pi)
++     target_platform=raspberry_pi
++     use_neon=no
++     use_cpu=arm1176jzf-s
++     platform_cflags="-mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp"
++     platform_cxxflags="-mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp"
++     platform_ldflags=""
++     ;;
++  raspberry-pi2)
++     target_platform=raspberry_pi
++     use_neon=yes
++     use_cpu=cortex-a7
++     platform_cflags="-fPIC -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4"
++     platform_cxxflags="-fPIC -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4"
++     platform_ldflags="-lpthread"
++     ;;
++esac
++
++if test "$target_platform" = "raspberry_pi" ; then
+   if test -d "${use_firmware}/opt/vc/include"; then
+     :
    else
      AC_MSG_ERROR([Raspberry Pi firmware not found])
    fi
 -  use_neon=no
-+  use_neon=yes
    use_arch="arm"
 -  use_cpu="arm1176jzf-s"
-+  use_cpu="cortex-a7"
    use_hardcoded_tables="yes"
-   use_alsa="no"
+-  use_alsa="no"
    ARCH="arm"
-@@ -299,13 +299,11 @@ if test "$use_platform" = "raspberry-pi"; then
+   platform_os="linux"
    cross_compiling="yes"
    use_host="arm-linux-gnueabihf"
    deps_dir="$use_host"
 -  platform_cflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard \
 -   -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated \
-+  platform_cflags="-pipe -Wno-psabi -Wa,-mno-warn-deprecated \
-    -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
+-   -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
++  platform_cflags+=" -pipe -mabi=aapcs-linux -Wno-psabi \
++   -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
++   -isystem${use_firmware}/opt/vc/include \
     -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
     -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
 -  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s \
 -   -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
-+  platform_cxxflags="-pipe -Wno-psabi \
++  platform_cxxflags+=" -pipe -mabi=aapcs-linux -Wno-psabi \
     -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
     -isystem${use_firmware}/opt/vc/include \
     -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
+    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
+-  platform_ldflags="-L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos \
++  platform_ldflags+=" -L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos \
+    -lvchiq_arm"
+ fi
+ 
+diff --git a/tools/depends/target/Toolchain.cmake.in b/tools/depends/target/Toolchain.cmake.in
+index 943be73..59385e8 100644
+--- a/tools/depends/target/Toolchain.cmake.in
++++ b/tools/depends/target/Toolchain.cmake.in
+@@ -1,6 +1,6 @@
+ SET(OS "@platform_os@")
+ SET(CPU "@use_cpu@")
+-SET(PLATFORM "@use_platform@")
++SET(PLATFORM "@target_platform@")
+ IF("${OS}" STREQUAL "linux" OR "${OS}" STREQUAL "android")
+ SET(CMAKE_SYSTEM_NAME Linux)
+ ENDIF()
+diff --git a/tools/depends/target/Toolchain_binaddons.cmake.in b/tools/depends/target/Toolchain_binaddons.cmake.in
+index cdc2fe4..379bd1d 100644
+--- a/tools/depends/target/Toolchain_binaddons.cmake.in
++++ b/tools/depends/target/Toolchain_binaddons.cmake.in
+@@ -1,7 +1,7 @@
+ set(CMAKE_SYSTEM_VERSION 1)
+ set(OS "@platform_os@")
+ set(CPU "@use_cpu@")
+-set(PLATFORM "@use_platform@")
++set(PLATFORM "@target_platform@")
+ if("${OS}" STREQUAL "linux" OR "${OS}" STREQUAL "android")
+   set(CMAKE_SYSTEM_NAME Linux)
+ endif()

@@ -144,7 +144,8 @@ then
 		--disable-pulse \
 		--disable-projectm
 	# Raspberry Pi Configuration
-	if [ "$1" == "rbp2" ]; then $PI2="--enable-neon"; fi
+	if [ "$1" == "rbp1" ]; then $PIDEV="raspberry-pi"; fi
+	if [ "$1" == "rbp2" ]; then $PIDEV="raspberry-pi2"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
 	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
@@ -168,10 +169,9 @@ then
 		--disable-vdpau \
 		--disable-pulse \
 		--disable-projectm \
-		--with-platform=raspberry-pi \
+		--with-platform=$PIDEV \
 		--enable-optimizations \
 		--enable-libcec \
-		$PI2 \
 		--enable-player=omxplayer
 	fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
