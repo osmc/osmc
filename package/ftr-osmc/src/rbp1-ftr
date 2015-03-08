@@ -6,6 +6,7 @@
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 PRESEED_FILE="/boot/preseed.cfg"
+touch /tmp/NO_UPDATE
 rm -f $DSA_KEY
 rm -f $RSA_KEY
 dbus-uuidgen > /var/lib/dbus/machine-id
@@ -18,5 +19,4 @@ fi
 ssh-keygen -f $DSA_KEY -N '' -t dsa &
 ssh-keygen -f $RSA_KEY -N '' -t rsa &
 wait
-touch /tmp/NO_UPDATE
 systemctl disable ftr.service
