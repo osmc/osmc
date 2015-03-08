@@ -130,7 +130,7 @@ class OSMCSettingClass(object):
 		self.me = xbmcaddon.Addon(self.addonid)
 
 		# this is what is displayed in the main settings gui
-		self.shortname = 'APF Store'
+		self.shortname = 'App Store'
 
 
 		self.description = 	"""This module is where you can grab awesome APFs like ... """
