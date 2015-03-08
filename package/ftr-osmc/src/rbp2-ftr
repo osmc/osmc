@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+DSA_KEY="/etc/ssh/ssh_host_dsa_key"
+RSA_KEY="/etc/ssh/ssh_host_rsa_key"
+PRESEED_FILE="/boot/preseed.cfg"
+rm -f $DSA_KEY
+rm -f $RSA_KEY
+dbus-uuidgen > /var/lib/dbus/machine-id
+depmod
+if [ -f $PRESEED_FILE ]
+then
+    sed 's/^M$//' -i $PRESEED_FILE
+    python /usr/bin/preseed &
+fi
+ssh-keygen -f $DSA_KEY -N '' -t dsa &
+ssh-keygen -f $RSA_KEY -N '' -t rsa &
+wait
+touch /tmp/NO_UPDATE
+systemctl disable ftr.service

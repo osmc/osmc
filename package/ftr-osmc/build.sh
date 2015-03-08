@@ -13,9 +13,7 @@ then
 	echo "Package: ${1}-ftr-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	pushd files
-	test "$1" == rbp1 && install_patch "../patches" "rbp1"
-	test "$1" == rbp2 && install_patch "../patches" "rbp2"
-	test "$1" == atv && install_patch "../patches" "atv"
+	cp src/${1}-ftr usr/bin/ftr
 	chmod +x usr/bin/ftr
 	popd
 	dpkg -b files/ ftr-osmc.deb
