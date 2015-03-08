@@ -89,6 +89,9 @@ verify_action
 echo -e "	* Configuring BusyBox symlinks"
 setup_busybox_links ${DIR}
 verify_action
+echo -e "	* Configuring optimised string.h operations"
+MEM_OPTIM="/usr/lib/libarmmem.so"
+echo ${MEM_OPTIM} > /etc/ld.so.preload
 
 # Remove QEMU binary
 chroot ${DIR} umount /proc
