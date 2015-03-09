@@ -4,9 +4,6 @@ all:
 armv7:
 	sudo bash build.sh "armv7"
 
-imx6:
-	sudo bash build.sh "imx6"
-
 gen:
 	sudo bash build.sh "gen"
 

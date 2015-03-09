@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-if [ $? == "imx6" ]
+if [ $? == "armv7" ]
 then
     pull_source "https://github.com/samnazarko/irqbalanced/archive/master.zip" "$(pwd)/src"
 else
