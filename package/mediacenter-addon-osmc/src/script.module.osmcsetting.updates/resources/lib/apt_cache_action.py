@@ -78,6 +78,7 @@ class Main(object):
 
 		self.action_to_method = {
 								'update' 		: self.update,
+								'update_manual' : self.update,
 								'commit' 		: self.commit,
 								'fetch'  		: self.fetch,
 								'action_list'	: self.action_list,
@@ -211,6 +212,7 @@ class Main(object):
 
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
+
 	@clog()
 	def commit(self):
 
@@ -254,6 +256,7 @@ class Main(object):
 			return 'Failed to remove block_update_file'
 
 		return '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
+		
 
 	@clog()
 	def fetch(self):

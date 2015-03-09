@@ -94,6 +94,7 @@ class Main(object):
 		# and the corresponding methods in the parent
 		self.action_dict = 	{
 								'apt_cache update complete' 		: self.apt_update_complete,
+								'apt_cache update_manual complete'	: self.apt_update_manual_complete,
 								'apt_cache commit complete'			: self.apt_commit_complete,
 								'apt_cache fetch complete'			: self.apt_fetch_complete,
 								'progress_bar'						: self.progress_bar,
@@ -695,36 +696,36 @@ class Main(object):
 
 		if action == 'update':
 
-			self.call_child_script('update')
+			self.call_child_script('update_manual')
 
-			return 'Called child action - update'
+			return 'Called child action - update_manual'
 
-		elif action == 'install':
+		# elif action == 'install':
 
-			check, _ = self.check_for_legit_updates()
+		# 	check, _ = self.check_for_legit_updates()
 
-			if check == 'bail':
+		# 	if check == 'bail':
 
-				return  'Update not legit, bail'
+		# 		return  'Update not legit, bail'
 
-			if not self.EXTERNAL_UPDATE_REQUIRED:
+		# 	if not self.EXTERNAL_UPDATE_REQUIRED:
 
-				self.call_child_script('commit')
+		# 		self.call_child_script('commit')
 
-				return 'Called child action - commit'
+		# 		return 'Called child action - commit'
 
-			else:
+		# 	else:
 
-				ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
+		# 		ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
-				if ans:
+		# 		if ans:
 
-					exit_osmc_settings_addon()
-					xbmc.sleep(1000)
+		# 			exit_osmc_settings_addon()
+		# 			xbmc.sleep(1000)
 
-					subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
+		# 			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
 
-					return "Calling external update"
+		# 			return "Calling external update"
 
 
 	#ACTION METHOD
@@ -837,39 +838,27 @@ class Main(object):
 
 	# ACTION METHOD
 	@clog(log)
-	def apt_update_complete(self):
+	def apt_update_manual_complete(self):
+
+		self.apt_update_complete(data='manual_update_complete')
+
+
+	# ACTION METHOD
+	@clog(log)
+	def apt_update_complete(self, data=None):
 		
 		check, _ = self.check_for_legit_updates()
-		
+
 		if check == 'bail':
+
+			if data == 'manual_update_complete':
+
+				okey_dokey = DIALOG.ok(lang(32072), lang(32092))
 			
 			return 'Updates not legit, bail'
 
 		# The following section implements the procedure that the user has chosen to take place when updates are detected
-
-		if self.s['on_upd_detected'] == 1: 
-			# Display icon on home screen only
-
-			return 'Displaying icon on home screen only'
-
-		elif (self.s['on_upd_detected'] in [2, 3]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
-			# Download updates, then prompt
-			# Download and display icon
-			# Download, install, prompt if restart needed (restart is needed)
-			# Download, install, auto-restart if needed
-
-			self.call_child_script('fetch')
-
-			return 'Downloading updates'
-
-		elif self.s['on_upd_detected'] == 4 and not self.EXTERNAL_UPDATE_REQUIRED:
-			# Download, install, prompt if restart needed (restart is not needed)
-
-			self.call_child_script('commit')
-			
-			return 'Download, install, prompt if restart needed'
-
-		elif self.s['on_upd_detected'] == 0:
+		if self.s['on_upd_detected'] == 0 or data == 'manual_update_complete':
 			# show all prompts (default)
 
 			if self.EXTERNAL_UPDATE_REQUIRED == 1:
@@ -904,6 +893,29 @@ class Main(object):
 					self.skip_update_check = True
 
 				return "Updates are available, no reboot is required"
+
+		elif self.s['on_upd_detected'] == 1: 
+			# Display icon on home screen only
+
+			return 'Displaying icon on home screen only'
+
+		elif (self.s['on_upd_detected'] in [2, 3]) or (self.s['on_upd_detected'] == 4 and self.EXTERNAL_UPDATE_REQUIRED):
+			# Download updates, then prompt
+			# Download and display icon
+			# Download, install, prompt if restart needed (restart is needed)
+			# Download, install, auto-restart if needed
+
+			self.call_child_script('fetch')
+
+			return 'Downloading updates'
+
+		elif self.s['on_upd_detected'] == 4 and not self.EXTERNAL_UPDATE_REQUIRED:
+			# Download, install, prompt if restart needed (restart is not needed)
+
+			self.call_child_script('commit')
+			
+			return 'Download, install, prompt if restart needed'
+
 
 	@clog(log)
 	def check_if_reboot_required(self):
