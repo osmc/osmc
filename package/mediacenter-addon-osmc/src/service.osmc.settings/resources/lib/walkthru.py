@@ -136,6 +136,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			# delete skin update block file
 			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
 
+			if self.getControl(50001).isSelected():
+				# sign up for newsletter button
+
+				# show keyboard
+				kb = xbmc.Keyboard(self.email, 'Please enter your email')
+				kb.doModal()
+				if kb.isConfirmed():
+					self.email = kb.getText()
+					requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
+					self.setFocusId(1005)
+
 			if self.selected_language != None:
 
 				log('users language: %s' % self.selected_language)
@@ -211,7 +222,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.getControl(1006).setVisible(True)
 				self.setFocusId(1006)				
 
-
 		elif controlID == 40020:
 			# unused scroll bar for TandC
 
@@ -221,17 +231,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			#unused scroll bar for TandC
 
 			self.getControl(555).scroll(-10)
-
-		elif controlID == 50001:
-			# sign up for newsletter button
-
-			# show keyboard
-			kb = xbmc.Keyboard(self.email, 'Please enter your email')
-			kb.doModal()
-			if kb.isConfirmed():
-				self.email = kb.getText()
-				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
-				self.setFocusId(1005)
 
 		elif controlID == 60090:
 			# skip networking button
@@ -252,15 +251,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1005).setVisible(True)
 			self.setFocusId(1005)	
 
-	# def onAction(self, action):
 
-	# 	pass
+	def onAction(self, action):
 
-		# if action == ACTION_PREVIOUS_MENU or action == ACTION_NAV_BACK:
+		if action == 10 or action == 92:
+			# *** THIS IS FOR TESTING ONLY ***
 
-		# 	# disable BACK and PREVIOUS MENU
-
-		# 	pass
+			# delete skin update block file
+			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
 
 
 	def onFocus(self, controlID):

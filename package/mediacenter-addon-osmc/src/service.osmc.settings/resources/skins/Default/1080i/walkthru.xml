@@ -311,18 +311,60 @@
             <onup>noop</onup>
             <ondown>noop</ondown>
             <orientation>vertical</orientation>
-            <control id="50001" type="button">
+            <!-- welcome message -->
+            <control type="label">
+                <top>0</top>
                 <width>1400</width>
                 <height>42</height>
-                <label>Click here to sign up to the OSMC newsletter</label>
                 <font>osmc_addon_OLD_Font42</font>
+                <label>That's it! You're now ready to enjoy your sweet new OSMC set up.</label>
+                <textcolor>66ffffff</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+            <control type="label">
+                <top>45</top>
+                <width>1400</width>
+                <height>42</height>
+                <font>osmc_addon_OLD_Font42</font>
+                <label>If you need any help, be sure to check out osmc.tv/help.</label>
+                <textcolor>66ffffff</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+            <control type="label">
+                <top>90</top>
+                <width>1400</width>
+                <height>42</height>
+                <font>osmc_addon_OLD_Font42</font>
+                <label>Thanks for using OSMC!</label>
+                <textcolor>66ffffff</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+            <!-- newsletter signup                  -->
+            <control id="50001" type="radiobutton">
+                <label>I'd like to hear about new changes from OSMC via email</label>
+                <width>1400</width>
+                <height>42</height>
+                <top>135</top>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
+                <radiowidth>16</radiowidth>
+                <radioheight>16</radioheight>
+                <texturenofocus>-</texturenofocus>
+                <texturefocus>-</texturefocus>
+                <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                <onup>-</onup>
+                <ondown>-</ondown>
+                <onleft>1000</onleft>
+                <onright>9999</onright>
             </control>
         </control>
         <!-- Timezone sub menu -->
