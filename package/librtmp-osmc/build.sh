@@ -21,6 +21,7 @@ then
 	handle_dep "libssl-dev"
 	echo "Package: ${1}-librtmp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-librtmp-osmc" >> files-dev/DEBIAN/control
 	pushd src
+	install_patch "../patches" "all"
 	$BUILD sys=posix
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	pushd librtmp
