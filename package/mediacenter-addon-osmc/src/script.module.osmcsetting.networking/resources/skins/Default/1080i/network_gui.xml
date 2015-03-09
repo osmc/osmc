@@ -66,7 +66,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <onright>1020</onright>
+                <onright>10217</onright>
             </control>
             <!-- Bluetooth -->
             <control id="103" type="button">
@@ -94,6 +94,7 @@
             <onright>101</onright>
             <onleft>101</onleft>
             <control id="10120" type="radiobutton">
+                <visible>Control.IsEnabled(10120)</visible>`
                 <description>Enable Adapter</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
                 <posx>100</posx>
@@ -119,6 +120,7 @@
                 <onright>101</onright>
             </control>
             <control id="10111" type="button">
+                <visible>Control.IsEnabled(10111)</visible>`
                 <description>Automatically configure the network toggle</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
                 <posx>100</posx>
@@ -140,6 +142,7 @@
                 <onright>101</onright>
             </control>
             <control id="10112" type="button">
+                <visible>Control.IsEnabled(10112)</visible>`
                 <description>IP Address</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32007]</label>
                 <posx>100</posx>
@@ -161,6 +164,7 @@
                 <onright>101</onright>
             </control>
             <control id="10113" type="button">
+                <visible>Control.IsEnabled(10113)</visible>`
                 <description>Subnet Mask</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32008]</label>
                 <posx>100</posx>
@@ -182,6 +186,7 @@
                 <onright>101</onright>
             </control>
             <control id="10114" type="button">
+                <visible>Control.IsEnabled(10114)</visible>`
                 <description>Default Gateway</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32009]</label>
                 <posx>100</posx>
@@ -203,6 +208,7 @@
                 <onright>101</onright>
             </control>
             <control id="10115" type="button">
+                <visible>Control.IsEnabled(10115)</visible>`
                 <description>Primary DNS</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32010]</label>
                 <posx>100</posx>
@@ -224,6 +230,7 @@
                 <onright>101</onright>
             </control>
             <control id="10116" type="button">
+                <visible>Control.IsEnabled(10116)</visible>`
                 <description>Secondary DNS</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32011]</label>
                 <posx>100</posx>
@@ -245,6 +252,7 @@
                 <onright>101</onright>
             </control>
             <control id="910112" type="label">
+                <visible>Control.IsEnabled(910112)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>!Control.HasFocus(10112)+Control.isVisible(10112)</visible>
@@ -258,6 +266,7 @@
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
+                <align>right</align>
                 <aligny>center</aligny>
                 <visible>Control.HasFocus(10112)+Control.isVisible(10112)</visible>
                 <label>$INFO[Control.GetLabel(910112)]</label>
@@ -270,6 +279,7 @@
                 <textcolor>ffffffff</textcolor>
             </control>
             <control id="910113" type="label">
+                <visible>Control.IsEnabled(910113)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>!Control.HasFocus(10113)+Control.isVisible(10113)</visible>
@@ -296,6 +306,7 @@
                 <textcolor>ffffffff</textcolor>
             </control>
             <control id="910114" type="label">
+                <visible>Control.IsEnabled(910114)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>!Control.HasFocus(10114)+Control.isVisible(10114)</visible>
@@ -322,6 +333,7 @@
                 <textcolor>ffffffff</textcolor>
             </control>
             <control id="910115" type="label">
+                <visible>Control.IsEnabled(910115)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>!Control.HasFocus(10115)+Control.isVisible(10115)</visible>
@@ -361,6 +373,7 @@
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
+                <visible>Control.IsEnabled(910116)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>Control.HasFocus(10116)+Control.isVisible(10116)</visible>
@@ -373,8 +386,7 @@
                 <font>osmc_addon_OLD_Font36</font>
                 <textcolor>ffffffff</textcolor>
             </control>
-            <!-- <control id="10117" type="list"><description>Wired Network list</description><posx>350</posx><posy>50</posy><width>250</width><height>100</height><orientation>vertical</orientation><autoscroll>false</autoscroll><scrolltime easing="out" tween="sine">200</scrolltime><itemlayout height="100" width="200"><control type="image"><description>connected icon</description><posx>10</posx><posy>10</posy><width>50</width><height>50</height><info>ListItem.Icon</info></control><control type="label"><description>network name</description><posx>100</posx><posy>10</posy><width>150</width><height>50</height><font>font13</font><align>center</align><aligny>center</aligny><textcolor>FFFFFFFF</textcolor><info>ListItem.Label</info><selectedcolor>FF8FF5EE</selectedcolor></control></itemlayout><focusedlayout height="100" width="300"><control type="image"><description>focused background</description><width>300</width><height>50</height><posx>10</posx><posy>10</posy><texture>myfocustexture.png</texture></control><control type="image"><description>connected icon</description><posx>10</posx><posy>10</posy><width>50</width><height>50</height><info>ListItem.Icon</info></control><control type="label"><description>network name</description><posx>100</posx><posy>10</posy><width>250</width><height>50</height><font>font13</font><align>left</align><aligny>center</aligny><textcolor>FFFFFFFF</textcolor><info>ListItem.Label</info><selectedcolor>FF8FF5EE</selectedcolor></control></focusedlayout></control>-->
-            <!-- connected or not connected label -->
+             <!-- connected or not connected label -->
             <control id="81000" type="label">
                 <description>connection status</description>
                 <label>Connected or not connected</label>
@@ -389,6 +401,7 @@
             </control>
             <!-- apply and reset buttons -->
             <control id="10118" type="button">
+                <visible>Control.IsEnabled(10118)</visible>`
                 <description>Apply</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
                 <posx>250</posx>
@@ -409,6 +422,7 @@
                 <onleft>101</onleft>
             </control>
             <control id="10119" type="button">
+                <visible>Control.IsEnabled(10119)</visible>`
                 <description>Reset</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
                 <posx>600</posx>
@@ -440,10 +454,11 @@
             <onleft>102</onleft>
             <control id="777" type="group">
                 <control id="10217" type="radiobutton">
+                    <visible>Control.IsEnabled(10217)</visible>`
                     <description>Enable Adapter</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
                     <posx>100</posx>
-                    <posy>180</posy>
+                    <posy>160</posy>
                     <width>400</width>
                     <height>66</height>
                     <align>left</align>
@@ -460,37 +475,12 @@
                     <textureradioofffocus>RadioOff.png</textureradioofffocus>
                     <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
                     <onup>noop</onup>
-                    <ondown>12000</ondown>
+                    <ondown>10211</ondown>
                     <onright>10220</onright>
                     <onleft>102</onleft>
                 </control>
-                <control id="910219" type="label">
-                    <description>password indicator</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10219)+Control.isVisible(10219)</visible>
-                    <posx>730</posx>
-                    <posy>160</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_OLD_Font36</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <description>password indicator</description>
-                    <label>$INFO[Control.GetLabel(910219)]</label>
-                    <visible>Control.HasFocus(10219)+Control.isVisible(10219)</visible>
-                    <posx>730</posx>
-                    <posy>160</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_OLD_Font36</font>
-                    <textcolor>ffffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
                 <control id="10211" type="button">
+                    <visible>Control.IsEnabled(10211)</visible>`
                     <description>Automatically configure the network toggle</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
                     <posx>100</posx>
@@ -505,12 +495,13 @@
                     <focusedcolor>ffffffff</focusedcolor>
                     <texturefocus>-</texturefocus>
                     <texturenofocus>-</texturenofocus>
-                    <onup>12000</onup>
+                    <onup>10217</onup>
                     <ondown>10212</ondown>
                     <onright>10220</onright>
                     <onleft>102</onleft>
                 </control>
                 <control id="10212" type="button">
+                    <visible>Control.IsEnabled(10212)</visible>`
                     <description>IP Address</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32007]</label>
                     <posx>100</posx>
@@ -531,6 +522,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10213" type="button">
+                    <visible>Control.IsEnabled(10213)</visible>`
                     <description>Subnet Mask</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32008]</label>
                     <posx>100</posx>
@@ -551,6 +543,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10214" type="button">
+                    <visible>Control.IsEnabled(10214)</visible>`
                     <description>Default Gateway</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32009]</label>
                     <posx>100</posx>
@@ -571,6 +564,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10215" type="button">
+                    <visible>Control.IsEnabled(10215)</visible>`
                     <description>Primary DNS</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32010]</label>
                     <posx>100</posx>
@@ -591,6 +585,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10216" type="button">
+                    <visible>Control.IsEnabled(10216)</visible>`
                     <description>Secondary DNS</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32011]</label>
                     <posx>100</posx>
@@ -611,6 +606,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="910212" type="label">
+                    <visible>Control.IsEnabled(910212)</visible>`
                     <description>IP Address VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
                     <visible>!Control.HasFocus(10212)+Control.isVisible(10212)</visible>
@@ -637,6 +633,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control id="910213" type="label">
+                    <visible>Control.IsEnabled(910213)</visible>`
                     <description>Subnet Mask VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
                     <visible>!Control.HasFocus(10213)+Control.isVisible(10213)</visible>
@@ -663,6 +660,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control id="910214" type="label">
+                    <visible>Control.IsEnabled(910214)</visible>`
                     <description>Default Gateway VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
                     <visible>!Control.HasFocus(10214)+Control.isVisible(10214)</visible>
@@ -689,6 +687,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control id="910215" type="label">
+                    <visible>Control.IsEnabled(910215)</visible>`
                     <description>Primary DNS VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
                     <visible>Control.HasFocus(10215)+Control.isVisible(10215)</visible>
@@ -715,6 +714,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control id="910216" type="label">
+                    <visible>Control.IsEnabled(910216)</visible>`
                     <description>Secondary DNS VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
                     <visible>!Control.HasFocus(10216)+Control.isVisible(10216)</visible>
@@ -741,6 +741,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control id="10218" type="button">
+                    <visible>Control.IsEnabled(10218)</visible>`
                     <description>Apply</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
                     <posx>250</posx>
@@ -760,6 +761,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10219" type="button">
+                    <visible>Control.IsEnabled(10219)</visible>`
                     <description>Reset</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
                     <posx>600</posx>
@@ -781,6 +783,7 @@
             </control>
             <!-- wifi scan button -->
             <control id="10220" type="button">
+                <visible>Control.IsEnabled(10220)</visible>`
                 <description>Scan for connections</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32012]</label>
                 <posx>820</posx>
@@ -811,6 +814,7 @@
             </control>
             <!-- wifi list -->
             <control id="5000" type="list">
+                <visible>Control.IsEnabled(5000)</visible>`
                 <description>WIFI list</description>
                 <posx>820</posx>
                 <posy>250</posy>
@@ -880,6 +884,7 @@
             <onleft>103</onleft>
             <onright>103</onright>
             <control id="10301" type="radiobutton">
+                <visible>Control.IsEnabled(10301)</visible>`
                 <description>Enable Adapter</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32015]</label>
                 <posx>100</posx>
@@ -904,6 +909,7 @@
                 <onleft>103</onleft>
             </control>
             <control id="10300" type="button">
+                <visible>Control.IsEnabled(10300)</visible>`
                 <description>Refresh</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32014]</label>
                 <posx>100</posx>
@@ -924,6 +930,7 @@
                 <onleft>103</onleft>
             </control>
             <control id="10303" type="radiobutton">
+                <visible>Control.IsEnabled(10303)</visible>`
                 <description>Start/Stop Discovery</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32017]</label>
                 <posx>820</posx>
@@ -969,6 +976,7 @@
                 <aligny>top</aligny>
             </control>
             <control id="6000" type="list">
+                <visible>Control.IsEnabled(6000)</visible>`
                 <description>Bluetooth paired list</description>
                 <posx>100</posx>
                 <posy>300</posy>
@@ -1048,6 +1056,7 @@
                 <aligny>top</aligny>
             </control>
             <control id="7000" type="list">
+                <visible>Control.IsEnabled(7000)</visible>`
                 <description>Bluetooth available list</description>
                 <posx>820</posx>
                 <posy>300</posy>

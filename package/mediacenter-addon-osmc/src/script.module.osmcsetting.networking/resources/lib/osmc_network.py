@@ -261,7 +261,7 @@ def wifi_connect(path, password=None):
     except dbus.DBusException, e:
         print ('DBusException connecting')
         connected = False
-
+    print (connected)
     if password:
         process.kill()
         os.remove('/tmp/key')
