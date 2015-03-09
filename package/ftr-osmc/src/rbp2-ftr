@@ -7,6 +7,7 @@ DSA_KEY="/etc/ssh/ssh_host_dsa_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 PRESEED_FILE="/boot/preseed.cfg"
 touch /tmp/NO_UPDATE
+chown osmc:osmc /tmp/NO_UPDATE
 rm -f $DSA_KEY
 rm -f $RSA_KEY
 dbus-uuidgen > /var/lib/dbus/machine-id
