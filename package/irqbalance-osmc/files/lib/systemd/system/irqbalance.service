@@ -3,7 +3,8 @@ Description=irqbalance
 After=sysinit.target
  
 [Service]
-ExecStart=/usr/sbin/irqbalance --foreground
+ExecStart=/usr/sbin/irqbalance
+Type=forking
  
 [Install]
 WantedBy=multi-user.target
