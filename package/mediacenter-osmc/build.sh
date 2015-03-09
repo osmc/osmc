@@ -144,14 +144,14 @@ then
 		--disable-pulse \
 		--disable-projectm
 	# Raspberry Pi Configuration
-	if [ "$1" == "rbp1" ]; then $PIDEV="raspberry-pi"; fi
-	if [ "$1" == "rbp2" ]; then $PIDEV="raspberry-pi2" && $PILD="-lGLESv2"; fi
+	if [ "$1" == "rbp1" ]; then PIDEV="raspberry-pi"; fi
+	if [ "$1" == "rbp2" ]; then PIDEV="raspberry-pi2"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
 	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
-	export LDFLAGS="-L/opt/vc/lib $PILD" && \
+	export LDFLAGS="-L/opt/vc/lib" && \
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
