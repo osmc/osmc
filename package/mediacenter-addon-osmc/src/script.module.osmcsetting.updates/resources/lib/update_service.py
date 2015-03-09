@@ -853,7 +853,7 @@ class Main(object):
 
 			if data == 'manual_update_complete':
 
-				okey_dokey = DIALOG.ok(lang(32072), lang(32092))
+				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
 			
 			return 'Updates not legit, bail'
 
