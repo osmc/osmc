@@ -1,7 +1,7 @@
 diff --git Makefile Makefile
 index a1595a8..9fe7584 100644
---- Makefile
-+++ Makefile
+--- a/Makefile
++++ b/Makefile
 @@ -32,7 +32,7 @@ BINDIR=$(DESTDIR)$(bindir)
  SBINDIR=$(DESTDIR)$(sbindir)
  MANDIR=$(DESTDIR)$(mandir)
@@ -13,8 +13,8 @@ index a1595a8..9fe7584 100644
  LIB_RTMP=-Llibrtmp -lrtmp
 diff --git librtmp/Makefile librtmp/Makefile
 index 2c1c790..e367535 100644
---- librtmp/Makefile
-+++ librtmp/Makefile
+--- a/librtmp/Makefile
++++ b/librtmp/Makefile
 @@ -26,7 +26,7 @@ REQ_GNUTLS=gnutls,hogweed,nettle
  REQ_OPENSSL=libssl,libcrypto
  PUB_GNUTLS=-lgmp
@@ -26,8 +26,8 @@ index 2c1c790..e367535 100644
  LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp $(LIBZ)
 diff --git librtmp/amf.c librtmp/amf.c
 index 73d1486..5e076b0 100644
---- librtmp/amf.c
-+++ librtmp/amf.c
+--- a/librtmp/amf.c
++++ b/librtmp/amf.c
 @@ -618,6 +618,9 @@ AMFProp_Decode(AMFObjectProperty *prop, const char *pBuffer, int nSize,
        return -1;
      }
@@ -105,8 +105,8 @@ index 73d1486..5e076b0 100644
  AVal *
 diff --git librtmp/handshake.h librtmp/handshake.h
 index 0438486..104af28 100644
---- librtmp/handshake.h
-+++ librtmp/handshake.h
+--- a/librtmp/handshake.h
++++ b/librtmp/handshake.h
 @@ -707,7 +707,7 @@ HandShake(RTMP * r, int FP9HandShake)
    uint32_t uptime;
  
@@ -246,8 +246,8 @@ index 0438486..104af28 100644
    /* set handshake digest */
 diff --git librtmp/hashswf.c librtmp/hashswf.c
 index 9f4e2c0..17a8dee 100644
---- librtmp/hashswf.c
-+++ librtmp/hashswf.c
+--- a/librtmp/hashswf.c
++++ b/librtmp/hashswf.c
 @@ -70,7 +70,7 @@ extern TLS_CTX RTMP_TLS_ctx;
  
  #endif /* CRYPTO */
@@ -299,8 +299,8 @@ index 9f4e2c0..17a8dee 100644
  	  for (i = 0; i < SHA256_DIGEST_LENGTH; i++)
 diff --git librtmp/log.c librtmp/log.c
 index 0012985..856e3e4 100644
---- librtmp/log.c
-+++ librtmp/log.c
+--- a/librtmp/log.c
++++ b/librtmp/log.c
 @@ -52,8 +52,8 @@ static void rtmp_log_default(int level, const char *format, va_list vl)
  	vsnprintf(str, MAX_PRINT_LEN-1, format, vl);
  
@@ -314,8 +314,8 @@ index 0012985..856e3e4 100644
  
 diff --git librtmp/parseurl.c librtmp/parseurl.c
 index 646c70c..a0a83e6 100644
---- librtmp/parseurl.c
-+++ librtmp/parseurl.c
+--- a/librtmp/parseurl.c
++++ b/librtmp/parseurl.c
 @@ -34,6 +34,7 @@ int RTMP_ParseURL(const char *url, int *protocol, AVal *host, unsigned int *port
  	AVal *playpath, AVal *app)
  {
@@ -360,8 +360,8 @@ index 646c70c..a0a83e6 100644
  	RTMP_Log(RTMP_LOGDEBUG, "Parsed app     : %.*s", applen, p);
 diff --git librtmp/rtmp.c librtmp/rtmp.c
 index ca7db6a..ef81e83 100644
---- librtmp/rtmp.c
-+++ librtmp/rtmp.c
+--- a/librtmp/rtmp.c
++++ b/librtmp/rtmp.c
 @@ -28,6 +28,7 @@
  #include <string.h>
  #include <assert.h>
@@ -2492,8 +2492,8 @@ index ca7db6a..ef81e83 100644
 +}
 diff --git librtmp/rtmp.h librtmp/rtmp.h
 index 0248913..3e573da 100644
---- librtmp/rtmp.h
-+++ librtmp/rtmp.h
+--- a/librtmp/rtmp.h
++++ b/librtmp/rtmp.h
 @@ -150,12 +150,15 @@ extern "C"
      AVal playpath;	/* passed in explicitly */
      AVal tcUrl;
@@ -2560,8 +2560,8 @@ index 0248913..3e573da 100644
  #endif
 diff --git librtmp/rtmp_sys.h librtmp/rtmp_sys.h
 index 85d7e53..b2a3438 100644
---- librtmp/rtmp_sys.h
-+++ librtmp/rtmp_sys.h
+--- a/librtmp/rtmp_sys.h
++++ b/librtmp/rtmp_sys.h
 @@ -65,6 +65,7 @@
  #include <polarssl/net.h>
  #include <polarssl/ssl.h>
@@ -2597,8 +2597,8 @@ index 85d7e53..b2a3438 100644
  #endif
 diff --git rtmpdump.c rtmpdump.c
 index 13741a7..e9c450d 100644
---- rtmpdump.c
-+++ rtmpdump.c
+--- a/rtmpdump.c
++++ b/rtmpdump.c
 @@ -283,6 +283,7 @@ GetLastKeyframe(FILE * file,	// output file [in]
    uint8_t dataType;
    int bAudioOnly;
@@ -2779,8 +2779,8 @@ index 13741a7..e9c450d 100644
      {
 diff --git rtmpgw.c rtmpgw.c
 index 3e47602..e56b855 100644
---- rtmpgw.c
-+++ rtmpgw.c
+--- a/rtmpgw.c
++++ b/rtmpgw.c
 @@ -96,7 +96,9 @@ typedef struct
    AVal flashVer;
    AVal token;
@@ -2849,8 +2849,8 @@ index 3e47602..e56b855 100644
  
 diff --git rtmpsrv.c rtmpsrv.c
 index a9e9045..f71ec97 100644
---- rtmpsrv.c
-+++ rtmpsrv.c
+--- a/rtmpsrv.c
++++ b/rtmpsrv.c
 @@ -25,9 +25,13 @@
   */
  
@@ -3332,8 +3332,8 @@ index a9e9045..f71ec97 100644
 +}
 diff --git rtmpsuck.c rtmpsuck.c
 index e886179..1f0792b 100644
---- rtmpsuck.c
-+++ rtmpsuck.c
+--- a/rtmpsuck.c
++++ b/rtmpsuck.c
 @@ -25,10 +25,13 @@
   */
  
@@ -3716,8 +3716,8 @@ index e886179..1f0792b 100644
 +}
 diff --git thread.c thread.c
 index 0913c98..13d624a 100644
---- thread.c
-+++ thread.c
+--- a/thread.c
++++ b/thread.c
 @@ -32,7 +32,7 @@ ThreadCreate(thrfunc *routine, void *args)
    HANDLE thd;
  
