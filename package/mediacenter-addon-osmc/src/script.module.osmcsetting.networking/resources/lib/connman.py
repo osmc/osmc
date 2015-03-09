@@ -1,5 +1,4 @@
 import dbus
-import syslog
 
 
 CONNMAN_OBJECT_PATH = 'net.connman'
@@ -36,22 +35,23 @@ def toggle_technology_state(technology, state):
     try:
         technology_interface.SetProperty('Powered', state)
     except dbus.DBusException, error:
-        syslog.syslog(
-            technology + ' connectivity is already enabled')
+        print("Error Toggling State " + technology + ' : ' + str(error))
+        return False
+    return True
 
 
 def get_manager_interface():
     try:
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, '/'), 'net.connman.Manager')
     except dbus.DBusException, error:
-        syslog.syslog('Could not get connman manager interface')
+        print('Could not get connman manager interface')
 
 
 def get_service_interface(path):
     try:
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, path), 'net.connman.Service')
     except dbus.DBusException, error:
-        syslog.syslog('Could not get connman service interface')
+       print('Could not get connman service interface')
 
 
 def get_technology_interface(technology):
@@ -59,5 +59,5 @@ def get_technology_interface(technology):
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, '/net/connman/technology/'+technology),
                               "net.connman.Technology")
     except dbus.DBusException, error:
-        syslog.syslog('Could not get connman technology' + technology + 'interface')
+        print('Could not get connman technology' + technology + 'interface')
 

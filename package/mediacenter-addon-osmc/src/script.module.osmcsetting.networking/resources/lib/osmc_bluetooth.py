@@ -1,10 +1,8 @@
 import connman
 import bluetooth
 import systemd
-import subprocess
 import sys
 import pexpect
-import os.path
 import json
 
 RUNNING_IN_KODI = True

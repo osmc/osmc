@@ -90,7 +90,7 @@ MAIN_MENU = [WIRED_NETWORK_SELECTOR, WIRELESS_NETWORK_SELECTOR, BLUETOOTH_SELECT
 
 STATUS_LABEL = 81000
 
-BLUETOOTH_CONTROLS = [10300, 10301, 10303, 6000, 7000]
+BLUETOOTH_CONTROLS = [10300, 10303, 6000, 7000]
 
 BLUETOOTH_ENABLE_TOGGLE = 10301
 
@@ -299,18 +299,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                  self.populate_bluetooth_panel()
 
         if actionID == 7:  # Selected
-            if focused_control in BLUETOOTH_CONTROLS:
+            if focused_control in BLUETOOTH_CONTROLS or focused_control == BLUETOOTH_ENABLE_TOGGLE:
                 self.handle_bluetooth_selection(focused_control)
                 self.populate_bluetooth_panel()
 
-            if focused_control in ALL_WIRED_CONTROLS:
-                self.handle_wired_selection(focused_control)
-            if focused_control == WIRED_ADAPTER_TOGGLE:
+            if focused_control in ALL_WIRED_CONTROLS or focused_control == WIRED_ADAPTER_TOGGLE:
                 self.handle_wired_selection(focused_control)
 
-            if focused_control in ALL_WIRELESS_CONTROLS:
-                self.handle_wireless_selection(focused_control)
-            if focused_control == WIRELESS_ADAPTER_TOGGLE:
+            if focused_control in ALL_WIRELESS_CONTROLS or focused_control == WIRELESS_ADAPTER_TOGGLE:
                 self.handle_wireless_selection(focused_control)
 
 
@@ -763,21 +759,20 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.BTD.reset()
         self.BTP.reset()
 
-        # enable all controls
-        self.toggle_controls(True, BLUETOOTH_CONTROLS)
-        # disable all if bluetooth is not detected
-        if not osmc_bluetooth.is_bluetooth_available():
-            self.toggle_controls(False, BLUETOOTH_CONTROLS)
-            return
-        else:
-            if not osmc_bluetooth.is_bluetooth_enabled():
-                controls_to_disable = list(BLUETOOTH_CONTROLS)
-                controls_to_disable.remove(BLUETOOTH_ENABLE_TOGGLE)
-                self.toggle_controls(False, controls_to_disable)
-                return
+        # disable all controls
+        self.toggle_controls(False, BLUETOOTH_CONTROLS)
 
         bluetoothRadioButton = self.getControl(10301)
         bluetoothRadioButton.setSelected(osmc_bluetooth.is_bluetooth_enabled())
+
+        # disable all if bluetooth is not detected
+        if not osmc_bluetooth.is_bluetooth_available():
+            return
+        else:
+            if not osmc_bluetooth.is_bluetooth_enabled():
+                return
+
+        self.toggle_controls(True, BLUETOOTH_CONTROLS)
         discoveryRadioButton = self.getControl(10303)
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
 
@@ -805,7 +800,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def handle_bluetooth_selection(self, control_id):
         # 10300 - No Action Here - Refresh - populate_bluetooth_panel() will be called by calling code
         if control_id == 10301:  # Enable Bluetooth
-            osmc_bluetooth.toggle_bluetooth_state(not osmc_bluetooth.is_bluetooth_enabled())
+            if osmc_bluetooth.is_bluetooth_enabled():
+                osmc_bluetooth.toggle_bluetooth_state(False)
+            else:
+                osmc_bluetooth.toggle_bluetooth_state(True)
 
         if control_id == 10303:  # Discovery
             if not osmc_bluetooth.is_discovering():
