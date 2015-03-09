@@ -5,7 +5,8 @@
 
 . ../common.sh
 # Build in native environment
-pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"
+if [ $? == "rbp1" ]; then pull_source "https://github.com/bavison/arm-mem/archive/cd2c8f9202137c79f7afb77ecb87e713a0800d3c.zip" "$(pwd)/src"; fi
+if [ $? == "rbp2" ]; then pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"; fi
 build_in_env "${1}" $(pwd) "rbp-armmem-osmc"
 if [ $? == 0 ]
 then
@@ -14,7 +15,7 @@ then
     sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-armmem-osmc" >> files/DEBIAN/control
 	make clean
-	pushd src/arm-mem-master
+	pushd src/arm-mem-*
 	make
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_libs
