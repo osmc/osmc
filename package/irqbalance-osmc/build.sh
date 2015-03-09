@@ -5,7 +5,12 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Irqbalance/irqbalance/archive/v1.0.8.tar.gz" "$(pwd)/src"
+if [ $? == "imx6" ]
+then
+    pull_source "https://github.com/samnazarko/irqbalanced/archive/master.zip" "$(pwd)/src"
+else
+    pull_source "https://github.com/Irqbalance/irqbalance/archive/v1.0.8.tar.gz" "$(pwd)/src"
+fi
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "irqbalance-osmc"
@@ -19,7 +24,7 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
-	test "$1" == armv7 && echo "Package: armv7-irqbalance-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-irqbalance-osmc" >> files/DEBIAN/control
 	pushd src/irqbalance*
 	./autogen.sh
 	./configure --prefix=/usr
