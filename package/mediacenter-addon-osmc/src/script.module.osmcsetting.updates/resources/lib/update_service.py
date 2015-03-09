@@ -415,6 +415,7 @@ class Main(object):
 			# self.icon_settings		= ['pos_x', 'pos_y']
 
 			self.on_upd = [lang(x) for x in [32057,32058,32059,32060,32061]]
+			# self.on_upd = [lang(x) for x in [32059,32061]]  # 2==> 0, 4 ==> 1
 			
 			self.s = {}
 

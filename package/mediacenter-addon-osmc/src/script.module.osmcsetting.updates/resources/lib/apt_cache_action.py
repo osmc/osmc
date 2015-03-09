@@ -299,8 +299,12 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	@clog()
 	def error(self, pkg, errormsg):
 
+		print 'ERROR!!! \n%s\n' % errormsg
+
 		try:
 			pkgname = os.path.basename(pkg).split('_')
+
+			print 'Package affected!!! \n%s\n' % pkgname
 
 			self.parent.error_package = pkgname[0]
 
@@ -312,6 +316,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 			self.parent.error_package = '(unknown package)'
 
+
 		self.parent.error_message = errormsg
 
 		''' (Abstract) Called when a error is detected during the install. '''
@@ -320,16 +325,16 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	# The following method should be overridden to implement progress reporting for dpkg-based runs 
 	# i.e. calls to run() with a filename:
 
-	def processing(self, pkg, stage):
-		''' This method is called just before a processing stage starts. The parameter pkg is the name of the 
-			package and the parameter stage is one of the stages listed in the dpkg manual under the 
-			status-fd option, i.e. "upgrade", "install" (both sent before unpacking), "configure", "trigproc", 
-			"remove", "purge". '''
+	# def processing(self, pkg, stage):
+	# 	''' This method is called just before a processing stage starts. The parameter pkg is the name of the 
+	# 		package and the parameter stage is one of the stages listed in the dpkg manual under the 
+	# 		status-fd option, i.e. "upgrade", "install" (both sent before unpacking), "configure", "trigproc", 
+	# 		"remove", "purge". '''
 
-	def dpkg_status_change(self, pkg, status):
-		''' This method is called whenever the dpkg status of the package changes. The parameter pkg is the 
-			name of the package and the parameter status is one of the status strings used in the status file 
-			(/var/lib/dpkg/status) and documented in dpkg(1). '''
+	# def dpkg_status_change(self, pkg, status):
+	# 	''' This method is called whenever the dpkg status of the package changes. The parameter pkg is the 
+	# 		name of the package and the parameter status is one of the status strings used in the status file 
+	# 		(/var/lib/dpkg/status) and documented in dpkg(1). '''
 
 	# The following methods should be overridden to implement progress reporting for run() calls 
 	# with an apt_pkg.PackageManager object as their parameter:
