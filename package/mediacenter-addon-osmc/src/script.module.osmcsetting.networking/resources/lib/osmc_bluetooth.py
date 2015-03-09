@@ -3,6 +3,7 @@ import bluetooth
 import systemd
 import sys
 import pexpect
+import time
 import json
 
 RUNNING_IN_KODI = True
@@ -41,8 +42,13 @@ def is_bluetooth_enabled():
     return connman_status and service_status
 
 def toggle_bluetooth_state(state):
-    connman.toggle_technology_state('bluetooth', state)
-    systemd.toggle_service('bluetooth.service', state)
+    # need to do this in a specific order
+    if state:
+        systemd.toggle_service('bluetooth.service', state)
+        connman.toggle_technology_state('bluetooth', state)
+    else:
+        connman.toggle_technology_state('bluetooth', state)
+        systemd.toggle_service('bluetooth.service', state)
 
 def get_adapter_property(key):
     return bluetooth.get_adapter_property(key)
