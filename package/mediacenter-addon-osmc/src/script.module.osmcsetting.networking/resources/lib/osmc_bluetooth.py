@@ -3,7 +3,6 @@ import bluetooth
 import systemd
 import sys
 import pexpect
-import time
 import json
 
 RUNNING_IN_KODI = True
@@ -25,12 +24,14 @@ BLUETOOTH_SERVICE = 'bluetooth.service'
 PEXPECT_SOL = 'SOL@'
 PEXPECT_EOL = '@EOL'
 
+
 def log(message):
     msg_str='OSMC_BLUETOOTH -  ' + str(message)
     if RUNNING_IN_KODI:
         xbmc.log(msg_str, level=xbmc.LOGDEBUG)
     else:
         print(msg_str)
+
 
 def is_bluetooth_available():
     return connman.is_technology_available('bluetooth')
@@ -41,14 +42,15 @@ def is_bluetooth_enabled():
     service_status = systemd.is_service_running(BLUETOOTH_SERVICE)
     return connman_status and service_status
 
+
 def toggle_bluetooth_state(state):
-    # need to do this in a specific order
     if state:
-        systemd.toggle_service('bluetooth.service', state)
+        if not systemd.is_service_running(BLUETOOTH_SERVICE):
+            systemd.toggle_service(BLUETOOTH_SERVICE, state)
         connman.toggle_technology_state('bluetooth', state)
     else:
         connman.toggle_technology_state('bluetooth', state)
-        systemd.toggle_service('bluetooth.service', state)
+
 
 def get_adapter_property(key):
     return bluetooth.get_adapter_property(key)
@@ -133,9 +135,11 @@ def list_devices(filterkey=None, expectedvalue=None):
                     devices[str(device_dict['Address'])] = device_dict
     return devices
 
+
 def encode_return(result, messages):
     return_value = {result : messages}
     return PEXPECT_SOL+ json.dumps(return_value) + PEXPECT_EOL
+
 
 def pair_device(deviceAddress, scriptBasePath = ''):
     script_path = scriptBasePath + PAIRING_AGENT
@@ -170,6 +174,7 @@ def pair_device(deviceAddress, scriptBasePath = ''):
         return False
     return True
 
+
 def handleAgentInteraction(deviceAlias, command , messages):
     supported_commands = ['NOTIFICATION', 'YESNO_INPUT', 'NUMERIC_INPUT']
     if not command in supported_commands:
@@ -202,6 +207,7 @@ def handleAgentInteraction(deviceAlias, command , messages):
         return  dialog.numeric(0, message)
                     
     return None
+
 
 def lang(id):
     addon = xbmcaddon.Addon('script.module.osmcsetting.networking')

@@ -40,6 +40,7 @@
             <orientation>vertical</orientation>
             <!-- Wired -->
             <control id="101" type="button">
+                <visible>Control.IsEnabled(101)</visible>
                 <width>300</width>
                 <height>42</height>
                 <label>Wired</label>
@@ -55,6 +56,7 @@
             </control>
             <!-- Wireless -->
             <control id="102" type="button">
+                <visible>Control.IsEnabled(102)</visible>
                 <width>300</width>
                 <height>42</height>
                 <label>Wireless</label>
@@ -70,6 +72,7 @@
             </control>
             <!-- Bluetooth -->
             <control id="103" type="button">
+                <visible>Control.IsEnabled(103)</visible>
                 <width>300</width>
                 <height>42</height>
                 <label>Bluetooth</label>
@@ -142,7 +145,7 @@
                 <onright>101</onright>
             </control>
             <control id="10112" type="button">
-                <visible>Control.IsEnabled(10112)</visible>`
+                <visible>Control.IsEnabled(10112)</visible>
                 <description>IP Address</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32007]</label>
                 <posx>100</posx>

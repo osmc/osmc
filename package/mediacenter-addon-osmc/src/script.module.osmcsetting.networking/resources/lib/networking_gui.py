@@ -81,10 +81,10 @@ ip_controls = [10112, 10113, 10114, 10115, 10116, 910112, 910113, 910114, 910115
     , 10216, 910212, 910213, 910214, 910215, 910216, ]
 
 
-WIRED_NETWORK_SELECTOR = 101
-WIRELESS_NETWORK_SELECTOR = 102
-BLUETOOTH_SELECTOR = 103
-MAIN_MENU = [WIRED_NETWORK_SELECTOR, WIRELESS_NETWORK_SELECTOR, BLUETOOTH_SELECTOR]
+SELECTOR_WIRED_NETWORK = 101
+SELECTOR_WIRELESS_NETWORK = 102
+SELECTOR_BLUETOOTH = 103
+MAIN_MENU = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH]
 
 #panel_controls = [1010, 1020, 1030]
 
@@ -200,21 +200,27 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # bluetooth discovered device panel (BTD)
         self.BTD = self.getControl(7000)
 
-        panel_to_show = WIRED_NETWORK_SELECTOR
+        # Hide panel selectors if devices are not present
+        if not osmc_network.is_wifi_available():
+             self.toggle_controls(False, [SELECTOR_WIRELESS_NETWORK])
+        if not osmc_bluetooth.is_bluetooth_available():
+             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
+
+        panel_to_show = SELECTOR_WIRED_NETWORK
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.preseed_data = osmc_network.parse_preseed()
             if self.preseed_data:
                 if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
-                    panel_to_show = WIRELESS_NETWORK_SELECTOR
+                    panel_to_show = SELECTOR_WIRELESS_NETWORK
                 else:
-                    panel_to_show = WIRED_NETWORK_SELECTOR
+                    panel_to_show = SELECTOR_WIRED_NETWORK
 
         # set all the panels to invisible except the first one
         for ctl in MAIN_MENU:
                 self.getControl(ctl * 10).setVisible(True if ctl == panel_to_show else False)
-        if panel_to_show == WIRED_NETWORK_SELECTOR:
+        if panel_to_show == SELECTOR_WIRED_NETWORK:
             self.populate_wired_panel()
-        if panel_to_show == WIRELESS_NETWORK_SELECTOR:
+        if panel_to_show == SELECTOR_WIRELESS_NETWORK:
             self.populate_wifi_panel(False)
 
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
