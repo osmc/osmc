@@ -86,9 +86,6 @@ SELECTOR_WIRELESS_NETWORK = 102
 SELECTOR_BLUETOOTH = 103
 MAIN_MENU = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH]
 
-#panel_controls = [1010, 1020, 1030]
-
-STATUS_LABEL = 81000
 
 BLUETOOTH_CONTROLS = [10300, 10303, 6000, 7000]
 
@@ -97,10 +94,11 @@ BLUETOOTH_ENABLE_TOGGLE = 10301
 ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10118, 10119,  910112, 910113, 910114,
                       910115, 910116]
 
+WIRED_STATUS_LABEL = 81000
+
 WIRED_IP_VALUES = [910112, 910113, 910114, 910115, 910116]
 
 WIRED_IP_LABELS = [10112, 10113, 10114, 10115, 10116]
-
 
 WIRED_APPLY_BUTTON = 10118
 
@@ -120,6 +118,8 @@ WIRED_DHCP_MANUAL_BUTTON = 10111
 
 ALL_WIRELESS_CONTROLS = [5000, 910212, 910213, 910214, 910215, 910216, 10211, 10212, 10213, 10214, 10215, 10216,
                          10218, 10219, 10220]
+
+WIRELESS_STATUS_LABEL = 82000
 
 WIRELESS_IP_VALUES = [910212, 910213, 910214, 910215, 910216]
 
@@ -185,14 +185,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.preseed_data = None
 
-        self.status_label = None
+        self.wired_status_label = None
+
+        self.wireless_status_label = None
 
     def onInit(self):
          # Wired Network Label
-        self.status_label = self.getControl(STATUS_LABEL);
+        self.wired_status_label = self.getControl(WIRED_STATUS_LABEL);
 
         # wifi panel (WFP)
         self.WFP = self.getControl(5000)
+
+        # Wireless Network Label
+        self.wireless_status_label = self.getControl(WIRELESS_STATUS_LABEL);
 
         # bluetooth paired device panel (BTP)
         self.BTP = self.getControl(6000)
@@ -367,17 +372,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.toggle_controls(True, ALL_WIRED_CONTROLS)
 
                 interface = self.current_network_config['Interface']
-
-                if self.current_network_config['State'] in ('online'):
+                if osmc_network.has_internet_connection():
                     #         'Status'                               'Connected'
                     status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
-                elif self.current_network_config['State'] in ('ready'):
+                else:
                     #         'Status'                               'No internet'
                     status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
-                else:
-                    #                 'Status'
-                    status = status = lang(32044) + ' ' + interface
-                self.status_label.setLabel(status)
+                self.wired_status_label.setLabel(status)
                 self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
 
                 self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
@@ -389,12 +390,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.toggle_controls(False, ALL_WIRED_CONTROLS)
                 #                 'Status'     'no wired connection'
                 status = lang(32044) + ': ' + lang(32049)
-                self.status_label.setLabel(status)
+                self.wired_status_label.setLabel(status)
         else:  # Disabled
                 self.toggle_controls(False, ALL_WIRED_CONTROLS)
                 #                 'Status'     'disabled'
                 status = lang(32044) + ': ' + lang(32048)
-                self.status_label.setLabel(status)
+                self.wired_status_label.setLabel(status)
                 self.update_apply_reset_button('WIRED')
 
         adapterRadioButton = self.getControl(WIRED_ADAPTER_TOGGLE)
@@ -459,7 +460,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         secondaryDNS = self.getControl(controls[4])
         if secondaryDNS.getLabel():
             self.current_network_config['DNS_2'] = secondaryDNS.getLabel()
-        log(self.current_network_config)
 
     def handle_wired_selection(self, control_id):
         if control_id == WIRED_DHCP_MANUAL_BUTTON:
@@ -503,7 +503,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def toggle_ethernet(self):
         self.toggle_controls(False, ALL_WIRED_CONTROLS)
         #                          'Status'              'Configuring...'
-        self.status_label.setLabel(lang(32044) + ' : ' + lang(32016))
+        self.wired_status_label.setLabel(lang(32044) + ' : ' + lang(32016))
         osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
         # 10 second wait to allow connman to make the changes before refreshing
         time.sleep(10)
@@ -540,13 +540,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_SCAN_BUTTON, WIRELESS_NETWORKS,
                                                 WIRELESS_DHCP_MANUAL_BUTTON ])
+                    if osmc_network.has_internet_connection():
+                        #         'Status'            'Connected'
+                        status = lang(32044) + ': ' + lang(32046)
+                    else:
+                        #         'Status'            'No internet'
+                        status = lang(32044) + ':  ' + lang(32047)
+                    self.wireless_status_label.setLabel(status)
                 else:# not connected to a network
                     self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_SCAN_BUTTON, WIRELESS_NETWORKS])
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
+                    #         'Status'           'Not connected'
+                    status = lang(32044) + ': ' + lang(32050)
+                    self.wireless_status_label.setLabel(status)
 
             else:# Wifi disabled
-                 self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
+                self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
+                #         'Status'            'disabled'
+                status = lang(32044) + ': ' + lang(32048)
+                self.wireless_status_label.setLabel(status)
 
             adapterRadioButton = self.getControl(WIRELESS_ADAPTER_TOGGLE)
             adapterRadioButton.setSelected(osmc_network.is_wifi_enabled())
@@ -581,7 +594,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 connected = True
                 self.conn_ssid = ssid
                 self.current_network_config = self.get_wireless_config(ssid)
-                log(self.current_network_config)
                 self.populate_ip_controls(info, WIRELESS_IP_VALUES)
             icon_image = self.get_wifi_icon(encrypted, strength / 25, connected)
             itm.setIconImage(icon_image)
@@ -673,7 +685,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
                     self.current_network_config = {}
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
-                    self.toggle_controls(False, [WIRED_DHCP_MANUAL_BUTTON])
+                    self.toggle_controls(False, [WIRELESS_DHCP_MANUAL_BUTTON])
+                    status = lang(32044) + ': ' + lang(32050)
+                    self.wireless_status_label.setLabel(status)
         osmc_network.update_preseed_file(self.current_network_config)
         self.populate_wifi_networks(False)
 
@@ -708,6 +722,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.current_network_config = {}
                 self.clear_ip_controls(WIRELESS_IP_VALUES)
                 self.toggle_controls(False, [WIRELESS_DHCP_MANUAL_BUTTON])
+                #         'Status'           'Not connected'
+                status = lang(32044) + ': ' + lang(32050)
+                self.wireless_status_label.setLabel(status)
                 return False
             else:
                 self.current_network_config = self.get_wireless_config(ssid)
@@ -716,6 +733,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                 self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_SCAN_BUTTON, WIRELESS_NETWORKS,
                                             WIRELESS_DHCP_MANUAL_BUTTON ])
+                interface = self.current_network_config['Interface']
+                if osmc_network.has_internet_connection():
+                    #         'Status'                               'Connected'
+                    status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
+                else:
+                    #         'Status'                               'No internet'
+                    status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
+                self.wireless_status_label.setLabel(status)
                 return True
         else:
             return False

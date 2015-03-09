@@ -151,7 +151,6 @@ def update_cmdline_file(file_path, key, value):
 
 def split_nfs_static_cmdlline(value):
     connection_details = value.split(':')
-    print connection_details
     nfs_static = {'Address': connection_details[0], 'Gateway': connection_details[2], 'Netmask': connection_details[3]}
     if len(connection_details) > 6:
         nfs_static['DNS_1'] = connection_details[7]
