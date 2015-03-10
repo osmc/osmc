@@ -34,6 +34,8 @@ class Networking_caller(Thread):
 	def run(self):
 		"""Calls Barkers method to check for internet connection"""
 
+		log('checking internet connection')
+
 		self.parent.internet_connected = self.net_call.check_internet()
 
 
