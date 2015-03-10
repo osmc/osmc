@@ -38,6 +38,8 @@ class Networking_caller(Thread):
 
 		self.parent.internet_connected = self.net_call.check_internet()
 
+		log('internet connection is %s' % self.parent.internet_connected)
+
 
 
 class walkthru_gui(xbmcgui.WindowXMLDialog):
@@ -212,12 +214,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# check if internet is connected
 			if self.internet_connected:
+				log('internet is connected, jumping to exit')
 				# skip the Networking setup menu item
 				self.getControl(94000).setVisible(False)
 				self.getControl(95000).setVisible(True)
 				self.getControl(1005).setVisible(True)
 				self.setFocusId(1005)
 			else:
+				log('internet is not connected, jumping to networking')
 				# display the Networking panel
 				self.getControl(94000).setVisible(False)
 				self.getControl(96000).setVisible(True)
