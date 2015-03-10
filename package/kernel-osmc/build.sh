@@ -6,8 +6,13 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="3.18.9" && REV="1"
 test $1 == rbp2 && VERSION="3.18.9" && REV="3"
-if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
-pull_source "https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz" "$(pwd)/src/"
+if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
+then
+	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
+	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz"
+fi
+if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/samnazarko/vero-linux"; fi
+pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "kernel-osmc"
@@ -34,8 +39,7 @@ then
 	pushd src/linux-*
 	install_patch "../../patches" "all"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
-	test "$1" == rbp1 && install_patch "../../patches" "rbp1"
-	test "$1" == rbp2 && install_patch "../../patches" "rbp2"
+	install_patch "../../patches" "${1}"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
@@ -58,10 +62,10 @@ then
 		lirc-rpi-overlay
 		w1-gpio-overlay
 		w1-gpio-pullup-overlay
-		y28a-overlay.dtb
-		piscreen-overlay.dtb
-		rpi-display-overlay.dtb
-		spi-bcm2835-overlay.dtb
+		y28a-overlay
+		piscreen-overlay
+		rpi-display-overlay
+		spi-bcm2835-overlay
 		"
 		pushd arch/arm/boot/dts
 		for dtb in $overlays
@@ -72,6 +76,18 @@ then
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 	popd
 		# Disassemble kernel package to add overlays
+		mv src/${1}-image*.deb .
+		dpkg -x ${1}-image*.deb files-image/
+		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
+		rm ${1}-image*.deb
+		dpkg -b files-image ${1}-image-osmc.deb
+	fi
+	if [ "$1" == "vero" ]
+	then
+		make imx6dl-vero.dtb
+		mkdir -p ../../files-image/boot/
+		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
+		# Disassemble kernel package to add device tree
 		mv src/${1}-image*.deb .
 		dpkg -x ${1}-image*.deb files-image/
 		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
