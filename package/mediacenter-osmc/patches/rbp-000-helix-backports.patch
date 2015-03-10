@@ -1,7 +1,7 @@
 From 202fc1876e0435fbdaf9081c74a0ae6ac8bc3d19 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Apr 2014 18:19:32 +0100
-Subject: [PATCH 01/68] [rbp/omxplayer] When opening a stream don't try to
+Subject: [PATCH 01/69] [rbp/omxplayer] When opening a stream don't try to
  update gui so often
 
 ---
@@ -28,7 +28,7 @@ index e7cfcdd..20b99ad 100644
 From e3ea0709b402c449934409c50eee6ae39a54f800 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 29 Apr 2014 15:23:22 +0100
-Subject: [PATCH 02/68] [ffmpeg] Speed up wtv index creation
+Subject: [PATCH 02/69] [ffmpeg] Speed up wtv index creation
 
 The index creation is O(N^2) with number of entries (typically thousands).
 On a Pi this can take more than 60 seconds to execute for a recording of a few hours.
@@ -117,7 +117,7 @@ index 0000000..4ac5636
 From 846371a4aae5d5bd4ddf6542fcce4e4333a5f7f3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 2 Aug 2014 17:48:04 +0100
-Subject: [PATCH 03/68] [omx] Report decoded image name
+Subject: [PATCH 03/69] [omx] Report decoded image name
 
 ---
  xbmc/cores/omxplayer/OMXImage.cpp | 1 +
@@ -139,7 +139,7 @@ index aa413b9..22ec3f0 100644
 From 29ec0cc66854ace13bbf9060af5ba4c298792c01 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 8 Mar 2014 15:36:06 +0000
-Subject: [PATCH 04/68] [hifiberry] Hack: force it to be recognised as IEC958
+Subject: [PATCH 04/69] [hifiberry] Hack: force it to be recognised as IEC958
  capable to enable passthrough options
 
 ---
@@ -165,7 +165,7 @@ index df50940..2d853d6 100644
 From eaec9ca4d20bee85b8a204bc82c8f9a2ca68e24d Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 11 Dec 2013 17:21:54 +0000
-Subject: [PATCH 05/68] Move the reference-counting of Begin and End calls from
+Subject: [PATCH 05/69] Move the reference-counting of Begin and End calls from
  DX and GL source files into GUIFontTTF.cpp.
 
 ---
@@ -556,7 +556,7 @@ index c0bb53a..735fb3a 100644
 From 8d2767e9572569db014601db01a57d10d129ebd3 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 11 Dec 2013 18:47:54 +0000
-Subject: [PATCH 06/68] Convert CGUIFontTTFBase::m_vertex to be managed as a
+Subject: [PATCH 06/69] Convert CGUIFontTTFBase::m_vertex to be managed as a
  std::vector.
 
 Also retired CGUIFontTTFBase::m_vertex_count and
@@ -739,7 +739,7 @@ index 97853fd..b76c6a5 100644
 From 5aedd0ba83809881e08dd1f2831e6679b9667568 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Mon, 16 Dec 2013 18:58:12 +0000
-Subject: [PATCH 07/68] CGUIFontTTFBase::RenderCharacter can now append to
+Subject: [PATCH 07/69] CGUIFontTTFBase::RenderCharacter can now append to
  arbitrary vectors of vertices rather than only CGUIFontTTFBase::m_vertex
 
 ---
@@ -815,7 +815,7 @@ index 5675725..a5d44f4 100644
 From fbf66fb6a0ab79933d1f7f512caa179c09b37502 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 17:18:38 +0000
-Subject: [PATCH 08/68] Add a cache of font glyph bounding box vertices.
+Subject: [PATCH 08/69] Add a cache of font glyph bounding box vertices.
 
 This is implemented as a template because ultimately we will key on different
 parameters and store values of different types, depending upon whether we
@@ -1592,7 +1592,7 @@ index f351c99..9036ba9 100644
 From 2fea8f2bdef2a9c4d293ce9ab72895f1d08a1085 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 23 Jan 2014 22:24:17 +0000
-Subject: [PATCH 09/68] Lay the groundwork for hardware clipping.
+Subject: [PATCH 09/69] Lay the groundwork for hardware clipping.
 
 For glScissor() to replace CGraphicContext::ClipRect, a necessary condition
 is that no shear or rotation is introduced between the coordinate systems
@@ -1857,7 +1857,7 @@ index 98e398a..81ee49e 100644
 From dc5cdb1cd9bd68ad4c70123ac81a1b5baa355566 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 23 Jan 2014 16:42:22 +0000
-Subject: [PATCH 10/68] Increase font cache hit rate by keying on the
+Subject: [PATCH 10/69] Increase font cache hit rate by keying on the
  fractional part of m_originX and m_originY *after* they have been through the
  graphics context's transformation matrix, plus the scale/rotation elements of
  the matrix, rather than the origin in the original frame of reference plus
@@ -2061,7 +2061,7 @@ index 3b93672..258dffa 100644
 From 235ea92960c0beb68b6e02013c1bc51fba0079bb Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 8 Jan 2014 12:16:33 +0000
-Subject: [PATCH 11/68] Rewrite of scrolling text code.
+Subject: [PATCH 11/69] Rewrite of scrolling text code.
 
 No longer shuffles the string round to minimise the number of characters
 before the clipping rectangle; this doesn't save much on rendering time but
@@ -2380,7 +2380,7 @@ index 2cda726..fbc579e 100644
 From 28b2ee0164045008062336fd92af05e1dba9bf29 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Mon, 27 Jan 2014 23:21:10 +0000
-Subject: [PATCH 12/68] Move the application of the translation offsets into
+Subject: [PATCH 12/69] Move the application of the translation offsets into
  the GLES code.
 
 Still all pure software at this stage. Main change is in the data types at
@@ -2577,7 +2577,7 @@ index 9935ea4..18c9358 100644
 From 74dfaa28bb6379a0cf3e4a4dc2e40f68b7b714f7 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 15:28:06 +0000
-Subject: [PATCH 13/68] Rather than applying the translation offsets to the
+Subject: [PATCH 13/69] Rather than applying the translation offsets to the
  vertices, now applies them to the model view matrix from the top of the
  matrix stack and pushes it over to OpenGL. The vertices themselves are still
  all held client-side.
@@ -2724,7 +2724,7 @@ index 81ee49e..d2f9cd1 100644
 From 28709ba5b0fbc09f0f5159a39e154c3f3eae3271 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 29 Jan 2014 13:21:19 +0000
-Subject: [PATCH 14/68] Enable hardware clipping.
+Subject: [PATCH 14/69] Enable hardware clipping.
 
 ---
  xbmc/guilib/GUIFontTTF.cpp   | 4 ++--
@@ -2799,7 +2799,7 @@ index ea08bf4..b63e337 100644
 From 564a1924ae6c449255356b77ca816628ef5c9945 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 15:32:51 +0000
-Subject: [PATCH 15/68] Move the vertex data across to a vertex buffer object
+Subject: [PATCH 15/69] Move the vertex data across to a vertex buffer object
  just prior to drawing.
 
 ---
@@ -2853,7 +2853,7 @@ index b63e337..b00055d 100644
 From dff7deac153b80cd06446e620de38a0503890536 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 16:04:04 +0000
-Subject: [PATCH 16/68] Move vertex data into an OpenGL VBO when the font cache
+Subject: [PATCH 16/69] Move vertex data into an OpenGL VBO when the font cache
  entry is populated.
 
 The font cache now stores the "name" (handle) of the VBO, rather than a vector
@@ -3129,7 +3129,7 @@ index 735fb3a..6102c90 100644
 From dbe7f053a04a4efdf4b6bf81132b82bd181b2168 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 1 Nov 2014 22:15:13 +0000
-Subject: [PATCH 17/68] Switch from glDrawArrays() to glDrawElements().
+Subject: [PATCH 17/69] Switch from glDrawArrays() to glDrawElements().
 
 This involves setting up a static VBO containing the indexes necessary to
 convert from quads to triangles on the fly in the GPU.
@@ -3353,7 +3353,7 @@ index 2bdd4fa..68f0117 100644
 From fc17eaf7b3992e29c5259381ce290e42a5a45e5b Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 1 May 2014 16:28:39 +0100
-Subject: [PATCH 18/68] Improved file buffering in CArchive
+Subject: [PATCH 18/69] Improved file buffering in CArchive
 
 Even though memcpy is typically inlined by the compiler into byte/word loads
 and stores (at least for release builds), the frequency with which 1, 2 and 4
@@ -3416,7 +3416,7 @@ index 6ed0f8f..8506d95 100644
 From 2654635ceb202591c8b14fcb49c5be35da411314 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 10 Sep 2014 22:07:21 +0100
-Subject: [PATCH 19/68] [mmal] Allow mmal codec for dvd stills
+Subject: [PATCH 19/69] [mmal] Allow mmal codec for dvd stills
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 4 ++++
@@ -3441,7 +3441,7 @@ index 10648c5..bea5e4f 100644
 From 273b803ec86b40cdd26233b43472d66d302a2994 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 12 Aug 2014 00:31:36 +0100
-Subject: [PATCH 20/68] [omxcodec] Don't force software codec with dvds
+Subject: [PATCH 20/69] [omxcodec] Don't force software codec with dvds
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 2 ++
@@ -3465,7 +3465,7 @@ index aae59dc..12a3ed6 100644
 From a1497039da7801db146fb753ab048f3da00d61e6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Apr 2014 21:18:06 +0100
-Subject: [PATCH 21/68] [omxplayer] Don't propagate 3d flags based on supported
+Subject: [PATCH 21/69] [omxplayer] Don't propagate 3d flags based on supported
  3d modes
 
 ---
@@ -3521,7 +3521,7 @@ index ac838ce..605318c9 100644
 From 74c6864c9e77a7f9301a1865e603f0000a43fcc6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:00:52 +0100
-Subject: [PATCH 22/68] [graphics] Don't set stereo mode based on resolution
+Subject: [PATCH 22/69] [graphics] Don't set stereo mode based on resolution
 
 The resolution change should follow stereo mode
 ---
@@ -3582,7 +3582,7 @@ index 3cb5587..fe6ebf4 100644
 From 0dd8a7b3ef674c933315e5cd31e51ea5321e43f0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:01:51 +0100
-Subject: [PATCH 23/68] [graphics] Allow switching to a more suitable 3D
+Subject: [PATCH 23/69] [graphics] Allow switching to a more suitable 3D
  resolution
 
 ---
@@ -3671,7 +3671,7 @@ index 2904c1b..8d3774f 100644
 From c3ea49fd70b079825ab7f3c5a5c6a61bc2120565 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:38:55 +0100
-Subject: [PATCH 24/68] [3D] Support switching to 3D resolutions
+Subject: [PATCH 24/69] [3D] Support switching to 3D resolutions
 
 Include matching 3D flags (SBS/TAB) in the score of a resolution to switch to, to enable switching to 3d modes.
 Also remove the old code that treated 3D modes differently when assigning a score.
@@ -3756,7 +3756,7 @@ index 83c3adb..8076e76 100644
 From 2823d328d11d26109328652b6ee1caccdce66e91 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 23 Apr 2014 00:05:07 +0100
-Subject: [PATCH 25/68] [graphics] Make pixel ratio for 3d modes consistent
+Subject: [PATCH 25/69] [graphics] Make pixel ratio for 3d modes consistent
 
 Note: Use the stored stereo flags from lists of resolutions.
 Use current stereo mode for current resolution.
@@ -3962,7 +3962,7 @@ index c58c28a..bf1e589 100644
 From 0b052f5363b112b05335d697ef379489cc9aaf88 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 16:45:16 +0100
-Subject: [PATCH 26/68] filesystem: Make support of browsing into archives
+Subject: [PATCH 26/69] filesystem: Make support of browsing into archives
  optional
 
 The ability to browse, scan and play content in archives can cause problems on low powered/low memory devices.
@@ -4064,7 +4064,7 @@ index 2fd8777..3b294cd 100644
 From bf4d9d890c9dcfd779aadb785981dbf6dea390fc Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 18:58:37 +0100
-Subject: [PATCH 27/68] confluence: Remove media-overlay.jpg for when video is
+Subject: [PATCH 27/69] confluence: Remove media-overlay.jpg for when video is
  backgrounded
 
 ---
@@ -4088,7 +4088,7 @@ index 01d4ee9..64b317f 100644
 From f5d8381a8c6c1056b10720c9890d298656246274 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 13:06:57 +0000
-Subject: [PATCH 28/68] [rbp] Make cachemembuffersize default depend on memory
+Subject: [PATCH 28/69] [rbp] Make cachemembuffersize default depend on memory
  size
 
 ---
@@ -4147,7 +4147,7 @@ index a1b68b5..e9cd63a 100644
 From 4e34065084cd354f1dd152792357644595a1a5a2 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 16 Jun 2014 19:06:00 +0100
-Subject: [PATCH 30/68] [experimental] Disable quiet-noise generation
+Subject: [PATCH 30/69] [experimental] Disable quiet-noise generation
 
 ---
  xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp | 2 ++
@@ -4177,7 +4177,7 @@ index b391ff3..463a89c 100644
 From 4d74dd27acc57fcc360340480214d34cc6bc60cb Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 30 May 2014 14:58:43 +0100
-Subject: [PATCH 31/68] [settings] Experiment: Report DESKTOP resolution in
+Subject: [PATCH 31/69] [settings] Experiment: Report DESKTOP resolution in
  video settings
 
 ---
@@ -4202,7 +4202,7 @@ index 6902f83..50c5f97 100644
 From b8ab38f7ccfba3fbd92ddf14ca871fa82381f9f0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 16 Aug 2014 21:01:42 +0100
-Subject: [PATCH 32/68] omxrender: Hacks to reduce GUI rendering rate when
+Subject: [PATCH 32/69] omxrender: Hacks to reduce GUI rendering rate when
  playing video
 
 ---
@@ -4305,7 +4305,7 @@ index 47b7610..b60422a 100644
 From 90c19a7670d77b651bfd12e0026b970dc697c28c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 9 Sep 2014 12:04:26 +0100
-Subject: [PATCH 33/68] egl: Treat unknown display aspect ratio as square pixel
+Subject: [PATCH 33/69] egl: Treat unknown display aspect ratio as square pixel
 
 ---
  xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp | 4 ++--
@@ -4337,7 +4337,7 @@ index bf1e589..a25eb86 100644
 From 38f18d69b3d6079d56d2a8302b53bd812789d354 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Thu, 11 Sep 2014 21:30:43 +0200
-Subject: [PATCH 34/68] Disable textbox autoscrolling while on screensaver.
+Subject: [PATCH 34/69] Disable textbox autoscrolling while on screensaver.
 
 SQUASH: only if dim or black
 ---
@@ -4401,7 +4401,7 @@ index c0e2fa5..0eca360 100644
 From 3bdb71d868a2ac674a57c0c26caac1e483591508 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 18 Sep 2014 14:24:56 +0100
-Subject: [PATCH 35/68] [omxplayer] Only enable audio clock master when A/V
+Subject: [PATCH 35/69] [omxplayer] Only enable audio clock master when A/V
  sync method is set to audio clock
 
 ---
@@ -4435,7 +4435,7 @@ index 5475570..7c07b57 100644
 From 9de345d5c2aee43a3c5e2ded2bb65b89e207f094 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 19 Sep 2014 11:54:49 +0100
-Subject: [PATCH 36/68] [dvdplayer/rbp] Add pi specific option to maintain
+Subject: [PATCH 36/69] [dvdplayer/rbp] Add pi specific option to maintain
  vsync with pll adjustment
 
 New A/V sync option in settings/video/playback to do "Adjust PLL".
@@ -4637,7 +4637,7 @@ index 4fd18f3..6456657 100644
 From 9891f4d41bad768ccf359537117d1bcf8fad6676 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 27 Sep 2014 15:32:37 +0100
-Subject: [PATCH 37/68] [dvdplayer] exerimental: don't raise priority of audio
+Subject: [PATCH 37/69] [dvdplayer] exerimental: don't raise priority of audio
  thread
 
 ---
@@ -4664,7 +4664,7 @@ index 12a3ed6..cb512ed 100644
 From fc2c66f37c62952b2a772078a4ad1da3ebfb54c1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 28 Sep 2014 19:28:17 +0100
-Subject: [PATCH 38/68] [mmalcodec] Introduce a preroll period to buffer up
+Subject: [PATCH 38/69] [mmalcodec] Introduce a preroll period to buffer up
  frames on startup
 
 ---
@@ -4800,7 +4800,7 @@ index b4aa571..4f81bbd 100644
 From eea2991a355a1c428ad24d97e62bdfc4e2e92792 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH 39/68] [audio] Add settings option to boost centre channel
+Subject: [PATCH 39/69] [audio] Add settings option to boost centre channel
  when downmixing
 
 This allows a dB volume increase to be added to centre channel.
@@ -4926,7 +4926,7 @@ index 7c07b57..ef4c3d4 100644
 From c18fc1934020ff0b09f945cb458a472ae181e474 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 3 Oct 2014 18:38:07 +0100
-Subject: [PATCH 40/68] [omxcore] Skip out of flush on error
+Subject: [PATCH 40/69] [omxcore] Skip out of flush on error
 
 ---
  xbmc/linux/OMXCore.cpp | 4 ++--
@@ -4958,7 +4958,7 @@ index 4ae29ba..4caa304 100644
 From f94b68531877a3d393a949359164f8a4ea05a0d8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 3 Oct 2014 18:40:06 +0100
-Subject: [PATCH 41/68] [SinkPi] Handle multichannel layout more like OMXAudio
+Subject: [PATCH 41/69] [SinkPi] Handle multichannel layout more like OMXAudio
 
 ---
  xbmc/cores/AudioEngine/Sinks/AESinkPi.cpp | 14 +++++++-------
@@ -5020,7 +5020,7 @@ index 89684e4..fd9a03d 100644
 From 9fe13e7aca1ed60c5adee8102485caf4ca272861 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 15:23:51 +0000
-Subject: [PATCH 42/68] [rbp] Default extract thumbnails to false
+Subject: [PATCH 42/69] [rbp] Default extract thumbnails to false
 
 It can take 80 seconds for a single file on a Pi. It can cause crashes with out-of-memory errors.
 It genereates a lot of support issues. Best to default to disabled and let users enable it if they must
@@ -5053,7 +5053,7 @@ index 79853a8..4c2ef41 100644
 From 4b93ad73cc7de711acf461f8dbd7f0b5b35dbf0a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 11 Nov 2014 18:14:23 +0000
-Subject: [PATCH 43/68] [resamplepi] Try to report the same numbers as ffmpeg
+Subject: [PATCH 43/69] [resamplepi] Try to report the same numbers as ffmpeg
 
 ---
  .../cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp | 11 ++++++-----
@@ -5107,7 +5107,7 @@ index 84505bf..2b5bef2 100644
 From 4a3c14fbbba8ff2d0ee2bc931282d73f364c4478 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 11 Nov 2014 20:49:30 +0000
-Subject: [PATCH 44/68] [dvdplayer] New scheme for PLL adjustment for video
+Subject: [PATCH 44/69] [dvdplayer] New scheme for PLL adjustment for video
  clock
 
 ---
@@ -5225,7 +5225,7 @@ index 02c64a0..37bf4bd 100644
 From 418d91d761b1e7f2223197c37d495f87af058b69 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 15 Nov 2014 12:03:34 +0000
-Subject: [PATCH 45/68] [dvdplayer] Add lock for player creation
+Subject: [PATCH 45/69] [dvdplayer] Add lock for player creation
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 3 +++
@@ -5274,7 +5274,7 @@ index ef64076..7ea6ea6 100644
 From 696505c903c3355189c46ea29282b44021af3895 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 19 Nov 2014 13:29:43 +0000
-Subject: [PATCH 46/68] [dvdplayeraudio] Add advancedsetting for configuring
+Subject: [PATCH 46/69] [dvdplayeraudio] Add advancedsetting for configuring
  max pll adjustment
 
 ---
@@ -5346,7 +5346,7 @@ index ed91aba..eccc62f 100644
 From 119bb0ad3127084e8683d2b0c0ae49b884996763 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 19 Nov 2014 17:35:44 +0000
-Subject: [PATCH 47/68] [mmalrender] Skip some log message in bypass mode
+Subject: [PATCH 47/69] [mmalrender] Skip some log message in bypass mode
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp | 9 ++++++---
@@ -5387,7 +5387,7 @@ index 03a05de..c0ff30d 100644
 From 56f421e538dd6eefb7105a184fd402e4e578292a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 21:24:25 +0000
-Subject: [PATCH 48/68] [mmalcodec] Avoid deinterlace for dvd menus for now
+Subject: [PATCH 48/69] [mmalcodec] Avoid deinterlace for dvd menus for now
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
@@ -5410,7 +5410,7 @@ index 6742e0e..a1f11e9 100644
 From e619812582cbe37c1856483adf329fad2ecd0d89 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 22:07:25 +0000
-Subject: [PATCH 49/68] [dvdplayervideo] Prod decoder when in stills mode
+Subject: [PATCH 49/69] [dvdplayervideo] Prod decoder when in stills mode
 
 An asynchronous hardware decoder doesn't only produce output pictures when new packets arrive.
 In dvd stills mode give it a chance to return pictures that weren't ready when frame was decoded.
@@ -5490,7 +5490,7 @@ index f030e37..7a8fc10 100644
 From c2015cb59af38462243fb14fa53e8a5f8091d28e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:20:56 +0000
-Subject: [PATCH 50/68] [mmalcodec] Skip some setup that is not required when
+Subject: [PATCH 50/69] [mmalcodec] Skip some setup that is not required when
  closing
 
 ---
@@ -5560,7 +5560,7 @@ index a1f11e9..a11fa65 100644
 From b47ecf659d1564a1afacf864dd079fed0bab631b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:31:56 +0000
-Subject: [PATCH 51/68] [languageinvoker] Reduce priority of python threads
+Subject: [PATCH 51/69] [languageinvoker] Reduce priority of python threads
 
 ---
  xbmc/interfaces/generic/LanguageInvokerThread.cpp | 5 +++++
@@ -5586,7 +5586,7 @@ index 7b0d903..f92aa3e 100644
 From a16cdfd495525be8b7e1ded348cca579afdf620b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 17:53:46 +0000
-Subject: [PATCH 52/68] [mmalcodec] Try reducing number of video frames
+Subject: [PATCH 52/69] [mmalcodec] Try reducing number of video frames
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
@@ -5623,7 +5623,7 @@ index 4f81bbd..79a4bfd 100644
 From af1b4ef4fd1bd6abc56c1378559bf17d4e16e4f0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 1 Dec 2014 17:31:00 +0000
-Subject: [PATCH 53/68] [mmalcodec] Ensure we have requested number of buffers
+Subject: [PATCH 53/69] [mmalcodec] Ensure we have requested number of buffers
  in non-accelerated case
 
 ---
@@ -5647,7 +5647,7 @@ index c0ff30d..6d461bd 100644
 From 70d59f97b95a3443e4a6ea6453d976f890da259b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 3 Dec 2014 21:17:53 +0000
-Subject: [PATCH 54/68] [omxplayer] Add some info about hdmi sync to codec
+Subject: [PATCH 54/69] [omxplayer] Add some info about hdmi sync to codec
  overlay
 
 ---
@@ -5731,7 +5731,7 @@ index c8fd5fb..9f26427 100644
 From 8bffb33415c3ef4588dcdd146aca1e4340f5e2b4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 7 Dec 2014 15:21:18 +0000
-Subject: [PATCH 55/68] [omxplayer] Remove test of removed setting, avoids a
+Subject: [PATCH 55/69] [omxplayer] Remove test of removed setting, avoids a
  log message
 
 ---
@@ -5767,7 +5767,7 @@ index 66014d4..c2da2d2 100644
 From cbe1c7bc5e0a42374bf75cb4e4fa9cf87649e327 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 28 Dec 2014 19:13:51 +0000
-Subject: [PATCH 56/68] [omxplayer] Skip packet concatenation for WMAV2 files
+Subject: [PATCH 56/69] [omxplayer] Skip packet concatenation for WMAV2 files
 
 See: http://forum.kodi.tv/showthread.php?tid=212552
 ---
@@ -5793,7 +5793,7 @@ index 94b673e..1a920f7 100644
 From 329a2ebaa60a748b2ae4c1f4e31e571ab8e63c0a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 31 Dec 2014 17:08:52 +0000
-Subject: [PATCH 57/68] filesystem: Make browsing into archives enbabled by
+Subject: [PATCH 57/69] filesystem: Make browsing into archives enbabled by
  default on Pi
 
 This causes issues for people who scan library with archives disabled, then subsequently enable it.
@@ -5828,7 +5828,7 @@ index 4c2ef41..3260465 100644
 From bdc193bf26b5143a4b65182c32c5dd4ffd6b9b1e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 31 Dec 2014 16:03:32 +0000
-Subject: [PATCH 58/68] [PVR] Fix for slow metadata updates of recordings
+Subject: [PATCH 58/69] [PVR] Fix for slow metadata updates of recordings
 
 See: http://forum.kodi.tv/showthread.php?tid=210774
 
@@ -6019,7 +6019,7 @@ index 6b8cb14..2bcc834 100644
 From c6ce752f7e428ad1ecc5f5b745a4589c2381d4da Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 29 Dec 2014 17:20:00 +0000
-Subject: [PATCH 59/68] [dvdplayer] Allow pll adjustment to go higher, but tail
+Subject: [PATCH 59/69] [dvdplayer] Allow pll adjustment to go higher, but tail
  off more gradually
 
 ---
@@ -6057,7 +6057,7 @@ index 3a266f8..f007f42 100644
 From 27126077a8cf3d1cdf7162906c749f7a0adc51c4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 11 Dec 2014 17:00:57 +0000
-Subject: [PATCH 60/68] Fix for UI not showing both extractflags and
+Subject: [PATCH 60/69] Fix for UI not showing both extractflags and
  extractthumb
 
 ---
@@ -6136,7 +6136,7 @@ index dbddcb6..756475f 100644
 From 0a365e588b510814682b33f143be83b26a94be77 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 26 Jan 2015 19:24:17 +0000
-Subject: [PATCH 61/68] Fix for occasinal heap corruption with font cache
+Subject: [PATCH 61/69] Fix for occasinal heap corruption with font cache
 
 See: PR 4143 issuecomment-71114810
 ---
@@ -6269,7 +6269,7 @@ index 7d4fc88..4110546 100644
 From 6c313f80feff677782c1b1497eff2592ad64f21b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 4 Feb 2015 22:02:33 +0000
-Subject: [PATCH 62/68] [omxplayer] Avoid extra frame allocation when
+Subject: [PATCH 62/69] [omxplayer] Avoid extra frame allocation when
  deinterlace might be enabled
 
 Requires updated firmware
@@ -6308,7 +6308,7 @@ index dea0e11..55e16c4 100644
 From 151de82f2eceb80f7146dafc6ec43e614bf55f64 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 18 Jan 2015 16:45:51 +0000
-Subject: [PATCH 63/68] [rbp] Enable error concealment by default
+Subject: [PATCH 63/69] [rbp] Enable error concealment by default
 
 Firmware now supports parsing SEI recovery points meaning streams without
 IDR frames don't get discarded completely when error concealment is enabled.
@@ -6350,7 +6350,7 @@ index f007f42..9f00cf4 100644
 From bbe89eae350e1a972a840a396ac63cee7221b718 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 26 Jan 2015 17:54:07 +0000
-Subject: [PATCH 64/68] [mmalrenderer] Avoid grabbing the g_graphicsContext
+Subject: [PATCH 64/69] [mmalrenderer] Avoid grabbing the g_graphicsContext
  lock - it can deadlock
 
 ---
@@ -6381,7 +6381,7 @@ index 6d461bd..11a6f10 100644
 From ab4504933fa7895a2c9c5af831a3c392ab4e1bf5 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 15 Feb 2015 14:06:12 +0000
-Subject: [PATCH 65/68] [mmal] Use libmpeg2 when mpeg2 codec licence is not
+Subject: [PATCH 65/69] [mmal] Use libmpeg2 when mpeg2 codec licence is not
  available
 
 ---
@@ -6415,7 +6415,7 @@ index bea5e4f..e4f59d7 100644
 From 58822156959cbb8f79ffbdf367eaa2a09926427d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 28 Feb 2015 22:34:52 +0000
-Subject: [PATCH 66/68] [mmalrender] Fix for hang on shutdown
+Subject: [PATCH 66/69] [mmalrender] Fix for hang on shutdown
 
 mmal_queue_push doesn't allow null pointers, so use a unique packet for signalling quit
 ---
@@ -6470,7 +6470,7 @@ index 8ca0b94..a5c248c 100644
 From 7bec53dfe63c888ffa0d4d1bbd7863c37bc981ba Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Feb 2015 19:07:17 +0000
-Subject: [PATCH 67/68] [omxplayer] Attempt to fix missing subtitles after seek
+Subject: [PATCH 67/69] [omxplayer] Attempt to fix missing subtitles after seek
 
 ---
  xbmc/cores/omxplayer/OMXPlayerVideo.cpp | 2 +-
@@ -6493,7 +6493,7 @@ index 77b9461..2a3619f 100644
 From ef7e912ee01e0ba34bacf1e5d8dcdf1103972132 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Wed, 25 Feb 2015 18:22:21 +0100
-Subject: [PATCH 68/68] Load OSD dialogs on startup.
+Subject: [PATCH 68/69] Load OSD dialogs on startup.
 
 Fixes skipped frames the first time they're loaded in memory on less powered
 devices, like a Raspberry Pi, when using DVDPlayer.
@@ -6601,3 +6601,32 @@ index ca65fdc..fbd2a52 100644
  
  CGUIDialogVideoSettings::~CGUIDialogVideoSettings()
  { }
+
+From 821baa4793c6a4df63d0f4fb206892aff70d28f3 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Sun, 1 Mar 2015 14:49:12 +0000
+Subject: [PATCH 69/69] [omxplayer] Fix for volume being treated as a linear
+ scale
+
+The volume in kodi is actually 0.0=-60dB to 1.0=0dB. omxplayer was treating this as a linear scale.
+That's correct for 0.0 and 1.0, but too loud for 0.5.
+
+The fix has been tested with white noise sample and decibel meter smartphone app, and now omxplayer and
+dvdplayer produce the same output
+---
+ xbmc/cores/omxplayer/OMXAudio.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/cores/omxplayer/OMXAudio.cpp b/xbmc/cores/omxplayer/OMXAudio.cpp
+index ef4c3d4..c16ae2e 100644
+--- a/xbmc/cores/omxplayer/OMXAudio.cpp
++++ b/xbmc/cores/omxplayer/OMXAudio.cpp
+@@ -1056,6 +1056,8 @@ bool COMXAudio::ApplyVolume(void)
+     return false;
+ 
+   float fVolume = m_Mute ? VOLUME_MINIMUM : m_CurrentVolume;
++  // need to convert a log scale of 0.0=-60dB, 1.0=0dB to a linear scale (0.0=silence, 1.0=full)
++  fVolume = CAEUtil::GainToScale(CAEUtil::PercentToGain(fVolume));
+ 
+   // the analogue volume is too quiet for some. Allow use of an advancedsetting to boost this (at risk of distortion) (deprecated)
+   double gain = pow(10, (g_advancedSettings.m_ac3Gain - 12.0f) / 20.0);
