@@ -70,6 +70,8 @@ class Main(object):
 		
 		self.error_message = ''
 
+		self.heading = 'Updater'
+
 		self.action = action
 
 		self.cache = apt.Cache()
@@ -131,6 +133,8 @@ class Main(object):
 			The list is sent as a string:
 
 					install_packageid1|=|install_packageid2|=|removal_packageid3'''
+
+		self.heading = 'App Store'
 
 		action_string = sys.argv[2]
 
@@ -297,7 +301,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 		
 		super(Install_Progress, self).__init__()	
 		
-		call_parent('progress_bar', {'percent': 0,  'heading': 'Installing Update', 'message':'Starting Installation'})
+		call_parent('progress_bar', {'percent': 0,  'heading': self.heading, 'message':'Starting Installation'})
 
 	@clog()
 	def error(self, pkg, errormsg):
@@ -357,7 +361,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		self.pulse_time = t.now()
 
-		call_parent('progress_bar', {'percent': int(percent),  'heading': 'Installing Update', 'message': status})
+		call_parent('progress_bar', {'percent': int(percent),  'heading': self.heading, 'message': status})
 
 	@clog()
 	def start_update(self):
