@@ -5,14 +5,14 @@
 
 . ../common.sh
 # Build in native environment
-if [ $? == "rbp1" ]; then pull_source "https://github.com/bavison/arm-mem/archive/cd2c8f9202137c79f7afb77ecb87e713a0800d3c.zip" "$(pwd)/src"; fi
-if [ $? == "rbp2" ]; then pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"; fi
+if [ $1 == "rbp1" ]; then pull_source "https://github.com/bavison/arm-mem/archive/cd2c8f9202137c79f7afb77ecb87e713a0800d3c.zip" "$(pwd)/src"; fi
+if [ $1 == "rbp2" ]; then pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"; fi
 build_in_env "${1}" $(pwd) "rbp-armmem-osmc"
 if [ $? == 0 ]
 then
 	echo -e "Building package rbp-armmem"
 	out=$(pwd)/files
-    sed '/Package/d' -i files/DEBIAN/control
+    	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-armmem-osmc" >> files/DEBIAN/control
 	make clean
 	pushd src/arm-mem-*
