@@ -169,7 +169,7 @@ class Main(object):
 
 				if pkg.is_auto_removable:
 
-					pkg.mark_delete()
+					pkg.mark_delete(purge=True)
 
 					removals = True
 
