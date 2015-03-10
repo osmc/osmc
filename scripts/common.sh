@@ -106,6 +106,7 @@ function cleanup_filesystem()
 	rm -rf ${1}/var/cache/apt/archives/*
 	rm -rf ${1}/var/lib/apt/lists/*
 	rm -f ${1}/var/log/*.log
+	rm -f ${1}/var/log/apt/*.log
 }
 
 function remove_existing_filesystem()
