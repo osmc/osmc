@@ -249,7 +249,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID == 60010:
 			# open networking gui
-			self.net_call.open_settings_window(True)
+			self.net_call.open_settings_window(False)
 
 			# display the Exit panel
 			self.getControl(96000).setVisible(False)
