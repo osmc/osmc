@@ -1,5 +1,5 @@
---- a/src/wispr.c	2015-03-03 10:23:37.163894844 +0000
-+++ b/src/wispr.c	2015-03-03 11:59:49.916179175 +0000
+--- a/src/wispr.c	2015-03-10 10:32:41.691836519 +0000
++++ b/src/wispr.c	2015-03-10 10:41:30.035380065 +0000
 @@ -30,8 +30,58 @@
  
  #include "connman.h"
@@ -13,8 +13,8 @@
 +#include <net/if.h>
 +#include <unistd.h>
 +
-+#define STATUS_URL_IPV4  "http://ipv4.online.osmc.io/online/status.html"
-+#define STATUS_URL_IPV6  "http://ipv6.online.osmc.io/online/status.html"
++#define STATUS_URL_IPV4 "http://ipv4.online.osmc.io/online/status.html"
++#define STATUS_URL_IPV6 "http://ipv6.online.osmc.io/online/status.html"
 +
 +int parse_option(const char *line, const char *option, char *value, size_t size)
 +{
@@ -70,7 +70,7 @@
  						&str)) {
  			portal_manage_status(result, wp_context);
  			return false;
-@@ -798,7 +848,45 @@
+@@ -798,7 +848,40 @@
  	}
  
  	g_web_set_accept(wp_context->web, NULL);
@@ -80,25 +80,20 @@
 +	get_cmdline_option("osmcdev=", osmcdev, sizeof(osmcdev));
 +	/* Get the OS version */
 +	FILE *fp = fopen("/etc/os-release", "r");
-+	static char version[256];
++	char *version = '\0';
 +	if (fp)
 +	{
 +		char line[256];
-+		char *key;
-+		char *val;
 +		while ((fgets(line, sizeof(line), fp) != NULL))
 +		{
-+			key = strtok(line, "=");
-+			val = strtok(NULL, "=");
-+			if (strncmp(key, "VERSION_ID", 1024) == 0)
++			if (strstr(line, "VERSION_ID"))
 +			{
-+				strncpy(version, val, sizeof(val));
-+				version[strlen(version) - 1 ] = '\0';
++				asprintf(&version, line);
++				break;
 +			}
 +		}
 +		fclose(fp);
-+	 }
-+
++	}
 +	/* Get the MAC of eth0 so NAT does not affect device count */
 +	int fd;
 +	struct ifreq ifr;
