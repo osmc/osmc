@@ -74,7 +74,7 @@ then
 		done
 		popd
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
-	popd
+		popd
 		# Disassemble kernel package to add overlays
 		mv src/${1}-image*.deb .
 		dpkg -x ${1}-image*.deb files-image/
