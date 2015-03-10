@@ -17,5 +17,8 @@ if [ "$1" = "configure" ]; then
 	systemctl enable connman.service >/dev/null 2>&1
 
 	ischroot
+	if [ $? -eq 0 ]; then
+	exit 0
+	fi
 	systemctl restart connman.service
 fi
