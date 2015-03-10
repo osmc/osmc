@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import os.path
+import requests
 
 WIRELESS_AGENT = '/usr/bin/preseed-agent'
 
@@ -285,12 +286,26 @@ def wifi_remove(path):
 
 
 def has_internet_connection():
-    try:
-        subprocess.Popen(['/bin/ping', '-c1', '-w5', '8.8.8.8'], stdout=subprocess.PIPE).stdout.read()
-        return True
-    except:
-        return False
+    ethernet_settings = get_ethernet_settings()
+    if ethernet_settings:
+        if 'Method' in ethernet_settings:
+            if ethernet_settings['Method'].startswith('nfs_'):
+                return check_MS_NCSI_response()
+            elif 'State' in ethernet_settings and ethernet_settings['State'] == 'online':
+                return True
+    wifi_networks = get_wifi_networks()
+    for ssid in wifi_networks.keys():
+        info = wifi_networks[ssid]
+        if info['State'] == 'online':
+            return True
+    return False
 
+
+def check_MS_NCSI_response():
+    response =  requests.get('http://www.msftncsi.com/ncsi.txt')
+    if response.status_code == 200 and response.text == 'Microsoft NCSI':
+        return True
+    return False
 
 def update_preseed_file(settings_dict):
     if os.path.isfile(PREESEED_LOCATION):

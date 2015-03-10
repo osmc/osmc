@@ -551,7 +551,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_SCAN_BUTTON, WIRELESS_NETWORKS])
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
-                    #         'Status'           'Not connected'
+                    #         'Status'           'No wireless Connection'
                     status = lang(32044) + ': ' + lang(32050)
                     self.wireless_status_label.setLabel(status)
 
