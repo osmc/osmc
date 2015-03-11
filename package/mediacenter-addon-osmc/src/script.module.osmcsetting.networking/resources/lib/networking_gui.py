@@ -148,6 +148,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     use_preseed = False
 
+    scan_control_button = None
+
 
     def setUsePreseed(self, value):
         self.use_preseed = value
@@ -288,14 +290,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             # the following conditionals were moved from onAction, because the focus id method may 
             # not be as precise and the controlID method
-        elif controlID in BLUETOOTH_CONTROLS or controlID == BLUETOOTH_ENABLE_TOGGLE:
+        elif controlID in BLUETOOTH_CONTROLS + [BLUETOOTH_ENABLE_TOGGLE]:
             self.handle_bluetooth_selection(controlID)
             self.populate_bluetooth_panel()
 
-        elif controlID in ALL_WIRED_CONTROLS or controlID == WIRED_ADAPTER_TOGGLE:
+        elif controlID in ALL_WIRED_CONTROLS + [WIRED_ADAPTER_TOGGLE]:
             self.handle_wired_selection(controlID)
 
-        elif controlID in ALL_WIRELESS_CONTROLS or controlID == WIRELESS_ADAPTER_TOGGLE:
+        elif controlID in ALL_WIRELESS_CONTROLS + [WIRELESS_ADAPTER_TOGGLE]:
             self.handle_wireless_selection(controlID)            
 
 
@@ -310,11 +312,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.close()
 
         if focused_control in MAIN_MENU:
-            # change to the required settings panel
-
-            for ctl in MAIN_MENU:
-                self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False) 
-
             if focused_control != self.current_panel:
 
                 self.current_panel = focused_control
@@ -323,12 +320,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.populate_wired_panel()
 
                 elif focused_control == 102:
-                    # self.populate_wifi_panel()
-                    # repopulating the wifi panel every time it is shown is probably overkill
-                    pass
+                     self.populate_wifi_panel()
 
                 elif focused_control == 103:
                  self.populate_bluetooth_panel()
+
+            # change to the required settings panel
+            for ctl in MAIN_MENU:
+                self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False)
 
 
     def edit_ip_address(self, controlID):
@@ -557,6 +556,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if osmc_network.is_wifi_available():
             if osmc_network.is_wifi_enabled():
                 self.populate_wifi_networks(scan)
+                self.current_network_config = osmc_network.get_connected_wifi()
+                log(self.current_network_config)
+                self.conn_ssid = None
+                if 'SSID' in self.current_network_config:
+                    self.conn_ssid = self.current_network_config['SSID']
                 if self.conn_ssid:
                     self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
                     self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
@@ -640,7 +644,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def handle_selected_wireless_network(self):
-
+        
         # stop the bot from scanning
         try:
             self.wifi_populate_bot.exit = True
@@ -648,11 +652,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             pass
 
         item        = self.WFP.getSelectedItem()
+
         path        = item.getProperty('Path')
         encrypted   = item.getProperty('Encrypted')
         connected   = item.getProperty('Connected')
         ssid        = item.getProperty('SSID')
-
+        self.conn_ssid = self.wifi_populate_bot.get_ssid()
+        log(self.conn_ssid)
         if connected == 'False' and not self.conn_ssid:
             self.connect_to_wifi(ssid, encrypted)
 
@@ -665,13 +671,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.current_network_config = {}
                     osmc_network.wifi_disconnect(path)
                     osmc_network.wifi_remove(path)
-                    self.current_network_config = {'Method' : 'dhcp'} # force manual/dhcp button back to auto
-                    self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
-                    self.current_network_config = {}
-                    self.clear_ip_controls(WIRELESS_IP_VALUES)
-                    self.toggle_controls(False, [WIRELESS_DHCP_MANUAL_BUTTON])
-                    status = lang(32044) + ': ' + lang(32050)
-                    self.wireless_status_label.setLabel(status)
+                    self.populate_wifi_panel()
 
         osmc_network.update_preseed_file(self.current_network_config)
         self.populate_wifi_networks(False)
@@ -720,6 +720,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                 self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_SCAN_BUTTON, WIRELESS_NETWORKS,
                                             WIRELESS_DHCP_MANUAL_BUTTON ])
+                self.conn_ssid = ssid
                 interface = self.current_network_config['Interface']
                 if osmc_network.has_internet_connection():
                     #         'Status'                               'Connected'
@@ -742,34 +743,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         except:
             metric = 0
         return metric
-
-
-    def get_wifi_icon(self, encrypted, strength, connected):
-        icon_tuple = (connected, encrypted, strength)
-        icons = {
-            (True, True, 0): 'bar0_ce.png',
-            (True, True, 1): 'bar1_ce.png',
-            (True, True, 2): 'bar2_ce.png',
-            (True, True, 3): 'bar3_ce.png',
-            (True, True, 4): 'bar4_ce.png',
-            (True, False, 0): 'bar0_cx.png',
-            (True, False, 1): 'bar1_cx.png',
-            (True, False, 2): 'bar2_cx.png',
-            (True, False, 3): 'bar3_cx.png',
-            (True, False, 4): 'bar4_cx.png',
-            (False, True, 0): 'bar0_xe.png',
-            (False, True, 1): 'bar1_xe.png',
-            (False, True, 2): 'bar2_xe.png',
-            (False, True, 3): 'bar3_xe.png',
-            (False, True, 4): 'bar4_xe.png',
-            (False, False, 0): 'bar0_xx.png',
-            (False, False, 1): 'bar1_xx.png',
-            (False, False, 2): 'bar2_xx.png',
-            (False, False, 3): 'bar3_xx.png',
-            (False, False, 4): 'bar4_xx.png',
-        }
-
-        return icons.get(icon_tuple, 'bar0_xx.png')
 
 
     def populate_bluetooth_panel(self):
@@ -902,26 +875,24 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def populate_wifi_networks(self, scan=False):
-
         self.scan_control_button = self.getControl(10220)
-
         # check the label of the scanning control
-        if self.scan_control_button == lang(32012):
-            # if the control label is SCAN, then start the populate bot
-
+        if self.scan_control_button.getLabel() == lang(32012):
+            # attempt to stop the bot
             try:
                 self.wifi_populate_bot.exit = True
                 xbmc.sleep(2500)
 
             except:
+               pass
+            # if the control label is SCAN, then start the populate bot
+            self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.scan_control_button, self.conn_ssid)
+            self.wifi_populate_bot.setDaemon(True)
+            self.wifi_populate_bot.start()
 
-                self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.scan_control_button)
-                self.wifi_populate_bot.setDaemon(True)
-                self.wifi_populate_bot.start()
-
-        elif self.scan_control_button == lang(32051):
+        elif self.scan_control_button.getLabel() == lang(32051):
             # if the control label is CANCEL SCAN, then kill the populate bot
-
+            log('Stopping Populate')
             try:
                 self.wifi_populate_bot.exit = True
             except:
@@ -941,7 +912,7 @@ class wifi_scanner_bot(threading.Thread):
 
 class wifi_populate_bot(threading.Thread):
 
-    def __init__(self, scan, wifi_list_control, scan_button):
+    def __init__(self, scan, wifi_list_control, scan_button, conn_ssid):
         
         super(wifi_populate_bot, self).__init__()
 
@@ -949,6 +920,9 @@ class wifi_populate_bot(threading.Thread):
         self.SCB        = scan_button
         self.scan       = scan
         self.exit       = False
+        self.conn_ssid = conn_ssid
+        self.wifis = []
+        self.current_network_config = None
 
         if self.scan:
             self.wifi_scanner_bot = wifi_scanner_bot()
@@ -968,11 +942,8 @@ class wifi_populate_bot(threading.Thread):
 
         while not self.exit and runs < 15:      # assuming each run is 2 seconds, this is a 30 second life for the bot
 
-            try:
-                wifis = osmc_network.get_wifi_networks()
-            except:
-                break
-
+            wifis = osmc_network.get_wifi_networks()
+            
             running_dict.update(wifis)
 
             self.update_list_control(running_dict)
@@ -980,12 +951,9 @@ class wifi_populate_bot(threading.Thread):
             # if the bot wasnt asked to scan, there is not need to keep refreshing, so just exit
             if not self.scan: break
 
-            xbms.sleep(2000)
+            xbmc.sleep(2000)
 
             runs += 1
-
-
-
         # find any connected setting and load its values into the controls
 
         for k, v in running_dict.iteritems():
@@ -1002,7 +970,7 @@ class wifi_populate_bot(threading.Thread):
 
     def update_list_control(self, running_dict):
 
-        self.wifis = [convert_wifi_to_listitem(v) for k, v in running_dict.iteritems()]
+        self.wifis = [self.convert_wifi_to_listitem(v) for k, v in running_dict.iteritems()]
 
         # sort the list of wifis based on signal strength
         self.wifis.sort(key=self.sort_strength, reverse=True)
@@ -1010,6 +978,7 @@ class wifi_populate_bot(threading.Thread):
         # remove everything from the existing panel
         self.WFP.reset()
 
+        print self.wifis
         # add the to the panel
         self.WFP.addItems(self.wifis)
 
@@ -1026,20 +995,16 @@ class wifi_populate_bot(threading.Thread):
         # 'Strength': int(dbus_properties['Strength']),
         # 'State' : str(dbus_properties['State'])}
 
-        try:
-            ssid        = wifi['SSID']
-            strength    = wifi['Strength']
-            state       = wifi['State']
-            path        = wifi['path']
-            encrypted   = True if wifi['Security'] != 'none' else False
-            connected   = True if wifi['State'] != 'idle' else False
-    
-            # icon_tuple = (connected, encrypted, strength)
-            icon_image  = self.get_wifi_icon(encrypted, strength / 25, connected)
-    
-        except:
-            return False
+        ssid        = wifi['SSID']
+        strength    = wifi['Strength']
+        state       = wifi['State']
+        path        = wifi['path']
+        encrypted   = True if wifi['Security'] != 'none' else False
+        connected   = True if wifi['State'] != 'idle' else False
 
+        # icon_tuple = (connected, encrypted, strength)
+        icon_image  = self.get_wifi_icon(encrypted, strength / 25, connected)
+    
         itm = xbmcgui.ListItem(ssid)
         itm.setIconImage(icon_image)
         itm.setProperty(    'Strength'      , str(strength))
@@ -1053,6 +1018,32 @@ class wifi_populate_bot(threading.Thread):
 
         return itm
 
+    def get_wifi_icon(self, encrypted, strength, connected):
+        icon_tuple = (connected, encrypted, strength)
+        icons = {
+            (True, True, 0): 'bar0_ce.png',
+            (True, True, 1): 'bar1_ce.png',
+            (True, True, 2): 'bar2_ce.png',
+            (True, True, 3): 'bar3_ce.png',
+            (True, True, 4): 'bar4_ce.png',
+            (True, False, 0): 'bar0_cx.png',
+            (True, False, 1): 'bar1_cx.png',
+            (True, False, 2): 'bar2_cx.png',
+            (True, False, 3): 'bar3_cx.png',
+            (True, False, 4): 'bar4_cx.png',
+            (False, True, 0): 'bar0_xe.png',
+            (False, True, 1): 'bar1_xe.png',
+            (False, True, 2): 'bar2_xe.png',
+            (False, True, 3): 'bar3_xe.png',
+            (False, True, 4): 'bar4_xe.png',
+            (False, False, 0): 'bar0_xx.png',
+            (False, False, 1): 'bar1_xx.png',
+            (False, False, 2): 'bar2_xx.png',
+            (False, False, 3): 'bar3_xx.png',
+            (False, False, 4): 'bar4_xx.png',
+        }
+
+        return icons.get(icon_tuple, 'bar0_xx.png')
 
     def sort_strength(self, itm):
         try:
@@ -1065,3 +1056,8 @@ class wifi_populate_bot(threading.Thread):
         return metric
 
 
+    def get_ssid(self):
+        return self.conn_ssid
+
+    def get_currrent_network_config(self):
+        return self.get_currrent_network_config()
