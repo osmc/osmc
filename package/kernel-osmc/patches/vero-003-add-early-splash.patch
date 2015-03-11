@@ -1,0 +1,12 @@
+--- a/init/main.c	2015-02-01 17:51:33.800500975 +0000
++++ b/init/main.c	2015-02-01 17:52:25.519551569 +0000
+@@ -962,7 +962,8 @@
+ 		pr_err("Failed to execute %s (error %d).  Attempting defaults...\n",
+ 			execute_command, ret);
+ 	}
+-	if (!try_to_run_init_process("/sbin/init") ||
++	if (!try_to_run_init_process("/sbin/splash_early") ||
++            !try_to_run_init_process("/sbin/init") ||
+ 	    !try_to_run_init_process("/etc/init") ||
+ 	    !try_to_run_init_process("/bin/init") ||
+ 	    !try_to_run_init_process("/bin/sh"))
