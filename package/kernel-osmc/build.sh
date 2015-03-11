@@ -62,7 +62,8 @@ then
 		lirc-rpi-overlay
 		w1-gpio-overlay
 		w1-gpio-pullup-overlay
-		y28a-overlay
+		hy28a-overlay
+		hy28b-overlay
 		piscreen-overlay
 		rpi-display-overlay
 		spi-bcm2835-overlay
