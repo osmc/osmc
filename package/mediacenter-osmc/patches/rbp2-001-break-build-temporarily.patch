@@ -1,0 +1,15 @@
+diff --git a/xbmc/utils/CPUInfo.cpp b/xbmc/utils/CPUInfo.cpp
+index 71aa745..a5eb856 100644
+--- a/xbmc/utils/CPUInfo.cpp
++++ b/xbmc/utils/CPUInfo.cpp
+@@ -18,6 +18,10 @@
+  *
+  */
+ 
++#ifndef __ARM_NEON__
++#error 1
++#endif
++
+ #include "CPUInfo.h"
+ #include "Temperature.h"
+ #include <string>
