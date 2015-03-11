@@ -26,6 +26,7 @@ $quote: #96e8cf;
 $link: #51bc9b;
 $back: $white;
 $dark: #17394A;
+$dark2: #143343;
 $dark-trans: rgba(23, 57, 74, 0.9);
 $black: $dark;
 
@@ -549,23 +550,21 @@ $title-size-res: 1.2em;
   }
 }
 nav {
-	float: right;
-	list-style-type: none;
-  
-	li {
-      display: inline;
-      padding: 0 1em 0 1em;
-      margin: 0;
-    
-      a {
-        font-weight: 300;
-      }
+  float: right;
+  list-style-type: none;
+
+  li {
+    display: inline;
+    padding: 0 1em 0 1em;
+    margin: 0;
+
+    a {
+      font-weight: 300;
     }
-	li:last-child {
-		padding: 0 0em 0 1em;
-	}
+  }
 }
-.top-nav.nav-res {
+
+.top-nav {
 	margin: 0;
 
 	a {
@@ -575,7 +574,7 @@ nav {
         border-bottom: 2px solid $white;
 	  }
     }
-	.current-menu-item a {
+	.current-menu-item a, .current-page-ancestor a {
 	border-bottom: 2px solid $white;
 	}
 }
@@ -597,7 +596,7 @@ footer {
     position: relative;
   }
   .contentcontainer {
-    background-color: $black;
+    background-color: $dark;
     padding: 1.5em 0;
   }
   
@@ -624,8 +623,8 @@ footer {
       color: #fff;
     }
   }
-  .current-menu-item a {
-    border-bottom: 2px solid $white;
+  .current-menu-item a, .current-page-ancestor a {
+    border-bottom: 1px solid $white;
   }
   ul {
     list-style: none;
@@ -1010,62 +1009,96 @@ footer {
           line-height: ($header-res / $title-size-res);
         }
       }
-    }
-  }
-  .nav-header {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: auto;
-    width: auto;
-  }
-  #nav-res-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    line-height: 2em;
-    display: block;
-    font-size: ($header-res / 2);
-    float: right;
-    height: 100%;
-    color: $white;
-    padding: 0 0.8em;
-    cursor: pointer; cursor: hand;
-    -webkit-user-select: none;  /* Chrome all / Safari all */
-      -moz-user-select: none;     /* Firefox all */
-      -ms-user-select: none;      /* IE 10+ */
-      -webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
-      /* No support for these yet, use at own risk */
-      -o-user-select: none;
-      user-select: none;    
-    
-    img {
-    }
-  }
-  .top-nav.nav-res {
-    display: none;
-    position: absolute;
-    font-size: 1em;
-    padding: 3em 2em 0 2em;
-    background-color: $black;
-    height: 1000em;
-    width: auto;
-    right: 0;
-    top: 0;
+      
+      .nav-header {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: auto;
+        width: auto;
+      }
+      #nav-res-toggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: block;
+        float: right;
+        height: 100%;
+        padding: 0 1em;
+        cursor: pointer; cursor: hand;
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
+        /* No support for these yet, use at own risk */
+        -o-user-select: none;
+        user-select: none;    
 
-    a {
-      color: $black;
-    }
-    li {
-      float: right;
-      clear: right;
-      width: 100%;
-      height: 2.5em;
-      padding: 0;
-      margin: 0;
-      white-space: nowrap;
+        p {
+          color: $white;
+          font-size: 105%;
+          line-height: 1em;
+          font-weight: 400;
+          @include transition-duration(0.5s);
+          @include transition-timing-function(ease);
+        }
+        p:after {
+          display: block;
+          left: 0;
+          bottom: 0;
+          margin-top: 2px;
+          width: 0;
+          height: 2px;
+          background-color: $white;
+          content: "";
+          @include transition-duration(0.5s);
+          @include transition-timing-function(ease);
+        }
+      }
+
+      #nav-res-toggle.open {
+        p {
+          color: $link;
+        }
+
+        p:after {
+          background-color: $link;
+          width: 100%;
+        }
+      }
+
+      .top-nav {
+        position: absolute;
+        font-size: 1em;
+        padding: 1em 2em 0;
+        background-color: $dark;
+        height: 1000em;
+        width: auto;
+        right: -9em;
+        top: 3.1em;
+        @include transition-duration(0.5s);
+        @include transition-timing-function(ease);
+
+        a {
+          color: $white;
+        }
+        li {
+          float: right;
+          clear: right;
+          width: 100%;
+          height: 2.5em;
+          padding: 0;
+          margin: 0;
+          white-space: nowrap;
+        }
+      }
+
+      .top-nav.open {
+        right: 0;
+      }
     }
   }
+  
   .downloados {
     .third {
       width: 33.3%;
