@@ -6,8 +6,6 @@ jQuery("#nav-res-toggle").toggle(function(){
   
   jQuery(".top-nav").addClass("open");
   jQuery("#nav-res-toggle").addClass("open");
-  
-  console.log("yes");
 
 }, function() {
   
