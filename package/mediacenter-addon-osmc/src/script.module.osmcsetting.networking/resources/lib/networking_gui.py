@@ -923,6 +923,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             try:
                 self.wifi_populate_bot.exit = True
+            except:
+                pass
 
 
 class wifi_scanner_bot(threading.Thread):
