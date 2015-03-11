@@ -1,137 +1,93 @@
+From 4ef24dcf5fc3eba1bae9bfe097d166fce5e17e65 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 11 Mar 2015 17:05:50 +0000
+Subject: [PATCH] Add Raspberry Pi 2 support
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.in               | 13 +++++++++++++
+ m4/xbmc_arch.m4            |  3 +++
+ tools/depends/configure.in | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
+
 diff --git a/configure.in b/configure.in
-index 799ec17..4f47440 100644
+index 799ec17..f8998b4 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -724,8 +724,17 @@ case $use_platform in
-   raspberry-pi)
-      target_platform=target_raspberry_pi
-      use_neon=no
--     use_arch="arm"
-      use_cpu=arm1176jzf-s
-+     ;;
+@@ -734,6 +734,19 @@ case $use_platform in
+      CFLAGS="$CFLAGS"
+      CXXFLAGS="$CXXFLAGS"
+      ;;
 +  raspberry-pi2)
 +     target_platform=target_raspberry_pi
 +     use_neon=yes
-+     use_cpu=cortex-a7
-+     ;;
-+esac
-+
-+if test "$target_platform" = "target_raspberry_pi" ; then
 +     use_arch="arm"
-      use_hardcoded_tables="yes"
-      ARCH="arm"
-      AC_DEFINE(HAS_EGLGLES, [1], [Define if supporting EGL based GLES Framebuffer])
-@@ -733,8 +742,7 @@ case $use_platform in
-      USE_MMAL=1; AC_DEFINE([HAS_MMAL],[1],["Define to 1 if MMAL libs is enabled"])
-      CFLAGS="$CFLAGS"
-      CXXFLAGS="$CXXFLAGS"
--     ;;
--esac
-+fi
- 
- XBMC_SETUP_ARCH_DEFINES()
- 
-diff --git a/m4/xbmc_arch.m4 b/m4/xbmc_arch.m4
-index 5bcdd81..f1efd24 100644
---- a/m4/xbmc_arch.m4
-+++ b/m4/xbmc_arch.m4
-@@ -43,9 +43,7 @@ if test "$target_platform" = "target_android" ; then
-   AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -DTARGET_ANDROID")
- fi
- 
--case $use_platform in
--  raspberry-pi)
--     AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
--     ;;
--esac
-+if test "$target_platform" = "target_raspberry_pi" ; then
-+  AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
-+fi
- ])
-diff --git a/tools/depends/Makefile.include.in b/tools/depends/Makefile.include.in
-index bc0ef10..9c678c5 100644
---- a/tools/depends/Makefile.include.in
-+++ b/tools/depends/Makefile.include.in
-@@ -19,7 +19,7 @@ ARCHIVE_TOOL_NATIVE=$(NATIVEPREFIX)/bin/tar
- OS=@platform_os@
- CROSS_COMPILING=@cross_compiling@
- ARCH_DEFINES=@ARCH_DEFINES@
--TARGET_PLATFORM=@use_platform@
-+TARGET_PLATFORM=@target_platform@
- XCODE_VERSION=@use_xcode@
- AAPT=@AAPT@
- DX=@DX@
-diff --git a/tools/depends/configure.in b/tools/depends/configure.in
-index 08a9205..9d65e95 100644
---- a/tools/depends/configure.in
-+++ b/tools/depends/configure.in
-@@ -14,7 +14,8 @@ AC_ARG_WITH([toolchain],
- AC_ARG_WITH([platform],
-   [AS_HELP_STRING([--with-platform],
-   [target platform [auto]])],
--  [use_platform=$withval])
-+  [use_platform=$withval],
-+  [target_platform=$withval])
- 
- AC_ARG_WITH([firmware],
-   [AS_HELP_STRING([--with-firmware],
-@@ -283,34 +284,49 @@ case $host in
-     AC_MSG_ERROR(unsupported host ($use_host))
++     use_cpu=cortex-a7
++     use_hardcoded_tables="yes"
++     ARCH="arm"
++     AC_DEFINE(HAS_EGLGLES, [1], [Define if supporting EGL based GLES Framebuffer])
++     USE_OMXLIB=1; AC_DEFINE([HAVE_OMXLIB],[1],["Define to 1 if OMX libs is enabled"])
++     USE_MMAL=1; AC_DEFINE([HAS_MMAL],[1],["Define to 1 if MMAL libs is enabled"])
++     CFLAGS="$CFLAGS"
++     CXXFLAGS="$CXXFLAGS"
++     ;;
  esac
  
--if test "$use_platform" = "raspberry-pi"; then
-+case $use_platform in
-+  raspberry-pi)
-+     target_platform=raspberry_pi
-+     use_neon=no
-+     use_cpu=arm1176jzf-s
-+     platform_cflags="-mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp"
-+     platform_cxxflags="-mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp"
-+     platform_ldflags=""
-+     ;;
+ XBMC_SETUP_ARCH_DEFINES()
+diff --git a/m4/xbmc_arch.m4 b/m4/xbmc_arch.m4
+index 5bcdd81..088f02b 100644
+--- a/m4/xbmc_arch.m4
++++ b/m4/xbmc_arch.m4
+@@ -47,5 +47,8 @@ case $use_platform in
+   raspberry-pi)
+      AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
+      ;;
 +  raspberry-pi2)
-+     target_platform=raspberry_pi
-+     use_neon=yes
-+     use_cpu=cortex-a7
-+     platform_cflags="-fPIC -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4"
-+     platform_cxxflags="-fPIC -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4"
-+     platform_ldflags="-lpthread"
-+     ;;
-+esac
-+
-+if test "$target_platform" = "raspberry_pi" ; then
-   if test -d "${use_firmware}/opt/vc/include"; then
-     :
-   else
-     AC_MSG_ERROR([Raspberry Pi firmware not found])
-   fi
--  use_neon=no
-   use_arch="arm"
--  use_cpu="arm1176jzf-s"
-   use_hardcoded_tables="yes"
--  use_alsa="no"
-   ARCH="arm"
-   platform_os="linux"
-   cross_compiling="yes"
-   use_host="arm-linux-gnueabihf"
-   deps_dir="$use_host"
--  platform_cflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard \
--   -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated \
--   -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
-+  platform_cflags+=" -pipe -mabi=aapcs-linux -Wno-psabi \
-+   -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
-+   -isystem${use_firmware}/opt/vc/include \
-    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
-    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
--  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s \
--   -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
-+  platform_cxxflags+=" -pipe -mabi=aapcs-linux -Wno-psabi \
-    -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
-    -isystem${use_firmware}/opt/vc/include \
-    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
-    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
--  platform_ldflags="-L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos \
-+  platform_ldflags+=" -L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos \
++    AC_SUBST(ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX -D_ARMEL -DTARGET_RASPBERRY_PI")
++    ;;
+ esac
+ ])
+diff --git a/tools/depends/configure.in b/tools/depends/configure.in
+index 08a9205..1a32666 100644
+--- a/tools/depends/configure.in
++++ b/tools/depends/configure.in
+@@ -314,6 +314,36 @@ if test "$use_platform" = "raspberry-pi"; then
     -lvchiq_arm"
  fi
  
++if test "$use_platform" = "raspberry-pi2"; then
++  if test -d "${use_firmware}/opt/vc/include"; then
++    :
++  else
++    AC_MSG_ERROR([Raspberry Pi firmware not found])
++  fi
++  use_neon=yes
++  use_arch="arm"
++  use_cpu="cortex-a7"
++  use_hardcoded_tables="yes"
++  ARCH="arm"
++  platform_os="linux"
++  cross_compiling="yes"
++  use_host="arm-linux-gnueabihf"
++  deps_dir="$use_host"
++  platform_cflags="-pipe -fPIC -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard \
++   -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated \
++   -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
++   -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
++   -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
++  platform_cxxflags="-pipe -fPIC -mcpu=cortex-a7 -mfpu=neon-vfpv4 \
++   -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
++   -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
++   -isystem${use_firmware}/opt/vc/include \
++   -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
++   -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
++  platform_ldflags="-L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos -lpthread \
++   -lvchiq_arm"
++fi
++
+ XBMC_SETUP_ARCH_DEFINES()
+ 
+ platform_cflags+=" $passed_cflags"
+-- 
+2.1.0
+
