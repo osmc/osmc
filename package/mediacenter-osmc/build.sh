@@ -169,7 +169,7 @@ then
 		--disable-vdpau \
 		--disable-pulse \
 		--disable-projectm \
-		--with-platform=$PIDEV \
+		--with-platform=raspberry-pi2 \
 		--enable-optimizations \
 		--enable-libcec \
 		--enable-player=omxplayer
