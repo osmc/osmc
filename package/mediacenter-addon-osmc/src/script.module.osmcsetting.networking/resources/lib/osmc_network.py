@@ -33,11 +33,15 @@ def toggle_ethernet_state(state):
 
 def get_ethernet_settings():
     for entry in manager.GetServices():
+        eth_settings = None
         path = entry[0]
         dbus_properties = entry[1]
         if path.startswith(ETHERNET_PATH):
-            eth_settings = {'path': path}
-            eth_settings.update(extract_network_properties(dbus_properties))
+            
+            settings = extract_network_properties(dbus_properties)
+            if settings:
+                eth_settings = {'path': path }
+                eth_settings.update(settings)
             return eth_settings
 
     # if we are here we have not detected a ethernet connection check for NFS
@@ -73,25 +77,27 @@ def get_nfs_ip_cmdline_value():
 
 
 def extract_network_properties(dbus_properties):
-    settings = {}
+    settings = None
     # get IPv4 Data
     ipv4_props = dbus_properties['IPv4']
-    settings['Method'] = str(ipv4_props['Method'])
-    settings['Address'] = str(ipv4_props['Address'])
-    settings['Netmask'] = str(ipv4_props['Netmask'])
-    if 'Gateway' in ipv4_props:
-        settings['Gateway'] = str(ipv4_props['Gateway'])
-    # Get  DNS Servers
-    nameservers = dbus_properties['Nameservers']
-    count = 1
-    for nameserver in nameservers:
-        settings['DNS_' + str(count)] = str(nameserver)
-        count += 1
-    # get state
-    settings['State'] = str(dbus_properties['State'])
-    # get Interface name
-    eth_props = dbus_properties['Ethernet']
-    settings['Interface'] = str(eth_props['Interface'])
+    if 'Method' in ipv4_props:
+        settings = {}
+        settings['Method'] = str(ipv4_props['Method'])
+        settings['Address'] = str(ipv4_props['Address'])
+        settings['Netmask'] = str(ipv4_props['Netmask'])
+        if 'Gateway' in ipv4_props:
+            settings['Gateway'] = str(ipv4_props['Gateway'])
+        # Get  DNS Servers
+        nameservers = dbus_properties['Nameservers']
+        count = 1
+        for nameserver in nameservers:
+            settings['DNS_' + str(count)] = str(nameserver)
+            count += 1
+        # get state
+        settings['State'] = str(dbus_properties['State'])
+        # get Interface name
+        eth_props = dbus_properties['Ethernet']
+        settings['Interface'] = str(eth_props['Interface'])
     return settings
 
 
@@ -239,8 +245,13 @@ def get_wifi_networks():
             security_props = dbus_properties['Security']
             if len(security_props) > 0:
                 wifi_settings['Security'] = str(security_props[0])
+                
             if not str(dbus_properties['State']) == 'idle' and not str(dbus_properties['State']) == 'failure':
-                wifi_settings.update(extract_network_properties(dbus_properties))
+                settings = extract_network_properties(dbus_properties)
+                if settings:
+                    wifi_settings.update(settings)
+                else:
+                    print (dbus_properties['State'])
             wifis[wifi_settings['SSID']] = wifi_settings
     return wifis
 
@@ -284,6 +295,14 @@ def wifi_remove(path):
         print ('DBusException removing')
         connected = False
 
+def get_connected_wifi():
+    for ssid, value in get_wifi_networks().iteritems():
+            try:
+                if value.getProperty('Connected') == 'True':
+                    return value
+            except:
+                pass
+    return {}
 
 def has_internet_connection():
     ethernet_settings = get_ethernet_settings()
