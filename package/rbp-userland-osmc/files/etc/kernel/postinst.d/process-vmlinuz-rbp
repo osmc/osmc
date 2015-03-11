@@ -7,6 +7,7 @@ processimage()
     EXIT=$?; if [ $EXIT -ne 0 ]; then cp -f ${2} /boot/kernel.img; exit $EXIT; fi
 
     rm -rf /boot/*.dtb /boot/overlays/
+    rm -f /boot/kernel7.img
     cp -af /boot/dtb-${1}/* /boot/
     EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
 
