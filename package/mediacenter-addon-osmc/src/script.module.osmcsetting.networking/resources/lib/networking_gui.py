@@ -288,14 +288,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             # the following conditionals were moved from onAction, because the focus id method may 
             # not be as precise and the controlID method
-        elif controlID in BLUETOOTH_CONTROLS + BLUETOOTH_ENABLE_TOGGLE:
+        elif controlID in BLUETOOTH_CONTROLS or controlID == BLUETOOTH_ENABLE_TOGGLE:
             self.handle_bluetooth_selection(controlID)
             self.populate_bluetooth_panel()
 
-        elif controlID in ALL_WIRED_CONTROLS + WIRED_ADAPTER_TOGGLE:
+        elif controlID in ALL_WIRED_CONTROLS or controlID == WIRED_ADAPTER_TOGGLE:
             self.handle_wired_selection(controlID)
 
-        elif controlID in ALL_WIRELESS_CONTROLS + WIRELESS_ADAPTER_TOGGLE:
+        elif controlID in ALL_WIRELESS_CONTROLS or controlID == WIRELESS_ADAPTER_TOGGLE:
             self.handle_wireless_selection(controlID)            
 
 
