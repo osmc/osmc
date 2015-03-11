@@ -6,6 +6,7 @@ import os
 import os.path
 import subprocess
 import time
+import threading
 
 
 # XBMC Modules
