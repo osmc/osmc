@@ -1,0 +1,2006 @@
+diff --git a/drivers/staging/dvb_hdhomerun/Kconfig b/drivers/staging/dvb_hdhomerun/Kconfig
+index e69de29..eceef36 100644
+--- a/drivers/staging/dvb_hdhomerun/Kconfig
++++ b/drivers/staging/dvb_hdhomerun/Kconfig
+@@ -0,0 +1,7 @@
++config DVB_HDHOMERUN 
++	tristate "DVB HDHOMERUN Driver"
++	depends on USB
++	default N
++	---help---
++	This option adds DVB support the HDHOMERUN devices.
++	If built as a module, it will be called dvb_hdhomerun.
+
+diff --git a/drivers/staging/dvb_hdhomerun/Makefile b/drivers/staging/dvb_hdhomerun/Makefile
+index e69de29..38cece1 100644
+--- a/drivers/staging/dvb_hdhomerun/Makefile
++++ b/drivers/staging/dvb_hdhomerun/Makefile
+@@ -0,0 +1,8 @@
++ccflags-y += -Idrivers/media/dvb-core
++
++dvb_hdhomerun-y := dvb_hdhomerun_init.o \
++		dvb_hdhomerun_data.o \
++		dvb_hdhomerun_control.o \
++		dvb_hdhomerun_core.o \
++		dvb_hdhomerun_fe.o
++obj-$(CONFIG_DVB_HDHOMERUN)	:= dvb_hdhomerun.o
+
+--- a/drivers/staging/Makefile	2013-05-12 05:47:39.760541478 +0100
++++ b/drivers/staging/Makefile 	2013-05-12 05:48:22.164541112 +0100
+@@ -59,6 +59,7 @@
+ obj-$(CONFIG_DGRP)		+= dgrp/
+ obj-$(CONFIG_SB105X)		+= sb105x/
+ obj-$(CONFIG_FIREWIRE_SERIAL)	+= fwserial/
++obj-$(CONFIG_DVB_HDHOMERUN)	+= dvb_hdhomerun/
+ obj-$(CONFIG_GOLDFISH)		+= goldfish/
+ obj-$(CONFIG_USB_DWC2)		+= dwc2/
+ obj-$(CONFIG_LUSTRE_FS)		+= lustre/
+
+--- a/drivers/staging/Kconfig	2013-05-12 05:47:36.696541505 +0100
++++ b/drivers/staging/Kconfig	2013-05-12 05:48:42.508540937 +0100
+@@ -140,4 +140,6 @@
+ 
+ source "drivers/staging/dwc2/Kconfig"
+ 
++source "drivers/staging/dvb_hdhomerun/Kconfig"
++
+ endif # STAGING
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_compat.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_compat.h
+index e69de29..1d4da56 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_compat.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_compat.h
+@@ -0,0 +1,37 @@
++/*
++ * dvb_hdhomerun_compat.h, compat for various kernel versions
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_COMPAT_H__
++#define __DVB_HDHOMERUN_COMPAT_H__
++
++#include <linux/version.h>
++
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
++#define my_kfifo_len __kfifo_len
++#define my_kfifo_put kfifo_put
++#define my_kfifo_get kfifo_get
++#else
++#define my_kfifo_len kfifo_len
++#define my_kfifo_get kfifo_out
++#define my_kfifo_put kfifo_in
++#endif
++
++#endif /* __DVB_HDHOMERUN_COMPAT_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.c b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.c
+index e69de29..d03fca6 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.c
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.c
+@@ -0,0 +1,306 @@
++/*
++ * dvb_hdhomerun_control.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#include <dvbdev.h>
++#include <linux/cdev.h>
++#include <linux/device.h>
++#include <linux/dvb/dmx.h>
++#include <linux/dvb/frontend.h>
++#include <linux/fs.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/kfifo.h>
++#include <linux/kobject.h>
++#include <linux/ioctl.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/poll.h>
++#include <linux/slab.h>
++#include <linux/spinlock.h>
++#include <linux/sched.h>
++#include <linux/wait.h>
++
++#include "dvb_hdhomerun_control_messages.h"
++#include "dvb_hdhomerun_compat.h"
++#include "dvb_hdhomerun_init.h"
++#include "dvb_hdhomerun_data.h"
++#include "dvb_hdhomerun_debug.h"
++#include "dvb_hdhomerun_core.h"
++
++#include "dvb_hdhomerun_control.h"
++
++MODULE_AUTHOR("Villy Thomsen");
++MODULE_DESCRIPTION("HDHomeRun Driver Core Module");
++MODULE_LICENSE("GPL");
++MODULE_VERSION(HDHOMERUN_VERSION);
++
++static unsigned int hdhomerun_control_poll(struct file *f, struct poll_table_struct *p)
++{
++	unsigned int mask = 0;
++	poll_wait(f, &inq, p);
++	poll_wait(f, &outq, p);
++	if (my_kfifo_len(&control_fifo_user) != 0) mask |= POLLIN | POLLRDNORM; /* readable */
++	mask |= POLLOUT | POLLWRNORM; /* writable... always? */
++	return mask;
++}
++
++static ssize_t hdhomerun_control_read(struct file *f, char *buf,
++				      size_t count, loff_t *offset)
++{
++	char *user_data;
++	ssize_t retval;
++
++	DEBUG_FUNC(HDHOMERUN_CONTROL);
++	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %Zu, offset %lld, buf size: %d\n", count, *offset, my_kfifo_len(&control_fifo_user));
++
++	if (!buf)
++		return -EINVAL;
++
++	if (count == 0)
++		return 0;
++
++	while(my_kfifo_len(&control_fifo_user) <= 0) {
++		if (f->f_flags & O_NONBLOCK)
++			return -EAGAIN;
++		if (wait_event_interruptible(inq, (my_kfifo_len(&control_fifo_user) != 0) ))
++			return -ERESTARTSYS;
++	}
++
++	user_data = kmalloc(count, GFP_KERNEL);
++	if (!user_data)
++		return -ENOMEM;
++	
++	retval = my_kfifo_get(&control_fifo_user, user_data, count);
++
++	if(copy_to_user(buf, user_data, retval)) {
++		retval = -EFAULT;
++	} 
++
++	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %Zu\n", retval);
++
++	kfree(user_data);
++	return retval;
++}
++
++static ssize_t hdhomerun_control_write(struct file *f, const char __user *buf,
++				       size_t count, loff_t *offset)
++{
++	char *user_data;
++	ssize_t retval = count;
++	
++	DEBUG_FUNC(1);
++	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %Zu, offset %lld, buf size: %d\n", count, *offset, my_kfifo_len(&control_fifo_kernel));
++	
++	user_data = kmalloc(count, GFP_KERNEL);
++	if(!user_data) {
++		retval = -ENOMEM;
++		goto error;
++	}
++	
++	if (copy_from_user(user_data, buf, count)) {
++		retval = -EFAULT;
++		goto error;
++	}
++	
++	if(wait_for_write) {
++		while(my_kfifo_len(&control_fifo_kernel) == control_bufsize) {
++			if (f->f_flags & O_NONBLOCK)
++				return -EAGAIN;
++			if (wait_event_interruptible(outq, (my_kfifo_len(&control_fifo_kernel) < control_bufsize) ))
++				return -ERESTARTSYS;
++		}
++		retval = my_kfifo_put(&control_fifo_kernel, user_data, count);
++	} else {
++		DEBUG_OUT(HDHOMERUN_CONTROL, "%s ignoring write\n", __FUNCTION__);
++	}	
++	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %Zu\n", retval);
++	
++	wake_up_interruptible(&control_readq);
++	
++error:
++	kfree(user_data);
++	return retval;
++}
++
++static int hdhomerun_control_open(struct inode *inode, struct file *file)
++{
++	DEBUG_FUNC(1);
++
++	printk(KERN_INFO "hdhomerun: userhdhomerun connected\n");
++
++	userspace_ready = 1; /*  need mutex here */
++
++	return 0;
++}
++
++static int hdhomerun_control_release(struct inode *inode, struct file *file)
++{
++	DEBUG_FUNC(1);
++
++	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (user)  : %d\n", my_kfifo_len(&control_fifo_user));
++	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (kernel): %d\n", my_kfifo_len(&control_fifo_kernel));
++	
++	/* Clear the contents of the fifo when the user space program
++	   disconnects. We want to start fresh when we reconnect
++	   again. This is probably a problem for the programs using
++	   the /dev/dvb/adapterX/etcY */
++	kfifo_reset(&control_fifo_kernel);
++	kfifo_reset(&control_fifo_user);
++	
++	wait_for_write = 0; /* need mutex here */
++	userspace_ready =0; /* need mutex here */
++
++   printk(KERN_INFO "hdhomerun: userhdhomerun disconnected\n");
++
++   return 0;
++}
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
++static long hdhomerun_control_ioctl(struct file *f,
++				   unsigned int cmd, unsigned long arg)
++#else
++static int hdhomerun_control_ioctl(struct inode *inode,struct file *f,
++				    unsigned int cmd, unsigned long arg)
++#endif
++{
++	int retval = 0;
++	int err = 1;
++	
++	DEBUG_FUNC(1);
++
++	if (_IOC_DIR(cmd) & _IOC_READ) {
++		err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
++	}
++	else if (_IOC_DIR(cmd) & _IOC_WRITE) {
++		err =  !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
++	}
++	
++	if (err) {
++		printk(KERN_ERR "access_ok() fails\n");
++		return -EFAULT;
++	}
++
++	switch(cmd) {
++	case HDHOMERUN_REGISTER_TUNER: {
++		struct hdhomerun_register_tuner_data tuner_data;
++
++		retval = copy_from_user(&tuner_data, (struct hdhomerun_register_tuner_data*)arg, sizeof(struct hdhomerun_register_tuner_data));
++		if(retval != 0) {
++			printk(KERN_ERR "hdhomerun: get_user() failed, no dvb device created!\n");
++		}
++		else {
++			printk(KERN_INFO "hdhomerun: creating dvb device for %s\n", tuner_data.name);
++
++			retval = dvb_hdhomerun_data_init(tuner_data.num_of_devices);
++			if(retval != 0) {
++				printk(KERN_ERR "hdhomerun: hdhomerun_data_init() failed, no dvb device created\n");
++				return -EFAULT;
++			}
++
++			retval = dvb_hdhomerun_register_hdhomerun(&tuner_data);
++			if(retval != 0) {
++				printk(KERN_ERR "hdhomerun: register_hdhomerun() failed, no dvb device created\n");
++				return -EFAULT;
++			}
++
++			retval = copy_to_user((void *)arg, &tuner_data, sizeof(struct hdhomerun_register_tuner_data));
++			break;
++		}
++	}
++		
++	default:
++		retval = -ENOTTY;
++		DEBUG_OUT(1,"Unknown/unhandled ioctl cmd: %x, nr:%d, type:%d\n", cmd, _IOC_NR(cmd), _IOC_TYPE(cmd));
++	}
++	
++	return retval;
++}
++
++static struct file_operations hdhomerun_control_fops = {
++	.owner = THIS_MODULE,
++	.read = hdhomerun_control_read,
++	.write = hdhomerun_control_write,
++	.open = hdhomerun_control_open,
++	.release = hdhomerun_control_release,
++	.poll = hdhomerun_control_poll,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
++	.unlocked_ioctl = hdhomerun_control_ioctl,
++#else
++	.ioctl = hdhomerun_control_ioctl,
++#endif
++};
++  
++static struct miscdevice hdhomerun_control_device = {
++	MISC_DYNAMIC_MINOR,
++	"hdhomerun_control",
++	&hdhomerun_control_fops
++};
++
++int dvb_hdhomerun_control_init() {
++	int ret = misc_register(&hdhomerun_control_device);
++	
++	DEBUG_FUNC(1);
++
++	if (ret) {
++		printk(KERN_ERR "Unable to register hdhomerun_control device\n");
++		goto error;
++	}
++
++	/* Buffer for sending message between kernel/userspace */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
++	control_fifo_user = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_user));
++#else
++	kfifo_alloc(&control_fifo_user, control_bufsize, GFP_KERNEL);
++#endif
++
++	if (IS_ERR(&control_fifo_user)) {
++		return PTR_ERR(&control_fifo_user);
++	}
++
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
++	control_fifo_kernel = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_kernel));
++#else
++	kfifo_alloc(&control_fifo_kernel, control_bufsize, GFP_KERNEL);
++#endif 
++
++	if (IS_ERR(&control_fifo_kernel)) {
++		return PTR_ERR(&control_fifo_kernel);
++	}
++	init_waitqueue_head(&control_readq);
++	init_waitqueue_head(&inq);
++	init_waitqueue_head(&outq);
++
++error:
++	return ret;
++}
++EXPORT_SYMBOL(dvb_hdhomerun_control_init);
++
++void dvb_hdhomerun_control_exit() {
++	DEBUG_FUNC(1);
++#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)
++	kfifo_free(&control_fifo_user);
++	kfifo_free(&control_fifo_kernel);
++#endif
++
++	misc_deregister(&hdhomerun_control_device);
++}
++EXPORT_SYMBOL(dvb_hdhomerun_control_exit);
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.h
+index e69de29..1417583 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control.h
+@@ -0,0 +1,28 @@
++/*
++ * dvb_hdhomerun_control.h, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_CONTROL_H__
++#define __DVB_HDHOMERUN_CONTROL_H__
++
++extern int dvb_hdhomerun_control_init(void);
++extern void dvb_hdhomerun_control_exit(void);
++
++#endif /* __DVB_HDHOMERUN_CONTROL_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control_messages.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control_messages.h
+index e69de29..45230b1 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control_messages.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_control_messages.h
+@@ -0,0 +1,77 @@
++/*
++ * dvb_hdhomerun_control_messages.h, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVBHDHOMERUN_CONTROL_MESSAGES_H__
++#define __DVBHDHOMERUN_CONTROL_MESSAGES_H__
++
++#include <linux/dvb/dmx.h>
++#include <linux/dvb/frontend.h>
++#include <linux/ioctl.h>
++
++#ifndef __KERNEL__
++#include <stdint.h>
++#endif
++
++typedef enum {
++	DVB_HDHOMERUN_FE_READ_STATUS = 0,
++	DVB_HDHOMERUN_FE_READ_BER,
++	DVB_HDHOMERUN_FE_READ_UNCORRECTED_BLOCKS,
++	DVB_HDHOMERUN_FE_SET_FRONTEND,
++	DVB_HDHOMERUN_FE_READ_SIGNAL_STRENGTH,
++	DVB_HDHOMERUN_START_FEED,
++	DVB_HDHOMERUN_STOP_FEED,
++	DVB_HDHOMERUN_DMX_SET_PES_FILTER,
++	DVB_HDHOMERUN_INT_REGISTER_DEVICE  
++} hdhomerun_control_mesg_type_t;
++
++
++struct hdhomerun_dvb_demux_feed {
++	uint16_t pid;
++	unsigned int index;
++};
++
++struct hdhomerun_register_tuner_data {
++   uint8_t num_of_devices;
++   char name[12];
++   int id;
++   int type;
++   bool use_full_name;
++};
++
++struct dvbhdhomerun_control_mesg {
++	unsigned int type;
++	union {
++		unsigned int frequency;
++		fe_status_t fe_status;
++		int16_t signal_strength;
++		struct dmx_pes_filter_params dmx_pes_filter;
++		struct hdhomerun_dvb_demux_feed demux_feed;
++		struct hdhomerun_register_tuner_data reg_data;
++	} u;
++	int id;
++};
++
++
++/* Use 'v' as magic number */
++#define HDHOMERUN_IOC_MAGIC  'v'
++#define HDHOMERUN_REGISTER_TUNER _IOWR(HDHOMERUN_IOC_MAGIC, 0, struct hdhomerun_register_tuner_data)
++
++#endif
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.c b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.c
+index e69de29..761fcce 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.c
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.c
+@@ -0,0 +1,123 @@
++/*
++ * dvb_hdhomerun_core.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#include <linux/module.h>
++#include <linux/sched.h>
++
++#include "dvb_hdhomerun_control.h"
++#include "dvb_hdhomerun_compat.h"
++#include "dvb_hdhomerun_debug.h"
++
++#include "dvb_hdhomerun_core.h"
++
++/* for the control device */
++struct kfifo control_fifo_user;
++EXPORT_SYMBOL(control_fifo_user);
++
++struct kfifo control_fifo_kernel;
++EXPORT_SYMBOL(control_fifo_kernel);
++
++spinlock_t control_spinlock_user;
++EXPORT_SYMBOL(control_spinlock_user);
++
++spinlock_t control_spinlock_kernel;
++EXPORT_SYMBOL(control_spinlock_kernel);
++
++wait_queue_head_t control_readq;
++EXPORT_SYMBOL(control_readq);
++
++wait_queue_head_t inq;
++EXPORT_SYMBOL(inq);
++
++wait_queue_head_t outq;
++EXPORT_SYMBOL(outq);
++
++int control_bufsize = 32768;
++EXPORT_SYMBOL(control_bufsize);
++
++/* Handles the case where the user space app ctrl-c's. I.E the hdhomerun app, shouldn't write to fifo.*/
++int wait_for_write = 0; /* Need mutex on this */
++EXPORT_SYMBOL(wait_for_write);
++
++/* Handles the case where the hdhomerun app is not running */
++int userspace_ready = 0; /* Need mutex on this */
++EXPORT_SYMBOL(userspace_ready);
++
++int hdhomerun_debug_mask = 0x0;
++module_param(hdhomerun_debug_mask, int, S_IRUGO | S_IWUSR);
++MODULE_PARM_DESC(hdhomerun_debug_mask, "Mask for debug output\n");
++EXPORT_SYMBOL(hdhomerun_debug_mask);
++
++MODULE_AUTHOR("Villy Thomsen");
++MODULE_DESCRIPTION("HDHomeRun Driver Core Module");
++MODULE_LICENSE("GPL");
++MODULE_VERSION(HDHOMERUN_VERSION);
++
++int hdhomerun_control_post_message(struct dvbhdhomerun_control_mesg *mesg) {
++	int ret = -1;
++
++	DEBUG_FUNC(1);
++
++	if(userspace_ready) {
++		if(my_kfifo_put(&control_fifo_user, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg)) < sizeof(struct dvbhdhomerun_control_mesg) ) {
++			printk(KERN_CRIT "No buffer space for hdhomerun control device!\n");
++		} else {
++			ret = 1;
++		}
++		wake_up_interruptible(&inq);
++	}
++	return ret;
++}
++EXPORT_SYMBOL(hdhomerun_control_post_message);
++
++int hdhomerun_control_wait_for_message(struct dvbhdhomerun_control_mesg *mesg) {
++	DEBUG_FUNC(1);
++	wait_for_write = 1;
++	do {
++		if(wait_event_interruptible(control_readq, my_kfifo_len(&control_fifo_kernel) > 0)) {
++			DEBUG_OUT(HDHOMERUN_CONTROL,"%s read interrupted\n", __FUNCTION__);
++			wait_for_write = 0;
++			return -ERESTARTSYS;
++		}
++	} while(my_kfifo_len(&control_fifo_kernel) == 0);
++
++	return my_kfifo_get(&control_fifo_kernel, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg));
++	wake_up_interruptible(&outq);
++}
++EXPORT_SYMBOL(hdhomerun_control_wait_for_message);
++
++int hdhomerun_control_post_and_wait(struct dvbhdhomerun_control_mesg *mesg) {
++	int ret;
++
++	ret = hdhomerun_control_post_message(mesg);
++	if(ret == 1) {
++		/* Now we wait for userspace to return to us */
++		ret = hdhomerun_control_wait_for_message(mesg);
++		if(ret == 0) {
++			DEBUG_OUT(HDHOMERUN_CONTROL, "dvbhdhomerun_wait_for_message failed, shouldn't happen!\n");
++		}
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL(hdhomerun_control_post_and_wait);
++
++
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.h
+index e69de29..eea6c26 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_core.h
+@@ -0,0 +1,52 @@
++/*
++ * dvb_hdhomerun_core.h skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_CORE_H__
++#define __DVB_HDHOMERUN_CORE_H__
++
++#include <linux/kfifo.h>
++#include <linux/wait.h>
++
++#include "dvb_hdhomerun_control_messages.h"
++
++#define HDHOMERUN_VERSION "0.0.11"
++
++#define HDHOMERUN_MAX_TUNERS 8
++
++extern struct kfifo control_fifo_user;
++extern struct kfifo control_fifo_kernel;
++extern int wait_for_write;
++extern int userspace_ready;
++extern wait_queue_head_t control_readq;
++extern wait_queue_head_t inq;
++extern wait_queue_head_t outq;
++extern int control_bufsize;
++extern spinlock_t control_spinlock_user;
++extern spinlock_t control_spinlock_kernel;
++
++extern int hdhomerun_debug_mask;
++
++extern int hdhomerun_control_post_message(struct dvbhdhomerun_control_mesg *mesg);
++extern int hdhomerun_control_wait_for_message(struct dvbhdhomerun_control_mesg *mesg);
++extern int hdhomerun_control_post_and_wait(struct dvbhdhomerun_control_mesg *mesg);
++
++
++#endif /* __DVB_HDHOMERUN_CORE_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.c b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.c
+index e69de29..99174d2 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.c
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.c
+@@ -0,0 +1,224 @@
++/*
++ * dvb_hdhomerun_data.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#include <dvbdev.h>
++#include <linux/cdev.h>
++#include <linux/device.h>
++#include <linux/dvb/dmx.h>
++#include <linux/dvb/frontend.h>
++#include <linux/fs.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/kfifo.h>
++#include <linux/kobject.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/spinlock.h>
++#include <linux/wait.h>
++
++#include "dvb_hdhomerun_core.h"
++#include "dvb_hdhomerun_debug.h"
++#include "dvb_hdhomerun_data.h"
++
++struct hdhomerun_data_state *hdhomerun_data_states[HDHOMERUN_MAX_TUNERS];
++
++struct hdhomerun_data_state {
++	struct dvb_demux *dvb_demux;
++	int id;
++	dev_t dev;
++	struct cdev cdev;
++	struct device *device;
++};
++
++static dev_t hdhomerun_major = -1;
++static struct class *hdhomerun_class;
++static int hdhomerun_num_of_devices = 0;
++
++MODULE_AUTHOR("Villy Thomsen");
++MODULE_DESCRIPTION("HDHomeRun driver");
++MODULE_LICENSE("GPL");
++MODULE_VERSION(HDHOMERUN_VERSION);
++
++static ssize_t hdhomerun_data_write(struct file *f, const char __user *buf,
++				       size_t count, loff_t *offset)
++{
++	char *user_data;
++	ssize_t retval = count;
++
++	struct hdhomerun_data_state *state = f->private_data;
++	
++	DEBUG_FUNC(1);
++	DEBUG_OUT(HDHOMERUN_DATA, "Count: %Zu, offset %lld\n", count, *offset);
++	
++	user_data = kmalloc(count, GFP_KERNEL);
++	if(!user_data) {
++		retval = -ENOMEM;
++		goto error;
++	}
++	
++	if (copy_from_user(user_data, buf, count)) {
++		retval = -EFAULT;
++		goto error;
++	}
++	
++	/* Feed stuff to V4l-DVB */
++	dvb_dmx_swfilter(state->dvb_demux, user_data, count);
++
++error:
++	kfree(user_data);
++	return retval;
++}
++
++static int hdhomerun_data_open(struct inode *inode, struct file *file)
++{
++	struct hdhomerun_data_state *state;
++
++	DEBUG_FUNC(1);
++
++	state = container_of(inode->i_cdev, struct hdhomerun_data_state, cdev);
++	DEBUG_OUT(HDHOMERUN_DATA, "Open major: %d\n", MAJOR(hdhomerun_major));
++
++	file->private_data = state;
++
++	return 0;
++}
++
++static int hdhomerun_data_release(struct inode *inode, struct file *file)
++{
++	DEBUG_FUNC(1);
++
++	return 0;
++}
++
++static struct file_operations hdhomerun_data_fops = {
++	.owner = THIS_MODULE,
++	.write = hdhomerun_data_write,
++	.open = hdhomerun_data_open,
++	.release = hdhomerun_data_release,
++};
++
++int dvb_hdhomerun_data_init(int num_of_devices) {
++	int ret = 0;
++
++	if(hdhomerun_major == -1) {
++		/* Create class (should I use an existing?) */
++		hdhomerun_class = class_create(THIS_MODULE, "hdhomerun");
++		if (IS_ERR(hdhomerun_class)) {
++			ret = PTR_ERR(hdhomerun_class);
++			goto fail_class_create;
++		}
++	
++		/* Create major */
++		ret = alloc_chrdev_region(&hdhomerun_major, 0, num_of_devices, "hdhomerun_data");
++		if(ret < 0) {
++			printk(KERN_WARNING "hdhomerun: Can't get major: %d, num of devices: %d\n", MAJOR(hdhomerun_major), num_of_devices);
++		}
++
++		hdhomerun_num_of_devices = num_of_devices;
++	}
++
++	return ret;
++
++fail_class_create:
++	printk(KERN_ERR "unable to create class for hdhomerun\n");
++	return ret;
++}
++EXPORT_SYMBOL(dvb_hdhomerun_data_init);
++  
++int dvb_hdhomerun_data_create_device(struct dvb_demux *dvb_demux, int id) {
++	struct hdhomerun_data_state *state;
++	int major;
++	int minor;
++	int ret = 0;
++
++	DEBUG_FUNC(1);
++
++	if(hdhomerun_major == -1) {
++		printk(KERN_ERR "hdhomerun: class not created yet!\n");
++		return -1;
++	}
++
++	/* setup internal structure for storing data */
++	state = kzalloc(sizeof(struct hdhomerun_data_state), GFP_KERNEL);
++	if (state == NULL) {
++		printk(KERN_ERR
++		       "HDHomeRun: out of memory for data device %d\n",
++		       id);
++		return -ENOMEM;
++	}
++
++	state->dvb_demux = dvb_demux;
++	state->id = id;
++
++	/* Create dev_t for this tuner */
++	major = MAJOR(hdhomerun_major);
++	minor = MINOR(hdhomerun_major);
++	state->dev = MKDEV(major, minor + id);
++
++	/* Create the character device */
++	cdev_init(&state->cdev, &hdhomerun_data_fops);
++	state->cdev.owner = THIS_MODULE;
++	state->cdev.ops = &hdhomerun_data_fops;
++
++	ret = cdev_add(&state->cdev, state->dev, 1);
++	if(ret < 0) {
++		printk(KERN_WARNING "hdhomerun: Can't add char device: %d %d\n", major, minor);
++	}
++
++	/* Create device file and sysfs entry */
++	state->device = device_create(hdhomerun_class, NULL, state->dev, NULL, "hdhomerun_data%d", id);
++	if(IS_ERR(state->device)) {
++		ret = PTR_ERR(state->device);
++		goto fail_device_create;
++	}
++	printk(KERN_INFO "hdhomerun: device /dev/hdhomerun_data%d created\n", id);
++	
++	hdhomerun_data_states[id] = state;
++
++	return ret;
++
++fail_device_create:
++	printk(KERN_ERR "unable to create device /dev/hdhomerun%d\n", id);
++	return ret;
++}
++EXPORT_SYMBOL(dvb_hdhomerun_data_create_device);
++
++void dvb_hdhomerun_data_delete_device(int id) {
++	DEBUG_FUNC(1);
++
++	cdev_del(&hdhomerun_data_states[id]->cdev);
++	device_destroy(hdhomerun_class, hdhomerun_data_states[id]->dev);
++}
++EXPORT_SYMBOL(dvb_hdhomerun_data_delete_device);
++
++void dvb_hdhomerun_data_exit() {
++	DEBUG_FUNC(1);
++
++	if(hdhomerun_major != -1) {
++		unregister_chrdev_region(hdhomerun_major, hdhomerun_num_of_devices);
++		hdhomerun_major = -1;
++
++		class_destroy(hdhomerun_class);
++	}
++}
++EXPORT_SYMBOL(dvb_hdhomerun_data_exit);
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.h
+index e69de29..1fc607f 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_data.h
+@@ -0,0 +1,34 @@
++/*
++ * dvb_hdhomerun_data.h, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_DATA_H__
++#define __DVB_HDHOMERUN_DATA_H__
++
++#include "dvb_demux.h"
++
++#include "dvb_hdhomerun_control_messages.h"
++
++extern int dvb_hdhomerun_data_init(int num_of_devices);
++extern int dvb_hdhomerun_data_create_device(struct dvb_demux *dvb_demux, int id);
++extern void dvb_hdhomerun_data_delete_device(int id);
++extern void dvb_hdhomerun_data_exit(void);
++
++#endif /* __DVB_HDHOMERUN_DATA_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_debug.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_debug.h
+index e69de29..6d0ea67 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_debug.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_debug.h
+@@ -0,0 +1,40 @@
++/*
++ * dvb_hdhomerun_debug.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_DEBUG_H__
++#define __DVB_HDHOMERUN_DEBUG_H__
++
++extern int hdhomerun_debug_mask;
++
++enum enum_hdhomerun_debug_mask {
++	HDHOMERUN_FUNCTION = 1,
++	HDHOMERUN_FE = 2,
++	HDHOMERUN_DATA = 4,
++	HDHOMERUN_CONTROL = 8,
++	HDHOMERUN_STREAM = 16
++};
++
++#define DEBUG_OUT(level, fmt, args...) if( level & hdhomerun_debug_mask )	\
++    printk(KERN_DEBUG fmt, ## args);
++
++#define DEBUG_FUNC(x) DEBUG_OUT(x, "%s\n", __FUNCTION__);
++
++#endif /* __DVB_HDHOMERUN_DEBUG_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.c b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.c
+index e69de29..a96799b 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.c
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.c
+@@ -0,0 +1,424 @@
++/*
++ * dvb_hdhomerun_fe.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/moduleparam.h>
++#include <linux/init.h>
++#include <linux/version.h>
++
++#include <linux/platform_device.h>
++
++#include "dvb_demux.h"
++#include "dvb_frontend.h"
++#include "dvb_net.h"
++#include "dvbdev.h"
++#include "dmxdev.h"
++
++#include "dvb_hdhomerun_debug.h"
++#include "dvb_hdhomerun_core.h"
++#include "dvb_hdhomerun_control_messages.h"
++
++MODULE_AUTHOR("Villy Thomsen");
++MODULE_DESCRIPTION("DVB frontend for HDHomeRun");
++MODULE_LICENSE("GPL");
++MODULE_VERSION(HDHOMERUN_VERSION);
++
++struct dvb_hdhomerun_fe_state {
++	struct dvb_frontend frontend;
++	int id;
++};
++
++extern int hdhomerun_debug_mask;
++
++static int dvb_hdhomerun_fe_read_status(struct dvb_frontend* fe, fe_status_t* status)
++{
++	struct dvbhdhomerun_control_mesg mesg;
++	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
++
++	DEBUG_FUNC(1);
++
++	mesg.type = DVB_HDHOMERUN_FE_READ_STATUS;
++	mesg.id = state->id;
++	hdhomerun_control_post_and_wait(&mesg);
++
++	*status = mesg.u.fe_status;
++
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_read_ber(struct dvb_frontend* fe, u32* ber)
++{
++	DEBUG_FUNC(1);
++	*ber = 0;
++
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_read_signal_strength(struct dvb_frontend* fe, u16* strength)
++{
++	struct dvbhdhomerun_control_mesg mesg;
++	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
++
++	DEBUG_FUNC(1);
++
++	mesg.type = DVB_HDHOMERUN_FE_READ_SIGNAL_STRENGTH;
++	mesg.id = state->id;
++	hdhomerun_control_post_and_wait(&mesg);
++
++	*strength = mesg.u.signal_strength;
++
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_read_snr(struct dvb_frontend* fe, u16* snr)
++{
++	DEBUG_FUNC(1);
++	*snr = 0;
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks)
++{
++	DEBUG_FUNC(1);
++	*ucblocks = 0;
++	return 0;
++}
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe)
++#else
++static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe, struct dvb_frontend_parameters *p)
++#endif
++{
++	DEBUG_FUNC(1);
++	return 0;
++}
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++static int dvb_hdhomerun_fe_set_frontend(struct dvb_frontend* fe)
++#else
++static int dvb_hdhomerun_fe_set_frontend(struct dvb_frontend* fe, struct dvb_frontend_parameters *p)
++#endif
++{
++	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
++#endif
++
++	DEBUG_FUNC(1);
++	if (fe->ops.tuner_ops.set_params) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++		fe->ops.tuner_ops.set_params(fe);
++#else
++		fe->ops.tuner_ops.set_params(fe,p);
++#endif
++		if (fe->ops.i2c_gate_ctrl)
++			fe->ops.i2c_gate_ctrl(fe, 0);
++	}
++
++	DEBUG_OUT(HDHOMERUN_FE, "FE_SET_FRONTEND, freq: %d\n",
++             p->frequency);
++
++	{
++		struct dvbhdhomerun_control_mesg mesg;
++		mesg.type = DVB_HDHOMERUN_FE_SET_FRONTEND;
++		mesg.id = state->id;
++		mesg.u.frequency = p->frequency;
++		
++		hdhomerun_control_post_and_wait(&mesg);
++	}
++
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_sleep(struct dvb_frontend* fe)
++{
++	DEBUG_FUNC(1);
++	return 0;
++}
++
++static int dvb_hdhomerun_fe_init(struct dvb_frontend* fe)
++{
++	DEBUG_FUNC(1);
++	
++	/* Don't really need to do anything here */
++
++	return 0;
++}
++
++static void dvb_hdhomerun_fe_release(struct dvb_frontend* fe)
++{
++	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
++
++	DEBUG_FUNC(1);
++
++	kfree(state);
++}
++
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
++static int dvb_hdhomerun_fe_get_frontend_algo(struct dvb_frontend *fe)
++#else
++static enum dvbfe_algo dvb_hdhomerun_fe_get_frontend_algo(struct dvb_frontend *fe)
++#endif
++{
++	DEBUG_FUNC(1);
++
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
++	return 1; // The two drivers that use get_grontend_algo in debian lenny return 1 for HW.
++#else
++	return DVBFE_ALGO_HW; // This is actually 0. hmm.
++#endif
++}
++
++#ifdef S2_LIPLIANIN
++static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params)
++{
++	DEBUG_FUNC(1);
++
++	return dvb_hdhomerun_fe_set_frontend(fe, params);
++}
++#else
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, bool re_tune, 
++#else
++static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params,
++#endif
++					unsigned int mode_flags, unsigned int *delay, fe_status_t *status)
++{
++   int ret;
++	DEBUG_FUNC(1);
++
++	//*delay = HZ / 5;
++	*delay = 60 * HZ;
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++	ret = dvb_hdhomerun_fe_set_frontend(fe);
++	if (ret)
++           return ret;
++#else
++	if (params) {
++		ret = dvb_hdhomerun_fe_set_frontend(fe, params);
++		if (ret)
++                        return ret;
++	}
++#endif
++
++	return dvb_hdhomerun_fe_read_status(fe, status);
++}
++#endif // S2_LIPLIANIN
++
++
++/* Setup/Init functions */
++
++/* DVB_T */
++static struct dvb_frontend_ops dvb_hdhomerun_fe_ofdm_ops;
++
++struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id)
++{
++        struct dvb_hdhomerun_fe_state* state = NULL;
++
++        DEBUG_FUNC(1);
++
++        /* allocate memory for the internal state */
++        state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
++        if (state == NULL) goto error;
++
++        DEBUG_OUT(HDHOMERUN_FE, "Attaching a DVB-T HDHomeRun id %d\n", id);
++        DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
++        state->id = id;
++
++        /* create dvb_frontend */
++        memcpy(&state->frontend.ops, &dvb_hdhomerun_fe_ofdm_ops, sizeof(struct dvb_frontend_ops));
++        state->frontend.demodulator_priv = state;
++        return &state->frontend;
++
++error:
++        kfree(state);
++        return NULL;
++}
++
++static struct dvb_frontend_ops dvb_hdhomerun_fe_ofdm_ops = {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++        .delsys = { SYS_DVBT },
++#endif
++        .info = {
++                .name                   = "HDHomeRun DVB-T",
++                .type                   = FE_OFDM,
++                .frequency_stepsize     = 62500,
++                .frequency_min          = 50500000,
++                .frequency_max          = 862000000,
++        .caps =
++		    FE_CAN_FEC_1_2 | FE_CAN_FEC_2_3 | FE_CAN_FEC_3_4 |
++		    FE_CAN_FEC_5_6 | FE_CAN_FEC_7_8 | FE_CAN_FEC_AUTO |
++		    FE_CAN_QPSK | FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_AUTO |
++		    FE_CAN_TRANSMISSION_MODE_AUTO | FE_CAN_GUARD_INTERVAL_AUTO
++        },
++
++        .release = dvb_hdhomerun_fe_release,
++
++        .init = dvb_hdhomerun_fe_init,
++        .sleep = dvb_hdhomerun_fe_sleep,
++
++        .set_frontend = dvb_hdhomerun_fe_set_frontend,
++        .get_frontend = dvb_hdhomerun_fe_get_frontend,
++
++        .read_status = dvb_hdhomerun_fe_read_status,
++        .read_ber = dvb_hdhomerun_fe_read_ber,
++        .read_signal_strength = dvb_hdhomerun_fe_read_signal_strength,
++        .read_snr = dvb_hdhomerun_fe_read_snr,
++        .read_ucblocks = dvb_hdhomerun_fe_read_ucblocks,
++
++        .tune = dvb_hdhomerun_fe_tune,
++        .get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
++};
++
++/* DVB_C */
++static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops;
++
++struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id)
++{
++	struct dvb_hdhomerun_fe_state* state = NULL;
++
++	DEBUG_FUNC(1);
++
++	/* allocate memory for the internal state */
++	state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
++	if (state == NULL) goto error;
++
++	DEBUG_OUT(HDHOMERUN_FE, "Attaching a DVB-C HDHomeRun id %d\n", id);	
++	DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
++	state->id = id;
++
++	/* create dvb_frontend */
++	memcpy(&state->frontend.ops, &dvb_hdhomerun_fe_qam_ops, sizeof(struct dvb_frontend_ops));
++	state->frontend.demodulator_priv = state;
++	return &state->frontend;
++
++error:
++	kfree(state);
++	return NULL;
++}
++
++static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops = {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++   .delsys = { SYS_DVBC_ANNEX_A },
++#endif
++	.info = {
++		.name			= "HDHomeRun DVB-C",
++		.type			= FE_QAM,
++		.frequency_stepsize	= 62500,
++		.frequency_min		= 51000000,
++		.frequency_max		= 858000000,
++		.symbol_rate_min	= (57840000/2)/64,     /* SACLK/64 == (XIN/2)/64 */
++		.symbol_rate_max	= (57840000/2)/4,      /* SACLK/4 */
++		.caps = FE_CAN_QAM_16 | FE_CAN_QAM_32 | FE_CAN_QAM_64 |
++			FE_CAN_QAM_128 | FE_CAN_QAM_256 | FE_CAN_QAM_AUTO |
++			FE_CAN_FEC_AUTO | FE_CAN_INVERSION_AUTO
++	},
++
++	.release = dvb_hdhomerun_fe_release,
++
++	.init = dvb_hdhomerun_fe_init,
++	.sleep = dvb_hdhomerun_fe_sleep,
++
++	.set_frontend = dvb_hdhomerun_fe_set_frontend,
++	.get_frontend = dvb_hdhomerun_fe_get_frontend,
++
++	.read_status = dvb_hdhomerun_fe_read_status,
++	.read_ber = dvb_hdhomerun_fe_read_ber,
++	.read_signal_strength = dvb_hdhomerun_fe_read_signal_strength,
++	.read_snr = dvb_hdhomerun_fe_read_snr,
++	.read_ucblocks = dvb_hdhomerun_fe_read_ucblocks,
++
++	.tune = dvb_hdhomerun_fe_tune,
++	.get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
++};
++
++/* ATSC */
++static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops;
++
++struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id)
++{
++	struct dvb_hdhomerun_fe_state* state = NULL;
++
++	DEBUG_FUNC(1);
++
++	/* allocate memory for the internal state */
++	state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
++	if (state == NULL) goto error;
++
++	DEBUG_OUT(HDHOMERUN_FE, "Attaching an ATSC HDHomeRun id %d\n", id);	
++	DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
++	state->id = id;
++
++	/* create dvb_frontend */
++	memcpy(&state->frontend.ops, &dvb_hdhomerun_fe_atsc_ops, sizeof(struct dvb_frontend_ops));
++	state->frontend.demodulator_priv = state;
++	return &state->frontend;
++
++error:
++	kfree(state);
++	return NULL;
++}
++
++static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops = {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
++   .delsys = { SYS_ATSC },
++#endif
++	.info = {
++		.name			= "HDHomeRun ATSC",
++		.type			= FE_ATSC,
++		.frequency_stepsize	= 62500,
++		.frequency_min		= 54000000,
++		.frequency_max		= 858000000,
++		.symbol_rate_min	= (57840000/2)/64,     /* SACLK/64 == (XIN/2)/64 */
++		.symbol_rate_max	= (57840000/2)/4,      /* SACLK/4 */
++		.caps = FE_CAN_FEC_AUTO | FE_CAN_INVERSION_AUTO | 
++              FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_128 |
++              FE_CAN_QAM_256 | FE_CAN_QAM_AUTO |
++		        FE_CAN_8VSB | FE_CAN_16VSB
++	},
++
++	.release = dvb_hdhomerun_fe_release,
++
++	.init = dvb_hdhomerun_fe_init,
++	.sleep = dvb_hdhomerun_fe_sleep,
++
++	.set_frontend = dvb_hdhomerun_fe_set_frontend,
++	.get_frontend = dvb_hdhomerun_fe_get_frontend,
++
++	.read_status = dvb_hdhomerun_fe_read_status,
++	.read_ber = dvb_hdhomerun_fe_read_ber,
++	.read_signal_strength = dvb_hdhomerun_fe_read_signal_strength,
++	.read_snr = dvb_hdhomerun_fe_read_snr,
++	.read_ucblocks = dvb_hdhomerun_fe_read_ucblocks,
++
++	.tune = dvb_hdhomerun_fe_tune,
++	.get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
++};
++
++
++EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_dvbc);
++EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_atsc);
++EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_dvbt);
++
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.h
+index e69de29..6e657dc 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_fe.h
+@@ -0,0 +1,49 @@
++/*
++ * dvb_hdhomerun_fe.h, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_FE_H__
++#define __DVB_HDHOMERUN_FE_H__
++
++#include <linux/dvb/frontend.h>
++
++#define CONFIG_DVB_HDHOMERUN_FE 1  // Need to got when/if included in linuxtv.org
++
++#if defined(CONFIG_DVB_HDHOMERUN_FE) && defined(MODULE)
++extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id);
++extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id);
++extern struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id);
++#else
++static inline
++struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id) {
++	printk(KERN_WARNING "%s: driver disabled by Kconfig\n", __func__);
++	return NULL;
++}
++struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id) {
++	printk(KERN_WARNING "%s: driver disabled by Kconfig\n", __func__);
++	return NULL;
++}
++struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id) {
++	printk(KERN_WARNING "%s: driver disabled by Kconfig\n", __func__);
++	return NULL;
++}
++#endif /* CONFIG_DVB_HDHOMERUN_FE */
++
++#endif /* __DVB_HDHOMERUN_FE_H__ */
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.c b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.c
+index e69de29..d02a322 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.c
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.c
+@@ -0,0 +1,458 @@
++/*
++ * dvb_hdhomerun_init.c, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/moduleparam.h>
++#include <linux/init.h>
++
++#include <linux/platform_device.h>
++
++#include "dvb_demux.h"
++#include "dvb_frontend.h"
++#include "dvb_net.h"
++#include "dvbdev.h"
++#include "dmxdev.h"
++
++#include "dvb_hdhomerun_control.h"
++#include "dvb_hdhomerun_core.h"
++#include "dvb_hdhomerun_data.h"
++#include "dvb_hdhomerun_debug.h"
++#include "dvb_hdhomerun_fe.h"
++
++#include "dvb_hdhomerun_init.h"
++
++MODULE_AUTHOR("Villy Thomsen");
++MODULE_DESCRIPTION("HDHomeRun Driver");
++MODULE_LICENSE("GPL");
++MODULE_VERSION(HDHOMERUN_VERSION);
++
++DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
++
++#ifndef __devinit
++#define __devinit
++#define __devinitdata
++#endif
++
++extern int hdhomerun_debug_mask;
++
++struct dvb_hdhomerun {
++	struct platform_device *plat_dev;
++	int instance;
++
++	struct dmx_frontend hw_frontend;
++	struct dmx_frontend mem_frontend;
++	struct dmxdev dmxdev;
++	struct dvb_adapter dvb_adapter;
++	struct dvb_demux demux;
++	struct dvb_frontend *fe;
++
++	struct mutex feedlock;
++
++	struct hdhomerun_register_tuner_data tuner_data;
++};
++
++struct platform_device *platform_device[HDHOMERUN_MAX_TUNERS];
++
++static int hdhomerun_num_of_devices = 0;
++
++/*
++ * Demux setup
++ */
++static int dvb_hdhomerun_start_feed(struct dvb_demux_feed *feed)
++{
++	int ret = 0;
++	struct dvb_demux *demux = feed->demux;
++	struct dvb_hdhomerun *hdhomerun = (struct dvb_hdhomerun *) demux->priv;
++	
++	DEBUG_FUNC(1);
++
++	if (hdhomerun == NULL)
++		return -EINVAL;
++	
++	DEBUG_OUT(HDHOMERUN_STREAM, "hdhomerun%d: Tuner: %s "
++		  "start feed: pid = 0x%x index = %d\n",
++		  hdhomerun->instance, hdhomerun->tuner_data.name, feed->pid, feed->index);
++
++	
++	
++	if (!demux->dmx.frontend)
++		return -EINVAL;
++
++	mutex_lock(&hdhomerun->feedlock);
++	{
++		struct dvbhdhomerun_control_mesg mesg;
++		struct hdhomerun_dvb_demux_feed my_feed = {
++			.pid = feed->pid,
++			.index = feed->index,
++		};
++		mesg.type = DVB_HDHOMERUN_START_FEED;
++		mesg.id = hdhomerun->plat_dev->id;
++		mesg.u.demux_feed = my_feed;
++		ret = hdhomerun_control_post_and_wait(&mesg);
++	}
++	
++	mutex_unlock(&hdhomerun->feedlock);
++	return ret;
++}
++
++static int dvb_hdhomerun_stop_feed(struct dvb_demux_feed *feed)
++{
++	int ret = 0;
++	struct dvb_demux *demux = feed->demux;
++	struct dvb_hdhomerun *hdhomerun = (struct dvb_hdhomerun *) demux->priv;
++
++	DEBUG_FUNC(1);
++
++	if (hdhomerun == NULL)
++		return -EINVAL;
++
++	DEBUG_OUT(HDHOMERUN_STREAM, "hdhomerun%d: "
++		  "Stop feed: pid = 0x%x index = %d\n",
++		  hdhomerun->instance, feed->pid, feed->index);
++	
++	mutex_lock(&hdhomerun->feedlock);
++	{
++		struct dvbhdhomerun_control_mesg mesg;
++		struct hdhomerun_dvb_demux_feed my_feed = {
++			.pid = feed->pid,
++			.index = feed->index,
++		};
++		mesg.type = DVB_HDHOMERUN_STOP_FEED;
++		mesg.id = hdhomerun->plat_dev->id;
++		mesg.u.demux_feed = my_feed;
++		ret = hdhomerun_control_post_and_wait(&mesg);
++	}
++
++
++	mutex_unlock(&hdhomerun->feedlock);
++
++	return ret;
++}
++
++static int __devinit dvb_hdhomerun_register(struct dvb_hdhomerun *hdhomerun)
++{
++	struct dvb_adapter *dvb_adapter;
++	struct dvb_demux *dvbdemux;
++	struct dmx_demux *dmx;
++	int ret;
++   int len;
++
++	DEBUG_FUNC(1);
++
++	ret = dvb_register_adapter(&hdhomerun->dvb_adapter, "HDHomeRun",
++				   THIS_MODULE, &hdhomerun->plat_dev->dev,
++				   adapter_nr);
++	if (ret < 0)
++		goto err_out;
++
++	dvb_adapter = &hdhomerun->dvb_adapter;
++
++	dvbdemux = &hdhomerun->demux;
++
++	dvbdemux->priv = (void *) hdhomerun;
++
++	dvbdemux->filternum = 256;
++	dvbdemux->feednum = 256;
++	dvbdemux->start_feed = dvb_hdhomerun_start_feed;
++	dvbdemux->stop_feed = dvb_hdhomerun_stop_feed;
++	dvbdemux->dmx.capabilities = (DMX_TS_FILTERING | DMX_SECTION_FILTERING | DMX_MEMORY_BASED_FILTERING);
++	ret = dvb_dmx_init(dvbdemux);
++	if (ret < 0)
++		goto err_dvb_unregister_adapter;
++
++	dmx = &dvbdemux->dmx;
++
++	hdhomerun->hw_frontend.source = DMX_FRONTEND_0;
++	hdhomerun->mem_frontend.source = DMX_MEMORY_FE;
++	hdhomerun->dmxdev.filternum = 256;
++	hdhomerun->dmxdev.demux = dmx;
++
++	ret = dvb_dmxdev_init(&hdhomerun->dmxdev, dvb_adapter);
++	if (ret < 0)
++		goto err_dvb_dmx_release;
++
++	ret = dmx->add_frontend(dmx, &hdhomerun->hw_frontend);
++	if (ret < 0)
++		goto err_dvb_dmxdev_release;
++
++	ret = dmx->add_frontend(dmx, &hdhomerun->mem_frontend);
++	if (ret < 0)
++		goto err_remove_hw_frontend;
++
++	ret = dmx->connect_frontend(dmx, &hdhomerun->hw_frontend);
++	if (ret < 0)
++		goto err_remove_mem_frontend;
++
++	if(hdhomerun->tuner_data.type == 1) {
++	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_dvbc, hdhomerun->plat_dev->id);
++	} else if(hdhomerun->tuner_data.type == 2) {
++	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_dvbt, hdhomerun->plat_dev->id);
++	} else if(hdhomerun->tuner_data.type == 3) {
++	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_atsc, hdhomerun->plat_dev->id);
++	} else {
++	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_atsc, hdhomerun->plat_dev->id);
++	}
++
++	ret = (hdhomerun->fe == NULL) ? -1 : 0;
++	if (ret < 0)
++		goto err_disconnect_frontend;
++
++   if(hdhomerun->tuner_data.use_full_name) {
++      len = strlen((const char*)hdhomerun->fe->ops.info.name);
++      hdhomerun->fe->ops.info.name[len] = 32; // Insert space char
++      strncpy( &hdhomerun->fe->ops.info.name[len+1],
++               hdhomerun->tuner_data.name,
++               sizeof(hdhomerun->fe->ops.info.name) - len - 1);
++      hdhomerun->fe->ops.info.name[ sizeof(hdhomerun->fe->ops.info.name) - 1 ] = '\0';
++   }
++
++	ret = dvb_register_frontend(dvb_adapter, hdhomerun->fe);
++	if (ret < 0)
++		goto err_release_frontend;
++
++	printk(KERN_INFO "HDHomeRun%d: DVB Frontend registered\n",
++	       hdhomerun->instance);
++	printk(KERN_INFO "HDHomeRun%d: Registered DVB adapter%d\n",
++	       hdhomerun->instance, hdhomerun->dvb_adapter.num);
++
++	mutex_init(&hdhomerun->feedlock);
++
++	ret = dvb_hdhomerun_data_create_device(dvbdemux, hdhomerun->plat_dev->id);
++
++	return ret;
++
++err_release_frontend:
++	if (hdhomerun->fe->ops.release)
++		hdhomerun->fe->ops.release(hdhomerun->fe);
++err_disconnect_frontend:
++	dmx->disconnect_frontend(dmx);
++err_remove_mem_frontend:
++	dmx->remove_frontend(dmx, &hdhomerun->mem_frontend);
++err_remove_hw_frontend:
++	dmx->remove_frontend(dmx, &hdhomerun->hw_frontend);
++err_dvb_dmxdev_release:
++	dvb_dmxdev_release(&hdhomerun->dmxdev);
++err_dvb_dmx_release:
++	dvb_dmx_release(dvbdemux);
++err_dvb_unregister_adapter:
++	dvbdemux->priv = NULL;
++	dvb_unregister_adapter(dvb_adapter);
++err_out:
++	return ret;
++}
++
++static void dvb_hdhomerun_unregister(struct dvb_hdhomerun *hdhomerun)
++{
++	struct dvb_adapter *dvb_adapter;
++	struct dvb_demux *dvbdemux;
++	struct dmx_demux *dmx;
++	
++	DEBUG_FUNC(1);
++
++	printk(KERN_INFO "HDHomeRun%d: DVB Frontend unregister\n",
++	       hdhomerun->instance);
++	printk(KERN_INFO "HDHomeRun%d: Unregister DVB adapter%d\n",
++	       hdhomerun->instance, hdhomerun->dvb_adapter.num);
++
++	dvb_adapter = &hdhomerun->dvb_adapter;
++	dvbdemux = &hdhomerun->demux;
++	dmx = &dvbdemux->dmx;
++
++	dmx->close(dmx);
++	dmx->remove_frontend(dmx, &hdhomerun->mem_frontend);
++	dmx->remove_frontend(dmx, &hdhomerun->hw_frontend);
++	dvb_dmxdev_release(&hdhomerun->dmxdev);
++	dvb_dmx_release(dvbdemux);
++	dvbdemux->priv = NULL;
++	dvb_unregister_frontend(hdhomerun->fe);
++	dvb_frontend_detach(hdhomerun->fe);
++	dvb_unregister_adapter(dvb_adapter);
++}
++
++
++static int __devinit dvb_hdhomerun_probe(struct platform_device *plat_dev)
++{
++	int ret;
++	struct dvb_hdhomerun *hdhomerun;
++
++	DEBUG_FUNC(1);
++
++	hdhomerun = kzalloc(sizeof(struct dvb_hdhomerun), GFP_KERNEL);
++	if (hdhomerun == NULL) {
++		printk(KERN_ERR
++		       "HDHomeRun: out of memory for adapter %d\n",
++		       plat_dev->id);
++		return -ENOMEM;
++	}
++
++	hdhomerun->plat_dev = plat_dev;
++	hdhomerun->instance = plat_dev->id;
++
++	platform_set_drvdata(plat_dev, hdhomerun);
++
++	/* ret = dvb_hdhomerun_register(hdhomerun); */
++	/* if (ret < 0) { */
++	/* 	platform_set_drvdata(plat_dev, NULL); */
++	/* 	kfree(hdhomerun); */
++	/* } */
++
++	return 0;
++	return ret;
++}
++
++static int dvb_hdhomerun_remove(struct platform_device *plat_dev)
++{
++	struct dvb_hdhomerun *hdhomerun;
++
++	DEBUG_FUNC(1);
++
++	hdhomerun = platform_get_drvdata(plat_dev);
++	if (hdhomerun == NULL)
++		return 0;
++
++	dvb_hdhomerun_unregister(hdhomerun);
++
++	platform_set_drvdata(plat_dev, NULL);
++	kfree(hdhomerun);
++	return 0;
++}
++
++
++int dvb_hdhomerun_register_hdhomerun(struct hdhomerun_register_tuner_data *tuner_data) 
++{
++	int i;
++	int ret;
++	struct dvb_hdhomerun *hdhomerun;
++	struct hdhomerun_register_tuner_data *tmp;
++
++	DEBUG_FUNC(1);
++
++	/* Check if we already have this tuner registered, handles the
++	   case where userhdhomerun has been stopped/started. */
++	if(hdhomerun_num_of_devices > 0) {
++		for(i = 0; i < hdhomerun_num_of_devices; ++i) {
++			hdhomerun = platform_get_drvdata(platform_device[i]);
++			tmp = &hdhomerun->tuner_data;
++			if(strncmp(tuner_data->name, tmp->name, 10) == 0) {
++				/* Already have that tuner */
++				printk("hdhomerun: dvb device for this tuner already exists, ignore request %s\n", tuner_data->name);
++				tuner_data->id = tmp->id;
++				return 0;
++			}
++		}
++	}
++
++	if(hdhomerun_num_of_devices < HDHOMERUN_MAX_TUNERS) {
++		platform_device[hdhomerun_num_of_devices] = platform_device_register_simple("HDHomeRun",
++											    hdhomerun_num_of_devices, NULL, 0);
++		if (IS_ERR(platform_device)) {
++			printk(KERN_ERR "HdhomeRun: could not allocate and register instance %d\n", hdhomerun_num_of_devices);
++			return -ENODEV;
++		}
++		tuner_data->id = platform_device[hdhomerun_num_of_devices]->id;
++
++		hdhomerun = platform_get_drvdata(platform_device[hdhomerun_num_of_devices]);
++		hdhomerun->tuner_data = *tuner_data;
++
++		ret = dvb_hdhomerun_register(hdhomerun);
++		if (ret < 0) {
++			platform_set_drvdata(platform_device[hdhomerun_num_of_devices], NULL);
++			kfree(hdhomerun);
++		}
++
++		hdhomerun_num_of_devices++;
++	}
++	else {
++		return -ENODEV;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(dvb_hdhomerun_register_hdhomerun);
++
++
++/*
++ * Init/Exit
++ */
++
++static struct platform_driver dvb_hdhomerun_platform_driver = {
++	.probe = dvb_hdhomerun_probe,
++	.remove = dvb_hdhomerun_remove,
++	.driver = {
++		.name = "HDHomeRun",
++	},
++};
++
++
++static int __init dvb_hdhomerun_init(void)
++{
++	int ret = 0;
++
++	DEBUG_FUNC(1);
++
++	printk(KERN_INFO
++	       "HDHomeRun: Begin init, version %s\n",
++	       HDHOMERUN_VERSION);
++
++	ret = platform_driver_register(&dvb_hdhomerun_platform_driver);
++	if (ret) {
++		printk(KERN_ERR "HDHomeRun: "
++		       "Error %d from platform_driver_register()\n", ret);
++		goto init_exit;
++	}
++
++	ret = dvb_hdhomerun_control_init();
++
++	printk(KERN_INFO "HDHomeRun: Waiting for userspace to connect\n");
++
++	/* Hmmm, need a bit more error checking in the above */
++
++init_exit:
++	printk(KERN_INFO "HDHomeRun: End init\n");
++	return ret;
++}
++
++static void __exit dvb_hdhomerun_exit(void)
++{
++	int i;
++
++	printk(KERN_INFO "HDHomeRun: Begin exit\n");
++
++	DEBUG_FUNC(1);
++
++	dvb_hdhomerun_control_exit();
++
++	if(hdhomerun_num_of_devices) {
++		for(i = 0; i < hdhomerun_num_of_devices; ++i) {
++			dvb_hdhomerun_data_delete_device(i);
++			platform_device_unregister(platform_device[i]);
++		}
++	}
++
++	dvb_hdhomerun_data_exit();
++
++	platform_driver_unregister(&dvb_hdhomerun_platform_driver);
++	printk(KERN_INFO "HDHomeRun: End exit\n");
++}
++
++module_init(dvb_hdhomerun_init);
++module_exit(dvb_hdhomerun_exit);
+
+diff --git a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.h b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.h
+index e69de29..81a6c41 100644
+--- a/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.h
++++ b/drivers/staging/dvb_hdhomerun/dvb_hdhomerun_init.h
+@@ -0,0 +1,29 @@
++/*
++ * dvb_hdhomerun_init.h, skeleton driver for the HDHomeRun devices
++ *
++ * Copyright (C) 2010 Villy Thomsen <tfylliv@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ *
++ */
++
++#ifndef __DVB_HDHOMERUN_INIT_H__
++#define __DVB_HDHOMERUN_INIT_H__
++
++#include "dvb_hdhomerun_control_messages.h"
++
++extern int dvb_hdhomerun_register_hdhomerun(struct hdhomerun_register_tuner_data *tuner_data);
++
++#endif /* __DVB_HDHOMERUN_INIT_H__ */
