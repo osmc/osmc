@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;
     w.show();
+    w.raise();
     
     return a.exec();
 }
