@@ -1,0 +1,13 @@
+diff --git a/include/linux/printk.h b/include/linux/printk.h
+index fa47e27..f86acdf 100644
+--- a/include/linux/printk.h
++++ b/include/linux/printk.h
+@@ -39,7 +39,7 @@ extern int console_printk[];
+ #define console_loglevel (console_printk[0])
+ #define default_message_loglevel (console_printk[1])
+ #define minimum_console_loglevel (console_printk[2])
+-#define default_console_loglevel (console_printk[3])
++#define default_console_loglevel (console_printk[2])
+ 
+ static inline void console_silent(void)
+ {
