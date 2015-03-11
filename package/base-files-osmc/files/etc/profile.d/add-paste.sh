@@ -9,3 +9,4 @@ else
 	rm -f $tmp
 fi
 }
+export -f paste-log
