@@ -53,8 +53,16 @@
 		<value condition="Window.IsVisible(videolibrary)">$LOCALIZE[3]</value>
 		<value condition="Window.IsVisible(pictures)">$LOCALIZE[1]</value>
 		<value condition="Window.IsVisible(programs)">$LOCALIZE[0]</value>
-		<value condition="[Window.IsVisible(settings) | Window.IsVisible(SettingsCategory.xml) | Window.IsVisible(skinsettings) | Window.IsVisible(systeminfo) | Window.IsVisible(addonbrowser) | Window.IsVisible(profiles) | Window.IsVisible(filemanager)]">$LOCALIZE[5]</value>
+		<value condition="Window.IsVisible(systeminfo)">$LOCALIZE[130]</value>
+		<value condition="Window.IsVisible(addonbrowser)">$LOCALIZE[10040]</value>
+		<value condition="[Window.IsVisible(settings) | Window.IsVisible(SettingsCategory.xml) | Window.IsVisible(skinsettings) | Window.IsVisible(profiles) | Window.IsVisible(filemanager)]">$LOCALIZE[5]</value>
 		<value condition="Window.IsVisible(weather)">$LOCALIZE[8]</value>
+	</variable>
+
+	<variable name="ListItemOverlay">
+		<value condition="SubString(ListItem.Path,videodb://movies/sets/)">views/overlay_movieset.png</value>
+		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/overlay_inprogress.png</value>
+		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/overlay_watched.png</value>
 	</variable>
 
 	<variable name="PVRChannelIcon">
@@ -80,9 +88,49 @@
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),Playlist) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(Hide_Widget_Headings)">$INFO[Container(9002).ListItem.Label]</value>
 	</variable>
 
+	<variable name="SystemInfoButton94">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(94)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SystemInfoButton95">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(95)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SystemInfoButton96">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(96)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SystemInfoButton97">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(97)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SystemInfoButton98">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(98)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SystemInfoButton99">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(99)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SettingProfileButton4">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(4)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
+	<variable name="SettingProfileButton5">
+		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(5)">99ffffff</value>
+		<value>ColorNF</value>
+	</variable>
+
 	<variable name="SubMenuColor">
-		<value condition="!Control.HasFocus(9002)">TextColor2</value>
-		<value>TextColor1</value>
+		<value condition="!Control.HasFocus(9002)">ColorNF</value>
+		<value>ColorFO</value>
 	</variable>
 
 	<variable name="Plot">
@@ -187,11 +235,6 @@
 		<value>$INFO[Player.Title]</value>
 	</variable>
 
-	<variable name="StatusOverlay">
-		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/OverlayResumable.png</value>
-		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatched.png</value>
-	</variable>
-
 	<variable name="StatusOverlayWide">
 		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/OverlayResumableWide.png</value>
 		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatchedWide.png</value>
@@ -216,29 +259,10 @@
 		<value condition="Player.Rewinding32x">[B]x32[/B]</value>
 	</variable>
 
-	<variable name="SettingButtonFade">
-		<value condition="ControlGroup(5).HasFocus">TextColor3</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="MoreButtonFade">
-		<value condition="ControlGroup(8000).HasFocus">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SkinSettingButton10">
-		<value condition="ControlGroup(9).HasFocus(10)">DialogColor1</value>
-		<value>DialogColor2</value>
-	</variable>
-
-	<variable name="SkinSettingButton11">
-		<value condition="ControlGroup(9).HasFocus(11)">DialogColor1</value>
-		<value>DialogColor2</value>
-	</variable>
-
-	<variable name="SkinSettingButton12">
-		<value condition="ControlGroup(9).HasFocus(12)">DialogColor1</value>
-		<value>DialogColor2</value>
+	<variable name="SettingsMainButtonFade">
+		<value condition="Control.HasFocus(20)">ColorNF</value>
+		<value condition="ControlGroup(5).HasFocus">99ffffff</value>
+		<value>ColorFO</value>
 	</variable>
 
 	<variable name="Label1">
@@ -350,36 +374,6 @@
 		<value condition="Window.IsVisible(pvr) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19019]</value>
 		<value condition="!IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31000]</value>
 		<value condition="IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31001]</value>
-	</variable>
-
-	<variable name="SystemInfoButton94">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(94)">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SystemInfoButton95">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(95)">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SystemInfoButton96">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(96)">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SystemInfoButton97">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(97)">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SystemInfoButton98">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(98)">TextColor1</value>
-		<value>TextColor2</value>
-	</variable>
-
-	<variable name="SystemInfoButton99">
-		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(99)">TextColor1</value>
-		<value>TextColor2</value>
 	</variable>
 
 </includes>

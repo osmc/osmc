@@ -41,8 +41,8 @@
 				<top>216</top>
 				<width>463</width>
 				<height>708</height>
-				<onup>noop</onup>
-				<ondown>noop</ondown>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
 				<onleft>noop</onleft>
 				<onright condition="!IsEmpty(Container(9000).ListItem.Property(Widget))">9100</onright>
 				<onright condition="IsEmpty(Container(9000).ListItem.Property(Widget))">9001</onright>
@@ -623,7 +623,7 @@
 						<left>702</left>
 						<top>816</top>
 						<width>640</width>
-						<height>708</height>
+						<height>688</height>
 						<onup>9100</onup>
 						<ondown>noop</ondown>
 						<onleft>PageUp</onleft>
@@ -632,10 +632,10 @@
 						<orientation>vertical</orientation>
 						<scrolltime tween="sine" easing="out">300</scrolltime>
 
-						<itemlayout width="640" height="81">
+						<itemlayout width="640" height="86">
 							<control type="label">
 								<width>640</width>
-								<height>81</height>
+								<height>86</height>
 								<font>Font40</font>
 								<textcolor>ColorNF</textcolor>
 								<label>$INFO[ListItem.Label]</label>
@@ -644,10 +644,10 @@
 							</control>
 						</itemlayout>
 
-						<focusedlayout width="640" height="81">
+						<focusedlayout width="640" height="86">
 							<control type="label">
 								<width>640</width>
-								<height>81</height>
+								<height>86</height>
 								<font>Font40</font>
 								<textcolor>ColorNF</textcolor>
 								<label>$INFO[ListItem.Label]</label>
@@ -655,7 +655,7 @@
 							</control>
 							<control type="label">
 								<width>640</width>
-								<height>81</height>
+								<height>87</height>
 								<font>Font40</font>
 								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label]</label>
@@ -672,12 +672,12 @@
 					<!-- Next item (focused) -->
 					<control type="image">
 						<left>702</left>
-						<top>926</top>
+						<top>1518</top>
 						<width>40</width>
 						<height>4</height>
 						<texture>common/white.png</texture>
 						<colordiffuse>ColorNF</colordiffuse>
-						<visible>Control.HasFocus(9001) + Container(9001).HasNext</visible>
+						<visible>IsEmpty(Container(9000).ListItem.Property(Widget)) + Container(9001).HasNext</visible>
 					</control>
 
 					<!-- Next item (not focused) -->
@@ -688,7 +688,7 @@
 						<height>4</height>
 						<texture>common/white.png</texture>
 						<colordiffuse>ColorNF</colordiffuse>
-						<visible>!Control.HasFocus(9001) + !IsEmpty(Container(9001).ListItem(1).Label) + !IsEmpty(Container(9000).ListItem.Property(Widget))</visible>
+						<visible>!Control.HasFocus(9001) + !IsEmpty(Container(9000).ListItem.Property(Widget)) + !IsEmpty(Container(9001).ListItemNoWrap(2).Label)</visible>
 					</control>
 
 				</control>
@@ -708,9 +708,9 @@
 				<width>1920</width>
 				<height>30</height>
 				<font>OLD_Font30</font>
-				<textcolor>TextColor2</textcolor>
-				<headlinecolor>TextColor2</headlinecolor>
-				<titlecolor>TextColor2</titlecolor>
+				<textcolor>ColorNF</textcolor>
+				<headlinecolor>ColorNF</headlinecolor>
+				<titlecolor>ColorNF</titlecolor>
 				<urlset>1</urlset>
 			</control-->
 

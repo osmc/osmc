@@ -53,18 +53,35 @@
 
 				<!-- Heading -->
 				<control type="label">
-					<left>702</left>
+					<left>738</left>
 					<top>166</top>
-					<width>1118</width>
+					<width>1082</width>
 					<height>200</height>
 					<font>Font40</font>
 					<textcolor>ColorFO</textcolor>
 					<label>$VAR[Heading]</label>
 				</control>
 
+				<!-- Scrollbar -->
+				<control type="scrollbar" id="60">
+					<left>656</left>
+					<top>358</top>
+					<width>4</width>
+					<height>532</height>
+					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
+					<onright>50</onright>
+					<showonepage>false</showonepage>
+					<orientation>vertical</orientation>
+					<texturesliderbackground>-</texturesliderbackground>
+					<texturesliderbar colordiffuse="ColorNF">common/white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="ColorFO">common/white.png</texturesliderbarfocus>
+					<textureslidernib>-</textureslidernib>
+					<textureslidernibfocus>-</textureslidernibfocus>
+				</control>
+
 				<!-- Previous item -->
 				<control type="image">
-					<left>702</left>
+					<left>738</left>
 					<top>332</top>
 					<width>40</width>
 					<height>4</height>
@@ -75,22 +92,31 @@
 
 				<!-- Sub menu list -->
 				<control type="fixedlist" id="50">
-					<left>702</left>
+					<left>690</left>
 					<top>358</top>
-					<width>1118</width>
+					<width>1130</width>
 					<height>532</height>
 					<onup>50</onup>
 					<ondown>50</ondown>
-					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
+					<onleft>60</onleft>
 					<onright>noop</onright>
+					<pagecontrol>60</pagecontrol>
 					<focusposition>0</focusposition>
 					<orientation>vertical</orientation>
 					<viewtype label="535">list</viewtype>
 					<scrolltime tween="sine" easing="out">300</scrolltime>
 
-					<itemlayout width="1118" height="82">
+					<itemlayout width="1130" height="82">
+						<control type="image">
+							<top>27</top>
+							<width>24</width>
+							<height>30</height>
+							<colordiffuse>ColorNF</colordiffuse>
+							<texture>$VAR[ListItemOverlay]</texture>
+						</control>
 						<control type="label">
-							<width>1118</width>
+							<left>48</left>
+							<width>1082</width>
 							<height>82</height>
 							<font>Font40</font>
 							<textcolor>ColorNF</textcolor>
@@ -98,10 +124,17 @@
 						</control>
 					</itemlayout>
 
-					<focusedlayout width="1118" height="118">
+					<focusedlayout width="1130" height="118">
+						<control type="image">
+							<top>42</top>
+							<width>24</width>
+							<height>30</height>
+							<texture>$VAR[ListItemOverlay]</texture>
+						</control>
 						<control type="label">
+							<left>48</left>
 							<top>40</top>
-							<width>1118</width>
+							<width>1082</width>
 							<height>40</height>
 							<font>Font40</font>
 							<textcolor>ColorFO</textcolor>
@@ -109,8 +142,9 @@
 							<animation effect="slide" end="0,-19" condition="!IsEmpty(ListItem.Label2)">Conditional</animation>
 						</control>
 						<control type="label">
+							<left>48</left>
 							<top>66</top>
-							<width>1118</width>
+							<width>1082</width>
 							<height>30</height>
 							<font>Font30</font>
 							<textcolor>ColorFO</textcolor>
@@ -123,7 +157,7 @@
 
 				<!-- Next item -->
 				<control type="image">
-					<left>702</left>
+					<left>738</left>
 					<top>926</top>
 					<width>40</width>
 					<height>4</height>
