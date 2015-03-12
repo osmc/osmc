@@ -145,7 +145,11 @@ then
 		--disable-projectm
 	# Raspberry Pi Configuration
 	if [ "$1" == "rbp1" ]; then PIDEV="raspberry-pi"; fi
-	if [ "$1" == "rbp2" ]; then PIDEV="raspberry-pi2"; fi
+	if [ "$1" == "rbp2" ]
+	then
+		PIDEV="raspberry-pi2"
+		CFLAGS="-mcpu=cortex-a7 -mfpu=neon-vfpv4"
+	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
 	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
@@ -172,9 +176,12 @@ then
 		--with-platform=raspberry-pi2 \
 		--enable-optimizations \
 		--enable-libcec \
-		--enable-player=omxplayer
+		--enable-player=omxplayer \
+		--build=arm-linux
 	fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
+	# Hack:
+	sed -i Makefile.include -e s/-O2//g
 	umount /proc/ > /dev/null 2>&1
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
