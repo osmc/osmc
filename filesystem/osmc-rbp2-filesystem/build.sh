@@ -74,6 +74,9 @@ chroot ${DIR} apt-get -y install --no-install-recommends rbp-userland-osmc
 verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends rbp2-device-osmc
 verify_action
+# We have SSH separate so we can remove it later via App Store
+chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
+verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
 setup_osmc_user ${DIR}
