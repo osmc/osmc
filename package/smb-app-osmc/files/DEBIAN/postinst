@@ -22,8 +22,8 @@ if [ "$1" = "configure" ]; then
 	then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
 		(echo osmc; echo osmc) | smbpasswd -a osmc
-		systemctl disable smbd.service nmbd.service
-		systemctl stop smbd.service nmbd.service
+		systemctl disable smbd.service nmbd.service samba-ad-dc.service
+		systemctl stop smbd.service nmbd.service samba-ad-dc.service
 		systemctl enable samba.service
 	fi
 	if systemctl is-enabled samba.service >/dev/null; then systemctl start samba.service; fi
