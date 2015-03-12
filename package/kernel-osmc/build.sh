@@ -11,7 +11,7 @@ then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz"
 fi
-if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/samnazarko/vero-linux"; fi
+if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/samnazarko/vero-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
