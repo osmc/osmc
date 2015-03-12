@@ -5,6 +5,8 @@
 
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
+ECDSA_KEY="/etc/ssh/ssh_host_ecdsa_key"
+ED25519_KEY="/etc/ssh/ssh_host_ed25519_key"
 PRESEED_FILE="/boot/preseed.cfg"
 touch /tmp/NO_UPDATE
 chown osmc:osmc /tmp/NO_UPDATE
@@ -19,5 +21,7 @@ then
 fi
 ssh-keygen -f $DSA_KEY -N '' -t dsa &
 ssh-keygen -f $RSA_KEY -N '' -t rsa &
+ssh-keygen -f $ECDSA_KEY -N '' -t ecdsa &
+ssh-keygen -f $ED25519_KEY -N '' -t ed25519 &
 wait
 systemctl disable ftr.service
