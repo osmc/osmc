@@ -2,434 +2,198 @@
 <window>
 	<!-- settingscategory -->
 	<backgroundcolor>0xff2e4655</backgroundcolor>
-	<onload condition="IsEmpty(Window(settings).Property(ChangeSettingsLevel))">SetFocus(3)</onload>
-	<onload condition="!IsEmpty(Window(settings).Property(ChangeSettingsLevel))">SetFocus(20)</onload>
-	<onload condition="Window.Previous(skinsettings)">Right</onload>
-
+	<defaultcontrol always="true">3</defaultcontrol>
 
 	<controls>
 
 		<!-- Background -->
 		<include>WindowBackgroundImage</include>
 
-		<!-- Curve -->
-		<control type="image">
-			<right>20</right>
-			<top>20</top>
-			<width>1520</width>
-			<height>1040</height>
-			<texture border="40,0,0,0">common/Curve.png</texture>
-			<visible>Skin.HasSetting(ShowCurve)</visible>
+		<!-- Main controls -->
+		<control type="group">
+			<include>WindowFadeAnimation</include>
+
+			<!-- Previous item -->
+			<control type="image">
+				<left>180</left>
+				<top>210</top>
+				<width>40</width>
+				<height>4</height>
+				<texture>common/white.png</texture>
+				<colordiffuse>ColorNF</colordiffuse>
+				<visible>Container(3).HasPrevious</visible>
+			</control>
+
+			<!-- Default group -->
+			<control type="grouplist" id="3">
+				<left>180</left>
+				<top>216</top>
+				<width>464</width>
+				<height>590</height>
+				<onup>3</onup>
+				<ondown>20</ondown>
+				<onleft>noop</onleft>
+				<onright>5</onright>
+				<itemgap>0</itemgap>
+				<orientation>vertical</orientation>
+			</control>
+
+			<!-- Default group button -->
+			<control type="button" id="10">
+				<width>464</width>
+				<height>118</height>
+				<font>Font60</font>
+				<onclick>SetFocus(5)</onclick>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>$VAR[SettingsMainButtonFade]</focusedcolor>
+				<invalidcolor>TextColor4</invalidcolor>
+				<disabledcolor>TextColor4</disabledcolor>
+			</control>
+
+			<!-- Next item -->
+			<control type="image">
+				<left>180</left>
+				<top>809</top>
+				<width>40</width>
+				<height>4</height>
+				<texture>common/white.png</texture>
+				<colordiffuse>ColorNF</colordiffuse>
+			</control>
+
+			<!-- Settings level button -->
+			<control type="button" id="20">
+				<left>180</left>
+				<top>806</top>
+				<width>464</width>
+				<height>118</height>
+				<font>Font60</font>
+				<label>10037</label>
+				<onleft>noop</onleft>
+				<onright>noop</onright>
+				<onup>3</onup>
+				<ondown>noop</ondown>
+				<onclick>SettingsLevelChange</onclick>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>ColorFO</focusedcolor>
+			</control>
+
+			<!-- Previous item -->
+			<control type="image">
+				<left>708</left>
+				<top>210</top>
+				<width>40</width>
+				<height>4</height>
+				<texture>common/white.png</texture>
+				<colordiffuse>ColorNF</colordiffuse>
+				<visible>Container(5).HasPrevious</visible>
+			</control>
+
+			<!-- Sub list -->
+			<control type="grouplist" id="5">
+				<left>702</left>
+				<top>224</top>
+				<width>1038</width>
+				<height>602</height>
+				<onup>5</onup>
+				<ondown>5</ondown>
+				<onleft>3</onleft>
+				<onright>noop</onright>
+				<itemgap>0</itemgap>
+				<orientation>vertical</orientation>
+			</control>
+
+			<!-- Next item -->
+			<control type="image">
+				<left>708</left>
+				<top>840</top>
+				<width>40</width>
+				<height>4</height>
+				<texture>common/white.png</texture>
+				<colordiffuse>ColorNF</colordiffuse>
+				<visible>Container(5).HasNext</visible>
+			</control>
+
+			<!-- Default button -->
+			<control type="button" id="7">
+				<width>1038</width>
+				<height>86</height>
+				<font>Font40</font>
+				<textwidth>900</textwidth>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>ColorFO</focusedcolor>
+				<invalidcolor>TextColor4</invalidcolor>
+				<disabledcolor>TextColor4</disabledcolor>
+			</control>
+
+			<!-- Default radiobutton -->
+			<control type="radiobutton" id="8">
+				<width>1038</width>
+				<height>86</height>
+				<font>Font40</font>
+				<textwidth>900</textwidth>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>ColorFO</focusedcolor>
+				<disabledcolor>TextColor4</disabledcolor>
+			</control>
+
+			<!-- Default spincontrolex -->
+			<control type="spincontrolex" id="9">
+				<width>1038</width>
+				<height>86</height>
+				<font>Font40</font>
+				<textwidth>900</textwidth>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>ColorFO</focusedcolor>
+				<disabledcolor>TextColor4</disabledcolor>
+			</control>
+
+			<!-- Default sliderex -->
+			<control type="sliderex" id="13">
+				<width>1038</width>
+				<height>86</height>
+				<font>Font40</font>
+				<textwidth>900</textwidth>
+				<textcolor>ColorNF</textcolor>
+				<focusedcolor>ColorFO</focusedcolor>
+				<disabledcolor>TextColor4</disabledcolor>
+			</control>
+
+			<!-- Default image -->
+			<control type="image" id="11">
+				<width>1038</width>
+				<height>1</height>
+				<colordiffuse>ColorNF</colordiffuse>
+				<texture border="2">common/white.png</texture>
+			</control>
+
+			<!-- Settings description -->
+			<control type="textbox" id="6">
+				<left>702</left>
+				<top>868</top>
+				<width>1038</width>
+				<height>118</height>
+				<font>Font30</font>
+				<textcolor>ColorFO</textcolor>
+				<visible>!Control.HasFocus(20)</visible>
+			</control>
+			<control type="textbox">
+				<left>702</left>
+				<top>868</top>
+				<width>1038</width>
+				<height>118</height>
+				<font>Font30</font>
+				<label>10047</label>
+				<textcolor>ColorFO</textcolor>
+				<visible>Control.HasFocus(20)</visible>
+			</control>
+
 		</control>
 
-		<!-- Curve -->
-		<control type="image">
-			<right>20</right>
-			<top>20</top>
-			<width>1172</width>
-			<height>1040</height>
-			<texture border="40,0,0,0">common/Curve.png</texture>
-			<visible>Skin.HasSetting(ShowCurve)</visible>
-			<animation effect="fade" start="100" end="0" time="0" condition="!ControlGroup(5).HasFocus + IsEmpty(Window(settings).Property(ChangeSettingsLevel))">Conditional</animation>
-		</control>
+		<!-- Logo -->
+		<include>Logo</include>
 
 		<!-- Time -->
 		<include>Time</include>
-
-		<!-- Dummy list -->
-		<control type="grouplist" id="9000">
-			<left>120</left>
-			<top>240</top>
-			<width>300</width>
-			<height>870</height>
-			<itemgap>34</itemgap>
-			<orientation>vertical</orientation>
-
-			<!-- Appearance -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>480</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(appearancesettings) + IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>480</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(appearancesettings) | !IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-			</control>
-			<!-- Videos -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>3</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(videossettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>3</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(videossettings)</visible>
-			</control>
-			<!-- Music -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>2</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(musicsettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>2</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(musicsettings)</visible>
-			</control>
-			<!-- Pictures -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>1</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(picturessettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>1</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(picturessettings)</visible>
-			</control>
-			<!-- Weather -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>8</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(weathersettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>8</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(weathersettings)</visible>
-			</control>
-			<!-- System -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>13000</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(systemsettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>13000</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(systemsettings)</visible>
-			</control>
-			<!-- Service -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>14036</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(servicesettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>14036</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(servicesettings)</visible>
-			</control>
-			<!-- PVR -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>31015</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(pvrsettings)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>31015</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(pvrsettings)</visible>
-			</control>
-			<!-- System info -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>130</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>Window.IsActive(systeminfo)</visible>
-			</control>
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>130</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>!Window.IsActive(systeminfo)</visible>
-			</control>
-			<!-- More -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>22082</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
-				<visible>IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-			</control>
-			<!-- More -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>22082</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor1</textcolor>
-				<visible>!IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-			</control>
-
-		</control>
-
-		<!-- Main list -->
-		<control type="grouplist" id="3">
-			<left>480</left>
-			<top>244</top>
-			<width>1680</width>
-			<height>726</height>
-			<itemgap>34</itemgap>
-			<onleft>ActivateWindow(settings)</onleft>
-			<onright>5</onright>
-			<onup>noop</onup>
-			<ondown>noop</ondown>
-			<orientation>vertical</orientation>
-			<visible>IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-		</control>
-
-		<!-- Dummy main list -->
-		<control type="grouplist">
-			<left>480</left>
-			<top>244</top>
-			<width>300</width>
-			<height>726</height>
-			<itemgap>34</itemgap>
-			<orientation>vertical</orientation>
-			<visible>!IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-
-			<!-- Addons -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>24001</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
-			</control>
-			<!-- Profiles -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>13200</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
-			</control>
-			<!-- File manager -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>7</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
-			</control>
-			<!-- Settings level -->
-			<control type="button">
-				<width>300</width>
-				<height>42</height>
-				<label>31016</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor1</textcolor>
-			</control>
-
-		</control>
-
-		<!-- Main list indicator -->
-		<control type="image">
-			<left>442</left>
-			<top>248</top>
-			<width>20</width>
-			<height>60</height>
-			<colordiffuse>OverlayColorFO</colordiffuse>
-			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
-			<animation effect="fade" start="100" end="50" time="0" condition="ControlGroup(5).HasFocus | !IsEmpty(Window(settings).Property(ChangeSettingsLevel))">Conditional</animation>
-		</control>
-
-		<!-- Sub list -->
-		<control type="grouplist" id="5">
-			<left>830</left>
-			<top>244</top>
-			<width>970</width>
-			<height>574</height>
-			<itemgap>34</itemgap>
-			<onleft>3</onleft>
-			<onright>998</onright>
-			<onup>noop</onup>
-			<ondown>noop</ondown>
-			<orientation>vertical</orientation>
-			<animation effect="fade" start="100" end="0" time="0" condition="!ControlGroup(5).HasFocus">Conditional</animation>
-		</control>
-
-		<!-- Settings level button -->
-		<control type="button" id="20">
-			<left>830</left>
-			<top>244</top>
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<label>10037</label>
-			<onleft>ReplaceWindow(settings)</onleft>
-			<onright>noop</onright>
-			<onup>noop</onup>
-			<ondown>noop</ondown>
-			<onclick>SettingsLevelChange</onclick>
-			<textcolor>TextColor2</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<invalidcolor>TextColor4</invalidcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-			<visible allowhiddenfocus="true">!IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-		</control>
-
-		<!-- Settings level button arrow -->
-		<control type="image">
-			<left>1764</left>
-			<top>232</top>
-			<width>35</width>
-			<height>66</height>
-			<texture>common/ArrowDownFO.png</texture>
-			<visible>!IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-		</control>
-
-		<!-- Sub list indicator -->
-		<control type="image">
-			<left>792</left>
-			<top>248</top>
-			<width>20</width>
-			<height>60</height>
-			<colordiffuse>OverlayColorFO</colordiffuse>
-			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
-			<animation effect="fade" start="100" end="0" time="0" condition="!ControlGroup(5).HasFocus + IsEmpty(Window(settings).Property(ChangeSettingsLevel))">Conditional</animation>
-		</control>
-
-		<!-- Settings description -->
-		<control type="textbox" id="6">
-			<left>830</left>
-			<top>856</top>
-			<width>970</width>
-			<height>118</height>
-			<textcolor>TextColor1</textcolor>
-			<shadowcolor>TextColor4</shadowcolor>
-			<visible>ControlGroup(5).HasFocus</visible>
-		</control>
-		<control type="textbox">
-			<left>830</left>
-			<top>856</top>
-			<width>970</width>
-			<height>118</height>
-			<label>10047</label>
-			<textcolor>TextColor1</textcolor>
-			<shadowcolor>TextColor4</shadowcolor>
-			<visible>!IsEmpty(Window(settings).Property(ChangeSettingsLevel))</visible>
-		</control>
-
-		<!-- Default group button -->
-		<control type="button" id="10">
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<onclick>SetFocus(5)</onclick>
-			<textcolor>$VAR[SettingButtonFade]</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<invalidcolor>TextColor4</invalidcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-		</control>
-
-		<!-- Default button -->
-		<control type="button" id="7">
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<textwidth>900</textwidth>
-			<textcolor>TextColor2</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<invalidcolor>TextColor4</invalidcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-		</control>
-
-		<!-- Default radiobutton -->
-		<control type="radiobutton" id="8">
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<textwidth>900</textwidth>
-			<textcolor>TextColor2</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-		</control>
-
-		<!-- Default spincontrolex -->
-		<control type="spincontrolex" id="9">
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<textwidth>900</textwidth>
-			<textcolor>TextColor2</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-		</control>
-
-		<!-- Default sliderex -->
-		<control type="sliderex" id="13">
-			<width>970</width>
-			<height>42</height>
-			<font>OLD_Font33</font>
-			<textwidth>900</textwidth>
-			<textcolor>TextColor2</textcolor>
-			<focusedcolor>TextColor1</focusedcolor>
-			<disabledcolor>TextColor4</disabledcolor>
-		</control>
-
-		<!-- Default image -->
-		<control type="image" id="11">
-			<width>970</width>
-			<height>-42</height>
-			<texture border="2">common/Divider.png</texture>
-		</control>
 
 	</controls>
 
