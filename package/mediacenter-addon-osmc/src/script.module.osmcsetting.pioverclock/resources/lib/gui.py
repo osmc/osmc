@@ -80,7 +80,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 				101  :  lang(32088) % self.normal_profile,
 				102  :  lang(32089) % self.medium_profile,
 				104  :  lang(32091) % self.custom_profile,
-				103  :  lang(32092),
+				402  :  lang(32092),
 				502  :  lang(32093),
 				602  :  lang(32094),
 				702  :  lang(32095),
@@ -120,14 +120,22 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def onInit(self):
 
 		if self.model == 'Pi2':
+			# the number of cores is counted, more than 1 is Pi2
 			hbutton = self.getControl(103)
 			hbutton.setEnabled(False)
 			hbutton.setVisible(False)
+
+			hgroup = self.getControl(3)
+			hgroup.setEnabled(False)
+			hgroup.setVisible(False)
+
 			mbutton = self.getControl(102)
 			mbutton.setLabel('Turbo')
+
 			cbutton = self.getControl(104)
-			mbutton.controlUp(cbutton)
-			cbutton.controlDown(mbutton)
+
+			mbutton.controlUp(self.getControl(101))
+			cbutton.controlDown(cbutton)
 
 		# apply the users current settings (custom)
 		self.apply_profile(104)
@@ -147,7 +155,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def slider_change(self, control, up = False):
 		''' Executes the change in slider value '''
 
-		cid = control+1 if up else control+2
+		cid = control - 2 if up else control - 1
 		ctl = self.getControl(cid)
 		lbl = ctl.getLabel()
 		lst = self.variable_lists[cid]
@@ -201,13 +209,18 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		match = False
 
 		for i, profile in enumerate(self.overclock_profiles):
-			if i == 3: break
-			ctl = self.getControl(1000 + (i * 10))
+			
+			if i == 3: break 	# i == 3 means the custom profile
+
+			ctl = self.getControl(1000 + ((i + 1) * 10))
+
 			if profile == compare:
 				ctl.setVisible(True)
 				match = True
 				if focus:
-					self.setFocusId(100 + i)
+					self.setFocusId(100 + i + 1)
+					self.set_description(100 + i + 1)
+
 			else:
 				ctl.setVisible(False)
 
@@ -217,6 +230,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1040).setVisible(True)
 			if focus: 
 				self.setFocusId(104)
+				self.set_description(104)
 
 
 		# warning
@@ -264,6 +278,11 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			self.close() 
 
 		else:
+
+			self.set_description(focused_control)
+
+
+	def set_description(self, focused_control):
 
 			desc = 	self.descriptions.get(focused_control, 
 					self.descriptions.get(focused_control - 1, 

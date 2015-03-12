@@ -29,7 +29,7 @@
         </control>
         <!-- Preset Menu List -->
         <control id="1000" type="grouplist">
-            <left>120</left>
+            <left>95</left>
             <top>260</top>
             <width>300</width>
             <height>870</height>
@@ -40,14 +40,17 @@
             <orientation>vertical</orientation>
             <!-- Normal -->
             <control id="1" type="group">
+                <width>300</width>
+                <height>42</height>
                 <control description="profile indicator" id="1010" type="image">
-                    <width>300</width>
-                    <height>42</height>
+                    <width>320</width>
+                    <height>60</height>
                     <texture>TextShade.png</texture>
                 </control>
                 <control id="101" type="button">
+                    <left>30</left>
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
                     <label>Normal</label>
                     <font>osmc_addon_OLD_Font42</font>
                     <textcolor>66ffffff</textcolor>
@@ -64,14 +67,17 @@
             </control>
             <!-- Medium -->
             <control id="2" type="group">
+                <width>320</width>
+                <height>60</height>
                 <control description="profile indicator" id="1020" type="image">
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
                     <texture>TextShade.png</texture>
                 </control>
                 <control id="102" type="button">
+                    <left>30</left>
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
                     <label>Medium</label>
                     <font>osmc_addon_OLD_Font42</font>
                     <textcolor>66ffffff</textcolor>
@@ -88,14 +94,17 @@
             </control>
             <!-- High -->
             <control id="3" type="group">
+                <width>320</width>
+                <height>60</height>
                 <control description="profile indicator" id="1030" type="image">
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
                     <texture>TextShade.png</texture>
                 </control>
                 <control id="103" type="button">
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
+                    <left>30</left>
                     <label>High</label>
                     <font>osmc_addon_OLD_Font42</font>
                     <textcolor>66ffffff</textcolor>
@@ -112,14 +121,17 @@
             </control>
             <!-- Custom -->
             <control id="4" type="group">
+                <width>320</width>
+                <height>60</height>
                 <control description="profile indicator" id="1040" type="image">
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
                     <texture>TextShade.png</texture>
                 </control>
                 <control id="104" type="button">
                     <width>300</width>
-                    <height>42</height>
+                    <height>60</height>
+                    <left>30</left>
                     <label>Custom</label>
                     <font>osmc_addon_OLD_Font42</font>
                     <textcolor>66ffffff</textcolor>
@@ -136,21 +148,22 @@
             </control>
         </control>
         <!-- ## Main Controls ## -->
-        <control id="5000" type="group">
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
+        <control id="5000" type="grouplist">
+            <left>540</left>
+            <top>280</top>
+            <width>850</width>
             <height>726</height>
             <onright>1000</onright>
             <onleft>1000</onleft>
             <itemgap>34</itemgap>
+            <orientation>vertical</orientation>
             <!-- ######### -->
             <!-- arm frequency -->
             <!-- ######### -->
-            <control id="400" type="group" description="arm_">
+            <control description="arm_" id="400" type="group">
                 <left>0</left>
                 <top>0</top>
-                <width>970</width>
+                <width>770</width>
                 <height>42</height>
                 <!-- item label -->
                 <control description="arm_label" id="401" type="label">
@@ -161,7 +174,7 @@
                     <textcolor>66ffffff</textcolor>
                     <left>0</left>
                     <top>0</top>
-                    <width>770</width>
+                    <width>500</width>
                     <height>42</height>
                 </control>
                 <!-- item value -->
@@ -173,20 +186,20 @@
                     <textcolor>66ffffff</textcolor>
                     <right>75</right>
                     <top>0</top>
-                    <width>770</width>
+                    <width>500</width>
                     <height>42</height>
                 </control>
                 <!-- item label FOCUSSED -->
                 <control description="arm_label_focussed" type="label">
                     <visible>Control.HasFocus(403)|Control.HasFocus(404)</visible>
                     <font>osmc_addon_OLD_Font33</font>
-                    <label>arm_freq</label>
+                    <label>$INFO[Control.GetLabel(401)]</label>
                     <align>left</align>
                     <aligny>center</aligny>
                     <textcolor>ffffffff</textcolor>
                     <left>0</left>
                     <top>0</top>
-                    <width>770</width>
+                    <width>500</width>
                     <height>42</height>
                 </control>
                 <!-- item value FOCUSSED -->
@@ -195,11 +208,11 @@
                     <font>osmc_addon_OLD_Font33</font>
                     <align>center</align>
                     <aligny>center</aligny>
-                    <label>placeholder</label>
+                    <label>$INFO[Control.GetLabel(402)]</label>
                     <textcolor>ffffffff</textcolor>
                     <right>75</right>
                     <top>0</top>
-                    <width>770</width>
+                    <width>500</width>
                     <height>42</height>
                 </control>
                 <!-- down control -->
@@ -220,7 +233,432 @@
                     <onup>noop</onup>
                     <ondown>504</ondown>
                     <onleft>403</onleft>
-                    <onright>noop</onright>
+                    <onright>2001</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- ######### -->
+            <!-- sdram frequency -->
+            <!-- ######### -->
+            <control description="sdram_" id="500" type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>770</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="sdram_label" id="501" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>sdram_freq</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="sdram_value" id="502" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="sdram_label_focussed" type="label">
+                    <visible>Control.HasFocus(503)|Control.HasFocus(504)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>$INFO[Control.GetLabel(501)]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="sdram_value_focussed" type="label">
+                    <visible>Control.HasFocus(503)|Control.HasFocus(504)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Control.GetLabel(502)]</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="sdram_down" id="503" type="button">
+                    <onup>403</onup>
+                    <ondown>603</ondown>
+                    <onleft>1000</onleft>
+                    <onright>504</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="sdram_up" id="504" type="button">
+                    <onup>404</onup>
+                    <ondown>604</ondown>
+                    <onleft>503</onleft>
+                    <onright>2001</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- ######### -->
+            <!-- core frequency -->
+            <!-- ######### -->
+            <control description="core_" id="600" type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>770</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="core_label" id="601" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>core_freq</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="core_value" id="602" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="core_label_focussed" type="label">
+                    <visible>Control.HasFocus(603)|Control.HasFocus(604)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>$INFO[Control.GetLabel(601)]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="core_value_focussed" type="label">
+                    <visible>Control.HasFocus(603)|Control.HasFocus(604)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Control.GetLabel(602)]</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="core_down" id="603" type="button">
+                    <onup>503</onup>
+                    <ondown>703</ondown>
+                    <onleft>1000</onleft>
+                    <onright>604</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="core_up" id="604" type="button">
+                    <onup>504</onup>
+                    <ondown>704</ondown>
+                    <onleft>603</onleft>
+                    <onright>2001</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- ######### -->
+            <!-- init_turbo frequency -->
+            <!-- ######### -->
+            <control description="init_turbo_" id="700" type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>770</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="init_turbo_label" id="701" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>init_turbo</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="init_turbo_value" id="702" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="init_turbo_label_focussed" type="label">
+                    <visible>Control.HasFocus(703)|Control.HasFocus(704)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>$INFO[Control.GetLabel(701)]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="init_turbo_value_focussed" type="label">
+                    <visible>Control.HasFocus(703)|Control.HasFocus(704)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Control.GetLabel(702)]</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="init_turbo_down" id="703" type="button">
+                    <onup>603</onup>
+                    <ondown>803</ondown>
+                    <onleft>1000</onleft>
+                    <onright>704</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="init_turbo_up" id="704" type="button">
+                    <onup>604</onup>
+                    <ondown>804</ondown>
+                    <onleft>703</onleft>
+                    <onright>2001</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- ######### -->
+            <!-- overvolt frequency -->
+            <!-- ######### -->
+            <control description="overvolt_" id="800" type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>770</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="overvolt_label" id="801" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>over_voltage</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="overvolt_value" id="802" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="overvolt_label_focussed" type="label">
+                    <visible>Control.HasFocus(803)|Control.HasFocus(804)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>$INFO[Control.GetLabel(801)]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="overvolt_value_focussed" type="label">
+                    <visible>Control.HasFocus(803)|Control.HasFocus(804)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Control.GetLabel(802)]</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="overvolt_down" id="803" type="button">
+                    <onup>703</onup>
+                    <ondown>903</ondown>
+                    <onleft>1000</onleft>
+                    <onright>804</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="overvolt_up" id="804" type="button">
+                    <onup>704</onup>
+                    <ondown>904</ondown>
+                    <onleft>803</onleft>
+                    <onright>2001</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- ######### -->
+            <!-- sdramov frequency -->
+            <!-- ######### -->
+            <control description="sdramov_" id="900" type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>770</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="sdramov_label" id="901" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>sdram_over_voltage</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="sdramov_value" id="902" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="sdramov_label_focussed" type="label">
+                    <visible>Control.HasFocus(903)|Control.HasFocus(904)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>$INFO[Control.GetLabel(901)]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="sdramov_value_focussed" type="label">
+                    <visible>Control.HasFocus(903)|Control.HasFocus(904)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Control.GetLabel(902)]</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>500</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="sdramov_down" id="903" type="button">
+                    <onup>803</onup>
+                    <ondown>1002</ondown>
+                    <onleft>1000</onleft>
+                    <onright>904</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="sdramov_up" id="904" type="button">
+                    <onup>804</onup>
+                    <ondown>1002</ondown>
+                    <onleft>903</onleft>
+                    <onright>2001</onright>
                     <texturefocus>ArrowUpFO.png</texturefocus>
                     <texturenofocus>ArrowUpNF.png</texturenofocus>
                     <right>0</right>
@@ -230,11 +668,11 @@
                 </control>
             </control>
             <!-- force turbo radio button -->
-            <control id="1002" type="radiobutton" description="turbobuttons_turbo">
+            <control description="turbobuttons_turbo" id="1002" type="radiobutton">
                 <label>force_turbo</label>
                 <posx>0</posx>
                 <posy>0</posy>
-                <width>700</width>
+                <width>750</width>
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -256,28 +694,28 @@
             </control>
         </control>
         <control description="textbox background" type="image">
-            <right>90</right>
-            <top>370</top>
-            <width>400</width>
+            <right>95</right>
+            <top>230</top>
+            <width>410</width>
             <height>570</height>
             <texture>TextShade.png</texture>
         </control>
-        <control id="1102" type="textbox" description="Comment">
+        <control description="Comment" id="1102" type="textbox">
             <right>100</right>
-            <top>380</top>
+            <top>240</top>
             <width>380</width>
             <height>550</height>
-            <font>osmc_addon_OLD_Font25</font>
+            <font>osmc_addon_OLD_Font27</font>
         </control>
-        <control id="2001" type="button" description="apply_button">
+        <control description="apply_button" id="2001" type="button">
             <right>120</right>
             <bottom>110</bottom>
             <width>231</width>
-            <height>44</height>
-            <onleft>1010</onleft>
-            <onright>1010</onright>
-            <onup>1010</onup>
-            <ondown>403</ondown>
+            <height>54</height>
+            <onleft>5000</onleft>
+            <onright>5000</onright>
+            <onup>5000</onup>
+            <ondown>noop</ondown>
             <align>center</align>
             <aligny>center</aligny>
             <label>Apply</label>
