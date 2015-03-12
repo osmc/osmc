@@ -152,7 +152,7 @@ then
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
-	export CFLAGS="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
+	export CFLAGS+="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vc/lib" && \
@@ -173,7 +173,7 @@ then
 		--disable-vdpau \
 		--disable-pulse \
 		--disable-projectm \
-		--with-platform=raspberry-pi2 \
+		--with-platform=$PIDEV \
 		--enable-optimizations \
 		--enable-libcec \
 		--enable-player=omxplayer \
