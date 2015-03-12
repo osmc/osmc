@@ -125,7 +125,7 @@ class Main(object):
 			print 'Action not in action_to_method dict'
 
 
-	@clog()
+	#@clog()
 	def action_list(self):
 
 		''' This method processes a list sent in argv[2], and either installs or remove packages. 
@@ -183,7 +183,7 @@ class Main(object):
 				self.commit_action()
 
 
-	@clog()
+	# #@clog()
 	def parse_argv2(self, action_string):
 
 		install = []
@@ -204,7 +204,7 @@ class Main(object):
 		return {'install': install, 'removal': removal}
 
 
-	@clog()
+	#@clog()
 	def update(self):
 
 		dprg = Download_Progress(partial_heading='Updating')
@@ -217,7 +217,7 @@ class Main(object):
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
 
-	@clog()
+	#@clog()
 	def commit(self):
 
 		# check whether any packages are broken, if they are then the install needs to take place outside of Kodi
@@ -237,7 +237,7 @@ class Main(object):
 		self.commit_action()
 
 
-	@clog()
+	#@clog()
 	def commit_action(self):
 
 		dprg = Download_Progress()
@@ -262,7 +262,7 @@ class Main(object):
 		return '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
 		
 
-	@clog()
+	#@clog()
 	def fetch(self):
 
 		self.cache.upgrade(True)
@@ -301,9 +301,9 @@ class Install_Progress(apt.progress.base.InstallProgress):
 		
 		super(Install_Progress, self).__init__()	
 		
-		call_parent('progress_bar', {'percent': 0,  'heading': self.heading, 'message':'Starting Installation'})
+		call_parent('progress_bar', {'percent': 0,  'heading': self.parent.heading, 'message':'Starting Installation'})
 
-	@clog()
+	#@clog()
 	def error(self, pkg, errormsg):
 
 		print 'ERROR!!! \n%s\n' % errormsg
@@ -346,7 +346,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	# The following methods should be overridden to implement progress reporting for run() calls 
 	# with an apt_pkg.PackageManager object as their parameter:
 
-	@clog()
+	#@clog()
 	def status_change(self, pkg, percent, status):
 		''' This method implements progress reporting for package installation by APT and may be extended to 
 			dpkg at a later time. This method takes two parameters: The parameter percent is a float value 
@@ -361,9 +361,9 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		self.pulse_time = t.now()
 
-		call_parent('progress_bar', {'percent': int(percent),  'heading': self.heading, 'message': status})
+		call_parent('progress_bar', {'percent': int(percent),  'heading': self.parent.heading, 'message': status})
 
-	@clog()
+	#@clog()
 	def start_update(self):
 		''' This method is called before the installation of any package starts. '''
 
@@ -372,7 +372,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	@clog()
+	#@clog()
 	def finish_update(self):
 		''' This method is called when all changes have been applied. '''
 
@@ -387,7 +387,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		self.partial_heading = partial_heading
 		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
-	@clog()
+	#@clog()
 	def start(self):
 		''' Invoked when the Acquire process starts running. '''
 
@@ -396,13 +396,13 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	@clog()
+	#@clog()
 	def stop(self):
 		''' Invoked when the Acquire process stops running. '''
 
 		return 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	@clog()
+	#@clog()
 	def fetch(self, item):
 		''' Invoked when an item is being fetched. '''
 
@@ -414,7 +414,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
 
-	@clog()
+	#@clog()
 	def pulse(self, owner):
 		''' Periodically invoked as something is being downloaded. '''
 
@@ -464,7 +464,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return True
 
-	@clog()
+	#@clog()
 	def done(self, item):
 		''' Invoked when an item has finished downloading. '''
 
