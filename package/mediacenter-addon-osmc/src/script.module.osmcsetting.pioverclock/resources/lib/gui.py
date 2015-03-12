@@ -46,17 +46,17 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			self.overclock_profiles = [self.normal_profile, self.medium_profile, self.higher_profile, self.custom_profile]
 
 			self.descriptions = {
-				301  :  lang(32088) % self.normal_profile,
-				302  :  lang(32089) % self.medium_profile,
-				303  :  lang(32090) % self.higher_profile,
-				304  :  lang(32091) % self.custom_profile,
-				403  :  lang(32092),
-				503  :  lang(32093),
-				603  :  lang(32094),
-				703  :  lang(32095),
-				803  :	lang(32096),
-				903  :  lang(32097),
-				1003 :  lang(32098),
+				101  :  lang(32088) % self.normal_profile,
+				102  :  lang(32089) % self.medium_profile,
+				103  :  lang(32090) % self.higher_profile,
+				104  :  lang(32091) % self.custom_profile,
+				402  :  lang(32092),
+				502  :  lang(32093),
+				602  :  lang(32094),
+				702  :  lang(32095),
+				802  :	lang(32096),
+				902  :  lang(32097),
+				1002 :  lang(32098),
 				}
 
 
@@ -77,26 +77,26 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			self.overclock_profiles = [self.normal_profile, self.medium_profile, 'nothing', self.custom_profile]
 
 			self.descriptions = {
-				301  :  lang(32088) % self.normal_profile,
-				302  :  lang(32089) % self.medium_profile,
-				304  :  lang(32091) % self.custom_profile,
-				403  :  lang(32092),
-				503  :  lang(32093),
-				603  :  lang(32094),
-				703  :  lang(32095),
-				803  :	lang(32096),
-				903  :  lang(32097),
-				1003 :  lang(32098),
+				101  :  lang(32088) % self.normal_profile,
+				102  :  lang(32089) % self.medium_profile,
+				104  :  lang(32091) % self.custom_profile,
+				103  :  lang(32092),
+				502  :  lang(32093),
+				602  :  lang(32094),
+				702  :  lang(32095),
+				802  :	lang(32096),
+				902  :  lang(32097),
+				1002 :  lang(32098),
 				}
 
 
 		self.control_matching = {
-			'arm_freq'				: 403,
-			'sdram_freq'			: 503,
-			'core_freq'				: 603, 
-			'initial_turbo'			: 703,
-			'over_voltage'			: 803,
-			'over_voltage_sdram'	: 903,
+			'arm_freq'				: 402,
+			'sdram_freq'			: 502,
+			'core_freq'				: 602, 
+			'initial_turbo'			: 702,
+			'over_voltage'			: 802,
+			'over_voltage_sdram'	: 902,
 			'force_turbo'			: 1002,
 			}
 
@@ -120,20 +120,17 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def onInit(self):
 
 		if self.model == 'Pi2':
-			frame = self.getControl(1303)
-			frame.setEnabled(False)
-			frame.setVisible(False)
-			hbutton = self.getControl(303)
+			hbutton = self.getControl(103)
 			hbutton.setEnabled(False)
 			hbutton.setVisible(False)
-			mbutton = self.getControl(302)
+			mbutton = self.getControl(102)
 			mbutton.setLabel('Turbo')
-			cbutton = self.getControl(304)
-			mbutton.controlRight(cbutton)
-			cbutton.controlLeft(mbutton)
+			cbutton = self.getControl(104)
+			mbutton.controlUp(cbutton)
+			cbutton.controlDown(mbutton)
 
 		# apply the users current settings (custom)
-		self.apply_profile(304)
+		self.apply_profile(104)
 		self.check_for_profile(focus=True)
 
 
@@ -150,7 +147,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def slider_change(self, control, up = False):
 		''' Executes the change in slider value '''
 
-		cid = control-1 if up else control+1
+		cid = control+1 if up else control+2
 		ctl = self.getControl(cid)
 		lbl = ctl.getLabel()
 		lst = self.variable_lists[cid]
@@ -167,7 +164,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def apply_profile(self, control):
 		''' Applies specific profile to the controls '''
 
-		idx = (control % 300) - 1 
+		idx = (control % 100) - 1 
 		pfl = self.overclock_profiles[ idx ]._asdict()
 		for k, v in self.control_matching.iteritems():
 			ctl = self.getControl(v)
@@ -205,21 +202,21 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
 		for i, profile in enumerate(self.overclock_profiles):
 			if i == 3: break
-			ctl = self.getControl(1301 + i)
+			ctl = self.getControl(1000 + (i * 10))
 			if profile == compare:
 				ctl.setVisible(True)
 				match = True
 				if focus:
-					self.setFocusId(301 + i)
+					self.setFocusId(100 + i)
 			else:
 				ctl.setVisible(False)
 
 		if match:
-			self.getControl(1304).setVisible(False)
+			self.getControl(1040).setVisible(False)
 		else:
-			self.getControl(1304).setVisible(True)
+			self.getControl(1040).setVisible(True)
 			if focus: 
-				self.setFocusId(304)
+				self.setFocusId(104)
 
 
 		# warning
@@ -237,16 +234,16 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		if controlID == 2001:
 			self.close()
 
-		elif 399 < controlID < 999 and controlID % 100 in [2,4]:
+		elif 399 < controlID < 999 and controlID % 100 in [3,4]:
 			# slider control
-			if controlID % 100 == 2:
+			if controlID % 100 == 3:
 				# down
 				self.slider_change(controlID, up = False)
 			else:
 				# up
 				self.slider_change(controlID, up = True)
 
-		elif controlID in [301, 302, 303, 304]:
+		elif controlID in [101, 102, 103, 104]:
 			# profile change
 
 			self.apply_profile(controlID)
@@ -269,8 +266,8 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		else:
 
 			desc = 	self.descriptions.get(focused_control, 
-					self.descriptions.get(focused_control + 1, 
-					self.descriptions.get(focused_control - 1)))
+					self.descriptions.get(focused_control - 1, 
+					self.descriptions.get(focused_control - 2)))
 
 			if desc and self.warning:
 				desc = desc + lang(32099)

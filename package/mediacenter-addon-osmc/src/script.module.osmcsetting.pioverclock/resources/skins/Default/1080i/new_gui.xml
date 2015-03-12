@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">101</defaultcontrol>
+    <animation effect="fade" time="250">WindowOpen</animation>
+    <animation effect="fade" time="500">WindowClose</animation>
+    <controls>
+        <!-- Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture>background.png</texture>
+        </control>
+        <!-- Curve -->
+        <control type="image">
+            <right>20</right>
+            <top>20</top>
+            <width>1280</width>
+            <height>1040</height>
+            <texture border="40,0,0,0">Curve.png</texture>
+        </control>
+        <control description="osmc icon" type="image">
+            <left>100</left>
+            <top>100</top>
+            <width>247</width>
+            <height>44</height>
+            <texture>logo.png</texture>
+        </control>
+        <!-- Preset Menu List -->
+        <control id="1000" type="grouplist">
+            <left>120</left>
+            <top>260</top>
+            <width>300</width>
+            <height>870</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <!-- Normal -->
+            <control id="1" type="group">
+                <control description="profile indicator" id="1010" type="image">
+                    <width>300</width>
+                    <height>42</height>
+                    <texture>TextShade.png</texture>
+                </control>
+                <control id="101" type="button">
+                    <width>300</width>
+                    <height>42</height>
+                    <label>Normal</label>
+                    <font>osmc_addon_OLD_Font42</font>
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffffffff</focusedcolor>
+                    <texturefocus>single_pixel.png</texturefocus>
+                    <texturenofocus>single_pixel.png</texturenofocus>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onclick>noop</onclick>
+                    <onup>104</onup>
+                    <ondown>102</ondown>
+                    <onright>5000</onright>
+                </control>
+            </control>
+            <!-- Medium -->
+            <control id="2" type="group">
+                <control description="profile indicator" id="1020" type="image">
+                    <width>300</width>
+                    <height>42</height>
+                    <texture>TextShade.png</texture>
+                </control>
+                <control id="102" type="button">
+                    <width>300</width>
+                    <height>42</height>
+                    <label>Medium</label>
+                    <font>osmc_addon_OLD_Font42</font>
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffffffff</focusedcolor>
+                    <texturefocus>single_pixel.png</texturefocus>
+                    <texturenofocus>single_pixel.png</texturenofocus>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onclick>noop</onclick>
+                    <onup>101</onup>
+                    <ondown>103</ondown>
+                    <onright>5000</onright>
+                </control>
+            </control>
+            <!-- High -->
+            <control id="3" type="group">
+                <control description="profile indicator" id="1030" type="image">
+                    <width>300</width>
+                    <height>42</height>
+                    <texture>TextShade.png</texture>
+                </control>
+                <control id="103" type="button">
+                    <width>300</width>
+                    <height>42</height>
+                    <label>High</label>
+                    <font>osmc_addon_OLD_Font42</font>
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffffffff</focusedcolor>
+                    <texturefocus>single_pixel.png</texturefocus>
+                    <texturenofocus>single_pixel.png</texturenofocus>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onclick>noop</onclick>
+                    <onup>102</onup>
+                    <ondown>104</ondown>
+                    <onright>5000</onright>
+                </control>
+            </control>
+            <!-- Custom -->
+            <control id="4" type="group">
+                <control description="profile indicator" id="1040" type="image">
+                    <width>300</width>
+                    <height>42</height>
+                    <texture>TextShade.png</texture>
+                </control>
+                <control id="104" type="button">
+                    <width>300</width>
+                    <height>42</height>
+                    <label>Custom</label>
+                    <font>osmc_addon_OLD_Font42</font>
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffffffff</focusedcolor>
+                    <texturefocus>single_pixel.png</texturefocus>
+                    <texturenofocus>single_pixel.png</texturenofocus>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <onclick>noop</onclick>
+                    <onup>103</onup>
+                    <ondown>101</ondown>
+                    <onright>5000</onright>
+                </control>
+            </control>
+        </control>
+        <!-- ## Main Controls ## -->
+        <control id="5000" type="group">
+            <left>380</left>
+            <top>85</top>
+            <width>1400</width>
+            <height>726</height>
+            <onright>1000</onright>
+            <onleft>1000</onleft>
+            <itemgap>34</itemgap>
+            <!-- ######### -->
+            <!-- arm frequency -->
+            <!-- ######### -->
+            <control id="400" type="group" description="arm_">
+                <left>0</left>
+                <top>0</top>
+                <width>970</width>
+                <height>42</height>
+                <!-- item label -->
+                <control description="arm_label" id="401" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>arm_freq</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>66ffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>770</width>
+                    <height>42</height>
+                </control>
+                <!-- item value -->
+                <control description="arm_value" id="402" type="label">
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>66ffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>770</width>
+                    <height>42</height>
+                </control>
+                <!-- item label FOCUSSED -->
+                <control description="arm_label_focussed" type="label">
+                    <visible>Control.HasFocus(403)|Control.HasFocus(404)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <label>arm_freq</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <textcolor>ffffffff</textcolor>
+                    <left>0</left>
+                    <top>0</top>
+                    <width>770</width>
+                    <height>42</height>
+                </control>
+                <!-- item value FOCUSSED -->
+                <control description="arm_value_focussed" type="label">
+                    <visible>Control.HasFocus(403)|Control.HasFocus(404)</visible>
+                    <font>osmc_addon_OLD_Font33</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>placeholder</label>
+                    <textcolor>ffffffff</textcolor>
+                    <right>75</right>
+                    <top>0</top>
+                    <width>770</width>
+                    <height>42</height>
+                </control>
+                <!-- down control -->
+                <control description="arm_down" id="403" type="button">
+                    <onup>noop</onup>
+                    <ondown>503</ondown>
+                    <onleft>1000</onleft>
+                    <onright>404</onright>
+                    <texturefocus>ArrowDownFO.png</texturefocus>
+                    <texturenofocus>ArrowDownNF.png</texturenofocus>
+                    <right>35</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+                <!-- up control -->
+                <control description="arm_up" id="404" type="button">
+                    <onup>noop</onup>
+                    <ondown>504</ondown>
+                    <onleft>403</onleft>
+                    <onright>noop</onright>
+                    <texturefocus>ArrowUpFO.png</texturefocus>
+                    <texturenofocus>ArrowUpNF.png</texturenofocus>
+                    <right>0</right>
+                    <top>-12</top>
+                    <width>35</width>
+                    <height>66</height>
+                </control>
+            </control>
+            <!-- force turbo radio button -->
+            <control id="1002" type="radiobutton" description="turbobuttons_turbo">
+                <label>force_turbo</label>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>700</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <radiowidth>16</radiowidth>
+                <radioheight>16</radioheight>
+                <texturenofocus>-</texturenofocus>
+                <texturefocus>-</texturefocus>
+                <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                <onup>903</onup>
+                <ondown>2001</ondown>
+                <onleft>1000</onleft>
+                <onright>2001</onright>
+            </control>
+        </control>
+        <control description="textbox background" type="image">
+            <right>90</right>
+            <top>370</top>
+            <width>400</width>
+            <height>570</height>
+            <texture>TextShade.png</texture>
+        </control>
+        <control id="1102" type="textbox" description="Comment">
+            <right>100</right>
+            <top>380</top>
+            <width>380</width>
+            <height>550</height>
+            <font>osmc_addon_OLD_Font25</font>
+        </control>
+        <control id="2001" type="button" description="apply_button">
+            <right>120</right>
+            <bottom>110</bottom>
+            <width>231</width>
+            <height>44</height>
+            <onleft>1010</onleft>
+            <onright>1010</onright>
+            <onup>1010</onup>
+            <ondown>403</ondown>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>Apply</label>
+            <font>osmc_addon_OLD_Font33</font>
+            <texturefocus>TextShade.png</texturefocus>
+            <texturenofocus>single_pixel.png</texturenofocus>
+            <focusedcolor>FFFFFFFF</focusedcolor>
+            <textcolor>66ffffff</textcolor>
+            <align>center</align>
+        </control>
+    </controls>
+</window>
+<!-- 
+
+arm_freq
+sdram
+core
+initial turbo
+overvolt
+sdram overvolt
+force turbo
+
+ -->
