@@ -297,11 +297,8 @@ def wifi_remove(path):
 
 def get_connected_wifi():
     for ssid, value in get_wifi_networks().iteritems():
-            try:
-                if value.getProperty('Connected') == 'True':
-                    return value
-            except:
-                pass
+        if value['State'] in ('online', 'ready'):
+            return value
     return {}
 
 def has_internet_connection():

@@ -34,8 +34,7 @@ def toggle_technology_state(technology, state):
                                 'net.connman.Technology')
     try:
         technology_interface.SetProperty('Powered', state)
-    except dbus.DBusException, error:
-        print("Error Toggling State " + technology + ' : ' + str(error))
+    except dbus.DBusException:
         return False
     return True
 
