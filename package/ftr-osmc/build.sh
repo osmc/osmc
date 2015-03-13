@@ -12,8 +12,8 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-ftr-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
+    cp src/${1}-ftr files/usr/bin/ftr
 	pushd files
-	cp src/${1}-ftr usr/bin/ftr
 	chmod +x usr/bin/ftr
 	popd
 	dpkg -b files/ ftr-osmc.deb
