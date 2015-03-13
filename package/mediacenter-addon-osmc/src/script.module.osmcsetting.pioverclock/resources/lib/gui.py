@@ -135,7 +135,14 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			cbutton = self.getControl(104)
 
 			mbutton.controlUp(self.getControl(101))
-			cbutton.controlDown(cbutton)
+			cbutton.controlDown(self.getControl(101))
+
+		else:
+			hbutton = self.getControl(103)
+			hbutton.setEnabled(True)
+			hgroup = self.getControl(3)
+			hgroup.setEnabled(True)
+
 
 		# apply the users current settings (custom)
 		self.apply_profile(104)
