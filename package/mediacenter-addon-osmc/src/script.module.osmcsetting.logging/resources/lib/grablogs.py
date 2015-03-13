@@ -235,15 +235,15 @@ class Main(object):
 
 	def grab_cmdline(self):
 
-		self.log_list.extend(['\n====================== cmdline.txt =====================\n'])
+		self.log_list.extend(['\n====================== cmdline =========================\n'])
 
-		location = '/proc/cmdline.txt'
+		location = '/proc/cmdline'
 
 		try:
 			with open (location, 'r') as f:
 				self.log_list.extend(f.readlines())
 		except:
-			self.log_list.extend(['cmdline.txt not found'])
+			self.log_list.extend(['cmdline not found'])
 
 
 	def grab_all_other_packages(self):
