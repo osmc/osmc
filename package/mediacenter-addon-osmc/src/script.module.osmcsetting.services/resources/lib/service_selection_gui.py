@@ -133,7 +133,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
                 if enabled == True:
                     sundry = " (enabled)"
                 else:
-                    sundry = ""
+                    sundry = " (stopped)"
 
             else:
                 sundry = " (running)"
