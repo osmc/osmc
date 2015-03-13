@@ -672,8 +672,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         connected   = item.getProperty('Connected')
         ssid        = item.getProperty('SSID')
         self.conn_ssid = self.wifi_populate_bot.get_ssid()
-        if connected == 'False' and not self.conn_ssid:
-            self.connect_to_wifi(ssid, encrypted)
+        if connected == 'False':
+            if not self.conn_ssid: # if we are nit connected to a network connect
+                self.connect_to_wifi(ssid, encrypted)
+            else: # Display a toast asking the user to disconnect first
+                # 'Please disconnect from the current network before connecting'
+                message = lang(32053)
+                #                                                   'Wireless'
+                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32041), message, "2500"))
 
         else:
             if ssid == self.conn_ssid:
@@ -707,7 +713,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             connection_status = False
             if encrypted == 'False':
                 #               'Wireless'   'Connect to'
-                if DIALOG.yesno(lang(32041), lang(32043) + ' ' + ssid + '?'):
+                if DIALOG.yesno(lang(32041), lang(32052) + ' ' + ssid + '?'):
                     connection_status = osmc_network.wifi_connect(path)
             else:
                 if password is None:
@@ -744,6 +750,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     #         'Status'                               'No internet'
                     status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
                 self.wireless_status_label.setLabel(status)
+                self.populate_wifi_networks()
                 return True
         else:
             return False
@@ -1013,7 +1020,7 @@ class wifi_populate_bot(threading.Thread):
         state       = wifi['State']
         path        = wifi['path']
         encrypted   = True if wifi['Security'] != 'none' else False
-        connected   = True if wifi['State'] != 'idle' else False
+        connected   = True if wifi['State'] in ('ready', 'online') else False
 
         # icon_tuple = (connected, encrypted, strength)
         icon_image  = self.get_wifi_icon(encrypted, strength / 25, connected)
