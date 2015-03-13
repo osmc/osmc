@@ -191,6 +191,8 @@ class service_selection(xbmcgui.WindowXMLDialog):
                 else:
                     self.initiants.append(item_tup)
 
+            xbmc.sleep(10)
+
             self.update_checklist()
 
 
@@ -199,13 +201,13 @@ class service_selection(xbmcgui.WindowXMLDialog):
         todo_list = ''
 
         if self.initiants:
-            todo_list += "Enable:" + '\n - '.join([x[0] for x in self.initiants])
+            todo_list += "Enable:\n" + '\n - '.join([x[0] for x in self.initiants])
 
             if self.finitiants:
                 todo_list += '\n'
 
         if self.finitiants:
-            todo_list += "Disable:" + '\n - '.join([x[0] for x in self.finitiants])
+            todo_list += "Disable:\n" + '\n - '.join([x[0] for x in self.finitiants])
 
         self.getControl(1102).setText(todo_list)
 
