@@ -329,6 +329,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             for ctl in MAIN_MENU:
                 self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False)
 
+        if focused_control in WIRED_IP_LABELS:
+            self.update_current_ip_settings(WIRED_IP_VALUES)
+            self.update_apply_reset_button('WIRED')
+
+        if focused_control in WIRELESS_IP_LABELS:
+            self.update_current_ip_settings(WIRELESS_IP_VALUES)
+            self.update_apply_reset_button('WIRELESS')
 
     def edit_ip_address(self, controlID):
         relevant_label_control = self.getControl(900000 + controlID)
@@ -520,8 +527,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_ethernet()
             self.populate_wired_panel()
 
-        if control_id in WIRED_IP_LABELS:
-            self.update_current_ip_settings(WIRED_IP_VALUES)
         self.update_apply_reset_button('WIRED')
 
 
@@ -630,9 +635,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         elif control_id == WIRELESS_ADAPTER_TOGGLE:
             self.toggle_wifi()
             self.populate_wifi_panel()
-
-        elif control_id in WIRELESS_IP_LABELS:
-            self.update_current_ip_settings(WIRELESS_IP_VALUES)
 
         self.update_apply_reset_button('WIRELESS')
 
