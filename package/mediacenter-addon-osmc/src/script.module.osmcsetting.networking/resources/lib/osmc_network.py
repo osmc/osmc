@@ -240,7 +240,7 @@ def get_wifi_networks():
         path = entry[0]
         dbus_properties = entry[1]
         if path.startswith(WIFI_PATH) and 'hidden' not in path:
-            wifi_settings = {'path': str(path), 'SSID': str(dbus_properties['Name']),
+            wifi_settings = {'path': str(path), 'SSID': dbus_properties['Name'].encode('UTF-8'),
                      'Strength': int(dbus_properties['Strength']), 'State' : str(dbus_properties['State'])}
             security_props = dbus_properties['Security']
             if len(security_props) > 0:
