@@ -125,9 +125,9 @@
             <control id="10111" type="button">
                 <visible>Control.IsEnabled(10111)</visible>`
                 <description>Automatically configure the network toggle</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
+                <label>Automatically configure the network toggle</label>
                 <posx>100</posx>
-                <posy>230</posy>
+                <posy>160</posy>
                 <width>700</width>
                 <height>66</height>
                 <align>left</align>
@@ -461,10 +461,10 @@
                     <description>Enable Adapter</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
                     <posx>100</posx>
-                    <posy>160</posy>
+                    <posy>90</posy>
                     <width>400</width>
                     <height>66</height>
-                    <align>left</align>
+                    <align>left</align>qqqqq
                     <aligny>center</aligny>
                     <font>osmc_addon_OLD_Font36</font>
                     <textcolor>66ffffff</textcolor>
@@ -487,7 +487,7 @@
                     <description>Automatically configure the network toggle</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
                     <posx>100</posx>
-                    <posy>230</posy>
+                    <posy>160</posy>
                     <width>700</width>
                     <height>66</height>
                     <align>left</align>
@@ -694,22 +694,8 @@
                 </control>
                 <control id="910215" type="label">
                     <disabledcolor>ff000000</disabledcolor>
-                    <description>Primary DNS VALUE</description>
+                    <description>Default Gateway VALUE</description>
                     <label>___ : ___ : ___ : ___</label>
-                    <visible>Control.HasFocus(10215)+Control.isVisible(10215)</visible>
-                    <posx>730</posx>
-                    <posy>510</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_OLD_Font36</font>
-                    <textcolor>ffffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Primary DNS VALUE</description>
-                    <label>$INFO[Control.GetLabel(910215)]</label>
                     <visible>!Control.HasFocus(10215)+Control.isVisible(10215)</visible>
                     <posx>730</posx>
                     <posy>510</posy>
@@ -717,6 +703,20 @@
                     <height>70</height>
                     <font>osmc_addon_OLD_Font36</font>
                     <textcolor>66ffffff</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                </control>
+                <control type="label">
+                    <disabledcolor>ff000000</disabledcolor>
+                    <description>Default Gateway VALUE</description>
+                    <label>$INFO[Control.GetLabel(910214)]</label>
+                    <visible>Control.HasFocus(10215)+Control.isVisible(10215)</visible>
+                    <posx>510</posx>
+                    <posy>440</posy>
+                    <width>880</width>
+                    <height>70</height>
+                    <font>osmc_addon_OLD_Font36</font>
+                    <textcolor>ffffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
                 </control>
@@ -808,7 +808,7 @@
                 <description>Scan for connections</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32012]</label>
                 <posx>820</posx>
-                <posy>160</posy>
+                <posy>90</posy>
                 <width>700</width>
                 <height>66</height>
                 <align>left</align>
