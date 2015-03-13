@@ -21,12 +21,10 @@ function setup_osmc_user()
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
 	# Default storage directories
-	for dir in "Pictures
-	Music
-	Movies
-	TV"
+	directories=( "Pictures" "Music" "Movies" "TV Shows" )
+	for dir in "${directories[@]}"
 	do
-	mkdir -p ${1}/home/osmc/${dir}
+	mkdir -p "${1}/home/osmc/${dir}"
 	done
 	chroot ${1} chown -R osmc:osmc /home/osmc/
 }
