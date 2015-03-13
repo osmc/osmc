@@ -143,7 +143,7 @@ The module allows you to manually adjust:
 		with open('/proc/cpuinfo', 'r') as f:
 			lines = f.readlines()
 
-		cpu_count = sum([1 for x in lines if x.startswith('processor') else 0])
+		cpu_count = sum([1 for x in lines if x.startswith('processor')])
 
 		if cpu_count == 1:
 			self.pimodel = 'PiB'
