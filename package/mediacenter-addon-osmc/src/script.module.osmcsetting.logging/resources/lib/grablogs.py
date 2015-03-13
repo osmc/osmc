@@ -232,6 +232,9 @@ class Main(object):
 		with os.popen('uname -a') as f:
 			self.log_list.extend(f.readlines())
 
+
+	def grab_cmdline(self):
+
 		self.log_list.extend(['\n====================== cmdline.txt =====================\n'])
 
 		location = '/proc/cmdline.txt'
