@@ -2,7 +2,7 @@
 <window>
 	<!-- home -->
 	<backgroundcolor>0xff2e4655</backgroundcolor>
-	<defaultcontrol always="true">9000</defaultcontrol>
+	<defaultcontrol>9000</defaultcontrol>
 	<onload condition="System.HasAddon(script.favourites)">RunScript(script.favourites)</onload>
 	<onload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onload>
 
@@ -17,7 +17,7 @@
 			<include>VisibleFadeAnimation</include>
 			<fadetime>200</fadetime>
 			<texture colordiffuse="12ffffff" background="true">$VAR[WidgetFanart]</texture>
-			<visible>!Control.HasFocus(9001)</visible>
+			<visible>!Control.HasFocus(9001) + Skin.HasSetting(HomeFanart)</visible>
 		</control>
 
 		<!-- Main controls -->
@@ -655,7 +655,7 @@
 							</control>
 							<control type="label">
 								<width>640</width>
-								<height>87</height>
+								<height>86</height>
 								<font>Font40</font>
 								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label]</label>

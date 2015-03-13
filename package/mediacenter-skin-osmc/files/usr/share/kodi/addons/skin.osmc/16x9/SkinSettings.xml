@@ -545,6 +545,16 @@
 					<onclick>RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu)</onclick>
 					<visible>ControlGroup(9).HasFocus(10)</visible>
 				</control>
+				<!-- Home fanart -->
+				<control type="radiobutton" id="1214">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>Enable fanart for widgets</label>
+					<onclick>Skin.ToggleSetting(HomeFanart)</onclick>
+					<selected>Skin.HasSetting(HomeFanart)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
 
 				<!-- General -->
 				<!-- Kiosk mode -->
