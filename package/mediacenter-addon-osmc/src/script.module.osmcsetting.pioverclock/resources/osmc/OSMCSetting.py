@@ -142,13 +142,13 @@ The module allows you to manually adjust:
 
 		with open('/proc/cpuinfo', 'r') as f:
 			lines = f.readlines()
-			for line in lines:
-				if line.startswith('processor'):
-					if '1' in line:
-						self.pimodel = 'PiB'
-					else:
-						self.pimodel = 'Pi2'
-					break
+
+		 cpu_count = sum([1 for x in lines if x.startswith('processor') else 0])
+
+		if cpu_count == 1:
+			self.pimodel = 'PiB'
+		else:
+			self.pimodel = 'Pi2'
 
 		log('Model = %s' % self.pimodel)
 		
