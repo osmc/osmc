@@ -363,6 +363,7 @@
                 <textcolor>ffffffff</textcolor>
             </control>
             <control id="910116" type="label">
+                <disabledcolor>ff000000</disabledcolor>
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>!Control.HasFocus(10116)+Control.isVisible(10116)</visible>
@@ -376,7 +377,8 @@
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
-                <visible>Control.IsEnabled(910116)</visible>`
+                <disabledcolor>ff000000</disabledcolor>
+		<visible>Control.IsEnabled(910116)</visible>`
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>Control.HasFocus(10116)+Control.isVisible(10116)</visible>
@@ -735,6 +737,7 @@
                     <aligny>center</aligny>
                 </control>
                 <control type="label">
+		    <disabledcolor>ff000000</disabledcolor>
                     <description>Secondary DNS VALUE</description>
                     <label>$INFO[Control.GetLabel(910216)]</label>
                     <visible>Control.HasFocus(10216)+Control.isVisible(10216)</visible>
