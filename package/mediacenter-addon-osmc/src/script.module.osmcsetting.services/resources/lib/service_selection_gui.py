@@ -169,7 +169,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
             selItem = self.name_list.getSelectedItem().getLabel()
             s_entry = self.name_list.getSelectedItem().getLabel2()
-            clean_name = selItem.replace(' (running)','').replace(' (enabled)','').replace('\n','')
+            clean_name = selItem.replace(' (running)','').replace(' (enabled)','').replace(' (stopped)','').replace('\n','')
 
             item_tup = (clean_name, s_entry)
             
@@ -198,16 +198,20 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
     def update_checklist(self):
 
-        todo_list = ''
+        if not self.initiants and not self.finitiants:
+            self.getControl(1102).setText(' ')
+            return
+
+        todo_list = '-= Pending Actions =-\n\n'
 
         if self.initiants:
-            todo_list += "Enable:\n" + '\n - '.join([x[0] for x in self.initiants])
+            todo_list += "Enable:\n   - " + '\n   - '.join([x[0] for x in self.initiants])
 
             if self.finitiants:
-                todo_list += '\n'
+                todo_list += '\n\n'
 
         if self.finitiants:
-            todo_list += "Disable:\n" + '\n - '.join([x[0] for x in self.finitiants])
+            todo_list += "Disable:\n   - " + '\n   - '.join([x[0] for x in self.finitiants])
 
         self.getControl(1102).setText(todo_list)
 
