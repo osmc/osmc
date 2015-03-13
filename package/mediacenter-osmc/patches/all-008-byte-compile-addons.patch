@@ -1,29 +1,3 @@
-diff --git a/addon-compiler.c b/addon-compiler.c
-new file mode 100644
-index 0000000..89d7e8b
---- /dev/null
-+++ b/addon-compiler.c
-@@ -0,0 +1,20 @@
-+/*
-+ * addon-compiler.c
-+ *
-+ * (c) 2014-2015 Sam Nazarko
-+ * email@samnazarko.co.uk
-+ */
-+
-+#include <stdio.h>
-+
-+int main(int argc, char **argv)
-+{
-+	int ret = fork();
-+	if (ret == 0)
-+	{
-+		system("/usr/bin/pycompile -O /home/osmc/.kodi/addons");
-+		system("/usr/bin/sudo /usr/bin/pycompile -O /usr/share/kodi/addons");
-+	}
-+	return 0;
-+}
-+
 diff --git a/xbmc/addons/AddonInstaller.cpp b/xbmc/addons/AddonInstaller.cpp
 index c61da1b..36acd90 100644
 --- a/xbmc/addons/AddonInstaller.cpp
@@ -36,3 +10,43 @@ index c61da1b..36acd90 100644
  }
  
  void CAddonInstaller::OnJobProgress(unsigned int jobID, unsigned int progress, unsigned int total, const CJob *job)
+
+--- /dev/null	2015-03-13 20:40:47.940007140 +0000
++++ b/addon-compiler.c	2015-03-13 14:31:28.521653296 +0000
+@@ -0,0 +1,36 @@
++/*
++ * addon-compiler.c
++ *
++ * (c) 2014-2015 Sam Nazarko
++ * email@samnazarko.co.uk
++ */
++
++#include <stdio.h>
++#include <fcntl.h>
++#define LOCK_FILE "/tmp/addon-compiler.lock"
++
++int main(int argc, char **argv)
++{
++    mode_t m = umask(0);
++    int fd = open(LOCK_FILE, O_RDWR|O_CREAT, 0666);
++    umask(m);
++    if(fd >= 0 && flock(fd, LOCK_EX | LOCK_NB) < 0)
++    {
++        close(fd);
++        fd = -1;
++    }
++    if (fd != -1)
++    {
++		int ret = fork();
++		if (ret == 0)
++		{
++			system("/usr/bin/pycompile -O /home/osmc/.kodi/addons");
++			system("/usr/bin/sudo /usr/bin/pycompile -O /usr/share/kodi/addons");
++			remove(LOCK_FILE);
++			close(fd);
++		}
++    }
++
++	return 0;
++}
++
