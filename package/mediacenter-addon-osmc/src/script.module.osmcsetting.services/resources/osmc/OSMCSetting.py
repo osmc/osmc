@@ -179,7 +179,7 @@ class OSMCSettingClass(object):
 
 		service_list = [('test1', 'active'), ('test2','inactive'), ('test3', 'active')]
 
-		creation = service_selection("DialogSelect.xml", scriptPath, 'Default', service_list=service_list, logger=log)
+		creation = service_selection("ServiceBrowser_OSMC.xml", scriptPath, 'Default', service_list=service_list, logger=log)
 		creation.doModal()
 		del creation
 

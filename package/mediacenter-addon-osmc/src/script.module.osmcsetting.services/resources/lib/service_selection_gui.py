@@ -88,16 +88,14 @@ class MaitreD(object):
 
 
     @clog(KodiLogger, maxlength=250)
-    def process_user_changes(self, user_selection):
+    def process_user_changes(self, initiants, finitiants):
         ''' User selection is a list of tuples (s_name::str, service_name::str, enable::bool) '''
 
-        for s_name, s_entry, status in user_selection:
-            if status != self.services[s_name][-1]:
-                if status == True:
-                    self.enable_service(s_entry)
-                else:
-                    self.disable_service(s_entry)
+        for clean_name, s_entry in initiants:
+            self.enable_service(s_entry)
 
+        for clean_name, s_entry in finitiants:
+            self.disable_service(s_entry)
 
 
 class service_selection(xbmcgui.WindowXMLDialog):
@@ -106,6 +104,10 @@ class service_selection(xbmcgui.WindowXMLDialog):
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
         self.service_list = kwargs.get('service_list', [])
+
+        # the lists to hold the services to start, and to finish
+        self.initiants  = []
+        self.finitiants = []
 
         self.garcon = MaitreD()
         self.service_list = self.garcon.discover_services()
@@ -118,20 +120,12 @@ class service_selection(xbmcgui.WindowXMLDialog):
     def onInit(self):
 
         # Save button
-        self.ok = self.getControl(SAVE)
+        self.ok = self.getControl(7)
         self.ok.setLabel('Apply')
 
-        # Heading
-        self.hdg = self.getControl(HEADING)
-        self.hdg.setLabel('OSMC Service Management')
-        self.hdg.setVisible(True)
-
-        # Hide unused list frame
-        self.x = self.getControl(3)
-        self.x.setVisible(False)
 
         # Populate the list frame
-        self.name_list = self.getControl(6)
+        self.name_list = self.getControl(500)
         self.name_list.setEnabled(True)
 
         # Set action when clicking right from the Save button
@@ -143,7 +137,17 @@ class service_selection(xbmcgui.WindowXMLDialog):
         for s_name, service_tup in self.service_list.iteritems():
             # populate the list
             s_entry, service_name, running, enabled = service_tup
-            self.tmp = xbmcgui.ListItem(label=s_name + running, label2=s_entry)
+
+            if running != " (running)":
+                if enabled == True:
+                    sundry = " (enabled)"
+                else:
+                    sundry = ""
+
+            else:
+                sundry = " (running)"
+
+            self.tmp = xbmcgui.ListItem(label=s_name + sundry, label2=s_entry)
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
@@ -163,29 +167,61 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
     def onClick(self, controlID):
 
-        if controlID == SAVE:
+        if controlID == 7:
+            self.close()
+
+        elif controlID == 6:
             self.process()
             self.close()
 
-        else:
-            selItem = self.name_list.getSelectedPosition()
-            if self.name_list.getSelectedItem().isSelected():
-                self.name_list.getSelectedItem().select(False)
+        elif controlID == 500:
+
+            selItem = self.name_list.getSelectedItem().getLabel()
+            s_entry = self.name_list.getSelectedItem().getLabel2()
+            clean_name = selItem.replace(' (running)','').replace(' (enabled)','').replace('\n','')
+
+            item_tup = (clean_name, s_entry)
+            
+            if selItem.endswith(' (running)') or selItem.endswith(' (enabled)'):
+
+                # if the item is currently enabled or running
+
+                if item_tup in self.finitiants:
+                    self.finitiants.remove(item_tup)
+                else:
+                    self.finitiants.append(item_tup)
+
             else:
-                self.name_list.getSelectedItem().select(True)
+
+                # if the item is not enabled
+
+                if item_tup in self.initiants:
+                    self.initiants.remove(item_tup)
+                else:
+                    self.initiants.append(item_tup)
+
+            self.update_checklist()
+
+
+    def update_checklist(self):
+
+        todo_list = ''
+
+        if self.initiants:
+            todo_list += "Enable:" + '\n - '.join([x[0] for x in self.initiants])
+
+            if self.finitiants:
+                todo_list += '\n'
+
+        if self.finitiants:
+            todo_list += "Disable:" + '\n - '.join([x[0] for x in self.finitiants])
+
+        self.getControl(1102).setText(todo_list)
+
 
     def process(self):
 
-        sz = self.name_list.size()
+        self.garcon.process_user_changes(self.initiants, self.finitiants)
+        
 
-        processing_list = []
-
-        for x in range(sz):
-            line = self.name_list.getListItem(x)
-            s_name = line.getLabel().replace(' (running)','').replace(' (stopped)','').replace('\n','')
-            s_entry = line.getLabel2().replace('\n','')
-            issel = True if line.isSelected() == 1 else False
-            processing_list.append((s_name, s_entry, line.isSelected()))
-
-        self.garcon.process_user_changes(processing_list)
 
