@@ -30,14 +30,14 @@ index 3c27907..a762b0f 100644
  	imx6q_set_lpm(WAIT_CLOCKED);
  
 diff --git a/arch/arm/mach-imx/mach-imx6q.c b/arch/arm/mach-imx/mach-imx6q.c
-index cf62ee0..c4e3f9f 100644
+index cf62ee0..52bde0b 100644
 --- a/arch/arm/mach-imx/mach-imx6q.c
 +++ b/arch/arm/mach-imx/mach-imx6q.c
 @@ -364,6 +364,10 @@ static void __init imx6q_opp_init(void)
  		pr_warn("failed to init OPP table\n");
  		goto put_node;
  	}
-+	if (dev_pm_opp_disable(cpu_dev, 396000000))
++	if (dev_pm_opp_disable(cpu_dev, 396000000)) {
 +		pr_warn("failed to disable 396MHz OPP\n");
 +		pr_info("remove 396MHz OPP for VPU running at 352MHz!\n");
 +	}
