@@ -23,7 +23,9 @@ int main(int argc, char *argv[])
     fontDatabase.addApplicationFont(":/assets/resources/SourceSansPro-Regular.ttf");
     MainWindow w;
     w.show();
+    #ifdef Q_OS_MAC
     w.raise();
-    
+    #endif
+    w.activateWindow();
     return a.exec();
 }
