@@ -103,7 +103,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
-        self.service_list = kwargs.get('service_list', [])
+        # self.service_list = kwargs.get('service_list', [])
 
         # the lists to hold the services to start, and to finish
         self.initiants  = []
@@ -119,18 +119,9 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
 
-        # Save button
-        self.ok = self.getControl(7)
-        self.ok.setLabel('Apply')
-
-
         # Populate the list frame
         self.name_list = self.getControl(500)
         self.name_list.setEnabled(True)
-
-        # Set action when clicking right from the Save button
-        self.ok.controlRight(self.name_list)
-        self.ok.controlLeft(self.name_list)
 
         item_pos = 0
 
@@ -151,8 +142,8 @@ class service_selection(xbmcgui.WindowXMLDialog):
             self.name_list.addItem(self.tmp)
 
             # highlight the already selection randos
-            if enabled:
-                self.name_list.getListItem(item_pos).select(True)
+            # if enabled:
+            #     self.name_list.getListItem(item_pos).select(True)
 
             item_pos += 1
 

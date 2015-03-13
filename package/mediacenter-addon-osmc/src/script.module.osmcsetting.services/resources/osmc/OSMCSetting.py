@@ -177,7 +177,9 @@ class OSMCSettingClass(object):
 		me = xbmcaddon.Addon(self.addonid)
 		scriptPath = me.getAddonInfo('path')
 
-		service_list = [('test1', 'active'), ('test2','inactive'), ('test3', 'active')]
+		# 						( s_entry, service_name, running, enabled )
+
+		service_list = {'test1b': ('test1', 'test1a', ' (running)', True), 'test2b': ('test2','test2a', ' (enabled)', True), 'test3b': ('test3', 'test3a', '', False)}
 
 		creation = service_selection("ServiceBrowser_OSMC.xml", scriptPath, 'Default', service_list=service_list, logger=log)
 		creation.doModal()
