@@ -12,9 +12,16 @@ SAVE                 = 5
 HEADING              = 1
 ACTION_SELECT_ITEM   = 7
 
+addonid     = "script.module.osmcsetting.services"
+__addon__   = xbmcaddon.Addon(addonid)
 
 def KodiLogger(message):
     xbmc.log('OSMC SERVICES ' + str(message), level=xbmc.LOGDEBUG)
+
+
+def lang(id):
+    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+    return san 
 
 
 class MaitreD(object):
@@ -72,9 +79,9 @@ class MaitreD(object):
                     enabled     = self.is_enabled(s_entry)
                     runcheck    = self.is_running(s_entry)
                     if runcheck:
-                        running = " (running)"
+                        running = lang(32003)
                     else:
-                        running = " (stopped)"
+                        running = lang(32005)
 
                     svcs[s_name] = ( s_entry, service_name, running, enabled )
                                     
@@ -129,14 +136,14 @@ class service_selection(xbmcgui.WindowXMLDialog):
             # populate the list
             s_entry, service_name, running, enabled = service_tup
 
-            if running != " (running)":
+            if running != lang(32003):
                 if enabled == True:
-                    sundry = " (enabled)"
+                    sundry = lang(32004)
                 else:
-                    sundry = " (stopped)"
+                    sundry = lang(32005)
 
             else:
-                sundry = " (running)"
+                sundry = lang(32003)
 
             self.tmp = xbmcgui.ListItem(label=s_name + sundry, label2=s_entry)
             self.name_list.addItem(self.tmp)
@@ -169,11 +176,11 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
             selItem = self.name_list.getSelectedItem().getLabel()
             s_entry = self.name_list.getSelectedItem().getLabel2()
-            clean_name = selItem.replace(' (running)','').replace(' (enabled)','').replace(' (stopped)','').replace('\n','')
+            clean_name = selItem.replace(lang(32003),'').replace(lang(32004),'').replace(lang(32005),'').replace('\n','')
 
             item_tup = (clean_name, s_entry)
             
-            if selItem.endswith(' (running)') or selItem.endswith(' (enabled)'):
+            if selItem.endswith(lang(32003)) or selItem.endswith(lang(32004)):
 
                 # if the item is currently enabled or running
 
