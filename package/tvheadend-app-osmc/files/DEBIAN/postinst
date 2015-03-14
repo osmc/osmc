@@ -18,6 +18,7 @@ then
         "admin": 1,
         "id": "1"
 	}' > /home/osmc/.hts/tvheadend/accesscontrol/1
+chown -R osmc:osmc /home/osmc/.hts
 fi
 
 systemctl enable tvheadend.service
