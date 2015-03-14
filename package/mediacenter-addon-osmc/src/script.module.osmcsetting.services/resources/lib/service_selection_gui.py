@@ -1,5 +1,6 @@
 import os
 import subprocess
+import xbmcaddon
 import xbmcgui
 import xbmc
 from collections import OrderedDict
