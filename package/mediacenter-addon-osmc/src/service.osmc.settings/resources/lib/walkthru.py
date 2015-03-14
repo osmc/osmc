@@ -21,6 +21,11 @@ def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+
 class Networking_caller(Thread):
 	def __init__(self, parent, net_call):
 		super(Networking_caller, self).__init__()

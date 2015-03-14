@@ -32,6 +32,11 @@ def log(message):
 	xbmc.log('osmc_settings: ' + str(message), level=xbmc.LOGDEBUG)
 
 
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+
 class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
