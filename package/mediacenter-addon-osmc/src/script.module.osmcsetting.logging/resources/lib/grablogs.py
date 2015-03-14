@@ -127,7 +127,7 @@ class Main(object):
 
 		else:
 
-			self.url = 'http://paste.osmc.io/%s' % key
+			self.url = 'http://paste.osmc.io/ %s' % key
 
 			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
 
