@@ -94,7 +94,7 @@ class APF_obj(xbmcgui.ListItem):
 		if status == True:
 
 			self.installed = True
-			self.setLabel2('Installed')
+			self.setLabel2(lang(32005))
 
 
 	def refresh_icon(self):

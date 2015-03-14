@@ -286,6 +286,10 @@ class OSMCGui(object):
 									"script.module.osmcsetting.pioverclock":			1,
 									"script.module.osmcsetting.updates":				2,
 									"script.module.osmcsetting.networking":				3,
+									"script.module.osmcsetting.logging":				4, 
+									"script.module.osmcsetting.apfstore":				5,
+									"script.module.osmcsetting.services":				6,
+
 									}
 
 		# order of addon hierarchy

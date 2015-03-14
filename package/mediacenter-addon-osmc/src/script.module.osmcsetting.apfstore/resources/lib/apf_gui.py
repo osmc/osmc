@@ -92,7 +92,7 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 		if install:
 
-			self.getControl(61).setLabel('Install: %s' % install)
+			self.getControl(61).setLabel(lang(32001) % install)
 			self.getControl(6).setVisible(True)
 			self.getControl(61).setVisible(True)
 
@@ -102,7 +102,7 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 		if removal:
 
-			self.getControl(62).setLabel('Uninstall: %s' % removal)
+			self.getControl(62).setLabel(lang(32002) % removal)
 			self.getControl(6).setVisible(True)
 			self.getControl(62).setVisible(True)			
 
@@ -213,11 +213,11 @@ class addon_info_gui(xbmcgui.WindowXMLDialog):
 
 		if self.sel_item.installed:
 
-			self.getControl(6).setLabel('Uninstall')
+			self.getControl(6).setLabel(lang(32004))
 
 		else:
 
-			self.getControl(6).setLabel('Install')
+			self.getControl(6).setLabel(lang(32003))
 			
 
 
@@ -227,7 +227,7 @@ class addon_info_gui(xbmcgui.WindowXMLDialog):
 
 			lbl = self.getControl(6).getLabel()
 
-			if lbl == 'Install':
+			if lbl == lang(32003):
 				self.action = 'Install'
 			else:
 				self.action = 'Uninstall'
