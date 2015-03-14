@@ -23,7 +23,7 @@
 		<!-- 32069: Only check for updates if system is idle for 1 minute -->
 		<setting default="true" id="update_on_idle" label="32069" type="bool"/>
 	</category>
-	<category label="Update Settings">
+	<category label="32093">
 		<!-- 32064: Action when updates are found -->
 		<setting default="0" id="on_upd_detected" label="32059" lvalues="32057|32058|32059|32060|32061" type="enum"/>
 		<!-- 32057: "Prompt for all actions" -->
@@ -45,7 +45,7 @@
 		<!-- 32068: Do not show icon on home screen -->
 		<setting default="false" id="suppress_icon" label="32068" type="bool"/>
 	</category>
-	<category label="Manual Controls">
+	<category label="32094">
 		<!-- 32056: Scan for updates now -->
 		<setting action="RunScript($CWD/resources/lib/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
 		<setting action="RunScript($CWD/resources/lib/call_osmc_parent.py, walkthru)" id="walkthru" label="TEMP TESTING walkthru" option="close" type="action"/>
