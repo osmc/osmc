@@ -130,7 +130,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			hgroup.setVisible(False)
 
 			mbutton = self.getControl(102)
-			mbutton.setLabel('Turbo')
+			mbutton.setLabel(lang(32100))
 
 			cbutton = self.getControl(104)
 
