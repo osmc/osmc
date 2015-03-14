@@ -42,7 +42,6 @@ class Main(object):
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False},
 				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False},
-				'cmdline' 			: {'function': self.grab_cmdline, 				'setting': False},
 				'fstab' 			: {'function': self.grab_fstab, 				'setting': False},
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False},
@@ -61,7 +60,6 @@ class Main(object):
 		keys = [
 				'uname',
 				'config',
-				'cmdline',
 				'advancedsettings',
 				'keyboard',
 				'remote',
@@ -229,11 +227,11 @@ class Main(object):
 
 		self.log_list.extend(['\n====================== UNAME ==============================\n'])
 
-		with os.popen('uname -a') as f:
-			self.log_list.extend(f.readlines())
-
-
-	def grab_cmdline(self):
+		try:
+			with os.popen('uname -a') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['uname not found'])
 
 		self.log_list.extend(['\n====================== cmdline =========================\n'])
 
