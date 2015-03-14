@@ -1,0 +1,27 @@
+From eafd27b5ab9712c1a35bfac2ac85730dabaf56b1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 14 Mar 2015 12:46:36 +0000
+Subject: [PATCH] Fix NEON check by changing HWCAP_NEON from a #define to an
+ explicit value (1 << 12)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/CPUInfo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/CPUInfo.cpp b/xbmc/utils/CPUInfo.cpp
+index 71aa745..deeeb6a 100644
+--- a/xbmc/utils/CPUInfo.cpp
++++ b/xbmc/utils/CPUInfo.cpp
+@@ -941,7 +941,7 @@ bool CCPUInfo::HasNeon()
+       {
+         if (auxv.a_type == AT_HWCAP)
+         {
+-          has_neon = (auxv.a_un.a_val & HWCAP_NEON) ? 1 : 0;
++          has_neon = (auxv.a_un.a_val & (1 << 12)) ? 1 : 0;
+           break;
+         }
+       }
+-- 
+2.1.0
+
