@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-filestub="osmc-vero-filesystem"
+filestub="osmc-vero1-filesystem"
 
 check_platform
 verify_action
@@ -70,7 +70,7 @@ verify_action
 echo -e "Installing core packages"
 # We have to set up userland first for kernel postinst rules
 verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends vero-device-osmc
+chroot ${DIR} apt-get -y install --no-install-recommends vero1-device-osmc
 verify_action
 # We have SSH separate so we can remove it later via App Store
 chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
