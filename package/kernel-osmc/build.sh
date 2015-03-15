@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="3.18.9" && REV="3"
 test $1 == rbp2 && VERSION="3.18.9" && REV="5"
-test $1 == vero && REV="1"
+test $1 == vero && REV="2"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -88,6 +88,7 @@ then
 		make imx6dl-vero.dtb
 		mkdir -p ../../files-image/boot/
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
+		popd
 		# Disassemble kernel package to add device tree
 		mv src/${1}-image*.deb .
 		dpkg -x ${1}-image*.deb files-image/
