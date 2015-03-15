@@ -5,6 +5,6 @@
 
 . ../common.sh
 
-echo -e "Building package vero-device-osmc"
+echo -e "Building package vero1-device-osmc"
 make clean
-dpkg -b files/ vero-device-osmc.deb
+dpkg -b files/ vero1-device-osmc.deb
