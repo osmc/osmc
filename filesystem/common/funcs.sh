@@ -81,10 +81,13 @@ function conf_tty()
 
 function setup_busybox_links()
 {
-	chroot ${1} ln -s /bin/busybox /bin/vi
-	chroot ${1} ln -s /bin/busybox /bin/ping
-	chroot ${1} ln -s /bin/busybox /bin/unzip
-	chroot ${1} chmod +s /bin/busybox
+	if [ -f ${1}/bin/busybox ]
+	then
+		chroot ${1} ln -s /bin/busybox /bin/vi
+		chroot ${1} ln -s /bin/busybox /bin/ping
+		chroot ${1} ln -s /bin/busybox /bin/unzip
+		chroot ${1} chmod +s /bin/busybox
+	fi
 }
 
 export -f setup_osmc_user
