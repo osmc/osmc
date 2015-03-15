@@ -63,7 +63,6 @@ deb http://apt.osmc.tv jessie main
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
