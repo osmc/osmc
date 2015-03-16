@@ -23,7 +23,7 @@ then
 	cp -ar libarmmem.so $out/usr/lib
 	cp -ar libarmmem.a $out/usr/lib
 	popd
-        fix_arch_ctl "files/DEBIAN/control"
+    fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ rbp-armmem-osmc.deb
 fi
 teardown_env "${1}"
