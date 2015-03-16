@@ -294,6 +294,7 @@ class OSMCGui(object):
 									"script.module.osmcsetting.logging":				4, 
 									"script.module.osmcsetting.apfstore":				5,
 									"script.module.osmcsetting.services":				6,
+									"script.module.osmcsetting.remotes":				7,
 
 									}
 
