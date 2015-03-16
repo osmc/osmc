@@ -12,7 +12,7 @@ if [ $? == 0 ]
 then
 	echo -e "Building package rbp-armmem"
 	out=$(pwd)/files
-    	sed '/Package/d' -i files/DEBIAN/control
+    sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-armmem-osmc" >> files/DEBIAN/control
 	make clean
 	pushd src/arm-mem-*
