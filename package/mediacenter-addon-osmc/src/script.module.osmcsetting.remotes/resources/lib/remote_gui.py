@@ -44,7 +44,8 @@ class remote_gui_launcher(object):
 		# container for any confs we want to ignore
 		self.excluded = ['lircd.conf']
 
-		self.lircd_path = '/home/osmc/lircd.conf'
+		self.lircd_home_path = '/home/osmc/lircd.conf'
+		self.lircd_path = '/etc/lirc/lircd.conf'
 
 		self.etc_lirc = '/etc/lirc/'
 
@@ -78,16 +79,16 @@ class remote_gui_launcher(object):
 
 		path, filename = os.path.split(conf)
 
-		# get conf name; check first line in file for "# name: "
+		# get conf name; check first line in file for "# name:"
 		with open(conf, 'r') as f:
 			lines = f.readlines()
 			first_line = lines[0]
-			if first_line.startswith("# name: "):
-				name = first_line[len("# name: "):]
+			if first_line.startswith("# name:"):
+				name = first_line[len("# name:"):]
 				name2 = filename
 			else:
-				name = filename
-				name2 = '/etc/lirc/'
+				name = filename.replace('.conf')
+				name2 = '/etc/lirc/%s' % filename
 
 		# check for remote image, use it if it is available
 		image_path = os.path.join(path, filename.replace('.conf','.png'))
@@ -119,23 +120,28 @@ class remote_gui_launcher(object):
 		if via == 'local':
 			# symlink the local file to /home/osmc/lircd.conf
 
-			if os.path.isfile(self.lircd_path):
-				os.remove(self.lircd_path)
+			if os.path.isfile(self.lircd_home_path):
+				os.remove(self.lircd_home_path)
 
-			os.symlink(conf, self.lircd_path)
+			os.symlink(conf, self.lircd_home_path)
 
 		elif via == 'user':
 			# copy the users file to /home/osmc/lircd.conf
 
-			if os.path.isfile(self.lircd_path):
-				os.remove(self.lircd_path)
+			if os.path.isfile(self.lircd_home_path):
+				os.remove(self.lircd_home_path)
 
-			shutil.copyfile(conf, self.lircd_path)
+			shutil.copyfile(conf, self.lircd_home_path)
 
 		else:
 			return
 
-		subprocess.call(['sudo', 'systemctl', 'restart', 'lirc'])
+		if os.path.isfile(self.lircd_path):
+			os.remove(self.lircd_path)
+
+		subprocess.call(['sudo', 'ln', '-s', self.lircd_home_path, self.lircd_path])
+
+		subprocess.call(['sudo', 'systemctl', 'restart', 'eventlircd.service'])
 
 
 class remote_GUI(xbmcgui.WindowXMLDialog):
