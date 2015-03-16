@@ -66,6 +66,7 @@ function build_in_env()
 	test $DEP == rbp2 && DEP="armv7"
 	test $DEP == imx6 && DEP="armv7"
 	test $DEP == vero && DEP="armv7"
+	test $DEP == vero1 && DEP="armv7"
 	test $DEP == rbp1 && DEP="armv6l"
 	test $DEP == atv && DEP="i386"
 	TCDIR="/opt/osmc-tc/$DEP-toolchain-osmc"
