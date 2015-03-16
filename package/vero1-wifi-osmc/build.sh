@@ -6,10 +6,10 @@
 . ../common.sh
 
 # Build in native environment
-build_in_env "${1}" $(pwd) "vero-wifi-osmc"
+build_in_env "${1}" $(pwd) "vero1-wifi-osmc"
 if [ $? == 0 ]
 then
-	echo -e "Building vero-wifi-osmc"
+	echo -e "Building vero1-wifi-osmc"
 	out=$(pwd)/files
 	make clean
 	mkdir -p ${out}/usr/bin
@@ -18,6 +18,6 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	dpkg -b files/ vero-wifi-osmc.deb
+	dpkg -b files/ vero1-wifi-osmc.deb
 fi
 teardown_env "${1}"
