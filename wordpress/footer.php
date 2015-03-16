@@ -24,7 +24,7 @@
                       <br>
                       <a href="http://simonbrunton.com" target="_blank" class="designed">Logo by Simon Brunton</a>
                       <br>
-                      <a href="http://markthe.is" target="_blank" class="designed">Designed by Mark Theis Maden</a>
+                      <a href="http://markthe.is" target="_blank" class="designed">Website by Mark Theis Madsen</a>
                       <br><br>
                       <p>&#169; 2015 OSMC </p>
 
