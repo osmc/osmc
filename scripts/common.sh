@@ -183,6 +183,16 @@ function pull_source()
 	echo -e "No file type match found for URL" && exit 1
 }
 
+function pull_bin()
+{
+	ischroot
+	chrootval=$?
+	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return; fi # Prevent recursive loop
+	if ! command -v wget >/dev/null 2>&1; then update_sources && verify_action && install_package "wget" && verify_action; fi
+	if [ -f $2 ]; then echo "Cleaning old source" && rm -f ${2}; fi
+	wget ${1} -O ${2}
+}
+
 if [ -z $DOWNLOAD_URL ]
 then
 	DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
@@ -205,3 +215,4 @@ export -f cleanup_filesystem
 export -f remove_existing_filesystem
 export -f install_patch
 export -f pull_source
+export -f pull_bin
