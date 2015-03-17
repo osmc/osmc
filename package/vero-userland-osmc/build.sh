@@ -27,6 +27,8 @@ then
 	handle_dep "libtool-bin"
 	handle_dep "autoconf"
 	handle_dep "automake"
+	mkdir -p ${out}/opt/vero/lib
+	mkdir -p files-dev/opt/vero/include
 	pushd src
 	install_patch "../patches" "all"
 	rm -rf /headers > /dev/null 2>&1
@@ -51,7 +53,7 @@ then
 	popd
 	sh libfslvpuwrap.bin --auto-accept
 	pushd libfslvpuwrap*
-	CFLAGS="-I../../files/usr/include -L../../files/usr/lib" ./autogen.sh --prefix=/usr
+	CFLAGS="-I../../files/usr/include -L../../files/usr/lib" ./autogen.sh --prefix=/opt/vero
 	$BUILD all
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	make install DESTDIR=${out}
@@ -67,16 +69,23 @@ then
 	ln -s libGAL-fb.so libGAL.so
 	ln -s libVIVANTE-fb.so libVIVANTE.so
 	popd
-	cp -ar usr ${out}
+	cp -ar usr/include ${out}/opt/vero
+	cp -ar usr/lib ${out}/opt/vero
 	popd
-	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_libs
 	popd
-	mkdir -p files-dev/usr
-	mv files/usr/include files-dev/usr/
-	rm -rf ${out}/usr/share/imx-mm/video-codec
-	rm -rf ${out}/usr/share/doc/
+	mv ${out}/usr/include/* files-dev/opt/vero/include
+	mv ${out}/usr/lib/* ${out}/opt/vero/lib/
+	rm -rf ${out}/usr/lib >/dev/null 2>&1
+	rm -rf ${out}/usr/include >/dev/null 2>&1
+	mv files/opt/vero/include/* files-dev/opt/vero/include
+	rm -rf files/opt/vero/include
+	mkdir -p ${out}/etc/ld.so.conf.d
+	echo "/opt/vero/lib" > files/etc/ld.so.conf.d/vero.conf
+	rm -rf ${out}/opt/vero/share
+	rm -rf ${out}/usr/share
 	dpkg -b files/ vero-userland-osmc.deb
 	dpkg -b files-dev vero-userland-dev-osmc.deb
+	rm -rf /headers
 fi
 teardown_env "${1}"
