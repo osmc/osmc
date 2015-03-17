@@ -127,7 +127,8 @@ then
 	test "$1" == atv && install_patch "../../patches" "atv"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr"
+		install_patch "../../patches" "rbp"
+		test "$1" == rbp1 && install_patch "../../patches" "lpr"
 		test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	fi
 	./bootstrap
