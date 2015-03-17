@@ -206,8 +206,7 @@ then
 		--disable-openmax \
 		--disable-vdpau \
 		--disable-vaapi \
-		--enable-neon \
-		--enable-gles
+		--enable-gles \
 		--enable-codec=imxvpu \
 		--enable-libcec \
 		--disable-debug \
@@ -228,9 +227,10 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-    gcc addon-compiler.c -o addon-compiler
-    mv addon-compiler ${out}/usr/bin
-	popd
+        gcc addon-compiler.c -o addon-compiler
+        mv addon-compiler ${out}/usr/bin
+	if [ "$1" == vero ]; then gcc devmem2.c -o devmem2 && mv devmem2 ${out}/usr/bin; fi
+        popd
 	pushd kodi-pvr/xbmc-pvr*
 	# Reset CFLAGS here! Add some optimisation
 	export CFLAGS="-O3 -fomit-frame-pointer" && \
