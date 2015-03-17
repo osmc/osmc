@@ -193,11 +193,11 @@ then
 		--build=arm-linux
 	fi
 	if [ "$1" == "vero" ]; then
-	LIBRARY_PATH+="" && \
-	export CFLAGS+="-I/usr/include/afpfs-ng" && \
+	LIBRARY_PATH+="/opt/vero/lib" && \
+	export CFLAGS+="-I/usr/include/afpfs-ng -I/opt/vero/include" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
-	export LDFLAGS="" && \
+	export LDFLAGS="-L/opt/vero/lib" && \
 	./configure \
 		--prefix=/usr \
 		--disable-x11 \
