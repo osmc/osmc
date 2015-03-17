@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Pulse-Eight/libcec/archive/master.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/Pulse-Eight/libcec/archive/0a3a1d742ceebcde87ca67b4a68805a5df4f88ec.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
@@ -24,11 +24,14 @@ then
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
+	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
-	pushd src/libcec-master
+	pushd src/libcec*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
+	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero"; fi
 	./bootstrap
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib; fi
+	if [ "$1" == "vero" ]; then ./configure --prefix=/usr --enable-imx6; fi
 	if [ "$1" == "i386" ]; then ./configure --prefix=/usr; fi
 	$BUILD
 	make install DESTDIR=${out}
