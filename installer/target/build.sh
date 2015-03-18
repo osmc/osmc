@@ -81,7 +81,7 @@ then
 	echo -e "Installing Vero files"
 	mv zImage /mnt
 	mv *.dtb /mnt
-	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
+	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/

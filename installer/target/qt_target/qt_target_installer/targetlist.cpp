@@ -17,7 +17,7 @@ TargetList::TargetList()
     /* We can use the same Target for both Pis, identical entries */
     targetMap.insert("rbp1", RBP);
     targetMap.insert("rbp2", RBP);
-    targetMap.insert("vero", VERO);
+    targetMap.insert("vero1", VERO);
 }
 
 TargetList::~TargetList()
