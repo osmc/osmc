@@ -12,7 +12,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-network-osmc" >> files/DEBIAN/control
-	echo "Depends: ${1}-connman-osmc, bluez, wget, wireless-firmware-osmc, net-tools, ntp, wpasupplicant, libnss-mdns, nfs-common, cifs-utils, ca-certificates, curl, python-dbus, python-gobject" >> files/DEBIAN/control
+	echo "Depends: ${1}-connman-osmc, bluez, wget, iptables, wireless-firmware-osmc, net-tools, ntp, wpasupplicant, libnss-mdns, nfs-common, cifs-utils, ca-certificates, curl, python-dbus, python-gobject" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ network-osmc.deb
 fi
