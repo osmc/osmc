@@ -12,10 +12,22 @@ function is_rbp()
 	fi
 }
 
+function is_vero()
+{
+        if ischroot
+        then
+                dpkg -l | grep -q "vero-userland-osmc"
+                return
+        else
+                grep -q osmcdev=vero /proc/cmdline > /dev/null 2>&1
+                return
+        fi
+}
+
 if [ "$1" = "configure" ]
 then
 	if ! is_rbp; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1; fi
-
+	if is_vero; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.remotes >/dev/null 2>&1; fi
 	for dir in /usr/share/kodi/addons/service.osmc.settings/ /usr/share/kodi/addons/script.module.osmcsetting.*/
 	do
 		if pushd $dir >/dev/null 2>&1; then pycompile -O . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
