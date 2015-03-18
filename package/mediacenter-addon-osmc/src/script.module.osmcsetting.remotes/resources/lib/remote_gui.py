@@ -46,8 +46,7 @@ class remote_gui_launcher(object):
 
 		self.lircd_home_path = '/home/osmc/lircd.conf'
 		self.lircd_path = '/etc/lirc/lircd.conf'
-
-		self.etc_lirc = '/etc/lirc/'
+		self.etc_lirc = '/etc/lirc/'	
 
 		# get the contents of /etc/lirc/
 		local_confs_base = os.listdir(self.etc_lirc)
@@ -87,7 +86,7 @@ class remote_gui_launcher(object):
 				name = first_line[len("# name:"):]
 				name2 = filename
 			else:
-				name = filename.replace('.conf')
+				name = filename.replace('.conf', '')
 				name2 = '/etc/lirc/%s' % filename
 
 		# check for remote image, use it if it is available
