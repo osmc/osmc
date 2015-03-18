@@ -90,6 +90,10 @@ MAIN_MENU = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOO
 
 BLUETOOTH_CONTROLS = [10300, 10303, 6000, 7000]
 
+BLUETOOTH_REFRESH = 10300
+
+BLUETOOTH_DISCOVERY = 10303
+
 BLUETOOTH_ENABLE_TOGGLE = 10301
 
 ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10118, 10119,  910112, 910113, 910114,
@@ -566,8 +570,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def populate_wifi_panel(self, scan=False):
         # remove everything from the existing panel
-        self.WFP.reset()
-        self.setFocusId(WIRELESS_ADAPTER_TOGGLE)
         if osmc_network.is_wifi_available():
             if osmc_network.is_wifi_enabled():
                 self.populate_wifi_networks(scan)
@@ -786,7 +788,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             return
 
         self.toggle_controls(True, BLUETOOTH_CONTROLS)
-        discoveryRadioButton = self.getControl(10303)
+        discoveryRadioButton = self.getControl(BLUETOOTH_DISCOVERY)
+
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
 
         bluetooth_paired_dict = self.populate_bluetooth_dict(True)
@@ -813,42 +816,47 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def handle_bluetooth_selection(self, control_id):
         # 10300 - No Action Here - Refresh - populate_bluetooth_panel() will be called by calling code
-        if control_id == 10301:  # Enable Bluetooth
+        if control_id == BLUETOOTH_ENABLE_TOGGLE:  # Enable Bluetooth
             if osmc_bluetooth.is_bluetooth_enabled():
                 osmc_bluetooth.toggle_bluetooth_state(False)
             else:
                 osmc_bluetooth.toggle_bluetooth_state(True)
 
-        if control_id == 10303:  # Discovery
+        if control_id == BLUETOOTH_DISCOVERY:  # Discovery
             if not osmc_bluetooth.is_discovering():
                 osmc_bluetooth.start_discovery()
             else:
                 osmc_bluetooth.stop_discovery()
+            time.sleep(1)
 
         if control_id == 6000:  # paired devices
             item = self.BTP.getSelectedItem()
-            address = item.getProperty('address')
-            alias = item.getProperty('alias')
-            # 'Bluetooth' , 'Remove Device'
-            if DIALOG.yesno(lang(32020), lang(32021) + ' ' + alias + '?'):
-                osmc_bluetooth.remove_device(address)
+            if item:
+                address = item.getProperty('address')
+                alias = item.getProperty('alias')
+                # 'Bluetooth' , 'Remove Device'
+                if DIALOG.yesno(lang(32020), lang(32021) + ' ' + alias + '?'):
+                    osmc_bluetooth.remove_device(address)
+                    self.setFocusId(BLUETOOTH_REFRESH)
 
         if control_id == 7000:  # Discovered devices
             item = self.BTD.getSelectedItem()
-            address = item.getProperty('address')
-            alias = item.getProperty('alias')
-            # 'Bluetooth' , 'Pair with Device'
-            if DIALOG.yesno(lang(32020), lang(32022) + ' ' + alias + '?'):
-                script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
-                result = osmc_bluetooth.pair_device(address, script_base_path)
-                if result:
-                    # 'Paired Sucessfully with'
-                    message = lang(32023) + ' ' + alias
-                else:
-                    # 'Pairing with'         'failed'
-                    message = lang(32024) + alias + lang(320025)
-                # 'Bluetooth'
-                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
+            if item:
+                address = item.getProperty('address')
+                alias = item.getProperty('alias')
+                # 'Bluetooth' ,        'Pair with Device'
+                if DIALOG.yesno(lang(32020), lang(32022) + ' ' + alias + '?'):
+                    script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
+                    result = osmc_bluetooth.pair_device(address, script_base_path)
+                    self.setFocusId(BLUETOOTH_REFRESH)
+                    if result:
+                        # 'Paired Sucessfully with'
+                        message = lang(32023) + ' ' + alias
+                    else:
+                        # 'Pairing with'                            'failed'
+                        message = lang(32024) + ' ' + alias + ' ' + lang(320025)
+                    # 'Bluetooth'
+                    xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
 
 
     def create_bluetooth_items(self, bluetooth_dict):

@@ -30,7 +30,6 @@ def return_status(result, messages):
 def decode_response(message):
     if message.startswith(PEXPECT_SOL):
         jsonStr = message.replace(PEXPECT_SOL,'').replace(PEXPECT_EOL,'')
-
         returnValue = json.loads(jsonStr)
         if returnValue.keys()[0] == 'RETURN_VALUE':
             return str(returnValue.values()[0][0])
@@ -204,8 +203,7 @@ if __name__ == '__main__':
             device = bluezutils.find_device(args[0],
                                             options.adapter_pattern)
         except:
-            return_value  ={'DEVICE_NOT_FOUND' : ['Device not Found' ]}
-            print json.dumps(return_value) + PEXPECT_EOL
+            return_status('DEVICE_NOT_FOUND' , ['Device not Found' ])
             exit(1)
         dev_path = device.object_path
         agent.set_exit_on_release(False)

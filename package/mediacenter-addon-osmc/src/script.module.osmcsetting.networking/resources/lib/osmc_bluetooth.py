@@ -157,7 +157,7 @@ def pair_device(deviceAddress, scriptBasePath = ''):
             messages = d.values()[0]
             log(['return_value = '+ return_value, 'Messages = ' + str(messages)])
             if return_value == 'PAIRING_OK':
-                paired =  True
+                paired = True
                 break
             if return_value == 'DEVICE_NOT_FOUND':
                 return False  # return early no need to call remove_device()
@@ -165,6 +165,8 @@ def pair_device(deviceAddress, scriptBasePath = ''):
                 deviceAlias = get_device_property(deviceAddress, 'Alias')
                 returnValue = handleAgentInteraction(deviceAlias, return_value , messages)
                 if returnValue:
+                    if returnValue == 'NO_PIN_ENTERED':
+                        return False
                     sendStr = encode_return('RETURN_VALUE', [ returnValue ])
                     child.sendline(sendStr)
         except pexpect.EOF:
@@ -194,7 +196,7 @@ def handleAgentInteraction(deviceAlias, command , messages):
         #         'Enter PIN to Pair with'
         message = lang(32030) + ' ' + deviceAlias
     if messages[0] == 'CONFIRM_PASSKEY':
-#                 'Confirm passkey'                      'for'
+       #           'Confirm passkey'                      'for'
         message = lang(32031)+ ' '  +messages[0] + ' ' + lang(32032) + ' ' + deviceAlias
 
     if command == 'NOTIFICATION':
@@ -204,7 +206,10 @@ def handleAgentInteraction(deviceAlias, command , messages):
             return 'YES'
         return 'NO'
     if command == 'NUMERIC_INPUT':
-        return  dialog.numeric(0, message)
+        value = dialog.numeric(0, message)
+        if len(value) == 0:
+            value = 'NO_PIN_ENTERED'
+        return value
                     
     return None
 
