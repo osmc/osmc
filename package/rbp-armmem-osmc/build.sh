@@ -12,7 +12,7 @@ if [ $? == 0 ]
 then
 	echo -e "Building package rbp-armmem"
 	out=$(pwd)/files
-    	sed '/Package/d' -i files/DEBIAN/control
+    sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-armmem-osmc" >> files/DEBIAN/control
 	make clean
 	pushd src/arm-mem-*
@@ -23,7 +23,7 @@ then
 	cp -ar libarmmem.so $out/usr/lib
 	cp -ar libarmmem.a $out/usr/lib
 	popd
-        fix_arch_ctl "files/DEBIAN/control"
+    fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ rbp-armmem-osmc.deb
 fi
 teardown_env "${1}"

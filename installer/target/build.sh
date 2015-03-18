@@ -32,6 +32,7 @@ pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION
 verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
+test "$1" == vero1 && install_patch "../patches" "vero1"
 test "$1" == rbp1 && install_patch "../patches" "rbp1"
 test "$1" == rbp2 && install_patch "../patches" "rbp2"
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -39,8 +40,8 @@ then
 	install_patch "../patches" "rbp"
 	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
 	echo "dwc_otg.fiq_fix_enable=1 sdhci-bcm2708.sync_after_dma=0 dwc_otg.lpm_enable=0 console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=${1}" > package/rpi-firmware-osmc/cmdline.txt
-	make osmc_defconfig
 fi
+make osmc_defconfig
 make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 popd
@@ -58,9 +59,9 @@ while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1
 done
 if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] ; then size=256; fi
 date=$(date +%Y%m%d)
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "imx6" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
@@ -75,21 +76,24 @@ then
 	mv zImage /mnt/kernel.img
 	mv INSTALLER/* /mnt
 fi
-if [ "$1" == "imx6" ]
+if [ "$1" == "vero1" ]
 then
-	echo -e "Installing i.MX6 files"
+	echo -e "Installing Vero files"
 	mv zImage /mnt
 	mv *.dtb /mnt
-	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init osmcdev=imx6 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
-	echo -e "Flashing bootloader"
-	cp u-boot.img /mnt
-	dd if=SPL of=/dev/loop0 bs=1K seek=1
+	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
 umount /mnt
 sync
 kpartx -d OSMC_TGT_${1}_${date}.img
+if [ "$1" == "vero1" ]
+then
+	echo -e "Flashing bootloader"
+	dd conv=notrunc if=SPL of=OSMC_TGT_${1}_${date}.img bs=1K seek=1
+	dd conv=notrunc if=u-boot.img of=OSMC_TGT_${1}_${date}.img bs=1K seek=42
+fi
 echo -e "Compressing image"
 gzip OSMC_TGT_${1}_${date}.img
 md5sum OSMC_TGT_${1}_${date}.img.gz > OSMC_TGT_${1}_${date}.md5

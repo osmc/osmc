@@ -514,7 +514,7 @@ class Main(object):
 		ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
-	@clog(log, maxlength=250)
+	# @clog(log, maxlength=250)
 	def progress_bar(self, **kwargs):
 
 		''' Controls the creation and updating of the background prgress bar in kodi.

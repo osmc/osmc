@@ -28,7 +28,7 @@ void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1")
     {
         fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
@@ -51,7 +51,7 @@ void BootloaderConfig::configureEnvironment()
         else
         {
             /* NFS install */
-            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet";
+            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet ";
         }
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
@@ -69,5 +69,20 @@ void BootloaderConfig::configureEnvironment()
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         configFile.close();
         cmdlineFile.close();
+    }
+    if (utils->getOSMCDev() == "vero1")
+    {
+        QFile uEnvFile("/mnt/boot/uEnv.txt");
+        QStringList uEnvStringList;
+        if (! device->getRoot().contains(":/"))
+            uEnvStringList << "mmcargs=setenv bootargs 'root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 ";
+        else
+        {
+            /* NFS install */
+            uEnvStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 ";
+        }
+        uEnvStringList << "osmcdev=vero1'";
+        utils->writeToFile(uEnvFile, uEnvStringList, false);
+        uEnvFile.close();
     }
 }

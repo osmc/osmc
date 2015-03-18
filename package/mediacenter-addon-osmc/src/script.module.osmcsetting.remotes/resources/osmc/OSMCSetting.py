@@ -106,6 +106,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 
 # OSMC SETTING Modules
 from CompLogger import comprehensive_logger as clog
+import remote_gui
 
 def log(message):
 	xbmc.log('OSMC REMOTES ' + str(message), level=xbmc.LOGDEBUG)
@@ -130,7 +131,6 @@ class OSMCSettingClass(object):
 		# this is what is displayed in the main settings gui
 		self.shortname = 'Remotes'
 
-
 		self.description = 	"""This module allows the user to select the appropriate lirc.conf file for their remote."""
 
 
@@ -145,7 +145,12 @@ class OSMCSettingClass(object):
 			own user interfaces.
 		'''
 
-		self.me.openSettings()
+		scriptPath = self.me.getAddonInfo('path')
+
+		self.GUI = remote_gui.remote_gui_launcher()
+
+		self.GUI.open_gui()
+
 
 
 	@clog(log)

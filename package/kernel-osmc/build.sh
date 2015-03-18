@@ -4,9 +4,9 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp1 && VERSION="3.18.9" && REV="3"
-test $1 == rbp2 && VERSION="3.18.9" && REV="5"
-test $1 == vero && VERSION="3.14.14" && REV="3"
+test $1 == rbp1 && VERSION="3.18.9" && REV="4"
+test $1 == rbp2 && VERSION="3.18.9" && REV="6"
+test $1 == vero && VERSION="3.14.14" && REV="4"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -44,6 +44,8 @@ then
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
+	make-kpkg --stem $1 kernel_source --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
+	if [ $? != 0 ]; then echo "Building kernel source package failed" && exit 1; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
 	if [ "$1" == "rbp1" ]
 	then

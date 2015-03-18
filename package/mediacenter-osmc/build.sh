@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/b5dbdb57db04a8628c78fecfa7002eac04820797.tar.gz" "$(pwd)/kodi"
 else
@@ -103,6 +103,10 @@ then
 	then
 		handle_dep "rbp-userland-dev-osmc"
 	fi
+	if [ "$1" == "vero" ]
+	then
+		handle_dep "vero-userland-dev-osmc"
+	fi
 	if [ "$1" == "rbp1" ]
 	then
 		handle_dep "rbp1-libcec-dev-osmc"
@@ -119,6 +123,14 @@ then
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libafpclient-dev-osmc"
 	fi
+	if [ "$1" == "vero" ]
+	then
+		handle_dep "vero-libcec-dev-osmc"
+		handle_dep "armv7-libshairplay-dev-osmc"
+		handle_dep "armv7-librtmp-dev-osmc"
+		handle_dep "armv7-libnfs-dev-osmc"
+		handle_dep "armv7-libafpclient-dev-osmc"
+	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-mediacenter-osmc" >> files/DEBIAN/control
@@ -127,7 +139,8 @@ then
 	test "$1" == atv && install_patch "../../patches" "atv"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		install_patch "../../patches" "rbp" && install_patch "../../patches" "lpr"
+		install_patch "../../patches" "rbp"
+		test "$1" == rbp1 && install_patch "../../patches" "lpr"
 		test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	fi
 	./bootstrap
@@ -179,6 +192,34 @@ then
 		--enable-player=omxplayer \
 		--build=arm-linux
 	fi
+	if [ "$1" == "vero" ]; then
+	LIBRARY_PATH+="/opt/vero/lib" && \
+	export CFLAGS+="-I/usr/include/afpfs-ng -I/opt/vero/include" && \
+	export CXXFLAGS=$CFLAGS && \
+	export CPPFLAGS=$CFLAGS && \
+	export LDFLAGS="-L/opt/vero/lib" && \
+	./configure \
+		--prefix=/usr \
+		--disable-x11 \
+		--disable-sdl \
+		--disable-xrandr \
+		--disable-openmax \
+		--disable-vdpau \
+		--disable-vaapi \
+		--enable-gles \
+		--enable-codec=imxvpu \
+		--enable-libcec \
+		--disable-debug \
+		--disable-texturepacker \
+		--enable-optical-drive \
+		--enable-dvdcss \
+		--enable-libbluray \
+		--disable-joystick \
+		--disable-vtbdecoder \
+		--disable-pulse \
+		--disable-projectm \
+		--build=arm-linux
+	fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	# Hack:
 	sed -i Makefile.include -e s/-O2//g
@@ -186,9 +227,10 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-    gcc addon-compiler.c -o addon-compiler
-    mv addon-compiler ${out}/usr/bin
-	popd
+        gcc addon-compiler.c -o addon-compiler
+        mv addon-compiler ${out}/usr/bin
+	if [ "$1" == vero ]; then gcc devmem2.c -o devmem2 && mv devmem2 ${out}/usr/bin; fi
+        popd
 	pushd kodi-pvr/xbmc-pvr*
 	# Reset CFLAGS here! Add some optimisation
 	export CFLAGS="-O3 -fomit-frame-pointer" && \
@@ -210,6 +252,7 @@ then
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libpulse0, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
 	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp1-libcec-osmc, armv6l-libafpclient-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp2-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
+	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, libx11-6, vero-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter

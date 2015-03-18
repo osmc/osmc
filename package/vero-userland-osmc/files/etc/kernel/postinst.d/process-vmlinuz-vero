@@ -1,0 +1,11 @@
+#!/bin/sh
+
+processimage()
+{
+    cp -f ${2} /boot/zImage
+    rm -rf /boot/*.dtb
+    cp -af /boot/dtb-${1}/* /boot/
+    rm -rf /lib/modules/${1}_kernel_*
+}
+
+if [ -f /boot/uEnv.txt ]; then processimage $1 $2; fi
