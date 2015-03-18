@@ -47,6 +47,7 @@ then
 	make-kpkg --stem $1 kernel_source --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel source package failed" && exit 1; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
+	if [ "$1" == "vero" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc; fi
 	if [ "$1" == "rbp1" ]
 	then
 		make bcm2708-rpi-b.dtb
