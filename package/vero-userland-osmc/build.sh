@@ -12,6 +12,7 @@ pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-3.10.17-1.
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-3.10.17-1.0.0.bin" "$(pwd)/src/imx-vpu.bin"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
+pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/gpu-viv-g2d-3.10.17-1.0.0.bin" "$(pwd)/src/viv-g2d.bin"
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/libfslvpuwrap-1.0.46.bin" "$(pwd)/src/libfslvpuwrap.bin"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/gpu-viv-bin-mx6q-3.10.17-1.0.0-hfp.bin" "$(pwd)/src/gpu-viv.bin"
@@ -48,6 +49,11 @@ then
 	rm firmware/Android.mk
 	mkdir -p ${out}/lib
 	cp -ar firmware ${out}/lib
+	popd
+	sh viv-g2d.bin --auto-accept
+	pushd gpu-viv-g2d*
+	cp -ar usr/include ${out}/opt/vero
+	cp -ar usr/lib ${out}/opt/vero
 	popd
 	sh imx-vpu.bin --auto-accept
 	pushd imx-vpu*
@@ -88,7 +94,6 @@ then
 	mkdir -p ${out}/etc/ld.so.conf.d
 	echo "/opt/vero/lib" > files/etc/ld.so.conf.d/vero.conf
 	rm -rf ${out}/opt/vero/share
-	rm -rf ${out}/usr/share
 	dpkg -b files/ vero-userland-osmc.deb
 	dpkg -b files-dev vero-userland-dev-osmc.deb
 	rm -rf /headers
