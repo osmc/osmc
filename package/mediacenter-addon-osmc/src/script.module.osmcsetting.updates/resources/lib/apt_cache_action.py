@@ -28,7 +28,7 @@ except:
 	pass
 
 
-@clog(maxlength=1500)
+# @clog(maxlength=1500)
 def call_parent(raw_message, data={}):
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
