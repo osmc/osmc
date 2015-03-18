@@ -44,7 +44,6 @@ class remote_gui_launcher(object):
 		# container for any confs we want to ignore
 		self.excluded = ['lircd.conf']
 
-		self.lircd_home_path = '/home/osmc/lircd.conf'
 		self.lircd_path = '/etc/lirc/lircd.conf'
 		self.etc_lirc = '/etc/lirc/'	
 
@@ -116,31 +115,11 @@ class remote_gui_launcher(object):
 
 		via, conf = selection
 
-		if via == 'local':
-			# symlink the local file to /home/osmc/lircd.conf
+		if os.path.isfile(conf):
 
-			if os.path.isfile(self.lircd_home_path):
-				os.remove(self.lircd_home_path)
+			subprocess.call(['sudo', 'ln', '-sf', conf, self.lircd_path])
 
-			os.symlink(conf, self.lircd_home_path)
-
-		elif via == 'user':
-			# copy the users file to /home/osmc/lircd.conf
-
-			if os.path.isfile(self.lircd_home_path):
-				os.remove(self.lircd_home_path)
-
-			shutil.copyfile(conf, self.lircd_home_path)
-
-		else:
-			return
-
-		if os.path.isfile(self.lircd_path):
-			os.remove(self.lircd_path)
-
-		subprocess.call(['sudo', 'ln', '-s', self.lircd_home_path, self.lircd_path])
-
-		subprocess.call(['sudo', 'systemctl', 'restart', 'eventlircd.service'])
+			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
 
 class remote_GUI(xbmcgui.WindowXMLDialog):
