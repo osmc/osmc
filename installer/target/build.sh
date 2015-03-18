@@ -82,15 +82,18 @@ then
 	mv zImage /mnt
 	mv *.dtb /mnt
 	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
-	echo -e "Flashing bootloader"
-	dd if=SPL of=/dev/mapper/loop0p1 bs=1K seek=1
-	dd if=u-boot.img of=/dev/mapper/loop0p1 bs=1K seek=42
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
 umount /mnt
 sync
 kpartx -d OSMC_TGT_${1}_${date}.img
+if [ "$1" == "vero1" ]
+then
+	echo -e "Flashing bootloader"
+	dd conv=notrunc if=SPL of=OSMC_TGT_${1}_${date}.img bs=1K seek=1
+	dd conv=notrunc if=u-boot.img of=OSMC_TGT_${1}_${date}.img bs=1K seek=42
+fi
 echo -e "Compressing image"
 gzip OSMC_TGT_${1}_${date}.img
 md5sum OSMC_TGT_${1}_${date}.img.gz > OSMC_TGT_${1}_${date}.md5
