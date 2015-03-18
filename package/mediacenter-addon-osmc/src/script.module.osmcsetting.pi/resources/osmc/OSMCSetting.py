@@ -649,19 +649,19 @@ Overclock settings are set using the Pi Overclock module."""
 		# setting: the set of settings in the group
 		# value: the value to assign to the kodi displayed settings if the overlay is active
 		overlay_settings 		= 	{
-		'hifiberry-dac-overlay'		: {'dacplus': 'false', 'setting': ['soundcard_dac'], 'value': '1'},
-		'iqaudio-dac-overlay'		: {'dacplus': 'false', 'setting': ['soundcard_dac'], 'value': '2'},
-		'hifiberry-digi-overlay'	: {'dacplus': 'irr',   'setting': ['soundcard_dac', 'soundcard_dacplus'], 'value': '3'},
-		'hifiberry-dacplus-overlay'	: {'dacplus': 'true',  'setting': ['soundcard_dacplus'], 'value': '1'},
-		'iq-audio-dacplus-overlay'	: {'dacplus': 'true',  'setting': ['soundcard_dacplus'], 'value': '2'},
-		'w1-gpio-overlay'			: {'dacplus': 'irr',   'setting': ['w1gpio'], 'value': '1'},
-		'w1-gpio-pullup-overlay'	: {'dacplus': 'irr',   'setting': ['w1gpio'], 'value': '2'},
-		'lirc-rpi-overlay'			: {'dacplus': 'irr',   'setting': ['lirc-rpi-overlay'], 'value': 'true'},
-		'spi-bcm2835-overlay'		: {'dacplus': 'irr',   'setting': ['spi-bcm2835-overlay'], 'value': 'true'},
+		'hifiberry-dac-overlay'		: {'setting': 'soundcard_dac', 'value': '1'},
+		'hifiberry-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '1'},
+		'iqaudio-dac-overlay'		: {'setting': 'soundcard_dac', 'value': '2'},
+		'iqaudio-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '2'},
+		'hifiberry-digi-overlay'	: {'setting': 'soundcard_dac', 'value': '3'},
+		'w1-gpio-overlay'			: {'setting': 'w1gpio', 'value': '1'},
+		'w1-gpio-pullup-overlay'	: {'setting': 'w1gpio', 'value': '2'},
+		'lirc-rpi-overlay'			: {'setting': 'lirc-rpi-overlay', 'value': 'true'},
+		'spi-bcm2835-overlay'		: {'setting': 'spi-bcm2835-overlay', 'value': 'true'},
 									}
 
 		dac 	= ['hifiberry-dac-overlay', 'iqaudio-dac-overlay', 'hifiberry-digi-overlay']
-		dacplus = ['hifiberry-dacplus-overlay','iq-audio-dacplus-overlay','hifiberry-digi-overlay']
+		dac_all = ['hifiberry-dac-overlay', 'iqaudio-dac-overlay', 'hifiberry-dacplus-overlay','iq-audio-dacplus-overlay','hifiberry-digi-overlay']
 		w1gpio  = ['w1-gpio-overlay', 'w1-gpio-pullup-overlay']
 
 		datalist = data.split('\n')
@@ -674,38 +674,47 @@ Overclock settings are set using the Pi Overclock module."""
 			self.me.setSetting('lirc-rpi-overlay', 'false')
 			self.me.setSetting('spi-bcm2835-overlay', 'false')
 			self.me.setSetting('soundcard_dac', '0')
-			self.me.setSetting('soundcard_dacplus', '0')
 			self.me.setSetting('w1gpio', '0')
 
 			for overlay in datalist:
 
-				ovl = overlay_settings.get(overlay, {})
-				dcp = ovl.get('dacplus', 'irr')
-				stg = ovl.get('setting', [])
-				val = ovl.get('value'  , 'irr')
-				if dcp != 'irr':
-					self.me.setSetting('dacplus', dcp)
-				for group in stg:
-					self.me.setSetting(group, val)
+				log(overlay)
+
+				if overlay not in overlay_settings:
+					log('not in overlay_settings')
+					continue
+
+				if 'dacplus' in overlay:
+					self.me.setSetting('dacplus', 'true')
+
+				ovl = overlay_settings[overlay]
+
+				self.me.setSetting(ovl['setting'], ovl['value'])
 
 		else:
 			new_dtoverlay = []
 
-			dcp = self.me.getSetting('dacplus')
-			
-			if dcp == 'true':
-				pos = self.me.getSetting('soundcard_dacplus')
-				if pos != '0':
-					new_dtoverlay.append(dacplus[int(pos)-1])
-				else:
-					new_dtoverlay.extend([x + '[remove]' for x in dacplus])
+			pos = self.me.getSetting('soundcard_dac')
 
+			if pos == '0':
+
+				new_dtoverlay.extend([x + '[remove]' for x in dac_all])
+			
 			else:
-				pos = self.me.getSetting('soundcard_dac')
-				if pos != '0':
-					new_dtoverlay.append(dac[int(pos)-1])
-				else:
-					new_dtoverlay.extend([x + '[remove]' for x in dac])
+
+				dcp = self.me.getSetting('dacplus')
+				
+				soundcard = dac[int(pos)-1]
+
+				if dcp == 'true':
+
+					soundcard = soundcard.replace('dac', 'dacplus')
+
+				# add the soundcard overlay
+				new_dtoverlay.append(soundcard)
+
+				#remove the unneeded entries
+				new_dtoverlay.extend([x + '[remove]' for x in dac_all if x != soundcard])
 
 			wgp = self.me.getSetting('w1gpio')
 
