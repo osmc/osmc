@@ -32,6 +32,7 @@ while true; do
 	echo TBC
     fi
 	setcap 'cap_net_bind_service=+ep' /usr/lib/kodi/kodi.bin
+	echo 0 > /sys/class/vtconsole/vtcon1/bind
 	sudo -u osmc /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
