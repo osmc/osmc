@@ -5,6 +5,8 @@ processimage()
     cp -f ${2} /boot/zImage
     rm -rf /boot/*.dtb
     cp -af /boot/dtb-${1}/* /boot/
+    EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+
     rm -rf /lib/modules/${1}_kernel_*
 }
 
