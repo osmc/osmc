@@ -41,6 +41,11 @@ then
 	popd
 	sh firmware-imx.bin --auto-accept
 	pushd firmware-imx*
+	rm -rf firmware/ar3k
+	rm -rf firmware/ath6k
+	rm firmware/LICENCE.atheros_firmware
+	rm firmware/README
+	rm firmware/Android.mk
 	mkdir -p ${out}/lib
 	cp -ar firmware ${out}/lib
 	popd
