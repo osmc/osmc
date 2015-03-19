@@ -27,6 +27,8 @@
             echo '<div class="byline vcard">';
             if (!$isMailWikiPage) {
               echo '<p><a href="http://osmc.tv/help/wiki">Back to Wiki</a></p>';
+            } else {
+               echo '<p><a href="https://github.com/samnazarko/osmc/tree/master/wiki">Wiki on GitHub</a></p>';
             }
             echo '<div class="cat">';
             echo '<p><a href="https://github.com/samnazarko/osmc/blob/master/wiki/' . $page . '" target="_blank">Edit this page</a></p>';
