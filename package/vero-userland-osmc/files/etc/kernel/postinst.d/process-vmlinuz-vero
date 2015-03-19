@@ -10,4 +10,4 @@ processimage()
     rm -rf /lib/modules/${1}_kernel_*
 }
 
-if [ -f /boot/uEnv.txt ]; then processimage $1 $2; fi
+processimage $1 $2
