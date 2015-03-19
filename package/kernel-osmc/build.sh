@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="3.18.9" && REV="4"
 test $1 == rbp2 && VERSION="3.18.9" && REV="6"
-test $1 == vero && VERSION="3.14.14" && REV="5"
+test $1 == vero && VERSION="3.14.14" && REV="6"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -56,7 +56,7 @@ then
 	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
+		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		overlays="hifiberry-dac-overlay
 		hifiberry-dacplus-overlay
 		hifiberry-digi-overlay
@@ -90,7 +90,7 @@ then
 	then
 		make imx6dl-vero.dtb
 		mkdir -p ../../files-image/boot/
-		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc
+		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		popd
 		# Disassemble kernel package to add device tree
 		mv src/${1}-image*.deb .
