@@ -32,8 +32,9 @@ then
 	mkdir -p files-dev/opt/vero/include
 	pushd src
 	install_patch "../patches" "all"
-	rm -rf /headers > /dev/null 2>&1
 	cp -ar headers /
+	cp -ar headers/include ../files-dev/opt/vero
+	rm -rf headers > /dev/null 2>&1
 	pushd imx-lib*
 	sed -i */Makefile -e s/-O2/-O3/
 	$BUILD PLATFORM=IMX6Q C_INCLUDE_PATH=/headers/include/ all
@@ -52,7 +53,7 @@ then
 	popd
 	sh viv-g2d.bin --auto-accept
 	pushd gpu-viv-g2d*
-	cp -ar usr/include ${out}/opt/vero
+	cp -ar usr/include ../../files-dev/opt/vero
 	cp -ar usr/lib ${out}/opt/vero
 	popd
 	sh imx-vpu.bin --auto-accept
@@ -80,17 +81,15 @@ then
 	ln -s libGAL-fb.so libGAL.so
 	ln -s libVIVANTE-fb.so libVIVANTE.so
 	popd
-	cp -ar usr/include ${out}/opt/vero
+	cp -ar usr/include ../../files-dev/opt/vero
 	cp -ar usr/lib ${out}/opt/vero
 	popd
 	strip_libs
 	popd
-	mv ${out}/usr/include/* files-dev/opt/vero/include
-	mv ${out}/usr/lib/* ${out}/opt/vero/lib/
+	cp -ar ${out}/usr/include files-dev/opt/vero/ # Remnants
+	cp -ar ${out}/usr/lib ${out}/opt/vero/
 	rm -rf ${out}/usr/lib >/dev/null 2>&1
 	rm -rf ${out}/usr/include >/dev/null 2>&1
-	mv files/opt/vero/include/* files-dev/opt/vero/include
-	rm -rf files/opt/vero/include
 	mkdir -p ${out}/etc/ld.so.conf.d
 	echo "/opt/vero/lib" > files/etc/ld.so.conf.d/vero.conf
 	rm -rf ${out}/opt/vero/share
