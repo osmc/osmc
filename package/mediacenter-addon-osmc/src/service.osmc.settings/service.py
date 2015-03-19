@@ -103,6 +103,9 @@ class Main(object):
 			log('Skin reload requested')
 
 			xbmc.executebuiltin('ReloadSkin()')
+
+		# load the fonts into the window(10000)
+		ubiquifonts.load_fonts()
 			
 		# daemon
 		self._daemon()
@@ -174,6 +177,7 @@ class Main(object):
 								xbmc.executebuiltin('ReloadSkin()')
 								
 								break
+
 				
 				except Exception as e:
 
@@ -185,6 +189,9 @@ class Main(object):
 				except:
 					pass
 
+				# load the fonts into the window(10000)
+				ubiquifonts.load_fonts()
+				
 				self.create_gui()
 			
 			# if xbmc is aborting
