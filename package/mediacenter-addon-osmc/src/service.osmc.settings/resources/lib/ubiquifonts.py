@@ -3,7 +3,6 @@ import os
 import shutil
 import sys
 import subprocess
-import xmltodict
 from xml.etree import ElementTree as ET
 import traceback
 
@@ -79,7 +78,7 @@ def get_addon_folder(alien_skin_folder):
 	if height:
 		WINDOW.setProperty("SkinHeight", str(height))
 
-	return folder
+	return os.path.join(alien_skin_folder, folder)
 
 
 
