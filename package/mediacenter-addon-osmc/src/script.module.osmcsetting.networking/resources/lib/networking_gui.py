@@ -313,6 +313,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         log('focused_control = %s,   %s' % (type(focused_control), focused_control))
 
         if actionID in (10, 92):
+
+            self.killbot()
+
             self.close()
 
         if focused_control in MAIN_MENU:
@@ -371,6 +374,17 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             relevant_label_control.setLabel(user_input)
 
             return
+
+
+    def killbot(self):
+
+        # call the wifi checking bot to exit, if it exists
+        try:
+            self.wifi_populate_bot.exit = True
+            xbmc.sleep(20)
+
+        except:
+           pass
 
 
     def toggle_controls(self, enabled, control_ids):
@@ -663,10 +677,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def handle_selected_wireless_network(self):
         
         # stop the bot from scanning
-        try:
-            self.wifi_populate_bot.exit = True
-        except:
-            pass
+        self.killbot()
 
         item        = self.WFP.getSelectedItem()
 
@@ -674,7 +685,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         encrypted   = item.getProperty('Encrypted')
         connected   = item.getProperty('Connected')
         ssid        = item.getProperty('SSID')
-        self.conn_ssid = self.wifi_populate_bot.get_ssid()
+        # this line wont work as the bot is dead, however before it dies the bot updates self.conn_ssid if a connection is discovered
+        # self.conn_ssid = self.wifi_populate_bot.get_ssid()
         if connected == 'False':
             if not self.conn_ssid: # if we are nit connected to a network connect
                 self.connect_to_wifi(ssid, encrypted)
@@ -905,13 +917,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.scan_control_button = self.getControl(10220)
         # check the label of the scanning control
         if self.scan_control_button.getLabel() == lang(32012):
-            # attempt to stop the bot
-            try:
-                self.wifi_populate_bot.exit = True
-                xbmc.sleep(2500)
 
-            except:
-               pass
+            # attempt to stop the bot
+            self.killbot()
+
             # if the control label is SCAN, then start the populate bot
             self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.scan_control_button, self.conn_ssid)
             self.wifi_populate_bot.setDaemon(True)
@@ -946,8 +955,8 @@ class wifi_populate_bot(threading.Thread):
         self.SCB        = scan_button
         self.scan       = scan
         self.exit       = False
-        self.conn_ssid = conn_ssid
-        self.wifis = []
+        self.conn_ssid  = conn_ssid
+        self.wifis      = []
         self.current_network_config = None
 
         if self.scan:
@@ -966,20 +975,24 @@ class wifi_populate_bot(threading.Thread):
 
         runs = 0
 
-        while not self.exit and runs < 15:      # assuming each run is 2 seconds, this is a 30 second life for the bot
+        while not self.exit and runs < 3000:      # assuming each run is 10ms, this is a 30 second life for the bot
 
-            wifis = osmc_network.get_wifi_networks()
-            
-            running_dict.update(wifis)
+            # only run the network check every 2 seconds, but allow the exit command to be checked every 10ms
+            if runs % 200 == 0:
 
-            self.update_list_control(running_dict)
+                wifis = osmc_network.get_wifi_networks()
+                
+                running_dict.update(wifis)
 
-            # if the bot wasnt asked to scan, there is not need to keep refreshing, so just exit
-            if not self.scan: break
+                self.update_list_control(running_dict)
 
-            xbmc.sleep(2000)
+                # if the bot wasnt asked to scan, there is not need to keep refreshing, so just exit
+                if not self.scan: break
+
+            xbmc.sleep(10)
 
             runs += 1
+
         # find any connected setting and load its values into the controls
 
         for k, v in running_dict.iteritems():
@@ -1080,9 +1093,3 @@ class wifi_populate_bot(threading.Thread):
             metric = 0
         return metric
 
-
-    def get_ssid(self):
-        return self.conn_ssid
-
-    def get_currrent_network_config(self):
-        return self.get_currrent_network_config()
