@@ -29,7 +29,7 @@ ACTION_SELECT_ITEM   = 7
 
 
 def log(message):
-	xbmc.log('OSMC APFStore gui : ' + str(message), level=xbmc.LOGDEBUG)
+	xbmc.log('REMOTE: ' + str(message), level=xbmc.LOGDEBUG)
 
 
 def lang(id):
@@ -45,7 +45,29 @@ class remote_gui_launcher(object):
 		self.excluded = ['lircd.conf']
 
 		self.lircd_path = '/etc/lirc/lircd.conf'
-		self.etc_lirc = '/etc/lirc/'	
+		self.etc_lirc = '/etc/lirc/'
+
+		# self.lircd_path = '/home/kubkev/temp/lirc/lircd.conf'
+		# self.etc_lirc = '/home/kubkev/temp/lirc'		
+
+		try:
+			real_file = os.path.realpath(self.lircd_path)
+			path, filename = os.path.split(real_file)
+
+			log(path)
+			log(filename)
+
+			if path != self.etc_lirc:
+				custom = True
+			else:
+				custom = False
+
+		except:
+			real_file = None
+			custom = False
+
+		log(real_file)
+		log('custom=' + str(custom))
 
 		# get the contents of /etc/lirc/
 		local_confs_base = os.listdir(self.etc_lirc)
@@ -64,7 +86,7 @@ class remote_gui_launcher(object):
 
 			local_confs.append(self.construct_listitem(conf))
 
-		self.remote_gui = remote_GUI("RemoteBrowser_OSMC.xml", __path__, 'Default', local_confs=local_confs)
+		self.remote_gui = remote_GUI("RemoteBrowser_OSMC.xml", __path__, 'Default', local_confs=local_confs, real_file=real_file, custom=custom)
 
 
 	def open_gui(self):
@@ -86,7 +108,7 @@ class remote_gui_launcher(object):
 				name2 = filename
 			else:
 				name = filename.replace('.conf', '')
-				name2 = '/etc/lirc/%s' % filename
+				name2 = conf
 
 		# check for remote image, use it if it is available
 		image_path = os.path.join(path, filename.replace('.conf','.png'))
@@ -124,9 +146,11 @@ class remote_gui_launcher(object):
 
 class remote_GUI(xbmcgui.WindowXMLDialog):
 
-	def __init__(self, strXMLname, strFallbackPath, strDefaultName, local_confs):
+	def __init__(self, strXMLname, strFallbackPath, strDefaultName, local_confs, real_file, custom):
 
 		self.local_confs = local_confs
+		self.real_file = real_file
+		self.custom = custom
 
 		self.remote_selection = None
 
@@ -135,9 +159,23 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 
 		self.list = self.getControl(500)
 		self.list.setVisible(True)
-		for x in self.local_confs:
+
+		if self.custom:
+			cst = xbmcgui.ListItem(label=os.path.basename(self.real_file).replace('.conf',''), label2=self.real_file)
+			self.list.addItem(cst)
+			self.list.getListItem(0).select(True)
+
+		for i, x in enumerate(self.local_confs):
 
 			self.list.addItem(x)
+
+			if x.getLabel2() == self.real_file:
+				idx = i + 1 if self.custom else i
+				self.list.getListItem(idx).select(True)
+
+			log(x.getLabel2())
+			log(self.real_file)
+			log(self.real_file == x.getLabel2())
 
 		try:
 			self.getControl(50).setVisible(False)
