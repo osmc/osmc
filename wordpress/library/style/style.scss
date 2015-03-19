@@ -145,6 +145,79 @@ table {
   }
 }
 
+// SOCIAL WIDGET //
+
+.social {
+  text-align: center;
+  padding-bottom: 3em;
+  max-width: 20em;
+  margin: 0 auto;
+  
+  .icon {
+    display: inline-block;
+    position: relative;
+    float: left;
+    width: 25%;
+    
+    svg {
+      width: 100%;
+      max-width: 2em;
+      height: 100%;
+      path {
+        fill: $dark;
+        @include transition-duration(0.2s);
+      }
+    }
+    
+    p {
+      position: absolute;
+      font-size: 78%;
+      left: 0;
+      right: 0;
+      margin: 0;
+      color: $dark;
+      opacity: 1;
+      white-space: nowrap;
+      @include transition-duration(0.2s);
+    }
+  }
+  
+  .facebook:hover {
+    
+    svg path {
+      fill: #3B5998;
+    }
+    
+    p {
+      color: #3B5998;
+    }
+  }
+  .twitter:hover {
+    svg path {
+      fill: #4099FF;
+    }
+    p {
+      color: #4099FF;
+    }
+  }
+  .github:hover {
+    svg path {
+      fill: $dgrey;
+    }
+    p {
+      color: $dgrey;
+    }
+  }
+  .rss:hover {
+    svg path {
+      fill: #FF6600;
+    }
+    p {
+      color: #FF6600;
+    }
+  }
+}
+
 pre, code {
   font-weight: 300;
   font-size: 110%;
