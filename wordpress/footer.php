@@ -22,9 +22,9 @@
                     <div class="middle">
                       <img src="<?php echo get_template_directory_uri(); ?>/library/images/logo-l.png">
                       <br>
-                      <a href="http://simonbrunton.com" target="_blank" class="designed">Logo by Simon Brunton</a>
+                      <a href="http://simonbrunton.com" target="_blank" class="designed">Graphic Design by Simon Brunton</a>
                       <br>
-                      <a href="http://markthe.is" target="_blank" class="designed">Website by Mark Theis Madsen</a>
+                      <a href="http://markthe.is" target="_blank" class="designed">Website Design by Mark Theis Madsen</a>
                       <br><br>
                       <p>&#169; 2015 OSMC </p>
 
