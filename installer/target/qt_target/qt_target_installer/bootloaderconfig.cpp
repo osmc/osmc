@@ -81,7 +81,7 @@ void BootloaderConfig::configureEnvironment()
             /* NFS install */
             uEnvStringList << "mmcargs=setenv bootargs console=tty1 root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 loglevel=2 ";
         }
-        uEnvStringList << "osmcdev=vero1";
+        uEnvStringList << "osmcdev=vero";
         utils->writeToFile(uEnvFile, uEnvStringList, false);
         uEnvFile.close();
     }
