@@ -21,90 +21,13 @@ FONT_FOLDER = xbmc.translatePath(os.path.join(FOLDER, 'skins', 'Default', 'fonts
 FONT_PARTIALS = os.path.join(FOLDER, 'lib', 'fonts.txt')
 # FONT_PARTIALS = '/home/kubkev/.kodi/addons/service.osmc.settings/resources/lib/fonts.txt'
 
-FONT_DICT = 	{
-			'Font26': 		{
-						'720': 'osmc_addon_720_Font26',
-						'1080': 'osmc_addon_Font26'
-							},
-			'Font30': 		{
-						'720': 'osmc_addon_720_Font30',
-						'1080': 'osmc_addon_Font30'
-							},
-			'Font40': 		{
-						'720': 'osmc_addon_720_Font40',
-						'1080': 'osmc_addon_Font40'
-							},
-			'Font60': 		{
-						'720': 'osmc_addon_720_Font60',
-						'1080': 'osmc_addon_Font60'
-							},
-			'OLD_Font25': 	{
-						'720': 'osmc_addon_720_OLD_Font25',
-						'1080': 'osmc_addon_OLD_Font25'
-							},
-			'OLD_Font27': 	{
-						'720': 'osmc_addon_720_OLD_Font27',
-						'1080': 'osmc_addon_OLD_Font27'
-							},
-			'OLD_Font30': 	{
-						'720': 'osmc_addon_720_OLD_Font30',
-						'1080': 'osmc_addon_OLD_Font30'},
-			'OLD_Font33': 	{
-						'720': 'osmc_addon_720_OLD_Font33',
-						'1080': 'osmc_addon_OLD_Font33'
-							},
-			'OLD_Font36': 	{
-						'720': 'osmc_addon_720_OLD_Font36',
-						'1080': 'osmc_addon_OLD_Font36'
-							},
-			'OLD_Font42': 	{
-						'720': 'osmc_addon_720_OLD_Font42',
-						'1080': 'osmc_addon_OLD_Font42'
-							},
-			'OLD_Font48': 	{
-						'720': 'osmc_addon_720_OLD_Font48',
-						'1080': 'osmc_addon_OLD_Font48'
-							},
-			'OLD_Font72': 	{
-						'720': 'osmc_addon_720_OLD_Font72',
-						'1080': 'osmc_addon_OLD_Font72'
-							},
-				}
-
 
 def log(message):
 	xbmc.log('UBIQUIFONTS ' + str(message), level=xbmc.LOGDEBUG)
 
 
-def load_fonts():
-	'''
-		Loads the font references into Window(10000) for use in OSMC addon guis
-	'''
-
-	# get the skin height
-	skin_height = WINDOW.getProperty("SkinHeight")
-	
-	# assign a sabot and height prefix
-	if skin_height != '720':
-
-		sabot  = 'osmc_addon_720_'
-		height = '720'
-
-	else:
-
-		sabot  = 'osmc_addon_'
-		height = '1080'
-
-	# load the fonts into window(10000)
-	for fake, fonts in FONT_DICT.iteritems():
-
-		WINDOW.setProperty(fake, sabot + fonts[height] + fake)
-
-
-
 def get_addon_folder(alien_skin_folder):
 	folder = None
-	height = None
 
 	try:
 		# first check the addon for the folder location
