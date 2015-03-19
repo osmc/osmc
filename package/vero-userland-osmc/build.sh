@@ -88,8 +88,10 @@ then
 	popd
 	cp -ar ${out}/usr/include files-dev/opt/vero/ # Remnants
 	cp -ar ${out}/usr/lib ${out}/opt/vero/
+	cp -ar ${out}/opt/vero/include files-dev/opt/vero
 	rm -rf ${out}/usr/lib >/dev/null 2>&1
 	rm -rf ${out}/usr/include >/dev/null 2>&1
+	rm -rf ${out}/opt/vero/include >/dev/null 2>&1
 	mkdir -p ${out}/etc/ld.so.conf.d
 	echo "/opt/vero/lib" > files/etc/ld.so.conf.d/vero.conf
 	rm -rf ${out}/opt/vero/share
