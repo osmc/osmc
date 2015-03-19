@@ -3,11 +3,16 @@ import os
 import shutil
 import sys
 import subprocess
+import xmltodict
+from xml.etree import ElementTree as ET
+import traceback
 
 # XBMC modules
 import xbmc
 import xbmcaddon
 import xbmcgui
+
+WINDOW = xbmcgui.Window(10000)
 
 FOLDER = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources'))
 
@@ -17,45 +22,86 @@ FONT_PARTIALS = os.path.join(FOLDER, 'lib', 'fonts.txt')
 # FONT_PARTIALS = '/home/kubkev/.kodi/addons/service.osmc.settings/resources/lib/fonts.txt'
 
 
+def log(message):
+	xbmc.log('UBIQUIFONTS ' + str(message), level=xbmc.LOGDEBUG)
+
+
+def get_addon_folder(alien_skin_folder):
+	folder = None
+
+	try:
+		# first check the addon for the folder location
+		tree = ET.parse(os.path.join(alien_skin_folder, 'addon.xml'))
+		root = tree.getroot()
+
+		for ext in root.iter('extension'):
+			res = ext.find('res')
+			if res is None: continue
+			height = res.attrib['height']
+			folder = res.attrib['folder']
+			break
+
+	except Exception, e:
+		log(e.args)
+		log(traceback.format_exc())
+
+	# failing that, use the folder search option
+	if not folder:
+
+		possible_xml_locations = [('1080i', 1080), ('720p', 720), ('1080p', 1080), ('16x9', None)]
+
+		for pos_loc in possible_xml_locations:
+
+			folder = os.path.join(alien_skin_folder, pos_loc[0])
+
+			log('POSSIBLE XML LOCATION = %s' % folder)
+
+			try:
+
+				test = os.listdir(folder)
+				height = pos_loc[1]
+				break
+
+			except:
+
+				pass
+
+			log('ISNT A FOLDER')
+
+		else:
+
+			log('BREAKEN')
+
+			return
+
+		log('ACTUAL XML LOCATION = %s' % folder)
+
+	if height:
+		WINDOW.setProperty("SkinHeight", str(height))
+
+	return folder
+
+
+
 def import_osmc_fonts():
 
 	alien_skin_folder = xbmc.translatePath('special://skin')
 
-	print 'alien_skin_folder: %s' % alien_skin_folder
+	log('alien_skin_folder: %s' % alien_skin_folder)
 
 	alien_fonts_folder = os.path.join(alien_skin_folder, 'fonts/')
+	alien_fonts = set(os.listdir(alien_fonts_folder))
 
-	possible_xml_locations = ['1080i', '720p', '1080p','16x9']
 
-	for pos_loc in possible_xml_locations:
+	alien_xml_folder = get_addon_folder(alien_skin_folder)
+	log('ACTUAL XML LOCATION = %s' % alien_xml_folder)
 
-		alien_xml_folder = os.path.join(alien_skin_folder, pos_loc)
-
-		print 'POSSIBLE XML LOCATION = %s' % alien_xml_folder
-
-		try:
-
-			alien_fonts = set(os.listdir(alien_fonts_folder))
-			test = os.listdir(alien_xml_folder)
-			alien_font_xml = os.path.join(alien_xml_folder, 'Font.xml')
-
-			break
-
-		except:
-
-			pass
-
-		print 'ISNT A FOLDER'
-
-	else:
-
-		print 'BREAKEN'
-
+	if not alien_xml_folder:
 		return 'failed'
 
-	print 'ACTUAL XML LOCATION = %s' % alien_xml_folder
+	alien_font_xml = os.path.join(alien_xml_folder, 'Font.xml')
+	log('alien_font_xml = %s' % alien_font_xml)
 
-	print 'alien_font_xml = %s' % alien_font_xml
 
 	# check whether the fonts are already in the font xml, if they are then simply return.
 	# the previous solution of checking for a backup fonts file is pointless as an update of the skin
@@ -101,7 +147,7 @@ def import_osmc_fonts():
 	# make backup of original Font.xml
 	backup_file = os.path.join(alien_fonts_folder,'backup_Font.xml')
 	
-	print 'BACKUP FILE: %s' % backup_file
+	log('BACKUP FILE: %s' % backup_file)
 
 	subprocess.call(["sudo", "cp", alien_font_xml, backup_file])
 	

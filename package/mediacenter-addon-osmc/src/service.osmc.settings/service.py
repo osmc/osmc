@@ -24,8 +24,8 @@ import os
 
 # XBMC modules
 import xbmcgui
+WINDOW = xbmcgui.Window(10000)
 if not os.path.isfile('/walkthrough_completed'):
-	WINDOW = xbmcgui.Window(10000)
 	WINDOW.setProperty("walkthrough_is_running", 'any_value')
 import xbmc
 import xbmcaddon
