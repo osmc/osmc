@@ -127,11 +127,12 @@ function publish_applications_targeted()
 	echo -e "Publishing application for platform ${TARGET}"
 	# This is a tad hacky. Architecture specific, platform independent
 	if [ "$2" == "armv6l" ]; then devices="rbp1"; fi
-	if [ "$2" == "armv7" ]; then devices="rbp2"; fi
+	if [ "$2" == "armv7" ]; then devices="rbp2 vero"; fi
 	if [ "$2" == "i386" ]; then devices="atv"; fi
 	# Architecture specific, platform specific
 	if [ "$2" == "rbp1" ]; then devices="rbp1"; fi
 	if [ "$2" == "rbp2" ]; then devices="rbp2"; fi
+	if [ "$2" == "vero" ]; then devices="vero"; fi
 	if [ "$2" == "atv1" ]; then devices="atv"; fi
 	for device in $devices
 	do
