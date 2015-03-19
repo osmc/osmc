@@ -45,7 +45,7 @@ class remote_gui_launcher(object):
 		self.excluded = ['lircd.conf']
 
 		self.lircd_path = '/etc/lirc/lircd.conf'
-		self.etc_lirc = '/etc/lirc/'
+		self.etc_lirc = '/etc/lirc'
 
 		# self.lircd_path = '/home/kubkev/temp/lirc/lircd.conf'
 		# self.etc_lirc = '/home/kubkev/temp/lirc'		
