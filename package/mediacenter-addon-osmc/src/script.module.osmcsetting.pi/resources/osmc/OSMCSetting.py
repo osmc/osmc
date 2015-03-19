@@ -226,7 +226,7 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': '112',
 																	},
 									'gpu_mem_512': 				{'setting_value' : '',
-																	'default': '128',
+																	'default': '144',
 																	},
 									'gpu_mem_1024': 			{'setting_value' : '',
 																	'default': '192',
