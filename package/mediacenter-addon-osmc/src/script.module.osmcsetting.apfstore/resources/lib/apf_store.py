@@ -1,6 +1,7 @@
 
 # KODI modules
 import xbmc
+import xbmcgui
 import xbmcaddon
 
 # Standard modules
@@ -380,5 +381,7 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def create_apf_store_gui(self, apf_dict):
 
-		return apf_GUI("APFBrowser_OSMC.xml", __path__, 'Default', apf_dict=apf_dict)
+		xml = "APFBrowser_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "APFBrowser_OSMC.xml"
+
+		return apf_GUI(xml, __path__, 'Default', apf_dict=apf_dict)
 

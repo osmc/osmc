@@ -181,7 +181,9 @@ class OSMCSettingClass(object):
 
 		service_list = {'test1b': ('test1', 'test1a', ' (running)', True), 'test2b': ('test2','test2a', ' (enabled)', True), 'test3b': ('test3', 'test3a', '', False)}
 
-		creation = service_selection("ServiceBrowser_OSMC.xml", scriptPath, 'Default', service_list=service_list, logger=log)
+		xml = "ServiceBrowser_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "ServiceBrowser_OSMC.xml"
+
+		creation = service_selection(xml, scriptPath, 'Default', service_list=service_list, logger=log)
 		creation.doModal()
 		del creation
 

@@ -86,7 +86,9 @@ class remote_gui_launcher(object):
 
 			local_confs.append(self.construct_listitem(conf))
 
-		self.remote_gui = remote_GUI("RemoteBrowser_OSMC.xml", __path__, 'Default', local_confs=local_confs, real_file=real_file, custom=custom)
+		xml = "RemoteBrowser_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "RemoteBrowser_OSMC.xml"
+
+		self.remote_gui = remote_GUI(xml, __path__, 'Default', local_confs=local_confs, real_file=real_file, custom=custom)
 
 
 	def open_gui(self):

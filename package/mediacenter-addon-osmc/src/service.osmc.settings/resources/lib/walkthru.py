@@ -315,9 +315,10 @@ def open_gui(networking_instance):
 
 	__addon__        = xbmcaddon.Addon()
 	scriptPath       = __addon__.getAddonInfo('path')
-	xmlfile = 'walkthru.xml'
 
-	GUI = walkthru_gui(xmlfile, scriptPath, 'Default', networking_instance=networking_instance)
+	xml = "walkthru_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "walkthru.xml"
+
+	GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance)
 
 	GUI.doModal()
 

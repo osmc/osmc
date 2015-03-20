@@ -189,7 +189,9 @@ The module allows you to manually adjust:
 
 		# setting_values = {'core_freq': 500, 'arm_freq': 800, 'sdram_freq': 700, 'initial_turbo': 60, 'over_voltage': 2, 'over_voltage_sdram': 6, 'force_turbo' : 0}
 
-		self.GUI = overclock_gui("new_gui.xml", scriptPath, 'Default', setting_values=self.setting_values, model=self.pimodel)
+		xml = "new_gui_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "new_gui.xml"
+
+		self.GUI = overclock_gui(xml, scriptPath, 'Default', setting_values=self.setting_values, model=self.pimodel)
 
 		self.GUI.doModal()
 

@@ -304,8 +304,7 @@ class OSMCGui(object):
 		self.apply_button  = [105]
 
 		# window xml to use
-		# xmlfile = 'settings_main.xml'
-		self.xmlfile = 'settings_gui.xml'
+		xml = "settings_gui_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "settings_gui.xml"
 
 		# check if modules and services exist, add the ones that exist to the live_modules list
 		self.ordered_live_modules = self.retrieve_modules()
@@ -323,7 +322,7 @@ class OSMCGui(object):
 
 
 		# instantiate the window
-		self.GUI = OSMC_gui(self.xmlfile, scriptPath, 'Default', order_of_fill=self.order_of_fill,
+		self.GUI = OSMC_gui(xml, scriptPath, 'Default', order_of_fill=self.order_of_fill,
 			apply_buttons=self.apply_buttons, live_modules=self.live_modules)
 
 	

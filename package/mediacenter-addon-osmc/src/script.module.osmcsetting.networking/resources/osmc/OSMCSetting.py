@@ -94,6 +94,7 @@
 # XBMC Modules
 import xbmcaddon
 import xbmc
+import xbmcgui
 import sys
 import os
 
@@ -191,7 +192,9 @@ class OSMCSettingClass(object):
 		me = xbmcaddon.Addon(self.addonid)
 		scriptPath = me.getAddonInfo('path')
 
-		self.GUI = networking_gui("network_gui.xml", scriptPath, 'Default')
+		xml = "network_gui_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "network_gui.xml"
+
+		self.GUI = networking_gui(xml, scriptPath, 'Default')
 		self.GUI.setUsePreseed(usePreseed)
 		self.GUI.doModal()
 

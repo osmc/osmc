@@ -123,7 +123,9 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
 			sel_item = self.apf_dict[self.apf_order_list[sel_pos]]
 
-			self.addon_gui = addon_info_gui("APFAddonInfo_OSMC.xml", __path__, 'Default', sel_item=sel_item)
+			xml = "APFAddonInfo_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "APFAddonInfo_OSMC.xml"
+
+			self.addon_gui = addon_info_gui(xml, __path__, 'Default', sel_item=sel_item)
 
 			self.addon_gui.doModal()
 
