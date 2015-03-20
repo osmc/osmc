@@ -108,7 +108,7 @@ def import_osmc_fonts():
 	with open(alien_font_xml, 'r') as f:
 		lines = f.readlines()
 		for line in lines:
-			if 'osmc_addon_OLD_Font72' in line:
+			if 'osmc_addon_720_OLD_Font25' in line:
 				return 'ubiquited'
 
 	# copy fonts to skins font folder 
