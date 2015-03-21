@@ -282,7 +282,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		focused_control = self.getFocusId()
 
 		if actionID in (10, 92):
-			self.close() <left>695</left>
+			self.close()
 
 		else:
 
