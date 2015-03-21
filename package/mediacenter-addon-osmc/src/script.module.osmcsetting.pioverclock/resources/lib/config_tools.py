@@ -7,7 +7,6 @@ from collections import OrderedDict
 import re
 from CompLogger import comprehensive_logger as clog
 
-
 class MultiOrderedDict(OrderedDict):
     '''
         A new type of dictionary that handles the concatenation of multiple entries when read from the config,
@@ -17,9 +16,9 @@ class MultiOrderedDict(OrderedDict):
 
     def __setitem__(self, key, value):
 
-        alias = {      'device_tree_overlay'   :   'dtoverlay', 
-                            'device_tree_param'     :   'dtparam',
-                            'device_tree_params'    :   'dtparams'
+        alias = {      'device_tree_overlay'    :   'dtoverlay', 
+                        'device_tree_param'     :   'dtparam',
+                        'device_tree_params'    :   'dtparams'
                         }
 
         if key in alias:
@@ -153,15 +152,33 @@ def write_config(config_location,  changes={}):
 
             #print 'tool: setting removed'
 
-            blotter.remove_option('osmc', setting)
+            # this separate rule is required for lirc-rpi because it often carries parameters
+            if setting == 'lirc-rpi-overlay':
+
+                for k, v in blotter.items('osmc'):
+                    if 'lirc-rpi' in k:
+                        blotter.remove_option('osmc', k)
+                        break
+
+            else:
+
+                blotter.remove_option('osmc', setting)
 
             continue
-        
-        if isinstance(value, str) :
-            if '\n' in value:
-                #print 'tool: value is string, and newline in string'
-                continue
-        
+
+        if isinstance(value, list):
+            for x in value:
+                if 'lirc-rpi' in x:
+                    # if lirc-rpi is in the value, then remove the existing entry in the blotter as it will be overwritten
+                    for k, v in blotter.items('osmc'):
+                        if isinstance(v, str):
+                            if 'lirc-rpi' in v:
+                                v += '\n'
+                                new_v = v[:v.index('lirc-rpi')] + v[v[v.index('lirc-rpi'):].index('\n') + v.index('lirc-rpi'):]
+                                new_v = new_v[:len(v)-2]
+                                blotter.set('osmc', k, new_v)
+                                break
+
         # otherwise, write the new value to the setting
         #print 'tool: setting value in blotter'
         blotter.set('osmc', setting, value)
@@ -171,7 +188,7 @@ def write_config(config_location,  changes={}):
 
     # multiple entries: 
     #           expands a concatenated string into individual 'repeated' settings, 
-    #           expans a list of multiple settings into individual 'repeated' settings
+    #           expands a list of multiple settings into individual 'repeated' settings
     # multiple entries are given their own unique keys with [----]integer appended
     # the original settings (string OR list) are removed
     items = blotter.items('osmc')
@@ -251,7 +268,7 @@ if ( __name__ == "__main__" ):
     #print 'ORIGINAL: %s' % op
 
     # apply this test set of changes
-    changes = {'dtoverlay' : ['frts[remove]','hifiberry-dac-overlay', 'iqaudio-dac-overlay[remove]', 'hifiberry-digi-overlay[remove]', 'w1-gpio-overlay[remove]', 'w1-gpio-pullup-overlay[remove]', 'lirc-rpi-overlay']}
+    changes = {'dtoverlay' : ['frts','hifiberry-dac-overlay[remove]', 'iqaudio-dac-overlay[remove]', 'hifiberry-digi-overlay[remove]', 'w1-gpio-overlay[remove]', 'w1-gpio-pullup-overlay[remove]', 'lirc-rpi-overlay']}
 
     write_config(file_loc, changes)
 

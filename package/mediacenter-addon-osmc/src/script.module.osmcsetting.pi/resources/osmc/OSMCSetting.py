@@ -669,6 +669,8 @@ Overclock settings are set using the Pi Overclock module."""
 		log('datalist = %s' % datalist)
 
 		if not reverse:
+
+			# do this when reading the items into Kodi
 				
 			self.me.setSetting('dacplus', 'false')
 			self.me.setSetting('lirc-rpi-overlay', 'false')
@@ -676,9 +678,28 @@ Overclock settings are set using the Pi Overclock module."""
 			self.me.setSetting('soundcard_dac', '0')
 			self.me.setSetting('w1gpio', '0')
 
+			# dtoverlay=lirc-rpi:gpio_out_pin=19,gpio_in_pin=23,gpio_in_pull=down
+
 			for overlay in datalist:
 
-				log(overlay)
+				log('individual overlay=%s' % overlay)
+
+				# lirc has to be handled individually as it may include extra parameters
+				if 'lirc-rpi' in overlay:
+					self.me.setSetting('lirc-rpi-overlay', 'true')
+
+					sub_params = ['gpio_out_pin', 'gpio_in_pin', 'gpio_in_pull']
+
+					if ':' in overlay:
+						params = [x.split('=') for x in overlay[overlay.index(':')+1:].split(',')]
+
+						log('lirc-rpi params=%s' % params)
+						
+						for param in params:
+							for sub in sub_params:
+								if param[0] == sub:
+									self.me.setSetting(sub, param[1].strip())
+					continue
 
 				if overlay not in overlay_settings:
 					log('not in overlay_settings')
@@ -692,6 +713,9 @@ Overclock settings are set using the Pi Overclock module."""
 				self.me.setSetting(ovl['setting'], ovl['value'])
 
 		else:
+
+			# do this when writing the Kodi settings back to config.txt
+
 			new_dtoverlay = []
 
 			pos = self.me.getSetting('soundcard_dac')
@@ -726,7 +750,20 @@ Overclock settings are set using the Pi Overclock module."""
 			rpi = self.me.getSetting('lirc-rpi-overlay')
 
 			if rpi == 'true':
-				new_dtoverlay.append('lirc-rpi-overlay')
+
+				# dtoverlay=lirc-rpi:gpio_out_pin=19,gpio_in_pin=23,gpio_in_pull=down
+
+				out_pin  = self.me.getSetting('gpio_out_pin')
+				in_pin   = self.me.getSetting('gpio_in_pin')
+				pull_pin = self.me.getSetting('gpio_in_pull')
+
+				lirc = 'lirc-rpi:' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
+
+				if pull_pin != 'off':
+					lirc = lirc + ',gpio_in_pull=' + pull_pin
+
+				new_dtoverlay.append(lirc)
+
 			else:
 				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
 
@@ -737,6 +774,7 @@ Overclock settings are set using the Pi Overclock module."""
 			else:
 				new_dtoverlay.append('spi-bcm2835-overlay' + '[remove]')
 
+			log("NEW DT OVERLAY = %s" % new_dtoverlay)
 			return new_dtoverlay
 
 	@clog(log)
