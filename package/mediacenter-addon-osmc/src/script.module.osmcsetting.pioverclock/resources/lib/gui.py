@@ -50,9 +50,9 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 				102  :  lang(32089) % self.medium_profile,
 				103  :  lang(32090) % self.higher_profile,
 				104  :  lang(32091) % self.custom_profile,
-				402  :  lang(32092),
-				502  :  lang(32093),
-				602  :  lang(32094),
+				402  :  lang(32092) % 700,
+				502  :  lang(32093) % 400,
+				602  :  lang(32094) % 250,
 				702  :  lang(32095),
 				802  :	lang(32096),
 				902  :  lang(32097),
@@ -80,11 +80,11 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 				101  :  lang(32088) % self.normal_profile,
 				102  :  lang(32089) % self.medium_profile,
 				104  :  lang(32091) % self.custom_profile,
-				402  :  lang(32092),
-				502  :  lang(32093),
-				602  :  lang(32094),
+				402  :  lang(32092) % 900,
+				502  :  lang(32093) % 450,
+				602  :  lang(32094) % 250,
 				702  :  lang(32095),
-				802  :	lang(32096),
+				802  :	lang(32106),
 				902  :  lang(32097),
 				1002 :  lang(32098),
 				}
@@ -282,7 +282,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		focused_control = self.getFocusId()
 
 		if actionID in (10, 92):
-			self.close() 
+			self.close() <left>695</left>
 
 		else:
 
