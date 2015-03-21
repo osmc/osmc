@@ -1,0 +1,19 @@
+--- a/configure.in
++++ b/configure.in
+@@ -1757,14 +1757,14 @@
+       if test "$with_ffmpeg" = "yes" || test "$FFMPEG_FOUND" = "false"; then
+         # ffmpeg not found with pkg-config, lets install it
+         AC_MSG_NOTICE("Installing FFmpeg")
+-        CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh ${FFMPEG_OPTS}
++        CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh --cpu=$use_cpu ${FFMPEG_OPTS}
+         export PKG_CONFIG_PATH="${ffmpeg_build}/ffmpeg-install/lib/pkgconfig:$PKG_CONFIG_PATH"
+       fi
+ 
+     elif test "$with_ffmpeg" = "force"; then
+       # always build our ffmpeg
+       AC_MSG_NOTICE("FFmpeg installation forced by user - installing our version")
+-      CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh ${FFMPEG_OPTS}
++      CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh --cpu=$use_cpu ${FFMPEG_OPTS}
+       export PKG_CONFIG_PATH="${ffmpeg_build}/ffmpeg-install/lib/pkgconfig:$PKG_CONFIG_PATH"
+ 
+     elif test "$with_ffmpeg" != "no"; then
