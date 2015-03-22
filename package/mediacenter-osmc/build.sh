@@ -143,6 +143,7 @@ then
 		test "$1" == rbp1 && install_patch "../../patches" "lpr"
 		test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	fi
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then install_patch "../../patches" "arm"
 	test "$1" == vero && install_patch "../../patches" "vero"
 	./bootstrap
 	# Apple TV configuration
@@ -195,7 +196,7 @@ then
 	fi
 	if [ "$1" == "vero" ]; then
 	LIBRARY_PATH+="/opt/vero/lib" && \
-	export CFLAGS+="-I/usr/include/afpfs-ng -I/opt/vero/include" && \
+	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon-vfpv4 -I/usr/include/afpfs-ng -I/opt/vero/include" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vero/lib" && \
@@ -219,6 +220,8 @@ then
 		--disable-vtbdecoder \
 		--disable-pulse \
 		--disable-projectm \
+		--enable-optimizations \
+		--with-platform=vero \
 		--build=arm-linux
 	fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
