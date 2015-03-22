@@ -143,7 +143,7 @@ then
 		test "$1" == rbp1 && install_patch "../../patches" "lpr"
 		test "$1" == rbp2 && install_patch "../../patches" "rbp2"
 	fi
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then install_patch "../../patches" "arm"
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then install_patch "../../patches" "arm"; fi
 	test "$1" == vero && install_patch "../../patches" "vero"
 	./bootstrap
 	# Apple TV configuration
