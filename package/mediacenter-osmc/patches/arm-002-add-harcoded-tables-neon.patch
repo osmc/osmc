@@ -1,0 +1,14 @@
+diff --git a/configure.in b/configure.in
+index 799ec17..2ee094c 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1711,6 +1711,9 @@ if test "${USE_STATIC_FFMPEG}" = "1"; then
+     if test "$use_optimizations" != "yes"; then
+       FFMPEG_OPTS="${FFMPEG_OPTS} --disable-optimizations"
+     fi
++    if test "$use_hardcoded_tables" = "yes"; then
++      FFMPEG_OPTS="${FFMPEG_OPTS} --enable-hardcoded-tables"
++    fi
+ 
+     if test "$with_ffmpeg" = "auto" || test "$with_ffmpeg" = "yes"; then
+       SAVE_INCLUDES="$INCLUDES"
