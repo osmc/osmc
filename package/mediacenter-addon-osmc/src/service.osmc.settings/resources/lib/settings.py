@@ -273,11 +273,13 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 
 
-class OSMCGui(object):
+class OSMCGui(threading.Thread):
 
 	def __init__(self, **kwargs):
 
 		self.queue = kwargs['queue']
+
+		super(OSMCGui, self).__init__()
 
 		self.create_gui()
 
@@ -335,7 +337,7 @@ class OSMCGui(object):
 
 
 
-	def open(self):
+	def run(self):
 		'''
 			Opens the gui window
 		'''

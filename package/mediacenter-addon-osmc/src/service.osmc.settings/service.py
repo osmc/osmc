@@ -113,6 +113,8 @@ class Main(object):
 	def create_gui(self):
 
 		self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+		self.stored_gui.setDaemon(True)
+		self.stored_gui.start()
 
 
 	def _daemon(self):
@@ -329,7 +331,7 @@ class Main(object):
 
 		try:
 			# try opening the gui
-			threading.Thread(target=self.stored_gui.open()).start()
+			self.stored_gui.start()
 			self.gui_last_accessed = datetime.datetime.now()
 			self.skip_check = False
 
