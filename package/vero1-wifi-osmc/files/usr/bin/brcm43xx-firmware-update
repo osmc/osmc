@@ -1,0 +1,70 @@
+#!/bin/bash
+
+CACHE=/var/cache/brcm43xx-mac
+if [ -z "$MAC_ADDR" ]; then
+	if [ ! -f "$CACHE" ]; then
+		echo 43:29:B1$(od -txC -An -N3 /dev/random|tr \  : | tr '[:lower:]' '[:upper:]') >"$CACHE"
+	fi
+	MAC_ADDR=`cat "$CACHE"`
+	echo "Warning: Using self generated MAC address! MAC_ADDR should be defined in /etc/conf.d/bcm43xx."
+else
+	[ -f "$CACHE" ] && rm "$CACHE"
+fi
+OPTIONS="$OPTIONS --bd_addr $MAC_ADDR"
+
+# Find chip version
+if [ -z "$HCD" ]; then
+	DEVS=($( cat /sys/class/mmc_host/mmc*/mmc?\:0001/mmc?\:0001:?/device ))
+	for DEV in "${DEVS[@]}"; do
+		if [ "${DEV:0:4}" = "0x43" ]; then
+			HCD="bcm${DEV:2}.hcd"
+		fi
+	done
+	if [ -z "$HCD" ]; then
+		echo "Failed: Unable to locate bluetooth device"
+		exit 1
+	fi
+fi
+HCD_BASE=$(basename "$HCD")
+
+# Device specific options
+[ "$HCD_BASE" = "bcm4330.hcd" ] && OPTIONS="--no2bytes --tosleep=50000 $OPTIONS"
+
+[ ! -e "$HCD" ] && HCD="/lib/firmware/brcm/${HCD_BASE}"
+if [ ! -e "$HCD" ]; then
+	echo "Failed: $HCD does not exist."
+	exit 1
+fi
+
+# UART TTY can be different for each board
+# FIXME: Possibly test each port with hciattach (-n)?
+#        For now, just use the highest port as it works for current boards
+if [ -z "$TTY" ]; then
+	TTYS=($( ls -r1 /dev/ttymxc? ))
+	for t in "${TTYS[@]}" ; do
+		ttynum=${t:0-1}
+		if [ $ttynum -eq 0 ]; then
+			echo "Abort: UART ttymcx0 does not seem right."
+			exit 1
+		else
+			TTY=$t
+			break
+		fi
+	done
+fi
+
+[ ! -e "$TTY" ] && TTY="/dev/$(basename $TTY)"
+if [ ! -e "$TTY" ]; then
+	echo "Failed: $TTY does not exist."
+	exit 1
+fi
+
+echo "Updating bluetooth firmware via $TTY from $HCD."
+/usr/bin/brcm_patchram_plus --patchram $HCD --baudrate 3000000 --use_baudrate_for_download $TTY $OPTIONS
+
+# Create a symlink to TTY for hci service
+if [ $? -eq 0 ]; then
+	ln -sr "$TTY" /dev/brcm43xx
+else
+	exit 1
+fi

@@ -1,0 +1,19 @@
+[Unit]
+Description=Broadcom 43xx firmware update
+DefaultDependencies=no
+Wants=local-fs.target
+Conflicts=shutdown.target
+After=systemd-modules-load.service local-fs.target
+Before=sysinit.target shutdown.target
+RefuseManualStart=yes
+RefuseManualStop=yes
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/conf.d/bcm43xx
+RemainAfterExit=yes
+ExecStart=/usr/bin/brcm43xx-firmware-update
+TimeoutSec=10
+
+[Install]
+WantedBy=sysinit.target

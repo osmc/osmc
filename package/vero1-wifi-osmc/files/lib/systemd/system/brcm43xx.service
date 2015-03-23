@@ -1,0 +1,13 @@
+[Unit]
+Description=Broadcom 43xx bluetooth HCI
+Requires=brcm43xx-firmware.service
+After=brcm43xx-firmware.service
+Before=bluetooth.service
+ConditionPathExists=/dev/brcm43xx
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hciattach -n /dev/brcm43xx any 3000000
+
+[Install]
+WantedBy=bluetooth.target
