@@ -1,10 +1,8 @@
 #!/bin/bash
 
-systemctl disable vero-wifi.service >/dev/null 2>&1
-
-ischroot
-if [ $? == 0 ]; then exit 0; fi
-
-systemctl stop vero-wifi.service
-exit 0
+if [ "$1" = "remove" ]; then
+	systemctl disable brcm43xx-firmware.service brcm43xx.service >/dev/null 2>&1
+	systemctl stop brcm43xx.service >/dev/null 2>&1
+	exit 0
+fi
 

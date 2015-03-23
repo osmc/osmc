@@ -1,4 +1,8 @@
 #!/bin/bash
 
-touch /tmp/reboot-needed
-systemctl enable vero-wifi.service
+if [ "$1" = "configure" ]; then
+
+	systemctl enable brcm43xx-firmware.service brcm43xx.service >/dev/null 2>&1
+	if ischroot; then exit 0; fi
+	touch /tmp/reboot-needed
+fi
