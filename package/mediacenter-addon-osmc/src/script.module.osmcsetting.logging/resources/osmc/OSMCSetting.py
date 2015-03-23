@@ -97,6 +97,7 @@ import xbmcaddon
 import subprocess
 import sys
 import os
+import threading
 
 addonid = "script.module.osmcsetting.logging"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -110,7 +111,7 @@ from CompLogger import comprehensive_logger as clog
 def log(message):
 	xbmc.log('OSMC LOGGING ' + str(message), level=xbmc.LOGDEBUG)
 
-class OSMCSettingClass(object):
+class OSMCSettingClass(threading.Thread):
 
 	''' 
 		A OSMCSettingClass is way to substantiate the settings of an OSMC settings module, and make them available to the 
@@ -123,6 +124,8 @@ class OSMCSettingClass(object):
 		''' 
 			The logger simply runs specific logs. All this module does is open the Settings window.
 		'''
+
+		super(OSMCSettingClass, self).__init__()
 
 		self.addonid = addonid
 		self.me = xbmcaddon.Addon(self.addonid)
@@ -138,7 +141,7 @@ class OSMCSettingClass(object):
 
 
 	@clog(log, nowait=True)
-	def open_settings_window(self):
+	def run(self):
 
 		'''
 			The method determines what happens when the item is clicked in the settings GUI.

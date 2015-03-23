@@ -83,6 +83,7 @@
 from collections import namedtuple
 import sys
 import os
+import threading
 
 # XBMC Modules
 import xbmc
@@ -104,7 +105,7 @@ def log(message):
 	xbmc.log('OSMC PI OVERCLOCK ' + str(message), level=xbmc.LOGDEBUG)
 
 
-class OSMCSettingClass(object):
+class OSMCSettingClass(threading.Thread):
 
 	''' 
 		A OSMCSettingClass is way to substantiate the settings of an OSMC settings module, and make them available to the 
@@ -118,6 +119,8 @@ class OSMCSettingClass(object):
 			The setting_data_method contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
 		'''
+
+		super(OSMCSettingClass, self).__init__()
 
 		self.addonid = "script.module.osmcsetting.pioverclock"
 
@@ -155,7 +158,7 @@ The module allows you to manually adjust:
 		log('START')
 
 
-	def open_settings_window(self):
+	def run(self):
 
 		'''
 			The method that determines what happens when the item is clicked in the settings GUI.

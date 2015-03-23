@@ -210,7 +210,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			log(instance)
 
 			# try:
-			instance.open_settings_window()
+			instance.start()
 			# except:
 			# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
@@ -436,6 +436,7 @@ class OSMCGui(threading.Thread):
 			OSMCSetting = imp.load_source(new_module_name, osmc_setting_file)
 			log(dir(OSMCSetting))
 			setting_instance = OSMCSetting.OSMCSettingClass()
+			setting_instance.setDaemon(True)
 		except:
 			exc_type, exc_value, exc_traceback = sys.exc_info()
 			log('OSMCSetting __ %s __ failed to import' % sub_folder)
