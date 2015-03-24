@@ -208,12 +208,22 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			instance = module.get('SET', False)
 
 			log(instance)
+			log(instance.isAlive())
 
 			# try:
 			if instance.isAlive():
 				instance.run()
 			else:
-				instance.start()
+
+				setting_instance = module['OSMCSetting'].OSMCSettingClass()
+				setting_instance.setDaemon(True)
+
+				module['SET'] = setting_instance
+
+				# instance = imp.load_source(new_module_name, osmc_setting_file)
+				# module_holder['SET'] = instance
+				# instance.setDaemon(True)
+				setting_instance.start()
 			# except:
 			# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
@@ -458,6 +468,6 @@ class OSMCGui(threading.Thread):
 			order = self.module_tally
 			self.module_tally += 1
 
-		return (order, {'id': sub_folder, 'FX_Icon': osmc_setting_FX_icon, 'FO_Icon': osmc_setting_FO_icon, 'SET':setting_instance})
+		return (order, {'id': sub_folder, 'FX_Icon': osmc_setting_FX_icon, 'FO_Icon': osmc_setting_FO_icon, 'SET':setting_instance, 'OSMCSetting':OSMCSetting})
 
 
