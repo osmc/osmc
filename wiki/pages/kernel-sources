@@ -1,0 +1,35 @@
+Kernel headers and source
+<p>
+The kernel headers and sources are available for all OSMC kernel releases, however they are not shipped with OSMC by default to save space. They can be installed via the OSMC apt repository.
+</p>
+
+<h2>Automatically installing headers</h2>
+<p>
+To get the headers package which matches your kernel version, run the following command:
+<pre>
+for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-headers-$(uname -r)"; ;; esac; done
+</pre>
+Kernel headers are useful for compiling new modules / drivers for your device.
+</p>
+
+<h2>Automatically installing the kernel source</h2>
+<p>
+To get the full kernel source (including OSMC patches) for the kernel that you are currently running, run the following command:
+<pre>
+for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-source-$(uname -r)"; ;; esac; done
+</pre>
+</p>
+<h2>Manually finding a specific version</h2>
+<p>
+You may wish to find a specific header or source package which is different from the kernel that you are running. To do this:
+</p>
+<p>
+First, update your sources
+<pre>sudo apt-get update</pre>
+Now, you can search the repository for available packages:
+<pre>sudo apt-cache search osmc | grep headers</pre> 
+<pre>sudo apt-cache search osmc | grep source</pre>
+
+You can install the appropriate package with:
+
+<pre>sudo apt-get install</pre>
