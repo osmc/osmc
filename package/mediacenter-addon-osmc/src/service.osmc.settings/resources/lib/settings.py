@@ -210,7 +210,10 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 			log(instance)
 
 			# try:
-			instance.start()
+			if instance.isAlive():
+				instance.run()
+			else:
+				instance.start()
 			# except:
 			# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
