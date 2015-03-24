@@ -1,0 +1,3317 @@
+diff --git a/configure.ac b/configure.ac
+index fb92035..8de082f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -100,6 +100,14 @@ if test "x$use_rpi" != "xno"; then
+   esac
+ fi
+ 
++## i.MX6 support
++AC_ARG_ENABLE([imx6],
++  [AS_HELP_STRING([--enable-imx6],
++  [enable support for freescale i.MX6 (default is no)])],
++  [use_imx6=$enableval],
++  [use_imx6=no])
++
++
+ ## add the top dir and include to the include path, so we can include config.h and cec.h
+ CPPFLAGS="$CPPFLAGS -I\$(abs_top_srcdir)/src -I\$(abs_top_srcdir)/include"
+ 
+@@ -296,6 +304,17 @@ else
+   features="$features\n  TDA995x support :\t\t\tno"
+ fi
+ 
++## mark i.MX6 support as available
++if test "x$use_imx6" != "xno"; then
++  AC_DEFINE([HAVE_IMX_API],[1],[Define to 1 to include i.MX6 support])
++  AM_CONDITIONAL(USE_IMX_API, true)
++  features="$features\n  i.MX6 support :\t\t\tyes"
++  LIB_INFO="$LIB_INFO 'i.MX6'"
++else
++  AM_CONDITIONAL(USE_IMX_API, false)
++  features="$features\n  i.MX6 support :\t\t\tno"
++fi
++
+ ## mark Exynos support as available
+ if test "x$use_exynos" != "xno"; then
+   AC_DEFINE([HAVE_EXYNOS_API],[1],[Define to 1 to include Exynos support])
+@@ -308,7 +327,6 @@ else
+   features="$features\n  EXYNOS support :\t\t\tno"
+ fi
+ 
+-
+ ## check if our build system is complete
+ AC_CHECK_HEADER(algorithm,,AC_MSG_ERROR($msg_required_header_missing))
+ AC_CHECK_HEADER(ctype.h,,AC_MSG_ERROR($msg_required_header_missing))
+diff --git a/include/cectypes.h b/include/cectypes.h
+index 0a90d0e..88b10f7 100644
+--- a/include/cectypes.h
++++ b/include/cectypes.h
+@@ -297,6 +297,16 @@ namespace CEC {
+ #define CEC_TDA995x_VIRTUAL_COM		"CuBox"
+ 
+ /*!
++ * the path to use for the i.MX CEC wire
++ */
++#define CEC_IMX_PATH		"/dev/mxc_hdmi_cec"
++
++/*!
++ * the name of the virtual COM port to use for the i.MX CEC wire
++ */
++#define CEC_IMX_VIRTUAL_COM		"i.MX"
++
++/*!
+  * the path to use for the Exynos HDMI CEC device
+  */
+ #define CEC_EXYNOS_PATH		"/dev/CEC"
+@@ -888,7 +898,8 @@ typedef enum cec_adapter_type
+   ADAPTERTYPE_P8_DAUGHTERBOARD = 0x2,
+   ADAPTERTYPE_RPI              = 0x100,
+   ADAPTERTYPE_TDA995x          = 0x200,
+-  ADAPTERTYPE_EXYNOS           = 0x300
++  ADAPTERTYPE_EXYNOS           = 0x300,
++  ADAPTERTYPE_IMX              = 0x400,
+ } cec_adapter_type;
+ 
+ typedef struct cec_menu_language
+diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
+index da42c36..0bc9705 100644
+--- a/src/lib/CECClient.cpp
++++ b/src/lib/CECClient.cpp
+@@ -317,8 +317,6 @@ bool CCECClient::AllocateLogicalAddresses(void)
+ 
+     // find an LA for this type
+     cec_logical_address address(CECDEVICE_UNKNOWN);
+-    if (m_configuration.deviceTypes.types[iPtr] == CEC_DEVICE_TYPE_TV)
+-      address = CECDEVICE_TV;
+     if (m_configuration.deviceTypes.types[iPtr] == CEC_DEVICE_TYPE_RECORDING_DEVICE)
+       address = AllocateLogicalAddressRecordingDevice();
+     if (m_configuration.deviceTypes.types[iPtr] == CEC_DEVICE_TYPE_TUNER)
+diff --git a/src/lib/CECProcessor.cpp b/src/lib/CECProcessor.cpp
+index d6be706..557b76d 100644
+--- a/src/lib/CECProcessor.cpp
++++ b/src/lib/CECProcessor.cpp
+@@ -103,9 +103,9 @@ CCECProcessor::CCECProcessor(CLibCEC *libcec) :
+ CCECProcessor::~CCECProcessor(void)
+ {
+   m_bStallCommunication = false;
+-  SAFE_DELETE(m_addrAllocator);
++  DELETE_AND_NULL(m_addrAllocator);
+   Close();
+-  SAFE_DELETE(m_busDevices);
++  DELETE_AND_NULL(m_busDevices);
+ }
+ 
+ bool CCECProcessor::Start(const char *strPort, uint16_t iBaudRate /* = CEC_SERIAL_DEFAULT_BAUDRATE */, uint32_t iTimeoutMs /* = CEC_DEFAULT_CONNECT_TIMEOUT */)
+@@ -134,20 +134,20 @@ void CCECProcessor::Close(void)
+   SetCECInitialised(false);
+ 
+   // stop the processor
+-  SAFE_DELETE(m_connCheck);
++  DELETE_AND_NULL(m_connCheck);
+   StopThread(-1);
+   m_inBuffer.Broadcast();
+   StopThread();
+ 
+   // close the connection
+   CLockObject lock(m_mutex);
+-  SAFE_DELETE(m_communication);
++  DELETE_AND_NULL(m_communication);
+ }
+ 
+ void CCECProcessor::ResetMembers(void)
+ {
+   // close the connection
+-  SAFE_DELETE(m_communication);
++  DELETE_AND_NULL(m_communication);
+ 
+   // reset the other members to the initial state
+   m_iStandardLineTimeout = 3;
+@@ -196,7 +196,7 @@ bool CCECProcessor::OpenConnection(const char *strPort, uint16_t iBaudRate, uint
+ 
+ bool CCECProcessor::CECInitialised(void)
+ {
+-  CLockObject lock(m_mutex);
++  CLockObject lock(m_threadMutex);
+   return m_bInitialised;
+ }
+ 
+@@ -609,7 +609,7 @@ bool CCECProcessor::StartBootloader(const char *strPort /* = NULL */)
+     if (comm->IsOpen())
+     {
+       bReturn = comm->StartBootloader();
+-      SAFE_DELETE(comm);
++      DELETE_AND_NULL(comm);
+     }
+     return bReturn;
+   }
+diff --git a/src/lib/CECTypeUtils.h b/src/lib/CECTypeUtils.h
+index 64f5c21..800c4f0 100644
+--- a/src/lib/CECTypeUtils.h
++++ b/src/lib/CECTypeUtils.h
+@@ -877,6 +877,8 @@ namespace CEC
+         return "Raspberry Pi";
+       case ADAPTERTYPE_TDA995x:
+         return "TDA995x";
++      case ADAPTERTYPE_IMX:
++        return "i.MX";
+       default:
+         return "unknown";
+       }
+diff --git a/src/lib/LibCEC.cpp b/src/lib/LibCEC.cpp
+index 78c6964..c24b4ed 100644
+--- a/src/lib/LibCEC.cpp
++++ b/src/lib/LibCEC.cpp
+@@ -63,7 +63,7 @@ CLibCEC::~CLibCEC(void)
+   UnregisterClients();
+ 
+   // delete the adapter connection
+-  SAFE_DELETE(m_cec);
++  DELETE_AND_NULL(m_cec);
+ }
+ 
+ bool CLibCEC::Open(const char *strPort, uint32_t iTimeoutMs /* = CEC_DEFAULT_CONNECT_TIMEOUT */)
+@@ -424,7 +424,7 @@ void CLibCEC::UnregisterClients(void)
+ 
+   m_clients.clear();
+ 
+-  SAFE_DELETE(m_client);
++  DELETE_AND_NULL(m_client);
+ }
+ 
+ void * CECInitialise(libcec_configuration *configuration)
+@@ -494,7 +494,7 @@ bool CECStartBootloader(void)
+ 
+ void CECDestroy(CEC::ICECAdapter *instance)
+ {
+-  SAFE_DELETE(instance);
++  DELETE_AND_NULL(instance);
+ }
+ 
+ bool CLibCEC::GetDeviceInformation(const char *strPort, libcec_configuration *config, uint32_t iTimeoutMs /* = CEC_DEFAULT_CONNECT_TIMEOUT */)
+diff --git a/src/lib/Makefile.am b/src/lib/Makefile.am
+index bd9598f..524e9f6 100644
+--- a/src/lib/Makefile.am
++++ b/src/lib/Makefile.am
+@@ -63,6 +63,12 @@ libcec_la_SOURCES += adapter/TDA995x/TDA995xCECAdapterDetection.cpp \
+                      adapter/TDA995x/TDA995xCECAdapterCommunication.cpp
+ endif
+ 
++## i.MX6 support
++if USE_IMX_API
++libcec_la_SOURCES += adapter/IMX/IMXCECAdapterDetection.cpp \
++                     adapter/IMX/IMXCECAdapterCommunication.cpp
++endif
++
+ ## Exynos support
+ if USE_EXYNOS_API
+ libcec_la_SOURCES += adapter/Exynos/ExynosCECAdapterDetection.cpp \
+diff --git a/src/lib/adapter/AdapterFactory.cpp b/src/lib/adapter/AdapterFactory.cpp
+index d585154..34159b2 100644
+--- a/src/lib/adapter/AdapterFactory.cpp
++++ b/src/lib/adapter/AdapterFactory.cpp
+@@ -52,6 +52,11 @@
+ #include "TDA995x/TDA995xCECAdapterCommunication.h"
+ #endif
+ 
++#if defined(HAVE_IMX_API)
++#include "IMX/IMXCECAdapterDetection.h"
++#include "IMX/IMXCECAdapterCommunication.h"
++#endif
++
+ #if defined(HAVE_EXYNOS_API)
+ #include "Exynos/ExynosCECAdapterDetection.h"
+ #include "Exynos/ExynosCECAdapterCommunication.h"
+@@ -114,6 +119,19 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
+   }
+ #endif
+ 
++#if defined(HAVE_IMX_API)
++  if (iAdaptersFound < iBufSize && CIMXCECAdapterDetection::FindAdapter() &&
++      (!strDevicePath || !strcmp(strDevicePath, CEC_IMX_VIRTUAL_COM)))
++  {
++    snprintf(deviceList[iAdaptersFound].strComPath, sizeof(deviceList[iAdaptersFound].strComPath), CEC_IMX_PATH);
++    snprintf(deviceList[iAdaptersFound].strComName, sizeof(deviceList[iAdaptersFound].strComName), CEC_IMX_VIRTUAL_COM);
++    deviceList[iAdaptersFound].iVendorId = IMX_ADAPTER_VID;
++    deviceList[iAdaptersFound].iProductId = IMX_ADAPTER_PID;
++    deviceList[iAdaptersFound].adapterType = ADAPTERTYPE_IMX;
++    iAdaptersFound++;
++  }
++#endif
++    
+ #if defined(HAVE_EXYNOS_API)
+   if (iAdaptersFound < iBufSize && CExynosCECAdapterDetection::FindAdapter())
+   {
+@@ -127,7 +145,7 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
+ #endif
+ 
+ 
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API)
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_IMX_API)
+ #error "libCEC doesn't have support for any type of adapter. please check your build system or configuration"
+ #endif
+ 
+@@ -151,11 +169,17 @@ IAdapterCommunication *CAdapterFactory::GetInstance(const char *strPort, uint16_
+     return new CRPiCECAdapterCommunication(m_lib->m_cec);
+ #endif
+ 
++#if defined(HAVE_IMX_API)
++  if (!strcmp(strPort, CEC_IMX_VIRTUAL_COM))
++    return new CIMXCECAdapterCommunication(m_lib->m_cec);
++#endif
++
+ #if defined(HAVE_P8_USB)
+   return new CUSBCECAdapterCommunication(m_lib->m_cec, strPort, iBaudRate);
+ #endif
+ 
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API)
++
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_IMX_API)
+   return NULL;
+ #endif
+ }
+diff --git a/src/lib/adapter/IMX/AdapterMessageQueue.h b/src/lib/adapter/IMX/AdapterMessageQueue.h
+new file mode 100644
+index 0000000..c8bcf71
+--- /dev/null
++++ b/src/lib/adapter/IMX/AdapterMessageQueue.h
+@@ -0,0 +1,134 @@
++#pragma once
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ *
++ * This program is dual-licensed; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ * Alternatively, you can license this library under a commercial license,
++ * please contact Pulse-Eight Licensing for more information.
++ *
++ * For more information contact:
++ * Pulse-Eight Licensing       <license@pulse-eight.com>
++ *     http://www.pulse-eight.com/
++ *     http://www.pulse-eight.net/
++ */
++
++#include "lib/platform/threads/mutex.h"
++
++namespace CEC
++{
++  using namespace PLATFORM;
++  
++  class CAdapterMessageQueueEntry
++  {
++  public:
++    CAdapterMessageQueueEntry(const cec_command &command)
++       : m_bWaiting(true), m_retval((uint32_t)-1), m_bSucceeded(false)
++    {
++      m_hash = hashValue(
++    	uint32_t(command.opcode_set ? command.opcode : CEC_OPCODE_NONE),
++        command.initiator, command.destination);
++    }
++    
++    virtual ~CAdapterMessageQueueEntry(void) {}
++
++    /*!
++     * @brief Query result from worker thread
++     */
++    uint32_t Result() const
++    {
++      return m_retval;
++    }
++    
++    /*!
++     * @brief Signal waiting threads
++     */
++    void Broadcast(void)
++    {
++      CLockObject lock(m_mutex);
++      m_condition.Broadcast();
++    }
++
++    /*!
++     * @brief Signal waiting thread(s) when message matches this entry
++     */
++    bool CheckMatch(uint32_t opcode, cec_logical_address initiator, 
++                    cec_logical_address destination, uint32_t response)
++    {
++      uint32_t hash = hashValue(opcode, initiator, destination);
++      
++      if (hash == m_hash)
++      {
++        CLockObject lock(m_mutex);
++
++        m_retval = response;
++        m_bSucceeded = true;
++        m_condition.Signal();
++        return true;
++      }
++      
++      return false;
++    }
++
++    /*!
++     * @brief Wait for a response to this command.
++     * @param iTimeout The timeout to use while waiting.
++     * @return True when a response was received before the timeout passed, false otherwise.
++     */
++    bool Wait(uint32_t iTimeout)
++    {
++      CLockObject lock(m_mutex);
++      
++      bool bReturn = m_bSucceeded ? true : m_condition.Wait(m_mutex, m_bSucceeded, iTimeout);
++      m_bWaiting = false;
++      return bReturn;
++    }
++
++    /*!
++     * @return True while a thread is waiting for a signal or isn't waiting yet, false otherwise.
++     */
++    bool IsWaiting(void)
++    {
++      CLockObject lock(m_mutex);
++      return m_bWaiting;
++    }
++
++    /*!
++     * @return Hash value for given cec_command
++     */
++    static uint32_t hashValue(uint32_t opcode, 
++                              cec_logical_address initiator,  
++                              cec_logical_address destination)
++    {
++      return 1 | ((uint32_t)initiator << 8) | 
++             ((uint32_t)destination << 16) | ((uint32_t)opcode << 16);
++    }
++    
++  private:    
++    bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
++    PLATFORM::CCondition<bool>   m_condition;    /**< the condition to wait on */
++    PLATFORM::CMutex             m_mutex;        /**< mutex for changes to this class */
++    uint32_t                  	 m_hash;
++    uint32_t                     m_retval;
++    bool                         m_bSucceeded;
++  };
++ 
++};
+diff --git a/src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp b/src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp
+new file mode 100644
+index 0000000..1f70989
+--- /dev/null
++++ b/src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp
+@@ -0,0 +1,328 @@
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ * 
++ * IMX adpater port is Copyright (C) 2013 by Stephan Rafin
++ * 
++ * You can redistribute this file and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ */
++
++#include "env.h"
++
++#if defined(HAVE_IMX_API)
++#include "IMXCECAdapterCommunication.h"
++
++#include "lib/CECTypeUtils.h"
++#include "lib/LibCEC.h"
++#include "lib/platform/sockets/cdevsocket.h"
++#include "lib/platform/util/StdString.h"
++#include "lib/platform/util/buffer.h"
++
++/*
++ * Ioctl definitions from kernel header
++ */
++#define HDMICEC_IOC_MAGIC  'H'
++#define HDMICEC_IOC_SETLOGICALADDRESS _IOW(HDMICEC_IOC_MAGIC,  1, unsigned char)
++#define HDMICEC_IOC_STARTDEVICE _IO(HDMICEC_IOC_MAGIC,  2)
++#define HDMICEC_IOC_STOPDEVICE  _IO(HDMICEC_IOC_MAGIC,  3)
++#define HDMICEC_IOC_GETPHYADDRESS _IOR(HDMICEC_IOC_MAGIC,  4, unsigned char[4])
++
++#define MAX_CEC_MESSAGE_LEN 17
++
++#define MESSAGE_TYPE_RECEIVE_SUCCESS 1
++#define MESSAGE_TYPE_NOACK 2
++#define MESSAGE_TYPE_DISCONNECTED 3
++#define MESSAGE_TYPE_CONNECTED 4
++#define MESSAGE_TYPE_SEND_SUCCESS 5
++
++typedef struct hdmi_cec_event{
++  int event_type;
++  int msg_len;
++  unsigned char msg[MAX_CEC_MESSAGE_LEN];
++}hdmi_cec_event;
++
++
++using namespace std;
++using namespace CEC;
++using namespace PLATFORM;
++
++#include "AdapterMessageQueue.h"
++
++#define LIB_CEC m_callback->GetLib()
++
++// these are defined in nxp private header file
++#define CEC_MSG_SUCCESS                 0x00	/*Message transmisson Succeed*/
++#define CEC_CSP_OFF_STATE               0x80	/*CSP in Off State*/
++#define CEC_BAD_REQ_SERVICE             0x81	/*Bad .req service*/
++#define CEC_MSG_FAIL_UNABLE_TO_ACCESS	0x82	/*Message transmisson failed: Unable to access CEC line*/
++#define CEC_MSG_FAIL_ARBITRATION_ERROR	0x83	/*Message transmisson failed: Arbitration error*/
++#define CEC_MSG_FAIL_BIT_TIMMING_ERROR	0x84	/*Message transmisson failed: Bit timming error*/
++#define CEC_MSG_FAIL_DEST_NOT_ACK       0x85	/*Message transmisson failed: Destination Address not aknowledged*/
++#define CEC_MSG_FAIL_DATA_NOT_ACK       0x86	/*Message transmisson failed: Databyte not acknowledged*/
++
++
++CIMXCECAdapterCommunication::CIMXCECAdapterCommunication(IAdapterCommunicationCallback *callback) :
++    IAdapterCommunication(callback)/*,
++    m_bLogicalAddressChanged(false)*/
++{ 
++  CLockObject lock(m_mutex);
++
++  m_iNextMessage = 0;
++  //m_logicalAddresses.Clear();
++  m_logicalAddress = CECDEVICE_UNKNOWN;
++  m_bLogicalAddressRegistered = false;
++  m_bInitialised = false;
++  m_dev = new CCDevSocket(CEC_IMX_PATH);
++}
++
++CIMXCECAdapterCommunication::~CIMXCECAdapterCommunication(void)
++{
++  Close();
++
++  CLockObject lock(m_mutex);
++  delete m_dev;
++  m_dev = 0;
++}
++
++bool CIMXCECAdapterCommunication::IsOpen(void)
++{
++  return IsInitialised() && m_dev->IsOpen();
++}
++
++bool CIMXCECAdapterCommunication::Open(uint32_t iTimeoutMs, bool UNUSED(bSkipChecks), bool bStartListening)
++{
++  if (m_dev->Open(iTimeoutMs))
++  {
++    if (!bStartListening || CreateThread()) {
++      if (m_dev->Ioctl(HDMICEC_IOC_STARTDEVICE, NULL) == 0) {
++         m_bInitialised = true;
++         return true;
++      }
++      LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: Unable to start device\n", __func__);
++    }
++    m_dev->Close();
++  }
++
++  return false;
++}
++
++
++void CIMXCECAdapterCommunication::Close(void)
++{
++  StopThread(0);
++
++  CLockObject lock(m_mutex);
++  if (!m_bInitialised) {
++    return;
++  }
++  if (m_dev->Ioctl(HDMICEC_IOC_STOPDEVICE, NULL) != 0) {
++    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: Unable to stop device\n", __func__);
++  }
++  m_dev->Close();
++  m_bInitialised = false;
++}
++
++
++std::string CIMXCECAdapterCommunication::GetError(void) const
++{
++  std::string strError(m_strError);
++  return strError;
++}
++
++
++cec_adapter_message_state CIMXCECAdapterCommunication::Write(
++  const cec_command &data, bool &UNUSED(bRetry), uint8_t UNUSED(iLineTimeout), bool UNUSED(bIsReply))
++{
++  //cec_frame frame;
++  unsigned char message[MAX_CEC_MESSAGE_LEN];
++  int msg_len = 1;
++  cec_adapter_message_state rc = ADAPTER_MESSAGE_STATE_ERROR;
++
++  if ((size_t)data.parameters.size + data.opcode_set + 1 > sizeof(message))
++  {
++    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: data size too large !", __func__);
++    return ADAPTER_MESSAGE_STATE_ERROR;
++  }
++
++  message[0] = (data.initiator << 4) | (data.destination & 0x0f);
++  if (data.opcode_set)
++  {
++    message[1] = data.opcode;
++    msg_len++;
++    memcpy(&message[2], data.parameters.data, data.parameters.size);
++    msg_len+=data.parameters.size;
++  }
++
++  if (m_dev->Write(message, msg_len) == msg_len)
++  {
++    rc = ADAPTER_MESSAGE_STATE_SENT_ACKED;
++  }
++    else
++      LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: sent command error !", __func__);
++
++  return rc;
++}
++
++
++uint16_t CIMXCECAdapterCommunication::GetFirmwareVersion(void)
++{
++  /* FIXME add ioctl ? */
++  return 0;
++}
++
++
++cec_vendor_id CIMXCECAdapterCommunication::GetVendorId(void)
++{
++  return CEC_VENDOR_UNKNOWN;
++}
++
++
++uint16_t CIMXCECAdapterCommunication::GetPhysicalAddress(void)
++{
++  uint32_t info;
++  uint16_t phy_addr;
++
++  if (m_dev->Ioctl(HDMICEC_IOC_GETPHYADDRESS, &info) != 0)
++  {
++    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: HDMICEC_IOC_GETPHYADDRESS failed !", __func__);
++    return CEC_INVALID_PHYSICAL_ADDRESS; 
++  }
++  /* Rebuild 16 bit raw value from fsl 32 bits value */
++  phy_addr = ((info & 0x0f) << 12) | (info & 0x0f00) |
++             ((info & 0x0f0000) >> 12) | ((info & 0x0f000000) >> 24);
++
++  return phy_addr;
++}
++
++
++cec_logical_addresses CIMXCECAdapterCommunication::GetLogicalAddresses(void)
++{
++  cec_logical_addresses addresses;
++  addresses.Clear();
++
++  CLockObject lock(m_mutex);
++  if ((m_logicalAddress & (CECDEVICE_UNKNOWN | CECDEVICE_UNREGISTERED)) == 0)
++    addresses.Set(m_logicalAddress);
++
++  return addresses;
++}
++
++void CIMXCECAdapterCommunication::HandleLogicalAddressLost(cec_logical_address UNUSED(oldAddress))
++{
++  UnregisterLogicalAddress();
++}
++
++bool CIMXCECAdapterCommunication::UnregisterLogicalAddress(void)
++{
++  CLockObject lock(m_mutex);
++  if (!m_bLogicalAddressRegistered)
++    return true;
++
++  if (m_dev->Ioctl(HDMICEC_IOC_SETLOGICALADDRESS, (void *)CECDEVICE_BROADCAST) != 0)
++  {
++    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: HDMICEC_IOC_SETLOGICALADDRESS failed !", __func__);
++    return false;
++  }
++
++  m_logicalAddress = CECDEVICE_UNKNOWN;
++  m_bLogicalAddressRegistered = false;
++  return true;
++}
++
++bool CIMXCECAdapterCommunication::RegisterLogicalAddress(const cec_logical_address address)
++{
++  CLockObject lock(m_mutex);
++
++  if (m_logicalAddress == address && m_bLogicalAddressRegistered)
++  {
++    return true;
++  }
++
++  if (m_dev->Ioctl(HDMICEC_IOC_SETLOGICALADDRESS, (void *)address) != 0)
++  {
++    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: HDMICEC_IOC_SETLOGICALADDRESS failed !", __func__);
++    return false;
++  }
++
++  m_logicalAddress = address;
++  m_bLogicalAddressRegistered = true;
++  return true;
++}
++
++bool CIMXCECAdapterCommunication::SetLogicalAddresses(const cec_logical_addresses &addresses)
++{
++  int log_addr = addresses.primary;
++
++  return RegisterLogicalAddress((cec_logical_address)log_addr);
++}
++
++void *CIMXCECAdapterCommunication::Process(void)
++{
++  bool bHandled;
++  hdmi_cec_event event;
++  int ret;
++
++  uint32_t opcode, status;
++  cec_logical_address initiator, destination;
++
++  while (!IsStopped())
++  {
++    ret = m_dev->Read((char *)&event, sizeof(event), 5000);
++    if (ret > 0)
++    {
++
++      initiator = cec_logical_address(event.msg[0] >> 4);
++      destination = cec_logical_address(event.msg[0] & 0x0f);
++
++      //LIB_CEC->AddLog(CEC_LOG_DEBUG, "%s: Read data : type : %d initiator %d dest %d", __func__, event.event_type, initiator, destination);
++      if (event.event_type == MESSAGE_TYPE_RECEIVE_SUCCESS)
++      /* Message received */
++      {
++        cec_command cmd;
++
++        cec_command::Format(
++          cmd, initiator, destination,
++          ( event.msg_len > 1 ) ? cec_opcode(event.msg[1]) : CEC_OPCODE_NONE);
++
++        for( uint8_t i = 2; i < event.msg_len; i++ )
++          cmd.parameters.PushBack(event.msg[i]);
++
++        if (!IsStopped())
++          m_callback->OnCommandReceived(cmd);
++      }
++
++      if (event.event_type == MESSAGE_TYPE_CONNECTED)
++      /* HDMI has just been reconnected - Notify  phy address*/
++      {
++        uint16_t iNewAddress = GetPhysicalAddress();
++        m_callback->HandlePhysicalAddressChanged(iNewAddress);
++      }
++      /* We are not interested in other events */
++    } /*else {
++      LIB_CEC->AddLog(CEC_LOG_DEBUG, "%s: Read returned %d", __func__, ret);
++    }*/
++
++  }
++
++  return 0;
++}
++
++#endif	// HAVE_IMX_API
+diff --git a/src/lib/adapter/IMX/IMXCECAdapterCommunication.h b/src/lib/adapter/IMX/IMXCECAdapterCommunication.h
+new file mode 100644
+index 0000000..ce5c4cb
+--- /dev/null
++++ b/src/lib/adapter/IMX/IMXCECAdapterCommunication.h
+@@ -0,0 +1,119 @@
++#pragma once
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ *
++ * IMX adpater port is Copyright (C) 2013 by Stephan Rafin
++ * 
++ * You can redistribute this file and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ */
++
++#if defined(HAVE_IMX_API)
++
++#include "lib/platform/threads/mutex.h"
++#include "lib/platform/threads/threads.h"
++#include "lib/platform/sockets/socket.h"
++#include "lib/adapter/AdapterCommunication.h"
++#include <map>
++
++#define IMX_ADAPTER_VID 0x0471 /*FIXME TBD*/
++#define IMX_ADAPTER_PID 0x1001
++
++
++
++namespace PLATFORM
++{
++  class CCDevSocket;
++};
++
++
++namespace CEC
++{
++  class CAdapterMessageQueueEntry;
++
++  class CIMXCECAdapterCommunication : public IAdapterCommunication, public PLATFORM::CThread
++  {
++  public:
++    /*!
++     * @brief Create a new USB-CEC communication handler.
++     * @param callback The callback to use for incoming CEC commands.
++     */
++    CIMXCECAdapterCommunication(IAdapterCommunicationCallback *callback);
++    virtual ~CIMXCECAdapterCommunication(void);
++
++    /** @name IAdapterCommunication implementation */
++    ///{
++    bool Open(uint32_t iTimeoutMs = CEC_DEFAULT_CONNECT_TIMEOUT, bool bSkipChecks = false, bool bStartListening = true);
++    void Close(void);
++    bool IsOpen(void);
++    std::string GetError(void) const;
++    cec_adapter_message_state Write(const cec_command &data, bool &bRetry, uint8_t iLineTimeout, bool bIsReply);
++
++    bool SetLineTimeout(uint8_t UNUSED(iTimeout)) { return true; }
++    bool StartBootloader(void) { return false; }
++    bool SetLogicalAddresses(const cec_logical_addresses &addresses);
++    cec_logical_addresses GetLogicalAddresses(void);
++    bool PingAdapter(void) { return IsInitialised(); }
++    uint16_t GetFirmwareVersion(void);
++    uint32_t GetFirmwareBuildDate(void) { return 0; }
++    bool IsRunningLatestFirmware(void) { return true; }
++    bool PersistConfiguration(const libcec_configuration & UNUSED(configuration)) { return false; }
++    bool GetConfiguration(libcec_configuration & UNUSED(configuration)) { return false; }
++    std::string GetPortName(void) { return std::string("IMX"); }
++    uint16_t GetPhysicalAddress(void);
++    bool SetControlledMode(bool UNUSED(controlled)) { return true; }
++    cec_vendor_id GetVendorId(void);
++    bool SupportsSourceLogicalAddress(const cec_logical_address address) { return address > CECDEVICE_TV && address <= CECDEVICE_BROADCAST; }
++    cec_adapter_type GetAdapterType(void) { return ADAPTERTYPE_IMX; }
++    uint16_t GetAdapterVendorId(void) const { return IMX_ADAPTER_VID; }
++    uint16_t GetAdapterProductId(void) const { return IMX_ADAPTER_PID; }
++    void HandleLogicalAddressLost(cec_logical_address UNUSED(oldAddress));
++    void SetActiveSource(bool UNUSED(bSetTo), bool UNUSED(bClientUnregistered)) {}
++    bool RegisterLogicalAddress(const cec_logical_address address);
++    ///}
++
++    /** @name PLATFORM::CThread implementation */
++    ///{
++    void *Process(void);
++    ///}
++
++  private:
++    bool IsInitialised(void) const { return m_bInitialised; };
++    bool UnregisterLogicalAddress(void);
++
++    std::string                 m_strError; /**< current error message */
++
++    //cec_logical_addresses       m_logicalAddresses;
++    cec_logical_address         m_logicalAddress;
++
++    PLATFORM::CMutex            m_mutex;
++    PLATFORM::CCDevSocket       *m_dev;	/**< the device connection */
++    bool                        m_bLogicalAddressRegistered;
++    bool                        m_bInitialised;
++
++    PLATFORM::CMutex            m_messageMutex;
++    uint32_t                    m_iNextMessage;
++    std::map<uint32_t, CAdapterMessageQueueEntry *> m_messages;
++  };
++  
++};
++
++#endif
+diff --git a/src/lib/adapter/IMX/IMXCECAdapterDetection.cpp b/src/lib/adapter/IMX/IMXCECAdapterDetection.cpp
+new file mode 100644
+index 0000000..6c93c45
+--- /dev/null
++++ b/src/lib/adapter/IMX/IMXCECAdapterDetection.cpp
+@@ -0,0 +1,42 @@
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ * 
++ * IMX adpater port is Copyright (C) 2013 by Stephan Rafin
++ * 
++ * You can redistribute this file and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ */
++
++#include "env.h"
++#include <stdio.h>
++
++#if defined(HAVE_IMX_API)
++#include "IMXCECAdapterDetection.h"
++
++
++using namespace CEC;
++
++bool CIMXCECAdapterDetection::FindAdapter(void)
++{
++  return access(CEC_IMX_PATH, 0) == 0;
++}
++
++#endif
+diff --git a/src/lib/adapter/IMX/IMXCECAdapterDetection.h b/src/lib/adapter/IMX/IMXCECAdapterDetection.h
+new file mode 100644
+index 0000000..d54891d
+--- /dev/null
++++ b/src/lib/adapter/IMX/IMXCECAdapterDetection.h
+@@ -0,0 +1,36 @@
++#pragma once
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ * 
++ * IMX adpater port is Copyright (C) 2013 by Stephan Rafin
++ * 
++ * You can redistribute this file and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ */
++
++namespace CEC
++{
++  class CIMXCECAdapterDetection
++  {
++  public:
++    static bool FindAdapter(void);
++  };
++}
+diff --git a/src/lib/adapter/Pulse-Eight/USBCECAdapterCommands.cpp b/src/lib/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
+index b723380..8505033 100644
+--- a/src/lib/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
++++ b/src/lib/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
+@@ -75,7 +75,7 @@ cec_datapacket CUSBCECAdapterCommands::RequestSetting(cec_adapter_messagecode ms
+     retVal.size -= 1; // remove end
+   }
+ 
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+   return retVal;
+ }
+ 
+@@ -283,7 +283,7 @@ bool CUSBCECAdapterCommands::SetSettingAutoEnabled(bool enabled)
+   params.PushEscaped(enabled ? 1 : 0);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_AUTO_ENABLED, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -312,7 +312,7 @@ bool CUSBCECAdapterCommands::SetSettingDeviceType(cec_device_type type)
+   params.PushEscaped((uint8_t)type);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_DEVICE_TYPE, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -341,7 +341,7 @@ bool CUSBCECAdapterCommands::SetSettingDefaultLogicalAddress(cec_logical_address
+   params.PushEscaped((uint8_t)address);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_DEFAULT_LOGICAL_ADDRESS, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -371,7 +371,7 @@ bool CUSBCECAdapterCommands::SetSettingLogicalAddressMask(uint16_t iMask)
+   params.PushEscaped((uint8_t)iMask);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_LOGICAL_ADDRESS_MASK, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -401,7 +401,7 @@ bool CUSBCECAdapterCommands::SetSettingPhysicalAddress(uint16_t iPhysicalAddress
+   params.PushEscaped((uint8_t)iPhysicalAddress);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_PHYSICAL_ADDRESS, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -430,7 +430,7 @@ bool CUSBCECAdapterCommands::SetSettingCECVersion(cec_version version)
+   params.PushEscaped((uint8_t)version);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_HDMI_VERSION, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -456,7 +456,7 @@ bool CUSBCECAdapterCommands::SetSettingOSDName(const char *strOSDName)
+     params.PushEscaped(strOSDName[iPtr]);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_OSD_NAME, params);
+   bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+     snprintf(m_persistedConfiguration.strDeviceName, 13, "%s", strOSDName);
+@@ -477,7 +477,7 @@ bool CUSBCECAdapterCommands::WriteEEPROM(void)
+   CCECAdapterMessage params;
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_WRITE_EEPROM, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+@@ -576,7 +576,7 @@ bool CUSBCECAdapterCommands::PingAdapter(void)
+   CCECAdapterMessage params;
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_PING, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+   return bReturn;
+ }
+ 
+@@ -589,7 +589,7 @@ bool CUSBCECAdapterCommands::SetAckMask(uint16_t iMask)
+   params.PushEscaped((uint8_t)iMask);
+   CCECAdapterMessage *message  = m_comm->SendCommand(MSGCODE_SET_ACK_MASK, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+   return bReturn;
+ }
+ 
+@@ -602,7 +602,7 @@ void CUSBCECAdapterCommands::SetActiveSource(bool bSetTo, bool bClientUnregister
+     CCECAdapterMessage params;
+     params.PushEscaped(bSetTo ? 1 : 0);
+     CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_ACTIVE_SOURCE, params);
+-    SAFE_DELETE(message);
++    DELETE_AND_NULL(message);
+   }
+ }
+ 
+@@ -613,7 +613,7 @@ bool CUSBCECAdapterCommands::StartBootloader(void)
+   CCECAdapterMessage params;
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_START_BOOTLOADER, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+   return bReturn;
+ }
+ 
+@@ -624,7 +624,7 @@ bool CUSBCECAdapterCommands::SetLineTimeout(uint8_t iTimeout)
+   params.PushEscaped(iTimeout);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_TRANSMIT_IDLETIME, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+   return bReturn;
+ }
+ 
+@@ -642,7 +642,7 @@ bool CUSBCECAdapterCommands::SetControlledMode(bool controlled)
+   params.PushEscaped(controlled ? 1 : 0);
+   CCECAdapterMessage *message = m_comm->SendCommand(MSGCODE_SET_CONTROLLED, params);
+   bool bReturn = message && message->state == ADAPTER_MESSAGE_STATE_SENT_ACKED;
+-  SAFE_DELETE(message);
++  DELETE_AND_NULL(message);
+ 
+   if (bReturn)
+   {
+diff --git a/src/lib/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp b/src/lib/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
+index 3552def..1be07c5 100644
+--- a/src/lib/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
++++ b/src/lib/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
+@@ -85,14 +85,14 @@ CUSBCECAdapterCommunication::CUSBCECAdapterCommunication(IAdapterCommunicationCa
+ CUSBCECAdapterCommunication::~CUSBCECAdapterCommunication(void)
+ {
+   Close();
+-  SAFE_DELETE(m_commands);
+-  SAFE_DELETE(m_adapterMessageQueue);
+-  SAFE_DELETE(m_port);
++  DELETE_AND_NULL(m_commands);
++  DELETE_AND_NULL(m_adapterMessageQueue);
++  DELETE_AND_NULL(m_port);
+ }
+ 
+ void CUSBCECAdapterCommunication::ResetMessageQueue(void)
+ {
+-  SAFE_DELETE(m_adapterMessageQueue);
++  DELETE_AND_NULL(m_adapterMessageQueue);
+   m_adapterMessageQueue = new CCECAdapterMessageQueue(this);
+   m_adapterMessageQueue->CreateThread();
+ }
+@@ -226,10 +226,10 @@ void CUSBCECAdapterCommunication::Close(void)
+   /* stop and delete the write thread */
+   if (m_eepromWriteThread)
+     m_eepromWriteThread->Stop();
+-  SAFE_DELETE(m_eepromWriteThread);
++  DELETE_AND_NULL(m_eepromWriteThread);
+ 
+   /* stop and delete the ping thread */
+-  SAFE_DELETE(m_pingThread);
++  DELETE_AND_NULL(m_pingThread);
+ 
+   /* close and delete the com port connection */
+   if (m_port)
+diff --git a/src/lib/devices/CECBusDevice.cpp b/src/lib/devices/CECBusDevice.cpp
+index b1627e6..489ded2 100644
+--- a/src/lib/devices/CECBusDevice.cpp
++++ b/src/lib/devices/CECBusDevice.cpp
+@@ -166,8 +166,8 @@ CCECBusDevice::CCECBusDevice(CCECProcessor *processor, cec_logical_address iLogi
+ 
+ CCECBusDevice::~CCECBusDevice(void)
+ {
+-  SAFE_DELETE(m_handler);
+-  SAFE_DELETE(m_waitForResponse);
++  DELETE_AND_NULL(m_handler);
++  DELETE_AND_NULL(m_waitForResponse);
+ }
+ 
+ bool CCECBusDevice::ReplaceHandler(bool bActivateSource /* = true */)
+@@ -195,7 +195,7 @@ bool CCECBusDevice::ReplaceHandler(bool bActivateSource /* = true */)
+         int8_t  iTransmitRetries     = m_handler->m_iTransmitRetries;
+         int64_t iActiveSourcePending = m_handler->m_iActiveSourcePending;
+ 
+-        SAFE_DELETE(m_handler);
++        DELETE_AND_NULL(m_handler);
+ 
+         switch (m_vendor)
+         {
+diff --git a/src/lib/platform/adl/adl-edid.cpp b/src/lib/platform/adl/adl-edid.cpp
+index 2747ea4..fda3e1b 100644
+--- a/src/lib/platform/adl/adl-edid.cpp
++++ b/src/lib/platform/adl/adl-edid.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/adl/adl-edid.h b/src/lib/platform/adl/adl-edid.h
+index 866ae2c..9401f18 100644
+--- a/src/lib/platform/adl/adl-edid.h
++++ b/src/lib/platform/adl/adl-edid.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/nvidia/nv-edid.cpp b/src/lib/platform/nvidia/nv-edid.cpp
+index 2ef6abd..549255c 100644
+--- a/src/lib/platform/nvidia/nv-edid.cpp
++++ b/src/lib/platform/nvidia/nv-edid.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/nvidia/nv-edid.h b/src/lib/platform/nvidia/nv-edid.h
+index 4ba6812..9438c51 100644
+--- a/src/lib/platform/nvidia/nv-edid.h
++++ b/src/lib/platform/nvidia/nv-edid.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/os.h b/src/lib/platform/os.h
+index 661e97f..d3108e4 100644
+--- a/src/lib/platform/os.h
++++ b/src/lib/platform/os.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -46,4 +45,3 @@
+ #else
+ #include "posix/os-types.h"
+ #endif
+-
+diff --git a/src/lib/platform/posix/os-edid.cpp b/src/lib/platform/posix/os-edid.cpp
+index 3d52107..51dc92f 100644
+--- a/src/lib/platform/posix/os-edid.cpp
++++ b/src/lib/platform/posix/os-edid.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/posix/os-socket.h b/src/lib/platform/posix/os-socket.h
+index 4799bb7..7156c75 100644
+--- a/src/lib/platform/posix/os-socket.h
++++ b/src/lib/platform/posix/os-socket.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -33,10 +32,11 @@
+  */
+ 
+ 
+-#include "../os.h"
+-#include "../util/timeutils.h"
++#include "lib/platform/os.h"
++#include "lib/platform/util/timeutils.h"
+ #include <stdio.h>
+ #include <fcntl.h>
++#include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
+@@ -87,7 +87,7 @@ namespace PLATFORM
+     {
+       FD_ZERO(&port);
+       FD_SET(socket, &port);
+-      int returnv = select(socket + 1, NULL, &port, NULL, tv);
++      ssize_t returnv = (ssize_t)select(socket + 1, NULL, &port, NULL, tv);
+       if (returnv < 0)
+       {
+         *iError = errno;
+@@ -115,9 +115,9 @@ namespace PLATFORM
+   {
+     fd_set port;
+     struct timeval timeout, *tv;
++    int64_t iNow(0), iTarget(0);
+     ssize_t iBytesRead(0);
+     *iError = 0;
+-    CTimeout readTimeout(iTimeoutMs);
+ 
+     if (socket == INVALID_SOCKET_VALUE)
+     {
+@@ -125,7 +125,13 @@ namespace PLATFORM
+       return -EINVAL;
+     }
+ 
+-    while (iBytesRead >= 0 && iBytesRead < (ssize_t)len && (iTimeoutMs == 0 || readTimeout.TimeLeft() > 0))
++    if (iTimeoutMs > 0)
++    {
++      iNow    = GetTimeMs();
++      iTarget = iNow + (int64_t) iTimeoutMs;
++    }
++
++    while (iBytesRead >= 0 && iBytesRead < (ssize_t)len && (iTimeoutMs == 0 || iTarget > iNow))
+     {
+       if (iTimeoutMs == 0)
+       {
+@@ -133,15 +139,14 @@ namespace PLATFORM
+       }
+       else
+       {
+-        long iTimeLeft = (long)readTimeout.TimeLeft();
+-        timeout.tv_sec  = iTimeLeft / (long int)1000.;
+-        timeout.tv_usec = iTimeLeft % (long int)1000.;
++        timeout.tv_sec  = ((long int)iTarget - (long int)iNow) / (long int)1000.;
++        timeout.tv_usec = ((long int)iTarget - (long int)iNow) % (long int)1000.;
+         tv = &timeout;
+       }
+ 
+       FD_ZERO(&port);
+       FD_SET(socket, &port);
+-      int32_t returnv = select(socket + 1, &port, NULL, NULL, tv);
++      ssize_t returnv = (ssize_t)select(socket + 1, &port, NULL, NULL, tv);
+ 
+       if (returnv == -1)
+       {
+@@ -161,10 +166,27 @@ namespace PLATFORM
+       }
+ 
+       iBytesRead += returnv;
++
++      if (iTimeoutMs > 0)
++        iNow = GetTimeMs();
+     }
+ 
+     return iBytesRead;
+   }
++
++  inline int SocketIoctl(socket_t socket, int *iError, int request, void* data)
++  {
++    if (socket == INVALID_SOCKET_VALUE)
++    {
++      *iError = EINVAL;
++      return -1;
++    }
++
++    int iReturn = ioctl(socket, request, data);
++    if (iReturn < 0)
++      *iError = errno;
++    return iReturn;
++  }
+   //@}
+ 
+   // TCP
+@@ -217,16 +239,16 @@ namespace PLATFORM
+     fds.events = POLLIN;
+     fds.revents = 0;
+ 
+-    while (iBytesRead >= 0 &&
+-        iBytesRead < (ssize_t)len &&
+-        (iTimeoutMs == 0 || iTarget > iNow) &&
+-        *iError == 0)
++    while (iBytesRead >= 0 && iBytesRead < (ssize_t)len && (iTimeoutMs == 0 || iTarget > iNow))
+     {
+       if (iTimeoutMs > 0)
+       {
+-        int iPollResult = poll(&fds, 1, iTarget - iNow);
++        int iPollResult = poll(&fds, 1, (int)(iTarget - iNow));
+         if (iPollResult == 0)
++        {
+           *iError = ETIMEDOUT;
++          return -ETIMEDOUT;
++        }
+       }
+ 
+       ssize_t iReadResult = (iTimeoutMs > 0) ?
+@@ -237,11 +259,12 @@ namespace PLATFORM
+         if (errno == EAGAIN && iTimeoutMs > 0)
+           continue;
+         *iError = errno;
+-        return (iBytesRead > 0) ? iBytesRead : -errno;
++        return -errno;
+       }
+       else if (iReadResult == 0 || (iReadResult != (ssize_t)len && iTimeoutMs == 0))
+       {
+         *iError = ECONNRESET;
++        return -ECONNRESET;
+       }
+ 
+       iBytesRead += iReadResult;
+@@ -250,7 +273,7 @@ namespace PLATFORM
+         iNow = GetTimeMs();
+     }
+ 
+-    if (iBytesRead < (ssize_t)len && iError == 0)
++    if (iBytesRead < (ssize_t)len)
+       *iError = ETIMEDOUT;
+     return iBytesRead;
+   }
+@@ -297,7 +320,7 @@ namespace PLATFORM
+         pfd.events = POLLOUT;
+         pfd.revents = 0;
+ 
+-        int iPollResult = poll(&pfd, 1, iTimeout);
++        int iPollResult = poll(&pfd, 1, (int)iTimeout);
+         if (iPollResult == 0)
+           *iError = ETIMEDOUT;
+         else if (iPollResult == -1)
+diff --git a/src/lib/platform/posix/os-threads.h b/src/lib/platform/posix/os-threads.h
+index 425b314..7b7fc3c 100644
+--- a/src/lib/platform/posix/os-threads.h
++++ b/src/lib/platform/posix/os-threads.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,12 +31,6 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#if defined(TARGET_DARWIN)
+-#  ifndef PTHREAD_MUTEX_RECURSIVE_NP
+-#    define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+-#  endif
+-#endif
+-
+ namespace PLATFORM
+ {
+   inline pthread_mutexattr_t *GetRecursiveMutexAttribute(void)
+@@ -71,9 +64,10 @@ namespace PLATFORM
+   }
+ 
+   typedef pthread_t thread_t;
++  #define INVALID_THREAD_VALUE 0
+ 
+   #define ThreadsCreate(thread, func, arg)         (pthread_create(&thread, NULL, (void *(*) (void *))func, (void *)arg) == 0)
+-  #define ThreadsWait(thread, retval)              (pthread_join(thread, retval) == 0)
++  #define ThreadsWait(thread, retval)              (thread ? pthread_join(thread, retval) == 0 : true)
+ 
+   typedef pthread_mutex_t mutex_t;
+   #define MutexCreate(mutex)                       pthread_mutex_init(&mutex, GetRecursiveMutexAttribute());
+diff --git a/src/lib/platform/posix/os-types.h b/src/lib/platform/posix/os-types.h
+index a52b101..af076b2 100644
+--- a/src/lib/platform/posix/os-types.h
++++ b/src/lib/platform/posix/os-types.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -45,10 +44,9 @@
+ #include <semaphore.h>
+ #include <stdint.h>
+ 
+-#include <inttypes.h>
+-#include <stdint.h>
++extern "C" {
+ #include <sys/types.h>
+-#include <sys/stat.h>
++}
+ 
+ #define LIBTYPE
+ #define DECLSPEC
+@@ -58,128 +56,6 @@ typedef socket_t tcp_socket_t;
+ #define INVALID_SOCKET_VALUE        (-1)
+ typedef socket_t serial_socket_t;
+ #define INVALID_SERIAL_SOCKET_VALUE (-1)
++typedef socket_t chardev_socket_t;
++#define INVALID_CHARDEV_SOCKET_VALUE (-1)
+ 
+-typedef long LONG;
+-typedef LONG HRESULT;
+-
+-#define _FILE_OFFSET_BITS 64
+-#define FILE_BEGIN              0
+-#define FILE_CURRENT            1
+-#define FILE_END                2
+-
+-// Success codes
+-#define S_OK           0L
+-#define S_FALSE        1L
+-#define FAILED(Status) ((HRESULT)(Status)<0)
+-#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+-
+-// Error codes
+-#define ERROR_FILENAME_EXCED_RANGE 206L
+-#define ERROR_INVALID_NAME         123L
+-#define E_OUTOFMEMORY              0x8007000EL
+-#define E_FAIL                     0x8004005EL
+-
+-#ifdef TARGET_LINUX
+-#include <limits.h>
+-#define MAX_PATH PATH_MAX
+-#elif defined TARGET_DARWIN || defined __FreeBSD__
+-#include <sys/syslimits.h>
+-#define MAX_PATH PATH_MAX
+-#else
+-#define MAX_PATH 256
+-#endif
+-
+-#if defined(__APPLE__)
+-  #include <stdio.h> // for fpos_t
+-  #include <sched.h>
+-  #include <AvailabilityMacros.h>
+-  typedef int64_t   off64_t;
+-  typedef off_t     __off_t;
+-  typedef off64_t   __off64_t;
+-  typedef fpos_t fpos64_t;
+-  #define __stat64 stat
+-  #define stat64 stat
+-  #if defined(TARGET_DARWIN_IOS)
+-    #define statfs64 statfs
+-  #endif
+-  #define fstat64 fstat
+-#elif defined(__FreeBSD__)
+-  #include <stdio.h> // for fpos_t
+-  typedef int64_t   off64_t;
+-  typedef off_t     __off_t;
+-  typedef off64_t   __off64_t;
+-  typedef fpos_t fpos64_t;
+-  #define __stat64 stat
+-  #define stat64 stat
+-  #define statfs64 statfs
+-  #define fstat64 fstat
+-#else
+-  #define __stat64 stat64
+-#endif
+-
+-#include <string.h>
+-#define strnicmp(X,Y,N) strncasecmp(X,Y,N)
+-
+-typedef unsigned char byte;
+-
+-/* Platform dependent path separator */
+-#ifndef PATH_SEPARATOR_CHAR
+-#define PATH_SEPARATOR_CHAR '/'
+-#define PATH_SEPARATOR_STRING "/"
+-#endif
+-
+-#ifdef TARGET_LINUX
+-// Retrieve the number of milliseconds that have elapsed since the system was started
+-#include <time.h>
+-inline unsigned long GetTickCount(void)
+-{
+-  struct timespec ts;
+-  if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0)
+-  {
+-    return 0;
+-  }
+-  return (unsigned long)( (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000) );
+-};
+-#else
+-#include <time.h>
+-inline unsigned long GetTickCount(void)
+-{
+-  struct timeval tv;
+-  gettimeofday(&tv, NULL);
+-  return (unsigned long)( (tv.tv_sec * 1000) + (tv.tv_usec / 1000) );
+-};
+-#endif /* TARGET_LINUX || TARGET_DARWIN */
+-
+-/* Handling of 2-byte Windows wchar strings on non-Windows targets
+- * Used by The MediaPortal and ForTheRecord pvr addons 
+- */
+-typedef uint16_t Wchar_t; /* sizeof(wchar_t) = 4 bytes on Linux, but the MediaPortal buffer files have 2-byte wchars */
+-
+-/* This is a replacement of the Windows wcslen() function which assumes that
+- * wchar_t is a 2-byte character.
+- * It is used for processing Windows wchar strings
+- */
+-inline size_t WcsLen(const Wchar_t *str)
+-{
+-  const unsigned short *eos = (const unsigned short*)str;
+-  while( *eos++ ) ;
+-  return( (size_t)(eos - (const unsigned short*)str) -1);
+-};
+-
+-/* This is a replacement of the Windows wcstombs() function which assumes that
+- * wchar_t is a 2-byte character.
+- * It is used for processing Windows wchar strings
+- */
+-inline size_t WcsToMbs(char *s, const Wchar_t *w, size_t n)
+-{
+-  size_t i = 0;
+-  const unsigned short *wc = (const unsigned short*) w;
+-  while(wc[i] && (i < n))
+-  {
+-    s[i] = wc[i];
+-    ++i;
+-  }
+-  if (i < n) s[i] = '\0';
+-
+-  return (i);
+-};
+diff --git a/src/lib/platform/posix/serialport.cpp b/src/lib/platform/posix/serialport.cpp
+index 78b9eee..1e0e364 100644
+--- a/src/lib/platform/posix/serialport.cpp
++++ b/src/lib/platform/posix/serialport.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -18,8 +18,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -31,12 +30,12 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
++#include "env.h"
+ #include <stdio.h>
+ #include <fcntl.h>
+-#include "../sockets/serialport.h"
+-#include "../util/baudrate.h"
+-#include "../posix/os-socket.h"
++#include "lib/platform/sockets/serialport.h"
++#include "lib/platform/util/baudrate.h"
++#include "lib/platform/posix/os-socket.h"
+ 
+ #if defined(__APPLE__) || defined(__FreeBSD__)
+ #ifndef XCASE
+diff --git a/src/lib/platform/posix/serversocket.cpp b/src/lib/platform/posix/serversocket.cpp
+index 827ffc0..c708a99 100644
+--- a/src/lib/platform/posix/serversocket.cpp
++++ b/src/lib/platform/posix/serversocket.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/sockets/cdevsocket.h b/src/lib/platform/sockets/cdevsocket.h
+index 65636e3..78034e9 100644
+--- a/src/lib/platform/sockets/cdevsocket.h
++++ b/src/lib/platform/sockets/cdevsocket.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/sockets/serialport.h b/src/lib/platform/sockets/serialport.h
+index f8a0173..bf33df9 100644
+--- a/src/lib/platform/sockets/serialport.h
++++ b/src/lib/platform/sockets/serialport.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,8 +31,8 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
+-#include "../util/buffer.h"
++#include "lib/platform/os.h"
++#include "lib/platform/util/buffer.h"
+ 
+ #include <string>
+ #include <stdint.h>
+diff --git a/src/lib/platform/sockets/serversocket.h b/src/lib/platform/sockets/serversocket.h
+index f13b342..c573797 100644
+--- a/src/lib/platform/sockets/serversocket.h
++++ b/src/lib/platform/sockets/serversocket.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/sockets/socket.h b/src/lib/platform/sockets/socket.h
+index 2b32fce..d36dbb0 100644
+--- a/src/lib/platform/sockets/socket.h
++++ b/src/lib/platform/sockets/socket.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,15 +31,16 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../threads/mutex.h"
+-#include "../util/StdString.h"
++#include "lib/platform/threads/mutex.h"
+ 
+ #if defined(__WINDOWS__)
+-#include "../windows/os-socket.h"
++#include "lib/platform/windows/os-socket.h"
+ #else
+-#include "../posix/os-socket.h"
++#include "lib/platform/posix/os-socket.h"
+ #endif
+ 
++#include <string>
++
+ // Common socket operations
+ 
+ namespace PLATFORM
+@@ -57,26 +57,26 @@ namespace PLATFORM
+     virtual bool IsOpen(void) = 0;
+     virtual ssize_t Write(void* data, size_t len) = 0;
+     virtual ssize_t Read(void* data, size_t len, uint64_t iTimeoutMs = 0) = 0;
+-    virtual CStdString GetError(void) = 0;
++    virtual std::string GetError(void) = 0;
+     virtual int GetErrorNumber(void) = 0;
+-    virtual CStdString GetName(void) = 0;
++    virtual std::string GetName(void) = 0;
+   };
+ 
+   template <typename _SType>
+   class CCommonSocket : public ISocket
+   {
+   public:
+-    CCommonSocket(_SType initialSocketValue, const CStdString &strName) :
++    CCommonSocket(_SType initialSocketValue, const std::string &strName) :
+       m_socket(initialSocketValue),
+       m_strName(strName),
+       m_iError(0) {}
+ 
+     virtual ~CCommonSocket(void) {}
+ 
+-    virtual CStdString GetError(void)
++    virtual std::string GetError(void)
+     {
+-      CStdString strError;
+-      strError = m_strError.IsEmpty() && m_iError != 0 ? strerror(m_iError) : m_strError;
++      std::string strError;
++      strError = m_strError.empty() && m_iError != 0 ? strerror(m_iError) : m_strError;
+       return strError;
+     }
+ 
+@@ -85,17 +85,17 @@ namespace PLATFORM
+       return m_iError;
+     }
+ 
+-    virtual CStdString GetName(void)
++    virtual std::string GetName(void)
+     {
+-      CStdString strName;
++      std::string strName;
+       strName = m_strName;
+       return strName;
+     }
+ 
+   protected:
+     _SType     m_socket;
+-    CStdString m_strError;
+-    CStdString m_strName;
++    std::string m_strError;
++    std::string m_strName;
+     int        m_iError;
+     CMutex     m_mutex;
+   };
+@@ -110,6 +110,7 @@ namespace PLATFORM
+ 
+     virtual ~CProtectedSocket(void)
+     {
++      Close();
+       delete m_socket;
+     }
+ 
+@@ -135,10 +136,10 @@ namespace PLATFORM
+ 
+     virtual void Shutdown(void)
+     {
+-      CLockObject lock(m_mutex);
+-      if (m_socket)
++      if (m_socket && WaitReady())
+       {
+         m_socket->Shutdown();
++        MarkReady();
+       }
+     }
+ 
+@@ -182,9 +183,9 @@ namespace PLATFORM
+       return iReturn;
+     }
+ 
+-    virtual CStdString GetError(void)
++    virtual std::string GetError(void)
+     {
+-      CStdString strError;
++      std::string strError;
+       CLockObject lock(m_mutex);
+       strError = m_socket ? m_socket->GetError() : "";
+       return strError;
+@@ -196,9 +197,9 @@ namespace PLATFORM
+       return m_socket ? m_socket->GetErrorNumber() : -EINVAL;
+     }
+ 
+-    virtual CStdString GetName(void)
++    virtual std::string GetName(void)
+     {
+-      CStdString strName;
++      std::string strName;
+       CLockObject lock(m_mutex);
+       strName = m_socket ? m_socket->GetName() : "";
+       return strName;
+diff --git a/src/lib/platform/sockets/tcp.h b/src/lib/platform/sockets/tcp.h
+index bbf9dad..15c2db7 100644
+--- a/src/lib/platform/sockets/tcp.h
++++ b/src/lib/platform/sockets/tcp.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -34,24 +33,23 @@
+ 
+ #include "socket.h"
+ 
++using namespace std;
+ 
+ namespace PLATFORM
+ {
+   class CTcpSocket : public CCommonSocket<tcp_socket_t>
+   {
+     public:
+-      CTcpSocket(const CStdString &strHostname, uint16_t iPort) :
++      CTcpSocket(const std::string &strHostname, uint16_t iPort) :
+         CCommonSocket<tcp_socket_t>(INVALID_SOCKET_VALUE, strHostname),
+         m_iPort(iPort) {}
+ 
+-      virtual ~CTcpSocket(void) { Close(); }
++      virtual ~CTcpSocket(void) {}
+ 
+       virtual bool Open(uint64_t iTimeoutMs = 0)
+       {
+         bool bReturn(false);
+         struct addrinfo *address(NULL), *addr(NULL);
+-        m_strError.clear();
+-        m_iError = 0;
+         if (!TcpResolveAddress(m_strName.c_str(), m_iPort, &m_iError, &address))
+         {
+           m_strError = strerror(m_iError);
+@@ -60,20 +58,9 @@ namespace PLATFORM
+ 
+         for(addr = address; !bReturn && addr; addr = addr->ai_next)
+         {
+-          m_socket = TcpCreateSocket(addr, &m_iError);
++          m_socket = TcpCreateSocket(addr, &m_iError, iTimeoutMs);
+           if (m_socket != INVALID_SOCKET_VALUE)
+-          {
+-            if (!TcpConnectSocket(m_socket, addr, &m_iError, iTimeoutMs))
+-            {
+-              TcpSocketClose(m_socket);
+-              m_strError = strerror(m_iError);
+-            }
+-            else
+-            {
+-              TcpSetNoDelay(m_socket);
+-              bReturn = true;
+-            }
+-          }
++            bReturn = true;
+           else
+             m_strError = strerror(m_iError);
+         }
+@@ -91,7 +78,6 @@ namespace PLATFORM
+       virtual void Shutdown(void)
+       {
+         TcpSocketShutdown(m_socket);
+-        TcpSocketClose(m_socket);
+         m_socket = INVALID_SOCKET_VALUE;
+       }
+ 
+@@ -111,7 +97,7 @@ namespace PLATFORM
+       }
+ 
+     protected:
+-      virtual tcp_socket_t TcpCreateSocket(struct addrinfo* addr, int* iError)
++      virtual tcp_socket_t TcpCreateSocket(struct addrinfo* addr, int* iError, uint64_t iTimeout)
+       {
+         tcp_socket_t fdSock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+         if (fdSock == INVALID_SOCKET_VALUE)
+@@ -120,16 +106,66 @@ namespace PLATFORM
+           return (tcp_socket_t)INVALID_SOCKET_VALUE;
+         }
+ 
++        if (!TcpConnectSocket(fdSock, addr, iError, iTimeout))
++        {
++          TcpSocketClose(fdSock);
++          return (tcp_socket_t)INVALID_SOCKET_VALUE;
++        }
++
++        TcpSetNoDelay(fdSock);
++
+         return fdSock;
+       }
+ 
+       uint16_t   m_iPort;
+   };
+ 
++  class CTcpClientSocket : public CCommonSocket<tcp_socket_t>
++  {
++  public:
++    CTcpClientSocket(tcp_socket_t socket) :
++      CCommonSocket<tcp_socket_t>(socket, "tcpclient") {}
++
++    virtual ~CTcpClientSocket(void) {}
++
++    virtual bool Open(uint64_t iTimeoutMs = 0)
++    {
++      (void) iTimeoutMs;
++      return true;
++    }
++
++    virtual void Close(void)
++    {
++      TcpSocketClose(m_socket);
++      m_socket = INVALID_SOCKET_VALUE;
++    }
++
++    virtual void Shutdown(void)
++    {
++      TcpSocketShutdown(m_socket);
++      m_socket = INVALID_SOCKET_VALUE;
++    }
++
++    virtual ssize_t Write(void* data, size_t len)
++    {
++      return TcpSocketWrite(m_socket, &m_iError, data, len);
++    }
++
++    virtual ssize_t Read(void* data, size_t len, uint64_t iTimeoutMs = 0)
++    {
++      return TcpSocketRead(m_socket, &m_iError, data, len, iTimeoutMs);
++    }
++
++    virtual bool IsOpen(void)
++    {
++      return m_socket != INVALID_SOCKET_VALUE;
++    }
++  };
++
+   class CTcpConnection : public CProtectedSocket<CTcpSocket>
+   {
+   public:
+-    CTcpConnection(const CStdString &strHostname, uint16_t iPort) :
++    CTcpConnection(const std::string &strHostname, uint16_t iPort) :
+       CProtectedSocket<CTcpSocket> (new CTcpSocket(strHostname, iPort)) {}
+     virtual ~CTcpConnection(void) {}
+   };
+diff --git a/src/lib/platform/threads/mutex.h b/src/lib/platform/threads/mutex.h
+index 6665972..2bd908e 100644
+--- a/src/lib/platform/threads/mutex.h
++++ b/src/lib/platform/threads/mutex.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,15 +31,15 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
++#include "lib/platform/os.h"
+ 
+ #if defined(__WINDOWS__)
+-#include "../windows/os-threads.h"
++#include "lib/platform/windows/os-threads.h"
+ #else
+-#include "../posix/os-threads.h"
++#include "lib/platform/posix/os-threads.h"
+ #endif
+ 
+-#include "../util/timeutils.h"
++#include "lib/platform/util/timeutils.h"
+ 
+ namespace PLATFORM
+ {
+@@ -52,7 +51,7 @@ namespace PLATFORM
+ 
+   private:
+     inline PreventCopy(const PreventCopy &c) { *this = c; }
+-    inline PreventCopy &operator=(const PreventCopy &c){ *this = c; return *this; }
++    inline PreventCopy &operator=(const PreventCopy & UNUSED(c)){ return *this; }
+   };
+ 
+   template <typename _Predicate>
+@@ -87,9 +86,12 @@ namespace PLATFORM
+ 
+     inline bool Lock(void)
+     {
+-      MutexLock(m_mutex);
+-      ++m_iLockCount;
+-      return true;
++      if (MutexLock(m_mutex))
++      {
++        ++m_iLockCount;
++        return true;
++      }
++      return false;
+     }
+ 
+     inline void Unlock(void)
+@@ -226,17 +228,9 @@ namespace PLATFORM
+     volatile bool m_bIsLocked;
+   };
+ 
+-  typedef bool (*PredicateCallback) (void *param);
+-
+   template <typename _Predicate>
+     class CCondition : public PreventCopy
+     {
+-    private:
+-      static bool _PredicateCallbackDefault ( void *param )
+-      {
+-        _Predicate *p = (_Predicate*)param;
+-        return (*p);
+-      }
+     public:
+       inline CCondition(void) {}
+       inline ~CCondition(void)
+@@ -254,34 +248,35 @@ namespace PLATFORM
+         m_condition.Signal();
+       }
+ 
+-      inline bool Wait(CMutex &mutex, uint32_t iTimeout)
++      inline bool Wait(CMutex &mutex, _Predicate &predicate)
+       {
+-        return m_condition.Wait(mutex.m_mutex, iTimeout);
++        while(!predicate)
++          m_condition.Wait(mutex.m_mutex);
++        return true;
+       }
+ 
+-      inline bool Wait(CMutex &mutex, PredicateCallback callback, void *param, uint32_t iTimeout)
++      inline bool Wait(CMutex &mutex, _Predicate &predicate, uint32_t iTimeout)
+       {
++        if (iTimeout == 0)
++          return Wait(mutex, predicate);
++
++        if (predicate)
++          return true;
++
+         bool bReturn(false);
++        bool bBreak(false);
+         CTimeout timeout(iTimeout);
++        uint32_t iMsLeft(0);
+ 
+-        while (!bReturn)
++        while (!bReturn && !bBreak)
+         {
+-          if ((bReturn = callback(param)) == true)
+-            break;
+-          uint32_t iMsLeft = timeout.TimeLeft();
+-          if ((iTimeout != 0) && (iMsLeft == 0))
+-            break;
+-          m_condition.Wait(mutex.m_mutex, iMsLeft);
++          iMsLeft = timeout.TimeLeft();
++          if ((bReturn = predicate) == false && (bBreak = iMsLeft == 0) == false)
++            m_condition.Wait(mutex.m_mutex, iMsLeft);
+         }
+-
+         return bReturn;
+       }
+ 
+-      inline bool Wait(CMutex &mutex, _Predicate &predicate, uint32_t iTimeout = 0)
+-      {
+-        return Wait(mutex, _PredicateCallbackDefault, (void*)&predicate, iTimeout);
+-      }
+-
+     private:
+       CConditionImpl m_condition;
+     };
+diff --git a/src/lib/platform/threads/threads.h b/src/lib/platform/threads/threads.h
+index 85b3109..90db34b 100644
+--- a/src/lib/platform/threads/threads.h
++++ b/src/lib/platform/threads/threads.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -42,11 +41,15 @@ namespace PLATFORM
+     CThread(void) :
+         m_bStop(false),
+         m_bRunning(false),
+-        m_bStopped(false) {}
++        m_bStopped(false),
++        m_thread(INVALID_THREAD_VALUE) {}
+ 
+     virtual ~CThread(void)
+     {
+       StopThread(0);
++      void *retVal = NULL;
++      if (m_thread != INVALID_THREAD_VALUE)
++        if (ThreadsWait(m_thread, &retVal)){}; // silence unused warning
+     }
+ 
+     static void *ThreadHandler(void *_thread)
+@@ -90,18 +93,18 @@ namespace PLATFORM
+ 
+     virtual bool CreateThread(bool bWait = true)
+     {
+-        bool bReturn(false);
+-        CLockObject lock(m_threadMutex);
+-        if (!IsRunning())
++      bool bReturn(false);
++      CLockObject lock(m_threadMutex);
++      if (!IsRunning())
++      {
++        m_bStop = false;
++        if (ThreadsCreate(m_thread, CThread::ThreadHandler, ((void*)static_cast<CThread *>(this))))
+         {
+-          m_bStop = false;
+-          if (ThreadsCreate(m_thread, CThread::ThreadHandler, ((void*)static_cast<CThread *>(this))))
+-          {
+-            if (bWait)
+-              m_threadCondition.Wait(m_threadMutex, m_bRunning);
+-            bReturn = true;
+-          }
++          if (bWait)
++            m_threadCondition.Wait(m_threadMutex, m_bRunning);
++          bReturn = true;
+         }
++      }
+       return bReturn;
+     }
+ 
+@@ -142,13 +145,13 @@ namespace PLATFORM
+ 
+   protected:
+     void SetRunning(bool bSetTo);
++    CMutex           m_threadMutex;
+ 
+   private:
+     bool             m_bStop;
+     bool             m_bRunning;
+     bool             m_bStopped;
+     CCondition<bool> m_threadCondition;
+-    CMutex           m_threadMutex;
+     thread_t         m_thread;
+   };
+ };
+diff --git a/src/lib/platform/util/StdString.h b/src/lib/platform/util/StdString.h
+index 496dae7..00f53bf 100644
+--- a/src/lib/platform/util/StdString.h
++++ b/src/lib/platform/util/StdString.h
+@@ -1,5 +1,4 @@
+ #pragma once
+-#include "../os.h"
+ #include <string>
+ #include <stdint.h>
+ #include <vector>
+@@ -364,7 +363,7 @@
+ #if !defined (SS_ANSI) && defined(_MSC_VER)
+   #undef SS_IS_INTRESOURCE
+   #if defined(_WIN64)
+-    #define SS_IS_INTRESOURCE(_r) (((unsigned __int64)(_r) >> 16) == 0)
++    #define SS_IS_INTRESOURCE(_r) (((uint64_t)(_r) >> 16) == 0)
+   #else
+     #define SS_IS_INTRESOURCE(_r) (((unsigned long)(_r) >> 16) == 0)
+   #endif
+@@ -865,7 +864,11 @@ inline const Type& SSMAX(const Type& arg1, const Type& arg2)
+       PWSTR pNextDstW      = pDstW;
+       SSCodeCvt::result res  = SSCodeCvt::ok;
+       const SSCodeCvt& conv  = SS_USE_FACET(loc, SSCodeCvt);
++#if defined(TARGET_DARWIN) || defined(__FreeBSD__) || defined(TARGET_ANDROID)
++      SSCodeCvt::state_type st= { { 0 } };
++#else
+       SSCodeCvt::state_type st= { 0 };
++#endif
+       res            = conv.in(st,
+                     pSrcA, pSrcA + nSrc, pNextSrcA,
+                     pDstW, pDstW + nDst, pNextDstW);
+@@ -908,7 +911,11 @@ inline const Type& SSMAX(const Type& arg1, const Type& arg2)
+       PCWSTR pNextSrcW    = pSrcW;
+       SSCodeCvt::result res  = SSCodeCvt::ok;
+       const SSCodeCvt& conv  = SS_USE_FACET(loc, SSCodeCvt);
++#if defined(TARGET_DARWIN) || defined(__FreeBSD__) || defined(TARGET_ANDROID)
++      SSCodeCvt::state_type st= { { 0 } };
++#else
+       SSCodeCvt::state_type st= { 0 };
++#endif
+       res            = conv.out(st,
+                     pSrcW, pSrcW + nSrc, pNextSrcW,
+                     pDstA, pDstA + nDst, pNextDstA);
+diff --git a/src/lib/platform/util/atomic.h b/src/lib/platform/util/atomic.h
+deleted file mode 100644
+index 800c062..0000000
+--- a/src/lib/platform/util/atomic.h
++++ /dev/null
+@@ -1,102 +0,0 @@
+-#pragma once
+-/*
+- *      Copyright (C) 2005-2012 Team XBMC
+- *      http://www.xbmc.org
+- *
+- *  This Program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2, or (at your option)
+- *  any later version.
+- *
+- *  This Program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with XBMC; see the file COPYING.  If not, see
+- *  <http://www.gnu.org/licenses/>.
+- *
+- */
+-
+-#ifdef _MSC_VER
+-#include <windows.h>
+-#endif
+-
+-///////////////////////////////////////////////////////////////////////////
+-// 32-bit atomic increment
+-// Returns new value of *pAddr
+-///////////////////////////////////////////////////////////////////////////
+-static inline long atomic_inc(volatile long* pAddr)
+-{
+-#if defined(HAS_BUILTIN_SYNC_ADD_AND_FETCH)
+-  return __sync_add_and_fetch(pAddr, 1);
+-
+-#elif defined(__ppc__) || defined(__powerpc__) // PowerPC
+-  long val;
+-  __asm__ __volatile__ (
+-    "sync             \n"
+-    "1: lwarx  %0, 0, %1 \n"
+-    "addic  %0, %0, 1 \n"
+-    "stwcx. %0, 0, %1 \n"
+-    "bne-   1b        \n"
+-    "isync"
+-    : "=&r" (val)
+-    : "r" (pAddr)
+-    : "cc", "xer", "memory");
+-  return val;
+-
+-#elif defined(__arm__) && !defined(__ARM_ARCH_5__)
+-  register long val;
+-  asm volatile (
+-    "dmb      ish            \n" // Memory barrier. Make sure all memory accesses appearing before this complete before any that appear after
+-    "1:                     \n"
+-    "ldrex   %0, [%1]       \n" // (val = *pAddr)
+-    "add     %0,  #1        \n" // (val += 1)
+-    "strex   r1,  %0, [%1]      \n"
+-    "cmp     r1,   #0       \n"
+-    "bne     1b             \n"
+-    "dmb     ish            \n" // Memory barrier.
+-    : "=&r" (val)
+-    : "r"(pAddr)
+-    : "r1"
+-    );
+-  return val;
+-
+-#elif defined(__mips__)
+-// TODO:
+-  long val;
+-  #error AtomicIncrement undefined for mips
+-  return val;
+-
+-#elif defined(WIN32)
+-  long val;
+-  __asm
+-  {
+-    mov eax, pAddr ;
+-    lock inc dword ptr [eax] ;
+-    mov eax, [eax] ;
+-    mov val, eax ;
+-  }
+-  return val;
+-
+-#elif defined(__x86_64__)
+-  register long result;
+-  __asm__ __volatile__ (
+-    "lock/xaddq %q0, %1"
+-    : "=r" (result), "=m" (*pAddr)
+-    : "0" ((long) (1)), "m" (*pAddr));
+-  return *pAddr;
+-
+-#else // Linux / OSX86 (GCC)
+-  register long reg __asm__ ("eax") = 1;
+-  __asm__ __volatile__ (
+-    "lock/xadd %0, %1 \n"
+-    "inc %%eax"
+-    : "+r" (reg)
+-    : "m" (*pAddr)
+-    : "memory" );
+-  return reg;
+-
+-#endif
+-}
+diff --git a/src/lib/platform/util/baudrate.h b/src/lib/platform/util/baudrate.h
+index 755d407..2e0e2c1 100644
+--- a/src/lib/platform/util/baudrate.h
++++ b/src/lib/platform/util/baudrate.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+diff --git a/src/lib/platform/util/buffer.h b/src/lib/platform/util/buffer.h
+index 077b9dc..28ba30c 100644
+--- a/src/lib/platform/util/buffer.h
++++ b/src/lib/platform/util/buffer.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,7 +31,7 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../threads/mutex.h"
++#include "lib/platform/threads/mutex.h"
+ #include <queue>
+ 
+ namespace PLATFORM
+@@ -43,7 +42,7 @@ namespace PLATFORM
+     public:
+       SyncedBuffer(size_t iMaxSize = 100) :
+           m_maxSize(iMaxSize),
+-          m_bHasData(false) {}
++          m_bHasMessages(false) {}
+ 
+       virtual ~SyncedBuffer(void)
+       {
+@@ -55,7 +54,7 @@ namespace PLATFORM
+         CLockObject lock(m_mutex);
+         while (!m_buffer.empty())
+           m_buffer.pop();
+-        m_bHasData = false;
++        m_bHasMessages = true;
+         m_condition.Broadcast();
+       }
+ 
+@@ -68,7 +67,7 @@ namespace PLATFORM
+       bool IsEmpty(void)
+       {
+         CLockObject lock(m_mutex);
+-        return !m_bHasData;
++        return m_buffer.empty();
+       }
+ 
+       bool Push(_BType entry)
+@@ -78,33 +77,51 @@ namespace PLATFORM
+           return false;
+ 
+         m_buffer.push(entry);
+-        m_bHasData = true;
++        m_bHasMessages = true;
+         m_condition.Signal();
+         return true;
+       }
+ 
+-      bool Pop(_BType &entry, int32_t iTimeoutMs = 0)
++      bool Pop(_BType &entry, uint32_t iTimeoutMs = 0)
+       {
++        bool bReturn(false);
+         CLockObject lock(m_mutex);
+-        if (m_buffer.empty())
++
++        // wait for a signal if the buffer is empty
++        if (m_buffer.empty() && iTimeoutMs > 0)
+         {
+-          if (iTimeoutMs == 0)
+-            return false;
+-          if (!m_condition.Wait(m_mutex, m_bHasData, iTimeoutMs))
+-            return false;
++          if (!m_condition.Wait(m_mutex, m_bHasMessages, iTimeoutMs))
++            return bReturn;
+         }
+ 
+-        entry = m_buffer.front();
+-        m_buffer.pop();
+-        m_bHasData = !m_buffer.empty();
+-        return true;
++        // pop the first item
++        m_bHasMessages = !m_buffer.empty();
++        if (!m_buffer.empty())
++        {
++          entry = m_buffer.front();
++          m_buffer.pop();
++          bReturn = true;
++        }
++        return bReturn;
++      }
++
++      bool Peek(_BType &entry)
++      {
++        bool bReturn(false);
++        CLockObject lock(m_mutex);
++        if (!m_buffer.empty())
++        {
++          entry = m_buffer.front();
++          bReturn = true;
++        }
++        return bReturn;
+       }
+ 
+     private:
+       size_t             m_maxSize;
+       std::queue<_BType> m_buffer;
+       CMutex             m_mutex;
+-      bool               m_bHasData;
+       CCondition<bool>   m_condition;
++      bool               m_bHasMessages;
+     };
+ };
+diff --git a/src/lib/platform/util/edid.h b/src/lib/platform/util/edid.h
+index becea62..c43b062 100644
+--- a/src/lib/platform/util/edid.h
++++ b/src/lib/platform/util/edid.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/util/timeutils.h b/src/lib/platform/util/timeutils.h
+index 0adbddb..d7c0fe2 100644
+--- a/src/lib/platform/util/timeutils.h
++++ b/src/lib/platform/util/timeutils.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,7 +31,8 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
++#include "env.h"
++#include "lib/platform/os.h"
+ 
+ #if defined(__APPLE__)
+ #include <mach/mach_time.h>
+@@ -40,6 +40,7 @@
+ #elif defined(__WINDOWS__)
+ #include <time.h>
+ #else
++#include <time.h>
+ #include <sys/time.h>
+ #endif
+ 
+diff --git a/src/lib/platform/util/util.h b/src/lib/platform/util/util.h
+index 6c4a5b2..6fa01fc 100644
+--- a/src/lib/platform/util/util.h
++++ b/src/lib/platform/util/util.h
+@@ -1,27 +1,34 @@
+ #pragma once
+ /*
+- *      Copyright (C) 2012 Team XBMC
+- *      http://www.xbmc.org
++ * This file is part of the libCEC(R) library.
+  *
+- *  This Program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2, or (at your option)
+- *  any later version.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
+  *
+- *  This Program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- *  GNU General Public License for more details.
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
+  *
+- *  You should have received a copy of the GNU General Public License
+- *  along with XBMC; see the file COPYING.  If not, see
+- *  <http://www.gnu.org/licenses/>.
++ * This program is dual-licensed; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
+  *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ *
++ * Alternatively, you can license this library under a commercial license,
++ * please contact Pulse-Eight Licensing for more information.
++ *
++ * For more information contact:
++ * Pulse-Eight Licensing       <license@pulse-eight.com>
++ *     http://www.pulse-eight.com/
++ *     http://www.pulse-eight.net/
+  */
+ 
+-#ifndef SAFE_DELETE
+-#define SAFE_DELETE(p)       do { delete (p);     (p)=NULL; } while (0)
+-#endif
+-#ifndef SAFE_DELETE_ARRAY
+-#define SAFE_DELETE_ARRAY(p) do { delete[] (p);   (p)=NULL; } while (0)
+-#endif
++#define DELETE_AND_NULL(t) while (t) { delete (t); (t) = NULL; }
+diff --git a/src/lib/platform/windows/dlfcn-win32.cpp b/src/lib/platform/windows/dlfcn-win32.cpp
+index 5839921..38bafd8 100644
+--- a/src/lib/platform/windows/dlfcn-win32.cpp
++++ b/src/lib/platform/windows/dlfcn-win32.cpp
+@@ -17,6 +17,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include "env.h"
+ #include <windows.h>
+ #include <stdio.h>
+ 
+diff --git a/src/lib/platform/windows/inttypes.h b/src/lib/platform/windows/inttypes.h
+deleted file mode 100644
+index 73b7543..0000000
+--- a/src/lib/platform/windows/inttypes.h
++++ /dev/null
+@@ -1,308 +0,0 @@
+-// ISO C9x  compliant inttypes.h for Microsoft Visual Studio
+-// Based on ISO/IEC 9899:TC2 Committee draft (May 6, 2005) WG14/N1124
+-//
+-//  Copyright (c) 2006 Alexander Chemeris
+-//
+-// Redistribution and use in source and binary forms, with or without
+-// modification, are permitted provided that the following conditions are met:
+-//
+-//   1. Redistributions of source code must retain the above copyright notice,
+-//      this list of conditions and the following disclaimer.
+-//
+-//   2. Redistributions in binary form must reproduce the above copyright
+-//      notice, this list of conditions and the following disclaimer in the
+-//      documentation and/or other materials provided with the distribution.
+-//
+-//   3. The name of the author may be used to endorse or promote products
+-//      derived from this software without specific prior written permission.
+-//
+-// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+-// EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+-// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+-// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-//
+-///////////////////////////////////////////////////////////////////////////////
+-
+-#ifndef _MSC_VER // [
+-#error "Use this header only with Microsoft Visual C++ compilers!"
+-#endif // _MSC_VER ]
+-
+-#ifndef _MSC_INTTYPES_H_ // [
+-#define _MSC_INTTYPES_H_
+-
+-#if _MSC_VER > 1000
+-#pragma once
+-#endif
+-
+-#include "stdint.h"
+-
+-// 7.8 Format conversion of integer types
+-
+-typedef struct {
+-   intmax_t quot;
+-   intmax_t rem;
+-} imaxdiv_t;
+-
+-// 7.8.1 Macros for format specifiers
+-
+-#if !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) // [   See footnote 185 at page 198
+-
+-// The fprintf macros for signed integers are:
+-#define PRId8       "d"
+-#define PRIi8       "i"
+-#define PRIdLEAST8  "d"
+-#define PRIiLEAST8  "i"
+-#define PRIdFAST8   "d"
+-#define PRIiFAST8   "i"
+-
+-#define PRId16       "hd"
+-#define PRIi16       "hi"
+-#define PRIdLEAST16  "hd"
+-#define PRIiLEAST16  "hi"
+-#define PRIdFAST16   "hd"
+-#define PRIiFAST16   "hi"
+-
+-#define PRId32       "I32d"
+-#define PRIi32       "I32i"
+-#define PRIdLEAST32  "I32d"
+-#define PRIiLEAST32  "I32i"
+-#define PRIdFAST32   "I32d"
+-#define PRIiFAST32   "I32i"
+-
+-#define PRId64       "I64d"
+-#define PRIi64       "I64i"
+-#define PRIdLEAST64  "I64d"
+-#define PRIiLEAST64  "I64i"
+-#define PRIdFAST64   "I64d"
+-#define PRIiFAST64   "I64i"
+-
+-#define PRIdMAX     "I64d"
+-#define PRIiMAX     "I64i"
+-
+-#define PRIdPTR     "Id"
+-#define PRIiPTR     "Ii"
+-
+-// The fprintf macros for unsigned integers are:
+-#define PRIo8       "o"
+-#define PRIu8       "u"
+-#define PRIx8       "x"
+-#define PRIX8       "X"
+-#define PRIoLEAST8  "o"
+-#define PRIuLEAST8  "u"
+-#define PRIxLEAST8  "x"
+-#define PRIXLEAST8  "X"
+-#define PRIoFAST8   "o"
+-#define PRIuFAST8   "u"
+-#define PRIxFAST8   "x"
+-#define PRIXFAST8   "X"
+-
+-#define PRIo16       "ho"
+-#define PRIu16       "hu"
+-#define PRIx16       "hx"
+-#define PRIX16       "hX"
+-#define PRIoLEAST16  "ho"
+-#define PRIuLEAST16  "hu"
+-#define PRIxLEAST16  "hx"
+-#define PRIXLEAST16  "hX"
+-#define PRIoFAST16   "ho"
+-#define PRIuFAST16   "hu"
+-#define PRIxFAST16   "hx"
+-#define PRIXFAST16   "hX"
+-
+-#define PRIo32       "I32o"
+-#define PRIu32       "I32u"
+-#define PRIx32       "I32x"
+-#define PRIX32       "I32X"
+-#define PRIoLEAST32  "I32o"
+-#define PRIuLEAST32  "I32u"
+-#define PRIxLEAST32  "I32x"
+-#define PRIXLEAST32  "I32X"
+-#define PRIoFAST32   "I32o"
+-#define PRIuFAST32   "I32u"
+-#define PRIxFAST32   "I32x"
+-#define PRIXFAST32   "I32X"
+-
+-#define PRIo64       "I64o"
+-#define PRIu64       "I64u"
+-#define PRIx64       "I64x"
+-#define PRIX64       "I64X"
+-#define PRIoLEAST64  "I64o"
+-#define PRIuLEAST64  "I64u"
+-#define PRIxLEAST64  "I64x"
+-#define PRIXLEAST64  "I64X"
+-#define PRIoFAST64   "I64o"
+-#define PRIuFAST64   "I64u"
+-#define PRIxFAST64   "I64x"
+-#define PRIXFAST64   "I64X"
+-
+-#define PRIoMAX     "I64o"
+-#define PRIuMAX     "I64u"
+-#define PRIxMAX     "I64x"
+-#define PRIXMAX     "I64X"
+-
+-#define PRIoPTR     "Io"
+-#define PRIuPTR     "Iu"
+-#define PRIxPTR     "Ix"
+-#define PRIXPTR     "IX"
+-
+-#define PRIdS       "Id"
+-#define PRIuS       "Iu"
+-
+-// The fscanf macros for signed integers are:
+-#define SCNd8       "d"
+-#define SCNi8       "i"
+-#define SCNdLEAST8  "d"
+-#define SCNiLEAST8  "i"
+-#define SCNdFAST8   "d"
+-#define SCNiFAST8   "i"
+-
+-#define SCNd16       "hd"
+-#define SCNi16       "hi"
+-#define SCNdLEAST16  "hd"
+-#define SCNiLEAST16  "hi"
+-#define SCNdFAST16   "hd"
+-#define SCNiFAST16   "hi"
+-
+-#define SCNd32       "ld"
+-#define SCNi32       "li"
+-#define SCNdLEAST32  "ld"
+-#define SCNiLEAST32  "li"
+-#define SCNdFAST32   "ld"
+-#define SCNiFAST32   "li"
+-
+-#define SCNd64       "I64d"
+-#define SCNi64       "I64i"
+-#define SCNdLEAST64  "I64d"
+-#define SCNiLEAST64  "I64i"
+-#define SCNdFAST64   "I64d"
+-#define SCNiFAST64   "I64i"
+-
+-#define SCNdMAX     "I64d"
+-#define SCNiMAX     "I64i"
+-
+-#ifdef _WIN64 // [
+-#  define SCNdPTR     "I64d"
+-#  define SCNiPTR     "I64i"
+-#else  // _WIN64 ][
+-#  define SCNdPTR     "ld"
+-#  define SCNiPTR     "li"
+-#endif  // _WIN64 ]
+-
+-// The fscanf macros for unsigned integers are:
+-#define SCNo8       "o"
+-#define SCNu8       "u"
+-#define SCNx8       "x"
+-#define SCNX8       "X"
+-#define SCNoLEAST8  "o"
+-#define SCNuLEAST8  "u"
+-#define SCNxLEAST8  "x"
+-#define SCNXLEAST8  "X"
+-#define SCNoFAST8   "o"
+-#define SCNuFAST8   "u"
+-#define SCNxFAST8   "x"
+-#define SCNXFAST8   "X"
+-
+-#define SCNo16       "ho"
+-#define SCNu16       "hu"
+-#define SCNx16       "hx"
+-#define SCNX16       "hX"
+-#define SCNoLEAST16  "ho"
+-#define SCNuLEAST16  "hu"
+-#define SCNxLEAST16  "hx"
+-#define SCNXLEAST16  "hX"
+-#define SCNoFAST16   "ho"
+-#define SCNuFAST16   "hu"
+-#define SCNxFAST16   "hx"
+-#define SCNXFAST16   "hX"
+-
+-#define SCNo32       "lo"
+-#define SCNu32       "lu"
+-#define SCNx32       "lx"
+-#define SCNX32       "lX"
+-#define SCNoLEAST32  "lo"
+-#define SCNuLEAST32  "lu"
+-#define SCNxLEAST32  "lx"
+-#define SCNXLEAST32  "lX"
+-#define SCNoFAST32   "lo"
+-#define SCNuFAST32   "lu"
+-#define SCNxFAST32   "lx"
+-#define SCNXFAST32   "lX"
+-
+-#define SCNo64       "I64o"
+-#define SCNu64       "I64u"
+-#define SCNx64       "I64x"
+-#define SCNX64       "I64X"
+-#define SCNoLEAST64  "I64o"
+-#define SCNuLEAST64  "I64u"
+-#define SCNxLEAST64  "I64x"
+-#define SCNXLEAST64  "I64X"
+-#define SCNoFAST64   "I64o"
+-#define SCNuFAST64   "I64u"
+-#define SCNxFAST64   "I64x"
+-#define SCNXFAST64   "I64X"
+-
+-#define SCNoMAX     "I64o"
+-#define SCNuMAX     "I64u"
+-#define SCNxMAX     "I64x"
+-#define SCNXMAX     "I64X"
+-
+-#ifdef _WIN64 // [
+-#  define SCNoPTR     "I64o"
+-#  define SCNuPTR     "I64u"
+-#  define SCNxPTR     "I64x"
+-#  define SCNXPTR     "I64X"
+-#else  // _WIN64 ][
+-#  define SCNoPTR     "lo"
+-#  define SCNuPTR     "lu"
+-#  define SCNxPTR     "lx"
+-#  define SCNXPTR     "lX"
+-#endif  // _WIN64 ]
+-
+-#endif // __STDC_FORMAT_MACROS ]
+-
+-// 7.8.2 Functions for greatest-width integer types
+-
+-// 7.8.2.1 The imaxabs function
+-#define imaxabs _abs64
+-
+-// 7.8.2.2 The imaxdiv function
+-
+-// This is modified version of div() function from Microsoft's div.c found
+-// in %MSVC.NET%\crt\src\div.c
+-#ifdef STATIC_IMAXDIV // [
+-static
+-#else // STATIC_IMAXDIV ][
+-_inline
+-#endif // STATIC_IMAXDIV ]
+-imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)
+-{
+-   imaxdiv_t result;
+-
+-   result.quot = numer / denom;
+-   result.rem = numer % denom;
+-
+-   if (numer < 0 && result.rem > 0) {
+-      // did division wrong; must fix up
+-      ++result.quot;
+-      result.rem -= denom;
+-   }
+-
+-   return result;
+-}
+-
+-// 7.8.2.3 The strtoimax and strtoumax functions
+-#define strtoimax _strtoi64
+-#define strtoumax _strtoui64
+-
+-// 7.8.2.4 The wcstoimax and wcstoumax functions
+-#define wcstoimax _wcstoi64
+-#define wcstoumax _wcstoui64
+-
+-
+-#endif // _MSC_INTTYPES_H_ ]
+diff --git a/src/lib/platform/windows/os-edid.cpp b/src/lib/platform/windows/os-edid.cpp
+index f605761..d040257 100644
+--- a/src/lib/platform/windows/os-edid.cpp
++++ b/src/lib/platform/windows/os-edid.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+diff --git a/src/lib/platform/windows/os-socket.h b/src/lib/platform/windows/os-socket.h
+index e87d17e..1ce8912 100644
+--- a/src/lib/platform/windows/os-socket.h
++++ b/src/lib/platform/windows/os-socket.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,8 +31,8 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
+-#include "../util/timeutils.h"
++#include "lib/platform/os.h"
++#include "lib/platform/util/timeutils.h"
+ 
+ #include <ws2spi.h>
+ #include <ws2ipdef.h>
+@@ -174,7 +173,7 @@ namespace PLATFORM
+ 
+     fd_set fd_read;
+     struct timeval tv;
+-    while (iBytesRead >= 0 && iBytesRead < (ssize_t)len && (iTimeoutMs == 0 || iTarget > iNow) && *iError == 0)
++    while (iBytesRead >= 0 && iBytesRead < (ssize_t)len && (iTimeoutMs == 0 || iTarget > iNow))
+     {
+       if (iTimeoutMs > 0)
+       {
+@@ -182,11 +181,14 @@ namespace PLATFORM
+         tv.tv_usec = 1000 * (long)(iTimeoutMs % 1000);
+ 
+         FD_ZERO(&fd_read);
++        #pragma warning(disable:4127) /* disable 'conditional expression is constant' */
+         FD_SET(socket, &fd_read);
++        #pragma warning(default:4127)
+ 
+         if (select((int)socket + 1, &fd_read, NULL, NULL, &tv) == 0)
+         {
+           *iError = ETIMEDOUT;
++          return ETIMEDOUT;
+         }
+         TcpSocketSetBlocking(socket, false);
+       }
+@@ -194,7 +196,7 @@ namespace PLATFORM
+       ssize_t iReadResult = (iTimeoutMs > 0) ?
+           recv(socket, (char*)data + iBytesRead, (int)(len - iBytesRead), 0) :
+           recv(socket, (char*)data, (int)len, MSG_WAITALL);
+-      int iSocketError = GetSocketError();
++      *iError = GetSocketError();
+ 
+       if (iTimeoutMs > 0)
+       {
+@@ -204,14 +206,14 @@ namespace PLATFORM
+ 
+       if (iReadResult < 0)
+       {
+-        if (iSocketError == EAGAIN && iTimeoutMs > 0)
++        if (*iError == EAGAIN && iTimeoutMs > 0)
+           continue;
+-        *iError = iSocketError;
+-        return (iBytesRead > 0) ? iBytesRead : -iSocketError;
++        return -1;
+       }
+       else if (iReadResult == 0 || (iReadResult != (ssize_t)len && iTimeoutMs == 0))
+       {
+         *iError = ECONNRESET;
++        return -1;
+       }
+ 
+       iBytesRead += iReadResult;
+@@ -270,8 +272,10 @@ namespace PLATFORM
+ 
+         FD_ZERO(&fd_write);
+         FD_ZERO(&fd_except);
++        #pragma warning(disable:4127) /* disable 'conditional expression is constant' */
+         FD_SET(socket, &fd_write);
+         FD_SET(socket, &fd_except);
++        #pragma warning(default:4127)
+ 
+         int iPollResult = select(sizeof(socket)*8, NULL, &fd_write, &fd_except, &tv);
+         if (iPollResult == 0)
+diff --git a/src/lib/platform/windows/os-threads.cpp b/src/lib/platform/windows/os-threads.cpp
+index ec97251..6920345 100644
+--- a/src/lib/platform/windows/os-threads.cpp
++++ b/src/lib/platform/windows/os-threads.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -18,8 +18,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -31,7 +30,7 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
+-#include "../os.h"
++#include "env.h"
+ #include "os-threads.h"
+ using namespace PLATFORM;
+ 
+diff --git a/src/lib/platform/windows/os-threads.h b/src/lib/platform/windows/os-threads.h
+index bc56479..e39b601 100644
+--- a/src/lib/platform/windows/os-threads.h
++++ b/src/lib/platform/windows/os-threads.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,16 +31,19 @@
+  *     http://www.pulse-eight.net/
+  */
+ 
++#include <stdint.h>
++
+ namespace PLATFORM
+ {
+   #define thread_t                                 HANDLE
++  #define INVALID_THREAD_VALUE                     NULL
+   #define ThreadsWait(thread, retVal)              (::WaitForSingleObject(thread, INFINITE) < 0)
+   #define ThreadsCreate(thread, func, arg)         ((thread = ::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func, arg, 0, NULL)) == NULL ? false : true)
+ 
+   typedef CRITICAL_SECTION* mutex_t;
+   #define MutexCreate(mutex)                       ::InitializeCriticalSection(mutex = new CRITICAL_SECTION)
+   #define MutexDelete(mutex)                       ::DeleteCriticalSection(mutex); delete mutex
+-  #define MutexLock(mutex)                         ::EnterCriticalSection(mutex)
++  inline bool MutexLock(mutex_t mutex)             {::EnterCriticalSection(mutex); return true; }
+   #define MutexTryLock(mutex)                      (::TryEnterCriticalSection(mutex) != 0)
+   #define MutexUnlock(mutex)                       ::LeaveCriticalSection(mutex)
+ 
+diff --git a/src/lib/platform/windows/os-types.h b/src/lib/platform/windows/os-types.h
+index c66ef94..b8035c2 100644
+--- a/src/lib/platform/windows/os-types.h
++++ b/src/lib/platform/windows/os-types.h
+@@ -2,7 +2,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -19,8 +19,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -40,22 +39,6 @@
+ #define _WINSOCKAPI_
+ #endif
+ 
+-#define WIN32_LEAN_AND_MEAN           // Enable LEAN_AND_MEAN support
+-#define NOMINMAX                      // don't define min() and max() to prevent a clash with std::min() and std::max
+-#include <windows.h>
+-#include <wchar.h>
+-
+-/* Platform dependent path separator */
+-#ifndef PATH_SEPARATOR_CHAR
+-#define PATH_SEPARATOR_CHAR '\\'
+-#define PATH_SEPARATOR_STRING "\\"
+-#endif
+-
+-/* Handling of 2-byte Windows wchar strings */
+-#define WcsLen wcslen
+-#define WcsToMbs wcstombs
+-typedef wchar_t Wchar_t; /* sizeof(wchar_t) = 2 bytes on Windows */
+-
+ #pragma warning(disable:4005) // Disable "warning C4005: '_WINSOCKAPI_' : macro redefinition"
+ #include <winsock2.h>
+ #pragma warning(default:4005)
+@@ -66,7 +49,6 @@ typedef wchar_t Wchar_t; /* sizeof(wchar_t) = 2 bytes on Windows */
+ #include <errno.h>
+ #include <stddef.h>
+ #include <process.h>
+-#include <stdint.h>
+ 
+ typedef SOCKET tcp_socket_t;
+ #define INVALID_SOCKET_VALUE        INVALID_SOCKET
+@@ -82,9 +64,8 @@ typedef _W64 int   ssize_t;
+ #define _SSIZE_T_DEFINED
+ #endif
+ 
+-/* Prevent deprecation warnings */
+ #define snprintf _snprintf
+-#define strnicmp _strnicmp
++#define strdup _strdup
+ 
+ #if defined(_MSC_VER)
+ #pragma warning (push)
+diff --git a/src/lib/platform/windows/serialport.cpp b/src/lib/platform/windows/serialport.cpp
+index 111d7da..e1cec66 100644
+--- a/src/lib/platform/windows/serialport.cpp
++++ b/src/lib/platform/windows/serialport.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * This file is part of the libCEC(R) library.
+  *
+- * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
+  * libCEC(R) is an original work, containing original code.
+  *
+  * libCEC(R) is a trademark of Pulse-Eight Limited.
+@@ -18,8 +18,7 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301  USA
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  *
+  *
+  * Alternatively, you can license this library under a commercial license,
+@@ -32,9 +31,9 @@
+  */
+ 
+ #include "env.h"
+-#include "../sockets/serialport.h"
+-#include "../util/baudrate.h"
+-#include "../util/timeutils.h"
++#include "lib/platform/sockets/serialport.h"
++#include "lib/platform/util/baudrate.h"
++#include "lib/platform/util/timeutils.h"
+ 
+ using namespace std;
+ using namespace PLATFORM;
+diff --git a/src/testclient/main.cpp b/src/testclient/main.cpp
+index 42132a0..03ca91d 100644
+--- a/src/testclient/main.cpp
++++ b/src/testclient/main.cpp
+@@ -1066,12 +1066,6 @@ bool ProcessCommandLineArguments(int argc, char *argv[])
+               cout << "== using device type 'audio system'" << endl;
+             g_config.deviceTypes.Add(CEC_DEVICE_TYPE_AUDIO_SYSTEM);
+           }
+-          else if (!strcmp(argv[iArgPtr + 1], "x"))
+-          {
+-            if (!g_bSingleCommand)
+-              cout << "== using device type 'tv'" << endl;
+-            g_config.deviceTypes.Add(CEC_DEVICE_TYPE_TV);
+-          }
+           else
+           {
+             cout << "== skipped invalid device type '" << argv[iArgPtr + 1] << "'" << endl;
