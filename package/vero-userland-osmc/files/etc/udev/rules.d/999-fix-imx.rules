@@ -1,3 +1,6 @@
 KERNEL=="galcore", SUBSYSTEM=="graphics_class", GROUP="video", MODE="0660"
 KERNEL=="mxc_vpu", SUBSYSTEM=="mxc_vpu", GROUP="video", MODE="0660"
 KERNEL=="mxc_ipu", SUBSYSTEM=="mxc_ipu", GROUP="video", MODE="0660"
+KERNEL=="mxc_hdmi", SUBSYSTEM=="mxc_hdmi", GROUP="video", MODE="0666"
+KERNEL=="mxc_hdmi_cec", SUBSYSTEM=="mxc_hdmi_cec", GROUP="video", MODE="0666"
+KERNEL=="fb0", SUBSYSTEM=="graphics", PROGRAM="/bin/sh -c 'chgrp -R video /sys/%p; chmod -R g+u /sys/%p'"
