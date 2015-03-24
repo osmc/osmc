@@ -89,6 +89,8 @@ class Main(object):
 		try:
 			
 			self.act()
+
+			call_parent('progress_bar', {'kill': True})
 		
 		except Exception as e:
 		
@@ -211,8 +213,8 @@ class Main(object):
 
 		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
 
-		# call the parent and kill the pDialog
-		call_parent('progress_bar', {'kill': True})
+		# call the parent and kill the pDialog, now handled in on exit
+		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Cache Update Complete'})
 
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
@@ -246,8 +248,8 @@ class Main(object):
 		
 		self.cache.commit(fetch_progress=dprg, install_progress=iprg)
 
-		# call the parent and kill the pDialog
-		call_parent('progress_bar', {'kill': True})
+		# call the parent and kill the pDialog, now handled in on exit
+		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Commit Complete'})
 
 		# remove the file that blocks further update checks
 		
@@ -273,8 +275,8 @@ class Main(object):
 
 		self.cache.fetch_archives(progress=dprg)
 
-		# call the parent and kill the pDialog
-		call_parent('progress_bar', {'kill': True})
+		# call the parent and the progress bar is killed on error or once all complete
+		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Downloads Complete'})
 
 		return '%s %s all packages fetched' % (t.now(), 'apt_cache_action.py')
 
@@ -289,8 +291,9 @@ class Operation_Progress(apt.progress.base.OpProgress):
 		call_parent('progress_bar', {'percent': self.percent,  'heading': self.op, 'message':self.sub_op,})
 
 	def done(self):
+		pass
 
-		call_parent('progress_bar', {'kill': True})
+		# call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Operations Complete'})
 
 
 class Install_Progress(apt.progress.base.InstallProgress):
