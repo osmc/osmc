@@ -7,7 +7,7 @@ The kernel headers and sources are available for all OSMC kernel releases, howev
 <p>
 To get the headers package which matches your kernel version, run the following command:
 <pre>
-for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-headers-$(uname -r)"; ;; esac; done
+set -- $(cat /proc/cmdline) && for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-headers-$(uname -r)"; ;; esac; done
 </pre>
 Kernel headers are useful for compiling new modules / drivers for your device.
 </p>
@@ -16,7 +16,7 @@ Kernel headers are useful for compiling new modules / drivers for your device.
 <p>
 To get the full kernel source (including OSMC patches) for the kernel that you are currently running, run the following command:
 <pre>
-for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-source-$(uname -r)"; ;; esac; done
+set -- $(cat /proc/cmdline) && for x in "$@"; do case "$x" in osmcdev=*) sudo apt-get update && sudo apt-get install -y "${x#osmcdev=}-source-$(uname -r)"; ;; esac; done
 </pre>
 </p>
 <h2>Manually finding a specific version</h2>
