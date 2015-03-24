@@ -90,7 +90,7 @@ class Agent(dbus.service.Object):
         pin = '0000'
         if not returnValue == None:
             pin = returnValue;
-        message_list = ['ENTER_PIN', pin]
+        message_list = ['ENTER_PIN', str(pin)]
         return_status('NOTIFICATION', message_list)
         set_trusted(device, True)
         return pin
@@ -105,20 +105,20 @@ class Agent(dbus.service.Object):
         pin = '0000'
         if not returnValue == None:
             pin = returnValue;
-        message_list = ['ENTER_PIN', pin]
+        message_list = ['ENTER_PIN', str(pin)]
         return_status('NOTIFICATION', message_list)
         return dbus.UInt32(pin)
 
     @dbus.service.method(AGENT_INTERFACE,
                          in_signature="ouq", out_signature="")
     def DisplayPasskey(self, device, passkey, entered):
-        message_list = ['ENTER_PIN', passkey ]
+        message_list = ['ENTER_PIN', str(passkey) ]
         return_status('NOTIFICATION', message_list)
 
     @dbus.service.method(AGENT_INTERFACE,
                          in_signature="os", out_signature="")
     def DisplayPinCode(self, device, pincode):
-        message_list = ['ENTER_PIN', pincode ]
+        message_list = ['ENTER_PIN', str(pincode) ]
         return_status('NOTIFICATION', message_list)
 
     @dbus.service.method(AGENT_INTERFACE,
