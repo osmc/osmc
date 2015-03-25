@@ -3,7 +3,8 @@ Description=Connection service
 Requires=dbus.socket
 After=dbus.socket
 Wants=network.target
-Before=remote-fs.target
+Before=remote-fs-pre.target
+Wants=remote-fs-pre.target
 
 [Service]
 Type=dbus
