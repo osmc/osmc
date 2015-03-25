@@ -24,7 +24,7 @@ manager = connman.get_manager_interface()
 
 
 def is_ethernet_enabled():
-    return connman.is_technology_enabled('ethernet')
+    return connman.is_technology_enabled('ethernet') or not get_nfs_ip_cmdline_value() == None
 
 
 def toggle_ethernet_state(state):
@@ -57,7 +57,7 @@ def get_ethernet_settings():
         nfs_settings['Interface'] = 'eth0 (NFS)'
         nfs_settings['State'] = 'online'
         nfs_settings['path'] = 'nfs'
-        if not has_internet_connection():
+        if not check_MS_NCSI_response():
             nfs_settings['State'] = 'ready'
         return nfs_settings
 
@@ -67,13 +67,16 @@ def get_ethernet_settings():
 def get_nfs_ip_cmdline_value():
     ip_value = None
     cmdline_data = open(RUNNING_NETWORK_DETAILS_FILE, 'r').read()
+    nfs_install = False
     for cmdline_value in cmdline_data.split(' '):
         if 'root=/dev/nfs' in cmdline_value:
-            return True
+            nfs_install = True
         # grab the ip= value from cmdline
         if cmdline_value.startswith('ip='):
             ip_value = cmdline_value[3:]
-    return ip_value
+    if nfs_install:
+        return ip_value
+    return None
 
 
 def extract_network_properties(dbus_properties):
