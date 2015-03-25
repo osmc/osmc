@@ -42,6 +42,14 @@
             <height>1</height>
             <label/>
         </control>
+        <control id="97000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>        
         <!-- Background -->
         <control type="image">
             <left>0</left>
@@ -120,6 +128,21 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>40010</onright>
+            </control>
+            <!-- Warranty -->
+            <control id="1007" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>$ADDON[service.osmc.settings 32023]</label>
+                <font>osmc_addon_720_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>70010</onright>
             </control>
             <!-- Networking -->
             <control id="1006" type="button">
@@ -258,6 +281,64 @@
                 <onright>noop</onright>
             </control>
         </control>
+
+               <!-- Warranty sub menu -->
+        <control id="7000" type="group">
+            <left>580</left>
+            <top>144</top>
+            <width>1000</width>
+            <height>726</height>
+            <onleft>1000</onleft>
+            <visible>Control.IsVisible(97000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <control type="image">
+                <description>text background</description>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>900</width>
+                <height>800</height>
+                <texture>TextShade.png</texture>
+            </control>
+            <!-- scroll up button -->
+            <!-- <control type="button" id="40030"><posx>482</posx><posy>0</posy><width>36</width><height>66</height><colordiffuse>FFFFFFFF</colordiffuse><texturefocus>ArrowUpFO.png</texturefocus><texturenofocus>ArrowUpNF.png</texturenofocus><onleft>1004</onleft><onright>40010</onright><ondown>40020</ondown></control>-->
+            <!-- scroll down button -->
+            <!-- <control type="button" id="40020"><posx>482</posx><posy>734</posy><width>36</width><height>66</height><colordiffuse>FFFFFFFF</colordiffuse><texturefocus>ArrowDownFO.png</texturefocus><texturenofocus>ArrowDownNF.png</texturenofocus><onleft>1004</onleft><onright>40010</onright><onup>40030</onup></control>-->
+            <control id="777" type="textbox">
+                <description>warranty</description>
+                <posx>50</posx>
+                <posy>50</posy>
+                <width>800</width>
+                <height>700</height>
+                <wraptext>true</wraptext>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+                <font>osmc_addon_720_OLD_Font28</font>
+                <textcolor>66ffffff</textcolor>
+                <scrolltime>75</scrolltime>
+                <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(777)</autoscroll>
+                <!-- <autoscroll delay="3000" repeat="10000" time="1000">false</autoscroll>-->
+            </control>
+            <!-- I Agree -->
+            <control id="70010" type="button">
+                <left>1100</left>
+                <top>200</top>
+                <width>300</width>
+                <height>42</height>
+                <label>$ADDON[service.osmc.settings 32013]</label>
+                <font>osmc_addon_720_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onleft>1007</onleft>
+                <onright>noop</onright>
+            </control>
+        </control>
+
+
         <!-- Networking -->
         <control id="6000" type="grouplist">
             <left>480</left>

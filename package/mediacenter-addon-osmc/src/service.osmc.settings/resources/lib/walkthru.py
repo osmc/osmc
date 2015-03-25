@@ -14,8 +14,10 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('
 # Custom Modules
 import timezones
 import LICENSE
+import WARRANTY
 
 EULA = LICENSE.license
+WARR = WARRANTY.warranty
 
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
@@ -92,13 +94,16 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.selected_region   = None
 		self.selected_country  = None
 
+		self.vero = self.check_hardware()
+
 
 	def onInit(self):
 
 		global EULA
+		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1004, 1005, 1006]:
+		for hide_this in [1003, 1004, 1005, 1006, 1007]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -117,7 +122,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
-		for visibility_control in [93000,94000,95000, 96000]:
+		for visibility_control in [93000,94000,95000, 96000, 97000]:
 
 			self.getControl(visibility_control).setVisible(False)
 
@@ -135,6 +140,36 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# populate the terms and conditions
 		self.getControl(555).setText(EULA)
+
+		# populate the warranty
+		self.getControl(777).setText(WARR)		
+
+
+	def check_hardware(self):
+		'''
+			Checks whether this is a Vero and whether the warranty info should be shown 
+		'''
+
+		# generate the URL
+		with open('/proc/cmdline', 'r') as f:
+
+			line = f.readline()
+
+			settings = line.split(' ')
+
+			for setting in settings:
+
+				if setting.startswith('osmcdev='):
+
+					if setting[len('osmcdev='):] == 'vero':
+
+						log('Hardware is Vero')
+
+						return True
+
+		log('Hardware not Vero')
+
+		return False
 
 
 	def onClick(self, controlID):
@@ -214,24 +249,60 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1004).setVisible(True)
 			self.setFocusId(1004)
 
+
 		elif controlID == 40010:
 			# terms and conditions I Agree button
 
-			# check if internet is connected
-			if self.internet_connected:
-				log('internet is connected, jumping to exit')
-				# skip the Networking setup menu item
+			if self.vero:
+
 				self.getControl(94000).setVisible(False)
-				self.getControl(95000).setVisible(True)
-				self.getControl(1005).setVisible(True)
-				self.setFocusId(1005)
+				self.getControl(97000).setVisible(True)
+				self.getControl(1007).setVisible(True)
+				self.setFocusId(1007)
+
 			else:
-				log('internet is not connected, jumping to networking')
-				# display the Networking panel
-				self.getControl(94000).setVisible(False)
-				self.getControl(96000).setVisible(True)
-				self.getControl(1006).setVisible(True)
-				self.setFocusId(1006)				
+
+
+				# check if internet is connected
+				if self.internet_connected:
+					log('internet is connected, jumping to exit')
+					# skip the Networking setup menu item
+					self.getControl(94000).setVisible(False)
+					self.getControl(95000).setVisible(True)
+					self.getControl(1005).setVisible(True)
+					self.setFocusId(1005)
+				else:
+					log('internet is not connected, jumping to networking')
+					# display the Networking panel
+					self.getControl(94000).setVisible(False)
+					self.getControl(96000).setVisible(True)
+					self.getControl(1006).setVisible(True)
+					self.setFocusId(1006)		
+	
+
+		elif controlID == 70010:
+			#  warranty I Agree button
+
+			if self.vero:
+
+				# check if internet is connected
+				if self.internet_connected:
+					log('internet is connected, jumping to exit')
+					# skip the Networking setup menu item
+					self.getControl(97000).setVisible(False)
+					self.getControl(95000).setVisible(True)
+					self.getControl(1005).setVisible(True)
+					self.setFocusId(1005)
+				else:
+					log('internet is not connected, jumping to networking')
+					# display the Networking panel
+					self.getControl(97000).setVisible(False)
+					self.getControl(96000).setVisible(True)
+					self.getControl(1006).setVisible(True)
+					self.setFocusId(1006)	
+
+			else:
+				pass							
 
 		elif controlID == 40020:
 			# unused scroll bar for TandC
@@ -274,7 +345,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def onFocus(self, controlID):
 
-		main_controls = [1002, 1003, 1004, 1005, 1006]
+		main_controls = [1002, 1003, 1004, 1005, 1006, 1007]
 
 		tz_controls = [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 
