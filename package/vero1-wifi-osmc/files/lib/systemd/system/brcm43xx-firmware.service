@@ -4,7 +4,7 @@ DefaultDependencies=no
 Wants=local-fs.target
 Conflicts=shutdown.target
 After=systemd-modules-load.service local-fs.target
-Before=sysinit.target shutdown.target
+Before=shutdown.target
 RefuseManualStart=yes
 RefuseManualStop=yes
 
