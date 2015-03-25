@@ -1,0 +1,36 @@
+Getting OSMC logs to diagnose problems
+
+<h2>Overview</h2>
+<p>
+OSMC developers to do their best to ensure that OSMC works well on all of its supported devices, however developers cannot exhaust every possible use case scenario and as such bugs do occur. Logs can help identify problems and ensure they are resolved in a timely manner as well as help developers replicate issues so they can be fixed.
+</p>
+<h2>Where to upload logs</h2>
+<p>
+OSMC hosts its own Pastebin that is ad-free for users to upload logs to. You can find it at <a href="http://paste.osmc.io" target="_blank">http://paste.osmc.io</a>. We ask that it is used responsibly.
+</p>
+<p>
+OSMC's Pastebin also supports uploading via the command line. This allows you to upload logs directly from your device instead of having to transfer them to an intermediate device.
+</p>
+<p>
+After logging in to your device and <a href="http://osmc.tv/help/wiki/console">getting to the console</a>, you can 'pipe' most commands to paste-log to upload the output online.  For example:
+<pre>echo "Hello World" | paste-log</pre>
+will return a URL containing the above text. To upload a file called /home/osmc/somefile.log, you would run:
+<pre>cat /home/osmc/somefile.log | paste-log</pre>
+Please note that this may not work for larger logs.
+</p>
+<h2>Uploading logs from within My OSMC</h2>
+<p>
+To simplify the process further, OSMC makes it possible to upload several different logs to the OSMC Pastebin service without any command line interaction. To upload a log, head to My OSMC -> Logger. Here you will be able to select from several different logs and will receive a web address after your logs are uploaded. You can start a new forum post or head in to IRC with your logs and a description of your problem to get help straight away. 
+</p>
+<p>Note: if you're not sure what logs to upload, either upload all logs before asking for help or ask which logs would be most helpful in diagnosing your issue.</p>
+<h2>Useful logs</h2>
+<p>Different logs are useful for identifying different issues. The most notable are</p>
+<li>
+<ul>dmesg - for identifying hardware compatibility issues</ul>
+<ul>journalctl - for identifying kernel issues</ul>
+<ul>kodi.log - for identifying issues with Kodi</ul>
+</li>
+<h2>Enabling debug logging for Kodi</h2>
+<p>
+To ensure your logs are as verbose as possible, you should enable Debugging in Kodi and afterwards replicate your problem. To do this go to Settings -> System -> Debugging and select 'Enable Debugging'. This will ensure that Kodi writes to the log in a more detailed fashion and hopefully provide enough information to diagnose your problem. 
+</p>
