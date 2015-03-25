@@ -95,7 +95,7 @@ class Main(object):
 		# add the quick look-up references
 		for key in keys:
 			if sets.get(key,{}).get('setting',False):
-				pntr = sets.get(key,'pointer')
+				pntr = sets.get(key,{}).get('pointer',[])
 				for p in pntr:
 					# p is a tuple of the Label and lookup value
 					self.log_list.append(p[1] + '  :  ' + p[0] + '\n')
