@@ -1,0 +1,13 @@
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index cf2f706..2e0838f 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -276,8 +276,6 @@ bool CEGLNativeTypeIMX::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutio
+   RESOLUTION_INFO res;
+   for (size_t i = 0; i < probe_str.size(); i++)
+   {
+-    if(!StringUtils::StartsWith(probe_str[i], "S:"))
+-      continue;
+     if(ModeToResolution(probe_str[i], &res))
+       resolutions.push_back(res);
+   }
