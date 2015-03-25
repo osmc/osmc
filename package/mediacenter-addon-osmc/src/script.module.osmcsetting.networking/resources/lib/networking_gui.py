@@ -866,7 +866,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         message = lang(32023) + ' ' + alias
                     else:
                         # 'Pairing with'                            'failed'
-                        message = lang(32024) + ' ' + alias + ' ' + lang(320025)
+                        message = lang(32024) + ' ' + alias + ' ' + lang(32025)
                     # 'Bluetooth'
                     xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
 
