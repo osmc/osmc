@@ -18,6 +18,18 @@ clear > /dev/tty1
 chvt 1
 systemctl stop mediacenter
 
+vres=$(/bin/fbset | grep geometry | awk '{print $3}')
+if ((vres<=660))
+then
+    setfont OSMC-Lat15-Terminus14.psf.gz
+elif ((661<=vres && vres<=890))
+then
+    setfont OSMC-Lat15-TerminusBold22x11.psf.gz
+elif ((891<=vres))
+then
+    setfont OSMC-Lat15-TerminusBold28x14.psf.gz
+fi
+
 dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    Checking for updates to install..." 5 48 > /dev/tty1
 
 err=$(dpkg --configure -a 2>&1)
