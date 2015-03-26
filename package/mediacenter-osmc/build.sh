@@ -196,7 +196,7 @@ then
 	fi
 	if [ "$1" == "vero" ]; then
 	LIBRARY_PATH+="/opt/vero/lib" && \
-	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon-vfpv4 -I/usr/include/afpfs-ng -I/opt/vero/include" && \
+	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon-vfpv3 -I/usr/include/afpfs-ng -I/opt/vero/include" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vero/lib" && \
