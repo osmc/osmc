@@ -18,6 +18,9 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 from CompLogger import comprehensive_logger as clog
 
 
+USER_ACTION = sys.argv[1]
+
+
 def log(message):
 	xbmc.log('OSMC LOGGING ' + str(message), level=xbmc.LOGDEBUG)
 
@@ -121,25 +124,39 @@ class Main(object):
 
 		self.pDialog.update(percent=100, message=lang(32026))
 
-		with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_log_location) as f:
-
-			line = f.readline()
+		if USER_ACTION == 'copy':
 			
-			key = line.replace('{"key":"','').replace('"}','')
-			
-			log('pastio key: %s' % key)
+			os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
 
-		self.pDialog.close()
+			ok = xbmcgui.Dialog().ok(lang(32013), lang(32040))
 
-		if not key:
-
-			ok = xbmcgui.Dialog().ok(lang(32013), lang(32023))
+			self.pDialog.close()
 
 		else:
 
-			self.url = 'http://paste.osmc.io/ %s' % key
+			with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_log_location) as f:
 
-			ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
+				line = f.readline()
+				
+				key = line.replace('{"key":"','').replace('"}','')
+				
+				log('pastio key: %s' % key)
+
+			self.pDialog.close()
+
+			if not key:
+
+				copy = xbmcgui.Dialog().yesno(lang(32013), lang(32023), lang(32039))
+
+				if copy:
+
+					os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
+
+			else:
+
+				self.url = 'http://paste.osmc.io/ %s' % key
+
+				ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
 
 
 	def grab_mem(self):
