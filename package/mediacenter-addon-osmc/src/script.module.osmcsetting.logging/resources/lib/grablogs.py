@@ -44,7 +44,7 @@ class Main(object):
 				'config' 			: {'function': self.grab_config, 				'setting': False, 'pointer': [('Pi config', 'Ul2H1CLu')]},
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False, 'pointer': [('OSMC Packages', '7nQvfy9a')]},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False, 'pointer': [('All Other Packages', 'hwvkLCMX')]},
-				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT Logs', 'RcBRrsRs')]},
+				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT Logs', 'RcBRrsRs'), ('History Logs', 'B8sj7DO8Fj')]},
 				'fstab' 			: {'function': self.grab_fstab, 				'setting': False, 'pointer': [('fstab', 'qiE9Dtax')]},
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False, 'pointer': [('advancedsettings.xml', 'C7hKmH1p')]},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False, 'pointer': [('sources.xml', 'SGkuGLGj')]},
@@ -285,6 +285,14 @@ class Main(object):
 
 		if os.path.isfile('/var/log/apt/term.log'):
 			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500') as f:
+				self.log_list.extend(f.readlines())
+		else:
+			self.log_list.extend(['apt log not found'])
+
+		self.log_list.extend(['\n====================== History Logs ===========================B8sj7DO8Fj\n'])
+
+		if os.path.isfile('/var/log/apt/history.log'):
+			with os.popen('grep -v "^(Reading database" /var/log/apt/history.log | tail -n 500') as f:
 				self.log_list.extend(f.readlines())
 		else:
 			self.log_list.extend(['apt log not found'])
