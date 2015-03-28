@@ -138,9 +138,9 @@ class Main(object):
 
 				line = f.readline()
 				
-				key = line.replace('{"key":"','').replace('"}','')
+				key = line.replace('{"key":"','').replace('"}','').replace('\n','')
 				
-				log('pastio key: %s' % key)
+				log('pastio line: %s' % repr(line))
 
 			self.pDialog.close()
 
