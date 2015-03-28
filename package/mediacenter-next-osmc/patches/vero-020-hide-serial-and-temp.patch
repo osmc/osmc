@@ -1,0 +1,14 @@
+diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
+index 196a1c6..fa98098 100644
+--- a/xbmc/windows/GUIWindowSystemInfo.cpp
++++ b/xbmc/windows/GUIWindowSystemInfo.cpp
+@@ -155,9 +155,7 @@ void CGUIWindowSystemInfo::FrameMove()
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUHardware());
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPURevision());
+-    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());
+ #endif
+-    SetControlLabel(i++, "%s %s", 22011, SYSTEM_CPU_TEMPERATURE);
+ #if !defined(__arm__) || defined(TARGET_RASPBERRY_PI)
+     SetControlLabel(i++, "%s %s", 13284, SYSTEM_CPUFREQUENCY);
+ #endif

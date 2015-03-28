@@ -1,0 +1,18 @@
+diff --git a/configure.ac b/configure.ac
+index 8080641..fb3c448 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -737,7 +737,13 @@ case $use_platform in
+   raspberry-pi2)
+      target_platform=target_raspberry_pi
+      use_neon=yes
++     use_arch="arm"
+      use_cpu=cortex-a7
++     use_hardcoded_tables="yes"
++     ARCH="arm"
++     AC_DEFINE(HAS_EGLGLES, [1], [Define if supporting EGL based GLES Framebuffer])
++     USE_OMXLIB=1; AC_DEFINE([HAVE_OMXLIB],[1],["Define to 1 if OMX libs is enabled"])
++     USE_MMAL=1; AC_DEFINE([HAS_MMAL],[1],["Define to 1 if MMAL libs is enabled"])
+      ;;
+ esac
+ 

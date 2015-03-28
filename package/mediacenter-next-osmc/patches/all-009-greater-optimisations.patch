@@ -1,0 +1,15 @@
+diff --git a/configure.ac b/configure2.ac
+index 2761fa5..8080641 100755
+--- a/configure.ac
++++ b/configure2.ac
+@@ -794,8 +794,8 @@ CXXFLAGS="$DEBUG_FLAGS $CXXFLAGS"
+ 
+ if test "$use_optimizations" = "yes"; then
+   final_message="$final_message\n  Optimization:\tYes"
+-  CXXFLAGS="-O2 $CXXFLAGS"
+-  CFLAGS="-O2 $CFLAGS"
++  CXXFLAGS="-O3 -fomit-frame-pointer $CXXFLAGS"
++  CFLAGS="-O3 -fomit-frame-pointer $CFLAGS"
+ else
+   final_message="$final_message\n  Optimization:\tNo"
+ fi

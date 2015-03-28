@@ -10,35 +10,33 @@ fb_restore() {
 }
 
 export TERM=linux
-sudo chown osmc:osmc /sys/class/vtconsole/vtcon*/bind
+chown osmc:osmc /sys/class/vtconsole/vtcon*/bind
 
 if [ "$1" = "stop" ]; then
 	fb_restore
 	exit
 fi
 
-sudo chmod a+rw /dev/tty1
-sudo /usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
-
-who | awk '{print $2}' | grep tty1 >/dev/null
-if [ "$?" -ne 0 ]; then
-	sudo systemctl stop getty@tty1
-fi
+chmod a+rw /dev/tty1
+/usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
 
 if [ ! -e /var/run/fb_resolution ]; then
-	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' | sudo tee /var/run/fb_resolution >/dev/null
+	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
 fi
 
 while true; do
-	sudo setcap cap_net_admin,cap_net_bind_service,cap_net_raw=e /usr/lib/kodi/kodi.bin
-	LD_PRELOAD="/usr/lib/libarmmem.so" /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
+    sudo umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
+    sudo mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+	setcap 'cap_net_bind_service=+ep' /usr/lib/kodi/kodi.bin
+	echo 0 > /sys/class/vtconsole/vtcon1/bind
+	sudo -u osmc /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
 	fb_restore
-	sudo chmod a+rw /dev/tty1
-	sudo systemctl status getty@tty1 >/dev/null; GETTY=$?
+	chmod a+rw /dev/tty1
+	systemctl status getty@tty1 >/dev/null; GETTY=$?
 	if [ "$GETTY" -ne 0 ]; then
-		sudo chvt 1
+		chvt 1
 		/usr/bin/setterm --cursor off >/dev/tty1
 		/usr/bin/clear >/dev/tty1
 		/usr/bin/ply-image "$CODE"
@@ -47,10 +45,10 @@ while true; do
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
 		/bin/fbset -depth 8 && /bin/fbset -depth 16
 		/usr/bin/setterm --cursor on >/dev/tty1
-		sudo systemctl start getty@tty1
+		systemctl start getty@tty1
 		count=30
 		while [ $count -gt 0 ]; do
-			who | awk '{print $2}' | grep tty1 >/dev/null
+			who | awk '{print $2}' | grep -q tty1
 			if [ "$?" -eq 0 ]; then
 				count=5
 			else
@@ -58,6 +56,6 @@ while true; do
 			fi
 			sleep 5
 		done
-		sudo systemctl stop getty@tty1
+		systemctl stop getty@tty1
 	fi
 done

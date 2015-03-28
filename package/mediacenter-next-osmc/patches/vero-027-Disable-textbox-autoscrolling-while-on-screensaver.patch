@@ -1,0 +1,66 @@
+From cf25f1174502e071d126ff8b9a28a4b6ed23891a Mon Sep 17 00:00:00 2001
+From: anaconda <anaconda@menakite.eu>
+Date: Thu, 11 Sep 2014 21:30:43 +0200
+Subject: [PATCH 5/5] Disable textbox autoscrolling while on screensaver.
+
+SQUASH: only if dim or black
+---
+ xbmc/Application.cpp       | 7 +++++++
+ xbmc/Application.h         | 2 ++
+ xbmc/guilib/GUITextBox.cpp | 5 ++++-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index f6365a5..16bf81d 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -5899,3 +5899,10 @@ void CApplication::CloseNetworkShares()
+   CSFTPSessionManager::DisconnectAllSessions();
+ #endif
+ }
++
++std::string CApplication::GetScreenSaverId()
++{
++  if (m_screenSaver)
++    return m_screenSaver->ID();
++  return "";
++}
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 0a332ff..15efc90 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -380,6 +380,8 @@ public:
+ 
+   void SetLoggingIn(bool loggingIn) { m_loggingIn = loggingIn; }
+ 
++  std::string GetScreenSaverId();
++
+ protected:
+   virtual bool OnSettingsSaving() const;
+ 
+diff --git a/xbmc/guilib/GUITextBox.cpp b/xbmc/guilib/GUITextBox.cpp
+index c0e2fa5..0eca360 100644
+--- a/xbmc/guilib/GUITextBox.cpp
++++ b/xbmc/guilib/GUITextBox.cpp
+@@ -23,6 +23,7 @@
+ #include "utils/XBMCTinyXML.h"
+ #include "utils/MathUtils.h"
+ #include "utils/StringUtils.h"
++#include "Application.h"
+ 
+ using namespace std;
+ 
+@@ -132,7 +133,9 @@ void CGUITextBox::Process(unsigned int currentTime, CDirtyRegionList &dirtyregio
+   // update our auto-scrolling as necessary
+   if (m_autoScrollTime && m_lines.size() > m_itemsPerPage)
+   {
+-    if (!m_autoScrollCondition || m_autoScrollCondition->Get())
++    if ((!m_autoScrollCondition || m_autoScrollCondition->Get()) && !(g_application.IsInScreenSaver() &&
++         (g_application.GetScreenSaverId() == "screensaver.xbmc.builtin.black" ||
++          g_application.GetScreenSaverId() == "screensaver.xbmc.builtin.dim")))
+     {
+       if (m_lastRenderTime)
+         m_autoScrollDelayTime += currentTime - m_lastRenderTime;
+-- 
+2.1.0
+

@@ -1,0 +1,13 @@
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 5775a76..bae5c10 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -677,6 +677,7 @@ bool CApplication::Create()
+ //#elif defined(some_ID) // uncomment for special version/fork
+ //  specialVersion = " (version for XXXX)";
+ #endif
++specialVersion = " (version for Vero)";
+   CLog::Log(LOGNOTICE, "Using %s %s x%d build%s", buildType.c_str(), g_infoManager.GetAppName().c_str(), g_sysinfo.GetXbmcBitness(), specialVersion.c_str());
+   CLog::Log(LOGNOTICE, "%s compiled " __DATE__ " by %s for %s %s %d-bit %s (%s)", g_infoManager.GetAppName().c_str(), g_sysinfo.GetUsedCompilerNameAndVer().c_str(), g_sysinfo.GetBuildTargetPlatformName().c_str(),
+             g_sysinfo.GetBuildTargetCpuFamily().c_str(), g_sysinfo.GetXbmcBitness(), g_sysinfo.GetBuildTargetPlatformVersionDecoded().c_str(),
+

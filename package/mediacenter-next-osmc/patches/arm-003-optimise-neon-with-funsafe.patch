@@ -1,0 +1,15 @@
+diff --git a/configure.ac b/configure.ac
+index 4d89920..917b883 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -854,8 +854,8 @@ elif test "$use_arch" = "arm"; then
+         use_cpu=cortex-a8])
+   else
+     if test "$use_neon" = "yes"; then 
+-      CFLAGS="$CFLAGS -mfpu=neon -mvectorize-with-neon-quad"
+-      CXXFLAGS="$CXXFLAGS -mfpu=neon -mvectorize-with-neon-quad"
++      CFLAGS="$CFLAGS -mfpu=neon -funsafe-math-optimizations -mvectorize-with-neon-quad"
++      CXXFLAGS="$CXXFLAGS -mfpu=neon -funsafe-math-optimizations -mvectorize-with-neon-quad"
+     fi
+   fi
+ fi

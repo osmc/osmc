@@ -1,0 +1,21 @@
+diff --git a/configure.in b/configure.in
+index 799ec17..2a047e1 100644
+--- a/configure.in
++++ b/configure.in
+@@ -734,6 +734,16 @@ case $use_platform in
+      CFLAGS="$CFLAGS"
+      CXXFLAGS="$CXXFLAGS"
+      ;;
++   vero)
++     use_static_ffmpeg=yes
++     use_joystick=no
++     use_sdl=no
++     use_hardcoded_tables="yes"
++     CFLAGS="$CFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations "
++     CXXFLAGS="$CXXFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations "
++     FFMPEG_EXTRACFLAGS="$FFMPEG_EXTRACFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations "
++     use_cpu=cortex-a9
++     ;;
+ esac
+ 
+ XBMC_SETUP_ARCH_DEFINES()
