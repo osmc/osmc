@@ -44,7 +44,7 @@ class Main(object):
 				'config' 			: {'function': self.grab_config, 				'setting': False, 'pointer': [('Pi config', 'Ul2H1CLu')]},
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False, 'pointer': [('OSMC Packages', '7nQvfy9a')]},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False, 'pointer': [('All Other Packages', 'hwvkLCMX')]},
-				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT Logs', 'RcBRrsRs'), ('History Logs', 'B8sj7DO8Fj')]},
+				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT Logs', 'RcBRrsRs'), ('History Logs', 'B8sj7DO8')]},
 				'fstab' 			: {'function': self.grab_fstab, 				'setting': False, 'pointer': [('fstab', 'qiE9Dtax')]},
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False, 'pointer': [('advancedsettings.xml', 'C7hKmH1p')]},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False, 'pointer': [('sources.xml', 'SGkuGLGj')]},
@@ -161,7 +161,7 @@ class Main(object):
 
 	def grab_mem(self):
 
-		self.log_list.extend(['\n====================== Memory =========================eWTP1Mc8\n'])
+		self.log_list.extend(['\n====================== Memory ========================= eWTP1Mc8\n'])
 
 		with os.popen('free -m') as f:
 			self.log_list.extend(f.readlines())		
@@ -169,7 +169,7 @@ class Main(object):
 
 	def grab_diskspace(self):
 
-		self.log_list.extend(['\n====================== Diskspace ======================qZy25Yas\n'])
+		self.log_list.extend(['\n====================== Diskspace ====================== qZy25Yas\n'])
 
 		with os.popen('df -h') as f:
 			self.log_list.extend(f.readlines())	
@@ -177,7 +177,7 @@ class Main(object):
 
 	def grab_initd(self):
 
-		self.log_list.extend(['\n====================== init.d =========================Vr58kq0w\n'])
+		self.log_list.extend(['\n====================== init.d ========================= Vr58kq0w\n'])
 
 		with os.popen('ls -al /etc/init.d') as f:
 			self.log_list.extend(f.readlines())	
@@ -185,7 +185,7 @@ class Main(object):
 
 	def grab_systemd(self):
 
-		self.log_list.extend(['\n====================== systemd ========================86JFGfNO\n'])
+		self.log_list.extend(['\n====================== systemd ======================== 86JFGfNO\n'])
 
 		with os.popen('ls -al /lib/systemd/system') as f:
 			self.log_list.extend(f.readlines())	
@@ -193,18 +193,7 @@ class Main(object):
 
 	def grab_kodi_logs(self):
 
-		self.log_list.extend(['\n====================== Kodi Old Log ======================2qaAc90c\n'])
-
-		location = '/home/osmc/.kodi/temp/kodi.old.log'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_list.extend(f.readlines())
-		except:
-
-			self.log_list.extend(['kodi old logs not found'])
-
-		self.log_list.extend(['\n====================== Kodi Log =======================HyhIT4UP\n'])
+		self.log_list.extend(['\n====================== Kodi Log ======================= HyhIT4UP\n'])
 
 		location = '/home/osmc/.kodi/temp/kodi.log'
 
@@ -213,12 +202,23 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		except:
 
-			self.log_list.extend(['kodi logs not found'])
+			self.log_list.extend(['kodi.log not found'])
+
+		self.log_list.extend(['\n====================== Kodi Old Log ====================== 2qaAc90c\n'])
+
+		location = '/home/osmc/.kodi/temp/kodi.old.log'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+
+			self.log_list.extend(['kodi.old.log not found'])
 
 
 	def grab_lirc_conf(self):
 
-		self.log_list.extend(['\n====================== lircd.conf =========================kdgLUcwP\n'])
+		self.log_list.extend(['\n====================== lircd.conf ========================= kdgLUcwP\n'])
 
 		location = '/etc/lirc/lircd.conf'
 
@@ -231,7 +231,7 @@ class Main(object):
 
 	def grab_config(self):
 
-		self.log_list.extend(['\n====================== Pi config.txt ======================Ul2H1CLu\n'])
+		self.log_list.extend(['\n====================== Pi config.txt ====================== Ul2H1CLu\n'])
 
 		location = '/boot/config.txt'
 
@@ -244,7 +244,7 @@ class Main(object):
 
 	def grab_osmc_packages(self):
 
-		self.log_list.extend(['\n====================== OSMC Packages ======================7nQvfy9a\n'])
+		self.log_list.extend(['\n====================== OSMC Packages ====================== 7nQvfy9a\n'])
 
 		with os.popen('dpkg -l | grep osmc') as f:
 			self.log_list.extend(f.readlines())
@@ -252,7 +252,7 @@ class Main(object):
 
 	def grab_uname(self):
 
-		self.log_list.extend(['\n====================== UNAME ==============================0wwkXuO5\n'])
+		self.log_list.extend(['\n====================== UNAME ============================== 0wwkXuO5\n'])
 
 		try:
 			with os.popen('uname -a') as f:
@@ -273,7 +273,7 @@ class Main(object):
 
 	def grab_all_other_packages(self):
 
-		self.log_list.extend(['\n====================== All Other Packages =================hwvkLCMX\n'])
+		self.log_list.extend(['\n====================== All Other Packages ================= hwvkLCMX\n'])
 
 		with os.popen('dpkg -l | grep -v osmc') as f:
 			self.log_list.extend(f.readlines())
@@ -281,26 +281,26 @@ class Main(object):
 
 	def grab_apt_logs(self):
 
-		self.log_list.extend(['\n====================== APT Logs ===========================RcBRrsRs\n'])
+		self.log_list.extend(['\n====================== APT term.log ======================= RcBRrsRs\n'])
 
 		if os.path.isfile('/var/log/apt/term.log'):
 			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500') as f:
 				self.log_list.extend(f.readlines())
 		else:
-			self.log_list.extend(['apt log not found'])
+			self.log_list.extend(['apt term.log not found'])
 
-		self.log_list.extend(['\n====================== History Logs ===========================B8sj7DO8Fj\n'])
+		self.log_list.extend(['\n====================== APT history.log ======================== B8sj7DO8\n'])
 
 		if os.path.isfile('/var/log/apt/history.log'):
 			with os.popen('grep -v "^(Reading database" /var/log/apt/history.log | tail -n 500') as f:
 				self.log_list.extend(f.readlines())
 		else:
-			self.log_list.extend(['apt log not found'])
+			self.log_list.extend(['apt history.log not found'])
 
 
 	def grab_advancedsettings(self):
 
-		self.log_list.extend(['\n====================== advancedsettings.xml ===============C7hKmH1p\n'])
+		self.log_list.extend(['\n====================== advancedsettings.xml =============== C7hKmH1p\n'])
 
 		location = '/home/osmc/.kodi/userdata/advancedsettings.xml'
 
@@ -308,12 +308,12 @@ class Main(object):
 			with open (location, 'r') as f:
 				self.log_list.extend(f.readlines())
 		except:
-			self.log_list.extend(['advanced settings not found'])
+			self.log_list.extend(['advancedsettings.xml not found'])
 
 
 	def grab_sources(self):
 
-		self.log_list.extend(['\n====================== sources.xml ========================SGkuGLGj\n'])
+		self.log_list.extend(['\n====================== sources.xml ======================== SGkuGLGj\n'])
 		
 		location = '/home/osmc/.kodi/userdata/sources.xml'
 
@@ -326,7 +326,7 @@ class Main(object):
 
 	def grab_fstab(self):
 
-		self.log_list.extend(['\n====================== fstab ==============================qiE9Dtax\n'])
+		self.log_list.extend(['\n====================== fstab ============================== qiE9Dtax\n'])
 
 		location = '/etc/fstab'
 
@@ -339,7 +339,7 @@ class Main(object):
 
 	def grab_keyboard(self):
 
-		self.log_list.extend(['\n====================== keyboard.xml =======================MBom5YV6\n'])
+		self.log_list.extend(['\n====================== keyboard.xml ======================= MBom5YV6\n'])
 
 		location = '/home/osmc/.kodi/userdata/keyboard.xml'
 
@@ -352,7 +352,7 @@ class Main(object):
 
 	def grab_remote(self):
 
-		self.log_list.extend(['\n====================== remote.xml =======================5jmphjm3\n'])
+		self.log_list.extend(['\n====================== remote.xml ======================= 5jmphjm3\n'])
 
 		location = '/home/osmc/.kodi/userdata/remote.xml'
 
@@ -365,7 +365,7 @@ class Main(object):
 
 	def grab_system_logs(self):
 
-		self.log_list.extend(['\n====================== System Journal ====================MyqVXi2x\n'])
+		self.log_list.extend(['\n====================== System Journal ==================== MyqVXi2x\n'])
 
 		try:
 			with os.popen('sudo journalctl') as f:
@@ -376,7 +376,7 @@ class Main(object):
 
 	def grab_boot_contents(self):
 
-		self.log_list.extend(['\n====================== /boot Contents ===================H3gEog10\n'])
+		self.log_list.extend(['\n====================== /boot Contents =================== H3gEog10\n'])
 
 		with os.popen('ls -al /boot') as f:
 			self.log_list.extend(f.readlines())
