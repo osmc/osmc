@@ -44,7 +44,7 @@ class Main(object):
 				'config' 			: {'function': self.grab_config, 				'setting': False, 'pointer': [('Pi config', 'Ul2H1CLu')]},
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False, 'pointer': [('OSMC Packages', '7nQvfy9a')]},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False, 'pointer': [('All Other Packages', 'hwvkLCMX')]},
-				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT Logs', 'RcBRrsRs'), ('History Logs', 'B8sj7DO8')]},
+				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT term.log', 'RcBRrsRs'), ('APT history.log', 'B8sj7DO8')]},
 				'fstab' 			: {'function': self.grab_fstab, 				'setting': False, 'pointer': [('fstab', 'qiE9Dtax')]},
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False, 'pointer': [('advancedsettings.xml', 'C7hKmH1p')]},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False, 'pointer': [('sources.xml', 'SGkuGLGj')]},
