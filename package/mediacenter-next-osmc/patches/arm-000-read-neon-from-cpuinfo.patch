@@ -1,0 +1,82 @@
+commit 6617197509fdbbc09884e4adae3ed1731938d3eb
+Author: Matus Kral <matuskral@me.com>
+Date:   Wed Jul 30 11:48:29 2014 +0200
+
+    Read THUMB & NEON extensions from /proc/cpuinfo (as other ext)
+
+diff --git a/xbmc/utils/CPUInfo.cpp b/xbmc/utils/CPUInfo.cpp
+index f3f275f..68f83e2 100644
+--- a/xbmc/utils/CPUInfo.cpp
++++ b/xbmc/utils/CPUInfo.cpp
+@@ -342,7 +342,7 @@ CCPUInfo::CCPUInfo(void)
+           StringUtils::Trim(m_cores[nCurrId].m_strModel);
+         }
+       }
+-      else if (strncmp(buffer, "flags", 5) == 0)
++      else if (strncmp(buffer, "flags", 5) == 0 || strncmp(buffer, "Features", 8) == 0)
+       {
+         char* needle = strchr(buffer, ':');
+         if (needle)
+@@ -373,6 +373,10 @@ CCPUInfo::CCPUInfo(void)
+               m_cpuFeatures |= CPU_FEATURE_3DNOW;
+             else if (0 == strcmp(tok, "3dnowext"))
+               m_cpuFeatures |= CPU_FEATURE_3DNOWEXT;
++            else if (0 == strcmp(tok, "neon"))
++              m_cpuFeatures |= CPU_FEATURE_NEON;
++            else if (0 == strcmp(tok, "thumb"))
++              m_cpuFeatures |= CPU_FEATURE_THUMB;
+             tok = strtok_r(NULL, " ", &save);
+           }
+         }
+@@ -410,10 +414,6 @@ CCPUInfo::CCPUInfo(void)
+   // Set MMX2 when SSE is present as SSE is a superset of MMX2 and Intel doesn't set the MMX2 cap
+   if (m_cpuFeatures & CPU_FEATURE_SSE)
+     m_cpuFeatures |= CPU_FEATURE_MMX2;
+-
+-  if (HasNeon())
+-    m_cpuFeatures |= CPU_FEATURE_NEON;
+-
+ }
+ 
+ CCPUInfo::~CCPUInfo()
+@@ -856,27 +856,7 @@ bool CCPUInfo::HasNeon()
+   has_neon = 1;
+ 
+ #elif defined(TARGET_LINUX) && defined(__ARM_NEON__)
+-  if (has_neon == -1)
+-  {
+-    has_neon = 0;
+-    // why are we not looking at the Features in
+-    // /proc/cpuinfo for neon ?
+-    int fd = open("/proc/self/auxv", O_RDONLY);
+-    if (fd >= 0)
+-    {
+-      Elf32_auxv_t auxv;
+-      while (read(fd, &auxv, sizeof(Elf32_auxv_t)) == sizeof(Elf32_auxv_t))
+-      {
+-        if (auxv.a_type == AT_HWCAP)
+-        {
+-          has_neon = (auxv.a_un.a_val & HWCAP_NEON) ? 1 : 0;
+-          break;
+-        }
+-      }
+-      close(fd);
+-    }
+-  }
+-
++  has_neon = ((g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON) == CPU_FEATURE_NEON) ? 1 : 0;
+ #endif
+ 
+   return has_neon == 1;
+diff --git a/xbmc/utils/CPUInfo.h b/xbmc/utils/CPUInfo.h
+index 093884b..21d3a13 100644
+--- a/xbmc/utils/CPUInfo.h
++++ b/xbmc/utils/CPUInfo.h
+@@ -42,6 +42,7 @@ class CTemperature;
+ #define CPU_FEATURE_3DNOWEXT 1 << 9
+ #define CPU_FEATURE_ALTIVEC  1 << 10
+ #define CPU_FEATURE_NEON     1 << 11
++#define CPU_FEATURE_THUMB    1 << 12
+ 
+ struct CoreInfo
+ {

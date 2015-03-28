@@ -1,0 +1,27 @@
+From d7d6af212d237e5cdb07e6b7b95939c1aed41421 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 26 Mar 2015 04:47:23 +0000
+Subject: [PATCH 3/5] Vero: don't try to update the GUI so often when opening a
+ stream
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/dialogs/GUIDialogBusy.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/dialogs/GUIDialogBusy.cpp b/xbmc/dialogs/GUIDialogBusy.cpp
+index e7cfcdd..d01f8a5 100644
+--- a/xbmc/dialogs/GUIDialogBusy.cpp
++++ b/xbmc/dialogs/GUIDialogBusy.cpp
+@@ -68,7 +68,7 @@ bool CGUIDialogBusy::WaitOnEvent(CEvent &event, unsigned int displaytime /* = 10
+     if (dialog)
+     {
+       dialog->Show();
+-      while(!event.WaitMSec(1))
++      while(!event.WaitMSec(100))
+       {
+         g_windowManager.ProcessRenderLoop(false);
+         if (allowCancel && dialog->IsCanceled())
+-- 
+2.1.0
+

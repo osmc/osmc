@@ -1,0 +1,42 @@
+diff --git a/configure.ac b/configure.ac
+index 74060b1..d0df849 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -352,6 +352,37 @@ if test "$target_platform" = "raspberry_pi" ; then
+    -lvchiq_arm"
+ fi
+ 
++if test "$use_platform" = "raspberry-pi2"; then
++ if test -d "${use_firmware}/opt/vc/include"; then
++    :
++  else
++    AC_MSG_ERROR([Raspberry Pi firmware not found])
++  fi
++  use_neon=yes
++  use_arch="arm"
++  use_cpu="cortex-a7"
++  use_hardcoded_tables="yes"
++  ARCH="arm"
++  platform_os="linux"
++  cross_compiling="yes"
++  use_host="arm-linux-gnueabihf"
++  deps_dir="$use_host"
++  platform_cflags="-pipe -fPIC -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard \
++    -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated \
++    -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
++    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
++    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
++  platform_cxxflags="-pipe -fPIC -mcpu=cortex-a7 -mfpu=neon-vfpv4 \
++    -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
++    -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
++    -isystem${use_firmware}/opt/vc/include \
++    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
++    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
++  platform_ldflags="-L${use_firmware}/opt/vc/lib -lEGL -lGLESv2 -lbcm_host -lvcos -lpthread \
++    -lvchiq_arm"
++fi
++
++
+ XBMC_SETUP_ARCH_DEFINES()
+ 
+ platform_cflags+=" $passed_cflags"

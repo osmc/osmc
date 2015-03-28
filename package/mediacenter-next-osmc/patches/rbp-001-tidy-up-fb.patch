@@ -1,0 +1,33 @@
+diff --git a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
+index 10a0409..7e33ab0 100755
+--- a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
+@@ -29,6 +29,7 @@
+ #include "utils/StringUtils.h"
+ #include "settings/Settings.h"
+ #include <cassert>
++#include <stdlib.h>
+ 
+ #ifndef __VIDEOCORE4__
+ #define __VIDEOCORE4__
+@@ -105,6 +106,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
+ 
+   m_DllBcmHost = new DllBcmHost;
+   m_DllBcmHost->Load();
++    CLog::Log(LOGDEBUG, "Unbind vtcon0 to save resources");
++    FILE *fp;
++    fp = fopen("/sys/class/vtconsole/vtcon1/bind", "w");
++    if (fp != NULL)
++    {
++        fprintf(fp, "0");
++        fclose(fp);
++        CLog::Log(LOGDEBUG, "Reducing framebuffer resolution with fbset to save resources");
++        system("/bin/fbset -xres 1 -yres 1 -vxres 1 -vyres 1");
++    }
++    else
++    {
++        CLog::Log(LOGDEBUG, "Could not open vtcon1 for writing. You probably ran this independent of the watchdog!");
++    }
+ #endif
+ }
+ 

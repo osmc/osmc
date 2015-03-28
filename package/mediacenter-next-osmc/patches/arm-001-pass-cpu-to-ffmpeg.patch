@@ -1,0 +1,21 @@
+diff --git a/configure.ac b/configure.ac
+index fb3c448..fa22f01 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -1775,14 +1775,14 @@ if test "${USE_STATIC_FFMPEG}" = "1"; then
+       if test "$with_ffmpeg" = "yes" || test "$FFMPEG_FOUND" = "false"; then
+         # ffmpeg not found with pkg-config, lets install it
+         AC_MSG_NOTICE("Installing FFmpeg")
+-        CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh ${FFMPEG_OPTS}
++        CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh --cpu=$use_cpu ${FFMPEG_OPTS}
+         export PKG_CONFIG_PATH="${ffmpeg_build}/ffmpeg-install/lib/pkgconfig:$PKG_CONFIG_PATH"
+       fi
+ 
+     elif test "$with_ffmpeg" = "force"; then
+       # always build our ffmpeg
+       AC_MSG_NOTICE("FFmpeg installation forced by user - installing our version")
+-      CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh ${FFMPEG_OPTS}
++      CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ${ffmpeg_build}/autobuild.sh --cpu=$use_cpu ${FFMPEG_OPTS}
+       export PKG_CONFIG_PATH="${ffmpeg_build}/ffmpeg-install/lib/pkgconfig:$PKG_CONFIG_PATH"
+ 
+     elif test "$with_ffmpeg" != "no"; then

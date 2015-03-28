@@ -1,0 +1,28 @@
+diff --git a/xbmc/linux/LinuxTimezone.cpp b/xbmc/linux/LinuxTimezone.cpp
+index b4ffd13..236d15f 100644
+--- a/xbmc/linux/LinuxTimezone.cpp
++++ b/xbmc/linux/LinuxTimezone.cpp
+@@ -212,6 +212,23 @@ void CLinuxTimezone::SetTimezone(std::string timezoneName)
+     sprintf(env_var, "TZ=:%s", timezoneName.c_str());
+     putenv(env_var);
+     tzset();
++    if (timezoneName.empty())
++	return;
++    /* Keep /etc/timezone in sync */
++    FILE *fp = fopen("/tmp/timezone", "w");
++    if (fp)
++    {
++		fprintf(fp, "%s\n", timezoneName.c_str());
++		fclose(fp);
++		int res = system("/usr/bin/sudo /bin/mv /tmp/timezone /etc/timezone"); /* We need this to update a root owned file */
++		if (res == 0)
++		{
++		  char *command;
++		  asprintf(&command, "%s%s%s", "/usr/bin/sudo /bin/cp /usr/share/zoneinfo/", timezoneName.c_str(), " /etc/localtime.dpkg-new");
++		  system(command);
++		  system("/usr/bin/sudo /bin/mv /etc/localtime.dpkg-new /etc/localtime");
++		}
++    }
+   }
+ }
+ 
