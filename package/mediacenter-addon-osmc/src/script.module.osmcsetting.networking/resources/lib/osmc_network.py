@@ -7,18 +7,21 @@ import sys
 import os
 import os.path
 import requests
+import systemd
 
 WIRELESS_AGENT = '/usr/bin/preseed-agent'
 
 ETHERNET_PATH = '/net/connman/service/ethernet'
 WIFI_PATH = '/net/connman/service/wifi'
 
-# this is wher we read NFS network info from this is the current running config
+# this is where we read NFS network info from this is the current running config
 RUNNING_NETWORK_DETAILS_FILE = '/proc/cmdline'
 # but we want to update here - this gets copied to /proc/ as part og boot
 UPDATE_NETWORK_DETAILS_FILE = '/boot/cmdline'
 PREESEED_TEMP_LOCATION = '/tmp/preseed.tmp'
 PREESEED_LOCATION = '/boot/preseed.cfg'
+
+WAIT_FOR_NETWORK_SERVICE = 'connman-wait-for-network.service'
 
 manager = connman.get_manager_interface()
 
@@ -281,6 +284,7 @@ def wifi_connect(path, password=None):
         os.remove('/tmp/key')
     return connected
 
+
 def wifi_disconnect(path):
     service = connman.get_service_interface(path)
     try:
@@ -297,6 +301,7 @@ def wifi_remove(path):
     except dbus.DBusException, e:
         print ('DBusException removing')
         connected = False
+
 
 def get_connected_wifi():
     for ssid, value in get_wifi_networks().iteritems():
@@ -325,6 +330,7 @@ def check_MS_NCSI_response():
     if response.status_code == 200 and response.text == 'Microsoft NCSI':
         return True
     return False
+
 
 def update_preseed_file(settings_dict):
     if os.path.isfile(PREESEED_LOCATION):
@@ -419,3 +425,14 @@ def parse_preseed():
             if 'dns2' in preseed_info:
                 network_settings['DNS_1'] = preseed_info['dns1']
     return network_settings
+
+
+def is_connman_wait_for_network_enabled():
+    return systemd.is_service_enabled(WAIT_FOR_NETWORK_SERVICE);
+
+
+def toggle_wait_for_network(state):
+    if state:
+        systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'enable')
+    else:
+        systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'disable')

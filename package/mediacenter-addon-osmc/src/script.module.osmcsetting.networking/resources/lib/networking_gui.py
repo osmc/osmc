@@ -54,7 +54,7 @@ gui_ids = { \
     10118: 'Wired - Apply',
     10119: 'Wired - Reset',
     10120: 'Wired - Enable Adapter',
-    10220: 'Wireless - Scan for connections',
+    10121: 'Wired - Toggle wait for network service',
     10211: 'Wireless - Automatically configure the network toggle',
     10212: 'Wireless - IP Address',
     910212: 'Wireless - IP Address VALUE',
@@ -69,6 +69,8 @@ gui_ids = { \
     10217: 'Wireless - Enable Adapter',
     10218: 'Wireless - Apply',
     10219: 'Wireless - Reset',
+    10220: 'Wireless - Scan for connections',
+    10221: 'Wireless - Toggle wait for network service',
     10300: 'Bluetooth - Refresh',
     10301: 'Bluetooth - Toggle Bluetooth Adapter',
     10303: 'Bluetooth - Toggle Discovery',
@@ -121,6 +123,8 @@ WIRED_RESET_BUTTON = 10119
 
 WIRED_DHCP_MANUAL_BUTTON = 10111
 
+WIRED_WAIT_FOR_NETWORK = 10121
+
 ALL_WIRELESS_CONTROLS = [5000, 910212, 910213, 910214, 910215, 910216, 10211, 10212, 10213, 10214, 10215, 10216,
                          10218, 10219, 10220]
 
@@ -141,6 +145,8 @@ WIRELESS_RESET_BUTTON = 10219
 WIRELESS_DHCP_MANUAL_BUTTON = 10211
 
 WIRELESS_NETWORKS = 5000
+
+WIRELESS_WAIT_FOR_NETWORK = 10221
 
 password = None
 
@@ -298,10 +304,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.handle_bluetooth_selection(controlID)
             self.populate_bluetooth_panel()
 
-        elif controlID in ALL_WIRED_CONTROLS + [WIRED_ADAPTER_TOGGLE]:
+        elif controlID in ALL_WIRED_CONTROLS + [WIRED_ADAPTER_TOGGLE, WIRED_WAIT_FOR_NETWORK]:
             self.handle_wired_selection(controlID)
 
-        elif controlID in ALL_WIRELESS_CONTROLS + [WIRELESS_ADAPTER_TOGGLE]:
+        elif controlID in ALL_WIRELESS_CONTROLS + [WIRELESS_ADAPTER_TOGGLE, WIRELESS_WAIT_FOR_NETWORK]:
             self.handle_wireless_selection(controlID)            
 
 
@@ -445,6 +451,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         adapterRadioButton.setSelected(osmc_network.is_ethernet_enabled())
         adapterRadioButton.setEnabled(True)
 
+        waitForNetwokRadioButton = self.getControl(WIRED_WAIT_FOR_NETWORK)
+        waitForNetwokRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
+        waitForNetwokRadioButton.setEnabled(True)
+
 
     def update_manual_DHCP_button(self, button_id, ip_values, ip_labels):
         manualDHCPButton = self.getControl(button_id)
@@ -547,6 +557,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_ethernet()
             self.populate_wired_panel()
 
+        if control_id == WIRED_WAIT_FOR_NETWORK:
+            osmc_network.toggle_wait_for_network(not osmc_network.is_connman_wait_for_network_enabled())
+            waitForNetwokRadioButton = self.getControl(WIRED_WAIT_FOR_NETWORK)
+            waitForNetwokRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
+
+
         self.update_apply_reset_button('WIRED')
 
 
@@ -625,6 +641,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         else:# Wifi not available
             self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
 
+        waitForNetwokRadioButton = self.getControl(WIRELESS_WAIT_FOR_NETWORK)
+        waitForNetwokRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
+        waitForNetwokRadioButton.setEnabled(True)
+
 
     def handle_wireless_selection(self, control_id):
         if control_id == 5000:  # wireless network
@@ -657,6 +677,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         elif control_id == WIRELESS_ADAPTER_TOGGLE:
             self.toggle_wifi()
             self.populate_wifi_panel()
+
+        elif control_id == WIRELESS_WAIT_FOR_NETWORK:
+            osmc_network.toggle_wait_for_network(not osmc_network.is_connman_wait_for_network_enabled())
+            waitForNetwokRadioButton = self.getControl(WIRELESS_WAIT_FOR_NETWORK)
+            waitForNetwokRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
 
         self.update_apply_reset_button('WIRELESS')
 

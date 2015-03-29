@@ -97,7 +97,7 @@
             <onright>101</onright>
             <onleft>101</onleft>
             <control id="10120" type="radiobutton">
-                <visible>Control.IsEnabled(10120)</visible>`
+                <visible>Control.IsEnabled(10120)</visible>
                 <description>Enable Adapter</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
                 <posx>100</posx>
@@ -123,7 +123,7 @@
                 <onright>101</onright>
             </control>
             <control id="10111" type="button">
-                <visible>Control.IsEnabled(10111)</visible>`
+                <visible>Control.IsEnabled(10111)</visible>
                 <description>Automatically configure the network toggle</description>
                 <label>Automatically configure the network toggle</label>
                 <posx>100</posx>
@@ -378,7 +378,7 @@
             </control>
             <control type="label">
                 <disabledcolor>ff000000</disabledcolor>
-		<visible>Control.IsEnabled(910116)</visible>`
+		<visible>Control.IsEnabled(910116)</visible>
                 <align>right</align>
                 <aligny>center</aligny>
                 <visible>Control.HasFocus(10116)+Control.isVisible(10116)</visible>
@@ -406,11 +406,11 @@
             </control>
             <!-- apply and reset buttons -->
             <control id="10118" type="button">
-                <visible>Control.IsEnabled(10118)</visible>`
+                <visible>Control.IsEnabled(10118)</visible>
                 <description>Apply</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
                 <posx>250</posx>
-                <posy>850</posy>
+                <posy>750</posy>
                 <width>400</width>
                 <height>66</height>
                 <align>left</align>
@@ -425,13 +425,14 @@
                 <onright>10119</onright>
                 <onup>10116</onup>
                 <onleft>101</onleft>
+                 <ondown>10121</ondown>
             </control>
             <control id="10119" type="button">
-                <visible>Control.IsEnabled(10119)</visible>`
+                <visible>Control.IsEnabled(10119)</visible>
                 <description>Reset</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
                 <posx>600</posx>
-                <posy>850</posy>
+                <posy>750</posy>
                 <width>400</width>
                 <height>66</height>
                 <align>left</align>
@@ -446,6 +447,29 @@
                 <onright>101</onright>
                 <onleft>10118</onleft>
                 <onup>10116</onup>
+                <ondown>10121</ondown>
+                </control>
+            <control id="10121" type="radiobutton">
+                <description>Wireless Enable Wait-for-network Service</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32054]</label>
+                <posx>100</posx>
+                <posy>850</posy>
+                <width>600</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_720_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <radiowidth>16</radiowidth>
+                <radioheight>16</radioheight>
+                <texturenofocus>-</texturenofocus>
+                <texturefocus>-</texturefocus>
+                <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                <onup>10118</onup>
             </control>
         </control>
         <!-- ## Wireless Panel ## -->
@@ -459,7 +483,7 @@
             <onleft>102</onleft>
             <control id="777" type="group">
                 <control id="10217" type="radiobutton">
-                    <visible>Control.IsEnabled(10217)</visible>`
+                    <visible>Control.IsEnabled(10217)</visible>
                     <description>Enable Adapter</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
                     <posx>100</posx>
@@ -485,7 +509,7 @@
                     <onleft>102</onleft>
                 </control>
                 <control id="10211" type="button">
-                    <visible>Control.IsEnabled(10211)</visible>`
+                    <visible>Control.IsEnabled(10211)</visible>
                     <description>Automatically configure the network toggle</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
                     <posx>100</posx>
@@ -765,11 +789,11 @@
             </control>
                 <!-- apply and reset buttons -->
                 <control id="10218" type="button">
-                    <visible>Control.IsEnabled(10218)</visible>`
+                    <visible>Control.IsEnabled(10218)</visible>
                     <description>Apply</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
                     <posx>250</posx>
-                    <posy>850</posy>
+                    <posy>750</posy>
                     <width>400</width>
                     <height>66</height>
                     <align>left</align>
@@ -783,13 +807,14 @@
                     <onright>10219</onright>
                     <onup>10216</onup>
                     <onleft>102</onleft>
+                    <ondown>10221</ondown>
                 </control>
                 <control id="10219" type="button">
-                    <visible>Control.IsEnabled(10219)</visible>`
+                    <visible>Control.IsEnabled(10219)</visible>
                     <description>Reset</description>
                     <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
                     <posx>600</posx>
-                    <posy>850</posy>
+                    <posy>750</posy>
                     <width>400</width>
                     <height>66</height>
                     <align>left</align>
@@ -803,11 +828,34 @@
                     <onleft>10218</onleft>
                     <onup>10216</onup>
                     <onright>10220</onright>
+                    <ondown>10221</ondown>
+                </control>
+                <control id="10121" type="radiobutton">
+                    <description>Wireless Enable Wait-for-network Service</description>
+                    <label>$ADDON[script.module.osmcsetting.networking 32054]</label>
+                    <posx>100</posx>
+                    <posy>850</posy>
+                    <width>600</width>
+                    <height>66</height>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <font>osmc_addon_720_OLD_Font36</font>
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffffffff</focusedcolor>
+                    <radiowidth>16</radiowidth>
+                    <radioheight>16</radioheight>
+                    <texturenofocus>-</texturenofocus>
+                    <texturefocus>-</texturefocus>
+                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                    <onup>10218</onup>
                 </control>
             </control>
             <!-- wifi scan button -->
             <control id="10220" type="button">
-                <visible>Control.IsEnabled(10220)</visible>`
+                <visible>Control.IsEnabled(10220)</visible>
                 <description>Scan for connections</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32012]</label>
                 <posx>820</posx>
@@ -838,7 +886,7 @@
             </control>
             <!-- wifi list -->
             <control id="5000" type="list">
-                <visible>Control.IsEnabled(5000)</visible>`
+                <visible>Control.IsEnabled(5000)</visible>
                 <description>WIFI list</description>
                 <posx>820</posx>
                 <posy>250</posy>
@@ -907,7 +955,7 @@
             <onleft>103</onleft>
             <onright>103</onright>
             <control id="10301" type="radiobutton">
-                <visible>Control.IsEnabled(10301)</visible>`
+                <visible>Control.IsEnabled(10301)</visible>
                 <description>Enable Adapter</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32015]</label>
                 <posx>100</posx>
@@ -932,7 +980,7 @@
                 <onleft>103</onleft>
             </control>
             <control id="10300" type="button">
-                <visible>Control.IsEnabled(10300)</visible>`
+                <visible>Control.IsEnabled(10300)</visible>
                 <description>Refresh</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32014]</label>
                 <posx>100</posx>
@@ -953,7 +1001,7 @@
                 <onleft>103</onleft>
             </control>
             <control id="10303" type="radiobutton">
-                <visible>Control.IsEnabled(10303)</visible>`
+                <visible>Control.IsEnabled(10303)</visible>
                 <description>Start/Stop Discovery</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32017]</label>
                 <posx>820</posx>
@@ -999,7 +1047,7 @@
                 <aligny>top</aligny>
             </control>
             <control id="6000" type="list">
-                <visible>Control.IsEnabled(6000)</visible>`
+                <visible>Control.IsEnabled(6000)</visible>
                 <description>Bluetooth paired list</description>
                 <posx>100</posx>
                 <posy>300</posy>
@@ -1079,7 +1127,7 @@
                 <aligny>top</aligny>
             </control>
             <control id="7000" type="list">
-                <visible>Control.IsEnabled(7000)</visible>`
+                <visible>Control.IsEnabled(7000)</visible>
                 <description>Bluetooth available list</description>
                 <posx>820</posx>
                 <posy>300</posy>
