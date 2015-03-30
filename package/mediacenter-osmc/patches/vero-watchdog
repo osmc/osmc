@@ -30,6 +30,7 @@ while true; do
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
+	echo 0 > /sys/class/vtconsole/vtcon1/bind
 	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
