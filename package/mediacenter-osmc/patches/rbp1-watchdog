@@ -25,8 +25,8 @@ if [ ! -e /var/run/fb_resolution ]; then
 fi
 
 while true; do
-    sudo umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
-    sudo mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
+	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 	setcap 'cap_net_bind_service=+ep' /usr/lib/kodi/kodi.bin
 	sudo -u osmc /usr/lib/kodi/kodi.bin --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
