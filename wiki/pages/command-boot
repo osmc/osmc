@@ -1,0 +1,15 @@
+Booting to the command line
+<p>
+To disable Kodi from starting at boot run the following command and launch a shell on the screen at bootup, run the following commands:
+<pre>sudo systemctl disable mediacenter</pre>
+<pre>sudo systemctl enable getty@tty</pre>
+</p>
+<p>
+After a reboot, these changes will be active.
+</p>
+<h2>Reverting these changes</h2>
+<p>
+To revert these changes, run the following commands:
+<pre>sudo systemctl disable mediacenter</pre>
+<pre>sudo systemctl enable getty@tty</pre>
+</p>
