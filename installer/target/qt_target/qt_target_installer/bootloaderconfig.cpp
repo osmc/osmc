@@ -51,7 +51,12 @@ void BootloaderConfig::configureEnvironment()
         else
         {
             /* NFS install */
-            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet ";
+            cmdlineStringList << "root=/dev/nfs nfsroot=" + this->device->getRoot();
+            if (network->isDefined() == false)
+                cmdlineStringList << " ip=dhcp";
+            else
+                cmdlineStringList << " ip=" + network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off:" + network->getDNS1() + ":" + network->getDNS2();
+            cmdlineStringList << " rootwait quiet ";
         }
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
@@ -74,19 +79,17 @@ void BootloaderConfig::configureEnvironment()
     {
         QFile uEnvFile("/mnt/boot/uEnv.txt");
         QStringList uEnvStringList;
-        uEnvStringList << "mmcargs=setenv bootargs console=tty1 root=" + this->device->getRoot();
-        if (! device->getRoo)
         if (! device->getRoot().contains(":/"))
             uEnvStringList << "mmcargs=setenv bootargs console=tty1 root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 loglevel=2 ";
         else
         {
             /* NFS install */
-            uEnvStringList << "mmcargs=setenv bootargs console=tty1 root=/dev/nfs nfsroot=" + this->device->getRoot() + " ip=" + ((network->isDefined() == false) ? "dhcp" : network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off") + ":" + network->getDNS1() + ":" + network->getDNS2() + " rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 loglevel=2 ";
+            uEnvStringList << "mmcargs=setenv bootargs console=tty1 root=/dev/nfs nfsroot=" + this->device->getRoot();
             if (network->isDefined() == false)
-                uEnvStringList << "dhcp"
+                uEnvStringList << " ip=dhcp";
             else
-                uEnvStringList << network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off" + ":" + network->getDNS1() + ":" + network->getDNS2();
-            uEnvStringList << "rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 loglevel=2 ";"
+                uEnvStringList << " ip=" + network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off:" + network->getDNS1() + ":" + network->getDNS2();
+            uEnvStringList << " rootwait quiet video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32 dmfc=3 consoleblank=0 loglevel=2 ";
         }
         uEnvStringList << "osmcdev=vero";
         utils->writeToFile(uEnvFile, uEnvStringList, false);
