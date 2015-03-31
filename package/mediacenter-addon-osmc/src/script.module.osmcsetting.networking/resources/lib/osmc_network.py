@@ -16,8 +16,8 @@ WIFI_PATH = '/net/connman/service/wifi'
 
 # this is where we read NFS network info from this is the current running config
 RUNNING_NETWORK_DETAILS_FILE = '/proc/cmdline'
-# but we want to update here - this gets copied to /proc/ as part og boot
-UPDATE_NETWORK_DETAILS_FILE = '/boot/cmdline'
+# but we want to update here - this gets copied to /proc/ as part of boot
+UPDATE_NETWORK_DETAILS_FILE = '/boot/cmdline.txt'
 PREESEED_TEMP_LOCATION = '/tmp/preseed.tmp'
 PREESEED_LOCATION = '/boot/preseed.cfg'
 
@@ -132,7 +132,7 @@ def apply_network_changes(settings_dict):
             ip_value = 'dhcp'
         if settings_dict['Method'] == 'nfs_manual':
             ip_value = create_cmdline_nfs_manual_string(settings_dict)
-            update_cmdline_file(UPDATE_NETWORK_DETAILS_FILE, 'ip', ip_value)
+        update_cmdline_file(UPDATE_NETWORK_DETAILS_FILE, 'ip', ip_value)
     update_preseed_file(settings_dict)
 
 
@@ -151,9 +151,10 @@ def update_cmdline_file(file_path, key, value):
         else:
             cmdline_values.extend([cmdline_value])
     updated_cmdline = ' '.join(cmdline_values)  # join the list with a space
-    cmdline_file = open(file_path, 'w')
+    cmdline_file = open('/tmp/cmdline.txt', 'w')
     cmdline_file.write(updated_cmdline)
     cmdline_file.close()
+    subprocess.call(['sudo', 'mv', '/tmp/cmdline.txt', file_path])
 
 
 '''
