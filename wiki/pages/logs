@@ -34,3 +34,8 @@ To simplify the process further, OSMC makes it possible to upload several differ
 <p>
 To ensure your logs are as verbose as possible, you should enable Debugging in Kodi and afterwards replicate your problem. To do this go to Settings -> System -> Debugging and select 'Enable Debugging'. This will ensure that Kodi writes to the log in a more detailed fashion and hopefully provide enough information to diagnose your problem. 
 </p>
+<h2>How to check errors in system log</h2>
+<p>
+Run `sudo journalctl --priority 2..3`
+If you want to see the full log just run `sudo journalctl --priority 2..3`
+</p>
