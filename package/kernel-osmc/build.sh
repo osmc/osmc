@@ -52,6 +52,8 @@ then
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_source --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel source package failed" && exit 1; fi
+	# Make modules directory
+	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
 	if [ "$1" == "vero" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc; fi
 	if [ "$1" == "rbp1" ]
@@ -61,6 +63,12 @@ then
 	fi
 	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+	# Build RTL8812AU module
+	pushd drivers/net/wireless/rtl8812au
+	$BUILD ARCH=arm
+	popd
+	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
+	cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
 	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		overlays="hifiberry-dac-overlay
