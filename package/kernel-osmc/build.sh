@@ -85,12 +85,6 @@ then
 		popd
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 		popd
-		# Disassemble kernel package to add overlays
-		mv src/${1}-image*.deb .
-		dpkg -x ${1}-image*.deb files-image/
-		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
-		rm ${1}-image*.deb
-		dpkg -b files-image ${1}-image-osmc.deb
 	fi
 	if [ "$1" == "vero" ]
 	then
@@ -98,13 +92,13 @@ then
 		mkdir -p ../../files-image/boot/
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		popd
-		# Disassemble kernel package to add device tree
-		mv src/${1}-image*.deb .
-		dpkg -x ${1}-image*.deb files-image/
-		dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
-		rm ${1}-image*.deb
-		dpkg -b files-image ${1}-image-osmc.deb
 	fi
+	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
+	mv src/${1}-image*.deb .
+	dpkg -x ${1}-image*.deb files-image/
+	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
+	rm ${1}-image*.deb
+	dpkg -b files-image ${1}-image-osmc.deb
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
