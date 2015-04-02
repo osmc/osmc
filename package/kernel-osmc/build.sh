@@ -38,7 +38,11 @@ then
 	priority := High" >/etc/kernel-pkg.conf
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+	then
+		rm -rf drivers/net/wireless/rtlwifi
+		install_patch "../../patches" "rbp"
+	fi
 	install_patch "../../patches" "${1}"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
