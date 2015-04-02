@@ -41,8 +41,6 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		rm -rf drivers/net/wireless/rtlwifi
-		sed '-Werror-implicit-function-declaration/d' -i Makefile
-		sed -e s/-Werror=implicit-int// -i Makefile
 		install_patch "../../patches" "rbp"
 	fi
 	install_patch "../../patches" "${1}"
