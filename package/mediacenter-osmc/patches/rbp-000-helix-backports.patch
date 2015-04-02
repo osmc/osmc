@@ -1,7 +1,7 @@
-From 202fc1876e0435fbdaf9081c74a0ae6ac8bc3d19 Mon Sep 17 00:00:00 2001
+From 632fd2b97fbfa016fe229cf44e6d2a42e8d91edc Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Apr 2014 18:19:32 +0100
-Subject: [PATCH 01/69] [rbp/omxplayer] When opening a stream don't try to
+Subject: [PATCH 01/75] [rbp/omxplayer] When opening a stream don't try to
  update gui so often
 
 ---
@@ -25,10 +25,10 @@ index e7cfcdd..20b99ad 100644
          g_windowManager.ProcessRenderLoop(false);
          if (allowCancel && dialog->IsCanceled())
 
-From e3ea0709b402c449934409c50eee6ae39a54f800 Mon Sep 17 00:00:00 2001
+From 3f4ea17c35b2534740ab625358dc9c3ae1d9059d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 29 Apr 2014 15:23:22 +0100
-Subject: [PATCH 02/69] [ffmpeg] Speed up wtv index creation
+Subject: [PATCH 02/75] [ffmpeg] Speed up wtv index creation
 
 The index creation is O(N^2) with number of entries (typically thousands).
 On a Pi this can take more than 60 seconds to execute for a recording of a few hours.
@@ -114,10 +114,10 @@ index 0000000..4ac5636
 +             }
 +         }
 
-From 846371a4aae5d5bd4ddf6542fcce4e4333a5f7f3 Mon Sep 17 00:00:00 2001
+From a7d6d41cba0dedb0e3afb819273a995e4706e0aa Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 2 Aug 2014 17:48:04 +0100
-Subject: [PATCH 03/69] [omx] Report decoded image name
+Subject: [PATCH 03/75] [omx] Report decoded image name
 
 ---
  xbmc/cores/omxplayer/OMXImage.cpp | 1 +
@@ -136,10 +136,10 @@ index aa413b9..22ec3f0 100644
    else
    {
 
-From 29ec0cc66854ace13bbf9060af5ba4c298792c01 Mon Sep 17 00:00:00 2001
+From 339d2a6c448685ec177367b4c20bbf2bacfcbf6a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 8 Mar 2014 15:36:06 +0000
-Subject: [PATCH 04/69] [hifiberry] Hack: force it to be recognised as IEC958
+Subject: [PATCH 04/75] [hifiberry] Hack: force it to be recognised as IEC958
  capable to enable passthrough options
 
 ---
@@ -162,10 +162,10 @@ index df50940..2d853d6 100644
          info.m_displayName.substr(info.m_displayName.size()-5) == " HDMI")
      {
 
-From eaec9ca4d20bee85b8a204bc82c8f9a2ca68e24d Mon Sep 17 00:00:00 2001
+From 9f045eb959a0cc511c83fb527bcbef0507a64964 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 11 Dec 2013 17:21:54 +0000
-Subject: [PATCH 05/69] Move the reference-counting of Begin and End calls from
+Subject: [PATCH 05/75] Move the reference-counting of Begin and End calls from
  DX and GL source files into GUIFontTTF.cpp.
 
 ---
@@ -553,10 +553,10 @@ index c0bb53a..735fb3a 100644
  protected:
    virtual CBaseTexture* ReallocTexture(unsigned int& newHeight);
 
-From 8d2767e9572569db014601db01a57d10d129ebd3 Mon Sep 17 00:00:00 2001
+From ad4929367028c6111ce1117070fcb99f3cce9aac Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 11 Dec 2013 18:47:54 +0000
-Subject: [PATCH 06/69] Convert CGUIFontTTFBase::m_vertex to be managed as a
+Subject: [PATCH 06/75] Convert CGUIFontTTFBase::m_vertex to be managed as a
  std::vector.
 
 Also retired CGUIFontTTFBase::m_vertex_count and
@@ -736,10 +736,10 @@ index 97853fd..b76c6a5 100644
      *vertices++ = m_vertex[i];
      *vertices++ = m_vertex[i+1];
 
-From 5aedd0ba83809881e08dd1f2831e6679b9667568 Mon Sep 17 00:00:00 2001
+From 14b9fe8b9a25ec2f6c016bc68d00d33a775ff420 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Mon, 16 Dec 2013 18:58:12 +0000
-Subject: [PATCH 07/69] CGUIFontTTFBase::RenderCharacter can now append to
+Subject: [PATCH 07/75] CGUIFontTTFBase::RenderCharacter can now append to
  arbitrary vectors of vertices rather than only CGUIFontTTFBase::m_vertex
 
 ---
@@ -812,10 +812,10 @@ index 5675725..a5d44f4 100644
  
    virtual CBaseTexture* ReallocTexture(unsigned int& newHeight) = 0;
 
-From fbf66fb6a0ab79933d1f7f512caa179c09b37502 Mon Sep 17 00:00:00 2001
+From d8c252f045dee39e64df00abc4d54a4b5e7b9fcf Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 17:18:38 +0000
-Subject: [PATCH 08/69] Add a cache of font glyph bounding box vertices.
+Subject: [PATCH 08/75] Add a cache of font glyph bounding box vertices.
 
 This is implemented as a template because ultimately we will key on different
 parameters and store values of different types, depending upon whether we
@@ -823,8 +823,8 @@ have a GLES or non-GLES backend, and for GLES, whether or not the currently
 applicable transformation matrices permit the use of hardware clipping.
 ---
  Kodi.xcodeproj/project.pbxproj             |  10 ++
- project/VS2010Express/XBMC.vcxproj         |   4 +-
- project/VS2010Express/XBMC.vcxproj.filters |   8 +-
+ project/VS2010Express/XBMC.vcxproj         |   2 +
+ project/VS2010Express/XBMC.vcxproj.filters |   6 +
  xbmc/guilib/GUIFontCache.cpp               | 105 ++++++++++++++
  xbmc/guilib/GUIFontCache.h                 | 217 +++++++++++++++++++++++++++++
  xbmc/guilib/GUIFontTTF.cpp                 | 181 +++++++++++++-----------
@@ -833,12 +833,12 @@ applicable transformation matrices permit the use of hardware clipping.
  xbmc/guilib/GraphicContext.h               |   1 +
  xbmc/guilib/Makefile.in                    |   1 +
  xbmc/guilib/TransformMatrix.h              |  11 ++
- 11 files changed, 458 insertions(+), 86 deletions(-)
+ 11 files changed, 456 insertions(+), 84 deletions(-)
  create mode 100644 xbmc/guilib/GUIFontCache.cpp
  create mode 100644 xbmc/guilib/GUIFontCache.h
 
 diff --git a/Kodi.xcodeproj/project.pbxproj b/Kodi.xcodeproj/project.pbxproj
-index 6dd3cf2..1f04a0b 100644
+index a9ecd08..6d42c1c 100644
 --- a/Kodi.xcodeproj/project.pbxproj
 +++ b/Kodi.xcodeproj/project.pbxproj
 @@ -168,6 +168,9 @@
@@ -851,7 +851,7 @@ index 6dd3cf2..1f04a0b 100644
  		32C631281423A90F00F18420 /* JpegIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32C631261423A90F00F18420 /* JpegIO.cpp */; };
  		36A9443D15821E2800727135 /* DatabaseUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A9443B15821E2800727135 /* DatabaseUtils.cpp */; };
  		36A9444115821E7C00727135 /* SortUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A9443F15821E7C00727135 /* SortUtils.cpp */; };
-@@ -4018,6 +4021,8 @@
+@@ -4021,6 +4024,8 @@
  		1DAFDB7B16DFDCA7007F8C68 /* PeripheralBusCEC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeripheralBusCEC.h; sourceTree = "<group>"; };
  		1DE0443315828F4B005DDB4D /* Exception.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Exception.cpp; path = commons/Exception.cpp; sourceTree = "<group>"; };
  		1DE0443415828F4B005DDB4D /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Exception.h; path = commons/Exception.h; sourceTree = "<group>"; };
@@ -860,7 +860,7 @@ index 6dd3cf2..1f04a0b 100644
  		32C631261423A90F00F18420 /* JpegIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JpegIO.cpp; sourceTree = "<group>"; };
  		32C631271423A90F00F18420 /* JpegIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JpegIO.h; sourceTree = "<group>"; };
  		36A9443B15821E2800727135 /* DatabaseUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseUtils.cpp; sourceTree = "<group>"; };
-@@ -6532,6 +6537,8 @@
+@@ -6537,6 +6542,8 @@
  				18B7C7101294222D009E7A26 /* GUIFixedListContainer.h */,
  				18B7C76B1294222E009E7A26 /* GUIFont.cpp */,
  				18B7C7111294222D009E7A26 /* GUIFont.h */,
@@ -869,7 +869,7 @@ index 6dd3cf2..1f04a0b 100644
  				18B7C76C1294222E009E7A26 /* GUIFontManager.cpp */,
  				18B7C7121294222D009E7A26 /* GUIFontManager.h */,
  				18B7C76D1294222E009E7A26 /* GUIFontTTF.cpp */,
-@@ -11038,6 +11045,7 @@
+@@ -11045,6 +11052,7 @@
  				7C5608C70F1754930056433A /* ExternalPlayer.cpp in Sources */,
  				F584E12E0F257C5100DB26A5 /* HTTPDirectory.cpp in Sources */,
  				F54C51D20F1E783200D46E3C /* GUIDialogKaraokeSongSelector.cpp in Sources */,
@@ -877,7 +877,7 @@ index 6dd3cf2..1f04a0b 100644
  				F54C51D50F1E784800D46E3C /* karaokelyricscdg.cpp in Sources */,
  				F54C51D80F1E785700D46E3C /* karaokelyrics.cpp in Sources */,
  				F54C51E50F1E787700D46E3C /* karaokelyricstextkar.cpp in Sources */,
-@@ -12712,6 +12720,7 @@
+@@ -12721,6 +12729,7 @@
  				DFF0F45B17528350002DA3A4 /* Control.cpp in Sources */,
  				DFF0F45C17528350002DA3A4 /* Dialog.cpp in Sources */,
  				DFF0F45D17528350002DA3A4 /* File.cpp in Sources */,
@@ -885,7 +885,7 @@ index 6dd3cf2..1f04a0b 100644
  				DFF0F45E17528350002DA3A4 /* InfoTagMusic.cpp in Sources */,
  				DFF0F45F17528350002DA3A4 /* InfoTagVideo.cpp in Sources */,
  				DFF0F46017528350002DA3A4 /* Keyboard.cpp in Sources */,
-@@ -13507,6 +13516,7 @@
+@@ -13517,6 +13526,7 @@
  				E499131D174E5DAD00741B6D /* GUIVisualisationControl.cpp in Sources */,
  				E499131E174E5DAD00741B6D /* GUIWindow.cpp in Sources */,
  				E499131F174E5DAD00741B6D /* GUIWindowManager.cpp in Sources */,
@@ -894,10 +894,10 @@ index 6dd3cf2..1f04a0b 100644
  				E4991321174E5DAD00741B6D /* imagefactory.cpp in Sources */,
  				E4991322174E5DAD00741B6D /* IWindowManagerCallback.cpp in Sources */,
 diff --git a/project/VS2010Express/XBMC.vcxproj b/project/VS2010Express/XBMC.vcxproj
-index dd93d9a..2665ba3 100644
+index 5dd6967..86b983c 100644
 --- a/project/VS2010Express/XBMC.vcxproj
 +++ b/project/VS2010Express/XBMC.vcxproj
-@@ -426,6 +426,7 @@
+@@ -427,6 +427,7 @@
      <ClCompile Include="..\..\xbmc\guilib\GUIFadeLabelControl.cpp" />
      <ClCompile Include="..\..\xbmc\guilib\GUIFixedListContainer.cpp" />
      <ClCompile Include="..\..\xbmc\guilib\GUIFont.cpp" />
@@ -905,7 +905,7 @@ index dd93d9a..2665ba3 100644
      <ClCompile Include="..\..\xbmc\guilib\GUIFontManager.cpp" />
      <ClCompile Include="..\..\xbmc\guilib\GUIFontTTF.cpp" />
      <ClCompile Include="..\..\xbmc\guilib\GUIFontTTFDX.cpp" />
-@@ -1752,6 +1753,7 @@
+@@ -1754,6 +1755,7 @@
      <ClInclude Include="..\..\xbmc\guilib\GUIFadeLabelControl.h" />
      <ClInclude Include="..\..\xbmc\guilib\GUIFixedListContainer.h" />
      <ClInclude Include="..\..\xbmc\guilib\GUIFont.h" />
@@ -913,15 +913,8 @@ index dd93d9a..2665ba3 100644
      <ClInclude Include="..\..\xbmc\guilib\GUIFontManager.h" />
      <ClInclude Include="..\..\xbmc\guilib\GUIFontTTF.h" />
      <ClInclude Include="..\..\xbmc\guilib\GUIFontTTFDX.h" />
-@@ -2554,4 +2556,4 @@
-     </VisualStudio>
-   </ProjectExtensions>
-   <Import Project="$(SolutionDir)\$(ProjectFileName).targets.user" Condition="Exists('$(SolutionDir)\$(ProjectFileName).targets.user')" />
--</Project>
-\ No newline at end of file
-+</Project>
 diff --git a/project/VS2010Express/XBMC.vcxproj.filters b/project/VS2010Express/XBMC.vcxproj.filters
-index d8cc27f..e3b7242 100644
+index 58d782a..3f937de 100644
 --- a/project/VS2010Express/XBMC.vcxproj.filters
 +++ b/project/VS2010Express/XBMC.vcxproj.filters
 @@ -994,6 +994,9 @@
@@ -934,7 +927,7 @@ index d8cc27f..e3b7242 100644
      <ClCompile Include="..\..\xbmc\guilib\GUIFontManager.cpp">
        <Filter>guilib</Filter>
      </ClCompile>
-@@ -3897,6 +3900,9 @@
+@@ -3900,6 +3903,9 @@
      <ClInclude Include="..\..\xbmc\guilib\GUIFont.h">
        <Filter>guilib</Filter>
      </ClInclude>
@@ -944,13 +937,6 @@ index d8cc27f..e3b7242 100644
      <ClInclude Include="..\..\xbmc\guilib\GUIFontManager.h">
        <Filter>guilib</Filter>
      </ClInclude>
-@@ -6079,4 +6085,4 @@
-       <Filter>interfaces\swig</Filter>
-     </None>
-   </ItemGroup>
--</Project>
-\ No newline at end of file
-+</Project>
 diff --git a/xbmc/guilib/GUIFontCache.cpp b/xbmc/guilib/GUIFontCache.cpp
 new file mode 100644
 index 0000000..2c72f9c
@@ -1589,10 +1575,10 @@ index f351c99..9036ba9 100644
 +  return !operator==(a, b);
 +}
 
-From 2fea8f2bdef2a9c4d293ce9ab72895f1d08a1085 Mon Sep 17 00:00:00 2001
+From 824d5347910e00b9e0c44deffaff4d2b6db6bca3 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 23 Jan 2014 22:24:17 +0000
-Subject: [PATCH 09/69] Lay the groundwork for hardware clipping.
+Subject: [PATCH 09/75] Lay the groundwork for hardware clipping.
 
 For glScissor() to replace CGraphicContext::ClipRect, a necessary condition
 is that no shear or rotation is introduced between the coordinate systems
@@ -1854,10 +1840,10 @@ index 98e398a..81ee49e 100644
    virtual void ResetScissors();
  
 
-From dc5cdb1cd9bd68ad4c70123ac81a1b5baa355566 Mon Sep 17 00:00:00 2001
+From b201e727e19af94c6d58528ebcd5960baafee499 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 23 Jan 2014 16:42:22 +0000
-Subject: [PATCH 10/69] Increase font cache hit rate by keying on the
+Subject: [PATCH 10/75] Increase font cache hit rate by keying on the
  fractional part of m_originX and m_originY *after* they have been through the
  graphics context's transformation matrix, plus the scale/rotation elements of
  the matrix, rather than the origin in the original frame of reference plus
@@ -2058,10 +2044,10 @@ index 3b93672..258dffa 100644
  private:
    virtual bool FirstBegin() = 0;
 
-From 235ea92960c0beb68b6e02013c1bc51fba0079bb Mon Sep 17 00:00:00 2001
+From 818067e098f2b2f0fe8c816775646eef96f3b7b9 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 8 Jan 2014 12:16:33 +0000
-Subject: [PATCH 11/69] Rewrite of scrolling text code.
+Subject: [PATCH 11/75] Rewrite of scrolling text code.
 
 No longer shuffles the string round to minimise the number of characters
 before the clipping rectangle; this doesn't save much on rendering time but
@@ -2377,10 +2363,10 @@ index 2cda726..fbc579e 100644
  private:
    void Process();
 
-From 28b2ee0164045008062336fd92af05e1dba9bf29 Mon Sep 17 00:00:00 2001
+From 92fa695abd21992829758d5978f98f81ea99a3c5 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Mon, 27 Jan 2014 23:21:10 +0000
-Subject: [PATCH 12/69] Move the application of the translation offsets into
+Subject: [PATCH 12/75] Move the application of the translation offsets into
  the GLES code.
 
 Still all pure software at this stage. Main change is in the data types at
@@ -2574,10 +2560,10 @@ index 9935ea4..18c9358 100644
    memset(newTexture->GetPixels(), 0, m_textureHeight * newTexture->GetPitch());
    if (m_texture)
 
-From 74dfaa28bb6379a0cf3e4a4dc2e40f68b7b714f7 Mon Sep 17 00:00:00 2001
+From 81abd97bf3d135acc7be29f201ea53657c7727d2 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 15:28:06 +0000
-Subject: [PATCH 13/69] Rather than applying the translation offsets to the
+Subject: [PATCH 13/75] Rather than applying the translation offsets to the
  vertices, now applies them to the model view matrix from the top of the
  matrix stack and pushes it over to OpenGL. The vertices themselves are still
  all held client-side.
@@ -2721,10 +2707,10 @@ index 81ee49e..d2f9cd1 100644
  protected:
    virtual void SetVSyncImpl(bool enable) = 0;
 
-From 28709ba5b0fbc09f0f5159a39e154c3f3eae3271 Mon Sep 17 00:00:00 2001
+From 0112e23ceb86275743bb929c50db98928a7c635b Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 29 Jan 2014 13:21:19 +0000
-Subject: [PATCH 14/69] Enable hardware clipping.
+Subject: [PATCH 14/75] Enable hardware clipping.
 
 ---
  xbmc/guilib/GUIFontTTF.cpp   | 4 ++--
@@ -2796,10 +2782,10 @@ index ea08bf4..b63e337 100644
      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, g_matrices.GetMatrix(MM_MODELVIEW));
    }
 
-From 564a1924ae6c449255356b77ca816628ef5c9945 Mon Sep 17 00:00:00 2001
+From 7a633290e3614e6ff0d073e2653e080d5e2ac8fd Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 15:32:51 +0000
-Subject: [PATCH 15/69] Move the vertex data across to a vertex buffer object
+Subject: [PATCH 15/75] Move the vertex data across to a vertex buffer object
  just prior to drawing.
 
 ---
@@ -2850,10 +2836,10 @@ index b63e337..b00055d 100644
  
    // Disable the attributes used by this shader
 
-From dff7deac153b80cd06446e620de38a0503890536 Mon Sep 17 00:00:00 2001
+From 243c446cdb97ab29e1a75b70c244ad5b741dce57 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Wed, 15 Jan 2014 16:04:04 +0000
-Subject: [PATCH 16/69] Move vertex data into an OpenGL VBO when the font cache
+Subject: [PATCH 16/75] Move vertex data into an OpenGL VBO when the font cache
  entry is populated.
 
 The font cache now stores the "name" (handle) of the VBO, rather than a vector
@@ -3126,10 +3112,10 @@ index 735fb3a..6102c90 100644
  protected:
    virtual CBaseTexture* ReallocTexture(unsigned int& newHeight);
 
-From dbe7f053a04a4efdf4b6bf81132b82bd181b2168 Mon Sep 17 00:00:00 2001
+From 2c1526c28ea480fdf884904a4e21db9ad514855b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 1 Nov 2014 22:15:13 +0000
-Subject: [PATCH 17/69] Switch from glDrawArrays() to glDrawElements().
+Subject: [PATCH 17/75] Switch from glDrawArrays() to glDrawElements().
 
 This involves setting up a static VBO containing the indexes necessary to
 convert from quads to triangles on the fly in the GPU.
@@ -3350,10 +3336,10 @@ index 2bdd4fa..68f0117 100644
  
    if (m_display != EGL_NO_DISPLAY)
 
-From fc17eaf7b3992e29c5259381ce290e42a5a45e5b Mon Sep 17 00:00:00 2001
+From 0581bdecd8c045559dcf682ea7e4bbd5a7849653 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 1 May 2014 16:28:39 +0100
-Subject: [PATCH 18/69] Improved file buffering in CArchive
+Subject: [PATCH 18/75] Improved file buffering in CArchive
 
 Even though memcpy is typically inlined by the compiler into byte/word loads
 and stores (at least for release builds), the frequency with which 1, 2 and 4
@@ -3413,10 +3399,10 @@ index 6ed0f8f..8506d95 100644
      }
      else
 
-From 2654635ceb202591c8b14fcb49c5be35da411314 Mon Sep 17 00:00:00 2001
+From 0dc98aba1e8c9bf8d63bcd12bbc18a5a6021231f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 10 Sep 2014 22:07:21 +0100
-Subject: [PATCH 19/69] [mmal] Allow mmal codec for dvd stills
+Subject: [PATCH 19/75] [mmal] Allow mmal codec for dvd stills
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 4 ++++
@@ -3438,10 +3424,10 @@ index 10648c5..bea5e4f 100644
    {
       // If dvd is an mpeg2 and hint.stills
 
-From 273b803ec86b40cdd26233b43472d66d302a2994 Mon Sep 17 00:00:00 2001
+From d46182be867dae3e4405be4558275250f87ea3c5 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 12 Aug 2014 00:31:36 +0100
-Subject: [PATCH 20/69] [omxcodec] Don't force software codec with dvds
+Subject: [PATCH 20/75] [omxcodec] Don't force software codec with dvds
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 2 ++
@@ -3462,10 +3448,10 @@ index aae59dc..12a3ed6 100644
  
    CDVDInputStream::IMenus* pMenus = dynamic_cast<CDVDInputStream::IMenus*>(m_pInputStream);
 
-From a1497039da7801db146fb753ab048f3da00d61e6 Mon Sep 17 00:00:00 2001
+From 7026b367733a3529f98c3ccb56b16adb6324d320 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Apr 2014 21:18:06 +0100
-Subject: [PATCH 21/69] [omxplayer] Don't propagate 3d flags based on supported
+Subject: [PATCH 21/75] [omxplayer] Don't propagate 3d flags based on supported
  3d modes
 
 ---
@@ -3518,10 +3504,10 @@ index ac838ce..605318c9 100644
    unsigned int iDisplayWidth  = width;
    unsigned int iDisplayHeight = height;
 
-From 74c6864c9e77a7f9301a1865e603f0000a43fcc6 Mon Sep 17 00:00:00 2001
+From 9b5da40db6647d40a2c17ab957a3058622472898 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:00:52 +0100
-Subject: [PATCH 22/69] [graphics] Don't set stereo mode based on resolution
+Subject: [PATCH 22/75] [graphics] Don't set stereo mode based on resolution
 
 The resolution change should follow stereo mode
 ---
@@ -3579,10 +3565,10 @@ index 3cb5587..fe6ebf4 100644
  
    m_iScreenWidth  = info_mod.iWidth;
 
-From 0dd8a7b3ef674c933315e5cd31e51ea5321e43f0 Mon Sep 17 00:00:00 2001
+From 47fab3f66ff687e42456d0ae5f94dd5df359285e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:01:51 +0100
-Subject: [PATCH 23/69] [graphics] Allow switching to a more suitable 3D
+Subject: [PATCH 23/75] [graphics] Allow switching to a more suitable 3D
  resolution
 
 ---
@@ -3668,10 +3654,10 @@ index 2904c1b..8d3774f 100644
    void ResetOverscan(RESOLUTION_INFO &resinfo);
    void ResetScreenParameters(RESOLUTION res);
 
-From c3ea49fd70b079825ab7f3c5a5c6a61bc2120565 Mon Sep 17 00:00:00 2001
+From d5838e37d76f6a0e7054d7e9cbb7beab41b2f63b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Apr 2014 13:38:55 +0100
-Subject: [PATCH 24/69] [3D] Support switching to 3D resolutions
+Subject: [PATCH 24/75] [3D] Support switching to 3D resolutions
 
 Include matching 3D flags (SBS/TAB) in the score of a resolution to switch to, to enable switching to 3d modes.
 Also remove the old code that treated 3D modes differently when assigning a score.
@@ -3753,10 +3739,10 @@ index 83c3adb..8076e76 100644
    return current;
  }
 
-From 2823d328d11d26109328652b6ee1caccdce66e91 Mon Sep 17 00:00:00 2001
+From e397abe59fbddcaf141d261855278cb6048e136f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 23 Apr 2014 00:05:07 +0100
-Subject: [PATCH 25/69] [graphics] Make pixel ratio for 3d modes consistent
+Subject: [PATCH 25/75] [graphics] Make pixel ratio for 3d modes consistent
 
 Note: Use the stored stereo flags from lists of resolutions.
 Use current stereo mode for current resolution.
@@ -3959,10 +3945,10 @@ index c58c28a..bf1e589 100644
  
          AddUniqueResolution(res2, resolutions);
 
-From 0b052f5363b112b05335d697ef379489cc9aaf88 Mon Sep 17 00:00:00 2001
+From 00d11452657c179a50e9754838753b4dd1e3742e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 16:45:16 +0100
-Subject: [PATCH 26/69] filesystem: Make support of browsing into archives
+Subject: [PATCH 26/75] filesystem: Make support of browsing into archives
  optional
 
 The ability to browse, scan and play content in archives can cause problems on low powered/low memory devices.
@@ -4061,10 +4047,10 @@ index 2fd8777..3b294cd 100644
    { // XBMC Smart playlist - just XML renamed to XSP
      // read the name of the playlist in
 
-From bf4d9d890c9dcfd779aadb785981dbf6dea390fc Mon Sep 17 00:00:00 2001
+From 879016a0eee81c901eb29ae2fac1ef01055cc204 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 18:58:37 +0100
-Subject: [PATCH 27/69] confluence: Remove media-overlay.jpg for when video is
+Subject: [PATCH 27/75] confluence: Remove media-overlay.jpg for when video is
  backgrounded
 
 ---
@@ -4085,10 +4071,10 @@ index 01d4ee9..64b317f 100644
  			<include>VisibleFadeEffect</include>
  		</control>
 
-From f5d8381a8c6c1056b10720c9890d298656246274 Mon Sep 17 00:00:00 2001
+From 7d1f22e56a754a0723d7245baf7505665e0bebeb Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 13:06:57 +0000
-Subject: [PATCH 28/69] [rbp] Make cachemembuffersize default depend on memory
+Subject: [PATCH 28/75] [rbp] Make cachemembuffersize default depend on memory
  size
 
 ---
@@ -4144,10 +4130,10 @@ index a1b68b5..e9cd63a 100644
    // the following setting determines the readRate of a player data
    // as multiply of the default data read rate
 
-From 4e34065084cd354f1dd152792357644595a1a5a2 Mon Sep 17 00:00:00 2001
+From 62ecc2e30e189aedac46f4be65186803bfa82f18 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 16 Jun 2014 19:06:00 +0100
-Subject: [PATCH 30/69] [experimental] Disable quiet-noise generation
+Subject: [PATCH 30/75] [experimental] Disable quiet-noise generation
 
 ---
  xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp | 2 ++
@@ -4174,10 +4160,10 @@ index b391ff3..463a89c 100644
  
  void CActiveAESink::SetSilenceTimer()
 
-From 4d74dd27acc57fcc360340480214d34cc6bc60cb Mon Sep 17 00:00:00 2001
+From 009d4c64318bcdc5e032fa0b7cee597b5a681d54 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 30 May 2014 14:58:43 +0100
-Subject: [PATCH 31/69] [settings] Experiment: Report DESKTOP resolution in
+Subject: [PATCH 31/75] [settings] Experiment: Report DESKTOP resolution in
  video settings
 
 ---
@@ -4199,10 +4185,10 @@ index 6902f83..50c5f97 100644
          StringUtils::Format("%dx%d%s", resolution->width, resolution->height,
                              ModeFlagsToString(resolution->flags, false).c_str()),
 
-From b8ab38f7ccfba3fbd92ddf14ca871fa82381f9f0 Mon Sep 17 00:00:00 2001
+From 725c75575238ea8e0de9eba52323dd9a391ac355 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 16 Aug 2014 21:01:42 +0100
-Subject: [PATCH 32/69] omxrender: Hacks to reduce GUI rendering rate when
+Subject: [PATCH 32/75] omxrender: Hacks to reduce GUI rendering rate when
  playing video
 
 ---
@@ -4274,10 +4260,10 @@ index f3c8a01..2996c29 100644
    </section>
  
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 47b7610..b60422a 100644
+index 5425322..1df2418 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2211,6 +2211,23 @@ void CApplication::Render()
+@@ -2212,6 +2212,23 @@ void CApplication::Render()
    if (m_bStop)
      return;
  
@@ -4302,10 +4288,10 @@ index 47b7610..b60422a 100644
  
    int vsync_mode = CSettings::Get().GetInt("videoscreen.vsync");
 
-From 90c19a7670d77b651bfd12e0026b970dc697c28c Mon Sep 17 00:00:00 2001
+From a284f50bd2047bc50af73aa75a44020dfa3cde42 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 9 Sep 2014 12:04:26 +0100
-Subject: [PATCH 33/69] egl: Treat unknown display aspect ratio as square pixel
+Subject: [PATCH 33/75] egl: Treat unknown display aspect ratio as square pixel
 
 ---
  xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp | 4 ++--
@@ -4334,10 +4320,10 @@ index bf1e589..a25eb86 100644
  
      SetResolutionString(m_desktopRes);
 
-From 38f18d69b3d6079d56d2a8302b53bd812789d354 Mon Sep 17 00:00:00 2001
+From 212072cd72b7b11e45fe2582a2f442edf889f55c Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Thu, 11 Sep 2014 21:30:43 +0200
-Subject: [PATCH 34/69] Disable textbox autoscrolling while on screensaver.
+Subject: [PATCH 34/75] Disable textbox autoscrolling while on screensaver.
 
 SQUASH: only if dim or black
 ---
@@ -4347,10 +4333,10 @@ SQUASH: only if dim or black
  3 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index b60422a..fc3464d 100644
+index 1df2418..80350c4 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -5885,3 +5885,10 @@ void CApplication::CloseNetworkShares()
+@@ -5894,3 +5894,10 @@ void CApplication::CloseNetworkShares()
    CSFTPSessionManager::DisconnectAllSessions();
  #endif
  }
@@ -4398,10 +4384,10 @@ index c0e2fa5..0eca360 100644
        if (m_lastRenderTime)
          m_autoScrollDelayTime += currentTime - m_lastRenderTime;
 
-From 3bdb71d868a2ac674a57c0c26caac1e483591508 Mon Sep 17 00:00:00 2001
+From 3220e1f7f63c9d9d4b50088a6f8627770658a582 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 18 Sep 2014 14:24:56 +0100
-Subject: [PATCH 35/69] [omxplayer] Only enable audio clock master when A/V
+Subject: [PATCH 35/75] [omxplayer] Only enable audio clock master when A/V
  sync method is set to audio clock
 
 ---
@@ -4432,10 +4418,10 @@ index 5475570..7c07b57 100644
        OMX_CONFIG_BOOLEANTYPE configBool;
        OMX_INIT_STRUCTURE(configBool);
 
-From 9de345d5c2aee43a3c5e2ded2bb65b89e207f094 Mon Sep 17 00:00:00 2001
+From 222992a4992f1eee0e343b072b59b7680d46162b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 19 Sep 2014 11:54:49 +0100
-Subject: [PATCH 36/69] [dvdplayer/rbp] Add pi specific option to maintain
+Subject: [PATCH 36/75] [dvdplayer/rbp] Add pi specific option to maintain
  vsync with pll adjustment
 
 New A/V sync option in settings/video/playback to do "Adjust PLL".
@@ -4634,10 +4620,10 @@ index 4fd18f3..6456657 100644
  private:
    DllBcmHost *m_DllBcmHost;
 
-From 9891f4d41bad768ccf359537117d1bcf8fad6676 Mon Sep 17 00:00:00 2001
+From 29a77a2507e861a52bec8c00547c566803610109 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 27 Sep 2014 15:32:37 +0100
-Subject: [PATCH 37/69] [dvdplayer] exerimental: don't raise priority of audio
+Subject: [PATCH 37/75] [dvdplayer] exerimental: don't raise priority of audio
  thread
 
 ---
@@ -4661,10 +4647,10 @@ index 12a3ed6..cb512ed 100644
  }
  
 
-From fc2c66f37c62952b2a772078a4ad1da3ebfb54c1 Mon Sep 17 00:00:00 2001
+From eedd135d8bb82fdd8bdc965513beb2dc3e62c66e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 28 Sep 2014 19:28:17 +0100
-Subject: [PATCH 38/69] [mmalcodec] Introduce a preroll period to buffer up
+Subject: [PATCH 38/75] [mmalcodec] Introduce a preroll period to buffer up
  frames on startup
 
 ---
@@ -4797,10 +4783,10 @@ index b4aa571..4f81bbd 100644
    MMAL_COMPONENT_T *m_dec;
    MMAL_PORT_T *m_dec_input;
 
-From eea2991a355a1c428ad24d97e62bdfc4e2e92792 Mon Sep 17 00:00:00 2001
+From 84916f93b7d3c7a740a4669c3d36f3314a773b54 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH 39/69] [audio] Add settings option to boost centre channel
+Subject: [PATCH 39/75] [audio] Add settings option to boost centre channel
  when downmixing
 
 This allows a dB volume increase to be added to centre channel.
@@ -4923,10 +4909,10 @@ index 7c07b57..ef4c3d4 100644
      // stereo upmix
      if (upmix && m_src_channels == 2 && m_dst_channels > 2)
 
-From c18fc1934020ff0b09f945cb458a472ae181e474 Mon Sep 17 00:00:00 2001
+From 138475ea18c50ffb151d83b4498065f6fd177a4c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 3 Oct 2014 18:38:07 +0100
-Subject: [PATCH 40/69] [omxcore] Skip out of flush on error
+Subject: [PATCH 40/75] [omxcore] Skip out of flush on error
 
 ---
  xbmc/linux/OMXCore.cpp | 4 ++--
@@ -4955,10 +4941,10 @@ index 4ae29ba..4caa304 100644
  
    OMX_ERRORTYPE omx_err = OMX_ErrorNone;
 
-From f94b68531877a3d393a949359164f8a4ea05a0d8 Mon Sep 17 00:00:00 2001
+From 02de40bac468886dcb16dbbfc6175a1d7167ffb3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 3 Oct 2014 18:40:06 +0100
-Subject: [PATCH 41/69] [SinkPi] Handle multichannel layout more like OMXAudio
+Subject: [PATCH 41/75] [SinkPi] Handle multichannel layout more like OMXAudio
 
 ---
  xbmc/cores/AudioEngine/Sinks/AESinkPi.cpp | 14 +++++++-------
@@ -5017,10 +5003,10 @@ index 89684e4..fd9a03d 100644
    m_format = format;
    m_sinkbuffer_sec_per_byte = 1.0 / (double)(m_format.m_frameSize * m_format.m_sampleRate);
 
-From 9fe13e7aca1ed60c5adee8102485caf4ca272861 Mon Sep 17 00:00:00 2001
+From 960a504f649cd7b044244c57baad37ed51e0254a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 15:23:51 +0000
-Subject: [PATCH 42/69] [rbp] Default extract thumbnails to false
+Subject: [PATCH 42/75] [rbp] Default extract thumbnails to false
 
 It can take 80 seconds for a single file on a Pi. It can cause crashes with out-of-memory errors.
 It genereates a lot of support issues. Best to default to disabled and let users enable it if they must
@@ -5050,10 +5036,10 @@ index 79853a8..4c2ef41 100644
  
    <section id="system">
 
-From 4b93ad73cc7de711acf461f8dbd7f0b5b35dbf0a Mon Sep 17 00:00:00 2001
+From 23830676efe433f73e747f68bebbea710bbeb88e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 11 Nov 2014 18:14:23 +0000
-Subject: [PATCH 43/69] [resamplepi] Try to report the same numbers as ffmpeg
+Subject: [PATCH 43/75] [resamplepi] Try to report the same numbers as ffmpeg
 
 ---
  .../cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp | 11 ++++++-----
@@ -5104,10 +5090,10 @@ index 84505bf..2b5bef2 100644
    CLog::Log(LOGINFO, "%s::%s = %d", CLASSNAME, __func__, ret);
    #endif
 
-From 4a3c14fbbba8ff2d0ee2bc931282d73f364c4478 Mon Sep 17 00:00:00 2001
+From dff457e218d695b32a4ad362e9cd96595e677fd4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 11 Nov 2014 20:49:30 +0000
-Subject: [PATCH 44/69] [dvdplayer] New scheme for PLL adjustment for video
+Subject: [PATCH 44/75] [dvdplayer] New scheme for PLL adjustment for video
  clock
 
 ---
@@ -5222,10 +5208,10 @@ index 02c64a0..37bf4bd 100644
    struct SInfo
    {
 
-From 418d91d761b1e7f2223197c37d495f87af058b69 Mon Sep 17 00:00:00 2001
+From 063facdddb659360288c377eb4a11aa25427ac74 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 15 Nov 2014 12:03:34 +0000
-Subject: [PATCH 45/69] [dvdplayer] Add lock for player creation
+Subject: [PATCH 45/75] [dvdplayer] Add lock for player creation
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 3 +++
@@ -5271,10 +5257,10 @@ index ef64076..7ea6ea6 100644
 +  CCriticalSection m_players_lock;
  };
 
-From 696505c903c3355189c46ea29282b44021af3895 Mon Sep 17 00:00:00 2001
+From ec8eebaab2cbc09a09f6435d51cfdf946368a2a3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 19 Nov 2014 13:29:43 +0000
-Subject: [PATCH 46/69] [dvdplayeraudio] Add advancedsetting for configuring
+Subject: [PATCH 46/75] [dvdplayeraudio] Add advancedsetting for configuring
  max pll adjustment
 
 ---
@@ -5343,10 +5329,10 @@ index ed91aba..eccc62f 100644
      float m_audioPlayCountMinimumPercent;
      bool m_dvdplayerIgnoreDTSinWAV;
 
-From 119bb0ad3127084e8683d2b0c0ae49b884996763 Mon Sep 17 00:00:00 2001
+From 7f6ceceb2f69718018c768a6bdad004b8d8cbb88 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 19 Nov 2014 17:35:44 +0000
-Subject: [PATCH 47/69] [mmalrender] Skip some log message in bypass mode
+Subject: [PATCH 47/75] [mmalrender] Skip some log message in bypass mode
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp | 9 ++++++---
@@ -5384,10 +5370,10 @@ index 03a05de..c0ff30d 100644
    // we only want to upload frames once
    if (buffer->flipindex++)
 
-From 56f421e538dd6eefb7105a184fd402e4e578292a Mon Sep 17 00:00:00 2001
+From e1b8916187049e731b79ea1550b1d2bd393f4014 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 21:24:25 +0000
-Subject: [PATCH 48/69] [mmalcodec] Avoid deinterlace for dvd menus for now
+Subject: [PATCH 48/75] [mmalcodec] Avoid deinterlace for dvd menus for now
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
@@ -5407,10 +5393,10 @@ index 6742e0e..a1f11e9 100644
           else if (deinterlace_request == VS_DEINTERLACEMODE_FORCE)
             deinterlace = true;
 
-From e619812582cbe37c1856483adf329fad2ecd0d89 Mon Sep 17 00:00:00 2001
+From be0e902ee3257fb5a3ffc27cdeecad337b506c30 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 22:07:25 +0000
-Subject: [PATCH 49/69] [dvdplayervideo] Prod decoder when in stills mode
+Subject: [PATCH 49/75] [dvdplayervideo] Prod decoder when in stills mode
 
 An asynchronous hardware decoder doesn't only produce output pictures when new packets arrive.
 In dvd stills mode give it a chance to return pictures that weren't ready when frame was decoded.
@@ -5487,10 +5473,10 @@ index f030e37..7a8fc10 100644
  
      if (pMsg->IsType(CDVDMsg::GENERAL_SYNCHRONIZE))
 
-From c2015cb59af38462243fb14fa53e8a5f8091d28e Mon Sep 17 00:00:00 2001
+From bb7e171804ee58a781715cce47c51fd53614c667 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:20:56 +0000
-Subject: [PATCH 50/69] [mmalcodec] Skip some setup that is not required when
+Subject: [PATCH 50/75] [mmalcodec] Skip some setup that is not required when
  closing
 
 ---
@@ -5557,10 +5543,10 @@ index a1f11e9..a11fa65 100644
    m_startframe = false;
    m_decoderPts = DVD_NOPTS_VALUE;
 
-From b47ecf659d1564a1afacf864dd079fed0bab631b Mon Sep 17 00:00:00 2001
+From 5930f4130c9d65fd93e58e2e4982948d2040f52f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:31:56 +0000
-Subject: [PATCH 51/69] [languageinvoker] Reduce priority of python threads
+Subject: [PATCH 51/75] [languageinvoker] Reduce priority of python threads
 
 ---
  xbmc/interfaces/generic/LanguageInvokerThread.cpp | 5 +++++
@@ -5583,10 +5569,10 @@ index 7b0d903..f92aa3e 100644
  }
  
 
-From a16cdfd495525be8b7e1ded348cca579afdf620b Mon Sep 17 00:00:00 2001
+From cf8ad14e8e9035e4d29ca3e1b34c87a736418de0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 17:53:46 +0000
-Subject: [PATCH 52/69] [mmalcodec] Try reducing number of video frames
+Subject: [PATCH 52/75] [mmalcodec] Try reducing number of video frames
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
@@ -5620,10 +5606,10 @@ index 4f81bbd..79a4bfd 100644
    virtual const char* GetName(void) { return (const char*)m_pFormatName; }
    virtual bool GetCodecStats(double &pts, int &droppedPics);
 
-From af1b4ef4fd1bd6abc56c1378559bf17d4e16e4f0 Mon Sep 17 00:00:00 2001
+From 8674e33d70b70cbdddb884150f9367913281c822 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 1 Dec 2014 17:31:00 +0000
-Subject: [PATCH 53/69] [mmalcodec] Ensure we have requested number of buffers
+Subject: [PATCH 53/75] [mmalcodec] Ensure we have requested number of buffers
  in non-accelerated case
 
 ---
@@ -5644,10 +5630,10 @@ index c0ff30d..6d461bd 100644
  
    status = mmal_port_enable(m_vout_input, vout_input_port_cb_static);
 
-From 70d59f97b95a3443e4a6ea6453d976f890da259b Mon Sep 17 00:00:00 2001
+From 9f8efa4d26372a517b28da10b46e761efb08fd82 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 3 Dec 2014 21:17:53 +0000
-Subject: [PATCH 54/69] [omxplayer] Add some info about hdmi sync to codec
+Subject: [PATCH 54/75] [omxplayer] Add some info about hdmi sync to codec
  overlay
 
 ---
@@ -5728,10 +5714,10 @@ index c8fd5fb..9f26427 100644
    bool IsEOS();
    bool SubmittedEOS() const { return m_submitted_eos; }
 
-From 8bffb33415c3ef4588dcdd146aca1e4340f5e2b4 Mon Sep 17 00:00:00 2001
+From c3220a3ed4bf509aa691979a3e341574eb2b940b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 7 Dec 2014 15:21:18 +0000
-Subject: [PATCH 55/69] [omxplayer] Remove test of removed setting, avoids a
+Subject: [PATCH 55/75] [omxplayer] Remove test of removed setting, avoids a
  log message
 
 ---
@@ -5764,10 +5750,10 @@ index 66014d4..c2da2d2 100644
      dataFormat = AE_FMT_DTS;
      m_passthrough = true;
 
-From cbe1c7bc5e0a42374bf75cb4e4fa9cf87649e327 Mon Sep 17 00:00:00 2001
+From 38648532ae2482c5923009a8085665d721630b6d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 28 Dec 2014 19:13:51 +0000
-Subject: [PATCH 56/69] [omxplayer] Skip packet concatenation for WMAV2 files
+Subject: [PATCH 56/75] [omxplayer] Skip packet concatenation for WMAV2 files
 
 See: http://forum.kodi.tv/showthread.php?tid=212552
 ---
@@ -5790,10 +5776,10 @@ index 94b673e..1a920f7 100644
  
    if(m_pCodecContext->bits_per_coded_sample == 0)
 
-From 329a2ebaa60a748b2ae4c1f4e31e571ab8e63c0a Mon Sep 17 00:00:00 2001
+From a10151bb193d6c832c1700be0bbabedae32f8b80 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 31 Dec 2014 17:08:52 +0000
-Subject: [PATCH 57/69] filesystem: Make browsing into archives enbabled by
+Subject: [PATCH 57/75] filesystem: Make browsing into archives enbabled by
  default on Pi
 
 This causes issues for people who scan library with archives disabled, then subsequently enable it.
@@ -5825,10 +5811,10 @@ index 4c2ef41..3260465 100644
      <category id="videoplayer" label="14086" help="36151">
        <group id="2">
 
-From bdc193bf26b5143a4b65182c32c5dd4ffd6b9b1e Mon Sep 17 00:00:00 2001
+From 1b25d3a54d15b90d76dcbcdceebb719ea18c24a3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 31 Dec 2014 16:03:32 +0000
-Subject: [PATCH 58/69] [PVR] Fix for slow metadata updates of recordings
+Subject: [PATCH 58/75] [PVR] Fix for slow metadata updates of recordings
 
 See: http://forum.kodi.tv/showthread.php?tid=210774
 
@@ -6016,10 +6002,10 @@ index 6b8cb14..2bcc834 100644
      int Load();
      void Unload();
 
-From c6ce752f7e428ad1ecc5f5b745a4589c2381d4da Mon Sep 17 00:00:00 2001
+From 1da99439c1b3502111974ddce6f033b9d59675a0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 29 Dec 2014 17:20:00 +0000
-Subject: [PATCH 59/69] [dvdplayer] Allow pll adjustment to go higher, but tail
+Subject: [PATCH 59/75] [dvdplayer] Allow pll adjustment to go higher, but tail
  off more gradually
 
 ---
@@ -6054,10 +6040,10 @@ index 3a266f8..f007f42 100644
    m_dvdplayerIgnoreDTSinWAV = false;
  
 
-From 27126077a8cf3d1cdf7162906c749f7a0adc51c4 Mon Sep 17 00:00:00 2001
+From 884b78280878f6ab25f51f3e0b3ab49376320219 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 11 Dec 2014 17:00:57 +0000
-Subject: [PATCH 60/69] Fix for UI not showing both extractflags and
+Subject: [PATCH 60/75] Fix for UI not showing both extractflags and
  extractthumb
 
 ---
@@ -6133,10 +6119,10 @@ index dbddcb6..756475f 100644
            <control type="toggle" />
          </setting>
 
-From 0a365e588b510814682b33f143be83b26a94be77 Mon Sep 17 00:00:00 2001
+From be43189486ef1b1886d116e8d875d7e1548c6dee Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 26 Jan 2015 19:24:17 +0000
-Subject: [PATCH 61/69] Fix for occasinal heap corruption with font cache
+Subject: [PATCH 61/75] Fix for occasinal heap corruption with font cache
 
 See: PR 4143 issuecomment-71114810
 ---
@@ -6266,10 +6252,10 @@ index 7d4fc88..4110546 100644
    End();
  }
 
-From 6c313f80feff677782c1b1497eff2592ad64f21b Mon Sep 17 00:00:00 2001
+From 232c2dc0a1a51436a44678437ce55080ff124914 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 4 Feb 2015 22:02:33 +0000
-Subject: [PATCH 62/69] [omxplayer] Avoid extra frame allocation when
+Subject: [PATCH 62/75] [omxplayer] Avoid extra frame allocation when
  deinterlace might be enabled
 
 Requires updated firmware
@@ -6305,10 +6291,10 @@ index dea0e11..55e16c4 100644
    // When enabled, the timestamp fifo mode will change the way incoming timestamps are associated with output images.
    // In this mode the incoming timestamps get used without re-ordering on output images.
 
-From 151de82f2eceb80f7146dafc6ec43e614bf55f64 Mon Sep 17 00:00:00 2001
+From 7e18dad8c601498c8d15b2d916b0524716b49f11 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 18 Jan 2015 16:45:51 +0000
-Subject: [PATCH 63/69] [rbp] Enable error concealment by default
+Subject: [PATCH 63/75] [rbp] Enable error concealment by default
 
 Firmware now supports parsing SEI recovery points meaning streams without
 IDR frames don't get discarded completely when error concealment is enabled.
@@ -6347,10 +6333,10 @@ index f007f42..9f00cf4 100644
    m_karaokeSyncDelayCDG = 0.0f;
    m_karaokeSyncDelayLRC = 0.0f;
 
-From bbe89eae350e1a972a840a396ac63cee7221b718 Mon Sep 17 00:00:00 2001
+From feca09cb89fda6814030d0a0a62d92400625bfe0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 26 Jan 2015 17:54:07 +0000
-Subject: [PATCH 64/69] [mmalrenderer] Avoid grabbing the g_graphicsContext
+Subject: [PATCH 64/75] [mmalrenderer] Avoid grabbing the g_graphicsContext
  lock - it can deadlock
 
 ---
@@ -6378,10 +6364,10 @@ index 6d461bd..11a6f10 100644
    if (m_vout)
    {
 
-From ab4504933fa7895a2c9c5af831a3c392ab4e1bf5 Mon Sep 17 00:00:00 2001
+From 348995898891377b83f550f25fc657d167eecdde Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 15 Feb 2015 14:06:12 +0000
-Subject: [PATCH 65/69] [mmal] Use libmpeg2 when mpeg2 codec licence is not
+Subject: [PATCH 65/75] [mmal] Use libmpeg2 when mpeg2 codec licence is not
  available
 
 ---
@@ -6412,10 +6398,10 @@ index bea5e4f..e4f59d7 100644
    if (hint.stills && (hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_MPEG1VIDEO))
    {
 
-From 58822156959cbb8f79ffbdf367eaa2a09926427d Mon Sep 17 00:00:00 2001
+From 232f0dafea51c319364b314b2e2277429c5bcdd7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 28 Feb 2015 22:34:52 +0000
-Subject: [PATCH 66/69] [mmalrender] Fix for hang on shutdown
+Subject: [PATCH 66/75] [mmalrender] Fix for hang on shutdown
 
 mmal_queue_push doesn't allow null pointers, so use a unique packet for signalling quit
 ---
@@ -6467,10 +6453,10 @@ index 8ca0b94..a5c248c 100644
    void ReleaseBuffers();
  };
 
-From 7bec53dfe63c888ffa0d4d1bbd7863c37bc981ba Mon Sep 17 00:00:00 2001
+From 69fa623c46a38f94b8a4e3eabc5cd108bc55b925 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Feb 2015 19:07:17 +0000
-Subject: [PATCH 67/69] [omxplayer] Attempt to fix missing subtitles after seek
+Subject: [PATCH 67/75] [omxplayer] Attempt to fix missing subtitles after seek
 
 ---
  xbmc/cores/omxplayer/OMXPlayerVideo.cpp | 2 +-
@@ -6490,10 +6476,10 @@ index 77b9461..2a3619f 100644
  
    int buffer = g_renderManager.WaitForBuffer(CThread::m_bStop);
 
-From ef7e912ee01e0ba34bacf1e5d8dcdf1103972132 Mon Sep 17 00:00:00 2001
+From 925a4e4d7e775cc246518d6ea934d1f93a069870 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Wed, 25 Feb 2015 18:22:21 +0100
-Subject: [PATCH 68/69] Load OSD dialogs on startup.
+Subject: [PATCH 68/75] Load OSD dialogs on startup.
 
 Fixes skipped frames the first time they're loaded in memory on less powered
 devices, like a Raspberry Pi, when using DVDPlayer.
@@ -6602,10 +6588,10 @@ index ca65fdc..fbd2a52 100644
  CGUIDialogVideoSettings::~CGUIDialogVideoSettings()
  { }
 
-From 821baa4793c6a4df63d0f4fb206892aff70d28f3 Mon Sep 17 00:00:00 2001
+From f12f1a04a761c73ed1bb1fd49caef5246743f5b4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 1 Mar 2015 14:49:12 +0000
-Subject: [PATCH 69/69] [omxplayer] Fix for volume being treated as a linear
+Subject: [PATCH 69/75] [omxplayer] Fix for volume being treated as a linear
  scale
 
 The volume in kodi is actually 0.0=-60dB to 1.0=0dB. omxplayer was treating this as a linear scale.
@@ -6630,3 +6616,851 @@ index ef4c3d4..c16ae2e 100644
  
    // the analogue volume is too quiet for some. Allow use of an advancedsetting to boost this (at risk of distortion) (deprecated)
    double gain = pow(10, (g_advancedSettings.m_ac3Gain - 12.0f) / 20.0);
+
+From 6da1be424f1c9c115352e2812a96f038bef188c5 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 24 Feb 2015 00:09:19 +0000
+Subject: [PATCH 70/75] [omxplayer] Limit subtitle updates to 10fps to avoid
+ stuttering with closed captions
+
+---
+ xbmc/cores/omxplayer/OMXPlayerVideo.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
+index 2a3619f..6ae404df 100644
+--- a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
++++ b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
+@@ -221,7 +221,7 @@ double OMXPlayerVideo::NextOverlay(double pts)
+     else if (delta_stop > 0.0 && (min_delta == DVD_NOPTS_VALUE || delta_stop < min_delta))
+       min_delta = delta_stop;
+   }
+-  return min_delta == DVD_NOPTS_VALUE ? pts+DVD_MSEC_TO_TIME(500) : pts+min_delta;
++  return min_delta == DVD_NOPTS_VALUE ? pts+DVD_MSEC_TO_TIME(500) : pts+std::max(min_delta, DVD_MSEC_TO_TIME(100));
+ }
+ 
+ 
+@@ -305,9 +305,9 @@ void OMXPlayerVideo::Output(double pts, bool bDropPacket)
+   double subtitle_pts = m_nextOverlay;
+   double time = subtitle_pts != DVD_NOPTS_VALUE ? subtitle_pts - media_pts : 0.0;
+ 
+-  m_nextOverlay = NextOverlay(media_pts);
++  m_nextOverlay = NextOverlay(media_pts + preroll);
+ 
+-  ProcessOverlays(media_pts);
++  ProcessOverlays(media_pts + preroll);
+ 
+   time += m_av_clock->GetAbsoluteClock();
+   g_renderManager.FlipPage(CThread::m_bStop, time/DVD_TIME_BASE);
+
+From 2563cbc8489b33d5a1067d439683e41c2d090496 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 17 Mar 2015 20:52:28 +0000
+Subject: [PATCH 71/75] [omxplayer] Allow HDMI output to work when unsupported
+ ALSA card is selected
+
+See: http://forum.kodi.tv/showthread.php?tid=221118&pid=1958062#pid1958062
+
+Basically omxplayer doesn't support ALSA and can only drive HDMI or the analogue output.
+In the past users have made use of this fact to effictively get HDMI output for videos, and ALSA output for music.
+
+In some of the code restructuring using omxplayer with ALSA enabled no longer works - you just get errors in the log.
+A trivial change allows this to work again
+---
+ xbmc/cores/omxplayer/OMXAudio.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/omxplayer/OMXAudio.cpp b/xbmc/cores/omxplayer/OMXAudio.cpp
+index c16ae2e..95db68c 100644
+--- a/xbmc/cores/omxplayer/OMXAudio.cpp
++++ b/xbmc/cores/omxplayer/OMXAudio.cpp
+@@ -128,7 +128,7 @@ bool COMXAudio::PortSettingsChanged()
+     if(!m_omx_render_analog.Initialize("OMX.broadcom.audio_render", OMX_IndexParamAudioInit))
+       return false;
+   }
+-  if (CSettings::Get().GetString("audiooutput.audiodevice") == "PI:Both" || CSettings::Get().GetString("audiooutput.audiodevice") == "PI:HDMI")
++  if (CSettings::Get().GetString("audiooutput.audiodevice") == "PI:Both" || CSettings::Get().GetString("audiooutput.audiodevice") != "PI:Analogue")
+   {
+     if(!m_omx_render_hdmi.Initialize("OMX.broadcom.audio_render", OMX_IndexParamAudioInit))
+       return false;
+
+From a7b59996ad260e8ea95eb39da5a05618559dd8e7 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 10 Feb 2015 15:29:16 +0000
+Subject: [PATCH 72/75] [libcec] Add repeating keypress patch from popcornmix'
+ repo
+
+---
+ tools/depends/target/libcec/Makefile         |   1 +
+ tools/depends/target/libcec/popcornmix.patch | 615 +++++++++++++++++++++++++++
+ 2 files changed, 616 insertions(+)
+ create mode 100644 tools/depends/target/libcec/popcornmix.patch
+
+diff --git a/tools/depends/target/libcec/Makefile b/tools/depends/target/libcec/Makefile
+index 6c72240..4378628 100644
+--- a/tools/depends/target/libcec/Makefile
++++ b/tools/depends/target/libcec/Makefile
+@@ -21,6 +21,7 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
+ 	rm -rf $(PLATFORM); mkdir -p $(PLATFORM)
+ 	cd $(PLATFORM); $(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
+ 	cd $(PLATFORM); $(AUTORECONF) -vif
++	cd $(PLATFORM); patch -p1 < ../popcornmix.patch
+ 	cd $(PLATFORM); $(CONFIGURE)
+ 
+ $(LIBDYLIB): $(PLATFORM)
+diff --git a/tools/depends/target/libcec/popcornmix.patch b/tools/depends/target/libcec/popcornmix.patch
+new file mode 100644
+index 0000000..84adc8c
+--- /dev/null
++++ b/tools/depends/target/libcec/popcornmix.patch
+@@ -0,0 +1,615 @@
++From 651fc15222923bcaea6f7925c207217a40e967ab Mon Sep 17 00:00:00 2001
++From: popcornmix <popcornmix@gmail.com>
++Date: Fri, 24 Oct 2014 13:45:21 +0100
++Subject: [PATCH 1/5] Make released key polling wait for exact time until key
++ gets released
++
++---
++ src/lib/CECClient.cpp    | 28 ++++++++++++++++++++++++----
++ src/lib/CECClient.h      |  2 +-
++ src/lib/CECProcessor.cpp |  8 +++++---
++ src/lib/LibCEC.cpp       | 10 ++++++++--
++ src/lib/LibCEC.h         |  4 +++-
++ 5 files changed, 41 insertions(+), 11 deletions(-)
++
++diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
++index 0bc9705..5fb1e6a 100644
++--- a/src/lib/CECClient.cpp
+++++ b/src/lib/CECClient.cpp
++@@ -1057,10 +1057,16 @@ void CCECClient::SetCurrentButton(const cec_user_control_code iButtonCode)
++   AddKey(key);
++ }
++
++-void CCECClient::CheckKeypressTimeout(void)
+++uint16_t CCECClient::CheckKeypressTimeout(void)
++ {
+++  // time when we'd like to be called again
+++  unsigned int timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++   cec_keypress key;
+++  key.keycode = CEC_USER_CONTROL_CODE_UNKNOWN;
+++  key.duration = 0;
++
+++  if (m_iCurrentButton == CEC_USER_CONTROL_CODE_UNKNOWN)
+++    return timeout;
++   {
++     CLockObject lock(m_mutex);
++     uint64_t iNow = GetTimeMs();
++@@ -1081,12 +1087,26 @@ void CCECClient::CheckKeypressTimeout(void)
++     }
++     else
++     {
++-      return;
+++      // time when this keypress will be released and we'd like to be called again
+++      unsigned int timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
+++      if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN && m_iCurrentButton == comboKey && iTimeoutMs > 0)
+++        timeout = iTimeoutMs - (iNow - m_buttontime) + 1;
+++      else if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN && m_iCurrentButton != comboKey)
+++        timeout = CEC_BUTTON_TIMEOUT - (iNow - m_buttontime) + 1;
+++      if (timeout > CEC_PROCESSOR_SIGNAL_WAIT_TIME)
+++      {
+++        LIB_CEC->AddLog(CEC_LOG_ERROR, "Unexpected timeout: %d (%.3f %.3f %.3f) k:%02x", timeout, iNow*1e-3, m_buttontime*1e-3, CEC_BUTTON_TIMEOUT*1e-3, m_iCurrentButton);
+++        timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
+++      }
++     }
++   }
++
++-  LIB_CEC->AddLog(CEC_LOG_DEBUG, "key auto-released: %s (%1x)", ToString(key.keycode), key.keycode);
++-  CallbackAddKey(key);
+++  if (key.keycode != CEC_USER_CONTROL_CODE_UNKNOWN)
+++  {
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key auto-released: %s (%1x)", ToString(key.keycode), key.keycode);
+++    CallbackAddKey(key);
+++  }
+++  return timeout;
++ }
++
++ bool CCECClient::EnableCallbacks(void *cbParam, ICECCallbacks *callbacks)
++diff --git a/src/lib/CECClient.h b/src/lib/CECClient.h
++index 3ef0453..88efbbb 100644
++--- a/src/lib/CECClient.h
+++++ b/src/lib/CECClient.h
++@@ -182,7 +182,7 @@ namespace CEC
++     virtual void                  AddKey(bool bSendComboKey = false);
++     virtual void                  AddKey(const cec_keypress &key);
++     virtual void                  SetCurrentButton(const cec_user_control_code iButtonCode);
++-    virtual void                  CheckKeypressTimeout(void);
+++    virtual uint16_t              CheckKeypressTimeout(void);
++     virtual void                  SourceActivated(const cec_logical_address logicalAddress);
++     virtual void                  SourceDeactivated(const cec_logical_address logicalAddress);
++
++diff --git a/src/lib/CECProcessor.cpp b/src/lib/CECProcessor.cpp
++index 557b76d..ecf9244 100644
++--- a/src/lib/CECProcessor.cpp
+++++ b/src/lib/CECProcessor.cpp
++@@ -51,7 +51,6 @@ using namespace CEC;
++ using namespace std;
++ using namespace PLATFORM;
++
++-#define CEC_PROCESSOR_SIGNAL_WAIT_TIME 1000
++ #define ACTIVE_SOURCE_CHECK_INTERVAL   500
++ #define TV_PRESENT_CHECK_INTERVAL      30000
++
++@@ -244,6 +243,7 @@ bool CCECProcessor::OnCommandReceived(const cec_command &command)
++
++ void *CCECProcessor::Process(void)
++ {
+++  uint16_t timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++   m_libcec->AddLog(CEC_LOG_DEBUG, "processor thread started");
++
++   if (!m_connCheck)
++@@ -258,13 +258,13 @@ void *CCECProcessor::Process(void)
++   while (!IsStopped() && m_communication->IsOpen())
++   {
++     // wait for a new incoming command, and process it
++-    if (m_inBuffer.Pop(command, CEC_PROCESSOR_SIGNAL_WAIT_TIME))
+++    if (m_inBuffer.Pop(command, timeout))
++       ProcessCommand(command);
++
++     if (CECInitialised() && !IsStopped())
++     {
++       // check clients for keypress timeouts
++-      m_libcec->CheckKeypressTimeout();
+++      timeout = m_libcec->CheckKeypressTimeout();
++
++       // check if we need to replace handlers
++       ReplaceHandlers();
++@@ -295,6 +295,8 @@ void *CCECProcessor::Process(void)
++         tvPresentCheck.Init(TV_PRESENT_CHECK_INTERVAL);
++       }
++     }
+++    else
+++      timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++   }
++
++   return NULL;
++diff --git a/src/lib/LibCEC.cpp b/src/lib/LibCEC.cpp
++index c24b4ed..046205c 100644
++--- a/src/lib/LibCEC.cpp
+++++ b/src/lib/LibCEC.cpp
++@@ -354,11 +354,17 @@ bool CLibCEC::IsValidPhysicalAddress(uint16_t iPhysicalAddress)
++          iPhysicalAddress <= CEC_MAX_PHYSICAL_ADDRESS;
++ }
++
++-void CLibCEC::CheckKeypressTimeout(void)
+++uint16_t CLibCEC::CheckKeypressTimeout(void)
++ {
+++  uint16_t timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++   // check all clients
++   for (vector<CCECClient *>::iterator it = m_clients.begin(); it != m_clients.end(); it++)
++-    (*it)->CheckKeypressTimeout();
+++  {
+++    uint16_t t = (*it)->CheckKeypressTimeout();
+++    if (t < timeout)
+++      timeout = t;
+++  }
+++  return timeout;
++ }
++
++ void CLibCEC::AddLog(const cec_log_level level, const char *strFormat, ...)
++diff --git a/src/lib/LibCEC.h b/src/lib/LibCEC.h
++index 3a312c0..b7ac645 100644
++--- a/src/lib/LibCEC.h
+++++ b/src/lib/LibCEC.h
++@@ -36,6 +36,8 @@
++ #include "platform/util/buffer.h"
++ #include "CECTypeUtils.h"
++
+++#define CEC_PROCESSOR_SIGNAL_WAIT_TIME 1000
+++
++ namespace CEC
++ {
++   class CAdapterCommunication;
++@@ -121,7 +123,7 @@ namespace CEC
++
++       void AddLog(const cec_log_level level, const char *strFormat, ...);
++       void AddCommand(const cec_command &command);
++-      void CheckKeypressTimeout(void);
+++      uint16_t CheckKeypressTimeout(void);
++       void Alert(const libcec_alert type, const libcec_parameter &param);
++
++       static bool IsValidPhysicalAddress(uint16_t iPhysicalAddress);
++--
++1.9.1
++
++
++From d506af4cff04156391f34d07f921e02c41a563b7 Mon Sep 17 00:00:00 2001
++From: popcornmix <popcornmix@gmail.com>
++Date: Mon, 24 Nov 2014 23:18:52 +0000
++Subject: [PATCH 2/5] Add settings for repeat and release
++
++---
++ include/cectypes.h    | 6 ++++++
++ src/lib/CECClient.cpp | 6 ++++++
++ 2 files changed, 12 insertions(+)
++
++diff --git a/include/cectypes.h b/include/cectypes.h
++index 0a90d0e..b75b1b3 100644
++--- a/include/cectypes.h
+++++ b/include/cectypes.h
++@@ -1532,6 +1532,8 @@ struct libcec_configuration
++                                                    XXX changed meaning in 2.2.0 to not break binary compatibility. next major (3.0) release will fix it in a nicer way */
++   cec_user_control_code comboKey;             /*!< key code that initiates combo keys. defaults to CEC_USER_CONTROL_CODE_F1_BLUE. CEC_USER_CONTROL_CODE_UNKNOWN to disable. added in 2.0.5 */
++   uint32_t              iComboKeyTimeoutMs;   /*!< timeout until the combo key is sent as normal keypress */
+++  uint32_t              iButtonRepeatRateMs;  /*!< rate at which buttons autorepeat. 0 means rely on CEC device */
+++  uint32_t              iButtonReleaseDelayMs;/*!< duration after last update until a button is considered released */
++
++ #ifdef __cplusplus
++    libcec_configuration(void) { Clear(); }
++@@ -1566,6 +1568,8 @@ struct libcec_configuration
++                  cecVersion                == other.cecVersion &&
++                  adapterType               == other.adapterType &&
++                  iDoubleTapTimeout50Ms     == other.iDoubleTapTimeout50Ms &&
+++                 iButtonRepeatRateMs       == other.iButtonRepeatRateMs &&
+++                 iButtonReleaseDelayMs     == other.iButtonReleaseDelayMs &&
++                  (other.clientVersion <= CEC_CLIENT_VERSION_2_0_4 || comboKey            == other.comboKey) &&
++                  (other.clientVersion <= CEC_CLIENT_VERSION_2_0_4 || iComboKeyTimeoutMs  == other.iComboKeyTimeoutMs) &&
++                  (other.clientVersion <  CEC_CLIENT_VERSION_2_1_0 || bPowerOnScreensaver == other.bPowerOnScreensaver));
++@@ -1606,6 +1610,8 @@ struct libcec_configuration
++     iDoubleTapTimeout50Ms =           CEC_DOUBLE_TAP_TIMEOUT_50_MS;
++     comboKey =                        CEC_USER_CONTROL_CODE_STOP;
++     iComboKeyTimeoutMs =              CEC_DEFAULT_COMBO_TIMEOUT_MS;
+++    iButtonRepeatRateMs =             0;
+++    iButtonReleaseDelayMs =           CEC_BUTTON_TIMEOUT;
++
++     memset(strDeviceName, 0, 13);
++     deviceTypes.Clear();
++diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
++index 5fb1e6a..02f5f4a 100644
++--- a/src/lib/CECClient.cpp
+++++ b/src/lib/CECClient.cpp
++@@ -834,6 +834,9 @@ bool CCECClient::GetCurrentConfiguration(libcec_configuration &configuration)
++   configuration.bMonitorOnly              = m_configuration.bMonitorOnly;
++   configuration.cecVersion                = m_configuration.cecVersion;
++   configuration.adapterType               = m_configuration.adapterType;
+++  configuration.iDoubleTapTimeout50Ms     = m_configuration.iDoubleTapTimeout50Ms;
+++  configuration.iButtonRepeatRateMs       = m_configuration.iButtonRepeatRateMs;
+++  configuration.iButtonReleaseDelayMs     = m_configuration.iButtonReleaseDelayMs;
++
++   return true;
++ }
++@@ -877,6 +880,9 @@ bool CCECClient::SetConfiguration(const libcec_configuration &configuration)
++     m_configuration.cecVersion                 = configuration.cecVersion;
++     m_configuration.adapterType                = configuration.adapterType;
++     m_configuration.iDoubleTapTimeout50Ms      = configuration.iDoubleTapTimeout50Ms;
+++    m_configuration.iButtonRepeatRateMs        = configuration.iButtonRepeatRateMs;
+++    m_configuration.iButtonReleaseDelayMs      = configuration.iButtonReleaseDelayMs;
+++
++     m_configuration.deviceTypes.Add(configuration.deviceTypes[0]);
++
++     if (m_configuration.clientVersion >= CEC_CLIENT_VERSION_2_0_5)
++--
++1.9.1
++
++
++From b6a6cc8ad12571dff0e02bc9a38ce97a00424df0 Mon Sep 17 00:00:00 2001
++From: popcornmix <popcornmix@gmail.com>
++Date: Mon, 24 Nov 2014 23:20:05 +0000
++Subject: [PATCH 3/5] Distinguish explicit and implicit forms of AddKey
++ releases
++
++---
++ src/lib/CECClient.cpp                         | 2 +-
++ src/lib/CECClient.h                           | 2 +-
++ src/lib/implementations/CECCommandHandler.cpp | 2 +-
++ 3 files changed, 3 insertions(+), 3 deletions(-)
++
++diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
++index 02f5f4a..3663b24 100644
++--- a/src/lib/CECClient.cpp
+++++ b/src/lib/CECClient.cpp
++@@ -968,7 +968,7 @@ int CCECClient::MenuStateChanged(const cec_menu_state newState)
++   return CallbackMenuStateChanged(newState);
++ }
++
++-void CCECClient::AddKey(bool bSendComboKey /* = false */)
+++void CCECClient::AddKey(bool bSendComboKey /* = false */, bool bButtonRelease /* = false */)
++ {
++   cec_keypress key;
++   key.keycode = CEC_USER_CONTROL_CODE_UNKNOWN;
++diff --git a/src/lib/CECClient.h b/src/lib/CECClient.h
++index 88efbbb..84fb909 100644
++--- a/src/lib/CECClient.h
+++++ b/src/lib/CECClient.h
++@@ -179,7 +179,7 @@ namespace CEC
++     virtual int                   MenuStateChanged(const cec_menu_state newState);
++     virtual void                  Alert(const libcec_alert type, const libcec_parameter &param) { CallbackAlert(type, param); }
++     virtual void                  AddLog(const cec_log_message &message) { CallbackAddLog(message); }
++-    virtual void                  AddKey(bool bSendComboKey = false);
+++    virtual void                  AddKey(bool bSendComboKey = false, bool bButtonRelease = false);
++     virtual void                  AddKey(const cec_keypress &key);
++     virtual void                  SetCurrentButton(const cec_user_control_code iButtonCode);
++     virtual uint16_t              CheckKeypressTimeout(void);
++diff --git a/src/lib/implementations/CECCommandHandler.cpp b/src/lib/implementations/CECCommandHandler.cpp
++index a89ebe6..932c54b 100644
++--- a/src/lib/implementations/CECCommandHandler.cpp
+++++ b/src/lib/implementations/CECCommandHandler.cpp
++@@ -745,7 +745,7 @@ int CCECCommandHandler::HandleUserControlRelease(const cec_command &command)
++
++   CCECClient *client = m_processor->GetClient(command.destination);
++   if (client)
++-    client->AddKey();
+++    client->AddKey(false, true);
++
++   return COMMAND_HANDLED;
++ }
++--
++1.9.1
++
++
++From 3b7606a9e0653149ae4b6e80d0df9c53645bfac9 Mon Sep 17 00:00:00 2001
++From: popcornmix <popcornmix@gmail.com>
++Date: Mon, 24 Nov 2014 23:20:22 +0000
++Subject: [PATCH 4/5] Support repeating button presses with configurable repeat
++ rate Keep track of time since initial button press and last button update
++
++---
++ src/lib/CECClient.cpp | 119 ++++++++++++++++++++++++++++++++++++++++----------
++ src/lib/CECClient.h   |   6 ++-
++ 2 files changed, 101 insertions(+), 24 deletions(-)
++
++diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
++index 3663b24..68eaee9 100644
++--- a/src/lib/CECClient.cpp
+++++ b/src/lib/CECClient.cpp
++@@ -52,7 +52,11 @@ CCECClient::CCECClient(CCECProcessor *processor, const libcec_configuration &con
++     m_bInitialised(false),
++     m_bRegistered(false),
++     m_iCurrentButton(CEC_USER_CONTROL_CODE_UNKNOWN),
++-    m_buttontime(0),
+++    m_initialButtontime(0),
+++    m_updateButtontime(0),
+++    m_repeatButtontime(0),
+++    m_releaseButtontime(0),
+++    m_pressedButtoncount(0),
++     m_iPreventForwardingPowerOffCommand(0),
++     m_iLastKeypressTime(0)
++ {
++@@ -939,6 +943,7 @@ bool CCECClient::SetConfiguration(const libcec_configuration &configuration)
++     primary->ActivateSource();
++   }
++
+++  LIB_CEC->AddLog(CEC_LOG_DEBUG, "%s: %d:%d:%d", __FUNCTION__, DoubleTapTimeoutMS(), m_configuration.iButtonRepeatRateMs, m_configuration.iButtonReleaseDelayMs);
++   return true;
++ }
++
++@@ -977,9 +982,10 @@ void CCECClient::AddKey(bool bSendComboKey /* = false */, bool bButtonRelease /*
++     CLockObject lock(m_mutex);
++     if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN)
++     {
++-      key.duration = (unsigned int) (GetTimeMs() - m_buttontime);
+++      unsigned int duration = (unsigned int) (GetTimeMs() - m_updateButtontime);
+++      key.duration = (unsigned int) (GetTimeMs() - m_initialButtontime);
++
++-      if (key.duration > m_configuration.iComboKeyTimeoutMs ||
+++      if (duration > m_configuration.iComboKeyTimeoutMs ||
++           m_configuration.iComboKeyTimeoutMs == 0 ||
++           m_iCurrentButton != m_configuration.comboKey ||
++           bSendComboKey)
++@@ -987,14 +993,22 @@ void CCECClient::AddKey(bool bSendComboKey /* = false */, bool bButtonRelease /*
++         key.keycode = m_iCurrentButton;
++
++         m_iCurrentButton = CEC_USER_CONTROL_CODE_UNKNOWN;
++-        m_buttontime = 0;
+++        m_initialButtontime = 0;
+++        m_updateButtontime = 0;
+++        m_repeatButtontime = 0;
+++        m_releaseButtontime = 0;
+++        m_pressedButtoncount = 0;
++       }
++     }
++   }
++
+++  // we don't forward releases when supporting repeating keys
+++  if (bButtonRelease && m_configuration.iButtonRepeatRateMs)
+++    return;
+++
++   if (key.keycode != CEC_USER_CONTROL_CODE_UNKNOWN)
++   {
++-    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key released: %s (%1x)", ToString(key.keycode), key.keycode);
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key released: %s (%1x) D:%dms", ToString(key.keycode), key.keycode, key.duration);
++     CallbackAddKey(key);
++   }
++ }
++@@ -1005,10 +1019,11 @@ void CCECClient::AddKey(const cec_keypress &key)
++       key.keycode < CEC_USER_CONTROL_CODE_SELECT)
++   {
++     // send back the previous key if there is one
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "Unexpected key %s (%1x) D:%dms", ToString(key.keycode), key.keycode, key.duration);
++     AddKey();
++     return;
++   }
++-
+++  bool isrepeat = false;
++   cec_keypress transmitKey(key);
++   cec_user_control_code comboKey(m_configuration.clientVersion >= CEC_CLIENT_VERSION_2_0_5 ?
++       m_configuration.comboKey : CEC_USER_CONTROL_CODE_STOP);
++@@ -1028,27 +1043,60 @@ void CCECClient::AddKey(const cec_keypress &key)
++         transmitKey.keycode = CEC_USER_CONTROL_CODE_DOT;
++       // default, send back the previous key
++       else
+++      {
+++        LIB_CEC->AddLog(CEC_LOG_DEBUG, "Combo key %s (%1x) D%dms:", ToString(key.keycode), key.keycode, key.duration);
++         AddKey(true);
+++      }
++     }
++
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key pressed: %s (%1x) current(%lx) duration(%d)", ToString(transmitKey.keycode), transmitKey.keycode, m_iCurrentButton, key.duration);
+++
++     if (m_iCurrentButton == key.keycode)
++     {
++-      m_buttontime = GetTimeMs();
+++      m_updateButtontime = GetTimeMs();
+++      m_releaseButtontime = m_updateButtontime + (m_configuration.iButtonReleaseDelayMs ? m_configuration.iButtonReleaseDelayMs : CEC_BUTTON_TIMEOUT);
+++      // want to have seen some updated before considering a repeat
+++      if (m_configuration.iButtonRepeatRateMs)
+++      {
+++        if (!m_repeatButtontime && m_pressedButtoncount > 1)
+++          m_repeatButtontime = m_initialButtontime + DoubleTapTimeoutMS();
+++        isrepeat = true;
+++      }
+++      m_pressedButtoncount++;
++     }
++     else
++     {
++-      AddKey();
+++      if (m_iCurrentButton != transmitKey.keycode)
+++      {
+++        LIB_CEC->AddLog(CEC_LOG_DEBUG, "Changed key %s (%1x) D:%dms cur:%lx", ToString(transmitKey.keycode), transmitKey.keycode, transmitKey.duration, m_iCurrentButton);
+++        AddKey();
+++      }
++       if (key.duration == 0)
++       {
++         m_iCurrentButton = transmitKey.keycode;
++-        m_buttontime = m_iCurrentButton == CEC_USER_CONTROL_CODE_UNKNOWN || key.duration > 0 ? 0 : GetTimeMs();
+++        if (m_iCurrentButton == CEC_USER_CONTROL_CODE_UNKNOWN)
+++        {
+++          m_initialButtontime = 0;
+++          m_updateButtontime = 0;
+++          m_repeatButtontime = 0;
+++          m_releaseButtontime = 0;
+++          m_pressedButtoncount = 0;
+++        }
+++        else
+++        {
+++          m_initialButtontime = GetTimeMs();
+++          m_updateButtontime = m_initialButtontime;
+++          m_repeatButtontime = 0; // set this on next update
+++          m_releaseButtontime = m_initialButtontime + (m_configuration.iButtonReleaseDelayMs ? m_configuration.iButtonReleaseDelayMs : CEC_BUTTON_TIMEOUT);
+++          m_pressedButtoncount = 1;
+++        }
++       }
++     }
++   }
++
++-  if (key.keycode != comboKey || key.duration > 0)
+++  if (!isrepeat && (key.keycode != comboKey || key.duration > 0))
++   {
++-    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key pressed: %s (%1x)", ToString(transmitKey.keycode), transmitKey.keycode);
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "key pressed: %s (%1x, %d)", ToString(transmitKey.keycode), transmitKey.keycode, transmitKey.duration);
++     CallbackAddKey(transmitKey);
++   }
++ }
++@@ -1060,6 +1108,7 @@ void CCECClient::SetCurrentButton(const cec_user_control_code iButtonCode)
++   key.duration = 0;
++   key.keycode = iButtonCode;
++
+++  LIB_CEC->AddLog(CEC_LOG_DEBUG, "SetCurrentButton %s (%1x) D:%dms cur:%lx", ToString(key.keycode), key.keycode, key.duration);
++   AddKey(key);
++ }
++
++@@ -1076,35 +1125,59 @@ uint16_t CCECClient::CheckKeypressTimeout(void)
++   {
++     CLockObject lock(m_mutex);
++     uint64_t iNow = GetTimeMs();
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "%s T:%.3f", __FUNCTION__, iNow*1e-3);
++     cec_user_control_code comboKey(m_configuration.clientVersion >= CEC_CLIENT_VERSION_2_0_5 ?
++         m_configuration.comboKey : CEC_USER_CONTROL_CODE_STOP);
++     uint32_t iTimeoutMs(m_configuration.clientVersion >= CEC_CLIENT_VERSION_2_0_5 ?
++         m_configuration.iComboKeyTimeoutMs : CEC_DEFAULT_COMBO_TIMEOUT_MS);
++
++-    if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN &&
++-          ((m_iCurrentButton == comboKey && iTimeoutMs > 0 && iNow - m_buttontime > iTimeoutMs) ||
++-          (m_iCurrentButton != comboKey && iNow - m_buttontime > CEC_BUTTON_TIMEOUT)))
+++    if (m_iCurrentButton == comboKey && iTimeoutMs > 0 && iNow - m_updateButtontime >= iTimeoutMs)
++     {
++-      key.duration = (unsigned int) (iNow - m_buttontime);
+++      key.duration = (unsigned int) (iNow - m_initialButtontime);
++       key.keycode = m_iCurrentButton;
++
++       m_iCurrentButton = CEC_USER_CONTROL_CODE_UNKNOWN;
++-      m_buttontime = 0;
+++      m_initialButtontime = 0;
+++      m_updateButtontime = 0;
+++      m_repeatButtontime = 0;
+++      m_releaseButtontime = 0;
+++      m_pressedButtoncount = 0;
+++    }
+++    else if (m_iCurrentButton != comboKey && m_releaseButtontime && iNow >= (uint64_t)m_releaseButtontime)
+++    {
+++      key.duration = (unsigned int) (iNow - m_initialButtontime);
+++      key.keycode = CEC_USER_CONTROL_CODE_UNKNOWN;
+++
+++      m_iCurrentButton = CEC_USER_CONTROL_CODE_UNKNOWN;
+++      m_initialButtontime = 0;
+++      m_updateButtontime = 0;
+++      m_repeatButtontime = 0;
+++      m_releaseButtontime = 0;
+++      m_pressedButtoncount = 0;
+++    }
+++    else if (m_iCurrentButton != comboKey && m_repeatButtontime && iNow >= (uint64_t)m_repeatButtontime)
+++    {
+++      key.duration = (unsigned int) (iNow - m_initialButtontime);
+++      key.keycode = m_iCurrentButton;
+++      m_repeatButtontime = iNow + m_configuration.iButtonRepeatRateMs;
+++      timeout = std::min((uint64_t)timeout, m_repeatButtontime - iNow);
++     }
++     else
++     {
++-      // time when this keypress will be released and we'd like to be called again
++-      unsigned int timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++-      if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN && m_iCurrentButton == comboKey && iTimeoutMs > 0)
++-        timeout = iTimeoutMs - (iNow - m_buttontime) + 1;
++-      else if (m_iCurrentButton != CEC_USER_CONTROL_CODE_UNKNOWN && m_iCurrentButton != comboKey)
++-        timeout = CEC_BUTTON_TIMEOUT - (iNow - m_buttontime) + 1;
+++      if (m_iCurrentButton == comboKey && iTimeoutMs > 0)
+++        timeout = std::min((uint64_t)timeout, m_updateButtontime - iNow + iTimeoutMs);
+++      if (m_iCurrentButton != comboKey && m_releaseButtontime)
+++        timeout = std::min((uint64_t)timeout, m_releaseButtontime - iNow);
+++      if (m_iCurrentButton != comboKey && m_repeatButtontime)
+++        timeout = std::min((uint64_t)timeout, m_repeatButtontime - iNow);
++       if (timeout > CEC_PROCESSOR_SIGNAL_WAIT_TIME)
++       {
++-        LIB_CEC->AddLog(CEC_LOG_ERROR, "Unexpected timeout: %d (%.3f %.3f %.3f) k:%02x", timeout, iNow*1e-3, m_buttontime*1e-3, CEC_BUTTON_TIMEOUT*1e-3, m_iCurrentButton);
+++        LIB_CEC->AddLog(CEC_LOG_ERROR, "Unexpected timeout: %d (%.3f %.3f %.3f) k:%02x", timeout, iNow*1e-3, m_updateButtontime*1e-3, m_releaseButtontime*1e-3, m_iCurrentButton);
++         timeout = CEC_PROCESSOR_SIGNAL_WAIT_TIME;
++       }
++     }
+++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "Key %s: %s (duration:%d) (%1x) timeout:%dms (rel:%d,rep:%d,prs:%d)", ToString(m_iCurrentButton), key.keycode == CEC_USER_CONTROL_CODE_UNKNOWN ? "idle" : m_repeatButtontime ? "repeated" : "released", key.duration,
+++        m_iCurrentButton, timeout, (int)(m_releaseButtontime ? m_releaseButtontime - iNow : 0), (int)(m_repeatButtontime ? m_repeatButtontime - iNow : 0), m_pressedButtoncount);
++   }
++
++   if (key.keycode != CEC_USER_CONTROL_CODE_UNKNOWN)
++diff --git a/src/lib/CECClient.h b/src/lib/CECClient.h
++index 84fb909..27af3f9 100644
++--- a/src/lib/CECClient.h
+++++ b/src/lib/CECClient.h
++@@ -311,7 +311,11 @@ namespace CEC
++     PLATFORM::CMutex      m_mutex;                             /**< mutex for changes to this instance */
++     PLATFORM::CMutex      m_cbMutex;                           /**< mutex that is held when doing anything with callbacks */
++     cec_user_control_code m_iCurrentButton;                    /**< the control code of the button that's currently held down (if any) */
++-    int64_t               m_buttontime;                        /**< the timestamp when the button was pressed (in seconds since epoch), or 0 if none was pressed. */
+++    int64_t               m_initialButtontime;                 /**< the timestamp when the button was initially pressed (in seconds since epoch), or 0 if none was pressed. */
+++    int64_t               m_updateButtontime;                  /**< the timestamp when the button was updated (in seconds since epoch), or 0 if none was pressed. */
+++    int64_t               m_repeatButtontime;                  /**< the timestamp when the button will next repeat (in seconds since epoch), or 0 if repeat is disabled. */
+++    int64_t               m_releaseButtontime;                 /**< the timestamp when the button will be released (in seconds since epoch), or 0 if none was pressed. */
+++    int32_t               m_pressedButtoncount;                /**< the number of times a button released message has been seen for this press. */
++     int64_t               m_iPreventForwardingPowerOffCommand; /**< prevent forwarding standby commands until this time */
++     int64_t               m_iLastKeypressTime;                 /**< last time a key press was sent to the client */
++     cec_keypress          m_lastKeypress;                      /**< the last key press that was sent to the client */
++--
++1.9.1
++
++
++From 23860987ec534a4aecf93100bef3736c2620fb93 Mon Sep 17 00:00:00 2001
++From: popcornmix <popcornmix@gmail.com>
++Date: Tue, 28 Oct 2014 01:21:35 +0000
++Subject: [PATCH 5/5] Skip double press removal. It is handled through other
++ means.
++
++---
++ src/lib/CECClient.cpp | 18 +-----------------
++ src/lib/CECClient.h   |  2 --
++ 2 files changed, 1 insertion(+), 19 deletions(-)
++
++diff --git a/src/lib/CECClient.cpp b/src/lib/CECClient.cpp
++index 68eaee9..9b4b533 100644
++--- a/src/lib/CECClient.cpp
+++++ b/src/lib/CECClient.cpp
++@@ -57,11 +57,8 @@ CCECClient::CCECClient(CCECProcessor *processor, const libcec_configuration &con
++     m_repeatButtontime(0),
++     m_releaseButtontime(0),
++     m_pressedButtoncount(0),
++-    m_iPreventForwardingPowerOffCommand(0),
++-    m_iLastKeypressTime(0)
+++    m_iPreventForwardingPowerOffCommand(0)
++ {
++-  m_lastKeypress.keycode = CEC_USER_CONTROL_CODE_UNKNOWN;
++-  m_lastKeypress.duration = 0;
++   m_configuration.Clear();
++   // set the initial configuration
++   SetConfiguration(configuration);
++@@ -1568,20 +1565,7 @@ void CCECClient::CallbackAddKey(const cec_keypress &key)
++ {
++   CLockObject lock(m_cbMutex);
++   if (m_configuration.callbacks && m_configuration.callbacks->CBCecKeyPress)
++-  {
++-    // prevent double taps
++-    int64_t now = GetTimeMs();
++-    if (m_lastKeypress.keycode != key.keycode ||
++-        key.duration > 0 ||
++-        now - m_iLastKeypressTime >= DoubleTapTimeoutMS())
++-    {
++-      // no double tap
++-      if (key.duration == 0)
++-        m_iLastKeypressTime = now;
++-      m_lastKeypress = key;
++       m_configuration.callbacks->CBCecKeyPress(m_configuration.callbackParam, key);
++-    }
++-  }
++ }
++
++ void CCECClient::CallbackAddLog(const cec_log_message &message)
++diff --git a/src/lib/CECClient.h b/src/lib/CECClient.h
++index 27af3f9..eb11d9b 100644
++--- a/src/lib/CECClient.h
+++++ b/src/lib/CECClient.h
++@@ -317,7 +317,5 @@ namespace CEC
++     int64_t               m_releaseButtontime;                 /**< the timestamp when the button will be released (in seconds since epoch), or 0 if none was pressed. */
++     int32_t               m_pressedButtoncount;                /**< the number of times a button released message has been seen for this press. */
++     int64_t               m_iPreventForwardingPowerOffCommand; /**< prevent forwarding standby commands until this time */
++-    int64_t               m_iLastKeypressTime;                 /**< last time a key press was sent to the client */
++-    cec_keypress          m_lastKeypress;                      /**< the last key press that was sent to the client */
++   };
++ }
++--
++1.9.1
+
+From 95351db94a9576a5b368be85487a507f7b4e8222 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 28 Oct 2014 00:19:40 +0000
+Subject: [PATCH 73/75] [cec] Add settings for configuring button repeats
+
+---
+ language/English/strings.po                       | 15 +++++++++++++++
+ system/peripherals.xml                            |  4 +++-
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 16 ++++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/language/English/strings.po b/language/English/strings.po
+index c54cb25..761a3bc 100755
+--- a/language/English/strings.po
++++ b/language/English/strings.po
+@@ -16177,3 +16177,18 @@ msgstr ""
+ msgctxt "#38015"
+ msgid "Extract thumbnails from video files"
+ msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38050"
++msgid "Remote button press delay before repeating (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38051"
++msgid "Remote button press repeat rate (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38052"
++msgid "Remote button press release time (ms)"
++msgstr ""
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index a67dc2f..094a3c1 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -30,7 +30,9 @@
+     <setting key="device_type" type="int" value="1" configurable="0" />
+     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
+-    <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
++    <setting key="double_tap_timeout_ms" type="int" min="50" max="500" step="50" value="300" label="38050" order="16" />
++    <setting key="button_repeat_rate_ms" type="int" min="0" max="250" step="10" value="0" label="38051" order="17" />
++    <setting key="button_release_delay_ms" type="int" min="0" max="500" step="50" value="0" label="38052" order="18" />
+   </peripheral>
+ 
+   <peripheral vendor_product="2548:1001,2548:1002" bus="usb" name="Pulse-Eight CEC Adapter" mapTo="cec">
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index e80feb1..cd1c60c 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -1269,6 +1269,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+   m_configuration.bSendInactiveSource = config.bSendInactiveSource;
+   bChanged |= SetSetting("send_inactive_source", m_configuration.bSendInactiveSource == 1);
+ 
++#if defined(CEC_DOUBLE_TAP_TIMEOUT_MS_OLD)
++  m_configuration.iDoubleTapTimeout50Ms = config.iDoubleTapTimeout50Ms;
++  bChanged |= SetSetting("double_tap_timeout_ms", (int)m_configuration.iDoubleTapTimeout50Ms * 50);
++#else
++  m_configuration.iDoubleTapTimeoutMs = config.iDoubleTapTimeoutMs;
++  bChanged |= SetSetting("double_tap_timeout_ms", (int)m_configuration.iDoubleTapTimeoutMs;
++#endif
++
++  m_configuration.iButtonRepeatRateMs = config.iButtonRepeatRateMs;
++  bChanged |= SetSetting("button_repeat_rate_ms", (int)m_configuration.iButtonRepeatRateMs);
++
++  m_configuration.iButtonReleaseDelayMs = config.iButtonReleaseDelayMs;
++  bChanged |= SetSetting("button_release_delay_ms", (int)m_configuration.iButtonReleaseDelayMs);
++
+   m_configuration.iFirmwareVersion = config.iFirmwareVersion;
+   m_configuration.bShutdownOnStandby = config.bShutdownOnStandby;
+ 
+@@ -1373,6 +1387,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+   // backwards compatibility. will be removed once the next major release of libCEC is out
+   m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
+ #endif
++  m_configuration.iButtonRepeatRateMs = GetSettingInt("button_repeat_rate_ms");
++  m_configuration.iButtonReleaseDelayMs = GetSettingInt("button_release_delay_ms");
+ }
+ 
+ void CPeripheralCecAdapter::ReadLogicalAddresses(const CStdString &strString, cec_logical_addresses &addresses)
+
+From ff5ebd4c2b233480dfce05baf40bc4d40dac2a80 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Mon, 3 Nov 2014 23:17:46 +0000
+Subject: [PATCH 74/75] [cec] Don't discard buttons when repeat mode is enabled
+
+---
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index cd1c60c..7d56f2b 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -769,7 +769,10 @@ void CPeripheralCecAdapter::PushCecKeypress(const CecButtonPress &key)
+   CLog::Log(LOGDEBUG, "%s - received key %2x duration %d", __FUNCTION__, key.iButton, key.iDuration);
+ 
+   CSingleLock lock(m_critSection);
+-  if (key.iDuration > 0)
++  // avoid the queue getting too long
++  if (m_configuration.iButtonRepeatRateMs && m_buttonQueue.size() > 5)
++    return;
++  if (m_configuration.iButtonRepeatRateMs == 0 && key.iDuration > 0)
+   {
+     if (m_currentButton.iButton == key.iButton && m_currentButton.iDuration == 0)
+     {
+
+From a960108065b8effd7673c89542392e8ff600c548 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Fri, 27 Mar 2015 22:20:39 +0000
+Subject: [PATCH 75/75] Revert "[omxplayer] Attempt to fix missing subtitles
+ after seek"
+
+This reverts commit cb2e41c82fd58fd87ddfd632b847fef5e287b97e.
+---
+ xbmc/cores/omxplayer/OMXPlayerVideo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
+index 6ae404df..028b8cd 100644
+--- a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
++++ b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
+@@ -295,7 +295,7 @@ void OMXPlayerVideo::Output(double pts, bool bDropPacket)
+   const double preroll = DVD_MSEC_TO_TIME(100);
+   double media_pts = m_av_clock->OMXMediaTime();
+ 
+-  if (m_nextOverlay != DVD_NOPTS_VALUE && media_pts != 0.0 && media_pts + preroll <= m_nextOverlay)
++  if (m_nextOverlay != DVD_NOPTS_VALUE && media_pts + preroll <= m_nextOverlay)
+     return;
+ 
+   int buffer = g_renderManager.WaitForBuffer(CThread::m_bStop);
