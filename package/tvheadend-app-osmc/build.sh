@@ -22,6 +22,12 @@ then
 	handle_dep "libcurl3"
 	handle_dep "libcurl4-gnutls-dev"
 	handle_dep "git" # for dvbscan info?
+	handle_dep "zlib1g-dev"
+	handle_dep "liburiparser-dev"
+	handle_dep "libavcodec-dev"
+	handle_dep "libavutil-dev "
+	handle_dep "libavformat-dev"
+	handle_dep "libswscale-dev"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
