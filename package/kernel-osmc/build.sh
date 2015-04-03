@@ -40,7 +40,11 @@ then
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		rm -rf drivers/net/wireless/rtlwifi
+		# This is better than tracking upstream
+		rm drivers/net/wireless/rtlwifi/*.c
+		rm drivers/net/wireless/rtlwifi/*.h
+		rm drivers/net/wireless/rtlwifi/rtl8192cu/*.c
+		rm drivers/net/wireless/rtlwifi/rtl8192cu/*.h
 		install_patch "../../patches" "rbp"
 	fi
 	install_patch "../../patches" "${1}"
