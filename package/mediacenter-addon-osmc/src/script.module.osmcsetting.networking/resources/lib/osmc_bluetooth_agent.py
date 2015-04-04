@@ -41,13 +41,6 @@ def set_trusted(path, boolean):
                            "org.freedesktop.DBus.Properties")
     props.Set("org.bluez.Device1", "Trusted", boolean)
 
-
-def dev_connect(path):
-    dev = dbus.Interface(bus.get_object("org.bluez", path),
-                         "org.bluez.Device1")
-    dev.Connect()
-
-
 class Rejected(dbus.DBusException):
     _dbus_error_name = "org.bluez.Error.Rejected"
 
@@ -149,14 +142,6 @@ class Agent(dbus.service.Object):
 
 def pair_successful():
     set_trusted(dev_path, True)
-    try:
-        dev_connect(dev_path)
-    except Exception, e:
-        print(traceback.format_exc())
-        agent.set_return(1, "Exception Connecting")
-        mainloop.quit()
-        return
-
     agent.set_return(0, None)
     mainloop.quit()
 

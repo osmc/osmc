@@ -76,9 +76,13 @@ def list_paired_devices():
     return list_devices('Paired', True)
 
 
+def list_trusted_devices():
+    return list_devices('Trusted', True)
+
 def list_discovered_devices():
-    # assuming discovered device are non paired
-    return list_devices('Paired', False)
+    # assuming discovered device are non Trusted
+    # (e.g. ps3 controller is never paired)
+    return list_devices('Trusted', False)
 
 
 def get_device_property(deviceAddress, key):
@@ -110,8 +114,12 @@ def is_device_connected(deviceAddress):
 
 
 def connect_device(deviceAddress):
-    bluetooth.connect_device(deviceAddress)
-
+    try:
+        bluetooth.connect_device(deviceAddress)
+        set_device_trusted(deviceAddress, True)
+    except:
+        return False
+    return True
 
 def disconnect_device(deviceAddress):
     bluetooth.disconnect_device(deviceAddress)
@@ -142,10 +150,21 @@ def encode_return(result, messages):
 
 
 def pair_device(deviceAddress, scriptBasePath = ''):
+    print 'Attempting to pair with ' + deviceAddress
+    paired = False
+    paired = pair_using_agent(deviceAddress, scriptBasePath)
+    if not paired:
+        bluetooth.remove_device(deviceAddress)
+        return False
+    return paired
+
+
+def pair_using_agent(deviceAddress, scriptBasePath = ''):
     script_path = scriptBasePath + PAIRING_AGENT
     script = str.join(' ', [sys.executable, script_path,deviceAddress])
-    child = pexpect.spawn(script)
     paired = False
+    print 'calling agent "' + script + '"'
+    child = pexpect.spawn(script)
     while True:
         try:
             index = child.expect(['@EOL'], timeout=None)
@@ -171,10 +190,7 @@ def pair_device(deviceAddress, scriptBasePath = ''):
                     child.sendline(sendStr)
         except pexpect.EOF:
             break
-    if not paired:
-        bluetooth.remove_device(deviceAddress)
-        return False
-    return True
+    return paired
 
 
 def handleAgentInteraction(deviceAlias, command , messages):
@@ -191,7 +207,7 @@ def handleAgentInteraction(deviceAlias, command , messages):
         message = lang(32027) + ' ' + messages[1]
     if messages[0] == 'AUTHORIZE_SERVICE':
         #         'Authorize Service '                 ' on device ' 
-        message = lang(32027) + ' ' + messages[0] + ' ' + lang(32029) + ' ' + deviceAddress
+        message = lang(32027) + ' ' + messages[0] + ' ' + lang(32029) + ' ' + deviceAlias
     if messages[0] == 'REQUEST_PIN':
         #         'Enter PIN to Pair with'
         message = lang(32030) + ' ' + deviceAlias
