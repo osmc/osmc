@@ -27,12 +27,8 @@ then
 	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
 	handle_dep "cpio"
-	if [ "$1" != "rbp1" ] && [ "$1" != "rbp2" ]
-	then
-		handle_dep "device-tree-compiler"
-	else
-		handle_dep "rbp1-device-tree-compiler-osmc" # We don't need a Pi2 / ARMv7 version as we don't deploy this. No performance gain
-	fi
+	handle_dep "bison"
+	handle_dep "flex"
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
 	priority := High" >/etc/kernel-pkg.conf
@@ -40,12 +36,18 @@ then
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		# This is better than tracking upstream
-		rm drivers/net/wireless/rtlwifi/*.c
-		rm drivers/net/wireless/rtlwifi/*.h
-		rm drivers/net/wireless/rtlwifi/rtl8192cu/*.c
-		rm drivers/net/wireless/rtlwifi/rtl8192cu/*.h
 		install_patch "../../patches" "rbp"
+	fi
+	# Set up DTC
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+	then
+		pushd dtc-overlays
+		$BUILD
+		popd
+		DTC="dtc-overlays/dtc"
+	else
+		$BUILD scripts
+		DTC="scripts/dtc/dtc"
 	fi
 	install_patch "../../patches" "${1}"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
@@ -65,12 +67,6 @@ then
 	fi
 	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
-	# Build RTL8812AU module
-	pushd drivers/net/wireless/rtl8812au
-	$BUILD ARCH=arm
-	popd
-	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
-	cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
 	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		overlays="hifiberry-dac-overlay
@@ -90,7 +86,7 @@ then
 		pushd arch/arm/boot/dts
 		for dtb in $overlays
 		do
-			dtc -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
+			$DTC -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
 		done
 		popd
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
@@ -103,6 +99,13 @@ then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		popd
 	fi
+	# Add out of tree modules that lack a proper Kconfig and Makefile
+		# Build RTL8812AU module
+		pushd drivers/net/wireless/rtl8812au
+		$BUILD
+		popd
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
+		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
 	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
