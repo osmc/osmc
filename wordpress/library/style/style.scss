@@ -18,10 +18,10 @@ html, body, button, input, select, textarea {
 // COLOR //
 
 $white: #F0F0F0;
-$wc-white: #f4f4e9;
 $lgrey: #D3D3D3;
 $lgrey2: #c9c9c9;
 $dgrey: #969696;
+$dgrey2: #575757;
 $quote: #96e8cf;
 $link: #51bc9b;
 $back: $white;
@@ -491,19 +491,35 @@ width: 70%;
 // SEARCH //
 
 // DOWNLOAD //
-
-.downloados {
-  margin: 3em 0;
+.downloadsplit {
+  width: 100%;
+  height: 1px;
+  margin: 2em 0;
+  border-bottom: 2px dotted $lgrey;
+  float: left;
+  display: block;
+}
+.download.os {
+  margin: 2em 0 3.5em;
+  
+  .third {
+    .wrapper {
+      svg {
+        height: 5.5em;
+      }
+    }
+  }
+}
+.download {
+  margin: 2em 0 1.5em;
   p {
     display: none;
   }
-  .third {
+  .third, .fourth {
     text-align: center;
     color: $dark;
     
-          
     a {
-      display: inline-block;
     }
     
     .wrapper {
@@ -511,14 +527,61 @@ width: 70%;
       width: 6em;
       position: relative;
       
-      img, h3 {
+      svg {
+        width: 5em;
+        height: 7em;
+        
+        path {
+          fill: $dark;
+        }
+      }
+      .pi {
+        .structure {
+          fill: $dark;
+        }
+        .ins, .leaf {
+          fill: $white;
+        }
+      }
+      
+      img, h3, path {
         @include transition-duration(0.1s);
       }
       h3 {
-        margin-bottom: 0;
+        margin: 0.8em 0 0;
+        font-size: 110%;
+        float: left;
+        width: 100%;
+        text-align: center;
+      }
+      .info, .info2 {
+        float: left;
+        width: 100%;
+        text-align: center;
+        display: block;
+        font-size: 88%;
+      }
+      .info {
+        color: $dgrey2;
+        margin: 0.4em 0 0 0;
+      }
+      .info2 {
+        font-size: 88%;
+        color: $dgrey;
+        margin: 0;
       }
       
       &:hover, &:focus {
+        svg {
+          path {
+            fill: $link;
+          }
+        }
+        .pi {
+          .ins, .leaf {
+            fill: $link;
+          }
+        }
         img {
           opacity: 0.7;
         }
@@ -601,6 +664,7 @@ $title-size-res: 1.2em;
     
     .column {
       font-size: 95%;
+      height: 100%;
     }
 
     #logo-title {
@@ -627,7 +691,7 @@ $title-size-res: 1.2em;
     a {
       margin: 0px;
       padding: 0px;
-      line-height: $header + 0.2;
+      line-height: $header;
       text-decoration: none;
     }
   }
@@ -1192,19 +1256,38 @@ footer {
     }
   }
   
-  .downloados {
-    .third {
-      width: 33.3%;
+  .download {
+    text-align: center;
+    
+    .column {
+      width: 25%;
       float: left;
             
       .wrapper {
         width: 100%;
         padding: 0 0.8em;
-        max-width: 6em;
+        
+        svg {
+          width: 4.5em;
+        }
         
         h3 {
           font-size: 90%;
         }
+      }
+    }
+    
+    .fourth {
+      width: 25%;
+    }
+    .third {
+      width: 32%;
+      display: inline-block;
+      float: none;
+      
+      svg {
+        max-width: 4em;
+        width: 100%;
       }
     }
   }
@@ -1243,6 +1326,33 @@ footer {
 }
 
 @media screen and (max-width: $res2) {
+  .download.os {
+    margin: 1em 0 3.5em;
+  }
+  .download {
+    margin: 0;
+    
+    .fourth {
+      width: 50%;
+      float: left;
+            
+      .wrapper {
+        width: 100%;
+        padding: 0 0.8em;
+        margin: 1em 0;
+        
+        svg {
+          height: 5em;
+          width: 4em;
+        }
+        
+        h3 {
+          font-size: 90%;
+        }
+      }
+    }
+  }
+  
   .disktables {
     .table {
 
