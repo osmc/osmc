@@ -110,7 +110,7 @@ jQuery(window).on('popstate', function() {
 
 // DOWNLOAD SCROLL TO //
 
-jQuery(".download .wrapper").click(function() {
+jQuery(".download.devices .wrapper").click(function() {
   jQuery('html, body').animate({
     scrollTop: jQuery(".getstarted").offset().top - 40
   }, 800);
