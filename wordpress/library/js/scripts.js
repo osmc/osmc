@@ -108,6 +108,14 @@ jQuery(window).on('popstate', function() {
   handler.close();
 });
 
+// DOWNLOAD SCROLL TO //
+
+jQuery(".download .wrapper").click(function() {
+  jQuery('html, body').animate({
+    scrollTop: jQuery(".getstarted").offset().top - 40
+  }, 800);
+});
+
 // JS TABLE //
 
 var tablecount = 0;

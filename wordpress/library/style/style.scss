@@ -491,7 +491,7 @@ width: 70%;
 .downloadsplit {
   width: 100%;
   height: 1px;
-  margin: 2em 0;
+  margin: 0 0 2em 0;
   border-bottom: 2px dotted $lgrey;
   float: left;
   display: block;
@@ -507,8 +507,13 @@ width: 70%;
     }
   }
 }
+.veroline {
+  font-size: 0.9em;
+  text-align: center;
+  color: $dgrey2;
+}
 .download {
-  margin: 2em 0 1.5em;
+  margin: 3em 0 3em;
   p {
     display: none;
   }
@@ -522,7 +527,9 @@ width: 70%;
     .wrapper {
       margin: 0 auto;
       width: 6em;
+      cursor: pointer;
       position: relative;
+      display: inline-block;
       
       svg {
         width: 5em;
@@ -591,6 +598,8 @@ width: 70%;
 }
 
 .diskline {
+  margin: 0 0 2em;
+  
   svg {
     width: 18px;
     height: 18px;
