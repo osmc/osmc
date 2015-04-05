@@ -86,7 +86,7 @@ def extract_network_properties(dbus_properties):
     settings = None
     # get IPv4 Data
     ipv4_props = dbus_properties['IPv4']
-    if 'Address' in Ip ipv4_props:
+    if 'Address' in ipv4_props:
         settings = {}
         settings['Method'] = str(ipv4_props['Method'])
         settings['Address'] = str(ipv4_props['Address'])
