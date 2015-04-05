@@ -47,10 +47,10 @@ then
 		pushd dtc-overlays
 		$BUILD
 		popd
-		DTC="dtc-overlays/dtc"
+		DTC=$(pwd)"/dtc-overlays/dtc"
 	else
 		$BUILD scripts
-		DTC="scripts/dtc/dtc"
+		DTC=$(pwd)"/scripts/dtc/dtc"
 	fi
 	install_patch "../../patches" "${1}"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
@@ -93,7 +93,6 @@ then
 		done
 		popd
 		mv arch/arm/boot/dts/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
-		popd
 	fi
 	if [ "$1" == "vero" ]
 	then
