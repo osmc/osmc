@@ -106,12 +106,14 @@ then
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
 		$BUILD
+		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		# Build RTL8192CU module
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
+		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
