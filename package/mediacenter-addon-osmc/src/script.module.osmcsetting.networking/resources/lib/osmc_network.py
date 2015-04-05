@@ -86,7 +86,7 @@ def extract_network_properties(dbus_properties):
     settings = None
     # get IPv4 Data
     ipv4_props = dbus_properties['IPv4']
-    if 'Method' in ipv4_props:
+    if 'Address' in Ip ipv4_props:
         settings = {}
         settings['Method'] = str(ipv4_props['Method'])
         settings['Address'] = str(ipv4_props['Address'])
@@ -234,11 +234,10 @@ def scan_wifi():
     except dbus.DBusException:
         # technology.Scan() will sometimes time out if connman is "busy". Catch exception and retry.
         try:
-            time.sleep(2)
+            time.sleep(1)
             wifi.Scan()
         except dbus.DBusException:
             pass
-    time.sleep(5)
 
 
 def get_wifi_networks():
@@ -257,8 +256,6 @@ def get_wifi_networks():
                 settings = extract_network_properties(dbus_properties)
                 if settings:
                     wifi_settings.update(settings)
-                else:
-                    print (dbus_properties['State'])
             wifis[wifi_settings['SSID']] = wifi_settings
     return wifis
 
