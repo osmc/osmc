@@ -36,6 +36,8 @@ then
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
+		# We prefer to build 8192cu out of tree. This got included upstream..
+		rm -rf drivers/net/wireless/rtl8192cu
 		install_patch "../../patches" "rbp"
 	fi
 	# Set up DTC
