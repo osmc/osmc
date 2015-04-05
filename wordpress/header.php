@@ -45,7 +45,7 @@
 		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
 		<?php wp_head(); ?>
         <!-- inject:css -->
-        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-882d1e6d.css">
+        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-f652e6ac.css">
         <!-- endinject -->
         
 	</head>

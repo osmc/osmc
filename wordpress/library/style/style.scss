@@ -55,6 +55,20 @@ body {
   margin: 0;
 }
 
+input, textarea {
+  
+  border: 0;
+  padding: 0.4em;
+  border: 1px solid transparent;
+  color: $black;
+  font-size: 0.8rem;
+  @include border-radius(1px);
+  @include transition-duration(0.1s);
+
+  &:focus {
+    border: 1px solid $dgrey;
+  }
+}
 
 input:focus {
   outline: none;
@@ -87,7 +101,7 @@ a:active {
 	text-decoration: none;
 }
 a:hover, a:focus {
-  color: $dark;
+  color: $dgrey2;
   text-decoration: none;
 }
 p {
@@ -163,7 +177,7 @@ table {
     }
   }
   
-  .facebook:hover {
+  .facebook:hover, .facebook:focus {
     
     svg path {
       fill: #3B5998;
@@ -173,7 +187,7 @@ table {
       color: #3B5998;
     }
   }
-  .twitter:hover {
+  .twitter:hover, .twitter:focus {
     svg path {
       fill: #4099FF;
     }
@@ -181,7 +195,7 @@ table {
       color: #4099FF;
     }
   }
-  .github:hover {
+  .github:hover, .github:focus {
     svg path {
       fill: $dgrey;
     }
@@ -189,7 +203,7 @@ table {
       color: $dgrey;
     }
   }
-  .rss:hover {
+  .rss:hover, .rss:focus {
     svg path {
       fill: #FF6600;
     }
@@ -344,10 +358,6 @@ article {
 	border-bottom: 1px solid $lgrey;
 	padding: 0 0 2em 0;
   }
-  div:first-child .widgettitle {
-      margin: 0 0 1.33em 0;
-    font-size: 105%;
-  }
   .widgettitle {
     font-weight: 600;
   }
@@ -392,16 +402,13 @@ nav.pagination {
 .contactform {
   color: $black;
   input {
-    width: 40%;
+    width: 30%;
     float: left;
     margin: 0 1em 0 0;
-    padding: 0 0 0 0.1em;
-    background: none;
+    
   }
   input, textarea {
-    border: none;
     color: $dark;
-    border-bottom: 1px solid $lgrey;
     margin-top: 1em;
     @include input-placeholder {
       color: $dgrey;
@@ -410,8 +417,8 @@ nav.pagination {
   
   textarea {
     width: 80%;
+    font-size: 1rem;
     height: 10em;
-    border: 0px solid $lgrey;
     padding: 0.5em;
     margin: 2em 0 1.5em;
   }
@@ -419,8 +426,9 @@ nav.pagination {
 
 button {
   background-color: $dark-trans;
+  font-size: 0.9rem;
   border: 0;
-  border-radius: 3px;
+  @include border-radius(2px);
   color: $white;
   padding: 0.5em 0.7em;
   @include transition-duration(0.2s);
@@ -440,17 +448,6 @@ button {
   border: 0;
   
   input {
-    border: 0;
-    padding: 0.4em;
-    font-size: 80%;
-    border: 1px solid transparent;
-    color: $black;
-    border-radius: 2px;
-    @include transition-duration(0.1s);
-  }
-  
-  input:focus {
-    border: 1px solid $dgrey;
   }
   
   button {
@@ -829,8 +826,7 @@ footer {
     text-align: center;
     
     .amount {
-      border: 0;
-      padding: 0.2em 0.2em;
+      padding: 0.2em;
       width: 15%;
       max-width: 3em;
       min-width: 2.2em;
@@ -846,7 +842,7 @@ footer {
       background-color: $lgrey;
       padding: 0.2em 0.4em;
       font-size: 95%;
-      border-radius: 2px;
+      @include border-radius(2px);
       @include transition-duration(0.1s);
     }
     .radio:checked + label {
@@ -862,6 +858,7 @@ footer {
         max-width: 8em;
         height: 2.6em;
         padding: 0.4em 0.5em;
+        margin: 0 0.2em;
         vertical-align: middle;
         
         &:hover, &:focus {
@@ -899,18 +896,11 @@ footer {
 // NEWSLETTER //
 
 .newsletter_subscribe {
-  text-align: center;
-  font-size: 95%;
   .email {
-    background-color: $white;
-    color: $black;
     display: block;
     margin: 1em auto;
     width: 100%;
     max-width: 15em;
-    border: 0px;
-    font-weight: 400;
-    padding: 0.3em;
     @include input-placeholder {
       color: $dgrey;
     }
@@ -940,7 +930,7 @@ footer {
     color: $link;
     
     &:hover, &:focus {
-      border-bottom: 0px solid black;
+      color: $dgrey2;
     }
   }
   
@@ -1317,7 +1307,7 @@ footer {
   }
   .contactform {
     input {
-      width: 45%;
+      width: 40%;
     }
     textarea {
       width: 90%;
