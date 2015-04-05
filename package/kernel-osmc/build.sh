@@ -100,12 +100,18 @@ then
 		popd
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
+	# Fix CPU architecture
+	ARCH=$(arch | tr -d v7l | tr -d v6)
+	export ARCH
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
 		$BUILD
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/rtl8812au/
+	# Unset architecture
+	ARCH=$(arch)
+	export ARCH
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
 	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
