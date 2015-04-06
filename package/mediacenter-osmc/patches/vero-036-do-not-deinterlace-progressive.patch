@@ -1,0 +1,28 @@
+From e62704932ef7fdd29c5a6f1e379014b865552a3b Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Mon, 6 Apr 2015 12:11:32 +0200
+Subject: [PATCH] IMX: Do not deinterlace progressive frames v2
+
+---
+ xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
+index d523db4..a271b8da 100644
+--- a/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
+@@ -612,8 +612,12 @@ void CLinuxRendererGLES::RenderUpdateVideo(bool clear, DWORD flags, DWORD alpha)
+ 
+       bool topFieldFirst = true;
+ 
+-      // Deinterlacing requested
+-      if (flags & RENDER_FLAG_FIELDMASK)
++      // Deinterlacing requested - don't deinterlace progressive that is wrongly flagged
++      bool wronglyFlagged = (flags & RENDER_FLAG_FIELDMASK && buffer->GetFieldType() == VPU_FIELD_NONE);
++      if (wronglyFlagged)
++        CLog::Log(LOGWARNING, "Content is progressive but flagged interlaced");
++
++      if (flags & RENDER_FLAG_FIELDMASK && !wronglyFlagged)
+       {
+         if ((buffer->GetFieldType() == VPU_FIELD_BOTTOM)
+         ||  (buffer->GetFieldType() == VPU_FIELD_BT) )
