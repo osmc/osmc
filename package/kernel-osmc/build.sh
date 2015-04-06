@@ -40,7 +40,6 @@ then
 		install_patch "../../patches" "rbp"
 		# have to do this after, because upstream brings its own rtl8192cu in!
 		rm -rf drivers/net/wireless/rtl8192cu
-		mv drivers/net/wireless/rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
 	# Set up DTC
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -107,6 +106,7 @@ then
 	ARCH=$(arch | tr -d v7l | tr -d v6)
 	export ARCH
 		# Build RTL8812AU module
+		mv rtl8812au drivers/net/wireless/rtl8812au
 		pushd drivers/net/wireless/rtl8812au
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
@@ -114,6 +114,7 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		# Build RTL8192CU module
+		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
