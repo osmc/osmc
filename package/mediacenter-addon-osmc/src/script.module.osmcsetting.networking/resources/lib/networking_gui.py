@@ -689,11 +689,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         connected = item.getProperty('Connected')
         ssid = item.getProperty('SSID')
         if connected == 'False':
-            if not self.conn_ssid:  # if we are nit connected to a network connect
+            if not self.conn_ssid:  # if we are not connected to a network connect
                 if self.connect_to_wifi(ssid, encrypted):
                     strength = self.current_network_config['Strength']
                     icon = wifi_populate_bot.get_wifi_icon(encrypted,strength / 25,True)
                     item.setIconImage(icon)
+                    item.setProperty('Connected', 'True')
+                    self.conn_ssid = ssid
 
             else:  # Display a toast asking the user to disconnect first
                 # 'Please disconnect from the current network before connecting'
@@ -948,6 +950,7 @@ class wifi_scanner_bot(threading.Thread):
         super(wifi_scanner_bot, self).__init__()
 
     def run(self):
+        log('Scanning WIFI')
         osmc_network.scan_wifi()
 
 
@@ -977,7 +980,7 @@ class wifi_populate_bot(threading.Thread):
                 self.stop_thread()
             # only run the network check every 2 seconds, but allow the exit command to be checked every 10ms
             if runs % 200 == 0:
-
+                log('Updating Wifi networks')
                 wifis = osmc_network.get_wifi_networks()
 
                 running_dict.update(wifis)
@@ -993,7 +996,7 @@ class wifi_populate_bot(threading.Thread):
                     except:
                         pass
 
-            if runs % 600 == 0: # every minute re-scan wifi
+            if not self.exit and runs % 600 == 0: # every minute re-scan wifi unless the thread has been asked to exit
                 self.wifi_scanner_bot = wifi_scanner_bot()
                 self.wifi_scanner_bot.setDaemon(True)
                 self.wifi_scanner_bot.start()
@@ -1004,6 +1007,7 @@ class wifi_populate_bot(threading.Thread):
 
 
     def stop_thread(self):
+        log('Request to stop thread')
         self.exit = True
 
     def update_list_control(self, running_dict):
