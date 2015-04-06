@@ -40,6 +40,7 @@ then
 		install_patch "../../patches" "rbp"
 		# have to do this after, because upstream brings its own rtl8192cu in!
 		rm -rf drivers/net/wireless/rtl8192cu
+		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
 	# Set up DTC
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -102,7 +103,8 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		# Build RTL8192CU module
-		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
+		# We already moved in place to satisfy Pi deps
+		if [ "$1" != "rbp1" ] && [ "$1" != "rbp2" ]; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
