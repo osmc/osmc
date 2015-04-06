@@ -85,11 +85,11 @@ then
 		hy28b-overlay
 		piscreen-overlay
 		rpi-display-overlay
-		spi-bcm2835-overlay
-		"
+		spi-bcm2835-overlay"
 		pushd arch/arm/boot/dts
 		for dtb in $overlays
 		do
+			echo Building DT overlay $dtb
 			$DTC -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
 		done
 		popd
