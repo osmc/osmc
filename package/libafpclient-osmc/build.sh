@@ -9,7 +9,8 @@ pull_source "https://github.com/Sky-git/afpfs-ng-fork" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libafpclient-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building libafpclient"
 	out=$(pwd)/files
@@ -36,5 +37,7 @@ then
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files/ libafpclient-osmc.deb
 	dpkg -b files-dev libafpclient-dev-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

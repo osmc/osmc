@@ -7,7 +7,8 @@
 
 # Build in native environment
 build_in_env "${1}" $(pwd) "splash-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building splash for OSMC"
 	out=$(pwd)/files
@@ -27,5 +28,7 @@ then
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files splash-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

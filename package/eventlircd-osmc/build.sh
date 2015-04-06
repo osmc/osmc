@@ -9,7 +9,8 @@ pull_source "http://eventlircd.googlecode.com/svn/trunk/" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching eventlircd source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "eventlircd-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building package eventlircd"
 	out=$(pwd)/files
@@ -37,5 +38,7 @@ then
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ eventlircd-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

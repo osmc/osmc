@@ -8,7 +8,8 @@
 if [ $1 == "rbp1" ]; then pull_source "https://github.com/bavison/arm-mem/archive/cd2c8f9202137c79f7afb77ecb87e713a0800d3c.zip" "$(pwd)/src"; fi
 if [ $1 == "rbp2" ]; then pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"; fi
 build_in_env "${1}" $(pwd) "rbp-armmem-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building package rbp-armmem"
 	out=$(pwd)/files
@@ -23,7 +24,9 @@ then
 	cp -ar libarmmem.so $out/usr/lib
 	cp -ar libarmmem.a $out/usr/lib
 	popd
-    fix_arch_ctl "files/DEBIAN/control"
+	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ rbp-armmem-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

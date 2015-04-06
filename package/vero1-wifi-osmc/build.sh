@@ -7,7 +7,8 @@
 
 # Build in native environment
 build_in_env "${1}" $(pwd) "vero1-wifi-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building vero1-wifi-osmc"
 	out=$(pwd)/files
@@ -19,5 +20,7 @@ then
 	strip_files "${out}"
 	popd
 	dpkg -b files/ vero1-wifi-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

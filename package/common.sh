@@ -59,7 +59,7 @@ function build_in_env()
 	mount -t proc proc /proc >/dev/null 2>&1
 	ischroot
 	chrootval=$?
-	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return 0; fi
+	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return 99; fi
 	umount /proc >/dev/null 2>&1
 	update_sources
 	DEP=${1}
@@ -76,14 +76,14 @@ function build_in_env()
 	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
 	mount --bind "$2/../../" "$TCDIR"/mnt
 	chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
-	return 1
+	return=$?
+	if [ $return == 99 ]; then return 1; else return $return; fi
 }
 
 function teardown_env()
 {
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
 	umount ${TCDIR}/mnt >/dev/null 2>&1
-	return 0 # Fix Make error 32
 }
 
 function handle_dep()

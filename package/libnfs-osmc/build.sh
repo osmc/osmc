@@ -9,7 +9,8 @@ pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.6.tar.gz
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libnfs-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building libnfs"
 	out=$(pwd)/files
@@ -36,5 +37,7 @@ then
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files libnfs-osmc.deb
 	dpkg -b files-dev libnfs-dev-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

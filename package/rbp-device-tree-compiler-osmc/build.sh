@@ -6,7 +6,8 @@
 . ../common.sh
 # Build in native environment
 build_in_env "${1}" $(pwd) "rbp-device-tree-compiler-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building package rbp-device-tree-compiler"
 	out=$(pwd)/files
@@ -23,5 +24,7 @@ then
 	strip_files "${out}"
 	popd
 	dpkg -b files/ rbp-device-tree-compiler-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

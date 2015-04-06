@@ -9,7 +9,8 @@ pull_source "https://github.com/Pulse-Eight/libcec/archive/0a3a1d742ceebcde87ca6
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building libcec"
 	out=$(pwd)/files
@@ -44,5 +45,7 @@ then
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files/ libcec-osmc.deb
 	dpkg -b files-dev libcec-dev-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

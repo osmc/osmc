@@ -11,4 +11,3 @@ mkdir -p files/usr/share/kodi/addons
 cp -ar src/* files/usr/share/kodi/addons
 rm -rf files/usr/share/kodi/addons/script.module.osmcsetting.template*
 dpkg -b files/ mediacenter-addon-osmc.deb
-teardown_env "${1}"

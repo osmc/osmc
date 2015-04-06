@@ -9,7 +9,8 @@ pull_source "git://git.ffmpeg.org/rtmpdump" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "librtmp-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building librtmp"
 	out=$(pwd)/files
@@ -44,5 +45,7 @@ then
 	cd ../../
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files-dev librtmp-dev-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

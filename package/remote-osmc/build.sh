@@ -5,7 +5,8 @@
 
 . ../common.sh
 build_in_env "${1}" $(pwd) "remote-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building remote package"
 	make clean
@@ -15,5 +16,7 @@ then
 	echo "Depends: ${1}-lirc-osmc, ${1}-eventlircd-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ remote-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

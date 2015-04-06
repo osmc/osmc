@@ -17,7 +17,8 @@ pull_source "http://busybox.net/downloads/busybox-1.23.0.tar.bz2" "$(pwd)/src/bu
 pull_source "https://www.kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.8.tar.xz" "$(pwd)/src/kexec-tools"
 build_in_env "${1}" $(pwd) "atv-bootloader-osmc"
 
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building package atv-bootloader"
 	mkdir -p src/initrd
@@ -92,5 +93,7 @@ then
 	cp src/bootloader/mach_kernel files/boot/
 	# Build Deb package
 	dpkg -b files/ atv-bootloader-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

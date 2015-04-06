@@ -14,7 +14,8 @@ fi
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "irqbalance-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building irqbalance"
 	out=$(pwd)/files
@@ -35,5 +36,7 @@ then
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ irqbalance-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

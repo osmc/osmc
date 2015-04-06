@@ -9,7 +9,8 @@ pull_source "http://psg.mtu.edu/pub/xbmc/build-deps/sources/shairplay-139d5ef.ta
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libshairplay-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building libshairplay"
 	out=$(pwd)/files
@@ -37,5 +38,7 @@ then
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg -b files/ libshairplay-osmc.deb
 	dpkg -b files-dev libshairplay-dev-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

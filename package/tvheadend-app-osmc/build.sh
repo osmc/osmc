@@ -9,7 +9,8 @@ pull_source "https://github.com/tvheadend/tvheadend/archive/${VERSION}.tar.gz" "
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "tvheadend-app-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building TVHeadend"
 	out=$(pwd)/files
@@ -43,5 +44,7 @@ then
 	fix_arch_ctl "files/DEBIAN/control"
 	publish_applications_targeted "$(pwd)" "$1" "tvheadend-app-osmc"
 	dpkg -b files/ tvheadend-app-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

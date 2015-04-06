@@ -9,7 +9,8 @@ pull_source "https://www.kernel.org/pub/linux/network/connman/connman-${VERSION}
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "connman-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building package connman"
 	out=$(pwd)/files
@@ -40,5 +41,7 @@ then
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg -b files/ connman-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return

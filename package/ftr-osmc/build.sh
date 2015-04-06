@@ -5,7 +5,8 @@
 
 . ../common.sh
 build_in_env "${1}" $(pwd) "ftr-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building ftr"
 	make clean
@@ -17,5 +18,7 @@ then
 	chmod +x usr/bin/ftr
 	popd
 	dpkg -b files/ ftr-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return
