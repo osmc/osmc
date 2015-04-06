@@ -1,0 +1,34 @@
+<html>
+<head></head>
+<body>
+<p>OSMC has bluetooth support built into the My OSMC addon as part of the Networking module</p>
+
+<p>OSMC currently supports connecting to the following types of devices:</p>
+<ul>
+  <li>HID devices (e.g. Keyboards)</li>
+  <li>Remotes (e.g. <a href="http://http://en.wikipedia.org/wiki/PlayStation_3_accessories#Blu-ray_Disc_Remote_Control"> Sony BD Remote</a>)
+</ul>
+</p>
+<p><h4>Connecting a Bluetooth Device</h4></p>
+<ul>
+ <li>Goto My OSMC</li>
+ <li>Open the Networking module</li>
+ <li>Select the Bluetooth menu option (If you do not see the option see the troubleshooting section)</li>
+ <li>Select the Start/Stop Discover toggle to turn bluetooth discovery on</li>
+ <li>Put the device you want to connect into pairing mode after a while it should appear in the 'Available Devices' list</li>
+ <li>Select your device in the list you should now get two options 'Pair and Connect' or 'Connect'</li>
+ <li>If you have chosen to pair with the device notifications will appear giving further instructions to pair your device</li>
+ <li>Once your device is paired it will move from the Available Devices to 'Paired Device'</li> 
+</ul>
+<p><h4>Troubleshooting</h4></p>
+If the bluetooth menu item not displayed in the Networking module this could be because
+<ul>
+  <li>Your bluetooth adapter is not supported by OSMC<br> 
+check <em>dmesg</em> if you require support please upload  <a href="https://osmc.tv/help/wiki/logs"> logs</a> and start a post on the <a href=”https://discourse.osmc.tv”>forums</a></li>
+  <li>The <em>bluetooth</em> service has been stopped – the addon cannot detect a bluetooth adapter if the service is not started.<br>
+To check service status use <em>systemctl is-active bluetooth</em> if the service is not active start it with <em>systemctl start bluetooth</em>
+</li>
+</ul>
+<p>If your bluetooth device will not connect/pair please upload  <a href="https://osmc.tv/help/wiki/logs"> logs</a> after attempting to connect the device and start a post on the <a href=”https://discourse.osmc.tv”>forums</a></p>
+</body>
+</html>
