@@ -118,7 +118,9 @@ then
 	fi
 	if [ "$1" == "rbp2" ]
 	then
-		handle_dep "rbp2-libcec-dev-osmc"
+		# Stop Vero conflicts
+		dpkg --list "vero-libcec-dev-osmc"
+		if [ $? != 0]; then handle_dep "rbp2-libcec-dev-osmc"; fi
 		handle_dep "armv7-libshairplay-dev-osmc"
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
@@ -126,7 +128,9 @@ then
 	fi
 	if [ "$1" == "vero" ]
 	then
-		handle_dep "vero-libcec-dev-osmc"
+		# Stop RBP2 conflicts
+		dpkg --list "rbp2-libcec-dev-osmc"
+		if [ $? != 0]; then handle_dep "vero-libcec-dev-osmc"; fi
 		handle_dep "armv7-libshairplay-dev-osmc"
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
