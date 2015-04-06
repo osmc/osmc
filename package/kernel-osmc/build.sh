@@ -112,6 +112,7 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 	# Unset architecture
+	popd
 	ARCH=$(arch)
 	export ARCH
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
