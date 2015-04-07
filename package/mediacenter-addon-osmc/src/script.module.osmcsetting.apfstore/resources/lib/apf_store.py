@@ -241,8 +241,14 @@ class APF_STORE(object):
 			self.URL = 'http://download.osmc.tv/apps/rbp2'
 
 		log('APF data URL: %s' % self.URL)
-			
-		r = requests.get(self.URL.replace('\n','').replace('\t','').replace('\n',''))
+		
+		try:
+			r = requests.get(self.URL.replace('\n','').replace('\t','').replace('\n',''))
+
+		except:
+			log('Connection to %s failed' % self.URL)
+
+			return 'failed'
 
 		try:
 
