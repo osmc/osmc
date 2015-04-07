@@ -15,4 +15,5 @@ if [ "$1" = "remove" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	remove_divert /lib/systemd/system/connman.service.distributed /lib/systemd/system/connman.service
+	remove_divert /lib/udev/rules.d/75-persistent-net-generator.rules.distributed /lib/udev/rules.d/75-persistent-net-generator.rules
 fi

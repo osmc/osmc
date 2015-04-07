@@ -15,4 +15,6 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install_divert PATH_DIV PATH_ORIG
 
 	install_divert /lib/systemd/system/connman.service.distributed /lib/systemd/system/connman.service
+	install_divert /lib/udev/rules.d/75-persistent-net-generator.rules.distributed /lib/udev/rules.d/75-persistent-net-generator.rules
+	rm -f /etc/udev/rules.d/70-persistent-net.rules
 fi
