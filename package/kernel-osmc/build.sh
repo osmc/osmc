@@ -4,8 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp1 && VERSION="3.18.10" && REV="1"
-test $1 == rbp2 && VERSION="3.18.10" && REV="1"
+test $1 == rbp1 && VERSION="3.18.11" && REV="1"
+test $1 == rbp2 && VERSION="3.18.11" && REV="1"
 test $1 == vero && VERSION="3.14.37" && REV="1"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
