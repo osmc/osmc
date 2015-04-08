@@ -101,6 +101,9 @@ function handle_dep()
 			return 1
 		else
 			echo -e "Found in APT and will install"
+			# armv7 conflicts
+			if [ "$1" == "vero-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc"; fi
+			if [ "$1" == "rbp-userland-dev-osmc" ]; then remove_conflicting "vero-userland-dev-osmc"; fi
 			install_package ${1}
 		fi
 	else
@@ -141,6 +144,19 @@ function publish_applications_targeted()
 	done
 }
 
+function remove_conflicting()
+{
+	# This is not ideal...
+	ischroot
+	chrootval=$?
+	# guard
+	if [ $chrootval == 2 ] || [ $chrootval == 0 ]
+	then
+		dpkg --list | grep -q $1
+		if [ $? == 0 ]; then apt-get remove --purge $1; fi
+	fi
+}
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
@@ -149,3 +165,4 @@ export -f teardown_env
 export -f handle_dep
 export -f publish_applications_any
 export -f publish_applications_targeted
+export -f remove_conflicting
