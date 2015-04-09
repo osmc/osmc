@@ -75,8 +75,10 @@ namespace utils
     {
         utils::writeLog("Enumerating supported devices");
         QList<SupportedDevice * > devices;
+        SupportedDevice *VERO = new SupportedDevice("Vero", "VERO1", true, false, false, false, true, false);
         SupportedDevice *RBP = new SupportedDevice("Raspberry Pi", "RBP", true, true, true, false, true, false);
         SupportedDevice *RBP2 = new SupportedDevice("Raspberry Pi 2", "RBP2", true, true, true, false, true, false);
+        devices.append(VERO);
         devices.append(RBP);
         devices.append(RBP2);
         return devices;
