@@ -268,7 +268,15 @@ def wifi_connect(path, password=None):
         keyfile.write(password)
         keyfile.close()
         process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'keyfile'])
-        time.sleep(7)
+	count = 0
+	while not os.path.exists('/tmp/agent_started'):
+	    count+=1
+	    time.sleep(1)
+	    if count > 10:
+                print 'Agent had not started after 10 seconds'
+		break 
+	if os.path.exists('/tmp/agent_started'):
+	    os.remove('/tmp/agent_started')
     print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
     try:
