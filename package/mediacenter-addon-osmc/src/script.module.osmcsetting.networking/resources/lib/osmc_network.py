@@ -263,18 +263,19 @@ def get_wifi_networks():
 def wifi_connect(path, password=None):
     connected = False
     if password:
-        keyfile = open("/tmp/key", "w")
+        print 'Starting Agent'
+        keyfile = open('/tmp/key', 'w')
         keyfile.write(password)
         keyfile.close()
         process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'keyfile'])
-        time.sleep(2)
+        time.sleep(7)
     print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
     try:
         service.Connect(timeout=15000)
         connected = True
     except dbus.DBusException, e:
-        print ('DBusException connecting')
+        print ('DBusException connecting ' + str(e))
         connected = False
     print (connected)
     if password:
