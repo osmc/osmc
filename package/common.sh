@@ -104,6 +104,8 @@ function handle_dep()
 			# armv7 conflicts
 			if [ "$1" == "vero-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc"; fi
 			if [ "$1" == "rbp-userland-dev-osmc" ]; then remove_conflicting "vero-userland-dev-osmc"; fi
+			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc"; fi
+			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc"; fi
 			install_package ${1}
 		fi
 	else
@@ -153,7 +155,7 @@ function remove_conflicting()
 	if [ $chrootval == 2 ] || [ $chrootval == 0 ]
 	then
 		dpkg --list | grep -q $1
-		if [ $? == 0 ]; then apt-get remove --purge $1; fi
+		if [ $? == 0 ]; then echo -e "Removing conflicting package $1" && apt-get remove --purge $1; fi
 	fi
 }
 
