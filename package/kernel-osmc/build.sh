@@ -94,6 +94,8 @@ then
 	# Fix CPU architecture
 	ARCH=$(arch | tr -d v7l | tr -d v6)
 	export ARCH
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+		then
 		# Build RTL8812AU module
 		mv rtl8812au drivers/net/wireless/rtl8812au
 		pushd drivers/net/wireless/rtl8812au
@@ -102,6 +104,9 @@ then
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		fi
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+		then
 		# Build RTL8192CU module
 		# We already moved in place to satisfy Pi deps
 		if [ "$1" != "rbp1" ] && [ "$1" != "rbp2" ]; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
@@ -111,6 +116,7 @@ then
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		fi
 	# Unset architecture
 	popd
 	ARCH=$(arch)
