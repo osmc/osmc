@@ -2,6 +2,10 @@
 
 processimage()
 {
+    count1=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'imx6*.dtb' | wc -l)
+    count2=$(find /boot/dtb-${1}/overlays/ -maxdepth 1 -type f -name '*.dtb' | wc -l)
+    if [ $count1 -lt 1 -o $count2 -lt 1 ]; then exit 1; fi
+
     cp -f ${2} /boot/zImage
     rm -rf /boot/*.dtb
     cp -af /boot/dtb-${1}/* /boot/
