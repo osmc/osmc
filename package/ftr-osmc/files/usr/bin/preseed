@@ -187,7 +187,16 @@ def main():
 							keyfile.write(network["keyvalue"])
 							keyfile.close()
 							os.system("/bin/sh -c \"/usr/bin/python /usr/bin/preseed-agent keyfile &\"")
-							time.sleep(5)
+							count = 0
+                                                        while not os.path.exists('/tmp/agent_started'):
+                                                            count+=1
+                                                            time.sleep(1)
+                                                            if count > 10:
+                                                                syslog.syslog('Agent had not started after 10 seconds')
+                                                                break
+                                                        if os.path.exists('/tmp/agent_started'):
+                                                            os.remove('/tmp/agent_started')
+
 							try:
 								syslog.syslog("Attempting connection now")
 								service.Connect(timeout=15000)
