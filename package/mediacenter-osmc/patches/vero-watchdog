@@ -5,7 +5,7 @@
 
 fb_restore() {
 	[ -e /var/run/fb_resolution ] && /bin/fbset $(cat /var/run/fb_resolution)
-	/bin/fbset -depth 8 && /bin/fbset -depth 16
+	/bin/fbset -depth 8 && /bin/fbset -depth 32
 	echo 1 >/sys/class/vtconsole/vtcon1/bind
 }
 
@@ -30,7 +30,6 @@ while true; do
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
-	echo 0 > /sys/class/vtconsole/vtcon1/bind
 	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
@@ -45,7 +44,7 @@ while true; do
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
-		/bin/fbset -depth 8 && /bin/fbset -depth 16
+		/bin/fbset -depth 8 && /bin/fbset -depth 32
 		/usr/bin/setterm --cursor on >/dev/tty1
 		systemctl start getty@tty1
 		count=30
