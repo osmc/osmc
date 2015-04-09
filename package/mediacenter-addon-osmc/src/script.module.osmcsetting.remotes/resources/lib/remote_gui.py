@@ -41,6 +41,9 @@ class remote_gui_launcher(object):
 
 	def __init__(self):
 
+		# flag to idicate whether the GUI should re-opn upon close. This is for when the remote changes do not stick.
+		self.open_gui = True
+
 		# container for any confs we want to ignore
 		self.excluded = ['lircd.conf']
 
@@ -92,9 +95,14 @@ class remote_gui_launcher(object):
 
 
 	def open_gui(self):
-		self.remote_gui.doModal()
 
-		self.apply_selection(self.remote_gui.remote_selection)
+		while self.reopen:
+
+			self.open_gui = False
+
+			self.remote_gui.doModal()
+
+			self.apply_selection(self.remote_gui.remote_selection)
 
 
 	def construct_listitem(self, conf):
@@ -141,9 +149,24 @@ class remote_gui_launcher(object):
 
 		if os.path.isfile(conf):
 
+			# read the symlink target
+			original_target = os.readlink( self.lircd_path )
+			
 			subprocess.call(['sudo', 'ln', '-sf', conf, self.lircd_path])
 
 			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
+
+		# get the user to confirm that this works
+		user_confirm = Dialog.yesno(heading=lang(32006), line1=lang(32007), line2=lang(32008), nolabel=lang(32009), yeslabel=lang(32010), autoclose=10000 )
+
+		if not user_confirm:
+
+			subprocess.call(['sudo', 'ln', '-sf', original_target, self.lircd_path])
+
+			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
+
+			self.open_gui = True
+
 
 
 class remote_GUI(xbmcgui.WindowXMLDialog):
