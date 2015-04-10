@@ -1,0 +1,29 @@
+From bde1b0a8527b3dcf5a5b138fd65d6081396afc82 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 10 Apr 2015 13:04:37 +0100
+Subject: [PATCH 1/2] [sysfsutils] Make sure terminator is not read in
+ GetString()
+
+* Causes issues in IMXWindowingEGL
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/SysfsUtils.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
+index ca62986..3a988e3 100644
+--- a/xbmc/utils/SysfsUtils.cpp
++++ b/xbmc/utils/SysfsUtils.cpp
+@@ -45,7 +45,7 @@ int SysfsUtils::GetString(const std::string& path, std::string& valstr)
+   int len;
+   char buf[256] = {0};
+ 
+-  int fd = open(path.c_str(), O_RDONLY);
++  int fd = open(path.c_str(), O_RDONLY | O_TEXT);
+   if (fd >= 0)
+   {
+     valstr.clear();
+-- 
+2.1.0
+
