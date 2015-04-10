@@ -143,6 +143,8 @@ class remote_gui_launcher(object):
 		# local means that the file is in /etc/lirc
 		# user means that the file was selected by the user
 
+		CONFIRM_DURATION = 10
+
 		if not selection: return 
 
 		via, conf = selection
@@ -157,7 +159,7 @@ class remote_gui_launcher(object):
 			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
 		# get the user to confirm that this works
-		user_confirm = Dialog.yesno(heading=lang(32006), line1=lang(32007), line2=lang(32008), nolabel=lang(32009), yeslabel=lang(32010), autoclose=10000 )
+		user_confirm = xbmcgui.Dialog.yesno(heading=lang(32006), line1=lang(32007), line2=lang(32008) % CONFIRM_DURATION, nolabel=lang(32009), yeslabel=lang(32010), autoclose=CONFIRM_DURATION * 1000 )
 
 		if not user_confirm:
 
