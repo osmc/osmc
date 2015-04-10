@@ -1,30 +1,15 @@
-From abb872a7fd7d286471c1c469ddb2bdb32a1edbb8 Mon Sep 17 00:00:00 2001
+From df3ad93253c7e9a850ec466b31f12ca15f3c59fa Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Fri, 10 Apr 2015 03:43:11 +0100
-Subject: [PATCH] More logging for i.MX window bringup and some test
- workarounds
+Date: Fri, 10 Apr 2015 13:05:39 +0100
+Subject: [PATCH 2/2] Logging of the i.MX window bringup
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/utils/SysfsUtils.cpp               |  2 +-
  xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 16 +++++++++++++++-
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
-index ca62986..87b2cc2 100644
---- a/xbmc/utils/SysfsUtils.cpp
-+++ b/xbmc/utils/SysfsUtils.cpp
-@@ -29,7 +29,7 @@
- 
- int SysfsUtils::SetString(const std::string& path, const std::string& valstr)
- {
--  int fd = open(path.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0644);
-+  int fd = open(path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_SYNC, 0644);
-   if (fd >= 0)
-   {
-     write(fd, valstr.c_str(), valstr.size());
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-index 8b5ec68..ab8b4ac 100644
+index 8d67bcc..e1a6b27 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 @@ -244,14 +244,28 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
