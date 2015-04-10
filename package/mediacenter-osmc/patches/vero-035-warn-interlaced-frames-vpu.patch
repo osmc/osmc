@@ -1,0 +1,67 @@
+From 6110bcfd99b080f298903760c459c478de4fc222 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Sat, 4 Apr 2015 22:35:27 +0200
+Subject: [PATCH] IMX: Warn once when frames are received but VPU detects
+ interlaced content
+
+---
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp    | 19 +++++++++++++++++--
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h      |  1 +
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+index 7789e38..8a2cc3f 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+@@ -419,6 +419,7 @@ CDVDVideoCodecIMX::CDVDVideoCodecIMX()
+   m_convert_bitstream = false;
+   m_bytesToBeConsumed = 0;
+   m_previousPts = DVD_NOPTS_VALUE;
++  m_warnOnce = true;
+ #ifdef DUMP_STREAM
+   m_dump = NULL;
+ #endif
+@@ -1078,8 +1079,21 @@ bool CDVDVideoCodecIMX::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+   else
+     pDvdVideoPicture->iFlags &= ~DVP_FLAG_INTERLACED;
+ 
+-  if (m_currentBuffer->GetFieldType() != VPU_FIELD_BOTTOM && m_currentBuffer->GetFieldType() != VPU_FIELD_BT)
+-    pDvdVideoPicture->iFlags |= DVP_FLAG_TOP_FIELD_FIRST;
++  // do a sanity check to not deinterlace progressive content
++  if ((pDvdVideoPicture->iFlags & DVP_FLAG_INTERLACED) && (m_currentBuffer->GetFieldType() == VPU_FIELD_NONE))
++  {
++    if (m_warnOnce)
++    {
++      m_warnOnce = false;
++      CLog::Log(LOGWARNING, "Interlaced content reported by VPU, but full frames detected - Please turn off deinterlacing manually.");
++    }
++  }
++
++  if (pDvdVideoPicture->iFlags & DVP_FLAG_INTERLACED)
++  {
++    if (m_currentBuffer->GetFieldType() != VPU_FIELD_BOTTOM && m_currentBuffer->GetFieldType() != VPU_FIELD_BT)
++      pDvdVideoPicture->iFlags |= DVP_FLAG_TOP_FIELD_FIRST;
++  }
+   else
+     pDvdVideoPicture->iFlags &= ~DVP_FLAG_TOP_FIELD_FIRST;
+ 
+@@ -1277,6 +1291,7 @@ CIMXContext::CIMXContext()
+   , m_fbVirtAddr(NULL)
+   , m_ipuHandle(0)
+   , m_vsync(true)
++  , m_deInterlacing(false)
+   , m_pageCrops(NULL)
+   , m_g2dHandle(NULL)
+   , m_bufferCapture(NULL)
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
+index e414454..8a39dd8 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
+@@ -341,6 +341,7 @@ class CDVDVideoCodecIMX : public CDVDVideoCodec
+   int                          m_bytesToBeConsumed; // Remaining bytes in VPU
+   double                       m_previousPts;       // Enable to keep pts when needed
+   bool                         m_frameReported;     // State whether the frame consumed event will be reported by libfslvpu
++  bool                         m_warnOnce;          // Track warning messages to only warn once
+ #ifdef DUMP_STREAM
+   FILE                        *m_dump;
+ #endif
