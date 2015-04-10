@@ -45,14 +45,6 @@ index 7789e38..8a2cc3f 100644
    else
      pDvdVideoPicture->iFlags &= ~DVP_FLAG_TOP_FIELD_FIRST;
  
-@@ -1277,6 +1291,7 @@ CIMXContext::CIMXContext()
-   , m_fbVirtAddr(NULL)
-   , m_ipuHandle(0)
-   , m_vsync(true)
-+  , m_deInterlacing(false)
-   , m_pageCrops(NULL)
-   , m_g2dHandle(NULL)
-   , m_bufferCapture(NULL)
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
 index e414454..8a39dd8 100644
 --- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
