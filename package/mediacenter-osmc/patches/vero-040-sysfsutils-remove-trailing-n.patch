@@ -1,0 +1,32 @@
+From 3d459a03ae2214f755fb33f245a992027455b0e4 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Fri, 10 Apr 2015 14:56:27 +0200
+Subject: [PATCH] IMX: Read Text strings without \n
+
+---
+ xbmc/utils/SysfsUtils.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
+index 530df5a..0cafb33 100644
+--- a/xbmc/utils/SysfsUtils.cpp
++++ b/xbmc/utils/SysfsUtils.cpp
+@@ -52,6 +52,16 @@ int SysfsUtils::GetString(const std::string& path, std::string& valstr)
+     while ((len = read(fd, buf, 256)) > 0)
+       valstr.append(buf, len);
+     close(fd);
++    // Remove trailing \n
++    size_t last_pos = valstr.size() - 1;
++    if (last_pos > 0 && valstr.at(last_pos) == '\n')
++      valstr.erase(last_pos);
++    
++    // if we are fully C++11 compliant
++    // if (valstr.back() == '\n')
++    //   valstr.pop_back()
++
++    CLog::Log(LOGERROR, "Read: %s length: %d",valstr.c_str(), valstr.size());
+     return 0;
+   }
+ 
+-- 
+1.9.1
