@@ -16,7 +16,7 @@ index 530df5a..0cafb33 100644
        valstr.append(buf, len);
      close(fd);
 +    // Remove trailing \n
-+    size_t last_pos = valstr.size() - 1;
++    int last_pos = valstr.size() - 1;
 +    if (last_pos > 0 && valstr.at(last_pos) == '\n')
 +      valstr.erase(last_pos);
 +    
