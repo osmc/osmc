@@ -1,0 +1,26 @@
+From c4bc6a251d368e71eed660c21e344ca40bfd8fa8 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Thu, 9 Apr 2015 20:17:39 +0200
+Subject: [PATCH] IMX: Only fallback to ffmpeg for AVC with level 3.0 - others
+ are fine
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+index 4c1fa77..65437b9 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+@@ -515,9 +515,9 @@ bool CDVDVideoCodecIMX::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
+   {
+     // Test for VPU unsupported profiles to revert to sw decoding
+     if ((m_hints.profile == 110) || //hi10p
+-        (m_hints.profile == 578))   //quite uncommon h264 profile
++        (m_hints.profile == 578 && m_hints.level == 30))   //quite uncommon h264 profile with Main 3.0
+     {
+-      CLog::Log(LOGNOTICE, "i.MX6 VPU is not able to decode AVC profile %d", m_hints.profile);
++      CLog::Log(LOGNOTICE, "i.MX6 VPU is not able to decode AVC profile %d level %d", m_hints.profile, m_hints.level);
+       return false;
+     }
+     m_decOpenParam.CodecFormat = VPU_V_AVC;
