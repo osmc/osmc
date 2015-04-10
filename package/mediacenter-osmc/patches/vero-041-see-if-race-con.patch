@@ -1,0 +1,26 @@
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index ab8b4ac..3bbf834 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -35,6 +35,7 @@
+ #include "windowing/WindowingFactory.h"
+ #include "cores/AudioEngine/AEFactory.h"
+ #include <fstream>
++#include <unistd.h>
+ 
+ CEGLNativeTypeIMX::CEGLNativeTypeIMX()
+   : m_display(NULL)
+@@ -266,11 +267,13 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
+ 	system("/usr/bin/sudo /bin/chown osmc:osmc /sys/class/graphics/fb0/mode");
+ 	SysfsUtils::SetString("/sys/class/graphics/fb0/mode", res.strId + "\n");
+   }
++  sleep (5);
+   CreateNativeDisplay();
+ 
+   CLog::Log(LOGDEBUG, "%s: %s",__FUNCTION__, res.strId.c_str());
+ 
+   // Reset AE
++  sleep(5);
+   CAEFactory::DeviceChange();
+ 
+   return true;
