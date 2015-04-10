@@ -155,7 +155,7 @@ function remove_conflicting()
 	if [ $chrootval == 2 ] || [ $chrootval == 0 ]
 	then
 		dpkg --list | grep -q $1
-		if [ $? == 0 ]; then echo -e "Removing conflicting package $1" && apt-get remove --purge $1; fi
+		if [ $? == 0 ]; then echo -e "Removing conflicting package $1" && apt-get remove -y --purge $1; fi
 	fi
 }
 
