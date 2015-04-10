@@ -49,7 +49,7 @@ index 8b5ec68..ab8b4ac 100644
 +  else
 +  {
 +	CLog::Log(LOGDEBUG, "%s", "Mode was not changed successfully");
-+	CLog::Log(LOGDEBUG, "%%s", "fb0 mode is ", mode);
++	CLog::Log(LOGDEBUG, "%s%s", "fb0 mode is ", mode);
 +	CLog::Log(LOGDEBUG, "%s", "Going to chown to osmc user and try again..");
 +	system("/usr/bin/sudo /bin/chown osmc:osmc /sys/class/graphics/fb0/mode");
 +	SysfsUtils::SetString("/sys/class/graphics/fb0/mode", res.strId + "\n");
