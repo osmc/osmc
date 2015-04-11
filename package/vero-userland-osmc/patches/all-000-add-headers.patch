@@ -4,9 +4,8 @@ Date: Tue, 17 Mar 2015 00:29:56 +0000
 Subject: [PATCH] Add headers for FSL BSP integration
 
 Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
+
 ---
- headers/include/asm-generic/..install.cmd          |    1 +
- headers/include/asm-generic/.install               |    0
  headers/include/asm-generic/auxvec.h               |    8 +
  headers/include/asm-generic/bitsperlong.h          |   15 +
  headers/include/asm-generic/errno-base.h           |   39 +
@@ -42,8 +41,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/asm-generic/types.h                |    8 +
  headers/include/asm-generic/ucontext.h             |   12 +
  headers/include/asm-generic/unistd.h               |  908 +++++
- headers/include/asm/..install.cmd                  |    1 +
- headers/include/asm/.install                       |    0
  headers/include/asm/auxvec.h                       |    1 +
  headers/include/asm/bitsperlong.h                  |    1 +
  headers/include/asm/byteorder.h                    |   25 +
@@ -77,9 +74,7 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/asm/termbits.h                     |    1 +
  headers/include/asm/termios.h                      |    1 +
  headers/include/asm/types.h                        |   40 +
- headers/include/asm/unistd.h                       |  451 +++
- headers/include/drm/..install.cmd                  |    1 +
- headers/include/drm/.install                       |    0
+ headers/include/asm/unistd.h                       |  440 +++
  headers/include/drm/drm.h                          |  847 ++++
  headers/include/drm/drm_fourcc.h                   |  135 +
  headers/include/drm/drm_mode.h                     |  499 +++
@@ -98,8 +93,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/drm/tegra_drm.h                    |  148 +
  headers/include/drm/via_drm.h                      |  279 ++
  headers/include/drm/vmwgfx_drm.h                   | 1050 +++++
- headers/include/linux/..install.cmd                |    1 +
- headers/include/linux/.install                     |    0
  headers/include/linux/acct.h                       |  116 +
  headers/include/linux/adb.h                        |   44 +
  headers/include/linux/adfs_fs.h                    |   44 +
@@ -142,17 +135,11 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/bpqether.h                   |   41 +
  headers/include/linux/bsg.h                        |   65 +
  headers/include/linux/btrfs.h                      |  622 +++
- headers/include/linux/byteorder/..install.cmd      |    1 +
- headers/include/linux/byteorder/.install           |    0
  headers/include/linux/byteorder/big_endian.h       |  105 +
  headers/include/linux/byteorder/little_endian.h    |  105 +
- headers/include/linux/caif/..install.cmd           |    1 +
- headers/include/linux/caif/.install                |    0
  headers/include/linux/caif/caif_socket.h           |  194 +
  headers/include/linux/caif/if_caif.h               |   34 +
  headers/include/linux/can.h                        |  162 +
- headers/include/linux/can/..install.cmd            |    1 +
- headers/include/linux/can/.install                 |    0
  headers/include/linux/can/bcm.h                    |   98 +
  headers/include/linux/can/error.h                  |  123 +
  headers/include/linux/can/gw.h                     |  203 +
@@ -187,8 +174,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/dm-log-userspace.h           |  430 +++
  headers/include/linux/dn.h                         |  148 +
  headers/include/linux/dqblk_xfs.h                  |  213 ++
- headers/include/linux/dvb/..install.cmd            |    1 +
- headers/include/linux/dvb/.install                 |    0
  headers/include/linux/dvb/audio.h                  |  135 +
  headers/include/linux/dvb/ca.h                     |   90 +
  headers/include/linux/dvb/dmx.h                    |  153 +
@@ -230,8 +215,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/gfs2_ondisk.h                |  473 +++
  headers/include/linux/gigaset_dev.h                |   38 +
  headers/include/linux/hdlc.h                       |   23 +
- headers/include/linux/hdlc/..install.cmd           |    1 +
- headers/include/linux/hdlc/.install                |    0
  headers/include/linux/hdlc/ioctl.h                 |   84 +
  headers/include/linux/hdlcdrv.h                    |  110 +
  headers/include/linux/hdreg.h                      |  642 ++++
@@ -239,8 +222,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/hiddev.h                     |  212 +
  headers/include/linux/hidraw.h                     |   50 +
  headers/include/linux/hpet.h                       |   25 +
- headers/include/linux/hsi/..install.cmd            |    1 +
- headers/include/linux/hsi/.install                 |    0
  headers/include/linux/hsi/hsi_char.h               |   63 +
  headers/include/linux/hw_breakpoint.h              |   30 +
  headers/include/linux/hysdn_if.h                   |   33 +
@@ -282,7 +263,7 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/if_x25.h                     |   26 +
  headers/include/linux/igmp.h                       |  128 +
  headers/include/linux/in.h                         |  281 ++
- headers/include/linux/in6.h                        |  287 ++
+ headers/include/linux/in6.h                        |  288 ++
  headers/include/linux/in_route.h                   |   32 +
  headers/include/linux/inet_diag.h                  |  137 +
  headers/include/linux/inotify.h                    |   74 +
@@ -302,8 +283,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/irda.h                       |  251 ++
  headers/include/linux/irqnr.h                      |    4 +
  headers/include/linux/isdn.h                       |  143 +
- headers/include/linux/isdn/..install.cmd           |    1 +
- headers/include/linux/isdn/.install                |    0
  headers/include/linux/isdn/capicmd.h               |  115 +
  headers/include/linux/isdn_divertif.h              |   30 +
  headers/include/linux/isdn_ppp.h                   |   67 +
@@ -325,7 +304,7 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/kvm.h                        | 1080 ++++++
  headers/include/linux/kvm_para.h                   |   29 +
  headers/include/linux/l2tp.h                       |  178 +
- headers/include/linux/libc-compat.h                |  112 +
+ headers/include/linux/libc-compat.h                |  115 +
  headers/include/linux/limits.h                     |   20 +
  headers/include/linux/llc.h                        |   84 +
  headers/include/linux/loop.h                       |   94 +
@@ -344,8 +323,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/mii.h                        |  161 +
  headers/include/linux/minix_fs.h                   |  106 +
  headers/include/linux/mman.h                       |   13 +
- headers/include/linux/mmc/..install.cmd            |    1 +
- headers/include/linux/mmc/.install                 |    0
  headers/include/linux/mmc/ioctl.h                  |   57 +
  headers/include/linux/mmtimer.h                    |   56 +
  headers/include/linux/mqueue.h                     |   53 +
@@ -370,10 +347,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/netconf.h                    |   25 +
  headers/include/linux/netdevice.h                  |   53 +
  headers/include/linux/netfilter.h                  |   71 +
- headers/include/linux/netfilter/..install.cmd      |    1 +
- headers/include/linux/netfilter/.install           |    0
- .../include/linux/netfilter/ipset/..install.cmd    |    1 +
- headers/include/linux/netfilter/ipset/.install     |    0
  headers/include/linux/netfilter/ipset/ip_set.h     |  273 ++
  .../include/linux/netfilter/ipset/ip_set_bitmap.h  |   13 +
  .../include/linux/netfilter/ipset/ip_set_hash.h    |   21 +
@@ -416,7 +389,7 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/netfilter/xt_TEE.h           |   12 +
  headers/include/linux/netfilter/xt_TPROXY.h        |   23 +
  headers/include/linux/netfilter/xt_addrtype.h      |   44 +
- headers/include/linux/netfilter/xt_bpf.h           |   17 +
+ headers/include/linux/netfilter/xt_bpf.h           |   19 +
  headers/include/linux/netfilter/xt_cgroup.h        |   11 +
  headers/include/linux/netfilter/xt_cluster.h       |   19 +
  headers/include/linux/netfilter/xt_comment.h       |   10 +
@@ -464,13 +437,9 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/netfilter/xt_time.h          |   32 +
  headers/include/linux/netfilter/xt_u32.h           |   42 +
  headers/include/linux/netfilter_arp.h              |   19 +
- headers/include/linux/netfilter_arp/..install.cmd  |    1 +
- headers/include/linux/netfilter_arp/.install       |    0
  headers/include/linux/netfilter_arp/arp_tables.h   |  204 +
  headers/include/linux/netfilter_arp/arpt_mangle.h  |   26 +
  headers/include/linux/netfilter_bridge.h           |   27 +
- .../include/linux/netfilter_bridge/..install.cmd   |    1 +
- headers/include/linux/netfilter_bridge/.install    |    0
  headers/include/linux/netfilter_bridge/ebt_802_3.h |   63 +
  headers/include/linux/netfilter_bridge/ebt_among.h |   64 +
  headers/include/linux/netfilter_bridge/ebt_arp.h   |   36 +
@@ -491,8 +460,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/netfilter_bridge/ebtables.h  |  268 ++
  headers/include/linux/netfilter_decnet.h           |   75 +
  headers/include/linux/netfilter_ipv4.h             |   79 +
- headers/include/linux/netfilter_ipv4/..install.cmd |    1 +
- headers/include/linux/netfilter_ipv4/.install      |    0
  headers/include/linux/netfilter_ipv4/ip_tables.h   |  227 ++
  .../include/linux/netfilter_ipv4/ipt_CLUSTERIP.h   |   37 +
  headers/include/linux/netfilter_ipv4/ipt_ECN.h     |   33 +
@@ -504,8 +471,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/netfilter_ipv4/ipt_ecn.h     |   15 +
  headers/include/linux/netfilter_ipv4/ipt_ttl.h     |   23 +
  headers/include/linux/netfilter_ipv6.h             |   77 +
- headers/include/linux/netfilter_ipv6/..install.cmd |    1 +
- headers/include/linux/netfilter_ipv6/.install      |    0
  headers/include/linux/netfilter_ipv6/ip6_tables.h  |  268 ++
  headers/include/linux/netfilter_ipv6/ip6t_HL.h     |   24 +
  headers/include/linux/netfilter_ipv6/ip6t_LOG.h    |   21 +
@@ -531,8 +496,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/nfs_idmap.h                  |   65 +
  headers/include/linux/nfs_mount.h                  |   77 +
  headers/include/linux/nfsacl.h                     |   29 +
- headers/include/linux/nfsd/..install.cmd           |    1 +
- headers/include/linux/nfsd/.install                |    0
  headers/include/linux/nfsd/cld.h                   |   56 +
  headers/include/linux/nfsd/debug.h                 |   40 +
  headers/include/linux/nfsd/export.h                |   58 +
@@ -578,8 +541,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/qnxtypes.h                   |   28 +
  headers/include/linux/quota.h                      |  171 +
  headers/include/linux/radeonfb.h                   |   15 +
- headers/include/linux/raid/..install.cmd           |    1 +
- headers/include/linux/raid/.install                |    0
  headers/include/linux/raid/md_p.h                  |  308 ++
  headers/include/linux/raid/md_u.h                  |  155 +
  headers/include/linux/random.h                     |   43 +
@@ -620,14 +581,10 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/sonypi.h                     |  146 +
  headers/include/linux/sound.h                      |   31 +
  headers/include/linux/soundcard.h                  | 1276 +++++++
- headers/include/linux/spi/..install.cmd            |    1 +
- headers/include/linux/spi/.install                 |    0
  headers/include/linux/spi/spidev.h                 |  131 +
  headers/include/linux/stat.h                       |   45 +
  headers/include/linux/stddef.h                     |    1 +
  headers/include/linux/string.h                     |    7 +
- headers/include/linux/sunrpc/..install.cmd         |    1 +
- headers/include/linux/sunrpc/.install              |    0
  headers/include/linux/sunrpc/debug.h               |   48 +
  headers/include/linux/suspend_ioctls.h             |   33 +
  headers/include/linux/swab.h                       |  288 ++
@@ -635,8 +592,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/sysctl.h                     |  932 +++++
  headers/include/linux/sysinfo.h                    |   24 +
  headers/include/linux/taskstats.h                  |  213 ++
- headers/include/linux/tc_act/..install.cmd         |    1 +
- headers/include/linux/tc_act/.install              |    0
  headers/include/linux/tc_act/tc_csum.h             |   32 +
  headers/include/linux/tc_act/tc_defact.h           |   19 +
  headers/include/linux/tc_act/tc_gact.h             |   32 +
@@ -645,8 +600,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/tc_act/tc_nat.h              |   27 +
  headers/include/linux/tc_act/tc_pedit.h            |   34 +
  headers/include/linux/tc_act/tc_skbedit.h          |   46 +
- headers/include/linux/tc_ematch/..install.cmd      |    1 +
- headers/include/linux/tc_ematch/.install           |    0
  headers/include/linux/tc_ematch/tc_em_cmp.h        |   25 +
  headers/include/linux/tc_ematch/tc_em_meta.h       |   92 +
  headers/include/linux/tc_ematch/tc_em_nbyte.h      |   13 +
@@ -674,14 +627,12 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/un.h                         |   13 +
  headers/include/linux/unistd.h                     |    9 +
  headers/include/linux/unix_diag.h                  |   58 +
- headers/include/linux/usb/..install.cmd            |    1 +
- headers/include/linux/usb/.install                 |    0
  headers/include/linux/usb/audio.h                  |  547 +++
  headers/include/linux/usb/cdc-wdm.h                |   23 +
  headers/include/linux/usb/cdc.h                    |  435 +++
  headers/include/linux/usb/ch11.h                   |  277 ++
  headers/include/linux/usb/ch9.h                    |  999 +++++
- headers/include/linux/usb/functionfs.h             |  174 +
+ headers/include/linux/usb/functionfs.h             |  168 +
  headers/include/linux/usb/g_printer.h              |   35 +
  headers/include/linux/usb/gadgetfs.h               |   88 +
  headers/include/linux/usb/midi.h                   |  112 +
@@ -717,8 +668,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/wanrouter.h                  |   17 +
  headers/include/linux/watchdog.h                   |   57 +
  headers/include/linux/wimax.h                      |  239 ++
- headers/include/linux/wimax/..install.cmd          |    1 +
- headers/include/linux/wimax/.install               |    0
  headers/include/linux/wimax/i2400m.h               |  572 +++
  headers/include/linux/wireless.h                   | 1128 ++++++
  headers/include/linux/x25.h                        |  152 +
@@ -726,25 +675,17 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/linux/xfrm.h                       |  507 +++
  headers/include/linux/zorro.h                      |  113 +
  headers/include/linux/zorro_ids.h                  |  552 +++
- headers/include/mtd/..install.cmd                  |    1 +
- headers/include/mtd/.install                       |    0
  headers/include/mtd/inftl-user.h                   |   91 +
  headers/include/mtd/mtd-abi.h                      |  283 ++
  headers/include/mtd/mtd-user.h                     |   34 +
  headers/include/mtd/nftl-user.h                    |   90 +
  headers/include/mtd/ubi-user.h                     |  423 ++
- headers/include/rdma/..install.cmd                 |    1 +
- headers/include/rdma/.install                      |    0
  headers/include/rdma/ib_user_cm.h                  |  325 ++
  headers/include/rdma/ib_user_mad.h                 |  203 +
  headers/include/rdma/ib_user_sa.h                  |   76 +
  headers/include/rdma/ib_user_verbs.h               |  864 +++++
  headers/include/rdma/rdma_netlink.h                |   37 +
- headers/include/rdma/rdma_user_cm.h                |  302 ++
- headers/include/scsi/..install.cmd                 |    1 +
- headers/include/scsi/.install                      |    0
- headers/include/scsi/fc/..install.cmd              |    1 +
- headers/include/scsi/fc/.install                   |    0
+ headers/include/rdma/rdma_user_cm.h                |  303 ++
  headers/include/scsi/fc/fc_els.h                   |  831 ++++
  headers/include/scsi/fc/fc_fs.h                    |  348 ++
  headers/include/scsi/fc/fc_gs.h                    |   96 +
@@ -752,8 +693,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/scsi/scsi_bsg_fc.h                 |  320 ++
  headers/include/scsi/scsi_netlink.h                |  123 +
  headers/include/scsi/scsi_netlink_fc.h             |   71 +
- headers/include/sound/..install.cmd                |    1 +
- headers/include/sound/.install                     |    0
  headers/include/sound/asequencer.h                 |  614 +++
  headers/include/sound/asound.h                     |  976 +++++
  headers/include/sound/asound_fm.h                  |  134 +
@@ -765,22 +704,14 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  headers/include/sound/hdspm.h                      |  229 ++
  headers/include/sound/sb16_csp.h                   |  122 +
  headers/include/sound/sfnt_info.h                  |  212 +
- headers/include/uapi/..install.cmd                 |    1 +
- headers/include/uapi/.install                      |    0
- headers/include/video/..install.cmd                |    1 +
- headers/include/video/.install                     |    0
  headers/include/video/edid.h                       |    9 +
  headers/include/video/sisfb.h                      |  209 +
  headers/include/video/uvesafb.h                    |   60 +
- headers/include/xen/..install.cmd                  |    1 +
- headers/include/xen/.install                       |    0
  headers/include/xen/evtchn.h                       |   88 +
  headers/include/xen/gntalloc.h                     |   82 +
  headers/include/xen/gntdev.h                       |  150 +
  headers/include/xen/privcmd.h                      |   98 +
- 773 files changed, 103261 insertions(+)
- create mode 100644 headers/include/asm-generic/..install.cmd
- create mode 100644 headers/include/asm-generic/.install
+ 705 files changed, 103217 insertions(+)
  create mode 100644 headers/include/asm-generic/auxvec.h
  create mode 100644 headers/include/asm-generic/bitsperlong.h
  create mode 100644 headers/include/asm-generic/errno-base.h
@@ -816,8 +747,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/asm-generic/types.h
  create mode 100644 headers/include/asm-generic/ucontext.h
  create mode 100644 headers/include/asm-generic/unistd.h
- create mode 100644 headers/include/asm/..install.cmd
- create mode 100644 headers/include/asm/.install
  create mode 100644 headers/include/asm/auxvec.h
  create mode 100644 headers/include/asm/bitsperlong.h
  create mode 100644 headers/include/asm/byteorder.h
@@ -852,8 +781,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/asm/termios.h
  create mode 100644 headers/include/asm/types.h
  create mode 100644 headers/include/asm/unistd.h
- create mode 100644 headers/include/drm/..install.cmd
- create mode 100644 headers/include/drm/.install
  create mode 100644 headers/include/drm/drm.h
  create mode 100644 headers/include/drm/drm_fourcc.h
  create mode 100644 headers/include/drm/drm_mode.h
@@ -872,8 +799,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/drm/tegra_drm.h
  create mode 100644 headers/include/drm/via_drm.h
  create mode 100644 headers/include/drm/vmwgfx_drm.h
- create mode 100644 headers/include/linux/..install.cmd
- create mode 100644 headers/include/linux/.install
  create mode 100644 headers/include/linux/acct.h
  create mode 100644 headers/include/linux/adb.h
  create mode 100644 headers/include/linux/adfs_fs.h
@@ -916,17 +841,11 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/bpqether.h
  create mode 100644 headers/include/linux/bsg.h
  create mode 100644 headers/include/linux/btrfs.h
- create mode 100644 headers/include/linux/byteorder/..install.cmd
- create mode 100644 headers/include/linux/byteorder/.install
  create mode 100644 headers/include/linux/byteorder/big_endian.h
  create mode 100644 headers/include/linux/byteorder/little_endian.h
- create mode 100644 headers/include/linux/caif/..install.cmd
- create mode 100644 headers/include/linux/caif/.install
  create mode 100644 headers/include/linux/caif/caif_socket.h
  create mode 100644 headers/include/linux/caif/if_caif.h
  create mode 100644 headers/include/linux/can.h
- create mode 100644 headers/include/linux/can/..install.cmd
- create mode 100644 headers/include/linux/can/.install
  create mode 100644 headers/include/linux/can/bcm.h
  create mode 100644 headers/include/linux/can/error.h
  create mode 100644 headers/include/linux/can/gw.h
@@ -961,8 +880,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/dm-log-userspace.h
  create mode 100644 headers/include/linux/dn.h
  create mode 100644 headers/include/linux/dqblk_xfs.h
- create mode 100644 headers/include/linux/dvb/..install.cmd
- create mode 100644 headers/include/linux/dvb/.install
  create mode 100644 headers/include/linux/dvb/audio.h
  create mode 100644 headers/include/linux/dvb/ca.h
  create mode 100644 headers/include/linux/dvb/dmx.h
@@ -1004,8 +921,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/gfs2_ondisk.h
  create mode 100644 headers/include/linux/gigaset_dev.h
  create mode 100644 headers/include/linux/hdlc.h
- create mode 100644 headers/include/linux/hdlc/..install.cmd
- create mode 100644 headers/include/linux/hdlc/.install
  create mode 100644 headers/include/linux/hdlc/ioctl.h
  create mode 100644 headers/include/linux/hdlcdrv.h
  create mode 100644 headers/include/linux/hdreg.h
@@ -1013,8 +928,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/hiddev.h
  create mode 100644 headers/include/linux/hidraw.h
  create mode 100644 headers/include/linux/hpet.h
- create mode 100644 headers/include/linux/hsi/..install.cmd
- create mode 100644 headers/include/linux/hsi/.install
  create mode 100644 headers/include/linux/hsi/hsi_char.h
  create mode 100644 headers/include/linux/hw_breakpoint.h
  create mode 100644 headers/include/linux/hysdn_if.h
@@ -1076,8 +989,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/irda.h
  create mode 100644 headers/include/linux/irqnr.h
  create mode 100644 headers/include/linux/isdn.h
- create mode 100644 headers/include/linux/isdn/..install.cmd
- create mode 100644 headers/include/linux/isdn/.install
  create mode 100644 headers/include/linux/isdn/capicmd.h
  create mode 100644 headers/include/linux/isdn_divertif.h
  create mode 100644 headers/include/linux/isdn_ppp.h
@@ -1118,8 +1029,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/mii.h
  create mode 100644 headers/include/linux/minix_fs.h
  create mode 100644 headers/include/linux/mman.h
- create mode 100644 headers/include/linux/mmc/..install.cmd
- create mode 100644 headers/include/linux/mmc/.install
  create mode 100644 headers/include/linux/mmc/ioctl.h
  create mode 100644 headers/include/linux/mmtimer.h
  create mode 100644 headers/include/linux/mqueue.h
@@ -1144,10 +1053,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/netconf.h
  create mode 100644 headers/include/linux/netdevice.h
  create mode 100644 headers/include/linux/netfilter.h
- create mode 100644 headers/include/linux/netfilter/..install.cmd
- create mode 100644 headers/include/linux/netfilter/.install
- create mode 100644 headers/include/linux/netfilter/ipset/..install.cmd
- create mode 100644 headers/include/linux/netfilter/ipset/.install
  create mode 100644 headers/include/linux/netfilter/ipset/ip_set.h
  create mode 100644 headers/include/linux/netfilter/ipset/ip_set_bitmap.h
  create mode 100644 headers/include/linux/netfilter/ipset/ip_set_hash.h
@@ -1238,13 +1143,9 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/netfilter/xt_time.h
  create mode 100644 headers/include/linux/netfilter/xt_u32.h
  create mode 100644 headers/include/linux/netfilter_arp.h
- create mode 100644 headers/include/linux/netfilter_arp/..install.cmd
- create mode 100644 headers/include/linux/netfilter_arp/.install
  create mode 100644 headers/include/linux/netfilter_arp/arp_tables.h
  create mode 100644 headers/include/linux/netfilter_arp/arpt_mangle.h
  create mode 100644 headers/include/linux/netfilter_bridge.h
- create mode 100644 headers/include/linux/netfilter_bridge/..install.cmd
- create mode 100644 headers/include/linux/netfilter_bridge/.install
  create mode 100644 headers/include/linux/netfilter_bridge/ebt_802_3.h
  create mode 100644 headers/include/linux/netfilter_bridge/ebt_among.h
  create mode 100644 headers/include/linux/netfilter_bridge/ebt_arp.h
@@ -1265,8 +1166,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/netfilter_bridge/ebtables.h
  create mode 100644 headers/include/linux/netfilter_decnet.h
  create mode 100644 headers/include/linux/netfilter_ipv4.h
- create mode 100644 headers/include/linux/netfilter_ipv4/..install.cmd
- create mode 100644 headers/include/linux/netfilter_ipv4/.install
  create mode 100644 headers/include/linux/netfilter_ipv4/ip_tables.h
  create mode 100644 headers/include/linux/netfilter_ipv4/ipt_CLUSTERIP.h
  create mode 100644 headers/include/linux/netfilter_ipv4/ipt_ECN.h
@@ -1278,8 +1177,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/netfilter_ipv4/ipt_ecn.h
  create mode 100644 headers/include/linux/netfilter_ipv4/ipt_ttl.h
  create mode 100644 headers/include/linux/netfilter_ipv6.h
- create mode 100644 headers/include/linux/netfilter_ipv6/..install.cmd
- create mode 100644 headers/include/linux/netfilter_ipv6/.install
  create mode 100644 headers/include/linux/netfilter_ipv6/ip6_tables.h
  create mode 100644 headers/include/linux/netfilter_ipv6/ip6t_HL.h
  create mode 100644 headers/include/linux/netfilter_ipv6/ip6t_LOG.h
@@ -1305,8 +1202,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/nfs_idmap.h
  create mode 100644 headers/include/linux/nfs_mount.h
  create mode 100644 headers/include/linux/nfsacl.h
- create mode 100644 headers/include/linux/nfsd/..install.cmd
- create mode 100644 headers/include/linux/nfsd/.install
  create mode 100644 headers/include/linux/nfsd/cld.h
  create mode 100644 headers/include/linux/nfsd/debug.h
  create mode 100644 headers/include/linux/nfsd/export.h
@@ -1352,8 +1247,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/qnxtypes.h
  create mode 100644 headers/include/linux/quota.h
  create mode 100644 headers/include/linux/radeonfb.h
- create mode 100644 headers/include/linux/raid/..install.cmd
- create mode 100644 headers/include/linux/raid/.install
  create mode 100644 headers/include/linux/raid/md_p.h
  create mode 100644 headers/include/linux/raid/md_u.h
  create mode 100644 headers/include/linux/random.h
@@ -1394,14 +1287,10 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/sonypi.h
  create mode 100644 headers/include/linux/sound.h
  create mode 100644 headers/include/linux/soundcard.h
- create mode 100644 headers/include/linux/spi/..install.cmd
- create mode 100644 headers/include/linux/spi/.install
  create mode 100644 headers/include/linux/spi/spidev.h
  create mode 100644 headers/include/linux/stat.h
  create mode 100644 headers/include/linux/stddef.h
  create mode 100644 headers/include/linux/string.h
- create mode 100644 headers/include/linux/sunrpc/..install.cmd
- create mode 100644 headers/include/linux/sunrpc/.install
  create mode 100644 headers/include/linux/sunrpc/debug.h
  create mode 100644 headers/include/linux/suspend_ioctls.h
  create mode 100644 headers/include/linux/swab.h
@@ -1409,8 +1298,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/sysctl.h
  create mode 100644 headers/include/linux/sysinfo.h
  create mode 100644 headers/include/linux/taskstats.h
- create mode 100644 headers/include/linux/tc_act/..install.cmd
- create mode 100644 headers/include/linux/tc_act/.install
  create mode 100644 headers/include/linux/tc_act/tc_csum.h
  create mode 100644 headers/include/linux/tc_act/tc_defact.h
  create mode 100644 headers/include/linux/tc_act/tc_gact.h
@@ -1419,8 +1306,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/tc_act/tc_nat.h
  create mode 100644 headers/include/linux/tc_act/tc_pedit.h
  create mode 100644 headers/include/linux/tc_act/tc_skbedit.h
- create mode 100644 headers/include/linux/tc_ematch/..install.cmd
- create mode 100644 headers/include/linux/tc_ematch/.install
  create mode 100644 headers/include/linux/tc_ematch/tc_em_cmp.h
  create mode 100644 headers/include/linux/tc_ematch/tc_em_meta.h
  create mode 100644 headers/include/linux/tc_ematch/tc_em_nbyte.h
@@ -1448,8 +1333,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/un.h
  create mode 100644 headers/include/linux/unistd.h
  create mode 100644 headers/include/linux/unix_diag.h
- create mode 100644 headers/include/linux/usb/..install.cmd
- create mode 100644 headers/include/linux/usb/.install
  create mode 100644 headers/include/linux/usb/audio.h
  create mode 100644 headers/include/linux/usb/cdc-wdm.h
  create mode 100644 headers/include/linux/usb/cdc.h
@@ -1491,8 +1374,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/wanrouter.h
  create mode 100644 headers/include/linux/watchdog.h
  create mode 100644 headers/include/linux/wimax.h
- create mode 100644 headers/include/linux/wimax/..install.cmd
- create mode 100644 headers/include/linux/wimax/.install
  create mode 100644 headers/include/linux/wimax/i2400m.h
  create mode 100644 headers/include/linux/wireless.h
  create mode 100644 headers/include/linux/x25.h
@@ -1500,25 +1381,17 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/linux/xfrm.h
  create mode 100644 headers/include/linux/zorro.h
  create mode 100644 headers/include/linux/zorro_ids.h
- create mode 100644 headers/include/mtd/..install.cmd
- create mode 100644 headers/include/mtd/.install
  create mode 100644 headers/include/mtd/inftl-user.h
  create mode 100644 headers/include/mtd/mtd-abi.h
  create mode 100644 headers/include/mtd/mtd-user.h
  create mode 100644 headers/include/mtd/nftl-user.h
  create mode 100644 headers/include/mtd/ubi-user.h
- create mode 100644 headers/include/rdma/..install.cmd
- create mode 100644 headers/include/rdma/.install
  create mode 100644 headers/include/rdma/ib_user_cm.h
  create mode 100644 headers/include/rdma/ib_user_mad.h
  create mode 100644 headers/include/rdma/ib_user_sa.h
  create mode 100644 headers/include/rdma/ib_user_verbs.h
  create mode 100644 headers/include/rdma/rdma_netlink.h
  create mode 100644 headers/include/rdma/rdma_user_cm.h
- create mode 100644 headers/include/scsi/..install.cmd
- create mode 100644 headers/include/scsi/.install
- create mode 100644 headers/include/scsi/fc/..install.cmd
- create mode 100644 headers/include/scsi/fc/.install
  create mode 100644 headers/include/scsi/fc/fc_els.h
  create mode 100644 headers/include/scsi/fc/fc_fs.h
  create mode 100644 headers/include/scsi/fc/fc_gs.h
@@ -1526,8 +1399,6 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/scsi/scsi_bsg_fc.h
  create mode 100644 headers/include/scsi/scsi_netlink.h
  create mode 100644 headers/include/scsi/scsi_netlink_fc.h
- create mode 100644 headers/include/sound/..install.cmd
- create mode 100644 headers/include/sound/.install
  create mode 100644 headers/include/sound/asequencer.h
  create mode 100644 headers/include/sound/asound.h
  create mode 100644 headers/include/sound/asound_fm.h
@@ -1539,30 +1410,14 @@ Signed-off-by: Sam G Nazarko <email@samnazarko.co.uk>
  create mode 100644 headers/include/sound/hdspm.h
  create mode 100644 headers/include/sound/sb16_csp.h
  create mode 100644 headers/include/sound/sfnt_info.h
- create mode 100644 headers/include/uapi/..install.cmd
- create mode 100644 headers/include/uapi/.install
- create mode 100644 headers/include/video/..install.cmd
- create mode 100644 headers/include/video/.install
  create mode 100644 headers/include/video/edid.h
  create mode 100644 headers/include/video/sisfb.h
  create mode 100644 headers/include/video/uvesafb.h
- create mode 100644 headers/include/xen/..install.cmd
- create mode 100644 headers/include/xen/.install
  create mode 100644 headers/include/xen/evtchn.h
  create mode 100644 headers/include/xen/gntalloc.h
  create mode 100644 headers/include/xen/gntdev.h
  create mode 100644 headers/include/xen/privcmd.h
 
-diff --git a/headers/include/asm-generic/..install.cmd b/headers/include/asm-generic/..install.cmd
-new file mode 100644
-index 0000000..f3c0aca
---- /dev/null
-+++ b/headers/include/asm-generic/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/asm-generic/.install := /bin/bash scripts/headers_install.sh /test/headers//include/asm-generic /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/asm-generic auxvec.h bitsperlong.h errno-base.h errno.h fcntl.h int-l64.h int-ll64.h ioctl.h ioctls.h ipcbuf.h kvm_para.h mman-common.h mman.h msgbuf.h param.h poll.h posix_types.h resource.h sembuf.h setup.h shmbuf.h shmparam.h siginfo.h signal-defs.h signal.h socket.h sockios.h stat.h statfs.h swab.h termbits.h termios.h types.h ucontext.h unistd.h; /bin/bash scripts/headers_install.sh /test/headers//include/asm-generic /mnt/package/kernel-osmc/src/vero-linux-master/include/asm-generic ; /bin/bash scripts/headers_install.sh /test/headers//include/asm-generic /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/asm-generic ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/asm-generic/$$F; done; touch /test/headers//include/asm-generic/.install
-diff --git a/headers/include/asm-generic/.install b/headers/include/asm-generic/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/asm-generic/auxvec.h b/headers/include/asm-generic/auxvec.h
 new file mode 100644
 index 0000000..b99573b
@@ -4838,16 +4693,6 @@ index 0000000..dde8041
 +#define __NR_lstat64 __NR3264_lstat
 +#endif
 +#endif
-diff --git a/headers/include/asm/..install.cmd b/headers/include/asm/..install.cmd
-new file mode 100644
-index 0000000..da762b2
---- /dev/null
-+++ b/headers/include/asm/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/asm/.install := /bin/bash scripts/headers_install.sh /test/headers//include/asm /mnt/package/kernel-osmc/src/vero-linux-master/arch/arm/include/uapi/asm byteorder.h fcntl.h hwcap.h ioctls.h kvm.h kvm_para.h mman.h perf_regs.h posix_types.h ptrace.h setup.h sigcontext.h signal.h stat.h statfs.h swab.h unistd.h; /bin/bash scripts/headers_install.sh /test/headers//include/asm /mnt/package/kernel-osmc/src/vero-linux-master/arch/arm/include/asm types.h; /bin/bash scripts/headers_install.sh /test/headers//include/asm /mnt/package/kernel-osmc/src/vero-linux-master/arch/arm/include/generated/uapi/asm ; for F in auxvec.h bitsperlong.h errno.h ioctl.h ipcbuf.h msgbuf.h param.h poll.h resource.h sembuf.h shmbuf.h siginfo.h socket.h sockios.h termbits.h termios.h; do echo "\#include <asm-generic/$$F>" > /test/headers//include/asm/$$F; done; touch /test/headers//include/asm/.install
-diff --git a/headers/include/asm/.install b/headers/include/asm/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/asm/auxvec.h b/headers/include/asm/auxvec.h
 new file mode 100644
 index 0000000..41fa68b
@@ -6082,10 +5927,10 @@ index 0000000..a53cdb8
 +#endif /* _ASM_TYPES_H */
 diff --git a/headers/include/asm/unistd.h b/headers/include/asm/unistd.h
 new file mode 100644
-index 0000000..bbc791a
+index 0000000..87230d3
 --- /dev/null
 +++ b/headers/include/asm/unistd.h
-@@ -0,0 +1,451 @@
+@@ -0,0 +1,440 @@
 +/*
 + *  arch/arm/include/asm/unistd.h
 + *
@@ -6498,11 +6343,6 @@ index 0000000..bbc791a
 +#define __NR_sched_getattr		(__NR_SYSCALL_BASE+381)
 +
 +/*
-+ * This may need to be greater than __NR_last_syscall+1 in order to
-+ * account for the padding in the syscall table
-+ */
-+
-+/*
 + * The following SWIs are ARM private.
 + */
 +#define __ARM_NR_BASE			(__NR_SYSCALL_BASE+0x0f0000)
@@ -6511,12 +6351,6 @@ index 0000000..bbc791a
 +#define __ARM_NR_usr26			(__ARM_NR_BASE+3)
 +#define __ARM_NR_usr32			(__ARM_NR_BASE+4)
 +#define __ARM_NR_set_tls		(__ARM_NR_BASE+5)
-+
-+/*
-+ * *NOTE*: This is a ghost syscall private to the kernel.  Only the
-+ * __kuser_cmpxchg code in entry-armv.S should be aware of its
-+ * existence.  Don't ever use this from user code.
-+ */
 +
 +/*
 + * The following syscalls are obsolete and no longer available for EABI.
@@ -6537,16 +6371,6 @@ index 0000000..bbc791a
 +#endif
 +
 +#endif /* __ASM_ARM_UNISTD_H */
-diff --git a/headers/include/drm/..install.cmd b/headers/include/drm/..install.cmd
-new file mode 100644
-index 0000000..97d807d
---- /dev/null
-+++ b/headers/include/drm/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/drm/.install := /bin/bash scripts/headers_install.sh /test/headers//include/drm /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/drm drm.h drm_fourcc.h drm_mode.h drm_sarea.h exynos_drm.h i810_drm.h i915_drm.h mga_drm.h msm_drm.h nouveau_drm.h qxl_drm.h r128_drm.h radeon_drm.h savage_drm.h sis_drm.h tegra_drm.h via_drm.h vmwgfx_drm.h; /bin/bash scripts/headers_install.sh /test/headers//include/drm /mnt/package/kernel-osmc/src/vero-linux-master/include/drm ; /bin/bash scripts/headers_install.sh /test/headers//include/drm /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/drm ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/drm/$$F; done; touch /test/headers//include/drm/.install
-diff --git a/headers/include/drm/.install b/headers/include/drm/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/drm/drm.h b/headers/include/drm/drm.h
 new file mode 100644
 index 0000000..3e9e2c9
@@ -12907,7 +12731,7 @@ index 0000000..ece3e9f
 +#endif				/* _VIA_DRM_H_ */
 diff --git a/headers/include/drm/vmwgfx_drm.h b/headers/include/drm/vmwgfx_drm.h
 new file mode 100644
-index 0000000..8c5e2d7
+index 0000000..e602c64
 --- /dev/null
 +++ b/headers/include/drm/vmwgfx_drm.h
 @@ -0,0 +1,1050 @@
@@ -12941,7 +12765,7 @@ index 0000000..8c5e2d7
 +#ifndef __VMWGFX_DRM_H__
 +#define __VMWGFX_DRM_H__
 +
-+#include <drm.h>
++#include <drm/drm.h>
 +
 +#define DRM_VMW_MAX_SURFACE_FACES 6
 +#define DRM_VMW_MAX_MIP_LEVELS 24
@@ -13961,16 +13785,6 @@ index 0000000..8c5e2d7
 +};
 +
 +#endif
-diff --git a/headers/include/linux/..install.cmd b/headers/include/linux/..install.cmd
-new file mode 100644
-index 0000000..4677fe1
---- /dev/null
-+++ b/headers/include/linux/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux acct.h adb.h adfs_fs.h affs_hardblocks.h agpgart.h aio_abi.h apm_bios.h arcfb.h atalk.h atm.h atm_eni.h atm_he.h atm_idt77105.h atm_nicstar.h atm_tcp.h atm_zatm.h atmapi.h atmarp.h atmbr2684.h atmclip.h atmdev.h atmioc.h atmlec.h atmmpc.h atmppp.h atmsap.h atmsvc.h audit.h auto_fs.h auto_fs4.h auxvec.h ax25.h b1lli.h baycom.h bcm933xx_hcs.h bfs_fs.h binfmts.h blkpg.h blktrace_api.h bpqether.h bsg.h btrfs.h can.h capability.h capi.h cciss_defs.h cciss_ioctl.h cdrom.h cgroupstats.h chio.h cm4000_cs.h cn_proc.h coda.h coda_psdev.h coff.h connector.h const.h cramfs_fs.h cuda.h cyclades.h cycx_cfm.h dcbnl.h dccp.h dlm.h dlm_device.h dlm_netlink.h dlm_plock.h dlmconstants.h dm-ioctl.h dm-log-userspace.h dn.h dqblk_xfs.h edd.h efs_fs_sb.h elf-em.h elf-fdpic.h elf.h elfcore.h errno.h errqueue.h ethtool.h eventpoll.h fadvise.h falloc.h fanotify.h fb.h fcntl.h fd.h fdreg.h fib_rules.h fiemap.h filter.h firewire-cdev.h firewire-constants.h flat.h fs.h fsl_hypervisor.h fuse.h futex.h gameport.h gen_stats.h genetlink.h gfs2_ondisk.h gigaset_dev.h hdlc.h hdlcdrv.h hdreg.h hid.h hiddev.h hidraw.h hpet.h hw_breakpoint.h hysdn_if.h i2c-dev.h i2c.h i2o-dev.h i8k.h icmp.h icmpv6.h if.h if_addr.h if_addrlabel.h if_alg.h if_arcnet.h if_arp.h if_bonding.h if_bridge.h if_cablemodem.h if_eql.h if_ether.h if_fc.h if_fddi.h if_frad.h if_hippi.h if_infiniband.h if_link.h if_ltalk.h if_packet.h if_phonet.h if_plip.h if_ppp.h if_pppol2tp.h if_pppox.h if_slip.h if_team.h if_tun.h if_tunnel.h if_vlan.h if_x25.h igmp.h in.h in6.h in_route.h inet_diag.h inotify.h input.h ioctl.h ip.h ip6_tunnel.h ip_vs.h ipc.h ipmi.h ipmi_msgdefs.h ipsec.h ipu.h ipv6.h ipv6_route.h ipx.h irda.h irqnr.h isdn.h isdn_divertif.h isdn_ppp.h isdnif.h iso_fs.h ivtv.h ivtvfb.h ixjuser.h jffs2.h joystick.h kd.h kdev_t.h kernel-page-flags.h kernel.h kernelcapi.h kexec.h keyboard.h keyctl.h kvm.h kvm_para.h l2tp.h libc-compat.h limits.h llc.h loop.h lp.h magic.h major.h map_to_7segment.h matroxfb.h mdio.h media.h mei.h mempolicy.h meye.h mic_common.h mic_ioctl.h mii.h minix_fs.h mman.h mmtimer.h mqueue.h mroute.h mroute6.h msdos_fs.h msg.h mtio.h mxc_asrc.h mxc_v4l2.h mxcfb.h n_r3964.h nbd.h ncp.h ncp_fs.h ncp_mount.h ncp_no.h neighbour.h net.h net_dropmon.h net_tstamp.h netconf.h netdevice.h netfilter.h netfilter_arp.h netfilter_bridge.h netfilter_decnet.h netfilter_ipv4.h netfilter_ipv6.h netlink.h netlink_diag.h netrom.h nfc.h nfs.h nfs2.h nfs3.h nfs4.h nfs4_mount.h nfs_fs.h nfs_idmap.h nfs_mount.h nfsacl.h nl80211.h nubus.h nvme.h nvram.h omap3isp.h omapfb.h oom.h openvswitch.h packet_diag.h param.h parport.h patchkey.h pci.h pci_regs.h perf_event.h personality.h pfkeyv2.h pg.h phantom.h phonet.h pkt_cls.h pkt_sched.h pktcdvd.h pmu.h poll.h posix_types.h ppdev.h ppp-comp.h ppp-ioctl.h ppp_defs.h pps.h prctl.h ptp_clock.h ptrace.h pxp_device.h pxp_dma.h qnx4_fs.h qnxtypes.h quota.h radeonfb.h random.h raw.h rds.h reboot.h reiserfs_fs.h reiserfs_xattr.h resource.h rfkill.h romfs_fs.h rose.h route.h rtc.h rtnetlink.h scc.h sched.h screen_info.h sctp.h sdla.h seccomp.h securebits.h selinux_netlink.h sem.h serial.h serial_core.h serial_reg.h serio.h shm.h signal.h signalfd.h snmp.h sock_diag.h socket.h sockios.h som.h sonet.h sonypi.h sound.h soundcard.h stat.h stddef.h string.h suspend_ioctls.h swab.h synclink.h sysctl.h sysinfo.h taskstats.h tcp.h tcp_metrics.h telephony.h termios.h time.h times.h timex.h tiocl.h tipc.h tipc_config.h toshiba.h tty.h tty_flags.h types.h udf_fs_i.h udp.h uhid.h uinput.h uio.h ultrasound.h un.h unistd.h unix_diag.h usbdevice_fs.h utime.h utsname.h uuid.h uvcvideo.h v4l2-common.h v4l2-controls.h v4l2-dv-timings.h v4l2-mediabus.h v4l2-subdev.h veth.h vfio.h vhost.h videodev2.h virtio_9p.h virtio_balloon.h virtio_blk.h virtio_config.h virtio_console.h virtio_ids.h virtio_net.h virtio_pci.h virtio_ring.h virtio_rng.h vt.h wait.h wanrouter.h watchdog.h wimax.h wireless.h x25.h xattr.h xfrm.h zorro.h zorro_ids.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux /mnt/package/kernel-osmc/src/vero-linux-master/include/linux ; /bin/bash scripts/headers_install.sh /test/headers//include/linux /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux version.h; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/$$F; done; touch /test/headers//include/linux/.install
-diff --git a/headers/include/linux/.install b/headers/include/linux/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/acct.h b/headers/include/linux/acct.h
 new file mode 100644
 index 0000000..19baf8a
@@ -18299,16 +18113,6 @@ index 0000000..11556e2
 +				   struct btrfs_ioctl_feature_flags[3])
 +
 +#endif /* _LINUX_BTRFS_H */
-diff --git a/headers/include/linux/byteorder/..install.cmd b/headers/include/linux/byteorder/..install.cmd
-new file mode 100644
-index 0000000..84c7c1d
---- /dev/null
-+++ b/headers/include/linux/byteorder/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/byteorder/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/byteorder /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/byteorder big_endian.h little_endian.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/byteorder /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/byteorder ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/byteorder /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/byteorder ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/byteorder/$$F; done; touch /test/headers//include/linux/byteorder/.install
-diff --git a/headers/include/linux/byteorder/.install b/headers/include/linux/byteorder/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/byteorder/big_endian.h b/headers/include/linux/byteorder/big_endian.h
 new file mode 100644
 index 0000000..a4ef98d
@@ -18531,16 +18335,6 @@ index 0000000..74e8a15
 +
 +
 +#endif /* _LINUX_BYTEORDER_LITTLE_ENDIAN_H */
-diff --git a/headers/include/linux/caif/..install.cmd b/headers/include/linux/caif/..install.cmd
-new file mode 100644
-index 0000000..779e948
---- /dev/null
-+++ b/headers/include/linux/caif/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/caif/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/caif /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/caif caif_socket.h if_caif.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/caif /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/caif ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/caif /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/caif ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/caif/$$F; done; touch /test/headers//include/linux/caif/.install
-diff --git a/headers/include/linux/caif/.install b/headers/include/linux/caif/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/caif/caif_socket.h b/headers/include/linux/caif/caif_socket.h
 new file mode 100644
 index 0000000..586e9f9
@@ -18949,16 +18743,6 @@ index 0000000..e52958d
 +#define CAN_INV_FILTER 0x20000000U /* to be set in can_filter.can_id */
 +
 +#endif /* CAN_H */
-diff --git a/headers/include/linux/can/..install.cmd b/headers/include/linux/can/..install.cmd
-new file mode 100644
-index 0000000..ed992e7
---- /dev/null
-+++ b/headers/include/linux/can/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/can/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/can /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/can bcm.h error.h gw.h netlink.h raw.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/can /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/can ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/can /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/can ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/can/$$F; done; touch /test/headers//include/linux/can/.install
-diff --git a/headers/include/linux/can/.install b/headers/include/linux/can/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/can/bcm.h b/headers/include/linux/can/bcm.h
 new file mode 100644
 index 0000000..382251a
@@ -26313,16 +26097,6 @@ index 0000000..dcd75cc
 +};
 +
 +#endif	/* _LINUX_DQBLK_XFS_H */
-diff --git a/headers/include/linux/dvb/..install.cmd b/headers/include/linux/dvb/..install.cmd
-new file mode 100644
-index 0000000..ee35ed7
---- /dev/null
-+++ b/headers/include/linux/dvb/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/dvb/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/dvb /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/dvb audio.h ca.h dmx.h frontend.h net.h osd.h version.h video.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/dvb /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/dvb ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/dvb /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/dvb ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/dvb/$$F; done; touch /test/headers//include/linux/dvb/.install
-diff --git a/headers/include/linux/dvb/.install b/headers/include/linux/dvb/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/dvb/audio.h b/headers/include/linux/dvb/audio.h
 new file mode 100644
 index 0000000..d47bccd
@@ -34709,16 +34483,6 @@ index 0000000..89e484d
 +
 +
 +#endif /* __HDLC_H */
-diff --git a/headers/include/linux/hdlc/..install.cmd b/headers/include/linux/hdlc/..install.cmd
-new file mode 100644
-index 0000000..a8684c6
---- /dev/null
-+++ b/headers/include/linux/hdlc/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/hdlc/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/hdlc /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/hdlc ioctl.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/hdlc /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/hdlc ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/hdlc /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/hdlc ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/hdlc/$$F; done; touch /test/headers//include/linux/hdlc/.install
-diff --git a/headers/include/linux/hdlc/.install b/headers/include/linux/hdlc/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/hdlc/ioctl.h b/headers/include/linux/hdlc/ioctl.h
 new file mode 100644
 index 0000000..04bc027
@@ -35950,16 +35714,6 @@ index 0000000..031f16f
 +#define MAX_HPET_TBS	8		/* maximum hpet timer blocks */
 +
 +#endif /* __HPET__ */
-diff --git a/headers/include/linux/hsi/..install.cmd b/headers/include/linux/hsi/..install.cmd
-new file mode 100644
-index 0000000..d0320dd
---- /dev/null
-+++ b/headers/include/linux/hsi/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/hsi/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/hsi /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/hsi hsi_char.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/hsi /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/hsi ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/hsi /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/hsi ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/hsi/$$F; done; touch /test/headers//include/linux/hsi/.install
-diff --git a/headers/include/linux/hsi/.install b/headers/include/linux/hsi/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/hsi/hsi_char.h b/headers/include/linux/hsi/hsi_char.h
 new file mode 100644
 index 0000000..76160b4
@@ -40965,10 +40719,10 @@ index 0000000..7370d80
 +#endif /* _LINUX_IN_H */
 diff --git a/headers/include/linux/in6.h b/headers/include/linux/in6.h
 new file mode 100644
-index 0000000..b690d02
+index 0000000..05189c3
 --- /dev/null
 +++ b/headers/include/linux/in6.h
-@@ -0,0 +1,287 @@
+@@ -0,0 +1,288 @@
 +/*
 + *	Types and definitions for AF_INET6 
 + *	Linux INET6 implementation 
@@ -41120,7 +40874,7 @@ index 0000000..b690d02
 +/*
 + *	IPV6 socket options
 + */
-+
++#if __UAPI_DEF_IPV6_OPTIONS
 +#define IPV6_ADDRFORM		1
 +#define IPV6_2292PKTINFO	2
 +#define IPV6_2292HOPOPTS	3
@@ -41163,6 +40917,7 @@ index 0000000..b690d02
 +
 +#define IPV6_IPSEC_POLICY	34
 +#define IPV6_XFRM_POLICY	35
++#endif
 +
 +/*
 + * Multicast:
@@ -45138,16 +44893,6 @@ index 0000000..55c0a1e
 +
 +
 +#endif /* __ISDN_H__ */
-diff --git a/headers/include/linux/isdn/..install.cmd b/headers/include/linux/isdn/..install.cmd
-new file mode 100644
-index 0000000..c59a893
---- /dev/null
-+++ b/headers/include/linux/isdn/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/isdn/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/isdn /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/isdn capicmd.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/isdn /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/isdn ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/isdn /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/isdn ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/isdn/$$F; done; touch /test/headers//include/linux/isdn/.install
-diff --git a/headers/include/linux/isdn/.install b/headers/include/linux/isdn/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/isdn/capicmd.h b/headers/include/linux/isdn/capicmd.h
 new file mode 100644
 index 0000000..b58635f
@@ -49032,10 +48777,10 @@ index 0000000..c4bec82
 +#endif /* _LINUX_L2TP_H_ */
 diff --git a/headers/include/linux/libc-compat.h b/headers/include/linux/libc-compat.h
 new file mode 100644
-index 0000000..629e104
+index 0000000..9e860a0
 --- /dev/null
 +++ b/headers/include/linux/libc-compat.h
-@@ -0,0 +1,112 @@
+@@ -0,0 +1,115 @@
 +/*
 + * Compatibility interface for userspace libc header coordination:
 + *
@@ -49107,6 +48852,7 @@ index 0000000..629e104
 +#define __UAPI_DEF_SOCKADDR_IN6		0
 +#define __UAPI_DEF_IPV6_MREQ		0
 +#define __UAPI_DEF_IPPROTO_V6		0
++#define __UAPI_DEF_IPV6_OPTIONS		0
 +
 +#else
 +
@@ -49120,6 +48866,7 @@ index 0000000..629e104
 +#define __UAPI_DEF_SOCKADDR_IN6		1
 +#define __UAPI_DEF_IPV6_MREQ		1
 +#define __UAPI_DEF_IPPROTO_V6		1
++#define __UAPI_DEF_IPV6_OPTIONS		1
 +
 +#endif /* _NETINET_IN_H */
 +
@@ -49141,6 +48888,7 @@ index 0000000..629e104
 +#define __UAPI_DEF_SOCKADDR_IN6		1
 +#define __UAPI_DEF_IPV6_MREQ		1
 +#define __UAPI_DEF_IPPROTO_V6		1
++#define __UAPI_DEF_IPV6_OPTIONS		1
 +
 +/* Definitions for xattr.h */
 +#define __UAPI_DEF_XATTR		1
@@ -51301,16 +51049,6 @@ index 0000000..36b3004
 +#define OVERCOMMIT_NEVER		2
 +
 +#endif /* _LINUX_MMAN_H */
-diff --git a/headers/include/linux/mmc/..install.cmd b/headers/include/linux/mmc/..install.cmd
-new file mode 100644
-index 0000000..4aed9f7
---- /dev/null
-+++ b/headers/include/linux/mmc/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/mmc/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/mmc /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/mmc ioctl.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/mmc /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/mmc ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/mmc /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/mmc ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/mmc/$$F; done; touch /test/headers//include/linux/mmc/.install
-diff --git a/headers/include/linux/mmc/.install b/headers/include/linux/mmc/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/mmc/ioctl.h b/headers/include/linux/mmc/ioctl.h
 new file mode 100644
 index 0000000..1f5e689
@@ -53917,26 +53655,6 @@ index 0000000..be0bc18
 +};
 +
 +#endif /* __LINUX_NETFILTER_H */
-diff --git a/headers/include/linux/netfilter/..install.cmd b/headers/include/linux/netfilter/..install.cmd
-new file mode 100644
-index 0000000..069ba01
---- /dev/null
-+++ b/headers/include/linux/netfilter/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter nf_conntrack_common.h nf_conntrack_ftp.h nf_conntrack_sctp.h nf_conntrack_tcp.h nf_conntrack_tuple_common.h nf_nat.h nf_tables.h nf_tables_compat.h nfnetlink.h nfnetlink_acct.h nfnetlink_compat.h nfnetlink_conntrack.h nfnetlink_cthelper.h nfnetlink_cttimeout.h nfnetlink_log.h nfnetlink_queue.h x_tables.h xt_AUDIT.h xt_CHECKSUM.h xt_CLASSIFY.h xt_CONNMARK.h xt_CONNSECMARK.h xt_CT.h xt_DSCP.h xt_HMARK.h xt_IDLETIMER.h xt_LED.h xt_LOG.h xt_MARK.h xt_NFLOG.h xt_NFQUEUE.h xt_RATEEST.h xt_SECMARK.h xt_TCPMSS.h xt_TCPOPTSTRIP.h xt_TEE.h xt_TPROXY.h xt_addrtype.h xt_bpf.h xt_cgroup.h xt_cluster.h xt_comment.h xt_connbytes.h xt_connlabel.h xt_connlimit.h xt_connmark.h xt_conntrack.h xt_cpu.h xt_dccp.h xt_devgroup.h xt_dscp.h xt_ecn.h xt_esp.h xt_hashlimit.h xt_helper.h xt_ipcomp.h xt_iprange.h xt_ipvs.h xt_l2tp.h xt_length.h xt_limit.h xt_mac.h xt_mark.h xt_multiport.h xt_nfacct.h xt_osf.h xt_owner.h xt_physdev.h xt_pkttype.h xt_policy.h xt_quota.h xt_rateest.h xt_realm.h xt_recent.h xt_rpfilter.h xt_sctp.h xt_set.h xt_socket.h xt_state.h xt_statistic.h xt_string.h xt_tcpmss.h xt_tcpudp.h xt_time.h xt_u32.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter/$$F; done; touch /test/headers//include/linux/netfilter/.install
-diff --git a/headers/include/linux/netfilter/.install b/headers/include/linux/netfilter/.install
-new file mode 100644
-index 0000000..e69de29
-diff --git a/headers/include/linux/netfilter/ipset/..install.cmd b/headers/include/linux/netfilter/ipset/..install.cmd
-new file mode 100644
-index 0000000..f7f2a5f
---- /dev/null
-+++ b/headers/include/linux/netfilter/ipset/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter/ipset/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter/ipset /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter/ipset ip_set.h ip_set_bitmap.h ip_set_hash.h ip_set_list.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter/ipset /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter/ipset ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter/ipset /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter/ipset ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter/ipset/$$F; done; touch /test/headers//include/linux/netfilter/ipset/.install
-diff --git a/headers/include/linux/netfilter/ipset/.install b/headers/include/linux/netfilter/ipset/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/netfilter/ipset/ip_set.h b/headers/include/linux/netfilter/ipset/ip_set.h
 new file mode 100644
 index 0000000..dcf33c5
@@ -57059,10 +56777,10 @@ index 0000000..b156baa
 +#endif
 diff --git a/headers/include/linux/netfilter/xt_bpf.h b/headers/include/linux/netfilter/xt_bpf.h
 new file mode 100644
-index 0000000..5dda450
+index 0000000..2ec9fbc
 --- /dev/null
 +++ b/headers/include/linux/netfilter/xt_bpf.h
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,19 @@
 +#ifndef _XT_BPF_H
 +#define _XT_BPF_H
 +
@@ -57070,6 +56788,8 @@ index 0000000..5dda450
 +#include <linux/types.h>
 +
 +#define XT_BPF_MAX_NUM_INSTR	64
++
++struct sk_filter;
 +
 +struct xt_bpf_info {
 +	__u16 bpf_program_num_elem;
@@ -58773,16 +58493,6 @@ index 0000000..92bc6dd
 +#define NF_ARP_NUMHOOKS	3
 +
 +#endif /* __LINUX_ARP_NETFILTER_H */
-diff --git a/headers/include/linux/netfilter_arp/..install.cmd b/headers/include/linux/netfilter_arp/..install.cmd
-new file mode 100644
-index 0000000..37240ea
---- /dev/null
-+++ b/headers/include/linux/netfilter_arp/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter_arp/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_arp /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter_arp arp_tables.h arpt_mangle.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_arp /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter_arp ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_arp /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter_arp ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter_arp/$$F; done; touch /test/headers//include/linux/netfilter_arp/.install
-diff --git a/headers/include/linux/netfilter_arp/.install b/headers/include/linux/netfilter_arp/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/netfilter_arp/arp_tables.h b/headers/include/linux/netfilter_arp/arp_tables.h
 new file mode 100644
 index 0000000..bb1ec64
@@ -59058,16 +58768,6 @@ index 0000000..c4dbfd9
 +#define NF_BR_NUMHOOKS		6
 +
 +#endif /* __LINUX_BRIDGE_NETFILTER_H */
-diff --git a/headers/include/linux/netfilter_bridge/..install.cmd b/headers/include/linux/netfilter_bridge/..install.cmd
-new file mode 100644
-index 0000000..51534cd
---- /dev/null
-+++ b/headers/include/linux/netfilter_bridge/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter_bridge/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_bridge /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter_bridge ebt_802_3.h ebt_among.h ebt_arp.h ebt_arpreply.h ebt_ip.h ebt_ip6.h ebt_limit.h ebt_log.h ebt_mark_m.h ebt_mark_t.h ebt_nat.h ebt_nflog.h ebt_pkttype.h ebt_redirect.h ebt_stp.h ebt_ulog.h ebt_vlan.h ebtables.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_bridge /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter_bridge ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_bridge /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter_bridge ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter_bridge/$$F; done; touch /test/headers//include/linux/netfilter_bridge/.install
-diff --git a/headers/include/linux/netfilter_bridge/.install b/headers/include/linux/netfilter_bridge/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/netfilter_bridge/ebt_802_3.h b/headers/include/linux/netfilter_bridge/ebt_802_3.h
 new file mode 100644
 index 0000000..70028c1
@@ -60124,16 +59824,6 @@ index 0000000..a5f4dc7
 +
 +
 +#endif /* __LINUX_IP_NETFILTER_H */
-diff --git a/headers/include/linux/netfilter_ipv4/..install.cmd b/headers/include/linux/netfilter_ipv4/..install.cmd
-new file mode 100644
-index 0000000..0fa94b2
---- /dev/null
-+++ b/headers/include/linux/netfilter_ipv4/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter_ipv4/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv4 /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter_ipv4 ip_tables.h ipt_CLUSTERIP.h ipt_ECN.h ipt_LOG.h ipt_REJECT.h ipt_TTL.h ipt_ULOG.h ipt_ah.h ipt_ecn.h ipt_ttl.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv4 /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter_ipv4 ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv4 /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter_ipv4 ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter_ipv4/$$F; done; touch /test/headers//include/linux/netfilter_ipv4/.install
-diff --git a/headers/include/linux/netfilter_ipv4/.install b/headers/include/linux/netfilter_ipv4/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/netfilter_ipv4/ip_tables.h b/headers/include/linux/netfilter_ipv4/ip_tables.h
 new file mode 100644
 index 0000000..38542b4
@@ -60742,16 +60432,6 @@ index 0000000..8483d1d
 +
 +
 +#endif /* __LINUX_IP6_NETFILTER_H */
-diff --git a/headers/include/linux/netfilter_ipv6/..install.cmd b/headers/include/linux/netfilter_ipv6/..install.cmd
-new file mode 100644
-index 0000000..f9f2e7f
---- /dev/null
-+++ b/headers/include/linux/netfilter_ipv6/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/netfilter_ipv6/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv6 /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/netfilter_ipv6 ip6_tables.h ip6t_HL.h ip6t_LOG.h ip6t_NPT.h ip6t_REJECT.h ip6t_ah.h ip6t_frag.h ip6t_hl.h ip6t_ipv6header.h ip6t_mh.h ip6t_opts.h ip6t_rt.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv6 /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/netfilter_ipv6 ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/netfilter_ipv6 /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/netfilter_ipv6 ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/netfilter_ipv6/$$F; done; touch /test/headers//include/linux/netfilter_ipv6/.install
-diff --git a/headers/include/linux/netfilter_ipv6/.install b/headers/include/linux/netfilter_ipv6/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/netfilter_ipv6/ip6_tables.h b/headers/include/linux/netfilter_ipv6/ip6_tables.h
 new file mode 100644
 index 0000000..640a1d0
@@ -62755,16 +62435,6 @@ index 0000000..1b16be3
 +#define NFS_ACL_DEFAULT		0x1000
 +
 +#endif /* __LINUX_NFSACL_H */
-diff --git a/headers/include/linux/nfsd/..install.cmd b/headers/include/linux/nfsd/..install.cmd
-new file mode 100644
-index 0000000..d60c8d5
---- /dev/null
-+++ b/headers/include/linux/nfsd/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/nfsd/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/nfsd /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/nfsd cld.h debug.h export.h nfsfh.h stats.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/nfsd /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/nfsd ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/nfsd /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/nfsd ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/nfsd/$$F; done; touch /test/headers//include/linux/nfsd/.install
-diff --git a/headers/include/linux/nfsd/.install b/headers/include/linux/nfsd/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/nfsd/cld.h b/headers/include/linux/nfsd/cld.h
 new file mode 100644
 index 0000000..f14a9ab
@@ -75365,16 +75035,6 @@ index 0000000..8c4bbde
 +
 +#endif
 +
-diff --git a/headers/include/linux/raid/..install.cmd b/headers/include/linux/raid/..install.cmd
-new file mode 100644
-index 0000000..75c3eee
---- /dev/null
-+++ b/headers/include/linux/raid/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/raid/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/raid /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/raid md_p.h md_u.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/raid /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/raid ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/raid /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/raid ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/raid/$$F; done; touch /test/headers//include/linux/raid/.install
-diff --git a/headers/include/linux/raid/.install b/headers/include/linux/raid/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/raid/md_p.h b/headers/include/linux/raid/md_p.h
 new file mode 100644
 index 0000000..9ef9677
@@ -82279,16 +81939,6 @@ index 0000000..c5abf86
 +		(SEQ_DUMPBUF(), write(seqfd, (char*)(patchx), len))
 +
 +#endif /* SOUNDCARD_H */
-diff --git a/headers/include/linux/spi/..install.cmd b/headers/include/linux/spi/..install.cmd
-new file mode 100644
-index 0000000..07f60bf
---- /dev/null
-+++ b/headers/include/linux/spi/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/spi/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/spi /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/spi spidev.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/spi /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/spi ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/spi /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/spi ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/spi/$$F; done; touch /test/headers//include/linux/spi/.install
-diff --git a/headers/include/linux/spi/.install b/headers/include/linux/spi/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/spi/spidev.h b/headers/include/linux/spi/spidev.h
 new file mode 100644
 index 0000000..52d9ed0
@@ -82497,16 +82147,6 @@ index 0000000..d7ed844
 +
 +#include <string.h>
 +#endif /* _LINUX_STRING_H_ */
-diff --git a/headers/include/linux/sunrpc/..install.cmd b/headers/include/linux/sunrpc/..install.cmd
-new file mode 100644
-index 0000000..b0296af
---- /dev/null
-+++ b/headers/include/linux/sunrpc/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/sunrpc/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/sunrpc /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/sunrpc debug.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/sunrpc /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/sunrpc ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/sunrpc /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/sunrpc ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/sunrpc/$$F; done; touch /test/headers//include/linux/sunrpc/.install
-diff --git a/headers/include/linux/sunrpc/.install b/headers/include/linux/sunrpc/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/sunrpc/debug.h b/headers/include/linux/sunrpc/debug.h
 new file mode 100644
 index 0000000..4ead318
@@ -84387,16 +84027,6 @@ index 0000000..2466e55
 +#define TASKSTATS_GENL_VERSION	0x1
 +
 +#endif /* _LINUX_TASKSTATS_H */
-diff --git a/headers/include/linux/tc_act/..install.cmd b/headers/include/linux/tc_act/..install.cmd
-new file mode 100644
-index 0000000..ecfed4c
---- /dev/null
-+++ b/headers/include/linux/tc_act/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/tc_act/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_act /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/tc_act tc_csum.h tc_defact.h tc_gact.h tc_ipt.h tc_mirred.h tc_nat.h tc_pedit.h tc_skbedit.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_act /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/tc_act ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_act /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/tc_act ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/tc_act/$$F; done; touch /test/headers//include/linux/tc_act/.install
-diff --git a/headers/include/linux/tc_act/.install b/headers/include/linux/tc_act/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/tc_act/tc_csum.h b/headers/include/linux/tc_act/tc_csum.h
 new file mode 100644
 index 0000000..a047c49
@@ -84683,16 +84313,6 @@ index 0000000..7a2e910
 +#define TCA_SKBEDIT_MAX (__TCA_SKBEDIT_MAX - 1)
 +
 +#endif
-diff --git a/headers/include/linux/tc_ematch/..install.cmd b/headers/include/linux/tc_ematch/..install.cmd
-new file mode 100644
-index 0000000..3df622d
---- /dev/null
-+++ b/headers/include/linux/tc_ematch/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/tc_ematch/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_ematch /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/tc_ematch tc_em_cmp.h tc_em_meta.h tc_em_nbyte.h tc_em_text.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_ematch /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/tc_ematch ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/tc_ematch /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/tc_ematch ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/tc_ematch/$$F; done; touch /test/headers//include/linux/tc_ematch/.install
-diff --git a/headers/include/linux/tc_ematch/.install b/headers/include/linux/tc_ematch/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/tc_ematch/tc_em_cmp.h b/headers/include/linux/tc_ematch/tc_em_cmp.h
 new file mode 100644
 index 0000000..f34bb1b
@@ -87153,16 +86773,6 @@ index 0000000..1eb0b8d
 +};
 +
 +#endif
-diff --git a/headers/include/linux/usb/..install.cmd b/headers/include/linux/usb/..install.cmd
-new file mode 100644
-index 0000000..714f88e
---- /dev/null
-+++ b/headers/include/linux/usb/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/usb/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/usb /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/usb audio.h cdc-wdm.h cdc.h ch11.h ch9.h functionfs.h g_printer.h gadgetfs.h midi.h tmc.h video.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/usb /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/usb ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/usb /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/usb ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/usb/$$F; done; touch /test/headers//include/linux/usb/.install
-diff --git a/headers/include/linux/usb/.install b/headers/include/linux/usb/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/usb/audio.h b/headers/include/linux/usb/audio.h
 new file mode 100644
 index 0000000..210f2f5
@@ -89476,10 +89086,10 @@ index 0000000..ebe53ea
 +#endif /* __LINUX_USB_CH9_H */
 diff --git a/headers/include/linux/usb/functionfs.h b/headers/include/linux/usb/functionfs.h
 new file mode 100644
-index 0000000..a31b40c
+index 0000000..71d4f8d
 --- /dev/null
 +++ b/headers/include/linux/usb/functionfs.h
-@@ -0,0 +1,174 @@
+@@ -0,0 +1,168 @@
 +#ifndef __LINUX_FUNCTIONFS_H__
 +#define __LINUX_FUNCTIONFS_H__
 +
@@ -89508,6 +89118,11 @@ index 0000000..a31b40c
 +	__u8  bInterval;
 +} __attribute__((packed));
 +
++
++/*
++ * All numbers must be in little endian order.
++ */
++
 +/* Legacy format, deprecated as of 3.14. */
 +struct usb_functionfs_descs_head {
 +	__le32 magic;
@@ -89515,17 +89130,6 @@ index 0000000..a31b40c
 +	__le32 fs_count;
 +	__le32 hs_count;
 +} __attribute__((packed, deprecated));
-+
-+/*
-+ * All numbers must be in little endian order.
-+ */
-+
-+struct usb_functionfs_descs_head {
-+	__le32 magic;
-+	__le32 length;
-+	__le32 fs_count;
-+	__le32 hs_count;
-+} __attribute__((packed));
 +
 +/*
 + * Descriptors format:
@@ -93055,11 +92659,11 @@ index 0000000..c1add0d
 +#endif
 diff --git a/headers/include/linux/version.h b/headers/include/linux/version.h
 new file mode 100644
-index 0000000..fe38bdd
+index 0000000..c8fa53a
 --- /dev/null
 +++ b/headers/include/linux/version.h
 @@ -0,0 +1,2 @@
-+#define LINUX_VERSION_CODE 200206
++#define LINUX_VERSION_CODE 200229
 +#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 diff --git a/headers/include/linux/veth.h b/headers/include/linux/veth.h
 new file mode 100644
@@ -97067,16 +96671,6 @@ index 0000000..9f6b77a
 +
 +
 +#endif /* #ifndef __LINUX__WIMAX_H__ */
-diff --git a/headers/include/linux/wimax/..install.cmd b/headers/include/linux/wimax/..install.cmd
-new file mode 100644
-index 0000000..990cacd
---- /dev/null
-+++ b/headers/include/linux/wimax/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/linux/wimax/.install := /bin/bash scripts/headers_install.sh /test/headers//include/linux/wimax /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/linux/wimax i2400m.h; /bin/bash scripts/headers_install.sh /test/headers//include/linux/wimax /mnt/package/kernel-osmc/src/vero-linux-master/include/linux/wimax ; /bin/bash scripts/headers_install.sh /test/headers//include/linux/wimax /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/linux/wimax ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/linux/wimax/$$F; done; touch /test/headers//include/linux/wimax/.install
-diff --git a/headers/include/linux/wimax/.install b/headers/include/linux/wimax/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/linux/wimax/i2400m.h b/headers/include/linux/wimax/i2400m.h
 new file mode 100644
 index 0000000..fd198bc
@@ -98949,7 +98543,7 @@ index 0000000..810cce6
 +#endif
 diff --git a/headers/include/linux/xattr.h b/headers/include/linux/xattr.h
 new file mode 100644
-index 0000000..c7ad960
+index 0000000..2634d03
 --- /dev/null
 +++ b/headers/include/linux/xattr.h
 @@ -0,0 +1,77 @@
@@ -98968,7 +98562,7 @@ index 0000000..c7ad960
 +#ifndef _LINUX_XATTR_H
 +#define _LINUX_XATTR_H
 +
-+#ifdef __UAPI_DEF_XATTR
++#if __UAPI_DEF_XATTR
 +#define __USE_KERNEL_XATTR_DEFS
 +
 +#define XATTR_CREATE	0x1	/* set value, fail if attr already exists */
@@ -100220,16 +99814,6 @@ index 0000000..74bc53b
 +#define  ZORRO_PROD_VECTOR_CONNECTION_3				ZORRO_ID(HACKER, 0xE1, 0)
 +#define  ZORRO_PROD_VECTOR_CONNECTION_4				ZORRO_ID(HACKER, 0xE2, 0)
 +#define  ZORRO_PROD_VECTOR_CONNECTION_5				ZORRO_ID(HACKER, 0xE3, 0)
-diff --git a/headers/include/mtd/..install.cmd b/headers/include/mtd/..install.cmd
-new file mode 100644
-index 0000000..4801ca9
---- /dev/null
-+++ b/headers/include/mtd/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/mtd/.install := /bin/bash scripts/headers_install.sh /test/headers//include/mtd /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/mtd inftl-user.h mtd-abi.h mtd-user.h nftl-user.h ubi-user.h; /bin/bash scripts/headers_install.sh /test/headers//include/mtd /mnt/package/kernel-osmc/src/vero-linux-master/include/mtd ; /bin/bash scripts/headers_install.sh /test/headers//include/mtd /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/mtd ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/mtd/$$F; done; touch /test/headers//include/mtd/.install
-diff --git a/headers/include/mtd/.install b/headers/include/mtd/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/mtd/inftl-user.h b/headers/include/mtd/inftl-user.h
 new file mode 100644
 index 0000000..8376bd1
@@ -101181,16 +100765,6 @@ index 0000000..f6d93e8
 +}  __attribute__((packed));
 +
 +#endif /* __UBI_USER_H__ */
-diff --git a/headers/include/rdma/..install.cmd b/headers/include/rdma/..install.cmd
-new file mode 100644
-index 0000000..72cdf7a
---- /dev/null
-+++ b/headers/include/rdma/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/rdma/.install := /bin/bash scripts/headers_install.sh /test/headers//include/rdma /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/rdma ib_user_cm.h ib_user_mad.h ib_user_sa.h ib_user_verbs.h rdma_netlink.h rdma_user_cm.h; /bin/bash scripts/headers_install.sh /test/headers//include/rdma /mnt/package/kernel-osmc/src/vero-linux-master/include/rdma ; /bin/bash scripts/headers_install.sh /test/headers//include/rdma /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/rdma ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/rdma/$$F; done; touch /test/headers//include/rdma/.install
-diff --git a/headers/include/rdma/.install b/headers/include/rdma/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/rdma/ib_user_cm.h b/headers/include/rdma/ib_user_cm.h
 new file mode 100644
 index 0000000..f79014a
@@ -102728,10 +102302,10 @@ index 0000000..6a79ea8
 +#endif /* _RDMA_NETLINK_H */
 diff --git a/headers/include/rdma/rdma_user_cm.h b/headers/include/rdma/rdma_user_cm.h
 new file mode 100644
-index 0000000..99b80ab
+index 0000000..3066718
 --- /dev/null
 +++ b/headers/include/rdma/rdma_user_cm.h
-@@ -0,0 +1,302 @@
+@@ -0,0 +1,303 @@
 +/*
 + * Copyright (c) 2005-2006 Intel Corporation.  All rights reserved.
 + *
@@ -102768,6 +102342,7 @@ index 0000000..99b80ab
 +#define RDMA_USER_CM_H
 +
 +#include <linux/types.h>
++#include <linux/socket.h>
 +#include <linux/in6.h>
 +#include <rdma/ib_user_verbs.h>
 +#include <rdma/ib_user_sa.h>
@@ -103034,26 +102609,6 @@ index 0000000..99b80ab
 +};
 +
 +#endif /* RDMA_USER_CM_H */
-diff --git a/headers/include/scsi/..install.cmd b/headers/include/scsi/..install.cmd
-new file mode 100644
-index 0000000..d907550
---- /dev/null
-+++ b/headers/include/scsi/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/scsi/.install := /bin/bash scripts/headers_install.sh /test/headers//include/scsi /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/scsi scsi_bsg_fc.h scsi_netlink.h scsi_netlink_fc.h; /bin/bash scripts/headers_install.sh /test/headers//include/scsi /mnt/package/kernel-osmc/src/vero-linux-master/include/scsi ; /bin/bash scripts/headers_install.sh /test/headers//include/scsi /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/scsi ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/scsi/$$F; done; touch /test/headers//include/scsi/.install
-diff --git a/headers/include/scsi/.install b/headers/include/scsi/.install
-new file mode 100644
-index 0000000..e69de29
-diff --git a/headers/include/scsi/fc/..install.cmd b/headers/include/scsi/fc/..install.cmd
-new file mode 100644
-index 0000000..cac5121
---- /dev/null
-+++ b/headers/include/scsi/fc/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/scsi/fc/.install := /bin/bash scripts/headers_install.sh /test/headers//include/scsi/fc /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/scsi/fc fc_els.h fc_fs.h fc_gs.h fc_ns.h; /bin/bash scripts/headers_install.sh /test/headers//include/scsi/fc /mnt/package/kernel-osmc/src/vero-linux-master/include/scsi/fc ; /bin/bash scripts/headers_install.sh /test/headers//include/scsi/fc /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/scsi/fc ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/scsi/fc/$$F; done; touch /test/headers//include/scsi/fc/.install
-diff --git a/headers/include/scsi/fc/.install b/headers/include/scsi/fc/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/scsi/fc/fc_els.h b/headers/include/scsi/fc/fc_els.h
 new file mode 100644
 index 0000000..481abbd
@@ -105093,16 +104648,6 @@ index 0000000..cbf76e4
 +
 +#endif /* SCSI_NETLINK_FC_H */
 +
-diff --git a/headers/include/sound/..install.cmd b/headers/include/sound/..install.cmd
-new file mode 100644
-index 0000000..9c3ab29
---- /dev/null
-+++ b/headers/include/sound/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/sound/.install := /bin/bash scripts/headers_install.sh /test/headers//include/sound /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/sound asequencer.h asound.h asound_fm.h compress_offload.h compress_params.h emu10k1.h firewire.h hdsp.h hdspm.h sb16_csp.h sfnt_info.h; /bin/bash scripts/headers_install.sh /test/headers//include/sound /mnt/package/kernel-osmc/src/vero-linux-master/include/sound ; /bin/bash scripts/headers_install.sh /test/headers//include/sound /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/sound ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/sound/$$F; done; touch /test/headers//include/sound/.install
-diff --git a/headers/include/sound/.install b/headers/include/sound/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/sound/asequencer.h b/headers/include/sound/asequencer.h
 new file mode 100644
 index 0000000..2be4da5
@@ -108582,26 +108127,6 @@ index 0000000..1bce7fd
 +#define SNDRV_EMUX_IOCTL_MISC_MODE	_IOWR('H', 0x84, struct snd_emux_misc_mode)
 +
 +#endif /* __SOUND_SFNT_INFO_H */
-diff --git a/headers/include/uapi/..install.cmd b/headers/include/uapi/..install.cmd
-new file mode 100644
-index 0000000..819b675
---- /dev/null
-+++ b/headers/include/uapi/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/uapi/.install := /bin/bash scripts/headers_install.sh /test/headers//include/uapi /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi ; /bin/bash scripts/headers_install.sh /test/headers//include/uapi /mnt/package/kernel-osmc/src/vero-linux-master/include ; /bin/bash scripts/headers_install.sh /test/headers//include/uapi /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/uapi/$$F; done; touch /test/headers//include/uapi/.install
-diff --git a/headers/include/uapi/.install b/headers/include/uapi/.install
-new file mode 100644
-index 0000000..e69de29
-diff --git a/headers/include/video/..install.cmd b/headers/include/video/..install.cmd
-new file mode 100644
-index 0000000..06d5569
---- /dev/null
-+++ b/headers/include/video/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/video/.install := /bin/bash scripts/headers_install.sh /test/headers//include/video /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/video edid.h sisfb.h uvesafb.h; /bin/bash scripts/headers_install.sh /test/headers//include/video /mnt/package/kernel-osmc/src/vero-linux-master/include/video ; /bin/bash scripts/headers_install.sh /test/headers//include/video /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/video ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/video/$$F; done; touch /test/headers//include/video/.install
-diff --git a/headers/include/video/.install b/headers/include/video/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/video/edid.h b/headers/include/video/edid.h
 new file mode 100644
 index 0000000..6aeb974
@@ -108898,16 +108423,6 @@ index 0000000..79e281b
 +} __attribute__ ((packed));
 +
 +#endif /* _UVESAFB_H */
-diff --git a/headers/include/xen/..install.cmd b/headers/include/xen/..install.cmd
-new file mode 100644
-index 0000000..426572b
---- /dev/null
-+++ b/headers/include/xen/..install.cmd
-@@ -0,0 +1 @@
-+cmd_/test/headers//include/xen/.install := /bin/bash scripts/headers_install.sh /test/headers//include/xen /mnt/package/kernel-osmc/src/vero-linux-master/include/uapi/xen evtchn.h gntalloc.h gntdev.h privcmd.h; /bin/bash scripts/headers_install.sh /test/headers//include/xen /mnt/package/kernel-osmc/src/vero-linux-master/include/xen ; /bin/bash scripts/headers_install.sh /test/headers//include/xen /mnt/package/kernel-osmc/src/vero-linux-master/include/generated/uapi/xen ; for F in ; do echo "\#include <asm-generic/$$F>" > /test/headers//include/xen/$$F; done; touch /test/headers//include/xen/.install
-diff --git a/headers/include/xen/.install b/headers/include/xen/.install
-new file mode 100644
-index 0000000..e69de29
 diff --git a/headers/include/xen/evtchn.h b/headers/include/xen/evtchn.h
 new file mode 100644
 index 0000000..14e833e
@@ -109351,5 +108866,5 @@ index 0000000..12eab3c
 +
 +#endif /* __LINUX_PUBLIC_PRIVCMD_H__ */
 -- 
-2.1.4
+1.7.10.4
 
