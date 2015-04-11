@@ -41,8 +41,8 @@ class remote_gui_launcher(object):
 
 	def __init__(self):
 
-		# flag to idicate whether the GUI should re-open upon close. This is for when the remote changes do not stick.
-		self.reopen = True
+		# flag to idicate whether the GUI should re-opn upon close. This is for when the remote changes do not stick.
+		self.open_gui = True
 
 		# container for any confs we want to ignore
 		self.excluded = ['lircd.conf']
@@ -98,7 +98,7 @@ class remote_gui_launcher(object):
 
 		while self.reopen:
 
-			self.reopen = False
+			self.open_gui = False
 
 			self.remote_gui.doModal()
 
@@ -167,7 +167,7 @@ class remote_gui_launcher(object):
 
 			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
-			self.reopen = True
+			self.open_gui = True
 
 
 
