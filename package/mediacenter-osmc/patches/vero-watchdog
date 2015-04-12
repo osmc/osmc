@@ -4,7 +4,8 @@
 # email@samnazarko.co.uk
 
 fb_restore() {
-	/bin/fbset -depth 8 && /bin/fbset -depth 32
+	echo 1 >/sys/class/vtconsole/vtcon1/bind
+	/bin/fbset -depth 32 && /bin/fbset -depth 16
 }
 
 export TERM=linux
@@ -21,9 +22,11 @@ chmod a+rw /dev/tty1
 while true; do
 	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
 	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+	/bin/fbset -depth 16 && /bin/fbset -depth 32
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
+	echo 0 > /sys/class/vtconsole/vtcon1/bind
 	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
@@ -38,7 +41,7 @@ while true; do
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
-		/bin/fbset -depth 8 && /bin/fbset -depth 32
+		/bin/fbset -depth 32 && /bin/fbset -depth 16
 		/usr/bin/setterm --cursor on >/dev/tty1
 		systemctl start getty@tty1
 		count=30
