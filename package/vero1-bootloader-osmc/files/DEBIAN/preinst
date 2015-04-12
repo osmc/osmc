@@ -1,2 +1,5 @@
 #!/bin/bash
 
+if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+	rm -f /boot/SPL /boot/u-boot.img
+fi

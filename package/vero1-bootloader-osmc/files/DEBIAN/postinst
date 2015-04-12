@@ -2,7 +2,10 @@
 
 if ischroot; then exit 0; fi
 
-dd if=/boot/SPL of=/dev/mmcblk0 bs=1K seek=1 conv=fdatasync
-dd if=/boot/u-boot.img of=/dev/mmcblk0 bs=1K seek=42 conv=fdatasync
-touch /tmp/reboot-needed
-
+if [ "$1" = "configure" ]; then
+	dd if=/boot/SPL of=/dev/mmcblk0 bs=1K seek=1 conv=fdatasync
+	EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+	dd if=/boot/u-boot.img of=/dev/mmcblk0 bs=1K seek=42 conv=fdatasync
+	EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+	touch /tmp/reboot-needed
+fi
