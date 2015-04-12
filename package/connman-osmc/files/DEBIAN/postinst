@@ -14,7 +14,8 @@ if [ "$1" = "configure" ]; then
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
 
-	systemctl enable eventlircd.service >/dev/null 2>&1
+	systemctl enable connman.service >/dev/null 2>&1
+
 	if ischroot; then exit 0; fi
-	systemctl start eventlircd.service >/dev/null 2>&1
+	systemctl restart connman.service
 fi
