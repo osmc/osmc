@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <!-- yesnodialog -->
+    <defaultcontrol always="true">55</defaultcontrol>
+    <zorder>4</zorder>
+    <controls>
+        <!-- Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="88000000">DialogTextBackground.png</texture>
+            <animation effect="fade" end="100" start="0" time="200">WindowOpen</animation>
+            <animation effect="fade" end="0" start="100" time="200">WindowClose</animation>
+        </control>
+
+        <!-- countdown label -->
+<!--         <control id="45" type="label">
+            <left>40</left>
+            <top>262</top>
+            <width>270</width>
+            <height>36</height>
+            <align>center</align>
+            <label>nothing</label>
+            <font>osmc_addon_720_OLD_Font48</font>
+        </control> -->
+
+        <!-- progress bar -->
+        <control id="101" type="image">
+            <left>360</left>
+            <top>200</top>
+            <width>1200</width>
+            <height>45</height>
+            <texture border="20">OSDProgressBar.png</texture>
+        </control>
+
+        <!-- Main group -->
+        <control type="group">
+            <animation type="WindowOpen">
+                <effect center="auto" easing="inout" end="100" start="70" time="300" tween="back" type="zoom"/>
+                <effect end="100" start="0" time="300" type="fade"/>
+            </animation>
+            <animation type="WindowClose">
+                <effect center="auto" end="70" start="100" time="100" type="zoom"/>
+                <effect end="0" start="100" time="100" type="fade"/>
+            </animation>
+            <left>600</left>
+            <top>360</top>
+            <width>720</width>
+            <height>360</height>
+            <!-- Background -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>720</width>
+                <height>360</height>
+                <texture border="20">DialogBackground.png</texture>
+            </control>
+            <!-- Heading -->
+            <control id="1" type="label">
+                <label>$ADDON[script.module.osmcsetting.remotes 32006]</label>
+                <left>60</left>
+                <top>40</top>
+                <width>600</width>
+                <height>48</height>
+                <align>center</align>
+                <font>osmc_addon_720_OLD_Font48</font>
+                <textcolor>ffffffff</textcolor>
+            </control>
+            <!-- restarting service label -->
+            <control id="90" type="label">
+                <left>60</left>
+                <label>$ADDON[script.module.osmcsetting.remotes 32011]</label>
+                <top>96</top>
+                <width>600</width>
+                <height>158</height>
+                <align>center</align>
+                <font>osmc_addon_720_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+            </control>
+            <!-- service restarted label -->
+            <control id="91" type="label">
+                <left>60</left>
+                <label>$ADDON[script.module.osmcsetting.remotes 32007]</label>
+                <top>96</top>
+                <width>600</width>
+                <height>158</height>
+                <align>center</align>
+                <font>osmc_addon_720_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+            </control>
+
+
+            <!-- No -->
+            <control id="55" type="button">
+                <left>40</left>
+                <top>262</top>
+                <width>270</width>
+                <height>36</height>
+                <align>right</align>
+                <onleft>noop</onleft>
+                <onright>25</onright>
+                <label>$ADDON[script.module.osmcsetting.remotes 32009]</label>
+                <font>osmc_addon_720_OLD_Font36</font>
+            </control>
+            <!-- Yes -->
+            <control id="25" type="button">
+                <left>410</left>
+                <top>262</top>
+                <width>270</width>
+                <height>36</height>
+                <onleft>55</onleft>
+                <onright>noop</onright>
+                <label>$ADDON[script.module.osmcsetting.remotes 32010]</label>
+                <font>osmc_addon_720_OLD_Font36</font>
+            </control>
+        </control>
+    </controls>
+</window>
