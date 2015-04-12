@@ -19,15 +19,6 @@ class SimpleScheduler(object):
 		self.set_trigger()
 
 
-	def action(self):
-
-		''' The action that should take place at the target time. '''
-
-		self.parent_queue.put('update_now')
-
-		self.step_trigger()
-
-
 	def set_trigger(self):
 
 		# use right_nows year and month
@@ -124,6 +115,11 @@ class SimpleScheduler(object):
 		if self.trigger_time < right_now < self.trigger_time + datetime.timedelta(minutes=self.leeway):
 
 			# time is currently after the trigger time, but within the leeway
+			self.step_trigger()
 
-			self.action()
+			return True
+
+		else:
+
+			return False
 

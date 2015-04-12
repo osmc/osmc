@@ -19,6 +19,7 @@ __libpath__ = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('pa
 sys.path.append(__libpath__)
 import comms
 import simple_scheduler as sched
+import OSMC_Backups
 from CompLogger import comprehensive_logger as clog
 
 __addon__              	= xbmcaddon.Addon()
@@ -197,6 +198,11 @@ class Main(object):
 				log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
 			count += 1 											# FOR TESTING ONLY
 			# FOR TESTING ONLY
+
+			# check the scheduler for the update trigger
+			if self.scheduler.check_trigger():
+				self.update_now()
+				log(self.scheduler.trigger_time, 'trigger_time')
 
 			# check the action queue
 			self.check_action_queue()
@@ -431,10 +437,36 @@ class Main(object):
 			self.s['check_minute'] 		= int(float(	__setting__('check_minute')			))
 			# self.s['pos_x']				= int(float(	__setting__('pos_x')				))
 			# self.s['pos_y']				= int(float(	__setting__('pos_y')				))
-			self.s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
-			self.s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
-			self.s['update_on_idle']	= True if 		__setting__('update_on_idle') 		== 'true' else False
-			self.s['home_prompts_only']	= True if 		__setting__('home_prompts_only') 	== 'true' else False
+			self.s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
+			self.s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
+			self.s['update_on_idle']			= True if 	__setting__('update_on_idle') 			== 'true' else False
+			self.s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
+			self.s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
+			self.s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
+			self.s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
+			self.s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False
+			self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			self.s['backup_location'] 			= __setting__('backup_location')
+			self.s['tarball_count'] 			= int(float(	__setting__('tarball_count')		))
+			self.s['backup_addons'] 			= True if 	__setting__('backup_addons')			== 'true' else False
+			self.s['backup_addon_data'] 		= True if 	__setting__('backup_addon_data')		== 'true' else False
+			self.s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
+			self.s['backup_keymaps'] 			= True if 	__setting__('backup_keymaps')			== 'true' else False
+			self.s['backup_library'] 			= True if 	__setting__('backup_library')			== 'true' else False
+			self.s['backup_playlists'] 			= True if 	__setting__('backup_playlists')			== 'true' else False
+			self.s['backup_Thumbnails']		 	= True if 	__setting__('backup_Thumbnails')		== 'true' else False
+			self.s['backup_favourites'] 		= True if 	__setting__('backup_favourites')		== 'true' else False
+			self.s['backup_keyboard'] 			= True if 	__setting__('backup_keyboard')			== 'true' else False
+			self.s['backup_remote'] 			= True if 	__setting__('backup_remote')			== 'true' else False
+			self.s['backup_LCD'] 				= True if 	__setting__('backup_LCD')				== 'true' else False
+			self.s['backup_profiles'] 			= True if 	__setting__('backup_profiles')			== 'true' else False
+			self.s['backup_RssFeeds'] 			= True if 	__setting__('backup_RssFeeds')			== 'true' else False
+			self.s['backup_sources'] 			= True if 	__setting__('backup_sources')			== 'true' else False
+			self.s['backup_upnpserver'] 		= True if 	__setting__('backup_upnpserver')		== 'true' else False
+			self.s['backup_peripheral_data'] 	= True if 	__setting__('backup_peripheral_data')	== 'true' else False
+			self.s['backup_guisettings'] 		= True if 	__setting__('backup_guisettings')		== 'true' else False
+			self.s['backup_advancedsettings'] 	= True if 	__setting__('backup_advancedsettings')	== 'true' else False
+
 
 			return "initial run", self.s
 
@@ -453,10 +485,39 @@ class Main(object):
 			tmp_s['check_minute'] 		= int(float(	__setting__('check_minute')			))
 			# tmp_s['pos_x']				= int(float(	__setting__('pos_x')				))
 			# tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
-			tmp_s['suppress_progress']	= True if 		__setting__('suppress_progress') 	== 'true' else False
-			tmp_s['suppress_icon']		= True if 		__setting__('suppress_icon') 		== 'true' else False
-			tmp_s['update_on_idle']		= True if 		__setting__('update_on_idle') 		== 'true' else False
-			tmp_s['home_prompts_only']	= True if 		__setting__('home_prompts_only') 	== 'true' else False
+			tmp_s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
+			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
+			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
+			tmp_s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
+			tmp_s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
+			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
+			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
+			tmp_s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
+			tmp_s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
+			tmp_s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
+			tmp_s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
+			tmp_s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False			
+			tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			tmp_s['backup_location'] 			= __setting__('backup_location')
+			tmp_s['tarball_count'] 				= int(float(	__setting__('tarball_count')		))
+			tmp_s['backup_addons'] 				= True if 	__setting__('backup_addons')			== 'true' else False
+			tmp_s['backup_addon_data'] 			= True if 	__setting__('backup_addon_data')		== 'true' else False
+			tmp_s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
+			tmp_s['backup_keymaps'] 			= True if 	__setting__('backup_keymaps')			== 'true' else False
+			tmp_s['backup_library'] 			= True if 	__setting__('backup_library')			== 'true' else False
+			tmp_s['backup_playlists'] 			= True if 	__setting__('backup_playlists')			== 'true' else False
+			tmp_s['backup_Thumbnails']		 	= True if 	__setting__('backup_Thumbnails')		== 'true' else False
+			tmp_s['backup_favourites'] 			= True if 	__setting__('backup_favourites')		== 'true' else False
+			tmp_s['backup_keyboard'] 			= True if 	__setting__('backup_keyboard')			== 'true' else False
+			tmp_s['backup_remote'] 				= True if 	__setting__('backup_remote')			== 'true' else False
+			tmp_s['backup_LCD'] 				= True if 	__setting__('backup_LCD')				== 'true' else False
+			tmp_s['backup_profiles'] 			= True if 	__setting__('backup_profiles')			== 'true' else False
+			tmp_s['backup_RssFeeds'] 			= True if 	__setting__('backup_RssFeeds')			== 'true' else False
+			tmp_s['backup_sources'] 			= True if 	__setting__('backup_sources')			== 'true' else False
+			tmp_s['backup_upnpserver'] 			= True if 	__setting__('backup_upnpserver')		== 'true' else False
+			tmp_s['backup_peripheral_data'] 	= True if 	__setting__('backup_peripheral_data')	== 'true' else False
+			tmp_s['backup_guisettings'] 		= True if 	__setting__('backup_guisettings')		== 'true' else False
+			tmp_s['backup_advancedsettings'] 	= True if 	__setting__('backup_advancedsettings')	== 'true' else False			
 
 		# flags to determine whether the update scheduler needs to be reconstructed or icon repositioned
 		update_scheduler = False
@@ -514,7 +575,7 @@ class Main(object):
 		ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
-	# @clog(log, maxlength=250)
+	# @clog(log, maxlength=2500)
 	def progress_bar(self, **kwargs):
 
 		''' Controls the creation and updating of the background prgress bar in kodi.
@@ -699,6 +760,15 @@ class Main(object):
 			self.call_child_script('update_manual')
 
 			return 'Called child action - update_manual'
+
+
+		if action == 'backup':
+
+			self.update_settings()
+
+			bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
+
+			bckp.start_backup()
 
 		# elif action == 'install':
 
