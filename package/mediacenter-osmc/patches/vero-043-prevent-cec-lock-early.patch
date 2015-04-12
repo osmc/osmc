@@ -1,0 +1,60 @@
+From 4af99fcc83027829e5747e05e8582565063cfbc1 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Sat, 28 Mar 2015 23:35:22 +0100
+Subject: [PATCH] Prevent lock GUI on early CEC RC buttons press (before CEC
+ inited and initial update configuration).
+
+---
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 5d0feef..942426e 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -1579,36 +1579,34 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+     strNotification += StringUtils::Format("- %s", strAmpName.c_str());
+ 
+   UpdateMenuLanguage();
++  {
++    CSingleLock lock(m_critSection);
++    m_bIsUpdating = false;
++  }
+ 
+   // request the OSD name of the TV
+   cec_osd_name tvName = m_adapter->m_cecAdapter->GetDeviceOSDName(CECDEVICE_TV);
+   strNotification = StringUtils::Format("%s: %s", g_localizeStrings.Get(36016).c_str(), tvName.name);
+ 
+-  m_adapter->m_bIsReady = true;
+   if (m_configuration.bActivateSource == 1)
+   {
+-    /*if (m_configuration.bActivateSource == 1 && m_adapter->m_cecAdapter->IsActiveDevice(CECDEVICE_TV))
+-      m_adapter->m_cecAdapter->SetMenuState(CEC_MENU_STATE_DEACTIVATED, false);*/
+-
+     m_adapter->ActivateSource();
+-    // wait until TV are powered up
+-    if (!WaitReady())
+-      return false;
++    // wait until power up
++    WaitReady();
++    m_adapter->m_bIsReady = true;
+ 
+     // wait until we get active source
+     bool bContinue(false);
+-
+     while (!m_adapter->m_cecAdapter->IsLibCECActiveSource() && 
+            bContinue)
+       bContinue = !m_event.WaitMSec(10000);
+   }
++  else
++    m_adapter->m_bIsReady = true;
+ 
+   // and let the gui know that we're done
+   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), strNotification);
+ 
+-  CSingleLock lock(m_critSection);
+-  m_bIsUpdating = false;
+-
+   g_application.SetCecStandby(false, true);
+   return true;
+ }
