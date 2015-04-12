@@ -1,0 +1,56 @@
+From 240dbb1d9516cb89df3a08ea91bdfacf919af3f3 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Sat, 28 Mar 2015 23:30:03 +0100
+Subject: [PATCH] Add CEC IMX adapter as known type and set no polling. - that
+ eliminates extensive periodic /sys walkthrough
+
+---
+ xbmc/peripherals/PeripheralTypes.h                | 5 +++++
+ xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/xbmc/peripherals/PeripheralTypes.h b/xbmc/peripherals/PeripheralTypes.h
+index e92fd41..2b362f0 100644
+--- a/xbmc/peripherals/PeripheralTypes.h
++++ b/xbmc/peripherals/PeripheralTypes.h
+@@ -37,6 +37,7 @@ namespace PERIPHERALS
+     PERIPHERAL_BUS_USB,
+     PERIPHERAL_BUS_PCI,
+     PERIPHERAL_BUS_RPI,
++    PERIPHERAL_BUS_IMX,
+     PERIPHERAL_BUS_CEC
+   };
+ 
+@@ -151,6 +152,8 @@ namespace PERIPHERALS
+         return "pci";
+       case PERIPHERAL_BUS_RPI:
+         return "rpi";
++      case PERIPHERAL_BUS_IMX:
++        return "imx";
+       case PERIPHERAL_BUS_CEC:
+         return "cec";
+       default:
+@@ -169,6 +172,8 @@ namespace PERIPHERALS
+         return PERIPHERAL_BUS_PCI;
+       else if (strTypeLowerCase.Equals("rpi"))
+         return PERIPHERAL_BUS_RPI;
++      else if (strTypeLowerCase.Equals("imx"))
++        return PERIPHERAL_BUS_IMX;
+       else if (strTypeLowerCase.Equals("cec"))
+         return PERIPHERAL_BUS_CEC;
+ 
+diff --git a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+index 4941ae6..94e4a08 100644
+--- a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
++++ b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+@@ -104,6 +104,10 @@ bool CPeripheralBusCEC::PerformDeviceScan(PeripheralScanResults &results)
+       /** the Pi's adapter cannot be removed, no need to rescan */
+       m_bNeedsPolling = false;
+       break;
++    case ADAPTERTYPE_IMX:
++      result.m_mappedBusType = PERIPHERAL_BUS_IMX;
++      m_bNeedsPolling = false;
++      break;
+     default:
+       break;
+     }
