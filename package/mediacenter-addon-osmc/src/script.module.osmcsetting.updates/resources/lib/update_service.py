@@ -766,9 +766,9 @@ class Main(object):
 
 			self.update_settings()
 
-			bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
+			# bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
 
-			bckp.start_backup()
+			# bckp.start_backup()
 
 		# elif action == 'install':
 
