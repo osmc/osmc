@@ -133,7 +133,6 @@ def apply_network_changes(settings_dict):
         if settings_dict['Method'] == 'nfs_manual':
             ip_value = create_cmdline_nfs_manual_string(settings_dict)
         update_cmdline_file(UPDATE_NETWORK_DETAILS_FILE, 'ip', ip_value)
-    update_preseed_file(settings_dict)
 
 
 def make_variant(string):
