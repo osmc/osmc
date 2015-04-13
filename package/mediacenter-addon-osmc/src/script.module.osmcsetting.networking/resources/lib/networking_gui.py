@@ -540,17 +540,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.setFocusId(WIRED_DHCP_MANUAL_BUTTON)
 
         if control_id == WIRED_APPLY_BUTTON:
-            osmc_network.apply_network_changes(self.current_network_config)
-            if self.current_network_config['Method'] in ['nfs_dhcp', 'nfs_manual']:
-                with open(self.reboot_required_file, 'w') as f:
-                    f.write('d')
-                # 'NFS Network Settings'
-                # 'Your Settings will not take effect until you reboot. Reboot Now?''
-                if DIALOG.yesno(lang(32036), lang(32037)):
-                    xbmc.executebuiltin('Reboot')
-            else:
-                self.populate_wired_panel()
-            self.setFocusId(WIRED_DHCP_MANUAL_BUTTON)
+            if self.current_network_config:
+                osmc_network.apply_network_changes(self.current_network_config)
+                if self.current_network_config['Method'] in ['nfs_dhcp', 'nfs_manual']:
+                    with open(self.reboot_required_file, 'w') as f:
+                        f.write('d')
+                    # 'NFS Network Settings'
+                    # 'Your Settings will not take effect until you reboot. Reboot Now?''
+                    if DIALOG.yesno(lang(32036), lang(32037)):
+                        xbmc.executebuiltin('Reboot')
+                else:
+                    self.populate_wired_panel()
+                self.setFocusId(WIRED_DHCP_MANUAL_BUTTON)
 
         if control_id == WIRED_ADAPTER_TOGGLE:
             self.toggle_ethernet()
@@ -668,9 +669,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
 
         elif control_id == WIRELESS_APPLY_BUTTON:
-            osmc_network.apply_network_changes(self.current_network_config)
-            self.populate_wifi_panel()
-            self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
+            if self.current_network_config:
+                osmc_network.apply_network_changes(self.current_network_config)
+                self.populate_wifi_panel()
+                self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
 
         elif control_id == WIRELESS_ADAPTER_TOGGLE:
             self.toggle_wifi()
