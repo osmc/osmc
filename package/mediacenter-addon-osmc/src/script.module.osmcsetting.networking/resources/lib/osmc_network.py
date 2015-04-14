@@ -23,7 +23,7 @@ PREESEED_LOCATION = '/boot/preseed.cfg'
 
 WAIT_FOR_NETWORK_SERVICE = 'connman-wait-for-network.service'
 
-manager = connman.get_manager_interface()
+
 
 
 def is_ethernet_enabled():
@@ -35,6 +35,7 @@ def toggle_ethernet_state(state):
 
 
 def get_ethernet_settings():
+    manager = connman.get_manager_interface()
     for entry in manager.GetServices():
         eth_settings = None
         path = entry[0]
@@ -241,6 +242,7 @@ def scan_wifi():
 
 def get_wifi_networks():
     wifis = {}
+    manager = connman.get_manager_interface()
     for entry in manager.GetServices():
         path = entry[0]
         dbus_properties = entry[1]
