@@ -33,20 +33,62 @@
 		<!-- 32061: "Download and install automatically" ************* -->
 		<!-- 32062: "Download, install, auto-restart if needed" -->
 		<!-- . -->
-
 		<!-- 32065: Only show prompts on the Home screen -->
 		<setting default="false" id="home_prompts_only" label="32065" type="bool" visible="eq(-1, 0)"/>
 		<!-- 32066: Icon Position X (% of screen) -->
-		<!-- <setting default="5" id="pos_x" label="32066" option="int" range="0,1,100" type="slider" visible="!eq(-2,0)"/> -->
+		<!-- <setting default="5" id="pos_x" label="32066" option="int" range="0,1,100" type="slider" visible="!eq(-2,0)"/>-->
 		<!-- 32067: Icon Position Y (% of screen) -->
-		<!-- <setting default="5" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-3,0)"/> -->
+		<!-- <setting default="5" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-3,0)"/>-->
 		<!-- 32046: Suppress on-screen progress updates -->
 		<setting default="false" id="suppress_progress" label="32046" type="bool"/>
 		<!-- 32068: Do not show icon on home screen -->
 		<setting default="false" id="suppress_icon" label="32068" type="bool"/>
 	</category>
+	<category label="Backups">
+		<!-- backup before updating -->
+		<setting default="false" id="backup_on_update" label="Backup before each update (excludes manual update)." type="bool"/>
+		<!-- . -->
+		<!-- export the libraries -->
+		<!-- . -->
+		<setting default="false" id="export_library" label="Export libraries" type="bool"/>
+		<setting visible="eq(-1,true)" subsetting="true" default="false" id="export_video" label="Export Video Library" type="bool"/>
+		<setting visible="eq(-1,true)+eq(-2,true)" subsetting="true" default="false" id="multifile_vid_export" label="Export individual xml files to the video locations" type="bool"/>
+		<setting visible="eq(-3,true)" subsetting="true" default="false" id="export_music" label="Export Music Library" type="bool"/>
+		<!-- . -->
+		<!-- create tarball of folders and files -->
+		<!-- . -->
+		<setting default="false" id="create_tarball" label="create_tarball" type="bool"/>
+		<!-- location of backup -->
+		<setting visible="eq(-1,true)" subsetting="true" id="backup_location" label="Location of backup storage" source="auto" option="writeable" type="folder"/>
+		<!-- number of backup tarballs to keep -->
+		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" subsetting="true" type="slider" visible="eq(-2,true)"/>
+		<!-- folders and files to tarball -->
+		<setting visible="eq(-3,true)" subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
+		<setting visible="eq(-4,true)" subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
+		<setting visible="eq(-5,true)" subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
+		<setting visible="eq(-6,true)" subsetting="true" default="true" id="backup_keymaps" label="Keymaps Folder" type="bool"/>
+		<setting visible="eq(-7,true)" subsetting="true" default="true" id="backup_library" label="Library Folder" type="bool"/>
+		<setting visible="eq(-8,true)" subsetting="true" default="true" id="backup_peripheral_data" label="Peripheral_data Folder" type="bool"/>
+		<setting visible="eq(-9,true)" subsetting="true" default="true" id="backup_playlists" label="Playlists Folder" type="bool"/>
+		<setting visible="eq(-10,true)" subsetting="true" default="false" id="backup_Thumbnails" label="Thumbnails Folder (very large)" type="bool"/>
+		<setting visible="eq(-11,true)" subsetting="true" default="true" id="backup_favourites" label="favourites.xml" type="bool"/>
+		<setting visible="eq(-12,true)" subsetting="true" default="true" id="backup_guisettings" label="guisettings.xml" type="bool"/>
+		<setting visible="eq(-13,true)" subsetting="true" default="true" id="backup_keyboard" label="keyboard.xml" type="bool"/>
+		<setting visible="eq(-14,true)" subsetting="true" default="true" id="backup_remote" label="remote.xml" type="bool"/>
+		<setting visible="eq(-15,true)" subsetting="true" default="true" id="backup_LCD" label="LCD.xml" type="bool"/>
+		<setting visible="eq(-16,true)" subsetting="true" default="true" id="backup_profiles" label="profiles.xml" type="bool"/>
+		<setting visible="eq(-17,true)" subsetting="true" default="true" id="backup_RssFeeds" label="RssFeeds.xml" type="bool"/>
+		<setting visible="eq(-18,true)" subsetting="true" default="true" id="backup_sources" label="sources.xml" type="bool"/>
+		<setting visible="eq(-19,true)" subsetting="true" default="true" id="backup_upnpserver" label="upnpserver.xml" type="bool"/>
+		<setting visible="eq(-20,true)" subsetting="true" default="true" id="backup_advancedsettings" label="advancedsettings.xml" type="bool"/>
+
+	</category>
 	<category label="32094">
 		<!-- 32056: Scan for updates now -->
 		<setting action="RunScript($CWD/resources/lib/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
+		<!-- backup now -->
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, backup)" id="backup_now" label="Run Backup of settings now." option="close" type="action"/>
+		<!-- restore now -->
+		<setting action="RunScript($CWD/resources/lib/OSMC_Backups.py, restore)" id="restore_now" label="Restore a backup of settings now." option="close" type="action"/>
 	</category>
 </settings>
