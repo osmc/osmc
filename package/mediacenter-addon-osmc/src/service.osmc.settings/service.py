@@ -64,6 +64,33 @@ def lang(id):
 def log(message):
 	xbmc.log('OSMC ADDON MAIN ' + str(message), level=xbmc.LOGDEBUG)
 
+
+def set_version():
+
+	''' Loads the current OSMC version into the Home window for display in MyOSMC '''
+
+	version = []
+	
+	with open('/etc/os-release','r') as f:
+
+		tags = ['NAME=', 'VERSION=', 'VERSION_ID=']
+
+		lines = f.readlines()
+
+		for line in lines:
+
+			for tag in tags:
+
+				if line.startswith(tag):
+					version.append(line[len(tag):].replace('"','').replace('\n',''))
+
+	version_string = ' '.join(version)
+
+	log('Current Version: %s' % version_string)
+
+	WINDOW.setProperty('osmc_version', version_string)
+
+
 class Main(object):
 
 
@@ -348,6 +375,8 @@ class Main(object):
 
 
 if __name__ == "__main__":
+
+	set_version()
 
 	m = Main()
 
