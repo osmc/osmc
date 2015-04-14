@@ -30,6 +30,9 @@ then
 	fi
 	exec /usr/sbin/connmand -n -I eth0 --nodnsproxy --config=/etc/connman.conf
 else
-	exec /usr/sbin/connmand -n --config=/etc/connman.conf
+	if echo "$dnsproxy" | grep -iqw no; then
+		exec /usr/sbin/connmand -n --nodnsproxy --config=/etc/connman.conf
+	else
+		exec /usr/sbin/connmand -n --config=/etc/connman.conf
+	fi
 fi
-

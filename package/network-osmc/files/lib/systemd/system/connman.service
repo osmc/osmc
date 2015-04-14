@@ -9,6 +9,7 @@ Wants=remote-fs-pre.target
 [Service]
 Type=dbus
 BusName=net.connman
+EnvironmentFile=-/etc/connman.prefs
 Restart=on-failure
 ExecStart = /usr/bin/start-network
 StandardOutput=null
