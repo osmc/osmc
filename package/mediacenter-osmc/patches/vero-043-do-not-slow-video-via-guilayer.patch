@@ -1,0 +1,22 @@
+From 81979e6a75d462159ad4f25f5c62339c168ea04b Mon Sep 17 00:00:00 2001
+From: fritsch <peter.fruehberger@gmail.com>
+Date: Mon, 13 Apr 2015 17:11:47 +0200
+Subject: [PATCH] Application: Don't slow down videos rendered on GuiLayer
+
+---
+ xbmc/Application.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 51fdf84..2bf5275 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2486,7 +2486,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
+ #if defined(TARGET_RASPBERRY_PI) || defined(HAS_IMXVPU)
+     // This code reduces rendering fps of the GUI layer when playing videos in fullscreen mode
+     // it makes only sense on architectures with multiple layers
+-    if (g_graphicsContext.IsFullScreenVideo() && !m_pPlayer->IsPausedPlayback())
++    if (g_graphicsContext.IsFullScreenVideo() && !m_pPlayer->IsPausedPlayback() && g_renderManager.IsVideoLayer())
+       fps = CSettings::Get().GetInt("videoplayer.limitguiupdate");
+ #endif
+ 
