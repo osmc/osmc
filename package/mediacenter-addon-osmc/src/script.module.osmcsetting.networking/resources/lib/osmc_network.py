@@ -264,20 +264,20 @@ def get_wifi_networks():
 def wifi_connect(path, password=None):
     connected = False
     if password:
-        print 'Starting Agent'
+        print('Starting Wireless Agent')
         keyfile = open('/tmp/key', 'w')
         keyfile.write(password)
         keyfile.close()
         process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'keyfile'])
-	count = 0
-	while not os.path.exists('/tmp/agent_started'):
-	    count+=1
-	    time.sleep(1)
-	    if count > 10:
-                print 'Agent had not started after 10 seconds'
-		break 
-	if os.path.exists('/tmp/agent_started'):
-	    os.remove('/tmp/agent_started')
+    count = 0
+    while not os.path.exists('/tmp/agent_started'):
+        count += 1
+        time.sleep(1)
+        if count > 10:
+                print('Agent had not started after 10 seconds')
+        break
+    if os.path.exists('/tmp/agent_started'):
+        os.remove('/tmp/agent_started')
     print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
     try:
@@ -286,7 +286,7 @@ def wifi_connect(path, password=None):
     except dbus.DBusException, e:
         print ('DBusException connecting ' + str(e))
         connected = False
-    print (connected)
+    print ('Connection to ' + path + ' : ' + str(connected))
     if password:
         process.kill()
         os.remove('/tmp/key')
