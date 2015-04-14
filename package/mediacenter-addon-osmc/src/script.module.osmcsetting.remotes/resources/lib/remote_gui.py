@@ -83,6 +83,8 @@ def construct_listitem(conf):
 
 def test_custom(conf):
 
+	''' Returns a boolean indicating whether the supplied conf file is a custom conf file. '''
+
 	try:
 		path, filename = os.path.split(conf)
 
@@ -92,7 +94,6 @@ def test_custom(conf):
 			return False
 
 	except:
-		self.active_conf = None
 		return False
 
 
@@ -108,7 +109,16 @@ class remote_gui_launcher(object):
 
 		self.active_conf = os.path.realpath(LIRCD_PATH)
 
-		custom = test_custom(self.active_conf)
+		# check if the target file actually exists, if it doesnt, then set the active conf file as None,
+		# if it does, then check whether it is a custom file
+		if os.path.isfile(self.active_conf):
+
+			custom = test_custom(self.active_conf)
+
+		else:
+
+			custom = False
+			self.active_conf = None
 
 		# get the contents of /etc/lirc/
 		local_confs_base = os.listdir(ETC_LIRC)
@@ -128,6 +138,8 @@ class remote_gui_launcher(object):
 			local_confs.append(construct_listitem(conf))
 
 		if custom:
+			# self.active_conf can only be None if custom is False, so there is no risk in this
+			# reconstruction of the local_confs
 			local_confs = [construct_listitem(self.active_conf)] + local_confs
 
 		xml = "RemoteBrowser_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "RemoteBrowser_OSMC.xml"
@@ -196,6 +208,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 
 			tmp_path = tmp.getLabel2()
 
+			# if self.active_conf is None (i.e. the user deleted it externally) then no item will be selected
 			if self.active_conf == tmp_path:
 				tmp.select(True)
 			else:
@@ -271,6 +284,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 						self.list.removeItem(i)
 
 					# add the new custom as an item
+					# self.active_conf cannot be None at this point, as the user must have selected one
 					tmp = construct_listitem(self.active_conf)
 					self.list.addItem(tmp)
 
