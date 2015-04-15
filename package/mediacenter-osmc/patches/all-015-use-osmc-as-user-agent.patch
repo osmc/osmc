@@ -1,0 +1,40 @@
+From edee2e8835fe92c19c635a839b5deecad7f3e256 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 15 Apr 2015 04:29:31 +0100
+Subject: [PATCH] Use "OSMC/Open Source Media Center" as user agent
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/filesystem/CurlFile.cpp | 2 +-
+ xbmc/utils/RssReader.cpp     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/filesystem/CurlFile.cpp b/xbmc/filesystem/CurlFile.cpp
+index 3c7d4ba..d8a34db 100644
+--- a/xbmc/filesystem/CurlFile.cpp
++++ b/xbmc/filesystem/CurlFile.cpp
+@@ -565,7 +565,7 @@ void CCurlFile::SetCommonOptions(CReadState* state)
+   if (m_userAgent.length() > 0)
+     g_curlInterface.easy_setopt(h, CURLOPT_USERAGENT, m_userAgent.c_str());
+   else /* set some default agent as shoutcast doesn't return proper stuff otherwise */
+-    g_curlInterface.easy_setopt(h, CURLOPT_USERAGENT, g_advancedSettings.m_userAgent.c_str());
++    g_curlInterface.easy_setopt(h, CURLOPT_USERAGENT, "OSMC/Open Source Media Center");
+ 
+   if (m_useOldHttpVersion)
+     g_curlInterface.easy_setopt(h, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+diff --git a/xbmc/utils/RssReader.cpp b/xbmc/utils/RssReader.cpp
+index 5383156..6d119e9 100644
+--- a/xbmc/utils/RssReader.cpp
++++ b/xbmc/utils/RssReader.cpp
+@@ -135,7 +135,7 @@ void CRssReader::Process()
+     m_strColors[iFeed].clear();
+ 
+     CCurlFile http;
+-    http.SetUserAgent(g_advancedSettings.m_userAgent);
++    http.SetUserAgent("OSMC/Open Source Media Center");
+     http.SetTimeout(2);
+     std::string strXML;
+     std::string strUrl = m_vecUrls[iFeed];
+-- 
+2.1.0
+
