@@ -1,0 +1,105 @@
+From ed5fc205958e961fb83346ea22572630e326d2d7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pasi=20Sj=C3=B6holm?= <pasi.sjoholm@jollamobile.com>
+Date: Thu, 12 Feb 2015 15:28:44 +0200
+Subject: ipconfig: Use only settings related to configuration method
+
+If service is ever being configured with manual ip-address, netmask
+and gateway and later changed to dhcp, the related settings must
+not be read if configuration method is not manual or fixed.
+Otherwise they can possible collide with the settings got from
+dhcp-server if they are exactly the same
+(eg. dhcp.c: lease_available_cb()). This could lead network
+interface not being configured correctly.
+
+diff --git a/src/ipconfig.c b/src/ipconfig.c
+index 5c34e98..ac783e5 100644
+--- a/src/ipconfig.c
++++ b/src/ipconfig.c
+@@ -2249,42 +2249,59 @@ int __connman_ipconfig_load(struct connman_ipconfig *ipconfig,
+ 	g_free(method);
+ 	g_free(key);
+ 
+-	key = g_strdup_printf("%snetmask_prefixlen", prefix);
+-	ipconfig->address->prefixlen = g_key_file_get_integer(
++	switch (ipconfig->method) {
++	case CONNMAN_IPCONFIG_METHOD_UNKNOWN:
++	case CONNMAN_IPCONFIG_METHOD_OFF:
++		break;
++
++	case CONNMAN_IPCONFIG_METHOD_FIXED:
++	case CONNMAN_IPCONFIG_METHOD_MANUAL:
++
++		key = g_strdup_printf("%snetmask_prefixlen", prefix);
++		ipconfig->address->prefixlen = g_key_file_get_integer(
+ 				keyfile, identifier, key, NULL);
+-	g_free(key);
++		g_free(key);
+ 
+-	key = g_strdup_printf("%slocal_address", prefix);
+-	g_free(ipconfig->address->local);
+-	ipconfig->address->local = g_key_file_get_string(
++		key = g_strdup_printf("%slocal_address", prefix);
++		g_free(ipconfig->address->local);
++		ipconfig->address->local = g_key_file_get_string(
+ 			keyfile, identifier, key, NULL);
+-	g_free(key);
++		g_free(key);
+ 
+-	key = g_strdup_printf("%speer_address", prefix);
+-	g_free(ipconfig->address->peer);
+-	ipconfig->address->peer = g_key_file_get_string(
++		key = g_strdup_printf("%speer_address", prefix);
++		g_free(ipconfig->address->peer);
++		ipconfig->address->peer = g_key_file_get_string(
+ 				keyfile, identifier, key, NULL);
+-	g_free(key);
++		g_free(key);
+ 
+-	key = g_strdup_printf("%sbroadcast_address", prefix);
+-	g_free(ipconfig->address->broadcast);
+-	ipconfig->address->broadcast = g_key_file_get_string(
++		key = g_strdup_printf("%sbroadcast_address", prefix);
++		g_free(ipconfig->address->broadcast);
++		ipconfig->address->broadcast = g_key_file_get_string(
+ 				keyfile, identifier, key, NULL);
+-	g_free(key);
++		g_free(key);
+ 
+-	key = g_strdup_printf("%sgateway", prefix);
+-	g_free(ipconfig->address->gateway);
+-	ipconfig->address->gateway = g_key_file_get_string(
++		key = g_strdup_printf("%sgateway", prefix);
++		g_free(ipconfig->address->gateway);
++		ipconfig->address->gateway = g_key_file_get_string(
+ 				keyfile, identifier, key, NULL);
+-	g_free(key);
++		g_free(key);
++		break;
++
++	case CONNMAN_IPCONFIG_METHOD_DHCP:
+ 
+-	key = g_strdup_printf("%sDHCP.LastAddress", prefix);
+-	str = g_key_file_get_string(keyfile, identifier, key, NULL);
+-	if (str) {
+-		g_free(ipconfig->last_dhcp_address);
+-		ipconfig->last_dhcp_address = str;
++		key = g_strdup_printf("%sDHCP.LastAddress", prefix);
++		str = g_key_file_get_string(keyfile, identifier, key, NULL);
++		if (str) {
++			g_free(ipconfig->last_dhcp_address);
++			ipconfig->last_dhcp_address = str;
++		}
++		g_free(key);
++
++		break;
++
++	case CONNMAN_IPCONFIG_METHOD_AUTO:
++		break;
+ 	}
+-	g_free(key);
+ 
+ 	return 0;
+ }
+-- 
+cgit v0.10.2
+
