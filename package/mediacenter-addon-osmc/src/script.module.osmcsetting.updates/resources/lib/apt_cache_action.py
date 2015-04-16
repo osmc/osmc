@@ -74,8 +74,6 @@ class Main(object):
 
 		self.action = action
 
-		self.cache = apt.Cache()
-
 		self.block_update_file = '/var/tmp/.suppress_osmc_update_checks'
 
 		self.action_to_method = {
@@ -90,7 +88,9 @@ class Main(object):
 			
 			self.act()
 
-			call_parent('progress_bar', {'kill': True})
+			if action != 'update_manual':
+
+				call_parent('progress_bar', {'kill': True})
 		
 		except Exception as e:
 		
@@ -209,7 +209,12 @@ class Main(object):
 	#@clog()
 	def update(self):
 
+		# call the parent and kill the pDialog, now handled in on exit
+		call_parent('progress_bar', {'percent': 1,  'heading': self.heading, 'message':'Cache Updating'})
+
 		dprg = Download_Progress(partial_heading='Updating')
+
+		self.cache = apt.Cache()
 
 		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
 
@@ -221,6 +226,9 @@ class Main(object):
 
 	#@clog()
 	def commit(self):
+
+
+		self.cache = apt.Cache()
 
 		# check whether any packages are broken, if they are then the install needs to take place outside of Kodi
 
@@ -266,6 +274,8 @@ class Main(object):
 
 	#@clog()
 	def fetch(self):
+
+		self.cache = apt.Cache()
 
 		self.cache.upgrade(True)
 

@@ -924,6 +924,9 @@ class Main(object):
 			if data == 'manual_update_complete':
 
 				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
+
+				# send kill message to progress bar
+				self.progress_bar(kill=True)
 			
 			return 'Updates not legit, bail'
 
@@ -954,6 +957,9 @@ class Main(object):
 				else:
 
 					okey_dokey = DIALOG.ok(lang(32072), lang(32085), lang(32086))
+
+					# send kill message to progress bar
+					self.progress_bar(kill=True)
 
 					# create the file that will prevent further update checks until the updates have been installed
 					with open(self.block_update_file, 'w') as f:

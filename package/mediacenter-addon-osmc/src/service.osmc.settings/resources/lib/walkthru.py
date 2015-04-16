@@ -513,7 +513,7 @@ def open_gui(networking_instance):
 
 	if GUI.selected_skin != 'OSMC':
 
-		
+		pass
 
 	log('Exiting GUI')
 
