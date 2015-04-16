@@ -823,10 +823,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def handle_bluetooth_selection(self, control_id):
         if control_id == BLUETOOTH_ENABLE_TOGGLE:  # Enable Bluetooth
+            self.show_busy_dialogue()
             if osmc_bluetooth.is_bluetooth_enabled():
                 osmc_bluetooth.toggle_bluetooth_state(False)
             else:
                 osmc_bluetooth.toggle_bluetooth_state(True)
+            self.clear_busy_dialogue()
 
         if control_id == BLUETOOTH_DISCOVERY:  # Discovery
             if not osmc_bluetooth.is_discovering():
@@ -843,7 +845,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 # 'Bluetooth' , 'Remove Device'
                 if DIALOG.yesno(lang(32020), lang(32021) + ' ' + alias + '?'):
                     osmc_bluetooth.remove_device(address)
-                self.setFocusId(BLUETOOTH_ENABLE_TOGGLE)
+                    self.setFocusId(BLUETOOTH_ENABLE_TOGGLE)
+                    self.bluetooth_population_thread.update_bluetooth_lists()
 
         if control_id == 7000:  # Discovered devices
             item = self.BTD.getSelectedItem()
@@ -854,20 +857,23 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 selection = DIALOG.select(lang(32022) + ' ' + alias + '?', [lang(32055),lang(32056), lang(32057)])
                 if selection == 0:
                     return
+                self.show_busy_dialogue()
+                self.setFocusId(BLUETOOTH_DISCOVERY)
                 if selection == 1:
-                    self.show_busy_dialogue()
                     script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
                     result = osmc_bluetooth.pair_device(address, script_base_path)
-                    self.setFocusId(BLUETOOTH_DISCOVERY)
+
                     if not result:
                         #         'Pairing with'                       'failed'
                         message = lang(32024) + ' ' + alias + ' ' + lang(32025)
                         #                                                     'Bluetooth'
                         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
                         return
-                    self.clear_busy_dialogue()
                 osmc_bluetooth.connect_device(address)
                 osmc_bluetooth.set_device_trusted(address, True)
+                self.bluetooth_population_thread.update_bluetooth_lists()
+                self.clear_busy_dialogue()
+
 
 
 
@@ -878,6 +884,8 @@ class bluetooth_population_thread(threading.Thread):
         self.exit = False
         self.discovered_list_control = discovered_list_control
         self.trusted_list_control = trusted_list_control
+        self.trusted_dict = {}
+        self.discovered_dict = {}
 
     def run(self):
         runs = 0
@@ -886,20 +894,25 @@ class bluetooth_population_thread(threading.Thread):
             if not osmc_bluetooth.is_bluetooth_enabled():
                 self.stop_thread()
             # update gui every 2 seconds
-            if runs % 200 == 0:
-                trusted_dict = self.populate_bluetooth_dict(True)
-                discovered_dict = self.populate_bluetooth_dict(False)
-                 # every 5 seconds output debug info
+            if runs % 200 == 0 and not self.exit:
+                self.update_bluetooth_lists()
+            # every 4 seconds output debug info
+            if runs % 400 == 0 and not self.exit:
                 log('-- DISCOVERED ---')
-                log(discovered_dict)
+                log(self.discovered_dict)
                 log('-- TRUSTED --')
-                log(trusted_dict)
-                self.update_list_control(discovered_dict, self.discovered_list_control)
-                self.update_list_control(trusted_dict, self.trusted_list_control)
+                log(self.trusted_dict)
 
             xbmc.sleep(10)
             runs += 1
         log('Bluetooth thread ended')
+
+    def update_bluetooth_lists(self):
+        log('Updating Bluetooth Lists')
+        self.trusted_dict = self.populate_bluetooth_dict(True)
+        self.discovered_dict = self.populate_bluetooth_dict(False)
+        self.update_list_control(dict(self.discovered_dict), self.discovered_list_control)
+        self.update_list_control(dict(self.trusted_dict), self.trusted_list_control)
 
     def stop_thread(self):
         self.exit = True
@@ -910,7 +923,13 @@ class bluetooth_population_thread(threading.Thread):
             listItem = list_control.getListItem(itemIndex)
             address = listItem.getProperty('address')
             if address in devices_dict.keys():
-                devices_dict.pop(address)
+                connected = listItem.getProperty('connected') == 'True'
+                # connected status differs
+                if not connected == devices_dict[address]['connected']:
+                    log('Connected status differs')
+                    items_to_be_removed.append(itemIndex)
+                else:
+                    devices_dict.pop(address)
             else:
                 items_to_be_removed.append(itemIndex)
 
@@ -933,6 +952,7 @@ class bluetooth_population_thread(threading.Thread):
         item.setIconImage(icon_image)
         item.setProperty('address', address)
         item.setProperty('alias', info['alias'])
+        item.setProperty('connected', str(info['connected']))
         return item
 
     def populate_bluetooth_dict(self, paired):
@@ -1016,7 +1036,6 @@ class wifi_populate_bot(threading.Thread):
                 self.wifi_scanner_bot.setDaemon(True)
                 self.wifi_scanner_bot.start()
             xbmc.sleep(10)
-
             runs += 1
         log('Wifi thread ended')
 
