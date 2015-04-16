@@ -47,10 +47,10 @@ for arch in archlist:
 		package_version = None
 
 		for line in package.splitlines():
-			if line.startswith('Package: '):
+			if line.startswith('Package:'):
 				package_name = line.split('Package:',1)[1].lstrip()
 
-			if line.startswith('Version: '):
+			if line.startswith('Version:'):
 				package_version = line.split('Version:',1)[1].lstrip()
 
 		if package_name and package_version:
