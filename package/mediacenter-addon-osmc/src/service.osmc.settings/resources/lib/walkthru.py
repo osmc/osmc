@@ -1,3 +1,5 @@
+
+
 # XBMC modules
 import xbmc
 import xbmcgui
@@ -8,7 +10,7 @@ import os
 import sys
 import requests
 import subprocess
-from threading import Thread
+import threading
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
@@ -16,8 +18,10 @@ import timezones
 import LICENSE
 import WARRANTY
 
-EULA = LICENSE.license
-WARR = WARRANTY.warranty
+EULA   = LICENSE.license
+WARR   = WARRANTY.warranty
+DIALOG = xbmcgui.Dialog()
+
 
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
@@ -28,7 +32,7 @@ def lang(id):
 	return san 
 
 
-class Networking_caller(Thread):
+class Networking_caller(threading.Thread):
 	def __init__(self, parent, net_call):
 		super(Networking_caller, self).__init__()
 		self.daemon = True
@@ -51,7 +55,7 @@ class Networking_caller(Thread):
 
 class walkthru_gui(xbmcgui.WindowXMLDialog):
 
-	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance):
+	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance, lang_rerun, selected_language):
 
 
 		# show timezone switch
@@ -66,6 +70,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.internet_check = False
 		self.internet_checker = Networking_caller(self, self.net_call)
 		self.internet_checker.start()
+
+		# this flag tells us whether the GUI has been reloaded due to language selection
+		self.lang_rerun = lang_rerun
 
 		# edit the timezone in /etc/timezone
 		if self.showtimezone:
@@ -90,7 +97,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 						'UTC'		: 30090,
 						}
 
-		self.selected_language = None
+		self.selected_language = selected_language
 		self.selected_region   = None
 		self.selected_country  = None
 
@@ -144,6 +151,39 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# populate the warranty
 		self.getControl(777).setText(WARR)		
 
+		# this will only be True, if the language has been selected and the GUI has reloaded
+		if self.lang_rerun:
+			# set the flag to False so the GUI doesnt reload on exit
+			self.lang_rerun = False
+			self.bypass_language()
+
+
+	def bypass_language(self):
+
+		''' Bypasses the language setting, sets the language as selected so the window doesnt reopen '''
+
+		if self.showtimezone:
+			# this part is being kept just in case we want to reimplement the timezone selection
+
+			self.getControl(92000).setVisible(False)
+			self.getControl(93000).setVisible(True)
+			self.getControl(1003).setVisible(True)
+			self.setFocusId(1003)
+
+		else:
+
+			# make the language panel invisible
+			self.getControl(92000).setVisible(False)
+			# make the terms panel visible
+			self.getControl(94000).setVisible(True)
+			# make the Term menu item visible
+			self.getControl(1004).setVisible(True)
+			# jump to the Terms menu item
+			self.setFocusId(1004)
+			# change the up and down controls for the language and terms menu items
+			self.getControl(1004).controlUp(self.getControl(1002))
+			self.getControl(1002).controlDown(self.getControl(1004))
+
 
 	def check_hardware(self):
 		'''
@@ -191,13 +231,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
 					self.setFocusId(1005)
 
-			if self.selected_language != None:
-
-				log('users language: %s' % self.selected_language)
-
-				# set language
-				xbmc.executebuiltin('xbmc.SetGUILanguage(%s)' % self.selected_language)
-
 			if self.selected_country != None:
 
 				# set timezone
@@ -220,23 +253,30 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID == 20010:
 			# language container
 
+			self.previous_language = self.selected_language
+
 			self.selected_language = self.getControl(controlID).getSelectedItem().getLabel()
 
-			if self.showtimezone:
+			# display confirmation dialog
+			user_confirmation = DIALOG.yesno('Confirm', self.selected_language, autoclose=10000)
 
-				self.getControl(92000).setVisible(False)
-				self.getControl(93000).setVisible(True)
-				self.getControl(1003).setVisible(True)
-				self.setFocusId(1003)
+			if user_confirmation == True:
+				# if user CONFIRMS, check whether a skin reload is required
+
+				if 'english' not in self.selected_language.lower():
+					# if skin reload required, then close the window, change system language, reload the window and jump to TERMS
+					
+					# when lang_rerun set is True, the walkthru is reloaded and skips to the setting after language
+					self.lang_rerun = True
+					self.close()
+
+				else:
+					# jump to the setting AFTER language
+					self.bypass_language()
 
 			else:
-
-				self.getControl(92000).setVisible(False)
-				self.getControl(94000).setVisible(True)
-				self.getControl(1004).setVisible(True)
-				self.setFocusId(1004)
-				self.getControl(1004).controlUp(self.getControl(1002))
-				self.getControl(1002).controlDown(self.getControl(1004))
+				# if not, then revert to the previous_language
+				self.selected_language = self.previous_language
 
 		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]:
 			# timezone containers
@@ -248,7 +288,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(94000).setVisible(True)
 			self.getControl(1004).setVisible(True)
 			self.setFocusId(1004)
-
 
 		elif controlID == 40010:
 			# terms and conditions I Agree button
@@ -279,7 +318,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(1006).setVisible(True)
 					self.setFocusId(1006)		
 	
-
 		elif controlID == 70010:
 			#  warranty I Agree button
 
@@ -381,7 +419,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 
 
-
 def open_gui(networking_instance):
 
 	__addon__        = xbmcaddon.Addon()
@@ -389,11 +426,23 @@ def open_gui(networking_instance):
 
 	xml = "walkthru_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "walkthru.xml"
 
-	GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance)
+	lang_rerun 			= False
+	first_run 			= True
 
-	GUI.doModal()
+	selected_language 	= None
+
+	while first_run or lang_run:
+		first_run = False
+		GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language)
+		GUI.doModal()
+
+		# set language
+		selected_language = GUI.selected_language
+		xbmc.executebuiltin('xbmc.SetGUILanguage(%s)' % selected_language)
+		log('users language: %s' % selected_language)
+
+		lang_rerun = GUI.lang_rerun
 
 	log('Exiting GUI')
 
 	del GUI
-
