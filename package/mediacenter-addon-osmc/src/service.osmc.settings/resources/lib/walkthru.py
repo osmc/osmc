@@ -78,6 +78,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		if self.showtimezone:
 			self.timezones = timezones.get_timezones()
 
+		# this attribute denotes the skin the user wants to have applied when the walkthru closes
+		self.selected_skin = 'OSMC'
+
 		# newsletter email address
 		self.email = ''
 
@@ -101,7 +104,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.selected_region   = None
 		self.selected_country  = None
 
+		# textures for the skin image
+		self.osmc_skin_image = '/usr/share/kodi/addons/skin.osmc/extras/osmc_preview.png'
+		self.conf_skin_image = '/usr/share/kodi/addons/skin.osmc/extras/conf_preview.png'
+
 		self.vero = self.check_hardware()
+
+		# this attribute is used to determine when the user is allowed to exit the walkthru using the Esc or Back buttons
+		self.prevent_escape = True
 
 
 	def onInit(self):
@@ -110,7 +120,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1004, 1005, 1006, 1007]:
+		for hide_this in [1003, 1004, 1005, 1006, 1007, 1008]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -129,7 +139,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
-		for visibility_control in [93000,94000,95000, 96000, 97000]:
+		for visibility_control in [93000,94000,95000, 96000, 97000, 98000, 99000]:
 
 			self.getControl(visibility_control).setVisible(False)
 
@@ -150,6 +160,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# populate the warranty
 		self.getControl(777).setText(WARR)		
+
+		# set the image for the skin preview control
+		self.set_skin_image('OSMC')
 
 		# this will only be True, if the language has been selected and the GUI has reloaded
 		if self.lang_rerun:
@@ -185,6 +198,20 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1002).controlDown(self.getControl(1004))
 
 
+	def set_skin_image(self, skin):
+
+		''' Sets the image for the skin preview '''
+
+		# TEMP FOR TESTING, do nothing for the time being
+		return
+
+		if skin == 'CONF':
+			self.getControl(88888).setImage(self.conf_skin_image)
+		else:
+			self.getControl(88888).setImage(self.osmc_skin_image)
+
+
+
 	def check_hardware(self):
 		'''
 			Checks whether this is a Vero and whether the warranty info should be shown 
@@ -212,46 +239,37 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		return False
 
 
+	def exit_proceedure(self):
+
+		if self.selected_country != None:
+
+			# set timezone
+			for reg, cnt in self.timezones.iteritems():
+
+				if self.selected_country in cnt:
+					self.selected_region = reg
+					break
+
+		if self.selected_country != None and self.selected_region != None:
+
+			users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
+
+			log('users timezone: %s' % users_timezone)
+
+			os.system('echo %s | sudo tee /etc/timezone' % users_timezone)
+
+		self.close()
+
+
+
 	def onClick(self, controlID):
 
-		if controlID == 1005:
-			# Exit control
+		if   controlID == 1005:				# Exit control
 
-			# delete skin update block file
-			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
+			self.exit_proceedure()
 
-			if self.getControl(50001).isSelected():
-				# sign up for newsletter button
-
-				# show keyboard
-				kb = xbmc.Keyboard(self.email, 'Please enter your email')
-				kb.doModal()
-				if kb.isConfirmed():
-					self.email = kb.getText()
-					requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
-					self.setFocusId(1005)
-
-			if self.selected_country != None:
-
-				# set timezone
-				for reg, cnt in self.timezones.iteritems():
-
-					if self.selected_country in cnt:
-						self.selected_region = reg
-						break
-
-			if self.selected_country != None and self.selected_region != None:
-
-				users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
-
-				log('users timezone: %s' % users_timezone)
-
-				os.system('echo %s | sudo tee /etc/timezone' % users_timezone)
-
-			self.close()
-
-		elif controlID == 20010:
-			# language container
+		elif controlID == 20010:			# language container
+			
 
 			self.previous_language = self.selected_language
 
@@ -278,8 +296,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				# if not, then revert to the previous_language
 				self.selected_language = self.previous_language
 
-		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]:
-			# timezone containers
+		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]: # timezone containers
+			
 
 			# user has clicked on a timezone
 			self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
@@ -289,8 +307,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1004).setVisible(True)
 			self.setFocusId(1004)
 
-		elif controlID == 40010:
-			# terms and conditions I Agree button
+		elif controlID == 40010:			# terms and conditions I Agree button
+			
 
 			if self.vero:
 
@@ -318,8 +336,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(1006).setVisible(True)
 					self.setFocusId(1006)		
 	
-		elif controlID == 70010:
-			#  warranty I Agree button
+		elif controlID == 70010:			#  warranty I Agree button
+			
 
 			if self.vero:
 
@@ -342,18 +360,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			else:
 				pass							
 
-		elif controlID == 40020:
-			# unused scroll bar for TandC
+		elif controlID == 40020:			# unused scroll bar for TandC
+			
 
 			self.getControl(555).scroll(10)
 
-		elif controlID == 40030:
-			#unused scroll bar for TandC
+		elif controlID == 40030:			# unused scroll bar for TandC
+			
 
 			self.getControl(555).scroll(-10)
 
-		elif controlID == 60090:
-			# skip networking button
+		elif controlID == 60090:			# skip networking button
 
 			# display the Exit panel
 			self.getControl(96000).setVisible(False)
@@ -361,31 +378,70 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(1005).setVisible(True)
 			self.setFocusId(1005)	
 
-		elif controlID == 60010:
-			# open networking gui
+		elif controlID == 60010:			# open networking gui
+			
 			self.net_call.run(False)
 
-			# display the Exit panel
+			# display the skin panel
 			self.getControl(96000).setVisible(False)
+			self.getControl(98000).setVisible(True)
+			self.getControl(1008).setVisible(True)
+			self.setFocusId(1008)	
+
+		elif controlID in [80010, 80020]:	# user has selected a skin
+			
+			if controlID == 80010:
+
+				self.selected_skin = 'OSMC'
+
+			else:
+
+				self.selected_skin = 'Confluence'
+
+			# display the sign-up panel
+			self.getControl(98000).setVisible(False)
+			self.getControl(99000).setVisible(True)
+			self.getControl(1009).setVisible(True)
+			self.setFocusId(1009)
+
+		elif controlID in [90010, 90020]:	# newsletter sign up
+
+			if controlID == 90010:
+
+				# show keyboard
+				kb = xbmc.Keyboard(self.email, 'Please enter your email')
+				kb.doModal()
+				if kb.isConfirmed():
+					self.email = kb.getText()
+					requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})
+
+			# display the sign-up panel
+			self.getControl(99000).setVisible(False)
 			self.getControl(95000).setVisible(True)
 			self.getControl(1005).setVisible(True)
-			self.setFocusId(1005)	
+			self.setFocusId(1005)
 
 
 	def onAction(self, action):
 
+		if self.prevent_escape:
+			return
+
 		if action == 10 or action == 92:
-			# *** THIS IS FOR TESTING ONLY ***
 
 			# delete skin update block file
 			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
 
+			self.close()
+
 
 	def onFocus(self, controlID):
 
-		main_controls = [1002, 1003, 1004, 1005, 1006, 1007]
+		main_controls 	= [1002, 1003, 1004, 1005, 1006, 1007, 1008]
 
-		tz_controls = [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
+		tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
+
+		skin_controls 	= [80010, 80020]
 
 		if controlID in main_controls:
 
@@ -417,6 +473,18 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 					ctl.setVisible(False)
 
+		elif controlID in skin_controls:
+
+			if controlID == 80010:
+
+				# display the OSMC skin image
+				self.set_skin_image('OSMC')
+
+			elif controlID == 80020:
+
+				# display the confluence skin image
+				self.set_skin_image('CONF')
+
 
 
 def open_gui(networking_instance):
@@ -442,6 +510,10 @@ def open_gui(networking_instance):
 		log('users language: %s' % selected_language)
 
 		lang_rerun = GUI.lang_rerun
+
+	if GUI.selected_skin != 'OSMC':
+
+		
 
 	log('Exiting GUI')
 
