@@ -1,0 +1,75 @@
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 0a332ff..0318ca8 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -380,6 +380,9 @@ public:
+ 
+   void SetLoggingIn(bool loggingIn) { m_loggingIn = loggingIn; }
+ 
++  bool LoadSkin(const CStdString& skinID);
++  bool LoadSkin(const boost::shared_ptr<ADDON::CSkinInfo>& skin);
++
+ protected:
+   virtual bool OnSettingsSaving() const;
+ 
+@@ -390,9 +393,6 @@ protected:
+   virtual void OnSettingAction(const CSetting *setting);
+   virtual bool OnSettingUpdate(CSetting* &setting, const char *oldSettingId, const TiXmlNode *oldSettingNode);
+ 
+-  bool LoadSkin(const CStdString& skinID);
+-  bool LoadSkin(const boost::shared_ptr<ADDON::CSkinInfo>& skin);
+-
+   bool m_skinReverting;
+ 
+   bool m_loggingIn;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index dfdca99..21411eb 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -113,6 +113,23 @@ namespace XBMCAddon
+       CApplicationMessenger::Get().ExecBuiltIn(function,wait);
+     }
+ 
++    void setskin(const char* skin)
++    {
++		XBMC_TRACE;
++		if (! function)
++		return;
++		std::string defaultSkin = ((const CSettingString*)CSettings::Get().GetSetting("lookandfeel.skin"))->GetDefault();
++		if (!g_application.LoadSkin(skin))
++		{
++			CLog::Log(LOGERROR, "Error trying to load skin '%s%'! Reverting to default", skin);
++			g_application.LoadSkin(defaultSkin);
++		}
++		else
++		{
++			CLog::Log(LOGINFO, "New skin was loaded successfully");
++		}
++	}
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 69f1075..9ecc606 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -93,6 +93,18 @@ namespace XBMCAddon
+      */
+     void executebuiltin(const char* function, bool wait = false);
+ 
++	/**
++	 * setskin(skinname) -- Change the XBMC skin
++	 *
++	 * skinname		  :	string - the name of the skin to change to
++	 *
++	 *
++	 * example:
++	 *    - xbmc.setskin("skin.confluence")
++	 */
++
++	 void setskin(const char* skin);
++
+     /**
+      * executeJSONRPC(jsonrpccommand) -- Execute an JSONRPC command.
+      * 
