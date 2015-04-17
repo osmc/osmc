@@ -421,7 +421,7 @@ class Main(object):
 			self.scheduler_settings = ['check_freq', 'check_weekday', 'check_day', 'check_time', 'check_hour', 'check_minute']
 			# self.icon_settings		= ['pos_x', 'pos_y']
 
-			self.on_upd = [lang(x) for x in [32057,32058,32059,32060,32061]]
+			self.on_upd = [lang(x) for x in [32057,32058,32095,32060,32061]]
 			# self.on_upd = [lang(x) for x in [32059,32061]]  # 2==> 0, 4 ==> 1
 			
 			self.s = {}
@@ -729,6 +729,9 @@ class Main(object):
 			# create the file that will prevent further update checks until the updates have been installed
 			with open(self.block_update_file, 'w') as f:
 				f.write('d')
+
+			# turn on the "install now" setting in Settings.xml
+			__addon__.setSetting('install_now_visible', 'true')
 			
 			return 'Download complete, leaving icon displayed'
 
@@ -761,7 +764,6 @@ class Main(object):
 
 			return 'Called child action - update_manual'
 
-
 		if action == 'backup':
 
 			self.update_settings()
@@ -770,32 +772,36 @@ class Main(object):
 
 			bckp.start_backup()
 
-		# elif action == 'install':
+		elif action == 'install':
 
-		# 	check, _ = self.check_for_legit_updates()
+			# check, _ = self.check_for_legit_updates()
 
-		# 	if check == 'bail':
+			# if check == 'bail':
 
-		# 		return  'Update not legit, bail'
+			# 	return  'Update not legit, bail'
 
-		# 	if not self.EXTERNAL_UPDATE_REQUIRED:
+			# if not self.EXTERNAL_UPDATE_REQUIRED:
 
-		# 		self.call_child_script('commit')
+			# 	__addon__.setSetting('install_now_visible', 'false')
 
-		# 		return 'Called child action - commit'
+			# 	self.call_child_script('commit')
 
-		# 	else:
+			# 	return 'Called child action - commit'
 
-		# 		ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
+			# else:
 
-		# 		if ans:
+			ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
-		# 			exit_osmc_settings_addon()
-		# 			xbmc.sleep(1000)
+			if ans:
 
-		# 			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
+				__addon__.setSetting('install_now_visible', 'false')
+				
+				exit_osmc_settings_addon()
+				xbmc.sleep(1000)
 
-		# 			return "Calling external update"
+				subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
+
+				return "Calling external update"
 
 
 	#ACTION METHOD

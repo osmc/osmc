@@ -69,6 +69,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		self.internet_check = False
 		self.internet_checker = Networking_caller(self, self.net_call)
+		self.internet_checker.setDaemon(True)
 		self.internet_checker.start()
 
 		# this flag tells us whether the GUI has been reloaded due to language selection
@@ -192,7 +193,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			# make the Term menu item visible
 			self.getControl(1004).setVisible(True)
 			# jump to the Terms menu item
-			self.setFocusId(1004)
+			self.setFocusId(40010)
 			# change the up and down controls for the language and terms menu items
 			self.getControl(1004).controlUp(self.getControl(1002))
 			self.getControl(1002).controlDown(self.getControl(1004))
@@ -261,7 +262,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.close()
 
 
-
 	def onClick(self, controlID):
 
 		if   controlID == 1005:				# Exit control
@@ -269,7 +269,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.exit_proceedure()
 
 		elif controlID == 20010:			# language container
-			
 
 			self.previous_language = self.selected_language
 
@@ -305,7 +304,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(93000).setVisible(False)
 			self.getControl(94000).setVisible(True)
 			self.getControl(1004).setVisible(True)
-			self.setFocusId(1004)
+			self.setFocusId(40010)
 
 		elif controlID == 40010:			# terms and conditions I Agree button
 			
@@ -315,7 +314,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.getControl(94000).setVisible(False)
 				self.getControl(97000).setVisible(True)
 				self.getControl(1007).setVisible(True)
-				self.setFocusId(1007)
+				self.setFocusId(70010)
 
 			else:
 
@@ -327,14 +326,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(94000).setVisible(False)
 					self.getControl(98000).setVisible(True)
 					self.getControl(1008).setVisible(True)
-					self.setFocusId(1008)
+					self.setFocusId(80010)
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
 					self.getControl(94000).setVisible(False)
 					self.getControl(96000).setVisible(True)
 					self.getControl(1006).setVisible(True)
-					self.setFocusId(1006)		
+					self.setFocusId(60010)		
 	
 		elif controlID == 70010:			# warranty I Agree button
 			
@@ -348,14 +347,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(97000).setVisible(False)
 					self.getControl(98000).setVisible(True)
 					self.getControl(1008).setVisible(True)
-					self.setFocusId(1008)
+					self.setFocusId(80010)
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
 					self.getControl(97000).setVisible(False)
 					self.getControl(96000).setVisible(True)
 					self.getControl(1006).setVisible(True)
-					self.setFocusId(1006)	
+					self.setFocusId(60010)	
 
 			else:
 				pass							
@@ -376,7 +375,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(96000).setVisible(False)
 			self.getControl(98000).setVisible(True)
 			self.getControl(1008).setVisible(True)
-			self.setFocusId(1008)	
+			self.setFocusId(80010)	
 
 		elif controlID == 60010:			# open networking gui
 			
@@ -386,7 +385,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(96000).setVisible(False)
 			self.getControl(98000).setVisible(True)
 			self.getControl(1008).setVisible(True)
-			self.setFocusId(1008)	
+			self.setFocusId(80010)	
 
 		elif controlID in [80010, 80020]:	# user has selected a skin
 			
@@ -402,7 +401,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(98000).setVisible(False)
 			self.getControl(99000).setVisible(True)
 			self.getControl(1009).setVisible(True)
-			self.setFocusId(1009)
+			self.setFocusId(90010)
 
 		elif controlID in [90010, 90020]:	# newsletter sign up
 
@@ -502,22 +501,30 @@ def open_gui(networking_instance):
 
 	selected_language 	= None
 
-	while first_run or lang_run:
+	while first_run or lang_rerun:
+
 		first_run = False
+		
 		GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language)
 		GUI.doModal()
 
+		selected_language 	= GUI.selected_language
+		skin_choice 		= GUI.selected_skin
+		lang_rerun 			= GUI.lang_rerun
+
 		# set language
-		selected_language = GUI.selected_language
 		xbmc.executebuiltin('xbmc.SetGUILanguage(%s)' % selected_language)
+		
+		xbmc.sleep(1000)
+
 		log('users language: %s' % selected_language)
-
-		lang_rerun = GUI.lang_rerun
-
-	if GUI.selected_skin != 'OSMC':
+		log('lang_rerun: %s' % lang_rerun)
+		log('skin_choice: %s' % skin_choice)
+		
+	
+	if skin_choice != 'OSMC':
 
 		log('Loading Confluence')
-
 		try:
 			xbmc.setskin('skin.confluence')
 		except:
@@ -525,4 +532,3 @@ def open_gui(networking_instance):
 
 	log('Exiting GUI')
 
-	del GUI

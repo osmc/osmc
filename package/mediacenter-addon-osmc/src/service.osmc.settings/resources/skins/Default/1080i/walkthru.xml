@@ -449,6 +449,7 @@
             <onup>noop</onup>
             <ondown>noop</ondown>
             <orientation>vertical</orientation>
+            
             <!-- OSMC skin label -->
             <control id="80010" type="button">
                 <width>300</width>
@@ -492,6 +493,57 @@
 
 
 
+
+
+            <!-- newsletter signup                  -->
+        <control id="9000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1200</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(99000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control type="label">
+                <width>1600</width>
+                <height>42</height>
+                <label>Would you like to receive the newsletter?</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+            </control>
+            <control id="90010" type="button">
+                <width>1300</width>
+                <height>42</height>
+                <label>Sure, sign me up</label>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="90020" type="button">
+                <width>1300</width>
+                <height>42</height>
+                <label>No thanks</label>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
 
 
 
@@ -566,57 +618,7 @@
                 <aligny>center</aligny>
             </control>
         </control>
-            <!-- newsletter signup                  -->
-        <control id="9000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1200</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(99000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control type="label">
-                <width>1600</width>
-                <height>42</height>
-                <label>Would you like to receive the newsletter?</label>
-                <font>osmc_addon_OLD_Font36</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
-            </control>
-            <control id="90010" type="button">
-                <width>1300</width>
-                <height>42</height>
-                <label>Sure, sign me up</label>
-                <font>osmc_addon_OLD_Font42</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffffffff</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="90020" type="button">
-                <width>1300</width>
-                <height>42</height>
-                <label>No thanks</label>
-                <font>osmc_addon_OLD_Font42</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffffffff</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-
-
+        
 
         <!-- Timezone sub menu -->
         <control id="3000" type="grouplist">

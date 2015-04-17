@@ -25,7 +25,7 @@
 	</category>
 	<category label="32093">
 		<!-- 32064: Action when updates are found -->
-		<setting default="0" id="on_upd_detected" label="32059" lvalues="32057|32058|32059|32060|32061" type="enum"/>
+		<setting default="0" id="on_upd_detected" label="32059" lvalues="32057|32058|32095|32060|32061" type="enum"/>
 		<!-- 32057: "Prompt for all actions" -->
 		<!-- 32058: "Display icon on home screen only" -->
 		<!-- 32059: "Download updates, then prompt" *********-->
@@ -86,6 +86,10 @@
 	<category label="32094">
 		<!-- 32056: Scan for updates now -->
 		<setting action="RunScript($CWD/resources/lib/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
+		<!-- install now visibility bool -->
+		<setting visible="false" default="false" id="install_now_visible" label="" type="bool"/>
+		<!-- install now -->
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, install)" id="install_now" label="32053" option="close" type="action" visible="eq(-1,true)"/>
 		<!-- backup now -->
 		<setting action="RunScript($CWD/resources/lib/call_parent.py, backup)" id="backup_now" label="Run Backup of settings now." option="close" type="action"/>
 		<!-- restore now -->

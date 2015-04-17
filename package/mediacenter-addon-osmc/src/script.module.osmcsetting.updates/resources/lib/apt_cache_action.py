@@ -219,7 +219,7 @@ class Main(object):
 		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
 
 		# call the parent and kill the pDialog, now handled in on exit
-		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Cache Update Complete'})
+		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Cache Updated - please wait'})
 
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
