@@ -32,8 +32,7 @@ while true; do
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
-	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd &
-	wait $!
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
 	CODE="$?"
 
 	fb_restore
