@@ -120,7 +120,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1004, 1005, 1006, 1007, 1008]:
+		for hide_this in [1003, 1004, 1005, 1006, 1007, 1008, 1009]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -310,7 +310,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID == 40010:			# terms and conditions I Agree button
 			
 
-			if self.vero:
+			if self.vero:		# show the warranty panel
 
 				self.getControl(94000).setVisible(False)
 				self.getControl(97000).setVisible(True)
@@ -323,11 +323,11 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				# check if internet is connected
 				if self.internet_connected:
 					log('internet is connected, jumping to exit')
-					# skip the Networking setup menu item
+					# skip the Networking setup menu item and go to the skin pabel
 					self.getControl(94000).setVisible(False)
-					self.getControl(95000).setVisible(True)
-					self.getControl(1005).setVisible(True)
-					self.setFocusId(1005)
+					self.getControl(98000).setVisible(True)
+					self.getControl(1008).setVisible(True)
+					self.setFocusId(1008)
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
@@ -336,7 +336,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(1006).setVisible(True)
 					self.setFocusId(1006)		
 	
-		elif controlID == 70010:			#  warranty I Agree button
+		elif controlID == 70010:			# warranty I Agree button
 			
 
 			if self.vero:
@@ -344,11 +344,11 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				# check if internet is connected
 				if self.internet_connected:
 					log('internet is connected, jumping to exit')
-					# skip the Networking setup menu item
+					# skip the Networking setup menu item and go to skin selection
 					self.getControl(97000).setVisible(False)
-					self.getControl(95000).setVisible(True)
-					self.getControl(1005).setVisible(True)
-					self.setFocusId(1005)
+					self.getControl(98000).setVisible(True)
+					self.getControl(1008).setVisible(True)
+					self.setFocusId(1008)
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
@@ -372,11 +372,11 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID == 60090:			# skip networking button
 
-			# display the Exit panel
+			# display the skin panel
 			self.getControl(96000).setVisible(False)
-			self.getControl(95000).setVisible(True)
-			self.getControl(1005).setVisible(True)
-			self.setFocusId(1005)	
+			self.getControl(98000).setVisible(True)
+			self.getControl(1008).setVisible(True)
+			self.setFocusId(1008)	
 
 		elif controlID == 60010:			# open networking gui
 			
@@ -420,6 +420,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(95000).setVisible(True)
 			self.getControl(1005).setVisible(True)
 			self.setFocusId(1005)
+
+			# allow the user to exit
+			self.prevent_escape = False
 
 
 	def onAction(self, action):
@@ -513,7 +516,12 @@ def open_gui(networking_instance):
 
 	if GUI.selected_skin != 'OSMC':
 
-		pass
+		log('Loading Confluence')
+
+		try:
+			xbmc.setskin('skin.confluence')
+		except:
+			log('Loading Confluence failed.')
 
 	log('Exiting GUI')
 
