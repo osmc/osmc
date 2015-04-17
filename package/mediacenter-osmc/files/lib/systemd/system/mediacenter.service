@@ -4,6 +4,7 @@ After = remote-fs.target network-online.target
 
 [Service]
 Type = simple
+TimeoutStopSec = 20
 ExecStart = /usr/bin/mediacenter
 ExecStopPost = /usr/bin/mediacenter stop
 Restart = on-abort

@@ -17,6 +17,8 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+trap 'wait; exit 0' SIGTERM
+
 chmod a+rw /dev/tty1
 /usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
 
@@ -30,7 +32,8 @@ while true; do
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
-	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd &
+	wait $!
 	CODE="$?"
 
 	fb_restore
