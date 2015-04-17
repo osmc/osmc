@@ -48,7 +48,7 @@ class Networking_caller(threading.Thread):
 
 		log('checking internet connection')
 
-		self.parent.internet_connected = True # self.net_call.check_internet()
+		self.parent.internet_connected = self.net_call.check_internet()
 
 		log('internet connection is %s' % self.parent.internet_connected)
 
