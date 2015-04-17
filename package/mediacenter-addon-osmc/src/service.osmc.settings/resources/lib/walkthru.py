@@ -23,6 +23,7 @@ WARR   = WARRANTY.warranty
 DIALOG = xbmcgui.Dialog()
 
 
+
 def log(message):
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
@@ -47,7 +48,7 @@ class Networking_caller(threading.Thread):
 
 		log('checking internet connection')
 
-		self.parent.internet_connected = self.net_call.check_internet()
+		self.parent.internet_connected = True # self.net_call.check_internet()
 
 		log('internet connection is %s' % self.parent.internet_connected)
 
@@ -106,8 +107,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.selected_country  = None
 
 		# textures for the skin image
-		self.osmc_skin_image = '/usr/share/kodi/addons/skin.osmc/extras/osmc_preview.png'
-		self.conf_skin_image = '/usr/share/kodi/addons/skin.osmc/extras/conf_preview.png'
+		media_path = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
+		self.osmc_skin_image = os.path.join(media_path, 'osmc_preview.png')
+		self.conf_skin_image = os.path.join(media_path, 'conf_preview.jpg')
 
 		self.vero = self.check_hardware()
 
@@ -202,9 +204,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 	def set_skin_image(self, skin):
 
 		''' Sets the image for the skin preview '''
-
-		# TEMP FOR TESTING, do nothing for the time being
-		return
 
 		if skin == 'CONF':
 			self.getControl(88888).setImage(self.conf_skin_image)
@@ -439,7 +438,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def onFocus(self, controlID):
 
-		main_controls 	= [1002, 1003, 1004, 1005, 1006, 1007, 1008]
+		main_controls 	= [1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009]
 
 		tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 
