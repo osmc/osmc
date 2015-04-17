@@ -1,170 +1,40 @@
-From ec3a12fb4708e9319c18af1b851a7a324294bc6c Mon Sep 17 00:00:00 2001
-From: Stefan Saraev <stefan@saraev.ca>
-Date: Mon, 15 Dec 2014 21:28:54 +0200
-Subject: [PATCH 6/6] handle SIGTERM
+From ab8d2ab714cc665aec348eb803942a48a4fa3fbb Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 17 Apr 2015 01:53:21 +0100
+Subject: [PATCH] Make Kodi quit on SIGTERM. We do not need to call Stop()
+ because we can handle a hang properly but we still get good teardown
 
-In some situations, due to deadlocks or crashes, xbmc fails to exit properly in
-CApplication::Stop(), so  g_powerManager.Reboot() / g_powerManager.Powerdown() never gets
-called, that's a big no-no for openelec as our users can't shutdown or reboot.
-There are few addons reported to cause this behaviour: trakkt.tv, watchdog, weather.underground.
-
-I've also noticed that sometimes new threads (FileCache ??) get started AFTER
-CApplication::Stop() is called, delaying shutdown with 1+ minute (2 curl timeoouts?).
-The problem seems to be in CJobManager::CancelJobs() but I am too lame to understand where,
-why, and how to fix it.
-
-To me, it seems best to let systemd handle it. systemd sends SIGTERM, then waits
-TimeoutStopSec=xx seconds then sends SIGKILL,s so dont call g_application.Stop() from
-ApplicationMessenger as it can not be trusted. save the requested exitcode instead
-(that's required for CEC to switch off the tv) and do it from a simple SIGTERM handler instead.
-
-CEC thread has enough time (5 seconds in xbmc.service) to switch of the TV after receiving OnQuit.
-As a side "effect", now guisettings.xml will ALWAYS be saved, even if shutdown / rebooot
-is requested externaly (ssh, 3rdparty script).
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp          | 10 ++++++++--
- xbmc/Application.h            |  1 +
- xbmc/ApplicationMessenger.cpp |  6 ++++--
- xbmc/XBApplicationEx.cpp      |  1 +
- xbmc/XBApplicationEx.h        |  1 +
- xbmc/main/main.cpp            | 15 +++++++++++++++
- 6 files changed, 30 insertions(+), 4 deletions(-)
+ xbmc/main/main.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 69b1cd7..f1f60cd 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -2543,12 +2543,19 @@ bool CApplication::Cleanup()
-   }
- }
- 
-+void CApplication::SetExitCode(int exitCode)
-+{
-+  // save it for CEC
-+  m_ExitCode = exitCode;
-+  m_ExitCodeSet = true;
-+}
-+
- void CApplication::Stop(int exitCode)
- {
-   try
-   {
-     CVariant vExitCode(CVariant::VariantTypeObject);
--    vExitCode["exitcode"] = exitCode;
-+    vExitCode["exitcode"] = m_ExitCode;
-     CAnnouncementManager::Get().Announce(System, "xbmc", "OnQuit", vExitCode);
- 
-     SaveFileState(true);
-@@ -2572,7 +2579,6 @@ void CApplication::Stop(int exitCode)
- 
-     m_bStop = true;
-     m_AppFocused = false;
--    m_ExitCode = exitCode;
-     CLog::Log(LOGNOTICE, "stop all");
- 
-     // cancel any jobs from the jobmanager
-diff --git a/xbmc/Application.h b/xbmc/Application.h
-index ec5dfac..96cbf71 100644
---- a/xbmc/Application.h
-+++ b/xbmc/Application.h
-@@ -154,6 +154,7 @@ public:
-   bool StartPVRManager();
-   void StopPVRManager();
-   bool IsCurrentThread() const;
-+  void SetExitCode(int exitCode);
-   void Stop(int exitCode);
-   void RestartApp();
-   void UnloadSkin(bool forReload = false);
-diff --git a/xbmc/ApplicationMessenger.cpp b/xbmc/ApplicationMessenger.cpp
-index a46c9be..9bb6804 100644
---- a/xbmc/ApplicationMessenger.cpp
-+++ b/xbmc/ApplicationMessenger.cpp
-@@ -261,13 +261,14 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
- 
-     case TMSG_POWERDOWN:
-       {
--        g_application.Stop(EXITCODE_POWERDOWN);
-+        g_application.SetExitCode(EXITCODE_POWERDOWN);
-         g_powerManager.Powerdown();
-       }
-       break;
- 
-     case TMSG_QUIT:
-       {
-+        g_application.SetExitCode(EXITCODE_QUIT);
-         g_application.Stop(EXITCODE_QUIT);
-       }
-       break;
-@@ -289,7 +290,7 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
-     case TMSG_RESTART:
-     case TMSG_RESET:
-       {
--        g_application.Stop(EXITCODE_REBOOT);
-+        g_application.SetExitCode(EXITCODE_REBOOT);
-         g_powerManager.Reboot();
-       }
-       break;
-@@ -297,6 +298,7 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
-     case TMSG_RESTARTAPP:
-       {
- #if defined(TARGET_WINDOWS) || defined(TARGET_LINUX)
-+        g_application.SetExitCode(EXITCODE_RESTARTAPP);
-         g_application.Stop(EXITCODE_RESTARTAPP);
- #endif
-       }
-diff --git a/xbmc/XBApplicationEx.cpp b/xbmc/XBApplicationEx.cpp
-index ad6a145..6058938 100644
---- a/xbmc/XBApplicationEx.cpp
-+++ b/xbmc/XBApplicationEx.cpp
-@@ -40,6 +40,7 @@ CXBApplicationEx::CXBApplicationEx()
-   m_bStop = false;
-   m_AppFocused = true;
-   m_ExitCode = EXITCODE_QUIT;
-+  m_ExitCodeSet = false;
-   m_renderGUI = false;
- }
- 
-diff --git a/xbmc/XBApplicationEx.h b/xbmc/XBApplicationEx.h
-index c46cba1..ed3f35f 100644
---- a/xbmc/XBApplicationEx.h
-+++ b/xbmc/XBApplicationEx.h
-@@ -40,6 +40,7 @@ public:
-   // Variables for timing
-   bool m_bStop;
-   int  m_ExitCode;
-+  bool m_ExitCodeSet;
-   bool m_AppFocused;
-   bool m_renderGUI;
- 
 diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
-index 87fe2fd..3bfb338 100644
+index ec86426..dacf832 100644
 --- a/xbmc/main/main.cpp
 +++ b/xbmc/main/main.cpp
-@@ -41,9 +41,24 @@
+@@ -40,9 +40,21 @@
  #include "input/linux/LIRC.h"
  #endif
  #include "XbmcContext.h"
++#include "ApplicationOperations.h"
 +#include "Application.h"
 +
-+void xbmc_term_handler(int signum)
++void term_handler(int signum)
 +{
-+  CLog::Log(LOGINFO, "Received SIGTERM...");
-+  if (!g_application.m_ExitCodeSet)
-+    g_application.SetExitCode(EXITCODE_RESTARTAPP);
-+  g_application.Stop(EXITCODE_RESTARTAPP);
++	CLog::Log(LOGINFO, "Received signal");
++	CApplicationMessenger::Get().Quit();
 +}
  
  int main(int argc, char* argv[])
  {
-+  // SIGTERM handler
 +  struct sigaction action;
 +  memset(&action, 0, sizeof(struct sigaction));
-+  action.sa_handler = xbmc_term_handler;
++  action.sa_handler = term_handler;
 +  sigaction(SIGTERM, &action, NULL);
-+
    // set up some xbmc specific relationships
    XBMC::Context context;
  
 -- 
-2.1.4
+2.1.0
 
