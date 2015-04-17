@@ -6,21 +6,17 @@ Subject: [PATCH] Make Kodi quit on SIGTERM. We do not need to call Stop()
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/main/main.cpp | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
 diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
-index ec86426..dacf832 100644
+index ec86426..f5381f6 100644
 --- a/xbmc/main/main.cpp
 +++ b/xbmc/main/main.cpp
-@@ -40,9 +40,21 @@
+@@ -40,9 +40,20 @@
  #include "input/linux/LIRC.h"
  #endif
  #include "XbmcContext.h"
-+#include "ApplicationOperations.h"
-+#include "Application.h"
++#include "ApplicationMessenger.h"
 +
-+void term_handler(int signum)
++void sigterm_handler(int signum)
 +{
 +	CLog::Log(LOGINFO, "Received signal");
 +	CApplicationMessenger::Get().Quit();
@@ -30,11 +26,8 @@ index ec86426..dacf832 100644
  {
 +  struct sigaction action;
 +  memset(&action, 0, sizeof(struct sigaction));
-+  action.sa_handler = term_handler;
++  action.sa_handler = sigterm_handler;
 +  sigaction(SIGTERM, &action, NULL);
    // set up some xbmc specific relationships
    XBMC::Context context;
  
--- 
-2.1.0
-
