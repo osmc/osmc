@@ -1,3 +1,15 @@
+From 90b84616c9b7f33adc8fc8c7c74807edc475917b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 17 Apr 2015 05:09:01 +0100
+Subject: [PATCH] Allow the skin to be changed via the xbmc Python API
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.h                    |  6 +++---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 17 +++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
+ 3 files changed, 32 insertions(+), 3 deletions(-)
+
 diff --git a/xbmc/Application.h b/xbmc/Application.h
 index 0a332ff..0318ca8 100644
 --- a/xbmc/Application.h
@@ -23,7 +35,7 @@ index 0a332ff..0318ca8 100644
  
    bool m_loggingIn;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index dfdca99..21411eb 100644
+index dfdca99..96dbf8b 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -113,6 +113,23 @@ namespace XBMCAddon
@@ -33,7 +45,7 @@ index dfdca99..21411eb 100644
 +    void setskin(const char* skin)
 +    {
 +		XBMC_TRACE;
-+		if (! function)
++		if (! skin)
 +		return;
 +		std::string defaultSkin = ((const CSettingString*)CSettings::Get().GetSetting("lookandfeel.skin"))->GetDefault();
 +		if (!g_application.LoadSkin(skin))
@@ -73,3 +85,6 @@ index 69f1075..9ecc606 100644
      /**
       * executeJSONRPC(jsonrpccommand) -- Execute an JSONRPC command.
       * 
+-- 
+2.1.0
+
