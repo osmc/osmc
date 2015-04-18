@@ -40,6 +40,7 @@ void WiFiNetworkSetup::on_networkoptionsnextButton_clicked()
     if (ssid.isEmpty())
     {
         utils::displayError(tr("Missing SSID"), tr("You need to provide a SSID!"), false);
+        ui->networkoptionsnextButton->setEnabled(true);
         return;
     }
 
