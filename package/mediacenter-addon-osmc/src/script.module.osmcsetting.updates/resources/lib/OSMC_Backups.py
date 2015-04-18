@@ -1,16 +1,18 @@
 
 # STANDARD Modules
-import tarfile
-import os
-import glob
 import datetime as dt
-import traceback
+import glob
 import math
+import os
+import re
+import tarfile
+import traceback
 
 # KODI Modules
 import xbmc
 import xbmcgui
 import xbmcaddon
+import xbmcvfs
 
 __addonid__	= 'OSMC Backup'
 DIALOG = xbmcgui.Dialog()
@@ -48,7 +50,7 @@ def lang(id):
 
 
 def log(message, label = ''):
-	logmsg       = '%s : %s - %s ' % ('OSMC BACKUP' , str(label), str(message))
+	logmsg       = '%s : %s - %s ' % ('OSMC BACKUP: ' , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
 
@@ -149,25 +151,46 @@ class osmc_backup(object):
 		''' Checks the target location to see if there is sufficient space for the tarball.
 			Returns True if there is sufficient disk space '''
 
-		st = os.statvfs(location)
+		# the backup file gets created locally first, and then gets transfered, so we have to make sure both location
+		# have sufficient free space.
+		# linux cannot query freespace from remote locations, so we just have to copy and hope
 
-		requirement = self.estimate_disk_requirement()
-		if st.f_frsize:
-			available = st.f_frsize * st.f_bavail
-		else:
-			available = st.f_bsize * st.f_bavail
-		# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+		# check locally
+		try:
+			st = os.statvfs(xbmc.translatePath('special://temp'))
 
-		log('required disk space: %s' % requirement)
-		log('available disk space: %s' % available)
-		
-		log('f_bfree = %s' % st.f_bfree)
-		log('f_bsize = %s' % st.f_bsize)
-		log('f_blocks = %s' % st.f_blocks)
-		log('f_bavail = %s' % st.f_bavail)
-		log('f_frsize = %s' % st.f_frsize)
+			requirement = self.estimate_disk_requirement()
+			if st.f_frsize:
+				available = st.f_frsize * st.f_bavail
+			else:
+				available = st.f_bsize * st.f_bavail
+			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
 
-		return  requirement < available
+			log('local required disk space: %s' % requirement)
+			log('local available disk space: %s' % available)
+
+			if not requirement < available:
+				return False
+		except:
+			pass
+
+		# check remote
+		try:
+			st = os.statvfs(location)
+
+			requirement = self.estimate_disk_requirement()
+			if st.f_frsize:
+				available = st.f_frsize * st.f_bavail
+			else:
+				available = st.f_bsize * st.f_bavail
+			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+
+			log('remote required disk space: %s' % requirement)
+			log('remote available disk space: %s' % available)
+
+			return requirement < available
+		except:
+			return True
 
 
 	def check_target_writeable(self, location):
@@ -176,18 +199,21 @@ class osmc_backup(object):
 
 		temp_file = os.path.join(location, 'temp_write_test')
 
-		try:
-			with open(temp_file, 'w') as f:
-				f.write(' ')
-		except:
-			log('%s is not writeable' % location)
-			return False
+		f =xbmcvfs.File (temp_file, 'w')
 
 		try:
-			os.remove(temp_file)
+			result = f.write('buffer')
+		except:
+			log('%s is not writeable' % location)
+			f.close()
+			return False
+		finally:
+			f.close()
+
+		try:
+			xbmcvfs.delete(temp_file)
 		except:
 			log('Cannot delete temp file at %s' % location)
-			return False 
 
 		return True
 
@@ -223,8 +249,14 @@ class osmc_backup(object):
 		else:
 			remove_these = []
 
-		# generate name for new tarball
-		tarball_name = self.generate_tarball_name(location)
+		# get the tag for the backup file
+		tag = self.generate_tarball_name()
+
+		# generate name for temporary tarball
+		local_tarball_name = os.path.join(xbmc.translatePath('special://temp'), FILE_PATTERN % tag)
+
+		# generate name for remote tarball
+		remote_tarball_name = os.path.join(location, FILE_PATTERN % tag)
 
 		# get the size of all the files that are being backed up
 		total_size 		= max(1, self.estimate_disk_requirement(func='log'))
@@ -242,7 +274,7 @@ class osmc_backup(object):
 		self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': 'Starting tar ball backup' })
 
 		try:
-			with tarfile.open(tarball_name, "w:gz") as tar:
+			with tarfile.open(local_tarball_name, "w:gz") as tar:
 				for name, size in self.backup_candidates:
 
 					self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
@@ -257,14 +289,29 @@ class osmc_backup(object):
 
 					pct = int( (progress_total / float(total_size) ) * 100.0 )
 
+			# copy the local file to remote location
+			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
+			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+
+			if success:
+				log('Backup file successfully transferred')
+
+			else:
+				log('Transfer of backup file not successful')
+
+				return 'failed'
 
 			# remove the unneeded backups (this will only occur if the tarball is successfully created)
+			log('Removing these files: %s' % remove_these)
 			for r in remove_these:
 				try:
 					self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Removing old backup file: %s' % r})
-					os.remove(r)
-				except:
-					log('Failed to remove excess tarball: %s' % r)
+					xbmcvfs.delete(os.path.join(location, r))
+				except Exception as e:
+					log('Deleting tarball failed: %s' % r)
+					log(type(e).__name__)
+					log(e.args)
+					log(traceback.format_exc())
 
 			self.progress(kill=True)
 
@@ -280,13 +327,13 @@ class osmc_backup(object):
 			return 'failed'
 
 
-	def generate_tarball_name(self, location):
+	def generate_tarball_name(self):
 
 		''' Returns the name for the new tarball '''
 
 		file_tag = dt.datetime.strftime(dt.datetime.now(), TIME_PATTERN)
 
-		return os.path.join(location, FILE_PATTERN % file_tag)
+		return file_tag
 
 
 	def list_current_tarballs(self, location):
@@ -295,9 +342,14 @@ class osmc_backup(object):
 
 		pattern = os.path.join(location, FILE_PATTERN % APPENDAGE)
 
-		tarball_list = glob.glob(pattern)
+		dirs, tarball_list = xbmcvfs.listdir(location)
+
+		regex = re.compile(pattern)
+		tarball_list = [i for i in tarball_list if not regex.search(i)]		
 
 		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location))
+
+		log('tarball list from location: %s' % tarball_list)
 
 		return tarball_list
 
