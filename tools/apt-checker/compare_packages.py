@@ -24,6 +24,7 @@ for arch in archlist:
 	for package in devel_packages:
 		package_name = None
 		package_version = None
+		package_depends = None
 
 		for line in package.splitlines():
 			if line.startswith('Package:'):
@@ -31,6 +32,9 @@ for arch in archlist:
 
 			if line.startswith('Version:'):
 				package_version = line.split('Version:',1)[1].lstrip()
+
+			if line.startswith('Depends:'):
+				package_depends = line.split('Depends:',1)[1].lstrip()
 
 		if package_name and package_version:
 			try:
@@ -42,9 +46,25 @@ for arch in archlist:
 
 			results.update({package_name:list})
 
+			if package_name.endswith('-kernel-osmc') and package_depends:
+				kernel_prefix = package_name.split('-kernel-osmc')[0]
+				kernel_name = '(Active ' + kernel_prefix + ' Kernel)'
+				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
+
+				try:
+					list = results[kernel_name]
+					list[0] = kernel_version
+
+				except KeyError:
+					list = [kernel_version, 'MISSING' ]
+
+				results.update({kernel_name:list})
+
+
 	for package in release_packages:
 		package_name = None
 		package_version = None
+		package_depends = None
 
 		for line in package.splitlines():
 			if line.startswith('Package:'):
@@ -52,6 +72,9 @@ for arch in archlist:
 
 			if line.startswith('Version:'):
 				package_version = line.split('Version:',1)[1].lstrip()
+
+			if line.startswith('Depends:'):
+				package_depends = line.split('Depends:',1)[1].lstrip()
 
 		if package_name and package_version:
 			try:
@@ -62,6 +85,21 @@ for arch in archlist:
 				list = ['MISSING', package_version]
 
 			results.update({package_name:list})
+
+			if package_name.endswith('-kernel-osmc') and package_depends:
+				kernel_prefix = package_name.split('-kernel-osmc')[0]
+				kernel_name = '(Active ' + kernel_prefix + ' Kernel)'
+				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
+
+				try:
+					list = results[kernel_name]
+					list[1] = kernel_version
+
+				except KeyError:
+					list = [ 'MISSING', kernel_version ]
+
+				results.update({kernel_name:list})
+
 
 package_length = len(max(results, key=len))
 devel_length = max([len(x) for x, y in results.values()])
