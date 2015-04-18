@@ -1,0 +1,22 @@
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 2f1376e..5752ac7 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -26,6 +26,8 @@ GZFLAGS		:=-9
+ # Never generate .eh_frame
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
+ 
++KBUILD_CFLAGS	+= -funsafe-math-optimizations -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon
++
+ # Do not use arch/arm/defconfig - it's always outdated.
+ # Select a platform tht is kept up-to-date
+ KBUILD_DEFCONFIG := versatile_defconfig
+@@ -118,7 +120,7 @@ AFLAGS_ISA	:=$(CFLAGS_ISA)
+ endif
+ 
+ # Need -Uarm for gcc < 3.x
+-KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_ISA) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -msoft-float -Uarm
++KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_ISA) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -Uarm
+ KBUILD_AFLAGS	+=$(CFLAGS_ABI) $(AFLAGS_ISA) $(arch-y) $(tune-y) -include asm/unified.h -msoft-float
+ 
+ CHECKFLAGS	+= -D__arm__
