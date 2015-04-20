@@ -791,7 +791,7 @@ class Main(object):
 
 			try:
 
-				bckp.start_backup()
+				bckp.start_restore()
 
 			except Exception as e:
 			
