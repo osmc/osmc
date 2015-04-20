@@ -258,6 +258,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			os.system('echo %s | sudo tee /etc/timezone' % users_timezone)
 
+		
+		# delete skin update block file
+		subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
+
 		self.close()
 
 
