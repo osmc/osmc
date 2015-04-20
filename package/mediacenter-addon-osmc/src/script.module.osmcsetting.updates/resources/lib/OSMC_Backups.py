@@ -323,6 +323,11 @@ class osmc_backup(object):
 			if success:
 				log('Backup file successfully transferred')
 
+				try:
+					xbmcvfs.delete(local_tarball_name)
+				except:
+					log('Cannot delete temp file at %s' % local_tarball_name)
+
 			else:
 				log('Transfer of backup file not successful')
 
@@ -541,7 +546,12 @@ class osmc_backup(object):
 
 							continue
 
-			ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')				
+			ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')	
+
+			try:
+				xbmcvfs.delete(local_copy)
+			except:
+				log('Cannot delete temp file at %s' % local_copy)			
 
 		self.progress(kill=True)
 
