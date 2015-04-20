@@ -320,8 +320,6 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 			# symlink the master conf to the new selection
 			subprocess.call(['sudo', 'ln', '-sf', self.remote_selection, LIRCD_PATH])
 
-			# restart the service for the changes to take effect
-			subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
 			# open test dialog
 			xml = "OSMC_remote_testing720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "OSMC_remote_testing.xml"
@@ -378,6 +376,7 @@ class remote_test(xbmcgui.WindowXMLDialog):
 		self.countdown_timer = countdown_timer(self)
 		self.countdown_timer.setDaemon(True)
 
+		# start the service checker straight away
 		self.service_checker = service_checker(self)
 		self.service_checker.setDaemon(True)
 		self.service_checker.start()
@@ -480,45 +479,58 @@ class remote_test(xbmcgui.WindowXMLDialog):
 
 class service_checker(threading.Thread):
 
-	''' Checks that the remote service is runnning. '''
+	''' Rsstarts the remote service, and waits for the response that it is running. '''
 
 	def __init__(self, parent):
 
 		super(service_checker, self).__init__(name='service_checker')
 		self.parent = parent
-		self.check_service = True
 		self.exit = False
 
 	def run(self):
 
 		log('Remote service checker thread active.')
 
-		xbmc.sleep(1000)
-
 		counter = 0
 
-		# loop until the service has restarted (or too much time has elapsed, in which case fail)
-		while self.check_service and counter < 400 and not self.exit:
+		# restart the service for the changes to take effect
+		proc = subprocess.Popen(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
-			if subprocess.call(["sudo", "/bin/systemctl", "is-active", 'lircd_helper@*']) == 0:
+		# loop until the service has restarted (or too much time has elapsed, in which case fail out)
+		while counter < 40 and not self.exit:
 
-				self.check_service = False	
+			p = proc.poll()
 
-			# FOR TESTING ONLY, THIS SHORTCIRCUITS THE SERVICE CHECK
-			# if counter == 100:
-			# 	self.check_service = False	
-				
-			xbmc.sleep(25)
+			if p is None:
+				counter += 1
+				xbmc.sleep(250)
+				continue
 
-			counter += 1
-
-		if counter >= 400:
-
-			self.parent.service_dead_state()
+			elif p == 0:
+				break
 
 		else:
+			# if the process times out or the exit signal is recieved, then return nothing
+			# on a timeout however, enter something in the log
 
-			self.parent.second_state()
+			if counter >= 40:
+				# this is reached if the counter reaches 40, meaning the process check timed out
+				self.parent.service_dead_state()
+
+			elif self.exit:
+				# this occurs when the user has clicked cancel or back
+				# there is no need to do anything
+				pass
+
+			elif p != 0:
+				# this occurs if there is an error code returned by the process
+				log('Error code from systemctl restart lircd-helper: %s' % p)
+
+			return
+
+
+		# this point it only reached if proc.poll returns 0
+		self.parent.second_state()
 
 
 class countdown_timer(threading.Thread):
