@@ -781,6 +781,25 @@ class Main(object):
 
 				ok = DIALOG.ok(lang(32096), lang(32097))
 
+			return 'Called BACKUP script complete'
+
+		if action == 'restore':
+
+			self.update_settings()
+
+			bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
+
+			try:
+
+				bckp.start_backup()
+
+			except Exception as e:
+			
+				log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
+
+				ok = DIALOG.ok(lang(32096), lang(32097))
+
+			return 'Called RESTORE script complete'
 
 
 		elif action == 'install':

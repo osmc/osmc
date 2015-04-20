@@ -23,7 +23,7 @@ FILE_PATTERN = 'OSMCBACKUP_%s.tar.gz'
 LOCATIONS = {
 
 			'backup_addons'				:	'{kodi_folder}/addons/',
-			'backup_addon_data'			:	'{kodi_folder}/userdata/addon_data',
+			'backup_addon_data'			:	'{kodi_folder}/userdata/addon_data/',
 			'backup_Database'			:	'{kodi_folder}/userdata/Database/',
 			'backup_keymaps'			:	'{kodi_folder}/userdata/keymaps/',
 			'backup_library'			:	'{kodi_folder}/userdata/library/',
@@ -40,6 +40,29 @@ LOCATIONS = {
 			'backup_peripheral_data'	:	'{kodi_folder}/userdata/peripheral_data.xml',
 			'backup_guisettings'		:	'{kodi_folder}/userdata/guisettings.xml',
 			'backup_advancedsettings'	:	'{kodi_folder}/userdata/advancedsettings.xml',
+
+			}
+
+LABELS = 	{
+
+			'{kodi_folder}/addons'							: 'Addons Folder',
+			'{kodi_folder}/userdata/addon_data'				: 'Addon Data Folder',
+			'{kodi_folder}/userdata/Database'				: 'Database Folder',
+			'{kodi_folder}/userdata/keymaps'				: 'Keymaps Folder',
+			'{kodi_folder}/userdata/library'				: 'Library Folder',
+			'{kodi_folder}/userdata/playlists'				: 'Playlists Folder',
+			'{kodi_folder}/userdata/Thumbnails'				: 'Thumbnails Folder',
+			'{kodi_folder}/userdata/advancedsettings.xml'	: 'advancedsettings.xml',
+			'{kodi_folder}/userdata/guisettings.xml'		: 'guisettings.xml',
+			'{kodi_folder}/userdata/sources.xml'			: 'sources.xml',
+			'{kodi_folder}/userdata/profiles.xml'			: 'profiles.xml',
+			'{kodi_folder}/userdata/favourites.xml' 		: 'favourites.',
+			'{kodi_folder}/userdata/keyboard.xml'			: 'keyboard.xml',
+			'{kodi_folder}/userdata/remote.xml'				: 'remote.xml',
+			'{kodi_folder}/userdata/LCD.xml'				: 'LCD.xml',
+			'{kodi_folder}/userdata/RssFeeds.xml'			: 'RssFeeds.xml',
+			'{kodi_folder}/userdata/upnpserver.xml'			: 'upnpserver.xml',
+			'{kodi_folder}/userdata/peripheral_data.xml'	: 'peripheral_data.xml',
 
 			}
 
@@ -273,14 +296,17 @@ class osmc_backup(object):
 
 		self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': 'Starting tar ball backup' })
 
+		new_root = xbmc.translatePath('special://home')
+
 		try:
 			with tarfile.open(local_tarball_name, "w:gz") as tar:
 				for name, size in self.backup_candidates:
 
 					self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
-					
+
 					try:
-						tar.add(name)
+						new_path = os.path.relpath(name, new_root)
+						tar.add(name, arcname=new_path)
 					except:
 						log('%s failed to backup to tarball' % name)
 						continue
@@ -327,6 +353,213 @@ class osmc_backup(object):
 			return 'failed'
 
 
+	def tarball_filter(self, tar_object):
+
+		''' Takes a tarball object and returns that object with a new name.
+			The new name is the filepath relative to the kodi Home folder. '''
+
+		name = tar_object.name[]
+
+
+
+
+	def start_restore(self):
+
+		''' Posts a list of backup files in the location, allows the user to choose one (including browse to a different location,
+			allows the user to choose what to restore, including an ALL option.
+		'''
+
+		current_tarballs = self.list_current_tarballs()
+
+		# the first entry on the list dialog
+		dialog_list = [(None, 'Browse for backup file')]
+
+		# strip the boilerplate from the file and just show the name
+		current_tarballs = [(name, self.strip_name(name)) for name in current_tarballs]
+
+		# sort the list by date stamp (reverse)
+		current_tarballs.sort(key=lambda x: x[1], reverse=True)
+
+		# join the complete list together
+		dialog_list.extend(current_tarballs)
+
+		back_to_select = True
+
+		while back_to_select:
+
+			# display the list
+			file_selection = DIALOG.select('Select a backup file', [x[1] for x in dialog_list])
+
+			if not file_selection:
+				back_to_select = False
+				continue
+
+			elif file_selection == 1:
+				# open the browse dialog
+
+				local_copy = DIALOG.browse(1, 'Browse to backup file', 'files')
+
+				if not local_copy:
+					# return to select window
+					continue
+
+			else:
+				# read the tar_file, post dialog with the contents
+
+				# get file_selection
+				backup_file = dialog_list[file_selection-1]
+
+				# this requires copying the tar_file from its stored location, to kodi/temp 
+				# xbmcvfs cannot read into tar files without copying the whole thing to memory
+
+				result = xbmcvfs.copy(file_selection, xbmc.translatePath('special://temp'))
+
+				if not result:
+					# copy of file failed
+
+					ok = DIALOG.ok('Restore failed', 'Restore failed to copy the file.', 'Check freespace on disk.')
+					back_to_select = False
+					continue
+
+				local_copy = os.path.join(xbmc.translatePath('special://temp'), os.path.basename(backup_file))
+
+
+			# open local copy and check for contents
+			try:
+
+				with tarfile.open(local_copy, 'r') as t:
+					members = t.getmembers()
+
+					log('tarfile members: %s' % members)
+
+			except Exception as e:
+
+				log('Opening and reading tarball failed')
+				log(type(e).__name__)
+				log(e.args)
+				log(traceback.format_exc())
+
+				ok = DIALOG.ok('Restore failed', 'Failure to read the file.')
+
+				continue
+
+			if members:
+
+				# the first entry on the list dialog, tuple is (member, display name, name in tarfile, restore location)
+				tar_contents_list = [(None, None, 'Everything')]
+
+				# create list of items in the tar_file for the user to select from, these are prime members; either they are the 
+				# xml files or they are the base folder
+				for member in members:
+					filepath = member.name
+					display_name = self.identify_prime_member(filepath)
+					if display_name:
+						tar_contents_list.append((member, display_name))
+
+				if len(tar_contents_list) < 2:
+
+					log('Could not identify contents of backup file')
+
+					ok = DIALOG.ok('Restore', 'Could not identify contents of backup file.')
+
+					continue
+
+				# at the moment this only allows for a single item to be selected, however we can build our own dialog that
+				# can allow multiple selection, with the action only taking place on users OK
+				item_selection = DIALOG.select('Select items to restore', [x[1] for x in tar_contents_list])
+
+				if not item_selection:
+
+					continue
+
+				elif item_selection == 1:
+
+					log('User has chosen to restore all items')
+					# restore all items
+
+					restore_items = tar_contents_list[1:]
+
+				else:
+
+					# restore single item
+					restore_item = tar_contents_list[item_selection - 1] 
+					restore_items = [ restore_item[0] ]
+
+					log('User has chosen to restore a single item: %s' % restore_item[1])
+
+					# if the item is a single xml file, then restore that member, otherwise loop through the file members
+					# and collect the ones in the relevant folder
+
+					if restore_item[0].name.endswith('.xml'):
+						restore_items = [ restore_item[0] ]
+					else:
+						restore_items = []
+						for member in members:
+							if member.name.startswith(restore_item[0]):
+								restore_items.append(member)
+
+				# confirm with user that they want to overwrite existing files OR extract to a different location
+				overwrite = DIALOG.select('OSMC Restore', ['Restore over existing files', 'Select new restore folder')
+
+				if not overwrite:
+					log('User has escaped restore dialog')
+					continue
+
+				if overwrite == 1:
+					# restore over existing files
+					log('User has chosen to overwrite existing files.')
+					restore_location = xbmc.translatePath('special://home')
+
+				elif overwrite == 2:
+					# select new folder
+					log('User has chosen to browse for a new restore location')
+					restore_location = DIALOG.browse(0, 'Browse to restore location', 'files')
+
+				else:
+					log('User has escaped restore dialog')
+					continue
+
+				with tarfile.open(local_copy, 'r') as t:
+					for member in restore_items:
+						try:
+							t.extract(member, restore_location)
+
+						except Exception as e:
+							log('Extraction of %s failed' % member.name)
+							log(type(e).__name__)
+							log(e.args)
+							log(traceback.format_exc())
+
+							continue
+
+
+
+		self.progress(kill=True)
+
+
+	def identify_prime_member(self, member):
+
+		''' 
+			Receives the name of a file in the tar, checks it against the main files and folders,
+			returns a tuple of the display name
+			Prime members are the main items; it is either the specific xml file or the base folder
+		'''
+
+		for partial_name, label in LABELS.iteritems():
+			if member.startswith(partial_name.replace('{kodi_folder}/',''):
+				return label
+		finally:
+			return None
+
+
+	def strip_name(self, name):
+
+		''' Returns the tarball file name with the boilerplate removed '''
+
+		return name.replace('.tar.gz', '').replace('OSMCBACKUP_',''))
+
+
+
 	def generate_tarball_name(self):
 
 		''' Returns the name for the new tarball '''
@@ -334,6 +567,7 @@ class osmc_backup(object):
 		file_tag = dt.datetime.strftime(dt.datetime.now(), TIME_PATTERN)
 
 		return file_tag
+
 
 
 	def list_current_tarballs(self, location):
