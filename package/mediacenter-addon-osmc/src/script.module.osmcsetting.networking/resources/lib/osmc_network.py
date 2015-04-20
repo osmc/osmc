@@ -241,7 +241,7 @@ def scan_wifi():
 
 
 def get_wifi_networks():
-    wifis = {}
+    interfaces = {}
     manager = connman.get_manager_interface()
     for entry in manager.GetServices():
         path = entry[0]
@@ -252,13 +252,20 @@ def get_wifi_networks():
             security_props = dbus_properties['Security']
             if len(security_props) > 0:
                 wifi_settings['Security'] = str(security_props[0])
-                
             if not str(dbus_properties['State']) == 'idle' and not str(dbus_properties['State']) == 'failure':
                 settings = extract_network_properties(dbus_properties)
                 if settings:
                     wifi_settings.update(settings)
-            wifis[wifi_settings['SSID']] = wifi_settings
-    return wifis
+            # get Interface name and address
+            eth_props = dbus_properties['Ethernet']
+            wifi_settings['Interface'] = str(eth_props['Interface'])
+            address = str(eth_props['Address'])
+            wifi_settings['AdapterAddress'] = address
+            if address not in interfaces:
+                interfaces[address] = {}
+            interfaces[address][wifi_settings['SSID']] = wifi_settings
+    return interfaces
+
 
 
 def wifi_connect(path, password=None):
@@ -312,9 +319,10 @@ def wifi_remove(path):
 
 
 def get_connected_wifi():
-    for ssid, value in get_wifi_networks().iteritems():
-        if value['State'] in ('online', 'ready'):
-            return value
+    for address, wifis in get_wifi_networks().iteritems():
+        for ssid, value in wifis.iteritems():
+            if value['State'] in ('online', 'ready'):
+                return value
     return {}
 
 def has_internet_connection():
@@ -325,11 +333,11 @@ def has_internet_connection():
                 return check_MS_NCSI_response()
             elif 'State' in ethernet_settings and ethernet_settings['State'] == 'online':
                 return True
-    wifi_networks = get_wifi_networks()
-    for ssid in wifi_networks.keys():
-        info = wifi_networks[ssid]
-        if info['State'] == 'online':
-            return True
+    for address, wifis in get_wifi_networks().iteritems():
+	for ssid in wifis.keys():
+        	info = wifis[ssid]
+        	if info['State'] == 'online':
+            		return True
     return False
 
 
