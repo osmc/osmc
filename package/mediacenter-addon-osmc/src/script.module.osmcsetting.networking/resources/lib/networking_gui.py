@@ -773,6 +773,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     #         'Status'           'Not connected'
                     status = lang(32044) + ': ' + lang(32050)
                     self.wireless_status_label.setLabel(status)
+                    self.clear_busy_dialogue()
                     return False
                 else:
                     self.show_busy_dialogue()
@@ -877,6 +878,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         message = lang(32024) + ' ' + alias + ' ' + lang(32025)
                         #                                                     'Bluetooth'
                         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
+                        self.clear_busy_dialogue()
                         return
                 osmc_bluetooth.connect_device(address)
                 osmc_bluetooth.set_device_trusted(address, True)
