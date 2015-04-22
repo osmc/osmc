@@ -1,6 +1,6 @@
 
 ply-image: ply-image.c ply-frame-buffer.c checkmodifier.c Makefile
-	gcc -static ply-image.c ply-frame-buffer.c -o ply-image -lpng12 -lm -lz
+	gcc ply-image.c ply-frame-buffer.c -o ply-image -lpng12 -lm -lz
 	strip ply-image
 	gcc checkmodifier.c -o checkmodifier
 	strip checkmodifier
