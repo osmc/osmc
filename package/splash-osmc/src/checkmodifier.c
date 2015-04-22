@@ -10,6 +10,14 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+/*      Return kernel shift_state (depressed modifier keys) bitmask from /dev/console. Needs root access.
+        0 = no modifier keys
+        1 = Left/Right Shift
+        2 = Alt Gr (right ALT)
+        4 = Left/Right Ctrl
+        8 = Left Alt
+*/
+
 int main(int argc, char *argv[])
 {
     char shift_state;
