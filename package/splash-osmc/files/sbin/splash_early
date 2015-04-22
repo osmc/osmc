@@ -23,7 +23,9 @@ then
 	/bin/mkdir /dev/pts
 	/bin/mount -t devpts devpts /dev/pts
 	/bin/hostname -F /etc/hostname
-	echo "Emergency recovery console. Use 'exit' to reboot when finished."
+	echo; echo "          OSMC Recovery Console."
+	echo "          Type 'exit' to reboot when finished."
+	echo "          For help and support see http://osmc.tv/help"; echo
 	/usr/bin/setsid -c /bin/bash
 	/bin/sync
 	echo 1 > /proc/sys/kernel/sysrq
