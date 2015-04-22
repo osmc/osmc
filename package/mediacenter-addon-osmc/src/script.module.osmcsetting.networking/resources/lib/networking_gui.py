@@ -865,7 +865,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 alias = item.getProperty('alias')
                 #              'Connect With Device'            'No'     Pair and Connect'    'pair'
                 selection = DIALOG.select(lang(32022) + ' ' + alias + '?', [lang(32055),lang(32056), lang(32057)])
-                if selection == 0:
+                if selection == -1 or selection == 0:
                     return
                 self.show_busy_dialogue()
                 self.setFocusId(BLUETOOTH_DISCOVERY)
