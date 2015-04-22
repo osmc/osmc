@@ -1,11 +1,33 @@
-#!/bin/sh
+#!/bin/bash
 mount -t proc proc /proc
 export TERM=linux
-TTY1="/dev/tty1"
-/usr/bin/setterm --cursor off > $TTY1
+
 if grep -q quiet /proc/cmdline
 then
-   /usr/bin/clear > $TTY1
-   /usr/bin/ply-image > /dev/null
+	/usr/bin/setterm --cursor off
+	/usr/bin/clear
+	/usr/bin/ply-image > /dev/null
 fi
-exec /sbin/init $*
+/sbin/checkmodifier
+if [ $? -eq 1 ]
+then
+	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/opt/vc/bin"
+	trap '' SIGINT
+	echo 0 > /proc/sys/kernel/ctrl-alt-del
+	fbset -depth 8 && fbset -depth 16
+	/usr/bin/setterm --cursor on
+	/sbin/fsck /
+	/bin/mount / -o remount,rw
+	/bin/mount /boot
+	/bin/mount -t sysfs sysfs /sys
+	/bin/mkdir /dev/pts
+	/bin/mount -t devpts devpts /dev/pts
+	/bin/hostname -F /etc/hostname
+	echo "Emergency recovery console. Use 'exit' to reboot when finished."
+	/usr/bin/setsid -c /bin/bash
+	/bin/sync
+	echo 1 > /proc/sys/kernel/sysrq
+	echo b > /proc/sysrq-trigger
+else
+	exec /sbin/init $*
+fi
