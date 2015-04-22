@@ -25,7 +25,7 @@ chmod a+rw /dev/tty1
 case $? in
 4)
 	/usr/bin/setterm --cursor on >/dev/tty1
-	sudo systemctl start getty@tty1
+	systemctl start getty@tty1
 	exit 0
 	;;
 5)
@@ -49,12 +49,12 @@ case $? in
 		sleep 20; reboot
 	fi
         dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
-        err=$(sudo apt-get -qq update); if [ -n "$err" ]
+        err=$(apt-get -qq update); if [ -n "$err" ]
         then
                 dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
                 sleep 20
         fi
-        sudo systemctl start manual-update
+        systemctl start manual-update
         exit 0
         ;;
 esac
