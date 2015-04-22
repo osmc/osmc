@@ -23,6 +23,7 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	mkdir -p ${out}/usr/bin
 	cp -ar ply-image ${out}/usr/bin
+	cp -ar checkmodifier ${out}/sbin
 	cp -ar splash.png ${out}/usr
 	cp -ar splash_sad.png ${out}/usr
 	popd
