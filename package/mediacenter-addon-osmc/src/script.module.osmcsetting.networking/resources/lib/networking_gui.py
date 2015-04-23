@@ -719,17 +719,23 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         else:
             if ssid == self.conn_ssid:
-                # 'Wireless' , 'Disconnect from'
-                if DIALOG.yesno(lang(32041), lang(32042) + ' ' + self.conn_ssid + '?'):
-                    self.show_busy_dialogue()
-                    self.conn_ssid = None
-                    self.wireless_password = None
-                    self.current_network_config = {}
-                    self.hide_controls(WIRELESS_IP_VALUES + WIRELESS_IP_LABELS)
-                    osmc_network.wifi_disconnect(path)
-                    self.WFP.removeItem(self.WFP.getSelectedPosition())
-                    self.populate_wifi_panel()
-                    self.clear_busy_dialogue()
+                #                             'Disconnect from'
+                selection = DIALOG.select(lang(32041) + ' ' + self.conn_ssid + '?',
+                                           #'No'      'Disconnect'  'Disconnect and Remove'
+                                          [lang(32055),lang(32058), lang(32059)])
+                if selection == -1 or selection == 0:
+                    return
+                self.show_busy_dialogue()
+                self.conn_ssid = None
+                self.wireless_password = None
+                self.current_network_config = {}
+                self.hide_controls(WIRELESS_IP_VALUES + WIRELESS_IP_LABELS)
+                osmc_network.wifi_disconnect(path)
+                if selection == 2: # we also want to remove/forget this network
+                    osmc_network.wifi_remove(path)
+                self.WFP.removeItem(self.WFP.getSelectedPosition())
+                self.populate_wifi_panel()
+                self.clear_busy_dialogue()
 
 
     def connect_to_wifi(self, ssid, encrypted, password=None, scan=False):
@@ -863,7 +869,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if item:
                 address = item.getProperty('address')
                 alias = item.getProperty('alias')
-                #              'Connect With Device'            'No'     Pair and Connect'    'pair'
+                #              'Connect With Device'                        'No'        'Pair and Connect' 'pair'
                 selection = DIALOG.select(lang(32022) + ' ' + alias + '?', [lang(32055),lang(32056), lang(32057)])
                 if selection == -1 or selection == 0:
                     return
