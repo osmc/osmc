@@ -154,7 +154,10 @@ def pair_device(deviceAddress, scriptBasePath = ''):
     paired = False
     paired = pair_using_agent(deviceAddress, scriptBasePath)
     if not paired:
-        bluetooth.remove_device(deviceAddress)
+        try:
+            bluetooth.remove_device(deviceAddress)
+        except:
+            pass
         return False
     return paired
 
