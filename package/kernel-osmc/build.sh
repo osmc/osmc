@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="3.18.11" && REV="2"
 test $1 == rbp2 && VERSION="3.18.11" && REV="2"
-test $1 == vero && VERSION="3.14.37" && REV="5"
+test $1 == vero && VERSION="3.14.37" && REV="6"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -86,7 +86,6 @@ then
 	if [ "$1" == "vero" ]
 	then
 		make imx6dl-vero.dtb
-		mkdir -p ../../files-image/boot/
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
 		popd
 	fi
@@ -118,7 +117,6 @@ then
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 	# Unset architecture
-	popd
 	ARCH=$(arch)
 	export ARCH
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
