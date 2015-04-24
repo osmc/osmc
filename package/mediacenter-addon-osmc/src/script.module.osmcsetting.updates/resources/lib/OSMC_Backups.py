@@ -2,6 +2,7 @@
 # STANDARD Modules
 import datetime as dt
 import glob
+import json
 import math
 import os
 import re
@@ -80,11 +81,13 @@ def log(message, label = ''):
 
 class osmc_backup(object):
 
-	def __init__(self, settings_dict, progress_function):
+	def __init__(self, settings_dict, progress_function, parent_queue=None):
 
 		log('osmc_backup INIT')
 
 		self.s = settings_dict
+
+		self.parent_queue = parent_queue
 
 		self.progress = progress_function
 
@@ -105,6 +108,10 @@ class osmc_backup(object):
 			if self.s['create_tarball']:
 
 				self.create_tarball()
+
+				msg = json.dumps(('pre_backup_complete', {}))
+
+				self.parent_queue.put(msg)
 
 
 	def check_backup_location(self):

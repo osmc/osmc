@@ -108,6 +108,7 @@ class Main(object):
 								'apt_error'							: self.apt_error,
 								'action_list'						: self.action_list,
 								'apt_cache action_list complete'	: self.action_list_complete,
+								'pre_backup_complete'				: self.pre_backup_complete, 
 
 							}
 
@@ -449,6 +450,7 @@ class Main(object):
 			self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
 			self.s['backup_location'] 			= __setting__('backup_location')
 			self.s['tarball_count'] 			= int(float(	__setting__('tarball_count')		))
+			self.s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
 			self.s['backup_addons'] 			= True if 	__setting__('backup_addons')			== 'true' else False
 			self.s['backup_addon_data'] 		= True if 	__setting__('backup_addon_data')		== 'true' else False
 			self.s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
@@ -501,6 +503,7 @@ class Main(object):
 			tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
 			tmp_s['backup_location'] 			= __setting__('backup_location')
 			tmp_s['tarball_count'] 				= int(float(	__setting__('tarball_count')		))
+			tmp_s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
 			tmp_s['backup_addons'] 				= True if 	__setting__('backup_addons')			== 'true' else False
 			tmp_s['backup_addon_data'] 			= True if 	__setting__('backup_addon_data')		== 'true' else False
 			tmp_s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
@@ -665,7 +668,28 @@ class Main(object):
 
 		if check:
 
-			self.call_child_script('update')
+
+			if self.s['backup_on_update']:
+
+				# run backup
+
+				self.update_settings()
+
+				bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar, self.parent_queue)
+
+				try:
+
+					bckp.start_backup()
+
+				except Exception as e:
+				
+					log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
+
+			else:
+
+				# run the update
+
+				self.call_child_script('update')
 		
 		else:
 
@@ -676,6 +700,15 @@ class Main(object):
 	@clog(log)
 	def user_update_now(self):
 		''' Similar to update_now, but as this is a users request, forego all the player and idle checks. '''
+
+		self.call_child_script('update')
+
+
+	# ACTION METHOD
+	@clog(log)
+	def pre_backup_complete(self):
+		''' This method is called when the pre-update backup is completed. No need to worry about checking the 
+		update conditions, just run the update. '''
 
 		self.call_child_script('update')
 
