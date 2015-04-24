@@ -111,7 +111,13 @@ class osmc_backup(object):
 
 				msg = json.dumps(('pre_backup_complete', {}))
 
-				self.parent_queue.put(msg)
+				try:
+
+					self.parent_queue.put(msg)
+
+				except:
+
+					pass
 
 
 	def check_backup_location(self):
