@@ -94,6 +94,7 @@
 # XBMC Modules
 import xbmc
 import xbmcaddon
+import xbmcgui
 import subprocess
 import sys
 import os
@@ -101,6 +102,7 @@ import threading
 
 addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
+DIALOG     = xbmcgui.Dialog()
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
@@ -109,8 +111,15 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 import config_tools as ct
 from CompLogger import comprehensive_logger as clog
 
+
+def lang(id):
+    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+    return san 
+
+
 def log(message):
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
+
 
 class OSMCSettingClass(threading.Thread):
 
@@ -359,7 +368,6 @@ Overclock settings are set using the Pi Overclock module."""
 		for x, k in self.pi_settings_dict.iteritems():
 			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
-
 		self.me.openSettings()
 
 		# code placed here will run when the modules settings window is closed
@@ -429,6 +437,8 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# call the final method if there is one
 		self.final_method()
+
+		ok = DIALOG.notification(lang(32095), lang(32096))
 
 
 	def settings_retriever_xml(self):

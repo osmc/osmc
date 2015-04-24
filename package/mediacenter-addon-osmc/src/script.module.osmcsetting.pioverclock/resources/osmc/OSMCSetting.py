@@ -92,6 +92,7 @@ import xbmcgui
 
 addonid = "script.module.osmcsetting.pioverclock"
 __addon__  = xbmcaddon.Addon(addonid)
+DIALOG     = xbmcgui.Dialog()
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
@@ -103,6 +104,11 @@ from gui import overclock_gui
 
 def log(message):
 	xbmc.log('OSMC PI OVERCLOCK ' + str(message), level=xbmc.LOGDEBUG)
+
+
+def lang(id):
+    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+    return san 
 
 
 class OSMCSettingClass(threading.Thread):
@@ -211,6 +217,9 @@ The module allows you to manually adjust:
 		for k, s in self.new_settings.iteritems():
 			if s != self.setting_values.get(k, 'no setting available'):
 				self.reboot_required
+
+		# dialog to notify the user they should restart for changes to take effect
+		ok = DIALOG.notification(lang(32107), lang(32108))
 
 		log('END')
 
