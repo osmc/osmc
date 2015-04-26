@@ -220,7 +220,10 @@ def is_wifi_available():
 
 
 def is_wifi_enabled():
-    return connman.is_technology_enabled('wifi')
+    try:
+        return connman.is_technology_enabled('wifi')
+    except:
+        return False
 
 
 def toggle_wifi_state(state):
@@ -452,3 +455,36 @@ def toggle_wait_for_network(state):
         systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'enable')
     else:
         systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'disable')
+
+
+def is_tethering_ethernet():
+    return connman.is_technology_tethering('ethernet')
+
+
+def is_tethering_wifi():
+    return connman.is_technology_tethering('wifi')
+
+
+def get_tethering_SSID():
+    info = connman.get_technology_info('wifi')
+    if 'TetheringIdentifier' in info:
+        return str(info['TetheringIdentifier'])
+    return None
+
+
+def get_tethering_passphrase():
+    info = connman.get_technology_info('wifi')
+    if 'TetheringPassphrase' in info:
+        return str(info['TetheringPassphrase'])
+    return None
+
+
+def tethering_enable(technology, ssid, passphrase):
+    return connman.tethering_enable(technology, ssid, passphrase)
+
+
+def tethering_disable():
+    if is_tethering_wifi():
+        return connman.tethering_disable('wifi')
+    if is_tethering_ethernet():
+        return connman.tethering_disable('ethernet')

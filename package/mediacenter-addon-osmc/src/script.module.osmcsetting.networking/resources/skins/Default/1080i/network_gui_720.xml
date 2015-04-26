@@ -43,7 +43,8 @@
                 <visible>Control.IsEnabled(101)</visible>
                 <width>300</width>
                 <height>42</height>
-                <label>Wired</label>
+		<description>Wired</description>
+		<label>$ADDON[script.module.osmcsetting.networking 32060]</label>
                 <font>osmc_addon_720_OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
@@ -58,8 +59,9 @@
             <control id="102" type="button">
                 <visible>Control.IsEnabled(102)</visible>
                 <width>300</width>
-                <height>42</height>
-                <label>Wireless</label>
+		<height>42</height>
+		<description>Wireless</description>
+		<label>$ADDON[script.module.osmcsetting.networking 32041]</label>
                 <font>osmc_addon_720_OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
@@ -75,7 +77,8 @@
                 <visible>Control.IsEnabled(103)</visible>
                 <width>300</width>
                 <height>42</height>
-                <label>Bluetooth</label>
+		<description>Bluetooth</description>
+		<label>$ADDON[script.module.osmcsetting.networking 32003]</label>
                 <font>osmc_addon_720_OLD_Font42</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffffffff</focusedcolor>
@@ -85,6 +88,23 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>1030</onright>
+            </control>
+            <!-- Tethering -->
+            <control id="104" type="button">
+                <visible>Control.IsEnabled(104)</visible>
+                <width>300</width>
+                <height>42</height>
+		<description>Tethering</description>
+		<label>$ADDON[script.module.osmcsetting.networking 32001]</label>
+                <font>osmc_addon_OLD_Font42</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>1040</onright>
             </control>
         </control>
         <!-- ## Wired Panel ## -->
@@ -1125,6 +1145,228 @@
                     </control>
                 </focusedlayout>
             </control>
+        </control>
+        <!-- ## Tethering Panel ## -->
+        <control id="1040" type="group">
+            <description>Tethering Panel</description>
+            <left>380</left>
+            <top>85</top>
+            <width>1400</width>
+            <height>726</height>
+            <onleft>104</onleft>
+            <onright>104</onright>
+            <control type="label">
+                <align>left</align>
+                <aligny>center</aligny>
+                <label>$ADDON[script.module.osmcsetting.networking 32063]</label>
+                <posx>100</posx>
+                <posy>100</posy>
+                <width>880</width>
+                <height>70</height>
+                <description>Header</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>ffffffff</textcolor>
+              </control>
+            <control id="10401" type="button">
+                <disabledcolor>ff000000</disabledcolor>
+                <description>Hotspot SSID</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32061]</label>
+                <posx>100</posx>
+                <posy>200</posy>
+                <width>700</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <textoffsetx>0</textoffsetx>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+                <onup>noop</onup>
+                <ondown>10402</ondown>
+                <onleft>104</onleft>
+                <onright>104</onright>
+             </control>
+            <control id="910401" type="label">
+                <disabledcolor>ff000000</disabledcolor>
+                <align>right</align>
+                <aligny>center</aligny>
+                <visible>!Control.HasFocus(10401)+Control.isVisible(10401)</visible>
+                <label></label>
+                <posx>730</posx>
+                <posy>200</posy>
+                <width>880</width>
+                <height>70</height>
+                <description>Hotspit SSID VALUE</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+            </control>
+            <control type="label">
+                <align>right</align>
+                <aligny>center</aligny>
+                <visible>Control.HasFocus(10401)+Control.isVisible(10401)</visible>
+                <label>$INFO[Control.GetLabel(910401)]</label>
+                <posx>730</posx>
+                <posy>200</posy>
+                <width>880</width>
+                <height>70</height>
+                <description>Hotspot Passphrase VALUE</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>ffffffff</textcolor>
+            </control>
+            <control id="10402" type="button">
+                <disabledcolor>ff000000</disabledcolor>
+                <description>Hotspot passphrase</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32062]</label>
+                <posx>100</posx>
+                <posy>300</posy>
+                <width>700</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <textoffsetx>0</textoffsetx>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+                <onup>10401</onup>
+                <ondown>10403</ondown>
+                <onleft>104</onleft>
+                <onright>104</onright>
+             </control>
+            <control id="910402" type="label">
+                <disabledcolor>ff000000</disabledcolor>
+                <align>right</align>
+                <aligny>center</aligny>
+                <visible>!Control.HasFocus(10402)+Control.isVisible(10402)</visible>
+                <label></label>
+                <posx>730</posx>
+                <posy>300</posy>
+                <width>880</width>
+                <height>70</height>
+                <description>Hotspot passphrase VALUE</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+            </control>
+            <control type="label">
+                <align>right</align>
+                <aligny>center</aligny>
+                <visible>Control.HasFocus(10402)+Control.isVisible(10402)</visible>
+                <label>$INFO[Control.GetLabel(910402)]</label>
+                <posx>730</posx>
+                <posy>300</posy>
+                <width>880</width>
+                <height>70</height>
+                <description>Hotspot passphrase VALUE</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>ffffffff</textcolor>
+            </control>
+            <control id="10403" type="radiobutton">
+                <description>Ethernet to WiFi</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32064]</label>
+                <posx>100</posx>
+                <posy>500</posy>
+                <width>700</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <radiowidth>16</radiowidth>
+                <radioheight>16</radioheight>
+                <texturenofocus>-</texturenofocus>
+                <texturefocus>-</texturefocus>
+                <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                <onup>10402</onup>
+                <ondown>10404</ondown>
+                <onleft>104</onleft>
+            </control>
+            <control id="10404" type="radiobutton">
+                <description> WiFi to Ethernet</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32065]</label>
+                <posx>100</posx>
+                <posy>560</posy>
+                <width>700</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <radiowidth>16</radiowidth>
+                <radioheight>16</radioheight>
+                <texturenofocus>-</texturenofocus>
+                <texturefocus>-</texturefocus>
+                <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                <onup>10403</onup>
+                <ondown>10405</ondown>
+                <onleft>104</onleft>
+            </control>
+            <control id="10407" type="label">
+                <align>left</align>
+                <aligny>center</aligny>
+                <label>$ADDON[script.module.osmcsetting.networking 32040]</label>
+                <posx>100</posx>
+                <posy>700</posy>
+                <width>1400</width>
+                <height>70</height>
+                <description>Do not connect this device to a wired network with a DHCP server</description>
+                <font>osmc_addon_OLD_Font36</font>
+                <textcolor>ffffffff</textcolor>
+              </control>
+            <!-- Enable and Disable buttons -->
+            <control id="10405" type="button">
+                <description>Enable</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32066]</label>
+                <posx>250</posx>
+                <posy>800</posy>
+                <width>400</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <label>-</label>
+                <textoffsetx>0</textoffsetx>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+                <onup>10403</onup>
+                <ondown>noop</ondown>
+                <onleft>104</onleft>
+                <onright>10406</onright>
+            </control>
+            <control id="10406" type="button">
+                <description>Disable</description>
+                <label>$ADDON[script.module.osmcsetting.networking 32067]</label>
+                <posx>600</posx>
+                <posy>800</posy>
+                <width>400</width>
+                <height>66</height>
+                <align>left</align>
+                <aligny>center</aligny>
+                <font>osmc_addon_OLD_Font36</font>
+                <label>-</label>
+                <textoffsetx>0</textoffsetx>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffffffff</focusedcolor>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+                <onup>10404</onup>
+                <ondown>noop</ondown>
+                <onleft>10405</onleft>
+                <onright>noop</onright>
+            </control>
+
         </control>
     </controls>
 </window>
