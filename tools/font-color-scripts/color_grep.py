@@ -56,7 +56,7 @@ for root, dirs, files in os.walk(base_folder, topdown=False):
 								COLOR_CONVERSIONS[key]['count'] = COLOR_CONVERSIONS[key]['count'] + 1
 								conversion = True
 								line = line.replace('\n','').replace('\t','')
-								new_line = line.replace(search_key, key % COLOR_CONVERSIONS[key]['orig']) + '<!--former_line%s-->\n' % line
+								new_line = line.replace(search_key, key % COLOR_CONVERSIONS[key]['repl']) + '<!--former_line%s-->\n' % line
 								break
 						else: # if nobreak
 							new_line = line
