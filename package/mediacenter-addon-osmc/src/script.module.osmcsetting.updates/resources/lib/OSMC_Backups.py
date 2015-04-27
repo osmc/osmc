@@ -572,7 +572,7 @@ class osmc_backup(object):
 								t.extract(member, alt_restore_location)
 
 								with open('/RESET_GUISETTINGS', 'w') as f:
-									line1 = os.path.join(alt_restore_location,'userdata','guisettings.xml'))
+									line1 = os.path.join(alt_restore_location,'userdata','guisettings.xml')
 									line2 = os.path.join(xbmc.translatePath('special://userdata'))
 									f.write(line1)
 
