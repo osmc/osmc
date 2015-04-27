@@ -826,7 +826,19 @@ class Main(object):
 
 				bckp.start_restore()
 
-				if bckp.restoring_guisettings:
+				restart_required = bckp.restoring_guisettings
+
+				if bckp.success != 'Full':
+
+					ok = DIALOG.ok('Restore','Some items failed to restore.','See log for details.')
+
+					for x in bckp.success:
+
+						if x.endswith('userdata/guisettings.xml'):
+
+							restart_required = False
+
+				if restart_required:
 
 					user_input_restart_now = DIALOG.yesno(lang(32096), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
 

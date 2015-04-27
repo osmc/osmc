@@ -518,7 +518,8 @@ class osmc_backup(object):
 					# we arent backing up any other single files
 
 					if restore_item[0].name.endswith('.xml'):
-						restore_items = [ restore_item[0] ]
+						restore_items = []
+						restore_items.append(restore_item[0])
 
 						log('User has chosen to restore a single item: %s' % restore_item[1])
 
@@ -545,7 +546,7 @@ class osmc_backup(object):
 					# create the /RESET_GUISETTINGS file and write in the location of the restored guisettings.xml
 					# change the restoring_guisettings flag so the user is informed that this change requires a restart, 
 					# or will take effect on next boot
-					if any( [x[0].name.endswith('userdata/guisettings.xml') for x in restore_items] ):
+					if any( [True for x in restore_items if x.name.endswith('userdata/guisettings.xml') ] ):
 						self.restoring_guisettings = True
 
 
@@ -558,7 +559,7 @@ class osmc_backup(object):
 					log('User has escaped restore dialog')
 					continue
 
-
+				self.success = 'Full'
 				with tarfile.open(local_copy, 'r') as t:
 					for member in restore_items:
 
@@ -581,14 +582,22 @@ class osmc_backup(object):
 								t.extract(member, restore_location)
 
 						except Exception as e:
+							
 							log('Extraction of %s failed' % member.name)
 							log(type(e).__name__)
 							log(e.args)
 							log(traceback.format_exc())
 
+							if self.success == 'Full':	self.success = []
+
+							self.success.append(member.name)
+
 							continue
 
-			ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')	
+			if self.success == 'Full':
+				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')	
+			else:
+				back_to_select = False
 
 			try:
 				xbmcvfs.delete(local_copy)
