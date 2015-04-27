@@ -826,6 +826,18 @@ class Main(object):
 
 				bckp.start_restore()
 
+				if bckp.restoring_guisettings:
+
+					user_input_restart_now = DIALOG.yesno(lang(32096), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
+
+					if user_input_restart_now:
+
+						ok = DIALOG.ok('OSMC', 'Sorry this has yet to be implemented.')
+
+						# this should call a script that closes Kodi and overwrites the guisettings.xml with the restored one
+						# subprocess.Popen(['sudo', 'systemctl', 'start', 'NOTHING YET'])	
+
+
 			except Exception as e:
 			
 				log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))

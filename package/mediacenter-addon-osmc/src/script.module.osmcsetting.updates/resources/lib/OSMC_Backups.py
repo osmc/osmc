@@ -91,6 +91,8 @@ class osmc_backup(object):
 
 		self.progress = progress_function
 
+		self.restoring_guisettings = False
+
 		# backup candidates is a list of tuples that contain the folder/file path and the size in bytes of the entry
 		self.backup_candidates = self.create_backup_file_list() if self.s.get('create_tarball', False) else None
 
@@ -396,6 +398,9 @@ class osmc_backup(object):
 
 		back_to_select = True
 
+		# the location to restore the guisettings.xml to temporarily
+		alt_restore_location = os.path.join(xbmc.translatePath('special://userdata'), 'addon_data', 'script.module.osmcsetting.updates')
+
 		while back_to_select:
 
 			# display the list
@@ -536,6 +541,14 @@ class osmc_backup(object):
 					log('User has chosen to overwrite existing files.')
 					restore_location = xbmc.translatePath('special://home')
 
+					# check the restore_items for guisettings.xml, if found then restore that to the addon_data folder,
+					# create the /RESET_GUISETTINGS file and write in the location of the restored guisettings.xml
+					# change the restoring_guisettings flag so the user is informed that this change requires a restart, 
+					# or will take effect on next boot
+					if any( [x[0].name.endswith('userdata/guisettings.xml') for x in restore_items] ):
+						self.restoring_guisettings = True
+
+
 				elif overwrite == 1:
 					# select new folder
 					log('User has chosen to browse for a new restore location')
@@ -545,11 +558,27 @@ class osmc_backup(object):
 					log('User has escaped restore dialog')
 					continue
 
+
 				with tarfile.open(local_copy, 'r') as t:
 					for member in restore_items:
+
 						log('attempting to restore %s to %s' % (member.name, restore_location))
+
 						try:
-							t.extract(member, restore_location)
+							# if the item is userdata/guisettings.xml then restore it to the addon data folder, and create the flag
+							# (/RESET_GUISETTINGS) holding the location of the alternative backup location
+							if member.name.endswith('userdata/guisettings.xml') and self.restoring_guisettings:
+
+								t.extract(member, alt_restore_location)
+
+								with open('/RESET_GUISETTINGS', 'w') as f:
+									line1 = os.path.join(alt_restore_location,'userdata','guisettings.xml')
+									line2 = os.path.join(xbmc.translatePath('special://userdata')
+									f.write(line1)
+
+							else:
+								
+								t.extract(member, restore_location)
 
 						except Exception as e:
 							log('Extraction of %s failed' % member.name)
