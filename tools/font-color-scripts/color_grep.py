@@ -32,11 +32,9 @@ GOFFS_COLORS = 	{
 
 
 
-base_folder = 'C:\\Users\\kodonne\\Desktop\\GitHub\\osmc\\package\\mediacenter-addon-osmc\\src'
+base_folder = 'C:\\Users\\x\\Desktop\\GitHub\\osmc\\package\\mediacenter-addon-osmc\\src'
 
 for root, dirs, files in os.walk(base_folder, topdown=False):
-	if root == 'C:\\Users\\kodonne\\Desktop\\GitHub\\osmc\\package\\mediacenter-addon-osmc\\src\\script.module.elementtree':
-		continue
 
 	for name in files:
 		if name.endswith('.xml'):
