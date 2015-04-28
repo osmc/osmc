@@ -42,11 +42,13 @@ function build_fs_image()
 		disable_overscan=1
 		start_x=1" > config.txt
 	fi
+	echo -e "Creating boot tarball"
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
 	mv boot-${1}.tar.xz ../../
 	rm -rf *
 	popd
 	# NOOBS modifications, i.e. future 'health' script would be in .
+	echo -e "Creating root tarball"
 	tar -cf - * | xz -9 -c - > root-${1}.tar.xz
 	mv root-${1}.tar.xz ../
 	popd
