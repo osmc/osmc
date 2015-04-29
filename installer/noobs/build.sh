@@ -28,19 +28,19 @@ function build_fs_image()
 	if [ "$1" == "rbp1" ]
 	then
 		# Add Pi1 config.txt
-		echo "arm_freq=850
-		core_freq=375
-		gpu_mem_256=112
-		gpu_mem_512=144
-		hdmi_ignore_cec_init=1
-		disable_overscan=1
-		start_x=1" > config.txt
+		echo "arm_freq=850" >> config.txt
+		echo "core_freq=375" >> config.txt
+		echo "gpu_mem_256=112" >> config.txt
+		echo "gpu_mem_512=144" >> config.txt
+		echo "hdmi_ignore_cec_init=1" >> config.txt
+		echo "disable_overscan=1" >> config.txt
+		echo "start_x=1" >> config.txt
 	else
 		# Add Pi2 config.txt
-		echo "gpu_mem_1024=256
-		hdmi_ignore_cec_init=1
-		disable_overscan=1
-		start_x=1" > config.txt
+		echo "gpu_mem_1024=256" >> config.txt
+		echo "hdmi_ignore_cec_init=1" >> config.txt
+		echo "disable_overscan=1" >> config.txt
+		echo "start_x=1" >> config.txt
 	fi
 	echo -e "Creating boot tarball"
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
