@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- addonbrowser -->
-<backgroundcolor>ff203b4c</backgroundcolor><!--former_line<backgroundcolor>0xff18394a</backgroundcolor>-->
+	<backgroundcolor>ff203b4c</backgroundcolor>
+	<!--former_line<backgroundcolor>0xff18394a</backgroundcolor>-->
 	<defaultcontrol always="true">500</defaultcontrol>
 	<views>500</views>
 	<controls>
@@ -31,25 +32,25 @@
 		<control type="group">
 			<animation effect="fade" end="100" start="0" time="0">Visible</animation>
 			<!-- Image -->
-<!-- 			<control type="image">
-				<left>120</left>
-				<top>225</top>
-				<width>405</width>
-				<height>666</height>
-				<texture>$INFO[Container(500).ListItem.Icon]</texture>
-				<aspectratio aligny="center">keep</aspectratio>
-				<bordertexture border="1,1,1,69">DropShadow.png</bordertexture>
-				<bordersize>0,0,0,66</bordersize>
-			</control>
-			<control type="label">
-				<left>120</left>
-				<top>500</top>
-				<width>1018</width>
-				<height>90</height>
-<font>osmc_addon_font13</font><!--former_line<font>osmc_addon_font13</font>-->
-				<label>$INFO[ListItem.Icon]</label>
-				<textcolor>66ffffff</textcolor>
-			</control> -->
+			<!-- <control type="image">-->
+			<!-- <left>120</left>-->
+			<!-- <top>225</top>-->
+			<!-- <width>405</width>-->
+			<!-- <height>666</height>-->
+			<!-- <texture>$INFO[Container(500).ListItem.Icon]</texture>-->
+			<!-- <aspectratio aligny="center">keep</aspectratio>-->
+			<!-- <bordertexture border="1,1,1,69">DropShadow.png</bordertexture>-->
+			<!-- <bordersize>0,0,0,66</bordersize>-->
+			<!-- </control>-->
+			<!-- <control type="label">-->
+			<!-- <left>120</left>-->
+			<!-- <top>500</top>-->
+			<!-- <width>1018</width>-->
+			<!-- <height>90</height>-->
+			<!--former_line<font>osmc_addon_font13</font>-->
+			<!-- <label>$INFO[ListItem.Icon]</label>-->
+			<!-- <textcolor>66ffffff</textcolor>-->
+			<!-- </control>-->
 			<control id="500" type="fixedlist">
 				<left>750</left>
 				<centertop>50%</centertop>
@@ -64,15 +65,14 @@
 				<orientation>vertical</orientation>
 				<viewtype label="535">list</viewtype>
 				<scrolltime easing="out" tween="sine">240</scrolltime>
-				<!-- <visible>!IsEmpty(Container.FolderPath)</visible>-->
 				<itemlayout height="90" width="1050">
 					<control type="label">
 						<left>32</left>
 						<top>0</top>
 						<width>1018</width>
 						<height>90</height>
-<font>osmc_addon_Med</font><!--former_line<font>osmc_addon_OLD_Font36</font>-->
-						<!-- <font>osmc_addon_font13</font>-->
+						<font>osmc_addon_Med</font>
+						<!--former_line<font>osmc_addon_OLD_Font36</font>-->
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -83,12 +83,12 @@
 						<top>0</top>
 						<width>1018</width>
 						<height>180</height>
-<font>osmc_addon_720_XLarge</font><!--former_line<font>osmc_addon_OLD_Font72</font>-->
-						<!-- <font>osmc_addon_font13</font>-->
+						<font>osmc_addon_XLarge</font>
+						<!--former_line<font>osmc_addon_OLD_Font72</font>-->
 						<label>$INFO[ListItem.Label]</label>
-<textcolor>ff808080</textcolor><!--former_line<textcolor>ffffffff</textcolor>-->
+						<textcolor>ff808080</textcolor>
+						<!--former_line<textcolor>ffffffff</textcolor>-->
 						<shadowcolor>44000000</shadowcolor>
-						<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						<visible>IsEmpty(ListItem.Label2)</visible>
 					</control>
 					<control type="group">
@@ -98,25 +98,24 @@
 							<top>43</top>
 							<width>1018</width>
 							<height>48</height>
-<font>osmc_addon_XLarge</font><!--former_line<font>osmc_addon_OLD_Font48</font>-->
-							<!-- <font>osmc_addon_font13</font>-->
+							<font>osmc_addon_XLarge</font>
+							<!--former_line<font>osmc_addon_OLD_Font48</font>-->
 							<label>$INFO[ListItem.Label]</label>
-<textcolor>ff808080</textcolor><!--former_line<textcolor>ffffffff</textcolor>-->
+							<textcolor>ff808080</textcolor>
+							<!--former_line<textcolor>ffffffff</textcolor>-->
 							<shadowcolor>44000000</shadowcolor>
-							<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						</control>
 						<control type="label">
 							<left>32</left>
 							<top>100</top>
 							<width>1018</width>
 							<height>27</height>
-<font>osmc_addon_XSmall</font><!--former_line<font>osmc_addon_OLD_Font27</font>-->
-							<!-- <font>osmc_addon_font13</font>-->
+							<font>osmc_addon_XSmall</font>
+							<!--former_line<font>osmc_addon_OLD_Font27</font>-->
 							<label>$INFO[ListItem.Label2]</label>
 							<!-- <textcolor>66ffffff</textcolor>-->
 							<textcolor>88f0f0f0</textcolor>
 							<shadowcolor>44000000</shadowcolor>
-							<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						</control>
 					</control>
 				</focusedlayout>
@@ -137,7 +136,6 @@
 				<texturesliderbarfocus border="8,1,6,1" colordiffuse="ffffffff">ScrollbarGripFO.png</texturesliderbarfocus>
 				<textureslidernib>-</textureslidernib>
 				<textureslidernibfocus>-</textureslidernibfocus>
-				<!-- <visible>!Skin.HasSetting(Scrollbars) + Control.IsVisible(500)</visible>-->
 			</control>
 			<!-- action item text box -->
 			<control description="textbox background" type="image">
@@ -152,7 +150,8 @@
 				<top>240</top>
 				<width>380</width>
 				<height>550</height>
-<font>osmc_addon_XSmall</font><!--former_line<font>osmc_addon_OLD_Font27</font>-->
+				<font>osmc_addon_XSmall</font>
+				<!--former_line<font>osmc_addon_OLD_Font27</font>-->
 				<scrolltime>200</scrolltime>
 				<autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(1102)</autoscroll>
 			</control>
@@ -174,7 +173,8 @@
 					<width>231</width>
 					<height>44</height>
 					<label>$ADDON[script.module.osmcsetting.services 32001]</label>
-<font>osmc_addon_Small</font><!--former_line<font>osmc_addon_OLD_Font33</font>-->
+					<font>osmc_addon_Small</font>
+					<!--former_line<font>osmc_addon_OLD_Font33</font>-->
 					<!-- <visible>False</visible>-->
 					<texturefocus>TextShade.png</texturefocus>
 					<texturenofocus>single_pixel.png</texturenofocus>
@@ -187,7 +187,8 @@
 					<width>231</width>
 					<height>44</height>
 					<label>$ADDON[script.module.osmcsetting.services 32002]</label>
-<font>osmc_addon_Small</font><!--former_line<font>osmc_addon_OLD_Font33</font>-->
+					<font>osmc_addon_Small</font>
+					<!--former_line<font>osmc_addon_OLD_Font33</font>-->
 					<texturefocus>TextShade.png</texturefocus>
 					<texturenofocus>single_pixel.png</texturenofocus>
 					<focusedcolor>FFFFFFFF</focusedcolor>

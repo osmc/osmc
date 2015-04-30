@@ -53,8 +53,6 @@
 				<label>$INFO[ListItem.Icon]</label>
 				<textcolor>66ffffff</textcolor>
 			</control>
-			<!-- 			<control type="image"><left>120</left><top>225</top><width>405</width><height>600</height><texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture><aspectratio aligny="center">keep</aspectratio><bordertexture border="21,21,21,150">OverlayEffect.png</bordertexture><visible>!SubString(ListItem.Icon,Default) + Skin.HasSetting(Overlays)</visible></control>-->
-			<!-- 			<control type="image"><left>120</left><top>225</top><width>405</width><height>600</height><texture>$INFO[ListItem.Icon]</texture><colordiffuse>ffffffff</colordiffuse><aspectratio aligny="center">keep</aspectratio><visible>SubString(ListItem.Icon,Default)</visible></control>-->
 			<!-- List -->
 			<control id="500" type="fixedlist">
 				<left>750</left>
@@ -79,7 +77,6 @@
 						<height>90</height>
 						<font>osmc_addon_720_Med</font>
 						<!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
-						<!-- <font>osmc_addon_720_font13</font>-->
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>66ffffff</textcolor>
 					</control>
@@ -92,12 +89,10 @@
 						<height>180</height>
 						<font>osmc_addon_720_XLarge</font>
 						<!--former_line<font>osmc_addon_720_OLD_Font72</font>-->
-						<!-- <font>osmc_addon_720_font13</font>-->
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>ff808080</textcolor>
 						<!--former_line<textcolor>ffffffff</textcolor>-->
 						<shadowcolor>44000000</shadowcolor>
-						<!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
 						<visible>IsEmpty(ListItem.Label2)</visible>
 					</control>
 					<control type="group">
@@ -109,7 +104,6 @@
 							<height>48</height>
 							<font>osmc_addon_720_XLarge</font>
 							<!--former_line<font>osmc_addon_720_OLD_Font48</font>-->
-							<!-- <font>osmc_addon_720_font13</font>-->
 							<label>$INFO[ListItem.Label]</label>
 							<textcolor>ff808080</textcolor>
 							<!--former_line<textcolor>ffffffff</textcolor>-->
@@ -123,7 +117,6 @@
 							<height>27</height>
 							<font>osmc_addon_720_XSmall</font>
 							<!--former_line<font>osmc_addon_720_OLD_Font27</font>-->
-							<!-- <font>osmc_addon_720_font13</font>-->
 							<label>$INFO[ListItem.Label2]</label>
 							<!-- <textcolor>66ffffff</textcolor>-->
 							<textcolor>88f0f0f0</textcolor>
@@ -187,7 +180,6 @@
 					<!-- <visible>False</visible>-->
 					<font>osmc_addon_720_Small</font>
 					<!--former_line<font>osmc_addon_720_OLD_Font33</font>-->
-					<!-- <font>osmc_addon_720_font13</font>-->
 					<textcolor>66ffffff</textcolor>
 				</control>
 				<!-- remove count -->
@@ -198,7 +190,6 @@
 					<!-- <visible>False</visible>-->
 					<font>osmc_addon_720_Small</font>
 					<!--former_line<font>osmc_addon_720_OLD_Font33</font>-->
-					<!-- <font>osmc_addon_720_font13</font>-->
 					<textcolor>66ffffff</textcolor>
 					<align>center</align>
 				</control>
