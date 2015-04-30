@@ -15,4 +15,7 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install_divert PATH_DIV PATH_ORIG
 
 	install_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
+
+	systemctl stop udisks-glue.service >/dev/null 2>&1
+	exit 0
 fi
