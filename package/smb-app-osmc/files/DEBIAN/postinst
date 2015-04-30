@@ -21,7 +21,7 @@ if [ "$1" = "configure" ]; then
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]
 	then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
-		if dpkg --compare-versions "$2" lt "1.1.1" && [ ! -e /etc/samba/smb-shares.conf ]; then
+		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "1.1.1" && [ ! -e /etc/samba/smb-shares.conf ]; then
 
 			cat <<- 'EOF' > /etc/samba/smb-shares.conf
 			# Deprecated devices share. If you do not need this you can remove it.
