@@ -200,6 +200,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.wireless_status_label = None
 
+        self.hotspot_ssid = None
+
+        self.hotspot_passphrase = None
+
     def onInit(self):
         # Wired Network Label
         self.wired_status_label = self.getControl(WIRED_STATUS_LABEL);
@@ -223,9 +227,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if not osmc_bluetooth.is_bluetooth_available():
             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
-
-        if not osmc_network.get_connected_wifi():
-            self.toggle_controls(False, [SELECTOR_TETHERING])
 
         panel_to_show = SELECTOR_WIRED_NETWORK
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
@@ -914,6 +915,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.bluetooth_population_thread.update_bluetooth_lists()
                 self.clear_busy_dialogue()
 
+
     def populate_tethering_panel(self):
         wifi_tethering = osmc_network.is_tethering_wifi()
         ethernet_tethering = osmc_network.is_tethering_ethernet()
@@ -934,15 +936,17 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_controls(False, [TETHERING_DISABLE])
 
         wifiSSIDLabel = self.getControl(TETHERING_WIFI_SSID_VALUE)
-        ssid = osmc_network.get_tethering_SSID();
-        if not ssid:
-            ssid = 'osmc_wifi';
-        wifiSSIDLabel.setLabel(ssid)
-        passphrase = osmc_network.get_tethering_passphrase();
-        if not passphrase:
-            passphrase = 'h0tsp0t0smc'
+        self.hotspot_ssid  = osmc_network.get_tethering_SSID();
+        if not self.hotspot_ssid:
+            self.hotspot_ssid = 'osmc_wifi';
+        wifiSSIDLabel.setLabel(self.hotspot_ssid)
+        self.hotspot_passphrase = osmc_network.get_tethering_passphrase();
+        if not self.hotspot_passphrase:
+            self.hotspot_passphrase = 'h0tsp0t0smc'
+        control_label = ' '.join([self.hotspot_passphrase[i: i + 33] for i in
+                                  xrange(0, len(self.hotspot_passphrase), 33)])
         wifiPassphaseLabel = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
-        wifiPassphaseLabel.setLabel(passphrase)
+        wifiPassphaseLabel.setLabel(control_label)
 
     def handle_tethering_selection(self, control_id):
         if control_id in [TETHERING_WIFI_RADIOBUTTON, TETHERING_ETHERNET_RADIOBUTTON]:
@@ -965,17 +969,20 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if control_id == TETHERING_WIFI_SSID_LABEL:
             wifiSSIDLabel = self.getControl(TETHERING_WIFI_SSID_VALUE)
-            currentSSID = wifiSSIDLabel.getLabel()
-            enteredSSID = DIALOG.input(lang(32068), currentSSID)
+            enteredSSID = DIALOG.input(lang(32068), self.hotspot_ssid)
             if enteredSSID:
+                self.hotspot_ssid = enteredSSID
                 wifiSSIDLabel.setLabel(enteredSSID)
 
         if control_id == TETHERING_WIFI_PASSPHRASE_LABEL:
-            wifiPassphaseLabel = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
-            currentPassphrase = wifiPassphaseLabel.getLabel()
-            enteredPassphras = DIALOG.input(lang(32069), currentPassphrase)
-            if enteredPassphras:
-                wifiPassphaseLabel.setLabel(enteredPassphras)
+            wifiPassphraseLabel = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
+            currentPassphrase =self.hotspot_passphrase
+            enteredPassphrase = DIALOG.input(lang(32069), currentPassphrase)
+            if enteredPassphrase:
+                self.hotspot_passphrase = enteredPassphrase
+                control_label = ' '.join([self.hotspot_passphrase[i: i + 33] for i in
+                                  xrange(0, len(self.hotspot_passphrase), 33)])
+                wifiPassphraseLabel.setLabel(control_label)
 
         if control_id == TETHERING_ENABLE:
             wifi_radiobutton = self.getControl(TETHERING_WIFI_RADIOBUTTON)
@@ -984,13 +991,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             passphrase = None
             if wifi_radiobutton.isSelected():
                 technology = 'wifi'
-                ssid = self.getControl(TETHERING_WIFI_SSID_VALUE).getLabel()
+                ssid = self.hotspot_ssid
                 if len(ssid) == 0:
                     # 'Portable Hotspot'
                     # 'SSID must be set to enable WiFi Tethering'
                     DIALOG.ok(lang(32063), lang(32070))
                     return
-                passphrase = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE).getLabel()
+                passphrase = self.hotspot_passphrase
+                if len(passphrase) > 63:
+                    # 'Portable Hotspot'
+                    # 'Passphrase must be 63 characters or less"'
+                    DIALOG.ok(lang(32063), lang(32074))
+                    return
                 if len(passphrase) < 8:
                     # 'Portable Hotspot'
                     # 'Passphrase must at least 8 characters long'
