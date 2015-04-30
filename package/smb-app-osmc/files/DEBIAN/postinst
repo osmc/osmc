@@ -17,6 +17,25 @@ if [ "$1" = "configure" ]; then
 	# work around for: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762080
 	mkdir -p /var/log/samba
 
+	# only do this for upgrade not install
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]
+	then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
+		if dpkg --compare-versions "$2" lt "1.1.1" && [ ! -e /etc/samba/smb-shares.conf ]; then
+
+			cat <<- 'EOF' > /etc/samba/smb-shares.conf
+			# Deprecated devices share. If you do not need this you can remove it.
+			[devices]
+			    browsable = yes
+			    read only = no
+			    valid users = osmc
+			    path = /media
+			    force user = root
+			    comment = Deprecated (Please use the Auto-mount Volume shares)
+			EOF
+		fi
+	fi
+
 	# only do this for install not upgrade
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]
 	then
