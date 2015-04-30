@@ -29,6 +29,7 @@
 # 4 = ethernet interface not connected
 # 5 = wireless network not found
 # 6 = wireless network found but could not connect
+# 7 = Agent failed to start
 
 import syslog
 import os.path
@@ -36,6 +37,7 @@ import dbus
 import os
 import time
 import sys
+import subprocess
 
 def getvalue(valuestring):
 	splitvalue = valuestring.split(' ',3)
@@ -58,6 +60,7 @@ def main():
 		network = {}
 		network["interface"] = "eth"
 		network["auto"] = "true"
+                network["hidden"] = "false"
 		bus = dbus.SystemBus()
 		manager = dbus.Interface(bus.get_object('net.connman', '/'), 'net.connman.Manager')
 		for line in file:
@@ -97,7 +100,10 @@ def main():
 					log_key = wlan_key
 				syslog.syslog("WLAN key is set to " + log_key)
 				network["keyvalue"] = wlan_key
-
+                        if line.startswith("d-i network/hidden boolean"):
+				syslog.syslog("hidden is set to " + getvalue(line))
+				network["hidden"] = getvalue(line)
+                                
 		syslog.syslog("Parsing completed. Performing setup")
 		if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
 			syslog.syslog("Non-standard network setup specified")
@@ -160,71 +166,104 @@ def main():
 				for entry in services:
 					path = entry[0]
 					properties = entry[1]
-					if path.startswith("/net/connman/service/wifi") is False:
-						continue
-					try:
-						svcname = properties["Name"]
-						syslog.syslog("Detected wireless network " + properties["Name"] + " during scan")
-					except:
-						# Hidden networks have no Name key in dictionary entry causing an exception.
-						syslog.syslog("Detected hidden wireless network during scan")
-						continue
-					if network["ssid"] == svcname:
-						syslog.syslog("Found SSID entry point for " + network["ssid"] + " at " + path)
-						network_found = True
-						service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
-						if network["keytype"] == "0":
-							syslog.syslog("Open network does not need an agent. Attempting connection")
-							try:
-								syslog.syslog("Attempting connection now")
-								service.Connect(timeout=15000)
-							except dbus.DBusException, error:
-								syslog.syslog("Could not connect. Network is probably actually encrypted and not open")
-								sys.exit(6)
-						else:
-							syslog.syslog("Encrypted network: need to set up an agent")
-							keyfile = open("/tmp/key", "w")
-							keyfile.write(network["keyvalue"])
-							keyfile.close()
-							os.system("/bin/sh -c \"/usr/bin/python /usr/bin/preseed-agent keyfile &\"")
-							count = 0
-                                                        while not os.path.exists('/tmp/agent_started'):
-                                                            count+=1
-                                                            time.sleep(1)
-                                                            if count > 10:
-                                                                syslog.syslog('Agent had not started after 10 seconds')
+                                        if network["hidden"] == "false":
+                                                if not path.startswith("/net/connman/service/wifi"):
+                                                        continue
+                                                try:
+                                                        svcname = properties["Name"]
+                                                        syslog.syslog("Detected wireless network " + properties["Name"] + " during scan")
+                                                except:
+                                                        # Hidden networks have no Name key in dictionary entry causing an exception.
+                                                        syslog.syslog("Detected hidden wireless network during scan")
+                                                        continue
+                                                if network["ssid"] == svcname:
+                                                        syslog.syslog("Found SSID entry point for " + network["ssid"] + " at " + path)
+                                                        network_found = True
+                                                        service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
+                                                        break
+                                        else: # hidden network
+                                                syslog.syslog('Looking for hidden network entry ' + path)
+                                                if network["keytype"] == "0":
+                                                        if path.endswith("hidden_managed_none"):
+                                                                syslog.syslog("Found open but hidden network at " + path)
+                                                                network_found = True
+                                                                service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
                                                                 break
-                                                        if os.path.exists('/tmp/agent_started'):
-                                                            os.remove('/tmp/agent_started')
-
-							try:
-								syslog.syslog("Attempting connection now")
-								service.Connect(timeout=15000)
-							except dbus.DBusException, error:
-								syslog.syslog("Could not connect to network. Please check the key is correct")
-								sys.exit(6)
-
-						if network["auto"] == "false":
-							syslog.syslog("Configuring static wireless connection")
-							properties = service.GetProperties()
-							syslog.syslog("Setting ip, mask and gateway")
-							ipv4_configuration = { "Method": make_variant("manual") }
-							ipv4_configuration["Address"] = make_variant(network["ip"])
-							ipv4_configuration["Netmask"] = make_variant(network["mask"])
-							ipv4_configuration["Gateway"] = make_variant(network["gw"])
-							service.SetProperty("IPv4.Configuration", ipv4_configuration)
-							time.sleep(2)
-							syslog.syslog("Setting nameservers")
-							dns = { network["dns1"], network["dns2"] }
-							# duplicate SetProperty message works around connman dns forwarder bug
-							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
-							service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
-						break
+                                                else:
+                                                        if path.endswith("_hidden_managed_psk"):
+                                                                syslog.syslog("Found (psk) encyrypted hidden network at " + path)
+                                                                network_found = True
+                                                                service = dbus.Interface(bus.get_object("net.connman", path), "net.connman.Service")
+                                                                break
+                                                        
 
 				if network_found is False:
 					syslog.syslog("Unable to find wireless network " + network ["ssid"])
 					sys.exit(5)
+                                        
+                                agentRequired =  not network["keytype"] == "0" or network["hidden"] == "true"
+                                if agentRequired:
+                                        syslog.syslog("Hidden and or protected network need to setup an agent")
+                                        preseeddata = open("/tmp/preseed_data", "w")
+                                        if not network["keytype"] == "0":
+                                                syslog.syslog('Protected Network - Writting key to preseed_data for agent')
+                                                preseeddata.write(network["keyvalue"])
+                                        preseeddata.write('\n')
+                                        if network["hidden"] == "true":
+                                                syslog.syslog('Encrypted Network - Writting SSID to preseed_data for agent')
+                                                preseeddata.write(network["ssid"])
+                                        preseeddata.write('\n')
+                                        preseeddata.close()
+                                        process = subprocess.Popen([sys.executable, '/usr/bin/preseed-agent', 'fromfile'])
+                                        count = 0
+                                        while not os.path.exists('/tmp/agent_started'):
+                                                count+=1
+                                                time.sleep(1)
+                                                if count > 10:
+                                                        syslog.syslog('Agent has not started after 10 seconds - Aborting')
+                                                        exit(7)
+                                        if os.path.exists('/tmp/agent_started'):
+                                                os.remove('/tmp/agent_started')
+                                        syslog.syslog('Agent Started')
+                                else:        
+                                        syslog.syslog("Open network does not need an agent. Attempting connection")
+                                connected = True
+                                try:
+                                        syslog.syslog("Attempting connection now")
+                                        service.Connect(timeout=15000)
+                                except dbus.DBusException, error:
+                                        syslog.syslog("Could not connect")
+                                        connected = False
 
+                                syslog.syslog("Cleaning up deleteing /tmp/preseed_data and killing Agent")
+                                if agentRequired:
+                                        if os.path.exists('/tmp/preseed_data'):
+                                                os.remove('/tmp/preseed_data')
+                                        process.kill()
+
+                                if not connected:
+                                        sys.exit(6)
+                        
+                                                
+
+                                        
+                                if network["auto"] == "false":
+                                        syslog.syslog("Configuring static wireless connection")
+                                        properties = service.GetProperties()
+                                        syslog.syslog("Setting ip, mask and gateway")
+                                        ipv4_configuration = { "Method": make_variant("manual") }
+                                        ipv4_configuration["Address"] = make_variant(network["ip"])
+                                        ipv4_configuration["Netmask"] = make_variant(network["mask"])
+                                        ipv4_configuration["Gateway"] = make_variant(network["gw"])
+                                        service.SetProperty("IPv4.Configuration", ipv4_configuration)
+                                        time.sleep(2)
+                                        syslog.syslog("Setting nameservers")
+                                        dns = { network["dns1"], network["dns2"] }
+                                        # duplicate SetProperty message works around connman dns forwarder bug
+                                        service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+                                        service.SetProperty("Nameservers.Configuration", dbus.Array(dns, signature=dbus.Signature('s')))
+
+	
 	else:
 		syslog.syslog("No preseed file found")
 		sys.exit(3)
