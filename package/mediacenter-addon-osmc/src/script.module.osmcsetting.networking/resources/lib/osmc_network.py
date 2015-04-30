@@ -249,12 +249,17 @@ def get_wifi_networks():
     for entry in manager.GetServices():
         path = entry[0]
         dbus_properties = entry[1]
-        if path.startswith(WIFI_PATH) and 'hidden' not in path:
-            wifi_settings = {'path': str(path), 'SSID': dbus_properties['Name'].encode('UTF-8'),
-                     'Strength': int(dbus_properties['Strength']), 'State' : str(dbus_properties['State'])}
+        if path.startswith(WIFI_PATH):
+            wifi_settings = {'path': str(path), 'Strength': int(dbus_properties['Strength']),
+                             'State' : str(dbus_properties['State'])}
             security_props = dbus_properties['Security']
             if len(security_props) > 0:
                 wifi_settings['Security'] = str(security_props[0])
+            if 'hidden' not in path:
+                wifi_settings['SSID'] = dbus_properties['Name'].encode('UTF-8')
+            else:
+                wifi_settings['SSID'] = '< Hidden (' + wifi_settings['Security'] + ') >'
+
             if not str(dbus_properties['State']) == 'idle' and not str(dbus_properties['State']) == 'failure':
                 settings = extract_network_properties(dbus_properties)
                 if settings:
@@ -271,14 +276,20 @@ def get_wifi_networks():
 
 
 
-def wifi_connect(path, password=None):
+def wifi_connect(path, password=None, ssid=None):
     connected = False
-    if password:
+    if password or ssid:
         print('Starting Wireless Agent')
-        keyfile = open('/tmp/key', 'w')
-        keyfile.write(password)
+        keyfile = open('/tmp/preseed_data', 'w')
+        if password:
+            print('Setting password')
+            keyfile.write(password)
+        keyfile.write('\n')
+        if ssid:
+            print('Setting password')
+            keyfile.write(ssid)
         keyfile.close()
-        process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'keyfile'])
+        process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'fromfile'])
     count = 0
     while not os.path.exists('/tmp/agent_started'):
         count += 1
@@ -297,9 +308,9 @@ def wifi_connect(path, password=None):
         print ('DBusException connecting ' + str(e))
         connected = False
     print ('Connection to ' + path + ' : ' + str(connected))
-    if password:
+    if password or ssid:
         process.kill()
-        os.remove('/tmp/key')
+        #os.remove('/tmp/preseed_data')
     return connected
 
 
@@ -337,10 +348,10 @@ def has_internet_connection():
             elif 'State' in ethernet_settings and ethernet_settings['State'] == 'online':
                 return True
     for address, wifis in get_wifi_networks().iteritems():
-	for ssid in wifis.keys():
-        	info = wifis[ssid]
-        	if info['State'] == 'online':
-            		return True
+        for ssid in wifis.keys():
+            info = wifis[ssid]
+            if info['State'] == 'online':
+                return True
     return False
 
 

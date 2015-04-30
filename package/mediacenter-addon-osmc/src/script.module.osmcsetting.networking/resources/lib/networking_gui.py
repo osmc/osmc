@@ -224,6 +224,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if not osmc_bluetooth.is_bluetooth_available():
             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
 
+        if not osmc_network.get_connected_wifi():
+            self.toggle_controls(False, [SELECTOR_TETHERING])
+
         panel_to_show = SELECTOR_WIRED_NETWORK
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.preseed_data = osmc_network.parse_preseed()
@@ -716,11 +719,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if connected == 'False':
             if not self.conn_ssid:  # if we are not connected to a network connect
                 if self.connect_to_wifi(ssid, encrypted):
-                    strength = self.current_network_config['Strength']
-                    icon = wifi_populate_bot.get_wifi_icon(encrypted,strength / 25,True)
-                    item.setIconImage(icon)
-                    item.setProperty('Connected', 'True')
-                    self.conn_ssid = ssid
+                    if '_hidden_' not in path:
+                        strength = self.current_network_config['Strength']
+                        icon = wifi_populate_bot.get_wifi_icon(encrypted, strength / 25, True)
+                        item.setIconImage(icon)
+                        item.setProperty('Connected', 'True')
 
             else:  # Display a toast asking the user to disconnect first
                 # 'Please disconnect from the current network before connecting'
@@ -765,10 +768,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.wireless_status_label.setLabel(lang(32016))
             path = wifi['path']
             connection_status = False
-            # 'Wireless'   'Connect to'
-            if DIALOG.yesno(lang(32041), lang(32052) + ' ' + ssid + '?'):
+            hiddenssid = None
+            connect = False
+            if '_hidden_' in path :
+                # 'Enter SSID to connect to this hidden network'
+                hiddenssid = DIALOG.input(lang(32073))
+            else:
+                # 'Wireless'   'Connect to'
+                if DIALOG.yesno(lang(32041), lang(32052) + ' ' + ssid + '?'):
+                    connect = True
+            if connect or hiddenssid:
                 self.show_busy_dialogue()
-                connection_status = osmc_network.wifi_connect(path)
+                # try without a password see if connman has the password
+                connection_status = osmc_network.wifi_connect(path, None, hiddenssid)
                 self.clear_busy_dialogue()
                 if not connection_status and encrypted:
                     if password is None:
@@ -777,7 +789,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     if password:
                         self.wireless_password = password
                         self.show_busy_dialogue()
-                        connection_status = osmc_network.wifi_connect(path, password)
+                        connection_status = osmc_network.wifi_connect(path, password, hiddenssid)
                         self.clear_busy_dialogue()
                 if not connection_status:
                     # 'Connection to '                  'failed'
@@ -794,12 +806,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     return False
                 else:
                     self.show_busy_dialogue()
-                    self.current_network_config = self.get_wireless_config(ssid)
+                    self.current_network_config = osmc_network.get_connected_wifi()
                     self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
                     self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_NETWORKS,
                                                 WIRELESS_DHCP_MANUAL_BUTTON])
-                    self.conn_ssid = ssid
+                    self.conn_ssid = self.current_network_config['SSID']
                     interface = self.current_network_config['Interface']
                     if osmc_network.has_internet_connection():
                         # 'Status'                               'Connected'
@@ -1184,10 +1196,13 @@ class wifi_populate_bot(threading.Thread):
             listItem = self.WFP.getListItem(itemIndex)
             listItemAdapterAddress = listItem.getProperty('AdapterAddress')
             listItemSSID = listItem.getProperty('SSID')
+            listItemConnected = True if listItem.getProperty('Connected') in 'True' else False
             if listItemAdapterAddress in running_dict.keys():
                     if listItemSSID in running_dict[listItemAdapterAddress].keys():
-                        expectedLabel = self.getListItemLabel(running_dict[listItemAdapterAddress][listItemSSID], multiAdpter);
-                        if listItem.getLabel() == expectedLabel:
+                        wifi = running_dict[listItemAdapterAddress][listItemSSID]
+                        networkConnected = True if wifi['State']in ('ready', 'online') else False
+                        expectedLabel = self.getListItemLabel(wifi, multiAdpter);
+                        if listItem.getLabel() == expectedLabel and listItemConnected == networkConnected:
                             running_dict[listItemAdapterAddress].pop(listItemSSID)
                         else:
                             items_to_be_removed.append(itemIndex)
