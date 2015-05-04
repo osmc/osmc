@@ -1,0 +1,38 @@
+diff --git a/xbmc/addons/AddonInstaller.cpp b/xbmc/addons/AddonInstaller.cpp
+index 290d491..9f07891 100644
+--- a/xbmc/addons/AddonInstaller.cpp
++++ b/xbmc/addons/AddonInstaller.cpp
+@@ -213,8 +213,21 @@ bool CAddonInstaller::Install(const std::string &addonID, bool force /* = false
+   return DoInstall(addon, hash, addonInstalled, referer, background, modal);
+ }
+ 
++bool CAddonInstaller::IsBadAddon(std::string addonName)
++{
++  if (addonName == "plugin.video.genesis" || addonName == "repository.xunitytalk" || addonName == "script.allinone" || addonName == "plugin.video.xunity" || addonName == "plugin.video.1channel" || addonName == "plugin.video.icefilms" || addonName == "plugin.video.phstreams")
++  {
++      return CGUIDialogYesNo::ShowAndGetInput("Potentially unwanted addon: " + addonName, "This addon is known to cause issues with OSMC installations.", "We recommend that you do not install it and cannot provide support for it. Do not ask for support in the forum.", "Would you like to continue with installation?", "Cancel Install", "I accept the risk");
++  }
++  return false;
++}
++
+ bool CAddonInstaller::DoInstall(const AddonPtr &addon, const std::string &hash /* = "" */, bool update /* = false */, const std::string &referer /* = "" */, bool background /* = true */, bool modal /* = false */)
+ {
++  // check whether the addon is dodgy
++  if (IsBadAddon(addon->ID()))
++       return false;
++
+   // check whether we already have the addon installing
+   CSingleLock lock(m_critSection);
+   if (m_downloadJobs.find(addon->ID()) != m_downloadJobs.end())
+diff --git a/xbmc/addons/AddonInstaller.h b/xbmc/addons/AddonInstaller.h
+index ede0e5c..193c234 100644
+--- a/xbmc/addons/AddonInstaller.h
++++ b/xbmc/addons/AddonInstaller.h
+@@ -147,6 +147,7 @@ private:
+    \return true if dependencies are available, false otherwise.
+    */
+   bool CheckDependencies(const ADDON::AddonPtr &addon, std::vector<std::string>& preDeps, CAddonDatabase &database);
++  bool IsBadAddon(std::string addonName);
+ 
+   void PrunePackageCache();
+   int64_t EnumeratePackageFolder(std::map<std::string,CFileItemList*>& result);
