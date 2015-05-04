@@ -46,7 +46,7 @@
 		<?php wp_head(); ?>
 		
 		<!-- inject:css -->
-		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/style.css">
+		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-7f81ba68.css">
 		<!-- endinject -->
         
 	</head>

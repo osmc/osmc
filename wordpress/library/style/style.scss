@@ -271,10 +271,12 @@ $blue-s3: #0C5B8E;
 
 // Header //
 
+$home-header: rgba(14, 61, 82, 0.52);
+
 .home.page {
   .header {
     backface-visibility: hidden;
-    background-color: rgba(14, 69, 82, 0.55);
+    background-color: $home-header;
     box-shadow: none;
     z-index: 200;
     
@@ -286,7 +288,7 @@ $blue-s3: #0C5B8E;
 
 @media screen and (max-width: $res) {
   .home.page .header .container .nav-header .top-nav {
-    background-color: rgba(14, 69, 82, 0.55);
+    background-color: $home-header;
     top: 3.15em;
     border-top: 1px solid rgba(163, 163, 163, 0.66);
   }
@@ -384,7 +386,7 @@ $blue-s3: #0C5B8E;
         display: table-cell;
         vertical-align: middle;
         float: none;
-        padding-bottom: 3.5em;
+        padding-bottom: 2.5em;
         @include user-select(none);
         @include transition-duration(0.6s);
         @include transition-timing-function(ease-in);
@@ -565,8 +567,8 @@ $blue-s3: #0C5B8E;
           
           
         .playicon {
-          width: 3.2em;
-          height: 3.2em;
+          width: 50px;
+          height: 50px;
           position: absolute;
           top: 0;
           bottom: 0;
