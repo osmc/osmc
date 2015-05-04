@@ -470,6 +470,7 @@ $blue-s3: #0C5B8E;
         position: relative;
         float: left;
         @include box-shadow(0 0 10px rgba(58, 128, 106, 0.65));
+				background-color: $dark;
         
         .monitor {
           width: 100%;
@@ -487,7 +488,7 @@ $blue-s3: #0C5B8E;
           }
           
           line, polygon {
-            stroke: $black;
+            stroke: $dark;
             stroke-width: 5;
           }
         }
@@ -496,25 +497,36 @@ $blue-s3: #0C5B8E;
         
         .video-wrap {
           position: relative;
+					border: $mon-border solid $dark;
+					background-color: $dark;
+					text-align: center;
+					overflow: hidden;
           
           video {
             position: relative;
-            border: $mon-border solid $black;
+            border: 0;
             width: 100%;
             float: left;
           }
           #player {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 101%;
+            height: 101%;
+						top: 0;
+						bottom: 0;
+						left: 0;
+						right: 0;
+						background-color: $dark;
             
             .player-poster {
-              border: 5px solid $trans;
+              border: 0;
             }
           }
           
           .size-fix {
+						width: 100%;
             opacity: 0;
+						vertical-align: middle;
           }
         }        
         
@@ -527,7 +539,7 @@ $blue-s3: #0C5B8E;
           right: 0;
           left: 0;
           margin: auto;
-          border: $mon-border solid $black;
+          //border: $mon-border solid $black;
           background-color: rgba(0, 255, 255, 0.35);
           cursor: pointer;
           @include transition-duration(0.4s);
@@ -547,7 +559,7 @@ $blue-s3: #0C5B8E;
           left: 0;
           margin: auto;
           @include box-shadow(inset 0 0 60px rgba(0, 0, 0, 0.40));
-          border: $mon-border solid $trans;
+          //border: $mon-border solid $trans;
           cursor: pointer;
         }
           
