@@ -1,20 +1,12 @@
 <!doctype html>
 
-<!--[if lt IE 7]><html <?php language_attributes(); ?> class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if (IE 7)&!(IEMobile)]><html <?php language_attributes(); ?> class="no-js lt-ie9 lt-ie8"><![endif]-->
-<!--[if (IE 8)&!(IEMobile)]><html <?php language_attributes(); ?> class="no-js lt-ie9"><![endif]-->
-<!--[if gt IE 8]><!--> <html <?php language_attributes(); ?> class="no-js"><!--<![endif]-->
+<!--[if IE 9]> <html class="ie9"> <![endif]-->
 
 	<head>
 		<meta charset="utf-8">
-
-		<?php // Google Chrome Frame for IE ?>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
 		<title><?php bloginfo('name'); ?> <?php wp_title(); ?></title>
 		<meta name="description" content="<?php echo get_bloginfo ( 'description' );  ?>">
-
-		<?php // mobile meta (hooray!) ?>
 		<meta name="HandheldFriendly" content="True">
 		<meta name="MobileOptimized" content="320">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -43,14 +35,30 @@
         
 		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
 		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
+		
+		<!--[if lte IE 8]> 
+		<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.0/outdatedbrowser.min.js"></script><link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/lib/outdatedbrowser.min.css">
+		<![endif]-->
+		
 		<?php wp_head(); ?>
         <!-- inject:css -->
-        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-0072e0fc.css">
+        <link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/style.css">
         <!-- endinject -->
         
 	</head>
 
 	<body <?php body_class(); ?>>
+    <div id="outdated"></div>
+    <!--[if lte IE 8]>
+    <script>
+    outdatedBrowser({
+    bgColor: '#41c5cb',
+    color: '#ffffff',
+    lowerThan: 'transform',
+    languagePath: 'your_path/outdatedbrowser/lang/en.html'
+    });
+    </script>
+    <![endif]-->
 
 		<div id="container">
 
