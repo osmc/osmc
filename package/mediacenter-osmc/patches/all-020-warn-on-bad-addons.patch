@@ -10,7 +10,7 @@ index 290d491..9f07891 100644
 +{
 +  if (addonName == "plugin.video.genesis" || addonName == "repository.xunitytalk" || addonName == "script.allinone" || addonName == "plugin.video.xunity" || addonName == "plugin.video.1channel" || addonName == "plugin.video.icefilms" || addonName == "plugin.video.phstreams")
 +  {
-+      return CGUIDialogYesNo::ShowAndGetInput("Potentially unwanted addon: " + addonName, "This addon is known to cause issues with OSMC installations.", "We recommend that you do not install it and cannot provide support for it. Do not ask for support in the forum.", "Would you like to continue with installation?", "Cancel Install", "I accept the risk");
++      return ! CGUIDialogYesNo::ShowAndGetInput("Potentially unwanted addon: " + addonName, "This addon is known to cause issues with OSMC installations.", "We recommend that you do not install it and cannot provide support for it. Do not ask for support in the forum.", "Would you like to continue with installation?", "Cancel Install", "I accept the risk");
 +  }
 +  return false;
 +}
