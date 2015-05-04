@@ -6,34 +6,16 @@ import sys
 from datetime import datetime
 import json
 import os
-import time
-import subprocess
 import traceback
-from CompLogger import comprehensive_logger as clog
 
 t = datetime
 
-class Logger(object):
-	def __init__(self, filename="Default.log"):
-		self.terminal = sys.stdout
-		self.log = open(filename, "a")
 
-	def write(self, message):
-		self.terminal.write(message)
-		self.log.write(message)
-
-try:
-	sys.stdout = Logger("/var/tmp/OSMC_python_apt_log.txt")
-except:
-	pass
-
-
-# @clog(maxlength=1500)
 def call_parent(raw_message, data={}):
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
 	
-	print '%s %s sending response' % (t.now(), 'apt_cache_action.py')
+	# print '%s %s sending response' % (t.now(), 'apt_cache_action.py')
 
 	message = (raw_message, data)
 
@@ -63,8 +45,8 @@ class Main(object):
 		# with apt.apt_pkg.SystemLock():
 		# implements a lock on the package system, so that nothing else can alter packages
 
-		print '==================================================================='
-		print '%s %s running' % (t.now(), 'apt_cache_action.py')
+		# print '==================================================================='
+		# print '%s %s running' % (t.now(), 'apt_cache_action.py')
 
 		self.error_package = ''
 		
@@ -94,9 +76,9 @@ class Main(object):
 		
 		except Exception as e:
 		
-			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
+			# print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
 		
-			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
+			# print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
 			deets = 'Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc())
 
@@ -105,8 +87,8 @@ class Main(object):
 
 		self.respond()
 
-		print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
-		print '==================================================================='
+		# print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
+		# print '==================================================================='
 
 
 	def respond(self):
@@ -124,10 +106,12 @@ class Main(object):
 
 		else:
 
-			print 'Action not in action_to_method dict'
+			# print 'Action not in action_to_method dict'
+			pass
 
 
-	#@clog()
+
+	
 	def action_list(self):
 
 		''' This method processes a list sent in argv[2], and either installs or remove packages. 
@@ -185,7 +169,7 @@ class Main(object):
 				self.commit_action()
 
 
-	# #@clog()
+	# 
 	def parse_argv2(self, action_string):
 
 		install = []
@@ -206,7 +190,7 @@ class Main(object):
 		return {'install': install, 'removal': removal}
 
 
-	#@clog()
+	
 	def update(self):
 
 		# call the parent and kill the pDialog, now handled in on exit
@@ -224,7 +208,7 @@ class Main(object):
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
 
-	#@clog()
+	
 	def commit(self):
 
 
@@ -238,16 +222,16 @@ class Main(object):
 		
 				return "%s is BROKEN, cannot proceed with commit" % pkg.shortname
 
-		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
+		# print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 		
 		self.cache.upgrade(True)
 
-		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
+		# print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
 
 		self.commit_action()
 
 
-	#@clog()
+	
 	def commit_action(self):
 
 		dprg = Download_Progress()
@@ -272,14 +256,14 @@ class Main(object):
 		return '%s %s cache committed' % (t.now(), 'apt_cache_action.py')
 		
 
-	#@clog()
+	
 	def fetch(self):
 
 		self.cache = apt.Cache()
 
 		self.cache.upgrade(True)
 
-		print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
+		# print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
 
 		dprg = Download_Progress()
 
@@ -316,15 +300,15 @@ class Install_Progress(apt.progress.base.InstallProgress):
 		
 		call_parent('progress_bar', {'percent': 0,  'heading': self.parent.heading, 'message':'Starting Installation'})
 
-	#@clog()
+	
 	def error(self, pkg, errormsg):
 
-		print 'ERROR!!! \n%s\n' % errormsg
+		# print 'ERROR!!! \n%s\n' % errormsg
 
 		try:
 			pkgname = os.path.basename(pkg).split('_')
 
-			print 'Package affected!!! \n%s\n' % pkgname
+			# print 'Package affected!!! \n%s\n' % pkgname
 
 			self.parent.error_package = pkgname[0]
 
@@ -359,7 +343,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	# The following methods should be overridden to implement progress reporting for run() calls 
 	# with an apt_pkg.PackageManager object as their parameter:
 
-	#@clog()
+	
 	def status_change(self, pkg, percent, status):
 		''' This method implements progress reporting for package installation by APT and may be extended to 
 			dpkg at a later time. This method takes two parameters: The parameter percent is a float value 
@@ -376,7 +360,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		call_parent('progress_bar', {'percent': int(percent),  'heading': self.parent.heading, 'message': status})
 
-	#@clog()
+	
 	def start_update(self):
 		''' This method is called before the installation of any package starts. '''
 
@@ -385,7 +369,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	#@clog()
+	
 	def finish_update(self):
 		''' This method is called when all changes have been applied. '''
 
@@ -400,7 +384,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		self.partial_heading = partial_heading
 		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
 
-	#@clog()
+	
 	def start(self):
 		''' Invoked when the Acquire process starts running. '''
 
@@ -409,13 +393,13 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return 'Start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	#@clog()
+	
 	def stop(self):
 		''' Invoked when the Acquire process stops running. '''
 
 		return 'Stop !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
-	#@clog()
+	
 	def fetch(self, item):
 		''' Invoked when an item is being fetched. '''
 
@@ -427,7 +411,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
 
-	#@clog()
+	
 	def pulse(self, owner):
 		''' Periodically invoked as something is being downloaded. '''
 
@@ -444,14 +428,14 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		
 			self.pulse_time = t.now()
 		
-			print 'Pulse ==========================================='
-			print 'current_items', self.current_items
-			print 'total_items', self.total_items 
-			print 'total_bytes', self.total_bytes
-			print 'fetched_bytes', self.fetched_bytes 
-			print 'current_bytes', self.current_bytes
-			print 'current_cps', self.current_cps 
-			print 'Pulse ==========================================='
+			# print 'Pulse ==========================================='
+			# print 'current_items', self.current_items
+			# print 'total_items', self.total_items 
+			# print 'total_bytes', self.total_bytes
+			# print 'fetched_bytes', self.fetched_bytes 
+			# print 'current_bytes', self.current_bytes
+			# print 'current_cps', self.current_cps 
+			# print 'Pulse ==========================================='
 
 			pct = int(self.current_bytes / float(self.total_bytes) * 100)
 
@@ -477,7 +461,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 		return True
 
-	#@clog()
+	
 	def done(self, item):
 		''' Invoked when an item has finished downloading. '''
 
