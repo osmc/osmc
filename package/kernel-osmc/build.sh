@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="3.18.11" && REV="2"
 test $1 == rbp2 && VERSION="3.18.11" && REV="2"
-test $1 == vero && VERSION="3.14.37" && REV="7"
+test $1 == vero && VERSION="3.14.37" && REV="8"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
