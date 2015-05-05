@@ -14,6 +14,7 @@ then
 	out=$(pwd)/files
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
+        sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-splash-osmc" >> files/DEBIAN/control
 	echo "Depends: fbset" >> files/DEBIAN/control
 	update_sources
