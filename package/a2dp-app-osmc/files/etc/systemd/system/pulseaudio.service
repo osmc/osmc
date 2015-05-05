@@ -1,0 +1,6 @@
+[Unit]
+Description=Pulse Audio
+        
+[Service]
+Type=simple
+ExecStart=pulseaudio --system --disallow-exit --disallow-module-loading --disable-shm --daemonize
