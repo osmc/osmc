@@ -309,10 +309,15 @@ ply_image_resize (ply_image_t *image,
 
   new_image = ply_image_new (image->filename);
 
-  new_image->layout.address = malloc (height * width * 4);
-
   new_image->width = width;
   new_image->height = height;
+
+  if (width % 16 != 0)
+  {
+    width = (width + (16 - width % 16));
+  }
+
+  new_image->layout.address = malloc (height * width * 4);
 
   old_width = ply_image_get_width (image);
   old_height = ply_image_get_height (image);
