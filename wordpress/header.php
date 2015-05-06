@@ -35,19 +35,25 @@
 		<meta name="msapplication-square150x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-150x150.png">
 		<meta name="msapplication-square310x310logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x310.png">
 		<meta name="msapplication-wide310x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x150.png">
-
-		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
+		<!-- inject:css -->
+		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/style.css">
+		<!-- endinject -->
 		
 		<!--[if lte IE 8]> 
 		<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.0/outdatedbrowser.min.js"></script><link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/lib/outdatedbrowser.min.css">
 		<![endif]-->
 		
 		<?php wp_head(); ?>
-		
-		<!-- inject:css -->
-		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-7f81ba68.css">
-		<!-- endinject -->
+        <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
+		<link rel="alternate" type="application/rss+xml" title="OSMC Feed" href="/feed?cat=-42" />
+		<script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+          ga('create', 'UA-12677925-5', 'auto');
+          ga('send', 'pageview');
+        </script>
         
 	</head>
 
