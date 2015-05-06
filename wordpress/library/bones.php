@@ -210,6 +210,11 @@ function disable_emojis_tinymce( $plugins ) {
   }
 }
 
+// Remove discourse stylesheet
+add_action( 'wp_enqueue_scripts', 'ac_cleanup_scripts' );
+function ac_cleanup_scripts() {
+  wp_deregister_style( 'discourse_comments' );
+}
 
 /*********************
 THEME SUPPORT
