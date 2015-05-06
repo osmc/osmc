@@ -2,15 +2,15 @@ jQuery(function() {
     FastClick.attach(document.body);
 });
 
-jQuery("#nav-res-toggle").toggle(function(){
+jQuery("#nav-res-toggle").click(function(){
   
-  jQuery(".top-nav").addClass("open");
-  jQuery("#nav-res-toggle").addClass("open");
-
-}, function() {
-  
-  jQuery(".top-nav").removeClass("open");
-  jQuery("#nav-res-toggle").removeClass("open");
+  if ( jQuery(this).hasClass("open") ) {
+    jQuery(".top-nav").removeClass("open");
+    jQuery("#nav-res-toggle").removeClass("open");
+  } else {
+    jQuery(".top-nav").addClass("open");
+    jQuery("#nav-res-toggle").addClass("open"); 
+  }
   
 });
 
