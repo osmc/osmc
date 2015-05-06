@@ -1,9 +1,9 @@
 diff --git a/xbmc/addons/AddonInstaller.cpp b/xbmc/addons/AddonInstaller.cpp
-index 290d491..9f07891 100644
+index c61da1b..a76712d 100644
 --- a/xbmc/addons/AddonInstaller.cpp
 +++ b/xbmc/addons/AddonInstaller.cpp
-@@ -213,8 +213,21 @@ bool CAddonInstaller::Install(const std::string &addonID, bool force /* = false
-   return DoInstall(addon, hash, addonInstalled, referer, background, modal);
+@@ -240,8 +240,22 @@ bool CAddonInstaller::Install(const std::string &addonID, bool force, const std:
+   return false;
  }
  
 +bool CAddonInstaller::IsBadAddon(std::string addonName)
@@ -15,7 +15,8 @@ index 290d491..9f07891 100644
 +  return false;
 +}
 +
- bool CAddonInstaller::DoInstall(const AddonPtr &addon, const std::string &hash /* = "" */, bool update /* = false */, const std::string &referer /* = "" */, bool background /* = true */, bool modal /* = false */)
++
+ bool CAddonInstaller::DoInstall(const AddonPtr &addon, const std::string &hash, bool update, const std::string &referer, bool background)
  {
 +  // check whether the addon is dodgy
 +  if (IsBadAddon(addon->ID()))
@@ -25,14 +26,15 @@ index 290d491..9f07891 100644
    CSingleLock lock(m_critSection);
    if (m_downloadJobs.find(addon->ID()) != m_downloadJobs.end())
 diff --git a/xbmc/addons/AddonInstaller.h b/xbmc/addons/AddonInstaller.h
-index ede0e5c..193c234 100644
+index ab93a2f..9853e39 100644
 --- a/xbmc/addons/AddonInstaller.h
 +++ b/xbmc/addons/AddonInstaller.h
-@@ -147,6 +147,7 @@ private:
-    \return true if dependencies are available, false otherwise.
+@@ -82,6 +82,8 @@ public:
     */
-   bool CheckDependencies(const ADDON::AddonPtr &addon, std::vector<std::string>& preDeps, CAddonDatabase &database);
-+  bool IsBadAddon(std::string addonName);
+   bool CheckDependencies(const ADDON::AddonPtr &addon, CAddonDatabase *database = NULL);
  
-   void PrunePackageCache();
-   int64_t EnumeratePackageFolder(std::map<std::string,CFileItemList*>& result);
++  bool IsBadAddon(std::string addonName);
++
+   /*! \brief Update all repositories (if needed)
+    Runs through all available repositories and queues an update of them if they
+    need it (according to the set timeouts) or if forced.  Optionally busy wait
