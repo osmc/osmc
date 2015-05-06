@@ -18,75 +18,80 @@ jQuery("#nav-res-toggle").click(function(){
 
 // Video
 
-var player = new Clappr.Player({
-  source: 'https://osmc.tv/homepage_tour.mp4',
-  poster: 'https://osmc.tv/wp-content/themes/osmc/library/images/video-poster.png',
-  preload: 'none',
-  loop: 'true',
-  width: '100%',
-  height: '100%',
-  parentId: '#player',
-  chromeless: 'true'
-});
+if ( jQuery("body").hasClass("home") ) {
+      
+  var player = new Clappr.Player({
+    source: 'https://osmc.tv/homepage_tour.mp4',
+    poster: 'https://osmc.tv/wp-content/themes/osmc/library/images/video-poster.png',
+    preload: 'none',
+    loop: 'true',
+    width: '100%',
+    height: '100%',
+    parentId: '#player',
+    chromeless: 'true'
+  });
 
-jQuery(".home .vignette-overlay").click(function() {
-  
-  var vid = jQuery("body.home .video-wrap video").get(0);
-  var play = jQuery("body.home .video-wrap button.media-control-button[data-playpause]");
-  var overlay = jQuery("body.home .video-overlay");
-  var icon = jQuery("body.home .playicon");
-  
-  if ( vid.paused ) {
-    play.click();
-    overlay.addClass("hidden");
-    icon.addClass("hidden");
-  } else {
-    play.click();
-    overlay.removeClass("hidden");
-    icon.removeClass("hidden");
-  }
-  
-});
+  jQuery(".home .vignette-overlay").click(function() {
 
-// set height 100%
+    var vid = jQuery("body.home .video-wrap video").get(0);
+    var play = jQuery("body.home .video-wrap button.media-control-button[data-playpause]");
+    var overlay = jQuery("body.home .video-overlay");
+    var icon = jQuery("body.home .playicon");
 
-var hwindow = jQuery(window).height();
-var h130 = jQuery(window).height() * 1.55;
-jQuery(".home .firstn").css("height", hwindow);
-setTimeout(function() {
-  jQuery(".home .firstn-wrap .full").addClass("show");
-}, 100);
-jQuery(".home .firstn-back").css("height", h130);
+    if ( vid.paused ) {
+      play.click();
+      overlay.addClass("hidden");
+      icon.addClass("hidden");
+    } else {
+      play.click();
+      overlay.removeClass("hidden");
+      icon.removeClass("hidden");
+    }
 
-// images
+  });
 
-currentZ = 1;
-currentImg = 1;
 
-jQuery(".home .thirdn li").click(function() {
-  var lclass = jQuery(this).attr("class");
-  var nr = lclass.substr(lclass.length - 1);
+  // set height 100%
 
-  if ( jQuery.isNumeric(nr)  ) {	
+  var hwindow = jQuery(window).height();
+  var h130 = jQuery(window).height() * 1.55;
+  jQuery(".home .firstn").css("height", hwindow);
+  setTimeout(function() {
+    jQuery(".home .firstn-wrap .full").addClass("show");
+  }, 100);
+  jQuery(".home .firstn-back").css("height", h130);
 
-    jQuery(".home .thirdn img").removeClass("show");
-    jQuery(".home .thirdn .img-wrap" + currentImg + " img").addClass("show");
-    jQuery(".home .thirdn .img-wrap" + nr).css("z-index", currentZ + 1);
-    jQuery(".home .thirdn .img-wrap" + nr + " img").addClass("show");
-    jQuery(".home .thirdn li").removeClass("show");
-    jQuery(".home .thirdn li.link" + nr).addClass("show");
+  // images
 
-    oldImg = currentImg;
-    currentImg = nr;
+  currentZ = 1;
+  currentImg = 1;
 
-    setTimeout(function() {
-      jQuery(".home .thirdn .img-wrap" + oldImg + " img").removeClass("show");
-    }, 400);
+  jQuery(".home .thirdn li").click(function() {
+    var lclass = jQuery(this).attr("class");
+    var nr = lclass.substr(lclass.length - 1);
 
-  }
-  currentZ = currentZ + 1;
-	
-});
+    if ( jQuery.isNumeric(nr)  ) {	
+
+      jQuery(".home .thirdn img").removeClass("show");
+      jQuery(".home .thirdn .img-wrap" + currentImg + " img").addClass("show");
+      jQuery(".home .thirdn .img-wrap" + nr).css("z-index", currentZ + 1);
+      jQuery(".home .thirdn .img-wrap" + nr + " img").addClass("show");
+      jQuery(".home .thirdn li").removeClass("show");
+      jQuery(".home .thirdn li.link" + nr).addClass("show");
+
+      oldImg = currentImg;
+      currentImg = nr;
+
+      setTimeout(function() {
+        jQuery(".home .thirdn .img-wrap" + oldImg + " img").removeClass("show");
+      }, 400);
+
+    }
+    currentZ = currentZ + 1;
+
+  });
+
+};
 
 // NEWSLETTER FORM //
 
@@ -189,6 +194,19 @@ jQuery(".download.devices .wrapper").click(function() {
     scrollTop: jQuery(".getstarted").offset().top - 40
   }, 800);
 });
+
+// SHOP //
+
+// Archive
+
+if ( jQuery("body").hasClass("post-type-archive") ) {
+  
+  jQuery('body.woocommerce-page #container .archive .productlist li.product a').contents().filter(function(){
+    return this.nodeType === 3;
+  }).remove();
+  
+}
+  
 
 // JS TABLE //
 
