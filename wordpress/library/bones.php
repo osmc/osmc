@@ -131,24 +131,85 @@ function bones_scripts_and_styles() {
 		}
 
 		//adding scripts file in the footer
-		wp_register_script( 'bones-js', get_stylesheet_directory_uri() . '/library/js/scripts_v2.min.js', array( 'jquery' ), '', true );
-
-		// enqueue styles and scripts
-		wp_enqueue_script( 'bones-modernizr' );
-		wp_enqueue_style( 'bones-ie-only' );
-
-		$wp_styles->add_data( 'bones-ie-only', 'conditional', 'lt IE 9' ); // add conditional wrapper around ie stylesheet
+		wp_register_script( 'script.js', get_stylesheet_directory_uri() . '/library/js/scripts_v2.min.js', array( 'jquery' ), '', true );
 
 		/*
 		I recommend using a plugin to call jQuery
 		using the google cdn. That way it stays cached
 		and your site will load faster.
 		*/
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'bones-js' );
+		wp_enqueue_script( 'script.js' );
 
 	}
 }
+
+// Remove jquery-migrate
+add_filter( 'wp_default_scripts', 'remove_jquery_migrate' );
+
+function remove_jquery_migrate( &$scripts) {
+  if(!is_admin()) {
+    $scripts->remove( 'jquery');
+    $scripts->add( 'jquery', false, array( 'jquery-core' ));
+  }
+}
+
+// Remove wc scripts and styles on non wc pages
+add_action( 'wp_enqueue_scripts', 'child_manage_woocommerce_styles', 99 );
+
+function child_manage_woocommerce_styles() {
+  //remove generator meta tag
+  remove_action( 'wp_head', array( $GLOBALS['woocommerce'], 'generator' ) );
+
+  //first check that woo exists to prevent fatal errors
+  if ( function_exists( 'is_woocommerce' ) ) {
+    
+    //dequeue scripts and styles
+    if ( ! is_woocommerce() && ! is_cart() && ! is_checkout() ) {
+      wp_dequeue_style( 'woocommerce-general' );
+      wp_dequeue_style( 'woocommerce-layout' );
+      wp_dequeue_style( 'woocommerce-smallscreen' );
+      wp_dequeue_script( 'wc_price_slider' );
+      wp_dequeue_script( 'wc-single-product' );
+      wp_dequeue_script( 'wc-add-to-cart' );
+      wp_dequeue_script( 'wc-cart-fragments' );
+      wp_dequeue_script( 'wc-checkout' );
+      wp_dequeue_script( 'wc-add-to-cart-variation' );
+      wp_dequeue_script( 'wc-single-product' );
+      wp_dequeue_script( 'wc-cart' );
+      wp_dequeue_script( 'wc-chosen' );
+      wp_dequeue_script( 'woocommerce' );
+      wp_dequeue_script( 'prettyPhoto' );
+      wp_dequeue_script( 'prettyPhoto-init' );
+      wp_dequeue_script( 'jquery-blockui' );
+      wp_dequeue_script( 'jquery-placeholder' );
+      wp_dequeue_script( 'fancybox' );
+      wp_dequeue_script( 'jqueryui' );
+    }
+  }
+
+}
+
+// Remove emoji script
+function disable_emojis() {
+  remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+  remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+  remove_action( 'wp_print_styles', 'print_emoji_styles' );
+  remove_action( 'admin_print_styles', 'print_emoji_styles' );
+  remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+  remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+  remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+  add_filter( 'tiny_mce_plugins', 'disable_emojis_tinymce' );
+}
+
+add_action( 'init', 'disable_emojis' );
+function disable_emojis_tinymce( $plugins ) {
+  if ( is_array( $plugins ) ) {
+    return array_diff( $plugins, array( 'wpemoji' ) );
+  } else {
+    return array();
+  }
+}
+
 
 /*********************
 THEME SUPPORT
