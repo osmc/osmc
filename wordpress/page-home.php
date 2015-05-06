@@ -135,7 +135,7 @@
            <h3 class="link">Buy it <a href="https://osmc.tv/product/vero/">here</a></h3>
           </div>
           <div class="column third">
-            <img src="https://osmc.tv/wp-content/uploads/2014/11/1-784x784.png">
+            <img src="<?php echo get_template_directory_uri(); ?>/library/images/vero-front.png">
           </div>
         </div>
       </div>
