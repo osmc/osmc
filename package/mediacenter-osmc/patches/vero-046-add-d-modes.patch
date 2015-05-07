@@ -1,0 +1,29 @@
+From ad11e1f2d9af5d61f5c6882ad3a0e7b0f7262edd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 7 May 2015 17:20:01 +0100
+Subject: [PATCH] Get the D modes back:
+
+* A D: mode may exist but this does not guarantee that an equivalent S: mode is available as well.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index ad98d7e..8aa88fd 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -298,9 +298,6 @@ bool CEGLNativeTypeIMX::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutio
+   RESOLUTION_INFO res;
+   for (size_t i = 0; i < probe_str.size(); i++)
+   {
+-    if(!StringUtils::StartsWith(probe_str[i], "S:") && !StringUtils::StartsWith(probe_str[i], "U:") &&
+-       !StringUtils::StartsWith(probe_str[i], "V:"))
+-      continue;
+ 
+     if(ModeToResolution(probe_str[i], &res))
+       if(!FindMatchingResolution(res, resolutions))
+-- 
+2.1.0
+
