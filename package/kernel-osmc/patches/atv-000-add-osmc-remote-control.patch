@@ -1,0 +1,84 @@
+diff --git a/drivers/media/rc/keymaps/Makefile b/drivers/media/rc/keymaps/Makefile
+index abf6079..afb6e1a 100644
+--- a/drivers/media/rc/keymaps/Makefile
++++ b/drivers/media/rc/keymaps/Makefile
+@@ -64,6 +64,7 @@ obj-$(CONFIG_RC_MAP) += rc-adstech-dvb-t-pci.o \
+ 			rc-nebula.o \
+ 			rc-nec-terratec-cinergy-xs.o \
+ 			rc-norwood.o \
++			rc-osmc.o \
+ 			rc-npgtech.o \
+ 			rc-pctv-sedna.o \
+ 			rc-pinnacle-color.o \
+diff --git a/drivers/media/rc/keymaps/rc-osmc.c b/drivers/media/rc/keymaps/rc-osmc.c
+new file mode 100644
+index 0000000..cc55375
+--- /dev/null
++++ b/drivers/media/rc/keymaps/rc-osmc.c
+@@ -0,0 +1,54 @@
++/* rc-osmc.c - Keytable for OSMC remote controller
++ *
++ * Copyright (c) 2014 Sam G Nazarko
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include <media/rc-map.h>
++#include <linux/module.h>
++
++static struct rc_map_table rc5_osmc[] = {
++	/* Codes start with 0x02 */
++	{ 0x020F, KEY_HOME },								/* HOME icon */
++	{ 0x0210, KEY_INFO },								/* INFO icon */
++	{ 0x0211, KEY_UP },									/* UP icon */
++	{ 0x0212, KEY_RIGHT },								/* RIGHT icon */
++	{ 0x0213, KEY_DOWN },								/* DOWN icon */
++	{ 0x0214, KEY_OK },								/* OK icon */
++	{ 0x0215, KEY_LEFT },								/* LEFT icon */
++	{ 0x0216, KEY_BACK },								/* BACK icon */
++	{ 0x0217, KEY_TITLE },						/* CONTEXT icon */
++	{ 0x0218, KEY_PLAYPAUSE },							/* PLAY icon */
++	{ 0x0219, KEY_STOP },								/* STOP icon */
++	{ 0x021A, KEY_REWIND},								/* RW icon */
++	{ 0x021B, KEY_FASTFORWARD },						/* FW icon */
++};
++
++static struct rc_map_list rc5_osmc_map = {
++	.map = {
++		.scan    = rc5_osmc,
++		.size    = ARRAY_SIZE(rc5_osmc),
++		.rc_type = RC_TYPE_RC5,
++		.name    = RC_MAP_OSMC,
++	}
++};
++
++static int __init init_rc_map_rc5_osmc(void)
++{
++	return rc_map_register(&rc5_osmc_map);
++}
++
++static void __exit exit_rc_map_rc5_osmc(void)
++{
++	rc_map_unregister(&rc5_osmc_map);
++}
++
++module_init(init_rc_map_rc5_osmc)
++module_exit(exit_rc_map_rc5_osmc)
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Sam G Nazarko");
+diff --git a/include/media/rc-map.h b/include/media/rc-map.h
+index e7a1514..905fc99 100644
+--- a/include/media/rc-map.h
++++ b/include/media/rc-map.h
+@@ -174,6 +174,7 @@ void rc_map_init(void);
+ #define RC_MAP_NEC_TERRATEC_CINERGY_XS   "rc-nec-terratec-cinergy-xs"
+ #define RC_MAP_NORWOOD                   "rc-norwood"
+ #define RC_MAP_NPGTECH                   "rc-npgtech"
++#define RC_MAP_OSMC                      "rc-osmc"
+ #define RC_MAP_PCTV_SEDNA                "rc-pctv-sedna"
+ #define RC_MAP_PINNACLE_COLOR            "rc-pinnacle-color"
+ #define RC_MAP_PINNACLE_GREY             "rc-pinnacle-grey"

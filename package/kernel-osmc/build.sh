@@ -7,10 +7,12 @@
 test $1 == rbp1 && VERSION="3.18.11" && REV="2"
 test $1 == rbp2 && VERSION="3.18.11" && REV="2"
 test $1 == vero && VERSION="3.14.37" && REV="10"
-if [ $1 == "rbp1" ] || [ $1 == "rbp2" ]
+test $1 == atv && VERSION="4.0.2" && REV="1"
+if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
-	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v3.x/linux-${VERSION}.tar.xz"
+	MAJOR=$(echo ${VERSION:0:1})
+	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${VERSION}.tar.xz"
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
@@ -40,7 +42,6 @@ then
 		install_patch "../../patches" "rbp"
 		# have to do this after, because upstream brings its own rtl8192cu in!
 		rm -rf drivers/net/wireless/rtl8192cu
-		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
 	# Set up DTC
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -91,9 +92,14 @@ then
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
-	ARCH=$(arch | tr -d v7l | tr -d v6)
+	ARCH=$(arch)
+        echo $ARCH | grep -q arm
+        if [ $? == 0 ]
+	then
+	    ARCH=$(echo $ARCH | tr -d v7l | tr -d v6)
+	fi
 	export ARCH
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
 		# Build RTL8812AU module
 		mv rtl8812au drivers/net/wireless/rtl8812au
@@ -104,11 +110,10 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]]
 		then
 		# Build RTL8192CU module
-		# We already moved in place to satisfy Pi deps
-		if [ "$1" != "rbp1" ] && [ "$1" != "rbp2" ]; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
+		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi

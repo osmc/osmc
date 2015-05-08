@@ -10,6 +10,9 @@ rbp2:
 vero:
 	sudo bash build.sh "vero"
 
+atv:
+	sudo bash build.sh "atv"
+
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files-image >/dev/null 2>&1
