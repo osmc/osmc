@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
-# Compare and display Devel and Release OSMC package versions - (c) 2015 DBMandrake.
-# Accepts command line option 'changes' to only display packages whose devel and release versions differ.
+# Compare and display Staging and Release OSMC package versions - (c) 2015 DBMandrake.
+# Accepts optional command line parameter '--changes' to only display packages whose Staging and Release versions differ.
 
 import urllib
 import sys
 
 print_changes = False
-if len(sys.argv) > 1 and sys.argv[1] == 'changes':
+if len(sys.argv) > 1 and sys.argv[1] == '--changes':
 	print_changes = True
 
 results = {}
@@ -15,13 +15,13 @@ archlist = [ 'binary-i386', 'binary-amd64', 'binary-armhf' ]
 
 for arch in archlist:
 
-	devel = urllib.urlopen('http://apt.osmc.tv/dists/jessie-devel/main/' + arch + '/Packages').read()
+	staging = urllib.urlopen('http://apt.osmc.tv/dists/jessie-devel/main/' + arch + '/Packages').read()
 	release = urllib.urlopen('http://apt.osmc.tv/dists/jessie/main/' + arch + '/Packages').read()
 
-	devel_packages = devel.split('\n\n')
+	staging_packages = staging.split('\n\n')
 	release_packages = release.split('\n\n')
 
-	for package in devel_packages:
+	for package in staging_packages:
 		package_name = None
 		package_version = None
 		package_depends = None
@@ -102,22 +102,22 @@ for arch in archlist:
 
 
 package_length = len(max(results, key=len))
-devel_length = max([len(x) for x, y in results.values()])
+staging_length = max([len(x) for x, y in results.values()])
 release_length = max([len(y) for x, y in results.values()])
 
-print 'Package name' + (package_length - 7) * ' ' + 'Devel' + (devel_length) * ' ' + 'Release' + (release_length - 1) * ' ' + 'Changes'
-print (package_length + devel_length + release_length + 23) * '-' + '\n'
+print 'Package name' + (package_length - 7) * ' ' + 'Staging' + (staging_length - 2) * ' ' + 'Release' + (release_length - 1) * ' ' + 'Changes'
+print (package_length + staging_length + release_length + 23) * '-' + '\n'
 
 for pkg in sorted(results):
-	devel_version = results[pkg][0]
+	staging_version = results[pkg][0]
 	release_version = results[pkg][1]
 
-	if devel_version == release_version and print_changes is True:
+	if staging_version == release_version and print_changes is True:
 		continue
 
-	print pkg + (package_length + 5 - len(pkg)) * ' ' + devel_version + (devel_length + 5 - len(devel_version)) * ' ' + release_version + (release_length + 5 - len(release_version)) * ' ',
+	print pkg + (package_length + 5 - len(pkg)) * ' ' + staging_version + (staging_length + 5 - len(staging_version)) * ' ' + release_version + (release_length + 5 - len(release_version)) * ' ',
 
-	if devel_version != release_version:
+	if staging_version != release_version:
 		print '<------'
 	else:
 		print
