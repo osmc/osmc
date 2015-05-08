@@ -882,8 +882,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if item:
                 address = item.getProperty('address')
                 alias = item.getProperty('alias')
-                # 'Bluetooth' , 'Remove Device'
-                if DIALOG.yesno(lang(32020), lang(32021) + ' ' + alias + '?'):
+                #                                'Cancel'     'Re-connect'  'Remove Device'
+                selection = DIALOG.select(alias, [lang(32051), lang(32075), lang(32021)])
+                if selection == -1 or selection == 0:
+                    return
+
+                if selection == 1: # Reconnect
+                    self.show_busy_dialogue()
+                    if self.connect_bluetooth(address, alias):
+                        self.bluetooth_population_thread.update_bluetooth_lists()
+                    self.clear_busy_dialogue()
+
+                if selection == 2:
                     osmc_bluetooth.remove_device(address)
                     self.setFocusId(BLUETOOTH_ENABLE_TOGGLE)
                     self.bluetooth_population_thread.update_bluetooth_lists()
@@ -904,17 +914,25 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     result = osmc_bluetooth.pair_device(address, script_base_path)
 
                     if not result:
-                        #         'Pairing with'                       'failed'
+                        #         'Connection to '                       'failed'
                         message = lang(32024) + ' ' + alias + ' ' + lang(32025)
                         #                                                     'Bluetooth'
                         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
                         self.clear_busy_dialogue()
                         return
-                osmc_bluetooth.connect_device(address)
-                osmc_bluetooth.set_device_trusted(address, True)
-                self.bluetooth_population_thread.update_bluetooth_lists()
+                if self.connect_bluetooth(address, alias):
+                    osmc_bluetooth.set_device_trusted(address, True)
+                    self.bluetooth_population_thread.update_bluetooth_lists()
                 self.clear_busy_dialogue()
 
+    def connect_bluetooth(self, address, alias):
+        connected = osmc_bluetooth.connect_device(address)
+        if not connected:
+             #         'Connection to'                       'failed'
+            message = lang(32024) + ' ' + alias + ' ' + lang(32025)
+            #                                                     'Bluetooth'
+            xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
+        return connected
 
     def populate_tethering_panel(self):
         wifi_tethering = osmc_network.is_tethering_wifi()
@@ -1092,12 +1110,14 @@ class bluetooth_population_thread(threading.Thread):
                 items_to_be_removed.append(itemIndex)
 
         for itemIndex in items_to_be_removed:
-            list_control.removeItem(itemIndex)
+            try:
+                list_control.removeItem(itemIndex)
+            except:
+                pass
 
         if len(devices_dict.keys()) > 0:
             for address, info in devices_dict.iteritems():
                 list_control.addItem(self.create_bluetooth_item(address, info))
-
 
     def create_bluetooth_item(self, address, info):
         label = address
