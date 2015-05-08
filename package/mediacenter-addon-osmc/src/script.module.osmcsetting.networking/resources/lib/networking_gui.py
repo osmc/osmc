@@ -882,16 +882,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if item:
                 address = item.getProperty('address')
                 alias = item.getProperty('alias')
+                connected = item.getProperty('connected') == 'True'
                 #                                'Cancel'     'Re-connect'  'Remove Device'
                 selection = DIALOG.select(alias, [lang(32051), lang(32075), lang(32021)])
                 if selection == -1 or selection == 0:
                     return
 
                 if selection == 1: # Reconnect
-                    self.show_busy_dialogue()
-                    if self.connect_bluetooth(address, alias):
-                        self.bluetooth_population_thread.update_bluetooth_lists()
-                    self.clear_busy_dialogue()
+                    if not connected:
+                        self.show_busy_dialogue()
+                        if self.connect_bluetooth(address, alias):
+                            self.bluetooth_population_thread.update_bluetooth_lists()
+                        self.clear_busy_dialogue()
+
 
                 if selection == 2:
                     osmc_bluetooth.remove_device(address)
