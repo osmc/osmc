@@ -1,9 +1,7 @@
-From 914f400b7e18daa04913dfb02e5ae39781084be2 Mon Sep 17 00:00:00 2001
+From 24d56b2d8f77be20733e0a46df2afa4c988b4aea Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Fri, 8 May 2015 04:52:03 +0100
-Subject: [PATCH] Add CrystalHD support to kernel:
-
-* Based on Linux 3.16 before removal
+Date: Fri, 8 May 2015 11:06:09 +0100
+Subject: [PATCH] Add CrystalHD support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -44,25 +42,25 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  create mode 100644 drivers/staging/crystalhd/crystalhd_misc.h
 
 diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
-index bfacf69..cb1df59 100644
+index 45baa83..0e3caff 100644
 --- a/drivers/staging/Kconfig
 +++ b/drivers/staging/Kconfig
-@@ -112,4 +112,6 @@ source "drivers/staging/i2o/Kconfig"
+@@ -108,4 +108,6 @@ source "drivers/staging/fbtft/Kconfig"
  
- source "drivers/staging/fsl-mc/Kconfig"
+ source "drivers/staging/i2o/Kconfig"
  
 +source "drivers/staging/crystalhd/Kconfig"
 +
  endif # STAGING
 diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
-index 2bbd1bf..e24c4e3 100644
+index 2916079..82ed057 100644
 --- a/drivers/staging/Makefile
 +++ b/drivers/staging/Makefile
-@@ -48,3 +48,4 @@ obj-$(CONFIG_COMMON_CLK_XLNX_CLKWZRD)	+= clocking-wizard/
+@@ -46,3 +46,4 @@ obj-$(CONFIG_UNISYSSPAR)	+= unisys/
+ obj-$(CONFIG_COMMON_CLK_XLNX_CLKWZRD)	+= clocking-wizard/
  obj-$(CONFIG_FB_TFT)		+= fbtft/
  obj-$(CONFIG_I2O)		+= i2o/
- obj-$(CONFIG_FSL_MC_BUS)	+= fsl-mc/
-+obj-$(CONFIG_CRYSTALHD)		+= crystalhd/
++obj-$(CONFIG_CRYSTALHD)                += crystalhd/
 diff --git a/drivers/staging/crystalhd/Kconfig b/drivers/staging/crystalhd/Kconfig
 new file mode 100644
 index 0000000..56b414b
