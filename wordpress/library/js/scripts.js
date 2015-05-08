@@ -197,17 +197,6 @@ jQuery(".download.devices .wrapper").click(function() {
 
 // SHOP //
 
-// Archive
-
-if ( jQuery("body").hasClass("post-type-archive") ) {
-  
-  jQuery('body.woocommerce-page #container .archive .productlist li.product a').contents().filter(function(){
-    return this.nodeType === 3;
-  }).remove();
-  
-}
-  
-
 // JS TABLE //
 
 var tablecount = 0;
