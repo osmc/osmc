@@ -145,7 +145,7 @@ function pull_source()
 	if [[ $1 =~ \.zip$ ]]
 	then
 	echo -e "Detected ZIP source"
-	if [ "$2" != "." ]; then mkdir ${2}; fi
+	if [ "$2" != "." ]; then mkdir -p ${2}; fi
 	wget ${1} -O source.zip
 	if [ $? != 0 ]; then echo "Downloading zip failed" && exit 1; fi
 	unzip source.zip -d ${2}
@@ -156,7 +156,7 @@ function pull_source()
 	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ || $1 =~ \.tar\.xz$ ]]
 	then
 	echo -e "Detected tarball source"
-	if [ "$2" != "." ]; then mkdir ${2}; fi
+	if [ "$2" != "." ]; then mkdir -p ${2}; fi
 	wget ${1} -O source.tar
 	if [ $? != 0 ]; then echo "Downloading tarball failed" && exit 1; fi
 	tar -xvf source.tar -C ${2}
