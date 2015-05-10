@@ -39,6 +39,7 @@ then
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
+		rm -rf drivers/net/wireless/rtl8192cu # rbp kernel swaps rtlwifi for this, but we still want newer
 		install_patch "../../patches" "rbp"
 		# have to do this after, because upstream brings its own rtl8192cu in!
 		rm -rf drivers/net/wireless/rtl8192cu
@@ -65,6 +66,7 @@ then
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
 	if [ "$1" == "vero" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc; fi
+	if [ "$1" == "atv" ]; then mkdir -p ../../files-image/boot; fi
 	if [ "$1" == "rbp1" ]
 	then
 		make bcm2708-rpi-b.dtb
@@ -88,7 +90,6 @@ then
 	then
 		make imx6dl-vero.dtb
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
-		popd
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
@@ -110,7 +111,7 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
 		# Build RTL8192CU module
 		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
@@ -124,6 +125,8 @@ then
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
+	popd
+	pwd
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
 	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
