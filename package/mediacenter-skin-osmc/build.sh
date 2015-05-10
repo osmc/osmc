@@ -7,4 +7,3 @@
 
 echo -e "Building package mediacenter-skin-osmc"
 dpkg -b files/ mediacenter-skin-osmc.deb
-teardown_env "${1}"
