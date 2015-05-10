@@ -1,29 +1,56 @@
-From ad11e1f2d9af5d61f5c6882ad3a0e7b0f7262edd Mon Sep 17 00:00:00 2001
-From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Thu, 7 May 2015 17:20:01 +0100
-Subject: [PATCH] Get the D modes back:
+From 2feb561d6009886f53a373c0844d98309c174a6f Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Fri, 8 May 2015 07:35:14 +0200
+Subject: [PATCH] IMX: Special case D: modes (DBMandrake edition ;-) <- needs
+ compile testing
 
-* A D: mode may exist but this does not guarantee that an equivalent S: mode is available as well.
-
-Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 3 ---
- 1 file changed, 3 deletions(-)
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-index ad98d7e..8aa88fd 100644
+index dce814f..d52365e 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-@@ -298,9 +298,6 @@ bool CEGLNativeTypeIMX::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutio
-   RESOLUTION_INFO res;
-   for (size_t i = 0; i < probe_str.size(); i++)
+@@ -287,11 +287,14 @@ bool CEGLNativeTypeIMX::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutio
+   std::string valstr;
+   SysfsUtils::GetString("/sys/class/graphics/fb0/modes", valstr);
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
++  std::vector<std::string> d_modes;
+ 
+   // lexical order puts the modes list into our preferred
+   // order and by later filtering through FindMatchingResolution()
+   // we make sure we read _all_ S modes, following U and V modes
+   // while list will hold unique resolutions only
++  // d_modes as DVI monitors (without audio) provide are handled
++  // after those and added if they are unique
+   std::sort(probe_str.begin(), probe_str.end());
+ 
+   resolutions.clear();
+@@ -300,12 +303,26 @@ bool CEGLNativeTypeIMX::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutio
    {
--    if(!StringUtils::StartsWith(probe_str[i], "S:") && !StringUtils::StartsWith(probe_str[i], "U:") &&
--       !StringUtils::StartsWith(probe_str[i], "V:"))
--      continue;
+     if(!StringUtils::StartsWith(probe_str[i], "S:") && !StringUtils::StartsWith(probe_str[i], "U:") &&
+        !StringUtils::StartsWith(probe_str[i], "V:"))
++    {
++      // save d_modes and try to insert them later if not yet available
++      if (StringUtils::StartsWith(probe_str[i], "D:"))
++        d_modes.push_back(probe_str[i]);
++
+       continue;
++    }
  
      if(ModeToResolution(probe_str[i], &res))
        if(!FindMatchingResolution(res, resolutions))
--- 
-2.1.0
-
+         resolutions.push_back(res);
+   }
++
++  // add unique D: modes also
++  for (size_t i = 0; i < d_modes.size(); i++)
++  {
++    if(ModeToResolution(d_modes[i], &res))
++      if(!FindMatchingResolution(res, resolutions))
++        resolutions.push_back(res);
++  }
+   return resolutions.size() > 0;
+ }
+ 
