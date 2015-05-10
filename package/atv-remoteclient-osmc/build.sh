@@ -19,7 +19,7 @@ then
         handle_dep "autoconf"
         handle_dep "pkg-config"
 	pushd src/atvclient*
-	./configure --prefix=/usr
+	./configure --prefix=/usr CFLAGS="-O3"
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
