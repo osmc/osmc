@@ -1,6 +1,6 @@
---- /dev/null	2015-05-04 02:06:13.988007378 +0100
-+++ a/.config	2015-05-08 17:08:25.480741606 +0100
-@@ -0,0 +1,4467 @@
+--- /dev/null	2015-05-10 08:21:01.540306265 +0100
++++ a/.config	2015-05-10 10:04:54.882253845 +0100
+@@ -0,0 +1,4471 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/i386 4.0.2 Kernel Configuration
@@ -3018,10 +3018,10 @@
 +# Direct Rendering Manager
 +#
 +CONFIG_DRM=y
-+CONFIG_DRM_MIPI_DSI=y
-+CONFIG_DRM_KMS_HELPER=y
++CONFIG_DRM_KMS_HELPER=m
 +CONFIG_DRM_KMS_FB_HELPER=y
 +# CONFIG_DRM_LOAD_EDID_FIRMWARE is not set
++CONFIG_DRM_TTM=m
 +
 +#
 +# I2C encoder or helper chips
@@ -3033,11 +3033,11 @@
 +# CONFIG_DRM_TDFX is not set
 +# CONFIG_DRM_R128 is not set
 +# CONFIG_DRM_RADEON is not set
-+# CONFIG_DRM_NOUVEAU is not set
-+CONFIG_DRM_I915=y
-+CONFIG_DRM_I915_KMS=y
-+CONFIG_DRM_I915_FBDEV=y
-+# CONFIG_DRM_I915_PRELIMINARY_HW_SUPPORT is not set
++CONFIG_DRM_NOUVEAU=m
++CONFIG_NOUVEAU_DEBUG=5
++CONFIG_NOUVEAU_DEBUG_DEFAULT=5
++CONFIG_DRM_NOUVEAU_BACKLIGHT=y
++# CONFIG_DRM_I915 is not set
 +# CONFIG_DRM_MGA is not set
 +# CONFIG_DRM_SIS is not set
 +# CONFIG_DRM_VIA is not set
@@ -3050,11 +3050,6 @@
 +# CONFIG_DRM_CIRRUS_QEMU is not set
 +# CONFIG_DRM_QXL is not set
 +# CONFIG_DRM_BOCHS is not set
-+CONFIG_DRM_PANEL=y
-+
-+#
-+# Display Panels
-+#
 +
 +#
 +# Frame buffer Devices
@@ -3075,7 +3070,7 @@
 +# CONFIG_FB_SYS_FOPS is not set
 +# CONFIG_FB_SVGALIB is not set
 +# CONFIG_FB_MACMODES is not set
-+# CONFIG_FB_BACKLIGHT is not set
++CONFIG_FB_BACKLIGHT=y
 +CONFIG_FB_MODE_HELPERS=y
 +CONFIG_FB_TILEBLITTING=y
 +
@@ -3278,7 +3273,6 @@
 +# CONFIG_SND_HDA_CODEC_SIGMATEL is not set
 +# CONFIG_SND_HDA_CODEC_VIA is not set
 +# CONFIG_SND_HDA_CODEC_HDMI is not set
-+CONFIG_SND_HDA_I915=y
 +# CONFIG_SND_HDA_CODEC_CIRRUS is not set
 +# CONFIG_SND_HDA_CODEC_CONEXANT is not set
 +# CONFIG_SND_HDA_CODEC_CA0110 is not set
@@ -3552,6 +3546,7 @@
 +# CONFIG_LEDS_PCA963X is not set
 +# CONFIG_LEDS_BD2802 is not set
 +# CONFIG_LEDS_INTEL_SS4200 is not set
++# CONFIG_LEDS_DELL_NETBOOKS is not set
 +# CONFIG_LEDS_TCA6507 is not set
 +# CONFIG_LEDS_LM355x is not set
 +# CONFIG_LEDS_OT200 is not set
@@ -3741,14 +3736,20 @@
 +CONFIG_CRYSTALHD=m
 +CONFIG_DVB_HDHOMERUN=m
 +CONFIG_X86_PLATFORM_DEVICES=y
++# CONFIG_ACER_WMI is not set
 +# CONFIG_ACERHDF is not set
++# CONFIG_ALIENWARE_WMI is not set
 +# CONFIG_ASUS_LAPTOP is not set
++# CONFIG_DELL_WMI is not set
++# CONFIG_DELL_WMI_AIO is not set
 +# CONFIG_DELL_SMO8800 is not set
 +# CONFIG_FUJITSU_LAPTOP is not set
 +# CONFIG_FUJITSU_TABLET is not set
 +# CONFIG_AMILO_RFKILL is not set
++# CONFIG_TC1100_WMI is not set
 +# CONFIG_HP_ACCEL is not set
 +# CONFIG_HP_WIRELESS is not set
++# CONFIG_HP_WMI is not set
 +# CONFIG_MSI_LAPTOP is not set
 +# CONFIG_PANASONIC_LAPTOP is not set
 +# CONFIG_COMPAL_LAPTOP is not set
@@ -3758,14 +3759,18 @@
 +# CONFIG_SENSORS_HDAPS is not set
 +# CONFIG_INTEL_MENLOW is not set
 +# CONFIG_EEEPC_LAPTOP is not set
-+# CONFIG_ACPI_WMI is not set
++# CONFIG_ASUS_WMI is not set
++CONFIG_ACPI_WMI=m
++# CONFIG_MSI_WMI is not set
 +# CONFIG_TOPSTAR_LAPTOP is not set
++# CONFIG_ACPI_TOSHIBA is not set
 +# CONFIG_TOSHIBA_BT_RFKILL is not set
 +# CONFIG_TOSHIBA_HAPS is not set
 +# CONFIG_ACPI_CMPC is not set
 +# CONFIG_INTEL_IPS is not set
 +# CONFIG_IBM_RTL is not set
 +# CONFIG_SAMSUNG_LAPTOP is not set
++CONFIG_MXM_WMI=m
 +# CONFIG_INTEL_OAKTRAIL is not set
 +# CONFIG_SAMSUNG_Q10 is not set
 +# CONFIG_APPLE_GMUX is not set
@@ -4446,7 +4451,6 @@
 +CONFIG_LZO_DECOMPRESS=y
 +# CONFIG_XZ_DEC is not set
 +# CONFIG_XZ_DEC_BCJ is not set
-+CONFIG_INTERVAL_TREE=y
 +CONFIG_ASSOCIATIVE_ARRAY=y
 +CONFIG_HAS_IOMEM=y
 +CONFIG_HAS_IOPORT_MAP=y
