@@ -32,9 +32,7 @@ pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION
 verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
-test "$1" == vero1 && install_patch "../patches" "vero1"
-test "$1" == rbp1 && install_patch "../patches" "rbp1"
-test "$1" == rbp2 && install_patch "../patches" "rbp2"
+install_patch "../patches" "$1"
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 	install_patch "../patches" "rbp"
