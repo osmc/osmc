@@ -53,16 +53,19 @@ deb http://apt.osmc.tv jessie main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-LOCAL_CHROOT_PKGS="appletv-remote-osmc splash-osmc"
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
 echo -e "Installing core packages"
-chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
+# We have to set up userland first for kernel postinst rules
+chroot ${DIR} apt-get -y install --no-install-recommends atv-userland-osmc
 verify_action
-chroot ${DIR} apt-get -y install --no-install-recommends $LOCAL_CHROOT_PKGS
+chroot ${DIR} apt-get -y install --no-install-recommends atv-device-osmc
+verify_action
+# We have SSH separate so we can remove it later via App Store
+chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
 verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
