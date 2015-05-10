@@ -62,6 +62,7 @@ esac
 while true; do
 	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
 	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+	echo 0 > /sys/devices/soc0/soc/20e0000.hdmi_video/enable_3d > /dev/null 2>&1
 	/bin/fbset -depth 16 && /bin/fbset -depth 32
 
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
