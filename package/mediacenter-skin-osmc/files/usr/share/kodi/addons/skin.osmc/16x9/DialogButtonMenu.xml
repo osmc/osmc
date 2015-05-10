@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- shutdownmenu -->
-	<defaultcontrol always="true">6000</defaultcontrol>
+	<defaultcontrol always="true">6001</defaultcontrol>
+	<include>DialogAnimation</include>
 
 	<controls>
 
 		<!-- Background -->
-		<include>DialogFadeBackgroundImage</include>
+		<include>DialogBackgroundImage</include>
 
 		<!-- List -->
 		<control type="grouplist" id="6000">
-			<centerleft>50%</centerleft>
-			<centertop>50%</centertop>
-			<width>480</width>
-			<height>840</height>
+			<left>120</left>
+			<top>120</top>
+			<width>1200</width>
+			<height>792</height>
 			<onup>noop</onup>
 			<ondown>noop</ondown>
 			<onleft>Close</onleft>
 			<onright>Close</onright>
-			<itemgap>0</itemgap>
-			<align>center</align>
+			<itemgap>38</itemgap>
 			<scrolltime>200</scrolltime>
 			<orientation>vertical</orientation>
-			<include>DialogZoomAnimation</include>
 
+			<!-- Dummy to set focus to top -->
+			<control type="button" id="6001">
+				<width>0</width>
+				<height>-8</height>
+				<label>-</label>
+				<onfocus>Down</onfocus>
+			</control>
 			<control type="button" id="6002">
 				<include>ShutdownButtons</include>
 				<label>13012</label>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- videolibrary -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol>50</defaultcontrol>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Main group -->
 		<control type="group">
@@ -43,9 +43,9 @@
 					<control type="label">
 						<left>20</left>
 						<top>12</top>
-						<width>200</width>
+						<width>280</width>
 						<align>right</align>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.StartDate]</label>
 					</control>
 
@@ -53,11 +53,11 @@
 					<control type="label">
 						<left>20</left>
 						<top>62</top>
-						<width>200</width>
+						<width>280</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
+						<font>XSmall</font>
 						<align>right</align>
-						<textcolor>TextColor4</textcolor>
+						<textcolor>ColorDetails</textcolor>
 						<label>$INFO[ListItem.StartTime]$INFO[ListItem.EndTime, - ,]</label>
 					</control>
 
@@ -76,7 +76,7 @@
 						<left>489</left>
 						<top>12</top>
 						<width>634</width>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 
@@ -86,18 +86,18 @@
 						<top>62</top>
 						<width>634</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>TextColor4</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorDetails</textcolor>
 						<label>$INFO[ListItem.ChannelName]</label>
 					</control>
 
 					<!-- Program comment -->
 					<control type="label">
-						<left>1120</left>
+						<left>1020</left>
 						<top>12</top>
 						<width>400</width>
 						<align>right</align>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Comment]</label>
 					</control>
 
@@ -116,7 +116,7 @@
 					<control type="label">
 						<left>20</left>
 						<top>12</top>
-						<width>200</width>
+						<width>280</width>
 						<align>right</align>
 						<label>$INFO[ListItem.StartDate]</label>
 					</control>
@@ -125,11 +125,11 @@
 					<control type="label">
 						<left>20</left>
 						<top>62</top>
-						<width>200</width>
+						<width>280</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
+						<font>XSmall</font>
 						<align>right</align>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.StartTime]$INFO[ListItem.EndTime, - ,]</label>
 					</control>
 
@@ -157,14 +157,14 @@
 						<top>62</top>
 						<width>634</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>ColorNF</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.ChannelName]</label>
 					</control>
 
 					<!-- Program comment -->
 					<control type="label">
-						<left>1120</left>
+						<left>1020</left>
 						<top>12</top>
 						<width>400</width>
 						<align>right</align>
@@ -184,10 +184,10 @@
 				<onleft>50</onleft>
 				<showonepage>false</showonepage>
 				<orientation>vertical</orientation>
-				<colordiffuse>OverlayColorNF</colordiffuse>
+				<colordiffuse>ColorHeading</colordiffuse>
 				<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
 				<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
-				<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
+				<texturesliderbarfocus border="8,1,6,1" colordiffuse="ColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
 				<textureslidernib>-</textureslidernib>
 				<textureslidernibfocus>-</textureslidernibfocus>
 				<visible>!Skin.HasSetting(Scrollbars)</visible>
@@ -210,8 +210,8 @@
 					<height>44</height>
 					<align>right</align>
 					<label>$INFO[Container(50).NumItems]</label>
-					<font>OLD_Font25</font>
-					<textcolor>ColorNF</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
 				</control>
 
 				<control type="label">
@@ -219,8 +219,8 @@
 					<height>44</height>
 					<align>right</align>
 					<label>$VAR[ContentType]</label>
-					<font>OLD_Font33</font>
-					<textcolor>ColorNF</textcolor>
+					<font>Small</font>
+					<textcolor>ColorHeading</textcolor>
 				</control>
 
 			</control>
@@ -249,14 +249,14 @@
 					<top>0</top>
 					<width>72</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 				<control type="image">
 					<left>0</left>
 					<top>0</top>
 					<width>24</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripHorizontalFO.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorFO">common/ScrollbarGripHorizontalFO.png</texture>
 					<animation effect="slide" start="0" end="24" time="200" condition="ControlGroup(4000).HasFocus()">Conditional</animation>
 					<animation effect="slide" start="0" end="48" time="200" condition="ControlGroup(5000).HasFocus()">Conditional</animation>
 				</control>
@@ -269,8 +269,8 @@
 					<width>1200</width>
 					<height>72</height>
 					<label>$VAR[CustomMenuHeading]</label>
-					<font>OLD_Font72</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>XLarge</font>
+					<textcolor>ColorFO</textcolor>
 				</control>
 
 				<!-- Look controls -->
@@ -308,7 +308,7 @@
 					<!-- Guide -->
 					<control type="button" id="102">
 						<include>OptionButtons</include>
-						<label>$LOCALIZE[19222]: $LOCALIZE[19030]</label>
+						<label>22020</label>
 						<onclick condition="Window.IsActive(TVGuide) | Window.IsActive(RadioGuide)">NextChannelGroup</onclick>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVGuide)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioGuide)</onclick>
@@ -332,7 +332,7 @@
 					<height>600</height>
 					<onup>noop</onup>
 					<ondown>noop</ondown>
-					<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+					<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
 					<onright>5001</onright>
 					<itemgap>8</itemgap>
 					<scrolltime>200</scrolltime>

@@ -5,60 +5,28 @@
 	<coordinates>
 		<origin x="0" y="0"/>
 	</coordinates>
-
 	<controls>
-
 		<!-- Background -->
-		<include>DialogFadeBackgroundImage</include>
-
-		<!-- Dialog group -->
-		<control type="group">
-			<include>DialogZoomAnimation</include>
-			<top>125</top>
+		<include>DialogBackgroundImage</include>
+		<!-- Default grouplist -->
+		<control type="grouplist" id="996">
 			<centerleft>50%</centerleft>
 			<width>440</width>
-			<height>825</height>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1001)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1002)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1003)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1004)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1005)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1006)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1007)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1008)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1009)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1010)">Conditional</animation>
-			<animation effect="slide" end="0,37.5" time="0" condition="!Control.IsVisible(1011)">Conditional</animation>
-
-			<!-- Background -->
-			<control type="image" id="999">
-				<left>-40</left>
-				<top>-30</top>
-				<width>520</width>
-				<height>885</height>
-				<texture border="20">dialogs/DialogBackground.png</texture>
-			</control>
-
-			<!-- Default grouplist -->
-			<control type="grouplist" id="996">
-				<centerleft>50%</centerleft>
-				<width>440</width>
-				<height max="825">auto</height>
-				<onup>noop</onup>
-				<ondown>noop</ondown>
-				<itemgap>0</itemgap>
-			</control>
-
-			<!-- Default button -->
-			<control type="button" id="1000">
-				<width>440</width>
-				<height>75</height>
-				<align>center</align>
-				<font>OLD_Font36</font>
-			</control>
-
+			<height>auto</height>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<itemgap>0</itemgap>
+			<align>center</align>
+			<include>DialogAnimation</include>
 		</control>
-
+		<!-- Default button -->
+		<control type="button" id="1000">
+			<width>440</width>
+			<height>68</height>
+			<align>center</align>
+			<font>Med</font>
+			<texturefocus>dialogs/DialogBackground.png</texturefocus>
+			<texturenofocus>dialogs/DialogBackground.png</texturenofocus>
+		</control>
 	</controls>
-
 </window>

@@ -1,198 +1,277 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- skinsettings -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
-	<defaultcontrol always="true">3</defaultcontrol>
+	<backgroundcolor>0</backgroundcolor>
+	<defaultcontrol always="true">9</defaultcontrol>
 	<onunload>RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;levels=0)</onunload>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
-		<!-- Main controls -->
+		<!-- Time -->
+		<include>Time</include>
+
+		<!-- Settings description -->
+		<control type="textbox">
+			<left>830</left>
+			<top>856</top>
+			<width>970</width>
+			<height>118</height>
+			<label>36104</label>
+			<textcolor>ColorFO</textcolor>
+			<shadowcolor>ColorDetails</shadowcolor>
+		</control>
+
+		<!-- Skin settings -->
 		<control type="group">
-			<include>WindowFadeAnimation</include>
+			<include>DialogAnimation</include>
 
-			<!-- Default group -->
-			<control type="grouplist" id="3">
-				<left>180</left>
-				<top>216</top>
-				<width>464</width>
-				<height>590</height>
-				<onup>3</onup>
-				<ondown>3</ondown>
-				<onleft>noop</onleft>
-				<onright>5</onright>
+			<!-- Heading -->
+			<control type="label">
+				<left>150</left>
+				<top>96</top>
+				<width>1620</width>
+				<height>72</height>
+				<font>XLarge</font>
+				<label>20077</label>
+			</control>
+
+			<!-- Left grouplist -->
+			<control type="grouplist" id="9">
+				<left>150</left>
+				<top>228</top>
+				<width>360</width>
+				<height>660</height>
 				<itemgap>0</itemgap>
+				<onleft>noop</onleft>
+				<onright>2</onright>
+				<onup>noop</onup>
+				<ondown>9001</ondown>
 				<orientation>vertical</orientation>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
 
 				<!-- Home items-->
 				<control type="button" id="10">
-					<width>464</width>
-					<height>118</height>
-					<font>Font60</font>
-					<onclick>SetFocus(5)</onclick>
-					<textcolor>ColorNF</textcolor>
+					<width>600</width>
+					<height>66</height>
 					<label>31021</label>
 					<textcolor>$VAR[SkinSettingButton10]</textcolor>
 				</control>
 
-				<!-- General -->
+				<!-- Background -->
 				<control type="button" id="11">
-					<width>464</width>
-					<height>118</height>
-					<font>Font60</font>
-					<onclick>SetFocus(5)</onclick>
-					<textcolor>ColorNF</textcolor>
-					<label>128</label>
+					<width>600</width>
+					<height>66</height>
+					<label>31020</label>
 					<textcolor>$VAR[SkinSettingButton11]</textcolor>
 				</control>
 
-				<!-- Debug-->
+				<!-- General -->
 				<control type="button" id="12">
-					<width>464</width>
-					<height>118</height>
-					<font>Font60</font>
-					<onclick>SetFocus(5)</onclick>
-					<textcolor>ColorNF</textcolor>
-					<label>Debug</label>
+					<width>600</width>
+					<height>66</height>
+					<label>128</label>
 					<textcolor>$VAR[SkinSettingButton12]</textcolor>
 				</control>
-
 			</control>
 
 			<!-- Right grouplist -->
-			<control type="grouplist" id="5">
-				<left>702</left>
-				<top>224</top>
-				<width>1038</width>
-				<height>516</height>
-				<onup>5</onup>
-				<ondown>5</ondown>
-				<onleft>3</onleft>
-				<onright>noop</onright>
+			<control type="grouplist" id="2">
+				<left>600</left>
+				<top>228</top>
+				<width>1240</width>
+				<height>660</height>
 				<itemgap>0</itemgap>
+				<onleft>9</onleft>
+				<onright>noop</onright>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
 				<orientation>vertical</orientation>
+				<usecontrolcoords>true</usecontrolcoords>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
 
 				<!-- Home items -->
 				<!-- Home submenu-->
 				<control type="button" id="1213">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
 					<label>31049</label>
 					<onclick>RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu)</onclick>
-					<visible>ControlGroup(3).HasFocus(10)</visible>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
 				</control>
-				<!-- Home fanart -->
+				<!-- Hide submenu headings -->
 				<control type="radiobutton" id="1214">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
-					<label>Enable fanart for widgets</label>
-					<onclick>Skin.ToggleSetting(HomeFanart)</onclick>
-					<selected>Skin.HasSetting(HomeFanart)</selected>
-					<visible>ControlGroup(3).HasFocus(10)</visible>
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31053</label>
+					<onclick>Skin.ToggleSetting(HideSubmenuHeading)</onclick>
+					<selected>Skin.HasSetting(HideSubmenuHeading)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+				<!-- Horizontal home -->
+				<control type="radiobutton" id="1002">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31061</label>
+					<onclick>Skin.ToggleSetting(HomeHorizontal)</onclick>
+					<selected>Skin.HasSetting(HomeHorizontal)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+				<!-- Hide Conq logo -->
+				<control type="radiobutton" id="1112">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31040</label>
+					<onclick>Skin.ToggleSetting(HideConqLogo)</onclick>
+					<selected>Skin.HasSetting(HideConqLogo)</selected>
+					<visible>ControlGroup(9).HasFocus(10)</visible>
+				</control>
+
+				<!-- Background -->
+				<!-- Custom image -->
+				<control type="button" id="1000">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31064</label>
+					<onclick>Skin.SetFile(CustomBackgroundImage,,special://skin/extras/backgrounds/)</onclick>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Background video -->
+				<control type="radiobutton" id="1003">
+					<width>1200</width>
+					<height>66</height>
+					<onup>101</onup>
+					<textwidth>1120</textwidth>
+					<label>31027</label>
+					<onclick>Skin.ToggleSetting(BackgroundVideo)</onclick>
+					<selected>Skin.HasSetting(BackgroundVideo)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Background visualisation -->
+				<control type="radiobutton" id="1004">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31028</label>
+					<onclick>Skin.ToggleSetting(BackgroundVisualisation)</onclick>
+					<selected>Skin.HasSetting(BackgroundVisualisation)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Enable artist slideshow -->
+				<control type="radiobutton" id="1005">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31034</label>
+					<onclick>Skin.ToggleSetting(EnableArtistFanart)</onclick>
+					<selected>Skin.HasSetting(EnableArtistFanart)</selected>
+					<visible>ControlGroup(9).HasFocus(11)</visible>
+				</control>
+				<!-- Fade artist slideshow -->
+				<control type="radiobutton" id="1006">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31014</label>
+					<onclick>Skin.ToggleSetting(FadeArtistFanart)</onclick>
+					<selected>Skin.HasSetting(FadeArtistFanart)</selected>
+					<visible>ControlGroup(9).HasFocus(11) + Skin.HasSetting(EnableArtistFanart)</visible>
 				</control>
 
 				<!-- General -->
-				<!-- Kiosk mode -->
-				<control type="radiobutton" id="1304">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
-					<label>31057</label>
-					<onclick>Skin.ToggleSetting(KioskMode)</onclick>
-					<selected>Skin.HasSetting(KioskMode)</selected>
-					<visible>ControlGroup(3).HasFocus(11)</visible>
+				<!-- Headings -->
+				<control type="radiobutton" id="1301">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31060</label>
+					<onclick>Skin.ToggleSetting(Headings)</onclick>
+					<selected>Skin.HasSetting(Headings)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
 				</control>
-				<!-- Scroll plots -->
-				<control type="radiobutton" id="1305">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
-					<label>Scroll plots</label>
-					<onclick>Skin.ToggleSetting(ScrollPlots)</onclick>
-					<selected>Skin.HasSetting(ScrollPlots)</selected>
-					<visible>ControlGroup(3).HasFocus(11)</visible>
+				<!-- Show curved segments -->
+				<control type="radiobutton" id="1007">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31030</label>
+					<onclick>Skin.ToggleSetting(ShowCurve)</onclick>
+					<selected>Skin.HasSetting(ShowCurve)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
 				</control>
-				<!-- Reset skin's setting -->
-				<control type="button" id="1306">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
-					<label>31058</label>
-					<onclick>Skin.ResetSettings</onclick>
-					<visible>ControlGroup(3).HasFocus(11)</visible>
+				<!-- Hide 'Mouse' warning -->
+				<control type="radiobutton" id="1008">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31065</label>
+					<onclick>Skin.ToggleSetting(HideMouse)</onclick>
+					<selected>Skin.HasSetting(HideMouse)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
 				</control>
-
-				<!-- Debug -->
 				<!-- Enable Debug Grid -->
 				<control type="radiobutton" id="1302">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
 					<label>31041</label>
 					<onclick>Skin.ToggleSetting(DebugGrid)</onclick>
 					<selected>Skin.HasSetting(DebugGrid)</selected>
-					<visible>ControlGroup(3).HasFocus(12)</visible>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
 				</control>
 				<!-- Disable Debug Info -->
 				<control type="radiobutton" id="1303">
-					<width>1038</width>
-					<height>86</height>
-					<font>Font40</font>
-					<textwidth>900</textwidth>
-					<textcolor>ColorNF</textcolor>
-					<focusedcolor>ColorFO</focusedcolor>
-					<invalidcolor>TextColor4</invalidcolor>
-					<disabledcolor>TextColor4</disabledcolor>
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
 					<label>31042</label>
 					<onclick>Skin.ToggleSetting(DebugInfo)</onclick>
 					<selected>Skin.HasSetting(DebugInfo)</selected>
-					<visible>ControlGroup(3).HasFocus(12)</visible>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Kiosk mode -->
+				<control type="radiobutton" id="1304">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31057</label>
+					<onclick>Skin.ToggleSetting(KioskMode)</onclick>
+					<selected>Skin.HasSetting(KioskMode)</selected>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
+				</control>
+				<!-- Reset skin's setting -->
+				<control type="button" id="1305">
+					<width>1200</width>
+					<height>66</height>
+					<textwidth>1120</textwidth>
+					<label>31058</label>
+					<onclick>Skin.ResetSettings</onclick>
+					<visible>ControlGroup(9).HasFocus(12)</visible>
 				</control>
 
 			</control>
 
 		</control>
 
-		<!-- Logo -->
-		<include>Logo</include>
-
-		<!-- Time -->
-		<include>Time</include>
+		<!-- Hide settings warning -->
+		<control type="textbox">
+			<left>600</left>
+			<top>894</top>
+			<width>1240</width>
+			<height>132</height>
+			<label>31051</label>
+			<textcolor>ColorDisabled</textcolor>
+			<visible>ControlGroup(9).HasFocus(11) + Skin.HasSetting(HideSettings)</visible>
+		</control>
 
 	</controls>
 

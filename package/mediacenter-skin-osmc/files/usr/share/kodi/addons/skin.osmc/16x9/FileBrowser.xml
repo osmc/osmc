@@ -2,7 +2,7 @@
 <window>
 	<!-- filebrowser -->
 	<defaultcontrol always="true">450</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -15,7 +15,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 		</control>
 
 		<!-- Image -->
@@ -43,7 +43,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>$INFO[ListItem.Icon]</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 			<visible>SubString(ListItem.Icon,Default)</visible>
 		</control>
@@ -53,7 +53,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>$INFO[ListItem.FileNameAndPath]</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 			<visible>StringCompare(ListItem.Path,special://skin/extras/backgrounds/)</visible>
 		</control>
@@ -84,8 +84,8 @@
 					<left>140</left>
 					<width>1030</width>
 					<height>96</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -103,8 +103,8 @@
 					<left>140</left>
 					<width>1030</width>
 					<height>96</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</focusedlayout>
@@ -137,8 +137,8 @@
 					<left>140</left>
 					<width>1030</width>
 					<height>96</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -156,8 +156,8 @@
 					<left>140</left>
 					<width>1030</width>
 					<height>96</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</focusedlayout>

@@ -1,175 +1,231 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
-
 	<include name="Viewtype50">
-
 		<control type="group">
+			<left>140</left>
+			<top>140</top>
 			<visible>Control.IsVisible(50)</visible>
-
-			<!-- Background -->
+			<!-- Image -->
 			<control type="image">
-				<left>656</left>
-				<width>1264</width>
-				<height>1080</height>
-				<texture>common/blue.png</texture>
-				<colordiffuse>88ffffff</colordiffuse>
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio aligny="bottom">keep</aspectratio>
+				<visible>SubString(ListItem.Icon,Default)</visible>
 			</control>
-
+			<control type="image">
+				<width>405</width>
+				<height>600</height>
+				<texture colordiffuse="00ffffff">$INFO[ListItem.Icon]</texture>
+				<aspectratio>keep</aspectratio>
+				<bordertexture>common/black.png</bordertexture>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<control type="image">
+				<width>405</width>
+				<height>600</height>
+				<texture>$INFO[ListItem.Icon]</texture>
+				<aspectratio>keep</aspectratio>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+			</control>
+			<!-- Info -->
 			<control type="group">
-				<visible>!ControlGroup(3000).HasFocus</visible>
-				<animation effect="fade" start="0" end="100" time="200" delay="200" tween="cubic" easing="out" reversible="false">Visible</animation>
-
-				<control type="group">
-					<visible>!Container(50).OnNext + !Container(50).OnPrevious</visible>
-					<animation effect="fade" start="0" end="100" time="200" delay="50">Visible</animation>
-
-					<!-- Image -->
+				<top>649</top>
+				<width>405</width>
+				<height>152</height>
+				<control type="image">
+					<width>130</width>
+					<height>56</height>
+					<texture>$INFO[ListItem.VideoResolution,flagging/video/,.png]</texture>
+				</control>
+				<control type="image">
+					<left>135</left>
+					<width>130</width>
+					<height>56</height>
+					<texture>$INFO[ListItem.AudioCodec,flagging/audio/,.png]</texture>
+				</control>
+				<control type="image">
+					<left>270</left>
+					<width>130</width>
+					<height>56</height>
+					<texture>$VAR[typehackflagging,flagging/video/,.png]</texture>
+				</control>
+				<control type="image">
+					<top>61</top>
+					<width>130</width>
+					<height>56</height>
+					<texture>$INFO[ListItem.VideoAspect,flagging/aspectratio/,.png]</texture>
+				</control>
+				<control type="image">
+					<top>61</top>
+					<left>135</left>
+					<width>130</width>
+					<height>56</height>
+					<texture>$INFO[ListItem.AudioChannels,flagging/audio/,.png]</texture>
+				</control>
+				<control type="image">
+					<top>61</top>
+					<left>270</left>
+					<width>130</width>
+					<height>56</height>
+					<texture>$VAR[videocodec,flagging/video/,.png]</texture>
+				</control>
+			</control>
+			<!--control type="grouplist">
+				<top>649</top>
+				<width>405</width>
+				<height>152</height>
+				<itemgap>0</itemgap>
+				<visible>!SubString(ListItem.Icon,Default)</visible>
+				<control type="button">
+					<width>405</width>
+					<height>48</height>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
+					<focusedcolor>ColorHeading</focusedcolor>
+					<label>$VAR[InfoHeading1]</label>
+					<label2>$VAR[InfoDetails1]</label2>
+				</control>
+				<control type="button">
+					<width>405</width>
+					<height>48</height>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
+					<focusedcolor>ColorHeading</focusedcolor>
+					<label>$VAR[InfoHeading2]</label>
+					<label2>$VAR[InfoDetails2]</label2>
+				</control>
+				<control type="button">
+					<width>405</width>
+					<height>48</height>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
+					<focusedcolor>ColorHeading</focusedcolor>
+					<label>$VAR[InfoHeading3]</label>
+					<label2>$VAR[InfoDetails3]</label2>
+				</control>
+			</control-->
+			<!-- Previous item -->
+			<control type="image">
+				<left>525</left>
+				<top>-4</top>
+				<width>40</width>
+				<height>4</height>
+				<texture colordiffuse="ColorSelected">common/white.png</texture>
+				<visible>Container(50).HasPrevious</visible>
+			</control>
+			<!-- List -->
+			<control type="fixedlist" id="50">
+				<left>485</left>
+				<width>1155</width>
+				<height>780</height>
+				<onup>50</onup>
+				<ondown>50</ondown>
+				<onright>60</onright>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
+				<pagecontrol>60</pagecontrol>
+				<focusposition>4</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<itemlayout height="80" width="1155">
+					<!-- Watched status -->
 					<control type="image">
-						<left>100</left>
-						<top>250</top>
-						<width>516</width>
-						<height>516</height>
-						<texture>$INFO[ListItem.Icon]</texture>
-						<aspectratio aligny="center">keep</aspectratio>
+						<top>30</top>
+						<width>20</width>
+						<height>20</height>
+						<texture>$VAR[StatusOverlay]</texture>
 					</control>
-
-					<!-- Plot -->
-					<control type="textbox">
-						<left>100</left>
-						<top>783</top>
-						<width>516</width>
-						<height>152</height>
-						<font>Font30</font>
-						<textcolor>ColorFO</textcolor>
-						<label>$VAR[Plot]</label>
+					<control type="label">
+						<left>40</left>
+						<top>0</top>
+						<width>1115</width>
+						<height>80</height>
+						<font>Med</font>
+						<label>$INFO[ListItem.Label]</label>
+						<textcolor>ColorNF</textcolor>
 					</control>
-
-				</control>
-
-			</control>
-
-			<control type="group">
-				<animation effect="fade" start="100" end="60" time="200" tween="cubic" easing="out" reversible="false" condition="!Control.HasFocus(50)">Conditional</animation>
-
-				<!-- Heading -->
-				<control type="label">
-					<left>738</left>
-					<top>166</top>
-					<width>1082</width>
-					<height>200</height>
-					<font>Font40</font>
-					<textcolor>ColorFO</textcolor>
-					<label>$VAR[Heading]</label>
-				</control>
-
-				<!-- Scrollbar -->
-				<control type="scrollbar" id="60">
-					<left>656</left>
-					<top>358</top>
-					<width>4</width>
-					<height>532</height>
-					<onleft condition="!Skin.HasSetting(KioskMode)">99</onleft>
-					<onright>50</onright>
-					<showonepage>false</showonepage>
-					<orientation>vertical</orientation>
-					<texturesliderbackground>-</texturesliderbackground>
-					<texturesliderbar colordiffuse="ColorNF">common/white.png</texturesliderbar>
-					<texturesliderbarfocus colordiffuse="ColorFO">common/white.png</texturesliderbarfocus>
-					<textureslidernib>-</textureslidernib>
-					<textureslidernibfocus>-</textureslidernibfocus>
-				</control>
-
-				<!-- Previous item -->
-				<control type="image">
-					<left>738</left>
-					<top>332</top>
-					<width>40</width>
-					<height>4</height>
-					<texture>common/white.png</texture>
-					<colordiffuse>ColorNF</colordiffuse>
-					<visible>Container(50).HasPrevious</visible>
-				</control>
-
-				<!-- List -->
-				<control type="fixedlist" id="50">
-					<left>690</left>
-					<top>358</top>
-					<width>1130</width>
-					<height>532</height>
-					<onup>50</onup>
-					<ondown>50</ondown>
-					<onleft>60</onleft>
-					<onright>noop</onright>
-					<pagecontrol>60</pagecontrol>
-					<focusposition>0</focusposition>
-					<orientation>vertical</orientation>
-					<viewtype label="535">list</viewtype>
-					<scrolltime tween="sine" easing="out">300</scrolltime>
-
-					<itemlayout width="1130" height="82">
-						<control type="image">
-							<top>27</top>
-							<width>24</width>
-							<height>30</height>
-							<colordiffuse>ColorNF</colordiffuse>
-							<texture>$VAR[ListItemOverlay]</texture>
-						</control>
+				</itemlayout>
+				<focusedlayout height="140" width="1155">
+					<!-- Watched status -->
+					<control type="image">
+						<top>60</top>
+						<width>20</width>
+						<height>20</height>
+						<texture>$VAR[StatusOverlay]</texture>
+					</control>
+					<control type="group">
+						<visible>Control.Hasfocus(50)</visible>
 						<control type="label">
-							<left>48</left>
-							<width>1082</width>
-							<height>82</height>
-							<font>Font40</font>
-							<textcolor>ColorNF</textcolor>
+							<left>40</left>
+							<top>20</top>
+							<width>1115</width>
+							<height>50</height>
+							<font>XLarge</font>
 							<label>$INFO[ListItem.Label]</label>
-						</control>
-					</itemlayout>
-
-					<focusedlayout width="1130" height="118">
-						<control type="image">
-							<top>42</top>
-							<width>24</width>
-							<height>30</height>
-							<texture>$VAR[ListItemOverlay]</texture>
+							<textcolor>ColorFO</textcolor>
+							<animation effect="slide" end="0,22" condition="IsEmpty(Control.GetLabel(9999))">Conditional</animation>
 						</control>
 						<control type="label">
-							<left>48</left>
-							<top>40</top>
-							<width>1082</width>
-							<height>40</height>
-							<font>Font40</font>
-							<textcolor>ColorFO</textcolor>
-							<label>$INFO[ListItem.Label]</label>
-							<animation effect="slide" end="0,-19" condition="!IsEmpty(ListItem.Label2)">Conditional</animation>
-						</control>
-						<control type="label">
-							<left>48</left>
-							<top>66</top>
-							<width>1082</width>
+							<left>40</left>
+							<top>80</top>
+							<width>1115</width>
 							<height>30</height>
-							<font>Font30</font>
-							<textcolor>ColorFO</textcolor>
+							<font>Small</font>
 							<label>$VAR[Label2]</label>
-							<visible>!IsEmpty(ListItem.Label2)</visible>
+							<textcolor>ColorFO</textcolor>
+							<visible>!IsEmpty(Control.GetLabel(9999))</visible>
 						</control>
-					</focusedlayout>
-
-				</control>
-
-				<!-- Next item -->
-				<control type="image">
-					<left>738</left>
-					<top>926</top>
-					<width>40</width>
-					<height>4</height>
-					<texture>common/white.png</texture>
-					<colordiffuse>ColorNF</colordiffuse>
-					<visible>Container(50).HasNext</visible>
-				</control>
-
+					</control>
+					<control type="group">
+						<visible>!Control.Hasfocus(50)</visible>
+						<control type="label">
+							<left>40</left>
+							<top>20</top>
+							<width>1115</width>
+							<height>50</height>
+							<font>XLarge</font>
+							<label>$INFO[ListItem.Label]</label>
+							<textcolor>ColorSelected</textcolor>
+							<animation effect="slide" end="0,22" condition="IsEmpty(Control.GetLabel(9999))">Conditional</animation>
+						</control>
+						<control type="label">
+							<left>40</left>
+							<top>80</top>
+							<width>1115</width>
+							<height>30</height>
+							<font>Small</font>
+							<label>$VAR[Label2]</label>
+							<textcolor>ColorSelected</textcolor>
+							<visible>!IsEmpty(Control.GetLabel(9999))</visible>
+						</control>
+					</control>
+				</focusedlayout>
 			</control>
-
+			<!-- Next item -->
+			<control type="image">
+				<left>525</left>
+				<bottom>156</bottom>
+				<width>40</width>
+				<height>4</height>
+				<texture colordiffuse="ColorSelected">common/white.png</texture>
+				<visible>Container(50).HasNext</visible>
+			</control>
+			<!-- Scrollbar -->
+			<control type="scrollbar" id="60">
+				<left>1640</left>
+				<width>20</width>
+				<height>780</height>
+				<onleft>50</onleft>
+				<onright>noop</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<texturesliderbackground colordiffuse="22ffffff" border="3">common/ScrollbarVertical.png</texturesliderbackground>
+				<texturesliderbar colordiffuse="ColorNF" border="3">common/ScrollbarVertical.png</texturesliderbar>
+				<texturesliderbarfocus colordiffuse="ColorFO" border="3">common/ScrollbarVertical.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+			</control>
 		</control>
-
 	</include>
-
 </includes>

@@ -1,5 +1,4 @@
 <includes>
-
 	<include file="Defaults.xml" />
 	<include file="Include_Home_Default.xml" />
 	<include file="Include_Home_Horizontal.xml" />
@@ -9,10 +8,7 @@
 	<include file="Viewtype51.xml" />
 	<include file="Viewtype52.xml" />
 	<include file="Viewtype53.xml" />
-	<include file="Viewtype54.xml" />
-	<include file="Viewtype55.xml" />
 	<include file="Variables.xml" />
-
 	<!-- Fullscreen dimensions -->
 	<include name="FullscreenDimensions">
 		<left>0</left>
@@ -20,44 +16,46 @@
 		<width>1920</width>
 		<height>1080</height>
 	</include>
-
 	<!-- OSMC logo -->
 	<include name="Logo">
 		<control type="image">
-			<left>100</left>
-			<top>100</top>
+			<left>50</left>
+			<top>50</top>
 			<width>247</width>
 			<height>44</height>
-			<texture>common/logo.png</texture>
+			<texture colordiffuse="ColorHeading">OSMC.png</texture>
 		</control>
 	</include>
-
 	<!-- Window background image -->
-	<include name="WindowBackgroundImage">
+	<include name="WindowBackground">
 		<control type="image">
 			<include>FullscreenDimensions</include>
-			<texture>special://skin/extras/background.png</texture>
+			<texture colordiffuse="WindowBackgroundColor">common/white.png</texture>
+		</control>
+		<control type="visualisation">
+			<include>FullscreenDimensions</include>
+			<visible>Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)</visible>
+		</control>
+		<control type="videowindow">
+			<include>FullscreenDimensions</include>
+			<visible>Player.HasVideo + Skin.HasSetting(BackgroundVideo)</visible>
+		</control>
+		<control type="image">
+			<include>FullscreenDimensions</include>
+			<texture colordiffuse="WindowBackgroundColor">common/white.png</texture>
+			<animation effect="fade" end="90" condition="true">Conditional</animation>
+			<visible>[Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)] | [Player.HasVideo + Skin.HasSetting(BackgroundVideo)]</visible>
 		</control>
 	</include>
-
 	<!-- Dialog background image -->
 	<include name="DialogBackgroundImage">
 		<control type="image">
 			<include>FullscreenDimensions</include>
-			<texture border="20">dialogs/DialogBackground.png</texture>
+			<texture colordiffuse="WindowBackgroundColor">common/white.png</texture>
+			<animation effect="fade" start="0" end="70" time="200">WindowOpen</animation>
+			<animation effect="fade" start="70" end="0" time="200">WindowClose</animation>
 		</control>
 	</include>
-
-	<!-- Dialog fade background image -->
-	<include name="DialogFadeBackgroundImage">
-		<control type="image">
-			<include>FullscreenDimensions</include>
-			<texture colordiffuse="88000000">dialogs/DialogTextBackground.png</texture>
-			<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
-			<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
-		</control>
-	</include>
-
 	<!-- Options background image -->
 	<include name="OptionsBackgroundImage">
 		<control type="image">
@@ -65,56 +63,81 @@
 			<texture border="20">dialogs/OptionsBackground.png</texture>
 		</control>
 	</include>
-
 	<!-- Fanart -->
 	<include name="Fanart">
 		<control type="image">
 			<include>FullscreenDimensions</include>
 			<include>VisibleFadeAnimation</include>
 			<fadetime>400</fadetime>
-			<texture colordiffuse="12ffffff" background="true">$INFO[ListItem.Art(fanart)]</texture>
-			<visible>[Skin.HasSetting(Fanart)]</visible>
+			<colordiffuse>22f1f1f1</colordiffuse>
+			<texture background="true">$VAR[Fanart]</texture>
+			<animation effect="fade" start="100" end="0" condition="[Player.HasVideo + Skin.HasSetting(BackgroundVideo)] | [Player.HasAudio + Skin.HasSetting(BackgroundVisualisation) + !SubString(Window(videolibrary).Property(TvTunesIsAlive),True)]">Conditional</animation>
 		</control>
 	</include>
-
 	<!-- Time -->
 	<include name="Time">
 		<control type="label">
-			<right>100</right>
-			<top>95</top>
+			<right>47</right>
+			<top>44</top>
 			<width>800</width>
 			<height>40</height>
 			<align>right</align>
 			<label>$INFO[System.Time]</label>
-			<font>Font40</font>
-			<textcolor>ColorFO</textcolor>
+			<font>Large</font>
+			<textcolor>ColorHeading</textcolor>
+		</control>
+		<control type="label">
+			<right>47</right>
+			<top>88</top>
+			<width>800</width>
+			<height>33</height>
+			<align>right</align>
+			<label>$INFO[System.Date]</label>
+			<font>XSmall</font>
+			<textcolor>ColorDetails</textcolor>
 		</control>
 	</include>
-
+	<!-- Heading -->
+	<include name="Heading">
+		<control type="label">
+			<left>50</left>
+			<top>44</top>
+			<width>800</width>
+			<height>40</height>
+			<label>$VAR[Heading]</label>
+			<font>Large</font>
+			<textcolor>ColorHeading</textcolor>
+		</control>
+		<control type="label">
+			<left>50</left>
+			<top>88</top>
+			<width>800</width>
+			<height>33</height>
+			<label>$INFO[Container.NumItems,, Items]</label>
+			<font>XSmall</font>
+			<textcolor>ColorDetails</textcolor>
+		</control>
+	</include>
 	<!-- Window animation -->
 	<include name="WindowFadeAnimation">
 		<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
 		<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
 	</include>
-
 	<!-- Visible animation -->
 	<include name="VisibleFadeAnimation">
 		<animation effect="fade" start="0" end="100" time="200">Visible</animation>
 		<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
 	</include>
-
 	<!-- Dialog animation -->
-	<include name="DialogZoomAnimation">
+	<include name="DialogAnimation">
 		<animation type="WindowOpen">
-			<effect type="zoom" start="70" end="100" center="auto" tween="back" easing="inout" time="300" />
+			<effect type="slide" start="0,80" end="0,0" center="auto" tween="back" easing="out" time="300" />
 			<effect type="fade" start="0" end="100" time="300" />
 		</animation>
 		<animation type="WindowClose">
-			<effect type="zoom" start="100" end="70" center="auto" time="100" />
 			<effect type="fade" start="100" end="0" time="100" />
 		</animation>
 	</include>
-
 	<!-- Options animation -->
 	<include name="OptionsAnimation">
 		<animation type="Visible">
@@ -126,38 +149,26 @@
 			<effect type="fade" start="100" end="0" time="100" />
 		</animation>
 	</include>
-
 	<!-- Shutdown buttons -->
 	<include name="ShutdownButtons">
-		<width>480</width>
-		<height>75</height>
-		<font>OLD_Font36</font>
-		<align>center</align>
-		<textoffsetx>20</textoffsetx>
-		<textcolor>DialogColor2</textcolor>
-		<focusedcolor>DialogColor1</focusedcolor>
-		<texturefocus>dialogs/ShutdownButton.png</texturefocus>
-		<texturenofocus>dialogs/ShutdownButton.png</texturenofocus>
+		<width>520</width>
+		<height>68</height>
+		<font>Med</font>
 	</include>
-
 	<!-- Options buttons -->
 	<include name="OptionButtons">
-		<width>516</width>
-		<height>76</height>
-		<font>Font40</font>
-		<textcolor>ColorNF</textcolor>
-		<focusedcolor>ColorFO</focusedcolor>
+		<width>480</width>
+		<height>68</height>
+		<font>Med</font>
 	</include>
-
 	<!-- Keyboard buttons -->
 	<include name="KeyboardButtons">
 		<width>84</width>
 		<height>74</height>
-		<font>OLD_Font48</font>
+		<font>Med</font>
 		<align>center</align>
 		<textoffsetx>10</textoffsetx>
 	</include>
-
 	<!-- OSD Play buttons -->
 	<include name="OSDPlayStopButtons">
 		<control type="togglebutton" id="1">
@@ -178,7 +189,6 @@
 			<onclick>PlayerControl(Stop)</onclick>
 		</control>
 	</include>
-
 	<!-- OSD Stop buttons -->
 	<include name="OSDStopButton">
 		<control type="button" id="1">
@@ -189,7 +199,6 @@
 			<onclick>PlayerControl(Stop)</onclick>
 		</control>
 	</include>
-
 	<!-- Item count -->
 	<include name="ItemCount">
 		<control type="grouplist">
@@ -208,18 +217,17 @@
 				<height>44</height>
 				<align>right</align>
 				<label>$INFO[Container.NumItems]</label>
-				<font>OLD_Font25</font>
-				<textcolor>ColorNF</textcolor>
+				<font>XSmall</font>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>auto</width>
 				<height>44</height>
 				<align>right</align>
 				<label>$VAR[ContentType]</label>
-				<font>OLD_Font33</font>
-				<textcolor>ColorNF</textcolor>
+				<font>Small</font>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 		</control>
 	</include>
-
 </includes>

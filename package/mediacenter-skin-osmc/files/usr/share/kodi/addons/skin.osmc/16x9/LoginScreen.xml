@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- loginscreen -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol always="true">52</defaultcontrol>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Time -->
 		<include>Time</include>
@@ -16,8 +16,8 @@
 		<control type="group">
 			<include>WindowFadeAnimation</include>
 
-			<!-- OSMC logo -->
-			<include condition="!Skin.HasSetting(HideOSMCLogo)">OSMCLogo</include>
+			<!-- Conq logo -->
+			<include condition="!Skin.HasSetting(HideConqLogo)">ConqLogo</include>
 
 			<!-- Image -->
 			<control type="image">
@@ -47,7 +47,7 @@
 				<width>405</width>
 				<height>600</height>
 				<texture>DefaultActor.png</texture>
-				<colordiffuse>OverlayColorFO</colordiffuse>
+				<colordiffuse>ColorFO</colordiffuse>
 				<aspectratio aligny="center">keep</aspectratio>
 				<visible>SubString(ListItem.Icon,unknown-user)</visible>
 			</control>
@@ -73,9 +73,9 @@
 						<top>0</top>
 						<width>1018</width>
 						<height>90</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Label]</label>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 				</itemlayout>
 
@@ -85,7 +85,7 @@
 						<top>43</top>
 						<width>1018</width>
 						<height>48</height>
-						<font>OLD_Font48</font>
+						<font>XLarge</font>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>ColorFO</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
@@ -96,9 +96,9 @@
 						<top>100</top>
 						<width>1018</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
+						<font>XSmall</font>
 						<label>$INFO[ListItem.Label2]</label>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
 						<animation effect="fade" start="100" end="50" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(52)">Conditional</animation>
 					</control>

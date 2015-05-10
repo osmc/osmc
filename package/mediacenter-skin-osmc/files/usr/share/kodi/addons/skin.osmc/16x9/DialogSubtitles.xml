@@ -2,7 +2,7 @@
 <window>
 	<!-- subtitlesearch -->
 	<defaultcontrol>150</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -15,7 +15,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 		</control>
 
 		<!-- Left heading -->
@@ -33,7 +33,7 @@
 			<top>298</top>
 			<width>360</width>
 			<height>20</height>
-			<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+			<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 		</control>
 
 		<!-- Left list -->
@@ -53,7 +53,7 @@
 				<control type="label">
 					<width>360</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -92,7 +92,7 @@
 			<top>298</top>
 			<width>1200</width>
 			<height>20</height>
-			<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+			<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 		</control>
 
 		<!-- List -->
@@ -114,21 +114,21 @@
 					<top>9</top>
 					<width>48</width>
 					<height>48</height>
-					<colordiffuse>OverlayColorNF</colordiffuse>
+					<colordiffuse>ColorHeading</colordiffuse>
 					<texture>$INFO[ListItem.Thumb,language/,.png]</texture>
 				</control>
 				<control type="label">
 					<left>86</left>
 					<width>120</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 				<control type="label">
 					<left>226</left>
 					<width>70</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>[CC]</label>
 					<visible>ListItem.Property(hearingimp)</visible>
 				</control>
@@ -136,7 +136,7 @@
 					<left>316</left>
 					<width>120</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>(SYNC)</label>
 					<visible>ListItem.Property(sync)</visible>
 				</control>
@@ -144,7 +144,7 @@
 					<left>456</left>
 					<width>584</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label2]</label>
 				</control>
 				<control type="image">
@@ -171,14 +171,14 @@
 						<left>86</left>
 						<width>120</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 					<control type="label">
 						<left>226</left>
 						<width>70</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 						<label>[CC]</label>
 						<visible>ListItem.Property(hearingimp)</visible>
 					</control>
@@ -186,7 +186,7 @@
 						<left>316</left>
 						<width>120</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 						<label>(SYNC)</label>
 						<visible>ListItem.Property(sync)</visible>
 					</control>
@@ -194,7 +194,7 @@
 						<left>456</left>
 						<width>584</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 					<control type="image">
@@ -221,8 +221,8 @@
 			<onup>120</onup>
 			<ondown>noop</ondown>
 			<label>24120</label>
-			<textcolor>DialogColor2</textcolor>
-			<focusedcolor>DialogColor1</focusedcolor>
+			<textcolor>ColorHeading</textcolor>
+			<focusedcolor>ColorFO</focusedcolor>
 		</control>
 
 		<!-- Notification -->
@@ -233,7 +233,7 @@
 			<height>66</height>
 			<align>right</align>
 			<label>31044</label>
-			<textcolor>DialogColor1</textcolor>
+			<textcolor>ColorFO</textcolor>
 		</control>
 
 	</controls>

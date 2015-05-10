@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- musicplaylisteditor -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<onload>SetFocus(50)</onload>
 	<onload>SetFocus(6)</onload>
 
@@ -9,7 +9,7 @@
 
 		<!-- Fake previous window (music library) -->
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Curve -->
 		<control type="image">
@@ -31,7 +31,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>DefaultFile.png</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 		</control>
 
@@ -46,28 +46,28 @@
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem-3)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem-2)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem-1)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>1018</width>
 				<height>180</height>
-				<font>OLD_Font72</font>
+				<font>XLarge</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem)]</label>
 				<textcolor>ColorFO</textcolor>
 				<shadowcolor>ShadowColor</shadowcolor>
@@ -75,23 +75,23 @@
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem1)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem2)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>1018</width>
 				<height>90</height>
-				<font>OLD_Font36</font>
+				<font>Med</font>
 				<label>$INFO[Window(musiclibrary).Property(ListItem3)]</label>
-				<textcolor>ColorNF</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 		</control>
 
@@ -111,22 +111,22 @@
 				<height>44</height>
 				<align>right</align>
 				<label>$INFO[Window(musiclibrary).Property(NumberItems)]</label>
-				<font>OLD_Font25</font>
-				<textcolor>ColorNF</textcolor>
+				<font>XSmall</font>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 			<control type="label">
 				<width>auto</width>
 				<height>44</height>
 				<align>right</align>
 				<label>136</label>
-				<font>OLD_Font33</font>
-				<textcolor>ColorNF</textcolor>
+				<font>Small</font>
+				<textcolor>ColorHeading</textcolor>
 			</control>
 		</control>
 
 		<!-- Playlist editor controls -->
 		<control type="group">
-			<include>DialogZoomAnimation</include>
+			<include>DialogAnimation</include>
 
 			<!-- Background -->
 			<include>DialogBackgroundImage</include>
@@ -137,7 +137,7 @@
 				<top>96</top>
 				<width>1620</width>
 				<height>72</height>
-				<font>OLD_Font72</font>
+				<font>XLarge</font>
 				<label>10503</label>
 			</control>
 
@@ -150,7 +150,7 @@
 				<control type="label">
 					<width>610</width>
 					<height>66</height>
-					<textcolor>DialogColor1</textcolor>
+					<textcolor>ColorFO</textcolor>
 					<label>31007</label>
 				</control>
 
@@ -159,7 +159,7 @@
 					<top>66</top>
 					<width>610</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 
 				<!-- Left list -->
@@ -176,7 +176,7 @@
 					<itemlayout height="66" width="610">
 						<control type="label">
 							<width>610</width>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 					</itemlayout>
@@ -184,7 +184,7 @@
 					<focusedlayout height="66" width="610">
 						<control type="label">
 							<width>610</width>
-							<textcolor>DialogColor1</textcolor>
+							<textcolor>ColorFO</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(50)">Conditional</animation>
 						</control>
@@ -206,17 +206,17 @@
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
-						<font>OLD_Font25</font>
+						<font>XSmall</font>
 						<label>$INFO[Container(50).NumItems]</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
 						<label>31000</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>!IntegerGreaterThan(Container(50).NumItems,1)</visible>
 					</control>
 					<control type="label">
@@ -224,8 +224,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>31001</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>IntegerGreaterThan(Container(50).NumItems,1)</visible>
 					</control>
 				</control>
@@ -243,7 +243,7 @@
 					<width>360</width>
 					<height>66</height>
 					<align>center</align>
-					<textcolor>DialogColor1</textcolor>
+					<textcolor>ColorFO</textcolor>
 					<label>31008</label>
 				</control>
 
@@ -265,9 +265,9 @@
 						<left>20</left>
 						<top>390</top>
 						<width>320</width>
-						<font>OLD_Font25</font>
-						<textcolor>DialogColor1</textcolor>
-						<label>$INFO[Container(50).ListItem.Artist,[COLOR=SelectedColor]$LOCALIZE[557]:[/COLOR] ,[CR]]$INFO[Container(50).ListItem.Album,[COLOR=SelectedColor]$LOCALIZE[558]: [/COLOR]]</label>
+						<font>XSmall</font>
+						<textcolor>ColorFO</textcolor>
+						<label>$INFO[Container(50).ListItem.Artist,[COLOR=ColorSelected]$LOCALIZE[557]:[/COLOR] ,[CR]]$INFO[Container(50).ListItem.Album,[COLOR=ColorSelected]$LOCALIZE[558]: [/COLOR]]</label>
 					</control>
 
 				</control>
@@ -291,9 +291,9 @@
 						<top>390</top>
 						<width>320</width>
 						<height>330</height>
-						<font>OLD_Font25</font>
-						<textcolor>DialogColor1</textcolor>
-						<label>$INFO[Container(100).ListItem.Artist,[COLOR=SelectedColor]$LOCALIZE[557]:[/COLOR] ,[CR]]$INFO[Container(100).ListItem.Album,[COLOR=SelectedColor]$LOCALIZE[558]: [/COLOR]]</label>
+						<font>XSmall</font>
+						<textcolor>ColorFO</textcolor>
+						<label>$INFO[Container(100).ListItem.Artist,[COLOR=ColorSelected]$LOCALIZE[557]:[/COLOR] ,[CR]]$INFO[Container(100).ListItem.Album,[COLOR=ColorSelected]$LOCALIZE[558]: [/COLOR]]</label>
 					</control>
 
 				</control>
@@ -345,7 +345,7 @@
 				<control type="label">
 					<width>610</width>
 					<height>66</height>
-					<textcolor>DialogColor1</textcolor>
+					<textcolor>ColorFO</textcolor>
 					<label>31012</label>
 				</control>
 
@@ -354,7 +354,7 @@
 					<top>66</top>
 					<width>610</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 
 				<!-- Right list -->
@@ -371,13 +371,13 @@
 					<itemlayout height="66" width="610">
 						<control type="label">
 							<width>610</width>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 						<control type="label">
 							<width>610</width>
 							<align>right</align>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label2]</label>
 						</control>
 					</itemlayout>
@@ -387,13 +387,13 @@
 							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(100)">Conditional</animation>
 							<control type="label">
 								<width>610</width>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label]</label>
 							</control>
 							<control type="label">
 								<width>610</width>
 								<align>right</align>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label2]</label>
 							</control>
 						</control>
@@ -415,17 +415,17 @@
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
-						<font>OLD_Font25</font>
+						<font>XSmall</font>
 						<label>$INFO[Container(100).NumItems]</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
 						<label>31000</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>!IntegerGreaterThan(Container(100).NumItems,1)</visible>
 					</control>
 					<control type="label">
@@ -433,8 +433,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>31001</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>IntegerGreaterThan(Container(100).NumItems,1)</visible>
 					</control>
 				</control>

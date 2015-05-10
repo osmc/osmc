@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- startup -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
-	<defaultcontrol always="true">100</defaultcontrol>
-	<controls>
-		<control type="button" id="100">
-			<font>-</font>
-			<onfocus condition="!IsEmpty(Window(home).Property(walkthrough_is_running))">SetFocus(101)</onfocus>
-			<onfocus condition="IsEmpty(Window(home).Property(walkthrough_is_running))">ReplaceWindow($INFO[System.StartupWindow])</onfocus>
-		</control>
-		<control type="button" id="101">
-			<font>-</font>
-			<onfocus>SetFocus(100)</onfocus>
-		</control>
-		<!-- Background -->
-		<include>WindowBackgroundImage</include>
-	</controls>
+	<onload>Skin.Reset(HideSettings)</onload>
+	<onload>ReplaceWindow($INFO[System.StartupWindow])</onload>
 </window>

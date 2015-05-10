@@ -2,8 +2,8 @@
 <window>
 	<!-- selectdialog -->
 	<defaultcontrol always="true">3</defaultcontrol>
-	<include>DialogZoomAnimation</include>
-	<zorder>1</zorder>
+	<include>DialogAnimation</include>
+	<zorder>2</zorder>
 
 	<controls>
 
@@ -16,7 +16,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 		</control>
 
 		<!-- Image -->
@@ -35,7 +35,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>$INFO[Container(6).ListItem.Icon]</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 			<visible>Control.IsVisible(6) + SubString(Container(6).ListItem.Icon,Default)</visible>
 		</control>
@@ -58,8 +58,8 @@
 				<control type="label">
 					<width>1620</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -68,8 +68,8 @@
 				<control type="label">
 					<width>1620</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 					<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(3)">Conditional</animation>
 				</control>
@@ -103,8 +103,8 @@
 					<top>10</top>
 					<width>1030</width>
 					<height>36</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 					<animation effect="slide" end="0,18" condition="IsEmpty(ListItem.Property(Addon.Summary))">Conditional</animation>
 				</control>
@@ -113,8 +113,8 @@
 					<top>54</top>
 					<width>1030</width>
 					<height>27</height>
-					<font>OLD_Font27</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Property(Addon.Summary)]</label>
 				</control>
 			</itemlayout>
@@ -133,8 +133,8 @@
 					<top>10</top>
 					<width>1030</width>
 					<height>36</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 					<animation effect="slide" end="0,18" condition="IsEmpty(ListItem.Property(Addon.Summary))">Conditional</animation>
 				</control>
@@ -143,8 +143,8 @@
 					<top>54</top>
 					<width>1030</width>
 					<height>27</height>
-					<font>OLD_Font27</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Property(Addon.Summary)]</label>
 				</control>
 			</focusedlayout>

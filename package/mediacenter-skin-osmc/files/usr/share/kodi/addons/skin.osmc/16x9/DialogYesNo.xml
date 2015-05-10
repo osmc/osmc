@@ -2,79 +2,74 @@
 <window>
 	<!-- yesnodialog -->
 	<defaultcontrol always="true">10</defaultcontrol>
-	<zorder>4</zorder>
-
 	<controls>
-
 		<!-- Background -->
-		<include>DialogFadeBackgroundImage</include>
-
+		<include>DialogBackgroundImage</include>
 		<!-- Main group -->
 		<control type="group">
-			<include>DialogZoomAnimation</include>
+			<include>DialogAnimation</include>
 			<centerleft>50%</centerleft>
 			<centertop>50%</centertop>
-			<width>720</width>
-			<height>360</height>
-
+			<width>800</width>
+			<height>290</height>
 			<!-- Background -->
 			<control type="image">
 				<centerleft>50%</centerleft>
-				<width>720</width>
-				<height>360</height>
-				<texture border="20">dialogs/DialogBackground.png</texture>
+				<width>100%</width>
+				<height>100%</height>
+				<texture>dialogs/DialogBackground.png</texture>
 			</control>
-
 			<!-- Heading -->
 			<control type="label" id="1">
-				<centerleft>50%</centerleft>
-				<top>40</top>
-				<width>600</width>
-				<height>48</height>
-				<align>center</align>
-				<font>OLD_Font48</font>
-				<textcolor>DialogColor1</textcolor>
+				<left>20</left>
+				<width>95%</width>
+				<height>68</height>
+				<font>Large</font>
+				<textcolor>ColorHeading</textcolor>
 			</control>
-
 			<!-- Details -->
 			<control type="textbox" id="9">
 				<centerleft>50%</centerleft>
-				<top>96</top>
-				<width>600</width>
-				<height>158</height>
-				<align>center</align>
-				<font>OLD_Font42</font>
-				<autoscroll>False</autoscroll>
-				<textcolor>DialogColor2</textcolor>
+				<top>76</top>
+				<width>95%</width>
+				<height>146</height>
+				<font>XSmall</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
-
-			<!-- No -->
-			<control type="button" id="10">
-				<left>40</left>
-				<top>262</top>
-				<width>270</width>
-				<height>36</height>
-				<align>right</align>
+			<!-- Button grouplist -->
+			<control type="grouplist" id="9001">
+				<centerleft>50%</centerleft>
+				<bottom>0</bottom>
+				<width>100%</width>
+				<height>68</height>
+				<itemgap>0</itemgap>
 				<onleft>noop</onleft>
-				<onright>11</onright>
-				<label>106</label>
-				<font>OLD_Font36</font>
-			</control>
-
-			<!-- Yes -->
-			<control type="button" id="11">
-				<right>40</right>
-				<top>262</top>
-				<width>270</width>
-				<height>36</height>
-				<onleft>10</onleft>
 				<onright>noop</onright>
-				<label>107</label>
-				<font>OLD_Font36</font>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
+				<defaultcontrol>10</defaultcontrol>
+				<orientation>horizontal</orientation>
+				<!-- No -->
+				<control type="button" id="10">
+					<width>360</width>
+					<height>68</height>
+					<align>center</align>
+					<onleft>noop</onleft>
+					<onright>11</onright>
+					<label>106</label>
+					<font>Med</font>
+				</control>
+				<!-- Yes -->
+				<control type="button" id="11">
+					<width>360</width>
+					<height>68</height>
+					<align>center</align>
+					<onleft>10</onleft>
+					<onright>noop</onright>
+					<label>107</label>
+					<font>Med</font>
+				</control>
 			</control>
-
 		</control>
-
 	</controls>
-
 </window>

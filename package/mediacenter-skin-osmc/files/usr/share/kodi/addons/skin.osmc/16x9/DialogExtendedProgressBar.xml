@@ -4,43 +4,37 @@
 	<zorder>2</zorder>
 	<animation effect="fade" start="0" end="100" time="100">WindowOpen</animation>
 	<animation effect="fade" start="100" end="0" time="100">WindowClose</animation>
-
 	<controls>
-
 		<!-- Heading -->
 		<control type="label" id="30">
-			<right>190</right>
-			<bottom>124</bottom>
+			<right>140</right>
+			<bottom>84</bottom>
 			<width>720</width>
 			<height>30</height>
 			<haspath>true</haspath>
-			<font>Font30</font>
+			<font>XSmall</font>
 			<align>right</align>
-			<textcolor>ColorFO</textcolor>
+			<textcolor>ColorHeading</textcolor>
 		</control>
-
 		<!-- Details -->
 		<control type="label" id="31">
-			<right>190</right>
-			<bottom>88</bottom>
+			<right>140</right>
+			<bottom>48</bottom>
 			<width>720</width>
-			<height>30</height>
-			<haspath>true</haspath>
-			<font>Font30</font>
+			<height>28</height>
+			<font>XSmall</font>
 			<align>right</align>
-			<textcolor>ColorFO</textcolor>
+			<haspath>true</haspath>
+			<textcolor>ColorDetails</textcolor>
 		</control>
-		
 		<!-- Busy -->
 		<control type="image">
-			<right>114</right>
-			<bottom>90</bottom>
-			<width>58</width>
-			<height>58</height>
-			<texture>dialogs/busy.png</texture>
-			<animation effect="rotate" end="360" center="auto" time="1120" loop="true" reversible="false" condition="true">Conditional</animation>
+			<right>54</right>
+			<bottom>54</bottom>
+			<width>52</width>
+			<height>52</height>
+			<texture>dialogs/loading.png</texture>
+			<animation effect="rotate" end="-360" center="auto" time="1800" loop="true" reversible="false" condition="true">Conditional</animation>
 		</control>
-
 	</controls>
-
 </window>

@@ -5,7 +5,7 @@
 	<onload condition="StringCompare(Control.GetLabel(5),$LOCALIZE[207])">SendClick(50)</onload>
 	<onload condition="System.HasAddon(script.tvtunes)">XBMC.RunScript(script.tvtunes,backend=True)</onload>
 	<onunload condition="StringCompare(Control.GetLabel(5),$LOCALIZE[207])">SendClick(50)</onunload>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -18,7 +18,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 			<label>$VAR[VideoInfoLabel]</label>
 		</control>
 
@@ -74,7 +74,7 @@
 				<width>405</width>
 				<height>600</height>
 				<texture>$INFO[Container(50).ListItem.Icon]</texture>
-				<colordiffuse>OverlayColorFO</colordiffuse>
+				<colordiffuse>ColorFO</colordiffuse>
 				<aspectratio aligny="center">keep</aspectratio>
 				<visible>SubString(Container(50).ListItem.Icon,Default)</visible>
 			</control>
@@ -103,17 +103,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>557</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Artist]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -126,17 +126,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>558</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Album]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -149,17 +149,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>515</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Genre]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -172,17 +172,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>20339</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Director]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -195,17 +195,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>20417</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Writer]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -218,17 +218,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>180</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Duration,, mins]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -241,17 +241,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>31017</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.RatingAndVotes]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -264,17 +264,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>563</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.Mpaa]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -287,17 +287,17 @@
 						<width>200</width>
 						<height>36</height>
 						<align>right</align>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>169</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<left>220</left>
 						<width>950</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<label>$INFO[ListItem.VideoResolution]</label>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 					</control>
 				</control>
 
@@ -309,7 +309,7 @@
 				<width>1170</width>
 				<height>210</height>
 				<label>$VAR[Plot]</label>
-				<textcolor>DialogColor2</textcolor>
+				<textcolor>ColorHeading</textcolor>
 				<autoscroll delay="10000" time="2000" repeat="12000">True</autoscroll>
 			</control>
 
@@ -334,8 +334,8 @@
 				<control type="label">
 					<width>1170</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -344,8 +344,8 @@
 				<control type="label">
 					<width>1170</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 					<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(50)">Conditional</animation>
 				</control>

@@ -1,82 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- programs -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol always="true">50</defaultcontrol>
-	<views>50,55</views>
-
+	<views>50,51,52,53</views>
 	<controls>
-
+		<!-- Fake label2 -->
+		<control type="label" id="9999">
+			<font>-</font>
+			<label>$VAR[Label2]</label>
+		</control>
+		<!-- Fake wideinfo -->
+		<control type="label" id="9998">
+			<font>-</font>
+			<label>$VAR[WideInfo]</label>
+		</control>
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
-
+		<include>WindowBackground</include>
 		<!-- Fanart -->
 		<include>Fanart</include>
-
+		<!-- Heading -->
+		<include>Heading</include>
+		<!-- Time -->
+		<include>Time</include>
 		<!-- Main group -->
 		<control type="group">
 			<include>WindowFadeAnimation</include>
-
 			<!-- Views -->
 			<include>Viewtype50</include>
 			<include>Viewtype51</include>
 			<include>Viewtype52</include>
 			<include>Viewtype53</include>
-
 		</control>
-
+		<!-- Background -->
+		<control type="image">
+			<include>FullscreenDimensions</include>
+			<texture colordiffuse="44000000">dialogs/DialogTextBackground.png</texture>
+			<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+			<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
+			<visible>ControlGroup(3000).HasFocus | Control.HasFocus(3001)</visible>
+		</control>
 		<control type="group">
-			<left>-616</left>
-			<animation effect="slide" end="616" time="200" tween="cubic" easing="out" reversible="true" condition="ControlGroup(3000).HasFocus">Conditional</animation>
-
+			<left>50</left>
+			<top>140</top>
+			<width>560</width>
+			<height>780</height>
+			<visible allowhiddenfocus="true">ControlGroup(3000).HasFocus | Control.HasFocus(3001)</visible>
+			<animation type="Visible">
+				<effect type="slide" start="-550,0" end="0,0" center="auto" tween="sine" easing="out" time="200" />
+				<effect type="fade" start="0" end="100" time="200" />
+			</animation>
+			<animation type="Hidden">
+				<effect type="fade" start="100" end="0" time="100" />
+			</animation>
+			<!-- Background -->
+			<control type="image">
+				<width>560</width>
+				<height>780</height>
+				<texture>dialogs/DialogBackground.png</texture>
+			</control>
 			<!-- Heading -->
 			<control type="label">
-				<left>100</left>
-				<top>166</top>
-				<width>1400</width>
-				<height>200</height>
-				<font>Font40</font>
-				<textcolor>ColorFO</textcolor>
+				<left>20</left>
+				<top>20</top>
+				<width>520</width>
+				<height>50</height>
+				<font>Large</font>
 				<label>33063</label>
+				<textcolor>ColorHeading</textcolor>
 			</control>
-
-			<!-- Previous item -->
-			<control type="image">
-				<left>100</left>
-				<top>332</top>
-				<width>40</width>
-				<height>4</height>
-				<texture>common/white.png</texture>
-				<colordiffuse>ColorNF</colordiffuse>
-				<visible>Container(3000).HasPrevious</visible>
-			</control>
-
 			<!-- Options -->
 			<control type="grouplist" id="3000">
-				<left>100</left>
-				<top>358</top>
-				<width>516</width>
-				<height>532</height>
+				<left>40</left>
+				<top>80</top>
+				<width>480</width>
+				<height>680</height>
 				<onup>noop</onup>
 				<ondown>noop</ondown>
-				<onleft>noop</onleft>
+				<onleft>50</onleft>
 				<onright>50</onright>
 				<itemgap>0</itemgap>
 				<scrolltime>200</scrolltime>
 				<orientation>vertical</orientation>
-				<defaultcontrol always="true">99</defaultcontrol>
+				<visible allowhiddenfocus="true">ControlGroup(3000).HasFocus | Control.HasFocus(3001)</visible>
+				<defaultcontrol always="true">2</defaultcontrol>
 				<!-- View -->
-				<control type="button" id="99">
+				<control type="button" id="2">
 					<include>OptionButtons</include>
-					<label>$INFO[Container.ViewMode]</label>
-					<onclick>Container.NextViewMode</onclick>
-				</control>
-				<!-- Fanart -->
-				<control type="radiobutton" id="98">
-					<include>OptionButtons</include>
-					<label>20445</label>
-					<onclick>Skin.ToggleSetting(AddonFanart)</onclick>
-					<selected>Skin.HasSetting(AddonFanart)</selected>
+					<label>-</label>
 				</control>
 				<!-- Sort by -->
 				<control type="button" id="3">
@@ -91,6 +103,13 @@
 					<altlabel>585</altlabel>
 					<usealttexture>Container.SortDirection(Descending)</usealttexture>
 					<visible>Control.IsEnabled(4)</visible>
+				</control>
+				<!-- Fanart -->
+				<control type="radiobutton" id="98">
+					<include>OptionButtons</include>
+					<label>20445</label>
+					<onclick>Skin.ToggleSetting(AddonFanart)</onclick>
+					<selected>Skin.HasSetting(AddonFanart)</selected>
 				</control>
 				<!-- Filter -->
 				<control type="edit" id="19">
@@ -108,33 +127,32 @@
 					<selected>Container.Filtered</selected>
 					<visible>Container.CanFilterAdvanced</visible>
 				</control>
+				<!-- Unlock Shares -->
+				<control type="radiobutton" id="11">
+					<include>OptionButtons</include>
+					<label>20336</label>
+					<onclick>XBMC.Mastermode</onclick>
+					<selected>System.IsMaster</selected>
+					<visible>System.HasLocks</visible>
+				</control>
 				<!-- Settings -->
 				<control type="button" id="92">
 					<include>OptionButtons</include>
 					<label>5</label>
+					<onclick>SetFocus(50)</onclick>
 					<onclick>ActivateWindow(addonbrowser)</onclick>
 				</control>
 			</control>
-
-			<!-- Next item -->
-			<control type="image">
-				<left>100</left>
-				<top>926</top>
-				<width>40</width>
-				<height>4</height>
-				<texture>common/white.png</texture>
-				<colordiffuse>ColorNF</colordiffuse>
-				<visible>Container(3000).HasNext</visible>
-			</control>
-
 		</control>
-
-		<!-- Logo -->
-		<include>Logo</include>
-
-		<!-- Time -->
-		<include>Time</include>
-
+		<control type="button" id="3001">
+			<top>140</top>
+			<width>90</width>
+			<height>780</height>
+			<label>-</label>
+			<font>-</font>
+			<texturenofocus>-</texturenofocus>
+			<texturefocus>-</texturefocus>
+			<visible>true</visible>
+		</control>
 	</controls>
-
 </window>

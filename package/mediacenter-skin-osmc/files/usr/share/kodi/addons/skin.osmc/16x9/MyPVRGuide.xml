@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- videolibrary -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol>10</defaultcontrol>
 	<views>10,11,12,13</views>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Main group -->
 		<control type="group">
@@ -49,7 +49,7 @@
 						<control type="label" id="2">
 							<width>100</width>
 							<height>33</height>
-							<font>OLD_Font33</font>
+							<font>Small</font>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 
@@ -72,7 +72,7 @@
 							<left>102</left>
 							<width>332</width>
 							<height>92</height>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.ChannelName]</label>
 						</control>
 
@@ -82,7 +82,7 @@
 							<width>88</width>
 							<height>92</height>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>[B]$INFO[ListItem.ChannelNumber][/B]</label>
 						</control>
 
@@ -149,7 +149,7 @@
 							<top>0</top>
 							<width>56</width>
 							<height>92</height>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 
@@ -283,7 +283,7 @@
 					<width>800</width>
 					<height>33</height>
 					<aligny>top</aligny>
-					<font>OLD_Font33</font>
+					<font>Small</font>
 					<label>$INFO[ListItem.StartDate]</label>
 				</control>
 
@@ -320,7 +320,7 @@
 							<top>12</top>
 							<width>200</width>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.StartTime]</label>
 						</control>
 
@@ -331,7 +331,7 @@
 							<width>200</width>
 							<height>27</height>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.EndTime]</label>
 						</control>
 
@@ -340,7 +340,7 @@
 							<left>308</left>
 							<top>12</top>
 							<width>712</width>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 
@@ -350,8 +350,8 @@
 							<top>54</top>
 							<width>712</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>TextColor4</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorDetails</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -361,7 +361,7 @@
 							<top>93</top>
 							<width>706</width>
 							<height>6</height>
-							<colordiffuse>OverlayColorNF</colordiffuse>
+							<colordiffuse>ColorHeading</colordiffuse>
 							<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 							<lefttexture>-</lefttexture>
 							<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -424,8 +424,8 @@
 							<top>54</top>
 							<width>712</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>ColorNF</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -435,7 +435,7 @@
 							<top>93</top>
 							<width>706</width>
 							<height>6</height>
-							<colordiffuse>OverlayColorFO</colordiffuse>
+							<colordiffuse>ColorFO</colordiffuse>
 							<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 							<lefttexture>-</lefttexture>
 							<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -457,10 +457,10 @@
 					<onleft>11</onleft>
 					<showonepage>false</showonepage>
 					<orientation>vertical</orientation>
-					<colordiffuse>OverlayColorNF</colordiffuse>
+					<colordiffuse>ColorHeading</colordiffuse>
 					<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
 					<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
-					<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
+					<texturesliderbarfocus border="8,1,6,1" colordiffuse="ColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
 					<textureslidernib>-</textureslidernib>
 					<textureslidernibfocus>-</textureslidernibfocus>
 					<visible>!Skin.HasSetting(Scrollbars)</visible>
@@ -486,7 +486,7 @@
 							<width>512</width>
 							<height>460</height>
 							<align>justify</align>
-							<font>OLD_Font25</font>
+							<font>XSmall</font>
 							<textcolor>ColorFO</textcolor>
 							<shadowcolor>ShadowColor</shadowcolor>
 							<info>Container(11).ListItem.Plot</info>
@@ -499,7 +499,7 @@
 							<width>512</width>
 							<height>30</height>
 							<aspectratio>keep</aspectratio>
-							<font>OLD_Font30</font>
+							<font>XSmall</font>
 							<align>right</align>
 							<label>$INFO[Container(11).ListItem.Genre]</label>
 						</control>
@@ -525,8 +525,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$INFO[Container(11).NumItems]</label>
-						<font>OLD_Font25</font>
-						<textcolor>ColorNF</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 					<control type="label">
@@ -534,8 +534,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$VAR[ContentType]</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 				</control>
@@ -562,7 +562,7 @@
 					<width>800</width>
 					<height>33</height>
 					<aligny>top</aligny>
-					<font>OLD_Font33</font>
+					<font>Small</font>
 					<label>$INFO[ListItem.StartDate]</label>
 				</control>
 
@@ -599,7 +599,7 @@
 							<top>12</top>
 							<width>200</width>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.StartTime]</label>
 						</control>
 
@@ -610,7 +610,7 @@
 							<width>200</width>
 							<height>27</height>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.EndTime]</label>
 						</control>
 
@@ -619,7 +619,7 @@
 							<left>308</left>
 							<top>12</top>
 							<width>712</width>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 
@@ -629,8 +629,8 @@
 							<top>54</top>
 							<width>712</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>TextColor4</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorDetails</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -640,7 +640,7 @@
 							<top>93</top>
 							<width>706</width>
 							<height>6</height>
-							<colordiffuse>OverlayColorNF</colordiffuse>
+							<colordiffuse>ColorHeading</colordiffuse>
 							<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 							<lefttexture>-</lefttexture>
 							<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -703,8 +703,8 @@
 							<top>54</top>
 							<width>712</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>ColorNF</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -714,7 +714,7 @@
 							<top>93</top>
 							<width>706</width>
 							<height>6</height>
-							<colordiffuse>OverlayColorFO</colordiffuse>
+							<colordiffuse>ColorFO</colordiffuse>
 							<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 							<lefttexture>-</lefttexture>
 							<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -736,10 +736,10 @@
 					<onleft>12</onleft>
 					<showonepage>false</showonepage>
 					<orientation>vertical</orientation>
-					<colordiffuse>OverlayColorNF</colordiffuse>
+					<colordiffuse>ColorHeading</colordiffuse>
 					<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
 					<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
-					<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
+					<texturesliderbarfocus border="8,1,6,1" colordiffuse="ColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
 					<textureslidernib>-</textureslidernib>
 					<textureslidernibfocus>-</textureslidernibfocus>
 					<visible>!Skin.HasSetting(Scrollbars)</visible>
@@ -765,7 +765,7 @@
 							<width>512</width>
 							<height>460</height>
 							<align>justify</align>
-							<font>OLD_Font25</font>
+							<font>XSmall</font>
 							<textcolor>ColorFO</textcolor>
 							<shadowcolor>ShadowColor</shadowcolor>
 							<info>Container(12).ListItem.Plot</info>
@@ -778,7 +778,7 @@
 							<width>512</width>
 							<height>30</height>
 							<aspectratio>keep</aspectratio>
-							<font>OLD_Font30</font>
+							<font>XSmall</font>
 							<align>right</align>
 							<label>$INFO[Container(12).ListItem.Genre]</label>
 						</control>
@@ -804,8 +804,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$INFO[Container(12).NumItems]</label>
-						<font>OLD_Font25</font>
-						<textcolor>ColorNF</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 					<control type="label">
@@ -813,8 +813,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$VAR[ContentType]</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 				</control>
@@ -841,7 +841,7 @@
 					<width>800</width>
 					<height>33</height>
 					<aligny>top</aligny>
-					<font>OLD_Font33</font>
+					<font>Small</font>
 					<label>$INFO[ListItem.StartDate]</label>
 				</control>
 
@@ -867,7 +867,7 @@
 							<top>12</top>
 							<width>200</width>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.StartTime]</label>
 						</control>
 
@@ -876,9 +876,9 @@
 							<top>62</top>
 							<width>200</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
+							<font>XSmall</font>
 							<align>right</align>
-							<textcolor>TextColor4</textcolor>
+							<textcolor>ColorDetails</textcolor>
 							<label>$INFO[ListItem.Duration]</label>
 						</control>
 
@@ -907,7 +907,7 @@
 							<left>280</left>
 							<top>12</top>
 							<width>740</width>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 
@@ -917,8 +917,8 @@
 							<top>62</top>
 							<width>740</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>TextColor4</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorDetails</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -946,9 +946,9 @@
 							<top>62</top>
 							<width>200</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
+							<font>XSmall</font>
 							<align>right</align>
-							<textcolor>ColorNF</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Duration]</label>
 						</control>
 
@@ -986,8 +986,8 @@
 							<top>62</top>
 							<width>740</width>
 							<height>27</height>
-							<font>OLD_Font27</font>
-							<textcolor>ColorNF</textcolor>
+							<font>XSmall</font>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Genre]</label>
 						</control>
 
@@ -1004,10 +1004,10 @@
 					<onleft>13</onleft>
 					<showonepage>false</showonepage>
 					<orientation>vertical</orientation>
-					<colordiffuse>OverlayColorNF</colordiffuse>
+					<colordiffuse>ColorHeading</colordiffuse>
 					<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
 					<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
-					<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
+					<texturesliderbarfocus border="8,1,6,1" colordiffuse="ColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
 					<textureslidernib>-</textureslidernib>
 					<textureslidernibfocus>-</textureslidernibfocus>
 					<visible>!Skin.HasSetting(Scrollbars)</visible>
@@ -1033,7 +1033,7 @@
 							<width>512</width>
 							<height>460</height>
 							<align>justify</align>
-							<font>OLD_Font25</font>
+							<font>XSmall</font>
 							<textcolor>ColorFO</textcolor>
 							<shadowcolor>ShadowColor</shadowcolor>
 							<info>Container(13).ListItem.Plot</info>
@@ -1046,7 +1046,7 @@
 							<width>512</width>
 							<height>30</height>
 							<aspectratio>keep</aspectratio>
-							<font>OLD_Font30</font>
+							<font>XSmall</font>
 							<align>right</align>
 							<label>$INFO[Container(13).ListItem.Genre]</label>
 						</control>
@@ -1072,8 +1072,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$INFO[Container(13).NumItems]</label>
-						<font>OLD_Font25</font>
-						<textcolor>ColorNF</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 					<control type="label">
@@ -1081,8 +1081,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>$VAR[ContentType]</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 
 				</control>
@@ -1113,14 +1113,14 @@
 					<top>0</top>
 					<width>72</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 				<control type="image">
 					<left>0</left>
 					<top>0</top>
 					<width>24</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripHorizontalFO.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorFO">common/ScrollbarGripHorizontalFO.png</texture>
 					<animation effect="slide" start="0" end="24" time="200" condition="ControlGroup(4000).HasFocus()">Conditional</animation>
 					<animation effect="slide" start="0" end="48" time="200" condition="ControlGroup(5000).HasFocus()">Conditional</animation>
 				</control>
@@ -1133,8 +1133,8 @@
 					<width>1200</width>
 					<height>72</height>
 					<label>$VAR[CustomMenuHeading]</label>
-					<font>OLD_Font72</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>XLarge</font>
+					<textcolor>ColorFO</textcolor>
 				</control>
 
 				<!-- Look controls -->
@@ -1145,7 +1145,7 @@
 					<height>600</height>
 					<onup>noop</onup>
 					<ondown>noop</ondown>
-					<onleft>50</onleft>
+					<onleft>10</onleft>
 					<onright>4001</onright>
 					<itemgap>8</itemgap>
 					<scrolltime>200</scrolltime>
@@ -1160,19 +1160,23 @@
 						<label>-</label>
 						<onfocus>Down</onfocus>
 					</control>
+					<!-- View -->
+					<control type="button" id="2">
+						<include>OptionButtons</include>
+					</control>
 					<!-- Channels -->
 					<control type="button" id="100">
 						<include>OptionButtons</include>
 						<onclick condition="Window.IsActive(TVChannels) | Window.IsActive(RadioChannels)">NextChannelGroup</onclick>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVChannels)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioChannels)</onclick>
-						<onclick>SetFocus(50)</onclick>
+						<onclick>SetFocus(10)</onclick>
 						<label>19019</label>
 					</control>
 					<!-- Guide -->
 					<control type="button" id="102">
 						<include>OptionButtons</include>
-						<label>$LOCALIZE[19222]: $LOCALIZE[19030]</label>
+						<label>22020</label>
 						<onclick condition="Window.IsActive(TVGuide) | Window.IsActive(RadioGuide)">NextChannelGroup</onclick>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVGuide)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioGuide)</onclick>
@@ -1183,7 +1187,7 @@
 						<include>OptionButtons</include>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVRecordings)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioRecordings)</onclick>
-						<onclick>SetFocus(50)</onclick>
+						<onclick>SetFocus(10)</onclick>
 						<label>19163</label>
 					</control>
 				</control>
@@ -1196,7 +1200,7 @@
 					<height>600</height>
 					<onup>noop</onup>
 					<ondown>noop</ondown>
-					<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+					<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
 					<onright>5001</onright>
 					<itemgap>8</itemgap>
 					<scrolltime>200</scrolltime>
@@ -1248,7 +1252,7 @@
 					<onup>noop</onup>
 					<ondown>noop</ondown>
 					<onleft>4001</onleft>
-					<onright>50</onright>
+					<onright>10</onright>
 					<itemgap>8</itemgap>
 					<scrolltime>200</scrolltime>
 					<orientation>vertical</orientation>
@@ -1267,7 +1271,7 @@
 						<include>OptionButtons</include>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVTimers)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioTimers)</onclick>
-						<onclick>SetFocus(50)</onclick>
+						<onclick>SetFocus(10)</onclick>
 						<label>19040</label>
 					</control>
 					<!-- Search -->
@@ -1275,7 +1279,7 @@
 						<include>OptionButtons</include>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVSearch)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioSearch)</onclick>
-						<onclick>SetFocus(50)</onclick>
+						<onclick>SetFocus(10)</onclick>
 						<label>137</label>
 					</control>
 				</control>

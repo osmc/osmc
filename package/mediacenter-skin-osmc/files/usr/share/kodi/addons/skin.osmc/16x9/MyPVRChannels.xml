@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- pvrchannels -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol>50</defaultcontrol>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Main group -->
 		<control type="group">
@@ -30,7 +30,7 @@
 				<width>800</width>
 				<height>33</height>
 				<aligny>top</aligny>
-				<font>OLD_Font33</font>
+				<font>Small</font>
 				<label>$INFO[ListItem.StartDate]</label>
 			</control>
 
@@ -66,7 +66,7 @@
 						<left>118</left>
 						<width>88</width>
 						<height>108</height>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>[B]$INFO[ListItem.ChannelNumber][/B]</label>
 					</control>
 
@@ -76,7 +76,7 @@
 						<top>12</top>
 						<width>802</width>
 						<height>36</height>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 
@@ -86,8 +86,8 @@
 						<top>54</top>
 						<width>802</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>TextColor4</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorDetails</textcolor>
 						<label>$INFO[ListItem.Title]</label>
 					</control>
 
@@ -117,7 +117,7 @@
 						<top>93</top>
 						<width>783</width>
 						<height>6</height>
-						<colordiffuse>OverlayColorNF</colordiffuse>
+						<colordiffuse>ColorHeading</colordiffuse>
 						<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 						<lefttexture>-</lefttexture>
 						<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -170,8 +170,8 @@
 						<top>54</top>
 						<width>802</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>ColorNF</textcolor>
+						<font>XSmall</font>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Title]</label>
 					</control>
 
@@ -201,7 +201,7 @@
 						<top>93</top>
 						<width>783</width>
 						<height>6</height>
-						<colordiffuse>OverlayColorFO</colordiffuse>
+						<colordiffuse>ColorFO</colordiffuse>
 						<texturebg border="2">osd/OSDProgressBack.png</texturebg>
 						<lefttexture>-</lefttexture>
 						<midtexture border="2">osd/OSDProgressBar.png</midtexture>
@@ -223,10 +223,10 @@
 				<onleft>50</onleft>
 				<showonepage>false</showonepage>
 				<orientation>vertical</orientation>
-				<colordiffuse>OverlayColorNF</colordiffuse>
+				<colordiffuse>ColorHeading</colordiffuse>
 				<texturesliderbackground border="6,1,8,1">common/ScrollBackground.png</texturesliderbackground>
 				<texturesliderbar border="8,1,6,1">common/ScrollbarGripNF.png</texturesliderbar>
-				<texturesliderbarfocus border="8,1,6,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
+				<texturesliderbarfocus border="8,1,6,1" colordiffuse="ColorFO">common/ScrollbarGripFO.png</texturesliderbarfocus>
 				<textureslidernib>-</textureslidernib>
 				<textureslidernibfocus>-</textureslidernibfocus>
 				<visible>!Skin.HasSetting(Scrollbars)</visible>
@@ -253,7 +253,7 @@
 						<width>512</width>
 						<height>460</height>
 						<align>justify</align>
-						<font>OLD_Font25</font>
+						<font>XSmall</font>
 						<textcolor>ColorFO</textcolor>
 						<shadowcolor>ShadowColor</shadowcolor>
 						<info>Container(50).ListItem.Plot</info>
@@ -266,7 +266,7 @@
 						<width>512</width>
 						<height>30</height>
 						<aspectratio>keep</aspectratio>
-						<font>OLD_Font30</font>
+						<font>XSmall</font>
 						<align>right</align>
 						<label>$INFO[Container(50).ListItem.NextTitle,$LOCALIZE[19031]: ,]$INFO[Container(50).ListItem.NextStartTime, (,)]</label>
 					</control>
@@ -292,8 +292,8 @@
 					<height>44</height>
 					<align>right</align>
 					<label>$INFO[Container(50).NumItems]</label>
-					<font>OLD_Font25</font>
-					<textcolor>ColorNF</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
 
 				</control>
 				<control type="label">
@@ -301,8 +301,8 @@
 					<height>44</height>
 					<align>right</align>
 					<label>$VAR[ContentType]</label>
-					<font>OLD_Font33</font>
-					<textcolor>ColorNF</textcolor>
+					<font>Small</font>
+					<textcolor>ColorHeading</textcolor>
 				</control>
 
 			</control>
@@ -331,14 +331,14 @@
 					<top>0</top>
 					<width>72</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 				<control type="image">
 					<left>0</left>
 					<top>0</top>
 					<width>24</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorFO">common/ScrollbarGripHorizontalFO.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorFO">common/ScrollbarGripHorizontalFO.png</texture>
 					<animation effect="slide" start="0" end="24" time="200" condition="ControlGroup(4000).HasFocus()">Conditional</animation>
 					<animation effect="slide" start="0" end="48" time="200" condition="ControlGroup(5000).HasFocus()">Conditional</animation>
 				</control>
@@ -351,8 +351,8 @@
 					<width>1200</width>
 					<height>72</height>
 					<label>$VAR[CustomMenuHeading]</label>
-					<font>OLD_Font72</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>XLarge</font>
+					<textcolor>ColorFO</textcolor>
 				</control>
 
 				<!-- Look controls -->
@@ -390,7 +390,7 @@
 					<!-- Guide -->
 					<control type="button" id="102">
 						<include>OptionButtons</include>
-						<label>$LOCALIZE[19222]: $LOCALIZE[19030]</label>
+						<label>22020</label>
 						<onclick condition="Window.IsActive(TVGuide) | Window.IsActive(RadioGuide)">NextChannelGroup</onclick>
 						<onclick condition="IsEmpty(Window.Property(IsRadio))">ActivateWindow(TVGuide)</onclick>
 						<onclick condition="!IsEmpty(Window.Property(IsRadio))">ActivateWindow(RadioGuide)</onclick>
@@ -414,7 +414,7 @@
 					<height>600</height>
 					<onup>noop</onup>
 					<ondown>noop</ondown>
-					<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
+					<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
 					<onright>5001</onright>
 					<itemgap>8</itemgap>
 					<scrolltime>200</scrolltime>

@@ -2,7 +2,7 @@
 <window>
 	<!-- smartplaylisteditor -->
 	<defaultcontrol always="true">22</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -15,7 +15,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 			<label>21432</label>
 		</control>
 
@@ -33,7 +33,7 @@
 				<height>66</height>
 				<label>21433</label>
 				<align>right</align>
-				<textcolor>SelectedColor</textcolor>
+				<textcolor>ColorSelected</textcolor>
 			</control>
 
 			<!-- Rules label -->
@@ -43,7 +43,7 @@
 				<height>66</height>
 				<label>21434</label>
 				<align>right</align>
-				<textcolor>SelectedColor</textcolor>
+				<textcolor>ColorSelected</textcolor>
 			</control>
 
 			<!-- Name Label -->
@@ -53,7 +53,7 @@
 				<height>66</height>
 				<label>31048</label>
 				<align>right</align>
-				<textcolor>SelectedColor</textcolor>
+				<textcolor>ColorSelected</textcolor>
 			</control>
 
 		</control>
@@ -104,7 +104,7 @@
 					<control type="label">
 						<width>880</width>
 						<height>66</height>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 				</itemlayout>
@@ -113,7 +113,7 @@
 					<control type="label">
 						<width>880</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
+						<textcolor>ColorFO</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 						<animation effect="fade" start="100" end="75" condition="!Control.HasFocus(10)">Conditional</animation>
 					</control>

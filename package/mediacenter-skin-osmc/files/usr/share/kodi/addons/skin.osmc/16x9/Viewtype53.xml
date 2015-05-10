@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<include name="Viewtype53">
+		<control type="group">
+			<top>140</top>
+			<left>140</left>
+			<visible>Control.IsVisible(53)</visible>
+			<!-- Wide list -->
+			<control type="panel" id="53">
+				<width>1640</width>
+				<height>656</height>
+				<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
+				<onright>63</onright>
+				<pagecontrol>63</pagecontrol>
+				<preloaditems>4</preloaditems>
+				<focusposition>1</focusposition>
+				<orientation>vertical</orientation>
+				<viewtype label="538">bigicon</viewtype>
+				<scrolltime tween="sine" easing="out">240</scrolltime>
+				<itemlayout width="328" height="328">
+					<control type="image">
+						<left>5</left>
+						<top>5</top>
+						<width>318</width>
+						<height>318</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<colordiffuse>ColorHeading</colordiffuse>
+						<aspectratio>keep</aspectratio>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture>common/black.png</bordertexture>
+						</control>
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="68ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+						</control>
+						<!-- Watched -->
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture border="0,50,50,0">views/OverlayWatchedLargeNF.png</bordertexture>
+							<visible>StringCompare(ListItem.Overlay,OverlayWatched.png)</visible>
+						</control>
+						<!-- Resumable -->
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture border="0,50,50,0">views/OverlayResumableLargeNF.png</bordertexture>
+							<visible>ListItem.IsResumable</visible>
+						</control>
+					</control>
+				</itemlayout>
+				<focusedlayout width="328" height="328">
+					<control type="image">
+						<left>5</left>
+						<top>5</top>
+						<width>318</width>
+						<height>318</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<visible>SubString(ListItem.Icon,Default)</visible>
+					</control>
+					<control type="group">
+						<visible>!SubString(ListItem.Icon,Default)</visible>
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture>common/black.png</bordertexture>
+							<visible>!SubString(ListItem.Icon,Default)</visible>
+						</control>
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<visible>!SubString(ListItem.Icon,Default)</visible>
+						</control>
+						<!-- Watched -->
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture border="0,50,50,0">views/OverlayWatchedLargeNF.png</bordertexture>
+							<visible>StringCompare(ListItem.Overlay,OverlayWatched.png)</visible>
+						</control>
+						<!-- Resumable -->
+						<control type="image">
+							<left>5</left>
+							<top>5</top>
+							<width>318</width>
+							<height>318</height>
+							<texture colordiffuse="00ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							<aspectratio>keep</aspectratio>
+							<bordertexture border="0,50,50,0">views/OverlayResumableLargeNF.png</bordertexture>
+							<visible>ListItem.IsResumable</visible>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+			<!-- Scrollbar -->
+			<control type="scrollbar" id="63">
+				<left>1640</left>
+				<width>20</width>
+				<height>656</height>
+				<onleft>53</onleft>
+				<onright>noop</onright>
+				<showonepage>false</showonepage>
+				<orientation>vertical</orientation>
+				<texturesliderbackground colordiffuse="22ffffff" border="3">common/ScrollbarVertical.png</texturesliderbackground>
+				<texturesliderbar colordiffuse="ColorNF" border="3">common/ScrollbarVertical.png</texturesliderbar>
+				<texturesliderbarfocus colordiffuse="ColorFO" border="3">common/ScrollbarVertical.png</texturesliderbarfocus>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
+			</control>
+			<control type="group">
+				<top>648</top>
+				<!-- Title -->
+				<control type="label">
+					<width>1640</width>
+					<height>72</height>
+					<font>XLarge</font>
+					<textcolor>ColorFO</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>Control.HasFocus(53)</visible>
+				</control>
+				<!-- Title -->
+				<control type="label">
+					<width>1640</width>
+					<height>72</height>
+					<font>XLarge</font>
+					<textcolor>ColorSelected</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>!Control.HasFocus(53)</visible>
+				</control>
+				<!-- Info -->
+				<control type="grouplist">
+					<top>70</top>
+					<width>805</width>
+					<height>56</height>
+					<itemgap>5</itemgap>
+					<orientation>horizontal</orientation>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>$INFO[ListItem.VideoResolution,flagging/video/,.png]</texture>
+					</control>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>$INFO[ListItem.AudioCodec,flagging/audio/,.png]</texture>
+					</control>
+					<control type="image" id="777">
+						<width>130</width>
+						<height>56</height>
+						<texture>$VAR[typehackflagging,flagging/video/,.png]</texture>
+						<visible>!IsEmpty(Control.GetLabel(777))</visible>
+					</control>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>$INFO[ListItem.VideoAspect,flagging/aspectratio/,.png]</texture>
+					</control>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>$INFO[ListItem.AudioChannels,flagging/audio/,.png]</texture>
+					</control>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>$VAR[videocodec,flagging/video/,.png]</texture>
+					</control>
+				</control>
+				<!--control type="label">
+					<top>76</top>
+					<width>1640</width>
+					<height>27</height>
+					<font>XSmall</font>
+					<label>$VAR[WideInfo]</label>
+					<textcolor>ColorDetails</textcolor>
+					<visible>!IsEmpty(Control.GetLabel(9998))</visible>
+				</control-->
+			</control>
+		</control>
+	</include>
+</includes>

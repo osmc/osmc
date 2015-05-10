@@ -2,7 +2,7 @@
 <window>
 	<!-- favourites -->
 	<defaultcontrol always="true">450</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 	<onload>ClearProperty(favourite.1.name,home)</onload>
 	<onload>ClearProperty(favourite.2.name,home)</onload>
 	<onload>ClearProperty(favourite.3.name,home)</onload>
@@ -26,7 +26,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 			<label>1036</label>
 		</control>
 
@@ -46,7 +46,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>$INFO[Container(450).ListItem.Icon]</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 			<visible>SubString(Container(450).ListItem.Icon,Default)</visible>
 		</control>
@@ -69,8 +69,8 @@
 				<control type="label">
 					<width>1170</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor2</textcolor>
+					<font>Med</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -79,8 +79,8 @@
 				<control type="label">
 					<width>1170</width>
 					<height>58</height>
-					<font>OLD_Font36</font>
-					<textcolor>DialogColor1</textcolor>
+					<font>Med</font>
+					<textcolor>ColorFO</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</focusedlayout>

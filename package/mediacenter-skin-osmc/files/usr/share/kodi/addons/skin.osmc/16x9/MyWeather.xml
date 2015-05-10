@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- weather -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol always="true">100</defaultcontrol>
 
 	<controls>
@@ -9,14 +9,14 @@
 		<!-- Hidden button -->
 		<control type="button" id="100">
 			<onclick condition="!Skin.HasSetting(KioskMode)">SetFocus(3001)</onclick>
-			<onup condition="!Skin.HasSetting(KioskMode)">3001</onup>
-			<ondown condition="!Skin.HasSetting(KioskMode)">3001</ondown>
-			<onleft condition="!Skin.HasSetting(KioskMode)">3001</onleft>
-			<onright condition="!Skin.HasSetting(KioskMode)">3001</onright>
+			<onup condition="!Skin.HasSetting(KioskMode)">3000</onup>
+			<ondown condition="!Skin.HasSetting(KioskMode)">3000</ondown>
+			<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
+			<onleft condition="!Skin.HasSetting(KioskMode)">3000</onleft>
 		</control>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Curve -->
 		<control type="image">
@@ -57,10 +57,10 @@
 						<top>2</top>
 						<width>280</width>
 						<height>42</height>
-						<font>OLD_Font42</font>
+						<font>Large</font>
 						<align>center</align>
 						<textcolor>ColorFO</textcolor>
-						<shadowcolor>TextColor4</shadowcolor>
+						<shadowcolor>ColorDetails</shadowcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 					<control type="image">
@@ -75,9 +75,9 @@
 						<top>320</top>
 						<width>280</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<align>center</align>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 				</itemlayout>
@@ -87,11 +87,11 @@
 						<top>2</top>
 						<width>280</width>
 						<height>42</height>
-						<font>OLD_Font42</font>
+						<font>Large</font>
 						<align>center</align>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>ColorFO</textcolor>
-						<shadowcolor>TextColor4</shadowcolor>
+						<shadowcolor>ColorDetails</shadowcolor>
 					</control>
 					<control type="image">
 						<left>40</left>
@@ -105,9 +105,9 @@
 						<top>320</top>
 						<width>280</width>
 						<height>36</height>
-						<font>OLD_Font36</font>
+						<font>Med</font>
 						<align>center</align>
-						<textcolor>ColorNF</textcolor>
+						<textcolor>ColorHeading</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 				</focusedlayout>
@@ -177,7 +177,7 @@
 					<top>314</top>
 					<width>1600</width>
 					<height>45</height>
-					<font>OLD_Font42</font>
+					<font>Large</font>
 					<label>$LOCALIZE[31046]: $INFO[Window(Weather).Property(Current.Condition)]</label>
 					<textcolor>ColorFO</textcolor>
 				</control>
@@ -186,8 +186,8 @@
 					<top>366</top>
 					<width>1600</width>
 					<height>45</height>
-					<font>OLD_Font33</font>
-					<textcolor>ColorNF</textcolor>
+					<font>Small</font>
+					<textcolor>ColorHeading</textcolor>
 					<label>$LOCALIZE[383]: $INFO[Window(Weather).Property(Current.Wind)]</label>
 				</control>
 				<control type="label">
@@ -195,8 +195,8 @@
 					<top>420</top>
 					<width>1600</width>
 					<height>45</height>
-					<font>OLD_Font30</font>
-					<textcolor>TextColor3</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorDetails</textcolor>
 					<label>$LOCALIZE[401]: $INFO[Window(Weather).Property(Day0.LowTemp)]$INFO[System.TemperatureUnits] / $INFO[Window(Weather).Property(Day0.HighTemp)]$INFO[System.TemperatureUnits]</label>
 				</control>
 				<control type="textbox">
@@ -206,7 +206,7 @@
 					<height>42</height>
 					<label>$LOCALIZE[33030]: $INFO[Window(Weather).Property(Day0.Outlook)]</label>
 					<textcolor>ColorFO</textcolor>
-					<shadowcolor>TextColor4</shadowcolor>
+					<shadowcolor>ColorDetails</shadowcolor>
 					<autoscroll>false</autoscroll>
 				</control>
 			</control>
@@ -227,16 +227,16 @@
 					<height>44</height>
 					<align>right</align>
 					<label>31045</label>
-					<font>OLD_Font25</font>
-					<textcolor>ColorNF</textcolor>
+					<font>XSmall</font>
+					<textcolor>ColorHeading</textcolor>
 				</control>
 				<control type="label">
 					<width>auto</width>
 					<height>44</height>
 					<align>right</align>
 					<label>$INFO[Window(Weather).Property(WeatherProvider)]</label>
-					<font>OLD_Font33</font>
-					<textcolor>ColorNF</textcolor>
+					<font>Small</font>
+					<textcolor>ColorHeading</textcolor>
 				</control>
 			</control>
 
@@ -261,8 +261,8 @@
 						<width>1200</width>
 						<height>72</height>
 						<label>33063</label>
-						<font>OLD_Font72</font>
-						<textcolor>DialogColor1</textcolor>
+						<font>XLarge</font>
+						<textcolor>ColorFO</textcolor>
 					</control>
 
 					<!-- Weather controls -->

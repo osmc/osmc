@@ -6,6 +6,11 @@ This is a Kodi skin which provides the OSMC look and feel. The initial skin was 
 
 Versioning continues from v1.0.1 of Conq.
 
+2.0.0: 10th May 2015
+
+* Better highlight colours
+* More views again
+
 1.0.2: 12th September 2014
 
 * Add light and dark logos

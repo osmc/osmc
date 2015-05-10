@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
 	<!-- filemanager -->
-	<backgroundcolor>0xff2e4655</backgroundcolor>
+	<backgroundcolor>0</backgroundcolor>
 	<defaultcontrol always="true">20</defaultcontrol>
 
 	<controls>
 
 		<!-- Background -->
-		<include>WindowBackgroundImage</include>
+		<include>WindowBackground</include>
 
 		<!-- Curve -->
 		<control type="image">
@@ -36,79 +36,79 @@
 				<width>300</width>
 				<height>42</height>
 				<label>480</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Videos -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>3</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Music -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>2</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Pictures -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>1</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Weather -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>8</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- System -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>13000</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Service -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>14036</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- PVR -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>31015</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- System info -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>130</label>
-				<font>OLD_Font42</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Large</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- More -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>22082</label>
-				<font>OLD_Font42</font>
+				<font>Large</font>
 				<textcolor>ColorFO</textcolor>
 			</control>
 
@@ -128,23 +128,23 @@
 				<width>300</width>
 				<height>42</height>
 				<label>24001</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Small</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- Profiles -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>13200</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Small</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 			<!-- File manager -->
 			<control type="button">
 				<width>300</width>
 				<height>42</height>
 				<label>7</label>
-				<font>OLD_Font33</font>
+				<font>Small</font>
 				<textcolor>ColorFO</textcolor>
 			</control>
 			<!-- Settings level -->
@@ -152,8 +152,8 @@
 				<width>300</width>
 				<height>42</height>
 				<label>31016</label>
-				<font>OLD_Font33</font>
-				<textcolor>TextColor3</textcolor>
+				<font>Small</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
 
 		</control>
@@ -164,14 +164,14 @@
 			<top>248</top>
 			<width>20</width>
 			<height>60</height>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<texture border="6,1,8,1">common/ScrollBackground.png</texture>
 			<animation effect="fade" start="100" end="50" time="0" condition="true">Conditional</animation>
 		</control>
 
 		<!-- Main group -->
 		<control type="group">
-			<include>DialogZoomAnimation</include>
+			<include>DialogAnimation</include>
 
 			<!-- Background -->
 			<include>DialogBackgroundImage</include>
@@ -182,7 +182,7 @@
 				<top>96</top>
 				<width>1620</width>
 				<height>72</height>
-				<font>OLD_Font72</font>
+				<font>XLarge</font>
 				<label>7</label>
 			</control>
 
@@ -196,7 +196,7 @@
 					<width>770</width>
 					<height>66</height>
 					<haspath>true</haspath>
-					<textcolor>DialogColor1</textcolor>
+					<textcolor>ColorFO</textcolor>
 				</control>
 
 				<!-- Seperator -->
@@ -204,7 +204,7 @@
 					<top>66</top>
 					<width>770</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 
 				<!-- Left list -->
@@ -220,13 +220,13 @@
 					<itemlayout height="66" width="770">
 						<control type="label">
 							<width>770</width>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 						<control type="label">
 							<width>770</width>
 							<align>right</align>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label2]</label>
 						</control>
 					</itemlayout>
@@ -236,13 +236,13 @@
 							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(20)">Conditional</animation>
 							<control type="label">
 								<width>770</width>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label]</label>
 							</control>
 							<control type="label">
 								<width>770</width>
 								<align>right</align>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label2]</label>
 							</control>
 						</control>
@@ -264,17 +264,17 @@
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
-						<font>OLD_Font25</font>
+						<font>XSmall</font>
 						<label>$INFO[Container(20).NumItems]</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
 						<label>31000</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>!IntegerGreaterThan(Container(20).NumItems,1)</visible>
 					</control>
 					<control type="label">
@@ -282,8 +282,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>31001</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>IntegerGreaterThan(Container(20).NumItems,1)</visible>
 					</control>
 				</control>
@@ -300,7 +300,7 @@
 					<width>770</width>
 					<height>66</height>
 					<haspath>true</haspath>
-					<textcolor>DialogColor1</textcolor>
+					<textcolor>ColorFO</textcolor>
 				</control>
 
 				<!-- Seperator -->
@@ -308,7 +308,7 @@
 					<top>66</top>
 					<width>770</width>
 					<height>20</height>
-					<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+					<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 				</control>
 
 				<!-- Right list -->
@@ -324,13 +324,13 @@
 					<itemlayout height="66" width="770">
 						<control type="label">
 							<width>770</width>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 						<control type="label">
 							<width>770</width>
 							<align>right</align>
-							<textcolor>DialogColor2</textcolor>
+							<textcolor>ColorHeading</textcolor>
 							<label>$INFO[ListItem.Label2]</label>
 						</control>
 					</itemlayout>
@@ -340,13 +340,13 @@
 							<animation effect="fade" start="100" end="75" time="200" tween="cubic" easing="out" reversible="true" condition="!Control.HasFocus(21)">Conditional</animation>
 							<control type="label">
 								<width>770</width>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label]</label>
 							</control>
 							<control type="label">
 								<width>770</width>
 								<align>right</align>
-								<textcolor>DialogColor1</textcolor>
+								<textcolor>ColorFO</textcolor>
 								<label>$INFO[ListItem.Label2]</label>
 							</control>
 						</control>
@@ -368,17 +368,17 @@
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
-						<font>OLD_Font25</font>
+						<font>XSmall</font>
 						<label>$INFO[Container(21).NumItems]</label>
-						<textcolor>DialogColor2</textcolor>
+						<textcolor>ColorHeading</textcolor>
 					</control>
 					<control type="label">
 						<width>auto</width>
 						<height>44</height>
 						<align>right</align>
 						<label>31000</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>!IntegerGreaterThan(Container(21).NumItems,1)</visible>
 					</control>
 					<control type="label">
@@ -386,8 +386,8 @@
 						<height>44</height>
 						<align>right</align>
 						<label>31001</label>
-						<font>OLD_Font33</font>
-						<textcolor>ColorNF</textcolor>
+						<font>Small</font>
+						<textcolor>ColorHeading</textcolor>
 						<visible>IntegerGreaterThan(Container(21).NumItems,1)</visible>
 					</control>
 				</control>

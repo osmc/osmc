@@ -1,5 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+	<variable name="typehackflagging">
+		<value condition="[substring(ListItem.FilenameAndPath,bluray) | substring(ListItem.FilenameAndPath,bdrip) | substring(ListItem.FilenameAndPath,bd25) | substring(ListItem.FilenameAndPath,bd50)]">bluray</value>
+		<value condition="substring(ListItem.FilenameAndPath,hddvd)">hddvd</value>
+		<value condition="substring(ListItem.FilenameAndPath,dvd)">dvd</value>
+		<value condition="[substring(ListItem.FilenameAndPath,pdtv) | substring(ListItem.FilenameAndPath,hdtv) | substring(ListItem.FilenameAndPath,dsr)]">TV</value>
+		<value condition="substring(ListItem.FilenameAndPath,vhs)">vhs</value>
+	</variable>
+	<variable name="videocodec">
+		<value condition="[substring(ListItem.VideoCodec,div,left) | stringcompare(ListItem.VideoCodec,dx50)]">divx</value>
+		<value>$INFO[ListItem.VideoCodec]</value>
+	</variable>
+
+	<variable name="InfoHeading1">
+		<value condition="Container.Content(movies) | Container.Content(episodes)">$LOCALIZE[563]:</value>
+	</variable>
+
+	<variable name="InfoDetails1">
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + !IsEmpty(ListItem.Rating)">[COLOR=ColorDetails]$INFO[ListItem.Rating][/COLOR]</value>
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + IsEmpty(ListItem.Rating)">[COLOR=ColorDetails]N/A[/COLOR]</value>
+	</variable>
+
+	<variable name="InfoHeading2">
+		<value condition="Container.Content(movies) | Container.Content(episodes)">$LOCALIZE[2050]:</value>
+	</variable>
+
+	<variable name="InfoDetails2">
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + !IsEmpty(ListItem.Duration)">[COLOR=ColorDetails]$INFO[ListItem.Duration] mins[/COLOR]</value>
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + IsEmpty(ListItem.Duration)">[COLOR=ColorDetails]N/A[/COLOR]</value>
+	</variable>
+
+	<variable name="InfoHeading3">
+		<value condition="Container.Content(movies) | Container.Content(episodes)">$LOCALIZE[169]:</value>
+	</variable>
+
+	<variable name="InfoDetails3">
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + !IsEmpty(ListItem.VideoResolution)">[COLOR=ColorDetails]$INFO[ListItem.VideoResolution][/COLOR]</value>
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + IsEmpty(ListItem.VideoResolution)">[COLOR=ColorDetails]N/A[/COLOR]</value>
+	</variable>
+
+	<variable name="Fanart">
+		<value condition="Window.IsVisible(pictures) + Skin.HasSetting(PictureFanart)">$INFO[ListItem.FileNameAndPath]</value>
+		<value condition="[Skin.HasSetting(MovieFanart) + Container.Content(Movies)] | [Skin.HasSetting(TVFanart) + [Container.Content(TVShows) | Container.Content(Seasons) | Container.Content(Episodes)]] | [Skin.HasSetting(MusicFanart) + Window.IsVisible(musiclibrary)] | [Skin.HasSetting(WeatherFanart) + Window.IsVisible(weather)] | [Skin.HasSetting(AddonFanart) + [Container.Content(Addons) | Window.IsVisible(addonbrowser)]]">$INFO[ListItem.Art(fanart)]</value>
+	</variable>
+
+	<variable name="WideInfo">
+		<value condition="[Container.Content(movies) | Container.Content(episodes)]">$INFO[ListItem.Rating,[COLOR=ColorHeading]$LOCALIZE[563]: [/COLOR],   ]$INFO[ListItem.Duration,[COLOR=ColorHeading]$LOCALIZE[2050]: [/COLOR], mins   ]$INFO[ListItem.VideoResolution,[COLOR=ColorHeading]$LOCALIZE[169]: [/COLOR]]</value>
+		<value condition="!IsEmpty(ListItem.Label2)">[COLOR=ColorHeading]$INFO[ListItem.Label2][/COLOR]</value>
+	</variable>
+
+	<variable name="WideIcon">
+		<value condition="Window.IsVisible(pictures)">$INFO[ListItem.FileNameAndPath]</value>
+		<value condition="Container.Content(episodes)">$INFO[ListItem.Icon]</value>
+		<value condition="!IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+		<value>DefaultAddonNone.png</value>
+	</variable>
 
 	<variable name="WidgetLabel">
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$INFO[Container(9002).ListItem.Label]</value>
@@ -38,25 +93,39 @@
 	</variable>
 
 	<variable name="Heading">
-		<value condition="!IsEmpty(Container.FolderName)">$INFO[Container.FolderName]</value>
-		<value condition="Window.IsVisible(TVChannels)">$LOCALIZE[19020]: $LOCALIZE[19019]</value>
-		<value condition="Window.IsVisible(RadioChannels)">$LOCALIZE[19021]: $LOCALIZE[19019]</value>
-		<value condition="Window.IsVisible(TVGuide)">$LOCALIZE[19020]: $LOCALIZE[22020]</value>
-		<value condition="Window.IsVisible(RadioGuide)">$LOCALIZE[19021]: $LOCALIZE[22020]</value>
-		<value condition="Window.IsVisible(TVRecordings)">$LOCALIZE[19020]: $LOCALIZE[19017]</value>
-		<value condition="Window.IsVisible(RadioRecordings)">$LOCALIZE[19021]: $LOCALIZE[19017]</value>
-		<value condition="Window.IsVisible(TVTimers)">$LOCALIZE[19020]: $LOCALIZE[19040]</value>
-		<value condition="Window.IsVisible(RadioTimers)">$LOCALIZE[19021]: $LOCALIZE[19040]</value>
-		<value condition="Window.IsVisible(TVSearch)">$LOCALIZE[19020]: $LOCALIZE[137]</value>
-		<value condition="Window.IsVisible(RadioSearch)">$LOCALIZE[19021]: $LOCALIZE[137]</value>
-		<value condition="[Window.IsVisible(musiclibrary) | Window.IsVisible(musicfiles)]">$LOCALIZE[2]</value>
-		<value condition="Window.IsVisible(videolibrary)">$LOCALIZE[3]</value>
-		<value condition="Window.IsVisible(pictures)">$LOCALIZE[1]</value>
-		<value condition="Window.IsVisible(programs)">$LOCALIZE[0]</value>
+		<value condition="Window.IsVisible(videolibrary)">$LOCALIZE[3]$INFO[Container.FolderName,: ]</value>
+		<value condition="[Window.IsVisible(musiclibrary) | Window.IsVisible(musicfiles)]">$LOCALIZE[2]$INFO[Container.FolderName,: ]</value>
+		<value condition="Window.IsVisible(pictures)">$LOCALIZE[1]$INFO[Container.FolderName,: ]</value>
+		<value condition="Window.IsVisible(programs)">$LOCALIZE[0]$INFO[Container.FolderName,: ]</value>
+		<value condition="Window.IsVisible(skinsettings)">$LOCALIZE[20077]</value>
 		<value condition="Window.IsVisible(systeminfo)">$LOCALIZE[130]</value>
-		<value condition="Window.IsVisible(addonbrowser)">$LOCALIZE[10040]</value>
-		<value condition="[Window.IsVisible(settings) | Window.IsVisible(SettingsCategory.xml) | Window.IsVisible(skinsettings) | Window.IsVisible(profiles) | Window.IsVisible(filemanager)]">$LOCALIZE[5]</value>
+		<value condition="Window.IsVisible(addonbrowser)">$LOCALIZE[24001]</value>
+		<value condition="Window.IsVisible(profiles)">$LOCALIZE[13200]</value>
+		<value condition="Window.IsVisible(filemanager)]">$LOCALIZE[7]</value>
 		<value condition="Window.IsVisible(weather)">$LOCALIZE[8]</value>
+		<value condition="Window.IsVisible(videoplaylist)">$LOCALIZE[20012]</value>
+		<value condition="Window.IsVisible(musicplaylist)">$LOCALIZE[20011]</value>
+		<value condition="Window.IsVisible(settings)">$LOCALIZE[5]</value>
+		<value condition="Window.IsVisible(AppearanceSettings)">$LOCALIZE[480]</value>
+		<value condition="Window.IsVisible(VideosSettings)">$LOCALIZE[157]</value>
+		<value condition="Window.IsVisible(PVRSettings)">$LOCALIZE[19020]</value>
+		<value condition="Window.IsVisible(MusicSettings)">$LOCALIZE[2]</value>
+		<value condition="Window.IsVisible(PicturesSettings)">$LOCALIZE[1]</value>
+		<value condition="Window.IsVisible(WeatherSettings)">$LOCALIZE[8]</value>
+		<value condition="Window.IsVisible(ServiceSettings)">$LOCALIZE[14036]</value>
+		<value condition="Window.IsVisible(SystemSettings)">$LOCALIZE[13000]</value>
+		<value condition="Window.IsVisible(SettingsProfile)">$LOCALIZE[13200]</value>
+	</variable>
+
+	<variable name="NowPlayingVideoImage">
+		<value condition="!IsEmpty(Player.Art(poster))">$INFO[Player.Art(poster)]</value>
+		<value condition="!IsEmpty(Player.Art(tvshow.poster))">$INFO[Player.Art(tvshow.poster)]</value>
+		<value>NowPlayingVideoFallback.png</value>
+	</variable>
+
+	<variable name="NowPlayingMusicImage">
+		<value condition="!IsEmpty(MusicPlayer.Cover)">$INFO[MusicPlayer.Cover]</value>
+		<value>NowPlayingMusicFallback.png</value>
 	</variable>
 
 	<variable name="ListItemOverlay">
@@ -88,55 +157,12 @@
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),Playlist) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(Hide_Widget_Headings)">$INFO[Container(9002).ListItem.Label]</value>
 	</variable>
 
-	<variable name="SystemInfoButton94">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(94)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SystemInfoButton95">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(95)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SystemInfoButton96">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(96)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SystemInfoButton97">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(97)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SystemInfoButton98">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(98)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SystemInfoButton99">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(99)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SettingProfileButton4">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(4)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
-	<variable name="SettingProfileButton5">
-		<value condition="!ControlGroup(3).HasFocus + ControlGroup(3).HasFocus(5)">99ffffff</value>
-		<value>ColorNF</value>
-	</variable>
-
 	<variable name="SubMenuColor">
-		<value condition="!Control.HasFocus(9002)">ColorNF</value>
+		<value condition="!Control.HasFocus(9002)">ColorHeading</value>
 		<value>ColorFO</value>
 	</variable>
 
 	<variable name="Plot">
-		<value condition="!IsEmpty(ListItem.Property(Album_Description))">$INFO[ListItem.Property(Album_Description)]</value>
-		<value condition="!IsEmpty(ListItem.Property(Artist_Description))">$INFO[ListItem.Property(Artist_Description)]</value>
-		<value condition="!IsEmpty(ListItem.Property(Addon.Description))">$INFO[ListItem.Property(Addon.Description)]</value>
 		<value condition="!IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
 		<value condition="!IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
 	</variable>
@@ -235,6 +261,15 @@
 		<value>$INFO[Player.Title]</value>
 	</variable>
 
+	<variable name="VideoPlayerIcon">
+		<value>$INFO[VideoPlayer.Cover]</value>
+	</variable>
+
+	<variable name="StatusOverlay">
+		<value condition="ListItem.IsResumable">views/OverlayResumable.png</value>
+		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatched.png</value>
+	</variable>
+
 	<variable name="StatusOverlayWide">
 		<value condition="ListItem.IsResumable | [[Container.Content(tvshows) | Container.Content(seasons)] + IntegerGreaterThan(ListItem.Property(WatchedEpisodes),0) + IntegerGreaterThan(ListItem.Property(UnWatchedEpisodes),0)]">views/OverlayResumableWide.png</value>
 		<value condition="StringCompare(ListItem.Overlay,OverlayWatched.png)">views/OverlayWatchedWide.png</value>
@@ -259,10 +294,25 @@
 		<value condition="Player.Rewinding32x">[B]x32[/B]</value>
 	</variable>
 
-	<variable name="SettingsMainButtonFade">
+	<variable name="SettingButtonColor">
 		<value condition="Control.HasFocus(20)">ColorNF</value>
-		<value condition="ControlGroup(5).HasFocus">99ffffff</value>
-		<value>ColorFO</value>
+		<value condition="!ControlGroup(5).HasFocus">ColorFO</value>
+		<value>ColorSelected</value>
+	</variable>
+
+	<variable name="SkinSettingButton10">
+		<value condition="ControlGroup(9).HasFocus(10)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SkinSettingButton11">
+		<value condition="ControlGroup(9).HasFocus(11)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SkinSettingButton12">
+		<value condition="ControlGroup(9).HasFocus(12)">ColorFO</value>
+		<value>ColorHeading</value>
 	</variable>
 
 	<variable name="Label1">
@@ -374,6 +424,36 @@
 		<value condition="Window.IsVisible(pvr) + IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[19019]</value>
 		<value condition="!IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31000]</value>
 		<value condition="IntegerGreaterThan(Container.NumItems,1)">$LOCALIZE[31001]</value>
+	</variable>
+
+	<variable name="SystemInfoButton94">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(94)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SystemInfoButton95">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(95)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SystemInfoButton96">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(96)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SystemInfoButton97">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(97)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SystemInfoButton98">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(98)">ColorFO</value>
+		<value>ColorHeading</value>
+	</variable>
+
+	<variable name="SystemInfoButton99">
+		<value condition="!ControlGroup(50).HasFocus + ControlGroup(50).HasFocus(99)">ColorFO</value>
+		<value>ColorHeading</value>
 	</variable>
 
 </includes>

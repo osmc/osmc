@@ -2,7 +2,7 @@
 <window>
 	<!-- contentsettings -->
 	<defaultcontrol always="true">20</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -15,7 +15,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 			<label>20333</label>
 		</control>
 
@@ -35,7 +35,7 @@
 			<width>405</width>
 			<height>600</height>
 			<texture>$INFO[ListItem.Icon]</texture>
-			<colordiffuse>OverlayColorFO</colordiffuse>
+			<colordiffuse>ColorFO</colordiffuse>
 			<aspectratio aligny="center">keep</aspectratio>
 			<visible>SubString(ListItem.Icon,Default)</visible>
 		</control>
@@ -73,7 +73,7 @@
 			<width>1200</width>
 			<height>66</height>
 			<label>$LOCALIZE[20344]</label>
-			<textcolor>DialogColor2</textcolor>
+			<textcolor>ColorHeading</textcolor>
 			<visible>!Control.HasFocus(20)</visible>
 		</control>
 
@@ -95,7 +95,7 @@
 			<width>600</width>
 			<height>66</height>
 			<align>right</align>
-			<textcolor>DialogColor2</textcolor>
+			<textcolor>ColorHeading</textcolor>
 			<label>$INFO[Control.GetLabel(20)]</label>
 			<visible>!Control.HasFocus(20)</visible>
 		</control>
@@ -117,7 +117,7 @@
 				<control type="label">
 					<width>1120</width>
 					<height>66</height>
-					<textcolor>DialogColor2</textcolor>
+					<textcolor>ColorHeading</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 			</itemlayout>
@@ -167,7 +167,7 @@
 			<top>548</top>
 			<width>1200</width>
 			<height>20</height>
-			<texture border="1,12,1,1" colordiffuse="DialogOverlayColorNF">common/ScrollBackgroundHorizontal.png</texture>
+			<texture border="1,12,1,1" colordiffuse="ColorHeading">common/ScrollBackgroundHorizontal.png</texture>
 		</control>
 
 		<!-- Button grouplist -->

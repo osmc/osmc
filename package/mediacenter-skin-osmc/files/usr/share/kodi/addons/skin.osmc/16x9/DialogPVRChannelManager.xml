@@ -2,7 +2,7 @@
 <window>
 	<!-- pvrchannelmanager -->
 	<defaultcontrol always="true">20</defaultcontrol>
-	<include>DialogZoomAnimation</include>
+	<include>DialogAnimation</include>
 
 	<controls>
 
@@ -15,7 +15,7 @@
 			<top>96</top>
 			<width>1620</width>
 			<height>72</height>
-			<font>OLD_Font72</font>
+			<font>XLarge</font>
 			<label>19199</label>
 		</control>
 
@@ -46,8 +46,8 @@
 						<left>80</left>
 						<width>720</width>
 						<height>66</height>
-						<textcolor>SelectedColor</textcolor>
-						<selectedcolor>SelectedColor</selectedcolor>
+						<textcolor>ColorSelected</textcolor>
+						<colorselected>ColorSelected</colorselected>
 						<label>$INFO[ListItem.Property(Number),(,) ]$INFO[ListItem.Property(Name)]</label>
 						<visible>ListItem.Property(Changed)</visible>
 					</control>
@@ -55,8 +55,8 @@
 						<left>80</left>
 						<width>720</width>
 						<height>66</height>
-						<textcolor>DialogColor2</textcolor>
-						<selectedcolor>DialogColor2</selectedcolor>
+						<textcolor>ColorHeading</textcolor>
+						<colorselected>ColorHeading</colorselected>
 						<label>$INFO[ListItem.Property(Number),(,) ]$INFO[ListItem.Property(Name)]</label>
 						<visible>!ListItem.Property(Changed)</visible>
 					</control>
@@ -80,8 +80,8 @@
 						<left>80</left>
 						<width>720</width>
 						<height>66</height>
-						<textcolor>SelectedColor</textcolor>
-						<selectedcolor>SelectedColor</selectedcolor>
+						<textcolor>ColorSelected</textcolor>
+						<colorselected>ColorSelected</colorselected>
 						<label>$INFO[ListItem.Property(Number),(,) ]$INFO[ListItem.Property(Name)]</label>
 						<visible>ListItem.Property(Changed)</visible>
 					</control>
@@ -89,8 +89,8 @@
 						<left>80</left>
 						<width>720</width>
 						<height>66</height>
-						<textcolor>DialogColor1</textcolor>
-						<selectedcolor>DialogColor1</selectedcolor>
+						<textcolor>ColorFO</textcolor>
+						<colorselected>ColorFO</colorselected>
 						<label>$INFO[ListItem.Property(Number),(,) ]$INFO[ListItem.Property(Name)]</label>
 						<visible>!ListItem.Property(Changed)</visible>
 					</control>
@@ -99,9 +99,9 @@
 						<left>20</left>
 						<width>860</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>SelectedColor</textcolor>
-						<selectedcolor>SelectedColor</selectedcolor>
+						<font>XSmall</font>
+						<textcolor>ColorSelected</textcolor>
+						<colorselected>ColorSelected</colorselected>
 						<label>$LOCALIZE[19210]: $INFO[ListItem.Property(ClientName)]</label>
 						<visible>ListItem.Property(Changed)</visible>
 					</control>
@@ -110,9 +110,9 @@
 						<left>20</left>
 						<width>860</width>
 						<height>27</height>
-						<font>OLD_Font27</font>
-						<textcolor>DialogColor1</textcolor>
-						<selectedcolor>DialogColor1</selectedcolor>
+						<font>XSmall</font>
+						<textcolor>ColorFO</textcolor>
+						<colorselected>ColorFO</colorselected>
 						<label>$LOCALIZE[19210]: $INFO[ListItem.Property(ClientName)]</label>
 						<visible>!ListItem.Property(Changed)</visible>
 					</control>
