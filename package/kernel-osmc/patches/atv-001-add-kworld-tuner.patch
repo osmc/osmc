@@ -12,14 +12,12 @@ diff --git a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c b/drivers/media/usb/dvb-usb
 index 87fc0fe..a21acbb 100644
 --- a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
 +++ b/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
-@@ -1754,6 +1754,10 @@ static const struct usb_device_id rtl28xxu_id_table[] = {
+@@ -1754,6 +1754,8 @@ static const struct usb_device_id rtl28xxu_id_table[] = {
  		&rtl28xxu_props, "Sveon STV21", NULL) },
  	{ DVB_USB_DEVICE(USB_VID_KWORLD_2, USB_PID_SVEON_STV27,
  		&rtl28xxu_props, "Sveon STV27", NULL) },
 +       { DVB_USB_DEVICE(USB_VID_KWORLD_2, 0xd398,
-+               &rtl2832u_props, "Realtek 2832U USB DVB-T Stick RC", NULL) },
-+        { DVB_USB_DEVICE(USB_VID_KWORLD_2, USB_PID_TURBOX_DTT_2000,
-+                &rtl28xxu_props, "TURBO-X Pure TV Tuner DTT-2000", NULL) },
++               &rtl28xxu_props, "Realtek 2832U USB DVB-T Stick RC", NULL) },
  
  	/* RTL2832P devices: */
  	{ DVB_USB_DEVICE(USB_VID_HANFTEK, 0x0131,
