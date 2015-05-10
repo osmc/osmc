@@ -126,7 +126,6 @@ then
 	ARCH=$(arch)
 	export ARCH
 	popd
-	pwd
 	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
 	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
