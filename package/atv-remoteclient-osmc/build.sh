@@ -8,14 +8,17 @@
 # Build in native environment
 pull_source "https://github.com/samnazarko/atvclient/archive/master.zip" "$(pwd)/src"
 build_in_env "${1}" $(pwd) "atv-remoteclient-osmc"
-if [ $? == 0 ]
+build_return=$?
+if [ $build_return == 99 ]
 then
 	echo -e "Building atvclient"
 	out=$(pwd)/files
 	make clean
 	update_sources
 	handle_dep "libusb-dev"
-	pushd src/
+        handle_dep "autoconf"
+        handle_dep "pkg-config"
+	pushd src/atvclient*
 	./configure --prefix=/usr
 	$BUILD
 	make install DESTDIR=${out}
@@ -23,5 +26,7 @@ then
 	strip_files "${out}"
 	popd
 	dpkg -b files/ atv-remoteclient-osmc.deb
+	build_return=$?
 fi
 teardown_env "${1}"
+exit $build_return
