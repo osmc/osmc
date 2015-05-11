@@ -1,0 +1,12 @@
+[Unit]
+Description=Set Time using HTTP query
+After=fake-hwclock.service connman.service
+Requires=connman.service
+Before=ntp.service
+
+[Service]
+ExecStart=/usr/bin/http-time
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

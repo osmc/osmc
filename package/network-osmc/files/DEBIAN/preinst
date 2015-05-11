@@ -9,6 +9,10 @@ install_divert ()
 }
 
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
+
+if [ "$1" = "install" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; fi
+if [ "$1" = "upgrade" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"; fi
+
 if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 
 	# install all diverts needed by this version of the package:

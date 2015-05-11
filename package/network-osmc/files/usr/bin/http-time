@@ -1,0 +1,22 @@
+#!/bin/bash
+# Set system time during boot using an HTTP request to Google, Apple or Microsoft as a backup for ntpd when port 123 is blocked.
+
+count=60
+while [ $count -gt 0 ]; do
+	if connmanctl state | grep -iq 'online'
+		then break
+	fi
+	sleep 5; let count-=5
+done
+if [ $count -lt 1 ]; then echo "No internet connection was available within 60 seconds, giving up."; exit; fi
+
+OLD_DATE=$(date -u)
+for server in www.google.com www.apple.com www.microsoft.com; do
+
+	DATE_STRING=$(LANG=C wget --server-response --timeout=4 --max-redirect 0 --spider "$server" 2>&1 | egrep -o '^ *Date:.*' | sed 's/^ *Date: *//g')
+	if [ -n "$DATE_STRING" ]; then
+		echo "Updated time from $OLD_DATE to $(date -u --set="$DATE_STRING") using HTTP query to $server"
+		exit
+	fi
+done
+echo "Unable to set time using HTTP query - no response received from servers."
