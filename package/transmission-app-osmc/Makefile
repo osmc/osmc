@@ -13,5 +13,5 @@ i386:
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files/usr > /dev/null 2>&1
-	sudo rm -f files/etc/osmc/apps.d/*tvheadend-app-osmc >/dev/null 2>&1
+	sudo rm -f files/etc/osmc/apps.d/*transmission-app-osmc >/dev/null 2>&1
 	sudo rm -rf src/ >/dev/null 2>&1
