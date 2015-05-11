@@ -2,5 +2,6 @@
 
 if [ "$1" = "remove" ]; then
 	systemctl disable connman.service >/dev/null 2>&1
+	systemctl disable http-time.service >/dev/null 2>&1
 	systemctl stop connman.service
 fi
