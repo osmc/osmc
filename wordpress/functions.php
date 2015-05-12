@@ -162,6 +162,12 @@ if( is_home() )
   return implode(' ', array_slice($words, 0, $word_limit));
 }
 
+// disable pingbacks
+add_filter( 'xmlrpc_methods', function( $methods ) {
+	unset( $methods['pingback.ping'] );
+	return $methods;
+} );
+
 /************* COMMENT LAYOUT *********************/
 
 // Comment Layout
