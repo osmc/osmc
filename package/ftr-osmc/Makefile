@@ -8,7 +8,7 @@ rbp2:
 	sudo bash build.sh "rbp2"
 
 atv:
-	sudo bash build.sh "atv"
+	sudo setarch i686 bash build.sh "atv"
 
 vero1:
 	sudo bash build.sh "vero1"
