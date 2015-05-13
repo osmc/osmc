@@ -15,7 +15,9 @@ then
 	echo -e "Building Qt BSP for OSMC"
 	out=$(pwd)/files
 	make clean
-	sed '/Package/d' -i files/DEBIAN/control
+        sed '/Package/d' -i files/DEBIAN/control
+        sed '/Package/d' -i files-dev/DEBIAN/control
+        sed '/Depends/d' -i files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libudev-dev"
 	handle_dep "libdbus-1-dev"
