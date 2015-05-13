@@ -25,16 +25,23 @@ for arch in archlist:
 		package_name = None
 		package_version = None
 		package_depends = None
+		package_architecture = None
 
 		for line in package.splitlines():
 			if line.startswith('Package:'):
-				package_name = line.split('Package:',1)[1].lstrip()
+				package_name = str(line.split('Package:',1)[1].lstrip())
 
 			if line.startswith('Version:'):
-				package_version = line.split('Version:',1)[1].lstrip()
+				package_version = str(line.split('Version:',1)[1].lstrip())
 
 			if line.startswith('Depends:'):
-				package_depends = line.split('Depends:',1)[1].lstrip()
+				package_depends = str(line.split('Depends:',1)[1].lstrip())
+
+			if line.startswith('Architecture:'):
+				package_architecture = str(line.split('Architecture:',1)[1].lstrip())
+
+		if package_version and package_architecture:
+			package_version = package_architecture + ' ' + package_version
 
 		if package_name and package_version:
 			try:
@@ -65,16 +72,23 @@ for arch in archlist:
 		package_name = None
 		package_version = None
 		package_depends = None
+		package_architecture = None
 
 		for line in package.splitlines():
 			if line.startswith('Package:'):
-				package_name = line.split('Package:',1)[1].lstrip()
+				package_name = str(line.split('Package:',1)[1].lstrip())
 
 			if line.startswith('Version:'):
-				package_version = line.split('Version:',1)[1].lstrip()
+				package_version = str(line.split('Version:',1)[1].lstrip())
 
 			if line.startswith('Depends:'):
-				package_depends = line.split('Depends:',1)[1].lstrip()
+				package_depends = str(line.split('Depends:',1)[1].lstrip())
+
+			if line.startswith('Architecture:'):
+				package_architecture = str(line.split('Architecture:',1)[1].lstrip())
+
+		if package_version and package_architecture:
+			package_version = package_architecture + ' ' + package_version
 
 		if package_name and package_version:
 			try:
