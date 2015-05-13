@@ -1,0 +1,26 @@
+From 49bf0b6c77f699ec8e6c02ee477399f85d846f90 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 3 May 2015 05:43:45 +0100
+Subject: [PATCH 2/3] Optimise CFLAGS to provide better performance
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ qtbase/mkspecs/devices/linux-rasp-pi-g++/qmake.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qtbase/mkspecs/devices/linux-rasp-pi-g++/qmake.conf b/qtbase/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
+index 0d44022..8b60a2d 100644
+--- a/qtbase/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
++++ b/qtbase/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
+@@ -27,7 +27,7 @@ contains(DISTRO, squeeze) {
+     DISTRO_OPTS += hard-float
+ }
+ 
+-QMAKE_CFLAGS           += \
++QMAKE_CFLAGS           += -O3 -fomit-frame-pointer \
+                           -marm \
+                           -mfpu=vfp \
+                           -mtune=arm1176jzf-s \
+-- 
+2.1.0
+
