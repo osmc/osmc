@@ -1,0 +1,6 @@
+#!/bin/sh
+if echo "$@" | grep -qw "uhelper=udisks" && [ "$3" = "-o" ]; then
+	exec /sbin/mount.exfat-fuse.distributed "$1" "$2" "$3" "rw,nodev,nosuid,fmask=0111,dmask=0000,uid=1000,gid=1000,uhelper=udisks"
+else
+	exec /sbin/mount.exfat-fuse.distributed "$@"
+fi
