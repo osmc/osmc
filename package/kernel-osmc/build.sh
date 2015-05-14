@@ -99,6 +99,7 @@ then
 	then
 	    ARCH=$(echo $ARCH | tr -d v7l | tr -d v6)
 	fi
+	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	export ARCH
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
