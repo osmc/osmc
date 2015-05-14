@@ -1,4 +1,6 @@
 #!/bin/bash
 
-systemctl stop mediacenter.service
-exit 0
+if [ "$1" = "remove" ]; then
+	systemctl stop mediacenter.service >/dev/null 2>&1
+	exit 0
+fi

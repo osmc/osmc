@@ -1,3 +1,5 @@
 #!/bin/bash
 
-systemctl enable mediacenter.service
+if [ "$1" = "configure" ]; then
+	systemctl enable mediacenter.service >/dev/null 2>&1
+fi
