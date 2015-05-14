@@ -8,7 +8,7 @@ rbp2:
 	sudo bash build.sh "rbp2"
 
 i386:
-	sudo bash build.sh "i386"
+	sudo setarch i686 bash build.sh "i386"
 
 vero:
 	sudo bash build.sh "vero"
