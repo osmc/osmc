@@ -1,0 +1,33 @@
+From 96c7ef55c6b80132b1720343dd48450b0e0173e8 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Sun, 10 May 2015 07:47:28 +0200
+Subject: [PATCH] IMX: Edid lie a bit when we are only slightly off
+
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index d52365e..b52c78f 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -439,7 +439,18 @@ bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res)
+   res->bFullScreen   = true;
+   res->iSubtitles    = (int)(0.965 * res->iHeight);
+ 
+-  res->fPixelRatio   = !m_sar ? 1.0f : (float)m_sar / res->iScreenWidth * res->iScreenHeight;
++
++  float pixel_ratio  = 1.0f;
++  // workaround minimal off when getting sar in a rounded way
++  // it is better to lie for computed 1918 pixels than rescaling full
++  // screen content with a lossy scaler
++  if (m_sar > 0.0f)
++  {
++    pixel_ratio = ((float)m_sar / res->iScreenWidth * res->iScreenHeight);
++    if (fabs((float) res->iScreenWidth * pixel_ratio - res->iScreenWidth) < 3.0f)
++      pixel_ratio = 1.0f;
++  }
++  res->fPixelRatio   = pixel_ratio;
+   res->strMode       = StringUtils::Format("%dx%d @ %.2f%s - Full Screen", res->iScreenWidth, res->iScreenHeight, res->fRefreshRate,
+                                            res->dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
+   res->strId         = mode;
