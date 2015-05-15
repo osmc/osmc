@@ -40,7 +40,7 @@ then
 	-no-journald -system-libpng -system-freetype -system-libjpeg -openssl -no-pulseaudio -alsa -no-sql-sqlite \
 	-no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports $PLATFORM
 	$BUILD
-	make install DESTDIR=${out}
+	make install INSTALL_ROOT=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
