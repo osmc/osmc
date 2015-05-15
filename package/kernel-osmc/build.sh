@@ -41,8 +41,8 @@ then
 	then
 		rm -rf drivers/net/wireless/rtl8192cu # rbp kernel swaps rtlwifi for this, but we still want newer
 		install_patch "../../patches" "rbp"
-		# have to do this after, because upstream brings its own rtl8192cu in!
-		rm -rf drivers/net/wireless/rtl8192cu
+		# have to do this after, because upstream brings its own rtl8192cu in! Other kernels use rtlwifi by default. Have to do earlier here or Kconfig won't find it!
+		mv drivers/net/wireless/rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
 	# Set up DTC
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -115,7 +115,7 @@ then
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
 		# Build RTL8192CU module
-		mv rtl8192cu-new drivers/net/wireless/rtl8192cu
+		if [ "$1" == "atv"] ; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
