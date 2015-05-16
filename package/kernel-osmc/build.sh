@@ -115,7 +115,7 @@ then
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
 		# Build RTL8192CU module
-		if [ "$1" == "atv"] ; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
+		if [ "$1" == "atv" ]; then mv rtl8192cu-new drivers/net/wireless/rtl8192cu; fi
 		pushd drivers/net/wireless/rtl8192cu
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
