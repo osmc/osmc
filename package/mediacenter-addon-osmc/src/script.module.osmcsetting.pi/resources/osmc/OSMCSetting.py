@@ -658,23 +658,21 @@ Overclock settings are set using the Pi Overclock module."""
 			a single list.
 		'''
 
-		# dacplus: indicates whether the item is in the dacplus group or the other, irr means it is irrelevant
 		# setting: the set of settings in the group
 		# value: the value to assign to the kodi displayed settings if the overlay is active
 		overlay_settings 		= 	{
 		'hifiberry-dac-overlay'		: {'setting': 'soundcard_dac', 'value': '1'},
-		'hifiberry-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '1'},
-		'iqaudio-dac-overlay'		: {'setting': 'soundcard_dac', 'value': '2'},
-		'iqaudio-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '2'},
+		'hifiberry-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '2'},
 		'hifiberry-digi-overlay'	: {'setting': 'soundcard_dac', 'value': '3'},
+		'iqaudio-dac-overlay'		: {'setting': 'soundcard_dac', 'value': '4'},
+		'iqaudio-dacplus-overlay'	: {'setting': 'soundcard_dac', 'value': '5'},
 		'w1-gpio-overlay'			: {'setting': 'w1gpio', 'value': '1'},
 		'w1-gpio-pullup-overlay'	: {'setting': 'w1gpio', 'value': '2'},
 		'lirc-rpi-overlay'			: {'setting': 'lirc-rpi-overlay', 'value': 'true'},
 		'spi-bcm2835-overlay'		: {'setting': 'spi-bcm2835-overlay', 'value': 'true'},
 									}
 
-		dac 	= ['hifiberry-dac-overlay', 'iqaudio-dac-overlay', 'hifiberry-digi-overlay']
-		dac_all = ['hifiberry-dac-overlay', 'iqaudio-dac-overlay', 'hifiberry-dacplus-overlay','iq-audio-dacplus-overlay','hifiberry-digi-overlay']
+		dac_all = ['hifiberry-dac-overlay', 'hifiberry-dacplus-overlay','hifiberry-digi-overlay', 'iqaudio-dac-overlay','iqaudio-dacplus-overlay']
 		w1gpio  = ['w1-gpio-overlay', 'w1-gpio-pullup-overlay']
 
 		datalist = data.split('\n')
@@ -685,7 +683,6 @@ Overclock settings are set using the Pi Overclock module."""
 
 			# do this when reading the items into Kodi
 				
-			self.me.setSetting('dacplus', 'false')
 			self.me.setSetting('lirc-rpi-overlay', 'false')
 			self.me.setSetting('spi-bcm2835-overlay', 'false')
 			self.me.setSetting('soundcard_dac', '0')
@@ -715,15 +712,18 @@ Overclock settings are set using the Pi Overclock module."""
 					continue
 
 				if overlay not in overlay_settings:
-					log('not in overlay_settings')
+
+					log('%s not in overlay_settings' % overlay)
+					
 					continue
 
-				if 'dacplus' in overlay:
-					self.me.setSetting('dacplus', 'true')
+				else:
 
-				ovl = overlay_settings[overlay]
+					ovl = overlay_settings[overlay]
 
-				self.me.setSetting(ovl['setting'], ovl['value'])
+					self.me.setSetting(ovl['setting'], ovl['value'])
+
+					log('overlay: %s,   setting: %s,   value: %s' % (overlay, ovl['setting'], ovl['value']))
 
 		else:
 
@@ -738,14 +738,8 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.extend([x + '[remove]' for x in dac_all])
 			
 			else:
-
-				dcp = self.me.getSetting('dacplus')
 				
-				soundcard = dac[int(pos)-1]
-
-				if dcp == 'true':
-
-					soundcard = soundcard.replace('dac', 'dacplus')
+				soundcard = dac_all[int(pos)-1]
 
 				# add the soundcard overlay
 				new_dtoverlay.append(soundcard)
