@@ -104,7 +104,6 @@ then
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ]
 		then
 		# Build RTL8812AU module
-		mv rtl8812au drivers/net/wireless/rtl8812au
 		pushd drivers/net/wireless/rtl8812au
 		$BUILD
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
