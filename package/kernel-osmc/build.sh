@@ -39,8 +39,8 @@ then
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-		rm -rf drivers/net/wireless/rtl8192cu # rbp kernel swaps rtlwifi for this, but we still want newer
 		install_patch "../../patches" "rbp"
+		rm -rf drivers/net/wireless/rtl8192cu
 		# have to do this after, because upstream brings its own rtl8192cu in! Other kernels use rtlwifi by default. Have to do earlier here or Kconfig won't find it!
 		mv drivers/net/wireless/rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
