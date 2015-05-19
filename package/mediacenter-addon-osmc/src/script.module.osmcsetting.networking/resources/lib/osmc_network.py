@@ -119,11 +119,14 @@ def apply_network_changes(settings_dict):
             ipv4_configuration['Gateway'] = make_variant(settings_dict['Gateway'])
         service.SetProperty('IPv4.Configuration', ipv4_configuration)
         time.sleep(2)
-        dns = []
-        if 'DNS_1' in settings_dict:
-            dns.append(settings_dict['DNS_1'])
-        if 'DNS_2' in settings_dict:
-            dns.append(settings_dict['DNS_2'])
+	if settings_dict['Method'] == 'dhcp':
+		dns = [ '', '' ]
+	else:
+	        dns = []
+	        if 'DNS_1' in settings_dict:
+	            dns.append(settings_dict['DNS_1'])
+	        if 'DNS_2' in settings_dict:
+	            dns.append(settings_dict['DNS_2'])
         # duplicate SetProperty message works around connman dns forwarder bug
         service.SetProperty('Nameservers.Configuration', dbus.Array(dns, signature=dbus.Signature('s')))
         service.SetProperty('Nameservers.Configuration', dbus.Array(dns, signature=dbus.Signature('s')))
