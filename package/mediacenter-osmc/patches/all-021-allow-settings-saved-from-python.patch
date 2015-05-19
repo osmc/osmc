@@ -1,0 +1,35 @@
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 96dbf8b..9cb2973 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -505,6 +505,11 @@ namespace XBMCAddon
+       CAEFactory::Resume();
+     }
+ 
++   void saveSettings()
++   {
++      CSettings::Get().Save();
++   }
++
+     String convertLanguage(const char* language, int format)
+     {
+       std::string convertedLanguage;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 9ecc606..0443f05 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -417,6 +417,14 @@ namespace XBMCAddon
+      */  
+     void audioResume();
+ 
++   /**
++    * saveSettings() -- saves settings to guisettings.xml
++    *
++    * example:
++    *   xbmc.saveSettings()
++    */
++    void saveSettings();
++
+     /**
+     * convertLanguage(language, format) -- Returns the given language converted to the given format as a string.
+     *
