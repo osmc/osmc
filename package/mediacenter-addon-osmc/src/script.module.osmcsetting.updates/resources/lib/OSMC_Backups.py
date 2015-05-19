@@ -20,7 +20,7 @@ DIALOG = xbmcgui.Dialog()
 
 TIME_PATTERN = '%Y_%m_%d_%H_%M_%S'
 READ_PATTERN = '%Y-%m-%d %H:%M:%S'
-APPENDAGE	 = '[0-9]*'
+APPENDAGE	 = '[0-9|_]*'
 FILE_PATTERN = 'OSMCBACKUP_%s.tar.gz'
 LOCATIONS = {
 
@@ -94,7 +94,7 @@ class osmc_backup(object):
 		self.restoring_guisettings = False
 
 		# backup candidates is a list of tuples that contain the folder/file path and the size in bytes of the entry
-		self.backup_candidates = self.create_backup_file_list() if self.s.get('create_tarball', False) else None
+		self.backup_candidates = self.create_backup_file_list() #if self.s.get('create_tarball', False) else None
 
 
 	def start_backup(self):
@@ -103,23 +103,23 @@ class osmc_backup(object):
 
 		if self.check_backup_location():
 
-			if self.s['export_library']:
+			# if self.s['export_library']:
 
-				self.export_libraries()
+			# 	self.export_libraries()
 
-			if self.s['create_tarball']:
+			# if self.s['create_tarball']:
 
-				self.create_tarball()
+			self.create_tarball()
 
-				msg = json.dumps(('pre_backup_complete', {}))
+			msg = json.dumps(('pre_backup_complete', {}))
 
-				try:
+			try:
 
-					self.parent_queue.put(msg)
+				self.parent_queue.put(msg)
 
-				except:
+			except:
 
-					pass
+				pass
 
 
 	def check_backup_location(self):
@@ -145,6 +145,9 @@ class osmc_backup(object):
 
 			return False
 
+		else:
+			log('Sufficent diskspace at target location')
+
 		# check for write permission at backup location
 		if not self.check_target_writeable(self.location):
 
@@ -153,6 +156,9 @@ class osmc_backup(object):
 			ok = DIALOG.ok('OSMC Backup', 'Backup location not writeable')
 
 			return False
+
+		else:
+			log('Backup location writeable.')
 
 		return True
 
@@ -179,7 +185,15 @@ class osmc_backup(object):
 				# if the user is backing up guisettings.xml, then call for the settings to be saved using
 				# custom method 
 				if setting == 'backup_guisettings':
-					xbmc.saveSettings()
+
+					log('Trying to backup guisettings, running xbmc.saveSettings')
+					try:
+						xbmc.saveSettings()
+					except Exception as e:
+						log('xbmc.saveSetting failed')
+						log(type(e).__name__)
+						log(e.args)
+						log(traceback.format_exc())
 
 				path = location.format(kodi_folder=kodi_folder)
 
@@ -243,7 +257,7 @@ class osmc_backup(object):
 
 		temp_file = os.path.join(location, 'temp_write_test')
 
-		f =xbmcvfs.File (temp_file, 'w')
+		f = xbmcvfs.File(temp_file, 'w')
 
 		try:
 			result = f.write('buffer')
@@ -251,8 +265,8 @@ class osmc_backup(object):
 			log('%s is not writeable' % location)
 			f.close()
 			return False
-		finally:
-			f.close()
+
+		f.close()
 
 		try:
 			xbmcvfs.delete(temp_file)
@@ -338,7 +352,15 @@ class osmc_backup(object):
 
 			# copy the local file to remote location
 			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
+
+			log('local tarball name: %s'   % local_tarball_name)
+			log('local tarball exists: %s' % os.path.isfile(local_tarball_name))
+			log('remote tarball name: %s'  % remote_tarball_name)
+			log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
+
 			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+
+			xbmcvfs.delete(local_tarball_name)
 
 			if success:
 				log('Backup file successfully transferred')
@@ -349,7 +371,11 @@ class osmc_backup(object):
 					log('Cannot delete temp file at %s' % local_tarball_name)
 
 			else:
-				log('Transfer of backup file not successful')
+				log('Transfer of backup file not successful: %s' % success)
+
+				self.progress(kill=True)
+
+				ok = DIALOG.ok('Backup failed', 'Backup failed to copy the tar file.')
 
 				return 'failed'
 
@@ -651,14 +677,16 @@ class osmc_backup(object):
 
 		''' Returns a list of the tarballs in the current backup location, from youngest to oldest '''
 
-		pattern = os.path.join(location, FILE_PATTERN % APPENDAGE)
+		pattern = os.path.join(FILE_PATTERN % APPENDAGE)
 
 		dirs, tarball_list = xbmcvfs.listdir(location)
 
-		regex = re.compile(pattern)
-		tarball_list = [i for i in tarball_list if not regex.search(i)]		
+		log(tarball_list)
 
-		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location))
+		regex = re.compile(pattern)
+		tarball_list = [i for i in tarball_list if regex.search(i)]		
+
+		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location), reverse=True)
 
 		log('tarball list from location: %s' % tarball_list)
 
