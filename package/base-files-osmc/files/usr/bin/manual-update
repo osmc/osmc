@@ -32,7 +32,7 @@ fi
 
 dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    Checking for updates to install..." 5 48 > /dev/tty1
 
-err=$(dpkg --configure -a 2>&1)
+err=$(dpkg --configure --force-confdef --force-confold -a 2>&1)
 if [ -n "$err" ]; then sleep 4; dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "$err\n\nContinuing in 10 seconds..." 0 0 >/dev/tty1; sleep 10; fi
 
 # Package downloads have been done in the addon, so let's get right to upgrade.
