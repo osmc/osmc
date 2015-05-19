@@ -65,6 +65,12 @@ while true; do
 	echo 0 > /sys/devices/soc0/soc/20e0000.hdmi_video/enable_3d > /dev/null 2>&1
 	/bin/fbset -depth 16 && /bin/fbset -depth 32
 
+        if [ -f /tmp/guisettings.restore ]
+        then
+           mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml
+           sudo chown osmc:osmc /home/osmc/.kodi/userdata/guisettings.xml
+        fi
+
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 	setcap 'cap_net_bind_service=+ep' $KODI
 	echo 0 > /sys/class/vtconsole/vtcon1/bind
