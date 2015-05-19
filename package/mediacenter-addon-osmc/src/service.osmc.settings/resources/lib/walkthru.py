@@ -325,11 +325,22 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				# check if internet is connected
 				if self.internet_connected:
 					log('internet is connected, jumping to exit')
-					# skip the Networking setup menu item and go to the skin pabel
+
+					# skip the Networking setup menu item and go to the skin panel
+					# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+					# self.getControl(94000).setVisible(False)
+					# self.getControl(98000).setVisible(True)
+					# self.getControl(1008).setVisible(True)
+					# self.setFocusId(80010)
+
+					# display the sign-up panel
+					# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
 					self.getControl(94000).setVisible(False)
-					self.getControl(98000).setVisible(True)
-					self.getControl(1008).setVisible(True)
-					self.setFocusId(80010)
+					self.getControl(99000).setVisible(True)
+					self.getControl(1009).setVisible(True)
+					self.setFocusId(90010)
+
+
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
@@ -347,10 +358,19 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				if self.internet_connected:
 					log('internet is connected, jumping to exit')
 					# skip the Networking setup menu item and go to skin selection
+					# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+					# self.getControl(97000).setVisible(False)
+					# self.getControl(98000).setVisible(True)
+					# self.getControl(1008).setVisible(True)
+					# self.setFocusId(80010)
+
+					# display the sign-up panel
+					# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
 					self.getControl(97000).setVisible(False)
-					self.getControl(98000).setVisible(True)
-					self.getControl(1008).setVisible(True)
-					self.setFocusId(80010)
+					self.getControl(99000).setVisible(True)
+					self.getControl(1009).setVisible(True)
+					self.setFocusId(90010)
+
 				else:
 					log('internet is not connected, jumping to networking')
 					# display the Networking panel
@@ -362,35 +382,52 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			else:
 				pass							
 
-		elif controlID == 40020:			# unused scroll bar for TandC
-			
+		elif controlID == 40020:			# unused scroll bar for TandC		
 
 			self.getControl(555).scroll(10)
 
 		elif controlID == 40030:			# unused scroll bar for TandC
 			
-
 			self.getControl(555).scroll(-10)
 
 		elif controlID == 60090:			# skip networking button
 
 			# display the skin panel
+			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+			# self.getControl(96000).setVisible(False)
+			# self.getControl(98000).setVisible(True)
+			# self.getControl(1008).setVisible(True)
+			# self.setFocusId(80010)	
+
+			# display the sign-up panel
+			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
 			self.getControl(96000).setVisible(False)
-			self.getControl(98000).setVisible(True)
-			self.getControl(1008).setVisible(True)
-			self.setFocusId(80010)	
+			self.getControl(99000).setVisible(True)
+			self.getControl(1009).setVisible(True)
+			self.setFocusId(90010)
 
 		elif controlID == 60010:			# open networking gui
 			
 			self.net_call.run(False)
 
-			# display the skin panel
+			# display the skin panel  
+			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+			# self.getControl(96000).setVisible(False)
+			# self.getControl(98000).setVisible(True)
+			# self.getControl(1008).setVisible(True)
+			# self.setFocusId(80010)	
+
+			# display the sign-up panel
+			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
 			self.getControl(96000).setVisible(False)
-			self.getControl(98000).setVisible(True)
-			self.getControl(1008).setVisible(True)
-			self.setFocusId(80010)	
+			self.getControl(99000).setVisible(True)
+			self.getControl(1009).setVisible(True)
+			self.setFocusId(90010)
 
 		elif controlID in [80010, 80020]:	# user has selected a skin
+
+			# -- THIS SECTION IS SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
+			# -- IT CANNOT BE REACHED AS THE PANEL WITH THE BUTTONS IS NEVER DISPLAYED --
 			
 			if controlID == 80010:
 
@@ -480,6 +517,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID in skin_controls:
 
+			# -- THIS SECTION IS SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
+			# -- IT CANNOT BE REACHED AS THE PANEL WITH THE SKIN CONTROLS IS NEVER MADE VISIBLE --
+
+
 			if controlID == 80010:
 
 				# display the OSMC skin image
@@ -524,14 +565,14 @@ def open_gui(networking_instance):
 		log('lang_rerun: %s' % lang_rerun)
 		log('skin_choice: %s' % skin_choice)
 		
-	
-	if skin_choice != 'OSMC':
+	# -- THIS SECTION IS SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
+	# if skin_choice != 'OSMC':
 
-		log('Loading Confluence')
-		try:
-			xbmc.setskin('skin.confluence')
-		except:
-			log('Loading Confluence failed.')
+	# 	log('Loading Confluence')
+	# 	try:
+	# 		xbmc.setskin('skin.confluence')
+	# 	except:
+	# 		log('Loading Confluence failed.')
 
 	log('Exiting GUI')
 
