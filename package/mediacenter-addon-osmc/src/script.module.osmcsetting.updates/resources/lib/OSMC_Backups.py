@@ -176,6 +176,11 @@ class osmc_backup(object):
 
 			if self.s[setting]:
 
+				# if the user is backing up guisettings.xml, then call for the settings to be saved using
+				# custom method 
+				if setting == 'backup_guisettings':
+					xbmc.saveSettings()
+
 				path = location.format(kodi_folder=kodi_folder)
 
 				size = self.calculate_byte_size(path)
@@ -398,9 +403,6 @@ class osmc_backup(object):
 
 		back_to_select = True
 
-		# the location to restore the guisettings.xml to temporarily
-		alt_restore_location = os.path.join(xbmc.translatePath('special://userdata'), 'addon_data', 'script.module.osmcsetting.updates')
-
 		while back_to_select:
 
 			# display the list
@@ -566,16 +568,13 @@ class osmc_backup(object):
 						log('attempting to restore %s to %s' % (member.name, restore_location))
 
 						try:
-							# if the item is userdata/guisettings.xml then restore it to the addon data folder, and create the flag
-							# (/RESET_GUISETTINGS) holding the location of the alternative backup location
+							# if the item is userdata/guisettings.xml then restore it to /tmp and rename it
+							# the external script will pick it up there and overwrite the live version
 							if member.name.endswith('userdata/guisettings.xml') and self.restoring_guisettings:
 
-								t.extract(member, alt_restore_location)
+								t.extract(member, '/tmp/')
 
-								with open('/RESET_GUISETTINGS', 'w') as f:
-									line1 = os.path.join(alt_restore_location,'userdata','guisettings.xml')
-									line2 = os.path.join(xbmc.translatePath('special://userdata'))
-									f.write(line1)
+								os.rename('/tmp/guisettings.xml', '/tmp/guisettings.restore')
 
 							else:
 								
@@ -594,8 +593,10 @@ class osmc_backup(object):
 
 							continue
 
-			if self.success == 'Full':
-				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')	
+			if self.success == 'Full' and not self.restoring_guisettings:
+				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')
+			elif self.success == 'Full' and self.restoring_guisettings:
+				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored', 'Restoring guisettings.xml requires restart.')
 			else:
 				back_to_select = False
 
