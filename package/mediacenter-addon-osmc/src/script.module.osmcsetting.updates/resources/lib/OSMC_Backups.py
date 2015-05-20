@@ -360,7 +360,7 @@ class osmc_backup(object):
 
 			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
-			xbmcvfs.delete(local_tarball_name)
+			# xbmcvfs.delete(local_tarball_name)
 
 			if success:
 				log('Backup file successfully transferred')
@@ -677,7 +677,7 @@ class osmc_backup(object):
 
 		''' Returns a list of the tarballs in the current backup location, from youngest to oldest '''
 
-		pattern = os.path.join(FILE_PATTERN % APPENDAGE)
+		pattern = FILE_PATTERN % APPENDAGE
 
 		dirs, tarball_list = xbmcvfs.listdir(location)
 
@@ -686,7 +686,7 @@ class osmc_backup(object):
 		regex = re.compile(pattern)
 		tarball_list = [i for i in tarball_list if regex.search(i)]		
 
-		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location), reverse=True)
+		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location))
 
 		log('tarball list from location: %s' % tarball_list)
 
@@ -697,7 +697,7 @@ class osmc_backup(object):
 
 		''' Returns the date of the backup that is embedded in the backup filename '''
 
-		prefix = os.path.join(location, FILE_PATTERN % APPENDAGE)
+		prefix = FILE_PATTERN % APPENDAGE
 
 		# extract just the relevant part of the string
 		string = filename.replace(prefix[:prefix.index(APPENDAGE)], '').replace('.tar.gz', '')

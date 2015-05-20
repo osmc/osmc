@@ -443,11 +443,11 @@ class Main(object):
 			self.s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
 			self.s['update_on_idle']			= True if 	__setting__('update_on_idle') 			== 'true' else False
 			self.s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
-			self.s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
-			self.s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
-			self.s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
-			self.s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False
-			self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			# self.s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
+			# self.s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
+			# self.s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
+			# self.s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False
+			# self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
 			self.s['backup_location'] 			= __setting__('backup_location')
 			self.s['tarball_count'] 			= int(float(	__setting__('tarball_count')		))
 			self.s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
@@ -496,11 +496,11 @@ class Main(object):
 			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
 			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
 			tmp_s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
-			tmp_s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
-			tmp_s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
-			tmp_s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
-			tmp_s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False			
-			tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			# tmp_s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
+			# tmp_s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
+			# tmp_s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
+			# tmp_s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False			
+			# tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
 			tmp_s['backup_location'] 			= __setting__('backup_location')
 			tmp_s['tarball_count'] 				= int(float(	__setting__('tarball_count')		))
 			tmp_s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False

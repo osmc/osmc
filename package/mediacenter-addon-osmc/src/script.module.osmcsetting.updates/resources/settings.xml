@@ -50,37 +50,37 @@
 		<!-- . -->
 		<!-- export the libraries -->
 		<!-- . -->
-		<setting default="false" id="export_library" label="Export libraries" type="bool"/>
-		<setting visible="eq(-1,true)" subsetting="true" default="false" id="export_video" label="Export Video Library" type="bool"/>
-		<setting visible="eq(-1,true)+eq(-2,true)" subsetting="true" default="false" id="multifile_vid_export" label="Export individual xml files to the video locations" type="bool"/>
-		<setting visible="eq(-3,true)" subsetting="true" default="false" id="export_music" label="Export Music Library" type="bool"/>
+		<!-- <setting default="false" id="export_library" label="Export libraries" type="bool"/> -->
+		<!-- <setting visible="eq(-1,true)" subsetting="true" default="false" id="export_video" label="Export Video Library" type="bool"/> -->
+		<!-- <setting visible="eq(-1,true)+eq(-2,true)" subsetting="true" default="false" id="multifile_vid_export" label="Export individual xml files to the video locations" type="bool"/> -->
+		<!-- <setting visible="eq(-3,true)" subsetting="true" default="false" id="export_music" label="Export Music Library" type="bool"/> -->
 		<!-- . -->
 		<!-- create tarball of folders and files -->
 		<!-- . -->
-		<setting default="false" id="create_tarball" label="create_tarball" type="bool"/>
+		<!-- <setting default="true" id="create_tarball" label="create_tarball" type="bool"/> -->
 		<!-- location of backup -->
-		<setting visible="eq(-1,true)" subsetting="true" id="backup_location" label="Location of backup storage" source="auto" option="writeable" type="folder"/>
+		<setting subsetting="true" id="backup_location" label="Location of backup storage" source="auto" option="writeable" type="folder"/>
 		<!-- number of backup tarballs to keep -->
-		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" subsetting="true" type="slider" visible="eq(-2,true)"/>
+		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" subsetting="true" type="slider"/>
 		<!-- folders and files to tarball -->
-		<setting visible="eq(-3,true)" subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
-		<setting visible="eq(-4,true)" subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
-		<setting visible="eq(-5,true)" subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
-		<setting visible="eq(-6,true)" subsetting="true" default="true" id="backup_keymaps" label="Keymaps Folder" type="bool"/>
-		<setting visible="eq(-7,true)" subsetting="true" default="true" id="backup_library" label="Library Folder" type="bool"/>
-		<setting visible="eq(-8,true)" subsetting="true" default="true" id="backup_peripheral_data" label="Peripheral_data Folder" type="bool"/>
-		<setting visible="eq(-9,true)" subsetting="true" default="true" id="backup_playlists" label="Playlists Folder" type="bool"/>
-		<setting visible="eq(-10,true)" subsetting="true" default="false" id="backup_Thumbnails" label="Thumbnails Folder (very large)" type="bool"/>
-		<setting visible="eq(-11,true)" subsetting="true" default="true" id="backup_favourites" label="favourites.xml" type="bool"/>
-		<setting visible="eq(-12,true)" subsetting="true" default="true" id="backup_guisettings" label="guisettings.xml" type="bool"/>
-		<setting visible="eq(-13,true)" subsetting="true" default="true" id="backup_keyboard" label="keyboard.xml" type="bool"/>
-		<setting visible="eq(-14,true)" subsetting="true" default="true" id="backup_remote" label="remote.xml" type="bool"/>
-		<setting visible="eq(-15,true)" subsetting="true" default="true" id="backup_LCD" label="LCD.xml" type="bool"/>
-		<setting visible="eq(-16,true)" subsetting="true" default="true" id="backup_profiles" label="profiles.xml" type="bool"/>
-		<setting visible="eq(-17,true)" subsetting="true" default="true" id="backup_RssFeeds" label="RssFeeds.xml" type="bool"/>
-		<setting visible="eq(-18,true)" subsetting="true" default="true" id="backup_sources" label="sources.xml" type="bool"/>
-		<setting visible="eq(-19,true)" subsetting="true" default="true" id="backup_upnpserver" label="upnpserver.xml" type="bool"/>
-		<setting visible="eq(-20,true)" subsetting="true" default="true" id="backup_advancedsettings" label="advancedsettings.xml" type="bool"/>
+		<setting subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_keymaps" label="Keymaps Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_library" label="Library Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_peripheral_data" label="Peripheral_data Folder" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_playlists" label="Playlists Folder" type="bool"/>
+		<setting subsetting="true" default="false" id="backup_Thumbnails" label="Thumbnails Folder (very large)" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_favourites" label="favourites.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_guisettings" label="guisettings.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_keyboard" label="keyboard.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_remote" label="remote.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_LCD" label="LCD.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_profiles" label="profiles.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_RssFeeds" label="RssFeeds.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_sources" label="sources.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_upnpserver" label="upnpserver.xml" type="bool"/>
+		<setting subsetting="true" default="true" id="backup_advancedsettings" label="advancedsettings.xml" type="bool"/>
 
 	</category>
 	<category label="32094">
