@@ -36,7 +36,7 @@
 		<meta name="msapplication-square310x310logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x310.png">
 		<meta name="msapplication-wide310x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x150.png">
 		<!-- inject:css -->
-		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-726f6cff.css">
+		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-abc7376c.css">
 		<!-- endinject -->
 		
 		<!--[if lte IE 8]> 
@@ -71,7 +71,7 @@
       <div class="donationwidget">
         <h3>Donate</h3>
         <p>OSMC is a new and and young project that needs some support to make sure it lands on its feet.</p>
-        <form action="https://osmc.tv/contribute/donate/thanks">
+        <form action="#">
           <input type="tel" class="amount" pattern="\d+" required>
           <input type="radio" class="radio" id="usd-pop" name="currency" value="USD" checked="checked">
           <label for="usd-pop">USD</label>

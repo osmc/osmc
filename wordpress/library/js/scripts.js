@@ -1,25 +1,25 @@
-jQuery(function() {
-    FastClick.attach(document.body);
+jQuery(function () {
+  FastClick.attach(document.body);
 });
 
-jQuery("#nav-res-toggle").click(function(){
-  
-  if ( jQuery(this).hasClass("open") ) {
+jQuery("#nav-res-toggle").click(function () {
+
+  if (jQuery(this).hasClass("open"))  {
     jQuery(".top-nav").removeClass("open");
     jQuery("#nav-res-toggle").removeClass("open");
-  } else {
+  } else  {
     jQuery(".top-nav").addClass("open");
-    jQuery("#nav-res-toggle").addClass("open"); 
+    jQuery("#nav-res-toggle").addClass("open");
   }
-  
+
 });
 
 // FRONT PAGE //
 
 // Video
 
-if ( jQuery("body").hasClass("home") ) {
-      
+if (jQuery("body").hasClass("home")) {
+
   var player = new Clappr.Player({
     source: 'https://osmc.tv/homepage_tour.mp4',
     poster: 'https://osmc.tv/wp-content/themes/osmc/library/images/video-poster.png',
@@ -31,14 +31,14 @@ if ( jQuery("body").hasClass("home") ) {
     chromeless: 'true'
   });
 
-  jQuery(".home .vignette-overlay").click(function() {
+  jQuery(".home .vignette-overlay").click(function ()  {
 
     var vid = jQuery("body.home .video-wrap video").get(0);
     var play = jQuery("body.home .video-wrap button.media-control-button[data-playpause]");
     var overlay = jQuery("body.home .video-overlay");
     var icon = jQuery("body.home .playicon");
 
-    if ( vid.paused ) {
+    if (vid.paused) {
       play.click();
       overlay.addClass("hidden");
       icon.addClass("hidden");
@@ -56,7 +56,7 @@ if ( jQuery("body").hasClass("home") ) {
   var hwindow = jQuery(window).height();
   var h130 = jQuery(window).height() * 1.55;
   jQuery(".home .firstn").css("height", hwindow);
-  setTimeout(function() {
+  setTimeout(function () {
     jQuery(".home .firstn-wrap .full").addClass("show");
   }, 100);
   jQuery(".home .firstn-back").css("height", h130);
@@ -66,11 +66,11 @@ if ( jQuery("body").hasClass("home") ) {
   currentZ = 1;
   currentImg = 1;
 
-  jQuery(".home .thirdn li").click(function() {
+  jQuery(".home .thirdn li").click(function ()  {
     var lclass = jQuery(this).attr("class");
     var nr = lclass.substr(lclass.length - 1);
 
-    if ( jQuery.isNumeric(nr)  ) {	
+    if (jQuery.isNumeric(nr)) {
 
       jQuery(".home .thirdn img").removeClass("show");
       jQuery(".home .thirdn .img-wrap" + currentImg + " img").addClass("show");
@@ -82,7 +82,7 @@ if ( jQuery("body").hasClass("home") ) {
       oldImg = currentImg;
       currentImg = nr;
 
-      setTimeout(function() {
+      setTimeout(function () {
         jQuery(".home .thirdn .img-wrap" + oldImg + " img").removeClass("show");
       }, 400);
 
@@ -95,26 +95,26 @@ if ( jQuery("body").hasClass("home") ) {
 
 // NEWSLETTER FORM //
 
-jQuery(".newsletter_subscribe").submit(function(e) {
-  
+jQuery(".newsletter_subscribe").submit(function (e) {
+
   e.preventDefault();
-  
+
   var form = jQuery(this);
   var button = form.find("button");
-  
+
   form.removeClass("wait success error");
-  
+
   form.addClass("wait");
-  
+
   button.prop('disabled', true);
   button.text("loading");
-  
+
   jQuery.ajax({
-    
+
     url: jQuery(this).attr("action"),
     type: "POST",
     data: jQuery(this).serialize(),
-    success: function(response) {
+    success: function (response)  {
       button.prop('disabled', false);
       button.text("Subscribe");
       form.find(".email").val("You are now subscribed!");
@@ -125,28 +125,28 @@ jQuery(".newsletter_subscribe").submit(function(e) {
 
 // DONATION //
 
-jQuery(".donationwidget button").click(function(){
+jQuery(".donationwidget button").click(function () {
   jQuery('.donationwidget button').removeClass("clicked");
   jQuery(this).addClass("clicked");
 });
 
-jQuery.each(jQuery(".donationwidget form"), function(index, oneForm) {
+jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {
   jQuery(oneForm).validate({
-    submitHandler: function(form) {
+    submitHandler: function () {
       var form = jQuery(oneForm);
 
       var button = form.find(".clicked");
       var amount = form.find(".amount").val();
       var currency = form.find(".radio:checked").val();
 
-      if ( button.hasClass("paypal") ) {
+      if (button.hasClass("paypal"))  {
 
-      var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=main_page_tracker&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount;
+        var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=main_page_tracker&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount;
 
-      window.open(paypallink);
+        window.open(paypallink);
 
       }
-      if ( button.hasClass("stripe") ) {
+      if (button.hasClass("stripe")) {
 
         button.prop('disabled', true);
         button.addClass("loading");
@@ -154,7 +154,7 @@ jQuery.each(jQuery(".donationwidget form"), function(index, oneForm) {
         button.append('<img src="https://osmc.tv/wp-content/themes/osmc/library/images/preloader.gif">');
         var newamount = amount + "00";
 
-        jQuery.getScript("https://checkout.stripe.com/checkout.js", function() {
+        jQuery.getScript("https://checkout.stripe.com/checkout.js", function () {
           stripe(newamount, currency);
         });
       }
@@ -166,35 +166,37 @@ jQuery.each(jQuery(".donationwidget form"), function(index, oneForm) {
 // POPUP //
 
 // check hash on load
-var url_load = document.URL.substr(document.URL.indexOf('#')+1);
-if ( url_load === "donate" ) {
+var url_load = document.URL.substr(document.URL.indexOf('#') + 1);
+if (url_load === "donate") {
   popup_donate();
 };
 
 // check hash on change
-jQuery(window).on('hashchange',function(){
+jQuery(window).on('hashchange', function () {
   var hash = location.hash.slice(1);
-  if ( hash === "donate" ) {
+  if (hash == "donate") {
     popup_donate();
-  };
+  }
 });
 
 function popup_donate() {
+  console.log("pup");
   var overlay = jQuery(".overlay");
   var popup = jQuery(".popup_donate");
   overlay.addClass("show");
   popup.addClass("show");
-  setTimeout(function() {
+
+  setTimeout(function () {
     overlay.addClass("fade");
     popup.addClass("fade");
   }, 100);
-  
+
 };
 
-jQuery(".overlay").click(function() {
+jQuery(".overlay").click(function () {
   jQuery(".popup_donate").removeClass("show fade");
   jQuery(".overlay").removeClass("show fade");
-  window.location.hash = "";
+  window.location.hash = "exit";
 });
 
 // STRIPE //
@@ -203,18 +205,18 @@ function stripe(am, cur) {
   var handler = StripeCheckout.configure({
     key: 'pk_live_HEfJk95fTFmjEBYMYVTxWFZk',
     image: '/wp-content/themes/osmc/library/images/favicons/apple-touch-icon-180x180.png',
-    token: function(token) {
+    token: function (token) {
       window.location.href = "https://osmc.tv/contribute/donate/thanks/";
     }
   });
-    
+
   // Open Checkout with further options
   handler.open({
     name: 'OSMC Donation',
     description: "",
     amount: am,
     currency: cur,
-    opened: function() {
+    opened: function () {
       var button = jQuery(".donationwidget form").find(".clicked");
       button.prop('disabled', false);
       button.removeClass("loading");
@@ -225,13 +227,13 @@ function stripe(am, cur) {
 };
 
 // Close Checkout on page navigation
-jQuery(window).on('popstate', function() {
+jQuery(window).on('popstate', function () {
   handler.close();
 });
 
 // DOWNLOAD SCROLL TO //
 
-jQuery(".download.devices .wrapper").click(function() {
+jQuery(".download.devices .wrapper").click(function () {
   jQuery('html, body').animate({
     scrollTop: jQuery(".getstarted").offset().top - 40
   }, 800);
@@ -244,59 +246,59 @@ jQuery(".download.devices .wrapper").click(function() {
 var tablecount = 0;
 var tableclass = "";
 
-function diskimages(device, title) {
-  
+function diskimages(device, title)  {
+
   tablecount = tablecount + 1;
 
   var url = "https://osmc.tv/citm.php?citm=installers/versions_" + device;
   var citm = "https://osmc.tv/citm.php?citm=";
   var div = jQuery(".disktables");
-  
+
   if (tablecount % 2 == 0) {
-  
+
     div.find("." + tableclass).append("<div class='table'><h3>" + title + "</h3><table class='" + device + "'><tr><th>Release</th><th>Checksum (MD5)</th></table></div>");
-  
+
   } else {
-  
+
     tableclass = "column" + tablecount;
-    
+
     div.append("<div class='row " + tableclass + "'><div class='table'><h3>" + title + "</h3><table class='" + device + "'><tr><th>Release</th><th>Checksum (MD5)</th></table></div></div>");
   }
-  
+
   var table = div.find("." + device);
-  
+
   jQuery.ajax({
     url: url,
     type: "GET",
-    success: function(response) {
-      
+    success: function (response)  {
+
       var array = response.split("\n");
-      
-      jQuery.each(array, function(index, value) {
-        
-        if ( value.length > 2 ) {
-          
+
+      jQuery.each(array, function (index, value) {
+
+        if (value.length > 2) {
+
           table.append("<tr class='tr" + index + "'>");
-        
+
           var name = value.substr(0, value.indexOf(" "));
           var address = value.split(" ").pop();
           var adrsplit = address.split("http://download.osmc.tv/").pop();
-          var md5adr = citm + (adrsplit.substr(0, adrsplit.length-7)) + ".md5";
-          
+          var md5adr = citm + (adrsplit.substr(0, adrsplit.length - 7)) + ".md5";
+
           jQuery.ajax({
             url: md5adr,
             type: "GET",
-            success: function(response) {
-              
+            success: function (response)  {
+
               var md5 = response.slice(0, response.indexOf(" "));
               table.find(".tr" + index).append("<td><a href='" + address + "'>" + name + "</a></td><td>" + md5 + "</td>");
-              
+
             }
           });
         }
-        
+
       });
     }
   });
-  
+
 };
