@@ -1,0 +1,20 @@
+{
+    "partitions": [
+        {
+            "label": "boot-rbp2",
+            "filesystem_type": "FAT",
+            "partition_size_nominal": 80,
+            "want_maximised": false,
+            "mkfs_options": "-F32",
+            "uncompressed_tarball_size": 20
+        },
+        {
+            "label": "root-rbp2",
+            "filesystem_type": "ext4",
+            "partition_size_nominal": 2048,
+            "uncompressed_tarball_size": 768,
+            "want_maximised": true,
+            "mkfs_options": "-F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096"
+        }
+    ]
+}
