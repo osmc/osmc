@@ -363,6 +363,18 @@ class osmc_backup(object):
 
 			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
+			st = xbmcvfs.Stat(remote_tarball_name)
+			size_a = 0
+			size_b = 1
+			count = 0
+			while count < 50 and size_a != size_b:
+				log('%s : %s' % (size_a, size_b))
+				size_a = size_b
+				size_b = st.st_size()
+				count += 1
+				xbmc.sleep(100)
+				log('%s : %s -!' % (size_a, size_b))
+
 			# xbmcvfs.delete(local_tarball_name)
 
 			if success:
