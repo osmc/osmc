@@ -125,38 +125,76 @@ jQuery(".newsletter_subscribe").submit(function(e) {
 
 // DONATION //
 
-jQuery('.donationwidget button').click(function(){
-    jQuery('.donationwidget button').removeClass("clicked");
-    jQuery(this).addClass("clicked");
+jQuery(".donationwidget button").click(function(){
+  jQuery('.donationwidget button').removeClass("clicked");
+  jQuery(this).addClass("clicked");
 });
 
-jQuery(".donationwidget form").submit(function(e) {
-  e.preventDefault();
+jQuery.each(jQuery(".donationwidget form"), function(index, oneForm) {
+  jQuery(oneForm).validate({
+    submitHandler: function(form) {
+      var form = jQuery(oneForm);
+
+      var button = form.find(".clicked");
+      var amount = form.find(".amount").val();
+      var currency = form.find(".radio:checked").val();
+
+      if ( button.hasClass("paypal") ) {
+
+      var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=main_page_tracker&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount;
+
+      window.open(paypallink);
+
+      }
+      if ( button.hasClass("stripe") ) {
+
+        button.prop('disabled', true);
+        button.addClass("loading");
+        button.find(".svg").addClass("hidden");
+        button.append('<img src="https://osmc.tv/wp-content/themes/osmc/library/images/preloader.gif">');
+        var newamount = amount + "00";
+
+        jQuery.getScript("https://checkout.stripe.com/checkout.js", function() {
+          stripe(newamount, currency);
+        });
+      }
+    }
+  });
+});
+
+
+// POPUP //
+
+// check hash on load
+var url_load = document.URL.substr(document.URL.indexOf('#')+1);
+if ( url_load === "donate" ) {
+  popup_donate();
+};
+
+// check hash on change
+jQuery(window).on('hashchange',function(){
+  var hash = location.hash.slice(1);
+  if ( hash === "donate" ) {
+    popup_donate();
+  };
+});
+
+function popup_donate() {
+  var overlay = jQuery(".overlay");
+  var popup = jQuery(".popup_donate");
+  overlay.addClass("show");
+  popup.addClass("show");
+  setTimeout(function() {
+    overlay.addClass("fade");
+    popup.addClass("fade");
+  }, 100);
   
-  var form = jQuery(this);
-  
-  var button = form.find(".clicked");
-  var amount = form.find(".amount").val();
-  var currency = form.find(".radio:checked").val();
-  
-  if ( button.hasClass("paypal") ) {
-    
-  var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=main_page_tracker&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount
-    
-    window.open(paypallink);
-    
-  }
-  if ( button.hasClass("stripe") ) {
-    
-    button.prop('disabled', true);
-    button.addClass("loading");
-    button.find("img").attr('src', 'https://osmc.tv/wp-content/themes/osmc/library/images/preloader.gif');
-    var newamount = amount + "00";
-    
-    jQuery.getScript("https://checkout.stripe.com/checkout.js", function() {
-      stripe(newamount, currency);
-    });
-  }
+};
+
+jQuery(".overlay").click(function() {
+  jQuery(".popup_donate").removeClass("show fade");
+  jQuery(".overlay").removeClass("show fade");
+  window.location.hash = "";
 });
 
 // STRIPE //
@@ -164,12 +202,15 @@ jQuery(".donationwidget form").submit(function(e) {
 function stripe(am, cur) {
   var handler = StripeCheckout.configure({
     key: 'pk_live_HEfJk95fTFmjEBYMYVTxWFZk',
-    image: '/wp-content/themes/osmc/library/images/favicons/apple-touch-icon-180x180.png'
+    image: '/wp-content/themes/osmc/library/images/favicons/apple-touch-icon-180x180.png',
+    token: function(token) {
+      window.location.href = "https://osmc.tv/contribute/donate/thanks/";
+    }
   });
     
   // Open Checkout with further options
   handler.open({
-    name: 'Stripe Donation',
+    name: 'OSMC Donation',
     description: "",
     amount: am,
     currency: cur,
@@ -177,7 +218,8 @@ function stripe(am, cur) {
       var button = jQuery(".donationwidget form").find(".clicked");
       button.prop('disabled', false);
       button.removeClass("loading");
-      button.find("img").attr('src', 'https://osmc.tv/wp-content/themes/osmc/library/images/stripe.png');
+      button.find(".svg").removeClass("hidden");
+      button.find("img").remove();
     }
   });
 };

@@ -26,6 +26,7 @@ $dblue-trans: rgba(0, 59, 90, 0.9);
 
 $dblue2: #001F3F;
 
+$red: #fc4f4f; 
 
 $white: #F0F0F0;
 $lgrey: #D3D3D3;
@@ -75,6 +76,7 @@ body {
   background-color: $white;
   color: $dark;
   margin: 0;
+  overflow-y: scroll;
 }
 
 input, textarea {
@@ -1667,7 +1669,74 @@ footer {
   }
 }
 
+
+.overlay.show {
+  display: block;
+}
+.overlay.fade {
+  opacity: 1;
+}
+.overlay {
+  opacity: 0;
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  @include transition-duration(0.2s);
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.60);
+}
+
 // DONATION //
+
+.popup_donate.show {
+  display: block;
+}
+.popup_donate.fade {
+  opacity: 1;
+}
+
+.popup_donate {
+  opacity: 0;
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  max-width: 30em;
+  max-height: 25em;
+  @include transition-duration(0.2s);
+  
+  h3 {
+    margin: 0;
+  }
+  
+  .donationwidget {
+    padding: 1em 1em 3em;
+    margin: 1em;
+    background-color: $white;
+    @include border-radius(2px);
+  }
+}
+
+@-webkit-keyframes display-none-transition {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+  
 
 .donationwidget {
   
@@ -1682,6 +1751,9 @@ footer {
       min-width: 2.2em;
       margin: 0 5% 0 0;
       text-align: center;
+    }
+    .amount.error {
+      border: 1px solid $red;
     }
     
     .radio {
@@ -1705,11 +1777,12 @@ footer {
       button {
         background-color: $lgrey;
         width: 35%;
-        max-width: 8em;
+        max-width: 6em;
         height: 2.6em;
         padding: 0.4em 0.5em;
         margin: 0 0.2em;
         vertical-align: middle;
+        position: relative;
         
         &:hover, &:focus {
           background-color: $link;
@@ -1728,6 +1801,37 @@ footer {
           padding: 0 0 3px;
         }
       }
+      .svg {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 47%;
+        margin: auto;
+          
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .svg.hidden {
+        display: none;
+      }
+      .card1 {
+          bottom: 0.3em;
+          left: auto;
+          width: 89%;
+      }
+      .card2 {
+          top: 0.3em;
+          right: auto;
+          width: 89%;
+      }
+    }
+    #-error {
+      display: none !important;
     }
   }
 }
