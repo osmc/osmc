@@ -180,7 +180,6 @@ jQuery(window).on('hashchange', function () {
 });
 
 function popup_donate() {
-  console.log("pup");
   var overlay = jQuery(".overlay");
   var popup = jQuery(".popup_donate");
   overlay.addClass("show");
