@@ -7,6 +7,7 @@ import math
 import os
 import re
 import tarfile
+import tempfile
 import traceback
 
 # KODI Modules
@@ -334,24 +335,32 @@ class osmc_backup(object):
 		new_root = xbmc.translatePath('special://home')
 
 		try:
-			tar = tarfile.open(local_tarball_name, "w:gz")
-			
-			for name, size in self.backup_candidates:
 
-				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
+			# tarfile.TarFile(name=None, mode='r', fileobj=None, format=DEFAULT_FORMAT, tarinfo=TarInfo, dereference=False, ignore_zeros=False, encoding=ENCODING, errors=None, pax_headers=None, debug=0, errorlevel=0)
 
-				try:
-					new_path = os.path.relpath(name, new_root)
-					tar.add(name, arcname=new_path)
-				except:
-					log('%s failed to backup to tarball' % name)
-					continue
+			with open(local_tarball_name, 'w') as f:
+				tar = tarfile.open(fileobj=f, mode="w:gz")
+				
+				for name, size in self.backup_candidates:
 
-				progress_total += math.log(max(size, 1))
+					self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
 
-				pct = int( (progress_total / float(total_size) ) * 100.0 )
+					try:
+						new_path = os.path.relpath(name, new_root)
+						tar.add(name, arcname=new_path)
+					except:
+						log('%s failed to backup to tarball' % name)
+						continue
 
-			tar.close()
+					progress_total += math.log(max(size, 1))
+
+					pct = int( (progress_total / float(total_size) ) * 100.0 )
+
+				tar.close()
+
+				f.flush()
+				
+				os.fsync(f)
 
 			# copy the local file to remote location
 			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
@@ -361,6 +370,7 @@ class osmc_backup(object):
 			log('remote tarball name: %s'  % remote_tarball_name)
 			log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
 
+			# work-around for xbmcvfs.copy starting before file finished writing
 			st = xbmcvfs.Stat(local_tarball_name)
 			size_a = 0
 			size_b = 1
@@ -371,11 +381,8 @@ class osmc_backup(object):
 				size_b = st.st_size()
 				count += 1
 				xbmc.sleep(100)
-				log('%s : %s -!' % (size_a, size_b))
 
 			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
-
-			# xbmcvfs.delete(local_tarball_name)
 
 			if success:
 				log('Backup file successfully transferred')
