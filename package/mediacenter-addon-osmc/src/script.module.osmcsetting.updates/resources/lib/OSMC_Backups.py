@@ -361,9 +361,7 @@ class osmc_backup(object):
 			log('remote tarball name: %s'  % remote_tarball_name)
 			log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
 
-			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
-
-			st = xbmcvfs.Stat(remote_tarball_name)
+			st = xbmcvfs.Stat(local_tarball_name)
 			size_a = 0
 			size_b = 1
 			count = 0
@@ -374,6 +372,8 @@ class osmc_backup(object):
 				count += 1
 				xbmc.sleep(100)
 				log('%s : %s -!' % (size_a, size_b))
+
+			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
 			# xbmcvfs.delete(local_tarball_name)
 
