@@ -334,21 +334,24 @@ class osmc_backup(object):
 		new_root = xbmc.translatePath('special://home')
 
 		try:
-			with tarfile.open(local_tarball_name, "w:gz") as tar:
-				for name, size in self.backup_candidates:
+			tar = tarfile.open(local_tarball_name, "w:gz")
+			
+			for name, size in self.backup_candidates:
 
-					self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
+				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
 
-					try:
-						new_path = os.path.relpath(name, new_root)
-						tar.add(name, arcname=new_path)
-					except:
-						log('%s failed to backup to tarball' % name)
-						continue
+				try:
+					new_path = os.path.relpath(name, new_root)
+					tar.add(name, arcname=new_path)
+				except:
+					log('%s failed to backup to tarball' % name)
+					continue
 
-					progress_total += math.log(max(size, 1))
+				progress_total += math.log(max(size, 1))
 
-					pct = int( (progress_total / float(total_size) ) * 100.0 )
+				pct = int( (progress_total / float(total_size) ) * 100.0 )
+
+			tar.close()
 
 			# copy the local file to remote location
 			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
