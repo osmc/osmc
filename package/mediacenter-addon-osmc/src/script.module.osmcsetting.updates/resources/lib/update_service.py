@@ -198,9 +198,9 @@ class Main(object):
 			if not count % 100:									# FOR TESTING ONLY
 				xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
 				log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
-			count += 1 											# FOR TESTING ONLY
+			count += 1 								# FOR TESTING ONLY
 			# FOR TESTING ONLY
-
+			
 			# check the scheduler for the update trigger
 			if self.scheduler.check_trigger():
 				self.update_now()
@@ -727,6 +727,9 @@ class Main(object):
 		except:
 			pass
 
+		# run an apt-cache clean
+		self.clean_apt_cache()
+
 		if self.check_if_reboot_required():
 			# the files flagging that an installed package needs a reboot are present
 
@@ -1096,3 +1099,11 @@ class Main(object):
 			return True
 		else:
 			return False
+
+
+	def clean_apt_cache(self):
+
+		try:
+			os.system('sudo apt-cache clean')
+		except:
+			pass
