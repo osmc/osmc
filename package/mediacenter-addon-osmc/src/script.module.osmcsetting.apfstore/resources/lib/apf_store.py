@@ -16,6 +16,7 @@ import shutil
 import apt
 import traceback
 import datetime as dt
+import subprocess
 
 addonid 	= "script.module.osmcsetting.apfstore"
 __addon__  	= xbmcaddon.Addon(addonid)
