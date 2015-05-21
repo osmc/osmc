@@ -67,10 +67,29 @@ APF JSON STRUCTURE
 '''
 
 
+def check_for_unsupported_version():
+
+	''' Checks if this version is an Alpha, prevent updates '''
+
+	if xbmcgui.Window(10000).getProperty('osmc_version') == 'OSMC Unsupported Alpha release':
+
+		ok = xbmcgui.Dialog().ok(lang(32017), lang(32018))
+
+		return 'alpha'
+
+	else:
+
+		return 'proceed'
+
+
+
 class APF_STORE(object):
 
 
 	def __init__(self):
+
+		# do not proceed if the version is alpha
+		if check_for_unsupported_version() == 'alpha': return
 
 		self.CACHETIMEOUT = 6
 
