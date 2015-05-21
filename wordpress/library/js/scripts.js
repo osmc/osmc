@@ -130,8 +130,14 @@ jQuery(".donationwidget button").click(function () {
   jQuery(this).addClass("clicked");
 });
 
-jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {
+jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {  
   jQuery(oneForm).validate({
+    rules: {
+      amount: {
+        required: true,
+        digits: true
+      }
+    },
     submitHandler: function () {
       var form = jQuery(oneForm);
 

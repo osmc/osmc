@@ -1725,6 +1725,12 @@ footer {
     margin: 1em;
     background-color: $white;
     @include border-radius(2px);
+    
+    form {
+      #amount-error {
+        top: 1.7em;
+      }
+    }
   }
 }
 
@@ -1743,6 +1749,7 @@ footer {
   form {
     font-size: 90%;
     text-align: center;
+    position: relative;
     
     .amount {
       padding: 0.2em;
@@ -1830,8 +1837,14 @@ footer {
           width: 89%;
       }
     }
-    #-error {
-      display: none !important;
+    #amount-error {
+      font-size: 90%;
+      position: absolute;
+      top: 1.6em;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      background-color: $trans;
     }
   }
 }
