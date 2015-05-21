@@ -1184,7 +1184,9 @@ class Main(object):
 
 		''' Checks if this version is an Alpha, prevent updates '''
 
-		if self.window.getProperty('osmc_version') == 'OSMC Unsupported Alpha release':
+		process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'])
+
+		if process == 0:
 
 			ok = DIALOG.ok(lang(32102), lang(32103))
 

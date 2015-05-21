@@ -71,7 +71,9 @@ def check_for_unsupported_version():
 
 	''' Checks if this version is an Alpha, prevent updates '''
 
-	if xbmcgui.Window(10000).getProperty('osmc_version') == 'OSMC Unsupported Alpha release':
+	process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'])
+
+	if process == 0:
 
 		ok = xbmcgui.Dialog().ok(lang(32017), lang(32018))
 
