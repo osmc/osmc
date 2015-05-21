@@ -632,6 +632,9 @@ class Main(object):
 	# ACTION METHOD
 	def action_list(self,  action):
 
+		# check whether the install is an alpha version
+		if self.check_for_unsupported_version() == 'alpha': return
+
 		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
 
 
@@ -726,6 +729,9 @@ class Main(object):
 		# do not do anything while there is something in the holding pattern
 		if self.function_holding_pattern: return
 
+		# check whether the install is an alpha version
+		if self.check_for_unsupported_version() == 'alpha': return
+
 		check, _ = self.check_update_conditions()
 
 		if check:
@@ -762,6 +768,9 @@ class Main(object):
 	@clog(log)
 	def user_update_now(self):
 		''' Similar to update_now, but as this is a users request, forego all the player and idle checks. '''
+
+		# check whether the install is an alpha version
+		if self.check_for_unsupported_version() == 'alpha': return
 
 		self.call_child_script('update')
 
@@ -1169,3 +1178,19 @@ class Main(object):
 			os.system('sudo apt-cache clean')
 		except:
 			pass
+
+
+	def check_for_unsupported_version(self):
+
+		''' Checks if this version is an Alpha, prevent updates '''
+
+		if self.window.getProperty('osmc_version') == 'OSMC Unsupported Alpha release':
+
+			ok = DIALOG.ok(lang(32102), lang(32103))
+
+			return 'alpha'
+
+		else:
+
+			return 'proceed'
+
