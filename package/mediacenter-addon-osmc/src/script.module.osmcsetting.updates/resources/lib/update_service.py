@@ -1188,7 +1188,7 @@ class Main(object):
 
 		if process == 0:
 
-			ok = DIALOG.ok(lang(32102), lang(32103))
+			ok = DIALOG.ok(lang(32102), lang(32103), lang(32104))
 
 			return 'alpha'
 

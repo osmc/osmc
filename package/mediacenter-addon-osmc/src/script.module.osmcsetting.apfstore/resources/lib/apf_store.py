@@ -76,7 +76,7 @@ def check_for_unsupported_version():
 
 	if process == 0:
 
-		ok = xbmcgui.Dialog().ok(lang(32017), lang(32018))
+		ok = xbmcgui.Dialog().ok(lang(32017), lang(32018), lang(32019))
 
 		return 'alpha'
 
