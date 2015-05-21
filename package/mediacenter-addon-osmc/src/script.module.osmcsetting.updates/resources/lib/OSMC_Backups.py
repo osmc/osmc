@@ -338,29 +338,33 @@ class osmc_backup(object):
 
 			# tarfile.TarFile(name=None, mode='r', fileobj=None, format=DEFAULT_FORMAT, tarinfo=TarInfo, dereference=False, ignore_zeros=False, encoding=ENCODING, errors=None, pax_headers=None, debug=0, errorlevel=0)
 
-			with open(local_tarball_name, 'w') as f:
-				tar = tarfile.open(fileobj=f, mode="w:gz")
-				
-				for name, size in self.backup_candidates:
 
-					self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
+			f = xbmcvfs.File(local_tarball_name,'w')
+			# f = open(local_tarball_name, 'w')
+			tar = tarfile.open(fileobj=f, mode="w:gz")
+			
+			for name, size in self.backup_candidates:
 
-					try:
-						new_path = os.path.relpath(name, new_root)
-						tar.add(name, arcname=new_path)
-					except:
-						log('%s failed to backup to tarball' % name)
-						continue
+				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
 
-					progress_total += math.log(max(size, 1))
+				try:
+					new_path = os.path.relpath(name, new_root)
+					tar.add(name, arcname=new_path)
+				except:
+					log('%s failed to backup to tarball' % name)
+					continue
 
-					pct = int( (progress_total / float(total_size) ) * 100.0 )
+				progress_total += math.log(max(size, 1))
 
-				tar.close()
+				pct = int( (progress_total / float(total_size) ) * 100.0 )
 
-				f.flush()
-				
-				os.fsync(f)
+			tar.close()
+
+			# f.flush()
+			
+			# os.fsync(f.fileno())
+
+			f.close()
 
 			# copy the local file to remote location
 			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
