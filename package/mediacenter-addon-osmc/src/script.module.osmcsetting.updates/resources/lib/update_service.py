@@ -398,6 +398,9 @@ class Main(object):
 	@clog(log)
 	def call_child_script(self, action):
 
+		# check whether the install is an alpha version
+		if self.check_for_unsupported_version() == 'alpha': return
+
 		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, action])
 
 
