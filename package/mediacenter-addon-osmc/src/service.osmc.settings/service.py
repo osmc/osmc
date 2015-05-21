@@ -74,7 +74,7 @@ def set_version():
 
 	if process == 0:
 
-		version_string = 'OSMC Unsupported Alpha release'
+		version_string = 'Unsupported OSMC Alpha release'
 
 	else:
 
