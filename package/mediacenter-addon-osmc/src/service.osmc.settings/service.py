@@ -69,22 +69,31 @@ def set_version():
 
 	''' Loads the current OSMC version into the Home window for display in MyOSMC '''
 
-	version = []
+	# Check for "upgraded" Alpha 4 and earlier
+	process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'])
+
+	if process == 0:
+
+		version_string = 'OSMC Unsupported Alpha release'
+
+	else:
+
+		version = []
 	
-	with open('/etc/os-release','r') as f:
+		with open('/etc/os-release','r') as f:
 
-		tags = ['NAME=', 'VERSION=', 'VERSION_ID=']
+			tags = ['NAME=', 'VERSION=', 'VERSION_ID=']
 
-		lines = f.readlines()
+			lines = f.readlines()
 
-		for line in lines:
+			for line in lines:
 
-			for tag in tags:
+				for tag in tags:
 
-				if line.startswith(tag):
-					version.append(line[len(tag):].replace('"','').replace('\n',''))
+					if line.startswith(tag):
+						version.append(line[len(tag):].replace('"','').replace('\n',''))
 
-	version_string = ' '.join(version)
+		version_string = ' '.join(version)
 
 	log('Current Version: %s' % version_string)
 
