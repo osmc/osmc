@@ -37,6 +37,7 @@ def get_addon_folder(alien_skin_folder):
 			res = ext.find('res')
 			if res is None: continue
 			height = res.attrib['height']
+			width  = res.attrib['width']
 			folder = res.attrib['folder']
 			break
 
@@ -47,7 +48,7 @@ def get_addon_folder(alien_skin_folder):
 	# failing that, use the folder search option
 	if not folder:
 
-		possible_xml_locations = [('1080i', 1080), ('720p', 720), ('1080p', 1080), ('16x9', None)]
+		possible_xml_locations = [('1080i', 1080, 1920), ('720p', 720, 1280), ('1080p', 1080, 1920), ('16x9', None, None)]
 
 		for pos_loc in possible_xml_locations:
 
@@ -59,6 +60,7 @@ def get_addon_folder(alien_skin_folder):
 
 				test = os.listdir(folder)
 				height = pos_loc[1]
+				width = pos_loc[2]
 				break
 
 			except:
@@ -77,6 +79,7 @@ def get_addon_folder(alien_skin_folder):
 
 	if height:
 		WINDOW.setProperty("SkinHeight", str(height))
+		WINDOW.setProperty("SkinWidth", str(width))
 
 	return os.path.join(alien_skin_folder, folder)
 

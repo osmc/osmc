@@ -1,14 +1,15 @@
 # Standard Modules
 import apt
 from datetime import datetime
+import decimal
+import json
 import os
-import sys
-import subprocess
-import traceback
 import Queue
 import random
-import json
 import socket
+import subprocess
+import sys
+import traceback
 
 # Kodi Modules
 import xbmc
@@ -144,10 +145,13 @@ class Main(object):
 		self.window.setProperty('OSMC_notification','false')
 
 		# ControlImage(x, y, width, height, filename[, aspectRatio, colorDiffuse])
-		self.update_image = xbmcgui.ControlImage(15, 55, 175, 75, __image_file__)
+		self.update_image = xbmcgui.ControlImage(50, 1695, 175, 75, __image_file__)
+		self.try_image_position_again = False
+		self.try_count = 0
 		self.position_icon()
 		self.window.addControl(self.update_image)
 		self.update_image.setVisibleCondition('[SubString(Window(Home).Property(OSMC_notification), true, left)]')
+		# self.window.setProperty('OSMC_notification', 'true')    # USE THIS TO TEST THE UPDATE_ICON
 
 		# this flag is present when updates have been downloaded but the user wants to choose when to install using
 		# the manual control in the settings
@@ -213,6 +217,11 @@ class Main(object):
 			if self.function_holding_pattern:
 
 				self.function_holding_pattern()
+
+			# try to position the icon again, ubiquifonts may not have had time to post the screen height and width 
+			# to Home yet.
+			if self.try_image_position_again:
+				self.position_icon()
 
 			# check for an early exit
 			if not self.keep_alive: break
@@ -394,18 +403,71 @@ class Main(object):
 
 	# MAIN METHOD
 	def position_icon(self):
-		''' sets the position of the icon '''
+		''' Sets the position of the icon.
 
-		return
-		# this is suppressed for the time-being while we try and find a way to detect the skin resolution
+			Original image dimensions are 175 wide and 75 tall. This is for 1080p '''
 
-		w = 1920
-		h = 1080
+		self.try_image_position_again = False
+		
 
-		x_pct = int(self.s['pos_x'] / 100.0 * w )
-		y_pct = int(self.s['pos_y'] / 100.0 * h )
+		pos_horiz  = self.s['pos_x'] / 100.0
+		pos_vertic = self.s['pos_y'] / 100.0
 
-		self.update_image.setPosition(x_pct, y_pct)
+		width  = 175  # as % of 1920: 0.0911458333333
+		height = 75   # as % of 1080: 0.0694444444444
+		width_pct  = 0.0911458333333
+		height_pct = 0.0694444444444
+
+		# retrieve the skin height and width (supplied by ubiquifonts and stored in Home)
+		try:
+			screen_height = self.window.getProperty("SkinHeight")
+			screen_width  = self.window.getProperty("SkinWidth")
+		except:
+			screen_height = 1080
+			screen_width  = 1920
+
+		if screen_height == '':
+			if self.try_count >= 50:
+				self.try_count = 0
+				screen_height = 1080
+				screen_width  = 1920
+			else:
+				self.try_image_position_again = True
+				self.try_count += 1
+				return
+
+		screen_height = int(screen_height)
+		screen_width  = int(screen_width)
+
+		# determine new dimensions of the image
+		img_height = int(round(decimal.Decimal(screen_height * height_pct), 0))
+		img_width  = int(round(decimal.Decimal(screen_width  * width_pct), 0))
+
+		# determine the new coordinates of the image
+		adj_height = screen_height - img_height
+		adj_width  = screen_width  - img_width
+
+		pos_top  = int(round(decimal.Decimal(adj_height * pos_vertic), 0))
+		pos_left = int(round(decimal.Decimal(adj_width  * pos_horiz),  0))
+
+		log('=============================')
+		log(screen_height)
+		log(screen_width)
+		log(adj_height)
+		log(adj_width)
+		log(img_height)
+		log(img_width)
+		log(pos_top)
+		log(pos_left)
+		log('=============================')
+
+		# reposition the image
+		self.update_image.setPosition(pos_left, pos_top)
+
+		# rescale the image
+		self.update_image.setWidth(img_width)
+		self.update_image.setHeight(img_height)
+
 
 
 	# MAIN METHOD
@@ -421,7 +483,7 @@ class Main(object):
 			self.first_run = False
 
 			self.scheduler_settings = ['check_freq', 'check_weekday', 'check_day', 'check_time', 'check_hour', 'check_minute']
-			# self.icon_settings		= ['pos_x', 'pos_y']
+			self.icon_settings		= ['pos_x', 'pos_y']
 
 			self.on_upd = [lang(x) for x in [32057,32058,32095,32060,32061]]
 			# self.on_upd = [lang(x) for x in [32059,32061]]  # 2==> 0, 4 ==> 1
@@ -437,8 +499,8 @@ class Main(object):
 			self.s['check_time'] 		= int(float(	__setting__('check_time')			))
 			self.s['check_hour'] 		= int(float(	__setting__('check_hour')			))
 			self.s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			# self.s['pos_x']				= int(float(	__setting__('pos_x')				))
-			# self.s['pos_y']				= int(float(	__setting__('pos_y')				))
+			self.s['pos_x']				= int(float(	__setting__('pos_x')				))
+			self.s['pos_y']				= int(float(	__setting__('pos_y')				))
 			self.s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
 			self.s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
 			self.s['update_on_idle']			= True if 	__setting__('update_on_idle') 			== 'true' else False
@@ -486,8 +548,8 @@ class Main(object):
 			tmp_s['check_time'] 		= int(float(	__setting__('check_time')			))
 			tmp_s['check_hour'] 		= int(float(	__setting__('check_hour')			))
 			tmp_s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			# tmp_s['pos_x']				= int(float(	__setting__('pos_x')				))
-			# tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
+			tmp_s['pos_x']				= int(float(	__setting__('pos_x')				))
+			tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
 			tmp_s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
 			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
 			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
@@ -537,8 +599,8 @@ class Main(object):
 				self.s[k] = v
 				if k in self.scheduler_settings:
 					update_scheduler = True
-				# elif k in self.icon_settings:
-					# reposition_icon = True
+				elif k in self.icon_settings:
+					reposition_icon = True
 
 		# reconstruct the scheduler if needed
 		if update_scheduler:
