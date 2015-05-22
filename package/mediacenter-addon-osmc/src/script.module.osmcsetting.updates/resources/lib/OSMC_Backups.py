@@ -439,6 +439,8 @@ class osmc_backup(object):
 
 		location = self.s['backup_location']
 
+		self.success = 'Full'
+
 		current_tarballs = self.list_current_tarballs(location)
 
 		# the first entry on the list dialog
@@ -614,10 +616,10 @@ class osmc_backup(object):
 					continue
 
 				if restore_location == '':
-					log('User has filed to select a restore location')
+					log('User has failed to select a restore location')
 					continue
 
-				self.success = 'Full'
+				
 				with tarfile.open(backup_file, 'r') as t:
 					for member in restore_items:
 

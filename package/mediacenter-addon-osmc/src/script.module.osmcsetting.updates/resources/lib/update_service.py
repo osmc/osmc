@@ -513,7 +513,9 @@ class Main(object):
 			# self.s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
 			# self.s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False
 			# self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			self.s['location_selection'] 		= __setting__('location_selection')
 			self.s['backup_location'] 			= __setting__('backup_location')
+			self.s['backup_location_typed']		= __setting__('backup_location_typed')
 			self.s['tarball_count'] 			= int(float(	__setting__('tarball_count')		))
 			self.s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
 			self.s['backup_addons'] 			= True if 	__setting__('backup_addons')			== 'true' else False
@@ -566,7 +568,9 @@ class Main(object):
 			# tmp_s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
 			# tmp_s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False			
 			# tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
+			tmp_s['location_selection'] 		= __setting__('location_selection')
 			tmp_s['backup_location'] 			= __setting__('backup_location')
+			tmp_s['backup_location_typed']		= __setting__('backup_location_typed')
 			tmp_s['tarball_count'] 				= int(float(	__setting__('tarball_count')		))
 			tmp_s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
 			tmp_s['backup_addons'] 				= True if 	__setting__('backup_addons')			== 'true' else False
@@ -604,6 +608,10 @@ class Main(object):
 					update_scheduler = True
 				elif k in self.icon_settings:
 					reposition_icon = True
+
+		# if the user has elected to type the backup location, then overwrite the backup_location with the typed version
+		if self.s['location_selection'] == '1':
+			self.s['backup_location']  = self.s['backup_location_typed'] 
 
 		# reconstruct the scheduler if needed
 		if update_scheduler:

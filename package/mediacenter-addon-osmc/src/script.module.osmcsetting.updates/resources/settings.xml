@@ -59,10 +59,13 @@
 		<!-- . -->
 		<!-- <setting default="true" id="create_tarball" label="create_tarball" type="bool"/> -->
 		<!-- location of backup -->
-		<setting subsetting="true" id="backup_location" label="Location of backup storage" source="auto" option="writeable" type="folder"/>
+		<setting id="location_selection" type="enum" lvalues="32021|32022" default="0" label="32020"/>
+		<setting subsetting="true" id="backup_location" label="32024" source="auto" option="writeable" type="folder" visible="eq(-1,0)" />
+		<setting id="backup_location_typed" type="text" label="32023" default="" visible="eq(-2,1)" subsetting="true" />
 		<!-- number of backup tarballs to keep -->
-		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" subsetting="true" type="slider"/>
+		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" type="slider"/>
 		<!-- folders and files to tarball -->
+		<setting label="32025" type="lsep"/>
 		<setting subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
 		<setting subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
 		<setting subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
