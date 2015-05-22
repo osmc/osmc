@@ -31,5 +31,5 @@ void SuccessDialog::on_facebookButton_clicked()
 
 void SuccessDialog::on_twitterButton_clicked()
 {
-    QDesktopServices::openUrl(QUrl("http://twitter.com/samnazarko"));
+    QDesktopServices::openUrl(QUrl("http://twitter.com/try_osmc"));
 }
