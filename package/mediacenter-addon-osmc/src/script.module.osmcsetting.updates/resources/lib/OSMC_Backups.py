@@ -467,11 +467,11 @@ class osmc_backup(object):
 			elif file_selection == 0:
 				# open the browse dialog
 
-				local_copy = DIALOG.browse(1, 'Browse to backup file', 'files')
+				backup_file = DIALOG.browse(1, 'Browse to backup file', 'files')
 
-				log('User selected backup file: %s' % local_copy)
+				log('User selected backup file: %s' % backup_file)
 
-				if not local_copy:
+				if not backup_file:
 					# return to select window
 					log('User has not selected backup file.')
 					continue
@@ -480,14 +480,16 @@ class osmc_backup(object):
 				# read the tar_file, post dialog with the contents
 
 				# get file_selection
-				backup_file = os.path.join(location, dialog_list[file_selection][0])
+				remote_file = os.path.join(location, dialog_list[file_selection][0])
+				basename = os.path.basename(remote_file)
 
-				log('User selected backup file: %s' % backup_file)
+				log('User selected backup file: %s' % remote_file)
 
 				# this requires copying the tar_file from its stored location, to kodi/temp 
 				# xbmcvfs cannot read into tar files without copying the whole thing to memory
+				temp_copy = os.path.join(xbmc.translatePath('special://temp'), basename)
 
-				result = xbmcvfs.copy(backup_file, os.path.join(xbmc.translatePath('special://temp'), os.path.basename(backup_file)))
+				result = xbmcvfs.copy(remote_file, temp_copy)
 
 				if not result:
 					# copy of file failed
@@ -498,13 +500,11 @@ class osmc_backup(object):
 					back_to_select = False
 					continue
 
-				local_copy = os.path.join(xbmc.translatePath('special://temp'), os.path.basename(backup_file))
-
+				backup_file = temp_copy
 
 			# open local copy and check for contents
 			try:
-
-				with tarfile.open(local_copy, 'r') as t:
+				with tarfile.open(backup_file, 'r:gz') as t:
 					members = t.getmembers()
 
 					# log('tarfile members: %s' % members)
@@ -607,14 +607,18 @@ class osmc_backup(object):
 				elif overwrite == 1:
 					# select new folder
 					log('User has chosen to browse for a new restore location')
-					restore_location = DIALOG.browse(0, 'Browse to restore location', 'files')
+					restore_location = DIALOG.browse(3, 'Browse to restore location', 'files')
 
 				else:
 					log('User has escaped restore dialog')
 					continue
 
+				if restore_location == '':
+					log('User has filed to select a restore location')
+					continue
+
 				self.success = 'Full'
-				with tarfile.open(local_copy, 'r') as t:
+				with tarfile.open(backup_file, 'r') as t:
 					for member in restore_items:
 
 						log('attempting to restore %s to %s' % (member.name, restore_location))
@@ -647,15 +651,17 @@ class osmc_backup(object):
 
 			if self.success == 'Full' and not self.restoring_guisettings:
 				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')
+
 			elif self.success == 'Full' and self.restoring_guisettings:
 				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored', 'Restoring guisettings.xml requires restart.')
+			
 			else:
 				back_to_select = False
 
 			try:
-				xbmcvfs.delete(local_copy)
+				xbmcvfs.delete(temp_copy)
 			except:
-				log('Cannot delete temp file at %s' % local_copy)			
+				log('Deleting temp_copy failed. Dont worry, it might not exist.')			
 
 		self.progress(kill=True)
 
@@ -707,7 +713,7 @@ class osmc_backup(object):
 
 		dirs, tarball_list = xbmcvfs.listdir(location)
 
-		log(tarball_list)
+		log('Contents of remote location: %s' % tarball_list)
 
 		regex = re.compile(pattern)
 		tarball_list = [i for i in tarball_list if regex.search(i)]		
