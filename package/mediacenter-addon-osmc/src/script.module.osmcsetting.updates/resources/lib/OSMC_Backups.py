@@ -630,6 +630,8 @@ class osmc_backup(object):
 							# the external script will pick it up there and overwrite the live version
 							if member.name.endswith('userdata/guisettings.xml') and self.restoring_guisettings:
 
+								member.name = os.path.basename(member.name)
+
 								t.extract(member, '/tmp/')
 
 								os.rename('/tmp/guisettings.xml', '/tmp/guisettings.restore')
