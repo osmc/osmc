@@ -336,11 +336,8 @@ class osmc_backup(object):
 
 		try:
 
-			# tarfile.TarFile(name=None, mode='r', fileobj=None, format=DEFAULT_FORMAT, tarinfo=TarInfo, dereference=False, ignore_zeros=False, encoding=ENCODING, errors=None, pax_headers=None, debug=0, errorlevel=0)
-
-
 			f = xbmcvfs.File(local_tarball_name,'w')
-			# f = open(local_tarball_name, 'w')
+
 			tar = tarfile.open(fileobj=f, mode="w:gz")
 			
 			for name, size in self.backup_candidates:
@@ -360,10 +357,6 @@ class osmc_backup(object):
 
 			tar.close()
 
-			# f.flush()
-			
-			# os.fsync(f.fileno())
-
 			f.close()
 
 			# copy the local file to remote location
@@ -373,18 +366,6 @@ class osmc_backup(object):
 			log('local tarball exists: %s' % os.path.isfile(local_tarball_name))
 			log('remote tarball name: %s'  % remote_tarball_name)
 			log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
-
-			# work-around for xbmcvfs.copy starting before file finished writing
-			st = xbmcvfs.Stat(local_tarball_name)
-			size_a = 0
-			size_b = 1
-			count = 0
-			while count < 50 and size_a != size_b:
-				log('%s : %s' % (size_a, size_b))
-				size_a = size_b
-				size_b = st.st_size()
-				count += 1
-				xbmc.sleep(100)
 
 			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
