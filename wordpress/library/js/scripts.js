@@ -146,8 +146,9 @@ jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {
       var currency = form.find(".radio:checked").val();
 
       if (button.hasClass("paypal"))  {
-
-        var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=main_page_tracker&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount;
+        
+        var currentUrl = window.location.host + window.location.pathname;
+        var paypallink = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=email@samnazarko.co.uk&item_name=OSMC%20Blog%20Donation&item_number=" + currentUrl + "&no_shipping=1&&no_note=1&tax=0&currency_code=" + currency + "&amount=" + amount;
 
         window.open(paypallink);
 
