@@ -929,11 +929,7 @@ class Main(object):
 
 					if user_input_restart_now:
 
-						ok = DIALOG.ok('OSMC', 'Sorry this has yet to be implemented.')
-
-						# this should call a script that closes Kodi and overwrites the guisettings.xml with the restored one
-						# subprocess.Popen(['sudo', 'systemctl', 'start', 'NOTHING YET'])	
-
+						subprocess.Popen(['sudo', 'systemctl', 'restart', 'mediacenter'])
 
 			except Exception as e:
 			
