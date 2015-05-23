@@ -17,6 +17,8 @@ if [ "$1" = "configure" ]; then
 	# work around for: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762080
 	mkdir -p /var/log/samba
 
+	usermod -a -G sambashare osmc
+
 	# only do this for upgrade not install
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]
 	then
