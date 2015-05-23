@@ -384,6 +384,11 @@ class osmc_backup(object):
 
 				ok = DIALOG.ok('Backup failed', 'Backup failed to copy the tar file.')
 
+                                try:
+                                        xbmcvfs.delete(local_tarball_name)
+                                except:
+                                        log('Cannot delete temp file at %s' % local_tarball_name)
+
 				return 'failed'
 
 			# remove the unneeded backups (this will only occur if the tarball is successfully created)
