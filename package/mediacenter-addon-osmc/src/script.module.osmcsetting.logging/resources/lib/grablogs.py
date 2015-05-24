@@ -58,6 +58,7 @@ class Main(object):
 				'systemd' 			: {'function': self.grab_systemd,				'setting': False, 'pointer': [('systemd', '86JFGfNO')]},
 				'mem' 				: {'function': self.grab_mem,					'setting': False, 'pointer': [('Memory', 'eWTP1Mc8')]},
 				'diskspace' 		: {'function': self.grab_diskspace,				'setting': False, 'pointer': [('Diskspace', 'qZy25Yas')]},
+				'dmesg' 			: {'function': self.grab_dmesg,					'setting': False, 'pointer': [('Kernel Message Log', 'Ad2zzd21')]},
 				}
 
 		keys = [
@@ -75,6 +76,7 @@ class Main(object):
 				'lirc',
 				'initd',
 				'systemd',
+				'dmesg',
 				'mem',
 				'diskspace',
 				'boot',
@@ -188,6 +190,14 @@ class Main(object):
 		self.log_list.extend(['\n====================== systemd ======================== 86JFGfNO\n'])
 
 		with os.popen('ls -al /lib/systemd/system') as f:
+			self.log_list.extend(f.readlines())	
+
+
+	def grab_dmesg(self):
+
+		self.log_list.extend(['\n====================== Kernel Message Log (dmesg) ========================= Ad2zzd21\n'])
+
+		with os.popen('dmesg') as f:
 			self.log_list.extend(f.readlines())	
 
 
