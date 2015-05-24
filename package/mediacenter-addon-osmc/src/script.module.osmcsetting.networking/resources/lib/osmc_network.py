@@ -280,8 +280,9 @@ def get_wifi_networks():
 
 
 def wifi_connect(path, password=None, ssid=None):
-    connected = False
+    agentNeeded = False
     if password or ssid:
+        agentNeeded = True
         print('Starting Wireless Agent')
         keyfile = open('/tmp/preseed_data', 'w')
         if password:
@@ -289,32 +290,31 @@ def wifi_connect(path, password=None, ssid=None):
             keyfile.write(password)
         keyfile.write('\n')
         if ssid:
-            print('Setting password')
+            print('Setting SSID')
             keyfile.write(ssid)
         keyfile.close()
         process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'fromfile'])
-    count = 0
-    while not os.path.exists('/tmp/agent_started'):
-        count += 1
-        time.sleep(1)
-        if count > 10:
-                print('Agent had not started after 10 seconds')
-        break
-    if os.path.exists('/tmp/agent_started'):
-        os.remove('/tmp/agent_started')
     print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
-    try:
-        service.Connect(timeout=15000)
-        connected = True
-    except dbus.DBusException, e:
-        print ('DBusException connecting ' + str(e))
-        connected = False
-    print ('Connection to ' + path + ' : ' + str(connected))
-    if password or ssid:
+    connected = 1
+    connectionAttempts = 15
+    while connected != 0 and connected < (connectionAttempts + 1):
+        try:
+             service.Connect(timeout=15000)
+             connected = 0
+        except dbus.DBusException, e:
+            if len(e.args) > 0 and e.args[0] == 'Not registered' and agentNeeded:
+                connected += 1
+                time.sleep(1)
+                print 'Connection agent not started yet, waiting a second'
+            else: # another type of exception jump out of the loop
+                connected = (connectionAttempts+1)
+                print 'DBusException Raised: ' +  str(e)
+    print ('Connection to ' + path + ' : ' + str(connected == 0))
+    if agentNeeded:
         process.kill()
-        #os.remove('/tmp/preseed_data')
-    return connected
+        os.remove('/tmp/preseed_data')
+    return connected == 0
 
 
 def wifi_disconnect(path):
