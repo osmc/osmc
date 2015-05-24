@@ -215,25 +215,20 @@ def main():
                                         preseeddata.write('\n')
                                         preseeddata.close()
                                         process = subprocess.Popen([sys.executable, '/usr/bin/preseed-agent', 'fromfile'])
-                                        count = 0
-                                        while not os.path.exists('/tmp/agent_started'):
-                                                count+=1
-                                                time.sleep(1)
-                                                if count > 10:
-                                                        syslog.syslog('Agent has not started after 10 seconds - Aborting')
-                                                        exit(7)
-                                        if os.path.exists('/tmp/agent_started'):
-                                                os.remove('/tmp/agent_started')
-                                        syslog.syslog('Agent Started')
-                                else:        
-                                        syslog.syslog("Open network does not need an agent. Attempting connection")
-                                connected = True
-                                try:
-                                        syslog.syslog("Attempting connection now")
-                                        service.Connect(timeout=15000)
-                                except dbus.DBusException, error:
-                                        syslog.syslog("Could not connect")
-                                        connected = False
+                                syslog.syslog("Attempting connection now")
+                                connected = 1
+                                while connected != 0 and connected < 16:
+					try:
+                                                service.Connect(timeout=15000)
+                                                connected = 0
+                                        except dbus.DBusException, e:
+                                                if len(e.args) > 0 and e.args[0] == 'Not registered' and agentRequired:
+                                                        connected += 1
+                                                        time.sleep(1)
+					                syslog.syslog('Connection agent not started yet, waiting a second')
+                                                else: # another type of exception jump out of the loop
+                                                        connected = 2
+                                                        syslog.syslog('DBusException Raised: ' +  str(e))
 
                                 syslog.syslog("Cleaning up deleteing /tmp/preseed_data and killing Agent")
                                 if agentRequired:
@@ -241,8 +236,13 @@ def main():
                                                 os.remove('/tmp/preseed_data')
                                         process.kill()
 
-                                if not connected:
-                                        sys.exit(6)
+                                        
+                                if not connected == 0:
+                                        if connected == 15: # agent has not started in time
+                                                sys.exit(7)
+                                        else:
+                                                sys.exit(6) # could not connect
+                                        
                         
                                                 
 
