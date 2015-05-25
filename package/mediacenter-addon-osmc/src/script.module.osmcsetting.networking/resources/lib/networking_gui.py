@@ -735,9 +735,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         else:
             if ssid == self.conn_ssid:
                 #                             'Disconnect from'
-                selection = DIALOG.select(lang(32041) + ' ' + self.conn_ssid + '?',
-                                           #'No'      'Disconnect'  'Disconnect and Remove'
-                                          [lang(32055),lang(32058), lang(32059)])
+                selection = DIALOG.select(lang(32042) + ' ' + self.conn_ssid + '?',
+                                          [lang(32051),lang(32058), lang(32059)])
                 if selection == -1 or selection == 0:
                     return
                 self.show_busy_dialogue()
@@ -790,7 +789,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     if password:
                         self.wireless_password = password
                         self.show_busy_dialogue()
-                        connection_status = osmc_network.wifi_connect(path, password, hiddenssid)
+                        script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
+                        connection_status = osmc_network.wifi_connect(path, password, hiddenssid, script_base_path)
                         self.clear_busy_dialogue()
                 if not connection_status:
                     # 'Connection to '                  'failed'
@@ -894,7 +894,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         if self.connect_bluetooth(address, alias):
                             self.bluetooth_population_thread.update_bluetooth_lists()
                         self.clear_busy_dialogue()
-
 
                 if selection == 2:
                     osmc_bluetooth.remove_device(address)

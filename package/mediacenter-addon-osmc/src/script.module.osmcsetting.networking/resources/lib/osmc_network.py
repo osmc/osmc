@@ -9,7 +9,7 @@ import os.path
 import requests
 import systemd
 
-WIRELESS_AGENT = '/usr/bin/preseed-agent'
+WIRELESS_AGENT = 'osmc_wireless_agent.py'
 
 ETHERNET_PATH = '/net/connman/service/ethernet'
 WIFI_PATH = '/net/connman/service/wifi'
@@ -279,7 +279,7 @@ def get_wifi_networks():
 
 
 
-def wifi_connect(path, password=None, ssid=None):
+def wifi_connect(path, password=None, ssid=None, script_base_path = None):
     agentNeeded = False
     if password or ssid:
         agentNeeded = True
@@ -293,11 +293,12 @@ def wifi_connect(path, password=None, ssid=None):
             print('Setting SSID')
             keyfile.write(ssid)
         keyfile.close()
-        process = subprocess.Popen([sys.executable, WIRELESS_AGENT, 'fromfile'])
+        agent_script = script_base_path + WIRELESS_AGENT
+        process = subprocess.Popen([sys.executable, agent_script, 'fromfile'])
     print ('Attempting connection to ' + path )
     service = connman.get_service_interface(path)
     connected = 1
-    connectionAttempts = 15
+    connectionAttempts = 20
     while connected != 0 and connected < (connectionAttempts + 1):
         try:
              service.Connect(timeout=15000)
