@@ -44,9 +44,9 @@
 		<!-- 32067: Icon Position Y (% of screen) -->
 		 <setting default="95" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-2,true)"/>
 	</category>
-	<category label="Backups">
+	<category label="32109">
 		<!-- backup before updating -->
-		<setting default="false" id="backup_on_update" label="Backup before each update (excludes manual update)." type="bool"/>
+		<setting default="false" id="backup_on_update" label="32107" type="bool"/>
 		<!-- . -->
 		<!-- export the libraries -->
 		<!-- . -->
@@ -63,7 +63,7 @@
 		<setting subsetting="true" id="backup_location" label="32024" source="auto" option="writeable" type="folder" visible="eq(-1,0)" />
 		<setting id="backup_location_typed" type="text" label="32023" default="" visible="eq(-2,1)" subsetting="true" />
 		<!-- number of backup tarballs to keep -->
-		<setting default="1" id="tarball_count" label="Number of backup files to keep (0 for keep all)" option="int" range="0,1,25" type="slider"/>
+		<setting default="1" id="tarball_count" label="32108" option="int" range="0,1,25" type="slider"/>
 		<!-- folders and files to tarball -->
 		<setting label="32025" type="lsep"/>
 		<setting subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
@@ -94,8 +94,8 @@
 		<!-- install now -->
 		<setting action="RunScript($CWD/resources/lib/call_parent.py, install)" id="install_now" label="32053" option="close" type="action" visible="eq(-1,true)"/>
 		<!-- backup now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, backup)" id="backup_now" label="Run Backup of settings now." option="close" type="action"/>
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, backup)" id="backup_now" label="32105" option="close" type="action"/>
 		<!-- restore now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, restore)" id="restore_now" label="Restore a backup of settings now." option="close" type="action"/>
+		<setting action="RunScript($CWD/resources/lib/call_parent.py, restore)" id="restore_now" label="32106" option="close" type="action"/>
 	</category>
 </settings>
