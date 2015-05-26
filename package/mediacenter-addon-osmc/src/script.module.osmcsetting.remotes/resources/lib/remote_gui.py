@@ -376,10 +376,9 @@ class remote_test(xbmcgui.WindowXMLDialog):
 		self.countdown_timer = countdown_timer(self)
 		self.countdown_timer.setDaemon(True)
 
-		# start the service checker straight away
+		# setup the service checker straight away
 		self.service_checker = service_checker(self)
 		self.service_checker.setDaemon(True)
-		self.service_checker.start()
 
 
 	def onInit(self):
@@ -393,6 +392,9 @@ class remote_test(xbmcgui.WindowXMLDialog):
 		self.progress_bar				= self.getControl(101)
 
 		self.initial_state()
+
+		# start the service_checker AFTER the class attributes have been set (prevents race condition)
+		self.service_checker.start()
 
 
 	def initial_state(self):
