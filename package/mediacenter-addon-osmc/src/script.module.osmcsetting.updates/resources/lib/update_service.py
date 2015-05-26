@@ -925,7 +925,7 @@ class Main(object):
 
 				if restart_required:
 
-					user_input_restart_now = DIALOG.yesno(lang(32096), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
+					user_input_restart_now = DIALOG.yesno(lang(32110), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
 
 					if user_input_restart_now:
 

@@ -643,9 +643,8 @@ class osmc_backup(object):
 				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')
 
 			elif self.success == 'Full' and self.restoring_guisettings:
-				res = DIALOG.yesno('OSMC Restore', 'Items successfully restored', 'Restoring guisettings.xml requires restart.', yeslabel='Reboot Now', nolabel='Reboot Later')
-				
-				if res: back_to_select = False
+
+				back_to_select = False
 
 			else:
 				back_to_select = False
