@@ -72,7 +72,7 @@ LABELS = 	{
 
 def lang(id):
 	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-	return san 
+	return san
 
 
 def log(message, label = ''):
@@ -184,7 +184,7 @@ class osmc_backup(object):
 			if self.s[setting]:
 
 				# if the user is backing up guisettings.xml, then call for the settings to be saved using
-				# custom method 
+				# custom method
 				if setting == 'backup_guisettings':
 
 					log('Trying to backup guisettings, running xbmc.saveSettings')
@@ -339,7 +339,7 @@ class osmc_backup(object):
 			f = xbmcvfs.File(local_tarball_name,'w')
 
 			tar = tarfile.open(fileobj=f, mode="w:gz")
-			
+
 			for name, size in self.backup_candidates:
 
 				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
@@ -513,7 +513,7 @@ class osmc_backup(object):
 				# the first entry on the list dialog, tuple is (member, display name, name in tarfile, restore location)
 				tar_contents_list = [(None, 'Everything')]
 
-				# create list of items in the tar_file for the user to select from, these are prime members; either they are the 
+				# create list of items in the tar_file for the user to select from, these are prime members; either they are the
 				# xml files or they are the base folder
 
 				menu_items = []
@@ -552,7 +552,7 @@ class osmc_backup(object):
 				else:
 
 					# restore single item
-					restore_item = tar_contents_list[item_selection] 
+					restore_item = tar_contents_list[item_selection]
 
 					# if the item is a single xml file, then restore that member, otherwise loop through the file members
 					# and collect the ones in the relevant folder
@@ -586,7 +586,7 @@ class osmc_backup(object):
 
 					# check the restore_items for guisettings.xml, if found then restore that to the addon_data folder,
 					# create the /RESET_GUISETTINGS file and write in the location of the restored guisettings.xml
-					# change the restoring_guisettings flag so the user is informed that this change requires a restart, 
+					# change the restoring_guisettings flag so the user is informed that this change requires a restart,
 					# or will take effect on next boot
 					if any( [True for x in restore_items if x.name.endswith('userdata/guisettings.xml') ] ):
 						self.restoring_guisettings = True
@@ -605,7 +605,7 @@ class osmc_backup(object):
 					log('User has failed to select a restore location')
 					continue
 
-				
+
 				with tarfile.open(backup_file, 'r') as t:
 					for member in restore_items:
 
@@ -623,11 +623,11 @@ class osmc_backup(object):
 								os.rename('/tmp/guisettings.xml', '/tmp/guisettings.restore')
 
 							else:
-								
+
 								t.extract(member, restore_location)
 
 						except Exception as e:
-							
+
 							log('Extraction of %s failed' % member.name)
 							log(type(e).__name__)
 							log(e.args)
@@ -652,7 +652,7 @@ class osmc_backup(object):
 			try:
 				xbmcvfs.delete(temp_copy)
 			except:
-				log('Deleting temp_copy failed. Dont worry, it might not exist.')			
+				log('Deleting temp_copy failed. Dont worry, it might not exist.')
 
 		self.progress(kill=True)
 
@@ -707,7 +707,7 @@ class osmc_backup(object):
 		log('Contents of remote location: %s' % tarball_list)
 
 		regex = re.compile(pattern)
-		tarball_list = [i for i in tarball_list if regex.search(i)]		
+		tarball_list = [i for i in tarball_list if regex.search(i)]
 
 		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location))
 
@@ -750,7 +750,7 @@ class osmc_backup(object):
 
 			return total_size
 
-		return 0	
+		return 0
 
 
 	def count_stored_tarballs(self, location):
@@ -762,14 +762,14 @@ class osmc_backup(object):
 
 		''' calls on kodi to export the selected libraries to a single .xml file '''
 
-		# exportlibrary(music,false,filepath)	
+		# exportlibrary(music,false,filepath)
 		# The music library will be exported to a single file stored at filepath location.
 
-		# exportlibrary(video,true,thumbs,overwrite,actorthumbs)	
-		# The video library is exported to multiple files with the given options. 
+		# exportlibrary(video,true,thumbs,overwrite,actorthumbs)
+		# The video library is exported to multiple files with the given options.
 		# Here thumbs, overwrite and actorthumbs are boolean values (true or false).
 
-		
+
 
 
 if __name__ == "__main__":
