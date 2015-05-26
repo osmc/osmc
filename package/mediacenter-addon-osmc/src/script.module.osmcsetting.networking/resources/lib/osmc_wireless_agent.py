@@ -209,8 +209,5 @@ except:
     print "Cannot register connman agent."
 
 mainloop = gobject.MainLoop()
-agent_file = open('/tmp/agent_started', 'w')
-agent_file.close()
 mainloop.run()
 
-#manager.UnregisterAgent(path)
