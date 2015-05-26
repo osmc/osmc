@@ -780,7 +780,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if connect or hiddenssid:
                 self.show_busy_dialogue()
                 # try without a password see if connman has the password
-                connection_status = osmc_network.wifi_connect(path, None, hiddenssid)
+                script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
+                connection_status = osmc_network.wifi_connect(path, None, hiddenssid, script_base_path)
                 self.clear_busy_dialogue()
                 if not connection_status and encrypted:
                     if password is None:
@@ -789,7 +790,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     if password:
                         self.wireless_password = password
                         self.show_busy_dialogue()
-                        script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
                         connection_status = osmc_network.wifi_connect(path, password, hiddenssid, script_base_path)
                         self.clear_busy_dialogue()
                 if not connection_status:
