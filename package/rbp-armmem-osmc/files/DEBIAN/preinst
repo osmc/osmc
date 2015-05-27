@@ -1,2 +1,3 @@
 #!/bin/bash
 
+if [ "$1" = "install" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; fi
