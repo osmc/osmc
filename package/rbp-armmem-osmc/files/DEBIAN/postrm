@@ -1,4 +1,4 @@
 #!/bin/bash
 
 MEM_OPTIM="/usr/lib/libarmmem.so"
-sed '/${MEM_OPTIM}/d' -i files/DEBIAN/control
+sed '/${MEM_OPTIM}/d' -i /etc/ld.so.preload
