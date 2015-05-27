@@ -103,7 +103,7 @@ remove_emulate_arm "${DIR}"
 # We do this after ARM user emulation removal, because QEMU gets broken by this
 echo -e "       * Configuring optimised string.h operations"
 MEM_OPTIM="/usr/lib/libarmmem.so"
-#echo ${MEM_OPTIM} > ${DIR}/etc/ld.so.preload
+echo ${MEM_OPTIM} > ${DIR}/etc/ld.so.preload
 
 # Perform filesystem cleanup
 enable_init "${DIR}"
