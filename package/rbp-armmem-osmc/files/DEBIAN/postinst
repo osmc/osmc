@@ -1,7 +1,8 @@
 #!/bin/bash
 
-ischroot
-if [ $? == 0 ]; then exit 0; fi
+if ischroot; then exit 0; fi
 
-MEM_OPTIM="/usr/lib/libarmmem.so"
-echo ${MEM_OPTIM} > ${DIR}/etc/ld.so.preload
+if [ "$1" = "install" ]; then
+	sed '/^\/usr\/lib\/libarmmem.so$/d' -i /etc/ld.so.preload
+	echo "/usr/lib/libarmmem.so" > /etc/ld.so.preload
+fi

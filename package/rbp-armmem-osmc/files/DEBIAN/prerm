@@ -1,2 +1,5 @@
 #!/bin/bash
 
+if [ "$1" = "remove" ]; then
+	sed '/^\/usr\/lib\/libarmmem.so$/d' -i /etc/ld.so.preload
+fi
