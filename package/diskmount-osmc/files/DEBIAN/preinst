@@ -16,6 +16,7 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 
 	install_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
 	install_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+	install_divert /lib/udev/rules.d/60-cdrom_id.rules.distributed /lib/udev/rules.d/60-cdrom_id.rules
 
 	systemctl stop udisks-glue.service >/dev/null 2>&1
 	exit 0

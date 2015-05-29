@@ -16,4 +16,7 @@ if [ "$1" = "remove" ]; then
 
 	remove_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
 	remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+	remove_divert /lib/udev/rules.d/60-cdrom_id.rules.distributed /lib/udev/rules.d/60-cdrom_id.rules
+	udevadm control --reload
+	exit 0
 fi

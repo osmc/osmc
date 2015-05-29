@@ -17,5 +17,6 @@ if [ "$1" = "configure" ]; then
 	systemctl enable udisks-glue.service >/dev/null 2>&1
 	if ischroot; then exit 0; fi
 	systemctl start udisks-glue.service
+	udevadm control --reload
 	touch /tmp/reboot-needed
 fi
