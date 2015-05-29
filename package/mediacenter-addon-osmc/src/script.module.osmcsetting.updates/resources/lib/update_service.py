@@ -118,7 +118,7 @@ class Main(object):
 
 		self.randomid = random.randint(0,1000)
 
-		self.EXTERNAL_UPDATE_REQUIRED = 0
+		self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# create socket, listen for comms
 		self.listener = comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.update.sockfile')
@@ -1019,7 +1019,7 @@ class Main(object):
 	@clog(log)
 	def check_for_legit_updates(self):
 
-		self.EXTERNAL_UPDATE_REQUIRED = 0
+		self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		check, msg = self.check_for_broken_installs()
 
@@ -1068,9 +1068,9 @@ class Main(object):
 
 			return 'bail', 'There are no osmc packages'
 
-		if any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x or "dbus" in x or "dbus-x11" in x for x in available_updates]):
+		if not any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x or "dbus" in x or "dbus-x11" in x for x in available_updates]):
 
-			self.EXTERNAL_UPDATE_REQUIRED = 1
+			self.EXTERNAL_UPDATE_REQUIRED = 0
 
 		# display update available notification
 		if not self.s['suppress_icon']:
