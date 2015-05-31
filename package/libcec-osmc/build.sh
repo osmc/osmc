@@ -28,6 +28,7 @@ then
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src/libcec*
+	install_patch "../../patches" "all"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero"; fi
 	./bootstrap
