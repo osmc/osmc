@@ -20,8 +20,7 @@ then
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
 	update_sources
-	handle_dep "autoconf"
-	handle_dep "libtool"
+	handle_dep "cmake"
 	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libplatform-osmc" >> files-dev/DEBIAN/control
 	pushd src/platform-*
 	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
