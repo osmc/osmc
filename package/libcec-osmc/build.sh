@@ -24,12 +24,12 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
+	handle_dep "libplatform-dev"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero"; fi
 	./bootstrap
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then ./configure --prefix=/usr --enable-rpi --with-rpi-include-path=/opt/vc/include --with-rpi-lib-path=/opt/vc/lib; fi
