@@ -24,6 +24,7 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
+	handle_dep "cmake"
 	if [ "$1" == "rbp1" ]; then handle_dep "armv6l-libplatform-dev-osmc"; fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then handle_dep "armv7-libplatform-dev-osmc"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
