@@ -1,8 +1,18 @@
-diff --git a/configure.in b/configure.in
-index 799ec17..070b047 100644
---- a/configure.in
-+++ b/configure.in
-@@ -832,8 +832,8 @@ elif test "$use_arch" = "arm"; then
+From 64177f33845cb1a36a34f3b195e677054e1f83fa Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:13:39 +0100
+Subject: [PATCH] Optimise NEON with funsafe optimisations
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3b19cd3..a378a7d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -884,8 +884,8 @@ elif test "$use_arch" = "arm"; then
          use_cpu=cortex-a8])
    else
      if test "$use_neon" = "yes"; then 
@@ -13,3 +23,6 @@ index 799ec17..070b047 100644
      fi
    fi
  fi
+-- 
+2.1.0
+
