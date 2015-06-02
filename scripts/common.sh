@@ -121,9 +121,18 @@ function install_patch()
 	do
 		cp ${1}/$patch .
 		echo Applying patch $patch
-		patch -p1 < $patch
-		verify_action
-		rm $patch
+		if ! grep -q "GIT binary patch" $patch
+		then
+		    patch -p1 < $patch
+		    verify_action
+	        else
+		    # this is a binary patch
+		    install_package "git"
+		    verify_action
+		    git apply $patch
+		    verify_action
+	        fi
+	        rm $patch
 	done
 }
 
