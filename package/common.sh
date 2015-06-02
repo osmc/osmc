@@ -159,6 +159,16 @@ function remove_conflicting()
 	fi
 }
 
+function dpkg_build()
+{
+	# Calculate package size and update control file before packaging.
+	if [ ! -e "$1" -o ! -e "$1/DEBIAN/control" ]; then exit 1; fi
+	sed '/^Installed-Size/d' -i "$1/DEBIAN/control"
+	size=$(du -s --apparent-size "$1" | awk '{print $1}')
+	echo "Installed-Size: $size" >> "$1/DEBIAN/control"
+	dpkg -b "$1" "$2"
+}
+
 export -f fix_arch_ctl
 export -f strip_files
 export -f strip_libs
@@ -168,3 +178,4 @@ export -f handle_dep
 export -f publish_applications_any
 export -f publish_applications_targeted
 export -f remove_conflicting
+export -f dpkg_build
