@@ -6,13 +6,11 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/cd21822005be72a7ad3a1fa59a88ea5362dc5109.tar.gz" "$(pwd)/kodi"
+pull_source "https://github.com/xbmc/xbmc/archive/cd21822005be72a7ad3a1fa59a88ea5362dc5109.tar.gz" "$(pwd)/src"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
-pull_source "https://github.com/opdenkamp/xbmc-pvr-addons/archive/helix.tar.gz" "$(pwd)/kodi-pvr"
-if [ $? != 0 ]; then echo -e "Error fetching Kodi PVR source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "mediacenter-osmc"
 build_return=$?
@@ -134,7 +132,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-mediacenter-osmc" >> files/DEBIAN/control
-	pushd kodi/xbmc-*
+	pushd src/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -234,23 +232,9 @@ then
         gcc addon-compiler.c -o addon-compiler
         mv addon-compiler ${out}/usr/bin
         popd
-	pushd kodi-pvr/xbmc-pvr*
-	# Reset CFLAGS here! Add some optimisation
-	export CFLAGS="-O3 -fomit-frame-pointer" && \
-	export CXXFLAGS=$CFLAGS && \
-	export CPPFLAGS=$CFLAGS
-	./bootstrap
-	./configure --prefix=/usr --enable-addons-with-dependencies
-	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
-	$BUILD
-	make install DESTDIR=${out}
-	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
-	popd
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	rm ${out}/usr/share/kodi/media/Splash.png
 	strip ${out}/usr/lib/kodi/kodi.bin
-	strip ${out}/usr/lib/kodi/addons/*/*.so
-	strip ${out}/usr/lib/kodi/addons/pvr.*/*.pvr
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbisenc2, libass5, libcurl3-gnutls, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc, mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
 	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp1-libcec-osmc, armv6l-libafpclient-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
