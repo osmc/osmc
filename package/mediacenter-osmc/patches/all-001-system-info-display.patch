@@ -1,8 +1,18 @@
+From fc15b4874358c9a5e033feb1400f2465509b9fe6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 17:56:35 +0100
+Subject: [PATCH] Cosmetic changes to the System Information dialog
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windows/GUIWindowSystemInfo.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 196a1c6..67c2e11 100644
+index 604a0d9..732ae33 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -57,8 +57,7 @@
+@@ -56,8 +56,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
    case GUI_MSG_WINDOW_INIT:
      {
        CGUIWindow::OnMessage(message);
@@ -12,7 +22,7 @@ index 196a1c6..67c2e11 100644
        CONTROL_ENABLE_ON_CONDITION(CONTROL_BT_PVR,
                                    PVR::CPVRManager::Get().IsStarted());
        return true;
-@@ -101,7 +100,6 @@
+@@ -100,7 +99,6 @@ void CGUIWindowSystemInfo::FrameMove()
  #endif
      SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
      SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
@@ -20,7 +30,7 @@ index 196a1c6..67c2e11 100644
    }
    else if (m_section == CONTROL_BT_STORAGE)
    {
-@@ -124,8 +122,6 @@
+@@ -123,8 +121,6 @@ void CGUIWindowSystemInfo::FrameMove()
      SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
      SetControlLabel(i++, "%s: %s", 13159, NETWORK_SUBNET_MASK);
      SetControlLabel(i++, "%s: %s", 13160, NETWORK_GATEWAY_ADDRESS);
@@ -29,4 +39,6 @@ index 196a1c6..67c2e11 100644
      SetControlLabel(i++, "%s %s", 13295, SYSTEM_INTERNET_STATE);
    }
    else if (m_section == CONTROL_BT_VIDEO)
+-- 
+2.1.0
 
