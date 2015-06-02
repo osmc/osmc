@@ -1,8 +1,19 @@
+From 8ef869097b31e8f2dbb28e8f5462e347744fa574 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 18:05:25 +0100
+Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
+ timezone as well
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/linux/LinuxTimezone.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
 diff --git a/xbmc/linux/LinuxTimezone.cpp b/xbmc/linux/LinuxTimezone.cpp
-index b4ffd13..236d15f 100644
+index 37130d8..2c1fe1c 100644
 --- a/xbmc/linux/LinuxTimezone.cpp
 +++ b/xbmc/linux/LinuxTimezone.cpp
-@@ -212,6 +212,23 @@ void CLinuxTimezone::SetTimezone(std::string timezoneName)
+@@ -214,6 +214,23 @@ void CLinuxTimezone::SetTimezone(std::string timezoneName)
      sprintf(env_var, "TZ=:%s", timezoneName.c_str());
      putenv(env_var);
      tzset();
@@ -26,3 +37,6 @@ index b4ffd13..236d15f 100644
    }
  }
  
+-- 
+2.1.0
+
