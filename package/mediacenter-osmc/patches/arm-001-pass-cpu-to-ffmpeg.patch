@@ -1,6 +1,18 @@
---- a/configure.in
-+++ b/configure.in
-@@ -1757,14 +1757,14 @@
+From b880535607857cc1cc38095c1416e6f5f61ae9ba Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:10:58 +0100
+Subject: [PATCH] Pass CPU flags to ffmpeg build.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6073aca..3b19cd3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1785,14 +1785,14 @@ if test "${USE_STATIC_FFMPEG}" = "1"; then
        if test "$with_ffmpeg" = "yes" || test "$FFMPEG_FOUND" = "false"; then
          # ffmpeg not found with pkg-config, lets install it
          AC_MSG_NOTICE("Installing FFmpeg")
@@ -17,3 +29,6 @@
        export PKG_CONFIG_PATH="${ffmpeg_build}/ffmpeg-install/lib/pkgconfig:$PKG_CONFIG_PATH"
  
      elif test "$with_ffmpeg" != "no"; then
+-- 
+2.1.0
+
