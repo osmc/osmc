@@ -1,8 +1,19 @@
+From c548fb0b5f63ee038c441a7530622aa96b9b756c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 17:58:16 +0100
+Subject: [PATCH] Always ensure the Web Server is enabled by default and do not
+ require a username for access.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 25c2007..fc8a070 100644
+index d1a8e1c..697c83d 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2015,7 +2015,7 @@
+@@ -2145,7 +2145,7 @@
        <group id="1">
          <setting id="services.webserver" type="boolean" label="263" help="36328">
            <level>1</level>
@@ -11,7 +22,7 @@ index 25c2007..fc8a070 100644
            <control type="toggle" />
          </setting>
          <setting id="services.webserverport" type="integer" parent="services.webserver" label="730" help="36329">
-@@ -2030,7 +2030,7 @@
+@@ -2160,7 +2160,7 @@
          </setting>
          <setting id="services.webserverusername" type="string" parent="services.webserver" label="1048" help="36330">
            <level>1</level>
@@ -20,4 +31,6 @@ index 25c2007..fc8a070 100644
            <constraints>
              <allowempty>true</allowempty>
            </constraints>
+-- 
+2.1.0
 
