@@ -6,7 +6,7 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/14.2-Helix.tar.gz" "$(pwd)/kodi"
+pull_source "https://github.com/xbmc/xbmc/archive/cd21822005be72a7ad3a1fa59a88ea5362dc5109.tar.gz" "$(pwd)/kodi"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
