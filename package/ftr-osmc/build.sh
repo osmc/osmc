@@ -17,7 +17,7 @@ then
 	pushd files
 	chmod +x usr/bin/ftr
 	popd
-	dpkg_build files/ ftr-osmc.deb
+	dpkg_build files/ ${1}-ftr-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

@@ -38,7 +38,7 @@ then
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	publish_applications_targeted "$(pwd)" "$1" "transmission-app-osmc"
-	dpkg_build files/ transmission-app-osmc.deb
+	dpkg_build files/ ${1}-transmission-app-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

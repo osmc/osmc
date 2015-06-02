@@ -37,7 +37,7 @@ then
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ eventlircd-osmc.deb
+	dpkg_build files/ ${1}-eventlircd-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

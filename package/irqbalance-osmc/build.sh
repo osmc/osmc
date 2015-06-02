@@ -35,7 +35,7 @@ then
 	strip_files "${out}"
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ irqbalance-osmc.deb
+	dpkg_build files/ ${1}-irqbalance-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

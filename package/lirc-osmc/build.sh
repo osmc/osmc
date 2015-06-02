@@ -28,7 +28,7 @@ then
 	strip_files "${out}"
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ lirc-osmc.deb
+	dpkg_build files/ ${1}-lirc-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

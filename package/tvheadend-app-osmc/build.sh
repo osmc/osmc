@@ -43,7 +43,7 @@ then
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	publish_applications_targeted "$(pwd)" "$1" "tvheadend-app-osmc"
-	dpkg_build files/ tvheadend-app-osmc.deb
+	dpkg_build files/ ${1}-tvheadend-app-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

@@ -35,8 +35,8 @@ then
 	mv files/usr/include  files-dev/usr/
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	dpkg_build files libnfs-osmc.deb
-	dpkg_build files-dev libnfs-dev-osmc.deb
+	dpkg_build files ${1}-libnfs-osmc.deb
+	dpkg_build files-dev ${1}-libnfs-dev-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

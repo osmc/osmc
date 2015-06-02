@@ -36,7 +36,7 @@ then
 	popd
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ librtmp-osmc.deb
+	dpkg_build files/ ${1}-librtmp-osmc.deb
 	out=$(pwd)/files-dev
 	cd src
 	cd librtmp
@@ -44,7 +44,7 @@ then
 	cp -ar *.h $out/usr/include/librtmp
 	cd ../../
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	dpkg_build files-dev librtmp-dev-osmc.deb
+	dpkg_build files-dev ${1}-librtmp-dev-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

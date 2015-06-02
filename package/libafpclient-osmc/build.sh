@@ -35,8 +35,8 @@ then
 	cp src/afpfs-ng/include/* files-dev/usr/include/afpfs-ng
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	dpkg_build files/ libafpclient-osmc.deb
-	dpkg_build files-dev libafpclient-dev-osmc.deb
+	dpkg_build files/ ${1}-libafpclient-osmc.deb
+	dpkg_build files-dev ${1}-libafpclient-dev-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

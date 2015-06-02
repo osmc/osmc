@@ -29,7 +29,7 @@ then
 	cp -ar splash_sad.png ${out}/usr
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files splash-osmc.deb
+	dpkg_build files ${1}-splash-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"
