@@ -1,8 +1,18 @@
-diff --git a/configure.in b/configure.in
-index 799ec17..3a60c0c 100644
---- a/configure.in
-+++ b/configure.in
-@@ -778,8 +778,8 @@ CXXFLAGS="$CXXFLAGS $DEBUG_FLAGS"
+From 0a0b56b028c38d3d1d2b025c1521349ab44ebd54 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 18:09:49 +0100
+Subject: [PATCH] Optimise default compiler flag options
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8c1e412..14e6a54 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -814,8 +814,8 @@ CXXFLAGS="$DEBUG_FLAGS $CXXFLAGS"
  
  if test "$use_optimizations" = "yes"; then
    final_message="$final_message\n  Optimization:\tYes"
@@ -13,3 +23,6 @@ index 799ec17..3a60c0c 100644
  else
    final_message="$final_message\n  Optimization:\tNo"
  fi
+-- 
+2.1.0
+
