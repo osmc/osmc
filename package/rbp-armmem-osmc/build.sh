@@ -32,7 +32,7 @@ then
 	fi
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ rbp-armmem-osmc.deb
+	dpkg_build files/ rbp-armmem-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

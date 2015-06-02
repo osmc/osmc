@@ -7,4 +7,4 @@
 
 echo -e "Building package atv-device-osmc"
 make clean
-dpkg -b files/ atv-device-osmc.deb
+dpkg_build files/ atv-device-osmc.deb

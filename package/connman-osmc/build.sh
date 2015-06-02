@@ -40,7 +40,7 @@ then
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ connman-osmc.deb
+	dpkg_build files/ connman-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

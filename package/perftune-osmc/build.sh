@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building performancetuner"
 make clean
-dpkg -b files/ perftune-osmc.deb
+dpkg_build files/ perftune-osmc.deb

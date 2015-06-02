@@ -18,4 +18,4 @@ install_patch "patches/" "all"
 mkdir -p files/lib/firmware
 mv *.fw files/lib/firmware
 
-dpkg -b files/ dvb-firmware-osmc.deb
+dpkg_build files/ dvb-firmware-osmc.deb

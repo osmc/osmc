@@ -20,5 +20,5 @@ cp -ar src/firmware-master/hardfp/opt/vc/bin/ files/opt/vc
 cp -ar src/firmware-master/hardfp/opt/vc/lib files/opt/vc
 cp -ar src/firmware-master/hardfp/opt/vc/include files-dev/opt/vc
 rm -rf src
-dpkg -b files/ rbp-userland-osmc.deb
-dpkg -b files-dev/ rbp-userland-dev-osmc.deb
+dpkg_build files/ rbp-userland-osmc.deb
+dpkg_build files-dev/ rbp-userland-dev-osmc.deb

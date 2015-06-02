@@ -33,9 +33,9 @@ then
 	popd
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ libdcadec-osmc.deb
+	dpkg_build files/ libdcadec-osmc.deb
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	dpkg -b files-dev libdcadec-dev-osmc.deb
+	dpkg_build files-dev libdcadec-dev-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

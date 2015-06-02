@@ -260,7 +260,7 @@ then
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ mediacenter-osmc.deb
+	dpkg_build files/ mediacenter-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

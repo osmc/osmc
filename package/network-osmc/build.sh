@@ -15,7 +15,7 @@ then
 	echo "Package: ${1}-network-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-connman-osmc, bluez, wget, iptables, wireless-firmware-osmc, net-tools, ntp, wpasupplicant, libnss-mdns, nfs-common, cifs-utils, ca-certificates, curl, python-dbus, python-gobject, ifupdown" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ network-osmc.deb
+	dpkg_build files/ network-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

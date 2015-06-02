@@ -7,4 +7,4 @@
 
 echo -e "Building package rbp2-device-osmc"
 make clean
-dpkg -b files/ rbp2-device-osmc.deb
+dpkg_build files/ rbp2-device-osmc.deb

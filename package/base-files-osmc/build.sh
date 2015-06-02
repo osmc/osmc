@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 makedirnb()
 {
   # Git doesn't allow empty folders. Do at runtime.
@@ -27,4 +29,4 @@ makedirnb "mnt"
 makedirnb "selinux"
 makedirnb "boot"
 makedirnb "dev"
-dpkg -b files/ base-files-osmc.deb
+dpkg_build files/ base-files-osmc.deb

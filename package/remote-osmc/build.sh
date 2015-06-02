@@ -15,7 +15,7 @@ then
 	echo "Package: ${1}-remote-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-lirc-osmc, ${1}-eventlircd-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ remote-osmc.deb
+	dpkg_build files/ remote-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

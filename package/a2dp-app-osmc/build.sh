@@ -7,4 +7,4 @@
 
 echo -e "Building package a2dp-app-osmc"
 publish_applications_any $(pwd) "a2dp-app-osmc"
-dpkg -b files/ a2dp-app-osmc.deb
+dpkg_build files/ a2dp-app-osmc.deb

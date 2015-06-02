@@ -25,7 +25,7 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	dpkg -b files/ atv-remoteclient-osmc.deb
+	dpkg_build files/ atv-remoteclient-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

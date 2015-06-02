@@ -19,7 +19,7 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	dpkg -b files/ vero1-wifi-osmc.deb
+	dpkg_build files/ vero1-wifi-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

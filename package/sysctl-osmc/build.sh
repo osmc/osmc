@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building sysctl tweaks"
 make clean
-dpkg -b files/ sysctl-osmc.deb
+dpkg_build files/ sysctl-osmc.deb

@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building disk mounting package"
 make clean
-dpkg -b files/ diskmount-osmc.deb
+dpkg_build files/ diskmount-osmc.deb

@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building mediacenter-send"
 make clean
-dpkg -b files/ mediacenter-send-osmc.deb
+dpkg_build files/ mediacenter-send-osmc.deb

@@ -8,4 +8,4 @@
 echo -e "Building package atv-userland"
 out=$(pwd)/files
 make clean
-dpkg -b files/ atv-userland-osmc.deb
+dpkg_build files/ atv-userland-osmc.deb

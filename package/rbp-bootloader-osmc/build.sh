@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building package rbp-bootloader"
 BOOT="files/boot"
 FWFILES="LICENCE.broadcom
@@ -19,4 +21,4 @@ do
 	if [ $? != 0 ]; then echo "Download failed" && exit 1; fi
 done
 
-dpkg -b files/ rbp-bootloader-osmc.deb
+dpkg_build files/ rbp-bootloader-osmc.deb

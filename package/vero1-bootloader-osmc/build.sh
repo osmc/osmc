@@ -23,7 +23,7 @@ then
 	cp -ar SPL ${out}/boot/
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
-	dpkg -b files/ vero1-bootloader-osmc.deb
+	dpkg_build files/ vero1-bootloader-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

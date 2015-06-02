@@ -96,8 +96,8 @@ then
 	mkdir -p ${out}/etc/ld.so.conf.d
 	echo "/opt/vero/lib" > files/etc/ld.so.conf.d/vero.conf
 	rm -rf ${out}/opt/vero/share
-	dpkg -b files/ vero-userland-osmc.deb
-	dpkg -b files-dev vero-userland-dev-osmc.deb
+	dpkg_build files/ vero-userland-osmc.deb
+	dpkg_build files-dev vero-userland-dev-osmc.deb
 	rm -rf /headers
 	build_return=$?
 fi

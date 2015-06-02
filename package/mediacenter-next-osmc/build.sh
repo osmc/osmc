@@ -200,7 +200,7 @@ then
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg -b files/ mediacenter-next-osmc.deb
+	dpkg_build files/ mediacenter-next-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

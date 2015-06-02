@@ -7,4 +7,4 @@
 
 echo -e "Building package vero1-device-osmc"
 make clean
-dpkg -b files/ vero1-device-osmc.deb
+dpkg_build files/ vero1-device-osmc.deb

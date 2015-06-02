@@ -33,8 +33,8 @@ then
 	mv files/usr/include  files-dev/usr/
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	dpkg -b files libplatform-osmc.deb
-	dpkg -b files-dev libplatform-dev-osmc.deb
+	dpkg_build files libplatform-osmc.deb
+	dpkg_build files-dev libplatform-dev-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"

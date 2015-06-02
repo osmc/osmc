@@ -7,4 +7,4 @@
 
 echo -e "Building package cron-app-osmc"
 publish_applications_any $(pwd) "cron-app-osmc"
-dpkg -b files/ cron-app-osmc.deb
+dpkg_build files/ cron-app-osmc.deb

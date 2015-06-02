@@ -6,4 +6,4 @@
 . ../common.sh
 
 echo -e "Building package mediacenter-skin-osmc"
-dpkg -b files/ mediacenter-skin-osmc.deb
+dpkg_build files/ mediacenter-skin-osmc.deb

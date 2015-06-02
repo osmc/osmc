@@ -7,4 +7,4 @@
 
 echo -e "Building package ssh-app-osmc"
 publish_applications_any $(pwd) "ssh-app-osmc"
-dpkg -b files/ ssh-app-osmc.deb
+dpkg_build files/ ssh-app-osmc.deb

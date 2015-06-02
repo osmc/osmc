@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building OSMC policy to allow NICE adjustment"
 make clean
-dpkg -b files/ niceprioritypolicy-osmc.deb
+dpkg_build files/ niceprioritypolicy-osmc.deb

@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building mediacenter-eventclients-common"
 make clean
-dpkg -b files/ mediacenter-eventclients-common-osmc.deb
+dpkg_build files/ mediacenter-eventclients-common-osmc.deb

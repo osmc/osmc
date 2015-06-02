@@ -3,6 +3,8 @@
 
 #!/bin/bash
 
+. ../common.sh
+
 echo -e "Building package WiFi firmware"
 
-dpkg -b files/ wireless-firmware-osmc.deb
+dpkg_build files/ wireless-firmware-osmc.deb
