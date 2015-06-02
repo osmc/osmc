@@ -1,8 +1,19 @@
+From 038739f392fb17391f4de2bbd58bb08f00bf54b1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 18:12:00 +0100
+Subject: [PATCH] Do not reload under certain conditions (prevents tutorial
+ window from being removed during addon updates on first boot)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index fc3464d..754124e 100644
+index c4ec6ca..786e35f 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -1841,6 +1841,14 @@ bool CApplication::OnSettingsSaving() const
+@@ -1519,6 +1519,14 @@ bool CApplication::OnSettingsSaving() const
  
  void CApplication::ReloadSkin(bool confirm/*=false*/)
  {
@@ -17,3 +28,6 @@ index fc3464d..754124e 100644
    std::string oldSkin = g_SkinInfo ? g_SkinInfo->ID() : "";
  
    CGUIMessage msg(GUI_MSG_LOAD_SKIN, -1, g_windowManager.GetActiveWindow());
+-- 
+2.1.0
+
