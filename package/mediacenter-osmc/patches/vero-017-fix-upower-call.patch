@@ -1,8 +1,19 @@
+From ba629b85e7ee522243d565e6af00fa692a91d59e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:56:15 +0100
+Subject: [PATCH] Fix UPower capability detection on Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/powermanagement/linux/LogindUPowerSyscall.cpp | 4 ++--
+ xbmc/powermanagement/linux/UPowerSyscall.cpp       | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
 diff --git a/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp b/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
-index 5a97fe6..0674a15 100644
+index 4e5bcc6..3bfc9a6 100644
 --- a/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
 +++ b/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
-@@ -49,8 +49,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
+@@ -50,8 +50,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
    if (!m_hasUPower)
      CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
  
@@ -37,3 +48,6 @@ index 28ce475..d90247e 100644
    UpdateCapabilities();
  
    EnumeratePowerSources();
+-- 
+2.1.0
+
