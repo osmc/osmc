@@ -1,8 +1,18 @@
+From aae3caa2d1b17b3431434a3208a0edb4d0176419 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:23:24 +0100
+Subject: [PATCH] Do not decode VC1 or MPEG2 via CrystalHD
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 5 -----
+ 1 file changed, 5 deletions(-)
+
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-index ab0959e..5c5deba 100644
+index 4142c9c..89f0f87 100644
 --- a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-@@ -261,14 +261,9 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
+@@ -284,14 +284,9 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
      {
        switch(hint.codec)
        {
@@ -17,33 +27,6 @@ index ab0959e..5c5deba 100644
            if ( (pCodec = OpenCodec(new CDVDVideoCodecCrystalHD(), hint, options)) ) return pCodec;
          break;
          default:
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
-index 373ae2c..94a6995 100644
---- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
-@@ -59,7 +59,7 @@ bool CDVDVideoCodecCrystalHD::Open(CDVDStreamInfo &hints, CDVDCodecOptions &opti
-     {
-       case AV_CODEC_ID_MPEG2VIDEO:
-         m_CodecType = CRYSTALHD_CODEC_ID_MPEG2;
--        m_pFormatName = "chd-mpeg2";
-+        m_pFormatName = "chd-osmc-backport-mpeg2";
-       break;
-       case AV_CODEC_ID_H264:
-         switch(hints.profile)
-@@ -86,15 +86,7 @@ bool CDVDVideoCodecCrystalHD::Open(CDVDStreamInfo &hints, CDVDCodecOptions &opti
-         else
-           m_CodecType = CRYSTALHD_CODEC_ID_H264;
- 
--        m_pFormatName = "chd-h264";
--      break;
--      case AV_CODEC_ID_VC1:
--        m_CodecType = CRYSTALHD_CODEC_ID_VC1;
--        m_pFormatName = "chd-vc1";
--      break;
--      case AV_CODEC_ID_WMV3:
--        m_CodecType = CRYSTALHD_CODEC_ID_WMV3;
--        m_pFormatName = "chd-wmv3";
-+        m_pFormatName = "chd-osmc-backport-h264";
-       break;
-       default:
-         return false;
+-- 
+2.1.0
+
