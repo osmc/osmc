@@ -1,17 +1,18 @@
-diff --git a/xbmc/system.h b/xbmc/system.h
-index 41c1f5d..c236cf9 100644
---- a/xbmc/system.h
-+++ b/xbmc/system.h
-@@ -275,5 +275,5 @@
- #if defined(HAS_TOUCH_SKIN) && defined(TARGET_DARWIN_IOS) && !defined(TARGET_DARWIN_IOS_ATV2)
- #define DEFAULT_SKIN          "skin.re-touched"
- #else
--#define DEFAULT_SKIN          "skin.confluence"
-+#define DEFAULT_SKIN          "skin.osmc"
- #endif
+From 612239903a95724344c7b9484f48f549ae88a953 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 18:04:22 +0100
+Subject: [PATCH] Make the OSMC skin the default
 
---- a/system/settings/settings.xml	2014-12-31 23:20:35.763722714 +0000
-+++ b/system/settings/settings.xml	2015-01-10 16:48:48.916812499 +0000
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ xbmc/system.h                | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index b27da57..dcdf0bd 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
 @@ -5,7 +5,7 @@
        <group id="1">
          <setting id="lookandfeel.skin" type="addon" label="166" help="36103">
@@ -21,4 +22,17 @@ index 41c1f5d..c236cf9 100644
            <constraints>
              <addontype>xbmc.gui.skin</addontype>
            </constraints>
+diff --git a/xbmc/system.h b/xbmc/system.h
+index 2213421..31bdb6e 100644
+--- a/xbmc/system.h
++++ b/xbmc/system.h
+@@ -261,5 +261,5 @@
+ #if defined(HAS_TOUCH_SKIN) && defined(TARGET_DARWIN_IOS) && !defined(TARGET_DARWIN_IOS_ATV2)
+ #define DEFAULT_SKIN          "skin.re-touched"
+ #else
+-#define DEFAULT_SKIN          "skin.confluence"
++#define DEFAULT_SKIN          "skin.osmc"
+ #endif
+-- 
+2.1.0
 
