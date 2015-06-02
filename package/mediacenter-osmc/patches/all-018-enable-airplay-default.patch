@@ -1,8 +1,18 @@
+From 6f2ce7154081c59d04bdf341de23a88a4999d19e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 18:19:39 +0100
+Subject: [PATCH] Enable AirPlay by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 560b650..af8b35a 100644
+index dcdf0bd..e2ab138 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2173,7 +2173,7 @@
+@@ -2305,7 +2305,7 @@
        <group id="1">
          <setting id="services.airplay" type="boolean" label="1270" help="36343">
            <level>1</level>
@@ -11,3 +21,6 @@ index 560b650..af8b35a 100644
            <control type="toggle" />
          </setting>
          <setting id="services.airplayvolumecontrol" type="boolean" parent="services.airplay" label="1269" help="36541">
+-- 
+2.1.0
+
