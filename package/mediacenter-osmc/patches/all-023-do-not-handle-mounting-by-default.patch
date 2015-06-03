@@ -1,0 +1,27 @@
+From 229f3fc900b1f9ec319dfc9bb747c4407fc3f577 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 3 Jun 2015 16:30:41 +0100
+Subject: [PATCH] Do not handle mounting in Kodi unless specified in
+ advancedsettings
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/settings/AdvancedSettings.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index 2e3282c..019f6f3 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -198,7 +198,7 @@ void CAdvancedSettings::Initialize()
+ 
+   m_cddbAddress = "freedb.freedb.org";
+ 
+-  m_handleMounting = g_application.IsStandAlone();
++  m_handleMounting = false;
+ 
+   m_fullScreenOnMovieStart = true;
+   m_cachePath = "special://temp/";
+-- 
+2.1.0
+
