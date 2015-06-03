@@ -1,0 +1,33 @@
+From f3883379b2fb9777bc560e59dcf735724fc266b4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 3 Jun 2015 16:25:59 +0100
+Subject: [PATCH] Add Hama MCE keyboard mappings
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/keymaps/hama_mce.xml | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 system/keymaps/hama_mce.xml
+
+diff --git a/system/keymaps/hama_mce.xml b/system/keymaps/hama_mce.xml
+new file mode 100644
+index 0000000..2e7efc2
+--- /dev/null
++++ b/system/keymaps/hama_mce.xml
+@@ -0,0 +1,13 @@
++<keymap>	
++	<global>
++		<keyboard>>
++			<f14>VolumeDown</f14>
++			<f13>Mute</f13>
++			<numpadtimes>Info</numpadtimes>  <!--star key -->
++			<numpadfive mod="alt">ContextMenu</numpadfive>  <!--hash key -->
++			<return mod="alt">XBMC.ActivateWindow(Home)</return>  <!--Start key -->
++			<f4 mod="alt">Info</f4>  <!--close key -->
++			<r mod="ctrl">Info</r>   <!--record key -->			
++		</keyboard>
++	</global>	
++</keymap>
+-- 
+2.1.0
+
