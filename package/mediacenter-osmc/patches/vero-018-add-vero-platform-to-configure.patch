@@ -1,8 +1,18 @@
-diff --git a/configure.in b/configure.in
-index 799ec17..2a047e1 100644
---- a/configure.in
-+++ b/configure.in
-@@ -734,6 +734,16 @@ case $use_platform in
+From f5a87e9707eb31144c52661189cd0188feb28676 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 3 Jun 2015 14:12:58 +0100
+Subject: [PATCH] Create configuration option for Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.ac | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 8c1e412..2211bb9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -755,6 +755,16 @@ case $use_platform in
       CFLAGS="$CFLAGS"
       CXXFLAGS="$CXXFLAGS"
       ;;
@@ -18,4 +28,7 @@ index 799ec17..2a047e1 100644
 +     ;;
  esac
  
- XBMC_SETUP_ARCH_DEFINES()
+ if test "$host_vendor" = "apple"; then
+-- 
+2.1.0
+
