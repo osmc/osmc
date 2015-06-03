@@ -32,21 +32,15 @@ function strip_libs()
 
 function configure_build_env()
 {
-	if [ ! -f "${1}/etc/resolv.conf" ]
+	if [ -f "/etc/resolv.conf" ]
 	then
-		if [ -f "/etc/resolv.conf" ]
-		then
 		echo -e "Installing /etc/resolv.conf"
 		cp /etc/resolv.conf ${1}/etc/resolv.conf
-		fi
 	fi
-	if [ ! -f "${1}/etc/network/interfaces" ]
+	if [ -f "/etc/network/interfaces" ]
 	then
-		if [ -f "/etc/network/interfaces" ]
-		then
 		echo -e "Installing /etc/network/interfaces"
 		cp /etc/network/interfaces ${1}/etc/network/interfaces
-		fi
 	fi
 	HOSTNAME=$(cat /etc/hostname)
 	echo "127.0.0.1 $HOSTNAME" > ${1}/etc/hosts
