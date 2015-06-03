@@ -83,16 +83,15 @@ function teardown_env()
 function handle_dep()
 {
 	# Used by packages that need other packages to be built first
-	# Check dpkg -l for the existence of the package, try install, otherwise bail. 
-	if ! dpkg -s ${1} >/dev/null 2>&1
+	# Check dpkg-query for the existence of the package, try install, otherwise bail.
+	if ! dpkg-query -W -f='${Status}' "${1}" 2>/dev/null | grep -q "install ok installed" >/dev/null 2>&1
 	then
 		echo -e "Package ${1} is not found on the system, checking APT"
 		# apt-cache search always returns 0. Ugh. 
-		packages=$(apt-cache search ${1} | wc -l)
-		if [ "$packages" -eq 0 ]
+		if ! apt-cache search "${1}" | grep -q "^${1} "
 		then
 			echo -e "Can't find the package in APT repo. It needs to be built first or you need to wait for upstream to add it"
-			return 1
+			exit 1
 		else
 			echo -e "Found in APT and will install"
 			# armv7 conflicts
@@ -101,6 +100,7 @@ function handle_dep()
 			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc"; fi # only rbp2 because armv7
 			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc"; fi
 			install_package ${1}
+			if [ $? -ne 0 ]; then exit 1; fi
 		fi
 	else
 		echo -e "Package ${1} is already installed in the environment"
