@@ -2,64 +2,67 @@
 <window>
 	<!-- okdialog -->
 	<defaultcontrol always="true">10</defaultcontrol>
-
 	<controls>
-
 		<!-- Background -->
 		<include>DialogBackgroundImage</include>
-
 		<!-- Main group -->
 		<control type="group">
 			<include>DialogAnimation</include>
 			<centerleft>50%</centerleft>
 			<centertop>50%</centertop>
-			<width>720</width>
-			<height>360</height>
-
+			<width>800</width>
+			<height>350</height>
 			<!-- Background -->
 			<control type="image">
 				<centerleft>50%</centerleft>
-				<width>720</width>
-				<height>360</height>
+				<width>100%</width>
+				<height>100%</height>
 				<texture>dialogs/DialogBackground.png</texture>
 			</control>
-
 			<!-- Heading -->
 			<control type="label" id="1">
-				<centerleft>50%</centerleft>
-				<top>40</top>
-				<width>600</width>
-				<height>48</height>
+				<left>20</left>
+				<top>10</top>
+				<width>95%</width>
+				<height>68</height>
+				<font>Large</font>
 				<align>center</align>
-				<font>XLarge</font>
-				<textcolor>ColorFO</textcolor>
+				<textcolor>ColorHeading</textcolor>
 			</control>
-
 			<!-- Details -->
 			<control type="textbox" id="9">
 				<centerleft>50%</centerleft>
-				<top>96</top>
-				<width>600</width>
-				<height>158</height>
-				<align>center</align>
-				<font>Large</font>
-				<autoscroll>False</autoscroll>
-				<textcolor>ColorHeading</textcolor>
+				<top>86</top>
+				<width>90%</width>
+				<height>182</height>
+				<font>XSmall</font>
+				<textcolor>ColorDetails</textcolor>
 			</control>
-
-			<!-- OK -->
-			<control type="button" id="10">
+			<!-- Button grouplist -->
+			<control type="grouplist" id="9001">
 				<centerleft>50%</centerleft>
-				<top>262</top>
-				<width>600</width>
-				<height>36</height>
+				<bottom>10</bottom>
+				<width>100%</width>
+				<height>68</height>
+				<itemgap>20</itemgap>
+				<onleft>noop</onleft>
+				<onright>noop</onright>
+				<onup>noop</onup>
+				<ondown>noop</ondown>
 				<align>center</align>
-				<label>106</label>
-				<font>Med</font>
+				<defaultcontrol>10</defaultcontrol>
+				<orientation>horizontal</orientation>
+				<!-- OK -->
+				<control type="button" id="10">
+					<width>370</width>
+					<height>68</height>
+					<align>center</align>
+					<onleft>noop</onleft>
+					<onright>11</onright>
+					<label>106</label>
+					<font>Med</font>
+				</control>
 			</control>
-
 		</control>
-
 	</controls>
-
 </window>
