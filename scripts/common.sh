@@ -130,7 +130,7 @@ function install_patch()
 		    install_package "git"
 		    verify_action
 		    prefix=$(realpath --relative-to="$(git rev-parse --show-toplevel)" .)
-		    git apply --directory="$prefix" $patch
+		    git apply --whitespace=nowarn --directory="$prefix" $patch
 		    verify_action
 	        fi
 	        rm $patch
