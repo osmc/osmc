@@ -1,2 +1,5 @@
 #!/bin/bash
 
+if [ "$1" = "remove" ]; then
+	rm -rf /opt/osmc-tc/armv6l-toolchain-osmc/ >/dev/null 2>&1
+fi
