@@ -113,6 +113,7 @@ then
 		handle_dep "armv6l-libnfs-dev-osmc"
 		handle_dep "armv6l-libafpclient-dev-osmc"
 		handle_dep "armv6l-libplatform-dev-osmc"
+		handle_dep "armv6l-libdcadec-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
 	then
@@ -122,6 +123,7 @@ then
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libafpclient-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
+		handle_dep "armv7-libdcadec-dev-osmc"
 	fi
 	if [ "$1" == "vero" ]
 	then
