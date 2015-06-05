@@ -54,7 +54,7 @@ deb http://ftp.debian.org/debian/ jessie-updates main contrib
 
 deb http://security.debian.org/ jessie/updates main contrib
 
-deb http://apt.osmc.tv jessie main
+deb http://apt.osmc.tv jessie-devel main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation

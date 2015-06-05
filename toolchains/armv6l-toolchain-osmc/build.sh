@@ -55,7 +55,7 @@ verify_action
 
 # Set up sources.list
 echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-free
-deb http://apt.osmc.tv jessie main
+deb http://apt.osmc.tv jessie-devel main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
