@@ -3,5 +3,5 @@
 if [ "$1" = "remove" ]; then
 	umount /opt/osmc-tc/armv7-toolchain-osmc/proc >/dev/null 2>&1
 	umount /opt/osmc-tc/armv7-toolchain-osmc/mnt >/dev/null 2>&1
-	if [ -z "$(ls -A /opt/osmc-tc/armv7-toolchain-osmc/mnt 2>/dev/null)" ]; then exit 1; fi
+	if [ -n "$(ls -A /opt/osmc-tc/armv7-toolchain-osmc/mnt 2>/dev/null)" ]; then exit 1; fi
 fi
