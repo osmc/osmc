@@ -129,7 +129,8 @@ function install_patch()
 		    # this is a binary patch
 		    install_package "git"
 		    verify_action
-		    git apply $patch
+		    prefix=$(realpath --relative-to="$(git rev-parse --show-toplevel)" .)
+		    git apply --directory="$prefix" $patch
 		    verify_action
 	        fi
 	        rm $patch
