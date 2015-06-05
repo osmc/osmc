@@ -1,6 +1,9 @@
 all:
 	echo -e "Specify a target:\nmake armv7"
 
+armv6l:
+	sudo bash build.sh "armv6l"
+
 armv7:
 	sudo bash build.sh "armv7"
 
