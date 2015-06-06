@@ -35,12 +35,14 @@ function build_fs_image()
 		echo "hdmi_ignore_cec_init=1" >> config.txt
 		echo "disable_overscan=1" >> config.txt
 		echo "start_x=1" >> config.txt
+		echo "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18" >> config.txt
 	else
 		# Add Pi2 config.txt
 		echo "gpu_mem_1024=256" >> config.txt
 		echo "hdmi_ignore_cec_init=1" >> config.txt
 		echo "disable_overscan=1" >> config.txt
 		echo "start_x=1" >> config.txt
+		echo "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18" >> config.txt
 	fi
 	echo -e "Creating boot tarball"
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
