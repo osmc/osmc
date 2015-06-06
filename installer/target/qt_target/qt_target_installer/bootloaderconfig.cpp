@@ -62,12 +62,12 @@ void BootloaderConfig::configureEnvironment()
         QStringList configStringList;
         if (utils->getOSMCDev() == "rbp1")
         {
-            configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
+            configStringList << "arm_freq=850\n" << "core_freq=375\n" << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
             cmdlineStringList << "osmcdev=rbp1";
         }
         if (utils->getOSMCDev() == "rbp2")
         {
-            configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n";
+            configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
             cmdlineStringList << "osmcdev=rbp2";
         }
         utils->writeToFile(configFile, configStringList, false);
