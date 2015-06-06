@@ -9,6 +9,9 @@ tcstub="armv6l-toolchain-osmc"
 
 make clean
 
+check_platform
+verify_action
+
 update_sources
 verify_action
 
@@ -18,16 +21,12 @@ dh-make
 devscripts
 qemu
 binfmt-support
-qemu-user-static
-lsb-release"
+qemu-user-static"
 for package in $packages
 do
 	install_package $package
 	verify_action
 done
-
-check_platform
-verify_action
 
 # Configure the target directory
 ARCH="armhf"

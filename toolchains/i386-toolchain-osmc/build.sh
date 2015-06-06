@@ -9,22 +9,21 @@ tcstub="i386-toolchain-osmc"
 
 make clean
 
+check_platform
+verify_action
+
 update_sources
 verify_action
 
 # Install packages needed to build filesystem for building
 packages="debootstrap
 dh-make
-devscripts
-lsb-release"
+devscripts"
 for package in $packages
 do
 	install_package $package
 	verify_action
 done
-
-check_platform
-verify_action
 
 # Configure the target directory
 ARCH="i386"
