@@ -4,6 +4,7 @@
 #!/bin/bash
 
 . ../../scripts/common.sh
+. ../../package/common.sh
 
 function build_deb_package()
 {
@@ -13,7 +14,7 @@ function build_deb_package()
 	# Mark our FS
 	target=$(echo $1 | rev | cut -d / -f 1 | rev | cut -d - -f 1)
 	echo ${2} >${1}/output/opt/osmc-tc/${target}-toolchain-osmc/tcver.${target}
-	dpkg -b ${1}/output ${2}.deb
+	dpkg_build ${1}/output ${2}.deb
 }
 
 function patchfs()
