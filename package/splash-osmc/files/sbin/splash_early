@@ -2,11 +2,13 @@
 mount -t proc proc /proc
 export TERM=linux
 
+/usr/bin/clear
 if grep -q quiet /proc/cmdline
 then
 	/usr/bin/setterm --cursor off
-	/usr/bin/clear
 	/usr/bin/ply-image > /dev/null
+else
+	sleep 2
 fi
 /sbin/checkmodifier
 if [ $? -eq 1 ]
