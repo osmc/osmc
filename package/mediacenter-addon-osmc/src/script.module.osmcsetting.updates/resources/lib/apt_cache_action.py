@@ -93,7 +93,16 @@ class Main(object):
 
 	def respond(self):
 
-		call_parent('apt_cache %s complete' % self.action)
+		# check if the action was installing something from the apf store, then chekc if errormsg is populated
+		# if so, then call parent with the apf store install failed message
+		if self.action == 'action_list' and self.error_message != '':
+
+			call_parent('apt_error', {'error': self.error_message, 'package' = self.error_package})
+
+		else:
+
+			call_parent('apt_cache %s complete' % self.action)
+
 
 
 	def act(self):
