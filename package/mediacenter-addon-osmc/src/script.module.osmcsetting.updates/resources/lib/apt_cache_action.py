@@ -97,7 +97,7 @@ class Main(object):
 		# if so, then call parent with the apf store install failed message
 		if self.action == 'action_list' and self.error_message != '':
 
-			call_parent('apt_error', {'error': self.error_message, 'package' = self.error_package})
+			call_parent('apt_action_list_error', {'error': self.error_message, 'package' = self.error_package})
 
 		else:
 
@@ -131,6 +131,10 @@ class Main(object):
 
 		self.heading = 'App Store'
 
+		self.removals_not_found = []
+
+		self.package_found = False
+
 		action_string = sys.argv[2]
 
 		action_dict = self.parse_argv2(action_string)
@@ -139,20 +143,37 @@ class Main(object):
 
 		self.cache.open()
 
+		# populate a copy of the removals list to identify the packages not found
+		for rem in action_dict['removal']:
+			self.removals_not_found.append(rem)
+
 		for pkg in self.cache:
 
 			# mark packages as install or remove
 
 			if pkg.shortname in action_dict['install']:
 
+				action_dict['install'].remove(pkg.shortname)
+
 				pkg.mark_install()
+				self.package_found = True
 
 			if pkg.shortname in action_dict['removal']:
 
+				self.removals_not_found.remove(pkg.shortname)
+
 				pkg.mark_delete(purge=True)
+				self.package_found = True
 
 
-		# commit
+		# if no packages are found, then skip the commit and report error
+		if not self.package_found:
+			self.error_package = 'No packages found:\nInstalls: %s\nRemovals: %s' % (action_dict['install'], self.removals_not_found)
+			self.error_message = 'Failed to identify any Apps'
+			return
+
+
+		# commit install of new packages
 		self.commit_action()
 
 		if action_dict['removal']:
@@ -176,6 +197,10 @@ class Main(object):
 				
 				# commit
 				self.commit_action()
+
+		# if there were any packages not identified, then notify user and send to parent to write to log
+		if any([action_dict['install'], self.removals_not_found]):
+			self.error_message += '\nFailed to identify Apps: Installs: %s\nRemovals: %s' % (action_dict['install'], self.removals_not_found)
 
 
 	# 

@@ -107,6 +107,7 @@ class Main(object):
 								'kill_yourself'						: self.kill_yourself,
 								'settings_command'					: self.settings_command,
 								'apt_error'							: self.apt_error,
+								'apt_action_list_error'				: self.apt_action_list_error,
 								'action_list'						: self.action_list,
 								'apt_cache action_list complete'	: self.action_list_complete,
 								'pre_backup_complete'				: self.pre_backup_complete, 
@@ -638,6 +639,20 @@ class Main(object):
 
 		# notify the user that an error has occured with an update
 		ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
+
+
+	# ACTION METHOD
+	def apt_action_list_error(self, **kwargs):
+
+		package = kwargs.get('package','not provided')
+
+		log('apt_updater encountered and error: \nException : %s \nPackages : %s \nError : %s' % (kwargs.get('exception','not provided'),package,kwargs.get('error','not provided')))
+
+		# kill the progress bar
+		self.progress_bar(kill=True)
+
+		# notify the user that an error has occured with an update
+		ok = DIALOG.ok(lang(32087), lang(32112) % package, '', lang(32113))
 
 
 	# ACTION METHOD
