@@ -34,7 +34,7 @@ then
 	install_patch "../../patches" "all"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then export LIBRARY_PATH+=/opt/vc/lib && install_patch "../../patches" "rbp"; fi
 	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero"; fi
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=1 .
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
