@@ -30,7 +30,7 @@ index 0a99d59..b65b7fe 100644
  bool CAddonInstaller::DoInstall(const AddonPtr &addon, const std::string &hash /* = "" */, bool update /* = false */, const std::string &referer /* = "" */, bool background /* = true */, bool modal /* = false */)
  {
 +  // check whether the addon is dodgy if we're not updating it
-+  if (IsBadAddon(addon->ID()) && ! updating)
++  if (IsBadAddon(addon->ID()) && ! update)
 +       return false;
 +
    // check whether we already have the addon installing
