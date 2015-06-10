@@ -489,7 +489,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 
 			msg = self.fetching
 
-			hdg = '{0:d} / {1:d} items  --  {2:}  --  {3:.1f} / {4:.1f}MB'.format(self.current_items, self.total_items, cps, cmb, tmb)
+			hdg = '{0:d} / {1:d} items  --  {2:}  --  {3:.1f} / {4:.1f}MB'.format(self.current_items + 1, self.total_items, cps, cmb, tmb)
 
 			call_parent('progress_bar', {'percent': pct, 'heading': hdg, 'message': msg})
 
