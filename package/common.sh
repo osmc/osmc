@@ -84,7 +84,7 @@ function handle_dep()
 {
 	# Used by packages that need other packages to be built first
 	# Check dpkg-query for the existence of the package, try install, otherwise bail.
-	if ! dpkg-query -W -f='${Status}' "${1}" 2>/dev/null | grep -q "install ok installed" >/dev/null 2>&1
+	if ! dpkg-query -W -f='${Status}' "${1}" 2>/dev/null | grep -q "ok installed" >/dev/null 2>&1
 	then
 		echo -e "Package ${1} is not found on the system, checking APT"
 		# apt-cache search always returns 0. Ugh. 
