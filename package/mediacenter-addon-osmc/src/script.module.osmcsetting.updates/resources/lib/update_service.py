@@ -652,7 +652,7 @@ class Main(object):
 		self.progress_bar(kill=True)
 
 		# notify the user that an error has occured with an update
-		ok = DIALOG.ok(lang(32087), lang(32112) % package, '', lang(32113))
+		ok = DIALOG.ok(lang(32087), lang(32112), '', lang(32113))
 
 
 	# ACTION METHOD

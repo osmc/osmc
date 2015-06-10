@@ -15,7 +15,7 @@ def call_parent(raw_message, data={}):
 
 	address = '/var/tmp/osmc.settings.update.sockfile'
 	
-	# print '%s %s sending response' % (t.now(), 'apt_cache_action.py')
+	print '%s %s sending response' % (t.now(), 'apt_cache_action.py')
 
 	message = (raw_message, data)
 
@@ -45,8 +45,8 @@ class Main(object):
 		# with apt.apt_pkg.SystemLock():
 		# implements a lock on the package system, so that nothing else can alter packages
 
-		# print '==================================================================='
-		# print '%s %s running' % (t.now(), 'apt_cache_action.py')
+		print '==================================================================='
+		print '%s %s running' % (t.now(), 'apt_cache_action.py')
 
 		self.error_package = ''
 		
@@ -76,9 +76,9 @@ class Main(object):
 		
 		except Exception as e:
 		
-			# print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
+			print '%s %s exception occurred' % (t.now(), 'apt_cache_action.py')
 		
-			# print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
+			print '%s %s exception value : %s' % (t.now(), 'apt_cache_action.py', e)
 
 			deets = 'Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc())
 
@@ -87,8 +87,8 @@ class Main(object):
 
 		self.respond()
 
-		# print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
-		# print '==================================================================='
+		print '%s %s exiting' % (t.now(), 'apt_cache_action.py')
+		print '==================================================================='
 
 
 	def respond(self):
@@ -97,7 +97,7 @@ class Main(object):
 		# if so, then call parent with the apf store install failed message
 		if self.action == 'action_list' and self.error_message != '':
 
-			call_parent('apt_action_list_error', {'error': self.error_message, 'package' = self.error_package})
+			call_parent('apt_action_list_error', {'error': self.error_message, 'package' : self.error_package})
 
 		else:
 
@@ -115,7 +115,7 @@ class Main(object):
 
 		else:
 
-			# print 'Action not in action_to_method dict'
+			print 'Action not in action_to_method dict'
 			pass
 
 
@@ -256,11 +256,11 @@ class Main(object):
 		
 				return "%s is BROKEN, cannot proceed with commit" % pkg.shortname
 
-		# print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
+		print '%s %s upgrading all packages' % (t.now(), 'apt_cache_action.py')
 		
 		self.cache.upgrade(True)
 
-		# print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
+		print '%s %s committing cache' % (t.now(), 'apt_cache_action.py')
 
 		self.commit_action()
 
@@ -297,7 +297,7 @@ class Main(object):
 
 		self.cache.upgrade(True)
 
-		# print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
+		print '%s %s fetching all packages' % (t.now(), 'apt_cache_action.py')
 
 		dprg = Download_Progress()
 
@@ -337,12 +337,12 @@ class Install_Progress(apt.progress.base.InstallProgress):
 	
 	def error(self, pkg, errormsg):
 
-		# print 'ERROR!!! \n%s\n' % errormsg
+		print 'ERROR!!! \n%s\n' % errormsg
 
 		try:
 			pkgname = os.path.basename(pkg).split('_')
 
-			# print 'Package affected!!! \n%s\n' % pkgname
+			print 'Package affected!!! \n%s\n' % pkgname
 
 			self.parent.error_package = pkgname[0]
 
@@ -462,14 +462,14 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		
 			self.pulse_time = t.now()
 		
-			# print 'Pulse ==========================================='
-			# print 'current_items', self.current_items
-			# print 'total_items', self.total_items 
-			# print 'total_bytes', self.total_bytes
-			# print 'fetched_bytes', self.fetched_bytes 
-			# print 'current_bytes', self.current_bytes
-			# print 'current_cps', self.current_cps 
-			# print 'Pulse ==========================================='
+			print 'Pulse ==========================================='
+			print 'current_items', self.current_items
+			print 'total_items', self.total_items 
+			print 'total_bytes', self.total_bytes
+			print 'fetched_bytes', self.fetched_bytes 
+			print 'current_bytes', self.current_bytes
+			print 'current_cps', self.current_cps 
+			print 'Pulse ==========================================='
 
 			pct = int(self.current_bytes / float(self.total_bytes) * 100)
 
