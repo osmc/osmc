@@ -348,6 +348,7 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def retrieve_install_status(self):
 
+
 		with os.popen('dpkg -l') as f:
 			self.package_list = ''.join(f.readlines())
 
@@ -372,8 +373,17 @@ class APF_STORE(object):
 				# grabs the item from the queue
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
 				apf = thread_queue.get(True, 1)
+
+				install_query = ['dpkg-query', '-W', '-f="${Status}"', apf.id,  '2>/dev/null']
 				
-				if apf.id in self.package_list:
+				try:
+					output = subprocess.check_output(install_query)
+
+				except subprocess.CalledProcessError as e:
+				# raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+					output = e.output
+				
+				if "ok installed" in output:
 					log('%s IS Installed' % apf.name)
 
 					apf.set_installed(True)
