@@ -175,7 +175,6 @@ then
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
-		--disable-sdl \
 		--disable-x11 \
 		--disable-xrandr \
 		--disable-openmax \
@@ -204,7 +203,6 @@ then
 	./configure \
 		--prefix=/usr \
 		--disable-x11 \
-		--disable-sdl \
 		--disable-xrandr \
 		--disable-openmax \
 		--disable-vdpau \
