@@ -2,6 +2,7 @@
 from datetime import datetime
 import json
 import os
+import requests
 import shlex
 import subprocess
 import sys
@@ -12,7 +13,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-__addon__              	= xbmcaddon.Addon()
+__addon__              	= xbmcaddon.Addon('script.module.osmcsetting.updates')
 __addonid__            	= __addon__.getAddonInfo('id')
 __scriptPath__         	= __addon__.getAddonInfo('path')
 __setting__            	= __addon__.getSetting
@@ -64,8 +65,8 @@ class HotFix(object):
 		''' Provides a dialog through which the user enters a 5-digit key code '''
 
 		# DEFAULT VALUE ONLY USED FOR TESTING
-		hf_key = DIALOG.input('Enter HotFix ID', default='fequdijumu', type=xbmcgui.INPUT_ALPHANUM)
-		# hf_key = DIALOG.input('Enter HotFix ID', default='fizikedaka', type=xbmcgui.INPUT_ALPHANUM)
+		hf_key = DIALOG.input(lang(32115), 'lanevudaqu', type=xbmcgui.INPUT_ALPHANUM)
+		# hf_key = DIALOG.input('Enter HotFix ID', type=xbmcgui.INPUT_ALPHANUM)
 
 		log(label='User entered hotfix ID', message=hf_key)
 
@@ -78,7 +79,7 @@ class HotFix(object):
 
 		# YET TO BE IMPLEMENTED
 
-		hf_cypher = 'fizikedaka'
+		hf_cypher = ''
 
 		return hf_key
 
@@ -188,7 +189,7 @@ class HotFix(object):
 		''' Asks the user to confirm that they wish to apply the instruction.
 			Returns TRUE, only if user clicks Yes. '''
 
-		user_confirmation = DIALOG.yesno('OSMC HotFix', 'Are you sure you would like to apply this HotFix?')
+		user_confirmation = DIALOG.yesno(lang(32116), lang(32117), lang(32118), lang(32119))
 
 		return user_confirmation
 
@@ -198,6 +199,8 @@ class HotFix(object):
 		''' Applies the instruction via the command line.
 			Returns the resulting output in a list of lines.'''
 
+		dangerous = ['rm -rf /', ]
+
 		results = []
 
 		for line in instruction:
@@ -205,6 +208,7 @@ class HotFix(object):
 			try:
 
 				instruct = shlex.split(line)
+				results.append('>>>>> INSTRUCTION >>>>> %s\n' % ' '.join(instruct))
 				
 				try:
 					results.append(subprocess.check_output(instruct))
@@ -217,14 +221,14 @@ class HotFix(object):
 
 			except Exception as e:
 
-				results.append(traceback.format_exc())
+				results.append('Error: %s\n%s' % (e.message, traceback.format_exc()))
 
 				break
 
 		return results
 
 
-	def resolution_dispatcher(self, results, resolution=[]):
+	def resolution_dispatcher(self, results, resolutions=[]):
 
 		''' Applies the stated resolutions in the file.
 			If LOG is not in resolutions, then add it in.'''
@@ -269,7 +273,7 @@ class HotFix(object):
 
 			log("OSMC HotFix upload failed.")
 
-			save = DIALOG.yesno("OSMC HotFix Uploader", "HotFix Upload failed.", "Save the output to /boot/?")
+			save = DIALOG.yesno(lang(32120), lang(32121), lang(32122))
 
 			if save:
 
@@ -279,9 +283,9 @@ class HotFix(object):
 
 			url = 'http://paste.osmc.io/ %s' % key
 
-			log(label="HotFix output uploaded to", message=url)
+			log(label="HotFix output uploaded to", message=url.replace(' ',''))
 
-			ok = DIALOG.ok("OSMC HotFix Uploader", "URL: %s" % url)
+			ok = DIALOG.ok(lang(32120), lang(32123), "URL: %s" % url)
 
 
 	def save_temp_hotfix_output(self, results):
@@ -299,7 +303,7 @@ class HotFix(object):
 
 		log('Copying HotFix output to /boot/')
 			
-		os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
+		os.popen('sudo cp -rf %s /boot/' % self.tmp_hfo_location)
 
 
 	def resolution_log(self, results):
