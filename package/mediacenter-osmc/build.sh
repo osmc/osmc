@@ -176,7 +176,6 @@ then
 		--prefix=/usr \
 		--enable-gles \
 		--disable-x11 \
-		--disable-xrandr \
 		--disable-openmax \
 		--enable-optical-drive \
 		--enable-libbluray \
@@ -203,7 +202,6 @@ then
 	./configure \
 		--prefix=/usr \
 		--disable-x11 \
-		--disable-xrandr \
 		--disable-openmax \
 		--disable-vdpau \
 		--disable-vaapi \
