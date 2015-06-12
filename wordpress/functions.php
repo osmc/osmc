@@ -143,8 +143,6 @@ function bones_register_sidebars() {
 
 // SCRIPTS //
 
-add_action( 'wp_enqueue_scripts' );
-
 
 // EXCERPT //
 function custom_excerpt_length( $length ) {
