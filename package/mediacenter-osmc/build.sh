@@ -27,7 +27,7 @@ then
 	handle_dep "make"
 	handle_dep "curl"
 	handle_dep "cvs"
-	handle_dep "default-jre"
+	handle_dep "default-jre-headless"
 	handle_dep "fp-compiler"
 	handle_dep "gawk"
 	handle_dep "gdc"
