@@ -3,31 +3,26 @@
 	<!-- script-skinshortcuts -->
 	<defaultcontrol always="true">10</defaultcontrol>
 	<include>DialogAnimation</include>
-
 	<controls>
-
 		<control type="group">
 			<left>140</left>
 			<top>140</top>
 			<width>1640</width>
 			<height>780</height>
-
 			<!-- Background -->
 			<control type="image">
 				<width>1640</width>
 				<height>780</height>
 				<texture colordiffuse="DialogBackgroundColor">common/white.png</texture>
 			</control>
-
 			<!-- Heading -->
 			<control type="label" id="500">
-			<left>20</left>
+				<left>20</left>
 				<width>1620</width>
 				<height>72</height>
 				<font>XLarge</font>
 				<textcolor>ColorHeading</textcolor>
 			</control>
-
 			<!-- Move down -->
 			<control type="button" id="304">
 				<left>-10</left>
@@ -39,7 +34,6 @@
 				<onup>Control.Move(211,-1)</onup>
 				<ondown>Control.Move(211,1)</ondown>
 			</control>
-
 			<!-- Move up -->
 			<control type="button" id="303">
 				<left>-10</left>
@@ -51,10 +45,9 @@
 				<onup>Control.Move(211,-1)</onup>
 				<ondown>Control.Move(211,1)</ondown>
 			</control>
-
 			<!-- Left list -->
 			<control type="list" id="211">
-			<left>20</left>
+				<left>20</left>
 				<top>100</top>
 				<width>360</width>
 				<height>660</height>
@@ -63,25 +56,33 @@
 				<onup>noop</onup>
 				<ondown>9001</ondown>
 				<scrolltime tween="sine" easing="out">240</scrolltime>
-
 				<itemlayout width="360" height="66">
 					<control type="label">
 						<left>25</left>
 						<width>260</width>
 						<height>66</height>
-						<textcolor>ColorHeading</textcolor>
+						<textcolor>ColorNF</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 				</itemlayout>
-
 				<focusedlayout width="360" height="66">
 					<control type="label">
 						<left>25</left>
 						<width>260</width>
 						<height>66</height>
 						<scroll>true</scroll>
+						<textcolor>ColorFO</textcolor>
 						<label>$INFO[ListItem.Label]</label>
-						<animation effect="fade" start="100" end="75" time="0" condition="!Control.HasFocus(211)">Conditional</animation>
+						<visible>Control.HasFocus(303) | Control.HasFocus(304)</visible>
+					</control>
+					<control type="label">
+						<left>25</left>
+						<width>260</width>
+						<height>66</height>
+						<scroll>true</scroll>
+						<textcolor>ColorSelected</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+						<visible>!Control.HasFocus(303) + !Control.HasFocus(304)</visible>
 					</control>
 					<control type="image">
 						<left>290</left>
@@ -112,13 +113,11 @@
 						<visible>Control.HasFocus(303)</visible>
 					</control>
 				</focusedlayout>
-
 			</control>
-
 			<!-- Right grouplist -->
 			<control type="grouplist" id="9000">
-				<left>600</left>
-				<top>228</top>
+				<left>400</left>
+				<top>100</top>
 				<width>1200</width>
 				<height>660</height>
 				<itemgap>0</itemgap>
@@ -129,14 +128,12 @@
 				<orientation>vertical</orientation>
 				<usecontrolcoords>true</usecontrolcoords>
 				<scrolltime tween="sine" easing="out">240</scrolltime>
-
 				<!-- Change shortcut -->
 				<control type="button" id="401">
 					<width>1200</width>
 					<height>66</height>
 					<label>$ADDON[script.skinshortcuts 32048]</label>
 				</control>
-
 				<!-- Change label -->
 				<control type="button" id="305">
 					<width>1200</width>
@@ -144,7 +141,6 @@
 					<label>$ADDON[script.skinshortcuts 32025]</label>
 					<label2>$INFO[Container(211).ListItem.Label]</label2>
 				</control>
-
 				<!-- Change icon -->
 				<control type="button" id="306">
 					<width>1200</width>
@@ -152,7 +148,6 @@
 					<label>$ADDON[script.skinshortcuts 32026]</label>
 					<label2>$INFO[Container(211).ListItem.Icon]</label2>
 				</control>
-
 				<!-- Change action -->
 				<control type="button" id="307">
 					<width>1200</width>
@@ -160,42 +155,36 @@
 					<label>$ADDON[script.skinshortcuts 32027]</label>
 					<label2>$INFO[Container(211).ListItem.Property(displaypath)]</label2>
 				</control>
-
 				<!-- Edit sub menu -->
 				<control type="button" id="405">
 					<width>1200</width>
 					<label>$ADDON[script.skinshortcuts 32072]</label>
 					<visible>StringCompare(Window.Property(groupname),mainmenu)</visible>
 				</control>
-
 				<!-- Edit widget -->
 				<control type="button" id="309">
-					<width>1200</width>				
+					<width>1200</width>
 					<label>$ADDON[script.skinshortcuts 32044]</label>
 					<label2>$INFO[Container(211).ListItem.Property(widgetName)]</label2>
 					<visible>StringCompare(Window.Property(groupname), mainmenu)</visible>
 				</control>
-
 				<!-- Remove -->
 				<control type="button" id="302">
 					<width>1200</width>
 					<height>66</height>
 					<label>-</label>
 				</control>
-
 				<!-- Add item -->
 				<control type="button" id="301">
 					<width>1200</width>
 					<height>66</height>
 					<label>$ADDON[script.skinshortcuts 32000]</label>
 				</control>
-
 			</control>
-
 			<!-- Button grouplist -->
 			<control type="grouplist" id="9001">
-				<left>600</left>
-				<top>926</top>
+				<left>400</left>
+				<top>694</top>
 				<width>1620</width>
 				<itemgap>0</itemgap>
 				<onleft>303</onleft>
@@ -203,7 +192,6 @@
 				<onup>9000</onup>
 				<ondown>noop</ondown>
 				<orientation>horizontal</orientation>
-
 				<!-- OK Button -->
 				<control type="button" id="10">
 					<width>200</width>
@@ -212,24 +200,18 @@
 					<onclick condition="StringCompare(Window.Property(groupname),mainmenu)">RunScript(script.skinshortcuts,type=buildxml&amp;mainmenuID=9000&amp;group=mainmenu|&amp;group=shutdown)</onclick>
 					<onclick>Close</onclick>
 				</control>
-
 				<!-- Reset -->
 				<control type="button" id="308">
 					<width>400</width>
 					<label>$ADDON[script.skinshortcuts 32028]</label>
 				</control>
-
 				<!-- Reset all -->
 				<control type="button" id="999">
 					<width>400</width>
 					<onclick>RunScript(script.skinshortcuts,type=resetall)</onclick>
 					<label>$ADDON[script.skinshortcuts 32037]</label>
 				</control>
-
 			</control>
-
 		</control>
-
 	</controls>
-
 </window>
