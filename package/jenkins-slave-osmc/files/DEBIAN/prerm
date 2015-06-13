@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$1" = "remove" ]; then
+	systemctl disable jenkins-slave.service >/dev/null 2>&1
+	systemctl stop jenkins-slave.service >/dev/null 2>&1
+	rm -f /opt/osmc-tc/jenkins-slave/slave.jar
+fi

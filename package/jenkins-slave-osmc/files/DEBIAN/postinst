@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable jenkins-slave.service >/dev/null 2>&1
+	        echo "Please make sure you edit /etc/jenkins-slave.conf to add your device's slave name and secret"
+	        echo "then restart the slave with 'sudo systemctl restart jenkins-slave.service'"
+	fi
+	if systemctl is-enabled jenkins-slave.service >/dev/null; then systemctl start jenkins-slave.service; fi
+	exit 0
+fi

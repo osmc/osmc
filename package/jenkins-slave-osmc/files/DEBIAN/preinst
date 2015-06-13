@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" = "install" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; fi
+
+if [ "$1" = "upgrade" ]; then
+	systemctl stop jenkins-slave.service >/dev/null 2>&1
+	exit 0
+fi

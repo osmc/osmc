@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ "$SLAVENAME" = "SlaveName" ] || [ -z "$SERVER" ] || [ -z "$SLAVENAME" ] || [ -z "$SECRET" ]; then
+	echo "Exiting because /etc/jenkins-slave.conf has not been configured."
+	exit
+fi
+
+while true; do
+	# Work around jenkins slave.jar dns lookup bug
+	while true; do if host $SERVER; then break; else sleep 5; fi; done
+
+	cd /opt/osmc-tc/jenkins-slave/
+	curl -O -L http://$SERVER/jnlpJars/slave.jar
+	java -jar slave.jar -jnlpUrl "http://$SERVER/computer/$SLAVENAME/slave-agent.jnlp" -secret "$SECRET"
+	echo "Java exited with return code $? - relaunching in 60 seconds."
+	sleep 60
+done
