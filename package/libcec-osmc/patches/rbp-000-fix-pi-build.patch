@@ -16,14 +16,6 @@ diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/Chec
 index 828cdb2..e631b1b 100644
 --- a/src/libcec/cmake/CheckPlatformSupport.cmake
 +++ b/src/libcec/cmake/CheckPlatformSupport.cmake
-@@ -14,6 +14,7 @@
- #
- 
- set(PLATFORM_LIBREQUIRES "")
-+set(HAVE_RPI_API "1")
- 
- # Pulse-Eight devices are always supported
- add_definitions(-DHAVE_P8_USB)
 @@ -75,9 +76,9 @@ else()
    endif()
  
