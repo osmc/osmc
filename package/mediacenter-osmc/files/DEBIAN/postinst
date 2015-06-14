@@ -1,5 +1,8 @@
 #!/bin/bash
 
 if [ "$1" = "configure" ]; then
-	systemctl enable mediacenter.service >/dev/null 2>&1
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable mediacenter.service >/dev/null 2>&1
+	fi
 fi
