@@ -255,12 +255,12 @@ function pielegend (data) {
   
   var options = {
     labelInterpolationFnc: function(value) {
-      var math = Math.round(value / data.series.reduce(sum) * 100) + '%';
+      var math = parseFloat((value / data.series.reduce(sum) * 100)).toFixed(2) + '%';
       calc.push(math);
       return math;
     },
     chartPadding: 0,
-    labelOffset: 20,
+    labelOffset: 15,
   };
     
   setTimeout(function() {
