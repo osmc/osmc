@@ -64,6 +64,8 @@ $res2: 33em;
 
 @import "lib/grid";
 @import "lib/woocommerce";
+@import "lib/custom-chartist-settings";
+@import "chartist/dist/scss/chartist";
 
 // MAIN //
 
@@ -1268,7 +1270,7 @@ nav.pagination {
 
 button {
   background-color: $dark-trans;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   border: 0;
   @include border-radius(2px);
   color: $white;
@@ -1784,8 +1786,8 @@ footer {
       button {
         background-color: $lgrey;
         width: 35%;
-        max-width: 6em;
-        height: 2.6em;
+        max-width: 6.5em;
+        height: 2.8em;
         padding: 0.4em 0.5em;
         margin: 0 0.2em;
         vertical-align: middle;
@@ -2293,6 +2295,9 @@ footer {
 }
 
 @media screen and (max-width: $res2) {
+  button {
+    padding: 0.4em 0.7em 0.5em;
+  }
   .download.os {
     margin: 1em 0 3.5em;
   }

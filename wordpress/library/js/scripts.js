@@ -245,7 +245,35 @@ jQuery(".download.devices .wrapper").click(function () {
   }, 800);
 });
 
-// SHOP //
+
+// CHARTIST.JS
+
+function pielegend (data) {
+  
+  var sum = function(a, b) { return a + b };
+  var calc = [];
+  
+  var options = {
+    labelInterpolationFnc: function(value) {
+      var math = Math.round(value / data.series.reduce(sum) * 100) + '%';
+      calc.push(math);
+      return math;
+    },
+    chartPadding: 0,
+    labelOffset: 20,
+  };
+    
+  setTimeout(function() {
+    jQuery(".ct-chart").after('<div class="ct-list"></div>');
+    var legend = jQuery(".ct-list");
+    jQuery.each(data.pielabels, function(i, val) {
+      var listitem = "<button class='ct-series-" + i + "'>" + calc[i] + " - " + val + "</button>";
+      legend.append(listitem);
+    });
+  }, 100);
+  
+  return options;
+};
 
 // JS TABLE //
 

@@ -131,7 +131,9 @@ function bones_scripts_and_styles() {
 		}
 
 		//adding scripts file in the footer
-		wp_register_script( 'script.js', get_stylesheet_directory_uri() . '/library/js/scripts_v2.min.js', array( 'jquery' ), '', true );
+        $script = 'scripts_v3.min.js';
+      
+		wp_register_script( 'script.js', get_stylesheet_directory_uri() . '/library/js/' . $script, array( 'jquery' ), '', true );
 
 		/*
 		I recommend using a plugin to call jQuery
