@@ -1,2 +1,4 @@
 #!/bin/bash
 
+# block removal of device metapackage due to broken dependencies
+if [ "$1" = "remove" ]; then exit 1; fi
