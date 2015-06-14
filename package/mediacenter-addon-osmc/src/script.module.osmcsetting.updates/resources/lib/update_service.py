@@ -779,12 +779,10 @@ class Main(object):
 				
 					log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
 
-			else:
+			# run the update
 
-				# run the update
-
-				self.call_child_script('update')
-		
+			self.call_child_script('update')
+	
 		else:
 
 			self.function_holding_pattern = self.holding_pattern_update
@@ -1068,7 +1066,7 @@ class Main(object):
 
 		log('The following packages have newer versions and are upgradable: ')
 
-		for pkg in self.cache:
+		for pkg in self.cache.get_changes():
 
 			if pkg.is_upgradable:
 
