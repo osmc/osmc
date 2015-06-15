@@ -1,19 +1,19 @@
-From 240dbb1d9516cb89df3a08ea91bdfacf919af3f3 Mon Sep 17 00:00:00 2001
-From: Matus Kral <matuskral@me.com>
-Date: Sat, 28 Mar 2015 23:30:03 +0100
-Subject: [PATCH] Add CEC IMX adapter as known type and set no polling. - that
- eliminates extensive periodic /sys walkthrough
+From e7f7f925183d001a888e64941432aff575df5e1b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 15 Jun 2015 09:56:09 +0100
+Subject: [PATCH] Do not poll sysfs for CEC
 
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/peripherals/PeripheralTypes.h                | 5 +++++
  xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp | 4 ++++
  2 files changed, 9 insertions(+)
 
 diff --git a/xbmc/peripherals/PeripheralTypes.h b/xbmc/peripherals/PeripheralTypes.h
-index e92fd41..2b362f0 100644
+index 699e1b2..fbe0cd2 100644
 --- a/xbmc/peripherals/PeripheralTypes.h
 +++ b/xbmc/peripherals/PeripheralTypes.h
-@@ -37,6 +37,7 @@ namespace PERIPHERALS
+@@ -38,6 +38,7 @@ namespace PERIPHERALS
      PERIPHERAL_BUS_USB,
      PERIPHERAL_BUS_PCI,
      PERIPHERAL_BUS_RPI,
@@ -21,7 +21,7 @@ index e92fd41..2b362f0 100644
      PERIPHERAL_BUS_CEC
    };
  
-@@ -151,6 +152,8 @@ namespace PERIPHERALS
+@@ -152,6 +153,8 @@ namespace PERIPHERALS
          return "pci";
        case PERIPHERAL_BUS_RPI:
          return "rpi";
@@ -30,20 +30,20 @@ index e92fd41..2b362f0 100644
        case PERIPHERAL_BUS_CEC:
          return "cec";
        default:
-@@ -169,6 +172,8 @@ namespace PERIPHERALS
+@@ -170,6 +173,8 @@ namespace PERIPHERALS
          return PERIPHERAL_BUS_PCI;
-       else if (strTypeLowerCase.Equals("rpi"))
+       else if (strTypeLowerCase == "rpi")
          return PERIPHERAL_BUS_RPI;
-+      else if (strTypeLowerCase.Equals("imx"))
-+        return PERIPHERAL_BUS_IMX;
-       else if (strTypeLowerCase.Equals("cec"))
++      else if (strTypeLowerCase == "imx")
++	return PERIPHERAL_BUS_IMX;
+       else if (strTypeLowerCase == "cec")
          return PERIPHERAL_BUS_CEC;
  
 diff --git a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
-index 4941ae6..94e4a08 100644
+index 70ba8d0..63e9624 100644
 --- a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
 +++ b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
-@@ -104,6 +104,10 @@ bool CPeripheralBusCEC::PerformDeviceScan(PeripheralScanResults &results)
+@@ -103,6 +103,10 @@ bool CPeripheralBusCEC::PerformDeviceScan(PeripheralScanResults &results)
        /** the Pi's adapter cannot be removed, no need to rescan */
        m_bNeedsPolling = false;
        break;
@@ -54,3 +54,6 @@ index 4941ae6..94e4a08 100644
      default:
        break;
      }
+-- 
+2.1.0
+
