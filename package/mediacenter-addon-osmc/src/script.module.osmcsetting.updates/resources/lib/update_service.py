@@ -1081,7 +1081,7 @@ class Main(object):
 
 			return 'bail', 'There are no osmc packages'
 
-		if not any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x or "dbus" in x or "dbus-x11" in x for x in available_updates]):
+		if not any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x or "libcec-osmc" in x or "dbus" in x or "dbus-x11" in x for x in available_updates]):
 
 			self.EXTERNAL_UPDATE_REQUIRED = 0
 
