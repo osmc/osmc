@@ -338,6 +338,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if focused_control != self.current_panel:
 
                 self.current_panel = focused_control
+                # stop any running threads on change of panel
+                self.stop_wifi_population_thread()
+                self.stop_bluetooth_population_thread()
 
                 if focused_control == SELECTOR_WIRED_NETWORK:
                     self.populate_wired_panel()
@@ -619,7 +622,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     if t.getName() == WIFI_THREAD_NAME:
                         threadRunning = True
                 if not threadRunning:
-                    log('Starting ' + WIFI_THREAD_NAME)
                     self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.conn_ssid)
                     self.wifi_populate_bot.setDaemon(True)
                     self.wifi_populate_bot.start()
@@ -704,10 +706,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.WFP.reset()
         self.hide_controls(ALL_WIRELESS_CONTROLS)
         self.toggle_controls(True, [WIRELESS_NETWORKS])
-        osmc_network.toggle_wifi_state(not osmc_network.is_wifi_enabled())
+        wifi_state = not osmc_network.is_wifi_enabled()
+        osmc_network.toggle_wifi_state(wifi_state)
         # 5 second wait to allow connman to make the changes before refreshing
         time.sleep(5)
-        if not osmc_network.is_wifi_enabled():
+        if not wifi_state:
+            self.stop_wifi_population_thread()
             self.current_network_config = {}
         self.clear_busy_dialogue()
 
@@ -839,10 +843,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def populate_bluetooth_panel(self):
         bluetoothRadioButton = self.getControl(BLUETOOTH_ENABLE_TOGGLE)
-        bluetoothRadioButton.setSelected(osmc_bluetooth.is_bluetooth_enabled())
+        bluetooth_enabled = osmc_bluetooth.is_bluetooth_enabled()
+        bluetoothRadioButton.setSelected(bluetooth_enabled)
 
         # disable all if bluetooth is not enabled
-        if not osmc_bluetooth.is_bluetooth_enabled():
+        if not bluetooth_enabled:
             # disable all controls
             self.toggle_controls(False, BLUETOOTH_CONTROLS)
             return
@@ -856,7 +861,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if t.getName() == BLUETOOTH_THREAD_NAME:
                 threadRunning = True
         if not threadRunning:
-            log('Starting ' + BLUETOOTH_THREAD_NAME)
             self.bluetooth_population_thread = bluetooth_population_thread(self.BTD, self.BTP)
             self.bluetooth_population_thread.setDaemon(True)
             self.bluetooth_population_thread.start()
@@ -866,6 +870,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.show_busy_dialogue()
             if osmc_bluetooth.is_bluetooth_enabled():
                 osmc_bluetooth.toggle_bluetooth_state(False)
+                self.stop_bluetooth_population_thread()
             else:
                 osmc_bluetooth.toggle_bluetooth_state(True)
             self.clear_busy_dialogue()
@@ -1068,9 +1073,6 @@ class bluetooth_population_thread(threading.Thread):
     def run(self):
         runs = 0
         while not self.exit:
-            # ask the thread to exit if bluetooth is no longer enabled
-            if not osmc_bluetooth.is_bluetooth_enabled():
-                self.stop_thread()
             # update gui every 2 seconds
             if runs % 200 == 0 and not self.exit:
                 self.update_bluetooth_lists()
@@ -1083,10 +1085,8 @@ class bluetooth_population_thread(threading.Thread):
 
             xbmc.sleep(10)
             runs += 1
-        log('Bluetooth thread ended')
 
     def update_bluetooth_lists(self):
-        log('Updating Bluetooth Lists')
         self.trusted_dict = self.populate_bluetooth_dict(True)
         self.discovered_dict = self.populate_bluetooth_dict(False)
         self.update_list_control(dict(self.discovered_dict), self.discovered_list_control)
@@ -1165,7 +1165,6 @@ class wifi_scanner_bot(threading.Thread):
         super(wifi_scanner_bot, self).__init__()
 
     def run(self):
-        log('Scanning WIFI')
         osmc_network.scan_wifi()
 
 
@@ -1190,9 +1189,6 @@ class wifi_populate_bot(threading.Thread):
         running_dict = {}
         runs = 0
         while not self.exit:
-            # ask the thread to exit if wifi is no longer enabled
-            if not osmc_network.is_wifi_enabled():
-                self.stop_thread()
             # only run the network check every 2 seconds, but allow the exit command to be checked every 10ms
             if runs % 200 == 0 and not self.exit:
                 log('Updating Wifi networks')
@@ -1211,17 +1207,15 @@ class wifi_populate_bot(threading.Thread):
                                 self.populate_ip_controls(info, WIRELESS_IP_VALUES)
                         except:
                             pass
-
-            if not self.exit and runs % 600 == 0: # every minute re-scan wifi unless the thread has been asked to exit
+             # every minute re-scan wifi unless the thread has been asked to exit
+            if not self.exit and runs % 600 == 0:
                 self.wifi_scanner_bot = wifi_scanner_bot()
                 self.wifi_scanner_bot.setDaemon(True)
                 self.wifi_scanner_bot.start()
             xbmc.sleep(10)
             runs += 1
-        log('Wifi thread ended')
 
     def stop_thread(self):
-        log('Request to stop thread')
         self.exit = True
 
     def update_list_control(self, running_dict, multiAdpter):
