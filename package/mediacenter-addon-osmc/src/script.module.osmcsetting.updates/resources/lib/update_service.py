@@ -130,6 +130,7 @@ class Main(object):
 
 		# Items that start with a hyphen should have the hardware prefix attached
 		self.UPDATE_WARNING_LIST = [(str(self.prefix) + x) if x[0] =='-' else x for x in self.UPDATE_WARNING_LIST]
+		log('UPDATE_WARNING_LIST: %s' % self.UPDATE_WARNING_LIST)
 
 		# the time that the service started
 		self.service_start = datetime.now()
@@ -1148,8 +1149,7 @@ class Main(object):
 				if pkg.shortname in self.UPDATE_WARNING_LIST:
 
 					#send the package for a major update check
-					if self.check_for_major_release(pkg):
-						self.UPDATE_WARNING = True
+					self.UPDATE_WARNING = self.check_for_major_release(pkg)
 
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		if not any(['osmc' in x for x in available_updates]):
@@ -1280,27 +1280,32 @@ class Main(object):
 			
 			return 'Download, install, prompt if restart needed'
 
-
+	@clog(log)
 	def check_for_major_release(self, pkg):
 		''' Checks a package to see whether it is a major release. This should trigger a warning to users that things might break'''
 
 		dig = '1234567890'
 
+		log('Checking package (%s) for major version change.' % pkg.shortname)
+
 		# get version of current package, raw_local_version_string
 		rlv = subprocess.check_output(["/usr/bin/dpkg-query", "-W", "-f", "'${version}\n'", pkg.shortname])
+		log(rlv)
 		lv = ''.join([x for x in rlv[:rlv.index(".")] if x in list(dig)])
+		log(lv)
 
 		# get version of updating package, raw_remote_version_string
 		rrv = pkg.versions[0]
+		log(rrv)
 		rv = ''.join([x for x in rrv[:rrv.index(".")] if x in list(dig)])
-
+		log(rv)
 		try:
 			if int(lv) < int(rv):
 				return True
 		except:
-			return False
+			pass
 
-
+		return False
 
 
 	@clog(log)
