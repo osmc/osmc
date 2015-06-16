@@ -129,7 +129,7 @@ class Main(object):
 									]
 
 		# Items that start with a hyphen should have the hardware prefix attached
-		self.UPDATE_WARNING_LIST = [(str(self.prefix) + x) if x[0] =='-' else x for x in self.UPDATE_WARNING_LIST]
+		self.UPDATE_WARNING_LIST = [(str(self.hw_prefix) + x) if x[0] =='-' else x for x in self.UPDATE_WARNING_LIST]
 		log('UPDATE_WARNING_LIST: %s' % self.UPDATE_WARNING_LIST)
 
 		# the time that the service started
@@ -297,7 +297,7 @@ class Main(object):
 		if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)') or bypass:
 
 			# if there is an update warning (for a major version change in Kodi) then alert the user
-			if self.UPDATE_WARNING
+			if self.UPDATE_WARNING:
 
 				confirm_update = self.display_update_warning()
 
@@ -1272,7 +1272,7 @@ class Main(object):
 
 			if self.UPDATE_WARNING:
 
-				confirm = self.display_update_warning:
+				confirm = self.display_update_warning()
 				
 				if not confirm: return 'user declined to do a major version update'
 
