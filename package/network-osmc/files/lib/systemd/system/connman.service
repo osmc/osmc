@@ -10,7 +10,8 @@ Wants=remote-fs-pre.target
 Type=dbus
 BusName=net.connman
 EnvironmentFile=-/etc/connman.prefs
-Restart=on-failure
+Restart=always
+RestartSec=5
 ExecStart = /usr/bin/start-network
 StandardOutput=null
 
