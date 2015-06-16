@@ -51,6 +51,25 @@ def exit_osmc_settings_addon():
 
 	return 'OSMC Settings addon called to exit'
 
+def get_hardware_prefix():
+	''' Returns the prefix for the hardware type. rbp, rbp2, etc '''	
+
+	with open('/proc/cmdline', 'r') as f:
+
+		line = f.readline()
+
+		settings = line.split(' ')
+
+		prefix = None
+
+		for setting in settings:
+
+			if setting.startswith('osmcdev='):
+
+				return setting[len('osmcdev='):]
+
+	return None
+
 
 class Monitah(xbmc.Monitor):
 
@@ -89,6 +108,28 @@ class Main(object):
 	def __init__(self):
 
 		self.first_run = True
+
+		# set the hardware prefix
+		self.hw_prefix = get_hardware_prefix()
+
+		# list of packages that require an external update
+		self.EXTERNAL_UPDATE_REQUIRED_LIST = 	[
+												"mediacenter",
+												"lirc-osmc",
+												"eventlircd-osmc",
+												"libcec-osmc",
+												"dbus",
+												"dbus-x11"
+												]
+
+		# list of packages that may break compatibility with addons and databases.
+		self.UPDATE_WARNING = False
+		self.UPDATE_WARNING_LIST = 	[
+									"-mediacenter-osmc",
+									]
+
+		# Items that start with a hyphen should have the hardware prefix attached
+		self.UPDATE_WARNING_LIST = [(str(self.prefix) + x) if x[0] =='-' else x for x in self.UPDATE_WARNING_LIST]
 
 		# the time that the service started
 		self.service_start = datetime.now()
@@ -254,6 +295,21 @@ class Main(object):
 		# stay in the holding pattern until the user returns to the Home screen
 		if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)') or bypass:
 
+			# if there is an update warning (for a major version change in Kodi) then alert the user
+			if self.UPDATE_WARNING
+
+				confirm_update = self.display_update_warning()
+
+				if not confirm_update:
+
+					# remove the function from the holding pattern
+					self.function_holding_pattern = False
+
+					# skip all future update checks (the user will have to run the check for updates manually.)
+					self.skip_future_update_checks()
+
+					return 'User declined to update major version of Kodi, skipping future update checks'
+
 			self.function_holding_pattern = False
 
 			if not self.EXTERNAL_UPDATE_REQUIRED:
@@ -283,18 +339,24 @@ class Main(object):
 			# if the code reaches this far, the user has elected not to install right away
 			# so we will need to suppress further update checks until the update occurs
 			# we put a file there to make sure the suppression carries over after a reboot
-				
-			# create the file that will prevent further update checks until the updates have been installed
-			with open(self.block_update_file, 'w') as f:
-				f.write('d')
-
-			# trigger the flag to skip update checks
-			self.skip_update_check = True
+			self.skip_future_update_checks()
 
 			if not self.s['suppress_icon']:
 				self.window.setProperty('OSMC_notification', 'true')
 
 			return 'skip_update_check= %s' % self.skip_update_check
+
+
+	# MAIN METHOD
+	def skip_future_update_checks(self):
+		''' Sets the conditions for future update checks to be blocked. '''
+
+		# create the file that will prevent further update checks until the updates have been installed
+		with open(self.block_update_file, 'w') as f:
+			f.write('d')
+
+		# trigger the flag to skip update checks
+		self.skip_update_check = True
 
 
 	# MAIN METHOD
@@ -971,6 +1033,12 @@ class Main(object):
 
 			# else:
 
+			# warn the user if there is a major Kodi update that will be installed
+			# bail if they decide not to proceed
+			if self.UPDATE_WARNING:
+				confirm = self.display_update_warning()
+				if not confirm: return
+
 			ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
 
 			if ans:
@@ -1032,6 +1100,8 @@ class Main(object):
 	@clog(log)
 	def check_for_legit_updates(self):
 
+		self.UPDATE_WARNING = False
+
 		self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		check, msg = self.check_for_broken_installs()
@@ -1074,6 +1144,13 @@ class Main(object):
 
 				available_updates.append(pkg.shortname.lower())
 
+				# check whether the package is one that should be monitored for significant version change
+				if pkg.shortname in self.UPDATE_WARNING_LIST:
+
+					#send the package for a major update check
+					if self.check_for_major_release(pkg):
+						self.UPDATE_WARNING = True
+
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		if not any(['osmc' in x for x in available_updates]):
 
@@ -1081,7 +1158,7 @@ class Main(object):
 
 			return 'bail', 'There are no osmc packages'
 
-		if not any(["mediacenter" in x or "lirc-osmc" in x or "eventlircd-osmc" in x or "libcec-osmc" in x or "dbus" in x or "dbus-x11" in x for x in available_updates]):
+		if not any([bl in av for bl in self.EXTERNAL_UPDATE_REQUIRED_LIST for av in available_updates]):
 
 			self.EXTERNAL_UPDATE_REQUIRED = 0
 
@@ -1090,7 +1167,25 @@ class Main(object):
 
 			self.window.setProperty('OSMC_notification', 'true')
 
+		# display a warning to the user
+		if self.UPDATE_WARNING:
+			if self.s['on_upd_detected'] not in [1, 2, 3, 4]:
+				confirm_update = self.display_update_warning()
+
+				if not confirm_update:
+
+					return 'bail', 'User declined to update major version of Kodi'
+
 		return 'passed', 'legit updates available'
+
+
+	def display_update_warning(self):
+		''' Displays a modal warning to the user that a major update is available, but that this could potentially cause
+			addon or database incompatibility.'''
+
+		user_confirm = DIALOG.yesno(lang(32077), lang(32128), lang(32127), lang(32126), yeslabel=lang(32125), nolabel=lang(32124))
+
+		return user_confirm
 
 
 	# ACTION METHOD
@@ -1175,9 +1270,37 @@ class Main(object):
 		elif self.s['on_upd_detected'] == 4 and not self.EXTERNAL_UPDATE_REQUIRED:
 			# Download, install, prompt if restart needed (restart is not needed)
 
+			if self.UPDATE_WARNING:
+
+				confirm = self.display_update_warning:
+				
+				if not confirm: return 'user declined to do a major version update'
+
 			self.call_child_script('commit')
 			
 			return 'Download, install, prompt if restart needed'
+
+
+	def check_for_major_release(self, pkg):
+		''' Checks a package to see whether it is a major release. This should trigger a warning to users that things might break'''
+
+		dig = '1234567890'
+
+		# get version of current package, raw_local_version_string
+		rlv = subprocess.check_output(["/usr/bin/dpkg-query", "-W", "-f", "'${version}\n'", pkg.shortname])
+		lv = ''.join([x for x in rlv[:rlv.index(".")] if x in list(dig)])
+
+		# get version of updating package, raw_remote_version_string
+		rrv = pkg.versions[0]
+		rv = ''.join([x for x in rrv[:rrv.index(".")] if x in list(dig)])
+
+		try:
+			if int(lv) < int(rv):
+				return True
+		except:
+			return False
+
+
 
 
 	@clog(log)
