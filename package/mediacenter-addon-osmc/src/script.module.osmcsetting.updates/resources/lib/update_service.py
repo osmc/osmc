@@ -1280,6 +1280,7 @@ class Main(object):
 			
 			return 'Download, install, prompt if restart needed'
 
+
 	@clog(log)
 	def check_for_major_release(self, pkg):
 		''' Checks a package to see whether it is a major release. This should trigger a warning to users that things might break'''
@@ -1290,15 +1291,23 @@ class Main(object):
 
 		# get version of current package, raw_local_version_string
 		rlv = subprocess.check_output(["/usr/bin/dpkg-query", "-W", "-f", "'${version}\n'", pkg.shortname])
-		log(rlv)
+		log('dpkg query results: %s' % rlv)
+
 		lv = ''.join([x for x in rlv[:rlv.index(".")] if x in list(dig)])
-		log(lv)
+		log('Local version number: %s' % lv)
 
 		# get version of updating package, raw_remote_version_string
-		rrv = pkg.versions[0]
-		log(rrv)
+		versions = pkg.versions
+		log('Versions available: %s' % versions)
+
+		if not versions: return False
+
+		rrv = versions[0].version
+		log('First version selected: %s' % rrv)
+
 		rv = ''.join([x for x in rrv[:rrv.index(".")] if x in list(dig)])
-		log(rv)
+		log('Available version string: %s' % rv)
+
 		try:
 			if int(lv) < int(rv):
 				return True
