@@ -37,6 +37,7 @@ private slots:
     void on_versionnextButton_clicked();
     void replyFinished(QNetworkReply* reply);
     void on_useLocalBuildCheckbox_stateChanged(int arg1);
+    void displayNetworkErrorMessage();
 
 private:
     Ui::VersionSelection *ui;
