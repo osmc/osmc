@@ -1,0 +1,27 @@
+From ec48b406a5667c4e812581893f3aab600d693337 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 15 Jun 2015 14:09:55 +0100
+Subject: [PATCH] Make sure we do not remove the current working directory! We
+ kind of need that!
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/xbmc-addons.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/depends/xbmc-addons.include b/tools/depends/xbmc-addons.include
+index c2726d6..5343f12 100644
+--- a/tools/depends/xbmc-addons.include
++++ b/tools/depends/xbmc-addons.include
+@@ -44,7 +44,7 @@ distclean:
+ 	rm -rf $(PLATFORM) .installed-$(PLATFORM) native
+ 
+ .installed-$(PLATFORM): $(DEPS)
+-	cd $(ADDON_PROJECT_DIR) && (git clean -xfd || rm -rf CMakeCache.txt CMakeFiles cmake_install.cmake build/*)
++	cd $(ADDON_PROJECT_DIR) && (rm -rf CMakeCache.txt CMakeFiles cmake_install.cmake build/*)
+ 	mkdir -p $(PLATFORM)
+ ifeq ($(PREFIX),)
+ 	@echo
+-- 
+2.1.0
+

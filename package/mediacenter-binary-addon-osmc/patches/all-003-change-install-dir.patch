@@ -1,0 +1,26 @@
+From ad2618f967e94896b3323363445b7c42572ec99b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 16 Jun 2015 01:11:18 +0100
+Subject: [PATCH] Change installation directory of addons
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/xbmc-addons.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/depends/xbmc-addons.include b/tools/depends/xbmc-addons.include
+index d26d2e0..1ca503d 100644
+--- a/tools/depends/xbmc-addons.include
++++ b/tools/depends/xbmc-addons.include
+@@ -56,7 +56,7 @@ ifeq ($(CROSS_COMPILING),yes)
+          cp -f $(abs_top_srcdir)/target/config-binaddons.site $(PLATFORM)/build/depends/share/config.site
+ endif
+ 	cd $(PLATFORM); \
+-         $(CMAKE) -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) $(CMAKE_EXTRA) \
++         $(CMAKE) -DCMAKE_INSTALL_PREFIX=$(INSTALL_OSMC_DIR) $(CMAKE_EXTRA) \
+          $(TOOLCHAIN) \
+          -DADDONS_TO_BUILD="$(ADDONS)" $(ADDON_PROJECT_DIR) -DBUILD_DIR=$(BUILDDIR)/$(PLATFORM)/build -DOVERRIDE_PATHS=1 ;\
+          for addon in $$(make supported_addons | awk '/^ALL_ADDONS_BUILDING: .*$$/ { first = $$1; $$1 = ""; print $$0 }'); do \
+-- 
+2.1.0
+

@@ -1,0 +1,26 @@
+From d23f86015e14777271a768e53364a83a43561633 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 16 Jun 2015 00:38:57 +0100
+Subject: [PATCH] Allow path overrides
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/xbmc-addons.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/depends/xbmc-addons.include b/tools/depends/xbmc-addons.include
+index 5343f12..d26d2e0 100644
+--- a/tools/depends/xbmc-addons.include
++++ b/tools/depends/xbmc-addons.include
+@@ -58,7 +58,7 @@ endif
+ 	cd $(PLATFORM); \
+          $(CMAKE) -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) $(CMAKE_EXTRA) \
+          $(TOOLCHAIN) \
+-         -DADDONS_TO_BUILD="$(ADDONS)" $(ADDON_PROJECT_DIR) -DBUILD_DIR=$(BUILDDIR)/$(PLATFORM)/build ;\
++         -DADDONS_TO_BUILD="$(ADDONS)" $(ADDON_PROJECT_DIR) -DBUILD_DIR=$(BUILDDIR)/$(PLATFORM)/build -DOVERRIDE_PATHS=1 ;\
+          for addon in $$(make supported_addons | awk '/^ALL_ADDONS_BUILDING: .*$$/ { first = $$1; $$1 = ""; print $$0 }'); do \
+            $(MAKE) $$addon && echo $$addon >> $(ADDON_PROJECT_DIR)/.success || echo $$addon >> $(ADDON_PROJECT_DIR)/.failure ;\
+          done
+-- 
+2.1.0
+
