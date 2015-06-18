@@ -1,4 +1,4 @@
-if [ -f /var/cache/apt/pkgcache.bin ]
+if [ ! -f /var/cache/apt/pkgcache.bin ]
 then
     echo -e "Updating APT cache. Please be patient."
     sudo apt-get update >/dev/null 2>&1
