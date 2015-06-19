@@ -50,12 +50,13 @@ then
 		sed '/Package/d' -i files/DEBIAN/control
 		sed '/Version/d' -i files/DEBIAN/control
 		echo "Package: ${1}-mediacenter-binary-addon-${ADDON}-osmc" >> files/DEBIAN/control
-		echo "Version: 1.0.0" >> files/DEBIAN/control
 		pushd src/xbmc-*
 		$BUILD -C tools/depends/target/binary-addons/ INSTALL_OSMC_DIR="${out}/usr" PREFIX="." ADDONS="$ADDON"
 		if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 		strip_files "${out}"
 		popd
+		VERSION=$(grep version src/xbmc-*/tools/depends/target/binary-addons/native/build/${ADDON}/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
+		echo "Version: ${VERSION}" >> files/DEBIAN/control
 		fix_arch_ctl "files/DEBIAN/control"
 		dpkg_build files ${1}-mediacenter-binary-addon-${ADDON}-osmc.deb
 		rm -rf ${out}/usr # Clean for next addon
