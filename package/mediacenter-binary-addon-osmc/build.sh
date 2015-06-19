@@ -64,7 +64,7 @@ then
 		strip_files "${out}"
 		popd
 		VERSION_OSMC=1
-		VERSION_ADDON=$(grep version src/xbmc-*/tools/depends/target/binary-addons/native/build/${ADDON}/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
+		VERSION_ADDON=$(grep version ${out}/usr/share/kodi/addons/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
 		echo "Version: ${VERSION_ADDON}-${VERSION_OSMC}" >> files/DEBIAN/control
 		echo ${ADDON} | grep -q pvr
 		BREAKS_HELIX=$?
