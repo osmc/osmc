@@ -69,7 +69,11 @@ function build_in_env()
 	configure_build_env "$TCDIR"
 	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
 	mount --bind "$2/../../" "$TCDIR"/mnt
-	chroot $TCDIR /usr/bin/make $1 $4 -C /mnt/package/$3
+	if [ -n "$4" ]; then
+		chroot $TCDIR /usr/bin/make $1 "$4" -C /mnt/package/$3
+	else
+		chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
+	fi
 	return=$?
 	if [ $return == 99 ]; then return 1; else return $return; fi
 }
