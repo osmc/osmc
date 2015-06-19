@@ -45,7 +45,13 @@ then
 	done
 	git_to_archive "project/cmake/addons/depends/common/kodi-platform/kodi-platform.txt"
 	popd
-	for ADDON in $2
+	if [ "$2" == "all" ]
+	then
+	    ADDONS="pvr.argustv pvr.dvblink pvr.dvbviewer pvr.filmon pvr.hts pvr.iptvsimple pvr.mediaportal pvr.mythtv pvr.nextpvr pvr.njoy pvr.pctv pvr.stalker pvr.vbox pvr.vdr pvr.vuplus pvr.wmc audioencoder.wav audioencoder.vorbis audioencoder.lame audioencoder.flac audioencoder.vgmstream"
+	else
+	    ADDONS="$2"
+	fi
+	for ADDON in $ADDONS
 	do
 		sed '/Package/d' -i files/DEBIAN/control
 		sed '/Version/d' -i files/DEBIAN/control
