@@ -55,6 +55,8 @@ then
 	do
 		sed '/Package/d' -i files/DEBIAN/control
 		sed '/Version/d' -i files/DEBIAN/control
+		sed '/Replaces/d' -i files/DEBIAN/control
+		sed '/Breaks/d' -i files/DEBIAN/control
 		echo "Package: ${1}-mediacenter-binary-addon-${ADDON}-osmc" >> files/DEBIAN/control
 		pushd src/xbmc-*
 		$BUILD -C tools/depends/target/binary-addons/ INSTALL_OSMC_DIR="${out}/usr" PREFIX="." ADDONS="$ADDON"
@@ -64,6 +66,22 @@ then
 		VERSION_OSMC=1
 		VERSION_ADDON=$(grep version src/xbmc-*/tools/depends/target/binary-addons/native/build/${ADDON}/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
 		echo "Version: ${VERSION_ADDON}-${VERSION_OSMC}" >> files/DEBIAN/control
+		echo ${ADDON} | grep -q pvr
+		BREAKS_HELIX=$?
+		if [ "$BREAKS_HELIX" -eq 0 ]
+		then
+			if [ "$1" == "armv6l" ]
+			then
+				echo "Replaces: rbp1-mediacenter-osmc (<< 14.9.0)" >> files/DEBIAN/control
+				echo "Breaks: rbp1-mediacenter-osmc (<< 14.9.0), vero-mediacenter-osmc (<< 14.9.0)" >> files/DEBIAN/control
+
+			fi
+			if [ "$1" == "armv7" ]
+			then
+				echo "Replaces: rbp2-mediacenter-osmc (<< 14.9.0), vero-mediacenter-osmc (<< 14.9.0)" >> files/DEBIAN/control
+				echo "Breaks: rbp2-mediacenter-osmc (<< 14.9.0), vero-mediacenter-osmc (<< 14.9.0)" >> files/DEBIAN/control
+			fi
+		fi
 		fix_arch_ctl "files/DEBIAN/control"
 		dpkg_build files ${1}-mediacenter-binary-addon-${ADDON}-osmc.deb
 		rm -rf ${out}/usr # Clean for next addon
