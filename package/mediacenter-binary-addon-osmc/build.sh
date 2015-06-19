@@ -55,8 +55,9 @@ then
 		if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 		strip_files "${out}"
 		popd
-		VERSION=$(grep version src/xbmc-*/tools/depends/target/binary-addons/native/build/${ADDON}/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
-		echo "Version: ${VERSION}" >> files/DEBIAN/control
+		VERSION_OSMC=1
+		VERSION_ADDON=$(grep version src/xbmc-*/tools/depends/target/binary-addons/native/build/${ADDON}/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
+		echo "Version: ${VERSION_ADDON}-${VERSION_OSMC}" >> files/DEBIAN/control
 		fix_arch_ctl "files/DEBIAN/control"
 		dpkg_build files ${1}-mediacenter-binary-addon-${ADDON}-osmc.deb
 		rm -rf ${out}/usr # Clean for next addon
