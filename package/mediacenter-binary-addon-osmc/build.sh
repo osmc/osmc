@@ -18,15 +18,15 @@ git_to_archive()
      fi
 }
 
-if [ -z "$ADDONS" ]
+if [ -z "$2" ]
 then
     echo -e "Please specify which addons you would like to build"
-	exit 1
+    exit 1
 fi
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
-build_in_env "${1}" $(pwd) "mediacenter-binary-addon-osmc"
+build_in_env "${1}" $(pwd) "mediacenter-binary-addon-osmc" "ADDONS=${2}"
 build_return=$?
 if [ $build_return == 99 ]
 then
@@ -46,12 +46,13 @@ then
 	done
 	git_to_archive "project/cmake/addons/depends/common/kodi-platform/kodi-platform.txt"
 	popd
-	for addon in $ADDONS
+	for ADDON in $2
 	do
 		sed '/Package/d' -i files/DEBIAN/control
+		sed '/Version/d' -i files/DEBIAN/control
 		echo "Package: ${1}-mediacenter-binary-addon-${ADDON}-osmc" >> files/DEBIAN/control
 		echo "Version: 1.0.0" >> files/DEBIAN/control
-		push src/xbmc-*
+		pushd src/xbmc-*
 		$BUILD -C tools/depends/target/binary-addons/ INSTALL_OSMC_DIR="${out}/usr" PREFIX="." ADDONS="$ADDON"
 		if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 		strip_files "${out}"
