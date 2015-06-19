@@ -35,7 +35,6 @@ then
 	if [ -d files/usr ]; then rm -rf files/usr; fi
 	update_sources
 	handle_dep "cmake"
-	handle_dep "${1}-libplatform-dev-osmc"
 	handle_dep "git"
 	handle_dep "make"
 	pushd src/xbmc-*
