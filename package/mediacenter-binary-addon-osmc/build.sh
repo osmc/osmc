@@ -65,6 +65,7 @@ then
 		popd
 		VERSION_OSMC=1
 		VERSION_ADDON=$(grep version ${out}/usr/share/kodi/addons/${ADDON}/addon.xml | head -n 2 | tail -n 1 | cut -f 2 -d \")
+		if [ -z "$VERSION_ADDON" ]; then echo "Error occured during build - no version found for ${ADDON}"; exit 1; fi
 		echo "Version: ${VERSION_ADDON}-${VERSION_OSMC}" >> files/DEBIAN/control
 		echo ${ADDON} | grep -q pvr
 		BREAKS_HELIX=$?
