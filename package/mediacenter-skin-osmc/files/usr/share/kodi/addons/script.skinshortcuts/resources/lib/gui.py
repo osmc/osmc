@@ -60,6 +60,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.shortcutgroup = 1
         
         # Empty arrays for different shortcut types
+        self.thumbnailBrowseDefault = None
         self.backgroundBrowse = False
         self.backgroundBrowseDefault = None
         self.widgetPlaylists = False
@@ -696,6 +697,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
             for elem in elems:
                 self.thumbnails.append( [elem.text, DATA.local( elem.attrib.get( 'label' ) )[2] ] )
                 self.thumbnailsPretty[elem.text] = DATA.local( elem.attrib.get( 'label' ) )[2]
+            
+            elem = tree.find("thumbnailBrowseDefault")
+            if elem is not None and len(elem.text) > 0:
+                self.thumbnailBrowseDefault = elem.text
+
                 
     # ========================
     # === GUI INTERACTIONS ===
@@ -935,7 +941,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             
             # Get new thumbnail from browse dialog
             dialog = xbmcgui.Dialog()
-            custom_thumbnail = dialog.browse( 2 , xbmc.getLocalizedString(1030), 'files')
+            custom_thumbnail = dialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.thumbnailBrowseDefault)
             
             if custom_thumbnail:
                 # Update the thumbnail
@@ -1209,7 +1215,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
             elif selectedThumbnail == 0:
                 # User has chosen to browse for an image
                 imagedialog = xbmcgui.Dialog()
-                custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.backgroundBrowseDefault)
+                
+                if self.thumbnailBrowseDefault:
+                    custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.thumbnailBrowseDefault)
+                else:
+                    custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.backgroundBrowseDefault)
                 
                 if custom_image:
                     listitem.setThumbnailImage( custom_image )

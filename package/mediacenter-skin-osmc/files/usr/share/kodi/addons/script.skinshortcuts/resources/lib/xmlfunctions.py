@@ -1,5 +1,5 @@
 # coding=utf-8
-import os, sys, datetime, unicodedata
+import os, sys, datetime, unicodedata, re
 import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 import xml.etree.ElementTree as xmltree
 from xml.sax.saxutils import escape as escapeXML
@@ -565,7 +565,15 @@ class XMLFunctions():
         visibility = item.find( "visibility" )
         if visibility is not None:
             xmltree.SubElement( newelement, "visible" ).text = visibility.text
-            
+        
+        #additional onclick (group overrides)
+        onclicks = item.findall( "additional-action" )
+        for onclick in onclicks:
+            onclickelement = xmltree.SubElement( newelement, "onclick" )
+            onclickelement.text = onclick.text
+            if "condition" in onclick.attrib:
+                onclickelement.set( "condition", onclick.attrib.get( "condition" ) )
+        
         # Onclick
         onclicks = item.findall( "override-action" )
         if len( onclicks ) == 0:
@@ -709,13 +717,63 @@ class XMLFunctions():
                         additionalproperty.text = DATA.local( self.MAINBACKGROUND[ key ].decode( "utf-8" ) )[1]
                     except:
                         additionalproperty.text = DATA.local( self.MAINBACKGROUND[ key ] )[1]
+
+        propertyPatterns = self.getPropertyPatterns(labelID.text, groupName)
+        if len(propertyPatterns) > 0:
+            propertyReplacements = self.getPropertyReplacements(newelement)
+            for propertyName in propertyPatterns:
+                propertyPattern = propertyPatterns[propertyName][0]
+                for original, replacement in propertyReplacements:
+                    regexpPattern = re.compile(re.escape(original), re.IGNORECASE)
+                    propertyPattern = regexpPattern.sub(replacement, propertyPattern)
+    
+                additionalproperty = xmltree.SubElement(newelement, "property")
+                additionalproperty.set("name", propertyName.decode("utf-8"))
+                additionalproperty.text = propertyPattern.decode("utf-8")
             
         return newelement
+
+
+    def getPropertyPatterns(self, labelID, group):
+        overrides = DATA._get_overrides_skin()
+        propertyPatterns = {}
         
+        if overrides is not None:
+            propertyPatternElements = overrides.getroot().findall("propertypattern")
+            for propertyPatternElement in propertyPatternElements:
+                propertyName = propertyPatternElement.get("property")
+                propertyGroup = propertyPatternElement.get("group")
+              
+                if not propertyName or not propertyGroup or propertyGroup != group or not propertyPatternElement.text:
+                    continue
+                  
+                propertyLabelID = propertyPatternElement.get("labelID")
+                if not propertyLabelID:
+                    if propertyName not in propertyPatterns:
+                        propertyPatterns[propertyName] = [propertyPatternElement.text, False]
+                elif propertyLabelID == labelID:
+                    if propertyName not in propertyPatterns or propertyPatterns[propertyName][1] == False:
+                        propertyPatterns[propertyName] = [propertyPatternElement.text, True]
+
+        return propertyPatterns
+    
+        
+    def getPropertyReplacements(self, element):
+        propertyReplacements = []
+        for subElement in list(element):
+            if subElement.tag == "property":
+                propertyName = subElement.get("name")
+                if propertyName and subElement.text:
+                    propertyReplacements.append(("::%s::" % propertyName, subElement.text))
+            elif subElement.text:
+                propertyReplacements.append(("::%s::" % subElement.tag, subElement.text))
+
+        return propertyReplacements
+
+      
     def findIncludePosition( self, list, item ):
         try:
             return list.index( item )
         except:
             return None
-            
             

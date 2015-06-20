@@ -199,6 +199,17 @@ class DataFunctions():
             # Get the action
             action = node.find( "action" )
             
+            # group overrides: add an additional onclick action for a particular menu
+            # this will allow you to close a modal dialog before calling any other window
+            # http://forum.kodi.tv/showthread.php?tid=224683
+            if skinoverrides != None:
+                allGroupOverrides = skinoverrides.findall( "groupoverride" )
+                for override in allGroupOverrides:
+                    if override.attrib.get( "group" ) == group:
+                        newaction = xmltree.SubElement( node, "additional-action" )
+                        newaction.text = override.text
+                        newaction.set( "condition", override.attrib.get( "condition" ) )
+            
             # Generate the labelID
             labelID = self._get_labelID( self.local( node.find( "label" ).text )[3].replace( " ", "" ).lower(), action.text )
             xmltree.SubElement( node, "labelID" ).text = labelID
@@ -251,7 +262,7 @@ class DataFunctions():
                             checkGroup = None
                             if "group" in elem.attrib:
                                 checkGroup = elem.attrib.get( "group" )
-                                
+
                             # If the action and (if provided) the group match...
                             if elem.attrib.get( "action" ) == action.text and (checkGroup == None or checkGroup == group):
                                 # Check the XBMC version matches

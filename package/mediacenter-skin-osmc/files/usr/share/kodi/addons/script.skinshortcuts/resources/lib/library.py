@@ -712,6 +712,8 @@ class LibraryFunctions():
             listitems.append( self._create(["Quit", "13009", "32054", {} ]) )
             listitems.append( self._create(["Hibernate", "13010", "32054", {} ]) )
             listitems.append( self._create(["Suspend", "13011", "32054", {} ]) )
+            listitems.append( self._create(["AlarmClock(shutdowntimer,XBMC.Shutdown())", "19026", "32054", {} ]) )
+            listitems.append( self._create(["CancelAlarm(shutdowntimer)", "20151", "32054", {} ]) )
             if xbmc.getCondVisibility( "System.HasLoginScreen" ):
                 listitems.append( self._create(["System.LogOff", "20126", "32054", {} ]) )
             listitems.append( self._create(["ActivateScreensaver", "360", "32054", {} ]) )
@@ -1622,10 +1624,10 @@ class LibraryFunctions():
             availableShortcuts = self.checkForFolder( availableShortcuts )
             
         if showNone is not False:
-            availableShortcuts.insert( 0, self._create(["::NONE::", "None", "", {"icon":"DefaultAddonNone.png"}] ) )
+            availableShortcuts.insert( 0, self._create(["::NONE::", __language__(32053), "", {"icon":"DefaultAddonNone.png"}] ) )
             
         if custom is not False:
-            availableShortcuts.append( self._create(["||CUSTOM||", "Custom shortcut", "", {}] ) )
+            availableShortcuts.append( self._create(["||CUSTOM||", __language__(32024), "", {}] ) )
         
         # Check a shortcut is available
         if len( availableShortcuts ) == 0:

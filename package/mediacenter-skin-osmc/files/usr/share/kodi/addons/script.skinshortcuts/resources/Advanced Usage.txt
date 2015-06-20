@@ -429,6 +429,65 @@ When using button 311 in the management dialog, you can provide a list of thumbn
 [label] - The name displayed to the user in the select dialog
 [path] - The path to the image. No need to include full path if the thumbnail is included with your skin.
 
+You can set path to the folder that will be displayed by default in the browse dialog:
+
+<thumbnailBrowseDefault>protocol://path/to/folder</thumbnailBrowseDefault>
+
+Works for both (306 and 311) thumbnails management dialogs.
+
+
+14. Custom shortcut properties patterns
+
+You can define custom properties patterns in the overrides.xml, its variables are then filled with real values during include XML building. As opposed to regular custom properties, patterns can't be modified from skin so they aren't saved as custom configuration (they are only defined in the overrides.xml).
+
+Pattern variables has format: ::<element name|property name>::
+For example for include XML item:
+
+	<item id="1">
+		<label>$LOCALIZE[10002]</label>
+		<icon>DefaultPicture.png</icon>
+		<property name="labelID">pictures</property>
+		<property name="defaultID">pictures</property>
+		<onclick>ActivateWindow(Pictures)</onclick>
+		...
+	</item>
+
+following variables (case insensitive) can be used: ::LABEL:: ::ICON:: ::LABELID:: ::DEFAULTID:: ::ONCLICK::
+Basically all elements and properties existing for item can be used as variables in pattern. 
+
+<propertypattern labelID="[LabelID]" group="[GroupName]" property="[PropertyName]">[PropertyPattern]</propertypattern>
+	
+[LabelID] - [Optional] The labelID of item you are providing a pattern for. If ommited, pattern is used for all items in group.
+[GroupName] - The group you are providing a pattern for.
+[PropertyName] - The string used to identify the property
+[PropertyPattern] - The pattern for the property
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<overrides>
+   		<propertypattern group="mainmenu" property="exampleProperty">$INFO[Window(Home).Property(::DEFAULTID::)]</propertypattern>
+   		<propertypattern labelID="pictures" group="mainmenu" property="exampleProperty">$INFO[Window(Home).Property(DefaultID-::DEFAULTID::)]</propertypattern>
+	</overrides>
+
+As result all items in mainmenu will have property "exampleProperty" filled with first pattern, only pictures will be filled with second pattern.
+
+	<item id="1">
+		<label>$LOCALIZE[10002]</label>
+		<icon>DefaultPicture.png</icon>
+		<property name="labelID">pictures</property>
+		<property name="defaultID">pictures</property>
+		<property name="exampleProperty">$INFO[Window(Home).Property(DefaultID-pictures)]</property>
+		...
+	</item>
+	<item id="2">
+		<label>$LOCALIZE[10005]</label>
+		<icon>DefaultMusicAlbums.png</icon>
+		<property name="labelID">music</property>
+		<property name="defaultID">music</property>
+		<property name="exampleProperty">$INFO[Window(Home).Property(music)]</property>
+		...
+	</item>
+    ...
+
 
 Localisation
 ------------
