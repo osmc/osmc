@@ -72,8 +72,11 @@ while true; do
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 
 	setcap 'cap_net_bind_service=+ep' $KODI
-	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
-	CODE="$?"
+	starttime=$(date +%s)
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
+	endtime=$(date +%s)
+	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
+	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
 
 	fb_restore
 	chmod a+rw /dev/tty1
