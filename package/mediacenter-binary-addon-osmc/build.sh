@@ -59,6 +59,7 @@ then
 		sed '/Breaks/d' -i files/DEBIAN/control
 		echo "Package: ${1}-mediacenter-binary-addon-${ADDON}-osmc" >> files/DEBIAN/control
 		pushd src/xbmc-*
+		rm -f tools/depends/target/binary-addons/.installed-native # hack hack hack
 		$BUILD -C tools/depends/target/binary-addons/ INSTALL_OSMC_DIR="${out}/usr" PREFIX="." ADDONS="$ADDON"
 		if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 		strip_files "${out}"
