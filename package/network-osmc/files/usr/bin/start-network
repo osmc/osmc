@@ -28,7 +28,7 @@ then
 			fi
 		done
 	fi
-	exec /usr/sbin/connmand -n -I eth0 --nodnsproxy --config=/etc/connman.conf
+	exec /usr/sbin/connmand -n -I eth0 --nodnsproxy --noresolvmodify --config=/etc/connman.conf
 else
 	if echo "$dnsproxy" | grep -iqw no; then
 		exec /usr/sbin/connmand -n --nodnsproxy --config=/etc/connman.conf
