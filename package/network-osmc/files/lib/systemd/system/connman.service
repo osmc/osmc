@@ -13,6 +13,7 @@ EnvironmentFile=-/etc/connman.prefs
 Restart=always
 RestartSec=5
 ExecStart = /usr/bin/start-network
+ExecStopPost = /bin/sleep 2
 StandardOutput=null
 
 [Install]
