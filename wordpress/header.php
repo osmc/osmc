@@ -36,7 +36,7 @@
 		<meta name="msapplication-square310x310logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x310.png">
 		<meta name="msapplication-wide310x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x150.png">
 		<!-- inject:css -->
-		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-a198b724.css">
+		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-6a9e0cdb.css">
 		<!-- endinject -->
 		
 		<!--[if lte IE 8]> 
@@ -70,7 +70,7 @@
     <div class="popup_donate">
       <div class="donationwidget">
         <h3>Donate</h3>
-        <p>OSMC is a new and and young project that needs some support to make sure it lands on its feet.</p>
+        <p>OSMC is free and will always remain free. Help support further development by making a donation. No matter how large or small, every contribution is appreciated.</p>
         <form action="#">
           <input type="tel" class="amount" id="amount" name="amount" required>
           <input type="radio" class="radio" id="usd-pop" name="currency" value="USD" checked="checked">
@@ -80,7 +80,8 @@
           <input type="radio" class="radio" id="gbp-pop" name="currency" value="GBP">
           <label for="gbp-pop">GBP</label>
           <div class="options">
-            <button class="paypal" title="Paypal" type="submit" value="Submit"><img src="https://osmc.tv/wp-content/themes/osmc/library/images/paypal.png">
+            <button class="paypal" title="Paypal" type="submit" value="Submit">
+            <svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="207.078px" height="55.181px" viewBox="52.708 15.014 207.078 55.181" enable-background="new 52.708 15.014 207.078 55.181" xml:space="preserve"><path fill="#009CDE" d="M194.301 30.1c-0.881 5.781-5.295 5.781-9.566 5.781h-2.432l1.705-10.795 c0.104-0.651 0.666-1.132 1.326-1.132h1.115c2.906 0 5.7 0 7.1 1.655C194.365 26.6 194.6 28.1 194.3 30.1 M192.441 15.014h-16.105c-1.104 0-2.041 0.802-2.213 1.891l-6.512 41.302c-0.129 0.8 0.5 1.6 1.3 1.551h8.266 c0.77 0 1.426-0.561 1.547-1.32l1.848-11.711c0.172-1.088 1.109-1.891 2.211-1.891h5.096c10.609 0 16.734-5.133 18.334-15.311 c0.721-4.448 0.029-7.945-2.055-10.395C201.891 16.4 197.8 15 192.4 15"/><path fill="#003087" d="M79.415 30.1c-0.88 5.781-5.295 5.781-9.567 5.781h-2.43l1.705-10.795c0.102-0.651 0.665-1.132 1.325-1.132 h1.115c2.908 0 5.7 0 7.1 1.655C79.479 26.6 79.7 28.1 79.4 30.1 M77.557 15.014H61.449 c-1.103 0-2.039 0.802-2.212 1.891l-6.513 41.302c-0.128 0.8 0.5 1.6 1.3 1.551h7.692c1.101 0 2.037-0.801 2.209-1.887 l1.759-11.145c0.17-1.088 1.109-1.891 2.209-1.891h5.096c10.61 0 16.734-5.133 18.333-15.311c0.721-4.448 0.029-7.945-2.054-10.395 C87.006 16.4 82.9 15 77.6 15"/><path fill="#003087" d="M114.951 44.928c-0.744 4.406-4.242 7.365-8.706 7.365c-2.236 0-4.029-0.721-5.179-2.082 c-1.14-1.35-1.57-3.275-1.208-5.416c0.693-4.369 4.249-7.422 8.643-7.422c2.191 0 4 0.7 5.1 2.1 C114.824 40.9 115.3 42.8 115 44.9 M125.701 29.915h-7.713c-0.66 0-1.223 0.479-1.328 1.134l-0.338 2.156l-0.537-0.781 c-1.672-2.424-5.396-3.235-9.114-3.235c-8.521 0-15.8 6.459-17.216 15.515c-0.737 4.5 0.3 8.8 2.9 11.8 c2.353 2.8 5.7 3.9 9.7 3.922c6.87 0 10.678-4.412 10.678-4.412l-0.344 2.145c-0.129 0.8 0.5 1.6 1.3 1.551h6.945 c1.102 0 2.039-0.799 2.211-1.889l4.17-26.403C127.156 30.7 126.5 29.9 125.7 29.9"/><path fill="#009CDE" d="M229.838 44.928c-0.746 4.406-4.244 7.365-8.707 7.365c-2.236 0-4.029-0.721-5.18-2.082 c-1.141-1.35-1.568-3.275-1.207-5.416c0.693-4.369 4.248-7.422 8.643-7.422c2.191 0 4 0.7 5.1 2.1 C229.711 40.9 230.2 42.8 229.8 44.9 M240.586 29.915h-7.713c-0.66 0-1.223 0.479-1.326 1.134l-0.34 2.156l-0.539-0.781 c-1.67-2.424-5.393-3.235-9.111-3.235c-8.52 0-15.799 6.459-17.215 15.515c-0.738 4.5 0.3 8.8 2.9 11.8 c2.354 2.8 5.7 3.9 9.7 3.922c6.869 0 10.68-4.412 10.68-4.412l-0.346 2.145c-0.129 0.8 0.5 1.6 1.3 1.551h6.945 c1.104 0 2.039-0.799 2.213-1.889l4.17-26.403C242.043 30.7 241.4 29.9 240.6 29.9"/><path fill="#003087" d="M166.781 29.915h-7.754c-0.74 0-1.434 0.368-1.85 0.982l-10.696 15.75l-4.531-15.134 c-0.285-0.947-1.156-1.598-2.145-1.598h-7.621c-0.92 0-1.568 0.906-1.27 1.776l8.535 25.057l-8.029 11.3 c-0.629 0.9 0 2.1 1.1 2.117h7.744c0.734 0 1.422-0.359 1.842-0.961l25.78-37.211 C168.5 31.1 167.9 29.9 166.8 29.9"/><path fill="#009CDE" d="M249.678 16.15l-6.611 42.057c-0.129 0.8 0.5 1.6 1.3 1.553h6.648c1.102 0 2.039-0.803 2.211-1.891 l6.518-41.302c0.129-0.814-0.5-1.552-1.326-1.552h-7.439C250.342 15 249.8 15.5 249.7 16.1"/></svg>
             </button>
             <button class="stripe" title="Credit Card" type="submit" value="Submit">
             <div class="svg card1">
