@@ -78,7 +78,15 @@ void MainWindow::install()
     }
     /* Mount the BOOT filesystem */
     logger->addLine("Mounting boot filesystem");
-    if (! utils->mountPartition(device, MNT_BOOT))
+    bool hasMount = false;
+    hasMount = utils->mountPartition(device, MNT_BOOT);
+    if (! hasMount && utils->getOSMCDev() == "atv")
+    {
+        /* Super hacky for Apple TV 1st gen. Sometimes no internal disk */
+        hasMount = utils->mountPartition(device, "/dev/sda1");
+        device->setRoot("/dev/sda2");
+    }
+    if (! hasMount)
     {
         haltInstall("could not mount bootfs");
         return;
@@ -174,7 +182,7 @@ void MainWindow::install()
         else
             rootBase.chop(1);
         logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
-        if (device->hasRootChanged())
+        if (device->hasRootChanged() && utils->getOSMCDev() != "atv")
         {
             logger->addLine("Must mklabel as root fs is on another device");
             utils->mklabel(rootBase, false);

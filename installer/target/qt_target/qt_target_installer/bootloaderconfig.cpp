@@ -95,4 +95,12 @@ void BootloaderConfig::configureEnvironment()
         utils->writeToFile(uEnvFile, uEnvStringList, false);
         uEnvFile.close();
     }
+   if (utils->getOSMCDev() == "atv")
+   {
+       QFile cmdlineFile("/mnt/boot/cmdline.txt");
+       QStringList cmdlineStringList;
+       cmdlineStringList << "console=tty1 root=" + this->device->getRoot() + "rootfstype=ext4 rootwait quiet video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet";
+       utils->writeToFile(cmdlineFile, cmdlineStringList, false);
+       cmdlineFile.close();
+   }
 }
