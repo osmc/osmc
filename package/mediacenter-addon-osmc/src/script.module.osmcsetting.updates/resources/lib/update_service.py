@@ -825,10 +825,10 @@ class Main(object):
 
 		if check:
 
-
 			if self.s['backup_on_update']:
 
-				# run backup
+				# run the backup, once the backup is completed the script calls pre_backup_complete to continue with the update
+				# that is the reason for the "else"
 
 				self.update_settings()
 
@@ -839,12 +839,13 @@ class Main(object):
 					bckp.start_backup()
 
 				except Exception as e:
-				
+
+					# if there is an error, then abort the Update. We dont want to run the update unless the user has backed up
 					log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
 
-			# run the update
-
-			self.call_child_script('update')
+			else:
+				# run the update
+				self.call_child_script('update')
 	
 		else:
 

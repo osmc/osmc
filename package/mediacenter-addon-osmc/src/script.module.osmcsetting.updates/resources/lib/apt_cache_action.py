@@ -1,11 +1,12 @@
 ''' This script is run as root by the osmc update module. '''
 
 import apt
-import socket
-import sys
 from datetime import datetime
 import json
 import os
+import socket
+import sys
+import time
 import traceback
 
 t = datetime
@@ -99,10 +100,10 @@ class Main(object):
 
 			call_parent('apt_action_list_error', {'error': self.error_message, 'package' : self.error_package})
 
-		else:
+		elif self.error_message == '':
+			# if there was no error, then respond to say the action was complete, and the service should proceed to the next step
 
 			call_parent('apt_cache %s complete' % self.action)
-
 
 
 	def act(self):
