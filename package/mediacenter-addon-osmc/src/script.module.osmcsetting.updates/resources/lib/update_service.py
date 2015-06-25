@@ -724,7 +724,14 @@ class Main(object):
 		# check whether the install is an alpha version
 		if self.check_for_unsupported_version() == 'alpha': return
 
-		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
+		# check for sufficient space, only proceed if it is available
+		if self.check_target_location_for_size(location='/', requirement=300):
+
+			subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
+
+		else:
+
+			okey_dokey = DIALOG.ok(lang(32129), lang(32130))
 
 
 	def action_list_complete(self):
@@ -1106,6 +1113,16 @@ class Main(object):
 
 		self.EXTERNAL_UPDATE_REQUIRED = 1
 
+		# check for sufficient disk space, requirement in MB
+		root_space = self.check_target_location_for_size(location='/', requirement=300)
+		boot_space = self.check_target_location_for_size(location='/boot', requirement=30)
+
+		if not root_space or not boot_space:
+
+			okey_dokey = DIALOG.ok(lang(32129), lang(32130))
+
+			return 'bail', 'Sufficient freespace: root=%s, boot=%s' % root_space, boot_space
+
 		check, msg = self.check_for_broken_installs()
 
 		if check == 'bail':
@@ -1353,4 +1370,30 @@ class Main(object):
 		else:
 
 			return 'proceed'
+
+
+	def check_target_location_for_size(self, location, requirement):
+
+		''' Checks the target location to see if there is sufficient space for the update.
+			Returns True if there is sufficient disk space '''
+
+		mb_to_b = requirement * 1048576.0
+
+		try:
+			st = os.statvfs(location)
+
+			if st.f_frsize:
+				available = st.f_frsize * st.f_bavail
+			else:
+				available = st.f_bsize * st.f_bavail
+			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+
+			log('local required disk space: %s' % mb_to_b)
+			log('local available disk space: %s' % available)
+
+			return mb_to_b < available
+				
+		except:
+
+			return False
 
