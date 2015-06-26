@@ -1121,7 +1121,7 @@ class Main(object):
 
 			okey_dokey = DIALOG.ok(lang(32129), lang(32130))
 
-			return 'bail', 'Sufficient freespace: root=%s, boot=%s' % root_space, boot_space
+			return 'bail', 'Sufficient freespace: root=%s, boot=%s' % (root_space, boot_space)
 
 		check, msg = self.check_for_broken_installs()
 
