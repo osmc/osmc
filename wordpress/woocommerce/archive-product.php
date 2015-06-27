@@ -18,8 +18,8 @@ get_header( 'shop' ); ?>
       <div class="column full">
   		<?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
         <h1 class="page-title" itemprop="headline"><?php woocommerce_page_title(); ?></h1>
-            <div class="byline vcard maintenance">
-              <p>The shop is currently closed. It will be back on 28th June.</p>
+            <div class="byline vcard">
+              <p>Get everything you need to get up and running right here.</p>
             </div>
 		<?php endif; ?>
 		
