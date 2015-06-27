@@ -2,7 +2,7 @@
 
 var ad = false;
 
-var bannertext = "Celebrate OSMC'S stable release with us on Sunday, 28th June!";
+var bannertext = "Celebrate OSMC's stable release with us on Sunday, 28th June!";
 var bannerlink = "https://osmc.tv/final";
 var bannerimg = "https://osmc.tv/wp-content/themes/osmc/library/images/forum_banner_back.png";
 
