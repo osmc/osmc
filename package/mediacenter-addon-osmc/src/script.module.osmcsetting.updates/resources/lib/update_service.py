@@ -1119,7 +1119,7 @@ class Main(object):
 
 		if not root_space or not boot_space:
 
-			okey_dokey = DIALOG.ok(lang(32129), lang(32130))
+			okey_dokey = DIALOG.ok(lang(32077), lang(32129), lang(32130))
 
 			return 'bail', 'Sufficient freespace: root=%s, boot=%s' % (root_space, boot_space)
 
@@ -1217,11 +1217,11 @@ class Main(object):
 	@clog(log)
 	def apt_update_complete(self, data=None):
 		
-		check, _ = self.check_for_legit_updates()
+		check, result = self.check_for_legit_updates()
 
 		if check == 'bail':
 
-			if data == 'manual_update_complete':
+			if data == 'manual_update_complete' and not 'Sufficient freespace:' in result:
 
 				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
 
