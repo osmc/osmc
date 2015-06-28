@@ -731,7 +731,7 @@ class Main(object):
 
 		else:
 
-			okey_dokey = DIALOG.ok(lang(32129), lang(32130))
+			okey_dokey = DIALOG.ok(lang(32077), lang(32129), lang(32130))
 
 
 	def action_list_complete(self):
@@ -1221,7 +1221,12 @@ class Main(object):
 
 		if check == 'bail':
 
-			if data == 'manual_update_complete' and not 'Sufficient freespace:' in result:
+			if 'Sufficient freespace:' in result:
+
+				# send kill message to progress bar
+				self.progress_bar(kill=True)
+
+			elif data == 'manual_update_complete':
 
 				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
 
