@@ -34,3 +34,8 @@ will return a URL containing the above text. To upload a file called /home/osmc/
 <pre>cat /home/osmc/somefile.log | paste-log</pre>
 Please note that this may not work for larger logs.
 </p>
+<h2>How to check errors in system log</h2>
+<p>
+Run `sudo journalctl --priority 2..3`
+If you want to see the full log just run `sudo journalctl`
+</p>
