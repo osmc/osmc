@@ -201,6 +201,8 @@ function pull_bin()
 	if ! command -v wget >/dev/null 2>&1; then update_sources && verify_action && install_package "wget" && verify_action; fi
 	if [ -f $2 ]; then echo "Cleaning old source" && rm -f ${2}; fi
 	wget ${1} -O ${2}
+	if [ $? != 0 ]; then echo "Binary download failed" && exit 1; fi
+	chmod +x ${2}
 }
 
 if [ -z $DOWNLOAD_URL ]
