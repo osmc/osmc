@@ -1,11 +1,14 @@
 [Unit]
 Description=Transmission BitTorrent Daemon
+After=udisks-glue.service
+Requires=udisks-glue.service
 
 [Service]
 User=osmc
 Group=osmc
 Type=notify
-ExecStart=/usr/bin/transmission-daemon -f --log-error
+ExecStartPre=/bin/sleep 3
+ExecStart=/usr/bin/transmission-daemon -f --log-error --allowed 0.0.0.0
 
 [Install]
 WantedBy=multi-user.target

@@ -5,4 +5,6 @@ systemctl enable transmission.service
 ischroot
 if [ $? == 0 ]; then exit 0; fi
 
+sysctl -p
+
 systemctl start transmission.service
