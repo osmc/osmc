@@ -26,9 +26,13 @@ then
 	handle_dep "zlib1g-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "libavcodec-dev"
-	handle_dep "libavutil-dev "
+	handle_dep "libavutil-dev"
 	handle_dep "libavformat-dev"
 	handle_dep "libswscale-dev"
+	handle_dep "python-minimal"
+	handle_dep "libhdhomerun-dev"
+	handle_dep "dvb-tools"
+	handle_dep "libdvbv5-0"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
