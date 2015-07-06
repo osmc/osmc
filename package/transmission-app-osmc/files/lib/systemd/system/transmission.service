@@ -8,7 +8,7 @@ User=osmc
 Group=osmc
 Type=notify
 ExecStartPre=/bin/sleep 3
-ExecStart=/usr/bin/transmission-daemon -f --log-error --allowed ...
+ExecStart=/usr/bin/transmission-daemon -f --log-error --allowed *.*.*.*
 
 [Install]
 WantedBy=multi-user.target
