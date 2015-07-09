@@ -1,10 +1,9 @@
 [Unit]
 Description=Connman connection service
 Requires=dbus.socket
-After=dbus.socket dbus.service
-Wants=network.target
+After=dbus.socket dbus.service network-pre.target
+Wants=network.target remote-fs-pre.target
 Before=remote-fs-pre.target network.target
-Wants=remote-fs-pre.target
 
 [Service]
 Type=dbus
