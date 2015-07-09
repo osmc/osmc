@@ -44,7 +44,7 @@ class Main(object):
 				'config' 			: {'function': self.grab_config, 				'setting': False, 'pointer': [('Pi config', 'Ul2H1CLu')]},
 				'packages' 			: {'function': self.grab_osmc_packages, 		'setting': False, 'pointer': [('OSMC Packages', '7nQvfy9a')]},
 				'allothers' 		: {'function': self.grab_all_other_packages, 	'setting': False, 'pointer': [('All Other Packages', 'hwvkLCMX')]},
-				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT term.log', 'RcBRrsRs'), ('APT history.log', 'B8sj7DO8')]},
+				'apt' 				: {'function': self.grab_apt_logs, 				'setting': False, 'pointer': [('APT term.log', 'RcBRrsRs'), ('APT history.log', 'B8sj7DO8'), ('APT sources.list', 'ZZz2wrJ1'), ('APT apt.conf.d', 'fFsk1x85'), ('APT preferences.d', 'vSKj25Lq')]},
 				'fstab' 			: {'function': self.grab_fstab, 				'setting': False, 'pointer': [('fstab', 'qiE9Dtax')]},
 				'advancedsettings' 	: {'function': self.grab_advancedsettings, 		'setting': False, 'pointer': [('advancedsettings.xml', 'C7hKmH1p')]},
 				'sources' 			: {'function': self.grab_sources, 				'setting': False, 'pointer': [('sources.xml', 'SGkuGLGj')]},
@@ -306,6 +306,26 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		else:
 			self.log_list.extend(['apt history.log not found'])
+
+		self.log_list.extend(['\n====================== APT sources.list ======================== ZZz2wrJ1\n'])
+
+		location = '/etc/apt/sources.list'
+
+		try:
+			with open (location, 'r') as f:
+				self.log_list.extend(f.readlines())
+		except:
+			self.log_list.extend(['APT sources.list not found'])
+
+		self.log_list.extend(['\n====================== APT apt.conf.d ======================== fFsk1x85\n'])
+
+		with os.popen('ls -al /etc/apt/apt.conf.d') as f:
+			self.log_list.extend(f.readlines())
+
+		self.log_list.extend(['\n====================== APT preferences.d ======================== vSKj25Lq\n'])
+
+		with os.popen('ls -al /etc/apt/preferences.d') as f:
+			self.log_list.extend(f.readlines())
 
 
 	def grab_advancedsettings(self):
