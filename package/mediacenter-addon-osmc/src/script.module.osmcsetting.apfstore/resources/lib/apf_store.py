@@ -378,14 +378,18 @@ class APF_STORE(object):
 				# the get BLOCKS and waits 1 second before throwing a Queue Empty error
 				apf = thread_queue.get(True, 1)
 
-				install_query = ['dpkg-query', '-W', '-f="${Status}"', apf.id,  '2>/dev/null']
+				install_query = ['dpkg-query', '-W', '-f="${Status}"', apf.id]
 				
+				fnull = open(os.devnull, 'w')
+
 				try:
-					output = subprocess.check_output(install_query)
+					output = subprocess.check_output(install_query, stderr=fnull)
 
 				except subprocess.CalledProcessError as e:
 				# raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 					output = e.output
+
+				fnull.close()
 				
 				if "ok installed" in output:
 					log('%s IS Installed' % apf.name)
