@@ -72,7 +72,11 @@ def check_for_unsupported_version():
 
 	''' Checks if this version is an Alpha, prevent updates '''
 
-	process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'])
+	fnull = open(os.devnull, 'w')
+
+	process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'], stderr=fnull, stdout=fnull)
+
+	fnull.close()
 
 	if process == 0:
 
