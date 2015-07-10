@@ -8,9 +8,9 @@ Version: 1.0
 @import "compass";
 
 html, body, button, input, select, textarea {
-	font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-	font-weight: 400;
-	font-size: 100%;
+  font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 400;
+  font-size: 100%;
 }
 
 * {-webkit-font-smoothing:subpixel-antialiased;}
@@ -1097,7 +1097,9 @@ $home-header: rgba(14, 61, 82, 0.52);
 // Content
 
 article {
-  margin: 0 0 3em;
+  float: left;
+  width: 100%;
+  margin: 2em 0 0em;
 }
 
 .page-title {
@@ -1116,57 +1118,48 @@ article {
   }
 }
 
-.search {
-  .page-title {
-    margin: 0 0 1em;
+.post-title {
+  margin: 0;
+  a:visited,
+  a:active,
+  a {
+    color: $dark;
+    text-decoration: none;
+    border-bottom: none;
   }
-  .post-title {
-    margin: 0 0 0.5em;
-    a:visited,
-    a:active,
-    a {
-      color: $dark;
-      text-decoration: none;
-      border-bottom: none;
-    }
-    a:hover, a:focus {
-      color: $link;
-    }
-  }
-  
-  .byline {
-    margin: 0;
-  }
-  
-  article {
-    margin: 0 0 0.5em;
+  a:hover, a:focus {
+    color: $link;
   }
 }
 
-.archive {
-  .page-title {
-    margin: 0 0 1em;
+.blog {
+  article {
+    margin-bottom: 1em;
+  }
+  .page-title {
+    margin-bottom: 0.1em;
   }
   .post-title {
-    margin: 0 0 0.5em;
-    a:visited,
-    a:active,
-    a {
-      color: $dark;
-      text-decoration: none;
-      border-bottom: none;
-    }
-    a:hover, a:focus {
-      color: $link;
-    }
+    font-weight: 300;
   }
-  
   .byline {
     margin: 0;
+    border-bottom: 0px;
+    border-top: 2px solid #e2e2e2;
+
+    p {
+      color: $dgrey;
+      font-weight: 400;
+    }
+    span {
+      color: $dgrey;
+    }
   }
-  
-  article {
-    margin: 0 0 0.5em;
+}
+
+.single {
+  article {
+    margin: 0;
   }
 }
 
@@ -1176,6 +1169,7 @@ article {
   border-bottom: 2px solid $lgrey;
   float: left;
   width: 100%;
+  font-size: 90%;
 
   a {
     color: $link;
@@ -1188,6 +1182,7 @@ article {
   }
   
   p {
+    color: $dgrey;
     margin: 0;
     float: left;
   }
@@ -1210,10 +1205,12 @@ article {
 }
 
 .tags {
+  font-size: 90%;
+  
   a {
     border-bottom: none;
     background-color: $lgrey;
-    padding: 0.2em 0.3em;
+    padding: 0.2em 0.5em;
     color: $dark;
   }
   a:hover, a:focus {
@@ -1252,6 +1249,11 @@ article {
       
       a {
         color: $black;
+        
+        &:hover {
+          color: $link;
+          border-bottom: 0px;
+        }
       }
       
       img {
@@ -1317,6 +1319,9 @@ nav.pagination {
 
   li, li:last-child {
   padding: 0 0.2em 0 0.2em;
+  }
+  li a {
+    font-weight: 400;
   }
 }
 

@@ -21,7 +21,7 @@
             $output = curl_exec($ch);
             curl_close($ch);
             $lines = explode("\n",$output);
-            echo '<article id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
+            echo '<div id="wiki-page" class="wiki-page page type-page status-publish hentry clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
             echo '<header class="article-header">';
             echo '<h1 class="page-title" itemprop="headline">' . $lines[0] . '</h1>';
             echo '<div class="byline vcard">';
@@ -53,7 +53,7 @@
         ?>
 
           </section> <?php // end article section ?>
-        </article> <?php // end article ?>
+        </div> <?php // end article ?>
     </div> <?php // end #main ?>
     <?php get_sidebar(); ?>
   </div> <?php // end #inner-content ?>

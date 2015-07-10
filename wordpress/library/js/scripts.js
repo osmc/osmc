@@ -169,7 +169,6 @@ jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {
   });
 });
 
-
 // POPUP //
 
 // check hash on load
@@ -244,7 +243,6 @@ jQuery(".download.devices .wrapper").click(function () {
     scrollTop: jQuery(".getstarted").offset().top - 40
   }, 800);
 });
-
 
 // CHARTIST.JS
 

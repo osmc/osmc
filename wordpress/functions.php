@@ -146,19 +146,10 @@ function bones_register_sidebars() {
 
 // EXCERPT //
 function custom_excerpt_length( $length ) {
-	return 100;
+	return 80;
 }
+
 add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
-
-
-// the_content excerpt //
-add_action('the_content','limit_the_content');
-function limit_the_content($content){
-if( is_home() )
-  $word_limit =120;
-  $words = explode(' ', $content);
-  return implode(' ', array_slice($words, 0, $word_limit));
-}
 
 // disable pingbacks
 add_filter( 'xmlrpc_methods', function( $methods ) {

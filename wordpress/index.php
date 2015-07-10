@@ -1,68 +1,42 @@
 <?php get_header(); ?>
 
-			<div class="row clearfix main">
+<div class="row clearfix main">
 
-				<div class="container">
+  <div class="container">
 
-						<div class="column three-fourths">
-							<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-							<article id="post-<?php the_ID(); ?>" <?php post_class( 'clearfix' ); ?> role="article">
+    <div class="column three-fourths">
 
+      <h1 class="page-title" itemprop="headline">Blog</h1>
 
-									<h1 class="page-title"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1>
-									<div class="byline vcard">
-									  <p><?php the_date(); ?></p>
-										<div class="cat"><?php the_category(', ') ?></div>
-								  </div>
+      <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
-								<section class="entry-content clearfix">
-									<?php the_content(); ?>
-								</section> <?php // end article section ?>
-								
-								<a href="<?php the_permalink() ?>">- Read More</a>
+      <article id="post-<?php the_ID(); ?>" role="article">
 
-								<footer class="article-footer">
+        <h2 class="post-title">
+          <a href="<?php the_permalink() ?>" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a>
+        </h2>
 
-								</footer> <?php // end article footer ?>
+        <div class="byline">
+          <p>
+            <?php the_date(); ?>
+          </p>
+          <div class="cat">
+            <span><?php comments_number('No replies', '1 reply'); ?></span>
+          </div>
+        </div>
 
-								<?php // comments_template(); // uncomment if you want to use them ?>
+      </article>
 
-							</article> <?php // end article ?>
+      <?php endwhile; ?>
+      <?php bones_page_navi(); ?>
+      <?php endif; ?>
 
-							<?php endwhile; ?>
+    </div>
 
-									<?php if ( function_exists( 'bones_page_navi' ) ) { ?>
-											<?php bones_page_navi(); ?>
-									<?php } else { ?>
-											<nav class="wp-prev-next">
-													<ul class="clearfix">
-														<li class="prev-link"><?php next_posts_link( __( '&laquo; Older Entries', 'bonestheme' )) ?></li>
-														<li class="next-link"><?php previous_posts_link( __( 'Newer Entries &raquo;', 'bonestheme' )) ?></li>
-													</ul>
-											</nav>
-									<?php } ?>
+    <?php get_sidebar(); ?>
 
-							<?php else : ?>
+  </div>
 
-									<article id="post-not-found" class="hentry clearfix">
-											<header class="article-header">
-												<h1><?php _e( 'Oops, Post Not Found!', 'bonestheme' ); ?></h1>
-										</header>
-											<section class="entry-content">
-												<p><?php _e( 'Uh Oh. Something is missing. Try double checking things.', 'bonestheme' ); ?></p>
-										</section>
-										<footer class="article-footer">
-												<p><?php _e( 'This is the error message in the index.php template.', 'bonestheme' ); ?></p>
-										</footer>
-									</article>
-
-							<?php endif; ?>
-						</div> <?php // end #main ?>
-
-						<?php get_sidebar(); ?>
-
-				</div> <?php // end #inner-content ?>
-
-			</div> <?php // end #content ?>
+</div>
 
 <?php get_footer(); ?>
