@@ -94,8 +94,8 @@ then
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
 	ARCH=$(arch)
-        echo $ARCH | grep -q arm
-        if [ $? == 0 ]
+    echo $ARCH | grep -q arm
+    if [ $? == 0 ]
 	then
 	    ARCH=$(echo $ARCH | tr -d v7l | tr -d v6)
 	fi
@@ -126,12 +126,26 @@ then
 	ARCH=$(arch)
 	export ARCH
 	popd
-	# Disassemble kernel package to add device tree overlays, additional out of tree modules etc
+	# Disassemble kernel image package to add device tree overlays, additional out of tree modules etc
 	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
 	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
 	rm ${1}-image*.deb
-	dpkg_build files-image ${1}-image-osmc.deb
+	dpkg_build files-image ${1}-image-osmc.deb # Don't worry about exact name. It all gets picked up.
+	# Disassemble kernel headers package to include full headers (upstream Debian bug...)
+	if [ "$ARCH" == "armv7l" ]
+	then
+		mv src/${1}-headers*.deb .
+		mkdir -p files-headers/
+		if [ "$1" == "rbp1" ]; then MACH="bcm2708"; fi
+		if [ "$1" == "rbp2" ]; then MACH="bcm2709"; fi
+		if [ "$1" == "vero" ]; then MACH="imx"; fi
+		dpkg -x ${1}-headers*.deb files-headers/
+		dpkg-deb -e ${1}-headers*.deb files-headers/DEBIAN
+		rm ${1}-headers*.deb
+		cp -ar src/*linux*/arch/arm/mach-${MACH}/include/mach files-headers/usr/src/*-headers-${VERSION}-${REV}-osmc/include
+		dpkg_build files-headers ${1}-headers-osmc.deb # Don't worry about exact name. It all gets picked up.
+	fi
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"

@@ -16,3 +16,4 @@ atv:
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files-image >/dev/null 2>&1
+	sudo rm -rf files-headers >/dev/null 2>&1
