@@ -246,31 +246,47 @@ jQuery(".download.devices .wrapper").click(function () {
 
 // CHARTIST.JS
 
-function pielegend (data) {
+function pieChart(items) {
   
+  var nr = 0;
   var sum = function(a, b) { return a + b };
-  var calc = [];
+  
+  var data = {
+    names: [],
+    series: []
+  }
+    
+  for (i = 0; i < items.length; i++ ) {
+    if (i % 2 === 0) {
+      data.names.push(items[i]);
+    } else {
+      data.series.push(items[i]);
+    }
+  }
   
   var options = {
     labelInterpolationFnc: function(value) {
       var math = parseFloat((value / data.series.reduce(sum) * 100)).toFixed(2) + '%';
-      calc.push(math);
+      if ( (nr >= data.names.length) == false ) {
+        pieLegend(nr, math);
+        nr += 1;
+      }
       return math;
     },
     chartPadding: 0,
     labelOffset: 15,
   };
     
-  setTimeout(function() {
-    jQuery(".ct-chart").after('<div class="ct-list"></div>');
-    var legend = jQuery(".ct-list");
-    jQuery.each(data.pielabels, function(i, val) {
-      var listitem = "<button class='ct-series-" + i + "'>" + calc[i] + " - " + val + "</button>";
-      legend.append(listitem);
-    });
-  }, 100);
+  Chartist.Pie('.ct-chart', data, options);
+
+  jQuery(".ct-chart").after('<div class="ct-list"></div>');
+  var legend = jQuery(".ct-list");
   
-  return options;
+  function pieLegend(i, calc) {
+    var listItem = "<button class='ct-series-" + i + "'>" + data.names[i] + " - " + calc + "</button>";
+    legend.append(listItem);
+  };
+  
 };
 
 // JS TABLE //
