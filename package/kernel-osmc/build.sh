@@ -122,6 +122,14 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
+		# Build RTL8192DU model
+		pushd drivers/net/wireless/rtl8192du
+		$BUILD
+		if [ $? != 0; then echo -e "Building kernel module failed" && exit 1; fi
+		popd
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		cp drivers/net/wireless/rtl8192cu/8192du.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		fi
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
