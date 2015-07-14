@@ -246,7 +246,7 @@ jQuery(".download.devices .wrapper").click(function () {
 
 // CHARTIST.JS
 
-function pieChart(items) {
+function pieChart(title, items) {
   
   var nr = 0;
   var sum = function(a, b) { return a + b };
@@ -278,8 +278,13 @@ function pieChart(items) {
   };
     
   Chartist.Pie('.ct-chart', data, options);
-
-  jQuery(".ct-chart").after('<div class="ct-list"></div>');
+  
+  var ctChart = jQuery(".ct-chart");
+  
+  ctChart.before('<p style="text-align: center; margin-top: 2em;"><em>' + title + '</em></p>');
+  
+  ctChart.after('<div class="ct-list"></div>');
+  
   var legend = jQuery(".ct-list");
   
   function pieLegend(i, calc) {
