@@ -1,7 +1,7 @@
 ADDONS := $(shell echo "$(ADDONS)")
 
 all:
-	echo -e "Specify a target:\nmake armv6l\nmake armv7\nmake i386"
+	echo -e "Specify a target:\nmake armv6l\nmake armv7\nmake i386\nADDONS=\"all\" or addon name"
 
 armv6l:
 	sudo bash build.sh "armv6l" "$(ADDONS)"
