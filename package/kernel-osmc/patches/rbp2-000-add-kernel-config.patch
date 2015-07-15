@@ -1,6 +1,6 @@
---- /dev/null	2015-07-10 15:43:17.064007755 +0100
-+++ a/.config	2015-07-11 01:46:18.707847596 +0100
-@@ -0,0 +1,4359 @@
+--- /dev/null	2015-07-11 09:36:18.852006704 +0100
++++ a/.config	2015-07-11 11:57:00.680068231 +0100
+@@ -0,0 +1,4378 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 4.1.1 Kernel Configuration
@@ -526,6 +526,7 @@
 +#
 +# CONFIG_CPUFREQ_DT is not set
 +# CONFIG_ARM_KIRKWOOD_CPUFREQ is not set
++CONFIG_ARM_BCM2835_CPUFREQ=y
 +# CONFIG_QORIQ_CPUFREQ is not set
 +
 +#
@@ -1349,6 +1350,7 @@
 +# Altera FPGA firmware download module
 +#
 +# CONFIG_ALTERA_STAPL is not set
++CONFIG_BCM2708_VCHIQ=y
 +
 +#
 +# Intel MIC Bus Driver
@@ -1673,8 +1675,14 @@
 +CONFIG_B43LEGACY_DMA_AND_PIO_MODE=y
 +# CONFIG_B43LEGACY_DMA_MODE is not set
 +# CONFIG_B43LEGACY_PIO_MODE is not set
++CONFIG_BRCMUTIL=m
 +# CONFIG_BRCMSMAC is not set
-+# CONFIG_BRCMFMAC is not set
++CONFIG_BRCMFMAC=m
++CONFIG_BRCMFMAC_PROTO_BCDC=y
++# CONFIG_BRCMFMAC_SDIO is not set
++CONFIG_BRCMFMAC_USB=y
++# CONFIG_BRCM_TRACING is not set
++# CONFIG_BRCMDBG is not set
 +CONFIG_HOSTAP=m
 +# CONFIG_HOSTAP_FIRMWARE is not set
 +CONFIG_LIBERTAS=m
@@ -1948,7 +1956,9 @@
 +CONFIG_MAX_RAW_DEVS=256
 +# CONFIG_TCG_TPM is not set
 +CONFIG_BRCM_CHAR_DRIVERS=y
++CONFIG_BCM_VC_CMA=y
 +CONFIG_BCM2708_VCMEM=y
++CONFIG_BCM_VC_SM=y
 +# CONFIG_XILLYBUS is not set
 +
 +#
@@ -2180,6 +2190,7 @@
 +# CONFIG_THERMAL_GOV_USER_SPACE is not set
 +# CONFIG_CPU_THERMAL is not set
 +# CONFIG_THERMAL_EMULATION is not set
++CONFIG_THERMAL_BCM2835=m
 +
 +#
 +# Texas Instruments thermal drivers
@@ -2541,6 +2552,7 @@
 +CONFIG_VIDEO_EM28XX_RC=m
 +CONFIG_V4L_PLATFORM_DRIVERS=y
 +CONFIG_VIDEO_BCM2835=y
++CONFIG_VIDEO_BCM2835_MMAL=m
 +# CONFIG_SOC_CAMERA is not set
 +# CONFIG_V4L_MEM2MEM_DRIVERS is not set
 +# CONFIG_V4L_TEST_DRIVERS is not set
@@ -2816,9 +2828,9 @@
 +CONFIG_FB_CMDLINE=y
 +# CONFIG_FB_DDC is not set
 +# CONFIG_FB_BOOT_VESA_SUPPORT is not set
-+# CONFIG_FB_CFB_FILLRECT is not set
-+# CONFIG_FB_CFB_COPYAREA is not set
-+# CONFIG_FB_CFB_IMAGEBLIT is not set
++CONFIG_FB_CFB_FILLRECT=y
++CONFIG_FB_CFB_COPYAREA=y
++CONFIG_FB_CFB_IMAGEBLIT=y
 +# CONFIG_FB_CFB_REV_PIXELS_IN_BYTE is not set
 +# CONFIG_FB_SYS_FILLRECT is not set
 +# CONFIG_FB_SYS_COPYAREA is not set
@@ -2834,6 +2846,7 @@
 +#
 +# Frame buffer hardware drivers
 +#
++CONFIG_FB_BCM2708=y
 +# CONFIG_FB_ARMCLCD is not set
 +# CONFIG_FB_UVESA is not set
 +# CONFIG_FB_OPENCORES is not set
@@ -2926,6 +2939,7 @@
 +#
 +CONFIG_SND_ARM=y
 +# CONFIG_SND_ARMAACI is not set
++CONFIG_SND_BCM2835=m
 +CONFIG_SND_SPI=y
 +CONFIG_SND_USB=y
 +CONFIG_SND_USB_AUDIO=m
@@ -3642,7 +3656,11 @@
 +# CONFIG_SH_TIMER_MTU2 is not set
 +# CONFIG_SH_TIMER_TMU is not set
 +# CONFIG_EM_TIMER_STI is not set
-+# CONFIG_MAILBOX is not set
++CONFIG_MAILBOX=y
++CONFIG_BCM2708_MBOX=y
++# CONFIG_ARM_MHU is not set
++# CONFIG_PL320_MBOX is not set
++# CONFIG_ALTERA_MBOX is not set
 +# CONFIG_IOMMU_SUPPORT is not set
 +
 +#
@@ -3657,6 +3675,7 @@
 +#
 +# SOC (System On Chip) specific Drivers
 +#
++CONFIG_BCM2708_POWER=y
 +# CONFIG_SOC_TI is not set
 +# CONFIG_PM_DEVFREQ is not set
 +CONFIG_EXTCON=m
