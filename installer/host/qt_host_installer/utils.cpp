@@ -24,7 +24,7 @@ namespace utils
 {
     void writeLog(QString strLog)
     {
-        QFile logFile(QDir::homePath() + "/" + "log.txt");
+        QFile logFile(QDir::homePath() + "/" + "osmc_installer_log.txt");
         QDateTime timestamp = QDateTime::currentDateTime();
         logFile.open(QIODevice::Append);
         if (logFile.isOpen())
