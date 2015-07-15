@@ -1,3 +1,18 @@
+From f975e5713943457c1198a38217b3cf14bc4ccf14 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 15 Jul 2015 17:35:55 +0100
+Subject: [PATCH] Add SpinelPlus support
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/hid/Kconfig          |   6 +++
+ drivers/hid/Makefile         |   1 +
+ drivers/hid/hid-core.c       |   3 ++
+ drivers/hid/hid-ids.h        |   3 ++
+ drivers/hid/hid-spinelplus.c | 104 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 117 insertions(+)
+ create mode 100644 drivers/hid/hid-spinelplus.c
+
 diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
 index 15338af..28dd8e9 100644
 --- a/drivers/hid/Kconfig
@@ -42,10 +57,10 @@ index 722a925..cae3688 100644
  	{ HID_USB_DEVICE(USB_VENDOR_ID_PRIMAX, USB_DEVICE_ID_PRIMAX_KEYBOARD) },
  #if IS_ENABLED(CONFIG_HID_ROCCAT)
 diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
-index 41f167e..c4122b2 100644
+index 7ce93d9..a4c182f 100644
 --- a/drivers/hid/hid-ids.h
 +++ b/drivers/hid/hid-ids.h
-@@ -761,6 +761,9 @@
+@@ -762,6 +762,9 @@
  
  #define USB_VENDOR_ID_PHILIPS		0x0471
  #define USB_DEVICE_ID_PHILIPS_IEEE802154_DONGLE 0x0617
