@@ -154,6 +154,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     use_preseed = False
 
+    internet_protocol = 'IPV4'
+
 
     def setUsePreseed(self, value):
         self.use_preseed = value
@@ -230,12 +232,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         panel_to_show = SELECTOR_WIRED_NETWORK
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
-            self.preseed_data = osmc_network.parse_preseed()
-            if self.preseed_data:
-                if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
-                    panel_to_show = SELECTOR_WIRELESS_NETWORK
-                else:
-                    panel_to_show = SELECTOR_WIRED_NETWORK
+             self.preseed_data = osmc_network.parse_preseed()
+             if self.preseed_data:
+                 if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
+                     panel_to_show = SELECTOR_WIRELESS_NETWORK
+                 else:
+                     panel_to_show = SELECTOR_WIRED_NETWORK
 
         # set all the panels to invisible except the first one
         for ctl in MAIN_MENU:
@@ -273,19 +275,19 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if connected:
             if self.preseed_data is None or 'dhcp' in self.preseed_data['Method']:
-                self.current_network_config['Method'] = 'dhcp'
+                self.current_network_config['IPV4']['Method'] = 'dhcp'
             else:
-                self.current_network_config['Method'] = 'manual'
-                self.current_network_config['Address'] = self.preseed_data['Address']
-                self.current_network_config['Netmask'] = self.preseed_data['Netmask']
-                if 'Gateway' in self.preseed_data:
-                    self.current_network_config['Gateway'] = self.preseed_data['Gateway']
-                if 'DNS_1' in self.preseed_data:
-                    self.current_network_config['DNS_1'] = self.preseed_data['DNS_1']
-                if 'DNS_2' in self.preseed_data:
-                    self.current_network_config['DNS_2'] = self.preseed_data['DNS_2']
+                self.current_network_config['IPV4']['Method'] = 'manual'
+                self.current_network_config['IPV4']['Address'] = self.preseed_data['Address']
+                self.current_network_config['IPV4']['Netmask'] = self.preseed_data['Netmask']
+                if self.preseed_data['Gateway']:
+                    self.current_network_config['IPV4']['Gateway'] = self.preseed_data['Gateway']
+                if self.preseed_data['DNS_1']:
+                    self.current_network_config['IPV4']['DNS_1'] = self.preseed_data['DNS_1']
+                if self.preseed_data['DNS_2']:
+                    self.current_network_config['IPV4']['DNS_2'] = self.preseed_data['DNS_2']
 
-            osmc_network.apply_network_changes(self.current_network_config)
+            osmc_network.apply_network_changes(self.current_network_config, 'IPV4')
 
         if wired:
             self.populate_wired_panel()
@@ -295,9 +297,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def onClick(self, controlID):
         if controlID in ip_controls:
             self.edit_ip_address(controlID)
-
-            # the following conditionals were moved from onAction, because the focus id method may 
-            # not be as precise and the controlID method
         elif controlID in BLUETOOTH_CONTROLS + [BLUETOOTH_ENABLE_TOGGLE]:
             self.handle_bluetooth_selection(controlID)
             self.populate_bluetooth_panel()
@@ -441,19 +440,25 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.current_network_config = self.get_wired_config()
             if self.current_network_config:
                 interface = self.current_network_config['Interface']
-                if osmc_network.has_internet_connection():
-                    # 'Status'                               'Connected'
-                    status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
+                if self.current_network_config['State'] == 'configuration':
+                    status = lang(32044) + ': ' + interface + ' ('+ lang(32076) + ')'
                 else:
-                    # 'Status'                               'No internet'
-                    status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
+                    if osmc_network.has_internet_connection():
+                        # 'Status'                               'Connected'
+                        status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
+                    else:
+                        # 'Status'                               'No internet'
+                        status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
                 self.wired_status_label.setLabel(status)
-                self.toggle_controls(True, ALL_WIRED_CONTROLS)
-                self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
-                self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
+                if self.current_network_config['State'] == 'configuration':
+                    self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+                if self.current_network_config['State'] in ['online', 'ready', 'configuration']:
+                    self.toggle_controls(True, ALL_WIRED_CONTROLS)
+                    self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
+                    self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
 
-                # enable reset and apply button
-                self.update_apply_reset_button('WIRED')
+                    # enable reset and apply button
+                    self.update_apply_reset_button('WIRED')
 
             else:  # no wired connection
                 self.hide_controls(WIRED_IP_VALUES + WIRELESS_IP_VALUES)
@@ -479,7 +484,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def update_manual_DHCP_button(self, button_id, ip_values, ip_labels):
         manualDHCPButton = self.getControl(button_id)
-        if 'dhcp' in self.current_network_config['Method']:
+        if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
             # 'Configure Network Manually'
             manualDHCPButton.setLabel(lang(32006))
             # if configuration is by DHCP disable controls
@@ -493,21 +498,23 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def populate_ip_controls(self, settings_dict, controls):
         ip_address = self.getControl(controls[0])
-        ip_address.setLabel(settings_dict['Address'])
+        ip_address.setLabel(settings_dict[self.internet_protocol]['Address'])
         subnet = self.getControl(controls[1])
-        subnet.setLabel(settings_dict['Netmask'])
+        subnet.setLabel(settings_dict[self.internet_protocol]['Netmask'])
         defaultGateway = self.getControl(controls[2])
-        if settings_dict.has_key('Gateway'):
-            defaultGateway.setLabel(settings_dict['Gateway'])
+        if settings_dict[self.internet_protocol].has_key('Gateway'):
+            defaultGateway.setLabel(settings_dict[self.internet_protocol]['Gateway'])
         else:
             defaultGateway.setLabel('')
             defaultGateway.setEnabled(False)
         primaryDNS = self.getControl(controls[3])
-        if settings_dict.has_key('DNS_1'):
-            primaryDNS.setLabel(settings_dict['DNS_1'])
+        if settings_dict['Nameservers']['DNS_1']:
+            primaryDNS.setLabel(settings_dict['Nameservers']['DNS_1'])
+        else:
+            primaryDNS.setLabel('')
         secondaryDNS = self.getControl(controls[4])
-        if settings_dict.has_key('DNS_2'):
-            secondaryDNS.setLabel(settings_dict['DNS_2'])
+        if settings_dict['Nameservers']['DNS_2']:
+            secondaryDNS.setLabel(settings_dict['Nameservers']['DNS_2'])
         else:
             secondaryDNS.setLabel('')
 
@@ -526,29 +533,29 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def update_current_ip_settings(self, controls):
         ip_address = self.getControl(controls[0])
-        self.current_network_config['Address'] = ip_address.getLabel()
+        self.current_network_config[self.internet_protocol]['Address'] = ip_address.getLabel()
         subnet = self.getControl(controls[1])
-        self.current_network_config['Netmask'] = subnet.getLabel()
+        self.current_network_config[self.internet_protocol]['Netmask'] = subnet.getLabel()
         defaultGateway = self.getControl(controls[2])
-        self.current_network_config['Gateway'] = defaultGateway.getLabel()
+        self.current_network_config[self.internet_protocol]['Gateway'] = defaultGateway.getLabel()
         primaryDNS = self.getControl(controls[3])
-        self.current_network_config['DNS_1'] = primaryDNS.getLabel()
+        self.current_network_config['Nameservers']['DNS_1'] = primaryDNS.getLabel()
         secondaryDNS = self.getControl(controls[4])
         if secondaryDNS.getLabel():
-            self.current_network_config['DNS_2'] = secondaryDNS.getLabel()
+            self.current_network_config['Nameservers']['DNS_2'] = secondaryDNS.getLabel()
 
     def handle_wired_selection(self, control_id):
         if control_id == WIRED_DHCP_MANUAL_BUTTON:
-            if self.current_network_config['Method'] == 'dhcp':
-                self.current_network_config['Method'] = 'manual'
-            elif self.current_network_config['Method'] == 'nfs_dhcp':
-                self.current_network_config['Method'] = 'nfs_manual'
-            elif self.current_network_config['Method'] == 'manual':
-                self.current_network_config['Method'] = 'dhcp'
-            elif self.current_network_config['Method'] == 'nfs_manual':
-                self.current_network_config['Method'] = 'nfs_dhcp'
+            if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
+                self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+            elif self.current_network_config[self.internet_protocol]['Method'] == 'nfs_dhcp':
+                self.current_network_config[self.internet_protocol]['Method'] = 'nfs_manual'
+            elif self.current_network_config[self.internet_protocol]['Method'] == 'manual':
+                self.current_network_config[self.internet_protocol]['Method'] = 'dhcp'
+            elif self.current_network_config[self.internet_protocol]['Method'] == 'nfs_manual':
+                self.current_network_config[self.internet_protocol]['Method'] = 'nfs_dhcp'
             self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
-            if 'dhcp' in self.current_network_config['Method']:
+            if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
                 self.hide_controls(WIRED_IP_VALUES)
 
         if control_id == WIRED_RESET_BUTTON:
@@ -559,8 +566,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if control_id == WIRED_APPLY_BUTTON:
             if self.current_network_config:
-                osmc_network.apply_network_changes(self.current_network_config)
-                if self.current_network_config['Method'] in ['nfs_dhcp', 'nfs_manual']:
+                osmc_network.apply_network_changes(self.current_network_config, self.internet_protocol)
+                if self.current_network_config[self.internet_protocol]['Method'] in ['nfs_dhcp', 'nfs_manual']:
                     with open(self.reboot_required_file, 'w') as f:
                         f.write('d')
                     # 'NFS Network Settings'
@@ -631,7 +638,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 if 'SSID' in self.current_network_config:
                     self.conn_ssid = self.current_network_config['SSID']
                 if self.conn_ssid:
-                    if 'Address' in self.current_network_config:
+                    if 'Address' in self.current_network_config[self.internet_protocol]:
                         self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
                         self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE,  WIRELESS_NETWORKS,
@@ -675,13 +682,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.handle_selected_wireless_network()
 
         elif control_id == WIRELESS_DHCP_MANUAL_BUTTON:
-            if self.current_network_config['Method'] == 'dhcp':
-                self.current_network_config['Method'] = 'manual'
-            elif self.current_network_config['Method'] == 'manual':
-                self.current_network_config['Method'] = 'dhcp'
+            if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
+                self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+            elif self.current_network_config[self.internet_protocol]['Method'] == 'manual':
+                self.current_network_config[self.internet_protocol]['Method'] = 'dhcp'
                 self.hide_controls(WIRELESS_IP_VALUES)
             self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
-            if 'dhcp' in self.current_network_config['Method']:
+            if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
                 self.hide_controls(WIRELESS_IP_VALUES)
 
         elif control_id == WIRELESS_RESET_BUTTON:
