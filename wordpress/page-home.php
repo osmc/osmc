@@ -151,7 +151,7 @@
           <div class="column full">
             <h2>Are you ready?</h2>
             <div class="buttons">
-              <a href="/download"><button>Download</button></a><a href="/shop"><button>Shop</button></a><a href="/help/wiki"><button>Documentation</button></a>
+              <a href="/download"><button>Download</button></a><a href="/shop"><button>Kit</button></a><a href="/help/wiki"><button>Help</button></a>
             </div>
           </div>
         </div>
