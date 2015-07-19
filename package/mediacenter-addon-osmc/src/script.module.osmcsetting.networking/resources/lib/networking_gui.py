@@ -733,7 +733,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 if self.connect_to_wifi(ssid, encrypted):
                     if '_hidden_' not in path:
                         strength = self.current_network_config['Strength']
-                        icon = wifi_populate_bot.get_wifi_icon(encrypted, strength / 25, True)
+                        icon = wifi_populate_bot.get_wifi_icon(encrypted, strength, True)
                         item.setIconImage(icon)
                         item.setProperty('Connected', 'True')
 
@@ -1281,7 +1281,7 @@ class wifi_populate_bot(threading.Thread):
         address = wifi['AdapterAddress']
 
         # icon_tuple = (connected, encrypted, strength)
-        icon_image = self.get_wifi_icon(encrypted, strength / 25, connected)
+        icon_image = self.get_wifi_icon(encrypted, strength, connected)
 
         item = xbmcgui.ListItem(self.getListItemLabel(wifi, multiAdapter))
         item.setIconImage(icon_image)
@@ -1299,39 +1299,21 @@ class wifi_populate_bot(threading.Thread):
 
     @staticmethod
     def get_wifi_icon(encrypted, strength, connected):
-        icon_tuple = (connected, encrypted, strength)
-        icons = {
-            (True, True, 0): 'bar0_ce.png',
-            (True, True, 1): 'bar1_ce.png',
-            (True, True, 2): 'bar2_ce.png',
-            (True, True, 3): 'bar3_ce.png',
-            (True, True, 4): 'bar4_ce.png',
-            (True, False, 0): 'bar0_cx.png',
-            (True, False, 1): 'bar1_cx.png',
-            (True, False, 2): 'bar2_cx.png',
-            (True, False, 3): 'bar3_cx.png',
-            (True, False, 4): 'bar4_cx.png',
-            (False, True, 0): 'bar0_xe.png',
-            (False, True, 1): 'bar1_xe.png',
-            (False, True, 2): 'bar2_xe.png',
-            (False, True, 3): 'bar3_xe.png',
-            (False, True, 4): 'bar4_xe.png',
-            (False, False, 0): 'bar0_xx.png',
-            (False, False, 1): 'bar1_xx.png',
-            (False, False, 2): 'bar2_xx.png',
-            (False, False, 3): 'bar3_xx.png',
-            (False, False, 4): 'bar4_xx.png',
-        }
+        filename = ''
+        if connected:
+            filename += 'c'
+        else:
+            filename += 'nc'
+        if encrypted:
+            filename += 'e'
+        else:
+            filename += 'ne'
+        if strength >= 0 and strength <= 40:
+            filename += '020'
+        if strength >= 41 and strength <= 60:
+            filename += '6080'
+        if strength >= 61 and strength <= 100:
+            filename += '80100'
 
-        return icons.get(icon_tuple, 'bar0_xx.png')
-
-    def sort_strength(self, itm):
-        try:
-            metric = int(itm.getProperty('strength'))
-            if itm.getProperty('Connected') == 'True':
-                # make sure the connected network is always at the top
-                metric += 100
-        except:
-            metric = 0
-        return metric
-
+        filename += ".png"
+        return filename
