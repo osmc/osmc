@@ -160,11 +160,11 @@ flush_xbgr32 (ply_frame_buffer_t *buffer)
   x2 = x1 + buffer->area_to_flush.width;
   y2 = y1 + buffer->area_to_flush.height;
 
-  dst = &buffer->map_address[(y1 * buffer->row_stride + x1) * 4];
-  src = (char *) &buffer->shadow_buffer[y1 * buffer->area.width + x1];
-
   for (y = y1; y < y2; y++)
     {
+     dst = &buffer->map_address[(y * buffer->row_stride + x1) * 4];
+     src = (char *) &buffer->shadow_buffer[y * buffer->area.width + x1];
+
      for (x = x1; x < x2; x++)
        {
          dst[0] = src[2];
@@ -188,11 +188,11 @@ flush_rgb16 (ply_frame_buffer_t *buffer)
   x2 = x1 + buffer->area_to_flush.width;
   y2 = y1 + buffer->area_to_flush.height;
 
-  dst = (unsigned short *)&buffer->map_address[(y1 * buffer->row_stride + x1) * 2];
-  src = (unsigned char *) &buffer->shadow_buffer[y1 * buffer->area.width + x1];
-
   for (y = y1; y < y2; y++)
     {
+     dst = (unsigned short *)&buffer->map_address[(y * buffer->row_stride + x1) * 2];
+     src = (unsigned char *) &buffer->shadow_buffer[y * buffer->area.width + x1];
+
      for (x = x1; x < x2; x++)
        {
          *dst++ = (src[0]>>3) << 0 | (src[1]>>2) << 5 | (src[2]>>3) << 11;
