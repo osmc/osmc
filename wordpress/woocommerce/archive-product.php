@@ -69,7 +69,7 @@ get_header( 'shop' ); ?>
         ?>
         
 		<div class="productlist">
-        <h2 class="title">Products</h2>
+        <h2 class="title">We also sell</h2>
 		  <?php echo do_shortcode( '[product_category category="products" orderby="menu_order" order="asc"]' ); ?>
         </div>
     
