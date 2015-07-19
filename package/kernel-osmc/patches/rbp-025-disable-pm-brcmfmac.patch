@@ -1,0 +1,26 @@
+From 6e04197604bb60d69c1272bf1edc76c5456d15b3 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 19 Jul 2015 19:43:00 +0100
+Subject: [PATCH] Disable power saving for Broadcom FullMAC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/net/wireless/brcm80211/brcmfmac/cfg80211.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/brcm80211/brcmfmac/cfg80211.c b/drivers/net/wireless/brcm80211/brcmfmac/cfg80211.c
+index 8a15ebb..31fdef8 100644
+--- a/drivers/net/wireless/brcm80211/brcmfmac/cfg80211.c
++++ b/drivers/net/wireless/brcm80211/brcmfmac/cfg80211.c
+@@ -6055,7 +6055,7 @@ struct brcmf_cfg80211_info *brcmf_cfg80211_attach(struct brcmf_pub *drvr,
+ 	init_vif_event(&cfg->vif_event);
+ 	INIT_LIST_HEAD(&cfg->vif_list);
+ 
+-	vif = brcmf_alloc_vif(cfg, NL80211_IFTYPE_STATION, false);
++	vif = brcmf_alloc_vif(cfg, NL80211_IFTYPE_STATION, true);
+ 	if (IS_ERR(vif))
+ 		goto wiphy_out;
+ 
+-- 
+2.1.0
+

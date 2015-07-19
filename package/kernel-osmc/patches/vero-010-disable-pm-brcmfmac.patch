@@ -1,0 +1,26 @@
+From 1e94e138af66f156272f7ac58c3ba8c768ed2d12 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 19 Jul 2015 22:38:09 +0100
+Subject: [PATCH] Disable power saving for Broadcom FullMAC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/net/wireless/brcm80211/brcmfmac/wl_cfg80211.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/brcm80211/brcmfmac/wl_cfg80211.c b/drivers/net/wireless/brcm80211/brcmfmac/wl_cfg80211.c
+index f9d1517..1e0dbe2 100644
+--- a/drivers/net/wireless/brcm80211/brcmfmac/wl_cfg80211.c
++++ b/drivers/net/wireless/brcm80211/brcmfmac/wl_cfg80211.c
+@@ -2361,7 +2361,7 @@ brcmf_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
+ 		goto done;
+ 	}
+ 
+-	pm = enabled ? PM_FAST : PM_OFF;
++	pm = PM_OFF;
+ 	/* Do not enable the power save after assoc if it is a p2p interface */
+ 	if (ifp->vif->wdev.iftype == NL80211_IFTYPE_P2P_CLIENT) {
+ 		brcmf_dbg(INFO, "Do not enable power save for P2P clients\n");
+-- 
+2.1.0
+
