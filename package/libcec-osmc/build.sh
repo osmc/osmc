@@ -32,7 +32,7 @@ then
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then export LIBRARY_PATH+=/opt/vc/lib && install_patch "../../patches" "rbp" && PLATFORM="-DHAVE_RPI_API=1"; fi
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then export LIBRARY_PATH+=/opt/vc/lib && install_patch "../../patches" "rbp" && PLATFORM="-DHAVE_RPI_API=1 -DRPI_INCLUDE_DIR=/opt/vc/include -DRPI_BCM_HOST=1 -DRPI_VCHIQ_ARM=1 -DRPI_VCOS=1"; fi
 	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero" && PLATFORM="-DHAVE_IMX_API=1"; fi
 	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=1 $PLATFORM .
 	$BUILD
