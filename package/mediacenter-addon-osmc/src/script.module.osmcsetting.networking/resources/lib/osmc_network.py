@@ -369,21 +369,33 @@ def get_connected_wifi():
                 return value
     return {}
 
-def has_internet_connection():
+def has_network_connection(online):
     ethernet_settings = get_ethernet_settings()
     if ethernet_settings:
-        if 'State' in ethernet_settings and ethernet_settings['State'] == 'online':
-            return True
+        if 'State' in ethernet_settings:
+            if online:
+                if ethernet_settings['State'] == 'online':
+                    return True
+            else:
+                if ethernet_settings['State'] in ('ready', 'online'):
+                    return True                    
         for internet_protocol in ['IPV4', 'IPV6']:
             if internet_protocol in ethernet_settings:
                 if 'Method' in ethernet_settings[internet_protocol]:
                     if ethernet_settings[internet_protocol]['Method'].startswith('nfs_'):
-                        return check_MS_NCSI_response()
+                        if online:
+                            return check_MS_NCSI_response()
+                        else: # if we on NFS we have network
+                            True
     for address, wifis in get_wifi_networks().iteritems():
         for ssid in wifis.keys():
             info = wifis[ssid]
-            if info['State'] == 'online':
-                return True
+            if online:
+                if info['State'] == 'online':
+                    return True
+            else:
+                if info['State'] in ('ready', 'online'):
+                    return True
     return False
 
 
@@ -495,3 +507,7 @@ def is_valid_ipv6_address(ip):
 
 def is_valid_ip_address(ip):
     return is_valid_ipv4_address(ip) or is_valid_ipv6_address(ip)
+
+
+def is_ftr_running():
+    return systemd.is_service_running('ftr')

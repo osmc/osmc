@@ -269,8 +269,11 @@ class OSMCSettingClass(threading.Thread):
 
 		return latest_settings
 
-	def check_internet(self):
-		return osmc_network.has_internet_connection()
+	def check_network(self, online):
+		return osmc_network.has_network_connection(online)
+
+        def is_ftr_running():
+                return osmc_netwok.is_ftr_running(self)
 
 	##############################################################################################################################
 	#																															 #

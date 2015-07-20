@@ -443,7 +443,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 if self.current_network_config['State'] == 'configuration':
                     status = lang(32044) + ': ' + interface + ' ('+ lang(32076) + ')'
                 else:
-                    if osmc_network.has_internet_connection():
+                    if osmc_network.has_network_connection(True):
                         # 'Status'                               'Connected'
                         status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
                     else:
@@ -643,7 +643,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE,  WIRELESS_NETWORKS,
                                                 WIRELESS_DHCP_MANUAL_BUTTON])
-                    if osmc_network.has_internet_connection():
+                    if osmc_network.has_network_connection(True):
                         # 'Status'            'Connected'
                         status = lang(32044) + ': ' + lang(32046)
                     else:
@@ -825,7 +825,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                                                 WIRELESS_DHCP_MANUAL_BUTTON])
                     self.conn_ssid = self.current_network_config['SSID']
                     interface = self.current_network_config['Interface']
-                    if osmc_network.has_internet_connection():
+                    if osmc_network.has_network_connection(True):
                         # 'Status'                               'Connected'
                         status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
                     else:
