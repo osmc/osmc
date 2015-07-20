@@ -1,0 +1,26 @@
+From c9c37f19da5de26037d6c3c1320effc1d92ab860 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 20 Jul 2015 17:02:25 +0100
+Subject: [PATCH] rtl8188eu: disable power management
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/staging/rtl8188eu/os_dep/os_intfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/staging/rtl8188eu/os_dep/os_intfs.c b/drivers/staging/rtl8188eu/os_dep/os_intfs.c
+index 750c87b..32e019b 100644
+--- a/drivers/staging/rtl8188eu/os_dep/os_intfs.c
++++ b/drivers/staging/rtl8188eu/os_dep/os_intfs.c
+@@ -52,7 +52,7 @@ static int rtw_preamble = PREAMBLE_LONG;/* long, short, auto */
+ static int rtw_scan_mode = 1;/* active, passive */
+ static int rtw_adhoc_tx_pwr = 1;
+ static int rtw_soft_ap;
+-static int rtw_power_mgnt = 1;
++static int rtw_power_mgnt = 0;
+ static int rtw_ips_mode = IPS_NORMAL;
+ 
+ static int rtw_smart_ps = 2;
+-- 
+2.1.0
+
