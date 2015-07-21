@@ -6,7 +6,7 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/1d20e723abe9b911ffdbf9b9d0f151f68b7034b0.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/xbmc/xbmc/archive/15.0-Isengard.tar.gz" "$(pwd)/src"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 fi
