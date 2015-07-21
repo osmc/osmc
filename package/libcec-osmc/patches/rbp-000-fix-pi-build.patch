@@ -1,0 +1,32 @@
+From 25c1cab48d4ed0f32fd4d5dad716339350960438 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 1 Jun 2015 17:22:54 +0100
+Subject: [PATCH] Fix Raspberry Pi build for libCEC 3.x series:
+
+* vchi_initialise does not live in lib bcm_host, but in vchiq_arm
+* fix vc libs not detected at configure time. As this patch is explicitly applied only for Pi and fixes upstream issues anyway, this is (ugly), but acceptable
+* verified with ldd at the end. export LIBRARY_PATH += /opt/vc/lib will generate working build
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/cmake/CheckPlatformSupport.cmake | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
+index 828cdb2..e631b1b 100644
+--- a/src/libcec/cmake/CheckPlatformSupport.cmake
++++ b/src/libcec/cmake/CheckPlatformSupport.cmake
+@@ -75,9 +76,9 @@ else()
+   endif()
+ 
+   # raspberry pi
+-  check_library_exists(bcm_host vchi_initialise "" HAVE_RPI_API)
+   if (HAVE_RPI_API)
+     set(LIB_INFO "${LIB_INFO}, 'RPi'")
++    include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux)
+     list(APPEND CMAKE_REQUIRED_LIBRARIES "vcos")
+     list(APPEND CMAKE_REQUIRED_LIBRARIES "vchiq_arm")
+     set(CEC_SOURCES_ADAPTER_RPI adapter/RPi/RPiCECAdapterDetection.cpp
+-- 
+2.1.0
+
