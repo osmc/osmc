@@ -1,0 +1,62 @@
+From 6d627de8354edbd184668a97509df3df62c37cfd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 21 Jul 2015 23:31:27 +0100
+Subject: [PATCH] Always force instantiation of LoginD power management
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/powermanagement/PowerManager.cpp | 37 +----------------------------------
+ 1 file changed, 1 insertion(+), 36 deletions(-)
+
+diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
+index 6754f42..f3347ca 100644
+--- a/xbmc/powermanagement/PowerManager.cpp
++++ b/xbmc/powermanagement/PowerManager.cpp
+@@ -75,43 +75,8 @@ void CPowerManager::Initialize()
+   m_instance = new CAndroidPowerSyscall();
+ #elif defined(TARGET_POSIX)
+ #if defined(HAS_DBUS)
+-  std::unique_ptr<IPowerSyscall> bestPowerManager;
+-  std::unique_ptr<IPowerSyscall> currPowerManager;
+-  int bestCount = -1;
+-  int currCount = -1;
+-  
+-  std::list< std::pair< std::function<bool()>,
+-                        std::function<IPowerSyscall*()> > > powerManagers =
+-  {
+-    std::make_pair(CConsoleUPowerSyscall::HasConsoleKitAndUPower,
+-                   [] { return new CConsoleUPowerSyscall(); }),
+-    std::make_pair(CConsoleDeviceKitPowerSyscall::HasDeviceConsoleKit,
+-                   [] { return new CConsoleDeviceKitPowerSyscall(); }),
+-    std::make_pair(CLogindUPowerSyscall::HasLogind,
+-                   [] { return new CLogindUPowerSyscall(); }),
+-    std::make_pair(CUPowerSyscall::HasUPower,
+-                   [] { return new CUPowerSyscall(); })
+-  };
+-  for(const auto& powerManager : powerManagers)
+-  {
+-    if (powerManager.first())
+-    {
+-      currPowerManager.reset(powerManager.second());
+-      currCount = currPowerManager->CountPowerFeatures();
+-      if (currCount > bestCount)
+-      {
+-        bestCount = currCount;
+-        bestPowerManager = std::move(currPowerManager);
+-      }
+-      if (bestCount == IPowerSyscall::MAX_COUNT_POWER_FEATURES)
+-        break;
+-    }
+-  }
+-  if (bestPowerManager)
+-    m_instance = bestPowerManager.release();
+-  else
++  m_instance = new CLogindUPowerSyscall();
+ #endif // HAS_DBUS
+-    m_instance = new CFallbackPowerSyscall();
+ #elif defined(TARGET_WINDOWS)
+   m_instance = new CWin32PowerSyscall();
+ #endif
+-- 
+2.1.0
+
