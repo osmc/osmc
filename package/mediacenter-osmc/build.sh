@@ -106,7 +106,6 @@ then
 		handle_dep "armv6l-libshairplay-dev-osmc"
 		handle_dep "armv6l-librtmp-dev-osmc"
 		handle_dep "armv6l-libnfs-dev-osmc"
-		handle_dep "armv6l-libafpclient-dev-osmc"
 		handle_dep "armv6l-libplatform-dev-osmc"
 		handle_dep "armv6l-libdcadec-dev-osmc"
 	fi
@@ -116,7 +115,6 @@ then
 		handle_dep "armv7-libshairplay-dev-osmc"
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
-		handle_dep "armv7-libafpclient-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libdcadec-dev-osmc"
 	fi
@@ -126,7 +124,6 @@ then
 		handle_dep "armv7-libshairplay-dev-osmc"
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
-		handle_dep "armv7-libafpclient-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
@@ -152,9 +149,10 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	export CFLAGS="-I/usr/include/afpfs-ng" && \
+	export CFLAGS+="" \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
+	export LDFLAGS="" & \
 	./configure \
 		--prefix=/usr \
 		--disable-vtbdecoder \
@@ -171,7 +169,7 @@ then
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
-	export CFLAGS+="-I/opt/vc/include -I/usr/include/afpfs-ng -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
+	export CFLAGS+="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vc/lib" && \
@@ -198,7 +196,7 @@ then
 	fi
 	if [ "$1" == "vero" ]; then
 	LIBRARY_PATH+="/opt/vero/lib" && \
-	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon -I/usr/include/afpfs-ng -I/opt/vero/include" && \
+	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon -I/opt/vero/include" && \
 	export CXXFLAGS=$CFLAGS && \
 	export CPPFLAGS=$CFLAGS && \
 	export LDFLAGS="-L/opt/vero/lib" && \
@@ -238,9 +236,9 @@ then
 	strip ${out}/usr/lib/kodi/kodi.bin
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libass5, libcurl3-gnutls, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc, mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd, i386-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libafpclient-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
-	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
-	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libafpclient-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
+	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
+	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
+	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-mediacenter-binary-addon-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
