@@ -210,4 +210,16 @@ ENV{eventlircd_enable}=="true", RUN+="wakeup_enable"
 
 LABEL="end-usb"
 
+SUBSYSTEMS=="bluetooth", GOTO="begin-bluetooth"
+GOTO="end-bluetooth"
+LABEL="begin-bluetooth"
+
+# Amazon Fire TV stick remote
+
+ ATTRS{name}=="Amazon Fire TV Remote", \
+   ENV{eventlircd_enable}="true", \
+   ENV{eventlircd_evmap}="aftvsremote.evmap"
+
+LABEL="end-bluetooth"
+
 LABEL="end"
