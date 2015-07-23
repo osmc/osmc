@@ -37,7 +37,7 @@
 		description 					: The description for the module, shown in the OSA
 
 		reboot_required					: A boolean to declare if the OS needs to be rebooted. If a change in a specific setting 
-									 	  requires an OS reboot to take affect, this is flag that will let the OSG know.
+										  requires an OS reboot to take affect, this is flag that will let the OSG know.
 
 		setting_data_method 			: This dictionary contains:
 												- the name of all settings in the module
@@ -272,8 +272,8 @@ class OSMCSettingClass(threading.Thread):
 	def check_network(self, online):
 		return osmc_network.has_network_connection(online)
 
-        def is_ftr_running():
-                return osmc_netwok.is_ftr_running(self)
+	def is_ftr_running():
+			return osmc_netwok.is_ftr_running(self)
 
 	##############################################################################################################################
 	#																															 #
