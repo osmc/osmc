@@ -40,18 +40,37 @@ class Networking_caller(threading.Thread):
 		self.cancelled = False
 		self.parent = parent
 		self.net_call = net_call
+		self.ftr_running = True
+		self.timeout = 0
 		# instantiate Barkers interface class
 		# self.networking_interface = NETWORKING.Barkersinterface()
 
 	def run(self):
-		"""Calls Barkers method to check for internet connection"""
+		"""Calls Barkers method to check for network connection"""
 
 		log('checking internet connection')
 
-		self.parent.internet_connected = self.net_call.check_network(False)
+		while self.ftr_running and self.timeout < 12:
+
+			self.ftr_running = self.net_call.is_ftr_running()
+
+			# break early if ftr is not running
+			if not self.ftr_running: break
+
+			self.timeout += 1
+
+			xbmc.sleep(10000)
+
+		if not self.ftr_running:
+
+			self.parent.internet_connected = self.net_call.check_network(False)
+
+		else:
+			# ftr_running has timed out, consider it ended and leave internet_connected as False
+			self.ftr_running = False
 
 		log('network connection is %s' % self.parent.internet_connected)
-                log('internet connection is %s' % self.net_call.check_network(True))
+		log('internet connection is %s' % self.net_call.check_network(True))
 
 
 
@@ -266,6 +285,80 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.close()
 
 
+	def networking_page_director(self, controlID):
+		''' Controls the navigation to the Networking page of the Walkthru GUI '''
+
+		control_id_pairs = {
+							40010: 94000,
+							70010: 97000
+							}
+
+		# check if internet is connected
+		if self.internet_connected:
+			log('internet is connected, jumping to exit')
+
+			# skip the Networking setup menu item and go to the skin panel
+			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+			# self.getControl(94000).setVisible(False)
+			# self.getControl(98000).setVisible(True)
+			# self.getControl(1008).setVisible(True)
+			# self.setFocusId(80010)
+
+			# display the sign-up panel
+			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
+			self.getControl(control_id_pairs.get(controlID, 94000)).setVisible(False)
+			self.getControl(99000).setVisible(True)
+			self.getControl(1009).setVisible(True)
+			self.setFocusId(90010)
+
+		else:
+
+			if self.internet_checker.ftr_running == True:
+				# only display Please Wait Progress Bar if the ftr is still running
+				self.pDialog = xbmcgui.DialogProgress()
+				self.pDialog.create(lang(32025), lang(32024))
+
+			# the starting point of the progress bar is the current cycle on the ftr_running loop * 10
+			# this will allow more frequent updates to the progress bar than using the timeout value would permit
+			cnt = self.internet_checker.timeout * 10.0
+
+			while self.internet_checker.ftr_running == True:
+				# ftr is still running, tell the user to Please Wait, and try again
+				# this will time out after 2 minutes
+
+				cnt += 1
+				
+				prog = min(max(int(cnt/120.0),1),100)
+
+				self.pDialog.update(percent=prog)
+
+				# break early if the user instructs to
+				if self.pDialog.iscanceled(): break
+
+				xbmc.sleep(1000)
+
+			try:
+				# wrapped in a Try as pDialog is not always created
+				self.pDialog.close()
+			except:
+				pass
+
+			if not self.internet_connected:
+
+				log('internet is not connected, jumping to networking')
+				# display the Networking panel
+				self.getControl(control_id_pairs.get(controlID, 94000)).setVisible(False)
+				self.getControl(96000).setVisible(True)
+				self.getControl(1006).setVisible(True)
+				self.setFocusId(60010)
+
+			else:	# internet is connected, jump to the next appropriate page
+				self.getControl(control_id_pairs.get(controlID, 94000)).setVisible(False)
+				self.getControl(99000).setVisible(True)
+				self.getControl(1009).setVisible(True)
+				self.setFocusId(90010)
+
+
 	def onClick(self, controlID):
 
 		if   controlID == 1005:				# Exit control
@@ -322,63 +415,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			else:
 
-
-				# check if internet is connected
-				if self.internet_connected:
-					log('internet is connected, jumping to exit')
-
-					# skip the Networking setup menu item and go to the skin panel
-					# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-					# self.getControl(94000).setVisible(False)
-					# self.getControl(98000).setVisible(True)
-					# self.getControl(1008).setVisible(True)
-					# self.setFocusId(80010)
-
-					# display the sign-up panel
-					# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-					self.getControl(94000).setVisible(False)
-					self.getControl(99000).setVisible(True)
-					self.getControl(1009).setVisible(True)
-					self.setFocusId(90010)
-
-
-				else:
-					log('internet is not connected, jumping to networking')
-					# display the Networking panel
-					self.getControl(94000).setVisible(False)
-					self.getControl(96000).setVisible(True)
-					self.getControl(1006).setVisible(True)
-					self.setFocusId(60010)		
+				self.networking_page_director(controlID)
 	
 		elif controlID == 70010:			# warranty I Agree button
 			
 
 			if self.vero:
 
-				# check if internet is connected
-				if self.internet_connected:
-					log('internet is connected, jumping to exit')
-					# skip the Networking setup menu item and go to skin selection
-					# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-					# self.getControl(97000).setVisible(False)
-					# self.getControl(98000).setVisible(True)
-					# self.getControl(1008).setVisible(True)
-					# self.setFocusId(80010)
-
-					# display the sign-up panel
-					# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-					self.getControl(97000).setVisible(False)
-					self.getControl(99000).setVisible(True)
-					self.getControl(1009).setVisible(True)
-					self.setFocusId(90010)
-
-				else:
-					log('internet is not connected, jumping to networking')
-					# display the Networking panel
-					self.getControl(97000).setVisible(False)
-					self.getControl(96000).setVisible(True)
-					self.getControl(1006).setVisible(True)
-					self.setFocusId(60010)	
+				self.networking_page_director(controlID)
 
 			else:
 				pass							
