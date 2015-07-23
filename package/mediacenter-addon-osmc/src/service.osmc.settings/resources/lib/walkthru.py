@@ -22,6 +22,8 @@ EULA   = LICENSE.license
 WARR   = WARRANTY.warranty
 DIALOG = xbmcgui.Dialog()
 
+__addon__   = xbmcaddon.Addon()
+scriptPath  = __addon__.getAddonInfo('path')
 
 
 def log(message):
