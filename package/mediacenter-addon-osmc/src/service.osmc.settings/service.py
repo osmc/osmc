@@ -31,16 +31,17 @@ import xbmc
 import xbmcaddon
 
 # Standard modules
-import shutil
-import time
-import re
-import sys
+import datetime
 import json
 import Queue
-import threading
-import datetime
-import traceback
+import re
+import shutil
+import socket
 import subprocess
+import sys
+import threading
+import time
+import traceback
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
@@ -63,6 +64,26 @@ def lang(id):
 
 def log(message):
 	xbmc.log('OSMC ADDON MAIN ' + str(message), level=xbmc.LOGDEBUG)
+
+
+def check_vendor():
+	''' Checks whether OSMC is being installed via N00bs or ts.
+		Returns None if the vendor file is not present or does not contain 'noobs' or 'ts'.
+		Vendor is pass to the Main settings service, which then asks the user whether they would like 
+		to update (noobs or ts only).
+	'''
+
+	if os.path.isfile('/vendor'):
+		with open('/vendor', 'r') as f:
+			line = f.readline()
+
+		if 'noobs' in line:
+			return 'noobs'
+
+		if 'ts' in line:
+			return 'ts'
+
+	return None
 
 
 def set_version():
@@ -169,9 +190,14 @@ class Main(object):
 					if module['id'] == "script.module.osmcsetting.networking":
 						networking_instance = module['SET']
 
+						vendor = check_vendor()
+
 						walkthru.open_gui(networking_instance)
 
+						log("Vendor is %s" % vendor)
+
 						with open('/tmp/walkthrough_completed', 'w+') as f:
+							log('/tmp/walkthrough_completed written')
 							pass
 							
 						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
@@ -179,6 +205,45 @@ class Main(object):
 						WINDOW.clearProperty('walkthrough_is_running')
 						
 						xbmc.executebuiltin('ReloadSkin()')
+
+						log('Skin reloaded')
+
+						# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+						
+						# Query user about whether they would like to update now
+
+						update_check_now = False
+
+						if vendor == 'noobs':
+
+							update_check_now = DIALOG.yesno(lang(32026), lang(32027), lang(32028), lang(32029))
+
+						elif vendor == 'ts':
+
+							update_check_now = DIALOG.yesno(lang(32026), lang(32030), lang(32031), lang(32029))
+
+						if update_check_now:
+
+							log('User elected to update now')
+
+							try:
+
+								address = '/var/tmp/osmc.settings.update.sockfile'
+
+								message = ('settings_command', {'action': 'update'})
+
+								message = json.dumps(message)
+
+								sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+								sock.connect(address)
+								sock.sendall(message) 
+								sock.close()
+
+							except Exception as e:
+
+								log(traceback.format_exc())
+
+						# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 						
 						break
 			else:
