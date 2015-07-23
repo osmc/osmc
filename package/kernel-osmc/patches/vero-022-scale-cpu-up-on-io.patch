@@ -1,0 +1,27 @@
+From 714e4e40a8e541792a5f9204235a1bf6e39114bd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 11 Jun 2015 16:43:03 +0100
+Subject: [PATCH] Scale up CPU on busyio by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/cpufreq/cpufreq_ondemand.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/cpufreq/cpufreq_ondemand.c b/drivers/cpufreq/cpufreq_ondemand.c
+index ad3f38f..85a397d 100644
+--- a/drivers/cpufreq/cpufreq_ondemand.c
++++ b/drivers/cpufreq/cpufreq_ondemand.c
+@@ -56,6 +56,9 @@ static void ondemand_powersave_bias_init_cpu(int cpu)
+  */
+ static int should_io_be_busy(void)
+ {
++
++        return 1;
++
+ #if defined(CONFIG_X86)
+ 	/*
+ 	 * For Intel, Core 2 (model 15) and later have an efficient idle.
+-- 
+2.1.0
+
