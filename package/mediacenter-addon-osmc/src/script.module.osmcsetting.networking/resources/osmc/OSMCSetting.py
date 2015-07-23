@@ -273,7 +273,7 @@ class OSMCSettingClass(threading.Thread):
 		return osmc_network.has_network_connection(online)
 
 	def is_ftr_running():
-			return osmc_netwok.is_ftr_running(self)
+		return osmc_network.is_ftr_running(self)
 
 	##############################################################################################################################
 	#																															 #
