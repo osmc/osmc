@@ -64,6 +64,7 @@ then
 	handle_dep "libsmbclient-dev"
 	handle_dep "libsqlite3-dev"
 	handle_dep "libssh-dev"
+	handle_dep "libavahi-client-dev"
 	handle_dep "libssl-dev"
 	handle_dep "libtiff5-dev"
 	handle_dep "libtinyxml-dev"
