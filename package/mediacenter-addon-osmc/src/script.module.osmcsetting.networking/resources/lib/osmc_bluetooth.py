@@ -1,6 +1,6 @@
 import connman
 import bluetooth
-import systemd
+import osmc_systemd
 import sys
 import pexpect
 import json
@@ -39,14 +39,14 @@ def is_bluetooth_available():
 
 def is_bluetooth_enabled():
     connman_status = connman.is_technology_enabled('bluetooth')
-    service_status = systemd.is_service_running(BLUETOOTH_SERVICE)
+    service_status = osmc_systemd.is_service_running(BLUETOOTH_SERVICE)
     return connman_status and service_status
 
 
 def toggle_bluetooth_state(state):
     if state:
-        if not systemd.is_service_running(BLUETOOTH_SERVICE):
-            systemd.toggle_service(BLUETOOTH_SERVICE, state)
+        if not osmc_systemd.is_service_running(BLUETOOTH_SERVICE):
+            osmc_systemd.toggle_service(BLUETOOTH_SERVICE, state)
         connman.toggle_technology_state('bluetooth', state)
     else:
         connman.toggle_technology_state('bluetooth', state)

@@ -8,7 +8,7 @@ import os
 import os.path
 import requests
 import socket
-import systemd
+import osmc_systemd
 
 WIRELESS_AGENT = 'osmc_wireless_agent.py'
 
@@ -446,14 +446,14 @@ def parse_preseed():
 
 
 def is_connman_wait_for_network_enabled():
-    return systemd.is_service_enabled(WAIT_FOR_NETWORK_SERVICE);
+    return osmc_systemd.is_service_enabled(WAIT_FOR_NETWORK_SERVICE);
 
 
 def toggle_wait_for_network(state):
     if state:
-        systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'enable')
+        osmc_systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'enable')
     else:
-        systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'disable')
+        osmc_systemd.update_service(WAIT_FOR_NETWORK_SERVICE, 'disable')
 
 
 def is_tethering_ethernet():
@@ -510,4 +510,4 @@ def is_valid_ip_address(ip):
 
 
 def is_ftr_running():
-    return systemd.is_service_running('ftr')
+    return osmc_systemd.is_service_running('ftr')
