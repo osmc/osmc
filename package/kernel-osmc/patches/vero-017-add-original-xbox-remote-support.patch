@@ -1,33 +1,7 @@
---- a/drivers/staging/media/lirc/Makefile	2013-05-12 05:36:28.676547269 +0100
-+++ b/drivers/staging/media/lirc/Makefile	2013-05-12 05:37:31.584546726 +0100
-@@ -8,6 +8,7 @@
- obj-$(CONFIG_LIRC_IMON)		+= lirc_imon.o
- obj-$(CONFIG_LIRC_PARALLEL)	+= lirc_parallel.o
- obj-$(CONFIG_LIRC_RPI)		+= lirc_rpi.o
-+obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
- obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
- obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
- obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
-
---- a/drivers/staging/media/lirc/Kconfig	2013-05-12 05:37:44.264546616 +0100
-+++ b/drivers/staging/media/lirc/Kconfig	2013-05-12 05:38:31.596546208 +0100
-@@ -44,6 +44,12 @@
- 	help
- 	  Driver for Homebrew GPIO Port Receiver/Transmitter for the RaspberryPi
- 
-+config LIRC_XBOX
-+	tristate "Original XBOX DVD Remote"
-+	depends on LIRC && USB
-+	help
-+	  Driver for the original XBOX DVD Remote
-+
- config LIRC_SASEM
- 	tristate "Sasem USB IR Remote"
- 	depends on LIRC && USB
-
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
-index e69de29..0ad0f5a 100644
---- a/drivers/staging/media/lirc/lirc_xbox.c
+new file mode 100644
+index 0000000..0ad0f5a
+--- /dev/null
 +++ b/drivers/staging/media/lirc/lirc_xbox.c
 @@ -0,0 +1,965 @@
 +/*
