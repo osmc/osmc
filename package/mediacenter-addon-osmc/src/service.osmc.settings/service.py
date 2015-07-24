@@ -382,6 +382,29 @@ class Main(object):
 									ignore_string = '|'.join(ignore_list)
 									__addon__.setSetting('ignored_devices', ignore_string)
 
+				else:
+					# check whether the response is one of the live_modules, if it is then launch that module
+
+					for module in self.stored_gui.live_modules:
+						if response == module.get('id', 'id_not_found'):
+
+							instance = module.get('SET', False)
+
+							if instance.isAlive():
+								log('Opening %s from widget' % instance)
+								instance.run()
+
+							else:
+								log('Starting %s from widget' % instance)
+
+								setting_instance = module['OSMCSetting'].OSMCSettingClass()
+								setting_instance.setDaemon(True)
+
+								module['SET'] = setting_instance
+
+								setting_instance.start()
+							
+
 			# THIS PART MAY NOT BE NEEDED, BUT IS INCLUDED HERE ANYWAY FOR TESTING PURPOSES
 			# if the gui was last accessed more than four hours
 			if not self.skip_check and (datetime.datetime.now() - self.gui_last_accessed).total_seconds() > 14400:

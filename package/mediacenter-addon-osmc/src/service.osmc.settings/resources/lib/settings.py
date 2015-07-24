@@ -26,7 +26,7 @@ sys.path.append(xbmc.translatePath(lib))
 
 __addon__        = xbmcaddon.Addon()
 scriptPath       = __addon__.getAddonInfo('path')
-
+WINDOW = xbmcgui.Window(10000)
 
 def log(message):
 	xbmc.log('osmc_settings: ' + str(message), level=xbmc.LOGDEBUG)
@@ -326,6 +326,9 @@ class OSMCGui(threading.Thread):
 		self.ordered_live_modules.sort()
 		self.live_modules = [x[1] for x in self.ordered_live_modules]
 
+		# load the modules as widget entries
+		self.load_widget_info()
+
 		# determine which order list is used, indexed to 0
 		self.number_of_pages_needed = (len(self.live_modules) // 9) +1
 
@@ -339,6 +342,21 @@ class OSMCGui(threading.Thread):
 		# instantiate the window
 		self.GUI = OSMC_gui(xml, scriptPath, 'Default', order_of_fill=self.order_of_fill,
 			apply_buttons=self.apply_buttons, live_modules=self.live_modules)
+
+
+	def load_widget_info(self):
+		''' Takes each live_module and loads the information required for it to be included in the MyOSMC widget into the Home window.
+		'''
+
+		for i, module in enumerate(self.live_modules):
+
+			WINDOW.setProperty('myosmc.module.%s.name' 		% i, module['SET'].shortname)
+			WINDOW.setProperty('myosmc.module.%s.fo_icon' 	% i, module['FO_Icon'])
+			WINDOW.setProperty('myosmc.module.%s.fx_icon' 	% i, module['FX_Icon'])
+
+			script_location = os.path.join(scriptPath, 'resources', 'lib', 'call_osmc_parent.py')
+			action = 'RunScript(%s %s)' % (script_location, module['id'])
+			WINDOW.setProperty('myosmc.module.%s.action' 	% i, action)
 
 	
 	def close(self):
