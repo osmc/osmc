@@ -50,6 +50,22 @@
             <height>1</height>
             <label/>
         </control>
+        <control id="98000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
+        <control id="99000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
         <!-- Background -->
         <control type="image">
             <left>0</left>
@@ -73,7 +89,7 @@
             <height>44</height>
             <texture>logo.png</texture>
         </control>
-        <!-- List -->
+        <!-- Left Menu button List -->
         <control id="1000" type="grouplist">
             <left>120</left>
             <top>280</top>
@@ -169,11 +185,11 @@
                 <onclick>noop</onclick>
                 <onright>60010</onright>
             </control>
-            <!-- Exit -->
-            <control id="1005" type="button">
+            <!-- Skin Selection -->
+            <control id="1008" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>$ADDON[service.osmc.settings 32012]</label>
+                <label>Look + Feel</label>
                 <font>osmc_addon_720_Large</font>
                 <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
@@ -184,7 +200,41 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-                <onright>5000</onright>
+                <onright>80010</onright>
+            </control>
+            <!-- Newsletter Signup -->
+            <control id="1009" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Sign-Up</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>90010</onright>
+            </control>
+            <!-- Exit -->
+            <control id="1005" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Exit</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>-</onright>
             </control>
         </control>
         <!-- Language sub menu -->
@@ -233,7 +283,7 @@
                         <!--former_line<font>osmc_addon_720_OLD_Font72</font>-->
                         <!-- <font>osmc_addon_720_font13</font>-->
                         <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ff808080</textcolor>
+                        <textcolor>ffe0b074</textcolor>
                         <!--former_line<textcolor>ffffffff</textcolor>-->
                         <shadowcolor>44000000</shadowcolor>
                         <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
@@ -376,7 +426,17 @@
                 <width>1600</width>
                 <height>42</height>
                 <label>$ADDON[service.osmc.settings 32014]</label>
-                <font>osmc_addon_720_Med</font>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+            </control>
+            <control type="label">
+                <width>1600</width>
+                <height>42</height>
+                <label>$ADDON[service.osmc.settings 32032]</label>
+                <font>osmc_addon_720_Large</font>
                 <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
@@ -386,7 +446,7 @@
                 <width>1300</width>
                 <height>42</height>
                 <label>$ADDON[service.osmc.settings 32015]</label>
-                <font>osmc_addon_720_Large</font>
+                <font>osmc_addon_720_Med</font>
                 <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -401,6 +461,52 @@
                 <width>1300</width>
                 <height>42</height>
                 <label>$ADDON[service.osmc.settings 32016]</label>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
+        <!-- Skin Selection -->
+        <control id="8000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1400</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(98000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <!-- OSMC skin label -->
+            <control id="80010" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>OSMC</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <!-- Confluence skin label -->
+            <control id="80020" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>Classic</label>
                 <font>osmc_addon_720_Large</font>
                 <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
@@ -413,7 +519,70 @@
                 <onclick>noop</onclick>
             </control>
         </control>
-        <!-- Newsletter & Exit sub menu -->
+        <!-- OSMC skin image -->
+        <control id="88888" type="image">
+            <left>690</left>
+            <top>240</top>
+            <width>1170</width>
+            <height>780</height>
+            <texture>osmc_preview.png</texture>
+            <visible>Control.IsVisible(98000)</visible>
+        </control>
+        <!-- newsletter signup                  -->
+        <control id="9000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1200</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(99000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control type="label">
+                <width>1800</width>
+                <height>42</height>
+                <label>Would you like to receive the newsletter?</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+            </control>
+            <control id="90010" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <label>Sure, sign me up</label>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="90020" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <label>No thanks</label>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
+        <!-- Exit sub menu -->
         <control id="5000" type="grouplist">
             <left>480</left>
             <top>244</top>
@@ -449,6 +618,21 @@
                 <align>center</align>
                 <aligny>center</aligny>
             </control>
+
+            <control type="label">
+                <top>45</top>
+                <width>1200</width>
+                <height>42</height>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <label>$ADDON[service.osmc.settings 32033]</label>
+                <textcolor>66ffffff</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+
+
+
             <control type="label">
                 <top>45</top>
                 <width>1200</width>
@@ -472,6 +656,18 @@
                 <aligny>center</aligny>
             </control>
             <control type="label">
+                <top>45</top>
+                <width>1200</width>
+                <height>42</height>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <label>$ADDON[service.osmc.settings 32034]</label>
+                <textcolor>66ffffff</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+
+            <control type="label">
                 <top>90</top>
                 <width>1200</width>
                 <height>42</height>
@@ -481,32 +677,6 @@
                 <textcolor>66ffffff</textcolor>
                 <align>center</align>
                 <aligny>center</aligny>
-            </control>
-            <!-- newsletter signup                  -->
-            <control id="50001" type="radiobutton">
-                <label>$ADDON[service.osmc.settings 32022]</label>
-                <width>1050</width>
-                <height>340</height>
-                <top>135</top>
-                <align>center</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>-</onup>
-                <ondown>-</ondown>
-                <onleft>1000</onleft>
-                <onright>9999</onright>
             </control>
         </control>
         <!-- Timezone sub menu -->
