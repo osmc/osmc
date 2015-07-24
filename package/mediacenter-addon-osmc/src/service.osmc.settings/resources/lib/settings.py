@@ -174,6 +174,10 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 			self.close()
 
+		elif controlID == 909:
+			# open the advanced settings beta addon
+			xbmc.executebuiltin("RunAddon(script.advancedsettingsetter)")
+
 			# elif controlID == 4444:
 			# 	# previous menu
 			# 	if self.active_page - 1 == 0:
