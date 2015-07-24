@@ -44,6 +44,7 @@ then
 		# have to do this after, because upstream brings its own rtl8192cu in! Other kernels use rtlwifi by default. Have to do earlier here or Kconfig won't find it!
 		mv drivers/net/wireless/rtl8192cu-new drivers/net/wireless/rtl8192cu
 	fi
+	install_patch "../../patches" "${1}"
 	# Set up DTC
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
@@ -55,7 +56,6 @@ then
 		$BUILD scripts
 		DTC=$(pwd)"/scripts/dtc/dtc"
 	fi
-	install_patch "../../patches" "${1}"
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
