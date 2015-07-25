@@ -1,0 +1,46 @@
+From 67552b34e14965e5bd53bea4324e6344108d127e Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Sat, 25 Jul 2015 16:26:58 +0200
+Subject: [PATCH] [EGLIMX] Change fractional modes refresh calculation
+
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index be1ebd8..fec11d5 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -471,6 +471,19 @@ bool CEGLNativeTypeIMX::set_sysfs_str(std::string path, std::string val) const
+   return true;
+ }
+ 
++inline double roundf_n(double dval, int n)
++{
++  char l_fmtp[32], l_buf[64];
++  char *p_str;
++
++  sprintf(l_fmtp, "%%.%df", n);
++  if (dval < 0)
++    return 0;
++
++  sprintf(l_buf, l_fmtp, dval);
++  return ((double)strtod(l_buf, &p_str));
++}
++
+ bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res) const
+ {
+   if (!res)
+@@ -512,9 +525,10 @@ bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res)
+   res->iHeight= h;
+   res->iScreenWidth = w;
+   res->iScreenHeight= h;
+-  res->fRefreshRate = (float)r;
+   if (StringUtils::isasciilowercaseletter(mode[0]))
+-    res->fRefreshRate *= ((float)1000 / 1001);
++    res->fRefreshRate = roundf_n((double)r * 1000 / 1001, 3);
++  else
++    res->fRefreshRate = r;
+   res->dwFlags |= p[0] == 'p' ? D3DPRESENTFLAG_PROGRESSIVE : D3DPRESENTFLAG_INTERLACED;
+ 
+   res->iScreen       = 0;
