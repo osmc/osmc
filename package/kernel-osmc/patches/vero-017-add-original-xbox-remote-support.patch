@@ -1,3 +1,32 @@
+diff --git a/drivers/staging/media/lirc/Kconfig b/drivers/staging/media/lirc/Kconfig
+index 6879c46..c435329 100644
+--- a/drivers/staging/media/lirc/Kconfig
++++ b/drivers/staging/media/lirc/Kconfig
+@@ -32,6 +32,12 @@ config LIRC_PARALLEL
+        help
+          Driver for Homebrew Parallel Port Receivers
+ 
++config LIRC_XBOX
++       tristate "Original XBOX DVD Remote"
++       depends on LIRC && USB
++       help
++         Driver for the original XBOX DVD Remote
++
+ config LIRC_SASEM
+        tristate "Sasem USB IR Remote"
+        depends on LIRC && USB
+diff --git a/drivers/staging/media/lirc/Makefile b/drivers/staging/media/lirc/Makefile
+index 5430adf..d46254b 100644
+--- a/drivers/staging/media/lirc/Makefile
++++ b/drivers/staging/media/lirc/Makefile
+@@ -7,6 +7,7 @@ obj-$(CONFIG_LIRC_BT829)        += lirc_bt829.o
+ obj-$(CONFIG_LIRC_IMON)                += lirc_imon.o
+ obj-$(CONFIG_LIRC_PARALLEL)    += lirc_parallel.o
+ obj-$(CONFIG_LIRC_SASEM)       += lirc_sasem.o
++obj-$(CONFIG_LIRC_XBOX)                += lirc_xbox.o
+ obj-$(CONFIG_LIRC_SERIAL)      += lirc_serial.o
+ obj-$(CONFIG_LIRC_SIR)         += lirc_sir.o
+ obj-$(CONFIG_LIRC_ZILOG)       += lirc_zilog.o
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
 new file mode 100644
 index 0000000..0ad0f5a
