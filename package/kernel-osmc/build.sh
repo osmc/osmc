@@ -163,6 +163,8 @@ then
 		dpkg -x ${1}-headers*.deb files-headers/
 		dpkg-deb -e ${1}-headers*.deb files-headers/DEBIAN
 		rm ${1}-headers*.deb
+		pwd
+		ls -l
 		cp -ar src/*linux*/arch/arm/mach-${MACH}/include/mach files-headers/usr/src/*-headers-${VERSION}-${REV}-osmc/include
 		dpkg_build files-headers ${1}-headers-osmc.deb # Don't worry about exact name. It all gets picked up.
 	fi
