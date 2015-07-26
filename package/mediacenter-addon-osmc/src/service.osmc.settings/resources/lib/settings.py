@@ -352,15 +352,16 @@ class OSMCGui(threading.Thread):
 		''' Takes each live_module and loads the information required for it to be included in the MyOSMC widget into the Home window.
 		'''
 
+		script_location = os.path.join(scriptPath, 'resources', 'lib', 'call_osmc_parent.py')
+		
+		WINDOW.setProperty('MyOSMC.Module.Script', script_location)
+
 		for i, module in enumerate(self.live_modules):
 
-			WINDOW.setProperty('myosmc.module.%s.name' 		% i, module['SET'].shortname)
-			WINDOW.setProperty('myosmc.module.%s.fo_icon' 	% i, module['FO_Icon'])
-			WINDOW.setProperty('myosmc.module.%s.fx_icon' 	% i, module['FX_Icon'])
-
-			script_location = os.path.join(scriptPath, 'resources', 'lib', 'call_osmc_parent.py')
-			action = 'RunScript(%s %s)' % (script_location, module['id'])
-			WINDOW.setProperty('myosmc.module.%s.action' 	% i, action)
+			WINDOW.setProperty('MyOSMC.Module.%s.name' 		% i, module['SET'].shortname)
+			WINDOW.setProperty('MyOSMC.Module.%s.fo_icon' 	% i, module['FO_Icon'])
+			WINDOW.setProperty('MyOSMC.Module.%s.fx_icon' 	% i, module['FX_Icon'])
+			WINDOW.setProperty('MyOSMC.Module.%s.id' 		% i, module['id'])
 
 	
 	def close(self):
