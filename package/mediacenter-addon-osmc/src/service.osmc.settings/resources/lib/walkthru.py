@@ -330,7 +330,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				cnt += 1
 				
-				prog = min(max(int(cnt/120.0),1),100)
+				prog = int(min(max(int(cnt/120.0*100),1),100))
 
 				self.pDialog.update(percent=prog)
 
