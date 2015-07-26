@@ -3,7 +3,7 @@ mount -t proc proc /proc
 export TERM=linux
 
 /usr/bin/clear
-if grep -q quiet /proc/cmdline
+if grep -qw quiet /proc/cmdline
 then
 	/usr/bin/setterm --cursor off
 	/usr/bin/ply-image > /dev/null
