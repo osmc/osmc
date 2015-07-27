@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="4.1.2" && REV="1"
 test $1 == rbp2 && VERSION="4.1.2" && REV="1"
-test $1 == vero && VERSION="4.1.3" && REV="3"
+test $1 == vero && VERSION="4.1.3" && REV="4"
 test $1 == atv && VERSION="4.0.2" && REV="2"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ]
 then
