@@ -1,0 +1,48 @@
+From 213f440122e1a1c1545a4bedaeff9f63e4eabcb1 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Mon, 27 Jul 2015 20:03:55 +0200
+Subject: [PATCH] [IMXEGL] SAR calc fix
+
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 6 +++---
+ xbmc/windowing/egl/EGLNativeTypeIMX.h   | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index ab60bff..84a826f 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -332,17 +332,17 @@ bool CEGLNativeTypeIMX::ShowWindow(bool show)
+ 
+ float CEGLNativeTypeIMX::ValidateSAR(struct dt_dim *dtm, bool mb)
+ {
+-  int Height = mb ? dtm->Height << 4 | (dtm->lobit & 0xf0) : dtm->Height;
++  int Height = dtm->Height | (mb ? (dtm->msbits & 0x0f) << 8 : 0);
+   if (Height < 1)
+     return .0f;
+ 
+-  int Width = mb ? dtm->Width << 4 | (dtm->lobit & 0x0f) : dtm->Width;
++  int Width = dtm->Width | (mb ? (dtm->msbits & 0xf0) << 4 : 0);
+   float t_sar = (float) Width / Height;
+ 
+   if (t_sar < 0.33 || t_sar > 3.00)
+     t_sar = .0f;
+   else
+-    CLog::Log(LOGDEBUG, "%s: Screen SAR: %.3f",__FUNCTION__, t_sar);
++    CLog::Log(LOGDEBUG, "%s: Screen SAR: %.3f (from detailed: %s, %dx%d)",__FUNCTION__, t_sar, mb ? "yes" : "no", Width, Height);
+ 
+   return t_sar;
+ }
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.h b/xbmc/windowing/egl/EGLNativeTypeIMX.h
+index 13d79ad..e02b9cf 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.h
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.h
+@@ -33,7 +33,7 @@ class CEGLNativeTypeIMX : public CEGLNativeType
+   struct dt_dim {
+     uint8_t Width;
+     uint8_t Height;
+-    uint8_t lobit;
++    uint8_t msbits;
+   };
+ 
+ public:
