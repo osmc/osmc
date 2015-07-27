@@ -1,0 +1,402 @@
+From a3b4c62ec9ad2b5f46510638fc6e3694ad9968e0 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Mon, 27 Jul 2015 15:02:22 +0200
+Subject: [PATCH 1/4] [IMX] EGL - Introduce blank/unblank steps.
+
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 22 +++++++++++++++-------
+ xbmc/windowing/egl/EGLNativeTypeIMX.h   |  1 +
+ 2 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index 9b35512..c6b9a82 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -41,7 +41,8 @@
+ #include <fstream>
+ 
+ CEGLNativeTypeIMX::CEGLNativeTypeIMX()
+-  : m_sar(0.0f)
++  : m_show(true)
++  , m_sar(0.0f)
+   , m_display(NULL)
+   , m_window(NULL)
+ {
+@@ -123,12 +124,8 @@ void CEGLNativeTypeIMX::Initialize()
+   if (ioctl(fd, MXCFB_SET_CLR_KEY, &colorKey) < 0)
+     CLog::Log(LOGERROR, "%s - Failed to setup color keying\n", __FUNCTION__);
+ #endif
+-  // Unblank the fb
+-  if (ioctl(fd, FBIOBLANK, 0) < 0)
+-  {
+-    CLog::Log(LOGERROR, "%s - Error while unblanking fb0.\n", __FUNCTION__);
+-  }
+ 
++  ShowWindow(false);
+   close(fd);
+ 
+   m_sar = GetMonitorSAR();
+@@ -256,6 +253,7 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
+   DestroyNativeWindow();
+   DestroyNativeDisplay();
+ 
++  ShowWindow(false);
+   SysfsUtils::SetString("/sys/class/graphics/fb0/mode", res.strId + "\n");
+ 
+   CreateNativeDisplay();
+@@ -320,13 +318,23 @@ bool CEGLNativeTypeIMX::GetPreferredResolution(RESOLUTION_INFO *res) const
+ 
+ bool CEGLNativeTypeIMX::ShowWindow(bool show)
+ {
++  if (m_show == show)
++    return true;
++
++  CLog::Log(LOGDEBUG, ": %s %s", __FUNCTION__, show ? "show" : "hide" );
++  SysfsUtils::SetInt("/sys/class/graphics/fb0/blank", show ? 0 : 1);
++
++  m_show = show;
++  if (!show)
++    return true;
++
+   // Force vsync by default
+   eglSwapInterval(g_Windowing.GetEGLDisplay(), 1);
+   EGLint result = eglGetError();
+   if(result != EGL_SUCCESS)
+     CLog::Log(LOGERROR, "EGL error in %s: %x",__FUNCTION__, result);
+ 
+-  return false;
++  return true;
+ }
+ 
+ float CEGLNativeTypeIMX::GetMonitorSAR()
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.h b/xbmc/windowing/egl/EGLNativeTypeIMX.h
+index ca738e3..9c7ca37 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.h
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.h
+@@ -54,6 +54,7 @@ class CEGLNativeTypeIMX : public CEGLNativeType
+ 
+ protected:
+   bool m_readonly;
++  bool m_show;
+   float m_sar;
+   bool ModeToResolution(std::string mode, RESOLUTION_INFO *res) const;
+   bool FindMatchingResolution(const RESOLUTION_INFO &res, const std::vector<RESOLUTION_INFO> &resolutions);
+
+From f828b63368f251747365804b3f043dca3c7d77bb Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Mon, 27 Jul 2015 15:03:39 +0200
+Subject: [PATCH 2/4] [WinEGL] call OnDeviceReset() before screen is unblanked.
+
+This way any other changes during OnDeviceReset()
+(of registered resources) will become activated
+on unblank (Show()).
+---
+ xbmc/windowing/egl/WinSystemEGL.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/egl/WinSystemEGL.cpp b/xbmc/windowing/egl/WinSystemEGL.cpp
+index c3bdb6a..6e9cf39 100644
+--- a/xbmc/windowing/egl/WinSystemEGL.cpp
++++ b/xbmc/windowing/egl/WinSystemEGL.cpp
+@@ -302,13 +302,14 @@ bool CWinSystemEGL::CreateNewWindow(const std::string& name, bool fullScreen, RE
+     CLog::Log(LOGERROR, "%s: Could not create new window",__FUNCTION__);
+     return false;
+   }
+-  Show();
+ 
+   CSingleLock lock(m_resourceSection);
+   // tell any shared resources
+   for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
+     (*i)->OnResetDevice();
+ 
++  Show();
++
+   return true;
+ }
+ 
+
+From e3c24361a8acf06f728581c3fd49912150093a95 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Mon, 27 Jul 2015 15:08:42 +0200
+Subject: [PATCH 3/4] [DVDVideoCodecIMX] Register to g_Windowing, implement
+ OnDeviceReset().
+
+Move fb1 reconfiguration to own function. Call it on g_windowing reset.
+---
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp | 85 +++++++++++++++-------
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h   | 10 ++-
+ 2 files changed, 66 insertions(+), 29 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+index c425814..41635c2 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+@@ -25,6 +25,7 @@
+ #include "threads/Atomics.h"
+ #include "utils/log.h"
+ #include "DVDClock.h"
++#include "windowing/WindowingFactory.h"
+ 
+ #include <cassert>
+ #include <sys/stat.h>
+@@ -1303,6 +1304,7 @@ CIMXContext::CIMXContext()
+   , m_g2dHandle(NULL)
+   , m_bufferCapture(NULL)
+   , m_checkConfigRequired(true)
++  , m_deviceName("/dev/fb1")
+ {
+   // Limit queue to 2
+   m_input.resize(2);
+@@ -1314,17 +1316,9 @@ CIMXContext::~CIMXContext()
+   Close();
+ }
+ 
+-
+-bool CIMXContext::Configure()
++bool CIMXContext::GetFBInfo(struct fb_var_screeninfo *fbVar)
+ {
+-
+-  if (!m_checkConfigRequired)
+-    return false;
+-
+-  SetBlitRects(CRectInt(), CRectInt());
+-  m_fbCurrentPage = 0;
+-
+-  int fb0 = open("/dev/fb0", O_RDWR, 0);
++  int fb0 = open("/dev/fb0", O_RDONLY | O_NONBLOCK, 0);
+ 
+   if (fb0 < 0)
+   {
+@@ -1332,8 +1326,7 @@ bool CIMXContext::Configure()
+     return false;
+   }
+ 
+-  struct fb_var_screeninfo fbVar;
+-  if (ioctl(fb0, FBIOGET_VSCREENINFO, &fbVar) < 0)
++  if (ioctl(fb0, FBIOGET_VSCREENINFO, fbVar) < 0)
+   {
+     CLog::Log(LOGWARNING, "iMX : Failed to read primary screen resolution\n");
+     close(fb0);
+@@ -1341,29 +1334,29 @@ bool CIMXContext::Configure()
+   }
+ 
+   close(fb0);
++  return true;
++}
+ 
+-  if (m_fbHandle)
+-    Close();
++bool CIMXContext::AdaptScreen(bool force)
++{
++  if (m_fbHandle <= 0 || (!IsRunning() && !force))
++    return false;
+ 
+-  CLog::Log(LOGNOTICE, "iMX : Initialize render buffers\n");
++  struct fb_var_screeninfo fbVar;
++  GetFBInfo(&fbVar);
+ 
+-  memcpy(&m_fbVar, &fbVar, sizeof(fbVar));
++  CSingleLock lk(m_pageSwapLock);
+ 
+-  const char *deviceName = "/dev/fb1";
++  memcpy(&m_fbVar, &fbVar, sizeof(fbVar));
+ 
+-  m_fbHandle = open(deviceName, O_RDWR | O_NONBLOCK, 0);
+-  if (m_fbHandle < 0)
+-  {
+-    CLog::Log(LOGWARNING, "iMX : Failed to open framebuffer: %s\n", deviceName);
+-    return false;
+-  }
++  CLog::Log(LOGNOTICE, "iMX : Initialize render buffers\n");
+ 
+   m_fbWidth = m_fbVar.xres;
+   m_fbHeight = m_fbVar.yres;
+ 
+   if (ioctl(m_fbHandle, FBIOGET_VSCREENINFO, &m_fbVar) < 0)
+   {
+-    CLog::Log(LOGWARNING, "iMX : Failed to query variable screen info at %s\n", deviceName);
++    CLog::Log(LOGWARNING, "iMX : Failed to query variable screen info at %s\n", m_deviceName.c_str());
+     return false;
+   }
+ 
+@@ -1381,7 +1374,7 @@ bool CIMXContext::Configure()
+     m_fbVar.nonstd = _4CC('R', 'G', 'B', '4');
+     m_fbVar.bits_per_pixel = 32;
+   }
+-  m_fbVar.activate = FB_ACTIVATE_NOW;
++  m_fbVar.activate |= FB_ACTIVATE_FORCE;
+   m_fbVar.xres = m_fbWidth;
+   m_fbVar.yres = m_fbHeight;
+   // One additional line that is required for deinterlacing
+@@ -1390,7 +1383,7 @@ bool CIMXContext::Configure()
+ 
+   if (ioctl(m_fbHandle, FBIOPUT_VSCREENINFO, &m_fbVar) < 0)
+   {
+-    CLog::Log(LOGWARNING, "iMX : Failed to setup %s\n", deviceName);
++    CLog::Log(LOGWARNING, "iMX : Failed to setup %s\n", m_deviceName.c_str());
+     close(m_fbHandle);
+     m_fbHandle = 0;
+     return false;
+@@ -1399,7 +1392,7 @@ bool CIMXContext::Configure()
+   struct fb_fix_screeninfo fb_fix;
+   if (ioctl(m_fbHandle, FBIOGET_FSCREENINFO, &fb_fix) < 0)
+   {
+-    CLog::Log(LOGWARNING, "iMX : Failed to query fixed screen info at %s\n", deviceName);
++    CLog::Log(LOGWARNING, "iMX : Failed to query fixed screen info at %s\n", m_deviceName.c_str());
+     close(m_fbHandle);
+     m_fbHandle = 0;
+     return false;
+@@ -1414,6 +1407,41 @@ bool CIMXContext::Configure()
+ 
+   CLog::Log(LOGDEBUG, "iMX : Allocated %d render buffers\n", m_fbPages);
+ 
++  Unblank();
++  return true;
++}
++
++void CIMXContext::OnResetDevice()
++{
++  CLog::Log(LOGINFO, "iMX : Changing screen parameters\n");
++  Blank();
++  AdaptScreen();
++}
++
++bool CIMXContext::Configure()
++{
++
++  if (!m_checkConfigRequired)
++    return false;
++
++  SetBlitRects(CRectInt(), CRectInt());
++  m_fbCurrentPage = 0;
++
++  struct fb_var_screeninfo fbVar;
++  GetFBInfo(&fbVar);
++
++  if (m_fbHandle)
++    Close();
++
++  m_fbHandle = open(m_deviceName.c_str(), O_RDWR | O_NONBLOCK, 0);
++  if (m_fbHandle < 0)
++  {
++    CLog::Log(LOGWARNING, "iMX : Failed to open framebuffer: %s\n", m_deviceName.c_str());
++    return false;
++  }
++
++  AdaptScreen(true);
++
+   m_ipuHandle = open("/dev/mxc_ipu", O_RDWR, 0);
+   if (m_ipuHandle < 0)
+   {
+@@ -1424,7 +1452,6 @@ bool CIMXContext::Configure()
+   }
+ 
+   Clear();
+-  Unblank();
+ 
+   // Start the ipu thread
+   Create();
+@@ -2054,11 +2081,13 @@ bool CIMXContext::DoTask(IPUTask &ipu, int targetPage)
+ 
+ void CIMXContext::OnStartup()
+ {
++  g_Windowing.Register(this);
+   CLog::Log(LOGNOTICE, "iMX : IPU thread started");
+ }
+ 
+ void CIMXContext::OnExit()
+ {
++  g_Windowing.Unregister(this);
+   CLog::Log(LOGNOTICE, "iMX : IPU thread terminated");
+ }
+ 
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
+index 8a39dd8..559bea5 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h
+@@ -26,6 +26,7 @@
+ #include "guilib/Geometry.h"
+ #include "DVDVideoCodec.h"
+ #include "DVDStreamInfo.h"
++#include "guilib/DispResource.h"
+ 
+ #include <vector>
+ #include <linux/ipu.h>
+@@ -88,13 +89,14 @@ class CIMXBuffer {
+ 
+ // iMX context class that handles all iMX hardware
+ // related stuff
+-class CIMXContext : private CThread
++class CIMXContext : private CThread, IDispResource
+ {
+ public:
+   CIMXContext();
+   ~CIMXContext();
+ 
+   void RequireConfiguration() { m_checkConfigRequired = true; }
++  bool AdaptScreen(bool force = false);
+   bool Configure();
+   bool Close();
+ 
+@@ -144,6 +146,8 @@ class CIMXContext : private CThread
+   void *GetCaptureBuffer() const { if (m_bufferCapture) return m_bufferCapture->buf_vaddr; else return NULL; }
+   void WaitCapture();
+ 
++  void OnResetDevice();
++
+ private:
+   struct IPUTask
+   {
+@@ -167,6 +171,8 @@ class CIMXContext : private CThread
+     struct ipu_task task;
+   };
+ 
++  bool GetFBInfo(struct fb_var_screeninfo *fbVar);
++
+   bool PushTask(const IPUTask &);
+   void PrepareTask(IPUTask &ipu, CIMXBuffer *source_p, CIMXBuffer *source,
+                    bool topBottomFields, CRect *dest = NULL);
+@@ -213,6 +219,8 @@ class CIMXContext : private CThread
+   bool                           m_CaptureDone;
+   bool                           m_checkConfigRequired;
+   static const int               m_fbPages;
++
++  std::string                    m_deviceName;
+ };
+ 
+ 
+
+From a5b9e4574cf165785d5475c51b218bd3a5ed5b35 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Mon, 27 Jul 2015 15:28:38 +0200
+Subject: [PATCH 4/4] [DVDVideoCodecIMX] On deinterlacing change use standalone
+ screen reconfiguration instead of restarting whole IMXContext thread.
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+index 41635c2..6ef2c48 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
+@@ -1519,7 +1519,7 @@ bool CIMXContext::GetPageInfo(CIMXBuffer *info, int page)
+ bool CIMXContext::Blank()
+ {
+   if (!m_fbHandle) return false;
+-  return ioctl(m_fbHandle, FBIOBLANK, 1) == 0;
++  return ioctl(m_fbHandle, FBIOBLANK, FB_BLANK_NORMAL) == 0;
+ }
+ 
+ bool CIMXContext::Unblank()
+@@ -1564,8 +1564,8 @@ void CIMXContext::SetDeInterlacing(bool flag)
+   // If deinterlacing configuration changes then fb has to be reconfigured
+   if (sav_deInt != m_deInterlacing)
+   {
+-    m_checkConfigRequired = true;
+-    Configure();
++    Blank();
++    AdaptScreen();
+   }
+ }
+ 
