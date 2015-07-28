@@ -7,8 +7,10 @@
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/15.0-Isengard.tar.gz" "$(pwd)/src"
+API_VERSION="15"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
+API_VERSION="16"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
@@ -242,6 +244,11 @@ then
 	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
+	mkdir -p ${out}/usr/share/kodi/addons/repository.osmc
+	cp patches/addon.xml ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
+	cp patches/addon-icon.png ${out}/usr/share/kodi/addons/repository.osmc/addon-icon.png
+	sed -e "s/DEVICENAME/${1}/g" -i ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
+	sed -e "s/KODIVERSION/${API_VERSION}/g" -i ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-mediacenter-osmc.deb
