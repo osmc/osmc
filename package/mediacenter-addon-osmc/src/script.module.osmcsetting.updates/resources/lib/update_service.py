@@ -700,8 +700,17 @@ class Main(object):
 		# kill the progress bar
 		self.progress_bar(kill=True)
 
-		# notify the user that an error has occured with an update
-		ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
+		# specifically handle a failure to connect to the apt server
+		if 'Unable to connect to' in kwargs.get('exception', ''):
+
+			ok = DIALOG.ok(lang(32087), lang(32131), lang(32132))
+
+		else:
+
+			# generic error handling
+
+			# notify the user that an error has occured with an update
+			ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
 
 
 	# ACTION METHOD
