@@ -1,0 +1,54 @@
+From 0e8d53638b6d721393d67d15d0dcb8fdd729559f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 28 Jul 2015 14:52:44 +0100
+Subject: [PATCH] [package] [mediacenter-osmc] Signal power event via
+ instantiated power interface before calling CApplication::Stop. If Stopping,
+ do not tear down addons if exiting.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp          | 3 ++-
+ xbmc/ApplicationMessenger.cpp | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 697f278..c7610f3 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2694,7 +2694,8 @@ void CApplication::Stop(int exitCode)
+     // stop all remaining scripts; must be done after skin has been unloaded,
+     // not before some windows still need it when deinitializing during skin
+     // unloading
+-    CScriptInvocationManager::Get().Uninitialize();
++    if (m_ExitCode != 0)
++        CScriptInvocationManager::Get().Uninitialize();
+ 
+     g_Windowing.DestroyRenderSystem();
+     g_Windowing.DestroyWindow();
+diff --git a/xbmc/ApplicationMessenger.cpp b/xbmc/ApplicationMessenger.cpp
+index 76ba9f2..999f4ee 100644
+--- a/xbmc/ApplicationMessenger.cpp
++++ b/xbmc/ApplicationMessenger.cpp
+@@ -257,8 +257,8 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
+ 
+     case TMSG_POWERDOWN:
+       {
+-        g_application.Stop(EXITCODE_POWERDOWN);
+         g_powerManager.Powerdown();
++	g_application.Stop(EXITCODE_POWERDOWN);
+       }
+       break;
+ 
+@@ -285,8 +285,8 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
+     case TMSG_RESTART:
+     case TMSG_RESET:
+       {
+-        g_application.Stop(EXITCODE_REBOOT);
+         g_powerManager.Reboot();
++	g_application.Stop(EXITCODE_REBOOT);
+       }
+       break;
+ 
+-- 
+2.1.0
+
