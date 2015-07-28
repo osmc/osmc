@@ -11,6 +11,9 @@ import sys
 import requests
 import subprocess
 import threading
+import xml.etree.ElementTree as ET
+
+
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
@@ -109,7 +112,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.email = ''
 
 		# get the languages
-		self.languages = [folder for folder in os.listdir('/usr/share/kodi/language/')]
+		self.languages = self.get_languages()
 		self.languages.sort()
 
 		self.tz_control_map = {
@@ -195,7 +198,21 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.lang_rerun = False
 			self.bypass_language()
 
-
+        def get_languages(self):
+                # try and find language files (Kodi 14.x)
+                try:
+                        return [folder for folder in os.listdir('/usr/share/kodi/language/')]
+                except:
+                        pass
+                # if we have not found yet try looking for laonguage addons (Kodi 15.x)
+                languages = ['English']
+                for folder in os.listdir('/home/osmc/.kodi/addons/'):
+                        if folder.startswith('resource.language.'):
+                                tree = ET.parse('/home/osmc/.kodi/addons/' + folder+ os.sep + 'addon.xml')
+                                root = tree.getroot()
+                                languages.append(root.attrib['name'])
+                return languages;
+ 
 	def bypass_language(self):
 
 		''' Bypasses the language setting, sets the language as selected so the window doesnt reopen '''
