@@ -1,0 +1,120 @@
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index fec78f6..c40c866 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -338,9 +338,11 @@ bool CPeripheralCecAdapter::OpenConnection(void)
+     libcec_configuration config;
+     if (m_cecAdapter->GetCurrentConfiguration(&config))
+     {
++      CLog::Log(LOGDEBUG, "%s - GetCurrentConfiguration OK", __FUNCTION__);
+       // update the local configuration
+       CSingleLock lock(m_critSection);
+       SetConfigurationFromLibCEC(config);
++      CLog::Log(LOGDEBUG, "%s - SetConfigurationFromLibCEC OK", __FUNCTION__);
+     }
+   }
+ 
+@@ -1477,21 +1479,30 @@ bool CPeripheralCecAdapterUpdateThread::WaitReady(void)
+   if (m_configuration.wakeDevices.IsEmpty() && m_configuration.bActivateSource == 0)
+     return true;
+ 
++  CLog::Log(LOGDEBUG, "%s - cec entered WaitReady", __FUNCTION__);
++  CTimer *m_timer = new CTimer(this);
++  m_timer->Start(5000);
++
+   // wait for the TV if we're configured to become the active source.
+   // wait for the first device in the wake list otherwise.
+   cec_logical_address waitFor = (m_configuration.bActivateSource == 1 && m_adapter->m_bActiveSourcePending) ?
+       CECDEVICE_TV :
+       m_configuration.wakeDevices.primary;
+ 
++  CLog::Log(LOGDEBUG, "%s - cec before ProcessActivateSource", __FUNCTION__);
+   m_adapter->ProcessActivateSource();
+ 
++  CLog::Log(LOGDEBUG, "%s - cec LOOP", __FUNCTION__);
+   cec_power_status powerStatus(CEC_POWER_STATUS_UNKNOWN);
+   bool bContinue(true);
+   while (bContinue && !m_adapter->m_bStop && !m_bStop && powerStatus != CEC_POWER_STATUS_ON)
+   {
++    CLog::Log(LOGDEBUG, "%s - cec LOOP in", __FUNCTION__);
+     powerStatus = m_adapter->m_cecAdapter->GetDevicePowerStatus(waitFor);
++    CLog::Log(LOGDEBUG, "%s - cec LOOP powerstatus %d", __FUNCTION__, (int)powerStatus);
+     if (powerStatus != CEC_POWER_STATUS_ON)
+-      bContinue = !m_event.WaitMSec(10000);
++      bContinue = !m_event.WaitMSec(1000);
++    CLog::Log(LOGDEBUG, "%s - cec LOOP bContinue %d", __FUNCTION__, (int)bContinue);
+   }
+ 
+   return powerStatus == CEC_POWER_STATUS_ON;
+@@ -1548,10 +1559,14 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+   // the option to make XBMC the active source is set
+   if (m_configuration.bActivateSource == 1)
+   {
++    CLog::Log(LOGDEBUG, "%s - cec going to ActivateSource()", __FUNCTION__);
+     m_adapter->ActivateSource();
+     // wait until power up
+-    WaitReady();
++    CLog::Log(LOGDEBUG, "%s - cec going to WaitReady()", __FUNCTION__);
++    if (!WaitReady())
++      return false;
+   }
++  CLog::Log(LOGDEBUG, "%s - cec WaitForPowerup (activatesource)", __FUNCTION__);
+ 
+   if (!m_configuration.wakeDevices.IsEmpty() && (m_configuration.wakeDevices.primary != CECDEVICE_TV || m_configuration.bActivateSource == 0))
+   {
+@@ -1571,11 +1586,13 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+     m_bIsUpdating = false;
+   }
+   m_adapter->m_bIsReady = true;
++  CTimer *m_timer = new CTimer(this);
++  m_timer->Start(5000);
+   // wait until we get active source
+   bool bContinue(true);
+   while (!m_adapter->m_cecAdapter->IsLibCECActiveSource() &&
+          bContinue)
+-    bContinue = !m_event.WaitMSec(5000);
++    bContinue = !m_event.WaitMSec(1000);
+ 
+   // request the OSD name of the TV
+   cec_osd_name tvName = m_adapter->m_cecAdapter->GetDeviceOSDName(CECDEVICE_TV);
+@@ -1592,9 +1609,11 @@ bool CPeripheralCecAdapter::IsRunning(void) const
+ 
+ void CPeripheralCecAdapterUpdateThread::Process(void)
+ {
++  CLog::Log(LOGDEBUG, "%s - cec Updaterprocess started OK", __FUNCTION__);
+   // set the initial configuration
+   if (!SetInitialConfiguration())
+     return;
++  CLog::Log(LOGDEBUG, "%s - cec going LOOP", __FUNCTION__);
+ 
+   // and wait for updates
+   bool bUpdate(false);
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.h b/xbmc/peripherals/devices/PeripheralCecAdapter.h
+index 7acb255..a78ed64 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.h
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.h
+@@ -48,6 +48,7 @@ namespace PERIPHERALS
+ #include "PeripheralHID.h"
+ #include "interfaces/AnnouncementManager.h"
+ #include "threads/Thread.h"
++#include "threads/Timer.h"
+ #include "threads/CriticalSection.h"
+ #include <queue>
+ 
+@@ -180,7 +181,7 @@ namespace PERIPHERALS
+     std::string                        m_strComPort;
+   };
+ 
+-  class CPeripheralCecAdapterUpdateThread : public CThread
++  class CPeripheralCecAdapterUpdateThread : public CThread, ITimerCallback
+   {
+   public:
+     CPeripheralCecAdapterUpdateThread(CPeripheralCecAdapter *adapter, CEC::libcec_configuration *configuration);
+@@ -195,6 +196,7 @@ namespace PERIPHERALS
+     bool WaitReady(void);
+     bool SetInitialConfiguration(void);
+     void Process(void);
++    void OnTimeout() { m_event.Set(); };
+ 
+     CPeripheralCecAdapter *    m_adapter;
+     CEvent                     m_event;
