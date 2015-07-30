@@ -10,7 +10,6 @@
 #include <QtNetwork/QNetworkReply>
 #include "utils.h"
 #include <QMap>
-#include <QDebug>
 
 VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName, QString mirrorURL) :
     QWidget(parent),
@@ -28,22 +27,19 @@ VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName, QSt
 
 void VersionSelection::replyFinished(QNetworkReply *reply)
 {
+    bool hasOSMCURL = false;
     if (reply->error() == QNetworkReply::NoError)
     {
         while (reply->canReadLine())
-            enumerateBuilds(reply->readLine());
+            if (enumerateBuilds(reply->readLine()))
+                hasOSMCURL = true; /* Check if we get at least one build back. We may get 200 but not the expected page.. */
         reply->deleteLater();
     }
-    else
-        displayNetworkErrorMessage();
+    else if (reply->error() != QNetworkReply::NoError || ! hasOSMCURL)
+        utils::displayError(tr("Error connecting to network"), tr("There seems to be an issue connecting to the network") + "\n" + "\n" + tr("Please check that you are not trying to download OSMC via a proxy server"), false);
 }
 
-void VersionSelection::displayNetworkErrorMessage()
-{
-    utils::displayError(tr("Error connecting to network"), tr("There seems to be an issue connecting to the network") + "\n" + "\n" + tr("Please check that you are not trying to download OSMC via a proxy server"), false);
-}
-
-void VersionSelection::enumerateBuilds(QByteArray buildline)
+bool VersionSelection::enumerateBuilds(QByteArray buildline)
 {
     QString line = QString::fromUtf8(buildline);
     if (line.contains("download.osmc.tv"))
@@ -58,10 +54,8 @@ void VersionSelection::enumerateBuilds(QByteArray buildline)
         utils::writeLog("Found a build called " + buildnameline);
         ui->versionSelectionBox->addItem(buildnameline);
         buildMap.insert(buildnameline, splitline.at((splitline.count() -1)));
+        return true;
     }
-    else
-        /* We may have a 200, but it's definitely not what was expected */
-        displayNetworkErrorMessage();
 }
 
 VersionSelection::~VersionSelection()
