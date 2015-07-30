@@ -31,4 +31,8 @@ then
 	do
 		if pushd $dir >/dev/null 2>&1; then pycompile -O . >/dev/null 2>&1; popd >/dev/null 2>&1; fi
 	done
+	chown -R osmc:osmc /usr/share/kodi/addons/script.module.elementtree
+	chown -R osmc:osmc /usr/share/kodi/addons/script.module.xmltodict
+	chown -R osmc:osmc /usr/share/kodi/addons/script.module.osmcsetting.*
+	chown -R osmc:osmc /usr/share/kodi/addons/service.osmc.settings
 fi
