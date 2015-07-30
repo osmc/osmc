@@ -39,13 +39,16 @@ class SimpleScheduler(object):
 			# specified hour and minute (using defaults if not provided)
 
 			right_now_weekday = right_now.weekday()
+            
+			days_to_day = self.day - right_now.weekday()
+			if days_to_day < 0:
+				days_to_day += 7
 
-			new_day = right_now.day + self.day - right_now_weekday
-
+			new_day = right_now + datetime.timedelta(days=days_to_day)
 			# mon = 0, tue = 1, wed = 2, thu = 3, fri = 4, sat = 5, sun = 6
 
 			# if the user wants a specific time, then use that, otherwise use a random time
-			self.trigger_time = self.set_trigger_time( right_now.replace(day=new_day) )
+			self.trigger_time = self.set_trigger_time( new_day )
 
 
 		elif self.frequency == 3:
