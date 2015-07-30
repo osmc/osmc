@@ -192,7 +192,7 @@ then
 		--disable-pulse \
 		--disable-projectm \
 		--with-platform=$PIDEV \
-		--enable-optimizations \
+		--disable-optimizations \
 		--enable-libcec \
 		--enable-player=omxplayer \
 		--build=arm-linux
@@ -221,7 +221,7 @@ then
 		--disable-vtbdecoder \
 		--disable-pulse \
 		--disable-projectm \
-		--enable-optimizations \
+		--disable-optimizations \
 		--with-platform=vero \
 		--build=arm-linux
 	fi
