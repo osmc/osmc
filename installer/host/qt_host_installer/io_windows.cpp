@@ -67,8 +67,18 @@ namespace io
        utils::writeLog("Writing 512 bytes to erase MBR");
        QProcess process;
        process.start(QDir::temp().filePath("usbitcmd.exe"), QStringList() << "r" << devicePath << QDir::temp().filePath("bs.img") << "/d", QIODevice::ReadOnly | QIODevice::Text);
-       if (! process.waitForFinished())
-           utils::writeLog("Could not trash MBR. No guarantee of ioctl");
+       process.waitForReadyRead(-1);
+       process.waitForFinished(-1);
+       QByteArray stdoutmbrArray = process.readAllStandardOutput();
+       QByteArray stderrmbrArray = process.readAllStandardError();
+       int exitCode = process.exitCode();
+       if (exitCode != 0)
+       {
+           utils::writeLog("Could not trash MBR");
+           utils::writeLog("Messages: stdout: " + QString(stdoutmbrArray));
+           utils::writeLog("Messages: stderr: " + QString(stderrmbrArray));
+           return false;
+       }
        else
        {
            utils::writeLog("MBR is trashed. Now beginning imaging process.");
@@ -87,7 +97,6 @@ namespace io
            QByteArray stderrArray = process.readAllStandardError();
            int exitCode = process.exitCode();
 
-
            if (exitCode != 0)
            {
                utils::writeLog("Could not invoke usbitcmd to write disk image");
@@ -95,6 +104,7 @@ namespace io
                utils::writeLog("Messages: stderr: " + QString(stderrArray));
                return false;
            }
+
            else
            {
                return true;
