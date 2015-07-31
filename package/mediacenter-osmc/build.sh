@@ -246,7 +246,7 @@ then
         pushd languages
         if [ "$API_VERSION" = "15" ]; then api_name="isengard"; fi
         if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
-        base_url="http://mirrors.kodi.tv/addons/${api_name}"
+        base_url="http://mirror.de.leaseweb.net/xbmc/addons/isengard/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
         languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
         if [ $? != 0 ]; then echo "Can't get list of languages" && exit 1; fi
