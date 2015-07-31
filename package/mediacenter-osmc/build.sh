@@ -152,7 +152,7 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	COMPFLAGS="" && \
+	COMPFLAGS="-O3 -fomit-frame-pointer" && \
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
@@ -168,12 +168,12 @@ then
 	if [ "$1" == "rbp1" ]
 	then
 		PIDEV="raspberry-pi";
-		COMPFLAGS="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations"
+		COMPFLAGS="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations -fomit-frame-pointer"
 	fi
 	if [ "$1" == "rbp2" ]
 	then
 		PIDEV="raspberry-pi2"
-		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -mfpu=neon-vfpv4"
+		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -mfpu=neon-vfpv4 -fomit-frame-pointer"
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
