@@ -238,28 +238,30 @@ then
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
 	# Addon compiler
-    gcc addon-compiler.c -o addon-compiler
-    mv addon-compiler ${out}/usr/bin
-    popd
-    # Languages
-    mkdir languages/
-    pushd languages
-    if [ "$API_VERSION" = "15" ]; then api_name="isengard"; fi
-    if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
-    base_url="http://mirrors.kodi.tv/addons/${api_name}"
-    languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
-    if [ $? != 0 ]; then echo "Can't get list of languages" && exit 1; fi
-    for language in ${languages}
-    do
-        echo "Downloading language file for ${language}"
-        language_file=$(wget ${base_url}/resource.language.${language} -O- | grep -o '<a .*href=.*>' | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | tail -n 1)
-        if [ $? != 0 ]; then echo "Can't determine language file" && exit 1; fi
-		wget ${base_url}/resource.language.${language}/${language_file}
-		if [ $? != 0 ]; then echo "Couldn't download language file ${language_file}" && exit 1; fi
-		unzip ${language_file}
-		rm ${language_file}
-    done
-    cp -ar resource.language.* ${out}/usr/share/kodi/addons
+        gcc addon-compiler.c -o addon-compiler
+        mv addon-compiler ${out}/usr/bin
+        popd
+        # Languages
+        mkdir languages/
+        pushd languages
+        if [ "$API_VERSION" = "15" ]; then api_name="isengard"; fi
+        if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
+        base_url="http://mirrors.kodi.tv/addons/${api_name}"
+	handle_dep "wget" # We do not usually use wget in the build environment
+        languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
+        if [ $? != 0 ]; then echo "Can't get list of languages" && exit 1; fi
+        for language in ${languages}
+        do
+            echo "Downloading language file for ${language}"
+            language_file=$(wget ${base_url}/resource.language.${language} -O- | grep -o '<a .*href=.*>' | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | tail -n 1)
+            if [ $? != 0 ]; then echo "Can't determine language file" && exit 1; fi
+	    wget ${base_url}/resource.language.${language}/${language_file}
+            if [ $? != 0 ]; then echo "Couldn't download language file ${language_file}" && exit 1; fi
+	    unzip ${language_file}
+	    rm ${language_file}
+        done
+        cp -ar resource.language.* ${out}/usr/share/kodi/addons
+	popd
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	strip ${out}/usr/lib/kodi/kodi.bin
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libass5, libcurl3-gnutls, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc, mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
