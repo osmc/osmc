@@ -40,12 +40,12 @@ class SimpleScheduler(object):
 
 			right_now_weekday = right_now.weekday()
 
-			new_day = right_now.day + self.day - right_now_weekday
+			delta_days = self.day - right_now_weekday
 
 			# mon = 0, tue = 1, wed = 2, thu = 3, fri = 4, sat = 5, sun = 6
 
 			# if the user wants a specific time, then use that, otherwise use a random time
-			self.trigger_time = self.set_trigger_time( right_now.replace(day=new_day) )
+			self.trigger_time = self.set_trigger_time( right_now + datetime.timedelta(days=delta_days) )
 
 
 		elif self.frequency == 3:
@@ -53,19 +53,17 @@ class SimpleScheduler(object):
 			# the initial trigger time will be this year and month, but the day number is the one the user has chosen, as well as the users 
 			# specified hour and minute (using defaults if not provided)
 
-			# days in the month, ditm = (right_now.replace(month = right_now.month % 12 +1, day = 1) - datetime.timedelta(days=1)).day
-
-			if self.daynum > 0:
-				trigger_day = self.daynum
-			else:
-				trigger_day = (right_now.replace(month = right_now.month % 12 + 1, day = 1) - datetime.timedelta(days=1)).day + self.daynum
+			# End of this current month plus or minus the number of days the user has chosen in settings
+			trigger_day = right_now.replace(month = right_now.month % 12 + 1, day = 1) + datetime.timedelta(days=self.daynum-1)
+			#             today, with day replaced by 1 and adding 1 to the month  	plus the number of days the user has chosen
+			#																		minus an extra day to rebase it to month-end
 
 			# if the user wants a specific time, then use that, otherwise use a random time
-			self.trigger_time = self.set_trigger_time( right_now.replace(day=trigger_day) )
+			self.trigger_time = self.set_trigger_time(trigger_day)
 
 
-		# if the trigger time is before the current time, then add one month to it
-		if self.trigger_time < right_now:
+		# if the trigger time is before the current time, then step it to the next period
+		while self.trigger_time < right_now:
 
 			self.step_trigger()
 
@@ -90,21 +88,27 @@ class SimpleScheduler(object):
 
 		if self.frequency == 1:
 
+			# jump one say ahead from the current trigger date
 			self.trigger_time = self.trigger_time + datetime.timedelta(days=1)
 
 		elif self.frequency == 2:
 
+			# jump 7 days ahead from teh current trigger date
 			self.trigger_time =  self.trigger_time + datetime.timedelta(days=7)
 
 		elif self.frequency == 3:
 
 			if self.daynum > 0:
-				trigger_day = self.daynum
+				# if the daynum is 1 to 16 then just add one month to the existing month and set the day to be the users chosen date
+				self.trigger_time = self.trigger_time.replace(month = (self.trigger_time.month % 12) + 1, day = self.daynum)
 
 			else:
-				trigger_day = (self.trigger_time.replace(month = self.trigger_time.month % 12 + 2, day = 1) - datetime.timedelta(days=1)).day + self.daynum
+				# if the daynum is negative, that is, the user wants the update to run a certain number of days BEFORE month-end,
+				# then jump to the first day of the month two months ahead of the current one, and then move back one day to get
+				# next months month-end date, then subtract the number of days the user has chosen
+				new_month = (((self.trigger_time.month % 12) + 1 ) % 12 ) + 1
 
-			self.trigger_time = self.trigger_time.replace(month = self.trigger_time.month + 1, day = trigger_day)
+				self.trigger_time = self.trigger_time.replace(month = new_month, day = 1) + datetime.timedelta(days=self.daynum-1)
 
 
 	def check_trigger(self):
