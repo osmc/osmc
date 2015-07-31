@@ -12,7 +12,7 @@ diff --git a/configure.ac b/configure.ac
 index 8c1e412..2211bb9 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -755,6 +755,16 @@ case $use_platform in
+@@ -755,6 +755,17 @@ case $use_platform in
       CFLAGS="$CFLAGS"
       CXXFLAGS="$CXXFLAGS"
       ;;
@@ -25,6 +25,7 @@ index 8c1e412..2211bb9 100644
 +     CXXFLAGS="$CXXFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations "
 +     FFMPEG_EXTRACFLAGS="$FFMPEG_EXTRACFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations "
 +     use_cpu=cortex-a9
++     use_neon=yes
 +     ;;
  esac
  

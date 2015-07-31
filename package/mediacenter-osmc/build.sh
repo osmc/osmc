@@ -152,9 +152,10 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	export CFLAGS+="" \
-	export CXXFLAGS=$CFLAGS && \
-	export CPPFLAGS=$CFLAGS && \
+	COMPFLAGS="" && \
+	export CFLAGS+=${COMPFLAGS} && \
+	export CXXFLAGS+=${COMPFLAGS} && \
+	export CPPFLAGS+=${COMPFLAGS} && \
 	export LDFLAGS="" & \
 	./configure \
 		--prefix=/usr \
@@ -164,17 +165,22 @@ then
 		--disable-pulse \
 		--disable-projectm
 	# Raspberry Pi Configuration
-	if [ "$1" == "rbp1" ]; then PIDEV="raspberry-pi"; fi
+	if [ "$1" == "rbp1" ]
+	then
+		PIDEV="raspberry-pi";
+		COMPFLAGS="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations"
+	fi
 	if [ "$1" == "rbp2" ]
 	then
 		PIDEV="raspberry-pi2"
-		CFLAGS="-mcpu=cortex-a7 -mfpu=neon-vfpv4 "
+		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -march=armv7-a -mfpu=neon-vfpv4"
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
-	export CFLAGS+="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
-	export CXXFLAGS=$CFLAGS && \
-	export CPPFLAGS=$CFLAGS && \
+	COMPFLAGS+="-I/opt/vc/include -I/opt/vc/include/interface -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux" && \
+	export CFLAGS+=${COMPFLAGS} && \
+	export CXXFLAGS+=${COMPFLAGS} && \
+	export CPPFLAGS+=${COMPFLAGS} && \
 	export LDFLAGS="-L/opt/vc/lib" && \
 	./configure \
 		--prefix=/usr \
@@ -199,9 +205,10 @@ then
 	fi
 	if [ "$1" == "vero" ]; then
 	LIBRARY_PATH+="/opt/vero/lib" && \
-	export CFLAGS+="-mcpu=cortex-a9 -mfpu=neon -I/opt/vero/include" && \
-	export CXXFLAGS=$CFLAGS && \
-	export CPPFLAGS=$CFLAGS && \
+	COMPFLAGS="-I/opt/vero/include" && \
+	export CFLAGS+=${COMPFLAGS} && \
+	export CXXFLAGS+=${COMPFLAGS} && \
+	export CPPFLAGS+=${COMPFLAGS} && \
 	export LDFLAGS="-L/opt/vero/lib" && \
 	./configure \
 		--prefix=/usr \
@@ -226,8 +233,6 @@ then
 		--build=arm-linux
 	fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
-	# Hack:
-	sed -i Makefile.include -e s/-O2//g
 	umount /proc/ > /dev/null 2>&1
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
