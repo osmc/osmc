@@ -29,7 +29,7 @@ index 711182f..6e8364a 100644
  	rm -rf $(PLATFORM); mkdir -p $(PLATFORM)
  	cd $(PLATFORM); $(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
  	cd $(PLATFORM); sed -i".bak" -e "s%pkg_config_default=pkg-config%export PKG_CONFIG_LIBDIR=$(PREFIX)/lib/pkgconfig \&\& pkg_config_default=$(NATIVEPREFIX)/bin/pkg-config%" configure
-+	cd $(PLATFORM); patch -p3 < ../ffmpeg_Speed_up_wtv_index_creation.patch
++	cd $(PLATFORM); patch -p1 < ../ffmpeg_Speed_up_wtv_index_creation.patch
  	cd $(PLATFORM);\
  	CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
  	./configure $(ffmpg_config)
@@ -50,10 +50,10 @@ index 0000000..4ac5636
 +
 +    By replacing with an O(N) loop, this takes virtually zero time
 +
-+diff --git a/lib/ffmpeg/libavformat/wtvdec.c b/lib/ffmpeg/libavformat/wtvdec.c
++diff --git a/libavformat/wtvdec.c b/libavformat/wtvdec.c
 +index e423370..70898bd 100644
-+--- a/lib/ffmpeg/libavformat/wtvdec.c
-++++ b/lib/ffmpeg/libavformat/wtvdec.c
++--- a/libavformat/wtvdec.c
+++++ b/libavformat/wtvdec.c
 +@@ -980,21 +980,23 @@ static int read_header(AVFormatContext *s)
 +                 pb = wtvfile_open(s, root, root_size, ff_timeline_table_0_entries_Events_le16);
 +                 if (pb) {
