@@ -173,7 +173,7 @@ then
 	if [ "$1" == "rbp2" ]
 	then
 		PIDEV="raspberry-pi2"
-		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -march=armv7-a -mfpu=neon-vfpv4"
+		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -mfpu=neon-vfpv4"
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
 	LIBRARY_PATH+=/opt/vc/lib && \
