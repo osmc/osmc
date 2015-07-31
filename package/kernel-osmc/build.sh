@@ -6,7 +6,7 @@
 . ../common.sh
 test $1 == rbp1 && VERSION="4.1.2" && REV="1"
 test $1 == rbp2 && VERSION="4.1.2" && REV="1"
-test $1 == vero && VERSION="4.1.3" && REV="5"
+test $1 == vero && VERSION="4.1.3" && REV="6"
 test $1 == atv && VERSION="4.0.2" && REV="2"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ]
 then
@@ -14,7 +14,7 @@ then
 	MAJOR=$(echo ${VERSION:0:1})
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${VERSION}.tar.xz"
 fi
-if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/imx6-4.1.y.tar.gz"; fi
+if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
