@@ -1,0 +1,26 @@
+From 27c63eeb88de1858129d964a291130460feab53c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 22 Jul 2015 16:59:15 +0100
+Subject: [PATCH] Allow patches to be applied to ffmpeg
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/target/ffmpeg/autobuild.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
+index 196c347..e977ff8 100755
+--- a/tools/depends/target/ffmpeg/autobuild.sh
++++ b/tools/depends/target/ffmpeg/autobuild.sh
+@@ -124,6 +124,8 @@ fi
+ mkdir ffmpeg-${VERSION}
+ cd ffmpeg-${VERSION} || exit 2
+ tar --strip-components=1 -xf ../${ARCHIVE}
++cp ../*.patch .
++for file in *.patch; do patch -p1 < $file; done
+ 
+ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ ./configure --prefix=$FFMPEG_PREFIX \
+-- 
+2.1.0
+

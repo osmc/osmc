@@ -1,0 +1,23 @@
+From 51611bb6438afa290477b06b8da1481085cebff8 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Sun, 10 Aug 2014 18:58:37 +0100
+Subject: [PATCH] confluence: Remove media-overlay.jpg for when video is
+ backgrounded
+
+---
+ addons/skin.confluence/720p/IncludesBackgroundBuilding.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/addons/skin.confluence/720p/IncludesBackgroundBuilding.xml b/addons/skin.confluence/720p/IncludesBackgroundBuilding.xml
+index df4b303..af4ac86 100644
+--- a/addons/skin.confluence/720p/IncludesBackgroundBuilding.xml
++++ b/addons/skin.confluence/720p/IncludesBackgroundBuilding.xml
+@@ -41,7 +41,7 @@
+ 			<top>0</top>
+ 			<width>1280</width>
+ 			<height>720</height>
+-			<texture>special://skin/backgrounds/media-overlay.jpg</texture>
++			<!--texture>special://skin/backgrounds/media-overlay.jpg</texture-->
+ 			<visible>[Player.HasVideo + !Skin.HasSetting(ShowBackgroundVideo)] + !Window.IsVisible(TVChannels) + !Window.IsVisible(RadioChannels)</visible>
+ 			<include>VisibleFadeEffect</include>
+ 		</control>

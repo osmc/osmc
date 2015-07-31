@@ -1,0 +1,26 @@
+From 75c356b38b83a5a15c34594e635a1058ee1a904d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 31 Jul 2015 10:16:28 +0100
+Subject: [PATCH] Do not try and update GUI so often when opening a stream
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/dialogs/GUIDialogBusy.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/dialogs/GUIDialogBusy.cpp b/xbmc/dialogs/GUIDialogBusy.cpp
+index 318ecec..9a0c326 100644
+--- a/xbmc/dialogs/GUIDialogBusy.cpp
++++ b/xbmc/dialogs/GUIDialogBusy.cpp
+@@ -68,7 +68,7 @@ bool CGUIDialogBusy::WaitOnEvent(CEvent &event, unsigned int displaytime /* = 10
+     if (dialog)
+     {
+       dialog->Show();
+-      while(!event.WaitMSec(1))
++      while(!event.WaitMSec(100))
+       {
+         g_windowManager.ProcessRenderLoop(false);
+         if (allowCancel && dialog->IsCanceled())
+-- 
+2.1.0
+
