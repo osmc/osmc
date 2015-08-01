@@ -198,21 +198,21 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.lang_rerun = False
 			self.bypass_language()
 
-        def get_languages(self):
-                # try and find language files (Kodi 14.x)
-                try:
-                        return [folder for folder in os.listdir('/usr/share/kodi/language/')]
-                except:
-                        pass
-                # if we have not found yet try looking for laonguage addons (Kodi 15.x)
-                languages = ['English']
+	def get_languages(self):
+		# try and find language files (Kodi 14.x)
+		try:
+			return [folder for folder in os.listdir('/usr/share/kodi/language/')]
+		except:
+			pass
+		# if we have not found yet try looking for laonguage addons (Kodi 15.x)
+		languages = ['English']
 		languagedirs = ["/home/osmc/.kodi/addons", "/usr/share/kodi/addons" ]
 		for folder in os.listdir(languagedirs[0]) + os.listdir(languagedirs[1]):
-		    if folder.startswith('resource.language.'):
-                        tree = ET.parse('/home/osmc/.kodi/addons/' + folder+ os.sep + 'addon.xml')
-                        root = tree.getroot()
-                        languages.append(root.attrib['name'])
-                return languages;
+			if folder.startswith('resource.language.'):
+				tree = ET.parse('/home/osmc/.kodi/addons/' + folder+ os.sep + 'addon.xml')
+				root = tree.getroot()
+				languages.append(root.attrib['name'])
+		return languages
  
 	def bypass_language(self):
 
