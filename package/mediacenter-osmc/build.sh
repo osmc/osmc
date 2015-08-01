@@ -168,7 +168,7 @@ then
 	if [ "$1" == "rbp1" ]
 	then
 		PIDEV="raspberry-pi";
-		COMPFLAGS="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations -fomit-frame-pointer "
+		COMPFLAGS="-O3 -fomit-frame-pointer "
 	fi
 	if [ "$1" == "rbp2" ]
 	then
