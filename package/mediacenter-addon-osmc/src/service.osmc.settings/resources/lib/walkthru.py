@@ -207,6 +207,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# if we have not found yet try looking for laonguage addons (Kodi 15.x)
 		languages = ['English']
 		languagedirs = ["/home/osmc/.kodi/addons", "/usr/share/kodi/addons" ]
+
+		try:
+			log("Contents of %s: %s" % (languagedirs[0], os.listdir(languagedirs[0])))
+		except:
+			log('%s not found' % languagedirs[0])
+		
+		try:
+			log("Contents of %s: %s" % (languagedirs[1], os.listdir(languagedirs[1])))
+		except:
+			log('%s not found' % languagedirs[1])
+
 		for folder in os.listdir(languagedirs[0]) + os.listdir(languagedirs[1]):
 			if folder.startswith('resource.language.'):
 				try:
@@ -214,6 +225,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				except:
 					tree = ET.parse('/usr/share/kodi/addons/' + folder + os.sep + 'addon.xml')
 				root = tree.getroot()
+				log('Name from %s: %s' % (folder, root.attrib['name']))
 				languages.append(root.attrib['name'])
 		return languages
  
