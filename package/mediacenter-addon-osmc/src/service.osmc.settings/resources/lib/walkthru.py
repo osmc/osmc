@@ -113,6 +113,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# get the languages
 		self.languages = self.get_languages()
+		self.languages = list(set(self.languages))
 		self.languages.sort()
 
 		self.tz_control_map = {
