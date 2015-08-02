@@ -247,7 +247,6 @@ then
 	$BUILD DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Building binary addons failed"; fi
 	popd
-        popd
         # Languages
         mkdir languages/
         pushd languages
@@ -268,6 +267,7 @@ then
 	    rm ${language_file}
         done
         cp -ar resource.language.* ${out}/usr/share/kodi/addons
+	popd
 	popd
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	strip ${out}/usr/lib/kodi/kodi.bin
