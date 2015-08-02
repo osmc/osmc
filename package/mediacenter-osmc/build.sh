@@ -240,6 +240,13 @@ then
 	# Addon compiler
         gcc addon-compiler.c -o addon-compiler
         mv addon-compiler ${out}/usr/bin
+	# Binary addons
+	pushd project/cmake/addons
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
+	if [ $? != 0 ]; then echo "Configuring binary addons failed"; fi
+	$BUILD DESTDIR=${out}
+	if [ $? != 0 ]; then echo "Building binary addons failed"; fi
+	popd
         popd
         # Languages
         mkdir languages/
@@ -272,10 +279,6 @@ then
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	mkdir -p ${out}/usr/share/kodi/addons/repository.osmc
-	cp patches/addon.xml ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
-	cp patches/addon-icon.png ${out}/usr/share/kodi/addons/repository.osmc/addon-icon.png
-	sed -e "s/DEVICENAME/${1}/g" -i ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
-	sed -e "s/KODIVERSION/${API_VERSION}/g" -i ${out}/usr/share/kodi/addons/repository.osmc/addon.xml
 	chmod +x ${out}/usr/bin/mediacenter
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-mediacenter-osmc.deb
