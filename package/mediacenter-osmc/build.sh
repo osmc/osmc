@@ -241,7 +241,7 @@ then
         gcc addon-compiler.c -o addon-compiler
         mv addon-compiler ${out}/usr/bin
 	# Binary addons
-	pushd project/cmake/addons/build
+	pushd project/cmake/addons/addons
 	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(readlink -f ./) ../ -DOVERRIDE_PATHS=1
 	if [ $? != 0 ]; then echo "Configuring binary addons failed"; fi
 	cd ../
