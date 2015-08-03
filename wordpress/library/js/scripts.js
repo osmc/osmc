@@ -1,7 +1,3 @@
-jQuery(function () {
-  FastClick.attach(document.body);
-});
-
 jQuery("#nav-res-toggle").click(function () {
 
   if (jQuery(this).hasClass("open"))  {
@@ -125,11 +121,67 @@ jQuery(".newsletter_subscribe").submit(function (e) {
 
 // DONATION //
 
+// check hash on load
+var url_load = document.URL.substr(document.URL.indexOf('#') + 1);
+if (url_load === "donate") {
+  popupDonateShow();
+};
+
+// check hash on change
+jQuery(window).on('hashchange', function () {
+  var hash = location.hash.slice(1);
+  if (hash == "donate") {
+    popupDonateShow();
+  }
+});
+
+// button loading
+function buttonLoadStart() {
+  var button = jQuery(".donationwidget form").find(".clicked");
+  button.prop('disabled', true);
+  button.addClass("loading");
+  button.find(".svg").addClass("hidden");
+  button.append('<img src="https://osmc.tv/wp-content/themes/osmc/library/images/preloader.gif">');
+};
+function buttonLoadStop() {
+  var button = jQuery(".donationwidget form").find(".clicked");
+  button.prop('disabled', false);
+  button.removeClass("loading");
+  button.find(".svg").removeClass("hidden");
+  button.find("img").remove();
+};
+
+// popup //
+function popupDonateShow() {
+  var overlay = jQuery(".overlay");
+  var popup = jQuery(".popup_donate");
+  overlay.addClass("show");
+  popup.addClass("show");
+
+  setTimeout(function () {
+    overlay.addClass("fade");
+    popup.addClass("fade");
+  }, 100);
+
+};
+function popupDonateHide() {
+  jQuery(".popup_donate").removeClass("show fade");
+  jQuery(".overlay").removeClass("show fade");
+  window.location.hash = "exit";
+};
+
+// hide popup on overlay click
+jQuery(".overlay").click(function () {
+  popupDonateHide();
+});
+
+// set which donation form
 jQuery(".donationwidget button").click(function () {
   jQuery('.donationwidget button').removeClass("clicked");
   jQuery(this).addClass("clicked");
 });
 
+// validate form
 jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {  
   jQuery(oneForm).validate({
     rules: {
@@ -154,58 +206,23 @@ jQuery.each(jQuery(".donationwidget form"), function (index, oneForm)  {
 
       }
       if (button.hasClass("stripe")) {
-
-        button.prop('disabled', true);
-        button.addClass("loading");
-        button.find(".svg").addClass("hidden");
-        button.append('<img src="https://osmc.tv/wp-content/themes/osmc/library/images/preloader.gif">');
+        
+        buttonLoadStart();
         var newamount = amount + "00";
-
         jQuery.getScript("https://checkout.stripe.com/checkout.js", function () {
           stripe(newamount, currency);
         });
       }
+      if (button.hasClass("bitcoin")) {
+        console.log("bitcoin");
+        window.addEventListener('message', receiveMessage, false);
+        jQuery(".overlay").before('<iframe class="overlayCoinbase" id="coinbase_inline_iframe_db2f17ea41912e21935a4850388cd848" src="https://www.coinbase.com/checkouts/db2f17ea41912e21935a4850388cd848/inline" style="width: 460px; height: 350px; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.25);" allowtransparency="true" frameborder="0"></iframe>');
+      };
     }
   });
 });
 
-// POPUP //
-
-// check hash on load
-var url_load = document.URL.substr(document.URL.indexOf('#') + 1);
-if (url_load === "donate") {
-  popup_donate();
-};
-
-// check hash on change
-jQuery(window).on('hashchange', function () {
-  var hash = location.hash.slice(1);
-  if (hash == "donate") {
-    popup_donate();
-  }
-});
-
-function popup_donate() {
-  var overlay = jQuery(".overlay");
-  var popup = jQuery(".popup_donate");
-  overlay.addClass("show");
-  popup.addClass("show");
-
-  setTimeout(function () {
-    overlay.addClass("fade");
-    popup.addClass("fade");
-  }, 100);
-
-};
-
-jQuery(".overlay").click(function () {
-  jQuery(".popup_donate").removeClass("show fade");
-  jQuery(".overlay").removeClass("show fade");
-  window.location.hash = "exit";
-});
-
-// STRIPE //
-
+// stripe
 function stripe(am, cur) {
   var handler = StripeCheckout.configure({
     key: 'pk_live_HEfJk95fTFmjEBYMYVTxWFZk',
@@ -222,19 +239,16 @@ function stripe(am, cur) {
     amount: am,
     currency: cur,
     opened: function () {
-      var button = jQuery(".donationwidget form").find(".clicked");
-      button.prop('disabled', false);
-      button.removeClass("loading");
-      button.find(".svg").removeClass("hidden");
-      button.find("img").remove();
+      buttonLoadStop();
     }
   });
+  
+  // Close stripe checkout on page navigation
+  jQuery(window).on('popstate', function () {
+    handler.close();
+  });
+  
 };
-
-// Close Checkout on page navigation
-jQuery(window).on('popstate', function () {
-  handler.close();
-});
 
 // DOWNLOAD SCROLL TO //
 
