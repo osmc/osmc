@@ -241,13 +241,13 @@ then
         gcc addon-compiler.c -o addon-compiler
         mv addon-compiler ${out}/usr/bin
 	# Binary addons
-	pushd project/cmake/addons/addons
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then export CFLAGS="-O3 -I/opt/vc/include"; fi
-	if [ "$1" == "vero" ]; then export CFLAGS="-O3 -I/opt/vero/include"; fi
+	pushd project/cmake/addons/
+	mkdir build
+	cd build
 	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(readlink -f ./) ../ -DOVERRIDE_PATHS=1
 	if [ $? != 0 ]; then echo "Configuring binary addons failed"; fi
 	cd ../
-	make -C kodiplatform_DIR=$(readlink -f ./depends)
+	$BUILD kodiplatform_DIR=$(readlink -f ./depends) -C build/
 	if [ $? != 0 ]; then echo "Building binary addons failed"; fi
 	popd
         # Languages
