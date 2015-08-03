@@ -36,7 +36,7 @@
 		<meta name="msapplication-square310x310logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x310.png">
 		<meta name="msapplication-wide310x150logo" content="<?php echo get_template_directory_uri(); ?>/library/images/favicons/mstile-310x150.png">
 		<!-- inject:css -->
-		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-9c23fac8.css">
+		<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/library/style/css/style-34e9e46d.css">
 		<!-- endinject -->
 		
 		<!--[if lte IE 8]> 
@@ -91,6 +91,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="1920px" height="1536px" viewBox="-408 -843.5 1920 1536" enable-background="new -408 -843.5 1920 1536" xml:space="preserve"><path fill="#D3D3D3" d="M1333.149-825.402c42.963 0 79.7 15.3 110.3 45.892c30.596 30.6 45.9 67.4 45.9 110.3 V518.173c0 42.963-15.297 79.744-45.893 110.337c-30.595 30.596-67.374 45.893-110.337 45.893H-229.149 c-42.963 0-79.742-15.297-110.337-45.893c-30.596-30.594-45.893-67.374-45.893-110.337V-669.173 c0-42.963 15.297-79.742 45.893-110.337c30.596-30.595 67.374-45.892 110.337-45.892H1333.149z"/><path d="M1352-843.5c44 0 81.7 15.7 113 47c31.334 31.3 47 69 47 113v1216c0 44-15.666 81.667-47 113 c-31.333 31.333-69 47-113 47H-248c-44 0-81.666-15.667-113-47s-47-69-47-113v-1216c0-44 15.666-81.666 47-113s69-47 113-47H1352z M-248-715.5c-8.666 0-16.166 3.166-22.5 9.5s-9.5 13.834-9.5 22.5v224h1664v-224c0-8.666-3.167-16.166-9.5-22.5 s-13.833-9.5-22.5-9.5H-248z M1352 564.5c8.667 0 16.167-3.167 22.5-9.5s9.5-13.833 9.5-22.5v-608H-280v608 c0 8.7 3.2 16.2 9.5 22.5s13.834 9.5 22.5 9.5H1352z M-152 436.5v-128h256v128H-152z M232 436.5v-128h384v128H232z"/></svg>
             </div>
             </button>
+          </div>
+          <div class="alternative">
+            <p>You can also donate via <a href="https://www.coinbase.com/checkouts/6931095171d32c0dce231a9657f6168e" target="_blank" title="Bitcoin">Bitcoin</a> or <a href="https://flattr.com/submit/auto?user_id=OSMC&url=https%3A%2F%2Fosmc.tv" target="_blank" title="Flattr this">Flattr</a>.</p>
           </div>
         </form>
       </div>
