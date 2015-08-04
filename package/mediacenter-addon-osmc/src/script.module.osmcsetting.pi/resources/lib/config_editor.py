@@ -5,6 +5,7 @@ import xbmcgui
 import subprocess
 import sys
 import time
+import os
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK      = 92
