@@ -1,8 +1,16 @@
 #!/bin/bash
 
 if [ "$1" = "configure" ]; then
+
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
 		systemctl enable mediacenter.service >/dev/null 2>&1
+	fi
+
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
+		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "14.2.0-14"; then
+			systemctl enable mediacenter.service >/dev/null 2>&1
+		fi
 	fi
 fi
