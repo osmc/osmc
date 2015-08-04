@@ -244,10 +244,10 @@ then
 	pushd project/cmake/addons/
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(readlink -f ./) ../ -DOVERRIDE_PATHS=1
+	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) ../ -DOVERRIDE_PATHS=1
 	if [ $? != 0 ]; then echo "Configuring binary addons failed"; fi
 	cd ../
-	$BUILD kodiplatform_DIR=$(readlink -f ./depends) -C build/
+	$BUILD kodiplatform_DIR=$(pwd) -C build/
 	if [ $? != 0 ]; then echo "Building binary addons failed"; fi
 	popd
         # Languages
