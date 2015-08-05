@@ -861,7 +861,7 @@ Overclock settings are set using the Pi Overclock module."""
 			elif memgpu:
 
 				# set the value in the pi_settings_dict and the settings.xml for display
-				val512 = min(768, int(memgpu))
+				val1024 = min(768, int(memgpu))
 				self.me.setSetting('gpu_mem_1024', str(val1024))
 				self.pi_settings_dict['gpu_mem_1024']['setting_value'] = val1024
 
