@@ -330,7 +330,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if actionID in (10, 92):
             self.stop_wifi_population_thread()
             self.stop_bluetooth_population_thread()
-            xbmc.sleep(50)
+            xbmc.sleep(200)
             self.close()
 
         if focused_control in MAIN_MENU:
@@ -862,7 +862,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.toggle_controls(True, BLUETOOTH_CONTROLS)
         discoveryRadioButton = self.getControl(BLUETOOTH_DISCOVERY)
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
-        # Start Bluetooth Poulation Thread
+        # Start Bluetooth Population Thread
         threadRunning = False
         for t in threading.enumerate():
             if t.getName() == BLUETOOTH_THREAD_NAME:
@@ -883,11 +883,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.clear_busy_dialogue()
 
         if control_id == BLUETOOTH_DISCOVERY:  # Discovery
+            self.show_busy_dialogue()
             if not osmc_bluetooth.is_discovering():
                 osmc_bluetooth.start_discovery()
             else:
                 osmc_bluetooth.stop_discovery()
-            xbmc.sleep(100)
+            xbmc.sleep(1500)
+            self.clear_busy_dialogue()
+
 
         if control_id == 6000:  # paired devices
             item = self.BTP.getSelectedItem()
