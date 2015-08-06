@@ -359,8 +359,8 @@ class OSMCGui(threading.Thread):
 		for i, module in enumerate(self.live_modules):
 
 			WINDOW.setProperty('MyOSMC.Module.%s.name' 		% i, module['SET'].shortname)
-			WINDOW.setProperty('MyOSMC.Module.%s.fo_icon' 	% i, module['FO_Icon'])
-			WINDOW.setProperty('MyOSMC.Module.%s.fx_icon' 	% i, module['FX_Icon'])
+			WINDOW.setProperty('MyOSMC.Module.%s.fo_icon' 	% i, module['FO_Icon_Widget'])
+			WINDOW.setProperty('MyOSMC.Module.%s.fx_icon' 	% i, module['FX_Icon_Widget'])
 			WINDOW.setProperty('MyOSMC.Module.%s.id' 		% i, module['id'])
 
 	
@@ -465,6 +465,18 @@ class OSMCGui(threading.Thread):
 		osmc_setting_FO_icon = os.path.join(osmc_subfolder, "FO_Icon.png")
 		if not os.path.isfile(osmc_setting_FO_icon): return
 
+		# check for the unfocussed widget icon.png
+		osmc_setting_FX_icon_Widget = os.path.join(osmc_subfolder, "FX_Icon_Widget.png")
+		if not os.path.isfile(osmc_setting_FX_icon): 
+			# if not found, use the ordinary icon instead
+			osmc_setting_FX_icon_Widget = osmc_setting_FX_icon
+
+		# check for the focussed widget icon.png
+		osmc_setting_FO_icon_Widget = os.path.join(osmc_subfolder, "FO_Icon_Widget.png")
+		if not os.path.isfile(osmc_setting_FO_icon):
+			# if not found, use the ordinary icon instead
+			osmc_setting_FO_icon_Widget = osmc_setting_FO_icon
+
 		# if you got this far then this is almost certainly an OSMC setting
 		try:
 			new_module_name = sub_folder.replace('.','')
@@ -484,13 +496,22 @@ class OSMCGui(threading.Thread):
 		# success!
 		log('OSMC Setting Module __ %s __ found and imported' % sub_folder)
 
-		# DETERMINE ORRDER OF ADDONS, THIS CAN BE HARDCODED FOR SOME OR THE USER SHOULD BE ABLE TO CHOOSE THEIR OWN ORDER
+		# DETERMINE ORDER OF ADDONS, THIS CAN BE HARDCODED FOR SOME OR THE USER SHOULD BE ABLE TO CHOOSE THEIR OWN ORDER
 		if sub_folder in self.known_modules_order.keys():
 			order = self.known_modules_order[sub_folder]
 		else:
 			order = self.module_tally
 			self.module_tally += 1
 
-		return (order, {'id': sub_folder, 'FX_Icon': osmc_setting_FX_icon, 'FO_Icon': osmc_setting_FO_icon, 'SET':setting_instance, 'OSMCSetting':OSMCSetting})
+		return (order, {
+						'id': sub_folder, 
+						'FX_Icon': osmc_setting_FX_icon, 
+						'FO_Icon': osmc_setting_FO_icon, 
+						'FX_Icon_Widget': osmc_setting_FX_icon_Widget, 
+						'FO_Icon_Widget': osmc_setting_FO_icon_Widget, 
+						'SET':setting_instance, 
+						'OSMCSetting':OSMCSetting
+						}
+				)
 
 
