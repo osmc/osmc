@@ -1,0 +1,25 @@
+From 6d1609a46bbce72329211cd538e551382e51d09f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 7 Aug 2015 21:05:33 +0100
+Subject: [PATCH] Enable libdcadec library
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/target/ffmpeg/autobuild.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
+index 204813e..868c6e9 100755
+--- a/tools/depends/target/ffmpeg/autobuild.sh
++++ b/tools/depends/target/ffmpeg/autobuild.sh
+@@ -141,6 +141,7 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ 	--enable-vaapi \
+ 	--enable-vdpau \
+ 	--disable-libxcb \
++	--enable-libdcadec \
+ 	--enable-bzlib \
+ 	--enable-gnutls \
+ 	--enable-muxer=spdif \
+-- 
+2.1.0
+
