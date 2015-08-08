@@ -698,7 +698,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         elif control_id == WIRELESS_APPLY_BUTTON:
             if self.current_network_config:
-                osmc_network.apply_network_changes(self.current_network_config)
+                osmc_network.apply_network_changes(self.current_network_config, self.internet_protocol)
                 self.populate_wifi_panel()
                 self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
 
