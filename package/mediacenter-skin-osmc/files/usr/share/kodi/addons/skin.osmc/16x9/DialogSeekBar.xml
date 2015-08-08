@@ -2,7 +2,7 @@
 <window>
 	<!-- seekbar -->
 	<defaultcontrol always="true">901</defaultcontrol>
-	<visible>[VideoPlayer.IsFullscreen | Window.IsVisible(visualisation)] + [Player.Seeking | Player.DisplayAfterSeek | Player.Paused | Player.Forwarding | Player.Rewinding] + !Window.IsVisible(VideoOSD)</visible>
+	<visible>[VideoPlayer.IsFullscreen | Window.IsVisible(visualisation)] + [Player.Seeking | Player.DisplayAfterSeek | Player.Paused | Player.Forwarding | Player.Rewinding] + !Window.IsVisible(videoosd) + !Window.IsVisible(subtitlesearch)</visible>
 	<animation type="WindowOpen">
 		<effect type="zoom" start="90" end="100" center="auto" tween="back" easing="out" time="200"/>
 		<effect type="fade" start="0" end="100" time="200"/>
