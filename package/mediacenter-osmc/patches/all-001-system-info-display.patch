@@ -18,7 +18,7 @@ index 604a0d9..732ae33 100644
        CGUIWindow::OnMessage(message);
 -      SET_CONTROL_LABEL(52, CSysInfo::GetAppName() + " " + g_infoManager.GetLabel(SYSTEM_BUILD_VERSION).c_str() +
 -                            " (Compiled: " + g_infoManager.GetLabel(SYSTEM_BUILD_DATE).c_str() +")");
-+      SET_CONTROL_LABEL(52, "Open Source Media Center running " + CSysInfo::GetAppName() + g_infoManager.GetLabel(SYSTEM_BUILD_VERSION).substr(4).c_str() + " (Compiled: " + g_infoManager.GetLabel(SYSTEM_BUILD_DATE).c_str() +")");
++      SET_CONTROL_LABEL(52, "Open Source Media Center running " + CSysInfo::GetAppName() + " " + g_infoManager.GetLabel(SYSTEM_BUILD_VERSION).substr(0,4).c_str() + " (Compiled: " + g_infoManager.GetLabel(SYSTEM_BUILD_DATE).c_str() +")");
        CONTROL_ENABLE_ON_CONDITION(CONTROL_BT_PVR,
                                    PVR::CPVRManager::Get().IsStarted());
        return true;
