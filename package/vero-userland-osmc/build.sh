@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/imx-lib-3.10.17-1.0.0.tar.gz" "$(pwd)/src"
+pull_source "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/imx-lib-3.10.31-1.1.0-beta.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 rm -rf src/imx-lib*/hdmi-cec
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-3.10.17-1.0.0.bin" "$(pwd)/src/firmware-imx.bin"
@@ -13,9 +13,9 @@ if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-3.10.17-1.0.0.bin" "$(pwd)/src/imx-vpu.bin"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/gpu-viv-g2d-3.10.17-1.0.0.bin" "$(pwd)/src/viv-g2d.bin"
-pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/libfslvpuwrap-1.0.46.bin" "$(pwd)/src/libfslvpuwrap.bin"
+pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/libfslvpuwrap-1.0.54.bin" "$(pwd)/src/libfslvpuwrap.bin"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
-pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/gpu-viv-bin-mx6q-3.10.17-1.0.0-hfp.bin" "$(pwd)/src/gpu-viv.bin"
+pull_bin "http://www.freescale.com/lgfiles/NMG/MAD/YOCTO/gpu-viv-bin-mx6q-3.10.17-1.0.2-hfp.bin" "$(pwd)/src/gpu-viv.bin"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "vero-userland-osmc"
