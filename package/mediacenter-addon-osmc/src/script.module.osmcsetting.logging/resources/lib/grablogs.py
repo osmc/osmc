@@ -168,6 +168,8 @@ class Main(object):
 		with os.popen('free -m') as f:
 			self.log_list.extend(f.readlines())		
 
+		self.log_list.extend(['\n====================== Memory END ===================== eWTP1Mc8\n'])
+
 
 	def grab_diskspace(self):
 
@@ -175,6 +177,8 @@ class Main(object):
 
 		with os.popen('df -h') as f:
 			self.log_list.extend(f.readlines())	
+		
+		self.log_list.extend(['\n====================== Diskspace END ================== qZy25Yas\n'])
 
 
 	def grab_initd(self):
@@ -184,6 +188,8 @@ class Main(object):
 		with os.popen('ls -al /etc/init.d') as f:
 			self.log_list.extend(f.readlines())	
 
+		self.log_list.extend(['\n====================== init.d END ===================== Vr58kq0w\n'])
+
 
 	def grab_systemd(self):
 
@@ -192,6 +198,8 @@ class Main(object):
 		with os.popen('ls -al /lib/systemd/system') as f:
 			self.log_list.extend(f.readlines())	
 
+		self.log_list.extend(['\n====================== systemd END ==================== 86JFGfNO\n'])
+
 
 	def grab_dmesg(self):
 
@@ -199,6 +207,8 @@ class Main(object):
 
 		with os.popen('dmesg') as f:
 			self.log_list.extend(f.readlines())	
+
+		self.log_list.extend(['\n====================== Kernel Message Log (dmesg) END ===================== Ad2zzd21\n'])
 
 
 	def grab_kodi_logs(self):
@@ -214,6 +224,8 @@ class Main(object):
 
 			self.log_list.extend(['kodi.log not found'])
 
+		self.log_list.extend(['\n====================== Kodi Log END =================== HyhIT4UP\n'])
+
 		self.log_list.extend(['\n====================== Kodi Old Log ====================== 2qaAc90c\n'])
 
 		location = '/home/osmc/.kodi/temp/kodi.old.log'
@@ -224,6 +236,8 @@ class Main(object):
 		except:
 
 			self.log_list.extend(['kodi.old.log not found'])
+
+		self.log_list.extend(['\n====================== Kodi Old Log END ================== 2qaAc90c\n'])
 
 
 	def grab_lirc_conf(self):
@@ -238,6 +252,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['lircd.conf not found'])
 
+		self.log_list.extend(['\n====================== lircd.conf END ===================== kdgLUcwP\n'])
+
 
 	def grab_config(self):
 
@@ -251,6 +267,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['config.txt not found'])
 
+		self.log_list.extend(['\n====================== Pi config.txt END ================== Ul2H1CLu\n'])
+
 
 	def grab_osmc_packages(self):
 
@@ -258,6 +276,8 @@ class Main(object):
 
 		with os.popen('dpkg -l | grep osmc') as f:
 			self.log_list.extend(f.readlines())
+
+		self.log_list.extend(['\n====================== OSMC Packages END ================== 7nQvfy9a\n'])
 
 
 	def grab_uname(self):
@@ -270,6 +290,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['uname not found'])
 
+		self.log_list.extend(['\n====================== UNAME END ========================== 0wwkXuO5\n'])
+
 		self.log_list.extend(['\n====================== cmdline =========================\n'])
 
 		location = '/proc/cmdline'
@@ -280,6 +302,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['cmdline not found'])
 
+		self.log_list.extend(['\n====================== cmdline END =====================\n'])
+
 
 	def grab_all_other_packages(self):
 
@@ -287,6 +311,8 @@ class Main(object):
 
 		with os.popen('dpkg -l | grep -v osmc') as f:
 			self.log_list.extend(f.readlines())
+
+		self.log_list.extend(['\n====================== All Other Packages END ============= hwvkLCMX\n'])
 
 
 	def grab_apt_logs(self):
@@ -299,6 +325,8 @@ class Main(object):
 		else:
 			self.log_list.extend(['apt term.log not found'])
 
+		self.log_list.extend(['\n====================== APT term.log END =================== RcBRrsRs\n'])
+
 		self.log_list.extend(['\n====================== APT history.log ======================== B8sj7DO8\n'])
 
 		if os.path.isfile('/var/log/apt/history.log'):
@@ -306,6 +334,8 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		else:
 			self.log_list.extend(['apt history.log not found'])
+
+		self.log_list.extend(['\n====================== APT history.log END ==================== B8sj7DO8\n'])
 
 		self.log_list.extend(['\n====================== APT sources.list ======================== ZZz2wrJ1\n'])
 
@@ -317,15 +347,21 @@ class Main(object):
 		except:
 			self.log_list.extend(['APT sources.list not found'])
 
+		self.log_list.extend(['\n====================== APT sources.list END ==================== ZZz2wrJ1\n'])
+
 		self.log_list.extend(['\n====================== APT apt.conf.d ======================== fFsk1x85\n'])
 
 		with os.popen('ls -al /etc/apt/apt.conf.d') as f:
 			self.log_list.extend(f.readlines())
 
+		self.log_list.extend(['\n====================== APT apt.conf.d END ==================== fFsk1x85\n'])
+
 		self.log_list.extend(['\n====================== APT preferences.d ======================== vSKj25Lq\n'])
 
 		with os.popen('ls -al /etc/apt/preferences.d') as f:
 			self.log_list.extend(f.readlines())
+
+		self.log_list.extend(['\n====================== APT preferences.d END ==================== vSKj25Lq\n'])
 
 
 	def grab_advancedsettings(self):
@@ -340,6 +376,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['advancedsettings.xml not found'])
 
+		self.log_list.extend(['\n====================== advancedsettings.xml END =========== C7hKmH1p\n'])
+
 
 	def grab_sources(self):
 
@@ -352,6 +390,8 @@ class Main(object):
 				self.log_list.extend(f.readlines())
 		except:
 			self.log_list.extend(['sources.xml not found'])
+
+		self.log_list.extend(['\n====================== sources.xml END ==================== SGkuGLGj\n'])
 
 
 	def grab_fstab(self):
@@ -366,10 +406,12 @@ class Main(object):
 		except:
 			self.log_list.extend(['fstab not found'])
 
+		self.log_list.extend(['\n====================== fstab END ========================== qiE9Dtax\n'])
+
 
 	def grab_keyboard(self):
 
-		self.log_list.extend(['\n====================== keyboard.xml ======================= MBom5YV6\n'])
+		self.log_list.extend(['\n====================== keyboard.xml ====================== MBom5YV6\n'])
 
 		location = '/home/osmc/.kodi/userdata/keyboard.xml'
 
@@ -379,10 +421,12 @@ class Main(object):
 		except:
 			self.log_list.extend(['keyboard.xml not found'])
 
+		self.log_list.extend(['\n====================== keyboard.xml END ================== MBom5YV6\n'])
+
 
 	def grab_remote(self):
 
-		self.log_list.extend(['\n====================== remote.xml ======================= 5jmphjm3\n'])
+		self.log_list.extend(['\n====================== remote.xml =================== 5jmphjm3\n'])
 
 		location = '/home/osmc/.kodi/userdata/remote.xml'
 
@@ -390,7 +434,9 @@ class Main(object):
 			with open (location, 'r') as f:
 				self.log_list.extend(f.readlines())
 		except:
-			self.log_list.extend(['remote.xml not found'])			
+			self.log_list.extend(['remote.xml not found'])	
+
+		self.log_list.extend(['\n====================== remote.xml END =================== 5jmphjm3\n'])		
 
 
 	def grab_system_logs(self):
@@ -403,6 +449,8 @@ class Main(object):
 		except:
 			self.log_list.extend(['system log not found'])
 
+		self.log_list.extend(['\n====================== System Journal END =============== MyqVXi2x\n'])
+
 
 	def grab_boot_contents(self):
 
@@ -410,6 +458,8 @@ class Main(object):
 
 		with os.popen('ls -al /boot') as f:
 			self.log_list.extend(f.readlines())
+
+		self.log_list.extend(['\n====================== /boot Contents END =============== H3gEog10\n'])
 
 
 if __name__ == "__main__":
