@@ -15,6 +15,12 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+if [ -e /home/osmc/enable-hdmi-trace ]; then
+	mv /var/log/hdmi-trace.log /var/log/hdmi-trace.old.log 2>/dev/null
+	/usr/bin/hdmi-trace >/var/log/hdmi-trace.log &
+	sleep 1
+fi
+
 trap 'wait; exit 0' SIGTERM
 
 chmod a+rw /dev/tty1

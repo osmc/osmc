@@ -283,6 +283,7 @@ then
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	mkdir -p ${out}/usr/share/kodi/addons/repository.osmc
 	chmod +x ${out}/usr/bin/mediacenter
+	test "$1" == vero && cp patches/${1}-hdmi-trace ${out}/usr/bin/hdmi-trace && chmod +x ${out}/usr/bin/hdmi-trace
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-mediacenter-osmc.deb
 	build_return=$?
