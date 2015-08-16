@@ -1,0 +1,26 @@
+From 648d8497f3144946550372cb89235c77f8c3ecfd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 16 Aug 2015 07:43:03 +0100
+Subject: [PATCH] Do not return SCM revision in version
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/GUIInfoManager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+index 8cf1202..82f4281 100644
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -4357,7 +4357,7 @@ std::string CGUIInfoManager::GetVersionShort(void)
+ 
+ std::string CGUIInfoManager::GetVersion()
+ {
+-  return GetVersionShort() + " Git:" + CCompileInfo::GetSCMID();
++  return GetVersionShort();
+ }
+ 
+ std::string CGUIInfoManager::GetBuild()
+-- 
+2.1.0
+
