@@ -335,17 +335,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# skip the Networking setup menu item and go to the skin panel
 			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			# self.getControl(94000).setVisible(False)
-			# self.getControl(98000).setVisible(True)
-			# self.getControl(1008).setVisible(True)
-			# self.setFocusId(80010)
+			self.getControl(94000).setVisible(False)
+			self.getControl(98000).setVisible(True)
+			self.getControl(1008).setVisible(True)
+			self.setFocusId(80010)
 
 			# display the sign-up panel
 			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			self.getControl(control_id_pairs.get(controlID, 94000)).setVisible(False)
-			self.getControl(99000).setVisible(True)
-			self.getControl(1009).setVisible(True)
-			self.setFocusId(90010)
+			# self.getControl(control_id_pairs.get(controlID, 94000)).setVisible(False)
+			# self.getControl(99000).setVisible(True)
+			# self.getControl(1009).setVisible(True)
+			# self.setFocusId(90010)
 
 		else:
 
@@ -475,17 +475,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# display the skin panel
 			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			# self.getControl(96000).setVisible(False)
-			# self.getControl(98000).setVisible(True)
-			# self.getControl(1008).setVisible(True)
-			# self.setFocusId(80010)	
+			self.getControl(96000).setVisible(False)
+			self.getControl(98000).setVisible(True)
+			self.getControl(1008).setVisible(True)
+			self.setFocusId(80010)	
 
 			# display the sign-up panel
 			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			self.getControl(96000).setVisible(False)
-			self.getControl(99000).setVisible(True)
-			self.getControl(1009).setVisible(True)
-			self.setFocusId(90010)
+			# self.getControl(96000).setVisible(False)
+			# self.getControl(99000).setVisible(True)
+			# self.getControl(1009).setVisible(True)
+			# self.setFocusId(90010)
 
 		elif controlID == 60010:			# open networking gui
 			
@@ -493,17 +493,17 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# display the skin panel  
 			# -- SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			# self.getControl(96000).setVisible(False)
-			# self.getControl(98000).setVisible(True)
-			# self.getControl(1008).setVisible(True)
-			# self.setFocusId(80010)	
+			self.getControl(96000).setVisible(False)
+			self.getControl(98000).setVisible(True)
+			self.getControl(1008).setVisible(True)
+			self.setFocusId(80010)	
 
 			# display the sign-up panel
 			# -- INCLUDED ONLY WHILE THE SKIN CHANGE METHOD IS WORKED ON --
-			self.getControl(96000).setVisible(False)
-			self.getControl(99000).setVisible(True)
-			self.getControl(1009).setVisible(True)
-			self.setFocusId(90010)
+			# self.getControl(96000).setVisible(False)
+			# self.getControl(99000).setVisible(True)
+			# self.getControl(1009).setVisible(True)
+			# self.setFocusId(90010)
 
 		elif controlID in [80010, 80020]:	# user has selected a skin
 
@@ -647,13 +647,13 @@ def open_gui(networking_instance):
 		log('skin_choice: %s' % skin_choice)
 		
 	# -- THIS SECTION IS SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
-	# if skin_choice != 'OSMC':
+	if skin_choice != 'OSMC':
 
-	# 	log('Loading Confluence')
-	# 	try:
-	# 		xbmc.setskin('skin.confluence')
-	# 	except:
-	# 		log('Loading Confluence failed.')
+		log('Loading Confluence')
+		try:
+			xbmc.setskin('skin.confluence')
+		except:
+			log('Loading Confluence failed.')
 
 	log('Exiting GUI')
 
