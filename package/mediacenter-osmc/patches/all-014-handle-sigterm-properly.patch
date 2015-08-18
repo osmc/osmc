@@ -1,16 +1,19 @@
-From ab8d2ab714cc665aec348eb803942a48a4fa3fbb Mon Sep 17 00:00:00 2001
+From 02efd980a97759c0e295ba5c8f6d277172a460c3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Fri, 17 Apr 2015 01:53:21 +0100
+Date: Tue, 18 Aug 2015 02:41:43 +0100
 Subject: [PATCH] Make Kodi quit on SIGTERM. We do not need to call Stop()
  because we can handle a hang properly but we still get good teardown
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
+ xbmc/main/main.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
 diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
-index ec86426..f5381f6 100644
+index 87fe2fd..eb22236 100644
 --- a/xbmc/main/main.cpp
 +++ b/xbmc/main/main.cpp
-@@ -40,9 +40,20 @@
+@@ -41,9 +41,21 @@
  #include "input/linux/LIRC.h"
  #endif
  #include "XbmcContext.h"
@@ -19,6 +22,7 @@ index ec86426..f5381f6 100644
 +void sigterm_handler(int signum)
 +{
 +	CLog::Log(LOGINFO, "Received signal");
++	CApplicationMessenger::Get().SaveStateStop();
 +	CApplicationMessenger::Get().Quit();
 +}
  
@@ -31,3 +35,6 @@ index ec86426..f5381f6 100644
    // set up some xbmc specific relationships
    XBMC::Context context;
  
+-- 
+2.1.0
+
