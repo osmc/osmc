@@ -1,0 +1,59 @@
+From 4876a15ef4795ed81a270776b25f6d48fe3c69d5 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 18 Aug 2015 05:02:38 +0100
+Subject: [PATCH] Allow skin to be changed via xbmc Python API
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 11 +++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 1ddfd64..42867d1 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -109,6 +109,17 @@ namespace XBMCAddon
+       CApplicationMessenger::Get().ExecBuiltIn(function,wait);
+     }
+ 
++    void setskin(const char* skin)
++    {
++		XBMC_TRACE;
++		if (! skin)
++		return;
++		std::string defaultSkin = ((const CSettingString*)CSettings::Get().GetSetting("lookandfeel.skin"))->GetDefault();
++		CApplicationMessenger::Get().ExecBuiltIn("UnloadSkin", true);
++		CSettings::Get().SetString("lookandfeel.skin", skin);
++		CApplicationMessenger::Get().ExecBuiltIn("ReloadSkin", true);
++	}
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 9817525..f15c615 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -91,6 +91,18 @@ namespace XBMCAddon
+      */
+     void executebuiltin(const char* function, bool wait = false);
+ 
++	/**
++	 * setskin(skinname) -- Change the XBMC skin
++	 *
++	 * skinname		  :	string - the name of the skin to change to
++	 *
++	 *
++	 * example:
++	 *    - xbmc.setskin("skin.confluence")
++	 */
++
++	 void setskin(const char* skin);
++
+     /**
+      * executeJSONRPC(jsonrpccommand) -- Execute an JSONRPC command.
+      * 
+-- 
+2.1.0
+
