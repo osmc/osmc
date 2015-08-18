@@ -6,7 +6,7 @@ After = remote-fs.target
 User = osmc
 Group = osmc
 Type = simple
-ExecStartPre = /bin/sh -c "sudo rmdir /media/*; exit 0"
+ExecStartPre = /bin/sh -c 'FSTAB=$(awk "{print \$2}" /etc/fstab|grep -i /media/); for f in /media/*; do if [ -d "$f" ];then if ! echo "$FSTAB" | grep -q "$f"; then sudo rmdir $f; echo "empty directory deleted "$f; fi fi done; exit 0'
 ExecStart = /usr/bin/udisks-glue --foreground
 
 [Install]
