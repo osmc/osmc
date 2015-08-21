@@ -238,8 +238,8 @@ then
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
 	# Addon compiler
-        gcc addon-compiler.c -o addon-compiler
-        mv addon-compiler ${out}/usr/bin
+        #gcc addon-compiler.c -o addon-compiler
+        #mv addon-compiler ${out}/usr/bin
 	# Binary addons
 	pushd project/cmake/addons/
 	mkdir build
