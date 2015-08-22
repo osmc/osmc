@@ -1,5 +1,6 @@
 #!/bin/bash
 if [ "$1" = "configure" ]; then
+	systemctl daemon-reload
 	systemctl enable performance.service >/dev/null 2>&1
 	if ischroot; then exit 0; fi
 	systemctl start performance.service

@@ -24,6 +24,7 @@ if [ "$1" = "configure" ]; then
 	fi
 	rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
 
+	systemctl daemon-reload
 	systemctl enable connman.service >/dev/null 2>&1
 
 	if ischroot; then exit 0; fi

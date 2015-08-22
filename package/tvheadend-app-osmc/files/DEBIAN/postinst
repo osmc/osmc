@@ -1,5 +1,7 @@
 #!/bin/bash
 
+systemctl daemon-reload
+
 if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ]
 then
     echo "Creating TVHeadend default access control file"
