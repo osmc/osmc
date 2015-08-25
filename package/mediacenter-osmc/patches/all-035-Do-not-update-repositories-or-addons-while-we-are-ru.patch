@@ -1,0 +1,27 @@
+From e20727621d8cc7e61d2d0f11ee2759070b3f275e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Aug 2015 12:52:20 +0100
+Subject: [PATCH 7/7] Do not update repositories or addons while we are running
+ the OSMC Walkthrough
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 183aa5f..16780fc 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -4336,7 +4336,7 @@ void CApplication::ProcessSlow()
+   g_mediaManager.ProcessEvents();
+ 
+   if (!m_pPlayer->IsPlayingVideo() &&
+-      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER)
++      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
+     CAddonInstaller::Get().UpdateRepos();
+ 
+   CAEFactory::GarbageCollect();
+-- 
+2.1.0
+
