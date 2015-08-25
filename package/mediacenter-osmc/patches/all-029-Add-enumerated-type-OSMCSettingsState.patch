@@ -1,0 +1,48 @@
+From 85dae8be6f50faf7155efde72f1ddd30948b9c77 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 23 Aug 2015 15:53:43 +0100
+Subject: [PATCH 1/7] Add enumerated type OSMCSettingsState
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp |  1 +
+ xbmc/Application.h   | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index dd416b5..440c04e 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -259,6 +259,7 @@ CApplication::CApplication(void)
+   , m_musicInfoScanner(new CMusicInfoScanner)
+   , m_playerController(new CPlayerController)
+   , m_fallbackLanguageLoaded(false)
++  , m_eOSMCWalkthroughState(OSMC_WALKTHROUGH_NOTRUNNING)
+ {
+   m_network = NULL;
+   TiXmlBase::SetCondenseWhiteSpace(false);
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 31bd26e..4839e55 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -157,6 +157,17 @@ public:
+    This allows us to save from our sigterm handler, or Application::Stop(), but not both.
+    */
+   void SaveStateStop();
++  
++  // osmc signals
++  
++  typedef enum
++  {
++	OSMC_WALKTHROUGH_NOTRUNNING = 0,
++	OSMC_WALKTHROUGH_ISRUNNING = 1,
++	OSMC_WALKTHROUGH_ISDONE = 2,
++  } OSMCWalkthroughState;
++  OSMCWalkthroughState m_eOSMCWalkthroughState;
++  void SetOSMCWalkthroughState(OSMCWalkthroughState state) { m_eOSMCWalkthroughState = state; }
+   void RestartApp();
+   void UnloadSkin(bool forReload = false);
+   bool LoadUserWindows();
+-- 
+2.1.0
+
