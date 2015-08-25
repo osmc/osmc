@@ -552,9 +552,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		if action == 10 or action == 92:
 
-			# delete skin update block file
-			subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
-
 			self.close()
 
 
