@@ -1,0 +1,31 @@
+From 017c0df5ceae9d80c5670723f4d28949c70d0554 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Aug 2015 12:48:19 +0100
+Subject: [PATCH 5/7] Do not prompt for confirmation of skin change if it has
+ been initiated by the Walkthrough
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 440c04e..6e89cdd 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -1370,8 +1370,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
+     }
+ 
+     std::string builtin("ReloadSkin");
+-    if (settingId == "lookandfeel.skin" && !m_skinReverting)
++    if (settingId == "lookandfeel.skin" && !m_skinReverting && m_eOSMCWalkthroughState != OSMC_WALKTHROUGH_ISRUNNING )
+       builtin += "(confirm)";
++    // We need to set ISDONE first so reloading is allowed
++    if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
++	m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE;
+     CApplicationMessenger::Get().ExecBuiltIn(builtin);
+   }
+   else if (settingId == "lookandfeel.skintheme")
+-- 
+2.1.0
+
