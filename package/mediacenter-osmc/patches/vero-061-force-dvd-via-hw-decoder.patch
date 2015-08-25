@@ -1,0 +1,26 @@
+From 399a5312a8378141d2576e868234cb5f1a9fc083 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Aug 2015 12:55:18 +0100
+Subject: [PATCH] Vero: send DVD to hardware decoder
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/dvdplayer/DVDPlayer.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayer.cpp b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+index 7c84557..d5961ad 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayer.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+@@ -3417,7 +3417,7 @@ bool CDVDPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+       hint.aspect = aspect;
+       hint.forced_aspect = true;
+     }
+-    hint.software = true;
++    hint.software = false;
+   }
+   else if (m_pInputStream && m_pInputStream->IsStreamType(DVDSTREAM_TYPE_PVRMANAGER))
+   {
+-- 
+2.1.0
+
