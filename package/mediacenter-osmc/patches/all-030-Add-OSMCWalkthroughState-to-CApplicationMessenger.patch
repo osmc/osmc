@@ -1,0 +1,54 @@
+From 6f3752971edf4fc47784f66e94ba694b932d412b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 23 Aug 2015 17:49:02 +0100
+Subject: [PATCH 2/7] Add OSMCWalkthroughState to CApplicationMessenger
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/ApplicationMessenger.cpp | 16 ++++++++++++++++
+ xbmc/ApplicationMessenger.h   |  2 ++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/xbmc/ApplicationMessenger.cpp b/xbmc/ApplicationMessenger.cpp
+index f66c0f1..6794aea 100644
+--- a/xbmc/ApplicationMessenger.cpp
++++ b/xbmc/ApplicationMessenger.cpp
+@@ -856,6 +856,22 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
+       g_application.SaveStateStop();
+       break;
+     }
++    case TMSG_SETOSMCWALKTHROUGHSTATE:
++    {
++		switch (pMsg->param1)
++		{
++			case 0:
++				g_application.SetOSMCWalkthroughState(g_application.OSMC_WALKTHROUGH_NOTRUNNING);
++				break;
++			case 1:
++				g_application.SetOSMCWalkthroughState(g_application.OSMC_WALKTHROUGH_ISRUNNING);
++				break;
++			case 2:
++				g_application.SetOSMCWalkthroughState(g_application.OSMC_WALKTHROUGH_ISDONE);
++				break;
++		}
++	  break;
++	}
+     case TMSG_START_ANDROID_ACTIVITY:
+     {
+ #if defined(TARGET_ANDROID)
+diff --git a/xbmc/ApplicationMessenger.h b/xbmc/ApplicationMessenger.h
+index 0b4ee7b..9907c6a 100644
+--- a/xbmc/ApplicationMessenger.h
++++ b/xbmc/ApplicationMessenger.h
+@@ -113,6 +113,8 @@ namespace MUSIC_INFO
+ 
+ #define TMSG_VOLUME_SHOW          900
+ 
++#define TMSG_SETOSMCWALKTHROUGHSTATE 950
++
+ #define TMSG_DISPLAY_SETUP      1000
+ #define TMSG_DISPLAY_DESTROY    1001
+ 
+-- 
+2.1.0
+
