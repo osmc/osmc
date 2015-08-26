@@ -21,7 +21,7 @@ index 1ddfd64..7fc7bba 100644
 +    void setosmcwalkthroughstatus(int state)
 +    {
 +      ThreadMessage tMsg = {TMSG_SETOSMCWALKTHROUGHSTATE};
-+      tMsg.strParam = state;
++      tMsg.param1 = state;
 +      CApplicationMessenger::Get().SendMessage(tMsg);
 +    }
 +
