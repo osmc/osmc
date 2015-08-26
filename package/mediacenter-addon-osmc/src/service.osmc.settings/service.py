@@ -135,10 +135,10 @@ class Main(object):
 
 		if not os.path.isfile('/walkthrough_completed'):
 			# Tell Kodi that OSMC is running the walkthrough
-			xbmc.setosmcwalkthroughstate(1)
+			xbmc.setosmcwalkthroughstatus(1)
 		else:
                        # Tell Kodi that OSMC is done
-                       xbmc.setosmcwalkthroughstate(2)
+                       xbmc.setosmcwalkthroughstatus(2)
 
 		# queue for communication with the comm and Main
 		self.parent_queue = Queue.Queue()
