@@ -17,7 +17,7 @@ index 6e89cdd..183aa5f 100644
  
  void CApplication::ReloadSkin(bool confirm/*=false*/)
  {
-+  if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
++  if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING || m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_NOTRUNNING)
 +  {
 +     CLog::Log(LOGINFO, "Suppressing skin reload as the walkthrough is running");
 +     return;
