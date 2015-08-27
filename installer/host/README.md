@@ -29,11 +29,11 @@ On Ubuntu or Debian, we can get a minimal build of Qt 4.8.x with the following c
 
 Only tested on OS X Mavericks:
 
-```git clone git://gitorious.org/qt/qt.git qt4 ```
+```git clone git://code.qt.io/qt/qt5.git -b 5.5```
 
-```cd qt4 ```
+```cd qt5 ```
 
-```./configure -release  -nomake examples -nomake demos -no-exceptions -no-stl -no-qt3support -no-scripttools -no-openssl -no-opengl -no-webkit -no-phonon -no-sql-sqlite -static -opensource -confirm-license --prefix=/usr```
+```/configure -opensource -confirm-license -static -release --prefix=/usr -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports```
 
 ```make -j8 && make install```
 
