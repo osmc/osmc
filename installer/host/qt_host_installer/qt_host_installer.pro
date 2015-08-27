@@ -37,6 +37,9 @@ SOURCES += main.cpp\
 macx {
 SOURCES += \
     io_osx.cpp
+
+CONFIG += \
+    c++11
 }
 
 unix:!macx {
