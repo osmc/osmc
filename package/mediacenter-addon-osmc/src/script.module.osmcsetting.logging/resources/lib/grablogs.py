@@ -132,21 +132,32 @@ class Main(object):
 
 			ok = xbmcgui.Dialog().ok(lang(32013), lang(32040))
 
-			self.pDialog.close()
-
 		else:
 
-			with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_log_location) as f:
+			attempts = 	[
+						'curl -X POST -s -T "%s" http://paste.osmc.io/documents',
+						'curl -X POST -s -0 -T "%s" http://paste.osmc.io/documents'
+						]
 
-				line = f.readline()
-				
-				key = line.replace('{"key":"','').replace('"}','').replace('\n','')
-				
-				log('pastio line: %s' % repr(line))
+			for attempt in attempts:
 
-			self.pDialog.close()
+				with os.popen(attempt % self.tmp_log_location) as f:
 
-			if not key:
+					line = f.readline()
+					
+					key = line.replace('{"key":"','').replace('"}','').replace('\n','')
+					
+					log('pastio line: %s' % repr(line))
+
+				if key:
+
+					self.url = 'http://paste.osmc.io/ %s' % key
+
+					ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
+
+					break
+
+			else:
 
 				copy = xbmcgui.Dialog().yesno(lang(32013), lang(32023), lang(32039))
 
@@ -154,11 +165,8 @@ class Main(object):
 
 					os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
 
-			else:
+		self.pDialog.close()
 
-				self.url = 'http://paste.osmc.io/ %s' % key
-
-				ok = xbmcgui.Dialog().ok(lang(32013), lang(32014) % self.url)
 
 
 	def grab_mem(self):
