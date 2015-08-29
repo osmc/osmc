@@ -67,7 +67,11 @@ void BootloaderConfig::configureEnvironment()
         }
         if (utils->getOSMCDev() == "rbp2")
         {
-            configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n" << "disable_splash=1\n";
+            configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
+            if (preseed->getStringValue("vendor/hifiberry"))
+                configStringList << "dtoverlay=hifiberry-dacplus\n";
+            else
+                configStringList << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
             cmdlineStringList << "osmcdev=rbp2";
         }
         utils->writeToFile(configFile, configStringList, false);
