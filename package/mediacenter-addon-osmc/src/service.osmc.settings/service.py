@@ -27,6 +27,7 @@ import xbmcgui
 WINDOW = xbmcgui.Window(10000)
 if not os.path.isfile('/walkthrough_completed'):
 	WINDOW.setProperty("walkthrough_is_running", 'any_value')
+	xbmc.setosmcwalkthroughstatus(1)
 import xbmc
 import xbmcaddon
 
@@ -203,6 +204,8 @@ class Main(object):
 							pass
 							
 						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
+
+						xbmc.setosmcwalkthroughstatus(2)
 
 						WINDOW.clearProperty('walkthrough_is_running')
 						
