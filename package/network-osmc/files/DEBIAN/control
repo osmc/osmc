@@ -1,8 +1,11 @@
 Origin: OSMC
-Package: network-osmc
-Version: 1.5.5
+Version: 1.5.6
 Section: net
 Essential: No
 Priority: required
 Maintainer: Sam G Nazarko <email@samnazarko.co.uk>
 Description: Network support for OSMC
+Package: armv7-network-osmc
+Depends: armv7-connman-osmc (>= 1.2.9-3), bluez, wget, iptables, wireless-firmware-osmc, net-tools, ntp, wpasupplicant, libnss-mdns, nfs-common, cifs-utils, ca-certificates, curl, python-dbus, python-gobject
+Architecture: armhf
+Installed-Size: 51

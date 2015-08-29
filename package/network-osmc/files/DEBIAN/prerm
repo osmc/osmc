@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# Block removal of essential OSMC package due to broken dependencies.
 if [ "$1" = "remove" ]; then
-	systemctl disable connman.service >/dev/null 2>&1
-	systemctl disable http-time.service >/dev/null 2>&1
-	systemctl stop connman.service
+	echo "WARNING: You have tried to remove a package that is essential to OSMC's operation."
+	echo "To undo these changes, run 'sudo apt-get -f install'."
+	exit 1
 fi
