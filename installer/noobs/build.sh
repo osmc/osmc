@@ -53,6 +53,7 @@ function build_fs_image()
 	popd
 	# NOOBS modifications, i.e. future 'health' script would be in .
 	echo -e "Creating root tarball"
+	echo "noobs" > vendor
 	tar -cf - * | xz -9 -c - > root-${1}.tar.xz
 	mv root-${1}.tar.xz ../
 	popd
