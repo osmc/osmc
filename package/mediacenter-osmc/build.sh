@@ -278,7 +278,6 @@ then
 	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, libx11-6, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
-	mkdir -p ${out}/usr/share/kodi/addons/repository.osmc
 	chmod +x ${out}/usr/bin/mediacenter
 	test "$1" == vero && cp patches/${1}-hdmi-trace ${out}/usr/bin/hdmi-trace && chmod +x ${out}/usr/bin/hdmi-trace
 	fix_arch_ctl "files/DEBIAN/control"
