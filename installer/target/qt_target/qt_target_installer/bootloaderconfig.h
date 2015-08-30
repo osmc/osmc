@@ -8,11 +8,12 @@
 #include "network.h"
 #include "utils.h";
 #include "logger.h"
+#include "preseedparser.h"
 
 class BootloaderConfig
 {
 public:
-    BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger);
+    BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed);
     void copyBootFiles();
     void configureMounts();
     void configureEnvironment();
@@ -22,6 +23,7 @@ private:
     Target *device;
     Network *network;
     Logger *logger;
+    PreseedParser *preseed;
 };
 
 #endif // BOOTLOADERCONFIG_H

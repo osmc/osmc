@@ -205,9 +205,9 @@ void MainWindow::install()
     }
     /* Mount root filesystem */
     if (useNFS)
-        bc = new BootloaderConfig(device, nw, utils, logger);
+        bc = new BootloaderConfig(device, nw, utils, logger, preseed);
     else
-        bc = new BootloaderConfig(device, NULL, utils, logger);
+        bc = new BootloaderConfig(device, NULL, utils, logger, preseed);
     logger->addLine("Mounting root");
     if ( ! utils->mountPartition(device, MNT_ROOT))
     {

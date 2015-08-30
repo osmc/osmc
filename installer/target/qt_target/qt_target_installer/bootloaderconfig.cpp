@@ -8,12 +8,13 @@
 #include "network.h"
 #include <QStringList>
 
-BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger)
+BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
     this->device = device;
     this->network = network;
     this->utils = utils;
     this->logger = logger;
+    this->preseed = preseed;
 }
 
 void BootloaderConfig::copyBootFiles()
@@ -68,7 +69,7 @@ void BootloaderConfig::configureEnvironment()
         if (utils->getOSMCDev() == "rbp2")
         {
             configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
-            if (preseed->getStringValue("vendor/hifiberry"))
+            if (preseed->getBoolValue("vendor/hifiberry"))
                 configStringList << "dtoverlay=hifiberry-dacplus\n";
             else
                 configStringList << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
