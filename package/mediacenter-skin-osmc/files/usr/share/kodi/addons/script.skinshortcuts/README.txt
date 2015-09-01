@@ -1,27 +1,16 @@
 script.skinshortcuts was written with the intention of making user customizable shortcuts on the home page easier for skinners.
 
 
-What's New for Skinners (version 0.4.4 - current Repo release)
+What's New for Skinners (version 0.5.2 - beta release)
 -----------------------
 
- - Just Select method - option to show a 'None' option, which will reset all skin labels passed in. See "Advanced Usage.txt", section "Just Select Shortcuts"
- - Ability to specify available thumbnails for user to choose from with new button 311. See "Advanced Usage.txt", section "Overrides.xml", part 13 and "Management Dialog.txt"
- - Ability to specify conditions for widgets and thumbnails to determine if they are available for selection. See "Advanced Usage.txt", section "Overrides.xml", parts 3 and 4
- - Ability to set skin boolean based on inclusion of a shortcut with a specified action. See "Advanced Usage.txt", section "Overrides.xml", part 7
- - Advice change - hasSubmenu cannot be relied upon to indicate there are no visible items, there may still be invisible items.
- 
-
-What's New for Skinners (version 0.4.2 - previous release)
------------------------
-
- - Ability to skip warning when resetting all shortcuts. See "Resetting all shortcuts", below
- - Ability to set default backgrounds and widgets based on defaultID. See "Advanced Usage.txt", section "Overrides.xml", parts 3 and 4
- - Ability to define a default path when browsing for backgrounds. See "Advanced Usage.txt", section "Overrides.xml", part 3
- - Skin properties set for each background and widget that is active. See "Advanced Usage.txt", sections "Managing Custom Backgrounds" and "Managing Widgets".
- - Window property set when management dialog for submenu/additional menu is launched. See "Management Dialog.txt", part 6
- - Advice change - consider providing a defaultID in your default shortcuts. See "Providing default shortcuts", below.
- - Advice change - use video node links, rather than library links, in your default shortcuts. See "Providing default shortcuts" below; and "Advanced Usage.txt", section "Overrides.xml", part 1.
- - Shortcuts with a <visible/> element will not only show in management dialog if this property evaluates to true. Though they won't be visible in the management dialog, they will not be removed from the menu, but will move to the end of the menu.
+ - Add additional actions on a per-menu basis - see "Advanced Usage.txt", section "Overrides.xml", part 16
+ - Ability to define default folder for thumbnail selection - see "Advanced Usage.txt", section "Overrides.xml", part 13
+ - Custom properties based on patterns - see "Advanced Usage.txt", section "Overrides.xml", part 14
+ - Ability to build skin xml elements for menu or other items based off of menu items from templates - see "Templates.txt"
+ - New widget selection with option to choose from library nodes, add-on nodes, playlists and sources - see "Advanced Usage.txt", section "Overrides.xml", part 4
+ - Ability to specify which grouping of available shortcuts will be able to be selected by user - see "Advanced Usage.txt", section "Overrides.xml", part 15
+ - Ability to provide a global override - see "Advanced Usage.txt", section "Overrides.xml", part 1.1
  
  
 With Thanks - Because their names don't deserve to be at the bottom :)
@@ -98,19 +87,13 @@ Replace 9000 with the ID of the list you are using for the mainmenu. If you are 
 
 2. Let users manage their main menu and sub-menu shortcuts
  
-The script can provide a list of controls for your overrides.xml to let the user manage both main menu and sub-menu.
-  
-Uses new method of filling the contents of a list in Gotham. In the list where you want these controls to appear, put the following in the <content> tag:
-  
-	plugin://script.skinshortcuts?type=settings&amp;property=$INFO[Window(10000).Property("skinshortcuts")]
-	
-Alternatively, you can create a button with the following onclick method:
+Create a button with the following onclick method:
 
 	RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu)
 	
-Then, within the management dialog, provide a button with the id 405 to let the user manage sub-menus. You must use this method if you want to provide more than one sub-menu.
+Then, within the management dialog, provide a button with the id 405 to let the user manage sub-menus.
 
-If using the second method, you may also want to provide a reset button, with the following in the onclick method:
+You may also want to provide a reset button, with the following in the onclick method:
 
 	RunScript(script.skinshortcuts,type=resetall)
  
@@ -145,7 +128,7 @@ Same as the method above, except you need to include the &amp;group= parameter t
 	
 To the let user manage shortcuts in these additional groups
 
-	RunScript(script.skinshortcuts, type=manage&amp;group=[groupname])
+	RunScript(script.skinshortcuts,type=manage&amp;group=[groupname])
 	
 And to display them:
 
@@ -258,7 +241,7 @@ The file format is simple enough:
 	</shortcut>
 </shortcuts
 
-If you want to provide a default which links to a playlist you include with your skin, then make sure the .shortcuts file uses the special protocol (e.g. special://skin/) as the URI to it. The script will replace this with a localised version, so that the playlist link will continue to work even if the user switches to another skin supporting skin shortcuts.
+If you want to provide a default which links to a playlist you include with your skin, then make sure the .DATA.xml file uses the special protocol (e.g. special://skin/) as the URI to it. The script will replace this with a localised version, so that the playlist link will continue to work even if the user switches to another skin supporting skin shortcuts.
 
 Particularly when setting defaults for the main menu, you may wish to include the <defaultID> element. This will set the [groupname] of the submenu's .DATA.xml file. (e.g. defaultID of tvshows -> tvshows.DATA.xml). Please note, any defaultID must follow the standard rules - all lowercase, all english characters, no spaces.
 
@@ -266,11 +249,11 @@ As Skin Shortcuts will integrate with a Video Node Editor script (for skins wher
 
 For example, a link to movie titles should be:
 
-	<action>ActivateWindow(10025,videodb://movies/titles/,Return)</action>
+	<action>ActivateWindow(10025,videodb://movies/titles/,return)</action>
 	
 rather than
 
-	<action>ActivateWindow(10025,MovieTitles,Return)</action>
+	<action>ActivateWindow(10025,MovieTitles,return)</action>
 	
 This will ensure that any users modifying the default Movies node (for example) will access the content they expect rather than, as video library links provide, all content.
 	

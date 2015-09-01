@@ -22,9 +22,9 @@ ID	Type	Label	Description
 307	Button	32027	Change shortcut action (if control 403 is not included)
 308	Button	32028	Reset shortcuts
 
-309 Button  32044	Change widget (See "Advanced Usage")
 310 Button  32045	Change background (See "Advanced Usage")
 311 Button          Select skin-provided thumbnail (See "Advanced Usage")
+312 Button  32044   Change widget (See "Advanced Usage")
 
 401 Button	32048	Alternative method to set a shortcut
 404 Button			Set a custom property
@@ -121,3 +121,10 @@ The available shortcuts are grouped into several categories within the managemen
 
 In some use-cases it can be useful to fill shortcut label with widget name when widget is selected (button 309). It can be edited by user (unlike of widget name) and then later shown in skin.
 To do this set window property "useWidgetNameAsLabel" to "true" before button 309 action is done.
+
+
+10. Set multiple widgets
+
+To set additional widgets, first set the window property "widgetID", then send a click to 309. The property will cleared afterwards.
+
+The widget, and all relevant properties, will then be accessible via [widgetProperty].[widgetID].

@@ -37,31 +37,23 @@ Custom backgrounds are saved on a skin-by-skin basis.
 Managing Widgets
 ----------------
 
-When using Skin Shortcuts to provide the whole main menu, you may wish to provide a series of widgets - such as PVR information, weather conditions, recently added movies, and so forth - that the user can choose from for each main menu item.
+When using Skin Shortcuts to provide the whole main menu, you can additionally use it to let the user select a widget for a menu item. The script provides a method to select any library node, playlist, source or plugin as a widget automatically, and you can additionally define custom widgets - such as PVR information, weather conditions and so forth.
 
-To let the user select from these widgets, include a button with the id 309 in your script-skinshortcuts.xml file.
-	
-Then use the following in the visibility condition for each widget:
+To let the user select from these widgets, include a button with the id 312 in your script-skinshortcuts.xml file.
 
-	<visible>StringCompare(Container(9000).ListItem.Property(widget),[WidgetID])</visible>
-	
-You can define your widgets - along with their WidgetID, an optional widgetType parameter and default labelID's they should appear against - in an overrides.xml file. See "overrides.xml" sections 3 and 4 for more details.
+For most shortcuts, the script will set a widgetPath property to the main menu item, which you can use to fill the contents of a list. You can use the properties widget and widgetType to decide which list to display. In the case of custom widgets, you can define these properties yourself so you can display your custom widget.
 
-You can also user overrides.xml to let the user select a playlist to use as a widget, which can then be shown by using it as the <content> tag in a list. To check for a playlist widget:
-	
-	<visible>StringCompare(Container(9000).ListItem.Property(widget),Playlist)</visible>
-	
-And then set the content of the list as so:
+For example, for a movie playlist, you could use something like the following to show the correct list
 
-	<content>$INFO[Container(9000).ListItem.Property(widgetPlaylist)]</content>
+	<visible>StringCompare(Container(9000).ListItem.Property(widget),Playlist) + StringCompare(Container(9000).ListItem.Property(widgetType),movies)</visible>
 
-In all cases, remember to replace 9000 with the ID of the list containing the menu. Widgets are saved on a skin-by-skin basis.
+And then fill the list as so:
 
-It may be advantageous for your submenu items to have the same background property as your main menu items. In which case, include &amp;options=clonewidgets in your buildxml command (multiple options can be separated with a pipe - | - symbol.
+	<content>$INFO[Container(9000).ListItem.Property(widgetPath)]</content>
 
-If you wish to run code based on whether a particular widget is attached to a menu item, the script will set the skin property skinshortcuts-widget-[widgetID] for each widget currently selected for a menu item. For a widget with the ID complexWidget for example, you could use the following in a condition:
+You can define your custom widgets - along with their relevant properties - in an overrides.xml file. See "overrides.xml" section 4 for more information, including the default values that will be returned for widget and widgetType for various widgets the user can select.
 
-	condition="Skin.HasSetting(skinshortcuts-widget-complexWidget)"
+It may be advantageous for your submenu items to have the same widget properties as your main menu items. In which case, include &amp;options=clonewidgets in your buildxml command (multiple options can be separated with a pipe - | - symbol.)
 
 Widgets are saved on a skin-by-skin basis.
 
@@ -100,14 +92,24 @@ When using this method, you specify which skin strings you want the script to se
 
 To use the script in this way, put the following in an onclick:
 
-RunScript(script.skinshortcuts,type=shortcuts&amp;custom=[True/False]&amp;showNone=[True/False]&amp;skinLabel=[skinLabel]&amp;skinAction=[skinAction]&amp;skinType=[skinType]&amp;skinThumbnail=[skinThumbnail])
+RunScript(script.skinshortcuts,type=shortcuts&amp;custom=[True/False]&amp;showNone=[True/False]&amp;grouping=[grouping]&amp;skinLabel=[skinLabel]&amp;skinAction=[skinAction]&amp;skinList=[skinList]&amp;skinType=[skinType]&amp;skinThumbnail=[skinThumbnail])
 
 custom=[True/False] - Whether you wish to allow the user to type their own custom command. If ommitted this will default to False. [OPTIONAL]
 showNone=[True/False] - Whether you wish to show a 'None' option to reset skin labels. If ommitted this will default to False. [OPTIONAL]
+[grouping] - The custom shortcut grouping to display - see Overrides.xml below, section 15
 [skinLabel] - The skin string the script will write the label of the selected shortcut to. [OPTIONAL]
 [skinAction] - the skin string the script will write the action of the selected shortcut to. [OPTIONAL]
+[skinList] - the skin string the script will write the action of the selected shortcut, without any 'ActivateWindow' elements, to. [OPTIONAL]
 [skinType] - The skin string the script will write the type of the selected shortcut to. [OPTIONAL]
 [skinThumbnail] - The skin string the script will write the thumbnail of the selected shortcut to. [OPTIONAL]
+
+
+Templates
+---------
+
+Templates offer an alternative way to build your menu's. Rather than an include being generated for a lists content tag, you can provide a template of one or more controls which will be built individually for each menu.
+
+Using this method means that each submenu, for example, can be contained in its own list and so can have visible/hidden animations, static items, and so on. You can also build additional controls dependant on, and including parameters from, main menu items. See templates.txt for more details.
 
 
 Overrides.xml
@@ -149,6 +151,43 @@ Please be aware that in the latest revisions of the script, library links - Acti
 IMPORTANT: User choice MUST be respected when overriding actions. That is to say, unless the user specifically gives permission for a shortcut they have chosen to do something else, it should be left alone. If you are overriding the action, it is expected that in most cases you will use a visibility condition - possibly linked to a skin settings - to ensure the user has consented.
 
 Users can also provide an overrides.xml file to override actions in special://profile/
+
+
+1.1 Override the action for all menu items in a menu (global override)
+
+It is possible to override all shortcuts in the list with a custom action. 
+This can be usefull for example when you want to launch something in your skin when a shortcut is pressed when a specific condition is applies.
+In that case you need to set the action to "globaloverride" and you need to specify the group to which the override applies.
+
+For example:
+
+<override action="globaloverride" group="mainmenu">
+	<condition>![Skin.HasSetting(OpenSubMenuOnClick) + IntegerGreaterThan(Container(4444).NumItems,0)]</condition>
+	<action>::ACTION::</action>
+</override>
+<override action="globaloverride" group="mainmenu">
+	<condition>[Skin.HasSetting(OpenSubMenuOnClick) + IntegerGreaterThan(Container(4444).NumItems,0)]</condition>
+	<action>SetFocus(4444)</action>
+</override>
+
+The above example changes the action to focus the submenu if the skinsetting OpenSubMenuOnClick is true.
+If the OpenSubMenuOnClick setting is false it will use the default action for the shortcut based (note that ::ACTION:: fill in the original action of the shortcut at buildtime)
+
+
+1.2 Add a supplemental action to all shortcuts in a menu.
+
+It is possible to supply an additional onclick action for all shortcuts in the list.
+Note that this doesn't override the action, it just adds an additional action to the menu item.
+
+<groupoverride group="[GroupName]" condition="[Boolean condition]">[command]</groupoverride>
+
+Important note: If you are using skinshortcuts to provide the powermenu (DialogButtonMenu.xml) in your skin, 
+you MUST use this feature from Kodi Isengard (15) and higher. 
+This is because of a change in that dialog that requires you to first close the dialog before launching any other windows.
+
+Example (assuming the name of your powermenu is powermenu):
+<groupoverride group="powermenu" condition="Window.IsActive(DialogButtonMenu.xml)">Close</groupoverride>
+
 
 
 2. Overriding icons
@@ -225,20 +264,42 @@ You can then choose which background to display based on the 'background' proper
 
 4. Widgets
 
-If you are using Skin Shortcuts to manage widgets, provide a list of the widgets your skin supports and defaults for labelID's in the overrides.xml.
+If you are using Skin Shortcuts to manage widgets, include button 312 to provide a list of library nodes, library sources and add-ons the user can select for a shortcut. 
 
-<widget label="[label]" condition="[Condition]" type="[type]">[WidgetID]</widget>
-<widgetdefault labelID="[labelID]" group="[GroupName]">[widgetID]</widgetdefault>
+Note, if moving from the previous method of managing shortcuts via 309, there is only an upgrade path for playlists. Other widgets will not provide that additional information that can now be set and will require the user to re-select the widget.
+
+You can provide a list of widgets your skin supports and defaults for labelID's in the overrides.xml.
+
+<widget label="[label]" icon="[icon]" condition="[Condition]" type="[type]" path="[path]" target="[target]">[widgetID]</widget>
 
 [label] - The display name of the widget, to be shown when choosing widgets (can be a localised string)
+[icon] - [Optional] An image provided by your skin to be used when selecting widgets
 [Condition] - [Optional] Boolean condition that must be true for the background to show in the management dialogs Background Select (evaluated when management dialog is loaded)[type] - [Optional] A string you use to identy the type of widget (returned as property widgetType)
+[type] - The string that will be assigned to <property name="widgetType">
+[path] - [Optional] The string that will be assigned to <property name="widgetPath">
+[target] - [Optional] The string that will be assigned to <property name="widgetContent">
+
+To set a default to one of your custom widgets:
+
+<widgetdefault labelID="[labelID]" group="[GroupName]">[widgetID]</widgetdefault>
+
+[labelID] - The labelID you are setting the default for. (Replace with defaultID="[defaultID]" to set default based on this property instead)
 [GroupName] - [Optional] The group that the labelID must be in, for example "movies". If omitted, the property will apply to items in the main menu.
 [widgetID] - A string you use to identify this widget
+
+To set a default to a library node, source, add-on or playlist, you need to set all widget parameters directly:
+
+<widgetdefaultnode labelID="[labelID]" group="[GroupName]" label="[label]" type="[type]" path="[path]" target="[target]">[widgetID]</widgetdefaultnode>
+
 [labelID] - The labelID you are setting the default for. (Replace with defaultID="[defaultID]" to set default based on this property instead)
+[GroupName] - [Optional] The group that the labelID must be in, for example "movies". If omitted, the property will apply to items in the main menu.
+[label] - The display name of the widget (can be a localised string)
+[type] - The string that will be assigned to <property name="widgetType">
+[path] - [Optional] The string that will be assigned to <property name="widgetPath">
+[target] - [Optional] The string that will be assigned to <property name="widgetContent">
+[widgetID] - A string you use to identify this widget
 
-If you want the user to be able to select a playlist as a widget, also include:
-
-<widgetPlaylists type="[type]">True</widgetPlaylists>
+Be careful when setting defaults to library nodes - if the user has customised their nodes, the node may not exist on their system. Only skin-provided playlists should be set as defaults.
 
 So, for example:
 
@@ -251,9 +312,46 @@ So, for example:
 	<widgetPlaylists>True</widgetPlaylists>
 </overrides>
 
-You can then choose which widget to display based on the 'widget' property of the selected listitem.
-
 You can optionally use choose to set the shortcut name to the widget name when selecting a widget. To do so, set the window property "useWidgetNameAsLabel" to "true". This property will be reset after the widget is set.
+
+The script will set the widgetTarget property to the menu item you have assigned the shortcut to for library/addons/playlists - this is the value that should be used in the target element of the content tag of the list you are using to display the widget.
+
+Additionally, the script will set four properties to the menu item you have assigned a shortcut to, as follows:
+
+4.1 Library nodes
+
+widget - Library
+widgetName - The name of the library node
+widgetType - Either 'video' or 'audio', or the content type specified in the nodes xml file
+widgetPath - The path to the selected node
+
+4.2 Library sources
+
+widget - Source
+widgetName - The name of the library source
+widgetType - Either 'video', 'audio' or 'picture'
+widgetPath - The path to the selected source
+
+4.3 Playlists
+
+widget - Playlist
+widgetName - The name of the playlist
+widgetType - The content type specified by the playlist
+widgetPath - The path to the playlist
+
+4.4 Add-ons
+
+widget - Addon
+widgetName - The name of the add-on + the selected node (if available)
+widgetType - Either 'video', 'audio' or 'picture', or a best-guess at the type of content provided
+widgetPath - The path to the selected node
+
+4.5 Skin widgets
+
+widget - The [widgetID]
+widgetName - The [label]
+widgetType - The [type]
+widgetPath - The [path]
 
 
 5. Skin-Recommended Shortcuts
@@ -277,10 +375,6 @@ Shortcut groupings within the management dialog are made up of several smaller g
  - commands
  
  - video
- - movie
- - tvshow
- - musicvideo
- - customvideonode
  - videosources
  
  - music
@@ -487,6 +581,38 @@ As result all items in mainmenu will have property "exampleProperty" filled with
 		...
 	</item>
     ...
+
+
+15. Customised groupings
+
+Groupings are used to decide which shortcuts are displayed where when the user selects a shortcut. Skin Shortcuts has three groupings in its overrides.xml
+
+ flatgroupings - used with list 111
+ groupings - used with buttons 401 and 307, and the Just Select method
+ widget-groupings - used with button 312
+
+You can include any of these groupings in your own overrides.xml to change how and where the available shortcuts are displayed.
+
+You can also create additional groups, naming them [name]-groupings, to provide additional layouts for specific cases.
+
+For button 401 or 307, first set the window property "custom-grouping" to the [name] of the grouping you wish to use, then send a click to the relevant button. The window property will be cleared after the shortcut dialog is closed.
+
+For Just Select, see the documentation on the Just Select Shortcut method, above.
+
+Note, widget-groupings is handled differently from all other groupings in that the user won't ever get a prompt about what they want to do with the shortcut they selected (no prompt about whether to play or display a playlist, for example) - it will always default to displaying the shortcut in the library.
+
+
+16. Conditional group overrides
+
+This will let you add an additional action on a per-menu base. For example to close all dialogs first before opening any additional windows on a modal dialog like DialogButtonMenu.xml
+
+Usage:
+
+Add an extra entry in your skin's overrides.xml file:
+
+<groupoverride group="powermenu" condition="Window.IsActive(DialogButtonMenu.xml)">Close</groupoverride>
+
+group is the name of the menugroup, for example mainmenu or powermenu etc.
 
 
 Localisation

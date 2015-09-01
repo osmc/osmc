@@ -58,27 +58,27 @@ class NodeFunctions():
     # Functions used by library.py to list nodes #
     ##############################################
         
-    def get_video_nodes( self, path ):
+    def get_nodes( self, path, prefix ):
         dirs, files = xbmcvfs.listdir( path )
         nodes = {}
         
         try:
             for dir in dirs:
-                self.parse_node( os.path.join( path, dir ), dir, nodes )
+                self.parse_node( os.path.join( path, dir ), dir, nodes, prefix )
             for file in files:
-                self.parse_view( os.path.join( path, file.decode( "utf-8" ) ), nodes, origPath = "library://video/%s" % (file ) )
+                self.parse_view( os.path.join( path, file.decode( "utf-8" ) ), nodes, origPath = "%s/%s" % ( prefix, file ), prefix = prefix )
         except:
             print_exc()
             return False
         
         return nodes
         
-    def parse_node( self, node, dir, nodes ):
+    def parse_node( self, node, dir, nodes, prefix ):
         # If the folder we've been passed contains an index.xml, send that file to be processed
         if xbmcvfs.exists( os.path.join( node, "index.xml" ) ):
-            self.parse_view( os.path.join( node, "index.xml" ), nodes, True, "library://video/%s/" % (dir), node )
+            self.parse_view( os.path.join( node, "index.xml" ), nodes, True, "%s/%s/" % ( prefix, dir ), node, prefix = prefix )
     
-    def parse_view( self, file, nodes, isFolder = False, origFolder = None, origPath = None ):
+    def parse_view( self, file, nodes, isFolder = False, origFolder = None, origPath = None, prefix = None ):
         if not isFolder and file.endswith( "index.xml" ):
             return
         try:
@@ -87,8 +87,8 @@ class NodeFunctions():
             root = tree.getroot()
             
             # Get the item index
-            if "order" in tree.getroot().attrib:
-                index = tree.getroot().attrib.get( "order" )
+            if "order" in root.attrib:
+                index = root.attrib.get( "order" )
                 origIndex = index
                 while int( index ) in nodes:
                     index = int( index )
@@ -98,7 +98,22 @@ class NodeFunctions():
                 self.indexCounter -= 1
                 index = str( self.indexCounter )
                 origIndex = "-"
-                
+
+            # Try to get media type from visibility condition
+            mediaType = None
+            if "visible" in root.attrib:
+                visibleAttrib = root.attrib.get( "visible" )
+                if not xbmc.getCondVisibility( visibleAttrib ):
+                    # The node isn't visible
+                    return
+                if "Library.HasContent(" in visibleAttrib and "+" not in visibleAttrib and "|" not in visibleAttrib:
+                    mediaType = visibleAttrib.split( "(" )[ 1 ].split( ")" )[ 0 ].lower()
+
+            # Try to get media type from content node
+            contentNode = root.find( "content" )
+            if contentNode is not None:
+                mediaType = contentNode.text
+
             # Get label and icon
             label = root.find( "label" ).text
             
@@ -107,10 +122,10 @@ class NodeFunctions():
                 icon = icon.text
             else:
                 icon = ""
-            
+
             if isFolder:
                 # Add it to our list of nodes
-                nodes[ int( index ) ] = [ label, icon, origFolder.decode( "utf-8" ), "folder", origIndex ]
+                nodes[ int( index ) ] = [ label, icon, origFolder.decode( "utf-8" ), "folder", origIndex, mediaType ]
             else:
                 # Check for a path
                 path = root.find( "path" )
@@ -122,22 +137,28 @@ class NodeFunctions():
                 group = root.find( "group" )
                 if group is None:
                     # Add it as an item
-                    nodes[ int( index ) ] = [ label, icon, origPath, "item", origIndex ]
+                    nodes[ int( index ) ] = [ label, icon, origPath, "item", origIndex, mediaType ]
                 else:
                     # Add it as grouped
-                    nodes[ int( index ) ] = [ label, icon, origPath, "grouped", origIndex ]
+                    nodes[ int( index ) ] = [ label, icon, origPath, "grouped", origIndex, mediaType ]
         except:
             print_exc()
             
     def isGrouped( self, path ):        
-        customPath = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", "video" ) )[:-1]
-        defaultPath = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", "video" ) )[:-1]
+        customPathVideo = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", "video" ) )[:-1]
+        defaultPathVideo = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", "video" ) )[:-1]
+        customPathAudio = path.replace( "library://music", os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", "music" ) )[:-1]
+        defaultPathAudio = path.replace( "library://music", os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", "music" ) )[:-1]
         
-        if xbmcvfs.exists( customPath ):
-            path = customPath
-        elif xbmcvfs.exists( defaultPath ):
-            path = defaultPath
-        else:
+        paths = [ customPathVideo, defaultPathVideo, customPathAudio, defaultPathAudio ]
+        foundPath = False
+
+        for tryPath in paths:
+            if xbmcvfs.exists( tryPath ):
+                path = tryPath
+                foundPath = True
+                break
+        if foundPath == False:
             return False
         
         # Open the file
@@ -153,15 +174,33 @@ class NodeFunctions():
                 return True
         except:
             return False
+
+    #####################################
+    # Function used by DataFunctions.py #
+    #####################################
             
     def get_visibility( self, path ):
         path = path.replace( "videodb://", "library://video/" )
-        
-        customPath = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", "video" ) ) + "index.xml"
-        customFile = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", "video" ) )[:-1] + ".xml"
-        defaultPath = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", "video" ) ) + "index.xml"
-        defaultFile = path.replace( "library://video", os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", "video" ) )[:-1] + ".xml"
-        
+        path = path.replace( "musicdb://", "library://music/" )
+        if path.endswith( ".xml" ):
+            path = path[ :-3 ]
+        if path.endswith( ".xml/" ):
+            path = path[ :-4 ]
+
+        if "library://video" in path:
+            pathStart = "library://video"
+            pathEnd = "video"
+        elif "library://music" in path:
+            pathStart = "library://music"
+            pathEnd = "music"
+        else:
+            return ""
+
+        customPath = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", pathEnd ) ) + "index.xml"
+        customFile = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", pathEnd ) )[:-1] + ".xml"
+        defaultPath = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", pathEnd ) ) + "index.xml"
+        defaultFile = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", pathEnd ) )[:-1] + ".xml"
+
         # Check whether the node exists - either as a parent node (with an index.xml) or a view node (append .xml)
         # in first custom video nodes, then default video nodes
         if xbmcvfs.exists( customPath ):
@@ -187,6 +226,62 @@ class NodeFunctions():
                 return ""
         except:
             return False
+
+    def get_mediaType( self, path ):
+        path = path.replace( "videodb://", "library://video/" )
+        path = path.replace( "musicdb://", "library://music/" )
+        if path.endswith( ".xml" ):
+            path = path[ :-3 ]
+        if path.endswith( ".xml/" ):
+            path = path[ :-4 ]
+
+        if "library://video" in path:
+            pathStart = "library://video"
+            pathEnd = "video"
+        elif "library://music" in path:
+            pathStart = "library://music"
+            pathEnd = "music"
+        else:
+            return "unknown"
+
+        customPath = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", pathEnd ) ) + "index.xml"
+        customFile = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://profile".decode('utf-8') ), "library", pathEnd ) )[:-1] + ".xml"
+        defaultPath = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", pathEnd ) ) + "index.xml"
+        defaultFile = path.replace( pathStart, os.path.join( xbmc.translatePath( "special://xbmc".decode('utf-8') ), "system", "library", pathEnd ) )[:-1] + ".xml"
+        
+        # Check whether the node exists - either as a parent node (with an index.xml) or a view node (append .xml)
+        # in first custom video nodes, then default video nodes
+        if xbmcvfs.exists( customPath ):
+            path = customPath
+        elif xbmcvfs.exists( customFile ):
+            path = customFile
+        elif xbmcvfs.exists( defaultPath ):
+            path = defaultPath
+        elif xbmcvfs.exists( defaultFile ):
+            path = defaultFile
+        else:
+            return "unknown"
+            
+        # Open the file
+        try:
+            # Load the xml file
+            tree = xmltree.parse( path )
+            root = tree.getroot()
+
+            mediaType = "unknown"
+            if "visible" in root.attrib:
+                visibleAttrib = root.attrib.get( "visible" )
+                if "Library.HasContent(" in visibleAttrib and "+" not in visibleAttrib and "|" not in visibleAttrib:
+                    mediaType = visibleAttrib.split( "(" )[ 1 ].split( ")" )[ 0 ].lower()
+
+            contentNode = root.find( "content" )
+            if contentNode is not None:
+                mediaType = contentNode.text
+
+            return mediaType
+
+        except:
+            return "unknown"
             
     ############################################
     # Functions used to add a node to the menu #
