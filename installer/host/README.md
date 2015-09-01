@@ -75,7 +75,7 @@ You also need the manfiest embedding tool, or we can't embed a requireAdministra
 * Uncheck everything except for Tools
 * This takes approx 200M disk. 
 
-![Install options](https://raw.githubusercontent.com/samnazarko/osmc/master/installer/host/win_help1.png)
+![Install options](https://raw.githubusercontent.com/osmc/osmc/master/installer/host/win_help1.png)
 
 If you now have C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin, you don't need to do anything. Otherwise, edit the PATH in make_host_win.sh again.
 
