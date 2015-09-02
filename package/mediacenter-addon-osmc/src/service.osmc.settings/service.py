@@ -412,11 +412,11 @@ class Main(object):
 
 			# THIS PART MAY NOT BE NEEDED, BUT IS INCLUDED HERE ANYWAY FOR TESTING PURPOSES
 			# if the gui was last accessed more than four hours
-			if not self.skip_check and (datetime.datetime.now() - self.gui_last_accessed).total_seconds() > 14400:
+			# if not self.skip_check and (datetime.datetime.now() - self.gui_last_accessed).total_seconds() > 14400:
 
-				self.skip_check = True
+			# 	self.skip_check = True
 
-				del self.stored_gui
+			# 	del self.stored_gui
 
 		log('_daemon exiting')
 
