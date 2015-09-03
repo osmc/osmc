@@ -151,7 +151,7 @@ then
 	dpkg -x ${1}-image*.deb files-image/
 	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
 	rm ${1}-image*.deb
-	dpkg_build files-image ${1}-image-osmc.deb # Don't worry about exact name. It all gets picked up.
+	dpkg_build files-image ${1}-image-${VERSION}-${REV}-osmc.deb
 	# Disassemble kernel headers package to include full headers (upstream Debian bug...)
 	if [ "$ARCH" == "armv7l" ]
 	then
@@ -161,12 +161,12 @@ then
 		dpkg-deb -e ${1}-headers*.deb files-headers/DEBIAN
 		rm ${1}-headers*.deb
 		cp -ar src/*linux*/arch/arm/include/ files-headers/usr/src/*-headers-${VERSION}-${REV}-osmc/include
-		dpkg_build files-headers ${1}-headers-osmc.deb # Don't worry about exact name. It all gets picked up.
+		dpkg_build files-headers ${1}-headers-${VERSION}-${REV}-osmc.deb
 	fi
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ kernel-${1}-osmc.deb
+	dpkg_build files/ ${1}-kernel-${VERSION}-${REV}-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"
