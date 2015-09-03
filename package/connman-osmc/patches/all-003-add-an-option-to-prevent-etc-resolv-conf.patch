@@ -1,6 +1,6 @@
-From 3219ad381a1a2da158b1548acb7a1d57fcdae861 Mon Sep 17 00:00:00 2001
+From bfabbac41c4554cf5de2729a25a7407ae257c7ee Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Mon, 22 Jun 2015 20:47:04 +0100
+Date: Thu, 3 Sep 2015 16:58:42 +0100
 Subject: [PATCH] Add an option to prevent /etc/resolv.conf from being modified
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
@@ -11,7 +11,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  3 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/src/connman.h b/src/connman.h
-index aac6a0b..d60b36b 100644
+index 35eb3f5..0d7b500 100644
 --- a/src/connman.h
 +++ b/src/connman.h
 @@ -244,7 +244,7 @@ int __connman_inet_get_address_netmask(int ifindex,
@@ -24,7 +24,7 @@ index aac6a0b..d60b36b 100644
  int __connman_resolvfile_append(int index, const char *domain, const char *server);
  int __connman_resolvfile_remove(int index, const char *domain, const char *server);
 diff --git a/src/main.c b/src/main.c
-index 54476dc..9598986 100644
+index e46fa7b..4d6f064 100644
 --- a/src/main.c
 +++ b/src/main.c
 @@ -468,6 +468,7 @@ static gchar *option_noplugin = NULL;
@@ -41,19 +41,19 @@ index 54476dc..9598986 100644
  				"Don't enable DNS Proxy" },
 +	{ "noresolvmodify", 's', G_OPTION_FLAG_REVERSE,
 +				G_OPTION_ARG_NONE, &option_allowresolvmodify,
-+				"Don't allow resolv.conf changes" },
++				"Don't allow resolv.conf changes. Useful if ignoring the primary interface" },
  	{ "nobacktrace", 0, G_OPTION_FLAG_REVERSE,
  				G_OPTION_ARG_NONE, &option_backtrace,
  				"Don't print out backtrace information" },
-@@ -676,7 +680,7 @@ int main(int argc, char *argv[])
- 	__connman_stats_init();
- 	__connman_clock_init();
+@@ -687,7 +691,7 @@ int main(int argc, char *argv[])
+ 
+ 	__connman_plugin_init(option_plugin, option_noplugin);
  
 -	__connman_resolver_init(option_dnsproxy);
 +	__connman_resolver_init(option_dnsproxy, option_allowresolvmodify);
- 	__connman_ipconfig_init();
- 	__connman_rtnl_init();
- 	__connman_task_init();
+ 	__connman_rtnl_start();
+ 	__connman_dhcp_init();
+ 	__connman_dhcpv6_init();
 diff --git a/src/resolver.c b/src/resolver.c
 index 6a64938..473412b 100644
 --- a/src/resolver.c
