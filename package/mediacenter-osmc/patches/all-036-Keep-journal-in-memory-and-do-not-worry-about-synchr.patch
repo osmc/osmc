@@ -1,0 +1,44 @@
+From b2d68308165e1ee3c06a2813f80589f92d430709 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 4 Sep 2015 21:06:22 +0100
+Subject: [PATCH] Keep journal in memory and do not worry about synchronicity
+ as the OS is handling it
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/dbwrappers/Database.cpp | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/dbwrappers/Database.cpp b/xbmc/dbwrappers/Database.cpp
+index 6e189e0..7672066 100644
+--- a/xbmc/dbwrappers/Database.cpp
++++ b/xbmc/dbwrappers/Database.cpp
+@@ -30,6 +30,9 @@
+ #include "sqlitedataset.h"
+ #include "DatabaseManager.h"
+ #include "DbUrl.h"
++#if defined(TARGET_RASPBERRY_PI)
++#include "linux/RBP.h"
++#endif
+ 
+ #ifdef HAS_MYSQL
+ #include "mysqldataset.h"
+@@ -493,8 +496,14 @@ bool CDatabase::Connect(const std::string &dbName, const DatabaseSettings &dbSet
+     if (dbSettings.type == "sqlite3")
+     {
+       m_pDS->exec("PRAGMA cache_size=4096\n");
+-      m_pDS->exec("PRAGMA synchronous='NORMAL'\n");
++      m_pDS->exec("PRAGMA synchronous='OFF'\n");
+       m_pDS->exec("PRAGMA count_changes='OFF'\n");
++      bool memJournal = true;
++      #if defined(TARGET_RASPBERRY_PI)
++	memJournal = ! (g_RBP.GetArmMem() < 384);
++      #endif
++     if (memJournal)
++         m_pDS->exec("PRAGMA journal_mode = 'MEMORY'\n");
+     }
+   }
+   catch (DbErrors &error)
+-- 
+2.1.0
+
