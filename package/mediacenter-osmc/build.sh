@@ -120,7 +120,7 @@ then
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libdcadec-dev-osmc"
-		handle_dep "armv6l-libsqlite-dev-osmc"
+		handle_dep "armv7-libsqlite-dev-osmc"
 	fi
 	if [ "$1" == "vero" ]
 	then
