@@ -1,6 +1,6 @@
 [Unit]
 Description = mount disks automatically with standby
-After = remote-fs.target
+After = remote-fs.target, systemd-udev-trigger.service
 
 [Service]
 User = osmc
