@@ -38,6 +38,9 @@ then
 	mv files/usr/include  files-dev/usr/
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
+	# Hacks for transitional package
+	mkdir -p files/usr/share/doc/libsqlite3-0
+	echo "transitional dummy file" > files/usr/share/doc/libsqlite3-0/README.Debian
 	dpkg_build files ${1}-libsqlite-osmc.deb
 	dpkg_build files-dev ${1}-libsqlite-dev-osmc.deb
 	build_return=$?
