@@ -64,6 +64,7 @@ then
 	handle_dep "libplist-dev"
 	handle_dep "libpng12-dev"
 	handle_dep "libsmbclient-dev"
+	handle_dep "libsqlite3-dev"
 	handle_dep "libssh-dev"
 	handle_dep "libavahi-client-dev"
 	handle_dep "libssl-dev"
@@ -110,7 +111,6 @@ then
 		handle_dep "armv6l-libnfs-dev-osmc"
 		handle_dep "armv6l-libplatform-dev-osmc"
 		handle_dep "armv6l-libdcadec-dev-osmc"
-		handle_dep "armv6l-libsqlite-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
 	then
@@ -120,7 +120,6 @@ then
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libdcadec-dev-osmc"
-		handle_dep "armv7-libsqlite-dev-osmc"
 	fi
 	if [ "$1" == "vero" ]
 	then
@@ -129,7 +128,6 @@ then
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
-		handle_dep "armv7-libsqlite-dev-osmc"
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
 	then
@@ -273,11 +271,11 @@ then
 	popd
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	strip ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libvorbisenc2, libass5, libcurl3, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libflac8, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libvorbisenc2, libass5, libcurl3, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-libsqlite-osmc" >> files/DEBIAN/control
-	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libsqlite-osmc" >> files/DEBIAN/control
-	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, libx11-6, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-libsqlite-osmc" >> files/DEBIAN/control
+	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
+	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, libx11-6, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
+	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, libx11-6, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
