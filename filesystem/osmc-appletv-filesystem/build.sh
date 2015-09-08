@@ -22,9 +22,17 @@ ARCH="i386"
 DIR="$filestub/"
 RLS="jessie"
 
+#User Information
+echo"
+Building for Apple TV.
+This will not take too long.
+"
+
 # Remove existing build
+echo Now removing the current Build..
 remove_existing_filesystem "{$wd}/{$DIR}"
 verify_action
+echo Creating the filestub dir..
 mkdir -p $DIR
 
 # Debootstrap (foreign)
@@ -33,6 +41,7 @@ fetch_filesystem "--arch=${ARCH} --foreign --variant=minbase ${RLS} ${DIR}"
 verify_action
 
 # Configure filesystem (2nd stage)
+echo Configuring..
 configure_filesystem "${DIR}"
 verify_action
 
@@ -41,16 +50,19 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://ftp.debian.org/debian jessie main contrib non-free
 
+echo Creating the source list..
+# echo "deb http://ftp.debian.org/debian jessie main contrib non-free
+echo Adding Debian Source..
 deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
-
+echo Adding Source 'Security.Debian.Org'
 deb http://security.debian.org/ jessie/updates main contrib non-free
-
+echo Adding OSMC Source
 deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
+echo Working on general configuration..
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
@@ -88,12 +100,14 @@ setup_busybox_links ${DIR}
 verify_action
 
 # Perform filesystem cleanup
+echo Just Cleaning Up..
 chroot ${DIR} umount /proc
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
 
 # Create filesystem tarball
+echo Making Tarball..
 create_fs_tarball "${DIR}" "${filestub}"
 verify_action
 
-echo -e "Build successful"
+read -p "Done! Press any key to continue!"
