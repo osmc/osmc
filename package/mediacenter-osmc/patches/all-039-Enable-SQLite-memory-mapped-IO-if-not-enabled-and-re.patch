@@ -1,0 +1,46 @@
+From cd0fb8ccf3424b8234b58a78c9edbcf5c014740a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 8 Sep 2015 03:51:03 +0100
+Subject: [PATCH 3/3] Enable SQLite memory mapped IO if not enabled and
+ register it as enabled if successful via the ApplicationMessenger
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/dbwrappers/sqlitedataset.cpp | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/xbmc/dbwrappers/sqlitedataset.cpp b/xbmc/dbwrappers/sqlitedataset.cpp
+index 112accf..1053c8c 100644
+--- a/xbmc/dbwrappers/sqlitedataset.cpp
++++ b/xbmc/dbwrappers/sqlitedataset.cpp
+@@ -33,6 +33,8 @@
+ #include "utils/log.h"
+ #include "system.h" // for Sleep(), OutputDebugString() and GetLastError()
+ #include "utils/URIUtils.h"
++#include "Application.h"
++#include "ApplicationMessenger.h"
+ 
+ #ifdef TARGET_WINDOWS
+ #pragma comment(lib, "sqlite3.lib")
+@@ -216,6 +218,18 @@ int SqliteDatabase::connect(bool create) {
+   {
+     disconnect();
+     int flags = SQLITE_OPEN_READWRITE;
++    if (! g_application.IsSqliteMm())
++    {
++       CLog::Log(LOGINFO, "sqlite-osmc: memory is not mapped yet");
++       if (sqlite3_config(SQLITE_CONFIG_MMAP_SIZE, 0x10000000) != SQLITE_MISUSE)
++       {
++            CLog::Log(LOGINFO, "sqlite-osmc: memory mapped IO is enabled");
++           // Let Kodi know
++           ThreadMessage tMsg = {TMSG_SETSQLITEMMAPSTATE};
++           CApplicationMessenger::Get().SendMessage(tMsg);
++       }
++    }
++
+     if (create)
+       flags |= SQLITE_OPEN_CREATE;
+     if (sqlite3_open_v2(db_fullpath.c_str(), &conn, flags, NULL)==SQLITE_OK)
+-- 
+2.1.0
+
