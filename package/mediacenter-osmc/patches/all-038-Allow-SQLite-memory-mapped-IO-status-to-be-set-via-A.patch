@@ -1,0 +1,43 @@
+From d089fe2249f79273062207598405f91cb2f0ec9b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 8 Sep 2015 03:50:32 +0100
+Subject: [PATCH 2/3] Allow SQLite memory mapped IO status to be set via
+ ApplicationMessenger
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/ApplicationMessenger.cpp | 5 +++++
+ xbmc/ApplicationMessenger.h   | 1 +
+ 2 files changed, 6 insertions(+)
+
+diff --git a/xbmc/ApplicationMessenger.cpp b/xbmc/ApplicationMessenger.cpp
+index 6794aea..11ec481 100644
+--- a/xbmc/ApplicationMessenger.cpp
++++ b/xbmc/ApplicationMessenger.cpp
+@@ -872,6 +872,11 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
+ 		}
+ 	  break;
+ 	}
++    case TMSG_SETSQLITEMMAPSTATE:
++    {
++        g_application.SetSqliteMmTrue();
++        break;
++    }
+     case TMSG_START_ANDROID_ACTIVITY:
+     {
+ #if defined(TARGET_ANDROID)
+diff --git a/xbmc/ApplicationMessenger.h b/xbmc/ApplicationMessenger.h
+index 9907c6a..1b16ea3 100644
+--- a/xbmc/ApplicationMessenger.h
++++ b/xbmc/ApplicationMessenger.h
+@@ -114,6 +114,7 @@ namespace MUSIC_INFO
+ #define TMSG_VOLUME_SHOW          900
+ 
+ #define TMSG_SETOSMCWALKTHROUGHSTATE 950
++#define TMSG_SETSQLITEMMAPSTATE 951
+ 
+ #define TMSG_DISPLAY_SETUP      1000
+ #define TMSG_DISPLAY_DESTROY    1001
+-- 
+2.1.0
+
