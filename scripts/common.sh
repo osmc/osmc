@@ -3,6 +3,10 @@
 
 #!/bin/bash
 
+
+
+#Check Platform for Debian Version
+
 function check_platform()
 {
     platform=$(lsb_release -c -s)
@@ -47,6 +51,7 @@ function remove_emulate_arm()
 {
 	echo Removing ARM QEMU binary
 	rm ${1}/usr/bin/qemu-arm-static
+        echo Done!
 }
 
 function update_sources()
@@ -154,10 +159,10 @@ function pull_source()
 		fi
 	if [[ $1 =~ \.zip$ ]]
 	then
-	echo -e "Detected ZIP source"
+	echo -e "Detected ZIP source, Trying to download.."
 	if [ "$2" != "." ]; then mkdir -p ${2}; fi
 	wget ${1} -O source.zip
-	if [ $? != 0 ]; then echo "Downloading zip failed" && exit 1; fi
+	if [ $? != 0 ]; then echo "ERROR: Downloading zip failed" && exit 1; fi
 	unzip source.zip -d ${2}
 	rm source.zip
 	return
@@ -165,10 +170,10 @@ function pull_source()
 
 	if [[ $1 =~ \.tar$ || $1 =~ \.tgz$ || $1 =~ \.tar\.gz$ || $1 =~ \.tar\.bz2$ || $1 =~ \.tar\.xz$ ]]
 	then
-	echo -e "Detected tarball source"
+	echo -e "Detected tarball source, Trying to download.."
 	if [ "$2" != "." ]; then mkdir -p ${2}; fi
 	wget ${1} -O source.tar
-	if [ $? != 0 ]; then echo "Downloading tarball failed" && exit 1; fi
+	if [ $? != 0 ]; then echo "ERROR: Downloading tarball failed" && exit 1; fi
 	tar -xvf source.tar -C ${2}
 	rm source.tar
 	return
