@@ -222,7 +222,7 @@ def parse_arguments():
 		Returns a bool determining whether the user wants to copy the logs to the SD Card.
 		If help is true, then the help dialog is displayed. '''
 
-	parser = argparse.ArgumentParser(description='Uploads vital logs to online pastebin site. If network is unavailable, logs are copied to SD Card. By default all logs are sent unless specific logs are selected.')
+	parser = argparse.ArgumentParser(description='Uploads vital logs to online pastebin site. If network is unavailable, logs are copied to SD Card.')
 
 	arguments = [v for k, v in SETS.iteritems()]
 	arguments.sort(key = lambda x: x.get('order', 99))
