@@ -36,7 +36,7 @@ SETS =	{
 								'help': 'Pi config.txt',
 								'dest': 'config',
 								'action': 'store_true',
-								'flags' : ['-P','--piconfig']},
+								'flags' : ['-p','--piconfig']},
 
 		'advancedsettings' 	: { 'order':	3, 
 								'function': 'grab_advancedsettings', 		
@@ -63,7 +63,7 @@ SETS =	{
 								'help': 'remote.xml',
 								'dest': 'remote',
 								'action': 'store_true',
-								'flags' : ['-R', '--remote']},
+								'flags' : ['-r', '--remote']},
 
 		'sources' 			: { 'order':	6, 
 								'function': 'grab_sources', 				
@@ -72,7 +72,7 @@ SETS =	{
 								'help': 'sources.xml',
 								'dest': 'sources',
 								'action': 'store_true',
-								'flags' : ['-S', '--sources']},
+								'flags' : ['-s', '--sources']},
 
 		'fstab' 			: { 'order':	7, 
 								'function': 'grab_fstab', 				
@@ -90,7 +90,7 @@ SETS =	{
 								'help': 'OSMC Packages',
 								'dest': 'packages',
 								'action': 'store_true',
-								'flags' : ['-p','--packages']},
+								'flags' : ['-O','--packages']},
 
 		'allothers' 		: { 'order':	9, 
 								'function': 'grab_all_other_packages', 	
@@ -113,7 +113,7 @@ SETS =	{
 								'help': 'APT term.log, history.log, sources.list, apt.conf.d, preferences.d',
 								'dest': 'apt',
 								'action': 'store_true',
-								'flags' : ['-a', '--apt']},
+								'flags' : ['-A', '--apt']},
 
 		'system' 			: { 'order':  11, 
 								'function': 'grab_system_logs', 			
@@ -219,7 +219,8 @@ def lang(id):
 
 def parse_arguments():
 	''' Parses the arguments provided by the user and activates the entries in SETS.
-		Returns a bool determining whether the user wants to copy the logs to the SD Card. '''
+		Returns a bool determining whether the user wants to copy the logs to the SD Card.
+		If help is true, then the help dialog is displayed. '''
 
 	parser = argparse.ArgumentParser(description='Uploads vital logs to online pastebin site. If network is unavailable, logs are copied to SD Card. By default all logs are sent unless specific logs are selected.')
 
@@ -227,13 +228,26 @@ def parse_arguments():
 	arguments.sort(key = lambda x: x.get('order', 99))
 
 	parser.add_argument('-C', '--copy', action='store_true', dest='copy', help='Copy logs to /boot (SD Card)', default=False)
+	parser.add_argument('-P', '--print',  action='store_true', dest='termprint',  help='Print logs to screen (no upload or copy')
+	parser.add_argument('-a', '--all',  action='store_true', dest='all',  help='Include all logs')
 	
 	for a in arguments: parser.add_argument(*a['flags'], action=a['action'], dest=a['dest'], help=a['help'])
 
 	args = parser.parse_args()
 
-	# tests whether any specific items are selected
-	if sum([1 for k, v in vars(args).iteritems() if v == True]) - (1 if args.copy else 0) == 0:
+	# Exit if there are no arguments or there is only the COPY argument
+	if any([
+			(len(sys.argv) == 1),
+			(len(sys.argv) == 2 and (args.copy or args.termprint)),
+			(len(sys.argv) == 3 and (args.copy and args.termprint))
+			]):
+
+		parser.print_help()
+
+		return None, None
+
+	# if 'all' is specified then include all logs
+	if args.all:
 
 		for k, v in SETS.iteritems():
 			SETS[k]['active'] = True
@@ -241,11 +255,10 @@ def parse_arguments():
 	else:
 
 		for k, arg in vars(args).iteritems():
-			if k != 'copy': 
-				if arg:
-					SETS[k]['active'] = True
+			if k not in ['copy', 'all', 'termprint']: 
+				SETS[k]['active'] = arg
 
-	return args.copy
+	return args.copy, args.termprint
 
 
 def retrieve_settings():
@@ -260,7 +273,7 @@ def retrieve_settings():
 		else:
 			SETS[key]['active'] = True if __addon__.getSetting(key) == 'true' else False
 
-	return sys.argv[1] == 'copy'
+	return sys.argv[1] == 'copy', False
 
 
 class Dummy_Progress_Dialog(object):
@@ -282,9 +295,11 @@ class Dummy_Progress_Dialog(object):
 class Main(object):
 
 
-	def __init__(self, copy):
+	def __init__(self, copy, termprint):
 
 		self.copy_to_boot = copy
+
+		self.termprint = termprint
 
 		self.tmp_log_location = '/var/tmp/uploadlog.txt'
 		
@@ -308,6 +323,10 @@ class Main(object):
 		self.add_content_index()
 
 		self.process_logs()
+
+		if self.termprint:
+			self.write_to_screen()
+			return
 
 		self.write_to_temp_file()
 
@@ -349,6 +368,13 @@ class Main(object):
 				getattr(self, v['function'])()
 
 		self.pDialog.update(percent=100, message=lang(32027))
+
+
+	def write_to_screen(self):
+
+		for line in self.log_blotter:
+
+			print line
 
 
 	def write_to_temp_file(self):
@@ -408,7 +434,7 @@ class Main(object):
 
 					self.copy_to_boot = True
 
-					log("Failed to upload log files, copying to /boot instead.")
+					log("Failed to upload log files, copying to /boot instead. (Unable to verify)")
 
 				if self.copy_to_boot:
 
@@ -733,10 +759,12 @@ if __name__ == "__main__":
 	log('Caller is: %s' % CALLER)
 
 	if CALLER == 'user':
-		copy = parse_arguments()
+		copy, termprint = parse_arguments()
 	else:
-		copy = retrieve_arguments()
+		copy, termprint = retrieve_arguments()
 
-	m = Main(copy)
+	if copy is not None:
 
-	m.launch_process()	
+		m = Main(copy, termprint)
+
+		m.launch_process()	
