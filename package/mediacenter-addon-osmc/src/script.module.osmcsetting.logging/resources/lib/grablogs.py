@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import os
 import argparse
@@ -346,7 +348,6 @@ class Main(object):
 
 					# p is a tuple of the Label and lookup value
 					self.log_blotter.append(p[1] + '  :  ' + p[0] + '\n')
-
 		self.log_blotter.append('\n')
 
 
@@ -372,9 +373,8 @@ class Main(object):
 
 	def write_to_screen(self):
 
-		for line in self.log_blotter:
+		print ''.join(self.log_blotter)
 
-			print line
 
 
 	def write_to_temp_file(self):
@@ -417,7 +417,9 @@ class Main(object):
 					
 					key = line.replace('{"key":"','').replace('"}','').replace('\n','')
 					
-					log('pastio line: %s' % repr(line))
+					if CALLER != 'user':
+						log('pastio line: %s' % repr(line))
+						
 			except:
 
 				key = False
@@ -450,7 +452,7 @@ class Main(object):
 
 				else:
 
-					log("Logs successfully uploaded to %s" % self.url)
+					log("Logs successfully uploaded to %s" % self.url.replace(' ' ,''))
 
 
 	def grab_mem(self):
@@ -755,8 +757,6 @@ class Main(object):
 
 
 if __name__ == "__main__":
-
-	log('Caller is: %s' % CALLER)
 
 	if CALLER == 'user':
 		copy, termprint = parse_arguments()
