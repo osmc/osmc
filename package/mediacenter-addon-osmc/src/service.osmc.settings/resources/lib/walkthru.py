@@ -7,12 +7,12 @@ import xbmcaddon
 
 # STANDARD library modules
 import os
-import sys
+import random
 import requests
 import subprocess
+import sys
 import threading
 import xml.etree.ElementTree as ET
-
 
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
@@ -446,7 +446,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID in [350010]:		# choosing the hostname
 
 			# show keyboard
-			kb = xbmc.Keyboard(self.device_name, 'Name your device')
+			kb = xbmc.Keyboard(self.random_name(), 'Name your device')
 
 			kb.doModal()
 
@@ -567,6 +567,21 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# allow the user to exit
 			self.prevent_escape = False
+
+
+	def random_name(self):
+
+		names = [	
+				"Alfonse", "Barnaby", "Aloyisius", "Archibald", "Algernon", "Basil", "Bertram", "Carston", "Cavendish", "Cecil", 
+				"Cyril", "Danforth", "Cuthbert", "Alastair",
+				"Edmund", "Gilbert", "Ethelbert", "Frederick", "Geoffrey", "Gideon", "Giggleswick", "Grumbole", "Hamilton",
+				"Ignatius", "Ebenezer", "Herbert", "Clement", "Humphrey", "Ian", "Ichabod", "Jonathan", "Malcolm",
+				"Mervyn", "Mortimer", "Nigel", "Percy", "Prentis", "Reginald", "Ridgewell", "Royston",
+				"Theophilus", "Tobias", "Tristram", "Ulysses", "Ulrich", "Virgil", "Vivian", "Waldo",
+				"Wesley", "Wilbur", "Wilfred", "Willard", "Willoughby",
+				]
+
+		return "OSMC_" + random.choice(names)
 
 
 	def onAction(self, action):
