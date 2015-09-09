@@ -139,7 +139,7 @@ SETS =	{
 								'function': 'grab_initd',					
 								'active': 	False, 
 								'pointer': [('init.d', 'Vr58kq0w')],
-								'help': 'init.d file',
+								'help': 'init.d directory',
 								'dest': 'initd',
 								'action': 'store_true',
 								'flags' : ['-i','--initd']},
@@ -148,7 +148,7 @@ SETS =	{
 								'function': 'grab_systemd',				
 								'active': 	False, 
 								'pointer': [('systemd', '86JFGfNO')],
-								'help': 'systemd file',
+								'help': 'systemd directory',
 								'dest': 'systemd',
 								'action': 'store_true',
 								'flags' : ['-d','--systemd']},
@@ -224,13 +224,13 @@ def parse_arguments():
 		Returns a bool determining whether the user wants to copy the logs to the SD Card.
 		If help is true, then the help dialog is displayed. '''
 
-	parser = argparse.ArgumentParser(description='Uploads vital logs to online pastebin site. If network is unavailable, logs are copied to SD Card.')
+	parser = argparse.ArgumentParser(description='Uploads vital logs to http://paste.osmc.io. If the network is unavailable, logs are copied to the SD Card.')
 
 	arguments = [v for k, v in SETS.iteritems()]
 	arguments.sort(key = lambda x: x.get('order', 99))
 
 	parser.add_argument('-C', '--copy', action='store_true', dest='copy', help='Copy logs to /boot (SD Card)', default=False)
-	parser.add_argument('-P', '--print',  action='store_true', dest='termprint',  help='Print logs to screen (no upload or copy')
+	parser.add_argument('-P', '--print',  action='store_true', dest='termprint',  help='Print logs to screen (no upload or copy)')
 	parser.add_argument('-a', '--all',  action='store_true', dest='all',  help='Include all logs')
 	
 	for a in arguments: parser.add_argument(*a['flags'], action=a['action'], dest=a['dest'], help=a['help'])
@@ -404,7 +404,7 @@ class Main(object):
 
 			else:
 
-				log("Complete")
+				log('Logs copied to /boot/%s on the SD card FAT partition' % os.path.basename(self.tmp_log_location))
 
 			self.pDialog.close()
 
