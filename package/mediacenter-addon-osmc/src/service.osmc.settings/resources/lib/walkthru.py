@@ -85,7 +85,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 
 		# show timezone switch
-		self.showtimezone = False
+		self.showtimezone = True
 
 		# switch that identifies whether the internet is connected
 		self.internet_connected = False
@@ -107,6 +107,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# this attribute denotes the skin the user wants to have applied when the walkthru closes
 		self.selected_skin = 'OSMC'
+
+		# this is the default hostname for the device
+		self.device_name = 'OSMC_Device'
 
 		# newsletter email address
 		self.email = ''
@@ -149,7 +152,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1004, 1005, 1006, 1007, 1008, 1009]:
+		for hide_this in [1003, 1035, 1004, 1005, 1006, 1007, 1008, 1009]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -168,7 +171,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
-		for visibility_control in [93000,94000,95000, 96000, 97000, 98000, 99000]:
+		for visibility_control in [93000,125000,94000,95000, 96000, 97000, 98000, 99000]:
 
 			self.getControl(visibility_control).setVisible(False)
 
@@ -430,14 +433,35 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]: # timezone containers
 			
-
 			# user has clicked on a timezone
 			self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
 
 			self.getControl(93000).setVisible(False)
-			self.getControl(94000).setVisible(True)
-			self.getControl(1004).setVisible(True)
-			self.setFocusId(40010)
+			self.getControl(125000).setVisible(True)
+			self.getControl(10035).setVisible(True)
+			self.setFocusId(350010)
+
+			# move on to choosing the hostname
+
+		elif controlID in [350010]:		# choosing the hostname
+
+			# show keyboard
+			kb = xbmc.Keyboard(self.device_name, 'Name your device')
+
+			kb.doModal()
+
+			# only move on if the device has been given a name
+			if kb.isConfirmed():
+
+				self.device_name = kb.getText()
+
+				''' NEED THE INTERFACE HERE TO CHANGE THE HOSTNAME '''
+
+				# user has chosen a hostname
+				self.getControl(125000).setVisible(False)
+				self.getControl(94000).setVisible(True)
+				self.getControl(1004).setVisible(True)
+				self.setFocusId(40010)
 
 		elif controlID == 40010:			# terms and conditions I Agree button
 			
@@ -557,7 +581,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def onFocus(self, controlID):
 
-		main_controls 	= [1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009]
+		main_controls 	= [1002, 1003, 10035, 1004, 1005, 1006, 1007, 1008, 1009]
 
 		tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 

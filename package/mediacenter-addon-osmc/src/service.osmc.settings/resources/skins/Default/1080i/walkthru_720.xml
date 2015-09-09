@@ -18,6 +18,14 @@
             <height>1</height>
             <label/>
         </control>
+        <control id="125000" type="label">
+            <description>visibility controller</description>
+            <posx>20</posx>
+            <posy>20</posy>
+            <width>1</width>
+            <height>1</height>
+            <label/>
+        </control>
         <control id="94000" type="label">
             <description>visibility controller</description>
             <posx>20</posx>
@@ -133,6 +141,24 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>3000</onright>
+            </control>
+            <!-- Hostname -->
+            <control id="10035" type="button">
+                <width>300</width>
+                <height>42</height>
+                <!-- <label>$ADDON[service.osmc.settings 32010]</label>-->
+                <label>Computer Name</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>350010</onright>
             </control>
             <!-- T&C -->
             <control id="1004" type="button">
@@ -528,6 +554,45 @@
             <texture>osmc_preview.png</texture>
             <visible>Control.IsVisible(98000)</visible>
         </control>
+        <!-- hostname change panel                -->
+        <control id="35000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1200</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(125000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control type="label">
+                <width>1800</width>
+                <height>42</height>
+                <label>Give your device a name</label>
+                <font>osmc_addon_720_Large</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <textcolor>66ffffff</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+            </control>
+            <control id="350010" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <label>.............</label>
+                <font>osmc_addon_720_Med</font>
+                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
         <!-- newsletter signup                  -->
         <control id="9000" type="grouplist">
             <left>480</left>
@@ -618,7 +683,6 @@
                 <align>center</align>
                 <aligny>center</aligny>
             </control>
-
             <control type="label">
                 <top>45</top>
                 <width>1200</width>
@@ -630,9 +694,6 @@
                 <align>center</align>
                 <aligny>center</aligny>
             </control>
-
-
-
             <control type="label">
                 <top>45</top>
                 <width>1200</width>
@@ -666,7 +727,6 @@
                 <align>center</align>
                 <aligny>center</aligny>
             </control>
-
             <control type="label">
                 <top>90</top>
                 <width>1200</width>
