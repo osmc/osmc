@@ -1,12 +1,11 @@
 [Unit]
 Description = mount disks automatically with standby
-After = remote-fs.target systemd-udev-trigger.service polkitd.service
+After = remote-fs.target
 
 [Service]
 User = osmc
 Group = osmc
 Type = simple
-ExecStartPre=/bin/udevadm trigger --subsystem-match=block
 ExecStartPre = /bin/sh -c "sudo rmdir /media/*; exit 0"
 ExecStart = /usr/bin/udisks-glue --foreground
 
