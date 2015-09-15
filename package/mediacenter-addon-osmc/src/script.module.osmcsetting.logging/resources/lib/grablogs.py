@@ -609,7 +609,7 @@ class Main(object):
 		else:
 
 			try:
-				with os.popen('curl -X POST -s -T "%s" %s/documents' % TEMP_LOG_FILE, UPLOAD_LOC) as f:
+				with os.popen('curl -X POST -s -T "%s" %s/documents' % (TEMP_LOG_FILE, UPLOAD_LOC)) as f:
 
 					line = f.readline()
 					
@@ -659,7 +659,7 @@ if __name__ == "__main__":
 	if CALLER == 'user':
 		copy, termprint = parse_arguments()
 	else:
-		copy, termprint = retrieve_arguments()
+		copy, termprint = retrieve_settings()
 
 	if copy is not None:
 
