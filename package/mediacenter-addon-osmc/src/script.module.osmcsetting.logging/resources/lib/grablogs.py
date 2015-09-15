@@ -21,185 +21,353 @@ except ImportError:
 
 	CALLER = 'user'
 
+
+SECTION_START = '\n====================== %s =================== %s\n'
+SECTION_END   = '\n^^^^^^^^^^^^^^^^^^^^^^ %s END ^^^^^^^^^^^^^^^^^^^^^^ %s\n'
+USERDATA  	  = '/home/osmc/.kodi/userdata/'
+TEMP_LOG_FILE = '/var/tmp/uploadlog.txt'
+UPLOAD_LOC    = 'http://paste.osmc.io'
+
 SETS =	{
-		'uname' 			: { 'order':	1, 
-								'function': 'grab_uname',					
-								'active': 	False, 
-								'pointer': [('UNAME', '0wwkXuO5')],
-								'help': 'System Information',
-								'dest': 'uname',
+		'uname' 			: { 'order' : 1,
+								'active': False, 
+								'help'  : 'System Information',
+								'dest'  : 'uname',
 								'action': 'store_true',
-								'flags' : ['-I','--systeminfo']},
+								'flags' : ['-I','--systeminfo'],
+								'logs'  : [
+											{
+												'name': 'UNAME',
+												'key' : '0wwkXuO5',
+												'ltyp': 'cl_log', 
+												'actn': 'uname -a',
+											},
+											{
+												'name': 'cmdline',
+												'key' : '0wwYYuO5',
+												'ltyp': 'cl_log', 
+												'actn': '/proc/cmdline',
+											},
+										  ],
+								},
 
-		'config' 			: { 'order':	2, 
-								'function': 'grab_config', 				
-								'active': 	False, 
-								'pointer': [('Pi config', 'Ul2H1CLu')],
-								'help': 'Pi config.txt',
-								'dest': 'config',
+		'config' 			: { 'order' : 2, 
+								'active': False, 
+								'help'  : 'Pi config.txt',
+								'dest'  : 'config',
 								'action': 'store_true',
-								'flags' : ['-p','--piconfig']},
+								'flags' : ['-p','--piconfig'],
+								'logs'  : [
+											{
+												'name': 'Pi config',
+												'key' : 'Ul2H1CLu',
+												'ltyp': 'file_log', 
+												'actn': '/boot/config.txt',
+											},
+										  ], 				
+								},
 
-		'advancedsettings' 	: { 'order':	3, 
-								'function': 'grab_advancedsettings', 		
-								'active': 	False, 
-								'pointer': [('advancedsettings.xml', 'C7hKmH1p')],
-								'help': 'advancedsettings.xml',
-								'dest': 'advancedsettings',
+		'advancedsettings' 	: { 'order' : 3, 
+								'active': False, 
+								'help'  : 'advancedsettings.xml',
+								'dest'  : 'advancedsettings',
 								'action': 'store_true',
-								'flags' : ['-v','--advset']},
+								'flags' : ['-v','--advset'],
+								'logs'  : [
+											{
+												'name': 'advancedsettings.xml',
+												'key' : 'C7hKmH1p',
+												'ltyp': 'file_log', 
+												'actn': USERDATA + 'advancedsettings.xml',
+											},
+										  ], 												
+								},
 
-		'keyboard' 			: { 'order':	4, 
-								'function': 'grab_keyboard', 				
-								'active': 	False, 
-								'pointer': [('keyboard.xml', 'MBom5YV6')],
-								'help': 'keyboard.xml',
-								'dest': 'keyboard',
+		'keyboard' 			: { 'order' : 4, 
+								'active': False, 
+								'help'  : 'keyboard.xml',
+								'dest'  : 'keyboard',
 								'action': 'store_true',
-								'flags' : ['-k','--keyboard']},
+								'flags' : ['-k','--keyboard'],
+								'logs'  : [
+											{
+												'name': 'keyboard.xml',
+												'key' : 'MBom5YV6',
+												'ltyp': 'file_log', 
+												'actn': USERDATA + 'keyboard.xml',
+											},
+										  ], 															
+								},
 
-		'remote' 			: { 'order':	5, 
-								'function': 'grab_remote', 				
-								'active': 	False, 
-								'pointer': [('remote.xml', '5jmphjm3')],
-								'help': 'remote.xml',
-								'dest': 'remote',
+		'remote' 			: { 'order' : 5, 
+								'active': False, 
+								'help'  : 'remote.xml',
+								'dest'  : 'remote',
 								'action': 'store_true',
-								'flags' : ['-r', '--remote']},
+								'flags' : ['-r', '--remote'],
+								'logs'  : [
+											{
+												'name': 'remote.xml',
+												'key' : '5jmphjm3',
+												'ltyp': 'file_log', 
+												'actn': USERDATA + 'remote.xml',
+											},
+										  ], 														
+								},
 
-		'sources' 			: { 'order':	6, 
-								'function': 'grab_sources', 				
-								'active': 	False, 
-								'pointer': [('sources.xml', 'SGkuGLGj')],
-								'help': 'sources.xml',
-								'dest': 'sources',
+		'sources' 			: { 'order' : 6, 
+								'active': False, 
+								'help'  : 'sources.xml',
+								'dest'  : 'sources',
 								'action': 'store_true',
-								'flags' : ['-s', '--sources']},
+								'flags' : ['-s', '--sources'],
+								'logs'  : [
+											{
+												'name': 'sources.xml',
+												'key' : 'SGkuGLGj',
+												'ltyp': 'file_log', 
+												'actn': USERDATA + 'sources.xml',
+											},
+										  ], 																							
+								},
 
-		'fstab' 			: { 'order':	7, 
-								'function': 'grab_fstab', 				
-								'active': 	False, 
-								'pointer': [('fstab', 'qiE9Dtax')],
-								'help': 'fstab file',
-								'dest': 'fstab',
+		'fstab' 			: { 'order' : 7, 
+								'active': False, 
+								'help'  : 'fstab file',
+								'dest'  : 'fstab',
 								'action': 'store_true',
-								'flags' : ['-f','--fstab']},
+								'flags' : ['-f','--fstab'],
+								'logs'  : [
+											{
+												'name': 'fstab',
+												'key' : 'qiE9Dtax',
+												'ltyp': 'file_log', 
+												'actn': '/etc/fstab',
+											},
+										  ], 														
+								},
 
-		'packages' 			: { 'order':	8, 
-								'function': 'grab_osmc_packages', 		
-								'active': 	False, 
-								'pointer': [('OSMC Packages', '7nQvfy9a')],
-								'help': 'OSMC Packages',
-								'dest': 'packages',
+		'packages' 			: { 'order' : 8, 
+								'active': False, 
+								'help'  : 'OSMC Packages',
+								'dest'  : 'packages',
 								'action': 'store_true',
-								'flags' : ['-O','--packages']},
+								'flags' : ['-O','--packages'],
+								'logs'  : [
+											{
+												'name': 'OSMC Packages',
+												'key' : '7nQvfy9a',
+												'ltyp': 'cl_log', 
+												'actn': 'dpkg -l | grep osmc',
+											},
+										  ], 													
+								},
 
-		'allothers' 		: { 'order':	9, 
-								'function': 'grab_all_other_packages', 	
-								'active': 	False, 'pointer': [('All Other Packages', 'hwvkLCMX')],
-								'help': 'All Other Packages',
-								'dest': 'allothers',
+		'allothers' 		: { 'order' : 9, 
+								'active': False, 
+								'help'  : 'All Other Packages',
+								'dest'  : 'allothers',
 								'action': 'store_true',
-								'flags' : ['-o','--othpack']},
+								'flags' : ['-o','--othpack'],
+								'logs'  : [
+											{
+												'name': 'All Other Packages',
+												'key' : 'hwvkLCMX',
+												'ltyp': 'cl_log', 
+												'actn': 'dpkg -l | grep -v osmc',
+											},
+										  ], 												
+								},
 
-		'apt' 				: { 'order':  10, 
-								'function': 'grab_apt_logs', 				
-								'active': 	False, 
-								'pointer': [	
-											('APT term.log', 'RcBRrsRs'), 
-											('APT history.log', 'B8sj7DO8'), 
-											('APT sources.list', 'ZZz2wrJ1'), 
-											('APT apt.conf.d', 'fFsk1x85'), 
-											('APT preferences.d', 'vSKj25Lq')
-										 ],
-								'help': 'APT term.log, history.log, sources.list, apt.conf.d, preferences.d',
-								'dest': 'apt',
+		'apt' 				: { 'order' : 10, 	
+								'active': False, 
+								'help'  : 'APT term.log, history.log, sources.list, apt.conf.d, preferences.d',
+								'dest'  : 'apt',
 								'action': 'store_true',
-								'flags' : ['-A', '--apt']},
+								'flags' : ['-a', '--apt'],
+								'logs'  : [
+											{
+												'name': 'APT term.log',
+												'key' : 'RcBRrsRs',
+												'ltyp': 'cl_log', 
+												'actn': 'grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500',
+											},
+											{
+												'name': 'APT history.log',
+												'key' : 'B8sj7DO8',
+												'ltyp': 'cl_log', 
+												'actn': 'grep -v "^(Reading database" /var/log/apt/history.log | tail -n 500',
+											},	
+											{
+												'name': 'APT sources.list',
+												'key' : 'ZZz2wrJ1',
+												'ltyp': 'file_log', 
+												'actn': '/etc/apt/sources.list',
+											},
+											{
+												'name': 'APT apt.conf.d',
+												'key' : 'fFsk1x85',
+												'ltyp': 'cl_log', 
+												'actn': 'ls -al /etc/apt/apt.conf.d',
+											},		
+											{
+												'name': 'APT preferences.d',
+												'key' : 'vSKj25Lq',
+												'ltyp': 'cl_log', 
+												'actn': 'ls -al /etc/apt/preferences.d',
+											},																																	
+										  ], 										 
+								},
 
-		'system' 			: { 'order':  11, 
-								'function': 'grab_system_logs', 			
-								'active': 	False, 
-								'pointer': [('System Journal', 'MyqVXi2x')],
-								'help': 'System Journal',
-								'dest': 'system',
+		'system' 			: { 'order' : 11, 
+								'active': False, 
+								'help'  : 'System Journal',
+								'dest'  : 'system',
 								'action': 'store_true',
-								'flags' : ['-J','--sysjrn']},
+								'flags' : ['-J','--sysjrn'],
+								'logs'  : [
+											{
+												'name': 'System Journal',
+												'key' : 'MyqVXi2x',
+												'ltyp': 'cl_log', 
+												'actn': 'sudo journalctl',
+											},
+										  ], 														
+								},
 
-		'lirc' 				: { 'order':  12, 
-								'function': 'grab_lirc_conf', 			
-								'active': 	False, 
-								'pointer': [('lircd.conf', 'kdgLUcwP')],
-								'help': 'lirc.conf file',
-								'dest': 'lirc',
+		'lirc' 				: { 'order' : 12, 
+								'active': False, 
+								'help'  : 'lirc.conf file',
+								'dest'  : 'lirc',
 								'action': 'store_true',
-								'flags' : ['-l','--lirc']},
+								'flags' : ['-l','--lirc'],
+								'logs'  : [
+											{
+												'name': 'lircd.conf',
+												'key' : 'kdgLUcwP',
+												'ltyp': 'file_log', 
+												'actn': '/etc/lirc/lircd.conf',
+											},
+										  ], 														
+								},
 
-		'initd' 			: { 'order':  13, 
-								'function': 'grab_initd',					
-								'active': 	False, 
-								'pointer': [('init.d', 'Vr58kq0w')],
-								'help': 'init.d directory',
-								'dest': 'initd',
+		'initd' 			: { 'order' : 13, 
+								'active': False, 
+								'help'  : 'init.d directory',
+								'dest'  : 'initd',
 								'action': 'store_true',
-								'flags' : ['-i','--initd']},
+								'flags' : ['-i','--initd'],
+								'logs'  : [
+											{
+												'name': 'init.d',
+												'key' : 'Vr58kq0w',
+												'ltyp': 'cl_log', 
+												'actn': 'ls -al /etc/init.d',
+											},
+										  ], 																		
+								},
 
-		'systemd' 			: { 'order':  14, 
-								'function': 'grab_systemd',				
-								'active': 	False, 
-								'pointer': [('systemd', '86JFGfNO')],
-								'help': 'systemd directory',
-								'dest': 'systemd',
+		'systemd' 			: { 'order' : 14, 
+								'active': False, 
+								'help'  : 'systemd directory',
+								'dest'  : 'systemd',
 								'action': 'store_true',
-								'flags' : ['-d','--systemd']},
+								'flags' : ['-d','--systemd'],
+								'logs'  : [
+											{
+												'name': 'systemd',
+												'key' : '86JFGfNO',
+												'ltyp': 'cl_log', 
+												'actn': 'ls -al /lib/systemd/system',
+											},
+										  ], 													
+								},
 
-		'dmesg' 			: { 'order':  15, 
-								'function': 'grab_dmesg',					
-								'active': 	False, 
-								'pointer': [('Kernel Message Log', 'Ad2zzd21')],
-								'help': 'Kernel Message Log',
-								'dest': 'dmesg',
+		'dmesg' 			: { 'order' : 15, 
+								'active': False, 
+								'help'  : 'Kernel Message Log',
+								'dest'  : 'dmesg',
 								'action': 'store_true',
-								'flags' : ['-K', '--kernel']},
+								'flags' : ['-K', '--kernel'],
+								'logs'  : [
+											{
+												'name': 'Kernel Message Log',
+												'key' : 'Ad2zzd21',
+												'ltyp': 'cl_log', 
+												'actn': 'dmesg',
+											},
+										  ], 																		
+								},
 
-		'mem' 				: { 'order':  16, 
-								'function': 'grab_mem',					
-								'active': 	False, 'pointer': [('Memory', 'eWTP1Mc8')],
-								'help': 'System Memory (total & available)',
-								'dest': 'mem',
+		'mem' 				: { 'order' : 16, 
+								'active': False, 
+								'help'  : 'System Memory (total & available)',
+								'dest'  : 'mem',
 								'action': 'store_true',
-								'flags' : ['-m','--memory']},
+								'flags' : ['-m','--memory'],
+								'logs'  : [
+											{
+												'name': 'Memory',
+												'key' : 'eWTP1Mc8',
+												'ltyp': 'cl_log', 
+												'actn': 'free -m',
+											},
+										  ], 																	
+								},
 
-		'diskspace' 		: { 'order':  17, 
-								'function': 'grab_diskspace',				
-								'active': 	False, 
-								'pointer': [('Diskspace', 'qZy25Yas')],
-								'help': 'Diskspace (total & available)',
-								'dest': 'diskspace',
+		'diskspace' 		: { 'order' : 17, 
+								'active': False, 
+								'help'  : 'Diskspace (total & available)',
+								'dest'  : 'diskspace',
 								'action': 'store_true',
-								'flags' : ['-D','--disk']},
+								'flags' : ['-D','--disk'],
+								'logs'  : [
+											{
+												'name': 'Diskspace',
+												'key' : 'qZy25Yas',
+												'ltyp': 'cl_log', 
+												'actn': 'df -h',
+											},
+										  ], 															
+								},
 
-		'boot' 				: {	'order':  18, 
-								'function': 'grab_boot_contents',			
-								'active': 	False, 
-								'pointer': [('/boot Contents', 'H3gEog10')],
-								'help': 'Contents of /boot/',
-								'dest': 'boot',
+		'boot' 				: {	'order' : 18, 
+								'active': False, 
+								'help'  : 'Contents of /boot/',
+								'dest'  : 'boot',
 								'action': 'store_true',
-								'flags' : ['-b', '--boot']},
+								'flags' : ['-b', '--boot'],
+								'logs'  : [
+											{
+												'name': '/boot Contents',
+												'key' : 'H3gEog10',
+												'ltyp': 'cl_log', 
+												'actn': 'ls -al /boot',
+											},
+										  ], 													
+								},
 
-		'kodi' 				: {	'order':  19, 
-								'function': 'grab_kodi_logs', 			
-								'active': 	False, 
-								'pointer': [
-											('Kodi Log', 'HyhIT4UP'), 
-											('Kodi Old Log', '2qaAc90c')
-											],
-								'help': 'Kodi log files (includes log from previous boot)',
-								'dest': 'kodi',
+		'kodi' 				: {	'order' : 19, 
+								'active': False, 
+								'help'  : 'Kodi log files (includes log from previous boot)',
+								'dest'  : 'kodi',
 								'action': 'store_true',
-								'flags' : ['-X', '--kodi', '--xbmc']},
-
+								'flags' : ['-X', '--kodi', '--xbmc'],
+								'logs'  : [
+											{
+												'name': 'Kodi Log',
+												'key' : 'HyhIT4UP',
+												'ltyp': 'file_log',
+												'actn': '/home/osmc/.kodi/temp/kodi.log',
+											},
+											{
+												'name': 'Kodi Old Log',
+												'key' : '2qaAc90c',
+												'ltyp': 'file_log', 
+												'actn': '/home/osmc/.kodi/temp/kodi.old.log',
+											},											
+										  ], 												
+								},
 		}
 
 
@@ -224,14 +392,15 @@ def parse_arguments():
 		Returns a bool determining whether the user wants to copy the logs to the SD Card.
 		If help is true, then the help dialog is displayed. '''
 
-	parser = argparse.ArgumentParser(description='Uploads vital logs to http://paste.osmc.io. If the network is unavailable, logs are copied to the SD Card.')
+	parser = argparse.ArgumentParser(description='Uploads vital logs to %s. If the network is unavailable, logs are copied to the SD Card.' % UPLOAD_LOC)
 
 	arguments = [v for k, v in SETS.iteritems()]
 	arguments.sort(key = lambda x: x.get('order', 99))
 
-	parser.add_argument('-C', '--copy', action='store_true', dest='copy', help='Copy logs to /boot (SD Card)', default=False)
-	parser.add_argument('-P', '--print',  action='store_true', dest='termprint',  help='Print logs to screen (no upload or copy)')
-	parser.add_argument('-a', '--all',  action='store_true', dest='all',  help='Include all logs')
+	parser.add_argument('-A', '--all',   action='store_true', dest='all',          help='Include all logs')
+	parser.add_argument('-T',            action='store',      dest='filename',     help='Override default name and location of temporary log file')
+	parser.add_argument('-C', '--copy',  action='store_true', dest='copy',         help='Copy logs to /boot (SD Card)')
+	parser.add_argument('-P', '--print', action='store_true', dest='termprint',    help='Print logs to screen (no upload or copy)')
 	
 	for a in arguments: parser.add_argument(*a['flags'], action=a['action'], dest=a['dest'], help=a['help'])
 
@@ -259,6 +428,11 @@ def parse_arguments():
 		for k, arg in vars(args).iteritems():
 			if k not in ['copy', 'all', 'termprint']: 
 				SETS[k]['active'] = arg
+
+	# if a different temporary location is provided, then use that in place of the global TEMP_LOG_FILE
+	if args.filename:
+		global TEMP_LOG_FILE
+		TEMP_LOG_FILE = args.filename
 
 	return args.copy, args.termprint
 
@@ -302,8 +476,6 @@ class Main(object):
 		self.copy_to_boot = copy
 
 		self.termprint = termprint
-
-		self.tmp_log_location = '/var/tmp/uploadlog.txt'
 		
 		self.log_blotter = [] # list to hold all the lines that need to be printed/uploaded
 
@@ -317,6 +489,7 @@ class Main(object):
 		self.pDialog.create(lang(32024), lang(32025))
 
 		self.arguments = [(k, v) for k, v in SETS.iteritems()]
+
 		self.arguments.sort(key = lambda x: x[1].get('order', 99))
 
 
@@ -342,12 +515,10 @@ class Main(object):
 
 			if v.get('active', False):
 
-				pntr = v.get('pointer',[])
+				for log in v.get('logs',{}):
 
-				for p in pntr:
+					self.log_blotter.append(log['key'] + '  :  ' + log['name'] + '\n')
 
-					# p is a tuple of the Label and lookup value
-					self.log_blotter.append(p[1] + '  :  ' + p[0] + '\n')
 		self.log_blotter.append('\n')
 
 
@@ -366,9 +537,27 @@ class Main(object):
 
 				self.pDialog.update(percent=pct, message=lang(32036) % k)
 
-				getattr(self, v['function'])()
+				for log in v['logs']:
+
+					self.grab_log(**log)
 
 		self.pDialog.update(percent=100, message=lang(32027))
+
+
+	def grab_log(self, ltyp, actn, name, key):
+		''' Method grabs the logs from either a file or the command line.'''
+
+		self.log_blotter.extend([SECTION_START % (name, key)])
+
+		func = open if ltyp == 'file_log' else os.popen
+
+		try:
+			with func(actn) as f:
+				self.log_blotter.extend(f.readlines())
+		except:
+			self.log_blotter.extend(['%s error' % name])
+
+		self.log_blotter.extend([SECTION_END % (name, key)])
 
 
 	def write_to_screen(self):
@@ -376,16 +565,15 @@ class Main(object):
 		print ''.join(self.log_blotter)
 
 
-
 	def write_to_temp_file(self):
 		''' Writes the logs to a single temporary file '''
 		try:
-			with open(self.tmp_log_location, 'w') as f:
+			with open(TEMP_LOG_FILE, 'w') as f:
 
 				f.writelines(self.log_blotter)
 		except:
 
-			log('Unable to write temporary log to %s' % self.tmp_log_location)
+			log('Unable to write temporary log to %s' % TEMP_LOG_FILE)
 
 			return
 
@@ -397,21 +585,21 @@ class Main(object):
 
 		if self.copy_to_boot:
 			
-			os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
+			os.popen('sudo cp -rf %s /boot/' % TEMP_LOG_FILE)
 
 			if CALLER == 'kodi':
 				ok = DIALOG.ok(lang(32013), lang(32040))
 
 			else:
 
-				log('Logs copied to /boot/%s on the SD card FAT partition' % os.path.basename(self.tmp_log_location))
+				log('Logs copied to /boot/%s on the SD card FAT partition' % os.path.basename(TEMP_LOG_FILE))
 
 			self.pDialog.close()
 
 		else:
 
 			try:
-				with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_log_location) as f:
+				with os.popen('curl -X POST -s -T "%s" %s/documents' % TEMP_LOG_FILE, UPLOAD_LOC) as f:
 
 					line = f.readline()
 					
@@ -440,11 +628,11 @@ class Main(object):
 
 				if self.copy_to_boot:
 
-					os.popen('sudo cp -rf %s /boot/' % self.tmp_log_location)
+					os.popen('sudo cp -rf %s /boot/' % TEMP_LOG_FILE)
 
 			else:
 
-				self.url = 'http://paste.osmc.io/ %s' % key
+				self.url = UPLOAD_LOC + '/ %s' % key
 
 				if CALLER == 'kodi':
 
@@ -453,307 +641,6 @@ class Main(object):
 				else:
 
 					log("Logs successfully uploaded to %s" % self.url.replace(' ' ,''))
-
-
-	def grab_mem(self):
-
-		self.log_blotter.extend(['\n====================== Memory ========================= eWTP1Mc8\n'])
-
-		with os.popen('free -m') as f:
-			self.log_blotter.extend(f.readlines())		
-
-		self.log_blotter.extend(['\n====================== Memory END ===================== eWTP1Mc8\n'])
-
-
-	def grab_diskspace(self):
-
-		self.log_blotter.extend(['\n====================== Diskspace ====================== qZy25Yas\n'])
-
-		with os.popen('df -h') as f:
-			self.log_blotter.extend(f.readlines())	
-		
-		self.log_blotter.extend(['\n====================== Diskspace END ================== qZy25Yas\n'])
-
-
-	def grab_initd(self):
-
-		self.log_blotter.extend(['\n====================== init.d ========================= Vr58kq0w\n'])
-
-		with os.popen('ls -al /etc/init.d') as f:
-			self.log_blotter.extend(f.readlines())	
-
-		self.log_blotter.extend(['\n====================== init.d END ===================== Vr58kq0w\n'])
-
-
-	def grab_systemd(self):
-
-		self.log_blotter.extend(['\n====================== systemd ======================== 86JFGfNO\n'])
-
-		with os.popen('ls -al /lib/systemd/system') as f:
-			self.log_blotter.extend(f.readlines())	
-
-		self.log_blotter.extend(['\n====================== systemd END ==================== 86JFGfNO\n'])
-
-
-	def grab_dmesg(self):
-
-		self.log_blotter.extend(['\n====================== Kernel Message Log (dmesg) ========================= Ad2zzd21\n'])
-
-		with os.popen('dmesg') as f:
-			self.log_blotter.extend(f.readlines())	
-
-		self.log_blotter.extend(['\n====================== Kernel Message Log (dmesg) END ===================== Ad2zzd21\n'])
-
-
-	def grab_kodi_logs(self):
-
-		self.log_blotter.extend(['\n====================== Kodi Log ======================= HyhIT4UP\n'])
-
-		location = '/home/osmc/.kodi/temp/kodi.log'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-
-			self.log_blotter.extend(['kodi.log not found'])
-
-		self.log_blotter.extend(['\n====================== Kodi Log END =================== HyhIT4UP\n'])
-
-		self.log_blotter.extend(['\n====================== Kodi Old Log ====================== 2qaAc90c\n'])
-
-		location = '/home/osmc/.kodi/temp/kodi.old.log'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-
-			self.log_blotter.extend(['kodi.old.log not found'])
-
-		self.log_blotter.extend(['\n====================== Kodi Old Log END ================== 2qaAc90c\n'])
-
-
-	def grab_lirc_conf(self):
-
-		self.log_blotter.extend(['\n====================== lircd.conf ========================= kdgLUcwP\n'])
-
-		location = '/etc/lirc/lircd.conf'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['lircd.conf not found'])
-
-		self.log_blotter.extend(['\n====================== lircd.conf END ===================== kdgLUcwP\n'])
-
-
-	def grab_config(self):
-
-		self.log_blotter.extend(['\n====================== Pi config.txt ====================== Ul2H1CLu\n'])
-
-		location = '/boot/config.txt'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['config.txt not found'])
-
-		self.log_blotter.extend(['\n====================== Pi config.txt END ================== Ul2H1CLu\n'])
-
-
-	def grab_osmc_packages(self):
-
-		self.log_blotter.extend(['\n====================== OSMC Packages ====================== 7nQvfy9a\n'])
-
-		with os.popen('dpkg -l | grep osmc') as f:
-			self.log_blotter.extend(f.readlines())
-
-		self.log_blotter.extend(['\n====================== OSMC Packages END ================== 7nQvfy9a\n'])
-
-
-	def grab_uname(self):
-
-		self.log_blotter.extend(['\n====================== UNAME ============================== 0wwkXuO5\n'])
-
-		try:
-			with os.popen('uname -a') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['uname not found'])
-
-		self.log_blotter.extend(['\n====================== UNAME END ========================== 0wwkXuO5\n'])
-
-		self.log_blotter.extend(['\n====================== cmdline =========================\n'])
-
-		location = '/proc/cmdline'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['cmdline not found'])
-
-		self.log_blotter.extend(['\n====================== cmdline END =====================\n'])
-
-
-	def grab_all_other_packages(self):
-
-		self.log_blotter.extend(['\n====================== All Other Packages ================= hwvkLCMX\n'])
-
-		with os.popen('dpkg -l | grep -v osmc') as f:
-			self.log_blotter.extend(f.readlines())
-
-		self.log_blotter.extend(['\n====================== All Other Packages END ============= hwvkLCMX\n'])
-
-
-	def grab_apt_logs(self):
-
-		self.log_blotter.extend(['\n====================== APT term.log ======================= RcBRrsRs\n'])
-
-		if os.path.isfile('/var/log/apt/term.log'):
-			with os.popen('grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500') as f:
-				self.log_blotter.extend(f.readlines())
-		else:
-			self.log_blotter.extend(['apt term.log not found'])
-
-		self.log_blotter.extend(['\n====================== APT term.log END =================== RcBRrsRs\n'])
-
-		self.log_blotter.extend(['\n====================== APT history.log ======================== B8sj7DO8\n'])
-
-		if os.path.isfile('/var/log/apt/history.log'):
-			with os.popen('grep -v "^(Reading database" /var/log/apt/history.log | tail -n 500') as f:
-				self.log_blotter.extend(f.readlines())
-		else:
-			self.log_blotter.extend(['apt history.log not found'])
-
-		self.log_blotter.extend(['\n====================== APT history.log END ==================== B8sj7DO8\n'])
-
-		self.log_blotter.extend(['\n====================== APT sources.list ======================== ZZz2wrJ1\n'])
-
-		location = '/etc/apt/sources.list'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['APT sources.list not found'])
-
-		self.log_blotter.extend(['\n====================== APT sources.list END ==================== ZZz2wrJ1\n'])
-
-		self.log_blotter.extend(['\n====================== APT apt.conf.d ======================== fFsk1x85\n'])
-
-		with os.popen('ls -al /etc/apt/apt.conf.d') as f:
-			self.log_blotter.extend(f.readlines())
-
-		self.log_blotter.extend(['\n====================== APT apt.conf.d END ==================== fFsk1x85\n'])
-
-		self.log_blotter.extend(['\n====================== APT preferences.d ======================== vSKj25Lq\n'])
-
-		with os.popen('ls -al /etc/apt/preferences.d') as f:
-			self.log_blotter.extend(f.readlines())
-
-		self.log_blotter.extend(['\n====================== APT preferences.d END ==================== vSKj25Lq\n'])
-
-
-	def grab_advancedsettings(self):
-
-		self.log_blotter.extend(['\n====================== advancedsettings.xml =============== C7hKmH1p\n'])
-
-		location = '/home/osmc/.kodi/userdata/advancedsettings.xml'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['advancedsettings.xml not found'])
-
-		self.log_blotter.extend(['\n====================== advancedsettings.xml END =========== C7hKmH1p\n'])
-
-
-	def grab_sources(self):
-
-		self.log_blotter.extend(['\n====================== sources.xml ======================== SGkuGLGj\n'])
-		
-		location = '/home/osmc/.kodi/userdata/sources.xml'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['sources.xml not found'])
-
-		self.log_blotter.extend(['\n====================== sources.xml END ==================== SGkuGLGj\n'])
-
-
-	def grab_fstab(self):
-
-		self.log_blotter.extend(['\n====================== fstab ============================== qiE9Dtax\n'])
-
-		location = '/etc/fstab'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['fstab not found'])
-
-		self.log_blotter.extend(['\n====================== fstab END ========================== qiE9Dtax\n'])
-
-
-	def grab_keyboard(self):
-
-		self.log_blotter.extend(['\n====================== keyboard.xml ====================== MBom5YV6\n'])
-
-		location = '/home/osmc/.kodi/userdata/keyboard.xml'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['keyboard.xml not found'])
-
-		self.log_blotter.extend(['\n====================== keyboard.xml END ================== MBom5YV6\n'])
-
-
-	def grab_remote(self):
-
-		self.log_blotter.extend(['\n====================== remote.xml =================== 5jmphjm3\n'])
-
-		location = '/home/osmc/.kodi/userdata/remote.xml'
-
-		try:
-			with open (location, 'r') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['remote.xml not found'])	
-
-		self.log_blotter.extend(['\n====================== remote.xml END =================== 5jmphjm3\n'])		
-
-
-	def grab_system_logs(self):
-
-		self.log_blotter.extend(['\n====================== System Journal ==================== MyqVXi2x\n'])
-
-		try:
-			with os.popen('sudo journalctl') as f:
-				self.log_blotter.extend(f.readlines())
-		except:
-			self.log_blotter.extend(['system log not found'])
-
-		self.log_blotter.extend(['\n====================== System Journal END =============== MyqVXi2x\n'])
-
-
-	def grab_boot_contents(self):
-
-		self.log_blotter.extend(['\n====================== /boot Contents =================== H3gEog10\n'])
-
-		with os.popen('ls -al /boot') as f:
-			self.log_blotter.extend(f.readlines())
-
-		self.log_blotter.extend(['\n====================== /boot Contents END =============== H3gEog10\n'])
 
 
 if __name__ == "__main__":
