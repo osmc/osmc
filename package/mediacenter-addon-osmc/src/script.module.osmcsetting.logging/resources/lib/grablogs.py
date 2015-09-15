@@ -23,7 +23,7 @@ except ImportError:
 
 
 SECTION_START = '\n====================== %s =================== %s\n'
-SECTION_END   = '\n^^^^^^^^^^^^^^^^^^^^^^ %s END ^^^^^^^^^^^^^^^^^^^^^^ %s\n'
+SECTION_END   = '\n---------------------- %s END --------------- %s\n\n'
 USERDATA  	  = '/home/osmc/.kodi/userdata/'
 TEMP_LOG_FILE = '/var/tmp/uploadlog.txt'
 UPLOAD_LOC    = 'http://paste.osmc.io'
@@ -401,6 +401,8 @@ def parse_arguments():
 	parser.add_argument('-T',            action='store',      dest='filename',     help='Override default name and location of temporary log file')
 	parser.add_argument('-C', '--copy',  action='store_true', dest='copy',         help='Copy logs to /boot (SD Card)')
 	parser.add_argument('-P', '--print', action='store_true', dest='termprint',    help='Print logs to screen (no upload or copy)')
+
+	ignored_args = ['copy', 'all', 'termprint', 'filename']
 	
 	for a in arguments: parser.add_argument(*a['flags'], action=a['action'], dest=a['dest'], help=a['help'])
 
@@ -426,7 +428,7 @@ def parse_arguments():
 	else:
 
 		for k, arg in vars(args).iteritems():
-			if k not in ['copy', 'all', 'termprint']: 
+			if k not in ignored_args: 
 				SETS[k]['active'] = arg
 
 	# if a different temporary location is provided, then use that in place of the global TEMP_LOG_FILE
@@ -441,10 +443,12 @@ def retrieve_settings():
 	''' Gets the settings from Kodi and activates the relevant entries in SETS.
 		Returns a bool determining whether the user wants to copy the logs to the SD Card.  '''
 
+	excluded_from_all = []
+
 	grab_all = True if __addon__.getSetting('all') == 'true' else False
 
 	for key in SETS:
-		if grab_all and key not in []:
+		if grab_all and key not in excluded_from_all:
 			SETS[key]['active'] = True
 		else:
 			SETS[key]['active'] = True if __addon__.getSetting(key) == 'true' else False
@@ -503,9 +507,11 @@ class Main(object):
 			self.write_to_screen()
 			return
 
-		self.write_to_temp_file()
+		result = self.write_to_temp_file()
 
-		self.dispatch_logs()
+		if result:
+	
+			self.dispatch_logs()
 
 
 	def add_content_index(self):
@@ -571,9 +577,13 @@ class Main(object):
 			with open(TEMP_LOG_FILE, 'w') as f:
 
 				f.writelines(self.log_blotter)
+
+			return True
+
 		except:
 
 			log('Unable to write temporary log to %s' % TEMP_LOG_FILE)
+			log('Failed')
 
 			return
 
@@ -640,7 +650,8 @@ class Main(object):
 
 				else:
 
-					log("Logs successfully uploaded to %s" % self.url.replace(' ' ,''))
+					log("Logs successfully uploaded.")
+					log("Logs available at %s" % self.url.replace(' ' ,''))
 
 
 if __name__ == "__main__":
