@@ -1,8 +1,9 @@
 #!/usr/bin/env python2
 
-import sys
-import os
 import argparse
+import os
+import sys
+import time
 
 try:
 
@@ -623,6 +624,7 @@ class Main(object):
 				key = False
 
 			self.pDialog.close()
+			time.sleep(0.5)
 
 			if not key:
 
