@@ -7,7 +7,7 @@ ConditionPathExists=/dev/brcm43xx
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/hciattach -n /dev/brcm43xx any 230400
+ExecStart=/usr/bin/hciattach -n /dev/brcm43xx any 3000000
 
 [Install]
 WantedBy=multi-user.target
