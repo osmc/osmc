@@ -152,18 +152,19 @@ TETHERING_DISABLE               = 10406
 TETHERING_WARNING               = 10407
 
 
+
+
 class networking_gui(xbmcgui.WindowXMLDialog):
+
     current_network_config = {}  # holds the current network config
-
-    reboot_required_file = '/tmp/.reboot-needed'
-
-    use_preseed = False
-
-    internet_protocol = 'IPV4'
+    reboot_required_file   = '/tmp/.reboot-needed'
+    use_preseed            = False
+    internet_protocol      = 'IPV4'
 
 
     def setUsePreseed(self, value):
         self.use_preseed = value
+
 
     def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
         self.setting_values = kwargs.get('setting_values', {})
@@ -185,41 +186,38 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         # bluetooth discovered device panel (BTD)
         self.BTD = None
-
+        
         # list containing list items of all wifi networks
-        self.wifis = []
-
+        self.wifis  = []
+        
         # connected SSID, the ssid we are currently connected to
-        self.conn_ssid = None
-
+        self.conn_ssid  = None
+        
         # list containing list items of all paired bluetooth devices
         self.paired_bluetooths = []
-
+        
         # list containing list items of all discovered bluetooth devices
         self.discovered_bluetooths = []
-
+        
         # Bluetooth GUI update Thread
         self.bluetooth_population_thread = None
+        self.preseed_data                = None
+        self.wired_status_label          = None
+        self.wireless_status_label       = None
+        self.hotspot_ssid                = None
+        self.hotspot_passphrase          = None
 
-        self.preseed_data = None
-
-        self.wired_status_label = None
-
-        self.wireless_status_label = None
-
-        self.hotspot_ssid = None
-
-        self.hotspot_passphrase = None
 
     def onInit(self):
+        
         # Wired Network Label
-        self.wired_status_label = self.getControl(WIRED_STATUS_LABEL);
+        self.wired_status_label = self.getControl(WIRED_STATUS_LABEL)
 
         # wifi panel (WFP)
         self.WFP = self.getControl(5000)
 
         # Wireless Network Label
-        self.wireless_status_label = self.getControl(WIRELESS_STATUS_LABEL);
+        self.wireless_status_label = self.getControl(WIRELESS_STATUS_LABEL)
 
         # bluetooth paired device panel (BTP)
         self.BTP = self.getControl(6000)
@@ -229,6 +227,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         # Hide panel selectors if devices are not present
         if not osmc_network.is_wifi_available():
+
             self.toggle_controls(False, [SELECTOR_WIRELESS_NETWORK])
             self.toggle_controls(False, [SELECTOR_TETHERING])
 
@@ -236,24 +235,31 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
 
         panel_to_show = SELECTOR_WIRED_NETWORK
+
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
+
              self.preseed_data = osmc_network.parse_preseed()
+
              if self.preseed_data:
                  if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
                      panel_to_show = SELECTOR_WIRELESS_NETWORK
+
                  else:
                      panel_to_show = SELECTOR_WIRED_NETWORK
 
         # set all the panels to invisible except the first one
         for ctl in MAIN_MENU:
             self.getControl(ctl * 10).setVisible(True if ctl == panel_to_show else False)
+
         if panel_to_show == SELECTOR_WIRED_NETWORK:
             self.populate_wired_panel()
+            
         if panel_to_show == SELECTOR_WIRELESS_NETWORK:
             self.populate_wifi_panel(False)
 
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.setup_networking_from_preseed()
+
 
     def setup_networking_from_preseed(self):
         wired = False
