@@ -1,12 +1,11 @@
 # Standard Modules
 from collections import namedtuple, OrderedDict
-import socket
-import sys
 import os
-import os.path
+import socket
 import subprocess
-import time
+import sys
 import threading
+import time
 
 
 # XBMC Modules
@@ -15,7 +14,7 @@ import xbmcgui
 import xbmc
 
 __addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
-DIALOG = xbmcgui.Dialog()
+DIALOG    = xbmcgui.Dialog()
 
 
 # Custom modules
@@ -24,7 +23,7 @@ sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 
 import osmc_bluetooth
 import osmc_network
 
-WIFI_THREAD_NAME = 'wifi_population_thread'
+WIFI_THREAD_NAME      = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
 
 
@@ -37,114 +36,120 @@ def lang(id):
     return san
 
 
-gui_ids = { \
- \
-    1000: 'Header Group list',
-    101: 'Wired Network',
-    102: 'Wireless Network',
-    103: 'Bluetooth',
-    10111: 'Wired - Manual/ DHCP toggle',
-    10112: 'Wired - IP Address',
-    910112: 'Wired - IP Address VALUE',
-    10113: 'Wired - Subnet Mask',
-    910113: 'Wired - Subnet Mask VALUE',
-    10114: 'Wired - Default Gateway',
-    910114: 'Wired - Default Gateway VALUE',
-    10115: 'Wired - Primary DNS',
-    910115: 'Wired - Primary DNS VALUE',
-    10116: 'Wired - Secondary DNS',
-    910116: 'Wired - Secondary DNS VALUE',
-    10118: 'Wired - Apply',
-    10119: 'Wired - Reset',
-    10120: 'Wired - Enable Adapter',
-    10121: 'Wired - Toggle wait for network service',
-    10211: 'Wireless - Automatically configure the network toggle',
-    10212: 'Wireless - IP Address',
-    910212: 'Wireless - IP Address VALUE',
-    10213: 'Wireless - Subnet Mask',
-    910213: 'Wireless - Subnet Mask VALUE',
-    10214: 'Wireless - Default Gateway',
-    910214: 'Wireless - Default Gateway VALUE',
-    10215: 'Wireless - Primary DNS',
-    910215: 'Wireless - Primary DNS VALUE',
-    10216: 'Wireless - Secondary DNS',
-    910216: 'Wireless - Secondary DNS VALUE',
-    10217: 'Wireless - Enable Adapter',
-    10218: 'Wireless - Apply',
-    10219: 'Wireless - Reset',
-    10221: 'Wireless - Toggle wait for network service',
-    10301: 'Bluetooth - Toggle Bluetooth Adapter',
-    10303: 'Bluetooth - Toggle Discovery',
-    10401:  'Tethering (wifi) - Hotspot SSID label',
-    910401: 'Tethering (Wifi) - Hotspot SSID VALUE',
-    10402:  'Tethering (Wifi) - Hotspot passphrase label',
-    910402: 'Tethering (Wifi) - Hotspot passphrase VALUE',
-    10403:  'Tethering (Wifi) - Enable Button',
-    10404:  'Tethering (Wifi) - Disable Button',
-    10405:  'Tethering (Ethernet) - Enable Button',
-    10406:  'Tethering (Ethernet) - Disable Button',
-    5000: 'WiFi panel',
-    6000: 'Bluetooth paired devices panel',
-    7000: 'Bluetooth discoverd devices panel'
+gui_ids = { 
+         
+            1000:   'Header Group list',
+            101:    'Wired Network',
+            102:    'Wireless Network',
+            103:    'Bluetooth',
+            10111:  'Wired - Manual/ DHCP toggle',
+            10112:  'Wired - IP Address',
+            910112: 'Wired - IP Address VALUE',
+            10113:  'Wired - Subnet Mask',
+            910113: 'Wired - Subnet Mask VALUE',
+            10114:  'Wired - Default Gateway',
+            910114: 'Wired - Default Gateway VALUE',
+            10115:  'Wired - Primary DNS',
+            910115: 'Wired - Primary DNS VALUE',
+            10116:  'Wired - Secondary DNS',
+            910116: 'Wired - Secondary DNS VALUE',
+            10118:  'Wired - Apply',
+            10119:  'Wired - Reset',
+            10120:  'Wired - Enable Adapter',
+            10121:  'Wired - Toggle wait for network service',
+            10211:  'Wireless - Automatically configure the network toggle',
+            10212:  'Wireless - IP Address',
+            910212: 'Wireless - IP Address VALUE',
+            10213:  'Wireless - Subnet Mask',
+            910213: 'Wireless - Subnet Mask VALUE',
+            10214:  'Wireless - Default Gateway',
+            910214: 'Wireless - Default Gateway VALUE',
+            10215:  'Wireless - Primary DNS',
+            910215: 'Wireless - Primary DNS VALUE',
+            10216:  'Wireless - Secondary DNS',
+            910216: 'Wireless - Secondary DNS VALUE',
+            10217:  'Wireless - Enable Adapter',
+            10218:  'Wireless - Apply',
+            10219:  'Wireless - Reset',
+            10221:  'Wireless - Toggle wait for network service',
+            10301:  'Bluetooth - Toggle Bluetooth Adapter',
+            10303:  'Bluetooth - Toggle Discovery',
+            10401:  'Tethering (wifi) - Hotspot SSID label',
+            910401: 'Tethering (Wifi) - Hotspot SSID VALUE',
+            10402:  'Tethering (Wifi) - Hotspot passphrase label',
+            910402: 'Tethering (Wifi) - Hotspot passphrase VALUE',
+            10403:  'Tethering (Wifi) - Enable Button',
+            10404:  'Tethering (Wifi) - Disable Button',
+            10405:  'Tethering (Ethernet) - Enable Button',
+            10406:  'Tethering (Ethernet) - Disable Button',
+            5000:   'WiFi panel',
+            6000:   'Bluetooth paired devices panel',
+            7000:   'Bluetooth discoverd devices panel',
+            105:    'MySQL',
+            1050:   'MySQL Panel',
+            10510:  'MySQL Video Database toggle',
+            10512:  'MySQL Video Database host',
+            10513:  'MySQL Video Database port',
+            10514:  'MySQL Video Database user',
+            10515:  'MySQL Video Database pass',
+            10520:  'MySQL Video Database toggle',
+            10522:  'MySQL Video Database host',
+            10523:  'MySQL Video Database port',
+            10524:  'MySQL Video Database user',
+            10525:  'MySQL Video Database pass',    
 
-}
+        }
 
-ip_controls = [10112, 10113, 10114, 10115, 10116, 910112, 910113, 910114, 910115, 910116, 10212, 10213, 10214, 10215
-    , 10216, 910212, 910213, 910214, 910215, 910216, ]
+ip_controls                     = [ 10112, 10113, 10114, 10115, 10116, 910112, 910113, 910114, 910115, 910116, 10212, 10213, 10214, 10215,
+                                    10216, 910212, 910213, 910214, 910215, 910216, ]
 
-SELECTOR_WIRED_NETWORK = 101
-SELECTOR_WIRELESS_NETWORK = 102
-SELECTOR_BLUETOOTH = 103
-SELECTOR_TETHERING = 104
+SELECTOR_WIRED_NETWORK          = 101
+SELECTOR_WIRELESS_NETWORK       = 102
+SELECTOR_BLUETOOTH              = 103
+SELECTOR_TETHERING              = 104
+SELECTOR_MYSQL                  = 105
 
-MAIN_MENU = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH, SELECTOR_TETHERING]
+MAIN_MENU                       = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH, SELECTOR_TETHERING]
 
-BLUETOOTH_CONTROLS = [10303, 6000, 7000]
+BLUETOOTH_CONTROLS              = [10303, 6000, 7000]
 
-BLUETOOTH_DISCOVERY = 10303
-BLUETOOTH_ENABLE_TOGGLE = 10301
+BLUETOOTH_DISCOVERY             = 10303
+BLUETOOTH_ENABLE_TOGGLE         = 10301
 
-ALL_WIRED_CONTROLS = [10111, 10112, 10113, 10114, 10115, 10116, 10118, 10119, 910112, 910113, 910114,
-                      910115, 910116]
-WIRED_STATUS_LABEL = 81000
-WIRED_IP_VALUES = [910112, 910113, 910114, 910115, 910116]
-WIRED_IP_LABELS = [10112, 10113, 10114, 10115, 10116]
-WIRED_APPLY_BUTTON = 10118
-WIRED_RESET_BUTTON = 10119
-WIRED_DHCP_MANUAL_BUTTON = 10111
-WIRED_IP_LABELS = [10112, 10113, 10114, 10115, 10116]
-WIRED_ADAPTER_TOGGLE = 10120
-WIRED_APPLY_BUTTON = 10118
-WIRED_RESET_BUTTON = 10119
-WIRED_DHCP_MANUAL_BUTTON = 10111
-WIRED_WAIT_FOR_NETWORK = 10121
+ALL_WIRED_CONTROLS              = [ 10111, 10112, 10113, 10114, 10115, 10116, 10118, 10119, 910112, 910113, 910114,
+                                    910115, 910116]
+WIRED_STATUS_LABEL              = 81000
+WIRED_IP_VALUES                 = [910112, 910113, 910114, 910115, 910116]
+WIRED_IP_LABELS                 = [10112, 10113, 10114, 10115, 10116]
+WIRED_APPLY_BUTTON              = 10118
+WIRED_RESET_BUTTON              = 10119
+WIRED_DHCP_MANUAL_BUTTON        = 10111
+WIRED_ADAPTER_TOGGLE            = 10120
+WIRED_WAIT_FOR_NETWORK          = 10121
 
-ALL_WIRELESS_CONTROLS = [5000, 910212, 910213, 910214, 910215, 910216, 10211, 10212, 10213, 10214, 10215, 10216,
-                         10218, 10219]
+ALL_WIRELESS_CONTROLS           = [ 5000, 910212, 910213, 910214, 910215, 910216, 10211, 10212, 10213, 10214, 10215, 10216,
+                                    10218, 10219]
 
-WIRELESS_STATUS_LABEL = 82000
-WIRELESS_IP_VALUES = [910212, 910213, 910214, 910215, 910216]
-WIRELESS_IP_LABELS = [10212, 10213, 10214, 10215, 10216]
-WIRELESS_ADAPTER_TOGGLE = 10217
-WIRELESS_APPLY_BUTTON = 10218
-WIRELESS_RESET_BUTTON = 10219
-WIRELESS_DHCP_MANUAL_BUTTON = 10211
-WIRELESS_NETWORKS = 5000
-WIRELESS_WAIT_FOR_NETWORK = 10221
+WIRELESS_STATUS_LABEL           = 82000
+WIRELESS_IP_VALUES              = [910212, 910213, 910214, 910215, 910216]
+WIRELESS_IP_LABELS              = [10212, 10213, 10214, 10215, 10216]
+WIRELESS_ADAPTER_TOGGLE         = 10217
+WIRELESS_APPLY_BUTTON           = 10218
+WIRELESS_RESET_BUTTON           = 10219
+WIRELESS_DHCP_MANUAL_BUTTON     = 10211
+WIRELESS_NETWORKS               = 5000
+WIRELESS_WAIT_FOR_NETWORK       = 10221
 
-ALL_TETHERING_CONTROLS = [10401, 910401, 10402, 910402, 10403, 10404, 10405, 10406, 10407]
-TETHERING_WIFI_SSID_LABEL = 10401
-TETHERING_WIFI_SSID_VALUE = 910401
+ALL_TETHERING_CONTROLS          = [10401, 910401, 10402, 910402, 10403, 10404, 10405, 10406, 10407]
+TETHERING_WIFI_SSID_LABEL       = 10401
+TETHERING_WIFI_SSID_VALUE       = 910401
 TETHERING_WIFI_PASSPHRASE_LABEL = 10402
 TETHERING_WIFI_PASSPHRASE_VALUE = 910402
-TETHERING_WIFI_RADIOBUTTON = 10403
-TETHERING_ETHERNET_RADIOBUTTON = 10404
-TETHERING_ENABLE = 10405
-TETHERING_DISABLE = 10406
-TETHERING_WARNING = 10407
-
-
-
+TETHERING_WIFI_RADIOBUTTON      = 10403
+TETHERING_ETHERNET_RADIOBUTTON  = 10404
+TETHERING_ENABLE                = 10405
+TETHERING_DISABLE               = 10406
+TETHERING_WARNING               = 10407
 
 
 class networking_gui(xbmcgui.WindowXMLDialog):
