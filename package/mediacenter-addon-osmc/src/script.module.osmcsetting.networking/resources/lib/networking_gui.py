@@ -556,7 +556,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             manualDHCPButton.setLabel(lang(32033))
             self.toggle_controls(True, ip_values)
             self.toggle_controls(True, ip_labels)
-            
+
 
     def populate_ip_controls(self, settings_dict, controls):
 
@@ -578,30 +578,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def clear_ip_controls(self, controls):
-        ip_address = self.getControl(controls[0])
-        ip_address.setLabel('')
-        subnet = self.getControl(controls[1])
-        subnet.setLabel('')
-        defaultGateway = self.getControl(controls[2])
-        defaultGateway.setLabel('')
-        primaryDNS = self.getControl(controls[3])
-        primaryDNS.setLabel('')
-        secondaryDNS = self.getControl(controls[4])
-        secondaryDNS.setLabel('')
+
+        for control in controls:
+            self.getControl(control).setLabel('')
+      
         self.toggle_controls(False, controls)
+        
 
     def update_current_ip_settings(self, controls):
-        ip_address = self.getControl(controls[0])
-        self.current_network_config[self.internet_protocol]['Address'] = ip_address.getLabel()
-        subnet = self.getControl(controls[1])
-        self.current_network_config[self.internet_protocol]['Netmask'] = subnet.getLabel()
-        defaultGateway = self.getControl(controls[2])
-        self.current_network_config[self.internet_protocol]['Gateway'] = defaultGateway.getLabel()
-        primaryDNS = self.getControl(controls[3])
-        self.current_network_config['Nameservers']['DNS_1'] = primaryDNS.getLabel()
-        secondaryDNS = self.getControl(controls[4])
-        if secondaryDNS.getLabel():
-            self.current_network_config['Nameservers']['DNS_2'] = secondaryDNS.getLabel()
+
+        ip_address, subnet, defaultGateway, primaryDNS, secondaryDNS = (self.getControl(x).getLabel() for x in controls)
+
+        self.current_network_config[self.internet_protocol]['Address'] = ip_address
+        self.current_network_config[self.internet_protocol]['Netmask'] = subnet
+        self.current_network_config[self.internet_protocol]['Gateway'] = defaultGateway
+        
+        self.current_network_config['Nameservers']['DNS_1'] = primaryDNS
+        
+        if secondaryDNS: 
+            self.current_network_config['Nameservers']['DNS_2'] = secondaryDNS
+
 
     def handle_wired_selection(self, control_id):
         if control_id == WIRED_DHCP_MANUAL_BUTTON:
