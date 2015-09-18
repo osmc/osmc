@@ -262,15 +262,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def setup_networking_from_preseed(self):
+
         wired = False
         connected = False
 
         if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
             if not osmc_network.is_wifi_enabled():
                 self.toggle_wifi()
-            ssid = self.preseed_data['SSID']
-            encrypted = False
+
+            ssid             = self.preseed_data['SSID']
+            encrypted        = False
             preseed_password = None
+
             if 'Password' in self.preseed_data:
                 encrypted = True
                 preseed_password = self.preseed_data['Password']
@@ -278,32 +281,42 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             connected = self.connect_to_wifi(ssid, encrypted, preseed_password, True)
 
         if self.preseed_data is None or self.preseed_data['Interface'].startswith('eth') or not connected:
+
             wired = True
             if not osmc_network.is_ethernet_enabled():
                 self.toggle_ethernet()
+
             self.current_network_config = self.get_wired_config()
             connected = True
 
         if connected:
+
             if self.preseed_data is None or 'dhcp' in self.preseed_data['Method']:
                 self.current_network_config['IPV4']['Method'] = 'dhcp'
+
             else:
-                self.current_network_config['IPV4']['Method'] = 'manual'
+
+                self.current_network_config['IPV4']['Method']  = 'manual'
                 self.current_network_config['IPV4']['Address'] = self.preseed_data['Address']
                 self.current_network_config['IPV4']['Netmask'] = self.preseed_data['Netmask']
+
                 if self.preseed_data['Gateway']:
                     self.current_network_config['IPV4']['Gateway'] = self.preseed_data['Gateway']
+
                 if self.preseed_data['DNS_1']:
-                    self.current_network_config['IPV4']['DNS_1'] = self.preseed_data['DNS_1']
+                    self.current_network_config['IPV4']['DNS_1']   = self.preseed_data['DNS_1']
+
                 if self.preseed_data['DNS_2']:
-                    self.current_network_config['IPV4']['DNS_2'] = self.preseed_data['DNS_2']
+                    self.current_network_config['IPV4']['DNS_2']   = self.preseed_data['DNS_2']
 
             osmc_network.apply_network_changes(self.current_network_config, 'IPV4')
 
         if wired:
             self.populate_wired_panel()
+
         else:
             self.populate_wifi_panel(False)
+
 
     def onClick(self, controlID):
         if controlID in ip_controls:
