@@ -688,65 +688,98 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def get_wireless_config(self, ssid):
+
         if ssid is not None:
+
             wifi = None
             for adapterAddress, wifis in osmc_network.get_wifi_networks().iteritems():
-                if ssid in wifis:
-                    wifi = wifis[ssid]
+                wifi = wifis.get(ssid, None)
+
             if wifi:
                 config = wifi
                 if self.wireless_password:
                     config['Password'] = self.wireless_password
+
                 return config
+
         return {}
 
+
     def populate_wifi_panel(self, scan=False):
+
         if osmc_network.is_wifi_available():
             if osmc_network.is_wifi_enabled():
+
                 # Start the wifi population thread
                 threadRunning = False
                 for t in threading.enumerate():
+
                     if t.getName() == WIFI_THREAD_NAME:
                         threadRunning = True
+
                 if not threadRunning:
+
                     self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.conn_ssid)
+
                     self.wifi_populate_bot.setDaemon(True)
                     self.wifi_populate_bot.start()
 
                 self.current_network_config = osmc_network.get_connected_wifi()
-                self.conn_ssid = None
+                self.conn_ssid              = None
+
                 if 'SSID' in self.current_network_config:
                     self.conn_ssid = self.current_network_config['SSID']
+
                 if self.conn_ssid:
+
                     if 'Address' in self.current_network_config[self.internet_protocol]:
-                        self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
+
+                        self.update_manual_DHCP_button( WIRELESS_DHCP_MANUAL_BUTTON, 
+                                                        WIRELESS_IP_VALUES, 
+                                                        WIRELESS_IP_LABELS
+                                                        )
                         self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
-                    self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE,  WIRELESS_NETWORKS,
-                                                WIRELESS_DHCP_MANUAL_BUTTON])
+
+                    self.toggle_controls(True, [    WIRELESS_ADAPTER_TOGGLE,  
+                                                    WIRELESS_NETWORKS,
+                                                    WIRELESS_DHCP_MANUAL_BUTTON
+                                                    ])
+
                     if osmc_network.has_network_connection(True):
                         # 'Status'            'Connected'
                         status = lang(32044) + ': ' + lang(32046)
+
                     else:
                         # 'Status'            'No internet'
                         status = lang(32044) + ':  ' + lang(32047)
+
                     self.wireless_status_label.setLabel(status)
+
                 else:  # not connected to a network
                     self.hide_controls(WIRELESS_IP_VALUES + WIRELESS_IP_LABELS + [WIRELESS_DHCP_MANUAL_BUTTON,
                                                                                   WIRELESS_APPLY_BUTTON,
-                                                                                  WIRELESS_RESET_BUTTON])
+                                                                                  WIRELESS_RESET_BUTTON
+                                                                                  ])
+
                     self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_NETWORKS])
+
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
+
                     # 'Status'           'No wireless Connection'
                     status = lang(32044) + ': ' + lang(32050)
+
                     self.wireless_status_label.setLabel(status)
 
             else:  # Wifi disabled
                 self.hide_controls(ALL_WIRELESS_CONTROLS)
+
                 # 'Status'            'disabled'
                 status = lang(32044) + ': ' + lang(32048)
                 self.wireless_status_label.setLabel(status)
 
+
             adapterRadioButton = self.getControl(WIRELESS_ADAPTER_TOGGLE)
+
             adapterRadioButton.setSelected(osmc_network.is_wifi_enabled())
             adapterRadioButton.setEnabled(True)
 
@@ -754,30 +787,47 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_controls(False, ALL_WIRELESS_CONTROLS)
 
         waitForNetworkRadioButton = self.getControl(WIRELESS_WAIT_FOR_NETWORK)
+
         waitForNetworkRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
         waitForNetworkRadioButton.setEnabled(True)
 
+
     def handle_wireless_selection(self, control_id):
+
         if control_id == 5000:  # wireless network
             self.handle_selected_wireless_network()
 
         elif control_id == WIRELESS_DHCP_MANUAL_BUTTON:
+
             if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
+                
                 self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+
             elif self.current_network_config[self.internet_protocol]['Method'] == 'manual':
+
                 self.current_network_config[self.internet_protocol]['Method'] = 'dhcp'
                 self.hide_controls(WIRELESS_IP_VALUES)
-            self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
+
+            self.update_manual_DHCP_button( WIRELESS_DHCP_MANUAL_BUTTON, 
+                                            WIRELESS_IP_VALUES, 
+                                            WIRELESS_IP_LABELS)
+
             if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
                 self.hide_controls(WIRELESS_IP_VALUES)
 
         elif control_id == WIRELESS_RESET_BUTTON:
+
             self.current_network_config = self.get_wireless_config(self.conn_ssid)
-            self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
+
+            self.update_manual_DHCP_button( WIRELESS_DHCP_MANUAL_BUTTON, 
+                                            WIRELESS_IP_VALUES, 
+                                            WIRELESS_IP_LABELS
+                                            )
             self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
 
         elif control_id == WIRELESS_APPLY_BUTTON:
             if self.current_network_config:
+
                 osmc_network.apply_network_changes(self.current_network_config, self.internet_protocol)
                 self.populate_wifi_panel()
                 self.setFocusId(WIRELESS_DHCP_MANUAL_BUTTON)
@@ -788,32 +838,43 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.update_apply_reset_button('WIRELESS')
 
+
     def toggle_wifi(self):
+
         self.show_busy_dialogue()
         self.WFP.reset()
         self.hide_controls(ALL_WIRELESS_CONTROLS)
         self.toggle_controls(True, [WIRELESS_NETWORKS])
+
         wifi_state = not osmc_network.is_wifi_enabled()
         osmc_network.toggle_wifi_state(wifi_state)
+
         # 5 second wait to allow connman to make the changes before refreshing
         time.sleep(5)
+
         if not wifi_state:
             self.stop_wifi_population_thread()
             self.current_network_config = {}
+
         self.clear_busy_dialogue()
 
+
     def handle_selected_wireless_network(self):
-        item = self.WFP.getSelectedItem()
-        path = item.getProperty('Path')
-        encrypted = item.getProperty('Encrypted') == 'True'
-        connected = item.getProperty('Connected')
-        ssid = item.getProperty('SSID')
+
+        item        = self.WFP.getSelectedItem()
+        path        = item.getProperty('Path')
+        encrypted   = item.getProperty('Encrypted') == 'True'
+        connected   = item.getProperty('Connected')
+        ssid        = item.getProperty('SSID')
+
         if connected == 'False':
             if not self.conn_ssid:  # if we are not connected to a network connect
                 if self.connect_to_wifi(ssid, encrypted):
                     if '_hidden_' not in path:
+
                         strength = self.current_network_config['Strength']
-                        icon = wifi_populate_bot.get_wifi_icon(encrypted, strength, True)
+                        icon     = wifi_populate_bot.get_wifi_icon(encrypted, strength, True)
+
                         item.setIconImage(icon)
                         item.setProperty('Connected', 'True')
 
@@ -824,26 +885,37 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32041), message, "2500"))
 
         else:
+
             if ssid == self.conn_ssid:
                 #                             'Disconnect from'
                 selection = DIALOG.select(lang(32042) + ' ' + self.conn_ssid + '?',
                                           [lang(32051),lang(32058), lang(32059)])
+
                 if selection == -1 or selection == 0:
                     return
+
                 self.show_busy_dialogue()
-                self.conn_ssid = None
-                self.wireless_password = None
-                self.current_network_config = {}
+
+                self.conn_ssid                  = None
+                self.wireless_password          = None
+                self.current_network_config     = {}
+
                 self.hide_controls(WIRELESS_IP_VALUES + WIRELESS_IP_LABELS)
                 osmc_network.wifi_disconnect(path)
+
                 if selection == 2: # we also want to remove/forget this network
                     osmc_network.wifi_remove(path)
+
                 self.WFP.removeItem(self.WFP.getSelectedPosition())
                 self.toggle_controls(False, [SELECTOR_TETHERING])
+
                 self.populate_wifi_panel()
+
                 self.clear_busy_dialogue()
 
+
     def connect_to_wifi(self, ssid, encrypted, password=None, scan=False):
+
         if scan:
             self.show_busy_dialogue()
             osmc_network.scan_wifi()
@@ -851,74 +923,115 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         wifi = None
         for adapterAddress, wifis in osmc_network.get_wifi_networks().iteritems():
-            if ssid in wifis:
-                wifi = wifis[ssid]
+
+            wifi = wifis.get(ssid, None)
 
         if wifi:
             # 'Configuring'
             self.wireless_status_label.setLabel(lang(32016))
-            path = wifi['path']
-            connection_status = False
-            hiddenssid = None
-            connect = False
+
+            path                = wifi['path']
+            connection_status   = False
+            hiddenssid          = None
+            connect             = False
+
             if '_hidden_' in path :
                 # 'Enter SSID to connect to this hidden network'
                 hiddenssid = DIALOG.input(lang(32073))
+
             else:
                 # 'Wireless'   'Connect to'
                 if DIALOG.yesno(lang(32041), lang(32052) + ' ' + ssid + '?'):
                     connect = True
+
             if connect or hiddenssid:
+
                 self.show_busy_dialogue()
+
                 # try without a password see if connman has the password
-                script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
+                script_base_path  = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
                 connection_status = osmc_network.wifi_connect(path, None, hiddenssid, script_base_path)
+
                 self.clear_busy_dialogue()
+
                 if not connection_status and encrypted:
                     if password is None:
-                        password = DIALOG.input(lang(32013), type=xbmcgui.INPUT_ALPHANUM,
-                                            option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                        password = DIALOG.input(lang(32013), 
+                                                type=xbmcgui.INPUT_ALPHANUM,
+                                                option=xbmcgui.ALPHANUM_HIDE_INPUT
+                                                )
+
                     if password:
                         self.wireless_password = password
                         self.show_busy_dialogue()
+
                         connection_status = osmc_network.wifi_connect(path, password, hiddenssid, script_base_path)
                         self.clear_busy_dialogue()
+
                 if not connection_status:
+
                     # 'Connection to '                  'failed'
                     message = lang(32043) + ' ' + ssid + ' ' + lang(32025)
+
                     #                                                   'Wireless'
                     xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32041), message, "2500"))
+
                     self.current_network_config = {}
+
                     self.clear_ip_controls(WIRELESS_IP_VALUES)
+
                     self.toggle_controls(False, [WIRELESS_DHCP_MANUAL_BUTTON])
+
                     #         'Status'           'Not connected'
                     status = lang(32044) + ': ' + lang(32050)
+
                     self.wireless_status_label.setLabel(status)
                     self.clear_busy_dialogue()
+
                     return False
+
                 else:
                     self.show_busy_dialogue()
+
                     self.current_network_config = osmc_network.get_connected_wifi()
-                    self.update_manual_DHCP_button(WIRELESS_DHCP_MANUAL_BUTTON, WIRELESS_IP_VALUES, WIRELESS_IP_LABELS)
+
+                    self.update_manual_DHCP_button( WIRELESS_DHCP_MANUAL_BUTTON, 
+                                                    WIRELESS_IP_VALUES, 
+                                                    WIRELESS_IP_LABELS
+                                                    )
+
                     self.populate_ip_controls(self.current_network_config, WIRELESS_IP_VALUES)
-                    self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, WIRELESS_NETWORKS,
-                                                WIRELESS_DHCP_MANUAL_BUTTON])
-                    self.conn_ssid = self.current_network_config['SSID']
-                    interface = self.current_network_config['Interface']
+
+                    self.toggle_controls(True, [WIRELESS_ADAPTER_TOGGLE, 
+                                                WIRELESS_NETWORKS,
+                                                WIRELESS_DHCP_MANUAL_BUTTON
+                                                ])
+
+                    self.conn_ssid  = self.current_network_config['SSID']
+                    interface       = self.current_network_config['Interface']
+
                     if osmc_network.has_network_connection(True):
                         # 'Status'                               'Connected'
                         status = lang(32044) + ': ' + interface + ' (' + lang(32046) + ')'
+                    
                     else:
                         # 'Status'                               'No internet'
                         status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
+                    
                     self.wireless_status_label.setLabel(status)
                     self.toggle_controls(True, [SELECTOR_TETHERING])
+
                     self.clear_busy_dialogue()
+                    
                     return True
+        
         else:
+        
             return False
 
+
     def sort_strength(self, itm):
+
         try:
             metric = int(itm.getProperty('strength'))
             if itm.getProperty('Connected') == 'True':
@@ -926,11 +1039,15 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 metric += 100
         except:
             metric = 0
+
         return metric
 
+
     def populate_bluetooth_panel(self):
-        bluetoothRadioButton = self.getControl(BLUETOOTH_ENABLE_TOGGLE)
-        bluetooth_enabled = osmc_bluetooth.is_bluetooth_enabled()
+
+        bluetoothRadioButton    = self.getControl(BLUETOOTH_ENABLE_TOGGLE)
+        bluetooth_enabled       = osmc_bluetooth.is_bluetooth_enabled()
+
         bluetoothRadioButton.setSelected(bluetooth_enabled)
 
         # disable all if bluetooth is not enabled
@@ -940,96 +1057,141 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             return
 
         self.toggle_controls(True, BLUETOOTH_CONTROLS)
+
         discoveryRadioButton = self.getControl(BLUETOOTH_DISCOVERY)
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
+
         # Start Bluetooth Population Thread
         threadRunning = False
         for t in threading.enumerate():
             if t.getName() == BLUETOOTH_THREAD_NAME:
                 threadRunning = True
+
         if not threadRunning:
+
             self.bluetooth_population_thread = bluetooth_population_thread(self.BTD, self.BTP)
+
             self.bluetooth_population_thread.setDaemon(True)
             self.bluetooth_population_thread.start()
 
+
     def handle_bluetooth_selection(self, control_id):
+
         if control_id == BLUETOOTH_ENABLE_TOGGLE:  # Enable Bluetooth
+
             self.show_busy_dialogue()
+
             if osmc_bluetooth.is_bluetooth_enabled():
+
                 osmc_bluetooth.toggle_bluetooth_state(False)
                 self.stop_bluetooth_population_thread()
+
             else:
+
                 osmc_bluetooth.toggle_bluetooth_state(True)
+
             self.clear_busy_dialogue()
 
-        if control_id == BLUETOOTH_DISCOVERY:  # Discovery
+        elif control_id == BLUETOOTH_DISCOVERY:  # Discovery
+
             self.show_busy_dialogue()
+
             if not osmc_bluetooth.is_discovering():
+
                 osmc_bluetooth.start_discovery()
+
             else:
+
                 osmc_bluetooth.stop_discovery()
+
             xbmc.sleep(1500)
             self.clear_busy_dialogue()
 
+        elif control_id == 6000:  # paired devices
 
-        if control_id == 6000:  # paired devices
             item = self.BTP.getSelectedItem()
+
             if item:
-                address = item.getProperty('address')
-                alias = item.getProperty('alias')
-                connected = item.getProperty('connected') == 'True'
+                address     = item.getProperty('address')
+                alias       = item.getProperty('alias')
+                connected   = item.getProperty('connected') == 'True'
+
                 #                                'Cancel'     'Re-connect'  'Remove Device'
                 selection = DIALOG.select(alias, [lang(32051), lang(32075), lang(32021)])
+
                 if selection == -1 or selection == 0:
                     return
 
-                if selection == 1: # Reconnect
+                elif selection == 1: # Reconnect
+
                     if not connected:
                         self.show_busy_dialogue()
+
                         if self.connect_bluetooth(address, alias):
                             self.bluetooth_population_thread.update_bluetooth_lists()
+
                         self.clear_busy_dialogue()
 
-                if selection == 2:
+                elif selection == 2:
+
                     osmc_bluetooth.remove_device(address)
                     self.setFocusId(BLUETOOTH_ENABLE_TOGGLE)
                     self.bluetooth_population_thread.update_bluetooth_lists()
 
-        if control_id == 7000:  # Discovered devices
+        elif control_id == 7000:  # Discovered devices
+
             item = self.BTD.getSelectedItem()
+        
             if item:
+        
                 address = item.getProperty('address')
-                alias = item.getProperty('alias')
+                alias   = item.getProperty('alias')
+
                 #              'Connect With Device'                        'No'        'Pair and Connect' 'pair'
                 selection = DIALOG.select(lang(32022) + ' ' + alias + '?', [lang(32055),lang(32056), lang(32057)])
+                
                 if selection == -1 or selection == 0:
                     return
+                
                 self.show_busy_dialogue()
                 self.setFocusId(BLUETOOTH_DISCOVERY)
+                
                 if selection == 1:
+                
                     script_base_path = os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib') + '/'
-                    result = osmc_bluetooth.pair_device(address, script_base_path)
+                    result           = osmc_bluetooth.pair_device(address, script_base_path)
 
                     if not result:
                         #         'Connection to '                       'failed'
                         message = lang(32024) + ' ' + alias + ' ' + lang(32025)
+
                         #                                                     'Bluetooth'
                         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
+
                         self.clear_busy_dialogue()
                         return
+
                 if self.connect_bluetooth(address, alias):
+
                     osmc_bluetooth.set_device_trusted(address, True)
                     self.bluetooth_population_thread.update_bluetooth_lists()
+
                 self.clear_busy_dialogue()
 
+
+
     def connect_bluetooth(self, address, alias):
+
         connected = osmc_bluetooth.connect_device(address)
+
         if not connected:
              #         'Connection to'                       'failed'
             message = lang(32024) + ' ' + alias + ' ' + lang(32025)
             #                                                     'Bluetooth'
             xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
+
         return connected
+        
 
     def populate_tethering_panel(self):
         wifi_tethering = osmc_network.is_tethering_wifi()
