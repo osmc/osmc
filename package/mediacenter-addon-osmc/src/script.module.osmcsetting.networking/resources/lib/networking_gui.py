@@ -319,8 +319,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def onClick(self, controlID):
+
         if controlID in ip_controls:
             self.edit_ip_address(controlID)
+
         elif controlID in BLUETOOTH_CONTROLS + [BLUETOOTH_ENABLE_TOGGLE]:
             self.handle_bluetooth_selection(controlID)
             self.populate_bluetooth_panel()
@@ -332,20 +334,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.handle_wireless_selection(controlID)
 
         elif controlID == WIRED_WAIT_FOR_NETWORK:
+
             osmc_network.toggle_wait_for_network(not osmc_network.is_connman_wait_for_network_enabled())
+
             waitForNetworkRadioButton = self.getControl(WIRED_WAIT_FOR_NETWORK)
             waitForNetworkRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
 
         elif controlID == WIRELESS_WAIT_FOR_NETWORK:
+
             osmc_network.toggle_wait_for_network(not osmc_network.is_connman_wait_for_network_enabled())
+
             waitForNetworkRadioButton = self.getControl(WIRELESS_WAIT_FOR_NETWORK)
             waitForNetworkRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
 
         elif controlID in ALL_TETHERING_CONTROLS:
             self.handle_tethering_selection(controlID)
 
+
     def onAction(self, action):
-        actionID = action.getId()
+
+        actionID        = action.getId()
         focused_control = self.getFocusId()
 
         log('actionID = ' + str(actionID))
@@ -358,6 +366,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.close()
 
         if focused_control in MAIN_MENU:
+
             if focused_control != self.current_panel:
 
                 self.current_panel = focused_control
@@ -365,36 +374,30 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.stop_wifi_population_thread()
                 self.stop_bluetooth_population_thread()
 
-                if focused_control == SELECTOR_WIRED_NETWORK:
-                    self.populate_wired_panel()
-
-                elif focused_control == SELECTOR_WIRELESS_NETWORK:
-                    self.populate_wifi_panel()
-
-                elif focused_control == SELECTOR_BLUETOOTH:
-                    self.populate_bluetooth_panel()
-
-                elif focused_control == SELECTOR_TETHERING:
-                    self.populate_tethering_panel()
+                if   focused_control == SELECTOR_WIRED_NETWORK:     self.populate_wired_panel()
+                elif focused_control == SELECTOR_WIRELESS_NETWORK:  self.populate_wifi_panel()
+                elif focused_control == SELECTOR_BLUETOOTH:         self.populate_bluetooth_panel()
+                elif focused_control == SELECTOR_TETHERING:         self.populate_tethering_panel()
 
             # change to the required settings panel
             for ctl in MAIN_MENU:
                 self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False)
 
         if focused_control in WIRED_IP_LABELS:
+
             self.update_current_ip_settings(WIRED_IP_VALUES)
             self.update_apply_reset_button('WIRED')
 
         if focused_control in WIRELESS_IP_LABELS:
+
             self.update_current_ip_settings(WIRELESS_IP_VALUES)
             self.update_apply_reset_button('WIRELESS')
 
-    def edit_ip_address(self, controlID):
-        relevant_label_control = self.getControl(900000 + controlID)
-        current_label = relevant_label_control.getLabel()
 
-        if current_label == '___ : ___ : ___ : ___':
-            current_label = ''
+    def edit_ip_address(self, controlID):
+
+        relevant_label_control  = self.getControl(900000 + controlID)
+        current_label           = relevant_label_control.getLabel().replace('___ : ___ : ___ : ___', '')
 
         user_input = DIALOG.input(lang(32004), current_label, type=xbmcgui.INPUT_IPADDRESS)
 
@@ -403,6 +406,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             relevant_label_control.setLabel(current_label)
 
         else:
+
             # validate ip_address format
             try:
                 socket.inet_aton(user_input)
@@ -419,6 +423,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             relevant_label_control.setLabel(user_input)
 
             return
+
 
     def stop_wifi_population_thread(self):
         # call the wifi checking bot to exit, if it exists
