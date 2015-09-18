@@ -1191,145 +1191,220 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (lang(32020), message, "2500"))
 
         return connected
-        
+
 
     def populate_tethering_panel(self):
-        wifi_tethering = osmc_network.is_tethering_wifi()
-        ethernet_tethering = osmc_network.is_tethering_ethernet()
+
+        wifi_tethering      = osmc_network.is_tethering_wifi()
+        ethernet_tethering  = osmc_network.is_tethering_ethernet()
+
         self.toggle_controls(True, ALL_TETHERING_CONTROLS)
+
         if wifi_tethering:
             self.handle_tethering_selection(TETHERING_WIFI_RADIOBUTTON)
+
         if ethernet_tethering:
             self.handle_tethering_selection(TETHERING_ETHERNET_RADIOBUTTON)
+
         if not wifi_tethering and not ethernet_tethering:
             self.handle_tethering_selection(TETHERING_WIFI_RADIOBUTTON)
 
         # disable controls if tethering is active
         if wifi_tethering or ethernet_tethering:
-            self.toggle_controls(False, [TETHERING_WIFI_SSID_LABEL,TETHERING_WIFI_SSID_VALUE, TETHERING_WIFI_PASSPHRASE_LABEL,
-                                         TETHERING_WIFI_PASSPHRASE_VALUE, TETHERING_ENABLE, TETHERING_WIFI_RADIOBUTTON,
-                                         TETHERING_ETHERNET_RADIOBUTTON])
+            self.toggle_controls(False, [
+                                        TETHERING_WIFI_SSID_LABEL,
+                                        TETHERING_WIFI_SSID_VALUE, 
+                                        TETHERING_WIFI_PASSPHRASE_LABEL,
+                                        TETHERING_WIFI_PASSPHRASE_VALUE, 
+                                        TETHERING_ENABLE, 
+                                        TETHERING_WIFI_RADIOBUTTON,
+                                        TETHERING_ETHERNET_RADIOBUTTON
+                                        ])
         else:
             self.toggle_controls(False, [TETHERING_DISABLE])
 
-        wifiSSIDLabel = self.getControl(TETHERING_WIFI_SSID_VALUE)
-        self.hotspot_ssid  = osmc_network.get_tethering_SSID();
+        wifiSSIDLabel      = self.getControl(TETHERING_WIFI_SSID_VALUE)
+        self.hotspot_ssid  = osmc_network.get_tethering_SSID()
+
         if not self.hotspot_ssid:
-            self.hotspot_ssid = 'osmc_wifi';
+            self.hotspot_ssid = 'osmc_wifi'
+
         wifiSSIDLabel.setLabel(self.hotspot_ssid)
-        self.hotspot_passphrase = osmc_network.get_tethering_passphrase();
+        self.hotspot_passphrase = osmc_network.get_tethering_passphrase()
+
         if not self.hotspot_passphrase:
             self.hotspot_passphrase = 'h0tsp0t0smc'
-        control_label = ' '.join([self.hotspot_passphrase[i: i + 33] for i in
-                                  xrange(0, len(self.hotspot_passphrase), 33)])
+
+        control_label = ''.join([x if i % 33 else ' '+x for i, x in enumerate(self.hotspot_passphrase)])
+
         wifiPassphaseLabel = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
         wifiPassphaseLabel.setLabel(control_label)
 
+
     def handle_tethering_selection(self, control_id):
+
         if control_id in [TETHERING_WIFI_RADIOBUTTON, TETHERING_ETHERNET_RADIOBUTTON]:
-            wifi_radiobutton = self.getControl(TETHERING_WIFI_RADIOBUTTON)
+
+            wifi_radiobutton     = self.getControl(TETHERING_WIFI_RADIOBUTTON)
             ethernet_radiobutton = self.getControl(TETHERING_ETHERNET_RADIOBUTTON)
+
             wifi_radiobutton.setSelected(False)
             ethernet_radiobutton.setSelected(False)
+            
             if control_id == TETHERING_WIFI_RADIOBUTTON:
                 self.hide_controls([TETHERING_WARNING])
                 wifi_radiobutton.setSelected(True)
                 ethernet_radiobutton.setSelected(False)
-                self.toggle_controls(True, [TETHERING_WIFI_SSID_LABEL,TETHERING_WIFI_SSID_VALUE,
-                                            TETHERING_WIFI_PASSPHRASE_LABEL, TETHERING_WIFI_PASSPHRASE_VALUE])
+                self.toggle_controls(True, [
+                                            TETHERING_WIFI_SSID_LABEL,
+                                            TETHERING_WIFI_SSID_VALUE,
+                                            TETHERING_WIFI_PASSPHRASE_LABEL, 
+                                            TETHERING_WIFI_PASSPHRASE_VALUE
+                                            ])
             else:
                 self.toggle_controls(True, [TETHERING_WARNING])
                 wifi_radiobutton.setSelected(False)
                 ethernet_radiobutton.setSelected(True)
-                self.toggle_controls(False, [TETHERING_WIFI_SSID_LABEL,TETHERING_WIFI_SSID_VALUE,
-                                            TETHERING_WIFI_PASSPHRASE_LABEL, TETHERING_WIFI_PASSPHRASE_VALUE])
+                self.toggle_controls(False, [
+                                            TETHERING_WIFI_SSID_LABEL,
+                                            TETHERING_WIFI_SSID_VALUE,
+                                            TETHERING_WIFI_PASSPHRASE_LABEL, 
+                                            TETHERING_WIFI_PASSPHRASE_VALUE
+                                            ])
 
         if control_id == TETHERING_WIFI_SSID_LABEL:
+
             wifiSSIDLabel = self.getControl(TETHERING_WIFI_SSID_VALUE)
-            enteredSSID = DIALOG.input(lang(32068), self.hotspot_ssid)
+            enteredSSID   = DIALOG.input(lang(32068), self.hotspot_ssid)
+
             if enteredSSID:
                 self.hotspot_ssid = enteredSSID
                 wifiSSIDLabel.setLabel(enteredSSID)
 
         if control_id == TETHERING_WIFI_PASSPHRASE_LABEL:
+
             wifiPassphraseLabel = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
-            currentPassphrase =self.hotspot_passphrase
-            enteredPassphrase = DIALOG.input(lang(32069), currentPassphrase)
+            currentPassphrase   = self.hotspot_passphrase
+            enteredPassphrase   = DIALOG.input(lang(32069), currentPassphrase)
+            
             if enteredPassphrase:
-                self.hotspot_passphrase = enteredPassphrase
-                control_label = ' '.join([self.hotspot_passphrase[i: i + 33] for i in
-                                  xrange(0, len(self.hotspot_passphrase), 33)])
+                self.hotspot_passphrase = enteredPassphrase             
+                control_label           = ''.join([x if i % 33 else ' '+x for i, x in enumerate(enteredPassphrase)])
+
                 wifiPassphraseLabel.setLabel(control_label)
 
         if control_id == TETHERING_ENABLE:
+
             wifi_radiobutton = self.getControl(TETHERING_WIFI_RADIOBUTTON)
-            technology = None
-            ssid = None
-            passphrase = None
+
+            technology       = None
+            ssid             = None
+            passphrase       = None
+
             if wifi_radiobutton.isSelected():
+
                 technology = 'wifi'
                 ssid = self.hotspot_ssid
+
                 if len(ssid) == 0:
                     # 'Portable Hotspot'
                     # 'SSID must be set to enable WiFi Tethering'
                     DIALOG.ok(lang(32063), lang(32070))
                     return
+
                 passphrase = self.hotspot_passphrase
                 if len(passphrase) > 63:
                     # 'Portable Hotspot'
                     # 'Passphrase must be 63 characters or less"'
                     DIALOG.ok(lang(32063), lang(32074))
                     return
+
                 if len(passphrase) < 8:
                     # 'Portable Hotspot'
                     # 'Passphrase must at least 8 characters long'
                     DIALOG.ok(lang(32063), lang(32071))
                     return
             else:
+
                 technology = 'ethernet'
 
             log('Enabling '+ technology +' Hotspot')
+
             if technology is 'wifi':
                 log('Hotspot ssid = ' + ssid)
 
             if osmc_network.tethering_enable(technology, ssid, passphrase):
+
                 self.setFocusId(TETHERING_DISABLE)
-                self.toggle_controls(False, [TETHERING_WIFI_SSID_LABEL,TETHERING_WIFI_SSID_VALUE, TETHERING_WIFI_PASSPHRASE_LABEL,
-                                         TETHERING_WIFI_PASSPHRASE_VALUE, TETHERING_ENABLE, TETHERING_WIFI_RADIOBUTTON,
-                                         TETHERING_ETHERNET_RADIOBUTTON, TETHERING_ENABLE])
+
+                self.toggle_controls(False, [
+                                            TETHERING_WIFI_SSID_LABEL,
+                                            TETHERING_WIFI_SSID_VALUE, 
+                                            TETHERING_WIFI_PASSPHRASE_LABEL,
+                                            TETHERING_WIFI_PASSPHRASE_VALUE, 
+                                            TETHERING_ENABLE, 
+                                            TETHERING_WIFI_RADIOBUTTON,
+                                            TETHERING_ETHERNET_RADIOBUTTON, 
+                                            TETHERING_ENABLE
+                                            ])
+
                 self.toggle_controls(True, [TETHERING_DISABLE])
+
             else:
                 # 'Portable Hotspot'
                 # 'Error enabling hotspot - see log for details'
                 DIALOG.ok(lang(32063), lang(32072))
 
         if control_id == TETHERING_DISABLE:
+
             log('Disabling Hotspot')
+            
             osmc_network.tethering_disable()
+
             self.setFocusId(SELECTOR_TETHERING)
-            self.toggle_controls(True, [TETHERING_WIFI_SSID_LABEL,TETHERING_WIFI_SSID_VALUE, TETHERING_WIFI_PASSPHRASE_LABEL,
-                                     TETHERING_WIFI_PASSPHRASE_VALUE, TETHERING_ENABLE, TETHERING_WIFI_RADIOBUTTON,
-                                     TETHERING_ETHERNET_RADIOBUTTON, TETHERING_ENABLE])
+
+            self.toggle_controls(True, [
+                                        TETHERING_WIFI_SSID_LABEL,
+                                        TETHERING_WIFI_SSID_VALUE, 
+                                        TETHERING_WIFI_PASSPHRASE_LABEL,
+                                        TETHERING_WIFI_PASSPHRASE_VALUE, 
+                                        TETHERING_ENABLE, 
+                                        TETHERING_WIFI_RADIOBUTTON,
+                                        TETHERING_ETHERNET_RADIOBUTTON, 
+                                        TETHERING_ENABLE
+                                        ])
+
             self.toggle_controls(False, [TETHERING_DISABLE])
 
 
 class bluetooth_population_thread(threading.Thread):
+
+
     def __init__(self, discovered_list_control, trusted_list_control):
+
         super(bluetooth_population_thread, self).__init__(name=BLUETOOTH_THREAD_NAME)
+
         self.exit = False
+
         self.discovered_list_control = discovered_list_control
-        self.trusted_list_control = trusted_list_control
-        self.trusted_dict = {}
+        self.trusted_list_control    = trusted_list_control
+
+        self.trusted_dict    = {}
         self.discovered_dict = {}
 
+
     def run(self):
+
         runs = 0
         while not self.exit:
+
             # update gui every 2 seconds
             if runs % 200 == 0 and not self.exit:
                 self.update_bluetooth_lists()
+
             # every 4 seconds output debug info
             if runs % 400 == 0 and not self.exit:
+
                 log('-- DISCOVERED ---')
                 log(self.discovered_dict)
                 log('-- TRUSTED --')
@@ -1338,28 +1413,42 @@ class bluetooth_population_thread(threading.Thread):
             xbmc.sleep(10)
             runs += 1
 
+
     def update_bluetooth_lists(self):
-        self.trusted_dict = self.populate_bluetooth_dict(True)
+
+        self.trusted_dict    = self.populate_bluetooth_dict(True)
         self.discovered_dict = self.populate_bluetooth_dict(False)
+
         self.update_list_control(dict(self.discovered_dict), self.discovered_list_control)
         self.update_list_control(dict(self.trusted_dict), self.trusted_list_control)
+
 
     def stop_thread(self):
         self.exit = True
 
+
     def update_list_control(self, devices_dict, list_control):
+
         items_to_be_removed = []
+
         for itemIndex in range(0, list_control.size()):
+
             listItem = list_control.getListItem(itemIndex)
-            address = listItem.getProperty('address')
+            address  = listItem.getProperty('address')
+
             if address in devices_dict.keys():
+
                 connected = listItem.getProperty('connected') == 'True'
+
                 # connected status differs
                 if not connected == devices_dict[address]['connected']:
+
                     log('Connected status differs')
                     items_to_be_removed.append(itemIndex)
+
                 else:
                     devices_dict.pop(address)
+
             else:
                 items_to_be_removed.append(itemIndex)
 
@@ -1369,41 +1458,45 @@ class bluetooth_population_thread(threading.Thread):
             except:
                 pass
 
-        if len(devices_dict.keys()) > 0:
-            for address, info in devices_dict.iteritems():
-                list_control.addItem(self.create_bluetooth_item(address, info))
+        map(lambda address, info: list_control.addItem(self.create_bluetooth_item(address, info)), devices_dict.iteritems())
+
 
     def create_bluetooth_item(self, address, info):
-        label = address
-        if info['alias']:
-            label = info['alias']
-        item = xbmcgui.ListItem(label)
-        icon_image = 'disconnected.png'
-        if info['connected']:
-            icon_image = 'connected.png'
+
+        label       = info['alias'] if info['alias'] else address
+        icon_image  = 'connected.png' if info['connected'] else 'disconnected.png'
+
+        item        = xbmcgui.ListItem(label)
+
         item.setIconImage(icon_image)
-        item.setProperty('address', address)
-        item.setProperty('alias', info['alias'])
+
+        item.setProperty('address'  , address)
+        item.setProperty('alias'    , info['alias'])
         item.setProperty('connected', str(info['connected']))
+
         return item
+        
 
     def populate_bluetooth_dict(self, paired):
-        devices = {}
-        if paired:
-            devices = osmc_bluetooth.list_trusted_devices()
-        else:
-            devices = osmc_bluetooth.list_discovered_devices()
-        bluetooth_dict = {}
+
+        devices         = {}
+        bluetooth_dict  = {}
+
+        devices         = osmc_bluetooth.list_trusted_devices() if paired else osmc_bluetooth.list_discovered_devices()
+            
         for address in devices.keys():
-            alias = str(osmc_bluetooth.get_device_property(address, 'Alias'))
-            paired = osmc_bluetooth.get_device_property(address, 'Paired')
-            connected = osmc_bluetooth.get_device_property(address, 'Connected')
-            trusted = osmc_bluetooth.get_device_property(address, 'Trusted')
-            bluetooth_dict[address] = {'alias': alias, 'paired': paired,
-                                       'connected': connected, 'trusted': trusted}
+
+            bluetooth_dict[address] = {
+                                        'alias'     : str(osmc_bluetooth.get_device_property(address, 'Alias')), 
+                                        'paired'    :     osmc_bluetooth.get_device_property(address, 'Paired'),
+                                        'connected' :     osmc_bluetooth.get_device_property(address, 'Connected'),
+                                        'trusted'   :     osmc_bluetooth.get_device_property(address, 'Trusted'),
+                                       }
         return bluetooth_dict
 
+
     def sort_alias(self, itm):
+
         try:
             metric = int(itm.getProperty('alias'))
         except:
