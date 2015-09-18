@@ -21,13 +21,17 @@
 
 # OS module
 import os
+import traceback
 
 # XBMC modules
 import xbmcgui
 WINDOW = xbmcgui.Window(10000)
 if not os.path.isfile('/walkthrough_completed'):
 	WINDOW.setProperty("walkthrough_is_running", 'any_value')
-	xbmc.setosmcwalkthroughstatus(1)
+	try:
+		xbmc.setosmcwalkthroughstatus(1)
+	except Exception as e:
+		print traceback.format_exc()
 import xbmc
 import xbmcaddon
 
@@ -42,7 +46,6 @@ import subprocess
 import sys
 import threading
 import time
-import traceback
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
@@ -136,10 +139,16 @@ class Main(object):
 
 		if not os.path.isfile('/walkthrough_completed'):
 			# Tell Kodi that OSMC is running the walkthrough
-			xbmc.setosmcwalkthroughstatus(1)
+			try:
+				xbmc.setosmcwalkthroughstatus(1)
+			except Exception as e:
+				log(traceback.format_exc())
 		else:
-                       # Tell Kodi that OSMC is done
-                       xbmc.setosmcwalkthroughstatus(2)
+			try:
+				# Tell Kodi that OSMC is done
+				xbmc.setosmcwalkthroughstatus(2)
+			except Exception as e:
+				log(traceback.format_exc())
 
 		# queue for communication with the comm and Main
 		self.parent_queue = Queue.Queue()
@@ -204,8 +213,10 @@ class Main(object):
 							pass
 							
 						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
-
-						xbmc.setosmcwalkthroughstatus(2)
+						try:
+							xbmc.setosmcwalkthroughstatus(2)
+						except Exception as e:
+							log(traceback.format_exc())
 
 						WINDOW.clearProperty('walkthrough_is_running')
 						
