@@ -583,7 +583,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.getControl(control).setLabel('')
       
         self.toggle_controls(False, controls)
-        
+
 
     def update_current_ip_settings(self, controls):
 
@@ -600,23 +600,37 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def handle_wired_selection(self, control_id):
+
         if control_id == WIRED_DHCP_MANUAL_BUTTON:
+
             if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
                 self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+
             elif self.current_network_config[self.internet_protocol]['Method'] == 'nfs_dhcp':
                 self.current_network_config[self.internet_protocol]['Method'] = 'nfs_manual'
+
             elif self.current_network_config[self.internet_protocol]['Method'] == 'manual':
                 self.current_network_config[self.internet_protocol]['Method'] = 'dhcp'
+
             elif self.current_network_config[self.internet_protocol]['Method'] == 'nfs_manual':
                 self.current_network_config[self.internet_protocol]['Method'] = 'nfs_dhcp'
-            self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
+
+            self.update_manual_DHCP_button( WIRED_DHCP_MANUAL_BUTTON, 
+                                            WIRED_IP_VALUES, 
+                                            WIRED_IP_LABELS
+                                            )
+
             if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
                 self.hide_controls(WIRED_IP_VALUES)
 
         if control_id == WIRED_RESET_BUTTON:
             self.current_network_config = self.get_wired_config()
             self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
-            self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
+
+            self.update_manual_DHCP_button( WIRED_DHCP_MANUAL_BUTTON, 
+                                            WIRED_IP_VALUES, 
+                                            WIRED_IP_LABELS
+                                            )
             self.setFocusId(WIRED_DHCP_MANUAL_BUTTON)
 
         if control_id == WIRED_APPLY_BUTTON:
@@ -639,28 +653,39 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.update_apply_reset_button('WIRED')
 
+
     def toggle_ethernet(self):
+
         self.show_busy_dialogue()
         self.hide_controls(ALL_WIRED_CONTROLS)
+
         # 'Status'              'Configuring...'
         self.wired_status_label.setLabel(lang(32044) + ' : ' + lang(32016))
+
         osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
         # 5 second wait to allow connman to make the changes before refreshing
+
         time.sleep(2)
         self.clear_busy_dialogue()
 
-    def update_apply_reset_button(self, type):
-        if type == 'WIRED':
+
+    def update_apply_reset_button(self, net_type):
+
+        if net_type == 'WIRED':
             if cmp(self.get_wired_config(), self.current_network_config) == 0 or not self.get_wired_config():
                 self.toggle_controls(False, [WIRED_RESET_BUTTON, WIRED_APPLY_BUTTON])
+
             else:
                 self.toggle_controls(True, [WIRED_RESET_BUTTON, WIRED_APPLY_BUTTON])
-        if type == 'WIRELESS':
+
+        if net_type == 'WIRELESS':
             wireless_config = self.get_wireless_config(self.conn_ssid)
             if cmp(wireless_config, self.current_network_config) == 0:
                 self.toggle_controls(False, [WIRELESS_RESET_BUTTON, WIRELESS_APPLY_BUTTON])
+
             else:
                 self.toggle_controls(True, [WIRELESS_RESET_BUTTON, WIRELESS_APPLY_BUTTON])
+
 
     def get_wireless_config(self, ssid):
         if ssid is not None:
