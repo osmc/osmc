@@ -1475,7 +1475,7 @@ class bluetooth_population_thread(threading.Thread):
         item.setProperty('connected', str(info['connected']))
 
         return item
-        
+
 
     def populate_bluetooth_dict(self, paired):
 
@@ -1506,23 +1506,29 @@ class bluetooth_population_thread(threading.Thread):
 
 
 class wifi_scanner_bot(threading.Thread):
+
     def __init__(self):
+
         super(wifi_scanner_bot, self).__init__()
 
     def run(self):
+        
         osmc_network.scan_wifi()
 
 
+
 class wifi_populate_bot(threading.Thread):
+
     def __init__(self, scan, wifi_list_control, conn_ssid):
 
         super(wifi_populate_bot, self).__init__(name=WIFI_THREAD_NAME)
-
-        self.WFP = wifi_list_control
-        self.scan = scan
-        self.exit = False
+        
+        self.WFP       = wifi_list_control
+        self.scan      = scan
+        self.exit      = False
         self.conn_ssid = conn_ssid
-        self.wifis = []
+        self.wifis     = []
+
         self.current_network_config = None
 
         if self.scan:
@@ -1530,12 +1536,16 @@ class wifi_populate_bot(threading.Thread):
             self.wifi_scanner_bot.setDaemon(True)
             self.wifi_scanner_bot.start()
 
+
     def run(self):
+
         running_dict = {}
-        runs = 0
+        runs         = 0
+
         while not self.exit:
             # only run the network check every 2 seconds, but allow the exit command to be checked every 10ms
             if runs % 200 == 0 and not self.exit:
+
                 log('Updating Wifi networks')
                 wifis = osmc_network.get_wifi_networks()
 
@@ -1546,37 +1556,53 @@ class wifi_populate_bot(threading.Thread):
                 # find any connected setting and load its values into the controls
                 for adapterAddress, wifis in running_dict.iteritems():
                     for ssid, info in wifis.iteritems():
+
                         try:
                             if info['Connected'] == 'True':
                                 self.current_network_config = self.get_wireless_config(ssid)
                                 self.populate_ip_controls(info, WIRELESS_IP_VALUES)
+
                         except:
                             pass
+
              # every minute re-scan wifi unless the thread has been asked to exit
             if not self.exit and runs % 600 == 0:
+
                 self.wifi_scanner_bot = wifi_scanner_bot()
                 self.wifi_scanner_bot.setDaemon(True)
                 self.wifi_scanner_bot.start()
+
             xbmc.sleep(10)
             runs += 1
 
+
     def stop_thread(self):
+        
         self.exit = True
 
+
     def update_list_control(self, running_dict, multiAdpter):
+
         items_to_be_removed = []
+
         for itemIndex in range(0, self.WFP.size()):
-            listItem = self.WFP.getListItem(itemIndex)
+
+            listItem               = self.WFP.getListItem(itemIndex)
             listItemAdapterAddress = listItem.getProperty('AdapterAddress')
-            listItemSSID = listItem.getProperty('SSID')
-            listItemConnected = True if listItem.getProperty('Connected') in 'True' else False
+            listItemSSID           = listItem.getProperty('SSID')
+            listItemConnected      = listItem.getProperty('Connected') == 'True'
+            
             if listItemAdapterAddress in running_dict.keys():
                     if listItemSSID in running_dict[listItemAdapterAddress].keys():
-                        wifi = running_dict[listItemAdapterAddress][listItemSSID]
-                        networkConnected = True if wifi['State']in ('ready', 'online') else False
-                        expectedLabel = self.getListItemLabel(wifi, multiAdpter);
+
+                        wifi             = running_dict[listItemAdapterAddress][listItemSSID]
+                        networkConnected = wifi['State'] in ('ready', 'online')
+                        expectedLabel    = self.getListItemLabel(wifi, multiAdpter)
+
                         if listItem.getLabel() == expectedLabel and listItemConnected == networkConnected:
+
                             running_dict[listItemAdapterAddress].pop(listItemSSID)
+
                         else:
                             items_to_be_removed.append(itemIndex)
                     else:
@@ -1589,19 +1615,25 @@ class wifi_populate_bot(threading.Thread):
 
         if len(running_dict.keys()) > 0:
             for adapterAddress, wifis in running_dict.iteritems():
+
                 for ssid, info in wifis.iteritems():
                     self.WFP.addItem(self.convert_wifi_to_listitem(info, multiAdpter))
                     connected = True if info['State'] in ('ready', 'online') else False
+
                     if connected and ssid == self.conn_ssid:
                         self.WFP.selectItem(self.WFP.size() - 1)
 
+
     def getListItemLabel(self, wifi, multiAdapter):
-        ssid = wifi['SSID']
+
+        ssid      = wifi['SSID']
         interface = wifi['Interface']
+
         if multiAdapter:
             return ssid + ' (' + interface + ')'
         else:
             return ssid
+
 
     def convert_wifi_to_listitem(self, wifi, multiAdapter):
 
@@ -1610,19 +1642,21 @@ class wifi_populate_bot(threading.Thread):
         # 'Strength': int(dbus_properties['Strength']),
         # 'State' : str(dbus_properties['State'])}
 
-        ssid = wifi['SSID']
-        strength = wifi['Strength']
-        state = wifi['State']
-        path = wifi['path']
-        encrypted = True if wifi['Security'] != 'none' else False
-        connected = True if wifi['State'] in ('ready', 'online') else False
-        address = wifi['AdapterAddress']
+        ssid      = wifi['SSID']
+        strength  = wifi['Strength']
+        state     = wifi['State']
+        path      = wifi['path']
+        encrypted = wifi['Security'] != 'none'
+        connected = wifi['State'] in ('ready', 'online')
+        address   = wifi['AdapterAddress']
 
         # icon_tuple = (connected, encrypted, strength)
         icon_image = self.get_wifi_icon(encrypted, strength, connected)
 
         item = xbmcgui.ListItem(self.getListItemLabel(wifi, multiAdapter))
+        
         item.setIconImage(icon_image)
+
         item.setProperty('Strength', str(strength))
         item.setProperty('Encrypted', str(encrypted))
         item.setProperty('Path', path)
@@ -1634,24 +1668,19 @@ class wifi_populate_bot(threading.Thread):
             self.conn_ssid = ssid
 
         return item
+        
 
     @staticmethod
     def get_wifi_icon(encrypted, strength, connected):
-        filename = ''
-        if connected:
-            filename += 'c'
-        else:
-            filename += 'nc'
-        if encrypted:
-            filename += 'e'
-        else:
-            filename += 'ne'
-        if strength >= 0 and strength <= 40:
-            filename += '020'
-        if strength >= 41 and strength <= 60:
-            filename += '6080'
-        if strength >= 61 and strength <= 100:
-            filename += '80100'
 
-        filename += ".png"
-        return filename
+        filename = ''
+
+        filename += 'c' if connected else 'nc'
+
+        filename += 'e' if encrypted else 'ne'
+
+        if   strength >= 0  and strength <= 40:     filename += '020'
+        elif strength >= 41 and strength <= 60:     filename += '6080'
+        elif strength >= 61 and strength <= 100:    filename += '80100'
+
+        return filename + ".png"
