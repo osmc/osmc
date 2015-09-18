@@ -426,36 +426,47 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def stop_wifi_population_thread(self):
+
         # call the wifi checking bot to exit, if it exists
         try:
             self.wifi_populate_bot.stop_thread()
         except:
             pass
 
+
     def stop_bluetooth_population_thread(self):
+
         try:
             self.bluetooth_population_thread.stop_thread()
         except:
             pass
 
+
     def show_busy_dialogue(self):
+
         xbmc.executebuiltin("ActivateWindow(busydialog)")
 
+
     def clear_busy_dialogue(self):
+
         xbmc.executebuiltin("Dialog.Close(busydialog)")
 
+
     def toggle_controls(self, enabled, control_ids):
+
         for control_id in control_ids:
             control = self.getControl(control_id)
             control.setEnabled(enabled)
             control.setVisible(True)
 
+
     def hide_controls(self, control_ids):
-        for control_id in control_ids:
-            control = self.getControl(control_id)
-            control.setVisible(False)
+
+        map(lambda x:  self.getControl(x).setVisible(False), control_ids)
+
 
     def get_wired_config(self):
+        
         return osmc_network.get_ethernet_settings()
 
     def populate_wired_panel(self):
