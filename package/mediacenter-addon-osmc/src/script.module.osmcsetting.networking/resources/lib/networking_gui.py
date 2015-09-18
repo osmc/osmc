@@ -466,22 +466,28 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def get_wired_config(self):
-        
+
         return osmc_network.get_ethernet_settings()
 
+
     def populate_wired_panel(self):
+
         if os.path.isfile(self.reboot_required_file):
             # 'NFS Network Settings'
             # 'The displayed network configuration may be out dated - A reboot is recommended before proceeding'
             DIALOG.ok(lang(32036), lang(32038))
+
         # Clear wired network Panel
         self.hide_controls(ALL_WIRED_CONTROLS)
         if osmc_network.is_ethernet_enabled():
             self.current_network_config = self.get_wired_config()
+
             if self.current_network_config:
                 interface = self.current_network_config['Interface']
+
                 if self.current_network_config['State'] == 'configuration':
                     status = lang(32044) + ': ' + interface + ' ('+ lang(32076) + ')'
+
                 else:
                     if osmc_network.has_network_connection(True):
                         # 'Status'                               'Connected'
@@ -489,12 +495,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     else:
                         # 'Status'                               'No internet'
                         status = lang(32044) + ': ' + interface + ' (' + lang(32047) + ')'
+
                 self.wired_status_label.setLabel(status)
+
                 if self.current_network_config['State'] == 'configuration':
                     self.current_network_config[self.internet_protocol]['Method'] = 'manual'
+
                 if self.current_network_config['State'] in ['online', 'ready', 'configuration']:
                     self.toggle_controls(True, ALL_WIRED_CONTROLS)
-                    self.update_manual_DHCP_button(WIRED_DHCP_MANUAL_BUTTON, WIRED_IP_VALUES, WIRED_IP_LABELS)
+                    self.update_manual_DHCP_button( WIRED_DHCP_MANUAL_BUTTON, 
+                                                    WIRED_IP_VALUES, 
+                                                    WIRED_IP_LABELS
+                                                    )
                     self.populate_ip_controls(self.current_network_config, WIRED_IP_VALUES)
 
                     # enable reset and apply button
@@ -502,15 +514,20 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             else:  # no wired connection
                 self.hide_controls(WIRED_IP_VALUES + WIRELESS_IP_VALUES)
+
                 # 'Status'     'no wired connection'
                 status = lang(32044) + ': ' + lang(32049)
+
                 self.wired_status_label.setLabel(status)
                 self.clear_ip_controls(WIRED_IP_VALUES)
+
         else:  # Disabled
             self.clear_ip_controls(WIRED_IP_VALUES)
             self.hide_controls(ALL_WIRED_CONTROLS)
+
             # 'Status'     'disabled'
             status = lang(32044) + ': ' + lang(32048)
+
             self.wired_status_label.setLabel(status)
             self.update_apply_reset_button('WIRED')
 
@@ -522,41 +539,43 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         waitForNetworkRadioButton.setSelected(osmc_network.is_connman_wait_for_network_enabled())
         waitForNetworkRadioButton.setEnabled(True)
 
+
     def update_manual_DHCP_button(self, button_id, ip_values, ip_labels):
+
         manualDHCPButton = self.getControl(button_id)
+
         if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
             # 'Configure Network Manually'
             manualDHCPButton.setLabel(lang(32006))
             # if configuration is by DHCP disable controls
             self.toggle_controls(False, ip_values)
             self.toggle_controls(False, ip_labels)
+
         else:
             # 'Configure Network Using DHCP'
             manualDHCPButton.setLabel(lang(32033))
             self.toggle_controls(True, ip_values)
             self.toggle_controls(True, ip_labels)
+            
 
     def populate_ip_controls(self, settings_dict, controls):
-        ip_address = self.getControl(controls[0])
-        ip_address.setLabel(settings_dict[self.internet_protocol]['Address'])
-        subnet = self.getControl(controls[1])
-        subnet.setLabel(settings_dict[self.internet_protocol]['Netmask'])
-        defaultGateway = self.getControl(controls[2])
-        if settings_dict[self.internet_protocol].has_key('Gateway'):
-            defaultGateway.setLabel(settings_dict[self.internet_protocol]['Gateway'])
-        else:
-            defaultGateway.setLabel('')
-            defaultGateway.setEnabled(False)
-        primaryDNS = self.getControl(controls[3])
-        if settings_dict['Nameservers']['DNS_1']:
-            primaryDNS.setLabel(settings_dict['Nameservers']['DNS_1'])
-        else:
-            primaryDNS.setLabel('')
-        secondaryDNS = self.getControl(controls[4])
-        if settings_dict['Nameservers']['DNS_2']:
-            secondaryDNS.setLabel(settings_dict['Nameservers']['DNS_2'])
-        else:
-            secondaryDNS.setLabel('')
+
+        ip_address, subnet, defaultGateway, primaryDNS, secondaryDNS = (self.getControl(x) for x in controls)
+
+        i_set = settings_dict[self.internet_protocol]
+
+        ip_address.setLabel(i_set['Address'])
+        
+        subnet.setLabel(i_set['Netmask'])
+        
+        defaultGateway.setLabel(i_set.get('Gateway', ''))
+
+        if 'Gateway' not in i_set: defaultGateway.setEnabled(False)
+               
+        primaryDNS.setLabel(settings_dict['Nameservers'].get('DNS_1', ''))
+        
+        secondaryDNS.setLabel(settings_dict['Nameservers'].get('DNS_2', ''))
+
 
     def clear_ip_controls(self, controls):
         ip_address = self.getControl(controls[0])
