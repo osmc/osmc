@@ -1458,7 +1458,7 @@ class bluetooth_population_thread(threading.Thread):
             except:
                 pass
 
-        map(lambda address, info: list_control.addItem(self.create_bluetooth_item(address, info)), devices_dict.iteritems())
+        map(lambda (address, info): list_control.addItem(self.create_bluetooth_item(address, info)), devices_dict.iteritems())
 
 
     def create_bluetooth_item(self, address, info):
