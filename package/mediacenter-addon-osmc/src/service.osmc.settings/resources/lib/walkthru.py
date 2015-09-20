@@ -108,9 +108,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# this attribute denotes the skin the user wants to have applied when the walkthru closes
 		self.selected_skin = 'OSMC'
 
-		# this is the default hostname for the device
-		self.device_name = 'OSMC_Device'
-
 		# newsletter email address
 		self.email = ''
 
@@ -449,16 +446,14 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID in [350010]:		# choosing the hostname
 
 			# show keyboard
-			kb = xbmc.Keyboard(self.random_name(), 'Name your device')
+			kb = xbmc.Keyboard(self.random_name(), 'Please give your device a meaningful name to identify it on the network')
 
 			kb.doModal()
 
 			# only move on if the device has been given a name
 			if kb.isConfirmed():
 
-				self.device_name = kb.getText()
-
-				''' NEED THE INTERFACE HERE TO CHANGE THE HOSTNAME '''
+                                xbmc.sethostname(kb.getText());
 
 				# user has chosen a hostname
 				self.getControl(125000).setVisible(False)
