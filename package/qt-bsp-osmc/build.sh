@@ -27,6 +27,7 @@ then
 	handle_dep "libpng12-dev"
 	handle_dep "libjpeg62-turbo-dev"
 	handle_dep "zlib1g-dev"
+	handle_dep "libgif-dev"
 	echo "Package: ${1}-qt-bsp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-qt-bsp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-qt-bsp-osmc" >> files-dev/DEBIAN/control
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
@@ -34,9 +35,9 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	install_patch "../../patches" "$1"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-rasp-pi-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
-    if [ "$1" == "vero" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
+        if [ "$1" == "vero" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
 	./configure --prefix=/usr -release -opensource -confirm-license -c++11 -no-largefile -no-qml-debug -system-zlib \
-	-no-journald -system-libpng -system-freetype -system-libjpeg -openssl -no-pulseaudio -alsa \
+	-no-journald -system-libpng -system-freetype -system-libjpeg -system-libgif -openssl -no-pulseaudio -alsa \
 	-no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports $PLATFORM
 	$BUILD
 	make install INSTALL_ROOT=${out}
