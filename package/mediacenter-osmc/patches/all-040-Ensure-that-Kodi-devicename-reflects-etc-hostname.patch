@@ -1,0 +1,110 @@
+From 97c538fdb9f8cbe84ac7e9691325f99993ebd800 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 20 Sep 2015 14:40:24 +0100
+Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
+ /etc/hostname:
+
+* Set the device name from the hostname at startup
+* Ensure callback handles changes to this and updates /etc/hostname if changed in GUI
+
+Do not worry about /etc/hosts as libnss-myhostname should handle this.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml     |  2 +-
+ xbmc/Application.cpp             |  2 ++
+ xbmc/GUIInfoManager.cpp          | 12 +++---------
+ xbmc/network/NetworkServices.cpp | 15 +++++++++++++++
+ xbmc/settings/Settings.cpp       |  1 +
+ 5 files changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index a36f250..d0448f1 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2096,7 +2096,7 @@
+       <group id="1">
+         <setting id="services.devicename" type="string" label="1271" help="36321">
+           <level>0</level>
+-          <default>Kodi</default>
++	  <default>""</default>
+           <control type="edit" format="string" />
+         </setting>
+       </group>
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index d975c7e..eab698f 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -627,6 +627,8 @@ bool CApplication::Create()
+   }
+   CSettings::Get().SetLoaded();
+ 
++  CSettings::Get().SetString("services.devicename", hostname);
++
+   CLog::Log(LOGINFO, "creating subdirectories");
+   CLog::Log(LOGINFO, "userdata folder: %s", CProfilesManager::Get().GetProfileUserDataFolder().c_str());
+   CLog::Log(LOGINFO, "recording folder: %s", CSettings::Get().GetString("audiocds.recordingpath").c_str());
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+index 82f4281..f3dd167 100644
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -1944,15 +1944,9 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
+     break;
+   case SYSTEM_FRIENDLY_NAME:
+     {
+-      std::string friendlyName = CSettings::Get().GetString("services.devicename");
+-      if (StringUtils::EqualsNoCase(friendlyName, CCompileInfo::GetAppName()))
+-      {
+-        std::string hostname("[unknown]");
+-        g_application.getNetwork().GetHostName(hostname);
+-        strLabel = StringUtils::Format("%s (%s)", friendlyName.c_str(), hostname.c_str());
+-      }
+-      else
+-        strLabel = friendlyName;
++      std::string hostname("osmc");
++      g_application.getNetwork().GetHostName(hostname);
++      strLabel = hostname.c_str();
+     }
+     break;
+   case SYSTEM_STEREOSCOPIC_MODE:
+diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
+index e91425b..db7250d 100644
+--- a/xbmc/network/NetworkServices.cpp
++++ b/xbmc/network/NetworkServices.cpp
+@@ -418,6 +418,21 @@ void CNetworkServices::OnSettingChanged(const CSetting *setting)
+       CApplicationMessenger::Get().RestartApp();
+     }
+   }
++  if (settingId == "services.devicename")
++  {
++     std::string newHostName = CSettings::Get().GetString("services.devicename");
++     FILE *fp;
++     fp = fopen("/tmp/hostname", "w");
++     if (fp)
++     {
++         fprintf(fp, "%s", newHostName.c_str());
++	 fclose(fp);
++     }
++     else
++         return;
++         system("/usr/bin/sudo /bin/mv /tmp/hostname /etc/hostname");
++         system("/usr/bin/sudo /bin/hostname -F /etc/hostname");
++  }
+ }
+ 
+ bool CNetworkServices::OnSettingUpdate(CSetting* &setting, const char *oldSettingId, const TiXmlNode *oldSettingNode)
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index bd0200d..cd31de3 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -826,6 +826,7 @@ void CSettings::InitializeISettingCallbacks()
+   settingSet.insert("services.escontinuousdelay");
+   settingSet.insert("smb.winsserver");
+   settingSet.insert("smb.workgroup");
++  settingSet.insert("services.devicename");
+   m_settingsManager->RegisterCallback(&CNetworkServices::Get(), settingSet);
+ 
+   settingSet.clear();
+-- 
+2.1.0
+
