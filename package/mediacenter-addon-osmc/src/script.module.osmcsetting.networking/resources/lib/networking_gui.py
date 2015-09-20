@@ -6,7 +6,8 @@ import subprocess
 import sys
 import threading
 import time
-
+import xmltodict
+#
 
 # XBMC Modules
 import xbmcaddon
@@ -89,19 +90,27 @@ gui_ids = {
             1050:   'MySQL Panel',
             10510:  'MySQL Video Database toggle',
             10512:  'MySQL Video Database host',
+            910512: 'MySQL Video Database host Value',
             10513:  'MySQL Video Database port',
+            910513: 'MySQL Video Database port Value',
             10514:  'MySQL Video Database user',
+            910514: 'MySQL Video Database user Value',
             10515:  'MySQL Video Database pass',
-            10520:  'MySQL Video Database toggle',
-            10522:  'MySQL Video Database host',
-            10523:  'MySQL Video Database port',
-            10524:  'MySQL Video Database user',
-            10525:  'MySQL Video Database pass',    
+            910515: 'MySQL Video Database pass Value',
+            10520:  'MySQL Music Database toggle',
+            10522:  'MySQL Music Database host',
+            910522: 'MySQL Music Database host Value',
+            10523:  'MySQL Music Database port',
+            910523: 'MySQL Music Database port Value',
+            10524:  'MySQL Music Database user',
+            910524: 'MySQL Music Database user Value',
+            10525:  'MySQL Music Database pass',  
+            910525: 'MySQL Music Database pass Value',                
 
         }
 
 ip_controls                     = [ 10112, 10113, 10114, 10115, 10116, 910112, 910113, 910114, 910115, 910116, 10212, 10213, 10214, 10215,
-                                    10216, 910212, 910213, 910214, 910215, 910216, ]
+                                    10216, 910212, 910213, 910214, 910215, 910216, 10512, 910512, 10522, 910522, ]
 
 SELECTOR_WIRED_NETWORK          = 101
 SELECTOR_WIRELESS_NETWORK       = 102
@@ -109,7 +118,7 @@ SELECTOR_BLUETOOTH              = 103
 SELECTOR_TETHERING              = 104
 SELECTOR_MYSQL                  = 105
 
-MAIN_MENU                       = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH, SELECTOR_TETHERING]
+MAIN_MENU                       = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH, SELECTOR_TETHERING, SELECTOR_MYSQL]
 
 BLUETOOTH_CONTROLS              = [10303, 6000, 7000]
 
@@ -151,7 +160,16 @@ TETHERING_ENABLE                = 10405
 TETHERING_DISABLE               = 10406
 TETHERING_WARNING               = 10407
 
-
+ALL_MYSQL_CONTROLS              = [ 10510, 10512, 910512, 10513, 910513, 10514, 910514, 10515, 910515, 10520, 
+                                    10522, 910522, 10523, 910523, 10524, 910524, 10525, 910525,]
+MYSQL_VIDEO_VALUES              = [910512, 910513, 910514, 910515, 810515]
+MYSQL_MUSIC_VALUES              = [910522, 910523, 910524, 910525, 810525]
+MYSQL_VIDEO_TOGGLE              = 10510
+MYSQL_MUSIC_TOGGLE              = 10520
+MYSQL_PANEL                     = 1050
+MYSQL_USER                      = [10514, 10524]
+MYSQL_PASS                      = [10515, 10525, 910515, 910525]
+MYSQL_PORT                      = [10523, 10513]
 
 
 class networking_gui(xbmcgui.WindowXMLDialog):
@@ -247,6 +265,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                  else:
                      panel_to_show = SELECTOR_WIRED_NETWORK
 
+        # read advancedsettings.xml file and parse the details, then load those into the fields in the MySQL panel
+        self.advs_dict = self.parse_advanced_settings()
+        self.populate_mysql(self.advs_dict)
+
         # set all the panels to invisible except the first one
         for ctl in MAIN_MENU:
             self.getControl(ctl * 10).setVisible(True if ctl == panel_to_show else False)
@@ -260,10 +282,177 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
             self.setup_networking_from_preseed()
 
+        self.getControl(MYSQL_PANEL).setVisible(False)
+
+
+    def populate_mysql(self, dictionary):
+        ''' Reads the MySQL information from the CAS and loads it into the local addon '''
+
+        video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
+        music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
+
+        sql_subitems = ['host', 'port', 'user', 'pass']
+
+        if video:
+
+            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(True)
+
+            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
+
+            host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
+            port.setLabel(video.get('port', ''))
+            user.setLabel(video.get('user', ''))
+            pswd.setLabel('*' * len(video.get('pass', '')))
+            hpwd.setLabel(video.get('pass', ''))
+
+        else:
+            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(False)
+
+        if music:
+
+            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(True)
+
+            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_MUSIC_VALUES)
+
+            host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
+            port.setLabel(music.get('port', ''))
+            user.setLabel(music.get('user', ''))
+            pswd.setLabel('*' * len(music.get('pass', '')))
+            hpwd.setLabel(music.get('pass', ''))
+
+        else:
+            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(False)
+
+        return
+
+
+    def parse_advanced_settings(self):
+        ''' Parses the advancedsettings.xml file. Returns a dict with ALL the details. '''
+
+        user_data = xbmc.translatePath( 'special://userdata')
+        loc       = os.path.join(user_data,'advancedsettings.xml')
+
+        null_doc  = {'advancedsettings': {}}
+
+        log('advancedsettings file exists = %s' % os.path.isfile(loc))
+
+        if os.path.isfile(loc):
+
+            with open(loc, 'r') as f:
+                lines = f.readlines()
+            
+            if not lines:
+                log('advancedsettings.xml file is empty')
+                return null_doc
+
+            with open(loc, 'r') as f:
+                doc = xmltodict.parse(f)
+
+            return doc
+
+        else:
+            return null_doc
+
+
+    def read_mysql_settings(self, dictionary):
+        ''' Reads the MySQL settings from the gui, and writes them directly into the ADVS. '''
+        
+        sub_dict = dictionary.get('advancedsettings',{})
+
+        sql_subitems = ['host', 'port', 'user', 'pass']
+
+        video = {'type': 'mysql'}
+        music = {'type': 'mysql'}
+
+        if self.getControl(MYSQL_VIDEO_TOGGLE).isSelected():
+
+            for sql_item, ctl in zip(sql_subitems, MYSQL_VIDEO_VALUES):
+                if ctl in MYSQL_PASS:
+                    ctl -= 100000
+                video[sql_item] = self.getControl(ctl).getLabel()
+
+                log('ctl %s : sql item %s : %s' %(ctl, sql_item, self.getControl(ctl).getLabel()))
+    
+            sub_dict['videodatabase'] = video
+
+        else:
+            try:
+                del sub_dict['videodatabase']
+            except:
+                pass
+
+        if self.getControl(MYSQL_MUSIC_TOGGLE).isSelected():
+
+            for sql_item, ctl in zip(sql_subitems, MYSQL_MUSIC_VALUES):
+                if ctl in MYSQL_PASS:
+                    ctl = ctl - 100000
+                music[sql_item] = self.getControl(ctl).getLabel()
+
+            sub_dict['musicdatabase'] = music
+
+        else:
+            try:
+                del sub_dict['musicdatabase']
+            except:
+                pass        
+
+        return {'advancedsettings': sub_dict}
+
+
+    def write_advancedsettings(self, dictionary):
+        ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
+
+        user_data = xbmc.translatePath( "special://userdata")
+        loc       = os.path.join(user_data,'advancedsettings.xml')
+
+        with open(loc, 'w') as f:
+            xmltodict.unparse(  input_dict=dictionary, 
+                                output=f, 
+                                pretty=True)
+
+
+    def user_entry_mysql(self, controlID):
+        ''' Handles the user input for MySQL panel. '''
+
+        new_val = None
+
+        current = self.getControl(controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)).getLabel()
+
+        log('current label = %s' % current)
+
+        if controlID in MYSQL_USER:
+            new_val = DIALOG.input( "Please Enter MySQL Username",
+                                    current,
+                                    type=xbmcgui.INPUT_ALPHANUM,
+                                    )
+
+        elif controlID in MYSQL_PASS:
+            new_val = DIALOG.input( "Please Enter MySQL Password",
+                                    current, 
+                                    type=xbmcgui.INPUT_ALPHANUM,
+                                    option=xbmcgui.ALPHANUM_HIDE_INPUT
+                                    )            
+
+        elif controlID in MYSQL_PORT:
+            new_val = DIALOG.input( "Please Enter MySQL Port Number", 
+                                    current,
+                                    type=xbmcgui.INPUT_NUMERIC,
+                                    )
+
+        if new_val and new_val != -1:
+            if controlID in MYSQL_PASS:
+                self.getControl(800000 + controlID).setLabel(new_val)
+                log('new val: %s ' % new_val)
+                new_val = '*' * len(new_val)
+
+            log('new val: %s ' % new_val)
+
+            self.getControl(900000 + controlID).setLabel(new_val)
+
 
     def setup_networking_from_preseed(self):
 
-        wired = False
+        wired     = False
         connected = False
 
         if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
@@ -350,6 +539,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         elif controlID in ALL_TETHERING_CONTROLS:
             self.handle_tethering_selection(controlID)
 
+        elif controlID in ALL_MYSQL_CONTROLS:
+            self.user_entry_mysql(controlID)
+
 
     def onAction(self, action):
 
@@ -362,6 +554,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if actionID in (10, 92):
             self.stop_wifi_population_thread()
             self.stop_bluetooth_population_thread()
+            self.read_mysql_settings(self.advs_dict)
+            self.write_advancedsettings(self.advs_dict)
             xbmc.sleep(200)
             self.close()
 
@@ -381,6 +575,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             # change to the required settings panel
             for ctl in MAIN_MENU:
+                log('focused_control: %s' % focused_control)
+                log('ctl: %s' % ctl)
+                try:
+                    self.getControl(ctl * 10)
+                except:
+                    log('fail1')
                 self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False)
 
         if focused_control in WIRED_IP_LABELS:
@@ -1177,7 +1377,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.bluetooth_population_thread.update_bluetooth_lists()
 
                 self.clear_busy_dialogue()
-
 
 
     def connect_bluetooth(self, address, alias):
