@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "http://download.qt-project.org/official_releases/qt/5.4/5.4.1/single/qt-everywhere-opensource-src-5.4.1.tar.gz" "$(pwd)/src"
+pull_source "http://download.qt.io/official_releases/qt/5.5/5.5.0/single/qt-everywhere-opensource-src-5.5.0.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "qt-bsp-osmc"
@@ -21,7 +21,6 @@ then
 	update_sources
 	handle_dep "libudev-dev"
 	handle_dep "libdbus-1-dev"
-	handle_dep "lixcb-1-dev"
 	handle_dep "libssl-dev"
 	handle_dep "libasound2-dev"
 	handle_dep "libfreetype6-dev"
@@ -35,7 +34,7 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp"; fi
 	install_patch "../../patches" "$1"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-rasp-pi-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
-        if [ "$1" == "vero" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
+    if [ "$1" == "vero" ]; then PLATFORM="-no-directfb -no-linuxfb -eglfs -no-xcb -device linux-g++ -device-option CROSS_COMPILE=/usr/bin/ -sysroot /"; fi
 	./configure --prefix=/usr -release -opensource -confirm-license -c++11 -no-largefile -no-qml-debug -system-zlib \
 	-no-journald -system-libpng -system-freetype -system-libjpeg -openssl -no-pulseaudio -alsa -no-sql-sqlite \
 	-no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports $PLATFORM
