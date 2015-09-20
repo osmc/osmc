@@ -147,7 +147,7 @@
                 <width>300</width>
                 <height>42</height>
                 <!-- <label>$ADDON[service.osmc.settings 32010]</label>-->
-                <label>Computer Name</label>
+                <label>Hostname</label>
                 <font>osmc_addon_Large</font>
                 <!--former_line<font>osmc_addon_OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
@@ -592,6 +592,37 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
             </control>
+            <control id="350011" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <label>(suggest a random name)</label>
+                <font>osmc_addon_XSmall</font>
+                <!--former_line<font>osmc_addon_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="350012" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <visible>!SubString(Control.GetLabel(350010),.............)</visible>
+                <label>Accept</label>
+                <font>osmc_addon_Med</font>
+                <!--former_line<font>osmc_addon_OLD_Font36</font>-->
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
         </control>
         <!-- newsletter signup                  -->
         <control id="9000" type="grouplist">
@@ -938,12 +969,12 @@
                         <left>32</left>
                         <top>0</top>
                         <width>1218</width>
-                        <height>180</height>
+                        <height>120</height>
                         <font>osmc_addon_XLarge</font>
                         <!--former_line<font>osmc_addon_OLD_Font72</font>-->
                         <!-- <font>osmc_addon_font13</font>-->
                         <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ff808080</textcolor>
+                        <textcolor>ffe0b074</textcolor>
                         <!--former_line<textcolor>ffffffff</textcolor>-->
                         <shadowcolor>44000000</shadowcolor>
                         <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->

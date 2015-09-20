@@ -108,6 +108,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# this attribute denotes the skin the user wants to have applied when the walkthru closes
 		self.selected_skin = 'OSMC'
 
+		# this is the default hostname for the device
+		self.device_name = 'osmc'
+
 		# newsletter email address
 		self.email = ''
 
@@ -149,7 +152,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 1035, 1004, 1005, 1006, 1007, 1008, 1009]:
+		for hide_this in [1003, 10035, 1004, 1005, 1006, 1007, 1008, 1009]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -446,20 +449,40 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID in [350010]:		# choosing the hostname
 
 			# show keyboard
-			kb = xbmc.Keyboard(self.random_name(), 'Please give your device a meaningful name to identify it on the network')
+			kb = xbmc.Keyboard(self.device_name, 'Name your device')
 
 			kb.doModal()
 
 			# only move on if the device has been given a name
 			if kb.isConfirmed():
 
-                                xbmc.sethostname(kb.getText());
+				self.device_name = kb.getText()
 
-				# user has chosen a hostname
-				self.getControl(125000).setVisible(False)
-				self.getControl(94000).setVisible(True)
-				self.getControl(1004).setVisible(True)
-				self.setFocusId(40010)
+				self.getControl(350010).setLabel(self.device_name)
+
+				self.getControl(350012).setVisible(True)
+
+		elif controlID in [350011]:	# user has asked for a random name
+
+			self.device_name = self.random_name()
+
+			self.getControl(350010).setLabel(self.device_name)
+
+			self.getControl(350012).setVisible(True)
+
+		elif controlID in [350012]: # user has accepted the hostname
+
+			# INTERFACE TO CHANGE THE HOSTNAME
+			try:
+				xbmc.sethostname(self.device_name) 
+			except:
+				log('hostname change failed')
+
+			# user has chosen a hostname
+			self.getControl(125000).setVisible(False)
+			self.getControl(94000).setVisible(True)
+			self.getControl(1004).setVisible(True)
+			self.setFocusId(40010)
 
 		elif controlID == 40010:			# terms and conditions I Agree button
 			
@@ -579,7 +602,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				"Wesley", "Wilbur", "Wilfred", "Willard", "Willoughby",
 				]
 
-		return "OSMC_" + random.choice(names)
+		return "osmc_" + random.choice(names)
 
 
 	def onAction(self, action):
