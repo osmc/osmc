@@ -1,5 +1,5 @@
 all:
-	@echo "Specify a target:\nmake rbp1\nmake rbp2\n\make atv\nmake vero\n"
+	@echo "Specify a target:\nmake rbp1\nmake rbp2\nmake atv\nmake vero\n"
 
 rbp1:
 	sudo bash build.sh "rbp1"
