@@ -11,10 +11,12 @@ export BUILD_OPTION_BUILD_FRESH=2
 export BUILD_OPTION_USE_GOLD=4
 export BUILD_OPTION_USE_O3=8
 export BUILD_OPTION_USE_NOFP=16
+export BUILD_OPTION_USE_MULTIARCH=32
+export BUILD_OPTION_USE_CCACHE=64
 
 function get_build_option_defaults()
 {
-	return $(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP))
+	return $(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE))
 }
 
 function fix_arch_ctl()
@@ -90,6 +92,14 @@ function build_in_env()
             then
                 export BUILD_FLAGS+="-fomit-frame-pointer"
             fi
+	    CC="/usr/bin/gcc"
+	    CXX="/usr/bin/g++"
+            if ((($BUILD_OPTS & $BUILD_OPTION_USE_CCACHE) == $BUILD_OPTION_USE_CCACHE))
+	    then
+		export CCACHE_DIR="/root/.ccache"
+		export CC="/usr/bin/ccache $CC"
+		export CXX="/usr/bin/ccache $CXX"
+	    fi
             export CFLAGS+=${BUILD_FLAGS}
             export CXXFLAGS+=${BUILD_FLAGS}
             export CPPFLAGS+={$BUILD_FLAGS}
