@@ -142,9 +142,10 @@ then
 	sed '/Version/d' -i files-debug/DEBIAN/control
 	echo "Package: ${1}-mediacenter-osmc" >> files/DEBIAN/control
 	echo "Package: ${1}-mediacenter-debug-osmc" >> files-debug/DEBIAN/control
-	echo "Depends: " >> files-debug/DEBIAN/control
 	VERSION_DBG=$(grep Version ${out}/DEBIAN/control)
+	VERSION_NUM=$(echo $VERSION_DBG | awk {'print $2'})
 	echo $VERSION_DBG >> files-debug/DEBIAN/control
+	echo "Depends: ${1}-userland-osmc (>=${VERSION_NUM})" >> files-debug/DEBIAN/control
 	pushd src/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
