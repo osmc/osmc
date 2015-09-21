@@ -1,5 +1,5 @@
 all:
-	echo -e "Please specify a platform\nmake obs\nmake win\nmake osx"
+	@echo "Please specify a platform\nmake obs\nmake win\nmake osx"
 
 obs:
 	bash make_host_obs.sh

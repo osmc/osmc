@@ -1,5 +1,5 @@
 all:
-	echo "Usage: make rbp1\nmake rbp2"
+	@echo "Usage: make rbp1\nmake rbp2"
 
 rbp1:
 	sudo bash build.sh rbp1

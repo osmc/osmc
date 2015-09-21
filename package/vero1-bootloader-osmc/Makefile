@@ -1,5 +1,5 @@
 all:
-	echo "Usage: make vero1\n"
+	@echo "Usage: make vero1\n"
 
 vero1:
 	sudo bash build.sh vero1

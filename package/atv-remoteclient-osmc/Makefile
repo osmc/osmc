@@ -1,5 +1,5 @@
 all:
-	echo "Usage: make atv"
+	@echo "Usage: make atv"
 
 atv:
 	sudo setarch i686 bash build.sh atv
