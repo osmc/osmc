@@ -5,6 +5,18 @@
 
 . ../../scripts/common.sh
 
+# Available options for building
+export BUILD_OPTION_LANGC=1
+export BUILD_OPTION_BUILD_FRESH=2
+export BUILD_OPTION_USE_GOLD=4
+export BUILD_OPTION_USE_O3=8
+export BUILD_OPTION_USE_NOFP=16
+
+function get_build_option_defaults()
+{
+	return $(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP))
+}
+
 function fix_arch_ctl()
 {
 	sed '/Architecture/d' -i $1
@@ -48,12 +60,41 @@ function configure_build_env()
 
 function build_in_env()
 {
-	export LANG=C
+	if [ -n "$4" ]
+	then
+	    BUILD_OPTS=$4
+	else
+	    get_build_option_defaults
+	    BUILD_OPTS=$?
+	fi
 	# Don't get stuck in an endless loop
 	mount -t proc proc /proc >/dev/null 2>&1
 	ischroot
 	chrootval=$?
-	if [ $chrootval == 2 ] || [ $chrootval == 0 ]; then return 99; fi
+	if [ $chrootval == 2 ] || [ $chrootval == 0 ]
+	then
+            if ((($BUILD_OPTS & $BUILD_OPTION_LANGC) == $BUILD_OPTION_LANGC))
+            then
+                export LANG=C
+            fi
+	    if ((($BUILD_OPTS & $BUILD_OPTION_USE_GOLD) == $BUILD_OPTION_USE_GOLD))
+	    then
+		echo "Using gold linker"
+		export LD="ld.gold"
+	    fi
+            if ((($BUILD_OPTS & $BUILD_OPTION_USE_O3) == $BUILD_OPTION_USE_O3))
+            then
+                export BUILD_FLAGS+="-O3"
+            fi
+            if ((($BUILD_OPTS & $BUILD_OPTION_USE_NOFP) == $BUILD_OPTION_USE_NOFP))
+            then
+                export BUILD_FLAGS+="-fomit-frame-pointer"
+            fi
+            export CFLAGS+=${BUILD_FLAGS}
+            export CXXFLAGS+=${BUILD_FLAGS}
+            export CPPFLAGS+={$BUILD_FLAGS}
+	    return 99
+	fi
 	umount /proc >/dev/null 2>&1
 	update_sources
 	DEP=${1}
@@ -64,16 +105,16 @@ function build_in_env()
 	test $DEP == rbp1 && DEP="armv6l"
 	test $DEP == atv && DEP="i386"
 	TCDIR="/opt/osmc-tc/$DEP-toolchain-osmc"
+	if ((($BUILD_OPTS & $BUILD_OPTION_BUILD_FRESH) == $BUILD_OPTION_BUILD_FRESH))
+	then
+	    apt-get -y remove --purge "$DEP-toolchain-osmc"
+	fi
 	handle_dep "$DEP-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
 	configure_build_env "$TCDIR"
 	umount ${TCDIR}/mnt >/dev/null 2>&1 # May be dirty
 	mount --bind "$2/../../" "$TCDIR"/mnt
-	if [ -n "$4" ]; then
-		chroot $TCDIR /usr/bin/make $1 "$4" -C /mnt/package/$3
-	else
-		chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
-	fi
+	chroot $TCDIR /usr/bin/make $1 -C /mnt/package/$3
 	return=$?
 	if [ $return == 99 ]; then return 1; else return $return; fi
 }
@@ -177,3 +218,4 @@ export -f publish_applications_any
 export -f publish_applications_targeted
 export -f remove_conflicting
 export -f dpkg_build
+export -f get_build_option_defaults
