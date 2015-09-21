@@ -97,6 +97,8 @@ gui_ids = {
             910514: 'MySQL Video Database user Value',
             10515:  'MySQL Video Database pass',
             910515: 'MySQL Video Database pass Value',
+            10580:  'MySQL Video Database Import Watched Status',
+            10590:  'MySQL Video Database Import Resum Point',            
             10520:  'MySQL Music Database toggle',
             10521:  'MySQL Music Database Name':
             910521: 'MySQL Music Database Name Value':            
@@ -107,7 +109,7 @@ gui_ids = {
             10524:  'MySQL Music Database user',
             910524: 'MySQL Music Database user Value',
             10525:  'MySQL Music Database pass',  
-            910525: 'MySQL Music Database pass Value',                
+            910525: 'MySQL Music Database pass Value',
 
         }
 
@@ -164,8 +166,8 @@ TETHERING_WARNING               = 10407
 
 ALL_MYSQL_CONTROLS              = [ 10510, 10512, 910512, 10513, 910513, 10514, 910514, 10515, 910515, 10520, 
                                     10522, 910522, 10523, 910523, 10524, 910524, 10525, 910525,
-                                    10511, 10521, 910511, 910521]
-MYSQL_VIDEO_VALUES              = [910511, 910512, 910513, 910514, 910515, 810515]
+                                    10511, 10521, 910511, 910521, 10580, 10590]
+MYSQL_VIDEO_VALUES              = [910511, 910512, 910513, 910514, 910515, 810515, 10580, 10590]
 MYSQL_MUSIC_VALUES              = [910521, 910522, 910523, 910524, 910525, 810525]
 MYSQL_VIDEO_TOGGLE              = 10510
 MYSQL_MUSIC_TOGGLE              = 10520
@@ -174,7 +176,9 @@ MYSQL_USER                      = [10514, 10524]
 MYSQL_PASS                      = [10515, 10525, 910515, 910525]
 MYSQL_PORT                      = [10523, 10513]
 MYSQL_NAME                      = [10511, 10521]
-
+MYSQL_IMPORT                    = [10580, 10590]
+MYSQL_IMPORT_WATCHED            = 10580
+MYSQL_IMPORT_RESUME             = 10590
 EXIT_CONTROL                    = 666
 
 
@@ -612,6 +616,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         ''' Reads the MySQL information from the CAS and loads it into the local addon '''
 
         video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
+        vidlb = dictionary.get('advancedsettings', {}).get('videolibrary', {})
         music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
 
         sql_subitems = ['name','host', 'port', 'user', 'pass']
@@ -620,7 +625,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(True)
 
-            name, host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
+            name, host, port, user, pswd, hpwd, impw, impr = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
 
             name.setLabel(video.get('name', 'MyVideos'))
             host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
@@ -628,6 +633,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             user.setLabel(video.get('user', ''))
             pswd.setLabel('*' * len(video.get('pass', '')))
             hpwd.setLabel(video.get('pass', ''))
+            impw.setSelected(vidlb.get('importwatchedstate', 'true') == 'true')
+            impr.setSelected(vidlb.get('importresumepoint', 'true') == 'true')
 
         else:
             self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(False)
@@ -700,9 +707,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     
             sub_dict['videodatabase'] = video
 
+            if 'videolibrary' not in sub_dict:
+                sub_dict['videolibrary'] = {}
+
+            if self.getControl(MYSQL_IMPORT_WATCHED).isSelected():
+                sub_dict['videolibrary']['importwatchedstate'] = 'true'
+
+            if self.getControl(MYSQL_IMPORT_RESUME).isSelected():
+                sub_dict['videolibrary']['importresumepoint'] = 'true'
+
         else:
             try:
                 del sub_dict['videodatabase']
+            except:
+                pass
+            try:
+                del sub_dict['videolibrary']['importwatchedstate']
+            except:
+                pass
+            try:
+                del sub_dict['videolibrary']['importresumepoint']
             except:
                 pass
 
