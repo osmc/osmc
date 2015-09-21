@@ -137,7 +137,14 @@ then
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
+	sed '/Package/d' -i files-debug/DEBIAN/control
+	sed '/Depends/d' -i files-debug/DEBIAN/control
+	sed '/Version/d' -i files-debug/DEBIAN/control
 	echo "Package: ${1}-mediacenter-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-mediacenter-debug-osmc" >> files-debug/DEBIAN/control
+	echo "Depends: " >> files-debug/DEBIAN/control
+	VERSION_DBG=$(grep Version ${out}/DEBIAN/control)
+	echo $VERSION_DBG >> files-debug/DEBIAN/control
 	pushd src/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
@@ -189,7 +196,7 @@ then
 		--enable-libbluray \
 		--enable-dvdcss \
 		--disable-joystick \
-		--disable-debug \
+		--enable-debug \
 		--disable-vtbdecoder \
 		--disable-vaapi \
 		--disable-vdpau \
@@ -217,7 +224,7 @@ then
 		--enable-gles \
 		--enable-codec=imxvpu \
 		--enable-libcec \
-		--disable-debug \
+		--enable-debug \
 		--disable-texturepacker \
 		--enable-optical-drive \
 		--enable-dvdcss \
@@ -268,7 +275,9 @@ then
 	popd
 	popd
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
-	strip ${out}/usr/lib/kodi/kodi.bin
+	mkdir -p files-debug/usr/lib/kodi
+	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
+	strip -s ${out}/usr/lib/kodi/kodi.bin
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libgif4, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libvorbisenc2, libass5, libcurl3, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
 	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
 	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
