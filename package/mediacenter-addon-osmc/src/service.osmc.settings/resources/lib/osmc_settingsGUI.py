@@ -1,32 +1,33 @@
 # XBMC modules
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 # STANDARD library modules
 import ast
 import datetime
+import imp
 import json
 import os
 import pickle
 import Queue
 import select
 import socket
+import sys
 import threading
 import time
-import sys
-import imp
 import traceback
 from CompLogger import comprehensive_logger as clog
 
-path = xbmcaddon.Addon().getAddonInfo('path')
-lib = os.path.join(path, 'resources','lib')
-media = os.path.join(path, 'resources','skins','Default','media')
+path       = xbmcaddon.Addon().getAddonInfo('path')
+lib        = os.path.join(path, 'resources','lib')
+media      = os.path.join(path, 'resources','skins','Default','media')
+
 sys.path.append(xbmc.translatePath(lib))
 
-__addon__        = xbmcaddon.Addon()
-scriptPath       = __addon__.getAddonInfo('path')
-WINDOW = xbmcgui.Window(10000)
+__addon__  = xbmcaddon.Addon()
+scriptPath = __addon__.getAddonInfo('path')
+WINDOW     = xbmcgui.Window(10000)
 
 def log(message):
 	xbmc.log('osmc_settings: ' + str(message), level=xbmc.LOGDEBUG)

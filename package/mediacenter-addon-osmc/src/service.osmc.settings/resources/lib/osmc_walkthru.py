@@ -21,12 +21,12 @@ import osmc_timezones
 import LICENSE
 import WARRANTY
 
-EULA   = LICENSE.license
-WARR   = WARRANTY.warranty
-DIALOG = xbmcgui.Dialog()
+EULA       = LICENSE.license
+WARR       = WARRANTY.warranty
+DIALOG     = xbmcgui.Dialog()
 
-__addon__   = xbmcaddon.Addon()
-scriptPath  = __addon__.getAddonInfo('path')
+__addon__  = xbmcaddon.Addon()
+scriptPath = __addon__.getAddonInfo('path')
 
 
 def log(message):
@@ -39,16 +39,19 @@ def lang(id):
 
 
 class Networking_caller(threading.Thread):
+
 	def __init__(self, parent, net_call):
+
 		super(Networking_caller, self).__init__()
-		self.daemon = True
-		self.cancelled = False
-		self.parent = parent
-		self.net_call = net_call
+		self.daemon      = True
+		self.cancelled   = False
+		self.parent      = parent
+		self.net_call    = net_call
 		self.ftr_running = True
-		self.timeout = 0
+		self.timeout     = 0
 		# instantiate Barkers interface class
 		# self.networking_interface = NETWORKING.Barkersinterface()
+
 
 	def run(self):
 		"""Calls Barkers method to check for network connection"""
@@ -78,11 +81,9 @@ class Networking_caller(threading.Thread):
 		log('internet connection is %s' % self.net_call.check_network(True))
 
 
-
 class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance, lang_rerun, selected_language):
-
 
 		# show timezone switch
 		self.showtimezone = True
@@ -93,7 +94,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		#start a new thread that begins checking for an internet connection
 		self.net_call = networking_instance
 
-		self.internet_check = False
+		self.internet_check   = False
 		self.internet_checker = Networking_caller(self, self.net_call)
 		self.internet_checker.setDaemon(True)
 		self.internet_checker.start()
@@ -202,6 +203,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.lang_rerun = False
 			self.bypass_language()
 
+
 	def get_languages(self):
 		# try and find language files (Kodi 14.x)
 		try:
@@ -236,6 +238,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				languages.append(root.attrib['name'])
 		return languages
  
+
 	def bypass_language(self):
 
 		''' Bypasses the language setting, sets the language as selected so the window doesnt reopen '''
@@ -271,7 +274,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			self.getControl(88888).setImage(self.conf_skin_image)
 		else:
 			self.getControl(88888).setImage(self.osmc_skin_image)
-
 
 
 	def check_hardware(self):
@@ -675,7 +677,6 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.set_skin_image('CONF')
 
 
-
 def open_gui(networking_instance):
 
 	__addon__        = xbmcaddon.Addon()
@@ -708,7 +709,7 @@ def open_gui(networking_instance):
 		log('lang_rerun: %s' % lang_rerun)
 		log('skin_choice: %s' % skin_choice)
 		
-	# -- THIS SECTION IS SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
+	# -- THIS SECTION SHOULD BE SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
 	if skin_choice != 'OSMC':
 
 		log('Loading Confluence')

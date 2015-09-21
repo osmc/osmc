@@ -154,7 +154,7 @@ class Main(object):
 		self.parent_queue = Queue.Queue()
 
 		# create socket, listen for comms
-		self.listener = comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.sockfile')
+		self.listener = osmc_comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.sockfile')
 		self.listener.start()
 
 		# the gui is created and stored in memory for quick access
@@ -170,7 +170,7 @@ class Main(object):
 		self.skindir = xbmc.getSkinDir()
 
 		# run the ubiquifonts script to import the needed fonts into the Font.xml
-		response = ubiquifonts.import_osmc_fonts()
+		response = osmc_ubiquifonts.import_osmc_fonts()
 
 		if response == 'reload_please':
 
@@ -186,7 +186,7 @@ class Main(object):
 
 	def create_gui(self):
 
-		self.stored_gui = settings.OSMCGui(queue=self.parent_queue)
+		self.stored_gui = osmc_settingsGUI.OSMCGui(queue=self.parent_queue)
 		self.stored_gui.setDaemon(True)
 		# self.stored_gui.start()
 
@@ -204,7 +204,7 @@ class Main(object):
 
 						vendor = check_vendor()
 
-						walkthru.open_gui(networking_instance)
+						osmc_walkthru.open_gui(networking_instance)
 
 						log("Vendor is %s" % vendor)
 
@@ -279,7 +279,7 @@ class Main(object):
 				log('New Skin: %s' % self.skindir)
 
 				try:
-					resp = ubiquifonts.import_osmc_fonts()
+					resp = osmc_ubiquifonts.import_osmc_fonts()
 
 					log('Ubiquifonts result: %s' % resp)
 
@@ -356,7 +356,7 @@ class Main(object):
 							if module['id'] == "script.module.osmcsetting.networking":
 								networking_instance = module['SET']
 
-								walkthru.open_gui(networking_instance)
+								osmc_walkthru.open_gui(networking_instance)
 
 								break
 			

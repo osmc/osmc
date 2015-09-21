@@ -1,23 +1,24 @@
 # Standard modules
 import os
 import shutil
-import sys
 import subprocess
-from xml.etree import ElementTree as ET
+import sys
 import traceback
+from xml.etree import ElementTree as ET
 
 # XBMC modules
 import xbmc
 import xbmcaddon
 import xbmcgui
 
-WINDOW = xbmcgui.Window(10000)
+WINDOW        = xbmcgui.Window(10000)
 
-FOLDER = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources'))
+FOLDER        = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources'))
 
-FONT_FOLDER = xbmc.translatePath(os.path.join(FOLDER, 'skins', 'Default', 'fonts'))
+FONT_FOLDER   = xbmc.translatePath(os.path.join(FOLDER, 'skins', 'Default', 'fonts'))
 
 FONT_PARTIALS = os.path.join(FOLDER, 'lib', 'fonts.txt')
+
 # FONT_PARTIALS = '/home/kubkev/.kodi/addons/service.osmc.settings/resources/lib/fonts.txt'
 
 

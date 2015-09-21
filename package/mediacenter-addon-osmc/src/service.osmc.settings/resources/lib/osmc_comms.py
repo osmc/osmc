@@ -1,8 +1,8 @@
 # Standard modules
-import socket
-import threading
 import os
+import socket
 import subprocess
+import threading
 
 # XBMC modules
 import xbmc
