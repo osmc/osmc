@@ -43,6 +43,7 @@ class Networking_caller(threading.Thread):
 	def __init__(self, parent, net_call):
 
 		super(Networking_caller, self).__init__()
+		
 		self.daemon      = True
 		self.cancelled   = False
 		self.parent      = parent
