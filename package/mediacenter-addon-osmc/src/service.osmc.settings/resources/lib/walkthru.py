@@ -505,6 +505,11 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				self.networking_page_director(controlID)
 
+				self.getControl(97000).setVisible(False)
+				self.getControl(98000).setVisible(True)
+				self.getControl(1008).setVisible(True)
+				self.setFocusId(80010)
+
 			else:
 				pass							
 
