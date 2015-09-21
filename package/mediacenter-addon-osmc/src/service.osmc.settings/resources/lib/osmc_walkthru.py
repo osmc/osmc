@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
-import timezones
+import osmc_timezones
 import LICENSE
 import WARRANTY
 
@@ -103,7 +103,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# edit the timezone in /etc/timezone
 		if self.showtimezone:
-			self.timezones = timezones.get_timezones()
+			self.timezones = osmc_timezones.get_timezones()
 
 		# this attribute denotes the skin the user wants to have applied when the walkthru closes
 		self.selected_skin = 'OSMC'

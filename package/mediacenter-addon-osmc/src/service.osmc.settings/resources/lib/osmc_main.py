@@ -49,10 +49,10 @@ import time
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
-import walkthru
-import settings
-import comms
-import ubiquifonts
+import osmc_walkthru
+import osmc_settingsGUI
+import osmc_comms
+import osmc_ubiquifonts
 
 
 __addon__        = xbmcaddon.Addon()
