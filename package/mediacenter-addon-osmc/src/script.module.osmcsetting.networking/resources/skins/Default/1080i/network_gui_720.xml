@@ -36,7 +36,7 @@
             <itemgap>34</itemgap>
             <onleft>1000</onleft>
             <onup>noop</onup>
-            <ondown>noop</ondown>
+            <ondown>666</ondown>
             <orientation>vertical</orientation>
             <!-- Wired -->
             <control id="101" type="button">
@@ -45,8 +45,8 @@
                 <height>42</height>
                 <description>Wired</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32060]</label>
-                <font>osmc_addon_720_Large</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <font>osmc_addon_720Large</font>
+                <!--former_line<font>osmc_addon_720OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -64,8 +64,8 @@
                 <height>42</height>
                 <description>Wireless</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32041]</label>
-                <font>osmc_addon_720_Large</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <font>osmc_addon_720Large</font>
+                <!--former_line<font>osmc_addon_720OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -83,8 +83,8 @@
                 <height>42</height>
                 <description>Bluetooth</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32003]</label>
-                <font>osmc_addon_720_Large</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <font>osmc_addon_720Large</font>
+                <!--former_line<font>osmc_addon_720OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -102,8 +102,8 @@
                 <height>42</height>
                 <description>Tethering</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32001]</label>
-                <font>osmc_addon_720_Large</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font42</font>-->
+                <font>osmc_addon_720Large</font>
+                <!--former_line<font>osmc_addon_720OLD_Font42</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -121,7 +121,7 @@
                 <height>42</height>
                 <description>MySQL</description>
                 <label>MySQL</label>
-                <font>osmc_addon_720_Large</font>
+                <font>osmc_addon_720Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <texturefocus>single_pixel.png</texturefocus>
@@ -131,6 +131,26 @@
                 <onclick>noop</onclick>
                 <onright>1050</onright>
             </control>
+        </control>
+        <!-- EXIT CONTROL -->
+        <control id="666" type="button">
+            <visible>Control.IsEnabled(105)</visible>
+            <width>300</width>
+            <height>42</height>
+            <left>120</left>
+            <bottom>100</bottom>
+            <description>Exit control</description>
+            <label>Exit</label>
+            <font>osmc_addon_720Large</font>
+            <textcolor>66ffffff</textcolor>
+            <focusedcolor>ffe0b074</focusedcolor>
+            <texturefocus>single_pixel.png</texturefocus>
+            <texturenofocus>single_pixel.png</texturenofocus>
+            <align>left</align>
+            <aligny>center</aligny>
+            <onclick>noop</onclick>
+            <onright>1050</onright>
+            <onup>1000</onup>
         </control>
         <!-- ## Wired Panel ## -->
         <control id="1010" type="group">
@@ -151,8 +171,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -179,8 +199,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -204,8 +224,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -229,8 +249,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -254,8 +274,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -279,8 +299,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -304,8 +324,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -330,8 +350,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>IP Address VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -344,8 +364,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>IP Address VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -361,8 +381,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Subnet Mask VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -375,8 +395,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>ISubnet Mask VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -392,8 +412,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Default Gateway VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -406,8 +426,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Default Gateway VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -423,8 +443,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Primary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -437,8 +457,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Primary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -454,8 +474,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Secondary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -471,8 +491,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Secondary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -486,8 +506,8 @@
                 <height>70</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <!-- apply and reset buttons -->
@@ -501,8 +521,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -525,8 +545,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -549,8 +569,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -585,8 +605,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
                     <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -613,8 +633,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -637,8 +657,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -661,8 +681,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -685,8 +705,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -709,8 +729,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -733,8 +753,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -756,8 +776,8 @@
                     <posy>300</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -772,8 +792,8 @@
                     <posy>300</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>ff808080</textcolor>
                     <!--former_line<textcolor>ffffffff</textcolor>-->
                     <align>right</align>
@@ -789,8 +809,8 @@
                     <posy>370</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -805,8 +825,8 @@
                     <posy>370</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>ff808080</textcolor>
                     <!--former_line<textcolor>ffffffff</textcolor>-->
                     <align>right</align>
@@ -822,8 +842,8 @@
                     <posy>440</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -838,8 +858,8 @@
                     <posy>440</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>ff808080</textcolor>
                     <!--former_line<textcolor>ffffffff</textcolor>-->
                     <align>right</align>
@@ -855,8 +875,8 @@
                     <posy>510</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -871,8 +891,8 @@
                     <posy>510</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>ff808080</textcolor>
                     <!--former_line<textcolor>ffffffff</textcolor>-->
                     <align>right</align>
@@ -888,8 +908,8 @@
                     <posy>580</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -904,8 +924,8 @@
                     <posy>580</posy>
                     <width>880</width>
                     <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>ff808080</textcolor>
                     <!--former_line<textcolor>ffffffff</textcolor>-->
                     <align>right</align>
@@ -921,8 +941,8 @@
                     <height>70</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                 </control>
                 <!-- apply and reset buttons -->
@@ -936,8 +956,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -959,8 +979,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textoffsetx>0</textoffsetx>
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
@@ -981,8 +1001,8 @@
                     <height>66</height>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <font>osmc_addon_720Med</font>
+                    <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                     <textcolor>66ffffff</textcolor>
                     <focusedcolor>ffe0b074</focusedcolor>
                     <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1033,8 +1053,8 @@
                         <posy>10</posy>
                         <width>640</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>left</align>
                         <aligny>center</aligny>
                         <textcolor>66ffffff</textcolor>
@@ -1057,8 +1077,8 @@
                         <posy>10</posy>
                         <width>640</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>left</align>
                         <aligny>center</aligny>
                         <!--former_line    <textcolor>ff808080</textcolor>-->
@@ -1088,8 +1108,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1115,8 +1135,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1148,8 +1168,8 @@
                 <posy>240</posy>
                 <width>230</width>
                 <height>70</height>
-                <font>osmc_addon_720_XSmall</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font27</font>-->
+                <font>osmc_addon_720XSmall</font>
+                <!--former_line<font>osmc_addon_720OLD_Font27</font>-->
                 <textcolor>66ffffff</textcolor>
                 <align>right</align>
                 <aligny>top</aligny>
@@ -1182,8 +1202,8 @@
                         <posy>10</posy>
                         <width>500</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>left</align>
                         <aligny>center</aligny>
                         <textcolor>66ffffff</textcolor>
@@ -1205,8 +1225,8 @@
                         <posy>10</posy>
                         <width>500</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>left</align>
                         <aligny>center</aligny>
                         <textcolor>ffffffff</textcolor>
@@ -1231,8 +1251,8 @@
                 <posy>240</posy>
                 <width>230</width>
                 <height>70</height>
-                <font>osmc_addon_720_XSmall</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font27</font>-->
+                <font>osmc_addon_720XSmall</font>
+                <!--former_line<font>osmc_addon_720OLD_Font27</font>-->
                 <textcolor>66ffffff</textcolor>
                 <align>right</align>
                 <aligny>top</aligny>
@@ -1256,8 +1276,8 @@
                         <posy>10</posy>
                         <width>450</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>centre</align>
                         <aligny>center</aligny>
                         <textcolor>66ffffff</textcolor>
@@ -1272,8 +1292,8 @@
                         <posy>10</posy>
                         <width>500</width>
                         <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <!--former_line    <font>osmc_addon_720_OLD_Font36</font>-->
+                        <font>osmc_addon_720Med</font>
+                        <!--former_line    <font>osmc_addon_720OLD_Font36</font>-->
                         <align>left</align>
                         <aligny>center</aligny>
                         <textcolor>ffffffff</textcolor>
@@ -1301,8 +1321,8 @@
                 <width>880</width>
                 <height>70</height>
                 <description>Header</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -1317,8 +1337,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -1342,8 +1362,8 @@
                 <width>1000</width>
                 <height>70</height>
                 <description>Hotspit SSID VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -1356,8 +1376,8 @@
                 <width>1000</width>
                 <height>70</height>
                 <description>Hotspot Passphrase VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -1372,8 +1392,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -1398,8 +1418,8 @@
                 <height>140</height>
                 <wrapmultiline>true</wrapmultiline>
                 <description>Hotspot passphrase VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
             </control>
             <control type="label">
@@ -1413,8 +1433,8 @@
                 <width>1000</width>
                 <description>Hotspot passphrase VALUE</description>
                 <wrapmultiline>true</wrapmultiline>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -1427,8 +1447,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1453,8 +1473,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1479,8 +1499,8 @@
                 <width>1400</width>
                 <height>70</height>
                 <description>Do not connect this device to a wired network with a DHCP server</description>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>ff808080</textcolor>
                 <!--former_line<textcolor>ffffffff</textcolor>-->
             </control>
@@ -1494,8 +1514,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -1517,8 +1537,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <label>-</label>
                 <textoffsetx>0</textoffsetx>
                 <textcolor>66ffffff</textcolor>
@@ -1553,8 +1573,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1567,7 +1587,7 @@
                 <textureradioofffocus>RadioOff.png</textureradioofffocus>
                 <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
                 <onup>105</onup>
-                <ondown>10512</ondown>
+                <ondown>10511</ondown>
                 <onleft>105</onleft>
                 <onright>10520</onright>
             </control>
@@ -1578,6 +1598,60 @@
                 <posx>75</posx>
                 <posy>180</posy>
                 <orientation>vertical</orientation>
+                <control type="group">
+                    <!-- NAME BUTTON -->
+                    <control id="10511" type="button">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <description>NAME</description>
+                        <label>Name</label>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <width>650</width>
+                        <height>66</height>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <font>osmc_addon_720Med</font>
+                        <label>-</label>
+                        <textoffsetx>0</textoffsetx>
+                        <textcolor>66ffffff</textcolor>
+                        <focusedcolor>ffe0b074</focusedcolor>
+                        <texturefocus>-</texturefocus>
+                        <texturenofocus>-</texturenofocus>
+                        <onup>10510</onup>
+                        <ondown>10512</ondown>
+                        <onleft>105</onleft>
+                        <onright>1050</onright>
+                    </control>
+                    <!-- VALUE -->
+                    <control id="910511" type="label">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>!Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+                        <label>MyVideos</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_720Med</font>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                    <!-- VALUE HIGHLIGHT -->
+                    <control type="label">
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+                        <label>$INFO[Control.GetLabel(910511)]</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_720Med</font>
+                        <textcolor>ff808080</textcolor>
+                    </control>
+                </control>
                 <control type="group">
                     <!-- IPADDRESS BUTTON -->
                     <control id="10512" type="button">
@@ -1590,7 +1664,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <label>-</label>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
@@ -1614,7 +1688,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1628,7 +1702,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -1644,7 +1718,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <label>-</label>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
@@ -1668,7 +1742,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1682,7 +1756,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -1698,7 +1772,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
@@ -1721,7 +1795,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1735,7 +1809,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -1751,7 +1825,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
@@ -1774,7 +1848,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1788,7 +1862,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                     <!-- VALUE HIDDEN -->
@@ -1813,8 +1887,8 @@
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                <font>osmc_addon_720Med</font>
+                <!--former_line<font>osmc_addon_720OLD_Font36</font>-->
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
@@ -1839,6 +1913,59 @@
                 <posy>180</posy>
                 <orientation>vertical</orientation>
                 <control type="group">
+                    <!-- NAME BUTTON -->
+                    <control id="10521" type="button">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <description>NAME</description>
+                        <label>Name</label>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <width>650</width>
+                        <height>66</height>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <font>osmc_addon_720Med</font>
+                        <label>-</label>
+                        <textoffsetx>0</textoffsetx>
+                        <textcolor>66ffffff</textcolor>
+                        <focusedcolor>ffe0b074</focusedcolor>
+                        <texturefocus>-</texturefocus>
+                        <texturenofocus>-</texturenofocus>
+                        <onup>10520</onup>
+                        <ondown>10522</ondown>
+                        <onleft>105</onleft>
+                        <onright>1050</onright>
+                    </control>
+                    <!-- VALUE -->
+                    <control id="910521" type="label">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>!Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+                        <label>MyMusic</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_720Med</font>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                    <!-- VALUE HIGHLIGHT -->
+                    <control type="label">
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+                        <label>$INFO[Control.GetLabel(910521)]</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_720Med</font>
+                        <textcolor>ff808080</textcolor>
+                    </control>
+                </control>                    
                     <!-- IPADDRESS BUTTON -->
                     <control id="10522" type="button">
                         <disabledcolor>ff000000</disabledcolor>
@@ -1850,13 +1977,13 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
                         <texturefocus>-</texturefocus>
                         <texturenofocus>-</texturenofocus>
-                        <onup>10520</onup>
+                        <onup>10521</onup>
                         <ondown>10523</ondown>
                         <onleft>1050</onleft>
                         <onright>105</onright>
@@ -1873,7 +2000,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1887,7 +2014,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -1903,7 +2030,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
@@ -1926,7 +2053,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1940,7 +2067,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -1956,7 +2083,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
@@ -1979,7 +2106,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -1993,7 +2120,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                 </control>
@@ -2009,7 +2136,7 @@
                         <height>66</height>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textoffsetx>0</textoffsetx>
                         <textcolor>66ffffff</textcolor>
                         <focusedcolor>ffe0b074</focusedcolor>
@@ -2032,7 +2159,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>66ffffff</textcolor>
                     </control>
                     <!-- VALUE HIGHLIGHT -->
@@ -2046,7 +2173,7 @@
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
+                        <font>osmc_addon_720Med</font>
                         <textcolor>ff808080</textcolor>
                     </control>
                     <!-- VALUE HIDDEN -->
