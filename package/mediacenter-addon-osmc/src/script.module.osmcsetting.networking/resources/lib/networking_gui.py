@@ -426,12 +426,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             # change to the required settings panel
             for ctl in MAIN_MENU:
-                log('focused_control: %s' % focused_control)
-                log('ctl: %s' % ctl)
-                try:
-                    self.getControl(ctl * 10)
-                except:
-                    log('fail1')
+
                 self.getControl(ctl * 10).setVisible(True if ctl == focused_control else False)
 
         if focused_control in WIRED_IP_LABELS:
