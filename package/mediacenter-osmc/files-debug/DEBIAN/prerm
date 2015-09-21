@@ -1,7 +1,6 @@
 #!/bin/bash
 
 if [ "$1" = "remove" ]; then
-	#systemctl disable mediacenter.service >/dev/null 2>&1
 	systemctl stop mediacenter.service >/dev/null 2>&1
 	exit 0
 fi
