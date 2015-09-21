@@ -171,6 +171,8 @@ MYSQL_USER                      = [10514, 10524]
 MYSQL_PASS                      = [10515, 10525, 910515, 910525]
 MYSQL_PORT                      = [10523, 10513]
 
+EXIT_CONTROL                    = 666
+
 
 class networking_gui(xbmcgui.WindowXMLDialog):
 
@@ -285,171 +287,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.getControl(MYSQL_PANEL).setVisible(False)
 
 
-    def populate_mysql(self, dictionary):
-        ''' Reads the MySQL information from the CAS and loads it into the local addon '''
-
-        video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
-        music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
-
-        sql_subitems = ['host', 'port', 'user', 'pass']
-
-        if video:
-
-            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(True)
-
-            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
-
-            host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
-            port.setLabel(video.get('port', ''))
-            user.setLabel(video.get('user', ''))
-            pswd.setLabel('*' * len(video.get('pass', '')))
-            hpwd.setLabel(video.get('pass', ''))
-
-        else:
-            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(False)
-
-        if music:
-
-            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(True)
-
-            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_MUSIC_VALUES)
-
-            host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
-            port.setLabel(music.get('port', ''))
-            user.setLabel(music.get('user', ''))
-            pswd.setLabel('*' * len(music.get('pass', '')))
-            hpwd.setLabel(music.get('pass', ''))
-
-        else:
-            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(False)
-
-        return
-
-
-    def parse_advanced_settings(self):
-        ''' Parses the advancedsettings.xml file. Returns a dict with ALL the details. '''
-
-        user_data = xbmc.translatePath( 'special://userdata')
-        loc       = os.path.join(user_data,'advancedsettings.xml')
-
-        null_doc  = {'advancedsettings': {}}
-
-        log('advancedsettings file exists = %s' % os.path.isfile(loc))
-
-        if os.path.isfile(loc):
-
-            with open(loc, 'r') as f:
-                lines = f.readlines()
-            
-            if not lines:
-                log('advancedsettings.xml file is empty')
-                return null_doc
-
-            with open(loc, 'r') as f:
-                doc = xmltodict.parse(f)
-
-            return doc
-
-        else:
-            return null_doc
-
-
-    def read_mysql_settings(self, dictionary):
-        ''' Reads the MySQL settings from the gui, and writes them directly into the ADVS. '''
-        
-        sub_dict = dictionary.get('advancedsettings',{})
-
-        sql_subitems = ['host', 'port', 'user', 'pass']
-
-        video = {'type': 'mysql'}
-        music = {'type': 'mysql'}
-
-        if self.getControl(MYSQL_VIDEO_TOGGLE).isSelected():
-
-            for sql_item, ctl in zip(sql_subitems, MYSQL_VIDEO_VALUES):
-                if ctl in MYSQL_PASS:
-                    ctl -= 100000
-                video[sql_item] = self.getControl(ctl).getLabel()
-
-                log('ctl %s : sql item %s : %s' %(ctl, sql_item, self.getControl(ctl).getLabel()))
-    
-            sub_dict['videodatabase'] = video
-
-        else:
-            try:
-                del sub_dict['videodatabase']
-            except:
-                pass
-
-        if self.getControl(MYSQL_MUSIC_TOGGLE).isSelected():
-
-            for sql_item, ctl in zip(sql_subitems, MYSQL_MUSIC_VALUES):
-                if ctl in MYSQL_PASS:
-                    ctl = ctl - 100000
-                music[sql_item] = self.getControl(ctl).getLabel()
-
-            sub_dict['musicdatabase'] = music
-
-        else:
-            try:
-                del sub_dict['musicdatabase']
-            except:
-                pass        
-
-        return {'advancedsettings': sub_dict}
-
-
-    def write_advancedsettings(self, dictionary):
-        ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
-
-        user_data = xbmc.translatePath( "special://userdata")
-        loc       = os.path.join(user_data,'advancedsettings.xml')
-
-        with open(loc, 'w') as f:
-            xmltodict.unparse(  input_dict=dictionary, 
-                                output=f, 
-                                pretty=True)
-
-
-    def user_entry_mysql(self, controlID):
-        ''' Handles the user input for MySQL panel. '''
-
-        new_val = None
-
-        current = self.getControl(controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)).getLabel()
-
-        log('current label = %s' % current)
-
-        if controlID in MYSQL_USER:
-            new_val = DIALOG.input( "Please Enter MySQL Username",
-                                    current,
-                                    type=xbmcgui.INPUT_ALPHANUM,
-                                    )
-
-        elif controlID in MYSQL_PASS:
-            new_val = DIALOG.input( "Please Enter MySQL Password",
-                                    current, 
-                                    type=xbmcgui.INPUT_ALPHANUM,
-                                    option=xbmcgui.ALPHANUM_HIDE_INPUT
-                                    )            
-
-        elif controlID in MYSQL_PORT:
-            new_val = DIALOG.input( "Please Enter MySQL Port Number", 
-                                    current,
-                                    type=xbmcgui.INPUT_NUMERIC,
-                                    )
-
-        if new_val and new_val != -1:
-            if controlID in MYSQL_PASS:
-                self.getControl(800000 + controlID).setLabel(new_val)
-                log('new val: %s ' % new_val)
-                new_val = '*' * len(new_val)
-
-            log('new val: %s ' % new_val)
-
-            self.getControl(900000 + controlID).setLabel(new_val)
-
-
     def setup_networking_from_preseed(self):
 
         wired     = False
@@ -542,6 +379,24 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         elif controlID in ALL_MYSQL_CONTROLS:
             self.user_entry_mysql(controlID)
 
+        elif controlID == EXIT_CONTROL:
+            self.shutdown_process()
+
+
+    def shutdown_process(self):
+        ''' Actions that are done when the user chooses to Go Back, Escape, or clicks Exit '''
+
+        self.stop_wifi_population_thread()
+
+        self.stop_bluetooth_population_thread()
+
+        self.read_mysql_settings(self.advs_dict)
+        self.write_advancedsettings(self.advs_dict)
+
+        xbmc.sleep(200)
+
+        self.close()
+        
 
     def onAction(self, action):
 
@@ -552,12 +407,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         log('focused_control = %s,   %s' % (type(focused_control), focused_control))
 
         if actionID in (10, 92):
-            self.stop_wifi_population_thread()
-            self.stop_bluetooth_population_thread()
-            self.read_mysql_settings(self.advs_dict)
-            self.write_advancedsettings(self.advs_dict)
-            xbmc.sleep(200)
-            self.close()
+
+            self.shutdown_process()
 
         if focused_control in MAIN_MENU:
 
@@ -756,6 +607,171 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             manualDHCPButton.setLabel(lang(32033))
             self.toggle_controls(True, ip_values)
             self.toggle_controls(True, ip_labels)
+
+
+    def populate_mysql(self, dictionary):
+        ''' Reads the MySQL information from the CAS and loads it into the local addon '''
+
+        video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
+        music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
+
+        sql_subitems = ['host', 'port', 'user', 'pass']
+
+        if video:
+
+            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(True)
+
+            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
+
+            host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
+            port.setLabel(video.get('port', ''))
+            user.setLabel(video.get('user', ''))
+            pswd.setLabel('*' * len(video.get('pass', '')))
+            hpwd.setLabel(video.get('pass', ''))
+
+        else:
+            self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(False)
+
+        if music:
+
+            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(True)
+
+            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_MUSIC_VALUES)
+
+            host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
+            port.setLabel(music.get('port', ''))
+            user.setLabel(music.get('user', ''))
+            pswd.setLabel('*' * len(music.get('pass', '')))
+            hpwd.setLabel(music.get('pass', ''))
+
+        else:
+            self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(False)
+
+        return
+
+
+    def parse_advanced_settings(self):
+        ''' Parses the advancedsettings.xml file. Returns a dict with ALL the details. '''
+
+        user_data = xbmc.translatePath( 'special://userdata')
+        loc       = os.path.join(user_data,'advancedsettings.xml')
+
+        null_doc  = {'advancedsettings': {}}
+
+        log('advancedsettings file exists = %s' % os.path.isfile(loc))
+
+        if os.path.isfile(loc):
+
+            with open(loc, 'r') as f:
+                lines = f.readlines()
+            
+            if not lines:
+                log('advancedsettings.xml file is empty')
+                return null_doc
+
+            with open(loc, 'r') as f:
+                doc = xmltodict.parse(f)
+
+            return doc
+
+        else:
+            return null_doc
+
+
+    def read_mysql_settings(self, dictionary):
+        ''' Reads the MySQL settings from the gui, and writes them directly into the ADVS. '''
+        
+        sub_dict = dictionary.get('advancedsettings',{})
+
+        sql_subitems = ['host', 'port', 'user', 'pass']
+
+        video = {'type': 'mysql'}
+        music = {'type': 'mysql'}
+
+        if self.getControl(MYSQL_VIDEO_TOGGLE).isSelected():
+
+            for sql_item, ctl in zip(sql_subitems, MYSQL_VIDEO_VALUES):
+                if ctl in MYSQL_PASS:
+                    ctl -= 100000
+                video[sql_item] = self.getControl(ctl).getLabel()
+
+                log('ctl %s : sql item %s : %s' %(ctl, sql_item, self.getControl(ctl).getLabel()))
+    
+            sub_dict['videodatabase'] = video
+
+        else:
+            try:
+                del sub_dict['videodatabase']
+            except:
+                pass
+
+        if self.getControl(MYSQL_MUSIC_TOGGLE).isSelected():
+
+            for sql_item, ctl in zip(sql_subitems, MYSQL_MUSIC_VALUES):
+                if ctl in MYSQL_PASS:
+                    ctl = ctl - 100000
+                music[sql_item] = self.getControl(ctl).getLabel()
+
+            sub_dict['musicdatabase'] = music
+
+        else:
+            try:
+                del sub_dict['musicdatabase']
+            except:
+                pass        
+
+        return {'advancedsettings': sub_dict}
+
+
+    def write_advancedsettings(self, dictionary):
+        ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
+
+        user_data = xbmc.translatePath( "special://userdata")
+        loc       = os.path.join(user_data,'advancedsettings.xml')
+
+        with open(loc, 'w') as f:
+            xmltodict.unparse(  input_dict=dictionary, 
+                                output=f, 
+                                pretty=True)
+
+
+    def user_entry_mysql(self, controlID):
+        ''' Handles the user input for MySQL panel. '''
+
+        new_val = None
+
+        current = self.getControl(controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)).getLabel()
+
+        log('current label = %s' % current)
+
+        if controlID in MYSQL_USER:
+            new_val = DIALOG.input( "Please Enter MySQL Username",
+                                    current,
+                                    type=xbmcgui.INPUT_ALPHANUM,
+                                    )
+
+        elif controlID in MYSQL_PASS:
+            new_val = DIALOG.input( "Please Enter MySQL Password",
+                                    current, 
+                                    type=xbmcgui.INPUT_ALPHANUM,
+                                    option=xbmcgui.ALPHANUM_HIDE_INPUT
+                                    )            
+
+        elif controlID in MYSQL_PORT:
+            new_val = DIALOG.input( "Please Enter MySQL Port Number", 
+                                    current,
+                                    type=xbmcgui.INPUT_NUMERIC,
+                                    )
+
+        if new_val and new_val != -1:
+            if controlID in MYSQL_PASS:
+                self.getControl(800000 + controlID).setLabel(new_val)
+                log('new val: %s ' % new_val)
+                new_val = '*' * len(new_val)
+
+            log('new val: %s ' % new_val)
+
+            self.getControl(900000 + controlID).setLabel(new_val)
 
 
     def populate_ip_controls(self, settings_dict, controls):

@@ -36,7 +36,7 @@
             <itemgap>34</itemgap>
             <onleft>1000</onleft>
             <onup>noop</onup>
-            <ondown>noop</ondown>
+            <ondown>666</ondown>
             <orientation>vertical</orientation>
             <!-- Wired -->
             <control id="101" type="button">
@@ -131,6 +131,26 @@
                 <onclick>noop</onclick>
                 <onright>1050</onright>
             </control>
+        </control>
+        <!-- EXIT CONTROL -->
+        <control id="666" type="button">
+            <visible>Control.IsEnabled(105)</visible>
+            <width>300</width>
+            <height>42</height>
+            <left>120</left>
+            <bottom>100</bottom>
+            <description>Exit control</description>
+            <label>Exit</label>
+            <font>osmc_addon_Large</font>
+            <textcolor>66ffffff</textcolor>
+            <focusedcolor>ffe0b074</focusedcolor>
+            <texturefocus>single_pixel.png</texturefocus>
+            <texturenofocus>single_pixel.png</texturenofocus>
+            <align>left</align>
+            <aligny>center</aligny>
+            <onclick>noop</onclick>
+            <onright>1050</onright>
+            <onup>1000</onup>
         </control>
         <!-- ## Wired Panel ## -->
         <control id="1010" type="group">
