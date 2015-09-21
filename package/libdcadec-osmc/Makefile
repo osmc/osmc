@@ -1,5 +1,5 @@
 all:
-	@echo "Specify a target:\nmake armv7"
+	@echo "Specify a target:\nmake armv7\nmake armv6l"
 
 armv6l:
 	sudo bash build.sh "armv6l"
