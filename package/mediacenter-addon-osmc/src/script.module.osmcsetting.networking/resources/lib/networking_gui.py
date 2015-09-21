@@ -7,7 +7,6 @@ import sys
 import threading
 import time
 import xmltodict
-#
 
 # XBMC Modules
 import xbmcaddon
@@ -16,7 +15,6 @@ import xbmc
 
 __addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
 DIALOG    = xbmcgui.Dialog()
-
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib')))
@@ -161,15 +159,17 @@ TETHERING_DISABLE               = 10406
 TETHERING_WARNING               = 10407
 
 ALL_MYSQL_CONTROLS              = [ 10510, 10512, 910512, 10513, 910513, 10514, 910514, 10515, 910515, 10520, 
-                                    10522, 910522, 10523, 910523, 10524, 910524, 10525, 910525,]
-MYSQL_VIDEO_VALUES              = [910512, 910513, 910514, 910515, 810515]
-MYSQL_MUSIC_VALUES              = [910522, 910523, 910524, 910525, 810525]
+                                    10522, 910522, 10523, 910523, 10524, 910524, 10525, 910525,
+                                    10511, 10521, 910511, 910521]
+MYSQL_VIDEO_VALUES              = [910511, 910512, 910513, 910514, 910515, 810515]
+MYSQL_MUSIC_VALUES              = [910521, 910522, 910523, 910524, 910525, 810525]
 MYSQL_VIDEO_TOGGLE              = 10510
 MYSQL_MUSIC_TOGGLE              = 10520
 MYSQL_PANEL                     = 1050
 MYSQL_USER                      = [10514, 10524]
 MYSQL_PASS                      = [10515, 10525, 910515, 910525]
 MYSQL_PORT                      = [10523, 10513]
+MYSQL_NAME                      = [10511, 10521]
 
 EXIT_CONTROL                    = 666
 
@@ -610,14 +610,15 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
         music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
 
-        sql_subitems = ['host', 'port', 'user', 'pass']
+        sql_subitems = ['name','host', 'port', 'user', 'pass']
 
         if video:
 
             self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(True)
 
-            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
+            name, host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_VIDEO_VALUES)
 
+            name.setLabel(video.get('name', 'MyVideos'))
             host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
             port.setLabel(video.get('port', ''))
             user.setLabel(video.get('user', ''))
@@ -631,8 +632,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(True)
 
-            host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_MUSIC_VALUES)
+            name, host, port, user, pswd, hpwd = (self.getControl(x) for x in MYSQL_MUSIC_VALUES)
 
+            name.setLabel(music.get('name', 'MyMusic'))
             host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
             port.setLabel(music.get('port', ''))
             user.setLabel(music.get('user', ''))
@@ -678,7 +680,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         
         sub_dict = dictionary.get('advancedsettings',{})
 
-        sql_subitems = ['host', 'port', 'user', 'pass']
+        sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
         video = {'type': 'mysql'}
         music = {'type': 'mysql'}
@@ -740,12 +742,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         log('current label = %s' % current)
 
         if controlID in MYSQL_USER:
+
             new_val = DIALOG.input( "Please Enter MySQL Username",
                                     current,
                                     type=xbmcgui.INPUT_ALPHANUM,
                                     )
 
         elif controlID in MYSQL_PASS:
+
             new_val = DIALOG.input( "Please Enter MySQL Password",
                                     current, 
                                     type=xbmcgui.INPUT_ALPHANUM,
@@ -753,15 +757,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                                     )            
 
         elif controlID in MYSQL_PORT:
+
             new_val = DIALOG.input( "Please Enter MySQL Port Number", 
                                     current,
                                     type=xbmcgui.INPUT_NUMERIC,
                                     )
 
+        elif controlID in MYSQL_NAME:
+
+            new_val = DIALOG.input( "Please Enter New Name",
+                                    current,
+                                    type=xbmcgui.INPUT_ALPHANUM,
+                                    )            
+
         if new_val and new_val != -1:
+
             if controlID in MYSQL_PASS:
+
                 self.getControl(800000 + controlID).setLabel(new_val)
                 log('new val: %s ' % new_val)
+
                 new_val = '*' * len(new_val)
 
             log('new val: %s ' % new_val)

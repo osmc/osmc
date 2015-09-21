@@ -1587,7 +1587,7 @@
                 <textureradioofffocus>RadioOff.png</textureradioofffocus>
                 <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
                 <onup>105</onup>
-                <ondown>10512</ondown>
+                <ondown>10511</ondown>
                 <onleft>105</onleft>
                 <onright>10520</onright>
             </control>
@@ -1598,6 +1598,60 @@
                 <posx>75</posx>
                 <posy>180</posy>
                 <orientation>vertical</orientation>
+                <control type="group">
+                    <!-- NAME BUTTON -->
+                    <control id="10511" type="button">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <description>NAME</description>
+                        <label>Name</label>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <width>650</width>
+                        <height>66</height>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <font>osmc_addon_Med</font>
+                        <label>-</label>
+                        <textoffsetx>0</textoffsetx>
+                        <textcolor>66ffffff</textcolor>
+                        <focusedcolor>ffe0b074</focusedcolor>
+                        <texturefocus>-</texturefocus>
+                        <texturenofocus>-</texturenofocus>
+                        <onup>10510</onup>
+                        <ondown>10512</ondown>
+                        <onleft>105</onleft>
+                        <onright>1050</onright>
+                    </control>
+                    <!-- VALUE -->
+                    <control id="910511" type="label">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>!Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+                        <label>MyVideos</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_Med</font>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                    <!-- VALUE HIGHLIGHT -->
+                    <control type="label">
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+                        <label>$INFO[Control.GetLabel(910511)]</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_Med</font>
+                        <textcolor>ff808080</textcolor>
+                    </control>
+                </control>
                 <control type="group">
                     <!-- IPADDRESS BUTTON -->
                     <control id="10512" type="button">
@@ -1859,6 +1913,59 @@
                 <posy>180</posy>
                 <orientation>vertical</orientation>
                 <control type="group">
+                    <!-- NAME BUTTON -->
+                    <control id="10521" type="button">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <description>NAME</description>
+                        <label>Name</label>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <width>650</width>
+                        <height>66</height>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <font>osmc_addon_Med</font>
+                        <label>-</label>
+                        <textoffsetx>0</textoffsetx>
+                        <textcolor>66ffffff</textcolor>
+                        <focusedcolor>ffe0b074</focusedcolor>
+                        <texturefocus>-</texturefocus>
+                        <texturenofocus>-</texturenofocus>
+                        <onup>10520</onup>
+                        <ondown>10522</ondown>
+                        <onleft>105</onleft>
+                        <onright>1050</onright>
+                    </control>
+                    <!-- VALUE -->
+                    <control id="910521" type="label">
+                        <disabledcolor>ff000000</disabledcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>!Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+                        <label>MyMusic</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_Med</font>
+                        <textcolor>66ffffff</textcolor>
+                    </control>
+                    <!-- VALUE HIGHLIGHT -->
+                    <control type="label">
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <visible>Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+                        <label>$INFO[Control.GetLabel(910521)]</label>
+                        <posx>530</posx>
+                         <posy>0</posy>
+                        <width>650</width>
+                        <height>70</height>
+                        <description>Name VALUE</description>
+                        <font>osmc_addon_Med</font>
+                        <textcolor>ff808080</textcolor>
+                    </control>
+                </control>                    
                     <!-- IPADDRESS BUTTON -->
                     <control id="10522" type="button">
                         <disabledcolor>ff000000</disabledcolor>
@@ -1876,7 +1983,7 @@
                         <focusedcolor>ffe0b074</focusedcolor>
                         <texturefocus>-</texturefocus>
                         <texturenofocus>-</texturenofocus>
-                        <onup>10520</onup>
+                        <onup>10521</onup>
                         <ondown>10523</ondown>
                         <onleft>1050</onleft>
                         <onright>105</onright>
