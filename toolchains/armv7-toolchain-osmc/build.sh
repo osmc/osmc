@@ -57,7 +57,7 @@ verify_action
 echo "deb http://ftp.debian.org/debian jessie main contrib non-free
 deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
 deb http://security.debian.org/ jessie/updates main contrib non-free
-deb http://apt.osmc.tv jessie-devel main
+deb http://staging.apt.osmc.tv jessie-devel main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
