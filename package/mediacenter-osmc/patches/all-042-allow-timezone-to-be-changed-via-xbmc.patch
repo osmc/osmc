@@ -1,0 +1,56 @@
+From 1e4ea3f35cb23b3832d1f870800bd7dbf9045f3a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 22 Sep 2015 01:07:46 +0100
+Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  8 ++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 94cf810..fdefd85 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -132,6 +132,14 @@ namespace XBMCAddon
+       CSettings::Get().SetString("services.devicename", hostname);
+     }
+ 
++    void settimezone(const char* timezone)
++    {
++      XBMC_TRACE;
++      if (! timezone)
++      return;
++      CSettings::Get().SetString("locale.timezone", timezone);
++    }
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index c017523..8157710 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -139,6 +139,18 @@ namespace XBMCAddon
+ 
+         void sethostname(const char* hostname);
+ 
++       /**
++        * settimezone(timezone) -- Change the timezone, and in turn, system timezone
++        *
++        * timezone               :     string - the name of the timezone to change to
++        *
++        *
++        * example:
++        *    - xbmc.settimezone("Europe/London")
++        */
++
++        void settimezone(const char* timezone);
++
+     /**
+      * sleep(time) -- Sleeps for 'time' msec.
+      * 
+-- 
+2.1.0
+
