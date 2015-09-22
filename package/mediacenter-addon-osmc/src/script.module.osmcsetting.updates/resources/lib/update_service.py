@@ -425,33 +425,50 @@ class Main(object):
 
 	# MAIN METHOD
 	@clog(log)
-	def check_update_conditions(self, media_only=False):
-		''' Checks the users update conditions are met. The media-only flag restricts the condition check to
-			only the media playing condition. '''
+	def check_update_conditions(self, connection_only=False):
+		''' Checks the users update conditions are met. 
+			Checks for:
+					- active player 
+					- idle time
+					- internet connectivity
+				connection_only, limits the check to just the internet connection
+					'''
+		if not connection_only:
 
-		result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
+			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
 
-		result = json.loads(result_raw)
-		
-		log(result, 'result of Player.GetActivePlayers')
-		
-		players = result.get('result', False)
-		
-		if players:
-		
-			log('Update CONDITION : player playing')
-		
-			return False, 'Update CONDITION : player playing'
+			result = json.loads(result_raw)
+			
+			log(result, 'result of Player.GetActivePlayers')
 
-		idle = xbmc.getGlobalIdleTime()
+			players = result.get('result', False)
 
-		if self.s['update_on_idle'] and idle < 60 and not media_only:
+			if players:
+			
+				log('Update CONDITION : player playing')
+			
+				return False, 'Update CONDITION : player playing'
 
-			msg = 'Update CONDITION : idle time = %s' % idle
 
-			return False, 'Update CONDITION : idle time = %s' % idle
+				idle = xbmc.getGlobalIdleTime()
 
-		return True, ''
+			if self.s['update_on_idle'] and idle < 60:
+
+				msg = 'Update CONDITION : idle time = %s' % idle
+
+				return False, 'Update CONDITION : idle time = %s' % idle
+
+		try:
+
+			host = socket.gethostbyname("www.google.com")
+
+			s = socket.create_connection((host, 80), 2)
+
+			return True, ''
+
+		except:
+
+			return False, 'Update CONDTION : NO INTERNET'
 
 
 	# MAIN METHOD
@@ -979,9 +996,19 @@ class Main(object):
 
 		if action == 'update':
 
-			self.call_child_script('update_manual')
+			check_connection, _ = self.check_update_conditions(connection_only=True)
 
-			return 'Called child action - update_manual'
+			if not check_connection:
+
+				DIALOG.ok('OSMC', 'Update not permitted.', 'Unable to reach internet.')
+
+				return 'manual update cancelled, no connection'
+
+			else:
+
+				self.call_child_script('update_manual')
+
+				return 'Called child action - update_manual'
 
 		if action == 'backup':
 
