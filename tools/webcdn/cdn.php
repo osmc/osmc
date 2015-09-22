@@ -17,7 +17,7 @@ $FALLBACK = "http://46.37.189.135";
 
 
 // Remote IP as provided by WebClient to Server
-$IP_tocheck=$_SERVER['REMOTE_ADDR'];
+$IP_tocheck=$_SERVER['HTTP_X_FORWARDED_FOR'];
 
 // Checking validity of IP
 // Will remove reserved IP's -> local loopback
