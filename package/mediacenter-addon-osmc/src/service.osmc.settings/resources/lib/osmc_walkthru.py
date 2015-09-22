@@ -2,8 +2,8 @@
 
 # XBMC modules
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 # STANDARD library modules
 import os
@@ -43,7 +43,7 @@ class Networking_caller(threading.Thread):
 	def __init__(self, parent, net_call):
 
 		super(Networking_caller, self).__init__()
-		
+
 		self.daemon      = True
 		self.cancelled   = False
 		self.parent      = parent
@@ -321,8 +321,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			log('users timezone: %s' % users_timezone)
 
-			os.system('echo %s | sudo tee /etc/timezone' % users_timezone)
-
+			try:
+				xbmc.settimezone(users_timezone)
+			except:
+				log('Failed to set users timezone: %s' % users_timezone)
 		
 		# delete skin update block file
 		subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
