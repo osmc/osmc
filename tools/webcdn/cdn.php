@@ -65,10 +65,10 @@ if ($readcsv == "read") {
     foreach ($csvline as $ikey => $data) {
         $key = $data['0']; // Set array key. Easier for later usage
         $active["$key"] = $data['1']; // link active tag to key
-        $downloadurl["$key"] = $data['5']; // link download URL to key
+        $downloadurl["$key"] = $data['3']; // link download URL to key
         $name["$key"] = $data['2']; // link mirror name to key
-        $speed["$key"] = $data['3']; // link speed to key
-        $cont["$key"] = $data['4']; // link to continent
+        $speed["$key"] = $data['4']; // link speed to key
+        $cont["$key"] = $data['5']; // link to continent
     } // Foreach loop
     
     // This previous foreach loop has provided us 5 arrays.
