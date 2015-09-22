@@ -250,6 +250,9 @@ class Main(object):
 				log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
 			count += 1 								# FOR TESTING ONLY
 			# FOR TESTING ONLY
+
+			# freespace checker, (runs 5 minutes after boot)
+			self.automatic_freespace_checker()
 			
 			# check the scheduler for the update trigger
 			if self.scheduler.check_trigger():
@@ -1421,6 +1424,7 @@ class Main(object):
 
 
 	def automatic_freespace_checker(self):
+		''' Daily checker of freespace on /. Notifies user in Home window when there is less than 50mb remaining. '''
 
 		if self.freespace_supressor > 172800:
 
@@ -1432,6 +1436,9 @@ class Main(object):
 
 					if self.freespace_remedy == 'apt':
 
+						# THIS SECTION IS CURRENTLY DISABLED
+						# TO ENABLE IT CHANGE THE INIT FREESPACE_REMEDY TO 'apt'
+
 						resp = DIALOG.yesno('OSMC', 'Your system is running out of storage (<%sMB left).' %s int(value), 'Would you like to try and clear unused system files?')
 
 						if resp:
@@ -1440,6 +1447,7 @@ class Main(object):
 
 							self.freespace_remedy = 'reboot'
 
+							# wait 10 minutes before next space check
 							self.freespace_supressor = 171600
 
 					else: # self.freespace_remedy == 'reboot'
