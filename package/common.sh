@@ -81,16 +81,15 @@ function build_in_env()
             fi
 	    if ((($BUILD_OPTS & $BUILD_OPTION_USE_GOLD) == $BUILD_OPTION_USE_GOLD))
 	    then
-		echo "Using gold linker"
 		export LD="ld.gold"
 	    fi
             if ((($BUILD_OPTS & $BUILD_OPTION_USE_O3) == $BUILD_OPTION_USE_O3))
             then
-                export BUILD_FLAGS+="-O3"
+                export BUILD_FLAGS+=" -O3"
             fi
             if ((($BUILD_OPTS & $BUILD_OPTION_USE_NOFP) == $BUILD_OPTION_USE_NOFP))
             then
-                export BUILD_FLAGS+="-fomit-frame-pointer"
+                export BUILD_FLAGS+=" -fomit-frame-pointer"
             fi
 	    CC="/usr/bin/gcc"
 	    CXX="/usr/bin/g++"
@@ -100,9 +99,9 @@ function build_in_env()
 		export CC="/usr/bin/ccache $CC"
 		export CXX="/usr/bin/ccache $CXX"
 	    fi
-            export CFLAGS+=${BUILD_FLAGS}
-            export CXXFLAGS+=${BUILD_FLAGS}
-            export CPPFLAGS+={$BUILD_FLAGS}
+            export CFLAGS+="$BUILD_FLAGS"
+            export CXXFLAGS+="$BUILD_FLAGS"
+            export CPPFLAGS+="$BUILD_FLAGS"
 	    return 99
 	fi
 	umount /proc >/dev/null 2>&1
