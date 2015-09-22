@@ -226,6 +226,9 @@ class Main(object):
 			except:
 				pass
 
+		self.freespace_supressor = 172200
+		Self.freespace_remedy    = 'reboot' # change this to 'apt' to give the user the option to clean the apt files
+
 		# keep alive method
 		self._daemon()
 
@@ -734,7 +737,8 @@ class Main(object):
 		if self.check_for_unsupported_version() == 'alpha': return
 
 		# check for sufficient space, only proceed if it is available
-		if self.check_target_location_for_size(location='/', requirement=300):
+		root_space, _ = self.check_target_location_for_size(location='/', requirement=300)
+		if root_space:
 
 			subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
 
@@ -1123,8 +1127,8 @@ class Main(object):
 		self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# check for sufficient disk space, requirement in MB
-		root_space = self.check_target_location_for_size(location='/', requirement=300)
-		boot_space = self.check_target_location_for_size(location='/boot', requirement=30)
+		root_space, _ = self.check_target_location_for_size(location='/', requirement=300)
+		boot_space, _ = self.check_target_location_for_size(location='/boot', requirement=30)
 
 		if not root_space or not boot_space:
 
@@ -1393,7 +1397,7 @@ class Main(object):
 	def check_target_location_for_size(self, location, requirement):
 
 		''' Checks the target location to see if there is sufficient space for the update.
-			Returns True if there is sufficient disk space '''
+			Returns tuple of boolean if there is sufficient disk space and actual freespace recorded '''
 
 		mb_to_b = requirement * 1048576.0
 
@@ -1409,9 +1413,36 @@ class Main(object):
 			log('local required disk space: %s' % mb_to_b)
 			log('local available disk space: %s' % available)
 
-			return mb_to_b < available
+			return mb_to_b < available, available / 1048570
 				
 		except:
 
-			return False
+			return False, 0
+
+
+	def automatic_freespace_checker(self):
+
+		if self.freespace_supressor > 172800:
+
+			freespace, value = self.check_target_location_for_size(location='/', requirement=50)
+
+			if not freespace:
+
+				if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)'):
+
+					if self.freespace_remedy == 'apt':
+
+						resp = DIALOG.yesno('OSMC', 'Your system is running out of storage (<%sMB left).' %s int(value), 'Would you like to try and clear unused system files?')
+
+						if resp:
+
+							subprocess.Popen(['sudo', 'apt-get', 'autoremove', '&&', 'apt-get', 'clean'])
+
+							self.freespace_remedy = 'reboot'
+
+							self.freespace_supressor = 171600
+
+					else: # self.freespace_remedy == 'reboot'
+
+						resp = DIALOG.ok('OSMC', 'Your system is running out of storage (<%sMB left).' %s int(value), 'Try rebooting a couple times to clear out temporary files.')
 
