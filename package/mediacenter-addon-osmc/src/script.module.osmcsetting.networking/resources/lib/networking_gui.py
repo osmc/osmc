@@ -169,6 +169,7 @@ ALL_MYSQL_CONTROLS              = [ 10510, 10512, 910512, 10513, 910513, 10514, 
                                     10511, 10521, 910511, 910521, 10580, 10590]
 MYSQL_VIDEO_VALUES              = [910511, 910512, 910513, 910514, 910515, 810515, 10580, 10590]
 MYSQL_MUSIC_VALUES              = [910521, 910522, 910523, 910524, 910525, 810525]
+MYSQL_TOGGLES                   = [10510, 10520]
 MYSQL_VIDEO_TOGGLE              = 10510
 MYSQL_MUSIC_TOGGLE              = 10520
 MYSQL_PANEL                     = 1050
@@ -796,7 +797,24 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             new_val = DIALOG.input( "Please Enter New Name",
                                     current,
                                     type=xbmcgui.INPUT_ALPHANUM,
-                                    )            
+                                    )           
+
+        elif controlID in MYSQL_TOGGLES:
+
+            if any([self.getControl(ctl).isSelected() for ctl in MYSQL_TOGGLES]):
+
+                if not osmc_network.is_connman_wait_for_network_enabled():
+                    osmc_network.toggle_wait_for_network(True)
+                    self.getControl(WIRED_WAIT_FOR_NETWORK).setSelected(True)
+                    self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(True)
+
+            else:
+
+                if osmc_network.is_connman_wait_for_network_enabled():
+
+                    osmc_network.toggle_wait_for_network(False)
+                    self.getControl(WIRED_WAIT_FOR_NETWORK).setSelected(False)
+                    self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(False)
 
         if new_val and new_val != -1:
 
