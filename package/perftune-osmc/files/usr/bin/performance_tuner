@@ -7,9 +7,11 @@ curgov=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)
 if [ ! -f /safe_mode ]
 then
     # 30 seconds of accelerated boot. we set curgov to ondemand so the next check only doesn't flip us back if we had performance to begin with
-    test "$curgov" != "performance" && echo "performance" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor && curgov="ondemand" > /dev/null 2>&1
     sleep 30
-    test "$curgov" != "performance" && echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1 && echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold && echo 100000 | tee /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate && echo 50 | tee /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor > /dev/null 2>&1
+    echo "ondemand" | tee /sys/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
+    echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+    echo 100000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
+    echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
 else
     echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 fi
