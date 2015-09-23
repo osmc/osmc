@@ -87,8 +87,8 @@ gui_ids = {
             105:    'MySQL',
             1050:   'MySQL Panel',
             10510:  'MySQL Video Database toggle',
-            10511:  'MySQL Video Database Name':
-            910511: 'MySQL Video Database Name Value':
+            10511:  'MySQL Video Database Name',
+            910511: 'MySQL Video Database Name Value',
             10512:  'MySQL Video Database host',
             910512: 'MySQL Video Database host Value',
             10513:  'MySQL Video Database port',
@@ -100,8 +100,8 @@ gui_ids = {
             10580:  'MySQL Video Database Import Watched Status',
             10590:  'MySQL Video Database Import Resum Point',            
             10520:  'MySQL Music Database toggle',
-            10521:  'MySQL Music Database Name':
-            910521: 'MySQL Music Database Name Value':            
+            10521:  'MySQL Music Database Name',
+            910521: 'MySQL Music Database Name Value',         
             10522:  'MySQL Music Database host',
             910522: 'MySQL Music Database host Value',
             10523:  'MySQL Music Database port',
