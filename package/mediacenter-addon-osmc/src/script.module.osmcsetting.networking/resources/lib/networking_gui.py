@@ -6,6 +6,7 @@ import subprocess
 import sys
 import threading
 import time
+import traceback
 import xmltodict
 
 # XBMC Modules
@@ -227,6 +228,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         
         # list containing list items of all discovered bluetooth devices
         self.discovered_bluetooths = []
+
+        # flag to identify when a MySQL setting has been changed
+        self.mysql_changed = False
+
         
         # Bluetooth GUI update Thread
         self.bluetooth_population_thread = None
@@ -390,6 +395,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         elif controlID == EXIT_CONTROL:
             self.shutdown_process()
+
 
 
     def shutdown_process(self):
@@ -755,21 +761,62 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         user_data = xbmc.translatePath( "special://userdata")
         loc       = os.path.join(user_data,'advancedsettings.xml')
 
-        with open(loc, 'w') as f:
-            xmltodict.unparse(  input_dict=dictionary, 
-                                output=f, 
-                                pretty=True)
+        try:
+            with open(loc, 'w') as f:
+                xmltodict.unparse(  input_dict = dictionary, 
+                                    output = f, 
+                                    pretty = True)
+        except IOError:
+
+            log('IOError trying to write to advancedsettings.xml')
+
+            resp = DIALOG.yesno(    'OSMC', 
+                                    'Writing to advancedsettings.xml failed: Permission restrictions',
+                                    'Will you allow OSMC to change those restrictions?')
+
+            if resp:
+
+                try:
+                    res = subprocess.check_call(['sudo', 'chmod', '777', loc])
+
+                except subprocess.CalledProcessError:
+                    log('Attempt to change permission on advancedsettings.xml file has failed.')
+                    ok = DIALOG.ok('OSMC', 'Failed to change permission restrictions.', 'More details may be found in the log.')
+                    res = 1
+
+                if res != 0:
+                    log('Second attempt at writing MySQL changes to advancedsettings.xml file.')
+
+                    try:
+                        with open(loc, 'w') as f:
+                            xmltodict.unparse(  input_dict = dictionary, 
+                                                output = f, 
+                                                pretty = True)
+                    except:
+                        ok = DIALOG.ok('OSMC', 'Failed to write to advancedsettings.xml again.', 'More details may be found in the log.')
+                        log('Failed to write to advancedsettings.xml again.\n\n%s' % traceback.format_exc())
+        except:
+            log('Failed to write to advancedsettings.xml.\n\n%s' % traceback.format_exc())
 
 
     def user_entry_mysql(self, controlID):
         ''' Handles the user input for MySQL panel. '''
 
+        # as soon as a control is touched in the MySQL panel, the trigger for rewriting the advancedsettings.xml file is flipped, and cannot be reversed
+        if not self.mysql_changed:
+                self.mysql_changed = True
+
         new_val = None
 
-        current = self.getControl(controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)).getLabel()
+        try:
+            current = self.getControl(controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)).getLabel()
+        except:
+            log('control non-existent or has no label: %s' % controlID)
+            return
 
         log('current label = %s' % current)
 
+        # this section handles changes to the text or IP entry fields
         if controlID in MYSQL_USER:
 
             new_val = DIALOG.input( "Please Enter MySQL Username",
@@ -817,6 +864,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(False)
 
         if new_val and new_val != -1:
+
+            if not self.mysql_changed and new_val != current: 
+
+                self.mysql_changed = True
 
             if controlID in MYSQL_PASS:
 
