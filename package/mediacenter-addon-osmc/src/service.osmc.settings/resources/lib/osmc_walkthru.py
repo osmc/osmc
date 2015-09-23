@@ -84,7 +84,13 @@ class Networking_caller(threading.Thread):
 
 class walkthru_gui(xbmcgui.WindowXMLDialog):
 
-	def __init__(self, strXMLname, strFallbackPath, strDefaultName, networking_instance, lang_rerun, selected_language):
+	def __init__(	self, 
+					strXMLname, 
+					strFallbackPath, 
+					strDefaultName, 
+					networking_instance, 
+					lang_rerun, 
+					selected_language):
 
 		# show timezone switch
 		self.showtimezone = True
