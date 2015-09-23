@@ -18,7 +18,9 @@ if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
-build_in_env "${1}" $(pwd) "kernel-osmc"
+BUILD_OPTS=get_build_option_defaults
+BUILD_OPTS=(($BUILD_OPTS - $BUILD_OPTION_USE_NOFP))
+build_in_env "${1}" $(pwd) "kernel-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
 then
