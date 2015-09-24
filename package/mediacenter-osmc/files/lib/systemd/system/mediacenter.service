@@ -6,7 +6,6 @@ Wants = network-online.target
 [Service]
 Type = simple
 TimeoutStopSec = 20
-ExecStartPre = /bin/udevadm trigger
 ExecStart = /usr/bin/mediacenter
 ExecStopPost = /usr/bin/mediacenter stop
 Restart = on-abort
