@@ -35,7 +35,7 @@
             <height>870</height>
             <itemgap>34</itemgap>
             <onleft>1000</onleft>
-            <onup>noop</onup>
+            <onup>666</onup>
             <ondown>666</ondown>
             <orientation>vertical</orientation>
             <!-- Wired -->
@@ -149,8 +149,9 @@
             <align>left</align>
             <aligny>center</aligny>
             <onclick>noop</onclick>
-            <onright>1050</onright>
-            <onup>1000</onup>
+            <onright>noop</onright>
+            <onup>105</onup>
+            <ondown>101</ondown>
         </control>
         <!-- ## Wired Panel ## -->
         <control id="1010" type="group">
@@ -1103,7 +1104,7 @@
                 <description>Enable Adapter</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32015]</label>
                 <posx>100</posx>
-                <posy>160</posy>
+                <posy>125</posy>
                 <width>400</width>
                 <height>66</height>
                 <align>left</align>
@@ -1130,7 +1131,7 @@
                 <description>Start/Stop Discovery</description>
                 <label>$ADDON[script.module.osmcsetting.networking 32017]</label>
                 <posx>820</posx>
-                <posy>160</posy>
+                <posy>125</posy>
                 <width>450</width>
                 <height>66</height>
                 <align>left</align>
@@ -1556,7 +1557,7 @@
         <control id="1050" type="group">
             <description>MySQL Panel</description>
             <left>380</left>
-            <top>175</top>
+            <top>85</top>
             <width>1400</width>
             <height>726</height>
             <onright>105</onright>
@@ -1586,7 +1587,7 @@
                 <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
                 <textureradioofffocus>RadioOff.png</textureradioofffocus>
                 <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>105</onup>
+                <onup>10590</onup>
                 <ondown>10511</ondown>
                 <onleft>105</onleft>
                 <onright>10520</onright>
@@ -1594,7 +1595,7 @@
             <!-- VIDEO GROUP -->
             <control description="MySQL Video Group" type="group">
                 <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
-                <!-- <itemgap>34</itemgap>-->
+                 <!-- <itemgap>34</itemgap> -->
                 <posx>75</posx>
                 <posy>180</posy>
                 <orientation>vertical</orientation>
@@ -1659,7 +1660,7 @@
                         <description>IP Address</description>
                         <label>IP Address</label>
                         <posx>0</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -1684,7 +1685,7 @@
                         <visible>!Control.HasFocus(10512)+Control.isVisible(10512)</visible>
                         <label>___ : ___ : ___ : ___</label>
                         <posx>530</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
@@ -1698,7 +1699,7 @@
                         <visible>Control.HasFocus(10512)+Control.isVisible(10512)</visible>
                         <label>$INFO[Control.GetLabel(910512)]</label>
                         <posx>530</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
@@ -1713,7 +1714,7 @@
                         <description>Port</description>
                         <label>Port</label>
                         <posx>0</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>600</width>
                         <height>66</height>
                         <align>left</align>
@@ -1738,7 +1739,7 @@
                         <visible>!Control.HasFocus(10513)+Control.isVisible(10513)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
@@ -1752,7 +1753,7 @@
                         <visible>Control.HasFocus(10513)+Control.isVisible(10513)</visible>
                         <label>$INFO[Control.GetLabel(910513)]</label>
                         <posx>530</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
@@ -1767,7 +1768,7 @@
                         <description>User</description>
                         <label>User</label>
                         <posx>0</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -1791,7 +1792,7 @@
                         <visible>!Control.HasFocus(10514)+Control.isVisible(10514)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
@@ -1805,7 +1806,7 @@
                         <visible>Control.HasFocus(10514)+Control.isVisible(10514)</visible>
                         <label>$INFO[Control.GetLabel(910514)]</label>
                         <posx>530</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
@@ -1820,7 +1821,7 @@
                         <description>User</description>
                         <label>Pass</label>
                         <posx>0</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -1844,7 +1845,7 @@
                         <visible>!Control.HasFocus(10515)+Control.isVisible(10515)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
@@ -1858,7 +1859,7 @@
                         <visible>Control.HasFocus(10515)+Control.isVisible(10515)</visible>
                         <label>$INFO[Control.GetLabel(910515)]</label>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
@@ -1869,67 +1870,67 @@
                     <control id="810515" type="label">
                         <visible>false</visible>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Password value, hidden control, normal control displays stars</description>
                     </control>
                 </control>
-            </control>
-            <control id="10580" type="radiobutton">
-                <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
-                <label>Import Watched State</label>
-                <posx>25</posx>
-                <posy>90</posy>
-                <width>600</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10515</onup>
-                <ondown>10590</ondown>
-                <onleft>105</onleft>
-                <onright>10520</onright>
-            </control>
-            <control id="10590" type="radiobutton">
-                <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
-                <description>Enable MySQL Video Database</description>
-                <label>Import Resume Points</label>
-                <posx>25</posx>
-                <posy>90</posy>
-                <width>600</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10580</onup>
-                <ondown>10510</ondown>
-                <onleft>105</onleft>
-                <onright>10520</onright>
+                <control id="10580" type="radiobutton">
+                    <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
+                    <label>Import Watched State</label>
+                    <posx>0</posx>
+                    <posy>460</posy>
+                    <width>500</width>
+                    <height>66</height>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <font>osmc_addon_720_Med</font>
+                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffe0b074</focusedcolor>
+                    <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                    <radiowidth>16</radiowidth>
+                    <radioheight>16</radioheight>
+                    <texturenofocus>-</texturenofocus>
+                    <texturefocus>-</texturefocus>
+                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                    <onup>10515</onup>
+                    <ondown>10590</ondown>
+                    <onleft>105</onleft>
+                    <onright>10520</onright>
+                </control>
+                <control id="10590" type="radiobutton">
+                    <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
+                    <description>Enable MySQL Video Database</description>
+                    <label>Import Resume Points</label>
+                    <posx>0</posx>
+                    <posy>550</posy>
+                    <width>500</width>
+                    <height>66</height>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <font>osmc_addon_720_Med</font>
+                    <!--former_line<font>osmc_addon_720_OLD_Font36</font>-->
+                    <textcolor>66ffffff</textcolor>
+                    <focusedcolor>ffe0b074</focusedcolor>
+                    <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                    <radiowidth>16</radiowidth>
+                    <radioheight>16</radioheight>
+                    <texturenofocus>-</texturenofocus>
+                    <texturefocus>-</texturefocus>
+                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
+                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
+                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+                    <onup>10580</onup>
+                    <ondown>10510</ondown>
+                    <onleft>105</onleft>
+                    <onright>10520</onright>
+                </control>
             </control>
             <!-- MUSIC TOGGLE -->
             <control id="10520" type="radiobutton">
@@ -1938,7 +1939,7 @@
                 <label>Enable MySQL MusicDB</label>
                 <posx>700</posx>
                 <posy>90</posy>
-                <width>650</width>
+                <width>620</width>
                 <height>66</height>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -1955,7 +1956,7 @@
                 <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
                 <textureradioofffocus>RadioOff.png</textureradioofffocus>
                 <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>1050</onup>
+                <onup>10525</onup>
                 <ondown>10522</ondown>
                 <onleft>10510</onleft>
                 <onright>105</onright>
@@ -2028,7 +2029,7 @@
                         <description>IP Address</description>
                         <label>IP Address</label>
                         <posx>0</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -2052,7 +2053,7 @@
                         <visible>!Control.HasFocus(10522)+Control.isVisible(10522)</visible>
                         <label>___ : ___ : ___ : ___</label>
                         <posx>530</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
@@ -2066,7 +2067,7 @@
                         <visible>Control.HasFocus(10522)+Control.isVisible(10522)</visible>
                         <label>$INFO[Control.GetLabel(910522)]</label>
                         <posx>530</posx>
-                        <posy>0</posy>
+                        <posy>90</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>IP Address VALUE</description>
@@ -2081,7 +2082,7 @@
                         <description>Port</description>
                         <label>Port</label>
                         <posx>0</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -2105,7 +2106,7 @@
                         <visible>!Control.HasFocus(10523)+Control.isVisible(10523)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
@@ -2119,7 +2120,7 @@
                         <visible>Control.HasFocus(10523)+Control.isVisible(10523)</visible>
                         <label>$INFO[Control.GetLabel(910523)]</label>
                         <posx>530</posx>
-                        <posy>90</posy>
+                        <posy>180</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Port VALUE</description>
@@ -2134,7 +2135,7 @@
                         <description>User</description>
                         <label>User</label>
                         <posx>0</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -2158,7 +2159,7 @@
                         <visible>!Control.HasFocus(10524)+Control.isVisible(10524)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
@@ -2172,7 +2173,7 @@
                         <visible>Control.HasFocus(10524)+Control.isVisible(10524)</visible>
                         <label>$INFO[Control.GetLabel(910524)]</label>
                         <posx>530</posx>
-                        <posy>180</posy>
+                        <posy>270</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>User VALUE</description>
@@ -2187,7 +2188,7 @@
                         <description>User</description>
                         <label>Pass</label>
                         <posx>0</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>66</height>
                         <align>left</align>
@@ -2211,7 +2212,7 @@
                         <visible>!Control.HasFocus(10525)+Control.isVisible(10525)</visible>
                         <label>-</label>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
@@ -2225,7 +2226,7 @@
                         <visible>Control.HasFocus(10525)+Control.isVisible(10525)</visible>
                         <label>$INFO[Control.GetLabel(910525)]</label>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Pass VALUE</description>
@@ -2236,7 +2237,7 @@
                     <control id="810525" type="label">
                         <visible>false</visible>
                         <posx>530</posx>
-                        <posy>270</posy>
+                        <posy>360</posy>
                         <width>650</width>
                         <height>70</height>
                         <description>Password value, hidden control, normal control displays stars</description>
