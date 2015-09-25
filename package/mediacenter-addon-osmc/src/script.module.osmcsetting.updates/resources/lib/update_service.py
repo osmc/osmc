@@ -1483,7 +1483,9 @@ class Main(object):
 
 		if self.freespace_supressor > 172800:
 
-			freespace, value = self.check_target_location_for_size(location='/', requirement=50)
+			self.freespace_supressor = 0
+
+			freespace, value = self.check_target_location_for_size(location='/', requirement=250)
 
 			if not freespace:
 
