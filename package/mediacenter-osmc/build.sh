@@ -147,7 +147,7 @@ then
 	VERSION_DBG=$(grep Version ${out}/DEBIAN/control)
 	VERSION_NUM=$(echo $VERSION_DBG | awk {'print $2'})
 	echo $VERSION_DBG >> files-debug/DEBIAN/control
-	echo "Depends: ${1}-mediacenter-osmc (>=${VERSION_NUM})" >> files-debug/DEBIAN/control
+	echo "Depends: ${1}-mediacenter-osmc (=${VERSION_NUM})" >> files-debug/DEBIAN/control
 	pushd src/xbmc-*
 	install_patch "../../patches" "all"
 	test "$1" == atv && install_patch "../../patches" "atv"
