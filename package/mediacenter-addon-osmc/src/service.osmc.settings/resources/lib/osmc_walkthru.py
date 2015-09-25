@@ -12,6 +12,7 @@ import requests
 import subprocess
 import sys
 import threading
+import traceback
 import xml.etree.ElementTree as ET
 
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
@@ -331,6 +332,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				xbmc.settimezone(users_timezone)
 			except:
 				log('Failed to set users timezone: %s' % users_timezone)
+				log(traceback.format_exc())
 		
 		# delete skin update block file
 		subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
