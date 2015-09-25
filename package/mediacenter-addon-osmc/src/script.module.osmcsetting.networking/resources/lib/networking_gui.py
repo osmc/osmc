@@ -779,12 +779,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 try:
                     res = subprocess.check_call(['sudo', 'chmod', '777', loc])
 
+                    log('response from subprocess chmod: %s, %s' % (res, type(res)))
+
                 except subprocess.CalledProcessError:
                     log('Attempt to change permission on advancedsettings.xml file has failed.')
                     ok = DIALOG.ok('OSMC', 'Failed to change permission restrictions.', 'More details may be found in the log.')
                     res = 1
 
-                if res != 0:
+                if res == 0:
                     log('Second attempt at writing MySQL changes to advancedsettings.xml file.')
 
                     try:
@@ -795,6 +797,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     except:
                         ok = DIALOG.ok('OSMC', 'Failed to write to advancedsettings.xml again.', 'More details may be found in the log.')
                         log('Failed to write to advancedsettings.xml again.\n\n%s' % traceback.format_exc())
+                else:
+                    ok = DIALOG.ok('OSMC', 'Failed to change file permissions.', 'More details may be found in the log.')
+                    log('subprocess chmod returned non-zero response')
         except:
             log('Failed to write to advancedsettings.xml.\n\n%s' % traceback.format_exc())
 
