@@ -487,9 +487,11 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# INTERFACE TO CHANGE THE HOSTNAME
 			try:
+				log('changing hostname to %s' % self.device_name)
 				xbmc.sethostname(self.device_name) 
 			except:
 				log('hostname change failed')
+				log(traceback.format_exc())
 
 			# user has chosen a hostname
 			self.getControl(125000).setVisible(False)
@@ -612,7 +614,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		names = [	
 				"Alfonse", "Barnaby", "Aloyisius", "Archibald", "Algernon", "Basil", "Bertram", "Carston", "Cavendish", "Cecil", 
-				"Cyril", "Danforth", "Cuthbert", "Alastair",
+				"Cyril", "Danforth", "Cuthbert", "Alastair", "Preston", "Giles", "Cortland", "Atticus",
 				"Edmund", "Gilbert", "Ethelbert", "Frederick", "Geoffrey", "Gideon", "Giggleswick", "Grumbole", "Hamilton",
 				"Ignatius", "Ebenezer", "Herbert", "Clement", "Humphrey", "Ian", "Ichabod", "Jonathan", "Malcolm",
 				"Mervyn", "Mortimer", "Nigel", "Percy", "Prentis", "Reginald", "Ridgewell", "Royston",
