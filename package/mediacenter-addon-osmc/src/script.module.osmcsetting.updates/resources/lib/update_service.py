@@ -22,6 +22,7 @@ sys.path.append(__libpath__)
 import comms
 import simple_scheduler as sched
 import OSMC_Backups
+import osmc_network
 from CompLogger import comprehensive_logger as clog
 
 __addon__              	= xbmcaddon.Addon()
@@ -458,18 +459,7 @@ class Main(object):
 
 				return False, 'Update CONDITION : idle time = %s' % idle
 
-		try:
-
-			host = socket.gethostbyname("www.google.com")
-
-			s = socket.create_connection((host, 80), 2)
-
-			return True, ''
-
-		except:
-
-			return False, 'Update CONDTION : NO INTERNET'
-
+		return osmc_network.has_network_connection(True)
 
 	# MAIN METHOD
 	@clog(log)
