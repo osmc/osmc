@@ -765,32 +765,28 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
 
     def validate_advset_dict(self, dictionary):
-        ''' Checks whether the provided dictionary is fully populated with MySQL settings info '''
+        ''' Checks whether the provided dictionary is fully populated with MySQL settings info.
+            Blank dictionaries pass, as do dictionaries with no video or music database dicts. '''
 
         main = dictionary.get('advancedsettings', False)
 
-        # fail if advancedsettings node isnt in the dictionary
-        if not main: return False
-
-        databases    = ['videodatabase', 'musicdatabase']
         sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
-        # fail if neither the video or music databases are present or populated
-        if  all([
-            any([not 'videodatabase' in main, not main['videodatabase']]),
-            any([not 'musicdatabase' in main, not main['musicdatabase']])
-                ]):
+        vdb = False
+        mdb = False
 
-            return False
+        if 'videodatabase' in main:
+            vdb = True
+            # fail if the items aren't filled in or are the default up value
+            for item in sql_subitems:
+                if not item or item == '___ : ___ : ___ : ___':
+                    return False
 
-        # check each database not for completeness
-        for db in databases:
-            if db in main:
-
-                # fail if the entry is not populated or is the default IP setting
-                for k, v in sql_subitems.iteritems():
-                    if not v or v == '___ : ___ : ___ : ___': 
-                        return False
+        if 'musicdatabase' in main:
+            mdb = True
+            for item in sql_subitems:
+                if not item or item == '___ : ___ : ___ : ___':
+                    return False
 
         return True
 
