@@ -22,7 +22,6 @@ sys.path.append(__libpath__)
 import comms
 import simple_scheduler as sched
 import OSMC_Backups
-import osmc_network
 from CompLogger import comprehensive_logger as clog
 
 __addon__              	= xbmcaddon.Addon()
@@ -458,8 +457,6 @@ class Main(object):
 				msg = 'Update CONDITION : idle time = %s' % idle
 
 				return False, 'Update CONDITION : idle time = %s' % idle
-
-		return osmc_network.has_network_connection(True)
 
 	# MAIN METHOD
 	@clog(log)
