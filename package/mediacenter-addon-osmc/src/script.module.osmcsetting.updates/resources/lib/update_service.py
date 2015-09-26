@@ -457,6 +457,7 @@ class Main(object):
 				msg = 'Update CONDITION : idle time = %s' % idle
 
 				return False, 'Update CONDITION : idle time = %s' % idle
+                return True
 
 	# MAIN METHOD
 	@clog(log)
