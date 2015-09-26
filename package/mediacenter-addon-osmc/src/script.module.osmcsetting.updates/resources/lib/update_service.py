@@ -1232,7 +1232,14 @@ class Main(object):
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		if not any(['osmc' in x for x in available_updates]):
 
+			# suppress the on-screen update notification
 			self.window.setProperty('OSMC_notification', 'false')
+
+			# delete the block_update_file if it exists, so that the icon doesnt display on next boot
+			try:
+				os.remove(self.block_update_file)
+			except:
+				pass
 
 			return 'bail', 'There are no osmc packages'
 
