@@ -118,7 +118,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.selected_skin = 'OSMC'
 
 		# this is the default hostname for the device
-		self.device_name = 'osmc'
+		self.device_name = 'current name: osmc'
 
 		# newsletter email address
 		self.email = ''
@@ -462,7 +462,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		elif controlID in [350010]:		# choosing the hostname
 
 			# show keyboard
-			kb = xbmc.Keyboard(self.device_name, 'Name your device')
+			kb = xbmc.Keyboard(self.device_name.replace('current name: ', ''), 'Name your device')
 
 			kb.doModal()
 
@@ -471,7 +471,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				self.device_name = kb.getText()
 
-				self.getControl(350010).setLabel(self.device_name)
+				self.getControl(350010).setLabel('current name: ' + self.device_name.replace('_',''))
 
 				self.getControl(350012).setVisible(True)
 
@@ -479,7 +479,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			self.device_name = self.random_name()
 
-			self.getControl(350010).setLabel(self.device_name)
+			self.getControl(350010).setLabel('current name: ' + self.device_name)
 
 			self.getControl(350012).setVisible(True)
 
@@ -487,8 +487,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# INTERFACE TO CHANGE THE HOSTNAME
 			try:
-				log('changing hostname to %s' % self.device_name)
-				xbmc.sethostname(self.device_name) 
+				log('changing hostname to %s' % self.device_name.replace('current name: ', ''))
+				xbmc.sethostname(self.device_name.replace('current name: ', '')) 
 			except:
 				log('hostname change failed')
 				log(traceback.format_exc())
