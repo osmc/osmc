@@ -622,7 +622,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				"Wesley", "Wilbur", "Wilfred", "Willard", "Willoughby",
 				]
 
-		return "osmc_" + random.choice(names)
+		return "osmc-" + random.choice(names)
 
 
 	def onAction(self, action):
