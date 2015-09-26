@@ -406,11 +406,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.stop_bluetooth_population_thread()
 
         self.read_mysql_settings(self.advs_dict)
-        self.write_advancedsettings(self.advs_dict)
+        write = self.write_advancedsettings(self.advs_dict)
 
         xbmc.sleep(200)
 
-        self.close()
+        if write is None:
+            self.close()
         
 
     def onAction(self, action):
@@ -637,9 +638,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             name.setLabel(video.get('name', 'MyVideos'))
             host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
             port.setLabel(video.get('port', ''))
-            user.setLabel(video.get('user', ''))
-            pswd.setLabel('*' * len(video.get('pass', '')))
-            hpwd.setLabel(video.get('pass', ''))
+            user.setLabel(video.get('user', 'kodi'))
+            try:
+                pswd.setLabel('*' * len(video.get('pass', 'kodi')))
+                hpwd.setLabel(video.get('pass', 'kodi'))
+            except:
+                pswd.setLabel('kodi')
+                hpwd.setLabel('kodi')
             impw.setSelected(vidlb.get('importwatchedstate', 'true') == 'true')
             impr.setSelected(vidlb.get('importresumepoint', 'true') == 'true')
 
@@ -655,9 +660,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             name.setLabel(music.get('name', 'MyMusic'))
             host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
             port.setLabel(music.get('port', ''))
-            user.setLabel(music.get('user', ''))
-            pswd.setLabel('*' * len(music.get('pass', '')))
-            hpwd.setLabel(music.get('pass', ''))
+            user.setLabel(music.get('user', 'kodi'))
+            try:
+                pswd.setLabel('*' * len(music.get('pass', 'kodi')))
+                hpwd.setLabel(music.get('pass', 'kodi'))
+            except:
+                pswd.setLabel('kodi')
+                hpwd.setLabel('kodi')
 
         else:
             self.getControl(MYSQL_MUSIC_TOGGLE).setSelected(False)
@@ -755,8 +764,54 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         return {'advancedsettings': sub_dict}
 
 
+    def validate_advset_dict(self, dictionary):
+        ''' Checks whether the provided dictionary is fully populated with MySQL settings info '''
+
+        main = dictionary.get('advancedsettings', False)
+
+        # fail if advancedsettings node isnt in the dictionary
+        if not main: return False
+
+        databases    = ['videodatabase', 'musicdatabase']
+        sql_subitems = ['name', 'host', 'port', 'user', 'pass']
+
+        # fail if neither the video or music databases are present or populated
+        if  all([
+            any([not 'videodatabase' in main, not main['videodatabase']]),
+            any([not 'musicdatabase' in main, not main['musicdatabase']])
+                ]):
+
+            return False
+
+        # check each database not for completeness
+        for db in databases:
+            if db in main:
+
+                # fail if the entry is not populated or is the default IP setting
+                for k, v in sql_subitems.iteritems():
+                    if not v or v == '___ : ___ : ___ : ___': 
+                        return False
+
+        return True
+
+
     def write_advancedsettings(self, dictionary):
         ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
+
+        dictionary_valid = self.validate_advset_dict(dictionary)
+
+        if not dictionary_valid:
+
+            discard = DIALOG.yesno(   'OSMC',
+                        'MySQL settings are incomplete.', 'Discard MySQL settings changes?')
+
+            if discard:
+
+                return
+
+            else:
+
+                return 'stay'
 
         user_data = xbmc.translatePath( "special://userdata")
         loc       = os.path.join(user_data,'advancedsettings.xml')
