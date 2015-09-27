@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.8.tar.gz" "$(pwd)/src"
+pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.6.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libnfs-osmc"
