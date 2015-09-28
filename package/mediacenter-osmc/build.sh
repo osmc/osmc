@@ -199,7 +199,7 @@ then
 		--enable-libbluray \
 		--enable-dvdcss \
 		--disable-joystick \
-		--enable-debug \
+		--disable-debug \
 		--disable-vtbdecoder \
 		--disable-vaapi \
 		--disable-vdpau \
@@ -227,7 +227,7 @@ then
 		--enable-gles \
 		--enable-codec=imxvpu \
 		--enable-libcec \
-		--enable-debug \
+		--disable-debug \
 		--disable-texturepacker \
 		--enable-optical-drive \
 		--enable-dvdcss \
