@@ -624,7 +624,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         ''' Reads the MySQL information from the CAS and loads it into the local addon '''
 
         video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
-        vidlb = dictionary.get('advancedsettings', {}).get('videolibrary', {})
+        vidlb = dictionary.get('advancedsettings', {}).get('videolibrary',  {})
         music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
 
         sql_subitems = ['name','host', 'port', 'user', 'pass']
@@ -766,9 +766,13 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def validate_advset_dict(self, dictionary):
         ''' Checks whether the provided dictionary is fully populated with MySQL settings info.
-            Blank dictionaries pass, as do dictionaries with no video or music database dicts. '''
+            Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed. '''
 
-        main = dictionary.get('advancedsettings', False)
+        main = dictionary.get('advancedsettings', {})
+
+        if not main:
+
+            return False, 'empty'
 
         sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
@@ -780,34 +784,42 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             # fail if the items aren't filled in or are the default up value
             for item in sql_subitems:
                 if not item or item == '___ : ___ : ___ : ___':
-                    return False
+                    return False, 'missing mysql'
 
         if 'musicdatabase' in main:
             mdb = True
             for item in sql_subitems:
                 if not item or item == '___ : ___ : ___ : ___':
-                    return False
+                    return False, 'missing mysql'
 
-        return True
+        return True, 'complete'
 
 
     def write_advancedsettings(self, dictionary):
         ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
 
-        dictionary_valid = self.validate_advset_dict(dictionary)
+        # check the dictionary to see if it is valid
+        dictionary_valid, invalidity_type = self.validate_advset_dict(dictionary)
 
         if not dictionary_valid:
+            if invalidity_type == 'missing mysql':
 
-            discard = DIALOG.yesno(   'OSMC',
-                        'MySQL settings are incomplete.', 'Discard MySQL settings changes?')
+                discard = DIALOG.yesno(   'OSMC',
+                            'MySQL settings are incomplete.', 'Discard MySQL settings changes?')
 
-            if discard:
+                if discard:
+
+                    return
+
+                else:
+
+                    return 'stay'
+
+            elif invalidity_type == 'empty':
+
+                # if the dictionary is empty, dont write anything
 
                 return
-
-            else:
-
-                return 'stay'
 
         user_data = xbmc.translatePath( "special://userdata")
         loc       = os.path.join(user_data,'advancedsettings.xml')
