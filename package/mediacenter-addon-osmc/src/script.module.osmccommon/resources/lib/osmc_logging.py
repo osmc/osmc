@@ -1,16 +1,41 @@
 import time
 from functools import wraps
 
+import xbmc
+
 TEST_LOG_BOOL = True
 
 def test_logger(msg):
 	print 'test-' + msg
 
 
-def comprehensive_logger(logger=None, logging=True, maxlength=250, nowait=False):
+def lang(id):
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+class StandardLogger(object):
+	''' Standard kodi logger. Used to add entries to the Kodi.log.
+		Best usage:
+			from osmc_logging import StandardLogger
+			standard_logger = StandardLogger(__addonid__)
+			log = standard_logger.log
+
+		'''
+
+	def __init__(self, addonid):
+		self.addonid = addonid
+
+	def log(message, label=''):
+		logmsg       = '%s : %s - %s ' % (self.__addonid__ , str(label), str(message))
+		xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)	
+
+
+
+
+def ComprehensiveLogger(logger=None, logging=True, maxlength=250, nowait=False):
 	'''
-		Decorator to log the inputs and outputs of functions, as well as the time taken
-		to run the function.
+		Decorator to log the inputs and outputs of functions, as well as the time taken to run the function.
+
 		Requires: time, functools
 		logger: 	[opt] logging function, if not provided print is used
 		logging: 	[opt] boolean, turn logging on and off, default is True
