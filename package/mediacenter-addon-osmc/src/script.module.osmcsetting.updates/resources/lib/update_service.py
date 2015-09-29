@@ -449,8 +449,7 @@ class Main(object):
 			
 				return False, 'Update CONDITION : player playing'
 
-
-				idle = xbmc.getGlobalIdleTime()
+			idle = xbmc.getGlobalIdleTime()
 
 			if self.s['update_on_idle'] and idle < 60:
 
