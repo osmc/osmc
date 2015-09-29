@@ -623,9 +623,16 @@ class networking_gui(xbmcgui.WindowXMLDialog):
     def populate_mysql(self, dictionary):
         ''' Reads the MySQL information from the CAS and loads it into the local addon '''
 
-        video = dictionary.get('advancedsettings', {}).get('videodatabase', {})
-        vidlb = dictionary.get('advancedsettings', {}).get('videolibrary',  {})
-        music = dictionary.get('advancedsettings', {}).get('musicdatabase', {})
+        main = dictionary.get('advancedsettings', {})
+
+        if not main:
+            video = False
+            music = False
+            
+        else:
+            video = main.get('videodatabase', {})
+            vidlb = main.get('videolibrary',  {})
+            music = main.get('musicdatabase', {})
 
         sql_subitems = ['name','host', 'port', 'user', 'pass']
 
