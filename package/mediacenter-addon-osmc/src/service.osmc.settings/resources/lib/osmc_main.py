@@ -24,6 +24,8 @@ import os
 import traceback
 
 # XBMC modules
+import xbmc
+import xbmcaddon
 import xbmcgui
 WINDOW = xbmcgui.Window(10000)
 if not os.path.isfile('/walkthrough_completed'):
@@ -32,8 +34,6 @@ if not os.path.isfile('/walkthrough_completed'):
 		xbmc.setosmcwalkthroughstatus(1)
 	except Exception as e:
 		print traceback.format_exc()
-import xbmc
-import xbmcaddon
 
 # Standard modules
 import datetime
