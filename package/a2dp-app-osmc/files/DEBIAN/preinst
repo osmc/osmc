@@ -11,9 +11,9 @@ install_divert ()
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
 if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 
-	# install all diverts needed by this version of the package:
-	# install_divert PATH_DIV PATH_ORIG
-        install_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
-	install_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
-       	install_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf
+    # install all diverts needed by this version of the package:
+    # install_divert PATH_DIV PATH_ORIG
+    install_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
+    install_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
+    install_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf
 fi

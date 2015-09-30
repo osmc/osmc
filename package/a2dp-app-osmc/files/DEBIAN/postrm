@@ -8,10 +8,26 @@ remove_divert ()
 	fi
 }
 
+function is_rbp()
+{
+	if ischroot
+	then
+		dpkg -l | grep -q "rbp-bootloader-osmc"
+		return
+	else
+		grep -q osmcdev=rbp /proc/cmdline > /dev/null 2>&1
+		return
+	fi
+}
+
+
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-#if [ "$1" = "remove" ]; then
-
-	# remove all diverts that this version _and_ all prior versions of the package once added:
-	# remove_divert PATH_DIV PATH_ORIG
-
-#fi
+if [ "$1" = "remove" ]; then
+    # remove all diverts that this version _and_ all prior versions of the package once added:
+    # remove_divert PATH_DIV PATH_ORIG
+    remove_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
+    remove_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
+    remove_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf
+    gpasswd -d osmc pulse-access
+    if is_rbp; then rm -rf  /etc/modules-load.d/snd_bcm2835.conf >/dev/null 2>&1; fi
+ fi
