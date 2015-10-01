@@ -1,0 +1,31 @@
+From 27d46b96da5787c663b718dc8a40edec0800df3e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 1 Oct 2015 16:18:06 +0100
+Subject: [PATCH] Do not show /boot in the list of mounted media
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/storage/linux/UDevProvider.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/xbmc/storage/linux/UDevProvider.cpp b/xbmc/storage/linux/UDevProvider.cpp
+index ff0763c..e7bbc33 100644
+--- a/xbmc/storage/linux/UDevProvider.cpp
++++ b/xbmc/storage/linux/UDevProvider.cpp
+@@ -145,6 +145,13 @@ void CUDevProvider::GetDisks(VECSOURCES& disks, bool removable)
+       continue;
+     }
+ 
++   // filter out osmc boot partition
++   if (strcmp(mountpoint, "/boot") == 0)
++   {
++      udev_device_unref(device);
++      continue;
++   }
++
+     // filter out things mounted on /tmp
+     if (strstr(mountpoint, "/tmp"))
+     {
+-- 
+2.1.0
+
