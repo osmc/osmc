@@ -1,0 +1,45 @@
+diff --git a/xbmc/peripherals/PeripheralTypes.h b/xbmc/peripherals/PeripheralTypes.h
+index 699e1b2..aa1f491 100644
+--- a/xbmc/peripherals/PeripheralTypes.h
++++ b/xbmc/peripherals/PeripheralTypes.h
+@@ -38,6 +38,7 @@ namespace PERIPHERALS
+     PERIPHERAL_BUS_USB,
+     PERIPHERAL_BUS_PCI,
+     PERIPHERAL_BUS_RPI,
++    PERIPHERAL_BUS_IMX,
+     PERIPHERAL_BUS_CEC
+   };
+ 
+@@ -152,6 +153,8 @@ namespace PERIPHERALS
+         return "pci";
+       case PERIPHERAL_BUS_RPI:
+         return "rpi";
++      case PERIPHERAL_BUS_IMX:
++        return "imx";
+       case PERIPHERAL_BUS_CEC:
+         return "cec";
+       default:
+@@ -170,6 +173,8 @@ namespace PERIPHERALS
+         return PERIPHERAL_BUS_PCI;
+       else if (strTypeLowerCase == "rpi")
+         return PERIPHERAL_BUS_RPI;
++      else if (strTypeLowerCase == "imx")
++        return PERIPHERAL_BUS_IMX;
+       else if (strTypeLowerCase == "cec")
+         return PERIPHERAL_BUS_CEC;
+ 
+diff --git a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+index 70ba8d0..63e9624 100644
+--- a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
++++ b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+@@ -103,6 +103,10 @@ bool CPeripheralBusCEC::PerformDeviceScan(PeripheralScanResults &results)
+       /** the Pi's adapter cannot be removed, no need to rescan */
+       m_bNeedsPolling = false;
+       break;
++    case ADAPTERTYPE_IMX:
++      result.m_mappedBusType = PERIPHERAL_BUS_IMX;
++      m_bNeedsPolling = false;
++      break;
+     default:
+       break;
+     }
