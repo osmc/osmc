@@ -29,4 +29,5 @@ if [ "$1" = "configure" ]; then
     # remove_divert PATH_DIV PATH_ORIG
     usermod -a -G pulse-access,audio osmc
     if is_rbp; then echo 'snd_bcm2835' >  /etc/modules-load.d/snd_bcm2835.conf; fi
+    touch /tmp/reboot-needed # ToDo, find what services to restart
 fi
