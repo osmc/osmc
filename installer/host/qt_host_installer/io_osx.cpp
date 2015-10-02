@@ -202,7 +202,7 @@ namespace io
            {
                line = line.simplified(); /* Remove trailing and leading ws */
                /* The line holding the device is the only line always starting with 0: */
-               if (line.simplified().startsWith("Ejectable:"))
+               if (line.simplified().startsWith("Ejectable:") || line.simplified().startsWith("Removable Media:"))
                {
                    QString ejectable = QString(line.split(":").at(1).simplified());
                    if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive))
