@@ -113,6 +113,7 @@ function build_in_env()
 	test $DEP == vero1 && DEP="armv7"
 	test $DEP == rbp1 && DEP="armv6l"
 	test $DEP == atv && DEP="i386"
+	test $DEP == pc && DEP="amd64"
 	TCDIR="/opt/osmc-tc/$DEP-toolchain-osmc"
 	if ((($BUILD_OPTS & $BUILD_OPTION_BUILD_FRESH) == $BUILD_OPTION_BUILD_FRESH))
 	then
