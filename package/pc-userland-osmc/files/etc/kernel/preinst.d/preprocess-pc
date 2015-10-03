@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# work around for dpkg not being able to backup files on fat32 when reinstalling a previously installed kernel version.
+# technically not necessary for pc
+
+rm -rf ${2} /boot/System.map-${1} /boot/config-${1} /boot/dtb-${1}/
