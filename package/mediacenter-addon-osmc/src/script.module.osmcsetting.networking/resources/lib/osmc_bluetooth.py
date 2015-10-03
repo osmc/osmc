@@ -40,7 +40,14 @@ def is_bluetooth_available():
 def is_bluetooth_enabled():
     connman_status = connman.is_technology_enabled('bluetooth')
     service_status = osmc_systemd.is_service_running(BLUETOOTH_SERVICE)
-    return connman_status and service_status
+    adapterFound = False
+    if connman_status and service_status:
+        try:
+            bluetooth.get_adapter()
+            adapterFound = True
+        except: #  catch issue where connman reports BT but Bluez can't find an adapter
+            adapterFound = False
+    return connman_status and service_status and adapterFound
 
 
 def toggle_bluetooth_state(state):
