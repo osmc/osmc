@@ -250,10 +250,10 @@ then
 	mkdir build
 	cd build
 	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) ../ -DOVERRIDE_PATHS=1
-	if [ $? != 0 ]; then echo "Configuring binary addons failed"; fi
+	if [ $? != 0 ]; then echo "Configuring binary addons failed"; && exit 1; fi
 	cd ../
 	$BUILD kodiplatform_DIR=$(pwd) -C build/
-	if [ $? != 0 ]; then echo "Building binary addons failed"; fi
+	if [ $? != 0 ]; then echo "Building binary addons failed"; && exit 1; fi
 	popd
         # Languages
         mkdir languages/
