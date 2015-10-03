@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-tcstub="i386-toolchain-osmc"
+tcstub="amd64-toolchain-osmc"
 
 make clean
 
