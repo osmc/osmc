@@ -109,6 +109,12 @@ function cleanup_filesystem()
 	rm -f ${1}/var/log/apt/*.log
 }
 
+function enable_mirrordirector()
+{
+	echo -e "Enabling mirror direction"
+	sed -e s/staging.//g -i ${1}/etc/apt/sources.list
+}
+
 function remove_existing_filesystem()
 {
 	if [ -d "$1" ]; then echo -e "Removing old filesystem" && rm -rf "$1"; fi
@@ -224,6 +230,7 @@ export -f update_sources
 export -f install_package
 export -f fetch_filesystem
 export -f cleanup_filesystem
+export -f enable_mirrordirector
 export -f remove_existing_filesystem
 export -f install_patch
 export -f pull_source
