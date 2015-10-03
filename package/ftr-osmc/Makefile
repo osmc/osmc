@@ -13,6 +13,9 @@ atv:
 vero1:
 	sudo bash build.sh "vero1"
 
+pc:
+	sudo bash build.sh "pc"
+
 clean:
 	sudo rm -f *.deb >/dev/null 2>&1
 	sudo rm -f files/usr/bin/ftr >/dev/null 2>&1
