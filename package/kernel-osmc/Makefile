@@ -13,6 +13,9 @@ vero:
 atv:
 	sudo setarch i686 bash build.sh "atv"
 
+pc:
+	sudo bash build.sh "pc"
+
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files-image >/dev/null 2>&1
