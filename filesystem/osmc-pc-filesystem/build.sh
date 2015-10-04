@@ -5,7 +5,7 @@
 
 . ../common/funcs.sh
 wd=$(pwd)
-filestub="osmc-amd64-filesystem"
+filestub="osmc-pc-filesystem"
 
 check_platform
 verify_action
