@@ -1,19 +1,23 @@
---- a/drivers/staging/media/lirc/Makefile	2013-05-12 05:36:28.676547269 +0100
-+++ b/drivers/staging/media/lirc/Makefile	2013-05-12 05:37:31.584546726 +0100
-@@ -8,6 +8,7 @@
- obj-$(CONFIG_LIRC_IMON)		+= lirc_imon.o
- obj-$(CONFIG_LIRC_PARALLEL)	+= lirc_parallel.o
- obj-$(CONFIG_LIRC_RPI)		+= lirc_rpi.o
-+obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
- obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
- obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
- obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+From 02a202ff07e54c1f32bab0f75f3495eb6d63230f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 8 May 2015 07:19:47 +0100
+Subject: [PATCH] Add Xbox support
 
---- a/drivers/staging/media/lirc/Kconfig	2013-05-12 05:37:44.264546616 +0100
-+++ b/drivers/staging/media/lirc/Kconfig	2013-05-12 05:38:31.596546208 +0100
-@@ -44,6 +44,12 @@
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/staging/media/lirc/Kconfig     |   6 +
+ drivers/staging/media/lirc/Makefile    |   1 +
+ drivers/staging/media/lirc/lirc_xbox.c | 965 +++++++++++++++++++++++++++++++++
+ 3 files changed, 972 insertions(+)
+ create mode 100644 drivers/staging/media/lirc/lirc_xbox.c
+
+diff --git a/drivers/staging/media/lirc/Kconfig b/drivers/staging/media/lirc/Kconfig
+index 6879c46..c435329 100644
+--- a/drivers/staging/media/lirc/Kconfig
++++ b/drivers/staging/media/lirc/Kconfig
+@@ -32,6 +32,12 @@ config LIRC_PARALLEL
  	help
- 	  Driver for Homebrew GPIO Port Receiver/Transmitter for the RaspberryPi
+ 	  Driver for Homebrew Parallel Port Receivers
  
 +config LIRC_XBOX
 +	tristate "Original XBOX DVD Remote"
@@ -24,10 +28,21 @@
  config LIRC_SASEM
  	tristate "Sasem USB IR Remote"
  	depends on LIRC && USB
-
+diff --git a/drivers/staging/media/lirc/Makefile b/drivers/staging/media/lirc/Makefile
+index 5430adf..be046c7 100644
+--- a/drivers/staging/media/lirc/Makefile
++++ b/drivers/staging/media/lirc/Makefile
+@@ -8,5 +8,6 @@ obj-$(CONFIG_LIRC_IMON)		+= lirc_imon.o
+ obj-$(CONFIG_LIRC_PARALLEL)	+= lirc_parallel.o
+ obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
+ obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
++obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
+ obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+ obj-$(CONFIG_LIRC_ZILOG)	+= lirc_zilog.o
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
-index e69de29..0ad0f5a 100644
---- a/drivers/staging/media/lirc/lirc_xbox.c
+new file mode 100644
+index 0000000..0ad0f5a
+--- /dev/null
 +++ b/drivers/staging/media/lirc/lirc_xbox.c
 @@ -0,0 +1,965 @@
 +/*
@@ -995,3 +1010,6 @@ index e69de29..0ad0f5a 100644
 +
 +module_param(repeat, int, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(repeat, "Repeat timeout (1/100 sec) (default: 10)");
+-- 
+2.1.0
+
