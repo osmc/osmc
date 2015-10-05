@@ -7,7 +7,7 @@
 test $1 == rbp1 && VERSION="4.2.1" && REV="1"
 test $1 == rbp2 && VERSION="4.2.1" && REV="1"
 test $1 == vero && VERSION="4.1.7" && REV="4"
-test $1 == atv && VERSION="4.0.2" && REV="2"
+test $1 == atv && VERSION="4.2.3" && REV="1"
 test $1 == pc && VERSION="4.2.3" && REV="1"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
@@ -144,6 +144,16 @@ then
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192eu/8192eu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		fi
+		if [ "$1" == "atv" ]
+		then
+		# Build CrystalHD
+		pushd drivers/staging/chd
+		$BUILD
+		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
+		popd
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/chd/
+		cp drivers/staging/chd/crystalhd.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
 		fi
 	# Unset architecture
 	ARCH=$(arch)
