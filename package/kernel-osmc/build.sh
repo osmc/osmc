@@ -155,6 +155,15 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/chd/
 		cp drivers/staging/chd/crystalhd.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
 		fi
+		if [ "$1" == "atv" ]
+		then
+		pushd drivers/staging/nv-osmc
+		$BUILD SYSSRC=$(pwd)/../../../
+		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
+		popd
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/nv-osmc
+		cp drivers/staging/nv-osmc/nvidia.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
+		fi
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
