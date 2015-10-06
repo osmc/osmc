@@ -29,6 +29,7 @@ then
 	if [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then handle_dep "armv7-libplatform-dev-osmc"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
+	if [ "$1" == "i386" ]; then handle_dep "i386-libplatform-dev-osmc"; fi
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
