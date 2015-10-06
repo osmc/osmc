@@ -101,7 +101,7 @@ then
 	mv mach_kernel /mnt
 	mv boot.efi /mnt
 	mv System /mnt
-	echo "console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=atv video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet" > /mnt/cmdline.txt
+	mv patchstick.sh /mnt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
