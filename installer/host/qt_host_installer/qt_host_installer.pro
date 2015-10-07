@@ -37,6 +37,7 @@ SOURCES += main.cpp\
 macx {
 SOURCES += \
     io_osx.cpp
+}
 
 unix:!macx {
 SOURCES += \
