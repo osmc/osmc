@@ -46,7 +46,7 @@ SETS =	{
 											{
 												'name': 'cmdline',
 												'key' : '0wwYYuO5',
-												'ltyp': 'cl_log', 
+												'ltyp': 'file_log', 
 												'actn': '/proc/cmdline',
 											},
 										  ],
