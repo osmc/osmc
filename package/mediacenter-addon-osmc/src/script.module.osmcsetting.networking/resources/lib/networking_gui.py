@@ -782,20 +782,17 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
-        vdb = False
-        mdb = False
-
         if 'videodatabase' in main:
-            vdb = True
             # fail if the items aren't filled in or are the default up value
             for item in sql_subitems:
-                if not item or item == '___ : ___ : ___ : ___':
+                subitem = main.get('videodatabase',{}).get(item, False)
+                if not subitem or subitem == '___ : ___ : ___ : ___':
                     return False, 'missing mysql'
 
         if 'musicdatabase' in main:
-            mdb = True
             for item in sql_subitems:
-                if not item or item == '___ : ___ : ___ : ___':
+                subitem = main.get('musicdatabase',{}).get(item, False)
+                if not subitem or subitem == '___ : ___ : ___ : ___':
                     return False, 'missing mysql'
 
         return True, 'complete'
