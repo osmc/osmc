@@ -1,0 +1,25 @@
+diff --git a/xbmc/storage/linux/UDevProvider.cpp b/xbmc/storage/linux/UDevProvider.cpp
+index e7bbc33..3a8f9eb 100644
+--- a/xbmc/storage/linux/UDevProvider.cpp
++++ b/xbmc/storage/linux/UDevProvider.cpp
+@@ -265,14 +265,18 @@ bool CUDevProvider::PumpDriveChangeEvents(IStorageEventsCallback *callback)
+       else if (mountpoint)
+         label = URIUtils::GetFileName(mountpoint);
+ 
+-      if (!strcmp(action, "add") && !strcmp(devtype, "partition"))
++      if (strcmp("add", action) && strcmp(devtype, "partition") == 0)
++	return false;
++      else
+       {
+         CLog::Log(LOGNOTICE, "UDev: Added %s", mountpoint);
+         if (callback)
+           callback->OnStorageAdded(label, mountpoint);
+         changed = true;
+       }
+-      if (!strcmp(action, "remove") && !strcmp(devtype, "partition"))
++      if (strcmp(action, "remove") && strcmp(devtype, "partition") == 0)
++	return false;
++      else
+       {
+         CLog::Log(LOGNOTICE, "UDev: Removed %s", mountpoint);
+         if (callback)
