@@ -13,7 +13,7 @@ pushd ${TARGET}
 if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
 rm -rf ${TARGET}.app
 echo Building installer
-qmake -spec macx-g++
+qmake
 make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 
