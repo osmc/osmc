@@ -543,7 +543,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.hide_controls(ALL_WIRED_CONTROLS)
         if osmc_network.is_ethernet_enabled():
             self.current_network_config = self.get_wired_config()
-
             if self.current_network_config:
                 interface = self.current_network_config['Interface']
 
@@ -1060,10 +1059,30 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # 'Status'              'Configuring...'
         self.wired_status_label.setLabel(lang(32044) + ' : ' + lang(32016))
 
-        osmc_network.toggle_ethernet_state(not osmc_network.is_ethernet_enabled())
+        ethernet_state = not osmc_network.is_ethernet_enabled();
+        osmc_network.toggle_ethernet_state(ethernet_state)
+        
         # 5 second wait to allow connman to make the changes before refreshing
-
-        time.sleep(2)
+        changed_state = 1
+        while changed_state != 0 and changed_state < 5:
+            if  osmc_network.is_ethernet_enabled() == ethernet_state:
+                 changed_state = 0;
+            else:
+                changed_state += 1
+            xbmc.sleep(1000)
+        if osmc_network.is_ethernet_enabled() != ethernet_state:
+            log("Failed to change ethernet state to " + str(ethernet_state))
+        # now wait for the ip address to be assigned to the adapter
+        if ethernet_state:
+            changed_state = 1
+            while changed_state != 0 and changed_state < 20:
+                settings = osmc_network.get_ethernet_settings()
+                log(settings)
+                if settings and 'State' in settings.keys() and settings['State'] in ('ready', 'online'):
+                     changed_state = 0;
+                else:
+                    changed_state += 1
+                xbmc.sleep(500)
         self.clear_busy_dialogue()
 
 
@@ -1243,13 +1262,18 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.WFP.reset()
         self.hide_controls(ALL_WIRELESS_CONTROLS)
         self.toggle_controls(True, [WIRELESS_NETWORKS])
-
         wifi_state = not osmc_network.is_wifi_enabled()
         osmc_network.toggle_wifi_state(wifi_state)
-
+        changed_state  = 1
         # 5 second wait to allow connman to make the changes before refreshing
-        time.sleep(5)
-
+        while changed_state != 0 and changed_state < 5:
+            if  osmc_network.is_wifi_enabled() == wifi_state:
+                 changed_state = 0;
+            else:
+                changed_state += 1
+            xbmc.sleep(1000)
+        if osmc_network.is_wifi_enabled() != wifi_state:
+            log("Failed to change wifi state to " + str(wifi_state))
         if not wifi_state:
             self.stop_wifi_population_thread()
             self.current_network_config = {}
@@ -1494,7 +1518,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             self.show_busy_dialogue()
 
-            if not osmc_bluetooth.is_discovering():
+            target_state = not osmc_bluetooth.is_discovering()
+            
+            if target_state: 
 
                 osmc_bluetooth.start_discovery()
 
@@ -1502,8 +1528,26 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
                 osmc_bluetooth.stop_discovery()
 
-            xbmc.sleep(1500)
-            self.clear_busy_dialogue()
+            changed_state  = 1
+
+            # up to 10 second wait to allow discovery to change state
+
+            while changed_state != 0 and changed_state < 10:
+
+                if osmc_bluetooth.is_discovering() == target_state:
+
+                    changed_state = 0;
+
+                else:
+
+                    changed_state += 1
+
+                xbmc.sleep(1000)
+
+                if osmc_bluetooth.is_discovering() != target_state:
+                    log("Failed to change discovery state to " + str(wifi_state))
+                    
+                self.clear_busy_dialogue()
 
         elif control_id == 6000:  # paired devices
 
@@ -1916,16 +1960,16 @@ class wifi_scanner_bot(threading.Thread):
 
 class wifi_populate_bot(threading.Thread):
 
-    def __init__(self, scan, wifi_list_control, conn_ssid):
+    def __init__(self, scan, wifi_list_control,conn_ssid):
 
         super(wifi_populate_bot, self).__init__(name=WIFI_THREAD_NAME)
         
-        self.WFP       = wifi_list_control
         self.scan      = scan
+        self.WFP       = wifi_list_control
+        self.conn_ssid = conn_ssid 
         self.exit      = False
-        self.conn_ssid = conn_ssid
         self.wifis     = []
-
+ 
         self.current_network_config = None
 
         if self.scan:
@@ -1950,17 +1994,6 @@ class wifi_populate_bot(threading.Thread):
 
                 self.update_list_control(running_dict, len(wifis.keys()) > 1)
 
-                # find any connected setting and load its values into the controls
-                for adapterAddress, wifis in running_dict.iteritems():
-                    for ssid, info in wifis.iteritems():
-
-                        try:
-                            if info['Connected'] == 'True':
-                                self.current_network_config = self.get_wireless_config(ssid)
-                                self.populate_ip_controls(info, WIRELESS_IP_VALUES)
-
-                        except:
-                            pass
 
              # every minute re-scan wifi unless the thread has been asked to exit
             if not self.exit and runs % 600 == 0:
@@ -2019,7 +2052,7 @@ class wifi_populate_bot(threading.Thread):
 
                     if connected and ssid == self.conn_ssid:
                         self.WFP.selectItem(self.WFP.size() - 1)
-
+                        
 
     def getListItemLabel(self, wifi, multiAdapter):
 
