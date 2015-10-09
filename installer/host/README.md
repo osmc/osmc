@@ -33,7 +33,7 @@ Only tested on OS X Mavericks:
 
 ```cd qt5 ```
 
-```/configure -opensource -confirm-license -static -release --prefix=/usr -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports```
+```/configure -opensource -confirm-license -release --prefix=/usr -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports```
 
 ```make -j8 && make install```
 
