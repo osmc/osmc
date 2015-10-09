@@ -29,7 +29,7 @@ On Ubuntu or Debian, we can get a minimal build of Qt 4.8.x with the following c
 
 Only tested on OS X Mavericks:
 
-```git clone git://code.qt.io/qt/qt5.git -b 5.5```
+```git clone git://code.qt.io/qt/qt5.git -b 5.5.1```
 
 ```cd qt5 ```
 
