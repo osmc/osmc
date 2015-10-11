@@ -13,11 +13,7 @@ export BUILD_OPTION_USE_O3=8
 export BUILD_OPTION_USE_NOFP=16
 export BUILD_OPTION_USE_MULTIARCH=32
 export BUILD_OPTION_USE_CCACHE=64
-
-function get_build_option_defaults()
-{
-	return $(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE + $BUILD_OPTION_USE_GOLD))
-}
+export BUILD_OPTION_DEFAULTS=$(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE + $BUILD_OPTION_USE_CCACHE))
 
 function fix_arch_ctl()
 {
@@ -66,8 +62,7 @@ function build_in_env()
 	then
 	    BUILD_OPTS=$4
 	else
-	    get_build_option_defaults
-	    BUILD_OPTS=$?
+	    BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 	fi
 	# Don't get stuck in an endless loop
 	mount -t proc proc /proc >/dev/null 2>&1
@@ -230,4 +225,3 @@ export -f publish_applications_any
 export -f publish_applications_targeted
 export -f remove_conflicting
 export -f dpkg_build
-export -f get_build_option_defaults
