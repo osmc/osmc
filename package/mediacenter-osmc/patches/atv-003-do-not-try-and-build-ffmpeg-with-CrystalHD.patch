@@ -1,0 +1,25 @@
+From c1150274b749a6093024849c3aa497bd14b899ba Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 11 Oct 2015 10:10:51 +0100
+Subject: [PATCH] Do not try and build ffmpeg with CrystalHD
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/depends/target/ffmpeg/autobuild.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
+index 196c347..bbcbeab 100755
+--- a/tools/depends/target/ffmpeg/autobuild.sh
++++ b/tools/depends/target/ffmpeg/autobuild.sh
+@@ -159,6 +159,7 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ 	--disable-mips32r2 \
+ 	--disable-mipsdspr1 \
+ 	--disable-mipsdspr2 \
++	--disable-crystalhd \
+         ${FLAGS}
+ 
+ make -j ${BUILDTHREADS} 
+-- 
+2.1.0
+
