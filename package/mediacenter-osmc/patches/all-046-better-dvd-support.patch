@@ -1,0 +1,43 @@
+From 02e205320ca02514b93659d16c62e6466e04a23e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 11 Oct 2015 12:47:10 +0100
+Subject: [PATCH] Improve DVD support: PumpDriveChangeEvents properly, don't display double notification.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/storage/linux/UDevProvider.cpp | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/storage/linux/UDevProvider.cpp b/xbmc/storage/linux/UDevProvider.cpp
+index e7bbc33..9375b74 100644
+--- a/xbmc/storage/linux/UDevProvider.cpp
++++ b/xbmc/storage/linux/UDevProvider.cpp
+@@ -265,17 +265,21 @@ bool CUDevProvider::PumpDriveChangeEvents(IStorageEventsCallback *callback)
+       else if (mountpoint)
+         label = URIUtils::GetFileName(mountpoint);
+ 
+-      if (!strcmp(action, "add") && !strcmp(devtype, "partition"))
++      if (strcmp("add", action) && strcmp(devtype, "partition") == 0)
++	return false;
++      else
+       {
+         CLog::Log(LOGNOTICE, "UDev: Added %s", mountpoint);
+-        if (callback)
++        if (callback && udev_label)
+           callback->OnStorageAdded(label, mountpoint);
+         changed = true;
+       }
+-      if (!strcmp(action, "remove") && !strcmp(devtype, "partition"))
++      if (strcmp(action, "remove") && strcmp(devtype, "partition") == 0)
++	return false;
++      else
+       {
+         CLog::Log(LOGNOTICE, "UDev: Removed %s", mountpoint);
+-        if (callback)
++        if (callback && ! udev_label)
+           callback->OnStorageSafelyRemoved(label);
+         changed = true;
+       }
+-- 
+2.1.0
+
