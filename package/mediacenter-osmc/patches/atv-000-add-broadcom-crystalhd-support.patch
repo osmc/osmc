@@ -1,8 +1,72 @@
+From 9c5ba5b0e9738b863f8723560795ff332ee682f8 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 11 Oct 2015 14:46:03 +0100
+Subject: [PATCH] Add support for CrystalHD. Do not use fast_memcpy() and
+ remove CHD pathways which don't make sense (MPEG2, VC1)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ .gitignore                                         |    1 +
+ configure.ac                                       |   52 +
+ docs/README.linux                                  |   33 +-
+ lib/win32/libcrystalhd/bc_dts_defs.h               |  635 +++++++
+ lib/win32/libcrystalhd/bc_dts_types.h              |   68 +
+ lib/win32/libcrystalhd/libcrystalhd_if.h           | 1539 +++++++++++++++
+ lib/win32/libcrystalhd/libcrystalhd_version.h      |   82 +
+ project/VS2010Express/XBMC.vcxproj                 |   15 +-
+ project/VS2010Express/XBMC.vcxproj.filters         |   12 +
+ system/settings/settings.xml                       |    9 +
+ tools/depends/target/Makefile                      |    6 +-
+ tools/depends/target/libcrystalhd/Makefile         |   15 +
+ .../target/libcrystalhd/libcrystalhd/bc_dts_defs.h |  635 +++++++
+ .../libcrystalhd/libcrystalhd/bc_dts_types.h       |   68 +
+ .../libcrystalhd/libcrystalhd/libcrystalhd_if.h    | 1515 +++++++++++++++
+ .../libcrystalhd/libcrystalhd_version.h            |   80 +
+ xbmc/Application.cpp                               |   11 +
+ xbmc/DllPaths_generated.h.in                       |   11 +
+ xbmc/DllPaths_win32.h                              |    1 +
+ xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp |   25 +
+ xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp | 2010 ++++++++++++++++++++
+ xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h   |  236 +++
+ .../DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp     |  204 ++
+ .../DVDCodecs/Video/DVDVideoCodecCrystalHD.h       |   51 +
+ xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in   |    4 +
+ xbmc/settings/SettingConditions.cpp                |    8 +
+ xbmc/system.h                                      |    1 +
+ xbmc/win32/WIN32Util.cpp                           |   41 +
+ xbmc/win32/WIN32Util.h                             |    2 +
+ 29 files changed, 7345 insertions(+), 25 deletions(-)
+ create mode 100644 lib/win32/libcrystalhd/bc_dts_defs.h
+ create mode 100644 lib/win32/libcrystalhd/bc_dts_types.h
+ create mode 100644 lib/win32/libcrystalhd/libcrystalhd_if.h
+ create mode 100644 lib/win32/libcrystalhd/libcrystalhd_version.h
+ create mode 100644 tools/depends/target/libcrystalhd/Makefile
+ create mode 100644 tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_defs.h
+ create mode 100644 tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_types.h
+ create mode 100644 tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_if.h
+ create mode 100644 tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_version.h
+ create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
+ create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h
+ create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
+ create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
+
+diff --git a/.gitignore b/.gitignore
+index 5cf42e7..f551c0e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -508,6 +508,7 @@ lib/cpluff/stamp-h1
+ /xbmc/cores/dvdplayer/DVDCodecs/Makefile
+ /xbmc/cores/dvdplayer/DVDCodecs/Overlay/Makefile
+ /xbmc/cores/dvdplayer/DVDCodecs/Video/libstagefrightICS/Makefile
++/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD/Makefile
+ /xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile
+ /xbmc/cores/dvdplayer/DVDDemuxers/Makefile
+ /xbmc/cores/dvdplayer/DVDSubtitles/Makefile
 diff --git a/configure.ac b/configure.ac
-index fb6ab20..fb02f14 100644
+index d2cd5b2..4113fab 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -151,6 +151,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
+@@ -200,6 +200,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
  vdpau_disabled="== VDPAU support manually disabled. =="
  vaapi_not_found="== Could not find libva. VAAPI support disabled. =="
  vaapi_disabled="== VAAPI support manually disabled. =="
@@ -11,7 +75,7 @@ index fb6ab20..fb02f14 100644
  vtbdecoder_enabled="== VTBDecoder support enabled. =="
  vtbdecoder_disabled="== VTBDecoder support manually disabled. =="
  openmax_disabled="== OpenMax support manually disabled. =="
-@@ -246,6 +248,12 @@ AC_ARG_ENABLE([vaapi],
+@@ -286,6 +288,12 @@ AC_ARG_ENABLE([vaapi],
    [use_vaapi=$enableval],
    [use_vaapi=auto])
  
@@ -24,7 +88,7 @@ index fb6ab20..fb02f14 100644
  AC_ARG_ENABLE([vtbdecoder],
    [AS_HELP_STRING([--enable-vtbdecoder],
    [enable VTBDecoder decoding (default is auto)])],
-@@ -586,6 +594,7 @@ case $host in
+@@ -645,6 +653,7 @@ case $host in
       use_joystick=no
       use_neon=yes
       use_libcec=no
@@ -32,7 +96,7 @@ index fb6ab20..fb02f14 100644
       use_vtbdecoder=yes
       use_optical_drive=no
       use_dvdcss=no
-@@ -611,6 +620,7 @@ case $host in
+@@ -670,6 +679,7 @@ case $host in
    powerpc-apple-darwin*)
       use_joystick=no
       use_vtbdecoder=no
@@ -40,7 +104,7 @@ index fb6ab20..fb02f14 100644
       ARCH="powerpc-osx"
       use_arch="ppc"
       DEPENDS_ROOT_FOR_XCODE=$(echo ${prefix%/*})
-@@ -1832,6 +1842,41 @@ else
+@@ -1887,6 +1897,41 @@ else
    USE_VAAPI=0
  fi
  
@@ -82,7 +146,7 @@ index fb6ab20..fb02f14 100644
  # VTBDecoder
  if test "x$use_vtbdecoder" != "xno"; then
    if test "$host_vendor" = "apple" ; then
-@@ -2035,6 +2080,12 @@ else
+@@ -2087,6 +2132,12 @@ else
    final_message="$final_message\n  VAAPI:\tNo"
  fi
  
@@ -95,19 +159,2508 @@ index fb6ab20..fb02f14 100644
  if test "x$use_vtbdecoder" != "xno"; then
    final_message="$final_message\n  VTBDecoder:\tYes"
  else
-@@ -2522,6 +2573,7 @@ AC_SUBST(USE_OPENGL)
+@@ -2618,6 +2669,7 @@ AC_SUBST(USE_OPENGL)
  AC_SUBST(USE_OPENGLES)
  AC_SUBST(USE_VDPAU)
  AC_SUBST(USE_VAAPI)
 +AC_SUBST(USE_CRYSTALHD)
  AC_SUBST(USE_LIBSMBCLIENT)
  AC_SUBST(USE_LIBNFS)
- AC_SUBST(USE_LIBAFPCLIENT)
+ AC_SUBST(USE_AIRPLAY)
+diff --git a/docs/README.linux b/docs/README.linux
+index ee64baf..029ad2d 100644
+--- a/docs/README.linux
++++ b/docs/README.linux
+@@ -45,21 +45,24 @@ external libraries enabled).
+ 
+ Build-Depends: autoconf, automake, autopoint, autotools-dev, cmake, curl,
+   debhelper (>= 7.0.50~), default-jre, gawk, gperf, libao-dev, libasound2-dev,
+-  libass-dev (>= 0.9.8), libavahi-client-dev, libavahi-common-dev, libbluetooth-dev,
+-  libbluray-dev, libboost-dev, libboost-thread-dev, libbz2-dev, libcap-dev, libcdio-dev,
+-  libcec-dev, libcurl4-gnutls-dev | libcurl4-openssl-dev | libcurl-dev, libcwiid-dev,
+-  libdbus-1-dev, libfontconfig-dev, libfreetype6-dev, libfribidi-dev,
+-  libgif-dev (>= 4.1.6), libgl1-mesa-dev | libgl-dev, libglew-dev, libglu1-mesa-dev | libglu-dev,
+-  libiso9660-dev, libjasper-dev, libjpeg-dev, libltdl-dev, liblzo2-dev, libmicrohttpd-dev,
+-  libmodplug-dev, libmpcdec-dev, libmpeg2-4-dev, libmysqlclient-dev, libnfs-dev, libogg-dev,
+-  libpcre3-dev, libplist-dev, libpng12-dev | libpng-dev, libpulse-dev, librtmp-dev,libsdl2-dev,
+-  libshairplay-dev, libsmbclient-dev, libsqlite3-dev, libssh-dev, libssl-dev, libswscale-dev,
+-  libtag1-dev (>= 1.8), libtiff-dev, libtinyxml-dev (>= 2.6.2), libtool, libudev-dev,
+-  libusb-dev, libva-dev, libvdpau-dev, libvorbis-dev, libxinerama-dev, libxml2-dev,
+-  libxmu-dev, libxrandr-dev, libxslt1-dev, libxt-dev, libyajl-dev (>=2.0), lsb-release,
+-  nasm [!amd64], python-dev, python-imaging, python-support, swig, unzip, yasm, zip,
+-  zlib1g-dev
+-  
++  libass-dev (>= 0.9.8), libavahi-client-dev, libavahi-common-dev, libavcodec-dev,
++  libavfilter-dev, libavformat-dev, libavutil-dev, libbluetooth-dev, libbluray-dev,
++  libboost-dev, libboost-thread-dev, libbz2-dev, libcap-dev, libcdio-dev, libcec-dev,
++  libcrystalhd-dev, libcurl4-gnutls-dev | libcurl4-openssl-dev | libcurl-dev,
++  libcwiid-dev, libdbus-1-dev, libenca-dev, libflac-dev, libfontconfig-dev,
++  libfreetype6-dev, libfribidi-dev, libgl1-mesa-dev | libgl-dev, libglew-dev, 
++  libglu1-mesa-dev | libglu-dev, libhal-dev, libhal-storage-dev, libiso9660-dev,
++  libjasper-dev, libjpeg-dev, libltdl-dev, liblzo2-dev, libmad0-dev, libmicrohttpd-dev,
++  libmodplug-dev, libmpcdec-dev, libmpeg2-4-dev, libmysqlclient-dev, libnfs-dev,
++  libogg-dev, libpcre3-dev, libplist-dev, libpng12-dev | libpng-dev, libpostproc-dev,
++  libpulse-dev, librtmp-dev, libsdl-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev,
++  libshairplay-dev, libsmbclient-dev, libsqlite3-dev, libssh-dev, libssl-dev, 
++  libswscale-dev, libtag1-dev (>= 1.8), libtiff-dev, libtinyxml-dev, libtool,
++  libudev-dev, libusb-dev, libva-dev, libvdpau-dev, libvorbis-dev, libxinerama-dev,
++  libxml2-dev, libxmu-dev, libxrandr-dev, libxslt1-dev, libxt-dev, libyajl-dev,
++  lsb-release, nasm [!amd64], python-dev, python-imaging, python-support, swig,
++  unzip, yasm, zip, zlib1g-dev
++
+ Note: For developers and anyone else who compiles frequently it is recommended to use ccache.
+ 
+    $ sudo apt-get install ccache
+diff --git a/lib/win32/libcrystalhd/bc_dts_defs.h b/lib/win32/libcrystalhd/bc_dts_defs.h
+new file mode 100644
+index 0000000..c2a7c2d
+--- /dev/null
++++ b/lib/win32/libcrystalhd/bc_dts_defs.h
+@@ -0,0 +1,635 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: bc_dts_defs.h
++ *
++ *  Description: Common definitions for all components. Only types
++ *		 is allowed to be included from this file.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_DEFS_H_
++#define _BC_DTS_DEFS_H_
++
++#include "bc_dts_types.h"
++
++/* BIT Mask */
++#define BC_BIT(_x)		(1 << (_x))
++
++typedef enum _BC_STATUS {
++	BC_STS_SUCCESS		= 0,
++	BC_STS_INV_ARG		= 1,
++	BC_STS_BUSY		= 2,
++	BC_STS_NOT_IMPL		= 3,
++	BC_STS_PGM_QUIT		= 4,
++	BC_STS_NO_ACCESS	= 5,
++	BC_STS_INSUFF_RES	= 6,
++	BC_STS_IO_ERROR		= 7,
++	BC_STS_NO_DATA		= 8,
++	BC_STS_VER_MISMATCH	= 9,
++	BC_STS_TIMEOUT		= 10,
++	BC_STS_FW_CMD_ERR	= 11,
++	BC_STS_DEC_NOT_OPEN	= 12,
++	BC_STS_ERR_USAGE	= 13,
++	BC_STS_IO_USER_ABORT	= 14,
++	BC_STS_IO_XFR_ERROR	= 15,
++	BC_STS_DEC_NOT_STARTED	= 16,
++	BC_STS_FWHEX_NOT_FOUND	= 17,
++	BC_STS_FMT_CHANGE	= 18,
++	BC_STS_HIF_ACCESS	= 19,
++	BC_STS_CMD_CANCELLED	= 20,
++	BC_STS_FW_AUTH_FAILED	= 21,
++	BC_STS_BOOTLOADER_FAILED = 22,
++	BC_STS_CERT_VERIFY_ERROR = 23,
++	BC_STS_DEC_EXIST_OPEN	= 24,
++	BC_STS_PENDING		= 25,
++	BC_STS_CLK_NOCHG	= 26,
++
++	/* Must be the last one.*/
++	BC_STS_ERROR		= -1
++} BC_STATUS;
++
++/*------------------------------------------------------*
++ *    Registry Key Definitions				*
++ *------------------------------------------------------*/
++#define BC_REG_KEY_MAIN_PATH	"Software\\Broadcom\\MediaPC\\CrystalHD"
++#define BC_REG_KEY_FWPATH		"FirmwareFilePath"
++#define BC_REG_KEY_SEC_OPT		"DbgOptions"
++
++/*
++ * Options:
++ *
++ *  b[5] = Enable RSA KEY in EEPROM Support
++ *  b[6] = Enable Old PIB scheme. (0 = Use PIB with video scheme)
++ *
++ *  b[12] = Enable send message to NotifyIcon
++ *
++ */
++
++typedef enum _BC_SW_OPTIONS {
++	BC_OPT_DOSER_OUT_ENCRYPT	= BC_BIT(3),
++	BC_OPT_LINK_OUT_ENCRYPT		= BC_BIT(29),
++} BC_SW_OPTIONS;
++
++typedef struct _BC_REG_CONFIG{
++	uint32_t		DbgOptions;
++} BC_REG_CONFIG;
++
++#if defined(__KERNEL__) || defined(__LINUX_USER__)
++#else
++/* Align data structures */
++#define ALIGN(x)	__declspec(align(x))
++#endif
++
++/* mode
++ * b[0]..b[7]	= _DtsDeviceOpenMode
++ * b[8]		=  Load new FW
++ * b[9]		=  Load file play back FW
++ * b[10]	=  Disk format (0 for HD DVD and 1 for BLU ray)
++ * b[11]-b[15]	=  default output resolution
++ * b[16]	=  Skip TX CPB Buffer Check
++ * b[17]	=  Adaptive Output Encrypt/Scramble Scheme
++ * b[18]-b[31]	=  reserved for future use
++ */
++
++/* To allow multiple apps to open the device. */
++enum _DtsDeviceOpenMode {
++	DTS_PLAYBACK_MODE = 0,
++	DTS_DIAG_MODE,
++	DTS_MONITOR_MODE,
++	DTS_HWINIT_MODE
++};
++
++/* To enable the filter to selectively enable/disable fixes or erratas */
++enum _DtsDeviceFixMode {
++	DTS_LOAD_NEW_FW		= BC_BIT(8),
++	DTS_LOAD_FILE_PLAY_FW	= BC_BIT(9),
++	DTS_DISK_FMT_BD		= BC_BIT(10),
++	/* b[11]-b[15] : Default output resolution */
++	DTS_SKIP_TX_CHK_CPB	= BC_BIT(16),
++	DTS_ADAPTIVE_OUTPUT_PER	= BC_BIT(17),
++	DTS_INTELLIMAP		= BC_BIT(18),
++	/* b[19]-b[21] : select clock frequency */
++	DTS_PLAYBACK_DROP_RPT_MODE = BC_BIT(22),
++	DTS_DIAG_TEST_MODE = BC_BIT(23),
++	DTS_SINGLE_THREADED_MODE = BC_BIT(24),
++	DTS_FILTER_MODE = BC_BIT(25),
++	DTS_MFT_MODE = BC_BIT(26)
++};
++
++#define DTS_DFLT_RESOLUTION(x)	(x<<11)
++
++#define DTS_DFLT_CLOCK(x) (x<<19)
++
++/* F/W File Version corresponding to S/W Releases */
++enum _FW_FILE_VER {
++	/* S/W release: 02.04.02	F/W release 2.12.2.0 */
++	BC_FW_VER_020402 = ((12<<16) | (2<<8) | (0))
++};
++
++/*------------------------------------------------------*
++ *    Stream Types for DtsOpenDecoder()			*
++ *------------------------------------------------------*/
++enum _DtsOpenDecStreamTypes {
++	BC_STREAM_TYPE_ES		= 0,
++	BC_STREAM_TYPE_PES		= 1,
++	BC_STREAM_TYPE_TS		= 2,
++	BC_STREAM_TYPE_ES_TSTAMP	= 6,
++};
++
++/*------------------------------------------------------*
++ *    Video Algorithms for DtsSetVideoParams()		*
++ *------------------------------------------------------*/
++enum _DtsSetVideoParamsAlgo {
++	BC_VID_ALGO_H264		= 0,
++	BC_VID_ALGO_MPEG2		= 1,
++	BC_VID_ALGO_VC1			= 4,
++	BC_VID_ALGO_DIVX		= 6,
++	BC_VID_ALGO_VC1MP		= 7,
++};
++
++/*------------------------------------------------------*
++ *    MPEG Extension to the PPB				*
++ *------------------------------------------------------*/
++#define BC_MPEG_VALID_PANSCAN		(1)
++
++typedef struct _BC_PIB_EXT_MPEG {
++	uint32_t	valid;
++	/* Always valid,  defaults to picture size if no
++	 * sequence display extension in the stream. */
++	uint32_t	display_horizontal_size;
++	uint32_t	display_vertical_size;
++
++	/* MPEG_VALID_PANSCAN
++	 * Offsets are a copy values from the MPEG stream. */
++	uint32_t	offset_count;
++	int32_t		horizontal_offset[3];
++	int32_t		vertical_offset[3];
++
++} BC_PIB_EXT_MPEG;
++
++/*------------------------------------------------------*
++ *    H.264 Extension to the PPB			*
++ *------------------------------------------------------*/
++/* Bit definitions for 'other.h264.valid' field */
++#define H264_VALID_PANSCAN		(1)
++#define H264_VALID_SPS_CROP		(2)
++#define H264_VALID_VUI			(4)
++
++typedef struct _BC_PIB_EXT_H264 {
++	/* 'valid' specifies which fields (or sets of
++	 * fields) below are valid.  If the corresponding
++	 * bit in 'valid' is NOT set then that field(s)
++	 * is (are) not initialized. */
++	uint32_t	valid;
++
++	/* H264_VALID_PANSCAN */
++	uint32_t	pan_scan_count;
++	int32_t		pan_scan_left[3];
++	int32_t		pan_scan_right[3];
++	int32_t		pan_scan_top[3];
++	int32_t		pan_scan_bottom[3];
++
++	/* H264_VALID_SPS_CROP */
++	int32_t		sps_crop_left;
++	int32_t		sps_crop_right;
++	int32_t		sps_crop_top;
++	int32_t		sps_crop_bottom;
++
++	/* H264_VALID_VUI */
++	uint32_t	chroma_top;
++	uint32_t	chroma_bottom;
++
++} BC_PIB_EXT_H264;
++
++/*------------------------------------------------------*
++ *    VC1 Extension to the PPB				*
++ *------------------------------------------------------*/
++#define VC1_VALID_PANSCAN		(1)
++
++typedef struct _BC_PIB_EXT_VC1 {
++	uint32_t	valid;
++
++	/* Always valid, defaults to picture size if no
++	 * sequence display extension in the stream. */
++	uint32_t	display_horizontal_size;
++	uint32_t	display_vertical_size;
++
++	/* VC1 pan scan windows */
++	uint32_t	num_panscan_windows;
++	int32_t		ps_horiz_offset[4];
++	int32_t		ps_vert_offset[4];
++	int32_t		ps_width[4];
++	int32_t		ps_height[4];
++
++} BC_PIB_EXT_VC1;
++
++
++/*------------------------------------------------------*
++ *    Picture Information Block				*
++ *------------------------------------------------------*/
++#if defined(__LINUX_USER__) || defined(_WIN32)
++/* Values for 'pulldown' field.  '0' means no pulldown information
++ * was present for this picture. */
++enum {
++	vdecNoPulldownInfo	= 0,
++	vdecTop			= 1,
++	vdecBottom		= 2,
++	vdecTopBottom		= 3,
++	vdecBottomTop		= 4,
++	vdecTopBottomTop	= 5,
++	vdecBottomTopBottom	= 6,
++	vdecFrame_X2		= 7,
++	vdecFrame_X3		= 8,
++	vdecFrame_X1		= 9,
++	vdecFrame_X4		= 10,
++};
++
++/* Values for the 'frame_rate' field. */
++enum {
++	vdecFrameRateUnknown = 0,
++	vdecFrameRate23_97,
++	vdecFrameRate24,
++	vdecFrameRate25,
++	vdecFrameRate29_97,
++	vdecFrameRate30,
++	vdecFrameRate50,
++	vdecFrameRate59_94,
++	vdecFrameRate60,
++	vdecFrameRate14_985,
++	vdecFrameRate7_496,
++};
++
++/* Values for the 'aspect_ratio' field. */
++enum {
++	vdecAspectRatioUnknown = 0,
++	vdecAspectRatioSquare,
++	vdecAspectRatio12_11,
++	vdecAspectRatio10_11,
++	vdecAspectRatio16_11,
++	vdecAspectRatio40_33,
++	vdecAspectRatio24_11,
++	vdecAspectRatio20_11,
++	vdecAspectRatio32_11,
++	vdecAspectRatio80_33,
++	vdecAspectRatio18_11,
++	vdecAspectRatio15_11,
++	vdecAspectRatio64_33,
++	vdecAspectRatio160_99,
++	vdecAspectRatio4_3,
++	vdecAspectRatio16_9,
++	vdecAspectRatio221_1,
++	vdecAspectRatioOther = 255,
++};
++
++/* Values for the 'colour_primaries' field. */
++enum {
++	vdecColourPrimariesUnknown = 0,
++	vdecColourPrimariesBT709,
++	vdecColourPrimariesUnspecified,
++	vdecColourPrimariesReserved,
++	vdecColourPrimariesBT470_2M = 4,
++	vdecColourPrimariesBT470_2BG,
++	vdecColourPrimariesSMPTE170M,
++	vdecColourPrimariesSMPTE240M,
++	vdecColourPrimariesGenericFilm,
++};
++
++enum {
++	vdecRESOLUTION_CUSTOM	= 0x00000000, /* custom */
++	vdecRESOLUTION_480i	= 0x00000001, /* 480i */
++	vdecRESOLUTION_1080i	= 0x00000002, /* 1080i (1920x1080, 60i) */
++	vdecRESOLUTION_NTSC	= 0x00000003, /* NTSC (720x483, 60i) */
++	vdecRESOLUTION_480p	= 0x00000004, /* 480p (720x480, 60p) */
++	vdecRESOLUTION_720p	= 0x00000005, /* 720p (1280x720, 60p) */
++	vdecRESOLUTION_PAL1	= 0x00000006, /* PAL_1 (720x576, 50i) */
++	vdecRESOLUTION_1080i25	= 0x00000007, /* 1080i25 (1920x1080, 50i) */
++	vdecRESOLUTION_720p50	= 0x00000008, /* 720p50 (1280x720, 50p) */
++	vdecRESOLUTION_576p	= 0x00000009, /* 576p (720x576, 50p) */
++	vdecRESOLUTION_1080i29_97 = 0x0000000A, /* 1080i (1920x1080, 59.94i) */
++	vdecRESOLUTION_720p59_94  = 0x0000000B, /* 720p (1280x720, 59.94p) */
++	vdecRESOLUTION_SD_DVD	= 0x0000000C, /* SD DVD (720x483, 60i) */
++	vdecRESOLUTION_480p656	= 0x0000000D, /* 480p (720x480, 60p), output bus width 8 bit, clock 74.25MHz */
++	vdecRESOLUTION_1080p23_976 = 0x0000000E, /* 1080p23_976 (1920x1080, 23.976p) */
++	vdecRESOLUTION_720p23_976  = 0x0000000F, /* 720p23_976 (1280x720p, 23.976p) */
++	vdecRESOLUTION_240p29_97   = 0x00000010, /* 240p (1440x240, 29.97p ) */
++	vdecRESOLUTION_240p30	= 0x00000011, /* 240p (1440x240, 30p) */
++	vdecRESOLUTION_288p25	= 0x00000012, /* 288p (1440x288p, 25p) */
++	vdecRESOLUTION_1080p29_97 = 0x00000013, /* 1080p29_97 (1920x1080, 29.97p) */
++	vdecRESOLUTION_1080p30	= 0x00000014, /* 1080p30 (1920x1080, 30p) */
++	vdecRESOLUTION_1080p24	= 0x00000015, /* 1080p24 (1920x1080, 24p) */
++	vdecRESOLUTION_1080p25	= 0x00000016, /* 1080p25 (1920x1080, 25p) */
++	vdecRESOLUTION_720p24	= 0x00000017, /* 720p24 (1280x720, 25p) */
++	vdecRESOLUTION_720p29_97  = 0x00000018, /* 720p29.97 (1280x720, 29.97p) */
++	vdecRESOLUTION_480p23_976 = 0x00000019, /* 480p23.976 (720*480, 23.976) */
++	vdecRESOLUTION_480p29_97  = 0x0000001A, /* 480p29.976 (720*480, 29.97p) */
++	vdecRESOLUTION_576p25	= 0x0000001B, /* 576p25 (720*576, 25p) */
++	/* For Zero Frame Rate */
++	vdecRESOLUTION_480p0	= 0x0000001C, /* 480p (720x480, 0p) */
++	vdecRESOLUTION_480i0	= 0x0000001D, /* 480i (720x480, 0i) */
++	vdecRESOLUTION_576p0	= 0x0000001E, /* 576p (720x576, 0p) */
++	vdecRESOLUTION_720p0	= 0x0000001F, /* 720p (1280x720, 0p) */
++	vdecRESOLUTION_1080p0	= 0x00000020, /* 1080p (1920x1080, 0p) */
++	vdecRESOLUTION_1080i0	= 0x00000021, /* 1080i (1920x1080, 0i) */
++};
++
++/* Bit definitions for 'flags' field */
++#define VDEC_FLAG_EOS				(0x0004)
++
++#define VDEC_FLAG_FRAME				(0x0000)
++#define VDEC_FLAG_FIELDPAIR			(0x0008)
++#define VDEC_FLAG_TOPFIELD			(0x0010)
++#define VDEC_FLAG_BOTTOMFIELD			(0x0018)
++
++#define VDEC_FLAG_PROGRESSIVE_SRC		(0x0000)
++#define VDEC_FLAG_INTERLACED_SRC		(0x0020)
++#define VDEC_FLAG_UNKNOWN_SRC			(0x0040)
++
++#define VDEC_FLAG_BOTTOM_FIRST			(0x0080)
++#define VDEC_FLAG_LAST_PICTURE			(0x0100)
++
++#define VDEC_FLAG_PICTURE_META_DATA_PRESENT	(0x40000)
++
++#endif /* __LINUX_USER__ */
++
++typedef struct _BC_PIC_INFO_BLOCK {
++	/* Common fields. */
++	uint64_t	timeStamp;	/* Timestamp */
++	uint32_t	picture_number;	/* Ordinal display number  */
++	uint32_t	width;		/* pixels	    */
++	uint32_t	height;		/* pixels	    */
++	uint32_t	chroma_format;	/* 0x420, 0x422 or 0x444 */
++	uint32_t	pulldown;
++	uint32_t	flags;
++	uint32_t	frame_rate;
++	uint32_t	aspect_ratio;
++	uint32_t	colour_primaries;
++	uint32_t	picture_meta_payload;
++	uint32_t	sess_num;
++	uint32_t	ycom;
++	uint32_t	custom_aspect_ratio_width_height;
++	uint32_t	n_drop;	/* number of non-reference frames remaining to be dropped */
++
++	/* Protocol-specific extensions. */
++	union {
++		BC_PIB_EXT_H264	h264;
++		BC_PIB_EXT_MPEG	mpeg;
++		BC_PIB_EXT_VC1	 vc1;
++	} other;
++
++} BC_PIC_INFO_BLOCK, *PBC_PIC_INFO_BLOCK;
++
++/*------------------------------------------------------*
++ *    ProcOut Info					*
++ *------------------------------------------------------*/
++/* Optional flags for ProcOut Interface.*/
++enum _POUT_OPTIONAL_IN_FLAGS_{
++	/* Flags from App to Device */
++	BC_POUT_FLAGS_YV12	  = 0x01,	/* Copy Data in YV12 format */
++	BC_POUT_FLAGS_STRIDE	  = 0x02,	/* Stride size is valid. */
++	BC_POUT_FLAGS_SIZE	  = 0x04,	/* Take size information from Application */
++	BC_POUT_FLAGS_INTERLACED  = 0x08,	/* copy only half the bytes */
++	BC_POUT_FLAGS_INTERLEAVED = 0x10,	/* interleaved frame */
++	BC_POUT_FLAGS_STRIDE_UV	  = 0x20,	/* Stride size is valid (for UV buffers). */
++	BC_POUT_FLAGS_MODE	  = 0x40,	/* Take output mode from Application, overrides YV12 flag if on */
++
++	/* Flags from Device to APP */
++	BC_POUT_FLAGS_FMT_CHANGE  = 0x10000,	/* Data is not VALID when this flag is set */
++	BC_POUT_FLAGS_PIB_VALID	  = 0x20000,	/* PIB Information valid */
++	BC_POUT_FLAGS_ENCRYPTED	  = 0x40000,	/* Data is encrypted. */
++	BC_POUT_FLAGS_FLD_BOT	  = 0x80000,	/* Bottom Field data */
++};
++
++//Decoder Capability
++enum DECODER_CAP_FLAGS
++{
++	BC_DEC_FLAGS_H264		= 0x01,
++	BC_DEC_FLAGS_MPEG2		= 0x02,
++	BC_DEC_FLAGS_VC1		= 0x04,
++	BC_DEC_FLAGS_M4P2		= 0x08,	//MPEG-4 Part 2: Divx, Xvid etc.
++};
++
++#if defined(__KERNEL__) || defined(__LINUX_USER__)
++typedef BC_STATUS(*dts_pout_callback)(void  *shnd, uint32_t width, uint32_t height, uint32_t stride, void *pOut);
++#else
++typedef BC_STATUS(*dts_pout_callback)(void  *shnd, uint32_t width, uint32_t height, uint32_t stride, struct _BC_DTS_PROC_OUT *pOut);
++#endif
++
++/* Line 21 Closed Caption */
++/* User Data */
++#define MAX_UD_SIZE		1792	/* 1920 - 128 */
++
++typedef struct _BC_DTS_PROC_OUT {
++	uint8_t		*Ybuff;			/* Caller Supplied buffer for Y data */
++	uint32_t	YbuffSz;		/* Caller Supplied Y buffer size */
++	uint32_t	YBuffDoneSz;		/* Transferred Y datasize */
++
++	uint8_t		*UVbuff;		/* Caller Supplied buffer for UV data */
++	uint32_t	UVbuffSz;		/* Caller Supplied UV buffer size */
++	uint32_t	UVBuffDoneSz;		/* Transferred UV data size */
++
++	uint32_t	StrideSz;		/* Caller supplied Stride Size */
++	uint32_t	PoutFlags;		/* Call IN Flags */
++
++	uint32_t	discCnt;		/* Picture discontinuity count */
++
++	BC_PIC_INFO_BLOCK PicInfo;		/* Picture Information Block Data */
++
++	/* Line 21 Closed Caption */
++	/* User Data */
++	uint32_t	UserDataSz;
++	uint8_t		UserData[MAX_UD_SIZE];
++
++	void		*hnd;
++	dts_pout_callback AppCallBack;
++	uint8_t		DropFrames;
++	uint8_t		b422Mode;		/* Picture output Mode */
++	uint8_t		bPibEnc;		/* PIB encrypted */
++	uint8_t		bRevertScramble;
++	uint32_t	StrideSzUV;		/* Caller supplied Stride Size */
++
++} BC_DTS_PROC_OUT;
++
++typedef struct _BC_DTS_STATUS {
++	uint8_t		ReadyListCount;	/* Number of frames in ready list (reported by driver) */
++	uint8_t		FreeListCount;	/* Number of frame buffers free.  (reported by driver) */
++	uint8_t		PowerStateChange; /* Number of active state power transitions (reported by driver) */
++	uint8_t		reserved_[1];
++
++	uint32_t	FramesDropped;	/* Number of frames dropped.  (reported by DIL) */
++	uint32_t	FramesCaptured;	/* Number of frames captured. (reported by DIL) */
++	uint32_t	FramesRepeated;	/* Number of frames repeated. (reported by DIL) */
++
++	uint32_t	InputCount;	/* Times compressed video has been sent to the HW.
++					 * i.e. Successful DtsProcInput() calls (reported by DIL) */
++	uint64_t	InputTotalSize;	/* Amount of compressed video that has been sent to the HW.
++					 * (reported by DIL) */
++	uint32_t	InputBusyCount;	/* Times compressed video has attempted to be sent to the HW
++					 * but the input FIFO was full. (reported by DIL) */
++
++	uint32_t	PIBMissCount;	/* Amount of times a PIB is invalid. (reported by DIL) */
++
++	uint32_t	cpbEmptySize;	/* supported only for H.264, specifically changed for
++					 * SingleThreadedAppMode. Report size of CPB buffer available.
++					 * Reported by DIL */
++	uint64_t	NextTimeStamp;	/* TimeStamp of the next picture that will be returned
++					 * by a call to ProcOutput. Added for SingleThreadedAppMode.
++					 * Reported back from the driver */
++	uint8_t		TxBufData;
++
++	uint8_t		reserved__[3];
++
++	uint32_t	picNumFlags; /* Picture number and flags of the next picture to be delivered from the driver */
++
++	uint8_t		reserved___[8];
++
++} BC_DTS_STATUS;
++
++#define BC_SWAP32(_v)			\
++	((((_v) & 0xFF000000)>>24)|	\
++	  (((_v) & 0x00FF0000)>>8)|	\
++	  (((_v) & 0x0000FF00)<<8)|	\
++	  (((_v) & 0x000000FF)<<24))
++
++#define WM_AGENT_TRAYICON_DECODER_OPEN	10001
++#define WM_AGENT_TRAYICON_DECODER_CLOSE	10002
++#define WM_AGENT_TRAYICON_DECODER_START	10003
++#define WM_AGENT_TRAYICON_DECODER_STOP	10004
++#define WM_AGENT_TRAYICON_DECODER_RUN	10005
++#define WM_AGENT_TRAYICON_DECODER_PAUSE	10006
++
++#define MAX_COLOR_SPACES	3
++
++typedef enum _BC_OUTPUT_FORMAT {
++	MODE420			= 0x0,
++	MODE422_YUY2		= 0x1,
++	MODE422_UYVY		= 0x2,
++	OUTPUT_MODE420		= 0x0,
++	OUTPUT_MODE422_YUY2	= 0x1,
++	OUTPUT_MODE422_UYVY	= 0x2,
++	OUTPUT_MODE420_NV12	= 0x0,
++	OUTPUT_MODE_INVALID	= 0xFF,
++} BC_OUTPUT_FORMAT;
++
++typedef struct _BC_COLOR_SPACES_ {
++	BC_OUTPUT_FORMAT	OutFmt[MAX_COLOR_SPACES];
++	uint16_t		Count;
++} BC_COLOR_SPACES;
++
++
++typedef enum _BC_CAPS_FLAGS_ {
++	PES_CONV_SUPPORT	= 1,	/*Support PES Conversion*/
++	MULTIPLE_DECODE_SUPPORT	= 2	/*Support multiple stream decode*/
++} BC_CAPS_FLAGS;
++
++typedef struct _BC_HW_CAPABILITY_ {
++	BC_CAPS_FLAGS		flags;
++	BC_COLOR_SPACES		ColorCaps;
++	void*			Reserved1;	/* Expansion Of API */
++
++	//Decoder Capability
++	uint32_t		DecCaps;	//DECODER_CAP_FLAGS
++} BC_HW_CAPS, *PBC_HW_CAPS;
++
++typedef struct _BC_SCALING_PARAMS_ {
++	uint32_t	sWidth;
++	uint32_t	sHeight;
++	uint32_t	DNR;
++	uint32_t	Reserved1;	/*Expansion Of API*/
++	uint8_t		*Reserved2;	/*Expansion OF API*/
++	uint32_t	Reserved3;	/*Expansion Of API*/
++	uint8_t		*Reserved4;	/*Expansion Of API*/
++
++} BC_SCALING_PARAMS, *PBC_SCALING_PARAMS;
++
++typedef enum _BC_MEDIA_SUBTYPE_ {
++	BC_MSUBTYPE_INVALID = 0,
++	BC_MSUBTYPE_MPEG1VIDEO,
++	BC_MSUBTYPE_MPEG2VIDEO,
++	BC_MSUBTYPE_H264,
++	BC_MSUBTYPE_WVC1,
++	BC_MSUBTYPE_WMV3,
++	BC_MSUBTYPE_AVC1,
++	BC_MSUBTYPE_WMVA,
++	BC_MSUBTYPE_VC1,
++	BC_MSUBTYPE_DIVX,
++	BC_MSUBTYPE_DIVX311,
++	BC_MSUBTYPE_OTHERS	/*Types to facilitate PES conversion*/
++} BC_MEDIA_SUBTYPE;
++
++typedef struct _BC_INPUT_FORMAT_ {
++	BOOL        FGTEnable;      /*Enable processing of FGT SEI*/
++	BOOL        MetaDataEnable; /*Enable retrieval of picture metadata to be sent to video pipeline.*/
++	BOOL        Progressive;    /*Instruct decoder to always try to send back progressive
++				     frames. If input content is 1080p, the decoder will
++				     ignore pull-down flags and always give 1080p output.
++				     If 1080i content is processed, the decoder will return
++				     1080i data. When this flag is not set, the decoder will
++				     use pull-down information in the input stream to decide
++				     the decoded data format.*/
++	uint32_t    OptFlags;       /*In this field bits 0:3 are used pass default frame rate, bits 4:5 are for operation mode
++				     (used to indicate Blu-ray mode to the decoder) and bit 6 is for the flag mpcOutPutMaxFRate
++				     which when set tells the FW to output at the max rate for the resolution and ignore the
++				     frame rate determined from the stream. Bit 7 is set to indicate that this is single threaded
++				     mode and the driver will be peeked to get timestamps ahead of time*/
++	BC_MEDIA_SUBTYPE mSubtype;  /* Video Media Type*/
++	uint32_t    width;
++	uint32_t    height;
++	uint32_t    startCodeSz;    /*Start code size for H264 clips*/
++	uint8_t     *pMetaData;     /*Metadata buffer that is used to pass sequence header*/
++	uint32_t    metaDataSz;     /*Metadata size*/
++	uint8_t     bEnableScaling;
++	BC_SCALING_PARAMS ScalingParams;
++} BC_INPUT_FORMAT;
++
++typedef struct _BC_INFO_CRYSTAL_ {
++	uint8_t device;
++	union {
++		struct {
++			uint32_t dilRelease:8;
++			uint32_t dilMajor:8;
++			uint32_t dilMinor:16;
++		};
++		uint32_t version;
++	} dilVersion;
++
++	union {
++		struct {
++			uint32_t drvRelease:4;
++			uint32_t drvMajor:8;
++			uint32_t drvMinor:12;
++			uint32_t drvBuild:8;
++		};
++		uint32_t version;
++	} drvVersion;
++
++	union {
++		struct {
++			uint32_t fwRelease:4;
++			uint32_t fwMajor:8;
++			uint32_t fwMinor:12;
++			uint32_t fwBuild:8;
++		};
++		uint32_t version;
++	} fwVersion;
++
++	uint32_t Reserved1; // For future expansion
++	uint32_t Reserved2; // For future expansion
++} BC_INFO_CRYSTAL, *PBC_INFO_CRYSTAL;
++
++#endif	/* _BC_DTS_DEFS_H_ */
+diff --git a/lib/win32/libcrystalhd/bc_dts_types.h b/lib/win32/libcrystalhd/bc_dts_types.h
+new file mode 100644
+index 0000000..a0b9ca5
+--- /dev/null
++++ b/lib/win32/libcrystalhd/bc_dts_types.h
+@@ -0,0 +1,68 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: bc_dts_types.h
++ *
++ *  Description: Data types
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_TYPES_H_
++#define _BC_DTS_TYPES_H_
++
++#ifdef __LINUX_USER__  /* Don't include these for KERNEL.. */
++#include <stdint.h>
++#endif
++
++#ifndef PVOID
++typedef void	*PVOID;
++#endif
++
++#ifndef BOOL
++typedef int	BOOL;
++#endif
++
++#ifdef __LINUX_USER__	/* Don't include these for KERNEL */
++typedef uint32_t	ULONG;
++typedef int32_t		LONG;
++typedef void		*HANDLE;
++#ifndef VOID
++typedef void		VOID;
++#endif
++typedef void		*LPVOID;
++typedef uint32_t	DWORD;
++typedef uint32_t	UINT32;
++typedef uint32_t	*LPDWORD;
++typedef unsigned char	*PUCHAR;
++
++#ifndef TRUE
++	#define TRUE		1
++#endif
++
++#ifndef FALSE
++	#define FALSE		0
++#endif
++
++#else /* !__LINUX_USER__ */
++
++/* For Kernel usage.. */
++typedef bool	bc_bool_t;
++#endif /* __LINUX_USER__ */
++
++#endif
++
+diff --git a/lib/win32/libcrystalhd/libcrystalhd_if.h b/lib/win32/libcrystalhd/libcrystalhd_if.h
+new file mode 100644
+index 0000000..8807842
+--- /dev/null
++++ b/lib/win32/libcrystalhd/libcrystalhd_if.h
+@@ -0,0 +1,1539 @@
++/*****************************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: libcrystalhd_if.h
++ *
++ *  Description: Device Interface Library API.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ *****************************************************************************
++ *
++ * This file is part of libcrystalhd.
++ *
++ * This library is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ ****************************************************************************/
++
++#ifndef _BCM_LDIL_IF_H_
++#define _BCM_LDIL_IF_H_
++
++#include "bc_dts_defs.h"
++
++#define FLEA_MAX_TRICK_MODE_SPEED	6
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*****************************************************************************
++******************************************************************************
++
++                            Theory of operation
++
++
++    The Device Interface Library (DIL) allows application level code, such
++as a DirectShow filter, to access the Broadcom CrystalHD decoder driver to 
++provide hardware decoding for MPEG-2, H.264 (AVC) and VC-1 streams.
++
++    In the Microsoft DirectShow system, the overall system graph would look 
++like the following:
++
+++--------+  +---------------+  +---------------+  +--------------------+
++| Source |->| Demultiplexer |->| Audio decoder |->| DirectSound Device |
+++--------+  +---------------+  +---------------+  +--------------------+
++                    |
++                    |  +-------------------------+  +----------------+
++                    +->| Broadcom decoder filter |->| Video Renderer |
++                       +-------------------------+  +----------------+
++                                  |    |  
++                            +----------------+
++                            |  Broadcom DIL  |
++                            +----------------+
++                                  |    |
++                            +-----------------+
++                            | Broadcom Driver |
++                            +-----------------+
++
++    From the view of the caller, the DIL will accept compressed video streams
++and will output decoded video frames or fields to seperate Y and UV buffers.
++The DIL is responsible solely for decoding video and has no responsibilities
++for audio nor for rendering, as shown in the above diagram.  Audio/video
++sychronization is assisted by feeding the DIL with timestamps so that it
++may pass those timestamps along with the decoded video.  The timestamped
++output video will then be presented at the appropriate time by the renderer.
++
++A minimal implementation would be:
++
++    HANDLE              hBRCMhandle;
++    uint8_t             input_buffer[INPUT_SIZE];
++    uint8_t             y_output_buffer[WIDTH*HEIGHT];
++    uint8_t             uv_output_buffer[WIDTH*HEIGHT];
++    BC_DTS_PROC_OUT     sProcOutData = { fill in your values here };
++    BC_PIC_INFO_BLOCK   sPIB = { fill in your values here };
++
++    // Acquire handle for device.
++    DtsDeviceOpen(&hBRCMhandle, 0);
++     
++    // Elemental stream.
++    DtsOpenDecoder(hBRCMhandle, 0);
++    
++    // H.264, Enable FGT SEI, do not parse metadata, no forced progressive out
++    DtsSetVideoParams(hBRCMhandle,0,1,0,0,0);
++
++    // Tell decoder to wait for input from host. (PC)
++    DtsStartDecoder(hBRCMhandle);       
++
++    // Input buffer address, input buffer size, no timestamp, Unencrypted
++    DtsProcInput(hBRCMhandle,input_buffer,sizeof(input_buffer),0,0);
++
++    // Tell PC to wait for data from decoder.
++    DtsStartCapture(hBRCMhandle);       
++
++    // 16ms timeout, pass pointer to PIB then get the decoded picture.
++    DtsProcOutput(hBRCMhandle,16,&sPIB);
++
++    // Stop the decoder.
++    DtsStopDecoder(hBRCMhandle);
++
++    // Close the decoder
++    DtsCloseDecoder(hBRCMhandle);
++
++    // Release handle for device.
++    DtsDeviceClose(hBRCMhandle);
++
++******************************************************************************
++*****************************************************************************/
++
++#define DRVIFLIB_API
++
++/*****************************************************************************
++Function name:
++
++    DtsDeviceOpen
++
++Description:
++
++    Opens a handle to the decoder device that will be used to address that
++    unique instance of the decoder for all subsequent operations.
++
++    Must be called once when the application opens the decoder for use.
++
++Parameters:
++
++    *hDevice    Pointer to device handle that will be filled in after the
++                device is successfully opened. [OUTPUT]
++
++    mode        Controls the mode in which the device is opened.
++                Currently only mode 0 (normal playback) is supported.
++                All other values will return BC_STS_INV_ARG.
++
++Return:
++
++    Returns BC_STS_SUCCESS or error codes as appropriate.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDeviceOpen(
++    HANDLE   *hDevice,
++    uint32_t mode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsDeviceClose
++
++Description:
++
++    Close the handle to the decoder device.
++
++    Must be called once when the application closes the decoder after use.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++
++Return:
++
++    Returns BC_STS_SUCCESS or error codes as appropriate.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDeviceClose(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetVersion
++
++Description:
++
++    Get version information from the driver as well as API library.
++    Version numbers are maintained in <Major>.<Minor>.<Revision> format.
++    Example ?01.23.4567
++
++    The device must have been previously opened for this call to succeed.
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 31 ?24
++    o Minor     (8 Bits) : Bit 23 ?16
++    o Revision (16 Bits) : Bits 15 ?Bit 0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    DrVer       Device driver version
++    DilVer      Driver interface library version
++
++Return:
++    The revision numbers from the currently loaded driver as well as the
++    driver interface API library.
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetVersion(
++    HANDLE   hDevice,
++    uint32_t *DrVer,
++    uint32_t *DilVer
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetFWVersionFromFile
++
++Description:
++
++    Get version information from the Firmware Bin file when FW is not running
++    Version numbers in FW are maintained in <Major>.<Minor>.<Spl Revision> format.
++    the return value will be of the format:
++    (Major << 16) | (Minor<<8) | Spl_rev ?012345
++
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 24 ?16
++    o Minor     (8 Bits) : Bit 16 ?8
++    o Revision (16 Bits) : Bits 8 ?0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    StreamVer   Stream FW version
++    DecVer      VDEC FW version
++    Rsvd        Reserved for future use
++
++Return:
++    The Stream FW Version umbers from the FW bin file in the install directory
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetFWVersionFromFile(
++    HANDLE   hDevice,
++    uint32_t *StreamVer,
++    uint32_t *DecVer,
++    char     *fname
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetFWVersion
++
++Description:
++
++    Get version information from the Firmware. The version information is obtained
++    from Bin file when the flag is not set. When the flag is set, a FW command is
++    issued to get the version numbers.
++    Version numbers in FW are maintained in <Major>.<Minor>.<Spl Revision> format.
++    Version number will be returned in the following format
++    (Major << 16) | (Minor<<8) | Spl_rev ?012345
++
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 24 ?16
++    o Minor     (8 Bits) : Bit 16 ?8
++    o Revision (16 Bits) : Bits 8 ?Bit 0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    StreamVer   Stream FW version
++    DecVer      VDEC FW version
++    HwVer       Hardware version
++    Rsvd        Reserved for future use
++    flag        Reseved for future use
++
++Return:
++    The Stream FW Version number, VDEC FW version and Hwrev
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetFWVersion(
++    HANDLE   hDevice,
++    uint32_t *StreamVer,
++    uint32_t *DecVer,
++    uint32_t *HwVer,
++    char     *fname,
++    uint32_t flag
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsOpenDecoder
++
++Description:
++
++    Open the decoder for playback operations and sets appropriate parameters
++    for decode of input video data.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    StreamType  Currently supported streams are:
++                        Elementary Streams with no timestamp management (0)
++                        Transport Streams (2)
++                        Elementary Streams with timestamp management (6)
++                All other values will return BC_STS_INV_ARG.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsOpenDecoder(
++    HANDLE   hDevice,
++    uint32_t StreamType
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsCloseDecoder
++
++Description:
++
++    Close the decoder. No further pictures will be produced and all input
++    will be ignored.
++
++    The device must have been previously opened for this call to succeed.
++    This function closes the decoder and cleans up the state of the driver
++    and the library. All pending pictures will be dropped and all outstanding
++    transfers to and from the decoder will be aborted.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsCloseDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStartDecoder
++
++Description:
++
++    Start the actual processing of input data. Before this command the
++    decoder will ignore all of the presented input data.
++
++    DtsOpenDecoder must always be followed by a DtsStartDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed. In addition the video
++    parameters for codec must have been set via a call to DtsSetVideoParams.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStartDecoder(
++    HANDLE hDevice
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetVideoParams
++
++Description:
++
++    Sets various codec parameters that would be used by a subsequent call
++    to DtsStartDecoder.
++
++    DtsSetVideoParams must always be called before DtsStartDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed.
++
++Parameters:
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    videoAlg        Video Codec to be enabled to decode stream.
++                    H.264 (0), VC-1 (4) and MPEG-2 (1) currently supported.
++                    All other values will return BC_STS_INV_ARG
++    FGTEnable       Enable processing of FGT SEI.
++    MetaDataEnable  Enable retrieval of picture metadata to be sent to video
++                    pipeline.
++    Progressive     Instruct decoder to always try to send back progressive
++                    frames. If input content is 1080p, the decoder will
++                    ignore pull-down flags and always give 1080p output.
++                    If 1080i content is processed, the decoder will return
++                    1080i data. When this flag is not set, the decoder will
++                    use pull-down information in the input stream to decide
++                    the decoded data format.
++    OptFlags        In this field bits 0:3 are used pass default frame rate,
++                    bits 4:5 are for operation mode (used to indicate Blu-ray
++                    mode to the decoder) and bit 6 is for the flag mpcOutPutMaxFRate
++                    which when set tells the FW to output at the max rate for the
++                    resolution and ignore the frame rate determined from the
++                    stream. Bit 7 is set to indicate that this is single threaded mode
++                    and the driver will be peeked to get timestamps ahead of time.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetVideoParams(
++    HANDLE   hDevice,
++    uint32_t videoAlg,
++    BOOL     FGTEnable,
++    BOOL     MetaDataEnable,
++    BOOL     Progressive,
++    uint32_t OptFlags
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetInputFormat
++    
++Description:
++
++    Sets input video's various parameters that would be used by a subsequent call
++    to DtsStartDecoder.
++
++    DtsSetInputFormat must always be called before DtsOpenDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed.
++
++Parameters:
++    hDevice         Handle to device. This is obtained via a prior call to DtsDeviceOpen.
++    pInputFormat Pointer to the BC_INPUT_FORMAT data.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetInputFormat(
++    HANDLE  			hDevice,
++    BC_INPUT_FORMAT   *pInputFormat
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetVideoParams
++
++Description:
++
++    Returns various codec parameters that would be used by a subsequent call
++    to DtsStartDecoder. These parameters are either default values or were
++    set via a prior call to DtsSetVideoParams
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    *videoAlg       See DtsSetVideoParams. [OUTPUT]
++    *FGTEnable      See DtsSetVideoParams. [OUTPUT]
++    *MetaDataEnable See DtsSetVideoParams. [OUTPUT]
++    *Progressive    See DtsSetVideoParams. [OUTPUT]
++    Reserved        This field is reserved for possible future expansion.
++                    Set to 0.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetVideoParams(
++    HANDLE   hDevice,
++    uint32_t *videoAlg,
++    BOOL     *FGTEnable,
++    BOOL     *MetaDataEnable,
++    BOOL     *Progressive,
++    uint32_t Reserved
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsFormatChange
++
++Description:
++
++    Changes codec type and parameters.
++
++    The device must have been previously opened for this call to succeed.
++    This function should be used only for mid-stream format changes.
++    DtsStartDecoder must have been called before for this function to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    videoAlg    Video Codec to be enabled to decode stream.
++                H.264 (0), VC-1 (4) and MPEG-2 (1) currently supported. All
++                other values will return BC_STS_INV_ARG
++    FGTEnable   Enable processing of FGT SEI.
++    Progressive Instruct decoder to always try to send back progressive
++                frames. If input content is 1080p, the decoder will ignore
++                pull-down flags and always give 1080p output. If 1080i
++                content is processed, the decoder will return 1080i data.
++                When this flag is not set, the decoder will use pull-down
++                information in the input stream to decide the decoded data
++                format.
++    Reserved    This field is reserved for possible future expansion.
++                Set to 0.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFormatChange(
++    HANDLE   hDevice,
++    uint32_t videoAlg,
++    BOOL     FGTEnable,
++    BOOL     MetaDataEnable,
++    BOOL     Progressive,
++    uint32_t Reserved
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStopDecoder
++
++Description:
++
++    Stop the decoder.
++
++    The device must have been previously opened for this call to succeed.
++    This function will clean up any pending operations and stop the decoder.
++    Internal state is still maintained and the decoder can be restarted.
++    Any pending pictures will be dropped.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStopDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsPauseDecoder
++
++Description:
++
++    Pause the decoder. The paused picture will be repeated by decoder.
++
++    The device must have been previously opened for this call to succeed.
++    In addition the decoder must have been started as well. If the decoder
++    is open but not started, this function will return BC_STS_DEC_NOT_STARTED.
++    If the decoder has not been opened this function will return
++    BC_STS_DEC_NOT_OPEN.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsPauseDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsResumeDecoder
++
++Description:
++
++    Unpause the decoder from a previous paused condition.
++
++    The device must have been previously opened for this call to succeed.
++    If the decoder was not paused previously, this function will return
++    without affecting the decoder with a BC_STS_SUCCESS status. If the
++    decoder is open but not started, this function will return
++    BC_STS_DEC_NOT_STARTED.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsResumeDecoder(
++    HANDLE  hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetVideoPID
++    
++Description:
++
++    Sets the video PID in the input Transport Stream that the decoder
++    needs to process.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice Handle to device. This is obtained via a prior call to
++            DtsDeviceOpen.
++    PID     PID value that decoder needs to process.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetVideoPID(
++    HANDLE    hDevice,
++    uint32_t  pid
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    StartCaptureImmidiate
++    
++Description:
++
++    Instruct the driver to start capturing decoded frames for output.
++
++    The device must have been previously opened for this call to succeed.
++    This function must be called before the first call to DtsProcInput.
++    This function instructs the receive path in the driver to start waiting
++    for valid data to be presented from the decoder.
++
++Parameters:
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsStartCaptureImmidiate(
++    HANDLE    hDevice,
++    uint32_t  Reserved
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    StartCapture
++
++Description:
++
++    Instruct the driver to start capturing decoded frames for output.
++
++    The device must have been previously opened for this call to succeed.
++    This function must be called before the first call to DtsProcInput.
++    This function instructs the receive path in the driver to start waiting
++    for valid data to be presented from the decoder.
++
++Parameters:
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStartCapture(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    FlushRxCapture
++
++Description:
++
++    ***This function is deprecated and is for temporary use only.***
++
++    Flush the driverís queue of pictures and stops the capture process. These
++    functions will be replaced with automatic Stop (End of Sequence) detection.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFlushRxCapture(
++    HANDLE hDevice,
++    BOOL   bDiscardOnly
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcOutput
++
++Description:
++
++    Returns one decoded picture to the caller.
++
++    The device must have been previously opened for this call to succeed.
++
++    == NOTE ====
++        For PIB AND 100% output encryption/scrambling on Bcm LINK hardware
++    use ProcOutputNoCopy() Interace. This interface will not support
++    PIB encryption.
++
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    milliSecWait    Timeout parameter. DtsProcOutput will fail is no picture
++                    is received in this time.
++    *pOut           This is a pointer to the BC_DTS_PROC_OUT structure that is
++                    allocated by the caller. The decoded picture is returned
++                    in this structure. This structure is described in the
++                    data structures section. The actual data buffer to be
++                    filled with the decoded data is allocated by the caller.
++                    Data is copied from the decoder to the buffers before this
++                    function returns. [INPUT/OUTPUT]
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcOutput(
++    HANDLE   hDevice,
++    uint32_t milliSecWait,
++    BC_DTS_PROC_OUT *pOut
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcOutputNoCopy
++
++Description:
++
++    Returns one decoded picture to the caller. Functionality of this API()
++    is very similar to ProcOutPut() API. This API will not copy the video data
++    to caller's buffers but provides the source buffer pointers in pOut structure.
++
++    This is more secure and preferred method for BCM's Link hardware. The actual
++    format conversion/copy routines are provided as part of the Filter/Security
++    layer source code. Using this method, all the clear data handling will be
++    done by bcmDFilter or bcmSec layers which are expected to be in Player's
++    tamper resistant area.
++
++    == NOTE ====
++     1) DtsReleaseOutputBuffs() interface must be called to release the buffers
++        back to DIL if return Status is BC_STS_SUCCESS.
++
++     2) Only this interface supports PIB and full 100% output encryption/Scrambling.
++
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    milliSecWait    Timeout parameter. DtsProcOoutput will fail is no picture
++                    is received in this time.
++    *pOut           This is a pointer to the BC_DTS_PROC_OUT structure that is
++                    allocated by the caller. The decoded picture is returned
++                    in this structure.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcOutputNoCopy(
++    HANDLE   hDevice,
++    uint32_t milliSecWait,
++    BC_DTS_PROC_OUT *pOut
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsReleaseOutputBuffs
++
++Description:
++
++    Release Buffers acquired during ProcOutputNoCopy() interface.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    Reserved        Reserved. Set to NULL.
++
++    fChange         FALSE.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsReleaseOutputBuffs(
++    HANDLE hDevice,
++    PVOID  Reserved,
++    BOOL   fChange
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcInput
++
++Description:
++
++    Sends compressed (coded) data to the decoder for processing.
++
++    The device must have been previously opened for this call to succeed.
++    In addition, suitable keys must have been exchanged for decryption and
++    decode to be successful.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    pUserData   Pointer to data buffer that holds the data to be transferred.
++                [INPUT]
++    sizeInBytes Size in Bytes of data available to be sent to the decoder for
++                processing.
++    Timestamp   Optional timestamp information attached to the media sample
++                that is available in the buffer. If timestamp is present
++                (i.e. non-zero), then this will be reflected in the output
++                sample (picture) produced from the contents of this buffer.
++				Timestamp should be in units of 100 ns.
++    Encrypted   Flag to indicate that the data transfer is not in the clear
++                and that the decoder needs to decrypt before it can decode
++                the data.  Note that due to complexity, it is preferred that
++                the application writer uses the higher level
++                dts_pre_proc_input() call if encypted content will be sent.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcInput(
++    HANDLE   hDevice,
++    uint8_t  *pUserData,
++    uint32_t ulSizeInBytes,
++    uint64_t timeStamp,
++    BOOL     encrypted
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetColorPrimaries
++
++Description:
++
++    Returns color primaries information from the stream being processed.
++
++    The device must have been previously opened for this call to succeed.
++    In addition at least one picture must have been successfully decoded and
++    returned back from the decoder.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    colorPrimaries  Pointer to U32 to receive the color primaries information.
++                    The values returned are described in the previous section
++                    regarding the picture metadata. [OUTPUT]
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetColorPrimaries(
++    HANDLE    hDevice,
++    uint32_t  *colorPrimaries
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsFlushInput
++
++Description:
++
++    Flushes the current channel and causes the decoder to stop accessing input
++    data.  Based on the flush mode parameter, the channel will be flushed from
++    the current point in the input data or from the current processing point.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    Mode            0   Flush at the current input point. use to drain the
++                        input FIFO . All the data that has been received will
++                        be decoded.
++                    1   Flush at the current processing point. All the decoded
++                        frames will be presented but no more data from the
++                        input will be decoded.
++                    2   Flushes all the decoder buffers, input, decoded and
++                        to be decoded.
++                    3   Cancels the pending TX Request from the DIL/driver
++					4	Flushes all the decoder buffers, input, decoded and
++						to be decoded data. Also flushes the drivers buffers
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFlushInput(
++    HANDLE   hDevice,
++    uint32_t Mode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetRateChange
++
++Description:
++
++    Sets the decoder playback speed and direction of playback.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    rate            Inverse of speed x 10000.
++                    Examples:
++                        1/2x playback speed = 20000
++                        1x   playback speed = 10000
++                        2x   playback speed = 5000
++
++    direction       Playback direction.
++                    0   Forward direction.
++                    1   Reverse direction.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetRateChange(
++    HANDLE   hDevice,
++    uint32_t rate,
++    uint8_t  direction
++    );
++
++
++//Set FF Rate for Catching Up
++/*****************************************************************************
++
++Function name:
++
++    DtsSetFFRate
++
++Description:
++
++    Sets the decoder playback FF speed
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    rate            Inverse of speed x 10000.
++                    Examples:
++                        1/2x playback speed = 20000
++                        1x   playback speed = 10000
++                        2x   playback speed = 5000
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetFFRate(
++    HANDLE   hDevice,
++    uint32_t rate
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetSkipPictureMode
++
++Description:
++
++    This command sets the decoder to only decode selected picture types.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    SkipMode        0   IPB, All pictures are decoded.
++
++                    1   IP decoding, This mode skips all non reference pictures.
++
++                    2   I decoding, This mode skips all P/B pictures and only decodes
++                        I pictures.
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetSkipPictureMode(
++    HANDLE   hDevice,
++    uint32_t SkipMode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetIFrameTrickMode
++
++Description:
++
++    This command sets the decoder to decode only I Frames for FF and FR.
++
++    Use this API for I Frame only trick mode play back in either direction. The
++    application/Up stream filter  determines the speed of the playback by
++    means of Skip on the input compressed data.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetIFrameTrickMode(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStepDecoder
++
++Description:
++
++    This function forwards one frame.
++
++    The device must have been opened must be in paused
++    state previously for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStepDecoder(
++    HANDLE hDevice
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsIs422Supported
++
++Description:
++
++    This function returns whether 422 YUV mode is supported or not.
++
++    The device must have been opened previously for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    bSupported  1 - 422 is supported
++                0 - 422 is not supported.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsIs422Supported(
++    HANDLE  hDevice,
++    uint8_t *bSupported
++    );
++
++/*****************************************************************************
++
++Function name:
++
++     DtsSetColorSpace    
++    
++Description:
++
++    This function sets the output sample's color space.
++
++    The device must have been opened previously and must support 422 mode for
++    this call to succeed.
++
++    Use "DtsIs422Supported" to find whether 422 mode is supported.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    422Mode     Mode is defined by BC_OUTPUT_FORMAT as follows -
++				OUTPUT_MODE420		= 0x0,
++				OUTPUT_MODE422_YUY2	= 0x1,
++				OUTPUT_MODE422_UYVY	= 0x2,
++				OUTPUT_MODE_INVALID	= 0xFF
++				Valid values for this API are OUTPUT_MODE422_YUY2 and OUTPUT_MODE422_UYVY
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetColorSpace(
++    HANDLE  hDevice,
++    BC_OUTPUT_FORMAT      Mode422
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSet422Mode
++
++Description:
++
++    This function sets the 422 mode to either YUY2 or UYVY.
++
++    The device must have been opened previously and must support 422 mode for
++    this call to succeed.
++
++    Use "DtsIs422Supported" to find whether 422 mode is supported.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    422Mode     0 - set the YUV mode to YUY2
++                1 - set the YUV mode to UYVY
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSet422Mode(
++    HANDLE  hDevice,
++    uint8_t Mode422
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetDILPath
++
++Description:
++
++    This is a helper function to return DIL's Path.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++    DilPath     Buffer to hold DIL path info upto 256 bytes.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++
++DRVIFLIB_API BC_STATUS
++DtsGetDILPath(
++    HANDLE   hDevice,
++    char   *DilPath,
++    uint32_t size
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsDropPictures
++
++Description:
++
++    This command sets the decoder to skip one or more non-reference (B) pictures
++    in the input data stream.  This is used for when the audio is ahead of
++    video and the application needs to cause video to move ahead to catch up.
++    Reference pictures are not skipped.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    Pictures        The number of non-reference pictures to drop.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDropPictures(
++    HANDLE   hDevice,
++    uint32_t Pictures
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetDriverStatus
++
++Description:
++
++    This command returns various statistics related to the driver and DIL.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    *pStatus        Pointer to BC_DTS_STATUS to receive driver status.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetDriverStatus(
++    HANDLE          hDevice,
++	BC_DTS_STATUS   *pStatus
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetCapabilities
++
++Description:
++
++    This command returns output format support and hardware capabilities.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    pCapsBuffer   Pointer to BC_HW_CAPS to receive HW Output capabilities.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsGetCapabilities (
++	HANDLE  hDevice,
++	PBC_HW_CAPS	pCapsBuffer
++	);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetScaleParams
++
++Description:
++
++    This command sets hardware scaling parameters.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    pScaleParams   Pointer to BC_SCALING_PARAMS to set hardware scaling parameters.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetScaleParams (
++	HANDLE  hDevice,
++	PBC_SCALING_PARAMS pScaleParams
++	);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsIsEndOfStream
++
++Description:
++
++    This command returns whether the end of stream(EOS) is reaching.
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    bEOS   Pointer to uint8_t to indicate if EOS of not
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsIsEndOfStream(
++    HANDLE  hDevice,
++    uint8_t*	bEOS
++);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsCrystalHDVersion
++
++Description:
++
++    This API returns hw and sw version information for Crystal HD solutions
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    bCrystalInfo   Pointer to structure to fill in with information
++
++	device = 0 for BCM70012, 1 for BCM70015
++	
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsCrystalHDVersion(
++    HANDLE  hDevice,
++    PBC_INFO_CRYSTAL bCrystalInfo
++);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsTxFreeSize
++
++Description:
++
++    This API returns the amount of free space in the tx circular buffer
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++Return:
++
++    uint32_t value of number of free bytes in the tx circular buffer
++
++*****************************************************************************/
++DRVIFLIB_API uint32_t
++DtsTxFreeSize(
++    HANDLE  hDevice
++);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/lib/win32/libcrystalhd/libcrystalhd_version.h b/lib/win32/libcrystalhd/libcrystalhd_version.h
+new file mode 100644
+index 0000000..9ac7632
+--- /dev/null
++++ b/lib/win32/libcrystalhd/libcrystalhd_version.h
+@@ -0,0 +1,82 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: libcrystalhd_version.h
++ *
++ *  Description: Version numbering for the driver use.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_VERSION_LNX_
++#define _BC_DTS_VERSION_LNX_
++//
++// The version format that we are adopting is
++// MajorVersion.MinorVersion.Revision
++// This will be the same for all the components.
++//
++//
++#define STRINGIFY_VERSION(MAJ,MIN,REV) STRINGIFIED_VERSION(MAJ,MIN,REV)
++#define STRINGIFIED_VERSION(MAJ,MIN,REV) #MAJ "." #MIN "." #REV
++
++#define STRINGIFY_VERSION_W(MAJ,MIN,REV) STRINGIFIED_VERSION_W(MAJ,MIN,REV)
++#define STRINGIFIED_VERSION_W(MAJ,MIN,REV) #MAJ "." #MIN "." #REV
++
++//
++//  Product Version number is:
++//  x.y.z.a
++//
++//  x = Major release.      1 = Dozer, 2 = Dozer + Link
++//  y = Minor release.      Should increase +1 per "real" release.
++//  z = Branch release.     0 for main branch.  This is +1 per branch release.
++//  a = Build number	+1 per candidate release.  Reset to 0 every "real" release.
++//
++//
++// Enabling Check-In rules enforcement 08092007
++//
++#define INVALID_VERSION		0xFFFF
++
++/*========================== Common For All Components =================================*/
++#define BRCM_MAJOR_VERSION	3
++
++// Note: the driver doesn't currently use these defines, it has its own
++// version information (which should match) stored in bc_dts_glob_lnx.h
++#define DRIVER_MAJOR_VERSION        BRCM_MAJOR_VERSION
++#define DRIVER_MINOR_VERSION        8
++#define DRIVER_REVISION             0
++
++#define RC_FILE_VERSION             STRINGIFY_VERSION(DRIVER_MAJOR_VERSION,DRIVER_MINOR_VERSION,DRIVER_REVISION) ".0"
++
++/*======================= Device Interface Library ========================*/
++#define DIL_MAJOR_VERSION	BRCM_MAJOR_VERSION
++#define DIL_MINOR_VERSION	20
++#define DIL_REVISION		0
++
++#define DIL_RC_FILE_VERSION	STRINGIFY_VERSION(DIL_MAJOR_VERSION,DIL_MINOR_VERSION,DIL_REVISION)
++
++/*========================== deconf utility ==============================*/
++#define DECONF_MAJOR_VERSION	BRCM_MAJOR_VERSION
++#define DECONF_MINOR_VERSION	9
++#define DECONF_REVISION		18
++#define DECONF_RC_FILE_VERSION  STRINGIFY_VERSION(DIL_MAJOR_VERSION,DIL_MINOR_VERSION,DIL_REVISION)
++
++/*========================== Firmware ==============================*/
++#define FW_MAJOR_VERSION        BRCM_MAJOR_VERSION
++#define FW_MINOR_VERSION        60
++#define FW_REVISION		39
++
++#endif
+diff --git a/project/VS2010Express/XBMC.vcxproj b/project/VS2010Express/XBMC.vcxproj
+index 7f652a2..32af238 100644
+--- a/project/VS2010Express/XBMC.vcxproj
++++ b/project/VS2010Express/XBMC.vcxproj
+@@ -233,12 +233,7 @@
+     <ClCompile Include="..\..\xbmc\cores\AudioEngine\Utils\AEUtil.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\DataCacheCore.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Audio\DVDAudioCodecPassthrough.cpp" />
+-    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Overlay\contrib\cc_decoder.c">
+-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug Testsuite|Win32'">CompileAsCpp</CompileAs>
+-    </ClCompile>
+-    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Overlay\contrib\cc_decoder708.cpp" />
++    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\CrystalHD.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodec.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDDemuxers\DVDDemuxBXA.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDDemuxers\DVDDemuxCC.cpp" />
+@@ -1513,6 +1508,7 @@
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\DVDCodecUtils.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\DVDFactoryCodec.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Audio\DVDAudioCodecFFmpeg.cpp" />
++    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecCrystalHD.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecFFmpeg.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecLibMpeg2.cpp" />
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoPPFFmpeg.cpp" />
+@@ -1692,7 +1688,11 @@
+     <ClInclude Include="..\..\xbmc\Autorun.h" />
+     <ClInclude Include="..\..\xbmc\AutoSwitch.h" />
+     <ClInclude Include="..\..\xbmc\BackgroundInfoLoader.h" />
++<<<<<<< HEAD
+     <ClInclude Include="..\..\xbmc\ContextMenuManager.h" />
++=======
++    <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\CrystalHD.h" />
++>>>>>>> parent of 2ca4c9a... Merge pull request #5105 from fritsch/removecrystalhd
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDDemuxers\DVDDemuxPVRClient.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDInputStreams\DVDInputStreamBluray.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDInputStreams\DVDInputStreamPVRManager.h" />
+@@ -2188,6 +2188,7 @@
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Audio\DVDAudioCodecFFmpeg.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DllLibMpeg2.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodec.h" />
++    <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecCrystalHD.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecFFmpeg.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecLibMpeg2.h" />
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoPPFFmpeg.h" />
+@@ -2545,4 +2546,4 @@
+     </VisualStudio>
+   </ProjectExtensions>
+   <Import Project="$(SolutionDir)\$(ProjectFileName).targets.user" Condition="Exists('$(SolutionDir)\$(ProjectFileName).targets.user')" />
+-</Project>
+\ No newline at end of file
++</Project>
+diff --git a/project/VS2010Express/XBMC.vcxproj.filters b/project/VS2010Express/XBMC.vcxproj.filters
+index cd39ec6..c5c90bb 100644
+--- a/project/VS2010Express/XBMC.vcxproj.filters
++++ b/project/VS2010Express/XBMC.vcxproj.filters
+@@ -423,6 +423,9 @@
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Audio\DVDAudioCodecFFmpeg.cpp">
+       <Filter>cores\dvdplayer\DVDCodecs\Audio</Filter>
+     </ClCompile>
++    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecCrystalHD.cpp">
++      <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
++    </ClCompile>
+     <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecFFmpeg.cpp">
+       <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
+     </ClCompile>
+@@ -756,6 +759,9 @@
+     <ClCompile Include="..\..\xbmc\addons\PluginSource.cpp">
+       <Filter>addons</Filter>
+     </ClCompile>
++    <ClCompile Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\CrystalHD.cpp">
++      <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
++    </ClCompile>
+     <ClCompile Include="..\..\xbmc\cores\VideoRenderers\VideoShaders\WinVideoFilter.cpp">
+       <Filter>cores\VideoRenderers\Shaders</Filter>
+     </ClCompile>
+@@ -3197,6 +3203,9 @@
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodec.h">
+       <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
+     </ClInclude>
++    <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecCrystalHD.h">
++      <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
++    </ClInclude>
+     <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\DVDVideoCodecFFmpeg.h">
+       <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
+     </ClInclude>
+@@ -3605,6 +3614,9 @@
+     <ClInclude Include="..\..\xbmc\addons\PluginSource.h">
+       <Filter>addons</Filter>
+     </ClInclude>
++    <ClInclude Include="..\..\xbmc\cores\dvdplayer\DVDCodecs\Video\CrystalHD.h">
++      <Filter>cores\dvdplayer\DVDCodecs\Video</Filter>
++    </ClInclude>
+     <ClInclude Include="..\..\xbmc\cores\VideoRenderers\VideoShaders\WinVideoFilter.h">
+       <Filter>cores\VideoRenderers\Shaders</Filter>
+     </ClInclude>
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 7f33d83..32ff1d9 100644
+index 3ef33e0..a0cd0dd 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -724,6 +724,15 @@
+@@ -792,6 +792,15 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
@@ -122,15 +2675,2377 @@ index 7f33d83..32ff1d9 100644
 +        </setting>
          <setting id="videoplayer.useomx" type="boolean" label="13430" help="36161">
            <requirement>HAVE_LIBOPENMAX</requirement>
-           <dependencies>
-
+           <level>2</level>
+diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
+index 45adf25..cd3c95d 100644
+--- a/tools/depends/target/Makefile
++++ b/tools/depends/target/Makefile
+@@ -27,12 +27,12 @@ endif
+ 
+ ifeq ($(OS),ios)
+   DEPENDS += Backrow
+-  EXCLUDED_DEPENDS = libcec libusb
++  EXCLUDED_DEPENDS = libcec libcrystalhd libusb gmp nettle gnutls
+ endif
+ 
+ ifeq ($(OS),osx)
+-  DEPENDS += libGLEW libsdl
+-  EXCLUDED_DEPENDS = libusb
++  DEPENDS += libGLEW libsdl libcrystalhd
++  EXCLUDED_DEPENDS = libusb gmp nettle gnutls
+ endif
+ 
+ ifeq ($(OS),android)
+diff --git a/tools/depends/target/libcrystalhd/Makefile b/tools/depends/target/libcrystalhd/Makefile
+new file mode 100644
+index 0000000..fa3d443
+--- /dev/null
++++ b/tools/depends/target/libcrystalhd/Makefile
+@@ -0,0 +1,15 @@
++include ../../Makefile.include
++DEPS= ../../Makefile.include
++
++SOURCE=libcrystalhd
++
++all: .installed-$(PLATFORM)
++
++.installed-$(PLATFORM): $(SOURCE)
++	mkdir -p $(PREFIX)/include
++	cp -rf $(SOURCE) $(PREFIX)/include/
++	touch $@
++
++clean:
++distclean::
++	rm -f .installed-$(PLATFORM)
+diff --git a/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_defs.h b/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_defs.h
+new file mode 100644
+index 0000000..2bffb80
+--- /dev/null
++++ b/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_defs.h
+@@ -0,0 +1,635 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: bc_dts_defs.h
++ *
++ *  Description: Common definitions for all components. Only types
++ *		 is allowed to be included from this file.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_DEFS_H_
++#define _BC_DTS_DEFS_H_
++
++#include "bc_dts_types.h"
++
++/* BIT Mask */
++#define BC_BIT(_x)		(1 << (_x))
++
++typedef enum _BC_STATUS {
++	BC_STS_SUCCESS		= 0,
++	BC_STS_INV_ARG		= 1,
++	BC_STS_BUSY		= 2,
++	BC_STS_NOT_IMPL		= 3,
++	BC_STS_PGM_QUIT		= 4,
++	BC_STS_NO_ACCESS	= 5,
++	BC_STS_INSUFF_RES	= 6,
++	BC_STS_IO_ERROR		= 7,
++	BC_STS_NO_DATA		= 8,
++	BC_STS_VER_MISMATCH	= 9,
++	BC_STS_TIMEOUT		= 10,
++	BC_STS_FW_CMD_ERR	= 11,
++	BC_STS_DEC_NOT_OPEN	= 12,
++	BC_STS_ERR_USAGE	= 13,
++	BC_STS_IO_USER_ABORT	= 14,
++	BC_STS_IO_XFR_ERROR	= 15,
++	BC_STS_DEC_NOT_STARTED	= 16,
++	BC_STS_FWHEX_NOT_FOUND	= 17,
++	BC_STS_FMT_CHANGE	= 18,
++	BC_STS_HIF_ACCESS	= 19,
++	BC_STS_CMD_CANCELLED	= 20,
++	BC_STS_FW_AUTH_FAILED	= 21,
++	BC_STS_BOOTLOADER_FAILED = 22,
++	BC_STS_CERT_VERIFY_ERROR = 23,
++	BC_STS_DEC_EXIST_OPEN	= 24,
++	BC_STS_PENDING		= 25,
++	BC_STS_CLK_NOCHG	= 26,
++
++	/* Must be the last one.*/
++	BC_STS_ERROR		= -1
++} BC_STATUS;
++
++/*------------------------------------------------------*
++ *    Registry Key Definitions				*
++ *------------------------------------------------------*/
++#define BC_REG_KEY_MAIN_PATH	"Software\\Broadcom\\MediaPC\\CrystalHD"
++#define BC_REG_KEY_FWPATH		"FirmwareFilePath"
++#define BC_REG_KEY_SEC_OPT		"DbgOptions"
++
++/*
++ * Options:
++ *
++ *  b[5] = Enable RSA KEY in EEPROM Support
++ *  b[6] = Enable Old PIB scheme. (0 = Use PIB with video scheme)
++ *
++ *  b[12] = Enable send message to NotifyIcon
++ *
++ */
++
++typedef enum _BC_SW_OPTIONS {
++	BC_OPT_DOSER_OUT_ENCRYPT	= BC_BIT(3),
++	BC_OPT_LINK_OUT_ENCRYPT		= BC_BIT(29),
++} BC_SW_OPTIONS;
++
++typedef struct _BC_REG_CONFIG{
++	uint32_t		DbgOptions;
++} BC_REG_CONFIG;
++
++#if defined(__KERNEL__) || defined(__LINUX_USER__)
++#else
++/* Align data structures */
++#define ALIGN(x)	__declspec(align(x))
++#endif
++
++/* mode
++ * b[0]..b[7]	= _DtsDeviceOpenMode
++ * b[8]		=  Load new FW
++ * b[9]		=  Load file play back FW
++ * b[10]	=  Disk format (0 for HD DVD and 1 for BLU ray)
++ * b[11]-b[15]	=  default output resolution
++ * b[16]	=  Skip TX CPB Buffer Check
++ * b[17]	=  Adaptive Output Encrypt/Scramble Scheme
++ * b[18]-b[31]	=  reserved for future use
++ */
++
++/* To allow multiple apps to open the device. */
++enum _DtsDeviceOpenMode {
++	DTS_PLAYBACK_MODE = 0,
++	DTS_DIAG_MODE,
++	DTS_MONITOR_MODE,
++	DTS_HWINIT_MODE
++};
++
++/* To enable the filter to selectively enable/disable fixes or erratas */
++enum _DtsDeviceFixMode {
++	DTS_LOAD_NEW_FW		= BC_BIT(8),
++	DTS_LOAD_FILE_PLAY_FW	= BC_BIT(9),
++	DTS_DISK_FMT_BD		= BC_BIT(10),
++	/* b[11]-b[15] : Default output resolution */
++	DTS_SKIP_TX_CHK_CPB	= BC_BIT(16),
++	DTS_ADAPTIVE_OUTPUT_PER	= BC_BIT(17),
++	DTS_INTELLIMAP		= BC_BIT(18),
++	/* b[19]-b[21] : select clock frequency */
++	DTS_PLAYBACK_DROP_RPT_MODE = BC_BIT(22),
++	DTS_DIAG_TEST_MODE = BC_BIT(23),
++	DTS_SINGLE_THREADED_MODE = BC_BIT(24),
++	DTS_FILTER_MODE = BC_BIT(25),
++	DTS_MFT_MODE = BC_BIT(26)
++};
++
++#define DTS_DFLT_RESOLUTION(x)	(x<<11)
++
++#define DTS_DFLT_CLOCK(x) (x<<19)
++
++/* F/W File Version corresponding to S/W Releases */
++enum _FW_FILE_VER {
++	/* S/W release: 02.04.02	F/W release 2.12.2.0 */
++	BC_FW_VER_020402 = ((12<<16) | (2<<8) | (0))
++};
++
++/*------------------------------------------------------*
++ *    Stream Types for DtsOpenDecoder()			*
++ *------------------------------------------------------*/
++enum _DtsOpenDecStreamTypes {
++	BC_STREAM_TYPE_ES		= 0,
++	BC_STREAM_TYPE_PES		= 1,
++	BC_STREAM_TYPE_TS		= 2,
++	BC_STREAM_TYPE_ES_TSTAMP	= 6,
++};
++
++/*------------------------------------------------------*
++ *    Video Algorithms for DtsSetVideoParams()		*
++ *------------------------------------------------------*/
++enum _DtsSetVideoParamsAlgo {
++	BC_VID_ALGO_H264		= 0,
++	BC_VID_ALGO_MPEG2		= 1,
++	BC_VID_ALGO_VC1			= 4,
++	BC_VID_ALGO_DIVX		= 6,
++	BC_VID_ALGO_VC1MP		= 7,
++};
++
++/*------------------------------------------------------*
++ *    MPEG Extension to the PPB				*
++ *------------------------------------------------------*/
++#define BC_MPEG_VALID_PANSCAN		(1)
++
++typedef struct _BC_PIB_EXT_MPEG {
++	uint32_t	valid;
++	/* Always valid,  defaults to picture size if no
++	 * sequence display extension in the stream. */
++	uint32_t	display_horizontal_size;
++	uint32_t	display_vertical_size;
++
++	/* MPEG_VALID_PANSCAN
++	 * Offsets are a copy values from the MPEG stream. */
++	uint32_t	offset_count;
++	int32_t		horizontal_offset[3];
++	int32_t		vertical_offset[3];
++
++} BC_PIB_EXT_MPEG;
++
++/*------------------------------------------------------*
++ *    H.264 Extension to the PPB			*
++ *------------------------------------------------------*/
++/* Bit definitions for 'other.h264.valid' field */
++#define H264_VALID_PANSCAN		(1)
++#define H264_VALID_SPS_CROP		(2)
++#define H264_VALID_VUI			(4)
++
++typedef struct _BC_PIB_EXT_H264 {
++	/* 'valid' specifies which fields (or sets of
++	 * fields) below are valid.  If the corresponding
++	 * bit in 'valid' is NOT set then that field(s)
++	 * is (are) not initialized. */
++	uint32_t	valid;
++
++	/* H264_VALID_PANSCAN */
++	uint32_t	pan_scan_count;
++	int32_t		pan_scan_left[3];
++	int32_t		pan_scan_right[3];
++	int32_t		pan_scan_top[3];
++	int32_t		pan_scan_bottom[3];
++
++	/* H264_VALID_SPS_CROP */
++	int32_t		sps_crop_left;
++	int32_t		sps_crop_right;
++	int32_t		sps_crop_top;
++	int32_t		sps_crop_bottom;
++
++	/* H264_VALID_VUI */
++	uint32_t	chroma_top;
++	uint32_t	chroma_bottom;
++
++} BC_PIB_EXT_H264;
++
++/*------------------------------------------------------*
++ *    VC1 Extension to the PPB				*
++ *------------------------------------------------------*/
++#define VC1_VALID_PANSCAN		(1)
++
++typedef struct _BC_PIB_EXT_VC1 {
++	uint32_t	valid;
++
++	/* Always valid, defaults to picture size if no
++	 * sequence display extension in the stream. */
++	uint32_t	display_horizontal_size;
++	uint32_t	display_vertical_size;
++
++	/* VC1 pan scan windows */
++	uint32_t	num_panscan_windows;
++	int32_t		ps_horiz_offset[4];
++	int32_t		ps_vert_offset[4];
++	int32_t		ps_width[4];
++	int32_t		ps_height[4];
++
++} BC_PIB_EXT_VC1;
++
++
++/*------------------------------------------------------*
++ *    Picture Information Block				*
++ *------------------------------------------------------*/
++#if defined(__LINUX_USER__)
++/* Values for 'pulldown' field.  '0' means no pulldown information
++ * was present for this picture. */
++enum {
++	vdecNoPulldownInfo	= 0,
++	vdecTop			= 1,
++	vdecBottom		= 2,
++	vdecTopBottom		= 3,
++	vdecBottomTop		= 4,
++	vdecTopBottomTop	= 5,
++	vdecBottomTopBottom	= 6,
++	vdecFrame_X2		= 7,
++	vdecFrame_X3		= 8,
++	vdecFrame_X1		= 9,
++	vdecFrame_X4		= 10,
++};
++
++/* Values for the 'frame_rate' field. */
++enum {
++	vdecFrameRateUnknown = 0,
++	vdecFrameRate23_97,
++	vdecFrameRate24,
++	vdecFrameRate25,
++	vdecFrameRate29_97,
++	vdecFrameRate30,
++	vdecFrameRate50,
++	vdecFrameRate59_94,
++	vdecFrameRate60,
++	vdecFrameRate14_985,
++	vdecFrameRate7_496,
++};
++
++/* Values for the 'aspect_ratio' field. */
++enum {
++	vdecAspectRatioUnknown = 0,
++	vdecAspectRatioSquare,
++	vdecAspectRatio12_11,
++	vdecAspectRatio10_11,
++	vdecAspectRatio16_11,
++	vdecAspectRatio40_33,
++	vdecAspectRatio24_11,
++	vdecAspectRatio20_11,
++	vdecAspectRatio32_11,
++	vdecAspectRatio80_33,
++	vdecAspectRatio18_11,
++	vdecAspectRatio15_11,
++	vdecAspectRatio64_33,
++	vdecAspectRatio160_99,
++	vdecAspectRatio4_3,
++	vdecAspectRatio16_9,
++	vdecAspectRatio221_1,
++	vdecAspectRatioOther = 255,
++};
++
++/* Values for the 'colour_primaries' field. */
++enum {
++	vdecColourPrimariesUnknown = 0,
++	vdecColourPrimariesBT709,
++	vdecColourPrimariesUnspecified,
++	vdecColourPrimariesReserved,
++	vdecColourPrimariesBT470_2M = 4,
++	vdecColourPrimariesBT470_2BG,
++	vdecColourPrimariesSMPTE170M,
++	vdecColourPrimariesSMPTE240M,
++	vdecColourPrimariesGenericFilm,
++};
++
++enum {
++	vdecRESOLUTION_CUSTOM	= 0x00000000, /* custom */
++	vdecRESOLUTION_480i	= 0x00000001, /* 480i */
++	vdecRESOLUTION_1080i	= 0x00000002, /* 1080i (1920x1080, 60i) */
++	vdecRESOLUTION_NTSC	= 0x00000003, /* NTSC (720x483, 60i) */
++	vdecRESOLUTION_480p	= 0x00000004, /* 480p (720x480, 60p) */
++	vdecRESOLUTION_720p	= 0x00000005, /* 720p (1280x720, 60p) */
++	vdecRESOLUTION_PAL1	= 0x00000006, /* PAL_1 (720x576, 50i) */
++	vdecRESOLUTION_1080i25	= 0x00000007, /* 1080i25 (1920x1080, 50i) */
++	vdecRESOLUTION_720p50	= 0x00000008, /* 720p50 (1280x720, 50p) */
++	vdecRESOLUTION_576p	= 0x00000009, /* 576p (720x576, 50p) */
++	vdecRESOLUTION_1080i29_97 = 0x0000000A, /* 1080i (1920x1080, 59.94i) */
++	vdecRESOLUTION_720p59_94  = 0x0000000B, /* 720p (1280x720, 59.94p) */
++	vdecRESOLUTION_SD_DVD	= 0x0000000C, /* SD DVD (720x483, 60i) */
++	vdecRESOLUTION_480p656	= 0x0000000D, /* 480p (720x480, 60p), output bus width 8 bit, clock 74.25MHz */
++	vdecRESOLUTION_1080p23_976 = 0x0000000E, /* 1080p23_976 (1920x1080, 23.976p) */
++	vdecRESOLUTION_720p23_976  = 0x0000000F, /* 720p23_976 (1280x720p, 23.976p) */
++	vdecRESOLUTION_240p29_97   = 0x00000010, /* 240p (1440x240, 29.97p ) */
++	vdecRESOLUTION_240p30	= 0x00000011, /* 240p (1440x240, 30p) */
++	vdecRESOLUTION_288p25	= 0x00000012, /* 288p (1440x288p, 25p) */
++	vdecRESOLUTION_1080p29_97 = 0x00000013, /* 1080p29_97 (1920x1080, 29.97p) */
++	vdecRESOLUTION_1080p30	= 0x00000014, /* 1080p30 (1920x1080, 30p) */
++	vdecRESOLUTION_1080p24	= 0x00000015, /* 1080p24 (1920x1080, 24p) */
++	vdecRESOLUTION_1080p25	= 0x00000016, /* 1080p25 (1920x1080, 25p) */
++	vdecRESOLUTION_720p24	= 0x00000017, /* 720p24 (1280x720, 25p) */
++	vdecRESOLUTION_720p29_97  = 0x00000018, /* 720p29.97 (1280x720, 29.97p) */
++	vdecRESOLUTION_480p23_976 = 0x00000019, /* 480p23.976 (720*480, 23.976) */
++	vdecRESOLUTION_480p29_97  = 0x0000001A, /* 480p29.976 (720*480, 29.97p) */
++	vdecRESOLUTION_576p25	= 0x0000001B, /* 576p25 (720*576, 25p) */
++	/* For Zero Frame Rate */
++	vdecRESOLUTION_480p0	= 0x0000001C, /* 480p (720x480, 0p) */
++	vdecRESOLUTION_480i0	= 0x0000001D, /* 480i (720x480, 0i) */
++	vdecRESOLUTION_576p0	= 0x0000001E, /* 576p (720x576, 0p) */
++	vdecRESOLUTION_720p0	= 0x0000001F, /* 720p (1280x720, 0p) */
++	vdecRESOLUTION_1080p0	= 0x00000020, /* 1080p (1920x1080, 0p) */
++	vdecRESOLUTION_1080i0	= 0x00000021, /* 1080i (1920x1080, 0i) */
++};
++
++/* Bit definitions for 'flags' field */
++#define VDEC_FLAG_EOS				(0x0004)
++
++#define VDEC_FLAG_FRAME				(0x0000)
++#define VDEC_FLAG_FIELDPAIR			(0x0008)
++#define VDEC_FLAG_TOPFIELD			(0x0010)
++#define VDEC_FLAG_BOTTOMFIELD			(0x0018)
++
++#define VDEC_FLAG_PROGRESSIVE_SRC		(0x0000)
++#define VDEC_FLAG_INTERLACED_SRC		(0x0020)
++#define VDEC_FLAG_UNKNOWN_SRC			(0x0040)
++
++#define VDEC_FLAG_BOTTOM_FIRST			(0x0080)
++#define VDEC_FLAG_LAST_PICTURE			(0x0100)
++
++#define VDEC_FLAG_PICTURE_META_DATA_PRESENT	(0x40000)
++
++#endif /* __LINUX_USER__ */
++
++typedef struct _BC_PIC_INFO_BLOCK {
++	/* Common fields. */
++	uint64_t	timeStamp;	/* Timestamp */
++	uint32_t	picture_number;	/* Ordinal display number  */
++	uint32_t	width;		/* pixels	    */
++	uint32_t	height;		/* pixels	    */
++	uint32_t	chroma_format;	/* 0x420, 0x422 or 0x444 */
++	uint32_t	pulldown;
++	uint32_t	flags;
++	uint32_t	frame_rate;
++	uint32_t	aspect_ratio;
++	uint32_t	colour_primaries;
++	uint32_t	picture_meta_payload;
++	uint32_t	sess_num;
++	uint32_t	ycom;
++	uint32_t	custom_aspect_ratio_width_height;
++	uint32_t	n_drop;	/* number of non-reference frames remaining to be dropped */
++
++	/* Protocol-specific extensions. */
++	union {
++		BC_PIB_EXT_H264	h264;
++		BC_PIB_EXT_MPEG	mpeg;
++		BC_PIB_EXT_VC1	 vc1;
++	} other;
++
++} BC_PIC_INFO_BLOCK, *PBC_PIC_INFO_BLOCK;
++
++/*------------------------------------------------------*
++ *    ProcOut Info					*
++ *------------------------------------------------------*/
++/* Optional flags for ProcOut Interface.*/
++enum _POUT_OPTIONAL_IN_FLAGS_{
++	/* Flags from App to Device */
++	BC_POUT_FLAGS_YV12	  = 0x01,	/* Copy Data in YV12 format */
++	BC_POUT_FLAGS_STRIDE	  = 0x02,	/* Stride size is valid. */
++	BC_POUT_FLAGS_SIZE	  = 0x04,	/* Take size information from Application */
++	BC_POUT_FLAGS_INTERLACED  = 0x08,	/* copy only half the bytes */
++	BC_POUT_FLAGS_INTERLEAVED = 0x10,	/* interleaved frame */
++	BC_POUT_FLAGS_STRIDE_UV	  = 0x20,	/* Stride size is valid (for UV buffers). */
++	BC_POUT_FLAGS_MODE	  = 0x40,	/* Take output mode from Application, overrides YV12 flag if on */
++
++	/* Flags from Device to APP */
++	BC_POUT_FLAGS_FMT_CHANGE  = 0x10000,	/* Data is not VALID when this flag is set */
++	BC_POUT_FLAGS_PIB_VALID	  = 0x20000,	/* PIB Information valid */
++	BC_POUT_FLAGS_ENCRYPTED	  = 0x40000,	/* Data is encrypted. */
++	BC_POUT_FLAGS_FLD_BOT	  = 0x80000,	/* Bottom Field data */
++};
++
++//Decoder Capability
++enum DECODER_CAP_FLAGS
++{
++	BC_DEC_FLAGS_H264		= 0x01,
++	BC_DEC_FLAGS_MPEG2		= 0x02,
++	BC_DEC_FLAGS_VC1		= 0x04,
++	BC_DEC_FLAGS_M4P2		= 0x08,	//MPEG-4 Part 2: Divx, Xvid etc.
++};
++
++#if defined(__KERNEL__) || defined(__LINUX_USER__)
++typedef BC_STATUS(*dts_pout_callback)(void  *shnd, uint32_t width, uint32_t height, uint32_t stride, void *pOut);
++#else
++typedef BC_STATUS(*dts_pout_callback)(void  *shnd, uint32_t width, uint32_t height, uint32_t stride, struct _BC_DTS_PROC_OUT *pOut);
++#endif
++
++/* Line 21 Closed Caption */
++/* User Data */
++#define MAX_UD_SIZE		1792	/* 1920 - 128 */
++
++typedef struct _BC_DTS_PROC_OUT {
++	uint8_t		*Ybuff;			/* Caller Supplied buffer for Y data */
++	uint32_t	YbuffSz;		/* Caller Supplied Y buffer size */
++	uint32_t	YBuffDoneSz;		/* Transferred Y datasize */
++
++	uint8_t		*UVbuff;		/* Caller Supplied buffer for UV data */
++	uint32_t	UVbuffSz;		/* Caller Supplied UV buffer size */
++	uint32_t	UVBuffDoneSz;		/* Transferred UV data size */
++
++	uint32_t	StrideSz;		/* Caller supplied Stride Size */
++	uint32_t	PoutFlags;		/* Call IN Flags */
++
++	uint32_t	discCnt;		/* Picture discontinuity count */
++
++	BC_PIC_INFO_BLOCK PicInfo;		/* Picture Information Block Data */
++
++	/* Line 21 Closed Caption */
++	/* User Data */
++	uint32_t	UserDataSz;
++	uint8_t		UserData[MAX_UD_SIZE];
++
++	void		*hnd;
++	dts_pout_callback AppCallBack;
++	uint8_t		DropFrames;
++	uint8_t		b422Mode;		/* Picture output Mode */
++	uint8_t		bPibEnc;		/* PIB encrypted */
++	uint8_t		bRevertScramble;
++	uint32_t	StrideSzUV;		/* Caller supplied Stride Size */
++
++} BC_DTS_PROC_OUT;
++
++typedef struct _BC_DTS_STATUS {
++	uint8_t		ReadyListCount;	/* Number of frames in ready list (reported by driver) */
++	uint8_t		FreeListCount;	/* Number of frame buffers free.  (reported by driver) */
++	uint8_t		PowerStateChange; /* Number of active state power transitions (reported by driver) */
++	uint8_t		reserved_[1];
++
++	uint32_t	FramesDropped;	/* Number of frames dropped.  (reported by DIL) */
++	uint32_t	FramesCaptured;	/* Number of frames captured. (reported by DIL) */
++	uint32_t	FramesRepeated;	/* Number of frames repeated. (reported by DIL) */
++
++	uint32_t	InputCount;	/* Times compressed video has been sent to the HW.
++					 * i.e. Successful DtsProcInput() calls (reported by DIL) */
++	uint64_t	InputTotalSize;	/* Amount of compressed video that has been sent to the HW.
++					 * (reported by DIL) */
++	uint32_t	InputBusyCount;	/* Times compressed video has attempted to be sent to the HW
++					 * but the input FIFO was full. (reported by DIL) */
++
++	uint32_t	PIBMissCount;	/* Amount of times a PIB is invalid. (reported by DIL) */
++
++	uint32_t	cpbEmptySize;	/* supported only for H.264, specifically changed for
++					 * SingleThreadedAppMode. Report size of CPB buffer available.
++					 * Reported by DIL */
++	uint64_t	NextTimeStamp;	/* TimeStamp of the next picture that will be returned
++					 * by a call to ProcOutput. Added for SingleThreadedAppMode.
++					 * Reported back from the driver */
++	uint8_t		TxBufData;
++
++	uint8_t		reserved__[3];
++
++	uint32_t	picNumFlags; /* Picture number and flags of the next picture to be delivered from the driver */
++
++	uint8_t		reserved___[8];
++
++} BC_DTS_STATUS;
++
++#define BC_SWAP32(_v)			\
++	((((_v) & 0xFF000000)>>24)|	\
++	  (((_v) & 0x00FF0000)>>8)|	\
++	  (((_v) & 0x0000FF00)<<8)|	\
++	  (((_v) & 0x000000FF)<<24))
++
++#define WM_AGENT_TRAYICON_DECODER_OPEN	10001
++#define WM_AGENT_TRAYICON_DECODER_CLOSE	10002
++#define WM_AGENT_TRAYICON_DECODER_START	10003
++#define WM_AGENT_TRAYICON_DECODER_STOP	10004
++#define WM_AGENT_TRAYICON_DECODER_RUN	10005
++#define WM_AGENT_TRAYICON_DECODER_PAUSE	10006
++
++#define MAX_COLOR_SPACES	3
++
++typedef enum _BC_OUTPUT_FORMAT {
++	MODE420			= 0x0,
++	MODE422_YUY2		= 0x1,
++	MODE422_UYVY		= 0x2,
++	OUTPUT_MODE420		= 0x0,
++	OUTPUT_MODE422_YUY2	= 0x1,
++	OUTPUT_MODE422_UYVY	= 0x2,
++	OUTPUT_MODE420_NV12	= 0x0,
++	OUTPUT_MODE_INVALID	= 0xFF,
++} BC_OUTPUT_FORMAT;
++
++typedef struct _BC_COLOR_SPACES_ {
++	BC_OUTPUT_FORMAT	OutFmt[MAX_COLOR_SPACES];
++	uint16_t		Count;
++} BC_COLOR_SPACES;
++
++
++typedef enum _BC_CAPS_FLAGS_ {
++	PES_CONV_SUPPORT	= 1,	/*Support PES Conversion*/
++	MULTIPLE_DECODE_SUPPORT	= 2	/*Support multiple stream decode*/
++} BC_CAPS_FLAGS;
++
++typedef struct _BC_HW_CAPABILITY_ {
++	BC_CAPS_FLAGS		flags;
++	BC_COLOR_SPACES		ColorCaps;
++	void*			Reserved1;	/* Expansion Of API */
++
++	//Decoder Capability
++	uint32_t		DecCaps;	//DECODER_CAP_FLAGS
++} BC_HW_CAPS, *PBC_HW_CAPS;
++
++typedef struct _BC_SCALING_PARAMS_ {
++	uint32_t	sWidth;
++	uint32_t	sHeight;
++	uint32_t	DNR;
++	uint32_t	Reserved1;	/*Expansion Of API*/
++	uint8_t		*Reserved2;	/*Expansion OF API*/
++	uint32_t	Reserved3;	/*Expansion Of API*/
++	uint8_t		*Reserved4;	/*Expansion Of API*/
++
++} BC_SCALING_PARAMS, *PBC_SCALING_PARAMS;
++
++typedef enum _BC_MEDIA_SUBTYPE_ {
++	BC_MSUBTYPE_INVALID = 0,
++	BC_MSUBTYPE_MPEG1VIDEO,
++	BC_MSUBTYPE_MPEG2VIDEO,
++	BC_MSUBTYPE_H264,
++	BC_MSUBTYPE_WVC1,
++	BC_MSUBTYPE_WMV3,
++	BC_MSUBTYPE_AVC1,
++	BC_MSUBTYPE_WMVA,
++	BC_MSUBTYPE_VC1,
++	BC_MSUBTYPE_DIVX,
++	BC_MSUBTYPE_DIVX311,
++	BC_MSUBTYPE_OTHERS	/*Types to facilitate PES conversion*/
++} BC_MEDIA_SUBTYPE;
++
++typedef struct _BC_INPUT_FORMAT_ {
++	BOOL        FGTEnable;      /*Enable processing of FGT SEI*/
++	BOOL        MetaDataEnable; /*Enable retrieval of picture metadata to be sent to video pipeline.*/
++	BOOL        Progressive;    /*Instruct decoder to always try to send back progressive
++				     frames. If input content is 1080p, the decoder will
++				     ignore pull-down flags and always give 1080p output.
++				     If 1080i content is processed, the decoder will return
++				     1080i data. When this flag is not set, the decoder will
++				     use pull-down information in the input stream to decide
++				     the decoded data format.*/
++	uint32_t    OptFlags;       /*In this field bits 0:3 are used pass default frame rate, bits 4:5 are for operation mode
++				     (used to indicate Blu-ray mode to the decoder) and bit 6 is for the flag mpcOutPutMaxFRate
++				     which when set tells the FW to output at the max rate for the resolution and ignore the
++				     frame rate determined from the stream. Bit 7 is set to indicate that this is single threaded
++				     mode and the driver will be peeked to get timestamps ahead of time*/
++	BC_MEDIA_SUBTYPE mSubtype;  /* Video Media Type*/
++	uint32_t    width;
++	uint32_t    height;
++	uint32_t    startCodeSz;    /*Start code size for H264 clips*/
++	uint8_t     *pMetaData;     /*Metadata buffer that is used to pass sequence header*/
++	uint32_t    metaDataSz;     /*Metadata size*/
++	uint8_t     bEnableScaling;
++	BC_SCALING_PARAMS ScalingParams;
++} BC_INPUT_FORMAT;
++
++typedef struct _BC_INFO_CRYSTAL_ {
++	uint8_t device;
++	union {
++		struct {
++			uint32_t dilRelease:8;
++			uint32_t dilMajor:8;
++			uint32_t dilMinor:16;
++		};
++		uint32_t version;
++	} dilVersion;
++
++	union {
++		struct {
++			uint32_t drvRelease:4;
++			uint32_t drvMajor:8;
++			uint32_t drvMinor:12;
++			uint32_t drvBuild:8;
++		};
++		uint32_t version;
++	} drvVersion;
++
++	union {
++		struct {
++			uint32_t fwRelease:4;
++			uint32_t fwMajor:8;
++			uint32_t fwMinor:12;
++			uint32_t fwBuild:8;
++		};
++		uint32_t version;
++	} fwVersion;
++
++	uint32_t Reserved1; // For future expansion
++	uint32_t Reserved2; // For future expansion
++} BC_INFO_CRYSTAL, *PBC_INFO_CRYSTAL;
++
++#endif	/* _BC_DTS_DEFS_H_ */
+diff --git a/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_types.h b/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_types.h
+new file mode 100644
+index 0000000..a0b9ca5
+--- /dev/null
++++ b/tools/depends/target/libcrystalhd/libcrystalhd/bc_dts_types.h
+@@ -0,0 +1,68 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: bc_dts_types.h
++ *
++ *  Description: Data types
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_TYPES_H_
++#define _BC_DTS_TYPES_H_
++
++#ifdef __LINUX_USER__  /* Don't include these for KERNEL.. */
++#include <stdint.h>
++#endif
++
++#ifndef PVOID
++typedef void	*PVOID;
++#endif
++
++#ifndef BOOL
++typedef int	BOOL;
++#endif
++
++#ifdef __LINUX_USER__	/* Don't include these for KERNEL */
++typedef uint32_t	ULONG;
++typedef int32_t		LONG;
++typedef void		*HANDLE;
++#ifndef VOID
++typedef void		VOID;
++#endif
++typedef void		*LPVOID;
++typedef uint32_t	DWORD;
++typedef uint32_t	UINT32;
++typedef uint32_t	*LPDWORD;
++typedef unsigned char	*PUCHAR;
++
++#ifndef TRUE
++	#define TRUE		1
++#endif
++
++#ifndef FALSE
++	#define FALSE		0
++#endif
++
++#else /* !__LINUX_USER__ */
++
++/* For Kernel usage.. */
++typedef bool	bc_bool_t;
++#endif /* __LINUX_USER__ */
++
++#endif
++
+diff --git a/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_if.h b/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_if.h
+new file mode 100644
+index 0000000..45fa7a6
+--- /dev/null
++++ b/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_if.h
+@@ -0,0 +1,1515 @@
++/*****************************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: libcrystalhd_if.h
++ *
++ *  Description: Device Interface Library API.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ *****************************************************************************
++ *
++ * This file is part of libcrystalhd.
++ *
++ * This library is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ ****************************************************************************/
++
++#ifndef _BCM_LDIL_IF_H_
++#define _BCM_LDIL_IF_H_
++
++#include "bc_dts_defs.h"
++
++#define FLEA_MAX_TRICK_MODE_SPEED	6
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*****************************************************************************
++******************************************************************************
++
++                            Theory of operation
++
++
++    The Device Interface Library (DIL) allows application level code, such
++as a DirectShow filter, to access the Broadcom CrystalHD decoder driver to 
++provide hardware decoding for MPEG-2, H.264 (AVC) and VC-1 streams.
++
++    In the Microsoft DirectShow system, the overall system graph would look 
++like the following:
++
+++--------+  +---------------+  +---------------+  +--------------------+
++| Source |->| Demultiplexer |->| Audio decoder |->| DirectSound Device |
+++--------+  +---------------+  +---------------+  +--------------------+
++                    |
++                    |  +-------------------------+  +----------------+
++                    +->| Broadcom decoder filter |->| Video Renderer |
++                       +-------------------------+  +----------------+
++                                  |    |  
++                            +----------------+
++                            |  Broadcom DIL  |
++                            +----------------+
++                                  |    |
++                            +-----------------+
++                            | Broadcom Driver |
++                            +-----------------+
++
++    From the view of the caller, the DIL will accept compressed video streams
++and will output decoded video frames or fields to seperate Y and UV buffers.
++The DIL is responsible solely for decoding video and has no responsibilities
++for audio nor for rendering, as shown in the above diagram.  Audio/video
++sychronization is assisted by feeding the DIL with timestamps so that it
++may pass those timestamps along with the decoded video.  The timestamped
++output video will then be presented at the appropriate time by the renderer.
++
++A minimal implementation would be:
++
++    HANDLE              hBRCMhandle;
++    uint8_t             input_buffer[INPUT_SIZE];
++    uint8_t             y_output_buffer[WIDTH*HEIGHT];
++    uint8_t             uv_output_buffer[WIDTH*HEIGHT];
++    BC_DTS_PROC_OUT     sProcOutData = { fill in your values here };
++    BC_PIC_INFO_BLOCK   sPIB = { fill in your values here };
++
++    // Acquire handle for device.
++    DtsDeviceOpen(&hBRCMhandle, 0);
++     
++    // Elemental stream.
++    DtsOpenDecoder(hBRCMhandle, 0);
++    
++    // H.264, Enable FGT SEI, do not parse metadata, no forced progressive out
++    DtsSetVideoParams(hBRCMhandle,0,1,0,0,0);
++
++    // Tell decoder to wait for input from host. (PC)
++    DtsStartDecoder(hBRCMhandle);       
++
++    // Input buffer address, input buffer size, no timestamp, Unencrypted
++    DtsProcInput(hBRCMhandle,input_buffer,sizeof(input_buffer),0,0);
++
++    // Tell PC to wait for data from decoder.
++    DtsStartCapture(hBRCMhandle);       
++
++    // 16ms timeout, pass pointer to PIB then get the decoded picture.
++    DtsProcOutput(hBRCMhandle,16,&sPIB);
++
++    // Stop the decoder.
++    DtsStopDecoder(hBRCMhandle);
++
++    // Close the decoder
++    DtsCloseDecoder(hBRCMhandle);
++
++    // Release handle for device.
++    DtsDeviceClose(hBRCMhandle);
++
++******************************************************************************
++*****************************************************************************/
++
++#define DRVIFLIB_API
++
++/*****************************************************************************
++Function name:
++
++    DtsDeviceOpen
++
++Description:
++
++    Opens a handle to the decoder device that will be used to address that
++    unique instance of the decoder for all subsequent operations.
++
++    Must be called once when the application opens the decoder for use.
++
++Parameters:
++
++    *hDevice    Pointer to device handle that will be filled in after the
++                device is successfully opened. [OUTPUT]
++
++    mode        Controls the mode in which the device is opened.
++                Currently only mode 0 (normal playback) is supported.
++                All other values will return BC_STS_INV_ARG.
++
++Return:
++
++    Returns BC_STS_SUCCESS or error codes as appropriate.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDeviceOpen(
++    HANDLE   *hDevice,
++    uint32_t mode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsDeviceClose
++
++Description:
++
++    Close the handle to the decoder device.
++
++    Must be called once when the application closes the decoder after use.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++
++Return:
++
++    Returns BC_STS_SUCCESS or error codes as appropriate.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDeviceClose(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetVersion
++
++Description:
++
++    Get version information from the driver as well as API library.
++    Version numbers are maintained in <Major>.<Minor>.<Revision> format.
++    Example ?01.23.4567
++
++    The device must have been previously opened for this call to succeed.
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 31 ?24
++    o Minor     (8 Bits) : Bit 23 ?16
++    o Revision (16 Bits) : Bits 15 ?Bit 0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    DrVer       Device driver version
++    DilVer      Driver interface library version
++
++Return:
++    The revision numbers from the currently loaded driver as well as the
++    driver interface API library.
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetVersion(
++    HANDLE   hDevice,
++    uint32_t *DrVer,
++    uint32_t *DilVer
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetFWVersionFromFile
++
++Description:
++
++    Get version information from the Firmware Bin file when FW is not running
++    Version numbers in FW are maintained in <Major>.<Minor>.<Spl Revision> format.
++    the return value will be of the format:
++    (Major << 16) | (Minor<<8) | Spl_rev ?012345
++
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 24 ?16
++    o Minor     (8 Bits) : Bit 16 ?8
++    o Revision (16 Bits) : Bits 8 ?0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    StreamVer   Stream FW version
++    DecVer      VDEC FW version
++    Rsvd        Reserved for future use
++
++Return:
++    The Stream FW Version umbers from the FW bin file in the install directory
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetFWVersionFromFile(
++    HANDLE   hDevice,
++    uint32_t *StreamVer,
++    uint32_t *DecVer,
++    char     *fname
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetFWVersion
++
++Description:
++
++    Get version information from the Firmware. The version information is obtained
++    from Bin file when the flag is not set. When the flag is set, a FW command is
++    issued to get the version numbers.
++    Version numbers in FW are maintained in <Major>.<Minor>.<Spl Revision> format.
++    Version number will be returned in the following format
++    (Major << 16) | (Minor<<8) | Spl_rev ?012345
++
++    The individual components of the revision number are available as follows:
++
++    o Major     (8 Bits) : Bit 24 ?16
++    o Minor     (8 Bits) : Bit 16 ?8
++    o Revision (16 Bits) : Bits 8 ?Bit 0.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen
++    StreamVer   Stream FW version
++    DecVer      VDEC FW version
++    HwVer       Hardware version
++    Rsvd        Reserved for future use
++    flag        Reseved for future use
++
++Return:
++    The Stream FW Version number, VDEC FW version and Hwrev
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetFWVersion(
++    HANDLE   hDevice,
++    uint32_t *StreamVer,
++    uint32_t *DecVer,
++    uint32_t *HwVer,
++    char     *fname,
++    uint32_t flag
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsOpenDecoder
++
++Description:
++
++    Open the decoder for playback operations and sets appropriate parameters
++    for decode of input video data.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    StreamType  Currently supported streams are:
++                        Elementary Streams with no timestamp management (0)
++                        Transport Streams (2)
++                        Elementary Streams with timestamp management (6)
++                All other values will return BC_STS_INV_ARG.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsOpenDecoder(
++    HANDLE   hDevice,
++    uint32_t StreamType
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsCloseDecoder
++
++Description:
++
++    Close the decoder. No further pictures will be produced and all input
++    will be ignored.
++
++    The device must have been previously opened for this call to succeed.
++    This function closes the decoder and cleans up the state of the driver
++    and the library. All pending pictures will be dropped and all outstanding
++    transfers to and from the decoder will be aborted.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsCloseDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStartDecoder
++
++Description:
++
++    Start the actual processing of input data. Before this command the
++    decoder will ignore all of the presented input data.
++
++    DtsOpenDecoder must always be followed by a DtsStartDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed. In addition the video
++    parameters for codec must have been set via a call to DtsSetVideoParams.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStartDecoder(
++    HANDLE hDevice
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetVideoParams
++
++Description:
++
++    Sets various codec parameters that would be used by a subsequent call
++    to DtsStartDecoder.
++
++    DtsSetVideoParams must always be called before DtsStartDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed.
++
++Parameters:
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    videoAlg        Video Codec to be enabled to decode stream.
++                    H.264 (0), VC-1 (4) and MPEG-2 (1) currently supported.
++                    All other values will return BC_STS_INV_ARG
++    FGTEnable       Enable processing of FGT SEI.
++    MetaDataEnable  Enable retrieval of picture metadata to be sent to video
++                    pipeline.
++    Progressive     Instruct decoder to always try to send back progressive
++                    frames. If input content is 1080p, the decoder will
++                    ignore pull-down flags and always give 1080p output.
++                    If 1080i content is processed, the decoder will return
++                    1080i data. When this flag is not set, the decoder will
++                    use pull-down information in the input stream to decide
++                    the decoded data format.
++    OptFlags        In this field bits 0:3 are used pass default frame rate,
++                    bits 4:5 are for operation mode (used to indicate Blu-ray
++                    mode to the decoder) and bit 6 is for the flag mpcOutPutMaxFRate
++                    which when set tells the FW to output at the max rate for the
++                    resolution and ignore the frame rate determined from the
++                    stream. Bit 7 is set to indicate that this is single threaded mode
++                    and the driver will be peeked to get timestamps ahead of time.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetVideoParams(
++    HANDLE   hDevice,
++    uint32_t videoAlg,
++    BOOL     FGTEnable,
++    BOOL     MetaDataEnable,
++    BOOL     Progressive,
++    uint32_t OptFlags
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetInputFormat
++    
++Description:
++
++    Sets input video's various parameters that would be used by a subsequent call
++    to DtsStartDecoder.
++
++    DtsSetInputFormat must always be called before DtsStartDecoder for the
++    decoder to start processing input data. The device must have been
++    previously opened for this call to succeed.
++
++Parameters:
++    hDevice         Handle to device. This is obtained via a prior call to DtsDeviceOpen.
++    pInputFormat Pointer to the BC_INPUT_FORMAT data.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetInputFormat(
++    HANDLE  			hDevice,
++    BC_INPUT_FORMAT   *pInputFormat
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetVideoParams
++
++Description:
++
++    Returns various codec parameters that would be used by a subsequent call
++    to DtsStartDecoder. These parameters are either default values or were
++    set via a prior call to DtsSetVideoParams
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    *videoAlg       See DtsSetVideoParams. [OUTPUT]
++    *FGTEnable      See DtsSetVideoParams. [OUTPUT]
++    *MetaDataEnable See DtsSetVideoParams. [OUTPUT]
++    *Progressive    See DtsSetVideoParams. [OUTPUT]
++    Reserved        This field is reserved for possible future expansion.
++                    Set to 0.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetVideoParams(
++    HANDLE   hDevice,
++    uint32_t *videoAlg,
++    BOOL     *FGTEnable,
++    BOOL     *MetaDataEnable,
++    BOOL     *Progressive,
++    uint32_t Reserved
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsFormatChange
++
++Description:
++
++    Changes codec type and parameters.
++
++    The device must have been previously opened for this call to succeed.
++    This function should be used only for mid-stream format changes.
++    DtsStartDecoder must have been called before for this function to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    videoAlg    Video Codec to be enabled to decode stream.
++                H.264 (0), VC-1 (4) and MPEG-2 (1) currently supported. All
++                other values will return BC_STS_INV_ARG
++    FGTEnable   Enable processing of FGT SEI.
++    Progressive Instruct decoder to always try to send back progressive
++                frames. If input content is 1080p, the decoder will ignore
++                pull-down flags and always give 1080p output. If 1080i
++                content is processed, the decoder will return 1080i data.
++                When this flag is not set, the decoder will use pull-down
++                information in the input stream to decide the decoded data
++                format.
++    Reserved    This field is reserved for possible future expansion.
++                Set to 0.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFormatChange(
++    HANDLE   hDevice,
++    uint32_t videoAlg,
++    BOOL     FGTEnable,
++    BOOL     MetaDataEnable,
++    BOOL     Progressive,
++    uint32_t Reserved
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStopDecoder
++
++Description:
++
++    Stop the decoder.
++
++    The device must have been previously opened for this call to succeed.
++    This function will clean up any pending operations and stop the decoder.
++    Internal state is still maintained and the decoder can be restarted.
++    Any pending pictures will be dropped.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStopDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsPauseDecoder
++
++Description:
++
++    Pause the decoder. The paused picture will be repeated by decoder.
++
++    The device must have been previously opened for this call to succeed.
++    In addition the decoder must have been started as well. If the decoder
++    is open but not started, this function will return BC_STS_DEC_NOT_STARTED.
++    If the decoder has not been opened this function will return
++    BC_STS_DEC_NOT_OPEN.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsPauseDecoder(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsResumeDecoder
++
++Description:
++
++    Unpause the decoder from a previous paused condition.
++
++    The device must have been previously opened for this call to succeed.
++    If the decoder was not paused previously, this function will return
++    without affecting the decoder with a BC_STS_SUCCESS status. If the
++    decoder is open but not started, this function will return
++    BC_STS_DEC_NOT_STARTED.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsResumeDecoder(
++    HANDLE  hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetVideoPID
++    
++Description:
++
++    Sets the video PID in the input Transport Stream that the decoder
++    needs to process.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice Handle to device. This is obtained via a prior call to
++            DtsDeviceOpen.
++    PID     PID value that decoder needs to process.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetVideoPID(
++    HANDLE    hDevice,
++    uint32_t  pid
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    StartCaptureImmidiate
++    
++Description:
++
++    Instruct the driver to start capturing decoded frames for output.
++
++    The device must have been previously opened for this call to succeed.
++    This function must be called before the first call to DtsProcInput.
++    This function instructs the receive path in the driver to start waiting
++    for valid data to be presented from the decoder.
++
++Parameters:
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsStartCaptureImmidiate(
++    HANDLE    hDevice,
++    uint32_t  Reserved
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    StartCapture
++
++Description:
++
++    Instruct the driver to start capturing decoded frames for output.
++
++    The device must have been previously opened for this call to succeed.
++    This function must be called before the first call to DtsProcInput.
++    This function instructs the receive path in the driver to start waiting
++    for valid data to be presented from the decoder.
++
++Parameters:
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStartCapture(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    FlushRxCapture
++
++Description:
++
++    ***This function is deprecated and is for temporary use only.***
++
++    Flush the driverís queue of pictures and stops the capture process. These
++    functions will be replaced with automatic Stop (End of Sequence) detection.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFlushRxCapture(
++    HANDLE hDevice,
++    BOOL   bDiscardOnly
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcOutput
++
++Description:
++
++    Returns one decoded picture to the caller.
++
++    The device must have been previously opened for this call to succeed.
++
++    == NOTE ====
++        For PIB AND 100% output encryption/scrambling on Bcm LINK hardware
++    use ProcOutputNoCopy() Interace. This interface will not support
++    PIB encryption.
++
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    milliSecWait    Timeout parameter. DtsProcOutput will fail is no picture
++                    is received in this time.
++    *pOut           This is a pointer to the BC_DTS_PROC_OUT structure that is
++                    allocated by the caller. The decoded picture is returned
++                    in this structure. This structure is described in the
++                    data structures section. The actual data buffer to be
++                    filled with the decoded data is allocated by the caller.
++                    Data is copied from the decoder to the buffers before this
++                    function returns. [INPUT/OUTPUT]
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcOutput(
++    HANDLE   hDevice,
++    uint32_t milliSecWait,
++    BC_DTS_PROC_OUT *pOut
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcOutputNoCopy
++
++Description:
++
++    Returns one decoded picture to the caller. Functionality of this API()
++    is very similar to ProcOutPut() API. This API will not copy the video data
++    to caller's buffers but provides the source buffer pointers in pOut structure.
++
++    This is more secure and preferred method for BCM's Link hardware. The actual
++    format conversion/copy routines are provided as part of the Filter/Security
++    layer source code. Using this method, all the clear data handling will be
++    done by bcmDFilter or bcmSec layers which are expected to be in Player's
++    tamper resistant area.
++
++    == NOTE ====
++     1) DtsReleaseOutputBuffs() interface must be called to release the buffers
++        back to DIL if return Status is BC_STS_SUCCESS.
++
++     2) Only this interface supports PIB and full 100% output encryption/Scrambling.
++
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    milliSecWait    Timeout parameter. DtsProcOoutput will fail is no picture
++                    is received in this time.
++    *pOut           This is a pointer to the BC_DTS_PROC_OUT structure that is
++                    allocated by the caller. The decoded picture is returned
++                    in this structure.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcOutputNoCopy(
++    HANDLE   hDevice,
++    uint32_t milliSecWait,
++    BC_DTS_PROC_OUT *pOut
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsReleaseOutputBuffs
++
++Description:
++
++    Release Buffers acquired during ProcOutputNoCopy() interface.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    Reserved        Reserved. Set to NULL.
++
++    fChange         FALSE.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsReleaseOutputBuffs(
++    HANDLE hDevice,
++    PVOID  Reserved,
++    BOOL   fChange
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsProcInput
++
++Description:
++
++    Sends compressed (coded) data to the decoder for processing.
++
++    The device must have been previously opened for this call to succeed.
++    In addition, suitable keys must have been exchanged for decryption and
++    decode to be successful.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    pUserData   Pointer to data buffer that holds the data to be transferred.
++                [INPUT]
++    sizeInBytes Size in Bytes of data available to be sent to the decoder for
++                processing.
++    Timestamp   Optional timestamp information attached to the media sample
++                that is available in the buffer. If timestamp is present
++                (i.e. non-zero), then this will be reflected in the output
++                sample (picture) produced from the contents of this buffer.
++				Timestamp should be in units of 100 ns.
++    Encrypted   Flag to indicate that the data transfer is not in the clear
++                and that the decoder needs to decrypt before it can decode
++                the data.  Note that due to complexity, it is preferred that
++                the application writer uses the higher level
++                dts_pre_proc_input() call if encypted content will be sent.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsProcInput(
++    HANDLE   hDevice,
++    uint8_t  *pUserData,
++    uint32_t ulSizeInBytes,
++    uint64_t timeStamp,
++    BOOL     encrypted
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetColorPrimaries
++
++Description:
++
++    Returns color primaries information from the stream being processed.
++
++    The device must have been previously opened for this call to succeed.
++    In addition at least one picture must have been successfully decoded and
++    returned back from the decoder.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    colorPrimaries  Pointer to U32 to receive the color primaries information.
++                    The values returned are described in the previous section
++                    regarding the picture metadata. [OUTPUT]
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetColorPrimaries(
++    HANDLE    hDevice,
++    uint32_t  *colorPrimaries
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsFlushInput
++
++Description:
++
++    Flushes the current channel and causes the decoder to stop accessing input
++    data.  Based on the flush mode parameter, the channel will be flushed from
++    the current point in the input data or from the current processing point.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    Mode            0   Flush at the current input point. use to drain the
++                        input FIFO . All the data that has been received will
++                        be decoded.
++                    1   Flush at the current processing point. All the decoded
++                        frames will be presented but no more data from the
++                        input will be decoded.
++                    2   Flushes all the decoder buffers, input, decoded and
++                        to be decoded.
++                    3   Cancels the pending TX Request from the DIL/driver
++					4	Flushes all the decoder buffers, input, decoded and
++						to be decoded data. Also flushes the drivers buffers
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsFlushInput(
++    HANDLE   hDevice,
++    uint32_t Mode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetRateChange
++
++Description:
++
++    Sets the decoder playback speed and direction of playback.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    rate            Inverse of speed x 10000.
++                    Examples:
++                        1/2x playback speed = 20000
++                        1x   playback speed = 10000
++                        2x   playback speed = 5000
++
++    direction       Playback direction.
++                    0   Forward direction.
++                    1   Reverse direction.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetRateChange(
++    HANDLE   hDevice,
++    uint32_t rate,
++    uint8_t  direction
++    );
++
++
++//Set FF Rate for Catching Up
++/*****************************************************************************
++
++Function name:
++
++    DtsSetFFRate
++
++Description:
++
++    Sets the decoder playback FF speed
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++    rate            Inverse of speed x 10000.
++                    Examples:
++                        1/2x playback speed = 20000
++                        1x   playback speed = 10000
++                        2x   playback speed = 5000
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetFFRate(
++    HANDLE   hDevice,
++    uint32_t rate
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetSkipPictureMode
++
++Description:
++
++    This command sets the decoder to only decode selected picture types.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    SkipMode        0   IPB, All pictures are decoded.
++
++                    1   IP decoding, This mode skips all non reference pictures.
++
++                    2   I decoding, This mode skips all P/B pictures and only decodes
++                        I pictures.
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetSkipPictureMode(
++    HANDLE   hDevice,
++    uint32_t SkipMode
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetIFrameTrickMode
++
++Description:
++
++    This command sets the decoder to decode only I Frames for FF and FR.
++
++    Use this API for I Frame only trick mode play back in either direction. The
++    application/Up stream filter  determines the speed of the playback by
++    means of Skip on the input compressed data.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSetIFrameTrickMode(
++    HANDLE hDevice
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsStepDecoder
++
++Description:
++
++    This function forwards one frame.
++
++    The device must have been opened must be in paused
++    state previously for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsStepDecoder(
++    HANDLE hDevice
++    );
++
++
++/*****************************************************************************
++
++Function name:
++
++    DtsIs422Supported
++
++Description:
++
++    This function returns whether 422 YUV mode is supported or not.
++
++    The device must have been opened previously for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    bSupported  1 - 422 is supported
++                0 - 422 is not supported.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsIs422Supported(
++    HANDLE  hDevice,
++    uint8_t *bSupported
++    );
++
++/*****************************************************************************
++
++Function name:
++
++     DtsSetColorSpace    
++    
++Description:
++
++    This function sets the output sample's color space.
++
++    The device must have been opened previously and must support 422 mode for
++    this call to succeed.
++
++    Use "DtsIs422Supported" to find whether 422 mode is supported.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    422Mode     Mode is defined by BC_OUTPUT_FORMAT as follows -
++				OUTPUT_MODE420		= 0x0,
++				OUTPUT_MODE422_YUY2	= 0x1,
++				OUTPUT_MODE422_UYVY	= 0x2,
++				OUTPUT_MODE_INVALID	= 0xFF
++				Valid values for this API are OUTPUT_MODE422_YUY2 and OUTPUT_MODE422_UYVY
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetColorSpace(
++    HANDLE  hDevice,
++    BC_OUTPUT_FORMAT      Mode422
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSet422Mode
++
++Description:
++
++    This function sets the 422 mode to either YUY2 or UYVY.
++
++    The device must have been opened previously and must support 422 mode for
++    this call to succeed.
++
++    Use "DtsIs422Supported" to find whether 422 mode is supported.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++    422Mode     0 - set the YUV mode to YUY2
++                1 - set the YUV mode to UYVY
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsSet422Mode(
++    HANDLE  hDevice,
++    uint8_t Mode422
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetDILPath
++
++Description:
++
++    This is a helper function to return DIL's Path.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                DtsDeviceOpen.
++
++    DilPath     Buffer to hold DIL path info upto 256 bytes.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++
++DRVIFLIB_API BC_STATUS
++DtsGetDILPath(
++    HANDLE   hDevice,
++    char   *DilPath,
++    uint32_t size
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsDropPictures
++
++Description:
++
++    This command sets the decoder to skip one or more non-reference (B) pictures
++    in the input data stream.  This is used for when the audio is ahead of
++    video and the application needs to cause video to move ahead to catch up.
++    Reference pictures are not skipped.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    Pictures        The number of non-reference pictures to drop.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsDropPictures(
++    HANDLE   hDevice,
++    uint32_t Pictures
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetDriverStatus
++
++Description:
++
++    This command returns various statistics related to the driver and DIL.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.
++
++    *pStatus        Pointer to BC_DTS_STATUS to receive driver status.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS
++DtsGetDriverStatus(
++    HANDLE          hDevice,
++	BC_DTS_STATUS   *pStatus
++    );
++
++/*****************************************************************************
++
++Function name:
++
++    DtsGetCapabilities
++
++Description:
++
++    This command returns output format support and hardware capabilities.
++
++    The device must have been previously opened for this call to succeed.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    pCapsBuffer   Pointer to BC_HW_CAPS to receive HW Output capabilities.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsGetCapabilities (
++	HANDLE  hDevice,
++	PBC_HW_CAPS	pCapsBuffer
++	);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsSetScaleParams
++
++Description:
++
++    This command sets hardware scaling parameters.
++
++Parameters:
++
++    hDevice         Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    pScaleParams   Pointer to BC_SCALING_PARAMS to set hardware scaling parameters.
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsSetScaleParams (
++	HANDLE  hDevice,
++	PBC_SCALING_PARAMS pScaleParams
++	);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsIsEndOfStream
++
++Description:
++
++    This command returns whether the end of stream(EOS) is reaching.
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    bEOS   Pointer to uint8_t to indicate if EOS of not
++
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsIsEndOfStream(
++    HANDLE  hDevice,
++    uint8_t*	bEOS
++);
++
++/*****************************************************************************
++
++Function name:
++
++    DtsCrystalHDVersion
++
++Description:
++
++    This API returns hw and sw version information for Crystal HD solutions
++Parameters:
++
++    hDevice     Handle to device. This is obtained via a prior call to
++                    DtsDeviceOpen.   
++
++    bCrystalInfo   Pointer to structure to fill in with information
++
++	device = 0 for BCM70012, 1 for BCM70015
++	
++Return:
++
++    BC_STS_SUCCESS will be returned on successful completion.
++
++*****************************************************************************/
++DRVIFLIB_API BC_STATUS 
++DtsCrystalHDVersion(
++    HANDLE  hDevice,
++    PBC_INFO_CRYSTAL bCrystalInfo
++);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_version.h b/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_version.h
+new file mode 100644
+index 0000000..b640dac
+--- /dev/null
++++ b/tools/depends/target/libcrystalhd/libcrystalhd/libcrystalhd_version.h
+@@ -0,0 +1,80 @@
++/********************************************************************
++ * Copyright(c) 2006-2009 Broadcom Corporation.
++ *
++ *  Name: libcrystalhd_version.h
++ *
++ *  Description: Version numbering for the driver use.
++ *
++ *  AU
++ *
++ *  HISTORY:
++ *
++ ********************************************************************
++ * This header is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation, either version 2.1 of the License.
++ *
++ * This header is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this header.  If not, see <http://www.gnu.org/licenses/>.
++ *******************************************************************/
++
++#ifndef _BC_DTS_VERSION_LNX_
++#define _BC_DTS_VERSION_LNX_
++//
++// The version format that we are adopting is
++// MajorVersion.MinorVersion.Revision
++// This will be the same for all the components.
++//
++//
++#define STRINGIFY_VERSION(MAJ,MIN,REV) STRINGIFIED_VERSION(MAJ,MIN,REV)
++#define STRINGIFIED_VERSION(MAJ,MIN,REV) #MAJ "." #MIN "." #REV
++
++#define STRINGIFY_VERSION_W(MAJ,MIN,REV) STRINGIFIED_VERSION_W(MAJ,MIN,REV)
++#define STRINGIFIED_VERSION_W(MAJ,MIN,REV) #MAJ "." #MIN "." #REV
++
++//
++//  Product Version number is:
++//  x.y.z.a
++//
++//  x = Major release.      1 = Dozer, 2 = Dozer + Link
++//  y = Minor release.      Should increase +1 per "real" release.
++//  z = Branch release.     0 for main branch.  This is +1 per branch release.
++//  a = Build number	+1 per candidate release.  Reset to 0 every "real" release.
++//
++//
++// Enabling Check-In rules enforcement 08092007
++//
++#define INVALID_VERSION		0xFFFF
++
++/*========================== Common For All Components =================================*/
++#define BRCM_MAJOR_VERSION	3
++
++#define DRIVER_MAJOR_VERSION        BRCM_MAJOR_VERSION
++#define DRIVER_MINOR_VERSION        6
++#define DRIVER_REVISION             0
++
++#define RC_FILE_VERSION             STRINGIFY_VERSION(DRIVER_MAJOR_VERSION,DRIVER_MINOR_VERSION,DRIVER_REVISION) ".0"
++
++/*======================= Device Interface Library ========================*/
++#define DIL_MAJOR_VERSION	BRCM_MAJOR_VERSION
++#define DIL_MINOR_VERSION	6
++#define DIL_REVISION		0
++
++#define DIL_RC_FILE_VERSION	STRINGIFY_VERSION(DIL_MAJOR_VERSION,DIL_MINOR_VERSION,DIL_REVISION)
++
++/*========================== deconf utility ==============================*/
++#define DECONF_MAJOR_VERSION	BRCM_MAJOR_VERSION
++#define DECONF_MINOR_VERSION	9
++#define DECONF_REVISION		18
++#define DECONF_RC_FILE_VERSION  STRINGIFY_VERSION(DIL_MAJOR_VERSION,DIL_MINOR_VERSION,DIL_REVISION)
++
++/*========================== Firmware ==============================*/
++#define FW_MAJOR_VERSION        BRCM_MAJOR_VERSION
++#define FW_MINOR_VERSION        60
++#define FW_REVISION		39
++
++#endif
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 57ea71b..2093886 100644
+index bc6f4a2..e4adcae 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -156,6 +156,9 @@
- #ifdef HAS_AIRTUNES
- #include "network/AirTunesServer.h"
+@@ -130,6 +130,9 @@
+ #ifdef HAS_JSONRPC
+ #include "interfaces/json-rpc/JSONRPC.h"
  #endif
 +#if defined(HAVE_LIBCRYSTALHD)
 +#include "cores/dvdplayer/DVDCodecs/Video/CrystalHD.h"
@@ -138,7 +5053,7 @@ index 57ea71b..2093886 100644
  #include "interfaces/AnnouncementManager.h"
  #include "peripherals/Peripherals.h"
  #include "peripherals/dialogs/GUIDialogPeripheralManager.h"
-@@ -1520,6 +1523,10 @@ bool CApplication::Initialize()
+@@ -1229,6 +1232,10 @@ bool CApplication::Initialize()
  
    m_slowTimer.StartZero();
  
@@ -148,8 +5063,8 @@ index 57ea71b..2093886 100644
 +
    CAddonMgr::Get().StartServices(true);
  
-   CLog::Log(LOGNOTICE, "initialize done");
-@@ -3609,6 +3616,10 @@ void CApplication::Stop(int exitCode)
+   // configure seek handler
+@@ -2679,6 +2686,10 @@ void CApplication::Stop(int exitCode)
        XBMCHelper::GetInstance().Stop();
  #endif
  
@@ -160,13 +5075,47 @@ index 57ea71b..2093886 100644
      g_mediaManager.Stop();
  
      // Stop services before unloading Python
+diff --git a/xbmc/DllPaths_generated.h.in b/xbmc/DllPaths_generated.h.in
+index c92a8bd..a98058c 100644
+--- a/xbmc/DllPaths_generated.h.in
++++ b/xbmc/DllPaths_generated.h.in
+@@ -46,6 +46,17 @@
+ #define DLL_PATH_LIBDVDNAV     "special://xbmcbin/system/players/dvdplayer/libdvdnav-@ARCH@.so"
+ #define DLL_PATH_LIBMPEG2      "@MPEG2_SONAME@"
+ 
++/* cdrip */
++#define DLL_PATH_OGG           "@OGG_SONAME@"
++#define DLL_PATH_VORBIS        "@VORBIS_SONAME@"
++
++/* broadcom crystalhd */
++#if defined(TARGET_DARWIN)
++#define DLL_PATH_LIBCRYSTALHD  "libcrystalhd.dylib"
++#else
++#define DLL_PATH_LIBCRYSTALHD  "@CRYSTALHD_SONAME@"
++#endif
++
+ /* libbluray */
+ #define DLL_PATH_LIBBLURAY     "@BLURAY_SONAME@"
+ 
+diff --git a/xbmc/DllPaths_win32.h b/xbmc/DllPaths_win32.h
+index c5026ac..066543c 100644
+--- a/xbmc/DllPaths_win32.h
++++ b/xbmc/DllPaths_win32.h
+@@ -36,6 +36,7 @@
+ #define DLL_PATH_LIBASS        "special://xbmcbin/system/players/dvdplayer/libass.dll"
+ #define DLL_PATH_LIBMPEG2      "special://xbmcbin/system/players/dvdplayer/libmpeg2-0.dll"
+ #define DLL_PATH_LIBDVDNAV     "special://xbmcbin/system/players/dvdplayer/libdvdnav.dll"
++#define DLL_PATH_LIBCRYSTALHD  "special://xbmcbin/system/players/dvdplayer/bcmDIL.dll"
+ #define DLL_PATH_LIBRTMP       "special://xbmcbin/system/players/dvdplayer/librtmp.dll"
+ 
+ /* cdrip */
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-index 181d755..32d58d4 100644
+index 4c363cf..4bafec4 100644
 --- a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-@@ -37,6 +37,9 @@
- #include "Video/DVDVideoCodecOpenMax.h"
- #include "Video/DVDVideoCodecLibMpeg2.h"
+@@ -42,6 +42,9 @@
+ #endif
+ #include "Video/MMALCodec.h"
  #include "Video/DVDVideoCodecStageFright.h"
 +#if defined(HAVE_LIBCRYSTALHD)
 +#include "Video/DVDVideoCodecCrystalHD.h"
@@ -174,7 +5123,7 @@ index 181d755..32d58d4 100644
  #if defined(HAS_LIBAMCODEC)
  #include "utils/AMLUtils.h"
  #include "Video/DVDVideoCodecAmlogic.h"
-@@ -146,6 +149,11 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
+@@ -154,6 +157,11 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
  #elif defined(TARGET_DARWIN)
    hwSupport += "VideoToolBoxDecoder:no ";
  #endif
@@ -186,7 +5135,7 @@ index 181d755..32d58d4 100644
  #if defined(HAS_LIBAMCODEC)
    hwSupport += "AMCodec:yes ";
  #else
-@@ -227,6 +235,30 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
+@@ -262,6 +270,23 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
    }
  #endif
  
@@ -197,14 +5146,7 @@ index 181d755..32d58d4 100644
 +    {
 +      switch(hint.codec)
 +      {
-+        case AV_CODEC_ID_VC1:
-+        case AV_CODEC_ID_WMV3:
 +        case AV_CODEC_ID_H264:
-+        case AV_CODEC_ID_MPEG2VIDEO:
-+          if (hint.codec == AV_CODEC_ID_H264 && hint.ptsinvalid)
-+            break;
-+          if (hint.codec == AV_CODEC_ID_MPEG2VIDEO && hint.width <= 720)
-+            break;
 +          if ( (pCodec = OpenCodec(new CDVDVideoCodecCrystalHD(), hint, options)) ) return pCodec;
 +        break;
 +        default:
@@ -219,10 +5161,10 @@ index 181d755..32d58d4 100644
    {
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
 new file mode 100644
-index 0000000..2dcc244
+index 0000000..586b45b
 --- /dev/null
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
-@@ -0,0 +1,2011 @@
+@@ -0,0 +1,2010 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -260,7 +5202,6 @@ index 0000000..2dcc244
 +#include "threads/Atomics.h"
 +#include "threads/Thread.h"
 +#include "utils/log.h"
-+#include "utils/fastmemcpy.h"
 +extern "C" {
 +#include "libswscale/swscale.h"
 +}
@@ -884,14 +5825,14 @@ index 0000000..2dcc244
 +  // copy y
 +  if (w == stride)
 +  {
-+    fast_memcpy(pBuffer->m_y_buffer_ptr, procOut->Ybuff, w * h);
++    memcpy(pBuffer->m_y_buffer_ptr, procOut->Ybuff, w * h);
 +  }
 +  else
 +  {
 +    uint8_t *s_y = procOut->Ybuff;
 +    uint8_t *d_y = pBuffer->m_y_buffer_ptr;
 +    for (int y = 0; y < h; y++, s_y += stride, d_y += w)
-+      fast_memcpy(d_y, s_y, w);
++      memcpy(d_y, s_y, w);
 +  }
 +  //copy chroma
 +  //copy uv packed to u,v planes (1/2 the width and 1/2 the height of y)
@@ -915,9 +5856,9 @@ index 0000000..2dcc244
 +  uint8_t *d_y = pBuffer->m_y_buffer_ptr;
 +  for (int y = 0; y < h/2; y++, s_y += stride)
 +  {
-+    fast_memcpy(d_y, s_y, w);
++    memcpy(d_y, s_y, w);
 +    d_y += w;
-+    fast_memcpy(d_y, s_y, w);
++    memcpy(d_y, s_y, w);
 +    d_y += w;
 +  }
 +  //copy chroma
@@ -949,9 +5890,9 @@ index 0000000..2dcc244
 +  {
 +    int bytes = w * h;
 +    // copy y
-+    fast_memcpy(pBuffer->m_y_buffer_ptr, procOut->Ybuff, bytes);
++    memcpy(pBuffer->m_y_buffer_ptr, procOut->Ybuff, bytes);
 +    // copy uv
-+    fast_memcpy(pBuffer->m_uv_buffer_ptr, procOut->UVbuff, bytes/2 );
++    memcpy(pBuffer->m_uv_buffer_ptr, procOut->UVbuff, bytes/2 );
 +  }
 +  else
 +  {
@@ -959,12 +5900,12 @@ index 0000000..2dcc244
 +    uint8_t *s = procOut->Ybuff;
 +    uint8_t *d = pBuffer->m_y_buffer_ptr;
 +    for (int y = 0; y < h; y++, s += stride, d += w)
-+      fast_memcpy(d, s, w);
++      memcpy(d, s, w);
 +    // copy uv
 +    s = procOut->UVbuff;
 +    d = pBuffer->m_uv_buffer_ptr;
 +    for (int y = 0; y < h/2; y++, s += stride, d += w)
-+      fast_memcpy(d, s, w);
++      memcpy(d, s, w);
 +  }
 +}
 +
@@ -976,18 +5917,18 @@ index 0000000..2dcc244
 +  uint8_t *d_y = pBuffer->m_y_buffer_ptr;
 +  for (int y = 0; y < h/2; y++, s_y += stride)
 +  {
-+    fast_memcpy(d_y, s_y, w);
++    memcpy(d_y, s_y, w);
 +    d_y += w;
-+    fast_memcpy(d_y, s_y, w);
++    memcpy(d_y, s_y, w);
 +    d_y += w;
 +  }
 +  //copy chroma
 +  uint8_t *s_uv = procOut->UVbuff;
 +  uint8_t *d_uv = pBuffer->m_uv_buffer_ptr;
 +  for (int y = 0; y < h/4; y++, s_uv += stride) {
-+    fast_memcpy(d_uv, s_uv, w);
++    memcpy(d_uv, s_uv, w);
 +    d_uv += w;
-+    fast_memcpy(d_uv, s_uv, w);
++    memcpy(d_uv, s_uv, w);
 +    d_uv += w;
 +  }
 +  pBuffer->m_interlace = false;
@@ -1151,16 +6092,16 @@ index 0000000..2dcc244
 +                  uint8_t *d_y = pBuffer->m_y_buffer_ptr;
 +                  for (int y = 0; y < h/2; y++, s_y += yuy2_stride)
 +                  {
-+                    fast_memcpy(d_y, s_y, yuy2_w);
++                    memcpy(d_y, s_y, yuy2_w);
 +                    d_y += yuy2_w;
-+                    fast_memcpy(d_y, s_y, yuy2_w);
++                    memcpy(d_y, s_y, yuy2_w);
 +                    d_y += yuy2_w;
 +                  }
 +                  pBuffer->m_interlace = false;
 +                }
 +                else
 +                {
-+                  fast_memcpy(pBuffer->m_y_buffer_ptr,  procOut.Ybuff, pBuffer->m_y_buffer_size);
++                  memcpy(pBuffer->m_y_buffer_ptr,  procOut.Ybuff, pBuffer->m_y_buffer_size);
 +                }
 +              break;
 +              case RENDER_FMT_YUV420P:
@@ -2478,7 +7419,7 @@ index 0000000..451a107
 +#endif
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
 new file mode 100644
-index 0000000..373ae2c
+index 0000000..2368c62
 --- /dev/null
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
 @@ -0,0 +1,204 @@
@@ -2570,7 +7511,7 @@ index 0000000..373ae2c
 +        else
 +          m_CodecType = CRYSTALHD_CODEC_ID_H264;
 +
-+        m_pFormatName = "chd-h264";
++        m_pFormatName = "chd-osmc";
 +      break;
 +      case AV_CODEC_ID_VC1:
 +        m_CodecType = CRYSTALHD_CODEC_ID_VC1;
@@ -2744,7 +7685,7 @@ index 0000000..cc36c29
 +
 +#endif
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in b/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
-index 9c13da8..8a97889 100644
+index 56ec6a3..5592bfe 100644
 --- a/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
 @@ -11,6 +11,10 @@ endif
@@ -2759,7 +7700,7 @@ index 9c13da8..8a97889 100644
  SRCS += DVDVideoCodecVDA.cpp
  SRCS += VDA.cpp
 diff --git a/xbmc/settings/SettingConditions.cpp b/xbmc/settings/SettingConditions.cpp
-index 7b61512..db1526a 100644
+index c313bd0..95089ce 100644
 --- a/xbmc/settings/SettingConditions.cpp
 +++ b/xbmc/settings/SettingConditions.cpp
 @@ -29,6 +29,9 @@
@@ -2785,10 +7726,10 @@ index 7b61512..db1526a 100644
    m_simpleConditions.insert("have_libopenmax");
  #endif
 diff --git a/xbmc/system.h b/xbmc/system.h
-index 1ca58d0..a9668d4 100644
+index 2213421..cfe988b 100644
 --- a/xbmc/system.h
 +++ b/xbmc/system.h
-@@ -114,6 +114,7 @@
+@@ -106,6 +106,7 @@
  #define HAS_WIN32_NETWORK
  #define HAS_IRSERVERSUITE
  #define HAS_AUDIO
@@ -2796,3 +7737,78 @@ index 1ca58d0..a9668d4 100644
  #define HAS_WEB_SERVER
  #define HAS_WEB_INTERFACE
  #define HAVE_LIBSSH
+diff --git a/xbmc/win32/WIN32Util.cpp b/xbmc/win32/WIN32Util.cpp
+index 0bf3a98..eb41437 100644
+--- a/xbmc/win32/WIN32Util.cpp
++++ b/xbmc/win32/WIN32Util.cpp
+@@ -42,6 +42,12 @@
+ 
+ #include <cassert>
+ 
++// default Broadcom registy bits (setup when installing a CrystalHD card)
++#define BC_REG_PATH       "Software\\Broadcom\\MediaPC"
++#define BC_REG_PRODUCT    "CrystalHD" // 70012/70015
++#define BC_BCM_DLL        "bcmDIL.dll"
++#define BC_REG_INST_PATH  "InstallPath"
++
+ #define DLL_ENV_PATH "special://xbmc/system/;" \
+                      "special://xbmc/system/players/dvdplayer/;" \
+                      "special://xbmc/system/players/paplayer/;" \
+@@ -1410,6 +1416,41 @@ bool CWIN32Util::UtilRegOpenKeyEx( const HKEY hKeyParent, const char *const pcKe
+   return bRet;
+ }
+ 
++bool CWIN32Util::GetCrystalHDLibraryPath(std::string &strPath)
++{
++  // support finding library by windows registry
++  HKEY hKey;
++  std::string strRegKey;
++
++  CLog::Log(LOGDEBUG, "CrystalHD: detecting CrystalHD installation path");
++  strRegKey = StringUtils::Format("%s\\%s", BC_REG_PATH, BC_REG_PRODUCT );
++
++  if( CWIN32Util::UtilRegOpenKeyEx( HKEY_LOCAL_MACHINE, strRegKey.c_str(), KEY_READ, &hKey ))
++  {
++    DWORD dwType;
++    char *pcPath= NULL;
++    if( CWIN32Util::UtilRegGetValue( hKey, BC_REG_INST_PATH, &dwType, &pcPath, NULL, sizeof( pcPath ) ) == ERROR_SUCCESS )
++    {
++      strPath = URIUtils::AddFileToFolder(pcPath, BC_BCM_DLL);
++      CLog::Log(LOGDEBUG, "CrystalHD: got CrystalHD installation path (%s)", strPath.c_str());
++      return true;
++    }
++    else
++    {
++      CLog::Log(LOGDEBUG, "CrystalHD: getting CrystalHD installation path failed");
++    }
++  }
++  else
++  {
++    CLog::Log(LOGDEBUG, "CrystalHD: CrystalHD software seems to be not installed.");
++  }
++  // check for dll in system dir
++  if(XFILE::CFile::Exists(DLL_PATH_LIBCRYSTALHD))
++    return true;
++  else
++    return false;
++}
++
+ // Retrieve the filename of the process that currently has the focus.
+ // Typically this will be some process using the system tray grabbing
+ // the focus and causing XBMC to minimise. Logging the offending
+diff --git a/xbmc/win32/WIN32Util.h b/xbmc/win32/WIN32Util.h
+index 55b1ee8..83b6cb0 100644
+--- a/xbmc/win32/WIN32Util.h
++++ b/xbmc/win32/WIN32Util.h
+@@ -88,6 +88,8 @@ public:
+   static LONG UtilRegGetValue( const HKEY hKey, const char *const pcKey, DWORD *const pdwType, char **const ppcBuffer, DWORD *const pdwSizeBuff, const DWORD dwSizeAdd );
+   static bool UtilRegOpenKeyEx( const HKEY hKeyParent, const char *const pcKey, const REGSAM rsAccessRights, HKEY *hKey, const bool bReadX64= false );
+ 
++  static bool GetCrystalHDLibraryPath(std::string &strPath);
++
+   static bool GetFocussedProcess(std::string &strProcessFile);
+   static void CropSource(CRect& src, CRect& dst, CRect target);
+ 
+-- 
+2.1.0
+
