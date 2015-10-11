@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/4ed3eb6692b6b755354a5fe18d5cd45f8003ea26.tar.gz" "$(pwd)/src"
 API_VERSION="15"
@@ -131,11 +131,19 @@ then
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
 	then
+		handle_dep "i386-libcec-dev-osmc"
+		handle_dep "i386-libshairplay-dev-osmc"
+		handle_dep "i386-librtmp-dev-osmc"
+		handle_dep "i386-libnfs-dev-osmc"
+		handle_dep "i386-libplatform-dev-osmc"
 		handle_dep "libglew-dev"
 		handle_dep "libsdl1.2-dev"
 		handle_dep "libsdl-gfx1.2-dev"
 		handle_dep "libsdl-image1.2-dev"
 		handle_dep "libsdl-mixer1.2-dev"
+		handle_dep "i386-libcrystalhd-dev-osmc"
+		handle_dep "xserver-xorg-dev"
+		handle_dep "libxrandr-dev"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
@@ -160,7 +168,7 @@ then
 	./bootstrap
 	# Apple TV configuration
 	test "$1" == atv && \
-	COMPFLAGS="-O3 -fomit-frame-pointer " && \
+	COMPFLAGS="-O3 -fomit-frame-pointer -I/usr/include/libcrystalhd " && \
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
@@ -171,7 +179,18 @@ then
 		--disable-vaapi \
 		--disable-vdpau \
 		--disable-pulse \
-		--disable-projectm
+		--disable-projectm \
+		--enable-x11 \
+		--disable-openmax \
+		--enable-optical-drive \
+		--enable-libbluray \
+		--enable-dvdcss \
+                --enable-dvdcss \
+                --disable-joystick \
+                --disable-debug \
+                --enable-libcec \
+		--disable-optimizations \
+		--enable-crystalhd
 	# Raspberry Pi Configuration
 	if [ "$1" == "rbp1" ]
 	then
@@ -282,7 +301,7 @@ then
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
 	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libbluray1, libtiff5, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2, libogg0, libmad0, libmicrohttpd10, libjasper1, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libgif4, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libvorbisenc2, libass5, libcurl3, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, diskmount-osmc (>= 1.2.9)"
-	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, ${X86_DEPENDS}, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd3, firmware-crystalhd" >> files/DEBIAN/control
+	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, i386-libcec-osmc, i386-libnfs-osmc, i386-librtmp-osmc, i386-libshairplay-osmc, libxrandr2, libsdl-image1.2, libglew1.10, libglu1-mesa, libcrystalhd-osmc, xserver-xorg-core, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-tools, alsa-utils, xserver-xorg-video-nvidia-legacy-304xx, nvidia-xconfig" >> files/DEBIAN/control
 	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
 	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, vero-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
