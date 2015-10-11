@@ -19,9 +19,9 @@ index 0ca370b..ff0763c 100644
 -  std::string cmd = "umount \"" + mountpath + "\"";
 +  std::string cmd;
 +  if (access("/usr/bin/udevil", F_OK) != -1)
-+      cmd = "umount \"" + mountpath + "\"";
-+  else
 +      cmd = "udevil umount \"" + mountpath + "\"";
++  else
++      cmd = "umount \"" + mountpath + "\"";
    int status = system(cmd.c_str());
  
    if (status == 0)
