@@ -14,8 +14,8 @@ API_VERSION="16"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
-BUILD_OPTS=get_build_option_defaults
-BUILD_OPTS=(($BUILD_OPTS - $BUILD_OPTION_USE_CCACHE))
+BUILD_OPTS=$BUILD_OPTION_DEFAULTS
+BUILD_OPTS=$(($BUILD_OPTS - $BUILD_OPTION_USE_CCACHE))
 build_in_env "${1}" $(pwd) "mediacenter-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
