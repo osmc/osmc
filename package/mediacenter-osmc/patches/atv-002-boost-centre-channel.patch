@@ -1,30 +1,10 @@
-From 258c2af821a608c1ed92f95e8e063da8d0083a1f Mon Sep 17 00:00:00 2001
-From: popcornmix <popcornmix@gmail.com>
-Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH] [audio] Add settings option to boost centre channel when
- downmixing
-
-This allows a dB volume increase to be added to centre channel.
-This can help improve dialgue in the presence of background music/effects.
-It can go up to 30dB for testing purposes, but value of 6 is probably more reasonable.
-It is recommended to ensure "Normalise levels on downmix" is enabled when boosting by large values to avoid clipping.
-
-Should work with Pi Sink (dvdplayer/paplayer) and omxplayer
----
- addons/resource.language.en_gb/resources/strings.po        | 14 ++++++++++++++
- system/settings/settings.xml                               | 12 ++++++++++++
- .../Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp            |  7 +++++++
- .../AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp    |  6 ++++++
- xbmc/cores/omxplayer/OMXAudio.cpp                          |  6 ++++++
- 5 files changed, 45 insertions(+)
-
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 530b3d4..bedbd87 100644
+index faf423c..cf123fe 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -16673,3 +16673,17 @@ msgctxt "#38006"
- msgid "Audio has to stay in sync, this can either be done by resampling, or adjusting the PLL"
- msgstr ""
+@@ -16602,6 +16602,21 @@ msgstr ""
+ 
+ #empty strings from id 37046 to 38009
  
 +#: system/settings/settings.xml
 +msgctxt "#38007"
@@ -40,15 +20,19 @@ index 530b3d4..bedbd87 100644
 +msgctxt "#38009"
 +msgid "%i dB"
 +msgstr ""
++
+ #: system/settings/rbp.xml
+ msgctxt "#38010"
+ msgid "GPU accelerated"
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index f493675..4843ab8 100644
+index 3ef33e0..44a9036 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2597,6 +2597,18 @@
+@@ -2578,6 +2578,18 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
-+         <setting id="audiooutput.boostcenter" type="integer" label="38007" help="38008">
++        <setting id="audiooutput.boostcenter" type="integer" label="38007" help="38008">
 +          <level>2</level>
 +          <default>0</default>
 +          <constraints>
@@ -88,37 +72,4 @@ index e4ddf9e..34d0152 100644
  
    if (remapLayout)
    {
-diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
-index 78071493..759ba7b 100644
---- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
-+++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
-@@ -164,6 +164,12 @@ bool CActiveAEResamplePi::Init(uint64_t dst_chan_layout, int dst_channels, int d
-   {
-     av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
-   }
-+  int boost_center = CSettings::Get().GetInt("audiooutput.boostcenter");
-+  if (boost_center)
-+  {
-+    float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
-+    av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
-+  }
- 
-   if (remapLayout)
-   {
-diff --git a/xbmc/cores/omxplayer/OMXAudio.cpp b/xbmc/cores/omxplayer/OMXAudio.cpp
-index f99c0e6..1911189 100644
---- a/xbmc/cores/omxplayer/OMXAudio.cpp
-+++ b/xbmc/cores/omxplayer/OMXAudio.cpp
-@@ -641,6 +641,12 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
-     {
-        av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
-     }
-+    int boost_center = CSettings::Get().GetInt("audiooutput.boostcenter");
-+    if (boost_center)
-+    {
-+      float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
-+      av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
-+    }
- 
-     // stereo upmix
-     if (upmix && m_src_channels == 2 && m_dst_channels > 2)
+
