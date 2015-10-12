@@ -41,7 +41,7 @@ index 0000000..56bbeb6
 +	$(INSTALL) -D -m 0644 $(@D)/mach_kernel $(BINARIES_DIR)/mach_kernel
 +	$(INSTALL) -D -m 0644 $(@D)/BootLogo.png $(BINARIES_DIR)/BootLogo.png
 +	$(INSTALL) -D -m 0644 $(@D)/boot.efi $(BINARIES_DIR)/boot.efi
-+	$(INSTALL) -d -m 0755 $(@D)/patchstick.sh $(BINARIES_DIR)/patchstick.sh
++	$(INSTALL) -D -m 0755 $(@D)/patchstick.sh $(BINARIES_DIR)/patchstick.sh
 +	cp -r $(@D)/System $(BINARIES_DIR)/System
 +endef
 +
