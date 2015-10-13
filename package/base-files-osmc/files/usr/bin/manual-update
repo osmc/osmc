@@ -50,11 +50,10 @@ then
 	sleep 30
 else
 	rm -f $suppress
+	. /etc/osmc/prefs.d/*
 	removable_kernels=$(dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d')
-	if [ -z "$removeable_kernels" ]
+	if [ ! -z "$removable_kernels" ] && [[ ! -z "$OSMC_KERNEL_AUTOREMOVE"  || "$OSMC_KERNEL_AUTOREMOVE" == "1" ]]
 	then
-	    echo "No removable kernels" >> $tmp
-	else
 	    debconf-apt-progress --logfile $tmp -- apt-get -y purge $removable_kernels > /dev/tty1
 	fi
 	sleep 5
