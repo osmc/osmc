@@ -20,12 +20,12 @@ index e3fcda0..5a1337d 100644
 +  std::string cmd;
 +  if (access("/usr/bin/udevil", F_OK) != -1)
 +  {
-+      cmd = "/bin/umount \"" + mountpath + "\"";
++      cmd = "/usr/bin/udevil umount \"" + mountpath + "\"";
 +      CLog::Log(LOGDEBUG, "Going to use /bin/umount to perform an unmount operation");
 +  }
 +  else
 +  {
-+      cmd = "/usr/bin/udevil umount \"" + mountpath + "\"";
++      cmd = "/bin/umount \"" + mountpath + "\"";
 +      CLog::Log(LOGDEBUG, "Going to use /usr/bin/udevil to perform an unmount operation");
 +  }
    int status = system(cmd.c_str());
