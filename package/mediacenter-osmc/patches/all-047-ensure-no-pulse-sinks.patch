@@ -6,31 +6,8 @@ Subject: [PATCH] Ensure that Pulse -> ALSA bridge is not enumerated when using
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp | 3 ++-
  xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp              | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
-index fbdbfac..69ff74f 100644
---- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
-+++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
-@@ -592,6 +592,8 @@ void CActiveAESink::PrintSinks()
-       CLog::Log(LOGNOTICE, "    Device %d", ++count);
-       CAEDeviceInfo& info = *itt2;
-       std::stringstream ss((std::string)info);
-+      printf("\n%s", info.m_displayName.c_str());
-+      fflush(stdout);
-       std::string line;
-       while(std::getline(ss, line, '\n'))
-         CLog::Log(LOGNOTICE, "        %s", line.c_str());
-@@ -623,7 +625,6 @@ void CActiveAESink::EnumerateOutputDevices(AEDeviceList &devices, bool passthrou
-       ss << devInfo.m_displayName;
-       if (!devInfo.m_displayNameExtra.empty())
-         ss << ", " << devInfo.m_displayNameExtra;
--
-       devices.push_back(AEDevice(ss.str(), device));
-     }
-   }
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 index e22db7a..103527f 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
