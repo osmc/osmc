@@ -1,0 +1,59 @@
+From ad638be23467c0004dda5d73179aa7ee5a671477 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 15 Oct 2015 16:14:13 +0100
+Subject: [PATCH] Ensure that Pulse -> ALSA bridge is not enumerated when using
+ A2DP
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp | 3 ++-
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp              | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+index fbdbfac..69ff74f 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+@@ -592,6 +592,8 @@ void CActiveAESink::PrintSinks()
+       CLog::Log(LOGNOTICE, "    Device %d", ++count);
+       CAEDeviceInfo& info = *itt2;
+       std::stringstream ss((std::string)info);
++      printf("\n%s", info.m_displayName.c_str());
++      fflush(stdout);
+       std::string line;
+       while(std::getline(ss, line, '\n'))
+         CLog::Log(LOGNOTICE, "        %s", line.c_str());
+@@ -623,7 +625,6 @@ void CActiveAESink::EnumerateOutputDevices(AEDeviceList &devices, bool passthrou
+       ss << devInfo.m_displayName;
+       if (!devInfo.m_displayNameExtra.empty())
+         ss << ", " << devInfo.m_displayNameExtra;
+-
+       devices.push_back(AEDevice(ss.str(), device));
+     }
+   }
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index e22db7a..103527f 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -1128,7 +1128,7 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+    * will automatically add "@" instead to enable surroundXX mangling.
+    * We don't want to do that if "default" can handle multichannel
+    * itself (e.g. in case of a pulseaudio server). */
+-  EnumerateDevice(list, "default", "", config);
++  //EnumerateDevice(list, "default", "", config);
+ 
+   void **hints;
+ 
+@@ -1554,7 +1554,8 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+   }
+ 
+   snd_pcm_close(pcmhandle);
+-  list.push_back(info);
++  if (info.m_deviceName != "pulse")
++    list.push_back(info);
+ }
+ 
+ bool CAESinkALSA::GetELD(snd_hctl_t *hctl, int device, CAEDeviceInfo& info, bool& badHDMI)
+-- 
+2.1.0
+
