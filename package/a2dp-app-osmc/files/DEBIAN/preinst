@@ -16,4 +16,5 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
     install_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
     install_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
     install_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf
+    install_divert /etc/dbus-1/system.d/bluetooth.conf.distributed /etc/dbus-1/system.d/bluetooth.conf
 fi
