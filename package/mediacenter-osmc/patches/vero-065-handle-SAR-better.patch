@@ -1,18 +1,26 @@
-From 6dd7fd889c95f24377b8503fd8cc7bcab4bb89bd Mon Sep 17 00:00:00 2001
+From 1e63f757e60a5146a57e4204623d7949cad4656b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Wed, 14 Oct 2015 16:34:30 +0100
+Date: Thu, 15 Oct 2015 05:49:18 +0100
 Subject: [PATCH] Better handling of case when SAR is not sane.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 7 +++++++
- 1 file changed, 7 insertions(+)
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-index c9bd48a..923480c 100644
+index c9bd48a..bf986dc 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-@@ -409,7 +409,14 @@ void CEGLNativeTypeIMX::GetMonitorSAR()
+@@ -37,6 +37,7 @@
+ #include "utils/Environment.h"
+ #include "guilib/gui3d.h"
+ #include "windowing/WindowingFactory.h"
++#include "settings/DisplaySettings.h"
+ #include "cores/AudioEngine/AEFactory.h"
+ #include <fstream>
+ 
+@@ -409,7 +410,14 @@ void CEGLNativeTypeIMX::GetMonitorSAR()
    // if it is 0, EDID info was missing or calculated
    // SAR value wasn't sane
    if (m_sar == 0)
