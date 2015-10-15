@@ -223,11 +223,11 @@ def handleAgentInteraction(deviceAlias, command , messages):
         message = lang(32030) + ' ' + deviceAlias
     if messages[0] == 'CONFIRM_PASSKEY':
        #           'Confirm passkey'                      'for'
-        message = lang(32031)+ ' '  +messages[0] + ' ' + lang(32032) + ' ' + deviceAlias
+        message = lang(32031)+ ' ' + str(messages[1]) + ' ' + lang(32032) + ' ' + deviceAlias
 
     if command == 'NOTIFICATION':
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (heading, message, "10000"))
-    if command == 'YESNO_DIALOGUE':
+    if command == 'YESNO_INPUT':
         if dialog.yesno(heading, message):
             return 'YES'
         return 'NO'
