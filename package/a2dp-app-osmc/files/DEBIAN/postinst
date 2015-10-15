@@ -25,10 +25,18 @@ if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
 
 if [ "$1" = "configure" ]; then
 
-    # remove only diverts that prior versions of this package added which are no longer needed:
-    # remove_divert PATH_DIV PATH_ORIG
-    usermod -a -G pulse-access,audio osmc
-    if is_rbp; then echo 'snd_bcm2835' >  /etc/modules-load.d/snd_bcm2835.conf; fi
-    ln -sf /var/run/pulse/.esd_auth /home/osmc/.esd_auth
-    touch /tmp/reboot-needed # ToDo, find what services to restart
+	# remove only diverts that prior versions of this package added which are no longer needed:
+	# remove_divert PATH_DIV PATH_ORIG
+
+	usermod -a -G pulse-access osmc
+	if is_rbp; then echo 'snd_bcm2835' > /etc/modules-load.d/snd_bcm2835.conf; fi
+	modprobe snd_bcm2835
+	ln -sf /var/run/pulse/.esd_auth /home/osmc/.esd_auth
+
+	systemctl daemon-reload
+	systemctl enable pulseaudio.service > /dev/null 2>&1
+	if ischroot; then exit 0; fi
+	systemctl start pulseaudio.service > /dev/null 2>&1
+	systemctl restart bluetooth.service > /dev/null 2>&1
+	exit 0
 fi
