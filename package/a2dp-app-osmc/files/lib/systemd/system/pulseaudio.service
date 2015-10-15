@@ -3,4 +3,4 @@ Description=Pulse Audio
         
 [Service]
 Type=simple
-ExecStart=/usr/bin/pulseaudio --system --disallow-exit  --disable-shm 
+ExecStart=/usr/bin/pulseaudio --system --disallow-exit --disable-shm --realtime --no-cpu-limit
