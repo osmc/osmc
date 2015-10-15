@@ -64,3 +64,6 @@ load-module module-position-event-sounds
 .ifexists module-bluetooth-discover.so
  load-module module-bluetooth-discover
 .endif
+
+load-module module-native-protocol-tcp auth-anonymous=1
+load-module module-zeroconf-publish
