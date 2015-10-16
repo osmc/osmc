@@ -14,7 +14,7 @@ then
         sed '/Package/d' -i files/DEBIAN/control
         sed '/Depends/d' -i files/DEBIAN/control
         echo "Package: ${1}-diskmount2-osmc" >> files/DEBIAN/control
-        echo "Depends: ${1}-udevil-osmc, dosfstools, exfat-utils, exfat-fuse, hfsutils, ntfs-3g, policykit-1, eject" >> files/DEBIAN/control
+        echo "Depends: ${1}-udevil-osmc, dosfstools, exfat-utils, exfat-fuse, hfsutils, ntfs-3g, policykit-1, eject, ${1}-hd-idle-osmc" >> files/DEBIAN/control
         fix_arch_ctl "files/DEBIAN/control"
         pushd files
         popd
