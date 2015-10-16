@@ -19,6 +19,7 @@ then
 	handle_dep "libudev-dev"
         handle_dep "libglib2.0-dev"
 	handle_dep "intltool"
+	handle_dep "gettext"
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-udevil-osmc" >> files/DEBIAN/control
