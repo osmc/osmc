@@ -25,7 +25,7 @@ import osmc_network
 
 WIFI_THREAD_NAME      = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
-
+WIFI_SCAN_THREAD_NAME = 'wifi_scan_thread'
 
 def log(message):
     xbmc.log(str(message), level=xbmc.LOGDEBUG)
@@ -408,7 +408,20 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.read_mysql_settings(self.advs_dict)
         write = self.write_advancedsettings(self.advs_dict)
 
-        xbmc.sleep(200)
+        wifi_thread = self.is_thread_running(WIFI_THREAD_NAME)
+        wifi_scan_thread = self.is_thread_running(WIFI_SCAN_THREAD_NAME)
+        bluetooth_thread = self.is_thread_running(BLUETOOTH_THREAD_NAME)
+
+        while wifi_thread or wifi_scan_thread or bluetooth_thread:
+            log("Wifi Thread " + str(wifi_thread))
+            log("Wifi Scan  Thread " + str(wifi_scan_thread))
+            log("BT Scan Thread " + str(bluetooth_thread))
+            xbmc.sleep(10)
+            wifi_thread = self.is_thread_running(WIFI_THREAD_NAME)
+            wifi_scan_thread = self.is_thread_running(WIFI_SCAN_THREAD_NAME)
+            bluetooth_thread = self.is_thread_running(BLUETOOTH_THREAD_NAME)
+
+        log("All Threads dead proceeding to exit")
 
         if write is None:
             self.close()
@@ -1118,6 +1131,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         return {}
 
+    def is_thread_running(self, thread_name):
+        for t in threading.enumerate():
+            if t.getName() == thread_name:
+                return True
+        return False
 
     def populate_wifi_panel(self, scan=False):
 
@@ -1125,13 +1143,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if osmc_network.is_wifi_enabled():
 
                 # Start the wifi population thread
-                threadRunning = False
-                for t in threading.enumerate():
 
-                    if t.getName() == WIFI_THREAD_NAME:
-                        threadRunning = True
-
-                if not threadRunning:
+                if not self.is_thread_running(WIFI_THREAD_NAME):
 
                     self.wifi_populate_bot = wifi_populate_bot(scan, self.getControl(5000), self.conn_ssid)
 
@@ -1481,12 +1494,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
 
         # Start Bluetooth Population Thread
-        threadRunning = False
-        for t in threading.enumerate():
-            if t.getName() == BLUETOOTH_THREAD_NAME:
-                threadRunning = True
-
-        if not threadRunning:
+        if not self.is_thread_running(BLUETOOTH_THREAD_NAME):
 
             self.bluetooth_population_thread = bluetooth_population_thread(self.BTD, self.BTP)
 
@@ -1947,7 +1955,7 @@ class wifi_scanner_bot(threading.Thread):
 
     def __init__(self):
 
-        super(wifi_scanner_bot, self).__init__()
+        super(wifi_scanner_bot, self).__init__(name=WIFI_SCAN_THREAD_NAME)
 
     def run(self):
         
