@@ -11,31 +11,40 @@ Builds are performed statically:
 
 On Ubuntu or Debian, we can get a minimal build of Qt 4.8.x with the following commands:
 
-```apt-get update```
+`apt-get update`
 
-```apt-get build-dep -y qt4-qmake```
+`apt-get build-dep -y qt4-qmake`
 
-```apt-get -y install build-essential git perl python libx11-dev "^libxb.*" libxrender-dev ```
+`apt-get -y install build-essential git perl python libx11-dev "^libxb.*" libxrender-dev `
 
-```git clone git://gitorious.org/qt/qt.git qt4 ```
+`git clone git://gitorious.org/qt/qt.git qt4 `
 
-```cd qt4 ```
+`cd qt4 `
 
-```./configure -release  -nomake examples -nomake demos -no-exceptions -no-stl -no-qt3support -no-scripttools -no-openssl -no-opengl -no-webkit -no-phonon -no-sql-sqlite -static -opensource -confirm-license --prefix=/usr```
+```
+./configure -release  -nomake examples -nomake demos -no-exceptions -no-stl -no-qt3support -no-scripttools -no-openssl -no-opengl -no-webkit -no-phonon -no-sql-sqlite -static -opensource -confirm-license --prefix=/usr
+```
 
-```make -j8 && make install```
+`make -j8 && make install`
 
 ## OS X Qt Static build 
 
-Only tested on OS X Mavericks:
+Only tested on OS X El Capitan:
 
-```git clone git://code.qt.io/qt/qt5.git -b 5.5.1```
+`git clone git://code.qt.io/qt/qt5.git -b 5.5.1`
 
-```cd qt5 ```
+`cd qt5 `
 
-```./configure -opensource -confirm-license -release --prefix=/usr -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports```
+`./init-repository`
 
-```make -j8 && make install```
+For configure, make sure you use a working `prefix`. El Capitan has a new security feature in place (http://enwp.org/System_Integrity_Protection). Usually, you want /usr/local anyway, but you might want to choose a different directory, to not mess up other Qt installs in /usr/local (like brew).
+```
+./configure -opensource -confirm-license -release --prefix=/usr/local -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports -static
+```
+
+Use a -j switch suitable for your processor. General rule of thumb: -jN where N is number of cores/processors +1.
+Also, you may have to `sudo make install`, depending on the prefix used in the configure step 
+`make -j8 && make install`
 
 ## Windows Qt static build ##
 
