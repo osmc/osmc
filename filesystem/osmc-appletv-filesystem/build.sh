@@ -62,6 +62,9 @@ echo -e "Installing core packages"
 # We have to set up userland first for kernel postinst rules
 chroot ${DIR} apt-get -y install --no-install-recommends atv-userland-osmc
 verify_action
+# We have to set up bootloader first for mach_kernel build abilities
+chroot ${DIR} apt-get -y install --no-install-recommends atv-bootloader-osmc
+verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends atv-device-osmc
 verify_action
 # We have SSH separate so we can remove it later via App Store
