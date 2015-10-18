@@ -26,7 +26,7 @@ new file mode 100644
 index 0000000..56bbeb6
 --- /dev/null
 +++ b/package/atv-bootloader/atv-bootloader.mk
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,17 @@
 +################################################################################
 +#
 +# atv-bootloader
@@ -38,10 +38,8 @@ index 0000000..56bbeb6
 +
 +define ATV_BOOTLOADER_INSTALL_TARGET_CMDS
 +	$(INSTALL) -D -m 0644 $(@D)/com.apple.Boot.plist $(BINARIES_DIR)/com.apple.Boot.plist
-+	$(INSTALL) -D -m 0644 $(@D)/mach_kernel $(BINARIES_DIR)/mach_kernel
 +	$(INSTALL) -D -m 0644 $(@D)/BootLogo.png $(BINARIES_DIR)/BootLogo.png
 +	$(INSTALL) -D -m 0644 $(@D)/boot.efi $(BINARIES_DIR)/boot.efi
-+	$(INSTALL) -D -m 0755 $(@D)/patchstick.sh $(BINARIES_DIR)/patchstick.sh
 +	cp -r $(@D)/System $(BINARIES_DIR)/System
 +endef
 +

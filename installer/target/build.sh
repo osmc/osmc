@@ -95,13 +95,17 @@ fi
 if [ "$1" == "appletv" ]
 then
 	echo -e "Installing AppleTV files"
-	mv bzImage /mnt/kernel.img
 	mv com.apple.Boot.plist /mnt
+	sed -e "s:BOOTFLAGS:console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=atv video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet:" -i /mnt/com.apple.Boot.plist
 	mv BootLogo.png /mnt
-	mv mach_kernel /mnt
 	mv boot.efi /mnt
 	mv System /mnt
-	mv patchstick.sh /mnt
+	echo -e "Building mach_kernel" # Had to be done after kernel image was built
+	mv bzImage ../build/atv-bootloader-master/vmlinuz
+	pushd ../build/atv-bootloader-master
+	make
+	popd
+	mv ../build/atv-bootloader-master/mach_kernel /mnt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/
