@@ -16,6 +16,7 @@ if [ "$1" = "configure" ]; then
 	if [ ! -f "/etc/osmc/prefs.d/.mysql_pw_set" ]
 	then
 	   mysqladmin -u root password osmc
+	   mkdir -p /etc/osmc/prefs.d
 	   touch /etc/osmc/prefs.d/.mysql_pw_set
 	fi
 fi
