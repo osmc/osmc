@@ -138,6 +138,15 @@ void MainWindow::install()
                 if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "vero1") { device->setRoot("/dev/sda1"); }
+                if (utils->getOSMCDev() == "atv") /* More AppleTV hacks */
+                {
+                    if ( ! device->hasRootChanged() )
+                    {
+                        /* This is not a USB fallback due to lack of HDD, so we need to create hfsplus on disk */
+                        device->setRoot("/dev/sda2");
+                        device->setBootNeedsFormat(true);
+                    }
+                }
                 for (int i = 0; i <= 60; i++)
                 {
                     ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
@@ -182,7 +191,7 @@ void MainWindow::install()
         else
             rootBase.chop(1);
         logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
-        if (device->hasRootChanged() && utils->getOSMCDev() != "atv")
+        if (device->hasRootChanged() && utils->getOSMCDev() != "atv") // && utils.getOSMCDev() != "pc" eventually.. -- cause we want boot there too.
         {
             logger->addLine("Must mklabel as root fs is on another device");
             utils->mklabel(rootBase, false);
@@ -191,16 +200,41 @@ void MainWindow::install()
         }
         else
         {
-            int size = utils->getPartSize(rootBase, device->getBootFS());
-            if (size == -1)
+            if (! device->doesBootNeedsFormat())
             {
-                logger->addLine("Issue getting size of device");
-                haltInstall(tr("cannot work out partition size"));
-                return;
+                int size = utils->getPartSize(rootBase, device->getBootFS());
+                if (size == -1)
+                {
+                    logger->addLine("Issue getting size of device");
+                    haltInstall(tr("cannot work out partition size"));
+                    return;
+                }
+                logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
+                utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
+                utils->fmtpart(device->getRoot(), "ext4");
             }
-            logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
-            utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
-            utils->fmtpart(device->getRoot(), "ext4");
+            else
+            {
+                /* We have to create the partition structure for /boot too */
+                logger->addLine("Must mklabel as rootfs is on another device");
+                utils->mklabel(rootBase, true); /* GPT favoured on PC */
+                logger->addLine("Making boot partition as this type of system needs one");
+                utils->mkpart(rootBase, device->getBootFS(), "4096s", "256M"); /* Hack to hard-code this for now */
+                if (utils->getOSMCDev() == "atv");
+                    utils->setflag(rootBase, "1 atvrecv", true);
+                utils->fmtpart(device->getBoot(), "hfsplus");
+                logger->addLine("Making root partition");
+                int size = utils->getPartSize(rootBase, device->getBootFS());
+                if (size == -1)
+                {
+                    logger->addLine("Issue getting size of device");
+                    haltInstall(tr("cannot work out partition size"));
+                    return;
+                }
+                logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
+                utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
+                utils->fmtpart(device->getRoot(), "ext4");
+            }
         }
     }
     /* Mount root filesystem */

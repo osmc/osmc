@@ -50,6 +50,16 @@ bool Utils::mklabel(QString device, bool isGPT)
     return mklabelProcess.exitCode() == 0;
 }
 
+bool Utils::setflag(QString device, QString flag, bool on)
+{
+    QProcess setflagProcess;
+    logger->addLine("Going to set flag " + flag + " on " + device + " with value of " + (on ? "on" : "off"));
+    setflagProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " set " + flag.toLocal8Bit() + (on ? "on" : "off"));
+    setflagProcess.waitForFinished(-1);
+    updateDevTable();
+    return setflagProcess.exitCode() == 0;
+}
+
 int Utils::getPartSize(QString device, QString fstype)
 {
     QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
@@ -80,10 +90,8 @@ bool Utils::fmtpart(QString partition, QString fstype)
     {
         mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
-    else if (fstype == "fat32")
-    {
-        mkfsProcess.start("/usr/sbin/mkfs.vfat -F 32 " + partition);
-    }
+    else if (fstype == "hfsplus")
+        mkfsProcess.start("/usr/sbin/mkfs.hfsplus " + partition);
     mkfsProcess.waitForFinished(-1);
     logger->addLine(QString(mkfsProcess.readAll()));
     return mkfsProcess.exitCode() == 0;

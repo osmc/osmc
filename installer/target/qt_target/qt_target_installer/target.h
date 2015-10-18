@@ -9,16 +9,19 @@
 class Target
 {
 public:
-    Target(QString bootPath, QString bootFS, bool bootRW, QString rootPath);
+    Target(QString bootPath, bool bootNeedsFormat, QString bootFS, bool bootRW, QString rootPath);
     QString getBoot() { return bootPath; }
     QString getBootFS() { return bootFS; }
     bool isBootRW() { return bootRW; }
     bool hasRootChanged() { return rootChanged; }
+    void setBootNeedsFormat(bool needsFormat);
+    bool doesBootNeedsFormat() { return bootNeedsFormat; }
     QString getRoot() { return rootPath; }
     void setRoot(QString newRoot); /* Allows overriding root */
 
 private:
     QString bootPath;
+    bool bootNeedsFormat;
     QString bootFS;
     QString rootPath;
     bool bootRW;
