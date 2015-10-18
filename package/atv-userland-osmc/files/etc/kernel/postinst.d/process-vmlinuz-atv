@@ -2,5 +2,5 @@
 
 pushd /opt/atvbl
 cp ${2} /opt/atvbl/vmlinuz
-make
-if [ $? == 0 ]; then echo -e "Installing new mach_kernel" && mv mach_kernel /boot; fi
+make -C /opt/atvbl
+mv /opt/atvbl/mach_kernel /boot
