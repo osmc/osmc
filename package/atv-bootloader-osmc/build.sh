@@ -13,5 +13,5 @@ mkdir -p ${out}/opt/atvbl
 mkdir -p ${out}/opt/darwin-cross
 mv src/atv-bootloader*/darwin-cross ${out}/opt
 mv src/atv-bootloader*/* ${out}/opt/atvbl
-sed -e s:\$\(pwd\):/opt/darwin-cross: -i files/opt/atvbl/Makefile
+sed -e s:\$\(pwd\):/opt: -i files/opt/atvbl/Makefile
 dpkg_build files/ atv-bootloader-osmc.deb
