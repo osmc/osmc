@@ -13,7 +13,6 @@ if [ "$1" = "remove" ]; then
 
 	# remove all diverts that this version _and_ all prior versions of the package once added:
 	# remove_divert PATH_DIV PATH_ORIG
-	touch /etc/osmc/prefs.d/.mysql_pw_set
 	remove_divert /etc/apache2/ports.conf.distributed /etc/apache2/ports.conf
 	remove_divert /etc/apache2/sites-available/000-default.conf.distributed /etc/apache2/sites-available/000-default.conf
 fi
