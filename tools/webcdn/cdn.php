@@ -8,7 +8,7 @@ $DEBUG = "no";
 $CSVFILE = "mirrors.csv";
 
 // FallBack URL - in case the mirrors.csv file is not accessible or empty.
-$FALLBACK = "http://46.37.189.135";
+$FALLBACK = "http://mirrorservice.org/sites/edge.samnazarko.co.uk/";
 
 
 //=======================================================================
