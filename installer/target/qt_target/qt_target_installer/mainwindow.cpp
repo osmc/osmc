@@ -191,7 +191,7 @@ void MainWindow::install()
         }
         else
         {
-            int size = utils->getPartSize(rootBase, (device->getBootFS() == "vfat" ? "fat32" : "ext4"));
+            int size = utils->getPartSize(rootBase, device->getBootFS());
             if (size == -1)
             {
                 logger->addLine("Issue getting size of device");
