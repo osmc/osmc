@@ -1,0 +1,62 @@
+#ifndef DLL_PATHS_GENERATED_H_
+#define DLL_PATHS_GENERATED_H_
+
+/*
+ *      Copyright (C) 2005-2013 Team XBMC
+ *      http://xbmc.org
+ *
+ *  This Program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2, or (at your option)
+ *  any later version.
+ *
+ *  This Program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XBMC; see the file COPYING.  If not, see
+ *  <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/* prefix install location */
+#define PREFIX_USR_PATH        "@prefix@"
+
+/* libraries */
+#define DLL_PATH_CPLUFF        "special://xbmcbin/system/libcpluff-@ARCH@.so"
+#define DLL_PATH_IMAGELIB      "special://xbmcbin/system/ImageLib-@ARCH@.so"
+#define DLL_PATH_LIBEXIF       "special://xbmcbin/system/libexif-@ARCH@.so"
+
+#define DLL_PATH_LIBRTMP       "@RTMP_SONAME@"
+#define DLL_PATH_LIBNFS        "@NFS_SONAME@"
+#define DLL_PATH_LIBGIF        "@GIF_SONAME@"
+
+#define DLL_PATH_LIBPLIST      "@PLIST_SONAME@"
+#define DLL_PATH_LIBSHAIRPLAY  "@SHAIRPLAY_SONAME@"
+#define DLL_PATH_LIBCEC        "@LIBCEC_SONAME@"
+
+#ifndef DLL_PATH_LIBCURL
+#define DLL_PATH_LIBCURL       "@CURL_SONAME@"
+#endif
+
+/* dvdplayer */
+#define DLL_PATH_LIBASS        "@ASS_SONAME@"
+#define DLL_PATH_LIBDVDNAV     "special://xbmcbin/system/players/dvdplayer/libdvdnav-@ARCH@.so"
+#define DLL_PATH_LIBMPEG2      "@MPEG2_SONAME@"
+
+/* libbluray */
+#define DLL_PATH_LIBBLURAY     "@BLURAY_SONAME@"
+
+/* wayland */
+#define DLL_PATH_WAYLAND_CLIENT "@WAYLAND_CLIENT_LIBRARY_SONAME@"
+#define DLL_PATH_WAYLAND_EGL "@WAYLAND_EGL_LIBRARY_SONAME@"
+
+/* xkbcommon */
+#define DLL_PATH_XKBCOMMON "@XKBCOMMON_LIBRARY_SONAME@"
+
+/* sse4 */
+#define DLL_PATH_LIBSSE4      "special://xbmcbin/system/libsse4-@ARCH@.so"
+
+#endif

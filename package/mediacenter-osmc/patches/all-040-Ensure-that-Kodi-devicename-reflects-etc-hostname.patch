@@ -1,4 +1,4 @@
-From a490f118586fac7a3791aea622dc3201a923060b Mon Sep 17 00:00:00 2001
+From 65bebbc52bfc6eab18104259b7c0dbc3edbc4ddf Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -11,99 +11,21 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/settings/settings.xml     |  4 ++--
- xbmc/Application.cpp             |  3 ++-
- xbmc/GUIInfoManager.cpp          |  3 +++
- xbmc/network/NetworkServices.cpp | 15 +++++++++++++++
- xbmc/settings/Settings.cpp       |  1 +
- 5 files changed, 23 insertions(+), 3 deletions(-)
+ xbmc/settings/Settings.cpp | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 1764d34..7ac990c 100644
---- a/system/settings/settings.xml
-+++ b/system/settings/settings.xml
-@@ -2145,7 +2145,7 @@
-       <group id="1">
-         <setting id="services.devicename" type="string" label="1271" help="36321">
-           <level>0</level>
--          <default>Kodi</default>
-+	  <default>""</default>
-           <control type="edit" format="string" />
-         </setting>
-       </group>
-@@ -2209,7 +2209,7 @@
-         </setting>
-         <setting id="services.webserverusername" type="string" parent="services.webserver" label="1048" help="36330">
-           <level>1</level>
--          <default>kodi</default>
-+          <default></default>
-           <constraints>
-             <allowempty>true</allowempty>
-           </constraints>
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index a290255..21da2a4 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -17,7 +17,7 @@
-  *  <http://www.gnu.org/licenses/>.
-  *
-  */
--CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
-+ CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
- #include "network/Network.h"
- #include "threads/SystemClock.h"
- #include "system.h"
-@@ -5338,3 +5338,4 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
-   
-   return false;
- }
-+  CSettings::Get().SetString("services.devicename", hostname);
-diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index 41552c0..f734e34 100644
---- a/xbmc/GUIInfoManager.cpp
-+++ b/xbmc/GUIInfoManager.cpp
-@@ -6390,3 +6390,6 @@ void CGUIInfoManager::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
-     break;
-   }
- }
-+std::string hostname("osmc");
-+      g_application.getNetwork().GetHostName(hostname);
-+      strLabel = hostname.c_str();
-\ No newline at end of file
-diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index 601251b..5035706 100644
---- a/xbmc/network/NetworkServices.cpp
-+++ b/xbmc/network/NetworkServices.cpp
-@@ -1042,3 +1042,18 @@ bool CNetworkServices::ValidatePort(int port)
- 
-   return true;
- }
-+if (settingId == "services.devicename")
-+ {
-+    std::string newHostName = CSettings::Get().GetString("services.devicename");
-+    FILE *fp;
-+     fp = fopen("/tmp/hostname", "w");
-+     if (fp)
-+     {
-+         fprintf(fp, "%s", newHostName.c_str());
-+	 fclose(fp);
-+     }
-+     else
-+         return;
-+         system("/usr/bin/sudo /bin/mv /tmp/hostname /etc/hostname");
-+         system("/usr/bin/sudo /bin/hostname -F /etc/hostname");
-+  }
-\ No newline at end of file
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 8404960..9f0536f 100644
+index 9f0536f..e90a8a0 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -1230,3 +1230,4 @@ bool CSettings::Reset()
+@@ -463,6 +463,7 @@ bool CSettings::Initialize()
  
    return true;
  }
 +settingSet.insert("services.devicename");
-\ No newline at end of file
+ 
+ bool CSettings::Load()
+ {
 -- 
 2.6.1.windows.1
 

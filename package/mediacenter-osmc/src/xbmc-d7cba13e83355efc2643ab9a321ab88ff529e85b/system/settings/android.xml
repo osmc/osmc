@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <section id="appearance">
+    <category id="locale">
+      <group id="2">
+        <visible>false</visible>
+      </group>
+    </category>
+  </section>
+  <section id="videos">
+    <category id="videoacceleration">
+      <group id="3">
+        <setting id="videoplayer.usestagefright" type="boolean" label="13436" help="36260">
+          <requirement>HAVE_LIBSTAGEFRIGHTDECODER</requirement>
+          <level>2</level>
+          <default>true</default>
+          <updates>
+            <update type="change" />
+          </updates>
+          <control type="toggle" />
+        </setting>
+        <setting id="videoplayer.usemediacodec" type="boolean" label="13439" help="36544">
+          <visible>HAS_MEDIACODEC</visible>
+          <level>2</level>
+          <default>true</default>
+          <updates>
+            <update type="change" />
+          </updates>
+          <control type="toggle" />
+        </setting>
+      </group>
+    </category>
+  </section>
+  <section id="system">
+    <category id="videoscreen">
+      <group id="1">
+        <setting id="videoscreen.resolution">
+          <visible>false</visible>
+        </setting>
+        <setting id="videoscreen.screen">
+          <visible>false</visible>
+        </setting>
+        <setting id="videoscreen.screenmode">
+          <visible>false</visible>
+        </setting>
+        <setting id="videoscreen.fakefullscreen">
+          <visible>false</visible>
+        </setting>
+        <setting id="videoscreen.blankdisplays">
+          <visible>false</visible>
+        </setting>
+      </group>
+    </category>
+  </section>
+</settings>

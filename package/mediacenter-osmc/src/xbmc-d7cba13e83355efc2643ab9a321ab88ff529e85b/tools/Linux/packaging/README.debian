@@ -1,0 +1,31 @@
+--- How to build a Kodi Debian package ---
+
+There are two available build methods:
+1.) debuild / debhelper
+  Requirements: debhelper, devscripts, all Kodi build deps 
+      sudo apt-get install debhelper devscripts
+      sudo apt-get build-dep kodi (if you have on of our repos/ppas added, else read docs/README.linux or docs/README.ubuntu)
+
+  Result: Debian package for your host distribution and architecture only
+  Recommended for local installs
+
+  Example Usage: ./mk-debian-package.sh
+
+2.) pdebuild / pbuilder 
+  Requirements: pbuilder, devscripts, proper pbuilder environment
+      For a comprehensive example how to setup pbuilder read: 
+      https://wiki.ubuntu.com/PbuilderHowto
+
+  Result: Debian package for arbitrary Debian based distributions and architectures.
+  Recommended for hosting your own apt repository or (clean room) compile testing for various distributions
+
+  Example Usage:
+  RELEASEV=16 \
+  DISTS=-"unstable" \
+  ARCHS="i386 amd64" \
+  BUILDER="pdebuild" \
+  PDEBUILD_OPTS="--debbuildopts \"-j4\"" \
+  PBUILDER_BASE="/home/$USER/xbmc-packaging/pbuilder" \
+  DPUT_TARGET="local" \
+  ./mk-debian-package.sh
+

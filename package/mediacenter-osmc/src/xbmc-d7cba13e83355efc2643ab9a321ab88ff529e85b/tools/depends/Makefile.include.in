@@ -1,0 +1,97 @@
+abs_top_srcdir=@abs_top_srcdir@
+
+TOOLCHAIN=@use_toolchain@
+NDKROOT=@use_ndk@
+SDKROOT=@use_sdk_path@
+XBMCROOT=$(abspath $(abs_top_srcdir)/../../)
+TARBALLS_LOCATION=@use_tarballs@
+PLATFORM=@deps_dir@
+HOST=@use_host@
+CPU=@use_cpu@
+NATIVEPLATFORM=@build_cpu@-@build_os@-native
+SDK_PLATFORM=@use_sdk@
+RETRIEVE_TOOL=@CURL@
+ARCHIVE_TOOL=@TAR@
+PREFIX=@prefix@/@deps_dir@
+NATIVEPREFIX=@prefix@/@tool_dir@
+ARCHIVE_TOOL_NATIVE=$(NATIVEPREFIX)/bin/tar
+OS=@platform_os@
+NATIVE_OS=@build_os@
+CROSS_COMPILING=@cross_compiling@
+ARCH_DEFINES=@ARCH_DEFINES@
+NATIVE_ARCH_DEFINES=@NATIVE_ARCH_DEFINES@
+TARGET_PLATFORM=@use_platform@
+XCODE_VERSION=@use_xcode@
+AAPT=@AAPT@
+DX=@DX@
+ZIPALIGN=@ZIPALIGN@
+
+HAS_ZLIB=@has_zlib@
+NEED_LIBICONV=@need_libiconv@
+LINK_ICONV=@link_iconv@
+ENABLE_GPLV3=@use_gplv3@
+HAS_LIBCRYSTAX=@has_libcrystax@
+
+BASE_URL=http://mirrors.kodi.tv/build-deps/sources
+ifneq ($(KODI_MIRROR),)
+BASE_URL=$(KODI_MIRROR)/build-deps/sources
+endif
+RETRIEVE_TOOL_FLAGS=-Ls --create-dirs -f -O
+ARCHIVE_TOOL_FLAGS=--strip-components=1 -xf
+CONFIG_SUB=@prefix@/@tool_dir@/share/automake-1.11/config.sub
+CONFIG_GUESS=@prefix@/@tool_dir@/share/automake-1.11/config.guess
+
+RPL=@prefix@/@tool_dir@/bin/python @prefix@/@tool_dir@/bin/rpl
+
+LD=@LD@
+CC=@CC@
+CXX=@CXX@
+CPP=@CPP@
+AR=@AR@
+RANLIB=@RANLIB@
+AS=@AS@
+NM=@NM@
+STRIP=@STRIP@
+READELF=@READELF@
+OBJDUMP=@OBJDUMP@
+
+CMAKE=@prefix@/@tool_dir@/bin/cmake -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/share/Toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+CFLAGS=@platform_cflags@ @platform_includes@ -isystem @prefix@/@deps_dir@/include
+LDFLAGS=-L@prefix@/@deps_dir@/lib @platform_ldflags@
+CXXFLAGS=@platform_cxxflags@ @platform_includes@ -isystem @prefix@/@deps_dir@/include
+CPPFLAGS=@platform_cflags@ @platform_includes@ -isystem @prefix@/@deps_dir@/include
+
+PATH:=@prefix@/@tool_dir@/bin:$(PATH)
+ifneq (@use_build_toolchain@,)
+  PATH:=@use_build_toolchain@/bin:@use_build_toolchain@/usr/bin:$(PATH)
+endif
+LD_FOR_BUILD=@LD_FOR_BUILD@
+CC_FOR_BUILD=@CC_FOR_BUILD@
+CXX_FOR_BUILD=@CXX_FOR_BUILD@
+AR_FOR_BUILD=@AR_FOR_BUILD@
+RANLIB_FOR_BUILD=@RANLIB_FOR_BUILD@
+AS_FOR_BUILD=@AS_FOR_BUILD@
+NM_FOR_BUILD=@NM_FOR_BUILD@
+STRIP_FOR_BUILD=@STRIP_FOR_BUILD@
+READELF_FOR_BUILD=@READELF_FOR_BUILD@
+OBJDUMP_FOR_BUILD=@OBJDUMP_FOR_BUILD@
+
+NATIVE_CFLAGS=-I@prefix@/@tool_dir@/include
+NATIVE_LDFLAGS=-L@prefix@/@tool_dir@/lib
+NATIVE_CPPFLAGS=-I@prefix@/@tool_dir@/include
+NATIVE_CXXFLAGS=-I@prefix@/@tool_dir@/include
+
+
+export AUTOM4TE=@prefix@/@tool_dir@/bin/autom4te
+export AUTOMAKE=@prefix@/@tool_dir@/bin/automake
+export AUTOCONF=@prefix@/@tool_dir@/bin/autoconf
+export ACLOCAL=@prefix@/@tool_dir@/bin/aclocal
+export ACLOCAL_PATH=@prefix@/@deps_dir@/share/aclocal:@prefix@/@tool_dir@/share/aclocal
+export AUTOPOINT=@prefix@/@tool_dir@/bin/autopoint
+export AUTOHEADER=@prefix@/@tool_dir@/bin/autoheader
+export LIBTOOL=@prefix@/@tool_dir@/bin/libtool
+export LIBTOOLIZE=@prefix@/@tool_dir@/bin/libtoolize
+
+export AUTORECONF=@prefix@/@tool_dir@/bin/autoreconf
+export JSON_BUILDER=$(NATIVEPREFIX)/bin/JsonSchemaBuilder
+

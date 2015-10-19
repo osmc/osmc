@@ -1,8 +1,8 @@
-From 017c0df5ceae9d80c5670723f4d28949c70d0554 Mon Sep 17 00:00:00 2001
+From 23396a43463b35640ef25f6708862549ae817b79 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:48:19 +0100
-Subject: [PATCH 5/7] Do not prompt for confirmation of skin change if it has
- been initiated by the Walkthrough
+Subject: [PATCH] Do not prompt for confirmation of skin change if it has been
+ initiated by the Walkthrough
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -10,22 +10,22 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 440c04e..6e89cdd 100644
+index 21da2a4..89ba9f2 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -1370,8 +1370,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
-     }
+@@ -1409,8 +1409,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
  
+     // now we can finally reload skins
      std::string builtin("ReloadSkin");
--    if (settingId == "lookandfeel.skin" && !m_skinReverting)
+-    if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && !m_skinReverting)
 +    if (settingId == "lookandfeel.skin" && !m_skinReverting && m_eOSMCWalkthroughState != OSMC_WALKTHROUGH_ISRUNNING )
        builtin += "(confirm)";
-+    // We need to set ISDONE first so reloading is allowed
++  // We need to set ISDONE first so reloading is allowed
 +    if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
 +	m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE;
-     CApplicationMessenger::Get().ExecBuiltIn(builtin);
+     CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, builtin);
    }
-   else if (settingId == "lookandfeel.skintheme")
+   else if (settingId == CSettings::SETTING_LOOKANDFEEL_SKINZOOM)
 -- 
-2.1.0
+2.6.1.windows.1
 

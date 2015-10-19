@@ -1,0 +1,18 @@
+To compile the WiiRemote event client:
+
+$ sudo apt-get install libbluetooth-dev
+$ make
+
+NOTE: if you get a permission denied error when make'ing the event client, you may need to use root,
+e.g. $ sudo make
+
+make will create an executable called WiiUse_WiiRemote that contains the event client.
+
+WiiUse_WiiRemote must be run from this directory as it uses relative linking to the built wiiuse_v0.12 library.
+
+WiiUse_WiiRemote.h contains the button number mappings for the WiiRemote (prefixed with KEYCODE).
+
+TODO:
+Add IR pointer support
+
+TheUni + dteirney

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN" "http://www.w3.org/2001/XMLSchema.dtd">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="extension">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="menu" type="menuType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="point" type="xs:string" use="required"/>
+      <xs:attribute name="id" type="simpleIdentifier"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="itemType">
+    <xs:sequence>
+      <xs:element name="label" type="xs:string"/>
+      <xs:element name="visible" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="library" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="menuType">
+    <xs:sequence>
+      <xs:element name="label" type="xs:string" minOccurs="0"/>
+      <xs:element name="item" type="itemType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="menu" type="menuType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+  <xs:simpleType name="simpleIdentifier">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^.]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
