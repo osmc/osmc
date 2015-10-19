@@ -1,4 +1,4 @@
-From a19b6fc83a6ab28b08eae0de08202e2542940f24 Mon Sep 17 00:00:00 2001
+From f5e8de4d9416231e1852436e6c94ddcd631957c6 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
@@ -6,17 +6,17 @@ Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  7 +++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 11 +++++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index e2eab38..94cf810 100644
+index 59517ba..2d610ca 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -124,6 +124,13 @@ namespace XBMCAddon
-       CSettings::Get().SetString("lookandfeel.skin", skin);
-     }
- 
+@@ -558,3 +558,10 @@ namespace XBMCAddon
+     const int lLOGNOTICE = LOGNOTICE;
+   }
+ }
 +    void sethostname(const char* hostname)
 +    {
 +      XBMC_TRACE;
@@ -24,17 +24,15 @@ index e2eab38..94cf810 100644
 +      return;
 +      CSettings::Get().SetString("services.devicename", hostname);
 +    }
- 
-     String executeJSONRPC(const char* jsonrpccommand)
-     {
+\ No newline at end of file
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index a5f0656..c017523 100644
+index 9817525..e0cb3be 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -127,6 +127,18 @@ namespace XBMCAddon
- 
-         void setskin(const char* skin);
- 
+@@ -461,3 +461,14 @@ namespace XBMCAddon
+ #endif
+   }
+ }
 +       /**
 +        * sethostname(hostname) -- Change the device name, and in turn, hostname
 +        *
@@ -46,10 +44,6 @@ index a5f0656..c017523 100644
 +        */
 +
 +        void sethostname(const char* hostname);
-+
-     /**
-      * sleep(time) -- Sleeps for 'time' msec.
-      * 
 -- 
-2.1.0
+2.6.1.windows.1
 

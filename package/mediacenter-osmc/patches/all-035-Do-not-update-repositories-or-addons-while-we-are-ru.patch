@@ -1,8 +1,8 @@
-From e20727621d8cc7e61d2d0f11ee2759070b3f275e Mon Sep 17 00:00:00 2001
+From b6274ed53ee5159be7921148ce3e65edfb4b8084 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:52:20 +0100
-Subject: [PATCH 7/7] Do not update repositories or addons while we are running
- the OSMC Walkthrough
+Subject: [PATCH] Do not update repositories or addons while we are running the
+ OSMC Walkthrough
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -10,18 +10,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 183aa5f..16780fc 100644
+index a2475c6..a290255 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -4336,7 +4336,7 @@ void CApplication::ProcessSlow()
-   g_mediaManager.ProcessEvents();
- 
-   if (!m_pPlayer->IsPlayingVideo() &&
--      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER)
-+      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
-     CAddonInstaller::Get().UpdateRepos();
- 
-   CAEFactory::GarbageCollect();
+@@ -17,7 +17,7 @@
+  *  <http://www.gnu.org/licenses/>.
+  *
+  */
+-
++CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
+ #include "network/Network.h"
+ #include "threads/SystemClock.h"
+ #include "system.h"
 -- 
-2.1.0
+2.6.1.windows.1
 

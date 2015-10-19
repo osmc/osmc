@@ -19,8 +19,8 @@ fi
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/4ed3eb6692b6b755354a5fe18d5cd45f8003ea26.tar.gz" "$(pwd)/src"
-API_VERSION="15"
+pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/src"
+API_VERSION="16"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 API_VERSION="16"
@@ -29,7 +29,7 @@ if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
 BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 BUILD_OPTS=$(($BUILD_OPTS - $BUILD_OPTION_USE_CCACHE))
-build_in_env "${1}" $(pwd) "mediacenter-osmc" "$BUILD_OPTS"
+build_in_env "${1}" $(pwd) "mediacenter-next-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
 then

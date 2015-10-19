@@ -1,32 +1,33 @@
-From 09140fe300d68036453c82767607149aa5d89d3d Mon Sep 17 00:00:00 2001
+From 088c41c80af2eed4b6b5efeee1d39546ed70d60a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 8 Sep 2015 03:49:56 +0100
-Subject: [PATCH 1/3] Add m_sqlitemm to g_Application to keep track of whether
+Subject: [PATCH] Add m_sqlitemm to g_Application to keep track of whether
  memory mapped IO is enabled for SQLite
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ xbmc/Application.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 4839e55..0900ee9 100644
+index c9ba273..a405f4e 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -168,6 +168,13 @@ public:
-   } OSMCWalkthroughState;
-   OSMCWalkthroughState m_eOSMCWalkthroughState;
-   void SetOSMCWalkthroughState(OSMCWalkthroughState state) { m_eOSMCWalkthroughState = state; }
-+
-+  // allow memory mapped IO with sqlite
-+
-+  bool m_sqlitemm;
-+  bool IsSqliteMm() const { return m_sqlitemm; }
-+  void SetSqliteMmTrue() { m_sqlitemm = true; }
-+
-   void RestartApp();
-   void UnloadSkin(bool forReload = false);
-   bool LoadUserWindows();
+@@ -36,7 +36,13 @@ class CAction;
+ class CFileItem;
+ class CFileItemList;
+ class CKey;
+-
+++
+++  // allow memory mapped IO with sqlite
+++
+++  bool m_sqlitemm;
+++  bool IsSqliteMm() const { return m_sqlitemm; }
+++  void SetSqliteMmTrue() { m_sqlitemm = true; }
+++
+ 
+ namespace ADDON
+ {
 -- 
-2.1.0
+2.6.1.windows.1
 
