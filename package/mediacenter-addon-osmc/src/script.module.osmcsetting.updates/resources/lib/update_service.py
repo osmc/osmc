@@ -1244,7 +1244,8 @@ class Main(object):
 
 		if not any([bl in av for bl in self.EXTERNAL_UPDATE_REQUIRED_LIST for av in available_updates]):
 
-			self.EXTERNAL_UPDATE_REQUIRED = 0
+			# self.EXTERNAL_UPDATE_REQUIRED = 0		##### changed to force all updates to occur with Kodi closed.
+			self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# display update available notification
 		if not self.s['suppress_icon']:
