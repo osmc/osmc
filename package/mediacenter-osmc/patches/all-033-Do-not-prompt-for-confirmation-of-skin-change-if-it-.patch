@@ -22,7 +22,7 @@ index 440c04e..6e89cdd 100644
        builtin += "(confirm)";
 +    // We need to set ISDONE first so reloading is allowed
 +    if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
-+	m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE;
++	m_eOSMCWalkthroughState = OSMC_WALKTHROUGH_ISDONE;
      CApplicationMessenger::Get().ExecBuiltIn(builtin);
    }
    else if (settingId == "lookandfeel.skintheme")
