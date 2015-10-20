@@ -3,7 +3,7 @@
 
 #!/bin/bash
 
-. ../../scripts/common.sh
+
 
 # Available options for building
 export BUILD_OPTION_LANGC=1

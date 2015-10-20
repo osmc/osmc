@@ -39,6 +39,10 @@ then
 	mount -t proc proc /proc >/dev/null 2>&1
 	update_sources
 	handle_dep "autopoint"
+	
+	handle_dep "libdcadec-osmc"
+	
+	
 	handle_dep "automake"
 	handle_dep "bison"
 	handle_dep "make"
