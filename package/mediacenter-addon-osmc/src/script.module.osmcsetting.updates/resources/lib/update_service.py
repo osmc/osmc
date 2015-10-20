@@ -755,8 +755,22 @@ class Main(object):
 
 	def action_list_complete(self):
 
-		# notify the user that the installation or uninstall of their desirec apfs has completed successfully
-		ok = DIALOG.ok(lang(32090), lang(32091))
+		# notify the user that the installation or uninstall of their desired apfs has completed successfully
+		# prompt for immediate reboot if needed.
+
+		if any([os.path.isfile('/tmp/reboot-needed'), os.path.isfile('fname/var/run/reboot-required')]):
+			reboot = DIALOG.yesno(lang(32090), lang(32091), lang(32133), yeslabel=lang(32081), nolabel=lang(32082))
+
+			if reboot:
+
+				exit_osmc_settings_addon()
+				
+				xbmc.sleep(1000)
+				
+				xbmc.executebuiltin('Reboot')
+
+		else:
+			ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
 	# @clog(log, maxlength=2500)
