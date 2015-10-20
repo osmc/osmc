@@ -1,0 +1,32 @@
+From 4a5a178a5f5cc915c430f88cdcf2f1c98f02fd17 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 20 Oct 2015 18:37:59 +0100
+Subject: [PATCH] Allow profile login screen GUIWindowLoginScreen to set OSMC
+ walkthrough status as completed to allow skin reloads after profile is
+ loaded.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windows/GUIWindowLoginScreen.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/windows/GUIWindowLoginScreen.cpp b/xbmc/windows/GUIWindowLoginScreen.cpp
+index 80d680d..63c8fb3 100644
+--- a/xbmc/windows/GUIWindowLoginScreen.cpp
++++ b/xbmc/windows/GUIWindowLoginScreen.cpp
+@@ -298,6 +298,12 @@ void CGUIWindowLoginScreen::LoadProfile(unsigned int profile)
+     g_playlistPlayer.SetCurrentPlaylist(PLAYLIST_NONE);
+   }
+ 
++  // allow add-on updating and skin reloading. they don't need tutorial if they have a profile...
++
++  ThreadMessage tMsg = {TMSG_SETOSMCWALKTHROUGHSTATE};
++  tMsg.param1 = 2;
++  CApplicationMessenger::Get().SendMessage(tMsg);
++
+   // reload the add-ons, or we will first load all add-ons from the master account without checking disabled status
+   ADDON::CAddonMgr::Get().ReInit();
+ 
+-- 
+2.1.0
+
