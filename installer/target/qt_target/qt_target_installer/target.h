@@ -9,7 +9,7 @@
 class Target
 {
 public:
-    Target(QString bootPath, bool bootNeedsFormat, QString bootFS, bool bootRW, QString rootPath);
+    Target(QString bootPath, bool bootNeedsFormat, QString bootFS, bool bootRW, QString rootPath, bool usesGPT);
     QString getBoot() { return bootPath; }
     QString getBootFS() { return bootFS; }
     bool isBootRW() { return bootRW; }
@@ -18,6 +18,7 @@ public:
     bool doesBootNeedsFormat() { return bootNeedsFormat; }
     QString getRoot() { return rootPath; }
     void setRoot(QString newRoot); /* Allows overriding root */
+    bool deviceUsesGPT() { return usesGPT; }
 
 private:
     QString bootPath;
@@ -26,6 +27,7 @@ private:
     QString rootPath;
     bool bootRW;
     bool rootChanged = false; /* So we know if we need to mklabel */
+    bool usesGPT;
 };
 
 #endif // TARGET_H

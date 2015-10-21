@@ -32,7 +32,7 @@ void Utils::rebootSystem()
     system("/bin/sh -c \"/bin/sleep 10 && /bin/echo b > /proc/sysrq-trigger\"");
 }
 
-void inline Utils::updateDevTable()
+void Utils::updateDevTable()
 {
     system("/usr/sbin/partprobe");
 }
@@ -62,6 +62,8 @@ bool Utils::setflag(QString device, QString flag, bool on)
 
 int Utils::getPartSize(QString device, QString fstype)
 {
+    if (fstype == "hfsplus")
+        fstype = "hfs+"; /* ATV hack */
     QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
     QProcess partedProcess;
     partedProcess.start("/bin/sh -c \"" + command + "\"");
@@ -90,7 +92,7 @@ bool Utils::fmtpart(QString partition, QString fstype)
     {
         mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
-    else if (fstype == "hfsplus")
+    else if (fstype == "hfs+")
         mkfsProcess.start("/usr/sbin/mkfs.hfsplus " + partition);
     mkfsProcess.waitForFinished(-1);
     logger->addLine(QString(mkfsProcess.readAll()));
@@ -118,14 +120,14 @@ bool Utils::mountPartition(Target *device, QString path)
     pathdir.mkpath(path);
     if (path == QString(MNT_BOOT))
     {
-        logger->addLine("Trying to mount to MNT_BOOT ("+QString(MNT_BOOT));
-        logger->addLine("Using device.boot: " + device->getBoot() + " and FS: " + device->getBootFS());
+        logger->addLine("Trying to mount to MNT_BOOT ("+QString(MNT_BOOT) + ")");
+        logger->addLine("Using device->boot: " + device->getBoot() + " and FS: " + device->getBootFS());
         return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
     }
     else if (path == QString(MNT_ROOT))
     {
-        logger->addLine("Trying to mount to MNT_ROOT ("+QString(MNT_ROOT));
-        logger->addLine("Using device.root: " + device->getRoot());
+        logger->addLine("Trying to mount to MNT_ROOT ("+QString(MNT_ROOT) + ")");
+        logger->addLine("Using device->root: " + device->getRoot());
         if (device->getRoot().contains(":/") && device->hasRootChanged())
         {
             logger->addLine("Assuming NFS mount.");

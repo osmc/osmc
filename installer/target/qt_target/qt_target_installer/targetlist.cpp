@@ -11,9 +11,9 @@ TargetList::TargetList()
 {
     /* Populate supported devices */
     /* Raspberry Pi */
-    Target *RBP = new Target("/dev/mmcblk0p1", false, "fat32", true, "/dev/mmcblk0p2");
-    Target *VERO = new Target("/dev/mmcblk0p1", false, "fat32", true, "/dev/mmcblk0p2");
-    Target *ATV = new Target("/dev/sdb1", false, "hfsplus", true, "/dev/sdb2");
+    Target *RBP = new Target("/dev/mmcblk0p1", false, "fat32", true, "/dev/mmcblk0p2", false);
+    Target *VERO = new Target("/dev/mmcblk0p1", false, "fat32", true, "/dev/mmcblk0p2", false);
+    Target *ATV = new Target("/dev/sdb1", false, "hfsplus", true, "/dev/sdb2", true);
     /* Add to map */
     /* We can use the same Target for both Pis, identical entries */
     targetMap.insert("rbp1", RBP);

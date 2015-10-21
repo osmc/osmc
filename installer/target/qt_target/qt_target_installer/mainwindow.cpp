@@ -21,6 +21,10 @@
 #include <QThread>
 #include "extractworker.h"
 #include <QTimer>
+#include <sys/types.h>
+#include <linux/hdreg.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -85,6 +89,7 @@ void MainWindow::install()
         /* Super hacky for Apple TV 1st gen. Sometimes no internal disk */
         hasMount = utils->mountPartition(device, "/dev/sda1");
         device->setRoot("/dev/sda2");
+        device->setBootNeedsFormat(false);
     }
     if (! hasMount)
     {
@@ -138,15 +143,6 @@ void MainWindow::install()
                 if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "vero1") { device->setRoot("/dev/sda1"); }
-                if (utils->getOSMCDev() == "atv") /* More AppleTV hacks */
-                {
-                    if ( ! device->hasRootChanged() )
-                    {
-                        /* This is not a USB fallback due to lack of HDD, so we need to create hfsplus on disk */
-                        device->setRoot("/dev/sda2");
-                        device->setBootNeedsFormat(true);
-                    }
-                }
                 for (int i = 0; i <= 60; i++)
                 {
                     ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
@@ -209,6 +205,32 @@ void MainWindow::install()
                     haltInstall(tr("cannot work out partition size"));
                     return;
                 }
+                if (device->deviceUsesGPT())
+                {
+                    /* GPT is too clever: has secondary header; so we need to trash it and recreate the partition layout */
+                    /* NB: for some reason on 4.x this does not work all the time. So we have some parted patches to make sure it does */
+                    logger->addLine("We are using GPT. I need to erase the first 512 bytes and reconstruct the partition table");
+                    QString ddCmd = "/bin/dd if=/dev/zero of=" + rootBase + " bs=512 count=1 conv=fsync";
+                    system(ddCmd.toLocal8Bit());
+                    int fd;
+                    QFile dev("/dev/sdb");
+                    dev.open(fd, QIODevice::ReadOnly);
+                    ioctl(fd, BLKRRPART, NULL);
+                    ioctl(fd, BLKFLSBUF, NULL);
+                    dev.close();
+                    utils->updateDevTable();
+                    utils->updateDevTable();
+                    if (utils->getOSMCDev() == "atv")
+                    {
+                        logger->addLine("Re-creating Apple TV partition structure");
+                        utils->mklabel(rootBase, true);
+                        utils->updateDevTable();
+                        utils->mkpart(rootBase, "hfsplus", "40s", "256M");
+                        /* We don't format /boot */
+                        utils->setflag(rootBase, "1 atvrecv", true);
+                        utils->updateDevTable();
+                    }
+                }
                 logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
                 utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
                 utils->fmtpart(device->getRoot(), "ext4");
@@ -219,10 +241,13 @@ void MainWindow::install()
                 logger->addLine("Must mklabel as rootfs is on another device");
                 utils->mklabel(rootBase, true); /* GPT favoured on PC */
                 logger->addLine("Making boot partition as this type of system needs one");
-                utils->mkpart(rootBase, device->getBootFS(), "4096s", "256M"); /* Hack to hard-code this for now */
-                if (utils->getOSMCDev() == "atv");
+                if (utils->getOSMCDev() == "atv")
+                {
+                    utils->mkpart(rootBase, device->getBootFS(), "40s", "256M"); /* Hack to hard-code this for now */
                     utils->setflag(rootBase, "1 atvrecv", true);
-                utils->fmtpart(device->getBoot(), "hfsplus");
+                    utils->fmtpart(device->getBoot(), "hfsplus");
+                }
+                utils->updateDevTable();
                 logger->addLine("Making root partition");
                 int size = utils->getPartSize(rootBase, device->getBootFS());
                 if (size == -1)

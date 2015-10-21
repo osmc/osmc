@@ -5,13 +5,14 @@
 #include "target.h"
 #include <QString>
 
-Target::Target(QString bootPath, bool bootNeedsFormat, QString bootFS, bool bootRW, QString rootPath)
+Target::Target(QString bootPath, bool bootNeedsFormat, QString bootFS, bool bootRW, QString rootPath, bool usesGPT)
 {
     this->bootPath = bootPath;
     this->bootNeedsFormat = bootNeedsFormat;
     this->bootFS = bootFS;
     this->bootRW = bootRW;
     this->rootPath = rootPath;
+    this->usesGPT = usesGPT;
 }
 
 void Target::setRoot(QString newRoot)
