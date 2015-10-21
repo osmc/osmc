@@ -29,7 +29,7 @@ void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv")
     {
         fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
