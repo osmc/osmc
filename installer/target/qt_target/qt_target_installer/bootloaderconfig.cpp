@@ -19,10 +19,22 @@ BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *util
 
 void BootloaderConfig::copyBootFiles()
 {
+    if (utils->getOSMCDev() == "atv")
+    {
+        system("mv /mnt/boot/BootLogo.png /tmp/BootLogo.png");
+        system("mv /mnt/boot/boot.efi /tmp/boot.efi");
+        system("mv /mnt/boot/System /tmp/System");
+    }
     system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
     system("mv /tmp/preseed.cfg /mnt/boot/preseed.cfg");
     system("mv /mnt/root/boot/* /mnt/boot");
+    if (utils->getOSMCDev() == "atv")
+    {
+        system("mv /tmp/BootLogo.png /mnt/boot/BootLogo.png");
+        system("mv /tmp/boot.efi /mnt/boot/boot.efi");
+        system("mv /tmp/System /mnt/boot");
+    }
 }
 
 void BootloaderConfig::configureMounts()
@@ -102,10 +114,23 @@ void BootloaderConfig::configureEnvironment()
     }
    if (utils->getOSMCDev() == "atv")
    {
-       QFile cmdlineFile("/mnt/boot/cmdline.txt");
-       QStringList cmdlineStringList;
-       cmdlineStringList << "console=tty1 root=" + this->device->getRoot() + "rootfstype=ext4 rootwait quiet video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet";
-       utils->writeToFile(cmdlineFile, cmdlineStringList, false);
-       cmdlineFile.close();
+       QFile bootListFile("/mnt/boot/com.apple.Boot.plist");
+       QStringList bootStringList;
+       bootListFile.close();
+       bootStringList << "<?xml version=\"1.0\" encoding=\"UTF-8\">" << "\n";
+       bootStringList << "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" << "\n";
+       bootStringList << "<plist version=\"1.0\">" << "\n";
+       bootStringList << "<dict>" << "\n";
+       bootStringList << "      <key>Background Color</key>" << "\n";
+       bootStringList << "      <integer>0</integer>" << "\n";
+       bootStringList << "      <key>Boot Logo</key>" << "\n";
+       bootStringList << "      <string>BootLogo.png</string>" << "\n";
+       bootStringList << "      <key>Kernel Flags</key>" << "\n";
+       bootStringList << "      <string>console=tty1 root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet" << "</string"> << "\n";
+       bootStringList << "      <key>Kernel</key>" << "\n";
+       bootStringList << "      <string>mach_kernel</string>" << "\n";
+       bootStringList << "</dict>" << "\n";
+       bootStringList << "</plist>" << "\n";
+       utils->writeToFile(bootListFile, bootStringList, false);
    }
 }
