@@ -18,5 +18,6 @@ if [ "$1" = "configure" ]; then
 		mv /etc/ssh/sshd_config.dpkg-dist /etc/ssh/sshd_config
 	fi
 
-	systemctl restart sshd.service
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && systemctl is-enabled sshd.service >/dev/null 2>&1; then systemctl restart sshd.service; fi
+	rm -f /var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade
 fi
