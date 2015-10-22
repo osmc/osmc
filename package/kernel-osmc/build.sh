@@ -157,6 +157,7 @@ then
 		fi
 		if [ "$1" == "atv" ]
 		then
+		# Build NVIDIA module
 		pushd drivers/staging/nv-osmc
 		$BUILD SYSSRC=$(pwd)/../../../
 		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
