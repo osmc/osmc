@@ -15,7 +15,7 @@ if [ "$1" = "configure" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "1.1.6"; then
-		mv /etc/ssh/sshd_config.dpkg-dist /etc/ssh/sshd_config
+		mv /etc/ssh/sshd_config.dpkg-dist /etc/ssh/sshd_config 2>/dev/null
 	fi
 
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && systemctl is-enabled sshd.service >/dev/null 2>&1; then systemctl restart sshd.service; fi
