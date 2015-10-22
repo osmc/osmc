@@ -9,8 +9,14 @@ remove_divert ()
 }
 
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-#if [ "$1" = "configure" ]; then
+if [ "$1" = "configure" ]; then
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
-#fi
+
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "1.1.6"; then
+		mv /etc/ssh/sshd_config.dpkg-dist /etc/ssh/sshd_config
+	fi
+
+	systemctl restart sshd.service
+fi
