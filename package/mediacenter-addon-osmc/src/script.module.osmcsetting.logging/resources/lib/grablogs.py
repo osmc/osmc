@@ -609,24 +609,36 @@ class Main(object):
 
 		else:
 
-			try:
-				with os.popen('curl -X POST -s -T "%s" %s/documents' % (TEMP_LOG_FILE, UPLOAD_LOC)) as f:
+			attempts = 	[
+						'curl -X POST -s    -T',
+						'curl -X POST -s -0 -T'
+						]
 
-					line = f.readline()
-					
-					key = line.replace('{"key":"','').replace('"}','').replace('\n','')
-					
-					if CALLER != 'user':
-						log('pastio line: %s' % repr(line))
+			for attempt in attempts:
+				try:
+					with os.popen('%s "%s" %s/documents' % (attempt, TEMP_LOG_FILE, UPLOAD_LOC)) as f:
+
+						line = f.readline()
 						
-			except:
+						key = line.replace('{"key":"','').replace('"}','').replace('\n','')
+						
+						if CALLER != 'user':
+							log('pastio line: %s' % repr(line))
 
-				key = False
+					upload_exception = None
+							
+				except Exception as e:
+
+					upload_exception = traceback.format_exc()
 
 			self.pDialog.close()
 			time.sleep(0.5)
 
 			if not key:
+
+				if upload_exception:
+					log('Exception Details:\n')
+					log(upload_exception)
 
 				if CALLER == 'kodi':
 
