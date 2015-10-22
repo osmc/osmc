@@ -126,7 +126,7 @@ void BootloaderConfig::configureEnvironment()
        bootStringList << "      <key>Boot Logo</key>" << "\n";
        bootStringList << "      <string>BootLogo.png</string>" << "\n";
        bootStringList << "      <key>Kernel Flags</key>" << "\n";
-       bootStringList << "      <string>console=tty1 root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet" << "</string"> << "\n";
+       bootStringList << "      <string>console=tty1 root=" + this->device->getRoot() + " rootfstype=ext4 rootwait quiet video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet" << "</string>" << "\n";
        bootStringList << "      <key>Kernel</key>" << "\n";
        bootStringList << "      <string>mach_kernel</string>" << "\n";
        bootStringList << "</dict>" << "\n";
