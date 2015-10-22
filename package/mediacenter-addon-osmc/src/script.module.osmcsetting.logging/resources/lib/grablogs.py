@@ -614,6 +614,9 @@ class Main(object):
 						'curl -X POST -s -0 -T'
 						]
 
+			upload_exception = None
+			key = None
+			
 			for attempt in attempts:
 				try:
 					with os.popen('%s "%s" %s/documents' % (attempt, TEMP_LOG_FILE, UPLOAD_LOC)) as f:
@@ -625,8 +628,15 @@ class Main(object):
 						if CALLER != 'user':
 							log('pastio line: %s' % repr(line))
 
-					upload_exception = None
-							
+					if not key:
+						# the upload returning an empty string is considered a specific Exception
+						# every other exception is caught and will be printed as well
+						# but only for the second (fallback) attempt
+						raise ValueError('Upload Returned Empty String')
+
+					else:
+						break
+
 				except Exception as e:
 
 					upload_exception = traceback.format_exc()
