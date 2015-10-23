@@ -129,7 +129,7 @@ function install_patch()
 		echo Applying patch $patch
 		if ! grep -q "GIT binary patch" $patch
 		then
-		    patch -p1 < $patch
+		    patch -p1 --ignore-whitespace < $patch
 		    verify_action
 	        else
 		    # this is a binary patch
