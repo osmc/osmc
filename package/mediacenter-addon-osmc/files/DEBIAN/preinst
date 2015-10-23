@@ -7,6 +7,7 @@ if [ "$1" = "upgrade" ]; then
 		grep -qw "core_freq=500" $CONFIG && grep -qw "sdram_freq=500" $CONFIG && grep -qw "over_voltage=2" $CONFIG
 	then
 		sed 's/^sdram_freq=500$/sdram_freq=450/g' -i $CONFIG
+		echo "Updated Turbo overclock profile to sdram_freq=450"
 		touch /tmp/reboot-needed
 	fi
 fi
