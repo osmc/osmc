@@ -570,8 +570,8 @@ class Main(object):
 			# this is to deprecate the automatic installation of non-system updates
 			# changed to Download, and Prompt
 			if self.s['on_upd_detected'] == 4:
-				__addon__.setSetting('on_upd_detected', '3')
-				self.s['on_upd_detected'] = 3
+				__addon__.setSetting('on_upd_detected', '2')
+				self.s['on_upd_detected'] = 2
 			self.s['check_freq']              = int(		__setting__('check_freq')			)
 			self.s['check_weekday']           = int(float(	__setting__('check_weekday')		))
 			self.s['check_day']               = int(float(	__setting__('check_day')			))
