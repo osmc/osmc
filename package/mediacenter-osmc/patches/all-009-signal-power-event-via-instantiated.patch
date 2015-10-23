@@ -1,4 +1,4 @@
-From f84249a5e659b7ec88a47c14099ab25ff6dbc7ae Mon Sep 17 00:00:00 2001
+From a29776acb80ff5e457b08cfc61bb3d272eb836ba Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 18 Aug 2015 01:53:19 +0100
 Subject: [PATCH] Signal power event via instantiated power interface before
@@ -10,17 +10,14 @@ Subject: [PATCH] Signal power event via instantiated power interface before
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp          | 31 +++++++++++++++++++------------
- xbmc/Application.h            |  6 ++++++
- xbmc/ApplicationMessenger.cpp | 15 +++++++++++++--
- xbmc/ApplicationMessenger.h   |  2 ++
- 4 files changed, 40 insertions(+), 14 deletions(-)
+ xbmc/Application.cpp | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index f3f65c5..dd416b5 100644
+index a2475c6..d9d15da 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2593,17 +2593,8 @@ void CApplication::Stop(int exitCode)
+@@ -2947,17 +2947,8 @@ void CApplication::Stop(int exitCode)
      if( m_bSystemScreenSaverEnable )
        g_Windowing.EnableSystemScreenSaver(true);
  
@@ -28,10 +25,10 @@ index f3f65c5..dd416b5 100644
 -    g_sysinfo.SetTotalUptime(g_sysinfo.GetTotalUptime() + (int)(CTimeUtils::GetFrameTime() / 60000));
 -
 -    // Update the settings information (volume, uptime etc. need saving)
--    if (CFile::Exists(CProfilesManager::Get().GetSettingsFile()))
+-    if (CFile::Exists(CProfilesManager::GetInstance().GetSettingsFile()))
 -    {
 -      CLog::Log(LOGNOTICE, "Saving settings");
--      CSettings::Get().Save();
+-      CSettings::GetInstance().Save();
 -    }
 -    else
 -      CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
@@ -40,17 +37,20 @@ index f3f65c5..dd416b5 100644
  
      m_bStop = true;
      m_AppFocused = false;
-@@ -2676,7 +2667,8 @@ void CApplication::Stop(int exitCode)
+@@ -3032,8 +3023,10 @@ void CApplication::Stop(int exitCode)
      // stop all remaining scripts; must be done after skin has been unloaded,
      // not before some windows still need it when deinitializing during skin
      // unloading
--    CScriptInvocationManager::Get().Uninitialize();
-+    if (m_ExitCode != EXITCODE_QUIT)
+-    CScriptInvocationManager::GetInstance().Uninitialize();
+-
++    
++if (m_ExitCode != EXITCODE_QUIT)
 +        CScriptInvocationManager::Get().Uninitialize();
- 
++ 
      g_Windowing.DestroyRenderSystem();
      g_Windowing.DestroyWindow();
-@@ -2705,6 +2697,21 @@ void CApplication::Stop(int exitCode)
+     g_Windowing.DestroyWindowSystem();
+@@ -3061,6 +3054,21 @@ void CApplication::Stop(int exitCode)
    Sleep(200);
  }
  
@@ -72,92 +72,6 @@ index f3f65c5..dd416b5 100644
  bool CApplication::PlayMedia(const CFileItem& item, int iPlaylist)
  {
    //If item is a plugin, expand out now and run ourselves again
-diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 362dd7a..31bd26e 100644
---- a/xbmc/Application.h
-+++ b/xbmc/Application.h
-@@ -151,6 +151,12 @@ public:
-   void StopPVRManager();
-   bool IsCurrentThread() const;
-   void Stop(int exitCode);
-+    /*!
-+   \brief Saves settings and uptime before Kodi is stopped
-+
-+   This allows us to save from our sigterm handler, or Application::Stop(), but not both.
-+   */
-+  void SaveStateStop();
-   void RestartApp();
-   void UnloadSkin(bool forReload = false);
-   bool LoadUserWindows();
-diff --git a/xbmc/ApplicationMessenger.cpp b/xbmc/ApplicationMessenger.cpp
-index 90424af..f66c0f1 100644
---- a/xbmc/ApplicationMessenger.cpp
-+++ b/xbmc/ApplicationMessenger.cpp
-@@ -256,8 +256,8 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
- 
-     case TMSG_POWERDOWN:
-       {
--        g_application.Stop(EXITCODE_POWERDOWN);
-         g_powerManager.Powerdown();
-+	g_application.Stop(EXITCODE_POWERDOWN);
-       }
-       break;
- 
-@@ -284,8 +284,8 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
-     case TMSG_RESTART:
-     case TMSG_RESET:
-       {
--        g_application.Stop(EXITCODE_REBOOT);
-         g_powerManager.Reboot();
-+	g_application.Stop(EXITCODE_REBOOT);
-       }
-       break;
- 
-@@ -851,6 +851,11 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
-       g_peripherals.ToggleDeviceState(STATE_STANDBY);
-       break;
-     }
-+    case TMSG_SAVESTATESTOP:
-+    {
-+      g_application.SaveStateStop();
-+      break;
-+    }
-     case TMSG_START_ANDROID_ACTIVITY:
-     {
- #if defined(TARGET_ANDROID)
-@@ -1173,6 +1178,12 @@ void CApplicationMessenger::Restart()
-   SendMessage(tMsg);
- }
- 
-+void CApplicationMessenger::SaveStateStop()
-+{
-+   ThreadMessage tMsg = {TMSG_SAVESTATESTOP};
-+   SendMessage(tMsg);
-+}
-+
- void CApplicationMessenger::Reset()
- {
-   ThreadMessage tMsg = {TMSG_RESET};
-diff --git a/xbmc/ApplicationMessenger.h b/xbmc/ApplicationMessenger.h
-index 8e1b4aa..0b4ee7b 100644
---- a/xbmc/ApplicationMessenger.h
-+++ b/xbmc/ApplicationMessenger.h
-@@ -77,6 +77,7 @@ namespace MUSIC_INFO
- #define TMSG_HIBERNATE            303
- #define TMSG_SUSPEND              304
- #define TMSG_RESTART              305
-+#define TMSG_SAVESTATESTOP	  399
- #define TMSG_RESET                306
- #define TMSG_RESTARTAPP           307
- #define TMSG_SWITCHTOFULLSCREEN   308
-@@ -204,6 +205,7 @@ public:
-   void Restart();
-   void RestartApp();
-   void Reset();
-+  void SaveStateStop();
-   void InhibitIdleShutdown(bool inhibit);
-   void ActivateScreensaver();
-   void SwitchToFullscreen(); //
 -- 
-2.1.0
+2.1.4
 

@@ -1,25 +1,25 @@
-From fec641dc4295f68641a5c45d68b2ff70e9dbc858 Mon Sep 17 00:00:00 2001
+From 8dbe26ee92759cf616275dd97f22ca19154a7185 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:03:16 +0100
 Subject: [PATCH] Improve CEC default settings
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/peripherals.xml | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ system/peripherals.xml | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index a67dc2f..5c51ff2 100644
+index ec3c3fe..ae914ad 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
-@@ -11,15 +11,15 @@
+@@ -11,15 +11,18 @@
    <peripheral bus="cec" name="CEC Adapter" mapTo="cec">
      <setting key="enabled" type="bool" value="1" label="305" order="1" />
      <setting key="activate_source" type="bool" value="1" label="36020" order="2" />
 -    <setting key="wake_devices" type="enum" value="36037" label="36007" lvalues="36037|36038|36039|231" order="3" />
 -    <setting key="standby_devices" type="enum" value="36037" label="36008" lvalues="36037|36038|36039|231" order="4" />
 -    <setting key="send_inactive_source" type="bool" value="1" label="36025" order="5" />
-+    <setting key="wake_devices" type="enum" value="231" label="36007" lvalues="36037|36038|36039|231" order="3" /> 
++    <setting key="wake_devices" type="enum" value="231" label="36007" lvalues="36037|36038|36039|231" order="3" />
 +    <setting key="standby_devices" type="enum" value="231" label="36008" lvalues="36037|36038|36039|231" order="4" />
 +    <setting key="send_inactive_source" type="bool" value="0" label="36025" order="5" />
      <setting key="cec_standby_screensaver" type="bool" value="0" label="36009" order="6" />
@@ -27,15 +27,18 @@ index a67dc2f..5c51ff2 100644
 -    <setting key="standby_pc_on_tv_standby" type="enum" value="13011" label="36029" order="8" lvalues="36028|13005|13011" />
 -    <setting key="standby_tv_on_pc_standby" type="bool" value="1" label="36026" order="9" />
 -    <setting key="use_tv_menu_language" type="bool" value="1" label="36018" order="10" />
--    <setting key="pause_playback_on_deactivate" type="bool" value="1" label="36033" order="11" />
+-    <setting key="pause_playback_on_deactivate" type="bool" value="1" label="36033" configurable="0" />
 +    <setting key="cec_wake_screensaver" type="bool" value="0" label="36010" order="7" />
 +    <setting key="standby_pc_on_tv_standby" type="enum" value="36028" label="36029" order="8" lvalues="36028|13005|13011" />
 +    <setting key="standby_tv_on_pc_standby" type="bool" value="0" label="36026" order="9" />
 +    <setting key="use_tv_menu_language" type="bool" value="0" label="36018" order="10" />
 +    <setting key="pause_playback_on_deactivate" type="bool" value="0" label="36033" order="11" />
++    
++    
++    
+     <setting key="pause_or_stop_playback_on_deactivate" type="enum" value="231" label="36033" order="11" lvalues="231|36044|36045" />
      <setting key="connected_device" type="enum" label="36019" value="36037" lvalues="36037|36038" order="12" />
      <setting key="cec_hdmi_port" type="int" value="1" min="1" max="15" label="36015" order="13" />
-     <setting key="physical_address" type="string" label="36021" value="0" order="14" />
 -- 
-2.1.0
+2.1.4
 

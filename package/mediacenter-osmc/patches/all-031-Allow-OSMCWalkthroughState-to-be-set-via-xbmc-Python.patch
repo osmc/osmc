@@ -1,21 +1,20 @@
-From 1e2cf5acf6cbc6e0dfbac8c652b265b844ed0735 Mon Sep 17 00:00:00 2001
+From 31399599e859166f082b4d1476be7fc230b0ef25 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 22:24:39 +0100
-Subject: [PATCH 3/7] Allow OSMCWalkthroughState to be set via xbmc Python
+Subject: [PATCH] Allow OSMCWalkthroughState to be set via xbmc Python
  interface
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp |  7 +++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 1ddfd64..7fc7bba 100644
+index e5b8b40..3b69bc1 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -109,6 +109,13 @@ namespace XBMCAddon
-       CApplicationMessenger::Get().ExecBuiltIn(function,wait);
+@@ -85,6 +85,12 @@ namespace XBMCAddon
+       CApplicationMessenger::GetInstance().PostMsg(TMSG_SHUTDOWN);
      }
  
 +    void setosmcwalkthroughstatus(int state)
@@ -24,33 +23,17 @@ index 1ddfd64..7fc7bba 100644
 +      tMsg.param1 = state;
 +      CApplicationMessenger::Get().SendMessage(tMsg);
 +    }
-+
-     String executeJSONRPC(const char* jsonrpccommand)
+     void restart()
      {
        XBMC_TRACE;
-diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 9817525..7492a1a 100644
---- a/xbmc/interfaces/legacy/ModuleXbmc.h
-+++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -103,6 +103,18 @@ namespace XBMCAddon
-      */
-     String executeJSONRPC(const char* jsonrpccommand);
+@@ -92,6 +98,7 @@ namespace XBMCAddon
+     }
  
-+	/**
-+	 * setosmcwalkthroughstatus(state) -- Change the OSMC Walkthrough Status
-+	 *
-+	 * status		  :	int - sets the internal state of the OSMC Walkthrough
-+	 *
-+	 *
-+	 * example:
-+	 *    - xbmc.setosmcwalkthroughstatus(1)
-+	 */
+     void executescript(const char* script)
 +
-+	 void setosmcwalkthroughstatus(int state);
-+
-     /**
-      * sleep(time) -- Sleeps for 'time' msec.
-      * 
+     {
+       XBMC_TRACE;
+       if (! script)
 -- 
-2.1.0
+2.1.4
 

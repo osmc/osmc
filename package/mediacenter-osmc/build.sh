@@ -19,8 +19,8 @@ fi
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/4ed3eb6692b6b755354a5fe18d5cd45f8003ea26.tar.gz" "$(pwd)/src"
-API_VERSION="15"
+pull_source "https://github.com/xbmc/xbmc/archive/d7cba13e83355efc2643ab9a321ab88ff529e85b.tar.gz" "$(pwd)/src"
+API_VERSION="16"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
 API_VERSION="16"
@@ -38,6 +38,7 @@ then
 	make clean
 	mount -t proc proc /proc >/dev/null 2>&1
 	update_sources
+	handle_dep "apt-utils"
 	handle_dep "autopoint"
 	handle_dep "automake"
 	handle_dep "bison"

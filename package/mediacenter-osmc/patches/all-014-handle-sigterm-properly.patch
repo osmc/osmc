@@ -1,4 +1,4 @@
-From 02efd980a97759c0e295ba5c8f6d277172a460c3 Mon Sep 17 00:00:00 2001
+From d589619ca2f4d2f7c9625392f134cb4d450b8446 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 18 Aug 2015 02:41:43 +0100
 Subject: [PATCH] Make Kodi quit on SIGTERM. We do not need to call Stop()
@@ -6,35 +6,39 @@ Subject: [PATCH] Make Kodi quit on SIGTERM. We do not need to call Stop()
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/main/main.cpp | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ xbmc/main/main.cpp | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
-index 87fe2fd..eb22236 100644
+index 01027f8..25a8ea5 100644
 --- a/xbmc/main/main.cpp
 +++ b/xbmc/main/main.cpp
-@@ -41,9 +41,21 @@
+@@ -41,12 +41,25 @@
  #include "input/linux/LIRC.h"
  #endif
  #include "XbmcContext.h"
 +#include "ApplicationMessenger.h"
-+
+ 
 +void sigterm_handler(int signum)
 +{
 +	CLog::Log(LOGINFO, "Received signal");
 +	CApplicationMessenger::Get().SaveStateStop();
 +	CApplicationMessenger::Get().Quit();
 +}
- 
+ #ifdef __cplusplus
+ extern "C"
+ #endif
  int main(int argc, char* argv[])
  {
 +  struct sigaction action;
 +  memset(&action, 0, sizeof(struct sigaction));
 +  action.sa_handler = sigterm_handler;
 +  sigaction(SIGTERM, &action, NULL);
++   // set up some xbmc specific relationships
++   XBMC::Context context;	
    // set up some xbmc specific relationships
    XBMC::Context context;
  
 -- 
-2.1.0
+2.6.1.windows.1
 
