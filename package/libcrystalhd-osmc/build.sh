@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/osmc/crystalhd/archive/2fe130c68d83ce57322f8a36fdacb40f201d0b67.zip" "$(pwd)/src"
+pull_source "https://github.com/osmc/crystalhd/archive/3b76afe92e98e2860567f4ad8e51443b77b866e0.zip" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcrystalhd-osmc"
