@@ -108,6 +108,7 @@ then
 	handle_dep "libltdl-dev"
 	handle_dep "cmake"
 	handle_dep "libgnutls28-dev"
+	handle_dep "git"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
