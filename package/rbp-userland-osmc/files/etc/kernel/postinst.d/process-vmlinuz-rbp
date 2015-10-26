@@ -4,18 +4,31 @@ processimage()
 {
     count1=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'bcm270?-rpi-*.dtb' | wc -l)
     count2=$(find /boot/dtb-${1}/overlays/ -maxdepth 1 -type f -name '*.dtb' | wc -l)
-    if [ $count1 -lt 1 -o $count2 -lt 1 ]; then exit 1; fi
+    if [ $count1 -lt 1 -o $count2 -lt 1 ]; then
+        echo "Aborting due to one or more missing device tree overlays."
+        exit 1
+    fi
 
     # use mkknlimg to rename the kernel too
-    LANG=C /usr/bin/mkknlimg --dtok ${2} /boot/kernel.img >/dev/null 2>&1
-    EXIT=$?; if [ $EXIT -ne 0 ]; then cp -f ${2} /boot/kernel.img; exit $EXIT; fi
+    LANG=C /usr/bin/mkknlimg --dtok ${2} /boot/kernel.img >/dev/null
+    EXIT=$?
+    if [ $EXIT -ne 0 ]; then
+        cp -f /boot/vmlinuz-$(uname -r) /boot/kernel.img
+	echo "Reverting to previous kernel due to mkknlimg failure."
+	exit $EXIT
+    fi
 
     rm -rf /boot/*.dtb /boot/overlays/
     rm -f /boot/kernel7.img
     cp -af /boot/dtb-${1}/* /boot/
-    EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+
+    EXIT=$?
+    if [ $EXIT -ne 0 ]; then
+	echo "Failed to copy device tree overlays."
+        exit $EXIT
+    fi
 
     rm -rf /lib/modules/${1}_kernel_*
 }
 
-if [ -f /boot/bootcode.bin ]; then processimage $1 $2; fi
+processimage $1 $2
