@@ -122,7 +122,9 @@ bool Utils::mountPartition(Target *device, QString path)
     {
         logger->addLine("Trying to mount to MNT_BOOT ("+QString(MNT_BOOT) + ")");
         logger->addLine("Using device->boot: " + device->getBoot() + " and FS: " + device->getBootFS());
-        return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+        QString bootFS = device->getBootFS();
+        if (bootFS == "fat32") { bootFS = "vfat"; }
+        return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, bootFS.toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
     }
     else if (path == QString(MNT_ROOT))
     {
