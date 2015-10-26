@@ -13,6 +13,7 @@ touch /tmp/NO_UPDATE
 chown osmc:osmc /tmp/NO_UPDATE
 rm -f $DSA_KEY
 rm -f $RSA_KEY
+nvidia-xconfig
 dbus-uuidgen > /var/lib/dbus/machine-id
 depmod
 if [ -f $PRESEED_FILE ]
