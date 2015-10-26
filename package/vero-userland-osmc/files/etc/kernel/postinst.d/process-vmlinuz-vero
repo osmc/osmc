@@ -3,12 +3,20 @@
 processimage()
 {
     count=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'imx6*.dtb' | wc -l)
-    if [ $count -lt 1 ]; then exit 1; fi
+    if [ $count -lt 1 ]; then
+        echo "Aborting due to one or more missing device tree overlays."
+        exit 1
+    fi
 
     cp -f ${2} /boot/zImage
     rm -rf /boot/*.dtb
     cp -af /boot/dtb-${1}/* /boot/
-    EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+
+    EXIT=$?
+    if [ $EXIT -ne 0 ]; then
+        echo "Failed to copy device tree overlays."
+        exit $EXIT
+    fi
 
     rm -rf /lib/modules/${1}_kernel_*
 }
