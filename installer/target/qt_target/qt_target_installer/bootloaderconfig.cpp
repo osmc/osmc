@@ -45,7 +45,7 @@ void BootloaderConfig::configureMounts()
     {
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
-        fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0\n");
+        fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
             fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
         else
