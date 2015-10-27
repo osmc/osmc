@@ -43,6 +43,8 @@ void BootloaderConfig::configureMounts()
     QStringList fstabStringList;
     if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv")
     {
+        QString bootFS = device->getBootFS();
+        if (bootFS == "fat32") { bootFS = "vfat"; }
         fstabStringList.append(device->getBoot() + "  /boot" + "    " + device->getBootFS() + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
             fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
