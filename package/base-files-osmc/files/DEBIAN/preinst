@@ -19,4 +19,5 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	install_divert /etc/os-release.distributed /etc/os-release
 	install_divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
 	install_divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
+	install_divert /etc/X11/Xwrapper.config.distributed /etc/X11/Xwrapper.config
 fi
