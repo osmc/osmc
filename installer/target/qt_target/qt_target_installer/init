@@ -21,7 +21,19 @@ udevadm trigger
 
 sleep 3 # Wait for /dev population
 
-/sbin/getty -L ttyAMA0 115200 vt100 & # for diagnostic purposes
+DEBUG_IP=$(sed 's/\ /\n/g' /proc/cmdline | grep "^debugip=" | sed 's/^debugip=//g')
+if [ -n "$DEBUG_IP" ]
+then
+        echo "auto eth0" > /etc/network/interfaces
+        echo "iface eth0 inet dhcp" >> /etc/network/interfaces
+        /sbin/ifup eth0
+        /bin/netcat -e /bin/sh "$DEBUG_IP" 9999
+
+	while true
+	do
+	    sleep 1
+	done
+fi
 
 /usr/bin/qt_target_installer -qws
 clear
