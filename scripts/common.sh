@@ -7,7 +7,7 @@ function check_platform()
 {
     platform=$(lsb_release -c -s)
     case $platform in
-        "wheezy" | "trusty" | "utopic" | "jessie" )
+        "wheezy" | "trusty" | "utopic" | "jessie" | "wily" )
             return 0
             ;;
         * )
