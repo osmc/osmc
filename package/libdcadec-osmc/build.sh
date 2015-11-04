@@ -20,6 +20,7 @@ then
 	sed '/Depends/d' -i files-dev/DEBIAN/control
 	echo "Package: ${1}-libdcadec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libdcadec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libdcadec-osmc" >> files-dev/DEBIAN/control
 	pushd src/dcadec*
+	install_patch "../../patches" "all"
 	CONFIG_SHARED=1 $BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	make install DESTDIR=$out
