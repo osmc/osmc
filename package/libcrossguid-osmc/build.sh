@@ -27,6 +27,8 @@ then
 	ar rvs libcrossguid.a guid.o
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
+	mkdir -p files/usr/lib
+	cp src/crossguid-*/libcrossguid.a files/usr/lib
 	mkdir -p files-dev/usr/include
 	cp -ar src/crossguid-*/guid.h files-dev/usr/include
 	fix_arch_ctl "files/DEBIAN/control"
