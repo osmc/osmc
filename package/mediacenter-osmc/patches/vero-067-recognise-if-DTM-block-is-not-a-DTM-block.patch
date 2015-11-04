@@ -1,0 +1,27 @@
+From de8ec7e9b28b741d1ec1cff532d8e15228a35e28 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Wed, 4 Nov 2015 18:35:16 +0000
+Subject: [PATCH] EGLEdid: recognise if DTM block is not a DTM block and skip
+ parsing it
+
+---
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index bf986dc..bb39b79 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+@@ -398,7 +398,8 @@ void CEGLNativeTypeIMX::GetMonitorSAR()
+   // enumerate through (max four) detailed timing info blocks
+   // specs and lookup WxH [mm / in]. W and H are in 3 bytes,
+   // where 1st = W, 2nd = H, 3rd byte is 4bit/4bit.
+-  for (int i = EDID_DTM_START; i < 126 && m_sar == 0; i += 18)
++  for (int i = EDID_DTM_START; i < 126 && m_sar == 0 && *(m_edid +i); i += 18)
++    // if DTM block starts with 0 - it is not DTM, skip
+     m_sar = ValidateSAR((struct dt_dim *)(m_edid +i +EDID_DTM_OFFSET_DIMENSION), true);
+ 
+   // fallback - info related to 'Basic display parameters.' is at offset 0x14-0x18.
+-- 
+2.1.0
+
