@@ -7,8 +7,12 @@
 
 count=60
 while [ $count -gt 0 ]; do
-	if connmanctl state | grep -iq 'online'
-		then break
+	if grep -q nfsroot /proc/cmdline; then
+		ping -c 1 -W 2 www.google.com >/dev/null 2>&1 && break
+		ping -c 1 -W 2 www.apple.com >/dev/null 2>&1 && break
+		ping -c 1 -W 2 www.microsoft.com >/dev/null 2>&1 && break
+	else
+		if connmanctl state | grep -iq 'online'; then break; fi
 	fi
 	sleep 5; let count-=5
 done

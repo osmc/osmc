@@ -6,7 +6,7 @@ Before=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq 'ready\|online'; then break; fi; sleep 1; let count-=1; done; exit 0"
+ExecStart=/bin/bash -c "if grep -q nfsroot /proc/cmdline; then exit 0; fi; count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq 'ready\|online'; then break; fi; sleep 1; let count-=1; done; exit 0"
 
 [Install]
 WantedBy=network-online.target
