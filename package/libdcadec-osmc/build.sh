@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/foo86/dcadec/archive/master.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/foo86/dcadec/archive/2a9186e34ce557d3af1a20f5b558d1e6687708b9.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libdcadec-osmc"
