@@ -25,7 +25,7 @@ then
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-eventlircd-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-lirc-osmc, udev" >> files/DEBIAN/control
-	pushd src
+	pushd src/eventlircd*
 	sed -i 's/\s\-Werror//' configure.ac # Disable warnings being errors
 	autoreconf -i
 	./configure --prefix=/usr --sysconfdir=/etc --with-lircd-socket=/run/lirc/lircd --with-evmap-dir=/etc/eventlircd.d --with-udev-dir=/lib/udev
