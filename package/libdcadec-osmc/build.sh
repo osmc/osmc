@@ -20,18 +20,13 @@ then
 	sed '/Depends/d' -i files-dev/DEBIAN/control
 	echo "Package: ${1}-libdcadec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libdcadec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libdcadec-osmc" >> files-dev/DEBIAN/control
 	pushd src/dcadec*
-	$BUILD
+	CONFIG_SHARED=1 $BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
-	pushd libdcadec
-	strip_libs
-	mkdir -p ${out}/usr/lib
-	cp -ar libdcadec.a ${out}/usr/lib
-	pushd ${out}/usr/lib
+	make install DESTDIR=$out
+        strip_files "${out}"
 	popd
-	mkdir -p ${out}-dev/usr/include/libdcadec
-	cp -ar *.h ${out}-dev/usr/include/libdcadec
-	popd
-	popd
+        mkdir -p files-dev/usr
+        mv files/usr/include files-dev/usr/
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-libdcadec-osmc.deb
 	fix_arch_ctl "files-dev/DEBIAN/control"
