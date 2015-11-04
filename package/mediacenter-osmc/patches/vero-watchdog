@@ -47,8 +47,18 @@ case $? in
 	fi
 
 	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
-	count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq 'online'; then break; fi; sleep 1; let count-=1; done
-	if [ $count -eq 0 ]
+
+	count=60
+	while [ $count -gt 0 ]; do
+		if grep -q nfsroot /proc/cmdline; then
+			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
+		else
+			if connmanctl state | grep -iq 'online'; then break; fi
+		fi
+		sleep 5; let count-=5
+	done
+
+	if [ $count -lt 1 ]
 	then
 		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
 		sleep 20; reboot
