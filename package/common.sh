@@ -180,11 +180,7 @@ function publish_applications_targeted()
 	if [ "$2" == "i386" ]; then devices="atv"; fi
 	if [ "$2" == "amd64" ]; then devices="pc"; fi
 	# Architecture specific, platform specific
-	if [ "$2" == "rbp1" ]; then devices="rbp1"; fi
-	if [ "$2" == "rbp2" ]; then devices="rbp2"; fi
-	if [ "$2" == "vero" ]; then devices="vero"; fi
-	if [ "$2" == "atv1" ]; then devices="atv"; fi
-	if [ "$2" == "pc" ]; then devices="pc"; fi
+	devices="$2"
 	for device in $devices
 	do
 	    cp ${1}/app.json ${1}/${device}-${3}.json
