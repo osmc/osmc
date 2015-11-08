@@ -18,6 +18,11 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
+        sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-libcec-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libusb-dev"
 	handle_dep "libudev-dev"
@@ -30,7 +35,7 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	if [ "$1" == "i386" ]; then handle_dep "i386-libplatform-dev-osmc"; fi
-	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libcec-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then export LIBRARY_PATH+=/opt/vc/lib && install_patch "../../patches" "rbp" && PLATFORM="-DHAVE_RPI_API=1 -DRPI_INCLUDE_DIR=/opt/vc/include/ -dDRPI_LIB_DIR=/opt/vc/lib -DRPI_BCM_HOST=1 -DRPI_VCHIQ_ARM=1 -DRPI_VCOS=1"; fi
