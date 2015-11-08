@@ -31,14 +31,14 @@ then
 	echo "Package: ${1}-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libshairplay-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*
 	./autogen.sh
-	./configure --prefix=/usr
+	./configure --prefix=/usr/osmc
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	mkdir -p files-dev/usr
-	mv files/usr/include  files-dev/usr/
+	mkdir -p files-dev/usr/osmc
+	mv files/usr/osmc/include  files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg_build files/ ${1}-libshairplay-osmc.deb
