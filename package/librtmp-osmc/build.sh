@@ -18,9 +18,14 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
+        sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-librtmp-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libssl-dev"
-	echo "Package: ${1}-librtmp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-librtmp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-librtmp-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-librtmp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-librtmp-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src
 	install_patch "../patches" "all"
 	$BUILD sys=posix
