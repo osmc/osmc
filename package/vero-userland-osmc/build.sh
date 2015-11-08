@@ -24,6 +24,12 @@ if [ $build_return == 99 ]
 then
 	echo -e "Building package vero-userland-osmc"
 	out=$(pwd)/files
+        sed '/Depends/d' -i files-dev/DEBIAN/control
+        sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: vero-userland-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	make clean
 	update_sources
 	handle_dep "libtool-bin"
