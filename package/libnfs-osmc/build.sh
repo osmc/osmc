@@ -24,7 +24,6 @@ then
 	handle_dep "libtool"
 	echo "Package: ${1}-libnfs-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libnfs-osmc" >> files-dev/DEBIAN/control
 	pushd src/libnfs-*
-	./bootstrap
 	./configure --prefix=/usr
 	$BUILD
 	make install DESTDIR=${out}
