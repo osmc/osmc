@@ -18,6 +18,11 @@ then
         sed '/Package/d' -i files/DEBIAN/control
         sed '/Package/d' -i files-dev/DEBIAN/control
         sed '/Depends/d' -i files-dev/DEBIAN/control
+        sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-qt-bsp-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libudev-dev"
 	handle_dep "libdbus-1-dev"
@@ -28,7 +33,7 @@ then
 	handle_dep "libjpeg62-turbo-dev"
 	handle_dep "zlib1g-dev"
 	handle_dep "libsqlite3-dev"
-	echo "Package: ${1}-qt-bsp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-qt-bsp-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-qt-bsp-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-qt-bsp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-qt-bsp-dev-osmc" >> files-dev/DEBIAN/control
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	pushd src/qt-everywhere-opensource*
