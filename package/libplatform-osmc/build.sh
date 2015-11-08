@@ -28,14 +28,14 @@ then
 	handle_dep "cmake"
 	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/platform-*
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr/osmc .
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	mkdir -p files-dev/usr
-	mv files/usr/include  files-dev/usr/
+	mkdir -p files-dev/usr/osmc
+	mv files/usr/osmc/include  files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg_build files ${1}-libplatform-osmc.deb
