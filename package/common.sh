@@ -98,7 +98,7 @@ function build_in_env()
 	    if ((($BUILD_OPTS & $BUILD_OPTION_PREFER_LIBOSMC) == $BUILD_OPTION_PREFER_LIBOSMC))
 	    then
 		export BUILD_FLAGS+="-I/usr/osmc/include -L/usr/osmc/lib "
-		export LIBRARY_PATH+="/usr/osmc/lib"
+		export LD_LIBRARY_PATH+="/usr/osmc/lib"
 	    fi
             export CFLAGS+="$BUILD_FLAGS"
             export CXXFLAGS+="$BUILD_FLAGS"
