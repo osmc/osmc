@@ -19,9 +19,14 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
+	sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-libplatform-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "cmake"
-	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libplatform-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/platform-*
 	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
 	$BUILD
