@@ -99,6 +99,7 @@ function build_in_env()
 	    then
 		export BUILD_FLAGS+="-I/usr/osmc/include -L/usr/osmc/lib "
 		export LD_LIBRARY_PATH+="/usr/osmc/lib"
+		export PKG_CONFIG_PATH+="/usr/osmc/lib/pkgconfig"
 	    fi
             export CFLAGS+="$BUILD_FLAGS"
             export CXXFLAGS+="$BUILD_FLAGS"
