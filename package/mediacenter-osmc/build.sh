@@ -144,6 +144,7 @@ then
 		handle_dep "armv7-librtmp-dev-osmc"
 		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
+		handle_dep "armv7-libdcadec-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
 	fi
@@ -154,6 +155,7 @@ then
 		handle_dep "i386-librtmp-dev-osmc"
 		handle_dep "i386-libnfs-dev-osmc"
 		handle_dep "i386-libplatform-dev-osmc"
+		handle_dep "i386-libdcadec-dev-osmc"
 		handle_dep "i386-libbluray-dev-osmc"
 		handle_dep "i386-libsqlite-dev-osmc"
 		handle_dep "libglew-dev"
