@@ -31,7 +31,6 @@ cp -ar src/firmware-${REV}/hardfp/opt/vc/bin/ files/opt/vc
 cp -ar src/firmware-${REV}/hardfp/opt/vc/lib files/opt/vc
 cp -ar src/firmware-${REV}/hardfp/opt/vc/include files-dev/opt/vc
 cp -ar src/firmware-${REV}/hardfp/opt/vc/src files-src/opt/vc
-rm -rf src
 dpkg_build files/ rbp-userland-osmc.deb
 dpkg_build files-dev/ rbp-userland-dev-osmc.deb
 dpkg_build files-src/ rbp-userland-src-osmc.deb
