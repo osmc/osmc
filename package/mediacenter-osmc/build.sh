@@ -17,7 +17,7 @@ fi
 }
 
 . ../common.sh
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ] || [ "$1" == "vero2" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/02e7013889e08d608363f2909ebeccdb9ea3b7c9.tar.gz" "$(pwd)/src"
 API_VERSION="15"
@@ -148,6 +148,17 @@ then
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
 	fi
+        if [ "$1" == "vero2" ]
+        then
+		handle_dep "vero2-userland-dev-osmc"
+                handle_dep "armv7-libshairplay-dev-osmc"
+                handle_dep "armv7-librtmp-dev-osmc"
+                handle_dep "armv7-libnfs-dev-osmc"
+                handle_dep "armv7-libplatform-dev-osmc"
+                handle_dep "armv7-libdcadec-dev-osmc"
+                handle_dep "armv7-libbluray-dev-osmc"
+                handle_dep "armv7-libsqlite-dev-osmc"
+        fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
 	then
 		handle_dep "i386-libcec-dev-osmc"
@@ -281,6 +292,35 @@ then
 		--with-platform=vero \
 		--build=arm-linux
 	fi
+        if [ "$1" == "vero2" ]; then
+        LIBRARY_PATH+="/opt/vero2/lib" && \
+        COMPFLAGS="-I/opt/vero2/include" && \
+        export CFLAGS+=${COMPFLAGS} && \
+        export CXXFLAGS+=${COMPFLAGS} && \
+        export CPPFLAGS+=${COMPFLAGS} && \
+        export LDFLAGS="-L/opt/vero2/lib" && \
+        ./configure \
+                --prefix=/usr \
+                --disable-x11 \
+                --disable-openmax \
+                --disable-vdpau \
+                --disable-vaapi \
+                --enable-gles \
+                --enable-codec=aml \
+                --disable-libcec \
+                --disable-debug \
+                --disable-texturepacker \
+                --enable-optical-drive \
+                --enable-dvdcss \
+                --enable-libbluray \
+                --disable-joystick \
+                --disable-vtbdecoder \
+                --disable-pulse \
+                --disable-projectm \
+                --disable-optimizations \
+                --with-platform=vero2 \
+                --build=arm-linux
+        fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	umount /proc/ > /dev/null 2>&1
 	$BUILD
