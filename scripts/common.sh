@@ -107,6 +107,7 @@ function cleanup_filesystem()
 	rm -rf ${1}/var/lib/apt/lists/*
 	rm -f ${1}/var/log/*.log
 	rm -f ${1}/var/log/apt/*.log
+	rm -f ${1}/tmp/reboot-needed
 }
 
 function enable_mirrordirector()
