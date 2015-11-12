@@ -11,7 +11,7 @@ amd64:
 	sudo bash build.sh "amd64"
 
 i386:
-	sudo bash build.sh "i386"
+	sudo setarch i686 bash build.sh "i386"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
