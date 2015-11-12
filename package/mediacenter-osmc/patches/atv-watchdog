@@ -5,6 +5,10 @@
 
 export TERM=linux
 
+if [ "$1" = "stop" ]; then
+	exit
+fi
+
 trap 'wait; exit 0' SIGTERM
 
 chmod a+rw /dev/tty1
