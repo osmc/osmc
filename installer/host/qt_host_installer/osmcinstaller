@@ -22,7 +22,7 @@ if [[ $EUID -eq 0 ]]; then
 elif command -v gksudo; then
     gksu -k $dir/qt_host_installer
 elif command -v kdesu; then
-    kdesu $dir/qt_host_installer
+    kdesu QT_X11_NO_MITSHM=1 $dir/qt_host_installer
 elif command -v xdg-su; then
     xdg-su -c $dir/qt_host_installer
 else
