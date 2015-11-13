@@ -26,5 +26,5 @@ elif command -v kdesu; then
 elif command -v xdg-su; then
     xdg-su -c $dir/qt_host_installer
 else
-    sudo $dir/qt_host_installer
+    sudo QT_X11_NO_MITSHM=1 $dir/qt_host_installer
 fi
