@@ -143,7 +143,7 @@ void MainWindow::install()
                 if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "vero1") { device->setRoot("/dev/sda1"); }
-                if (utils->getOSMCDev() == "atv") { device->setRoot("/dev/sda1"); } /* It's not USB, it's the internal disk.. but this is a hack */
+                if (utils->getOSMCDev() == "atv") { device->setRoot("/dev/sdb1"); } /* It's not USB, it's the internal disk.. but this is a hack */
                 for (int i = 0; i <= 60; i++)
                 {
                     ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
