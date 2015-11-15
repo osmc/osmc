@@ -85,7 +85,7 @@ while true; do
 	echo 0 > /sys/class/vtconsole/vtcon1/bind
 	starttime=$(date +%s)
 	echo "Starting Kodi..."
-	sudo -u osmc LIBRARY_PATH=/usr/osmc/lib $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
 	endtime=$(date +%s)
 	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
 	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
