@@ -108,6 +108,7 @@ function cleanup_filesystem()
 	rm -f ${1}/var/log/*.log
 	rm -f ${1}/var/log/apt/*.log
 	rm -f ${1}/tmp/reboot-needed
+	rm -f ${1}/var/cache/apt/pkgcache.bin
 }
 
 function enable_mirrordirector()
