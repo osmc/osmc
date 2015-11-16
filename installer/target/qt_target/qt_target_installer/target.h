@@ -18,6 +18,7 @@ public:
     bool doesBootNeedsFormat() { return bootNeedsFormat; }
     QString getRoot() { return rootPath; }
     void setRoot(QString newRoot); /* Allows overriding root */
+    void setBoot(QString newBoot); /* Allows overriding boot */
     bool deviceUsesGPT() { return usesGPT; }
 
 private:

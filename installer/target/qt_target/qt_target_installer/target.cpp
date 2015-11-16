@@ -21,6 +21,12 @@ void Target::setRoot(QString newRoot)
     rootChanged = true;
 }
 
+void Target::setBoot(QString newBoot)
+{
+    this->bootPath = newBoot;
+    this->bootNeedsFormat = true;
+}
+
 void Target::setBootNeedsFormat(bool needsFormat)
 {
     this->bootNeedsFormat = needsFormat;

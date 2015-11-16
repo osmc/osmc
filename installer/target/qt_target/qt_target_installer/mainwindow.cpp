@@ -88,6 +88,7 @@ void MainWindow::install()
     {
         /* Super hacky for Apple TV 1st gen. Sometimes no internal disk */
         hasMount = utils->mountPartition(device, "/dev/sda1");
+        device->setBoot("/dev/sda1");
         device->setRoot("/dev/sda2");
         device->setBootNeedsFormat(false);
     }
@@ -143,7 +144,12 @@ void MainWindow::install()
                 if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "vero1") { device->setRoot("/dev/sda1"); }
-                if (utils->getOSMCDev() == "atv") { device->setRoot("/dev/sdb1"); } /* It's not USB, it's the internal disk.. but this is a hack */
+                if (utils->getOSMCDev() == "atv")
+                {
+                    /* It's not USB, it's the internal disk.. but this is a hack */
+                    device->setBoot("/dev/sda1");
+                    device->setRoot("/dev/sda2");
+                }
                 for (int i = 0; i <= 60; i++)
                 {
                     ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
@@ -257,8 +263,7 @@ void MainWindow::install()
                     haltInstall(tr("cannot work out partition size"));
                     return;
                 }
-                logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
-                utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
+                utils->mkpart(rootBase, "ext4", "257M", "100%"); /* Hacky and hard-coded again */
                 utils->fmtpart(device->getRoot(), "ext4");
             }
         }
