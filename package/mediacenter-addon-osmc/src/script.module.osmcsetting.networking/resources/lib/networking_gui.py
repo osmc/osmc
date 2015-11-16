@@ -1910,7 +1910,12 @@ class bluetooth_population_thread(threading.Thread):
     def create_bluetooth_item(self, address, info):
 
         label       = info['alias'] if info['alias'] else address
-        icon_image  = 'connected.png' if info['connected'] else 'disconnected.png'
+        icon_image =  'bluetooth_nc.png'
+        if info['connected']:
+            if info['paired']:
+                icon_image  = 'bluetooth_cap.png'
+            else:
+                icon_image = 'bluetooth_cnp.png'
 
         item        = xbmcgui.ListItem(label)
 
