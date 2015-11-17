@@ -4,8 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.3.0" && REV="2"
-test $1 == rbp2 && VERSION="4.3.0" && REV="2"
+test $1 == rbp1 && VERSION="4.3.0" && REV="3"
+test $1 == rbp2 && VERSION="4.3.0" && REV="3"
 test $1 == vero && VERSION="4.1.12" && REV="4"
 test $1 == atv && VERSION="4.2.3" && REV="6"
 test $1 == pc && VERSION="4.2.3" && REV="1"
