@@ -4,8 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.3" && REV="1"
-test $1 == rbp2 && VERSION="4.3" && REV="1"
+test $1 == rbp1 && VERSION="4.3.0" && REV="2"
+test $1 == rbp2 && VERSION="4.3.0" && REV="2"
 test $1 == vero && VERSION="4.1.12" && REV="4"
 test $1 == atv && VERSION="4.2.3" && REV="6"
 test $1 == pc && VERSION="4.2.3" && REV="1"
@@ -13,6 +13,12 @@ if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 	MAJOR=$(echo ${VERSION:0:1})
+	DL_VERSION=${VERSION}
+	VERSION_POINT_RLS=$(echo ${VERSION} | cut -d . -f 3)
+	if [ "$VERSION_POINT_RLS" -eq 0 ]
+	then
+	    DL_VERSION=$(echo ${VERSION:0:3})
+	fi
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${VERSION}.tar.xz"
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
