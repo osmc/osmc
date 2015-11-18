@@ -87,8 +87,8 @@ void MainWindow::install()
     if (! hasMount && utils->getOSMCDev() == "atv")
     {
         /* Super hacky for Apple TV 1st gen. Sometimes no internal disk */
-        hasMount = utils->mountPartition(device, "/dev/sda1");
         device->setBoot("/dev/sda1");
+        hasMount = utils->mountPartition(device, MNT_BOOT);
         device->setRoot("/dev/sda2");
         device->setBootNeedsFormat(false);
     }
