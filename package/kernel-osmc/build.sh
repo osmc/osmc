@@ -67,6 +67,8 @@ then
 		$BUILD scripts
 		DTC=$(pwd)"/scripts/dtc/dtc"
 	fi
+	# Conver DTD to DTB
+	if [ "$1" == "vero2" ]; then $BUILD meson8b_vero2.dtd; fi
 	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
