@@ -10,6 +10,9 @@ rbp2:
 vero:
 	sudo bash build.sh "vero"
 
+vero2:
+	sudo bash build.sh "vero2"
+
 atv:
 	sudo setarch i686 bash build.sh "atv"
 
