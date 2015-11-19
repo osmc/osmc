@@ -10,7 +10,11 @@ ICONDIR="${RESOURCES}/app.iconset"
 ICONSET_NAME="logo.icns"
 
 pushd ${TARGET}
-if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
+if [ -f Makefile ]; then
+	echo "Cleaning"
+	make clean
+	if [ $? != 0 ]; then echo "Clean failed"; exit 1; fi
+fi
 rm -rf ${TARGET}.app
 echo Building installer
 qmake

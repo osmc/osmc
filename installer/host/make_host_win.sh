@@ -16,7 +16,11 @@ TARGET="qt_host_installer"
 ZLIB_VER="1.2.8"
 pushd ${TARGET}
 VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
-if [ -f Makefile ]; then echo "Cleaning Qt project" && mingw32-make clean; fi
+if [ -f Makefile ]; then
+	echo "Cleaning Qt project"
+	mingw32-make clean
+	if [ $? != 0 ]; then echo "Clean failed"; exit 1; fi
+fi
 pushd w32-lib/zlib-${ZLIB_VER}
 make -f win32/Makefile.gcc clean
 popd
