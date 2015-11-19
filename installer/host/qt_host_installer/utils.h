@@ -11,7 +11,7 @@
 #include "supporteddevice.h"
 #include <QList>
 
-#define BUILD_NUMBER 119
+#define BUILD_NUMBER 120
 
 namespace utils
 {

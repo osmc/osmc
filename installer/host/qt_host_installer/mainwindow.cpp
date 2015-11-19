@@ -338,19 +338,23 @@ void MainWindow::translate(QString locale)
 
 void MainWindow::showSuccessDialog()
 {
+    if (! this->device.allowsPreseedingNFS() && ! this->device.allowsPreseedingUSB() && ! this->device.allowsPreseedingSD() && ! this->device.allowsPreseedingInternal() && ! this->device.allowsPreseedingPartitioning() && ! this->device.allowsPreseedingNetwork())
+    {
+        sd = new SuccessDialog(this);
+        rotateWidget(ep, sd, false);
+    }
+    else
+    {
     /* Set up preseeder first */
     utils::writeLog("Creating preseeder");
     Preseeder *ps = new Preseeder();
-    if (this->device.allowsPreseedingNFS() || this->device.allowsPreseedingUSB() || this->device.allowsPreseedingSD() || this->device.allowsPreseedingInternal() || this->device.allowsPreseedingPartitioning() || this->device.allowsPreseedingNetwork())
-    {
-        if (!this->localeName.isEmpty())
+      if (!this->localeName.isEmpty())
             ps->setLanguageString(this->localeName);
-        ps->setTargetSettings(this);
-        if (this->device.allowsPreseedingNetwork())
-        {
-            ps->setNetworkSettings(nss);
-        }
-    }
+      ps->setTargetSettings(this);
+      if (this->device.allowsPreseedingNetwork())
+      {
+         ps->setNetworkSettings(nss);
+      }
     QStringList preseedList = ps->getPreseed();
 
     /* Write to the target */
@@ -445,6 +449,7 @@ void MainWindow::showSuccessDialog()
 #endif
     sd = new SuccessDialog(this);
     rotateWidget(ep, sd, false);
+}
 }
 
 MainWindow::~MainWindow()
