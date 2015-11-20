@@ -46,7 +46,7 @@ for option in $(cat /proc/cmdline); do
 	  root=*
 		OPTION_ROOT="${arg#*=}"
 		;;
-	  rootfs=*
+	  rootfstype=*
 		OPTION_FILESYSTEM="${arg#*=}"
 		;;
 	  init=*
@@ -87,7 +87,7 @@ then
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
 		sleep 5
-		/bin/e2fsck -M -y
+		/bin/e2fsck -y
 		fsck_result="$?"
 		if [ "$fsck_result" -eq 8 ]
 		then
