@@ -9,6 +9,4 @@ cpio:
 
 clean:
 	rm -f initramfs.gz >/dev/null 2>&1
-	rm -rf busybox >/dev/null 2>&1
-	rm -rf e2fsprogs >/dev/null 2>&1
 	rm -rf target >/dev/null 2>&1
