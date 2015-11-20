@@ -119,6 +119,12 @@ echo "" > /proc/sys/kernel/hotplug
 mount_result="$?"
 if [ "$mount_result" -eq 0 ]
 then
+	# If we checked the filesystem, tell systemd
+	if [ "$OPTION_DO_FSCK" -eq 1 ]
+	then
+	mkdir -p "$OPTION_MOUNT_PATH"/run/initramfs
+	touch "$OPTION_MOUNT_PATH"/run/initramfs/fsck-root
+	fi
 	exec switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT"
 else
 	print_message "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
