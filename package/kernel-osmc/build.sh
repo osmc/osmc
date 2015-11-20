@@ -86,7 +86,8 @@ then
 		popd
 		if ((($FLAGS_INITRAMFS & $INITRAMFS_EMBED) == $INITRAMFS_EMBED))
 		then
-			cp -ar ../../initramfs-src/target osmc-initramfs/
+			cp -ar ../../initramfs-src/target osmc-initramfs
+			export RAMFSDIR=$(pwd)/osmc-initramfs
 		fi
 	fi
 	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
