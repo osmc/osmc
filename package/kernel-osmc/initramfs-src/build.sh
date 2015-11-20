@@ -5,15 +5,37 @@
 
 pushd ../ && . ../common.sh && popd
 
+. VERSIONS
+
 if [ -z "$1" ]; then echo -e "No target defined" && exit 1; fi
-if [ "$1" == "cpio" ] && ! ischroot; then echo -e "Initramfs must be built within an OSMC chroot toolchain" && exit 1; fi
+if [ "$1" == "cpio" ]
+then
+ischroot
+chroot_result=$?
+if [ "$chroot_result" -eq 0 ] || [ "$chroot_result" -eq 1 ]
+then
+	echo -e "Initramfs must be built within an OSMC chroot toolchain" && exit 1
+fi
+fi
 echo "Building initramfs for target ${1}"
 make clean
 handle_dep "autoconf"
-BUSYBOX_VERSION="1.24.1"
-E2FSPROGS_VERSION="1.42.13"
-pull_source "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/busybox"
-pull_source "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/e2fsprogs"
+
+if [ "$1" == "cpio" ]
+then
+	rm -f *.tar.*
+	#rm -rf busybox >/dev/null 2>&1
+        #rm -rf e2fsprogs >/dev/null 2>&1
+	handle_dep "cpio"
+	handle_dep "wget" # Hack for poor man's pull_source
+	# Use wget to get resources, as pull_source not compatible in chroot. Do not use in production
+	wget "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2"
+	mkdir -p $(pwd)/busybox
+	tar -xvf busybox-${BUSYBOX_VERSION}.tar.bz2 -C "$(pwd)/busybox"
+	wget "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" 
+	mkdir -p $(pwd)/e2fsprogs
+	tar -xvf e2fsprogs-${E2FSPROGS_VERSION}.tar.gz -C "$(pwd)/e2fsprogs"
+fi
 echo "Compiling busybox"
 pushd busybox/busybox-${BUSYBOX_VERSION}
 cp ../../busybox.config .config
