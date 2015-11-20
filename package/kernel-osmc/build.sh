@@ -7,7 +7,7 @@
 test $1 == rbp1 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
 test $1 == vero && VERSION="4.1.12" && REV="4" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.61" && REV="1" && EMBED_INITRAMFS="1" && IMG_TYPE="uImage"
+test $1 == vero2 && VERSION="3.10.61" && REV="1" && EMBED_INITRAMFS="0" && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="6" && EMBED_INITRAMFS="0" && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="1" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
