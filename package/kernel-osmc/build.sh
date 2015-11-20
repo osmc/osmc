@@ -4,12 +4,12 @@
 #!/bin/bash
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1"
-test $1 == rbp2 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1"
-test $1 == vero && VERSION="4.1.12" && REV="4" && EMBED_INITRAMFS="1"
-test $1 == vero2 && VERSION="3.10.61" && REV="1" && EMBED_INITRAMFS="1"
-test $1 == atv && VERSION="4.2.3" && REV="6" && EMBED_INITRAMFS="0"
-test $1 == pc && VERSION="4.2.3" && REV="1" && EMBED_INITRAMFS="1"
+test $1 == rbp1 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.3.0" && REV="5" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
+test $1 == vero && VERSION="4.1.12" && REV="4" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
+test $1 == vero2 && VERSION="3.10.61" && REV="1" && EMBED_INITRAMFS="1" && IMG_TYPE="uImage"
+test $1 == atv && VERSION="4.2.3" && REV="6" && EMBED_INITRAMFS="0" && IMG_TYPE="zImage"
+test $1 == pc && VERSION="4.2.3" && REV="1" && EMBED_INITRAMFS="1" && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -69,7 +69,8 @@ then
 	fi
 	# Conver DTD to DTB
 	if [ "$1" == "vero2" ]; then $BUILD meson8b_vero2.dtd; fi
-	make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
+	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
+	if [ "$IMG_TYPE" == "uImage" ]; then make-kpkg --uimage --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
 	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
 	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
 	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
