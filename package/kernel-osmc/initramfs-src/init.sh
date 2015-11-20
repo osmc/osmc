@@ -71,7 +71,7 @@ done
 if [ "$OPTION_DO_FSCK" -eq 1 ]
 then
 	# Verify filesystem integrity
-	/bin/busybox fsck -T -a "$OPTION_ROOT"
+	/bin/e2fsck -T -a "$OPTION_ROOT"
 	fsck_result="$?"
 	# 0 == no error
 	# 1 == filesystem errors corrected
@@ -87,7 +87,7 @@ then
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
 		sleep 5
-		/bin/busybox fsck -T -M -y
+		/bin/e2fsck -T -M -y
 		fsck_result="$?"
 		if [ "$fsck_result" -eq 8 ]
 		then
