@@ -71,7 +71,7 @@ done
 if [ "$OPTION_DO_FSCK" -eq 1 ]
 then
 	# Verify filesystem integrity
-	/bin/e2fsck -a "$OPTION_ROOT"
+	/bin/e2fsck -a "$OPTION_ROOT" >/dev/null 2>&1
 	fsck_result="$?"
 	# 0 == no error
 	# 1 == filesystem errors corrected
