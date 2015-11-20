@@ -71,7 +71,9 @@ done
 if [ "$OPTION_DO_FSCK" -eq 1 ]
 then
 	# Verify filesystem integrity
-	/bin/e2fsck -a "$OPTION_ROOT" >/dev/null 2>&1
+	FSCK_BIN="/bin/e2fsck"
+	if [ -f /bin/fsck.${OPTION_FILESYSTEM}]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
+	$FSCK_BIN -a "$OPTION_ROOT" >/dev/null 2>&1
 	fsck_result="$?"
 	# 0 == no error
 	# 1 == filesystem errors corrected
@@ -87,7 +89,7 @@ then
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
 		sleep 5
-		/bin/e2fsck -y
+		$FSCK_BIN -y
 		fsck_result="$?"
 		if [ "$fsck_result" -eq 8 ]
 		then
