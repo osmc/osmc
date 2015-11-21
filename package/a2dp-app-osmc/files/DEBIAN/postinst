@@ -37,8 +37,10 @@ if [ "$1" = "configure" ]; then
 
 	systemctl daemon-reload
 	systemctl enable pulseaudio.service > /dev/null 2>&1
+	systemctl enable a2dpInfo.service > /dev/null 2>&1
 	if ischroot; then exit 0; fi
 	systemctl start pulseaudio.service > /dev/null 2>&1
 	systemctl restart bluetooth.service > /dev/null 2>&1
+	systemctl start a2dpInfo.service > /dev/null 2>&1
 	exit 0
 fi

@@ -2,6 +2,8 @@
 
 if [ "$1" = "remove" ]; then
 	systemctl disable pulseaudio.service > /dev/null 2>&1
-	systemctl stop pulseaudio.service > /dev/null 2>&1
+	systemctl stop pulseaudio.service > /dev/null 2>&1	
+	systemctl disable a2dpInfo.service > /dev/null 2>&1
+	systemctl stop a2dpInfo.service > /dev/null 2>&1
 	exit 0
 fi
