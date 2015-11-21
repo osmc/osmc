@@ -4,7 +4,7 @@ processimage()
 {
     count=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'imx6*.dtb' | wc -l)
     if [ $count -lt 1 ]; then
-        echo "Aborting due to one or more missing device tree overlays."
+        echo "Aborting due to one or more missing device tree overlays." >&2
         exit 1
     fi
 
@@ -14,7 +14,7 @@ processimage()
 
     EXIT=$?
     if [ $EXIT -ne 0 ]; then
-        echo "Failed to copy device tree overlays."
+        echo "Failed to copy device tree overlays." >&2
         exit $EXIT
     fi
 

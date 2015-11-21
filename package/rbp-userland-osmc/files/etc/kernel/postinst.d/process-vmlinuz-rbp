@@ -5,7 +5,7 @@ processimage()
     count1=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'bcm270?-rpi-*.dtb' | wc -l)
     count2=$(find /boot/dtb-${1}/overlays/ -maxdepth 1 -type f -name '*.dtb' | wc -l)
     if [ $count1 -lt 1 -o $count2 -lt 1 ]; then
-        echo "Aborting due to one or more missing device tree overlays."
+        echo "Aborting due to one or more missing device tree overlays." >&2
         exit 1
     fi
 
@@ -14,7 +14,7 @@ processimage()
     EXIT=$?
     if [ $EXIT -ne 0 ]; then
         cp -f /boot/vmlinuz-$(uname -r) /boot/kernel.img
-	echo "Reverting to previous kernel due to mkknlimg failure."
+	echo "Reverting to previous kernel due to mkknlimg failure." >&2
 	exit $EXIT
     fi
 
@@ -24,7 +24,7 @@ processimage()
 
     EXIT=$?
     if [ $EXIT -ne 0 ]; then
-	echo "Failed to copy device tree overlays."
+	echo "Failed to copy device tree overlays." >&2
         exit $EXIT
     fi
 
