@@ -16,7 +16,7 @@ while [ $count -gt 0 ]; do
 	fi
 	sleep 5; let count-=5
 done
-if [ $count -lt 1 ]; then echo "No internet connection was available within 60 seconds, giving up."; exit; fi
+if [ $count -lt 1 ]; then echo "No internet connectivity was detected within 60 seconds. Will try to send time query anyway."; fi
 
 OLD_DATE=$(date -u)
 for server in www.google.com www.apple.com www.microsoft.com; do
