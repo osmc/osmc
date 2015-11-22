@@ -86,22 +86,20 @@ then
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
 	then
+		echo "This device requests an initramfs"
+		pushd ../../initramfs-src
+		$BUILD kernel
+		if [ $? != 0 ]; then echo "Building initramfs failed" && exit 1; fi
+		popd
 		if ((($FLAGS_INITRAMFS & $INITRAMFS_EMBED) == $INITRAMFS_EMBED))
 		then
 			echo "This device requests an initramfs to be embedded"
-			pushd ../../initramfs-src
-			$BUILD kernel
-			if [ $? != 0 ]; then echo "Building initramfs failed" && exit 1; fi
-			popd
 			cp -ar ../../initramfs-src/target osmc-initramfs
 			export RAMFSDIR=$(pwd)/osmc-initramfs
 		else
 			echo "This device requests an initramfs to be built, but not embedded"
-			pushd ../../initramfs-src/
-			$BUILD kernel
-			
+			find ../../initramfs-src/target | cpio -H newc -o | gzip -> initrd.img.gz
 		fi
-		
 	fi
 	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
 	if [ "$IMG_TYPE" == "uImage" ]; then make-kpkg --uimage --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
