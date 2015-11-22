@@ -112,6 +112,7 @@ then
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
 	if [ "$1" == "vero" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc; fi
+	if [ "$1" == "vero2" ]; then mkdir -p ../../files-image/boot; fi
 	if [ "$1" == "atv" ]; then mkdir -p ../../files-image/boot; fi
 	if [ "$1" == "rbp1" ]
 	then
@@ -140,7 +141,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg --create kernel.img -k arch/arm/boot/uImage -r ../../initramfs/ -s arch/arm/boot/amlogic/meson8b_vero2.dtd
+		abootimg --create kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/amlogic/meson8b_vero2.dtd
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
