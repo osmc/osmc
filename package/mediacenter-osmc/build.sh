@@ -205,7 +205,7 @@ then
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
-	export LDFLAGS="-R/usr/osmc/lib" & \
+	export LDFLAGS="" & \
 	./configure \
 		--prefix=/usr \
 		--disable-vtbdecoder \
@@ -241,7 +241,7 @@ then
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
-	export LDFLAGS="-L/opt/vc/lib -R/usr/osmc/lib" && \
+	export LDFLAGS="-L/opt/vc/lib" && \
 	./configure \
 		--prefix=/usr \
 		--enable-gles \
@@ -269,7 +269,7 @@ then
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
-	export LDFLAGS="-L/opt/vero/lib -R/usr/osmc/lib" && \
+	export LDFLAGS="-L/opt/vero/lib" && \
 	./configure \
 		--prefix=/usr \
 		--disable-x11 \
@@ -298,7 +298,7 @@ then
         export CFLAGS+=${COMPFLAGS} && \
         export CXXFLAGS+=${COMPFLAGS} && \
         export CPPFLAGS+=${COMPFLAGS} && \
-        export LDFLAGS="-L/opt/vero2/lib -R/usr/osmc/lib" && \
+        export LDFLAGS="-L/opt/vero2/lib" && \
         ./configure \
                 --prefix=/usr \
                 --disable-x11 \
