@@ -10,9 +10,9 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.3.0" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.3.0" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero && VERSION="4.1.12" && REV="5" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.3.0" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.3.0" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero && VERSION="4.1.12" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.61" && REV="1" && FLAGS_INITRAMFS=$INITRAMFS_BUILD && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
@@ -86,16 +86,22 @@ then
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
 	then
-		echo "This device requests an initramfs"
-		pushd ../../initramfs-src
-		$BUILD kernel
-		if [ $? != 0 ]; then echo "Building initramfs failed" && exit 1; fi
-		popd
 		if ((($FLAGS_INITRAMFS & $INITRAMFS_EMBED) == $INITRAMFS_EMBED))
 		then
+			echo "This device requests an initramfs to be embedded"
+			pushd ../../initramfs-src
+			$BUILD kernel
+			if [ $? != 0 ]; then echo "Building initramfs failed" && exit 1; fi
+			popd
 			cp -ar ../../initramfs-src/target osmc-initramfs
 			export RAMFSDIR=$(pwd)/osmc-initramfs
+		else
+			echo "This device requests an initramfs to be built, but not embedded"
+			pushd ../../initramfs-src/
+			$BUILD kernel
+			
 		fi
+		
 	fi
 	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
 	if [ "$IMG_TYPE" == "uImage" ]; then make-kpkg --uimage --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
@@ -132,6 +138,11 @@ then
 	then
 		make imx6dl-vero.dtb
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
+	fi
+	if [ "$1" == "vero2" ]
+	then
+		# Special packaging for Android
+		abootimg --create kernel.img -k arch/arm/boot/uImage -r ../../initramfs/ -s arch/arm/boot/amlogic/meson8b_vero2.dtd
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
