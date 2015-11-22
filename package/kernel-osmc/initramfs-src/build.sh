@@ -58,6 +58,9 @@ mkdir -p target/tmp
 mkdir -p target/var
 mkdir -p target/etc
 mkdir -p target/dev
+install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
+install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
+install -m 0755 init.sh target/sbin/init
 ln -s target/bin/e2fsck target/bin/fsck.ext4
 ln -s target/bin/e2fsck target/bin/fsck.ext3
 ln -s target/bin/e2fsck target/bin/fsck.ext2
@@ -65,10 +68,6 @@ mknod target/dev/console c 5 1
 mknod target/dev/ttyS0 c 204 64
 mknod target/dev/null c 1 3
 mknod target/dev/tty c 5 0
-cp e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin
-cp busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin
-cp init.sh target/init
-chmod +x target/init
 for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 if [ "$1" == "cpio" ]
