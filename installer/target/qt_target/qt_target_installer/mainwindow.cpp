@@ -150,11 +150,15 @@ void MainWindow::install()
                     device->setBoot("/dev/sda1");
                     device->setRoot("/dev/sda2");
                 }
+                if (utils->getOSMCDev() != "atv")
+                {
                 for (int i = 0; i <= 60; i++)
                 {
-                    ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
-                    qApp->processEvents();
-                    system("/bin/sleep 1");
+
+                        ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
+                        qApp->processEvents();
+                        system("/bin/sleep 1");
+                }
                 }
             }
         }
