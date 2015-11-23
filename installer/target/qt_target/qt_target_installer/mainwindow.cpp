@@ -250,9 +250,7 @@ void MainWindow::install()
                 logger->addLine("Making boot partition as this type of system needs one");
                 if (utils->getOSMCDev() == "atv")
                 {
-                    utils->mkpart(rootBase, device->getBootFS(), "40s", "256M"); /* Hack to hard-code this for now */
-                    utils->setflag(rootBase, "1 atvrecv", true);
-                    utils->fmtpart(device->getBoot(), "hfsplus");
+                    system("/bin/dd if=/dev/sdb of=/dev/sda bs=1M count=256");
                 }
                 utils->updateDevTable();
                 logger->addLine("Making root partition");
