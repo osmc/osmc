@@ -51,6 +51,7 @@ if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 popd
 mkdir -p target/
 mkdir -p target/lib
+mkdir -p target/sbin
 mkdir -p target/bin
 mkdir -p target/proc
 mkdir -p target/sys
