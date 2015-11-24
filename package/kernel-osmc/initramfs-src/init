@@ -108,6 +108,9 @@ fi
 # Let's set up the new mountpoint and move our mounts over
 
 /bin/busybox mkdir -p "$OPTION_MOUNT_PATH"
+/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"/dev
+/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"/proc
+/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"/sys
 /bin/busybox mount --move /dev "$OPTION_MOUNT_PATH"/dev
 /bin/busybox mount --move /proc "$OPTION_MOUNT_PATH"/proc
 /bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
