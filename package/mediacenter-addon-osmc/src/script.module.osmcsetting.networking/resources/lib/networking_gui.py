@@ -22,6 +22,7 @@ sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 
 
 import osmc_bluetooth
 import osmc_network
+from resources.lib.osmc_advset_editor import AdvancedSettingsEditor
 
 WIFI_THREAD_NAME      = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
@@ -232,6 +233,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # flag to identify when a MySQL setting has been changed
         self.mysql_changed = False
 
+        # dictionary to hold advanced settings from file
+        self.advs_dict = {}
         
         # Bluetooth GUI update Thread
         self.bluetooth_population_thread = None
@@ -272,17 +275,20 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if self.use_preseed and not osmc_network.get_nfs_ip_cmdline_value():
 
-             self.preseed_data = osmc_network.parse_preseed()
+            self.preseed_data = osmc_network.parse_preseed()
 
-             if self.preseed_data:
-                 if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
-                     panel_to_show = SELECTOR_WIRELESS_NETWORK
+            if self.preseed_data:
+                if self.preseed_data['Interface'].startswith('wlan') and osmc_network.is_wifi_available():
+                    panel_to_show = SELECTOR_WIRELESS_NETWORK
 
-                 else:
-                     panel_to_show = SELECTOR_WIRED_NETWORK
+                else:
+                    panel_to_show = SELECTOR_WIRED_NETWORK
+
+        # create the advanced settings reader
+        self.ASE = AdvancedSettingsEditor(log)
 
         # read advancedsettings.xml file and parse the details, then load those into the fields in the MySQL panel
-        self.advs_dict = self.parse_advanced_settings()
+        self.advs_dict = self.ASE.parse_advanced_settings()
         self.populate_mysql(self.advs_dict)
 
         # set all the panels to invisible except the first one
@@ -693,34 +699,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         return
 
 
-    def parse_advanced_settings(self):
-        ''' Parses the advancedsettings.xml file. Returns a dict with ALL the details. '''
-
-        user_data = xbmc.translatePath( 'special://userdata')
-        loc       = os.path.join(user_data,'advancedsettings.xml')
-
-        null_doc  = {'advancedsettings': {}}
-
-        log('advancedsettings file exists = %s' % os.path.isfile(loc))
-
-        if os.path.isfile(loc):
-
-            with open(loc, 'r') as f:
-                lines = f.readlines()
-            
-            if not lines:
-                log('advancedsettings.xml file is empty')
-                return null_doc
-
-            with open(loc, 'r') as f:
-                doc = xmltodict.parse(f)
-
-            return doc
-
-        else:
-            return null_doc
-
-
     def read_mysql_settings(self, dictionary):
         ''' Reads the MySQL settings from the gui, and writes them directly into the ADVS. '''
         
@@ -783,39 +761,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         return {'advancedsettings': sub_dict}
 
 
-    def validate_advset_dict(self, dictionary):
-        ''' Checks whether the provided dictionary is fully populated with MySQL settings info.
-            Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed. '''
-
-        main = dictionary.get('advancedsettings', {})
-
-        if not main:
-
-            return False, 'empty'
-
-        sql_subitems = ['name', 'host', 'port', 'user', 'pass']
-
-        if 'videodatabase' in main:
-            # fail if the items aren't filled in or are the default up value
-            for item in sql_subitems:
-                subitem = main.get('videodatabase',{}).get(item, False)
-                if not subitem or subitem == '___ : ___ : ___ : ___':
-                    return False, 'missing mysql'
-
-        if 'musicdatabase' in main:
-            for item in sql_subitems:
-                subitem = main.get('musicdatabase',{}).get(item, False)
-                if not subitem or subitem == '___ : ___ : ___ : ___':
-                    return False, 'missing mysql'
-
-        return True, 'complete'
-
-
     def write_advancedsettings(self, dictionary):
         ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
 
         # check the dictionary to see if it is valid
-        dictionary_valid, invalidity_type = self.validate_advset_dict(dictionary)
+        dictionary_valid, invalidity_type = self.ASE.validate_advset_dict(dictionary)
 
         if not dictionary_valid:
             if invalidity_type == 'missing mysql':
@@ -841,10 +791,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         loc       = os.path.join(user_data,'advancedsettings.xml')
 
         try:
-            with open(loc, 'w') as f:
-                xmltodict.unparse(  input_dict = dictionary, 
-                                    output = f, 
-                                    pretty = True)
+            self.ASE.write_advancedsettings(loc, dictionary)
+
         except IOError:
 
             log('IOError trying to write to advancedsettings.xml')
@@ -869,10 +817,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     log('Second attempt at writing MySQL changes to advancedsettings.xml file.')
 
                     try:
-                        with open(loc, 'w') as f:
-                            xmltodict.unparse(  input_dict = dictionary, 
-                                                output = f, 
-                                                pretty = True)
+                        self.ASE.write_advancedsettings(loc, dictionary)
+
                     except:
                         ok = DIALOG.ok('OSMC', 'Failed to write to advancedsettings.xml again.', 'More details may be found in the log.')
                         log('Failed to write to advancedsettings.xml again.\n\n%s' % traceback.format_exc())
