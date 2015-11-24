@@ -19,6 +19,7 @@ fi
 fi
 echo "Building initramfs for target ${1}"
 make clean
+update_sources
 handle_dep "autoconf"
 
 if [ "$1" == "cpio" ]
