@@ -41,16 +41,16 @@ echo /bin/busybox mdev > /proc/sys/kernel/hotplug
 for option in $(/bin/busybox cat /proc/cmdline); do
 	case $option in
 	  rootdelay=*)
-	    OPTION_ROOTDELAY="${arg#*=}"
+	    OPTION_ROOTDELAY="${option#*=}"
 	    ;;
 	  root=*)
-		OPTION_ROOT="${arg#*=}"
+		OPTION_ROOT="${option#*=}"
 		;;
 	  rootfstype=*)
-		OPTION_FILESYSTEM="${arg#*=}"
+		OPTION_FILESYSTEM="${option#*=}"
 		;;
 	  init=*)
-		OPTION_INIT="${arg#*=}"
+		OPTION_INIT="${option#*=}"
 		;;
 	  nfsroot=*)
 		OPTION_BOOTS_NFS="1"
