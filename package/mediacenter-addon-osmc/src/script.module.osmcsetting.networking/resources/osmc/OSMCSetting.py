@@ -169,8 +169,8 @@ class OSMCSettingClass(threading.Thread):
 		# when a valid MySQL advanced settings file is found, toggle the Wait_for_Network setting to ON
 		if valid_advset_dict:
 
-			# check if the server is on the localhost
-			if not self.ASE.is_localhost(advset_dict):
+			# only proceed if the (either) server is not on the localhost
+			if self.ASE.server_not_localhost(advset_dict):
 
 				# confirm that wait_for_network is not already enabled
 				if not osmc_network.is_connman_wait_for_network_enabled():

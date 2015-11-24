@@ -403,7 +403,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.shutdown_process()
 
 
-
     def shutdown_process(self):
         ''' Actions that are done when the user chooses to Go Back, Escape, or clicks Exit '''
 
@@ -413,6 +412,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         self.read_mysql_settings(self.advs_dict)
         write = self.write_advancedsettings(self.advs_dict)
+
+        # Enable WaitForNetwork if either server is not local and the settings include valid music or video db info
+        if self.ASE.server_not_localhost(self.advs_dict):
+            if self.ASE.validate_advset_dict(self.advs_dict, reject_empty=True):
+                osmc_network.toggle_wait_for_network(True)
 
         wifi_thread = self.is_thread_running(WIFI_THREAD_NAME)
         wifi_scan_thread = self.is_thread_running(WIFI_SCAN_THREAD_NAME)
@@ -880,18 +884,11 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             if any([self.getControl(ctl).isSelected() for ctl in MYSQL_TOGGLES]):
 
-                if not osmc_network.is_connman_wait_for_network_enabled():
-                    osmc_network.toggle_wait_for_network(True)
-                    self.getControl(WIRED_WAIT_FOR_NETWORK).setSelected(True)
-                    self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(True)
+                # if not osmc_network.is_connman_wait_for_network_enabled():
+                # osmc_network.toggle_wait_for_network(True) -- we have moved this code to the shutdown process
+                self.getControl(WIRED_WAIT_FOR_NETWORK).setSelected(True)
+                self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(True)
 
-            else:
-
-                if osmc_network.is_connman_wait_for_network_enabled():
-
-                    osmc_network.toggle_wait_for_network(False)
-                    self.getControl(WIRED_WAIT_FOR_NETWORK).setSelected(False)
-                    self.getControl(WIRELESS_WAIT_FOR_NETWORK).setSelected(False)
 
         if new_val and new_val != -1:
 
