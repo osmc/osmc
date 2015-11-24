@@ -175,9 +175,9 @@ class OSMCSettingClass(threading.Thread):
 				# confirm that wait_for_network is not already enabled
 				if not osmc_network.is_connman_wait_for_network_enabled():
 
-					make_change = DIALOG.yesno('MyOSMC', lang(32078),nolabel=lang(32079), yeslabel=lang(32080), autoclose=10000)
+					undo_change = DIALOG.yesno('MyOSMC', lang(32078),nolabel=lang(32080), yeslabel=lang(32079), autoclose=10000)
 					
-					if make_change:
+					if not undo_change:
 						osmc_network.toggle_wait_for_network(True)
 
 		# a flag to determine whether a setting change requires a reboot to take effect

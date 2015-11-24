@@ -22,7 +22,7 @@ sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 
 
 import osmc_bluetooth
 import osmc_network
-from resources.lib.osmc_advset_editor import AdvancedSettingsEditor
+from osmc_advset_editor import AdvancedSettingsEditor
 
 WIFI_THREAD_NAME      = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'

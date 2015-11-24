@@ -9,7 +9,7 @@ __addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib')))
 
-import resources.lib.xmltodict as xmltodict
+import xmltodict as xmltodict
 
 
 class AdvancedSettingsEditor(object):
@@ -105,7 +105,7 @@ class AdvancedSettingsEditor(object):
 					return False, 'missing mysql'
 
 		if reject_empty:
-			if not any('musicdatabase' in main, 'videodatabase' in main):
+			if not any(['musicdatabase' in main, 'videodatabase' in main]):
 				return False, 'empty db fields'
 
 		return True, 'complete'
