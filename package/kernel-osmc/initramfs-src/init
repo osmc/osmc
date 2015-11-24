@@ -123,6 +123,15 @@ echo "" > /proc/sys/kernel/hotplug
 
 # Let's try and mount
 
+if [ "$OPTION_ROOTDELAY" -gt 0 ]
+then
+	COUNTER=0
+	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
+	do
+		sleep 1
+	done
+fi
+
 /bin/busybox mount "$OPTION_ROOT" "$OPTION_MOUNT_PATH" "$OPTION_MOUNT_OPTIONS" "$OPTION_FILESYSTEM"
 mount_result="$?"
 if [ "$mount_result" -eq 0 ]
