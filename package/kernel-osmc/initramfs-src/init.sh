@@ -29,39 +29,39 @@ OPTION_MOUNT_PATH="/real_root"
 
 echo 0 > /sys/devices/virtual/graphics/fbcon/cursor_blink
 echo 0 > /proc/sys/kernel/printk
-clear
+/bin/busybox clear
 
 # Set up device nodes
 
-echo /sbin/mdev > /proc/sys/kernel/hotplug 
-mdev -s 
+echo /bin/busybox mdev > /proc/sys/kernel/hotplug
+/bin/busybox mdev -s
 
 # Read /proc/cmdline and find out what we're doing.
 
-for option in $(cat /proc/cmdline); do
+for option in $(/bin/busybox cat /proc/cmdline); do
 	case $option in
 	  rootdelay=*)
 	    OPTION_ROOTDELAY="${arg#*=}"
 	    ;;
-	  root=*
+	  root=*)
 		OPTION_ROOT="${arg#*=}"
 		;;
-	  rootfstype=*
+	  rootfstype=*)
 		OPTION_FILESYSTEM="${arg#*=}"
 		;;
-	  init=*
+	  init=*)
 		OPTION_INIT="${arg#*=}"
 		;;
-	  nfsroot=*
+	  nfsroot=*)
 		OPTION_BOOTS_NFS="1"
 		OPTION_DO_FSCK="0"
 		# To be completed
 		;;
 	  nofsck)
 		OPTION_DO_FSCK="0"
-		;;	
+		;;
 	  osmcrescue)
-		/bin/sh
+		/bin/busybox sh
 		;;
 	 esac
 done
@@ -72,7 +72,7 @@ if [ "$OPTION_DO_FSCK" -eq 1 ]
 then
 	# Verify filesystem integrity
 	FSCK_BIN="/bin/e2fsck"
-	if [ -f /bin/fsck.${OPTION_FILESYSTEM}]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
+	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
 	$FSCK_BIN -a "$OPTION_ROOT" >/dev/null 2>&1
 	fsck_result="$?"
 	# 0 == no error
@@ -107,7 +107,7 @@ fi
 
 # Let's set up the new mountpoint and move our mounts over
 
-mkdir -p "$OPTION_MOUNT_PATH"
+/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"
 /bin/busybox mount --move /dev /sysroot/dev
 /bin/busybox mount --move /proc /sysroot/proc
 /bin/busybox mount --move /sys /sysroot/sys
@@ -131,5 +131,5 @@ then
 else
 	print_message "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
 	# Drop to a shell
-	/bin/sh
+	/bin/busybox sh
 fi
