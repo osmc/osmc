@@ -1,11 +1,11 @@
 all:
-	@echo "available targets: \nmake kernel\nmake cpio"
+	@echo "available targets: DEVICE=rbp1/rbp2/vero \nmake kernel\nmake cpio"
 
 kernel:
-	bash build.sh "kernel"
+	bash build.sh "kernel" "${DEVICE}"
 	
 cpio:
-	bash build.sh "cpio"
+	bash build.sh "cpio" "${DEVICE}"
 
 clean:
 	rm -f initramfs.gz >/dev/null 2>&1

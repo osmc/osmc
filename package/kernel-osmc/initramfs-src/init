@@ -25,6 +25,9 @@ OPTION_MOUNT_PATH="/real_root"
 /bin/busybox mount -t proc proc /proc
 /bin/busybox mount -t sysfs sysfs /sys
 
+# Load platform specific stuff
+. init-device
+
 # A nicer console
 
 echo 0 > /sys/devices/virtual/graphics/fbcon/cursor_blink

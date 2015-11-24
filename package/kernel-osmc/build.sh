@@ -88,7 +88,7 @@ then
 	then
 		echo "This device requests an initramfs"
 		pushd ../../initramfs-src
-		$BUILD kernel
+		DEVICE="$1" $BUILD kernel
 		if [ $? != 0 ]; then echo "Building initramfs failed" && exit 1; fi
 		popd
 		if ((($FLAGS_INITRAMFS & $INITRAMFS_EMBED) == $INITRAMFS_EMBED))

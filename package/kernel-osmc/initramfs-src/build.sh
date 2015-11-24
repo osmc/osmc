@@ -8,6 +8,7 @@ pushd ../ && . ../common.sh && popd
 . VERSIONS
 
 if [ -z "$1" ]; then echo -e "No target defined" && exit 1; fi
+if [ -z "$2" ]; then echo -e "No device defined" && exit 1; fi
 if [ "$1" == "cpio" ]
 then
 ischroot
@@ -66,6 +67,7 @@ mkdir -p target/dev
 install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
 install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
 install -m 0755 init target/init
+install -m 0755 init.d/${2} init-device
 ln -s target/bin/e2fsck target/bin/fsck.ext4
 ln -s target/bin/e2fsck target/bin/fsck.ext3
 ln -s target/bin/e2fsck target/bin/fsck.ext2
