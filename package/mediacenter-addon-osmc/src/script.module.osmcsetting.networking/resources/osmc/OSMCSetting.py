@@ -156,7 +156,7 @@ class OSMCSettingClass(threading.Thread):
 		advset_dict = self.ASE.parse_advanced_settings()
 
 		#check whether the advanced settings dict contains valid MySQL information
-		valid_advset_dict, _ = self.ASE.validate_advset_dict(advset_dict, reject_empty=True)
+		valid_advset_dict, _ = self.ASE.validate_advset_dict(advset_dict, reject_empty=True, exclude_name=True)
 
 		# when a valid MySQL advanced settings file is found, force the Wait_for_Network setting
 		if valid_advset_dict:

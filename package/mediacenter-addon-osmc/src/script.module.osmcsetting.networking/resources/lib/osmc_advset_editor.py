@@ -57,10 +57,11 @@ class AdvancedSettingsEditor(object):
 			return null_doc
 
 
-	def validate_advset_dict(self, dictionary, reject_empty=False):
+	def validate_advset_dict(self, dictionary, reject_empty=False, exclude_name=False):
 		''' Checks whether the provided dictionary is fully populated with MySQL settings info.
 			If reject_empty is False, then Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed.
-			If reject_empty is True,  then Blank dictionaries are rejected, AND dictionaries with no video or music database dicts are also rejected.'''
+			If reject_empty is True,  then Blank dictionaries are rejected, AND dictionaries with no video or music database dicts are also rejected.
+			exclude_name means that the name sql item can be ignored (it is not strictly required, but the GUI ALWAYS adds it.'''
 
 		main = dictionary.get('advancedsettings', {})
 
@@ -68,7 +69,10 @@ class AdvancedSettingsEditor(object):
 
 			return False, 'empty'
 
-		sql_subitems = ['name', 'host', 'port', 'user', 'pass']
+		if exclude_name:
+			sql_subitems = ['host', 'port', 'user', 'pass']	
+		else:
+			sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
 		if 'videodatabase' in main:
 			# fail if the items aren't filled in or are the default up value
