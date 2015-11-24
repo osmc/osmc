@@ -57,6 +57,21 @@ class AdvancedSettingsEditor(object):
 			return null_doc
 
 
+	def is_localhost(self, dictionary):
+		''' Checks the MySQL settings to ensure the server isnt on the localhost '''
+
+		dbs = [dictionary.get('advancedsettings',{}).get('musicdatabase',{}), 
+				dictionary.get('advancedsettings',{}).get('videodatabase',{})]
+
+		local_indicators = ['127.0.0.1', 'localhost']
+
+		for db in dbs:
+			if db.get('host',None) in local_indicators:
+				return True
+
+		return False
+
+
 	def validate_advset_dict(self, dictionary, reject_empty=False, exclude_name=False):
 		''' Checks whether the provided dictionary is fully populated with MySQL settings info.
 			If reject_empty is False, then Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed.

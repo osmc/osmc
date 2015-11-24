@@ -834,7 +834,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         # as soon as a control is touched in the MySQL panel, the trigger for rewriting the advancedsettings.xml file is flipped, and cannot be reversed
         if not self.mysql_changed:
-                self.mysql_changed = True
+            self.mysql_changed = True
 
         new_val = None
 
