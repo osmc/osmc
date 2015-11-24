@@ -124,8 +124,8 @@ then
 	# If we checked the filesystem, tell systemd
 	if [ "$OPTION_DO_FSCK" -eq 1 ]
 	then
-	mkdir -p "$OPTION_MOUNT_PATH"/run/initramfs
-	touch "$OPTION_MOUNT_PATH"/run/initramfs/fsck-root
+	/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"/run/initramfs
+	/bin/busybox touch "$OPTION_MOUNT_PATH"/run/initramfs/fsck-root
 	fi
 	exec switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT"
 else
