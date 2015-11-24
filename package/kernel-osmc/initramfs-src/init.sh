@@ -108,9 +108,9 @@ fi
 # Let's set up the new mountpoint and move our mounts over
 
 /bin/busybox mkdir -p "$OPTION_MOUNT_PATH"
-/bin/busybox mount --move /dev /sysroot/dev
-/bin/busybox mount --move /proc /sysroot/proc
-/bin/busybox mount --move /sys /sysroot/sys
+/bin/busybox mount --move /dev "$OPTION_MOUNT_PATH"/dev
+/bin/busybox mount --move /proc "$OPTION_MOUNT_PATH"/proc
+/bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
 
 # Deactivate the hotplugger. systemd will take over
 echo "" > /proc/sys/kernel/hotplug
