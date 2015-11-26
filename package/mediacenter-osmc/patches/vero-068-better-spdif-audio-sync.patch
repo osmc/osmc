@@ -1,0 +1,26 @@
+From ef49500da895172e4ca35fc546a555bbe078aabc Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 26 Nov 2015 09:14:58 +0000
+Subject: [PATCH] Vero: Better synchronisation for SPDIF audio
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
+index d7c9fd4..dd52a2d 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
+@@ -319,7 +319,7 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
+ 
+ double CAESinkAUDIOTRACK::GetLatency()
+ {
+-  return 0.0;
++  return 0.2;
+ }
+ 
+ double CAESinkAUDIOTRACK::GetCacheTotal()
+-- 
+2.1.0
+
