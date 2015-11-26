@@ -64,6 +64,7 @@ mkdir -p target/tmp
 mkdir -p target/var
 mkdir -p target/etc
 mkdir -p target/dev
+mkdir -p target/run
 mkdir -p target/init.d
 mkdir -p target/usr/share/udhcpc
 install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
