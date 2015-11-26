@@ -1,0 +1,27 @@
+From bb6d8fe291b180abe83947a226ed094783914448 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 26 Nov 2015 12:34:41 +0000
+Subject: [PATCH] Do not write to system journal when we can't find a URL. It
+ often means the device is not properly initialised yet, and will succeed
+ shortly after.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ plugins/pacrunner.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/plugins/pacrunner.c b/plugins/pacrunner.c
+index 850139f..a908baa 100644
+--- a/plugins/pacrunner.c
++++ b/plugins/pacrunner.c
+@@ -347,7 +347,6 @@ static void request_lookup_reply(DBusPendingCall *call, void *user_data)
+ 	DBG("");
+ 
+ 	if (dbus_message_get_type(reply) == DBUS_MESSAGE_TYPE_ERROR) {
+-		connman_error("Failed to find URL:%s", data->url);
+ 		proxy = NULL;
+ 		goto done;
+ 	}
+-- 
+2.1.0
+
