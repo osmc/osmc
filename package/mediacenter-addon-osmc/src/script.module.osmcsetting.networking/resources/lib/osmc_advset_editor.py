@@ -1,5 +1,6 @@
 
 import os
+import re
 import sys
 import xbmc
 import xbmcaddon
@@ -63,12 +64,14 @@ class AdvancedSettingsEditor(object):
 		dbs = [ dictionary.get('advancedsettings',{}).get('musicdatabase',{}), 
 				dictionary.get('advancedsettings',{}).get('videodatabase',{})]
 
-		local_indicators = ['127.0.0.1', '127.0.1.1','localhost', '::1']
+		pattern = re.compile(r'(127.\d+.\d+.\d+|localhost|::1)')
+
+		# local_indicators = ['127.0.0.1', '127.0.1.1','localhost', '::1']
 
 		for db in dbs:
 			host = db.get('host', None)
 			if host:
-				if host not in local_indicators:
+				if not pattern.match(host):
 					return True
 
 		return False
