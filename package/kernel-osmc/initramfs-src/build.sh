@@ -74,6 +74,7 @@ cp -ar udhcpc.script target/usr/share/udhcpc/default.script
 ln -s target/bin/e2fsck target/bin/fsck.ext4
 ln -s target/bin/e2fsck target/bin/fsck.ext3
 ln -s target/bin/e2fsck target/bin/fsck.ext2
+ln -s /proc/mounts target/etc/mtab
 mknod target/dev/console c 5 1
 mknod target/dev/ttyS0 c 204 64
 mknod target/dev/null c 1 3
