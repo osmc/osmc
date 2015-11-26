@@ -63,7 +63,7 @@ class AdvancedSettingsEditor(object):
 		dbs = [ dictionary.get('advancedsettings',{}).get('musicdatabase',{}), 
 				dictionary.get('advancedsettings',{}).get('videodatabase',{})]
 
-		local_indicators = ['127.0.0.1', '127.0.1.1','localhost']
+		local_indicators = ['127.0.0.1', '127.0.1.1','localhost', '::1']
 
 		for db in dbs:
 			host = db.get('host', None)
