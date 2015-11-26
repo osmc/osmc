@@ -69,7 +69,7 @@ mkdir -p target/usr/share/udhcpc
 install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
 install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
 install -m 0755 init target/init
-install -m 0755 init.d/${2} init-device
+install -m 0755 init.d/${2} target/init-device
 cp -ar udhcpc.script target/usr/share/udhcpc/default.script
 ln -s target/bin/e2fsck target/bin/fsck.ext4
 ln -s target/bin/e2fsck target/bin/fsck.ext3
