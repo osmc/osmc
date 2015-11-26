@@ -82,10 +82,10 @@ for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 if [ "$1" == "cpio" ]
 then
-pushd target
-# cpio
-find . | cpio -H newc -o > initramfs.cpio
-cat initramfs.cpio | gzip > initramfs.gz
-mv initramfs.gz ../
+    pushd target
+    # cpio
+    find . | cpio -H newc -o > initramfs.cpio
+    cat initramfs.cpio | gzip > initramfs.gz
+    mv initramfs.gz ../
 fi
 echo "Initramfs built successfully"
