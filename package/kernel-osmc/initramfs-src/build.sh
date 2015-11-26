@@ -11,12 +11,12 @@ if [ -z "$1" ]; then echo -e "No target defined" && exit 1; fi
 if [ -z "$2" ]; then echo -e "No device defined" && exit 1; fi
 if [ "$1" == "cpio" ]
 then
-ischroot
-chroot_result=$?
-if [ "$chroot_result" -eq 0 ] || [ "$chroot_result" -eq 1 ]
-then
-	echo -e "Initramfs must be built within an OSMC chroot toolchain" && exit 1
-fi
+    ischroot
+    chroot_result=$?
+    if [ "$chroot_result" -eq 0 ] || [ "$chroot_result" -eq 1 ]
+    then
+        echo -e "Initramfs must be built within an OSMC chroot toolchain" && exit 1
+    fi
 fi
 echo "Building initramfs for target ${1}"
 make clean
