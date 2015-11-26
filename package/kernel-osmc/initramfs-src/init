@@ -18,6 +18,7 @@ OPTION_FILESYSTEM="ext4"
 OPTION_INIT="/sbin/splash_early"
 OPTION_MOUNT_OPTIONS="-o "
 OPTION_MOUNT_PATH="/real_root"
+OPTION_NFS_IP_TYPE="dhcp"
 
 # Set up our mounts
 
@@ -56,9 +57,14 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 		OPTION_INIT="${option#*=}"
 		;;
 	  nfsroot=*)
-		OPTION_BOOTS_NFS="1"
 		OPTION_DO_FSCK="0"
-		# To be completed
+		OPTION_FILESYSTEM="nfs"
+		OPTION_ROOT="${option#*=}"
+		OPTION_MOUNT_OPTIONS="$(echo $OPTION_ROOT | /bin/busybox cut -f 2 -d ,)"
+		OPTION_ROOT="$(echo $OPTION_ROOT | /bin/busybox cut -f 1 -d ,)"
+		;;
+	  ip=*)
+		OPTION_NFS_IP_TYPE="${option#*=}"
 		;;
 	  nofsck)
 		OPTION_DO_FSCK="0"
@@ -85,13 +91,13 @@ then
 	if [ "$fsck_result" -eq 2 ]
 	then
 		print_message "OSMC has repaired some filesystem corruption on your system and needs to reboot"
-		sleep 10
+		/bin/busybox sleep 10
 		/bin/busybox reboot
 	fi
 		if [ "$fsck_result" -eq 4 ]
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
-		sleep 5
+		/bin/busybox sleep 5
 		$FSCK_BIN -y
 		fsck_result="$?"
 		if [ "$fsck_result" -eq 8 ]
@@ -100,11 +106,11 @@ then
 			print_message "OSMC cannot repair the filesystem. Please re-install OSMC from osmc.tv/download"
 			while true
 			do
-				sleep 1
+				/bin/busybox sleep 1
 			done
 		fi
 		print_message "OSMC has repaired your filesystem"
-		sleep 10
+		/bin/busybox sleep 10
 	fi
 fi
 
@@ -128,11 +134,35 @@ then
 	COUNTER=0
 	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
 	do
-		sleep 1
+		/bin/busybox sleep 1
 	done
 fi
 
-/bin/busybox mount "$OPTION_ROOT" "$OPTION_MOUNT_PATH" "$OPTION_MOUNT_OPTIONS" "$OPTION_FILESYSTEM"
+if [ "$OPTION_FILESYSTEM" == "nfs" ]
+then
+	# Bring up the network
+	/bin/busybox mkdir -p /var/run/ifstate
+	if echo $OPTION_NFS_IP_TYPE | /bin/busybox grep -q "dhcp"
+	then
+		/bin/busybox mkdir -p /etc/network
+		/bin/busybox mkdir -p /etc/network/if-up.d
+		echo "auto eth0
+		iface eth0 inet dhcp" > /etc/network/interfaces
+		/bin/busybox ifup eth0
+		/bin/busybox udhcpc -i eth0
+		/bin/busybox ifconfig
+		/bin/busybox sleep 10
+	else
+		NFS_IP_ADDR=$(echo $ip | cut -d : -f 1)
+                NFS_IP_GW=$(echo $ip | cut -d : -f 3)
+                NFS_IP_MASK=$(echo $ip | cut -d : -f 4)
+                /bin/ifconfig eth0 "$NFS_IP_ADDR" "NFS_IP_GW" "$NFS_IP_MASK"
+                /bin/route add default gw "$NFS_IP_GW" eth0
+        fi
+
+fi
+
+/bin/busybox mount -t "$OPTION_FILESYSTEM" "$OPTION_ROOT" "$OPTION_MOUNT_PATH" "$OPTION_MOUNT_OPTIONS"
 mount_result="$?"
 if [ "$mount_result" -eq 0 ]
 then
