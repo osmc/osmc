@@ -119,7 +119,7 @@ fi
 /bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
 
 # Deactivate the hotplugger. systemd will take over
-echo "" > /proc/sys/kernel/hotplug
+echo "" > "$OPTION_MOUNT_PATH"/proc/sys/kernel/hotplug
 
 # Let's try and mount
 
