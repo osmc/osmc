@@ -154,10 +154,12 @@ then
                 /bin/ifconfig eth0 "$NFS_IP_ADDR" "NFS_IP_GW" "$NFS_IP_MASK"
                 /bin/route add default gw "$NFS_IP_GW" eth0
         fi
-
+else
+	OPTION_MOUNT_OPTIONS="ro${OPTION_MOUNT_OPTIONS}"
 fi
 
-/bin/busybox mount -t "$OPTION_FILESYSTEM" "$OPTION_ROOT" "$OPTION_MOUNT_PATH" -o ro${OPTION_MOUNT_OPTIONS}
+if [ "$OPTION_MOUNT_OPTIONS" ]; then OPTION_MOUNT_OPTIONS="-o $OPTION_MOUNT_OPTIONS"; fi
+/bin/busybox mount -t "$OPTION_FILESYSTEM" "$OPTION_ROOT" "$OPTION_MOUNT_PATH" $OPTION_MOUNT_OPTIONS
 mount_result="$?"
 if [ "$mount_result" -eq 0 ]
 then
