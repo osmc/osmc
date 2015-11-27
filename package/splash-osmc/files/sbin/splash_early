@@ -1,5 +1,5 @@
 #!/bin/bash
-mount -t proc proc /proc
+mount -t proc proc /proc >/dev/null 2>&1
 export TERM=linux
 
 /usr/bin/clear
