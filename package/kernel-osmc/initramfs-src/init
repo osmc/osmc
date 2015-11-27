@@ -152,11 +152,11 @@ then
 		/bin/busybox ifconfig
 		/bin/busybox sleep 10
 	else
-		NFS_IP_ADDR=$(echo $ip | cut -d : -f 1)
-                NFS_IP_GW=$(echo $ip | cut -d : -f 3)
-                NFS_IP_MASK=$(echo $ip | cut -d : -f 4)
-                /bin/ifconfig eth0 "$NFS_IP_ADDR" "NFS_IP_GW" "$NFS_IP_MASK"
-                /bin/route add default gw "$NFS_IP_GW" eth0
+		NFS_IP_ADDR=$(echo $ip | /bin/busybox cut -d : -f 1)
+                NFS_IP_GW=$(echo $ip | /bin/busybox cut -d : -f 3)
+                NFS_IP_MASK=$(echo $ip | /bin/busybox cut -d : -f 4)
+                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" "NFS_IP_GW" "$NFS_IP_MASK"
+                /bin/busybox route add default gw "$NFS_IP_GW" eth0
         fi
 else
 	OPTION_MOUNT_OPTIONS="ro${OPTION_MOUNT_OPTIONS}"
