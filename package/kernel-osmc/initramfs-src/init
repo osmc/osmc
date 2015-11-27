@@ -156,7 +156,7 @@ then
 		NFS_IP_ADDR=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 1)
                 NFS_IP_GW=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 3)
                 NFS_IP_MASK=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 4)
-                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" "$NFS_IP_GW" "$NFS_IP_MASK"
+                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" netmask "$NFS_IP_MASK"
                 /bin/busybox route add default gw "$NFS_IP_GW" eth0
         fi
 else
