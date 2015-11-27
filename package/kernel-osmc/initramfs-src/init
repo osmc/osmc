@@ -178,7 +178,7 @@ then
 	/bin/busybox mount --move /proc "$OPTION_MOUNT_PATH"/proc
 	/bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
 	/bin/busybox mount --move /run "$OPTION_MOUNT_PATH"/run
-	exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT"
+	exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT" $*
 else
 	print_message "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
 	# Drop to a shell
