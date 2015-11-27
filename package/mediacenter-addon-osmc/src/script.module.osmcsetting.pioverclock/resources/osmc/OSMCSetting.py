@@ -111,6 +111,30 @@ def lang(id):
     return san 
 
 
+def is_pi_zero():
+
+	try:
+		with open('/proc/cpuinfo','r') as f:
+			lines = f.readlines()
+			for line in lines:
+				if line[0:8]=='Revision':
+					myrevision = line[11:len(line)-1]
+	except:
+		myrevision = "0000"
+
+    try: # Pi2 revision starts with 'a'
+        revisionInt = int(revision, 16)
+
+    except ValueError:
+        return False
+
+    if revisionInt >> 23 & 1 == True:
+        if (revisionInt >> 4) & 0X7FF == 9:
+            raise
+
+    return False
+
+
 class OSMCSettingClass(threading.Thread):
 
 	''' 
@@ -125,6 +149,8 @@ class OSMCSettingClass(threading.Thread):
 			The setting_data_method contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
 		'''
+
+		is_pi_zero()
 
 		super(OSMCSettingClass, self).__init__()
 
