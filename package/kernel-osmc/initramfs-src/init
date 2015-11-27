@@ -91,7 +91,8 @@ then
 	# Verify filesystem integrity
 	FSCK_BIN="/bin/e2fsck"
 	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
-	$FSCK_BIN -p "$OPTION_ROOT" >/dev/null 2>&1
+	echo -e "\n\n\n\n"
+	$FSCK_BIN -p -C 0 "$OPTION_ROOT"
 	fsck_result="$?"
 	if [ "$(( $fsck_result & 2 ))" = 2 ]
 	then
@@ -103,7 +104,7 @@ then
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
 		/bin/busybox sleep 5
-		$FSCK_BIN -y "$OPTION_ROOT"
+		$FSCK_BIN -f -y -C 0 "$OPTION_ROOT"
 		fsck_result="$?"
 		if [ "$(( $fsck_result & 8 ))" = 8 ]
 		then
