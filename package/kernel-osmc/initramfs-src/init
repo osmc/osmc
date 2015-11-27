@@ -11,6 +11,12 @@ print_message()
 	echo -e "\n\n\n\n\nOSMC initrd\n\n${1}"
 }
 
+install_busybox_symlinks()
+{
+        # Installs BusyBox symlinks to make the shell actually usable
+	/bin/busybox --install -s
+}
+
 OPTION_DO_FSCK="1"
 OPTION_ROOT="/dev/mmcblk0p2"
 OPTION_ROOTDELAY="0"
@@ -72,6 +78,7 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 		OPTION_DO_FSCK="0"
 		;;
 	  osmcrescue)
+		install_busybox_symlinks
 		/bin/busybox sh
 		;;
 	 esac
@@ -174,5 +181,6 @@ then
 else
 	print_message "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
 	# Drop to a shell
+	install_busybox_symlinks
 	/bin/busybox sh
 fi
