@@ -18,16 +18,17 @@ then
 	echo 0 > /proc/sys/kernel/ctrl-alt-del
 	fbset -depth 8 && fbset -depth 16
 	/usr/bin/setterm --cursor on
-	/sbin/fsck /
 	/bin/mount / -o remount,rw
 	/bin/mount /boot
-	/bin/mount -t sysfs sysfs /sys
+	/bin/mount -t sysfs sysfs /sys >/dev/null 2>&1
 	/bin/mkdir /dev/pts
 	/bin/mount -t devpts devpts /dev/pts
 	/bin/hostname -F /etc/hostname
-	echo; echo "          OSMC Recovery Console."
+	echo -e "\n\n\n\n"
+	echo "          OSMC Recovery Console."
 	echo "          Type 'exit' to reboot when finished."
-	echo "          For help and support see http://osmc.tv/help"; echo
+	echo "          For help and support see http://osmc.tv/help"
+	echo
 	/usr/bin/setsid -c /bin/bash
 	/bin/sync
 	echo 1 > /proc/sys/kernel/sysrq
