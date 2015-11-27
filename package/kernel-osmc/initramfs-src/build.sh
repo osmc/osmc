@@ -50,7 +50,7 @@ popd
 echo "Compiling e2fsprogs"
 pushd e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}
 # NB: can't build static because of pthread, which is part of glibc.
-./configure --prefix=/usr
+./configure --prefix=/usr --sysconfdir=/etc
 $BUILD
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 popd
@@ -72,6 +72,7 @@ install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
 install -m 0755 init target/init
 install -m 0755 init.d/${2} target/init-device
 cp -ar udhcpc.script target/usr/share/udhcpc/default.script
+cp -ar e2fsck.conf target/etc/e2fsck.conf
 ln -s target/bin/e2fsck target/bin/fsck.ext4
 ln -s target/bin/e2fsck target/bin/fsck.ext3
 ln -s target/bin/e2fsck target/bin/fsck.ext2

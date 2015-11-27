@@ -169,8 +169,9 @@ then
 	# If we checked the filesystem, tell systemd
 	if [ "$OPTION_DO_FSCK" -eq 1 ]
 	then
-	/bin/busybox mkdir -p /run/initramfs
-	/bin/busybox touch /run/initramfs/fsck-root
+		/bin/busybox mkdir -p /run/initramfs
+		/bin/busybox touch /run/initramfs/fsck-root
+		/bin/busybox cat /fsck.log >/dev/kmsg 2>/dev/null
 	fi
 	# Let's move our mounts over
 	/bin/busybox mount --move /dev "$OPTION_MOUNT_PATH"/dev
