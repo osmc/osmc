@@ -25,6 +25,7 @@ public:
     bool fmtpart(QString partition, QString fstype);
     void writeToFile(QFile &file, QStringList strings, bool append);
     bool mountPartition(Target *device, QString path);
+    bool unmountPartition(Target *device, QString path);
     int getPartSize(QString device, QString fstype);
     void updateDevTable();
 

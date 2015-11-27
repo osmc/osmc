@@ -249,11 +249,9 @@ void MainWindow::install()
             else
             {
                 /* We have to create the partition structure for /boot too */
-                logger->addLine("Must mklabel as rootfs is on another device");
-                utils->mklabel(rootBase, true); /* GPT favoured on PC */
-                logger->addLine("Making boot partition as this type of system needs one");
                 if (utils->getOSMCDev() == "atv")
                 {
+                    logger->addLine("Hack: duplicating first partition to internal disk as we have no hfsprogs");
                     system("/bin/dd if=/dev/sdb of=/dev/sda bs=1M count=256");
                 }
                 utils->updateDevTable();
@@ -311,6 +309,12 @@ void MainWindow::setupBootLoader()
     val += 25;
     /* Set up the boot loader */
     ui->statusLabel->setText(tr("Configuring bootloader"));
+    if (device->hasBootChanged())
+    {
+        logger->addLine("Boot changed. Re-mounting the real /boot");
+        utils->unmountPartition(device, MNT_BOOT);
+        utils->mountPartition(device, MNT_BOOT);
+    }
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
     QTimer::singleShot(0, this, SLOT(val));

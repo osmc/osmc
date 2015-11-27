@@ -24,6 +24,7 @@ void Target::setRoot(QString newRoot)
 void Target::setBoot(QString newBoot)
 {
     this->bootPath = newBoot;
+    this->bootChanged = true;
     this->bootNeedsFormat = true;
 }
 

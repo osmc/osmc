@@ -124,7 +124,13 @@ bool Utils::mountPartition(Target *device, QString path)
         logger->addLine("Using device->boot: " + device->getBoot() + " and FS: " + device->getBootFS());
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
-        return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, bootFS.toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+        if (this->getOSMCDev() != "atv")
+            return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, bootFS.toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+        else
+        {
+            QString mountCmd = "/bin/mount -t hfsplus -o force,rw " + device->getBoot() + MNT_BOOT;
+            return system(mountCmd.toLocal8Bit());
+        }
     }
     else if (path == QString(MNT_ROOT))
     {
@@ -150,4 +156,21 @@ bool Utils::mountPartition(Target *device, QString path)
     }
     logger->addLine("Unsupported mountpoint.");
     return false;
+}
+
+bool Utils::unmountPartition(Target *device, QString path)
+{
+    if (path == QString(MNT_BOOT))
+    {
+        logger->addLine("Trying to unmount MNT_BOOT ("+QString(MNT_BOOT) + ")");
+        logger->addLine("Using device->boot: " + device->getBoot());
+        return (umount(device->getBoot().toLocal8Bit()) == 0) ? true : false;
+    }
+    if (path == QString(MNT_ROOT))
+    {
+        logger->addLine("Trying to unmount MNT_ROOT ("+QString(MNT_ROOT) + ")");
+        logger->addLine("Using device->root: " + device->getRoot());
+        return (umount(device->getRoot().toLocal8Bit()) == 0) ? true : false;
+    }
+
 }

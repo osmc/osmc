@@ -14,6 +14,7 @@ public:
     QString getBootFS() { return bootFS; }
     bool isBootRW() { return bootRW; }
     bool hasRootChanged() { return rootChanged; }
+    bool hasBootChanged() { return bootChanged; }
     void setBootNeedsFormat(bool needsFormat);
     bool doesBootNeedsFormat() { return bootNeedsFormat; }
     QString getRoot() { return rootPath; }
@@ -28,6 +29,7 @@ private:
     QString rootPath;
     bool bootRW;
     bool rootChanged = false; /* So we know if we need to mklabel */
+    bool bootChanged = false; /* So we know to remount boot */
     bool usesGPT;
 };
 
