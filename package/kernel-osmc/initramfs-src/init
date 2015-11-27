@@ -86,23 +86,19 @@ then
 	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
 	$FSCK_BIN -p "$OPTION_ROOT" >/dev/null 2>&1
 	fsck_result="$?"
-	# 0 == no error
-	# 1 == filesystem errors corrected
-	# 2 == reboot needed
-	# 4 == not fully repaired. need to force.
-	if [ "$fsck_result" -eq 2 ]
+	if [ "$(( $fsck_result & 2 ))" = 2 ]
 	then
 		print_message "OSMC has repaired some filesystem corruption on your system and needs to reboot"
 		/bin/busybox sleep 10
 		/bin/busybox reboot
 	fi
-		if [ "$fsck_result" -eq 4 ]
+		if [ "$(( $fsck_result & 4 ))" = 4 ]
 	then
 		print_message "OSMC is significantly corrupted. We will our best to repair this system"
 		/bin/busybox sleep 5
 		$FSCK_BIN -y "$OPTION_ROOT"
 		fsck_result="$?"
-		if [ "$fsck_result" -eq 8 ]
+		if [ "$(( $fsck_result & 8 ))" = 8 ]
 		then
 			# We are broken for good
 			print_message "OSMC cannot repair the filesystem. Please re-install OSMC from osmc.tv/download"
