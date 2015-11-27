@@ -70,6 +70,7 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 		OPTION_ROOT="${option#*=}"
 		OPTION_MOUNT_OPTIONS="$(echo $OPTION_ROOT | /bin/busybox cut -f 2 -d ,)"
 		OPTION_ROOT="$(echo $OPTION_ROOT | /bin/busybox cut -f 1 -d ,)"
+		OPTION_FILESYSTEM="nfs"
 		;;
 	  ip=*)
 		OPTION_NFS_IP_TYPE="${option#*=}"
