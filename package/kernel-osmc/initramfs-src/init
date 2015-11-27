@@ -67,13 +67,8 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	  nfsroot=*)
 		OPTION_DO_FSCK="0"
 		OPTION_FILESYSTEM="nfs"
-		OPTION_ROOT="${option#*=}"
-		if echo $OPTION_ROOT | /bin/busybox grep -q ","
-		then
-		    OPTION_ROOT="$(echo $OPTION_ROOT | /bin/busybox cut -f 1 -d ,)"
-		    OPTION_MOUNT_OPTIONS="$(echo $OPTION_ROOT | /bin/busybox cut -f 2 -d ,)"
-		fi
-		OPTION_FILESYSTEM="nfs"
+		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox cut -f 1 -d,)
+		OPTION_MOUNT_OPTIONS=$(echo "${option#*=}" | /bin/busybox cut -sf 2- -d,)
 		;;
 	  ip=*)
 		OPTION_NFS_IP_TYPE="${option#*=}"
