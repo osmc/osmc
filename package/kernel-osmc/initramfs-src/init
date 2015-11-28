@@ -93,29 +93,33 @@ then
 	echo -e "\n\n\n\n"
 	$FSCK_BIN -p -C 0 "$OPTION_ROOT"
 	fsck_result="$?"
-	if [ "$(( $fsck_result & 2 ))" = 2 ]
+	if [ "$(( $fsck_result & 2 ))" -gt 0 ]
 	then
-		print_message "OSMC has repaired some filesystem corruption on your system and needs to reboot"
+		print_message "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds."
 		/bin/busybox sleep 10
 		/bin/busybox reboot
 	fi
-		if [ "$(( $fsck_result & 4 ))" = 4 ]
+	if [ "$(( $fsck_result & 12 ))" -gt 0 ]
 	then
-		print_message "OSMC is significantly corrupted. We will our best to repair this system"
+		print_message "Serious file system corruption found. We will do our best to repair this now."
 		/bin/busybox sleep 5
 		$FSCK_BIN -f -y -C 0 "$OPTION_ROOT"
 		fsck_result="$?"
-		if [ "$(( $fsck_result & 8 ))" = 8 ]
+		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
 		then
-			# We are broken for good
-			print_message "OSMC cannot repair the filesystem. Please re-install OSMC from osmc.tv/download"
-			while true
-			do
-				/bin/busybox sleep 1
-			done
+			print_message "OSMC has repaired major filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds."
+			/bin/busybox sleep 10
+			/bin/busybox reboot
 		fi
-		print_message "OSMC has repaired your filesystem"
-		/bin/busybox sleep 10
+		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
+		then
+			# Something is wrong that we can't fix. Warn the user but let them attempt to boot anyway in case some data can be backed up.
+			print_message "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds."
+			/bin/busybox sleep 30
+		else
+			print_message "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds."
+			/bin/busybox sleep 10
+		fi
 	fi
 fi
 
