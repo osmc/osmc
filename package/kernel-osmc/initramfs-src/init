@@ -175,7 +175,10 @@ then
 	then
 		/bin/busybox mkdir -p /run/initramfs
 		/bin/busybox touch /run/initramfs/fsck-root
-		/bin/busybox cat /fsck.log >/dev/kmsg 2>/dev/null
+		while read -r line
+		do
+			echo "fsck: $line" >/dev/kmsg
+		done </fsck.log 2>/dev/null
 	fi
 	# Let's move our mounts over
 	/bin/busybox mount --move /dev "$OPTION_MOUNT_PATH"/dev
