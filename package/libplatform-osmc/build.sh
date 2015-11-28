@@ -28,7 +28,7 @@ then
 	handle_dep "cmake"
 	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/platform-*
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr/osmc .
+	cmake -DCMAKE_INSTALL_PREFIX=/usr/osmc -DCMAKE_INSTALL_LIBDIR=/usr/osmc/lib -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/osmc/lib .
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
