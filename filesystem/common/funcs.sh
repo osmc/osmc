@@ -91,6 +91,11 @@ function setup_busybox_links()
 	fi
 }
 
+function enable_mirrordirection()
+{
+        sed -e "s/staging.apt.osmc.tv/apt.osmc.tv/g" -i ${1}/etc/apt/sources.list
+}
+
 export -f setup_osmc_user
 export -f setup_hostname
 export -f setup_hosts
@@ -100,3 +105,4 @@ export -f enable_init
 export -f create_base_fstab
 export -f conf_tty
 export -f setup_busybox_links
+export -f enable_mirrordirection
