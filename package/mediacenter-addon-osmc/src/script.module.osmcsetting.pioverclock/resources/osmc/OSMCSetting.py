@@ -122,17 +122,17 @@ def is_pi_zero():
 	except:
 		myrevision = "0000"
 
-    try: # Pi2 revision starts with 'a'
-        revisionInt = int(revision, 16)
+        try: # Pi2 revision starts with 'a'
+            revisionInt = int(myrevision, 16)
 
-    except ValueError:
+        except ValueError:
+            return False
+
+        if revisionInt >> 23 & 1 == True:
+            if (revisionInt >> 4) & 0X7FF == 9:
+                raise
+
         return False
-
-    if revisionInt >> 23 & 1 == True:
-        if (revisionInt >> 4) & 0X7FF == 9:
-            raise
-
-    return False
 
 
 class OSMCSettingClass(threading.Thread):
