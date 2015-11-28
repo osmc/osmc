@@ -68,7 +68,8 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 		OPTION_DO_FSCK="0"
 		OPTION_FILESYSTEM="nfs"
 		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox cut -f 1 -d,)
-		OPTION_MOUNT_OPTIONS=$(echo "${option#*=}" | /bin/busybox cut -sf 2- -d,)
+		OPTION_MOUNT_OPTIONS="nolock"
+		OPTION_MOUNT_OPTIONS+=$(echo "${option#*=}" | /bin/busybox cut -sf 2- -d,)
 		;;
 	  ip=*)
 		OPTION_NFS_IP_TYPE="${option#*=}"
@@ -143,7 +144,7 @@ fi
 if [ "$OPTION_FILESYSTEM" == "nfs" ]
 then
 	# Bring up the network
-	/bin/busybox mkdir -p /var/run/ifstate
+	/bin/busybox mkdir -p /var/run
 	if echo $OPTION_NFS_IP_TYPE | /bin/busybox grep -q "dhcp"
 	then
 		/bin/busybox mkdir -p /etc/network
@@ -151,9 +152,7 @@ then
 		echo "auto eth0
 		iface eth0 inet dhcp" > /etc/network/interfaces
 		/bin/busybox ifup eth0
-		/bin/busybox udhcpc -i eth0
-		/bin/busybox ifconfig
-		/bin/busybox sleep 10
+		/bin/busybox udhcpc -i eth0 > /dev/null 2>&1
 	else
 		NFS_IP_ADDR=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 1)
                 NFS_IP_GW=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 3)
