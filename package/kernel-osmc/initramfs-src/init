@@ -151,14 +151,14 @@ then
 		/bin/busybox mkdir -p /etc/network/if-up.d
 		echo "auto eth0
 		iface eth0 inet dhcp" > /etc/network/interfaces
-		/bin/busybox ifup eth0
+		/bin/busybox ifup eth0 > /dev/null 2>&1
 		/bin/busybox udhcpc -i eth0 > /dev/null 2>&1
 	else
 		NFS_IP_ADDR=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 1)
                 NFS_IP_GW=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 3)
                 NFS_IP_MASK=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 4)
-                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" netmask "$NFS_IP_MASK" up
-                /bin/busybox route add default gw "$NFS_IP_GW" eth0
+                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" netmask "$NFS_IP_MASK" up > /dev/null 2>&1
+                /bin/busybox route add default gw "$NFS_IP_GW" eth0 >/dev/null 2>&1
         fi
 else
 	OPTION_MOUNT_OPTIONS="ro${OPTION_MOUNT_OPTIONS}"
