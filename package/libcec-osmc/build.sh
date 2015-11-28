@@ -50,7 +50,7 @@ then
 	mv files/usr/osmc/include  files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
-	ln -s "${out}/usr/osmc/lib/libcec.so.3.0" "${out}/usr/osmc/lib/libcec.so.3.0.0" # Hack remove in Dec
+	ln -s "${out}/usr/osmc/lib/libcec.so.3.0" "/usr/osmc/lib/libcec.so.3.0.0" # Hack remove in Dec
 	dpkg_build files/ ${1}-libcec-osmc.deb
 	dpkg_build files-dev ${1}-libcec-dev-osmc.deb
 	build_return=$?
