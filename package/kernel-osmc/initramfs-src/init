@@ -5,12 +5,6 @@
 
 # Abstract settings and defaults
 
-print_message()
-{
-	# Prints a message that won't be trimmed by overscan and will be visible
-	echo -e "\n\n\n\n\nOSMC initrd\n\n${1}"
-}
-
 install_busybox_symlinks()
 {
         # Installs BusyBox symlinks to make the shell actually usable
@@ -42,6 +36,7 @@ OPTION_NFS_IP_TYPE="dhcp"
 echo 0 > /sys/devices/virtual/graphics/fbcon/cursor_blink
 echo 0 > /proc/sys/kernel/printk
 /bin/busybox clear
+echo -e "\n\n\n\n"
 
 # Set up device nodes
 
@@ -83,6 +78,32 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	 esac
 done
 
+# Wait user specified delay for root filesystem.
+
+if [ "$OPTION_ROOTDELAY" -gt 0 ]
+then
+	COUNTER=0
+	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
+	do
+		/bin/busybox sleep 1
+		COUNTER=$((COUNTER+1))
+	done
+fi
+
+# Wait for the root device node to appear if it has still not been added by mdev yet.
+
+COUNTER=0
+while [ ! -b "$OPTION_ROOT" -a "$OPTION_FILESYSTEM" != "nfs" ]; do
+	if [ "$COUNTER" -eq 0 ]; then echo "Waiting for root filesystem device node $OPTION_ROOT..."; fi
+	/bin/busybox sleep 1
+	COUNTER=$((COUNTER+1))
+	if [ "$COUNTER" -ge 30 ]
+	then
+		echo -e "FATAL ERROR: Could not find root filesystem device node - if this is a USB install please check the USB drive is connected.\n\n\n\n"
+		while true; do /bin/busybox sleep 1000; done
+	fi
+done
+
 # Should we check the filesystem?
 
 if [ "$OPTION_DO_FSCK" -eq 1 ]
@@ -90,34 +111,33 @@ then
 	# Verify filesystem integrity
 	FSCK_BIN="/bin/e2fsck"
 	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
-	echo -e "\n\n\n\n"
 	$FSCK_BIN -p -C 0 "$OPTION_ROOT"
 	fsck_result="$?"
 	if [ "$(( $fsck_result & 2 ))" -gt 0 ]
 	then
-		print_message "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds."
+		echo -e "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
 		/bin/busybox sleep 10
 		/bin/busybox reboot
 	fi
 	if [ "$(( $fsck_result & 12 ))" -gt 0 ]
 	then
-		print_message "Serious file system corruption found. We will do our best to repair this now."
+		echo -e "Serious file system corruption found. We will do our best to repair this now.\n"
 		/bin/busybox sleep 5
 		$FSCK_BIN -f -y -C 0 "$OPTION_ROOT"
 		fsck_result="$?"
 		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
 		then
-			print_message "OSMC has repaired major filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds."
+			echo -e "OSMC has repaired major filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
 			/bin/busybox sleep 10
 			/bin/busybox reboot
 		fi
 		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
 		then
 			# Something is wrong that we can't fix. Warn the user but let them attempt to boot anyway in case some data can be backed up.
-			print_message "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds."
+			echo -e "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds.\n\n\n\n"
 			/bin/busybox sleep 30
 		else
-			print_message "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds."
+			echo -e "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds.\n\n\n\n"
 			/bin/busybox sleep 10
 		fi
 	fi
@@ -129,16 +149,6 @@ fi
 echo "" > /proc/sys/kernel/hotplug
 
 # Let's try and mount
-
-if [ "$OPTION_ROOTDELAY" -gt 0 ]
-then
-	COUNTER=0
-	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
-	do
-		/bin/busybox sleep 1
-		COUNTER=$((COUNTER+1))
-	done
-fi
 
 if [ "$OPTION_FILESYSTEM" == "nfs" ]
 then
@@ -185,7 +195,7 @@ then
 	/bin/busybox mount --move /run "$OPTION_MOUNT_PATH"/run
 	exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT" $*
 else
-	print_message "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
+	echo "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
 	# Drop to a shell
 	install_busybox_symlinks
 	/bin/busybox sh
