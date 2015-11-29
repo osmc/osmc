@@ -128,7 +128,7 @@ bool Utils::mountPartition(Target *device, QString path)
             return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, bootFS.toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
         else
         {
-            QString mountCmd = "/bin/mount -t hfsplus -o force,rw " + device->getBoot() + MNT_BOOT;
+            QString mountCmd = "/bin/mount -t hfsplus -o force,rw " + device->getBoot() + " " + MNT_BOOT;
             return system(mountCmd.toLocal8Bit());
         }
     }
