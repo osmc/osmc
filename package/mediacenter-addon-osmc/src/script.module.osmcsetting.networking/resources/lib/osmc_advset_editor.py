@@ -1,7 +1,9 @@
 
 import os
 import re
+import subprocess
 import sys
+
 import xbmc
 import xbmcaddon
 
@@ -126,6 +128,16 @@ class AdvancedSettingsEditor(object):
 
 	def write_advancedsettings(self, loc, dictionary):
 		''' Writes the supplied dictionary back to the advancedsettings.xml file '''
+
+		if not dictionary.get('advancedsettings', None):
+
+			self.log('Empty dictionary passed to advancedsettings file writer. Preventing write, backing up and removing file.')
+
+			subprocess.call(['sudo', 'cp', loc, loc.replace('advancedsettings.xml', 'advancedsettings_backup.xml')])
+
+			subprocess.call(['sudo', 'rm', '-f', loc])
+
+			return
 
 		with open(loc, 'w') as f:
 			xmltodict.unparse(  input_dict = dictionary, 
