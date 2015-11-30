@@ -37,7 +37,7 @@ OPTION_NFS_IP_TYPE="dhcp"
 echo 0 > /sys/devices/virtual/graphics/fbcon/cursor_blink
 echo 0 > /proc/sys/kernel/printk
 /bin/busybox clear
-echo -e "\n\n\n\n"
+echo -e "\033[9;0]\n\n\n\n"
 
 # Set up device nodes
 
