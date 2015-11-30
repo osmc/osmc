@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 mount -t proc proc /proc >/dev/null 2>&1
 export TERM=linux
 
@@ -14,7 +14,7 @@ fi
 if [ $? -eq 1 ] || grep -qw recovery /proc/cmdline
 then
 	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/opt/vc/bin"
-	trap '' SIGINT
+	trap '' INT
 	echo 0 > /proc/sys/kernel/ctrl-alt-del
 	fbset -depth 8 && fbset -depth 16
 	/usr/bin/setterm --cursor on
@@ -24,7 +24,7 @@ then
 	/bin/mkdir /dev/pts
 	/bin/mount -t devpts devpts /dev/pts
 	/bin/hostname -F /etc/hostname
-	echo -e "\n\n\n\n"
+	/bin/echo -e "\n\n\n\n"
 	echo "          OSMC Recovery Console."
 	echo "          Type 'exit' to reboot when finished."
 	echo "          For help and support see http://osmc.tv/help"
