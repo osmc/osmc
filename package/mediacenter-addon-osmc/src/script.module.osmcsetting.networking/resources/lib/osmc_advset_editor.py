@@ -40,22 +40,32 @@ class AdvancedSettingsEditor(object):
 
 		self.log('advancedsettings file exists = %s' % os.path.isfile(loc))
 
-		if os.path.isfile(loc):
+		if not os.path.isfile(loc): return null_doc
 
+		try:
 			with open(loc, 'r') as f:
 				lines = f.readlines()
 			
 			if not lines:
 				self.log('advancedsettings.xml file is empty')
-				return null_doc
+				raise
 
 			with open(loc, 'r') as f:
 				doc = xmltodict.parse(f)
 
-			return doc
+			# ensure empty advancedsettings nodes are ignored
+			if not doc.get('advancedsettings', None):
+				self.log('advancedsettings node in advancedsettings.xml file is empty')
+				raise
 
-		else:
+			else:
+				return doc
+
+		except:
+			self.log('error occured reading advancedsettings.xml file')
+
 			return null_doc
+
 
 
 	def server_not_localhost(self, dictionary):
