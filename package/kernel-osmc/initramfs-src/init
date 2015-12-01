@@ -72,7 +72,10 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	  nofsck)
 		OPTION_DO_FSCK="0"
 		;;
-	  osmcrescue)
+	  rescue)
+		echo "          OSMC initramfs Rescue Console."
+		echo "          Type 'exit' to resume startup when finished."
+		echo -e "          For help and support see http://osmc.tv/help\n"
 		busybox_shell
 		;;
 	 esac
@@ -82,6 +85,7 @@ done
 
 if [ "$OPTION_ROOTDELAY" -gt 0 ]
 then
+	echo "Waiting user specified rootdelay of $OPTION_ROOTDELAY seconds."
 	COUNTER=0
 	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
 	do
@@ -101,8 +105,10 @@ then
         COUNTER=$((COUNTER+1))
         if [ "$COUNTER" -ge 30 ]
         then
-                echo "FATAL ERROR: Could not find root filesystem device $OPTION_ROOT - if this is a USB install please check the USB drive is connected."
+                echo -e "FATAL ERROR: Could not find root filesystem device $OPTION_ROOT - if this is a USB install please check the USB drive is connected.\n"
 		# Drop to a shell
+		echo "          OSMC initramfs Rescue Console."
+		echo -e "          For help and support see http://osmc.tv/help\n"
 		busybox_shell
 		break
         fi
@@ -155,7 +161,7 @@ echo "" > /proc/sys/kernel/hotplug
 
 # Let's try and mount
 
-if [ "$OPTION_FILESYSTEM" == "nfs" ]
+if [ "$OPTION_FILESYSTEM" = "nfs" ]
 then
 	# Bring up the network
 	/bin/busybox mkdir -p /var/run
@@ -200,7 +206,9 @@ then
 	/bin/busybox mount --move /run "$OPTION_MOUNT_PATH"/run
 	exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT" $*
 else
-	echo "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem"
+	echo -e "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
 	# Drop to a shell
+		echo "          OSMC initramfs Rescue Console."
+		echo -e "          For help and support see http://osmc.tv/help\n"
 	busybox_shell
 fi
