@@ -100,7 +100,7 @@ if [ "$OPTION_FILESYSTEM" != "nfs" ]
 then
 	COUNTER=0
 	echo "Waiting for root filesystem device $OPTION_ROOT"
-	while ! /bin/busybox blkid | /bin/busybox sed 's/"//g' | /bin/busybox grep -q "$OPTION_ROOT"; do
+	while [ ! -b "$OPTION_ROOT" ] && ! /bin/busybox blkid | /bin/busybox sed 's/"//g' | /bin/busybox grep -q "$OPTION_ROOT"; do
         /bin/busybox sleep 1
         COUNTER=$((COUNTER+1))
         if [ "$COUNTER" -ge 30 ]
