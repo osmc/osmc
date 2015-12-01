@@ -13,6 +13,7 @@ busybox_shell()
 }
 
 OPTION_DO_FSCK="1"
+OPTION_FORCE_FSCK="0"
 OPTION_ROOT="/dev/mmcblk0p2"
 OPTION_ROOTDELAY="0"
 OPTION_FILESYSTEM="ext4"
@@ -72,6 +73,9 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	  nofsck)
 		OPTION_DO_FSCK="0"
 		;;
+	  forcefsck)
+		OPTION_FORCE_FSCK="1"
+		;;
 	  rescue)
 		echo "          OSMC initramfs Rescue Console."
 		echo "          Type 'exit' to resume startup when finished."
@@ -122,34 +126,52 @@ then
 	# Verify filesystem integrity
 	FSCK_BIN="/bin/e2fsck"
 	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
-	$FSCK_BIN -p -C 0 "$OPTION_ROOT"
-	fsck_result="$?"
-	if [ "$(( $fsck_result & 2 ))" -gt 0 ]
+
+	# Skip first prune scan in forcefsck mode.
+	if [ "$OPTION_FORCE_FSCK" -eq 0 ]
 	then
-		echo -e "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
-		/bin/busybox sleep 10
-		/bin/busybox reboot
+		$FSCK_BIN -p -C 0 "$OPTION_ROOT"
+		fsck_result="$?"
+		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
+		then
+			echo -e "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
+			/bin/busybox sleep 10
+			/bin/busybox reboot
+		fi
+
+		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
+		then
+			echo -e "Serious file system corruption found. We will do our best to repair this now.\n"
+			/bin/busybox sleep 5
+		fi
+	else
+		fsck_result=0
 	fi
-	if [ "$(( $fsck_result & 12 ))" -gt 0 ]
+
+	if [ "$(( $fsck_result & 12 ))" -gt 0 ] || [ "$OPTION_FORCE_FSCK" -eq 1 ]
 	then
-		echo -e "Serious file system corruption found. We will do our best to repair this now.\n"
-		/bin/busybox sleep 5
 		$FSCK_BIN -f -y -C 0 "$OPTION_ROOT"
 		fsck_result="$?"
 		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
 		then
-			echo -e "OSMC has repaired major filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
+			echo -e "OSMC has repaired filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
 			/bin/busybox sleep 10
 			/bin/busybox reboot
 		fi
+
 		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
 		then
 			# Something is wrong that we can't fix. Warn the user but let them attempt to boot anyway in case some data can be backed up.
 			echo -e "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds.\n\n\n\n"
 			/bin/busybox sleep 30
 		else
-			echo -e "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds.\n\n\n\n"
-			/bin/busybox sleep 10
+			if [ "$fsck_result" -eq 0 ]
+			then
+				echo -e "No errors were found on your filesystem.\n\n\n\n"
+			else
+				echo -e "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds.\n\n\n\n"
+				/bin/busybox sleep 10
+			fi
 		fi
 	fi
 fi
