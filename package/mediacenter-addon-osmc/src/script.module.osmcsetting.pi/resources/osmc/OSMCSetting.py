@@ -735,7 +735,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 			if pos == '0':
 
-				new_dtoverlay.extend([x + '[remove]' for x in dac_all])
+				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all])
 			
 			else:
 				
@@ -745,14 +745,14 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.append(soundcard)
 
 				#remove the unneeded entries
-				new_dtoverlay.extend([x + '[remove]' for x in dac_all if x != soundcard])
+				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all if x != soundcard])
 
 			wgp = self.me.getSetting('w1gpio')
 
 			if wgp != '0':
-				new_dtoverlay.append(w1gpio[int(wgp)-1])
+				new_dtoverlay.append('dtoverlay_||_' + w1gpio[int(wgp)-1])
 			else:
-				new_dtoverlay.extend([x + '[remove]' for x in w1gpio])
+				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in w1gpio])
 
 			rpi = self.me.getSetting('lirc-rpi-overlay')
 
@@ -764,7 +764,7 @@ Overclock settings are set using the Pi Overclock module."""
 				in_pin   = self.me.getSetting('gpio_in_pin')
 				pull_pin = self.me.getSetting('gpio_in_pull')
 
-				lirc = 'lirc-rpi:' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
+				lirc = 'dtoverlay_||_lirc-rpi=' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
 
 				if pull_pin != 'off':
 					lirc = lirc + ',gpio_in_pull=' + pull_pin
@@ -772,14 +772,14 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.append(lirc)
 
 			else:
-				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
+				new_dtoverlay.append('dtoverlay_||_lirc-rpi-overlay' + '[remove]')
 
 			spi = self.me.getSetting('spi-bcm2835-overlay')
 
 			if spi == 'true':
-				new_dtoverlay.append('spi-bcm2835-overlay')
+				new_dtoverlay.append('dtoverlay_||_spi-bcm2835-overlay')
 			else:
-				new_dtoverlay.append('spi-bcm2835-overlay' + '[remove]')
+				new_dtoverlay.append('dtoverlay_||_spi-bcm2835-overlay' + '[remove]')
 
 			log("NEW DT OVERLAY = %s" % new_dtoverlay)
 			return new_dtoverlay
