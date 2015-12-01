@@ -260,7 +260,11 @@ Overclock settings are set using the Pi Overclock module."""
 									'device_tree':				{'setting_value' : '',
 																	'default': '',
 																		'translate': self.translate_device_tree,
-																	},																																			
+																	},	
+									'orphanedparams':			{'setting_value' : '',
+																	'default': 'false',
+																		'translate': self.translate_orphanedparams,
+																	},																																																				
 									# 'other_settings_string': 	{'setting_value' : '',
 									# 								'default': '',
 									# 									'translate': self.translate_other_string
@@ -896,6 +900,33 @@ Overclock settings are set using the Pi Overclock module."""
 			return 'remove'
 			
 
+	def translate_orphanedparams(self, data, reverse=False):
+
+		''' Translates the orphaned dtparam for audio from either on, or remove '''
+
+		if not reverse:
+
+			datalist = data.split('\n')
+
+			for param in datalist:
+
+				k, v = param.split('|__|')
+
+				if v == 'on':
+					self.me.setSetting(k, 'true')
+				else:
+					self.me.setSetting(k, 'false')
+
+		else:
+
+			new_dtparams = []
+
+			if self.me.getSetting('audio') == 'true' or self.me.getSetting('spi-bcm2835-overlay') == 'true':
+				new_dtparams.append('audio|__|on')
+			else:
+				new_dtparams.append('audio[remove]')
+
+			return new_dtparams
 
 	#																															 #
 	##############################################################################################################################

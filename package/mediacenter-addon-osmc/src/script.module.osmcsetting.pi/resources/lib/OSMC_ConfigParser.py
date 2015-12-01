@@ -38,6 +38,7 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
     ''' Takes the config.txt and constructs a StringIO object that will work well with the ConfigObj parser. '''
 
     overlay_storage = []
+    orphaned_dtparams = []
 
     newlines = []
 
@@ -59,46 +60,57 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
             for original, alias in aliases.iteritems():
                 line = line.replace(original, alias)
 
-
             # pass through all commented lines and newlines
             if line.startswith('#') or line == '\n' or not line:
                 newlines.append(line)
                 print 'pass through\n'
                 continue
 
-            # add dtparams to overlay_storage
+            # add dtparams to overlay_storage, this ensures only dtparams that occur right after the dtoverlay are counted as parameters for the dtoverlay
+            # ignoring comments and newlines
             if overlay_storage and 'dtparam' in line:
                 line = line.replace(' ','')
                 overlay_storage.append(line[line.index('=')+1:].strip())
                 print 'append param\n'
                 continue
 
-            # if the line is not a new dtparam, then roll those lines up together and appened to newlines
+            # do this if there is an orphaned dtparam line, that is, if a dtparam is found without any starting overlay block in overlay_storage
+            elif 'dtparam' in line:
+                line = line.replace(' ' ,'')
+                newlines.append(line.replace('dtparam=', 'dtparam|__|'))   # |__| is the marker declaring this param as an orphan
+                print 'dtparam orphan added'
+                continue
+
+            # if the line is not a new dtparam and there are items in storage, then roll those items up together and appened to newlines
             elif overlay_storage:
                 print 'combining overlay block'
                 overlay_root = overlay_storage.pop(0)
                 if overlay_storage:
                     overlay_root = overlay_root + '='
                 else:
-                    if ':' in overlay_root:
-                        overlay_root = overlay_root.replace(':','=')
-                    else:
-                        overlay_root = overlay_root + '=PLACEHOLDER'
+                    overlay_root = overlay_root + '=PLACEHOLDER'
+
                 overlay_oneline = overlay_root + ','.join(overlay_storage)
+
                 newlines.append(overlay_oneline)
                 overlay_storage = []
                 print overlay_oneline
                 print 'combined params\n'
 
-            elif 'dtparam' in line: # ignore the line, dtparam lines should not be placed anywhere but after dtoverlay entries
-                print 'ignoring line\n'
-                continue
+                # once complete, continue on with processing the current line
 
             # if this is a new dtoverlay block, add the starting line to overlay storage, but first make sure that it is unique using the overlay count
             if 'dtoverlay=' in line:
                 line = line.replace(' ','')
-                overlay_storage.append(line.strip().replace('dtoverlay=', 'dtoverlay_||_'))     # _||_ this is merely a place holder to indicate dtoverlays
-                print 'starting overlay block\n'
+
+                if ':' in line:
+                    line = line.strip().replace('dtoverlay=', 'dtoverlay_||_').replace(':','=')
+                    newlines.append(line)
+                    print 'adding condensed dtoverlay to newlines'
+                else:
+
+                    overlay_storage.append(line.strip().replace('dtoverlay=', 'dtoverlay_||_'))     # _||_ this is merely a place holder to indicate dtoverlays
+                    print 'starting overlay block\n'
                 continue
 
             # if there is no equals sign, then remove any spaces from the string, and add an equals sign, THIS MUST BE REVERSED WHEN WRITING BACK
@@ -110,20 +122,21 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
             newlines.append(line)
             print 'added: %s\n' % line
 
-        # take care of any orphaned dtoverlay blocks
+        # take care of any orphaned dtoverlay blocks, this will only occur if the overlay block items are at the end of the file
         if overlay_storage:
             print 'handling ophaned overlay blocks: %s' % overlay_storage
+
             overlay_root = overlay_storage.pop(0)
+
             if overlay_storage:
                 overlay_root = overlay_root + '='
             else:
-                if ':' in overlay_root:
-                    overlay_root = overlay_root.replace(':','=')
-                else:
-                    overlay_root = overlay_root + '=PLACEHOLDER'
+                overlay_root = overlay_root + '=PLACEHOLDER'
+
             overlay_oneline = overlay_root + ','.join(overlay_storage)
             newlines.append(overlay_oneline)
             overlay_storage = []
+
             print overlay_oneline
             print 'combined params\n'
 
@@ -153,7 +166,6 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
     # reverse the newlines list back to its original order
     newlines = newlines[::-1]
 
-
     # put the string into a stringIO to allow the Config parser to read it like a file
     return StringIO.StringIO('\n'.join(newlines))
 
@@ -176,7 +188,7 @@ def write_to_config_file(config_stringIO, export_location='C:\\temp\\temp.txt'):
                 line = line.replace('_||_','=')
 
             # replace the other changes made during sanitisation
-            line = line.replace(' = ', '=').replace('_SPACE_', ' ').replace('=NO_EQUALS_SIGN','').replace('=PLACEHOLDER','')
+            line = line.replace(' = ', '=').replace('_SPACE_', ' ').replace('=NO_EQUALS_SIGN','').replace('=PLACEHOLDER','').replace('|__|','=')
             f.write(line)
 
 
@@ -188,12 +200,6 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
     sanitised_file = read_and_sanitise_file(file_loc)
 
     config_dict = ConfigObj(infile=sanitised_file, write_empty_values=True, list_values=False)
-
-    print changes
-
-    print ''
-
-    print config_dict
 
     for key, value in changes.iteritems():
 
@@ -219,7 +225,31 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 else:
                     config_dict[true_key] = true_val
             continue
+
+
+        if key == 'orphanedparams':
+
+            if not isinstance(value, list):
+                continue            
         
+            for param_item in value:
+
+                if '|__|' in param_item:
+                    true_key, true_val = param_item.split('|__|')
+                else:
+                    true_key, true_val = param_item.replace('[remove]',''), None
+
+                true_key = 'dtparam|__|' + true_key
+                
+                if '[remove]' in param_item:
+
+                    if true_key in config_dict:
+                        del config_dict[true_key]
+
+                else:
+                    config_dict[true_key] = true_val
+            continue
+
         if value == 'remove':
             del config_dict[key]
             continue
@@ -249,8 +279,11 @@ def prepare_config_dict_for_addon(config_dict):
     '''
     
     combined_overlays = []
-    remove_keys = []
+    remove_keys       = []
+    combined_params   = []
+
     for k, v in config_dict.iteritems():
+
         if 'dtoverlay' in k:
             remove_keys.append(k)
             new_dtoverlay = k.replace('dtoverlay_||_', '')
@@ -260,8 +293,16 @@ def prepare_config_dict_for_addon(config_dict):
 
             combined_overlays.append(new_dtoverlay)
 
+        if 'dtparam' in k:
+            remove_keys.append(k)
+            new_dtparam = k.replace('dtparam|__|', '')
+            combined_params.append(new_dtparam + '|__|' + v)
+
     if combined_overlays:
         config_dict['dtoverlay'] = '\n'.join(combined_overlays)
+
+    if combined_params:
+        config_dict['orphanedparams'] = '\n'.join(combined_params)
 
     for key in remove_keys:
         del config_dict[key]
@@ -286,11 +327,17 @@ def test():
     'hifiberry-digi-overlay', 
     'w1-gpio-overlay[remove]', 
     'w1-gpio-pullup-overlay[remove]', 
-    'lirc-rpi-overlay:gpio_out_pin=9999999,gpio_in_pin=23,gpio_in_pull=shiiiiit'
-    ]
+    'lirc-rpi-overlay:gpio_out_pin=9999999,gpio_in_pin=23,gpio_in_pull=sh'
+    ],
+    'orphanedparams' : ['param2|__|on', 'param1|__|snickleremov']
+    
     }
 
     apply_changes_to_configtxt(changes)
+
+
+
+print test()
 
 
 # device_tree_overlay=lirc-rpi-overlay
