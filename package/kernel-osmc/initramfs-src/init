@@ -226,9 +226,19 @@ then
 	/bin/busybox mount --move /proc "$OPTION_MOUNT_PATH"/proc
 	/bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
 	/bin/busybox mount --move /run "$OPTION_MOUNT_PATH"/run
-	exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$OPTION_INIT" $*
+
+	for INIT in "$OPTION_INIT" /sbin/splash_early /sbin/init /etc/init /bin/init /bin/sh
+	do
+		if [ -f "${OPTION_MOUNT_PATH}/${INIT}" -o -L "${OPTION_MOUNT_PATH}/${INIT}" ]
+		then
+			exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$INIT" $*
+		fi
+	done
+
+	echo -e "FATAL ERROR: Could not find a suitable init on the root filesystem\n\n\n\n"
+	while true; do /bin/busybox sleep 1000; done
 else
-	echo -e "OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
+	echo -e "FATAL ERROR: OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
 	# Drop to a shell
 		echo "          OSMC initramfs Rescue Console."
 		echo -e "          For help and support see http://osmc.tv/help\n"
