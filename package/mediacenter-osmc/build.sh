@@ -19,11 +19,11 @@ fi
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ] || [ "$1" == "vero2" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/02e7013889e08d608363f2909ebeccdb9ea3b7c9.tar.gz" "$(pwd)/src"
-API_VERSION="15"
+pull_source "https://github.com/xbmc/xbmc/archive/6bcc4db1129fd65a3d97c9fa9a39437839622985.tar.gz" "$(pwd)/src"
+API_VERSION="16"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
-API_VERSION="16"
+API_VERSION="17"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
@@ -343,8 +343,8 @@ then
         # Languages
         mkdir languages/
         pushd languages
-        if [ "$API_VERSION" = "15" ]; then api_name="isengard"; fi
         if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
+        if [ "$API_VERSION" = "17" ]; then api_name="tbc"; fi
         base_url="http://mirror.us.leaseweb.net/xbmc/addons/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
         languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
