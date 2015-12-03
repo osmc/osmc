@@ -33,6 +33,7 @@ then
 	handle_dep "libhdhomerun-dev"
 	handle_dep "dvb-tools"
 	handle_dep "libdvbv5-0"
+	handle_dep "bzip2"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
