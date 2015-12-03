@@ -39,6 +39,24 @@ def lang(id):
 	return san 
 
 
+class mock_Networking_caller(object):
+
+	def __init__(self, parent, net_call):
+
+		self.ftr_running = False
+		self.timeout     = 0
+		self.parent = parent
+		self.parent.internet_connected = True
+
+	def start(self):
+
+		pass
+
+	def setDaemon(self, bool):
+
+		pass
+
+
 class Networking_caller(threading.Thread):
 
 	def __init__(self, parent, net_call):
@@ -91,7 +109,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					strDefaultName, 
 					networking_instance, 
 					lang_rerun, 
-					selected_language):
+					selected_language,
+					testing=False):
 
 		# show timezone switch
 		self.showtimezone = True
@@ -103,7 +122,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.net_call = networking_instance
 
 		self.internet_check   = False
-		self.internet_checker = Networking_caller(self, self.net_call)
+		if not testing:
+			self.internet_checker = Networking_caller(self, self.net_call)
+		else:
+			self.internet_checker = mock_Networking_caller(self, self.net_call)
 		self.internet_checker.setDaemon(True)
 		self.internet_checker.start()
 
@@ -643,7 +665,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				self.ssh_pass = user_pass
 
-				self.getControl(370011).setLabel('Click here to change/confirm password: ' + self.ssh_pass.replace('_',''))
+				self.getControl(370011).setLabel('Click here to change/confirm password:    ' + self.ssh_pass.replace('_',''))
 
 				self.getControl(370012).setVisible(True)			
 
@@ -796,7 +818,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def onFocus(self, controlID):
 
-		main_controls 	= [1002, 1003, 10035, 1004, 1005, 1006, 1007, 1008, 1009]
+		main_controls 	= [1002, 1003, 10035, 10037, 1004, 1005, 1006, 1007, 1008, 1009]
 
 		tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 
@@ -849,7 +871,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.set_skin_image('CONF')
 
 
-def open_gui(networking_instance):
+def open_gui(networking_instance, testing=False):
 
 	__addon__        = xbmcaddon.Addon()
 	scriptPath       = __addon__.getAddonInfo('path')
@@ -865,7 +887,7 @@ def open_gui(networking_instance):
 
 		first_run = False
 		
-		GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language)
+		GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language, testing=testing)
 		GUI.doModal()
 
 		selected_language 	= GUI.selected_language
