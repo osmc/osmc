@@ -8,3 +8,14 @@ export OPTION_FILESYSTEM="ext4"
 export OPTION_INIT="/sbin/splash_early"
 export OPTION_MOUNT_OPTIONS=""
 export OPTION_MOUNT_PATH="/real_root"
+
+# Enable framebuffer device
+echo 0 > /sys/class/graphics/fb0/blank
+
+# Disable framebuffer scaling
+echo 0 > /sys/class/graphics/fb0/free_scale
+
+# Include deinterlacer into default VFM map
+echo rm default > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+
