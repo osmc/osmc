@@ -350,18 +350,22 @@ class Main(object):
 
 				elif response == 'walkthru':
 
-					for module in self.stored_gui.live_modules:
-						if 'id' in module:
-							log(module['id'])
-							if module['id'] == "script.module.osmcsetting.networking":
-								networking_instance = module['SET']
+					log('Running manually called walkthru')
 
-								osmc_walkthru.open_gui(networking_instance)
+					osmc_walkthru.open_gui(None, testing=True)
 
-								break
+					# for module in self.stored_gui.live_modules:
+					# 	if 'id' in module:
+					# 		log(module['id'])
+					# 		if module['id'] == "script.module.osmcsetting.networking":
+					# 			networking_instance = module['SET']
+
+					# 			osmc_walkthru.open_gui(networking_instance)
+
+					# 			break
 			
-					else:
-						log('Networking module not found')
+					# else:
+					# 	log('Networking module not found')
 
 				elif 'new_device:' in response:
 
