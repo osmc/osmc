@@ -108,7 +108,7 @@ DIALOG     = xbmcgui.Dialog()
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-import config_tools as ct
+import OSMC_ConfigParser as ct
 from CompLogger import comprehensive_logger as clog
 
 
@@ -300,7 +300,7 @@ Overclock settings are set using the Pi Overclock module."""
 			__addon__.setSetting('serial', serial)
 
 		except:
-			self.test_config = '/home/kubkev/Documents/config.txt'
+			self.test_config = '/home/plaskev/Documents/config.txt'
 
 		log('START')
 		for x, k in self.pi_settings_dict.iteritems():
@@ -318,7 +318,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# but I am going to set up my own process in addition to the xml one, I will be reading some
 		# settings from the config.txt, and getting the rest from the settings.xml
-		self.config_settings = ct.read_config(self.test_config)
+		self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		log('Config settings received from the parser: %s' % self.config_settings)
 
@@ -528,7 +528,7 @@ Overclock settings are set using the Pi Overclock module."""
 		self.translated_changed_settings['start_x'] = 1
 
 		# write the settings to the config.txt
-		ct.write_config(self.test_config, self.translated_changed_settings)
+		ct.apply_changes_to_configtxt(self.translated_changed_settings, self.test_config)
 
 
 	def boot_method(self):

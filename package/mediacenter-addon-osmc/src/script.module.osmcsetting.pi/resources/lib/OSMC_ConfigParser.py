@@ -29,6 +29,7 @@ When Writing the settings to the file
 
 '''
 from configobj import ConfigObj
+import os
 import StringIO
 import subprocess
 import sys
@@ -263,13 +264,15 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
     print config_dict
 
     # temporary location for the config.txt
-    tmp_loc = '/var/tmp/config.txt'
-    tmp_loc = 'C:\\temp\\temp.txt'
+    if os.path.isfile('/var/tmp/config.txt'):
+        tmp_loc = '/var/tmp/config.txt'
+    else:
+        tmp_loc = 'C:\\temp\\temp.txt'
+
     write_to_config_file(blotter, tmp_loc)
 
-
     # copy over the temp config.txt to /boot/ as superuser
-    # subprocess.call(["sudo", "mv",  tmp_loc, file_loc])
+    subprocess.call(["sudo", "mv",  tmp_loc, file_loc])
 
 
 def prepare_config_dict_for_addon(config_dict):
@@ -329,15 +332,15 @@ def test():
     'w1-gpio-pullup-overlay[remove]', 
     'lirc-rpi-overlay:gpio_out_pin=9999999,gpio_in_pin=23,gpio_in_pull=sh'
     ],
-    'orphanedparams' : ['param2|__|on', 'param1|__|snickleremov']
+    'orphanedparams' : ['param2|__|on', 'param1|__|on']
     
     }
 
     apply_changes_to_configtxt(changes)
 
 
-
-print test()
+if __name__ == "__main__":
+    print test()
 
 
 # device_tree_overlay=lirc-rpi-overlay
