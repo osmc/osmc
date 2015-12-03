@@ -120,6 +120,12 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# this is the default hostname for the device
 		self.device_name = 'current name: osmc'
 
+		# this holds the users desired SSH state (True for enabled)
+		self.ssh_state = True
+
+		# this holds the users ssh password
+		self.ssh_pass = 'osmc'
+
 		# newsletter email address
 		self.email = ''
 
@@ -161,7 +167,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		global WARR
 
 		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 10035, 1004, 1005, 1006, 1007, 1008, 1009]:
+		for hide_this in [1003, 10035, 10037, 1004, 1005, 1006, 1007, 1008, 1009]:
 
 			self.getControl(hide_this).setVisible(False)
 
@@ -180,7 +186,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					self.getControl(ctl_id).addItem(self.tmp)
 
 		# hide the controls that determine panel visibility
-		for visibility_control in [93000,125000,94000,95000, 96000, 97000, 98000, 99000]:
+		for visibility_control in [93000,125000,127000,94000,95000, 96000, 97000, 98000, 99000]:
 
 			self.getControl(visibility_control).setVisible(False)
 
@@ -311,7 +317,58 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		return False
 
 
+	def apply_SSH_state_password(self):
+
+		# INTERFACE TO CHANGE THE SSH State and password
+		try:
+
+			if self.ssh_pass != 'osmc':
+
+				log('changing ssh password')
+				log('STILL NEED TO WRITE THE CODE TO CHANGE THE SSH PASSWORD!!!!!!!!!')
+
+		except:
+
+			log('ssh password change failed')
+			log(traceback.format_exc())
+		try:
+
+			if self.ssh_state != True:
+
+				log('Disabling SSH service')
+
+				os.system("sudo /bin/systemctl disable ssh-app-osmc")
+				os.system("sudo /bin/systemctl stop ssh-app-osmc")
+
+			else:
+
+				log('Leaving SSH service enabled')
+
+		except:
+
+			log('ssh state change failed')
+			log(traceback.format_exc())
+
+
+	def apply_hostname_change(self):
+
+		# INTERFACE TO CHANGE THE HOSTNAME
+		try:
+
+			log('changing hostname to %s' % self.device_name.replace('current name: ', ''))
+			xbmc.sethostname(self.device_name.replace('current name: ', '')) 
+
+		except:
+
+			log('hostname change failed')
+			log(traceback.format_exc())
+
+
 	def exit_proceedure(self):
+
+		self.apply_hostname_change()
+
+		self.apply_SSH_state_password()
 
 		if self.selected_country != None:
 
@@ -414,6 +471,74 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.setFocusId(90010)
 
 
+	def enter_password(self, pass_store, confirm=True, hidden=True):
+
+		mypass = None
+
+		# show keyboard for the first password
+		kb = xbmc.Keyboard(pass_store, 'Please enter your password', hidden=hidden)
+
+		kb.doModal()
+
+		# only move on if the device has been given a name
+		if kb.isConfirmed():
+
+			pass1 = kb.getText()
+
+			if not confirm:
+
+				# if we dont want password confirmation, then just return the first password entered
+				mypass = pass1
+
+			else:
+
+				if pass1 == pass_store:
+					passhint = pass_store
+				else:
+					passhint = ''
+
+				# show keyboard
+				kb = xbmc.Keyboard(passhint, 'Please confirm your password', hidden=hidden)
+
+				kb.doModal()
+				
+				if not kb.isConfirmed():
+
+					# if the user escapes the entry, then just return None
+
+					mypass = None
+
+				else:
+
+					pass2 = kb.getText()
+
+					# if the passwords dont match, then give the user the option of entering via hidden or plain text kayboards
+					if pass1 != pass2 and hidden == True:
+
+						plain_text_pass = DIALOG.yesno('Password mismatch', 'Would you like to enter your password in plain text?')
+
+						if plain_text_pass:
+
+							mypass = self.enter_password(pass_store, confirm=confirm, hidden=False)
+
+						else:
+
+							mypass = self.enter_password(pass_store, confirm=confirm, hidden=True)
+
+					# if the passwords dont match and they aren't hidden then alert the user and reshow the entry dialog
+					elif pass1 != pass2:
+
+						ok = DIALOG.ok('Password mismatch', 'Your password entries did not match')
+
+						mypass = self.enter_password(pass_store, confirm=confirm, hidden=hidden)
+
+					else:
+
+						mypass = pass1
+
+		return mypass
+
+
 	def onClick(self, controlID):
 
 		if   controlID == 1005:				# Exit control
@@ -459,7 +584,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			# move on to choosing the hostname
 
-		elif controlID in [350010]:		# choosing the hostname
+		elif controlID == 350010:			# choosing the hostname
 
 			# show keyboard
 			kb = xbmc.Keyboard(self.device_name.replace('current name: ', ''), 'Name your device')
@@ -475,7 +600,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				self.getControl(350012).setVisible(True)
 
-		elif controlID in [350011]:	# user has asked for a random name
+		elif controlID == 350011:			# user has asked for a random name
 
 			self.device_name = self.random_name()
 
@@ -483,21 +608,55 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			self.getControl(350012).setVisible(True)
 
-		elif controlID in [350012]: # user has accepted the hostname
+		elif controlID == 350012: 			# user has accepted the hostname
 
-			# INTERFACE TO CHANGE THE HOSTNAME
-			try:
-				log('changing hostname to %s' % self.device_name.replace('current name: ', ''))
-				xbmc.sethostname(self.device_name.replace('current name: ', '')) 
-			except:
-				log('hostname change failed')
-				log(traceback.format_exc())
+			# moved the changes to the shutdown process
 
 			# user has chosen a hostname
 			self.getControl(125000).setVisible(False)
+			self.getControl(127000).setVisible(True)
+			self.getControl(10037).setVisible(True)
+			self.setFocusId(370010)
+
+		elif controlID == 370010: 			# user wants to disable SSH service
+
+			ctl = self.getControl(370010)
+
+			if ctl.getLabel() == lang(32036):
+
+				self.ssh_state = False
+				ctl.setLabel(lang(32037))
+				self.setFocusId(370011)
+
+			else:
+
+				self.ssh_state = True
+				ctl.setLabel(lang(32036))
+				self.setFocusId(370011)
+
+		elif controlID == 370011: 			# user wants to change the SSH password
+
+			# show keyboard for the first password
+			user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
+
+			if user_pass is not None:
+
+				self.ssh_pass = user_pass
+
+				self.getControl(370011).setLabel('Click here to change/confirm password: ' + self.ssh_pass.replace('_',''))
+
+				self.getControl(370012).setVisible(True)			
+
+		elif controlID == 370012: 			# user has accepted the SSH settings
+
+			# this Accept button does not actually DO anything other than show the next menu item,
+			# but I think it is worthwhile having the user specifically consent to the settings
+
+			# user has chosen a hostname
+			self.getControl(127000).setVisible(False)
 			self.getControl(94000).setVisible(True)
 			self.getControl(1004).setVisible(True)
-			self.setFocusId(40010)
+			self.setFocusId(40010)			
 
 		elif controlID == 40010:			# terms and conditions I Agree button
 			

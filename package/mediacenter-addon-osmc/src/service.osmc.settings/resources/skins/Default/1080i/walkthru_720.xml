@@ -2,77 +2,88 @@
 <window>
     <defaultcontrol always="true">20010</defaultcontrol>
     <controls>
-        <control id="92000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="93000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="125000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="94000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="95000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="96000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="97000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="98000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
-        </control>
-        <control id="99000" type="label">
-            <description>visibility controller</description>
-            <posx>20</posx>
-            <posy>20</posy>
-            <width>1</width>
-            <height>1</height>
-            <label/>
+        <!-- VISIBILITY CONTROLLERS -->
+        <control type="grouplist">
+            <control id="92000" type="label">
+                <description>visibility controller - language</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="93000" type="label">
+                <description>visibility controller - timezone</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="125000" type="label">
+                <description>visibility controller - hostname</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="127000" type="label">
+                <description>visibility controller - SSH</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="94000" type="label">
+                <description>visibility controller - Terms and Conditions</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="95000" type="label">
+                <description>visibility controller - Exit</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="96000" type="label">
+                <description>visibility controller - networking</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="97000" type="label">
+                <description>visibility controller - warranty</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="98000" type="label">
+                <description>visibility controller - skin selection</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
+            <control id="99000" type="label">
+                <description>visibility controller - Newsletter</description>
+                <posx>20</posx>
+                <posy>20</posy>
+                <width>1</width>
+                <height>1</height>
+                <label/>
+            </control>
         </control>
         <!-- Background -->
         <control type="image">
@@ -159,6 +170,21 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
                 <onright>350010</onright>
+            </control>
+            <!-- SSH -->
+            <control id="10037" type="button">
+                <width>300</width>
+                <height>42</height>
+                <label>SSH</label>
+                <font>osmc_addon_720_Large</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+                <onright>370010</onright>
             </control>
             <!-- T&C -->
             <control id="1004" type="button">
@@ -617,6 +643,69 @@
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
                 <!--former_line<focusedcolor>ffffffff</focusedcolor>-->
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+        </control>
+        <!-- SSH disabling and password reset panel                -->
+        <control id="37000" type="grouplist">
+            <left>480</left>
+            <top>244</top>
+            <width>1200</width>
+            <height>726</height>
+            <itemgap>34</itemgap>
+            <onleft>1000</onleft>
+            <onright>9999</onright>
+            <visible>Control.IsVisible(127000)</visible>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <orientation>vertical</orientation>
+            <control type="label">
+                <width>1800</width>
+                <height>42</height>
+                <label>SSH gives you full control of your device and is accessible via your network</label>
+                <font>osmc_addon_720_Large</font>
+                <textcolor>66ffffff</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+            </control>
+            <control id="370010" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <label>Click here to disable SSH</label>
+                <font>osmc_addon_720_Med</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="370011" type="label">
+                <width>1600</width>
+                <height>42</height>
+                <label>Click here to change/confirm password: osmc (default)</label>
+                <font>osmc_addon_720_XSmall</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
+                <texturefocus>single_pixel.png</texturefocus>
+                <texturenofocus>single_pixel.png</texturenofocus>
+                <align>left</align>
+                <aligny>center</aligny>
+                <onclick>noop</onclick>
+            </control>
+            <control id="370012" type="button">
+                <width>1600</width>
+                <height>42</height>
+                <!-- <visible>!SubString(Control.GetLabel(370011),(default))</visible> -->
+                <label>Accept</label>
+                <font>osmc_addon_720_Med</font>
+                <textcolor>66ffffff</textcolor>
+                <focusedcolor>ffe0b074</focusedcolor>
                 <texturefocus>single_pixel.png</texturefocus>
                 <texturenofocus>single_pixel.png</texturenofocus>
                 <align>left</align>
