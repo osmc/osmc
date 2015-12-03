@@ -30,7 +30,7 @@
 		addonid							: The id for the addon. This must be the id declared in the addons addon.xml.
 
 		reboot_required					: A boolean to declare if the OS needs to be rebooted. If a change in a specific setting 
-									 	  requires an OS reboot to take affect, this is flag that will let the OSG know.
+										  requires an OS reboot to take affect, this is flag that will let the OSG know.
 
 		setting_data_method 			: This dictionary contains:
 												- the name of all settings in the module
@@ -107,8 +107,8 @@ def log(message):
 
 
 def lang(id):
-    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-    return san 
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
 
 
 def is_pi_zero():
@@ -119,20 +119,22 @@ def is_pi_zero():
 			for line in lines:
 				if line[0:8]=='Revision':
 					myrevision = line[11:len(line)-1]
+			else:
+				raise
 	except:
 		myrevision = "0000"
 
-        try: # Pi2 revision starts with 'a'
-            revisionInt = int(myrevision, 16)
+	try: # Pi2 revision starts with 'a'
+		revisionInt = int(myrevision, 16)
 
-        except ValueError:
-            return False
+	except ValueError:
+		return False
 
-        if revisionInt >> 23 & 1 == True:
-            if (revisionInt >> 4) & 0X7FF == 9:
-                raise
+	if revisionInt >> 23 & 1 == True:
+		if (revisionInt >> 4) & 0X7FF == 9:
+			raise
 
-        return False
+	return False
 
 
 class OSMCSettingClass(threading.Thread):
