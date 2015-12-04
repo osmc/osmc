@@ -675,16 +675,18 @@
             <control type="label">
                 <width>1800</width>
                 <height>60</height>
-                <label>via your network.</label>
+                <label>via your network. This is very useful for TroubleShooting.</label>
                 <font>osmc_addon_720_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>top</aligny>
             </control>
-            <control id="370010" type="button">
-                <width>1600</width>
+            <control id="370010" type="radiobutton">
+                <posx>15</posx>
+                <posy>40</posy>
+                <width>600</width>
                 <height>42</height>
-                <label>Click here to disable SSH</label>
+                <label>$ADDON[service.osmc.settings 32036]</label>
                 <font>osmc_addon_720_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -694,7 +696,10 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
             </control>
-            <control id="370011" type="button">
+
+
+            <!-- SSH PASSWORD CHANGE FUNCTION SUPPRESSED AT THIS TIME -->
+<!--             <control id="370011" type="button">
                 <width>1600</width>
                 <height>42</height>
                 <label>Click here to change/confirm password:    osmc (default)</label>
@@ -706,7 +711,8 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
-            </control>
+            </control> -->
+            
             <control id="370012" type="button">
                 <width>1600</width>
                 <height>42</height>

@@ -233,6 +233,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		# set the image for the skin preview control
 		self.set_skin_image('OSMC')
 
+		# set the SSH toggle to ON
+		self.getControl(370010).setSelected(True)
+
+
 		# this will only be True, if the language has been selected and the GUI has reloaded
 		if self.lang_rerun:
 			# set the flag to False so the GUI doesnt reload on exit
@@ -342,17 +346,21 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 	def apply_SSH_state_password(self):
 
 		# INTERFACE TO CHANGE THE SSH State and password
-		try:
 
-			if self.ssh_pass != 'osmc':
 
-				log('changing ssh password')
-				log('STILL NEED TO WRITE THE CODE TO CHANGE THE SSH PASSWORD!!!!!!!!!')
+		# SSH PASSWORD CHANGE NOT ALLOWED AT THIS TIME
+		# try:
 
-		except:
+		# 	if self.ssh_pass != 'osmc':
 
-			log('ssh password change failed')
-			log(traceback.format_exc())
+		# 		log('changing ssh password')
+		# 		log('STILL NEED TO WRITE THE CODE TO CHANGE THE SSH PASSWORD!!!!!!!!!')
+
+		# except:
+
+		# 	log('ssh password change failed')
+		# 	log(traceback.format_exc())
+
 		try:
 
 			if self.ssh_state != True:
@@ -644,30 +652,34 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 			ctl = self.getControl(370010)
 
-			if ctl.getLabel() == lang(32036):
-
-				self.ssh_state = False
-				ctl.setLabel(lang(32037))
-				self.setFocusId(370011)
-
-			else:
-
+			if ctl.isSelected():
+				# change to ENABLED
 				self.ssh_state = True
 				ctl.setLabel(lang(32036))
-				self.setFocusId(370011)
+				self.setFocusId(370012)
+
+			else:
+				# change to DISABLED
+				self.ssh_state = False
+				ctl.setLabel(lang(32037))
+				self.setFocusId(370012)
 
 		elif controlID == 370011: 			# user wants to change the SSH password
 
+			pass
+
+			# SSH PASSWORD CHANGE SUPPRESSED AT THIS TIME
+
 			# show keyboard for the first password
-			user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
+			# user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
 
-			if user_pass is not None:
+			# if user_pass is not None:
 
-				self.ssh_pass = user_pass
+			# 	self.ssh_pass = user_pass
 
-				self.getControl(370011).setLabel('Click here to change/confirm password:    ' + self.ssh_pass.replace('_',''))
+			# 	self.getControl(370011).setLabel('Click here to change/confirm password:    ' + self.ssh_pass.replace('_',''))
 
-				self.getControl(370012).setVisible(True)			
+			# 	self.getControl(370012).setVisible(True)			
 
 		elif controlID == 370012: 			# user has accepted the SSH settings
 
