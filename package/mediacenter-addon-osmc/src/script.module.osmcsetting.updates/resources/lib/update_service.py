@@ -38,7 +38,7 @@ def lang(id):
 
 
 def log(message, label = ''):
-	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message.encode( 'utf-8', 'ignore' )))
+	logmsg       = u'%s : %s - %s ' % (__addonid__ , label, message.encode( 'utf-8', 'ignore' ))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
 @clog(log)
