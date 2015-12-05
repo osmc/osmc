@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/foo86/dcadec/archive/2a9186e34ce557d3af1a20f5b558d1e6687708b9.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/foo86/dcadec/archive/ee687982dc1fe453513a46370f97913d729154e4.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libdcadec-osmc"
@@ -26,7 +26,7 @@ then
 	echo "Package: ${1}-libdcadec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libdcadec-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/dcadec*
 	install_patch "../../patches" "all"
-	CONFIG_SHARED=1 $BUILD
+	$BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	make install DESTDIR=$out
         strip_files "${out}"
