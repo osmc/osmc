@@ -1851,8 +1851,12 @@ class bluetooth_population_thread(threading.Thread):
 
 
     def create_bluetooth_item(self, address, info):
-
-        label       = info['alias'] if info['alias'] else address
+        label       = ""
+        try:
+            label       = info['alias'].decode('utf-8')
+        except:
+            log('Failed to decode BT Device Label.\n\n%s' % traceback.format_exc())
+            label = address
         icon_image =  'bluetooth_nc.png'
         if info['connected']:
             if info['paired']:
@@ -1881,7 +1885,7 @@ class bluetooth_population_thread(threading.Thread):
         for address in devices.keys():
 
             bluetooth_dict[address] = {
-                                        'alias'     : str(osmc_bluetooth.get_device_property(address, 'Alias')), 
+                                        'alias'     : osmc_bluetooth.get_device_property(address, 'Alias'), 
                                         'paired'    :     osmc_bluetooth.get_device_property(address, 'Paired'),
                                         'connected' :     osmc_bluetooth.get_device_property(address, 'Connected'),
                                         'trusted'   :     osmc_bluetooth.get_device_property(address, 'Trusted'),
