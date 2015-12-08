@@ -19,6 +19,7 @@
 '''
 import time
 import xbmc
+import xbmcaddon
 
 import signal
 import dbus
@@ -34,6 +35,15 @@ ADAPTER_IFACE = SERVICE_NAME + ".Adapter1"
 DEVICE_IFACE = SERVICE_NAME + ".Device1"
 PLAYER_IFACE = SERVICE_NAME + '.MediaPlayer1'
 TRANSPORT_IFACE = SERVICE_NAME + '.MediaTransport1'
+
+__addon__        = xbmcaddon.Addon()
+__addonversion__ = __addon__.getAddonInfo('version')
+__addonid__      = __addon__.getAddonInfo('id')
+__addonname__    = __addon__.getAddonInfo('name')
+
+def log(txt):
+    message = '%s: %s' % (__addonname__, str(txt).encode('ascii', 'ignore'))
+    xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 class A2DPInfo(threading.Thread):
     bus = None
@@ -105,7 +115,6 @@ class A2DPInfo(threading.Thread):
     def playerHandler(self, interface, changed, invalidated, path):
         """Handle relevant property change signals"""
         iface = interface[interface.rfind(".") + 1:]
-
         if iface == "Device1":
             if "Connected" in changed:
                 self.connected = changed["Connected"]
@@ -116,11 +125,13 @@ class A2DPInfo(threading.Thread):
                     self.findPlayer()
         elif iface == "MediaPlayer1":
             if "Status" in changed:
-                self.status = (changed["Status"])
-                if self.status in ["stopped", "paused"]:
-                    self.stopA2DP()
-                else:
-                    self.trackChanged()
+                if not changed["Status"] == self.status:
+                    self.status = changed["Status"]
+#                    log("STATUS : " + str(self.status))
+                    if self.status in ["stopped", "paused"]:
+                        self.stopA2DP()
+                    else:
+                        self.trackChanged()
                     
             if "Track" in changed:
                 self.track = changed["Track"]
@@ -135,43 +146,34 @@ class A2DPInfo(threading.Thread):
             if "Artist" in self.track:      artist = self.track["Artist"]
             if "Title" in self.track:       track = self.track["Title"]
             if "Album" in self.track:       album = self.track["Album"]
-            self.trackPlaying(artist, track, album)
+            self.trackIsPlaying(artist, track, album)
 
     def sendJSONRPC(self, method, params={}):
-#        try:
+        try:
             payload = json.dumps({"jsonrpc": "2.0", "method": method, "params" :params,"id": 1})
-            print payload
-            print xbmc.executeJSONRPC(payload)
-            
-#        except Exception as ex:
-#            print "Error Sending JSON Request : " + str(json_payload) + " - "  + format(ex)
+            return xbmc.executeJSONRPC(payload)
+        except Exception as ex:
+            log("Error Sending JSON Request : " + str(json_payload) + " - "  + format(ex))
 
-    def trackPlaying(self, artist, track, album=""):
+    def trackIsPlaying(self, artist, track, album=""):
         params = {"artist" : artist ,"track" : track, "album": album }
         return self.sendJSONRPC("OSMC.StartBTPlayer", params)
 
     def stopA2DP(self):
-        print "stop A2DP"
-        return self.sendJSONRPC("OSMC.StopBTPlayer")
+        jsonResponse = json.loads(self.sendJSONRPC("OSMC.BTPlayerActive"))
+        if ("result" in jsonResponse and jsonResponse["result"] == "OK"):
+            self.sendJSONRPC("OSMC.StopBTPlayer")
 
-class XBMCMonitor( xbmc.Monitor ):
 
-        def onNotification(self, sender, method, data):
-            print "sender = " + sender
-            print "method = " + method
-            print "data = " + data
-
-                                  
 if __name__ == "__main__":
-    xbmc.log("A2DP Info Starting", level=xbmc.LOGDEBUG)
+    log("A2DP Info Starting")
     try:
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         a2dpInfo = A2DPInfo()
         a2dpInfo.start()
         xbmc.log("Bluez Monitor Started", level=xbmc.LOGDEBUG)
 
-        monitor = XBMCMonitor()
-        
+        monitor = xbmc.Monitor()
         while not monitor.abortRequested():
             # Sleep/wait for abort for 10 seconds
             if monitor.waitForAbort(3):
@@ -187,5 +189,5 @@ if __name__ == "__main__":
     finally:
         a2dpInfo.end()
 
-    xbmc.log("A2DP Info ended", level=xbmc.LOGDEBUG)
+    log("A2DP Info ended")
                             
