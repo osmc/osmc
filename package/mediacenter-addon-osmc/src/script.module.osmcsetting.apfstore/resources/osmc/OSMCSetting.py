@@ -111,6 +111,12 @@ from apf_store import APF_STORE
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC APFStore ' + str(message), level=xbmc.LOGDEBUG)
 
 class OSMCSettingClass(threading.Thread):

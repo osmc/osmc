@@ -26,6 +26,17 @@ class StandardLogger(object):
 		self.addonid = addonid
 
 	def log(message, label=''):
+
+		try:
+			message = str(message)
+		except UnicodeEncodeError:
+			message = message.encode('utf-8', 'ignore' )
+
+		try:
+			label = str(label)
+		except UnicodeEncodeError:
+			label = label.encode('utf-8', 'ignore' )
+					
 		logmsg       = '%s : %s - %s ' % (self.__addonid__ , str(label), str(message))
 		xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)	
 

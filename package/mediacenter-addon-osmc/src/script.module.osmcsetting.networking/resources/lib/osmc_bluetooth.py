@@ -26,6 +26,12 @@ PEXPECT_EOL = '@EOL'
 
 
 def log(message):
+
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode('utf-8', 'ignore' )
+
     msg_str='OSMC_BLUETOOTH -  ' + str(message)
     if RUNNING_IN_KODI:
         xbmc.log(msg_str, level=xbmc.LOGDEBUG)

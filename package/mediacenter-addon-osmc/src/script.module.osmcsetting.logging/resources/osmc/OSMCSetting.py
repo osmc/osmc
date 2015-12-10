@@ -109,6 +109,12 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 from CompLogger import comprehensive_logger as clog
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC LOGGING ' + str(message), level=xbmc.LOGDEBUG)
 
 class OSMCSettingClass(threading.Thread):

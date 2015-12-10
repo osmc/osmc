@@ -38,6 +38,12 @@ if not os.path.isdir(ETC_LIRC):
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('REMOTE: ' + str(message), level=xbmc.LOGDEBUG)
 
 

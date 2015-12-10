@@ -31,6 +31,12 @@ scriptPath = __addon__.getAddonInfo('path')
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
 	xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 

@@ -10,6 +10,12 @@ import xbmcaddon
 import xbmcgui
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC COMMS: ' + str(message), level=xbmc.LOGDEBUG)
 
 class communicator(threading.Thread):

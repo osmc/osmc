@@ -23,6 +23,12 @@ FONT_PARTIALS = os.path.join(FOLDER, 'lib', 'fonts.txt')
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
 	xbmc.log('UBIQUIFONTS ' + str(message), level=xbmc.LOGDEBUG)
 
 

@@ -29,6 +29,12 @@ BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
 WIFI_SCAN_THREAD_NAME = 'wifi_scan_thread'
 
 def log(message):
+
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode('utf-8', 'ignore' )
+        
     xbmc.log(str(message), level=xbmc.LOGDEBUG)
 
 

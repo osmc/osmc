@@ -30,6 +30,12 @@ scriptPath = __addon__.getAddonInfo('path')
 WINDOW     = xbmcgui.Window(10000)
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('osmc_settings: ' + str(message), level=xbmc.LOGDEBUG)
 
 

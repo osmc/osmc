@@ -17,6 +17,12 @@ addonid     = "script.module.osmcsetting.services"
 __addon__   = xbmcaddon.Addon(addonid)
 
 def KodiLogger(message):
+
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode('utf-8', 'ignore' )
+        
     xbmc.log('OSMC SERVICES ' + str(message), level=xbmc.LOGDEBUG)
 
 
