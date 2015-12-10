@@ -38,6 +38,17 @@ def lang(id):
 
 
 def log(message, label = ''):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
+	try:
+		label = str(label)
+	except UnicodeEncodeError:
+		label = label.encode('utf-8', 'ignore' )
+
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message.encode( 'utf-8', 'ignore' )))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
