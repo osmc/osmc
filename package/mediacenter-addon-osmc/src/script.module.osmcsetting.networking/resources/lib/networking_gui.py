@@ -1859,9 +1859,9 @@ class bluetooth_population_thread(threading.Thread):
     def create_bluetooth_item(self, address, info):
         label       = ""
         try:
-            label       = info['alias'].decode('utf-8')
+            label       = info['alias'].encode('utf-8')
         except:
-            log('Failed to decode BT Device Label.\n\n%s' % traceback.format_exc())
+            log('Failed to encode BT Device Label.')
             label = address
         icon_image =  'bluetooth_nc.png'
         if info['connected']:
