@@ -99,7 +99,7 @@ void BootloaderConfig::configureEnvironment()
             }
             if ((rev >> 23) & 1)
             {
-                if ((rev >> 4 & 0x7FF) != 9)
+                if ((rev >> 4 & 0xFF) != 9)
                        /* Not a Pi Zero */
                        configStringList << "arm_freq=850\n" << "core_freq=375\n";
             }
