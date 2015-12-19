@@ -531,8 +531,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.bluetooth_population_thread.stop_thread()
         except:
             pass
-
-
+        # also make sure we have turned discocery off
+        try:
+            osmc_bluetooth.stop_discovery()
+        except:
+            pass
+        
     def show_busy_dialogue(self):
 
         xbmc.executebuiltin("ActivateWindow(busydialog)")
