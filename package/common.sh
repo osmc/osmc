@@ -121,6 +121,10 @@ function build_in_env()
 	if ((($BUILD_OPTS & $BUILD_OPTION_BUILD_FRESH) == $BUILD_OPTION_BUILD_FRESH))
 	then
 	    apt-get -y remove --purge "$DEP-toolchain-osmc"
+	    umount ${TCDIR}/mnt >/dev/null 2>&1
+	    umount ${TCDIR}/opt >/dev/null 2>&1
+	    umount ${TCDIR}/proc >/dev/null 2>&1
+	    rm -rf ${TCDIR}
 	fi
 	handle_dep "$DEP-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
