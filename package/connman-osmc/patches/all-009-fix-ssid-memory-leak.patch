@@ -1,0 +1,13 @@
+diff --git a/src/service.c b/src/service.c
+index e33284d..234c7f4 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -474,6 +474,8 @@ static int service_load(struct connman_service *service)
+ 
+ 				connman_network_set_blob(service->network,
+ 					"WiFi.SSID", ssid, hex_ssid_len / 2);
++
++				g_free(ssid);
+ 			}
+ 
+ 			g_free(hex_ssid);
