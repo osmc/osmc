@@ -49,7 +49,7 @@ def log(message, label = ''):
 	except UnicodeEncodeError:
 		label = label.encode('utf-8', 'ignore' )
 
-	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message.encode( 'utf-8', 'ignore' )))
+	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
 @clog(log)
