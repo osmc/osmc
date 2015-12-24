@@ -1,7 +1,7 @@
-From afaf616c293f7ca2c0586edfa6f63880b401d1d8 Mon Sep 17 00:00:00 2001
+From 28b1c04f1546f3fa163ef502de62d9b363fe338d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Sep 2015 19:11:14 +0100
-Subject: [PATCH 01/69] Enable concealed error frames, but discard them when
+Subject: [PATCH 01/70] Enable concealed error frames, but discard them when
  returned
 
 ---
@@ -55,10 +55,10 @@ index bebe136..727a9ea 100644
 2.1.0
 
 
-From 44d7c3933997f02c404d34a3e44f89f33646f718 Mon Sep 17 00:00:00 2001
+From b6ca1568c067a38dc0258b184f2af4eb15f0cf88 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 26 Aug 2015 21:47:41 +0100
-Subject: [PATCH 02/69] Reduce framerate of high framerate videos when not
+Subject: [PATCH 02/70] Reduce framerate of high framerate videos when not
  running fullscreen
 
 ---
@@ -124,10 +124,10 @@ index d081b9c..0ea6ecd 100644
 2.1.0
 
 
-From f2d85155eb2908d479a5a523b4db085f851c4499 Mon Sep 17 00:00:00 2001
+From 4347e7ecc57526d5d4352359bc7a9e4d1f87add9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 20:08:05 +0000
-Subject: [PATCH 03/69] Remove preroll
+Subject: [PATCH 03/70] Remove preroll
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 12 ++----------
@@ -202,10 +202,10 @@ index 0ea6ecd..50ac0e3 100644
 2.1.0
 
 
-From 70f2cd54bdeeb660e4f4a0b4129e305e14e032f0 Mon Sep 17 00:00:00 2001
+From 4f2989d53f280b56370c561baacb2c908d459c29 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 22:35:11 +0000
-Subject: [PATCH 04/69] Remove demux queue
+Subject: [PATCH 04/70] Remove demux queue
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 81 ++++------------------
@@ -400,10 +400,10 @@ index 50ac0e3..f4df09c 100644
 2.1.0
 
 
-From 20acbc67e7c315b157fc1c5e846ab06e53221c00 Mon Sep 17 00:00:00 2001
+From 3484aacb4e2b7364e169b556738903b613be0a97 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 20:10:33 +0000
-Subject: [PATCH 05/69] Remove time based limit on submitted packets
+Subject: [PATCH 05/70] Remove time based limit on submitted packets
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 24 +++-------------------
@@ -488,10 +488,10 @@ index f4df09c..8f84557 100644
 2.1.0
 
 
-From 96c3c31b0f8effa3b8732ba1f862a1f7e4cb4363 Mon Sep 17 00:00:00 2001
+From d4c43d61dbb8221ada93fe8813c08ce38b178409 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Dec 2015 22:18:47 +0000
-Subject: [PATCH 06/69] Add back logging of data queued in decoder
+Subject: [PATCH 06/70] Add back logging of data queued in decoder
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 22 +++++++++++++++++++++-
@@ -576,10 +576,10 @@ index 8f84557..f4df09c 100644
 2.1.0
 
 
-From 1ad9b66fa85c6165a7fb21119f67e0a73be479d8 Mon Sep 17 00:00:00 2001
+From 437a0f0ce8def7967ed4c5e1113bc7aca609c133 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 8 Dec 2015 11:40:17 +0000
-Subject: [PATCH 07/69] Try to minimise latency through hardware decoder. This
+Subject: [PATCH 07/70] Try to minimise latency through hardware decoder. This
  could reduce performance but keeps videoplayer happier
 
 ---
@@ -668,10 +668,10 @@ index 35a9847..f96cc14 100644
 2.1.0
 
 
-From f4b335fac0e98b91e244bebb55e1ece9c50086e2 Mon Sep 17 00:00:00 2001
+From 874560aa768dff2ffcb392dec78608df1f28f7cd Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 13 Jul 2015 19:27:25 +0100
-Subject: [PATCH 08/69] Enable QPU based deinterlace and remove resolution
+Subject: [PATCH 08/70] Enable QPU based deinterlace and remove resolution
  limit
 
 ---
@@ -743,10 +743,10 @@ index e50c13a..20ad4fa 100644
 2.1.0
 
 
-From 47920d1844559241db763db6d47028b1c47aa7aa Mon Sep 17 00:00:00 2001
+From b54b230b47544bbfabc1e84c995553b20d2d238d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 16 Aug 2015 15:46:33 +0100
-Subject: [PATCH 09/69] Allow deinterlace with software decode
+Subject: [PATCH 09/70] Allow deinterlace with software decode
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp | 9 +++++++++
@@ -783,10 +783,10 @@ index 1d5f171..32fa2c6 100644
 2.1.0
 
 
-From c6a20bbea9fe2068afe1885182050d5c2a3156a4 Mon Sep 17 00:00:00 2001
+From 653a369af4ca216b79e0ba3c634be21a3eebf3d7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 15 Sep 2015 22:26:26 +0100
-Subject: [PATCH 10/69] omxplayer: Don't use AutoInterlaceMethod it changes at
+Subject: [PATCH 10/70] omxplayer: Don't use AutoInterlaceMethod it changes at
  start of file
 
 ---
@@ -825,10 +825,10 @@ index de493a2..7251fc1 100644
 2.1.0
 
 
-From d344292e6a29f477d8c0d4c5005c523419f0936a Mon Sep 17 00:00:00 2001
+From 9200b5466be7d96edd33a09f2b80120b5ff60f9b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Sep 2015 15:05:37 +0100
-Subject: [PATCH 11/69] Avoid calling render callback with the lock held to
+Subject: [PATCH 11/70] Avoid calling render callback with the lock held to
  avoid a deadlock
 
 ---
@@ -935,10 +935,10 @@ index d0634bb..7baefa5 100644
 2.1.0
 
 
-From 8437ca71f71b9aaf449f5563502b2366e10e81b7 Mon Sep 17 00:00:00 2001
+From 5bc9cbd23a280d39f6c32f012398d30b08a2a7df Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Dec 2015 22:03:56 +0000
-Subject: [PATCH 12/69] Add settings option to enable MVC and frame packing
+Subject: [PATCH 12/70] Add settings option to enable MVC and frame packing
  support
 
 ---
@@ -1044,10 +1044,10 @@ index eb13e6f..5273c3e 100644
 2.1.0
 
 
-From 8c839b26e6aebb673be3397724d226326767efd2 Mon Sep 17 00:00:00 2001
+From ca9de2b6667dc34f385d577ef694cab232b12362 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Dec 2015 15:38:34 +0000
-Subject: [PATCH 13/69] Don't adjust 3d rectangles in bypass mode
+Subject: [PATCH 13/70] Don't adjust 3d rectangles in bypass mode
 
 ---
  xbmc/cores/VideoRenderers/BaseRenderer.cpp | 55 ++++++++++++++++--------------
@@ -1126,10 +1126,10 @@ index 987714f..7d357d0 100644
 2.1.0
 
 
-From 7ebf2dae1c51c2a7337acbed5c0cac418647bc24 Mon Sep 17 00:00:00 2001
+From 934d181a853145be45e534bac28a46bfaef15777 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 14 Mar 2015 12:38:08 +0000
-Subject: [PATCH 14/69] Switch to using transform flags for 3d modes
+Subject: [PATCH 14/70] Switch to using transform flags for 3d modes
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp      | 100 +++++++++---------------
@@ -1545,10 +1545,10 @@ index 5d5b74b..e99caf0 100644
 2.1.0
 
 
-From 0c96a2b1d6e9d70e75e4cbfa11e67d96125ace17 Mon Sep 17 00:00:00 2001
+From 296a0083ab677057cd93d9babda2bb977d2fcf10 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 21 Jun 2015 17:42:03 +0100
-Subject: [PATCH 15/69] Remove unused Support3D function
+Subject: [PATCH 15/70] Remove unused Support3D function
 
 ---
  xbmc/windowing/egl/WinSystemEGL.cpp | 29 -----------------------------
@@ -1611,10 +1611,10 @@ index 9d4baf6..1ec4225 100644
 2.1.0
 
 
-From 2b09a9745b197904e5bc49045a619e713c777a26 Mon Sep 17 00:00:00 2001
+From 12aee9ffa6a43bce4008b5c5edd1563ceccae605 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Dec 2015 21:08:34 +0000
-Subject: [PATCH 16/69] Avoid switching stereo mode based on current display
+Subject: [PATCH 16/70] Avoid switching stereo mode based on current display
  mode
 
 ---
@@ -1660,10 +1660,10 @@ index a1b8812..60979bb 100644
 2.1.0
 
 
-From 71633930681162d9f9afc6f1c1002532b9ba3a2c Mon Sep 17 00:00:00 2001
+From 1dc49c7469f22f39f54e4b4eaabb17f9161cbf15 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 21 Jun 2015 18:53:29 +0100
-Subject: [PATCH 17/69] Drop reporting 3D modes and just use current rendering
+Subject: [PATCH 17/70] Drop reporting 3D modes and just use current rendering
  mode to request 3D signalling
 
 [rbp] Add ntsc version of 48Hz mode
@@ -1939,10 +1939,10 @@ index a0acb1a..e5bcae7 100644
 2.1.0
 
 
-From a29194254effa1d2d668e5429912d44440313af6 Mon Sep 17 00:00:00 2001
+From 4d9bdbfcf705351501aa91d206b61e53b4fa7bfd Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jun 2015 16:27:15 +0100
-Subject: [PATCH 18/69] Consider stereomode when creating a new window
+Subject: [PATCH 18/70] Consider stereomode when creating a new window
 
 We might be changing from a non-3D to a 3D mode
 ---
@@ -2002,10 +2002,10 @@ index 1ec4225..a33dedc 100644
 2.1.0
 
 
-From 4e50ac3e35adb48f292b0eb293f0934c0552047e Mon Sep 17 00:00:00 2001
+From b61ce8cf4440e0a80fc1a3157acbdc2792f03735 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Apr 2014 18:19:32 +0100
-Subject: [PATCH 19/69] When opening a stream don't try to update gui so often
+Subject: [PATCH 19/70] When opening a stream don't try to update gui so often
 
 ---
  xbmc/dialogs/GUIDialogBusy.cpp | 4 ++++
@@ -2031,10 +2031,10 @@ index 6816b45..6cc5a8f 100644
 2.1.0
 
 
-From 8b59da7746527e9486077cd79199a4feec96cb1f Mon Sep 17 00:00:00 2001
+From 22504e219976ed005945da92c1aa3df31d47d0e4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 29 Apr 2014 15:23:22 +0100
-Subject: [PATCH 20/69] Speed up wtv index creation
+Subject: [PATCH 20/70] Speed up wtv index creation
 
 The index creation is O(N^2) with number of entries (typically thousands).
 On a Pi this can take more than 60 seconds to execute for a recording of a few hours.
@@ -2123,10 +2123,10 @@ index 0000000..d829898
 2.1.0
 
 
-From 7df71e193d5924bec6d3516c2e2f6875d815359f Mon Sep 17 00:00:00 2001
+From d4c4eccf34da92a49f92a8b0f94a4f43e2b6af95 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 8 Mar 2014 15:36:06 +0000
-Subject: [PATCH 21/69] Hack: force it to be recognised as IEC958 capable to
+Subject: [PATCH 21/70] Hack: force it to be recognised as IEC958 capable to
  enable passthrough options
 
 ---
@@ -2152,10 +2152,10 @@ index 4df3a77..d816f0c 100644
 2.1.0
 
 
-From d021942edaa2818f6c0f72fdab4faa828e544502 Mon Sep 17 00:00:00 2001
+From 7cb3e57660836506895a4b7bda53a951aea3eaea Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 1 May 2014 16:28:39 +0100
-Subject: [PATCH 22/69] Improved file buffering in CArchive
+Subject: [PATCH 22/70] Improved file buffering in CArchive
 
 Even though memcpy is typically inlined by the compiler into byte/word loads
 and stores (at least for release builds), the frequency with which 1, 2 and 4
@@ -2218,10 +2218,10 @@ index 6ed0f8f..8506d95 100644
 2.1.0
 
 
-From f99e1fbd178d8ea33656b19adad5ce391cccef0e Mon Sep 17 00:00:00 2001
+From 13cb508776e37bb210e6617b98e74a00498c198e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 12 Aug 2014 00:31:36 +0100
-Subject: [PATCH 23/69] Don't force software codec with dvds
+Subject: [PATCH 23/70] Don't force software codec with dvds
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 2 ++
@@ -2245,10 +2245,10 @@ index e276339..7e23fe5 100644
 2.1.0
 
 
-From 5f11e2ac54006c687aa55f20babde63cfb4d4af6 Mon Sep 17 00:00:00 2001
+From a10d1993bea9f4b68dc641316b99bdf762bba1b3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 16:45:16 +0100
-Subject: [PATCH 24/69] filesystem: Make support of browsing into archives
+Subject: [PATCH 24/70] filesystem: Make support of browsing into archives
  optional
 
 The ability to browse, scan and play content in archives can cause problems on low powered/low memory devices.
@@ -2334,10 +2334,10 @@ index a1d4ee4..4929283 100644
 2.1.0
 
 
-From bd207e1e716dbeb210738df36d5fa119393680a6 Mon Sep 17 00:00:00 2001
+From f619b4ead37575a62ff0dbfa935ed68e63e59852 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 18:58:37 +0100
-Subject: [PATCH 25/69] confluence: Remove media-overlay.jpg for when video is
+Subject: [PATCH 25/70] confluence: Remove media-overlay.jpg for when video is
  backgrounded
 
 ---
@@ -2361,10 +2361,10 @@ index cc996da..d6aa595 100644
 2.1.0
 
 
-From 71e9449d722fce1e04af9931b45b8c94eb1c277a Mon Sep 17 00:00:00 2001
+From d699e92823c315fd6fd997176bd00f0d0813720b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 13:06:57 +0000
-Subject: [PATCH 26/69] Make cachemembuffersize default depend on memory size
+Subject: [PATCH 26/70] Make cachemembuffersize default depend on memory size
 
 ---
  xbmc/linux/RBP.cpp                 | 10 ++++++++++
@@ -2468,10 +2468,10 @@ index a35aeb9..86c1076 100644
 2.1.0
 
 
-From 7b41e23a4c35d21fa3c3f9ce0cd9533bb33614c8 Mon Sep 17 00:00:00 2001
+From d3276740c74c0c88762b6120aa2e1b2c1bf19302 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jul 2013 23:19:15 +0100
-Subject: [PATCH 27/69] Use animated gif as a cheaper working spinner
+Subject: [PATCH 27/70] Use animated gif as a cheaper working spinner
 
 ---
  addons/skin.confluence/720p/DialogBusy.xml |   4 ++--
@@ -2558,10 +2558,10 @@ HcmV?d00001
 2.1.0
 
 
-From c91a3358a19384b788efa8e4af5393bc3bd13deb Mon Sep 17 00:00:00 2001
+From 464851d2d4c21d479e58ca1aa85d2200b52fed0e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 30 May 2014 14:58:43 +0100
-Subject: [PATCH 28/69] Experiment: Report DESKTOP resolution in video settings
+Subject: [PATCH 28/70] Experiment: Report DESKTOP resolution in video settings
 
 ---
  xbmc/settings/DisplaySettings.cpp | 3 +++
@@ -2585,10 +2585,10 @@ index 7993a73..761385b 100644
 2.1.0
 
 
-From 38f90278ea3d059ba7adc2eab93e80cbf5f441b1 Mon Sep 17 00:00:00 2001
+From 8872fab5064513e3c2eb0e774cf0710a781ab7d9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 19 Sep 2014 11:54:49 +0100
-Subject: [PATCH 29/69] Add pi specific option to maintain vsync with pll
+Subject: [PATCH 29/70] Add pi specific option to maintain vsync with pll
  adjustment
 
 New A/V sync option in settings/video/playback to do "Adjust PLL".
@@ -2897,10 +2897,10 @@ index 6475350..93de9bd 100644
 2.1.0
 
 
-From f6dddbde2ad398f7f1c30d420c83d30760e180e2 Mon Sep 17 00:00:00 2001
+From fd5d7c2171fb97551acadff1a57a61138b667f6a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH 30/69] Add settings option to boost centre channel when
+Subject: [PATCH 30/70] Add settings option to boost centre channel when
  downmixing
 
 This allows a dB volume increase to be added to centre channel.
@@ -3026,10 +3026,10 @@ index 08b1b84..70d0866 100644
 2.1.0
 
 
-From ac8d596ec1c6244bbfa2a00de809fbd2e03e257c Mon Sep 17 00:00:00 2001
+From 158b6c5832f41f0221a95464dccd801bae08c9be Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 15:23:51 +0000
-Subject: [PATCH 31/69] Default extract thumbnails to false
+Subject: [PATCH 31/70] Default extract thumbnails to false
 
 It can take 80 seconds for a single file on a Pi. It can cause crashes with out-of-memory errors.
 It genereates a lot of support issues. Best to default to disabled and let users enable it if they must
@@ -3062,10 +3062,10 @@ index f9d3a64..2133b83 100644
 2.1.0
 
 
-From 283c7ec16598a688c7abf93c0f03e3ee742187ac Mon Sep 17 00:00:00 2001
+From e9197b773990dccfd0d0fc19575b3e2e3449f796 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 10 Feb 2015 15:29:16 +0000
-Subject: [PATCH 32/69] Add repeating keypress patch from popcornmix' repo
+Subject: [PATCH 32/70] Add repeating keypress patch from popcornmix' repo
 
 ---
  tools/depends/target/libcec/Makefile         |   1 +
@@ -3954,10 +3954,10 @@ index 0000000..8366a69
 2.1.0
 
 
-From 66ca9fb15101f02703dc3230615dc45bab0817fe Mon Sep 17 00:00:00 2001
+From 64cf139f163aa0fd6ee0d9573a16d0a3db091339 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 00:19:40 +0000
-Subject: [PATCH 33/69] Add settings for configuring button repeats
+Subject: [PATCH 33/70] Add settings for configuring button repeats
 
 ---
  addons/resource.language.en_gb/resources/strings.po | 15 +++++++++++++++
@@ -4041,10 +4041,10 @@ index c3ed6b2..68adcbc 100644
 2.1.0
 
 
-From d0a1fb6897bba3fedd6b5dfa50406eb8cc0948c7 Mon Sep 17 00:00:00 2001
+From 83fd7b5ece327c42185d6140d47a51dca73af461 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 3 Nov 2014 23:17:46 +0000
-Subject: [PATCH 34/69] Don't discard buttons when repeat mode is enabled
+Subject: [PATCH 34/70] Don't discard buttons when repeat mode is enabled
 
 ---
  xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 5 ++++-
@@ -4070,10 +4070,10 @@ index 68adcbc..c9bf563 100644
 2.1.0
 
 
-From 6090d484bd2f4795ad0c7616962a9ca453fc5d5d Mon Sep 17 00:00:00 2001
+From 607f7e7c27044226a92539c3fc775b9a331bb907 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 4 Nov 2014 18:50:00 +0000
-Subject: [PATCH 35/69] Temp - more logging
+Subject: [PATCH 35/70] Temp - more logging
 
 ---
  xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 8 +++++++-
@@ -4128,10 +4128,10 @@ index c9bf563..7c446cf 100644
 2.1.0
 
 
-From 6aa3b321a8ce9a4cbf46e3b3d9ee3ddca4d6c70f Mon Sep 17 00:00:00 2001
+From 2913e75845a40e1822864f3e1110f58b66c9ab9a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 15 Nov 2014 12:03:34 +0000
-Subject: [PATCH 36/69] Add lock for player creation
+Subject: [PATCH 36/70] Add lock for player creation
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 3 +++
@@ -4180,10 +4180,10 @@ index 2f00647..b1418e3 100644
 2.1.0
 
 
-From 1db5a0f100468288bfde492d070cbaa47caf0d53 Mon Sep 17 00:00:00 2001
+From 9623f9ec3f3d2fe9d85565e4ecb75dd544e1b8f3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 22:07:25 +0000
-Subject: [PATCH 37/69] Prod decoder when in stills mode
+Subject: [PATCH 37/70] Prod decoder when in stills mode
 
 An asynchronous hardware decoder doesn't only produce output pictures when new packets arrive.
 In dvd stills mode give it a chance to return pictures that weren't ready when frame was decoded.
@@ -4263,10 +4263,10 @@ index 379c541..b5777a1 100644
 2.1.0
 
 
-From a97fab23c93a30ce254c525e3c9a746641ea740c Mon Sep 17 00:00:00 2001
+From a852324ca0fd602944515e573e8a38d8ac7d748f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:31:56 +0000
-Subject: [PATCH 38/69] Reduce priority of python threads
+Subject: [PATCH 38/70] Reduce priority of python threads
 
 ---
  xbmc/interfaces/generic/LanguageInvokerThread.cpp | 5 +++++
@@ -4292,10 +4292,10 @@ index fcdd063..16f0c89 100644
 2.1.0
 
 
-From 1e661b793f38732bdcd79f8ac6376c6d7b4f08df Mon Sep 17 00:00:00 2001
+From c926c862606389aa4e36ac1cb48bfd4764e1ef6a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 14 Dec 2013 16:55:05 +0000
-Subject: [PATCH 39/69] logging: Add microsecond timer to log messages
+Subject: [PATCH 39/70] logging: Add microsecond timer to log messages
 
 ---
  xbmc/utils/log.cpp | 17 +++++++++++++++--
@@ -4351,10 +4351,10 @@ index 3443f12..31c4a99 100644
 2.1.0
 
 
-From 641c6d9bf25d9e4cceea7239c18d1294c0cbc055 Mon Sep 17 00:00:00 2001
+From 2dbbc81928713d3db68f65d929ed8c03ebd7aec9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 29 Nov 2014 15:25:16 +0000
-Subject: [PATCH 40/69] hack: wait for splash to complete before changing hdmi
+Subject: [PATCH 40/70] hack: wait for splash to complete before changing hdmi
  mode
 
 ---
@@ -4431,10 +4431,10 @@ index 7e24489..c21f23e 100644
 2.1.0
 
 
-From 859c7aa93a5e37ce196631bc551a7505a4587313 Mon Sep 17 00:00:00 2001
+From 06f039c910a417ee65381ced2d22a6ef69ffee61 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 11 Dec 2014 17:00:57 +0000
-Subject: [PATCH 41/69] Fix for UI not showing both extractflags and
+Subject: [PATCH 41/70] Fix for UI not showing both extractflags and
  extractthumb
 
 ---
@@ -4501,10 +4501,10 @@ index 51a702b..540333a 100644
 2.1.0
 
 
-From d7c8db1caf28967f52cd76ae5ba3b1edeabc65af Mon Sep 17 00:00:00 2001
+From 987566e48c88a597c38e8f7b09b2d89b5a128c1c Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Thu, 11 Sep 2014 21:30:43 +0200
-Subject: [PATCH 42/69] Disable autoscrolling while on screensaver and while
+Subject: [PATCH 42/70] Disable autoscrolling while on screensaver and while
  opening streams.
 
 ---
@@ -4638,10 +4638,10 @@ index d7bc1c5..ac76629 100644
 2.1.0
 
 
-From 89fefd0ab3886dfec037710e8b54df034300741b Mon Sep 17 00:00:00 2001
+From 714545927bd0e3dacc4926b4d30c515f86178316 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 13 Dec 2014 18:35:20 +0000
-Subject: [PATCH 43/69] Avoid memcpy on every demuxer packet
+Subject: [PATCH 43/70] Avoid memcpy on every demuxer packet
 
 Avoids an unnecessary memcpy on every demuxer packet which for
 high bitrate videos can be significant.
@@ -4739,10 +4739,10 @@ index ab298b2..10c5ee0 100644
 2.1.0
 
 
-From 876454fef0e17fbdf8d1d17741a519dc6ad75001 Mon Sep 17 00:00:00 2001
+From 1616ad3b9c456e2862512e0864d16d55042715f5 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 15 Feb 2015 14:06:12 +0000
-Subject: [PATCH 44/69] Allow mmal codec for dvd stills
+Subject: [PATCH 44/70] Allow mmal codec for dvd stills
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 7 +++++++
@@ -4777,10 +4777,10 @@ index 84e9ef1..f920f49 100644
 2.1.0
 
 
-From 8c48d667f11acb60c295467efd59adb435d5719c Mon Sep 17 00:00:00 2001
+From b4ee8ac2219e14a67bf85fb331b871ad43f96ee6 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Wed, 25 Feb 2015 18:22:21 +0100
-Subject: [PATCH 45/69] Load OSD dialogs on startup.
+Subject: [PATCH 45/70] Load OSD dialogs on startup.
 
 Fixes skipped frames the first time they're loaded in memory on less powered
 devices, like a Raspberry Pi, when using DVDPlayer.
@@ -4878,10 +4878,10 @@ index b248566..96c63cd 100644
 2.1.0
 
 
-From 4e5aa2ae5478722201999733f966f753a06afd99 Mon Sep 17 00:00:00 2001
+From 36d0fe2265681d40cbbe2f4d63f387cd593007ca Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 7 Mar 2015 22:46:21 +0000
-Subject: [PATCH 46/69] configure: Add raspberry-pi2 platform
+Subject: [PATCH 46/70] configure: Add raspberry-pi2 platform
 
 ---
  configure.ac                                      | 14 +++++++--
@@ -5058,10 +5058,10 @@ index dc6d565..98494b4 100644
 2.1.0
 
 
-From 0df2a3bedf806c1a50094caac9b22855107118ee Mon Sep 17 00:00:00 2001
+From e43af113ee7d124b1a889aa3415ee2d99876e60b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 14 Apr 2015 20:51:14 +0100
-Subject: [PATCH 47/69] Also limit GUI updates when in non full-screen video
+Subject: [PATCH 47/70] Also limit GUI updates when in non full-screen video
  mode
 
 ---
@@ -5094,10 +5094,10 @@ index e4986ea..249e02e 100644
 2.1.0
 
 
-From dc6a1e197ec2b7ae80981b5ba1e0d1e292e969c4 Mon Sep 17 00:00:00 2001
+From 8bd10ba3e8bffd55bf002019af9a3177c12bbc74 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 21 Apr 2015 14:32:07 +0100
-Subject: [PATCH 48/69] Add sharpness control
+Subject: [PATCH 48/70] Add sharpness control
 
 ---
  addons/resource.language.en_gb/resources/strings.po |  2 +-
@@ -5172,10 +5172,10 @@ index d3e5129..a71e645 100644
 2.1.0
 
 
-From 213fe604979374a839b7e3cdae1c627a82117b9c Mon Sep 17 00:00:00 2001
+From 629d8bfa7ea72ff05ef34b8c0e33084f089884d1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Apr 2015 13:49:51 +0100
-Subject: [PATCH 49/69] Add back required include
+Subject: [PATCH 49/70] Add back required include
 
 ---
  xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 1 +
@@ -5197,17 +5197,17 @@ index b5777a1..64b4d60 100644
 2.1.0
 
 
-From 58b8243b741bdb082bbde57dd15ebd7e5637d4bf Mon Sep 17 00:00:00 2001
+From 885d49eeb2b04e7520117640bc43453036d5e4d7 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 5 May 2015 23:58:06 +0100
-Subject: [PATCH 50/69] Leave GUI contents available for screensaver
+Subject: [PATCH 50/70] Leave GUI contents available for screensaver
 
 ---
  xbmc/guilib/GUIWindowManager.cpp | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/guilib/GUIWindowManager.cpp b/xbmc/guilib/GUIWindowManager.cpp
-index 455feac..fa08049 100644
+index 89cfb8b..767c7b6 100644
 --- a/xbmc/guilib/GUIWindowManager.cpp
 +++ b/xbmc/guilib/GUIWindowManager.cpp
 @@ -786,7 +786,16 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
@@ -5232,10 +5232,10 @@ index 455feac..fa08049 100644
 2.1.0
 
 
-From 244c9d5c6c577c2000201453326308d66826495c Mon Sep 17 00:00:00 2001
+From 1ebf7dd55aa3c9e6d04d18acfe311788d2634c8c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 6 Jun 2015 18:43:57 +0100
-Subject: [PATCH 51/69] ffmpeg: Automatic switch to software decode for GMC
+Subject: [PATCH 51/70] ffmpeg: Automatic switch to software decode for GMC
  with more than one warp point
 
 ---
@@ -5452,10 +5452,10 @@ index 7251fc1..3429cea 100644
 2.1.0
 
 
-From b55b1136916f949fb36a6351a21f2c31e3ddec89 Mon Sep 17 00:00:00 2001
+From d075106559bebc089204af6455c5a87f0501aad9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jun 2015 21:46:57 +0100
-Subject: [PATCH 52/69] Use default resampling setting on Pi2
+Subject: [PATCH 52/70] Use default resampling setting on Pi2
 
 ---
  system/settings/rbp2.xml | 5 +++++
@@ -5481,10 +5481,10 @@ index 8cc8f19..52778ec 100644
 2.1.0
 
 
-From 3fcd42a53eb5d4ade4d58a17bcb3018af9cf97a3 Mon Sep 17 00:00:00 2001
+From cabe6a0a791929fc211f61b1929fdb3852df7872 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 25 Jun 2015 19:43:10 +0100
-Subject: [PATCH 53/69] HW mouse pointer
+Subject: [PATCH 53/70] HW mouse pointer
 
 Updating the mouse point provokes a complete screen update which can make it feel laggy
 and results in high cpu.
@@ -5505,7 +5505,7 @@ Requires recent firmware.
  create mode 100644 xbmc/linux/rpi_user_vcsm.h
 
 diff --git a/xbmc/guilib/GUIWindowManager.cpp b/xbmc/guilib/GUIWindowManager.cpp
-index fa08049..41a151f 100644
+index 767c7b6..58a196a 100644
 --- a/xbmc/guilib/GUIWindowManager.cpp
 +++ b/xbmc/guilib/GUIWindowManager.cpp
 @@ -192,7 +192,9 @@ void CGUIWindowManager::CreateWindows()
@@ -6554,10 +6554,10 @@ index a17e987..dc73b39 100644
 2.1.0
 
 
-From 10aa85c4df62a6d0abd5dc91edde3fb1413967be Mon Sep 17 00:00:00 2001
+From a177da88ca4711541942b935ea708e64a4ce5404 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 2 Aug 2014 17:48:04 +0100
-Subject: [PATCH 54/69] Report decoded image name
+Subject: [PATCH 54/70] Report decoded image name
 
 ---
  xbmc/cores/omxplayer/OMXImage.cpp | 1 +
@@ -6579,10 +6579,10 @@ index 1524214..a01c435 100644
 2.1.0
 
 
-From 9f8f1713ed0e4225ef0fa0efd2ea6c7074792a84 Mon Sep 17 00:00:00 2001
+From 6a4f07781925496fc2e91d46fcd0564376dbfaf1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 11 Apr 2014 16:12:27 +0100
-Subject: [PATCH 55/69] Add ability to log more timestamp info in extra debug
+Subject: [PATCH 55/70] Add ability to log more timestamp info in extra debug
  settings
 
 ---
@@ -6736,10 +6736,10 @@ index 14967f7..7883df9 100644
 2.1.0
 
 
-From 8371e43e8680a04ca43f0cd7302df64c33685ee1 Mon Sep 17 00:00:00 2001
+From ebcaf590c8af80f85747738182e78c28af1d3eb7 Mon Sep 17 00:00:00 2001
 From: Memphiz <memphis@machzwo.de>
 Date: Tue, 18 Nov 2014 13:28:36 +0100
-Subject: [PATCH 56/69] - evaluate the setting for hiding watched
+Subject: [PATCH 56/70] - evaluate the setting for hiding watched
  movies/episodes/musicvideos in recently added job (should influence
  homescreen of skins only)
 
@@ -6868,10 +6868,10 @@ index 2021dd9..5f67d10 100644
 2.1.0
 
 
-From 6daf6c73b68918b61979c003b77c6e8153acf863 Mon Sep 17 00:00:00 2001
+From 8f72208ca3034a2e9e96d5ae46c3855f858318d6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 14:28:37 +0100
-Subject: [PATCH 57/69] build: Add vcsm lib
+Subject: [PATCH 57/70] build: Add vcsm lib
 
 ---
  configure.ac | 2 +-
@@ -6894,10 +6894,10 @@ index c6d9d91..eb96b27 100644
 2.1.0
 
 
-From de2c6a4c8e55b7d105e06b5b648daebcc9c56897 Mon Sep 17 00:00:00 2001
+From 1d64175e734b67d283a453a6073be81fba838c86 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 8 May 2015 14:09:31 +0100
-Subject: [PATCH 58/69] re-implement 'RFC' style POLLing for LA registering
+Subject: [PATCH 58/70] re-implement 'RFC' style POLLing for LA registering
  process
 
 ---
@@ -7122,10 +7122,10 @@ index ddf9963..5d1f933 100644
 2.1.0
 
 
-From 64759b1e19ce1aa9cbb40a9ca7ab1ee5582a1e94 Mon Sep 17 00:00:00 2001
+From 6ba681d112a98d26bf9e60a53474d405b05de28c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 15:35:43 +0100
-Subject: [PATCH 59/69] ffmpeg: test: increase number of threads
+Subject: [PATCH 59/70] ffmpeg: test: increase number of threads
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp | 3 +++
@@ -7149,10 +7149,10 @@ index 3498503..c2f3287 100644
 2.1.0
 
 
-From b65eab3e1957af30cec36c8701df852c8cafca95 Mon Sep 17 00:00:00 2001
+From 62fdb442d6c0639f1284c3aa48aa17fcc5bcb48d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 22 May 2015 13:56:29 +0100
-Subject: [PATCH 60/69] ffmpeg: Allow neon to be enabled in unified builds
+Subject: [PATCH 60/70] ffmpeg: Allow neon to be enabled in unified builds
 
 ---
  tools/depends/target/ffmpeg/Makefile | 4 ++++
@@ -7178,10 +7178,10 @@ index 6a9f105..fef5ef2 100644
 2.1.0
 
 
-From 39ba62d0943b6555bf0bfd80cd645f757fa61120 Mon Sep 17 00:00:00 2001
+From c0ab32db2b2f3125c44fa14267267af3c8aa1667 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 5 Mar 2015 20:00:59 +0000
-Subject: [PATCH 61/69] Discard data before VO/VOL in mpeg-4 over mpegts
+Subject: [PATCH 61/70] Discard data before VO/VOL in mpeg-4 over mpegts
 
 ---
  ...-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch | 69 ++++++++++++++++++++++
@@ -7290,10 +7290,10 @@ index fef5ef2..e780521 100644
 2.1.0
 
 
-From 8c081914b01f01d6304d58810e51247b3c2cdcff Mon Sep 17 00:00:00 2001
+From 979373181f7599634aac7a4168e9bc1f8d00d511 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 20 Feb 2015 14:11:57 +0000
-Subject: [PATCH 62/69] libavformat: add mvcC handling in .mov/.mp4
+Subject: [PATCH 62/70] libavformat: add mvcC handling in .mov/.mp4
 
 ---
  ...ibavformat-add-mvcC-handling-in-.mov-.mp4.patch | 57 ++++++++++++++++++++++
@@ -7390,19 +7390,21 @@ index e780521..7e51853 100644
 2.1.0
 
 
-From bea231a0545675ecc05f0fbfd23d7204376fa5ca Mon Sep 17 00:00:00 2001
+From 0d4a9caa8ba61cc5b6e353a11d7d09842e7b0e33 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
-Date: Thu, 7 May 2015 14:04:18 +0100
-Subject: [PATCH 63/69] Add GPU acceleration to hevc
+Date: Fri, 27 Feb 2015 14:37:27 +0000
+Subject: [PATCH 63/70] ffmpeg: Add some upstream HEVC optimisations
 
 ---
- tools/depends/target/ffmpeg/Makefile               |    10 +-
- .../target/ffmpeg/pfcd_hevc_optimisations.patch    | 37481 +++++++++++++++++++
- 2 files changed, 37490 insertions(+), 1 deletion(-)
- create mode 100644 tools/depends/target/ffmpeg/pfcd_hevc_optimisations.patch
+ tools/depends/target/ffmpeg/Makefile               |    6 +-
+ .../added_ARM_NEON_optimized_SAO_patches.patch     | 3328 ++++++++++++++++++++
+ ...hevcdsp_ARM_NEON_optimized_epel_functions.patch |  409 +++
+ 3 files changed, 3742 insertions(+), 1 deletion(-)
+ create mode 100644 tools/depends/target/ffmpeg/added_ARM_NEON_optimized_SAO_patches.patch
+ create mode 100644 tools/depends/target/ffmpeg/hevcdsp_ARM_NEON_optimized_epel_functions.patch
 
 diff --git a/tools/depends/target/ffmpeg/Makefile b/tools/depends/target/ffmpeg/Makefile
-index 7e51853..cf59ca8 100644
+index 7e51853..17dc1fd 100644
 --- a/tools/depends/target/ffmpeg/Makefile
 +++ b/tools/depends/target/ffmpeg/Makefile
 @@ -3,7 +3,8 @@ include FFMPEG-VERSION
@@ -7411,24 +7413,3806 @@ index 7e51853..cf59ca8 100644
    0001-Discard-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch \
 -  0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch
 +  0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch \
++  hevcdsp_ARM_NEON_optimized_epel_functions.patch added_ARM_NEON_optimized_SAO_patches.patch
+ 
+ # set to "yes" to enable patching
+ # we don't apply patches until we move to a vanilla ffmpeg tarball
+@@ -81,6 +82,9 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
+ 	cd $(PLATFORM); patch -p1 < ../0001-mpeg4video-Signal-unsupported-GMC-with-more-than-one.patch
+ 	cd $(PLATFORM); patch -p1 < ../0001-Discard-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch
+ 	cd $(PLATFORM); patch -p1 < ../0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch
++	cd $(PLATFORM); patch -p1 < ../hevcdsp_ARM_NEON_optimized_epel_functions.patch
++	cd $(PLATFORM); patch -p1 < ../added_ARM_NEON_optimized_SAO_patches.patch
++
+ 	cd $(PLATFORM);\
+ 	CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+ 	./configure $(ffmpg_config)
+diff --git a/tools/depends/target/ffmpeg/added_ARM_NEON_optimized_SAO_patches.patch b/tools/depends/target/ffmpeg/added_ARM_NEON_optimized_SAO_patches.patch
+new file mode 100644
+index 0000000..792b5fe
+--- /dev/null
++++ b/tools/depends/target/ffmpeg/added_ARM_NEON_optimized_SAO_patches.patch
+@@ -0,0 +1,3328 @@
++From b0cb307c253d2c9f4b94a54dfc74ddb83af984cc Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Mon, 8 Dec 2014 13:24:40 +0200
++Subject: [PATCH 1/9] added ARM NEON optimized SAO band offset
++
++---
++ libavcodec/arm/Makefile            |   3 +-
++ libavcodec/arm/hevcdsp_init_neon.c |  47 +++++++++
++ libavcodec/arm/hevcdsp_sao_neon.S  | 204 +++++++++++++++++++++++++++++++++++++
++ 3 files changed, 253 insertions(+), 1 deletion(-)
++ create mode 100644 libavcodec/arm/hevcdsp_sao_neon.S
++
++diff --git a/libavcodec/arm/Makefile b/libavcodec/arm/Makefile
++index 6051ec8..093a2e8 100644
++--- a/libavcodec/arm/Makefile
+++++ b/libavcodec/arm/Makefile
++@@ -133,7 +133,8 @@ NEON-OBJS-$(CONFIG_HEVC_DECODER)       += arm/hevcdsp_init_neon.o       \
++                                           arm/hevcdsp_deblock_neon.o    \
++                                           arm/hevcdsp_epel_neon.o       \
++                                           arm/hevcdsp_idct_neon.o       \
++-                                          arm/hevcdsp_qpel_neon.o
+++                                          arm/hevcdsp_qpel_neon.o       \
+++                                          arm/hevcdsp_sao_neon.o
++ NEON-OBJS-$(CONFIG_RV30_DECODER)       += arm/rv34dsp_neon.o
++ NEON-OBJS-$(CONFIG_RV40_DECODER)       += arm/rv34dsp_neon.o            \
++                                           arm/rv40dsp_neon.o
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 733ff08..69e2b2c 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -22,6 +22,7 @@
++ #include "libavutil/arm/cpu.h"
++ #include "libavcodec/hevcdsp.h"
++ #include "hevcdsp_arm.h"
+++#include "../bit_depth_template.c"
++ 
++ void ff_hevc_v_loop_filter_luma_neon(uint8_t *_pix, ptrdiff_t _stride, int _beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
++ void ff_hevc_h_loop_filter_luma_neon(uint8_t *_pix, ptrdiff_t _stride, int _beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
++@@ -43,6 +44,11 @@ void ff_hevc_transform_add_16x16_neon_8(uint8_t *_dst, int16_t *coeffs,
++ void ff_hevc_transform_add_32x32_neon_8(uint8_t *_dst, int16_t *coeffs,
++                                       ptrdiff_t stride);
++ 
+++void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++
++ #define PUT_PIXELS(name) \
++     void name(int16_t *dst, uint8_t *src, \
++                                 ptrdiff_t srcstride, int height, \
++@@ -151,6 +157,44 @@ void ff_hevc_put_qpel_bi_neon_wrapper(uint8_t *dst, ptrdiff_t dststride, uint8_t
++     put_hevc_qpel_uw_neon[my][mx](dst, dststride, src, srcstride, width, height, src2, MAX_PB_SIZE);
++ }
++ 
+++static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src,
+++                                          int16_t *sao_offset_val, int sao_left_class, int width, int height)
+++{
+++    pixel *dst = (pixel *)_dst;
+++    pixel *src = (pixel *)_src;
+++    int8_t offset_table[32] = { 0 };
+++    int k, y, x;
+++    int shift  = 3; // BIT_DEPTH - 5
+++
+++    stride_src /= sizeof(pixel);
+++    stride_dst /= sizeof(pixel);
+++
+++    for (k = 0; k < 4; k++)
+++        offset_table[(k + sao_left_class) & 31] = sao_offset_val[k + 1];
+++
+++    switch(width){
+++    case 8:
+++        ff_hevc_sao_band_w8_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        break;
+++    case 16:
+++        ff_hevc_sao_band_w16_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        break;
+++    case 32:
+++        ff_hevc_sao_band_w32_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        break;
+++    case 64:
+++        ff_hevc_sao_band_w64_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        break;
+++    default:
+++        for (y = 0; y < height; y++) {
+++            for (x = 0; x < width; x++)
+++                dst[x] = av_clip_pixel(src[x] + offset_table[src[x] >> shift]);
+++            dst += stride_dst;
+++            src += stride_src;
+++        }
+++    }
+++}
+++
++ av_cold void ff_hevcdsp_init_neon(HEVCDSPContext *c, const int bit_depth)
++ {
++     if (bit_depth == 8) {
++@@ -170,6 +214,9 @@ av_cold void ff_hevcdsp_init_neon(HEVCDSPContext *c, const int bit_depth)
++         c->transform_add[2]            = ff_hevc_transform_add_16x16_neon_8;
++         c->transform_add[3]            = ff_hevc_transform_add_32x32_neon_8;
++         c->idct_4x4_luma               = ff_hevc_transform_luma_4x4_neon_8;
+++        for (x = 0; x < sizeof c->sao_band_filter / sizeof *c->sao_band_filter; x++) {
+++          c->sao_band_filter[x]        = ff_hevc_sao_band_neon_wrapper;
+++        }
++         put_hevc_qpel_neon[1][0]       = ff_hevc_put_qpel_v1_neon_8;
++         put_hevc_qpel_neon[2][0]       = ff_hevc_put_qpel_v2_neon_8;
++         put_hevc_qpel_neon[3][0]       = ff_hevc_put_qpel_v3_neon_8;
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++new file mode 100644
++index 0000000..1f0ad64
++--- /dev/null
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -0,0 +1,204 @@
+++/*
+++ * Copyright (c) 2014 Seppo Tomperi <seppo.tomperi@vtt.fi>
+++ *
+++ * This file is part of FFmpeg.
+++ *
+++ * FFmpeg is free software; you can redistribute it and/or
+++ * modify it under the terms of the GNU Lesser General Public
+++ * License as published by the Free Software Foundation; either
+++ * version 2.1 of the License, or (at your option) any later version.
+++ *
+++ * FFmpeg is distributed in the hope that it will be useful,
+++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+++ * Lesser General Public License for more details.
+++ *
+++ * You should have received a copy of the GNU Lesser General Public
+++ * License along with FFmpeg; if not, write to the Free Software
+++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+++ */
+++
+++#include "libavutil/arm/asm.S"
+++#include "neon.S"
+++
+++function ff_hevc_sao_band_w8_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // offset_table
+++        vpush {d8-d15}
+++        vld1.8  {q0, q1}, [r5] // offset table
+++
+++1:      subs    r4, #1
+++        vld1.8   {d24}, [r1], r3
+++        vshr.u8  d16, d24, #3
+++        vtbl.8   d16, {q0, q1}, d16
+++        vmovl.s8 q2, d16
+++        vmovl.u8 q6, d24
+++        vadd.s16 q2, q6
+++        vqmovun.s16 d4, q2
+++        vst1.8  {d4}, [r0], r2
+++        bne    1b
+++
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_band_w16_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // offset_table
+++        vpush {d8-d15}
+++        vld1.8  {q0, q1}, [r5] // offset table
+++
+++1:      subs    r4, #1
+++        vld1.8  {q12}, [r1], r3
+++
+++        vshr.u8   q8, q12, #3
+++
+++        vtbl.8  d16, {q0, q1}, d16
+++        vtbl.8  d17, {q0, q1}, d17
+++
+++        vmovl.s8 q2, d16
+++        vmovl.s8 q3, d17
+++
+++        vmovl.u8 q6, d24
+++        vmovl.u8 q7, d25
+++
+++        vadd.s16 q2, q6
+++        vadd.s16 q3, q7
+++
+++        vqmovun.s16 d4, q2
+++        vqmovun.s16 d5, q3
+++
+++        vstm.8   r0, {q2}
+++        add    r0, r2
+++        bne    1b
+++
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_band_w32_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // offset_table
+++        vpush {d8-d15}
+++        vld1.8  {q0, q1}, [r5] // offset table
+++
+++1:      subs    r4, #1
+++        vld1.8  {q12-q13}, [r1], r3
+++
+++        vshr.u8   q8, q12, #3
+++        vshr.u8   q9, q13, #3
+++
+++        vtbl.8  d16, {q0, q1}, d16
+++        vtbl.8  d17, {q0, q1}, d17
+++        vtbl.8  d18, {q0, q1}, d18
+++        vtbl.8  d19, {q0, q1}, d19
+++
+++        vmovl.s8 q2, d16
+++        vmovl.s8 q3, d17 // q8 free
+++        vmovl.s8 q4, d18
+++        vmovl.s8 q5, d19 // q9 free
+++
+++        vmovl.u8 q6, d24
+++        vmovl.u8 q7, d25 // q12 free
+++        vmovl.u8 q8, d26
+++        vmovl.u8 q9, d27 // q13 free
+++
+++        vadd.s16 q2, q6
+++        vadd.s16 q3, q7
+++        vadd.s16 q4, q8
+++        vadd.s16 q5, q9
+++
+++        vqmovun.s16 d4, q2
+++        vqmovun.s16 d5, q3
+++        vqmovun.s16 d6, q4 // q4 free
+++        vqmovun.s16 d7, q5 // q5 free
+++
+++        vst1.8 {q2-q3}, [r0], r2
+++        bne    1b
+++
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_band_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // offset_table
+++        vpush {d8-d15}
+++        vld1.8  {q0, q1}, [r5] // offset table
+++
+++1:      subs    r4, #1
+++        vld1.8  {q12-q13}, [r1]!
+++        vld1.8  {q14-q15}, [r1], r3
+++        sub     r1, #32
+++
+++        vshr.u8   q8, q12, #3
+++        vshr.u8   q9, q13, #3
+++        vshr.u8  q10, q14, #3
+++        vshr.u8  q11, q15, #3
+++
+++        vtbl.8  d16, {q0, q1}, d16
+++        vtbl.8  d17, {q0, q1}, d17
+++        vtbl.8  d18, {q0, q1}, d18
+++        vtbl.8  d19, {q0, q1}, d19
+++        vtbl.8  d20, {q0, q1}, d20
+++        vtbl.8  d21, {q0, q1}, d21
+++        vtbl.8  d22, {q0, q1}, d22
+++        vtbl.8  d23, {q0, q1}, d23
+++
+++        vmovl.s8 q2, d16
+++        vmovl.s8 q3, d17 // q8 free
+++        vmovl.s8 q4, d18
+++        vmovl.s8 q5, d19 // q9 free
+++
+++        vmovl.u8 q6, d24
+++        vmovl.u8 q7, d25 // q12 free
+++        vmovl.u8 q8, d26
+++        vmovl.u8 q9, d27 // q13 free
+++
+++        vadd.s16 q2, q6
+++        vadd.s16 q3, q7
+++        vadd.s16 q4, q8
+++        vadd.s16 q5, q9
+++
+++        vqmovun.s16 d4, q2
+++        vqmovun.s16 d5, q3
+++        vqmovun.s16 d6, q4 // q4 free
+++        vqmovun.s16 d7, q5 // q5 free
+++
+++        // free q4 -q9, q12 - q13
+++        vmovl.s8 q4, d20
+++        vmovl.s8 q5, d21 // q10 free
+++        vmovl.s8 q6, d22
+++        vmovl.s8 q7, d23 // q11 free
+++
+++        vmovl.u8  q8, d28
+++        vmovl.u8  q9, d29 // q14 free
+++        vmovl.u8 q10, d30
+++        vmovl.u8 q11, d31 // q15 free
+++
+++        vadd.s16 q4, q8
+++        vadd.s16 q5, q9
+++        vadd.s16 q6, q10
+++        vadd.s16 q7, q11
+++
+++        vqmovun.s16  d8, q4
+++        vqmovun.s16  d9, q5
+++        vqmovun.s16 d10, q6
+++        vqmovun.s16 d11, q7
+++
+++        vstm.8   r0, {q2-q5}
+++        add    r0, r2
+++        bne    1b
+++
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
++-- 
++2.5.0
++
++
++From 8429b1de64bb871d57651ecfe3b084e2dfe0af51 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Wed, 27 May 2015 18:10:20 +0100
++Subject: [PATCH 2/9] added NEON optimized sao edge for eo1 width 64
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |  47 ++++++++++++
++ libavcodec/arm/hevcdsp_sao_neon.S  | 147 +++++++++++++++++++++++++++++++++++++
++ 2 files changed, 194 insertions(+)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 69e2b2c..c7b5404 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -22,6 +22,7 @@
++ #include "libavutil/arm/cpu.h"
++ #include "libavcodec/hevcdsp.h"
++ #include "hevcdsp_arm.h"
+++#include "libavcodec/avcodec.h"
++ #include "../bit_depth_template.c"
++ 
++ void ff_hevc_v_loop_filter_luma_neon(uint8_t *_pix, ptrdiff_t _stride, int _beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
++@@ -48,6 +49,7 @@ void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_d
++ void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++ void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++ void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++void ff_hevc_sao_edge_eo1_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++ 
++ #define PUT_PIXELS(name) \
++     void name(int16_t *dst, uint8_t *src, \
++@@ -195,6 +197,50 @@ static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_
++     }
++ }
++ 
+++#define CMP(a, b) ((a) > (b) ? 1 : ((a) == (b) ? 0 : -1))
+++static void ff_hevc_sao_edge_neon_wrapper(uint8_t *_dst /* align 16 */, uint8_t *_src /* align 32 */, ptrdiff_t stride_dst,
+++                                          int16_t *_sao_offset_val, int eo, int width, int height)
+++{
+++    static const uint8_t edge_idx[] = { 1, 2, 0, 3, 4 };
+++    static const int8_t pos[4][2][2] = {
+++        { { -1,  0 }, {  1, 0 } }, // horizontal
+++        { {  0, -1 }, {  0, 1 } }, // vertical
+++        { { -1, -1 }, {  1, 1 } }, // 45 degree
+++        { {  1, -1 }, { -1, 1 } }, // 135 degree
+++    };
+++    int8_t sao_offset_val[8];  // padding of 3 for vld
+++    ptrdiff_t stride_src = (2*MAX_PB_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+++    pixel *dst = (pixel *)_dst;
+++    pixel *src = (pixel *)_src;
+++    int a_stride, b_stride;
+++    int x, y;
+++
+++    for (x = 0; x < 5; x++) {
+++        sao_offset_val[x] = _sao_offset_val[x];
+++    }
+++
+++    stride_src /= sizeof(pixel);
+++    stride_dst /= sizeof(pixel);
+++
+++    if (eo == 1 && width == 64) {
+++        ff_hevc_sao_edge_eo1_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++    } else {
+++        a_stride = pos[eo][0][0] + pos[eo][0][1] * stride_src;
+++        b_stride = pos[eo][1][0] + pos[eo][1][1] * stride_src;
+++        for (y = 0; y < height; y++) {
+++            for (x = 0; x < width; x++) {
+++                int diff0         = CMP(src[x], src[x + a_stride]);
+++                int diff1         = CMP(src[x], src[x + b_stride]);
+++                int offset_val    = edge_idx[2 + diff0 + diff1];
+++                dst[x] = av_clip_pixel(src[x] + sao_offset_val[offset_val]);
+++            }
+++            src += stride_src;
+++            dst += stride_dst;
+++        }
+++    }
+++}
+++#undef CMP
+++
++ av_cold void ff_hevcdsp_init_neon(HEVCDSPContext *c, const int bit_depth)
++ {
++     if (bit_depth == 8) {
++@@ -216,6 +262,7 @@ av_cold void ff_hevcdsp_init_neon(HEVCDSPContext *c, const int bit_depth)
++         c->idct_4x4_luma               = ff_hevc_transform_luma_4x4_neon_8;
++         for (x = 0; x < sizeof c->sao_band_filter / sizeof *c->sao_band_filter; x++) {
++           c->sao_band_filter[x]        = ff_hevc_sao_band_neon_wrapper;
+++          c->sao_edge_filter[x]        = ff_hevc_sao_edge_neon_wrapper;
++         }
++         put_hevc_qpel_neon[1][0]       = ff_hevc_put_qpel_v1_neon_8;
++         put_hevc_qpel_neon[2][0]       = ff_hevc_put_qpel_v2_neon_8;
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 1f0ad64..5ec2de9 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -202,3 +202,150 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++         bx lr
++ endfunc
++ 
+++function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x02
+++        vpush {d8-d15}
+++1:      subs    r4, #1
+++        // load a
+++        sub     r1, r3
+++        vld1.8  {q0-q1}, [r1]!
+++        vld1.8  {q2-q3}, [r1], r3
+++        sub     r1, #32
+++        // load c
+++        vld1.8  {q4-q5}, [r1]!
+++        vld1.8  {q6-q7}, [r1], r3
+++        sub     r1, #32
+++        // load b
+++        vld1.8  {q8-q9}, [r1]!
+++        vld1.8  {q10-q11}, [r1], r3
+++        sub     r1, #32
+++
+++        vcgt.u8 q12, q4, q0 // c > a -> -1 , otherwise 0
+++        vcgt.u8 q0,  q0, q4 // a > c -> -1 , otherwise 0
+++        vcgt.u8 q13, q5, q1
+++        vcgt.u8 q1,  q1, q5
+++        vcgt.u8 q14, q6, q2
+++        vcgt.u8 q2,  q2, q6
+++        vcgt.u8 q15, q7, q3
+++        vcgt.u8 q3,  q3, q7
+++
+++        vsub.s8 q12, q0, q12 // diff0
+++        vsub.s8 q13, q1, q13
+++        vsub.s8 q14, q2, q14
+++        vsub.s8 q15, q3, q15
+++
+++        vcgt.u8  q0,  q4, q8 // c > b
+++        vcgt.u8  q8,  q8, q4 // b > c
+++        vcgt.u8  q1,  q5, q9
+++        vcgt.u8  q9,  q9, q5
+++        vcgt.u8  q2,  q6, q10
+++        vcgt.u8 q10, q10, q6
+++        vcgt.u8  q3,  q7, q11
+++        vcgt.u8 q11, q11, q7
+++
+++        vsub.s8 q0, q8, q0 // diff1
+++        vsub.s8 q1, q9, q1
+++        vsub.s8 q2, q10, q2
+++        vsub.s8 q3, q11, q3
+++
+++        veor.u8 q8, q8  // zero register
+++        vdup.s8 q9, r6  // 2 to all elements
+++        add     r6, #1
+++        vdup.s8 q10, r6 // 3 to all elements
+++        sub     r6, #1
+++
+++        vadd.s8 q0, q12 //diff0 + diff1
+++        vadd.s8 q1, q13
+++        vadd.s8 q2, q14
+++        vadd.s8 q3, q15
+++
+++        vcgt.s8 q4, q0, q8 // diff0 + diff1 > 0
+++        vcgt.s8 q5, q1, q8
+++        vcgt.s8 q6, q2, q8
+++        vcgt.s8 q7, q3, q8
+++
+++        vclt.s8 q11, q0, q8 // diff0 + diff1 < 0
+++        vclt.s8 q12, q1, q8
+++        vclt.s8 q13, q2, q8
+++        vclt.s8 q14, q3, q8
+++
+++        vadd.s8  q8,  q0, q9  // diff0 + diff1 + 2
+++        vand.8  q15,  q8, q4
+++        vadd.s8  q8,  q0, q10 // diff0 + diff1 + 3
+++        vand.8   q8,  q8, q11
+++        vadd.s8  q0, q15, q8  // offset_idx
+++
+++        vadd.s8  q8,  q1, q9  // diff0 + diff1 + 2
+++        vand.8  q15,  q8, q5
+++        vadd.s8  q8,  q1, q10 // diff0 + diff1 + 3
+++        vand.8   q8,  q8, q12
+++        vadd.s8  q1, q15, q8  // offset_idx
+++
+++        vadd.s8  q8,  q2, q9  // diff0 + diff1 + 2 + 2
+++        vand.8  q15,  q8, q6
+++        vadd.s8  q8,  q2, q10 // diff0 + diff1 + 2 + 3
+++        vand.8   q8,  q8, q13
+++        vadd.s8  q2, q15, q8  // offset_idx
+++
+++        vadd.s8  q8,  q3, q9  // diff0 + diff1 + 2 + 2
+++        vand.8  q15,  q8, q7
+++        vadd.s8  q8,  q3, q10 // diff0 + diff1 + 2 + 3
+++        vand.8   q8,  q8, q14
+++        vadd.s8  q3, q15, q8  // offset_idx
+++        // TODO: load only once
+++        vld1.8   d16, [r5]
+++
+++        vtbl.8   d0, {d16}, d0
+++        vtbl.8   d1, {d16}, d1
+++        vtbl.8   d2, {d16}, d2
+++        vtbl.8   d3, {d16}, d3
+++        vtbl.8   d4, {d16}, d4
+++        vtbl.8   d5, {d16}, d5
+++        vtbl.8   d6, {d16}, d6
+++        vtbl.8   d7, {d16}, d7
+++
+++        // TODO: load only once
+++        // load c again
+++        sub     r1, r3
+++        sub     r1, r3
+++        vld1.8  {q4-q5}, [r1]!
+++        vld1.8  {q6-q7}, [r1], r3
+++        sub     r1, #32
+++
+++        vmovl.u8   q8, d8
+++        vmovl.u8   q9, d9
+++        vmovl.u8  q10, d10
+++        vmovl.u8  q11, d11
+++        vmovl.u8  q12, d12
+++        vmovl.u8  q13, d13
+++        vmovl.u8  q14, d14
+++        vmovl.u8  q15, d15
+++
+++        vaddw.s8  q8, d0
+++        vaddw.s8  q9, d1
+++        vaddw.s8 q10, d2
+++        vaddw.s8 q11, d3
+++        vaddw.s8 q12, d4
+++        vaddw.s8 q13, d5
+++        vaddw.s8 q14, d6
+++        vaddw.s8 q15, d7
+++
+++        vqmovun.s16  d0, q8
+++        vqmovun.s16  d1, q9
+++        vqmovun.s16  d2, q10
+++        vqmovun.s16  d3, q11
+++        vqmovun.s16  d4, q12
+++        vqmovun.s16  d5, q13
+++        vqmovun.s16  d6, q14
+++        vqmovun.s16  d7, q15
+++
+++        vstm r0, {q0-q3}
+++        add  r0, r2
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
++-- 
++2.5.0
++
++
++From 402e2bd1c5ad659c757bf9734abe6331904fb9e2 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Tue, 16 Dec 2014 16:28:25 +0200
++Subject: [PATCH 3/9] Added SAO edge offset for ARM NEON w32 and w64
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |  46 +++-
++ libavcodec/arm/hevcdsp_sao_neon.S  | 510 +++++++++++++++++++++++++++++++------
++ 2 files changed, 474 insertions(+), 82 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index c7b5404..c32940e 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -49,7 +49,16 @@ void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_d
++ void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++ void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++ void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++
+++void ff_hevc_sao_edge_eo0_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++void ff_hevc_sao_edge_eo1_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++void ff_hevc_sao_edge_eo2_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++void ff_hevc_sao_edge_eo3_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++
+++void ff_hevc_sao_edge_eo0_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++ void ff_hevc_sao_edge_eo1_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++void ff_hevc_sao_edge_eo2_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
+++void ff_hevc_sao_edge_eo3_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++ 
++ #define PUT_PIXELS(name) \
++     void name(int16_t *dst, uint8_t *src, \
++@@ -222,9 +231,40 @@ static void ff_hevc_sao_edge_neon_wrapper(uint8_t *_dst /* align 16 */, uint8_t
++     stride_src /= sizeof(pixel);
++     stride_dst /= sizeof(pixel);
++ 
++-    if (eo == 1 && width == 64) {
++-        ff_hevc_sao_edge_eo1_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
++-    } else {
+++    switch (width) {
+++    case 32:
+++        switch(eo) {
+++        case 0:
+++            ff_hevc_sao_edge_eo0_w32_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 1:
+++            ff_hevc_sao_edge_eo1_w32_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 2:
+++            ff_hevc_sao_edge_eo2_w32_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 3:
+++            ff_hevc_sao_edge_eo3_w32_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        }
+++        break;
+++    case 64:
+++        switch(eo) {
+++        case 0:
+++            ff_hevc_sao_edge_eo0_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 1:
+++            ff_hevc_sao_edge_eo1_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 2:
+++            ff_hevc_sao_edge_eo2_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        case 3:
+++            ff_hevc_sao_edge_eo3_w64_neon_8(dst, src, stride_dst, stride_src, height, sao_offset_val);
+++            break;
+++        }
+++        break;
+++    default:
++         a_stride = pos[eo][0][0] + pos[eo][0][1] * stride_src;
++         b_stride = pos[eo][1][0] + pos[eo][1][1] * stride_src;
++         for (y = 0; y < height; y++) {
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 5ec2de9..4687012 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -202,27 +202,7 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++         bx lr
++ endfunc
++ 
++-function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x02
++-        vpush {d8-d15}
++-1:      subs    r4, #1
++-        // load a
++-        sub     r1, r3
++-        vld1.8  {q0-q1}, [r1]!
++-        vld1.8  {q2-q3}, [r1], r3
++-        sub     r1, #32
++-        // load c
++-        vld1.8  {q4-q5}, [r1]!
++-        vld1.8  {q6-q7}, [r1], r3
++-        sub     r1, #32
++-        // load b
++-        vld1.8  {q8-q9}, [r1]!
++-        vld1.8  {q10-q11}, [r1], r3
++-        sub     r1, #32
++-
+++.macro edge_w64_body
++         vcgt.u8 q12, q4, q0 // c > a -> -1 , otherwise 0
++         vcgt.u8 q0,  q0, q4 // a > c -> -1 , otherwise 0
++         vcgt.u8 q13, q5, q1
++@@ -251,69 +231,61 @@ function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
++         vsub.s8 q2, q10, q2
++         vsub.s8 q3, q11, q3
++ 
++-        veor.u8 q8, q8  // zero register
++-        vdup.s8 q9, r6  // 2 to all elements
++-        add     r6, #1
++-        vdup.s8 q10, r6 // 3 to all elements
++-        sub     r6, #1
++-
++         vadd.s8 q0, q12 //diff0 + diff1
++         vadd.s8 q1, q13
++         vadd.s8 q2, q14
++         vadd.s8 q3, q15
++ 
++-        vcgt.s8 q4, q0, q8 // diff0 + diff1 > 0
++-        vcgt.s8 q5, q1, q8
++-        vcgt.s8 q6, q2, q8
++-        vcgt.s8 q7, q3, q8
++-
++-        vclt.s8 q11, q0, q8 // diff0 + diff1 < 0
++-        vclt.s8 q12, q1, q8
++-        vclt.s8 q13, q2, q8
++-        vclt.s8 q14, q3, q8
++-
++-        vadd.s8  q8,  q0, q9  // diff0 + diff1 + 2
++-        vand.8  q15,  q8, q4
++-        vadd.s8  q8,  q0, q10 // diff0 + diff1 + 3
++-        vand.8   q8,  q8, q11
++-        vadd.s8  q0, q15, q8  // offset_idx
++-
++-        vadd.s8  q8,  q1, q9  // diff0 + diff1 + 2
++-        vand.8  q15,  q8, q5
++-        vadd.s8  q8,  q1, q10 // diff0 + diff1 + 3
++-        vand.8   q8,  q8, q12
++-        vadd.s8  q1, q15, q8  // offset_idx
++-
++-        vadd.s8  q8,  q2, q9  // diff0 + diff1 + 2 + 2
++-        vand.8  q15,  q8, q6
++-        vadd.s8  q8,  q2, q10 // diff0 + diff1 + 2 + 3
++-        vand.8   q8,  q8, q13
++-        vadd.s8  q2, q15, q8  // offset_idx
++-
++-        vadd.s8  q8,  q3, q9  // diff0 + diff1 + 2 + 2
++-        vand.8  q15,  q8, q7
++-        vadd.s8  q8,  q3, q10 // diff0 + diff1 + 2 + 3
++-        vand.8   q8,  q8, q14
++-        vadd.s8  q3, q15, q8  // offset_idx
++-        // TODO: load only once
++-        vld1.8   d16, [r5]
++-
++-        vtbl.8   d0, {d16}, d0
++-        vtbl.8   d1, {d16}, d1
++-        vtbl.8   d2, {d16}, d2
++-        vtbl.8   d3, {d16}, d3
++-        vtbl.8   d4, {d16}, d4
++-        vtbl.8   d5, {d16}, d5
++-        vtbl.8   d6, {d16}, d6
++-        vtbl.8   d7, {d16}, d7
++-
++-        // TODO: load only once
++-        // load c again
++-        sub     r1, r3
++-        sub     r1, r3
++-        vld1.8  {q4-q5}, [r1]!
++-        vld1.8  {q6-q7}, [r1], r3
++-        sub     r1, #32
+++        vdup.s8 q9, r6 // 3 to all elements
+++        sub     r6, #1
+++
+++        vclt.s8 q12, q0, #0 // diff0 + diff1 < 0
+++        vclt.s8 q13, q1, #0
+++        vclt.s8 q14, q2, #0
+++        vclt.s8 q15, q3, #0
+++
+++        vadd.s8  q8,  q0, q9 // diff0 + diff1 + 3
+++        vadd.s8  q10,  q1, q9
+++        vand.8   q12, q8, q12 // if (diff0 + diff1 < 0) then (diff0 + diff1 + 3) else 0
+++        vand.8   q13, q10, q13
+++        vadd.s8  q8,  q2, q9
+++        vadd.s8  q10,  q3, q9
+++        vand.8   q14, q8, q14
+++        vand.8   q15, q10, q15
+++
+++        vdup.s8 q9, r6  // 2 to all elements
+++        add     r6, #1
+++
+++        vcgt.s8  q10, q0, #0 // diff0 + diff1 > 0
+++        vadd.s8   q8, q0, q9 // diff0 + diff1 + 2
+++        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vcgt.s8  q10, q1, #0
+++        vadd.s8   q0, q11, q12  // offset_idx
+++
+++        vadd.s8   q8, q1, q9 // diff0 + diff1 + 2
+++        vcgt.s8  q12, q2, #0
+++        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vadd.s8   q8, q2, q9 // diff0 + diff1 + 2
+++        vadd.s8   q1, q11, q13
+++
+++        vand.8   q11, q8, q12 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vcgt.s8  q10, q3, #0
+++        vadd.s8   q2, q11, q14
+++
+++        vadd.s8   q8, q3, q9 // diff0 + diff1 + 2
+++        vmov.32  d18[0], r7  // load offset table from general registers
+++        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vmov.32  d18[1], r5  // load rest of offset table
+++        vadd.s8   q3, q11, q15
+++
+++        vtbl.8   d0, {d18}, d0
+++        vtbl.8   d1, {d18}, d1
+++        vtbl.8   d2, {d18}, d2
+++        vtbl.8   d3, {d18}, d3
+++        vtbl.8   d4, {d18}, d4
+++        vtbl.8   d5, {d18}, d5
+++        vtbl.8   d6, {d18}, d6
+++        vtbl.8   d7, {d18}, d7
++ 
++         vmovl.u8   q8, d8
++         vmovl.u8   q9, d9
++@@ -344,8 +316,388 @@ function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
++ 
++         vstm r0, {q0-q3}
++         add  r0, r2
+++.endm
+++
+++.macro edge_w32_body
+++        vcgt.u8 q12, q4, q0 // c > a -> -1 , otherwise 0
+++        vcgt.u8 q0,  q0, q4 // a > c -> -1 , otherwise 0
+++        vcgt.u8 q13, q5, q1
+++        vcgt.u8 q1,  q1, q5
+++
+++        vsub.s8 q12, q0, q12 // diff0
+++        vcgt.u8  q0,  q4, q8 // c > b
+++        vsub.s8 q13, q1, q13 // diff0 part 2
+++
+++        vcgt.u8  q6,  q8, q4 // b > c
+++        vcgt.u8  q1,  q5, q9
+++        vcgt.u8  q7,  q9, q5
+++
+++        vsub.s8 q0, q6, q0 // diff1
+++        vsub.s8 q1, q7, q1 // diff1 part 2
+++        vadd.s8 q0, q12 //diff0 + diff1
+++
+++        vdup.s8 q7, r6 // 3 to all elements
+++        sub     r6, #1
+++        vadd.s8 q1, q13
+++
+++        vclt.s8 q12, q0, #0 // diff0 + diff1 < 0
+++        vclt.s8 q13, q1, #0
+++
+++        vadd.s8  q6,  q0, q7 // diff0 + diff1 + 3
+++        vadd.s8  q10,  q1, q7
+++        vdup.s8 q7, r6  // 2 to all elements
+++        add     r6, #1
+++        vand.8   q12, q6, q12 // if (diff0 + diff1 < 0) then (diff0 + diff1 + 3) else 0
+++        vand.8   q13, q10, q13
+++
+++
+++        vcgt.s8  q10, q0, #0 // diff0 + diff1 > 0
+++        vadd.s8   q6, q0, q7 // diff0 + diff1 + 2
+++        vand.8   q11, q6, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vcgt.s8  q10, q1, #0
+++        vadd.s8   q0, q11, q12  // offset_idx
+++
+++        vadd.s8   q6, q1, q7 // diff0 + diff1 + 2
+++        vmov.32  d14[0], r7  // load offset table from general registers
+++        vand.8   q11, q6, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
+++        vmov.32  d14[1], r5  // load rest of offset table
+++        vadd.s8   q1, q11, q13
+++
+++        vtbl.8   d0, {d14}, d0
+++        vtbl.8   d1, {d14}, d1
+++        vtbl.8   d2, {d14}, d2
+++        vtbl.8   d3, {d14}, d3
+++
+++        vmovl.u8   q6, d8
+++        vmovl.u8   q7, d9
+++        vmovl.u8  q10, d10
+++        vmovl.u8  q11, d11
+++
+++        vaddw.s8  q6, d0
+++        vaddw.s8  q7, d1
+++        vaddw.s8 q10, d2
+++        vaddw.s8 q11, d3
+++
+++        vqmovun.s16  d0, q6
+++        vqmovun.s16  d1, q7
+++        vqmovun.s16  d2, q10
+++        vqmovun.s16  d3, q11
+++
+++        vstm r0, {q0-q1}
+++        add  r0, r2
+++.endm
+++
+++function ff_hevc_sao_edge_eo0_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++        sub    r1, #8
+++1:      subs    r4, #1
+++        vld1.64  {q10-q11}, [r1]!
+++        vld1.64  {q12-q13}, [r1]!
+++        vld1.64  {q14}, [r1], r3
+++        sub      r1, #64
+++        // load a
+++        vext.8 q0, q10, q11, #7
+++        vext.8 q1, q11, q12, #7
+++        vext.8 q2, q12, q13, #7
+++        vext.8 q3, q13, q14, #7
+++        // load c
+++        vext.8 q4, q10, q11, #8
+++        vext.8 q5, q11, q12, #8
+++        vext.8 q6, q12, q13, #8
+++        vext.8 q7, q13, q14, #8
+++        // load b
+++        vext.8 q8, q10, q11, #9
+++        vext.8 q9, q11, q12, #9
+++        vext.8 q10, q12, q13, #9
+++        vext.8 q11, q13, q14, #9
+++        edge_w64_body
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++        sub     r1, r3
+++        // load a
+++        vld1.8  {q0-q1}, [r1]!
+++        vld1.8  {q2-q3}, [r1], r3
+++        sub     r1, #32
+++1:      subs    r4, #1
+++        // load c
+++        vld1.8  {q4-q5}, [r1]!
+++        vld1.8  {q6-q7}, [r1], r3
+++        sub     r1, #32
+++        // load b
+++        vld1.8  {q8-q9}, [r1]!
+++        vld1.8  {q10-q11}, [r1]
+++        sub     r1, #32
+++        edge_w64_body
+++        // copy c to a
+++        vmov.64 q0, q4
+++        vmov.64 q1, q5
+++        vmov.64 q2, q6
+++        vmov.64 q3, q7
++         bne   1b
++         vpop  {d8-d15}
++         pop   {r4-r8}
++         bx lr
++ endfunc
+++
+++function ff_hevc_sao_edge_eo2_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++1:      sub     r1, r3
+++        // load a
+++        // TODO: fix unaligned load
+++        //       don't reload a like in eo1
+++        sub     r1, #1
+++        vld1.8  {q0-q1}, [r1]!
+++        vld1.8  {q2-q3}, [r1], r3
+++        sub     r1, #31
+++        subs    r4, #1
+++        // load c
+++        vld1.8  {q4-q5}, [r1]!
+++        vld1.8  {q6-q7}, [r1], r3
+++        sub     r1, #32
+++        // load b
+++        add     r1, #1
+++        vld1.8  {q8-q9}, [r1]!
+++        vld1.8  {q10-q11}, [r1]
+++        sub     r1, #33
+++        edge_w64_body
+++        // copy c to a
+++        vmov.64 q0, q4
+++        vmov.64 q1, q5
+++        vmov.64 q2, q6
+++        vmov.64 q3, q7
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo3_w64_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++1:      sub     r1, r3
+++        // load a
+++        // TODO: fix unaligned load
+++        //       don't reload a like in eo1
+++        add     r1, #1
+++        vld1.8  {q0-q1}, [r1]!
+++        vld1.8  {q2-q3}, [r1], r3
+++        sub     r1, #33
+++        subs    r4, #1
+++        // load c
+++        vld1.8  {q4-q5}, [r1]!
+++        vld1.8  {q6-q7}, [r1], r3
+++        sub     r1, #32
+++        // load b
+++        sub     r1, #1
+++        vld1.8  {q8-q9}, [r1]!
+++        vld1.8  {q10-q11}, [r1]
+++        sub     r1, #31
+++        edge_w64_body
+++        // copy c to a
+++        vmov.64 q0, q4
+++        vmov.64 q1, q5
+++        vmov.64 q2, q6
+++        vmov.64 q3, q7
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo0_w32_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++        sub    r1, #8 // load 8 extra bytes
+++1:      subs    r4, #1
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3 // only first 9 bytes are used
+++        sub    r1, #32
+++        // a
+++        vext.8  q0, q10, q11, #7
+++        vext.8  q1, q11, q12, #7
+++        // c
+++        vext.8  q4, q10, q11, #8
+++        vext.8  q5, q11, q12, #8
+++        // b
+++        vext.8  q8, q10, q11, #9
+++        vext.8  q9, q11, q12, #9
+++        edge_w32_body
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo1_w32_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++        // load a
+++        sub     r1, r3
+++        vld1.8  {q0-q1}, [r1], r3
+++        // load c
+++        vld1.8  {q4-q5}, [r1], r3
+++1:      subs    r4, #1
+++        // load b
+++        vld1.8  {q8-q9}, [r1], r3
+++        edge_w32_body
+++        // inputs for next loop iteration
+++        // a
+++        vmov.64 q0, q4
+++        vmov.64 q1, q5
+++        // c
+++        vmov.64 q4, q8
+++        vmov.64 q5, q9
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo2_w32_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        ldr    r5, [r5]
+++        vpush {d8-d15}
+++        // load a
+++        sub     r1, r3
+++        sub    r1, #8
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q0, q10, q11, #7
+++        vext.8  q1, q11, q12, #7
+++        // load c
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q4, q10, q11, #8
+++        vext.8  q5, q11, q12, #8
+++        vext.8  q2, q10, q11, #7
+++1:      subs    r4, #1
+++        // load b
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q8, q10, q11, #9
+++        vext.8  q9, q11, q12, #9
+++        vext.8  q14, q10, q11, #8
+++        vext.8  q15, q11, q12, #8
+++        vext.8  q3, q10, q11, #7
+++        edge_w32_body
+++        // inputs for next loop iteration
+++        // a
+++        vmov.8 q0, q2
+++        vext.8 q1, q4, q5, #15
+++        // c
+++        vmov.8  q4, q14
+++        vmov.8  q5, q15
+++        vmov.8  q2, q3
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_edge_eo3_w32_neon_8, export=1
+++        push  {r4-r8}
+++        ldr    r4, [sp, #20] // height
+++        ldr    r5, [sp, #24] // sao_offset_val_table
+++        ldr    r6, =0x03
+++        ldr    r7, [r5]
+++        add    r5, #4
+++        sub    r1, r3
+++        ldr    r5, [r5]
+++        sub    r1, #8
+++        vpush {d8-d15}
+++        // load a
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q0, q10, q11, #9
+++        vext.8  q1, q11, q12, #9
+++        // load c
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q4, q10, q11, #8
+++        vext.8  q5, q11, q12, #8
+++        vext.8  q2, q12, q11, #8
+++1:      subs    r4, #1
+++        // load b
+++        vld1.8  {q10-q11}, [r1]
+++        add    r1, #32
+++        vld1.8  {q12}, [r1], r3
+++        sub    r1, #32
+++        vext.8  q8, q10, q11, #7
+++        vext.8  q9, q11, q12, #7
+++        vext.8  q3, q12, q10, #7
+++        edge_w32_body
+++        // inputs for next loop iteration
+++        // a
+++        vext.8 q0, q4, q5, #1
+++        vext.8 q1, q5, q2, #1
+++        // c
+++        vext.8  q4, q8, q9, #1
+++        vext.8  q5, q9, q3, #1
+++        vext.8  q2, q3, q1, #1
+++        bne   1b
+++        vpop  {d8-d15}
+++        pop   {r4-r8}
+++        bx lr
+++endfunc
+++
++-- 
++2.5.0
++
++
++From 1898d052a73370166d57e17cc7c52b7275887df3 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Fri, 19 Dec 2014 09:44:10 +0200
++Subject: [PATCH 4/9] Improved SAO band NEON opimizations made SAO buffer 16
++ byte aligned added alignment hints to loads and stores optimized register
++ usage in SAO band neon assembly
++
++---
++ libavcodec/arm/hevcdsp_sao_neon.S | 212 +++++++++++++++-----------------------
++ 1 file changed, 82 insertions(+), 130 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 4687012..ac21013 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -22,120 +22,84 @@
++ #include "neon.S"
++ 
++ function ff_hevc_sao_band_w8_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // offset_table
++-        vpush {d8-d15}
++-        vld1.8  {q0, q1}, [r5] // offset table
+++        ldr      r12, [sp, #4]    // offset_table address
+++        vld1.8   {q0, q1}, [r12]  // offset table
+++        ldr      r12, [sp, #0]    // height
++ 
++-1:      subs    r4, #1
++-        vld1.8   {d24}, [r1], r3
+++1:      subs     r12, #1
+++        vld1.8   {d24}, [r1,:64], r3
++         vshr.u8  d16, d24, #3
++         vtbl.8   d16, {q0, q1}, d16
++-        vmovl.s8 q2, d16
++         vmovl.u8 q6, d24
++-        vadd.s16 q2, q6
+++        vaddw.s8 q6, d16
++         vqmovun.s16 d4, q2
++-        vst1.8  {d4}, [r0], r2
+++        vst1.8  {d4}, [r0,:64], r2
++         bne    1b
++ 
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++         bx lr
++ endfunc
++ 
++ function ff_hevc_sao_band_w16_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // offset_table
++-        vpush {d8-d15}
++-        vld1.8  {q0, q1}, [r5] // offset table
++-
++-1:      subs    r4, #1
++-        vld1.8  {q12}, [r1], r3
+++        ldr      r12, [sp, #4]    // offset_table address
+++        vld1.8   {q0, q1}, [r12]  // offset table
+++        ldr      r12, [sp, #0]    // height
++ 
+++1:      subs     r12, #1
+++        vld1.8  {q12}, [r1,:128], r3
++         vshr.u8   q8, q12, #3
++-
++         vtbl.8  d16, {q0, q1}, d16
++         vtbl.8  d17, {q0, q1}, d17
++-
++-        vmovl.s8 q2, d16
++-        vmovl.s8 q3, d17
++-
++-        vmovl.u8 q6, d24
++-        vmovl.u8 q7, d25
++-
++-        vadd.s16 q2, q6
++-        vadd.s16 q3, q7
++-
++-        vqmovun.s16 d4, q2
++-        vqmovun.s16 d5, q3
++-
++-        vstm.8   r0, {q2}
++-        add    r0, r2
+++        vmovl.u8 q10, d24
+++        vmovl.u8 q11, d25
+++        vaddw.s8 q10, d16
+++        vaddw.s8 q11, d17
+++        vqmovun.s16 d4, q10
+++        vqmovun.s16 d5, q11
+++        vst1.8   {q2}, [r0,:128], r2
++         bne    1b
++ 
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++         bx lr
++ endfunc
++ 
++ function ff_hevc_sao_band_w32_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // offset_table
++-        vpush {d8-d15}
++-        vld1.8  {q0, q1}, [r5] // offset table
++-
++-1:      subs    r4, #1
++-        vld1.8  {q12-q13}, [r1], r3
++-
++-        vshr.u8   q8, q12, #3
++-        vshr.u8   q9, q13, #3
++-
++-        vtbl.8  d16, {q0, q1}, d16
++-        vtbl.8  d17, {q0, q1}, d17
++-        vtbl.8  d18, {q0, q1}, d18
++-        vtbl.8  d19, {q0, q1}, d19
++-
++-        vmovl.s8 q2, d16
++-        vmovl.s8 q3, d17 // q8 free
++-        vmovl.s8 q4, d18
++-        vmovl.s8 q5, d19 // q9 free
++-
++-        vmovl.u8 q6, d24
++-        vmovl.u8 q7, d25 // q12 free
++-        vmovl.u8 q8, d26
++-        vmovl.u8 q9, d27 // q13 free
++-
++-        vadd.s16 q2, q6
++-        vadd.s16 q3, q7
++-        vadd.s16 q4, q8
++-        vadd.s16 q5, q9
++-
++-        vqmovun.s16 d4, q2
++-        vqmovun.s16 d5, q3
++-        vqmovun.s16 d6, q4 // q4 free
++-        vqmovun.s16 d7, q5 // q5 free
++-
++-        vst1.8 {q2-q3}, [r0], r2
++-        bne    1b
++-
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++-        bx lr
+++        ldr      r12, [sp, #4]    // offset_table address
+++        vld1.8   {q0, q1}, [r12]  // offset table
+++        ldr      r12, [sp, #0]    // height
+++
+++1:      subs     r12, #1
+++        vld1.8   {q2-q3}, [r1,:128], r3
+++        vshr.u8  q8, q2, #3
+++        vshr.u8  q9, q3, #3
+++        vtbl.8   d16, {q0, q1}, d16
+++        vtbl.8   d17, {q0, q1}, d17
+++        vtbl.8   d18, {q0, q1}, d18
+++        vtbl.8   d19, {q0, q1}, d19
+++        vmovl.u8 q12, d4
+++        vmovl.u8 q13, d5
+++        vmovl.u8 q14, d6
+++        vmovl.u8 q15, d7
+++        vaddw.s8 q12, d16
+++        vaddw.s8 q13, d17
+++        vaddw.s8 q14, d18
+++        vaddw.s8 q15, d19
+++        vqmovun.s16 d4, q12
+++        vqmovun.s16 d5, q13
+++        vqmovun.s16 d6, q14
+++        vqmovun.s16 d7, q15
+++        vst1.8   {q2-q3}, [r0,:128], r2
+++        bne      1b
+++
+++        bx       lr
++ endfunc
++ 
++ function ff_hevc_sao_band_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // offset_table
++-        vpush {d8-d15}
++-        vld1.8  {q0, q1}, [r5] // offset table
+++        ldr      r12, [sp, #4]    // offset_table address
+++        vld1.8   {q0, q1}, [r12]  // offset table
+++        ldr      r12, [sp, #0]    // height
++ 
++-1:      subs    r4, #1
++-        vld1.8  {q12-q13}, [r1]!
++-        vld1.8  {q14-q15}, [r1], r3
+++1:      subs     r12, #1
+++        vld1.8  {q12-q13}, [r1,:128]!
+++        vld1.8  {q14-q15}, [r1,:128], r3
++         sub     r1, #32
++ 
++         vshr.u8   q8, q12, #3
++@@ -152,53 +116,41 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++         vtbl.8  d22, {q0, q1}, d22
++         vtbl.8  d23, {q0, q1}, d23
++ 
++-        vmovl.s8 q2, d16
++-        vmovl.s8 q3, d17 // q8 free
++-        vmovl.s8 q4, d18
++-        vmovl.s8 q5, d19 // q9 free
+++        vmovl.u8 q2, d24
+++        vmovl.u8 q3, d25
+++        vmovl.u8 q12, d26
+++        vmovl.u8 q13, d27
++ 
++-        vmovl.u8 q6, d24
++-        vmovl.u8 q7, d25 // q12 free
++-        vmovl.u8 q8, d26
++-        vmovl.u8 q9, d27 // q13 free
++-
++-        vadd.s16 q2, q6
++-        vadd.s16 q3, q7
++-        vadd.s16 q4, q8
++-        vadd.s16 q5, q9
+++        vaddw.s8 q2, d16
+++        vaddw.s8 q3, d17
+++        vaddw.s8 q12, d18
+++        vaddw.s8 q13, d19
++ 
++         vqmovun.s16 d4, q2
++         vqmovun.s16 d5, q3
++-        vqmovun.s16 d6, q4 // q4 free
++-        vqmovun.s16 d7, q5 // q5 free
++-
++-        // free q4 -q9, q12 - q13
++-        vmovl.s8 q4, d20
++-        vmovl.s8 q5, d21 // q10 free
++-        vmovl.s8 q6, d22
++-        vmovl.s8 q7, d23 // q11 free
++-
++-        vmovl.u8  q8, d28
++-        vmovl.u8  q9, d29 // q14 free
++-        vmovl.u8 q10, d30
++-        vmovl.u8 q11, d31 // q15 free
++-
++-        vadd.s16 q4, q8
++-        vadd.s16 q5, q9
++-        vadd.s16 q6, q10
++-        vadd.s16 q7, q11
++-
++-        vqmovun.s16  d8, q4
++-        vqmovun.s16  d9, q5
++-        vqmovun.s16 d10, q6
++-        vqmovun.s16 d11, q7
++-
++-        vstm.8   r0, {q2-q5}
++-        add    r0, r2
+++        vqmovun.s16 d6, q12
+++        vqmovun.s16 d7, q13
+++
+++        vmovl.u8 q12, d28
+++        vmovl.u8 q13, d29
+++        vmovl.u8 q14, d30
+++        vmovl.u8 q15, d31
+++
+++        vaddw.s8 q12, d20
+++        vaddw.s8 q13, d21
+++        vaddw.s8 q14, d22
+++        vaddw.s8 q15, d23
+++
+++        vqmovun.s16  d8, q12
+++        vqmovun.s16  d9, q13
+++        vqmovun.s16 d10, q14
+++        vqmovun.s16 d11, q15
+++
+++        vst1.8     {q2-q3}, [r0,:128]!
+++        vst1.8     {q4-q5}, [r0,:128], r2
+++        sub    r0, #32
++         bne    1b
++ 
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++         bx lr
++ endfunc
++ 
++-- 
++2.5.0
++
++
++From 26bd536800db2f50ff6a021e1fda0d0394d1ea01 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Mon, 29 Dec 2014 15:00:49 +0200
++Subject: [PATCH 5/9] better code reuse in NEON SAO band
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |  16 ++--
++ libavcodec/arm/hevcdsp_sao_neon.S  | 155 +++++++++++++------------------------
++ 2 files changed, 61 insertions(+), 110 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index c32940e..6379810 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -45,10 +45,10 @@ void ff_hevc_transform_add_16x16_neon_8(uint8_t *_dst, int16_t *coeffs,
++ void ff_hevc_transform_add_32x32_neon_8(uint8_t *_dst, int16_t *coeffs,
++                                       ptrdiff_t stride);
++ 
++-void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++-void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++-void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
++-void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t * offset_table);
+++void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
+++void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
+++void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
+++void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
++ 
++ void ff_hevc_sao_edge_eo0_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++ void ff_hevc_sao_edge_eo1_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++@@ -185,16 +185,16 @@ static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_
++ 
++     switch(width){
++     case 8:
++-        ff_hevc_sao_band_w8_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        ff_hevc_sao_band_w8_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
++         break;
++     case 16:
++-        ff_hevc_sao_band_w16_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        ff_hevc_sao_band_w16_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
++         break;
++     case 32:
++-        ff_hevc_sao_band_w32_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        ff_hevc_sao_band_w32_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
++         break;
++     case 64:
++-        ff_hevc_sao_band_w64_neon_8(_dst, _src, stride_dst, stride_src, height, offset_table);
+++        ff_hevc_sao_band_w64_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
++         break;
++     default:
++         for (y = 0; y < height; y++) {
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index ac21013..8852550 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -21,53 +21,13 @@
++ #include "libavutil/arm/asm.S"
++ #include "neon.S"
++ 
++-function ff_hevc_sao_band_w8_neon_8, export=1
++-        ldr      r12, [sp, #4]    // offset_table address
+++.macro init_sao_band
+++        ldr      r12, [sp, #0]    // offset_table address
++         vld1.8   {q0, q1}, [r12]  // offset table
++-        ldr      r12, [sp, #0]    // height
++-
++-1:      subs     r12, #1
++-        vld1.8   {d24}, [r1,:64], r3
++-        vshr.u8  d16, d24, #3
++-        vtbl.8   d16, {q0, q1}, d16
++-        vmovl.u8 q6, d24
++-        vaddw.s8 q6, d16
++-        vqmovun.s16 d4, q2
++-        vst1.8  {d4}, [r0,:64], r2
++-        bne    1b
++-
++-        bx lr
++-endfunc
++-
++-function ff_hevc_sao_band_w16_neon_8, export=1
++-        ldr      r12, [sp, #4]    // offset_table address
++-        vld1.8   {q0, q1}, [r12]  // offset table
++-        ldr      r12, [sp, #0]    // height
++-
++-1:      subs     r12, #1
++-        vld1.8  {q12}, [r1,:128], r3
++-        vshr.u8   q8, q12, #3
++-        vtbl.8  d16, {q0, q1}, d16
++-        vtbl.8  d17, {q0, q1}, d17
++-        vmovl.u8 q10, d24
++-        vmovl.u8 q11, d25
++-        vaddw.s8 q10, d16
++-        vaddw.s8 q11, d17
++-        vqmovun.s16 d4, q10
++-        vqmovun.s16 d5, q11
++-        vst1.8   {q2}, [r0,:128], r2
++-        bne    1b
++-
++-        bx lr
++-endfunc
++-
++-function ff_hevc_sao_band_w32_neon_8, export=1
++-        ldr      r12, [sp, #4]    // offset_table address
++-        vld1.8   {q0, q1}, [r12]  // offset table
++-        ldr      r12, [sp, #0]    // height
+++        ldr      r12, [sp, #4]    // height
+++.endm
++ 
++-1:      subs     r12, #1
++-        vld1.8   {q2-q3}, [r1,:128], r3
+++.macro sao_band_32
++         vshr.u8  q8, q2, #3
++         vshr.u8  q9, q3, #3
++         vtbl.8   d16, {q0, q1}, d16
++@@ -86,6 +46,43 @@ function ff_hevc_sao_band_w32_neon_8, export=1
++         vqmovun.s16 d5, q13
++         vqmovun.s16 d6, q14
++         vqmovun.s16 d7, q15
+++.endm
+++
+++function ff_hevc_sao_band_w8_neon_8, export=1
+++        init_sao_band
+++1:      subs     r12, #4
+++        vld1.8   {d4}, [r1,:64], r3
+++        vld1.8   {d5}, [r1,:64], r3
+++        vld1.8   {d6}, [r1,:64], r3
+++        vld1.8   {d7}, [r1,:64], r3
+++        sao_band_32
+++        vst1.8  {d4}, [r0,:64], r2
+++        vst1.8  {d5}, [r0,:64], r2
+++        vst1.8  {d6}, [r0,:64], r2
+++        vst1.8  {d7}, [r0,:64], r2
+++        bne    1b
+++
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_band_w16_neon_8, export=1
+++        init_sao_band
+++1:      subs     r12, #2
+++        vld1.8  {q2}, [r1,:128], r3
+++        vld1.8  {q3}, [r1,:128], r3
+++        sao_band_32
+++        vst1.8   {q2}, [r0,:128], r2
+++        vst1.8   {q3}, [r0,:128], r2
+++        bne    1b
+++
+++        bx lr
+++endfunc
+++
+++function ff_hevc_sao_band_w32_neon_8, export=1
+++        init_sao_band
+++1:      subs     r12, #1
+++        vld1.8   {q2-q3}, [r1,:128], r3
+++        sao_band_32
++         vst1.8   {q2-q3}, [r0,:128], r2
++         bne      1b
++ 
++@@ -93,63 +90,17 @@ function ff_hevc_sao_band_w32_neon_8, export=1
++ endfunc
++ 
++ function ff_hevc_sao_band_w64_neon_8, export=1
++-        ldr      r12, [sp, #4]    // offset_table address
++-        vld1.8   {q0, q1}, [r12]  // offset table
++-        ldr      r12, [sp, #0]    // height
++-
++-1:      subs     r12, #1
++-        vld1.8  {q12-q13}, [r1,:128]!
++-        vld1.8  {q14-q15}, [r1,:128], r3
++-        sub     r1, #32
++-
++-        vshr.u8   q8, q12, #3
++-        vshr.u8   q9, q13, #3
++-        vshr.u8  q10, q14, #3
++-        vshr.u8  q11, q15, #3
++-
++-        vtbl.8  d16, {q0, q1}, d16
++-        vtbl.8  d17, {q0, q1}, d17
++-        vtbl.8  d18, {q0, q1}, d18
++-        vtbl.8  d19, {q0, q1}, d19
++-        vtbl.8  d20, {q0, q1}, d20
++-        vtbl.8  d21, {q0, q1}, d21
++-        vtbl.8  d22, {q0, q1}, d22
++-        vtbl.8  d23, {q0, q1}, d23
++-
++-        vmovl.u8 q2, d24
++-        vmovl.u8 q3, d25
++-        vmovl.u8 q12, d26
++-        vmovl.u8 q13, d27
++-
++-        vaddw.s8 q2, d16
++-        vaddw.s8 q3, d17
++-        vaddw.s8 q12, d18
++-        vaddw.s8 q13, d19
++-
++-        vqmovun.s16 d4, q2
++-        vqmovun.s16 d5, q3
++-        vqmovun.s16 d6, q12
++-        vqmovun.s16 d7, q13
++-
++-        vmovl.u8 q12, d28
++-        vmovl.u8 q13, d29
++-        vmovl.u8 q14, d30
++-        vmovl.u8 q15, d31
++-
++-        vaddw.s8 q12, d20
++-        vaddw.s8 q13, d21
++-        vaddw.s8 q14, d22
++-        vaddw.s8 q15, d23
++-
++-        vqmovun.s16  d8, q12
++-        vqmovun.s16  d9, q13
++-        vqmovun.s16 d10, q14
++-        vqmovun.s16 d11, q15
++-
++-        vst1.8     {q2-q3}, [r0,:128]!
++-        vst1.8     {q4-q5}, [r0,:128], r2
++-        sub    r0, #32
++-        bne    1b
+++        init_sao_band
+++1:      subs      r12, #1
+++        vld1.8    {q2-q3}, [r1,:128]!
+++        sao_band_32
+++        vst1.8    {q2-q3}, [r0,:128]!
+++        vld1.8    {q2-q3}, [r1,:128], r3
+++        sub       r1, #32
+++        sao_band_32
+++        vst1.8    {q2-q3}, [r0,:128], r2
+++        sub       r0, #32
+++        bne       1b
++ 
++         bx lr
++ endfunc
++-- 
++2.5.0
++
++
++From f93646a97bc885b81759e774d04be3781916a3e7 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Wed, 7 Jan 2015 15:27:38 +0200
++Subject: [PATCH 6/9] More SAO NEON optimizations Now uses only 8 bit integers
++ for SAO calculations
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |   7 +-
++ libavcodec/arm/hevcdsp_sao_neon.S  | 664 +++++++++++++++----------------------
++ 2 files changed, 272 insertions(+), 399 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 6379810..8d6e863 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -225,7 +225,7 @@ static void ff_hevc_sao_edge_neon_wrapper(uint8_t *_dst /* align 16 */, uint8_t
++     int x, y;
++ 
++     for (x = 0; x < 5; x++) {
++-        sao_offset_val[x] = _sao_offset_val[x];
+++        sao_offset_val[x] = _sao_offset_val[edge_idx[x]];
++     }
++ 
++     stride_src /= sizeof(pixel);
++@@ -271,8 +271,9 @@ static void ff_hevc_sao_edge_neon_wrapper(uint8_t *_dst /* align 16 */, uint8_t
++             for (x = 0; x < width; x++) {
++                 int diff0         = CMP(src[x], src[x + a_stride]);
++                 int diff1         = CMP(src[x], src[x + b_stride]);
++-                int offset_val    = edge_idx[2 + diff0 + diff1];
++-                dst[x] = av_clip_pixel(src[x] + sao_offset_val[offset_val]);
+++                int idx           = diff0 + diff1;
+++                if (idx)
+++                    dst[x] = av_clip_pixel(src[x] + sao_offset_val[idx+2]);
++             }
++             src += stride_src;
++             dst += stride_dst;
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 8852550..5fc482b 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -1,5 +1,5 @@
++ /*
++- * Copyright (c) 2014 Seppo Tomperi <seppo.tomperi@vtt.fi>
+++ * Copyright (c) 2014 - 2015 Seppo Tomperi <seppo.tomperi@vtt.fi>
++  *
++  * This file is part of FFmpeg.
++  *
++@@ -23,6 +23,7 @@
++ 
++ .macro init_sao_band
++         ldr      r12, [sp, #0]    // offset_table address
+++        pld      [r1]
++         vld1.8   {q0, q1}, [r12]  // offset table
++         ldr      r12, [sp, #4]    // height
++ .endm
++@@ -30,36 +31,31 @@
++ .macro sao_band_32
++         vshr.u8  q8, q2, #3
++         vshr.u8  q9, q3, #3
+++        vmov.u8  q14, #128
++         vtbl.8   d16, {q0, q1}, d16
++         vtbl.8   d17, {q0, q1}, d17
++         vtbl.8   d18, {q0, q1}, d18
++         vtbl.8   d19, {q0, q1}, d19
++-        vmovl.u8 q12, d4
++-        vmovl.u8 q13, d5
++-        vmovl.u8 q14, d6
++-        vmovl.u8 q15, d7
++-        vaddw.s8 q12, d16
++-        vaddw.s8 q13, d17
++-        vaddw.s8 q14, d18
++-        vaddw.s8 q15, d19
++-        vqmovun.s16 d4, q12
++-        vqmovun.s16 d5, q13
++-        vqmovun.s16 d6, q14
++-        vqmovun.s16 d7, q15
+++        vadd.s8  q2, q14
+++        vadd.s8  q3, q14
+++        vqadd.s8 q2, q8
+++        vqadd.s8 q3, q9
+++        vsub.s8  q2, q14
+++        vsub.s8  q3, q14
++ .endm
++ 
++ function ff_hevc_sao_band_w8_neon_8, export=1
++         init_sao_band
++ 1:      subs     r12, #4
++-        vld1.8   {d4}, [r1,:64], r3
++-        vld1.8   {d5}, [r1,:64], r3
++-        vld1.8   {d6}, [r1,:64], r3
++-        vld1.8   {d7}, [r1,:64], r3
+++        vld1.8   {d4}, [r1, :64], r3
+++        vld1.8   {d5}, [r1, :64], r3
+++        vld1.8   {d6}, [r1, :64], r3
+++        vld1.8   {d7}, [r1, :64], r3
++         sao_band_32
++-        vst1.8  {d4}, [r0,:64], r2
++-        vst1.8  {d5}, [r0,:64], r2
++-        vst1.8  {d6}, [r0,:64], r2
++-        vst1.8  {d7}, [r0,:64], r2
+++        vst1.8  {d4}, [r0, :64], r2
+++        vst1.8  {d5}, [r0, :64], r2
+++        vst1.8  {d6}, [r0, :64], r2
+++        vst1.8  {d7}, [r0, :64], r2
++         bne    1b
++ 
++         bx lr
++@@ -68,11 +64,11 @@ endfunc
++ function ff_hevc_sao_band_w16_neon_8, export=1
++         init_sao_band
++ 1:      subs     r12, #2
++-        vld1.8  {q2}, [r1,:128], r3
++-        vld1.8  {q3}, [r1,:128], r3
+++        vld1.8  {q2}, [r1, :128], r3
+++        vld1.8  {q3}, [r1, :128], r3
++         sao_band_32
++-        vst1.8   {q2}, [r0,:128], r2
++-        vst1.8   {q3}, [r0,:128], r2
+++        vst1.8   {q2}, [r0, :128], r2
+++        vst1.8   {q3}, [r0, :128], r2
++         bne    1b
++ 
++         bx lr
++@@ -81,9 +77,9 @@ endfunc
++ function ff_hevc_sao_band_w32_neon_8, export=1
++         init_sao_band
++ 1:      subs     r12, #1
++-        vld1.8   {q2-q3}, [r1,:128], r3
+++        vld1.8   {q2-q3}, [r1, :128], r3
++         sao_band_32
++-        vst1.8   {q2-q3}, [r0,:128], r2
+++        vst1.8   {q2-q3}, [r0, :128], r2
++         bne      1b
++ 
++         bx       lr
++@@ -92,263 +88,153 @@ endfunc
++ function ff_hevc_sao_band_w64_neon_8, export=1
++         init_sao_band
++ 1:      subs      r12, #1
++-        vld1.8    {q2-q3}, [r1,:128]!
+++        pld       [r1, r3]
+++        vld1.8    {q2-q3}, [r1, :128]!
++         sao_band_32
++-        vst1.8    {q2-q3}, [r0,:128]!
++-        vld1.8    {q2-q3}, [r1,:128], r3
+++        vst1.8    {q2-q3}, [r0, :128]!
+++        vld1.8    {q2-q3}, [r1, :128], r3
++         sub       r1, #32
++         sao_band_32
++-        vst1.8    {q2-q3}, [r0,:128], r2
+++        vst1.8    {q2-q3}, [r0, :128], r2
++         sub       r0, #32
++         bne       1b
++ 
++         bx lr
++ endfunc
++-
+++// input
+++// a in q0 - q3
+++// c in q4 - q7
+++// b in q8 - q11
+++// offset table in r7 and r5
+++// output in q0 - q3
+++// clobbers q12 - q15
++ .macro edge_w64_body
++-        vcgt.u8 q12, q4, q0 // c > a -> -1 , otherwise 0
++-        vcgt.u8 q0,  q0, q4 // a > c -> -1 , otherwise 0
++-        vcgt.u8 q13, q5, q1
++-        vcgt.u8 q1,  q1, q5
++-        vcgt.u8 q14, q6, q2
++-        vcgt.u8 q2,  q2, q6
++-        vcgt.u8 q15, q7, q3
++-        vcgt.u8 q3,  q3, q7
++-
++-        vsub.s8 q12, q0, q12 // diff0
++-        vsub.s8 q13, q1, q13
++-        vsub.s8 q14, q2, q14
++-        vsub.s8 q15, q3, q15
++-
+++        vcgt.u8 q12,  q4, q0 // c > a -> -1 , otherwise 0
+++        vcgt.u8  q0,  q0, q4 // a > c -> -1 , otherwise 0
+++        vcgt.u8 q13,  q5, q1
+++        vcgt.u8  q1,  q1, q5
+++        vsub.s8 q12,  q0, q12 // diff0
++         vcgt.u8  q0,  q4, q8 // c > b
++-        vcgt.u8  q8,  q8, q4 // b > c
+++        vsub.s8 q13,  q1, q13
+++
+++        vcgt.u8 q14,  q8, q4 // b > c
++         vcgt.u8  q1,  q5, q9
++-        vcgt.u8  q9,  q9, q5
++-        vcgt.u8  q2,  q6, q10
++-        vcgt.u8 q10, q10, q6
++-        vcgt.u8  q3,  q7, q11
++-        vcgt.u8 q11, q11, q7
+++        vcgt.u8 q15,  q9, q5
+++        vsub.s8  q0, q14, q0 // diff1
++ 
++-        vsub.s8 q0, q8, q0 // diff1
++-        vsub.s8 q1, q9, q1
++-        vsub.s8 q2, q10, q2
++-        vsub.s8 q3, q11, q3
+++        vsub.s8  q1, q15, q1
++ 
++-        vadd.s8 q0, q12 //diff0 + diff1
++-        vadd.s8 q1, q13
++-        vadd.s8 q2, q14
++-        vadd.s8 q3, q15
++-
++-        vdup.s8 q9, r6 // 3 to all elements
++-        sub     r6, #1
++-
++-        vclt.s8 q12, q0, #0 // diff0 + diff1 < 0
++-        vclt.s8 q13, q1, #0
++-        vclt.s8 q14, q2, #0
++-        vclt.s8 q15, q3, #0
++-
++-        vadd.s8  q8,  q0, q9 // diff0 + diff1 + 3
++-        vadd.s8  q10,  q1, q9
++-        vand.8   q12, q8, q12 // if (diff0 + diff1 < 0) then (diff0 + diff1 + 3) else 0
++-        vand.8   q13, q10, q13
++-        vadd.s8  q8,  q2, q9
++-        vadd.s8  q10,  q3, q9
++-        vand.8   q14, q8, q14
++-        vand.8   q15, q10, q15
++-
++-        vdup.s8 q9, r6  // 2 to all elements
++-        add     r6, #1
++-
++-        vcgt.s8  q10, q0, #0 // diff0 + diff1 > 0
++-        vadd.s8   q8, q0, q9 // diff0 + diff1 + 2
++-        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vcgt.s8  q10, q1, #0
++-        vadd.s8   q0, q11, q12  // offset_idx
++-
++-        vadd.s8   q8, q1, q9 // diff0 + diff1 + 2
++-        vcgt.s8  q12, q2, #0
++-        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vadd.s8   q8, q2, q9 // diff0 + diff1 + 2
++-        vadd.s8   q1, q11, q13
++-
++-        vand.8   q11, q8, q12 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vcgt.s8  q10, q3, #0
++-        vadd.s8   q2, q11, q14
++-
++-        vadd.s8   q8, q3, q9 // diff0 + diff1 + 2
++-        vmov.32  d18[0], r7  // load offset table from general registers
++-        vand.8   q11, q8, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vmov.32  d18[1], r5  // load rest of offset table
++-        vadd.s8   q3, q11, q15
++-
++-        vtbl.8   d0, {d18}, d0
++-        vtbl.8   d1, {d18}, d1
++-        vtbl.8   d2, {d18}, d2
++-        vtbl.8   d3, {d18}, d3
++-        vtbl.8   d4, {d18}, d4
++-        vtbl.8   d5, {d18}, d5
++-        vtbl.8   d6, {d18}, d6
++-        vtbl.8   d7, {d18}, d7
++-
++-        vmovl.u8   q8, d8
++-        vmovl.u8   q9, d9
++-        vmovl.u8  q10, d10
++-        vmovl.u8  q11, d11
++-        vmovl.u8  q12, d12
++-        vmovl.u8  q13, d13
++-        vmovl.u8  q14, d14
++-        vmovl.u8  q15, d15
++-
++-        vaddw.s8  q8, d0
++-        vaddw.s8  q9, d1
++-        vaddw.s8 q10, d2
++-        vaddw.s8 q11, d3
++-        vaddw.s8 q12, d4
++-        vaddw.s8 q13, d5
++-        vaddw.s8 q14, d6
++-        vaddw.s8 q15, d7
++-
++-        vqmovun.s16  d0, q8
++-        vqmovun.s16  d1, q9
++-        vqmovun.s16  d2, q10
++-        vqmovun.s16  d3, q11
++-        vqmovun.s16  d4, q12
++-        vqmovun.s16  d5, q13
++-        vqmovun.s16  d6, q14
++-        vqmovun.s16  d7, q15
++-
++-        vstm r0, {q0-q3}
++-        add  r0, r2
++-.endm
+++        vadd.s8  q0, q12 //diff0 + diff1
+++        vadd.s8  q1, q13
++ 
++-.macro edge_w32_body
++-        vcgt.u8 q12, q4, q0 // c > a -> -1 , otherwise 0
++-        vcgt.u8 q0,  q0, q4 // a > c -> -1 , otherwise 0
++-        vcgt.u8 q13, q5, q1
++-        vcgt.u8 q1,  q1, q5
+++        vcgt.u8 q14,  q6, q2
+++        vcgt.u8  q2,  q2, q6
+++        vcgt.u8 q15,  q7, q3
+++        vcgt.u8  q3,  q3, q7
++ 
++-        vsub.s8 q12, q0, q12 // diff0
++-        vcgt.u8  q0,  q4, q8 // c > b
++-        vsub.s8 q13, q1, q13 // diff0 part 2
+++        vsub.s8 q14,  q2, q14
+++        vcgt.u8  q2,  q6, q10
+++        vsub.s8 q15,  q3, q15
++ 
++-        vcgt.u8  q6,  q8, q4 // b > c
++-        vcgt.u8  q1,  q5, q9
++-        vcgt.u8  q7,  q9, q5
+++        vcgt.u8 q12, q10, q6
+++        vcgt.u8  q3,  q7, q11
+++        vcgt.u8 q13, q11, q7
+++        vsub.s8  q2, q12, q2
+++        vsub.s8  q3, q13, q3
++ 
++-        vsub.s8 q0, q6, q0 // diff1
++-        vsub.s8 q1, q7, q1 // diff1 part 2
++-        vadd.s8 q0, q12 //diff0 + diff1
+++        vmov.s8 q13, #2 // 2 to all elements
++ 
++-        vdup.s8 q7, r6 // 3 to all elements
++-        sub     r6, #1
++-        vadd.s8 q1, q13
+++        vadd.s8  q2, q14
+++        vadd.s8  q3, q15
+++
+++        vmov.32  d24[0], r4  // load offset table from general registers
+++        vmov.32  d24[1], r5  // load rest of offset table
++ 
++-        vclt.s8 q12, q0, #0 // diff0 + diff1 < 0
++-        vclt.s8 q13, q1, #0
++-
++-        vadd.s8  q6,  q0, q7 // diff0 + diff1 + 3
++-        vadd.s8  q10,  q1, q7
++-        vdup.s8 q7, r6  // 2 to all elements
++-        add     r6, #1
++-        vand.8   q12, q6, q12 // if (diff0 + diff1 < 0) then (diff0 + diff1 + 3) else 0
++-        vand.8   q13, q10, q13
++-
++-
++-        vcgt.s8  q10, q0, #0 // diff0 + diff1 > 0
++-        vadd.s8   q6, q0, q7 // diff0 + diff1 + 2
++-        vand.8   q11, q6, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vcgt.s8  q10, q1, #0
++-        vadd.s8   q0, q11, q12  // offset_idx
++-
++-        vadd.s8   q6, q1, q7 // diff0 + diff1 + 2
++-        vmov.32  d14[0], r7  // load offset table from general registers
++-        vand.8   q11, q6, q10 // if (diff0 + diff1 > 0) then (diff0 + diff1 + 2) else 0
++-        vmov.32  d14[1], r5  // load rest of offset table
++-        vadd.s8   q1, q11, q13
++-
++-        vtbl.8   d0, {d14}, d0
++-        vtbl.8   d1, {d14}, d1
++-        vtbl.8   d2, {d14}, d2
++-        vtbl.8   d3, {d14}, d3
++-
++-        vmovl.u8   q6, d8
++-        vmovl.u8   q7, d9
++-        vmovl.u8  q10, d10
++-        vmovl.u8  q11, d11
++-
++-        vaddw.s8  q6, d0
++-        vaddw.s8  q7, d1
++-        vaddw.s8 q10, d2
++-        vaddw.s8 q11, d3
++-
++-        vqmovun.s16  d0, q6
++-        vqmovun.s16  d1, q7
++-        vqmovun.s16  d2, q10
++-        vqmovun.s16  d3, q11
++-
++-        vstm r0, {q0-q1}
++-        add  r0, r2
+++        vadd.s8 q0, q13
+++        vadd.s8 q1, q13
+++        vadd.s8 q2, q13
+++        vadd.s8 q3, q13
+++
+++        vmov.u8  q15, #128 // s8 #-128
+++        vtbl.8   d0, {d24}, d0
+++        vtbl.8   d1, {d24}, d1
+++        vtbl.8   d2, {d24}, d2
+++        vtbl.8   d3, {d24}, d3
+++        vtbl.8   d4, {d24}, d4
+++        vtbl.8   d5, {d24}, d5
+++        vtbl.8   d6, {d24}, d6
+++        vtbl.8   d7, {d24}, d7
+++
+++        vadd.s8  q12,  q4, q15
+++        vadd.s8  q13,  q5, q15
+++        vadd.s8  q14,  q6, q15
+++        vadd.s8  q15,  q7, q15
+++        vqadd.s8 q12,  q0
+++        vqadd.s8 q15,  q3
+++        vmov.u8   q3, #128 // s8 #-128
+++        vqadd.s8 q13,  q1
+++        vqadd.s8 q14,  q2
+++        vsub.s8   q0, q12, q3
+++        vsub.s8   q1, q13, q3
+++        vsub.s8   q2, q14, q3
+++        vsub.s8   q3, q15, q3
+++        vst1.8  {q0-q1}, [r0, :128]!
+++        vst1.8  {q2-q3}, [r0, :128], r2
+++        sub     r0, #32
++ .endm
++ 
++-function ff_hevc_sao_edge_eo0_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
+++.macro init_edge_64
+++        push   {r4-r5}
+++        ldr    r12, [sp, #8] // height
+++        ldr    r5, [sp, #12] // sao_offset_val_table
+++        ldr    r4, [r5]
++         add    r5, #4
++         ldr    r5, [r5]
+++.endm
+++
+++function ff_hevc_sao_edge_eo0_w64_neon_8, export=1
+++        init_edge_64
++         vpush {d8-d15}
++         sub    r1, #8
++-1:      subs    r4, #1
++-        vld1.64  {q10-q11}, [r1]!
++-        vld1.64  {q12-q13}, [r1]!
++-        vld1.64  {q14}, [r1], r3
++-        sub      r1, #64
+++1:      subs    r12, #1
+++        vld1.64  {d7}, [r1, :64]!
+++        vld1.64  {q4-q5}, [r1, :128]! // load c
+++        vld1.64  {q6-q7}, [r1, :128]!
+++        vld1.64  {d24}, [r1, :64], r3
+++        sub      r1, #72
++         // load a
++-        vext.8 q0, q10, q11, #7
++-        vext.8 q1, q11, q12, #7
++-        vext.8 q2, q12, q13, #7
++-        vext.8 q3, q13, q14, #7
++-        // load c
++-        vext.8 q4, q10, q11, #8
++-        vext.8 q5, q11, q12, #8
++-        vext.8 q6, q12, q13, #8
++-        vext.8 q7, q13, q14, #8
+++        vext.8 q0, q3, q4, #15
+++        vext.8 q1, q4, q5, #15
+++        vext.8 q2, q5, q6, #15
+++        vext.8 q3, q6, q7, #15
++         // load b
++-        vext.8 q8, q10, q11, #9
++-        vext.8 q9, q11, q12, #9
++-        vext.8 q10, q12, q13, #9
++-        vext.8 q11, q13, q14, #9
+++        vext.8 q8, q4, q5, #1
+++        vext.8 q9, q5, q6, #1
+++        vext.8 q10, q6, q7, #1
+++        vext.8 q11, q7, q12, #1
++         edge_w64_body
++         bne   1b
++         vpop  {d8-d15}
++-        pop   {r4-r8}
+++        pop   {r4-r5}
++         bx lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
+++        init_edge_64
++         vpush {d8-d15}
++         sub     r1, r3
++         // load a
++-        vld1.8  {q0-q1}, [r1]!
++-        vld1.8  {q2-q3}, [r1], r3
+++        vld1.8  {q0-q1}, [r1, :128]!
+++        vld1.8  {q2-q3}, [r1, :128], r3
++         sub     r1, #32
++-1:      subs    r4, #1
++         // load c
++-        vld1.8  {q4-q5}, [r1]!
++-        vld1.8  {q6-q7}, [r1], r3
+++        vld1.8  {q4-q5}, [r1, :128]!
+++        vld1.8  {q6-q7}, [r1, :128], r3
++         sub     r1, #32
+++1:      subs    r12, #1
++         // load b
++-        vld1.8  {q8-q9}, [r1]!
++-        vld1.8  {q10-q11}, [r1]
+++        vld1.8  {q8-q9}, [r1, :128]!
+++        vld1.8  {q10-q11}, [r1, :128], r3
++         sub     r1, #32
++         edge_w64_body
++         // copy c to a
++@@ -356,20 +242,19 @@ function ff_hevc_sao_edge_eo1_w64_neon_8, export=1
++         vmov.64 q1, q5
++         vmov.64 q2, q6
++         vmov.64 q3, q7
+++        // copy b to c
+++        vmov.64 q4, q8
+++        vmov.64 q5, q9
+++        vmov.64 q6, q10
+++        vmov.64 q7, q11
++         bne   1b
++         vpop  {d8-d15}
++-        pop   {r4-r8}
+++        pop   {r4-r5}
++         bx lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo2_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
+++        init_edge_64
++         vpush {d8-d15}
++ 1:      sub     r1, r3
++         // load a
++@@ -379,10 +264,10 @@ function ff_hevc_sao_edge_eo2_w64_neon_8, export=1
++         vld1.8  {q0-q1}, [r1]!
++         vld1.8  {q2-q3}, [r1], r3
++         sub     r1, #31
++-        subs    r4, #1
+++        subs    r12, #1
++         // load c
++-        vld1.8  {q4-q5}, [r1]!
++-        vld1.8  {q6-q7}, [r1], r3
+++        vld1.8  {q4-q5}, [r1, :128]!
+++        vld1.8  {q6-q7}, [r1, :128], r3
++         sub     r1, #32
++         // load b
++         add     r1, #1
++@@ -390,25 +275,14 @@ function ff_hevc_sao_edge_eo2_w64_neon_8, export=1
++         vld1.8  {q10-q11}, [r1]
++         sub     r1, #33
++         edge_w64_body
++-        // copy c to a
++-        vmov.64 q0, q4
++-        vmov.64 q1, q5
++-        vmov.64 q2, q6
++-        vmov.64 q3, q7
++         bne   1b
++         vpop  {d8-d15}
++-        pop   {r4-r8}
+++        pop   {r4-r5}
++         bx lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo3_w64_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
+++        init_edge_64
++         vpush {d8-d15}
++ 1:      sub     r1, r3
++         // load a
++@@ -418,10 +292,10 @@ function ff_hevc_sao_edge_eo3_w64_neon_8, export=1
++         vld1.8  {q0-q1}, [r1]!
++         vld1.8  {q2-q3}, [r1], r3
++         sub     r1, #33
++-        subs    r4, #1
+++        subs    r12, #1
++         // load c
++-        vld1.8  {q4-q5}, [r1]!
++-        vld1.8  {q6-q7}, [r1], r3
+++        vld1.8  {q4-q5}, [r1, :128]!
+++        vld1.8  {q6-q7}, [r1, :128], r3
++         sub     r1, #32
++         // load b
++         sub     r1, #1
++@@ -429,178 +303,176 @@ function ff_hevc_sao_edge_eo3_w64_neon_8, export=1
++         vld1.8  {q10-q11}, [r1]
++         sub     r1, #31
++         edge_w64_body
++-        // copy c to a
++-        vmov.64 q0, q4
++-        vmov.64 q1, q5
++-        vmov.64 q2, q6
++-        vmov.64 q3, q7
++         bne   1b
++         vpop  {d8-d15}
++-        pop   {r4-r8}
+++        pop   {r4-r5}
++         bx lr
++ endfunc
++ 
+++// inputs:
+++// a in q0, q1
+++// c in q2, q3
+++// b in q8, q9
+++// offset table in d31
+++// clobbered registers q0, q1, q10, q11, q12, q13
+++// output q0, q1
+++.macro edge_w32_body
+++        vcgt.u8 q12, q2, q0 // c > a -> -1 , otherwise 0
+++        vcgt.u8 q0,  q0, q2 // a > c -> -1 , otherwise 0
+++        vcgt.u8 q13, q3, q1
+++        vcgt.u8 q1,  q1, q3
+++
+++        vsub.s8 q12, q0, q12 // diff0
+++        vcgt.u8  q0,  q2, q8 // c > b
+++        vsub.s8 q13, q1, q13 // diff0 part 2
+++
+++        vcgt.u8  q10,  q8, q2 // b > c
+++        vcgt.u8  q1,  q3, q9
+++        vcgt.u8  q11,  q9, q3
+++
+++        vsub.s8 q0, q10, q0 // diff1
+++
+++        vmov.s8 q10, #2 // 2 to all elements
+++        vsub.s8 q1, q11, q1 // diff1 part 2
+++        vadd.s8 q0, q12 //diff0 + diff1
+++        vadd.s8 q1, q13
+++
+++        vadd.s8 q0, q10
+++        vadd.s8 q1, q10
+++
+++        vmov.u8  q10, #128
+++        vtbl.8   d0, {d31}, d0
+++        vtbl.8   d1, {d31}, d1
+++        vtbl.8   d2, {d31}, d2
+++        vtbl.8   d3, {d31}, d3
+++
+++        vadd.s8    q11, q2, q10
+++        vadd.s8    q12, q3, q10
+++        vqadd.s8   q11, q0
+++        vqadd.s8   q12, q1
+++        vsub.s8    q0, q11, q10
+++        vsub.s8    q1, q12, q10
+++        vst1.8   {q0-q1}, [r0, :128], r2
+++.endm
+++
+++.macro init_edge_32
+++        ldr     r12, [sp, #4] // sao_offset_val_table
+++        vld1.32 {d31}, [r12]
+++        ldr     r12, [sp] // height
+++.endm
+++
++ function ff_hevc_sao_edge_eo0_w32_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
++-        vpush {d8-d15}
++-        sub    r1, #8 // load 8 extra bytes
++-1:      subs    r4, #1
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3 // only first 9 bytes are used
++-        sub    r1, #32
+++        init_edge_32
+++        sub     r1, #4 // load 4 extra bytes
+++1:      subs    r12, #1
+++        vld1.32 d3[1], [r1]!
+++        vld1.8  {q2-q3}, [r1, :128]! // c
+++        vld1.32 d20[0], [r1], r3
+++        sub     r1, #36
++         // a
++-        vext.8  q0, q10, q11, #7
++-        vext.8  q1, q11, q12, #7
++-        // c
++-        vext.8  q4, q10, q11, #8
++-        vext.8  q5, q11, q12, #8
+++        vext.8  q0, q1, q2, #15
+++        vext.8  q1, q2, q3, #15
++         // b
++-        vext.8  q8, q10, q11, #9
++-        vext.8  q9, q11, q12, #9
+++        vext.8  q8, q2, q3, #1
+++        vext.8  q9, q3, q10, #1
++         edge_w32_body
++-        bne   1b
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++-        bx lr
+++        bne     1b
+++        bx      lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo1_w32_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
++-        vpush {d8-d15}
+++        init_edge_32
++         // load a
++         sub     r1, r3
++-        vld1.8  {q0-q1}, [r1], r3
+++        vld1.8  {q0-q1}, [r1, :128], r3
++         // load c
++-        vld1.8  {q4-q5}, [r1], r3
++-1:      subs    r4, #1
+++        vld1.8  {q2-q3}, [r1, :128], r3
+++1:      subs    r12, #1
++         // load b
++-        vld1.8  {q8-q9}, [r1], r3
+++        vld1.8  {q8-q9}, [r1, :128], r3
++         edge_w32_body
++         // inputs for next loop iteration
++         // a
++-        vmov.64 q0, q4
++-        vmov.64 q1, q5
+++        vmov.64 q0, q2
+++        vmov.64 q1, q3
++         // c
++-        vmov.64 q4, q8
++-        vmov.64 q5, q9
++-        bne   1b
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++-        bx lr
+++        vmov.64 q2, q8
+++        vmov.64 q3, q9
+++        bne     1b
+++        bx      lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo2_w32_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        ldr    r5, [r5]
++-        vpush {d8-d15}
+++        init_edge_32
+++        vpush   {d8-d15}
++         // load a
++         sub     r1, r3
++-        sub    r1, #8
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
+++        sub     r1, #8
+++        vld1.8  {q10-q11}, [r1, :64]!
+++        vld1.8  {d24}, [r1, :64], r3
+++        sub     r1, #32
++         vext.8  q0, q10, q11, #7
++         vext.8  q1, q11, q12, #7
++         // load c
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
++-        vext.8  q4, q10, q11, #8
++-        vext.8  q5, q11, q12, #8
++-        vext.8  q2, q10, q11, #7
++-1:      subs    r4, #1
+++        vld1.8  {d9}, [r1, :64]!
+++        vld1.8  {q2-q3}, [r1, :64], r3
+++        sub     r1, #8
+++        vext.8  q4, q4, q2, #15
+++1:      subs    r12, #1
++         // load b
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
+++        vld1.8  {q10-q11}, [r1, :64]!
+++        vld1.8  {q12}, [r1, :64], r3
+++        sub     r1, #32
++         vext.8  q8, q10, q11, #9
++         vext.8  q9, q11, q12, #9
++-        vext.8  q14, q10, q11, #8
++-        vext.8  q15, q11, q12, #8
++-        vext.8  q3, q10, q11, #7
+++        vext.8  q6, q10, q11, #8
+++        vext.8  q7, q11, q12, #8
+++        vext.8  q5, q10, q11, #7
++         edge_w32_body
++         // inputs for next loop iteration
++         // a
++-        vmov.8 q0, q2
++-        vext.8 q1, q4, q5, #15
+++        vmov.8  q0, q4
+++        vext.8  q1, q2, q3, #15
++         // c
++-        vmov.8  q4, q14
++-        vmov.8  q5, q15
++-        vmov.8  q2, q3
++-        bne   1b
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++-        bx lr
+++        vmov.8  q2, q6
+++        vmov.8  q3, q7
+++        vmov.8  q4, q5
+++        bne     1b
+++        vpop    {d8-d15}
+++        bx      lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo3_w32_neon_8, export=1
++-        push  {r4-r8}
++-        ldr    r4, [sp, #20] // height
++-        ldr    r5, [sp, #24] // sao_offset_val_table
++-        ldr    r6, =0x03
++-        ldr    r7, [r5]
++-        add    r5, #4
++-        sub    r1, r3
++-        ldr    r5, [r5]
++-        sub    r1, #8
++-        vpush {d8-d15}
+++        init_edge_32
+++        sub     r1, r3
++         // load a
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
++-        vext.8  q0, q10, q11, #9
++-        vext.8  q1, q11, q12, #9
+++        vld1.8  {q10-q11}, [r1, :64]!
+++        vld1.8  {d24}, [r1, :64], r3
+++        sub     r1, #32
+++        vext.8  q0, q10, q11, #1
+++        vext.8  q1, q11, q12, #1
++         // load c
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
++-        vext.8  q4, q10, q11, #8
++-        vext.8  q5, q11, q12, #8
++-        vext.8  q2, q12, q11, #8
++-1:      subs    r4, #1
+++        vld1.8  {q2-q3}, [r1, :64]!
+++        vld1.8  {d30}, [r1, :64], r3
+++        sub     r1, #40
+++1:      subs    r12, #1
++         // load b
++-        vld1.8  {q10-q11}, [r1]
++-        add    r1, #32
++-        vld1.8  {q12}, [r1], r3
++-        sub    r1, #32
+++        vld1.8  {q10-q11}, [r1, :64]!
+++        vld1.8  {q12}, [r1, :64], r3
+++        sub     r1, #32
++         vext.8  q8, q10, q11, #7
++         vext.8  q9, q11, q12, #7
++-        vext.8  q3, q12, q10, #7
+++        vext.8  q14, q12, q10, #7
++         edge_w32_body
++         // inputs for next loop iteration
++         // a
++-        vext.8 q0, q4, q5, #1
++-        vext.8 q1, q5, q2, #1
+++        vext.8  q0, q2, q3, #1
+++        vext.8  q1, q3, q15, #1
++         // c
++-        vext.8  q4, q8, q9, #1
++-        vext.8  q5, q9, q3, #1
++-        vext.8  q2, q3, q1, #1
++-        bne   1b
++-        vpop  {d8-d15}
++-        pop   {r4-r8}
++-        bx lr
+++        vext.8  q2, q8, q9, #1
+++        vext.8  q3, q9, q14, #1
+++        vext.8  d30, d28, d2, #1
+++        bne     1b
+++        bx      lr
++ endfunc
++ 
++-- 
++2.5.0
++
++
++From 016c39d46b86830204a4519590332d2a38f7ee51 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Thu, 8 Jan 2015 09:58:55 +0200
++Subject: [PATCH 7/9] small optimization to SAO BAND. correct path for
++ bit_depth_template.c
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c | 2 +-
++ libavcodec/arm/hevcdsp_sao_neon.S  | 2 +-
++ 2 files changed, 2 insertions(+), 2 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 8d6e863..385c35d 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -23,7 +23,7 @@
++ #include "libavcodec/hevcdsp.h"
++ #include "hevcdsp_arm.h"
++ #include "libavcodec/avcodec.h"
++-#include "../bit_depth_template.c"
+++#include "libavcodec/bit_depth_template.c"
++ 
++ void ff_hevc_v_loop_filter_luma_neon(uint8_t *_pix, ptrdiff_t _stride, int _beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
++ void ff_hevc_h_loop_filter_luma_neon(uint8_t *_pix, ptrdiff_t _stride, int _beta, int *_tc, uint8_t *_no_p, uint8_t *_no_q);
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 5fc482b..710b32b 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -26,12 +26,12 @@
++         pld      [r1]
++         vld1.8   {q0, q1}, [r12]  // offset table
++         ldr      r12, [sp, #4]    // height
+++        vmov.u8  q14, #128
++ .endm
++ 
++ .macro sao_band_32
++         vshr.u8  q8, q2, #3
++         vshr.u8  q9, q3, #3
++-        vmov.u8  q14, #128
++         vtbl.8   d16, {q0, q1}, d16
++         vtbl.8   d17, {q0, q1}, d17
++         vtbl.8   d18, {q0, q1}, d18
++-- 
++2.5.0
++
++
++From 579f1584d688e1ac24fb7d22697e2a7b64f62e8e Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Fri, 9 Jan 2015 10:28:52 +0200
++Subject: [PATCH 8/9] Added height check for SAO NEON optimizations. Faster SAO
++ band NEON Some reordering to use NEON pipelines more efficiently
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |  12 +++-
++ libavcodec/arm/hevcdsp_sao_neon.S  | 142 ++++++++++++++++++++++---------------
++ 2 files changed, 93 insertions(+), 61 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 385c35d..6d0689c 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -176,6 +176,7 @@ static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_
++     int8_t offset_table[32] = { 0 };
++     int k, y, x;
++     int shift  = 3; // BIT_DEPTH - 5
+++    int cwidth = 0;
++ 
++     stride_src /= sizeof(pixel);
++     stride_dst /= sizeof(pixel);
++@@ -183,7 +184,10 @@ static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_
++     for (k = 0; k < 4; k++)
++         offset_table[(k + sao_left_class) & 31] = sao_offset_val[k + 1];
++ 
++-    switch(width){
+++    if (height % 8 == 0)
+++        cwidth = width;
+++
+++    switch(cwidth){
++     case 8:
++         ff_hevc_sao_band_w8_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
++         break;
++@@ -223,15 +227,19 @@ static void ff_hevc_sao_edge_neon_wrapper(uint8_t *_dst /* align 16 */, uint8_t
++     pixel *src = (pixel *)_src;
++     int a_stride, b_stride;
++     int x, y;
+++    int cwidth = 0;
++ 
++     for (x = 0; x < 5; x++) {
++         sao_offset_val[x] = _sao_offset_val[edge_idx[x]];
++     }
++ 
+++    if (height % 8 == 0)
+++        cwidth = width;
+++
++     stride_src /= sizeof(pixel);
++     stride_dst /= sizeof(pixel);
++ 
++-    switch (width) {
+++    switch (cwidth) {
++     case 32:
++         switch(eo) {
++         case 0:
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 710b32b..08f50b8 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -26,36 +26,59 @@
++         pld      [r1]
++         vld1.8   {q0, q1}, [r12]  // offset table
++         ldr      r12, [sp, #4]    // height
++-        vmov.u8  q14, #128
+++        vmov.u8  q3, #128
++ .endm
++ 
++-.macro sao_band_32
++-        vshr.u8  q8, q2, #3
++-        vshr.u8  q9, q3, #3
++-        vtbl.8   d16, {q0, q1}, d16
++-        vtbl.8   d17, {q0, q1}, d17
++-        vtbl.8   d18, {q0, q1}, d18
++-        vtbl.8   d19, {q0, q1}, d19
++-        vadd.s8  q2, q14
++-        vadd.s8  q3, q14
++-        vqadd.s8 q2, q8
++-        vqadd.s8 q3, q9
++-        vsub.s8  q2, q14
++-        vsub.s8  q3, q14
+++// 128 in q3
+++// input q8 - q11
+++// 32 cycles
+++.macro sao_band_64
+++        vshr.u8  q12, q8, #3
+++        vshr.u8  q13, q9, #3
+++        vshr.u8  q14, q10, #3
+++        vshr.u8  q15, q11, #3
+++        vtbl.8   d24, {d0, d1, d2, d3}, d24
+++        vadd.s8  q8, q3
+++        vtbl.8   d25, {d0, d1, d2, d3}, d25
+++        vadd.s8  q9, q3
+++        vtbl.8   d26, {d0, d1, d2, d3}, d26
+++        vadd.s8  q10, q3
+++        vtbl.8   d27, {d0, d1, d2, d3}, d27
+++        vadd.s8  q11, q3
+++        vtbl.8   d28, {d0, d1, d2, d3}, d28
+++        vqadd.s8 q8, q12
+++        vtbl.8   d29, {d0, d1, d2, d3}, d29
+++        vqadd.s8 q9, q13
+++        vtbl.8   d30, {d0, d1, d2, d3}, d30
+++        vqadd.s8 q10, q14
+++        vtbl.8   d31, {d0, d1, d2, d3}, d31
+++        vqadd.s8 q11, q15
+++        vsub.s8  q8, q3
+++        vsub.s8  q9, q3
+++        vsub.s8  q10, q3
+++        vsub.s8  q11, q3
++ .endm
++ 
++ function ff_hevc_sao_band_w8_neon_8, export=1
++         init_sao_band
++-1:      subs     r12, #4
++-        vld1.8   {d4}, [r1, :64], r3
++-        vld1.8   {d5}, [r1, :64], r3
++-        vld1.8   {d6}, [r1, :64], r3
++-        vld1.8   {d7}, [r1, :64], r3
++-        sao_band_32
++-        vst1.8  {d4}, [r0, :64], r2
++-        vst1.8  {d5}, [r0, :64], r2
++-        vst1.8  {d6}, [r0, :64], r2
++-        vst1.8  {d7}, [r0, :64], r2
+++1:      subs     r12, #8
+++        vld1.8   {d16}, [r1, :64], r3
+++        vld1.8   {d17}, [r1, :64], r3
+++        vld1.8   {d18}, [r1, :64], r3
+++        vld1.8   {d19}, [r1, :64], r3
+++        vld1.8   {d20}, [r1, :64], r3
+++        vld1.8   {d21}, [r1, :64], r3
+++        vld1.8   {d22}, [r1, :64], r3
+++        vld1.8   {d23}, [r1, :64], r3
+++        sao_band_64
+++        vst1.8  {d16}, [r0, :64], r2
+++        vst1.8  {d17}, [r0, :64], r2
+++        vst1.8  {d18}, [r0, :64], r2
+++        vst1.8  {d19}, [r0, :64], r2
+++        vst1.8  {d20}, [r0, :64], r2
+++        vst1.8  {d21}, [r0, :64], r2
+++        vst1.8  {d22}, [r0, :64], r2
+++        vst1.8  {d23}, [r0, :64], r2
++         bne    1b
++ 
++         bx lr
++@@ -63,12 +86,16 @@ endfunc
++ 
++ function ff_hevc_sao_band_w16_neon_8, export=1
++         init_sao_band
++-1:      subs     r12, #2
++-        vld1.8  {q2}, [r1, :128], r3
++-        vld1.8  {q3}, [r1, :128], r3
++-        sao_band_32
++-        vst1.8   {q2}, [r0, :128], r2
++-        vst1.8   {q3}, [r0, :128], r2
+++1:      subs     r12, #4
+++        vld1.8  {q8}, [r1, :128], r3
+++        vld1.8  {q9}, [r1, :128], r3
+++        vld1.8  {q10}, [r1, :128], r3
+++        vld1.8  {q11}, [r1, :128], r3
+++        sao_band_64
+++        vst1.8   {q8}, [r0, :128], r2
+++        vst1.8   {q9}, [r0, :128], r2
+++        vst1.8   {q10}, [r0, :128], r2
+++        vst1.8   {q11}, [r0, :128], r2
++         bne    1b
++ 
++         bx lr
++@@ -76,10 +103,12 @@ endfunc
++ 
++ function ff_hevc_sao_band_w32_neon_8, export=1
++         init_sao_band
++-1:      subs     r12, #1
++-        vld1.8   {q2-q3}, [r1, :128], r3
++-        sao_band_32
++-        vst1.8   {q2-q3}, [r0, :128], r2
+++1:      subs     r12, #2
+++        vld1.8   {q8-q9}, [r1, :128], r3
+++        vld1.8   {q10-q11}, [r1, :128], r3
+++        sao_band_64
+++        vst1.8   {q8-q9}, [r0, :128], r2
+++        vst1.8   {q10-q11}, [r0, :128], r2
++         bne      1b
++ 
++         bx       lr
++@@ -89,13 +118,12 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++         init_sao_band
++ 1:      subs      r12, #1
++         pld       [r1, r3]
++-        vld1.8    {q2-q3}, [r1, :128]!
++-        sao_band_32
++-        vst1.8    {q2-q3}, [r0, :128]!
++-        vld1.8    {q2-q3}, [r1, :128], r3
+++        vld1.8    {q8-q9}, [r1, :128]!
+++        vld1.8    {q10-q11}, [r1, :128], r3
++         sub       r1, #32
++-        sao_band_32
++-        vst1.8    {q2-q3}, [r0, :128], r2
+++        sao_band_64
+++        vst1.8    {q8-q9}, [r0, :128]!
+++        vst1.8    {q10-q11}, [r0, :128], r2
++         sub       r0, #32
++         bne       1b
++ 
++@@ -121,7 +149,6 @@ endfunc
++         vcgt.u8  q1,  q5, q9
++         vcgt.u8 q15,  q9, q5
++         vsub.s8  q0, q14, q0 // diff1
++-
++         vsub.s8  q1, q15, q1
++ 
++         vadd.s8  q0, q12 //diff0 + diff1
++@@ -157,27 +184,25 @@ endfunc
++ 
++         vmov.u8  q15, #128 // s8 #-128
++         vtbl.8   d0, {d24}, d0
+++        vadd.s8  q13,  q4, q15
++         vtbl.8   d1, {d24}, d1
+++        vadd.s8  q14,  q5, q15
++         vtbl.8   d2, {d24}, d2
+++        vqadd.s8 q0, q13
++         vtbl.8   d3, {d24}, d3
+++        vqadd.s8 q1, q14
++         vtbl.8   d4, {d24}, d4
+++        vadd.s8  q13,  q6, q15
++         vtbl.8   d5, {d24}, d5
+++        vadd.s8  q14,  q7, q15
++         vtbl.8   d6, {d24}, d6
+++        vqadd.s8 q2, q13
++         vtbl.8   d7, {d24}, d7
++-
++-        vadd.s8  q12,  q4, q15
++-        vadd.s8  q13,  q5, q15
++-        vadd.s8  q14,  q6, q15
++-        vadd.s8  q15,  q7, q15
++-        vqadd.s8 q12,  q0
++-        vqadd.s8 q15,  q3
++-        vmov.u8   q3, #128 // s8 #-128
++-        vqadd.s8 q13,  q1
++-        vqadd.s8 q14,  q2
++-        vsub.s8   q0, q12, q3
++-        vsub.s8   q1, q13, q3
++-        vsub.s8   q2, q14, q3
++-        vsub.s8   q3, q15, q3
+++        vqadd.s8 q3, q14
+++        vsub.s8   q0, q15
+++        vsub.s8   q1, q15
+++        vsub.s8   q2, q15
+++        vsub.s8   q3, q15
++         vst1.8  {q0-q1}, [r0, :128]!
++         vst1.8  {q2-q3}, [r0, :128], r2
++         sub     r0, #32
++@@ -342,13 +367,12 @@ endfunc
++ 
++         vmov.u8  q10, #128
++         vtbl.8   d0, {d31}, d0
+++        vadd.s8  q11, q2, q10
++         vtbl.8   d1, {d31}, d1
+++        vadd.s8  q12, q3, q10
++         vtbl.8   d2, {d31}, d2
+++        vqadd.s8 q11, q0
++         vtbl.8   d3, {d31}, d3
++-
++-        vadd.s8    q11, q2, q10
++-        vadd.s8    q12, q3, q10
++-        vqadd.s8   q11, q0
++         vqadd.s8   q12, q1
++         vsub.s8    q0, q11, q10
++         vsub.s8    q1, q12, q10
++-- 
++2.5.0
++
++
++From 026bac1824e4936e948e6b1efec82868c520ea66 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Mon, 2 Feb 2015 16:08:27 +0200
++Subject: [PATCH 9/9] Further SAO NEON optimisations
++
++---
++ libavcodec/arm/hevcdsp_init_neon.c |  16 +--
++ libavcodec/arm/hevcdsp_sao_neon.S  | 224 +++++++++++++++++++------------------
++ 2 files changed, 124 insertions(+), 116 deletions(-)
++
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 6d0689c..e5da7e9 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -45,10 +45,10 @@ void ff_hevc_transform_add_16x16_neon_8(uint8_t *_dst, int16_t *coeffs,
++ void ff_hevc_transform_add_32x32_neon_8(uint8_t *_dst, int16_t *coeffs,
++                                       ptrdiff_t stride);
++ 
++-void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
++-void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
++-void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
++-void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int8_t * offset_table, int height);
+++void ff_hevc_sao_band_w8_neon_8(uint8_t *_dst, uint8_t *_src, int8_t * offset_table, ptrdiff_t stride_src, ptrdiff_t stride_dst, int height);
+++void ff_hevc_sao_band_w16_neon_8(uint8_t *_dst, uint8_t *_src, int8_t * offset_table, ptrdiff_t stride_src, ptrdiff_t stride_dst, int height);
+++void ff_hevc_sao_band_w32_neon_8(uint8_t *_dst, uint8_t *_src, int8_t * offset_table, ptrdiff_t stride_src, ptrdiff_t stride_dst, int height);
+++void ff_hevc_sao_band_w64_neon_8(uint8_t *_dst, uint8_t *_src, int8_t * offset_table, ptrdiff_t stride_src, ptrdiff_t stride_dst, int height);
++ 
++ void ff_hevc_sao_edge_eo0_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++ void ff_hevc_sao_edge_eo1_w32_neon_8(uint8_t *_dst, uint8_t *_src, ptrdiff_t stride_dst, ptrdiff_t stride_src, int height, int8_t *sao_offset_table);
++@@ -189,16 +189,16 @@ static void ff_hevc_sao_band_neon_wrapper(uint8_t *_dst, uint8_t *_src, ptrdiff_
++ 
++     switch(cwidth){
++     case 8:
++-        ff_hevc_sao_band_w8_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
+++        ff_hevc_sao_band_w8_neon_8(_dst, _src, offset_table, stride_src, stride_dst, height);
++         break;
++     case 16:
++-        ff_hevc_sao_band_w16_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
+++        ff_hevc_sao_band_w16_neon_8(_dst, _src, offset_table, stride_src, stride_dst, height);
++         break;
++     case 32:
++-        ff_hevc_sao_band_w32_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
+++        ff_hevc_sao_band_w32_neon_8(_dst, _src, offset_table, stride_src, stride_dst, height);
++         break;
++     case 64:
++-        ff_hevc_sao_band_w64_neon_8(_dst, _src, stride_dst, stride_src, offset_table, height);
+++        ff_hevc_sao_band_w64_neon_8(_dst, _src, offset_table, stride_src, stride_dst, height);
++         break;
++     default:
++         for (y = 0; y < height; y++) {
++diff --git a/libavcodec/arm/hevcdsp_sao_neon.S b/libavcodec/arm/hevcdsp_sao_neon.S
++index 08f50b8..9c7808d 100644
++--- a/libavcodec/arm/hevcdsp_sao_neon.S
+++++ b/libavcodec/arm/hevcdsp_sao_neon.S
++@@ -22,21 +22,16 @@
++ #include "neon.S"
++ 
++ .macro init_sao_band
++-        ldr      r12, [sp, #0]    // offset_table address
++         pld      [r1]
++-        vld1.8   {q0, q1}, [r12]  // offset table
++-        ldr      r12, [sp, #4]    // height
+++        vld1.8   {q0, q1}, [r2]  // offset table
+++        ldr       r2, [sp, #0]   // stride_dst
+++        ldr      r12, [sp, #4]   // height
++         vmov.u8  q3, #128
++ .endm
++ 
++ // 128 in q3
++ // input q8 - q11
++-// 32 cycles
++ .macro sao_band_64
++-        vshr.u8  q12, q8, #3
++-        vshr.u8  q13, q9, #3
++-        vshr.u8  q14, q10, #3
++-        vshr.u8  q15, q11, #3
++         vtbl.8   d24, {d0, d1, d2, d3}, d24
++         vadd.s8  q8, q3
++         vtbl.8   d25, {d0, d1, d2, d3}, d25
++@@ -52,8 +47,8 @@
++         vtbl.8   d30, {d0, d1, d2, d3}, d30
++         vqadd.s8 q10, q14
++         vtbl.8   d31, {d0, d1, d2, d3}, d31
++-        vqadd.s8 q11, q15
++         vsub.s8  q8, q3
+++        vqadd.s8 q11, q15
++         vsub.s8  q9, q3
++         vsub.s8  q10, q3
++         vsub.s8  q11, q3
++@@ -64,12 +59,16 @@ function ff_hevc_sao_band_w8_neon_8, export=1
++ 1:      subs     r12, #8
++         vld1.8   {d16}, [r1, :64], r3
++         vld1.8   {d17}, [r1, :64], r3
+++        vshr.u8  q12, q8, #3
++         vld1.8   {d18}, [r1, :64], r3
++         vld1.8   {d19}, [r1, :64], r3
+++        vshr.u8  q13, q9, #3
++         vld1.8   {d20}, [r1, :64], r3
++         vld1.8   {d21}, [r1, :64], r3
+++        vshr.u8  q14, q10, #3
++         vld1.8   {d22}, [r1, :64], r3
++         vld1.8   {d23}, [r1, :64], r3
+++        vshr.u8  q15, q11, #3
++         sao_band_64
++         vst1.8  {d16}, [r0, :64], r2
++         vst1.8  {d17}, [r0, :64], r2
++@@ -88,9 +87,13 @@ function ff_hevc_sao_band_w16_neon_8, export=1
++         init_sao_band
++ 1:      subs     r12, #4
++         vld1.8  {q8}, [r1, :128], r3
+++        vshr.u8  q12, q8, #3
++         vld1.8  {q9}, [r1, :128], r3
+++        vshr.u8  q13, q9, #3
++         vld1.8  {q10}, [r1, :128], r3
+++        vshr.u8  q14, q10, #3
++         vld1.8  {q11}, [r1, :128], r3
+++        vshr.u8  q15, q11, #3
++         sao_band_64
++         vst1.8   {q8}, [r0, :128], r2
++         vst1.8   {q9}, [r0, :128], r2
++@@ -105,7 +108,11 @@ function ff_hevc_sao_band_w32_neon_8, export=1
++         init_sao_band
++ 1:      subs     r12, #2
++         vld1.8   {q8-q9}, [r1, :128], r3
+++        vshr.u8  q12, q8, #3
+++        vshr.u8  q13, q9, #3
++         vld1.8   {q10-q11}, [r1, :128], r3
+++        vshr.u8  q14, q10, #3
+++        vshr.u8  q15, q11, #3
++         sao_band_64
++         vst1.8   {q8-q9}, [r0, :128], r2
++         vst1.8   {q10-q11}, [r0, :128], r2
++@@ -119,7 +126,11 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++ 1:      subs      r12, #1
++         pld       [r1, r3]
++         vld1.8    {q8-q9}, [r1, :128]!
+++        vshr.u8  q12, q8, #3
+++        vshr.u8  q13, q9, #3
++         vld1.8    {q10-q11}, [r1, :128], r3
+++        vshr.u8  q14, q10, #3
+++        vshr.u8  q15, q11, #3
++         sub       r1, #32
++         sao_band_64
++         vst1.8    {q8-q9}, [r0, :128]!
++@@ -129,51 +140,18 @@ function ff_hevc_sao_band_w64_neon_8, export=1
++ 
++         bx lr
++ endfunc
++-// input
++-// a in q0 - q3
++-// c in q4 - q7
++-// b in q8 - q11
++-// offset table in r7 and r5
++-// output in q0 - q3
++-// clobbers q12 - q15
++-.macro edge_w64_body
++-        vcgt.u8 q12,  q4, q0 // c > a -> -1 , otherwise 0
++-        vcgt.u8  q0,  q0, q4 // a > c -> -1 , otherwise 0
++-        vcgt.u8 q13,  q5, q1
++-        vcgt.u8  q1,  q1, q5
++-        vsub.s8 q12,  q0, q12 // diff0
++-        vcgt.u8  q0,  q4, q8 // c > b
++-        vsub.s8 q13,  q1, q13
++-
++-        vcgt.u8 q14,  q8, q4 // b > c
++-        vcgt.u8  q1,  q5, q9
++-        vcgt.u8 q15,  q9, q5
++-        vsub.s8  q0, q14, q0 // diff1
++-        vsub.s8  q1, q15, q1
++ 
++-        vadd.s8  q0, q12 //diff0 + diff1
++-        vadd.s8  q1, q13
++-
++-        vcgt.u8 q14,  q6, q2
++-        vcgt.u8  q2,  q2, q6
++-        vcgt.u8 q15,  q7, q3
++-        vcgt.u8  q3,  q3, q7
++-
++-        vsub.s8 q14,  q2, q14
++-        vcgt.u8  q2,  q6, q10
++-        vsub.s8 q15,  q3, q15
++-
++-        vcgt.u8 q12, q10, q6
++-        vcgt.u8  q3,  q7, q11
++-        vcgt.u8 q13, q11, q7
++-        vsub.s8  q2, q12, q2
++-        vsub.s8  q3, q13, q3
+++.macro diff32 out0, out1, tmp0, tmp1, in0, in1, in2, in3
+++        vcgt.u8 \out0, \in2, \in0  // c > a -> -1 , otherwise 0
+++        vcgt.u8 \tmp0,  \in0, \in2  // a > c -> -1 , otherwise 0
+++        vcgt.u8 \out1, \in3, \in1  // c > a -> -1 , otherwise 0 part 2
+++        vcgt.u8 \tmp1,  \in1, \in3  // a > c -> -1 , otherwise 0 part 2
+++        vsub.s8 \out0, \tmp0, \out0 // diff0
+++        vsub.s8 \out1, \tmp1, \out1 // diff0 part 2
+++.endm
++ 
+++.macro table64
++         vmov.s8 q13, #2 // 2 to all elements
++-
++-        vadd.s8  q2, q14
++-        vadd.s8  q3, q15
++-
++         vmov.32  d24[0], r4  // load offset table from general registers
++         vmov.32  d24[1], r5  // load rest of offset table
++ 
++@@ -208,6 +186,28 @@ endfunc
++         sub     r0, #32
++ .endm
++ 
+++// input
+++// a in q0 - q3
+++// c in q4 - q7
+++// b in q8 - q11
+++// offset table in r7 and r5
+++// output in q0 - q3
+++// clobbers q12 - q15
+++.macro edge_w64_body
+++        diff32 q12, q13, q0, q1, q0, q1, q4, q5
+++        diff32 q0, q1, q14, q15, q8, q9, q4, q5
+++
+++        vadd.s8  q0, q12 //diff0 + diff1
+++        vadd.s8  q1, q13
+++
+++        diff32  q14, q15, q2, q3, q2, q3, q6, q7
+++        diff32  q2, q3, q12, q13, q10, q11, q6, q7
+++
+++        vadd.s8  q2, q14
+++        vadd.s8  q3, q15
+++        table64
+++.endm
+++
++ .macro init_edge_64
++         push   {r4-r5}
++         ldr    r12, [sp, #8] // height
++@@ -334,38 +334,23 @@ function ff_hevc_sao_edge_eo3_w64_neon_8, export=1
++         bx lr
++ endfunc
++ 
++-// inputs:
++-// a in q0, q1
++-// c in q2, q3
++-// b in q8, q9
++-// offset table in d31
++-// clobbered registers q0, q1, q10, q11, q12, q13
++-// output q0, q1
++-.macro edge_w32_body
++-        vcgt.u8 q12, q2, q0 // c > a -> -1 , otherwise 0
++-        vcgt.u8 q0,  q0, q2 // a > c -> -1 , otherwise 0
++-        vcgt.u8 q13, q3, q1
++-        vcgt.u8 q1,  q1, q3
++-
++-        vsub.s8 q12, q0, q12 // diff0
++-        vcgt.u8  q0,  q2, q8 // c > b
++-        vsub.s8 q13, q1, q13 // diff0 part 2
++-
++-        vcgt.u8  q10,  q8, q2 // b > c
++-        vcgt.u8  q1,  q3, q9
++-        vcgt.u8  q11,  q9, q3
++-
++-        vsub.s8 q0, q10, q0 // diff1
++-
++-        vmov.s8 q10, #2 // 2 to all elements
++-        vsub.s8 q1, q11, q1 // diff1 part 2
++-        vadd.s8 q0, q12 //diff0 + diff1
++-        vadd.s8 q1, q13
+++.macro init_edge_32
+++        ldr     r12, [sp, #4] // sao_offset_val_table
+++        vld1.32 {d31}, [r12]
+++        ldr     r12, [sp] // height
+++.endm
++ 
++-        vadd.s8 q0, q10
++-        vadd.s8 q1, q10
+++.macro diff out0, tmp0, in0, in1
+++        vcgt.u8 \out0, \in1, \in0  // c > a -> -1 , otherwise 0
+++        vcgt.u8 \tmp0,  \in0, \in1  // a > c -> -1 , otherwise 0
+++        vsub.s8 \out0, \tmp0, \out0 // diff0
+++.endm
++ 
++-        vmov.u8  q10, #128
+++.macro table32
+++        vmov.s8  q10, #2
+++        vadd.s8  q0, q10
+++        vadd.s8  q1, q10
+++        vmov.s8  q10, #128
++         vtbl.8   d0, {d31}, d0
++         vadd.s8  q11, q2, q10
++         vtbl.8   d1, {d31}, d1
++@@ -373,56 +358,68 @@ endfunc
++         vtbl.8   d2, {d31}, d2
++         vqadd.s8 q11, q0
++         vtbl.8   d3, {d31}, d3
++-        vqadd.s8   q12, q1
++-        vsub.s8    q0, q11, q10
++-        vsub.s8    q1, q12, q10
+++        vqadd.s8 q12, q1
+++        vsub.s8  q0, q11, q10
+++        vsub.s8  q1, q12, q10
++         vst1.8   {q0-q1}, [r0, :128], r2
++ .endm
++ 
++-.macro init_edge_32
++-        ldr     r12, [sp, #4] // sao_offset_val_table
++-        vld1.32 {d31}, [r12]
++-        ldr     r12, [sp] // height
++-.endm
++-
++ function ff_hevc_sao_edge_eo0_w32_neon_8, export=1
++         init_edge_32
++-        sub     r1, #4 // load 4 extra bytes
+++        vpush {q4-q7}
+++        sub     r1, #4
++ 1:      subs    r12, #1
++-        vld1.32 d3[1], [r1]!
++-        vld1.8  {q2-q3}, [r1, :128]! // c
++-        vld1.32 d20[0], [r1], r3
++-        sub     r1, #36
+++        vld1.8  {q13-q14}, [r1]!
+++        vld1.32 d30, [r1], r3
+++        sub     r1, #32
++         // a
++-        vext.8  q0, q1, q2, #15
++-        vext.8  q1, q2, q3, #15
++-        // b
++-        vext.8  q8, q2, q3, #1
++-        vext.8  q9, q3, q10, #1
++-        edge_w32_body
+++        vext.8   q0, q13, q14, #3
+++        vext.8   q1, q14, q15, #3
+++        vshr.u64 d24, d30, #24
+++        // c
+++        vext.8   q2, q13, q14, #4
+++        vext.8   q3, q14, q15, #4
+++        vshr.u64 d16, d30, #32
+++        // diff0
+++        diff32 q13, q14, q4, q5, q0, q1, q2, q3
+++        diff   d18, d25, d24, d16
+++        // -diff1
+++        vext.s8 q0, q13, q14, #1
+++        vext.s8 q1, q14, q9, #1
+++
+++        vsub.s8 q0, q13, q0 //diff0 + diff1
+++        vsub.s8 q1, q14, q1
+++        table32
++         bne     1b
+++        vpop {q4-q7}
+++
++         bx      lr
++ endfunc
++ 
++ function ff_hevc_sao_edge_eo1_w32_neon_8, export=1
++         init_edge_32
+++        vpush {q4-q7}
++         // load a
++         sub     r1, r3
++         vld1.8  {q0-q1}, [r1, :128], r3
++         // load c
++         vld1.8  {q2-q3}, [r1, :128], r3
+++        diff32 q12, q13, q0, q1, q0, q1, q2, q3 // CMP ( c, a )
++ 1:      subs    r12, #1
++         // load b
++         vld1.8  {q8-q9}, [r1, :128], r3
++-        edge_w32_body
++-        // inputs for next loop iteration
++-        // a
++-        vmov.64 q0, q2
++-        vmov.64 q1, q3
+++        diff32 q4, q5, q10, q11, q8, q9, q2, q3 // CMP ( c, b )
+++        vadd.s8 q0, q4, q12 //diff0 + diff1
+++        vadd.s8 q1, q5, q13
+++        table32
+++        // CMP ( c, a )
+++        vneg.s8 q12, q4
+++        vneg.s8 q13, q5
++         // c
++         vmov.64 q2, q8
++         vmov.64 q3, q9
++         bne     1b
+++        vpop {q4-q7}
++         bx      lr
++ endfunc
++ 
++@@ -452,7 +449,11 @@ function ff_hevc_sao_edge_eo2_w32_neon_8, export=1
++         vext.8  q6, q10, q11, #8
++         vext.8  q7, q11, q12, #8
++         vext.8  q5, q10, q11, #7
++-        edge_w32_body
+++        diff32 q12, q13, q0, q1, q0, q1, q2, q3
+++        diff32 q0, q1, q10, q11, q8, q9, q2, q3
+++        vadd.s8 q0, q12 //diff0 + diff1
+++        vadd.s8 q1, q13
+++        table32
++         // inputs for next loop iteration
++         // a
++         vmov.8  q0, q4
++@@ -487,7 +488,14 @@ function ff_hevc_sao_edge_eo3_w32_neon_8, export=1
++         vext.8  q8, q10, q11, #7
++         vext.8  q9, q11, q12, #7
++         vext.8  q14, q12, q10, #7
++-        edge_w32_body
+++
+++        diff32 q12, q13, q0, q1, q0, q1, q2, q3
+++        diff32 q0, q1, q10, q11, q8, q9, q2, q3
+++
+++        vadd.s8 q0, q12 //diff0 + diff1
+++        vadd.s8 q1, q13
+++        table32
+++
++         // inputs for next loop iteration
++         // a
++         vext.8  q0, q2, q3, #1
++-- 
++2.5.0
++
+diff --git a/tools/depends/target/ffmpeg/hevcdsp_ARM_NEON_optimized_epel_functions.patch b/tools/depends/target/ffmpeg/hevcdsp_ARM_NEON_optimized_epel_functions.patch
+new file mode 100644
+index 0000000..5e8e07d
+--- /dev/null
++++ b/tools/depends/target/ffmpeg/hevcdsp_ARM_NEON_optimized_epel_functions.patch
+@@ -0,0 +1,409 @@
++From 29c3327a0d72a7e872ff170363cfe5ed13bca5d0 Mon Sep 17 00:00:00 2001
++From: Seppo Tomperi <seppo.tomperi@vtt.fi>
++Date: Tue, 22 Dec 2015 18:10:24 +0000
++Subject: [PATCH] hevcdsp: ARM NEON optimized epel functions
++
++---
++ libavcodec/arm/Makefile            |   1 +
++ libavcodec/arm/hevcdsp_epel_neon.S | 334 +++++++++++++++++++++++++++++++++++++
++ libavcodec/arm/hevcdsp_init_neon.c |  23 +++
++ 3 files changed, 358 insertions(+)
++ create mode 100644 libavcodec/arm/hevcdsp_epel_neon.S
++
++diff --git a/libavcodec/arm/Makefile b/libavcodec/arm/Makefile
++index cdd35b0..6051ec8 100644
++--- a/libavcodec/arm/Makefile
+++++ b/libavcodec/arm/Makefile
++@@ -131,6 +131,7 @@ NEON-OBJS-$(CONFIG_DCA_DECODER)        += arm/dcadsp_neon.o             \
++                                           arm/synth_filter_neon.o
++ NEON-OBJS-$(CONFIG_HEVC_DECODER)       += arm/hevcdsp_init_neon.o       \
++                                           arm/hevcdsp_deblock_neon.o    \
+++                                          arm/hevcdsp_epel_neon.o       \
++                                           arm/hevcdsp_idct_neon.o       \
++                                           arm/hevcdsp_qpel_neon.o
++ NEON-OBJS-$(CONFIG_RV30_DECODER)       += arm/rv34dsp_neon.o
++diff --git a/libavcodec/arm/hevcdsp_epel_neon.S b/libavcodec/arm/hevcdsp_epel_neon.S
++new file mode 100644
++index 0000000..516ae5b
++--- /dev/null
+++++ b/libavcodec/arm/hevcdsp_epel_neon.S
++@@ -0,0 +1,334 @@
+++/*
+++ * Copyright (c) 2014 - 2015 Seppo Tomperi <seppo.tomperi@vtt.fi>
+++ *
+++ * This file is part of FFmpeg.
+++ *
+++ * FFmpeg is free software; you can redistribute it and/or
+++ * modify it under the terms of the GNU Lesser General Public
+++ * License as published by the Free Software Foundation; either
+++ * version 2.1 of the License, or (at your option) any later version.
+++ *
+++ * FFmpeg is distributed in the hope that it will be useful,
+++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+++ * Lesser General Public License for more details.
+++ *
+++ * You should have received a copy of the GNU Lesser General Public
+++ * License along with FFmpeg; if not, write to the Free Software
+++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+++ */
+++
+++#include "libavutil/arm/asm.S"
+++#include "neon.S"
+++
+++#define MAX_PB_SIZE #64
+++
+++.macro vextin_d4
+++    vld1.8    {q10}, [r1], r2
+++    vmov      d16, d20
+++    vext.8    d17, d20, d21, #1
+++    vext.8    d18, d20, d21, #2
+++    vext.8    d19, d20, d21, #3
+++.endm
+++
+++.macro vextin_d4_8
+++    vld1.8    d16, [r1], r2
+++    vext.8    d17, d16, d16, #1
+++    vext.8    d18, d16, d16, #2
+++    vext.8    d19, d16, d16, #3
+++.endm
+++
+++.macro load_coeffs_16b coeffs
+++    ldr      \coeffs, [\coeffs]
+++    vdup.i8  d0, \coeffs
+++    lsr      \coeffs, #8
+++    vdup.i8  d1, \coeffs
+++    lsr      \coeffs, #8
+++    vdup.i8  d2, \coeffs
+++    lsr      \coeffs, #8
+++    vdup.i8  d3, \coeffs
+++.endm
+++
+++.macro epel_filter_16b out=q12
+++    vmull.u8 q3, d16, d0
+++    vmull.u8 q11, d19, d3
+++    vmull.u8 \out, d17, d1
+++    vmull.u8 q10, d18, d2
+++    vadd.s16 q3, q11
+++    vadd.s16 \out, q10
+++    vsub.s16 \out, q3
+++.endm
+++
+++.macro load_coeffs_32b coeffs
+++    ldr      \coeffs, [\coeffs]
+++    vmov.i64 d4, #0
+++    vmov.8   d4[0], \coeffs
+++    lsr      \coeffs, #8
+++    vmov.8   d4[2], \coeffs
+++    lsr      \coeffs, #8
+++    vmov.8   d4[4], \coeffs
+++    lsr      \coeffs, #8
+++    vmov.8   d4[6], \coeffs
+++.endm
+++
+++.macro epel_filter_32b
+++    vmull.s16 q3, d24, d4[0] //q12
+++    vmull.s16 q4, d25, d4[0]
+++    vmull.s16 q5, d30, d4[3] //q15
+++    vmull.s16 q6, d31, d4[3]
+++
+++    vmull.s16 q7, d26, d4[1] // q13
+++    vmull.s16 q8, d27, d4[1]
+++    vmull.s16 q9, d28, d4[2] // q14
+++    vmull.s16 q10, d29, d4[2]
+++    vadd.s32 q3, q5
+++    vadd.s32 q4, q6
+++    vadd.s32 q7, q9
+++    vadd.s32 q8, q10
+++    vsub.s32 q7, q3
+++    vsub.s32 q8, q4
+++    vqshrn.s32  d6, q7, #6
+++    vqshrn.s32  d7, q8, #6
+++.endm
+++
+++.macro epel_filter_32b_4
+++    vmull.s16 q3, d24, d4[0] //q12
+++    vmull.s16 q5, d30, d4[3] //q15
+++    vmull.s16 q7, d26, d4[1] // q13
+++    vmull.s16 q9, d28, d4[2] // q14
+++    vadd.s32 q3, q5
+++    vadd.s32 q7, q9
+++    vsub.s32 q7, q3
+++    vqshrn.s32  d6, q7, #6
+++.endm
+++
+++function ff_hevc_put_epel_h_neon_8, export=1
+++        push   {r4-r7}
+++        mov    r4, MAX_PB_SIZE
+++        ldr    r7, [sp, #16] // mx
+++        ldr    r5, [sp, #24] // width
+++        sub    r7, #1
+++        lsl    r7, #2
+++        vpush {d8-d15}
+++        adrl   r12, epel_coeffs
+++        add    r7, r12
+++        sub       r1, #1
+++        lsl       r4, #1
+++        load_coeffs_16b r7
+++        mov   r12, r3
+++        mov   r6, r0
+++        mov   r7, r1
+++        cmp       r5, #6
+++        bgt       8f
+++        cmp       r5, #4
+++        blt       2f
+++        b         4f
+++8:      subs r3, #1
+++        pld [r1]
+++        vextin_d4
+++        epel_filter_16b
+++        vst1.16    {q12}, [r0], r4
+++        bne 8b
+++        subs    r5, #8
+++        beq  99f
+++        mov       r3, r12
+++        add       r6, #16
+++        mov       r0, r6
+++        add       r7, #8
+++        mov       r1, r7
+++        cmp       r5, #4
+++        bgt       8b
+++4:      subs r3, #1
+++        pld [r1]
+++        vextin_d4_8
+++        epel_filter_16b
+++        vst1.16    d24, [r0], r4
+++        bne 4b
+++        subs      r5, #4
+++        beq       99f
+++        mov       r3, r12
+++        add       r6, #8
+++        mov       r0, r6
+++        add       r7, #4
+++        mov       r1, r7
+++2:      subs r3, #1
+++        pld [r1]
+++        vextin_d4_8
+++        epel_filter_16b
+++        vst1.32    d24[0], [r0], r4
+++        bne 2b
+++99:     vpop {d8-d15}
+++        pop {r4-r7}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_put_epel_v_neon_8, export=1
+++        push   {r4-r7}
+++        mov    r4, MAX_PB_SIZE
+++        ldr    r7, [sp, #20] // my
+++        ldr    r5, [sp, #24] // width
+++        sub    r7, #1
+++        lsl    r7, #2
+++        vpush {d8-d15}
+++        adrl   r12, epel_coeffs
+++        add    r7, r12
+++        load_coeffs_16b r7
+++        sub       r1, r2
+++        lsl       r4, #1
+++        mov   r12, r3
+++        mov   r6, r0
+++        mov   r7, r1
+++0:      pld [r1]
+++        vld1.8    {d16}, [r1], r2
+++        pld [r1]
+++        vld1.8    {d17}, [r1], r2
+++        pld [r1]
+++        vld1.8    {d18}, [r1], r2
+++        cmp       r5, #6
+++        bgt       8f
+++        cmp       r5, #4
+++        blt       2f
+++        b         4f
+++8:      pld [r1]
+++        vld1.8    {d19}, [r1], r2
+++        subs r3, #1
+++        epel_filter_16b
+++        vst1.16    {q12}, [r0], r4
+++        vmov d16, d17
+++        vmov d17, d18
+++        vmov d18, d19
+++        bne 8b
+++        subs    r5, #8
+++        beq  99f
+++        mov       r3, r12
+++        add       r6, #16
+++        mov       r0, r6
+++        add       r7, #8
+++        mov       r1, r7
+++        b         0b
+++4:      pld       [r1]
+++        vld1.8    {d19}, [r1], r2
+++        subs r3, #1
+++        epel_filter_16b
+++        vst1.16    d24, [r0], r4
+++        vmov d16, d17
+++        vmov d17, d18
+++        vmov d18, d19
+++        bne 4b
+++        subs      r5, #4
+++        beq       99f
+++        mov       r3, r12
+++        add       r6, #8
+++        mov       r0, r6
+++        add       r7, #4
+++        mov       r1, r7
+++        b         0b
+++2:      pld [r1]
+++        vld1.8    {d19}, [r1], r2
+++        subs r3, #1
+++        epel_filter_16b
+++        vst1.32    d24[0], [r0], r4
+++        vmov d16, d17
+++        vmov d17, d18
+++        vmov d18, d19
+++        bne 2b
+++99:     vpop {d8-d15}
+++        pop {r4-r7}
+++        bx lr
+++endfunc
+++
+++function ff_hevc_put_epel_hv_neon_8, export=1
+++        push   {r4-r7}
+++        mov    r4, MAX_PB_SIZE
+++        ldr    r6, [sp, #16] // mx
+++        ldr    r7, [sp, #20] // my
+++        ldr    r5, [sp, #24] // width
+++        sub    r7, #1
+++        lsl    r7, #2
+++        vpush {d8-d15}
+++        adrl   r12, epel_coeffs
+++        sub    r6, #1
+++        lsl    r6, #2
+++        add    r6, r12 // mx epel coeff offset
+++        add    r7, r12
+++        sub       r1, #1
+++        sub       r1, r2
+++        lsl       r4, #1
+++        load_coeffs_16b r6
+++        load_coeffs_32b r7
+++        mov   r12, r3
+++        mov   r6, r0
+++        mov   r7, r1
+++0:      pld   [r1]
+++        vextin_d4
+++        epel_filter_16b q12
+++        pld   [r1]
+++        vextin_d4
+++        epel_filter_16b q13
+++        pld   [r1]
+++        vextin_d4
+++        epel_filter_16b q14
+++        cmp       r5, #6
+++        bgt       8f
+++        cmp       r5, #4
+++        blt       2f
+++        b         4f
+++8:      pld     [r1]
+++        vextin_d4
+++        epel_filter_16b q15
+++        subs r3, #1
+++        epel_filter_32b
+++        vst1.16    {q3}, [r0], r4
+++        vmov q12, q13
+++        vmov q13, q14
+++        vmov q14, q15
+++        bne 8b
+++        subs    r5, #8
+++        beq  99f
+++        mov       r3, r12
+++        add       r6, #16
+++        mov       r0, r6
+++        add       r7, #8
+++        mov       r1, r7
+++        b         0b
+++4:      pld      [r1]
+++        vextin_d4_8
+++        epel_filter_16b q15
+++        subs r3, #1
+++        epel_filter_32b_4
+++        vst1.16    d6, [r0], r4
+++        vmov q12, q13
+++        vmov q13, q14
+++        vmov q14, q15
+++        bne 4b
+++        subs      r5, #4
+++        beq       99f
+++        mov       r3, r12
+++        add       r6, #8
+++        mov       r0, r6
+++        add       r7, #4
+++        mov       r1, r7
+++        b         0b
+++2:      pld      [r1]
+++        vextin_d4_8
+++        epel_filter_16b q15
+++        subs r3, #1
+++        epel_filter_32b_4
+++        vst1.32    d6[0], [r0], r4
+++        vmov q12, q13
+++        vmov q13, q14
+++        vmov q14, q15
+++        bne 2b
+++99:     vpop {d8-d15}
+++        pop {r4-r7}
+++        bx lr
+++endfunc
+++
+++epel_coeffs:
+++       .byte 2, 58, 10, 2
+++       .byte 4, 54, 16, 2
+++       .byte 6, 46, 28, 4
+++       .byte 4, 36, 36, 4
+++       .byte 4, 28, 46, 6
+++       .byte 2, 16, 54, 4
+++       .byte 2, 10, 58, 2
++diff --git a/libavcodec/arm/hevcdsp_init_neon.c b/libavcodec/arm/hevcdsp_init_neon.c
++index 5591807..733ff08 100644
++--- a/libavcodec/arm/hevcdsp_init_neon.c
+++++ b/libavcodec/arm/hevcdsp_init_neon.c
++@@ -58,6 +58,15 @@ PUT_PIXELS(ff_hevc_put_pixels_w32_neon_8);
++ PUT_PIXELS(ff_hevc_put_pixels_w48_neon_8);
++ PUT_PIXELS(ff_hevc_put_pixels_w64_neon_8);
++ #undef PUT_PIXELS
+++void ff_hevc_put_epel_h_neon_8(int16_t *dst, uint8_t *src,
+++                                ptrdiff_t srcstride, int height,
+++                                intptr_t mx, intptr_t my, int width);
+++void ff_hevc_put_epel_v_neon_8(int16_t *dst, uint8_t *src,
+++                                ptrdiff_t srcstride, int height,
+++                                intptr_t mx, intptr_t my, int width);
+++void ff_hevc_put_epel_hv_neon_8(int16_t *dst, uint8_t *src,
+++                                ptrdiff_t srcstride, int height,
+++                                intptr_t mx, intptr_t my, int width);
++ 
++ static void (*put_hevc_qpel_neon[4][4])(int16_t *dst, ptrdiff_t dststride, uint8_t *src, ptrdiff_t srcstride,
++                                    int height, int width);
++@@ -201,7 +210,21 @@ av_cold void ff_hevcdsp_init_neon(HEVCDSPContext *c, const int bit_depth)
++             c->put_hevc_qpel_bi[x][1][0]      = ff_hevc_put_qpel_bi_neon_wrapper;
++             c->put_hevc_qpel_bi[x][0][1]      = ff_hevc_put_qpel_bi_neon_wrapper;
++             c->put_hevc_qpel_bi[x][1][1]      = ff_hevc_put_qpel_bi_neon_wrapper;
+++            c->put_hevc_epel[x][1][0]         = ff_hevc_put_epel_v_neon_8;
+++            c->put_hevc_epel[x][0][1]         = ff_hevc_put_epel_h_neon_8;
+++            c->put_hevc_epel[x][1][1]         = ff_hevc_put_epel_hv_neon_8;
++         }
+++        c->put_hevc_epel[0][0][0]  = ff_hevc_put_pixels_w2_neon_8;
+++        c->put_hevc_epel[1][0][0]  = ff_hevc_put_pixels_w4_neon_8;
+++        c->put_hevc_epel[2][0][0]  = ff_hevc_put_pixels_w6_neon_8;
+++        c->put_hevc_epel[3][0][0]  = ff_hevc_put_pixels_w8_neon_8;
+++        c->put_hevc_epel[4][0][0]  = ff_hevc_put_pixels_w12_neon_8;
+++        c->put_hevc_epel[5][0][0]  = ff_hevc_put_pixels_w16_neon_8;
+++        c->put_hevc_epel[6][0][0]  = ff_hevc_put_pixels_w24_neon_8;
+++        c->put_hevc_epel[7][0][0]  = ff_hevc_put_pixels_w32_neon_8;
+++        c->put_hevc_epel[8][0][0]  = ff_hevc_put_pixels_w48_neon_8;
+++        c->put_hevc_epel[9][0][0]  = ff_hevc_put_pixels_w64_neon_8;
+++
++         c->put_hevc_qpel[0][0][0]  = ff_hevc_put_pixels_w2_neon_8;
++         c->put_hevc_qpel[1][0][0]  = ff_hevc_put_pixels_w4_neon_8;
++         c->put_hevc_qpel[2][0][0]  = ff_hevc_put_pixels_w6_neon_8;
++-- 
++2.5.0
++
+-- 
+2.1.0
+
+
+From b9c930d078fda8d5f8ebdc1a1ef9fe873f3bbd15 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Thu, 7 May 2015 14:04:18 +0100
+Subject: [PATCH 64/70] Add GPU acceleration to hevc
+
+---
+ tools/depends/target/ffmpeg/Makefile               |     4 +-
+ .../target/ffmpeg/pfcd_hevc_optimisations.patch    | 37481 +++++++++++++++++++
+ 2 files changed, 37484 insertions(+), 1 deletion(-)
+ create mode 100644 tools/depends/target/ffmpeg/pfcd_hevc_optimisations.patch
+
+diff --git a/tools/depends/target/ffmpeg/Makefile b/tools/depends/target/ffmpeg/Makefile
+index 17dc1fd..bb8358e 100644
+--- a/tools/depends/target/ffmpeg/Makefile
++++ b/tools/depends/target/ffmpeg/Makefile
+@@ -4,7 +4,8 @@ DEPS= ../../Makefile.include FFMPEG-VERSION Makefile ffmpeg_Speed_up_wtv_index_c
+   0001-mpeg4video-Signal-unsupported-GMC-with-more-than-one.patch \
+   0001-Discard-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch \
+   0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch \
+-  hevcdsp_ARM_NEON_optimized_epel_functions.patch added_ARM_NEON_optimized_SAO_patches.patch
++  hevcdsp_ARM_NEON_optimized_epel_functions.patch added_ARM_NEON_optimized_SAO_patches.patch \
 +  pfcd_hevc_optimisations.patch
  
  # set to "yes" to enable patching
  # we don't apply patches until we move to a vanilla ffmpeg tarball
-@@ -81,6 +82,13 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
- 	cd $(PLATFORM); patch -p1 < ../0001-mpeg4video-Signal-unsupported-GMC-with-more-than-one.patch
- 	cd $(PLATFORM); patch -p1 < ../0001-Discard-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch
+@@ -84,6 +85,7 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
  	cd $(PLATFORM); patch -p1 < ../0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch
-+<<<<<<< HEAD
-+=======
-+	cd $(PLATFORM); patch -p1 < ../hevcdsp_ARM_NEON_optimized_epel_functions.patch
-+	cd $(PLATFORM); patch -p1 < ../added_ARM_NEON_optimized_SAO_patches.patch
+ 	cd $(PLATFORM); patch -p1 < ../hevcdsp_ARM_NEON_optimized_epel_functions.patch
+ 	cd $(PLATFORM); patch -p1 < ../added_ARM_NEON_optimized_SAO_patches.patch
 +	cd $(PLATFORM); patch -p1 < ../pfcd_hevc_optimisations.patch
-+
-+>>>>>>> 642ed04... Add GPU acceleration to hevc
+ 
  	cd $(PLATFORM);\
  	CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
- 	./configure $(ffmpg_config)
 diff --git a/tools/depends/target/ffmpeg/pfcd_hevc_optimisations.patch b/tools/depends/target/ffmpeg/pfcd_hevc_optimisations.patch
 new file mode 100644
 index 0000000..ae06b37
@@ -44920,10 +48704,10 @@ index 0000000..ae06b37
 2.1.0
 
 
-From 2f4afae74205afef6b76d0918c319346b1c7bf79 Mon Sep 17 00:00:00 2001
+From 6ee45e313813f9470283dc6dbc85785c7b1993de Mon Sep 17 00:00:00 2001
 From: Rainer Hochecker <fernetmenta@online.de>
 Date: Tue, 14 Jul 2015 08:30:44 +0200
-Subject: [PATCH 64/69] fix high cpu load caused by false positive frame
+Subject: [PATCH 65/70] fix high cpu load caused by false positive frame
  limiter
 
 ---
@@ -44998,10 +48782,10 @@ index 249e02e..5daeee5 100644
 2.1.0
 
 
-From a4d4b2a929c33897105535334e138e4d4827ae2b Mon Sep 17 00:00:00 2001
+From a944eabd308e3769133ec0ac74855173fc6072df Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 5 Aug 2015 13:43:25 +0100
-Subject: [PATCH 65/69] Avoid busy spinning when queue is empty
+Subject: [PATCH 66/70] Avoid busy spinning when queue is empty
 
 ---
  xbmc/cores/dvdplayer/DVDPlayerAudio.cpp | 2 ++
@@ -45024,10 +48808,10 @@ index 97a23a6..9f21a19 100644
 2.1.0
 
 
-From 6f9cbfd0c4989156a9749471a6afa6441911df17 Mon Sep 17 00:00:00 2001
+From 8ee3db0a8cb7f6d464402baa1364fa0e3407c38e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 6 Aug 2015 11:23:05 +0100
-Subject: [PATCH 66/69] Make sync playback to display the default option
+Subject: [PATCH 67/70] Make sync playback to display the default option
 
 ---
  system/settings/rbp.xml | 7 +++++++
@@ -45055,10 +48839,10 @@ index 2133b83..05131b7 100644
 2.1.0
 
 
-From c61d55c84306699568648b18fb09d274fb806000 Mon Sep 17 00:00:00 2001
+From 8b52cf3c90e3ec9d5ab3f676c8ef560e4b4a718b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 8 Sep 2015 23:42:30 +0100
-Subject: [PATCH 67/69] Fixing initialisation issue found on Raspberry Pi with
+Subject: [PATCH 68/70] Fixing initialisation issue found on Raspberry Pi with
  Buildroot
 
 ---
@@ -45113,10 +48897,10 @@ index 0000000..8f289f2
 2.1.0
 
 
-From 30912db470b960cd4a6e46a7cfc88c0daf36b5ec Mon Sep 17 00:00:00 2001
+From 77857df30e01329927179fbe4a0c7830efedbe05 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 9 Dec 2015 13:31:14 +0000
-Subject: [PATCH 68/69] Fail to open when width is invalid. Can happen with
+Subject: [PATCH 69/70] Fail to open when width is invalid. Can happen with
  mpegts files
 
 ---
@@ -45142,10 +48926,10 @@ index 3836985..5afb11b 100644
 2.1.0
 
 
-From 17eb4fb9d735b42468a490835af313d033c29016 Mon Sep 17 00:00:00 2001
+From d11e431bd328690d7b14bf000bd9cdb9c312ccd9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 21 Dec 2015 18:34:06 +0000
-Subject: [PATCH 69/69] Force a SetVideoRect after a reconfigure
+Subject: [PATCH 70/70] Force a SetVideoRect after a reconfigure
 
 There has been an issue with dvd stills and a hdmi refresh rate change.
 The hdmi mode change loses the currently displayed picture.
