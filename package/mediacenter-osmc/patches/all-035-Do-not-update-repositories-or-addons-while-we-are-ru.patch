@@ -1,27 +1,27 @@
-From e20727621d8cc7e61d2d0f11ee2759070b3f275e Mon Sep 17 00:00:00 2001
+From 2b0cea54adce6777321f20960be87b011d7b6a36 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:52:20 +0100
-Subject: [PATCH 7/7] Do not update repositories or addons while we are running
- the OSMC Walkthrough
+Subject: [PATCH] Do not update repositories or addons while we are running the
+ OSMC Walkthrough
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 2 +-
+ xbmc/addons/RepositoryUpdater.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 183aa5f..16780fc 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -4336,7 +4336,7 @@ void CApplication::ProcessSlow()
-   g_mediaManager.ProcessEvents();
+diff --git a/xbmc/addons/RepositoryUpdater.cpp b/xbmc/addons/RepositoryUpdater.cpp
+index 4b1acd9..670002f 100644
+--- a/xbmc/addons/RepositoryUpdater.cpp
++++ b/xbmc/addons/RepositoryUpdater.cpp
+@@ -181,7 +181,7 @@ void CRepositoryUpdater::ScheduleUpdate()
+   CSingleLock lock(m_criticalSection);
+   m_timer.Stop(true);
  
-   if (!m_pPlayer->IsPlayingVideo() &&
--      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER)
-+      CSettings::Get().GetInt("general.addonupdates") != AUTO_UPDATES_NEVER && m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISDONE)
-     CAddonInstaller::Get().UpdateRepos();
+-  if (CSettings::GetInstance().GetInt(CSettings::SETTING_GENERAL_ADDONUPDATES) == AUTO_UPDATES_NEVER)
++  if (CSettings::GetInstance().GetInt(CSettings::SETTING_GENERAL_ADDONUPDATES) == AUTO_UPDATES_NEVER || g_application.m_eOSMCWalkthroughState != 2)
+     return;
  
-   CAEFactory::GarbageCollect();
+   if (!CAddonMgr::GetInstance().HasAddons(ADDON_REPOSITORY))
 -- 
 2.1.0
 

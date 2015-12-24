@@ -1,4 +1,4 @@
-From 7b338d22594e7489ed2cf57466613c814541176c Mon Sep 17 00:00:00 2001
+From 565e7a8552278516462d3f3690f0dbb16f9ff610 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 3 Jun 2015 16:09:50 +0100
 Subject: [PATCH] Hide Vero serial number and temperature
@@ -9,12 +9,12 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 7 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 604a0d9..6d36e88 100644
+index 0ce6f87..bb39455 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -150,13 +150,6 @@ void CGUIWindowSystemInfo::FrameMove()
+@@ -145,13 +145,6 @@ void CGUIWindowSystemInfo::FrameMove()
+   {
      SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
- #ifdef HAS_SYSINFO
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
 -#if defined(__arm__) && defined(TARGET_LINUX)
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());

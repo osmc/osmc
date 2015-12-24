@@ -1,20 +1,20 @@
-From a19b6fc83a6ab28b08eae0de08202e2542940f24 Mon Sep 17 00:00:00 2001
+From 08e2e5616ae26a7ac6b80a4af2a6bcbb3dd24af6 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp |  7 +++++++
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  9 +++++++++
  xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ 2 files changed, 21 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index e2eab38..94cf810 100644
+index 5bf91e5..5eb91bc 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -124,6 +124,13 @@ namespace XBMCAddon
-       CSettings::Get().SetString("lookandfeel.skin", skin);
+@@ -124,6 +124,15 @@ namespace XBMCAddon
+       CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
      }
  
 +    void sethostname(const char* hostname)
@@ -22,13 +22,15 @@ index e2eab38..94cf810 100644
 +      XBMC_TRACE;
 +      if (! hostname)
 +      return;
-+      CSettings::Get().SetString("services.devicename", hostname);
++      CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
 +    }
- 
++
++
      String executeJSONRPC(const char* jsonrpccommand)
      {
+       XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index a5f0656..c017523 100644
+index b2f044f..0fede41 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
 @@ -127,6 +127,18 @@ namespace XBMCAddon

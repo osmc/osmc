@@ -1,6 +1,8 @@
+diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
+index b029746..b28216e 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-@@ -255,12 +255,10 @@
+@@ -256,12 +256,10 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
    SysfsUtils::SetString("/sys/class/graphics/fb0/mode", res.strId + "\n");
  
    CreateNativeDisplay();
@@ -14,11 +16,18 @@
    return true;
  }
  
-@@ -329,12 +327,6 @@
+@@ -320,6 +318,7 @@ bool CEGLNativeTypeIMX::GetPreferredResolution(RESOLUTION_INFO *res) const
+ 
+ bool CEGLNativeTypeIMX::ShowWindow(bool show)
+ {
++
+   // Force vsync by default
+   if (m_show == show)
+     return true;
+@@ -331,11 +330,6 @@ bool CEGLNativeTypeIMX::ShowWindow(bool show)
    if (!show)
      return true;
  
--  // Force vsync by default
 -  eglSwapInterval(g_Windowing.GetEGLDisplay(), 1);
 -  EGLint result = eglGetError();
 -  if(result != EGL_SUCCESS)

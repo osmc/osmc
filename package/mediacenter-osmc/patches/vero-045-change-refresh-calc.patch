@@ -1,18 +1,18 @@
-From 67552b34e14965e5bd53bea4324e6344108d127e Mon Sep 17 00:00:00 2001
+From 617e0e09186f5efea779be411bff1e9e2de5d5ef Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Sat, 25 Jul 2015 16:26:58 +0200
-Subject: [PATCH] [EGLIMX] Change fractional modes refresh calculation
+Subject: [PATCH] Change fractional modes refresh calculation
 
 ---
  xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 18 ++++++++++++++++--
  1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-index be1ebd8..fec11d5 100644
+index bd0abed..027b45d 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-@@ -471,6 +471,19 @@ bool CEGLNativeTypeIMX::set_sysfs_str(std::string path, std::string val) const
-   return true;
+@@ -412,6 +412,19 @@ void CEGLNativeTypeIMX::GetMonitorSAR()
+     CLog::Log(LOGDEBUG, "%s: Screen SAR - not usable info",__FUNCTION__);
  }
  
 +inline double roundf_n(double dval, int n)
@@ -31,7 +31,7 @@ index be1ebd8..fec11d5 100644
  bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res) const
  {
    if (!res)
-@@ -512,9 +525,10 @@ bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res)
+@@ -453,9 +466,10 @@ bool CEGLNativeTypeIMX::ModeToResolution(std::string mode, RESOLUTION_INFO *res)
    res->iHeight= h;
    res->iScreenWidth = w;
    res->iScreenHeight= h;
@@ -44,3 +44,6 @@ index be1ebd8..fec11d5 100644
    res->dwFlags |= p[0] == 'p' ? D3DPRESENTFLAG_PROGRESSIVE : D3DPRESENTFLAG_INTERLACED;
  
    res->iScreen       = 0;
+-- 
+2.1.0
+

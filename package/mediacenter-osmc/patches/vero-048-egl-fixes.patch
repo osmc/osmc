@@ -1,15 +1,15 @@
-From a3b4c62ec9ad2b5f46510638fc6e3694ad9968e0 Mon Sep 17 00:00:00 2001
+From 287bc1052dda58b330a274cc99112ec35420b462 Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Mon, 27 Jul 2015 15:02:22 +0200
-Subject: [PATCH 1/4] [IMX] EGL - Introduce blank/unblank steps.
+Subject: [PATCH 1/4] EGL - Introduce blank/unblank steps.
 
 ---
- xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 22 +++++++++++++++-------
+ xbmc/windowing/egl/EGLNativeTypeIMX.cpp | 21 +++++++++++++++------
  xbmc/windowing/egl/EGLNativeTypeIMX.h   |  1 +
- 2 files changed, 16 insertions(+), 7 deletions(-)
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
-index 9b35512..c6b9a82 100644
+index 027b45d..f9f492e 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.cpp
 @@ -41,7 +41,8 @@
@@ -22,21 +22,19 @@ index 9b35512..c6b9a82 100644
    , m_display(NULL)
    , m_window(NULL)
  {
-@@ -123,12 +124,8 @@ void CEGLNativeTypeIMX::Initialize()
-   if (ioctl(fd, MXCFB_SET_CLR_KEY, &colorKey) < 0)
+@@ -124,10 +125,7 @@ void CEGLNativeTypeIMX::Initialize()
      CLog::Log(LOGERROR, "%s - Failed to setup color keying\n", __FUNCTION__);
  #endif
--  // Unblank the fb
+   // Unblank the fb
 -  if (ioctl(fd, FBIOBLANK, 0) < 0)
 -  {
 -    CLog::Log(LOGERROR, "%s - Error while unblanking fb0.\n", __FUNCTION__);
 -  }
- 
 +  ShowWindow(false);
-   close(fd);
  
-   m_sar = GetMonitorSAR();
-@@ -256,6 +253,7 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
+   close(fd);
+   return;
+@@ -254,6 +252,7 @@ bool CEGLNativeTypeIMX::SetNativeResolution(const RESOLUTION_INFO &res)
    DestroyNativeWindow();
    DestroyNativeDisplay();
  
@@ -44,10 +42,10 @@ index 9b35512..c6b9a82 100644
    SysfsUtils::SetString("/sys/class/graphics/fb0/mode", res.strId + "\n");
  
    CreateNativeDisplay();
-@@ -320,13 +318,23 @@ bool CEGLNativeTypeIMX::GetPreferredResolution(RESOLUTION_INFO *res) const
- 
+@@ -322,12 +321,22 @@ bool CEGLNativeTypeIMX::GetPreferredResolution(RESOLUTION_INFO *res) const
  bool CEGLNativeTypeIMX::ShowWindow(bool show)
  {
+   // Force vsync by default
 +  if (m_show == show)
 +    return true;
 +
@@ -58,7 +56,6 @@ index 9b35512..c6b9a82 100644
 +  if (!show)
 +    return true;
 +
-   // Force vsync by default
    eglSwapInterval(g_Windowing.GetEGLDisplay(), 1);
    EGLint result = eglGetError();
    if(result != EGL_SUCCESS)
@@ -68,12 +65,12 @@ index 9b35512..c6b9a82 100644
 +  return true;
  }
  
- float CEGLNativeTypeIMX::GetMonitorSAR()
+ float CEGLNativeTypeIMX::ValidateSAR(struct dt_dim *dtm, bool mb)
 diff --git a/xbmc/windowing/egl/EGLNativeTypeIMX.h b/xbmc/windowing/egl/EGLNativeTypeIMX.h
-index ca738e3..9c7ca37 100644
+index 88a5d5c..2789c38 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeIMX.h
 +++ b/xbmc/windowing/egl/EGLNativeTypeIMX.h
-@@ -54,6 +54,7 @@ class CEGLNativeTypeIMX : public CEGLNativeType
+@@ -62,6 +62,7 @@ public:
  
  protected:
    bool m_readonly;
@@ -81,11 +78,14 @@ index ca738e3..9c7ca37 100644
    float m_sar;
    bool ModeToResolution(std::string mode, RESOLUTION_INFO *res) const;
    bool FindMatchingResolution(const RESOLUTION_INFO &res, const std::vector<RESOLUTION_INFO> &resolutions);
+-- 
+2.1.0
 
-From f828b63368f251747365804b3f043dca3c7d77bb Mon Sep 17 00:00:00 2001
+
+From d0d04ca77a8a98c5fedbfda04658d46a83ea23f7 Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Mon, 27 Jul 2015 15:03:39 +0200
-Subject: [PATCH 2/4] [WinEGL] call OnDeviceReset() before screen is unblanked.
+Subject: [PATCH 2/4] call OnDeviceReset() before screen is unblanked.
 
 This way any other changes during OnDeviceReset()
 (of registered resources) will become activated
@@ -95,7 +95,7 @@ on unblank (Show()).
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/windowing/egl/WinSystemEGL.cpp b/xbmc/windowing/egl/WinSystemEGL.cpp
-index c3bdb6a..6e9cf39 100644
+index 696ded1..50c8f3c 100644
 --- a/xbmc/windowing/egl/WinSystemEGL.cpp
 +++ b/xbmc/windowing/egl/WinSystemEGL.cpp
 @@ -302,13 +302,14 @@ bool CWinSystemEGL::CreateNewWindow(const std::string& name, bool fullScreen, RE
@@ -114,12 +114,14 @@ index c3bdb6a..6e9cf39 100644
    return true;
  }
  
+-- 
+2.1.0
 
-From e3c24361a8acf06f728581c3fd49912150093a95 Mon Sep 17 00:00:00 2001
+
+From d59c8385df1ea042829c5bbfed38cc486f0f46a8 Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Mon, 27 Jul 2015 15:08:42 +0200
-Subject: [PATCH 3/4] [DVDVideoCodecIMX] Register to g_Windowing, implement
- OnDeviceReset().
+Subject: [PATCH 3/4] Register to g_Windowing, implement OnDeviceReset().
 
 Move fb1 reconfiguration to own function. Call it on g_windowing reset.
 ---
@@ -322,7 +324,7 @@ index 8a39dd8..559bea5 100644
  
  #include <vector>
  #include <linux/ipu.h>
-@@ -88,13 +89,14 @@ class CIMXBuffer {
+@@ -88,13 +89,14 @@ protected:
  
  // iMX context class that handles all iMX hardware
  // related stuff
@@ -338,7 +340,7 @@ index 8a39dd8..559bea5 100644
    bool Configure();
    bool Close();
  
-@@ -144,6 +146,8 @@ class CIMXContext : private CThread
+@@ -144,6 +146,8 @@ public:
    void *GetCaptureBuffer() const { if (m_bufferCapture) return m_bufferCapture->buf_vaddr; else return NULL; }
    void WaitCapture();
  
@@ -347,7 +349,7 @@ index 8a39dd8..559bea5 100644
  private:
    struct IPUTask
    {
-@@ -167,6 +171,8 @@ class CIMXContext : private CThread
+@@ -167,6 +171,8 @@ private:
      struct ipu_task task;
    };
  
@@ -356,7 +358,7 @@ index 8a39dd8..559bea5 100644
    bool PushTask(const IPUTask &);
    void PrepareTask(IPUTask &ipu, CIMXBuffer *source_p, CIMXBuffer *source,
                     bool topBottomFields, CRect *dest = NULL);
-@@ -213,6 +219,8 @@ class CIMXContext : private CThread
+@@ -213,6 +219,8 @@ private:
    bool                           m_CaptureDone;
    bool                           m_checkConfigRequired;
    static const int               m_fbPages;
@@ -365,12 +367,15 @@ index 8a39dd8..559bea5 100644
  };
  
  
+-- 
+2.1.0
 
-From a5b9e4574cf165785d5475c51b218bd3a5ed5b35 Mon Sep 17 00:00:00 2001
+
+From 7f92f081699c668839a7b1ef70f7ed112b529b2e Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Mon, 27 Jul 2015 15:28:38 +0200
-Subject: [PATCH 4/4] [DVDVideoCodecIMX] On deinterlacing change use standalone
- screen reconfiguration instead of restarting whole IMXContext thread.
+Subject: [PATCH 4/4] On deinterlacing change use standalone screen
+ reconfiguration instead of restarting whole IMXContext thread.
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp | 6 +++---
@@ -400,3 +405,6 @@ index 41635c2..6ef2c48 100644
    }
  }
  
+-- 
+2.1.0
+

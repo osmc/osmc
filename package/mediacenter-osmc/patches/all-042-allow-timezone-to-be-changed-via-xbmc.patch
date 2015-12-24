@@ -1,4 +1,4 @@
-From 1e4ea3f35cb23b3832d1f870800bd7dbf9045f3a Mon Sep 17 00:00:00 2001
+From b07607422bca3febc7d353978e5b4b5c93a87670 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 22 Sep 2015 01:07:46 +0100
 Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 20 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 94cf810..fdefd85 100644
+index 5eb91bc..53ece02 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -132,6 +132,14 @@ namespace XBMCAddon
-       CSettings::Get().SetString("services.devicename", hostname);
+       CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
      }
  
 +    void settimezone(const char* timezone)
@@ -22,14 +22,14 @@ index 94cf810..fdefd85 100644
 +      XBMC_TRACE;
 +      if (! timezone)
 +      return;
-+      CSettings::Get().SetString("locale.timezone", timezone);
++      CSettings::GetInstance().SetString(CSettings::SETTING_LOCALE_TIMEZONE, timezone);
 +    }
 +
+ 
      String executeJSONRPC(const char* jsonrpccommand)
      {
-       XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index c017523..8157710 100644
+index 0fede41..db92df5 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
 @@ -139,6 +139,18 @@ namespace XBMCAddon

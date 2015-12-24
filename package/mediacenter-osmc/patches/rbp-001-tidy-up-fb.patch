@@ -1,4 +1,4 @@
-From ad15f83794ef35720a3ed631ab2297294f410ccc Mon Sep 17 00:00:00 2001
+From 16dbdea8e90c9f8af80c8fffcd66fb9913f46258 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:01:21 +0100
 Subject: [PATCH] Tidy up Raspberry Pi framebuffer after Kodi EGL windowing
@@ -10,25 +10,25 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 15 insertions(+)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-index ae85484..1a79820 100644
+index c21f23e..e2c453a 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-@@ -29,6 +29,7 @@
- #include "utils/StringUtils.h"
- #include "settings/Settings.h"
+@@ -32,6 +32,7 @@
+ #include "guilib/StereoscopicsManager.h"
+ #include "rendering/RenderSystem.h"
  #include <cassert>
 +#include <stdlib.h>
  
  #ifndef __VIDEOCORE4__
  #define __VIDEOCORE4__
-@@ -102,6 +103,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
+@@ -108,6 +109,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
  
    m_DllBcmHost = new DllBcmHost;
    m_DllBcmHost->Load();
 +  CLog::Log(LOGDEBUG, "Unbind vtcon0 to save resources");
 +  FILE *fp;
 +  fp = fopen("/sys/class/vtconsole/vtcon1/bind", "w");
-+  if (fp != NULL)
++  if (fp)
 +  {
 +      fprintf(fp, "0");
 +      fclose(fp);
@@ -37,7 +37,7 @@ index ae85484..1a79820 100644
 +  }
 + else
 + {
-+      CLog::Log(LOGDEBUG, "Could not open vtcon1 for writing. You probably ran this independent of the watchdog!"); 
++      CLog::Log(LOGDEBUG, "Could not open vtcon1 for writing. You probably ran this independent of the watchdog!");
 + }
  #endif
  }

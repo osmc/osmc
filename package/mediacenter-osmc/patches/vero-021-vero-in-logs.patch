@@ -1,4 +1,4 @@
-From a9895ec4f8af347f7153c80a475d83737ff9095d Mon Sep 17 00:00:00 2001
+From c3c0e185e70e8113ae33df5d43f9922904eb7eca Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 3 Jun 2015 16:17:18 +0100
 Subject: [PATCH] Identify as Vero in Kodi logs
@@ -9,16 +9,16 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index c4ec6ca..ab43ca7 100644
+index 9933b18..2855496 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -511,6 +511,7 @@ bool CApplication::Create()
+@@ -513,6 +513,7 @@ bool CApplication::Create()
  //#elif defined(some_ID) // uncomment for special version/fork
  //  specialVersion = " (version for XXXX)";
  #endif
-+specialVersion = " (version for Vero)";
-   CLog::Log(LOGNOTICE, "Using %s %s x%d build%s", buildType.c_str(), g_infoManager.GetAppName().c_str(), g_sysinfo.GetXbmcBitness(), specialVersion.c_str());
-   CLog::Log(LOGNOTICE, "%s compiled " __DATE__ " by %s for %s %s %d-bit %s (%s)", g_infoManager.GetAppName().c_str(), g_sysinfo.GetUsedCompilerNameAndVer().c_str(), g_sysinfo.GetBuildTargetPlatformName().c_str(),
++  specialVersion = " (version for Vero)";
+   CLog::Log(LOGNOTICE, "Using %s %s x%d build%s", buildType.c_str(), CSysInfo::GetAppName().c_str(), g_sysinfo.GetXbmcBitness(), specialVersion.c_str());
+   CLog::Log(LOGNOTICE, "%s compiled " __DATE__ " by %s for %s %s %d-bit %s (%s)", CSysInfo::GetAppName().c_str(), g_sysinfo.GetUsedCompilerNameAndVer().c_str(), g_sysinfo.GetBuildTargetPlatformName().c_str(),
              g_sysinfo.GetBuildTargetCpuFamily().c_str(), g_sysinfo.GetXbmcBitness(), g_sysinfo.GetBuildTargetPlatformVersionDecoded().c_str(),
 -- 
 2.1.0
