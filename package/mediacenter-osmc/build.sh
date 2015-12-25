@@ -3,19 +3,6 @@
 
 #!/bin/bash
 
-git_to_archive()
-{
-file_contents=$(cat $1)
-if grep -q github.com $1
-then
-PKG_NAME=$(echo $file_contents | cut -f 1 -d " ")
-GIT_REPO=$(echo $file_contents | cut -f 2 -d " ")
-GIT_REV=$(echo $file_contents | cut -f 3 -d " ")
-GIT_URL=$(echo ${GIT_REPO}/archive/${GIT_REV}.zip)
-echo "${PKG_NAME} ${GIT_URL}" > $1
-fi
-}
-
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ] || [ "$1" == "vero2" ]
 then
@@ -108,7 +95,6 @@ then
 	handle_dep "libgnutls28-dev"
 	handle_dep "git"
 	handle_dep "uuid-dev"
-	handle_dep "linux-libc-dev"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
@@ -333,11 +319,6 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-	# Binary addons
-	for file in project/cmake/addons/addons/*/*.txt
-	do
-	    git_to_archive "$file"
-	done
 	pushd project/cmake/addons/
 	mkdir build
 	cd build
