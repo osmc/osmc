@@ -1,13 +1,13 @@
-From ddd8e68b482f2ca08c35fa245c8a4b61abd0a353 Mon Sep 17 00:00:00 2001
+From cc832d45e9d4ed6c1fd7f636653faf6e8aedcfdb Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Thu, 19 Nov 2015 08:03:05 +0100
 Subject: [PATCH] Add back IMX rendering from v14.
 
 ---
  .../resource.language.en_gb/resources/strings.po   |   6 +-
- xbmc/Application.cpp                               |   5 +
+ xbmc/Application.cpp                               |   9 +
  xbmc/cores/VideoRenderers/BaseRenderer.cpp         |   5 +
- xbmc/cores/VideoRenderers/BaseRenderer.h           |  21 +-
+ xbmc/cores/VideoRenderers/BaseRenderer.h           |  22 +-
  xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp    | 234 ++++++++++++++++++---
  xbmc/cores/VideoRenderers/LinuxRendererGLES.h      |   4 +-
  .../VideoRenderers/VideoShaders/YUV2RGBShader.cpp  |   6 +-
@@ -15,7 +15,7 @@ Subject: [PATCH] Add back IMX rendering from v14.
  .../dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h   |   8 +-
  xbmc/settings/DisplaySettings.cpp                  |   5 +
  xbmc/settings/Settings.cpp                         |   1 +
- 11 files changed, 267 insertions(+), 38 deletions(-)
+ 11 files changed, 272 insertions(+), 38 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
 index c688f8b..e620008 100644
@@ -35,10 +35,21 @@ index c688f8b..e620008 100644
  #: system/settings/settings.xml
  msgctxt "#13425"
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 531ff30..bee4f7c 100644
+index eeef1e3..380ae77 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -1449,6 +1449,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
+@@ -220,6 +220,10 @@
+ #include "utils/AMLUtils.h"
+ #endif
+ 
++#ifdef HAS_IMXVPU
++#include "cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.h"
++#endif
++
+ #include "cores/FFmpeg.h"
+ #include "utils/CharsetConverter.h"
+ #include "pictures/GUIWindowSlideShow.h"
+@@ -1454,6 +1458,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
      m_replayGainSettings.iNoGainPreAmp = ((CSettingInt*)setting)->GetValue();
    else if (StringUtils::EqualsNoCase(settingId, CSettings::SETTING_MUSICPLAYER_REPLAYGAINAVOIDCLIPPING))
      m_replayGainSettings.bAvoidClipping = ((CSettingBool*)setting)->GetValue();
@@ -67,10 +78,10 @@ index 987714f..e11ecdf 100644
    list.push_back(make_pair(g_localizeStrings.Get(16319), RENDER_METHOD_DXVA));
    list.push_back(make_pair(g_localizeStrings.Get(13431), RENDER_METHOD_D3D_PS));
 diff --git a/xbmc/cores/VideoRenderers/BaseRenderer.h b/xbmc/cores/VideoRenderers/BaseRenderer.h
-index d6a7140..3b89ec2 100644
+index d6a7140..6c7befb 100644
 --- a/xbmc/cores/VideoRenderers/BaseRenderer.h
 +++ b/xbmc/cores/VideoRenderers/BaseRenderer.h
-@@ -27,10 +27,14 @@
+@@ -27,10 +27,15 @@
  #include "guilib/Geometry.h"
  #include "RenderFormats.h"
  #include "RenderFeatures.h"
@@ -84,10 +95,11 @@ index d6a7140..3b89ec2 100644
 +#else
 +   #define NUM_BUFFERS 6
 +#endif
++
  
  class CSetting;
  
-@@ -64,6 +68,7 @@ enum RenderMethods
+@@ -64,6 +69,7 @@ enum RenderMethods
    RENDER_METHOD_SOFTWARE,
    RENDER_METHOD_D3D_PS,
    RENDER_METHOD_DXVA,
@@ -95,7 +107,7 @@ index d6a7140..3b89ec2 100644
    RENDER_OVERLAYS        = 99   // to retain compatibility
  };
  
-@@ -80,12 +85,12 @@ public:
+@@ -80,12 +86,12 @@ public:
  
    void SetViewMode(int viewMode);
    RESOLUTION GetResolution() const;
@@ -535,7 +547,7 @@ index 6fcb09c..9a9211b 100644
    else
      CLog::Log(LOGERROR, "GL: BaseYUV2RGBGLSLShader - unsupported format %d", m_format);
 diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
-index 6ef2c48..3a74224 100644
+index 7742fbe..40b7cf6 100644
 --- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
 +++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecIMX.cpp
 @@ -47,6 +47,7 @@
@@ -546,7 +558,7 @@ index 6ef2c48..3a74224 100644
  
  // Number of fb pages used for paning
  const int CIMXContext::m_fbPages = 2;
-@@ -2079,6 +2080,15 @@ bool CIMXContext::DoTask(IPUTask &ipu, int targetPage)
+@@ -2085,6 +2086,15 @@ bool CIMXContext::DoTask(IPUTask &ipu, int targetPage)
    return true;
  }
  
@@ -625,10 +637,10 @@ index 7993a73..8f91312 100644
  using namespace KODI::MESSAGING;
  
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index ecd155d..90937f4 100644
+index 3f67a20..73d9c7e 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -1038,6 +1038,7 @@ void CSettings::InitializeISettingCallbacks()
+@@ -1050,6 +1050,7 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_VSYNC);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);

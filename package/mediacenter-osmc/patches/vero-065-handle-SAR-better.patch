@@ -26,7 +26,7 @@ index c9bd48a..bf986dc 100644
    if (m_sar == 0)
 +  {
      CLog::Log(LOGDEBUG, "%s: Screen SAR - not usable info",__FUNCTION__);
-+    RESOLUTION_INFO res = CDisplaySettings::Get().GetCurrentResolutionInfo();
++    RESOLUTION_INFO res = CDisplaySettings::GetInstance().GetCurrentResolutionInfo();
 +    if (res.iScreenWidth != 0)
 +      m_sar = res.iScreenHeight / res.iScreenWidth;
 +    else
