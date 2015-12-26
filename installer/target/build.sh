@@ -50,7 +50,7 @@ date=$(date +%Y%m%d)
 count=150
 while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
        if [ "$?" -eq 0 ]; then
-			wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
+	    wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
             break
        fi
        date=$(date +%Y%m%d --date "yesterday $date")
