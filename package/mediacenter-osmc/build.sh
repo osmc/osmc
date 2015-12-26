@@ -322,7 +322,19 @@ then
 	pushd project/cmake/addons/
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) ../ -DOVERRIDE_PATHS=1
+	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
+	then
+            PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vc/include:/opt/vc/include/interface:/opt/vc/include/interface/vcos/pthreads:/opt/vc/include/interface/vmcs_host/linux -DCMAKE_LIBRARY_PATH=/opt/vc/lib"
+	fi
+	if [ "$1" == "vero" ]
+	then
+	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero/lib -DCMAKE_LIBRARY_PATH=/opt/vero/include"
+	fi
+	if [ "$1" == "vero2" ]
+	then
+	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero2/lib -DCMAKE_LIBRARY_PATH=/opt/vero2/include"
+	fi
+	cmake -DCMAKE_INSTALL_DESTDIR=/usr -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) ../ -DOVERRIDE_PATHS=1 $PLATFORM
 	if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
 	cd ../
 	$BUILD kodiplatform_DIR=$(pwd) -C build/
