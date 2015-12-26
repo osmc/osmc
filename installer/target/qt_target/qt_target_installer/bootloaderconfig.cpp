@@ -88,6 +88,7 @@ void BootloaderConfig::configureEnvironment()
                     QString line = in.readLine();
                     if (line.contains("Revision"))
                     {
+                        logger->addLine("Found device revision. It is " + line);
                         line.replace(" ", "");
                         QStringList lines = line.split(":");
                         rev = lines[1].toUInt(NULL, 16);
@@ -97,6 +98,7 @@ void BootloaderConfig::configureEnvironment()
                 }
                 cpuinfo.close();
             }
+            logger->addLine("The revision for this device is " + rev);
             if ((rev >> 23) & 1)
             {
                 if ((rev >> 4 & 0xFF) != 9)
