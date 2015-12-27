@@ -373,8 +373,8 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				log('Disabling SSH service')
 
-				os.system("sudo /bin/systemctl disable ssh-app-osmc")
-				os.system("sudo /bin/systemctl stop ssh-app-osmc")
+				os.system("/bin/sudo /bin/systemctl disable ssh-app-osmc")
+				os.system("/bin/sudo /bin/systemctl stop ssh-app-osmc")
 
 			else:
 
