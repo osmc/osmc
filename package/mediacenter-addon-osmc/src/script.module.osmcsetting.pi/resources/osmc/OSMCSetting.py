@@ -268,7 +268,7 @@ Overclock settings are set using the Pi Overclock module."""
 																		'translate': self.translate_device_tree,
 																	},	
 									'orphanedparams':			{'setting_value' : '',
-																	'default': 'false',
+																	'default': '',
 																		'translate': self.translate_orphanedparams,
 																	},																																																				
 									# 'other_settings_string': 	{'setting_value' : '',
@@ -913,10 +913,13 @@ Overclock settings are set using the Pi Overclock module."""
 		if not reverse:
 
 			datalist = data.split('\n')
-
+			
 			for param in datalist:
 
-				k, v = param.split('|__|')
+				try:
+					k, v = param.split('|__|')
+				except ValueError:
+					return None
 
 				if v == 'on':
 					self.me.setSetting(k, 'true')
