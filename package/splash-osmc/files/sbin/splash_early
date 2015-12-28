@@ -13,7 +13,7 @@ fi
 /sbin/checkmodifier
 if [ $? -eq 1 ] || grep -qw recovery /proc/cmdline
 then
-	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/opt/vc/bin"
+	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin"
 	trap '' INT
 	echo 0 > /proc/sys/kernel/ctrl-alt-del
 	fbset -depth 8 && fbset -depth 16
