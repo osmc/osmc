@@ -131,7 +131,7 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
-		overlays=( "hifiberry-dac-overlay" "hifiberry-dacplus-overlay" "hifiberry-digi-overlay" "hifiberry-amp-overlay" "iqaudio-dac-overlay" "iqaudio-dacplus-overlay" "rpi-dac-overlay" "lirc-rpi-overlay" "w1-gpio-overlay" "w1-gpio-pullup-overlay" "hy28a-overlay" "hy28b-overlay" "piscreen-overlay" "rpi-display-overlay" "mmc-overlay" "rpi-proto-overlay" "i2c-rtc-overlay" "i2s-mmap-overlay" "pps-gpio-overlay" "uart1-overlay" "rpi-ft5406-overlay" "rpi-sense-overlay")
+		overlays=( "hifiberry-dac-overlay" "hifiberry-dacplus-overlay" "hifiberry-digi-overlay" "hifiberry-amp-overlay" "iqaudio-dac-overlay" "iqaudio-dacplus-overlay" "rpi-dac-overlay" "lirc-rpi-overlay" "w1-gpio-overlay" "w1-gpio-pullup-overlay" "hy28a-overlay" "hy28b-overlay" "piscreen-overlay" "rpi-display-overlay" "sdhost-overlay" "mmc-overlay" "rpi-proto-overlay" "i2c-rtc-overlay" "i2s-mmap-overlay" "pps-gpio-overlay" "uart1-overlay" "rpi-ft5406-overlay" "rpi-sense-overlay")
 		pushd arch/arm/boot/dts/overlays
 		for dtb in ${overlays[@]}
 		do
