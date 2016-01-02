@@ -1,0 +1,268 @@
+diff --git a/arch/arm/boot/dts/bcm2708-rpi-b-plus.dts b/arch/arm/boot/dts/bcm2708-rpi-b-plus.dts
+index 4deb968..cd22780 100644
+--- a/arch/arm/boot/dts/bcm2708-rpi-b-plus.dts
++++ b/arch/arm/boot/dts/bcm2708-rpi-b-plus.dts
+@@ -8,11 +8,6 @@
+ };
+ 
+ &gpio {
+-	sdhost_pins: sdhost_pins {
+-		brcm,pins = <48 49 50 51 52 53>;
+-		brcm,function = <4>; /* alt0 */
+-	};
+-
+ 	spi0_pins: spi0_pins {
+ 		brcm,pins = <9 10 11>;
+ 		brcm,function = <4>; /* alt0 */
+@@ -39,11 +34,9 @@
+ 	};
+ };
+ 
+-&sdhost {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&sdhost_pins>;
+-	bus-width = <4>;
++&mmc {
+ 	status = "okay";
++	bus-width = <4>;
+ };
+ 
+ &fb {
+diff --git a/arch/arm/boot/dts/bcm2708-rpi-b.dts b/arch/arm/boot/dts/bcm2708-rpi-b.dts
+index 1e77926..0d7524e 100644
+--- a/arch/arm/boot/dts/bcm2708-rpi-b.dts
++++ b/arch/arm/boot/dts/bcm2708-rpi-b.dts
+@@ -8,11 +8,6 @@
+ };
+ 
+ &gpio {
+-	sdhost_pins: sdhost_pins {
+-		brcm,pins = <48 49 50 51 52 53>;
+-		brcm,function = <4>; /* alt0 */
+-	};
+-
+ 	spi0_pins: spi0_pins {
+ 		brcm,pins = <9 10 11>;
+ 		brcm,function = <4>; /* alt0 */
+@@ -39,11 +34,9 @@
+ 	};
+ };
+ 
+-&sdhost {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&sdhost_pins>;
+-	bus-width = <4>;
++&mmc {
+ 	status = "okay";
++	bus-width = <4>;
+ };
+ 
+ &fb {
+diff --git a/arch/arm/boot/dts/bcm2708-rpi-cm.dtsi b/arch/arm/boot/dts/bcm2708-rpi-cm.dtsi
+index 3c8bdde..2acefee 100644
+--- a/arch/arm/boot/dts/bcm2708-rpi-cm.dtsi
++++ b/arch/arm/boot/dts/bcm2708-rpi-cm.dtsi
+@@ -1,12 +1,5 @@
+ #include "bcm2708.dtsi"
+ 
+-&gpio {
+-	sdhost_pins: sdhost_pins {
+-		brcm,pins = <48 49 50 51 52 53>;
+-		brcm,function = <4>; /* alt0 */
+-	};
+-};
+-
+ &leds {
+ 	act_led: act {
+ 		label = "led0";
+@@ -15,12 +8,9 @@
+ 	};
+ };
+ 
+-&sdhost {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&sdhost_pins>;
+-	bus-width = <4>;
+-	non-removable;
++&mmc {
+ 	status = "okay";
++	bus-width = <4>;
+ };
+ 
+ &fb {
+diff --git a/arch/arm/boot/dts/bcm2708_common.dtsi b/arch/arm/boot/dts/bcm2708_common.dtsi
+index 75fb4ce..91ff784 100644
+--- a/arch/arm/boot/dts/bcm2708_common.dtsi
++++ b/arch/arm/boot/dts/bcm2708_common.dtsi
+@@ -14,7 +14,6 @@
+ 		mailbox = &mailbox;
+ 		gpio = &gpio;
+ 		uart0 = &uart0;
+-		sdhost = &sdhost;
+ 		i2s  = &i2s;
+ 		spi0 = &spi0;
+ 		i2c0 = &i2c0;
+@@ -127,18 +126,6 @@
+ 			status = "disabled";
+ 		};
+ 
+-		sdhost: sdhost@7e202000 {
+-			compatible = "brcm,bcm2835-sdhost";
+-			reg = <0x7e202000 0x100>;
+-			interrupts = <2 24>;
+-			clocks = <&clk_core>;
+-			dmas = <&dma 13>,
+-			       <&dma 13>;
+-			dma-names = "tx", "rx";
+-			brcm,pio-limit = <1>;
+-			status = "disabled";
+-		};
+-
+ 		i2s: i2s@7e203000 {
+ 			compatible = "brcm,bcm2835-i2s";
+ 			reg = <0x7e203000 0x24>,
+diff --git a/arch/arm/boot/dts/bcm2709-rpi-2-b.dts b/arch/arm/boot/dts/bcm2709-rpi-2-b.dts
+index 4e6c64e..f45aa50 100644
+--- a/arch/arm/boot/dts/bcm2709-rpi-2-b.dts
++++ b/arch/arm/boot/dts/bcm2709-rpi-2-b.dts
+@@ -8,11 +8,6 @@
+ };
+ 
+ &gpio {
+-	sdhost_pins: sdhost_pins {
+-		brcm,pins = <48 49 50 51 52 53>;
+-		brcm,function = <4>; /* alt0 */
+-	};
+-
+ 	spi0_pins: spi0_pins {
+ 		brcm,pins = <9 10 11>;
+ 		brcm,function = <4>; /* alt0 */
+@@ -39,11 +34,9 @@
+ 	};
+ };
+ 
+-&sdhost {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&sdhost_pins>;
+-	bus-width = <4>;
++&mmc {
+ 	status = "okay";
++	bus-width = <4>;
+ };
+ 
+ &fb {
+diff --git a/arch/arm/boot/dts/overlays/mmc-overlay.dts b/arch/arm/boot/dts/overlays/mmc-overlay.dts
+index 00a22be..4579ff2 100644
+--- a/arch/arm/boot/dts/overlays/mmc-overlay.dts
++++ b/arch/arm/boot/dts/overlays/mmc-overlay.dts
+@@ -6,29 +6,9 @@
+ 
+ 	fragment@0 {
+ 		target = <&mmc>;
++
+ 		frag0: __overlay__ {
+-			pinctrl-names = "default";
+-			pinctrl-0 = <&mmc_pins>;
+-			bus-width = <4>;
+ 			brcm,overclock-50 = <0>;
+-			status = "okay";
+-		};
+-	};
+-
+-	fragment@1 {
+-		target = <&gpio>;
+-		__overlay__ {
+-			mmc_pins: mmc_pins {
+-				brcm,pins = <48 49 50 51 52 53>;
+-				brcm,function = <7>; /* alt3 */
+-			};
+-		};
+-	};
+-
+-	fragment@2 {
+-		target = <&sdhost>;
+-		__overlay__ {
+-			status = "disabled";
+ 		};
+ 	};
+ 
+diff --git a/arch/arm/boot/dts/overlays/sdhost-overlay.dts b/arch/arm/boot/dts/overlays/sdhost-overlay.dts
+index 85f0725..2da14a4 100644
+--- a/arch/arm/boot/dts/overlays/sdhost-overlay.dts
++++ b/arch/arm/boot/dts/overlays/sdhost-overlay.dts
+@@ -5,25 +5,52 @@
+ 	compatible = "brcm,bcm2708";
+ 
+ 	fragment@0 {
+-		target = <&mmc>;
++		target = <&soc>;
+ 		__overlay__ {
+-			status = "disabled";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			sdhost: sdhost@7e202000 {
++				compatible = "brcm,bcm2835-sdhost";
++				reg = <0x7e202000 0x100>;
++				pinctrl-names = "default";
++				pinctrl-0 = <&sdhost_pins>;
++				interrupts = <2 24>;
++				clocks = <&clk_core>;
++				dmas = <&dma 13>,
++				       <&dma 13>;
++				dma-names = "tx", "rx";
++				brcm,delay-after-stop = <0>;
++				brcm,overclock-50 = <0>;
++				brcm,pio-limit = <1>;
++				status = "okay";
++			};
+ 		};
+ 	};
+ 
+ 	fragment@1 {
+-		target = <&sdhost>;
+-		frag1: __overlay__ {
+-			brcm,overclock-50 = <0>;
+-			brcm,pio-limit = <1>;
+-			status = "okay";
++		target = <&gpio>;
++		__overlay__ {
++			sdhost_pins: sdhost_pins {
++				brcm,pins = <48 49 50 51 52 53>;
++				brcm,function = <4>; /* alt0 */
++			};
++		};
++	};
++
++	fragment@2 {
++		target = <&mmc>;
++		__overlay__ {
++			/* Find a way to disable the other driver */
++			compatible = "";
++			status = "disabled";
+ 		};
+ 	};
+ 
+ 	__overrides__ {
+-		overclock_50     = <&frag1>,"brcm,overclock-50:0";
+-		force_pio        = <&frag1>,"brcm,force-pio?";
+-		pio_limit        = <&frag1>,"brcm,pio-limit:0";
+-		debug            = <&frag1>,"brcm,debug?";
++		overclock_50     = <&sdhost>,"brcm,overclock-50:0";
++		force_pio        = <&sdhost>,"brcm,force-pio?";
++		pio_limit        = <&sdhost>,"brcm,pio-limit:0";
++		debug            = <&sdhost>,"brcm,debug?";
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/overlays/sdio-overlay.dts b/arch/arm/boot/dts/overlays/sdio-overlay.dts
+index afc8742..6626a1d 100644
+--- a/arch/arm/boot/dts/overlays/sdio-overlay.dts
++++ b/arch/arm/boot/dts/overlays/sdio-overlay.dts
+@@ -8,6 +8,7 @@
+ 	fragment@3 {
+ 		target = <&mmc>;
+ 		sdio_mmc: __overlay__ {
++			compatible = "brcm,bcm2835-mmc";
+ 			pinctrl-names = "default";
+ 			pinctrl-0 = <&sdio_pins>;
+ 			non-removable;
