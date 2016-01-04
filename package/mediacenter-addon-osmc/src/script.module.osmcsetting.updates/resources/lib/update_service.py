@@ -518,12 +518,17 @@ class Main(object):
 		if screen_height == '':
 			if self.try_count >= 50:
 				self.try_count = 0
-				screen_height = 1080
-				screen_width  = 1920
+				screen_height  = 1080
+				screen_width   = 1920
 			else:
 				self.try_image_position_again = True
 				self.try_count += 1
 				return
+
+		# if the screen width is blank (for whatever reason) use the screen height to estimate the width
+		# this should be very, VERY rare, and might only happen due to freakish timing
+		if screen_width == '':
+			screen_width = screen_height * 1.7777777777
 
 		screen_height = int(screen_height)
 		screen_width  = int(screen_width)
