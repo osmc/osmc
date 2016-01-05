@@ -189,7 +189,7 @@ def write_to_config_file(config_stringIO, export_location='C:\\temp\\temp.txt'):
                 line = line.replace('_||_','=')
 
             # replace the other changes made during sanitisation
-            line = line.replace(' = ', '=').replace('_SPACE_', ' ').replace('=NO_EQUALS_SIGN','').replace('=PLACEHOLDER','').replace('|__|','=')
+            line = line.replace(' : ', ':').replace(' = ', '=').replace('_SPACE_', ' ').replace('=NO_EQUALS_SIGN','').replace('=PLACEHOLDER','').replace('|__|','=')
             f.write(line)
 
 
