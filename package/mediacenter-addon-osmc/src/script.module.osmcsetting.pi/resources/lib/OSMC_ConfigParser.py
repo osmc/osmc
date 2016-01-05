@@ -202,6 +202,11 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
 
     config_dict = ConfigObj(infile=sanitised_file, write_empty_values=True, list_values=False)
 
+    #print 'CHANGES'
+    #print changes
+    #print 'config_dict'
+    #print config_dict
+
     for key, value in changes.iteritems():
 
         if key == 'dtoverlay':
@@ -210,10 +215,14 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 continue
 
             for dtoverlay_item in value:
+                #print 'dtoverlay_item'
+                #print dtoverlay_item
                 
                 if ':' in dtoverlay_item:
-                    true_key = 'dtoverlay_||_' + dtoverlay_item[:dtoverlay_item.index(":")]
+                    true_key = dtoverlay_item[:dtoverlay_item.index(":")]
                     true_val = dtoverlay_item[dtoverlay_item.index(":")+1:]
+                    #print '\ttrue_key', true_key
+                    #print '\ttrue_val', true_val
                 else:
                     true_key = 'dtoverlay_||_' + dtoverlay_item.replace('[remove]','')
                     true_val = "PLACEHOLDER"
@@ -325,19 +334,25 @@ def retrieve_settings_from_configtxt(file_loc='C:\\temp\\config.txt'):
 
 
 def test():
-    changes = {'dtoverlay' : [
-    'hifiberry-dac-overlay[remove]', 
-    'iqaudio-dac-overlay[remove]', 
-    'hifiberry-digi-overlay', 
-    'w1-gpio-overlay[remove]', 
-    'w1-gpio-pullup-overlay[remove]', 
-    'lirc-rpi-overlay:gpio_out_pin=9999999,gpio_in_pin=23,gpio_in_pull=sh'
-    ],
-    'orphanedparams' : ['param2|__|on', 'param1|__|on']
-    
+    changes = {
+    'sdtv_aspect': 1, 
+    'hdmi_safe': '1', 
+    'orphanedparams': ['audio|__|on'], 
+    'start_x': 1, 
+    'dtoverlay': [
+        'dtoverlay_||_hifiberry-dac-overlay[remove]', 
+        'dtoverlay_||_hifiberry-dacplus-overlay[remove]', 
+        'dtoverlay_||_hifiberry-digi-overlay[remove]', 
+        'dtoverlay_||_iqaudio-dac-overlay[remove]', 
+        'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
+        'dtoverlay_||_w1-gpio-overlay[remove]', 
+        'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
+        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=99', 
+        'dtoverlay_||_spi-bcm2835-overlay[remove]'
+        ]
     }
 
-    apply_changes_to_configtxt(changes)
+    apply_changes_to_configtxt(changes, '/home/plaskev/Documents/config.txt')
 
 
 if __name__ == "__main__":

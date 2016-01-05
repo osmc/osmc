@@ -774,7 +774,7 @@ Overclock settings are set using the Pi Overclock module."""
 				in_pin   = self.me.getSetting('gpio_in_pin')
 				pull_pin = self.me.getSetting('gpio_in_pull')
 
-				lirc = 'dtoverlay_||_lirc-rpi=' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
+				lirc = 'dtoverlay_||_lirc-rpi:' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
 
 				if pull_pin != 'off':
 					lirc = lirc + ',gpio_in_pull=' + pull_pin
