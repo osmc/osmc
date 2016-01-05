@@ -221,16 +221,22 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 if ':' in dtoverlay_item:
                     true_key = dtoverlay_item[:dtoverlay_item.index(":")]
                     true_val = dtoverlay_item[dtoverlay_item.index(":")+1:]
-                    #print '\ttrue_key', true_key
-                    #print '\ttrue_val', true_val
                 else:
-                    true_key = 'dtoverlay_||_' + dtoverlay_item.replace('[remove]','')
+                    true_key = dtoverlay_item.replace('[remove]','')
                     true_val = "PLACEHOLDER"
+
+                #print '\ttrue_key', true_key
+                #print '\ttrue_val', true_val
 
                 if '[remove]' in dtoverlay_item:
 
                     if true_key in config_dict:
                         del config_dict[true_key]
+
+                    else:
+                        alt_key = true_key.replace('-overlay', '')
+                        if alt_key in config_dict:
+                            del config_dict[alt_key]
 
                 else:
                     config_dict[true_key] = true_val
@@ -347,7 +353,7 @@ def test():
         'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
         'dtoverlay_||_w1-gpio-overlay[remove]', 
         'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
-        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=99', 
+        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=99[remove]', 
         'dtoverlay_||_spi-bcm2835-overlay[remove]'
         ]
     }
