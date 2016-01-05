@@ -263,10 +263,10 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': '',
 																		'translate': self.translate_dtoverlay,
 																	},
-									'device_tree':				{'setting_value' : '',
-																	'default': '',
-																		'translate': self.translate_device_tree,
-																	},	
+									# 'device_tree':				{'setting_value' : '', 
+									# 								'default': '',
+									# 									'translate': self.translate_device_tree,
+									# 								},	
 									'orphanedparams':			{'setting_value' : '',
 																	'default': '',
 																		'translate': self.translate_orphanedparams,
@@ -657,7 +657,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		else:
 			if self.me.getSetting('suppress_dtoverlay') == 'true':
-				return ['']
+				return ''
 			else:
 				return ['[remove]']
 
