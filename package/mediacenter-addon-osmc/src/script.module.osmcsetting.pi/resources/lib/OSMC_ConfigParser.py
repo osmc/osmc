@@ -264,10 +264,11 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
     #print config_dict
 
     # temporary location for the config.txt
-    if os.path.isfile('/var/tmp/config.txt'):
-        tmp_loc = '/var/tmp/config.txt'
-    else:
-        tmp_loc = 'C:\\temp\\temp.txt'
+    tmp_loc = '/var/tmp/config.txt'
+    # if os.path.isfile('/var/tmp/config.txt'):
+    #     tmp_loc = '/var/tmp/config.txt'
+    # else:
+    #     tmp_loc = 'C:\\temp\\temp.txt'
 
     write_to_config_file(blotter, tmp_loc)
 
