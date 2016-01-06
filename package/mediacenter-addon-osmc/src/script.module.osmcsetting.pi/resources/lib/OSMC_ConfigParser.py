@@ -215,18 +215,17 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 continue
 
             for dtoverlay_item in value:
-                #print 'dtoverlay_item'
-                #print dtoverlay_item
+                #print 'dtoverlay_item %s' % dtoverlay_item
                 
                 if ':' in dtoverlay_item:
                     true_key = dtoverlay_item[:dtoverlay_item.index(":")]
                     true_val = dtoverlay_item[dtoverlay_item.index(":")+1:]
                 else:
                     true_key = dtoverlay_item.replace('[remove]','')
-                    true_val = "PLACEHOLDER"
+                    true_val = "PLACEHOLDER"                    
 
-                #print '\ttrue_key', true_key
-                #print '\ttrue_val', true_val
+                #print '\ttrue_key %s' % true_key
+                #print '\ttrue_val %s' % true_val
 
                 if '[remove]' in dtoverlay_item:
 
@@ -364,6 +363,7 @@ def test():
 if __name__ == "__main__":
 
     print test()
+    a = 1
 
 
 # device_tree_overlay=lirc-rpi-overlay

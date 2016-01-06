@@ -752,7 +752,7 @@ Overclock settings are set using the Pi Overclock module."""
 				soundcard = dac_all[int(pos)-1]
 
 				# add the soundcard overlay
-				new_dtoverlay.append(soundcard)
+				new_dtoverlay.append('dtoverlay_||_'+ soundcard)
 
 				#remove the unneeded entries
 				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all if x != soundcard])
