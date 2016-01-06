@@ -98,7 +98,7 @@ DIALOG     = xbmcgui.Dialog()
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-import config_tools as ct
+import OSMC_ConfigParser as ct
 from gui import overclock_gui
 
 
@@ -217,11 +217,11 @@ The module allows you to manually adjust:
 		# the location of the config file FOR TESTING ONLY
 		try:								
 			self.test_config = '/boot/config.txt'
-			self.config_settings = ct.read_config(self.test_config)
+			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		except:
-			self.test_config = '/home/kubkev/Documents/config.txt'
-			self.config_settings = ct.read_config(self.test_config)
+			self.test_config = '/home/plaskev/Documents/config.txt'
+			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		oc_keys = ['arm_freq', 'sdram_freq', 'core_freq', 'initial_turbo', 'over_voltage', 'over_voltage_sdram', 'force_turbo']
 
@@ -244,7 +244,7 @@ The module allows you to manually adjust:
 		log('self.setting_values')
 		log(self.setting_values)
 
-		ct.write_config(self.test_config, self.new_settings)
+		ct.apply_changes_to_configtxt(self.new_settings, self.test_config)
 
 		del self.GUI
 
