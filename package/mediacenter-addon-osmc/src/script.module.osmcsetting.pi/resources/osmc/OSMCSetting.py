@@ -214,8 +214,9 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': 'true',
 																		'translate': self.translate_bool
 																		},																		
-									'hdmi_boost': 				{'setting_value' : '',
+									'config_hdmi_boost': 		{'setting_value' : '',
 																	'default': '0',
+																		'translate': self.translate_hdmi_boost
 																	},
 									'hdmi_group': 				{'setting_value' : '',
 																	'default': '0',
@@ -280,8 +281,9 @@ Overclock settings are set using the Pi Overclock module."""
 		# list to hold the keys for the other string settings
 		self.unknown_setting_keys = []
 
-		# list to hold the keys for the settings that need to be removed from the config.txt
-		self.remove_list = []
+		# list to hold the keys for the settings that need to be removed from the config.txt.
+		# hdmi_boost was changed to config_hdmi_boost, so if hdmi_boost is in the existing config it should be removed.
+		self.remove_list = ['hdmi_boost']
 
 		# the location of the config file FOR TESTING ONLY
 		try:								
@@ -343,6 +345,11 @@ Overclock settings are set using the Pi Overclock module."""
 			if key in self.config_settings:
 
 				setting_value = self.config_settings[key]
+
+			elif key == 'config_hdmi_boost' and 'hdmi_boost' in self.config_settings:
+				# this key was changed, here we will bring in the old key from the config.txt and use it to populate the UI
+
+				setting_value = self.config_settings['hdmi_boost']
 
 			else:
 				# if the key ISNT in the config.txt then set the value from the default stored in 
@@ -660,6 +667,25 @@ Overclock settings are set using the Pi Overclock module."""
 				return ''
 			else:
 				return ['[remove]']
+
+
+	@clog(log)
+	def translate_hdmi_boost(self, data, reverse=False):
+		'''
+			Checks for the presence of an empty device_tree setting, which disables device tree overlays.
+		'''
+
+		if not reverse:
+			# use the setting as provided from the config.txt, only allow a max of 11 though
+
+			return min(data, 11)
+
+		else:
+			if self.me.getSetting('config_hdmi_boost') == '0':
+				self.remove_list.append('config_hdmi_boost')
+			else:
+				self.translated_changed_settings['config_hdmi_boost'] = data
+
 
 	@clog(log)
 	def translate_dtoverlay(self, data, reverse=False):
