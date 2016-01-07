@@ -56,6 +56,7 @@ bool VersionSelection::enumerateBuilds(QByteArray buildline)
         buildMap.insert(buildnameline, splitline.at((splitline.count() -1)));
         return true;
     }
+    return false;
 }
 
 VersionSelection::~VersionSelection()
