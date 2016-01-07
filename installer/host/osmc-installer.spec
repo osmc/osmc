@@ -175,5 +175,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Oct 12 2014 Sam G. Nazarko
+* Sun Oct 12 2014 Sam G. Nazarko
 - OBS initial release, thanks to Ivan Gonzalez (malkavi) for help
