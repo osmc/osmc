@@ -1,0 +1,177 @@
+From 95127cb54d492ed930faa09ba39c469226d33260 Mon Sep 17 00:00:00 2001
+From: Gerald Barker <gezb@users.noreply.github.com>
+Date: Sat, 5 Dec 2015 15:49:58 +0000
+Subject: [PATCH 3/3] JSONRPC function to find out if BTPlayer is active
+
+---
+ .../interfaces/json-rpc/JSONServiceDescription.cpp |  6 +-
+ xbmc/interfaces/json-rpc/OSMCOperations.cpp        | 82 ++++++++++++----------
+ xbmc/interfaces/json-rpc/OSMCOperations.h          |  1 +
+ xbmc/interfaces/json-rpc/schema/methods.json       |  8 +++
+ 4 files changed, 59 insertions(+), 38 deletions(-)
+
+diff --git a/xbmc/interfaces/json-rpc/JSONServiceDescription.cpp b/xbmc/interfaces/json-rpc/JSONServiceDescription.cpp
+index cc7ab74..2897a66 100644
+--- a/xbmc/interfaces/json-rpc/JSONServiceDescription.cpp
++++ b/xbmc/interfaces/json-rpc/JSONServiceDescription.cpp
+@@ -235,9 +235,11 @@ JsonRpcMethodMap CJSONServiceDescription::m_methodMaps[] = {
+ // XBMC operations
+   { "XBMC.GetInfoLabels",                           CXBMCOperations::GetInfoLabels },
+   { "XBMC.GetInfoBooleans",                         CXBMCOperations::GetInfoBooleans },
++
+ // OSMC operations
+-  { "OSMC.StartBTPlayer",                           COSMCOperations::StartBTPlayer },
+-  { "OSMC.StopBTPlayer",                           COSMCOperations::StopBTPlayer }
++  { "OSMC.StartBTPlayer",                          COSMCOperations::StartBTPlayer },
++  { "OSMC.StopBTPlayer",                           COSMCOperations::StopBTPlayer },
++  { "OSMC.BTPlayerActive",                       COSMCOperations::isBTPlayerActive }
+ };
+ 
+ JSONSchemaTypeDefinition::JSONSchemaTypeDefinition()
+diff --git a/xbmc/interfaces/json-rpc/OSMCOperations.cpp b/xbmc/interfaces/json-rpc/OSMCOperations.cpp
+index d5c59bc..deded21 100644
+--- a/xbmc/interfaces/json-rpc/OSMCOperations.cpp
++++ b/xbmc/interfaces/json-rpc/OSMCOperations.cpp
+@@ -31,23 +31,8 @@
+ using namespace JSONRPC;
+ using namespace KODI::MESSAGING;
+ 
+-JSONRPC_STATUS COSMCOperations::StartBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
++PLAYERCOREID findBTPlayer()
+ {
+-
+-  CVariant optionArtist = parameterObject["artist"];
+-  CVariant optionTitle = parameterObject["track"];
+-  CVariant optionAlbum = parameterObject["album"];
+-
+-  CFileItemList list;
+-  CFileItemPtr item;
+-  CURL url("/tmp/dummyA2dpFile");
+-  item.reset(new CFileItem(url.Get(), false));
+-  item->GetMusicInfoTag()->SetArtist(optionArtist.asString());
+-  item->GetMusicInfoTag()->SetTitle(optionTitle.asString());
+-  item->GetMusicInfoTag()->SetAlbum(optionAlbum.asString());
+-  item->GetMusicInfoTag()->SetLoaded(true);
+-  list.Add(item);
+-
+   // Find the "playerid"
+   PLAYERCOREID btPlayerId = 0;
+   VECPLAYERCORES players;
+@@ -66,7 +51,31 @@ JSONRPC_STATUS COSMCOperations::StartBTPlayer(const std::string &method, ITransp
+   }
+   // check if the there's actually a player with the given player ID
+   if (CPlayerCoreFactory::GetInstance().GetPlayerConfig(btPlayerId) == NULL)
+-    return InvalidParams;
++    btPlayerId = 0;
++  return btPlayerId;
++}
++
++JSONRPC_STATUS COSMCOperations::StartBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
++{
++
++  CVariant optionArtist = parameterObject["artist"];
++  CVariant optionTitle = parameterObject["track"];
++  CVariant optionAlbum = parameterObject["album"];
++
++  CFileItemList list;
++  CFileItemPtr item;
++  CURL url("/tmp/dummyA2dpFile");
++  item.reset(new CFileItem(url.Get(), false));
++  item->GetMusicInfoTag()->SetArtist(optionArtist.asString());
++  item->GetMusicInfoTag()->SetTitle(optionTitle.asString());
++  item->GetMusicInfoTag()->SetAlbum(optionAlbum.asString());
++  item->GetMusicInfoTag()->SetLoaded(true);
++  list.Add(item);
++
++  PLAYERCOREID btPlayerId = findBTPlayer();
++    if (btPlayerId == 0) {
++      return InvalidParams;
++    }
+ 
+   // set the next player to be used
+   g_application.m_eForcedNextPlayer = btPlayerId;
+@@ -77,31 +86,32 @@ JSONRPC_STATUS COSMCOperations::StartBTPlayer(const std::string &method, ITransp
+   return ACK;
+   }
+ 
+-JSONRPC_STATUS COSMCOperations::StopBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
++JSONRPC_STATUS COSMCOperations::isBTPlayerActive(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+ {
+ 
+-  // Find the "playerid"
+-  PLAYERCOREID btPlayerId = 0;
+-  VECPLAYERCORES players;
+-  CPlayerCoreFactory::GetInstance().GetPlayers(players, true, false);
+-  for (VECPLAYERCORES::const_iterator itPlayer = players.begin(); itPlayer != players.end(); ++itPlayer)
+-  {
+-    PLAYERCOREID playerId = *itPlayer;
+-    const CPlayerCoreConfig* playerConfig = CPlayerCoreFactory::GetInstance().GetPlayerConfig(playerId);
+-    if (playerConfig == NULL)
+-      continue;
++  PLAYERCOREID btPlayerId = findBTPlayer();
+ 
+-    if (playerConfig->GetType() == EPC_BTPLAYER)
+-    {
+-      btPlayerId = playerId;
+-    }
+-  }
+-  // check if the there's actually a player with the given player ID
+-  if (CPlayerCoreFactory::GetInstance().GetPlayerConfig(btPlayerId) == NULL)
++  if (btPlayerId == 0) {
+     return InvalidParams;
++  }
++
++  if (g_application.m_pPlayer->GetCurrentPlayer() == btPlayerId && g_application.m_pPlayer->IsPlayingAudio()){
++    return ACK;
++  }
++
++  return InvalidParams;
++}
++
++
++JSONRPC_STATUS COSMCOperations::StopBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
++{
+ 
++  PLAYERCOREID btPlayerId = findBTPlayer();
++  if (btPlayerId == 0) {
++    return InvalidParams;
++  }
+   CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_STOP, static_cast<int>(parameterObject["playerid"].asInteger()));
+ 
+   return ACK;
+- }
++}
+ 
+diff --git a/xbmc/interfaces/json-rpc/OSMCOperations.h b/xbmc/interfaces/json-rpc/OSMCOperations.h
+index 7b5d03e..4f92194 100644
+--- a/xbmc/interfaces/json-rpc/OSMCOperations.h
++++ b/xbmc/interfaces/json-rpc/OSMCOperations.h
+@@ -31,6 +31,7 @@ namespace JSONRPC
+   public:
+     static JSONRPC_STATUS StartBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result);
+     static JSONRPC_STATUS StopBTPlayer(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result);
++    static JSONRPC_STATUS isBTPlayerActive(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result);
+   protected:
+     MUSIC_INFO::CMusicInfoTag m_tag;
+   };
+diff --git a/xbmc/interfaces/json-rpc/schema/methods.json b/xbmc/interfaces/json-rpc/schema/methods.json
+index 10b1748..33c42d9 100644
+--- a/xbmc/interfaces/json-rpc/schema/methods.json
++++ b/xbmc/interfaces/json-rpc/schema/methods.json
+@@ -2409,5 +2409,13 @@
+     "permission": "ControlPlayback",
+     "params": [],
+     "returns": "string"
++  },
++    "OSMC.BTPlayerActive": {
++    "type": "method",
++    "description": "returns the status of the BTPlayer",
++    "transport": "Response",
++    "permission": "ControlPlayback",
++    "params": [],
++    "returns": "string"
+   }
+ }
+-- 
+2.5.0
+
