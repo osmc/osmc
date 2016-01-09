@@ -21,10 +21,6 @@
 #include <QThread>
 #include "extractworker.h"
 #include <QTimer>
-#include <sys/types.h>
-#include <linux/hdreg.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -144,20 +140,11 @@ void MainWindow::install()
                 if (utils->getOSMCDev() == "rbp1") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "rbp2") { device->setRoot("/dev/sda1"); }
                 if (utils->getOSMCDev() == "vero1") { device->setRoot("/dev/sda1"); }
-                if (utils->getOSMCDev() == "atv")
+                for (int i = 0; i <= 60; i++)
                 {
-                    /* It's not USB, it's the internal disk.. but this is a hack */
-                    device->setBoot("/dev/sda1");
-                    device->setRoot("/dev/sda2");
-                }
-                if (utils->getOSMCDev() != "atv")
-                {
-                    for (int i = 0; i <= 60; i++)
-                    {
-                        ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
-                        qApp->processEvents();
-                        system("/bin/sleep 1");
-                    }
+                    ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
+                    qApp->processEvents();
+                    system("/bin/sleep 1");
                 }
             }
         }
@@ -215,54 +202,8 @@ void MainWindow::install()
                     haltInstall(tr("cannot work out partition size"));
                     return;
                 }
-                if (device->deviceUsesGPT())
-                {
-                    /* GPT is too clever: has secondary header; so we need to trash it and recreate the partition layout */
-                    /* NB: for some reason on 4.x this does not work all the time. So we have some parted patches to make sure it does */
-                    logger->addLine("We are using GPT. I need to erase the first 512 bytes and reconstruct the partition table");
-                    QString ddCmd = "/bin/dd if=/dev/zero of=" + rootBase + " bs=512 count=1 conv=fsync";
-                    system(ddCmd.toLocal8Bit());
-                    int fd;
-                    QFile dev(rootBase);
-                    dev.open(fd, QIODevice::ReadOnly);
-                    ioctl(fd, BLKRRPART, NULL);
-                    ioctl(fd, BLKFLSBUF, NULL);
-                    dev.close();
-                    utils->updateDevTable();
-                    utils->updateDevTable();
-                    if (utils->getOSMCDev() == "atv")
-                    {
-                        logger->addLine("Re-creating Apple TV partition structure");
-                        utils->mklabel(rootBase, true);
-                        utils->updateDevTable();
-                        utils->mkpart(rootBase, "hfsplus", "40s", "256M");
-                        /* We don't format /boot */
-                        utils->setflag(rootBase, "1 atvrecv", true);
-                        utils->updateDevTable();
-                    }
-                }
                 logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
                 utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
-                utils->fmtpart(device->getRoot(), "ext4");
-            }
-            else
-            {
-                /* We have to create the partition structure for /boot too */
-                if (utils->getOSMCDev() == "atv")
-                {
-                    logger->addLine("Hack: duplicating first partition to internal disk as we have no hfsprogs");
-                    system("/bin/dd if=/dev/sdb of=/dev/sda bs=1M count=256");
-                }
-                utils->updateDevTable();
-                logger->addLine("Making root partition");
-                int size = utils->getPartSize(rootBase, device->getBootFS());
-                if (size == -1)
-                {
-                    logger->addLine("Issue getting size of device");
-                    haltInstall(tr("cannot work out partition size"));
-                    return;
-                }
-                utils->mkpart(rootBase, "ext4", "257M", "100%"); /* Hacky and hard-coded again */
                 utils->fmtpart(device->getRoot(), "ext4");
             }
         }
