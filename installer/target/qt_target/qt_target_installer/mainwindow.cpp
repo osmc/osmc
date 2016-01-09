@@ -152,13 +152,12 @@ void MainWindow::install()
                 }
                 if (utils->getOSMCDev() != "atv")
                 {
-                for (int i = 0; i <= 60; i++)
-                {
-
+                    for (int i = 0; i <= 60; i++)
+                    {
                         ui->statusLabel->setText(tr("USB install:") + " " + QString::number(60 - i) + " " + ("seconds to remove device before data loss"));
                         qApp->processEvents();
                         system("/bin/sleep 1");
-                }
+                    }
                 }
             }
         }

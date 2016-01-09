@@ -92,8 +92,6 @@ bool Utils::fmtpart(QString partition, QString fstype)
     {
         mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
-    else if (fstype == "hfs+")
-        mkfsProcess.start("/usr/sbin/mkfs.hfsplus " + partition);
     mkfsProcess.waitForFinished(-1);
     logger->addLine(QString(mkfsProcess.readAll()));
     return mkfsProcess.exitCode() == 0;
