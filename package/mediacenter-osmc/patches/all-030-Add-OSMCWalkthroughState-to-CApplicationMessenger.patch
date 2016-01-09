@@ -1,26 +1,24 @@
-From 7429303b90e6fea2436ce2861b804c7b004de738 Mon Sep 17 00:00:00 2001
+From 1c89d69671ba208a55a812b5bce5dfb20d37724b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 17:49:02 +0100
 Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 19 +++++++++++++++++++
+ xbmc/Application.cpp                  | 17 +++++++++++++++++
  xbmc/messaging/ApplicationMessenger.h |  1 +
- 2 files changed, 20 insertions(+)
+ 2 files changed, 18 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index e1f0b04..2403f0c 100644
+index 79ed347..c8d2ce0 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2592,6 +2592,25 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2604,6 +2604,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    }
    break;
  
 + case TMSG_SETOSMCWALKTHROUGHSTATE:
 + {
-+     if (pMsg->params.size() != 1)
-+        break;
 +     switch (pMsg->param1)
 +     {
 +         case 0:
