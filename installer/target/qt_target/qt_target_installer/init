@@ -5,6 +5,14 @@
 # (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
+loopforever()
+{
+    while true
+    do
+        sleep 1
+    done
+}
+
 # Standard busybox init
 /bin/mount -t proc proc /proc
 /bin/mount -o remount,rw,noatime /
@@ -35,9 +43,22 @@ then
 	done
 fi
 
+grep -q atvinst /proc/cmdline
+if [ $? == 0 ]
+then
+    if [ -b /dev/sda ]
+    then
+        dd if=/dev/sdb of=/dev/sda bs=1M count=256 conv=fsync >/dev/null 2>&1
+        dd if=/dev/zero of=/dev/sdb bs=512 count=1 >/dev/null 2>&1
+        dd if=/dev/zero of=/dev/sdb bs=1M count=1 skip=255 > /dev/null 2>&1
+	echo "Please remove this USB stick, the power, and plug the device back in."
+	loopforever
+    else
+	echo "No internal disk detected"
+	loopforever
+    fi
+fi
+
 /usr/bin/qt_target_installer -qws
 clear
-while true
-do
-	sleep 1
-done
+loopforever
