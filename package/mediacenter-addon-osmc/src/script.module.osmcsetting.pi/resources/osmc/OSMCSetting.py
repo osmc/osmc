@@ -218,6 +218,10 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': '0',
 																		'translate': self.translate_hdmi_boost
 																	},
+									'hdmi_boost': 		{'setting_value' : '',
+																	'default': '0',
+																		'translate': self.translate_hdmi_boost
+																	},																	
 									'hdmi_group': 				{'setting_value' : '',
 																	'default': '0',
 																	},
@@ -678,13 +682,13 @@ Overclock settings are set using the Pi Overclock module."""
 		if not reverse:
 			# use the setting as provided from the config.txt, only allow a max of 11 though
 
-			return min(data, 11)
+			return min(int(data), 11)
 
 		else:
 			if self.me.getSetting('config_hdmi_boost') == '0':
 				self.remove_list.append('config_hdmi_boost')
 			else:
-				self.translated_changed_settings['config_hdmi_boost'] = data
+				return data
 
 
 	@clog(log)

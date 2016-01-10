@@ -202,10 +202,10 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
 
     config_dict = ConfigObj(infile=sanitised_file, write_empty_values=True, list_values=False)
 
-    #print 'CHANGES'
-    #print changes
-    #print 'config_dict'
-    #print config_dict
+    print 'CHANGES'
+    print changes
+    print 'config_dict'
+    print config_dict
 
     for key, value in changes.iteritems():
 
@@ -287,7 +287,7 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
     # if os.path.isfile('/var/tmp/config.txt'):
     #     tmp_loc = '/var/tmp/config.txt'
     # else:
-    #     tmp_loc = 'C:\\temp\\temp.txt'
+    # tmp_loc = 'C:\\temp\\temp.txt'
 
     write_to_config_file(blotter, tmp_loc)
 
@@ -346,31 +346,34 @@ def retrieve_settings_from_configtxt(file_loc='C:\\temp\\config.txt'):
 def test():
     changes = {
     'sdtv_aspect': 1, 
-    'hdmi_safe': '1', 
+    'hdmi_safe': '1',
+    'hdmi_boost' : 'remove',
+    'gpu_mem' : 'remove',
     'orphanedparams': ['audio|__|on'], 
-    'start_x': 1, 
+    'start_x': 1,
+    'decode_MPG2' : '0x70b5858d',
     'dtoverlay': [
         'dtoverlay_||_hifiberry-dac-overlay[remove]', 
         'dtoverlay_||_hifiberry-dacplus-overlay[remove]', 
         'dtoverlay_||_hifiberry-digi-overlay[remove]', 
         'dtoverlay_||_iqaudio-dac-overlay[remove]', 
         'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
-        'dtoverlay_||_w1-gpio-overlay[remove]', 
-        'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
-        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=99[remove]', 
+        'dtoverlay_||_w1-gpio-overlay[remove]', 'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
+        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=18', 
         'dtoverlay_||_spi-bcm2835-overlay[remove]'
         ]
     }
 
-    apply_changes_to_configtxt(changes, '/home/plaskev/Documents/config.txt')
+    apply_changes_to_configtxt(changes, 'C:\\temp\\config.txt')
 
 
 if __name__ == "__main__":
 
     print test()
-    a = 1
 
+    a  = retrieve_settings_from_configtxt()
 
+    print a
 # device_tree_overlay=lirc-rpi-overlay
 
 # dtparam=gpio_out_pin=16
