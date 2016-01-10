@@ -1,1 +1,1 @@
-PATH="$PATH:/usr/osmc/bin"
+PATH="$PATH:/sbin:/usr/sbin"
