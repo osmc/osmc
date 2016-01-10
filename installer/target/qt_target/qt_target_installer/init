@@ -46,14 +46,16 @@ fi
 grep -q atvinst /proc/cmdline
 if [ $? == 0 ]
 then
-    if [ -b /dev/sda ]
+    if [ -b /dev/sda ] && [ -b /dev/sdb ]
     then
         dd if=/dev/sdb of=/dev/sda bs=1M count=256 conv=fsync >/dev/null 2>&1
         dd if=/dev/zero of=/dev/sdb bs=512 count=1 >/dev/null 2>&1
         dd if=/dev/zero of=/dev/sdb bs=1M count=1 skip=255 > /dev/null 2>&1
-	echo "Please remove this USB stick, the power, and plug the device back in."
+	echo "Please remove USB stick and  unplug the Apple TV.  Wait 10 seconds and plug the Apple TV back in"
 	loopforever
-    else
+    fi
+    if [ ! -b /dev/sda ]
+    then
 	echo "No internal disk detected"
 	loopforever
     fi
