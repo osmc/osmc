@@ -1,0 +1,53 @@
+From ba629b85e7ee522243d565e6af00fa692a91d59e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:56:15 +0100
+Subject: [PATCH] Fix UPower capability detection on Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/powermanagement/linux/LogindUPowerSyscall.cpp | 4 ++--
+ xbmc/powermanagement/linux/UPowerSyscall.cpp       | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp b/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
+index 4e5bcc6..3bfc9a6 100644
+--- a/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
++++ b/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
+@@ -50,8 +50,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
+   if (!m_hasUPower)
+     CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
+ 
+-  m_canPowerdown = LogindCheckCapability("CanPowerOff");
+-  m_canReboot    = LogindCheckCapability("CanReboot");
++  m_canPowerdown = true;
++  m_canReboot    = true;
+   m_canHibernate = LogindCheckCapability("CanHibernate");
+   m_canSuspend   = LogindCheckCapability("CanSuspend");
+ 
+diff --git a/xbmc/powermanagement/linux/UPowerSyscall.cpp b/xbmc/powermanagement/linux/UPowerSyscall.cpp
+index 28ce475..d90247e 100644
+--- a/xbmc/powermanagement/linux/UPowerSyscall.cpp
++++ b/xbmc/powermanagement/linux/UPowerSyscall.cpp
+@@ -62,6 +62,9 @@ CUPowerSyscall::CUPowerSyscall()
+ 
+   m_lowBattery = false;
+ 
++  m_CanPowerdown = true;
++  m_CanReboot    = true;
++
+   dbus_error_init (&m_error);
+   // TODO: do not use dbus_connection_pop_message() that requires the use of a
+   // private connection
+@@ -83,9 +86,6 @@ CUPowerSyscall::CUPowerSyscall()
+     m_connection = NULL;
+   }
+ 
+-  m_CanPowerdown = false;
+-  m_CanReboot    = false;
+-
+   UpdateCapabilities();
+ 
+   EnumeratePowerSources();
+-- 
+2.1.0
+
