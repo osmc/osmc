@@ -799,10 +799,15 @@ Overclock settings are set using the Pi Overclock module."""
 
 			wgp = self.me.getSetting('w1gpio')
 
-			if wgp != '0':
-				new_dtoverlay.append('dtoverlay_||_' + w1gpio[int(wgp)-1])
+			if wgp == '1':
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay[remove]')
+			elif wgp == '2':
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay[remove]')
 			else:
-				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in w1gpio])
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay[remove]')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay[remove]')
 
 			rpi = self.me.getSetting('lirc-rpi-overlay')
 
