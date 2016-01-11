@@ -267,7 +267,7 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                     config_dict[true_key] = true_val
             continue
 
-        if value == 'remove':
+        if value in ['remove', 'None']:
             try:
                 del config_dict[key]
                 continue
