@@ -43,6 +43,8 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
 
     newlines = []
 
+    section = 0
+
     aliases = {     'device_tree_overlay'   :   'dtoverlay', 
                     'device_tree_param'     :   'dtparam',
                     'device_tree_params'    :   'dtparams',
@@ -53,6 +55,11 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
         lines = f.readlines()
 
         for line in lines:
+
+            # add in a section heading for each different line
+            # this is to ensure all comments are retained
+            newlines.append('["sectionheading_shield %s"]' % section)
+            section += 1
 
             line = line.strip()
 
@@ -176,6 +183,12 @@ def write_to_config_file(config_stringIO, export_location='C:\\temp\\temp.txt'):
     with open(export_location, 'w') as f:
         config_stringIO.seek(0)
         for line in config_stringIO.readlines():
+
+            # remove the section heading lines
+            # this workaround is needed to maintain comments, as the parser considers comments within body of the config to be
+            # related to the items surrounding them, if the item was removed the comment was too
+            if 'sectionheading_shield' in line: continue
+
             #print line
             # this identifies dtoverlays
             if '_||_' in line:
@@ -229,16 +242,29 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
 
                 if '[remove]' in dtoverlay_item:
 
-                    if true_key in config_dict:
-                        del config_dict[true_key]
+                    #print 'removing %s' % true_key
 
-                    else:
-                        alt_key = true_key.replace('-overlay', '')
-                        if alt_key in config_dict:
-                            del config_dict[alt_key]
+                    for _, v in config_dict.iteritems():
+
+                        if true_key in v:
+                            del v[true_key]
+                            #print '%s removed' % true_key
+                            break
+
+                        else:
+                            alt_key = true_key.replace('-overlay', '')
+                            if alt_key in v:
+                                del v[alt_key]
+                                #print '%s removed (ALT)' % true_key
+                                break
 
                 else:
-                    config_dict[true_key] = true_val
+                    for _, v in config_dict.iteritems():
+                        if true_key in v:
+                            v[true_key] = true_val
+                            break
+                    else:
+                        config_dict[true_key] = true_val
             continue
 
 
@@ -258,23 +284,34 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 
                 if '[remove]' in param_item:
 
-                    try:
-                        del config_dict[true_key]
-                    except KeyError:
-                        pass
+                    for _, v in config_dict.iteritems():
+
+                        try:
+                            del v[true_key]
+                            break
+                        except KeyError:
+                            pass
 
                 else:
-                    config_dict[true_key] = true_val
+                    for _, v in config_dict.iteritems():
+                        if true_key in v:
+                            v[true_key] = true_val
             continue
 
         if value in ['remove', 'None']:
-            try:
-                del config_dict[key]
-                continue
-            except KeyError:
-                continue
+            for _, v in config_dict.iteritems():
+                try:
+                    del v[key]
+                    break
+                except (KeyError, TypeError):
+                    continue
 
-        config_dict[key] = value
+        for _, v in config_dict.iteritems():
+            if key in v:
+                v[key] = value
+                break
+        else:
+            config_dict[key] = value
 
     blotter = StringIO.StringIO()
     config_dict.write(blotter)
@@ -287,12 +324,12 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
     # if os.path.isfile('/var/tmp/config.txt'):
     #     tmp_loc = '/var/tmp/config.txt'
     # else:
-    # tmp_loc = 'C:\\temp\\temp.txt'
+    tmp_loc = 'C:\\temp\\temp.txt'
 
     write_to_config_file(blotter, tmp_loc)
 
     # copy over the temp config.txt to /boot/ as superuser
-    subprocess.call(["sudo", "mv",  tmp_loc, file_loc])
+    # subprocess.call(["sudo", "mv",  tmp_loc, file_loc])
 
 
 def prepare_config_dict_for_addon(config_dict):
@@ -345,21 +382,22 @@ def retrieve_settings_from_configtxt(file_loc='C:\\temp\\config.txt'):
 
 def test():
     changes = {
-    'sdtv_aspect': 1, 
-    'hdmi_safe': '1',
-    'hdmi_boost' : 'remove',
-    'gpu_mem' : 'remove',
-    'orphanedparams': ['audio|__|on'], 
-    'start_x': 1,
-    'decode_MPG2' : '0x70b5858d',
+    # 'sdtv_aspect': 1, 
+    # 'hdmi_safe': '1',
+    # 'hdmi_boost' : 'remove',
+    # 'gpu_mem' : 'remove',
+    # 'orphanedparams': ['audio|__|on'], 
+    # 'start_x': 1,
+    # 'decode_MPG2' : 'remove',
     'dtoverlay': [
         'dtoverlay_||_hifiberry-dac-overlay[remove]', 
         'dtoverlay_||_hifiberry-dacplus-overlay[remove]', 
         'dtoverlay_||_hifiberry-digi-overlay[remove]', 
         'dtoverlay_||_iqaudio-dac-overlay[remove]', 
         'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
-        'dtoverlay_||_w1-gpio-overlay[remove]', 'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
-        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=18', 
+        'dtoverlay_||_w1-gpio-overlay[remove]', 
+        'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
+        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=999', 
         'dtoverlay_||_spi-bcm2835-overlay[remove]'
         ]
     }

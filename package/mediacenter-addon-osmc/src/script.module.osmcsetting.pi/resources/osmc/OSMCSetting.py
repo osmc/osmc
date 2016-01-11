@@ -797,6 +797,7 @@ Overclock settings are set using the Pi Overclock module."""
 				#remove the unneeded entries
 				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all if x != soundcard])
 
+
 			wgp = self.me.getSetting('w1gpio')
 
 			if wgp == '1':
@@ -808,6 +809,7 @@ Overclock settings are set using the Pi Overclock module."""
 			else:
 				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay[remove]')
 				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay[remove]')
+
 
 			rpi = self.me.getSetting('lirc-rpi-overlay')
 
@@ -828,6 +830,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 			else:
 				new_dtoverlay.append('dtoverlay_||_lirc-rpi-overlay' + '[remove]')
+
 
 			spi = self.me.getSetting('spi-bcm2835-overlay')
 
