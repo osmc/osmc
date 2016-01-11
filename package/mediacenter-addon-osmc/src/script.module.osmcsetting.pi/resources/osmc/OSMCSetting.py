@@ -99,6 +99,7 @@ import subprocess
 import sys
 import os
 import threading
+import traceback
 
 addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -363,7 +364,12 @@ Overclock settings are set using the Pi Overclock module."""
 
 			# get the setting value, translate it if needed
 			if translate_method:
-				setting_value = translate_method(setting_value)
+				try:
+					setting_value = translate_method(setting_value)
+				except:
+					log('Setting translation failed for %s, using default value' % key)
+					log(traceback.format_exc())
+					setting_value = self.pi_settings_dict[key].get('default','')
 
 			# if default is setting_value, then the setting has been set in the translation so ignore it
 			if setting_value not in self.not_going_to_config:
@@ -682,7 +688,11 @@ Overclock settings are set using the Pi Overclock module."""
 		if not reverse:
 			# use the setting as provided from the config.txt, only allow a max of 11 though
 
-			return min(int(data), 11)
+			try:
+				return min(int(data), 11)
+			except ValueError:
+				log('Malformed hdmi_boost entry')
+				return '0'
 
 		else:
 			if self.me.getSetting('config_hdmi_boost') == '0':

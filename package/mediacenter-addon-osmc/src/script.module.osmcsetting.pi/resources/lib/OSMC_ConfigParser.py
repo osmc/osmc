@@ -272,7 +272,7 @@ def apply_changes_to_configtxt(changes, file_loc='C:\\temp\\config.txt'):
                 del config_dict[key]
                 continue
             except KeyError:
-                pass
+                continue
 
         config_dict[key] = value
 
