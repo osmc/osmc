@@ -1,0 +1,26 @@
+From 5569f172e05f35412c1a140e78e2dea823d5aa2f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 11 Jan 2016 16:27:33 +0000
+Subject: [PATCH] Pass raw IR to LIRC userspace
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ arch/arm/boot/dts/overlays/gpio-ir-overlay.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts b/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts
+index a2d6bc7..0bbd99e 100644
+--- a/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts
++++ b/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts
+@@ -15,7 +15,7 @@
+                                 gpios = <&gpio 18 1>;
+ 
+                                 // parameter for keymap name
+-                                linux,rc-map-name = "rc-rc6-mce";
++                                linux,rc-map-name = "rc-lirc";
+ 
+                                 status = "okay";
+                         };
+-- 
+2.1.0
+
