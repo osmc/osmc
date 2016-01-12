@@ -76,7 +76,7 @@ def read_and_sanitise_file(file_loc='C:\\temp\\config.txt'):
 
             # add dtparams to overlay_storage, this ensures only dtparams that occur right after the dtoverlay are counted as parameters for the dtoverlay
             # ignoring comments and newlines
-            if overlay_storage and 'dtparam' in line:
+            if overlay_storage and 'dtparam' in line and 'audio=on' not in line.replace(' ' ,''):
                 line = line.replace(' ','')
                 overlay_storage.append(line[line.index('=')+1:].strip())
                 #print 'append param\n'
@@ -390,14 +390,14 @@ def test():
     # 'start_x': 1,
     # 'decode_MPG2' : 'remove',
     'dtoverlay': [
-        'dtoverlay_||_hifiberry-dac-overlay[remove]', 
-        'dtoverlay_||_hifiberry-dacplus-overlay[remove]', 
-        'dtoverlay_||_hifiberry-digi-overlay[remove]', 
-        'dtoverlay_||_iqaudio-dac-overlay[remove]', 
-        'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
-        'dtoverlay_||_w1-gpio-overlay[remove]', 
-        'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
-        'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=999', 
+        # 'dtoverlay_||_hifiberry-dac-overlay[remove]', 
+        # 'dtoverlay_||_hifiberry-dacplus-overlay[remove]', 
+        # 'dtoverlay_||_hifiberry-digi-overlay[remove]', 
+        # 'dtoverlay_||_iqaudio-dac-overlay[remove]', 
+        # 'dtoverlay_||_iqaudio-dacplus-overlay[remove]', 
+        # 'dtoverlay_||_w1-gpio-overlay[remove]', 
+        # 'dtoverlay_||_w1-gpio-pullup-overlay[remove]', 
+        # 'dtoverlay_||_lirc-rpi:gpio_out_pin=17,gpio_in_pin=999', 
         'dtoverlay_||_spi-bcm2835-overlay[remove]'
         ]
     }
