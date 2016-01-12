@@ -1,6 +1,8 @@
---- a/src/wispr.c	2015-03-10 10:32:41.691836519 +0000
-+++ b/src/wispr.c	2015-03-10 10:41:30.035380065 +0000
-@@ -30,8 +30,58 @@
+diff --git a/src/wispr.c b/src/wispr.c
+index ef4bdab..aa504fa 100644
+--- a/src/wispr.c
++++ b/src/wispr.c
+@@ -30,8 +30,55 @@
  
  #include "connman.h"
  
@@ -8,13 +10,10 @@
 -#define STATUS_URL_IPV6  "http://ipv6.connman.net/online/status.html"
 +#include <string.h>
 +#include <stdio.h>
-+#include <sys/socket.h>
-+#include <sys/ioctl.h>
-+#include <net/if.h>
 +#include <unistd.h>
 +
-+#define STATUS_URL_IPV4 "http://ipv4.online.osmc.io/online/status.html"
-+#define STATUS_URL_IPV6 "http://ipv6.online.osmc.io/online/status.html"
++#define STATUS_URL_IPV4 "http://osmc.tv/osmc/api/online"
++#define STATUS_URL_IPV6 "http://osmc.tv/osmc/api/online"
 +
 +int parse_option(const char *line, const char *option, char *value, size_t size)
 +{
@@ -61,26 +60,26 @@
  
  struct connman_wispr_message {
  	bool has_error;
-@@ -722,7 +772,7 @@
+@@ -722,7 +769,7 @@ static bool wispr_portal_web_result(GWebResult *result, gpointer user_data)
  		if (wp_context->wispr_msg.message_type >= 0)
  			break;
  
 -		if (g_web_result_get_header(result, "X-ConnMan-Status",
-+		if (g_web_result_get_header(result, "X-OSMC-Status",
++		if (g_web_result_get_header(result, "x-osmc-status",
  						&str)) {
  			portal_manage_status(result, wp_context);
  			return false;
-@@ -798,7 +848,40 @@
+@@ -798,7 +845,61 @@ static void proxy_callback(const char *proxy, void *user_data)
  	}
  
  	g_web_set_accept(wp_context->web, NULL);
 -	g_web_set_user_agent(wp_context->web, "ConnMan/%s wispr", VERSION);
 +	/* Get the installed device */
-+	char osmcdev[32];
++	char osmcdev[34];
 +	get_cmdline_option("osmcdev=", osmcdev, sizeof(osmcdev));
 +	/* Get the OS version */
 +	FILE *fp = fopen("/etc/os-release", "r");
-+	char *version = '\0';
++	char *version;
 +	if (fp)
 +	{
 +		char line[256];
@@ -88,27 +87,60 @@
 +		{
 +			if (strstr(line, "VERSION_ID"))
 +			{
-+				asprintf(&version, line);
++                        	char *it = NULL;
++                        	char *parsed_part;
++
++                        	strtok_r(line, "=", &it);
++                        	parsed_part = strtok_r(NULL, "=", &it);
++                        	version = strdup(parsed_part);
 +				break;
 +			}
 +		}
 +		fclose(fp);
 +	}
-+	/* Get the MAC of eth0 so NAT does not affect device count */
-+	int fd;
-+	struct ifreq ifr;
-+	unsigned char *mac;
-+	fd = socket(AF_INET, SOCK_DGRAM, 0);
-+	ifr.ifr_addr.sa_family = AF_INET;
-+	strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);
-+	ioctl(fd, SIOCGIFHWADDR, &ifr);
-+	close(fd);
-+	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
-+	
-+	if (osmcdev[0] != '\0' && version[0] != '\0')
-+		g_web_set_user_agent(wp_context->web, "OSMC running %s,%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x", osmcdev, version, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-+	else
-+		g_web_set_user_agent(wp_context->web, "OSMC"); 
++	/* Get system uptime */
++        fp = fopen("/proc/uptime", "r");
++        char *uptimeTotal;
++        char *uptimeIdle;
++        char uptimeLine[512];
++        if (fp)
++        {
++		char *parsed_part;
++		char *it;
++                fgets(uptimeLine, sizeof(uptimeLine), fp);
++		parsed_part = strtok_r(uptimeLine, " ", &it);
++		uptimeTotal = strdup(parsed_part);
++		parsed_part = strtok_r(NULL, " ", &it);
++		uptimeIdle = strdup(parsed_part);
++		fclose(fp);
++        }
++	int cpuCount = sysconf(_SC_NPROCESSORS_ONLN); /* Idle is calculated across all cores */
++        int uptimeIdleBalanced = atoi(uptimeTotal) / cpuCount;
++	asprintf(&uptimeIdle, "%d", uptimeIdleBalanced);
++
++	/* Get the UUID */
++	fp = fopen("/var/lib/dbus/machine-id", "r");
++        char uuid[34];
++        if (fp)
++        {
++                fgets(uuid, sizeof(uuid), fp);
++                fclose(fp);
++        }
++
++	/* Pass device, version, uptime total, uptime idle, UUID */
++	g_web_set_user_agent(wp_context->web, "%s %s %s %s %s", version, osmcdev, uptimeTotal, uptimeIdle, uuid);
  	g_web_set_close_connection(wp_context->web, TRUE);
  
  	connman_wispr_message_init(&wp_context->wispr_msg);
+@@ -809,6 +910,11 @@ static void proxy_callback(const char *proxy, void *user_data)
+ 					xml_wispr_parser_callback, wp_context);
+ 
+ 	wispr_portal_request_portal(wp_context);
++
++	/* Clean up */
++	free(version);
++    	free(uptimeIdle);
++    	free(uptimeTotal);
+ }
+ 
+ static gboolean no_proxy_callback(gpointer user_data)

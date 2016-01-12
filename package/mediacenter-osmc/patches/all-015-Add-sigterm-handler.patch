@@ -1,0 +1,49 @@
+From e497740c6e0bfaa342f597efa41464f12e0b2679 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 21 Dec 2015 04:32:14 +0000
+Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
+ down. If we are shutting down, then systemd may trigger our sigterm handler.
+ If this happens, we don't want to be running teardown code twice, so let's
+ check if we're already shutting down.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/main/main.cpp | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
+index 01027f8..aa098d2 100644
+--- a/xbmc/main/main.cpp
++++ b/xbmc/main/main.cpp
+@@ -41,12 +41,28 @@
+ #include "input/linux/LIRC.h"
+ #endif
+ #include "XbmcContext.h"
++#include "Application.h"
++#include "messaging/ApplicationMessenger.h"
++
++using namespace KODI::MESSAGING;
++
++void sigterm_handler(int signum)
++{
++       CLog::Log(LOGINFO, "OSMC: received signal to tear down Kodi");
++       if (! g_application.isShuttingDown())
++          CApplicationMessenger::GetInstance().PostMsg(TMSG_QUIT);
++}
++
+ 
+ #ifdef __cplusplus
+ extern "C"
+ #endif
+ int main(int argc, char* argv[])
+ {
++  struct sigaction action;
++  memset(&action, 0, sizeof(struct sigaction));
++  action.sa_handler = sigterm_handler;
++  sigaction(SIGTERM, &action, NULL);
+   // set up some xbmc specific relationships
+   XBMC::Context context;
+ 
+-- 
+2.1.0
+

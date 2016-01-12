@@ -1,5 +1,17 @@
 #!/bin/bash
 
+if [ "$1" = "upgrade" ]; then
+
+	CONFIG=/boot/config.txt
+	if grep -qw "osmcdev=rbp2" /proc/cmdline && [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.0.500" && grep -qw "arm_freq=1000" $CONFIG && \
+		grep -qw "core_freq=500" $CONFIG && grep -qw "sdram_freq=500" $CONFIG && grep -qw "over_voltage=2" $CONFIG
+	then
+		sed 's/^sdram_freq=500$/sdram_freq=450/g' -i $CONFIG
+		echo "Updated Turbo overclock profile to sdram_freq=450"
+		touch /tmp/reboot-needed
+	fi
+fi
+
 if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	systemctl stop mediacenter.service >/dev/null 2>&1
 	exit 0

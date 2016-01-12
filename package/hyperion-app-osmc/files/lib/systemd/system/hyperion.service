@@ -1,0 +1,14 @@
+[Unit]
+Description = hyperion
+After = mediacenter.service
+
+[Service]
+User = osmc
+Group = osmc
+Type = simple
+ExecStart= /usr/bin/hyperiond /etc/hyperion.config.json
+Restart = always
+RestartSec = 1
+
+[Install]
+WantedBy = multi-user.target

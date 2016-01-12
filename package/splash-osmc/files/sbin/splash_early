@@ -1,9 +1,9 @@
-#!/bin/bash
-mount -t proc proc /proc
+#!/bin/sh
+mount -t proc proc /proc >/dev/null 2>&1
 export TERM=linux
 
 /usr/bin/clear
-if grep -q quiet /proc/cmdline
+if grep -qw quiet /proc/cmdline
 then
 	/usr/bin/setterm --cursor off
 	/usr/bin/ply-image > /dev/null
@@ -11,23 +11,24 @@ else
 	sleep 2
 fi
 /sbin/checkmodifier
-if [ $? -eq 1 ]
+if [ $? -eq 1 ] || grep -qw recovery /proc/cmdline
 then
-	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/opt/vc/bin"
-	trap '' SIGINT
+	export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin"
+	trap '' INT
 	echo 0 > /proc/sys/kernel/ctrl-alt-del
 	fbset -depth 8 && fbset -depth 16
 	/usr/bin/setterm --cursor on
-	/sbin/fsck /
 	/bin/mount / -o remount,rw
 	/bin/mount /boot
-	/bin/mount -t sysfs sysfs /sys
+	/bin/mount -t sysfs sysfs /sys >/dev/null 2>&1
 	/bin/mkdir /dev/pts
 	/bin/mount -t devpts devpts /dev/pts
 	/bin/hostname -F /etc/hostname
-	echo; echo "          OSMC Recovery Console."
+	/bin/echo -e "\n\n\n\n"
+	echo "          OSMC Recovery Console."
 	echo "          Type 'exit' to reboot when finished."
-	echo "          For help and support see http://osmc.tv/help"; echo
+	echo "          For help and support see http://osmc.tv/help"
+	echo
 	/usr/bin/setsid -c /bin/bash
 	/bin/sync
 	echo 1 > /proc/sys/kernel/sysrq

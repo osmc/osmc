@@ -9,7 +9,8 @@
 		<setting enable="false" label="32013" visible="eq(-1,true)"/>
 		<!-- <setting id="hdmi_edid_file" type="bool" default="false" visible='false'/><setting id="hdmi_force_hotplug" type="bool" default="false" visible='false'/>-->
 		<setting default="false" id="hdmi_ignore_cec" label="32014" type="bool"/>
-		<setting default="0" id="hdmi_boost" label="32015" option="int" range="0,1,7" type="slider"/>
+		<setting default="0" id="config_hdmi_boost" label="32015" option="int" range="0,1,11" type="slider"/>
+		<setting type="lsep" label="32098" visible="!eq(-1,0)" />
 		<setting default="0" id="hdmi_group" label="32016" lvalues="32017|32018|32019" type="enum"/>
 		<setting default="0" id="hdmi_mode" label="32020" option="int" range="0,1,86" type="slider"/>
 		<setting default="0" id="hdmi_pixel_encoding" label="32087" lvalues="32088|32089|32090|32091|32092" type="enum"/>
@@ -38,6 +39,7 @@
 		<!-- <setting default="false" id="hifiberry-digi-overlay" label="32077" type="bool"/> -->
 		<!-- <setting default="false" id="hifiberry-dacplus-overlay" label="32076" type="bool" visible="eq(-4, true)"/> -->
 		<!-- <setting default="false" id="iq-audio-dacplus-overlay" label="32079" type="bool" visible="eq(-5, true)"/> -->
+		<setting type="lsep" label="[COLOR red]Warning[/COLOR]: GPIO remote support with default pins incompatible with HiFiBerry and iqaudio." visible="gt(-1,0)+eq(1,true)" />
 		<setting default="false" id="lirc-rpi-overlay" label="32080" type="bool"/>
 		<setting default="17" id="gpio_out_pin" label="gpio_out_pin" option="int" range="1,1,24" type="slider" visible="eq(-1,true)" subsetting="true"/>
 		<setting default="18" id="gpio_in_pin"  label="gpio_in_pin"  option="int" range="1,1,24" type="slider" visible="eq(-2,true)" subsetting="true"/>
@@ -46,7 +48,8 @@
 		<!-- <setting default="false" id="w1-gpio-pullup-overlay" label="32082" type="bool"/> -->
 		<setting default="0" id="w1gpio" label="w1gpio" values="none|w1-gpio-overlay|w1-gpio-pullup-overlay" type="enum"/>
 		<setting default="false" id="spi-bcm2835-overlay" label="32086" type="bool"/>
-		<setting default="false" id="suppress_dtoverlay" label="32083" type="bool"/>
+		<setting default="false" id="audio" label="32097" type="bool"/>
+		<!-- <setting default="false" id="suppress_dtoverlay" label="32083" type="bool"/> -->
 	</category>
 	<category label="32070">
 		<setting action="RunScript($CWD/resources/lib/config_editor.py)" id="non_addon_settings" label="32034" option="close" type="action"/>

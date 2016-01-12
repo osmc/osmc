@@ -1,0 +1,20 @@
+#!/bin/bash
+
+install_divert ()
+{
+	if ! dpkg-divert --listpackage "$2" | grep -q "$DPKG_MAINTSCRIPT_PACKAGE"; then
+		dpkg-divert --add --package "$DPKG_MAINTSCRIPT_PACKAGE" --rename --divert "$1" "$2"
+		EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+	fi
+}
+if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
+
+if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+
+	systemctl stop mediacenter.service >/dev/null 2>&1
+
+	# install all diverts needed by this version of the package:
+	# install_divert PATH_DIV PATH_ORIG
+
+	install_divert /usr/lib/kodi/kodi.bin.distributed /usr/lib/kodi/kodi.bin
+fi

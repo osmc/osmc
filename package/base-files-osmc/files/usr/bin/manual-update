@@ -10,6 +10,7 @@ fi
 
 export TERM=linux
 export LANG=C
+export DEBIAN_PRIORITY=critical
 failed=/var/tmp/.osmc_failed_update
 suppress=/var/tmp/.suppress_osmc_update_checks
 
@@ -45,13 +46,29 @@ then
 	package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
 	if [ -z "$package" ]; then package="(unknown package)"; fi
 
-	dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum. Attempting\n    to restart Kodi in 30 seconds...\n" 9 71 > /dev/tty1
+	dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum, making sure to\n    include debug logs. Attempting to restart Kodi in 30 seconds...\n" 9 74 > /dev/tty1
 	echo $package > $failed; chown osmc:osmc $failed
-	sleep 30
+	sleep 25
 else
 	rm -f $suppress
-	sleep 5
+	[ -e /etc/osmc/prefs.d/update_preferences ] && . /etc/osmc/prefs.d/update_preferences
+
+	desired_kernel=$(dpkg-query -W -f='${Depends}\n' "*-kernel-osmc" | sed -e 's/, */,/g' -e 's/\,/\n/g' | egrep -o ".*-image-.*-osmc")
+	running_kernel="-image-$(uname -r)"
+	removable_kernels=$(dpkg-query -W -f='${Package}\n' "*-image-*-osmc" | grep -v "$desired_kernel\|$running_kernel")
+
+	if [ -n "$removable_kernels" ] && [ "$OSMC_KERNEL_AUTOREMOVE" = "1" ]
+	then
+		if ! debconf-apt-progress --logfile $tmp -- apt-get -y purge $removable_kernels > /dev/tty1
+		then
+			dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred removing no longer required kernel packages.\n\n    Please report this problem on the OSMC forum, making sure to\n    include debug logs. Attempting to restart Kodi in 30 seconds...\n" 9 74 > /dev/tty1
+			echo -e "\nError removing old kernels during manual-update:" >> /var/log/apt/term.log
+			cat $tmp >> /var/log/apt/term.log
+			sleep 25
+		fi
+	fi
 fi
+sleep 5
 
 rm -f $tmp
 if [ -f /tmp/reboot-needed ] || [ -f /var/run/reboot-required ]; then reboot; exit; fi

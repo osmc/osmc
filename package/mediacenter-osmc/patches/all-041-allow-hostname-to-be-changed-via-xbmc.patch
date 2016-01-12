@@ -1,0 +1,57 @@
+From 08e2e5616ae26a7ac6b80a4af2a6bcbb3dd24af6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 20 Sep 2015 14:45:37 +0100
+Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  9 +++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 5bf91e5..5eb91bc 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -124,6 +124,15 @@ namespace XBMCAddon
+       CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
+     }
+ 
++    void sethostname(const char* hostname)
++    {
++      XBMC_TRACE;
++      if (! hostname)
++      return;
++      CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
++    }
++
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index b2f044f..0fede41 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -127,6 +127,18 @@ namespace XBMCAddon
+ 
+         void setskin(const char* skin);
+ 
++       /**
++        * sethostname(hostname) -- Change the device name, and in turn, hostname
++        *
++        * hostname               :     string - the name of the hostname to change to
++        *
++        *
++        * example:
++        *    - xbmc.sethostname("osmc")
++        */
++
++        void sethostname(const char* hostname);
++
+     /**
+      * sleep(time) -- Sleeps for 'time' msec.
+      * 
+-- 
+2.1.0
+

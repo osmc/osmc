@@ -5,6 +5,14 @@
 # (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
+loopforever()
+{
+    while true
+    do
+        sleep 1
+    done
+}
+
 # Standard busybox init
 /bin/mount -t proc proc /proc
 /bin/mount -o remount,rw,noatime /
@@ -21,11 +29,38 @@ udevadm trigger
 
 sleep 3 # Wait for /dev population
 
-/sbin/getty -L ttyAMA0 115200 vt100 & # for diagnostic purposes
+DEBUG_IP=$(sed 's/\ /\n/g' /proc/cmdline | grep "^debugip=" | sed 's/^debugip=//g')
+if [ -n "$DEBUG_IP" ]
+then
+        echo "auto eth0" > /etc/network/interfaces
+        echo "iface eth0 inet dhcp" >> /etc/network/interfaces
+        /sbin/ifup eth0
+        /usr/bin/netcat -e /bin/sh "$DEBUG_IP" 9999
+
+	while true
+	do
+	    sleep 1
+	done
+fi
+
+grep -q atvinst /proc/cmdline
+if [ $? == 0 ]
+then
+    if [ -b /dev/sda ] && [ -b /dev/sdb ]
+    then
+        dd if=/dev/sdb of=/dev/sda bs=1M count=256 conv=fsync >/dev/null 2>&1
+        dd if=/dev/zero of=/dev/sdb bs=512 count=1 >/dev/null 2>&1
+        dd if=/dev/zero of=/dev/sdb bs=1M count=1 skip=255 > /dev/null 2>&1
+	echo "Please remove USB stick and  unplug the Apple TV.  Wait 10 seconds and plug the Apple TV back in"
+	loopforever
+    fi
+    if [ ! -b /dev/sda ]
+    then
+	echo "No internal disk detected"
+	loopforever
+    fi
+fi
 
 /usr/bin/qt_target_installer -qws
 clear
-while true
-do
-	sleep 1
-done
+loopforever

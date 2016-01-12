@@ -1,0 +1,36 @@
+#!/bin/bash
+
+trap "echo 'file drivers/video/fbmon.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/mxc/hdmi-cec/mxc_hdmi-cec.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/video/mxc/mxc_hdmi.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/video/mxc/mxc_edid.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/mfd/mxc-hdmi-core.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/video/mxc/mxc_ipuv3_fb.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file drivers/mxc/vpu/mxc_vpu.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+echo 'file sound/soc/fsl/fsl_hdmi.c -pflmt' > /sys/kernel/debug/dynamic_debug/control; \
+for f in '$(grep -v '^#' /sys/kernel/debug/dynamic_debug/control  | awk -F':' '{print $1}' | sort | uniq)'; \
+do echo 'file \$f -pflmt' > /sys/kernel/debug/dynamic_debug/control; done; " INT  TERM EXIT
+
+#trap
+
+echo "file drivers/video/fbmon.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/video/fbdev/fbmon.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/mfd/mxc-hdmi-core.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/video/mxc/mxc_ipuv3_fb.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/mxc/hdmi-cec/mxc_hdmi-cec.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/video/mxc/mxc_hdmi.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/video/mxc/mxc_edid.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file drivers/mxc/vpu/mxc_vpu.c +pft" > /sys/kernel/debug/dynamic_debug/control
+echo "file sound/soc/fsl/fsl_hdmi.c +pft" > /sys/kernel/debug/dynamic_debug/control
+
+#for f in $(grep 'sound/soc\|drivers/dma' /sys/kernel/debug/dynamic_debug/control  | awk -F':' '{print $1}' | sort | uniq); do
+#for f in $(grep -v '^#\|^fs/btrfs' /sys/kernel/debug/dynamic_debug/control  | awk -F':' '{print $1}' | sort | uniq); do
+#    echo "file $f +pft" > /sys/kernel/debug/dynamic_debug/control
+#done
+
+while sleep 0.5; do
+#    date
+    dmesg -T -c | grep -v 'AXI\|Updating SDC\|Update complete\|Y wrap disabled\|VSYNC\|FLIP'
+#\|cec_poll\|hdmi_set_clk_regenerator'
+
+done

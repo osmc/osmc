@@ -63,7 +63,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		else:
 			# raspberry Pi2 profiles, there is not higher, only normal and turbo
 			self.normal_profile = self.oc_profile(900, 450, 450, 0, 0, 0, 0)
-			self.medium_profile = self.oc_profile(1000, 500, 500, 0, 2, 0, 0)
+			self.medium_profile = self.oc_profile(1000, 450, 500, 0, 2, 0, 0)
 			self.custom_profile = self.oc_profile(
 				self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
 				self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),

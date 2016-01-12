@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">1</defaultcontrol>
+    <animation effect="fade" time="250">WindowOpen</animation>
+    <animation effect="fade" time="500">WindowClose</animation>
+    <controls>
+        <!-- DEFAULT BACKGROUND -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff0b2430">white.png</texture>
+        </control>
+        <!-- IMAGE LIST -->
+        <control description="List control holding the images in order" id="1" type="fixedlist">
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <visible>true</visible>
+            <orientation>horizontal</orientation>
+            <scrolltime>0</scrolltime>
+            <autoscroll>false</autoscroll>
+            <focusposition>0</focusposition>
+            <ondown>999</ondown>
+            <onup>noop</onup>
+            <onleft>noop</onleft>
+            <onright>noop</onright>
+            <movement>6</movement>
+            <itemlayout>
+                <control type="image">
+                    <posx>0</posx>
+                    <posy>0</posy>
+                    <width>1920</width>
+                    <height>1080</height>
+                    <visible>false</visible>
+                    <texture>$INFO[ListItem.Icon]</texture>
+                </control>
+            </itemlayout>
+            <focusedlayout>
+                <control type="image">
+                    <animation type="Focus">
+                        <effect delay="50" end="100" start="0" time="150" type="fade"/>
+                    </animation>
+                    <animation type="Unfocus">
+                        <effect end="0" start="100" time="100" type="fade"/>
+                    </animation>
+                    <posx>0</posx>
+                    <posy>0</posy>
+                    <width>1920</width>
+                    <height>1080</height>
+                    <texture>$INFO[ListItem.Icon]</texture>
+                </control>
+            </focusedlayout>
+        </control>
+        <!-- BLIP NAVIGATOR -->
+        <control description="group holding the navigation and exit controls" id="555" type="group">
+            <visible>!System.IdleTime(2)|Control.HasFocus(555)</visible>
+            <control description="control to house the current image indicator" id="50" type="list">
+                <centerleft>960</centerleft>
+                <bottom>100</bottom>
+                <width>250</width>
+                <height>40</height>
+                <orientation>horizontal</orientation>
+                <scrolltime>0</scrolltime>
+                <visible>IntegerGreaterThan(Container(50).NumItems, 1)</visible>
+                <itemlayout description="inactive image" height="40" width="40">
+                    <control type="image">
+                        <width>40</width>
+                        <height>40</height>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <texture>navi_blip_OFF.png</texture>
+                        <visible>!StringCompare(ListItem.Label, Container(1).ListItemPosition(Container(1).Position).Label)</visible>
+                    </control>
+                    <control description="active image" type="image">
+                        <!-- this image is visible if the corresponding position in the image container is focussed -->
+                        <width>40</width>
+                        <height>40</height>
+                        <posx>0</posx>
+                        <posy>0</posy>
+                        <texture>navi_blip_ON.png</texture>
+                        <visible>StringCompare(ListItem.Label, Container(1).ListItemPosition(Container(1).Position).Label)</visible>
+                        <animation type="Visible">
+                            <effect delay="25" end="100" start="0" time="250" type="fade"/>
+                        </animation>
+                        <animation type="Hidden">
+                            <effect end="0" start="100" time="50" type="fade"/>
+                        </animation>
+                    </control>
+                </itemlayout>
+            </control>
+            <!-- EXIT BUTTON -->
+            <control description="exit button" id="999" type="button">
+                <description>My first button control</description>
+                <bottom>50</bottom>
+                <centerleft>960</centerleft>
+                <width>60</width>
+                <height>40</height>
+                <animation type="Visible">
+                    <effect delay="25" end="100" start="0" time="250" type="fade"/>
+                </animation>
+                <animation type="Hidden">
+                    <effect end="0" start="100" time="50" type="fade"/>
+                </animation>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+                <texturefocus colordiffuse="FFFFAAFF">exit_buttonFO.png</texturefocus>
+                <texturenofocus colordiffuse="FFFFAAFF">exit_buttonFX.png</texturenofocus>
+                <onup>1</onup>
+            </control>
+        </control>
+    </controls>
+</window>

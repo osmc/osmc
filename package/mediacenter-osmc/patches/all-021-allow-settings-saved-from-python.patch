@@ -1,4 +1,4 @@
-From 3d238e966543c672b8bc3abad282f4820368fb65 Mon Sep 17 00:00:00 2001
+From 5380fb92c9c261d5d2ea8e977fb736bf549ebf0e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:22:04 +0100
 Subject: [PATCH] Allow legacy interface to be used for saving GUISettings
@@ -10,23 +10,23 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 13 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 1ddfd64..707ff97 100644
+index 7bf9093..d691955 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -484,6 +484,11 @@ namespace XBMCAddon
+@@ -493,6 +493,11 @@ namespace XBMCAddon
        CAEFactory::Resume();
      }
  
 +   void saveSettings()
 +   {
-+      CSettings::Get().Save();
++      CSettings::GetInstance().Save();
 +   }
 +
      String convertLanguage(const char* language, int format)
      {
        std::string convertedLanguage;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index cde3dd4..d48e478 100644
+index 09169dd..98b4190 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
 @@ -403,6 +403,14 @@ namespace XBMCAddon

@@ -1,0 +1,26 @@
+#!/bin/busybox sh
+
+export OPTION_DO_FSCK="1"
+export OPTION_FORCE_FSCK="0"
+export OPTION_ROOT="/dev/mmcblk0p2"
+export OPTION_ROOTDELAY="0"
+export OPTION_FILESYSTEM="ext4"
+export OPTION_INIT="/sbin/splash_early"
+export OPTION_MOUNT_OPTIONS=""
+export OPTION_MOUNT_PATH="/real_root"
+
+# Enable framebuffer device
+echo 0 > /sys/class/graphics/fb0/blank
+
+# Disable framebuffer scaling
+echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
+
+# Include deinterlacer into default VFM map
+echo rm default > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+
+# Better entropy
+for part in /sys/block/*/queue/add_random; do
+echo 0 > "$part"
+done

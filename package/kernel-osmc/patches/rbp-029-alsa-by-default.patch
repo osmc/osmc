@@ -1,0 +1,26 @@
+From e98c11c9ed072b3c0eccc5dc330f0e746bcebf41 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 12 Jan 2016 00:36:37 +0000
+Subject: [PATCH] snd_bcm2835 by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ arch/arm/boot/dts/bcm2708_common.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/bcm2708_common.dtsi b/arch/arm/boot/dts/bcm2708_common.dtsi
+index 75fb4ce..8b2e83e 100644
+--- a/arch/arm/boot/dts/bcm2708_common.dtsi
++++ b/arch/arm/boot/dts/bcm2708_common.dtsi
+@@ -34,7 +34,7 @@
+ 	audio: audio {
+ 		compatible = "brcm,bcm2835-audio";
+ 		brcm,pwm-channels = <8>;
+-		status = "disabled";
++		status = "okay";
+ 	};
+ 
+ 	/* External sound card */
+-- 
+2.1.0
+

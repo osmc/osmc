@@ -1,0 +1,29 @@
+From 47db40ea3d8cf6df8bedf8cc9c4886000987c1f9 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 16 Aug 2015 12:42:38 +0100
+Subject: [PATCH] Add My OSMC to System menu in Confluence
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ addons/skin.confluence/720p/IncludesHomeMenuItems.xml | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/addons/skin.confluence/720p/IncludesHomeMenuItems.xml b/addons/skin.confluence/720p/IncludesHomeMenuItems.xml
+index 70e95fb..28151b0 100644
+--- a/addons/skin.confluence/720p/IncludesHomeMenuItems.xml
++++ b/addons/skin.confluence/720p/IncludesHomeMenuItems.xml
+@@ -190,6 +190,11 @@
+ 			<label>5</label>
+ 			<onclick>ActivateWindow(Settings)</onclick>
+ 		</control>
++		<control type="button" id="90120">
++			<include>ButtonHomeSubCommonValues</include>
++			<label>My OSMC</label>
++			<onclick>RunAddon(service.osmc.settings)</onclick>
++		</control>
+ 		<control type="button" id="90123">
+ 			<include>ButtonHomeSubCommonValues</include>
+ 			<label>7</label>
+-- 
+2.1.0
+

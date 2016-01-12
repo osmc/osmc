@@ -1,0 +1,32 @@
+--- /dev/null	2015-10-21 21:00:35.263999475 +0100
++++ a/package/parted/parted-004-no-warn-on-disk-size.patch	2015-10-21 21:18:53.991796429 +0100
+@@ -0,0 +1,29 @@
++--- parted/libparted/labels/gpt.c       2015-10-21 20:46:32.940713524 +0100
+++++ parted/libparted/labels/gpt.c 2015-10-21 20:46:56.424026950 +0100   2015-10-21 20:58:10.252252716 +0100
++@@ -721,26 +721,8 @@
++ 
++   if (!asked_already && last_usable < last_usable_if_grown)
++     {
++-      PedExceptionOption q;
++-
++-      q = ped_exception_throw
++-        (PED_EXCEPTION_WARNING,
++-         PED_EXCEPTION_FIX | PED_EXCEPTION_IGNORE,
++-         _("Not all of the space available to %s appears "
++-           "to be used, you can fix the GPT to use all of the "
++-           "space (an extra %llu blocks) or continue with the "
++-           "current setting? "), disk->dev->path,
++-         (uint64_t) (last_usable_if_grown - last_usable));
++-
++-      if (q == PED_EXCEPTION_FIX)
++-        {
++           last_usable = last_usable_if_grown;
++           *update_needed = 1;
++-        }
++-      else if (q != PED_EXCEPTION_UNHANDLED)
++-        {
++-          asked_already = 1;
++-        }
++     }
++ 
++   ped_geometry_init (&gpt_disk_data->data_area, disk->dev,

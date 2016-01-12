@@ -32,7 +32,7 @@ void Utils::rebootSystem()
     system("/bin/sh -c \"/bin/sleep 10 && /bin/echo b > /proc/sysrq-trigger\"");
 }
 
-void inline Utils::updateDevTable()
+void Utils::updateDevTable()
 {
     system("/usr/sbin/partprobe");
 }
@@ -50,8 +50,20 @@ bool Utils::mklabel(QString device, bool isGPT)
     return mklabelProcess.exitCode() == 0;
 }
 
+bool Utils::setflag(QString device, QString flag, bool on)
+{
+    QProcess setflagProcess;
+    logger->addLine("Going to set flag " + flag + " on " + device + " with value of " + (on ? "on" : "off"));
+    setflagProcess.start("/usr/sbin/parted -s " + device.toLocal8Bit() + " set " + flag.toLocal8Bit() + (on ? "on" : "off"));
+    setflagProcess.waitForFinished(-1);
+    updateDevTable();
+    return setflagProcess.exitCode() == 0;
+}
+
 int Utils::getPartSize(QString device, QString fstype)
 {
+    if (fstype == "hfsplus")
+        fstype = "hfs+"; /* ATV hack */
     QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
     QProcess partedProcess;
     partedProcess.start("/bin/sh -c \"" + command + "\"");
@@ -80,10 +92,6 @@ bool Utils::fmtpart(QString partition, QString fstype)
     {
         mkfsProcess.start("/usr/sbin/mkfs.ext4 -F -I 256 -E stride=2,stripe-width=1024,nodiscard -b 4096 " + partition);
     }
-    else if (fstype == "vfat")
-    {
-        mkfsProcess.start("/usr/sbin/mkfs.vfat -F 32 " + partition);
-    }
     mkfsProcess.waitForFinished(-1);
     logger->addLine(QString(mkfsProcess.readAll()));
     return mkfsProcess.exitCode() == 0;
@@ -110,14 +118,27 @@ bool Utils::mountPartition(Target *device, QString path)
     pathdir.mkpath(path);
     if (path == QString(MNT_BOOT))
     {
-        logger->addLine("Trying to mount to MNT_BOOT ("+QString(MNT_BOOT));
-        logger->addLine("Using device.boot: " + device->getBoot() + " and FS: " + device->getBootFS());
-        return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, device->getBootFS().toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+        logger->addLine("Trying to mount to MNT_BOOT ("+QString(MNT_BOOT) + ")");
+        logger->addLine("Using device->boot: " + device->getBoot() + " and FS: " + device->getBootFS());
+        QString bootFS = device->getBootFS();
+        if (bootFS == "fat32") { bootFS = "vfat"; }
+        if (this->getOSMCDev() != "atv")
+            return (mount(device->getBoot().toLocal8Bit(), MNT_BOOT, bootFS.toLocal8Bit(), (device->isBootRW() == true) ? 0 : 1, "") == 0) ? true : false;
+        else
+        {
+            QProcess mountProcess;
+            mountProcess.start("/bin/mount -t hfsplus -o force,rw " + device->getBoot().toLocal8Bit() + " " + MNT_BOOT);
+            mountProcess.waitForFinished(-1);
+            if (mountProcess.exitCode() == 0)
+                return true;
+            else
+                return false;
+        }
     }
     else if (path == QString(MNT_ROOT))
     {
-        logger->addLine("Trying to mount to MNT_ROOT ("+QString(MNT_ROOT));
-        logger->addLine("Using device.root: " + device->getRoot());
+        logger->addLine("Trying to mount to MNT_ROOT ("+QString(MNT_ROOT) + ")");
+        logger->addLine("Using device->root: " + device->getRoot());
         if (device->getRoot().contains(":/") && device->hasRootChanged())
         {
             logger->addLine("Assuming NFS mount.");
@@ -138,4 +159,21 @@ bool Utils::mountPartition(Target *device, QString path)
     }
     logger->addLine("Unsupported mountpoint.");
     return false;
+}
+
+bool Utils::unmountPartition(Target *device, QString path)
+{
+    if (path == QString(MNT_BOOT))
+    {
+        logger->addLine("Trying to unmount MNT_BOOT ("+QString(MNT_BOOT) + ")");
+        logger->addLine("Using device->boot: " + device->getBoot());
+        return (umount(device->getBoot().toLocal8Bit()) == 0) ? true : false;
+    }
+    if (path == QString(MNT_ROOT))
+    {
+        logger->addLine("Trying to unmount MNT_ROOT ("+QString(MNT_ROOT) + ")");
+        logger->addLine("Using device->root: " + device->getRoot());
+        return (umount(device->getRoot().toLocal8Bit()) == 0) ? true : false;
+    }
+
 }

@@ -1,0 +1,30 @@
+From c2191b683a619741dc8614948d9cb6f77c596b53 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Aug 2015 13:14:22 +0100
+Subject: [PATCH 6/7] Use m_eOSMCWalkthroughState to suppress skin reloads that
+ may be caused by addons when the tutorial is running
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 6e89cdd..183aa5f 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -1511,6 +1511,11 @@ bool CApplication::OnSettingsSaving() const
+ 
+ void CApplication::ReloadSkin(bool confirm/*=false*/)
+ {
++  if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING || m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_NOTRUNNING)
++  {
++     CLog::Log(LOGINFO, "Suppressing skin reload as the walkthrough is running");
++     return;
++  }
+   std::string oldSkin = g_SkinInfo ? g_SkinInfo->ID() : "";
+ 
+   CGUIMessage msg(GUI_MSG_LOAD_SKIN, -1, g_windowManager.GetActiveWindow());
+-- 
+2.1.0
+

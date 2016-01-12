@@ -1,0 +1,22 @@
+diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
+index b9bfd57..5747231 100755
+--- a/tools/depends/target/ffmpeg/autobuild.sh
++++ b/tools/depends/target/ffmpeg/autobuild.sh
+@@ -124,6 +124,17 @@ fi
+ mkdir ffmpeg-${VERSION}
+ cd ffmpeg-${VERSION} || exit 2
+ tar --strip-components=1 -xf ../${ARCHIVE}
++cp ../*.patch .
++PATCHES="0001-Discard-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch
++0001-libavformat-add-mvcC-handling-in-.mov-.mp4.patch
++0001-mpeg4video-Signal-unsupported-GMC-with-more-than-one.patch
++added_ARM_NEON_optimized_SAO_patches.patch
++ffmpeg_Speed_up_wtv_index_creation.patch
++"
++for patch in $PATCHES
++do
++patch -p1 < $patch
++done
+ 
+ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ ./configure --prefix=$FFMPEG_PREFIX \

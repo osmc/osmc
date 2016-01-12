@@ -37,7 +37,7 @@
 		description 					: The description for the module, shown in the OSA
 
 		reboot_required					: A boolean to declare if the OS needs to be rebooted. If a change in a specific setting 
-									 	  requires an OS reboot to take affect, this is flag that will let the OSG know.
+										  requires an OS reboot to take affect, this is flag that will let the OSG know.
 
 		setting_data_method 			: This dictionary contains:
 												- the name of all settings in the module
@@ -108,10 +108,25 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 # OSMC SETTING Modules
 from networking_gui import networking_gui
 import osmc_network
+from osmc_advset_editor import AdvancedSettingsEditor
+
+
+DIALOG    = xbmcgui.Dialog()
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
 	xbmc.log('OSMC NETWORKING ' + str(message), level=xbmc.LOGDEBUG)
+
+
+def lang(id):
+    san = __addon__.getLocalizedString(id).encode('utf-8', 'ignore')
+    return san
 
 
 class OSMCSettingClass(threading.Thread):
@@ -147,6 +162,28 @@ class OSMCSettingClass(threading.Thread):
 		# populate the settings data in the setting_data_method
 		self.populate_setting_data_method()
 
+		# create the advanced settings reader to determine if Wait_for_Network should be activated
+		self.ASE = AdvancedSettingsEditor(log)
+
+		# read advancedsettings.xml and convert it into a dictionary
+		advset_dict = self.ASE.parse_advanced_settings()
+
+		#check whether the advanced settings dict contains valid MySQL information
+		valid_advset_dict, _ = self.ASE.validate_advset_dict(advset_dict, reject_empty=True, exclude_name=True)
+
+		# when a valid MySQL advanced settings file is found, toggle the Wait_for_Network setting to ON
+		if valid_advset_dict:
+
+			# only proceed if the (either) server is not on the localhost
+			if self.ASE.server_not_localhost(advset_dict):
+
+				# confirm that wait_for_network is not already enabled
+				if not osmc_network.is_connman_wait_for_network_enabled():
+
+					undo_change = DIALOG.yesno('MyOSMC', lang(32078),nolabel=lang(32080), yeslabel=lang(32079), autoclose=10000)
+					
+					if not undo_change:
+						osmc_network.toggle_wait_for_network(True)
 
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
@@ -269,8 +306,11 @@ class OSMCSettingClass(threading.Thread):
 
 		return latest_settings
 
-	def check_internet(self):
-		return osmc_network.has_internet_connection()
+	def check_network(self, online):
+		return osmc_network.has_network_connection(online)
+
+	def is_ftr_running(self):
+		return osmc_network.is_ftr_running()
 
 	##############################################################################################################################
 	#																															 #

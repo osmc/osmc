@@ -44,6 +44,12 @@ def getvalue(valuestring):
 	line = splitvalue[3].replace("\r", "")
 	return line.replace("\n", "")
 
+def format_ip(ipstring):
+	a = ipstring.split('.')
+	for i, s in enumerate(a):
+		a[i] = str(int(s,base=10))
+	return a[0] + '.' + a[1] + '.' + a[2] + '.' + a[3]
+
 def make_variant(string):
 	return dbus.String(string, variant_level=1)
 
@@ -71,20 +77,20 @@ def main():
 				syslog.syslog("DHCP is set to " + getvalue(line))
 				network["auto"] = getvalue(line)
 			if line.startswith("d-i network/ip string"):
-				syslog.syslog("IP address is set to " + getvalue(line))
-				network["ip"] = getvalue(line)
+				syslog.syslog("IP address is set to " + format_ip(getvalue(line)))
+				network["ip"] = format_ip(getvalue(line))
 			if line.startswith("d-i network/mask string"):
-				syslog.syslog("Subnet mask is set to " + getvalue(line))
-				network["mask"] = getvalue(line)
+				syslog.syslog("Subnet mask is set to " + format_ip(getvalue(line)))
+				network["mask"] = format_ip(getvalue(line))
 			if line.startswith("d-i network/dns1 string"):
-				syslog.syslog("DNS1 is set to " + getvalue(line))
-				network["dns1"] = getvalue(line)
+				syslog.syslog("DNS1 is set to " + format_ip(getvalue(line)))
+				network["dns1"] = format_ip(getvalue(line))
 			if line.startswith("d-i network/dns2 string"):
-				syslog.syslog("DNS2 is set to " + getvalue(line))
-				network["dns2"] = getvalue(line)
+				syslog.syslog("DNS2 is set to " + format_ip(getvalue(line)))
+				network["dns2"] = format_ip(getvalue(line))
 			if line.startswith("d-i network/gw string"):
-				syslog.syslog("Gateway is set to " + getvalue(line))
-				network["gw"] = getvalue(line)
+				syslog.syslog("Gateway is set to " + format_ip(getvalue(line)))
+				network["gw"] = format_ip(getvalue(line))
 			if line.startswith("d-i network/ssid string"):
 				syslog.syslog("SSID is set to " + getvalue(line))
 				network["ssid"] = getvalue(line)

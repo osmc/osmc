@@ -1,0 +1,60 @@
+From 2f0df1baf1fa35820a00fcfcc55c50c72da0ab2e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 15 Oct 2015 05:40:56 +0100
+Subject: [PATCH] Use UDevil to unmount disks if it is available
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/linux/PosixMountProvider.cpp   | 12 +++++++++++-
+ xbmc/storage/linux/UDevProvider.cpp | 12 +++++++++++-
+ 2 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/linux/PosixMountProvider.cpp b/xbmc/linux/PosixMountProvider.cpp
+index 218d10b..4aca9c7 100644
+--- a/xbmc/linux/PosixMountProvider.cpp
++++ b/xbmc/linux/PosixMountProvider.cpp
+@@ -133,7 +133,17 @@ bool CPosixMountProvider::Eject(const std::string& mountpath)
+ {
+   // just go ahead and try to umount the disk
+   // if it does umount, life is good, if not, no loss.
+-  std::string cmd = "umount \"" + mountpath + "\"";
++  std::string cmd;
++  if (access("/usr/bin/udevil", F_OK) != -1)
++  {
++      cmd = "/usr/bin/udevil umount \"" + mountpath + "\"";
++      CLog::Log(LOGDEBUG, "CPosixMountProvider::Eject - Going to use /bin/umount to perform an unmount operation");
++  }
++  else
++  {
++      cmd = "/bin/umount \"" + mountpath + "\"";
++      CLog::Log(LOGDEBUG, "CPosixMountProvider::Eject Going to use /usr/bin/udevil to perform an unmount operation");
++  }
+   int status = system(cmd.c_str());
+ 
+   if (status == 0)
+diff --git a/xbmc/storage/linux/UDevProvider.cpp b/xbmc/storage/linux/UDevProvider.cpp
+index 0ca370b..ec3dce2 100644
+--- a/xbmc/storage/linux/UDevProvider.cpp
++++ b/xbmc/storage/linux/UDevProvider.cpp
+@@ -207,7 +207,17 @@ bool CUDevProvider::Eject(const std::string& mountpath)
+ {
+   // just go ahead and try to umount the disk
+   // if it does umount, life is good, if not, no loss.
+-  std::string cmd = "umount \"" + mountpath + "\"";
++  std::string cmd;
++  if (access("/usr/bin/udevil", F_OK) != -1)
++  {
++      cmd = "/usr/bin/udevil umount \"" + mountpath + "\"";
++      CLog::Log(LOGDEBUG, "CUDevProvider::Eject - Going to use /bin/umount to perform an unmount operation");
++  }
++  else
++  {
++      cmd = "/bin/umount \"" + mountpath + "\"";
++      CLog::Log(LOGDEBUG, "CUDevProvider::Eject - Going to use /usr/bin/udevil to perform an unmount operation");
++  }
+   int status = system(cmd.c_str());
+ 
+   if (status == 0)
+-- 
+2.1.0
+

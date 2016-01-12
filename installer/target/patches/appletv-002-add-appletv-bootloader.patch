@@ -1,0 +1,46 @@
+diff --git a/package/Config.in b/package/Config.in
+index 6b6a73e..5940cf7 100644
+--- a/package/Config.in
++++ b/package/Config.in
+@@ -2,6 +2,7 @@ menu "Target packages"
+ 
+ source "package/busybox/Config.in"
+ source "package/osmc/Config.in"
++source "package/atv-bootloader/Config.in"
+ 
+ menu "Audio and video applications"
+ source "package/alsa-utils/Config.in"
+diff --git a/package/atv-bootloader/Config.in b/package/atv-bootloader/Config.in
+new file mode 100644
+index 0000000..0af0ad8
+--- /dev/null
++++ b/package/atv-bootloader/Config.in
+@@ -0,0 +1,5 @@
++config BR2_PACKAGE_ATV_BOOTLOADER
++	bool "atv-bootloader"
++	help
++	  AppleTV Bootloader
++	  Pre-compiled binaries of the AppleTV kexecable bootloader
+diff --git a/package/atv-bootloader/atv-bootloader.mk b/package/atv-bootloader/atv-bootloader.mk
+new file mode 100644
+index 0000000..56bbeb6
+--- /dev/null
++++ b/package/atv-bootloader/atv-bootloader.mk
+@@ -0,0 +1,17 @@
++################################################################################
++#
++# atv-bootloader
++#
++################################################################################
++
++ATV_BOOTLOADER_VERSION = master
++ATV_BOOTLOADER_SITE = $(call github,osmc,atv-bootloader,$(ATV_BOOTLOADER_VERSION))
++
++define ATV_BOOTLOADER_INSTALL_TARGET_CMDS
++	$(INSTALL) -D -m 0644 $(@D)/com.apple.Boot.plist $(BINARIES_DIR)/com.apple.Boot.plist
++	$(INSTALL) -D -m 0644 $(@D)/BootLogo.png $(BINARIES_DIR)/BootLogo.png
++	$(INSTALL) -D -m 0644 $(@D)/boot.efi $(BINARIES_DIR)/boot.efi
++	cp -r $(@D)/System $(BINARIES_DIR)/System
++endef
++
++$(eval $(generic-package))

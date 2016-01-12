@@ -5,20 +5,19 @@
 
 . ../common.sh
 
-echo -e "Building package rbp-bootloader"
+echo -e "Building package rbp-bootloader-osmc"
+
 BOOT="files/boot"
-FWFILES="LICENCE.broadcom
-start_x.elf
-fixup_x.dat
-bootcode.bin"
+FWFILES=( "LICENCE.broadcom" "start_x.elf" "fixup_x.dat" "bootcode.bin" )
+REV="1efc1ece0d1e282b1cf4f371d2f7c4098113c098"
+
 make clean
 
 mkdir -p "${BOOT}"
 
-for file in $FWFILES
+for file in ${FWFILES[@]}
 do
-	wget --no-check-certificate https://raw.githubusercontent.com/raspberrypi/firmware/master/boot/"${file}" -O "${BOOT}"/"${file}"
-	if [ $? != 0 ]; then echo "Download failed" && exit 1; fi
+    pull_bin "https://raw.githubusercontent.com/raspberrypi/firmware/${REV}/boot/${file}" "${BOOT}/${file}"
 done
 
 dpkg_build files/ rbp-bootloader-osmc.deb

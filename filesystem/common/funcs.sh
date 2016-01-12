@@ -86,8 +86,14 @@ function setup_busybox_links()
 		chroot ${1} ln -s /bin/busybox /bin/vi
 		chroot ${1} ln -s /bin/busybox /bin/ping
 		chroot ${1} ln -s /bin/busybox /bin/unzip
+		chroot ${1} ln -s /bin/busybox /bin/nc
 		chroot ${1} chmod +s /bin/busybox
 	fi
+}
+
+function enable_mirrordirection()
+{
+        sed -e "s/staging.apt.osmc.tv/apt.osmc.tv/g" -i ${1}/etc/apt/sources.list
 }
 
 export -f setup_osmc_user
@@ -99,3 +105,4 @@ export -f enable_init
 export -f create_base_fstab
 export -f conf_tty
 export -f setup_busybox_links
+export -f enable_mirrordirection

@@ -5,7 +5,6 @@
 
 fb_restore() {
 	echo 1 >/sys/class/vtconsole/vtcon1/bind
-	/bin/fbset -depth 32 && /bin/fbset -depth 16
 }
 
 export TERM=linux
@@ -14,6 +13,12 @@ chown osmc:osmc /sys/class/vtconsole/vtcon*/bind
 if [ "$1" = "stop" ]; then
 	fb_restore
 	exit
+fi
+
+if [ -e /home/osmc/enable-hdmi-trace ]; then
+	mv /var/log/hdmi-trace.log /var/log/hdmi-trace.old.log 2>/dev/null
+	/usr/bin/hdmi-trace >/var/log/hdmi-trace.log &
+	sleep 1
 fi
 
 trap 'wait; exit 0' SIGTERM
@@ -42,8 +47,18 @@ case $? in
 	fi
 
 	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
-	count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq 'online'; then break; fi; sleep 1; let count-=1; done
-	if [ $count -eq 0 ]
+
+	count=60
+	while [ $count -gt 0 ]; do
+		if grep -q nfsroot /proc/cmdline; then
+			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
+		else
+			if connmanctl state | grep -iq 'online'; then break; fi
+		fi
+		sleep 5; let count-=5
+	done
+
+	if [ $count -lt 1 ]
 	then
 		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
 		sleep 20; reboot
@@ -62,18 +77,24 @@ esac
 while true; do
 	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
 	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
-	echo 0 > /sys/devices/soc0/soc/20e0000.hdmi_video/enable_3d > /dev/null 2>&1
-	/bin/fbset -depth 16 && /bin/fbset -depth 32
 
 	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
 
 	setcap 'cap_net_bind_service=+ep' $KODI
 	echo 0 > /sys/class/vtconsole/vtcon1/bind
-	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd
-	CODE="$?"
+	starttime=$(date +%s)
+	echo "Starting Kodi..."
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
+	endtime=$(date +%s)
+	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
+	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
 
 	fb_restore
+	case $CODE in
+	64|66 )
+		exit 0;;
+	esac
 	chmod a+rw /dev/tty1
 	systemctl status getty@tty1 >/dev/null; GETTY=$?
 	if [ "$GETTY" -ne 0 ]; then
@@ -84,7 +105,6 @@ while true; do
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
-		/bin/fbset -depth 32 && /bin/fbset -depth 16
 		/usr/bin/setterm --cursor on >/dev/tty1
 		systemctl start getty@tty1
 		count=30

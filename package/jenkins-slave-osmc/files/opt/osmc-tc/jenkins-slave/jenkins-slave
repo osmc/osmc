@@ -5,9 +5,11 @@ if [ "$SLAVENAME" = "SlaveName" ] || [ -z "$SERVER" ] || [ -z "$SLAVENAME" ] || 
 	exit
 fi
 
+HOSTNAME=$(echo "$SERVER" | sed 's/:.*//')
+
 while true; do
 	# Work around jenkins slave.jar dns lookup bug
-	while true; do if host $SERVER; then break; else sleep 5; fi; done
+	while true; do if host $HOSTNAME; then break; else sleep 5; fi; done
 
 	cd /opt/osmc-tc/jenkins-slave/
 	curl -O -L http://$SERVER/jnlpJars/slave.jar

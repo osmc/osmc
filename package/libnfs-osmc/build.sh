@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.6.tar.gz" "$(pwd)/src"
+pull_source "https://sites.google.com/site/libnfstarballs/li/libnfs-1.9.8.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libnfs-osmc"
@@ -19,20 +19,24 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
+        sed '/Version/d' -i files-dev/DEBIAN/control
+        VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
+        VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
+        echo $VERSION_DEV >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-libns-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "autoconf"
 	handle_dep "libtool"
-	echo "Package: ${1}-libnfs-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libnfs-dev-osmc" >> files-dev/DEBIAN/control && echo "Depends: ${1}-libnfs-osmc" >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libnfs-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libnfs-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libnfs-*
-	./bootstrap
-	./configure --prefix=/usr
+	./configure --prefix=/usr/osmc
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
-	mkdir -p files-dev/usr
-	mv files/usr/include  files-dev/usr/
+	mkdir -p files-dev/usr/osmc
+	mv files/usr/osmc/include  files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg_build files ${1}-libnfs-osmc.deb

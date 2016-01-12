@@ -1,0 +1,56 @@
+From 3fb22d85ed854b62df8a12c428d1b59422be9796 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Aug 2015 12:41:13 +0100
+Subject: [PATCH] Allow skin to be changed via xbmc() legacy Python interface
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  8 ++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 9cf24a9..709c123 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -116,6 +116,14 @@ namespace XBMCAddon
+       CApplicationMessenger::GetInstance().SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
+     }
+ 
++    void setskin(const char* skin)
++    {
++      XBMC_TRACE;
++      if (! skin)
++      return;
++      CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
++    }
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 0425560..b2f044f 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -115,6 +115,18 @@ namespace XBMCAddon
+ 
+ 	 void setosmcwalkthroughstatus(int state);
+ 
++       /**
++        * setskin(skinname) -- Change the XBMC skin
++        *
++        * skinname               :     string - the name of the skin to change to
++        *
++        *
++        * example:
++        *    - xbmc.setskin("skin.confluence")
++        */
++
++        void setskin(const char* skin);
++
+     /**
+      * sleep(time) -- Sleeps for 'time' msec.
+      * 
+-- 
+2.1.0
+

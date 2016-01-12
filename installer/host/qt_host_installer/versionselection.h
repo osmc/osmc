@@ -43,7 +43,7 @@ private:
     QString version;
     QString buildName;
     QNetworkAccessManager *accessManager;
-    void enumerateBuilds(QByteArray buildline);
+    bool enumerateBuilds(QByteArray buildline);
     QMap<QString,QString> buildMap;
 };
 

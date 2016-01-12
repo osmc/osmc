@@ -1,0 +1,25 @@
+From a1e538336fd45654f00f61ea808ec8b7ed9d66a2 Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Fri, 4 Sep 2015 21:25:26 +0200
+Subject: [PATCH] Don't be over initiative. We know we should send AS. Just we
+ want our own timing when to send it.
+
+---
+ src/libcec/CECClient.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
+index 85b2e59..36381ca 100644
+--- a/src/libcec/CECClient.cpp
++++ b/src/libcec/CECClient.cpp
+@@ -137,10 +137,6 @@ bool CCECClient::OnRegister(void)
+   // set the physical address
+   SetPhysicalAddress(m_configuration);
+ 
+-  // make the primary device the active source if the option is set
+-  if (m_configuration.bActivateSource == 1)
+-    GetPrimaryDevice()->ActivateSource(500);
+-
+   return true;
+ }
+ 

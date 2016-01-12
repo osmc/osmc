@@ -110,6 +110,12 @@ from CompLogger import comprehensive_logger as clog
 import remote_gui
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC REMOTES ' + str(message), level=xbmc.LOGDEBUG)
 
 class OSMCSettingClass(threading.Thread):

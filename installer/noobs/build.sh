@@ -36,6 +36,7 @@ function build_fs_image()
 		echo "disable_overscan=1" >> config.txt
 		echo "start_x=1" >> config.txt
 		echo "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18" >> config.txt
+		echo "disable_splash=1" >> config.txt
 	else
 		# Add Pi2 config.txt
 		echo "gpu_mem_1024=256" >> config.txt
@@ -43,6 +44,7 @@ function build_fs_image()
 		echo "disable_overscan=1" >> config.txt
 		echo "start_x=1" >> config.txt
 		echo "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18" >> config.txt
+		echo "disable_splash=1" >> config.txt
 	fi
 	echo -e "Creating boot tarball"
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
@@ -51,6 +53,7 @@ function build_fs_image()
 	popd
 	# NOOBS modifications, i.e. future 'health' script would be in .
 	echo -e "Creating root tarball"
+	echo "noobs" > vendor
 	tar -cf - * | xz -9 -c - > root-${1}.tar.xz
 	mv root-${1}.tar.xz ../
 	popd

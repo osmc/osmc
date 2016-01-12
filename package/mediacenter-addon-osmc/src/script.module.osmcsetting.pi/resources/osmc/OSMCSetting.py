@@ -99,6 +99,7 @@ import subprocess
 import sys
 import os
 import threading
+import traceback
 
 addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -108,7 +109,7 @@ DIALOG     = xbmcgui.Dialog()
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-import config_tools as ct
+import OSMC_ConfigParser as ct
 from CompLogger import comprehensive_logger as clog
 
 
@@ -118,6 +119,12 @@ def lang(id):
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
 
 
@@ -208,9 +215,14 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': 'true',
 																		'translate': self.translate_bool
 																		},																		
-									'hdmi_boost': 				{'setting_value' : '',
+									'config_hdmi_boost': 		{'setting_value' : '',
 																	'default': '0',
+																		'translate': self.translate_hdmi_boost
 																	},
+									'hdmi_boost': 		{'setting_value' : '',
+																	'default': '0',
+																		'translate': self.translate_hdmi_boost
+																	},																	
 									'hdmi_group': 				{'setting_value' : '',
 																	'default': '0',
 																	},
@@ -241,7 +253,7 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': '144',
 																	},
 									'gpu_mem_1024': 			{'setting_value' : '',
-																	'default': '192',
+																	'default': '256',
 																	},																	
 									'decode_MPG2': 				{'setting_value' : '',
 																	'default': '',
@@ -257,10 +269,14 @@ Overclock settings are set using the Pi Overclock module."""
 																	'default': '',
 																		'translate': self.translate_dtoverlay,
 																	},
-									'device_tree':				{'setting_value' : '',
+									# 'device_tree':				{'setting_value' : '', 
+									# 								'default': '',
+									# 									'translate': self.translate_device_tree,
+									# 								},	
+									'orphanedparams':			{'setting_value' : '',
 																	'default': '',
-																		'translate': self.translate_device_tree,
-																	},																																			
+																		'translate': self.translate_orphanedparams,
+																	},																																																				
 									# 'other_settings_string': 	{'setting_value' : '',
 									# 								'default': '',
 									# 									'translate': self.translate_other_string
@@ -270,8 +286,9 @@ Overclock settings are set using the Pi Overclock module."""
 		# list to hold the keys for the other string settings
 		self.unknown_setting_keys = []
 
-		# list to hold the keys for the settings that need to be removed from the config.txt
-		self.remove_list = []
+		# list to hold the keys for the settings that need to be removed from the config.txt.
+		# hdmi_boost was changed to config_hdmi_boost, so if hdmi_boost is in the existing config it should be removed.
+		self.remove_list = ['hdmi_boost']
 
 		# the location of the config file FOR TESTING ONLY
 		try:								
@@ -296,7 +313,7 @@ Overclock settings are set using the Pi Overclock module."""
 			__addon__.setSetting('serial', serial)
 
 		except:
-			self.test_config = '/home/kubkev/Documents/config.txt'
+			self.test_config = '/home/plaskev/Documents/config.txt'
 
 		log('START')
 		for x, k in self.pi_settings_dict.iteritems():
@@ -314,7 +331,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# but I am going to set up my own process in addition to the xml one, I will be reading some
 		# settings from the config.txt, and getting the rest from the settings.xml
-		self.config_settings = ct.read_config(self.test_config)
+		self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		log('Config settings received from the parser: %s' % self.config_settings)
 
@@ -334,6 +351,11 @@ Overclock settings are set using the Pi Overclock module."""
 
 				setting_value = self.config_settings[key]
 
+			elif key == 'config_hdmi_boost' and 'hdmi_boost' in self.config_settings:
+				# this key was changed, here we will bring in the old key from the config.txt and use it to populate the UI
+
+				setting_value = self.config_settings['hdmi_boost']
+
 			else:
 				# if the key ISNT in the config.txt then set the value from the default stored in 
 				# the pi_settings_dict dict
@@ -342,7 +364,12 @@ Overclock settings are set using the Pi Overclock module."""
 
 			# get the setting value, translate it if needed
 			if translate_method:
-				setting_value = translate_method(setting_value)
+				try:
+					setting_value = translate_method(setting_value)
+				except:
+					log('Setting translation failed for %s, using default value' % key)
+					log(traceback.format_exc())
+					setting_value = self.pi_settings_dict[key].get('default','')
 
 			# if default is setting_value, then the setting has been set in the translation so ignore it
 			if setting_value not in self.not_going_to_config:
@@ -524,7 +551,7 @@ Overclock settings are set using the Pi Overclock module."""
 		self.translated_changed_settings['start_x'] = 1
 
 		# write the settings to the config.txt
-		ct.write_config(self.test_config, self.translated_changed_settings)
+		ct.apply_changes_to_configtxt(self.translated_changed_settings, self.test_config)
 
 
 	def boot_method(self):
@@ -647,9 +674,32 @@ Overclock settings are set using the Pi Overclock module."""
 
 		else:
 			if self.me.getSetting('suppress_dtoverlay') == 'true':
-				return ['']
+				return ''
 			else:
 				return ['[remove]']
+
+
+	@clog(log)
+	def translate_hdmi_boost(self, data, reverse=False):
+		'''
+			Checks for the presence of an empty device_tree setting, which disables device tree overlays.
+		'''
+
+		if not reverse:
+			# use the setting as provided from the config.txt, only allow a max of 11 though
+
+			try:
+				return min(int(data), 11)
+			except ValueError:
+				log('Malformed hdmi_boost entry')
+				return '0'
+
+		else:
+			if self.me.getSetting('config_hdmi_boost') == '0':
+				self.remove_list.append('config_hdmi_boost')
+			else:
+				return data
+
 
 	@clog(log)
 	def translate_dtoverlay(self, data, reverse=False):
@@ -735,24 +785,31 @@ Overclock settings are set using the Pi Overclock module."""
 
 			if pos == '0':
 
-				new_dtoverlay.extend([x + '[remove]' for x in dac_all])
+				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all])
 			
 			else:
 				
 				soundcard = dac_all[int(pos)-1]
 
 				# add the soundcard overlay
-				new_dtoverlay.append(soundcard)
+				new_dtoverlay.append('dtoverlay_||_'+ soundcard)
 
 				#remove the unneeded entries
-				new_dtoverlay.extend([x + '[remove]' for x in dac_all if x != soundcard])
+				new_dtoverlay.extend(['dtoverlay_||_' + x + '[remove]' for x in dac_all if x != soundcard])
+
 
 			wgp = self.me.getSetting('w1gpio')
 
-			if wgp != '0':
-				new_dtoverlay.append(w1gpio[int(wgp)-1])
+			if wgp == '1':
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay[remove]')
+			elif wgp == '2':
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay[remove]')
 			else:
-				new_dtoverlay.extend([x + '[remove]' for x in w1gpio])
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-overlay[remove]')
+				new_dtoverlay.append('dtoverlay_||_w1-gpio-pullup-overlay[remove]')
+
 
 			rpi = self.me.getSetting('lirc-rpi-overlay')
 
@@ -764,7 +821,7 @@ Overclock settings are set using the Pi Overclock module."""
 				in_pin   = self.me.getSetting('gpio_in_pin')
 				pull_pin = self.me.getSetting('gpio_in_pull')
 
-				lirc = 'lirc-rpi:' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
+				lirc = 'dtoverlay_||_lirc-rpi:' + 'gpio_out_pin=' + str(out_pin) + ',gpio_in_pin=' + str(in_pin)
 
 				if pull_pin != 'off':
 					lirc = lirc + ',gpio_in_pull=' + pull_pin
@@ -772,14 +829,15 @@ Overclock settings are set using the Pi Overclock module."""
 				new_dtoverlay.append(lirc)
 
 			else:
-				new_dtoverlay.append('lirc-rpi-overlay' + '[remove]')
+				new_dtoverlay.append('dtoverlay_||_lirc-rpi-overlay' + '[remove]')
+
 
 			spi = self.me.getSetting('spi-bcm2835-overlay')
 
 			if spi == 'true':
-				new_dtoverlay.append('spi-bcm2835-overlay')
+				new_dtoverlay.append('dtoverlay_||_spi-bcm2835-overlay')
 			else:
-				new_dtoverlay.append('spi-bcm2835-overlay' + '[remove]')
+				new_dtoverlay.append('dtoverlay_||_spi-bcm2835-overlay' + '[remove]')
 
 			log("NEW DT OVERLAY = %s" % new_dtoverlay)
 			return new_dtoverlay
@@ -861,7 +919,7 @@ Overclock settings are set using the Pi Overclock module."""
 			elif memgpu:
 
 				# set the value in the pi_settings_dict and the settings.xml for display
-				val512 = min(768, int(memgpu))
+				val1024 = min(768, int(memgpu))
 				self.me.setSetting('gpu_mem_1024', str(val1024))
 				self.pi_settings_dict['gpu_mem_1024']['setting_value'] = val1024
 
@@ -896,6 +954,36 @@ Overclock settings are set using the Pi Overclock module."""
 			return 'remove'
 			
 
+	def translate_orphanedparams(self, data, reverse=False):
+
+		''' Translates the orphaned dtparam for audio from either on, or remove '''
+
+		if not reverse:
+
+			datalist = data.split('\n')
+			
+			for param in datalist:
+
+				try:
+					k, v = param.split('|__|')
+				except ValueError:
+					return None
+
+				if v == 'on':
+					self.me.setSetting(k, 'true')
+				else:
+					self.me.setSetting(k, 'false')
+
+		else:
+
+			new_dtparams = []
+
+			if self.me.getSetting('audio') == 'true' or self.me.getSetting('spi-bcm2835-overlay') == 'true':
+				new_dtparams.append('audio|__|on')
+			else:
+				new_dtparams.append('audio[remove]')
+
+			return new_dtparams
 
 	#																															 #
 	##############################################################################################################################

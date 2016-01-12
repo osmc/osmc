@@ -15,8 +15,8 @@ archlist = [ 'binary-i386', 'binary-amd64', 'binary-armhf' ]
 
 for arch in archlist:
 
-	staging = urllib.urlopen('http://apt.osmc.tv/dists/jessie-devel/main/' + arch + '/Packages').read()
-	release = urllib.urlopen('http://apt.osmc.tv/dists/jessie/main/' + arch + '/Packages').read()
+	staging = urllib.urlopen('http://staging.apt.osmc.tv/dists/jessie-devel/main/' + arch + '/Packages').read()
+	release = urllib.urlopen('http://staging.apt.osmc.tv/dists/jessie/main/' + arch + '/Packages').read()
 
 	staging_packages = staging.split('\n\n')
 	release_packages = release.split('\n\n')

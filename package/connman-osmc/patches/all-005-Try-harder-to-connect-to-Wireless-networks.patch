@@ -1,0 +1,27 @@
+From 3b9c06defb866d4e682e0ad504b87d0010ea1ccb Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 29 Sep 2015 00:16:17 +0100
+Subject: [PATCH] Try harder to connect to Wireless networks. Helps with less
+ than stellar drivers
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ plugins/wifi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 587dee2..f4f84a6 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -61,7 +61,7 @@
+ 
+ #define CLEANUP_TIMEOUT   8	/* in seconds */
+ #define INACTIVE_TIMEOUT  12	/* in seconds */
+-#define FAVORITE_MAXIMUM_RETRIES 2
++#define FAVORITE_MAXIMUM_RETRIES 4
+ 
+ #define BGSCAN_DEFAULT "simple:30:-45:300"
+ #define AUTOSCAN_DEFAULT "exponential:3:300"
+-- 
+2.1.0
+

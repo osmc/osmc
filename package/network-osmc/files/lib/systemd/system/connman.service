@@ -1,10 +1,8 @@
 [Unit]
 Description=Connman connection service
-Requires=dbus.socket
-After=dbus.socket dbus.service
-Wants=network.target
+After=dbus.service network-pre.target
+Wants=network.target remote-fs-pre.target
 Before=remote-fs-pre.target network.target
-Wants=remote-fs-pre.target
 
 [Service]
 Type=dbus
@@ -13,6 +11,7 @@ EnvironmentFile=-/etc/connman.prefs
 Restart=always
 RestartSec=5
 ExecStart = /usr/bin/start-network
+ExecStopPost = /bin/sleep 2
 StandardOutput=null
 
 [Install]

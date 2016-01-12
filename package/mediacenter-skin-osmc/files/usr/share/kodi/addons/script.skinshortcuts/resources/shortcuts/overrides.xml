@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <overrides>
+	<versionEquivalency>
+		<!-- Handle groupings/shortcuts with version information, by specifying which other versions of
+		Kodi they are compatible with
+		
+		<equivalent version="14">All</equivalent>
+			- Valid on all versions of Kodi 14+
+
+		<equivalent version="14">16</equivalent>
+			- Valid on Kodi versions between 14 and 16 inclusive
+
+		-->
+		
+		<!-- PVR groupings -->
+		<groupEquivalent version="14" condition="PVR.HasTVChannels">All</groupEquivalent>
+		<groupEquivalent version="14" condition="PVR.HasRadioChannels">All</groupEquivalent>
+
+		<!-- PVR shortcuts -->
+		<shortcutEquivalent version="14" action="ActivateWindow(TVChannels)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(TVGuide)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(TVRecordings)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(TVTimers)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(TVSearch)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(RadioChannels)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(RadioGuide)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(RadioRecordings)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(RadioTimers)">All</shortcutEquivalent>
+		<shortcutEquivalent version="14" action="ActivateWindow(RadioSearch)">All</shortcutEquivalent>
+
+		<!-- Music shortcuts -->
+		<shortcutEquivalent version="13" action="MusicLibrary,Artists,return">14</shortcutEquivalent>
+		<shortcutEquivalent version="13" action="ActivateWindow(MusicLibrary,Albums,return)">14</shortcutEquivalent>
+		<shortcutEquivalent version="13" action="ActivateWindow(MusicLibrary,Songs,return)">14</shortcutEquivalent>
+
+		<shortcutEquivalent version="15" action="ActivateWindow(MusicLibrary,musicdb://artists/,return)">All</shortcutEquivalent>
+		<shortcutEquivalent version="15" action="ActivateWindow(MusicLibrary,musicdb://albums/,return)">All</shortcutEquivalent>
+		<shortcutEquivalent version="15" action="ActivateWindow(MusicLibrary,musicdb://songs/,return)">All</shortcutEquivalent>
+
+	</versionEquivalency>
+
+
 	<flatgroupings>
 		<node label="32029">
 			<content>common</content>
@@ -136,4 +176,50 @@
 			<content>commands</content>
 		</node>
 	</groupings>
+
+	<widget-groupings>
+		<content>widgets</content>
+		<node label="32030">
+			<content>video</content>
+			<node label="32040">
+				<content>playlist-video</content>
+			</node>
+			<node label="32010">
+				<content>addon-video</content>
+			</node>
+			<node label="32075">
+				<content>videosources</content>
+			</node>
+		</node>
+		<node label="32031">
+			<content>music</content>
+			<node label="32040">
+				<content>playlist-audio</content>
+			</node>
+			<node label="32011">
+				<content>addon-audio</content>
+			</node>
+			<node label="32075">
+				<content>musicsources</content>
+			</node>
+		</node>
+		<node label="32020">
+			<content>picturesources</content>
+		</node>
+		<node label="32007">
+			<node label="32010">
+				<content>addon-video</content>
+			</node>
+			<node label="32011">
+				<content>addon-audio</content>
+			</node>
+			<node label="32012">
+				<content>addon-image</content>
+			</node>
+			<shortcut label="10001" type="32021" icon="DefaultAddonProgram.png" widget="addon" widgetType="program" widgetTarget="programs">addons://sources/executable</shortcut>
+			<shortcut label="1037" type="32014" icon="DefaultAddonVideo.png" widget="addon" widgetType="video" widgetTarget="video">addons://sources/video</shortcut>
+			<shortcut label="1038" type="32019" icon="DefaultAddonMusic.png" widget="addon" widgetType="music" widgetTarget="music">addons://sources/audio</shortcut>
+			<shortcut label="1039" type="32020" icon="DefaultAddonPicture.png" widget="addon" widgetType="picture" widgetTarget="pictures">addons://sources/image</shortcut>
+		</node>
+	</widget-groupings>
 </overrides>

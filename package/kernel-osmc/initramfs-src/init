@@ -1,0 +1,246 @@
+#!/bin/busybox sh
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+# Abstract settings and defaults
+
+busybox_shell()
+{
+        # Installs BusyBox symlinks to make the shell actually usable
+	/bin/busybox --install -s
+	/bin/busybox setsid /bin/busybox sh -c 'exec /bin/busybox sh </dev/tty1 >/dev/tty1 2>&1'
+}
+
+OPTION_DO_FSCK="1"
+OPTION_FORCE_FSCK="0"
+OPTION_ROOT="/dev/mmcblk0p2"
+OPTION_ROOTDELAY="0"
+OPTION_FILESYSTEM="ext4"
+OPTION_INIT="/sbin/splash_early"
+# Each concatenated mount option should have a leading comma.
+OPTION_MOUNT_OPTIONS=""
+OPTION_MOUNT_PATH="/real_root"
+OPTION_NFS_IP_TYPE="dhcp"
+
+# Set up our mounts
+
+/bin/busybox mount -t devtmpfs devtmpfs /dev
+/bin/busybox mount -t proc proc /proc
+/bin/busybox mount -t sysfs sysfs /sys
+/bin/busybox mount -t tmpfs tmpfs /run
+
+# Load platform specific stuff
+. init-device
+
+# A nicer console
+
+echo 0 > /sys/devices/virtual/graphics/fbcon/cursor_blink
+echo 0 > /proc/sys/kernel/printk
+/bin/busybox clear
+echo -e "\033[9;0]\n\n\n\n"
+
+# Set up device nodes
+
+echo /bin/busybox mdev > /proc/sys/kernel/hotplug
+/bin/busybox mdev -s
+
+# Read /proc/cmdline and find out what we're doing.
+
+for option in $(/bin/busybox cat /proc/cmdline); do
+	case $option in
+	  rootdelay=*)
+	    OPTION_ROOTDELAY="${option#*=}"
+	    ;;
+	  root=*)
+		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox sed 's/"//g')
+		;;
+	  rootfstype=*)
+		OPTION_FILESYSTEM="${option#*=}"
+		;;
+	  init=*)
+		OPTION_INIT="${option#*=}"
+		;;
+	  nfsroot=*)
+		OPTION_DO_FSCK="0"
+		OPTION_FILESYSTEM="nfs"
+		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox cut -f 1 -d,)
+		OPTION_MOUNT_OPTIONS=$(echo "${option#*=},nolock" | /bin/busybox cut -sf 2- -d,)
+		;;
+	  ip=*)
+		OPTION_NFS_IP_TYPE="${option#*=}"
+		;;
+	  nofsck)
+		OPTION_DO_FSCK="0"
+		;;
+	  forcefsck)
+		OPTION_FORCE_FSCK="1"
+		;;
+	  rescue)
+		echo "          OSMC initramfs Rescue Console."
+		echo "          Type 'exit' to resume startup when finished."
+		echo -e "          For help and support see http://osmc.tv/help\n"
+		busybox_shell
+		;;
+	 esac
+done
+
+# Wait user specified delay for root filesystem.
+
+if [ "$OPTION_ROOTDELAY" -gt 0 ]
+then
+	echo "Waiting user specified rootdelay of $OPTION_ROOTDELAY seconds."
+	COUNTER=0
+	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
+	do
+		/bin/busybox sleep 1
+		COUNTER=$((COUNTER+1))
+	done
+fi
+
+# Wait for the root device node to appear if it has still not been added by mdev yet.
+
+if [ "$OPTION_FILESYSTEM" != "nfs" ]
+then
+	COUNTER=0
+	echo "Waiting for root filesystem device $OPTION_ROOT"
+	while [ ! -b "$OPTION_ROOT" ] && ! /bin/busybox blkid | /bin/busybox sed 's/"//g' | /bin/busybox grep -q "$OPTION_ROOT"; do
+        /bin/busybox sleep 1
+        COUNTER=$((COUNTER+1))
+        if [ "$COUNTER" -ge 30 ]
+        then
+                echo -e "FATAL ERROR: Could not find root filesystem device $OPTION_ROOT - if this is a USB install please check the USB drive is connected.\n"
+		# Drop to a shell
+		echo "          OSMC initramfs Rescue Console."
+		echo -e "          For help and support see http://osmc.tv/help\n"
+		busybox_shell
+		break
+        fi
+	done
+fi
+
+# Should we check the filesystem?
+
+if [ "$OPTION_DO_FSCK" -eq 1 ]
+then
+	# Verify filesystem integrity
+	FSCK_BIN="/bin/e2fsck"
+	if [ -f /bin/fsck.${OPTION_FILESYSTEM} ]; then FSCK_BIN="/bin/fsck.${OPTION_FILESYSTEM}"; fi
+
+	# Skip first prune scan in forcefsck mode.
+	if [ "$OPTION_FORCE_FSCK" -eq 0 ]
+	then
+		$FSCK_BIN -p -C 0 "$OPTION_ROOT"
+		fsck_result="$?"
+		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
+		then
+			echo -e "OSMC has repaired minor filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
+			/bin/busybox sleep 10
+			/bin/busybox reboot
+		fi
+
+		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
+		then
+			echo -e "Serious file system corruption found. We will do our best to repair this now.\n"
+			/bin/busybox sleep 5
+		fi
+	else
+		fsck_result=0
+	fi
+
+	if [ "$(( $fsck_result & 12 ))" -gt 0 ] || [ "$OPTION_FORCE_FSCK" -eq 1 ]
+	then
+		$FSCK_BIN -f -y -C 0 "$OPTION_ROOT"
+		fsck_result="$?"
+		if [ "$(( $fsck_result & 2 ))" -gt 0 ]
+		then
+			echo -e "OSMC has repaired filesystem corruption on your system that requires a reboot. Rebooting in 10 seconds.\n\n\n\n"
+			/bin/busybox sleep 10
+			/bin/busybox reboot
+		fi
+
+		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
+		then
+			# Something is wrong that we can't fix. Warn the user but let them attempt to boot anyway in case some data can be backed up.
+			echo -e "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds.\n\n\n\n"
+			/bin/busybox sleep 30
+		else
+			if [ "$fsck_result" -eq 0 ]
+			then
+				echo -e "No errors were found on your filesystem.\n\n\n\n"
+			else
+				echo -e "OSMC has successfully repaired your filesystem. Resuming startup in 10 seconds.\n\n\n\n"
+				/bin/busybox sleep 10
+			fi
+		fi
+	fi
+fi
+
+/bin/busybox mkdir -p "$OPTION_MOUNT_PATH"
+
+# Deactivate the hotplugger. systemd will take over
+echo "" > /proc/sys/kernel/hotplug
+
+# Let's try and mount
+
+if [ "$OPTION_FILESYSTEM" = "nfs" ]
+then
+	# Bring up the network
+	/bin/busybox mkdir -p /var/run
+	if echo $OPTION_NFS_IP_TYPE | /bin/busybox grep -q "dhcp"
+	then
+		/bin/busybox mkdir -p /etc/network
+		/bin/busybox mkdir -p /etc/network/if-up.d
+		echo "auto eth0
+		iface eth0 inet dhcp" > /etc/network/interfaces
+		/bin/busybox ifup eth0 > /dev/null 2>&1
+		/bin/busybox udhcpc -i eth0 > /dev/null 2>&1
+	else
+		NFS_IP_ADDR=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 1)
+                NFS_IP_GW=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 3)
+                NFS_IP_MASK=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 4)
+                /bin/busybox ifconfig eth0 "$NFS_IP_ADDR" netmask "$NFS_IP_MASK" up > /dev/null 2>&1
+                /bin/busybox route add default gw "$NFS_IP_GW" eth0 >/dev/null 2>&1
+        fi
+else
+	OPTION_MOUNT_OPTIONS="ro${OPTION_MOUNT_OPTIONS}"
+fi
+
+if [ "$OPTION_MOUNT_OPTIONS" ]; then OPTION_MOUNT_OPTIONS="-o $OPTION_MOUNT_OPTIONS"; fi
+/bin/busybox mount -t "$OPTION_FILESYSTEM" "$OPTION_ROOT" "$OPTION_MOUNT_PATH" $OPTION_MOUNT_OPTIONS
+mount_result="$?"
+if [ "$mount_result" -eq 0 ]
+then
+	# If we checked the filesystem, tell systemd
+	if [ "$OPTION_DO_FSCK" -eq 1 ]
+	then
+		/bin/busybox mkdir -p /run/initramfs
+		/bin/busybox touch /run/initramfs/fsck-root
+		while read -r line
+		do
+			echo "fsck: $line" >/dev/kmsg
+		done 2>/dev/null </fsck.log
+	fi
+	# Let's move our mounts over
+	/bin/busybox mount --move /dev "$OPTION_MOUNT_PATH"/dev
+	/bin/busybox mount --move /proc "$OPTION_MOUNT_PATH"/proc
+	/bin/busybox mount --move /sys "$OPTION_MOUNT_PATH"/sys
+	/bin/busybox mount --move /run "$OPTION_MOUNT_PATH"/run
+
+	for INIT in "$OPTION_INIT" /sbin/splash_early /sbin/init /etc/init /bin/init /bin/sh
+	do
+		if [ -f "${OPTION_MOUNT_PATH}/${INIT}" -o -L "${OPTION_MOUNT_PATH}/${INIT}" ]
+		then
+			exec /bin/busybox switch_root "$OPTION_MOUNT_PATH" "$INIT" $*
+		fi
+	done
+
+	echo -e "FATAL ERROR: Could not find a suitable init on the root filesystem\n\n\n\n"
+	while true; do /bin/busybox sleep 1000; done
+else
+	echo -e "FATAL ERROR: OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
+	# Drop to a shell
+		echo "          OSMC initramfs Rescue Console."
+		echo -e "          For help and support see http://osmc.tv/help\n"
+	busybox_shell
+fi

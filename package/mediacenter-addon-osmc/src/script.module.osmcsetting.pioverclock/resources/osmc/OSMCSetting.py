@@ -30,7 +30,7 @@
 		addonid							: The id for the addon. This must be the id declared in the addons addon.xml.
 
 		reboot_required					: A boolean to declare if the OS needs to be rebooted. If a change in a specific setting 
-									 	  requires an OS reboot to take affect, this is flag that will let the OSG know.
+										  requires an OS reboot to take affect, this is flag that will let the OSG know.
 
 		setting_data_method 			: This dictionary contains:
 												- the name of all settings in the module
@@ -98,17 +98,49 @@ DIALOG     = xbmcgui.Dialog()
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-import config_tools as ct
+import OSMC_ConfigParser as ct
 from gui import overclock_gui
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC PI OVERCLOCK ' + str(message), level=xbmc.LOGDEBUG)
 
 
 def lang(id):
-    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-    return san 
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
+
+
+def is_pi_zero():
+
+	try:
+		with open('/proc/cpuinfo','r') as f:
+			lines = f.readlines()
+			for line in lines:
+				if line[0:8]=='Revision':
+					myrevision = line[11:len(line)-1]
+			else:
+				raise
+	except:
+		myrevision = "0000"
+
+	try: # Pi2 revision starts with 'a'
+		revisionInt = int(myrevision, 16)
+
+	except ValueError:
+		return False
+
+	if revisionInt >> 23 & 1 == True:
+		if (revisionInt >> 4) & 0X7FF == 9:
+			raise
+
+	return False
 
 
 class OSMCSettingClass(threading.Thread):
@@ -125,6 +157,8 @@ class OSMCSettingClass(threading.Thread):
 			The setting_data_method contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
 		'''
+
+		is_pi_zero()
 
 		super(OSMCSettingClass, self).__init__()
 
@@ -183,11 +217,11 @@ The module allows you to manually adjust:
 		# the location of the config file FOR TESTING ONLY
 		try:								
 			self.test_config = '/boot/config.txt'
-			self.config_settings = ct.read_config(self.test_config)
+			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		except:
-			self.test_config = '/home/kubkev/Documents/config.txt'
-			self.config_settings = ct.read_config(self.test_config)
+			self.test_config = '/home/plaskev/Documents/config.txt'
+			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
 
 		oc_keys = ['arm_freq', 'sdram_freq', 'core_freq', 'initial_turbo', 'over_voltage', 'over_voltage_sdram', 'force_turbo']
 
@@ -210,7 +244,7 @@ The module allows you to manually adjust:
 		log('self.setting_values')
 		log(self.setting_values)
 
-		ct.write_config(self.test_config, self.new_settings)
+		ct.apply_changes_to_configtxt(self.new_settings, self.test_config)
 
 		del self.GUI
 

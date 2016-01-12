@@ -1,0 +1,23 @@
+From 6dce2b31e2095b64430bc4c1e240d9d7b57fd2ad Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Thu, 13 Aug 2015 03:22:39 +0200
+Subject: [PATCH] Splash: fix: flip() under lock is a no-start with active
+ splash & vsync_always
+
+---
+ xbmc/utils/Splash.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/Splash.cpp b/xbmc/utils/Splash.cpp
+index 688fb62..2f6ab72 100644
+--- a/xbmc/utils/Splash.cpp
++++ b/xbmc/utils/Splash.cpp
+@@ -72,6 +72,7 @@ void CSplash::Show()
+   //show it on screen
+   g_Windowing.EndRender();
+   CDirtyRegionList dirty;
+-  g_graphicsContext.Flip(dirty);
+   g_graphicsContext.Unlock();
++
++  g_graphicsContext.Flip(dirty);
+ }

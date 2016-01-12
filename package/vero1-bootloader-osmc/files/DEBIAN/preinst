@@ -1,5 +1,16 @@
 #!/bin/bash
 
 if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+	if ischroot; then exit 0; fi
+        if ! mountpoint /boot >/dev/null 2>&1; then echo "/boot is not mounted!"; exit 1; fi
+        touch /boot/testrw
+        if [ $? != 0 ]
+        then
+            mount -o remount,ro /boot
+            fsck /boot
+        else
+            rm -f /boot/testrw
+        fi
+
 	rm -f /boot/SPL /boot/u-boot.img
 fi

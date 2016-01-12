@@ -1,0 +1,22 @@
+From c1fe7a61b6ddc4992bf49cd9f9286fbf9829d51b Mon Sep 17 00:00:00 2001
+From: Matus Kral <matuskral@me.com>
+Date: Sun, 19 Apr 2015 05:28:59 +0200
+Subject: [PATCH] dont-send-TVPowerOn-overandover-again.patch
+
+---
+ src/libcec/devices/CECBusDevice.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index 010406d..26d585f 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -1276,7 +1276,7 @@ bool CCECBusDevice::PowerOn(const cec_logical_address initiator)
+ 
+   MarkBusy();
+   cec_power_status currentStatus;
+-  if (m_iLogicalAddress == CECDEVICE_TV ||
++  if (m_iLogicalAddress == CECDEVICE_TV && !m_bImageViewOnSent ||
+       ((currentStatus = GetPowerStatus(initiator, false)) != CEC_POWER_STATUS_IN_TRANSITION_STANDBY_TO_ON &&
+         currentStatus != CEC_POWER_STATUS_ON))
+   {

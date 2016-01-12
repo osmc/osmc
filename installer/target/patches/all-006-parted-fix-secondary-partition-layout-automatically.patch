@@ -1,0 +1,31 @@
+--- /dev/null	2015-10-21 21:00:35.263999475 +0100
++++ a/package/parted/parted-003-fix-backup-layout-auto.patch	2015-10-21 20:59:49.285347960 +0100
+@@ -0,0 +1,28 @@
++--- parted/libparted/labels/gpt.c       2015-10-21 20:46:32.940713524 +0100
+++++ parted/libparted/labels/gpt.c 2015-10-21 20:46:56.424026950 +0100	2015-10-21 20:58:10.252252716 +0100
++@@ -943,25 +943,9 @@
++ #ifndef DISCOVER_ONLY
++       if (PED_LE64_TO_CPU (primary_gpt->AlternateLBA) < disk->dev->length - 1)
++         {
++-          switch (ped_exception_throw
++-                  (PED_EXCEPTION_ERROR,
++-                   (PED_EXCEPTION_FIX | PED_EXCEPTION_CANCEL
++-                    | PED_EXCEPTION_IGNORE),
++-                   _("The backup GPT table is not at the end of the disk, as it "
++-                     "should be.  This might mean that another operating system "
++-                     "believes the disk is smaller.  Fix, by moving the backup "
++-                     "to the end (and removing the old backup)?")))
++-            {
++-            case PED_EXCEPTION_CANCEL:
++-              goto error_free_gpt;
++-            case PED_EXCEPTION_FIX:
++               ptt_clear_sectors (disk->dev,
++                                  PED_LE64_TO_CPU (primary_gpt->AlternateLBA), 1);
++               write_back = 1;
++-              break;
++-            default:
++-              break;
++-            }
++         }
++ #endif /* !DISCOVER_ONLY */
++       gpt = primary_gpt;

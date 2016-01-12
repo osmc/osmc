@@ -110,6 +110,12 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 from service_selection_gui import service_selection
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
 	xbmc.log('OSMC SERVICES ' + str(message), level=xbmc.LOGDEBUG)
 
 

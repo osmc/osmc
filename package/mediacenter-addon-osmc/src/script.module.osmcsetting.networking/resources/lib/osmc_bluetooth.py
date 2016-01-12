@@ -1,6 +1,6 @@
 import connman
 import bluetooth
-import systemd
+import osmc_systemd
 import sys
 import pexpect
 import json
@@ -26,6 +26,12 @@ PEXPECT_EOL = '@EOL'
 
 
 def log(message):
+
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode('utf-8', 'ignore' )
+
     msg_str='OSMC_BLUETOOTH -  ' + str(message)
     if RUNNING_IN_KODI:
         xbmc.log(msg_str, level=xbmc.LOGDEBUG)
@@ -39,14 +45,21 @@ def is_bluetooth_available():
 
 def is_bluetooth_enabled():
     connman_status = connman.is_technology_enabled('bluetooth')
-    service_status = systemd.is_service_running(BLUETOOTH_SERVICE)
-    return connman_status and service_status
+    service_status = osmc_systemd.is_service_running(BLUETOOTH_SERVICE)
+    adapterFound = False
+    if connman_status and service_status:
+        try:
+            bluetooth.get_adapter()
+            adapterFound = True
+        except: #  catch issue where connman reports BT but Bluez can't find an adapter
+            adapterFound = False
+    return connman_status and service_status and adapterFound
 
 
 def toggle_bluetooth_state(state):
     if state:
-        if not systemd.is_service_running(BLUETOOTH_SERVICE):
-            systemd.toggle_service(BLUETOOTH_SERVICE, state)
+        if not osmc_systemd.is_service_running(BLUETOOTH_SERVICE):
+            osmc_systemd.toggle_service(BLUETOOTH_SERVICE, state)
         connman.toggle_technology_state('bluetooth', state)
     else:
         connman.toggle_technology_state('bluetooth', state)
@@ -216,11 +229,11 @@ def handleAgentInteraction(deviceAlias, command , messages):
         message = lang(32030) + ' ' + deviceAlias
     if messages[0] == 'CONFIRM_PASSKEY':
        #           'Confirm passkey'                      'for'
-        message = lang(32031)+ ' '  +messages[0] + ' ' + lang(32032) + ' ' + deviceAlias
+        message = lang(32031)+ ' ' + str(messages[1]) + ' ' + lang(32032) + ' ' + deviceAlias
 
     if command == 'NOTIFICATION':
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (heading, message, "10000"))
-    if command == 'YESNO_DIALOGUE':
+    if command == 'YESNO_INPUT':
         if dialog.yesno(heading, message):
             return 'YES'
         return 'NO'

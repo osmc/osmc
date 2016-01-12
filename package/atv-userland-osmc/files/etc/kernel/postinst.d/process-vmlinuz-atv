@@ -1,3 +1,6 @@
 #!/bin/sh
 
-mv ${2} /boot/kernel.img
+cp ${2} /opt/atvbl/vmlinuz
+make -C /opt/atvbl
+mv /opt/atvbl/mach_kernel /boot
+make -C /opt/atvbl clean

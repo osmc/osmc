@@ -569,6 +569,54 @@
 						<include>RandomAlbums</include>
 						<visible>StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums)</visible>
 					</control>
+					<!-- My OSMC widget -->
+					<control type="fixedlist" id="9011">
+						<top>66</top>
+						<width>1510</width>
+						<height>384</height>
+						<onup>9000</onup>
+						<ondown>9101</ondown>
+						<onleft>9000</onleft>
+						<onright>noop</onright>
+						<focusposition>0</focusposition>
+						<viewtype label="">list</viewtype>
+						<orientation>horizontal</orientation>
+						<defaultcontrol always="true">0</defaultcontrol>
+						<scrolltime tween="sine" easing="out">300</scrolltime>
+						<itemlayout width="404" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<texture>common/black.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">keep</aspectratio>
+								<texture colordiffuse="68ffffff" background="true">$INFO[ListItem.Icon]</texture>
+							</control>
+						</itemlayout>
+						<focusedlayout width="404" height="384">
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<texture>common/black.png</texture>
+							</control>
+							<control type="image">
+								<top>0</top>
+								<width>384</width>
+								<height>384</height>
+								<aspectratio align="center" aligny="top">keep</aspectratio>
+								<texture background="true">$INFO[ListItem.Icon]</texture>
+								<animation effect="fade" start="100" end="60" condition="!ControlGroup(9100).HasFocus">Conditional</animation>
+							</control>
+						</focusedlayout>
+						<include>MyOSMC</include>
+						<visible>StringCompare(Container(9000).ListItem.Property(Widget),MyOSMC)</visible>
+					</control>
 					<!-- Focused label -->
 					<control type="textbox">
 						<top>456</top>

@@ -38,6 +38,17 @@ def lang(id):
 
 
 def log(message, label = ''):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
+	try:
+		label = str(label)
+	except UnicodeEncodeError:
+		label = label.encode('utf-8', 'ignore' )
+
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
@@ -226,6 +237,9 @@ class Main(object):
 			except:
 				pass
 
+		self.freespace_supressor = 172200
+		self.freespace_remedy    = 'reboot' # change this to 'apt' to give the user the option to clean the apt files
+
 		# keep alive method
 		self._daemon()
 
@@ -247,6 +261,9 @@ class Main(object):
 				log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
 			count += 1 								# FOR TESTING ONLY
 			# FOR TESTING ONLY
+
+			# freespace checker, (runs 5 minutes after boot)
+			self.automatic_freespace_checker()
 			
 			# check the scheduler for the update trigger
 			if self.scheduler.check_trigger():
@@ -419,34 +436,39 @@ class Main(object):
 
 	# MAIN METHOD
 	@clog(log)
-	def check_update_conditions(self, media_only=False):
-		''' Checks the users update conditions are met. The media-only flag restricts the condition check to
-			only the media playing condition. '''
+	def check_update_conditions(self, connection_only=False):
+		''' Checks the users update conditions are met. 
+			Checks for:
+					- active player 
+					- idle time
+					- internet connectivity
+				connection_only, limits the check to just the internet connection
+					'''
+		if not connection_only:
 
-		result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
+			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
 
-		result = json.loads(result_raw)
+			result = json.loads(result_raw)
+			
+			log(result, 'result of Player.GetActivePlayers')
+
+			players = result.get('result', False)
+
+			if players:
+			
+				log('Update CONDITION : player playing')
+			
+				return False, 'Update CONDITION : player playing'
+
+			idle = xbmc.getGlobalIdleTime()
+
+			if self.s['update_on_idle'] and idle < 60:
+
+				msg = 'Update CONDITION : idle time = %s' % idle
+
+				return False, 'Update CONDITION : idle time = %s' % idle
 		
-		log(result, 'result of Player.GetActivePlayers')
-		
-		players = result.get('result', False)
-		
-		if players:
-		
-			log('Update CONDITION : player playing')
-		
-			return False, 'Update CONDITION : player playing'
-
-		idle = xbmc.getGlobalIdleTime()
-
-		if self.s['update_on_idle'] and idle < 60 and not media_only:
-
-			msg = 'Update CONDITION : idle time = %s' % idle
-
-			return False, 'Update CONDITION : idle time = %s' % idle
-
 		return True, ''
-
 
 	# MAIN METHOD
 	@clog(log)
@@ -496,12 +518,17 @@ class Main(object):
 		if screen_height == '':
 			if self.try_count >= 50:
 				self.try_count = 0
-				screen_height = 1080
-				screen_width  = 1920
+				screen_height  = 1080
+				screen_width   = 1920
 			else:
 				self.try_image_position_again = True
 				self.try_count += 1
 				return
+
+		# if the screen width is blank (for whatever reason) use the screen height to estimate the width
+		# this should be very, VERY rare, and might only happen due to freakish timing
+		if screen_width == '':
+			screen_width = screen_height * 1.7777777777
 
 		screen_height = int(screen_height)
 		screen_width  = int(screen_width)
@@ -536,11 +563,9 @@ class Main(object):
 		self.update_image.setHeight(img_height)
 
 
-
 	# MAIN METHOD
 	@clog(log, maxlength=1000)
 	def update_settings(self):
-
 		''' Updates the settings for the service while the service is still running '''
 
 		if self.first_run:
@@ -557,49 +582,52 @@ class Main(object):
 			
 			self.s = {}
 
-			log(__setting__('on_upd_detected'))
-
-			self.s['on_upd_detected']	= int(			__setting__('on_upd_detected')		)
-			self.s['check_freq'] 		= int(			__setting__('check_freq')			)
-			self.s['check_weekday'] 	= int(float(	__setting__('check_weekday')		))
-			self.s['check_day'] 		= int(float(	__setting__('check_day')			))
-			self.s['check_time'] 		= int(float(	__setting__('check_time')			))
-			self.s['check_hour'] 		= int(float(	__setting__('check_hour')			))
-			self.s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			self.s['pos_x']				= int(float(	__setting__('pos_x')				))
-			self.s['pos_y']				= int(float(	__setting__('pos_y')				))
-			self.s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
-			self.s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
-			self.s['update_on_idle']			= True if 	__setting__('update_on_idle') 			== 'true' else False
-			self.s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
-			# self.s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
-			# self.s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
-			# self.s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
-			# self.s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False
-			# self.s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
-			self.s['location_selection'] 		= __setting__('location_selection')
-			self.s['backup_location'] 			= __setting__('backup_location')
-			self.s['backup_location_typed']		= __setting__('backup_location_typed')
-			self.s['tarball_count'] 			= int(float(	__setting__('tarball_count')		))
-			self.s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
-			self.s['backup_addons'] 			= True if 	__setting__('backup_addons')			== 'true' else False
-			self.s['backup_addon_data'] 		= True if 	__setting__('backup_addon_data')		== 'true' else False
-			self.s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
-			self.s['backup_keymaps'] 			= True if 	__setting__('backup_keymaps')			== 'true' else False
-			self.s['backup_library'] 			= True if 	__setting__('backup_library')			== 'true' else False
-			self.s['backup_playlists'] 			= True if 	__setting__('backup_playlists')			== 'true' else False
-			self.s['backup_Thumbnails']		 	= True if 	__setting__('backup_Thumbnails')		== 'true' else False
-			self.s['backup_favourites'] 		= True if 	__setting__('backup_favourites')		== 'true' else False
-			self.s['backup_keyboard'] 			= True if 	__setting__('backup_keyboard')			== 'true' else False
-			self.s['backup_remote'] 			= True if 	__setting__('backup_remote')			== 'true' else False
-			self.s['backup_LCD'] 				= True if 	__setting__('backup_LCD')				== 'true' else False
-			self.s['backup_profiles'] 			= True if 	__setting__('backup_profiles')			== 'true' else False
-			self.s['backup_RssFeeds'] 			= True if 	__setting__('backup_RssFeeds')			== 'true' else False
-			self.s['backup_sources'] 			= True if 	__setting__('backup_sources')			== 'true' else False
-			self.s['backup_upnpserver'] 		= True if 	__setting__('backup_upnpserver')		== 'true' else False
-			self.s['backup_peripheral_data'] 	= True if 	__setting__('backup_peripheral_data')	== 'true' else False
-			self.s['backup_guisettings'] 		= True if 	__setting__('backup_guisettings')		== 'true' else False
-			self.s['backup_advancedsettings'] 	= True if 	__setting__('backup_advancedsettings')	== 'true' else False
+			self.s['on_upd_detected']         = int(		__setting__('on_upd_detected')		)
+			# this is to deprecate the automatic installation of non-system updates
+			# changed to Download, and Prompt
+			if self.s['on_upd_detected'] == 4:
+				__addon__.setSetting('on_upd_detected', '2')
+				self.s['on_upd_detected'] = 2
+			self.s['check_freq']              = int(		__setting__('check_freq')			)
+			self.s['check_weekday']           = int(float(	__setting__('check_weekday')		))
+			self.s['check_day']               = int(float(	__setting__('check_day')			))
+			self.s['check_time']              = int(float(	__setting__('check_time')			))
+			self.s['check_hour']              = int(float(	__setting__('check_hour')			))
+			self.s['check_minute']            = int(float(	__setting__('check_minute')			))
+			self.s['pos_x']                   = int(float(	__setting__('pos_x')				))
+			self.s['pos_y']                   = int(float(	__setting__('pos_y')				))
+			self.s['suppress_progress']       = True if 	__setting__('suppress_progress') 		== 'true' else False
+			self.s['suppress_icon']           = True if 	__setting__('suppress_icon') 			== 'true' else False
+			self.s['update_on_idle']          = True if 	__setting__('update_on_idle') 			== 'true' else False
+			self.s['home_prompts_only']       = True if 	__setting__('home_prompts_only') 		== 'true' else False
+			# self.s['export_library']        = True if 	__setting__('export_library')			== 'true' else False
+			# self.s['export_video']          = True if 	__setting__('export_video')				== 'true' else False
+			# self.s['multifile_vid_export']  = True if 	__setting__('multifile_vid_export')		== 'true' else False
+			# self.s['export_music']          = True if 	__setting__('export_music')				== 'true' else False
+			# self.s['create_tarball']        = True if 	__setting__('create_tarball')			== 'true' else False
+			self.s['location_selection']      = 			__setting__('location_selection')
+			self.s['backup_location']         = 			__setting__('backup_location')
+			self.s['backup_location_typed']   = 			__setting__('backup_location_typed')
+			self.s['tarball_count']           = int(float(	__setting__('tarball_count')		))
+			self.s['backup_on_update']        = True if 	__setting__('backup_on_update')			== 'true' else False
+			self.s['backup_addons']           = True if 	__setting__('backup_addons')			== 'true' else False
+			self.s['backup_addon_data']       = True if 	__setting__('backup_addon_data')		== 'true' else False
+			self.s['backup_Database']         = True if 	__setting__('backup_Database')			== 'true' else False
+			self.s['backup_keymaps']          = True if 	__setting__('backup_keymaps')			== 'true' else False
+			self.s['backup_library']          = True if 	__setting__('backup_library')			== 'true' else False
+			self.s['backup_playlists']        = True if 	__setting__('backup_playlists')			== 'true' else False
+			self.s['backup_Thumbnails']       = True if 	__setting__('backup_Thumbnails')		== 'true' else False
+			self.s['backup_favourites']       = True if 	__setting__('backup_favourites')		== 'true' else False
+			self.s['backup_keyboard']         = True if 	__setting__('backup_keyboard')			== 'true' else False
+			self.s['backup_remote']           = True if 	__setting__('backup_remote')			== 'true' else False
+			self.s['backup_LCD']              = True if 	__setting__('backup_LCD')				== 'true' else False
+			self.s['backup_profiles']         = True if 	__setting__('backup_profiles')			== 'true' else False
+			self.s['backup_RssFeeds']         = True if 	__setting__('backup_RssFeeds')			== 'true' else False
+			self.s['backup_sources']          = True if 	__setting__('backup_sources')			== 'true' else False
+			self.s['backup_upnpserver']       = True if 	__setting__('backup_upnpserver')		== 'true' else False
+			self.s['backup_peripheral_data']  = True if 	__setting__('backup_peripheral_data')	== 'true' else False
+			self.s['backup_guisettings']      = True if 	__setting__('backup_guisettings')		== 'true' else False
+			self.s['backup_advancedsettings'] = True if 	__setting__('backup_advancedsettings')	== 'true' else False
 
 
 			return "initial run", self.s
@@ -609,52 +637,52 @@ class Main(object):
 			''' Construct a temporary dictionary for comparison with the existing settings dict '''
 
 			tmp_s = {}
-
-			tmp_s['on_upd_detected']	= int(			__setting__('on_upd_detected')		)
-			tmp_s['check_freq'] 		= int(			__setting__('check_freq')			)
-			tmp_s['check_weekday'] 		= int(float(	__setting__('check_weekday')		))
-			tmp_s['check_day'] 			= int(float(	__setting__('check_day')			))
-			tmp_s['check_time'] 		= int(float(	__setting__('check_time')			))
-			tmp_s['check_hour'] 		= int(float(	__setting__('check_hour')			))
-			tmp_s['check_minute'] 		= int(float(	__setting__('check_minute')			))
-			tmp_s['pos_x']				= int(float(	__setting__('pos_x')				))
-			tmp_s['pos_y']				= int(float(	__setting__('pos_y')				))			
-			tmp_s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
-			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
-			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
-			tmp_s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
-			tmp_s['suppress_progress']			= True if 	__setting__('suppress_progress') 		== 'true' else False
-			tmp_s['suppress_icon']				= True if 	__setting__('suppress_icon') 			== 'true' else False
-			tmp_s['update_on_idle']				= True if 	__setting__('update_on_idle') 			== 'true' else False
-			tmp_s['home_prompts_only']			= True if 	__setting__('home_prompts_only') 		== 'true' else False
-			# tmp_s['export_library'] 			= True if 	__setting__('export_library')			== 'true' else False
-			# tmp_s['export_video'] 				= True if 	__setting__('export_video')				== 'true' else False
-			# tmp_s['multifile_vid_export'] 		= True if 	__setting__('multifile_vid_export')		== 'true' else False
-			# tmp_s['export_music'] 				= True if 	__setting__('export_music')				== 'true' else False			
-			# tmp_s['create_tarball'] 			= True if 	__setting__('create_tarball')			== 'true' else False
-			tmp_s['location_selection'] 		= __setting__('location_selection')
-			tmp_s['backup_location'] 			= __setting__('backup_location')
-			tmp_s['backup_location_typed']		= __setting__('backup_location_typed')
-			tmp_s['tarball_count'] 				= int(float(	__setting__('tarball_count')		))
-			tmp_s['backup_on_update'] 			= True if 	__setting__('backup_on_update')			== 'true' else False
-			tmp_s['backup_addons'] 				= True if 	__setting__('backup_addons')			== 'true' else False
-			tmp_s['backup_addon_data'] 			= True if 	__setting__('backup_addon_data')		== 'true' else False
-			tmp_s['backup_Database'] 			= True if 	__setting__('backup_Database')			== 'true' else False
-			tmp_s['backup_keymaps'] 			= True if 	__setting__('backup_keymaps')			== 'true' else False
-			tmp_s['backup_library'] 			= True if 	__setting__('backup_library')			== 'true' else False
-			tmp_s['backup_playlists'] 			= True if 	__setting__('backup_playlists')			== 'true' else False
-			tmp_s['backup_Thumbnails']		 	= True if 	__setting__('backup_Thumbnails')		== 'true' else False
-			tmp_s['backup_favourites'] 			= True if 	__setting__('backup_favourites')		== 'true' else False
-			tmp_s['backup_keyboard'] 			= True if 	__setting__('backup_keyboard')			== 'true' else False
-			tmp_s['backup_remote'] 				= True if 	__setting__('backup_remote')			== 'true' else False
-			tmp_s['backup_LCD'] 				= True if 	__setting__('backup_LCD')				== 'true' else False
-			tmp_s['backup_profiles'] 			= True if 	__setting__('backup_profiles')			== 'true' else False
-			tmp_s['backup_RssFeeds'] 			= True if 	__setting__('backup_RssFeeds')			== 'true' else False
-			tmp_s['backup_sources'] 			= True if 	__setting__('backup_sources')			== 'true' else False
-			tmp_s['backup_upnpserver'] 			= True if 	__setting__('backup_upnpserver')		== 'true' else False
-			tmp_s['backup_peripheral_data'] 	= True if 	__setting__('backup_peripheral_data')	== 'true' else False
-			tmp_s['backup_guisettings'] 		= True if 	__setting__('backup_guisettings')		== 'true' else False
-			tmp_s['backup_advancedsettings'] 	= True if 	__setting__('backup_advancedsettings')	== 'true' else False			
+			
+			tmp_s['on_upd_detected']         = int(			__setting__('on_upd_detected')		)
+			tmp_s['check_freq']              = int(			__setting__('check_freq')			)
+			tmp_s['check_weekday']           = int(float(	__setting__('check_weekday')		))
+			tmp_s['check_day']               = int(float(	__setting__('check_day')			))
+			tmp_s['check_time']              = int(float(	__setting__('check_time')			))
+			tmp_s['check_hour']              = int(float(	__setting__('check_hour')			))
+			tmp_s['check_minute']            = int(float(	__setting__('check_minute')			))
+			tmp_s['pos_x']                   = int(float(	__setting__('pos_x')				))
+			tmp_s['pos_y']                   = int(float(	__setting__('pos_y')				))			
+			tmp_s['suppress_progress']       = True if 		__setting__('suppress_progress') 		== 'true' else False
+			tmp_s['suppress_icon']           = True if 		__setting__('suppress_icon') 			== 'true' else False
+			tmp_s['update_on_idle']          = True if 		__setting__('update_on_idle') 			== 'true' else False
+			tmp_s['home_prompts_only']       = True if 		__setting__('home_prompts_only') 		== 'true' else False
+			tmp_s['suppress_progress']       = True if 		__setting__('suppress_progress') 		== 'true' else False
+			tmp_s['suppress_icon']           = True if 		__setting__('suppress_icon') 			== 'true' else False
+			tmp_s['update_on_idle']          = True if 		__setting__('update_on_idle') 			== 'true' else False
+			tmp_s['home_prompts_only']       = True if 		__setting__('home_prompts_only') 		== 'true' else False
+			# tmp_s['export_library']        = True if 		__setting__('export_library')			== 'true' else False
+			# tmp_s['export_video']          = True if 		__setting__('export_video')				== 'true' else False
+			# tmp_s['multifile_vid_export']  = True if 		__setting__('multifile_vid_export')		== 'true' else False
+			# tmp_s['export_music']          = True if 		__setting__('export_music')				== 'true' else False			
+			# tmp_s['create_tarball']        = True if 		__setting__('create_tarball')			== 'true' else False
+			tmp_s['location_selection']      = 				__setting__('location_selection')
+			tmp_s['backup_location']         = 				__setting__('backup_location')
+			tmp_s['backup_location_typed']   = 				__setting__('backup_location_typed')
+			tmp_s['tarball_count']           = int(float(	__setting__('tarball_count')		))
+			tmp_s['backup_on_update']        = True if 		__setting__('backup_on_update')			== 'true' else False
+			tmp_s['backup_addons']           = True if 		__setting__('backup_addons')			== 'true' else False
+			tmp_s['backup_addon_data']       = True if 		__setting__('backup_addon_data')		== 'true' else False
+			tmp_s['backup_Database']         = True if 		__setting__('backup_Database')			== 'true' else False
+			tmp_s['backup_keymaps']          = True if 		__setting__('backup_keymaps')			== 'true' else False
+			tmp_s['backup_library']          = True if 		__setting__('backup_library')			== 'true' else False
+			tmp_s['backup_playlists']        = True if 		__setting__('backup_playlists')			== 'true' else False
+			tmp_s['backup_Thumbnails']       = True if 		__setting__('backup_Thumbnails')		== 'true' else False
+			tmp_s['backup_favourites']       = True if 		__setting__('backup_favourites')		== 'true' else False
+			tmp_s['backup_keyboard']         = True if 		__setting__('backup_keyboard')			== 'true' else False
+			tmp_s['backup_remote']           = True if 		__setting__('backup_remote')			== 'true' else False
+			tmp_s['backup_LCD']              = True if 		__setting__('backup_LCD')				== 'true' else False
+			tmp_s['backup_profiles']         = True if 		__setting__('backup_profiles')			== 'true' else False
+			tmp_s['backup_RssFeeds']         = True if 		__setting__('backup_RssFeeds')			== 'true' else False
+			tmp_s['backup_sources']          = True if 		__setting__('backup_sources')			== 'true' else False
+			tmp_s['backup_upnpserver']       = True if 		__setting__('backup_upnpserver')		== 'true' else False
+			tmp_s['backup_peripheral_data']  = True if 		__setting__('backup_peripheral_data')	== 'true' else False
+			tmp_s['backup_guisettings']      = True if 		__setting__('backup_guisettings')		== 'true' else False
+			tmp_s['backup_advancedsettings'] = True if 		__setting__('backup_advancedsettings')	== 'true' else False			
 
 		# flags to determine whether the update scheduler needs to be reconstructed or icon repositioned
 		update_scheduler = False
@@ -700,8 +728,17 @@ class Main(object):
 		# kill the progress bar
 		self.progress_bar(kill=True)
 
-		# notify the user that an error has occured with an update
-		ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
+		# specifically handle a failure to connect to the apt server
+		if 'Unable to connect to' in kwargs.get('exception', ''):
+
+			ok = DIALOG.ok(lang(32087), lang(32131), lang(32132))
+
+		else:
+
+			# generic error handling
+
+			# notify the user that an error has occured with an update
+			ok = DIALOG.ok(lang(32087), lang(32088) % package, '', lang(32089))
 
 
 	# ACTION METHOD
@@ -724,13 +761,35 @@ class Main(object):
 		# check whether the install is an alpha version
 		if self.check_for_unsupported_version() == 'alpha': return
 
-		subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
+		# check for sufficient space, only proceed if it is available
+		root_space, _ = self.check_target_location_for_size(location='/', requirement=300)
+		if root_space:
+
+			subprocess.Popen(['sudo', 'python','%s/apt_cache_action.py' % __libpath__, 'action_list', action])
+
+		else:
+
+			okey_dokey = DIALOG.ok(lang(32077), lang(32129), lang(32130))
 
 
 	def action_list_complete(self):
 
-		# notify the user that the installation or uninstall of their desirec apfs has completed successfully
-		ok = DIALOG.ok(lang(32090), lang(32091))
+		# notify the user that the installation or uninstall of their desired apfs has completed successfully
+		# prompt for immediate reboot if needed.
+
+		if any([os.path.isfile('/tmp/reboot-needed'), os.path.isfile('fname/var/run/reboot-required')]):
+			reboot = DIALOG.yesno(lang(32090), lang(32091), lang(32133), yeslabel=lang(32081), nolabel=lang(32082))
+
+			if reboot:
+
+				exit_osmc_settings_addon()
+				
+				xbmc.sleep(1000)
+				
+				xbmc.executebuiltin('Reboot')
+
+		else:
+			ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
 	# @clog(log, maxlength=2500)
@@ -825,10 +884,10 @@ class Main(object):
 
 		if check:
 
-
 			if self.s['backup_on_update']:
 
-				# run backup
+				# run the backup, once the backup is completed the script calls pre_backup_complete to continue with the update
+				# that is the reason for the "else"
 
 				self.update_settings()
 
@@ -839,12 +898,13 @@ class Main(object):
 					bckp.start_backup()
 
 				except Exception as e:
-				
+
+					# if there is an error, then abort the Update. We dont want to run the update unless the user has backed up
 					log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
 
-			# run the update
-
-			self.call_child_script('update')
+			else:
+				# run the update
+				self.call_child_script('update')
 	
 		else:
 
@@ -952,106 +1012,146 @@ class Main(object):
 	# ACTION METHOD
 	@clog(log)
 	def settings_command(self, action):
+		''' Dispatch user call from the addons settings. '''
 
-		if action == 'update':
+		if   action == 'update':
+
+			result = self.settings_command_action()
+
+		elif action == 'backup':
+
+			result = self.settings_command_backup()
+
+		elif action == 'restore':
+
+			result = self.settings_command_restore()
+
+		elif action == 'install':
+
+			result = self.settings_command_install()
+
+		return result
+
+
+	#ACTION METHOD
+	def settings_command_action(self):
+		''' User called for a manual update '''
+
+		check_connection, _ = self.check_update_conditions(connection_only=True)
+
+		if not check_connection:
+
+			DIALOG.ok('OSMC', 'Update not permitted.', 'Unable to reach internet.')
+
+			return 'manual update cancelled, no connection'
+
+		else:
 
 			self.call_child_script('update_manual')
 
 			return 'Called child action - update_manual'
 
-		if action == 'backup':
 
-			self.update_settings()
+	#ACTION METHOD
+	def settings_command_backup(self):
+		''' User called to initiate a backup '''
 
-			bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
+		self.update_settings()
 
-			try:
+		bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
 
-				bckp.start_backup()
+		try:
 
-			except Exception as e:
+			bckp.start_backup()
+
+		except Exception as e:
+		
+			log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
+
+			ok = DIALOG.ok(lang(32096), lang(32097))
+
+		return 'Called BACKUP script complete'
+
+
+	#ACTION METHOD
+	def settings_command_restore(self):		
+		''' User called to inititate a restore '''	
+
+		self.update_settings()
+
+		bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
+
+		try:
+
+			bckp.start_restore()
+
+			restart_required = bckp.restoring_guisettings
+
+			if bckp.success != 'Full':
+
+				ok = DIALOG.ok('Restore','Some items failed to restore.','See log for details.')
+
+				for x in bckp.success:
+
+					if x.endswith('userdata/guisettings.xml'):
+
+						restart_required = False
+
+			if restart_required:
+
+				user_input_restart_now = DIALOG.yesno(lang(32110), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
+
+				if user_input_restart_now:
+
+					subprocess.Popen(['sudo', 'systemctl', 'restart', 'mediacenter'])
+
+		except Exception as e:
+		
+			log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
+
+			ok = DIALOG.ok(lang(32096), lang(32097))
+
+		return 'Called RESTORE script complete'
+
+
+	#ACTION METHOD
+	def settings_command_install(self):
+		''' User called to install updates '''
+
+		# check, _ = self.check_for_legit_updates()
+
+		# if check == 'bail':
+
+		# 	return  'Update not legit, bail'
+
+		# if not self.EXTERNAL_UPDATE_REQUIRED:
+
+		# 	__addon__.setSetting('install_now_visible', 'false')
+
+		# 	self.call_child_script('commit')
+
+		# 	return 'Called child action - commit'
+
+		# else:
+
+		# warn the user if there is a major Kodi update that will be installed
+		# bail if they decide not to proceed
+		if self.UPDATE_WARNING:
+			confirm = self.display_update_warning()
+			if not confirm: return
+
+		ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
+
+		if ans:
+
+			__addon__.setSetting('install_now_visible', 'false')
 			
-				log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
+			exit_osmc_settings_addon()
+			xbmc.sleep(1000)
 
-				ok = DIALOG.ok(lang(32096), lang(32097))
+			subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
 
-			return 'Called BACKUP script complete'
-
-		if action == 'restore':
-
-			self.update_settings()
-
-			bckp = OSMC_Backups.osmc_backup(self.s, self.progress_bar)
-
-			try:
-
-				bckp.start_restore()
-
-				restart_required = bckp.restoring_guisettings
-
-				if bckp.success != 'Full':
-
-					ok = DIALOG.ok('Restore','Some items failed to restore.','See log for details.')
-
-					for x in bckp.success:
-
-						if x.endswith('userdata/guisettings.xml'):
-
-							restart_required = False
-
-				if restart_required:
-
-					user_input_restart_now = DIALOG.yesno(lang(32110), lang(32098), lang(32099), yeslabel=lang(32100), nolabel=lang(32101))
-
-					if user_input_restart_now:
-
-						subprocess.Popen(['sudo', 'systemctl', 'restart', 'mediacenter'])
-
-			except Exception as e:
-			
-				log('Backup Error Type and Args: %s : %s \n\n %s' % (type(e).__name__, e.args, traceback.format_exc()))
-
-				ok = DIALOG.ok(lang(32096), lang(32097))
-
-			return 'Called RESTORE script complete'
-
-
-		elif action == 'install':
-
-			# check, _ = self.check_for_legit_updates()
-
-			# if check == 'bail':
-
-			# 	return  'Update not legit, bail'
-
-			# if not self.EXTERNAL_UPDATE_REQUIRED:
-
-			# 	__addon__.setSetting('install_now_visible', 'false')
-
-			# 	self.call_child_script('commit')
-
-			# 	return 'Called child action - commit'
-
-			# else:
-
-			# warn the user if there is a major Kodi update that will be installed
-			# bail if they decide not to proceed
-			if self.UPDATE_WARNING:
-				confirm = self.display_update_warning()
-				if not confirm: return
-
-			ans = DIALOG.yesno(lang(32072), lang(32075), lang(32076))
-
-			if ans:
-
-				__addon__.setSetting('install_now_visible', 'false')
-				
-				exit_osmc_settings_addon()
-				xbmc.sleep(1000)
-
-				subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])	
-
-				return "Calling external update"
+			return "Calling external update"
 
 
 	#ACTION METHOD
@@ -1105,6 +1205,16 @@ class Main(object):
 
 		self.EXTERNAL_UPDATE_REQUIRED = 1
 
+		# check for sufficient disk space, requirement in MB
+		root_space, _ = self.check_target_location_for_size(location='/', requirement=300)
+		boot_space, _ = self.check_target_location_for_size(location='/boot', requirement=30)
+
+		if not root_space or not boot_space:
+
+			okey_dokey = DIALOG.ok(lang(32077), lang(32129), lang(32130))
+
+			return 'bail', 'Sufficient freespace: root=%s, boot=%s' % (root_space, boot_space)
+
 		check, msg = self.check_for_broken_installs()
 
 		if check == 'bail':
@@ -1154,13 +1264,21 @@ class Main(object):
 		# if 'osmc' isnt in the name of any available updates, then return without doing anything
 		if not any(['osmc' in x for x in available_updates]):
 
+			# suppress the on-screen update notification
 			self.window.setProperty('OSMC_notification', 'false')
+
+			# delete the block_update_file if it exists, so that the icon doesnt display on next boot
+			try:
+				os.remove(self.block_update_file)
+			except:
+				pass
 
 			return 'bail', 'There are no osmc packages'
 
 		if not any([bl in av for bl in self.EXTERNAL_UPDATE_REQUIRED_LIST for av in available_updates]):
 
-			self.EXTERNAL_UPDATE_REQUIRED = 0
+			# self.EXTERNAL_UPDATE_REQUIRED = 0		##### changed to force all updates to occur with Kodi closed.
+			self.EXTERNAL_UPDATE_REQUIRED = 1
 
 		# display update available notification
 		if not self.s['suppress_icon']:
@@ -1199,11 +1317,16 @@ class Main(object):
 	@clog(log)
 	def apt_update_complete(self, data=None):
 		
-		check, _ = self.check_for_legit_updates()
+		check, result = self.check_for_legit_updates()
 
 		if check == 'bail':
 
-			if data == 'manual_update_complete':
+			if 'Sufficient freespace:' in result:
+
+				# send kill message to progress bar
+				self.progress_bar(kill=True)
+
+			elif data == 'manual_update_complete':
 
 				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
 
@@ -1341,7 +1464,11 @@ class Main(object):
 
 		''' Checks if this version is an Alpha, prevent updates '''
 
-		process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'])
+		fnull = open(os.devnull, 'w')
+
+		process = subprocess.call(['/usr/bin/dpkg-query', '-l', 'rbp-mediacenter-osmc'], stderr=fnull, stdout=fnull)
+
+		fnull.close()
 
 		if process == 0:
 
@@ -1352,4 +1479,70 @@ class Main(object):
 		else:
 
 			return 'proceed'
+
+
+	def check_target_location_for_size(self, location, requirement):
+
+		''' Checks the target location to see if there is sufficient space for the update.
+			Returns tuple of boolean if there is sufficient disk space and actual freespace recorded '''
+
+		mb_to_b = requirement * 1048576.0
+
+		try:
+			st = os.statvfs(location)
+
+			if st.f_frsize:
+				available = st.f_frsize * st.f_bavail
+			else:
+				available = st.f_bsize * st.f_bavail
+			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+
+			log('local required disk space: %s' % mb_to_b)
+			log('local available disk space: %s' % available)
+
+			return mb_to_b < available, available / 1048570
+				
+		except:
+
+			return False, 0
+
+
+	def automatic_freespace_checker(self):
+		''' Daily checker of freespace on /. Notifies user in Home window when there is less than 50mb remaining. '''
+
+		if self.freespace_supressor > 172800:
+
+			self.freespace_supressor = 0
+
+			freespace, value = self.check_target_location_for_size(location='/', requirement=250)
+
+			if not freespace:
+
+				if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)'):
+
+					if self.freespace_remedy == 'apt':
+
+						# THIS SECTION IS CURRENTLY DISABLED
+						# TO ENABLE IT CHANGE THE INIT FREESPACE_REMEDY TO 'apt'
+
+						resp = DIALOG.yesno(	'OSMC', 
+												'Your system is running out of storage (<%sMB left).' % int(value), 
+												'Would you like to try and clear unused system files?'
+												)
+
+						if resp:
+
+							subprocess.Popen(['sudo', 'apt-get', 'autoremove', '&&', 'apt-get', 'clean'])
+
+							self.freespace_remedy = 'reboot'
+
+							# wait 10 minutes before next space check
+							self.freespace_supressor = 171600
+
+					else: # self.freespace_remedy == 'reboot'
+
+						resp = DIALOG.ok(	'OSMC', 
+											'Your system is running out of storage (<%sMB left).' % int(value), 
+											'Try rebooting a couple times to clear out temporary files.'
+											)
 

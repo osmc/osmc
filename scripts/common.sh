@@ -7,7 +7,7 @@ function check_platform()
 {
     platform=$(lsb_release -c -s)
     case $platform in
-        "wheezy" | "trusty" | "utopic" | "jessie" )
+        "wheezy" | "trusty" | "utopic" | "jessie" | "wily" )
             return 0
             ;;
         * )
@@ -107,6 +107,14 @@ function cleanup_filesystem()
 	rm -rf ${1}/var/lib/apt/lists/*
 	rm -f ${1}/var/log/*.log
 	rm -f ${1}/var/log/apt/*.log
+	rm -f ${1}/tmp/reboot-needed
+	rm -f ${1}/var/cache/apt/pkgcache.bin
+}
+
+function enable_mirrordirector()
+{
+	echo -e "Enabling mirror direction"
+	sed -e s/staging.//g -i ${1}/etc/apt/sources.list
 }
 
 function remove_existing_filesystem()
@@ -123,7 +131,7 @@ function install_patch()
 		echo Applying patch $patch
 		if ! grep -q "GIT binary patch" $patch
 		then
-		    patch -p1 < $patch
+		    patch -p1 --ignore-whitespace < $patch
 		    verify_action
 	        else
 		    # this is a binary patch
@@ -201,6 +209,8 @@ function pull_bin()
 	if ! command -v wget >/dev/null 2>&1; then update_sources && verify_action && install_package "wget" && verify_action; fi
 	if [ -f $2 ]; then echo "Cleaning old source" && rm -f ${2}; fi
 	wget ${1} -O ${2}
+	if [ $? != 0 ]; then echo "Binary download failed" && exit 1; fi
+	chmod +x ${2}
 }
 
 if [ -z $DOWNLOAD_URL ]
@@ -222,6 +232,7 @@ export -f update_sources
 export -f install_package
 export -f fetch_filesystem
 export -f cleanup_filesystem
+export -f enable_mirrordirector
 export -f remove_existing_filesystem
 export -f install_patch
 export -f pull_source

@@ -1,0 +1,18 @@
+diff --git a/src/dhcp.c b/src/dhcp.c
+index 9a74362..e4497fc 100644
+--- a/src/dhcp.c
++++ b/src/dhcp.c
+@@ -462,11 +462,12 @@ static void lease_available_cb(GDHCPClient *dhcp_client, gpointer user_data)
+ 	}
+ 
+ 	if (!apply_lease_available_on_network(dhcp_client, dhcp))
+-		return;
++		goto done;
+ 
+ 	if (ip_change)
+ 		dhcp_valid(dhcp);
+ 
++done:
+ 	g_free(address);
+ 	g_free(netmask);
+ 	g_free(gateway);

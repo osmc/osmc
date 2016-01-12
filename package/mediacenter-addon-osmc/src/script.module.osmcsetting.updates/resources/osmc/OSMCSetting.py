@@ -91,6 +91,12 @@ import threading
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+
 	xbmc.log(msg = 'OSMC UPDATES ' + str(message), level=xbmc.LOGDEBUG)
 
 

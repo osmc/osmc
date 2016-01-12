@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ]
+then
+    echo "Creating TVHeadend default access control file"
+    mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
+    echo '
+	{
+	"enabled": 1,
+        "username": "osmc",
+        "password": "osmc",
+        "comment": "Default access entry",
+        "prefix": "0.0.0.0/0,::/0",
+        "streaming": 1,
+        "dvr": 1,
+        "dvrallcfg": 1,
+        "webui": 1,
+        "admin": 1,
+        "id": "1"
+	}' > /home/osmc/.hts/tvheadend/accesscontrol/1
+chown -R osmc:osmc /home/osmc/.hts
+fi
+
+systemctl enable tvheadend.service
+
+ischroot
+if [ $? == 0 ]; then exit 0; fi
+
+systemctl start tvheadend.service

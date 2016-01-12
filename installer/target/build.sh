@@ -21,7 +21,8 @@ kpartx
 dosfstools
 parted
 cpio
-python"
+python
+hfsprogs"
 for package in $packages
 do
 	install_package $package
@@ -49,7 +50,7 @@ date=$(date +%Y%m%d)
 count=150
 while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
        if [ "$?" -eq 0 ]; then
-			wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
+	    wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
             break
        fi
        date=$(date +%Y%m%d --date "yesterday $date")
@@ -57,7 +58,7 @@ while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1
 done
 if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] ; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ]; then size=256; fi
 date=$(date +%Y%m%d)
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ]
 then
@@ -66,6 +67,16 @@ then
 	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 1M 256M
 	kpartx -a OSMC_TGT_${1}_${date}.img
 	mkfs.vfat -F32 /dev/mapper/loop0p1
+	mount /dev/mapper/loop0p1 /mnt
+fi
+if [ "$1" == "appletv" ]
+then
+	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
+	parted -s OSMC_TGT_${1}_${date}.img mklabel gpt
+	parted -s OSMC_TGT_${1}_${date}.img mkpart primary hfs+ 40s 256M
+	parted -s OSMC_TGT_${1}_${date}.img set 1 atvrecv on
+	kpartx -a OSMC_TGT_${1}_${date}.img
+	mkfs.hfsplus /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt
 fi
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -80,6 +91,21 @@ then
 	mv zImage /mnt
 	mv *.dtb /mnt
 	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
+fi
+if [ "$1" == "appletv" ]
+then
+	echo -e "Installing AppleTV files"
+	mv com.apple.Boot.plist /mnt
+	sed -e "s:BOOTFLAGS:console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=atv video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet:" -i /mnt/com.apple.Boot.plist
+	mv BootLogo.png /mnt
+	mv boot.efi /mnt
+	mv System /mnt
+	echo -e "Building mach_kernel" # Had to be done after kernel image was built
+	mv bzImage ../build/atv-bootloader-master/vmlinuz
+	pushd ../build/atv-bootloader-master
+	make
+	popd
+	mv ../build/atv-bootloader-master/mach_kernel /mnt
 fi
 echo -e "Installing filesystem"
 mv filesystem.tar.xz /mnt/

@@ -1,8 +1,21 @@
 #!/bin/bash
 
-systemctl enable transmission.service
+if [ "$1" = "configure" ]; then
 
-ischroot
-if [ $? == 0 ]; then exit 0; fi
+	systemctl daemon-reload
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable transmission.service >/dev/null 2>&1
+	fi
 
-systemctl start transmission.service
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
+		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.8.4-10"; then
+			systemctl enable transmission.service >/dev/null 2>&1
+		fi
+	fi
+
+	if ischroot; then exit 0; fi
+	if systemctl is-enabled transmission.service >/dev/null; then systemctl start transmission.service; fi
+	sysctl -p
+fi

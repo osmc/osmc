@@ -10,7 +10,6 @@
 #include <QtNetwork/QNetworkReply>
 #include "utils.h"
 #include <QMap>
-#include <QDebug>
 
 VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName, QString mirrorURL) :
     QWidget(parent),
@@ -28,26 +27,36 @@ VersionSelection::VersionSelection(QWidget *parent, QString deviceShortName, QSt
 
 void VersionSelection::replyFinished(QNetworkReply *reply)
 {
-    while (reply->canReadLine())
+    bool hasOSMCURL = false;
+    if (reply->error() == QNetworkReply::NoError)
     {
-        enumerateBuilds(reply->readLine());
+        while (reply->canReadLine())
+            if (enumerateBuilds(reply->readLine()))
+                hasOSMCURL = true; /* Check if we get at least one build back. We may get 200 but not the expected page.. */
+        reply->deleteLater();
     }
-    reply->deleteLater();
+    else if (reply->error() != QNetworkReply::NoError || ! hasOSMCURL)
+        utils::displayError(tr("Error connecting to network"), tr("There seems to be an issue connecting to the network") + "\n" + "\n" + tr("Please check that you are not trying to download OSMC via a proxy server"), false);
 }
 
-void VersionSelection::enumerateBuilds(QByteArray buildline)
+bool VersionSelection::enumerateBuilds(QByteArray buildline)
 {
     QString line = QString::fromUtf8(buildline);
-    QStringList splitline;
-    QString buildnameline;
-    splitline = line.split(QRegExp("\\ "));
-    for (int i = 0; i < (splitline.count() - 1); i++)
+    if (line.contains("download.osmc.tv"))
     {
-       buildnameline = buildnameline + " " + splitline.at(i);
+        QStringList splitline;
+        QString buildnameline;
+        splitline = line.split(QRegExp("\\ "));
+        for (int i = 0; i < (splitline.count() - 1); i++)
+        {
+           buildnameline = buildnameline + " " + splitline.at(i);
+        }
+        utils::writeLog("Found a build called " + buildnameline);
+        ui->versionSelectionBox->addItem(buildnameline);
+        buildMap.insert(buildnameline, splitline.at((splitline.count() -1)));
+        return true;
     }
-    utils::writeLog("Found a build called " + buildnameline);
-    ui->versionSelectionBox->addItem(buildnameline);
-    buildMap.insert(buildnameline, splitline.at((splitline.count() -1)));
+    return false;
 }
 
 VersionSelection::~VersionSelection()

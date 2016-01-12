@@ -1,0 +1,26 @@
+From fc04654448b68b643c5ef370bf75fb7f0218dae4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 16 Aug 2015 07:43:03 +0100
+Subject: [PATCH] Do not return SCM revision in version
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/SystemInfo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
+index d38502c..f0a6ac5 100644
+--- a/xbmc/utils/SystemInfo.cpp
++++ b/xbmc/utils/SystemInfo.cpp
+@@ -1249,7 +1249,7 @@ std::string CSysInfo::GetVersionShort()
+ 
+ std::string CSysInfo::GetVersion()
+ {
+-  return GetVersionShort() + " Git:" + CCompileInfo::GetSCMID();
++  return GetVersionShort();
+ }
+ 
+ std::string CSysInfo::GetBuildDate()
+-- 
+2.1.0
+

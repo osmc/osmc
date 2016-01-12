@@ -52,7 +52,7 @@ verify_action
 
 # Set up sources.list
 echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-free
-deb http://apt.osmc.tv jessie main
+deb http://staging.apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
@@ -105,6 +105,7 @@ echo ${MEM_OPTIM} > ${DIR}/etc/ld.so.preload
 # Perform filesystem cleanup
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
+enable_mirrordirection "${DIR}"
 
 # Create filesystem tarball
 create_fs_tarball "${DIR}" "${filestub}"

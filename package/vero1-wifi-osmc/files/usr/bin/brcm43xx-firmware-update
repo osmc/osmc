@@ -12,20 +12,7 @@ else
 fi
 OPTIONS="$OPTIONS --bd_addr $MAC_ADDR"
 
-# Find chip version
-if [ -z "$HCD" ]; then
-	DEVS=($( cat /sys/class/mmc_host/mmc*/mmc?\:0001/mmc?\:0001:?/device ))
-	for DEV in "${DEVS[@]}"; do
-		if [ "${DEV:0:4}" = "0x43" ]; then
-			HCD="bcm${DEV:2}.hcd"
-		fi
-	done
-	if [ -z "$HCD" ]; then
-		echo "Failed: Unable to locate bluetooth device"
-		exit 1
-	fi
-fi
-HCD_BASE=$(basename "$HCD")
+HCD_BASE="bcm4330.hcd"
 
 # Device specific options
 [ "$HCD_BASE" = "bcm4330.hcd" ] && OPTIONS="--no2bytes --tosleep=50000 $OPTIONS"
@@ -60,7 +47,7 @@ if [ ! -e "$TTY" ]; then
 fi
 
 echo "Updating bluetooth firmware via $TTY from $HCD."
-/usr/bin/brcm_patchram_plus --patchram $HCD --baudrate 3000000 --use_baudrate_for_download $TTY $OPTIONS
+/usr/bin/brcm_patchram_plus --patchram $HCD --baudrate 3000000 $TTY $OPTIONS
 
 # Create a symlink to TTY for hci service
 if [ $? -eq 0 ]; then

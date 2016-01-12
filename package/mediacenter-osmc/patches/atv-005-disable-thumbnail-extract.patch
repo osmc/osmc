@@ -1,0 +1,27 @@
+From 038b365f6b8f36e5a12c12b497b955a34acef0d6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:16:09 +0100
+Subject: [PATCH] Disable thumbnail extraction by default on low power
+ platforms
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 8fdda54..e4ca720 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -877,7 +877,7 @@
+         </setting>
+         <setting id="myvideos.extractthumb" type="boolean" label="20433" help="36180">
+           <level>4</level>
+-          <default>true</default>
++          <default>false</default>
+           <control type="toggle" />
+         </setting>
+       </group>
+-- 
+2.1.0
+

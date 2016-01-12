@@ -1,0 +1,13 @@
+--- a/package/eudev/eudev.mk	2015-10-12 23:41:26.746348257 +0100
++++ b/package/eudev/eudev.mk	2015-10-12 23:42:11.305101431 +0100
+@@ -42,4 +42,10 @@
+ 	$(INSTALL) -m 0755 package/eudev/S10udev $(TARGET_DIR)/etc/init.d/S10udev
+ endef
+ 
++define EUDEV_REMOVE_HWDB
++    rm -rf $(TARGET_DIR)/etc/udev/hwdb.d/*
++endef
++
++EUDEV_POST_INSTALL_TARGET_HOOKS += EUDEV_REMOVE_HWDB
++
+ $(eval $(autotools-package))

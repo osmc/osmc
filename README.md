@@ -4,7 +4,7 @@ OSMC (Open Source Media Center) is a free and open source social media hub that 
 
 #### Source Code ####
 
-Source code is available at https://github.com/samnazarko/osmc. You can clone this repository with the command 'git clone' 
+Source code is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone' 
 
 #### Contributing ####
 

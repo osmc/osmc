@@ -1,0 +1,27 @@
+diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
+index 45cc319..6e4feba 100644
+--- a/plugins/bluetooth.c
++++ b/plugins/bluetooth.c
+@@ -337,6 +337,7 @@ static void pan_create_nap(struct bluetooth_pan *pan)
+ {
+ 	struct connman_device *device;
+ 	const char* role;
++	const char *adapter;
+ 
+ 	role = proxy_get_role(pan->btdevice_proxy);
+ 	if (!role) {
+@@ -344,8 +345,12 @@ static void pan_create_nap(struct bluetooth_pan *pan)
+ 		return;
+ 	}
+ 
+-	device = g_hash_table_lookup(devices,
+-			proxy_get_string(pan->btdevice_proxy, "Adapter"));
++	adapter = proxy_get_string(pan->btdevice_proxy, "Adapter");
++
++	if (!adapter)
++		return;
++
++	device = g_hash_table_lookup(devices, adapter);
+ 
+ 	if (!device || !connman_device_get_powered(device))
+ 		return;

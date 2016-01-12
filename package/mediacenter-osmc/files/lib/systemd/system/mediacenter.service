@@ -1,6 +1,7 @@
 [Unit]
 Description = media center application
 After = remote-fs.target network-online.target mysql.service
+Wants = network-online.target
 
 [Service]
 Type = simple

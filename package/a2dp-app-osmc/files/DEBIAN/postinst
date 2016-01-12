@@ -8,9 +8,37 @@ remove_divert ()
 	fi
 }
 
+function is_rbp()
+{
+	if ischroot
+	then
+		dpkg -l | grep -q "rbp-bootloader-osmc"
+		return
+	else
+		grep -q osmcdev=rbp /proc/cmdline > /dev/null 2>&1
+		return
+	fi
+}
+
+
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-#if [ "$1" = "configure" ]; then
+
+if [ "$1" = "configure" ]; then
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
-#fi
+
+	usermod -a -G pulse-access osmc
+	if is_rbp; then
+		echo 'snd_bcm2835' > /etc/modules-load.d/snd_bcm2835.conf
+		modprobe snd_bcm2835
+	fi
+	ln -sf /var/run/pulse/.esd_auth /home/osmc/.esd_auth
+
+	systemctl daemon-reload
+	systemctl enable pulseaudio.service > /dev/null 2>&1
+	if ischroot; then exit 0; fi
+	systemctl start pulseaudio.service > /dev/null 2>&1
+	systemctl restart bluetooth.service > /dev/null 2>&1
+	exit 0
+fi

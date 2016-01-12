@@ -24,7 +24,7 @@ Name: %{osmc_package}
 Version: 1
 Release: PLACEHOLDER
 Source: %{osmc_tar}.tar.gz
-URL: https://github.com/samnazarko/osmc
+URL: https://github.com/osmc/osmc
 License: GPL-2.0
 Group: Multimedia
 %if 0%{?suse_version} == 1110
@@ -175,5 +175,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Oct 12 2014 Sam G. Nazarko
+* Sun Oct 12 2014 Sam G. Nazarko
 - OBS initial release, thanks to Ivan Gonzalez (malkavi) for help

@@ -1,12 +1,12 @@
 # coding=utf-8
 import os, sys, datetime, unicodedata
-import xbmc, xbmcgui, xbmcvfs#, urllib
+import xbmc, xbmcgui, xbmcvfs, urllib
 import xml.etree.ElementTree as xmltree
 from xml.dom.minidom import parse
 from xml.sax.saxutils import escape as escapeXML
 import thread
 from traceback import print_exc
-from unidecode import unidecode
+from unicodeutils import try_decode
 import random
 
 import datafunctions
@@ -60,6 +60,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.shortcutgroup = 1
         
         # Empty arrays for different shortcut types
+        self.thumbnailBrowseDefault = None
         self.backgroundBrowse = False
         self.backgroundBrowseDefault = None
         self.widgetPlaylists = False
@@ -72,17 +73,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
         log( 'Management module loaded' )
         
     def onInit( self ):
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-script" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-script-data" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-skin" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-skin-data" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-user" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-overrides-user-data" )
-        xbmcgui.Window( 10000 ).clearProperty( "skinshortcutsAdditionalProperties" )
         if self.group == '':
             self._close()
         else:
             self.window_id = xbmcgui.getCurrentWindowDialogId()
+            self.currentWindow = xbmcgui.Window( xbmcgui.getCurrentWindowDialogId() )
             xbmcgui.Window(self.window_id).setProperty('groupname', self.group)
             if self.groupname is not None:
                 xbmcgui.Window( self.window_id ).setProperty( 'groupDisplayName', self.groupname )
@@ -174,13 +169,19 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 try:
                     if self.getControl( 309 ).getLabel() == "":
                         self.getControl( 309 ).setLabel( __language__(32044) )
+                    log( "Warning: Deprecated widget button (id 309)" )
                 except:
-                    log( "No widget button on GUI (id 309)" )
+                    pass
                 try:
                     if self.getControl( 310 ).getLabel() == "":
                         self.getControl( 310 ).setLabel( __language__(32045) )
                 except:
                     log( "No background button on GUI (id 310)" )
+                try:
+                    if self.getControl( 312 ).getLabel() == "":
+                        self.getControl( 312 ).setLabel( __language__(32044) )
+                except:
+                    log( "No widget button on GUI (id 309)" )
                     
                 try:
                     if self.getControl( 401 ).getLabel() == "":
@@ -196,6 +197,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self._display_shortcuts()
                 except:
                     pass
+
+            # Clear window property indicating we're loading
+            xbmcgui.Window( 10000 ).clearProperty( "skinshortcuts-loading" )
 
 
                 
@@ -259,8 +263,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 211 ).addItems( listitems )
         if focus is not None:
             self.getControl( 211 ).selectItem( focus )
-            
-        
+              
     def _parse_shortcut( self, item ):
         # Parse a shortcut node
         localLabel = DATA.local( item.find( "label" ).text )
@@ -294,9 +297,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
         
         # Set the action
         action = item.find( "action" ).text
+        self._add_additionalproperty( listitem, "translatedPath", action )
         if "special://skin/" in action:
             translate = xbmc.translatePath( "special://skin/" ).decode( "utf-8" )
             action = action.replace( "special://skin/", translate )
+        
         listitem.setProperty( "path", action )
         listitem.setProperty( "displayPath", action )
         
@@ -332,7 +337,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
         if additionalProperties is not None:
             listitem.setProperty( "additionalListItemProperties", additionalProperties.text )
             for property in eval( additionalProperties.text ):
-                listitem.setProperty( property[0], DATA.local( property[1] )[2] )
+                if property[1].startswith("$") and not property[ 1 ].startswith( "$SKIN" ):
+                    #Translate some listItem properties if needed so they're displayed correctly in the gui
+                    listitem.setProperty(property[0],xbmc.getInfoLabel(property[1]))
+                else:
+                    listitem.setProperty( property[0], DATA.local( property[1] )[2] )
                 
                 # if this is backgroundName or backgroundPlaylistName, keep them so we can localise them properly
                 if property[0] == "backgroundName":
@@ -345,7 +354,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 listitem.setProperty( "backgroundName", DATA.local( backgroundName )[2].replace( "::PLAYLIST::", backgroundPlaylistName ) )
         else:
             listitem.setProperty( "additionalListItemProperties", "[]" )
-        
+                
         return [ isVisible, listitem ]
 
     def _get_icon_overrides( self, listitem, setToDefault = True ):
@@ -407,7 +416,72 @@ class GUI( xbmcgui.WindowXMLDialog ):
             # We set this to the default icon, so we need to check if /that/ icon is overriden
             self._get_icon_overrides( listitem, False )
         
-    def _save_shortcuts( self ):
+    def _save_shortcuts( self, weEnabledSystemDebug = False, weEnabledScriptDebug = False ):
+        # Entry point to save shortcuts - we will call the _save_shortcuts_function and, if it
+        # fails, enable debug options (if not enabled) + recreate the error, then offer to upload
+        # debug log (if relevant add-on is installed)
+
+        # Save the shortcuts
+        try:
+            self._save_shortcuts_function()
+            return
+        except:
+            print_exc()
+            log( "Failed to save shortcuts" )
+
+        # We failed to save the shortcuts
+        
+        if weEnabledSystemDebug or weEnabledScriptDebug:
+            # Disable any logging we enabled
+            if weEnabledSystemDebug:
+                json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "id": 0, "method":"Settings.setSettingValue", "params": {"setting":"debug.showloginfo", "value":false} } ' )
+            if weEnabledScriptDebug:
+                __addon__.setSetting( "enable_logging", "false" )
+
+            if xbmc.getCondVisibility( "System.HasAddon( script.xbmc.debug.log )" ):
+                # Offer to upload a debug log
+                ret = xbmcgui.Dialog().yesno( __addon__.getAddonInfo( "name" ), __language__( 32097 ), __language__( 32093 ) )
+                if ret:
+                    xbmc.executebuiltin( "RunScript(script.xbmc.debug.log)" )
+            else:
+                # Inform user menu couldn't be saved
+                xbmcgui.Dialog().ok( __addon__.getAddonInfo( "name" ), __language__( 32097 ), __language__( 32094 ) )
+
+            # We're done
+            return
+
+        # Enable any debug logging needed                        
+        json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "id": 0, "method": "Settings.getSettings", "params": { "filter":{"section":"system", "category":"debug"} } }')
+        json_query = unicode(json_query, 'utf-8', errors='ignore')
+        json_response = simplejson.loads(json_query)
+        
+        enabledSystemDebug = False
+        enabledScriptDebug = False
+        if json_response.has_key('result') and json_response['result'].has_key('settings') and json_response['result']['settings'] is not None:
+            for item in json_response['result']['settings']:
+                if item["id"] == "debug.showloginfo":
+                    if item["value"] == False:
+                        json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "id": 0, "method":"Settings.setSettingValue", "params": {"setting":"debug.showloginfo", "value":true} } ' )
+                        enabledSystemDebug = True
+        
+        if __addon__.getSetting( "enable_logging" ) != "true":
+            __addon__.setSetting( "enable_logging", "true" )
+            enabledScriptDebug = True
+            
+        if enabledSystemDebug or enabledScriptDebug:
+            # We enabled one or more of the debug options, re-run this function
+            self._save_shortcuts( enabledSystemDebug, enabledScriptDebug )
+        else:
+            if xbmc.getCondVisibility( "System.HasAddon( script.xbmc.debug.log )" ):
+                # Offer to upload a debug log
+                ret = xbmcgui.Dialog().yesno( __addon__.getAddonInfo( "name" ), __language__( 32097 ), __language__( 32093 ) )
+                if ret:
+                    xbmc.executebuiltin( "RunScript(script.xbmc.debug.log)" )
+            else:
+                # Inform user menu couldn't be saved
+                xbmcgui.Dialog().ok( __addon__.getAddonInfo( "name" ), __language__( 32097 ), __language__( 32094 ) )                 
+            
+    def _save_shortcuts_function( self ):
         # Save shortcuts
         if self.changeMade == True:
             log( "Saving changes" )
@@ -426,15 +500,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
             for listitem in self.allListItems:
                 
                 # If the item has a label...
-                if listitem.getLabel() != __language__(32013):
+                if try_decode( listitem.getLabel() ) != __language__(32013):
                     # Generate labelID, and mark if it has changed
                     labelID = listitem.getProperty( "labelID" )
                     newlabelID = labelID
+
                     # defaultID
-                    try:
-                        defaultID = listitem.getProperty( "defaultID" ).decode( "utf-8" )
-                    except:
-                        defaultID = listitem.getProperty( "defaultID" )
+                    defaultID = try_decode( listitem.getProperty( "defaultID" ) )
                     
                     localizedString = listitem.getProperty( "localizedString" )
                     if localizedString is None or localizedString == "":
@@ -456,21 +528,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     
                     # Icon and thumbnail
                     if listitem.getProperty( "untranslatedIcon" ):
-                        xmltree.SubElement( shortcut, "icon" ).text = listitem.getProperty( "untranslatedIcon" )
+                        icon = listitem.getProperty( "untranslatedIcon" )
                     else:
                         if listitem.getProperty( "original-icon" ):
-                            xmltree.SubElement( shortcut, "icon" ).text = listitem.getProperty( "original-icon" )
+                            icon = listitem.getProperty( "original-icon" )
                         else:
-                            xmltree.SubElement( shortcut, "icon" ).text = listitem.getProperty( "icon" )
+                            icon = listitem.getProperty( "icon" )
                         
-                    xmltree.SubElement( shortcut, "thumb" ).text = listitem.getProperty( "thumbnail" )
+                    xmltree.SubElement( shortcut, "icon" ).text = try_decode( icon )
+                    xmltree.SubElement( shortcut, "thumb" ).text = try_decode( listitem.getProperty( "thumbnail" ) )
                     
                     # Action
-                    try:
-                        action = listitem.getProperty( "path" ).decode( "utf-8" )
-                    except:
-                        action = listitem.getProperty( "path" )
-                    xmltree.SubElement( shortcut, "action" ).text = action
+                    xmltree.SubElement( shortcut, "action" ).text = try_decode( listitem.getProperty( "path" ) )
                     
                     # Visible
                     if listitem.getProperty( "visible-condition" ):
@@ -487,11 +556,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             # Save the shortcuts
             DATA.indent( root )
             path = os.path.join( __datapath__ , DATA.slugify( self.group ) + ".DATA.xml" )
-            
-            try:
-                path = path.decode( "utf-8" )
-            except:
-                pass
+            path = try_decode( path )
             
             tree.write( path.replace( ".shortcuts", ".DATA.xml" ), encoding="UTF-8"  )
             
@@ -528,20 +593,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         paths = [[os.path.join( __datapath__, DATA.slugify( labelIDFrom ) + "." + str( i ) + ".DATA,xml" ).encode( "utf-8" ), "Move"], [os.path.join( __skinpath__, DATA.slugify( defaultIDFrom ) + "." + str( i ) + ".DATA.xml" ).encode( "utf-8" ), "Copy"], [os.path.join( __defaultpath__, DATA.slugify( defaultIDFrom ) + "." + str( i ) + ".DATA.xml" ).encode( "utf-8" ), "Copy"]]
                         target = os.path.join( __datapath__, DATA.slugify( labelIDTo ) + "." + str( i ) + ".DATA.xml" ).encode( "utf-8" )
                         
-                    try:
-                        target = target.decode( "utf-8" )
-                    except:
-                        pass
+                    target = try_decode( target )
                     
                     for path in paths:
-                        try:
-                            path[ 0 ] = path[ 0 ].decode( "utf-8" )
-                        except:
-                            pass
-                        try:
-                            path[ 1 ] = path[ 1 ].decode( "utf-8" )
-                        except:
-                            pass
+                        path[0] = try_decode( path[0] )
+                        path[1] = try_decode( path[1] )
                             
                         if path[1] == "New":
                             tree = xmltree.ElementTree( xmltree.Element( "shortcuts" ) )
@@ -570,20 +626,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                                 DATA.indent( newtree.getroot() )
                                 newtree.write( target, encoding="utf-8" )
                                 log( "### Copying " + path[0] + " > " + target )
-                            break
-                            
-                        elif xbmcvfs.exists( path[0].replace( ".DATA.xml", ".shortcuts" ) ):
-                            # An original .shortcuts file exists
-                            
-                            # Copy a default shortcuts file to the target path
-                            xbmcvfs.copy( path[0].replace( ".DATA.xml", ".shortcuts" ), target.replace( ".DATA.xml", ".shortcuts" ) )
-                            
-                            # Upgrade the default shortcuts file
-                            datafunctions.UpgradeFunctions().upgrade_file( target.replace( ".DATA.xml", ".shortcuts" ) )
-                            datafunctions.UpgradeFunctions().upgrade_xmlfile( target.replace( ".DATA.xml", ".shortcuts" ) )
-                            
-                            # Delete the backup file
-                            xbmcvfs.delete( target.replace( ".DATA.xml", ".shortcuts.backup" ) )
                             break
                         
                 labelIDChanges.pop( 0 )
@@ -642,8 +684,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
     
     def _load_widgetsbackgrounds( self ):
         # Pre-load widget, background and thumbnail options provided by skin
-        self.widgets = []
-        self.widgetsPretty = {}
         self.backgrounds = []
         self.backgroundsPretty = {}
         self.thumbnails = []
@@ -651,57 +691,66 @@ class GUI( xbmcgui.WindowXMLDialog ):
         
         # Load skin overrides
         tree = DATA._get_overrides_skin()
-        
-        # Get widgets
-        if tree is not None:
-            elems = tree.getroot().findall('widget')
-            for elem in elems:
-                widgetType = None
-                if "type" in elem.attrib:
-                    widgetType = elem.attrib.get( "type" )
-                if "condition" in elem.attrib:
-                    if not xbmc.getCondVisibility( elem.attrib.get( "condition" ) ):
-                        continue
-                self.widgets.append( [elem.text, DATA.local( elem.attrib.get( 'label' ) )[2], widgetType ] )
-                self.widgetsPretty[elem.text] = DATA.local( elem.attrib.get( 'label' ) )[2]
+        if tree is None:
+            return
                 
-            # Should we allow the user to select a playlist as a widget...
-            elem = tree.find('widgetPlaylists')
-            if elem is not None and elem.text == "True":
-                self.widgetPlaylists = True
-                if "type" in elem.attrib:
-                    self.widgetPlaylistsType = elem.attrib.get( "type" )
+        # Should we allow the user to select a playlist as a widget...
+        elem = tree.find('widgetPlaylists')
+        if elem is not None and elem.text == "True":
+            self.widgetPlaylists = True
+            if "type" in elem.attrib:
+                self.widgetPlaylistsType = elem.attrib.get( "type" )
                 
         # Get backgrounds
-        if tree is not None:
-            elems = tree.findall('background')
-            for elem in elems:
-                if "condition" in elem.attrib:
-                    if not xbmc.getCondVisibility( elem.attrib.get( "condition" ) ):
-                        continue
-
+        elems = tree.findall('background')
+        for elem in elems:
+            if "condition" in elem.attrib:
+                if not xbmc.getCondVisibility( elem.attrib.get( "condition" ) ):
+                    continue
+            
+            if elem.text.startswith("||BROWSE||"):
+                #we want to include images from a VFS path...
+                images = LIBRARY.getImagesFromVfsPath(elem.text.replace("||BROWSE||",""))
+                for image in images:
+                    self.backgrounds.append( [image[0], image[1] ] )
+                    self.backgroundsPretty[image[0]] = image[1]  
+            else:
                 self.backgrounds.append( [elem.text, DATA.local( elem.attrib.get( 'label' ) )[2] ] )
                 self.backgroundsPretty[elem.text] = DATA.local( elem.attrib.get( 'label' ) )[2]
-                
-            # Should we allow the user to browse for background images...
-            elem = tree.find('backgroundBrowse')
-            if elem is not None and elem.text == "True":
-                self.backgroundBrowse = True
-                if "default" in elem.attrib:
-                    self.backgroundBrowseDefault = elem.attrib.get( "default" )
+            
+        # Should we allow the user to browse for background images...
+        elem = tree.find('backgroundBrowse')
+        if elem is not None and elem.text == "True":
+            self.backgroundBrowse = True
+            if "default" in elem.attrib:
+                self.backgroundBrowseDefault = elem.attrib.get( "default" )
 
         # Get thumbnails
-        if tree is not None:
-            elems = tree.findall('thumbnail')
-            for elem in elems:
+        elems = tree.findall('thumbnail')
+        for elem in elems:
+            if "condition" in elem.attrib:
+                if not xbmc.getCondVisibility( elem.attrib.get( "condition" ) ):
+                    continue
+                    
+            if elem.text.startswith("||BROWSE||"):
+                #we want to include images from a VFS path...
+                images = LIBRARY.getImagesFromVfsPath(elem.text.replace("||BROWSE||",""))
+                for image in images:
+                    self.thumbnails.append( [image[0], image[1] ] )
+                    self.thumbnailsPretty[image[0]] = image[1]
+            else:
                 self.thumbnails.append( [elem.text, DATA.local( elem.attrib.get( 'label' ) )[2] ] )
                 self.thumbnailsPretty[elem.text] = DATA.local( elem.attrib.get( 'label' ) )[2]
+        
+        elem = tree.find("thumbnailBrowseDefault")
+        if elem is not None and len(elem.text) > 0:
+            self.thumbnailBrowseDefault = elem.text
+
                 
     # ========================
     # === GUI INTERACTIONS ===
     # ========================
 
-    
     def onClick(self, controlID):
         if controlID == 102:
             # Move to previous type of shortcuts
@@ -772,7 +821,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 userchoice = dialog.yesno( __language__( 32040 ), __language__( 32060 ), "", "", __language__( 32061 ), __language__( 32062 ) )
                 # False: Display
                 # True: Play
-                if userchoice == False:
+                if not userchoice:
                     listitemCopy.setProperty( "path", selectedItem.getProperty( "action-show" ) )
                     listitemCopy.setProperty( "displayPath", selectedItem.getProperty( "action-show" ) )
                 else:
@@ -911,7 +960,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             oldlabelID = listitem.getProperty( "labelID" )
             
             # If the item is blank, set the current label to empty
-            if label == __language__(32013):
+            if try_decode( label ) == __language__(32013):
                 label = ""
                 
             # Get new label from keyboard dialog
@@ -935,7 +984,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             
             # Get new thumbnail from browse dialog
             dialog = xbmcgui.Dialog()
-            custom_thumbnail = dialog.browse( 2 , xbmc.getLocalizedString(1030), 'files')
+            custom_thumbnail = dialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.thumbnailBrowseDefault)
             
             if custom_thumbnail:
                 # Update the thumbnail
@@ -948,6 +997,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
             log( "Change action (307)" )
             listControl = self.getControl( 211 )
             listitem = listControl.getSelectedItem()
+
+            # If no label, redirect click to 401 (Select Shortcut)
+            if try_decode( listitem.getLabel() ) == __language__(32013):
+                self.onClick( 401 )
+                return
             
             if self.warnonremoval( listitem ) == False:
                 return
@@ -956,23 +1010,20 @@ class GUI( xbmcgui.WindowXMLDialog ):
             action = listitem.getProperty( "path" )
             if action == "noop":
                 action = ""
-                
-            # Get new action from keyboard dialog
-            keyboard = xbmc.Keyboard( action, xbmc.getLocalizedString(528), False )
-            keyboard.doModal()
             
-            if ( keyboard.isConfirmed() ):
-                try:
-                    action = keyboard.getText().decode( "utf-8" )
-                except:
-                    action = keyboard.getText()
-                if action == "":
-                    action = "noop"
-                    
-                # Check that a change was really made
-                if action == listitem.getProperty( "path" ):
-                    return
+            if self.currentWindow.getProperty( "custom-grouping" ):
+                selectedShortcut = LIBRARY.selectShortcut(custom = True, currentAction = listitem.getProperty("path"), grouping = self.currentWindow.getProperty( "custom-grouping" )) 
+                self.currentWindow.clearProperty( "custom-grouping" )
             else:
+                selectedShortcut = LIBRARY.selectShortcut(custom = True, currentAction = listitem.getProperty("path")) 
+
+            if selectedShortcut:
+                if selectedShortcut.getProperty( "chosenPath" ):
+                    action = try_decode( selectedShortcut.getProperty( "chosenPath" ) )
+                elif selectedShortcut.getProperty( "path" ):
+                    action = try_decode(selectedShortcut.getProperty( "path" ))
+            
+            if listitem.getProperty( "path" ) == action:
                 return
                 
             self.changeMade = True
@@ -1003,9 +1054,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 
         if controlID == 309:
             # Choose widget
-            log( "Choose widget (309)" )
+            log( "Warning: Deprecated control 309 (Choose widget) selected")
             listControl = self.getControl( 211 )
             listitem = listControl.getSelectedItem()
+
+            # Check that widgets have been loaded
+            LIBRARY.widgets()
+            
+            # If we're setting for an additional widget, get it's number
+            widgetID = ""
+            if self.currentWindow.getProperty( "widgetID" ):
+                widgetID += "." + self.currentWindow.getProperty( "widgetID" )
+                self.currentWindow.clearProperty( "widgetID" )
             
             # Get the default widget for this item
             defaultWidget = self.find_default( "widget", listitem.getProperty( "labelID" ), listitem.getProperty( "defaultID" ) )
@@ -1015,7 +1075,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             widgetLabel = [__language__(32053)]
             widgetName = [""]
             widgetType = [ None ]
-            for key in self.widgets:
+            for key in LIBRARY.dictionaryGroupings[ "widgets-classic" ]:
                 widget.append( key[0] )
                 widgetName.append( "" )
                 widgetType.append( key[2] )
@@ -1027,6 +1087,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 
             # If playlists have been enabled for widgets, add them too
             if self.widgetPlaylists:
+                # Ensure playlists are loaded
+                LIBRARY.playlists()
+
+                # Add them
                 for playlist in LIBRARY.widgetPlaylistsList:
                     widget.append( "::PLAYLIST::" + playlist[0] )
                     widgetLabel.append( playlist[1] )
@@ -1046,36 +1110,77 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 return
             elif selectedWidget == 0:
                 # User selected no widget
-                self._remove_additionalproperty( listitem, "widget" )
-                self._remove_additionalproperty( listitem, "widgetName" )
-                self._remove_additionalproperty( listitem, "widgetType" )
-                self._remove_additionalproperty( listitem, "widgetPlaylist" )
+                self._remove_additionalproperty( listitem, "widget" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetName" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetType" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetPlaylist" + widgetID )
                 
             else:
-                currentWindow = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
-                
                 if widget[selectedWidget].startswith( "::PLAYLIST::" ):
-                    self._add_additionalproperty( listitem, "widget", "Playlist" )
-                    self._add_additionalproperty( listitem, "widgetName", widgetName[selectedWidget] )
-                    self._add_additionalproperty( listitem, "widgetPlaylist", widget[selectedWidget].strip( "::PLAYLIST::" ) )
-                    if currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" :
+                    self._add_additionalproperty( listitem, "widget" + widgetID, "Playlist" )
+                    self._add_additionalproperty( listitem, "widgetName" + widgetID, widgetName[selectedWidget] )
+                    self._add_additionalproperty( listitem, "widgetPlaylist" + widgetID, widget[selectedWidget].strip( "::PLAYLIST::" ) )
+                    if self.currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" and widgetID == "":
                         self._set_label( listitem, widgetName[selectedWidget] )
-                        currentWindow.clearProperty( "useWidgetNameAsLabel" )
+                        self.currentWindow.clearProperty( "useWidgetNameAsLabel" )
                 else:
-                    self._add_additionalproperty( listitem, "widgetName", widgetLabel[selectedWidget].replace( " (%s)" %( __language__(32050) ), "" ) )
-                    self._add_additionalproperty( listitem, "widget", widget[selectedWidget] )
-                    self._remove_additionalproperty( listitem, "widgetPlaylist" )
-                    if currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" :
+                    self._add_additionalproperty( listitem, "widgetName" + widgetID, widgetLabel[selectedWidget].replace( " (%s)" %( __language__(32050) ), "" ) )
+                    self._add_additionalproperty( listitem, "widget" + widgetID, widget[selectedWidget] )
+                    self._remove_additionalproperty( listitem, "widgetPlaylist" + widgetID )
+                    if self.currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" and widgetID == "":
                         self._set_label( listitem, widgetLabel[selectedWidget].replace( " (%s)" %( __language__(32050) ), "" ) )
-                        currentWindow.clearProperty( "useWidgetNameAsLabel" )
+                        self.currentWindow.clearProperty( "useWidgetNameAsLabel" )
                 
                 if widgetType[ selectedWidget] is not None:
-                    self._add_additionalproperty( listitem, "widgetType", widgetType[ selectedWidget] )
+                    self._add_additionalproperty( listitem, "widgetType" + widgetID, widgetType[ selectedWidget] )
                 else:
-                    self._remove_additionalproperty( listitem, "widgetType" )
+                    self._remove_additionalproperty( listitem, "widgetType" + widgetID )
                 
             self.changeMade = True
-                
+
+        if controlID == 312:
+            # Alternative widget select
+            log( "Choose widget (312)" )
+            listControl = self.getControl( 211 )
+            listitem = listControl.getSelectedItem()
+
+            # If we're setting for an additional widget, get its number
+            widgetID = ""
+            if self.currentWindow.getProperty( "widgetID" ):
+                widgetID = "." + self.currentWindow.getProperty( "widgetID" )
+                self.currentWindow.clearProperty( "widgetID" )
+
+            # Get the default widget for this item
+            defaultWidget = self.find_default( "widget", listitem.getProperty( "labelID" ), listitem.getProperty( "defaultID" ) )
+
+            # Ensure widgets are loaded
+            LIBRARY.widgets()
+
+            # Let user choose widget
+            selectedShortcut = LIBRARY.selectShortcut( grouping = "widget", showNone = True )
+
+            if selectedShortcut is not None and selectedShortcut.getProperty( "Path" ):
+                self._add_additionalproperty( listitem, "widget" + widgetID, selectedShortcut.getProperty( "widget" ) )
+                self._add_additionalproperty( listitem, "widgetName" + widgetID, selectedShortcut.getProperty( "widgetName" ) )
+                self._add_additionalproperty( listitem, "widgetType" + widgetID, selectedShortcut.getProperty( "widgetType" ) )
+                self._add_additionalproperty( listitem, "widgetTarget" + widgetID, selectedShortcut.getProperty( "widgetTarget" ) )
+                self._add_additionalproperty( listitem, "widgetPath" + widgetID, selectedShortcut.getProperty( "widgetPath" ) )
+                if self.currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" and widgetID == "":
+                    self._set_label( listitem, selectedShortcut.getProperty( ( "widgetName" ) ) )
+                    self.currentWindow.clearProperty( "useWidgetNameAsLabel" )
+                self.changeMade = True
+
+            elif selectedShortcut is not None:
+                self._remove_additionalproperty( listitem, "widget" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetName" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetType" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetTarget" + widgetID )
+                self._remove_additionalproperty( listitem, "widgetPath" + widgetID )
+                if self.currentWindow.getProperty( "useWidgetNameAsLabel" ) == "true" and widgetID == "":
+                    self._set_label( listitem, selectedShortcut.getProperty( ( "widgetName" ) ) )
+                    self.currentWindow.clearProperty( "useWidgetNameAsLabel" )
+                self.changeMade = True
+       
         if controlID == 310:
             # Choose background
             log( "Choose background (310)" )
@@ -1110,18 +1215,23 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         backgroundLabel.append( key[1].replace( "::PLAYLIST::", playlist[1] ) )
                         backgroundPretty.append( LIBRARY._create(["", key[1].replace( "::PLAYLIST::", playlist[1] ), "", {}] ) )
                 else:
-                    background.append( key[0] )     
+                    background.append( key[0] )
+                    virtualImage = None
+                    if key[0].startswith("$INFO") or key[0].startswith("$VAR"):
+                        virtualImage = key[0].replace("$INFO[","").replace("$VAR[","").replace("]","")
+                        virtualImage = xbmc.getInfoLabel(virtualImage)
+
                     log( repr( defaultBackground ) + " : " + repr( key[ 0 ] ) )
                     if defaultBackground == key[ 0 ]:
                         backgroundLabel.append( key[1] + " (%s)" %( __language__(32050) ) )
-                        if xbmc.skinHasImage( key[ 0 ] ) == True:
+                        if xbmc.skinHasImage( key[ 0 ] ) or virtualImage:
                             usePrettyDialog = True
                             backgroundPretty.append( LIBRARY._create(["", key[ 1 ] + " (%s)" %( __language__(32050) ), "", { "icon": "DefaultFile.png", "thumb": key[ 0 ] } ] ) )
                         else:
                             backgroundPretty.append( LIBRARY._create(["", key[ 1 ] + " (%s)" %( __language__(32050) ), "", {} ] ) )
                     else:
                         backgroundLabel.append( key[1] )
-                        if xbmc.skinHasImage( key[ 0 ] ) == True:
+                        if xbmc.skinHasImage( key[ 0 ] ) or virtualImage:
                             usePrettyDialog = True
                             backgroundPretty.append( LIBRARY._create(["", key[ 1 ], "", { "icon": "DefaultFile.png", "thumb": key[ 0 ] } ] ) )
                         else:
@@ -1193,7 +1303,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             # Generate list of thumbnails for the dialog
             for key in self.thumbnails:
                 log( repr( key[ 0 ] ) + " " + repr( key[ 1 ] ) )
-                thumbnail.append( key[0] )            
+                thumbnail.append( key[0] )
                 thumbnailLabel.append( LIBRARY._create(["", key[ 1 ], "", {"icon": key[ 0 ] }] ) )
             
             # Show the dialog
@@ -1209,7 +1319,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
             elif selectedThumbnail == 0:
                 # User has chosen to browse for an image
                 imagedialog = xbmcgui.Dialog()
-                custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.backgroundBrowseDefault)
+                
+                if self.thumbnailBrowseDefault:
+                    custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.thumbnailBrowseDefault)
+                else:
+                    custom_image = imagedialog.browse( 2 , xbmc.getLocalizedString(1030), 'files', '', True, False, self.backgroundBrowseDefault)
                 
                 if custom_image:
                     listitem.setThumbnailImage( custom_image )
@@ -1227,16 +1341,43 @@ class GUI( xbmcgui.WindowXMLDialog ):
         if controlID == 401:
             # Select shortcut
             log( "Select shortcut (401)" )
-            
             num = self.getControl( 211 ).getSelectedPosition()
             orderIndex = int( self.getControl( 211 ).getListItem( num ).getProperty( "skinshortcuts-orderindex" ) )
             
             if self.warnonremoval( self.getControl( 211 ).getListItem( num ) ) == False:
                 return
+
+            if self.currentWindow.getProperty( "custom-grouping" ):
+                selectedShortcut = LIBRARY.selectShortcut( grouping = self.currentWindow.getProperty( "custom-grouping" ) )
+                self.currentWindow.clearProperty( "custom-grouping" )
+            else:
+                selectedShortcut = LIBRARY.selectShortcut()
             
-            selectedShortcut = LIBRARY.selectShortcut()
             if selectedShortcut is not None:
                 listitemCopy = self._duplicate_listitem( selectedShortcut, self.getControl( 211 ).getListItem( num ) )
+                
+                #add a translated version of the path as property
+                self._add_additionalproperty( listitemCopy, "translatedPath", selectedShortcut.getProperty( "path" ) )
+                
+                if selectedShortcut.getProperty( "smartShortcutProperties" ):
+                    for listitemProperty in eval( selectedShortcut.getProperty( "smartShortcutProperties" ) ):
+                        self._add_additionalproperty( listitemCopy, listitemProperty[0], listitemProperty[1] )
+                               
+                #set default background for this item (if any)
+                defaultBackground = self.find_defaultBackground( listitemCopy.getProperty( "labelID" ), listitemCopy.getProperty( "defaultID" ) )
+                if defaultBackground:
+                    self._add_additionalproperty( listitemCopy, "background", defaultBackground["path"] )
+                    self._add_additionalproperty( listitemCopy, "backgroundName", defaultBackground["label"] )
+            
+                #set default widget for this item (if any)
+                defaultWidget = self.find_defaultWidget( listitemCopy.getProperty( "labelID" ), listitemCopy.getProperty( "defaultID" ) )
+                if defaultWidget:
+                    self._add_additionalproperty( listitemCopy, "widget", defaultWidget["widget"] )
+                    self._add_additionalproperty( listitemCopy, "widgetName", defaultWidget["name"] )
+                    self._add_additionalproperty( listitemCopy, "widgetType", defaultWidget["type"] )
+                    self._add_additionalproperty( listitemCopy, "widgetPath", defaultWidget["path"] )
+                    self._add_additionalproperty( listitemCopy, "widgetTarget", defaultWidget["target"] )
+                        
                 if selectedShortcut.getProperty( "chosenPath" ):
                     listitemCopy.setProperty( "path", selectedShortcut.getProperty( "chosenPath" ) )
                     listitemCopy.setProperty( "displayPath", selectedShortcut.getProperty( "chosenPath" ) )
@@ -1253,19 +1394,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
             listControl = self.getControl( 211 )
             listitem = listControl.getSelectedItem()
             
-            currentWindow = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
             propertyName = ""
             propertyValue = ""
             
             # Retrieve the custom property
-            if currentWindow.getProperty( "customProperty" ):
-                propertyName = currentWindow.getProperty( "customProperty" )
-                currentWindow.clearProperty( "customProperty" )
+            if self.currentWindow.getProperty( "customProperty" ):
+                propertyName = self.currentWindow.getProperty( "customProperty" )
+                self.currentWindow.clearProperty( "customProperty" )
             
                 # Retrieve the custom value
-                if currentWindow.getProperty( "customValue" ):
-                    propertyValue = currentWindow.getProperty( "customValue" )
-                    currentWindow.clearProperty( "customValue" )
+                if self.currentWindow.getProperty( "customValue" ):
+                    propertyValue = self.currentWindow.getProperty( "customValue" )
+                    self.currentWindow.clearProperty( "customValue" )
                     
                 if propertyValue == "":
                     # No value set, so remove it from additionalListItemProperties
@@ -1276,8 +1416,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self._add_additionalproperty( listitem, propertyName, propertyValue )
                     self.changeMade = True
 
-            elif currentWindow.getProperty( "chooseProperty" ):
-                propertyName = currentWindow.getProperty( "chooseProperty" )
+            elif self.currentWindow.getProperty( "chooseProperty" ):
+                propertyName = self.currentWindow.getProperty( "chooseProperty" )
                 # Create lists for the select dialog
                 property = [""]
                 propertyLabel = ["None"]
@@ -1306,14 +1446,15 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 
             else:
                 # The customProperty value needs to be set, so return
-                currentWindow.clearProperty( "customValue" )
+                self.currentWindow.clearProperty( "customValue" )
                 return
             
         if controlID == 405 or controlID == 406 or controlID == 407 or controlID == 408 or controlID == 409 or controlID == 410:
             # Launch management dialog for submenu
-            log( "Launching management dialog for submenu/additional menu (" + str( controlID ) + ")" )
+            if xbmcgui.Window( 10000 ).getProperty( "skinshortcuts-loading" ):
+                return
 
-            currentWindow = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+            log( "Launching management dialog for submenu/additional menu (" + str( controlID ) + ")" )
             
             # Get the group we're about to edit
             launchGroup = self.getControl( 211 ).getSelectedItem().getProperty( "labelID" )
@@ -1354,22 +1495,23 @@ class GUI( xbmcgui.WindowXMLDialog ):
             elif controlID == 410:
                 launchGroup = launchGroup + ".5"
             # Check if 'level' property has been set
-            elif currentWindow.getProperty("level"):
-                launchGroup = launchGroup + "." + currentWindow.getProperty("level")
-                currentWindow.clearProperty("level")
+            elif self.currentWindow.getProperty("level"):
+                launchGroup = launchGroup + "." + self.currentWindow.getProperty("level")
+                self.currentWindow.clearProperty("level")
                 
             # Check if 'groupname' property has been set
-            if currentWindow.getProperty( "overrideName" ):
-                groupName = currentWindow.getProperty( "overrideName" )
-                currentWindow.clearProperty( "overrideName" )
+            if self.currentWindow.getProperty( "overrideName" ):
+                groupName = self.currentWindow.getProperty( "overrideName" )
+                self.currentWindow.clearProperty( "overrideName" )
                 
             # Execute the script
-            currentWindow.setProperty( "additionalDialog", "True" )
+            xbmcgui.Window( 10000 ).setProperty( "skinshortcuts-loading", "True" )
+            self.currentWindow.setProperty( "additionalDialog", "True" )
             import gui
             ui= gui.GUI( "script-skinshortcuts.xml", __cwd__, "default", group=launchGroup, defaultGroup=launchDefaultGroup, nolabels=self.nolabels, groupname=groupName )
             ui.doModal()
             del ui
-            currentWindow.clearProperty( "additionalDialog" )
+            self.currentWindow.clearProperty( "additionalDialog" )
 
 
 
@@ -1408,6 +1550,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             
         if listitem.getProperty( "defaultID" ):
             listitemCopy.setProperty( "defaultID", listitem.getProperty( "defaultID" ) )
+        elif listitem.getProperty( "labelID" ):
+            listitemCopy.setProperty( "defaultID", listitem.getProperty( "labelID" ) )
         else:
             listitemCopy.setProperty( "defaultID", DATA._get_labelID( DATA.local( listitem.getProperty( "localizedString" ) )[3],  listitem.getProperty( "path" ), True ) )
             
@@ -1456,17 +1600,22 @@ class GUI( xbmcgui.WindowXMLDialog ):
         properties = []
         if listitem.getProperty( "additionalListItemProperties" ):
             properties = eval( listitem.getProperty( "additionalListItemProperties" ) )
-        
+                
         foundProperty = False
         for property in properties:
             if property[0] == propertyName:
                 foundProperty = True
                 property[1] = DATA.local( propertyValue )[0]
-                listitem.setProperty( propertyName, DATA.local( propertyValue )[2] )
                 
         if foundProperty == False:
             properties.append( [propertyName, DATA.local( propertyValue )[0] ] )
-            listitem.setProperty( propertyName, DATA.local( propertyValue )[2] )
+        
+        #translate any INFO labels (if needed) so they will be displayed correctly in the gui
+        if propertyValue:
+            if propertyValue.startswith("$") and not propertyValue.startswith( "$SKIN" ):
+                listitem.setProperty( propertyName, xbmc.getInfoLabel(propertyValue) )
+            else:
+                listitem.setProperty( propertyName, DATA.local( propertyValue )[2] )
             
         listitem.setProperty( "additionalListItemProperties", repr( properties ) )
         
@@ -1504,13 +1653,59 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 return dialog.yesno( heading, message )
                 
         return True
+    
+    def find_defaultBackground( self, labelID, defaultID ):
+        # This function finds the default background, including properties
+        result = {}
+        defaultBackground = self.find_default( "background", labelID, defaultID )
+        if defaultBackground:
+            for key in self.backgrounds:
+                if defaultBackground == key[ 0 ]:
+                    result["path"] = key[ 0 ]
+                    result["label"] = key[ 1 ]
+                elif defaultBackground == key[ 1 ]:
+                    result["path"] = key[ 0 ]
+                    result["label"] = key[ 1 ]
         
+        return result
+
+    def find_defaultWidget( self, labelID, defaultID ):
+        # This function finds the default widget, including properties
+        result = {}
+        
+        #first look for any widgetdefaultnodes
+        defaultWidget = self.find_default( "widgetdefaultnode", labelID, defaultID )
+        if defaultWidget is not None:
+            result["path"] = defaultWidget.get( "path" )
+            result["name"] = defaultWidget.get( "label" )
+            result["widget"] = defaultWidget.text
+            result["type"] = defaultWidget.get( "type" )
+            result["target"] = defaultWidget.get( "target" )
+        else:
+            #find any classic widgets
+            defaultWidget = self.find_default( "widget", labelID, defaultID )
+            for key in LIBRARY.dictionaryGroupings[ "widgets-classic" ]:
+                if key[0] == defaultWidget:
+                    result["widget"] = key[ 0 ]
+                    result["name"] = key[ 1 ]
+                    result["type"] = key[ 2 ]
+                    result["path"] = key[ 3 ]
+                    result["target"] = key[ 5 ]
+                    break
+        return result
+       
     def find_default( self, backgroundorwidget, labelID, defaultID ):
         # This function finds the id of an items default background or widget
+        
+        if labelID == None:
+            labelID = defaultID
+        
         tree = DATA._get_overrides_skin()
         if tree is not None:
             if backgroundorwidget == "background":
                 elems = tree.getroot().findall( "backgrounddefault" )
+            elif backgroundorwidget == "widgetdefaultnode":
+                elems = tree.getroot().findall( "widgetdefaultnode" )
             else:
                 elems = tree.getroot().findall( "widgetdefault" )
                 
@@ -1519,7 +1714,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     if elem.attrib.get( "labelID" ) == labelID or elem.attrib.get( "defaultID" ) == defaultID:
                         if "group" in elem.attrib:
                             if elem.attrib.get( "group" ) == self.group:
-                                return elem.text
+                                if backgroundorwidget == "widgetdefaultnode":
+                                    #if it's a widgetdefaultnode, return the whole element
+                                    return elem
+                                else:
+                                    return elem.text
                             else:
                                 continue
                         else:

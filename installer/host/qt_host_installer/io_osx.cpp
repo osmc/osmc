@@ -202,7 +202,7 @@ namespace io
            {
                line = line.simplified(); /* Remove trailing and leading ws */
                /* The line holding the device is the only line always starting with 0: */
-               if (line.simplified().startsWith("Ejectable:"))
+               if (line.simplified().startsWith("Ejectable:") || line.simplified().startsWith("Removable Media:"))
                {
                    QString ejectable = QString(line.split(":").at(1).simplified());
                    if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive))
@@ -215,7 +215,7 @@ namespace io
                    if (0 == QString("Disk Image").compare(protocol, Qt::CaseInsensitive))
                        isDmg = true;
                    utils::writeLog("Determined " + protocol + " as protocol for " + diskPath);
-                   utils::writeLog("Decided to be a DMG? " + isDmg);
+                   utils::writeLog("Decided to be a DMG: " + isDmg ? "yes" : "no");
                }
                else if (line.simplified().startsWith("Read-Only Media:"))
                {
@@ -223,7 +223,7 @@ namespace io
                    if (0 == QString("Yes").compare(readOnlyMedia, Qt::CaseInsensitive))
                        isReadOnly = true;
                    utils::writeLog("Determined " + readOnlyMedia + " as readOnlyMedia for " + diskPath);
-                   utils::writeLog("Decided to be r/o? " + isReadOnly);
+                   utils::writeLog("Decided to be r/o: " + isReadOnly ? "yes" : "no");
                }
                else if (line.simplified().contains("Media Name"))
                {

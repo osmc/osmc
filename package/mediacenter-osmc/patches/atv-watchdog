@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+export TERM=linux
+
+if [ "$1" = "stop" ]; then
+	exit
+fi
+
+trap 'wait; exit 0' SIGTERM
+
+chmod a+rw /dev/tty1
+/usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
+
+/sbin/checkmodifier
+case $? in
+4)
+	/usr/bin/setterm --cursor on >/dev/tty1
+	systemctl start getty@tty1
+	exit 0
+	;;
+5)
+	vres=$(/bin/fbset | grep geometry | awk '{print $3}')
+	if ((vres<=660))
+	then
+		setfont OSMC-Lat15-Terminus14.psf.gz
+	elif ((661<=vres && vres<=890))
+	then
+		setfont OSMC-Lat15-TerminusBold22x11.psf.gz
+	elif ((891<=vres))
+	then
+		setfont OSMC-Lat15-TerminusBold28x14.psf.gz
+	fi
+
+	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
+	count=60; while [ $count -gt 0 ]; do if connmanctl state | grep -iq 'online'; then break; fi; sleep 1; let count-=1; done
+	if [ $count -eq 0 ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
+		sleep 20; reboot
+	fi
+        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
+        err=$(apt-get -qq update); if [ -n "$err" ]
+        then
+                dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
+                sleep 20
+        fi
+        systemctl start manual-update
+        exit 0
+        ;;
+esac
+
+if [ ! -e /var/run/fb_resolution ]; then
+	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
+fi
+
+while true; do
+	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
+	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+
+	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
+	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
+
+	setcap 'cap_net_bind_service=+ep' $KODI
+	starttime=$(date +%s)
+	echo "Starting Kodi..."
+	sudo -u osmc xinit $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
+	endtime=$(date +%s)
+	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
+	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
+
+	case $CODE in
+	64|66 )
+		exit 0;;
+	esac
+	chmod a+rw /dev/tty1
+	systemctl status getty@tty1 >/dev/null; GETTY=$?
+	if [ "$GETTY" -ne 0 ]; then
+		chvt 1
+		/usr/bin/setterm --cursor off >/dev/tty1
+		/usr/bin/clear >/dev/tty1
+		/usr/bin/ply-image "$CODE"
+		read -n 1 -s -t 10 key </dev/tty1
+	fi
+	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
+		/bin/fbset -depth 8 && /bin/fbset -depth 16
+		/usr/bin/setterm --cursor on >/dev/tty1
+		systemctl start getty@tty1
+		count=30
+		while [ $count -gt 0 ]; do
+			who | awk '{print $2}' | grep -q tty1
+			if [ "$?" -eq 0 ]; then
+				count=5
+			else
+				let count=count-5
+			fi
+			sleep 5
+		done
+		systemctl stop getty@tty1
+	fi
+done

@@ -1,0 +1,29 @@
+From bce806c94e52c8687eb90e5267d8281c0c712f27 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 13 Dec 2015 18:13:10 +0000
+Subject: [PATCH] Do not try and stop scripts if we are going to reboot or
+ shutdown. There is a significant chance with some addons that we will see a
+ hang
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index bf7932e..91a9060 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -3018,7 +3018,8 @@ void CApplication::Stop(int exitCode)
+     // stop all remaining scripts; must be done after skin has been unloaded,
+     // not before some windows still need it when deinitializing during skin
+     // unloading
+-    CScriptInvocationManager::GetInstance().Uninitialize();
++    if (m_ExitCode == EXITCODE_QUIT)
++        CScriptInvocationManager::GetInstance().Uninitialize();
+ 
+     g_Windowing.DestroyRenderSystem();
+     g_Windowing.DestroyWindow();
+-- 
+2.1.0
+

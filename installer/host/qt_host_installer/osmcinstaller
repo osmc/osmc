@@ -17,14 +17,17 @@ if [ $debug -eq 0 ]; then
     cd "$dir"
 fi
 
+export QT_X11_NO_MITSHM=1
+cmd="$dir/qt_host_installer"
+
 if [[ $EUID -eq 0 ]]; then
-    $dir/qt_host_installer
+    $cmd
 elif command -v gksudo; then
-    gksu -k $dir/qt_host_installer
+    gksu -k $cmd
 elif command -v kdesu; then
-    kdesu $dir/qt_host_installer
+    kdesu $cmd
 elif command -v xdg-su; then
-    xdg-su -c $dir/qt_host_installer
+    xdg-su -c $cmd
 else
-    sudo $dir/qt_host_installer
+    sudo $cmd
 fi

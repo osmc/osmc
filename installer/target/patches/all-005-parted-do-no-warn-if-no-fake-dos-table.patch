@@ -1,0 +1,30 @@
+--- /dev/null	2015-10-21 21:00:35.263999475 +0100
++++ a/package/parted/parted-002-fix-no-warning-gpt.patch	2015-10-21 20:59:30.553897347 +0100
+@@ -0,0 +1,27 @@
++--- parted/libparted/labels/gpt.c	2015-10-21 20:46:32.940713524 +0100
+++++ parted/libparted/labels/gpt.c	2015-10-21 20:46:56.424026950 +0100
++@@ -486,23 +486,6 @@
++     return 0;
++ 
++   int ok = 1;
++-  if (!_pmbr_is_valid ((const LegacyMBR_t *) label))
++-    {
++-      int ex_status = ped_exception_throw
++-        (PED_EXCEPTION_WARNING,
++-         PED_EXCEPTION_YES_NO,
++-         _("%s contains GPT signatures, indicating that it has "
++-           "a GPT table.  However, it does not have a valid "
++-           "fake msdos partition table, as it should.  Perhaps "
++-           "it was corrupted -- possibly by a program that "
++-           "doesn't understand GPT partition tables.  Or "
++-           "perhaps you deleted the GPT table, and are now "
++-           "using an msdos partition table.  Is this a GPT "
++-           "partition table?"),
++-         dev->path);
++-      if (ex_status == PED_EXCEPTION_NO)
++-        ok = 0;
++-    }
++ 
++   free (label);
++   return ok;
++

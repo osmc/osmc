@@ -54,6 +54,7 @@
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums)">$INFO[Container(9008).ListItem.Label]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums)">$INFO[Container(9009).ListItem.Label]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums)">$INFO[Container(9010).ListItem.Label]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MyOSMC)">$INFO[Container(9011).ListItem.Label]</value>
 	</variable>
 	<variable name="WidgetHeading">
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$LOCALIZE[31031]</value>
@@ -65,6 +66,7 @@
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums)">$LOCALIZE[31038]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums)">$LOCALIZE[31039]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums)">$LOCALIZE[31056]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MyOSMC)">$LOCALIZE[31067]</value>
 	</variable>
 	<variable name="WidgetFanart">
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$INFO[Container(9002).ListItem.Property(fanart)]</value>
@@ -130,6 +132,7 @@
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31038]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31039]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RandomAlbums) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31056]</value>
+		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MyOSMC) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[31067]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),MusicAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1038]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),PictureAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1039]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),ProgramAddons) + !IsEmpty(Container(9002).ListItem.Label) + !Skin.HasSetting(HideSubmenuHeading)">$LOCALIZE[1043]</value>

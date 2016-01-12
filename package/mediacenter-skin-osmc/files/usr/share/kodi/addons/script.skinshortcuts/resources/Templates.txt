@@ -1,0 +1,285 @@
+This file details usage of templates with the Skin Shortcuts script
+
+What Are Templates?
+-------------------
+
+Templates are snippets of xbmc gui xml, along with a few Skin Shortcuts-specific tags, that allow Skin Shortcuts to build whole gui elements for the menus, or even based on what is in the menus.
+
+This has a number of advantages over traditional Skin Shortcuts implementations. For example, all sub-menu's can be in their own list and so can have visible/hidden animation, it's possible to include static items before or after the users custom items in a menu, and widgets or other content can be built - with their own list - specific to the menu items and options the user has selected.
+
+
+Using Templates
+---------------
+
+To use templates you simply need to include a template.xml file in your skins shortcuts directory, with all content between <template /> tags.
+
+If this file is present, skin shortcuts will automatically build your templates alongside its traditional includes.
+
+
+Types of templates
+------------------
+
+Skin shortcuts supports 3 types of template - one for the main menu, one for sub-menus and one for other content based on main menu items
+
+
+1. Main menu template
+
+<mainmenu include="[include]">
+	<controls>
+		<your>
+			<kodi>
+				<controls and="tags">
+					<skinshortcuts>items</skinshortcuts>
+				</controls>
+			</kodi>
+		</your>
+	</controls>
+</mainmenu>
+
+[include] - [Optional] The name of the include this will be added to, appended to skinshortcuts-templates-. If ommitted, it will be added to skinshortcuts-template
+<skinshortcuts>items</skinshortcuts> - This will be replaced with the items the user has chosen for the main menu
+
+The <controls /> element must be included. Put your gui xml within.
+
+2. Sub-menu template
+
+<submenu include="[include]" level="[level]" name="[name]">
+	<controls>
+		<your>
+			<kodi>
+				<controls and="tags">
+					<skinshortcuts>items</skinshortcuts>
+				</controls>
+			</kodi>
+		</your>
+	</controls>
+</submenu>
+
+[include] - [Optional] The name of the include this will be added to, appended to skinshortcuts-templates-. If ommitted, it will be added to skinshortcuts-template
+[level] - [Optional] If building multiple sub-menu levels, specifies which level this applies to. Omit for the default level (0).
+[name] - [Optional] For use with additional groups, the name of the group
+<skinshortcuts>items</skinshortcuts> - This will be replaced with the items the user has chosen for the main menu
+<skinshortcuts>visibility</skinshortcuts> - This will be replaced with a visibility condition based on the focus of the main menu
+
+For each sub-menu that is built, a separate set of controls will be generated based on the template. You can include multiple templates with different level/name attributes.
+
+If the level or name attributes are specified, the script will match the first template found with the same attributes, or fall back to the first template without these attributes.
+
+The <controls /> element must be included. Put your gui xml within.
+
+
+3. Other template
+
+<other include="[include]">
+	<condition />
+	<match />
+	<property />
+	<controls>
+		<your>
+			<kodi>
+				<controls and="tags">
+					<skinshortcuts>visibility</skinshortcuts>
+					<custom tag="$skinshortcuts[propertyName]">$skinshortcuts[propertyName]</custom>
+				</controls
+			</kodi>
+		</your>
+	</controls>
+</other>
+
+[include] - [Optional] The name of the include this will be added to, appended to skinshortcuts-templates-. If ommitted, it will be added to skinshortcuts-template
+<condition /> - [Optional] See 3.1
+<match /> - [Optional] See 3.2
+<property /> - [Optional] See 3.3
+<skinshortcuts>visibility</skinshortcuts> - This will be replaced with a visibility condition based on the focus of the main menu
+%skinshortcuts[propertyName] - This will be replaced by the value of a matched <property /> element
+
+The <controls /> element must be included. Put your gui xml within.
+
+One Other template will be built for each main menu item per [include]. Use different [include]'s to build multiple Other templates.
+
+
+3.1 Condition elements
+
+Condition elements are used to decide whether an Other template should be built, dependant on the items in the main menu. You may use multiple Condition elements - unless you specify a <match /> element, the template will only be built if they all match.
+
+<condition tag="[tag]" attribute="[attributeName]|[attributeValue]">[textValue]</condition>
+
+[tag] - The main menu must have an element with this tag
+[attributeName]|[attributeValue] - [Optional] The element must have an attribute with the name [attributeName] and the value [attributeValue]
+[textValue] - [Optional] The element must have this value
+
+For example, to match against the following element in a main menu item:
+
+<property name="widgetType">myWidgetGrouping</property>
+
+The <condition /> would be
+<condition tag="property" attribute="name|widgetType">myWidgetGrouping</condition>
+
+
+3.2 Match element
+
+If you are using multiple condition elements, you can include a match element to speicify whether any or all of the conditions must be met for the template to be built
+
+<match>[any/all]</match>
+
+[any/all] - set as 'any' for the template to be built if any of the conditions match
+          - set as 'all' for the temlate to be built if all of the conditions match (default behaviour)
+
+e.g.
+
+<match>any</match>
+
+
+3.3 Property elements
+
+Property elements let you include a custom property in your template, dependant on the items in the main menu. You may include mutliple <property /> elements which set the same property - the first one matched will be used.
+
+<property name="[propertyName]" tag="[tag]" attribute="[attributeName]|[attributeValue]" value="[textValue]">[propertyValue]</property>
+
+[name] - The name of the property you are setting
+[tag] - [Optional] The main menu must have an element with this tag
+[attributeName]|[attributeValue] - [Optional] The element must have an attribute with the name [attributeName] and the value [attributeValue]
+[textValue] - [Optional] The elment must have this value
+[propertyValue] - [Optional] What you are setting the property to. If ommitted (e.g. a <property /> element), the propertyName will be set to the current text value of the matching property.
+
+You can also set a property directly to the value of a element within a main menu item:
+
+<property name="[propertyName]" tag="[tag]" attribute="[attributeName|attributeValue" />
+
+[name] - The name of the property you are setting
+[tag] - The main menu must have an element with this tag
+[attributeName]|[attributeValue] The element must have an attribute with the name [attributeName] and the value [attributeValue]
+
+If none of the <property /> elements match, the property will be an empty string. You can set an alternative fallback value by including the following as the final element in a list of <property />'s
+
+<property name="[propertyName]">[propertyValue]</property>
+
+[name] - The name of the property you are setting
+[propertyValue] - What you are setting the property to
+
+To access the property, include $SKINSHORTCUTS[propertyName] in either an attribute or as the value of an element.
+
+For example, the content of a widget list could be set as follows
+
+<property name="widgetContent" tag="property" attribute="name|widget" value="RecentMovies">plugin://service.library.data.provider?type=recentmovies&amp;reload=$INFO[Window.Property(recentmovies)]</property>
+<property name="widgetContent" tag="property" attribute="name|widget" value="RecentAlbums">plugin://service.library.data.provider?type=recentalbums&amp;reload=$INFO[Window.Property(recentalbums)]</property>
+<property name="widgetContent" tag="property" attribute="name|widget" />
+<property name="widgetContent">My fallback value</property>
+
+And then the content of a list within your Other template could be filled as
+
+<content>$SKINSHORTCUTS[widgetContent]</content>
+
+Alternatively, the property can be set to $INCLUDE[includeName], in which case the above example will be written as:
+
+<content>
+	<include>[includeName]</include>
+</content>
+
+
+A Simple Example
+----------------
+
+This example builds the main and sub-menu in a template. The main menu has a static item, in addition to the items the user has selected, as the first item. The submenus all have a visible/hidden animation. It also builds a widget template in a separate include, with the content set via properties.
+
+As no include attribute is provided for the mainmenu or submenu elements, they are both included in the skin with
+
+<include>skinshortcuts-template</include>
+
+The Other template for the widgets specifies an include attribute of "widget", and so are included with
+
+<include>skinshortcuts-template-widget</include>
+
+There is then an additional widget include for playlists, though it uses the same include attribute of "widget" and so is included into the skin with the same <include /> as the other widgets
+
+<template>
+	<mainmenu>
+		<controls>
+			<control type="fixedlist" id="9000">
+				<include>mainmenuList</include>
+				<itemlayout width="216" height="25">
+					<include>menuLayout</include>
+				</itemlayout>
+				<focusedlayout width="216" height="25">
+					<include>menuFocusedLayout</include>
+				</focusedlayout>
+				<content>
+					<item>
+						<label>Static item</label>
+						<icon>static.png</icon>
+					</item>
+					<skinshortcuts>items</skinshortcuts>
+				</content>
+			</control>
+		</controls>
+	</mainmenu>
+	
+	<submenu>
+		<controls>
+			<!-- Submenu -->
+			<control type="fixedlist" id="9001">
+				<skinshortcuts>visibility</skinshortcuts>
+				<include>submenuList</include>
+				<include>submenuAnimation</include>
+				<itemlayout width="216" height="25">
+					<include>menuLayout</include>
+				</itemlayout>
+				<focusedlayout width="216" height="25">
+					<include>menuFocusedLayout</include>
+				</focusedlayout>
+				<content>
+					<skinshortcuts>items</skinshortcuts>
+				</content>
+			</control>
+		</controls>
+	</submenu>
+	
+	<other include="widget">
+		<!-- Match our custom widgets with a widgetType of media, or a node with mediaType of movies or tvshows -->
+		<condition tag="property" attribute="name|widgetType">media</condition>
+		<condition tag="property" attribute="name|widgetType">movies</condition>
+		<condition tag="property" attribute="name|widgetType">tvshows</condition>
+		<match>any</match>
+
+		<!-- For our custom widgets, set the content property to the correct path of the plugin providing the widget -->
+		<property name="content" tag="property" attribute="name|widget" value="movies">plugin://service.library.data.provider?type=recentmovies&amp;reload=$INFO[Window.Property(recentmovies)]</property>
+		<property name="content" tag="property" attribute="name|widget" value="tv">plugin://service.library.data.provider?type=recommendedepisodes&amp;reload=$INFO[Window.Property(recommendedepisodes)]</property>
+		<property name="content" tag="property" attribute="name|widget" value="albums">plugin://service.library.data.provider?type=randomalbums&amp;reload=$INFO[Window.Property(randomalbums)]</property>
+		<property name="content" tag="property" attribute="name|widget" />
+
+		<!-- For nodes, set the content property to the value of widgetPath -->
+		<property name="content" tag="property" attribute="name|widgetPath" />
+
+		<controls>
+			<control type="list" id="9002">
+				<skinshortcuts>visibility</skinshortcuts>
+				<include>mediaList</include>
+				<layout>
+					<include>mediaLayout</include>
+				</layout>
+				<focusedlayout>
+					<include>mediaFocusedLayout</include>
+				</focusedlayout>
+				<content>$SKINSHORTCUTS[content]</content>
+			</control>
+		</controls>
+	</other>
+
+	<other include="widget">
+		<condition tag="property" attribute="name|widet">Playlist</condition>
+		<property name="content" tag="property" attribute="name|widgetPlaylist" />
+		<controls>
+			<control type="list" id="9002">
+				<skinshortcuts>visibility</skinshortcuts>
+				<include>mediaList</include>
+				<layout>
+					<include>mediaLayoutPlaylist</include>
+				</layout>
+				<focusedlayout>
+					<include>mediaFocusedLayoutPlaylist</include>
+				</focusedlayout>
+				<content>$SKINSHORTCUTS[content]</content>
+			</control>
+		</controls>
+	</other>
+</template>

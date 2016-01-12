@@ -1,0 +1,46 @@
+From 29547bb50826a83c22420207f08233a9edbc487d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 20 Oct 2015 17:38:50 +0100
+Subject: [PATCH] Do not enumerate the default device when we have PulseAudio
+ running, or the duplicate sink will cause some confusion. Use a friendlier
+ name when PulseAudio is running.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index e22db7a..4df3a77 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -1128,7 +1128,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+    * will automatically add "@" instead to enable surroundXX mangling.
+    * We don't want to do that if "default" can handle multichannel
+    * itself (e.g. in case of a pulseaudio server). */
+-  EnumerateDevice(list, "default", "", config);
++  if (system("/bin/systemctl is-active pulseaudio.service") != 0)
++      EnumerateDevice(list, "default", "", config);
+ 
+   void **hints;
+ 
+@@ -1554,7 +1555,15 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+   }
+ 
+   snd_pcm_close(pcmhandle);
+-  list.push_back(info);
++  int hasPulse = system("/bin/systemctl is-active pulseaudio.service"); /* ToDo: use systemd dbus api */
++  if (hasPulse == 0)
++  {
++     if (info.m_displayName == "PulseAudio Sound Server")
++         info.m_displayName.replace(info.m_displayName.begin(), info.m_displayName.end(), "OSMC streaming to Bluetooth speaker / headphones");
++     list.push_back(info);
++  }
++  else
++     list.push_back(info);
+ }
+ 
+ bool CAESinkALSA::GetELD(snd_hctl_t *hctl, int device, CAEDeviceInfo& info, bool& badHDMI)
+-- 
+2.1.0
+

@@ -1,29 +1,46 @@
 #!/bin/bash
 
-if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ]
-then
-    echo "Creating TVHeadend default access control file"
-    mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
-    echo '
-	{
-	"enabled": 1,
-        "username": "osmc",
-        "password": "osmc",
-        "comment": "Default access entry",
-        "prefix": "0.0.0.0/0,::/0",
-        "streaming": 1,
-        "dvr": 1,
-        "dvrallcfg": 1,
-        "webui": 1,
-        "admin": 1,
-        "id": "1"
-	}' > /home/osmc/.hts/tvheadend/accesscontrol/1
-chown -R osmc:osmc /home/osmc/.hts
+if [ "$1" = "configure" ]; then
+
+	systemctl daemon-reload
+
+	if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ] && [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+
+		echo "Creating TVHeadend default access control file"
+		mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
+
+		cat <<- 'EOF' > /home/osmc/.hts/tvheadend/accesscontrol/1
+		{
+			"enabled": 1,
+		        "username": "osmc",
+		        "password": "osmc",
+		        "comment": "Default access entry",
+		        "prefix": "0.0.0.0/0,::/0",
+		        "streaming": 1,
+		        "dvr": 1,
+		        "dvrallcfg": 1,
+		        "webui": 1,
+		        "admin": 1,
+		        "id": "1"
+		}
+		EOF
+
+		chown -R osmc:osmc /home/osmc/.hts/
+	fi
+
+
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable tvheadend.service >/dev/null 2>&1
+	fi
+
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
+		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "4.0.5-4"; then
+			systemctl enable tvheadend.service >/dev/null 2>&1
+		fi
+	fi
+
+	if ischroot; then exit 0; fi
+	if systemctl is-enabled tvheadend.service >/dev/null; then systemctl start tvheadend.service; fi
 fi
-
-systemctl enable tvheadend.service
-
-ischroot
-if [ $? == 0 ]; then exit 0; fi
-
-systemctl start tvheadend.service

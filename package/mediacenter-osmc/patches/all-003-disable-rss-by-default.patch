@@ -1,6 +1,6 @@
-From 36fd466fd46d36bddd9d84e235acdd5ae757ed71 Mon Sep 17 00:00:00 2001
+From 6b3c58af11cc8baecdc3495fd8c9566749ff3e84 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Tue, 2 Jun 2015 17:59:25 +0100
+Date: Tue, 16 Jun 2015 03:04:42 +0100
 Subject: [PATCH] Disable RSS feeds by default
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
@@ -9,18 +9,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 697c83d..b27da57 100644
+index 8f69bcb..65c43b8 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -260,7 +260,7 @@
-       <group id="1">
-         <setting id="filelists.showparentdiritems" type="boolean" label="13306" help="36122">
-           <level>1</level>
+@@ -97,7 +97,7 @@
+       <group id="2">
+         <setting id="lookandfeel.enablerssfeeds" type="boolean" label="13305" help="36111">
+           <level>0</level>
 -          <default>true</default>
 +          <default>false</default>
            <control type="toggle" />
          </setting>
-         <setting id="filelists.showextensions" type="boolean" label="497" help="36123">
+         <setting id="lookandfeel.rssedit" type="string" parent="lookandfeel.enablerssfeeds" label="21450" help="36112">
 -- 
 2.1.0
 

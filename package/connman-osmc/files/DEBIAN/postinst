@@ -14,6 +14,17 @@ if [ "$1" = "configure" ]; then
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
 
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "1.2.9-3"; then
+
+		# once only disable of ipv6 on all previously configured interfaces
+		for file in /var/lib/connman/*/settings; do
+			if [ ! -e "$file" ]; then break; fi
+			sed 's/^IPv6.method.*$/IPv6.method=off/g' -i "$file"
+		done
+	fi
+	rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
+
+	systemctl daemon-reload
 	systemctl enable connman.service >/dev/null 2>&1
 
 	if ischroot; then exit 0; fi

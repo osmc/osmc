@@ -7,7 +7,11 @@ echo Building installer files for OBS
 TARGET="qt_host_installer"
 OUTPUT="obs"
 pushd ${TARGET}
-if [ -f Makefile ]; then echo "Cleaning" && make clean; fi
+if [ -f Makefile ]; then
+	echo "Cleaning"
+	make clean
+	if [ $? != 0 ]; then echo "Clean failed"; exit 1; fi
+fi
 rm Makefile >/dev/null 2>&1
 VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
 popd

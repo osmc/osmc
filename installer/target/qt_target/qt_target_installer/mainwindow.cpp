@@ -78,7 +78,17 @@ void MainWindow::install()
     }
     /* Mount the BOOT filesystem */
     logger->addLine("Mounting boot filesystem");
-    if (! utils->mountPartition(device, MNT_BOOT))
+    bool hasMount = false;
+    hasMount = utils->mountPartition(device, MNT_BOOT);
+    if (! hasMount && utils->getOSMCDev() == "atv")
+    {
+        /* Super hacky for Apple TV 1st gen. Sometimes no internal disk */
+        device->setBoot("/dev/sda1");
+        hasMount = utils->mountPartition(device, MNT_BOOT);
+        device->setRoot("/dev/sda2");
+        device->setBootNeedsFormat(false);
+    }
+    if (! hasMount)
     {
         haltInstall("could not mount bootfs");
         return;
@@ -174,7 +184,7 @@ void MainWindow::install()
         else
             rootBase.chop(1);
         logger->addLine("From a root partition of " + device->getRoot() + ", I have deduced a base device of " + rootBase);
-        if (device->hasRootChanged())
+        if (device->hasRootChanged() && utils->getOSMCDev() != "atv") // && utils.getOSMCDev() != "pc" eventually.. -- cause we want boot there too.
         {
             logger->addLine("Must mklabel as root fs is on another device");
             utils->mklabel(rootBase, false);
@@ -183,23 +193,26 @@ void MainWindow::install()
         }
         else
         {
-            int size = utils->getPartSize(rootBase, (device->getBootFS() == "vfat" ? "fat32" : "ext4"));
-            if (size == -1)
+            if (! device->doesBootNeedsFormat())
             {
-                logger->addLine("Issue getting size of device");
-                haltInstall(tr("cannot work out partition size"));
-                return;
+                int size = utils->getPartSize(rootBase, device->getBootFS());
+                if (size == -1)
+                {
+                    logger->addLine("Issue getting size of device");
+                    haltInstall(tr("cannot work out partition size"));
+                    return;
+                }
+                logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
+                utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
+                utils->fmtpart(device->getRoot(), "ext4");
             }
-            logger->addLine("Determined " + QString::number(size) + " MB as end of first partition");
-            utils->mkpart(rootBase, "ext4", QString::number(size + 2) + "M", "100%");
-            utils->fmtpart(device->getRoot(), "ext4");
         }
     }
     /* Mount root filesystem */
     if (useNFS)
-        bc = new BootloaderConfig(device, nw, utils, logger);
+        bc = new BootloaderConfig(device, nw, utils, logger, preseed);
     else
-        bc = new BootloaderConfig(device, NULL, utils, logger);
+        bc = new BootloaderConfig(device, NULL, utils, logger, preseed);
     logger->addLine("Mounting root");
     if ( ! utils->mountPartition(device, MNT_ROOT))
     {
@@ -236,6 +249,12 @@ void MainWindow::setupBootLoader()
     val += 25;
     /* Set up the boot loader */
     ui->statusLabel->setText(tr("Configuring bootloader"));
+    if (device->hasBootChanged())
+    {
+        logger->addLine("Boot changed. Re-mounting the real /boot");
+        utils->unmountPartition(device, MNT_BOOT);
+        utils->mountPartition(device, MNT_BOOT);
+    }
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
     QTimer::singleShot(0, this, SLOT(val));

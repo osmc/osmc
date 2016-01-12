@@ -5,6 +5,7 @@ import xbmcgui
 import subprocess
 import sys
 import time
+import os
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK      = 92
@@ -12,10 +13,10 @@ SAVE                 = 5
 HEADING              = 1
 ACTION_SELECT_ITEM   = 7
 
-__addon__  = xbmcaddon.Addon("script.module.osmcsetting.pi")
-scriptPath = __addon__.getAddonInfo('path')
-DIALOG     = xbmcgui.Dialog()
-IMAGE = os.path.join(scriptPath,'resources','osmc','FO_Icon.png')
+__addon__   = xbmcaddon.Addon("script.module.osmcsetting.pi")
+scriptPath  = __addon__.getAddonInfo('path')
+DIALOG      = xbmcgui.Dialog()
+IMAGE 		= os.path.join(scriptPath,'resources','osmc','FO_Icon.png')
 
 
 def lang(id):
@@ -24,6 +25,12 @@ def lang(id):
 
 
 def log(message):
+
+	try:
+		message = str(message)
+	except UnicodeEncodeError:
+		message = message.encode('utf-8', 'ignore' )
+		
 	xbmc.log('OSMC PI Config Editor' + str(message), level=xbmc.LOGDEBUG)
 
 
@@ -36,7 +43,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 		xbmc.sleep(150)
 
 		# list of settings that are ignored in the duplicate check
-		self.ignore_list = ['dtoverlay', 'device_tree', 'device_tree_param', 'device_tree_overlay']
+		self.ignore_list = ['dtoverlay', 'device_tree', 'device_tree_param', 'device_tree_overlay', 'dtparam']
 
 		self.del_string = ' [' + lang(32056) + ']'
 
@@ -49,7 +56,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 		except:
 
 			# FOR TESTING
-			self.config = '/home/kubkev/Documents/config.txt'
+			self.config = '/home/plaskev/Documents/config.txt'
 
 			with open(self.config, 'r') as f:
 				self.lines = f.readlines()
