@@ -90,12 +90,7 @@ done
 if [ "$OPTION_ROOTDELAY" -gt 0 ]
 then
 	echo "Waiting user specified rootdelay of $OPTION_ROOTDELAY seconds."
-	COUNTER=0
-	while [ "$COUNTER" -lt "$OPTION_ROOTDELAY" ]
-	do
-		/bin/busybox sleep 1
-		COUNTER=$((COUNTER+1))
-	done
+	/bin/busybox sleep $OPTION_ROOTDELAY
 fi
 
 # Wait for the root device node to appear if it has still not been added by mdev yet.
