@@ -178,6 +178,8 @@ def general_config_set(config, new_settings, new_value, config_get_patterns, con
 
 			matched = re.search(pair['identify'], cf_line, re.IGNORECASE)
 
+			#print 'attempting match: %s' % pair['identify']
+
 			if matched:
 
 				line_matches = True
@@ -425,7 +427,7 @@ def hdmi_boost_custom_default():
 	''' Tests the users system to see which hdmi_boost figure should be used. '''
 	''' Yet to be implemented '''
 
-	return '2'
+	return '0'
 
 
 '''
@@ -484,9 +486,9 @@ def display_rotate_config_set(kodi_setting, all_settings):
 		'0x20000'
 		]
 
-	try:
-		return permitted[int(kodi_setting)]
-	except (IndexError, ValueError):
+	if kodi_setting in permitted:
+		return kodi_setting
+	else:
 		return 'remove_this_line'
 
 
@@ -1253,7 +1255,6 @@ if __name__ == "__main__":
 
 
 
-
 	original_values = {
 			'audio' : 'true',
 			'config_hdmi_boost' : '2',
@@ -1285,32 +1286,31 @@ if __name__ == "__main__":
 	}
 
 	test = {
-		'audio' : 'true',
-		'config_hdmi_boost' : '2',
-		'decode_MPG2' : '0000',
-		'decode_WVC1' : '0x95f2b10e',
-		'display_rotate' : '0',
+		'config_hdmi_boost' : '0',
+		'decode_MPG2' : '',
+		'decode_WVC1' : '',
+		'display_rotate' : '1',
 		'gpio_in_pin' : '18',
 		'gpio_in_pull' : 'off',
 		'gpio_out_pin' : '17',
-		'gpu_mem_1024' : '256',
-		'gpu_mem_512' : '144',
-		'gpu_mem_256' : '112',
+		'gpu_mem_1024' : '',
+		'gpu_mem_512' : '',
+		'gpu_mem_256' : '',
 		'hdmi_group' : '0',
 		'hdmi_ignore_cec' : 'false',
-		'hdmi_ignore_cec_init' : 'true',
-		'hdmi_ignore_edid' : 'true',
+		'hdmi_ignore_cec_init' : 'false',
+		'hdmi_ignore_edid' : 'false',
 		'hdmi_mode' : '0',
 		'hdmi_pixel_encoding' : '0',
-		'hdmi_safe' : 'true',
-		'lirc-rpi-overlay' : 'true',
-		'max_usb_current' : 'true',
+		'hdmi_safe' : 'false',
+		'lirc-rpi-overlay' : 'false',
+		'max_usb_current' : 'false',
 		'sdtv_aspect' : '0',
-		'sdtv_mode' : '1',
-		'soundcard_dac' : "2",
+		'sdtv_mode' : '0',
+		'soundcard_dac' : "0",
 		'spi-bcm2835-overlay' : 'false',
 		'store_hdmi_to_file' : 'false',
-		'w1gpio' : '2',
+		'w1gpio' : '0',
 
 	}
 
@@ -1321,3 +1321,8 @@ if __name__ == "__main__":
 	#print new_settings
 
 	write_config_file('C:\\temp\\results.txt', new_settings)
+
+	#print '\n'
+	#print 'extracted_settings'
+	#print extracted_settings
+	#print '\n'
