@@ -1,0 +1,26 @@
+From 8c3e5c467a385ef9e076d4bceb3216593b7327bb Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 14 Jan 2016 09:37:37 +0000
+Subject: [PATCH] Disable event logging by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 5a67d15..6a5c810 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2892,7 +2892,7 @@
+       <group id="1">
+         <setting id="eventlog.enabled" type="boolean" label="14112" help="36460">
+           <level>1</level>
+-          <default>true</default>
++          <default>false</default>
+           <control type="toggle" />
+         </setting>
+         <setting id="eventlog.enablednotifications" type="boolean" parent="eventlog.enabled" label="14113" help="36461">
+-- 
+2.1.0
+
