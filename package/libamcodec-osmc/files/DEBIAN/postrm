@@ -1,0 +1,18 @@
+#!/bin/bash
+
+remove_divert ()
+{
+	if dpkg-divert --listpackage "$2" | grep -q "$DPKG_MAINTSCRIPT_PACKAGE"; then
+		dpkg-divert --remove --package "$DPKG_MAINTSCRIPT_PACKAGE" --rename --divert "$1" "$2"
+		EXIT=$?; if [ $EXIT -ne 0 ]; then exit $EXIT; fi
+	fi
+}
+
+if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
+if [ "$1" = "remove" ]; then
+
+	# remove all diverts that this version _and_ all prior versions of the package once added:
+	# remove_divert PATH_DIV PATH_ORIG
+
+	remove_divert /etc/kernel-img.conf.distributed /etc/kernel-img.conf
+fi
