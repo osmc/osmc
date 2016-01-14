@@ -234,8 +234,6 @@ Overclock settings are set using the Pi Overclock module."""
 
 	def apply_settings(self):
 
-		'''
-		'''
 		pass 
 
 
@@ -250,7 +248,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		addon = xbmcaddon.Addon(self.addonid)
 
-		for key in MASTER_SETTINGS.keys():
+		for key in parser.MASTER_SETTINGS.keys():
 
 			latest_settings[key] = addon.getSetting(key)
 
