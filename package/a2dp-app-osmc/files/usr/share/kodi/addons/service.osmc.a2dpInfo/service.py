@@ -55,7 +55,10 @@ class A2DPInfo(threading.Thread):
     state = None
     status = None
     track = []
+    # hack to hide the fact we always get false 'playing' events
+    receivedPosition = False
 
+    
     def __init__(self):
         """Specify a signal handler, and find any connected media players"""
         super(A2DPInfo, self).__init__()
@@ -127,15 +130,21 @@ class A2DPInfo(threading.Thread):
             if "Status" in changed:
                 if not changed["Status"] == self.status:
                     self.status = changed["Status"]
-#                    log("STATUS : " + str(self.status))
                     if self.status in ["stopped", "paused"]:
                         self.stopA2DP()
+                        # hack to hide the fact we always get false 'playing' events
+                        self.receivedPosition = False
                     else:
-                        self.trackChanged()
+                        # hack to hide the fact we always get false 'playing' events
+                        if self.receivedPosition:
+                            self.trackChanged()
                     
             if "Track" in changed:
                 self.track = changed["Track"]
                 self.trackChanged()
+
+            if "Position" in changed and not self.status == 'paused':
+                self.receivedPosition = True
 
 
     def trackChanged(self):
@@ -151,7 +160,7 @@ class A2DPInfo(threading.Thread):
     def sendJSONRPC(self, method, params={}):
         try:
             payload = json.dumps({"jsonrpc": "2.0", "method": method, "params" :params,"id": 1})
-            return xbmc.executeJSONRPC(payload)
+            return xbmc.executeJSONRPC(payload)            
         except Exception as ex:
             log("Error Sending JSON Request : " + str(json_payload) + " - "  + format(ex))
 
@@ -164,15 +173,12 @@ class A2DPInfo(threading.Thread):
         if ("result" in jsonResponse and jsonResponse["result"] == "OK"):
             self.sendJSONRPC("OSMC.StopBTPlayer")
 
-
 if __name__ == "__main__":
     log("A2DP Info Starting")
     try:
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         a2dpInfo = A2DPInfo()
         a2dpInfo.start()
-        xbmc.log("Bluez Monitor Started", level=xbmc.LOGDEBUG)
-
         monitor = xbmc.Monitor()
         while not monitor.abortRequested():
             # Sleep/wait for abort for 10 seconds
