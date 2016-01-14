@@ -25,7 +25,7 @@ then
         echo "Depends: ${1}-libamcodec-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libasound2-dev"
-	echo "Package: ${1}-libamcodec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libamcodec-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
+	echo "Package: ${1}-libamcodec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libamcodec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	mkdir -p ${out}/usr/osmc/lib
 	mkdir -p files-dev/usr/osmc/include
 	pushd src/libamcodec*
