@@ -80,7 +80,7 @@
 
 '''
 # Standard Modules
-from collections import namedtuple
+import subprocess
 import sys
 import os
 import threading
@@ -98,7 +98,7 @@ DIALOG     = xbmcgui.Dialog()
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
 
 # OSMC SETTING Modules
-import OSMC_ConfigParser as ct
+import OSMC_OCparser as parser
 from gui import overclock_gui
 
 
@@ -216,55 +216,54 @@ The module allows you to manually adjust:
 
 		# the location of the config file FOR TESTING ONLY
 		try:								
-			self.test_config = '/boot/config.txt'
-			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
+			config_location = '/boot/config.txt'
+			config = parser.read_config_file(config_location)
 
 		except:
-			self.test_config = '/home/plaskev/Documents/config.txt'
-			self.config_settings = ct.retrieve_settings_from_configtxt(self.test_config)
+			config_location = '/home/plaskev/Documents/config.txt'
+			config = parser.read_config_file(config_location)
 
-		oc_keys = ['arm_freq', 'sdram_freq', 'core_freq', 'initial_turbo', 'over_voltage', 'over_voltage_sdram', 'force_turbo']
+		# oc_keys = ['arm_freq', 'sdram_freq', 'core_freq', 'initial_turbo', 'over_voltage', 'over_voltage_sdram', 'force_turbo']
 
-		self.setting_values = {}
-		for key in oc_keys:
-			if key in self.config_settings:
-				self.setting_values[key] = self.config_settings[key]
+		# read the config.txt file everytime the settings are opened. This is unavoidable because it is possible for
+		# the user to have made manual changes to the config.txt while OSG is active.
+		config = parser.read_config_file(config_location)
+
+		extracted_settings = parser.config_to_kodi(parser.MASTER_SETTINGS, config)
+
+		# load the settings into kodi
+		log('Settings extracted from the config.txt')
+		for k, v in extracted_settings.iteritems():
+
+			log("%s : %s" % (k, v))
+			self.me.setSetting(k, str(v))
 
 		# setting_values = {'core_freq': 500, 'arm_freq': 800, 'sdram_freq': 700, 'initial_turbo': 60, 'over_voltage': 2, 'over_voltage_sdram': 6, 'force_turbo' : 0}
 
 		xml = "new_gui_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "new_gui.xml"
 
-		self.GUI = overclock_gui(xml, scriptPath, 'Default', setting_values=self.setting_values, model=self.pimodel)
+		GUI = overclock_gui(xml, scriptPath, 'Default', setting_values=extracted_settings, model=self.pimodel)
 
-		self.GUI.doModal()
+		GUI.doModal()
 
-		self.new_settings = self.GUI.snapshot()
-		log('self.new_settings')
-		log(self.new_settings)
-		log('self.setting_values')
-		log(self.setting_values)
+		new_settings = self.GUI.snapshot()
 
-		ct.apply_changes_to_configtxt(self.new_settings, self.test_config)
+		log('New settings applied to the config.txt')
+		for k, v in new_settings.iteritems():
+			log("%s : %s" % (k, v))
 
-		del self.GUI
+		del GUI
 
-		for k, s in self.new_settings.iteritems():
-			if s != self.setting_values.get(k, 'no setting available'):
-				self.reboot_required
+		# write the new lines to the temporary config file
+		parser.write_config_file('/var/tmp/config.txt', new_settings)
 
-		# dialog to notify the user they should restart for changes to take effect
-		ok = DIALOG.notification(lang(32107), lang(32108))
+		# copy over the temp config.txt to /boot/ as superuser
+		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
 
-		log('END')
+		DIALOG.notification(lang(32095), lang(32096))
 
 
 	def apply_settings(self):
-
-		'''
-			This method will apply all of the settings. It calls the first_method, if it exists. 
-			Then it calls the method listed in setting_data_method for each setting. Then it calls the
-			final_method, again, if it exists.
-		'''
 
 		pass
 
