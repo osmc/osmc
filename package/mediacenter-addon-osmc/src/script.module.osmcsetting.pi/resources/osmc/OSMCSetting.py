@@ -140,7 +140,7 @@ class OSMCSettingClass(threading.Thread):
 	def __init__(self):
 
 		''' 
-			The pi_settings_dict contains all the settings in the settings group, as well as the methods to call when a
+			The MASTER_SETTINGS contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
 		'''
 
@@ -235,9 +235,6 @@ Overclock settings are set using the Pi Overclock module."""
 	def apply_settings(self):
 
 		'''
-			This method will apply all of the settings. It calls the first_method, if it exists. 
-			Then it calls the method listed in pi_settings_dict for each setting. Then it calls the
-			final_method, again, if it exists.
 		'''
 		pass 
 
@@ -253,7 +250,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		addon = xbmcaddon.Addon(self.addonid)
 
-		for key in self.pi_settings_dict.keys():
+		for key in MASTER_SETTINGS.keys():
 
 			latest_settings[key] = addon.getSetting(key)
 

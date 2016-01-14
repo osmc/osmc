@@ -459,17 +459,6 @@ def generic_passthrough_config_set(kodi_setting, all_settings):
 		return 'remove_this_line'
 
 
-def audio_config_set(kodi_setting, all_settings):
-
-	if kodi_setting == 'true' or all_settings.get('spi-bcm2835-overlay', None) == 'true':
-
-		return 'on'
-
-	else:
-
-		return 'remove_this_line'
-
-
 def config_hdmi_boost_config_set(kodi_setting, all_settings):
 
 	# if hdmi_safe is active, then remove this conflicting line
@@ -736,25 +725,6 @@ Houses the protocols for the settings in Kodi which come from the config.txt    
 '''
 
 MASTER_SETTINGS =    {
-
-		"audio": { 
-			"default"   : { 
-				"function"      : None, 
-				"value"         : "false"
-				},
-			"config_get_patterns": [
-				{
-				"identify"      : r"\s*(?:dtparam|dtparams|device_tree_param|device_tree_params)\s*=.*audio\s*=",
-				"extract"       : r"\s*(?:dtparam|dtparams|device_tree_param|device_tree_params)\s*=.*audio\s*=\s*(\w+)"
-				},
-
-				],
-			"config_set"        : audio_config_set,
-			"config_validation" : onoff_validation,
-			"kodi_set"          : generic_passthrough_kodi_set,
-			"already_set"       : False,
-			"setting_stub"      : "dtparam=audio=%s",
-		},
 
 		"config_hdmi_boost": { 
 			"default"   : { 
