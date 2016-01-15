@@ -500,8 +500,14 @@ def display_rotate_config_set(kodi_setting, all_settings):
 def store_hdmi_to_file_config_set(kodi_setting, all_settings):
 	"hdmi_force_hotplug=%s\nhdmi_edid_file=%s"
 
+	print 'config set'
+
+	print kodi_setting
+
 	# if hdmi_safe is active, then remove this conflicting line
 	kodi_setting = hdmi_safe_group_removal(kodi_setting, all_settings)
+
+	print kodi_setting
 
 	if kodi_setting == 'true':
 
@@ -1276,7 +1282,7 @@ if __name__ == "__main__":
 
 	   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ '''
 
-	config = read_config_file('C:\\temp\config.txt')
+	config = read_config_file('C:\\temp\\config.txt')
 
 	extracted_settings = config_to_kodi(MASTER_SETTINGS, config)
 
@@ -1315,7 +1321,7 @@ if __name__ == "__main__":
 	}
 
 	test = {
-		'config_hdmi_boost' : '1',
+		'config_hdmi_boost' : '0',
 		'decode_MPG2' : '',
 		'decode_WVC1' : '',
 		'display_rotate' : '0',
@@ -1338,12 +1344,12 @@ if __name__ == "__main__":
 		'sdtv_mode' : '0',
 		'soundcard_dac' : "0",
 		'spi-bcm2835-overlay' : 'false',
-		'store_hdmi_to_file' : 'false',
+		'store_hdmi_to_file' : 'true',
 		'w1gpio' : '0',
 
 	}
 
-	config = read_config_file('C:\\temp\config.txt')
+	config = read_config_file('C:\\temp\\config.txt')
 	
 	new_settings = kodi_to_config(MASTER_SETTINGS, config, test)
 
