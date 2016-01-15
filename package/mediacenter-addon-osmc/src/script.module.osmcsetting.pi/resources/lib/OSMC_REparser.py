@@ -460,6 +460,11 @@ def generic_passthrough_config_set(kodi_setting, all_settings):
 
 		return 'remove_this_line'
 
+def start_x_config_set(kodi_setting, all_settings):
+	''' Always return 1. This setting should be in every config.txt '''
+
+	return '1'
+
 
 def config_hdmi_boost_config_set(kodi_setting, all_settings):
 
@@ -546,11 +551,15 @@ def hdmi_pixel_config_set(kodi_setting, all_settings):
 		return 'remove_this_line'
 
 
-def hdmi_safe_group_removal(setting_key, all_settings):
+def hdmi_safe_group_removal(kodi_setting, all_settings):
 
 	if all_settings.get('hdmi_safe', None) == 'true':
 
 		return 'remove_this_line'
+
+	else:
+
+		return kodi_setting
 
 
 def hdmi_ignore_edid_config_set(kodi_setting, all_settings):
@@ -1216,6 +1225,26 @@ MASTER_SETTINGS =    {
 			"already_set"       : False,
 			"setting_stub"      : "dtparam=gpio_out_pin=%s",
 		},
+
+		"start_x": { 
+			"default"   : { 
+				"function"      : None, 
+				"value"         : "1"
+				},
+			"config_get_patterns": [
+				{
+				"identify"      : r"\s*start_x\s*=",
+				"extract"       : r"\s*start_x\s*=\s*(\d)"
+				},
+
+				],
+			"config_set"        : start_x_config_set,
+			"config_validation" : blank_check_validation,
+			"kodi_set"          : generic_passthrough_kodi_set,
+			"already_set"       : False,
+			"setting_stub"      : "start_x=%s",
+		},
+
 		
 	}
 
@@ -1286,10 +1315,10 @@ if __name__ == "__main__":
 	}
 
 	test = {
-		'config_hdmi_boost' : '0',
+		'config_hdmi_boost' : '1',
 		'decode_MPG2' : '',
 		'decode_WVC1' : '',
-		'display_rotate' : '1',
+		'display_rotate' : '0',
 		'gpio_in_pin' : '18',
 		'gpio_in_pull' : 'off',
 		'gpio_out_pin' : '17',
@@ -1316,13 +1345,13 @@ if __name__ == "__main__":
 
 	config = read_config_file('C:\\temp\config.txt')
 	
-	new_settings = kodi_to_config(MASTER_SETTINGS, config, extracted_settings)
+	new_settings = kodi_to_config(MASTER_SETTINGS, config, test)
 
-	#print new_settings
+	print new_settings
 
 	write_config_file('C:\\temp\\results.txt', new_settings)
 
-	#print '\n'
-	#print 'extracted_settings'
-	#print extracted_settings
-	#print '\n'
+	print '\n'
+	print 'extracted_settings'
+	print extracted_settings
+	print '\n'
