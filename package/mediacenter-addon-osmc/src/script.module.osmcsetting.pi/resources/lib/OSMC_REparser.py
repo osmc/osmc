@@ -500,14 +500,8 @@ def display_rotate_config_set(kodi_setting, all_settings):
 def store_hdmi_to_file_config_set(kodi_setting, all_settings):
 	"hdmi_force_hotplug=%s\nhdmi_edid_file=%s"
 
-	print 'config set'
-
-	print kodi_setting
-
 	# if hdmi_safe is active, then remove this conflicting line
 	kodi_setting = hdmi_safe_group_removal(kodi_setting, all_settings)
-
-	print kodi_setting
 
 	if kodi_setting == 'true':
 
@@ -1353,11 +1347,11 @@ if __name__ == "__main__":
 	
 	new_settings = kodi_to_config(MASTER_SETTINGS, config, test)
 
-	print new_settings
+	#print new_settings
 
 	write_config_file('C:\\temp\\results.txt', new_settings)
 
-	print '\n'
-	print 'extracted_settings'
-	print extracted_settings
-	print '\n'
+	#print '\n'
+	#print 'extracted_settings'
+	#print extracted_settings
+	#print '\n'
