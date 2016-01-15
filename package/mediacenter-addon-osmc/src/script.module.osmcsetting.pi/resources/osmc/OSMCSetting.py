@@ -184,6 +184,13 @@ Overclock settings are set using the Pi Overclock module."""
 			# in the testing location
 			self.config_location = '/home/plaskev/Documents/config.txt'
 
+		try:
+			self.clean_user_config()
+		except Exception:
+
+			log('Error cleaning users config')
+			log(traceback.format_exc())
+
 
 	def run(self):
 
@@ -268,6 +275,26 @@ Overclock settings are set using the Pi Overclock module."""
 		# load the values into the settings gui
 		__addon__.setSetting('codec_check', mpg.replace('\n','') + ', ' + wvc.replace('\n',''))
 		__addon__.setSetting('serial', serial)
+
+
+	def clean_user_config(self):
+		''' Comment out problematic lines in the users config.txt '''
+
+		patterns = [
+
+			r".*=.*\[remove\].*", 
+			r".*=remove",
+		]
+
+		config = parser.read_config_file(self.location)
+
+		new_config = parser.clean_config(config, patterns)
+
+		# write the new lines to the temporary config file
+		parser.write_config_file('/var/tmp/config.txt', new_config)
+
+		# copy over the temp config.txt to /boot/ as superuser
+		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
 
 
 if __name__ == "__main__":
