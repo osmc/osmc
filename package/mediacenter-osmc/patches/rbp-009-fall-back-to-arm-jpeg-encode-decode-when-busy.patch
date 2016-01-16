@@ -1,0 +1,245 @@
+From 6211490b2c2b28bae84214a837748371ab07a5d8 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Mon, 21 Dec 2015 22:17:25 +0000
+Subject: [PATCH] [omximage] Fall back to arm jpeg encode/decode when gpu is
+ busy
+
+---
+ xbmc/cores/omxplayer/OMXImage.cpp | 50 ++++++++++++++++++++++++++++++++-------
+ xbmc/cores/omxplayer/OMXImage.h   |  7 ++++++
+ 2 files changed, 48 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/cores/omxplayer/OMXImage.cpp b/xbmc/cores/omxplayer/OMXImage.cpp
+index adbf9b9..629126d 100644
+--- a/xbmc/cores/omxplayer/OMXImage.cpp
++++ b/xbmc/cores/omxplayer/OMXImage.cpp
+@@ -57,12 +57,17 @@ static XbmcThreads::ConditionVariable g_count_cond;
+ static CCriticalSection               g_count_lock;
+ static int g_count_val;
+ 
+-static void limit_calls_enter()
++static bool limit_calls_enter()
+ {
+   CSingleLock lock(g_count_lock);
++  // on Pi2 fall back to arm decode if the queue is getting big
++  if (g_RBP.RasberryPiVersion() > 1 && g_count_val >= 2)
++    return false;
++
+   while (g_count_val >= 3)
+     g_count_cond.wait(lock);
+   g_count_val++;
++  return true;
+ }
+ 
+ static void limit_calls_leave()
+@@ -112,6 +117,9 @@ bool COMXImage::CreateThumbnailFromSurface(unsigned char* buffer, unsigned int w
+       unsigned int format, unsigned int pitch, const std::string& destFile)
+ {
+   COMXImageEnc omxImageEnc;
++  if (!omxImageEnc.Gpu())
++    return false;
++
+   bool ret = omxImageEnc.CreateThumbnailFromSurface(buffer, width, height, format, pitch, destFile);
+   if (!ret)
+     CLog::Log(LOGNOTICE, "%s: unable to create thumbnail %s %dx%d", __func__, destFile.c_str(), width, height);
+@@ -205,6 +213,8 @@ bool COMXImage::CreateThumb(const std::string& srcFile, unsigned int maxHeight,
+   bool okay = false;
+   COMXImageFile file;
+   COMXImageReEnc reenc;
++  if (!reenc.Gpu())
++    return false;
+   void *pDestBuffer;
+   unsigned int nDestSize;
+   int orientation = additional_info == "flipped" ? 1:0;
+@@ -310,6 +320,9 @@ bool COMXImage::DecodeJpegToTexture(COMXImageFile *file, unsigned int width, uns
+   bool ret = false;
+   COMXTexture omx_image;
+ 
++  if (!omx_image.Gpu())
++    return false;
++
+   struct textureinfo *tex = new struct textureinfo;
+   if (!tex)
+     return NULL;
+@@ -924,7 +937,7 @@ bool COMXImageFile::ReadFile(const std::string& inputFile, int orientation)
+ 
+ COMXImageDec::COMXImageDec()
+ {
+-  limit_calls_enter();
++  m_gpu = limit_calls_enter();
+   m_decoded_buffer = NULL;
+   OMX_INIT_STRUCTURE(m_decoded_format);
+   m_success = false;
+@@ -936,7 +949,8 @@ COMXImageDec::~COMXImageDec()
+ 
+   OMX_INIT_STRUCTURE(m_decoded_format);
+   m_decoded_buffer = NULL;
+-  limit_calls_leave();
++  if (m_gpu)
++    limit_calls_leave();
+ }
+ 
+ void COMXImageDec::Close()
+@@ -1086,6 +1100,9 @@ bool COMXImageDec::HandlePortSettingChange(unsigned int resize_width, unsigned i
+ 
+ bool COMXImageDec::Decode(const uint8_t *demuxer_content, unsigned demuxer_bytes, unsigned width, unsigned height, unsigned stride, void *pixels)
+ {
++  if (!m_gpu)
++    return false;
++
+   CSingleLock lock(m_OMXSection);
+   OMX_ERRORTYPE omx_err = OMX_ErrorNone;
+   OMX_BUFFERHEADERTYPE *omx_buffer = NULL;
+@@ -1223,7 +1240,7 @@ bool COMXImageDec::Decode(const uint8_t *demuxer_content, unsigned demuxer_bytes
+ 
+ COMXImageEnc::COMXImageEnc()
+ {
+-  limit_calls_enter();
++  m_gpu = limit_calls_enter();
+   CSingleLock lock(m_OMXSection);
+   OMX_INIT_STRUCTURE(m_encoded_format);
+   m_encoded_buffer = NULL;
+@@ -1247,11 +1264,15 @@ COMXImageEnc::~COMXImageEnc()
+       m_omx_encoder.Deinitialize();
+     }
+   }
+-  limit_calls_leave();
++  if (m_gpu)
++    limit_calls_leave();
+ }
+ 
+ bool COMXImageEnc::Encode(unsigned char *buffer, int size, unsigned width, unsigned height, unsigned int pitch)
+ {
++  if (!m_gpu)
++    return false;
++
+   CSingleLock lock(m_OMXSection);
+ 
+   unsigned int demuxer_bytes = 0;
+@@ -1432,6 +1453,9 @@ bool COMXImageEnc::Encode(unsigned char *buffer, int size, unsigned width, unsig
+ bool COMXImageEnc::CreateThumbnailFromSurface(unsigned char* buffer, unsigned int width, unsigned int height,
+     unsigned int format, unsigned int pitch, const std::string& destFile)
+ {
++  if (!m_gpu)
++    return false;
++
+   if(format != XB_FMT_A8R8G8B8 || !buffer)
+   {
+     CLog::Log(LOGDEBUG, "%s::%s : %s failed format=0x%x\n", CLASSNAME, __func__, destFile.c_str(), format);
+@@ -1465,7 +1489,7 @@ bool COMXImageEnc::CreateThumbnailFromSurface(unsigned char* buffer, unsigned in
+ 
+ COMXImageReEnc::COMXImageReEnc()
+ {
+-  limit_calls_enter();
++  m_gpu = limit_calls_enter();
+   m_encoded_buffer = NULL;
+   m_pDestBuffer = NULL;
+   m_nDestAllocSize = 0;
+@@ -1479,7 +1503,8 @@ COMXImageReEnc::~COMXImageReEnc()
+     free (m_pDestBuffer);
+   m_pDestBuffer = NULL;
+   m_nDestAllocSize = 0;
+-  limit_calls_leave();
++  if (m_gpu)
++    limit_calls_leave();
+ }
+ 
+ void COMXImageReEnc::Close()
+@@ -1771,6 +1796,9 @@ bool COMXImageReEnc::HandlePortSettingChange(unsigned int resize_width, unsigned
+ 
+ bool COMXImageReEnc::ReEncode(COMXImageFile &srcFile, unsigned int maxWidth, unsigned int maxHeight, void * &pDestBuffer, unsigned int &nDestSize)
+ {
++  if (!m_gpu)
++    return false;
++
+   CSingleLock lock(m_OMXSection);
+   OMX_ERRORTYPE omx_err = OMX_ErrorNone;
+ 
+@@ -1943,14 +1971,15 @@ bool COMXImageReEnc::ReEncode(COMXImageFile &srcFile, unsigned int maxWidth, uns
+ 
+ COMXTexture::COMXTexture()
+ {
+-  limit_calls_enter();
++  m_gpu = limit_calls_enter();
+   m_success = false;
+ }
+ 
+ COMXTexture::~COMXTexture()
+ {
+   Close();
+-  limit_calls_leave();
++  if (m_gpu)
++    limit_calls_leave();
+ }
+ 
+ void COMXTexture::Close()
+@@ -2134,6 +2163,9 @@ bool COMXTexture::HandlePortSettingChange(unsigned int resize_width, unsigned in
+ 
+ bool COMXTexture::Decode(const uint8_t *demuxer_content, unsigned demuxer_bytes, unsigned int width, unsigned int height, void *egl_image)
+ {
++  if (!m_gpu)
++    return false;
++
+   CSingleLock lock(m_OMXSection);
+   OMX_ERRORTYPE omx_err = OMX_ErrorNone;
+ 
+diff --git a/xbmc/cores/omxplayer/OMXImage.h b/xbmc/cores/omxplayer/OMXImage.h
+index a93aa82..6f38dbc 100644
+--- a/xbmc/cores/omxplayer/OMXImage.h
++++ b/xbmc/cores/omxplayer/OMXImage.h
+@@ -133,6 +133,7 @@ class COMXImageDec
+   OMX_PARAM_PORTDEFINITIONTYPE  m_decoded_format;
+   CCriticalSection              m_OMXSection;
+   bool                          m_success;
++  bool                          m_gpu;
+ };
+ 
+ class COMXImageEnc
+@@ -144,6 +145,7 @@ class COMXImageEnc
+   // Required overrides
+   bool CreateThumbnailFromSurface(unsigned char* buffer, unsigned int width, unsigned int height,
+       unsigned int format, unsigned int pitch, const std::string& destFile);
++  bool Gpu() { return m_gpu; }
+ protected:
+   bool Encode(unsigned char *buffer, int size, unsigned int width, unsigned int height, unsigned int pitch);
+   // Components
+@@ -152,6 +154,7 @@ class COMXImageEnc
+   OMX_PARAM_PORTDEFINITIONTYPE  m_encoded_format;
+   CCriticalSection              m_OMXSection;
+   bool                          m_success;
++  bool                          m_gpu;
+ };
+ 
+ class COMXImageReEnc
+@@ -163,6 +166,7 @@ class COMXImageReEnc
+   // Required overrides
+   void Close();
+   bool ReEncode(COMXImageFile &srcFile, unsigned int width, unsigned int height, void * &pDestBuffer, unsigned int &nDestSize);
++  bool Gpu() { return m_gpu; }
+ protected:
+   bool HandlePortSettingChange(unsigned int resize_width, unsigned int resize_height, int orientation, bool port_settings_changed);
+   // Components
+@@ -176,6 +180,7 @@ class COMXImageReEnc
+   void                          *m_pDestBuffer;
+   unsigned int                  m_nDestAllocSize;
+   bool                          m_success;
++  bool                          m_gpu;
+ };
+ 
+ class COMXTexture
+@@ -187,6 +192,7 @@ class COMXTexture
+   // Required overrides
+   void Close(void);
+   bool Decode(const uint8_t *data, unsigned size, unsigned int width, unsigned int height, void *egl_image);
++  bool Gpu() { return m_gpu; }
+ protected:
+   bool HandlePortSettingChange(unsigned int resize_width, unsigned int resize_height, void *egl_image, bool port_settings_changed);
+ 
+@@ -201,6 +207,7 @@ class COMXTexture
+   OMX_BUFFERHEADERTYPE *m_egl_buffer;
+   CCriticalSection              m_OMXSection;
+   bool              m_success;
++  bool              m_gpu;
+ };
+ 
+ extern COMXImage g_OMXImage;
