@@ -286,7 +286,7 @@ Overclock settings are set using the Pi Overclock module."""
 			r".*=remove",
 		]
 
-		config = parser.read_config_file(self.location)
+		config = parser.read_config_file(self.config_location)
 
 		new_config = parser.clean_config(config, patterns)
 
