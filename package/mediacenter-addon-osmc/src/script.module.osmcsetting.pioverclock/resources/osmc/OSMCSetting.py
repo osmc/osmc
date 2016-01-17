@@ -231,12 +231,12 @@ The module allows you to manually adjust:
 
 		extracted_settings = parser.config_to_kodi(parser.MASTER_SETTINGS, config)
 
-		# load the settings into kodi
+		# print the settings
 		log('Settings extracted from the config.txt')
 		for k, v in extracted_settings.iteritems():
 
 			log("%s : %s" % (k, v))
-			self.me.setSetting(k, str(v))
+			# self.me.setSetting(k, str(v))
 
 		# setting_values = {'core_freq': 500, 'arm_freq': 800, 'sdram_freq': 700, 'initial_turbo': 60, 'over_voltage': 2, 'over_voltage_sdram': 6, 'force_turbo' : 0}
 
@@ -246,7 +246,8 @@ The module allows you to manually adjust:
 
 		GUI.doModal()
 
-		new_settings = self.GUI.snapshot()
+
+		new_settings = GUI.snapshot()
 
 		log('New settings applied to the config.txt')
 		for k, v in new_settings.iteritems():
@@ -254,13 +255,14 @@ The module allows you to manually adjust:
 
 		del GUI
 
+		config = parser.read_config_file(config_location)
+		new_settings = parser.kodi_to_config(parser.MASTER_SETTINGS, config, new_settings)
+
 		# write the new lines to the temporary config file
 		parser.write_config_file('/var/tmp/config.txt', new_settings)
 
 		# copy over the temp config.txt to /boot/ as superuser
-		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
-
-		DIALOG.notification(lang(32095), lang(32096))
+		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', config_location])
 
 
 	def apply_settings(self):
