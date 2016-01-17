@@ -309,13 +309,13 @@ def gpio_pin_validation(config_value):
 def gpio_updown_validation(config_value):
 
 	permitted = [
+			'down',
 			'up',
-			'down'
 			]
 
 	try:
 		return str(permitted.index(config_value) + 1)
-	except IndexError:
+	except IndexError, TypeError:
 		return None
 
 
@@ -680,8 +680,8 @@ def gpio_updown_config_set(kodi_setting, all_settings):
 
 	permitted = [
 			'remove_this_line',
+			'down',
 			'up',
-			'down'
 			]
 
 	if kodi_setting in ['0','1','2']:
