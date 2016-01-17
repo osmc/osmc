@@ -679,7 +679,7 @@ def gpio_updown_config_set(kodi_setting, all_settings):
 	kodi_setting = gpio_group_removal(kodi_setting, all_settings)
 
 	permitted = [
-			'remove_this_line'
+			'remove_this_line',
 			'up',
 			'down'
 			]
