@@ -190,6 +190,7 @@ then
 	then
 		install_patch "../../patches" "rbp"
 	fi
+	if [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp2"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ]; then install_patch "../../patches" "arm"; fi
 	test "$1" == vero && install_patch "../../patches" "vero"
 	test "$1" == vero2 && install_patch "../../patches" "vero2"
