@@ -23,7 +23,7 @@ then
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
         VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
         echo $VERSION_DEV >> files-dev/DEBIAN/control
-        echo "Depends: ${1}-libns-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
+        echo "Depends: ${1}-libnfs-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "autoconf"
 	handle_dep "libtool"
