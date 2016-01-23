@@ -1,4 +1,4 @@
-From 0ee4cb8788c1a72680c4581570c6d19697dd291b Mon Sep 17 00:00:00 2001
+From 44345df1e656473ed542aed75553b0086a40851a Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Wed, 10 Sep 2014 22:23:37 +0200
 Subject: [PATCH] - update to IMX6 support - handle releasing adapter better on
@@ -22,10 +22,10 @@ Subject: [PATCH] - update to IMX6 support - handle releasing adapter better on
  src/lib/adapter/IMX/IMXCECAdapterCommunication.h   |  35 +-
  src/lib/adapter/IMX/IMXCECAdapterMessageQueue.h    | 118 ++++++
  src/lib/adapter/IMX/mxc_hdmi-cec.h                 |  47 +++
- src/libcec/CMakeLists.txt                          |  14 +-
+ src/libcec/CMakeLists.txt                          |  18 +-
  src/libcec/cmake/CheckPlatformSupport.cmake        |  28 +-
  src/libcec/cmake/DisplayPlatformSupport.cmake      |   6 +
- 9 files changed, 412 insertions(+), 641 deletions(-)
+ 9 files changed, 414 insertions(+), 643 deletions(-)
  delete mode 100644 configure.ac
  delete mode 100644 src/lib/adapter/IMX/AdapterMessageQueue.h
  create mode 100644 src/lib/adapter/IMX/IMXCECAdapterMessageQueue.h
@@ -1256,27 +1256,29 @@ index 0000000..bc5bbce
 +#endif				/* !_HDMICEC_H_ */
 +
 diff --git a/src/libcec/CMakeLists.txt b/src/libcec/CMakeLists.txt
-index a7cc6c4..bd13277 100644
+index a494533..13becad 100644
 --- a/src/libcec/CMakeLists.txt
 +++ b/src/libcec/CMakeLists.txt
-@@ -170,13 +170,17 @@ install(FILES ${PROJECT_SOURCE_DIR}/../../include/cec.h
+@@ -173,13 +173,17 @@ install(FILES ${PROJECT_SOURCE_DIR}/../../include/cec.h
          DESTINATION include/libcec)
  
  # libCEC target
 -add_library(cec SHARED ${CEC_SOURCES})
 -install(TARGETS cec
+-        DESTINATION ${LIB_DESTINATION})
+-set_target_properties(cec PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
+-                                     SOVERSION ${LIBCEC_VERSION_MAJOR})
+-target_link_libraries(cec ${p8-platform_LIBRARIES})
+-target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
 +add_library(cecobj OBJECT ${CEC_SOURCES})
 +set_property(TARGET ${cecobj} PROPERTY POSITION_INDEPENDENT_CODE 1)
 +add_library(cec SHARED $<TARGET_OBJECTS:cecobj>)
 +add_library(cecstatic STATIC $<TARGET_OBJECTS:cecobj>)
 +set_target_properties(cecstatic PROPERTIES OUTPUT_NAME cec)
 +install(TARGETS cec cecstatic
-         DESTINATION ${LIB_DESTINATION})
--set_target_properties(cec PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
++         DESTINATION ${LIB_DESTINATION})
 +set_target_properties(cec cecstatic PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
-                                      SOVERSION ${LIBCEC_VERSION_MAJOR}.0)
--target_link_libraries(cec ${platform_LIBRARIES})
--target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
++                                      SOVERSION ${LIBCEC_VERSION_MAJOR}.0)
 +target_link_libraries(cec cecstatic ${platform_LIBRARIES})
 +target_link_libraries(cec cecstatic ${CMAKE_THREAD_LIBS_INIT})
  
@@ -1345,3 +1347,6 @@ index feee111..57f75dd 100644
  if (HAVE_PYTHON)
    message(STATUS "Python support:                         version ${PYTHONLIBS_VERSION_STRING} (${PYTHON_VERSION})")
  else()
+-- 
+2.1.0
+

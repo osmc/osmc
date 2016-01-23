@@ -1,0 +1,4579 @@
+From 4938552e2c9731f297670d48725756c2f7266431 Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Tue, 1 Dec 2015 21:23:02 +0100
+Subject: [PATCH] renamed PLATFORM namespace to P8PLATFORM
+
+---
+ src/LibCecSharp/CecSharpTypes.h                    |   20 +-
+ src/LibCecSharp/CecSharpTypes.h.orig               | 2289 ++++++++++++++++++++
+ src/LibCecSharp/CecSharpTypes.h.rej                |   11 +
+ src/cec-client/CMakeLists.txt.rej                  |   29 +
+ src/cec-client/cec-client.cpp                      |    4 +-
+ src/cec-client/cec-client.cpp.rej                  |   15 +
+ src/cec-client/curses/CursesControl.cpp.rej        |   11 +
+ src/cec-client/env.h.in.rej                        |   11 +
+ src/cecc-client/CMakeLists.txt.rej                 |   28 +
+ src/libcec/CECClient.cpp                           |    2 +-
+ src/libcec/CECClient.h                             |   64 +-
+ src/libcec/CECInputBuffer.h                        |   16 +-
+ src/libcec/CECProcessor.cpp                        |    4 +-
+ src/libcec/CECProcessor.h                          |    8 +-
+ src/libcec/CMakeLists.txt.orig                     |  186 ++
+ src/libcec/CMakeLists.txt.rej                      |   11 +
+ src/libcec/LibCEC.cpp                              |    2 +-
+ src/libcec/LibCEC.h                                |    2 +-
+ src/libcec/SwigHelper.h                            |   12 -
+ src/libcec/SwigHelper.h.orig                       |  237 ++
+ src/libcec/SwigHelper.h.rej                        |   11 +
+ .../Exynos/ExynosCECAdapterCommunication.cpp       |    4 +-
+ .../adapter/Exynos/ExynosCECAdapterCommunication.h |   10 +-
+ .../adapter/Pulse-Eight/USBCECAdapterCommands.cpp  |    2 +-
+ .../adapter/Pulse-Eight/USBCECAdapterCommands.h    |    2 +-
+ .../Pulse-Eight/USBCECAdapterCommunication.cpp     |    2 +-
+ .../Pulse-Eight/USBCECAdapterCommunication.h       |   22 +-
+ .../adapter/Pulse-Eight/USBCECAdapterMessage.cpp   |    2 +-
+ .../Pulse-Eight/USBCECAdapterMessageQueue.cpp      |    4 +-
+ .../Pulse-Eight/USBCECAdapterMessageQueue.h        |   32 +-
+ .../adapter/RPi/RPiCECAdapterCommunication.cpp     |    2 +-
+ .../adapter/RPi/RPiCECAdapterCommunication.h       |   16 +-
+ .../adapter/RPi/RPiCECAdapterMessageQueue.cpp      |    2 +-
+ src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.h |    6 +-
+ src/libcec/adapter/TDA995x/AdapterMessageQueue.h   |    6 +-
+ .../TDA995x/TDA995xCECAdapterCommunication.cpp     |    2 +-
+ .../TDA995x/TDA995xCECAdapterCommunication.h       |   12 +-
+ src/libcec/devices/CECAudioSystem.cpp              |    2 +-
+ src/libcec/devices/CECBusDevice.cpp                |    6 +-
+ src/libcec/devices/CECBusDevice.h                  |   12 +-
+ src/libcec/devices/CECPlaybackDevice.cpp           |    2 +-
+ src/libcec/devices/CECRecordingDevice.cpp          |    2 +-
+ src/libcec/devices/CECTV.cpp                       |    2 +-
+ src/libcec/devices/CECTuner.cpp                    |    2 +-
+ src/libcec/implementations/AQCommandHandler.cpp    |    2 +-
+ src/libcec/implementations/AQCommandHandler.h      |    2 +-
+ src/libcec/implementations/CECCommandHandler.cpp   |    2 +-
+ src/libcec/implementations/CECCommandHandler.h     |   22 +-
+ src/libcec/implementations/PHCommandHandler.cpp    |    2 +-
+ src/libcec/implementations/PHCommandHandler.h      |    4 +-
+ src/libcec/implementations/RLCommandHandler.cpp    |    2 +-
+ src/libcec/implementations/SLCommandHandler.cpp    |    2 +-
+ src/libcec/implementations/SLCommandHandler.h      |    6 +-
+ src/libcec/implementations/VLCommandHandler.cpp    |    2 +-
+ src/libcec/implementations/VLCommandHandler.h      |    6 +-
+ src/libcec/platform/X11/randr-edid.cpp             |    2 +-
+ src/libcec/platform/X11/randr-edid.h               |    2 +-
+ src/libcec/platform/adl/adl-edid.cpp               |    2 +-
+ src/libcec/platform/adl/adl-edid.h                 |    2 +-
+ src/libcec/platform/drm/drm-edid.cpp               |    2 +-
+ src/libcec/platform/drm/drm-edid.h                 |    2 +-
+ src/libcec/platform/nvidia/nv-edid.cpp             |    2 +-
+ src/libcec/platform/nvidia/nv-edid.h               |    2 +-
+ src/libcec/platform/posix/os-edid.cpp              |    2 +-
+ src/libcec/platform/posix/serialport.cpp           |    2 +-
+ src/libcec/platform/posix/serialport.cpp.orig      |  236 ++
+ src/libcec/platform/posix/serialport.cpp.rej       |   10 +
+ src/libcec/platform/sockets/serialport.h           |    2 +-
+ src/libcec/platform/util/baudrate.h                |    4 +-
+ src/libcec/platform/util/edid.h                    |    2 +-
+ src/libcec/platform/windows/os-edid.cpp            |    2 +-
+ src/libcec/platform/windows/serialport.cpp         |    2 +-
+ 72 files changed, 3265 insertions(+), 192 deletions(-)
+ create mode 100644 src/LibCecSharp/CecSharpTypes.h.orig
+ create mode 100644 src/LibCecSharp/CecSharpTypes.h.rej
+ create mode 100644 src/cec-client/CMakeLists.txt.rej
+ create mode 100644 src/cec-client/cec-client.cpp.rej
+ create mode 100644 src/cec-client/curses/CursesControl.cpp.rej
+ create mode 100644 src/cec-client/env.h.in.rej
+ create mode 100644 src/cecc-client/CMakeLists.txt.rej
+ create mode 100644 src/libcec/CMakeLists.txt.orig
+ create mode 100644 src/libcec/CMakeLists.txt.rej
+ create mode 100644 src/libcec/SwigHelper.h.orig
+ create mode 100644 src/libcec/SwigHelper.h.rej
+ create mode 100644 src/libcec/platform/posix/serialport.cpp.orig
+ create mode 100644 src/libcec/platform/posix/serialport.cpp.rej
+
+diff --git a/src/LibCecSharp/CecSharpTypes.h b/src/LibCecSharp/CecSharpTypes.h
+index 4f26d54..f1e91bc 100644
+--- a/src/LibCecSharp/CecSharpTypes.h
++++ b/src/LibCecSharp/CecSharpTypes.h
+@@ -1792,7 +1792,7 @@ namespace CecSharp
+     ACTICB    sourceActivatedCB;
+   } UnmanagedCecCallbacks;
+ 
+-  static PLATFORM::CMutex                   g_callbackMutex;
++  static P8PLATFORM::CMutex                 g_callbackMutex;
+   static std::vector<UnmanagedCecCallbacks> g_unmanagedCallbacks;
+   static CEC::ICECCallbacks                 g_cecCallbacks;
+ 
+@@ -1807,7 +1807,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].logCB(message);
+     }
+@@ -1825,7 +1825,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].keyCB(key);
+     }
+@@ -1843,7 +1843,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].commandCB(command);
+     }
+@@ -1861,7 +1861,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].configCB(config);
+     }
+@@ -1879,7 +1879,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].alertCB(alert, data);
+     }
+@@ -1897,7 +1897,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         return g_unmanagedCallbacks[iPtr].menuCB(newVal);
+     }
+@@ -1915,7 +1915,7 @@ namespace CecSharp
+     if (cbParam)
+     {
+       size_t iPtr = (size_t)cbParam;
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
+         g_unmanagedCallbacks[iPtr].sourceActivatedCB(logicalAddress, activated);
+     }
+@@ -1989,7 +1989,7 @@ namespace CecSharp
+     /// </summary>
+     size_t GetCallbackPtr(void)
+     {
+-      PLATFORM::CLockObject lock(g_callbackMutex);
++      P8PLATFORM::CLockObject lock(g_callbackMutex);
+       return m_iCallbackPtr;
+     }
+ 
+@@ -2246,7 +2246,7 @@ namespace CecSharp
+         unmanagedCallbacks.menuCB            = m_menuCallback;
+         unmanagedCallbacks.sourceActivatedCB = m_sourceActivatedCallback;
+ 
+-        PLATFORM::CLockObject lock(g_callbackMutex);
++        P8PLATFORM::CLockObject lock(g_callbackMutex);
+         g_unmanagedCallbacks.push_back(unmanagedCallbacks);
+         m_iCallbackPtr = g_unmanagedCallbacks.size() - 1;
+         m_bDelegatesCreated = true;
+diff --git a/src/LibCecSharp/CecSharpTypes.h.orig b/src/LibCecSharp/CecSharpTypes.h.orig
+new file mode 100644
+index 0000000..4f26d54
+--- /dev/null
++++ b/src/LibCecSharp/CecSharpTypes.h.orig
+@@ -0,0 +1,2289 @@
++#pragma once
++/*
++* This file is part of the libCEC(R) library.
++*
++* libCEC(R) is Copyright (C) 2011-2013 Pulse-Eight Limited.  All rights reserved.
++* libCEC(R) is an original work, containing original code.
++*
++* libCEC(R) is a trademark of Pulse-Eight Limited.
++*
++* This program is dual-licensed; you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation; either version 2 of the License, or
++* (at your option) any later version.
++*
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++* GNU General Public License for more details.
++*
++* You should have received a copy of the GNU General Public License
++* along with this program; if not, write to the Free Software
++* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++*
++*
++* Alternatively, you can license this library under a commercial license,
++* please contact Pulse-Eight Licensing for more information.
++*
++* For more information contact:
++* Pulse-Eight Licensing       <license@pulse-eight.com>
++*     http://www.pulse-eight.com/
++*     http://www.pulse-eight.net/
++*/
++
++#include <p8-platform/threads/mutex.h>
++#include <vcclr.h>
++#include <msclr/marshal.h>
++#include "../../include/cec.h"
++#include <vector>
++
++#using <System.dll>
++
++/// <summary>
++/// LibCecSharp namespace
++/// </summary>
++/// <see cref="LibCecSharp" />
++namespace CecSharp
++{
++  /// <summary>
++  /// The device type. For client applications, libCEC only supports RecordingDevice, PlaybackDevice or Tuner.
++  /// libCEC uses RecordingDevice by default.
++  /// </summary>
++  public enum class CecDeviceType
++  {
++    /// <summary>
++    /// Television
++    /// </summary>
++    Tv              = 0,
++    /// <summary>
++    /// Recording device
++    /// </summary>
++    RecordingDevice = 1,
++    /// <summary>
++    /// Reserved / do not use
++    /// </summary>
++    Reserved        = 2,
++    /// <summary>
++    /// Tuner
++    /// </summary>
++    Tuner           = 3,
++    /// <summary>
++    /// Playback device
++    /// </summary>
++    PlaybackDevice  = 4,
++    /// <summary>
++    /// Audio system / AVR
++    /// </summary>
++    AudioSystem     = 5
++  };
++
++  /// <summary>
++  /// Log level that can be used by the logging callback method to filter messages from libCEC.
++  /// </summary>
++  public enum class CecLogLevel
++  {
++    /// <summary>
++    /// No logging
++    /// </summary>
++    None    = 0,
++    /// <summary>
++    /// libCEC encountered a serious problem, and couldn't complete an action.
++    /// </summary>
++    Error   = 1,
++    /// <summary>
++    /// libCEC warns that it encountered a problem, but recovered.
++    /// </summary>
++    Warning = 2,
++    /// <summary>
++    /// libCEC informs the client about a CEC state change.
++    /// </summary>
++    Notice  = 4,
++    /// <summary>
++    /// Raw CEC data traffic
++    /// </summary>
++    Traffic = 8,
++    /// <summary>
++    /// Debugging messages
++    /// </summary>
++    Debug   = 16,
++    /// <summary>
++    /// Display all messages
++    /// </summary>
++    All     = 31
++  };
++
++  /// <summary>
++  /// A logical address on the CEC bus
++  /// </summary>
++  public enum class CecLogicalAddress
++  {
++    /// <summary>
++    /// Not a valid logical address
++    /// </summary>
++    Unknown          = -1,
++    /// <summary>
++    /// Television
++    /// </summary>
++    Tv               = 0,
++    /// <summary>
++    /// Recording device 1
++    /// </summary>
++    RecordingDevice1 = 1,
++    /// <summary>
++    /// Recording device 2
++    /// </summary>
++    RecordingDevice2 = 2,
++    /// <summary>
++    /// Tuner 1
++    /// </summary>
++    Tuner1           = 3,
++    /// <summary>
++    /// Playback device 1
++    /// </summary>
++    PlaybackDevice1  = 4,
++    /// <summary>
++    /// Audio system / AVR
++    /// </summary>
++    AudioSystem      = 5,
++    /// <summary>
++    /// Tuner 2
++    /// </summary>
++    Tuner2           = 6,
++    /// <summary>
++    /// Tuner 3
++    /// </summary>
++    Tuner3           = 7,
++    /// <summary>
++    /// Playback device 2
++    /// </summary>
++    PlaybackDevice2  = 8,
++    /// <summary>
++    /// Recording device 3
++    /// </summary>
++    RecordingDevice3 = 9,
++    /// <summary>
++    /// Tuner 4
++    /// </summary>
++    Tuner4           = 10,
++    /// <summary>
++    /// Playback device 3
++    /// </summary>
++    PlaybackDevice3  = 11,
++    /// <summary>
++    /// Reserved address 1
++    /// </summary>
++    Reserved1        = 12,
++    /// <summary>
++    /// Reserved address 2
++    /// </summary>
++    Reserved2        = 13,
++    /// <summary>
++    /// Free to use
++    /// </summary>
++    FreeUse          = 14,
++    /// <summary>
++    /// Unregistered / new device
++    /// </summary>
++    Unregistered     = 15,
++    /// <summary>
++    /// Broadcast address
++    /// </summary>
++    Broadcast        = 15
++  };
++
++  /// <summary>
++  /// The type of alert when libCEC calls the CecAlert callback
++  /// </summary>
++  public enum class CecAlert
++  {
++    /// <summary>
++    /// The device needs servicing. This is set when the firmware can be upgraded, or when a problem with the firmware is detected.
++    /// The latest firmware flash tool can be downloaded from http://packages.pulse-eight.net/
++    /// </summary>
++    ServiceDevice = 0,
++    /// <summary>
++    /// The connection to the adapter was lost, probably because the device got unplugged.
++    /// </summary>
++    ConnectionLost,
++    /// <summary>
++    /// No permission from the OS to access the adapter.
++    /// </summary>
++    PermissionError,
++    /// <summary>
++    /// The device is being used by another program.
++    /// </summary>
++    PortBusy,
++    /// <summary>
++    /// The physical address that is assigned to the adapter is already being used.
++    /// </summary>
++    PhysicalAddressError,
++    /// <summary>
++    /// The TV does not respond to polls.
++    /// </summary>
++    TVPollFailed
++  };
++
++  /// <summary>
++  /// The type of parameter that is sent with the CecAlert callback
++  /// </summary>
++  public enum class CecParameterType
++  {
++    /// <summary>
++    /// The parameter is a string
++    /// </summary>
++    ParameterTypeString = 1
++  };
++
++  /// <summary>
++  /// A parameter for the CecAlert callback
++  /// </summary>
++  public ref class CecParameter
++  {
++  public:
++    /// <summary>
++    /// Create a new parameter
++    /// </summary>
++    /// <param name="type">The type of this parameter.</param>
++    /// <param name="data">The value of this parameter.</param>
++    CecParameter(CecParameterType type, System::String ^ data)
++    {
++      Type = type;
++      Data = data;
++    }
++
++    /// <summary>
++    /// The type of this parameter
++    /// </summary>
++    property CecParameterType Type;
++    /// <summary>
++    /// The value of this parameter
++    /// </summary>
++    property System::String ^ Data;
++  };
++
++  /// <summary>
++  /// The power status of a CEC device
++  /// </summary>
++  public enum class CecPowerStatus
++  {
++    /// <summary>
++    /// Powered on
++    /// </summary>
++    On                      = 0x00,
++    /// <summary>
++    /// In standby mode
++    /// </summary>
++    Standby                 = 0x01,
++    /// <summary>
++    /// In transition from standby to on
++    /// </summary>
++    InTransitionStandbyToOn = 0x02,
++    /// <summary>
++    /// In transition from on to standby
++    /// </summary>
++    InTransitionOnToStandby = 0x03,
++    /// <summary>
++    /// Unknown status
++    /// </summary>
++    Unknown                 = 0x99
++  };
++
++  /// <summary>
++  /// The CEC version of a CEC device
++  /// </summary>
++  public enum class CecVersion
++  {
++    /// <summary>
++    /// Unknown version
++    /// </summary>
++    Unknown = 0x00,
++    /// <summary>
++    /// Version 1.2
++    /// </summary>
++    V1_2    = 0x01,
++    /// <summary>
++    /// Version 1.2a
++    /// </summary>
++    V1_2A   = 0x02,
++    /// <summary>
++    /// Version 1.3
++    /// </summary>
++    V1_3    = 0x03,
++    /// <summary>
++    /// Version 1.3a
++    /// </summary>
++    V1_3A   = 0x04,
++    /// <summary>
++    /// Version 1.4
++    /// </summary>
++    V1_4    = 0x05
++  };
++
++  /// <summary>
++  /// Parameter for OSD string display, that controls how to display the string
++  /// </summary>
++  public enum class CecDisplayControl
++  {
++    /// <summary>
++    /// Display for the default time
++    /// </summary>
++    DisplayForDefaultTime = 0x00,
++    /// <summary>
++    /// Display until it is cleared by ClearPreviousMessage
++    /// </summary>
++    DisplayUntilCleared   = 0x40,
++    /// <summary>
++    /// Clear message displayed by DisplayUntilCleared
++    /// </summary>
++    ClearPreviousMessage  = 0x80,
++    /// <summary>
++    /// Reserved / do not use
++    /// </summary>
++    ReservedForFutureUse  = 0xC0
++  };
++
++  /// <summary>
++  /// The menu state of a CEC device
++  /// </summary>
++  public enum class CecMenuState
++  {
++    /// <summary>
++    /// Menu active
++    /// </summary>
++    Activated   = 0,
++    /// <summary>
++    /// Menu not active
++    /// </summary>
++    Deactivated = 1
++  };
++
++  /// <summary>
++  /// Deck control mode for playback and recording devices
++  /// </summary>
++  public enum class CecDeckControlMode
++  {
++    /// <summary>
++    /// Skip forward / wind
++    /// </summary>
++    SkipForwardWind   = 1,
++    /// <summary>
++    /// Skip reverse / rewind
++    /// </summary>
++    SkipReverseRewind = 2,
++    /// <summary>
++    /// Stop
++    /// </summary>
++    Stop              = 3,
++    /// <summary>
++    /// Eject
++    /// </summary>
++    Eject             = 4
++  };
++
++  /// <summary>
++  /// Deck status for playback and recording devices
++  /// </summary>
++  public enum class CecDeckInfo
++  {
++    /// <summary>
++    /// Playing
++    /// </summary>
++    Play               = 0x11,
++    /// <summary>
++    /// Recording
++    /// </summary>
++    Record             = 0x12,
++    /// <summary>
++    /// Reverse
++    /// </summary>
++    Reverse            = 0x13,
++    /// <summary>
++    /// Showing still frame
++    /// </summary>
++    Still              = 0x14,
++    /// <summary>
++    /// Playing slow
++    /// </summary>
++    Slow               = 0x15,
++    /// <summary>
++    /// Playing slow reverse
++    /// </summary>
++    SlowReverse        = 0x16,
++    /// <summary>
++    /// Fast forward
++    /// </summary>
++    FastForward        = 0x17,
++    /// <summary>
++    /// Fast reverse
++    /// </summary>
++    FastReverse        = 0x18,
++    /// <summary>
++    /// No media detected
++    /// </summary>
++    NoMedia            = 0x19,
++    /// <summary>
++    /// Stop / not playing
++    /// </summary>
++    Stop               = 0x1A,
++    /// <summary>
++    /// Skip forward / wind
++    /// </summary>
++    SkipForwardWind    = 0x1B,
++    /// <summary>
++    /// Skip reverse / rewind
++    /// </summary>
++    SkipReverseRewind  = 0x1C,
++    /// <summary>
++    /// Index search forward
++    /// </summary>
++    IndexSearchForward = 0x1D,
++    /// <summary>
++    /// Index search reverse
++    /// </summary>
++    IndexSearchReverse = 0x1E,
++    /// <summary>
++    /// Other / unknown status
++    /// </summary>
++    OtherStatus        = 0x1F
++  };
++
++  /// <summary>
++  /// User control code, the key code when the user presses or releases a button on the remote.
++  /// Used by SendKeypress() and the CecKey callback.
++  /// </summary>
++  public enum class CecUserControlCode
++  {
++    /// <summary>
++    /// Select / OK
++    /// </summary>
++    Select                      = 0x00,
++    /// <summary>
++    /// Direction up
++    /// </summary>
++    Up                          = 0x01,
++    /// <summary>
++    /// Direction down
++    /// </summary>
++    Down                        = 0x02,
++    /// <summary>
++    /// Direction left
++    /// </summary>
++    Left                        = 0x03,
++    /// <summary>
++    /// Direction right
++    /// </summary>
++    Right                       = 0x04,
++    /// <summary>
++    /// Direction right + up
++    /// </summary>
++    RightUp                     = 0x05,
++    /// <summary>
++    /// Direction right + down
++    /// </summary>
++    RightDown                   = 0x06,
++    /// <summary>
++    /// Direction left + up
++    /// </summary>
++    LeftUp                      = 0x07,
++    /// <summary>
++    /// Direction left + down
++    /// </summary>
++    LeftDown                    = 0x08,
++    /// <summary>
++    /// Root menu
++    /// </summary>
++    RootMenu                    = 0x09,
++    /// <summary>
++    /// Setup menu
++    /// </summary>
++    SetupMenu                   = 0x0A,
++    /// <summary>
++    /// Contents menu
++    /// </summary>
++    ContentsMenu                = 0x0B,
++    /// <summary>
++    /// Favourite menu
++    /// </summary>
++    FavoriteMenu                = 0x0C,
++    /// <summary>
++    /// Exit / back
++    /// </summary>
++    Exit                        = 0x0D,
++    /// <summary>
++    /// Number 0
++    /// </summary>
++    Number0                     = 0x20,
++    /// <summary>
++    /// Number 1
++    /// </summary>
++    Number1                     = 0x21,
++    /// <summary>
++    /// Number 2
++    /// </summary>
++    Number2                     = 0x22,
++    /// <summary>
++    /// Number 3
++    /// </summary>
++    Number3                     = 0x23,
++    /// <summary>
++    /// Number 4
++    /// </summary>
++    Number4                     = 0x24,
++    /// <summary>
++    /// Number 5
++    /// </summary>
++    Number5                     = 0x25,
++    /// <summary>
++    /// Number 6
++    /// </summary>
++    Number6                     = 0x26,
++    /// <summary>
++    /// Number 7
++    /// </summary>
++    Number7                     = 0x27,
++    /// <summary>
++    /// Number 8
++    /// </summary>
++    Number8                     = 0x28,
++    /// <summary>
++    /// Number 9
++    /// </summary>
++    Number9                     = 0x29,
++    /// <summary>
++    /// .
++    /// </summary>
++    Dot                         = 0x2A,
++    /// <summary>
++    /// Enter input
++    /// </summary>
++    Enter                       = 0x2B,
++    /// <summary>
++    /// Clear input
++    /// </summary>
++    Clear                       = 0x2C,
++    /// <summary>
++    /// Next favourite
++    /// </summary>
++    NextFavorite                = 0x2F,
++    /// <summary>
++    /// Channel up
++    /// </summary>
++    ChannelUp                   = 0x30,
++    /// <summary>
++    /// Channel down
++    /// </summary>
++    ChannelDown                 = 0x31,
++    /// <summary>
++    /// Previous channel
++    /// </summary>
++    PreviousChannel             = 0x32,
++    /// <summary>
++    /// Select sound track
++    /// </summary>
++    SoundSelect                 = 0x33,
++    /// <summary>
++    /// Select input
++    /// </summary>
++    InputSelect                 = 0x34,
++    /// <summary>
++    /// Display information
++    /// </summary>
++    DisplayInformation          = 0x35,
++    /// <summary>
++    /// Show help
++    /// </summary>
++    Help                        = 0x36,
++    /// <summary>
++    /// Page up
++    /// </summary>
++    PageUp                      = 0x37,
++    /// <summary>
++    /// Page down
++    /// </summary>
++    PageDown                    = 0x38,
++    /// <summary>
++    /// Toggle powered on / standby
++    /// </summary>
++    Power                       = 0x40,
++    /// <summary>
++    /// Volume up
++    /// </summary>
++    VolumeUp                    = 0x41,
++    /// <summary>
++    /// Volume down
++    /// </summary>
++    VolumeDown                  = 0x42,
++    /// <summary>
++    /// Mute audio
++    /// </summary>
++    Mute                        = 0x43,
++    /// <summary>
++    /// Start playback
++    /// </summary>
++    Play                        = 0x44,
++    /// <summary>
++    /// Stop playback
++    /// </summary>
++    Stop                        = 0x45,
++    /// <summary>
++    /// Pause playback
++    /// </summary>
++    Pause                       = 0x46,
++    /// <summary>
++    /// Toggle recording
++    /// </summary>
++    Record                      = 0x47,
++    /// <summary>
++    /// Rewind
++    /// </summary>
++    Rewind                      = 0x48,
++    /// <summary>
++    /// Fast forward
++    /// </summary>
++    FastForward                 = 0x49,
++    /// <summary>
++    /// Eject media
++    /// </summary>
++    Eject                       = 0x4A,
++    /// <summary>
++    /// Forward
++    /// </summary>
++    Forward                     = 0x4B,
++    /// <summary>
++    /// Backward
++    /// </summary>
++    Backward                    = 0x4C,
++    /// <summary>
++    /// Stop recording
++    /// </summary>
++    StopRecord                  = 0x4D,
++    /// <summary>
++    /// Pause recording
++    /// </summary>
++    PauseRecord                 = 0x4E,
++    /// <summary>
++    /// Change angle
++    /// </summary>
++    Angle                       = 0x50,
++    /// <summary>
++    /// Toggle sub picture
++    /// </summary>
++    SubPicture                  = 0x51,
++    /// <summary>
++    /// Toggle video on demand
++    /// </summary>
++    VideoOnDemand               = 0x52,
++    /// <summary>
++    /// Toggle electronic program guide (EPG)
++    /// </summary>
++    ElectronicProgramGuide      = 0x53,
++    /// <summary>
++    /// Toggle timer programming
++    /// </summary>
++    TimerProgramming            = 0x54,
++    /// <summary>
++    /// Set initial configuration
++    /// </summary>
++    InitialConfiguration        = 0x55,
++    /// <summary>
++    /// Start playback function
++    /// </summary>
++    PlayFunction                = 0x60,
++    /// <summary>
++    /// Pause playback function
++    /// </summary>
++    PausePlayFunction           = 0x61,
++    /// <summary>
++    /// Toggle recording function
++    /// </summary>
++    RecordFunction              = 0x62,
++    /// <summary>
++    /// Pause recording function
++    /// </summary>
++    PauseRecordFunction         = 0x63,
++    /// <summary>
++    /// Stop playback function
++    /// </summary>
++    StopFunction                = 0x64,
++    /// <summary>
++    /// Mute audio function
++    /// </summary>
++    MuteFunction                = 0x65,
++    /// <summary>
++    /// Restore volume function
++    /// </summary>
++    RestoreVolumeFunction       = 0x66,
++    /// <summary>
++    /// Tune function
++    /// </summary>
++    TuneFunction                = 0x67,
++    /// <summary>
++    /// Select media function
++    /// </summary>
++    SelectMediaFunction         = 0x68,
++    /// <summary>
++    /// Select AV input function
++    /// </summary>
++    SelectAVInputFunction       = 0x69,
++    /// <summary>
++    /// Select audio input function
++    /// </summary>
++    SelectAudioInputFunction    = 0x6A,
++    /// <summary>
++    /// Toggle powered on / standby function
++    /// </summary>
++    PowerToggleFunction         = 0x6B,
++    /// <summary>
++    /// Power off function
++    /// </summary>
++    PowerOffFunction            = 0x6C,
++    /// <summary>
++    /// Power on function
++    /// </summary>
++    PowerOnFunction             = 0x6D,
++    /// <summary>
++    /// F1 / blue button
++    /// </summary>
++    F1Blue                      = 0x71,
++    /// <summary>
++    /// F2 / red button
++    /// </summary>
++    F2Red                       = 0X72,
++    /// <summary>
++    /// F3 / green button
++    /// </summary>
++    F3Green                     = 0x73,
++    /// <summary>
++    /// F4 / yellow button
++    /// </summary>
++    F4Yellow                    = 0x74,
++    /// <summary>
++    /// F5
++    /// </summary>
++    F5                          = 0x75,
++    /// <summary>
++    /// Data / teletext
++    /// </summary>
++    Data                        = 0x76,
++    /// <summary>
++    /// Max. valid key code for standard buttons
++    /// </summary>
++    Max                         = 0x76,
++    /// <summary>
++    /// Extra return button on Samsung remotes
++    /// </summary>
++    SamsungReturn               = 0x91,
++    /// <summary>
++    /// Unknown / invalid key code
++    /// </summary>
++    Unknown
++  };
++
++  /// <summary>
++  /// Vendor IDs for CEC devices
++  /// </summary>
++  public enum class CecVendorId
++  {
++    Toshiba       = 0x000039,
++    Samsung       = 0x0000F0,
++    Denon         = 0x0005CD,
++    Marantz       = 0x000678,
++    Loewe         = 0x000982,
++    Onkyo         = 0x0009B0,
++    Medion        = 0x000CB8,
++    Toshiba2      = 0x000CE7,
++    PulseEight    = 0x001582,
++    HarmanKardon2 = 0x001950,
++    Google        = 0x001A11,
++    Akai          = 0x0020C7,
++    AOC           = 0x002467,
++    Panasonic     = 0x008045,
++    Philips       = 0x00903E,
++    Daewoo        = 0x009053,
++    Yamaha        = 0x00A0DE,
++    Grundig       = 0x00D0D5,
++    Pioneer       = 0x00E036,
++    LG            = 0x00E091,
++    Sharp         = 0x08001F,
++    Sony          = 0x080046,
++    Broadcom      = 0x18C086,
++    Vizio         = 0x6B746D,
++    Benq          = 0x8065E9,
++    HarmanKardon  = 0x9C645E,
++    Unknown       = 0
++  };
++
++  /// <summary>
++  /// Audio status of audio system / AVR devices
++  /// </summary>
++  public enum class CecAudioStatus
++  {
++    /// <summary>
++    /// Muted
++    /// </summary>
++    MuteStatusMask      = 0x80,
++    /// <summary>
++    /// Not muted, volume status mask
++    /// </summary>
++    VolumeStatusMask    = 0x7F,
++    /// <summary>
++    /// Minumum volume
++    /// </summary>
++    VolumeMin           = 0x00,
++    /// <summary>
++    /// Maximum volume
++    /// </summary>
++    VolumeMax           = 0x64,
++    /// <summary>
++    /// Unknown status
++    /// </summary>
++    VolumeStatusUnknown = 0x7F
++  };
++
++  /// <summary>
++  /// CEC opcodes, as described in the HDMI CEC specification
++  /// </summary>
++  public enum class CecOpcode
++  {
++    /// <summary>
++    /// Active source
++    /// </summary>
++    ActiveSource                  = 0x82,
++    /// <summary>
++    /// Image view on: power on display for image display
++    /// </summary>
++    ImageViewOn                   = 0x04,
++    /// <summary>
++    /// Text view on: power on display for text display
++    /// </summary>
++    TextViewOn                    = 0x0D,
++    /// <summary>
++    /// Device no longer is the active source
++    /// </summary>
++    InactiveSource                = 0x9D,
++    /// <summary>
++    /// Request which device has the active source status
++    /// </summary>
++    RequestActiveSource           = 0x85,
++    /// <summary>
++    /// Routing change for HDMI switches
++    /// </summary>
++    RoutingChange                 = 0x80,
++    /// <summary>
++    /// Routing information for HDMI switches
++    /// </summary>
++    RoutingInformation            = 0x81,
++    /// <summary>
++    /// Change the stream path to the given physical address
++    /// </summary>
++    SetStreamPath                 = 0x86,
++    /// <summary>
++    /// Inform that a device went into standby mode
++    /// </summary>
++    Standby                       = 0x36,
++    /// <summary>
++    /// Stop recording
++    /// </summary>
++    RecordOff                     = 0x0B,
++    /// <summary>
++    /// Start recording
++    /// </summary>
++    RecordOn                      = 0x09,
++    /// <summary>
++    /// Recording status information
++    /// </summary>
++    RecordStatus                  = 0x0A,
++    /// <summary>
++    /// Record current display
++    /// </summary>
++    RecordTvScreen                = 0x0F,
++    /// <summary>
++    /// Clear analogue timer
++    /// </summary>
++    ClearAnalogueTimer            = 0x33,
++    /// <summary>
++    /// Clear digital timer
++    /// </summary>
++    ClearDigitalTimer             = 0x99,
++    /// <summary>
++    /// Clear external timer
++    /// </summary>
++    ClearExternalTimer            = 0xA1,
++    /// <summary>
++    /// Set analogue timer
++    /// </summary>
++    SetAnalogueTimer              = 0x34,
++    /// <summary>
++    /// Set digital timer
++    /// </summary>
++    SetDigitalTimer               = 0x97,
++    /// <summary>
++    /// Set external timer
++    /// </summary>
++    SetExternalTimer              = 0xA2,
++    /// <summary>
++    /// Set program title of a timer
++    /// </summary>
++    SetTimerProgramTitle          = 0x67,
++    /// <summary>
++    /// Timer status cleared
++    /// </summary>
++    TimerClearedStatus            = 0x43,
++    /// <summary>
++    /// Timer status information
++    /// </summary>
++    TimerStatus                   = 0x35,
++    /// <summary>
++    /// CEC version used by a device
++    /// </summary>
++    CecVersion                    = 0x9E,
++    /// <summary>
++    /// Request CEC version of a device
++    /// </summary>
++    GetCecVersion                 = 0x9F,
++    /// <summary>
++    /// Request physical address of a device
++    /// </summary>
++    GivePhysicalAddress           = 0x83,
++    /// <summary>
++    /// Request language code of the menu language of a device
++    /// 3 character ISO 639-2 country code. see http://http://www.loc.gov/standards/iso639-2/
++    /// </summary>
++    GetMenuLanguage               = 0x91,
++    /// <summary>
++    /// Report the physical address
++    /// </summary>
++    ReportPhysicalAddress         = 0x84,
++    /// <summary>
++    /// Report the language code of the menu language
++    /// 3 character ISO 639-2 country code. see http://http://www.loc.gov/standards/iso639-2/
++    /// </summary>
++    SetMenuLanguage               = 0x32,
++    /// <summary>
++    /// Deck control for playback and recording devices
++    /// </summary>
++    DeckControl                   = 0x42,
++    /// <summary>
++    /// Deck status for playback and recording devices
++    /// </summary>
++    DeckStatus                    = 0x1B,
++    /// <summary>
++    /// Request deck status from playback and recording devices
++    /// </summary>
++    GiveDeckStatus                = 0x1A,
++    /// <summary>
++    /// Start playback on playback and recording devices
++    /// </summary>
++    Play                          = 0x41,
++    /// <summary>
++    /// Request tuner status
++    /// </summary>
++    GiveTunerDeviceStatus         = 0x08,
++    /// <summary>
++    /// Select analogue service on a tuner
++    /// </summary>
++    SelectAnalogueService         = 0x92,
++    /// <summary>
++    /// Select digital service on a tuner
++    /// </summary>
++    SelectDigtalService           = 0x93,
++    /// <summary>
++    /// Report tuner device status
++    /// </summary>
++    TunerDeviceStatus             = 0x07,
++    /// <summary>
++    /// Tuner step decrement
++    /// </summary>
++    TunerStepDecrement            = 0x06,
++    /// <summary>
++    /// Tuner step increment
++    /// </summary>
++    TunerStepIncrement            = 0x05,
++    /// <summary>
++    /// Report device vendor ID
++    /// </summary>
++    DeviceVendorId                = 0x87,
++    /// <summary>
++    /// Request device vendor ID
++    /// </summary>
++    GiveDeviceVendorId            = 0x8C,
++    /// <summary>
++    /// Vendor specific command
++    /// </summary>
++    VendorCommand                 = 0x89,
++    /// <summary>
++    /// Vendor specific command with vendor ID
++    /// </summary>
++    VendorCommandWithId           = 0xA0,
++    /// <summary>
++    /// Vendor specific remote button pressed
++    /// </summary>
++    VendorRemoteButtonDown        = 0x8A,
++    /// <summary>
++    /// Vendor specific remote button released
++    /// </summary>
++    VendorRemoteButtonUp          = 0x8B,
++    /// <summary>
++    /// Display / clear OSD string
++    /// </summary>
++    SetOsdString                  = 0x64,
++    /// <summary>
++    /// Request device OSD name
++    /// </summary>
++    GiveOsdName                   = 0x46,
++    /// <summary>
++    /// Report device OSD name
++    /// </summary>
++    SetOsdName                    = 0x47,
++    /// <summary>
++    /// Request device menu status
++    /// </summary>
++    MenuRequest                   = 0x8D,
++    /// <summary>
++    /// Report device menu status
++    /// </summary>
++    MenuStatus                    = 0x8E,
++    /// <summary>
++    /// Remote button pressed
++    /// </summary>
++    UserControlPressed            = 0x44,
++    /// <summary>
++    /// Remote button released
++    /// </summary>
++    UserControlRelease            = 0x45,
++    /// <summary>
++    /// Request device power status
++    /// </summary>
++    GiveDevicePowerStatus         = 0x8F,
++    /// <summary>
++    /// Report device power status
++    /// </summary>
++    ReportPowerStatus             = 0x90,
++    /// <summary>
++    /// Feature abort / unsupported command
++    /// </summary>
++    FeatureAbort                  = 0x00,
++    /// <summary>
++    /// Abort command
++    /// </summary>
++    Abort                         = 0xFF,
++    /// <summary>
++    /// Give audio status
++    /// </summary>
++    GiveAudioStatus               = 0x71,
++    /// <summary>
++    /// Give audiosystem mode
++    /// </summary>
++    GiveSystemAudioMode           = 0x7D,
++    /// <summary>
++    /// Report device audio status
++    /// </summary>
++    ReportAudioStatus             = 0x7A,
++    /// <summary>
++    /// Set audiosystem mode
++    /// </summary>
++    SetSystemAudioMode            = 0x72,
++    /// <summary>
++    /// Request audiosystem mode
++    /// </summary>
++    SystemAudioModeRequest        = 0x70,
++    /// <summary>
++    /// Report audiosystem mode
++    /// </summary>
++    SystemAudioModeStatus         = 0x7E,
++    /// <summary>
++    /// Set audio bitrate
++    /// </summary>
++    SetAudioRate                  = 0x9A,
++    /// <summary>
++    /// When this opcode is set, no opcode will be sent to the device / poll message
++    /// This is one of the reserved numbers
++    /// </summary>
++    None                          = 0xFD
++  };
++
++  /// <summary>
++  /// Audiosystem status
++  /// </summary>
++  public enum class CecSystemAudioStatus
++  {
++    /// <summary>
++    /// Turned off
++    /// </summary>
++    Off = 0,
++    /// <summary>
++    /// Turned on
++    /// </summary>
++    On  = 1
++  };
++
++  /// <summary>
++  /// Type of adapter to which libCEC is connected
++  /// </summary>
++  public enum class CecAdapterType
++  {
++    /// <summary>
++    /// Unknown adapter type
++    /// </summary>
++    Unknown                 = 0,
++    /// <summary>
++    /// Pulse-Eight USB-CEC adapter
++    /// </summary>
++    PulseEightExternal      = 0x1,
++    /// <summary>
++    /// Pulse-Eight CEC daughterboard
++    /// </summary>
++    PulseEightDaughterboard = 0x2,
++    /// <summary>
++    /// Raspberry Pi
++    /// </summary>
++    RaspberryPi             = 0x100,
++    /// <summary>
++    /// TDA995x
++    /// </summary>
++    TDA995x                 = 0x200
++  };
++
++  /// <summary>
++  /// Descriptor of a CEC adapter, returned when scanning for adapters that are connected to the system
++  /// </summary>
++  public ref class CecAdapter
++  {
++  public:
++    /// <summary>
++    /// Create a new CEC adapter descriptor
++    /// </summary>
++    /// <param name="path"> The path descriptor for this CEC adapter</param>
++    /// <param name="comPort">The COM port of this CEC adapter</param>
++    CecAdapter(System::String ^ path, System::String ^ comPort)
++    {
++      Path = path;
++      ComPort = comPort;
++    }
++
++    /// <summary>
++    /// The path descriptor for this CEC adapter
++    /// </summary>
++    property System::String ^ Path;
++
++    /// <summary>
++    /// The COM port of this CEC adapter
++    /// </summary>
++    property System::String ^ ComPort;
++  };
++
++  /// <summary>
++  /// A list of CEC device types
++  /// </summary>
++  public ref class CecDeviceTypeList
++  {
++  public:
++    /// <summary>
++    /// Create a new empty list of CEC device types
++    /// </summary>
++    CecDeviceTypeList(void)
++    {
++      Types = gcnew array<CecDeviceType>(5);
++      for (unsigned int iPtr = 0; iPtr < 5; iPtr++)
++        Types[iPtr] = CecDeviceType::Reserved;
++    }
++
++    /// <summary>
++    /// The array with CecDeviceType instances in this list.
++    /// </summary>
++    property array<CecDeviceType> ^ Types;
++  };
++
++  /// <summary>
++  /// A list of logical addresses
++  /// </summary>
++  public ref class CecLogicalAddresses
++  {
++  public:
++    /// <summary>
++    /// Create a new empty list of logical addresses
++    /// </summary>
++    CecLogicalAddresses(void)
++    {
++      Addresses = gcnew array<CecLogicalAddress>(16);
++      Clear();
++    }
++
++    /// <summary>
++    /// Clears this list
++    /// </summary>
++    void Clear(void)
++    {
++      Primary = CecLogicalAddress::Unknown;
++      for (unsigned int iPtr = 0; iPtr < 16; iPtr++)
++        Addresses[iPtr] = CecLogicalAddress::Unknown;
++    }
++
++    /// <summary>
++    /// Checks whether a logical address is set in this list.
++    /// </summary>
++    /// <param name="address">The address to check.</param>
++    /// <returns>True when set, false otherwise</returns>
++    bool IsSet(CecLogicalAddress address)
++    {
++      return Addresses[(unsigned int)address] != CecLogicalAddress::Unknown;
++    }
++
++    /// <summary>
++    /// Add a logical address to this list (if it's not set already)
++    /// </summary>
++    /// <param name="address">The address to add.</param>
++    void Set(CecLogicalAddress address)
++    {
++      Addresses[(unsigned int)address] = address;
++      if (Primary == CecLogicalAddress::Unknown)
++        Primary = address;
++    }
++
++    /// <summary>
++    /// The primary (first) address in this list
++    /// </summary>
++    property CecLogicalAddress          Primary;
++
++    /// <summary>
++    /// The list of addresses
++    /// </summary>
++    property array<CecLogicalAddress> ^ Addresses;
++  };
++
++
++  /// <summary>
++  /// Byte array used for CEC command parameters
++  /// </summary>
++  public ref class CecDatapacket
++  {
++  public:
++    /// <summary>
++    /// Create a new byte array with maximum size 100
++    /// </summary>
++    CecDatapacket(void)
++    {
++      Data = gcnew array<uint8_t>(100);
++      Size = 0;
++    }
++
++    /// <summary>
++    /// Adds a byte to this byte array
++    /// </summary>
++    /// <param name="data">The byte to add.</param>
++    void PushBack(uint8_t data)
++    {
++      if (Size < 100)
++      {
++        Data[Size] = data;
++        Size++;
++      }
++    }
++
++    /// <summary>
++    /// Array data
++    /// </summary>
++    property array<uint8_t> ^ Data;
++
++    /// <summary>
++    /// Current data size
++    /// </summary>
++    property uint8_t          Size;
++  };
++
++  /// <summary>
++  /// A CEC command that is received or transmitted over the CEC bus
++  /// </summary>
++  public ref class CecCommand
++  {
++  public:
++    /// <summary>
++    /// Create a new CEC command instance
++    /// </summary>
++    /// <param name="initiator">The initiator of the command</param>
++    /// <param name="destination">The receiver of the command</param>
++    /// <param name="ack">True when the ack bit is set, false otherwise</param>
++    /// <param name="eom">True when the eom bit is set, false otherwise</param>
++    /// <param name="opcode">The CEC opcode of this command</param>
++    /// <param name="transmitTimeout">The timeout to use when transmitting a command</param>
++    CecCommand(CecLogicalAddress initiator, CecLogicalAddress destination, bool ack, bool eom, CecOpcode opcode, int32_t transmitTimeout)
++    {
++      Initiator       = initiator;
++      Destination     = destination;
++      Ack             = ack;
++      Eom             = eom;
++      Opcode          = opcode;
++      OpcodeSet       = true;
++      TransmitTimeout = transmitTimeout;
++      Parameters      = gcnew CecDatapacket;
++      Empty           = false;
++    }
++
++    /// <summary>
++    /// Create a new empty CEC command instance
++    /// </summary>
++    CecCommand(void)
++    {
++      Initiator       = CecLogicalAddress::Unknown;
++      Destination     = CecLogicalAddress::Unknown;
++      Ack             = false;
++      Eom             = false;
++      Opcode          = CecOpcode::None;
++      OpcodeSet       = false;
++      TransmitTimeout = 0;
++      Parameters      = gcnew CecDatapacket;
++      Empty           = true;
++    }
++
++    /// <summary>
++    /// Pushes a byte of data to this CEC command
++    /// </summary>
++    /// <param name="data">The byte to add</param>
++    void PushBack(uint8_t data)
++    {
++      if (Initiator == CecLogicalAddress::Unknown && Destination == CecLogicalAddress::Unknown)
++      {
++        Initiator   = (CecLogicalAddress) (data >> 4);
++        Destination = (CecLogicalAddress) (data & 0xF);
++      }
++      else if (!OpcodeSet)
++      {
++        OpcodeSet = true;
++        Opcode    = (CecOpcode)data;
++      }
++      else
++      {
++        Parameters->PushBack(data);
++      }
++    }
++
++    /// <summary>
++    /// True when this command is empty, false otherwise.
++    /// </summary>
++    property bool               Empty;
++    /// <summary>
++    /// The initiator of the command
++    /// </summary>
++    property CecLogicalAddress  Initiator;
++    /// <summary>
++    /// The destination of the command
++    /// </summary>
++    property CecLogicalAddress  Destination;
++    /// <summary>
++    /// True when the ack bit is set, false otherwise
++    /// </summary>
++    property bool               Ack;
++    /// <summary>
++    /// True when the eom bit is set, false otherwise
++    /// </summary>
++    property bool               Eom;
++    /// <summary>
++    /// The CEC opcode of the command
++    /// </summary>
++    property CecOpcode          Opcode;
++    /// <summary>
++    /// The parameters of this command
++    /// </summary>
++    property CecDatapacket ^    Parameters;
++    /// <summary>
++    /// True when an opcode is set, false otherwise (poll message)
++    /// </summary>
++    property bool               OpcodeSet;
++    /// <summary>
++    /// The timeout to use when transmitting a command
++    /// </summary>
++    property int32_t            TransmitTimeout;
++  };
++
++  /// <summary>
++  /// A key press that was received
++  /// </summary>
++  public ref class CecKeypress
++  {
++  public:
++    /// <summary>
++    /// Create a new key press instance
++    /// </summary>
++    /// <param name="keycode">The key code of this key press</param>
++    /// <param name="duration">The duration of this key press in milliseconds</param>
++    CecKeypress(CecUserControlCode keycode, unsigned int duration)
++    {
++      Keycode  = keycode;
++      Duration = duration;
++      Empty    = false;
++    }
++
++    /// <summary>
++    /// Create a new empty key press instance
++    /// </summary>
++    CecKeypress(void)
++    {
++      Keycode  = CecUserControlCode::Unknown;
++      Duration = 0;
++      Empty    = true;
++    }
++
++    /// <summary>
++    /// True when empty, false otherwise
++    /// </summary>
++    property bool               Empty;
++    /// <summary>
++    /// The key code of this key press
++    /// </summary>
++    property CecUserControlCode Keycode;
++    /// <summary>
++    /// The duration of this key press in milliseconds
++    /// </summary>
++    property unsigned int       Duration;
++  };
++
++  /// <summary>
++  /// A log message that libCEC generated
++  /// </summary>
++  public ref class CecLogMessage
++  {
++  public:
++    /// <summary>
++    /// Create a new log message
++    /// </summary>
++    /// <param name="message">The actual message</param>
++    /// <param name="level">The log level, so the application can choose what type information to display</param>
++    /// <param name="time">The timestamp of this message, in milliseconds after connecting</param>
++    CecLogMessage(System::String ^ message, CecLogLevel level, int64_t time)
++    {
++      Message = message;
++      Level   = level;
++      Time    = time;
++      Empty   = false;
++    }
++
++    /// <summary>
++    /// Create a new empty log message
++    /// </summary>
++    CecLogMessage(void)
++    {
++      Message = "";
++      Level   = CecLogLevel::None;
++      Time    = 0;
++      Empty   = true;
++    }
++
++    /// <summary>
++    /// True when empty, false otherwise.
++    /// </summary>
++    property bool            Empty;
++    /// <summary>
++    /// The actual message
++    /// </summary>
++    property System::String ^Message;
++    /// <summary>
++    /// The log level, so the application can choose what type information to display
++    /// </summary>
++    property CecLogLevel     Level;
++    /// <summary>
++    /// The timestamp of this message, in milliseconds after connecting
++    /// </summary>
++    property int64_t         Time;
++  };
++
++  ref class CecCallbackMethods; //forward declaration
++
++  /// <summary>
++  /// The configuration that libCEC uses.
++  /// </summary>
++  public ref class LibCECConfiguration
++  {
++  public:
++    /// <summary>
++    /// Create a new configuration instance with default settings.
++    /// </summary>
++    LibCECConfiguration(void)
++    {
++      DeviceName          = "";
++      DeviceTypes         = gcnew CecDeviceTypeList();
++      AutodetectAddress  = true;
++      PhysicalAddress     = CEC_DEFAULT_PHYSICAL_ADDRESS;
++      BaseDevice          = (CecLogicalAddress)CEC_DEFAULT_BASE_DEVICE;
++      HDMIPort            = CEC_DEFAULT_HDMI_PORT;
++	  ClientVersion       = _LIBCEC_VERSION_CURRENT;
++      ServerVersion       = 0;
++      TvVendor            = CecVendorId::Unknown;
++
++      GetSettingsFromROM  = false;
++      UseTVMenuLanguage   = CEC_DEFAULT_SETTING_USE_TV_MENU_LANGUAGE == 1;
++      ActivateSource      = CEC_DEFAULT_SETTING_ACTIVATE_SOURCE == 1;
++
++      WakeDevices         = gcnew CecLogicalAddresses();
++      if (CEC_DEFAULT_SETTING_ACTIVATE_SOURCE == 1)
++        WakeDevices->Set(CecLogicalAddress::Tv);
++
++      PowerOffDevices     = gcnew CecLogicalAddresses();
++      if (CEC_DEFAULT_SETTING_POWER_OFF_SHUTDOWN == 1)
++        PowerOffDevices->Set(CecLogicalAddress::Broadcast);
++
++      PowerOffScreensaver = CEC_DEFAULT_SETTING_POWER_OFF_SCREENSAVER == 1;
++      PowerOffOnStandby   = CEC_DEFAULT_SETTING_POWER_OFF_ON_STANDBY == 1;
++
++      SendInactiveSource  = CEC_DEFAULT_SETTING_SEND_INACTIVE_SOURCE == 1;
++      LogicalAddresses    = gcnew CecLogicalAddresses();
++      FirmwareVersion     = 1;
++      PowerOffDevicesOnStandby = CEC_DEFAULT_SETTING_POWER_OFF_DEVICES_STANDBY == 1;
++      ShutdownOnStandby   = CEC_DEFAULT_SETTING_SHUTDOWN_ON_STANDBY == 1;
++      DeviceLanguage      = "";
++      FirmwareBuildDate   = gcnew System::DateTime(1970,1,1,0,0,0,0);
++      CECVersion          = (CecVersion)CEC_DEFAULT_SETTING_CEC_VERSION;
++      AdapterType         = CecAdapterType::Unknown;
++    }
++
++	static uint32_t CurrentVersion = _LIBCEC_VERSION_CURRENT;
++
++    /// <summary>
++    /// Change the callback method pointers in this configuration instance.
++    /// </summary>
++    /// <param name="callbacks">The new callbacks</param>
++    void SetCallbacks(CecCallbackMethods ^callbacks)
++    {
++      Callbacks = callbacks;
++    }
++
++    /// <summary>
++    /// Update this configuration with data received from libCEC
++    /// </summary>
++    /// <param name="config">The configuration that was received from libCEC</param>
++    void Update(const CEC::libcec_configuration &config)
++    {
++      DeviceName = gcnew System::String(config.strDeviceName);
++
++      for (unsigned int iPtr = 0; iPtr < 5; iPtr++)
++        DeviceTypes->Types[iPtr] = (CecDeviceType)config.deviceTypes.types[iPtr];
++
++      AutodetectAddress  = config.bAutodetectAddress == 1;
++      PhysicalAddress    = config.iPhysicalAddress;
++      BaseDevice         = (CecLogicalAddress)config.baseDevice;
++      HDMIPort           = config.iHDMIPort;
++      ClientVersion      = config.clientVersion;
++      ServerVersion      = config.serverVersion;
++      TvVendor           = (CecVendorId)config.tvVendor;
++
++      // player specific settings
++      GetSettingsFromROM = config.bGetSettingsFromROM == 1;
++      UseTVMenuLanguage = config.bUseTVMenuLanguage == 1;
++      ActivateSource = config.bActivateSource == 1;
++
++      WakeDevices->Clear();
++      for (uint8_t iPtr = 0; iPtr <= 16; iPtr++)
++        if (config.wakeDevices[iPtr])
++          WakeDevices->Set((CecLogicalAddress)iPtr);
++
++      PowerOffDevices->Clear();
++      for (uint8_t iPtr = 0; iPtr <= 16; iPtr++)
++        if (config.powerOffDevices[iPtr])
++          PowerOffDevices->Set((CecLogicalAddress)iPtr);
++
++      PowerOffScreensaver = config.bPowerOffScreensaver == 1;
++      PowerOffOnStandby = config.bPowerOffOnStandby == 1;
++      SendInactiveSource = config.bSendInactiveSource == 1;
++
++	  LogicalAddresses->Clear();
++      for (uint8_t iPtr = 0; iPtr <= 16; iPtr++)
++        if (config.logicalAddresses[iPtr])
++          LogicalAddresses->Set((CecLogicalAddress)iPtr);
++
++      FirmwareVersion          = config.iFirmwareVersion;
++      PowerOffDevicesOnStandby = config.bPowerOffDevicesOnStandby == 1;
++      ShutdownOnStandby        = config.bShutdownOnStandby == 1;
++
++      DeviceLanguage = gcnew System::String(config.strDeviceLanguage);
++      FirmwareBuildDate = gcnew System::DateTime(1970,1,1,0,0,0,0);
++      FirmwareBuildDate = FirmwareBuildDate->AddSeconds(config.iFirmwareBuildDate);
++
++      MonitorOnlyClient = config.bMonitorOnly == 1;
++      CECVersion = (CecVersion)config.cecVersion;
++      AdapterType = (CecAdapterType)config.adapterType;
++      PowerOnScreensaver = config.bPowerOnScreensaver == 1;
++    }
++
++    /// <summary>
++    /// The device name to use on the CEC bus
++    /// </summary>
++    property System::String ^     DeviceName;
++
++    /// <summary>
++    /// The device type(s) to use on the CEC bus for libCEC
++    /// </summary>
++    property CecDeviceTypeList ^  DeviceTypes;
++
++    /// <summary>
++    /// (read only) set to true by libCEC when the physical address was autodetected
++    /// </summary>
++    property bool                 AutodetectAddress;
++
++    /// <summary>
++    /// The physical address of the CEC adapter
++    /// </summary>
++    property uint16_t             PhysicalAddress;
++
++    /// <summary>
++    /// The logical address of the device to which the adapter is connected. Only used when PhysicalAddress = 0 or when the adapter doesn't support autodetection
++    /// </summary>
++    property CecLogicalAddress    BaseDevice;
++
++    /// <summary>
++    /// The HDMI port to which the adapter is connected. Only used when iPhysicalAddress = 0 or when the adapter doesn't support autodetection
++    /// </summary>
++    property uint8_t              HDMIPort;
++
++    /// <summary>
++    /// The client API version to use
++    /// </summary>
++    property uint32_t             ClientVersion;
++
++    /// <summary>
++    /// The version of libCEC
++    /// </summary>
++	property uint32_t             ServerVersion;
++
++    /// <summary>
++    /// Override the vendor ID of the TV. Leave this untouched to autodetect
++    /// </summary>
++    property CecVendorId          TvVendor;
++
++    /// <summary>
++    /// True to read the settings from the EEPROM, which possibly override the settings passed here
++    /// </summary>
++    property bool                 GetSettingsFromROM;
++
++    /// <summary>
++    /// Use the language setting of the TV in the client application. Must be implemented by the client application.
++    /// 3 character ISO 639-2 country code. see http://http://www.loc.gov/standards/iso639-2/
++    /// </summary>
++    property bool                 UseTVMenuLanguage;
++
++    /// <summary>
++    /// Make libCEC the active source when starting the client application
++    /// </summary>
++    property bool                 ActivateSource;
++
++    /// <summary>
++    /// List of devices to wake when initialising libCEC or when calling PowerOnDevices() without any parameter.
++    /// </summary>
++    property CecLogicalAddresses ^WakeDevices;
++
++    /// <summary>
++    /// List of devices to power off when calling StandbyDevices() without any parameter.
++    /// </summary>
++    property CecLogicalAddresses ^PowerOffDevices;
++
++    /// <summary>
++    /// Send standby commands when the client application activates the screensaver. Must be implemented by the client application.
++    /// </summary>
++    property bool                 PowerOffScreensaver;
++
++    /// <summary>
++    /// Power off the PC when the TV powers off. Must be implemented by the client application.
++    /// </summary>
++    property bool                 PowerOffOnStandby;
++
++    /// <summary>
++    /// Send an inactive source message when exiting the client application.
++    /// </summary>
++    property bool                 SendInactiveSource;
++
++    /// <summary>
++    /// The list of logical addresses that libCEC is using
++    /// </summary>
++    property CecLogicalAddresses ^LogicalAddresses;
++
++    /// <summary>
++    /// The firmware version of the adapter to which libCEC is connected
++    /// </summary>
++    property uint16_t             FirmwareVersion;
++
++    /// <summary>
++    /// Send standby commands when the client application activates standby mode (S3). Must be implemented by the client application.
++    /// </summary>
++    property bool                 PowerOffDevicesOnStandby;
++
++    /// <summary>
++    /// Shutdown this PC when the TV is switched off. only used when PowerOffOnStandby = false
++    /// </summary>
++    property bool                 ShutdownOnStandby;
++
++    /// <summary>
++    /// True to start a monitor-only client, false to start a standard client.
++    /// </summary>
++    property bool                 MonitorOnlyClient;
++
++    /// <summary>
++    /// The language code of the menu language that libCEC reports to other devices.
++    /// 3 character ISO 639-2 country code. see http://http://www.loc.gov/standards/iso639-2/
++    /// </summary>
++    property System::String ^     DeviceLanguage;
++
++    /// <summary>
++    /// The callback methods to use.
++    /// </summary>
++    property CecCallbackMethods ^ Callbacks;
++
++    /// <summary>
++    /// The build date of the firmware.
++    /// </summary>
++    property System::DateTime ^   FirmwareBuildDate;
++
++    /// <summary>
++    /// The CEC version that libCEC uses.
++    /// </summary>
++    property CecVersion           CECVersion;
++
++    /// <summary>
++    /// The type of adapter that libCEC is connected to.
++    /// </summary>
++    property CecAdapterType       AdapterType;
++
++	/// <summary>
++    /// True to power on when quitting the screensaver.
++    /// </summary>
++	property bool                 PowerOnScreensaver;
++  };
++
++  // the callback methods are called by unmanaged code, so we need some delegates for this
++#pragma unmanaged
++  // unmanaged callback methods
++  typedef int (__stdcall *LOGCB)    (const CEC::cec_log_message &message);
++  typedef int (__stdcall *KEYCB)    (const CEC::cec_keypress &key);
++  typedef int (__stdcall *COMMANDCB)(const CEC::cec_command &command);
++  typedef int (__stdcall *CONFIGCB) (const CEC::libcec_configuration &config);
++  typedef int (__stdcall *ALERTCB)  (const CEC::libcec_alert, const CEC::libcec_parameter &data);
++  typedef int (__stdcall *MENUCB)   (const CEC::cec_menu_state newVal);
++  typedef void (__stdcall *ACTICB)  (const CEC::cec_logical_address logicalAddress, const uint8_t bActivated);
++
++  /// <summary>
++  /// libCEC callback methods. Unmanaged code.
++  /// </summary>
++  typedef struct
++  {
++    /// <summary>
++    /// Log message callback
++    /// </summary>
++    LOGCB     logCB;
++    /// <summary>
++    /// Key press/release callback
++    /// </summary>
++    KEYCB     keyCB;
++    /// <summary>
++    /// Raw CEC data callback
++    /// </summary>
++    COMMANDCB commandCB;
++    /// <summary>
++    /// Updated configuration callback
++    /// </summary>
++    CONFIGCB  configCB;
++    /// <summary>
++    /// Alert message callback
++    /// </summary>
++    ALERTCB   alertCB;
++    /// <summary>
++    /// Menu status change callback
++    /// </summary>
++    MENUCB    menuCB;
++    /// <summary>
++    /// Source (de)activated callback
++    /// </summary>
++    ACTICB    sourceActivatedCB;
++  } UnmanagedCecCallbacks;
++
++  static PLATFORM::CMutex                   g_callbackMutex;
++  static std::vector<UnmanagedCecCallbacks> g_unmanagedCallbacks;
++  static CEC::ICECCallbacks                 g_cecCallbacks;
++
++  /// <summary>
++  /// Called by libCEC to send back a log message to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="message">The log message</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecLogMessageCB(void *cbParam, const CEC::cec_log_message message)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].logCB(message);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to send back a key press or release to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="key">The key press command that libCEC received</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecKeyPressCB(void *cbParam, const CEC::cec_keypress key)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].keyCB(key);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to send back raw CEC data to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="command">The raw CEC data</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecCommandCB(void *cbParam, const CEC::cec_command command)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].commandCB(command);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to send back an updated configuration to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="config">The new configuration</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecConfigCB(void *cbParam, const CEC::libcec_configuration config)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].configCB(config);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to send back an alert message to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="data">The alert message</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecAlertCB(void *cbParam, const CEC::libcec_alert alert, const CEC::libcec_parameter data)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].alertCB(alert, data);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to send back a menu state change to the application
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="newVal">The new menu state</param>
++  /// <return>1 when handled, 0 otherwise</return>
++  int CecMenuCB(void *cbParam, const CEC::cec_menu_state newVal)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        return g_unmanagedCallbacks[iPtr].menuCB(newVal);
++    }
++    return 0;
++  }
++
++  /// <summary>
++  /// Called by libCEC to notify the application that the source that is handled by libCEC was (de)activated
++  /// </summary>
++  /// <param name="cbParam">Pointer to the callback struct</param>
++  /// <param name="logicalAddress">The logical address that was (de)activated</param>
++  /// <param name="activated">True when activated, false when deactivated</param>
++  void CecSourceActivatedCB(void *cbParam, const CEC::cec_logical_address logicalAddress, const uint8_t activated)
++  {
++    if (cbParam)
++    {
++      size_t iPtr = (size_t)cbParam;
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      if (iPtr >= 0 && iPtr < g_unmanagedCallbacks.size())
++        g_unmanagedCallbacks[iPtr].sourceActivatedCB(logicalAddress, activated);
++    }
++  }
++
++#pragma managed
++  /// <summary>
++  /// Delegate method for the CecLogMessageCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecLogMessageManagedDelegate(const CEC::cec_log_message &);
++  /// <summary>
++  /// Delegate method for the CecKeyPressCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecKeyPressManagedDelegate(const CEC::cec_keypress &);
++  /// <summary>
++  /// Delegate method for the CecCommandCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecCommandManagedDelegate(const CEC::cec_command &);
++  /// <summary>
++  /// Delegate method for the CecConfigCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecConfigManagedDelegate(const CEC::libcec_configuration &);
++  /// <summary>
++  /// Delegate method for the CecAlertCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecAlertManagedDelegate(const CEC::libcec_alert, const CEC::libcec_parameter &);
++  /// <summary>
++  /// Delegate method for the CecMenuCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate int  CecMenuManagedDelegate(const CEC::cec_menu_state);
++  /// <summary>
++  /// Delegate method for the CecSourceActivatedCB callback in CecCallbackMethods
++  /// </summary>
++  public delegate void CecSourceActivatedManagedDelegate(const CEC::cec_logical_address, const uint8_t);
++
++  /// <summary>
++  /// Assign the callback methods in the g_cecCallbacks struct
++  /// </summary>
++  void AssignCallbacks()
++  {
++    g_cecCallbacks.CBCecLogMessage           = CecLogMessageCB;
++    g_cecCallbacks.CBCecKeyPress             = CecKeyPressCB;
++    g_cecCallbacks.CBCecCommand              = CecCommandCB;
++    g_cecCallbacks.CBCecConfigurationChanged = CecConfigCB;
++    g_cecCallbacks.CBCecAlert                = CecAlertCB;
++    g_cecCallbacks.CBCecMenuStateChanged     = CecMenuCB;
++    g_cecCallbacks.CBCecSourceActivated      = CecSourceActivatedCB;
++  }
++
++  /// <summary>
++  /// The callback methods that libCEC uses
++  /// </summary>
++  public ref class CecCallbackMethods
++  {
++  public:
++    CecCallbackMethods(void)
++    {
++      m_iCallbackPtr = -1;
++      AssignCallbacks();
++      m_bHasCallbacks = false;
++      m_bDelegatesCreated = false;
++    }
++
++    ~CecCallbackMethods(void)
++    {
++      DestroyDelegates();
++    }
++
++    /// <summary>
++    /// Pointer to the callbacks struct entry
++    /// </summary>
++    size_t GetCallbackPtr(void)
++    {
++      PLATFORM::CLockObject lock(g_callbackMutex);
++      return m_iCallbackPtr;
++    }
++
++  protected:
++    !CecCallbackMethods(void)
++    {
++      DestroyDelegates();
++    }
++
++  public:
++    /// <summary>
++    /// Disable callback methods
++    /// </summary>
++    virtual void DisableCallbacks(void)
++    {
++      DestroyDelegates();
++    }
++
++    /// <summary>
++    /// Enable callback methods
++    /// </summary>
++    /// <param name="callbacks">Callback methods to activate</param>
++    /// <return>true when handled, false otherwise</return>
++    virtual bool EnableCallbacks(CecCallbackMethods ^ callbacks)
++    {
++      CreateDelegates();
++      if (!m_bHasCallbacks)
++      {
++        m_bHasCallbacks = true;
++        m_callbacks = callbacks;
++        return true;
++      }
++
++      return false;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back a log message to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="message">The log message</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ReceiveLogMessage(CecLogMessage ^ message)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back a key press or release to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="key">The key press command that libCEC received</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ReceiveKeypress(CecKeypress ^ key)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back raw CEC data to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="command">The raw CEC data</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ReceiveCommand(CecCommand ^ command)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back an updated configuration to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="config">The new configuration</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ConfigurationChanged(LibCECConfiguration ^ config)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back an alert message to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="data">The alert message</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ReceiveAlert(CecAlert alert, CecParameter ^ data)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to send back a menu state change to the application.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="newVal">The new menu state</param>
++    /// <return>1 when handled, 0 otherwise</return>
++    virtual int ReceiveMenuStateChange(CecMenuState newVal)
++    {
++      return 0;
++    }
++
++    /// <summary>
++    /// Called by libCEC to notify the application that the source that is handled by libCEC was (de)activated.
++    /// Override in the application to handle this callback.
++    /// </summary>
++    /// <param name="logicalAddress">The logical address that was (de)activated</param>
++    /// <param name="activated">True when activated, false when deactivated</param>
++    virtual void SourceActivated(CecLogicalAddress logicalAddress, bool activated)
++    {
++    }
++
++  protected:
++    // managed callback methods
++    int CecLogMessageManaged(const CEC::cec_log_message &message)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++        iReturn = m_callbacks->ReceiveLogMessage(gcnew CecLogMessage(gcnew System::String(message.message), (CecLogLevel)message.level, message.time));
++      return iReturn;
++    }
++
++    int CecKeyPressManaged(const CEC::cec_keypress &key)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++        iReturn = m_callbacks->ReceiveKeypress(gcnew CecKeypress((CecUserControlCode)key.keycode, key.duration));
++      return iReturn;
++    }
++
++    int CecCommandManaged(const CEC::cec_command &command)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++      {
++        CecCommand ^ newCommand = gcnew CecCommand((CecLogicalAddress)command.initiator, (CecLogicalAddress)command.destination, command.ack == 1 ? true : false, command.eom == 1 ? true : false, (CecOpcode)command.opcode, command.transmit_timeout);
++        for (uint8_t iPtr = 0; iPtr < command.parameters.size; iPtr++)
++          newCommand->Parameters->PushBack(command.parameters[iPtr]);
++        iReturn = m_callbacks->ReceiveCommand(newCommand);
++      }
++      return iReturn;
++    }
++
++    int CecConfigManaged(const CEC::libcec_configuration &config)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++      {
++        LibCECConfiguration ^netConfig = gcnew LibCECConfiguration();
++        netConfig->Update(config);
++        iReturn = m_callbacks->ConfigurationChanged(netConfig);
++      }
++      return iReturn;
++    }
++
++    int CecAlertManaged(const CEC::libcec_alert alert, const CEC::libcec_parameter &data)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++      {
++        CecParameterType newType = (CecParameterType)data.paramType;
++        if (newType == CecParameterType::ParameterTypeString)
++        {
++          System::String ^ newData = gcnew System::String(data.paramData ? (const char *)data.paramData : "", 0, 128);
++          CecParameter ^ newParam = gcnew CecParameter(newType, newData);
++          iReturn = m_callbacks->ReceiveAlert((CecAlert)alert, newParam);
++        }
++      }
++      return iReturn;
++    }
++
++    int CecMenuManaged(const CEC::cec_menu_state newVal)
++    {
++      int iReturn(0);
++      if (m_bHasCallbacks)
++      {
++        iReturn = m_callbacks->ReceiveMenuStateChange((CecMenuState)newVal);
++      }
++      return iReturn;
++    }
++
++    void CecSourceActivatedManaged(const CEC::cec_logical_address logicalAddress, const uint8_t bActivated)
++    {
++      if (m_bHasCallbacks)
++        m_callbacks->SourceActivated((CecLogicalAddress)logicalAddress, bActivated == 1);
++    }
++
++    void DestroyDelegates()
++    {
++      m_bHasCallbacks = false;
++      if (m_bDelegatesCreated)
++      {
++        m_bDelegatesCreated = false;
++        m_logMessageGCHandle.Free();
++        m_keypressGCHandle.Free();
++        m_commandGCHandle.Free();
++        m_alertGCHandle.Free();
++        m_menuGCHandle.Free();
++        m_sourceActivatedGCHandle.Free();
++      }
++    }
++
++    void CreateDelegates()
++    {
++      DestroyDelegates();
++
++      if (!m_bDelegatesCreated)
++      {
++        msclr::interop::marshal_context ^ context = gcnew msclr::interop::marshal_context();
++
++        // create the delegate method for the log message callback
++        m_logMessageDelegate      = gcnew CecLogMessageManagedDelegate(this, &CecCallbackMethods::CecLogMessageManaged);
++        m_logMessageGCHandle      = System::Runtime::InteropServices::GCHandle::Alloc(m_logMessageDelegate);
++        m_logMessageCallback      = static_cast<LOGCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_logMessageDelegate).ToPointer());
++
++        // create the delegate method for the keypress callback
++        m_keypressDelegate        = gcnew CecKeyPressManagedDelegate(this, &CecCallbackMethods::CecKeyPressManaged);
++        m_keypressGCHandle        = System::Runtime::InteropServices::GCHandle::Alloc(m_keypressDelegate);
++        m_keypressCallback        = static_cast<KEYCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_keypressDelegate).ToPointer());
++
++        // create the delegate method for the command callback
++        m_commandDelegate         = gcnew CecCommandManagedDelegate(this, &CecCallbackMethods::CecCommandManaged);
++        m_commandGCHandle         = System::Runtime::InteropServices::GCHandle::Alloc(m_commandDelegate);
++        m_commandCallback         = static_cast<COMMANDCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_commandDelegate).ToPointer());
++
++        // create the delegate method for the configuration change callback
++        m_configDelegate          = gcnew CecConfigManagedDelegate(this, &CecCallbackMethods::CecConfigManaged);
++        m_configGCHandle          = System::Runtime::InteropServices::GCHandle::Alloc(m_configDelegate);
++        m_configCallback          = static_cast<CONFIGCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_configDelegate).ToPointer());
++
++        // create the delegate method for the alert callback
++        m_alertDelegate           = gcnew CecAlertManagedDelegate(this, &CecCallbackMethods::CecAlertManaged);
++        m_alertGCHandle           = System::Runtime::InteropServices::GCHandle::Alloc(m_alertDelegate);
++        m_alertCallback           = static_cast<ALERTCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_alertDelegate).ToPointer());
++
++        // create the delegate method for the menu callback
++        m_menuDelegate            = gcnew CecMenuManagedDelegate(this, &CecCallbackMethods::CecMenuManaged);
++        m_menuGCHandle            = System::Runtime::InteropServices::GCHandle::Alloc(m_menuDelegate);
++        m_menuCallback            = static_cast<MENUCB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_menuDelegate).ToPointer());
++
++        // create the delegate method for the source activated callback
++        m_sourceActivatedDelegate = gcnew CecSourceActivatedManagedDelegate(this, &CecCallbackMethods::CecSourceActivatedManaged);
++        m_sourceActivatedGCHandle = System::Runtime::InteropServices::GCHandle::Alloc(m_sourceActivatedDelegate);
++        m_sourceActivatedCallback = static_cast<ACTICB>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(m_sourceActivatedDelegate).ToPointer());
++
++        delete context;
++
++        UnmanagedCecCallbacks unmanagedCallbacks;
++        unmanagedCallbacks.logCB             = m_logMessageCallback;
++        unmanagedCallbacks.keyCB             = m_keypressCallback;
++        unmanagedCallbacks.commandCB         = m_commandCallback;
++        unmanagedCallbacks.configCB          = m_configCallback;
++        unmanagedCallbacks.alertCB           = m_alertCallback;
++        unmanagedCallbacks.menuCB            = m_menuCallback;
++        unmanagedCallbacks.sourceActivatedCB = m_sourceActivatedCallback;
++
++        PLATFORM::CLockObject lock(g_callbackMutex);
++        g_unmanagedCallbacks.push_back(unmanagedCallbacks);
++        m_iCallbackPtr = g_unmanagedCallbacks.size() - 1;
++        m_bDelegatesCreated = true;
++      }
++    }
++
++    CecLogMessageManagedDelegate ^                    m_logMessageDelegate;
++    static System::Runtime::InteropServices::GCHandle m_logMessageGCHandle;
++    LOGCB                                             m_logMessageCallback;
++
++    CecKeyPressManagedDelegate ^                      m_keypressDelegate;
++    static System::Runtime::InteropServices::GCHandle m_keypressGCHandle;
++    KEYCB                                             m_keypressCallback;
++
++    CecCommandManagedDelegate ^                       m_commandDelegate;
++    static System::Runtime::InteropServices::GCHandle m_commandGCHandle;
++    COMMANDCB                                         m_commandCallback;
++
++    CecConfigManagedDelegate ^                        m_configDelegate;
++    static System::Runtime::InteropServices::GCHandle m_configGCHandle;
++    CONFIGCB                                          m_configCallback;
++
++    CecAlertManagedDelegate ^                         m_alertDelegate;
++    static System::Runtime::InteropServices::GCHandle m_alertGCHandle;
++    ALERTCB                                           m_alertCallback;
++
++    CecMenuManagedDelegate ^                          m_menuDelegate;
++    static System::Runtime::InteropServices::GCHandle m_menuGCHandle;
++    MENUCB                                            m_menuCallback;
++
++    CecSourceActivatedManagedDelegate ^               m_sourceActivatedDelegate;
++    static System::Runtime::InteropServices::GCHandle m_sourceActivatedGCHandle;
++    ACTICB                                            m_sourceActivatedCallback;
++
++    CecCallbackMethods ^ m_callbacks;
++    bool                 m_bHasCallbacks;
++    bool                 m_bDelegatesCreated;
++    size_t               m_iCallbackPtr;
++  };
++}
+diff --git a/src/LibCecSharp/CecSharpTypes.h.rej b/src/LibCecSharp/CecSharpTypes.h.rej
+new file mode 100644
+index 0000000..88972ea
+--- /dev/null
++++ b/src/LibCecSharp/CecSharpTypes.h.rej
+@@ -0,0 +1,11 @@
++--- src/LibCecSharp/CecSharpTypes.h
+++++ src/LibCecSharp/CecSharpTypes.h
++@@ -31,7 +31,7 @@
++ *     http://www.pulse-eight.net/
++ */
++ 
++-#include "platform/threads/mutex.h"
+++#include <p8-platform/threads/mutex.h>
++ #include <vcclr.h>
++ #include <msclr/marshal.h>
++ #include "../../include/cec.h"
+diff --git a/src/cec-client/CMakeLists.txt.rej b/src/cec-client/CMakeLists.txt.rej
+new file mode 100644
+index 0000000..9b1e60e
+--- /dev/null
++++ b/src/cec-client/CMakeLists.txt.rej
+@@ -0,0 +1,29 @@
++--- src/cec-client/CMakeLists.txt
+++++ src/cec-client/CMakeLists.txt
++@@ -18,7 +18,7 @@
++   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++ endif()
++ 
++-find_package(platform REQUIRED)
+++find_package(p8-platform REQUIRED)
++ find_package(Threads REQUIRED)
++ 
++ set(cecclient_SOURCES cec-client.cpp)
++@@ -31,7 +31,7 @@
++ 
++ add_executable(cec-client ${cecclient_SOURCES})
++ set_target_properties(cec-client PROPERTIES VERSION ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH})
++-target_link_libraries(cec-client ${platform_LIBRARIES})
+++target_link_libraries(cec-client ${p8-platform_LIBRARIES})
++ target_link_libraries(cec-client ${CMAKE_THREAD_LIBS_INIT})
++ 
++ if (NOT WIN32)
++@@ -63,7 +63,7 @@
++   endif()
++ endif()
++ 
++-include_directories(${platform_INCLUDE_DIRS}
+++include_directories(${p8-platform_INCLUDE_DIRS}
++                     ${PROJECT_SOURCE_DIR}
++                     ${PROJECT_SOURCE_DIR}/../../include)
++ 
+diff --git a/src/cec-client/cec-client.cpp b/src/cec-client/cec-client.cpp
+index 4814149..5bbaed2 100644
+--- a/src/cec-client/cec-client.cpp
++++ b/src/cec-client/cec-client.cpp
+@@ -50,7 +50,7 @@
+ #endif
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #include "cecloader.h"
+ 
+@@ -73,7 +73,7 @@ bool                 g_cursesEnable(false);
+ CCursesControl        g_cursesControl("1", "0");
+ #endif
+ 
+-class CReconnect : public PLATFORM::CThread
++class CReconnect : public P8PLATFORM::CThread
+ {
+ public:
+   static CReconnect& Get(void)
+diff --git a/src/cec-client/cec-client.cpp.rej b/src/cec-client/cec-client.cpp.rej
+new file mode 100644
+index 0000000..b1b6e5d
+--- /dev/null
++++ b/src/cec-client/cec-client.cpp.rej
+@@ -0,0 +1,15 @@
++--- src/cec-client/cec-client.cpp
+++++ src/cec-client/cec-client.cpp
++@@ -42,9 +42,9 @@
++ #include <sstream>
++ #include <signal.h>
++ #include <stdlib.h>
++-#include "platform/os.h"
++-#include "platform/util/StringUtils.h"
++-#include "platform/threads/threads.h"
+++#include <p8-platform/os.h>
+++#include <p8-platform/util/StringUtils.h>
+++#include <p8-platform/threads/threads.h>
++ #if defined(HAVE_CURSES_API)
++   #include "curses/CursesControl.h"
++ #endif
+diff --git a/src/cec-client/curses/CursesControl.cpp.rej b/src/cec-client/curses/CursesControl.cpp.rej
+new file mode 100644
+index 0000000..696c3fe
+--- /dev/null
++++ b/src/cec-client/curses/CursesControl.cpp.rej
+@@ -0,0 +1,11 @@
++--- src/cec-client/curses/CursesControl.cpp
+++++ src/cec-client/curses/CursesControl.cpp
++@@ -32,7 +32,7 @@
++  */
++ 
++ #include "CursesControl.h"
++-#include "platform/util/StringUtils.h"
+++#include <p8-platform/util/StringUtils.h>
++ #include <curses.h>
++ 
++ void CCursesControl::Init()
+diff --git a/src/cec-client/env.h.in.rej b/src/cec-client/env.h.in.rej
+new file mode 100644
+index 0000000..55a340d
+--- /dev/null
++++ b/src/cec-client/env.h.in.rej
+@@ -0,0 +1,11 @@
++--- src/cec-client/env.h.in
+++++ src/cec-client/env.h.in
++@@ -34,7 +34,7 @@
++  */
++ 
++ #include "cectypes.h"
++-#include "platform/os.h"
+++#include <p8-platform/os.h>
++ 
++ #ifdef UNUSED
++ #elif defined(__GNUC__)
+diff --git a/src/cecc-client/CMakeLists.txt.rej b/src/cecc-client/CMakeLists.txt.rej
+new file mode 100644
+index 0000000..328d82f
+--- /dev/null
++++ b/src/cecc-client/CMakeLists.txt.rej
+@@ -0,0 +1,28 @@
++--- src/cecc-client/CMakeLists.txt
+++++ src/cecc-client/CMakeLists.txt
++@@ -12,14 +12,14 @@
++ include(CheckLibraryExists)
++ include(CheckIncludeFiles)
++ 
++-find_package(platform REQUIRED)
+++find_package(p8-platform REQUIRED)
++ find_package(Threads REQUIRED)
++ 
++ set(ceccclient_SOURCES cecc-client.c)
++ 
++ add_executable(cecc-client ${ceccclient_SOURCES})
++ set_target_properties(cecc-client PROPERTIES VERSION ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH})
++-target_link_libraries(cecc-client ${platform_LIBRARIES})
+++target_link_libraries(cecc-client ${p8-platform_LIBRARIES})
++ target_link_libraries(cecc-client ${CMAKE_THREAD_LIBS_INIT})
++ 
++ if (NOT WIN32)
++@@ -40,7 +40,7 @@
++   endif()
++ endif()
++ 
++-include_directories(${platform_INCLUDE_DIRS}
+++include_directories(${p8-platform_INCLUDE_DIRS}
++                     ${PROJECT_SOURCE_DIR}
++                     ${PROJECT_SOURCE_DIR}/../../include)
++ 
+diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
+index a0c93c2..aadd79d 100644
+--- a/src/libcec/CECClient.cpp
++++ b/src/libcec/CECClient.cpp
+@@ -44,7 +44,7 @@
+ #include <stdio.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_processor->GetLib()
+ #define ToString(x) CCECTypeUtils::ToString(x)
+diff --git a/src/libcec/CECClient.h b/src/libcec/CECClient.h
+index 3b86ff3..5b9cfce 100644
+--- a/src/libcec/CECClient.h
++++ b/src/libcec/CECClient.h
+@@ -121,7 +121,7 @@ namespace CEC
+ 
+     int Result(uint32_t iTimeout)
+     {
+-      PLATFORM::CLockObject lock(m_mutex);
++      P8PLATFORM::CLockObject lock(m_mutex);
+ 
+       bool bReturn = m_bSucceeded ? true : m_condition.Wait(m_mutex, m_bSucceeded, iTimeout);
+       if (bReturn)
+@@ -131,7 +131,7 @@ namespace CEC
+ 
+     void Report(int result)
+     {
+-      PLATFORM::CLockObject lock(m_mutex);
++      P8PLATFORM::CLockObject lock(m_mutex);
+ 
+       m_result = result;
+       m_bSucceeded = true;
+@@ -148,23 +148,23 @@ namespace CEC
+       CEC_CB_SOURCE_ACTIVATED,
+     } m_type;
+ 
+-    cec_command          m_command;
+-    cec_keypress         m_key;
+-    cec_log_message      m_message;
+-    libcec_alert         m_alertType;
+-    libcec_parameter     m_alertParam;
+-    libcec_configuration m_config;
+-    cec_menu_state       m_menuState;
+-    bool                 m_bActivated;
+-    cec_logical_address  m_logicalAddress;
+-    bool                 m_keepResult;
+-    int                  m_result;
+-    PLATFORM::CCondition<bool> m_condition;
+-    PLATFORM::CMutex     m_mutex;
+-    bool                 m_bSucceeded;
++    cec_command                  m_command;
++    cec_keypress                 m_key;
++    cec_log_message              m_message;
++    libcec_alert                 m_alertType;
++    libcec_parameter             m_alertParam;
++    libcec_configuration         m_config;
++    cec_menu_state               m_menuState;
++    bool                         m_bActivated;
++    cec_logical_address          m_logicalAddress;
++    bool                         m_keepResult;
++    int                          m_result;
++    P8PLATFORM::CCondition<bool> m_condition;
++    P8PLATFORM::CMutex           m_mutex;
++    bool                         m_bSucceeded;
+   };
+ 
+-  class CCECClient : private PLATFORM::CThread
++  class CCECClient : private P8PLATFORM::CThread
+   {
+     friend class CCECProcessor;
+ 
+@@ -436,20 +436,20 @@ namespace CEC
+ 
+     uint32_t DoubleTapTimeoutMS(void);
+ 
+-    CCECProcessor *       m_processor;                         /**< a pointer to the processor */
+-    libcec_configuration  m_configuration;                     /**< the configuration of this client */
+-    bool                  m_bInitialised;                      /**< true when initialised, false otherwise */
+-    bool                  m_bRegistered;                       /**< true when registered in the processor, false otherwise */
+-    PLATFORM::CMutex      m_mutex;                             /**< mutex for changes to this instance */
+-    PLATFORM::CMutex      m_cbMutex;                           /**< mutex that is held when doing anything with callbacks */
+-    cec_user_control_code m_iCurrentButton;                    /**< the control code of the button that's currently held down (if any) */
+-    int64_t               m_initialButtontime;                 /**< the timestamp when the button was initially pressed (in seconds since epoch), or 0 if none was pressed. */
+-    int64_t               m_updateButtontime;                  /**< the timestamp when the button was updated (in seconds since epoch), or 0 if none was pressed. */
+-    int64_t               m_repeatButtontime;                  /**< the timestamp when the button will next repeat (in seconds since epoch), or 0 if repeat is disabled. */
+-    int64_t               m_releaseButtontime;                 /**< the timestamp when the button will be released (in seconds since epoch), or 0 if none was pressed. */
+-    int32_t               m_pressedButtoncount;                /**< the number of times a button released message has been seen for this press. */
+-    int32_t               m_releasedButtoncount;               /**< the number of times a button pressed message has been seen for this press. */
+-    int64_t               m_iPreventForwardingPowerOffCommand; /**< prevent forwarding standby commands until this time */
+-    PLATFORM::SyncedBuffer<CCallbackWrap*> m_callbackCalls;
++    CCECProcessor *                          m_processor;                         /**< a pointer to the processor */
++    libcec_configuration                     m_configuration;                     /**< the configuration of this client */
++    bool                                     m_bInitialised;                      /**< true when initialised, false otherwise */
++    bool                                     m_bRegistered;                       /**< true when registered in the processor, false otherwise */
++    P8PLATFORM::CMutex                       m_mutex;                             /**< mutex for changes to this instance */
++    P8PLATFORM::CMutex                       m_cbMutex;                           /**< mutex that is held when doing anything with callbacks */
++    cec_user_control_code                    m_iCurrentButton;                    /**< the control code of the button that's currently held down (if any) */
++    int64_t                                  m_initialButtontime;                 /**< the timestamp when the button was initially pressed (in seconds since epoch), or 0 if none was pressed. */
++    int64_t                                  m_updateButtontime;                  /**< the timestamp when the button was updated (in seconds since epoch), or 0 if none was pressed. */
++    int64_t                                  m_repeatButtontime;                  /**< the timestamp when the button will next repeat (in seconds since epoch), or 0 if repeat is disabled. */
++    int64_t                                  m_releaseButtontime;                 /**< the timestamp when the button will be released (in seconds since epoch), or 0 if none was pressed. */
++    int32_t                                  m_pressedButtoncount;                /**< the number of times a button released message has been seen for this press. */
++    int32_t                                  m_releasedButtoncount;               /**< the number of times a button pressed message has been seen for this press. */
++    int64_t                                  m_iPreventForwardingPowerOffCommand; /**< prevent forwarding standby commands until this time */
++    P8PLATFORM::SyncedBuffer<CCallbackWrap*> m_callbackCalls;
+   };
+ }
+diff --git a/src/libcec/CECInputBuffer.h b/src/libcec/CECInputBuffer.h
+index e38ab80..89251f7 100644
+--- a/src/libcec/CECInputBuffer.h
++++ b/src/libcec/CECInputBuffer.h
+@@ -51,7 +51,7 @@ namespace CEC
+ 
+     void Broadcast(void)
+     {
+-      PLATFORM::CLockObject lock(m_mutex);
++      P8PLATFORM::CLockObject lock(m_mutex);
+       m_bHasData = true;
+       m_condition.Broadcast();
+     }
+@@ -59,7 +59,7 @@ namespace CEC
+     bool Push(const cec_command &command)
+     {
+       bool bReturn(false);
+-      PLATFORM::CLockObject lock(m_mutex);
++      P8PLATFORM::CLockObject lock(m_mutex);
+       if (command.initiator == CECDEVICE_TV)
+         bReturn = m_tvInBuffer.Push(command);
+       else
+@@ -75,7 +75,7 @@ namespace CEC
+     bool Pop(cec_command &command, uint16_t iTimeout)
+     {
+       bool bReturn(false);
+-      PLATFORM::CLockObject lock(m_mutex);
++      P8PLATFORM::CLockObject lock(m_mutex);
+       if (m_tvInBuffer.IsEmpty() && m_inBuffer.IsEmpty() &&
+           !m_condition.Wait(m_mutex, m_bHasData, iTimeout))
+         return bReturn;
+@@ -90,10 +90,10 @@ namespace CEC
+     }
+ 
+   private:
+-    PLATFORM::CMutex                    m_mutex;
+-    PLATFORM::CCondition<volatile bool> m_condition;
+-    volatile bool                       m_bHasData;
+-    PLATFORM::SyncedBuffer<cec_command> m_tvInBuffer;
+-    PLATFORM::SyncedBuffer<cec_command> m_inBuffer;
++    P8PLATFORM::CMutex                    m_mutex;
++    P8PLATFORM::CCondition<volatile bool> m_condition;
++    volatile bool                         m_bHasData;
++    P8PLATFORM::SyncedBuffer<cec_command> m_tvInBuffer;
++    P8PLATFORM::SyncedBuffer<cec_command> m_inBuffer;
+   };
+ };
+diff --git a/src/libcec/CECProcessor.cpp b/src/libcec/CECProcessor.cpp
+index b5c607e..39d699b 100644
+--- a/src/libcec/CECProcessor.cpp
++++ b/src/libcec/CECProcessor.cpp
+@@ -50,7 +50,7 @@
+ #include <stdio.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define ACTIVE_SOURCE_CHECK_INTERVAL   500
+ #define TV_PRESENT_CHECK_INTERVAL      30000
+@@ -67,7 +67,7 @@ void* CCECStandbyProtection::Process(void)
+   int64_t next;
+   while (!IsStopped())
+   {
+-    PLATFORM::CEvent::Sleep(1000);
++    P8PLATFORM::CEvent::Sleep(1000);
+ 
+     next = GetTimeMs();
+ 
+diff --git a/src/libcec/CECProcessor.h b/src/libcec/CECProcessor.h
+index 5ddd84b..08917b9 100644
+--- a/src/libcec/CECProcessor.h
++++ b/src/libcec/CECProcessor.h
+@@ -65,7 +65,7 @@ namespace CEC
+     cec_device_type to;
+   } device_type_change_t;
+ 
+-  class CCECAllocateLogicalAddress : public PLATFORM::CThread
++  class CCECAllocateLogicalAddress : public P8PLATFORM::CThread
+   {
+   public:
+     CCECAllocateLogicalAddress(CCECProcessor* processor, CECClientPtr client);
+@@ -76,7 +76,7 @@ namespace CEC
+     CECClientPtr   m_client;
+   };
+ 
+-  class CCECProcessor : public PLATFORM::CThread, public IAdapterCommunicationCallback
++  class CCECProcessor : public P8PLATFORM::CThread, public IAdapterCommunicationCallback
+   {
+     public:
+       CCECProcessor(CLibCEC *libcec);
+@@ -180,7 +180,7 @@ namespace CEC
+       void ResetMembers(void);
+ 
+       bool                                        m_bInitialised;
+-      PLATFORM::CMutex                            m_mutex;
++      P8PLATFORM::CMutex                          m_mutex;
+       IAdapterCommunication *                     m_communication;
+       CLibCEC*                                    m_libcec;
+       uint8_t                                     m_iStandardLineTimeout;
+@@ -196,7 +196,7 @@ namespace CEC
+       std::vector<device_type_change_t>           m_deviceTypeChanges;
+   };
+ 
+-  class CCECStandbyProtection : public PLATFORM::CThread
++  class CCECStandbyProtection : public P8PLATFORM::CThread
+   {
+   public:
+     CCECStandbyProtection(CCECProcessor* processor);
+diff --git a/src/libcec/CMakeLists.txt.orig b/src/libcec/CMakeLists.txt.orig
+new file mode 100644
+index 0000000..9696264
+--- /dev/null
++++ b/src/libcec/CMakeLists.txt.orig
+@@ -0,0 +1,186 @@
++project(cec)
++
++cmake_minimum_required(VERSION 2.8.9)
++
++set(cec_NAME cec)
++set(cec_DESCRIPTION "libCEC")
++
++enable_language(CXX)
++
++include(CheckCXXSourceCompiles)
++include(CheckLibraryExists)
++include(CheckIncludeFiles)
++include(CheckCXXCompilerFlag)
++include(../../cmake/UseMultiArch.cmake)
++
++check_cxx_compiler_flag("-std=c++11" SUPPORTS_CXX11)
++if (SUPPORTS_CXX11)
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++endif()
++
++find_package(p8-platform REQUIRED)
++if (p8-platform_VERSION VERSION_LESS 2.0)
++  message(FATAL_ERROR "p8-platform 2.0+ is required")
++endif()
++
++find_package(Threads REQUIRED)
++
++include_directories(${platform_INCLUDE_DIRS}
++                    ${PROJECT_SOURCE_DIR}
++                    ${PROJECT_SOURCE_DIR}/../../include)
++
++set(CMAKE_POSITION_INDEPENDENT_CODE on)
++
++# main libCEC files
++set(CEC_SOURCES CECClient.cpp
++                CECProcessor.cpp
++                LibCEC.cpp
++                LibCECC.cpp)
++
++# /adapter
++set(CEC_SOURCES_ADAPTER adapter/AdapterFactory.cpp)
++
++# /adapter/Pulse-Eight
++set(CEC_SOURCES_ADAPTER_P8 adapter/Pulse-Eight/USBCECAdapterMessage.cpp
++                           adapter/Pulse-Eight/USBCECAdapterCommands.cpp
++                           adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
++                           adapter/Pulse-Eight/USBCECAdapterMessageQueue.cpp
++                           adapter/Pulse-Eight/USBCECAdapterDetection.cpp)
++
++# /devices
++set(CEC_SOURCES_DEVICES devices/CECAudioSystem.cpp
++                        devices/CECBusDevice.cpp
++                        devices/CECDeviceMap.cpp
++                        devices/CECPlaybackDevice.cpp
++                        devices/CECRecordingDevice.cpp
++                        devices/CECTuner.cpp
++                        devices/CECTV.cpp)
++
++# /implementations
++set(CEC_SOURCES_IMPLEMENTATIONS implementations/ANCommandHandler.cpp
++                                implementations/CECCommandHandler.cpp
++                                implementations/SLCommandHandler.cpp
++                                implementations/VLCommandHandler.cpp
++                                implementations/RLCommandHandler.cpp
++                                implementations/PHCommandHandler.cpp
++                                implementations/RHCommandHandler.cpp
++                                implementations/AQCommandHandler.cpp)
++
++# /platform/*
++set(CEC_SOURCES_PLATFORM platform/adl/adl-edid.cpp
++                         platform/nvidia/nv-edid.cpp)
++
++# headers
++set(CEC_EXT_HEADERS ${PROJECT_SOURCE_DIR}/../../include/cec.h
++                    ${PROJECT_SOURCE_DIR}/../../include/cecc.h
++                    ${PROJECT_SOURCE_DIR}/../../include/cecloader.h
++                    ${PROJECT_SOURCE_DIR}/../../include/cectypes.h
++                    ${PROJECT_SOURCE_DIR}/../../include/version.h)
++source_group("Header Files (external)" FILES ${CEC_EXT_HEADERS})
++set(CEC_HEADERS devices/CECRecordingDevice.h
++                devices/CECTuner.h
++                devices/CECAudioSystem.h
++                devices/CECTV.h
++                devices/CECBusDevice.h
++                devices/CECDeviceMap.h
++                devices/CECPlaybackDevice.h
++                adapter/Exynos/ExynosCEC.h
++                adapter/Exynos/ExynosCECAdapterDetection.h
++                adapter/Exynos/ExynosCECAdapterCommunication.h
++                adapter/Pulse-Eight/USBCECAdapterMessageQueue.h
++                adapter/Pulse-Eight/USBCECAdapterCommunication.h
++                adapter/Pulse-Eight/USBCECAdapterCommands.h
++                adapter/Pulse-Eight/USBCECAdapterDetection.h
++                adapter/Pulse-Eight/USBCECAdapterMessage.h
++                adapter/TDA995x/TDA995xCECAdapterDetection.h
++                adapter/TDA995x/AdapterMessageQueue.h
++                adapter/TDA995x/TDA995xCECAdapterCommunication.h
++                adapter/AdapterFactory.h
++                adapter/AdapterCommunication.h
++                adapter/RPi/RPiCECAdapterMessageQueue.h
++                adapter/RPi/RPiCECAdapterCommunication.h
++                adapter/RPi/RPiCECAdapterDetection.h
++                CECInputBuffer.h
++                platform/util/baudrate.h
++                platform/util/edid.h
++                platform/nvidia/nv-edid.h
++                platform/adl/adl_structures.h
++                platform/adl/adl_defines.h
++                platform/adl/adl-edid.h
++                platform/adl/adl_sdk.h
++                platform/drm/drm-edid.cpp
++                platform/sockets/serialport.h
++                platform/X11/randr-edid.h
++                CECClient.h
++                LibCEC.h
++                CECTypeUtils.h
++                implementations/SLCommandHandler.h
++                implementations/CECCommandHandler.h
++                implementations/VLCommandHandler.h
++                implementations/RLCommandHandler.h
++                implementations/ANCommandHandler.h
++                implementations/RHCommandHandler.h
++                implementations/PHCommandHandler.h
++                implementations/AQCommandHandler.h
++                CECProcessor.h)
++source_group("Header Files" FILES ${CEC_HEADERS})
++
++# platform and device specific
++include(cmake/SetBuildInfo.cmake)
++include(cmake/CheckPlatformSupport.cmake)
++
++## create project groups
++source_group("Source Files" FILES ${CEC_SOURCES})
++source_group("Source Files\\adapter" FILES ${CEC_SOURCES_ADAPTER})
++source_group("Source Files\\adapter\\Pulse-Eight" FILES ${CEC_SOURCES_ADAPTER_P8})
++source_group("Source Files\\devices" FILES ${CEC_SOURCES_DEVICES})
++source_group("Source Files\\implementations" FILES ${CEC_SOURCES_IMPLEMENTATIONS})
++source_group("Source Files\\platform" FILES ${CEC_SOURCES_PLATFORM})
++
++list(APPEND CEC_SOURCES ${CEC_HEADERS}
++                        ${CEC_EXT_HEADERS}
++                        ${CEC_SOURCES_ADAPTER}
++                        ${CEC_SOURCES_ADAPTER_P8}
++                        ${CEC_SOURCES_DEVICES}
++                        ${CEC_SOURCES_IMPLEMENTATIONS}
++                        ${CEC_SOURCES_PLATFORM})
++
++# write env.h
++set(LIBCEC_LIBREQUIRES "platform ${PLATFORM_LIBREQUIRES}")
++configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.h.in ${CMAKE_CURRENT_SOURCE_DIR}/env.h)
++if (WIN32)
++  # write libcec.rc
++  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libcec.rc.in ${CMAKE_CURRENT_SOURCE_DIR}/libcec.rc)
++  add_definitions(-DDLL_EXPORT)
++else()
++  # write pkgconfig
++  include(../../cmake/PkgConfigHandler.cmake)
++  configure_pc_file(cec ${CMAKE_CURRENT_SOURCE_DIR}/libcec.pc.in
++                        ${CMAKE_CURRENT_SOURCE_DIR}/libcec.pc
++                        ${CMAKE_INSTALL_PREFIX}
++                        ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
++                        ${CMAKE_INSTALL_PREFIX}/include)
++
++  install(FILES         ${CMAKE_CURRENT_SOURCE_DIR}/libcec.pc
++          DESTINATION   ${CMAKE_INSTALL_LIBDIR_NOARCH}/pkgconfig)
++endif()
++
++# install headers
++install(FILES ${PROJECT_SOURCE_DIR}/../../include/cec.h
++              ${PROJECT_SOURCE_DIR}/../../include/cecc.h
++              ${PROJECT_SOURCE_DIR}/../../include/cecloader.h
++              ${PROJECT_SOURCE_DIR}/../../include/cectypes.h
++              ${PROJECT_SOURCE_DIR}/../../include/version.h
++        DESTINATION include/libcec)
++
++# libCEC target
++add_library(cec SHARED ${CEC_SOURCES})
++install(TARGETS cec
++        DESTINATION ${LIB_DESTINATION})
++set_target_properties(cec PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
++                                     SOVERSION ${LIBCEC_VERSION_MAJOR}.0)
++target_link_libraries(cec ${platform_LIBRARIES})
++target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
++
++include(cmake/LinkPlatformSupport.cmake)
++include(cmake/DisplayPlatformSupport.cmake)
+diff --git a/src/libcec/CMakeLists.txt.rej b/src/libcec/CMakeLists.txt.rej
+new file mode 100644
+index 0000000..3492757
+--- /dev/null
++++ b/src/libcec/CMakeLists.txt.rej
+@@ -0,0 +1,11 @@
++--- src/libcec/CMakeLists.txt
+++++ src/libcec/CMakeLists.txt
++@@ -178,7 +177,7 @@
++         DESTINATION ${LIB_DESTINATION})
++ set_target_properties(cec PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
++                                      SOVERSION ${LIBCEC_VERSION_MAJOR})
++-target_link_libraries(cec ${platform_LIBRARIES})
+++target_link_libraries(cec ${p8-platform_LIBRARIES})
++ target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
++ 
++ include(cmake/LinkPlatformSupport.cmake)
+diff --git a/src/libcec/LibCEC.cpp b/src/libcec/LibCEC.cpp
+index 528f3fe..5f6a136 100644
+--- a/src/libcec/LibCEC.cpp
++++ b/src/libcec/LibCEC.cpp
+@@ -49,7 +49,7 @@
+ #include "CECClient.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CLibCEC::CLibCEC(void) :
+     m_iStartTime(GetTimeMs()),
+diff --git a/src/libcec/LibCEC.h b/src/libcec/LibCEC.h
+index d1f6507..cc29c82 100644
+--- a/src/libcec/LibCEC.h
++++ b/src/libcec/LibCEC.h
+@@ -149,7 +149,7 @@ namespace CEC
+ 
+     protected:
+       int64_t                   m_iStartTime;
+-      PLATFORM::CMutex          m_mutex;
++      P8PLATFORM::CMutex        m_mutex;
+       CECClientPtr              m_client;
+       std::vector<CECClientPtr> m_clients;
+   };
+diff --git a/src/libcec/SwigHelper.h b/src/libcec/SwigHelper.h
+index 69101a9..43f09b7 100644
+--- a/src/libcec/SwigHelper.h
++++ b/src/libcec/SwigHelper.h
+@@ -35,12 +35,6 @@
+ #define SWIG_FILE_WITH_INIT
+ #define LIBCEC_SWIG_EXPORTS
+ 
+-/** XXX python does a #define PLATFORM, which causes a collision with our PLATFORM namespace */
+-#ifdef PLATFORM
+-#define _platform_tmp PLATFORM
+-#undef PLATFORM
+-#endif
+-
+ #include "cectypes.h"
+ #include "cec.h"
+ #include "CECTypeUtils.h"
+@@ -51,12 +45,6 @@
+ #include <assert.h>
+ #endif
+ 
+-/** XXX python does a #define PLATFORM, which causes a collision with our PLATFORM namespace */
+-#ifdef _platform_tmp
+-#define PLATFORM _platform_tmp
+-#undef _platform_tmp
+-#endif
+-
+ namespace CEC
+ {
+   enum libcecSwigCallback {
+diff --git a/src/libcec/SwigHelper.h.orig b/src/libcec/SwigHelper.h.orig
+new file mode 100644
+index 0000000..28a1b75
+--- /dev/null
++++ b/src/libcec/SwigHelper.h.orig
+@@ -0,0 +1,237 @@
++#pragma once
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ *
++ * This program is dual-licensed; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301  USA
++ *
++ *
++ * Alternatively, you can license this library under a commercial license,
++ * please contact Pulse-Eight Licensing for more information.
++ *
++ * For more information contact:
++ * Pulse-Eight Licensing       <license@pulse-eight.com>
++ *     http://www.pulse-eight.com/
++ *     http://www.pulse-eight.net/
++ */
++
++#define SWIG_FILE_WITH_INIT
++#define LIBCEC_SWIG_EXPORTS
++
++/** XXX python does a #define PLATFORM, which causes a collision with our PLATFORM namespace */
++#ifdef PLATFORM
++#define _platform_tmp PLATFORM
++#undef PLATFORM
++#endif
++
++#include "cectypes.h"
++#include "cec.h"
++#include "CECTypeUtils.h"
++#include "platform/threads/mutex.h"
++
++/** XXX python does a #define PLATFORM, which causes a collision with our PLATFORM namespace */
++#ifdef _platform_tmp
++#define PLATFORM _platform_tmp
++#undef _platform_tmp
++#endif
++
++namespace CEC
++{
++  enum libcecSwigCallback {
++    PYTHON_CB_LOG_MESSAGE,
++    PYTHON_CB_KEY_PRESS,
++    PYTHON_CB_COMMAND,
++    PYTHON_CB_ALERT,
++    PYTHON_CB_MENU_STATE,
++    PYTHON_CB_SOURCE_ACTIVATED,
++    NB_PYTHON_CB,
++  };
++
++  class CCecPythonCallbacks
++  {
++  public:
++    /**
++     * Create a new python callbacks instance, and set callbacks in the configuration
++     * @param config    the configuration to set the callbacks in
++     */
++    CCecPythonCallbacks(libcec_configuration* config) :
++      m_configuration(config)
++    {
++      assert(m_configuration);
++
++      config->callbacks = new ICECCallbacks;
++      if (!config->callbacks)
++        throw std::bad_alloc();
++
++      for (size_t ptr = 0; ptr < NB_PYTHON_CB; ++ptr)
++        m_callbacks[ptr] = NULL;
++
++      m_configuration->callbacks->CBCecLogMessage       = CBCecLogMessage;
++      m_configuration->callbacks->CBCecKeyPress         = CBCecKeyPress;
++      m_configuration->callbacks->CBCecCommand          = CBCecCommand;
++      m_configuration->callbacks->CBCecMenuStateChanged = CBCecMenuStateChanged;
++      m_configuration->callbacks->CBCecSourceActivated  = CBCecSourceActivated;
++    }
++
++    /**
++     * Unreferences all python callbacks, and deletes the callbacks
++     */
++    virtual ~CCecPythonCallbacks(void)
++    {
++      for (size_t ptr = 0; ptr < NB_PYTHON_CB; ++ptr)
++        if (m_callbacks[ptr])
++          Py_XDECREF(m_callbacks[ptr]);
++      delete m_configuration->callbacks;
++      m_configuration->callbacks = NULL;
++    }
++
++    /**
++     * Call a python callback (if set)
++     * @param callback  the callback to call
++     * @param arglist   the arguments to pass to the callback
++     * @return 1 when processed, 0 otherwise
++     */
++    int CallPythonCallback(enum libcecSwigCallback callback, PyObject* arglist)
++    {
++      assert(callback < NB_PYTHON_CB);
++      assert(arglist);
++
++      if (!m_callbacks[callback])
++        return 0;
++
++      PyObject* result = NULL;
++      if (m_callbacks[callback] && arglist)
++      {
++        /** call the callback */
++        result = PyEval_CallObject(m_callbacks[callback], arglist);
++
++        /** unref the argument and result */
++        Py_DECREF(arglist);
++        if (result)
++          Py_XDECREF(result);
++      }
++
++      return 1;
++    }
++
++    /**
++     * Set a python callable as callback
++     * @param cb      the callback to set
++     * @param pyfunc  the python callable to call
++     */
++    void SetCallback(size_t cb, PyObject* pyfunc)
++    {
++      assert(cb < NB_PYTHON_CB);
++      assert(PyCallable_Check(pyfunc));
++
++      /** unref previous callback (if any) */
++      if (m_callbacks[cb])
++        Py_XDECREF(m_callbacks[cb]);
++
++      /** set the new callback */
++      m_callbacks[cb] = pyfunc;
++      Py_XINCREF(pyfunc);
++    }
++
++  private:
++    static inline int CallPythonCallback(void* param, enum libcecSwigCallback callback, PyObject* arglist)
++    {
++      CCecPythonCallbacks* pCallbacks = static_cast<CCecPythonCallbacks*>(param);
++      return pCallbacks ?
++        pCallbacks->CallPythonCallback(callback, arglist) :
++        0;
++    }
++
++    static int CBCecLogMessage(void* param, const CEC::cec_log_message message)
++    {
++      PyGILState_STATE gstate = PyGILState_Ensure();
++      PyObject* arglist = Py_BuildValue("(I,I,s)", message.level, (long)message.time, message.message);
++      int retval = CallPythonCallback(param, PYTHON_CB_LOG_MESSAGE, arglist);
++      PyGILState_Release(gstate);
++      return retval;
++    }
++
++    static int CBCecKeyPress(void* param, const CEC::cec_keypress key)
++    {
++      PyGILState_STATE gstate = PyGILState_Ensure();
++      int retval = CallPythonCallback(param, PYTHON_CB_KEY_PRESS,
++                                      Py_BuildValue("(I,I)", (long)key.keycode, (long)key.duration));
++      PyGILState_Release(gstate);
++      return retval;
++    }
++
++    static int CBCecCommand(void* param, const CEC::cec_command command)
++    {
++      PyGILState_STATE gstate = PyGILState_Ensure();
++      int retval = CallPythonCallback(param, PYTHON_CB_COMMAND,
++                                      Py_BuildValue("(s)", CEC::CCECTypeUtils::ToString(command).c_str()));
++      PyGILState_Release(gstate);
++      return retval;
++    }
++
++    static int CBCecMenuStateChanged(void* param, const CEC::cec_menu_state state)
++    {
++      PyGILState_STATE gstate = PyGILState_Ensure();
++      int retval = CallPythonCallback(param, PYTHON_CB_MENU_STATE,
++                                      Py_BuildValue("(i)", state));
++      PyGILState_Release(gstate);
++      return retval;
++    }
++
++    static void CBCecSourceActivated(void* param, const CEC::cec_logical_address logicalAddress, const uint8_t activated)
++    {
++      PyGILState_STATE gstate = PyGILState_Ensure();
++      CallPythonCallback(param, PYTHON_CB_SOURCE_ACTIVATED,
++                         Py_BuildValue("(I,i)", logicalAddress, activated ? 1 : 0));
++      PyGILState_Release(gstate);
++    }
++
++    PyObject*             m_callbacks[NB_PYTHON_CB];
++    libcec_configuration* m_configuration;
++  };
++
++  static CCecPythonCallbacks* _GetCallbacks(CEC::libcec_configuration* self)
++  {
++    /** allocate callbacks struct and python callbacks if needed */
++    if (!self->callbackParam)
++      self->callbackParam = new CCecPythonCallbacks(self);
++
++    return static_cast<CCecPythonCallbacks*>(self->callbackParam);
++  }
++}
++
++static void _SetCallback(CEC::libcec_configuration* self, size_t cb, PyObject* pyfunc)
++{
++  assert(self);
++  CEC::CCecPythonCallbacks* pCallbacks = CEC::_GetCallbacks(self);
++  if (pCallbacks)
++    pCallbacks->SetCallback(cb, pyfunc);
++  else
++    printf("ERROR: cannot set callback to %p: out of memory\n", pyfunc);
++}
++
++void _ClearCallbacks(CEC::libcec_configuration* self)
++{
++  CEC::CCecPythonCallbacks* pCallbacks = static_cast<CEC::CCecPythonCallbacks*>(self->callbackParam);
++  if (pCallbacks)
++    delete pCallbacks;
++  self->callbackParam = NULL;
++}
++
+diff --git a/src/libcec/SwigHelper.h.rej b/src/libcec/SwigHelper.h.rej
+new file mode 100644
+index 0000000..0ba8f2d
+--- /dev/null
++++ b/src/libcec/SwigHelper.h.rej
+@@ -0,0 +1,11 @@
++--- src/libcec/SwigHelper.h
+++++ src/libcec/SwigHelper.h
++@@ -44,7 +44,7 @@
++ #include "cectypes.h"
++ #include "cec.h"
++ #include "CECTypeUtils.h"
++-#include "platform/threads/mutex.h"
+++#include <p8-platform/threads/mutex.h>
++ /** XXX only to keep the IDE happy, using the actual Python.h with the correct system version when building */
++ #ifndef Py_PYTHON_H
++ #include <python2.7/Python.h>
+diff --git a/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.cpp b/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.cpp
+index 7a08d1c..285110f 100644
+--- a/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.cpp
+@@ -42,10 +42,10 @@
+ 
+ #include "CECTypeUtils.h"
+ #include "LibCEC.h"
+-#include "platform/util/buffer.h"
++#include <p8-platform/util/buffer.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC m_callback->GetLib()
+ 
+diff --git a/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.h b/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.h
+index b5f8e4e..24276c0 100644
+--- a/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.h
++++ b/src/libcec/adapter/Exynos/ExynosCECAdapterCommunication.h
+@@ -36,14 +36,14 @@
+ 
+ #if defined(HAVE_EXYNOS_API)
+ 
+-#include "platform/threads/mutex.h"
+-#include "platform/threads/threads.h"
++#include <p8-platform/threads/mutex.h>
++#include <p8-platform/threads/threads.h>
+ #include "../AdapterCommunication.h"
+ #include <map>
+ 
+ namespace CEC
+ {
+-  class CExynosCECAdapterCommunication : public IAdapterCommunication, public PLATFORM::CThread
++  class CExynosCECAdapterCommunication : public IAdapterCommunication, public P8PLATFORM::CThread
+   {
+   public:
+     /*!
+@@ -83,7 +83,7 @@ namespace CEC
+     void SetActiveSource(bool UNUSED(bSetTo), bool UNUSED(bClientUnregistered)) {}
+     ///}
+ 
+-    /** @name PLATFORM::CThread implementation */
++    /** @name P8PLATFORM::CThread implementation */
+     ///{
+     void *Process(void);
+     ///}
+@@ -96,7 +96,7 @@ namespace CEC
+     bool                        m_bLogicalAddressChanged;
+     cec_logical_addresses       m_logicalAddresses;
+ 
+-    PLATFORM::CMutex            m_mutex;
++    P8PLATFORM::CMutex          m_mutex;
+     int                         m_fd;
+   };
+ };
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.cpp b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
+index cae20d4..a271f74 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.cpp
+@@ -43,7 +43,7 @@
+ #include <stdio.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_comm->m_callback->GetLib()
+ #define ToString(p) CCECTypeUtils::ToString(p)
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.h b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.h
+index 305e815..60a112a 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.h
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommands.h
+@@ -250,6 +250,6 @@ namespace CEC
+     uint32_t                     m_iBuildDate;             /**< the build date of the firmware */
+     bool                         m_bControlledMode;        /**< current value of the controlled mode feature */
+     p8_cec_adapter_type          m_adapterType;            /**< the type of the adapter that we're connected to */
+-    PLATFORM::CMutex             m_mutex;
++    P8PLATFORM::CMutex           m_mutex;
+   };
+ }
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
+index fa35cd3..1ee208e 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.cpp
+@@ -49,7 +49,7 @@
+ #include "CECProcessor.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define CEC_ADAPTER_PING_TIMEOUT          15000
+ #define CEC_ADAPTER_EEPROM_WRITE_INTERVAL 30000
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.h b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.h
+index 3119be5..63a73a6 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.h
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterCommunication.h
+@@ -37,7 +37,7 @@
+ #include "adapter/AdapterCommunication.h"
+ #include "USBCECAdapterMessage.h"
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class ISocket;
+ }
+@@ -51,7 +51,7 @@ namespace CEC
+   class CCECAdapterMessageQueue;
+   class CCECAdapterMessage;
+ 
+-  class CUSBCECAdapterCommunication : public IAdapterCommunication, public PLATFORM::CThread
++  class CUSBCECAdapterCommunication : public IAdapterCommunication, public P8PLATFORM::CThread
+   {
+     friend class CUSBCECAdapterCommands;
+     friend class CCECAdapterMessageQueue;
+@@ -173,8 +173,8 @@ namespace CEC
+      */
+     void ResetMessageQueue(void);
+ 
+-    PLATFORM::ISocket *                          m_port;                 /**< the com port connection */
+-    PLATFORM::CMutex                             m_mutex;                /**< mutex for changes in this class */
++    P8PLATFORM::ISocket *                        m_port;                 /**< the com port connection */
++    P8PLATFORM::CMutex                           m_mutex;                /**< mutex for changes in this class */
+     uint8_t                                      m_iLineTimeout;         /**< the current line timeout on the CEC line */
+     cec_logical_address                          m_lastPollDestination;  /**< the destination of the last poll message that was received */
+     bool                                         m_bInitialised;         /**< true when the connection is initialised, false otherwise */
+@@ -184,10 +184,10 @@ namespace CEC
+     CUSBCECAdapterCommands *                     m_commands;             /**< commands that can be sent to the adapter */
+     CCECAdapterMessageQueue *                    m_adapterMessageQueue;  /**< the incoming and outgoing message queue */
+     cec_logical_addresses                        m_logicalAddresses;     /**< the logical address list that this instance is using */
+-    PLATFORM::CMutex                             m_waitingMutex;
++    P8PLATFORM::CMutex                           m_waitingMutex;
+   };
+ 
+-  class CAdapterEepromWriteThread : public PLATFORM::CThread
++  class CAdapterEepromWriteThread : public P8PLATFORM::CThread
+   {
+   public:
+     CAdapterEepromWriteThread(CUSBCECAdapterCommunication *com) :
+@@ -203,13 +203,13 @@ namespace CEC
+   private:
+     CUSBCECAdapterCommunication *m_com;
+     bool                         m_bWrite;
+-    PLATFORM::CCondition<bool>   m_condition;
+-    PLATFORM::CMutex             m_mutex;
++    P8PLATFORM::CCondition<bool> m_condition;
++    P8PLATFORM::CMutex           m_mutex;
+     int64_t                      m_iLastEepromWrite;     /**< last time that this instance did an eeprom write */
+     int64_t                      m_iScheduleEepromWrite; /**< in case there were more than 2 changes within 30 seconds, do another write at this time */
+   };
+ 
+-  class CAdapterPingThread : public PLATFORM::CThread
++  class CAdapterPingThread : public P8PLATFORM::CThread
+   {
+   public:
+     CAdapterPingThread(CUSBCECAdapterCommunication *com, uint32_t iTimeout) :
+@@ -219,7 +219,7 @@ namespace CEC
+ 
+     void* Process(void);
+   private:
+-    CUSBCECAdapterCommunication *m_com;
+-    PLATFORM::CTimeout           m_timeout;
++    CUSBCECAdapterCommunication* m_com;
++    P8PLATFORM::CTimeout         m_timeout;
+   };
+ };
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessage.cpp b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessage.cpp
+index 98345f0..c6446ab 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessage.cpp
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessage.cpp
+@@ -37,7 +37,7 @@
+ #include "LibCEC.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CCECAdapterMessage::CCECAdapterMessage(void)
+ {
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.cpp b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.cpp
+index 0afccd7..efa8521 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.cpp
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.cpp
+@@ -40,7 +40,7 @@
+ #include "LibCEC.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define MESSAGE_QUEUE_SIGNAL_WAIT_TIME 1000
+ 
+@@ -286,7 +286,7 @@ bool CCECAdapterMessageQueueEntry::TimedOutOrSucceeded(void) const
+ }
+ 
+ CCECAdapterMessageQueue::CCECAdapterMessageQueue(CUSBCECAdapterCommunication *com) :
+-  PLATFORM::CThread(),
++  P8PLATFORM::CThread(),
+   m_com(com),
+   m_iNextMessage(0)
+ {
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.h b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.h
+index 25586d6..c71deed 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.h
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterMessageQueue.h
+@@ -126,17 +126,17 @@ namespace CEC
+      */
+     bool TimedOutOrSucceeded(void) const;
+ 
+-    CCECAdapterMessageQueue *  m_queue;
+-    CCECAdapterMessage *       m_message;      /**< the message that was sent */
+-    uint8_t                    m_iPacketsLeft; /**< the amount of acks that we're waiting on */
+-    bool                       m_bSucceeded;   /**< true when the command received a response, false otherwise */
+-    bool                       m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
+-    PLATFORM::CCondition<bool> m_condition;    /**< the condition to wait on */
+-    PLATFORM::CMutex           m_mutex;        /**< mutex for changes to this class */
+-    PLATFORM::CTimeout         m_queueTimeout;   /**< ack timeout for fire and forget commands */
++    CCECAdapterMessageQueue *    m_queue;
++    CCECAdapterMessage *         m_message;      /**< the message that was sent */
++    uint8_t                      m_iPacketsLeft; /**< the amount of acks that we're waiting on */
++    bool                         m_bSucceeded;   /**< true when the command received a response, false otherwise */
++    bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
++    P8PLATFORM::CCondition<bool> m_condition;    /**< the condition to wait on */
++    P8PLATFORM::CMutex           m_mutex;        /**< mutex for changes to this class */
++    P8PLATFORM::CTimeout         m_queueTimeout;   /**< ack timeout for fire and forget commands */
+   };
+ 
+-  class CCECAdapterMessageQueue : public PLATFORM::CThread
++  class CCECAdapterMessageQueue : public P8PLATFORM::CThread
+   {
+     friend class CUSBCECAdapterCommunication;
+     friend class CCECAdapterMessageQueueEntry;
+@@ -182,12 +182,12 @@ namespace CEC
+     void CheckTimedOutMessages(void);
+ 
+   private:
+-    CUSBCECAdapterCommunication *                          m_com;                    /**< the communication handler */
+-    PLATFORM::CMutex                                       m_mutex;                  /**< mutex for changes to this class */
+-    std::map<uint64_t, CCECAdapterMessageQueueEntry *>     m_messages;               /**< the outgoing message queue */
+-    PLATFORM::SyncedBuffer<CCECAdapterMessageQueueEntry *> m_writeQueue;             /**< the queue for messages that are to be written */
+-    uint64_t                                               m_iNextMessage;           /**< the index of the next message */
+-    CCECAdapterMessage                                    *m_incomingAdapterMessage; /**< the current incoming message that's being assembled */
+-    cec_command                                            m_currentCECFrame;        /**< the current incoming CEC command that's being assembled */
++    CUSBCECAdapterCommunication *                            m_com;                    /**< the communication handler */
++    P8PLATFORM::CMutex                                       m_mutex;                  /**< mutex for changes to this class */
++    std::map<uint64_t, CCECAdapterMessageQueueEntry *>       m_messages;               /**< the outgoing message queue */
++    P8PLATFORM::SyncedBuffer<CCECAdapterMessageQueueEntry *> m_writeQueue;             /**< the queue for messages that are to be written */
++    uint64_t                                                 m_iNextMessage;           /**< the index of the next message */
++    CCECAdapterMessage                                    *  m_incomingAdapterMessage; /**< the current incoming message that's being assembled */
++    cec_command                                              m_currentCECFrame;        /**< the current incoming CEC command that's being assembled */
+   };
+ }
+diff --git a/src/libcec/adapter/RPi/RPiCECAdapterCommunication.cpp b/src/libcec/adapter/RPi/RPiCECAdapterCommunication.cpp
+index 6f0804d..d7889e5 100644
+--- a/src/libcec/adapter/RPi/RPiCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/RPi/RPiCECAdapterCommunication.cpp
+@@ -45,7 +45,7 @@ extern "C" {
+ #include "RPiCECAdapterMessageQueue.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC m_callback->GetLib()
+ 
+diff --git a/src/libcec/adapter/RPi/RPiCECAdapterCommunication.h b/src/libcec/adapter/RPi/RPiCECAdapterCommunication.h
+index 1e175f6..0cc1288 100644
+--- a/src/libcec/adapter/RPi/RPiCECAdapterCommunication.h
++++ b/src/libcec/adapter/RPi/RPiCECAdapterCommunication.h
+@@ -107,15 +107,15 @@ namespace CEC
+     CRPiCECAdapterMessageQueue *m_queue;
+     cec_logical_address         m_logicalAddress;
+ 
+-    bool                        m_bLogicalAddressChanged;
+-    PLATFORM::CCondition<bool>  m_logicalAddressCondition;
+-    PLATFORM::CMutex            m_mutex;
+-    VCHI_INSTANCE_T             m_vchi_instance;
+-    VCHI_CONNECTION_T *         m_vchi_connection;
+-    cec_logical_address         m_previousLogicalAddress;
+-    bool                        m_bLogicalAddressRegistered;
++    bool                          m_bLogicalAddressChanged;
++    P8PLATFORM::CCondition<bool>  m_logicalAddressCondition;
++    P8PLATFORM::CMutex            m_mutex;
++    VCHI_INSTANCE_T               m_vchi_instance;
++    VCHI_CONNECTION_T *           m_vchi_connection;
++    cec_logical_address           m_previousLogicalAddress;
++    bool                          m_bLogicalAddressRegistered;
+ 
+-    bool                        m_bDisableCallbacks;
++    bool                          m_bDisableCallbacks;
+   };
+ };
+ 
+diff --git a/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.cpp b/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.cpp
+index dde6f4b..08e7d51 100644
+--- a/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.cpp
++++ b/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.cpp
+@@ -49,7 +49,7 @@ extern "C" {
+ }
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC m_com->m_callback->GetLib()
+ 
+diff --git a/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.h b/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.h
+index 3ac1333..3d3148b 100644
+--- a/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.h
++++ b/src/libcec/adapter/RPi/RPiCECAdapterMessageQueue.h
+@@ -84,8 +84,8 @@ namespace CEC
+ 
+     CRPiCECAdapterMessageQueue * m_queue;
+     bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
+-    PLATFORM::CCondition<bool>   m_condition;    /**< the condition to wait on */
+-    PLATFORM::CMutex             m_mutex;        /**< mutex for changes to this class */
++    P8PLATFORM::CCondition<bool> m_condition;    /**< the condition to wait on */
++    P8PLATFORM::CMutex           m_mutex;        /**< mutex for changes to this class */
+     cec_command                  m_command;
+     uint32_t                     m_retval;
+     bool                         m_bSucceeded;
+@@ -123,7 +123,7 @@ namespace CEC
+ 
+   private:
+     CRPiCECAdapterCommunication *                             m_com;                    /**< the communication handler */
+-    PLATFORM::CMutex                                          m_mutex;                  /**< mutex for changes to this class */
++    P8PLATFORM::CMutex                                        m_mutex;                  /**< mutex for changes to this class */
+     std::map<uint64_t, CRPiCECAdapterMessageQueueEntry *>     m_messages;               /**< the outgoing message queue */
+     uint64_t                                                  m_iNextMessage;           /**< the index of the next message */
+   };
+diff --git a/src/libcec/adapter/TDA995x/AdapterMessageQueue.h b/src/libcec/adapter/TDA995x/AdapterMessageQueue.h
+index 52aadea..ea46e65 100644
+--- a/src/libcec/adapter/TDA995x/AdapterMessageQueue.h
++++ b/src/libcec/adapter/TDA995x/AdapterMessageQueue.h
+@@ -37,7 +37,7 @@
+ 
+ namespace CEC
+ {
+-  using namespace PLATFORM;
++  using namespace P8PLATFORM;
+   
+   class CAdapterMessageQueueEntry
+   {
+@@ -126,8 +126,8 @@ namespace CEC
+     
+   private:    
+     bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
+-    PLATFORM::CCondition<bool>   m_condition;    /**< the condition to wait on */
+-    PLATFORM::CMutex             m_mutex;        /**< mutex for changes to this class */
++    P8PLATFORM::CCondition<bool> m_condition;    /**< the condition to wait on */
++    P8PLATFORM::CMutex           m_mutex;        /**< mutex for changes to this class */
+     uint32_t                  	 m_hash;
+     uint32_t                     m_retval;
+     bool                         m_bSucceeded;
+diff --git a/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.cpp b/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.cpp
+index db288c2..01b4a83 100644
+--- a/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.cpp
+@@ -48,7 +48,7 @@ extern "C" {
+ }
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #include "AdapterMessageQueue.h"
+ 
+diff --git a/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.h b/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.h
+index 3aa6320..47dde4b 100644
+--- a/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.h
++++ b/src/libcec/adapter/TDA995x/TDA995xCECAdapterCommunication.h
+@@ -44,7 +44,7 @@
+ #define TDA995X_ADAPTER_VID 0x0471
+ #define TDA995X_ADAPTER_PID 0x1001
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CCDevSocket;
+ };
+@@ -54,7 +54,7 @@ namespace CEC
+ {
+   class CAdapterMessageQueueEntry;
+ 
+-  class CTDA995xCECAdapterCommunication : public IAdapterCommunication, public PLATFORM::CThread
++  class CTDA995xCECAdapterCommunication : public IAdapterCommunication, public P8PLATFORM::CThread
+   {
+   public:
+     /*!
+@@ -94,7 +94,7 @@ namespace CEC
+     void SetActiveSource(bool UNUSED(bSetTo), bool UNUSED(bClientUnregistered)) {}
+     ///}
+ 
+-    /** @name PLATFORM::CThread implementation */
++    /** @name P8PLATFORM::CThread implementation */
+     ///{
+     void *Process(void);
+     ///}
+@@ -107,10 +107,10 @@ namespace CEC
+     bool                        m_bLogicalAddressChanged;
+     cec_logical_addresses       m_logicalAddresses;
+ 
+-    PLATFORM::CMutex            m_mutex;
+-    PLATFORM::CCDevSocket       *m_dev;	/**< the device connection */
++    P8PLATFORM::CMutex          m_mutex;
++    P8PLATFORM::CCDevSocket     *m_dev;	/**< the device connection */
+     
+-    PLATFORM::CMutex            m_messageMutex;
++    P8PLATFORM::CMutex          m_messageMutex;
+     uint32_t                    m_iNextMessage;
+     std::map<uint32_t, CAdapterMessageQueueEntry *> m_messages;
+   };
+diff --git a/src/libcec/devices/CECAudioSystem.cpp b/src/libcec/devices/CECAudioSystem.cpp
+index 0d3565b..f220804 100644
+--- a/src/libcec/devices/CECAudioSystem.cpp
++++ b/src/libcec/devices/CECAudioSystem.cpp
+@@ -40,7 +40,7 @@
+ #include "CECTypeUtils.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_processor->GetLib()
+ #define ToString(p) CCECTypeUtils::ToString(p)
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index 3907e47..562114a 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -56,7 +56,7 @@
+ #include "CECTV.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_processor->GetLib()
+ #define ToString(p) CCECTypeUtils::ToString(p)
+@@ -92,7 +92,7 @@ CWaitForResponse::~CWaitForResponse(void)
+ 
+ void CWaitForResponse::Clear()
+ {
+-  PLATFORM::CLockObject lock(m_mutex);
++  P8PLATFORM::CLockObject lock(m_mutex);
+   for (std::map<cec_opcode, CResponse*>::iterator it = m_waitingFor.begin(); it != m_waitingFor.end(); it++)
+   {
+     it->second->Broadcast();
+@@ -118,7 +118,7 @@ CResponse* CWaitForResponse::GetEvent(cec_opcode opcode)
+ {
+   CResponse *retVal(NULL);
+   {
+-    PLATFORM::CLockObject lock(m_mutex);
++    P8PLATFORM::CLockObject lock(m_mutex);
+     std::map<cec_opcode, CResponse*>::iterator it = m_waitingFor.find(opcode);
+     if (it != m_waitingFor.end())
+     {
+diff --git a/src/libcec/devices/CECBusDevice.h b/src/libcec/devices/CECBusDevice.h
+index 1d55e9e..d8b7193 100644
+--- a/src/libcec/devices/CECBusDevice.h
++++ b/src/libcec/devices/CECBusDevice.h
+@@ -61,8 +61,8 @@ namespace CEC
+     void Broadcast(void);
+ 
+   private:
+-    cec_opcode       m_opcode;
+-    PLATFORM::CEvent m_event;
++    cec_opcode         m_opcode;
++    P8PLATFORM::CEvent m_event;
+   };
+ 
+   class CWaitForResponse
+@@ -78,7 +78,7 @@ namespace CEC
+   private:
+     CResponse *GetEvent(cec_opcode opcode);
+ 
+-    PLATFORM::CMutex                 m_mutex;
++    P8PLATFORM::CMutex               m_mutex;
+     std::map<cec_opcode, CResponse*> m_waitingFor;
+   };
+ 
+@@ -230,9 +230,9 @@ namespace CEC
+     cec_version           m_cecVersion;
+     cec_bus_device_status m_deviceStatus;
+     std::set<cec_opcode>  m_unsupportedFeatures;
+-    PLATFORM::CMutex      m_mutex;
+-    PLATFORM::CMutex      m_handlerMutex;
+-    PLATFORM::CEvent      m_replacing;
++    P8PLATFORM::CMutex    m_mutex;
++    P8PLATFORM::CMutex    m_handlerMutex;
++    P8PLATFORM::CEvent    m_replacing;
+     unsigned              m_iHandlerUseCount;
+     bool                  m_bAwaitingReceiveFailed;
+     bool                  m_bVendorIdRequested;
+diff --git a/src/libcec/devices/CECPlaybackDevice.cpp b/src/libcec/devices/CECPlaybackDevice.cpp
+index 868aacd..5830175 100644
+--- a/src/libcec/devices/CECPlaybackDevice.cpp
++++ b/src/libcec/devices/CECPlaybackDevice.cpp
+@@ -40,7 +40,7 @@
+ #include "CECTypeUtils.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define ToString(p) CCECTypeUtils::ToString(p)
+ 
+diff --git a/src/libcec/devices/CECRecordingDevice.cpp b/src/libcec/devices/CECRecordingDevice.cpp
+index 77f6b3c..d7fd729 100644
+--- a/src/libcec/devices/CECRecordingDevice.cpp
++++ b/src/libcec/devices/CECRecordingDevice.cpp
+@@ -35,7 +35,7 @@
+ #include "CECRecordingDevice.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CCECRecordingDevice::CCECRecordingDevice(CCECProcessor *processor, cec_logical_address address, uint16_t iPhysicalAddress /* = CEC_INVALID_PHYSICAL_ADDRESS */) :
+     CCECPlaybackDevice(processor, address, iPhysicalAddress),
+diff --git a/src/libcec/devices/CECTV.cpp b/src/libcec/devices/CECTV.cpp
+index 9ebc65a..f28313f 100644
+--- a/src/libcec/devices/CECTV.cpp
++++ b/src/libcec/devices/CECTV.cpp
+@@ -35,7 +35,7 @@
+ #include "CECTV.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CCECTV::CCECTV(CCECProcessor *processor, cec_logical_address address) :
+     CCECBusDevice(processor, address, CEC_PHYSICAL_ADDRESS_TV)
+diff --git a/src/libcec/devices/CECTuner.cpp b/src/libcec/devices/CECTuner.cpp
+index 703b009..d573f8e 100644
+--- a/src/libcec/devices/CECTuner.cpp
++++ b/src/libcec/devices/CECTuner.cpp
+@@ -35,7 +35,7 @@
+ #include "CECTuner.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CCECTuner::CCECTuner(CCECProcessor *processor, cec_logical_address address, uint16_t iPhysicalAddress /* = CEC_INVALID_PHYSICAL_ADDRESS */) :
+     CCECBusDevice(processor, address, iPhysicalAddress)
+diff --git a/src/libcec/implementations/AQCommandHandler.cpp b/src/libcec/implementations/AQCommandHandler.cpp
+index 927aa83..31f4357 100644
+--- a/src/libcec/implementations/AQCommandHandler.cpp
++++ b/src/libcec/implementations/AQCommandHandler.cpp
+@@ -40,7 +40,7 @@
+ #include "CECClient.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_busDevice->GetProcessor()->GetLib()
+ #define ToString(p) LIB_CEC->ToString(p)
+diff --git a/src/libcec/implementations/AQCommandHandler.h b/src/libcec/implementations/AQCommandHandler.h
+index 4e2d43f..b9a7ba4 100644
+--- a/src/libcec/implementations/AQCommandHandler.h
++++ b/src/libcec/implementations/AQCommandHandler.h
+@@ -58,7 +58,7 @@ namespace CEC
+     CAQPowerStatusCheck* m_powerOnCheck;
+   };
+ 
+-  class CAQPowerStatusCheck : public PLATFORM::CThread
++  class CAQPowerStatusCheck : public P8PLATFORM::CThread
+   {
+   public:
+     CAQPowerStatusCheck(CAQCommandHandler* handler, cec_logical_address iInitiator, cec_logical_address iDestination) :
+diff --git a/src/libcec/implementations/CECCommandHandler.cpp b/src/libcec/implementations/CECCommandHandler.cpp
+index b4b9819..2c2db21 100644
+--- a/src/libcec/implementations/CECCommandHandler.cpp
++++ b/src/libcec/implementations/CECCommandHandler.cpp
+@@ -44,7 +44,7 @@
+ #include <p8-platform/util/util.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_busDevice->GetProcessor()->GetLib()
+ #define ToString(p) CCECTypeUtils::ToString(p)
+diff --git a/src/libcec/implementations/CECCommandHandler.h b/src/libcec/implementations/CECCommandHandler.h
+index c60078a..2d24290 100644
+--- a/src/libcec/implementations/CECCommandHandler.h
++++ b/src/libcec/implementations/CECCommandHandler.h
+@@ -157,17 +157,17 @@ namespace CEC
+ 
+     virtual bool SourceSwitchAllowed(void) { return true; }
+ 
+-    CCECBusDevice *  m_busDevice;
+-    CCECProcessor *  m_processor;
+-    int32_t          m_iTransmitTimeout;
+-    int32_t          m_iTransmitWait;
+-    int8_t           m_iTransmitRetries;
+-    bool            m_bHandlerInited;
+-    bool            m_bOPTSendDeckStatusUpdateOnActiveSource;
+-    cec_vendor_id    m_vendorId;
+-    int64_t          m_iActiveSourcePending;
+-    PLATFORM::CMutex m_mutex;
+-    int64_t          m_iPowerStatusRequested;
++    CCECBusDevice *    m_busDevice;
++    CCECProcessor *    m_processor;
++    int32_t            m_iTransmitTimeout;
++    int32_t            m_iTransmitWait;
++    int8_t             m_iTransmitRetries;
++    bool               m_bHandlerInited;
++    bool               m_bOPTSendDeckStatusUpdateOnActiveSource;
++    cec_vendor_id      m_vendorId;
++    int64_t            m_iActiveSourcePending;
++    P8PLATFORM::CMutex m_mutex;
++    int64_t            m_iPowerStatusRequested;
+     std::map<cec_opcode, std::vector<cec_command> > m_logsRequested;
+   };
+ };
+diff --git a/src/libcec/implementations/PHCommandHandler.cpp b/src/libcec/implementations/PHCommandHandler.cpp
+index 68828a8..8609225 100644
+--- a/src/libcec/implementations/PHCommandHandler.cpp
++++ b/src/libcec/implementations/PHCommandHandler.cpp
+@@ -40,7 +40,7 @@
+ #include "CECClient.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_busDevice->GetProcessor()->GetLib()
+ #define ToString(p) LIB_CEC->ToString(p)
+diff --git a/src/libcec/implementations/PHCommandHandler.h b/src/libcec/implementations/PHCommandHandler.h
+index af42f12..2e37154 100644
+--- a/src/libcec/implementations/PHCommandHandler.h
++++ b/src/libcec/implementations/PHCommandHandler.h
+@@ -40,7 +40,7 @@ namespace CEC
+ {
+   class CPHCommandHandler;
+ 
+-  class CImageViewOnCheck : public PLATFORM::CThread
++  class CImageViewOnCheck : public P8PLATFORM::CThread
+   {
+   public:
+     CImageViewOnCheck(CPHCommandHandler* handler):
+@@ -51,7 +51,7 @@ namespace CEC
+ 
+   private:
+     CPHCommandHandler* m_handler;
+-    PLATFORM::CEvent   m_event;
++    P8PLATFORM::CEvent m_event;
+   };
+ 
+   class CPHCommandHandler : public CCECCommandHandler
+diff --git a/src/libcec/implementations/RLCommandHandler.cpp b/src/libcec/implementations/RLCommandHandler.cpp
+index aa0cca8..72c4be1 100644
+--- a/src/libcec/implementations/RLCommandHandler.cpp
++++ b/src/libcec/implementations/RLCommandHandler.cpp
+@@ -41,7 +41,7 @@
+ #include "CECClient.h"
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define RL_KEY_TOP_MENU           0x10
+ #define RL_KEY_DVD_MENU           0x11
+diff --git a/src/libcec/implementations/SLCommandHandler.cpp b/src/libcec/implementations/SLCommandHandler.cpp
+index 80262c2..fd223ba 100644
+--- a/src/libcec/implementations/SLCommandHandler.cpp
++++ b/src/libcec/implementations/SLCommandHandler.cpp
+@@ -42,7 +42,7 @@
+ #include <stdio.h>
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define SL_COMMAND_TYPE_HDDRECORDER_DISC  0x01
+ #define SL_COMMAND_TYPE_VCR               0x02
+diff --git a/src/libcec/implementations/SLCommandHandler.h b/src/libcec/implementations/SLCommandHandler.h
+index 60d7679..27fb172 100644
+--- a/src/libcec/implementations/SLCommandHandler.h
++++ b/src/libcec/implementations/SLCommandHandler.h
+@@ -74,8 +74,8 @@ namespace CEC
+     bool SLInitialised(void);
+     void SetSLInitialised(void);
+ 
+-    bool               m_bSLEnabled;
+-    PLATFORM::CTimeout m_resetPowerState;
+-    PLATFORM::CMutex   m_SLMutex;
++    bool                 m_bSLEnabled;
++    P8PLATFORM::CTimeout m_resetPowerState;
++    P8PLATFORM::CMutex   m_SLMutex;
+   };
+ };
+diff --git a/src/libcec/implementations/VLCommandHandler.cpp b/src/libcec/implementations/VLCommandHandler.cpp
+index c78e764..e2fa813 100644
+--- a/src/libcec/implementations/VLCommandHandler.cpp
++++ b/src/libcec/implementations/VLCommandHandler.cpp
+@@ -47,7 +47,7 @@
+ #define VL_UNKNOWN1     0x06
+ 
+ using namespace CEC;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ #define LIB_CEC     m_busDevice->GetProcessor()->GetLib()
+ #define ToString(p) LIB_CEC->ToString(p)
+diff --git a/src/libcec/implementations/VLCommandHandler.h b/src/libcec/implementations/VLCommandHandler.h
+index ca52f28..05bf451 100644
+--- a/src/libcec/implementations/VLCommandHandler.h
++++ b/src/libcec/implementations/VLCommandHandler.h
+@@ -65,8 +65,8 @@ namespace CEC
+     void SendVendorCommandCapabilities(const cec_logical_address initiator, const cec_logical_address destination);
+     int HandleReportPowerStatus(const cec_command &command);
+ 
+-    PLATFORM::CMutex m_mutex;
+-    uint64_t         m_iPowerUpEventReceived;
+-    bool             m_bCapabilitiesSent;
++    P8PLATFORM::CMutex m_mutex;
++    uint64_t           m_iPowerUpEventReceived;
++    bool               m_bCapabilitiesSent;
+   };
+ };
+diff --git a/src/libcec/platform/X11/randr-edid.cpp b/src/libcec/platform/X11/randr-edid.cpp
+index 9b4342d..5b70474 100644
+--- a/src/libcec/platform/X11/randr-edid.cpp
++++ b/src/libcec/platform/X11/randr-edid.cpp
+@@ -38,7 +38,7 @@
+ #include <X11/extensions/Xrandr.h>
+ #include <stdlib.h>
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ static const char * const edid_names[] = 
+ { 
+diff --git a/src/libcec/platform/X11/randr-edid.h b/src/libcec/platform/X11/randr-edid.h
+index 8cec3d5..29c145b 100644
+--- a/src/libcec/platform/X11/randr-edid.h
++++ b/src/libcec/platform/X11/randr-edid.h
+@@ -35,7 +35,7 @@
+ #include "env.h"
+ #include "platform/util/edid.h"
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CRandrEdidParser
+   {
+diff --git a/src/libcec/platform/adl/adl-edid.cpp b/src/libcec/platform/adl/adl-edid.cpp
+index 4617107..c3914b1 100644
+--- a/src/libcec/platform/adl/adl-edid.cpp
++++ b/src/libcec/platform/adl/adl-edid.cpp
+@@ -39,7 +39,7 @@
+ #include <p8-platform/windows/dlfcn-win32.h>
+ #endif
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ CADLEdidParser::CADLEdidParser(void) :
+   m_bOpen(false),
+diff --git a/src/libcec/platform/adl/adl-edid.h b/src/libcec/platform/adl/adl-edid.h
+index c324631..c8ed801 100644
+--- a/src/libcec/platform/adl/adl-edid.h
++++ b/src/libcec/platform/adl/adl-edid.h
+@@ -63,7 +63,7 @@ typedef int (*ADL_DISPLAY_EDIDDATA_GET)         (int, int, ADLDisplayEDIDData *)
+ 
+ #define ADL_DISPLAY_CONNECTED (ADL_DISPLAY_DISPLAYINFO_DISPLAYCONNECTED | ADL_DISPLAY_DISPLAYINFO_DISPLAYMAPPED)
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CADLEdidParser
+   {
+diff --git a/src/libcec/platform/drm/drm-edid.cpp b/src/libcec/platform/drm/drm-edid.cpp
+index a5512f1..65876eb 100644
+--- a/src/libcec/platform/drm/drm-edid.cpp
++++ b/src/libcec/platform/drm/drm-edid.cpp
+@@ -38,7 +38,7 @@
+ #include <dirent.h>
+ #include <fstream>
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ uint16_t CDRMEdidParser::GetPhysicalAddress(void)
+ {
+diff --git a/src/libcec/platform/drm/drm-edid.h b/src/libcec/platform/drm/drm-edid.h
+index 588b3c1..bf97c56 100644
+--- a/src/libcec/platform/drm/drm-edid.h
++++ b/src/libcec/platform/drm/drm-edid.h
+@@ -34,7 +34,7 @@
+ 
+ #include "platform/util/edid.h"
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CDRMEdidParser
+   {
+diff --git a/src/libcec/platform/nvidia/nv-edid.cpp b/src/libcec/platform/nvidia/nv-edid.cpp
+index fa4d7d6..db0cbef 100644
+--- a/src/libcec/platform/nvidia/nv-edid.cpp
++++ b/src/libcec/platform/nvidia/nv-edid.cpp
+@@ -37,7 +37,7 @@
+ #include "nv-edid.h"
+ #include <stdio.h>
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ uint16_t CNVEdidParser::GetPhysicalAddress(void)
+ {
+diff --git a/src/libcec/platform/nvidia/nv-edid.h b/src/libcec/platform/nvidia/nv-edid.h
+index 6cf1909..81c09a8 100644
+--- a/src/libcec/platform/nvidia/nv-edid.h
++++ b/src/libcec/platform/nvidia/nv-edid.h
+@@ -37,7 +37,7 @@
+ 
+ #include "platform/util/edid.h"
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CNVEdidParser
+   {
+diff --git a/src/libcec/platform/posix/os-edid.cpp b/src/libcec/platform/posix/os-edid.cpp
+index 7deb647..e508d4d 100644
+--- a/src/libcec/platform/posix/os-edid.cpp
++++ b/src/libcec/platform/posix/os-edid.cpp
+@@ -35,7 +35,7 @@
+ #include "platform/util/edid.h"
+ #include "platform/X11/randr-edid.h"
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ uint16_t CEDIDParser::GetPhysicalAddress(void)
+ {
+diff --git a/src/libcec/platform/posix/serialport.cpp b/src/libcec/platform/posix/serialport.cpp
+index b14c202..20dbc48 100644
+--- a/src/libcec/platform/posix/serialport.cpp
++++ b/src/libcec/platform/posix/serialport.cpp
+@@ -59,7 +59,7 @@
+ #define XCASE  0
+ #endif
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ inline bool RemoveLock(const char *strDeviceName)
+ {
+diff --git a/src/libcec/platform/posix/serialport.cpp.orig b/src/libcec/platform/posix/serialport.cpp.orig
+new file mode 100644
+index 0000000..b14c202
+--- /dev/null
++++ b/src/libcec/platform/posix/serialport.cpp.orig
+@@ -0,0 +1,236 @@
++/*
++ * This file is part of the libCEC(R) library.
++ *
++ * libCEC(R) is Copyright (C) 2011-2015 Pulse-Eight Limited.  All rights reserved.
++ * libCEC(R) is an original work, containing original code.
++ *
++ * libCEC(R) is a trademark of Pulse-Eight Limited.
++ *
++ * This program is dual-licensed; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301  USA
++ *
++ *
++ * Alternatively, you can license this library under a commercial license,
++ * please contact Pulse-Eight Licensing for more information.
++ *
++ * For more information contact:
++ * Pulse-Eight Licensing       <license@pulse-eight.com>
++ *     http://www.pulse-eight.com/
++ *     http://www.pulse-eight.net/
++ */
++
++#include "env.h"
++#include <stdio.h>
++#include <fcntl.h>
++#include "../sockets/serialport.h"
++#include "../util/baudrate.h"
++#include <p8-platform/posix/os-socket.h>
++
++#if defined(__APPLE__) || defined(__FreeBSD__)
++#ifndef XCASE
++#define XCASE	0
++#endif
++#ifndef OLCUC
++#define OLCUC	0
++#endif
++#ifndef IUCLC
++#define IUCLC	0
++#endif
++#else
++#ifdef HAVE_LOCKDEV
++#include <lockdev.h>
++#endif
++#endif
++
++/** XCASE was deprecated on removed from posix */
++#ifndef XCASE
++#define XCASE  0
++#endif
++
++using namespace PLATFORM;
++
++inline bool RemoveLock(const char *strDeviceName)
++{
++  #if !defined(__APPLE__) && !defined(__FreeBSD__) && defined(HAVE_LOCKDEV)
++  return dev_unlock(strDeviceName, 0) == 0;
++  #else
++  (void)strDeviceName; // silence unused warning
++  return true;
++  #endif
++}
++
++void CSerialSocket::Close(void)
++{
++  if (IsOpen())
++  {
++    SocketClose(m_socket);
++    RemoveLock(m_strName.c_str());
++  }
++}
++
++void CSerialSocket::Shutdown(void)
++{
++  if (IsOpen())
++  {
++    SocketClose(m_socket);
++    RemoveLock(m_strName.c_str());
++  }
++}
++
++ssize_t CSerialSocket::Write(void* data, size_t len)
++{
++  return IsOpen() ? SocketWrite(m_socket, &m_iError, data, len) : -1;
++}
++
++ssize_t CSerialSocket::Read(void* data, size_t len, uint64_t iTimeoutMs /* = 0 */)
++{
++  return IsOpen() ? SocketRead(m_socket, &m_iError, data, len, iTimeoutMs) : -1;
++}
++
++//setting all this stuff up is a pain in the ass
++bool CSerialSocket::Open(uint64_t iTimeoutMs /* = 0 */)
++{
++  iTimeoutMs = 0; if (!iTimeoutMs){} // silence unused warning
++  if (IsOpen())
++  {
++    m_iError = EINVAL;
++    return false;
++  }
++
++  if (m_iDatabits != SERIAL_DATA_BITS_FIVE && m_iDatabits != SERIAL_DATA_BITS_SIX &&
++      m_iDatabits != SERIAL_DATA_BITS_SEVEN && m_iDatabits != SERIAL_DATA_BITS_EIGHT)
++  {
++    m_strError = "Databits has to be between 5 and 8";
++    m_iError = EINVAL;
++    return false;
++  }
++
++  if (m_iStopbits != SERIAL_STOP_BITS_ONE && m_iStopbits != SERIAL_STOP_BITS_TWO)
++  {
++    m_strError = "Stopbits has to be 1 or 2";
++    m_iError = EINVAL;
++    return false;
++  }
++
++  if (m_iParity != SERIAL_PARITY_NONE && m_iParity != SERIAL_PARITY_EVEN && m_iParity != SERIAL_PARITY_ODD)
++  {
++    m_strError = "Parity has to be none, even or odd";
++    m_iError = EINVAL;
++    return false;
++  }
++
++  #if !defined(__APPLE__) && !defined(__FreeBSD__) && defined(HAVE_LOCKDEV)
++  if (dev_lock(m_strName.c_str()) != 0)
++  {
++    m_strError = "Couldn't lock the serial port";
++    m_iError = EBUSY;
++    return false;
++  }
++  #endif
++
++  m_socket = open(m_strName.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
++
++  if (m_socket == INVALID_SERIAL_SOCKET_VALUE)
++  {
++    m_strError = strerror(errno);
++    RemoveLock(m_strName.c_str());
++    return false;
++  }
++
++  SocketSetBlocking(m_socket, false);
++
++  if (!SetBaudRate(m_iBaudrate))
++    return false;
++
++  m_options.c_cflag |= (CLOCAL | CREAD);
++  m_options.c_cflag &= ~HUPCL;
++
++  m_options.c_cflag &= ~CSIZE;
++  if (m_iDatabits == SERIAL_DATA_BITS_FIVE)  m_options.c_cflag |= CS5;
++  if (m_iDatabits == SERIAL_DATA_BITS_SIX)   m_options.c_cflag |= CS6;
++  if (m_iDatabits == SERIAL_DATA_BITS_SEVEN) m_options.c_cflag |= CS7;
++  if (m_iDatabits == SERIAL_DATA_BITS_EIGHT) m_options.c_cflag |= CS8;
++
++  m_options.c_cflag &= ~PARENB;
++  if (m_iParity == SERIAL_PARITY_EVEN || m_iParity == SERIAL_PARITY_ODD)
++    m_options.c_cflag |= PARENB;
++  if (m_iParity == SERIAL_PARITY_ODD)
++    m_options.c_cflag |= PARODD;
++
++#ifdef CRTSCTS
++  m_options.c_cflag &= ~CRTSCTS;
++#elif defined(CNEW_RTSCTS)
++  m_options.c_cflag &= ~CNEW_RTSCTS;
++#endif
++
++  if (m_iStopbits == SERIAL_STOP_BITS_ONE) m_options.c_cflag &= ~CSTOPB;
++  else m_options.c_cflag |= CSTOPB;
++  
++  //I guessed a little here
++  m_options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | XCASE | ECHOK | ECHONL | ECHOCTL | ECHOPRT | ECHOKE | TOSTOP);
++
++  if (m_iParity == SERIAL_PARITY_NONE)
++    m_options.c_iflag &= ~INPCK;
++  else
++    m_options.c_iflag |= INPCK | ISTRIP;
++
++  m_options.c_iflag &= ~(IXON | IXOFF | IXANY | BRKINT | INLCR | IGNCR | ICRNL | IUCLC | IMAXBEL);
++  m_options.c_oflag &= ~(OPOST | ONLCR | OCRNL);
++
++  if (tcsetattr(m_socket, TCSANOW, &m_options) != 0)
++  {
++    m_strError = strerror(errno);
++    RemoveLock(m_strName.c_str());
++    return false;
++  }
++  
++  SocketSetBlocking(m_socket, true);
++  m_bIsOpen = true;
++
++  return true;
++}
++
++bool CSerialSocket::SetBaudRate(uint32_t baudrate)
++{
++  int rate = IntToBaudrate(baudrate);
++  if (rate == -1)
++  {
++    char buff[255];
++    sprintf(buff, "%i is not a valid baudrate", baudrate);
++    m_strError = buff;
++    return false;
++  }
++
++  //get the current port attributes
++  if (tcgetattr(m_socket, &m_options) != 0)
++  {
++    m_strError = strerror(errno);
++    return false;
++  }
++
++  if (cfsetispeed(&m_options, rate) != 0)
++  {
++    m_strError = strerror(errno);
++    return false;
++  }
++
++  if (cfsetospeed(&m_options, rate) != 0)
++  {
++    m_strError = strerror(errno);
++    return false;
++  }
++
++  return true;
++}
+diff --git a/src/libcec/platform/posix/serialport.cpp.rej b/src/libcec/platform/posix/serialport.cpp.rej
+new file mode 100644
+index 0000000..48c3386
+--- /dev/null
++++ b/src/libcec/platform/posix/serialport.cpp.rej
+@@ -0,0 +1,10 @@
++diff a/src/libcec/platform/posix/serialport.cpp b/src/libcec/platform/posix/serialport.cpp	(rejected hunks)
++@@ -59,7 +59,7 @@
++ #define XCASE  0
++ #endif
++ 
++-using namespace PLATFORM;
+++using namespace P8PLATFORM;
++ 
++ inline bool RemoveLock(int sock)
++ {
+diff --git a/src/libcec/platform/sockets/serialport.h b/src/libcec/platform/sockets/serialport.h
+index 127f0cc..ae1436e 100644
+--- a/src/libcec/platform/sockets/serialport.h
++++ b/src/libcec/platform/sockets/serialport.h
+@@ -44,7 +44,7 @@
+ 
+ #include <p8-platform/sockets/socket.h>
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   enum SerialParity
+   {
+diff --git a/src/libcec/platform/util/baudrate.h b/src/libcec/platform/util/baudrate.h
+index 28d57f6..b3fe21d 100644
+--- a/src/libcec/platform/util/baudrate.h
++++ b/src/libcec/platform/util/baudrate.h
+@@ -41,7 +41,7 @@
+ #include <termios.h>
+ #endif
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   static struct sbaudrate
+   {
+@@ -203,7 +203,7 @@ namespace PLATFORM
+ 
+   inline int32_t IntToBaudrate(uint32_t baudrate)
+   {
+-    for (unsigned int i = 0; i < sizeof(baudrates) / sizeof(PLATFORM::sbaudrate) - 1; i++)
++    for (unsigned int i = 0; i < sizeof(baudrates) / sizeof(P8PLATFORM::sbaudrate) - 1; i++)
+     {
+       if (baudrates[i].rate == (int32_t) baudrate)
+         return baudrates[i].symbol;
+diff --git a/src/libcec/platform/util/edid.h b/src/libcec/platform/util/edid.h
+index 9a49c44..0194640 100644
+--- a/src/libcec/platform/util/edid.h
++++ b/src/libcec/platform/util/edid.h
+@@ -34,7 +34,7 @@
+ 
+ #include "env.h"
+ 
+-namespace PLATFORM
++namespace P8PLATFORM
+ {
+   class CEDIDParser
+   {
+diff --git a/src/libcec/platform/windows/os-edid.cpp b/src/libcec/platform/windows/os-edid.cpp
+index 7280958..49d73c8 100644
+--- a/src/libcec/platform/windows/os-edid.cpp
++++ b/src/libcec/platform/windows/os-edid.cpp
+@@ -39,7 +39,7 @@
+ #include "initguid.h"
+ #include "stdio.h"
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ static GUID MONITOR_GUID =  { 0x4D36E96E, 0xE325, 0x11CE, { 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18 } };
+ #define PA_MAX_REGENTRIES_TO_CHECK 1024
+diff --git a/src/libcec/platform/windows/serialport.cpp b/src/libcec/platform/windows/serialport.cpp
+index c1ef0a5..94d0a8b 100644
+--- a/src/libcec/platform/windows/serialport.cpp
++++ b/src/libcec/platform/windows/serialport.cpp
+@@ -35,7 +35,7 @@
+ #include "../util/baudrate.h"
+ #include <p8-platform/util/timeutils.h>
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ void FormatWindowsError(int iErrorCode, std::string& strMessage)
+ {
+-- 
+2.1.0
+

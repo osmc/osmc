@@ -1,0 +1,25 @@
+From 670680b773eac8c9844efc2ad7cfb5ca71f81b5d Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Tue, 1 Dec 2015 10:39:16 +0100
+Subject: [PATCH 10/12] changed: use p8-platform instead of platform
+
+---
+ src/libcec/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcec/CMakeLists.txt b/src/libcec/CMakeLists.txt
+index a7cc6c4..55aceca 100644
+--- a/src/libcec/CMakeLists.txt
++++ b/src/libcec/CMakeLists.txt
+@@ -18,7 +18,7 @@ if (SUPPORTS_CXX11)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ endif()
+ 
+-find_package(platform REQUIRED)
++find_package(p8-platform REQUIRED)
+ find_package(Threads REQUIRED)
+ 
+ include_directories(${platform_INCLUDE_DIRS}
+-- 
+2.1.0
+
