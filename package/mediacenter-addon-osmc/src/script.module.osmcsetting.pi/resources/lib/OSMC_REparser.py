@@ -315,7 +315,7 @@ def gpio_updown_validation(config_value):
 
 	try:
 		return str(permitted.index(config_value) + 1)
-	except IndexError, TypeError:
+	except (ValueError, IndexError, TypeError):
 		return None
 
 
@@ -1196,7 +1196,7 @@ MASTER_SETTINGS =    {
 			"config_get_patterns": [
 				{
 				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pull[-\w\d]*=",
-				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pull[-\w\d]*=\s*(\d*)"
+				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pull[-\w\d]*=\s*(\w*)"
 				},
 
 				],
@@ -1215,7 +1215,7 @@ MASTER_SETTINGS =    {
 			"config_get_patterns": [
 				{
 				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=",
-				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\d*)"
+				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\w*)"
 				},
 
 				],
