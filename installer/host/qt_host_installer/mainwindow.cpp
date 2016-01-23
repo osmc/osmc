@@ -35,7 +35,6 @@
 #ifdef Q_OS_LINUX
 #include <unistd.h>
 #endif
-#include <QDebug>
 
 #define WIDGET_START QPoint(10,110)
 
