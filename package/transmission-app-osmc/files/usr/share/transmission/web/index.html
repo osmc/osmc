@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link type="text/css" rel="stylesheet" href="./resources/css/style.css">
+    <link type="text/css" rel="stylesheet" href="./resources/css/icons.css">
+    <script type="text/javascript" src="./resources/js/jquery.js"></script>
+    <script type="text/javascript" src="./resources/js/app.min.js"></script>
+    <title>Transmission Web Interface</title>
+  </head>
+  <body class="blue-grey darken-3">
+    <section class="fixed-action-btn floatingOptions click-to-toggle"><a class="btn-floating btn-large waves-button waves-effect waves-light purple hover"><i class="large material-icons">settings</i></a>
+      <ul>
+        <li><a data-position="left" data-delay="50" data-tooltip="Credits" class="btn-floating btn-large waves-effect waves-light cyan credits tooltipped"><i class="material-icons">person</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Settings" class="btn-floating btn-large waves-effect waves-light brown settings tooltipped"><i class="material-icons">settings_applications</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Speed Limit Mode" class="btn-floating btn-large waves-effect waves-light red speedLimitMode tooltipped"><i class="material-icons">network_check</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Add Torrent" class="btn-floating btn-large waves-effect waves-light teal addTorrent tooltipped"><i class="material-icons">note_add</i></a></li>
+      </ul>
+    </section>
+    <section class="fixed-action-btn floatingActions click-to-toggle"><a class="btn-floating btn-large waves-button waves-effect waves-light purple hover"><i class="large material-icons">open_in_browser</i></a>
+      <ul>
+        <li><a data-position="left" data-delay="50" data-tooltip="Start" class="btn-floating btn-large waves-effect waves-light green tooltipped"><i class="material-icons">play_arrow</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Pause" class="btn-floating btn-large waves-effect waves-light red tooltipped"><i class="material-icons">stop</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Verify" class="btn-floating btn-large waves-effect waves-light light-blue tooltipped"><i class="material-icons">done_all</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Ask tracker for more peers" class="btn-floating btn-large waves-effect waves-light teal tooltipped"><i class="material-icons">update</i></a></li>
+        <li><a data-position="left" data-delay="50" data-tooltip="Remove" class="btn-floating btn-large waves-effect waves-light red tooltipped"><i class="material-icons">delete</i></a></li>
+      </ul>
+    </section>
+    <section class="topBar indigo grid-container">
+      <p class="mobile-grid-100 tablet-grid-50 grid-40">Transmission Web Interface</p>
+      <p class="mobile-grid-100 tablet-grid-50 grid-60 additionalData"><span class="statistics">STATISTICS</span><span class="bandwidth">BANDWIDTH</span>
+        <!-- span.timeNow DATE-->
+      </p>
+    </section>
+    <section class="header indigo lighten-1"><span>Filter torrents by... </span>
+      <ul>
+        <li data-href="all" class="active"><a>All</a></li>
+        <li data-href="downloading"><a>Downloading</a></li>
+        <li data-href="seeding"><a>Seeding</a></li>
+        <li data-href="idling"><a>Idling</a></li>
+        <li data-href="paused"><a>Paused</a></li>
+        <li data-href="errored" class="hidden"><a>Errored</a></li>
+      </ul>
+    </section>
+    <section class="torrentPagination"><a class="btn waves-button waves-effect white previousPage black-text"><i class="material-icons left">keyboard_arrow_left</i></a><a class="btn waves-button waves-effect teal pageInfo white-text">Page <span class="currentPage"></span> of <span class="totalPages"></span></a><a class="btn waves-button waves-effect white nextPage black-text"><i class="material-icons right">keyboard_arrow_right</i></a></section>
+    <section class="search grid-container">
+      <input type="text" placeholder="Search..." autocomplete="off" class="search mobile-grid-100 tablet-grid-100 grid-100">
+    </section>
+    <section class="parachute hidden"></section>
+    <section class="torrents grid-container"></section>
+    <section class="sidebar">
+      <section class="head">
+        <h3>Torrent Information<span class="showOnMobile"> - <span class="torrentName"></span><i class="material-icons closeSidebar">close</i></span></h3>
+        <hr>
+        <ul class="tabs grid-container">
+          <li class="tab grid-20"><a href="#information" class="active">Information</a></li>
+          <li class="tab grid-20"><a href="#activity">Activity</a></li>
+          <li class="tab grid-20"><a href="#trackers">Trackers</a></li>
+          <li class="tab grid-10"><a href="#peers">Peers</a></li>
+          <li class="tab grid-10"><a href="#files">Files</a></li>
+          <li class="tab grid-20"><a href="#options">Options</a></li>
+        </ul>
+      </section>
+      <section class="tabs">
+        <section id="information">
+          <table>
+            <tr>
+              <td>Size:</td>
+              <td class="size"></td>
+            </tr>
+            <tr>
+              <td>Pieces:</td>
+              <td class="pieces"></td>
+            </tr>
+            <tr>
+              <td>Hash:</td>
+              <td class="hash"></td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td class="type"></td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td class="comment"></td>
+            </tr>
+            <tr>
+              <td>Created with:</td>
+              <td class="createdWith"></td>
+            </tr>
+          </table>
+        </section>
+        <section id="activity">
+          <table>
+            <tr>
+              <td>Status:</td>
+              <td class="status"></td>
+            </tr>
+            <tr>
+              <td>Progress:</td>
+              <td class="progress"></td>
+            </tr>
+            <tr>
+              <td>Downloaded:</td>
+              <td class="downloaded"></td>
+            </tr>
+            <tr>
+              <td>Uploaded:</td>
+              <td class="uploaded"></td>
+            </tr>
+            <tr>
+              <td>Ratio:</td>
+              <td class="ratio"></td>
+            </tr>
+            <tr>
+              <td>Download Speed:</td>
+              <td><span class="downloadSpeed"></span> (from <span class="downloadPeers"></span> peers)</td>
+            </tr>
+            <tr>
+              <td>Upload Speed:</td>
+              <td><span class="uploadSpeed"></span> (from <span class="uploadPeers"></span> peers)					</td>
+            </tr>
+          </table>
+        </section>
+        <section id="trackers">
+          <input type="text" placeholder="Search..." autocomplete="off" class="search mobile-grid-100 tablet-grid-100 grid-100">
+        </section>
+        <section id="peers">
+          <table>
+            <tr>
+              <th class="ipAddress">IP Address</th>
+              <th class="client">Client</th>
+              <th class="percentageDone">%</th>
+              <th class="uploading">Uploading</th>
+              <th class="downloading">Downloading</th>
+            </tr>
+          </table>
+        </section>
+        <section id="files"></section>
+        <section id="options">
+          <table>
+            <tr>
+              <td>Download Directory:</td>
+              <td> 
+                <input type="text" placeholder="Download Directory" class="downloadDirectory">
+              </td>
+            </tr>
+            <tr>
+              <td>Priority:</td>
+              <td class="priorityContainer"><span>
+                  <input id="low" name="priority" type="radio" class="priority">
+                  <label for="low">Low</label></span><span>
+                  <input id="normal" name="priority" type="radio" class="priority">
+                  <label for="normal">Normal</label></span><span>
+                  <input id="high" name="priority" type="radio" class="priority">
+                  <label for="high">High</label></span></td>
+            </tr>
+            <tr>
+              <td>Stop Seeding At:</td>
+              <td> 
+                <input type="text" placeholder="Stop Seeding At" class="stopSeedingAt">
+              </td>
+            </tr>
+            <tr>
+              <td>Limit Download Speed:</td>
+              <td>
+                <div class="switch downloadSpeedToggle">
+                  <label>Off
+                    <input type="checkbox"><span class="lever"></span>On
+                  </label>
+                </div>
+                <input type="text" placeholder="Limit Download Speed" class="downloadSpeed"> kB/s
+              </td>
+            </tr>
+            <tr>
+              <td>Limit Upload Speed:</td>
+              <td>
+                <div class="switch uploadSpeedToggle">
+                  <label>Off
+                    <input type="checkbox"><span class="lever"></span>On
+                  </label>
+                </div>
+                <input type="text" placeholder="Limit Upload Speed" class="uploadSpeed"> kB/s
+              </td>
+            </tr>
+            <tr>
+              <td>Maximum Connections</td>
+              <td>
+                <input type="text" class="maxConnections">
+              </td>
+            </tr>
+          </table><a class="btn waves-button waves-effect teal saveChanges">Save Changes</a>
+        </section>
+      </section>
+    </section>
+    <section class="sidebarOverflow hidden">
+      <section class="clickToClose"><i class="material-icons">close</i>
+        <h2>Click to close</h2>
+      </section>
+    </section>
+    <section class="settingsSidebar">
+      <section class="head">
+        <h3>Settings</h3><span class="closeTab"></span>
+      </section>
+      <table></table><a class="btn waves-button waves-effect teal updateSettingsButton">Save Settings</a>
+    </section>
+    <section class="statisticsSidebar">
+      <section class="head"> 
+        <h3>Statistics</h3><span class="closeTab"></span>
+      </section>
+      <table>
+        <tr>
+          <td>Active Torrents:</td>
+          <td class="activeTorrents"></td>
+        </tr>
+        <tr>
+          <td>Paused Torrents:</td>
+          <td class="pausedTorrents"></td>
+        </tr>
+        <tr>
+          <td>Total Downloaded:</td>
+          <td class="totalDownloaded"></td>
+        </tr>
+        <tr>
+          <td>Total Uploaded:</td>
+          <td class="totalUploaded"></td>
+        </tr>
+        <tr>
+          <td>Ratio:</td>
+          <td class="ratio"></td>
+        </tr>
+        <tr>
+          <td>Uptime:</td>
+          <td class="uptime"></td>
+        </tr>
+      </table>
+    </section>
+    <section class="addTorrentFunctionality">
+      <section class="head">
+        <h3>Add Torrent...</h3>
+      </section>
+      <section class="addTorrentForm">
+        <div class="file-field input-field grid-100">
+          <div class="btn"><span>File</span>
+            <input type="file" multiple class="torrentFile">
+          </div>
+          <div class="file-path-wrapper">
+            <input type="text" class="file-path validate torrentFilePathDisplay grid-50">
+          </div>
+          <input name="torrentLink" placeholder="Torrent URL or magnet: link" class="torrentLink grid-50">
+        </div>
+        <input type="checkbox" id="startAutomatically">
+        <label for="startAutomatically" checked>Start Automatically</label>
+        <section class="buttonTray"><a class="btn waves-button waves-effect addTorrent">Add Torrent</a></section>
+      </section>
+    </section>
+    <section class="removeTorrentFunctionality">
+      <section class="head">
+        <h3>Remove Torrent...</h3>
+      </section>
+      <section class="removeTorrentForm">
+        <p>Are you sure that you would like to remove <span class="torrentString"></span> torrent<span class="plural">s</span>?</p>
+        <input type="checkbox" id="deleteAllData">
+        <label for="deleteAllData" checked>Delete All Data</label>
+        <section class="buttonTray"><a class="btn waves-button waves-effect removeTorrent">Remove torrent<span class="plural">s</span></a></section>
+      </section>
+    </section>
+    <section class="credits">
+      <section class="head">
+        <h3>Credits</h3>
+      </section>
+      <section class="body grid-container">
+        <section class="grid-33"><img src="./resources/img/profilePicture/theroyalstudent.png">
+          <p>Edwin A. <a href="https://theroyalstudent.com">(@theroyalstudent)</a></p>
+        </section>
+        <section class="grid-66">
+          <h5>Special Thanks:</h5>
+          <ul>
+            <li> <a href="http://bourbon.io">Bourbon</a></li>
+            <li><a href="http://materializecss.com">MaterializeCSS</a></li>
+            <li><a href="http://unsemantic.com">Unsementic</a></li>
+          </ul>
+        </section>
+      </section>
+      <hr>
+      <section class="footer">
+        <p>
+           
+          If you are keen to contribute, do check out the GitHub repository <a href="https://github.com/theroyalstudent/layered">here</a>.<br>
+        </p>
+        <p>Do report bugs or feature requests <a href="https://github.com/theroyalstudent/layered/issues">here</a> if you find any, too.</p>
+      </section>
+    </section>
+  </body>
+</html>
