@@ -201,7 +201,7 @@ then
 	export CFLAGS+=${COMPFLAGS} && \
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
-	export LDFLAGS="" & \
+	export LDFLAGS="" && \
 	./configure \
 		--prefix=/usr \
 		--disable-vtbdecoder \
@@ -213,7 +213,6 @@ then
 		--disable-openmax \
 		--enable-optical-drive \
 		--enable-libbluray \
-		--enable-dvdcss \
                 --enable-dvdcss \
                 --disable-joystick \
                 --disable-debug \
