@@ -56,11 +56,6 @@ then
 	handle_dep "cpio"
 	handle_dep "bison"
 	handle_dep "flex"
-	if [ "$1" == "vero2" ]
-	then
-	    handle_dep "abootimg"
-	    handle_dep "u-boot-tools"
-	fi
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
 	priority := High" >/etc/kernel-pkg.conf
@@ -149,7 +144,9 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg --create ../../files-image/boot/kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
+		vero2_secondary_name="meson8b_vero2_second.img"
+	        ./dtbTool -o ${vero2_secondary_name} -p scripts/dtc
+	        ./mkbootimg --kernel uImage --ramdisk initrd.img.gz --second ${vero2_secondary_name} --output ../../files-image/boot/kernel.img
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
