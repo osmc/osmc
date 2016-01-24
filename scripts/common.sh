@@ -215,7 +215,8 @@ function pull_bin()
 
 if [ -z $DOWNLOAD_URL ]
 then
-	DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
+	#DOWNLOAD_URL=$(env LANG=C wget -S --spider --timeout 60 http://download.osmc.tv 2>&1 > /dev/null | grep "^Location:" | cut -f 2 -d ' ')
+	DOWNLOAD_URL="http://download.osmc.tv"
 	export DOWNLOAD_URL
 fi
 
