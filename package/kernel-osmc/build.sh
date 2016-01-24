@@ -149,7 +149,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg --create kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
+		abootimg --create ../../files-image/boot/kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
