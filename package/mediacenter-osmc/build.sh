@@ -207,7 +207,6 @@ then
 		--disable-vaapi \
 		--disable-vdpau \
 		--disable-pulse \
-		--disable-projectm \
 		--enable-x11 \
 		--disable-openmax \
 		--enable-optical-drive \
@@ -250,7 +249,6 @@ then
 		--disable-vaapi \
 		--disable-vdpau \
 		--disable-pulse \
-		--disable-projectm \
 		--with-platform=$PIDEV \
 		--disable-optimizations \
 		--enable-libcec \
@@ -281,7 +279,6 @@ then
 		--disable-joystick \
 		--disable-vtbdecoder \
 		--disable-pulse \
-		--disable-projectm \
 		--disable-optimizations \
 		--with-platform=vero \
 		--build=arm-linux
@@ -310,7 +307,6 @@ then
                 --disable-joystick \
                 --disable-vtbdecoder \
                 --disable-pulse \
-                --disable-projectm \
                 --disable-optimizations \
                 --with-platform=vero2 \
                 --build=arm-linux
