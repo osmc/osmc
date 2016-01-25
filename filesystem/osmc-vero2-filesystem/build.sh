@@ -56,7 +56,7 @@ deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
 
 deb http://security.debian.org/ jessie/updates main contrib non-free
 
-deb http://staging.apt.osmc.tv jessie main
+deb http://apt.osmc.tv jessie main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
@@ -103,7 +103,6 @@ remove_emulate_arm "${DIR}"
 # Perform filesystem cleanup
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
-enable_mirrordirector "${DIR}"
 
 # Create filesystem tarball
 create_fs_tarball "${DIR}" "${filestub}"
