@@ -1,9 +1,13 @@
 #!/bin/sh
-if ischroot; then exit 0; fi
-if ! mountpoint /boot >/dev/null 2>&1; then echo "/boot is not mounted!"; exit 1; fi
-echo hi
-umount /boot
-fsck.hfsplus /boot
-mount /boot
+if /usr/bin/ischroot; then exit 0; fi
+/bin/mountpoint /boot > /dev/null 2>&1
+if [ $? != 0 ]
+then
+    echo "/boot is not mounted!"
+    exit 1
+fi
+boot=$(grep "/boot" /etc/fstab | awk {'print $1'})
+/bin/umount /boot
+/sbin/fsck.hfsplus $boot
+/bin/mount /boot
 exit 0
-
