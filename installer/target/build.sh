@@ -21,8 +21,13 @@ kpartx
 dosfstools
 parted
 cpio
-python
-hfsprogs"
+python"
+
+if [ "$1" == "appletv" ]
+then
+   packages="hfsprogs $packages"
+fi
+
 for package in $packages
 do
 	install_package $package
