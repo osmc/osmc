@@ -13,7 +13,7 @@ INITRAMFS_NOBUILD=4
 test $1 == rbp1 && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.93" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
+test $1 == vero2 && VERSION="3.10.94" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
@@ -56,6 +56,11 @@ then
 	handle_dep "cpio"
 	handle_dep "bison"
 	handle_dep "flex"
+        if [ "$1" == "vero2" ]
+        then
+            handle_dep "abootimg"
+            handle_dep "u-boot-tools"
+        fi
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
 	priority := High" >/etc/kernel-pkg.conf
@@ -146,7 +151,7 @@ then
 		# Special packaging for Android
 		vero2_secondary_name="meson8b_vero2_second.img"
 	        ./dtbTool -o ${vero2_secondary_name} -p scripts/dtc
-	        ./mkbootimg --kernel uImage --ramdisk initrd.img.gz --second ${vero2_secondary_name} --output ../../files-image/boot/kernel.img
+		abootimg --create ../../files-image/boot/kernel.img -k arch/arm/boot/uImage -r initramfs.gz -s ${vero2_secondary_name}
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
