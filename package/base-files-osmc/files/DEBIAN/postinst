@@ -14,3 +14,9 @@ if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
 #fi
+
+chmod +x /etc/profile.d/100-add-sbin.sh
+chmod +x /etc/profile.d/101-apt-update.sh
+chmod +x /etc/profile.d/102-enable-cursor.patch
+chmod +x /etc/profile.d/103-generate-locale.sh
+chmod +x /etc/profile.d/104-add-osmc-bin.sh
