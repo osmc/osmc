@@ -59,6 +59,7 @@ then
         if [ "$1" == "vero2" ]
         then
             handle_dep "u-boot-tools"
+	    handle_dep "abootimg"
         fi
 	echo "maintainer := Sam G Nazarko
 	email := email@samnazarko.co.uk
@@ -89,6 +90,8 @@ then
 	then
 		$BUILD meson8b_vero2.dtd
 		$BUILD meson8b_vero2.dtb
+		$BUILD meson8b_skt.dtd
+		$BUILD meson8b_skt.dtb
 	fi
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -148,9 +151,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		vero2_secondary_name="meson8b_vero2_second.img"
-	        ./dtbTool -o ${vero2_secondary_name} -p scripts/dtc
-		./mkbootimg --kernel uImage --ramdisk initrd.img.gz --second ${vero2_secondary_name} --output ../../files-image/boot/kernel.img
+		abootimg ../../files-image/boot/kernel.img -k uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_skt.dtb
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
