@@ -100,7 +100,6 @@ import sys
 import os
 import threading
 import traceback
-import hashlib
 
 addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -127,15 +126,6 @@ def log(message):
 		message = message.encode('utf-8', 'ignore' )
 		
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
-
-
-# http://stackoverflow.com/questions/3431825/generating-a-md5-checksum-of-a-file
-def md5(fname):
-    hash = hashlib.md5()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash.update(chunk)
-    return hash.hexdigest()
 
 
 class OSMCSettingClass(threading.Thread):
@@ -409,7 +399,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# code placed here will run when the modules settings window is closed
 		self.apply_permitted = True
-
+		
 		self.apply_settings()
 
 		self.apply_permitted = False
@@ -435,13 +425,6 @@ Overclock settings are set using the Pi Overclock module."""
 		# window is closed.
 		if not self.apply_permitted:
 			return 'apply not permitted'
-
-		try:
-                    hash_pi_config_before = md5(self.test_config)
-                    log('config.txt hash calculated before any changes: %s' % hash_pi_config_before)
-                except:
-                    hash_pi_config_before = None
-                    log('could not hash config.txt before any changes: %s' % self.test_config)
 
 		# retrieve the current settings from the settings.xml (this is where the user has made changes)
 		new_settings = self.settings_retriever_xml()
@@ -482,15 +465,7 @@ Overclock settings are set using the Pi Overclock module."""
 		# call the final method if there is one
 		self.final_method()
 
-		try:
-                    hash_pi_config_after = md5(self.test_config)
-                    log('config.txt hash calculated after changes: %s' % hash_pi_config_after)
-                except:
-                    hash_pi_config_after = None
-                    log('could not hash config.txt after changes: %s' % self.test_config)
-
-                if not hash_pi_config_after == hash_pi_config_before:
-                    ok = DIALOG.notification(lang(32095), lang(32096))
+		ok = DIALOG.notification(lang(32095), lang(32096))
 
 
 	def settings_retriever_xml(self):
