@@ -31,35 +31,6 @@
 		<!-- Time -->
 		<include>Time</include>
 
-
-		<!--location, last update -->
-		<control type="group">
-			<left>30</left>
-			<top>30</top> 
-                	<control type="label">
-                    		<description>weather location label</description>
-		    		<left>30</left>
-                    		<top>30</top>
-                    		<width>1600</width>
-                    		<height>44</height>
-                    		<font>Small</font>
-                    		<textcolor>ColorHeading</textcolor>
-                    		<scroll>false</scroll>
-                    		<label>$INFO[Window.Property(Location)]</label>
-                	</control>
-                	<control type="label">
-                    		<description>update label</description>
-		    		<left>30</left>
-                    		<top>82</top>
-                    		<width>1600</width>
-                    		<height>44</height>
-                    		<font>XSmall</font>
-                    		<label>$LOCALIZE[31301]: $INFO[Window.Property(Updated)]</label>
-                    		<textcolor>ColorDetails</textcolor>
-                	</control>
-               	</control>
-
-
 		<!-- Main group -->
 		<control type="group">
 			<include>WindowFadeAnimation</include>
@@ -200,7 +171,7 @@
 			<!-- Weather Info -->
 			<control type="group">
 				<left>420</left>
-				<top>438</top> 
+				<top>438</top>
 				<control type="label">
 					<left>0</left>
 					<top>314</top>
@@ -239,7 +210,6 @@
 					<autoscroll>false</autoscroll>
 				</control>
 			</control>
-
 
 			<!-- Weather provider -->
 			<control type="grouplist">
