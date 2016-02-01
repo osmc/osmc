@@ -10,6 +10,9 @@ rbp2:
 vero1:
 	sudo bash build.sh "vero1"
 
+vero2:
+	sudo bash build.sh "vero2"
+
 appletv:
 	sudo bash build.sh "appletv"
 

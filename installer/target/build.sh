@@ -28,6 +28,11 @@ then
    packages="hfsprogs $packages"
 fi
 
+if [ "$1" == "vero2" ]
+then
+   packages="abootimg u-boot-tools $packages"
+fi
+
 for package in $packages
 do
 	install_package $package
@@ -63,9 +68,9 @@ while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1
 done
 if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ] || [ "$1" == "vero2" ]; then size=256; fi
 date=$(date +%Y%m%d)
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
@@ -96,6 +101,11 @@ then
 	mv zImage /mnt
 	mv *.dtb /mnt
 	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
+fi
+if [ "$1" == "vero2" ]
+then
+	echo -e "Installing Vero 2 files"
+	abootimg --create /mnt/kernel.img -k uImage -r rootfs.cpio.gz -s ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_skt.dtb
 fi
 if [ "$1" == "appletv" ]
 then
