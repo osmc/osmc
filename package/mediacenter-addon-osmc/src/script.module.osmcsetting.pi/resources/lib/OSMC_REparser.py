@@ -276,17 +276,22 @@ def config_hdmi_boost_validation(config_value):
 
 def soundcard_dac_validation(config_value):
 
-	permitted = [
-		'hifiberry-dac-overlay',
-		'hifiberry-dacplus-overlay',
-		'hifiberry-digi-overlay',
-		'iqaudio-dac-overlay',
-		'iqaudio-dacplus-overlay'
-		]
+	permitted = {
+		'hifiberry-dac-overlay' 	: '1',
+		'hifiberry-dac' 			: '1',
+		'hifiberry-dacplus-overlay' : '2',
+		'hifiberry-dacplus' 		: '2',
+		'hifiberry-digi-overlay' 	: '3',
+		'hifiberry-digi' 			: '3',
+		'iqaudio-dac-overlay' 		: '4',
+		'iqaudio-dac' 				: '4',
+		'iqaudio-dacplus-overlay' 	: '5',
+		'iqaudio-dacplus' 			: '5',		
+		}
 
 	try:
-		return str(permitted.index(config_value) + 1)
-	except IndexError:
+		return permitted.get(config_value, None)
+	except:
 		return None
 
 
