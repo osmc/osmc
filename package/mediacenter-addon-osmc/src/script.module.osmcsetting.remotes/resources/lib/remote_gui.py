@@ -171,6 +171,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 
 		self.local_confs = local_confs
 		self.active_conf = active_conf
+		self.rc6_file    = '/etc/modprobe.d/blacklist-rc6.conf'
 
 		self.remote_selection = None
 
@@ -189,6 +190,12 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 			self.getControl(50).setVisible(False)
 		except:
 			pass
+
+		# check for RC6 file, then set the radiobutton appropriately
+		if os.path.isfile(self.rc6_file):
+			self.getControl(8).setSelected(True)
+		else:
+			self.getControl(8).setSelected(False)
 
 
 	def find_custom_item(self):
@@ -219,6 +226,23 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 				tmp.select(True)
 			else:
 				tmp.select(False)
+
+
+	def rc6_handling(self):
+
+		sel = self.getControl(8).isSelected()
+
+		if sel:
+			# always overwrite the file, this will allow the contents to be updated (if ever needed)
+
+			with open('/var/tmp/blacklist-rc6.conf', 'w') as f:
+				f.write('blacklist ir_rc6_decoder\ninstall ir_rc6_decoder /bin/true')
+
+			subprocess.call(["sudo", "mv", '/var/tmp/blacklist-rc6.conf', self.rc6_file])
+
+		else:
+
+			subprocess.call(["sudo", "rm", "-f", self.rc6_file])
 
 
 	def onClick(self, controlID):
@@ -256,10 +280,11 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 		elif controlID == 7:
 			# user has selected Exit
 
+			self.rc6_handling()
+
 			self.remote_selection = None
 
 			self.close()
-
 
 		elif controlID == 62:
 			# user has chosen to browse for the file
