@@ -17,36 +17,48 @@ settings = {
 
 }
 
+keymap = {
+	
+	'i' : 'ip',
+	'p' : 'port',
+	'u' : 'user',
+	'w' : 'pssw',
+}
+
 try:
-	with open('/home/osmc/kodi_cli_remote.conf' , 'r') as f:
-		lines = f.readlines()
-		single = ''.join(lines)
-		settings = json.loads(single)
+	with open('/home/osmc/cli_remote.conf' , 'r') as f:
+		lines 		= f.readlines()
+		single 		= ''.join(lines)
+		raw_sets 	= json.loads(single)
+		settings.update(raw_sets)
 except:
 
-	print 'USAGE     : python cli_remote.py <ip address> <port> <user> <password>'
-	print 'Defaults  :                        127.0.0.1    80     ""       ""'
+	print 'USAGE     : cli-remote i=Your_ip_address p=your_port u=your_username w=your_password'
+	print 'All the settings are optional. The default will be used in their place if you dont specifiy them.'
+	print 'Defaults:'
+	print '		ip   : 127.0.0.1'
+	print '		port : 80'       
+	print '		user : ""'
+	print '		pass : ""'
 	print ''
-	print 'Alternatively, save a file called /home/osmc/cli_remote.conf with this:'
-	print '{"ip": <your_ip>, "port": <your_port>, "user" : <your_user>, "pssw": <your_pass<'
+	print 'If you are using this script on the device (via ssh or something) then you dont need to put in the IP address.'
+	print 'The default of 127.0.0.1 already points to the local host.'
+	print ''
+	print 'Alternatively, you can save a file called /home/osmc/cli_remote.conf with this:'
+	print '{"ip": "your_ip", "port": "your_port", "user" : "your_user", "pssw": "your_pass"}'
+	print 'Or just {"port": "your_port"} if that is all you would like to change.'
 	print ''
 
-	try:
-		settings['ip']   = sys.argv[1]
-	except:
-		pass
-	try:
-		settings['port'] = sys.argv[2]
-	except:
-		pass
-	try:	
-		settings['user'] = sys.argv[3]
-	except:
-		pass
-	try:
-		settings['pssw'] = sys.argv[4]
-	except:
-		pass
+	for arg in sys.argv[1:]:
+		try:
+			k, v = arg.split('=')
+			key = keymap.get(k, None)
+			if key is not None:
+				settings[key] = v
+
+		except:
+			continue
+
 
 def call(settings, action, params=None):
 
