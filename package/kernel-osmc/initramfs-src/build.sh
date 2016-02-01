@@ -89,7 +89,11 @@ mkdir -p target/etc
 mkdir -p target/dev
 mkdir -p target/run
 mkdir -p target/init.d
-mkdir -p target/usr/sbin
+if [ "$2" == "vero2" ]
+then
+    mkdir -p target/usr/sbin
+    mkdir -p target/etc/lvm
+fi
 mkdir -p target/usr/share/udhcpc
 install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
 install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
