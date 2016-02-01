@@ -13,7 +13,7 @@ INITRAMFS_NOBUILD=4
 test $1 == rbp1 && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.94" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
+test $1 == vero2 && VERSION="3.10.94" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
@@ -151,7 +151,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg ../../files-image/boot/kernel.img -k uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_skt.dtb
+		abootimg --create ../../files-image/boot/kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_skt.dtb
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
