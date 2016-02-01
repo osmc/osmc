@@ -29,6 +29,37 @@ udevadm trigger
 
 sleep 3 # Wait for /dev population
 
+grep -q vero2 /proc/cmdline
+if [ $? == 0 ]
+then
+    hdmimode=720p
+    for arg in $(cat /proc/cmdline); do
+      case $arg in
+       hdmimode=*)
+        hdmimode="${arg#*=}"
+       ;;
+      esac
+    done
+
+    # Enable framebuffer device
+    echo "$hdmimode" > /sys/class/display/mode
+    echo 0 > /sys/class/graphics/fb0/blank
+
+    # Disable framebuffer scaling
+    echo 0 > /sys/class/graphics/fb0/free_scale
+    echo 0 > /sys/class/graphics/fb1/free_scale
+
+    # Configure framebuffer with double buffer
+    case "$hdmimode" in
+      720*)
+       fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
+      ;;
+      1080*)
+       fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
+      ;;
+esac
+fi
+
 DEBUG_IP=$(sed 's/\ /\n/g' /proc/cmdline | grep "^debugip=" | sed 's/^debugip=//g')
 if [ -n "$DEBUG_IP" ]
 then
