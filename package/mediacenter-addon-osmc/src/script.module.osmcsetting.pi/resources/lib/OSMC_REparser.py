@@ -698,6 +698,17 @@ def gpio_updown_config_set(kodi_setting, all_settings):
 		return 'remove_this_line'
 
 
+def audio_config_set(kodi_setting, all_settings):
+
+	if all_settings.get('soundcard_dac', '0') != '0':
+
+		return 'off'
+
+	else:
+
+		return 'remove_this_line'
+
+
 '''
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@ 
@@ -741,6 +752,25 @@ Houses the protocols for the settings in Kodi which come from the config.txt    
 '''
 
 MASTER_SETTINGS =    {
+
+		"audio":{
+			"default":{
+				"function"		:None,
+				"value"			:"false"
+				},
+			"config_get_patterns":[
+				{
+				"identify"		: r"\s*(?:dtparam|dtparams|device_tree_param|device_tree_params)\s*=.*audio\s*=",
+				"extract"		: r"\s*(?:dtparam|dtparams|device_tree_param|device_tree_params)\s*=.*audio\s*=\s*(\w+)"
+				},
+
+				],
+			"config_set"		: audio_config_set,
+			"config_validation"	: blank_check_validation,
+			"kodi_set"			: generic_passthrough_kodi_set,
+			"already_set"		: False,
+			"setting_stub"		: "dtparam=audio=%s",
+		},
 
 		"config_hdmi_boost": { 
 			"default"   : { 
