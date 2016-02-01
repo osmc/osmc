@@ -2,7 +2,7 @@
 
 export OPTION_DO_FSCK="1"
 export OPTION_FORCE_FSCK="0"
-export OPTION_ROOT="/dev/mmcblk0p2"
+export OPTION_ROOT="/dev/vero-nand/root"
 export OPTION_ROOTDELAY="0"
 export OPTION_FILESYSTEM="ext4"
 export OPTION_INIT="/sbin/splash_early"
@@ -44,3 +44,9 @@ echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
 for part in /sys/block/*/queue/add_random; do
 echo 0 > "$part"
 done
+
+# Set up NAND
+# ToDo: only if bootfromsd
+/usr/sbin/pvscan >/dev/null 2>&1
+/usr/sbin/vgscan >/dev/null 2>&1
+/usr/sbin/lvchange -aly /dev/vero-nand/root --ignorelockingfailure >/dev/null 2>&1
