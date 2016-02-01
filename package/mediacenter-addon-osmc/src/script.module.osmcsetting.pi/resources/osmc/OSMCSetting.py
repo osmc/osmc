@@ -102,6 +102,7 @@ import sys
 import os
 import threading
 import traceback
+import hashlib
 
 addonid = "script.module.osmcsetting.pi"
 __addon__  = xbmcaddon.Addon(addonid)
@@ -115,8 +116,8 @@ import OSMC_REparser as parser
 
 
 def lang(id):
-    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-    return san 
+	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+	return san 
 
 
 def log(message):
@@ -129,6 +130,15 @@ def log(message):
 	xbmc.log('OSMC PI ' + str(message), level=xbmc.LOGDEBUG)
 
 
+# http://stackoverflow.com/questions/3431825/generating-a-md5-checksum-of-a-file
+def md5(fname):
+	hash = hashlib.md5()
+	with open(fname, "rb") as f:
+		for chunk in iter(lambda: f.read(4096), b""):
+			hash.update(chunk)
+	return hash.hexdigest()
+
+	
 class OSMCSettingClass(threading.Thread):
 
 	''' 
@@ -200,6 +210,15 @@ Overclock settings are set using the Pi Overclock module."""
 			This allows the creation of action buttons in the GUI, as well as allowing developers to script and skin their 
 			own user interfaces.
 		'''
+		
+		# calculate an md5 hash of config.txt *before* we make any changes
+		# will compare this to file at end to determine if any changes were actually made
+		try:
+			hash_pi_config_before = md5(self.config_location)
+			log('config.txt hash calculated before any changes: %s' % hash_pi_config_before)
+		except:
+			hash_pi_config_before = None
+			log('could not hash config.txt before any changes: %s' % self.config_location)
 
 		# read the config.txt file everytime the settings are opened. This is unavoidable because it is possible for
 		# the user to have made manual changes to the config.txt while OSG is active.
@@ -235,8 +254,18 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# copy over the temp config.txt to /boot/ as superuser
 		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
+		
+		# calculate an md5 hash of config.txt *after* all changes are made
+		# compare this hash from *before* to determine if any changes were actually made
+		try:
+			hash_pi_config_after = md5(self.config_location)
+			log('config.txt hash calculated after changes: %s' % hash_pi_config_after)
+		except:
+			hash_pi_config_after = None
+			log('could not hash config.txt after changes: %s' % self.config_location)
 
-		ok = DIALOG.notification(lang(32095), lang(32096))
+		if not hash_pi_config_after == hash_pi_config_before:
+			ok = DIALOG.notification(lang(32095), lang(32096))
 
 
 	def apply_settings(self):
