@@ -152,6 +152,7 @@ then
 	then
 		# Special packaging for Android
 		abootimg --create ../../files-image/boot/kernel.img -k arch/arm/boot/uImage -r initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_skt.dtb
+		f [ $? != 0 ]; then echo "Building Android image for Vero 2 failed" && exit 1; fi
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
