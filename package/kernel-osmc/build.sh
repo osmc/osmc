@@ -37,6 +37,10 @@ then
 	. initramfs-src/VERSIONS
 	pull_source "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
 	pull_source "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
+        if [ "$1" == "vero2" ]
+	then
+	    pull_source "ftp://sources.redhat.com/pub/lvm2/LVM2.${LVM_VERSION}.tgz" "$(pwd)/initramfs-src/lvm2"
+	fi
 fi
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
