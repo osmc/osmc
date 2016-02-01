@@ -115,8 +115,8 @@ from CompLogger import comprehensive_logger as clog
 
 
 def lang(id):
-	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-	return san 
+    san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
+    return san 
 
 
 def log(message):
@@ -131,11 +131,11 @@ def log(message):
 
 # http://stackoverflow.com/questions/3431825/generating-a-md5-checksum-of-a-file
 def md5(fname):
-	hash = hashlib.md5()
-	with open(fname, "rb") as f:
-		for chunk in iter(lambda: f.read(4096), b""):
-			hash.update(chunk)
-	return hash.hexdigest()
+    hash = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash.update(chunk)
+    return hash.hexdigest()
 
 
 class OSMCSettingClass(threading.Thread):
@@ -437,11 +437,11 @@ Overclock settings are set using the Pi Overclock module."""
 			return 'apply not permitted'
 
 		try:
-			hash_pi_config_before = md5(self.test_config)
-			log('config.txt hash calculated before any changes: %s' % hash_pi_config_before)
-		except:
-			hash_pi_config_before = None
-			log('could not hash config.txt before any changes: %s' % self.test_config)
+                    hash_pi_config_before = md5(self.test_config)
+                    log('config.txt hash calculated before any changes: %s' % hash_pi_config_before)
+                except:
+                    hash_pi_config_before = None
+                    log('could not hash config.txt before any changes: %s' % self.test_config)
 
 		# retrieve the current settings from the settings.xml (this is where the user has made changes)
 		new_settings = self.settings_retriever_xml()
@@ -483,14 +483,14 @@ Overclock settings are set using the Pi Overclock module."""
 		self.final_method()
 
 		try:
-			hash_pi_config_after = md5(self.test_config)
-			log('config.txt hash calculated after changes: %s' % hash_pi_config_after)
-		except:
-			hash_pi_config_after = None
-			log('could not hash config.txt after changes: %s' % self.test_config)
+                    hash_pi_config_after = md5(self.test_config)
+                    log('config.txt hash calculated after changes: %s' % hash_pi_config_after)
+                except:
+                    hash_pi_config_after = None
+                    log('could not hash config.txt after changes: %s' % self.test_config)
 
-		if not hash_pi_config_after == hash_pi_config_before:
-			ok = DIALOG.notification(lang(32095), lang(32096))
+                if not hash_pi_config_after == hash_pi_config_before:
+                    ok = DIALOG.notification(lang(32095), lang(32096))
 
 
 	def settings_retriever_xml(self):
