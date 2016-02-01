@@ -89,6 +89,7 @@ mkdir -p target/etc
 mkdir -p target/dev
 mkdir -p target/run
 mkdir -p target/init.d
+mkdir -p target/usr/sbin
 mkdir -p target/usr/share/udhcpc
 install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bin/e2fsck
 install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
@@ -97,9 +98,9 @@ install -m 0755 init.d/${2} target/init-device
 if [ "$2" == "vero2" ]
 then
     cp -ar lvm-vero2.conf target/etc/lvm/lvm.conf
-    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/pvscan target/sbin/pvscan
-    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/vgscan target/sbin/vgscan
-    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/lvchange target/sbin/lvchange
+    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/pvscan target/usr/sbin/pvscan
+    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/vgscan target/usr/sbin/vgscan
+    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/lvchange target/usr/sbin/lvchange
 fi
 cp -ar udhcpc.script target/usr/share/udhcpc/default.script
 cp -ar e2fsck.conf target/etc/e2fsck.conf
@@ -113,7 +114,12 @@ mknod target/dev/null c 1 3
 mknod target/dev/tty c 5 0
 for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+if [ "$2" == "vero" ]
+then
+    for line in $(ldd target/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    for line in $(ldd target/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    for line in $(ldd target/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+fi
 if [ "$1" == "cpio" ]
 then
     pushd target
