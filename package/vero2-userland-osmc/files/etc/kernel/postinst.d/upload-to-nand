@@ -2,6 +2,8 @@
 
 processimage()
 {
+    cp ${1} /boot/kernel.img
+    if ischroot; then exit 0; fi
     LANG=C /bin/dd if=${1} of=/dev/boot bs=1M conv=fsync
     STATUS=$?
     if [ "$STATUS" != 0 ]
@@ -10,7 +12,6 @@ processimage()
         exit $STATUS
     fi
     # Make it easy to see the active version and give target installer a handle
-    cp ${2} /boot/kernel.img >/dev/null 2>&1
 }
 
 processimage $2
