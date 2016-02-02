@@ -22,7 +22,10 @@ echo "Building initramfs for target ${1}"
 make clean
 update_sources
 handle_dep "autoconf"
-
+if [ "$2" == "vero2" ]
+then
+    handle_dep "libdevmapper-dev"
+fi
 if [ "$1" == "cpio" ]
 then
 	rm -f *.tar.*
@@ -31,10 +34,6 @@ then
 	handle_dep "cpio"
 	handle_dep "wget" # Hack for poor man's pull_source
 	handle_dep "ca-certificates" # kernel.org redirects to HTTPS
-	if [ "$2" == "vero2" ]
-	then
-	    handle_dep "libdevmapper-dev"
-	fi
 	# Use wget to get resources, as pull_source not compatible in chroot. Do not use in production
 	wget "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2"
 	if [ $? != 0 ]; then echo "Could not get busybox sources" && exit 1; fi
