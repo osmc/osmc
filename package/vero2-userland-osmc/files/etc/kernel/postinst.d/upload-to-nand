@@ -2,16 +2,14 @@
 
 processimage()
 {
-    cp ${1} /boot/kernel.img
     if ischroot; then exit 0; fi
-    LANG=C /bin/dd if=${1} of=/dev/boot bs=1M conv=fsync
+    LANG=C /bin/dd if=/boot/kernel.img of=/dev/boot bs=1M conv=fsync
     STATUS=$?
     if [ "$STATUS" != 0 ]
     then
         echo "Could not upload kernel to NAND" >&2
         exit $STATUS
     fi
-    # Make it easy to see the active version and give target installer a handle
 }
 
-processimage $2
+processimage
