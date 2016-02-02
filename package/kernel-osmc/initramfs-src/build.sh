@@ -77,6 +77,7 @@ then
     popd
 fi
 mkdir -p target/
+mkdir -p target/usr/lib
 mkdir -p target/lib
 mkdir -p target/sbin
 mkdir -p target/bin
@@ -122,6 +123,8 @@ then
     for line in $(ldd target/usr/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     for line in $(ldd target/usr/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    # HACK HACK HACK. Fix when not 6.33AM
+    cp -ar /usr/lib/arm-linux-gnueabihf/libdevmapper.so target/usr/lib/libdevmapper.so.1.02
 fi
 if [ "$1" == "cpio" ]
 then
