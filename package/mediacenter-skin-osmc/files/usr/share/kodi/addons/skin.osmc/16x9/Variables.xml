@@ -16,7 +16,8 @@
 	</variable>
 	<variable name="InfoDetails1">
 		<value condition="[Container.Content(movies) | Container.Content(episodes)] + !IsEmpty(ListItem.Rating)">[COLOR=ColorDetails]$INFO[ListItem.Rating][/COLOR]</value>
-		<value condition="[Container.Content(movies) | Container.Content(episodes)] + IsEmpty(ListItem.Rating)">[COLOR=ColorDetails]N/A[/COLOR]</value></variable>
+		<value condition="[Container.Content(movies) | Container.Content(episodes)] + IsEmpty(ListItem.Rating)">[COLOR=ColorDetails]N/A[/COLOR]</value>
+</variable>
 	<variable name="InfoHeading2">
 		<value condition="Container.Content(movies) | Container.Content(episodes)">$LOCALIZE[2050]:</value>
 	</variable>
@@ -43,7 +44,8 @@
 		<value condition="Window.IsVisible(pictures)">$INFO[ListItem.FileNameAndPath]</value>
 		<value condition="Container.Content(episodes)">$INFO[ListItem.Icon]</value>
 		<value condition="!IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
-		<value>DefaultAddonNone.png</value></variable>
+		<value>DefaultAddonNone.png</value>
+</variable>
 	<variable name="WidgetLabel">
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecentMovies)">$INFO[Container(9002).ListItem.Label]</value>
 		<value condition="StringCompare(Container(9000).ListItem.Property(Widget),RecommendedMovies)">$INFO[Container(9003).ListItem.Label]</value>
@@ -88,7 +90,7 @@
 		<value condition="Window.IsVisible(systeminfo)">$LOCALIZE[130]</value>
 		<value condition="Window.IsVisible(addonbrowser)">$LOCALIZE[24001]</value>
 		<value condition="Window.IsVisible(profiles)">$LOCALIZE[13200]</value>
-		<value condition="Window.IsVisible(filemanager)]">$LOCALIZE[7]</value>
+		<value condition="Window.IsVisible(filemanager)">$LOCALIZE[7]</value>
 		<value condition="Window.IsVisible(weather)">$LOCALIZE[8]</value>
 		<value condition="Window.IsVisible(videoplaylist)">$LOCALIZE[20012]</value>
 		<value condition="Window.IsVisible(musicplaylist)">$LOCALIZE[20011]</value>
