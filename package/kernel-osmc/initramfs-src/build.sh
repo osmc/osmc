@@ -22,10 +22,6 @@ echo "Building initramfs for target ${1}"
 make clean
 update_sources
 handle_dep "autoconf"
-if [ "$2" == "vero2" ]
-then
-    handle_dep "libdevmapper-dev"
-fi
 if [ "$1" == "cpio" ]
 then
 	rm -f *.tar.*
@@ -118,13 +114,13 @@ mknod target/dev/null c 1 3
 mknod target/dev/tty c 5 0
 for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-if [ "$2" == "vero" ]
+if [ "$2" == "vero2" ]
 then
     for line in $(ldd target/usr/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     for line in $(ldd target/usr/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     # HACK HACK HACK. Fix when not 6.33AM
-    cp -ar /usr/lib/arm-linux-gnueabihf/libdevmapper.so target/usr/lib/libdevmapper.so.1.02
+    cp lvm2/LVM2.${LVM_VERSION}/out/usr/lib/libdevmapper.so.* target/usr/lib
 fi
 if [ "$1" == "cpio" ]
 then
