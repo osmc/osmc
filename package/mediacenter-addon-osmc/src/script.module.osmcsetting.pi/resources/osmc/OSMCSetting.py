@@ -265,7 +265,10 @@ Overclock settings are set using the Pi Overclock module."""
 			log('could not hash config.txt after changes: %s' % self.config_location)
 
 		if not hash_pi_config_after == hash_pi_config_before:
+			log('config.txt changed (hashes did not match)')
 			ok = DIALOG.notification(lang(32095), lang(32096))
+		else:
+			log('config.txt unchanged (hashes matched)')
 
 
 	def apply_settings(self):
