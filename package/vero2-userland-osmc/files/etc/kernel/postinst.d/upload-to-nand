@@ -9,6 +9,8 @@ processimage()
         echo "Could not upload kernel to NAND" >&2
         exit $STATUS
     fi
+    # Make it easy to see the active version and give target installer a handle
+    cp ${2} /boot/kernel.img >/dev/null 2>&1
 }
 
 processimage $2
