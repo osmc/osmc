@@ -120,9 +120,9 @@ for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 if [ "$2" == "vero" ]
 then
-    for line in $(ldd target/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-    for line in $(ldd target/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-    for line in $(ldd target/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    for line in $(ldd target/usr/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    for line in $(ldd target/usr/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+    for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 fi
 if [ "$1" == "cpio" ]
 then
