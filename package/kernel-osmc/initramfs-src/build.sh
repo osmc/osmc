@@ -121,6 +121,8 @@ then
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     # HACK HACK HACK. Fix when not 6.33AM
     cp lvm2/LVM2.${LVM_VERSION}/out/usr/lib/libdevmapper.so.* target/usr/lib
+    # Double hack. Would normally overwrite if consistent, but catch libdevmapper being on system.
+    rm -f target/lib/libdevmapper.so.*
 fi
 if [ "$1" == "cpio" ]
 then
