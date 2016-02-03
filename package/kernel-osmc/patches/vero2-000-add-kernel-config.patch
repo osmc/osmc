@@ -1,6 +1,6 @@
---- /dev/null	2016-01-30 03:37:57.438507126 +0000
-+++ a/.config	2016-01-31 01:42:02.676245360 +0000
-@@ -0,0 +1,3772 @@
+--- /dev/null	2013-06-03 14:59:59.000000000 +0000
++++ b/.config	2016-02-03 16:39:28.971408450 +0000
+@@ -0,0 +1,3790 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 3.10.94 Kernel Configuration
@@ -469,7 +469,7 @@
 +CONFIG_ZBOOT_ROM_TEXT=0
 +CONFIG_ZBOOT_ROM_BSS=0
 +# CONFIG_ARM_APPENDED_DTB is not set
-+CONFIG_CMDLINE="console=tty0 consoleblank=0 hdmitx=cecf mac=00:11:22:33:44:55 osmcdev=vero2 root=/dev/vero-nand/root"
++CONFIG_CMDLINE="console=tty0 consoleblank=0 hdmitx=cecf mac=00:11:22:33:44:55 osmcdev=vero2 root=/dev/vero-nand/root quiet"
 +# CONFIG_CMDLINE_FROM_BOOTLOADER is not set
 +# CONFIG_CMDLINE_EXTEND is not set
 +# CONFIG_CMDLINE_FORCE is not set
@@ -1570,7 +1570,24 @@
 +# CONFIG_SCSI_DH is not set
 +# CONFIG_SCSI_OSD_INITIATOR is not set
 +# CONFIG_ATA is not set
-+# CONFIG_MD is not set
++CONFIG_MD=y
++# CONFIG_BLK_DEV_MD is not set
++# CONFIG_BCACHE is not set
++CONFIG_BLK_DEV_DM_BUILTIN=y
++CONFIG_BLK_DEV_DM=m
++# CONFIG_DM_DEBUG is not set
++# CONFIG_DM_CRYPT is not set
++# CONFIG_DM_SNAPSHOT is not set
++# CONFIG_DM_THIN_PROVISIONING is not set
++# CONFIG_DM_CACHE is not set
++# CONFIG_DM_MIRROR is not set
++# CONFIG_DM_RAID is not set
++# CONFIG_DM_ZERO is not set
++# CONFIG_DM_MULTIPATH is not set
++# CONFIG_DM_DELAY is not set
++# CONFIG_DM_UEVENT is not set
++# CONFIG_DM_FLAKEY is not set
++# CONFIG_DM_VERITY is not set
 +# CONFIG_TARGET_CORE is not set
 +CONFIG_NETDEVICES=y
 +CONFIG_NET_CORE=y
@@ -3406,6 +3423,7 @@
 +CONFIG_NFS_SWAP=y
 +CONFIG_NFS_V4_1=y
 +CONFIG_PNFS_FILE_LAYOUT=m
++CONFIG_PNFS_BLOCK=m
 +CONFIG_NFS_V4_1_IMPLEMENTATION_ID_DOMAIN="kernel.org"
 +CONFIG_ROOT_NFS=y
 +# CONFIG_NFS_FSCACHE is not set
