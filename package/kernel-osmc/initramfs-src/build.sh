@@ -98,8 +98,6 @@ install -m 0755 init.d/${2} target/init-device
 if [ "$2" == "vero2" ]
 then
     cp -ar lvm-vero2.conf target/etc/lvm/lvm.conf
-    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/pvscan target/usr/sbin/pvscan
-    install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/vgscan target/usr/sbin/vgscan
     install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/lvchange target/usr/sbin/lvchange
 fi
 cp -ar udhcpc.script target/usr/share/udhcpc/default.script
@@ -116,13 +114,13 @@ for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 if [ "$2" == "vero2" ]
 then
-    for line in $(ldd target/usr/sbin/pvscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-    for line in $(ldd target/usr/sbin/vgscan); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     # HACK HACK HACK. Fix when not 6.33AM
     cp lvm2/LVM2.${LVM_VERSION}/out/usr/lib/libdevmapper.so.* target/usr/lib
     # Double hack. Would normally overwrite if consistent, but catch libdevmapper being on system.
     rm -f target/lib/libdevmapper.so.*
+    # Dependency of a dependency..
+    cp /lib/arm-linux-gnueabihf/libsepol.so.1 target/lib/
 fi
 if [ "$1" == "cpio" ]
 then
