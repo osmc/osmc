@@ -10,7 +10,7 @@ export OPTION_MOUNT_OPTIONS=""
 export OPTION_MOUNT_PATH="/real_root"
 
 hdmimode=720p
-for arg in $(cat /proc/cmdline); do
+for arg in $(/bin/busybox cat /proc/cmdline); do
   case $arg in
    hdmimode=*)
      hdmimode="${arg#*=}"
@@ -29,10 +29,10 @@ echo 0 > /sys/class/graphics/fb1/free_scale
 # Configure framebuffer with double buffer
 case "$hdmimode" in
   720*)
-   fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
+   /bin/busybox fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
   ;;
   1080*)
-   fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
+   /bin/busybox fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
   ;;
 esac
 
