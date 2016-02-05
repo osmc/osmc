@@ -178,6 +178,20 @@ void MainWindow::install()
         logger->addLine("Creating root partition");
         ui->statusLabel->setText(tr("Formatting device"));
         qApp->processEvents(); /* Force GUI update */
+        if (utils->getOSMCDev() == "vero2" && ! device->hasBootChanged())
+        {
+            /* Set up LVM */
+            system("dd if=/dev/zero of=/dev/data bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/misc bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/system bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync");
+            /* Own logo eventually */
+            system("dd if=/dev/zero of=/dev/logo bs=1M count=1 conv=fsync");
+            system("pvcreate /dev/data dev/system /dev/cache /dev/misc");
+            system("vgcreate vero-nand /dev/data /dev/system /dev/cache /dev/misc");
+            system("lvcreate -n root -l100%FREE vero-nand");
+            utils->fmtpart(device->getRoot(), "ext4");
+        }
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -193,7 +207,7 @@ void MainWindow::install()
         }
         else
         {
-            if (! device->doesBootNeedsFormat())
+            if (! device->doesBootNeedsFormat() && utils->getOSMCDev() != "vero2")
             {
                 int size = utils->getPartSize(rootBase, device->getBootFS());
                 if (size == -1)
@@ -273,9 +287,18 @@ void MainWindow::setupBootLoader()
     QTimer::singleShot(0, this, SLOT(val));
 
     /* Reboot */
-    ui->statusLabel->setText(tr("OSMC installed successfully"));
-    qApp->processEvents(); /* Force GUI update */
-    utils->rebootSystem();
+    if (utils->getOSMCDev() == "vero2")
+    {
+        system("/bin/sync");
+        ui->statusLabel->setText(tr("OSMC installed successfully"));
+        qApp->processEvents(); /* Force GUI update */
+    }
+    else
+    {
+        ui->statusLabel->setText(tr("OSMC installed successfully"));
+        qApp->processEvents(); /* Force GUI update */
+        utils->rebootSystem();
+    }
 }
 
 void MainWindow::haltInstall(QString errorMsg)

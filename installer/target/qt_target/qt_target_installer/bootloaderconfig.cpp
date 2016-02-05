@@ -29,24 +29,28 @@ void BootloaderConfig::copyBootFiles()
     system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
     system("mv /tmp/preseed.cfg /mnt/boot/preseed.cfg");
-    system("mv /mnt/root/boot/* /mnt/boot");
+    if (utils->getOSMCDev() != "vero2")
+         system("mv /mnt/root/boot/* /mnt/boot");
     if (utils->getOSMCDev() == "atv")
     {
         system("mv /tmp/BootLogo.png /mnt/boot/BootLogo.png");
         system("mv /tmp/boot.efi /mnt/boot/boot.efi");
         system("mv /tmp/System /mnt/boot");
     }
+    if (utils->getOSMCDev() == "vero2")
+        system("dd if=/mnt/root/boot/kernel.img of=/dev/boot bs=1M conv=fsync");
 }
 
 void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv" || utils->getOSMCDev() == "vero2")
     {
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
-        fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime    0   0\n");
+        if (utils->getOSMCDev() != "vero2")
+            fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime    0   0\n");
         if (! device->getRoot().contains(":/"))
             fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
         else
