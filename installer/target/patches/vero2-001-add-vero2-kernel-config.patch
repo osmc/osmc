@@ -1,6 +1,6 @@
---- /dev/null	2016-01-31 15:00:56.260778715 +0000
-+++ a/vero2.config	2016-02-01 02:45:09.593195040 +0000
-@@ -0,0 +1,3417 @@
+--- /dev/null	2016-02-07 20:18:27.983354335 +0000
++++ b/vero2.config	2016-02-07 21:52:20.724127931 +0000
+@@ -0,0 +1,3421 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 3.10.94 Kernel Configuration
@@ -108,9 +108,14 @@
 +# CONFIG_CGROUP_SCHED is not set
 +# CONFIG_BLK_CGROUP is not set
 +# CONFIG_CHECKPOINT_RESTORE is not set
-+# CONFIG_NAMESPACES is not set
++CONFIG_NAMESPACES=y
++CONFIG_UTS_NS=y
++CONFIG_IPC_NS=y
++CONFIG_USER_NS=y
++CONFIG_PID_NS=y
++CONFIG_NET_NS=y
 +CONFIG_UIDGID_CONVERTED=y
-+# CONFIG_UIDGID_STRICT_TYPE_CHECKS is not set
++CONFIG_UIDGID_STRICT_TYPE_CHECKS=y
 +# CONFIG_SCHED_AUTOGROUP is not set
 +# CONFIG_SYSFS_DEPRECATED is not set
 +# CONFIG_RELAY is not set
@@ -166,7 +171,6 @@
 +# CONFIG_KPROBES is not set
 +CONFIG_JUMP_LABEL=y
 +# CONFIG_HAVE_64BIT_ALIGNED_ACCESS is not set
-+CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS=y
 +CONFIG_HAVE_KPROBES=y
 +CONFIG_HAVE_KRETPROBES=y
 +CONFIG_HAVE_ARCH_TRACEHOOK=y
@@ -469,7 +473,7 @@
 +CONFIG_ZBOOT_ROM_TEXT=0
 +CONFIG_ZBOOT_ROM_BSS=0
 +# CONFIG_ARM_APPENDED_DTB is not set
-+CONFIG_CMDLINE="console=tty0 consoleblank=0 hdmitx=cecf mac=00:11:22:33:44:55 root=/dev/ram0 osmcdev=vero2 debugip=192.168.1.17"
++CONFIG_CMDLINE="console=tty0 consoleblank=0 hdmitx=cecf mac=00:11:22:33:44:55 root=/dev/ram0 osmcdev=vero2"
 +# CONFIG_CMDLINE_FROM_BOOTLOADER is not set
 +# CONFIG_CMDLINE_EXTEND is not set
 +# CONFIG_CMDLINE_FORCE is not set
