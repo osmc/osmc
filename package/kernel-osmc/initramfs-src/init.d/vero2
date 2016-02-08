@@ -47,4 +47,6 @@ done
 
 # Set up NAND
 # ToDo: only if bootfromsd
+sleep 1
 /usr/sbin/lvchange -aly /dev/vero-nand/root --ignorelockingfailure >/dev/null 2>&1
+sleep 1
