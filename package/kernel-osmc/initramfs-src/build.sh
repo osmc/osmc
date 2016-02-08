@@ -84,7 +84,6 @@ mkdir -p target/var
 mkdir -p target/etc
 mkdir -p target/dev
 mkdir -p target/run
-mkdir -p target/init.d
 if [ "$2" == "vero2" ]
 then
     mkdir -p target/usr/sbin
