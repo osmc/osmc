@@ -3,7 +3,7 @@
 processimage()
 {
     if ischroot; then exit 0; fi
-    LANG=C /bin/dd if=/boot/kernel.img of=/dev/boot bs=1M conv=fsync
+    LANG=C /bin/dd if=/boot/kernel-${1}.img of=/dev/boot bs=1M conv=fsync
     STATUS=$?
     if [ "$STATUS" != 0 ]
     then
@@ -12,4 +12,4 @@ processimage()
     fi
 }
 
-processimage
+processimage $1
