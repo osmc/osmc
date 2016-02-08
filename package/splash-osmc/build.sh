@@ -16,7 +16,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
         sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-splash-osmc" >> files/DEBIAN/control
-	echo "Depends: fbset, libpng12" >> files/DEBIAN/control
+	echo "Depends: fbset, libpng12-0" >> files/DEBIAN/control
 	update_sources
 	handle_dep "libpng12-dev"
 	pushd src
