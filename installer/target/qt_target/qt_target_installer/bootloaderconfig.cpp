@@ -8,6 +8,7 @@
 #include "network.h"
 #include <QStringList>
 #include <QTextStream>
+#include <QDirIterator>
 
 BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
@@ -38,7 +39,21 @@ void BootloaderConfig::copyBootFiles()
         system("mv /tmp/System /mnt/boot");
     }
     if (utils->getOSMCDev() == "vero2")
-        system("dd if=/mnt/root/boot/kernel.img of=/dev/boot bs=1M conv=fsync");
+    {
+        /* We don't have an exact name for the kernel image */
+        QDirIterator it ("/mnt/root/boot", QStringList() << "kernel*.img", QDir::Files);
+        QString kernelName;
+        while (it.hasNext())
+        {
+            kernelName = it.next();
+            break;
+        }
+        if (! kernelName.isEmpty())
+        {
+            QString ddCmd = "dd if=" + kernelName + " of=/dev/boot bs=1M conv=fsync";
+            system(ddCmd.toLocal8Bit().data());
+        }
+    }
 }
 
 void BootloaderConfig::configureMounts()
