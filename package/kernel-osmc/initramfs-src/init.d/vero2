@@ -47,6 +47,4 @@ done
 
 # Set up NAND
 # ToDo: only if bootfromsd
-/bin/busybox sleep 1
 /usr/sbin/lvchange -aly /dev/vero-nand/root --ignorelockingfailure >/dev/null 2>&1
-/bin/busybox sleep 1
