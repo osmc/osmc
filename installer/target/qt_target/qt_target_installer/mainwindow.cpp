@@ -187,7 +187,7 @@ void MainWindow::install()
             system("dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync");
             /* Own logo eventually */
             system("dd if=/dev/zero of=/dev/logo bs=1M count=1 conv=fsync");
-            system("pvcreate /dev/data dev/system /dev/cache /dev/misc");
+            system("pvcreate /dev/data /dev/system /dev/cache /dev/misc");
             system("vgcreate vero-nand /dev/data /dev/system /dev/cache /dev/misc");
             system("lvcreate -n root -l100%FREE vero-nand");
             utils->fmtpart(device->getRoot(), "ext4");
