@@ -113,9 +113,8 @@ then
 		else
 			echo "This device requests an initramfs to be built, but not embedded"
 			pushd ../../initramfs-src/target
-			find . | cpio -H newc -o | gzip - > initrd.img.gz
+			find . | cpio -H newc -o | gzip - > ../../initramfs-src/target/initrd.img.gz
 			popd
-			mv ../../initramfs-src/target/initrd.img.gz .
 		fi
 	fi
 	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
