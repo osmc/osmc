@@ -108,8 +108,7 @@ then
 		if ((($FLAGS_INITRAMFS & $INITRAMFS_EMBED) == $INITRAMFS_EMBED))
 		then
 			echo "This device requests an initramfs to be embedded"
-			cp -ar ../../initramfs-src/target osmc-initramfs
-			export RAMFSDIR=$(pwd)/osmc-initramfs
+			export RAMFSDIR=$(pwd)/../../initramfs-src/target
 		else
 			echo "This device requests an initramfs to be built, but not embedded"
 			pushd ../../initramfs-src/target
