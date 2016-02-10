@@ -112,7 +112,7 @@ then
 		else
 			echo "This device requests an initramfs to be built, but not embedded"
 			pushd ../../initramfs-src/target
-			find . | cpio -H newc -o | gzip - > ../../initramfs-src/target/initrd.img.gz
+			find . | cpio -H newc -o | gzip - > ../../src/*linux*/initrd.img.gz
 			popd
 		fi
 	fi
