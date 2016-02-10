@@ -1,0 +1,7 @@
+KERNEL=="amvideo", SUBSYSTEM=="video", GROUP="video", MODE="0660"
+KERNEL=="amstream*", SUBSYSTEM=="amstream-dev", GROUP="video", MODE="0660"
+KERNEL=="amsubtitle", SUBSYSTEM=="subtitle", GROUP="video", MODE="0660"
+KERNEL=="amremote", SUBSYSTEM=="amremote", GROUP="osmc", MODE="0660"
+KERNEL=="amhdmitx0", SUBSYSTEM=="amhdmitx", GROUP="video", MODE="0660"
+KERNEL=="amaudio*", SUBSYSTEM=="amaudio*", GROUP="audio", MODE="0660"
+#KERNEL=="video", PROGRAM="/bin/sh -c 'chgrp -R video /sys/%p; chmod -R g+u /sys/%p'"
