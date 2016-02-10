@@ -9,4 +9,5 @@ cpio:
 
 clean:
 	rm -f initramfs.gz >/dev/null 2>&1
+	rm -f initrd.img.gz >/dev/null 2>&1
 	rm -rf target >/dev/null 2>&1
