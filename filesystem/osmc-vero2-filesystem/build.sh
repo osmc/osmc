@@ -75,6 +75,7 @@ chroot ${DIR} apt-get -y install --no-install-recommends vero2-device-osmc
 verify_action
 # We have SSH separate so we can remove it later via App Store
 chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
+chroot ${DIR} ln -s /dev/null /etc/systemd/system/serial-getty@hvc0.service
 verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
