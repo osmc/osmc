@@ -338,7 +338,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 				if setting.startswith('osmcdev='):
 
-					if 'vero' in setting:
+					if 'vero' in setting or 'vero2' in setting:
 
 						log('Hardware is Vero')
 
