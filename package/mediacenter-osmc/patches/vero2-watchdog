@@ -15,6 +15,18 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+syspaths="/sys/class/video/axis
+/sys/class/video/screen_mode
+/sys/class/video/disable_video
+/sys/class/tsync/pts_pcrscr
+/sys/class/audiodsp/digital_raw
+/sys/class/ppmgr/ppmgr_3d_mode"
+
+for syspath in $syspaths; do
+        chgrp -R video $syspath
+        chmod -R 0660 $syspath
+done
+
 trap 'wait; exit 0' SIGTERM
 
 chmod a+rw /dev/tty1
