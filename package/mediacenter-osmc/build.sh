@@ -243,6 +243,7 @@ then
 		--enable-optical-drive \
 		--enable-libbluray \
 		--enable-dvdcss \
+		--disable-alsa \
 		--disable-joystick \
 		--disable-debug \
 		--disable-vtbdecoder \
@@ -298,6 +299,7 @@ then
                 --disable-vaapi \
                 --enable-gles \
                 --enable-codec=aml \
+		--enable-player=amplayer \
                 --disable-libcec \
                 --disable-debug \
                 --disable-texturepacker \
