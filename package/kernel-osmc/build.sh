@@ -94,8 +94,6 @@ then
 	then
 		$BUILD meson8b_vero2.dtd
 		$BUILD meson8b_vero2.dtb
-		$BUILD meson8b_skt.dtd
-		$BUILD meson8b_skt.dtb
 	fi
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -156,7 +154,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm/boot/uImage -r ../../initramfs-src/initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_skt.dtb
+		abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm/boot/uImage -r ../../initramfs-src/initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
 		if [ $? != 0 ]; then echo "Building Android image for Vero 2 failed" && exit 1; fi
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
