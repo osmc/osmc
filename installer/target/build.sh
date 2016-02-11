@@ -105,7 +105,7 @@ fi
 if [ "$1" == "vero2" ]
 then
 	echo -e "Installing Vero 2 files"
-	abootimg --create /mnt/kernel.img -k uImage -r rootfs.cpio.gz -s ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_skt.dtb
+	abootimg --create /mnt/kernel.img -k uImage -r rootfs.cpio.gz -s ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
 fi
 if [ "$1" == "appletv" ]
 then
