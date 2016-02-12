@@ -27,7 +27,7 @@ then
 	handle_dep "libasound2-dev"
 	echo "Package: ${1}-libamcodec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libamcodec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	mkdir -p ${out}/usr/osmc/lib
-	mkdir -p files-dev/usr/osmc/include
+	mkdir -p files-dev/usr/osmc/include/amcodec/
 	pushd src/libamcodec*
 	$BUILD -C amavutils PREFIX="/usr/osmc"
 	if [ $? != 0 ]; then echo "Error occured building amavutils" && exit 1; fi
@@ -38,7 +38,7 @@ then
 	$BUILD -C amcodec PREFIX="/usr/osmc"
 	if [ $? != 0 ]; then echo "Error occured building amcodec" && exit 1; fi
 	cp -ar amcodec/libamcodec.so.0.0 ${out}/usr/osmc/lib
-	cp -ar amcodec/include/*.h ../../files-dev/usr/osmc/include
+	cp -ar amcodec/include/*.h ../../files-dev/usr/osmc/include/amcodec
 	ln -sf libamcodec.so.0.0 ${out}/usr/osmc/lib/libamcodec.so
 	popd
         fix_arch_ctl "files/DEBIAN/control"
