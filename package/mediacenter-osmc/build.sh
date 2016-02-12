@@ -243,7 +243,6 @@ then
 		--enable-optical-drive \
 		--enable-libbluray \
 		--enable-dvdcss \
-		--disable-alsa \
 		--disable-joystick \
 		--disable-debug \
 		--disable-vtbdecoder \
