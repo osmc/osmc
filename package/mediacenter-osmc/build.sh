@@ -297,7 +297,7 @@ then
                 --disable-vdpau \
                 --disable-vaapi \
                 --enable-gles \
-                --enable-codec=aml \
+                --enable-codec=amcodec \
 		--enable-player=amplayer \
 		--enable-alsa \
                 --disable-libcec \
