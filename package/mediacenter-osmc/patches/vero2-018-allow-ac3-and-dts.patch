@@ -1,26 +1,23 @@
-From 0e7e5bac78604a7e22ae1ce4ea7d800ea846e976 Mon Sep 17 00:00:00 2001
+From d3ca5acd37db612aedf3dc83be5e87bb780835f3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Fri, 12 Feb 2016 01:09:19 +0000
-Subject: [PATCH 1/9] Vero 2: Allow AC3 and DTS bitstreaming
+Date: Sat, 13 Feb 2016 04:32:53 +0000
+Subject: [PATCH] Hacky way to enable passthrough on Vero 2
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 6 ++++++
- 1 file changed, 6 insertions(+)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 4df3a77..eb8ea09 100644
+index 78f272b..c8bf3b1 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -1343,6 +1343,12 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1382,6 +1382,9 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
      if (snd_card_get_name(cardNr, &cardName) == 0)
        info.m_displayName = cardName;
  
-+    if (info.m_displayName == "AML-DUMMY-CODEC")
-+    {
-+      info.m_deviceType = AE_DEVTYPE_IEC958;
-+      info.m_displayName = "Vero 2 Sound";
-+    }
++    info.m_deviceType = AE_DEVTYPE_IEC958;
++    info.m_displayName = "Vero 2 Sound";
 +
      if (info.m_deviceType == AE_DEVTYPE_HDMI && info.m_displayName.size() > 5 &&
          info.m_displayName.substr(info.m_displayName.size()-5) == " HDMI")
