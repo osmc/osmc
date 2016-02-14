@@ -51,6 +51,7 @@ class A2DPInfo(threading.Thread):
     device = None
     deviceAlias = None
     player = None
+    transport = None
     connected = None
     state = None
     status = None
@@ -58,19 +59,15 @@ class A2DPInfo(threading.Thread):
     # hack to hide the fact we always get false 'playing' events
     receivedPosition = False
 
-    
     def __init__(self):
         """Specify a signal handler, and find any connected media players"""
         super(A2DPInfo, self).__init__()
-
         self.bus = dbus.SystemBus()
-
         self.bus.add_signal_receiver(self.playerHandler,
                 bus_name="org.bluez",
                 dbus_interface="org.freedesktop.DBus.Properties",
                 signal_name="PropertiesChanged",
                 path_keyword="path")
-
         self.findPlayer()
 
     def run(self):
@@ -90,10 +87,13 @@ class A2DPInfo(threading.Thread):
         objects = manager.GetManagedObjects()
 
         player_path = None
+        transport_path = None
         for path, interfaces in objects.iteritems():
             if PLAYER_IFACE in interfaces:
                 player_path = path
                 break
+            if TRANSPORT_IFACE in interfaces:
+                transport_path = path
 
         if player_path:
             self.connected = True
@@ -103,7 +103,15 @@ class A2DPInfo(threading.Thread):
                 self.status = player_properties["Status"]
             if "Track" in player_properties:
                 self.track = player_properties["Track"]            
-                
+        else:
+            log("Could not find a player")
+
+        if transport_path:
+            self.transport = self.bus.get_object("org.bluez", transport_path)
+            transport_properties = self.transport.GetAll(TRANSPORT_IFACE, dbus_interface="org.freedesktop.DBus.Properties")
+            if "State" in transport_properties:
+                self.state = transport_properties["State"]
+
     def getPlayer(self, path):
         """Get a media player from a dbus path, and the associated device"""
         self.player = self.bus.get_object("org.bluez", path)
@@ -130,8 +138,9 @@ class A2DPInfo(threading.Thread):
             if "Status" in changed:
                 if not changed["Status"] == self.status:
                     self.status = changed["Status"]
-                    if self.status in ["stopped", "paused"]:
-                        self.stopA2DP()
+                    log(self.status)
+                    if self.status in ["stopped"]:
+                        xbmc.stopBTPlayer()
                         # hack to hide the fact we always get false 'playing' events
                         self.receivedPosition = False
                     else:
@@ -143,35 +152,97 @@ class A2DPInfo(threading.Thread):
                 self.track = changed["Track"]
                 self.trackChanged()
 
+            # hack to hide the fact we always get false 'playing' events
             if "Position" in changed and not self.status == 'paused':
                 self.receivedPosition = True
 
+    def isPlaying(self):
+        return self.status == "playing"
+
+    def next(self):
+        self.player.Next(dbus_interface=PLAYER_IFACE)
+
+    def previous(self):
+        self.player.Previous(dbus_interface=PLAYER_IFACE)
+
+    def play(self):
+        self.player.Play(dbus_interface=PLAYER_IFACE)
+
+    def stop(self):
+        self.player.Stop(dbus_interface=PLAYER_IFACE)
+        
+    def pause(self):
+        self.player.Pause(dbus_interface=PLAYER_IFACE)
+
+    def volumeUp(self):
+        self.control.VolumeUp(dbus_interface=CONTROL_IFACE)
+        self.transport.VolumeUp(dbus_interface=TRANSPORT_IFACE)
+
+    def volumeDown(self):
+        self.control.VolumeDown(dbus_interface=CONTROL_IFACE)
+        self.transport.VolumeDown(dbus_interface=TRANSPORT_IFACE)
 
     def trackChanged(self):
         if "playing" in self.status:
             artist = ""
             track  = ""
             album = ""
-            if "Artist" in self.track:      artist = self.track["Artist"]
-            if "Title" in self.track:       track = self.track["Title"]
-            if "Album" in self.track:       album = self.track["Album"]
-            self.trackIsPlaying(artist, track, album)
+            if "Artist" in self.track:
+                artist = self.track["Artist"]
+            if "Title" in self.track:
+                track = self.track["Title"]
+            if "Album" in self.track:
+                album = self.track["Album"]
+            log("Start BTPLAYER")
+            xbmc.startBTPlayer(track, artist, album)
 
-    def sendJSONRPC(self, method, params={}):
-        try:
-            payload = json.dumps({"jsonrpc": "2.0", "method": method, "params" :params,"id": 1})
-            return xbmc.executeJSONRPC(payload)            
-        except Exception as ex:
-            log("Error Sending JSON Request : " + str(json_payload) + " - "  + format(ex))
+class BTPlayerMonitor(xbmc.Player):
+    a2dpInfo = None
 
-    def trackIsPlaying(self, artist, track, album=""):
-        params = {"artist" : artist ,"track" : track, "album": album }
-        return self.sendJSONRPC("OSMC.StartBTPlayer", params)
+    def __init__( self, *args, **kwargs ):
+        log("BTPlayerMonitor Started")
 
-    def stopA2DP(self):
-        jsonResponse = json.loads(self.sendJSONRPC("OSMC.BTPlayerActive"))
-        if ("result" in jsonResponse and jsonResponse["result"] == "OK"):
-            self.sendJSONRPC("OSMC.StopBTPlayer")
+    def setA2DPInfo(self, a2dpInfo):
+        self.a2dpInfo = a2dpInfo
+        
+    def onPlayBackStarted(self):
+        log("##player Started##")
+
+    def onPlayBackStopped(self):
+        log("##player stopped##")
+        if self.a2dpInfo.isPlaying():
+            self.a2dpInfo.stop()
+        else:
+            log("##Not playing##")
+            
+    def onPlayBackPaused(self):
+        log("##player paused##")
+        if self.a2dpInfo.isPlaying():
+            self.a2dpInfo.pause()
+        else:
+            log("##Not playing##")
+
+    def onPlayBackResumed(self):
+        log("##player resumed##")
+        if not self.a2dpInfo.isPlaying():
+            self.a2dpInfo.play()
+        else:
+            log("##Not playing##")
+    
+    def onNextItem(self):
+        log("##Next Item##")
+        if self.a2dpInfo.isPlaying():
+            self.a2dpInfo.next()
+        else:
+            log("##Not playing##")
+
+    def onPrevItem(self):
+        log("##Previous Item##")
+        if (self.a2dpInfo.isPlaying()):
+            self.a2dpInfo.previous()
+        else:
+            log("##Not playing##")
+
 
 if __name__ == "__main__":
     log("A2DP Info Starting")
@@ -179,16 +250,14 @@ if __name__ == "__main__":
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         a2dpInfo = A2DPInfo()
         a2dpInfo.start()
+        btPlayerMonitor = BTPlayerMonitor()
+        btPlayerMonitor.setA2DPInfo(a2dpInfo)
         monitor = xbmc.Monitor()
         while not monitor.abortRequested():
             # Sleep/wait for abort for 10 seconds
             if monitor.waitForAbort(3):
                 # Abort was requested while waiting. We should exit
                 break
-            # Would like to be able to get events when the track change buttons
-            # are pressed here and if its from BTPlayer we can then pass that event
-            # via AVRCP bluez dbus to change the track
-            
                 
     except Exception as e:
         print(e)
