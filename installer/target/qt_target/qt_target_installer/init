@@ -33,13 +33,8 @@ grep -q vero2 /proc/cmdline
 if [ $? == 0 ]
 then
     hdmimode=720p
-    for arg in $(cat /proc/cmdline); do
-      case $arg in
-       hdmimode=*)
-        hdmimode="${arg#*=}"
-       ;;
-      esac
-    done
+    prefered=$(grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | sed 's/\*//g')
+    if [ "$prefered" ]; then hdmimode="$prefered"; fi
 
     # Enable framebuffer device
     echo "$hdmimode" > /sys/class/display/mode
