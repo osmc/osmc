@@ -10,13 +10,8 @@ export OPTION_MOUNT_OPTIONS=""
 export OPTION_MOUNT_PATH="/real_root"
 
 hdmimode=720p
-for arg in $(/bin/busybox cat /proc/cmdline); do
-  case $arg in
-   hdmimode=*)
-     hdmimode="${arg#*=}"
-   ;;
-esac
-done
+prefered=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+if [ "$prefered" ]; then hdmimode="$prefered"; fi
 
 # Enable framebuffer device
 echo "$hdmimode" > /sys/class/display/mode
