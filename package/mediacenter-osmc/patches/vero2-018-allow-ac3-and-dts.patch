@@ -1,23 +1,69 @@
-From d3ca5acd37db612aedf3dc83be5e87bb780835f3 Mon Sep 17 00:00:00 2001
+From eabe736a67ab839a44a01453d5d4a5cd08744c48 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 13 Feb 2016 04:32:53 +0000
 Subject: [PATCH] Hacky way to enable passthrough on Vero 2
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 3 +++
- 1 file changed, 3 insertions(+)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 35 ++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 78f272b..c8bf3b1 100644
+index 78f272b..c23cd55 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -1382,6 +1382,9 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -38,6 +38,7 @@
+ #include "settings/AdvancedSettings.h"
+ #if defined(HAS_LIBAMCODEC)
+ #include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
+ #endif
+ 
+ 
+@@ -538,7 +539,37 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   if (aml_present())
+   {
+     aml_set_audio_passthrough(m_passthrough);
+-    device = "default";
++
++    int aml_digital_codec;
++    switch(format.m_dataFormat)
++    {
++      case AE_FMT_AC3:
++        aml_digital_codec = 2;
++        break;
++
++      case AE_FMT_DTS:
++        aml_digital_codec = 3;
++        break;
++
++      case AE_FMT_EAC3:
++        aml_digital_codec = 4;
++        break;
++
++      case AE_FMT_DTSHD:
++        aml_digital_codec = 5;
++        break;
++
++      case AE_FMT_TRUEHD:
++        aml_digital_codec = 7;
++        break;
++
++      default:
++        if (inconfig.channels > 2)
++          aml_digital_codec = 6;
++        else
++          aml_digital_codec = 0;
++    }
++    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+   }
+ #endif
+ 
+@@ -1382,6 +1413,8 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
      if (snd_card_get_name(cardNr, &cardName) == 0)
        info.m_displayName = cardName;
  
 +    info.m_deviceType = AE_DEVTYPE_IEC958;
-+    info.m_displayName = "Vero 2 Sound";
 +
      if (info.m_deviceType == AE_DEVTYPE_HDMI && info.m_displayName.size() > 5 &&
          info.m_displayName.substr(info.m_displayName.size()-5) == " HDMI")
