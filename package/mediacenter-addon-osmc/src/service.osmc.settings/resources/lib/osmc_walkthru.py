@@ -180,8 +180,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 					selected_language,
 					testing=False):
 
+		self.testing = testing
+
 		# the order of the panels, this list can be changed depending on the specific need
-		self.panel_order 	= sorted([k for k in PANEL_MAP.keys(), key=lambda x: PANEL_MAP[x]['order'])
+		self.panel_order 	= sorted(PANEL_MAP.keys(), key=lambda x: PANEL_MAP[x]['order'])
 
 		# the specific controlIDs for the main menu items and others, this is used by onFocus and saves recreating the list every time
 		self.menu_controls 	= [v['panel_menu_item_id'] for v in PANEL_MAP.values()]
@@ -284,7 +286,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.net_call = networking_instance
 
 		self.internet_check = False
-		if not testing:
+		if not self.testing:
 			self.internet_checker = Networking_caller(self, self.net_call)
 		else:
 			self.internet_checker = mock_Networking_caller(self, self.net_call)
@@ -662,7 +664,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def enter_ssh_password(self):
 
-		show keyboard for the first password
+		# show keyboard for the first password
 		user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
 
 		if user_pass is not None:
@@ -686,7 +688,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})	
 
 
-	def get_selected_country(self):
+	def get_selected_country(self, controlID):
 		
 		self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
 
@@ -705,7 +707,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]: # timezone containers
 			
-			self.get_selected_country()
+			self.get_selected_country(controlID)
 
 			self.reveal_next_panel(current_panel='timezone')
 
