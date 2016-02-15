@@ -1,15 +1,15 @@
-From 3c70e3e1dbdc20d12a3d6d5a37f8ea81c44f7587 Mon Sep 17 00:00:00 2001
+From 01c72418100a870c4d5df8dbd9291c4d49334305 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezbgit config --global user.email>
 Date: Sat, 13 Feb 2016 17:13:04 +0000
 Subject: [PATCH 2/3] [BTPlayer] allow control of BTPlayer from python
 
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp | 61 ++++++++++++++++++++++++++++++++++-
- xbmc/interfaces/legacy/ModuleXbmc.h   | 16 ++++++++-
- 2 files changed, 75 insertions(+), 2 deletions(-)
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 71 ++++++++++++++++++++++++++++++++++-
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 23 +++++++++++-
+ 2 files changed, 92 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 7bf9093..9bfdfed 100644
+index 7bf9093..05858fd 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -56,6 +56,9 @@
@@ -22,7 +22,7 @@ index 7bf9093..9bfdfed 100644
  
  #include "threads/SystemClock.h"
  #include <vector>
-@@ -563,5 +566,61 @@ namespace XBMCAddon
+@@ -563,5 +566,71 @@ namespace XBMCAddon
      int getENGLISH_NAME() { return CLangCodeExpander::ENGLISH_NAME; }
  
      const int lLOGNOTICE = LOGNOTICE;
@@ -82,14 +82,24 @@ index 7bf9093..9bfdfed 100644
 +                CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_STOP, static_cast<int>(btPlayerId));
 +            }
 +        }
++
++         bool isBTPlayerActive()
++        {
++            PLAYERCOREID btPlayerId = findBTPlayer();
++            if (g_application.m_pPlayer->GetCurrentPlayer() == btPlayerId)
++            {
++                return true;
++            }
++            return FALSE;
++        }
 +    }
    }
 -}
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 09169dd..d79654c 100644
+index 09169dd..3674dbf 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -418,7 +418,21 @@ namespace XBMCAddon
+@@ -418,7 +418,28 @@ namespace XBMCAddon
      */
      String convertLanguage(const char* language, int format); 
  
@@ -107,7 +117,14 @@ index 09169dd..d79654c 100644
 +    /**
 +    * stopBTPlayer() -- Stops BTPlayer
 +    */
-+    void stopBTPlayer();    SWIG_CONSTANT_FROM_GETTER(int, SERVER_WEBSERVER);
++    void stopBTPlayer();
++
++    /**
++    * isBTPlayerActive() -- returns true if BTPlayer is active
++    */
++    bool isBTPlayerActive();
++
++    SWIG_CONSTANT_FROM_GETTER(int, SERVER_WEBSERVER);
 +
      SWIG_CONSTANT_FROM_GETTER(int,SERVER_AIRPLAYSERVER);
      SWIG_CONSTANT_FROM_GETTER(int,SERVER_UPNPSERVER);
