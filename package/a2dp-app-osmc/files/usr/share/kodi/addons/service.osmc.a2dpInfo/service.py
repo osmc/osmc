@@ -57,7 +57,7 @@ class A2DPInfo(threading.Thread):
     status = None
     track = []
     # hack to hide the fact we always get false 'playing' events
-    receivedPosition = False
+    receivedPosition = None
 
     def __init__(self):
         """Specify a signal handler, and find any connected media players"""
@@ -71,7 +71,7 @@ class A2DPInfo(threading.Thread):
         self.findPlayer()
 
     def run(self):
-        """Start the BluePlayer by running the gobject Mainloop()"""
+        """Start monitoring bluez by running the gobject Mainloop()"""
         gobject.threads_init()
         self.mainloop = gobject.MainLoop()
         self.mainloop.run()
@@ -138,23 +138,23 @@ class A2DPInfo(threading.Thread):
             if "Status" in changed:
                 if not changed["Status"] == self.status:
                     self.status = changed["Status"]
-                    log(self.status)
                     if self.status in ["stopped"]:
                         xbmc.stopBTPlayer()
                         # hack to hide the fact we always get false 'playing' events
-                        self.receivedPosition = False
-                    else:
-                        # hack to hide the fact we always get false 'playing' events
-                        if self.receivedPosition:
-                            self.trackChanged()
-                    
+                        self.receivedPosition = None
+
             if "Track" in changed:
                 self.track = changed["Track"]
                 self.trackChanged()
 
             # hack to hide the fact we always get false 'playing' events
             if "Position" in changed and not self.status == 'paused':
-                self.receivedPosition = True
+                newPosition = changed["Position"]
+                if self.receivedPosition:
+                    if not self.receivedPosition == newPosition:
+                        self.trackChanged()
+                else:
+                     self.receivedPosition = newPosition;
 
     def isPlaying(self):
         return self.status == "playing"
@@ -170,6 +170,7 @@ class A2DPInfo(threading.Thread):
 
     def stop(self):
         self.player.Stop(dbus_interface=PLAYER_IFACE)
+        self.receivedPosition = None;
         
     def pause(self):
         self.player.Pause(dbus_interface=PLAYER_IFACE)
@@ -224,10 +225,10 @@ class BTPlayerMonitor(xbmc.Player):
 
     def onPlayBackResumed(self):
         log("##player resumed##")
-        if not self.a2dpInfo.isPlaying():
+        if xbmc.isBTPlayerActive():
             self.a2dpInfo.play()
         else:
-            log("##Not playing##")
+            log("##Not active##")
     
     def onNextItem(self):
         log("##Next Item##")
