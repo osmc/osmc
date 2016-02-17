@@ -10,8 +10,8 @@ export OPTION_MOUNT_OPTIONS=""
 export OPTION_MOUNT_PATH="/real_root"
 
 hdmimode=720p
-prefered=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
-if [ "$prefered" ]; then hdmimode="$prefered"; fi
+preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+if [ "$preferred" ]; then hdmimode="$preferred"; fi
 
 # Enable framebuffer device
 echo "$hdmimode" > /sys/class/display/mode
@@ -22,14 +22,12 @@ echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
 
 # Configure framebuffer with double buffer
-case "$hdmimode" in
-  720*)
-   /bin/busybox fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
-  ;;
-  1080*)
-   /bin/busybox fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
-  ;;
-esac
+
+xres=$(busybox sed 's/x.*$//g' /sys/class/video/device_resolution)
+yres=$(busybox sed 's/^.*x//g' /sys/class/video/device_resolution)
+ydouble=$((yres * 2))
+
+/bin/busybox fbset -fb /dev/fb0 -g $xres $yres $xres $ydouble 32
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
