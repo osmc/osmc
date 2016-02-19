@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QDirIterator>
+//#define FACTORYV2
 
 BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
@@ -28,7 +29,9 @@ void BootloaderConfig::copyBootFiles()
         system("mv /mnt/boot/System /tmp/System");
     }
     system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
+#ifndef FACTORYV2
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
+#endif
     system("mv /tmp/preseed.cfg /mnt/boot/preseed.cfg");
     if (utils->getOSMCDev() != "vero2")
          system("mv /mnt/root/boot/* /mnt/boot");

@@ -21,6 +21,7 @@
 #include <QThread>
 #include "extractworker.h"
 #include <QTimer>
+//#define FACTORYV2
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -285,20 +286,16 @@ void MainWindow::setupBootLoader()
     logger->addLine("Successful installation. Dumping log and rebooting system");
     dumpLog();
     QTimer::singleShot(0, this, SLOT(val));
-
     /* Reboot */
-    if (utils->getOSMCDev() == "vero2")
-    {
+#ifdef FACTORYV2
         system("/bin/sync");
         ui->statusLabel->setText(tr("OSMC installed successfully"));
         qApp->processEvents(); /* Force GUI update */
-    }
-    else
-    {
-        ui->statusLabel->setText(tr("OSMC installed successfully"));
-        qApp->processEvents(); /* Force GUI update */
-        utils->rebootSystem();
-    }
+#else
+    ui->statusLabel->setText(tr("OSMC installed successfully"));
+    qApp->processEvents(); /* Force GUI update */
+    utils->rebootSystem();
+#endif
 }
 
 void MainWindow::haltInstall(QString errorMsg)
