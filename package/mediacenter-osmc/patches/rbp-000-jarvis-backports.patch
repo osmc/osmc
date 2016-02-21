@@ -1,7 +1,7 @@
-From b943c6af310ee4ef0c75a49b038f6a05cb7e173e Mon Sep 17 00:00:00 2001
+From 6819180e5476e55b3a38c8cddd4f1ca4709c5065 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Sep 2015 19:11:14 +0100
-Subject: [PATCH 01/82] Enable concealed error frames, but discard them when
+Subject: [PATCH 01/87] Enable concealed error frames, but discard them when
  returned
 
 ---
@@ -55,10 +55,10 @@ index bebe136..727a9ea 100644
 2.1.0
 
 
-From f1266c75d8560debcfb92dbf4bdb9fdea64bbc46 Mon Sep 17 00:00:00 2001
+From 8ed9536d42255da6ce734ac6407810043cb36359 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 26 Aug 2015 21:47:41 +0100
-Subject: [PATCH 02/82] Reduce framerate of high framerate videos when not
+Subject: [PATCH 02/87] Reduce framerate of high framerate videos when not
  running fullscreen
 
 ---
@@ -124,10 +124,10 @@ index d081b9c..0ea6ecd 100644
 2.1.0
 
 
-From b909de4a6da067e7e4d3657c5321e448a8b71a58 Mon Sep 17 00:00:00 2001
+From c23f6a0b4df752025d8ab7699ea8714367c42794 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 20:08:05 +0000
-Subject: [PATCH 03/82] Remove preroll
+Subject: [PATCH 03/87] Remove preroll
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 12 ++----------
@@ -202,10 +202,10 @@ index 0ea6ecd..50ac0e3 100644
 2.1.0
 
 
-From ed2cc95b195a00f342cc1a9dc418507f1fc8cf76 Mon Sep 17 00:00:00 2001
+From 1e07220ec851d9e90b650b3ff0cabcde7107c727 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 22:35:11 +0000
-Subject: [PATCH 04/82] Remove demux queue
+Subject: [PATCH 04/87] Remove demux queue
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 81 ++++------------------
@@ -400,10 +400,10 @@ index 50ac0e3..f4df09c 100644
 2.1.0
 
 
-From 008e97a1c8d39552c5e25ffdaef789daf34f7ba0 Mon Sep 17 00:00:00 2001
+From dd15ae973624ecc6b67814de1ec0a7f09359643e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 2 Dec 2015 20:10:33 +0000
-Subject: [PATCH 05/82] Remove time based limit on submitted packets
+Subject: [PATCH 05/87] Remove time based limit on submitted packets
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 24 +++-------------------
@@ -488,10 +488,10 @@ index f4df09c..8f84557 100644
 2.1.0
 
 
-From fd15ca89a9a24c337919ed740acf6b6ea1850553 Mon Sep 17 00:00:00 2001
+From ccec96c53ce64873f01df6fe9981f4b0aef4e743 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Dec 2015 22:18:47 +0000
-Subject: [PATCH 06/82] Add back logging of data queued in decoder
+Subject: [PATCH 06/87] Add back logging of data queued in decoder
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 22 +++++++++++++++++++++-
@@ -576,10 +576,10 @@ index 8f84557..f4df09c 100644
 2.1.0
 
 
-From 36caf789f2e48af4f17924566f22ebd3db3202ce Mon Sep 17 00:00:00 2001
+From d165fab4a1dfcbe63ed625d58cc607826f8dafb3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 8 Dec 2015 11:40:17 +0000
-Subject: [PATCH 07/82] Try to minimise latency through hardware decoder. This
+Subject: [PATCH 07/87] Try to minimise latency through hardware decoder. This
  could reduce performance but keeps videoplayer happier
 
 ---
@@ -668,10 +668,10 @@ index 35a9847..f96cc14 100644
 2.1.0
 
 
-From 7f68d09afbca514e476feec23d78e86875e5f0b9 Mon Sep 17 00:00:00 2001
+From 300d2cafff2792d53fb1ece411bd13fcc12dbab0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 13 Jul 2015 19:27:25 +0100
-Subject: [PATCH 08/82] Enable QPU based deinterlace and remove resolution
+Subject: [PATCH 08/87] Enable QPU based deinterlace and remove resolution
  limit
 
 ---
@@ -743,10 +743,10 @@ index e50c13a..20ad4fa 100644
 2.1.0
 
 
-From 75420a2d1102c26aeea93e70d149d03520f1e37a Mon Sep 17 00:00:00 2001
+From e0d0bf8fbbd221679a8cd66ec80f7cd135a5a228 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 16 Aug 2015 15:46:33 +0100
-Subject: [PATCH 09/82] Allow deinterlace with software decode
+Subject: [PATCH 09/87] Allow deinterlace with software decode
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp | 9 +++++++++
@@ -783,10 +783,10 @@ index bee3af1..9b5c666 100644
 2.1.0
 
 
-From 282b3b03ff4822bb0469d42f1a5233b2821eb2eb Mon Sep 17 00:00:00 2001
+From ad83cd85837e0ecffda38747519854e18950083d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 15 Sep 2015 22:26:26 +0100
-Subject: [PATCH 10/82] omxplayer: Don't use AutoInterlaceMethod it changes at
+Subject: [PATCH 10/87] omxplayer: Don't use AutoInterlaceMethod it changes at
  start of file
 
 ---
@@ -825,10 +825,10 @@ index de493a2..7251fc1 100644
 2.1.0
 
 
-From 8950352b70d4125b9b6e2944c7dceef1775102e0 Mon Sep 17 00:00:00 2001
+From ad929f115910768e993b819a0df4b51f04869ae1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Sep 2015 15:05:37 +0100
-Subject: [PATCH 11/82] Avoid calling render callback with the lock held to
+Subject: [PATCH 11/87] Avoid calling render callback with the lock held to
  avoid a deadlock
 
 ---
@@ -935,10 +935,10 @@ index d0634bb..7baefa5 100644
 2.1.0
 
 
-From f563c58d7a2043be21f9f579f5f24a4e31fce462 Mon Sep 17 00:00:00 2001
+From df9f8e17b95c91c290d65fdeebdff29eff767ec0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Dec 2015 22:03:56 +0000
-Subject: [PATCH 12/82] Add settings option to enable MVC and frame packing
+Subject: [PATCH 12/87] Add settings option to enable MVC and frame packing
  support
 
 ---
@@ -951,10 +951,10 @@ Subject: [PATCH 12/82] Add settings option to enable MVC and frame packing
  6 files changed, 50 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index c688f8b..02457c7 100644
+index a697a61..01173ca 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -18106,3 +18106,25 @@ msgstr ""
+@@ -18110,3 +18110,25 @@ msgstr ""
  msgctxt "#38023"
  msgid "Set my rating"
  msgstr ""
@@ -1088,20 +1088,20 @@ index 55e150d..f3ba426 100644
 2.1.0
 
 
-From 5e0638b0a8ed878e1d8568234654b4c0eee2970a Mon Sep 17 00:00:00 2001
+From 5e9391fbbf74f05b683cc6575fdd273cb8c54823 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 17 Dec 2015 15:38:34 +0000
-Subject: [PATCH 13/82] Don't adjust 3d rectangles in bypass mode
+Subject: [PATCH 13/87] Don't adjust 3d rectangles in bypass mode
 
 ---
  xbmc/cores/VideoRenderers/BaseRenderer.cpp | 55 ++++++++++++++++--------------
  1 file changed, 29 insertions(+), 26 deletions(-)
 
 diff --git a/xbmc/cores/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoRenderers/BaseRenderer.cpp
-index 987714f..7d357d0 100644
+index 7889cf8..d4bb306 100644
 --- a/xbmc/cores/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoRenderers/BaseRenderer.cpp
-@@ -630,35 +630,38 @@ void CBaseRenderer::ManageDisplay()
+@@ -673,35 +673,38 @@ void CBaseRenderer::ManageDisplay()
      else if(stereo_view == RENDER_STEREO_VIEW_RIGHT) stereo_view = RENDER_STEREO_VIEW_LEFT;
    }
  
@@ -1170,10 +1170,10 @@ index 987714f..7d357d0 100644
 2.1.0
 
 
-From 89b9dd650881ec8b7bbb9093da1e6bd5533774ad Mon Sep 17 00:00:00 2001
+From 3bfd7eff9280e9e1a3d697fa012e5853c896cec8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 14 Mar 2015 12:38:08 +0000
-Subject: [PATCH 14/82] Switch to using transform flags for 3d modes
+Subject: [PATCH 14/87] Switch to using transform flags for 3d modes
 
 ---
  xbmc/cores/VideoRenderers/MMALRenderer.cpp      | 100 +++++++++---------------
@@ -1589,10 +1589,10 @@ index 5d5b74b..443d037 100644
 2.1.0
 
 
-From 8679959dd020ad81fb43a4d3072601b17c681af4 Mon Sep 17 00:00:00 2001
+From 19514cdb029c3ab13da5eaf77f351f0a5e9b93fc Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 21 Jun 2015 17:42:03 +0100
-Subject: [PATCH 15/82] Remove unused Support3D function
+Subject: [PATCH 15/87] Remove unused Support3D function
 
 ---
  xbmc/windowing/egl/WinSystemEGL.cpp | 29 -----------------------------
@@ -1655,10 +1655,10 @@ index 9d4baf6..1ec4225 100644
 2.1.0
 
 
-From a693f17bc6b2d3cf6ea219fb0d293fff9cc11053 Mon Sep 17 00:00:00 2001
+From 6fdcb72c2d158c0d3ed7fc4a347f8f88f2646011 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Dec 2015 21:08:34 +0000
-Subject: [PATCH 16/82] Avoid switching stereo mode based on current display
+Subject: [PATCH 16/87] Avoid switching stereo mode based on current display
  mode
 
 ---
@@ -1704,10 +1704,10 @@ index a1b8812..60979bb 100644
 2.1.0
 
 
-From 327cf98e61dc7006e3e9845ca93845a4f613a909 Mon Sep 17 00:00:00 2001
+From f86ef8e1dd679a3ecec319f9d9c692401d60a768 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 21 Jun 2015 18:53:29 +0100
-Subject: [PATCH 17/82] Drop reporting 3D modes and just use current rendering
+Subject: [PATCH 17/87] Drop reporting 3D modes and just use current rendering
  mode to request 3D signalling
 
 [rbp] Add ntsc version of 48Hz mode
@@ -1982,10 +1982,10 @@ index a0acb1a..e5bcae7 100644
 2.1.0
 
 
-From 3ae426523996e505283ac72cbf9b47314fa6d693 Mon Sep 17 00:00:00 2001
+From 0caaedc8e8f7344bf1a05ec2c00621b22cae3f23 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jun 2015 16:27:15 +0100
-Subject: [PATCH 18/82] Consider stereomode when creating a new window
+Subject: [PATCH 18/87] Consider stereomode when creating a new window
 
 We might be changing from a non-3D to a 3D mode
 ---
@@ -2045,10 +2045,10 @@ index 1ec4225..a33dedc 100644
 2.1.0
 
 
-From 65246498ca28af24d67e196283cdf1d8299778b9 Mon Sep 17 00:00:00 2001
+From 8daf0e8386f4b04a402ce2ff0b0ad85b1888f38e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Apr 2014 18:19:32 +0100
-Subject: [PATCH 19/82] When opening a stream don't try to update gui so often
+Subject: [PATCH 19/87] When opening a stream don't try to update gui so often
 
 ---
  xbmc/dialogs/GUIDialogBusy.cpp | 4 ++++
@@ -2074,10 +2074,10 @@ index 6816b45..6cc5a8f 100644
 2.1.0
 
 
-From 6285925b734a6049a22337527b5d5655138c8cec Mon Sep 17 00:00:00 2001
+From 6431f216c871d59c660e350a256ba7eae9f7d1ca Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 29 Apr 2014 15:23:22 +0100
-Subject: [PATCH 20/82] Speed up wtv index creation
+Subject: [PATCH 20/87] Speed up wtv index creation
 
 The index creation is O(N^2) with number of entries (typically thousands).
 On a Pi this can take more than 60 seconds to execute for a recording of a few hours.
@@ -2166,10 +2166,10 @@ index 0000000..d829898
 2.1.0
 
 
-From 8524df8eed600fd16c67843438b12ab3dd4b68f4 Mon Sep 17 00:00:00 2001
+From e58e83b667ff18bc4a3bcc0d226e04a0bbb83d68 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 8 Mar 2014 15:36:06 +0000
-Subject: [PATCH 21/82] Hack: force it to be recognised as IEC958 capable to
+Subject: [PATCH 21/87] Hack: force it to be recognised as IEC958 capable to
  enable passthrough options
 
 ---
@@ -2195,10 +2195,10 @@ index 4df3a77..d816f0c 100644
 2.1.0
 
 
-From 8aa55ddad49892c45045de8304173cd6df0c8234 Mon Sep 17 00:00:00 2001
+From 85d312987bd4c69bd3afe1c01672b31c5c74c67c Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 1 May 2014 16:28:39 +0100
-Subject: [PATCH 22/82] Improved file buffering in CArchive
+Subject: [PATCH 22/87] Improved file buffering in CArchive
 
 Even though memcpy is typically inlined by the compiler into byte/word loads
 and stores (at least for release builds), the frequency with which 1, 2 and 4
@@ -2261,10 +2261,10 @@ index 6ed0f8f..8506d95 100644
 2.1.0
 
 
-From 65ac23e34ac18b1143e93c296916c81a2d73d5c9 Mon Sep 17 00:00:00 2001
+From 7d935c908fc96b11a5f25634cf90783e0764c7cf Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 12 Aug 2014 00:31:36 +0100
-Subject: [PATCH 23/82] Don't force software codec with dvds
+Subject: [PATCH 23/87] Don't force software codec with dvds
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 2 ++
@@ -2288,10 +2288,10 @@ index e4a2cfc..7db6706 100644
 2.1.0
 
 
-From 941fbe8edbf95c900048e9dae255f6973d57895c Mon Sep 17 00:00:00 2001
+From 90c4b8ec7f4bae80b280cd28f4fc255793873223 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 16:45:16 +0100
-Subject: [PATCH 24/82] filesystem: Make support of browsing into archives
+Subject: [PATCH 24/87] filesystem: Make support of browsing into archives
  optional
 
 The ability to browse, scan and play content in archives can cause problems on low powered/low memory devices.
@@ -2309,10 +2309,10 @@ We'll let people who don't use archives disable it manually
  3 files changed, 18 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 02457c7..0019ad3 100644
+index 01173ca..e908209 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -18032,6 +18032,15 @@ msgstr ""
+@@ -18036,6 +18036,15 @@ msgstr ""
  #: system/settings/rbp.xml
  msgctxt "#38010"
  msgid "GPU accelerated"
@@ -2329,7 +2329,7 @@ index 02457c7..0019ad3 100644
  
  #. Setting #38011 "Videos -> Library -> Show All Items entry"
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index a41bc76..765ac58 100644
+index f557c4e..e3a34d5 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -317,6 +317,11 @@
@@ -2377,10 +2377,10 @@ index a1d4ee4..4929283 100644
 2.1.0
 
 
-From 8b45bee86bee83000ed55a7b082fa7d89bcd5e50 Mon Sep 17 00:00:00 2001
+From f5c0192b684be00659ea144b01dee8dd5141cf97 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 10 Aug 2014 18:58:37 +0100
-Subject: [PATCH 25/82] confluence: Remove media-overlay.jpg for when video is
+Subject: [PATCH 25/87] confluence: Remove media-overlay.jpg for when video is
  backgrounded
 
 ---
@@ -2404,10 +2404,10 @@ index cc996da..d6aa595 100644
 2.1.0
 
 
-From 84c48e178d7ff7327ca4ed019ee829c6022149cc Mon Sep 17 00:00:00 2001
+From 660197660e6706fba45ba5134220b29b6a46949b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 13:06:57 +0000
-Subject: [PATCH 26/82] Make cachemembuffersize default depend on memory size
+Subject: [PATCH 26/87] Make cachemembuffersize default depend on memory size
 
 ---
  xbmc/linux/RBP.cpp                 | 10 ++++++++++
@@ -2511,10 +2511,10 @@ index a35aeb9..86c1076 100644
 2.1.0
 
 
-From 3697128aaaac7c27836e84ebcc1d121c6df25bc8 Mon Sep 17 00:00:00 2001
+From 10a0a95d639a6cd37b56a8c4b5f226d7f802539b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jul 2013 23:19:15 +0100
-Subject: [PATCH 27/82] Use animated gif as a cheaper working spinner
+Subject: [PATCH 27/87] Use animated gif as a cheaper working spinner
 
 ---
  addons/skin.confluence/720p/DialogBusy.xml |   4 ++--
@@ -2601,10 +2601,10 @@ HcmV?d00001
 2.1.0
 
 
-From bd88a543bf9b39579ae47bca351c0d6ece0b4342 Mon Sep 17 00:00:00 2001
+From 90fe2722367cbec8d9dda7752e44c2c97ebc2050 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 30 May 2014 14:58:43 +0100
-Subject: [PATCH 28/82] Experiment: Report DESKTOP resolution in video settings
+Subject: [PATCH 28/87] Experiment: Report DESKTOP resolution in video settings
 
 ---
  xbmc/settings/DisplaySettings.cpp | 3 +++
@@ -2628,10 +2628,10 @@ index 7993a73..761385b 100644
 2.1.0
 
 
-From 46bb936f5e58d86a121060e107a573858b19b328 Mon Sep 17 00:00:00 2001
+From 4d9e8184dfa145ea415308026d277744436745b3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 19 Sep 2014 11:54:49 +0100
-Subject: [PATCH 29/82] Add pi specific option to maintain vsync with pll
+Subject: [PATCH 29/87] Add pi specific option to maintain vsync with pll
  adjustment
 
 New A/V sync option in settings/video/playback to do "Adjust PLL".
@@ -2656,7 +2656,7 @@ Needed updated firmware
  9 files changed, 91 insertions(+), 7 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 0019ad3..3ffeff1 100644
+index e908209..0f45ea0 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -6609,7 +6609,22 @@ msgctxt "#13459"
@@ -2683,7 +2683,7 @@ index 0019ad3..3ffeff1 100644
  
  #: system/settings/settings.xml
  msgctxt "#13505"
-@@ -18137,3 +18152,9 @@ msgstr ""
+@@ -18141,3 +18156,9 @@ msgstr ""
  msgctxt "#38030"
  msgid "This option uses frame-packing to output full resolution for 3D through HDMI.[CR]Enabling this improves quality of Multiview Video Coding (MVC) videos, but may not be supported by all displays."
  msgstr ""
@@ -2694,7 +2694,7 @@ index 0019ad3..3ffeff1 100644
 +msgid "Audio has to stay in sync, this can either be done by resampling, or adjusting the PLL"
 +msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 765ac58..5a9d1ac 100644
+index e3a34d5..4af7b51 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -595,6 +595,20 @@
@@ -2940,10 +2940,10 @@ index 6475350..93de9bd 100644
 2.1.0
 
 
-From 0d408865682c49f122493e7da2d57c31a5de2ba9 Mon Sep 17 00:00:00 2001
+From 86625b91fe4a2e57250e0ab9a6df2731187446d0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH 30/82] Add settings option to boost centre channel when
+Subject: [PATCH 30/87] Add settings option to boost centre channel when
  downmixing
 
 This allows a dB volume increase to be added to centre channel.
@@ -2961,10 +2961,10 @@ Should work with Pi Sink (dvdplayer/paplayer) and omxplayer
  5 files changed, 46 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 3ffeff1..4a0fbfb 100644
+index 0f45ea0..cc486da 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -18158,3 +18158,18 @@ msgstr ""
+@@ -18162,3 +18162,18 @@ msgstr ""
  msgctxt "#38006"
  msgid "Audio has to stay in sync, this can either be done by resampling, or adjusting the PLL"
  msgstr ""
@@ -2984,7 +2984,7 @@ index 3ffeff1..4a0fbfb 100644
 +msgid "%i dB"
 +msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5a9d1ac..2aa45b1 100644
+index 4af7b51..f3b25b6 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -2558,6 +2558,18 @@
@@ -3069,10 +3069,10 @@ index 08b1b84..70d0866 100644
 2.1.0
 
 
-From 1fe434fa088eef46e683358bd0cef5c95cd29288 Mon Sep 17 00:00:00 2001
+From c18f9bf0a8b02fc6fa69282e1a85651d67427c4a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 15:23:51 +0000
-Subject: [PATCH 31/82] Default extract thumbnails to false
+Subject: [PATCH 31/87] Default extract thumbnails to false
 
 It can take 80 seconds for a single file on a Pi. It can cause crashes with out-of-memory errors.
 It genereates a lot of support issues. Best to default to disabled and let users enable it if they must
@@ -3105,10 +3105,10 @@ index 7a170c2..1506035 100644
 2.1.0
 
 
-From ea640ad81cf9ae20375bc31c91e386510a5c6064 Mon Sep 17 00:00:00 2001
+From 0048702a9656c6d970b48d0dae5148dfc94ca29c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 10 Feb 2015 15:29:16 +0000
-Subject: [PATCH 32/82] Add repeating keypress patch from popcornmix' repo
+Subject: [PATCH 32/87] Add repeating keypress patch from popcornmix' repo
 
 ---
  tools/depends/target/libcec/Makefile         |   1 +
@@ -3997,10 +3997,10 @@ index 0000000..8366a69
 2.1.0
 
 
-From f390d1fc82a4b77818442bd938f4720f3f7cb341 Mon Sep 17 00:00:00 2001
+From c03f1c24eca433ed8bb6f883e6b67b10f9d7d5bc Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 00:19:40 +0000
-Subject: [PATCH 33/82] Add settings for configuring button repeats
+Subject: [PATCH 33/87] Add settings for configuring button repeats
 
 ---
  addons/resource.language.en_gb/resources/strings.po | 15 +++++++++++++++
@@ -4009,10 +4009,10 @@ Subject: [PATCH 33/82] Add settings for configuring button repeats
  3 files changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 4a0fbfb..d7773e6 100644
+index cc486da..f9b8277 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -18173,3 +18173,18 @@ msgstr ""
+@@ -18177,3 +18177,18 @@ msgstr ""
  msgctxt "#38009"
  msgid "%i dB"
  msgstr ""
@@ -4084,10 +4084,10 @@ index c3ed6b2..68adcbc 100644
 2.1.0
 
 
-From 6b785919edd32f56ed5710801cfd00f92cec6735 Mon Sep 17 00:00:00 2001
+From 3300f890ad9765518e0528073311877e53e1a3cf Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 3 Nov 2014 23:17:46 +0000
-Subject: [PATCH 34/82] Don't discard buttons when repeat mode is enabled
+Subject: [PATCH 34/87] Don't discard buttons when repeat mode is enabled
 
 ---
  xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 5 ++++-
@@ -4113,10 +4113,10 @@ index 68adcbc..c9bf563 100644
 2.1.0
 
 
-From 8ae87ce5e09d96db50907b4045f4c0dcf1847b6d Mon Sep 17 00:00:00 2001
+From 4c033a004d433a28f30c33a6c1bbaba8819a0d94 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 4 Nov 2014 18:50:00 +0000
-Subject: [PATCH 35/82] Temp - more logging
+Subject: [PATCH 35/87] Temp - more logging
 
 ---
  xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 8 +++++++-
@@ -4171,10 +4171,10 @@ index c9bf563..7c446cf 100644
 2.1.0
 
 
-From b89f2167b04d4719faded60f850511d5bdfebdc9 Mon Sep 17 00:00:00 2001
+From 031849db5e944433972de9f55276dbe33f92f9a3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 15 Nov 2014 12:03:34 +0000
-Subject: [PATCH 36/82] Add lock for player creation
+Subject: [PATCH 36/87] Add lock for player creation
 
 ---
  xbmc/cores/dvdplayer/DVDPlayer.cpp | 3 +++
@@ -4223,10 +4223,10 @@ index 2f00647..b1418e3 100644
 2.1.0
 
 
-From d592fd57ec00adfe5ff80d69049eee606d513922 Mon Sep 17 00:00:00 2001
+From 3e90e60e7142f7c1920629860e969bf5d8f40605 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 24 Nov 2014 22:07:25 +0000
-Subject: [PATCH 37/82] Prod decoder when in stills mode
+Subject: [PATCH 37/87] Prod decoder when in stills mode
 
 An asynchronous hardware decoder doesn't only produce output pictures when new packets arrive.
 In dvd stills mode give it a chance to return pictures that weren't ready when frame was decoded.
@@ -4306,10 +4306,10 @@ index 379c541..b5777a1 100644
 2.1.0
 
 
-From d0eff01f676f30eb1ac5d7c08633bfcc85b557eb Mon Sep 17 00:00:00 2001
+From ae00ec52fd04125405134043fc1cf5fd4bdc78f4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:31:56 +0000
-Subject: [PATCH 38/82] Reduce priority of python threads
+Subject: [PATCH 38/87] Reduce priority of python threads
 
 ---
  xbmc/interfaces/generic/LanguageInvokerThread.cpp | 5 +++++
@@ -4335,10 +4335,10 @@ index fcdd063..16f0c89 100644
 2.1.0
 
 
-From 7a04301b2fcb13a5fb9eca6f1c25e6c42c488a0b Mon Sep 17 00:00:00 2001
+From 8b7c6313fc7ae416b8d4f7e1e33fbda3c183d89c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 14 Dec 2013 16:55:05 +0000
-Subject: [PATCH 39/82] logging: Add microsecond timer to log messages
+Subject: [PATCH 39/87] logging: Add microsecond timer to log messages
 
 ---
  xbmc/utils/log.cpp | 17 +++++++++++++++--
@@ -4394,10 +4394,10 @@ index 3443f12..31c4a99 100644
 2.1.0
 
 
-From 24b4fde13cfa7cba5ebb51430da1599b65b25b75 Mon Sep 17 00:00:00 2001
+From a7e464025f45bed8dc485c6517d43d91dda5c8a3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 29 Nov 2014 15:25:16 +0000
-Subject: [PATCH 40/82] hack: wait for splash to complete before changing hdmi
+Subject: [PATCH 40/87] hack: wait for splash to complete before changing hdmi
  mode
 
 ---
@@ -4474,10 +4474,10 @@ index ee29770..ff0d3e3 100644
 2.1.0
 
 
-From 0b86cf03b131ef8a354132a7402b82fe5b8c6990 Mon Sep 17 00:00:00 2001
+From a22d937b367c6a2e6ee08d96168ede3fa80f06c0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 11 Dec 2014 17:00:57 +0000
-Subject: [PATCH 41/82] Fix for UI not showing both extractflags and
+Subject: [PATCH 41/87] Fix for UI not showing both extractflags and
  extractthumb
 
 ---
@@ -4486,10 +4486,10 @@ Subject: [PATCH 41/82] Fix for UI not showing both extractflags and
  2 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index d7773e6..8bdcd41 100644
+index f9b8277..32314b2 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -11811,7 +11811,7 @@ msgstr ""
+@@ -11815,7 +11815,7 @@ msgstr ""
  
  #: system/settings/settings.xml
  msgctxt "#20433"
@@ -4498,7 +4498,7 @@ index d7773e6..8bdcd41 100644
  msgstr ""
  
  #: xbmc/dialogs/GUIDialogSmartPlaylistRule.cpp
-@@ -15983,7 +15983,7 @@ msgstr ""
+@@ -15987,7 +15987,7 @@ msgstr ""
  #. Description of setting "Videos -> File lists -> Extract thumbnails and video information" with label #20433
  #: system/settings/settings.xml
  msgctxt "#36178"
@@ -4507,7 +4507,7 @@ index d7773e6..8bdcd41 100644
  msgstr ""
  
  #. Description of setting "Videos -> File lists -> Replace file names with library titles" with label #20419
-@@ -15995,7 +15995,7 @@ msgstr ""
+@@ -15999,7 +15999,7 @@ msgstr ""
  #. Description of setting "Videos -> File lists -> Extract thumbnails and video information" with label #20433
  #: system/settings/settings.xml
  msgctxt "#36180"
@@ -4516,7 +4516,7 @@ index d7773e6..8bdcd41 100644
  msgstr ""
  
  #: system/settings/settings.xml
-@@ -18188,3 +18188,8 @@ msgstr ""
+@@ -18192,3 +18192,8 @@ msgstr ""
  msgctxt "#38052"
  msgid "Remote button press release time (ms)"
  msgstr ""
@@ -4526,7 +4526,7 @@ index d7773e6..8bdcd41 100644
 +msgid "Extract thumbnails from video files"
 +msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 2aa45b1..6bc8622 100644
+index f3b25b6..be2718b 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -885,8 +885,8 @@
@@ -4544,26 +4544,26 @@ index 2aa45b1..6bc8622 100644
 2.1.0
 
 
-From 38480365842cc6e7b3ad43233a220555b4e5e339 Mon Sep 17 00:00:00 2001
+From 9cb679b9bf705d96b9100a2358f7b8858e07b430 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Thu, 11 Sep 2014 21:30:43 +0200
-Subject: [PATCH 42/82] Disable autoscrolling while on screensaver and while
+Subject: [PATCH 42/87] Disable autoscrolling while on screensaver and while
  opening streams.
 
 ---
  xbmc/Application.cpp                | 10 ++++++++++
- xbmc/Application.h                  |  2 ++
+ xbmc/Application.h                  |  1 +
  xbmc/guilib/GUIFadeLabelControl.cpp |  4 +++-
  xbmc/guilib/GUIFont.cpp             |  4 ++++
  xbmc/guilib/GUILabel.cpp            |  4 +++-
  xbmc/guilib/GUITextBox.cpp          |  3 ++-
- 6 files changed, 24 insertions(+), 3 deletions(-)
+ 6 files changed, 23 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 98a7555..db16750 100644
+index d8bfd37..01d071a 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -5324,3 +5324,13 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
+@@ -5353,3 +5353,13 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
    
    return false;
  }
@@ -4578,18 +4578,17 @@ index 98a7555..db16750 100644
 +  return onBlackDimScreenSaver || openingStreams;
 +}
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index ad46260..4b3cb6f 100644
+index 58b191a..6e8a102 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -407,6 +407,8 @@ public:
+@@ -408,6 +408,7 @@ public:
+   */
    bool m_ShuttingDown;
    bool isShuttingDown() { return m_ShuttingDown; }
- 
 +  bool ScreenSaverDisablesAutoScrolling();
-+
+ 
  protected:
    virtual bool OnSettingsSaving() const override;
- 
 diff --git a/xbmc/guilib/GUIFadeLabelControl.cpp b/xbmc/guilib/GUIFadeLabelControl.cpp
 index ebd435e..97efc8a 100644
 --- a/xbmc/guilib/GUIFadeLabelControl.cpp
@@ -4681,10 +4680,10 @@ index d7bc1c5..ac76629 100644
 2.1.0
 
 
-From d69cfc79d08f5764590e228e763dcc0ab16259c1 Mon Sep 17 00:00:00 2001
+From 3c44d52393d31d008bb129dfc1952394be858702 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 13 Dec 2014 18:35:20 +0000
-Subject: [PATCH 43/82] Avoid memcpy on every demuxer packet
+Subject: [PATCH 43/87] Avoid memcpy on every demuxer packet
 
 Avoids an unnecessary memcpy on every demuxer packet which for
 high bitrate videos can be significant.
@@ -4785,10 +4784,10 @@ index ab298b2..10c5ee0 100644
 2.1.0
 
 
-From d350c4a0c217aeaa2e2f739bc4f3de2277214142 Mon Sep 17 00:00:00 2001
+From 200e2b01d4d4a60d5ac1bf58d005a9d13939f597 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 15 Feb 2015 14:06:12 +0000
-Subject: [PATCH 44/82] Allow mmal codec for dvd stills
+Subject: [PATCH 44/87] Allow mmal codec for dvd stills
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 7 +++++++
@@ -4823,10 +4822,10 @@ index 84e9ef1..f920f49 100644
 2.1.0
 
 
-From effb26b7a4588ab550c03e4b13537d55b7071252 Mon Sep 17 00:00:00 2001
+From e6285554868c00cd82e1790aec0f6936d10a7f96 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Wed, 25 Feb 2015 18:22:21 +0100
-Subject: [PATCH 45/82] Load OSD dialogs on startup.
+Subject: [PATCH 45/87] Load OSD dialogs on startup.
 
 Fixes skipped frames the first time they're loaded in memory on less powered
 devices, like a Raspberry Pi, when using DVDPlayer.
@@ -4924,10 +4923,10 @@ index b248566..96c63cd 100644
 2.1.0
 
 
-From 839eb20482d7990f3e651fa0989df83904e47afb Mon Sep 17 00:00:00 2001
+From 9580012ec3e51483658e7364d8119bd8a3b7395d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 7 Mar 2015 22:46:21 +0000
-Subject: [PATCH 46/82] configure: Add raspberry-pi2 platform
+Subject: [PATCH 46/87] configure: Add raspberry-pi2 platform
 
 ---
  configure.ac                                      | 14 +++++++--
@@ -4939,7 +4938,7 @@ Subject: [PATCH 46/82] configure: Add raspberry-pi2 platform
  6 files changed, 44 insertions(+), 22 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index e986a2e..bc623c1 100644
+index e8abcc6..1b33dcd 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -698,8 +698,17 @@ case $use_platform in
@@ -5104,10 +5103,10 @@ index dc6d565..98494b4 100644
 2.1.0
 
 
-From ba848c1823ee37448cfc74ab775fc19712d206b1 Mon Sep 17 00:00:00 2001
+From 58f4d9a66b368b4711c73ec1ca22a0caf96387fb Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 14 Apr 2015 20:51:14 +0100
-Subject: [PATCH 47/82] Also limit GUI updates when in non full-screen video
+Subject: [PATCH 47/87] Also limit GUI updates when in non full-screen video
  mode
 
 ---
@@ -5115,10 +5114,10 @@ Subject: [PATCH 47/82] Also limit GUI updates when in non full-screen video
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index db16750..52d8da0 100644
+index 01d071a..3f30d36 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2861,7 +2861,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
+@@ -2876,7 +2876,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
  #if defined(TARGET_RASPBERRY_PI) || defined(HAS_IMXVPU)
      // This code reduces rendering fps of the GUI layer when playing videos in fullscreen mode
      // it makes only sense on architectures with multiple layers
@@ -5127,7 +5126,7 @@ index db16750..52d8da0 100644
        fps = CSettings::GetInstance().GetInt(CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE);
  #endif
  
-@@ -2874,6 +2874,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
+@@ -2889,6 +2889,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
      {
        if (!m_skipGuiRender)
          g_windowManager.Process(CTimeUtils::GetFrameTime());
@@ -5140,10 +5139,10 @@ index db16750..52d8da0 100644
 2.1.0
 
 
-From bfc47132931a9581ec9077fbfc79f474f2cc7ad6 Mon Sep 17 00:00:00 2001
+From 189892d9bb94469281b5a14f7d648c03602c5896 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 21 Apr 2015 14:32:07 +0100
-Subject: [PATCH 48/82] Add sharpness control
+Subject: [PATCH 48/87] Add sharpness control
 
 ---
  addons/resource.language.en_gb/resources/strings.po |  2 +-
@@ -5152,10 +5151,10 @@ Subject: [PATCH 48/82] Add sharpness control
  3 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 8bdcd41..e6c96aa 100644
+index 32314b2..a1da64b 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8225,7 +8225,7 @@ msgstr ""
+@@ -8229,7 +8229,7 @@ msgstr ""
  
  #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
  msgctxt "#16313"
@@ -5218,10 +5217,10 @@ index d3e5129..a71e645 100644
 2.1.0
 
 
-From d08528ea816503cc39043921b14c9e3641ae9618 Mon Sep 17 00:00:00 2001
+From e56fe3a0ae344fa17a14a730a61e2262f23514cc Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Apr 2015 13:49:51 +0100
-Subject: [PATCH 49/82] Add back required include
+Subject: [PATCH 49/87] Add back required include
 
 ---
  xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 1 +
@@ -5243,10 +5242,10 @@ index b5777a1..64b4d60 100644
 2.1.0
 
 
-From 6c9ff10b3281ed4390208d3c62790374a832fbf9 Mon Sep 17 00:00:00 2001
+From 4b169b5f74dc8d0b21f2dc12590a1ee7672c1807 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 5 May 2015 23:58:06 +0100
-Subject: [PATCH 50/82] Leave GUI contents available for screensaver
+Subject: [PATCH 50/87] Leave GUI contents available for screensaver
 
 ---
  xbmc/guilib/GUIWindowManager.cpp | 11 ++++++++++-
@@ -5278,10 +5277,10 @@ index 89cfb8b..767c7b6 100644
 2.1.0
 
 
-From 4cd4ecc12fd71f77075492d2b2410377e3ee4410 Mon Sep 17 00:00:00 2001
+From ffac4eb73a618456b8b848826eb3f1890eb19fd3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 6 Jun 2015 18:43:57 +0100
-Subject: [PATCH 51/82] ffmpeg: Automatic switch to software decode for GMC
+Subject: [PATCH 51/87] ffmpeg: Automatic switch to software decode for GMC
  with more than one warp point
 
 ---
@@ -5498,10 +5497,10 @@ index 7251fc1..3429cea 100644
 2.1.0
 
 
-From ab88e490029f17e7d3295a7e4d11817e1432d056 Mon Sep 17 00:00:00 2001
+From c54f5b81438b9949075511ca1b6b623e4743345c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 22 Jun 2015 21:46:57 +0100
-Subject: [PATCH 52/82] Use default resampling setting on Pi2
+Subject: [PATCH 52/87] Use default resampling setting on Pi2
 
 ---
  system/settings/rbp2.xml | 5 +++++
@@ -5527,10 +5526,10 @@ index 8cc8f19..52778ec 100644
 2.1.0
 
 
-From 935f26d943697b8843441ce025342b8208f7b8b5 Mon Sep 17 00:00:00 2001
+From d1eaac73ddbfaa2f0efd13c81df4d7dc87c0625c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 25 Jun 2015 19:43:10 +0100
-Subject: [PATCH 53/82] HW mouse pointer
+Subject: [PATCH 53/87] HW mouse pointer
 
 Updating the mouse point provokes a complete screen update which can make it feel laggy
 and results in high cpu.
@@ -6600,10 +6599,10 @@ index a17e987..dc73b39 100644
 2.1.0
 
 
-From 4cfb9e7d65d21411670d690582cd53623211bedf Mon Sep 17 00:00:00 2001
+From 93721fc6743566387eefb90ab47ddb8025b19a7a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 2 Aug 2014 17:48:04 +0100
-Subject: [PATCH 54/82] Report decoded image name
+Subject: [PATCH 54/87] Report decoded image name
 
 ---
  xbmc/cores/omxplayer/OMXImage.cpp | 1 +
@@ -6625,10 +6624,10 @@ index 1524214..a01c435 100644
 2.1.0
 
 
-From 23cf5a6b52e6240f8587b7034373090c2a03c6a8 Mon Sep 17 00:00:00 2001
+From bc381e896fd410ef210676bb8e60a871b23ffe58 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 11 Apr 2014 16:12:27 +0100
-Subject: [PATCH 55/82] Add ability to log more timestamp info in extra debug
+Subject: [PATCH 55/87] Add ability to log more timestamp info in extra debug
  settings
 
 ---
@@ -6641,7 +6640,7 @@ Subject: [PATCH 55/82] Add ability to log more timestamp info in extra debug
  6 files changed, 25 insertions(+), 13 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index e6c96aa..75ffa90 100644
+index a1da64b..1fb7988 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -2989,6 +2989,11 @@ msgctxt "#680"
@@ -6782,10 +6781,10 @@ index 14967f7..7883df9 100644
 2.1.0
 
 
-From 7c957926da49527534afb473e5cc01c4c4731e7b Mon Sep 17 00:00:00 2001
+From ee7c2c792dffff28976c26becfe5395443fdd4a9 Mon Sep 17 00:00:00 2001
 From: Memphiz <memphis@machzwo.de>
 Date: Tue, 18 Nov 2014 13:28:36 +0100
-Subject: [PATCH 56/82] - evaluate the setting for hiding watched
+Subject: [PATCH 56/87] - evaluate the setting for hiding watched
  movies/episodes/musicvideos in recently added job (should influence
  homescreen of skins only)
 
@@ -6914,17 +6913,17 @@ index 2021dd9..5f67d10 100644
 2.1.0
 
 
-From 18f4709365403755bdaff06795ff8ba716c45fd6 Mon Sep 17 00:00:00 2001
+From 733928c24eb33e494342b402a27feaa763b9455c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 14:28:37 +0100
-Subject: [PATCH 57/82] build: Add vcsm lib
+Subject: [PATCH 57/87] build: Add vcsm lib
 
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index bc623c1..5d7d0f4 100644
+index 1b33dcd..4597d8b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1012,7 +1012,7 @@ if test "$use_gles" = "yes"; then
@@ -6940,10 +6939,10 @@ index bc623c1..5d7d0f4 100644
 2.1.0
 
 
-From 41690e8668138c21f16aa905b1bc1fdd44981665 Mon Sep 17 00:00:00 2001
+From e8c7f60a26d9768014b1bbf8a6169df0a5b5763e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 8 May 2015 14:09:31 +0100
-Subject: [PATCH 58/82] re-implement 'RFC' style POLLing for LA registering
+Subject: [PATCH 58/87] re-implement 'RFC' style POLLing for LA registering
  process
 
 ---
@@ -7168,10 +7167,10 @@ index ddf9963..5d1f933 100644
 2.1.0
 
 
-From 05b74d5afb41228a76fa990c8890daa11fe95590 Mon Sep 17 00:00:00 2001
+From 25974d4477d750d0814903a1fc16972fb5adf4ce Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 15:35:43 +0100
-Subject: [PATCH 59/82] ffmpeg: test: increase number of threads
+Subject: [PATCH 59/87] ffmpeg: test: increase number of threads
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp | 3 +++
@@ -7195,10 +7194,10 @@ index 3498503..c2f3287 100644
 2.1.0
 
 
-From 8852df68ce6e68d5f77a0e2b76b6358edb04cce6 Mon Sep 17 00:00:00 2001
+From 3d2c938c098121c8121c02697292602bba71803a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 22 May 2015 13:56:29 +0100
-Subject: [PATCH 60/82] ffmpeg: Allow neon to be enabled in unified builds
+Subject: [PATCH 60/87] ffmpeg: Allow neon to be enabled in unified builds
 
 ---
  tools/depends/target/ffmpeg/Makefile | 4 ++++
@@ -7224,10 +7223,10 @@ index 6a9f105..fef5ef2 100644
 2.1.0
 
 
-From 06c0d37ac6e503a6d8c3168d70bd8069a304ceb5 Mon Sep 17 00:00:00 2001
+From ba14471b3ee2f0acbc2f7ef8ee53019801bc8d4b Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 5 Mar 2015 20:00:59 +0000
-Subject: [PATCH 61/82] Discard data before VO/VOL in mpeg-4 over mpegts
+Subject: [PATCH 61/87] Discard data before VO/VOL in mpeg-4 over mpegts
 
 ---
  ...-data-before-VO-VOL-in-mpeg-4-over-mpegts.patch | 69 ++++++++++++++++++++++
@@ -7336,10 +7335,10 @@ index fef5ef2..e780521 100644
 2.1.0
 
 
-From 6e22dc0d90115d6dcca812131a66d7fd12df5d19 Mon Sep 17 00:00:00 2001
+From 77160d82755d60149d58846287c199399b00c89d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Feb 2015 14:37:27 +0000
-Subject: [PATCH 62/82] ffmpeg: Add some upstream HEVC optimisations
+Subject: [PATCH 62/87] ffmpeg: Add some upstream HEVC optimisations
 
 ---
  tools/depends/target/ffmpeg/Makefile               |    6 +-
@@ -11126,10 +11125,10 @@ index 0000000..5e8e07d
 2.1.0
 
 
-From 4d79e6db58adff60200a2c9ffdf333032049bcca Mon Sep 17 00:00:00 2001
+From 02c23d176df9eda6c9ca0843f22fbb6fbe1908c8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 14:04:18 +0100
-Subject: [PATCH 63/82] Add GPU acceleration to hevc
+Subject: [PATCH 63/87] Add GPU acceleration to hevc
 
 ---
  tools/depends/target/ffmpeg/Makefile               |     4 +-
@@ -47841,10 +47840,10 @@ index 0000000..f2b8ffc
 2.1.0
 
 
-From 46a99318aeedd7e947328c0f7d1a09fcf7789bed Mon Sep 17 00:00:00 2001
+From 17f3d42294dfbf879688c343411d485638ecda60 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 14 Dec 2015 12:35:14 +0000
-Subject: [PATCH 64/82] Add patches to ffmpeg for native build
+Subject: [PATCH 64/87] Add patches to ffmpeg for native build
 
 ---
  tools/depends/target/ffmpeg/autobuild.sh | 8 ++++++++
@@ -47873,10 +47872,10 @@ index b9bfd57..f6d4c3b 100755
 2.1.0
 
 
-From 93e3e2b312061080c7461fef1b318e85f82ae6dd Mon Sep 17 00:00:00 2001
+From 0e353d54eecc97290ed6d7821a0527068c8d7fc1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 12 Jan 2016 16:29:57 +0000
-Subject: [PATCH 65/82] ffmpeg: Add cabac opimisations for hevc
+Subject: [PATCH 65/87] ffmpeg: Add cabac opimisations for hevc
 
 ---
  .../0001-Squashed-commit-of-the-following.patch    | 2288 ++++++++++++++++++++
@@ -50212,10 +50211,10 @@ index e4acfa9..072e711 100644
 2.1.0
 
 
-From 47b414d3ae14315a19220fc0df6b493543369013 Mon Sep 17 00:00:00 2001
+From 0bf8531626b6c25189643f56bcd2025097a3eb7e Mon Sep 17 00:00:00 2001
 From: Rainer Hochecker <fernetmenta@online.de>
 Date: Tue, 14 Jul 2015 08:30:44 +0200
-Subject: [PATCH 66/82] fix high cpu load caused by false positive frame
+Subject: [PATCH 66/87] fix high cpu load caused by false positive frame
  limiter
 
 ---
@@ -50223,7 +50222,7 @@ Subject: [PATCH 66/82] fix high cpu load caused by false positive frame
  1 file changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 52d8da0..6d0bca4 100644
+index 3f30d36..5ce885d 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -1912,7 +1912,7 @@ void CApplication::Render()
@@ -50290,10 +50289,10 @@ index 52d8da0..6d0bca4 100644
 2.1.0
 
 
-From 2985824bdc3b446c73051eb89ee7f485096e198b Mon Sep 17 00:00:00 2001
+From 31a707878c81c495bf9ecdd17e225a118696cf0d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 5 Aug 2015 13:43:25 +0100
-Subject: [PATCH 67/82] Avoid busy spinning when queue is empty
+Subject: [PATCH 67/87] Avoid busy spinning when queue is empty
 
 ---
  xbmc/cores/dvdplayer/DVDPlayerAudio.cpp | 2 ++
@@ -50316,10 +50315,10 @@ index 97a23a6..9f21a19 100644
 2.1.0
 
 
-From 5dac8a906acaa4db9c6f79f67f85ea2703149903 Mon Sep 17 00:00:00 2001
+From 1eaf343b39500954edca0dcad421f5804334ad8e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 6 Aug 2015 11:23:05 +0100
-Subject: [PATCH 68/82] Make sync playback to display the default option
+Subject: [PATCH 68/87] Make sync playback to display the default option
 
 ---
  system/settings/rbp.xml | 7 +++++++
@@ -50347,10 +50346,10 @@ index 1506035..f2a6892 100644
 2.1.0
 
 
-From c318987187e8f794f74731b3cdb6bcbce4e70ff1 Mon Sep 17 00:00:00 2001
+From b6489d11534c12721187f51bee214ea0a7475315 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 8 Sep 2015 23:42:30 +0100
-Subject: [PATCH 69/82] Fixing initialisation issue found on Raspberry Pi with
+Subject: [PATCH 69/87] Fixing initialisation issue found on Raspberry Pi with
  Buildroot
 
 ---
@@ -50405,10 +50404,10 @@ index 0000000..8f289f2
 2.1.0
 
 
-From 2c5b158ac3e2ab963bae4b413708a3da7c500e37 Mon Sep 17 00:00:00 2001
+From 656bb8e4b578263df6ea5d4a1e4f225c2fe59dbe Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 9 Dec 2015 13:31:14 +0000
-Subject: [PATCH 70/82] Fail to open when width is invalid. Can happen with
+Subject: [PATCH 70/87] Fail to open when width is invalid. Can happen with
  mpegts files
 
 ---
@@ -50434,10 +50433,10 @@ index 3345685..5386b4a 100644
 2.1.0
 
 
-From 278c505927cb27711d7c214ff117d16715b9f733 Mon Sep 17 00:00:00 2001
+From 7b1d50c6c8cbf97e83036122f684580e38ab3ce1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 21 Dec 2015 18:34:06 +0000
-Subject: [PATCH 71/82] Force a SetVideoRect after a reconfigure
+Subject: [PATCH 71/87] Force a SetVideoRect after a reconfigure
 
 There has been an issue with dvd stills and a hdmi refresh rate change.
 The hdmi mode change loses the currently displayed picture.
@@ -50468,10 +50467,10 @@ index adf6f73..ad3f66f 100644
 2.1.0
 
 
-From 5ffdb1840ca9c6783a0213933f77f39917ff511d Mon Sep 17 00:00:00 2001
+From 21ad272025b5c667b377c62c92ad9e4452e99ead Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 31 Mar 2015 17:31:47 +0100
-Subject: [PATCH 72/82] mmalcodec: Add SetCodecControl function
+Subject: [PATCH 72/87] mmalcodec: Add SetCodecControl function
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 10 +++++++++-
@@ -50541,10 +50540,10 @@ index f4df09c..37d0868 100644
 2.1.0
 
 
-From 6c877cebd0a813957d69c55e51d8bd61eae82119 Mon Sep 17 00:00:00 2001
+From ea0c0839fa475eb15b1ee15c061f3bbb4d13fb1d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 27 Dec 2015 18:44:22 +0000
-Subject: [PATCH 73/82] mmalcodec: Switch to a condition variable when blocking
+Subject: [PATCH 73/87] mmalcodec: Switch to a condition variable when blocking
  waiting for a picture
 
 ---
@@ -50656,10 +50655,10 @@ index 37d0868..ca28c6f 100644
 2.1.0
 
 
-From f61daaf2183e072903c3023b7b48efb8427b85eb Mon Sep 17 00:00:00 2001
+From 981d11868c758f59645870529889ceeb74084bc1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 16 Jan 2016 16:46:03 +0000
-Subject: [PATCH 74/82] omxaudio: Avoid reporting a spurious cached value
+Subject: [PATCH 74/87] omxaudio: Avoid reporting a spurious cached value
 
 Avoids seek bar showing zero after a seek
 ---
@@ -50683,10 +50682,10 @@ index 70d0866..052b5ef 100644
 2.1.0
 
 
-From 74d54946355742c1bee6df44caf4b0bda61bf6b0 Mon Sep 17 00:00:00 2001
+From 8d5ffb198870049b063360bbcc519570ca554afd Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 21 Dec 2015 22:17:25 +0000
-Subject: [PATCH 75/82] Fall back to arm jpeg encode/decode when gpu is busy
+Subject: [PATCH 75/87] Fall back to arm jpeg encode/decode when gpu is busy
 
 ---
  xbmc/cores/omxplayer/OMXImage.cpp | 50 ++++++++++++++++++++++++++++++++-------
@@ -50931,10 +50930,10 @@ index a93aa82..6f38dbc 100644
 2.1.0
 
 
-From 5fed5836e1055106915c730df99c7d7fff9cb0a6 Mon Sep 17 00:00:00 2001
+From 4be09ab16a45f2333ad8a93a7adf970dc204523c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 2 Jan 2016 18:08:16 +0000
-Subject: [PATCH 76/82] Don't send zero sized extradata
+Subject: [PATCH 76/87] Don't send zero sized extradata
 
 ---
  xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
@@ -50957,10 +50956,10 @@ index 3579966..0f5c1b7 100644
 2.1.0
 
 
-From 2b466440e41115c189f07af5d4490483ab155161 Mon Sep 17 00:00:00 2001
+From d61fff49481d036bb76abcac18e63cdd420f5327 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 3 Jan 2016 19:12:16 +0000
-Subject: [PATCH 77/82] stereoscopicmanager: Ensure we don't have a stale value
+Subject: [PATCH 77/87] stereoscopicmanager: Ensure we don't have a stale value
  of videoplayer stereoscopic mode
 
 ---
@@ -51055,10 +51054,10 @@ index ec2310f..f090bb9 100644
 2.1.0
 
 
-From f18b2098d1fc7340dcba58e3d8e228824206ba3e Mon Sep 17 00:00:00 2001
+From 6da18c74adcd816ba5bd48a3fe30135653f20425 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Sep 2015 19:05:12 +0100
-Subject: [PATCH 78/82] Make MVC a valid 3D filename tag
+Subject: [PATCH 78/87] Make MVC a valid 3D filename tag
 
 ---
  xbmc/guilib/StereoscopicsManager.cpp | 9 +++++++++
@@ -51122,10 +51121,10 @@ index 93de9bd..4da88f4 100644
 2.1.0
 
 
-From f500c630479bef2450c40b40c0f5835d78d8b030 Mon Sep 17 00:00:00 2001
+From c6e6b19fd8a6f5202e45a543d33e62d7c83a9414 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 24 Jan 2016 16:42:04 +0000
-Subject: [PATCH 79/82] fixup! [build] Add patches to ffmpeg for native build
+Subject: [PATCH 79/87] fixup! [build] Add patches to ffmpeg for native build
 
 ---
  tools/depends/target/ffmpeg/autobuild.sh | 2 +-
@@ -51148,10 +51147,10 @@ index f6d4c3b..cc59d17 100755
 2.1.0
 
 
-From c72e666b002fe41cc87b6a78de7c7d5cf03d978e Mon Sep 17 00:00:00 2001
+From 4444117c2328aaee329f450f9847404b8e2e545c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 26 Jan 2016 19:58:30 +0000
-Subject: [PATCH 80/82] OMXAudio: Make use of m_bGotFrame to skip decoding when
+Subject: [PATCH 80/87] OMXAudio: Make use of m_bGotFrame to skip decoding when
  full
 
 ---
@@ -51192,10 +51191,10 @@ index 33c4c6a..b9dab89 100644
 2.1.0
 
 
-From 1cbdff02a36563eb2e5ae145af6cab2ac8911ead Mon Sep 17 00:00:00 2001
+From de6469ac823bf4613dc460c6444c726af7679ef8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 26 Jan 2016 20:01:18 +0000
-Subject: [PATCH 81/82] OMXAudio: Handle GetData before adding the next buffer
+Subject: [PATCH 81/87] OMXAudio: Handle GetData before adding the next buffer
  so we can be sure it fits
 
 ---
@@ -51266,10 +51265,10 @@ index b9dab89..f150dc6 100644
 2.1.0
 
 
-From ca6b8405110f365cb38dc66b9baaa4a924646c70 Mon Sep 17 00:00:00 2001
+From 08854b76d4f7fc623187eeb202eef1e6b1c9fd6e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 26 Jan 2016 20:03:49 +0000
-Subject: [PATCH 82/82] OMXAudio: Handle changes in decoded audio size
+Subject: [PATCH 82/87] OMXAudio: Handle changes in decoded audio size
  correctly
 
 ---
@@ -51321,6 +51320,267 @@ index f150dc6..4956b5b 100644
    return 0;
  }
  
+-- 
+2.1.0
+
+
+From bb3e856cbe0ebd902d048c42398fc01cbccb0882 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Thu, 4 Feb 2016 15:29:55 +0000
+Subject: [PATCH 83/87] MMALCodec: Set dropped flag on output pictures when
+ input requested that
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 6 ++++++
+ xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.h   | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
+index 0f5c1b7..7b025fd 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
+@@ -759,6 +759,7 @@ void CMMALVideo::SetDropState(bool bDrop)
+ {
+   if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+     CLog::Log(LOGDEBUG, "%s::%s - bDrop(%d)", CLASSNAME, __func__, bDrop);
++  m_dropState = bDrop;
+ }
+ 
+ int CMMALVideo::Decode(uint8_t* pData, int iSize, double dts, double pts)
+@@ -794,6 +795,8 @@ int CMMALVideo::Decode(uint8_t* pData, int iSize, double dts, double pts)
+        buffer->length = (uint32_t)iSize > buffer->alloc_size ? buffer->alloc_size : (uint32_t)iSize;
+        // set a flag so we can identify primary frames from generated frames (deinterlace)
+        buffer->flags = MMAL_BUFFER_HEADER_FLAG_USER0;
++       if (m_dropState)
++         buffer->flags |= MMAL_BUFFER_HEADER_FLAG_USER3;
+ 
+        memcpy(buffer->data, pData, buffer->length);
+        iSize -= buffer->length;
+@@ -944,6 +947,7 @@ void CMMALVideo::Reset(void)
+   m_decoderPts = DVD_NOPTS_VALUE;
+   m_demuxerPts = DVD_NOPTS_VALUE;
+   m_codecControlFlags = 0;
++  m_dropState = false;
+ }
+ 
+ void CMMALVideo::SetSpeed(int iSpeed)
+@@ -1021,6 +1025,8 @@ bool CMMALVideo::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+ 
+     pDvdVideoPicture->MMALBuffer->Acquire();
+     pDvdVideoPicture->iFlags  = DVP_FLAG_ALLOCATED;
++    if (buffer->mmal_buffer->flags & MMAL_BUFFER_HEADER_FLAG_USER3)
++      pDvdVideoPicture->iFlags |= DVP_FLAG_DROPPED;
+     if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+       CLog::Log(LOGINFO, "%s::%s dts:%.3f pts:%.3f flags:%x:%x MMALBuffer:%p mmal_buffer:%p", CLASSNAME, __func__,
+           pDvdVideoPicture->dts == DVD_NOPTS_VALUE ? 0.0 : pDvdVideoPicture->dts*1e-6, pDvdVideoPicture->pts == DVD_NOPTS_VALUE ? 0.0 : pDvdVideoPicture->pts*1e-6,
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.h
+index ca28c6f..bf669e0 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.h
+@@ -124,6 +124,7 @@ protected:
+   double            m_decoderPts;
+   int               m_speed;
+   int               m_codecControlFlags;
++  bool              m_dropState;
+ 
+   CCriticalSection m_sharedSection;
+   MMAL_COMPONENT_T *m_dec;
+-- 
+2.1.0
+
+
+From c3a50d8cfc848fa7e3a7d547616752d8b8fd9b14 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Wed, 3 Feb 2016 21:35:01 +0000
+Subject: [PATCH 84/87] DVDVideoCodecFFmpeg: Enable refcounted frames
+
+Without this frames will get (deep) copied when deinterlace is set to automatic,
+but file is not deinterlaced.
+
+For 1080p24 that costs 150MB/s of memory bandwidth which is very expensive.
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index c2f3287..64087f2 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -316,6 +316,10 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+       av_opt_set(m_pCodecContext, it->m_name.c_str(), it->m_value.c_str(), 0);
+   }
+ 
++  // If non-zero, the decoded audio and video frames returned from avcodec_decode_video2() are reference-counted and are valid indefinitely.
++  // Without this frames will get (deep) copied when deinterlace is set to automatic, but file is not deinterlaced.
++  m_pCodecContext->refcounted_frames = 1;
++
+   if (avcodec_open2(m_pCodecContext, pCodec, NULL) < 0)
+   {
+     CLog::Log(LOGDEBUG,"CDVDVideoCodecFFmpeg::Open() Unable to open codec");
+-- 
+2.1.0
+
+
+From 068ca68f345f22c7422e5a70885cb3f5496969f4 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Fri, 19 Feb 2016 13:45:23 +0000
+Subject: [PATCH 85/87] mmal: increase decode buffering a little to help harder
+ MVC files
+
+PR8610 reduced buffering in codec which generally improved behaviour,
+but we have some reports of hard streams (like 3D BluRay) that now
+lag. The problem is when the codec's input buffer runs dry you
+waste useful decoder cycles. It seems adding another two frames of
+latency to decoder gets the performance back.
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
+index 7b025fd..08f61fc 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/MMALCodec.cpp
+@@ -676,7 +676,7 @@ bool CMMALVideo::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
+ 
+   // limit number of callback structures in video_decode to reduce latency. Too low and video hangs.
+   // negative numbers have special meaning. -1=size of DPB -2=size of DPB+1
+-  status = mmal_port_parameter_set_uint32(m_dec_input, MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS, -3);
++  status = mmal_port_parameter_set_uint32(m_dec_input, MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS, -5);
+   if (status != MMAL_SUCCESS)
+     CLog::Log(LOGERROR, "%s::%s Failed to configure max num callbacks on %s (status=%x %s)", CLASSNAME, __func__, m_dec_input->name, status, mmal_status_to_string(status));
+ 
+-- 
+2.1.0
+
+
+From 50ef8f72f56f9ee9aebf725685ae980523884d3a Mon Sep 17 00:00:00 2001
+From: Mario Holzinger <sandman01xda@gmail.com>
+Date: Fri, 11 Dec 2015 16:48:57 +0100
+Subject: [PATCH 86/87] touch panel to display adjustment
+
+---
+ xbmc/input/linux/LinuxInputDevices.cpp |  7 ++++---
+ xbmc/settings/AdvancedSettings.cpp     | 16 ++++++++++++++++
+ xbmc/settings/AdvancedSettings.h       |  6 ++++++
+ 3 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/input/linux/LinuxInputDevices.cpp b/xbmc/input/linux/LinuxInputDevices.cpp
+index 9f3e866..a506956 100644
+--- a/xbmc/input/linux/LinuxInputDevices.cpp
++++ b/xbmc/input/linux/LinuxInputDevices.cpp
+@@ -98,6 +98,7 @@ typedef unsigned long kernel_ulong_t;
+ #include "utils/log.h"
+ #include "input/touch/generic/GenericTouchActionHandler.h"
+ #include "input/touch/generic/GenericTouchInputHandler.h"
++#include "settings/AdvancedSettings.h"
+ 
+ #ifndef BITS_PER_LONG
+ #define BITS_PER_LONG        (sizeof(long) * 8)
+@@ -653,13 +654,13 @@ bool CLinuxInputDevice::AbsEvent(const struct input_event& levt, XBMC_Event& dev
+   switch (levt.code)
+   {
+   case ABS_X:
+-    m_mouseX = levt.value;
++    m_mouseX = (int)((float)levt.value * g_advancedSettings.m_screenAlign_xStretchFactor) + g_advancedSettings.m_screenAlign_xOffset; // stretch and shift touch x coordinates
+     break;
+ 
+   case ABS_Y:
+-    m_mouseY = levt.value;
++    m_mouseY = (int)((float)levt.value * g_advancedSettings.m_screenAlign_yStretchFactor) + g_advancedSettings.m_screenAlign_yOffset; // stretch and shift touch y coordinates
+     break;
+-  
++
+   case ABS_MISC:
+     remoteStatus = levt.value & 0xFF;
+     break;
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index e81758a..73cbe96 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -303,6 +303,12 @@ void CAdvancedSettings::Initialize()
+   m_iEdlCommBreakAutowait = 0;             // Off by default
+   m_iEdlCommBreakAutowind = 0;             // Off by default
+ 
++  // Touchscreen  default values if no adjustment is necessarry
++  m_screenAlign_xOffset = 0;
++  m_screenAlign_yOffset= 0;
++  m_screenAlign_xStretchFactor = 1.0;
++  m_screenAlign_yStretchFactor = 1.0;
++
+   m_curlconnecttimeout = 10;
+   m_curllowspeedtime = 20;
+   m_curlretries = 2;
+@@ -871,6 +877,16 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+     XMLUtils::GetInt(pElement, "commbreakautowind", m_iEdlCommBreakAutowind, 0, 10);        // Between 0 and 10 seconds
+   }
+ 
++  // Touchscreen
++  pElement = pRootElement->FirstChildElement("touchscreen");
++  if (pElement)
++  {
++    XMLUtils::GetInt(pElement, "x_offset", m_screenAlign_xOffset );
++    XMLUtils::GetInt(pElement, "y_offset", m_screenAlign_yOffset );
++    XMLUtils::GetFloat(pElement, "x_stretch_factor", m_screenAlign_xStretchFactor );
++    XMLUtils::GetFloat(pElement, "y_stretch_factor", m_screenAlign_yStretchFactor );
++  }
++
+   // picture exclude regexps
+   TiXmlElement* pPictureExcludes = pRootElement->FirstChildElement("pictureexcludes");
+   if (pPictureExcludes)
+diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
+index 4da88f4..1bdc77e 100644
+--- a/xbmc/settings/AdvancedSettings.h
++++ b/xbmc/settings/AdvancedSettings.h
+@@ -334,6 +334,12 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+     std::string m_cpuTempCmd;
+     std::string m_gpuTempCmd;
+ 
++    // Touchscreen
++    int m_screenAlign_xOffset;
++    int m_screenAlign_yOffset;
++    float m_screenAlign_xStretchFactor;
++    float m_screenAlign_yStretchFactor;
++
+     /* PVR/TV related advanced settings */
+     int m_iPVRTimeCorrection;     /*!< @brief correct all times (epg tags, timer tags, recording tags) by this amount of minutes. defaults to 0. */
+     int m_iPVRInfoToggleInterval; /*!< @brief if there are more than 1 pvr gui info item available (e.g. multiple recordings active at the same time), use this toggle delay in milliseconds. defaults to 3000. */
+-- 
+2.1.0
+
+
+From bdaf33f33b15cc2d692023d481d20dacfbd3966b Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Mon, 15 Feb 2016 15:51:11 +0000
+Subject: [PATCH 87/87] touch panel to display adjustment - support multitouch
+
+PR7978 allowed a simple calibration to be applied to touch input
+It didn't cover multitouch which this adds support for
+---
+ xbmc/input/linux/LinuxInputDevices.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/input/linux/LinuxInputDevices.cpp b/xbmc/input/linux/LinuxInputDevices.cpp
+index a506956..3579cd0 100644
+--- a/xbmc/input/linux/LinuxInputDevices.cpp
++++ b/xbmc/input/linux/LinuxInputDevices.cpp
+@@ -707,7 +707,7 @@ bool CLinuxInputDevice::mtAbsEvent(const struct input_event& levt)
+   case ABS_MT_POSITION_X:
+     if (m_mt_currentSlot < TOUCH_MAX_POINTERS)
+     {
+-      m_mt_x[m_mt_currentSlot] = levt.value;
++      m_mt_x[m_mt_currentSlot] = (int)((float)levt.value * g_advancedSettings.m_screenAlign_xStretchFactor) + g_advancedSettings.m_screenAlign_xOffset; // stretch and shift touch x coordinates
+       if (m_mt_event[m_mt_currentSlot] == TouchInputUnchanged)
+         m_mt_event[m_mt_currentSlot] = TouchInputMove;
+     }
+@@ -716,7 +716,7 @@ bool CLinuxInputDevice::mtAbsEvent(const struct input_event& levt)
+   case ABS_MT_POSITION_Y:
+     if (m_mt_currentSlot < TOUCH_MAX_POINTERS)
+     {
+-      m_mt_y[m_mt_currentSlot] = levt.value;
++      m_mt_y[m_mt_currentSlot] = (int)((float)levt.value * g_advancedSettings.m_screenAlign_yStretchFactor) + g_advancedSettings.m_screenAlign_yOffset; // stretch and shift touch y coordinates;
+       if (m_mt_event[m_mt_currentSlot] == TouchInputUnchanged)
+         m_mt_event[m_mt_currentSlot] = TouchInputMove;
+     }
 -- 
 2.1.0
 
