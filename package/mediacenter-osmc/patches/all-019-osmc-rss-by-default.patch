@@ -1,4 +1,4 @@
-From 0eb2d7174077e8d99193ebb7acc15f95a4f23bef Mon Sep 17 00:00:00 2001
+From 42323e3fbb859afaf498a91f7b864e448764a757 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:20:39 +0100
 Subject: [PATCH] Use the OSMC RSS feed by default if it is enabled
@@ -9,16 +9,16 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/userdata/RssFeeds.xml b/userdata/RssFeeds.xml
-index 6169113..5b36b40 100644
+index 48b99e8..dc60dea 100644
 --- a/userdata/RssFeeds.xml
 +++ b/userdata/RssFeeds.xml
 @@ -3,8 +3,6 @@
    <!-- RSS feeds. To have multiple feeds, just add a feed to the set. You can also have multiple sets. 	!-->
    <!-- To use different sets in your skin, each must be called from skin with a unique id.             	!-->
    <set id="1">
--    <feed updateinterval="30">http://feeds.xbmc.org/xbmc</feed>
--    <feed updateinterval="30">http://feeds.xbmc.org/latest_xbmc_addons</feed>
--    <feed updateinterval="30">http://feeds.xbmc.org/updated_xbmc_addons</feed>
+-    <feed updateinterval="30">http://feeds.kodi.tv/xbmc</feed>
+-    <feed updateinterval="30">http://feeds.kodi.tv/latest_xbmc_addons</feed>
+-    <feed updateinterval="30">http://feeds.kodi.tv/updated_xbmc_addons</feed>
 +    <feed updateinterval="240">https://osmc.tv/rss</feed>
    </set>
  </rssfeeds>
