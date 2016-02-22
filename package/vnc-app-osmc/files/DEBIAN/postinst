@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+
+	systemctl daemon-reload
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable vnc.service >/dev/null 2>&1
+	fi
+
+	if ischroot; then exit 0; fi
+	if systemctl is-enabled vnc.service >/dev/null; then systemctl start vnc.service; fi
+	sysctl -p
+fi
