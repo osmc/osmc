@@ -48,46 +48,25 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 	def __init__(self, strXMLname, strFallbackPath, strDefaultName, **kwargs):
 
-		self.order_of_fill  = kwargs.get('order_of_fill', [])
-		self.apply_buttons  = kwargs.get('apply_buttons', [])
 		self.live_modules   = kwargs.get('live_modules' , [])
+
+		self.module_holder = {}
 
 		log(kwargs)
 
 		log(len(self.live_modules))
 
-		self.module_holder  = {}
-
 		self.first_run = True
-
-		self.number_of_pages = len(self.apply_buttons)
-		self.active_page = 1
 
 
 	def onInit(self):
 
 		if self.first_run:
+
 			self.first_run = False
 
-			# hide the unneeded control groups
-			contr = 200
-			while True:
-				try:
-					self.getControl(contr).setVisible(False)
-					contr += 100
-				except:
-					break
-
-			# hide the left labels
-			self.getControl(4915).setLabel('OSMC')
-			self.getControl(4915).setVisible(True)
-			self.visible_left_label = 4915
-			self.getControl(4916).setVisible(False)
-
-			# hide next and prev if they arent needed
-			if self.number_of_pages < 2:
-				self.getControl(4444).setVisible(False)
-				self.getControl(6666).setVisible(False)
+			# add the exit button
+			self.getControl(555).addItem(xbmcgui.ListItem(label='Exit', label2=''))
 
 			# place the items into the gui
 			for i, module in enumerate(self.live_modules):
@@ -101,38 +80,16 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 				list_item = xbmcgui.ListItem(label=shortname, label2='', thumbnailImage = module['FX_Icon'])
 				list_item.setProperty('FO_ICON', module['FO_Icon'])
 
-				# grab the modules description for display in the textbox
-				# this is a TRY just in case the module doesnt have a self.description
-				try:
-					desc = module['SET'].description
-				except:
-					desc = ''
+				controlID = 555
 
-				list_item.setProperty('description', str(desc))
-
-				controlID = self.order_of_fill[i]
+				self.module_holder[i + 1] = module
 
 				self.getControl(controlID).addItem(list_item)
 
-				self.module_holder[controlID] = module
-
-			# set up the apply buttons
-			for apply_button in self.apply_buttons:
-
-				# set the image
-				list_item = xbmcgui.ListItem(label='', label2='')
-				list_item.setProperty('Action', "Apply")
-
-				self.getControl(apply_button).addItem(list_item)
-
-			self.setFocusId(105)
-
-			self.next_prev_direction_changer()
+			self.setFocusId(555)
 
 
 	def onAction(self, action):
-
-		# log(action)
 
 		actionID = action.getId()
 		focused_control = self.getFocusId()
@@ -140,160 +97,49 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 		if (actionID in (10, 92)):
 			self.close()
 
-		elif focused_control == 4444:
-
-			# previous menu
-			if self.active_page - 1 == 0:
-				new_page = self.number_of_pages
-			else:
-				new_page = self.active_page - 1
-
-			self.getControl(self.active_page * 100).setVisible(False)
-			self.getControl(new_page * 100).setVisible(True)
-
-			self.active_page = new_page
-
-			self.setFocusId((self.active_page * 100 ) + 5)
-
-			# self.next_prev_direction_changer()
-
-		elif focused_control == 6666:
-			# next menu
-			if ( self.active_page + 1 ) > self.number_of_pages:
-				new_page = 1
-			else:
-				new_page = self.active_page + 1
-
-			self.getControl(self.active_page * 100).setVisible(False)
-			self.getControl(new_page * 100).setVisible(True)
-
-			self.active_page = new_page
-
-			self.setFocusId((self.active_page * 100 ) + 5)
-
-			# self.next_prev_direction_changer()
-
-
 
 	def onClick(self, controlID):
 
-		if not (controlID - 5) % 100:
-
-			self.close()
-
-		elif controlID == 909:
+		if controlID == 909:
 			# open the advanced settings beta addon
 			xbmc.executebuiltin("RunAddon(script.advancedsettingsetter)")
 
-			# elif controlID == 4444:
-			# 	# previous menu
-			# 	if self.active_page - 1 == 0:
-			# 		new_page = self.number_of_pages
-			# 	else:
-			# 		new_page = self.active_page - 1
-
-			# 	self.getControl(self.active_page * 100).setVisible(False)
-			# 	self.getControl(new_page * 100).setVisible(True)
-
-			# 	self.active_page = new_page
-
-			# 	self.next_prev_direction_changer()
-
-			# elif controlID == 6666:
-			# 	# next menu
-			# 	if ( self.active_page + 1 ) > self.number_of_pages:
-			# 		new_page = 1
-			# 	else:
-			# 		new_page = self.active_page + 1
-
-			# 	self.getControl(self.active_page * 100).setVisible(False)
-			# 	self.getControl(new_page * 100).setVisible(True)
-
-			# 	self.active_page = new_page
-
-			# 	self.next_prev_direction_changer()
-
 		else:
 
-			module = self.module_holder.get(controlID, {})
-			instance = module.get('SET', False)
+			pos = self.getControl(555).getSelectedPosition()
 
-			log(instance)
-			log(instance.isAlive())
+			if pos == 0:
+				self.close()
 
-			# try:
-			if instance.isAlive():
-				instance.run()
 			else:
 
-				setting_instance = module['OSMCSetting'].OSMCSettingClass()
-				setting_instance.setDaemon(True)
+				module = self.module_holder.get(pos, {})
+				instance = module.get('SET', False)
 
-				module['SET'] = setting_instance
+				log(instance)
+				log(instance.isAlive())
 
-				# instance = imp.load_source(new_module_name, osmc_setting_file)
-				# module_holder['SET'] = instance
-				# instance.setDaemon(True)
-				setting_instance.start()
-			# except:
-			# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
+				# try:
+				if instance.isAlive():
+					instance.run()
+				else:
 
+					setting_instance = module['OSMCSetting'].OSMCSettingClass()
+					setting_instance.setDaemon(True)
 
-	def left_label_toggle(self, controlID):
+					module['SET'] = setting_instance
 
-		# toggles the left label which displayes the focussed module name
-		one = self.getControl(4915)
-		two = self.getControl(4916)
-		new_label = self.getControl(controlID).getListItem(0).getLabel()
-
-		if self.visible_left_label == 4915:
-			two.setLabel(new_label)
-			two.setVisible(True)
-			one.setVisible(False)
-			self.visible_left_label = 4916
-		else:
-			one.setLabel(new_label)
-			one.setVisible(True)
-			two.setVisible(False)
-			self.visible_left_label = 4915
-
+					# instance = imp.load_source(new_module_name, osmc_setting_file)
+					# module_holder['SET'] = instance
+					# instance.setDaemon(True)
+					setting_instance.start()
+				# except:
+				# log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
 
 	def onFocus(self, controlID):
 
-		# update the textbox 'description'
-		try:
-			self.getControl(2).setText(self.getControl(controlID).getSelectedItem().getProperty('description'))
-		except:
-			pass
-
-		module_icons = [101, 102, 103, 104, 105, 106, 107, 108, 109,
-						201, 202, 203, 204, 205, 206, 207, 208, 209,]
-
-		if controlID in module_icons:
-			self.left_label_toggle(controlID)
-
-
-	def next_prev_direction_changer(self):
-		''' Sets the direction (onLeft, onRight, etc) for the previous and next buttons in the gui '''
-
-		prev_button = self.getControl(4444)
-		next_button = self.getControl(6666)
-
-		pos5 = self.getControl((self.active_page * 100 ) + 5)
-
-		try:
-			pos4 = self.getControl((self.active_page * 100 ) + 4)
-		except:
-			pos4 = pos5
-
-		try:
-			pos6 = self.getControl((self.active_page * 100 ) + 6)
-		except:
-			pos6 = pos5
-
-		prev_button.setNavigation(pos5, pos5, next_button, pos4)
-		next_button.setNavigation(pos5, pos5, pos6, prev_button)
+		pass
 
 
 
@@ -340,19 +186,8 @@ class OSMCGui(threading.Thread):
 		# load the modules as widget entries
 		self.load_widget_info()
 
-		# determine which order list is used, indexed to 0
-		self.number_of_pages_needed = (len(self.live_modules) // 9) +1
-
-		log('number_of_pages_needed')
-		log(self.number_of_pages_needed)
-
-		self.order_of_fill = [ item + (100 * x) for x in range(self.number_of_pages_needed) for item in self.item_order    ]
-		self.apply_buttons = [ item + (100 * x) for x in range(self.number_of_pages_needed) for item in self.apply_button  ]
-
-
 		# instantiate the window
-		self.GUI = OSMC_gui(xml, scriptPath, 'Default', order_of_fill=self.order_of_fill,
-			apply_buttons=self.apply_buttons, live_modules=self.live_modules)
+		self.GUI = OSMC_gui(xml, scriptPath, 'Default', live_modules=self.live_modules)
 
 
 	def load_widget_info(self):
@@ -415,16 +250,6 @@ class OSMCGui(threading.Thread):
 
 		log('Exiting GUI')
 
-		# set the GUI back to the default first page view
-		try:
-			self.GUI.getControl(self.GUI.active_page * 100).setVisible(False)
-			self.GUI.getControl(100).setVisible(True)
-
-			self.GUI.active_page = 1
-			self.GUI.next_prev_direction_changer()
-			self.GUI.setFocusId(105)		
-		except:
-			pass
 
 	@clog(log)
 	def retrieve_modules(self):
