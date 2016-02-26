@@ -88,8 +88,13 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
 			# add in the Update Now button if the notification is 'true'
 			if xbmcgui.Window(10000).getProperty('OSMC_notification') == 'true':
-				self.getControl(555).addItem(xbmcgui.ListItem(label='Update Now'))
+				self.getControl(555).addItem(xbmcgui.ListItem(label=lang(32038)))
 
+
+			# add text to changelog box
+			# this is temporary text while Naz works on making the changelog available.
+			tmp = "this is temporary text purely for testing, if you are seeing this in the live version of OSMC then someone done screwed up"
+			self.getControl(2222).setText(tmp)
 			self.setFocusId(555)
 
 

@@ -21,32 +21,7 @@
             <height>1040</height>
             <texture border="40,0,0,0">Curve.png</texture>
         </control>
-<!--         <control id="4915" type="label">
-            <description>left module name label</description>
-            <left>1380</left>
-            <top>60</top>
-            <width>460</width>
-            <align>center</align>
-            <aligny>top</aligny>
-            <scroll>false</scroll>
-            <label>Temporary</label>
-            <font>osmc_addon_720_XLarge</font>
-            <textcolor>ff808080</textcolor>
-            <shadowcolor>44000000</shadowcolor>
-        </control>
-        <control id="4916" type="label">
-            <description>second left module name label</description>
-            <left>1380</left>
-            <top>60</top>
-            <width>460</width>
-            <align>center</align>
-            <aligny>top</aligny>
-            <scroll>false</scroll>
-            <label>Second Temporary</label>
-            <font>osmc_addon_720_XLarge</font>
-            <textcolor>ff808080</textcolor>
-            <shadowcolor>44000000</shadowcolor>
-        </control> -->
+        <!--         <control id="4915" type="label"><description>left module name label</description><left>1380</left><top>60</top><width>460</width><align>center</align><aligny>top</aligny><scroll>false</scroll><label>Temporary</label><font>osmc_addon_720_XLarge</font><textcolor>ff808080</textcolor><shadowcolor>44000000</shadowcolor></control><control id="4916" type="label"><description>second left module name label</description><left>1380</left><top>60</top><width>460</width><align>center</align><aligny>top</aligny><scroll>false</scroll><label>Second Temporary</label><font>osmc_addon_720_XLarge</font><textcolor>ff808080</textcolor><shadowcolor>44000000</shadowcolor></control>-->
         <control type="image">
             <left>50</left>
             <top>50</top>
@@ -85,7 +60,7 @@
             <height>666</height>
             <texture>$INFO[Container(555).ListItem.Property(FO_ICON)]</texture>
             <aspectratio aligny="center">keep</aspectratio>
-            <!-- <bordertexture border="1,1,1,69">DropShadow.png</bordertexture> -->
+            <!-- <bordertexture border="1,1,1,69">DropShadow.png</bordertexture>-->
             <bordersize>0,0,0,66</bordersize>
         </control>
         <control id="555" type="list">
@@ -98,19 +73,13 @@
             <onup>noop</onup>
             <ondown>noop</ondown>
             <onleft>noop</onleft>
-            <onright>noop</onright>
+            <onright>13</onright>
             <orientation>vertical</orientation>
             <focusposition>2</focusposition>
             <viewtype label="535">list</viewtype>
-            <scrolltime tween="cubic" easing="out">360</scrolltime>
+            <scrolltime easing="out" tween="cubic">360</scrolltime>
             <itemlayout height="78" width="900">
-<!--                 <control type="image">
-                    <posx>5</posx>
-                    <posy>3</posy>
-                    <width>40</width>
-                    <height>40</height>
-                    <info>ListItem.Icon</info>
-                </control> -->
+                <!--                 <control type="image"><posx>5</posx><posy>3</posy><width>40</width><height>40</height><info>ListItem.Icon</info></control>-->
                 <control type="label">
                     <left>90</left>
                     <top>0</top>
@@ -125,13 +94,7 @@
             </itemlayout>
             <focusedlayout height="78" width="900">
                 <!--                 <control type="image"><width>485</width><height>29</height><posx>0</posx><posy>0</posy><visible>Control.HasFocus(555)</visible><texture>list-focus.png</texture></control>-->
-<!--                 <control type="image">
-                    <posx>5</posx>
-                    <posy>3</posy>
-                    <width>40</width>
-                    <height>40</height>
-                    <info>$INFO[ListItem.Property(FO_ICON)]</info>
-                </control> -->
+                <!--                 <control type="image"><posx>5</posx><posy>3</posy><width>40</width><height>40</height><info>$INFO[ListItem.Property(FO_ICON)]</info></control>-->
                 <control type="label">
                     <left>90</left>
                     <top>0</top>
@@ -145,6 +108,43 @@
                     <textcolor>ffe0b074</textcolor>
                 </control>
             </focusedlayout>
+        </control>
+        <control id="2222" type="textbox">
+            <description>Changelog text box</description>
+            <left>1000</left>
+            <top>250</top>
+            <width>900</width>
+            <height>800</height>
+            <visible>SubString(Container(555).ListItem.Label, $ADDON[service.osmc.settings 32038])</visible>
+            <colordiffuse>FFFFFFFF</colordiffuse>
+            <font>osmc_addon_720_Med</font>
+            <textcolor>66ffffff</textcolor>
+            <pulseonselect/>
+            <label>this is temporary text purely for testing, if you are seeing this in the live version of OSMC then someone done screwed up</label>
+            <pagecontrol>13</pagecontrol>
+            <!-- <scrolltime>200</scrolltime>-->
+            <!-- <autoscroll delay="3000" time="1000" repeat="10000">!Control.HasFocus(13)</autoscroll>-->
+            <align>center</align>
+        </control>
+        <control id="13" type="scrollbar">
+            <description>scroll bar control for changelog</description>
+            <left>950</left>
+            <top>300</top>
+            <width>20</width>
+            <height>700</height>
+            <visible>SubString(Container(555).ListItem.Label, $ADDON[service.osmc.settings 32038])</visible>
+            <!-- <texturesliderbackground>scroll-background.png</texturesliderbackground>-->
+            <!-- <texturesliderbar>bar.png</texturesliderbar>-->
+            <!-- <texturesliderbarfocus>bar-focus.png</texturesliderbarfocus>-->
+            <textureslidernib>nib.png</textureslidernib>
+            <textureslidernibfocus>nib_focus.png</textureslidernibfocus>
+            <pulseonselect/>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <onup>noop</onup>
+            <ondown>noop</ondown>
+            <onleft>555</onleft>
+            <onright>noop</onright>
         </control>
         <control id="909" type="button">
             <description>Advanced Settings (beta)</description>
