@@ -13,7 +13,7 @@ class SimpleScheduler(object):
 		self.daynum 		= setting_dict.get('check_day', 1)				# the days from month end that the action should occur [-16, 16]
 		self.hour 			= setting_dict.get('check_hour', 3)				# the hour the action should occur (integer)
 		self.minute 		= setting_dict.get('check_minute', 0)			# the minute the action should occur (integer)
-		self.trigger_time 	= datetime.datetime.now().replace(year=2222)	# the time of the next update check
+		self.trigger_time 	= datetime.datetime.now().replace(year=2224)	# the time of the next update check
 		self.leeway			= 15											# the number of minutes past the action time that the action can still take place
 
 		if right_now is None:
