@@ -44,6 +44,9 @@ then
     echo 0 > /sys/class/graphics/fb0/free_scale
     echo 0 > /sys/class/graphics/fb1/free_scale
 
+    # Prevent static artefacts
+    echo 1 > /sys/class/graphics/fb1/blank
+
     # Configure framebuffer with double buffer
     case "$hdmimode" in
       720*)
