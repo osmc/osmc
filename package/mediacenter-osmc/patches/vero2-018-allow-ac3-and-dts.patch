@@ -1,0 +1,64 @@
+From 03c0936cbf144992403d771cf7d6ecd820034aa8 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 28 Mar 2015 22:53:16 +0100
+Subject: [PATCH 02/26] [aml] Set digital_codec parameter to notify HDMI about
+ audio format
+
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 32 ++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index df50940..446e75a 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -38,6 +38,7 @@
+ #include "settings/AdvancedSettings.h"
+ #if defined(HAS_LIBAMCODEC)
+ #include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
+ #endif
+
+
+@@ -526,7 +526,37 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   if (aml_present())
+   {
+     aml_set_audio_passthrough(m_passthrough);
+-    device = "default";
++
++    int aml_digital_codec;
++    switch(format.m_dataFormat)
++    {
++      case AE_FMT_AC3:
++        aml_digital_codec = 2;
++        break;
++
++      case AE_FMT_DTS:
++        aml_digital_codec = 3;
++        break;
++
++      case AE_FMT_EAC3:
++        aml_digital_codec = 4;
++        break;
++
++      case AE_FMT_DTSHD:
++        aml_digital_codec = 5;
++        break;
++
++      case AE_FMT_TRUEHD:
++        aml_digital_codec = 7;
++        break;
++
++      default:
++        if (inconfig.channels > 2)
++          aml_digital_codec = 6;
++        else
++          aml_digital_codec = 0;
++    }
++    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+   }
+ #endif
+ 
+-- 
+1.8.3.1
+
