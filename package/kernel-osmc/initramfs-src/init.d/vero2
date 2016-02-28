@@ -17,6 +17,9 @@ if [ "$preferred" ]; then hdmimode="$preferred"; fi
 echo "$hdmimode" > /sys/class/display/mode
 echo 0 > /sys/class/graphics/fb0/blank
 
+# Prevent static artefacts
+echo 1 > /sys/class/graphics/fb1/blank
+
 # Disable framebuffer scaling
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
