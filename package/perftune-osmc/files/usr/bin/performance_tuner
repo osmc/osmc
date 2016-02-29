@@ -10,14 +10,19 @@ for option in $(cat /proc/cmdline); do
 	  osmcdev=*)
 	    OPTION_OSMCDEV="${option#*=}"
 	    ;;
+	  root=UUID=*)
+	    OPTION_UUID=$(echo "${option#root=UUID=*}" | sed 's/"//g')
+	    ;;
 	  root=*)
-	    OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox sed 's/"//g')
+	    OPTION_ROOT=$(echo "${option#*=}" | sed 's/"//g')
 	    ;;
 	  nfsroot=*)
 	    OPTION_FILESYSTEM="nfs"
 	    ;;
 	esac
 done
+
+if [ "$OPTION_UUID" ]; then OPTION_ROOT=$(blkid -U "$OPTION_UUID"); fi
 
 # Set up swap file if required
 
