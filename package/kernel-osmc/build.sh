@@ -11,7 +11,7 @@ INITRAMFS_NOBUILD=4
 
 . ../common.sh
 test $1 == rbp1 && VERSION="4.4.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.4.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.4.3" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero && VERSION="4.4.0" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.94" && REV="24" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
@@ -132,7 +132,7 @@ then
 		make bcm2708-rpi-b.dtb
 		make bcm2708-rpi-b-plus.dtb
 	fi
-	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb; fi
+	if [ "$1" == "rbp2" ]; then make bcm2709-rpi-2-b.dtb && make bcm2710-rpi-3-b.dtb; fi #ToDo: Make separate build target for RBP3 when ARM64 is done
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
