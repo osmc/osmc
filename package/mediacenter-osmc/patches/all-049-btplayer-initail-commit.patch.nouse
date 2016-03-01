@@ -1,4 +1,4 @@
-From d761269fe8e140b63d96201b435323d5bd57c7b8 Mon Sep 17 00:00:00 2001
+From eb998bc7ee470fb23e605001aec0469c36d78091 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezbgit config --global user.email>
 Date: Sat, 13 Feb 2016 12:59:58 +0000
 Subject: [PATCH 1/3] [BTPlayer] initail commit
@@ -8,13 +8,15 @@ Subject: [PATCH 1/3] [BTPlayer] initail commit
  configure.ac                                       |     1 +
  project/VS2010Express/XBMC.vcxproj                 |  5988 ++++-----
  project/VS2010Express/XBMC.vcxproj.filters         | 12711 ++++++++++---------
- xbmc/cores/btplayer/BTPlayer.cpp                   |   223 +
- xbmc/cores/btplayer/BTPlayer.h                     |   116 +
+ xbmc/cores/btplayer/BTPlayer.cpp                   |   296 +
+ xbmc/cores/btplayer/BTPlayer.h                     |   128 +
  xbmc/cores/btplayer/Makefile.in                    |     9 +
  xbmc/cores/playercorefactory/PlayerCoreConfig.h    |     2 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.cpp |     6 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.h   |     1 +
- 10 files changed, 9714 insertions(+), 9344 deletions(-)
+ xbmc/linux/DBusUtil.cpp                            |   108 +-
+ xbmc/linux/DBusUtil.h                              |     8 +-
+ 12 files changed, 9871 insertions(+), 9388 deletions(-)
  create mode 100644 xbmc/cores/btplayer/BTPlayer.cpp
  create mode 100644 xbmc/cores/btplayer/BTPlayer.h
  create mode 100644 xbmc/cores/btplayer/Makefile.in
@@ -18756,10 +18758,10 @@ index eaecbbf..816376c 100644
 \ No newline at end of file
 diff --git a/xbmc/cores/btplayer/BTPlayer.cpp b/xbmc/cores/btplayer/BTPlayer.cpp
 new file mode 100644
-index 0000000..d19772a
+index 0000000..871b345
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.cpp
-@@ -0,0 +1,223 @@
+@@ -0,0 +1,296 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -18793,6 +18795,9 @@ index 0000000..d19772a
 +#include "cores/AudioEngine/Interfaces/AEStream.h"
 +#include "cores/DataCacheCore.h"
 +#include <unistd.h>
++
++using namespace MUSIC_INFO;
++using namespace KODI::MESSAGING;
 +
 +class CQueueNextFileJob : public CJob
 +{
@@ -18830,12 +18835,40 @@ index 0000000..d19772a
 +  m_bStop              (false)
 +{
 +  memset(&m_playerGUIData, 0, sizeof(m_playerGUIData));
++
++#ifdef HAS_DBUS
++  DBusError dbus_error;
++  dbus_error_init (&dbus_error);
++  m_connection = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_error);
++
++  if (m_connection)
++  {
++    dbus_connection_set_exit_on_disconnect(m_connection, false);
++    if (dbus_error_is_set(&dbus_error))
++    {
++      CLog::Log(LOGERROR, "Bluetooth: Failed to attach to signal %s", dbus_error.message);
++      dbus_connection_close(m_connection);
++      dbus_connection_unref(m_connection);
++      m_connection = NULL;
++    }
++  }
++  dbus_error_free (&dbus_error);
++  updateA2DPInfo();
++#endif
 +}
 +
 +BTPlayer::~BTPlayer()
 +{
 +  CloseFile();
 +  delete m_FileItem;
++#ifdef HAS_DBUS
++  if (m_connection)
++  {
++    dbus_connection_close(m_connection);
++    dbus_connection_unref(m_connection);
++    m_connection = NULL;
++  }
++#endif
 +}
 +
 +bool BTPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
@@ -18844,8 +18877,19 @@ index 0000000..d19772a
 +  m_isPaused = false;
 +
 +  CSharedLock lock(m_streamsLock);
-+  // Lock AudioEngine so external application can enjoy its time with the sink
-+  CAEFactory::Suspend();
++  /* Suspend AE temporarily so exclusive or hog-mode sinks */
++  /* don't block external player's access to audio device  */
++  CAEFactory::Suspend ();
++  // wait for AE has completed suspended
++  XbmcThreads::EndTime timer (2000);
++  while (!timer.IsTimePast () && !CAEFactory::IsSuspended ())
++  {
++    Sleep (50);
++  }
++  if (timer.IsTimePast ())
++  {
++    CLog::Log (LOGERROR, "%s: AudioEngine did not suspend", __FUNCTION__);
++  }
 +  lock.Leave();
 +  if (!IsRunning())
 +    Create();
@@ -18872,30 +18916,61 @@ index 0000000..d19772a
 +  StopThread(true);
 +  CSharedLock lock(m_streamsLock);
 +  while (m_jobCounter > 0)
-+    {
-+      lock.Leave();
-+      m_jobEvent.WaitMSec(100);
-+      lock.Enter();
-+    }
-+  CAEFactory::Resume();
++  {
++    lock.Leave();
++    m_jobEvent.WaitMSec(100);
++    lock.Enter();
++  }
++  /* Resume AE processing of XBMC native audio */
++  if (!CAEFactory::Resume ())
++  {
++    CLog::Log (LOGFATAL, "%s: Failed to restart AudioEngine", __FUNCTION__);
++  }	
 +  return true;
 +}
 +
-+void BTPlayer::Process()
++#ifdef HAS_DBUS
++void BTPlayer::updateA2DPInfo()
++{
++  // get details from bluez
++    CVariant properties = CDBusUtil::GetAll("org.bluez",
++                                            "/org/bluez/hci0/dev_88_C9_D0_23_01_39/player0",
++                                            "org.freedesktop.DBus.Properties",
++                                            "GetAll",
++                                            "org.bluez.MediaPlayer1");
++
++    m_tag.SetArtist(properties["Track"][0]["Artist"].asString());
++    m_tag.SetTitle(properties["Track"][0]["Title"].asString());
++    m_tag.SetAlbum(properties["Track"][0]["Album"].asString());
++    m_tag.SetTrackNumber(properties["Track"][0]["TrackNumber"].asInteger(0));
++    CApplicationMessenger::GetInstance().PostMsg(TMSG_UPDATE_CURRENT_ITEM, 1,-1, static_cast<void*>(new CFileItem(m_tag)));
++    const char* status = properties["Status"].asString().c_str();
++    if (strcmp(status, "playing")== 0) 
++    {  
++      m_playerGUIData.m_time = properties["Position"].asUnsignedInteger();
++      m_playerGUIData.m_totalTime = properties["Track"][0]["Duration"].asUnsignedInteger(0);
++    }
++}
++#endif
++
++void BTPlayer::Process ()
 +{
 +  m_isPlaying = true;
-+  if (!m_startEvent.WaitMSec(100))
-+    {
-+      CLog::Log(LOGDEBUG, "BTPlayer::Process - Failed to receive start event");
-+      return;
-+    }
-+  m_callback.OnPlayBackStarted();
-+  while(m_isPlaying && !m_bStop)
++  if (!m_startEvent.WaitMSec (100))
 +  {
-+    Sleep(2000);
++    CLog::Log (LOGDEBUG, "BTPlayer::Process - Failed to receive start event");
++    return;
 +  }
-+  m_callback.OnPlayBackStopped();
++  m_callback.OnPlayBackStarted ();
++  while (m_isPlaying && !m_bStop)
++  {
++#ifdef HAS_DBUS
++  updateA2DPInfo();
++#endif
++  }
++  m_callback.OnPlayBackStopped ();
 +}
++
 +
 +void BTPlayer::OnExit()
 +{
@@ -18985,10 +19060,10 @@ index 0000000..d19772a
 +}
 diff --git a/xbmc/cores/btplayer/BTPlayer.h b/xbmc/cores/btplayer/BTPlayer.h
 new file mode 100644
-index 0000000..1f17050
+index 0000000..b346ecfc
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.h
-@@ -0,0 +1,116 @@
+@@ -0,0 +1,128 @@
 +#pragma once
 +
 +/*
@@ -19011,7 +19086,6 @@ index 0000000..1f17050
 + *
 + */
 +
-+#include <list>
 +
 +#include "cores/IPlayer.h"
 +#include "threads/Thread.h"
@@ -19020,6 +19094,13 @@ index 0000000..1f17050
 +
 +#include "cores/IAudioCallback.h"
 +#include "cores/AudioEngine/Utils/AEChannelInfo.h"
++#include "music/tags/MusicInfoTag.h"
++
++#ifdef HAS_DBUS
++#include "DBusUtil.h"
++#define BLUEZ_SERVICE "org.bluez"
++
++#endif
 +
 +class IAEStream;
 +
@@ -19063,6 +19144,9 @@ index 0000000..1f17050
 +  static bool HandlesType(const std::string &type) { return true; }
 +
 +  virtual void OnJobComplete(unsigned int jobID, bool success, CJob *job);
++#ifdef HAS_DBUS
++  virtual void updateA2DPInfo();
++#endif
 +
 +    struct
 +    {
@@ -19084,25 +19168,28 @@ index 0000000..1f17050
 +
 + private:
 +
-+    bool                m_signalSpeedChange;   /* true if OnPlaybackSpeedChange needs to be called */
-+    int                 m_playbackSpeed;       /* the playback speed (1 = normal) */
-+    bool                m_isPlaying;
-+    bool                m_isPaused;
-+    bool                m_isFinished;          /* if there are no more songs in the queue */
-+    unsigned int        m_defaultCrossfadeMS;  /* how long the default crossfade is in ms */
-+    unsigned int        m_upcomingCrossfadeMS; /* how long the upcoming crossfade is in ms */
-+    CEvent              m_startEvent;          /* event for playback start */
-+    IAudioCallback*     m_audioCallback;       /* the viz audio callback */
++    bool                      m_signalSpeedChange;   /* true if OnPlaybackSpeedChange needs to be called */
++    int                       m_playbackSpeed;       /* the playback speed (1 = normal) */
++    bool                      m_isPlaying;
++    bool                      m_isPaused;
++    bool                      m_isFinished;          /* if there are no more songs in the queue */
++    unsigned int              m_defaultCrossfadeMS;  /* how long the default crossfade is in ms */
++    unsigned int              m_upcomingCrossfadeMS; /* how long the upcoming crossfade is in ms */
++    CEvent                    m_startEvent;          /* event for playback start */
++    IAudioCallback*           m_audioCallback;       /* the viz audio callback */
 +
-+    CFileItem*          m_FileItem;            /* our queued file or current file if no file is queued */
-+
-+    CSharedSection      m_streamsLock;         /* lock for the stream list */
-+    int                 m_jobCounter;
-+    CEvent              m_jobEvent;
-+    bool                m_continueStream;
-+    bool                m_bStop;
-+    int64_t GetTotalTime64();
-+    int64_t GetTimeInternal();
++    CFileItem*                m_FileItem;            /* our queued file or current file if no file is queued */
++    MUSIC_INFO::CMusicInfoTag m_tag;
++    CSharedSection            m_streamsLock;         /* lock for the stream list */
++    int                       m_jobCounter;
++    CEvent                    m_jobEvent;
++    bool                      m_continueStream;
++    bool                      m_bStop;
++    int64_t                   GetTotalTime64();
++    int64_t                   GetTimeInternal();
++#ifdef HAS_DBUS
++   DBusConnection             *m_connection;
++#endif
 +};
 +
 diff --git a/xbmc/cores/btplayer/Makefile.in b/xbmc/cores/btplayer/Makefile.in
@@ -19176,6 +19263,185 @@ index 0e79f5c..63533ef 100644
  };
  
  typedef unsigned int PLAYERCOREID;
+diff --git a/xbmc/linux/DBusUtil.cpp b/xbmc/linux/DBusUtil.cpp
+index 08041eb..60aee3f 100644
+--- a/xbmc/linux/DBusUtil.cpp
++++ b/xbmc/linux/DBusUtil.cpp
+@@ -40,7 +40,7 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
+         if (!dbus_message_has_signature(reply, "v"))
+           CLog::Log(LOGERROR, "DBus: wrong signature on Get - should be \"v\" but was %s", dbus_message_iter_get_signature(&iter));
+         else
+-          result = ParseVariant(&iter);
++          result = ParseType(&iter);
+       }
+     }
+   }
+@@ -50,11 +50,19 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
+   return result;
+ }
+ 
+-CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *interface)
++CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *arg)
+ {
+-  CDBusMessage message(destination, object, "org.freedesktop.DBus.Properties", "GetAll");
++  return CDBusUtil::GetAll(destination, object, "org.freedesktop.DBus.Properties", "Get", arg);
++}
++
++CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *interface, const char *method, const char *arg)
++{
++  CDBusMessage message(destination, object, interface, method);
+   CVariant properties;
+-  message.AppendArgument(interface);
++  if (arg != NULL)
++  {
++    message.AppendArgument(arg);
++  }
+   DBusMessage *reply = message.SendSystem();
+   if (reply)
+   {
+@@ -65,32 +73,7 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
+         CLog::Log(LOGERROR, "DBus: wrong signature on GetAll - should be \"a{sv}\" but was %s", dbus_message_iter_get_signature(&iter));
+       else
+       {
+-        do
+-        {
+-          DBusMessageIter sub;
+-          dbus_message_iter_recurse(&iter, &sub);
+-          do
+-          {
+-            DBusMessageIter dict;
+-            dbus_message_iter_recurse(&sub, &dict);
+-            do
+-            {
+-              const char * key = NULL;
+-
+-              dbus_message_iter_get_basic(&dict, &key);
+-              if (!dbus_message_iter_next(&dict))
+-                break;
+-
+-              CVariant value = ParseVariant(&dict);
+-
+-              if (!value.isNull())
+-                properties[key] = value;
+-
+-            } while (dbus_message_iter_next(&dict));
+-
+-          } while (dbus_message_iter_next(&sub));
+-
+-        } while (dbus_message_iter_next(&iter));
++        properties = ParseDictionary(&iter);
+       }
+     }
+   }
+@@ -98,12 +81,48 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
+   return properties;
+ }
+ 
+-CVariant CDBusUtil::ParseVariant(DBusMessageIter *itr)
++CVariant CDBusUtil::Parse(DBusMessageIter *itr)
+ {
+-  DBusMessageIter variant;
+-  dbus_message_iter_recurse(itr, &variant);
++  char *s = dbus_message_iter_get_signature(itr);
++  CVariant v;
++  if (strcmp(s, "a{sv}") == 0)
++    v = ParseDictionary(itr);
++  else
++    v = ParseType(itr);
++  dbus_free(s);
++  return v;
++}
+ 
+-  return ParseType(&variant);
++CVariant CDBusUtil::ParseDictionary(DBusMessageIter *itr)
++{
++  CVariant properties;
++  do
++  {
++    DBusMessageIter sub;
++    dbus_message_iter_recurse(itr, &sub);
++    do
++    {
++      DBusMessageIter dict;
++      dbus_message_iter_recurse(&sub, &dict);
++      do
++      {
++        const char * key = NULL;
++
++        dbus_message_iter_get_basic(&dict, &key);
++        dbus_message_iter_next(&dict);
++
++        CVariant value = ParseType(&dict);
++
++        if (!value.isNull())
++          properties[key] = value;
++
++      } while (dbus_message_iter_next(&dict));
++
++    } while (dbus_message_iter_next(&sub));
++
++  } while (dbus_message_iter_next(itr));
++
++  return properties;
+ }
+ 
+ CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
+@@ -151,20 +170,27 @@ CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
+     value = (double)doublev;
+     break;
+   case DBUS_TYPE_ARRAY:
+-    DBusMessageIter array;
+-    dbus_message_iter_recurse(itr, &array);
+-
++    DBusMessageIter arrayContainer;
++    dbus_message_iter_recurse(itr, &arrayContainer);
++    DBusMessageIter arrayContent;
+     value = CVariant::VariantTypeArray;
+-
+     do
+     {
+-      CVariant item = ParseType(&array);
++      dbus_message_iter_recurse(&arrayContainer, &arrayContent);
++      CVariant item = ParseDictionary(itr);
+       if (!item.isNull())
++      {
+         value.push_back(item);
+-    } while (dbus_message_iter_next(&array));
++      }
++    } while (dbus_message_iter_has_next(itr));
++    break;
++   case DBUS_TYPE_VARIANT:
++    DBusMessageIter variant;
++    dbus_message_iter_recurse(itr, &variant);
++    value = ParseType(&variant);
+     break;
+   }
+-
++  
+   return value;
+ }
+ #endif
+diff --git a/xbmc/linux/DBusUtil.h b/xbmc/linux/DBusUtil.h
+index a683d70..1191126 100644
+--- a/xbmc/linux/DBusUtil.h
++++ b/xbmc/linux/DBusUtil.h
+@@ -26,11 +26,13 @@
+ class CDBusUtil
+ {
+ public:
+-  static CVariant GetAll(const char *destination, const char *object, const char *interface);
++  static CVariant GetAll(const char *destination, const char *object, const char *arg);
++  static CVariant GetAll(const char *destination, const char *object, const char *interface, const char *method, const char *arg);
+ 
+   static CVariant GetVariant(const char *destination, const char *object, const char *interface, const char *property);
+-private:
++
++  static CVariant Parse(DBusMessageIter *itr);
++  static CVariant ParseDictionary(DBusMessageIter *itr);
+   static CVariant ParseType(DBusMessageIter *itr);
+-  static CVariant ParseVariant(DBusMessageIter *itr);
+ };
+ #endif
 -- 
-2.7.1.windows.1
+2.5.0
 
