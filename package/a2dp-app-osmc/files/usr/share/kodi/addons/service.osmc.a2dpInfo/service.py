@@ -55,7 +55,6 @@ class A2DPInfo(threading.Thread):
     connected = None
     state = None
     status = None
-    track = []
     # hack to hide the fact we always get false 'playing' events
     receivedPosition = None
 
@@ -144,15 +143,14 @@ class A2DPInfo(threading.Thread):
                         self.receivedPosition = None
 
             if "Track" in changed:
-                self.track = changed["Track"]
-                self.trackChanged()
+                self.startBTPlayer()
 
             # hack to hide the fact we always get false 'playing' events
             if "Position" in changed and not self.status == 'paused':
                 newPosition = changed["Position"]
                 if self.receivedPosition:
                     if not self.receivedPosition == newPosition:
-                        self.trackChanged()
+                        self.startBTPlayer()
                 else:
                      self.receivedPosition = newPosition;
 
@@ -183,19 +181,11 @@ class A2DPInfo(threading.Thread):
         self.control.VolumeDown(dbus_interface=CONTROL_IFACE)
         self.transport.VolumeDown(dbus_interface=TRANSPORT_IFACE)
 
-    def trackChanged(self):
+    def startBTPlayer(self):
         if "playing" in self.status:
-            artist = ""
-            track  = ""
-            album = ""
-            if "Artist" in self.track:
-                artist = self.track["Artist"]
-            if "Title" in self.track:
-                track = self.track["Title"]
-            if "Album" in self.track:
-                album = self.track["Album"]
-            log("Start BTPLAYER")
-            xbmc.startBTPlayer(track, artist, album)
+            if xbmc.isBTPlayerActive() == 0:
+                log("Start BTPlayer")
+                xbmc.startBTPlayer()
 
 class BTPlayerMonitor(xbmc.Player):
     a2dpInfo = None
@@ -206,44 +196,25 @@ class BTPlayerMonitor(xbmc.Player):
     def setA2DPInfo(self, a2dpInfo):
         self.a2dpInfo = a2dpInfo
         
-    def onPlayBackStarted(self):
-        log("##player Started##")
-
     def onPlayBackStopped(self):
-        log("##player stopped##")
         if self.a2dpInfo.isPlaying():
             self.a2dpInfo.stop()
-        else:
-            log("##Not playing##")
             
     def onPlayBackPaused(self):
-        log("##player paused##")
         if self.a2dpInfo.isPlaying():
             self.a2dpInfo.pause()
-        else:
-            log("##Not playing##")
 
     def onPlayBackResumed(self):
-        log("##player resumed##")
         if xbmc.isBTPlayerActive():
             self.a2dpInfo.play()
-        else:
-            log("##Not active##")
     
     def onNextItem(self):
-        log("##Next Item##")
         if self.a2dpInfo.isPlaying():
             self.a2dpInfo.next()
-        else:
-            log("##Not playing##")
 
     def onPrevItem(self):
-        log("##Previous Item##")
         if (self.a2dpInfo.isPlaying()):
             self.a2dpInfo.previous()
-        else:
-            log("##Not playing##")
-
 
 if __name__ == "__main__":
     log("A2DP Info Starting")
