@@ -1,15 +1,15 @@
-From 03c0936cbf144992403d771cf7d6ecd820034aa8 Mon Sep 17 00:00:00 2001
-From: kszaq <kszaquitto@gmail.com>
-Date: Sat, 28 Mar 2015 22:53:16 +0100
-Subject: [PATCH 02/26] [aml] Set digital_codec parameter to notify HDMI about
- audio format
+From eabe736a67ab839a44a01453d5d4a5cd08744c48 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Feb 2016 04:32:53 +0000
+Subject: [PATCH] Hacky way to enable passthrough on Vero 2
 
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 32 ++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 35 ++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index df50940..446e75a 100644
+index 78f272b..c23cd55 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 @@ -38,6 +38,7 @@
@@ -18,9 +18,9 @@ index df50940..446e75a 100644
  #include "utils/AMLUtils.h"
 +#include "utils/SysfsUtils.h"
  #endif
-
-
-@@ -526,7 +526,37 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ 
+ 
+@@ -538,7 +539,37 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    if (aml_present())
    {
      aml_set_audio_passthrough(m_passthrough);
@@ -59,6 +59,15 @@ index df50940..446e75a 100644
    }
  #endif
  
+@@ -1382,6 +1413,8 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+     if (snd_card_get_name(cardNr, &cardName) == 0)
+       info.m_displayName = cardName;
+ 
++    info.m_deviceType = AE_DEVTYPE_IEC958;
++
+     if (info.m_deviceType == AE_DEVTYPE_HDMI && info.m_displayName.size() > 5 &&
+         info.m_displayName.substr(info.m_displayName.size()-5) == " HDMI")
+     {
 -- 
-1.8.3.1
+2.1.0
 
