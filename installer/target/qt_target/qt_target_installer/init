@@ -48,14 +48,12 @@ then
     echo 1 > /sys/class/graphics/fb1/blank
 
     # Configure framebuffer with double buffer
-    case "$hdmimode" in
-      720*)
-       fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
-      ;;
-      1080*)
-       fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
-      ;;
-esac
+
+    xres=$(sed 's/x.*$//g' /sys/class/video/device_resolution)
+    yres=$(sed 's/^.*x//g' /sys/class/video/device_resolution)
+    ydouble=$((yres * 2))
+
+    fbset -fb /dev/fb0 -g $xres $yres $xres $ydouble 32
 fi
 
 DEBUG_IP=$(sed 's/\ /\n/g' /proc/cmdline | grep "^debugip=" | sed 's/^debugip=//g')
