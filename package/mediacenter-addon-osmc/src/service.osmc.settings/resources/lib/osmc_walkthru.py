@@ -487,7 +487,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.close()
 
 
-	def still_checking_for_network(self, controlID):
+	def still_checking_for_network(self):
 		''' Checks to see if the internet checker has finished, and if not, shows a progress bar until complete or exit. 
 			The internet checker will toggle the internet_connected bool if a connection is made.'''
 
@@ -818,7 +818,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				# if the internet is NOT connected, and the networking panel has NOT been revealed then show the internet checker progress bar. 
 				# Once that is complete (or cancelled) then check for the internet connection again
 				# and show the networking panel if negative, or jump to the next panel if positive.
-				self.still_checking_for_network(self, next_panel)
+				self.still_checking_for_network()
 
 				if self.internet_connected:
 					next_panel = self.panel_order[self.panel_order.index('networking') + 1]
