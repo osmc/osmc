@@ -361,8 +361,7 @@ def arm_freq_config_set(kodi_setting, all_settings):
 
 		if int(kodi_setting) == 900: return 'remove_this_line'
 
-	else:
-		return kodi_setting
+	return kodi_setting
 
 
 def sdram_freq_config_set(kodi_setting, all_settings):
@@ -380,8 +379,7 @@ def sdram_freq_config_set(kodi_setting, all_settings):
 	elif version == 'Pi2':
 		if int(kodi_setting) == 450: return 'remove_this_line'
 
-	else:
-		return kodi_setting
+	return kodi_setting
 
 
 def core_freq_config_set(kodi_setting, all_settings):
@@ -399,8 +397,7 @@ def core_freq_config_set(kodi_setting, all_settings):
 	elif version == 'Pi2':
 		if int(kodi_setting) == 450: return 'remove_this_line'
 
-	else:
-		return kodi_setting
+	return kodi_setting
 
 
 def zero_value_config_set(kodi_setting, all_settings):
@@ -541,7 +538,7 @@ MASTER_SETTINGS =    {
 				},
 
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : zero_value_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
