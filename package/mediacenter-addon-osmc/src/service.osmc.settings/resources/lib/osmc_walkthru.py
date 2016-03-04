@@ -94,14 +94,14 @@ PANEL_MAP = {
 }
 
 
-def log(message):
+def log(message, level=xbmc.LOGDEBUG):
 
 	try:
 		message = str(message)
 	except UnicodeEncodeError:
 		message = message.encode('utf-8', 'ignore' )
 
-	xbmc.log(str(message), level=xbmc.LOGDEBUG)
+	xbmc.log(str(message), level=level)
 
 
 def lang(id):
@@ -167,6 +167,25 @@ class Networking_caller(threading.Thread):
 
 		log('network connection is %s' % self.parent.internet_connected)
 		log('internet connection is %s' % self.net_call.check_network(True))
+
+
+def close_walkthru_on_error(func):
+
+    def wrapper(parent, *args, **kwargs):
+
+        try:
+            return func(parent, *args, **kwargs)
+        except Exception, e:
+
+            log('============= Walkthru Error ====================', xbmc.LOGERROR)
+            log(traceback.format_exc(), xbmc.LOGERROR)
+            log('=================================', xbmc.LOGERROR)
+
+            parent.close()
+
+    return wrapper
+
+
 
 
 class walkthru_gui(xbmcgui.WindowXMLDialog):
@@ -454,6 +473,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			log(traceback.format_exc())
 
 
+	@close_walkthru_on_error
 	def exit_proceedure(self):
 
 		self.apply_hostname_change()
@@ -693,6 +713,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
 
 
+	@close_walkthru_on_error
 	def onClick(self, controlID):
 
 		if controlID == 1005:				# Exit control
@@ -793,6 +814,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		return "osmc-" + random.choice(names)
 
 
+	@close_walkthru_on_error
 	def onAction(self, action):
 
 		if self.prevent_escape:
@@ -874,6 +896,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 				self.getControl(control_dict['visibility_controller']).setVisible(False)
 
 
+	@close_walkthru_on_error
 	def onFocus(self, controlID):
 
 
@@ -923,9 +946,12 @@ def open_gui(networking_instance, testing=False):
 	while first_run or lang_rerun:
 
 		first_run = False
-		
-		GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language, testing=testing)
-		GUI.doModal()
+		try:
+			GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language, testing=testing)
+			GUI.doModal()
+		except:
+			log(traceback.format_exc(), xbmc.LOGERROR)
+			return
 
 		selected_language 	= GUI.selected_language
 		skin_choice 		= GUI.selected_skin
