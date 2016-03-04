@@ -260,6 +260,70 @@ def hdmi_boost_custom_default():
 	return '2'
 
 
+def PiVersion():
+	''' Determines the version of Pi currently being used '''
+
+	with open('/proc/cpuinfo', 'r') as f:
+
+		cpu_count = sum([1 for x in f.readlines() if x.startswith('processor')])
+
+	if cpu_count == 1:
+		return 'PiB'
+	else:
+		return 'Pi2'
+
+
+def arm_freq_custom_default():
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+		return 850
+
+	elif version == 'Pi2':
+		return 900
+
+	else:
+		return 850
+
+
+def sdram_freq_custom_default():
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+		return 400
+
+	elif version == 'Pi2':
+		return 450
+
+	else:
+		return 400
+
+
+def core_freq_custom_default():
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+		return 375
+
+	elif version == 'Pi2':
+		return 450
+
+	else:
+		return 375
+
+
 '''
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@ 
@@ -278,6 +342,79 @@ def generic_number_config_set(kodi_setting, all_settings):
 		return str(kodi_setting)
 	except:
 		return 'remove_this_line'
+
+
+def arm_freq_config_set(kodi_setting, all_settings):
+	''' Checks if the frequency setting is the same as the default Pi setting.
+	If so, then remove the line from the config.txt as it is not needed. '''
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+
+		if int(kodi_setting) == 850: return 'remove_this_line'
+
+	elif version == 'Pi2':
+
+		if int(kodi_setting) == 900: return 'remove_this_line'
+
+	else:
+		return kodi_setting
+
+
+def sdram_freq_config_set(kodi_setting, all_settings):
+	''' Checks if the frequency setting is the same as the default Pi setting.
+	If so, then remove the line from the config.txt as it is not needed. '''
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+		if int(kodi_setting) == 400: return 'remove_this_line' 
+
+	elif version == 'Pi2':
+		if int(kodi_setting) == 450: return 'remove_this_line'
+
+	else:
+		return kodi_setting
+
+
+def core_freq_config_set(kodi_setting, all_settings):
+	''' Checks if the frequency setting is the same as the default Pi setting.
+	If so, then remove the line from the config.txt as it is not needed. '''
+
+	try:
+		version = PiVersion()
+	except IOError:
+		version = "PiB"
+
+	if version == 'PiB':
+		if int(kodi_setting) == 375: return 'remove_this_line'
+
+	elif version == 'Pi2':
+		if int(kodi_setting) == 450: return 'remove_this_line'
+
+	else:
+		return kodi_setting
+
+
+def zero_value_config_set(kodi_setting, all_settings):
+	''' If the value of the kodi setting is zero, then remove the 
+	entry from the config.txt. This should be used where zero is
+	the default (pi natural) value. '''
+
+	try:
+		if int(kodi_setting) == 0:
+			return 'remove_this_line'
+	except:
+		pass
+	
+	return kodi_setting
 
 
 '''
@@ -319,7 +456,7 @@ MASTER_SETTINGS =    {
 
 		"arm_freq": { 
 			"default"   : { 
-				"function"      : None, 
+				"function"      : arm_freq_custom_default, 
 				"value"         : 850
 				},
 			"config_get_patterns": [
@@ -329,7 +466,7 @@ MASTER_SETTINGS =    {
 				},
 
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : arm_freq_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -338,7 +475,7 @@ MASTER_SETTINGS =    {
 	
 		"sdram_freq": { 
 			"default"   : { 
-				"function"      : None, 
+				"function"      : sdram_freq_custom_default, 
 				"value"         : 400
 				},
 			"config_get_patterns": [
@@ -348,7 +485,7 @@ MASTER_SETTINGS =    {
 				},
 
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : sdram_freq_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -357,7 +494,7 @@ MASTER_SETTINGS =    {
 
 		"core_freq": { 
 			"default"   : { 
-				"function"      : None, 
+				"function"      : core_freq_custom_default, 
 				"value"         : 375
 				},
 			"config_get_patterns": [
@@ -367,7 +504,7 @@ MASTER_SETTINGS =    {
 				},
 
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : core_freq_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -385,7 +522,7 @@ MASTER_SETTINGS =    {
 				"extract"       : r"\s*initial_turbo\s*=\s*(\d+)"
 				},			
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : zero_value_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -423,7 +560,7 @@ MASTER_SETTINGS =    {
 				},	
 
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : zero_value_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -442,7 +579,7 @@ MASTER_SETTINGS =    {
 				},
 							
 				],
-			"config_set"        : generic_number_config_set,
+			"config_set"        : zero_value_config_set,
 			"config_validation" : generic_number_validation,
 			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
@@ -552,6 +689,6 @@ if __name__ == "__main__":
 	
 	new_settings = kodi_to_config(MASTER_SETTINGS, config, extracted_settings)
 
-	#print new_settings
+	print new_settings
 
 	write_config_file('C:\\temp\\results.txt', new_settings)
