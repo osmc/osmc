@@ -26,9 +26,11 @@ then
         echo "Depends: ${1}-libnfs-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "autoconf"
+	handle_dep "automake"
 	handle_dep "libtool"
 	echo "Package: ${1}-libnfs-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libnfs-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libnfs-*
+	./bootstrap
 	./configure --prefix=/usr/osmc
 	$BUILD
 	make install DESTDIR=${out}
