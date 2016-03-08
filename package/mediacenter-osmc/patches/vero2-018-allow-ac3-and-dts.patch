@@ -58,16 +58,3 @@ index 78f272b..c23cd55 100644
 +    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
    }
  #endif
- 
-@@ -1382,6 +1413,8 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
-     if (snd_card_get_name(cardNr, &cardName) == 0)
-       info.m_displayName = cardName;
- 
-+    info.m_deviceType = AE_DEVTYPE_IEC958;
-+
-     if (info.m_deviceType == AE_DEVTYPE_HDMI && info.m_displayName.size() > 5 &&
-         info.m_displayName.substr(info.m_displayName.size()-5) == " HDMI")
-     {
--- 
-2.1.0
-
