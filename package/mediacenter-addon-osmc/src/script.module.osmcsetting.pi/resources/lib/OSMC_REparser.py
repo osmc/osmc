@@ -465,6 +465,7 @@ def generic_passthrough_config_set(kodi_setting, all_settings):
 
 		return 'remove_this_line'
 
+
 def start_x_config_set(kodi_setting, all_settings):
 	''' Always return 1. This setting should be in every config.txt '''
 
@@ -709,6 +710,24 @@ def audio_config_set(kodi_setting, all_settings):
 		return 'remove_this_line'
 
 
+def hdmi_force_hotplug_config_set(kodi_setting, all_settings):
+	"""hdmi_edid_file needs hdmi_force_hotplug but hdmi_force_hotplug doesnt need hdmi_edid_file"""
+
+	if kodi_setting == 'true':
+
+		return '1'
+
+	elif all_settings.get('hdmi_edid_file', None) == 'true':
+		# if hdmi_edid_file is true in the kodi settings, then force hdmi_force_hotplug to be active in
+		# the config.txt
+
+		return '1'
+
+	else:
+
+		return 'remove_this_line'
+
+
 '''
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@ 
@@ -729,15 +748,6 @@ def generic_passthrough_kodi_set(results):
 		setting_value = None
 
 	return setting_value
-
-
-def store_hdmi_kodi_set(results):
-	''' Checks whether either hdmi_force_hotplug or hdmi_edid_file is set in the 
-		'''
-
-	if any([True for x in results if x == 'true']):
-
-		return 'true'
 
 
 '''
@@ -915,7 +925,7 @@ MASTER_SETTINGS =    {
 			"setting_stub"      : "gpu_mem_256=%s",
 		},
 
-		"store_hdmi_to_file": { 
+		"hdmi_force_hotplug": { 
 			"default"   : { 
 				"function"      : None, 
 				"value"         : "false"
@@ -925,17 +935,30 @@ MASTER_SETTINGS =    {
 				"identify"      : r"\s*hdmi_force_hotplug\s*=",
 				"extract"       : r"\s*hdmi_force_hotplug\s*=\s*(\d+)"
 				},
-		
+				],
+			"config_set"        : hdmi_force_hotplug_config_set,
+			"config_validation" : generic_bool_validation,
+			"kodi_set"          : generic_passthrough_kodi_set,
+			"already_set"       : False,
+			"setting_stub"      : "hdmi_force_hotplug=%s",
+		},
+
+		"hdmi_edid_file": { 
+			"default"   : { 
+				"function"      : None, 
+				"value"         : "false"
+				},
+			"config_get_patterns": [
 				{
 				"identify"      : r"\s*hdmi_edid_file\s*=",
 				"extract"       : r"\s*hdmi_edid_file\s*=\s*(\d+)"
 				},
 				],
-			"config_set"        : store_hdmi_to_file_config_set,
+			"config_set"        : generic_bool_config_set,
 			"config_validation" : generic_bool_validation,
-			"kodi_set"          : store_hdmi_kodi_set,
+			"kodi_set"          : generic_passthrough_kodi_set,
 			"already_set"       : False,
-			"setting_stub"      : "hdmi_force_hotplug=%s\nhdmi_edid_file=%s",
+			"setting_stub"      : "hdmi_edid_file=%s",
 		},
 
 		"hdmi_group": { 

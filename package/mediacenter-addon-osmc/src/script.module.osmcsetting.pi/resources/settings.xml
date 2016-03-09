@@ -6,8 +6,11 @@
 		<setting enable="false" label="32010" visible="eq(-1,true)"/>
 		<setting default="false" id="hdmi_ignore_edid" label="32011" type="bool"/>
 		<setting default="false" id="store_hdmi_to_file" label="32012" type="bool"/>
+		<setting default="false" id="hdmi_edid_file" label="32099" type="bool"/>
+		<setting default="false" id="hdmi_force_hotplug" label="32100" type="bool"/>
+		<!-- hdmi_edid needs force hotplug but force hotplug doesn't need hdmi_edid, hope this makes sense -->
 		<setting enable="false" label="32013" visible="eq(-1,true)"/>
-		<!-- <setting id="hdmi_edid_file" type="bool" default="false" visible='false'/><setting id="hdmi_force_hotplug" type="bool" default="false" visible='false'/>-->
+		<!-- hdmi_force_hotplug should be disabled before using a different tv or hdmi port -->
 		<setting default="false" id="hdmi_ignore_cec" label="32014" type="bool"/>
 		<setting default="0" id="config_hdmi_boost" label="32015" option="int" range="0,1,11" type="slider"/>
 		<setting type="lsep" label="32098" visible="!eq(-1,0)" />
