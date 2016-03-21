@@ -355,7 +355,7 @@ def arm_freq_config_set(kodi_setting, all_settings):
 
 	if version == 'PiB':
 
-		if int(kodi_setting) == 850: return 'remove_this_line'
+		if int(kodi_setting) == 700: return 'remove_this_line'
 
 	elif version == 'Pi2':
 
@@ -392,7 +392,7 @@ def core_freq_config_set(kodi_setting, all_settings):
 		version = "PiB"
 
 	if version == 'PiB':
-		if int(kodi_setting) == 375: return 'remove_this_line'
+		if int(kodi_setting) == 250: return 'remove_this_line'
 
 	elif version == 'Pi2':
 		if int(kodi_setting) == 450: return 'remove_this_line'
