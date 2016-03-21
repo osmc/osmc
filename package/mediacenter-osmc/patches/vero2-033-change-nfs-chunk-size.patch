@@ -1,0 +1,22 @@
+From 2cc482675ca26cee997100f3504d65bc84802302 Mon Sep 17 00:00:00 2001
+From: fritsch <peter.fruehberger@gmail.com>
+Date: Wed, 4 Feb 2015 22:32:03 +0100
+Subject: [PATCH] NFSFile: Chank ChunkSize to 1MB
+
+---
+ xbmc/filesystem/NFSFile.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/filesystem/NFSFile.h b/xbmc/filesystem/NFSFile.h
+index fc474e5..9be3493 100644
+--- a/xbmc/filesystem/NFSFile.h
++++ b/xbmc/filesystem/NFSFile.h
+@@ -147,7 +147,7 @@ namespace XFILE
+     //implement iocontrol for seek_possible for preventing the stat in File class for
+     //getting this info ...
+     virtual int IoControl(EIoControl request, void* param){ if(request == IOCTRL_SEEK_POSSIBLE) return 1;return -1;};    
+-    virtual int  GetChunkSize() {return 1;}
++    virtual int  GetChunkSize() {return 1024*1024;}
+     
+     virtual bool OpenForWrite(const CURL& url, bool bOverWrite = false);
+     virtual bool Delete(const CURL& url);
