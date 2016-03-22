@@ -1,0 +1,26 @@
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/AMLCodec.cpp
+index c4c7b1d..8ab043d 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1764,7 +1764,7 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+   // OpenDecoder call. So we need to restore it but it does not seem to stick :)
+   g_renderManager.RegisterRenderUpdateCallBack((const void*)this, RenderUpdateCallBack);
+ 
+-  if (pData)
++  if (pData && iSize)
+   {
+     am_private->am_pkt.data = pData;
+     am_private->am_pkt.data_size = iSize;
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 2e22fb7..91601e0 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -232,7 +232,7 @@ int CDVDVideoCodecAmlogic::Decode(uint8_t *pData, int iSize, double dts, double 
+ {
+   // Handle Input, add demuxer packet to input queue, we must accept it or
+   // it will be discarded as DVDPlayerVideo has no concept of "try again".
+-  if (pData)
++  if (pData && iSize)
+   {
+     if (m_bitstream)
+     {
