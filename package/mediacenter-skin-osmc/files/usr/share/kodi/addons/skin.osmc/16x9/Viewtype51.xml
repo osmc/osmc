@@ -178,7 +178,13 @@
 						<width>130</width>
 						<height>56</height>
 						<texture>$VAR[typehackflagging,flagging/video/,.png]</texture>
-						<visible>!IsEmpty(Control.GetLabel(777))</visible>
+						<visible>!IsEmpty(Control.GetLabel(777)) + !(Skin.HasSetting(StereoInfo) + ListItem.IsStereoscopic)</visible>
+					</control>
+					<control type="image">
+						<width>130</width>
+						<height>56</height>
+						<texture>flagging/video/3D.png</texture>
+						<visible>Skin.HasSetting(StereoInfo) + ListItem.IsStereoscopic</visible>
 					</control>
 					<control type="image">
 						<width>130</width>

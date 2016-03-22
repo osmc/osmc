@@ -49,6 +49,14 @@
 					<width>130</width>
 					<height>56</height>
 					<texture>$VAR[typehackflagging,flagging/video/,.png]</texture>
+					<visible>!(Skin.HasSetting(StereoInfo) + ListItem.IsStereoscopic)</visible>
+				</control>
+				<control type="image">
+					<left>270</left>
+					<width>130</width>
+					<height>56</height>
+					<texture>flagging/video/3D.png</texture>
+					<visible>Skin.HasSetting(StereoInfo) + ListItem.IsStereoscopic</visible>
 				</control>
 				<control type="image">
 					<top>61</top>
