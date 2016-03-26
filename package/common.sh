@@ -157,11 +157,12 @@ function handle_dep()
 		else
 			echo -e "Found in APT and will install"
 			# armv7 conflicts -- not caused by lib or headers, but rather, /etc/kernel-img.conf etc
-			if [ "$1" == "vero-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "vero2-userland-dev-osmc" && remove_conflicting "vero2-userland-osmc" ; fi
+			if [ "$1" == "vero-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "vero2-userland-dev-osmc" && remove_conflicting "vero2-userland-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc" ; fi
 			if [ "$1" == "vero2-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "vero-userland-dev-osmc" && remove_conflicting "vero-userland-osmc"; fi # We don't need to worry about CEC
 			if [ "$1" == "rbp-userland-dev-osmc" ]; then remove_conflicting "vero-userland-dev-osmc" && remove_conflicting "vero-userland-osmc" && remove_conflicting "vero2-userland-dev-osmc" && remove_conflicting "vero2-userland-osmc"; fi
-			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc"; fi # only rbp2 because armv7
-			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc"; fi
+			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
+			if [ "$1" == "vero2-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc"; fi
+			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
 			install_package ${1}
 			if [ $? -ne 0 ]; then exit 1; fi
 		fi
