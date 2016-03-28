@@ -87,6 +87,7 @@ function setup_busybox_links()
 		chroot ${1} ln -s /bin/busybox /bin/ping
 		chroot ${1} ln -s /bin/busybox /bin/unzip
 		chroot ${1} ln -s /bin/busybox /bin/nc
+		chroot ${1} ln -s /bin/busybox /bin/traceroute
 		chroot ${1} chmod +s /bin/busybox
 	fi
 }
