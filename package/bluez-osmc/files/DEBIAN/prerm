@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "remove" ]; then
-	systemctl disable bluez.service >/dev/null 2>&1
-	systemctl stop bluez.service >/dev/null 2>&1
+	systemctl disable bluetooth.service >/dev/null 2>&1
+	systemctl stop bluetooth.service >/dev/null 2>&1
 	exit 0
 fi
