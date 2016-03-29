@@ -17,5 +17,5 @@ if [ "$1" = "configure" ]; then
 	systemctl daemon-reload
 	systemctl enable brcm43xx.service >/dev/null 2>&1
 	if ischroot; then exit 0; fi
-	systemctl start brcm43xx.service >/dev/null 2>&1
+	touch /tmp/reboot-needed
 fi
