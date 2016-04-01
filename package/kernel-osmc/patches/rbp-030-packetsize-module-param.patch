@@ -1,0 +1,40 @@
+From 39251b16a05bb1e12df5f04b627f70e7b28f33e5 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 1 Apr 2016 17:27:21 +0100
+Subject: [PATCH] add smsc95xx packetsize module_param
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/net/usb/smsc95xx.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
+index a61bd08..5312b1e 100644
+--- a/drivers/net/usb/smsc95xx.c
++++ b/drivers/net/usb/smsc95xx.c
+@@ -83,6 +83,10 @@ static char *macaddr = ":";
+ module_param(macaddr, charp, 0);
+ MODULE_PARM_DESC(macaddr, "MAC address");
+ 
++int packetsize = 0;
++module_param(packetsize, int, 0644);
++MODULE_PARM_DESC(packetsize, "Use different single packet size");
++
+ static int __must_check __smsc95xx_read_reg(struct usbnet *dev, u32 index,
+ 					    u32 *data, int in_pm)
+ {
+@@ -1006,7 +1010,10 @@ static int smsc95xx_reset(struct usbnet *dev)
+ 
+ 	if (!turbo_mode) {
+ 		burst_cap = 0;
+-		dev->rx_urb_size = MAX_SINGLE_PACKET_SIZE;
++		if (packetsize)
++		    dev->rx_urb_size = packetsize;
++		else
++		    dev->rx_urb_size = MAX_SINGLE_PACKET_SIZE;
+ 	} else if (dev->udev->speed == USB_SPEED_HIGH) {
+ 		burst_cap = DEFAULT_HS_BURST_CAP_SIZE / HS_USB_PKT_SIZE;
+ 		dev->rx_urb_size = DEFAULT_HS_BURST_CAP_SIZE;
+-- 
+2.1.0
+
