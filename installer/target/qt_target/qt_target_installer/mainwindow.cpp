@@ -287,6 +287,9 @@ void MainWindow::setupBootLoader()
     dumpLog();
     QTimer::singleShot(0, this, SLOT(val));
     /* Reboot */
+    /* Unmount. May not alway succeed but limits chance of journal recovery */
+    utils->unmountPartition(device, MNT_BOOT);
+    utils->unmountPartition(device, MNT_ROOT);
 #ifdef FACTORYV2
         system("/bin/sync");
         ui->statusLabel->setText(tr("OSMC installed successfully"));
