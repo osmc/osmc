@@ -32,7 +32,7 @@ then
 	install_patch "../../patches" "all"
 	./configure --prefix=/usr/osmc --enable-threadsafe --disable-readline
 	export CXXFLAGS+="-DSQLITE_ENABLE_COLUMN_METADATA=1"
-	export CFLAGS+="-DSQLITE_TEMP_STORE=3 -DSQLITE_DEFAULT_MMAP_SIZE=0x10000000"
+	export CFLAGS+="-DSQLITE_TEMP_STORE=3 -DSQLITE_DEFAULT_MMAP_SIZE=0x10000000 -DHAVE_USLEEP=1"
 	export TCLLIBDIR="/dev/null"
 	$BUILD
 	make install DESTDIR=${out}
