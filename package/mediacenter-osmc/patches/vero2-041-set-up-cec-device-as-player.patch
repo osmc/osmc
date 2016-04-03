@@ -1,0 +1,49 @@
+From 2e9e12067d92888016640883c64ab06b1292ffba Mon Sep 17 00:00:00 2001
+From: Gerald Dachs <gda@dachsweb.de>
+Date: Sat, 2 Apr 2016 11:54:01 +0200
+Subject: [PATCH] device type for cec is now Player instead of Recorder. This
+ way it is matching with the announcement of u-boot.
+
+---
+ .../patches/kodi/0200-use-cec-device-type-player.patch       | 12 ++++++++++++
+ .../patches/kodi/0200-use-cec-device-type-player.patch       | 12 ++++++++++++
+ 2 files changed, 24 insertions(+)
+ create mode 100644 projects/WeTek_Core/patches/kodi/0200-use-cec-device-type-player.patch
+ create mode 100644 projects/WeTek_Play/patches/kodi/0200-use-cec-device-type-player.patch
+
+diff --git a/projects/WeTek_Core/patches/kodi/0200-use-cec-device-type-player.patch b/projects/WeTek_Core/patches/kodi/0200-use-cec-device-type-player.patch
+new file mode 100644
+index 0000000..5e7c919
+--- /dev/null
++++ b/projects/WeTek_Core/patches/kodi/0200-use-cec-device-type-player.patch
+@@ -0,0 +1,12 @@
++diff -Nur a/system/peripherals.xml b/system/peripherals.xml
++--- a/system/peripherals.xml	2016-03-21 16:42:19.000000000 +0100
+++++ b/system/peripherals.xml	2016-04-01 22:57:26.253146302 +0200
++@@ -28,7 +28,7 @@
++ 
++     <setting key="tv_vendor" type="int" value="0" configurable="0" />
++     <setting key="device_name" type="string" value="Kodi" configurable="0" />
++-    <setting key="device_type" type="int" value="1" configurable="0" />
+++    <setting key="device_type" type="int" value="4" configurable="0" />
++     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
++     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
++     <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
+diff --git a/projects/WeTek_Play/patches/kodi/0200-use-cec-device-type-player.patch b/projects/WeTek_Play/patches/kodi/0200-use-cec-device-type-player.patch
+new file mode 100644
+index 0000000..5e7c919
+--- /dev/null
++++ b/projects/WeTek_Play/patches/kodi/0200-use-cec-device-type-player.patch
+@@ -0,0 +1,12 @@
++diff -Nur a/system/peripherals.xml b/system/peripherals.xml
++--- a/system/peripherals.xml	2016-03-21 16:42:19.000000000 +0100
+++++ b/system/peripherals.xml	2016-04-01 22:57:26.253146302 +0200
++@@ -28,7 +28,7 @@
++ 
++     <setting key="tv_vendor" type="int" value="0" configurable="0" />
++     <setting key="device_name" type="string" value="Kodi" configurable="0" />
++-    <setting key="device_type" type="int" value="1" configurable="0" />
+++    <setting key="device_type" type="int" value="4" configurable="0" />
++     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
++     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
++     <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
