@@ -705,7 +705,9 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			kb.doModal()
 			if kb.isConfirmed():
 				self.email = kb.getText()
-				requests.post('https://osmc.tv/wp-content/plugins/newsletter/do/subscribe.php', data={'ne': self.email})	
+				requests.post('https://osmc.tv/osmc/api/newsletter/?p=subscribe&id=1', 
+								data={'email': self.email, 'subscribe': 'subscribe'}
+							)
 
 
 	def get_selected_country(self, controlID):
