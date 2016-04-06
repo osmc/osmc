@@ -41,7 +41,7 @@ fetch_filesystem "--no-check-gpg --arch=${ARCH} --foreign --variant=minbase ${RL
 verify_action
 
 # Configure filesystem (2nd stage)
-emulate_arm "${DIR}"
+emulate_arm "${DIR}" "32"
 
 configure_filesystem "${DIR}"
 verify_action
@@ -95,7 +95,7 @@ verify_action
 
 # Remove QEMU binary
 chroot ${DIR} umount /proc
-remove_emulate_arm "${DIR}"
+remove_emulate_arm "${DIR}" "32"
 
 # We do this after ARM user emulation removal, because QEMU gets broken by this
 echo -e "       * Configuring optimised string.h operations"

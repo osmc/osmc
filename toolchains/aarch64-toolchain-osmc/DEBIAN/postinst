@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+	ARM_BINARY="/usr/bin/qemu-aarch64-static"
+	if [ -f "$ARM_BINARY" ]; then echo -e "Copying QEMU binary" && cp -f "$ARM_BINARY" /opt/osmc-tc/aarch64-toolchain-osmc/usr/bin; fi
+fi

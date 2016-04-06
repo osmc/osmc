@@ -40,13 +40,21 @@ function add_apt_key()
 function emulate_arm()
 {
 	echo Copying ARM QEMU binary
-	cp /usr/bin/qemu-arm-static ${1}/usr/bin/qemu-arm-static
+	if [ "$2" == "32" ]; then ARM_EMULATOR="qemu-arm-static"; fi
+	if [ "$2" == "64" ]; then ARM_EMULATOR="qemu-aarch64-static"; fi
+	# Default to 32-bit
+	if [ -z "$2" ]; then ARM_EMULATOR="qemu-arm-static"; fi
+	cp /usr/bin/${ARM_EMULATOR} ${1}/usr/bin/${ARM_EMULATOR}
 }
 
 function remove_emulate_arm()
 {
 	echo Removing ARM QEMU binary
-	rm ${1}/usr/bin/qemu-arm-static
+        if [ "$2" == "32" ]; then ARM_EMULATOR="qemu-arm-static"; fi
+        if [ "$2" == "64" ]; then ARM_EMULATOR="qemu-aarch64-static"; fi
+        # Default to 32-bit
+        if [ -z "$2" ]; then ARM_EMULATOR="qemu-arm-static"; fi
+	rm ${1}/usr/bin/${ARM_EMULATOR}
 }
 
 function update_sources()
