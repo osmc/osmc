@@ -33,12 +33,14 @@ then
 	pushd src/libdvdnav-*
 	export CFLAGS="-D_XBMC $CFLAGS"
 	autoreconf -i
-	./configure --prefix=/usr/osmc --disable-shared --enable-static --with-pic
+	./configure --prefix=/usr/osmc
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	strip_files "${out}"
 	popd
+	mkdir -p ${out}/usr/lib/kodi/system/players/VideoPlayer/
+	ln -s /usr/osmc/lib/libdvdnav.so ${out}/usr/lib/kodi/system/players/VideoPlayer/libdvdnav-arm.so
 	mkdir -p files-dev/usr/osmc
 	mv files/usr/osmc/include  files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
