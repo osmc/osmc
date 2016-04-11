@@ -31,7 +31,7 @@ then
 	echo "Package: ${1}-libdvdcss-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libdvdcss-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libdvdcss-*
 	autoreconf -i
-	./configure --prefix=/usr/osmc --disable-shared --enable-static --with-pic
+	./configure --prefix=/usr/osmc
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
