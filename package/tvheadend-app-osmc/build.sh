@@ -23,6 +23,7 @@ then
 	handle_dep "libcurl3"
 	handle_dep "libcurl4-gnutls-dev"
 	handle_dep "git" # for dvbscan info?
+	handle_dep "ca-certificates"
 	handle_dep "zlib1g-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "libavcodec-dev"
