@@ -30,7 +30,7 @@ then
 	handle_dep "libtool"
 	echo "Package: ${1}-libsmbclient-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libsmbclient-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/samba-*/source3/
-	#export CFLAGS+="-ffreestanding -P"
+	install_patch "../../../patches" "all"
 	./autogen.sh
 	./configure --prefix=/usr/osmc --without-cluster-support --disable-swat --without-ldap --without-pam \
 	--without-pam_smbpass --with-fhs --with-libtalloc=no \
@@ -38,14 +38,12 @@ then
 	--disable-avahi --disable-fam --without-libaddns --without-libnetapi \
 	--without-dnsupdate --without-libsmbsharemodes --with-libiconv
 	$BUILD libsmbclient
-	mkdir -p ${out}/usr/osmc/lib
-	mkdir -p ${out}/../files-dev/usr/osmc/include
-	cp include/libsmbclient.h ${out}/../files-dev/usr/osmc/include
-	cp bin/libsmbclient.so* ${out}/../files/usr/osmc/lib
-	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
-	strip_files "${out}"
-	popd
-	mkdir -p files-dev/usr/osmc
+	make installlibsmbclient DESTDIR=${out}
+        if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
+        strip_files "${out}"
+        popd
+        mkdir -p files-dev/usr/osmc
+        mv files/usr/osmc/include files-dev/usr/osmc
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg_build files ${1}-libsmbclient-osmc.deb

@@ -1,0 +1,26 @@
+--- a/Makefile.in	2016-04-18 04:14:42.300458351 +0100
++++ b/Makefile.in	2016-04-18 04:17:00.338375674 +0100
+@@ -2588,6 +2588,7 @@
+ LIBSMBCLIENT=@LIBSMBCLIENT_STATIC@ @LIBSMBCLIENT_SHARED@
+ LIBSMBCLIENT_SYMS=$(srcdir)/exports/libsmbclient.@SYMSEXT@
+ LIBSMBCLIENT_HEADERS=$(srcdir)/include/libsmbclient.h
++LIBSMBCLIENT_PKG_CONFIG=$(srcdir)/pkgconfig/smbclient.pc
+ 
+ $(LIBSMBCLIENT_SYMS): $(LIBSMBCLIENT_HEADERS)
+ 	@$(MKSYMS_SH) $(AWK) $@ $(LIBSMBCLIENT_HEADERS)
+@@ -2617,6 +2618,7 @@
+ 
+ installlibsmbclient:: installdirs libsmbclient
+ 	@$(SHELL) $(srcdir)/script/installdirs.sh $(INSTALLPERMS_BIN) $(DESTDIR) $(LIBDIR)
++	@$(SHELL) $(srcdir)/script/installdirs.sh $(INSTALLPERMS_DATA) $(DESTDIR) $(LIBDIR) ${prefix}/lib/pkgconfig
+ 	-$(INSTALLLIBCMD_SH) $(LIBSMBCLIENT_SHARED_TARGET_SONAME) $(DESTDIR)$(LIBDIR)
+ 	@rm -f $(DESTDIR)$(LIBDIR)/`basename $(LIBSMBCLIENT_SHARED_TARGET)`
+ 	-if test -r $(LIBSMBCLIENT_SHARED_TARGET_SONAME) ; then \
+@@ -2626,6 +2628,7 @@
+ 	-$(INSTALLLIBCMD_A) $(LIBSMBCLIENT_STATIC_TARGET) $(DESTDIR)$(LIBDIR)
+ 	@$(SHELL) $(srcdir)/script/installdirs.sh $(INSTALLPERMS_BIN) $(DESTDIR) ${prefix}/include
+ 	-$(INSTALLCMD) -m $(INSTALLPERMS_DATA) $(LIBSMBCLIENT_HEADERS) $(DESTDIR)${prefix}/include
++	-$(INSTALLCMD) -m $(INSTALLPERMS_DATA) $(LIBSMBCLIENT_PKG_CONFIG) $(DESTDIR)${prefix}/lib/pkgconfig
+ 
+ installclientlib:: installlibsmbclient
+ 
