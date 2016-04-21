@@ -1,0 +1,28 @@
+From cc75c0b5aa8d4efa5ba5ed746785a1fab57dcb03 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 21 Apr 2016 13:40:20 +0100
+Subject: [PATCH] Fix connectivity to weaker shares
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/filesystem/SMBFile.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+index 1f7af9b..4270e8c 100644
+--- a/xbmc/filesystem/SMBFile.cpp
++++ b/xbmc/filesystem/SMBFile.cpp
+@@ -121,6 +121,10 @@ void CSMB::Init()
+         fprintf(f, "\tsocket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=65536 SO_SNDBUF=65536\n");      
+         fprintf(f, "\tlock directory = %s/.smb/\n", home.c_str());
+ 
++        // post badlock fixes for legacy
++        fprintf(f, "\tclient use spnego = noclient");
++	fprintf(f, "\tntlmv2 auth = no");
++
+         // set wins server if there's one. name resolve order defaults to 'lmhosts host wins bcast'.
+         // if no WINS server has been specified the wins method will be ignored.
+         if (CSettings::GetInstance().GetString(CSettings::SETTING_SMB_WINSSERVER).length() > 0 && !StringUtils::EqualsNoCase(CSettings::GetInstance().GetString(CSettings::SETTING_SMB_WINSSERVER), "0.0.0.0") )
+-- 
+2.7.4
+
