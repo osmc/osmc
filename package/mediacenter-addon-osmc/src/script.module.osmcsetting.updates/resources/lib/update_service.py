@@ -627,6 +627,7 @@ class Main(object):
 			self.s['backup_upnpserver']       = True if 	__setting__('backup_upnpserver')		== 'true' else False
 			self.s['backup_peripheral_data']  = True if 	__setting__('backup_peripheral_data')	== 'true' else False
 			self.s['backup_guisettings']      = True if 	__setting__('backup_guisettings')		== 'true' else False
+			self.s['backup_fstab']     		  = True if 	__setting__('backup_fstab')				== 'true' else False
 			self.s['backup_advancedsettings'] = True if 	__setting__('backup_advancedsettings')	== 'true' else False
 
 
@@ -682,6 +683,7 @@ class Main(object):
 			tmp_s['backup_upnpserver']       = True if 		__setting__('backup_upnpserver')		== 'true' else False
 			tmp_s['backup_peripheral_data']  = True if 		__setting__('backup_peripheral_data')	== 'true' else False
 			tmp_s['backup_guisettings']      = True if 		__setting__('backup_guisettings')		== 'true' else False
+			tmp_s['backup_fstab']      		 = True if 		__setting__('backup_fstab')				== 'true' else False
 			tmp_s['backup_advancedsettings'] = True if 		__setting__('backup_advancedsettings')	== 'true' else False			
 
 		# flags to determine whether the update scheduler needs to be reconstructed or icon repositioned

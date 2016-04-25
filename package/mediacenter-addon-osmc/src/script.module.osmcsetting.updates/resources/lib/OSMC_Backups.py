@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import subprocess
 import tarfile
 import tempfile
 import traceback
@@ -42,6 +43,7 @@ LOCATIONS = {
 			'backup_upnpserver'			:	'{kodi_folder}userdata/upnpserver.xml',
 			'backup_peripheral_data'	:	'{kodi_folder}userdata/peripheral_data.xml',
 			'backup_guisettings'		:	'{kodi_folder}userdata/guisettings.xml',
+			'backup_fstab'				:	'{kodi_folder}userdata/fstab',
 			'backup_advancedsettings'	:	'{kodi_folder}userdata/advancedsettings.xml',
 
 			}
@@ -57,8 +59,9 @@ LABELS = 	{
 			'{kodi_folder}/userdata/Thumbnails'				: 'Directory - Thumbnails',
 			'{kodi_folder}/userdata/advancedsettings.xml'	: 'File - advancedsettings.xml',
 			'{kodi_folder}/userdata/guisettings.xml'		: 'File - guisettings.xml',
+			'{kodi_folder}/userdata/fstab'					: 'File - fstab',
 			'{kodi_folder}/userdata/sources.xml'			: 'File - sources.xml',
-			'{kodi_folder}/userdata/profiles.xml'			: 'File - File - profiles.xml',
+			'{kodi_folder}/userdata/profiles.xml'			: 'File - profiles.xml',
 			'{kodi_folder}/userdata/favourites.xml' 		: 'File - favourites.xml',
 			'{kodi_folder}/userdata/keyboard.xml'			: 'File - keyboard.xml',
 			'{kodi_folder}/userdata/remote.xml'				: 'File - remote.xml',
@@ -104,6 +107,7 @@ class osmc_backup(object):
 		self.progress = progress_function
 
 		self.restoring_guisettings = False
+		self.restoring_fstab = False
 
 		# backup candidates is a list of tuples that contain the folder/file path and the size in bytes of the entry
 		self.backup_candidates = self.create_backup_file_list() #if self.s.get('create_tarball', False) else None
@@ -299,6 +303,35 @@ class osmc_backup(object):
 		return sum(sizes)
 
 
+	def copy_fstab_to_userdata(self, location):
+		''' Copy /etc/fstab to the userdata folder so that it can be backed up. '''
+
+		try:
+			xbmcvfs.delete(location)
+		except:
+			log('Failed to delete temporary fstab')
+
+		success = xbmcvfs.copy('/etc/fstab', location)
+
+		if success:
+			log('fstab file successfully copied to userdata')
+
+		else:
+			log('Failed to copy fstab file to userdata.')
+			raise
+
+
+	def copy_fstab_to_etc(self, location):
+		''' Copy /etc/fstab to the userdata folder so that it can be backed up. '''
+
+		try:
+			subprocess.Popen(['sudo', 'mv', location, '/etc'])
+
+		except:
+			log('Failed to copy fstab file to /etc.')
+			raise			
+
+
 	def create_tarball(self):
 
 		''' takes the file list and creates a tarball in the backup location '''
@@ -352,6 +385,13 @@ class osmc_backup(object):
 			tar = tarfile.open(fileobj=f, mode="w:gz")
 
 			for name, size in self.backup_candidates:
+
+				# if the user wants to backup the fstab file, then copy it to userdata
+				if name.endswith('fstab'):
+					try:
+						self.copy_fstab_to_userdata(name)
+					except:
+						continue
 
 				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
 
@@ -602,6 +642,9 @@ class osmc_backup(object):
 					if any( [True for x in restore_items if x.name.endswith('userdata/guisettings.xml') ] ):
 						self.restoring_guisettings = True
 
+					if any( [True for x in restore_items if x.name.endswith('userdata/fstab') ] ):
+						self.restoring_fstab = True
+
 
 				elif overwrite == 1:
 					# select new folder
@@ -632,6 +675,14 @@ class osmc_backup(object):
 								t.extract(member, '/tmp/')
 
 								os.rename('/tmp/guisettings.xml', '/tmp/guisettings.restore')
+
+							elif member.name.endswith('userdata/fstab') and self.restoring_fstab:
+
+								member.name = os.path.basename(member.name)
+
+								t.extract(member, '/tmp/')
+
+								self.copy_fstab_to_etc('/tmp/fstab')
 
 							else:
 
