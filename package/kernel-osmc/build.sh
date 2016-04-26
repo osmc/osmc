@@ -133,15 +133,15 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
-		overlays=( "hifiberry-dac-overlay" "hifiberry-dacplus-overlay" "hifiberry-digi-overlay" "hifiberry-amp-overlay" "iqaudio-dac-overlay" "iqaudio-dacplus-overlay" "rpi-dac-overlay" "lirc-rpi-overlay" "w1-gpio-overlay" "w1-gpio-pullup-overlay" "hy28a-overlay" "hy28b-overlay" "piscreen-overlay" "piscreen2r-overlay" "rpi-display-overlay" "sdhost-overlay" "mmc-overlay" "rpi-proto-overlay" "i2c-rtc-overlay" "i2s-mmap-overlay" "pps-gpio-overlay" "uart1-overlay" "rpi-ft5406-overlay" "rpi-sense-overlay" "rpi-backlight-overlay" "pi3-disable-bt" "pi3-miniuart-bt" )
 		pushd arch/arm/boot/dts/overlays
-		for dtb in ${overlays[@]}
+		for dtb in *.dts
 		do
 			echo Building DT overlay $dtb
-			$DTC -@ -I dts -O dtb -o $dtb.dtb $dtb.dts
+			$DTC -@ -I dts -O dtb -o $dtb.db $dtb.dts
 		done
 		popd
 		mv arch/arm/boot/dts/overlays/*-overlay.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
+		mv arch/arm/boot/dts/overlays/README ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
 	fi
 	if [ "$1" == "vero" ]
 	then
