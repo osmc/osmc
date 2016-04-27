@@ -1,22 +1,22 @@
-From eb998bc7ee470fb23e605001aec0469c36d78091 Mon Sep 17 00:00:00 2001
+From bb0a748b286ade05d9f6297574256af4f857a951 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezbgit config --global user.email>
 Date: Sat, 13 Feb 2016 12:59:58 +0000
-Subject: [PATCH 1/3] [BTPlayer] initail commit
+Subject: [PATCH 1/3] [BTPlayer] Initail Commit
 
 ---
  Makefile.in                                        |     1 +
  configure.ac                                       |     1 +
  project/VS2010Express/XBMC.vcxproj                 |  5988 ++++-----
  project/VS2010Express/XBMC.vcxproj.filters         | 12711 ++++++++++---------
- xbmc/cores/btplayer/BTPlayer.cpp                   |   296 +
- xbmc/cores/btplayer/BTPlayer.h                     |   128 +
+ xbmc/cores/btplayer/BTPlayer.cpp                   |   300 +
+ xbmc/cores/btplayer/BTPlayer.h                     |   129 +
  xbmc/cores/btplayer/Makefile.in                    |     9 +
  xbmc/cores/playercorefactory/PlayerCoreConfig.h    |     2 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.cpp |     6 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.h   |     1 +
  xbmc/linux/DBusUtil.cpp                            |   108 +-
  xbmc/linux/DBusUtil.h                              |     8 +-
- 12 files changed, 9871 insertions(+), 9388 deletions(-)
+ 12 files changed, 9876 insertions(+), 9388 deletions(-)
  create mode 100644 xbmc/cores/btplayer/BTPlayer.cpp
  create mode 100644 xbmc/cores/btplayer/BTPlayer.h
  create mode 100644 xbmc/cores/btplayer/Makefile.in
@@ -18758,10 +18758,10 @@ index eaecbbf..816376c 100644
 \ No newline at end of file
 diff --git a/xbmc/cores/btplayer/BTPlayer.cpp b/xbmc/cores/btplayer/BTPlayer.cpp
 new file mode 100644
-index 0000000..871b345
+index 0000000..b2f033a
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.cpp
-@@ -0,0 +1,296 @@
+@@ -0,0 +1,300 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -18846,14 +18846,13 @@ index 0000000..871b345
 +    dbus_connection_set_exit_on_disconnect(m_connection, false);
 +    if (dbus_error_is_set(&dbus_error))
 +    {
-+      CLog::Log(LOGERROR, "Bluetooth: Failed to attach to signal %s", dbus_error.message);
++      CLog::Log(LOGERROR, "Bluetooth: Failed to get system bus %s", dbus_error.message);
 +      dbus_connection_close(m_connection);
 +      dbus_connection_unref(m_connection);
 +      m_connection = NULL;
 +    }
 +  }
 +  dbus_error_free (&dbus_error);
-+  updateA2DPInfo();
 +#endif
 +}
 +
@@ -18875,7 +18874,8 @@ index 0000000..871b345
 +{
 +  StopThread();
 +  m_isPaused = false;
-+
++  CLog::Log (LOGINFO, "MAC Address %s", file.GetPath().c_str());
++  m_dbus_path = file.GetPath();
 +  CSharedLock lock(m_streamsLock);
 +  /* Suspend AE temporarily so exclusive or hog-mode sinks */
 +  /* don't block external player's access to audio device  */
@@ -18913,6 +18913,7 @@ index 0000000..871b345
 +{
 +  CLog::Log(LOGDEBUG, "BTPlayer::CloseFile");
 +  m_bStop = true;
++  m_dbus_path.clear();
 +  StopThread(true);
 +  CSharedLock lock(m_streamsLock);
 +  while (m_jobCounter > 0)
@@ -18925,16 +18926,16 @@ index 0000000..871b345
 +  if (!CAEFactory::Resume ())
 +  {
 +    CLog::Log (LOGFATAL, "%s: Failed to restart AudioEngine", __FUNCTION__);
-+  }	
++  }
 +  return true;
 +}
 +
 +#ifdef HAS_DBUS
-+void BTPlayer::updateA2DPInfo()
++void BTPlayer::updateA2DPInfo(std::string& destination_path)
 +{
 +  // get details from bluez
 +    CVariant properties = CDBusUtil::GetAll("org.bluez",
-+                                            "/org/bluez/hci0/dev_88_C9_D0_23_01_39/player0",
++                                            destination_path.c_str(),
 +                                            "org.freedesktop.DBus.Properties",
 +                                            "GetAll",
 +                                            "org.bluez.MediaPlayer1");
@@ -18965,7 +18966,10 @@ index 0000000..871b345
 +  while (m_isPlaying && !m_bStop)
 +  {
 +#ifdef HAS_DBUS
-+  updateA2DPInfo();
++  if (!m_dbus_path.empty()) {
++      updateA2DPInfo(m_dbus_path);
++  }
++  Sleep(500);
 +#endif
 +  }
 +  m_callback.OnPlayBackStopped ();
@@ -19060,10 +19064,10 @@ index 0000000..871b345
 +}
 diff --git a/xbmc/cores/btplayer/BTPlayer.h b/xbmc/cores/btplayer/BTPlayer.h
 new file mode 100644
-index 0000000..b346ecfc
+index 0000000..6458d81
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.h
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,129 @@
 +#pragma once
 +
 +/*
@@ -19145,7 +19149,7 @@ index 0000000..b346ecfc
 +
 +  virtual void OnJobComplete(unsigned int jobID, bool success, CJob *job);
 +#ifdef HAS_DBUS
-+  virtual void updateA2DPInfo();
++  virtual void updateA2DPInfo(std::string& macAddress);
 +#endif
 +
 +    struct
@@ -19189,6 +19193,7 @@ index 0000000..b346ecfc
 +    int64_t                   GetTimeInternal();
 +#ifdef HAS_DBUS
 +   DBusConnection             *m_connection;
++    std::string               m_dbus_path;
 +#endif
 +};
 +
@@ -19443,5 +19448,5 @@ index a683d70..1191126 100644
  };
  #endif
 -- 
-2.5.0
+2.1.4
 

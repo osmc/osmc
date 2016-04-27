@@ -1,15 +1,16 @@
-From f069366a0b70f2149ff20ed2978d694eb23360e8 Mon Sep 17 00:00:00 2001
+From e659f55a21f3ecd688dab5447575b45db9452d1c Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezbgit config --global user.email>
 Date: Sat, 13 Feb 2016 17:13:04 +0000
-Subject: [PATCH 2/3] [BTPlayer] allow control of BTPlayer from python
+Subject: [PATCH 2/3] [BTPlayer] Allow control of BTPlayer from the Kodi Python
+ module
 
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp | 67 ++++++++++++++++++++++++++++++++++-
- xbmc/interfaces/legacy/ModuleXbmc.h   | 20 ++++++++++-
- 2 files changed, 85 insertions(+), 2 deletions(-)
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 23 +++++++++++-
+ 2 files changed, 88 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 7bf9093..dbf2a93 100644
+index 7bf9093..87c1ea8 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -56,6 +56,9 @@
@@ -52,12 +53,12 @@ index 7bf9093..dbf2a93 100644
 +            return btPlayerId;
 +        }
 +
-+        void startBTPlayer()
++        void startBTPlayer(const char* dbus_path)
 +        {
 +            XBMC_TRACE
 +            CFileItemList list;
 +            CFileItemPtr item;
-+            item.reset(new CFileItem("", false));
++            item.reset(new CFileItem(dbus_path, false));
 +            list.Add(item);
 +
 +            PLAYERCOREID btPlayerId = findBTPlayer();
@@ -92,10 +93,10 @@ index 7bf9093..dbf2a93 100644
    }
 -}
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 09169dd..0900802 100644
+index 09169dd..1753a8b 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -418,7 +418,25 @@ namespace XBMCAddon
+@@ -418,7 +418,28 @@ namespace XBMCAddon
      */
      String convertLanguage(const char* language, int format); 
  
@@ -103,9 +104,12 @@ index 09169dd..0900802 100644
 +    /**
 +     * startBTPlayer()
 +     *
++     * dbus_path the DBUS path to the Player object to mintor for A2DP track information
 +     *
++     * example:
++     *  - xbmc.startBTPlayer("/org/bluez/hci0/dev_FXX_XX_XX_XX_XX_XX_XX/player0")
 +     */
-+	 void startBTPlayer();
++	 void startBTPlayer(const char* dbus_path);
 +
 +    /**
 +    * stopBTPlayer() -- Stops BTPlayer
@@ -123,5 +127,5 @@ index 09169dd..0900802 100644
      SWIG_CONSTANT_FROM_GETTER(int,SERVER_UPNPSERVER);
      SWIG_CONSTANT_FROM_GETTER(int,SERVER_UPNPRENDERER);
 -- 
-2.5.0
+2.1.4
 
