@@ -45,7 +45,7 @@ def log(txt):
     message = '%s: %s' % (__addonname__, str(txt).encode('ascii', 'ignore'))
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
-class A2DPInfo(threading.Thread):
+class BTPlayer(threading.Thread):
     bus = None
     mainloop = None
     device = None
@@ -55,12 +55,10 @@ class A2DPInfo(threading.Thread):
     connected = None
     state = None
     status = None
-    # hack to hide the fact we always get false 'playing' events
-    receivedPosition = None
 
     def __init__(self):
         """Specify a signal handler, and find any connected media players"""
-        super(A2DPInfo, self).__init__()
+        super(BTPlayer, self).__init__()
         self.bus = dbus.SystemBus()
         self.bus.add_signal_receiver(self.playerHandler,
                 bus_name="org.bluez",
@@ -125,6 +123,12 @@ class A2DPInfo(threading.Thread):
     def playerHandler(self, interface, changed, invalidated, path):
         """Handle relevant property change signals"""
         iface = interface[interface.rfind(".") + 1:]
+        player_path = path.replace("/fd0", "/player0")
+        if __addon__.getSetting("debug") == "true":
+            log("Changed : " + str(changed))
+            log("Interface : " + str(interface))
+            log("Path : " + str(path))
+            log("Player Path : " + str(player_path))
         if iface == "Device1":
             if "Connected" in changed:
                 self.connected = changed["Connected"]
@@ -133,29 +137,18 @@ class A2DPInfo(threading.Thread):
                 self.connected = changed["Connected"]
                 if changed["Connected"]:
                     self.findPlayer()
-        elif iface == "MediaPlayer1":
-            if "Status" in changed:
-                if not changed["Status"] == self.status:
-                    self.status = changed["Status"]
-                    if self.status in ["stopped"]:
+        elif iface == "MediaTransport1":
+            if "State" in changed:
+                if not changed["State"] == self.state:
+                    if changed["State"] == "active":
+                        self.state = changed["State"]
+                        xbmc.startBTPlayer(player_path);
+                    else:
+                        self.state = changed["State"]
                         xbmc.stopBTPlayer()
-                        # hack to hide the fact we always get false 'playing' events
-                        self.receivedPosition = None
-
-            if "Track" in changed:
-                self.startBTPlayer()
-
-            # hack to hide the fact we always get false 'playing' events
-            if "Position" in changed and not self.status == 'paused':
-                newPosition = changed["Position"]
-                if self.receivedPosition:
-                    if not self.receivedPosition == newPosition:
-                        self.startBTPlayer()
-                else:
-                     self.receivedPosition = newPosition;
-
+                        
     def isPlaying(self):
-        return self.status == "playing"
+        return self.state == "active"
 
     def next(self):
         self.player.Next(dbus_interface=PLAYER_IFACE)
@@ -181,60 +174,61 @@ class A2DPInfo(threading.Thread):
         self.control.VolumeDown(dbus_interface=CONTROL_IFACE)
         self.transport.VolumeDown(dbus_interface=TRANSPORT_IFACE)
 
-    def startBTPlayer(self):
+    def startBTPlayer(self, macAddress):
         if "playing" in self.status:
             if xbmc.isBTPlayerActive() == 0:
                 log("Start BTPlayer")
-                xbmc.startBTPlayer()
+                xbmc.startBTPlayer(macAddress)
 
 class BTPlayerMonitor(xbmc.Player):
-    a2dpInfo = None
+    btPlayer = None
 
     def __init__( self, *args, **kwargs ):
         log("BTPlayerMonitor Started")
 
-    def setA2DPInfo(self, a2dpInfo):
-        self.a2dpInfo = a2dpInfo
+    def setBtPlayer(self, btPlayer):
+        self.btPlayer = btPlayer
         
     def onPlayBackStopped(self):
-        if self.a2dpInfo.isPlaying():
-            self.a2dpInfo.stop()
+        if self.btPlayer.isPlaying():
+            self.btPlayer.stop()
             
     def onPlayBackPaused(self):
-        if self.a2dpInfo.isPlaying():
-            self.a2dpInfo.pause()
+        if self.btPlayer.isPlaying():
+            self.btPlayer.pause()
 
     def onPlayBackResumed(self):
         if xbmc.isBTPlayerActive():
-            self.a2dpInfo.play()
+            self.btPlayer.play()
     
     def onNextItem(self):
-        if self.a2dpInfo.isPlaying():
-            self.a2dpInfo.next()
+        if self.btPlayer.isPlaying():
+            self.btPlayer.next()
 
     def onPrevItem(self):
-        if (self.a2dpInfo.isPlaying()):
-            self.a2dpInfo.previous()
+        if (self.btPlayer.isPlaying()):
+            self.btPlayer.previous()
 
 if __name__ == "__main__":
-    log("A2DP Info Starting")
-    try:
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        a2dpInfo = A2DPInfo()
-        a2dpInfo.start()
-        btPlayerMonitor = BTPlayerMonitor()
-        btPlayerMonitor.setA2DPInfo(a2dpInfo)
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested():
-            # Sleep/wait for abort for 10 seconds
-            if monitor.waitForAbort(3):
-                # Abort was requested while waiting. We should exit
-                break
+    if __addon__.getSetting("enabled"):
+        log("BTPlayer Starting")
+        try:
+            dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+            btPlayer = BTPlayer()
+            btPlayer.start()
+            btPlayerMonitor = BTPlayerMonitor()
+            btPlayerMonitor.setBtPlayer(btPlayer)
+            monitor = xbmc.Monitor()
+            while not monitor.abortRequested():
+                # Sleep/wait for abort for 10 seconds
+                if monitor.waitForAbort(3):
+                    # Abort was requested while waiting. We should exit
+                    break
                 
-    except Exception as e:
-        print(e)
-    finally:
-        a2dpInfo.end()
+        except Exception as e:
+            print(e)
+        finally:
+            btPlayer.end()
 
-    log("A2DP Info ended")
+        log("BTPlayer ended")
                             
