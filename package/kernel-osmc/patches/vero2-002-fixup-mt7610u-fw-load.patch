@@ -1,0 +1,15 @@
+diff --git a/os/linux/rt_linux.c b/os/linux/rt_linux.c
+index 0b67443..9ee0d38 100644
+--- a/drivers/net/wireless/mt7610u/os/linux/rt_linux.c
++++ b/drivers/net/wireless/mt7610u/os/linux/rt_linux.c
+@@ -1083,8 +1083,8 @@ void RtmpOSFileSeek(RTMP_OS_FD osfd, int offset)
+ int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
+ {
+ 	/* The object must have a read method */
+-	if (osfd->f_op) {
+-		return __vfs_read(osfd, pDataPtr, readLen, &osfd->f_pos);
++	if (osfd->f_op && osfd->f_op->read) {
++		return osfd->f_op->read(osfd, pDataPtr, readLen, &osfd->f_pos);
+ 	} else {
+ 		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
+ 		return -1;
