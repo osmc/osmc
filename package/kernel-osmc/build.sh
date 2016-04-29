@@ -204,6 +204,16 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		cp drivers/net/wireless/rtl8192eu/8192eu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
+		then
+                # Build MT7610U model
+                pushd drivers/net/wireless/mt7610u
+                $BUILD
+                if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
+                popd
+                mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+                cp drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+                fi
 		if [ "$1" == "atv" ]
 		then
 		# Build CrystalHD
