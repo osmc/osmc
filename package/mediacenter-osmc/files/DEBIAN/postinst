@@ -13,6 +13,10 @@ if [ "$1" = "configure" ]; then
 		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "14.2.0-14"; then
 			systemctl enable mediacenter.service >/dev/null 2>&1
 		fi
+		if [ -n "$2" ] && dpkg --compare-versions "$2" lt "16.1.0-2"; then
+                        rm -rf /home/osmc/.smb >/dev/null 2>&1 # Fix some Badlock regressions
+                fi
+
 	fi
         if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
         chown -R $OWNER /usr/share/kodi/addons/resource.language.*
