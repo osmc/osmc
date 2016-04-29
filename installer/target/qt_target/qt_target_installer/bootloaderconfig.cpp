@@ -56,6 +56,7 @@ void BootloaderConfig::copyBootFiles()
             QString ddCmd = "dd if=" + kernelName + " of=/dev/boot bs=1M conv=fsync";
             system(ddCmd.toLocal8Bit().data());
         }
+        system("dd if=/mnt/root/boot/splash of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
     }
 }
 
