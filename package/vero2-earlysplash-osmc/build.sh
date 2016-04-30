@@ -44,5 +44,5 @@ do
     pull_bin "https://raw.githubusercontent.com/raspberrypi/firmware/${REV}/boot/${file}" "${BOOT}/${file}"
 done
 
-dpkg_build files/ rbp-bootloader-osmc.deb
+dpkg_build files/ vero2-earlysplash-osmc.deb
 
