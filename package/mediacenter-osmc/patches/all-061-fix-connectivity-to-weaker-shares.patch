@@ -17,8 +17,8 @@ index 1f7af9b..4270e8c 100644
          fprintf(f, "\tlock directory = %s/.smb/\n", home.c_str());
  
 +        // post badlock fixes for legacy
-+        fprintf(f, "\tclient use spnego = noclient\n");
-+	fprintf(f, "\tntlmv2 auth = no\n");
++        fprintf(f, "\tclient use spnego = no\n");
++	fprintf(f, "\tclient ntlmv2 auth = no\n");
 +
          // set wins server if there's one. name resolve order defaults to 'lmhosts host wins bcast'.
          // if no WINS server has been specified the wins method will be ignored.
