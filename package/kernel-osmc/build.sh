@@ -76,16 +76,8 @@ then
 	fi
 	install_patch "../../patches" "${1}"
 	# Set up DTC
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
-	then
-		pushd dtc-overlays
-		$BUILD
-		popd
-		DTC=$(pwd)"/dtc-overlays/dtc"
-	else
-		$BUILD scripts
-		DTC=$(pwd)"/scripts/dtc/dtc"
-	fi
+	$BUILD scripts
+	DTC=$(pwd)"/scripts/dtc/dtc"
 	# Conver DTD to DTB
 	if [ "$1" == "vero2" ]
 	then
