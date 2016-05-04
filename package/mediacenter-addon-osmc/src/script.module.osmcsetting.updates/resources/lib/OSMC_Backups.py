@@ -435,6 +435,10 @@ class osmc_backup(object):
 
 				ok = DIALOG.ok('Backup failed', 'Backup failed to copy the tar file.')
 
+				try:
+						xbmcvfs.delete(local_tarball_name)
+				except:
+						log('Cannot delete temp file at %s' % local_tarball_name)
 
 				return 'failed'
 
@@ -831,6 +835,7 @@ class osmc_backup(object):
 
 	def uniquify(self, list_with_duplicates):
 		'''Takes a list with duplicates and removes the duplicated lines, 
+		excluding blank lines or lines with only whitespace. Normally we
 		could just use list(set(list_with_duplicates)) but that screws with
 		the ordering of the list.'''
 
@@ -859,6 +864,7 @@ class osmc_backup(object):
 		''' Restores the mounts in the fstab file  '''
 
 		# run the backup file through millhams function to get a list of valid entries
+		backup_mnts = {}#milham_mod(location_of_backedup_fstab)
 		unused_mnts = backup_mnts.copy()
 		new_lines   = []
 
@@ -869,6 +875,7 @@ class osmc_backup(object):
 			for line in current_fstab.readlines():
 
 				# determine if the line contains a valid mount
+				tup = {}#milham_mod_mini(line)
 
 				# if not, or if the type of mount is no on this permitted list, then 
 				# add the line as-is to the new version, and then go to the next line
