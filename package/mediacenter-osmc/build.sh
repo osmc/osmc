@@ -249,7 +249,7 @@ then
 		--prefix=/usr \
 		--disable-vtbdecoder \
 		--enable-vaapi \
-		--disable-vdpau \ #Enable in future
+		--disable-vdpau \
 		--disable-pulse \
 		--enable-x11 \
 		--disable-openmax \
