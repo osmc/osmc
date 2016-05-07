@@ -4,12 +4,13 @@ processimage()
 {
     count1=$(find /boot/dtb-${1}/ -maxdepth 1 -type f -name 'bcm270?-rpi-*.dtb' | wc -l)
     count2=$(find /boot/dtb-${1}/overlays/ -maxdepth 1 -type f -name '*.dtbo' | wc -l)
+    count2=$((count2 + $(find /boot/dtb-${1}/overlays/ -maxdepth 1 -type f -name '*-overlay.dtb' | wc -l))) # Backward compatibility
     if [ $count1 -lt 1 -o $count2 -lt 1 ]; then
         echo "Aborting due to one or more missing device tree overlays." >&2
         exit 1
     fi
 
-    cp -f /boot/vmlinuz-$(uname -r) /boot/kernel.img
+    cp -f /boot/vmlinuz-${1} /boot/kernel.img
 
     rm -rf /boot/*.dtb /boot/overlays/
     rm -f /boot/kernel7.img
