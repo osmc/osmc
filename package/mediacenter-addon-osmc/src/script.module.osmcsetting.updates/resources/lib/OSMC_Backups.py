@@ -17,6 +17,9 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
+# FSTAB module
+from fstab_compare import fstab_compare
+
 __addonid__	= 'OSMC Backup'
 DIALOG = xbmcgui.Dialog()
 
@@ -863,57 +866,18 @@ class osmc_backup(object):
 	def restore_fstab(self, location_of_backedup_fstab):
 		''' Restores the mounts in the fstab file  '''
 
-		# run the backup file through millhams function to get a list of valid entries
-		backup_mnts = {}#milham_mod(location_of_backedup_fstab)
-		unused_mnts = backup_mnts.copy()
-		new_lines   = []
-
-		# read the current fstab file, process it line by line
-		with open('/etc/fstab', 'r') as current_fstab:
-			
-			# process each line in the current fstab files
-			for line in current_fstab.readlines():
-
-				# determine if the line contains a valid mount
-				tup = {}#milham_mod_mini(line)
-
-				# if not, or if the type of mount is no on this permitted list, then 
-				# add the line as-is to the new version, and then go to the next line
-				if not tup or tup.fs_vfstype not in ['nfs','cifs','bind']:
-					new_lines.append(line)
-					continue
-
-				# if there is a valid mount, then check that local mount point against those
-				# found in the backup file we are restoring
-				for mnt in backup_mnts:
-
-					# if the local mount point is the same, then add the existing line to the new file,
-					# put the backup mnt into new file as a comment, then remove the mnt from the
-					# list of unused backup mnts
-					if mnt.fs_file == tup.fs_file:
-						new_lines.append(line)
-						new_lines.append('#' + mnt.unparsed)
-						unused_mnts.remove(mnt)
-						break
-
-				else:   # no break
-
-					# if there is no match, then just add the line as-is to the new file
-					new_lines.append(line)
-
-			# add on all the unused mnts from the backup up file at then end
-			new_lines.extend(unused_mnts)
-
-		if new_lines:
-
-			# create the new, replacement fstab file
-			# we have to unquify the list first, as the proceedure above could result in multiple 
-			# commented out lines appearing in the restored fstab
-			# it's just easier to remove them here than avoid adding them in the first place
-			with open('/tmp/fstab', 'w') as f:
-				f.writelines(uniquify(new_lines))
-
-			# finally, copy the temp fstab over the live fstab
+		# Get the fs_files lines from the backup fstab that are not in /etc/fstab
+		fstab_diffs = fstab_compare('/etc/fstab', location_of_backedup_fstab_backup)
+		if len(fstab_diffs) > 0:
+			# TODO: Is it better to do the cp, or just build a new file?
+			# Create a temp file
+			res = subprocess.call(["cp", '/etc/fstab', '/tmp/fstab' ])
+			# Append the lines from the backup, comments in the backup will not be included
+			with open ('/tmp/fstab', 'a') as tmpfile:
+				tmpfile.write("# Restored from previous fstab\n")
+        		tmpfile.write(str(fstab_diffs))
+          		tmpfile.write("\n# End of restored entries\n")
+		  	# Restore fstab with backedup lines
 			res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
 
 

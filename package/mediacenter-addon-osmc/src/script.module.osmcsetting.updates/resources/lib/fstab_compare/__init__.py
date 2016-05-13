@@ -26,6 +26,14 @@ class fstab_compare(object):
         self.backup_lines = self.__readfstab(backup_fstab)
         self.original_fs_files = [o.fs_file for o in self.current_lines if o.fs_file is not None]
 
+    def __str__(self):
+        """ Special str that returns the formatted list of lines to be restored """
+        return "\n".join(self.unique_fs_files_formatted())
+
+    def __len__(self):
+        """ Return how many unique fs_files in the backup """
+        return len(self.unique_fs_files())
+
     def __readfstab(self, file):
         """ Internal. Used to read the fstab file into the namedtuple """
         lines = []
