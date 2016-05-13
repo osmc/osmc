@@ -1,0 +1,15 @@
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2016-05-10 16:02:24.510054677 +0000
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2016-05-10 16:04:34.476391427 +0000
+@@ -68,6 +68,12 @@
+ 
+   m_hints = hints;
+ 
++  if (hints.height < 720 && ! (hints.height == 544 || hints.height == 528))
++  {
++    CLog::Log(LOGINFO, "AML: non HD video goes to SW");
++    return false;
++  }
++
+   switch(m_hints.codec)
+   {
+     case AV_CODEC_ID_MJPEG:
