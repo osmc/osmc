@@ -684,7 +684,7 @@ class osmc_backup(object):
 								# restore temp version back to userdata
 								t.extract(member, restore_location)
 
-								fstab_loc = os.path.join(restore_location, os.path.basename(member.name))
+								fstab_loc = os.path.join(restore_location, "userdata", os.path.basename(member.name))
 
 								self.restore_fstab(fstab_loc)
 
@@ -873,8 +873,8 @@ class osmc_backup(object):
 		if len(fstab_diffs) > 0:
 			# Create a temp file with contents of the current fstab
 			try:
-				#self.copy_fstab_to_userdata('/tmp/fstab')
-				res = subprocess.call(["cp", '/etc/fstab', '/tmp/fstab' ])
+				self.copy_fstab_to_userdata('/tmp/fstab')
+				#res = subprocess.call(["cp", '/etc/fstab', '/tmp/fstab' ])
 			except:
 				log("Failed to make backup copy of /etc/fstab")
 			else:
@@ -882,13 +882,13 @@ class osmc_backup(object):
 				# TODO: Maybe preserve comments?
 				with open ('/tmp/fstab', 'a') as tmpfile:
 					tmpfile.write("# Restored from previous fstab\n")
-        			tmpfile.write(str(fstab_diffs))
-          			tmpfile.write("\n# End of restored entries\n")
+					tmpfile.write(str(fstab_diffs))
+					tmpfile.write("\n# End of restored entries\n")
 		  		# Restore fstab with backedup lines
 		  		try:
- 					res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
- 				except:
- 					log("Failed to restore updated fstab to /etc/fstab")
+		  			res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
+		  		except:
+		  			log("Failed to restore updated fstab to /etc/fstab")
 
 
 if __name__ == "__main__":
