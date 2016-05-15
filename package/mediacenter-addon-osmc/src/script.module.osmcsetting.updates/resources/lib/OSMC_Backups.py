@@ -866,14 +866,17 @@ class osmc_backup(object):
 	def restore_fstab(self, location_of_backedup_fstab):
 		''' Restores the mounts in the fstab file  '''
 
+		log("Restore backedup fstab from %s" % location_of_backedup_fstab)
 		# Get the fs_files lines from the backup fstab that are not in /etc/fstab
-		fstab_diffs = fstab_compare('/etc/fstab', location_of_backedup_fstab_backup)
+		fstab_diffs = fstab_compare('/etc/fstab', location_of_backedup_fstab)
+		log("Will restore %d lines to fstab" % len(fstab_diffs))
 		if len(fstab_diffs) > 0:
 			# Create a temp file with contents of the current fstab
 			try:
-				self.copy_fstab_to_userdata('/tmp/fstab')
+				#self.copy_fstab_to_userdata('/tmp/fstab')
+				res = subprocess.call(["cp", '/etc/fstab', '/tmp/fstab' ])
 			except:
-				continue
+				log("Failed to make backup copy of /etc/fstab")
 			else:
 				# Append the lines from the backup, comments in the backup will not be included
 				# TODO: Maybe preserve comments?
@@ -882,7 +885,10 @@ class osmc_backup(object):
         			tmpfile.write(str(fstab_diffs))
           			tmpfile.write("\n# End of restored entries\n")
 		  		# Restore fstab with backedup lines
- 				res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
+		  		try:
+ 					res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
+ 				except:
+ 					log("Failed to restore updated fstab to /etc/fstab")
 
 
 if __name__ == "__main__":
