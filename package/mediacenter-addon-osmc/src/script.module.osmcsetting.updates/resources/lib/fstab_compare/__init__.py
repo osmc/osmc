@@ -20,30 +20,29 @@ fstab_line_empty = {'fs_spec': None, 'fs_file': None, 'fs_vfstype': None, 'fs_mn
 
 class fstab_compare(object):
     """ A class to make finding lines in a backedup fstab easy to find """
-    def __init__(self, current_fstab, backup_fstab):
+    def __init__(self, current_fstab, backup_fstab, constrain_fs_vfstype = None):
         """ Call with the current fstab, and the backup fstab """
         self.current_lines = self.__readfstab(current_fstab)
         self.backup_lines = self.__readfstab(backup_fstab)
         self.original_fs_files = [o.fs_file for o in self.current_lines if o.fs_file is not None]
+        self.constrain_fs_vfstype = constrain_fs_vfstype
 
     def __str__(self):
         """ Special str that returns the formatted list of lines to be restored """
         return "\n".join(self.unique_fs_files_formatted())
     
     def __len__(self):
+        """ How many lines would be restored """
         return len(self.unique_fs_files())
 
-    def __readfstab(self, file):
+    def __readfstab(self, filename):
         """ Internal. Used to read the fstab file into the namedtuple """
-        lines = []
-        with open(file) as fstab_file:
-            for line in fstab_file:
-                lines.append(self.__namedtuple(line))
+        with open(filename) as fstab_file:
+            lines = [self.__namedtuple(l) for l in fstab_file]
         return lines
 
     def __namedtuple(self, line):
         """ Internal. Convert a fstab line into a namedtuple """
-        lines = []
         line = line.rstrip() # Remove trailing newlines
         d = fstab_line_empty.copy()
         if line == '':
@@ -76,7 +75,10 @@ class fstab_compare(object):
 
     def unique_fs_files(self):
         """ Return a list of the backed up fstab namedtuples (not in current fstab) """
-        return [d for d in self.__diffs() if d.fs_file not in self.original_fs_files and d.fs_file is not None]
+        diffs = [d for d in self.__diffs() if d.fs_file not in self.original_fs_files and d.fs_file is not None]
+        if self.constrain_fs_vfstype is not None:
+            diffs = [d for d in diffs if d.fs_vfstype in self.constrain_fs_vfstype]
+        return diffs
 
     def unique_fs_files_formatted(self):
         """ Return formatted lines of the backed up fstab lines (not in current fstab) """
