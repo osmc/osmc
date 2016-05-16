@@ -864,11 +864,14 @@ class osmc_backup(object):
 
 
 	def restore_fstab(self, location_of_backedup_fstab):
-		''' Restores the mounts in the fstab file  '''
+		''' Restores the mounts in the fstab file from a backup 
+		    if the fs_file was not used in the current fstab '''
 
 		log("Restore backedup fstab from %s" % location_of_backedup_fstab)
 		# Get the fs_files lines from the backup fstab that are not in /etc/fstab
-		fstab_diffs = fstab_compare('/etc/fstab', location_of_backedup_fstab, constrain_fs_vfstype=["nfs", "cifs"])
+		# Can be called with constrain_fs_vfstype=["nfs", "cifs", "fuse.sshfs", "bind"]
+		# to limit restoration to selected fs_vfs_types
+		fstab_diffs = fstab_compare('/etc/fstab', location_of_backedup_fstab)
 		log("Will restore %d lines to fstab" % len(fstab_diffs))
 		if len(fstab_diffs) > 0:
 			# Create a temp file with contents of the current fstab
