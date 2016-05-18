@@ -7,7 +7,7 @@ Type=forking
 PIDFile=/run/tvheadend.pid
 ExecStartPre=/bin/sleep 10
 ExecStart=/usr/bin/tvheadend -f -p /run/tvheadend.pid -C -u osmc -g video
-ExecStop=/usr/bin/rm /run/tvheadend.pid
+ExecStop=/bin/rm /run/tvheadend.pid
 Restart=always
 RestartSec=5
 
