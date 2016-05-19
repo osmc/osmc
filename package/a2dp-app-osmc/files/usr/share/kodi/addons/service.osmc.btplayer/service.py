@@ -123,7 +123,7 @@ class BTPlayer(threading.Thread):
     def playerHandler(self, interface, changed, invalidated, path):
         """Handle relevant property change signals"""
         iface = interface[interface.rfind(".") + 1:]
-        player_path = path.replace("/fd0", "/player0")
+        player_path = path[:path.rfind("/") + 1 ] + "player0"
         if __addon__.getSetting("debug") == "true":
             log("Changed : " + str(changed))
             log("Interface : " + str(interface))
