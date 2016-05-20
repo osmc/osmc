@@ -1,19 +1,19 @@
-From c6e02ffe39af20d382377663575e0015d7cb4d3a Mon Sep 17 00:00:00 2001
+From 9c5ce5636047ddc1d901f2895a5fcf90bca24a99 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sun, 23 Aug 2015 15:53:43 +0100
+Date: Fri, 20 May 2016 17:18:13 +0100
 Subject: [PATCH] Add enumerated type OSMCSettingsState
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp |  1 +
+ xbmc/Application.cpp |  7 +++++++
  xbmc/Application.h   | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
+ 2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 4c8bf1d..e1f0b04 100644
+index 1b5f3b8..537977c 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -265,6 +265,7 @@ CApplication::CApplication(void)
+@@ -267,6 +267,7 @@ CApplication::CApplication(void)
    , m_progressTrackingItem(new CFileItem)
    , m_musicInfoScanner(new CMusicInfoScanner)
    , m_fallbackLanguageLoaded(false)
@@ -21,8 +21,21 @@ index 4c8bf1d..e1f0b04 100644
  {
    m_network = NULL;
    TiXmlBase::SetCondenseWhiteSpace(false);
+@@ -3081,6 +3082,12 @@ void CApplication::Stop(int exitCode)
+   Sleep(200);
+ }
+ 
++void CApplication::SetOSMCWalkthroughState(OSMCWalkthroughState state)
++{
++ m_eOSMCWalkthroughState = state;
++ CRepositoryUpdater::GetInstance().ScheduleUpdate();
++}
++
+ bool CApplication::PlayMedia(const CFileItem& item, int iPlaylist)
+ {
+   //If item is a plugin, expand out now and run ourselves again
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index cd52a73..f95add6 100644
+index 1eb379d..49ac585 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -155,6 +155,18 @@ public:
@@ -39,11 +52,11 @@ index cd52a73..f95add6 100644
 +       OSMC_WALKTHROUGH_ISDONE = 2,
 +  } OSMCWalkthroughState;
 +  OSMCWalkthroughState m_eOSMCWalkthroughState;
-+  void SetOSMCWalkthroughState(OSMCWalkthroughState state) { m_eOSMCWalkthroughState = state; }
++  void SetOSMCWalkthroughState(OSMCWalkthroughState state);
 +
    void RestartApp();
    void UnloadSkin(bool forReload = false);
    bool LoadUserWindows();
 -- 
-2.1.0
+2.7.4
 
