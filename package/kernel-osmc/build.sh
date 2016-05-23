@@ -151,6 +151,7 @@ then
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/rtl8812au/8812au.ko
 		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
@@ -161,6 +162,7 @@ then
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
@@ -171,6 +173,7 @@ then
 		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/rtl8192du/8192du.ko
 		cp drivers/net/wireless/rtl8192du/8192du.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
@@ -181,6 +184,7 @@ then
 		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/rtl8192eu/8192eu.ko
 		cp drivers/net/wireless/rtl8192eu/8192eu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
@@ -191,6 +195,7 @@ then
                 if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
                 popd
                 mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko
                 cp drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
                 fi
 		if [ "$1" == "atv" ]
@@ -201,6 +206,7 @@ then
 		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/chd/
+		strip --strip-unneeded drivers/staging/chd/crystalhd.ko
 		cp drivers/staging/chd/crystalhd.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
 		fi
 		if [ "$1" == "atv" ]
@@ -211,6 +217,7 @@ then
 		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/nv-osmc
+		strip --strip-unneeded drivers/staging/nv-osmc/nvidia.ko
 		cp drivers/staging/nv-osmc/nvidia.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
 		fi
 	# Unset architecture
