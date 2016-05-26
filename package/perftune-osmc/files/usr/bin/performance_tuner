@@ -60,22 +60,20 @@ then
 	done
 fi
 
-case $OPTION_OSMCDEV in
-	vero2)
-		sleep 30
-		fstrim -v /
-		;;
-	*)
-		if [ ! -f /safe_mode ]
-		then
-			# 30 seconds of accelerated boot. we set curgov to ondemand so the next check only doesn't flip us back if we had performance to begin with
-			sleep 30
-			echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
-			echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
-			echo 100000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
-			echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
-		else
-			echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-		fi
-		;;
-esac
+if [ "$OPTION_OSMCDEV" == "vero2" ]
+then
+     sleep 30
+     fstrim -v /
+fi
+
+if [ ! -f /safe_mode ]
+then
+	# 30 seconds of accelerated boot. we set curgov to ondemand so the next check only doesn't flip us back if we had performance to begin with
+	sleep 30
+	echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
+	echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+	echo 100000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
+	echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
+	else
+	echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+fi
