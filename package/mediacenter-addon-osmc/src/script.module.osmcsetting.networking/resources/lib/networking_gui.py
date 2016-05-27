@@ -1982,6 +1982,12 @@ class wifi_populate_bot(threading.Thread):
 
         items_to_be_removed = []
 
+        # Remember selection, so it can be re-established after site list refresh
+        prevSelectedItem        = self.WFP.getSelectedItem()
+        if prevSelectedItem is not None:
+            selectedAdapterAddress = prevSelectedItem.getProperty('AdapterAddress')
+            selectedSSID           = prevSelectedItem.getProperty('SSID')
+                                                    
         for itemIndex in range(0, self.WFP.size()):
 
             listItem               = self.WFP.getListItem(itemIndex)
@@ -2017,8 +2023,17 @@ class wifi_populate_bot(threading.Thread):
                     self.WFP.addItem(self.convert_wifi_to_listitem(info, multiAdpter))
                     connected = True if info['State'] in ('ready', 'online') else False
 
-                    if connected and ssid == self.conn_ssid:
-                        self.WFP.selectItem(self.WFP.size() - 1)
+        # Find previously selected item and reselect as above actions reset selection to first
+        if prevSelectedItem is not None:
+                    
+            for itemIndex in range(0, self.WFP.size()):
+                listItem               = self.WFP.getListItem(itemIndex)
+                listItemAdapterAddress = listItem.getProperty('AdapterAddress')
+                listItemSSID           = listItem.getProperty('SSID')
+                                                                                    
+                if listItemAdapterAddress == selectedAdapterAddress and listItemSSID == selectedSSID:
+                    self.WFP.selectItem(itemIndex)
+                    break
                         
 
     def getListItemLabel(self, wifi, multiAdapter):
