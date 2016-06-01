@@ -35,11 +35,15 @@ then
 	handle_dep "dvb-tools"
 	handle_dep "libdvbv5-0"
 	handle_dep "bzip2"
+	handle_dep "gzip"
+	handle_dep "libsystemd-daemon-dev"
+	handle_dep "liburiparser-dev"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
-	./configure --prefix=/usr
+	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-inotify --enable-zlib --enable-libav --disable-libffmpeg_static --disable-libffmpeg_static_x264 \
+		--disable-epoll --enable-uriparser --disable-tvhcsa --disable-bundle --disable-dvbcsa --disable-dvben50221 --disable-kqueue --enable-dbus_1 --disable--android --disable-tsdebug --disable-gtimer_check --enable-dvbscan
 	sed -e "s/-Werror//" -i Makefile
 	sed -e "s/0.0.0~unknown/${VERSION}~osmc/" -i support/version
 	$BUILD
