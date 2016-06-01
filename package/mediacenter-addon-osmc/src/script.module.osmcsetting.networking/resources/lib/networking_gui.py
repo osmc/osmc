@@ -1256,15 +1256,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if connected == 'False':
             if not self.conn_ssid:  # if we are not connected to a network connect
-                if self.connect_to_wifi(ssid, encrypted):
-                    if '_hidden_' not in path:
-
-                        strength = self.current_network_config['Strength']
-                        icon     = wifi_populate_bot.get_wifi_icon(encrypted, strength, True)
-
-                        item.setIconImage(icon)
-                        item.setProperty('Connected', 'True')
-
+                self.connect_to_wifi(ssid, encrypted)
             else:  # Display a toast asking the user to disconnect first
                 # 'Please disconnect from the current network before connecting'
                 message = lang(32053)
