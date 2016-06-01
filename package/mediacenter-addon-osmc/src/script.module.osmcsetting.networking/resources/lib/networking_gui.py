@@ -236,6 +236,8 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # list containing list items of all discovered bluetooth devices
         self.discovered_bluetooths = []
 
+        self.bluetooth_discovering = False;
+
         # flag to identify when a MySQL setting has been changed
         self.mysql_changed = False
 
@@ -274,6 +276,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.toggle_controls(False, [SELECTOR_WIRELESS_NETWORK])
             self.toggle_controls(False, [SELECTOR_TETHERING])
 
+        log("Checking bluetooth");
         if not osmc_bluetooth.is_bluetooth_available():
             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
 
@@ -531,11 +534,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                 self.bluetooth_population_thread.stop_thread()
             except:
                 pass
-            # also make sure we have turned discocery off
-            try:
-                osmc_bluetooth.stop_discovery()
-            except:
-                pass
+        # also make sure we have turned discocery off
+        if self.bluetooth_discovering:
+            self.bluetooth_discovering = not self.bluetooth_discovering
+            osmc_bluetooth.stop_discovery()
 
     def show_busy_dialogue(self):
 
@@ -1444,7 +1446,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         self.toggle_controls(True, BLUETOOTH_CONTROLS)
 
         discoveryRadioButton = self.getControl(BLUETOOTH_DISCOVERY)
-        discoveryRadioButton.setSelected(osmc_bluetooth.is_discovering())
+        discoveryRadioButton.setSelected(self.bluetooth_discovering)
 
         # Start Bluetooth Population Thread
         if not self.is_thread_running(BLUETOOTH_THREAD_NAME):
@@ -1475,10 +1477,10 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         elif control_id == BLUETOOTH_DISCOVERY:  # Discovery
 
             self.show_busy_dialogue()
-
-            target_state = not osmc_bluetooth.is_discovering()
             
-            if target_state: 
+            self.bluetooth_discovering = not self.bluetooth_discovering;
+
+            if self.bluetooth_discovering:
 
                 osmc_bluetooth.start_discovery()
 
@@ -1486,25 +1488,6 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
                 osmc_bluetooth.stop_discovery()
 
-            changed_state  = 1
-
-            # up to 10 second wait to allow discovery to change state
-
-            while changed_state != 0 and changed_state < 10:
-
-                if osmc_bluetooth.is_discovering() == target_state:
-
-                    changed_state = 0;
-
-                else:
-
-                    changed_state += 1
-
-                xbmc.sleep(1000)
-
-                if osmc_bluetooth.is_discovering() != target_state:
-                    log("Failed to change discovery state to " + str(wifi_state))
-                    
                 self.clear_busy_dialogue()
 
         elif control_id == 6000:  # paired devices
