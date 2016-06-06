@@ -1,137 +1,35 @@
-From 1bbea7f9a1a5caf3198cf4944e745c44daff173f Mon Sep 17 00:00:00 2001
-From: Jamie Coldhill <wrxtasy@amnet.net.au>
-Date: Sun, 15 May 2016 20:38:29 +0800
-Subject: [PATCH] YADIFx2: quality deinterlacing for problematic DVD ISO's and
- .vob's
-
----
- .../resource.language.en_gb/resources/strings.po   | 36 +++++++++++++++++++---
- system/settings/settings.xml                       | 28 +++++++++++++++++
- xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp    | 17 ++++------
- xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp | 10 ++++--
- xbmc/cores/dvdplayer/DVDPlayerVideo.cpp            | 13 ++++++--
- xbmc/settings/Settings.cpp                         |  2 ++
- xbmc/settings/Settings.h                           |  2 ++
- xbmc/settings/VideoSettings.h                      |  6 ++--
- xbmc/video/dialogs/GUIDialogVideoSettings.cpp      |  5 +--
- 9 files changed, 95 insertions(+), 24 deletions(-)
-
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index f3f939f..ff0af57 100644
+index a697a61..0cc9e09 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -6709,7 +6709,19 @@ msgctxt "#13557"
- msgid "Skip delay"
- msgstr ""
- 
--#empty strings from id 13558 to 13599
-+#. Description of setting "Videos -> Playback -> Adjust hardware acceleration (amcodec)- mpeg2" with label #39001
-+#: system/settings/settings.xml
-+msgctxt "#13558"
-+msgid "Adjustable mpeg2 software decoding for problematic files"
-+msgstr ""
-+
-+#. Description of setting "Videos -> Playback -> Adjust hardware acceleration (amcodec)- mpeg2 / Xvid" with label #39002
-+#: system/settings/settings.xml
-+msgctxt "#13559"
-+msgid "Adjustable mpeg4 / Xvid software decoding for problematic files"
-+msgstr ""
-+
-+#empty strings from id 13560 to 13599
- 
- #: system/settings/darwin.xml
- msgctxt "#13600"
-@@ -7961,7 +7973,7 @@ msgstr ""
+@@ -7961,7 +7961,7 @@ msgstr ""
  
  #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
  msgctxt "#16020"
 -msgid "Deinterlace"
-+msgid "Yadif 2x"
- msgstr ""
- 
- #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
-@@ -8030,7 +8042,7 @@ msgstr ""
- 
- #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
- msgctxt "#16036"
--msgid "Deinterlace (half)"
 +msgid "Yadif"
  msgstr ""
  
- msgctxt "#16037"
-@@ -8057,7 +8069,11 @@ msgctxt "#16041"
- msgid "On"
+ #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+@@ -8333,7 +8333,12 @@ msgctxt "#16335"
+ msgid "IMX - Fast motion (double)"
  msgstr ""
  
--#empty strings from id 16042 to 16099
+-#empty strings from id 16336 to 16399
 +#: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
 +msgctxt "#16336"
 +msgid "Software - FFmpeg"
 +msgstr ""
++
 +#empty strings from id 16337 to 16399
  
- #: xbmc/video/windows/GUIWindowVideoNav.cpp
- msgctxt "#16100"
-@@ -18125,3 +18141,15 @@ msgstr ""
- msgctxt "#38023"
- msgid "Set my rating"
- msgstr ""
-+
-+msgctxt "#39000"
-+msgid "720p and up"
-+msgstr ""
-+
-+msgctxt "#39001"
-+msgid "Accelerate MPEG2"
-+msgstr ""
-+
-+msgctxt "#39002"
-+msgid "Accelerate MPEG4"
-+msgstr ""
-diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 360a548..56779c1 100644
---- a/system/settings/settings.xml
-+++ b/system/settings/settings.xml
-@@ -835,6 +835,34 @@
-           <control type="toggle" />
-         </setting>
-       </group>
-+      <group id="4">
-+       <setting id="videoplayer.accelmpeg2" type="integer" label="39001" help="13558">
-+         <level>2</level>
-+         <default>0</default>
-+         <constraints>
-+           <options>
-+           <option label="20420">9999</option>   <!-- Never -->
-+           <option label="39000">800</option>  <!-- HD -->
-+           <option label="20422">0</option>  <!-- Always -->
-+           </options>
-+         </constraints>
-+         <control type="spinner" format="string" />
-+         <control type="edit" format="integer" />
-+       </setting>
-+       <setting id="videoplayer.accelmpeg4" type="integer" label="39002" help="13559">
-+         <level>2</level>
-+         <default>800</default>
-+         <constraints>
-+           <options>
-+           <option label="20420">9999</option>   <!-- Never -->
-+           <option label="39000">800</option>  <!-- HD -->
-+           <option label="20422">0</option>  <!-- Always -->
-+           </options>
-+         </constraints>
-+         <control type="spinner" format="string" />
-+         <control type="edit" format="integer" />
-+       </setting>
-+      </group>
-     </category>
-     <category id="myvideos" label="14081" help="36601">
-       <group id="1">
+ #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+ msgctxt "#16400"
 diff --git a/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
-index 1c4715a..4e0850a 100644
+index 1c4715a..9e11c71 100644
 --- a/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
 +++ b/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp
-@@ -3009,18 +3009,13 @@ bool CLinuxRendererGLES::Supports(EINTERLACEMETHOD method)
+@@ -3009,15 +3009,12 @@ bool CLinuxRendererGLES::Supports(EINTERLACEMETHOD method)
        return false;
    }
  
@@ -149,45 +47,23 @@ index 1c4715a..4e0850a 100644
    || method == VS_INTERLACEMETHOD_RENDER_BOB_INVERTED)
 -#endif
      return true;
--
--  return false;
- }
  
- bool CLinuxRendererGLES::Supports(ESCALINGMETHOD method)
-@@ -3074,8 +3069,8 @@ EINTERLACEMETHOD CLinuxRendererGLES::AutoInterlaceMethod()
+   return false;
+@@ -3074,11 +3071,7 @@ EINTERLACEMETHOD CLinuxRendererGLES::AutoInterlaceMethod()
    if(m_renderMethod & RENDER_IMXMAP)
      return VS_INTERLACEMETHOD_IMX_FASTMOTION;
  
 -#if !defined(TARGET_ANDROID) && (defined(__i386__) || defined(__x86_64__))
 -  return VS_INTERLACEMETHOD_DEINTERLACE_HALF;
-+#if (defined(__i386__) || defined(__x86_64__) || defined(HAS_LIBAMCODEC))
-+  return VS_INTERLACEMETHOD_YADIF;
- #else
-   return VS_INTERLACEMETHOD_RENDER_BOB;
- #endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-index 84e9ef1..b6db130 100644
---- a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-@@ -218,8 +218,14 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
-       case AV_CODEC_ID_MSMPEG4V3:
-         // Avoid h/w decoder for SD; Those files might use features
-         // not supported and can easily be soft-decoded
--        if (hint.width <= 800)
--          break;
-+       if (hint.width > CSettings::GetInstance().GetInt(CSettings::SETTING_VIDEOPLAYER_ACCELMPEG4))
-+          if ( (pCodec = OpenCodec(new CDVDVideoCodecAmlogic(), hint, options)) ) return pCodec;
-+        break;
-+      case AV_CODEC_ID_MPEG1VIDEO:
-+      case AV_CODEC_ID_MPEG2VIDEO:
-+        if (hint.width >CSettings::GetInstance().GetInt(CSettings::SETTING_VIDEOPLAYER_ACCELMPEG2))
-+          if ( (pCodec = OpenCodec(new CDVDVideoCodecAmlogic(), hint, options)) ) return pCodec;
-+        break;
-       default:
-         if ( (pCodec = OpenCodec(new CDVDVideoCodecAmlogic(), hint, options)) ) return pCodec;
-     }
+-#else
+-  return VS_INTERLACEMETHOD_RENDER_BOB;
+-#endif
++  return VS_INTERLACEMETHOD_YADIF_HALF;
+ }
+ 
+ CRenderInfo CLinuxRendererGLES::GetRenderInfo()
 diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
-index 379c541..f6ba17d 100644
+index 379c541..b4de66c 100644
 --- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
 +++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
 @@ -553,9 +553,9 @@ void CDVDPlayerVideo::Process()
@@ -202,11 +78,10 @@ index 379c541..f6ba17d 100644
            mFilters = CDVDVideoCodec::FILTER_DEINTERLACE_ANY | CDVDVideoCodec::FILTER_DEINTERLACE_HALFED;
  
          if (mDeintMode == VS_DEINTERLACEMODE_AUTO && mFilters)
-@@ -678,7 +678,14 @@ void CDVDPlayerVideo::Process()
+@@ -678,6 +678,13 @@ void CDVDPlayerVideo::Process()
                  sPostProcessType += g_advancedSettings.m_videoPPFFmpegDeint;
                  bPostProcessDeint = true;
                }
--            }
 +              else if(mInt == VS_INTERLACEMETHOD_SW_FFMPEG)
 +              {
 +                if (!sPostProcessType.empty())
@@ -214,36 +89,9 @@ index 379c541..f6ba17d 100644
 +                sPostProcessType += "ffmpegdeint";
 +                bPostProcessDeint = true;
 +              }
-+	    }
+             }
  
              if (CMediaSettings::GetInstance().GetCurrentVideoSettings().m_PostProcess)
-             {
-diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index a125e34..d079e7a 100644
---- a/xbmc/settings/Settings.cpp
-+++ b/xbmc/settings/Settings.cpp
-@@ -181,6 +181,8 @@ const std::string CSettings::SETTING_VIDEOPLAYER_USEVIDEOTOOLBOX = "videoplayer.
- const std::string CSettings::SETTING_VIDEOPLAYER_USEVDA = "videoplayer.usevda";
- const std::string CSettings::SETTING_VIDEOPLAYER_USEMMAL = "videoplayer.usemmal";
- const std::string CSettings::SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
-+const std::string CSettings::SETTING_VIDEOPLAYER_ACCELMPEG2 = "videoplayer.accelmpeg2";
-+const std::string CSettings::SETTING_VIDEOPLAYER_ACCELMPEG4 = "videoplayer.accelmpeg4";
- const std::string CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
- const std::string CSettings::SETTING_MYVIDEOS_SELECTACTION = "myvideos.selectaction";
- const std::string CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS = "myvideos.extractflags";
-diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 55e150d..a874226 100644
---- a/xbmc/settings/Settings.h
-+++ b/xbmc/settings/Settings.h
-@@ -136,6 +136,8 @@ public:
-   static const std::string SETTING_VIDEOPLAYER_USEVDA;
-   static const std::string SETTING_VIDEOPLAYER_USEMMAL;
-   static const std::string SETTING_VIDEOPLAYER_USESTAGEFRIGHT;
-+  static const std::string SETTING_VIDEOPLAYER_ACCELMPEG2;
-+  static const std::string SETTING_VIDEOPLAYER_ACCELMPEG4;
-   static const std::string SETTING_VIDEOPLAYER_LIMITGUIUPDATE;
-   static const std::string SETTING_MYVIDEOS_SELECTACTION;
-   static const std::string SETTING_MYVIDEOS_EXTRACTFLAGS;
 diff --git a/xbmc/settings/VideoSettings.h b/xbmc/settings/VideoSettings.h
 index 0305058..aa30dc6 100644
 --- a/xbmc/settings/VideoSettings.h
@@ -276,10 +124,10 @@ index 0305058..aa30dc6 100644
  };
  
 diff --git a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
-index 96c63cd..6a60919 100644
+index b248566..f50307c 100644
 --- a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
 +++ b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
-@@ -254,9 +254,10 @@ void CGUIDialogVideoSettings::InitializeSettings()
+@@ -252,9 +252,10 @@ void CGUIDialogVideoSettings::InitializeSettings()
    entries.push_back(std::make_pair(20129, VS_INTERLACEMETHOD_RENDER_WEAVE));
    entries.push_back(std::make_pair(16022, VS_INTERLACEMETHOD_RENDER_BOB_INVERTED));
    entries.push_back(std::make_pair(16021, VS_INTERLACEMETHOD_RENDER_BOB));
@@ -292,6 +140,3 @@ index 96c63cd..6a60919 100644
    entries.push_back(std::make_pair(16314, VS_INTERLACEMETHOD_INVERSE_TELECINE));
    entries.push_back(std::make_pair(16311, VS_INTERLACEMETHOD_VDPAU_TEMPORAL_SPATIAL));
    entries.push_back(std::make_pair(16310, VS_INTERLACEMETHOD_VDPAU_TEMPORAL));
--- 
-2.7.4
-
