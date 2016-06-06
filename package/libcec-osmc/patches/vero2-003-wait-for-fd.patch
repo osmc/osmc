@@ -1,0 +1,27 @@
+From 710f6475cfb08be7d023d37da599438ac1e69eef Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 6 Jun 2016 22:31:36 +0100
+Subject: [PATCH] wait for valid fd
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp b/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
+index 9ee0043..eb33173 100644
+--- a/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
+@@ -252,7 +252,8 @@ void *CAmlogicCECAdapterCommunication::Process(void)
+ 
+     if (fd == INVALID_SOCKET_VALUE)
+     {
+-      break;
++	Sleep(250);
++	continue;
+     }
+ 
+     FD_ZERO(&rfds);
+-- 
+2.7.4
+
