@@ -55,18 +55,23 @@ make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 popd
 pushd buildroot-${BUILDROOT_VERSION}/output/images
-echo -e "Downloading latest filesystem"
-date=$(date +%Y%m%d)
-count=150
-while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
-       if [ "$?" -eq 0 ]; then
-	    wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O filesystem.tar.xz
-            break
-       fi
-       date=$(date +%Y%m%d --date "yesterday $date")
-       let count=count-1
-done
-if [ ! -f filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
+if [ -f ../../../filesystem.tar.xz ]
+then
+    echo -e "Using local filesystem"
+else
+    echo -e "Downloading latest filesystem"
+    date=$(date +%Y%m%d)
+    count=150
+    while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
+           if [ "$?" -eq 0 ]; then
+	        wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O $(pwd)/../../../filesystem.tar.xz
+                break
+           fi
+           date=$(date +%Y%m%d --date "yesterday $date")
+           let count=count-1
+    done
+fi
+if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ] || [ "$1" == "vero2" ]; then size=256; fi
 date=$(date +%Y%m%d)
@@ -123,7 +128,7 @@ then
 	mv ../build/atv-bootloader-master/mach_kernel /mnt
 fi
 echo -e "Installing filesystem"
-mv filesystem.tar.xz /mnt/
+mv $(pwd)/../../../filesystem.tar.xz /mnt/
 umount /mnt
 sync
 kpartx -d OSMC_TGT_${1}_${date}.img
