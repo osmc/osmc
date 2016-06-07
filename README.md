@@ -1,18 +1,18 @@
 # Open Source Media Center
 
-OSMC (Open Source Media Center) is a free and open source social media hub that runs on a number of devices. It allows you to collate and play your existing media collection locally and over your network. You can learn more about OSMC at http://osmc.tv/about. 
+OSMC (Open Source Media Center) is a free and open source media player based on Linux. Founded in 2014, OSMC lets you play back media from your local network, attached storage and the Internet. OSMC is the leading media center in terms of feature set and community and is based on the Kodi project. You can learn more about OSMC at <a href="http://osmc.tv/about">osmc.tv/about</a>. 
 
 #### Source Code ####
 
-Source code is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone' 
+Upstream source code for OSMC is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone'. You can learn about how to set up a development environment <a href="osmc.tv/wiki/development/getting-involved-with-osmc-development/">here</a>. 
 
-#### Contributing ####
+#### Download ####
 
-OSMC is a community led project and those who wish to contribute to the codebase are more than welcome to. You can get started by forking this project. Please create a new branch (based off master) before you commit changes. You can then send a pull request for review. 
+A compiled version of OSMC can be downloaded from <a href="https://osmc.tv/download">https://osmc.tv/download</a>. 
 
-#### Development blog ####
+#### Issues ####
 
-A development blog is at http://blog.osmc.io. This blog gives insight in to what is up and coming, including challenges faced when developing OSMC.
+Before creating a new GitHub issue, please read our policy on <a href="https://osmc.tv/wiki/development/reporting-bugs/">reporting bugs</a>. This will ensure that developer time is used effectively, and your issue is dealt with promptly, whether it is indeed a bug or not. 
 
 #### License ####
 
@@ -20,4 +20,4 @@ OSMC is licensed under the GPLv2. Commits to the OSMC codebase become copyright 
 
 #### Help and support ####
 
-For help and support, please refer to our blog at http://osmc.tv. 
+For help and support, please refer to our blog at <a href="https://osmc.tv">https://osmc.tv</a>. We have a discussion forum at <a href="https://discourse.osmc.tv">https://discourse.osmc.tv</a> with a bustling community full of users eager to help each other out. 
