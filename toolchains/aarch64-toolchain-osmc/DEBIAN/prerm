@@ -3,6 +3,8 @@
 if [ "$1" = "remove" ]; then
 	umount /opt/osmc-tc/aarch64-toolchain-osmc/proc >/dev/null 2>&1
 	chroot /opt/osmc-tc/aarch64-toolchain-osmc umount /proc >/dev/null 2>&1
-	umount /opt/osmc-tc/aarch64-toolchain-osmc/mnt >/dev/null 2>&1
-	if [ -n "$(ls -A /opt/osmc-tc/aarch64-toolchain-osmc/mnt 2>/dev/null)" ]; then exit 1; fi
+        umount /opt/osmc-tc/aarch64-toolchain-osmc/root/.ccache >/dev/null 2>&1
+        if [ -n "$(ls -A /opt/osmc-tc/aarch64-toolchain-osmc/mnt 2>/dev/null)" ]; then exit 1; fi
+        if [ -n "$(ls -A /opt/osmc-tc/aarch64-toolchain-osmc/root/.ccache 2>/dev/null)" ]; then exit 1; fi
+
 fi
