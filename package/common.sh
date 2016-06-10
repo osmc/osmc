@@ -92,8 +92,7 @@ function build_in_env()
             if ((($BUILD_OPTS & $BUILD_OPTION_USE_CCACHE) == $BUILD_OPTION_USE_CCACHE))
 	    then
 		export CCACHE_DIR="/root/.ccache"
-		export CC="/usr/bin/ccache $CC"
-		export CXX="/usr/bin/ccache $CXX"
+		export PATH=/usr/lib/ccache:$PATH
 	    fi
 	    if ((($BUILD_OPTS & $BUILD_OPTION_PREFER_LIBOSMC) == $BUILD_OPTION_PREFER_LIBOSMC))
 	    then
