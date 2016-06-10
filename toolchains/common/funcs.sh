@@ -28,7 +28,7 @@ function configure_ccache()
 	chroot ${1} apt-get -y install --no-install-recommends ccache
 }
 
-CHROOT_PKGS="build-essential nano sudo"
+CHROOT_PKGS="build-essential nano sudo libeatmydata1"
 export CHROOT_PKGS
 
 export -f build_deb_package
