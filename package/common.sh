@@ -87,8 +87,6 @@ function build_in_env()
             then
                 export BUILD_FLAGS+="-fomit-frame-pointer "
             fi
-	    CC="/usr/bin/gcc"
-	    CXX="/usr/bin/g++"
             if ((($BUILD_OPTS & $BUILD_OPTION_USE_CCACHE) == $BUILD_OPTION_USE_CCACHE))
 	    then
 		export CCACHE_DIR="/root/.ccache"
