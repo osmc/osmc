@@ -26,6 +26,7 @@ function patchfs()
 function configure_ccache()
 {
 	chroot ${1} apt-get -y install --no-install-recommends ccache
+	mkdir -p /root/.ccache
 }
 
 CHROOT_PKGS="build-essential nano sudo libeatmydata1"
