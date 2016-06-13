@@ -14,7 +14,8 @@ export BUILD_OPTION_USE_NOFP=16
 export BUILD_OPTION_USE_MULTIARCH=32
 export BUILD_OPTION_USE_CCACHE=64
 export BUILD_OPTION_PREFER_LIBOSMC=128
-export BUILD_OPTION_DEFAULTS=$(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE + $BUILD_OPTION_PREFER_LIBOSMC))
+export BUILD_OPTION_FASTER_APT=256
+export BUILD_OPTION_DEFAULTS=$(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE + $BUILD_OPTION_PREFER_LIBOSMC + $BUILD_OPTION_FASTER_APT))
 
 function fix_arch_ctl()
 {
@@ -165,7 +166,12 @@ function handle_dep()
 			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
 			if [ "$1" == "vero2-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc"; fi
 			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
-			install_package ${1}
+			if ((($BUILD_OPTS & $BUILD_OPTION_FASTER_APT) == $BUILD_OPTION_FASTER_APT))
+			then
+				install_package "${1}" "1"
+			else
+				install_package ${1}
+			fi
 			if [ $? -ne 0 ]; then exit 1; fi
 		fi
 	else
