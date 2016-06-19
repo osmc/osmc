@@ -1011,21 +1011,31 @@ index bea38f5..00b5ce7 100644
 2.7.4
 
 
-From eda06373ff5f25fd4552b92d611671318084a7b5 Mon Sep 17 00:00:00 2001
+From 5c72f35e677d15576104f095c54fbcaa1a2455bc Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 18 Jun 2016 23:51:14 +0100
 Subject: [PATCH 11/11] fixup SystemInfo for 3D
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/utils/SystemInfo.cpp | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ xbmc/utils/SystemInfo.cpp | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index 39ffa78..c56e924 100644
+index 39ffa78..c5b6728 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -874,19 +874,12 @@ bool CSysInfo::HasHW3DInterlaced()
+@@ -865,28 +865,17 @@ bool CSysInfo::IsAeroDisabled()
+ 
+ bool CSysInfo::HasHW3DInterlaced()
+ {
+-#if defined(HAS_LIBAMCODEC)
+-  if (aml_hw3d_present())
+-    return true;
+-#endif
+-  return false;
++  return true;
+ }
  
  bool CSysInfo::HWSupportsStereo(const int mode)
  {
@@ -1043,7 +1053,7 @@ index 39ffa78..c56e924 100644
 -  if (aml_present())
 -    aml_set_stereo_mode(mode, view);
 -#endif
-+  return true;
++  return;
  }
  
  CSysInfo::WindowsVersion CSysInfo::m_WinVer = WindowsVersionUnknown;
