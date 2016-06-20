@@ -10,8 +10,8 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.4.13" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.4.13" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.4.13" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.4.13" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero && VERSION="4.4.0" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.101" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
@@ -242,7 +242,12 @@ then
 		dpkg_build files-headers ${1}-headers-${VERSION}-${REV}-osmc.deb
 	fi
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
-	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
+	EXTRA_DEPENDS=""
+	if [ "$1" = "rbp1" ] || [ "$1" == "rbp2" ]
+	then
+	    $EXTRA_DEPENDS=", rbp-userland-osmc (>=1.2.0-4)"
+        fi
+	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc${EXTRA_DEPENDS}" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-kernel-${VERSION}-${REV}-osmc.deb
 	build_return=$?
