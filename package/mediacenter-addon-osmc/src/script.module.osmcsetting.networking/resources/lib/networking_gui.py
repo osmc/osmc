@@ -1480,7 +1480,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
                 osmc_bluetooth.stop_discovery()
 
-                self.clear_busy_dialogue()
+            self.clear_busy_dialogue()
 
         elif control_id == 6000:  # paired devices
 
