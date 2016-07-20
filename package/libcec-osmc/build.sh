@@ -30,6 +30,8 @@ then
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	handle_dep "cmake"
+	handle_dep "python-dev"
+	handle_dep "swig"
 	if [ "$1" == "rbp1" ]; then handle_dep "armv6l-libplatform-dev-osmc"; fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]; then handle_dep "armv7-libplatform-dev-osmc"; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
