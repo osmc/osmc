@@ -15,6 +15,7 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install all diverts needed by this version of the package:
 	# install_divert PATH_DIV PATH_ORIG
 
+	sleep 1
 	kill -9 $(pidof connmand) >/dev/null 2>&1
 	systemctl stop connman.service >/dev/null 2>&1
 	exit 0
