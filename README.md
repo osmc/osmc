@@ -4,7 +4,7 @@ OSMC (Open Source Media Center) is a free and open source media player based on 
 
 #### Source Code ####
 
-Upstream source code for OSMC is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone'. You can learn about how to set up a development environment <a href="osmc.tv/wiki/development/getting-involved-with-osmc-development/">here</a>. 
+Upstream source code for OSMC is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone'. You can learn about how to set up a development environment <a href="https://osmc.tv/wiki/development/getting-involved-with-osmc-development/">here</a>.
 
 #### Download ####
 
