@@ -133,6 +133,7 @@ function build_in_env()
 	    umount ${TCDIR}/proc >/dev/null 2>&1
 	    rm -rf ${TCDIR}
 	fi
+	export use_faster_apt=0 # This is only exported if in chroot, so we need to guard handle_dep for TC
 	handle_dep "$DEP-toolchain-osmc"
 	if [ $? != 0 ]; then echo -e "Can't get upstream toolchain. Is apt.osmc.tv in your sources.list?" && exit 1; fi
 	configure_build_env "$TCDIR"
