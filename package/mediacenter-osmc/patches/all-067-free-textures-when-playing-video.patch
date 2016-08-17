@@ -1,0 +1,27 @@
+From a2227b840c2a6e1d71e6f75ded805013f8a016a9 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Wed, 17 Aug 2016 14:57:58 +0100
+Subject: [PATCH] TextureManager: We still need to free textures when playing
+ video
+
+Currently if you background video and scroll through movie library we never release the textures resulting in a huge memory leak.
+
+See: http://forum.kodi.tv/showthread.php?tid=228120
+---
+ xbmc/Application.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 9e94e51..98b8506 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -4510,8 +4510,7 @@ void CApplication::ProcessSlow()
+   // check for any idle curl connections
+   g_curlInterface.CheckIdle();
+ 
+-  if (!m_pPlayer->IsPlayingVideo())
+-    g_largeTextureManager.CleanupUnusedImages();
++  g_largeTextureManager.CleanupUnusedImages();
+ 
+   g_TextureManager.FreeUnusedTextures(5000);
+ 
