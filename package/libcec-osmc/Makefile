@@ -16,6 +16,9 @@ vero:
 vero2:
 	sudo bash build.sh "vero2"
 
+amd64:
+	sudo bash build.sh "amd64"
+
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files/usr > /dev/null 2>&1
