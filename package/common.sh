@@ -67,7 +67,7 @@ function build_in_env()
 	    BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 	fi
 	# Don't get stuck in an endless loop
-	mount -t proc proc /proc >/dev/null 2>&1
+	mount -t proc proc /proc -o ro >/dev/null 2>&1
 	ischroot
 	chrootval=$?
 	if [ $chrootval == 2 ] || [ $chrootval == 0 ]
