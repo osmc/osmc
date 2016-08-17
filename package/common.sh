@@ -99,6 +99,12 @@ function build_in_env()
 		export LD_LIBRARY_PATH+="/usr/osmc/lib"
 		export PKG_CONFIG_PATH+="/usr/osmc/lib/pkgconfig"
 	    fi
+            if ((($BUILD_OPTS & $BUILD_OPTION_FASTER_APT) == $BUILD_OPTION_FASTER_APT))
+            then
+               export use_faster_apt=1 # handle_dep() cannot get access to $BUILD_OPTS directly
+           else
+               export use_faster_apt=0 # Ensure reset
+            fi
             export CFLAGS+="$BUILD_FLAGS"
             export CXXFLAGS+="$BUILD_FLAGS"
             export CPPFLAGS+="$BUILD_FLAGS"
@@ -166,7 +172,7 @@ function handle_dep()
 			if [ "$1" == "vero-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
 			if [ "$1" == "vero2-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc"; fi
 			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc"; fi
-			if ((($BUILD_OPTS & $BUILD_OPTION_FASTER_APT) == $BUILD_OPTION_FASTER_APT))
+			if [ "$use_faster_apt" -eq 1 ]
 			then
 				install_package "${1}" "1"
 			else
