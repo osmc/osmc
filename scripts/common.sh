@@ -5,14 +5,12 @@
 
 function check_platform()
 {
-    platform=$(lsb_release -c -s)
-    case $platform in
-        "wheezy" | "trusty" | "utopic" | "jessie" | "wily" )
-            return 0
-            ;;
-        * )
-            return 1
-    esac
+    if grep -q "ID_LIKE=debian" /etc/os-release
+    then
+       return 0
+    else
+       return 1
+    fi
 }
 
 function verify_action()
