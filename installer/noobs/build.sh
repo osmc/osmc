@@ -62,6 +62,7 @@ function build_fs_image()
 	# Set uncompressed tarball sizes
 	sed -e s/UNC_TS_SIZE_BOOT/${UNC_TS_SIZE_BOOT}/ -i partitions-pi$(echo ${1:3:4}).json
 	sed -e s/UNC_TS_SIZE_ROOT/${UNC_TS_SIZE_ROOT}/ -i partitions-pi$(echo ${1:3:4}).json
+	echo -e "Creating marketing tarball"
 	mkdir vga_slides
 	SLIDES="A B C D E"
 	for slide in $SLIDES
