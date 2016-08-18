@@ -5,7 +5,7 @@
 
 function check_platform()
 {
-    if grep -q "ID_LIKE=debian" /etc/os-release
+    if grep -q "debian" /etc/os-release
     then
        return 0
     else
