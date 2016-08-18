@@ -11,3 +11,4 @@ clean:
 	sudo rm -rf output > /dev/null 2>&1
 	sudo rm -f boot*.tar.xz > /dev/null 2>&1
 	sudo rm -f root*.tar.xz > /dev/null 2>&1
+	git checkout partitions-pi*.json > /dev/null 2>&1 # This is crude and hacky
