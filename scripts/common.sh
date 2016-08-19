@@ -71,7 +71,7 @@ function install_package()
 	then
 		echo -e "Package already installed."
 	else
-	if [ -z "$2" ]
+	if [ ! -z "$2" ]
 	then
 		if [ "$2" -eq 1 ]; then EMD=$(find /usr/lib | grep libeatmydata | tail -n 1); fi
 	fi
