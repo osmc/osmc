@@ -230,7 +230,7 @@ then
 	export DOWNLOAD_URL
 fi
 
-cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
+cores=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; getconf _NPROCESSORS_ONLN && umount /proc > /dev/null 2>&1)
 export BUILD="make -j${cores}"
 
 export -f check_platform
