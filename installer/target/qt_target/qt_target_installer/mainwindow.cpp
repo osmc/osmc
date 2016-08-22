@@ -148,6 +148,15 @@ void MainWindow::install()
                     system("/bin/sleep 1");
                 }
             }
+            if (utils->getOSMCDev() == "vero2")
+            {
+                for (int i = 0; i <= 60; i++)
+                {
+                    ui->statusLabel->setText(tr("You have ") + + QString::number(60 - i) + " " + ("seconds to unpower before NAND is formatted"));
+                    qApp->processEvents();
+                    system("/bin/sleep 1");
+                }
+            }
         }
         /* Bring up network if using NFS */
         if (useNFS)
