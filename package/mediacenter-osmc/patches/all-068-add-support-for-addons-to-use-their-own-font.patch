@@ -1,0 +1,108 @@
+From 755173a190a212e804442757c13c4ea9fc02da7b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Aug 2016 23:41:57 +0100
+Subject: [PATCH] Support loading of fonts from add-ons
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonManager.cpp   | 2 +-
+ xbmc/addons/PluginSource.cpp   | 9 ++++++++-
+ xbmc/addons/PluginSource.h     | 2 +-
+ xbmc/guilib/GUIFontManager.cpp | 8 ++++++--
+ xbmc/guilib/GUIFontManager.h   | 2 +-
+ 5 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/addons/AddonManager.cpp b/xbmc/addons/AddonManager.cpp
+index ec60036..b6666ed 100644
+--- a/xbmc/addons/AddonManager.cpp
++++ b/xbmc/addons/AddonManager.cpp
+@@ -94,7 +94,7 @@ AddonPtr CAddonMgr::Factory(const cp_extension_t *props)
+   {
+     case ADDON_PLUGIN:
+     case ADDON_SCRIPT:
+-      return AddonPtr(new CPluginSource(props));
++      return AddonPtr(new CPluginSource(props, true));
+     case ADDON_SCRIPT_LIBRARY:
+     case ADDON_SCRIPT_LYRICS:
+     case ADDON_SCRIPT_MODULE:
+diff --git a/xbmc/addons/PluginSource.cpp b/xbmc/addons/PluginSource.cpp
+index ce2ced3..eb8c75e 100644
+--- a/xbmc/addons/PluginSource.cpp
++++ b/xbmc/addons/PluginSource.cpp
+@@ -24,11 +24,13 @@
+ 
+ #include "AddonManager.h"
+ #include "utils/StringUtils.h"
++#include "utils/log.h"
++#include "guilib/GUIFontManager.h"
+ 
+ namespace ADDON
+ {
+ 
+-CPluginSource::CPluginSource(const AddonProps &props)
++CPluginSource::CPluginSource(const AddonProps &props, bool loadFonts)
+   : CAddon(props)
+ {
+   std::string provides;
+@@ -36,6 +38,11 @@ CPluginSource::CPluginSource(const AddonProps &props)
+   if (i != Props().extrainfo.end())
+     provides = i->second;
+   SetProvides(provides);
++  if (loadFonts) {
++    /* Allow this add-on to load their own fonts */
++     CLog::Log(LOGINFO, "PluginSource - %s - add-on %s can load its own fonts", __FUNCTION__, props.name.c_str());
++     g_fontManager.LoadFonts("Default", props.path); /* For now, use <fontset id="Default"> and you can load whatever you want */
++  }
+ }
+ 
+ CPluginSource::CPluginSource(const cp_extension_t *ext)
+diff --git a/xbmc/addons/PluginSource.h b/xbmc/addons/PluginSource.h
+index e7e2fe1..d13b10c 100644
+--- a/xbmc/addons/PluginSource.h
++++ b/xbmc/addons/PluginSource.h
+@@ -31,7 +31,7 @@ public:
+   enum Content { UNKNOWN, AUDIO, IMAGE, EXECUTABLE, VIDEO };
+ 
+   CPluginSource(const cp_extension_t *ext);
+-  CPluginSource(const AddonProps &props);
++  CPluginSource(const AddonProps &props, bool loadFonts = false);
+   virtual ~CPluginSource() {}
+   virtual AddonPtr Clone() const;
+   virtual TYPE FullType() const;
+diff --git a/xbmc/guilib/GUIFontManager.cpp b/xbmc/guilib/GUIFontManager.cpp
+index 8e044dd..5578303 100644
+--- a/xbmc/guilib/GUIFontManager.cpp
++++ b/xbmc/guilib/GUIFontManager.cpp
+@@ -336,10 +336,14 @@ void GUIFontManager::Clear()
+   m_vecFontInfo.clear();
+ }
+ 
+-void GUIFontManager::LoadFonts(const std::string& fontSet)
++void GUIFontManager::LoadFonts(const std::string& fontSet, std::string addonPath)
+ {
+   // Get the file to load fonts from:
+-  const std::string strPath = g_SkinInfo->GetSkinPath("Font.xml", &m_skinResolution);
++  std::string strPath;
++  if (! addonPath.empty())
++      strPath = CSpecialProtocol::TranslatePath(addonPath + "/" + std::to_string(m_skinResolution.iHeight) + "/Font.xml");
++  else
++      strPath = g_SkinInfo->GetSkinPath("Font.xml", &m_skinResolution);
+   CLog::Log(LOGINFO, "Loading fonts from %s", strPath.c_str());
+ 
+   CXBMCTinyXML xmlDoc;
+diff --git a/xbmc/guilib/GUIFontManager.h b/xbmc/guilib/GUIFontManager.h
+index 5d1a07b..fcd6a03 100644
+--- a/xbmc/guilib/GUIFontManager.h
++++ b/xbmc/guilib/GUIFontManager.h
+@@ -65,7 +65,7 @@ public:
+   virtual bool OnMessage(CGUIMessage &message);
+ 
+   void Unload(const std::string& strFontName);
+-  void LoadFonts(const std::string &fontSet);
++  void LoadFonts(const std::string &fontSet, std::string addonPath = "");
+   CGUIFont* LoadTTF(const std::string& strFontName, const std::string& strFilename, color_t textColor, color_t shadowColor, const int iSize, const int iStyle, bool border = false, float lineSpacing = 1.0f, float aspect = 1.0f, const RESOLUTION_INFO *res = NULL, bool preserveAspect = false);
+   CGUIFont* GetFont(const std::string& strFontName, bool fallback = true);
+ 
+-- 
+2.7.4
+
