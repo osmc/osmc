@@ -1,4 +1,4 @@
-From 20c1907c7695435e1ff4ddcab73ffa33e4b0591a Mon Sep 17 00:00:00 2001
+From 6fefd798b9a6cd1d41304a83a180529e8d52dd49 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 23 Aug 2016 19:32:01 +0100
 Subject: [PATCH] Add support for switching to Android from Kodi
@@ -9,12 +9,14 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  addons/script.osmc.android/addon.py      |   9 +
  addons/script.osmc.android/addon.xml     |  16 ++
  addons/script.osmc.android/changelog.txt |   1 +
+ addons/script.osmc.android/default.py    |   0
  addons/script.osmc.android/icon.png      | Bin 0 -> 14378 bytes
- 5 files changed, 365 insertions(+)
+ 6 files changed, 365 insertions(+)
  create mode 100644 addons/script.osmc.android/LICENSE.txt
  create mode 100644 addons/script.osmc.android/addon.py
  create mode 100644 addons/script.osmc.android/addon.xml
  create mode 100644 addons/script.osmc.android/changelog.txt
+ create mode 100644 addons/script.osmc.android/default.py
  create mode 100644 addons/script.osmc.android/icon.png
 
 diff --git a/addons/script.osmc.android/LICENSE.txt b/addons/script.osmc.android/LICENSE.txt
@@ -364,7 +366,7 @@ index 0000000..d159169
 +Public License instead of this License.
 diff --git a/addons/script.osmc.android/addon.py b/addons/script.osmc.android/addon.py
 new file mode 100644
-index 0000000..52d1508
+index 0000000..f2242f3
 --- /dev/null
 +++ b/addons/script.osmc.android/addon.py
 @@ -0,0 +1,9 @@
@@ -374,7 +376,7 @@ index 0000000..52d1508
 +
 +try:
 +    os.path.stat.S_ISBLK(os.stat("/dev/mmcblk0p1").st_mode)
-+    os.system("/bin/sudo reboot androidv2")
++    os.system("/usr/bin/sudo /sbin/reboot androidv2")
 +except:
 +    xbmcgui.Dialog().ok("Card not detected", "Please insert an SD card with Android first. See osmc.tv/wiki for more information")
 diff --git a/addons/script.osmc.android/addon.xml b/addons/script.osmc.android/addon.xml
@@ -406,6 +408,9 @@ index 0000000..2768d26
 +++ b/addons/script.osmc.android/changelog.txt
 @@ -0,0 +1 @@
 +1.0.0 Initial Release
+diff --git a/addons/script.osmc.android/default.py b/addons/script.osmc.android/default.py
+new file mode 100644
+index 0000000..e69de29
 diff --git a/addons/script.osmc.android/icon.png b/addons/script.osmc.android/icon.png
 new file mode 100644
 index 0000000000000000000000000000000000000000..b8af75d4b81f8018f948d33ef3c30364f163efb1
