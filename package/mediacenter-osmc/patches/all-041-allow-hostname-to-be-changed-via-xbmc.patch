@@ -1,4 +1,4 @@
-From 08e2e5616ae26a7ac6b80a4af2a6bcbb3dd24af6 Mon Sep 17 00:00:00 2001
+From e5a55f807cad45d5d563f1cb58ab2318625277d9 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
@@ -6,14 +6,14 @@ Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  9 +++++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
- 2 files changed, 21 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 5bf91e5..5eb91bc 100644
+index 1c9b1c6..8587c9b 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -124,6 +124,15 @@ namespace XBMCAddon
+@@ -128,6 +128,15 @@ namespace XBMCAddon
        CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
      }
  
@@ -30,28 +30,44 @@ index 5bf91e5..5eb91bc 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index b2f044f..0fede41 100644
+index 8616ca8..58ff7a3 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -127,6 +127,18 @@ namespace XBMCAddon
- 
-         void setskin(const char* skin);
- 
-+       /**
-+        * sethostname(hostname) -- Change the device name, and in turn, hostname
-+        *
-+        * hostname               :     string - the name of the hostname to change to
-+        *
-+        *
-+        * example:
-+        *    - xbmc.sethostname("osmc")
-+        */
+@@ -275,6 +275,34 @@ namespace XBMCAddon
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.sethostname(hostname) }
++    ///-----------------------------------------------------------------------
++    /// Change the XBMC skin
++    ///
++    /// @param          state       string - Change the device name, and in turn, hostname
++    ///
++    ///
++    ///
++    /// List of commands -
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.sethostname("osmc")
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    sethostname(...);
++#else
++    void sethostname(const char *hostname);
++#endif
 +
-+        void sethostname(const char* hostname);
-+
-     /**
-      * sleep(time) -- Sleeps for 'time' msec.
-      * 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
+     /// @brief \python_func{ xbmc.sleep(time) }
+     ///-----------------------------------------------------------------------
+     /// Sleeps for 'time' msec.
 -- 
-2.1.0
+2.7.4
 

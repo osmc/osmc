@@ -1,4 +1,4 @@
-From 3d61cddb68a362d4fe320dc6697a7cb8d91748e3 Mon Sep 17 00:00:00 2001
+From c531d5fe3b354b21b6f71d4f114533a726393984 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 13 Dec 2015 18:19:06 +0000
 Subject: [PATCH] Sometimes the shutdown or reboot process can hang:
@@ -14,10 +14,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 91a9060..4c8bf1d 100644
+index b3d5c77..137bed7 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2497,8 +2497,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2402,8 +2402,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    switch (pMsg->dwMessage)
    {
    case TMSG_POWERDOWN:
@@ -28,7 +28,7 @@ index 91a9060..4c8bf1d 100644
      break;
  
    case TMSG_QUIT:
-@@ -2523,8 +2524,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2428,8 +2429,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
  
    case TMSG_RESTART:
    case TMSG_RESET:
@@ -40,21 +40,21 @@ index 91a9060..4c8bf1d 100644
  
    case TMSG_RESTARTAPP:
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 616bfd5..cd52a73 100644
+index c14f62d..22a6026 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -390,6 +390,11 @@ public:
-    */
-   void UnregisterActionListener(IActionListener *listener);
+@@ -395,6 +395,11 @@ public:
+ 
+   std::unique_ptr<CServiceManager> m_ServiceManager;
  
 +  /*! \Allow OSMC's sigterm handler to know when to do the business or not, otherwise we get code on EXIT and POWERDOWN/REBOOT paths
 +  */
 +  bool m_ShuttingDown;
 +  bool isShuttingDown() { return m_ShuttingDown; }
 +
- protected:
-   virtual bool OnSettingsSaving() const override;
- 
+   /*!
+   \brief Locks calls from outside kodi (e.g. python) until framemove is processed.
+   */
 -- 
-2.1.0
+2.7.4
 

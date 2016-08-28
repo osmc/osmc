@@ -1,4 +1,4 @@
-From 29547bb50826a83c22420207f08233a9edbc487d Mon Sep 17 00:00:00 2001
+From 624e28a54a486dac290053c965a7ff03f296483f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 20 Oct 2015 17:38:50 +0100
 Subject: [PATCH] Do not enumerate the default device when we have PulseAudio
@@ -11,10 +11,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index e22db7a..4df3a77 100644
+index 6a9066b..f52d54a 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -1128,7 +1128,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+@@ -1138,7 +1138,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
     * will automatically add "@" instead to enable surroundXX mangling.
     * We don't want to do that if "default" can handle multichannel
     * itself (e.g. in case of a pulseaudio server). */
@@ -24,10 +24,10 @@ index e22db7a..4df3a77 100644
  
    void **hints;
  
-@@ -1554,7 +1555,15 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
-   }
+@@ -1568,7 +1569,15 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
  
    snd_pcm_close(pcmhandle);
+   info.m_wantsIECPassthrough = true;
 -  list.push_back(info);
 +  int hasPulse = system("/bin/systemctl is-active pulseaudio.service"); /* ToDo: use systemd dbus api */
 +  if (hasPulse == 0)
@@ -42,5 +42,5 @@ index e22db7a..4df3a77 100644
  
  bool CAESinkALSA::GetELD(snd_hctl_t *hctl, int device, CAEDeviceInfo& info, bool& badHDMI)
 -- 
-2.1.0
+2.7.4
 

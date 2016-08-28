@@ -1,4 +1,4 @@
-From 9c5ce5636047ddc1d901f2895a5fcf90bca24a99 Mon Sep 17 00:00:00 2001
+From 51075c090ac6dd64a70565d5a914b0e25742c8f4 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 17:18:13 +0100
 Subject: [PATCH] Add enumerated type OSMCSettingsState
@@ -10,18 +10,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 1b5f3b8..537977c 100644
+index 137bed7..34a0615 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -267,6 +267,7 @@ CApplication::CApplication(void)
+@@ -264,6 +264,7 @@ CApplication::CApplication(void)
    , m_progressTrackingItem(new CFileItem)
    , m_musicInfoScanner(new CMusicInfoScanner)
    , m_fallbackLanguageLoaded(false)
 +  , m_eOSMCWalkthroughState(OSMC_WALKTHROUGH_NOTRUNNING)
+   , m_WaitingExternalCalls(0)
+   , m_ProcessedExternalCalls(0)
  {
-   m_network = NULL;
-   TiXmlBase::SetCondenseWhiteSpace(false);
-@@ -3081,6 +3082,12 @@ void CApplication::Stop(int exitCode)
+@@ -2981,6 +2982,12 @@ void CApplication::Stop(int exitCode)
    Sleep(200);
  }
  
@@ -31,14 +31,14 @@ index 1b5f3b8..537977c 100644
 + CRepositoryUpdater::GetInstance().ScheduleUpdate();
 +}
 +
- bool CApplication::PlayMedia(const CFileItem& item, int iPlaylist)
+ bool CApplication::PlayMedia(const CFileItem& item, const std::string &player, int iPlaylist)
  {
    //If item is a plugin, expand out now and run ourselves again
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 1eb379d..49ac585 100644
+index 22a6026..a59f4c5 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -155,6 +155,18 @@ public:
+@@ -159,6 +159,18 @@ public:
    void StopPVRManager();
    bool IsCurrentThread() const;
    void Stop(int exitCode);

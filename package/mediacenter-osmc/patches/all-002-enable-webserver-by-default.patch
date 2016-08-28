@@ -1,4 +1,4 @@
-From c548fb0b5f63ee038c441a7530622aa96b9b756c Mon Sep 17 00:00:00 2001
+From b86ffbf6b3bcbb4f6e16225cae962dd8f986e3eb Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 17:58:16 +0100
 Subject: [PATCH] Always ensure the Web Server is enabled by default and do not
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index d1a8e1c..697c83d 100644
+index ca912cd..3a0c864 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2145,7 +2145,7 @@
-       <group id="1">
+@@ -1715,7 +1715,7 @@
+       <requirement>HAS_WEB_SERVER</requirement>
          <setting id="services.webserver" type="boolean" label="263" help="36328">
            <level>1</level>
 -          <default>false</default>
@@ -22,7 +22,7 @@ index d1a8e1c..697c83d 100644
            <control type="toggle" />
          </setting>
          <setting id="services.webserverport" type="integer" parent="services.webserver" label="730" help="36329">
-@@ -2160,7 +2160,7 @@
+@@ -1733,7 +1733,7 @@
          </setting>
          <setting id="services.webserverusername" type="string" parent="services.webserver" label="1048" help="36330">
            <level>1</level>
@@ -32,5 +32,5 @@ index d1a8e1c..697c83d 100644
              <allowempty>true</allowempty>
            </constraints>
 -- 
-2.1.0
+2.7.4
 

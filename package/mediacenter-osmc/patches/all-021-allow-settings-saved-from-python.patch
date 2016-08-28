@@ -1,19 +1,19 @@
-From 5380fb92c9c261d5d2ea8e977fb736bf549ebf0e Mon Sep 17 00:00:00 2001
+From 12f19922c851caeae605cd01092c82e74bd3fccb Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:22:04 +0100
 Subject: [PATCH] Allow legacy interface to be used for saving GUISettings
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp | 5 +++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 8 ++++++++
- 2 files changed, 13 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  5 +++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 21 +++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 7bf9093..d691955 100644
+index 0b921a8..a599e4c 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -493,6 +493,11 @@ namespace XBMCAddon
+@@ -496,6 +496,11 @@ namespace XBMCAddon
        CAEFactory::Resume();
      }
  
@@ -26,24 +26,37 @@ index 7bf9093..d691955 100644
      {
        std::string convertedLanguage;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 09169dd..98b4190 100644
+index 22e5fcf..59e43d9 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -403,6 +403,14 @@ namespace XBMCAddon
-      */  
-     void audioResume();
- 
-+   /**
-+    * saveSettings() -- saves settings to guisettings.xml
-+    *
-+    * example:
-+    *   xbmc.saveSettings()
-+    */
+@@ -919,6 +919,27 @@ namespace XBMCAddon
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.saveSettings() }
++    ///-----------------------------------------------------------------------
++    /// Save Kodi settings.
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.saveSettings()
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++#else
 +    void saveSettings();
++#endif
 +
-     /**
-     * convertLanguage(language, format) -- Returns the given language converted to the given format as a string.
-     *
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
+     /// @brief \python_func{ xbmc.getUserAgent() }
+     ///-----------------------------------------------------------------------
+     /// @brief Returns Kodi's HTTP UserAgent string
 -- 
-2.1.0
+2.7.4
 

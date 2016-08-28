@@ -1,4 +1,4 @@
-From e497740c6e0bfaa342f597efa41464f12e0b2679 Mon Sep 17 00:00:00 2001
+From 550115412955f6757bb11f05031cb13b636ac545 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 21 Dec 2015 04:32:14 +0000
 Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
@@ -8,17 +8,17 @@ Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/main/main.cpp | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ xbmc/platform/posix/main.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/xbmc/main/main.cpp b/xbmc/main/main.cpp
-index 01027f8..aa098d2 100644
---- a/xbmc/main/main.cpp
-+++ b/xbmc/main/main.cpp
-@@ -41,12 +41,28 @@
- #include "input/linux/LIRC.h"
+diff --git a/xbmc/platform/posix/main.cpp b/xbmc/platform/posix/main.cpp
+index b6b7035..ce2a211 100644
+--- a/xbmc/platform/posix/main.cpp
++++ b/xbmc/platform/posix/main.cpp
+@@ -42,6 +42,18 @@
  #endif
- #include "XbmcContext.h"
+ #include "platform/XbmcContext.h"
+ 
 +#include "Application.h"
 +#include "messaging/ApplicationMessenger.h"
 +
@@ -31,19 +31,9 @@ index 01027f8..aa098d2 100644
 +          CApplicationMessenger::GetInstance().PostMsg(TMSG_QUIT);
 +}
 +
- 
  #ifdef __cplusplus
  extern "C"
  #endif
- int main(int argc, char* argv[])
- {
-+  struct sigaction action;
-+  memset(&action, 0, sizeof(struct sigaction));
-+  action.sa_handler = sigterm_handler;
-+  sigaction(SIGTERM, &action, NULL);
-   // set up some xbmc specific relationships
-   XBMC::Context context;
- 
 -- 
-2.1.0
+2.7.4
 
