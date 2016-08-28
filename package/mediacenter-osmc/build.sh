@@ -6,11 +6,11 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ] || [ "$1" == "pc" ] || [ "$1" == "vero2" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/c327c53ac5346f71219e8353fe046e43e4d4a827.tar.gz" "$(pwd)/src"
-API_VERSION="16"
+pull_source "https://github.com/xbmc/xbmc/archive/df45f18d9b239c44f6ce84e54c0904ebe62ca259.tar.gz" "$(pwd)/src"
+API_VERSION="17"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
-API_VERSION="17"
+API_VERSION="18"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
@@ -385,7 +385,8 @@ then
         mkdir languages/
         pushd languages
         if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
-        if [ "$API_VERSION" = "17" ]; then api_name="tbc"; fi
+        if [ "$API_VERSION" = "17" ]; then api_name="krypton"; fi
+	if [ "$API_VERSION" = "18" ]; then api_name="tbc"; fi
         base_url="http://mirror.us.leaseweb.net/xbmc/addons/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
         languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
