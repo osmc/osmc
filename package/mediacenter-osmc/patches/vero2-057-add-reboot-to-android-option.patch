@@ -1,23 +1,23 @@
-From f04da26121df3860f5ee391249663fd34db98812 Mon Sep 17 00:00:00 2001
+From 20c1907c7695435e1ff4ddcab73ffa33e4b0591a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 23 Aug 2016 19:32:01 +0100
 Subject: [PATCH] Add support for switching to Android from Kodi
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- LICENSE.txt   | 339 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- addon.py      |   9 ++
- addon.xml     |  16 +++
- changelog.txt |   1 +
- icon.png      | Bin 0 -> 14378 bytes
+ addons/script.osmc.android/LICENSE.txt   | 339 +++++++++++++++++++++++++++++++
+ addons/script.osmc.android/addon.py      |   9 +
+ addons/script.osmc.android/addon.xml     |  16 ++
+ addons/script.osmc.android/changelog.txt |   1 +
+ addons/script.osmc.android/icon.png      | Bin 0 -> 14378 bytes
  5 files changed, 365 insertions(+)
- create mode 100644 LICENSE.txt
- create mode 100644 addon.py
- create mode 100644 addon.xml
- create mode 100644 changelog.txt
- create mode 100644 icon.png
+ create mode 100644 addons/script.osmc.android/LICENSE.txt
+ create mode 100644 addons/script.osmc.android/addon.py
+ create mode 100644 addons/script.osmc.android/addon.xml
+ create mode 100644 addons/script.osmc.android/changelog.txt
+ create mode 100644 addons/script.osmc.android/icon.png
 
-diff --git a/LICENSE.txt b/addons/script.osmc.android/LICENSE.txt
+diff --git a/addons/script.osmc.android/LICENSE.txt b/addons/script.osmc.android/LICENSE.txt
 new file mode 100644
 index 0000000..d159169
 --- /dev/null
@@ -362,7 +362,7 @@ index 0000000..d159169
 +consider it more useful to permit linking proprietary applications with the
 +library.  If this is what you want to do, use the GNU Lesser General
 +Public License instead of this License.
-diff --git a/addon.py b/addons/script.osmc.android/addon.py
+diff --git a/addons/script.osmc.android/addon.py b/addons/script.osmc.android/addon.py
 new file mode 100644
 index 0000000..52d1508
 --- /dev/null
@@ -377,7 +377,7 @@ index 0000000..52d1508
 +    os.system("/bin/sudo reboot androidv2")
 +except:
 +    xbmcgui.Dialog().ok("Card not detected", "Please insert an SD card with Android first. See osmc.tv/wiki for more information")
-diff --git a/addon.xml b/addons/script.osmc.android/addon.xml
+diff --git a/addons/script.osmc.android/addon.xml b/addons/script.osmc.android/addon.xml
 new file mode 100644
 index 0000000..1af62e6
 --- /dev/null
@@ -399,14 +399,14 @@ index 0000000..1af62e6
 +		<language></language>
 +	</extension>
 +</addon>
-diff --git a/changelog.txt b/addons/script.osmc.android/changelog.txt
+diff --git a/addons/script.osmc.android/changelog.txt b/addons/script.osmc.android/changelog.txt
 new file mode 100644
 index 0000000..2768d26
 --- /dev/null
 +++ b/addons/script.osmc.android/changelog.txt
 @@ -0,0 +1 @@
 +1.0.0 Initial Release
-diff --git a/icon.png b/addons/script.osmc.android/icon.png
+diff --git a/addons/script.osmc.android/icon.png b/addons/script.osmc.android/icon.png
 new file mode 100644
 index 0000000000000000000000000000000000000000..b8af75d4b81f8018f948d33ef3c30364f163efb1
 GIT binary patch
