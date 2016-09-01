@@ -1,11 +1,10 @@
-From 2b84be34961010cbe1851db8a0c5a246e65f98d0 Mon Sep 17 00:00:00 2001
+From 0c924cd0d77d3edc4d2d31411a11d4bdfcc22073 Mon Sep 17 00:00:00 2001
 From: mkreisl <manfred.kreisl@nexgo.de>
 Date: Tue, 9 Jun 2015 00:45:17 +0200
 Subject: [PATCH] Corrections for rebase to libcec version 3 - RPi2 tested
  successfully - i.MX6 build sucessfully
 
 ---
- include/cectypes.h                                 |   5 -
  src/lib/Makefile.am                                |  68 ----
  src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp | 379 ---------------------
  src/lib/adapter/IMX/IMXCECAdapterCommunication.h   | 139 --------
@@ -19,9 +18,9 @@ Subject: [PATCH] Corrections for rebase to libcec version 3 - RPi2 tested
  src/libcec/adapter/IMX/IMXCECAdapterDetection.h    |  36 ++
  src/libcec/adapter/IMX/IMXCECAdapterMessageQueue.h | 118 +++++++
  src/libcec/adapter/IMX/mxc_hdmi-cec.h              |  47 +++
- src/libcec/cmake/CheckPlatformSupport.cmake        |  40 ++-
+ src/libcec/cmake/CheckPlatformSupport.cmake        |  26 +-
  src/libcec/env.h.in                                |   3 +
- 16 files changed, 787 insertions(+), 851 deletions(-)
+ 15 files changed, 778 insertions(+), 841 deletions(-)
  delete mode 100644 src/lib/Makefile.am
  delete mode 100644 src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp
  delete mode 100644 src/lib/adapter/IMX/IMXCECAdapterCommunication.h
@@ -36,22 +35,6 @@ Subject: [PATCH] Corrections for rebase to libcec version 3 - RPi2 tested
  create mode 100644 src/libcec/adapter/IMX/IMXCECAdapterMessageQueue.h
  create mode 100644 src/libcec/adapter/IMX/mxc_hdmi-cec.h
 
-diff --git a/include/cectypes.h b/include/cectypes.h
-index c43a921..675d641 100644
---- a/include/cectypes.h
-+++ b/include/cectypes.h
-@@ -321,11 +321,6 @@ namespace CEC {
- /*!
-  * Mimimum client version
-  */
--#define CEC_MIN_LIB_VERSION          2
--
--/*!
-- * libCEC's major version number
-- */
- #define CEC_MIN_LIB_VERSION          3
- 
- #define MSGSTART                     0xFF
 diff --git a/src/lib/Makefile.am b/src/lib/Makefile.am
 deleted file mode 100644
 index 6788303..0000000
@@ -1721,11 +1704,11 @@ index 0000000..bc5bbce
 +#endif				/* !_HDMICEC_H_ */
 +
 diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
-index 4bd8043..57d8143 100644
+index 87ebe2c..16db906 100644
 --- a/src/libcec/cmake/CheckPlatformSupport.cmake
 +++ b/src/libcec/cmake/CheckPlatformSupport.cmake
-@@ -86,15 +86,31 @@ else()
-     set(HAVE_RANDR 0)
+@@ -99,6 +99,20 @@ else()
+     SET(HAVE_RANDR ON CACHE BOOL "xrandr supported" FORCE)
    endif()
  
 +  # iMX6
@@ -1740,30 +1723,13 @@ index 4bd8043..57d8143 100644
 +  else()
 +    set(HAVE_IMX_API 0)
 +    set(HAVE_RPI_API 1)
-+  endif()  
++  endif()
 +
    # raspberry pi
--  find_library(RPI_BCM_HOST bcm_host "${RPI_LIB_DIR}")
--  check_library_exists(bcm_host bcm_host_init "${RPI_LIB_DIR}" HAVE_RPI_API)
-   if (HAVE_RPI_API)
--    find_library(RPI_VCOS vcos "${RPI_LIB_DIR}")
--    find_library(RPI_VCHIQ_ARM vchiq_arm "${RPI_LIB_DIR}")
--    include_directories(${RPI_INCLUDE_DIR} ${RPI_INCLUDE_DIR}/interface/vcos/pthreads ${RPI_INCLUDE_DIR}/interface/vmcs_host/linux)
--
-+    find_library(BCM_HOST bcm_host)
-+    check_library_exists(${BCM_HOST} bcm_host_init "" HAVE_RPI_API)
-+  endif()
-+  if (HAVE_RPI_API)
-     set(LIB_INFO "${LIB_INFO}, 'RPi'")
-+    # find includes files on Raspberry Pi
-+    include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux)
-+    list(APPEND CMAKE_REQUIRED_LIBRARIES "vcos")
-+    list(APPEND CMAKE_REQUIRED_LIBRARIES "vchiq_arm")
-     set(CEC_SOURCES_ADAPTER_RPI adapter/RPi/RPiCECAdapterDetection.cpp
-                                 adapter/RPi/RPiCECAdapterCommunication.cpp
-                                 adapter/RPi/RPiCECAdapterMessageQueue.cpp)
-@@ -124,17 +140,7 @@ else()
-     set(HAVE_EXYNOS_API 0)
+   find_library(RPI_BCM_HOST bcm_host "${RPI_LIB_DIR}")
+   check_library_exists(bcm_host bcm_host_init "${RPI_LIB_DIR}" HAVE_RPI_LIB)
+@@ -137,18 +151,6 @@ else()
+     list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_EXYNOS})
    endif()
  
 -  # iMX6
@@ -1777,15 +1743,15 @@ index 4bd8043..57d8143 100644
 -  else()
 -    set(HAVE_IMX_API 0)
 -  endif()
-+
- endif()
- 
- # rt
+-
+   # AOCEC
+   if (${HAVE_AOCEC_API})
+     set(LIB_INFO "${LIB_INFO}, AOCEC")
 diff --git a/src/libcec/env.h.in b/src/libcec/env.h.in
-index ff20e49..a6e79bb 100644
+index fe6c83d..91c7a27 100644
 --- a/src/libcec/env.h.in
 +++ b/src/libcec/env.h.in
-@@ -60,6 +60,9 @@
+@@ -66,6 +66,9 @@
  /* Define to 1 for Raspberry Pi support */
  #cmakedefine HAVE_RPI_API @HAVE_RPI_API@
  
@@ -1795,3 +1761,6 @@ index ff20e49..a6e79bb 100644
  /* Define to 1 for TDA995x support */
  #cmakedefine HAVE_TDA995X_API @HAVE_TDA995X_API@
  
+-- 
+2.7.4
+

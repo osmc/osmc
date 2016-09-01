@@ -1,0 +1,146 @@
+From 36be848a7b138ba12adc7b1fa158773761ad4afc Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Dec 2016 23:14:03 +0000
+Subject: [PATCH] mutexfixes
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/adapter/Amlogic/AmlogicCEC.h            |  1 -
+ .../Amlogic/AmlogicCECAdapterCommunication.cpp     | 40 ++++++++++++----------
+ 2 files changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/src/libcec/adapter/Amlogic/AmlogicCEC.h b/src/libcec/adapter/Amlogic/AmlogicCEC.h
+index 7b86982..ac80865 100644
+--- a/src/libcec/adapter/Amlogic/AmlogicCEC.h
++++ b/src/libcec/adapter/Amlogic/AmlogicCEC.h
+@@ -35,7 +35,6 @@
+  */
+ 
+ 
+-#define CEC_DEFAULT_PADDR   0x1000
+ #define CEC_IOC_SETLADDR    _IOW('c', 0, unsigned int)
+ #define CEC_IOC_GETPADDR    _IO('c', 1)
+ #define CEC_MAX_FRAME_SIZE  16
+diff --git a/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp b/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
+index 5aeddda..d3ddc35 100644
+--- a/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
+@@ -78,11 +78,11 @@ bool CAmlogicCECAdapterCommunication::IsOpen(void)
+ 
+ bool CAmlogicCECAdapterCommunication::Open(uint32_t UNUSED(iTimeoutMs), bool UNUSED(bSkipChecks), bool bStartListening)
+ {
++  CLockObject lock(m_mutex);
++
+   if (IsOpen())
+     Close();
+ 
+-  CLockObject lock(m_mutex);
+-
+   if ((m_fd = open(CEC_AMLOGIC_PATH, O_RDWR)) > 0)
+   {
+     if (!bStartListening || CreateThread()) {
+@@ -126,19 +126,19 @@ cec_adapter_message_state CAmlogicCECAdapterCommunication::Write(
+ {
+   uint8_t buffer[CEC_MAX_FRAME_SIZE];
+   int32_t size = 1;
+-  cec_adapter_message_state rc = ADAPTER_MESSAGE_STATE_ERROR;
++  cec_adapter_message_state rc = ADAPTER_MESSAGE_STATE_SENT_NOT_ACKED;
++
++  CLockObject lock(m_mutex);
+ 
+   if (!IsOpen())
+     return rc;
+ 
+-  CLockObject lock(m_mutex);
+-
+   if ((size_t)data.parameters.size + data.opcode_set > sizeof(buffer))
+   {
+-    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: data size too large !", __func__);
++    LIB_CEC->AddLog(CEC_LOG_WARNING, "%s: buffer too small for data", __func__);
+     return ADAPTER_MESSAGE_STATE_ERROR;
+   }
+- 
++
+   buffer[0] = (data.initiator << 4) | (data.destination & 0x0f);
+ 
+   if (data.opcode_set)
+@@ -156,7 +156,7 @@ cec_adapter_message_state CAmlogicCECAdapterCommunication::Write(
+   }
+   else
+   {
+-    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: write failed !", __func__);
++    LIB_CEC->AddLog(CEC_LOG_WARNING, "%s: write failed",  __func__);
+   }
+ 
+   return rc;
+@@ -177,17 +177,17 @@ cec_vendor_id CAmlogicCECAdapterCommunication::GetVendorId(void)
+ 
+ uint16_t CAmlogicCECAdapterCommunication::GetPhysicalAddress(void)
+ {
+-  int phys_addr = CEC_DEFAULT_PADDR;
++  int phys_addr = CEC_INVALID_PHYSICAL_ADDRESS;
++
++  CLockObject lock(m_mutex);
+ 
+   if (!IsOpen())
+     return (uint16_t)phys_addr;
+ 
+-  CLockObject lock(m_mutex);
+-
+   if ((phys_addr = ioctl(m_fd, CEC_IOC_GETPADDR)) < 0)
+   {
+-    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL GetPhysicalAddr failed !", __func__);
+-    phys_addr = CEC_DEFAULT_PADDR;
++    LIB_CEC->AddLog(CEC_LOG_WARNING, "%s: ioctl(CEC_IOC_GETPADDR) failed", __func__);
++    phys_addr = CEC_INVALID_PHYSICAL_ADDRESS;
+   }
+   return (uint16_t)phys_addr;
+ }
+@@ -195,21 +195,23 @@ uint16_t CAmlogicCECAdapterCommunication::GetPhysicalAddress(void)
+ 
+ cec_logical_addresses CAmlogicCECAdapterCommunication::GetLogicalAddresses(void)
+ {
++  CLockObject lock(m_mutex);
+   return m_logicalAddresses;
+ }
+ 
+ 
+ bool CAmlogicCECAdapterCommunication::SetLogicalAddresses(const cec_logical_addresses &addresses)
+ {
++  CLockObject lock(m_mutex);
++
+   unsigned int log_addr = addresses.primary;
++
+   if (!IsOpen())
+     return false;
+ 
+-  CLockObject lock(m_mutex);
+-
+   if (ioctl(m_fd, CEC_IOC_SETLADDR, &log_addr))
+   {
+-    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL SetLogicalAddr failed !", __func__);
++    LIB_CEC->AddLog(CEC_LOG_WARNING, "%s: ioctl(CEC_IOC_SETLADDR) failed", __func__);
+     return false;
+   }
+   m_logicalAddresses = addresses;
+@@ -223,14 +225,14 @@ void CAmlogicCECAdapterCommunication::HandleLogicalAddressLost(cec_logical_addre
+ {
+   unsigned int log_addr = CECDEVICE_BROADCAST;
+ 
++  CLockObject lock(m_mutex);
++
+   if (!IsOpen())
+     return;
+ 
+-  CLockObject lock(m_mutex);
+-
+   if (ioctl(m_fd, CEC_IOC_SETLADDR, &log_addr))
+   {
+-    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL SetLogicalAddr failed !", __func__);
++    LIB_CEC->AddLog(CEC_LOG_WARNING, "%s: ioctl(CEC_IOC_SETLADDR) failed", __func__);
+   }
+ }
+ 
+-- 
+2.7.4
+

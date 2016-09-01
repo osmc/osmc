@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Pulse-Eight/libcec/archive/libcec-3.0.1.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/Pulse-Eight/libcec/archive/5388d3a18f7fe6b230cf7d6e678906e52d166532.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
@@ -29,15 +29,30 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
-	handle_dep "cmake"
 	handle_dep "python-dev"
 	handle_dep "swig"
-	if [ "$1" == "rbp1" ]; then handle_dep "armv6l-libplatform-dev-osmc"; fi
-	if [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]; then handle_dep "armv7-libplatform-dev-osmc"; fi
+	if [ "$1" == "rbp1" ];
+	then
+		handle_dep "armv6l-libplatform-dev-osmc"
+		handle_dep "armv6l-cmake-osmc"
+	fi
+	if [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
+	then
+		handle_dep "armv7-libplatform-dev-osmc"
+		handle_dep "armv7-cmake-osmc"
+	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
-	if [ "$1" == "i386" ]; then handle_dep "i386-libplatform-dev-osmc"; fi
-	if [ "$1" == "amd64" ]; then handle_dep "amd64-libplatform-dev-osmc"; fi
+	if [ "$1" == "i386" ]
+	then
+		handle_dep "i386-libplatform-dev-osmc"
+		handle_dep "i386-cmake-osmc"
+	fi
+	if [ "$1" == "amd64" ]
+	then
+		handle_dep "amd64-libplatform-dev-osmc"
+		handle_dep "amd64-cmake-osmc"
+	fi
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
