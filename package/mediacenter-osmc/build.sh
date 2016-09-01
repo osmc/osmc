@@ -39,8 +39,6 @@ then
 	handle_dep "gperf"
 	handle_dep "libasound2-dev"
 	handle_dep "libass-dev"
-	handle_dep "libboost-dev"
-	handle_dep "libboost-thread-dev"
 	handle_dep "libbz2-dev"
 	handle_dep "libcap-dev"
 	handle_dep "libcdio-dev"
