@@ -57,8 +57,6 @@ then
 	handle_dep "libmad0-dev"
 	handle_dep "libmicrohttpd-dev"
 	handle_dep "libmodplug-dev"
-	handle_dep "libmpeg2-4-dev"
-	handle_dep "libmpeg3-dev"
 	handle_dep "libmysqlclient-dev"
 	handle_dep "libpcre3-dev"
 	handle_dep "libplist-dev"
