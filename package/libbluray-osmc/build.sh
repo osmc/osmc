@@ -33,7 +33,7 @@ then
 	handle_dep "pkg-config"
 	echo "Package: ${1}-libbluray-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libbluray-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libbluray-*
-	./configure --prefix=/usr/osmc --disable-bdjava --enable-udf --with-freetype --with-fontconfig --with-libxml2
+	./configure --prefix=/usr/osmc --disable-bdjava --enable-udf --with-freetype --with-fontconfig --with-libxml2 --disable-examples
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
