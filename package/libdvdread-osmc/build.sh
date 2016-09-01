@@ -31,6 +31,7 @@ then
 	handle_dep "pkg-config"
 	echo "Package: ${1}-libdvdread-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libdvdread-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libdvdread-*
+	install_patch "../patches" "all"
 	export CFLAGS="-D_XBMC $CFLAGS"
 	autoreconf -i
 	./configure --prefix=/usr/osmc --with-libdvdcss
