@@ -9,5 +9,5 @@ fi
 boot=$(grep "/boot" /etc/fstab | awk {'print $1'})
 /bin/umount /boot
 /sbin/fsck.hfsplus $boot
-/bin/mount /boot
+/bin/mount -t hfsplus -o rw,force /boot
 exit 0
