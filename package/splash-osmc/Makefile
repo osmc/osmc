@@ -1,5 +1,5 @@
 all:
-	@echo "Specify a target:\nmake armv6l\nmake armv7\nmake i386\n"
+	@echo "Specify a target:\nmake armv6l\nmake armv7\nmake i386\nmake aarch64\n"
 
 armv6l:
 	sudo bash build.sh "armv6l"
@@ -19,5 +19,6 @@ aarch64:
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files/usr > /dev/null 2>&1
+	sudo rm -rf files/sbin > /dev/null 2>&1
 	sudo rm -f src/ply-image >/dev/null 2>&1
 	sudo rm -f src/checkmodifier >/dev/null 2>&1
