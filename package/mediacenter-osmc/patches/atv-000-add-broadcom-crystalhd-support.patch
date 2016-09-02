@@ -1,56 +1,41 @@
-From 8018c2a5cacdb126a621fdad8aca9e21c374d6d8 Mon Sep 17 00:00:00 2001
+From 52ca187712d1932cd079aca6e6250ce803aad5b5 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sun, 11 Oct 2015 14:46:03 +0100
-Subject: [PATCH] Add support for CrystalHD. Do not use fast_memcpy() and
- remove CHD pathways which don't make sense (MPEG2, VC1)
+Date: Tue, 6 Sep 2016 16:52:27 +0000
+Subject: [PATCH] Add support for Broadcom CrystalHD
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- .gitignore                                         |    1 +
- configure.ac                                       |   52 +
+ configure.ac                                       |   51 +
  system/settings/settings.xml                       |    9 +
  xbmc/Application.cpp                               |   11 +
- xbmc/DllPaths_generated.h.in                       |    7 +
- xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp |   25 +
- xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp | 2010 ++++++++++++++++++++
- xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h   |  236 +++
- .../DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp     |  204 ++
+ xbmc/DllPaths_generated.h.in                       |    4 +
+ .../VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp      |    5 +
+ .../VideoPlayer/DVDCodecs/Video/CrystalHD.cpp      | 2011 ++++++++++++++++++++
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h |  236 +++
+ .../DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp     |  165 ++
  .../DVDCodecs/Video/DVDVideoCodecCrystalHD.h       |   51 +
- xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in   |    4 +
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in |    5 +
  xbmc/settings/SettingConditions.cpp                |    8 +
- xbmc/system.h                                      |    1 +
- 13 files changed, 2619 insertions(+)
- create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
- create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h
- create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
- create mode 100644 xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
+ 11 files changed, 2556 insertions(+)
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
 
-diff --git a/.gitignore b/.gitignore
-index 4d36744..16e2280 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -504,6 +504,7 @@ lib/cpluff/stamp-h1
- /xbmc/cores/dvdplayer/DVDCodecs/Makefile
- /xbmc/cores/dvdplayer/DVDCodecs/Overlay/Makefile
- /xbmc/cores/dvdplayer/DVDCodecs/Video/libstagefrightICS/Makefile
-+/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD/Makefile
- /xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile
- /xbmc/cores/dvdplayer/DVDDemuxers/Makefile
- /xbmc/cores/dvdplayer/DVDSubtitles/Makefile
 diff --git a/configure.ac b/configure.ac
-index 4e125e5..b54466e 100644
+index 6a8b4a2..cc4df6a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -188,6 +188,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
+@@ -184,6 +184,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
  vdpau_disabled="== VDPAU support manually disabled. =="
  vaapi_not_found="== Could not find libva. VAAPI support disabled. =="
  vaapi_disabled="== VAAPI support manually disabled. =="
 +crystalhd_not_found="== Could not find libcrystalhd. CrystalHD support disabled. =="
 +crystalhd_disabled="== CrystalHD support manually disabled. =="
- vtbdecoder_enabled="== VTBDecoder support enabled. =="
- vtbdecoder_disabled="== VTBDecoder support manually disabled. =="
  openmax_disabled="== OpenMax support manually disabled. =="
-@@ -276,6 +278,12 @@ AC_ARG_ENABLE([vaapi],
+ openmax_not_found="== Could not find OpenMax headers. OpenMax support disabled. =="
+ libnfs_not_found="== Could not find libnfs. NFS client support disabled. =="
+@@ -268,6 +270,12 @@ AC_ARG_ENABLE([vaapi],
    [use_vaapi=$enableval],
    [use_vaapi=auto])
  
@@ -60,30 +45,13 @@ index 4e125e5..b54466e 100644
 +  [use_crystalhd=$enableval],
 +  [use_crystalhd=auto])
 +
- AC_ARG_ENABLE([vtbdecoder],
-   [AS_HELP_STRING([--enable-vtbdecoder],
-   [enable VTBDecoder decoding (default is auto)])],
-@@ -609,6 +617,7 @@ case $host in
-      use_joystick=no
-      use_neon=yes
-      use_libcec=no
-+     use_crystalhd=no
-      use_vtbdecoder=yes
-      use_optical_drive=no
-      use_dvdcss=no
-@@ -634,6 +643,7 @@ case $host in
-   powerpc-apple-darwin*)
-      use_joystick=no
-      use_vtbdecoder=no
-+     use_crystalhd=no
-      ARCH="powerpc-osx"
-      use_arch="ppc"
-      DEPENDS_ROOT_FOR_XCODE=$(echo ${prefix%/*})
-@@ -1815,6 +1825,41 @@ else
+ AC_ARG_ENABLE([openmax],
+   [AS_HELP_STRING([--enable-openmax],
+   [enable OpenMax decoding (default is auto, requires OpenGLES)])],
+@@ -1711,6 +1719,42 @@ else
    USE_VAAPI=0
  fi
  
-+# CrystalHD
 +if test "x$use_crystalhd" != "xno"; then
 +  SAVE_CFLAGS="$CFLAGS"
 +  CFLAGS="-D__LINUX_USER__"
@@ -118,10 +86,12 @@ index 4e125e5..b54466e 100644
 +  USE_CRYSTALHD=0
 +fi
 +
- # VTBDecoder
- if test "x$use_vtbdecoder" != "xno"; then
-   if test "$host_vendor" = "apple" ; then
-@@ -2015,6 +2060,12 @@ else
++
++
+ # OpenMax
+ if test "$use_gles" = "yes" && test "$use_openmax" = "auto"; then
+ 
+@@ -1892,6 +1936,12 @@ else
    final_message="$final_message\n  VAAPI:\tNo"
  fi
  
@@ -131,22 +101,22 @@ index 4e125e5..b54466e 100644
 +  final_message="$final_message\n  CrystalHD:\tNo"
 +fi
 +
- if test "x$use_vtbdecoder" != "xno"; then
-   final_message="$final_message\n  VTBDecoder:\tYes"
+ if test "$use_openmax" != "no"; then
+   final_message="$final_message\n  OpenMax:\tYes"
  else
-@@ -2507,6 +2558,7 @@ AC_SUBST(USE_OPENGL)
- AC_SUBST(USE_OPENGLES)
- AC_SUBST(USE_VDPAU)
- AC_SUBST(USE_VAAPI)
+@@ -2322,6 +2372,7 @@ AC_SUBST(USE_MMAL)
+ AC_SUBST(USE_X11)
+ AC_SUBST(USE_OPTICAL_DRIVE)
+ AC_SUBST(CROSS_COMPILING)
 +AC_SUBST(USE_CRYSTALHD)
- AC_SUBST(USE_LIBSMBCLIENT)
- AC_SUBST(USE_LIBNFS)
- AC_SUBST(USE_LIBGIF)
+ 
+ # pushd and popd are not available in other shells besides bash, so implement
+ # our own pushd/popd functions
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5a67d15..8fdda54 100644
+index 6ae4d40..1154b41 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -816,6 +816,15 @@
+@@ -317,6 +317,15 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
@@ -159,26 +129,26 @@ index 5a67d15..8fdda54 100644
 +          <default>true</default>
 +          <control type="toggle" />
 +        </setting>
-         <setting id="videoplayer.useomx" type="boolean" label="13430" help="36161">
-           <requirement>HAVE_LIBOPENMAX</requirement>
+         <setting id="videoplayer.usevtb" type="boolean" label="13429" help="36160">
+           <requirement>HasVTB</requirement>
            <level>2</level>
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 04e4032..9a2541f 100644
+index 13ff95b..443dac1 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -133,6 +133,9 @@
+@@ -129,6 +129,9 @@
  #ifdef HAS_JSONRPC
  #include "interfaces/json-rpc/JSONRPC.h"
  #endif
 +#if defined(HAVE_LIBCRYSTALHD)
-+#include "cores/dvdplayer/DVDCodecs/Video/CrystalHD.h"
++#include "cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h"
 +#endif
  #include "interfaces/AnnouncementManager.h"
  #include "peripherals/Peripherals.h"
  #include "peripherals/devices/PeripheralImon.h"
-@@ -1132,6 +1135,10 @@ bool CApplication::Initialize()
-   // initialize (and update as needed) our databases
+@@ -1134,6 +1137,10 @@ bool CApplication::Initialize()
    CDatabaseManager::GetInstance().Initialize();
+   CSplash::GetInstance().Show();
  
 +  #if defined(HAVE_LIBCRYSTALHD)
 +     CCrystalHD::GetInstance();
@@ -187,7 +157,7 @@ index 04e4032..9a2541f 100644
    StartServices();
  
    // Init DPMS, before creating the corresponding setting control.
-@@ -3040,6 +3047,10 @@ void CApplication::Stop(int exitCode)
+@@ -2981,6 +2988,10 @@ void CApplication::Stop(int exitCode)
        XBMCHelper::GetInstance().Stop();
  #endif
  
@@ -199,77 +169,47 @@ index 04e4032..9a2541f 100644
  
      // Stop services before unloading Python
 diff --git a/xbmc/DllPaths_generated.h.in b/xbmc/DllPaths_generated.h.in
-index 5384a0b..627d788 100644
+index a4d4530..d9d1d23 100644
 --- a/xbmc/DllPaths_generated.h.in
 +++ b/xbmc/DllPaths_generated.h.in
-@@ -59,4 +59,11 @@
+@@ -49,4 +49,8 @@
  /* sse4 */
  #define DLL_PATH_LIBSSE4      "special://xbmcbin/system/libsse4-@ARCH@.so"
  
-+/* broadcom crystalhd */
-+#if defined(TARGET_DARWIN)
-+#define DLL_PATH_LIBCRYSTALHD  "libcrystalhd.dylib"
-+#else
++/* crystalhd */
++
 +#define DLL_PATH_LIBCRYSTALHD  "@CRYSTALHD_SONAME@"
-+#endif
 +
  #endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-index 84e9ef1..fda1d24 100644
---- a/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/DVDFactoryCodec.cpp
-@@ -42,6 +42,9 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp
+index 9717412..eb8a0d4 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp
+@@ -37,6 +37,9 @@
+ #include "utils/AMLUtils.h"
+ #include "Video/DVDVideoCodecAmlogic.h"
  #endif
- #include "Video/MMALCodec.h"
- #include "Video/DVDVideoCodecStageFright.h"
 +#if defined(HAVE_LIBCRYSTALHD)
 +#include "Video/DVDVideoCodecCrystalHD.h"
 +#endif
- #if defined(HAS_LIBAMCODEC)
- #include "utils/AMLUtils.h"
- #include "Video/DVDVideoCodecAmlogic.h"
-@@ -154,6 +157,11 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
- #elif defined(TARGET_DARWIN)
-   hwSupport += "VideoToolBoxDecoder:no ";
+ #if defined(TARGET_ANDROID)
+ #include "Video/DVDVideoCodecAndroidMediaCodec.h"
+ #include "platform/android/activity/AndroidFeatures.h"
+@@ -149,6 +152,8 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, CProces
+     pCodec = OpenCodec(new CDVDVideoCodecOpenMax(processInfo), hint, options);
+ #elif defined(HAS_MMAL)
+     pCodec = OpenCodec(new CMMALVideo(processInfo), hint, options);
++#elif defined(HAVE_LIBCRYSTALHD)
++    pCodec = OpenCodec(new CDVDVideoCodecCrystalHD(processInfo), hint, options);
  #endif
-+#ifdef HAVE_LIBCRYSTALHD
-+  hwSupport += "CrystalHD:yes ";
-+#else
-+  hwSupport += "CrystalHD:no ";
-+#endif
- #if defined(HAS_LIBAMCODEC)
-   hwSupport += "AMCodec:yes ";
- #else
-@@ -297,6 +305,23 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
-   }
- #endif
- 
-+#if defined(HAVE_LIBCRYSTALHD)
-+  if (!hint.software && CSettings::GetInstance().GetBool("videoplayer.usechd"))
-+  {
-+    if (CCrystalHD::GetInstance()->DevicePresent())
-+    {
-+      switch(hint.codec)
-+      {
-+        case AV_CODEC_ID_H264:
-+          if ( (pCodec = OpenCodec(new CDVDVideoCodecCrystalHD(), hint, options)) ) return pCodec;
-+        break;
-+        default:
-+        break;
-+      }
-+    }
-+  }
-+#endif
-+
- #if defined(HAVE_LIBOPENMAX)
-     if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOPLAYER_USEOMX) && !hint.software )
-     {
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
+     if (pCodec)
+       return pCodec;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp
 new file mode 100644
-index 0000000..586b45b
+index 0000000..82ef313
 --- /dev/null
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.cpp
-@@ -0,0 +1,2010 @@
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp
+@@ -0,0 +1,2011 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -307,6 +247,7 @@ index 0000000..586b45b
 +#include "threads/Atomics.h"
 +#include "threads/Thread.h"
 +#include "utils/log.h"
++#include "linux/XMemUtils.h"
 +extern "C" {
 +#include "libswscale/swscale.h"
 +}
@@ -1132,7 +1073,7 @@ index 0000000..586b45b
 +
 +            CLog::Log(LOGDEBUG, "%s: Added a new Buffer, ReadyListCount: %d", __MODULE_NAME__, m_ReadyList.Count());
 +            while (!m_bStop && m_ReadyList.Count() > 10)
-+              Sleep(1);
++              usleep(1000);
 +          }
 +
 +          pBuffer->m_width = m_width;
@@ -1219,9 +1160,9 @@ index 0000000..586b45b
 +                  int      dstStride[] = { pBuffer->m_width, pBuffer->m_width/2, pBuffer->m_width/2, 0 };
 +
 +                  m_sw_scale_ctx = sws_getCachedContext(m_sw_scale_ctx,
-+                    pBuffer->m_width, pBuffer->m_height, PIX_FMT_YUYV422,
-+                    pBuffer->m_width, pBuffer->m_height, PIX_FMT_YUV420P,
-+                    SWS_FAST_BILINEAR | SwScaleCPUFlags(), NULL, NULL, NULL);
++                    pBuffer->m_width, pBuffer->m_height, AV_PIX_FMT_YUYV422,
++                    pBuffer->m_width, pBuffer->m_height, AV_PIX_FMT_YUV420P,
++                    SWS_FAST_BILINEAR, NULL, NULL, NULL);
 +                  sws_scale(m_sw_scale_ctx, src, srcStride, 0, pBuffer->m_height, dst, dstStride);
 +                }
 +              break;
@@ -1319,7 +1260,7 @@ index 0000000..586b45b
 +      GetDecoderOutput();
 +      break;
 +    }
-+    Sleep(10);
++    usleep(10000);
 +  }
 +
 +  // decoder is primed so now calls in DtsProcOutputXXCopy will block
@@ -1330,7 +1271,7 @@ index 0000000..586b45b
 +    if (ret == BCM::BC_STS_SUCCESS && decoder_status.ReadyListCount != 0)
 +      GetDecoderOutput();
 +    else
-+      Sleep(1);
++      usleep(1000);
 +
 +#ifdef USE_CHD_SINGLE_THREADED_API
 +    while (!m_bStop)
@@ -1342,7 +1283,7 @@ index 0000000..586b45b
 +        fprintf(stdout, "cpbEmptySize(%d), NextTimeStamp(%f)\n", decoder_status.cpbEmptySize, pts);
 +        break;
 +      }
-+      Sleep(10);
++      usleep(10000);
 +    }
 +#endif
 +  }
@@ -1795,7 +1736,7 @@ index 0000000..586b45b
 +
 +  while (m_pOutputThread->GetReadyCount())
 +  {
-+    ::Sleep(1);
++    usleep(1000);
 +    m_pOutputThread->FreeListPush( m_pOutputThread->ReadyListPop() );
 +  }
 +}
@@ -1836,7 +1777,7 @@ index 0000000..586b45b
 +      else if (ret == BCM::BC_STS_BUSY)
 +      {
 +        CLog::Log(LOGDEBUG, "%s: DtsProcInput returned BC_STS_BUSY", __MODULE_NAME__);
-+        ::Sleep(1); // Buffer is full, sleep it empty
++        usleep(1000); // Buffer is full, sleep it empty
 +      }
 +    } while (ret != BCM::BC_STS_SUCCESS);
 +
@@ -1982,7 +1923,7 @@ index 0000000..586b45b
 +          {
 +            m_skip_state = true;
 +            m_dll->DtsSetSkipPictureMode(m_device, 1);
-+            Sleep(1);
++            usleep(1000);
 +          }
 +        }
 +        else
@@ -1991,7 +1932,7 @@ index 0000000..586b45b
 +          {
 +            m_skip_state = false;
 +            m_dll->DtsSetSkipPictureMode(m_device, 0);
-+            Sleep(1);
++            usleep(1000);
 +          }
 +        }
 +      }
@@ -2280,11 +2221,11 @@ index 0000000..586b45b
 +}
 +
 +#endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h
 new file mode 100644
-index 0000000..451a107
+index 0000000..e6e3cb0
 --- /dev/null
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/CrystalHD.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h
 @@ -0,0 +1,236 @@
 +#pragma once
 +/*
@@ -2312,7 +2253,7 @@ index 0000000..451a107
 +#include <deque>
 +
 +#include "DVDVideoCodec.h"
-+#include "cores/dvdplayer/DVDStreamInfo.h"
++#include "cores/VideoPlayer/DVDStreamInfo.h"
 +#include "threads/SingleLock.h"
 +
 +////////////////////////////////////////////////////////////////////////////////////////////
@@ -2522,12 +2463,12 @@ index 0000000..451a107
 +};
 +
 +#endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
 new file mode 100644
-index 0000000..56f0ae0
+index 0000000..9383493
 --- /dev/null
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
-@@ -0,0 +1,204 @@
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
+@@ -0,0 +1,165 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -2567,12 +2508,13 @@ index 0000000..56f0ae0
 +
 +#define __MODULE_NAME__ "DVDVideoCodecCrystalHD"
 +
-+CDVDVideoCodecCrystalHD::CDVDVideoCodecCrystalHD() :
++CDVDVideoCodecCrystalHD::CDVDVideoCodecCrystalHD(CProcessInfo &processInfo) : CDVDVideoCodec(processInfo),
 +  m_Codec(NULL),
 +  m_DropPictures(false),
 +  m_Duration(0.0),
-+  m_pFormatName(""),
-+  m_CodecType(CRYSTALHD_CODEC_ID_MPEG2)
++  /* Initialise for only codec we handle now */
++  m_pFormatName("chd-h264-osmc"),
++  m_CodecType(CRYSTALHD_CODEC_ID_H264)
 +{
 +}
 +
@@ -2585,74 +2527,34 @@ index 0000000..56f0ae0
 +{
 +  if (CSettings::GetInstance().GetBool("videoplayer.usechd") && !hints.software)
 +  {
-+    switch (hints.codec)
++    /* We only use CHD for h264 on OSMC */
++    if (hints.codec == AV_CODEC_ID_H264)
 +    {
-+      case AV_CODEC_ID_MPEG2VIDEO:
-+        m_CodecType = CRYSTALHD_CODEC_ID_MPEG2;
-+        m_pFormatName = "chd-mpeg2";
-+      break;
-+      case AV_CODEC_ID_H264:
-+        switch(hints.profile)
-+        {
-+          case FF_PROFILE_H264_HIGH_10:
-+          case FF_PROFILE_H264_HIGH_10_INTRA:
-+          case FF_PROFILE_H264_HIGH_422:
-+          case FF_PROFILE_H264_HIGH_422_INTRA:
-+          case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
-+          case FF_PROFILE_H264_HIGH_444_INTRA:
-+          case FF_PROFILE_H264_CAVLC_444:
-+            CLog::Log(LOGNOTICE, "%s - unsupported h264 profile(%d)", __FUNCTION__, hints.profile);
-+            return false;
-+            break;
++	if ( *(char*)hints.extradata != 1 )
++    	{
++    	    if (!m_Codec)
++    	    {
++      		CLog::Log(LOGERROR, "%s: Failed to open Broadcom Crystal HD Codec", __MODULE_NAME__);
++      		return false;
++            }
++
++    	    if (m_Codec && !m_Codec->OpenDecoder(m_CodecType, hints))
++    	    {
++      		CLog::Log(LOGERROR, "%s: Failed to open Broadcom Crystal HD Codec", __MODULE_NAME__);
++      		return false;
++    	    }
++
++    	    // default duration to 23.976 fps, have to guess something.
++            m_Duration = (DVD_TIME_BASE / (24.0 * 1000.0/1001.0));
++            m_DropPictures = false;
++
++            CLog::Log(LOGINFO, "%s: Opened Broadcom Crystal HD Codec", __MODULE_NAME__);
++            return true;
 +        }
-+        if (hints.extrasize < 7 || hints.extradata == NULL)
-+        {
-+          CLog::Log(LOGNOTICE, "%s - avcC atom too data small or missing", __FUNCTION__);
-+          return false;
-+        }
-+        // valid avcC data (bitstream) always starts with the value 1 (version)
-+        if ( *(char*)hints.extradata == 1 )
-+          m_CodecType = CRYSTALHD_CODEC_ID_AVC1;
-+        else
-+          m_CodecType = CRYSTALHD_CODEC_ID_H264;
-+
-+        m_pFormatName = "chd-h264-osmc";
-+      break;
-+      case AV_CODEC_ID_VC1:
-+        m_CodecType = CRYSTALHD_CODEC_ID_VC1;
-+        m_pFormatName = "chd-vc1";
-+      break;
-+      case AV_CODEC_ID_WMV3:
-+        m_CodecType = CRYSTALHD_CODEC_ID_WMV3;
-+        m_pFormatName = "chd-wmv3";
-+      break;
-+      default:
-+        return false;
-+      break;
 +    }
-+
-+    m_Codec = CCrystalHD::GetInstance();
-+    if (!m_Codec)
-+    {
-+      CLog::Log(LOGERROR, "%s: Failed to open Broadcom Crystal HD Codec", __MODULE_NAME__);
-+      return false;
-+    }
-+
-+    if (m_Codec && !m_Codec->OpenDecoder(m_CodecType, hints))
-+    {
-+      CLog::Log(LOGERROR, "%s: Failed to open Broadcom Crystal HD Codec", __MODULE_NAME__);
-+      return false;
-+    }
-+
-+    // default duration to 23.976 fps, have to guess something.
-+    m_Duration = (DVD_TIME_BASE / (24.0 * 1000.0/1001.0));
-+    m_DropPictures = false;
-+
-+    CLog::Log(LOGINFO, "%s: Opened Broadcom Crystal HD Codec", __MODULE_NAME__);
-+    return true;
 +  }
-+
 +  return false;
++
 +}
 +
 +void CDVDVideoCodecCrystalHD::Dispose(void)
@@ -2695,7 +2597,7 @@ index 0000000..56f0ae0
 +    {
 +      // Deep crap error, this should never happen unless we run away pulling demuxer pkts.
 +      CLog::Log(LOGDEBUG, "%s: m_pInputThread->AddInput full.", __MODULE_NAME__);
-+      Sleep(10);
++      usleep(10000);
 +    }
 +  }
 +
@@ -2732,11 +2634,11 @@ index 0000000..56f0ae0
 +}
 +
 +#endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
 new file mode 100644
-index 0000000..cc36c29
+index 0000000..71f37e8
 --- /dev/null
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
 @@ -0,0 +1,51 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
@@ -2768,7 +2670,7 @@ index 0000000..cc36c29
 +class CDVDVideoCodecCrystalHD : public CDVDVideoCodec
 +{
 +public:
-+  CDVDVideoCodecCrystalHD();
++  CDVDVideoCodecCrystalHD(CProcessInfo &processInfo);
 +  virtual ~CDVDVideoCodecCrystalHD();
 +
 +  // Required overrides
@@ -2789,36 +2691,37 @@ index 0000000..cc36c29
 +};
 +
 +#endif
-diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in b/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
-index 56ec6a3..5592bfe 100644
---- a/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
-+++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/Makefile.in
-@@ -11,6 +11,10 @@ endif
- ifeq (@USE_VAAPI@,1)
- SRCS += VAAPI.cpp
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in b/xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in
+index 62d44ce..d5fa744 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in
+@@ -34,6 +34,11 @@ ifeq (@USE_MMAL@,1)
+ SRCS += MMALCodec.cpp MMALFFmpeg.cpp
  endif
+ 
 +ifeq (@USE_CRYSTALHD@,1)
 +SRCS += CrystalHD.cpp
 +SRCS += DVDVideoCodecCrystalHD.cpp
 +endif
- ifeq ($(findstring osx,@ARCH@),osx)
- SRCS += DVDVideoCodecVDA.cpp
- SRCS += VDA.cpp
++
+ LIB=Video.a
+ 
+ include @abs_top_srcdir@/Makefile.include
 diff --git a/xbmc/settings/SettingConditions.cpp b/xbmc/settings/SettingConditions.cpp
-index ed62e42..63b6c66 100644
+index 08116f0..54ec831 100644
 --- a/xbmc/settings/SettingConditions.cpp
 +++ b/xbmc/settings/SettingConditions.cpp
 @@ -29,6 +29,9 @@
- #include "android/activity/AndroidFeatures.h"
+ #include "platform/android/activity/AndroidFeatures.h"
  #endif // defined(TARGET_ANDROID)
  #include "cores/AudioEngine/AEFactory.h"
 +#if defined(HAVE_LIBCRYSTALHD)
-+#include "cores/dvdplayer/DVDCodecs/Video/CrystalHD.h"
++#include "cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h"
 +#endif // defined(HAVE_LIBCRYSTALHD)
- #include "cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h"
+ #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
  #include "guilib/LocalizeStrings.h"
  #include "peripherals/Peripherals.h"
-@@ -221,6 +224,11 @@ void CSettingConditions::Initialize()
+@@ -305,6 +308,11 @@ void CSettingConditions::Initialize()
  #ifdef HAS_ZEROCONF
    m_simpleConditions.insert("has_zeroconf");
  #endif
@@ -2830,18 +2733,6 @@ index ed62e42..63b6c66 100644
  #ifdef HAVE_LIBOPENMAX
    m_simpleConditions.insert("have_libopenmax");
  #endif
-diff --git a/xbmc/system.h b/xbmc/system.h
-index 8e8b2f9..df8bccb 100644
---- a/xbmc/system.h
-+++ b/xbmc/system.h
-@@ -109,6 +109,7 @@
- #define HAS_WIN32_NETWORK
- #define HAS_IRSERVERSUITE
- #define HAS_AUDIO
-+#define HAVE_LIBCRYSTALHD 2
- #define HAS_WEB_SERVER
- #define HAS_WEB_INTERFACE
- #define HAVE_LIBSSH
 -- 
-2.1.0
+2.7.4
 
