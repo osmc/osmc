@@ -57,8 +57,6 @@ if [ ! -e /var/run/fb_resolution ]; then
 fi
 
 while true; do
-	umount /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq >/dev/null 2>&1
-	mount --bind /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 
 	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
 	if [ -f /home/osmc/.kodi.bin ]; then KODI=/home/osmc/.kodi.bin; else KODI=/usr/lib/kodi/kodi.bin; fi
