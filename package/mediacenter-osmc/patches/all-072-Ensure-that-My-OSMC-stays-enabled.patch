@@ -1,0 +1,29 @@
+From ebf2e6911cd5bca985d5d550b6ea36a1c5dbee08 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Sep 2016 16:19:26 +0100
+Subject: [PATCH] Ensure that My OSMC stays enabled if Addons.db is removed
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonDatabase.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
+index 76fdb11..2204fe7 100644
+--- a/xbmc/addons/AddonDatabase.cpp
++++ b/xbmc/addons/AddonDatabase.cpp
+@@ -358,6 +358,11 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+       // Set origin *only* for addons that do not have one yet as it may have been changed by an update.
+       m_pDS->exec(PrepareSQL("UPDATE installed SET origin='%s' WHERE addonID='%s' AND origin=''",
+           ORIGIN_SYSTEM, id.c_str()));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'script.module.osmcsetting.%%'"));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.osmccommon'"));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.xmltodict'"));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.elementtree'"));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='service.osmc.settings'"));
+     }
+ 
+     CommitTransaction();
+-- 
+2.7.4
+
