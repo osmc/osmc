@@ -1,0 +1,26 @@
+From 8027d1ed7d03448c1fd19e00b48cde3cc07e5ba4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Sep 2016 15:13:06 +0100
+Subject: [PATCH] Enable unknown sources by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index fa77cca..8aa1964 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2794,7 +2794,7 @@
+         </setting>
+         <setting id="addons.unknownsources" type="boolean" label="36615" help="36616">
+           <level>0</level>
+-          <default>false</default>
++          <default>true</default>
+           <control type="toggle" />
+         </setting>
+       </group>
+-- 
+2.7.4
+
