@@ -218,8 +218,11 @@ namespace io
                {
                    QString ejectable = QString(line.split(":").at(1).simplified());
                    utils::writeLog("Ejectable-Line: " + line);
-                   if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive))
+
+                   if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive)
+                       || 0 == QString("Removable").compare(ejectable, Qt::CaseInsensitive))
                        isEjectable = true;
+
                    utils::writeLog("Determined " + ejectable + " as ejactableProperty for " + diskPath);
                }
                else if (line.simplified().startsWith("Protocol:"))
@@ -236,13 +239,10 @@ namespace io
                    utils::writeLog("R/O-Line: " + line);
                    QString readOnlyMedia = QString(line.split(":").at(1).simplified());
                    utils::writeLog("parsed/split/simplified readOnly line would have been: " + readOnlyMedia);
-                   /*
+
                    if (0 == QString("Yes").compare(readOnlyMedia, Qt::CaseInsensitive))
                        isReadOnly = true;
-                       */
 
-                   utils::writeLog("Using experimental 'contains'");
-                   isReadOnly = QString(line.split(":").at(1).simplified()).contains("Yes");
                    utils::writeLog("Determined " + readOnlyMedia + " as readOnlyMedia for " + diskPath);
                    utils::writeLog(QString("Decided to be r/o: ").append(isReadOnly ? "yes" : "no"));
                }
