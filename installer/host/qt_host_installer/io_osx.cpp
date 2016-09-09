@@ -70,10 +70,22 @@ namespace io
 
                deviceSpace.remove("*");
                DiskDevice *nd = new DiskDevice(i, devicePath, deviceSpace);
+               utils::writeLog("=================================================");
+               utils::writeLog("Starting to parse " + devicePath + " for additional info\n");
                nd = addAdditionalInfo(nd);
 
                if (nd->getIsWritable())
+               {
+                   utils::writeLog("Parsed device as writable. Appending.");
                    devices.append(nd);
+               }
+               else
+               {
+                   utils::writeLog("Parsed device as NON-writable. NOT Appending.");
+               }
+               utils::writeLog("\n");
+               utils::writeLog("Finished parsing additional info for " + devicePath);
+               utils::writeLog("=================================================\n");
            }
        }
        return devices;
@@ -205,40 +217,52 @@ namespace io
                if (line.simplified().startsWith("Ejectable:") || line.simplified().startsWith("Removable Media:"))
                {
                    QString ejectable = QString(line.split(":").at(1).simplified());
-                   if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive))
+                   utils::writeLog("Ejectable-Line: " + line);
+
+                   if (0 == QString("Yes").compare(ejectable, Qt::CaseInsensitive)
+                       || 0 == QString("Removable").compare(ejectable, Qt::CaseInsensitive))
                        isEjectable = true;
+
                    utils::writeLog("Determined " + ejectable + " as ejactableProperty for " + diskPath);
                }
                else if (line.simplified().startsWith("Protocol:"))
                {
+                   utils::writeLog("Protocol-Line: " + line);
                    QString protocol = QString(line.split(":").at(1).simplified());
                    if (0 == QString("Disk Image").compare(protocol, Qt::CaseInsensitive))
                        isDmg = true;
                    utils::writeLog("Determined " + protocol + " as protocol for " + diskPath);
-                   utils::writeLog("Decided to be a DMG: " + isDmg ? "yes" : "no");
+                   utils::writeLog(QString("Decided to be a DMG: ").append(isDmg ? "yes" : "no"));
                }
                else if (line.simplified().startsWith("Read-Only Media:"))
                {
+                   utils::writeLog("R/O-Line: " + line);
                    QString readOnlyMedia = QString(line.split(":").at(1).simplified());
+                   utils::writeLog("parsed/split/simplified readOnly line would have been: " + readOnlyMedia);
+
                    if (0 == QString("Yes").compare(readOnlyMedia, Qt::CaseInsensitive))
                        isReadOnly = true;
+
                    utils::writeLog("Determined " + readOnlyMedia + " as readOnlyMedia for " + diskPath);
-                   utils::writeLog("Decided to be r/o: " + isReadOnly ? "yes" : "no");
+                   utils::writeLog(QString("Decided to be r/o: ").append(isReadOnly ? "yes" : "no"));
                }
                else if (line.simplified().contains("Media Name"))
                {
+                   utils::writeLog("MediaName-Line: " + line);
                    QString label = QString(line.split(":").at(1).simplified());
                    diskDevice->setLabel(label);
                }
-               if (isEjectable && (!isDmg && !isReadOnly))
-                  diskDevice->setIsWritable(true);
-               else
-                   utils::writeLog("Decided that " + diskPath + " is not writable to us");
-
                /* advance to next line */
                line = stdoutStream.readLine();
            }
+           if (isEjectable && (!isDmg && !isReadOnly)) {
+              utils::writeLog(QString("isEjectable: ").append(isEjectable ? "yes" : "no").append("; isDmg: ").append(isDmg ? "yes" : "no").append("; isReadOnly: ").append(isReadOnly ? "yes" : "no"));
+              diskDevice->setIsWritable(true);
+           }
+           else
+               utils::writeLog("Decided that " + diskPath + " is not writable to us");
        }
+
        return diskDevice;
    }
 }
