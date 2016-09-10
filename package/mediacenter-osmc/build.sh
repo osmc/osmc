@@ -160,9 +160,6 @@ then
 		handle_dep "xserver-xorg-dev"
 		handle_dep "libxrandr-dev"
 		handle_dep "i386-libcrossguid-dev-osmc"
-                handle_dep "i386-libdvdnav-dev-osmc"
-                handle_dep "i386-libdvdread-dev-osmc"
-                handle_dep "i386-libdvdcss-dev-osmc"
 		handle_dep "libegl1-mesa-dev"
 	fi
 	if [ "$1" == "pc" ]
