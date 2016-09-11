@@ -1,4 +1,4 @@
-From babcfd28dd7505ee203fb5986e8ab57b532473d1 Mon Sep 17 00:00:00 2001
+From e6f905e70acba36fcae8e8c30fca5be16f930063 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 00:19:40 +0000
 Subject: [PATCH] Add settings for configuring button repeats
@@ -10,14 +10,13 @@ Subject: [PATCH] Add settings for configuring button repeats
  3 files changed, 35 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index f3f939f..82903ea 100644
+index 7a4cbf0..c691a55 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -18125,3 +18125,19 @@ msgstr ""
- msgctxt "#38023"
- msgid "Set my rating"
+@@ -19511,6 +19511,22 @@ msgctxt "#38046"
+ msgid "All roles"
  msgstr ""
-+
+ 
 +#: system/peripherals.xml
 +msgctxt "#38050"
 +msgid "Remote button press delay before repeating (ms)"
@@ -33,8 +32,12 @@ index f3f939f..82903ea 100644
 +msgid "Remote button press release time (ms)"
 +msgstr ""
 +
++
+ #empty strings from id 38047 to 38099
+ 
+ #. Description of section #14200 "Player""
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index c7d6dab..5624080 100644
+index 3f6221e..924076e 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
 @@ -31,7 +31,9 @@
@@ -49,10 +52,10 @@ index c7d6dab..5624080 100644
  
    <peripheral vendor_product="2548:1001,2548:1002" bus="usb" name="Pulse-Eight CEC Adapter" mapTo="cec">
 diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-index 50b75ff..2693dd4 100644
+index 74ec964..092a115 100644
 --- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 +++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-@@ -1276,6 +1276,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+@@ -1287,6 +1287,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
    m_configuration.bSendInactiveSource = config.bSendInactiveSource;
    bChanged |= SetSetting("send_inactive_source", m_configuration.bSendInactiveSource == 1);
  
@@ -73,7 +76,7 @@ index 50b75ff..2693dd4 100644
    m_configuration.iFirmwareVersion = config.iFirmwareVersion;
    m_configuration.bShutdownOnStandby = config.bShutdownOnStandby;
  
-@@ -1379,6 +1393,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+@@ -1390,6 +1404,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
  #else
    // backwards compatibility. will be removed once the next major release of libCEC is out
    m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
@@ -83,5 +86,5 @@ index 50b75ff..2693dd4 100644
  
    if (GetSettingBool("pause_playback_on_deactivate"))
 -- 
-2.1.0
+2.7.4
 

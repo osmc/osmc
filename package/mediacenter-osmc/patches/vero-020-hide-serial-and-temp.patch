@@ -1,4 +1,4 @@
-From 565e7a8552278516462d3f3690f0dbb16f9ff610 Mon Sep 17 00:00:00 2001
+From fede93f3463bc8542000ffd231693cab2b6fc77e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 3 Jun 2015 16:09:50 +0100
 Subject: [PATCH] Hide Vero serial number and temperature
@@ -9,7 +9,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 7 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 0ce6f87..bb39455 100644
+index a8da2ba..aed48d3 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
 @@ -145,13 +145,6 @@ void CGUIWindowSystemInfo::FrameMove()
@@ -23,9 +23,9 @@ index 0ce6f87..bb39455 100644
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());
 -#endif
 -    SetControlLabel(i++, "%s %s", 22011, SYSTEM_CPU_TEMPERATURE);
- #if !defined(__arm__) || defined(TARGET_RASPBERRY_PI)
+ #if (!defined(__arm__) && !defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
      SetControlLabel(i++, "%s %s", 13284, SYSTEM_CPUFREQUENCY);
  #endif
 -- 
-2.1.0
+2.7.4
 

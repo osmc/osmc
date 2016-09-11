@@ -1,20 +1,20 @@
-From f5a87e9707eb31144c52661189cd0188feb28676 Mon Sep 17 00:00:00 2001
+From 7c37d23aed00daf83c57b5b5b86252d47aeb1154 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 3 Jun 2015 14:12:58 +0100
 Subject: [PATCH] Create configuration option for Vero
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- configure.ac | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ configure.ac | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 8c1e412..2211bb9 100644
+index acf4ce6..04ed84c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -755,6 +755,17 @@ case $use_platform in
-      CFLAGS="$CFLAGS"
-      CXXFLAGS="$CXXFLAGS"
+@@ -677,6 +677,17 @@ case $use_platform in
+      use_neon=yes
+      use_cpu=cortex-a7
       ;;
 +   vero)
 +     use_static_ffmpeg=yes
@@ -29,7 +29,7 @@ index 8c1e412..2211bb9 100644
 +     ;;
  esac
  
- if test "$host_vendor" = "apple"; then
+ if test "$target_platform" = "target_raspberry_pi" ; then
 -- 
-2.1.0
+2.7.4
 
