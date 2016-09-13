@@ -19,10 +19,15 @@ syspaths="/sys/class/video/axis
 /sys/class/video/screen_mode
 /sys/class/video/disable_video
 /sys/class/tsync/pts_pcrscr
+/sys/class/tsync/enable
 /sys/class/audiodsp/digital_raw
 /sys/class/ppmgr/ppmgr_3d_mode
 /sys/class/display/mode
-/sys/class/audiodsp/digital_codec"
+/sys/class/audiodsp/digital_codec
+/sys/module/amlvideodri/parameters/freerun_mode
+/sys/module/amvideo/parameters/omx_pts
+/sys/class/vfm/map
+/dev/video10"
 
 for syspath in $syspaths; do
         chgrp -R video $syspath

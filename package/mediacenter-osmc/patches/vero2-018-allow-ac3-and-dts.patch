@@ -1,15 +1,15 @@
-From eabe736a67ab839a44a01453d5d4a5cd08744c48 Mon Sep 17 00:00:00 2001
+From 8ecb89576dd33a6e59cc1793e85975aaa10f9453 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 13 Feb 2016 04:32:53 +0000
 Subject: [PATCH] Hacky way to enable passthrough on Vero 2
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 35 ++++++++++++++++++++++++++++-
- 1 file changed, 34 insertions(+), 1 deletion(-)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 35 +++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 78f272b..c23cd55 100644
+index 531f308..2d4af06 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 @@ -38,6 +38,7 @@
@@ -19,33 +19,35 @@ index 78f272b..c23cd55 100644
 +#include "utils/SysfsUtils.h"
  #endif
  
- 
-@@ -538,7 +539,37 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ #ifdef TARGET_POSIX
+@@ -538,6 +539,40 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    if (aml_present())
    {
      aml_set_audio_passthrough(m_passthrough);
--    device = "default";
 +
 +    int aml_digital_codec;
 +    switch(format.m_dataFormat)
 +    {
-+      case AE_FMT_AC3:
++      case CAEStreamInfo::STREAM_TYPE_AC3:
 +        aml_digital_codec = 2;
 +        break;
 +
-+      case AE_FMT_DTS:
++      case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
++      case CAEStreamInfo::STREAM_TYPE_DTS_1024:
++      case CAEStreamInfo::STREAM_TYPE_DTS_2048:
++      case CAEStreamInfo::STREAM_TYPE_DTS_512:
 +        aml_digital_codec = 3;
 +        break;
 +
-+      case AE_FMT_EAC3:
++      case CAEStreamInfo::STREAM_TYPE_EAC3:
 +        aml_digital_codec = 4;
 +        break;
 +
-+      case AE_FMT_DTSHD:
++      case CAEStreamInfo::STREAM_TYPE_DTSHD:
 +        aml_digital_codec = 5;
 +        break;
 +
-+      case AE_FMT_TRUEHD:
++      case CAEStreamInfo::STREAM_TYPE_TRUEHD:
 +        aml_digital_codec = 7;
 +        break;
 +
@@ -58,3 +60,7 @@ index 78f272b..c23cd55 100644
 +    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
    }
  #endif
+ 
+-- 
+2.7.4
+

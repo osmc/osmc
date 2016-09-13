@@ -1,7 +1,7 @@
-From a236c9c7b83b7445587e9d139067da79a66c4f0d Mon Sep 17 00:00:00 2001
+From 87d7ca21866f62c62ea373b7f897e8218c5266bc Mon Sep 17 00:00:00 2001
 From: Alex Deryskyba <alex@codesnake.com>
 Date: Fri, 19 Sep 2014 01:55:12 +0300
-Subject: [PATCH 3/9] Change the sample rates that are supported by ALSA but
+Subject: [PATCH] Change the sample rates that are supported by ALSA but
  unsupported by HDMI to the closest supported value
 
 Conflicts:
@@ -12,10 +12,10 @@ Conflicts:
  1 file changed, 20 insertions(+)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index ae21ca6..464eb8d 100644
+index 8d51b89..35e16be 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -667,6 +667,26 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
+@@ -697,6 +697,26 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
    snd_pcm_hw_params_set_access(m_pcm, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
  
    unsigned int sampleRate   = inconfig.sampleRate;
@@ -43,5 +43,5 @@ index ae21ca6..464eb8d 100644
  
    unsigned int channelCount = inconfig.channels;
 -- 
-2.1.0
+2.7.4
 
