@@ -328,8 +328,7 @@ then
                 --with-platform=vero2 \
                 --build=arm-linux
         fi
-	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
-	umount /proc/ > /dev/null 2>&1
+	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
