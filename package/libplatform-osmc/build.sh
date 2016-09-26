@@ -25,7 +25,7 @@ then
         echo $VERSION_DEV >> files-dev/DEBIAN/control
         echo "Depends: ${1}-libplatform-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
-	handle_dep "cmake"
+	handle_dep "${1}-cmake-osmc"
 	echo "Package: ${1}-libplatform-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libplatform-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/platform-*
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/osmc -DCMAKE_INSTALL_LIBDIR=/usr/osmc/lib -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/osmc/lib .
