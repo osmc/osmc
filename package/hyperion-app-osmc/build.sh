@@ -26,6 +26,14 @@ then
         then
                 handle_dep "rbp-userland-dev-osmc"
         fi
+	if [ "$1" == "rbp1" ]
+	then
+		handle_dep "armv6l-cmake-osmc"
+	fi
+	if [ "$1" == "rbp2" ]
+        then
+                handle_dep "armv7-cmake-osmc"
+        fi
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-hyperion-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-hyperion-app-osmc"
     	echo -e "Hyperion\nhyperion.service" > $APP_FILE
