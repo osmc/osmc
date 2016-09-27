@@ -114,7 +114,6 @@ function build_in_env()
 	update_sources
 	DEP=${1}
 	test $DEP == rbp2 && DEP="armv7"
-	test $DEP == imx6 && DEP="armv7"
 	test $DEP == vero && DEP="armv7"
 	test $DEP == vero1 && DEP="armv7"
 	test $DEP == vero2 && DEP="armv7"
