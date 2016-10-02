@@ -1,0 +1,33 @@
+From 99fa6c674bb16822d50a7f2b79f727ee7db2b882 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 7 Oct 2016 17:43:51 +0100
+Subject: [PATCH] Fix an issue when passing multiple addons to ADDONS_TO_BUILD
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ project/cmake/addons/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/project/cmake/addons/CMakeLists.txt b/project/cmake/addons/CMakeLists.txt
+index 1b609ae..8058576 100644
+--- a/project/cmake/addons/CMakeLists.txt
++++ b/project/cmake/addons/CMakeLists.txt
+@@ -120,7 +120,6 @@ if(NOT ADDONS_TO_BUILD)
+ else()
+   string(STRIP "${ADDONS_TO_BUILD}" ADDONS_TO_BUILD)
+   message(STATUS "Building following addons: ${ADDONS_TO_BUILD}")
+-  separate_arguments(ADDONS_TO_BUILD)
+ endif()
+ 
+ if(NOT ADDONS_DEFINITION_DIR)
+@@ -224,6 +223,7 @@ endif()
+ # error either in ADDONS_TO_BUILD or in the directory configuration.
+ set(SUPPORTED_ADDON_FOUND FALSE)
+ 
++separate_arguments(ADDONS_TO_BUILD)
+ foreach(addon ${addons})
+   if(NOT (addon MATCHES platforms.txt))
+     file(STRINGS ${addon} def)
+-- 
+2.7.4
+
