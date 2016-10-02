@@ -225,8 +225,9 @@ then
 	ARCH=$(arch)
 	export ARCH
 	popd
+	# Move all of the Debian packages so they are where we would expect them
+	mv src/${1}-*.deb .
 	# Disassemble kernel image package to add device tree overlays, additional out of tree modules etc
-	mv src/${1}-image*.deb .
 	dpkg -x ${1}-image*.deb files-image/
 	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
 	rm ${1}-image*.deb
@@ -234,7 +235,6 @@ then
 	# Disassemble kernel headers package to include full headers (upstream Debian bug...)
 	if [ "$ARCH" == "armv7l" ]
 	then
-		mv src/${1}-headers*.deb .
 		mkdir -p files-headers/
 		dpkg -x ${1}-headers*.deb files-headers/
 		dpkg-deb -e ${1}-headers*.deb files-headers/DEBIAN
