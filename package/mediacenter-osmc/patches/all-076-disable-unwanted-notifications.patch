@@ -1,0 +1,35 @@
+From 77d57d47b4cca83be72ce87b5969d4a6462f3984 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 4 Oct 2016 14:52:58 +0100
+Subject: [PATCH] Krypton: disable unwanted notifications from 3rd parties
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonManager.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/addons/AddonManager.cpp b/xbmc/addons/AddonManager.cpp
+index 2d6e82a..666fbb9 100644
+--- a/xbmc/addons/AddonManager.cpp
++++ b/xbmc/addons/AddonManager.cpp
+@@ -24,6 +24,7 @@
+ #include <iterator>
+ #include <memory>
+ #include <utility>
++#include <regex>
+ 
+ #include "Addon.h"
+ #include "addons/AddonBuilder.h"
+@@ -796,6 +797,9 @@ bool CAddonMgr::EnableAddon(const std::string& id)
+ bool CAddonMgr::IsAddonDisabled(const std::string& ID)
+ {
+   CSingleLock lock(m_critSection);
++  std::regex addons_disable("plugin.program.xbmchub.notifications");
++  if (regex_match(ID, addons_disable))
++    return true;
+   return m_disabled.find(ID) != m_disabled.end();
+ }
+ 
+-- 
+2.7.4
+
