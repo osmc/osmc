@@ -1,0 +1,149 @@
+From 0fb6de50231c6be4d89eaefc51f6263109df6f1d Mon Sep 17 00:00:00 2001
+From: Gerald Barker <gezb@users.noreply.github.com>
+Date: Sun, 2 Oct 2016 12:55:57 +0100
+Subject: [PATCH] Allow control of BTPlayer from python
+
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 33 ++++++++++++++++-
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 69 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index 0b921a8..13ed73e 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -67,6 +67,10 @@ using namespace KODI::MESSAGING;
+ #include "linux/XMemUtils.h"
+ #endif
+ 
++#include "FileItem.h"
++#include "cores/playercorefactory/PlayerCoreConfig.h"
++#include "cores/playercorefactory/PlayerCoreFactory.h"
++
+ namespace XBMCAddon
+ {
+ 
+@@ -147,7 +151,7 @@ namespace XBMCAddon
+         {
+           DelayedCallGuard dcguard;
+           lh = dcguard.getLanguageHook(); // borrow this
+-          long nextSleep = endTime.MillisLeft();
++	  long nextSleep = endTime.MillisLeft();
+           if (nextSleep > 100)
+             nextSleep = 100; // only sleep for 100 millis
+           ::Sleep(nextSleep);
+@@ -528,7 +532,34 @@ namespace XBMCAddon
+     {
+       return CSysInfo::GetUserAgent();
+     }
++    
++    void startBTPlayer(const char* dbus_path)
++    {
++      XBMC_TRACE
++      CFileItemList list;
++      CFileItemPtr item;
++      item.reset(new CFileItem(dbus_path, false));
++      list.Add(item);
++      
++      std::string playerName = std::string("BTPlayer");
++      auto fileItemList = new CFileItemList(); //don't delete
++      fileItemList->Copy(list);
++      
++      CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_PLAY, -1, -1, static_cast<void*>(fileItemList), playerName);
++    }
++    
++    void stopBTPlayer()
++    {
++      CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_STOP);
++      // To Implement after VideoPlayer changes
++    }
++    
++    bool isBTPlayerActive()
++    {
++      return g_application.GetCurrentPlayer() == "BTPlayer";
++    }
+ 
++    
+     int getSERVER_WEBSERVER() { return CApplication::ES_WEBSERVER; }
+     int getSERVER_AIRPLAYSERVER() { return CApplication::ES_AIRPLAYSERVER; }
+     int getSERVER_UPNPSERVER() { return CApplication::ES_UPNPSERVER; }
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 22e5fcf..fa7d572 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -976,6 +976,75 @@ namespace XBMCAddon
+ #else
+     String convertLanguage(const char* language, int format);
+ #endif
++
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.startBTPlayer(dbus_path) }
++    ///-----------------------------------------------------------------------
++    /// Starts BTPlayer
++    ///
++    /// @param dbus_path           The full DBus path of the device to monitor
++    ///                            for A2DP events
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.startBTPlayer("/org/bluez/hci0/dev_FXX_XX_XX_XX_XX_XX_XX/player0h")
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    startBTPlayer();
++#else
++    void startBTPlayer(const char* dbus_path);
++#endif
++
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.stopBTPlayer() }
++    ///-----------------------------------------------------------------------
++    /// Stops BTPlayer
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.stopBTPlayer()
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    stopBTPlayer();
++#else
++    void stopBTPlayer();
++#endif
++
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.isBTPlayerActive() }
++    ///-----------------------------------------------------------------------
++    /// Returns true if BTPlayer is active
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.isBTPlayerActive()
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    isBTPlayerActive();
++#else
++    bool isBTPlayerActive();
++#endif
++
+     //@}
+ #ifndef DOXYGEN_SHOULD_SKIP_THIS
+     SWIG_CONSTANT_FROM_GETTER(int,SERVER_WEBSERVER);
