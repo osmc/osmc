@@ -15,6 +15,7 @@ export BUILD_OPTION_USE_MULTIARCH=32
 export BUILD_OPTION_USE_CCACHE=64
 export BUILD_OPTION_PREFER_LIBOSMC=128
 export BUILD_OPTION_FASTER_APT=256
+export BUILD_OPTION_NEEDS_SWAP=512
 export BUILD_OPTION_DEFAULTS=$(($BUILD_OPTION_LANGC + $BUILD_OPTION_USE_O3 + $BUILD_OPTION_USE_NOFP + $BUILD_OPTION_USE_CCACHE + $BUILD_OPTION_PREFER_LIBOSMC + $BUILD_OPTION_FASTER_APT))
 
 function fix_arch_ctl()
@@ -110,6 +111,26 @@ function build_in_env()
             export CPPFLAGS+="$BUILD_FLAGS"
 	    return 99
 	fi
+	# Set swap outside of chroot() if needed
+	if ((($BUILD_OPTS & $BUILD_OPTION_NEEDS_SWAP) == $BUILD_OPTION_NEEDS_SWAP))
+        then
+            if [ ! -f /opt/osmc-tc/swap ]
+            then
+                dd if=/dev/zero of=/opt/osmc-tc/swap bs=1M count=384
+                mkswap /opt/osmc-tc/swap
+                chmod 0600 /opt/osmc-tc/swap
+            fi
+            if ! grep -q /opt/osmc-tc/swap /proc/swaps
+            then
+                swapon /opt/osmc-tc/swap
+            fi
+        else
+            # This build doesn't want it, but we might still be swapping
+            if grep -q /opt/osmc-tc/swap /proc/swaps
+            then
+                swapoff /opt/osmc-tc/swap
+            fi
+        fi
 	umount /proc >/dev/null 2>&1
 	update_sources
 	DEP=${1}
