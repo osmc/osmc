@@ -706,7 +706,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 			if kb.isConfirmed():
 				self.email = kb.getText()
 				requests.post('https://osmc.tv/osmc/api/newsletter/?p=subscribe&id=1', 
-								data={'email': self.email, 'subscribe': 'subscribe'}
+								data={'email': self.email, 'subscribe': 'subscribe', 'list[7]': 'signup', 'listname[7]': 'Device'}
 							)
 
 
