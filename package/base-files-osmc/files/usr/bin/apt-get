@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# even with our sudo preservation hack, we can't set this up as a profile.d function and export it
+# this stops people running apt-get upgrade and breaking their system
+
+REAL_APT="/usr/bin/apt-get-real"
+
+    cmd=$*
+    case $cmd in
+    upgrade)
+        echo "Running apt-get upgrade on your system can cause adverse effects on your system"
+        echo "Use apt-get dist-upgrade, which is the proper way to administer a Debian / Ubuntu system"
+        echo "For more information about updates, see https://osmc.tv/wiki/general/keeping-your-osmc-system-up-to-date/"
+    ;;
+    nowarn-upgrade)
+        echo "Waiting 10 seconds before running potentially dangerous apt-get upgrade. Press CTRL + C to abort"
+	sleep 10
+        # Let's know that they ran this
+        touch /home/osmc/.did_non_dist_upgrade
+	$REAL_APT upgrade
+    ;;
+    *)
+	$REAL_APT "$@"
+    ;;
+    esac

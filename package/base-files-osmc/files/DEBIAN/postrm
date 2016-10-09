@@ -19,4 +19,5 @@ if [ "$1" = "remove" ]; then
 	remove_divert /etc/os-release.distributed /etc/os-release
 	remove_divert /usr/share/base-files/motd.distributed /usr/share/base-files/motd
 	remove_divert /etc/nsswitch.conf.distributed /etc/nsswitch.conf
+	remove_divert /usr/bin/apt-get-real /usr/bin/apt-get
 fi
