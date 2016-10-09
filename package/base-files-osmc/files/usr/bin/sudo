@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# sudo does not preserve environment variables or PATH unless it's executed with sudo -E
+# this is a cheap hack that lets us keep PATH and environment variables intact
+SUDO_REAL="/usr/bin/sudo-real"
+
+if [ -z "$1" ]
+then
+    $SUDO_REAL
+else
+    $SUDO_REAL -E "$@"
+fi
