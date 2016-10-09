@@ -1,1 +1,1 @@
-PATH="$PATH:/usr/osmc/bin"
+export PATH="$PATH:/usr/osmc/bin"
