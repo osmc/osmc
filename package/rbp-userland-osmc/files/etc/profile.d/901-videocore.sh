@@ -1,1 +1,1 @@
-PATH="$PATH:/opt/vc/bin"
+export PATH="$PATH:/opt/vc/bin"
