@@ -206,6 +206,12 @@ function pull_source()
 	echo -e "Detected Git source"
 	git clone ${1} ${2}
 	if [ $? != 0 ]; then echo "Source checkout failed" && exit 1; fi
+	if [ ! -z $3 ]
+	then
+	    pushd ${2}
+	    git reset --hard ${3}
+	    popd
+	fi
 	return
 	fi
 
