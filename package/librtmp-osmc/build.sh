@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "git://git.ffmpeg.org/rtmpdump" "$(pwd)/src"
+pull_source "git://git.ffmpeg.org/rtmpdump" "$(pwd)/src" "fa8646daeb19dfd12c181f7d19de708d623704c0"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "librtmp-osmc"
