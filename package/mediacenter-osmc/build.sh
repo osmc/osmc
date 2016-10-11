@@ -16,6 +16,10 @@ if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
 BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 BUILD_OPTS=$(($BUILD_OPTS - $BUILD_OPTION_USE_CCACHE))
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
+then
+    BUILD_OPTS=$(($BUILD_OPTS + $BUILD_OPTION_NEEDS_SWAP))
+fi
 build_in_env "${1}" $(pwd) "mediacenter-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
