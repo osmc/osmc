@@ -18,9 +18,12 @@ then
 	update_sources
 	handle_dep "libusb-dev"
 	handle_dep "autoconf"
+	handle_dep "automake"
+	handle_dep "libtool"
 	echo "Package: ${1}-lirc-osmc" >> files/DEBIAN/control
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
+	autoreconf -vif
 	./configure --prefix=/usr --without-x --with-driver=userspace
 	$BUILD
 	make install DESTDIR=${out}
