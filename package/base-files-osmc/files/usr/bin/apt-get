@@ -15,8 +15,6 @@ REAL_APT="/usr/bin/apt-get-real"
     nowarn-upgrade)
         echo "Waiting 10 seconds before running potentially dangerous apt-get upgrade. Press CTRL + C to abort"
 	sleep 10
-        # Let's know that they ran this
-        touch /home/osmc/.did_non_dist_upgrade
 	$REAL_APT upgrade
     ;;
     *)
