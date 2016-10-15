@@ -1,0 +1,26 @@
+From 38700728e45e4c420ad7fda0f2e60f7ba6c725ae Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 15 Oct 2016 18:46:36 +0100
+Subject: [PATCH] Ensure that OSMC skin is enabled if upgrading from an older
+ version of Kodi
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonDatabase.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
+index 2204fe7..6ee6066 100644
+--- a/xbmc/addons/AddonDatabase.cpp
++++ b/xbmc/addons/AddonDatabase.cpp
+@@ -363,6 +363,7 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+       m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.xmltodict'"));
+       m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.elementtree'"));
+       m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='service.osmc.settings'"));
++      m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='skin.osmc'"));
+     }
+ 
+     CommitTransaction();
+-- 
+2.7.4
+
