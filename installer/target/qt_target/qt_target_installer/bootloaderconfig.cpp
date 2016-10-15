@@ -145,6 +145,8 @@ void BootloaderConfig::configureEnvironment()
             configStringList << "dtoverlay=" << preseed->getStringValue("vendor/dtoverlayparam") << "\n";
         else
             configStringList << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
+        if (preseed->getBoolValue("alsaoff"))
+                configStringList << "dtparam=audio=off\n";
         utils->writeToFile(configFile, configStringList, false);
         utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         configFile.close();
