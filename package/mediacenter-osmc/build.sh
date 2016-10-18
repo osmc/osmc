@@ -187,6 +187,7 @@ then
 		handle_dep "libxrandr-dev"
 		handle_dep "x11proto-randr-dev"
 		handle_dep "amd64-libcrossguid-dev-osmc"
+		handle_dep "libegl1-mesa-dev"
 		handle_dep "amd64-cmake-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
