@@ -27,11 +27,14 @@ then
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	mkdir -p ${out}/usr/bin
 	mkdir -p ${out}/sbin
-	cp -ar ply-image ${out}/usr/bin
-	cp -ar checkmodifier ${out}/sbin
-	cp -ar splash.png ${out}/usr
-	cp -ar splash_sad.png ${out}/usr
-	cp -ar splash_early ${out}/sbin/splash_early
+
+	cp -ar ply-image ${out}/usr/bin && chmod 755 ${out}/usr/bin/ply-image
+	cp -ar checkmodifier ${out}/sbin && chmod 755 ${out}/sbin/checkmodifier
+	cp -ar splash_early ${out}/sbin/splash_early && chmod 755 ${out}/sbin/splash_early
+
+	cp -ar splash.png ${out}/usr && chmod 664 ${out}/usr/splash.png
+	cp -ar splash_sad.png ${out}/usr && chmod 664 ${out}/usr/splash_sad.png
+
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files ${1}-splash-osmc.deb
