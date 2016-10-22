@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="33ec81a2a67e94cc25e4ee1da505e92a32f8bdc8"
+REV="577a0d05fc96d112bdb9419e6bb57cf0d448a258"
 pull_source "https://github.com/osmc/ply-lite/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -25,13 +25,8 @@ then
 	pushd src/ply-lite*
 	$BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
-	mkdir -p ${out}/usr/bin
-	mkdir -p ${out}/sbin
-	cp -ar ply-image ${out}/usr/bin
-	cp -ar checkmodifier ${out}/sbin
-	cp -ar splash.png ${out}/usr
-	cp -ar splash_sad.png ${out}/usr
-	cp -ar splash_early ${out}/sbin/splash_early
+	make install DESTDIR=${out}
+	if [ $? != 0 ]; then echo "Error occured during installation" && exit 1; fi
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files ${1}-splash-osmc.deb
