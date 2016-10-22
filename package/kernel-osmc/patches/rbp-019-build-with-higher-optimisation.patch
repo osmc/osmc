@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 91cfe8d..b2d777d 100644
+index b6ee4ce..fe24891 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -297,8 +297,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+@@ -301,8 +301,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
  
  HOSTCC       = gcc
  HOSTCXX      = g++
@@ -13,11 +13,15 @@ index 91cfe8d..b2d777d 100644
  
  ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
  HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
-@@ -614,7 +614,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+@@ -622,9 +622,9 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS	+= -Os
  else
+ ifdef CONFIG_PROFILE_ALL_BRANCHES
 -KBUILD_CFLAGS	+= -O2
-+KBUILD_CFLAGS  += -O3
++KBUILD_CFLAGS	+= -O3
+ else
+-KBUILD_CFLAGS   += -O2
++KBUILD_CFLAGS   += -O3
+ endif
  endif
  
