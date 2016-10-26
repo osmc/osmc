@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/osmc/libamcodec/archive/b47da3006d666dd46d6567250ca541250ead462f.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/osmc/libamcodec/archive/6d0344aa766cf12c7d4376d7a01911f35e11df7f.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching libamcodec source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libamcodec-osmc"
@@ -38,11 +38,10 @@ then
 	cp -ar amadec/*.so ${out}/usr/osmc/lib
 	$BUILD -C amcodec PREFIX="/usr/osmc"
 	if [ $? != 0 ]; then echo "Error occured building amcodec" && exit 1; fi
-	cp -ar amcodec/libamcodec.so.0.0 ${out}/usr/osmc/lib
+	cp -ar amcodec/*.so ${out}/usr/osmc/lib
 	cp -ar amcodec/include/*.h ../../files-dev/usr/osmc/include/amcodec
 	cp -ar amcodec/include/ppmgr/*.h ../../files-dev/usr/osmc/include/amcodec/ppmgr
 	cp -ar amcodec/include/amports/*.h ../../files-dev/usr/osmc/include/amcodec/amports
-	ln -sf libamcodec.so.0.0 ${out}/usr/osmc/lib/libamcodec.so
 	popd
         fix_arch_ctl "files/DEBIAN/control"
         fix_arch_ctl "files-dev/DEBIAN/control"
