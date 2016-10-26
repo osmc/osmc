@@ -165,6 +165,7 @@ function pull_source()
 	if ! command -v git >/dev/null 2>&1; then update_sources && verify_action && install_package "git" && verify_action; fi
 	if ! command -v svn >/dev/null 2>&1; then update_sources && verify_action && install_package "subversion" && verify_action; fi
 	if ! command -v wget >/dev/null 2>&1; then update_sources && verify_action && install_package "wget" && verify_action; fi
+	if ! command -v xz >/dev/null 2>&1; then update_sources && verify_action && install_package "xz-utils" && verify_action; fi
 	if [ -d ${2} ]
 	then
 		if [ "$2" != "." ]
