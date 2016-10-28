@@ -640,8 +640,8 @@ def soundcard_dac_config_set(kodi_setting, all_settings):
 		'hifiberry-dac-overlay',
 		'hifiberry-dacplus-overlay',
 		'hifiberry-digi-overlay',
-		'iqaudio-dac-overlay',
-		'iqaudio-dacplus-overlay'
+		'iqaudio-dac-overlay,unmute_amp',
+		'iqaudio-dacplus-overlay,unmute_amp'
 		]
 
 	try:
