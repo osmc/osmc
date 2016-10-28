@@ -1,0 +1,91 @@
+#!/bin/busybox sh
+
+export OPTION_DO_FSCK="1"
+export OPTION_FORCE_FSCK="0"
+export OPTION_ROOT="/dev/vero-nand/root"
+export OPTION_ROOTDELAY="0"
+export OPTION_FILESYSTEM="ext4"
+export OPTION_INIT="/sbin/splash_early"
+export OPTION_MOUNT_OPTIONS=""
+export OPTION_MOUNT_PATH="/real_root"
+
+hdmimode=720p60hz
+
+for arg in $(/bin/busybox cat /proc/cmdline)
+do
+     case ${arg} in
+	hdmimode=*)
+	   hdmimode=${arg#*=}
+	;;
+esac
+done
+
+# Wait until /dev/fb1 is ready
+while [ ! -c /dev/fb1 ] || [ ! -d /sys/class/graphics/fb1 ]
+do
+    /bin/busybox sleep 1
+done
+
+# Configure framebuffer X and Y size
+
+case $hdmimode in
+  480*)            X=720  Y=480  ;;
+  576*)            X=720  Y=576  ;;
+  720p*)           X=1280 Y=720  ;;
+  *)               X=1920 Y=1080 ;;
+esac
+
+/bin/busybox fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+/bin/busybox fbset -fb /dev/fb1 -g 32 32 32 32 32
+
+/bin/busybox sleep 1 # avoid race
+
+echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
+echo 1 > /sys/class/video/disable_video
+
+# Enable scaling for 4K output
+case $hdmimode in
+  4k*|smpte*|2160*)
+    echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
+    echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
+    echo 1920 > /sys/class/graphics/fb0/scale_width
+    echo 1080 > /sys/class/graphics/fb0/scale_height
+    echo 0x10001 > /sys/class/graphics/fb0/free_scale
+  ;;
+esac
+
+# Enable framebuffer device
+
+echo 0 > /sys/class/graphics/fb0/blank
+
+# Prevent static artefacts
+echo 1 > /sys/class/graphics/fb1/blank
+
+# Include deinterlacer into default VFM map
+echo rm default > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+
+# Better entropy
+for part in /sys/block/*/queue/add_random; do
+echo 0 > "$part"
+done
+
+# Set CPU speed properly
+echo 1536000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+
+# set smp_affinity
+#            Binary       Hex
+#    CPU 0    0001         1
+#    CPU 1    0010         2
+#    CPU 2    0100         4
+#    CPU 3    1000         8
+
+echo f > /proc/irq/231/smp_affinity  # hdmi_aocec
+echo 2 > /proc/irq/40/smp_affinity   # eth0
+echo 4 > /proc/irq/63/smp_affinity   # dwc_otg, dwc_otg_hcd:usb1
+echo 8 > /proc/irq/62/smp_affinity   # dwc_otg, dwc_otg_hcd:usb2, dwc_otg_pcd
+
+# Set up NAND
+# ToDo: only if bootfromsd
+/usr/sbin/lvchange -aly /dev/vero-nand/root --ignorelockingfailure >/dev/null 2>&1

@@ -39,7 +39,7 @@ then
 	if [ $? != 0 ]; then echo "Could not get e2fsprogs sources" && exit 1; fi
 	mkdir -p $(pwd)/e2fsprogs
 	tar -xvf e2fsprogs-${E2FSPROGS_VERSION}.tar.gz -C "$(pwd)/e2fsprogs"
-	if [ "$2" == "vero2" ]
+	if [ "$2" == "vero2" ] || [ "$2" == "vero3" ]
 	then
             # LVM support
 	    wget "ftp://sources.redhat.com/pub/lvm2/LVM2.${LVM_VERSION}.tgz"
@@ -61,10 +61,15 @@ pushd e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}
 $BUILD
 if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 popd
-if [ "$2" == "vero2" ]
+if [ "$2" == "vero2" ] || [ "$2" == "vero3" ]
 then
     echo "Compiling LVM2"
     pushd lvm2/LVM2.${LVM_VERSION}
+    if [ "$2" == "vero3" ]
+    then
+        ## configure too old for arm64
+        patch -p1 < ../../vero3-add-arm64-support.patch
+    fi
     ./configure --prefix=/usr
     $BUILD
     mkdir out
@@ -84,7 +89,7 @@ mkdir -p target/var
 mkdir -p target/etc
 mkdir -p target/dev
 mkdir -p target/run
-if [ "$2" == "vero2" ]
+if [ "$2" == "vero2" ] || [ "$2" == "vero3" ]
 then
     mkdir -p target/usr/sbin
     mkdir -p target/etc/lvm
@@ -94,9 +99,9 @@ install -m 0755 e2fsprogs/e2fsprogs-${E2FSPROGS_VERSION}/e2fsck/e2fsck target/bi
 install -m 0755 busybox/busybox-${BUSYBOX_VERSION}/busybox target/bin/busybox
 install -m 0755 init target/init
 install -m 0755 init.d/${2} target/init-device
-if [ "$2" == "vero2" ]
+if [ "$2" == "vero2" ] || [ "$2" == "vero3" ]
 then
-    cp -ar lvm-vero2.conf target/etc/lvm/lvm.conf
+    cp -ar lvm-avnftl.conf target/etc/lvm/lvm.conf
     install -m 0755 lvm2/LVM2.${LVM_VERSION}/out/usr/sbin/lvchange target/usr/sbin/lvchange
 fi
 cp -ar udhcpc.script target/usr/share/udhcpc/default.script
@@ -111,7 +116,7 @@ mknod target/dev/null c 1 3
 mknod target/dev/tty c 5 0
 for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
-if [ "$2" == "vero2" ]
+if [ "$2" == "vero2" ] || [ "$2" == "vero3" ]
 then
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
     # HACK HACK HACK. Fix when not 6.33AM
@@ -119,7 +124,8 @@ then
     # Double hack. Would normally overwrite if consistent, but catch libdevmapper being on system.
     rm -f target/lib/libdevmapper.so.*
     # Dependency of a dependency..
-    cp /lib/arm-linux-gnueabihf/libsepol.so.1 target/lib/
+    if [ "$2" == "vero2" ]; then cp /lib/arm-linux-gnueabihf/libsepol.so.1 target/lib/; fi
+    if [ "$2" == "vero3" ]; then cp /lib/aarch64-linux-gnu/libsepol.so.1 target/lib; fi
 fi
 if [ "$1" == "cpio" ]
 then
