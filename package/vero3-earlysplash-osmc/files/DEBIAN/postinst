@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if ischroot; then exit 0; fi
+
+if [ "$1" = "configure" ]; then
+    LANG=C /bin/dd if=/boot/splash of=/dev/logo bs=1M conv=fsync
+    STATUS=$?
+    if [ "$STATUS" != 0 ]
+    then
+        echo "Could not upload splash to NAND" >&2
+        exit $STATUS
+    fi
+fi
