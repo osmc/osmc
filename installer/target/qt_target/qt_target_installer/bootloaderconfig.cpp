@@ -142,7 +142,12 @@ void BootloaderConfig::configureEnvironment()
             cmdlineStringList << "osmcdev=rbp2";
         }
         if (preseed->getBoolValue("vendor/dtoverlay"))
-            configStringList << "dtoverlay=" << preseed->getStringValue("vendor/dtoverlayparam") << "\n";
+            if (preseed->getBoolValue("vendor/dtoverlay")) {
+                QStringList dtOverlayList = preseed->getStringValue("vendor/dtoverlayparam").split("?");
+                for (int i = 0; i < dtOverlayList.count(); i++) {
+                    configStringList << "dtoverlay=" << dtOverlayList.at(i) << "\n";
+                }
+            }
         else
             configStringList << "dtoverlay=lirc-rpi:gpio_out_pin=17,gpio_in_pin=18\n";
         if (preseed->getBoolValue("alsaoff"))
