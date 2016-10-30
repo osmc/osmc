@@ -1094,25 +1094,6 @@ MASTER_SETTINGS =    {
 			"setting_stub"      : "hdmi_safe=%s",
 		},
 
-		"max_usb_current": { 
-			"default"   : { 
-				"function"      : None, 
-				"value"         : "false"
-				},
-			"config_get_patterns": [
-				{
-				"identify"      : r"\s*max_usb_current\s*=",
-				"extract"       : r"\s*max_usb_current\s*=\s*(\d+)"
-				},
-
-				],
-			"config_set"        : generic_bool_config_set,
-			"config_validation" : generic_bool_validation,
-			"kodi_set"          : generic_passthrough_kodi_set,
-			"already_set"       : False,
-			"setting_stub"      : "max_usb_current=%s",
-		},
-
 		"sdtv_aspect": { 
 			"default"   : { 
 				"function"      : None, 
@@ -1406,7 +1387,6 @@ if __name__ == "__main__":
 				'hdmi_pixel_encoding' : '0',
 				'hdmi_safe' : 'false',
 				'lirc-rpi-overlay' : '0',
-				'max_usb_current' : 'true',
 				'sdtv_aspect' : '0',
 				'sdtv_mode' : '0',
 				'soundcard_dac' : "0",
@@ -1435,7 +1415,6 @@ if __name__ == "__main__":
 			'hdmi_pixel_encoding' : '0',
 			'hdmi_safe' : 'false',
 			'lirc-rpi-overlay' : 'false',
-			'max_usb_current' : 'false',
 			'sdtv_aspect' : '0',
 			'sdtv_mode' : '0',
 			'soundcard_dac' : "0",
@@ -1478,7 +1457,6 @@ if __name__ == "__main__":
 		'hdmi_pixel_encoding' 	: [str(x) for x in range(0,5)],
 		'hdmi_safe' 			: ['false','true'],
 		'lirc-rpi-overlay' 		: ['false','true'],
-		'max_usb_current' 		: ['false','true'],
 		'sdtv_aspect' 			: [str(x) for x in range(0,4)],
 		'sdtv_mode' 			: [str(x) for x in range(0,4)],
 		'soundcard_dac' 		: [str(x) for x in range(0,7)],
