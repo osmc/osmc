@@ -108,7 +108,8 @@ def redraw(stdscr):
 	stdscr.addstr(10,0,">>> 'm' to toggle mute")
 	stdscr.addstr(11,0,">>> 'k' to enter keyboard mode (send text to Kodi's keyboard)")
 	stdscr.addstr(12,0,">>> 'd' debugger on, 'f' debugger off")
-	stdscr.addstr(13,0,">>> 'q' to quit")
+	stdscr.addstr(13,0,">>> 'p' take screenshot")
+	stdscr.addstr(14,0,">>> 'q' to quit")
 	stdscr.refresh()
 
 key_map = {
@@ -139,6 +140,10 @@ key_map = {
 
 	109						: {'name' : 'Toggle Mute', 	'action'	: 'Application.SetMute', 	 # m
 								"params": {"mute":"toggle"}},
+
+	112						: {'name' : 'Take Screenshot', 	'action'	: 'Input.ExecuteAction', 	 # p
+								"params": {"action":"screenshot"}},
+
 }
 
 
