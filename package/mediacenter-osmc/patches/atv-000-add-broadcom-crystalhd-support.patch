@@ -1,11 +1,11 @@
-From 52ca187712d1932cd079aca6e6250ce803aad5b5 Mon Sep 17 00:00:00 2001
+From 7a04c0200651f0d71e0fd0ac5ce04b00fd7c8492 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 6 Sep 2016 16:52:27 +0000
 Subject: [PATCH] Add support for Broadcom CrystalHD
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- configure.ac                                       |   51 +
+ configure.ac                                       |   50 +
  system/settings/settings.xml                       |    9 +
  xbmc/Application.cpp                               |   11 +
  xbmc/DllPaths_generated.h.in                       |    4 +
@@ -16,14 +16,14 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  .../DVDCodecs/Video/DVDVideoCodecCrystalHD.h       |   51 +
  xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in |    5 +
  xbmc/settings/SettingConditions.cpp                |    8 +
- 11 files changed, 2556 insertions(+)
+ 11 files changed, 2555 insertions(+)
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
 
 diff --git a/configure.ac b/configure.ac
-index 6a8b4a2..cc4df6a 100644
+index 26a53c2..ee18518 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -184,6 +184,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
@@ -48,7 +48,7 @@ index 6a8b4a2..cc4df6a 100644
  AC_ARG_ENABLE([openmax],
    [AS_HELP_STRING([--enable-openmax],
    [enable OpenMax decoding (default is auto, requires OpenGLES)])],
-@@ -1711,6 +1719,42 @@ else
+@@ -1717,6 +1725,42 @@ else
    USE_VAAPI=0
  fi
  
@@ -91,7 +91,7 @@ index 6a8b4a2..cc4df6a 100644
  # OpenMax
  if test "$use_gles" = "yes" && test "$use_openmax" = "auto"; then
  
-@@ -1892,6 +1936,12 @@ else
+@@ -1898,6 +1942,12 @@ else
    final_message="$final_message\n  VAAPI:\tNo"
  fi
  
@@ -104,16 +104,8 @@ index 6a8b4a2..cc4df6a 100644
  if test "$use_openmax" != "no"; then
    final_message="$final_message\n  OpenMax:\tYes"
  else
-@@ -2322,6 +2372,7 @@ AC_SUBST(USE_MMAL)
- AC_SUBST(USE_X11)
- AC_SUBST(USE_OPTICAL_DRIVE)
- AC_SUBST(CROSS_COMPILING)
-+AC_SUBST(USE_CRYSTALHD)
- 
- # pushd and popd are not available in other shells besides bash, so implement
- # our own pushd/popd functions
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 6ae4d40..1154b41 100644
+index 7c88460..a99569f 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -317,6 +317,15 @@
@@ -133,10 +125,10 @@ index 6ae4d40..1154b41 100644
            <requirement>HasVTB</requirement>
            <level>2</level>
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 13ff95b..443dac1 100644
+index ec9165b..dd11537 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -129,6 +129,9 @@
+@@ -130,6 +130,9 @@
  #ifdef HAS_JSONRPC
  #include "interfaces/json-rpc/JSONRPC.h"
  #endif
@@ -146,18 +138,18 @@ index 13ff95b..443dac1 100644
  #include "interfaces/AnnouncementManager.h"
  #include "peripherals/Peripherals.h"
  #include "peripherals/devices/PeripheralImon.h"
-@@ -1134,6 +1137,10 @@ bool CApplication::Initialize()
-   CDatabaseManager::GetInstance().Initialize();
+@@ -790,6 +793,10 @@ bool CApplication::CreateGUI()
+ 
    CSplash::GetInstance().Show();
  
 +  #if defined(HAVE_LIBCRYSTALHD)
 +     CCrystalHD::GetInstance();
 +  #endif
 +
-   StartServices();
- 
-   // Init DPMS, before creating the corresponding setting control.
-@@ -2981,6 +2988,10 @@ void CApplication::Stop(int exitCode)
+   // The key mappings may already have been loaded by a peripheral
+   CLog::Log(LOGINFO, "load keymapping");
+   if (!CButtonTranslator::GetInstance().Load())
+@@ -3009,6 +3016,10 @@ void CApplication::Stop(int exitCode)
        XBMCHelper::GetInstance().Stop();
  #endif
  
@@ -2708,7 +2700,7 @@ index 62d44ce..d5fa744 100644
  
  include @abs_top_srcdir@/Makefile.include
 diff --git a/xbmc/settings/SettingConditions.cpp b/xbmc/settings/SettingConditions.cpp
-index 08116f0..54ec831 100644
+index 4d368f7..489baa5 100644
 --- a/xbmc/settings/SettingConditions.cpp
 +++ b/xbmc/settings/SettingConditions.cpp
 @@ -29,6 +29,9 @@
