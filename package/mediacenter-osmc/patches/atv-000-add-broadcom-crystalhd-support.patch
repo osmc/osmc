@@ -1,11 +1,11 @@
-From 7a04c0200651f0d71e0fd0ac5ce04b00fd7c8492 Mon Sep 17 00:00:00 2001
+From 737c1dde242c7d029e8d7afb1190887467d118a7 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 6 Sep 2016 16:52:27 +0000
 Subject: [PATCH] Add support for Broadcom CrystalHD
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- configure.ac                                       |   50 +
+ configure.ac                                       |   51 +
  system/settings/settings.xml                       |    9 +
  xbmc/Application.cpp                               |   11 +
  xbmc/DllPaths_generated.h.in                       |    4 +
@@ -16,14 +16,14 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  .../DVDCodecs/Video/DVDVideoCodecCrystalHD.h       |   51 +
  xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in |    5 +
  xbmc/settings/SettingConditions.cpp                |    8 +
- 11 files changed, 2555 insertions(+)
+ 11 files changed, 2556 insertions(+)
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.cpp
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/CrystalHD.h
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.cpp
  create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecCrystalHD.h
 
 diff --git a/configure.ac b/configure.ac
-index 26a53c2..ee18518 100644
+index 26a53c2..cc9b19f 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -184,6 +184,8 @@ vdpau_not_found="== Could not find libvdpau. VDPAU support disabled. =="
@@ -104,6 +104,14 @@ index 26a53c2..ee18518 100644
  if test "$use_openmax" != "no"; then
    final_message="$final_message\n  OpenMax:\tYes"
  else
+@@ -2330,6 +2380,7 @@ AC_SUBST(HAVE_SSE4)
+ AC_SUBST(USE_MMAL)
+ AC_SUBST(USE_X11)
+ AC_SUBST(USE_OPTICAL_DRIVE)
++AC_SUBST(USE_CRYSTALHD)
+ 
+ # pushd and popd are not available in other shells besides bash, so implement
+ # our own pushd/popd functions
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
 index 7c88460..a99569f 100644
 --- a/system/settings/settings.xml
