@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+DSA_KEY="/etc/ssh/ssh_host_dsa_key"
+RSA_KEY="/etc/ssh/ssh_host_rsa_key"
+ECDSA_KEY="/etc/ssh/ssh_host_ecdsa_key"
+ED25519_KEY="/etc/ssh/ssh_host_ed25519_key"
+PRESEED_FILE="/boot/preseed.cfg"
+POSTINST_FILE="/boot/postinst.sh"
+touch /tmp/NO_UPDATE
+chown osmc:osmc /tmp/NO_UPDATE
+rm -f $DSA_KEY
+rm -f $RSA_KEY
+dbus-uuidgen > /var/lib/dbus/machine-id
+depmod
+if [ -f $PRESEED_FILE ]
+then
+    sed 's/^M$//' -i $PRESEED_FILE
+    python /usr/bin/preseed &
+fi
+if [ -f $POSTINST_FILE ]
+then
+   sed 's/^M$//' -i $POSTINST_FILE
+   bash $POSTINST_FILE &
+fi
+rm -f /etc/ssh/*_key*
+ssh-keygen -f $DSA_KEY -N '' -t dsa &
+ssh-keygen -f $RSA_KEY -N '' -t rsa &
+ssh-keygen -f $ECDSA_KEY -N '' -t ecdsa &
+ssh-keygen -f $ED25519_KEY -N '' -t ed25519 &
+wait
+systemctl disable ftr.service
