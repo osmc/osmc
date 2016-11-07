@@ -23,7 +23,6 @@ echo Moving files in to place
 mkdir -p files/opt/vero2
 mkdir -p files-dev/opt/vero2
 mkdir -p files/etc/ld.so.conf.d
-echo "/opt/vero2/lib" > files/etc/ld.so.conf.d/vero2.conf
 cp -ar src/vero2-opengl-${REV}/opt/vero2/lib files/opt/vero2/
 cp -ar src/vero2-opengl-${REV}/opt/vero2/include files-dev/opt/vero2
 dpkg_build files/ vero2-userland-osmc.deb
