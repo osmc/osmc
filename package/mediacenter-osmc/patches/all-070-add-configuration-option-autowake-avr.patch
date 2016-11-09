@@ -1,0 +1,48 @@
+diff -Naur xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/addons/resource.language.en_gb/resources/strings.po xbmc-b/addons/resource.language.en_gb/resources/strings.po
+--- xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/addons/resource.language.en_gb/resources/strings.po	2016-11-06 10:05:20.364000000 +0000
++++ xbmc-b/addons/resource.language.en_gb/resources/strings.po	2016-11-07 10:09:34.396000000 +0000
+@@ -15529,6 +15529,11 @@
+ msgid "Pause Playback"
+ msgstr ""
+ 
++#: system/peripherals.xml
++msgctxt "#36046"
++msgid "Force AVR wake up when Kodi is activated"
++msgstr ""
++
+ #empty strings from id 36046 to 36100
+ #strings from 36100 to 36999 are reserved for settings descriptions
+ 
+diff -Naur xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/system/peripherals.xml xbmc-b/system/peripherals.xml
+--- xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/system/peripherals.xml        2016-11-07 12:14:19.100000000 +0000
++++ xmbc-b/system/peripherals.xml       2016-11-07 12:24:36.692000000 +0000
+@@ -25,6 +25,7 @@
+     <setting key="cec_hdmi_port" type="int" value="1" min="1" max="15" label="36015" order="13" />
+     <setting key="physical_address" type="string" label="36021" value="0" order="14" />
+     <setting key="port" type="string" value="" label="36022" order="15" />
++    <setting key="power_avr_on_as" type="bool" label="36046" value="0" order="16" />
+ 
+     <setting key="tv_vendor" type="int" value="0" configurable="0" />
+     <setting key="device_name" type="string" value="Kodi" configurable="0" />
+
+diff -Naur xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/xbmc/peripherals/devices/PeripheralCecAdapter.cpp xbmc-b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+--- xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/xbmc/peripherals/devices/PeripheralCecAdapter.cpp	2016-11-06 10:05:20.364000000 +0000
++++ xbmc-b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp	2016-11-07 10:16:06.628000000 +0000
+@@ -1389,7 +1389,7 @@
+   m_configuration.bPowerOffScreensaver = GetSettingBool("cec_standby_screensaver") ? 1 : 0;
+   m_configuration.bPowerOnScreensaver  = GetSettingBool("cec_wake_screensaver") ? 1 : 0;
+   m_configuration.bSendInactiveSource  = GetSettingBool("send_inactive_source") ? 1 : 0;
+-
++  m_configuration.bAutoWakeAVR         = GetSettingBool("power_avr_on_as") ? 1 : 0;
+   // read the mutually exclusive boolean settings
+   int iStandbyAction(GetSettingInt("standby_pc_on_tv_standby"));
+   m_configuration.bPowerOffOnStandby = iStandbyAction == 13011 ? 1 : 0;
+
+--- xbmc-c327c53ac5346f71219e8353fe046e43e4d4a827/xbmc/peripherals/devices/PeripheralCecAdapter.h    2016-11-06 10:05:20.364000000 +0000
++++ xbmc-b/xbmc/peripherals/devices/PeripheralCecAdapter.h    2016-11-07 10:16:06.628000000 +0000
+@@ -179,6 +179,7 @@
+     bool                              m_bOnPlayReceived;
+     bool                              m_bPlaybackPaused;
+     std::string                        m_strComPort;
++    bool				m_bAutoWakeAVR;
+   };
