@@ -73,9 +73,9 @@ else
 fi
 if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ] || [ "$1" == "vero2" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
 date=$(date +%Y%m%d)
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ]
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
@@ -113,6 +113,12 @@ if [ "$1" == "vero2" ]
 then
 	echo -e "Installing Vero 2 files"
 	abootimg --create /mnt/kernel.img -k uImage -r rootfs.cpio.gz -s ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
+fi
+if [ "$1" == "vero3" ]
+then
+	echo -e "Installing Vero 3 files"
+	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s vero3_2g_16g.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
+	cp ../build/linux-custom/arch/arm64/boot/dts/amlogic/vero3_2g_16g.dtb /mnt/dtb.img
 fi
 if [ "$1" == "appletv" ]
 then

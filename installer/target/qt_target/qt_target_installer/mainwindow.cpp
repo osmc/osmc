@@ -148,15 +148,6 @@ void MainWindow::install()
                     system("/bin/sleep 1");
                 }
             }
-            if (utils->getOSMCDev() == "vero2")
-            {
-                for (int i = 0; i <= 60; i++)
-                {
-                    ui->statusLabel->setText(tr("You have ") + " " + QString::number(60 - i) + " " + ("seconds to unpower before NAND is formatted"));
-                    qApp->processEvents();
-                    system("/bin/sleep 1");
-                }
-            }
         }
         /* Bring up network if using NFS */
         if (useNFS)
@@ -182,6 +173,15 @@ void MainWindow::install()
     {
         logger->addLine("No preseed file was found");
     }
+    if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
+    {
+        for (int i = 0; i <= 60; i++)
+        {
+            ui->statusLabel->setText(tr("You have ") + " " + QString::number(60 - i) + " " + ("seconds to unpower before the device is formatted"));
+            qApp->processEvents();
+            system("/bin/sleep 1");
+        }
+    }
     /* If !nfs, create necessary partitions */
     if (! useNFS)
     {
@@ -200,6 +200,18 @@ void MainWindow::install()
             system("lvcreate -n root -l100%FREE vero-nand");
             utils->fmtpart(device->getRoot(), "ext4");
         }
+        if (utils->getOSMCDev() == "vero3" && ! device->hasBootChanged())
+        {
+            /* Set up LVM */
+            system("dd if=/dev/zero of=/dev/data bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/instaboot bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/system bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync");
+            system("pvcreate /dev/data /dev/system /dev/cache /dev/instaboot");
+            system("vgcreate vero-nand /dev/data /dev/system /dev/cache /dev/instaboot");
+            system("lvcreate -n root -l100%FREE vero-nand");
+            utils->fmtpart(device->getRoot(), "ext4");
+        }
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -215,7 +227,7 @@ void MainWindow::install()
         }
         else
         {
-            if (! device->doesBootNeedsFormat() && utils->getOSMCDev() != "vero2")
+            if (! device->doesBootNeedsFormat() && utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3")
             {
                 int size = utils->getPartSize(rootBase, device->getBootFS());
                 if (size == -1)
