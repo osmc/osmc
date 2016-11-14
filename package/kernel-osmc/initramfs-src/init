@@ -198,7 +198,7 @@ then
                 /bin/busybox route add default gw "$NFS_IP_GW" eth0 >/dev/null 2>&1
         fi
 else
-	OPTION_MOUNT_OPTIONS="ro${OPTION_MOUNT_OPTIONS}"
+	OPTION_MOUNT_OPTIONS="rw${OPTION_MOUNT_OPTIONS}"
 fi
 
 if [ "$OPTION_MOUNT_OPTIONS" ]; then OPTION_MOUNT_OPTIONS="-o $OPTION_MOUNT_OPTIONS"; fi
