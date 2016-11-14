@@ -1,0 +1,67 @@
+From 835338c27d9924e87a4c909a2e0f740e69071a69 Mon Sep 17 00:00:00 2001
+From: Alex Deryskyba <alex@codesnake.com>
+Date: Sat, 22 Oct 2016 13:47:54 +0200
+Subject: [PATCH] aml: Drop frames if requested by dvdplayer
+
+---
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  | 17 ++++++++++++++++-
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h    |  1 +
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 263acde..66e1fc7 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -27,6 +27,7 @@
+ #include "utils/AMLUtils.h"
+ #include "utils/BitstreamConverter.h"
+ #include "utils/log.h"
++#include "utils/SysfsUtils.h"
+ 
+ #define __MODULE_NAME__ "DVDVideoCodecAmlogic"
+ 
+@@ -47,7 +48,8 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic() :
+   m_video_rate(0),
+   m_mpeg2_sequence(NULL),
+   m_bitparser(NULL),
+-  m_bitstream(NULL)
++  m_bitstream(NULL),
++  m_drop(NULL)
+ {
+   pthread_mutex_init(&m_queue_mutex, NULL);
+ }
+@@ -296,6 +298,19 @@ bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+ 
+ void CDVDVideoCodecAmlogic::SetDropState(bool bDrop)
+ {
++  if (bDrop == m_drop)
++    return;
++
++  m_drop = bDrop;
++  if (bDrop)
++    m_videobuffer.iFlags |=  DVP_FLAG_DROPPED;
++  else
++    m_videobuffer.iFlags &= ~DVP_FLAG_DROPPED;
++
++  // Freerun mode causes amvideo driver to ignore timing and process frames
++  // as quickly as they are coming from decoder. By enabling freerun mode we can
++  // skip rendering of the frames that are requested to be dropped by dvdplayer.
++  SysfsUtils::SetInt("/sys/class/video/freerun_mode", bDrop ? 1 : 0);
+ }
+ 
+ void CDVDVideoCodecAmlogic::SetSpeed(int iSpeed)
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+index 9714b42..6b00907 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+@@ -65,6 +65,7 @@ protected:
+   float           m_aspect_ratio;
+   mpeg2_sequence *m_mpeg2_sequence;
+   double          m_mpeg2_sequence_pts;
++  bool		  m_drop;
+ 
+   CBitstreamParser *m_bitparser;
+   CBitstreamConverter *m_bitstream;
+-- 
+2.7.4
+

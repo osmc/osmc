@@ -22,7 +22,8 @@ syspaths="/sys/class/video/axis
 /sys/class/audiodsp/digital_raw
 /sys/class/ppmgr/ppmgr_3d_mode
 /sys/class/display/mode
-/sys/class/audiodsp/digital_codec"
+/sys/class/audiodsp/digital_codec
+/sys/module/amlvideodri/parameters/freerun_mode"
 
 for syspath in $syspaths; do
         chgrp -R video $syspath
