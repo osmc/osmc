@@ -69,7 +69,7 @@ void BootloaderConfig::configureMounts()
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
         if (utils->getOSMCDev() != "vero2")
-            fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime    0   0\n");
+            fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime,noauto,x-systemd.automount    0   0\n");
         if (! device->getRoot().contains(":/"))
             fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
         else
