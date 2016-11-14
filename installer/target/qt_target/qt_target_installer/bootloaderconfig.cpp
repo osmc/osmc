@@ -70,8 +70,10 @@ void BootloaderConfig::configureMounts()
         if (bootFS == "fat32") { bootFS = "vfat"; }
         if (utils->getOSMCDev() != "vero2")
             fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime,noauto,x-systemd.automount    0   0\n");
-        if (! device->getRoot().contains(":/"))
-            fstabStringList.append(device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
+        if (! device->getRoot().contains(":/")) {
+            fstabStringList.append("# rootfs is not mounted in fstab as we do it via initramfs. Uncomment for remount (slower boot)");
+            fstabStringList.append("#" + device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
+        }
         else
             /* NFS install */
             fstabStringList.append("/dev/nfs   /      auto       defaults,noatime    0   0\n");
