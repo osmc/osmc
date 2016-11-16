@@ -286,7 +286,11 @@ def soundcard_dac_validation(config_value):
 		'iqaudio-dac-overlay' 		: '4',
 		'iqaudio-dac' 				: '4',
 		'iqaudio-dacplus-overlay' 	: '5',
-		'iqaudio-dacplus' 			: '5',		
+		'iqaudio-dacplus' 			: '5',
+		'justboom-dac'                  : '6',
+		'justboom-dac-overlay'		: '6',
+                'justboom-digi'                 : '7',
+		'justboom-digi-overlay'		: '7',
 		}
 
 	try:
