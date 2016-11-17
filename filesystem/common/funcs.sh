@@ -92,6 +92,11 @@ function setup_busybox_links()
 	fi
 }
 
+function enable_legacy_elf()
+{
+	chroot ${1} ln -s /lib/arm-linux-gnueabihf/ld-linux.so.3 /lib/ld-linux.so.3
+}
+
 export -f setup_osmc_user
 export -f setup_hostname
 export -f setup_hosts
@@ -101,3 +106,4 @@ export -f enable_init
 export -f create_base_fstab
 export -f conf_tty
 export -f setup_busybox_links
+export -f enable_legacy_elf
