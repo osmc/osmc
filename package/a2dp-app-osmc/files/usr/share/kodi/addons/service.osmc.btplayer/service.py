@@ -123,7 +123,7 @@ class BTPlayer(threading.Thread):
     def playerHandler(self, interface, changed, invalidated, path):
         """Handle relevant property change signals"""
         iface = interface[interface.rfind(".") + 1:]
-        player_path = path[:path.rfind("/") + 1 ] + "player0"
+        player_path = path
         if __addon__.getSetting("debug") == "true":
             log("Changed : " + str(changed))
             log("Interface : " + str(interface))
@@ -140,20 +140,26 @@ class BTPlayer(threading.Thread):
         elif iface == "MediaTransport1":
             if "State" in changed:
                 if not changed["State"] == self.state:
-                    if changed["State"] == "active":
-                        self.state = changed["State"]
-                        xbmc.startBTPlayer(player_path);
-                    else:
-                        self.state = changed["State"]
+                    self.state = changed["State"]
+                    if not self.state  == "active":
                         xbmc.stopBTPlayer()
+        elif iface == "MediaPlayer1":
+            if "Status" in changed:
+                if not changed["Status"] == self.status:
+                    if changed["Status"] == "playing" and self.state  == "active":
+                        xbmc.startBTPlayer(player_path);
                         
     def isPlaying(self):
         return self.state == "active"
 
     def next(self):
+        if __addon__.getSetting("debug") == "true":
+            log("NEXT")
         self.player.Next(dbus_interface=PLAYER_IFACE)
 
     def previous(self):
+        if __addon__.getSetting("debug") == "true":
+            log("PREVIOUS")
         self.player.Previous(dbus_interface=PLAYER_IFACE)
 
     def play(self):
