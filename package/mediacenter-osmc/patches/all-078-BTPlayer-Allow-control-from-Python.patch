@@ -1,42 +1,33 @@
-From 0fb6de50231c6be4d89eaefc51f6263109df6f1d Mon Sep 17 00:00:00 2001
+From 3225a7e5a56f30bfaf0d3edd949a7ee223669d43 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Sun, 2 Oct 2016 12:55:57 +0100
-Subject: [PATCH] Allow control of BTPlayer from python
+Date: Sun, 20 Nov 2016 23:32:01 +0000
+Subject: [PATCH 2/2] [BTPlayer] Allow control from Python
 
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp | 33 ++++++++++++++++-
- xbmc/interfaces/legacy/ModuleXbmc.h   | 69 +++++++++++++++++++++++++++++++++++
- 2 files changed, 101 insertions(+), 1 deletion(-)
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 31 ++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 68 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 99 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 0b921a8..13ed73e 100644
+index 0b921a8..ba13da7 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -67,6 +67,10 @@ using namespace KODI::MESSAGING;
- #include "linux/XMemUtils.h"
- #endif
+@@ -61,6 +61,10 @@
+ #include <vector>
+ #include "utils/log.h"
  
 +#include "FileItem.h"
 +#include "cores/playercorefactory/PlayerCoreConfig.h"
 +#include "cores/playercorefactory/PlayerCoreFactory.h"
 +
- namespace XBMCAddon
- {
+ using namespace KODI::MESSAGING;
  
-@@ -147,7 +151,7 @@ namespace XBMCAddon
-         {
-           DelayedCallGuard dcguard;
-           lh = dcguard.getLanguageHook(); // borrow this
--          long nextSleep = endTime.MillisLeft();
-+	  long nextSleep = endTime.MillisLeft();
-           if (nextSleep > 100)
-             nextSleep = 100; // only sleep for 100 millis
-           ::Sleep(nextSleep);
-@@ -528,7 +532,34 @@ namespace XBMCAddon
-     {
+ #ifdef TARGET_POSIX
+@@ -529,6 +533,33 @@ namespace XBMCAddon
        return CSysInfo::GetUserAgent();
      }
-+    
+ 
++
 +    void startBTPlayer(const char* dbus_path)
 +    {
 +      XBMC_TRACE
@@ -44,41 +35,36 @@ index 0b921a8..13ed73e 100644
 +      CFileItemPtr item;
 +      item.reset(new CFileItem(dbus_path, false));
 +      list.Add(item);
-+      
++
 +      std::string playerName = std::string("BTPlayer");
 +      auto fileItemList = new CFileItemList(); //don't delete
 +      fileItemList->Copy(list);
-+      
++
 +      CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_PLAY, -1, -1, static_cast<void*>(fileItemList), playerName);
 +    }
-+    
++
 +    void stopBTPlayer()
 +    {
 +      CApplicationMessenger::GetInstance().SendMsg(TMSG_MEDIA_STOP);
-+      // To Implement after VideoPlayer changes
 +    }
-+    
++
 +    bool isBTPlayerActive()
 +    {
 +      return g_application.GetCurrentPlayer() == "BTPlayer";
 +    }
- 
++  
 +    
      int getSERVER_WEBSERVER() { return CApplication::ES_WEBSERVER; }
      int getSERVER_AIRPLAYSERVER() { return CApplication::ES_AIRPLAYSERVER; }
      int getSERVER_UPNPSERVER() { return CApplication::ES_UPNPSERVER; }
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 22e5fcf..fa7d572 100644
+index fcdb253..ae187a7 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -976,6 +976,75 @@ namespace XBMCAddon
- #else
-     String convertLanguage(const char* language, int format);
- #endif
-+
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
+@@ -985,6 +985,74 @@ namespace XBMCAddon
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.startBTPlayer(dbus_path) }
 +    ///-----------------------------------------------------------------------
 +    /// Starts BTPlayer
@@ -143,7 +129,13 @@ index 22e5fcf..fa7d572 100644
 +#else
 +    bool isBTPlayerActive();
 +#endif
-+
-     //@}
- #ifndef DOXYGEN_SHOULD_SKIP_THIS
-     SWIG_CONSTANT_FROM_GETTER(int,SERVER_WEBSERVER);
++    
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
+     /// @brief \python_func{ executehttpapi(httpcommand) }
+     ///-----------------------------------------------------------------------
+     /// @python_v12 Completely removed.
+-- 
+2.5.0
+

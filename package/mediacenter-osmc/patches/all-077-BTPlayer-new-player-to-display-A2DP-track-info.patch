@@ -1,27 +1,26 @@
-From 8fc9df5e3e63b57267bb354e3cc10673af303299 Mon Sep 17 00:00:00 2001
+From 041d1b2b6aa4543e436a11f6b2075ac66c18314d Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Sun, 2 Oct 2016 12:52:30 +0100
-Subject: [PATCH] Add BTPlayer as a new player
+Date: Sun, 20 Nov 2016 23:31:04 +0000
+Subject: [PATCH 1/2] [BTPlayer] new player to display A2DP track info when
+ playing
 
 ---
  Makefile.in                                        |   1 +
  configure.ac                                       |   1 +
- xbmc/cores/btplayer/BTPlayer.cpp                   | 314 +++++++++++++++++++++
- xbmc/cores/btplayer/BTPlayer.h                     | 131 +++++++++
- xbmc/cores/btplayer/Makefile                       |   9 +
+ xbmc/cores/btplayer/BTPlayer.cpp                   | 332 +++++++++++++++++++++
+ xbmc/cores/btplayer/BTPlayer.h                     | 131 ++++++++
  xbmc/cores/btplayer/Makefile.in                    |   9 +
  xbmc/cores/playercorefactory/PlayerCoreConfig.h    |   5 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.cpp |   5 +
- xbmc/linux/DBusUtil.cpp                            | 108 ++++---
- xbmc/linux/DBusUtil.h                              |   8 +-
- 10 files changed, 547 insertions(+), 44 deletions(-)
+ xbmc/linux/DBusUtil.cpp                            | 104 ++++---
+ xbmc/linux/DBusUtil.h                              |   4 +-
+ 9 files changed, 548 insertions(+), 44 deletions(-)
  create mode 100644 xbmc/cores/btplayer/BTPlayer.cpp
  create mode 100644 xbmc/cores/btplayer/BTPlayer.h
- create mode 100644 xbmc/cores/btplayer/Makefile
  create mode 100644 xbmc/cores/btplayer/Makefile.in
 
 diff --git a/Makefile.in b/Makefile.in
-index 58b3a17..8a1973b 100644
+index 0d70e9b..e53e870 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -43,6 +43,7 @@ DIRECTORY_ARCHIVES=$(VideoPlayer_ARCHIVES) \
@@ -33,10 +32,10 @@ index 58b3a17..8a1973b 100644
                     xbmc/cores/paplayer/paplayer.a \
                     xbmc/cores/playercorefactory/playercorefactory.a \
 diff --git a/configure.ac b/configure.ac
-index acf4ce6..d11bd5c 100644
+index 34fe643..aa62669 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2166,6 +2166,7 @@ OUTPUT_FILES="Makefile \
+@@ -2172,6 +2172,7 @@ OUTPUT_FILES="Makefile \
      xbmc/cores/AudioEngine/Makefile \
      xbmc/cores/paplayer/Makefile \
      xbmc/cores/omxplayer/Makefile \
@@ -46,10 +45,10 @@ index acf4ce6..d11bd5c 100644
      xbmc/messaging/helpers/Makefile \
 diff --git a/xbmc/cores/btplayer/BTPlayer.cpp b/xbmc/cores/btplayer/BTPlayer.cpp
 new file mode 100644
-index 0000000..1822eef
+index 0000000..511b57e
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.cpp
-@@ -0,0 +1,314 @@
+@@ -0,0 +1,332 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -83,6 +82,7 @@ index 0000000..1822eef
 +#include "cores/AudioEngine/Interfaces/AEStream.h"
 +#include "cores/AudioEngine/Interfaces/IAudioCallback.h"
 +
++#include "ServiceBroker.h"
 +#include "cores/DataCacheCore.h"
 +#include <unistd.h>
 +
@@ -228,23 +228,31 @@ index 0000000..1822eef
 +void BTPlayer::updateA2DPInfo(std::string& destination_path)
 +{
 +  // get details from bluez
-+   CVariant properties = CDBusUtil::GetAll("org.bluez",
-+					   destination_path.c_str(),
-+					   "org.freedesktop.DBus.Properties",
-+					   "GetAll",
-+					   "org.bluez.MediaPlayer1");
++  CVariant track = CDBusUtil::GetVariant("org.bluez",
++                                         destination_path.c_str(),
++					 "org.bluez.MediaPlayer1",
++					 "Track");
 +   
-+   m_tag.SetArtist(properties["Track"][0]["Artist"].asString());
-+   m_tag.SetTitle(properties["Track"][0]["Title"].asString());
-+   m_tag.SetAlbum(properties["Track"][0]["Album"].asString());
-+   m_tag.SetTrackNumber(properties["Track"][0]["TrackNumber"].asInteger(0));
-+   CApplicationMessenger::GetInstance().PostMsg(TMSG_UPDATE_CURRENT_ITEM, 1,-1, static_cast<void*>(new CFileItem(m_tag)));
-+   const char* status = properties["Status"].asString().c_str();
-+   if (strcmp(status, "playing")== 0) 
-+     {  
-+       m_playerGUIData.m_time = properties["Position"].asUnsignedInteger();
-+       m_playerGUIData.m_totalTime = properties["Track"][0]["Duration"].asUnsignedInteger(0);
-+     }
++  m_tag.SetArtist(track["Artist"].asString());
++  m_tag.SetTitle(track["Title"].asString());
++  m_tag.SetAlbum(track["Album"].asString());
++  m_tag.SetTrackNumber(track["TrackNumber"].asInteger(0));
++  m_playerGUIData.m_totalTime = track["Duration"].asUnsignedInteger(0);
++  CVariant status = CDBusUtil::GetVariant("org.bluez",
++     				          destination_path.c_str(),
++				          "org.bluez.MediaPlayer1",
++					  "Status");
++  if (strcmp(status.asString().c_str(), "playing")== 0) 
++  {  
++    CVariant position = CDBusUtil::GetVariant("org.bluez",
++    					      destination_path.c_str(),
++  					      "org.bluez.MediaPlayer1",
++					      "Position");
++    m_playerGUIData.m_time = position.asUnsignedInteger(0);
++  }
++  
++  CServiceBroker::GetDataCacheCore().SignalAudioInfoChange();
++  CApplicationMessenger::GetInstance().PostMsg(TMSG_UPDATE_CURRENT_ITEM, 1,-1, static_cast<void*>(new CFileItem(m_tag)));
 +}
 +#endif
 +
@@ -264,6 +272,7 @@ index 0000000..1822eef
 +      updateA2DPInfo(m_dbus_path);
 +    }
 +#endif
++    Sleep(500);
 +  }
 +  m_callback.OnPlayBackStopped ();
 +}
@@ -362,11 +371,19 @@ index 0000000..1822eef
 +
 +float BTPlayer::GetSpeed()
 +{
-+  return 0;
++  return 1;
++}
++
++float BTPlayer::GetPercentage()
++{
++  if (m_playerGUIData.m_totalTime > 0)
++    return m_playerGUIData.m_time * 100.0f / m_playerGUIData.m_totalTime;
++
++  return 0.0f;
 +}
 diff --git a/xbmc/cores/btplayer/BTPlayer.h b/xbmc/cores/btplayer/BTPlayer.h
 new file mode 100644
-index 0000000..6e23be4
+index 0000000..358047b
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.h
 @@ -0,0 +1,131 @@
@@ -431,7 +448,7 @@ index 0000000..6e23be4
 +  virtual bool CanSeek() const { return false; }
 +  virtual void Seek(bool bPlus = true, bool bLargeStep = false, bool bChapterOverride = false);
 +  virtual void SeekPercentage(float fPercent = 0.0f) { return; }
-+  virtual float GetPercentage() const { return 0.0f; }
++  virtual float GetPercentage();
 +  virtual void SetVolume(float volume) { return; }
 +  virtual void SetDynamicRangeCompression(long drc) { return; }
 +  virtual void GetAudioInfo( std::string& strAudioInfo) {}
@@ -501,21 +518,6 @@ index 0000000..6e23be4
 +   std::string                m_dbus_path;
 +#endif
 +};
-diff --git a/xbmc/cores/btplayer/Makefile b/xbmc/cores/btplayer/Makefile
-new file mode 100644
-index 0000000..716c134
---- /dev/null
-+++ b/xbmc/cores/btplayer/Makefile
-@@ -0,0 +1,9 @@
-+CXXFLAGS+=-D__STDC_FORMAT_MACROS
-+
-+SRCS  = BTPlayer.cpp
-+
-+LIB = btplayer.a
-+
-+include /home/gerald/development/gezb_xbmc/Makefile.include
-+-include $(patsubst %.cpp,%.P,$(patsubst %.c,%.P,$(SRCS)))
-+
 diff --git a/xbmc/cores/btplayer/Makefile.in b/xbmc/cores/btplayer/Makefile.in
 new file mode 100644
 index 0000000..6bf3bc9
@@ -543,7 +545,7 @@ index 15a6570..2b1799b 100644
  
  class CPlayerCoreConfig
  {
-@@ -104,6 +105,10 @@ class CPlayerCoreConfig
+@@ -104,6 +105,10 @@ public:
        pPlayer = new UPNP::CUPnPPlayer(callback, m_id.c_str());
      }
  #endif
@@ -578,7 +580,7 @@ index 896b865..1c537a1 100644
        int count = 0;
        std::string playername = name;
 diff --git a/xbmc/linux/DBusUtil.cpp b/xbmc/linux/DBusUtil.cpp
-index 08041eb..60aee3f 100644
+index 08041eb..fb0c58f 100644
 --- a/xbmc/linux/DBusUtil.cpp
 +++ b/xbmc/linux/DBusUtil.cpp
 @@ -40,7 +40,7 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
@@ -590,30 +592,7 @@ index 08041eb..60aee3f 100644
        }
      }
    }
-@@ -50,11 +50,19 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
-   return result;
- }
- 
--CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *interface)
-+CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *arg)
- {
--  CDBusMessage message(destination, object, "org.freedesktop.DBus.Properties", "GetAll");
-+  return CDBusUtil::GetAll(destination, object, "org.freedesktop.DBus.Properties", "Get", arg);
-+}
-+
-+CVariant CDBusUtil::GetAll(const char *destination, const char *object, const char *interface, const char *method, const char *arg)
-+{
-+  CDBusMessage message(destination, object, interface, method);
-   CVariant properties;
--  message.AppendArgument(interface);
-+  if (arg != NULL)
-+  {
-+    message.AppendArgument(arg);
-+  }
-   DBusMessage *reply = message.SendSystem();
-   if (reply)
-   {
-@@ -65,32 +73,7 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
+@@ -65,32 +65,7 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
          CLog::Log(LOGERROR, "DBus: wrong signature on GetAll - should be \"a{sv}\" but was %s", dbus_message_iter_get_signature(&iter));
        else
        {
@@ -643,19 +622,17 @@ index 08041eb..60aee3f 100644
 -          } while (dbus_message_iter_next(&sub));
 -
 -        } while (dbus_message_iter_next(&iter));
-+        properties = ParseDictionary(&iter);
++        properties = Parse(&iter);
        }
      }
    }
-@@ -98,12 +81,48 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
+@@ -98,12 +73,48 @@ CVariant CDBusUtil::GetAll(const char *destination, const char *object, const ch
    return properties;
  }
  
 -CVariant CDBusUtil::ParseVariant(DBusMessageIter *itr)
 +CVariant CDBusUtil::Parse(DBusMessageIter *itr)
- {
--  DBusMessageIter variant;
--  dbus_message_iter_recurse(itr, &variant);
++{
 +  char *s = dbus_message_iter_get_signature(itr);
 +  CVariant v;
 +  if (strcmp(s, "a{sv}") == 0)
@@ -665,10 +642,11 @@ index 08041eb..60aee3f 100644
 +  dbus_free(s);
 +  return v;
 +}
- 
--  return ParseType(&variant);
++
 +CVariant CDBusUtil::ParseDictionary(DBusMessageIter *itr)
-+{
+ {
+-  DBusMessageIter variant;
+-  dbus_message_iter_recurse(itr, &variant);
 +  CVariant properties;
 +  do
 +  {
@@ -681,7 +659,8 @@ index 08041eb..60aee3f 100644
 +      do
 +      {
 +        const char * key = NULL;
-+
+ 
+-  return ParseType(&variant);
 +        dbus_message_iter_get_basic(&dict, &key);
 +        dbus_message_iter_next(&dict);
 +
@@ -700,30 +679,42 @@ index 08041eb..60aee3f 100644
  }
  
  CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
-@@ -151,20 +170,27 @@ CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
-     value = (double)doublev;
-     break;
+@@ -116,7 +127,8 @@ CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
+   dbus_uint64_t   uint64  = 0;
+   dbus_bool_t     boolean = false;
+   double          doublev = 0;
+-
++  const char *    signature = NULL;
++  
+   int type = dbus_message_iter_get_arg_type(itr);
+   switch (type)
+   {
+@@ -153,18 +165,26 @@ CVariant CDBusUtil::ParseType(DBusMessageIter *itr)
    case DBUS_TYPE_ARRAY:
--    DBusMessageIter array;
--    dbus_message_iter_recurse(itr, &array);
+     DBusMessageIter array;
+     dbus_message_iter_recurse(itr, &array);
 -
-+    DBusMessageIter arrayContainer;
-+    dbus_message_iter_recurse(itr, &arrayContainer);
-+    DBusMessageIter arrayContent;
-     value = CVariant::VariantTypeArray;
+-    value = CVariant::VariantTypeArray;
 -
-     do
-     {
+-    do
+-    {
 -      CVariant item = ParseType(&array);
-+      dbus_message_iter_recurse(&arrayContainer, &arrayContent);
-+      CVariant item = ParseDictionary(itr);
-       if (!item.isNull())
-+      {
-         value.push_back(item);
+-      if (!item.isNull())
+-        value.push_back(item);
 -    } while (dbus_message_iter_next(&array));
-+      }
-+    } while (dbus_message_iter_has_next(itr));
-+    break;
++    signature = dbus_message_iter_get_signature(itr);
++    if (strcmp(signature, "a{sv}") == 0) {
++      value = ParseDictionary(itr);
++    } else {
++      value = CVariant::VariantTypeArray;
++        do
++	  {
++	    CVariant item = ParseType(&array);
++	    if (!item.isNull())
++	      value.push_back(item);
++	  } while (dbus_message_iter_next(&array));
++    }
++	break;
 +   case DBUS_TYPE_VARIANT:
 +    DBusMessageIter variant;
 +    dbus_message_iter_recurse(itr, &variant);
@@ -736,23 +727,22 @@ index 08041eb..60aee3f 100644
  }
  #endif
 diff --git a/xbmc/linux/DBusUtil.h b/xbmc/linux/DBusUtil.h
-index a683d70..1191126 100644
+index a683d70..cbd53d6 100644
 --- a/xbmc/linux/DBusUtil.h
 +++ b/xbmc/linux/DBusUtil.h
-@@ -26,11 +26,13 @@
- class CDBusUtil
+@@ -27,10 +27,10 @@ class CDBusUtil
  {
  public:
--  static CVariant GetAll(const char *destination, const char *object, const char *interface);
-+  static CVariant GetAll(const char *destination, const char *object, const char *arg);
-+  static CVariant GetAll(const char *destination, const char *object, const char *interface, const char *method, const char *arg);
- 
+   static CVariant GetAll(const char *destination, const char *object, const char *interface);
+-
    static CVariant GetVariant(const char *destination, const char *object, const char *interface, const char *property);
--private:
-+
+ private:
 +  static CVariant Parse(DBusMessageIter *itr);
 +  static CVariant ParseDictionary(DBusMessageIter *itr);
    static CVariant ParseType(DBusMessageIter *itr);
 -  static CVariant ParseVariant(DBusMessageIter *itr);
  };
  #endif
+-- 
+2.5.0
+
