@@ -11,7 +11,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '--changes':
 	print_changes = True
 
 results = {}
-archlist = [ 'binary-i386', 'binary-amd64', 'binary-armhf' ]
+archlist = [ 'binary-i386', 'binary-amd64', 'binary-armhf', 'binary-arm64' ]
 
 for arch in archlist:
 
