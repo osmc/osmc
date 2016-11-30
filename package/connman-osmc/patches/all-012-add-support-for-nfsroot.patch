@@ -1,0 +1,358 @@
+Signed-off-by: Pantelis Antoniou <pantelis.antoniou at konsulko.com>
+---
+ src/connman.h  |   3 +
+ src/device.c   |   8 +-
+ src/inet.c     | 281 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/resolver.c |   8 ++
+ 4 files changed, 299 insertions(+), 1 deletion(-)
+
+diff --git a/src/connman.h b/src/connman.h
+index ce3ef8d..1a76dc2 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -244,6 +244,9 @@ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex, const
+ int __connman_inet_get_address_netmask(int ifindex,
+ 		struct sockaddr_in *address, struct sockaddr_in *netmask);
+ 
++bool __connman_inet_isrootnfs_device(const char *devname);
++gchar **__connman_inet_get_pnp_nameservers(const char *pnp_file);
++
+ #include <connman/resolver.h>
+ 
+ int __connman_resolver_init(gboolean dnsproxy);
+diff --git a/src/device.c b/src/device.c
+index 742b3c4..3bcf5ab 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1324,7 +1324,7 @@ list:
+ 	blacklisted_interfaces =
+ 		connman_setting_get_string_list("NetworkInterfaceBlacklist");
+ 	if (!blacklisted_interfaces)
+-		return false;
++		goto rootnfs;
+ 
+ 	for (pattern = blacklisted_interfaces; *pattern; pattern++) {
+ 		if (g_str_has_prefix(devname, *pattern)) {
+@@ -1333,6 +1333,12 @@ list:
+ 		}
+ 	}
+ 
++rootnfs:
++	if (__connman_inet_isrootnfs_device(devname)) {
++		DBG("ignoring device %s (rootnfs)", devname);
++		return true;
++	}
++
+ 	return false;
+ }
+ 
+diff --git a/src/inet.c b/src/inet.c
+index 803f0e6..6733bfa 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -2964,3 +2964,284 @@ out:
+ 	close(sk);
+ 	return ret;
+ }
++
++static int get_nfs_server_ip(const char *cmdline_file, const char *pnp_file,
++				struct in_addr *addr)
++{
++	GError *error = NULL;
++	gchar *cmdline = NULL;
++	gchar *pnp = NULL;
++	gchar **args = NULL;
++	gchar **pnpent = NULL;
++	gchar **pp = NULL;
++	gchar *s, *nfsargs;
++	int ret, len, err;
++	char addrstr[INET_ADDRSTRLEN];
++	struct in_addr taddr;
++
++	ret = -1;
++
++	if (!cmdline_file)
++		cmdline_file = "/proc/cmdline";
++	if (!pnp_file)
++		pnp_file = "/proc/net/pnp";
++	if (!addr)
++		addr = &taddr;
++	addr->s_addr = INADDR_NONE;
++
++	if (!g_file_get_contents(cmdline_file, &cmdline, NULL, &error)) {
++		g_printerr("Cannot read %s %s\n", cmdline_file, error->message);
++		goto out;
++        }
++
++	if (!g_file_get_contents(pnp_file, &pnp, NULL, &error)) {
++		g_printerr("Cannot read %s %s\n", pnp_file, error->message);
++		goto out;
++        }
++
++	len = strlen(cmdline);
++	if (len <= 1) {
++		/* too short */
++		goto out;
++	}
++	/* remove newline */
++	if (cmdline[len - 1] == '\n')
++		cmdline[--len] = '\0';
++
++	/* g_print("cmdline=%s\n", cmdline); */
++
++	/* split in arguments (seperated by space) */
++	args = g_strsplit(cmdline, " ", 0);
++	if (!args) {
++		g_printerr("Cannot split cmdline \"%s\"\n", cmdline);
++		goto out;
++	}
++
++	/* split in entries (by newlines) */
++	pnpent = g_strsplit(pnp, "\n", 0);
++	if (!pnpent) {
++		g_printerr("Cannot split pnp\n");
++		goto out;
++	}
++
++	/* first find root argument */
++	for (pp = args; *pp; pp++) {
++		if (!strcmp(*pp, "root=/dev/nfs"))
++			break;
++	}
++	/* no rootnfs found */
++	if (!*pp)
++		goto out;
++
++	/* g_print("root argument: %s\n", *pp); */
++
++	/* locate nfsroot argument */
++	for (pp = args; *pp; pp++) {
++		if (!strncmp(*pp, "nfsroot=", strlen("nfsroot=")))
++			break;
++	}
++	/* no nfsroot argument found */
++	if (!*pp)
++		goto out;
++
++	/* g_print("nfsroot argument: %s\n", *pp); */
++
++	/* determine if nfsroot server is provided */
++	nfsargs = strchr(*pp, '=');
++	if (!nfsargs)
++		goto out;
++	nfsargs++;
++
++	/* find whether serverip is present */
++	s = strchr(nfsargs, ':');
++	if (s) {
++		len = s - nfsargs;
++		s = nfsargs;
++	} else {
++		/* no serverip, use bootserver */
++		for (pp = pnpent; *pp; pp++) {
++			if (!strncmp(*pp, "bootserver ", strlen("bootserver ")))
++				break;
++		}
++		/* no bootserver found */
++		if (!*pp)
++			goto out;
++		s = *pp + strlen("bootserver ");
++		len = strlen(s);
++	}
++
++	/* copy to addr string buffer */
++	if (len >= sizeof(addrstr)) {
++		g_printerr("Bad server\n");
++		goto out;
++	}
++	memcpy(addrstr, s, len);
++	addrstr[len] = '\0';
++
++	/* g_print("using server addr: %s\n", addrstr); */
++
++	err = inet_pton(AF_INET, addrstr, addr);
++	if (err <= 0) {
++		g_printerr("Cannot convert to numeric addr \"%s\"\n",
++				addrstr);
++		goto out;
++	}
++	/* all done */
++	ret = 0;
++out:
++	g_strfreev(pnpent);
++	g_strfreev(args);
++	if (error)
++		g_error_free(error);
++	g_free(pnp);
++	g_free(cmdline);
++
++	return ret;
++}
++
++/* get interface out of which peer is reachable (IPv4 only) */
++static int get_peer_iface(struct in_addr *addr, char *ifname)
++{
++	struct ifaddrs *ifaddr, *ifa;
++	int ret = -1, s;
++	socklen_t socklen;
++	struct sockaddr_in saddr, *ifsaddr;
++
++	/* Obtain address(es) matching host/port */
++	ret = getifaddrs(&ifaddr);
++	if (ret == -1) {
++		fprintf(stderr, "getifaddrs() failed %d (%s)\n",
++			errno, strerror(errno));
++		return -1;
++	}
++
++	s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
++	if (s == -1) {
++		fprintf(stderr, "socket() failed %d (%s)\n",
++			errno, strerror(errno));
++		return -1;
++	}
++
++	memset(&saddr, 0, sizeof(saddr));
++	saddr.sin_family = AF_INET;
++	saddr.sin_port = 0;	/* any port */
++	saddr.sin_addr = *addr;
++
++	/* no need to bind, connect will select iface */
++	ret = connect(s, (struct sockaddr *)&saddr, sizeof(struct sockaddr_in));
++	if (ret == -1) {
++		fprintf(stderr, "connect() failed: %d (%s)\n",
++			errno, strerror(errno));
++		goto do_close;
++	}
++
++	socklen = sizeof(saddr);
++	ret = getsockname(s, (struct sockaddr *)&saddr, &socklen);
++	if (ret == -1) {
++		fprintf(stderr, "getsockname() failed: %d (%s)\n",
++			errno, strerror(errno));
++		goto do_close;
++	}
++
++	ret = -1;
++	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
++		if (ifa->ifa_addr == NULL)
++			continue;
++
++		/* only IPv4 address */
++		if (ifa->ifa_addr->sa_family != AF_INET)
++			continue;
++
++		ifsaddr = (struct sockaddr_in *)ifa->ifa_addr;
++
++		/* match address? */
++		if (ifsaddr->sin_addr.s_addr == saddr.sin_addr.s_addr)
++			break;
++	}
++
++	if (ifa) {
++		ret = 0;
++		if (ifname)
++			strcpy(ifname, ifa->ifa_name);
++	}
++
++do_close:
++	close(s);
++
++	freeifaddrs(ifaddr);
++
++	return ret;
++}
++
++bool __connman_inet_isrootnfs_device(const char *devname)
++{
++	struct in_addr addr;
++	char ifname[IFNAMSIZ];
++
++	return get_nfs_server_ip(NULL, NULL, &addr) == 0 &&
++	       get_peer_iface(&addr, ifname) == 0 &&
++	       strcmp(devname, ifname) == 0;
++}
++
++gchar **__connman_inet_get_pnp_nameservers(const char *pnp_file)
++{
++	GError *error = NULL;
++	gchar *pnp = NULL;
++	gchar **pnpent = NULL;
++	gchar **nameservers = NULL;
++	gchar **pp;
++	char *s;
++	int pass, count;
++
++	if (!pnp_file)
++		pnp_file = "/proc/net/pnp";
++
++	if (!g_file_get_contents(pnp_file, &pnp, NULL, &error)) {
++		g_printerr("Cannot read %s %s\n", pnp_file, error->message);
++		goto out;
++        }
++
++	/* split in entries (by newlines) */
++	pnpent = g_strsplit(pnp, "\n", 0);
++	if (!pnpent) {
++		g_printerr("Cannot split pnp\n");
++		goto out;
++	}
++
++	count = 0;
++	nameservers = NULL;
++	for (pass = 1; pass <= 2; pass++) {
++
++		if (pass == 2)
++			nameservers = g_new(gchar *, count + 1);
++
++		count = 0;
++		for (pp = pnpent; *pp; pp++) {
++			if (strncmp(*pp, "nameserver ", strlen("nameserver ")))
++				continue;
++			s = *pp + strlen("nameserver ");
++			if (!strcmp(s, "0.0.0.0"))
++				continue;
++
++			if (pass == 2)
++				nameservers[count] = g_strdup(s);
++			count++;
++		}
++
++		/* no nameservers? */
++		if (count == 0)
++			goto out;
++
++		if (pass == 2)
++			nameservers[count] = NULL;
++
++	}
++
++out:
++	g_strfreev(pnpent);
++	g_free(pnp);
++	if (error)
++		g_error_free(error);
++
++	return nameservers;
++}
+diff --git a/src/resolver.c b/src/resolver.c
+index c4adbc6..75ea5ba 100644
+--- a/src/resolver.c
++++ b/src/resolver.c
+@@ -659,6 +659,14 @@ int __connman_resolver_init(gboolean dnsproxy)
+ 
+ 	DBG("dnsproxy %d", dnsproxy);
+ 
++	/* get autoip nameservers */
++	ns = __connman_inet_get_pnp_nameservers(NULL);
++	for (i = 0; ns && ns[i]; i += 1) {
++		DBG("pnp server %s", ns[i]);
++		append_resolver(i, NULL, ns[i], 86400, 0);
++	}
++	g_strfreev(ns);
++
+ 	if (!dnsproxy)
+ 		return 0;
+ 
+-- 
+2.1.4
