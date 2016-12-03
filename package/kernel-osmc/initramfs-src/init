@@ -5,11 +5,26 @@
 
 # Abstract settings and defaults
 
+install_symlinks()
+{
+	# Installs BusyBox symlinks to make the shell actually usable
+	/bin/busybox --install -s
+}
+
 busybox_shell()
 {
-        # Installs BusyBox symlinks to make the shell actually usable
-	/bin/busybox --install -s
+	install_symlinks
 	/bin/busybox setsid /bin/busybox sh -c 'exec /bin/busybox sh </dev/tty1 >/dev/tty1 2>&1'
+}
+
+setup_dhcp()
+{
+	/bin/busybox mkdir -p /etc/network
+	/bin/busybox mkdir -p /etc/network/if-up.d
+	echo "auto eth0
+	iface eth0 inet dhcp" > /etc/network/interfaces
+	/bin/busybox ifup eth0 > /dev/null 2>&1
+	/bin/busybox udhcpc -i eth0 > /dev/null 2>&1
 }
 
 OPTION_DO_FSCK="1"
@@ -29,6 +44,15 @@ OPTION_NFS_IP_TYPE="dhcp"
 /bin/busybox mount -t proc proc /proc
 /bin/busybox mount -t sysfs sysfs /sys
 /bin/busybox mount -t tmpfs tmpfs /run
+
+# Check for network debugger
+DEBUG_IP=$(/bin/busybox sed 's/\ /\n/g' /proc/cmdline | /bin/busybox grep "^debugip=" | /bin/busybox sed 's/^debugip=//g')
+if [ -n "$DEBUG_IP" ]
+then
+	setup_dhcp
+	install_symlinks
+	/bin/busybox nc "$DEBUG_IP" 9999 -e /bin/busybox sh
+fi
 
 # Load platform specific stuff
 . init-device
@@ -184,12 +208,7 @@ then
 	/bin/busybox mkdir -p /var/run
 	if echo $OPTION_NFS_IP_TYPE | /bin/busybox grep -q "dhcp"
 	then
-		/bin/busybox mkdir -p /etc/network
-		/bin/busybox mkdir -p /etc/network/if-up.d
-		echo "auto eth0
-		iface eth0 inet dhcp" > /etc/network/interfaces
-		/bin/busybox ifup eth0 > /dev/null 2>&1
-		/bin/busybox udhcpc -i eth0 > /dev/null 2>&1
+		setup_dhcp
 	else
 		NFS_IP_ADDR=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 1)
                 NFS_IP_GW=$(echo $OPTION_NFS_IP_TYPE | /bin/busybox cut -d : -f 3)
