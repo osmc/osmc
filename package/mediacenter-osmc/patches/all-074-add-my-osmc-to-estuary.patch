@@ -1,30 +1,31 @@
-From c15230a666f7ebfa0b919348cf4b4c1c82a15abf Mon Sep 17 00:00:00 2001
+From 3ddffdb65fe514a1effcf294f2a4f1aa723a5e16 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 6 Sep 2016 16:45:07 +0100
 Subject: [PATCH] Add My OSMC to Estuary skin
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- addons/skin.estuary/1080i/Home.xml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ addons/skin.estuary/xml/Home.xml | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/addons/skin.estuary/1080i/Home.xml b/addons/skin.estuary/1080i/Home.xml
-index e2bb2d4..b6c58ec 100644
---- a/addons/skin.estuary/1080i/Home.xml
-+++ b/addons/skin.estuary/1080i/Home.xml
-@@ -1090,6 +1090,12 @@
- 								<property name="id">weather</property>
- 								<visible>!Skin.HasSetting(HomeMenuNoWeatherButton)</visible>
- 							</item>
-+							<item>
-+								<label>My OSMC</label>
-+								<onclick>RunAddon(service.osmc.settings)</onclick>
-+								<thumb>icons/home/addons.png</thumb>
-+								<property name="id">osmc</property>
-+							</item>
- 						</content>
- 					</control>
+diff --git a/addons/skin.estuary/xml/Home.xml b/addons/skin.estuary/xml/Home.xml
+index d691b70..5965b06 100644
+--- a/addons/skin.estuary/xml/Home.xml
++++ b/addons/skin.estuary/xml/Home.xml
+@@ -898,6 +898,13 @@
+ 							<property name="id">weather</property>
+ 							<visible>!Skin.HasSetting(HomeMenuNoWeatherButton)</visible>
+ 						</item>
++                                                <item>
++                                                        <label>My OSMC</label>
++                                                        <onclick>RunAddon(service.osmc.settings)</onclick>
++                                                        <thumb>icons/home/addons.png</thumb>
++                                                        <property name="id">osmc</property>
++                                                </item>
++
+ 					</content>
  				</control>
+ 				<control type="grouplist" id="700">
 -- 
 2.7.4
 
