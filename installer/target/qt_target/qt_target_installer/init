@@ -88,6 +88,13 @@ then
     fi
 fi
 
+grep -q uart /proc/cmdline
+if [ $? == 0 ]
+then
+	/sbin/getty -L ttyAMA0 115200 vt100 &
+	loopforever
+fi
+
 /usr/bin/qt_target_installer -qws
 clear
 loopforever
