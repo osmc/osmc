@@ -250,7 +250,7 @@ then
 	done
 
 	echo -e "FATAL ERROR: Could not find a suitable init on the root filesystem\n\n\n\n"
-	while true; do /bin/busybox sleep 1000; done
+	busybox_shell
 else
 	echo -e "FATAL ERROR: OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
 	# Drop to a shell
