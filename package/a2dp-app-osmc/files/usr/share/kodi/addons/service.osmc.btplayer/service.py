@@ -153,13 +153,9 @@ class BTPlayer(threading.Thread):
         return self.state == "active"
 
     def next(self):
-        if __addon__.getSetting("debug") == "true":
-            log("NEXT")
         self.player.Next(dbus_interface=PLAYER_IFACE)
 
     def previous(self):
-        if __addon__.getSetting("debug") == "true":
-            log("PREVIOUS")
         self.player.Previous(dbus_interface=PLAYER_IFACE)
 
     def play(self):
@@ -208,12 +204,24 @@ class BTPlayerMonitor(xbmc.Player):
             self.btPlayer.play()
     
     def onNextItem(self):
+        if __addon__.getSetting("debug") == "true":
+            log("Next Item Event Fired")
         if self.btPlayer.isPlaying():
-            self.btPlayer.next()
+            try:
+                self.btPlayer.next()
+            except Exception as e:
+                log("Exception caught trying to request next track: " + str(e))
+                            
 
-    def onPrevItem(self):
-        if (self.btPlayer.isPlaying()):
-            self.btPlayer.previous()
+    def onPreviousItem(self):
+        if __addon__.getSetting("debug") == "true":
+            log("Previous Item Event Fired")
+        if self.btPlayer.isPlaying():
+            try:
+                self.btPlayer.previous()
+            except Exception as e:
+                log("Exception caught trying to request previous track: " + str(e))
+                            
 
 if __name__ == "__main__":
     if __addon__.getSetting("enabled") == "true":
@@ -232,7 +240,7 @@ if __name__ == "__main__":
                     break
                 
         except Exception as e:
-            print(e)
+            log("Exception caught  - service exiting " + str(e))
         finally:
             btPlayer.end()
         log("BTPlayer ended")
