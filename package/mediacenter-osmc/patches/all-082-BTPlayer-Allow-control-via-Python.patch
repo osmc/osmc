@@ -1,15 +1,15 @@
-From 3225a7e5a56f30bfaf0d3edd949a7ee223669d43 Mon Sep 17 00:00:00 2001
+From 9d525d6279a1274cf85c055593333970ca117440 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Sun, 20 Nov 2016 23:32:01 +0000
-Subject: [PATCH 2/2] [BTPlayer] Allow control from Python
+Date: Tue, 20 Dec 2016 22:49:37 +0000
+Subject: [PATCH 4/5] [BTPlayer] Allow control via Python
 
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp | 31 ++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 32 +++++++++++++++++
  xbmc/interfaces/legacy/ModuleXbmc.h   | 68 +++++++++++++++++++++++++++++++++++
- 2 files changed, 99 insertions(+)
+ 2 files changed, 100 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 0b921a8..ba13da7 100644
+index 0b921a8..c3f3bc5 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -61,6 +61,10 @@
@@ -23,7 +23,7 @@ index 0b921a8..ba13da7 100644
  using namespace KODI::MESSAGING;
  
  #ifdef TARGET_POSIX
-@@ -529,6 +533,33 @@ namespace XBMCAddon
+@@ -529,6 +533,34 @@ namespace XBMCAddon
        return CSysInfo::GetUserAgent();
      }
  
@@ -35,6 +35,7 @@ index 0b921a8..ba13da7 100644
 +      CFileItemPtr item;
 +      item.reset(new CFileItem(dbus_path, false));
 +      list.Add(item);
++      list.Add(item); // add a second time so we get next button rendered
 +
 +      std::string playerName = std::string("BTPlayer");
 +      auto fileItemList = new CFileItemList(); //don't delete
@@ -137,5 +138,5 @@ index fcdb253..ae187a7 100644
      ///-----------------------------------------------------------------------
      /// @python_v12 Completely removed.
 -- 
-2.5.0
+2.7.4
 

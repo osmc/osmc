@@ -1,0 +1,43 @@
+From 1c9504ec1ac4a027a7d7cd70d67aa9146f22c9ca Mon Sep 17 00:00:00 2001
+From: Gerald <gezb@users.noreply.github.com>
+Date: Mon, 26 Dec 2016 19:26:39 +0000
+Subject: [PATCH 2/5] [BTPlayer] new Application Message to set the current
+ playing playlist item
+
+---
+ xbmc/PlayListPlayer.cpp               | 5 +++++
+ xbmc/messaging/ApplicationMessenger.h | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/PlayListPlayer.cpp b/xbmc/PlayListPlayer.cpp
+index 577409c..0c7907a 100644
+--- a/xbmc/PlayListPlayer.cpp
++++ b/xbmc/PlayListPlayer.cpp
+@@ -937,6 +937,11 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
+       g_application.m_pPlayer->Pause();
+     }
+     break;
++  case TMSG_PLAYLISTPLAYER_SET_SONG_NO:
++    if (pMsg->param1 != -1)
++    {
++      m_iCurrentSong =  pMsg->param1 - 1;
++    }
+   default:
+     break;
+   }
+diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
+index b54b1c8..00a52f5 100644
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -57,7 +57,7 @@
+ #define TMSG_MEDIA_RESTART                TMSG_MASK_PLAYLISTPLAYER + 15
+ #define TMSG_MEDIA_UNPAUSE                TMSG_MASK_PLAYLISTPLAYER + 16
+ #define TMSG_MEDIA_PAUSE_IF_PLAYING       TMSG_MASK_PLAYLISTPLAYER + 17
+-
++#define TMSG_PLAYLISTPLAYER_SET_SONG_NO   TMSG_MASK_PLAYLISTPLAYER + 18
+ 
+ 
+ #define TMSG_SHUTDOWN                     TMSG_MASK_APPLICATION + 0
+-- 
+2.7.4
+

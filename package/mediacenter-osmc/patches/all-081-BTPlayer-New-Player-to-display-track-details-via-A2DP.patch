@@ -1,20 +1,19 @@
-From 041d1b2b6aa4543e436a11f6b2075ac66c18314d Mon Sep 17 00:00:00 2001
+From 6b7720ab4d364e9cfec649a1ac079f8c15841573 Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Sun, 20 Nov 2016 23:31:04 +0000
-Subject: [PATCH 1/2] [BTPlayer] new player to display A2DP track info when
- playing
+Date: Tue, 20 Dec 2016 22:47:27 +0000
+Subject: [PATCH 3/5] [BTPlayer] New Player to display track details via A2DP
 
 ---
  Makefile.in                                        |   1 +
  configure.ac                                       |   1 +
- xbmc/cores/btplayer/BTPlayer.cpp                   | 332 +++++++++++++++++++++
- xbmc/cores/btplayer/BTPlayer.h                     | 131 ++++++++
+ xbmc/cores/btplayer/BTPlayer.cpp                   | 392 +++++++++++++++++++++
+ xbmc/cores/btplayer/BTPlayer.h                     | 134 +++++++
  xbmc/cores/btplayer/Makefile.in                    |   9 +
  xbmc/cores/playercorefactory/PlayerCoreConfig.h    |   5 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.cpp |   5 +
- xbmc/linux/DBusUtil.cpp                            | 104 ++++---
+ xbmc/linux/DBusUtil.cpp                            | 106 +++---
  xbmc/linux/DBusUtil.h                              |   4 +-
- 9 files changed, 548 insertions(+), 44 deletions(-)
+ 9 files changed, 612 insertions(+), 45 deletions(-)
  create mode 100644 xbmc/cores/btplayer/BTPlayer.cpp
  create mode 100644 xbmc/cores/btplayer/BTPlayer.h
  create mode 100644 xbmc/cores/btplayer/Makefile.in
@@ -32,7 +31,7 @@ index 0d70e9b..e53e870 100644
                     xbmc/cores/paplayer/paplayer.a \
                     xbmc/cores/playercorefactory/playercorefactory.a \
 diff --git a/configure.ac b/configure.ac
-index 34fe643..aa62669 100644
+index a6d8b10..a824d1d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2172,6 +2172,7 @@ OUTPUT_FILES="Makefile \
@@ -45,10 +44,10 @@ index 34fe643..aa62669 100644
      xbmc/messaging/helpers/Makefile \
 diff --git a/xbmc/cores/btplayer/BTPlayer.cpp b/xbmc/cores/btplayer/BTPlayer.cpp
 new file mode 100644
-index 0000000..511b57e
+index 0000000..63fcc69
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.cpp
-@@ -0,0 +1,332 @@
+@@ -0,0 +1,392 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -125,39 +124,12 @@ index 0000000..511b57e
 +  m_bStop              (false)
 +{
 +  memset(&m_playerGUIData, 0, sizeof(m_playerGUIData));
-+
-+#ifdef HAS_DBUS
-+  DBusError dbus_error;
-+  dbus_error_init (&dbus_error);
-+  m_connection = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_error);
-+
-+  if (m_connection)
-+  {
-+    dbus_connection_set_exit_on_disconnect(m_connection, false);
-+    if (dbus_error_is_set(&dbus_error))
-+    {
-+      CLog::Log(LOGERROR, "Bluetooth: Failed to attach to signal %s", dbus_error.message);
-+      dbus_connection_close(m_connection);
-+      dbus_connection_unref(m_connection);
-+      m_connection = NULL;
-+    }
-+  }
-+  dbus_error_free (&dbus_error);
-+#endif
 +}
 +
 +BTPlayer::~BTPlayer()
 +{
 +  CloseFile();
 +  delete m_FileItem;
-+#ifdef HAS_DBUS
-+  if (m_connection)
-+  {
-+    dbus_connection_close(m_connection);
-+    dbus_connection_unref(m_connection);
-+    m_connection = NULL;
-+  }
-+#endif
 +}
 +
 +bool BTPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
@@ -167,6 +139,7 @@ index 0000000..511b57e
 +  CLog::Log (LOGINFO, "DBus Path : %s", file.GetPath().c_str());
 +#ifdef HAS_DBUS
 +  m_dbus_path = file.GetPath();
++  m_dbus_errors = 0;
 +#endif
 +  CSingleLock lock(m_streamsLock);
 +  /* Suspend AE temporarily so exclusive or hog-mode sinks */
@@ -225,34 +198,120 @@ index 0000000..511b57e
 +}
 +
 +#ifdef HAS_DBUS
++void BTPlayer::logDBusError()
++{
++  m_dbus_errors++;
++  if (m_dbus_errors > 50)
++    {
++      CLog::Log (LOGFATAL, "Too Many DBUS errors Closing BTPlayer");
++      m_bStop = true;
++    }
++}
++
++bool BTPlayer::haveTrackDetailsChanged(CVariant track, MUSIC_INFO::CMusicInfoTag &tag)
++{
++  bool trackDetailsChanged = false;
++  CLog::Log (LOGDEBUG, "haveTrackDetailsChanged");
++  if (!tag.GetArtist().empty())
++    {
++      if (tag.GetArtist().front().compare(track["Artist"].asString()) != 0)
++	{
++	  CLog::Log (LOGDEBUG, "Artist Changed %s %s", tag.GetArtist().front().c_str(), track["Artist"].asString().c_str());
++	  trackDetailsChanged = true;
++	}
++  }
++  if (tag.GetTitle().compare(track["Title"].asString()) != 0)
++  {
++    trackDetailsChanged = true;
++  }
++  if (tag.GetAlbum().compare(track["Album"].asString()) != 0)
++  {
++    trackDetailsChanged = true;
++  }
++  if (tag.GetTrackNumber() != track["TrackNumber"].asInteger())
++  {
++    trackDetailsChanged = true;
++  }
++  return trackDetailsChanged;
++}
++
 +void BTPlayer::updateA2DPInfo(std::string& destination_path)
 +{
++  bool trackDetailsChanged = false;
++  int numberOfTracks = m_numberOfTracks;
++  int trackNumber = 0;
 +  // get details from bluez
 +  CVariant track = CDBusUtil::GetVariant("org.bluez",
 +                                         destination_path.c_str(),
 +					 "org.bluez.MediaPlayer1",
 +					 "Track");
-+   
-+  m_tag.SetArtist(track["Artist"].asString());
-+  m_tag.SetTitle(track["Title"].asString());
-+  m_tag.SetAlbum(track["Album"].asString());
-+  m_tag.SetTrackNumber(track["TrackNumber"].asInteger(0));
-+  m_playerGUIData.m_totalTime = track["Duration"].asUnsignedInteger(0);
++  if (track == NULL)
++    {
++      logDBusError();
++    }
++  else
++    {
++      trackDetailsChanged = haveTrackDetailsChanged(track, m_tag);
++      if (trackDetailsChanged){
++	m_tag.SetArtist(track["Artist"].asString());
++	m_tag.SetTitle(track["Title"].asString());
++	m_tag.SetAlbum(track["Album"].asString());
++	m_tag.SetTrackNumber(track["TrackNumber"].asInteger(0));
++	numberOfTracks = track["NumberOfTracks"].asInteger(0);
++	trackNumber = track["TrackNumber"].asInteger(0);
++      }
++      m_playerGUIData.m_totalTime = track["Duration"].asUnsignedInteger(0);
++    }
 +  CVariant status = CDBusUtil::GetVariant("org.bluez",
-+     				          destination_path.c_str(),
-+				          "org.bluez.MediaPlayer1",
++					  destination_path.c_str(),
++					  "org.bluez.MediaPlayer1",
 +					  "Status");
-+  if (strcmp(status.asString().c_str(), "playing")== 0) 
-+  {  
-+    CVariant position = CDBusUtil::GetVariant("org.bluez",
-+    					      destination_path.c_str(),
-+  					      "org.bluez.MediaPlayer1",
-+					      "Position");
-+    m_playerGUIData.m_time = position.asUnsignedInteger(0);
-+  }
-+  
++  if (status == NULL)
++    {
++      logDBusError();
++    }
++  else 
++    {
++      if (strcmp(status.asString().c_str(), "playing")== 0) 
++	{  
++	  CVariant position = CDBusUtil::GetVariant("org.bluez",
++						    destination_path.c_str(),
++						    "org.bluez.MediaPlayer1",
++						    "Position");
++	  if (position == NULL)
++	    {
++	      logDBusError();
++	    }
++	  else
++	    {
++	      m_playerGUIData.m_time = position.asUnsignedInteger(0);
++	    }
++	}
++    }
++  // update the playlist size if the number of tracks have changed
++  if (m_numberOfTracks != numberOfTracks)
++    {
++      trackDetailsChanged = true;
++      m_numberOfTracks = numberOfTracks;
++      CFileItemList list;
++      for (int count =0; count < numberOfTracks; count++)
++	{
++	  CFileItemPtr item;
++	  item.reset(new CFileItem(destination_path, false));
++	  list.Add(item);
++	}
++      auto fileItemList = new CFileItemList();
++      fileItemList->Copy(list);
++      CApplicationMessenger::GetInstance().SendMsg(TMSG_PLAYLISTPLAYER_CLEAR, 0);
++      CApplicationMessenger::GetInstance().SendMsg(TMSG_PLAYLISTPLAYER_ADD,0, 0,static_cast<void*>(fileItemList));
++    }
++  // update progress bar
 +  CServiceBroker::GetDataCacheCore().SignalAudioInfoChange();
-+  CApplicationMessenger::GetInstance().PostMsg(TMSG_UPDATE_CURRENT_ITEM, 1,-1, static_cast<void*>(new CFileItem(m_tag)));
++  if (trackDetailsChanged)
++  {
++    CApplicationMessenger::GetInstance().PostMsg(TMSG_UPDATE_CURRENT_ITEM, 0, -1, static_cast<void*>(new CFileItem(m_tag)));
++    CApplicationMessenger::GetInstance().PostMsg(TMSG_PLAYLISTPLAYER_SET_SONG_NO, trackNumber, 0, NULL); 
++  }
 +}
 +#endif
 +
@@ -383,10 +442,10 @@ index 0000000..511b57e
 +}
 diff --git a/xbmc/cores/btplayer/BTPlayer.h b/xbmc/cores/btplayer/BTPlayer.h
 new file mode 100644
-index 0000000..358047b
+index 0000000..7550698
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.h
-@@ -0,0 +1,131 @@
+@@ -0,0 +1,134 @@
 +#pragma once
 +
 +/*
@@ -471,6 +530,7 @@ index 0000000..358047b
 +
 +  virtual void OnJobComplete(unsigned int jobID, bool success, CJob *job);
 +#ifdef HAS_DBUS
++  virtual void logDBusError();
 +  virtual void updateA2DPInfo(std::string& destination_path);
 +#endif
 +
@@ -513,9 +573,11 @@ index 0000000..358047b
 +    bool                      m_bStop;
 +    int64_t                   GetTotalTime64();
 +    int64_t                   GetTimeInternal();
++    bool                      haveTrackDetailsChanged(CVariant track, MUSIC_INFO::CMusicInfoTag &tag);
++    int                       m_numberOfTracks =0;
 +#ifdef HAS_DBUS
-+   DBusConnection             *m_connection;
 +   std::string                m_dbus_path;
++   unsigned int               m_dbus_errors;
 +#endif
 +};
 diff --git a/xbmc/cores/btplayer/Makefile.in b/xbmc/cores/btplayer/Makefile.in
@@ -580,9 +642,18 @@ index 896b865..1c537a1 100644
        int count = 0;
        std::string playername = name;
 diff --git a/xbmc/linux/DBusUtil.cpp b/xbmc/linux/DBusUtil.cpp
-index 08041eb..fb0c58f 100644
+index 08041eb..6c5f6b1 100644
 --- a/xbmc/linux/DBusUtil.cpp
 +++ b/xbmc/linux/DBusUtil.cpp
+@@ -25,7 +25,7 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
+ {
+ //dbus-send --system --print-reply --dest=destination object org.freedesktop.DBus.Properties.Get string:interface string:property
+   CDBusMessage message(destination, object, "org.freedesktop.DBus.Properties", "Get");
+-  CVariant result;
++  CVariant result = NULL;
+ 
+   if (message.AppendArgument(interface) && message.AppendArgument(property))
+   {
 @@ -40,7 +40,7 @@ CVariant CDBusUtil::GetVariant(const char *destination, const char *object, cons
          if (!dbus_message_has_signature(reply, "v"))
            CLog::Log(LOGERROR, "DBus: wrong signature on Get - should be \"v\" but was %s", dbus_message_iter_get_signature(&iter));
@@ -744,5 +815,5 @@ index a683d70..cbd53d6 100644
  };
  #endif
 -- 
-2.5.0
+2.7.4
 
