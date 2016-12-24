@@ -88,7 +88,7 @@ then
     fi
 fi
 
-grep -q uart /proc/cmdline
+grep -q osmcuart /proc/cmdline
 if [ $? == 0 ]
 then
 	/sbin/getty -L ttyAMA0 115200 vt100 &
