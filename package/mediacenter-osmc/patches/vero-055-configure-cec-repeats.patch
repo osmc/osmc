@@ -1,20 +1,20 @@
-From e6f905e70acba36fcae8e8c30fca5be16f930063 Mon Sep 17 00:00:00 2001
+From 4569762bae7daa9ef0537b865ed37d6b9e0f021d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 28 Oct 2014 00:19:40 +0000
 Subject: [PATCH] Add settings for configuring button repeats
 
 ---
- addons/resource.language.en_gb/resources/strings.po | 16 ++++++++++++++++
+ addons/resource.language.en_gb/resources/strings.po | 15 +++++++++++++++
  system/peripherals.xml                              |  4 +++-
  xbmc/peripherals/devices/PeripheralCecAdapter.cpp   | 16 ++++++++++++++++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ 3 files changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 7a4cbf0..c691a55 100644
+index abfc92b..7c56106 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -19511,6 +19511,22 @@ msgctxt "#38046"
- msgid "All roles"
+@@ -19433,6 +19433,21 @@ msgctxt "#38023"
+ msgid "Set my rating"
  msgstr ""
  
 +#: system/peripherals.xml
@@ -32,12 +32,11 @@ index 7a4cbf0..c691a55 100644
 +msgid "Remote button press release time (ms)"
 +msgstr ""
 +
-+
- #empty strings from id 38047 to 38099
- 
- #. Description of section #14200 "Player""
+ #: /xbmc/settings/dialogs/GUIDialogContentSettings.cpp
+ msgctxt "#38024"
+ msgid "Information provider selection"
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index 3f6221e..924076e 100644
+index 449f87c..d67f09f 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
 @@ -31,7 +31,9 @@
@@ -52,12 +51,12 @@ index 3f6221e..924076e 100644
  
    <peripheral vendor_product="2548:1001,2548:1002" bus="usb" name="Pulse-Eight CEC Adapter" mapTo="cec">
 diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-index 74ec964..092a115 100644
+index adae442..54e2fe7 100644
 --- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 +++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-@@ -1287,6 +1287,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
-   m_configuration.bSendInactiveSource = config.bSendInactiveSource;
-   bChanged |= SetSetting("send_inactive_source", m_configuration.bSendInactiveSource == 1);
+@@ -1295,6 +1295,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+ 
+   m_configuration.bPowerOffOnStandby = config.bPowerOffOnStandby;
  
 +#if defined(CEC_DOUBLE_TAP_TIMEOUT_MS_OLD)
 +  m_configuration.iDoubleTapTimeout50Ms = config.iDoubleTapTimeout50Ms;
@@ -74,9 +73,9 @@ index 74ec964..092a115 100644
 +  bChanged |= SetSetting("button_release_delay_ms", (int)m_configuration.iButtonReleaseDelayMs);
 +
    m_configuration.iFirmwareVersion = config.iFirmwareVersion;
-   m_configuration.bShutdownOnStandby = config.bShutdownOnStandby;
  
-@@ -1390,6 +1404,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+   memcpy(m_configuration.strDeviceLanguage, config.strDeviceLanguage, 3);
+@@ -1394,6 +1408,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
  #else
    // backwards compatibility. will be removed once the next major release of libCEC is out
    m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
