@@ -1,4 +1,4 @@
-From 6b7720ab4d364e9cfec649a1ac079f8c15841573 Mon Sep 17 00:00:00 2001
+From e6e06cfef5017cfe5dddba1fad899c20aecb170d Mon Sep 17 00:00:00 2001
 From: Gerald Barker <gezb@users.noreply.github.com>
 Date: Tue, 20 Dec 2016 22:47:27 +0000
 Subject: [PATCH 3/5] [BTPlayer] New Player to display track details via A2DP
@@ -6,8 +6,8 @@ Subject: [PATCH 3/5] [BTPlayer] New Player to display track details via A2DP
 ---
  Makefile.in                                        |   1 +
  configure.ac                                       |   1 +
- xbmc/cores/btplayer/BTPlayer.cpp                   | 392 +++++++++++++++++++++
- xbmc/cores/btplayer/BTPlayer.h                     | 134 +++++++
+ xbmc/cores/btplayer/BTPlayer.cpp                   | 390 +++++++++++++++++++++
+ xbmc/cores/btplayer/BTPlayer.h                     | 136 +++++++
  xbmc/cores/btplayer/Makefile.in                    |   9 +
  xbmc/cores/playercorefactory/PlayerCoreConfig.h    |   5 +
  xbmc/cores/playercorefactory/PlayerCoreFactory.cpp |   5 +
@@ -44,10 +44,10 @@ index a6d8b10..a824d1d 100644
      xbmc/messaging/helpers/Makefile \
 diff --git a/xbmc/cores/btplayer/BTPlayer.cpp b/xbmc/cores/btplayer/BTPlayer.cpp
 new file mode 100644
-index 0000000..63fcc69
+index 0000000..af6cd51
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.cpp
-@@ -0,0 +1,392 @@
+@@ -0,0 +1,390 @@
 +/*
 + *      Copyright (C) 2005-2013 Team XBMC
 + *      http://xbmc.org
@@ -211,12 +211,10 @@ index 0000000..63fcc69
 +bool BTPlayer::haveTrackDetailsChanged(CVariant track, MUSIC_INFO::CMusicInfoTag &tag)
 +{
 +  bool trackDetailsChanged = false;
-+  CLog::Log (LOGDEBUG, "haveTrackDetailsChanged");
 +  if (!tag.GetArtist().empty())
 +    {
 +      if (tag.GetArtist().front().compare(track["Artist"].asString()) != 0)
 +	{
-+	  CLog::Log (LOGDEBUG, "Artist Changed %s %s", tag.GetArtist().front().c_str(), track["Artist"].asString().c_str());
 +	  trackDetailsChanged = true;
 +	}
 +  }
@@ -442,10 +440,10 @@ index 0000000..63fcc69
 +}
 diff --git a/xbmc/cores/btplayer/BTPlayer.h b/xbmc/cores/btplayer/BTPlayer.h
 new file mode 100644
-index 0000000..7550698
+index 0000000..5aaed05
 --- /dev/null
 +++ b/xbmc/cores/btplayer/BTPlayer.h
-@@ -0,0 +1,134 @@
+@@ -0,0 +1,136 @@
 +#pragma once
 +
 +/*
@@ -524,9 +522,11 @@ index 0000000..7550698
 +  virtual int64_t GetTime();
 +  virtual void SeekTime() const { return; }
 +  virtual bool SkipNext() const { return false; }
++  virtual bool IsPassthrough() const { return true; }
 +  virtual void GetAudioCapabilities(std::vector<int> &audioCaps) {}
 +
 +  static bool HandlesType(const std::string &type) { return true; }
++  
 +
 +  virtual void OnJobComplete(unsigned int jobID, bool success, CJob *job);
 +#ifdef HAS_DBUS
