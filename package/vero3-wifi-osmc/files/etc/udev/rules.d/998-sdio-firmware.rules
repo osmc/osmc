@@ -1,0 +1,14 @@
+ACTION!="add", GOTO="end"
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", GOTO="begin"
+GOTO="end"
+
+LABEL="begin"
+
+### Broadcom bcm4345c0 bluetooth device
+ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa9bf", \
+  ENV{brcm_device}="bcm4345c0"
+
+ENV{brcm_device}=="bcm*", ACTION=="add", \
+  TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware@$env{brcm_device}.service"
+
+LABEL="end"
