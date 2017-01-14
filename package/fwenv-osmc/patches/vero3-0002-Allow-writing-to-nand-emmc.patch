@@ -1,0 +1,49 @@
+From 88af2538beeb1ea8ace788afb8a3aeef069372e5 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 11 Jan 2017 04:30:53 +0000
+Subject: [PATCH 2/4] Allow writing to nand/emmc
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ tools/env/fw_env.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tools/env/fw_env.c b/tools/env/fw_env.c
+index a76fb71..660e0f9 100644
+--- a/tools/env/fw_env.c
++++ b/tools/env/fw_env.c
+@@ -957,12 +957,13 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
+ 				}
+ 		}
+ 
+-		if (lseek (fd, blockstart, SEEK_SET) == -1) {
+-			fprintf (stderr,
+-				 "Seek error on %s: %s\n",
+-				 DEVNAME (dev), strerror (errno));
+-			return -1;
+-		}
++		if (blockstart != 0)
++			if (lseek (fd, blockstart, SEEK_SET) == -1) {
++				fprintf (stderr,
++					 "Seek error on %s: %s\n",
++					 DEVNAME (dev), strerror (errno));
++				return -1;
++			}
+ 
+ #ifdef DEBUG
+ 		fprintf(stderr, "Write 0x%x bytes at 0x%llx\n", erasesize,
+@@ -1105,9 +1106,8 @@ static int flash_read (int fd)
+ 		    mtdinfo.type != MTD_NANDFLASH &&
+ 		    mtdinfo.type != MTD_DATAFLASH &&
+ 		    mtdinfo.type != MTD_UBIVOLUME) {
+-			fprintf (stderr, "Unsupported flash type %u on %s\n",
+-				 mtdinfo.type, DEVNAME(dev_current));
+-			return -1;
++			memset(&mtdinfo, 0, sizeof(mtdinfo));
++			mtdinfo.type = MTD_ABSENT;
+ 		}
+ 	} else {
+ 		memset(&mtdinfo, 0, sizeof(mtdinfo));
+-- 
+2.7.4
+
