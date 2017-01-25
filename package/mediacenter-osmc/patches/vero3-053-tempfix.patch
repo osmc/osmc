@@ -1,0 +1,25 @@
+From a59121c272903ded910410407deb4cb2f11e9a0f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 26 Jan 2017 15:18:43 +0000
+Subject: [PATCH] tempfix
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Autorun.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/Autorun.cpp b/xbmc/Autorun.cpp
+index 909284d..606532b 100644
+--- a/xbmc/Autorun.cpp
++++ b/xbmc/Autorun.cpp
+@@ -465,6 +465,7 @@ bool CAutorun::RunDisc(IDirectory* pDir, const std::string& strDrive, int& nAdde
+ 
+ void CAutorun::HandleAutorun()
+ {
++return ;
+ #ifndef TARGET_WINDOWS
+   if (!m_bEnable)
+   {
+-- 
+2.7.4
+

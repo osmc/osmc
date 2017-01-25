@@ -1,0 +1,31 @@
+From 6b45e9c403ecd3bdd554e78f2ea6bc3649b10ee4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:47:44 +0100
+Subject: [PATCH] Disable suspend on Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/powermanagement/PowerManager.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
+index f946eec..d211fb0 100644
+--- a/xbmc/powermanagement/PowerManager.cpp
++++ b/xbmc/powermanagement/PowerManager.cpp
+@@ -199,11 +199,11 @@ bool CPowerManager::CanPowerdown()
+ }
+ bool CPowerManager::CanSuspend()
+ {
+-  return m_instance->CanSuspend();
++  return false;
+ }
+ bool CPowerManager::CanHibernate()
+ {
+-  return m_instance->CanHibernate();
++  return false;
+ }
+ bool CPowerManager::CanReboot()
+ {
+-- 
+2.1.0
+

@@ -1,0 +1,35 @@
+From 7c37d23aed00daf83c57b5b5b86252d47aeb1154 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 3 Jun 2015 14:12:58 +0100
+Subject: [PATCH] Create configuration option for Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure.ac | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index acf4ce6..04ed84c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -677,6 +677,17 @@ case $use_platform in
+      use_neon=yes
+      use_cpu=cortex-a7
+      ;;
++   vero3)
++     use_static_ffmpeg=yes
++     use_joystick=no
++     use_sdl=no
++     use_hardcoded_tables="yes"
++     CFLAGS="$CFLAGS -pipe -O3 -funroll-loops -mcpu=cortex-a53 -fomit-frame-pointer"
++     CXXFLAGS="$CXXFLAGS -pipe -O3 -funroll-loops -mcpu=cortex-a53 -fomit-frame-pointer"
++     FFMPEG_EXTRACFLAGS="$FFMPEG_EXTRACFLAGS -pipe -O3 -funroll-loops -mcpu=cortex-a53 -fomit-frame-pointer"
++     use_cpu=cortex-a53
++     use_neon=yes
++     ;;
+ esac
+ 
+ if test "$target_platform" = "target_raspberry_pi" ; then
+-- 
+2.7.4
+

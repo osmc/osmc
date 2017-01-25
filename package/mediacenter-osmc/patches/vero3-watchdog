@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+fb_restore() {
+	echo 1 >/sys/class/vtconsole/vtcon1/bind
+}
+
+export TERM=linux
+chown osmc:osmc /sys/class/vtconsole/vtcon*/bind
+
+if [ "$1" = "stop" ]; then
+	fb_restore
+	exit
+fi
+
+syspaths="/sys/class/video/axis
+/sys/class/video/screen_mode
+/sys/class/video/disable_video
+/sys/class/tsync/pts_pcrscr
+/sys/class/tsync/enable
+/sys/class/audiodsp/digital_raw
+/sys/class/ppmgr/ppmgr_3d_mode
+/sys/class/display/mode
+/sys/class/audiodsp/digital_codec
+/sys/module/amlvideodri/parameters/freerun_mode
+/sys/module/amvideo/parameters/omx_pts
+/sys/class/vfm/map
+/dev/video10"
+
+for syspath in $syspaths; do
+        chgrp -R video $syspath
+        chmod -R g+u $syspath
+done
+
+trap 'wait; exit 0' SIGTERM
+
+chmod a+rw /dev/tty1
+/usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
+
+/sbin/checkmodifier
+case $? in
+4)
+	/usr/bin/setterm --cursor on >/dev/tty1
+	systemctl start getty@tty1
+	exit 0
+	;;
+5)
+	vres=$(/bin/fbset | grep geometry | awk '{print $3}')
+	if ((vres<=660))
+	then
+		setfont OSMC-Lat15-Terminus14.psf.gz
+	elif ((661<=vres && vres<=890))
+	then
+		setfont OSMC-Lat15-TerminusBold22x11.psf.gz
+	elif ((891<=vres))
+	then
+		setfont OSMC-Lat15-TerminusBold28x14.psf.gz
+	fi
+
+	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
+
+	count=60
+	while [ $count -gt 0 ]; do
+		if grep -q nfsroot /proc/cmdline; then
+			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
+		else
+			if connmanctl state | grep -iq 'online'; then break; fi
+		fi
+		sleep 5; let count-=5
+	done
+
+	if [ $count -lt 1 ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
+		sleep 20; reboot
+	fi
+        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
+        err=$(apt-get -qq update); if [ -n "$err" ]
+        then
+                dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
+                sleep 20
+        fi
+        systemctl start manual-update
+        exit 0
+        ;;
+esac
+
+while true; do
+
+	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
+	KODI=/usr/lib/kodi/kodi.bin
+	setcap 'cap_net_bind_service=+ep' $KODI
+	echo 0 > /sys/class/vtconsole/vtcon1/bind
+	starttime=$(date +%s)
+	echo "Starting Kodi..."
+	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
+	endtime=$(date +%s)
+	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
+	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
+
+	fb_restore
+	case $CODE in
+	64|66 )
+		exit 0;;
+	esac
+	chmod a+rw /dev/tty1
+	systemctl status getty@tty1 >/dev/null; GETTY=$?
+	if [ "$GETTY" -ne 0 ]; then
+		chvt 1
+		/usr/bin/setterm --cursor off >/dev/tty1
+		/usr/bin/clear >/dev/tty1
+		/usr/bin/ply-image "$CODE"
+		read -n 1 -s -t 10 key </dev/tty1
+	fi
+	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
+		/usr/bin/setterm --cursor on >/dev/tty1
+		systemctl start getty@tty1
+		count=30
+		while [ $count -gt 0 ]; do
+			who | awk '{print $2}' | grep -q tty1
+			if [ "$?" -eq 0 ]; then
+				count=5
+			else
+				let count=count-5
+			fi
+			sleep 5
+		done
+		systemctl stop getty@tty1
+	fi
+done
