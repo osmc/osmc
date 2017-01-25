@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "diskdevice.h"
 #include <QFile>
+#include <QDataStream>
 #include "sys/mount.h"
 #include <stdlib.h>
 #include "writeimageworker.h"
