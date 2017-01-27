@@ -648,6 +648,8 @@ def soundcard_dac_config_set(kodi_setting, all_settings):
 		'hifiberry-digi-overlay',
 		'iqaudio-dac-overlay,unmute_amp',
 		'iqaudio-dacplus-overlay,unmute_amp',
+		'justboom-dac-overlay',
+		'justboom-digi-overlay',
 		'allo-piano-dac-pcm512x-audio-overlay'
 		]
 
@@ -1184,8 +1186,8 @@ MASTER_SETTINGS =    {
 				},
 			"config_get_patterns": [
 				{
-				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*[-\w\d]*(?:hifiberry-d|iqaudio-d|allo-piano-d)",
-				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*(?:hifiberry-d|iqaudio-d|allo-piano-d)[-\w\d]*)"
+				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*[-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d)",
+				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d)[-\w\d]*)"
 				},
 
 				],
