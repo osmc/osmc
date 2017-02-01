@@ -1,8 +1,11 @@
 all:
-	@echo "Usage: make vero2\n"
+	@echo "Usage: make vero2\nmake vero3"
 
 vero2:
 	sudo bash build.sh vero2
+
+vero3:
+	sudo bash build.sh vero3
 
 clean:
 	sudo rm -f *.deb >/dev/null 2>&1
