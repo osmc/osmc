@@ -1,0 +1,26 @@
+From e38318efde99eb376b822298ae02a47c8c400791 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 7 Oct 2016 17:43:51 +0100
+Subject: [PATCH] Fix an issue when passing multiple addons to ADDONS_TO_BUILD
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ project/cmake/addons/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/project/cmake/addons/CMakeLists.txt b/project/cmake/addons/CMakeLists.txt
+index 96e544b..ee4abf4 100644
+--- a/project/cmake/addons/CMakeLists.txt
++++ b/project/cmake/addons/CMakeLists.txt
+@@ -214,7 +214,7 @@ if(NOT addons)
+                   WORKING_DIRECTORY ${BOOTSTRAP_BUILD_DIR})
+ 
+   # now look for all the addons to be built again
+-  file(GLOB_RECURSE addons ${ADDONS_DEFINITION_DIR}/*.txt)
++  file(GLOB_RECURSE addons ${BOOTSTRAP_BUILD_DIR}/binary-addons/src/binary-addons/*.txt)
+ 
+   if(NOT addons)
+     message(FATAL_ERROR "No addons available to be built")
+-- 
+2.7.4
+

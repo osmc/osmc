@@ -1,0 +1,26 @@
+From d3064a9d72af72b0af1b67ddf49a51888d9d3254 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Sep 2016 16:22:43 +0100
+Subject: [PATCH] Enable Expert Settings by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/view/ViewStateSettings.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/view/ViewStateSettings.cpp b/xbmc/view/ViewStateSettings.cpp
+index a608a82..9ec76f8 100644
+--- a/xbmc/view/ViewStateSettings.cpp
++++ b/xbmc/view/ViewStateSettings.cpp
+@@ -128,7 +128,7 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
+     if (XMLUtils::GetInt(pElement, XML_SETTINGLEVEL, settingLevel, (const int)SettingLevelBasic, (const int)SettingLevelExpert))
+       m_settingLevel = (SettingLevel)settingLevel;
+     else
+-      m_settingLevel = SettingLevelStandard;
++      m_settingLevel = SettingLevelExpert;
+ 
+     const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
+     if (pEventLogNode != NULL)
+-- 
+2.7.4
+

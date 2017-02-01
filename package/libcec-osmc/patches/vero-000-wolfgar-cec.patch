@@ -1,4 +1,4 @@
-From 72cca3e01c2bed5ef2add7d2af008803896ad6cc Mon Sep 17 00:00:00 2001
+From 1154bfbed70b82561962c4e08f67aca367db3500 Mon Sep 17 00:00:00 2001
 From: wolfgar <stephan.rafin@laposte.net>
 Date: Sat, 28 Sep 2013 13:31:13 +0200
 Subject: [PATCH] Early support for i.MX6 Fix compiler warning (or even error
@@ -7,7 +7,7 @@ Subject: [PATCH] Early support for i.MX6 Fix compiler warning (or even error
 
 ---
  configure.ac                                       | 411 +++++++++++++++++++++
- include/cectypes.h                                 |  20 +-
+ include/cectypes.h                                 |  13 +-
  src/lib/Makefile.am                                |  68 ++++
  src/lib/adapter/IMX/AdapterMessageQueue.h          | 134 +++++++
  src/lib/adapter/IMX/IMXCECAdapterCommunication.cpp | 279 ++++++++++++++
@@ -15,8 +15,8 @@ Subject: [PATCH] Early support for i.MX6 Fix compiler warning (or even error
  src/lib/adapter/IMX/IMXCECAdapterDetection.cpp     |  42 +++
  src/lib/adapter/IMX/IMXCECAdapterDetection.h       |  36 ++
  src/libcec/CECTypeUtils.h                          |   2 +
- src/libcec/adapter/AdapterFactory.cpp              |  27 +-
- 10 files changed, 1129 insertions(+), 4 deletions(-)
+ src/libcec/adapter/AdapterFactory.cpp              |  28 +-
+ 10 files changed, 1124 insertions(+), 3 deletions(-)
  create mode 100644 configure.ac
  create mode 100644 src/lib/Makefile.am
  create mode 100644 src/lib/adapter/IMX/AdapterMessageQueue.h
@@ -443,10 +443,10 @@ index 0000000..923d7e5
 +
 +EOB
 diff --git a/include/cectypes.h b/include/cectypes.h
-index acff259..c43a921 100644
+index 9c91842..341b23b 100644
 --- a/include/cectypes.h
 +++ b/include/cectypes.h
-@@ -299,9 +299,19 @@ namespace CEC {
+@@ -267,9 +267,19 @@ namespace CEC {
  #define CEC_TDA995x_VIRTUAL_COM		"CuBox"
  
  /*!
@@ -467,28 +467,14 @@ index acff259..c43a921 100644
  
  /*!
   * the name of the virtual COM port to use for the EXYNOS' CEC wire
-@@ -311,6 +321,11 @@ namespace CEC {
- /*!
-  * Mimimum client version
-  */
-+#define CEC_MIN_LIB_VERSION          2
-+
-+/*!
-+ * libCEC's major version number
-+ */
- #define CEC_MIN_LIB_VERSION          3
- 
- #define MSGSTART                     0xFF
-@@ -876,7 +891,8 @@ typedef enum cec_adapter_type
-   ADAPTERTYPE_P8_DAUGHTERBOARD = 0x2,
+@@ -861,6 +871,7 @@ typedef enum cec_adapter_type
    ADAPTERTYPE_RPI              = 0x100,
    ADAPTERTYPE_TDA995x          = 0x200,
--  ADAPTERTYPE_EXYNOS           = 0x300
-+  ADAPTERTYPE_EXYNOS           = 0x300,
-+  ADAPTERTYPE_IMX              = 0x400
+   ADAPTERTYPE_EXYNOS           = 0x300,
++  ADAPTERTYPE_IMX              = 0x400,
+   ADAPTERTYPE_AOCEC            = 0x500
  } cec_adapter_type;
  
- /** force exporting through swig */
 diff --git a/src/lib/Makefile.am b/src/lib/Makefile.am
 new file mode 100644
 index 0000000..6788303
@@ -1199,10 +1185,10 @@ index 0000000..d54891d
 +  };
 +}
 diff --git a/src/libcec/CECTypeUtils.h b/src/libcec/CECTypeUtils.h
-index fd8046a..48cb215 100644
+index 0d0cf17..f6c818a 100644
 --- a/src/libcec/CECTypeUtils.h
 +++ b/src/libcec/CECTypeUtils.h
-@@ -765,6 +765,8 @@ namespace CEC
+@@ -766,6 +766,8 @@ namespace CEC
          return "Raspberry Pi";
        case ADAPTERTYPE_TDA995x:
          return "TDA995x";
@@ -1212,7 +1198,7 @@ index fd8046a..48cb215 100644
          return "unknown";
        }
 diff --git a/src/libcec/adapter/AdapterFactory.cpp b/src/libcec/adapter/AdapterFactory.cpp
-index da05725..3fe49f1 100644
+index 1e946e6..115bc4b 100644
 --- a/src/libcec/adapter/AdapterFactory.cpp
 +++ b/src/libcec/adapter/AdapterFactory.cpp
 @@ -58,6 +58,11 @@
@@ -1224,10 +1210,10 @@ index da05725..3fe49f1 100644
 +#include "IMX/IMXCECAdapterCommunication.h"
 +#endif
 +
- using namespace CEC;
- 
- int8_t CAdapterFactory::FindAdapters(cec_adapter *deviceList, uint8_t iBufSize, const char *strDevicePath /* = NULL */)
-@@ -126,8 +131,21 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
+ #if defined(HAVE_AOCEC_API)
+ #include "AOCEC/AOCECAdapterDetection.h"
+ #include "AOCEC/AOCECAdapterCommunication.h"
+@@ -131,6 +136,20 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
    }
  #endif
  
@@ -1244,13 +1230,20 @@ index da05725..3fe49f1 100644
 +  }
 +#endif
 +
++
+ #if defined(HAVE_AOCEC_API)
+   if (iAdaptersFound < iBufSize && CAOCECAdapterDetection::FindAdapter())
+   {
+@@ -144,7 +163,7 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
+ #endif
  
--#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API)
-+#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_IMX_API)
+ 
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_AOCEC_API)
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_AOCEC_API) && !defined(HAVE_IMX_API)
  #error "libCEC doesn't have support for any type of adapter. please check your build system or configuration"
  #endif
  
-@@ -151,11 +169,16 @@ IAdapterCommunication *CAdapterFactory::GetInstance(const char *strPort, uint16_
+@@ -173,11 +192,16 @@ IAdapterCommunication *CAdapterFactory::GetInstance(const char *strPort, uint16_
      return new CRPiCECAdapterCommunication(m_lib->m_cec);
  #endif
  
@@ -1268,3 +1261,6 @@ index da05725..3fe49f1 100644
    return NULL;
  #endif
  }
+-- 
+2.7.4
+

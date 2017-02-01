@@ -1,0 +1,27 @@
+From 6039e8024df96079cf07c7b6edcfde977eb2d30b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Sep 2016 16:59:33 +0100
+Subject: [PATCH] Use scaling_max_freq to avoid confusion, particularly on ARM
+ platforms
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/CPUInfo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/CPUInfo.cpp b/xbmc/utils/CPUInfo.cpp
+index 6377d35..e6fef0e 100644
+--- a/xbmc/utils/CPUInfo.cpp
++++ b/xbmc/utils/CPUInfo.cpp
+@@ -271,7 +271,7 @@ CCPUInfo::CCPUInfo(void)
+   if (m_fProcTemperature == NULL)   
+     m_fProcTemperature = fopen("/sys/class/thermal/thermal_zone0/temp", "r");  // On Raspberry PIs
+ 
+-  m_fCPUFreq = fopen ("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq", "r");
++  m_fCPUFreq = fopen ("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", "r");
+   if (!m_fCPUFreq)
+   {
+     m_cpuInfoForFreq = true;
+-- 
+2.7.4
+

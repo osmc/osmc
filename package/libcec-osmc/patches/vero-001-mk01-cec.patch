@@ -1,4 +1,4 @@
-From 0ee4cb8788c1a72680c4581570c6d19697dd291b Mon Sep 17 00:00:00 2001
+From d5db0b26d093cf133dc494c9bb0a22fa71560ac6 Mon Sep 17 00:00:00 2001
 From: Matus Kral <matuskral@me.com>
 Date: Wed, 10 Sep 2014 22:23:37 +0200
 Subject: [PATCH] - update to IMX6 support - handle releasing adapter better on
@@ -22,10 +22,10 @@ Subject: [PATCH] - update to IMX6 support - handle releasing adapter better on
  src/lib/adapter/IMX/IMXCECAdapterCommunication.h   |  35 +-
  src/lib/adapter/IMX/IMXCECAdapterMessageQueue.h    | 118 ++++++
  src/lib/adapter/IMX/mxc_hdmi-cec.h                 |  47 +++
- src/libcec/CMakeLists.txt                          |  14 +-
- src/libcec/cmake/CheckPlatformSupport.cmake        |  28 +-
+ src/libcec/CMakeLists.txt                          |  12 +-
+ src/libcec/cmake/CheckPlatformSupport.cmake        |  12 +
  src/libcec/cmake/DisplayPlatformSupport.cmake      |   6 +
- 9 files changed, 412 insertions(+), 641 deletions(-)
+ 9 files changed, 401 insertions(+), 634 deletions(-)
  delete mode 100644 configure.ac
  delete mode 100644 src/lib/adapter/IMX/AdapterMessageQueue.h
  create mode 100644 src/lib/adapter/IMX/IMXCECAdapterMessageQueue.h
@@ -1256,10 +1256,10 @@ index 0000000..bc5bbce
 +#endif				/* !_HDMICEC_H_ */
 +
 diff --git a/src/libcec/CMakeLists.txt b/src/libcec/CMakeLists.txt
-index a7cc6c4..bd13277 100644
+index d3eefa3..3f59faa 100644
 --- a/src/libcec/CMakeLists.txt
 +++ b/src/libcec/CMakeLists.txt
-@@ -170,13 +170,17 @@ install(FILES ${PROJECT_SOURCE_DIR}/../../include/cec.h
+@@ -176,11 +176,15 @@ install(FILES ${PROJECT_SOURCE_DIR}/../../include/cec.h
          DESTINATION include/libcec)
  
  # libCEC target
@@ -1273,47 +1273,20 @@ index a7cc6c4..bd13277 100644
 +install(TARGETS cec cecstatic
          DESTINATION ${LIB_DESTINATION})
 -set_target_properties(cec PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
+-                                     SOVERSION ${LIBCEC_VERSION_MAJOR})
 +set_target_properties(cec cecstatic PROPERTIES VERSION   ${LIBCEC_VERSION_MAJOR}.${LIBCEC_VERSION_MINOR}.${LIBCEC_VERSION_PATCH}
-                                      SOVERSION ${LIBCEC_VERSION_MAJOR}.0)
--target_link_libraries(cec ${platform_LIBRARIES})
--target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
-+target_link_libraries(cec cecstatic ${platform_LIBRARIES})
-+target_link_libraries(cec cecstatic ${CMAKE_THREAD_LIBS_INIT})
++                                      SOVERSION ${LIBCEC_VERSION_MAJOR}.0)
+ target_link_libraries(cec ${p8-platform_LIBRARIES})
+ target_link_libraries(cec ${CMAKE_THREAD_LIBS_INIT})
  
- include(cmake/LinkPlatformSupport.cmake)
- include(cmake/DisplayPlatformSupport.cmake)
 diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
-index 74f3690..4bd8043 100644
+index 532f213..87ebe2c 100644
 --- a/src/libcec/cmake/CheckPlatformSupport.cmake
 +++ b/src/libcec/cmake/CheckPlatformSupport.cmake
-@@ -72,12 +72,16 @@ else()
+@@ -137,6 +137,18 @@ else()
+     list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_EXYNOS})
    endif()
  
-   # xrandr
--  check_include_files("X11/Xlib.h;X11/Xatom.h;X11/extensions/Xrandr.h" HAVE_RANDR_HEADERS)
--  check_library_exists(Xrandr XRRGetScreenResources "" HAVE_RANDR_LIB)
--  if (HAVE_RANDR_HEADERS AND HAVE_RANDR_LIB)
--    set(LIB_INFO "${LIB_INFO}, randr")
--    list(APPEND CEC_SOURCES_PLATFORM platform/X11/randr-edid.cpp)
--    set(HAVE_RANDR 1)
-+  if (${HAVE_RANDR_API})
-+    check_include_files("X11/Xlib.h;X11/Xatom.h;X11/extensions/Xrandr.h" HAVE_RANDR_HEADERS)
-+    check_library_exists(Xrandr XRRGetScreenResources "" HAVE_RANDR_LIB)
-+    if (HAVE_RANDR_HEADERS AND HAVE_RANDR_LIB)
-+      set(LIB_INFO "${LIB_INFO}, randr")
-+      list(APPEND CEC_SOURCES_PLATFORM platform/X11/randr-edid.cpp)
-+      set(HAVE_RANDR 1)
-+    else()
-+      set(HAVE_RANDR 0)
-+    endif()
-   else()
-     set(HAVE_RANDR 0)
-   endif()
-@@ -119,6 +123,18 @@ else()
-   else()
-     set(HAVE_EXYNOS_API 0)
-   endif()
-+
 +  # iMX6
 +  if (${HAVE_IMX_API})
 +    set(LIB_INFO "${LIB_INFO}, iMX6")
@@ -1325,15 +1298,16 @@ index 74f3690..4bd8043 100644
 +  else()
 +    set(HAVE_IMX_API 0)
 +  endif()
- endif()
- 
- # rt
++
+   # AOCEC
+   if (${HAVE_AOCEC_API})
+     set(LIB_INFO "${LIB_INFO}, AOCEC")
 diff --git a/src/libcec/cmake/DisplayPlatformSupport.cmake b/src/libcec/cmake/DisplayPlatformSupport.cmake
-index feee111..57f75dd 100644
+index 7ec10f5..dd26c58 100644
 --- a/src/libcec/cmake/DisplayPlatformSupport.cmake
 +++ b/src/libcec/cmake/DisplayPlatformSupport.cmake
-@@ -44,6 +44,12 @@ else()
-   message(STATUS "Exynos support:                         no")
+@@ -56,5 +56,11 @@ else()
+   message(STATUS "Python support:                         no")
  endif()
  
 +if (HAVE_IMX_API)
@@ -1342,6 +1316,8 @@ index feee111..57f75dd 100644
 +  message(STATUS "i.MX6 support:                          no")
 +endif()
 +
- if (HAVE_PYTHON)
-   message(STATUS "Python support:                         version ${PYTHONLIBS_VERSION_STRING} (${PYTHON_VERSION})")
- else()
+ message(STATUS "lib info: ${LIB_INFO}")
+ 
+-- 
+2.7.4
+

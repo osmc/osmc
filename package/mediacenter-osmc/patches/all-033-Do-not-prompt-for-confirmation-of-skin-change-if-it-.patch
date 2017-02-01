@@ -1,4 +1,4 @@
-From b9186ba9e45820ff96b27f8a1fcb2e660e0742bc Mon Sep 17 00:00:00 2001
+From 051869b0ca74c645c650acd34b08ce44d313f5b8 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:48:19 +0100
 Subject: [PATCH] Do not prompt for confirmation of skin change if it has been
@@ -10,22 +10,22 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 2403f0c..be7a7a8 100644
+index 3b3fe9c..e914de9 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -1399,8 +1399,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
- 
-     // now we can finally reload skins
-     std::string builtin("ReloadSkin");
--    if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && !m_skinReverting)
-+    if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && !m_skinReverting && m_eOSMCWalkthroughState != OSMC_WALKTHROUGH_ISRUNNING )
-       builtin += "(confirm)";
-+    // We need to set ISDONE first so reloading is allowed
-+    if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
-+      m_eOSMCWalkthroughState = OSMC_WALKTHROUGH_ISDONE;
-     CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, builtin);
+@@ -1410,8 +1410,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
+     {
+       // now we can finally reload skins
+       std::string builtin("ReloadSkin");
+-      if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && m_confirmSkinChange)
++      if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && m_confirmSkinChange && m_eOSMCWalkthroughState != OSMC_WALKTHROUGH_ISRUNNING)
+         builtin += "(confirm)";
++     // We need to set ISDONE first so reloading is allowed
++     if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
++        m_eOSMCWalkthroughState = OSMC_WALKTHROUGH_ISDONE;
+       CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, builtin);
+     }
    }
-   else if (settingId == CSettings::SETTING_LOOKANDFEEL_SKINZOOM)
 -- 
-2.1.0
+2.7.4
 

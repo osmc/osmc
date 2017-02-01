@@ -1,4 +1,4 @@
-From 16dbdea8e90c9f8af80c8fffcd66fb9913f46258 Mon Sep 17 00:00:00 2001
+From f8d57c0b613066bde3c56317d0a91fbdb8e34ace Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:01:21 +0100
 Subject: [PATCH] Tidy up Raspberry Pi framebuffer after Kodi EGL windowing
@@ -10,7 +10,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 15 insertions(+)
 
 diff --git a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-index c21f23e..e2c453a 100644
+index bbe501d..cbb3cfb 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
 @@ -32,6 +32,7 @@
@@ -18,10 +18,10 @@ index c21f23e..e2c453a 100644
  #include "rendering/RenderSystem.h"
  #include <cassert>
 +#include <stdlib.h>
- 
- #ifndef __VIDEOCORE4__
- #define __VIDEOCORE4__
-@@ -108,6 +109,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
+ #ifdef TARGET_POSIX
+ #include "linux/XTimeUtils.h"
+ #endif
+@@ -111,6 +112,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
  
    m_DllBcmHost = new DllBcmHost;
    m_DllBcmHost->Load();
@@ -43,5 +43,5 @@ index c21f23e..e2c453a 100644
  }
  
 -- 
-2.1.0
+2.7.4
 

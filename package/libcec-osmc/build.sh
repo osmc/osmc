@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Pulse-Eight/libcec/archive/libcec-3.0.1.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/Pulse-Eight/libcec/archive/5388d3a18f7fe6b230cf7d6e678906e52d166532.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
@@ -41,6 +41,11 @@ then
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-cmake-osmc"
 	fi
+	if [ "$1" == "vero3" ]
+	then
+		handle_dep "aarch64-libplatform-dev-osmc"
+		handle_dep "aarch64-cmake-osmc"
+	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
 	if [ "$1" == "vero" ]; then handle_dep "vero-userland-dev-osmc"; fi
 	if [ "$1" == "i386" ]
@@ -59,6 +64,7 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp" && PLATFORM="-DRPI_INCLUDE_DIR=/opt/vc/include -DRPI_LIB_DIR=/opt/vc/lib"; fi
 	if [ "$1" == "vero" ]; then install_patch "../../patches" "vero" && PLATFORM="-DHAVE_IMX_API=1"; fi
 	if [ "$1" == "vero2" ]; then install_patch "../../patches" "vero2" && PLATFORM="-DHAVE_AMLOGIC_API=1"; fi
+	if [ "$1" == "vero3" ]; then install_patch "../../patches" "vero3" && PLATFORM="-DHAVE_AOCEC=1"; fi
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/osmc -DCMAKE_INSTALL_LIBDIR=/usr/osmc/lib -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/osmc/lib -DBUILD_SHARED_LIBS=1 -DCMAKE_INSTALL_RPATH=/usr/osmc/lib $PLATFORM .
 	$BUILD
 	make install DESTDIR=${out}

@@ -1,35 +1,21 @@
-From 755173a190a212e804442757c13c4ea9fc02da7b Mon Sep 17 00:00:00 2001
+From 8d04e44704b928c97bd25ebcc0944a452060595f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 13 Aug 2016 23:41:57 +0100
 Subject: [PATCH] Support loading of fonts from add-ons
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/addons/AddonManager.cpp   | 2 +-
- xbmc/addons/PluginSource.cpp   | 9 ++++++++-
- xbmc/addons/PluginSource.h     | 2 +-
+ xbmc/addons/PluginSource.cpp   | 7 +++++++
+ xbmc/addons/PluginSource.h     | 1 -
  xbmc/guilib/GUIFontManager.cpp | 8 ++++++--
  xbmc/guilib/GUIFontManager.h   | 2 +-
- 5 files changed, 17 insertions(+), 6 deletions(-)
+ 4 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/xbmc/addons/AddonManager.cpp b/xbmc/addons/AddonManager.cpp
-index ec60036..b6666ed 100644
---- a/xbmc/addons/AddonManager.cpp
-+++ b/xbmc/addons/AddonManager.cpp
-@@ -94,7 +94,7 @@ AddonPtr CAddonMgr::Factory(const cp_extension_t *props)
-   {
-     case ADDON_PLUGIN:
-     case ADDON_SCRIPT:
--      return AddonPtr(new CPluginSource(props));
-+      return AddonPtr(new CPluginSource(props, true));
-     case ADDON_SCRIPT_LIBRARY:
-     case ADDON_SCRIPT_LYRICS:
-     case ADDON_SCRIPT_MODULE:
 diff --git a/xbmc/addons/PluginSource.cpp b/xbmc/addons/PluginSource.cpp
-index ce2ced3..eb8c75e 100644
+index 14ca09e..fe15811 100644
 --- a/xbmc/addons/PluginSource.cpp
 +++ b/xbmc/addons/PluginSource.cpp
-@@ -24,11 +24,13 @@
+@@ -24,6 +24,8 @@
  
  #include "AddonManager.h"
  #include "utils/StringUtils.h"
@@ -38,42 +24,35 @@ index ce2ced3..eb8c75e 100644
  
  namespace ADDON
  {
- 
--CPluginSource::CPluginSource(const AddonProps &props)
-+CPluginSource::CPluginSource(const AddonProps &props, bool loadFonts)
-   : CAddon(props)
- {
-   std::string provides;
-@@ -36,6 +38,11 @@ CPluginSource::CPluginSource(const AddonProps &props)
-   if (i != Props().extrainfo.end())
+@@ -43,6 +45,11 @@ CPluginSource::CPluginSource(AddonProps props) : CAddon(std::move(props))
+   if (i != m_props.extrainfo.end())
      provides = i->second;
    SetProvides(provides);
-+  if (loadFonts) {
++  if (props.type == ADDON_SCRIPT) {
 +    /* Allow this add-on to load their own fonts */
 +     CLog::Log(LOGINFO, "PluginSource - %s - add-on %s can load its own fonts", __FUNCTION__, props.name.c_str());
 +     g_fontManager.LoadFonts("Default", props.path); /* For now, use <fontset id="Default"> and you can load whatever you want */
 +  }
  }
  
- CPluginSource::CPluginSource(const cp_extension_t *ext)
+ CPluginSource::CPluginSource(AddonProps props, const std::string& provides)
 diff --git a/xbmc/addons/PluginSource.h b/xbmc/addons/PluginSource.h
-index e7e2fe1..d13b10c 100644
+index eafc12b..1946f3d 100644
 --- a/xbmc/addons/PluginSource.h
 +++ b/xbmc/addons/PluginSource.h
-@@ -31,7 +31,7 @@ public:
-   enum Content { UNKNOWN, AUDIO, IMAGE, EXECUTABLE, VIDEO };
+@@ -34,7 +34,6 @@ public:
  
-   CPluginSource(const cp_extension_t *ext);
--  CPluginSource(const AddonProps &props);
-+  CPluginSource(const AddonProps &props, bool loadFonts = false);
-   virtual ~CPluginSource() {}
-   virtual AddonPtr Clone() const;
+   explicit CPluginSource(AddonProps props);
+   CPluginSource(AddonProps props, const std::string& provides);
+-
    virtual TYPE FullType() const;
+   virtual bool IsType(TYPE type) const;
+   bool Provides(const Content& content) const
 diff --git a/xbmc/guilib/GUIFontManager.cpp b/xbmc/guilib/GUIFontManager.cpp
-index 8e044dd..5578303 100644
+index 3235a40..da78f4a 100644
 --- a/xbmc/guilib/GUIFontManager.cpp
 +++ b/xbmc/guilib/GUIFontManager.cpp
-@@ -336,10 +336,14 @@ void GUIFontManager::Clear()
+@@ -335,10 +335,14 @@ void GUIFontManager::Clear()
    m_vecFontInfo.clear();
  }
  
@@ -91,10 +70,10 @@ index 8e044dd..5578303 100644
  
    CXBMCTinyXML xmlDoc;
 diff --git a/xbmc/guilib/GUIFontManager.h b/xbmc/guilib/GUIFontManager.h
-index 5d1a07b..fcd6a03 100644
+index 5f8745d..9b8e55c 100644
 --- a/xbmc/guilib/GUIFontManager.h
 +++ b/xbmc/guilib/GUIFontManager.h
-@@ -65,7 +65,7 @@ public:
+@@ -66,7 +66,7 @@ public:
    virtual bool OnMessage(CGUIMessage &message);
  
    void Unload(const std::string& strFontName);

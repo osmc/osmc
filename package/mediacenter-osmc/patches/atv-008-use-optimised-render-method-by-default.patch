@@ -1,20 +1,20 @@
-From 36c0a5f7676341f08e58b9618f957a34b109de3b Mon Sep 17 00:00:00 2001
+From 5a70c24897042896a493449670693738950dca7c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sun, 21 Feb 2016 17:10:07 +0000
-Subject: [PATCH] Use optimised render method by default
+Date: Thu, 1 Sep 2016 21:17:42 +0100
+Subject: [PATCH] Force optimised render method
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/VideoRenderers/LinuxRendererGL.cpp | 2 +-
+ xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
-index cd5f2b3..9d33995 100644
---- a/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
-+++ b/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
-@@ -925,7 +925,7 @@ void CLinuxRendererGL::LoadShaders(int field)
-   }
-   else
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+index 89cdc23..55276d0 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+@@ -910,7 +910,7 @@ void CLinuxRendererGL::LoadShaders(int field)
+ {
+   if (!LoadShadersHook())
    {
 -    int requestedMethod = CSettings::GetInstance().GetInt(CSettings::SETTING_VIDEOPLAYER_RENDERMETHOD);
 +    int requestedMethod = 2;
@@ -22,5 +22,5 @@ index cd5f2b3..9d33995 100644
  
      if (m_pYUVShader)
 -- 
-2.1.0
+2.7.4
 

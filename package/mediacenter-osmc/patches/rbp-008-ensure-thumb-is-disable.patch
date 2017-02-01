@@ -1,4 +1,4 @@
-From 22364aa82d72f1b2caa4adc9366fc3395ed49845 Mon Sep 17 00:00:00 2001
+From 98ab3e5dbe747fa8ebceb2d8db03db730774ba6e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 16 Jan 2016 17:14:16 +0000
 Subject: [PATCH] Ensure thumb is disabled for hevc optimisations
@@ -9,17 +9,17 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+)
 
 diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
-index 33a39f1..777e17c 100755
+index 4681f47..364ad74 100755
 --- a/tools/depends/target/ffmpeg/autobuild.sh
 +++ b/tools/depends/target/ffmpeg/autobuild.sh
-@@ -177,6 +177,7 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
- 	--disable-mipsdspr1 \
+@@ -176,6 +176,7 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ 	--disable-mipsdsp \
  	--disable-mipsdspr2 \
- 	--enable-libdcadec \
+ 	--extra-cflags="-DRPI=1" \
 +	--disable-thumb \
          ${FLAGS}
  
  make -j ${BUILDTHREADS} 
 -- 
-2.1.0
+2.7.4
 

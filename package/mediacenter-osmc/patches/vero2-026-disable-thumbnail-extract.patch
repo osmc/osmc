@@ -1,4 +1,4 @@
-From 038b365f6b8f36e5a12c12b497b955a34acef0d6 Mon Sep 17 00:00:00 2001
+From fb2e5cd366c5830b9f8f442606074fa3342bad0b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:16:09 +0100
 Subject: [PATCH] Disable thumbnail extraction by default on low power
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 8fdda54..e4ca720 100644
+index d7ef609..574621d 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -877,7 +877,7 @@
+@@ -979,7 +979,7 @@
          </setting>
          <setting id="myvideos.extractthumb" type="boolean" label="20433" help="36180">
            <level>4</level>
@@ -21,7 +21,7 @@ index 8fdda54..e4ca720 100644
 +          <default>false</default>
            <control type="toggle" />
          </setting>
-       </group>
+         <setting id="myvideos.extractchapterthumbs" type="boolean" label="37044" help="37045">
 -- 
-2.1.0
+2.7.4
 

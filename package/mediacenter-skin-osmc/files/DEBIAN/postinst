@@ -2,7 +2,8 @@
 
 if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
 chown -R $OWNER /usr/share/kodi/addons/skin.osmc
-chown -R $OWNER /usr/share/kodi/addons/script.module.simplejson
-chown -R $OWNER /usr/share/kodi/addons/script.module.unidecode
-chown -R $OWNER /usr/share/kodi/addons/script.skinshortcuts
-chown -R $OWNER /usr/share/kodi/addons/service.skin.widgets
+
+        if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "4.0.0-1"; then
+	    rm -f /home/osmc/.kodi/addon_data/script.skinshortcuts/skin.osmc.properties
+        fi
+

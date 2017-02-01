@@ -1,0 +1,26 @@
+From 5097f09782b6c11ae140395c747cbf4064da0e3c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 22 Jul 2016 08:54:51 +0100
+Subject: [PATCH] add HPD check fix from @EmbER-Dev
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/AMLUtils.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 1b54435..6bee159 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -277,7 +277,7 @@ bool aml_IsHdmiConnected()
+ {
+   int hpd_state;
+   SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", hpd_state);
+-  if (hpd_state == 2)
++  if (! hpd_state)
+   {
+     return 1;
+   }
+-- 
+2.7.4
+

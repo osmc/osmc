@@ -1,4 +1,4 @@
-From 124c889adbc2a1cc23917567116ab2833f339611 Mon Sep 17 00:00:00 2001
+From aaddff915df03a3cb99ee6b9849aa9a861da55f2 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -11,31 +11,17 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/settings/settings.xml     |  2 +-
  xbmc/Application.cpp             |  1 +
  xbmc/GUIInfoManager.cpp          |  6 +++++-
  xbmc/network/NetworkServices.cpp | 17 +++++++++++++++++
  xbmc/settings/Settings.cpp       |  1 +
  5 files changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 8ba5ef2..5a67d15 100644
---- a/system/settings/settings.xml
-+++ b/system/settings/settings.xml
-@@ -2054,7 +2054,7 @@
-       <group id="1">
-         <setting id="services.devicename" type="string" label="1271" help="36321">
-           <level>0</level>
--          <default>Kodi</default>
-+	  <default>""</default>
-           <control type="edit" format="string" />
-         </setting>
-       </group>
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index d37aa11..9933b18 100644
+index 0e6bd95..07ee861 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -628,6 +628,7 @@ bool CApplication::Create()
+@@ -652,6 +652,7 @@ bool CApplication::Create()
      return false;
    }
    CSettings::GetInstance().SetLoaded();
@@ -44,10 +30,10 @@ index d37aa11..9933b18 100644
    CLog::Log(LOGINFO, "creating subdirectories");
    CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(CProfilesManager::GetInstance().GetProfileUserDataFolder()).c_str());
 diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index 458ab86..e4da7f0 100644
+index 8db6a24..7d63cf7 100644
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -2114,7 +2114,11 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
+@@ -6379,7 +6379,11 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
      }
      break;
    case SYSTEM_FRIENDLY_NAME:
@@ -61,10 +47,10 @@ index 458ab86..e4da7f0 100644
    case SYSTEM_STEREOSCOPIC_MODE:
      {
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index 601251b..f63e812 100644
+index 6c58426..07babe9 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
-@@ -439,6 +439,23 @@ void CNetworkServices::OnSettingChanged(const CSetting *setting)
+@@ -448,6 +448,23 @@ void CNetworkServices::OnSettingChanged(const CSetting *setting)
        CApplicationMessenger::GetInstance().PostMsg(TMSG_RESTARTAPP);
      }
    }
@@ -89,10 +75,10 @@ index 601251b..f63e812 100644
  
  bool CNetworkServices::OnSettingUpdate(CSetting* &setting, const char *oldSettingId, const TiXmlNode *oldSettingNode)
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 9aaf6ed..3f67a20 100644
+index 7d6bd35..4ed74a4 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -1157,6 +1157,7 @@ void CSettings::InitializeISettingCallbacks()
+@@ -1168,6 +1168,7 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_SERVICES_ESCONTINUOUSDELAY);
    settingSet.insert(CSettings::SETTING_SMB_WINSSERVER);
    settingSet.insert(CSettings::SETTING_SMB_WORKGROUP);
@@ -101,5 +87,5 @@ index 9aaf6ed..3f67a20 100644
  
    settingSet.clear();
 -- 
-2.1.0
+2.7.4
 

@@ -1,4 +1,4 @@
-From 5fdb0ecad302fe91c725fbfad224b9e433dd7c62 Mon Sep 17 00:00:00 2001
+From 3bc03925a4cc43bf734505e9e6530697b37a789a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 16:45:44 +0100
 Subject: [PATCH] Do not allow repository updates while we are in the My OSMC
@@ -10,16 +10,16 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 5 insertions(+)
 
 diff --git a/xbmc/addons/RepositoryUpdater.cpp b/xbmc/addons/RepositoryUpdater.cpp
-index 4b1acd9..25071c4 100644
+index 41bc15c..1d83eff 100644
 --- a/xbmc/addons/RepositoryUpdater.cpp
 +++ b/xbmc/addons/RepositoryUpdater.cpp
-@@ -184,6 +184,11 @@ void CRepositoryUpdater::ScheduleUpdate()
-   if (CSettings::GetInstance().GetInt(CSettings::SETTING_GENERAL_ADDONUPDATES) == AUTO_UPDATES_NEVER)
+@@ -193,6 +193,11 @@ void CRepositoryUpdater::ScheduleUpdate()
+   if (CSettings::GetInstance().GetInt(CSettings::SETTING_ADDONS_AUTOUPDATES) == AUTO_UPDATES_NEVER)
      return;
  
 +  if (g_application.m_eOSMCWalkthroughState != 2) {
-+	CLog::Log(LOGDEBUG, "CRepositoryUpdater: refusing to update until My OSMC asserts");
-+	return;
++       CLog::Log(LOGDEBUG, "CRepositoryUpdater: refusing to update until My OSMC asserts");
++       return;
 +  }
 +
    if (!CAddonMgr::GetInstance().HasAddons(ADDON_REPOSITORY))

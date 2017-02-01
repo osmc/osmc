@@ -1,0 +1,31 @@
+From fae9037ee30638d2a206d41c9316bfa3e21285e9 Mon Sep 17 00:00:00 2001
+From: Gerald Barker <gezb@users.noreply.github.com>
+Date: Tue, 20 Dec 2016 23:47:18 +0000
+Subject: [PATCH 5/5] [BTPlayer] Make sure Kodi ignores next item and previous
+ item events coming from BTPlayer
+
+---
+ xbmc/Application.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index a493970..0800d3c 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2185,6 +2185,13 @@ bool CApplication::OnAction(const CAction &action)
+        OnNextItem();
+      }
+ 
++   // make sure kodi does not handle these events for BTPlayer
++   if (g_application.GetCurrentPlayer() == "BTPlayer" &&
++       (action.GetID() == ACTION_PREV_ITEM || action.GetID() == ACTION_NEXT_ITEM))
++     {
++       return true;
++     }
++   
+   // Now check with the playlist player if action can be handled.
+   // In case of the action PREV_ITEM, we only allow the playlist player to take it if we're less than 3 seconds into playback.
+   if (!(action.GetID() == ACTION_PREV_ITEM && m_pPlayer->CanSeek() && GetTime() > 3) )
+-- 
+2.7.4
+

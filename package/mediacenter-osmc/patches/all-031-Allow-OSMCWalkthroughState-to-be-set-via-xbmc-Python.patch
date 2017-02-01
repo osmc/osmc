@@ -1,4 +1,4 @@
-From 9d41dbd43b39776b19c2727954db673dd06da848 Mon Sep 17 00:00:00 2001
+From 152583cfa59eaf4519d303938ec7a189dabc6231 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 22:24:39 +0100
 Subject: [PATCH] Allow OSMCWalkthroughState to be set via xbmc Python
@@ -7,14 +7,14 @@ Subject: [PATCH] Allow OSMCWalkthroughState to be set via xbmc Python
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  5 +++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 12 ++++++++++++
- 2 files changed, 17 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index d691955..9cf24a9 100644
+index a599e4c..953fc27 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -111,6 +111,11 @@ namespace XBMCAddon
+@@ -115,6 +115,11 @@ namespace XBMCAddon
          CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, function);
      }
  
@@ -27,28 +27,44 @@ index d691955..9cf24a9 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 98b4190..0425560 100644
+index 59e43d9..11efb35 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -103,6 +103,18 @@ namespace XBMCAddon
-      */
-     String executeJSONRPC(const char* jsonrpccommand);
- 
-+	/**
-+	 * setosmcwalkthroughstatus(state) -- Change the OSMC Walkthrough Status
-+	 *
-+	 * status		  :	int - sets the internal state of the OSMC Walkthrough
-+	 *
-+	 *
-+	 * example:
-+	 *    - xbmc.setosmcwalkthroughstatus(1)
-+	 */
+@@ -219,6 +219,34 @@ namespace XBMCAddon
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.setosmcwalkthroughstatus(state) }
++    ///-----------------------------------------------------------------------
++    /// Change the OSMC Walkthrough Status
++    ///
++    /// @param          state       int - state of the walkthrough progress
++    ///
++    ///
++    ///
++    /// List of commands -
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.setosmcwalkthroughstatus(1)
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    setosmcwalkthroughstatus(...);
++#else
++    void setosmcwalkthroughstatus(int state);
++#endif
 +
-+	 void setosmcwalkthroughstatus(int state);
-+
-     /**
-      * sleep(time) -- Sleeps for 'time' msec.
-      * 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
+     /// @brief \python_func{ xbmc.sleep(time) }
+     ///-----------------------------------------------------------------------
+     /// Sleeps for 'time' msec.
 -- 
-2.1.0
+2.7.4
 
