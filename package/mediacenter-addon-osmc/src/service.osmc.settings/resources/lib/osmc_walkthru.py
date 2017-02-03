@@ -261,7 +261,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		# textures for the skin image
 		media_path = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
-		self.osmc_skin_image = os.path.join(media_path, 'osmc_preview.png')
+		self.osmc_skin_image = os.path.join(media_path, 'osmc_preview.jpg')
 		self.conf_skin_image = os.path.join(media_path, 'conf_preview.jpg')
 
 		# if the device is not recognised as a vero, then remove the warranty panel from the walkthrough
@@ -787,7 +787,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		elif controlID in [80010, 80020]:	# user has selected a skin
 
-			self.selected_skin = 'OSMC' if controlID == 80010 else 'Confluence'
+			self.selected_skin = 'OSMC' if controlID == 80010 else 'Estuary'
 
 			self.reveal_next_panel(current_panel='skin')
 
@@ -971,11 +971,11 @@ def open_gui(networking_instance, testing=False):
 	# -- THIS SECTION SHOULD BE SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
 	if skin_choice != 'OSMC':
 
-		log('Loading Confluence')
+		log('Loading Estuary')
 		try:
-			xbmc.setskin('skin.confluence')
+			xbmc.setskin('skin.estuary')
 		except:
-			log('Loading Confluence failed.')
+			log('Loading Estuary failed.')
 
 	log('Exiting GUI')
 
