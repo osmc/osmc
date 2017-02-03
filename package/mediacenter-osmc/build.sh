@@ -402,12 +402,12 @@ then
 	if [ "$1" == "vero" ]
 	then
            ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
-           PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero/lib -DCMAKE_LIBRARY_PATH=/opt/vero/include"
+           PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero/include -DCMAKE_LIBRARY_PATH=/opt/vero/lib"
 	fi
 	if [ "$1" == "vero2" ]
 	then
 	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
-	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero2/lib -DCMAKE_LIBRARY_PATH=/opt/vero2/include"
+	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero2/include -DCMAKE_LIBRARY_PATH=/opt/vero2/lib"
 	fi
 	if [ "$1" == "vero3" ]
 	then
