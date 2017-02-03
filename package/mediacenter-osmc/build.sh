@@ -6,7 +6,7 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero" ] || [ "$1" == "atv" ] || [ "$1" == "pc" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/8cf5c61df262a3aa48117f98092111a4e0d743e6.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/xbmc/xbmc/archive/ef7766e5b28811e6a3a55f5a331e77db8874d14b.tar.gz" "$(pwd)/src"
 API_VERSION="17"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
@@ -419,11 +419,11 @@ then
 	   ADDONS_TO_BUILD="${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_SCREENSAVERS}"
 	   PLATFORM=""
         fi
-	#cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" "$PLATFORM" ../
-	#if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
+	cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" "$PLATFORM" ../
+	if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
 	cd ../
-	#$BUILD kodiplatform_DIR=$(pwd) CMAKE_PREFIX_PATH=/usr/osmc -C build/
-	#if [ $? != 0 ]; then echo "Building binary addons failed" && exit 1; fi
+	$BUILD kodiplatform_DIR=$(pwd) CMAKE_PREFIX_PATH=/usr/osmc -C build/
+	if [ $? != 0 ]; then echo "Building binary addons failed" && exit 1; fi
 	popd
         # Languages
         mkdir languages/
