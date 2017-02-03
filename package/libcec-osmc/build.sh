@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/Pulse-Eight/libcec/archive/5388d3a18f7fe6b230cf7d6e678906e52d166532.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/Pulse-Eight/libcec/archive/0a97062dd4b196ceeb003ec41841c7a7edc36dd1.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libcec-osmc"
