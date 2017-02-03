@@ -1,4 +1,4 @@
-From 5024de31286624e925cdc1696f72351eead60199 Mon Sep 17 00:00:00 2001
+From d892f56e589d434462b0bc9dcacde4295aa689e1 Mon Sep 17 00:00:00 2001
 From: Gerald Dachs <gda@dachsweb.de>
 Date: Thu, 3 Mar 2016 09:38:44 +0100
 Subject: [PATCH] new adapter for amlogic devices
@@ -6,7 +6,7 @@ Subject: [PATCH] new adapter for amlogic devices
 ---
  include/cectypes.h                                 |  15 +-
  src/libcec/CMakeLists.txt                          |   3 +
- src/libcec/adapter/AdapterFactory.cpp              |  24 +-
+ src/libcec/adapter/AdapterFactory.cpp              |  26 +-
  src/libcec/adapter/Amlogic/AmlogicCEC.h            |  41 +++
  .../Amlogic/AmlogicCECAdapterCommunication.cpp     | 305 +++++++++++++++++++++
  .../Amlogic/AmlogicCECAdapterCommunication.h       | 105 +++++++
@@ -15,7 +15,7 @@ Subject: [PATCH] new adapter for amlogic devices
  src/libcec/cmake/CheckPlatformSupport.cmake        |  13 +
  src/libcec/cmake/DisplayPlatformSupport.cmake      |   6 +
  src/libcec/env.h.in                                |   3 +
- 11 files changed, 609 insertions(+), 2 deletions(-)
+ 11 files changed, 610 insertions(+), 3 deletions(-)
  create mode 100644 src/libcec/adapter/Amlogic/AmlogicCEC.h
  create mode 100644 src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.cpp
  create mode 100644 src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.h
@@ -56,10 +56,10 @@ index 9c91842..1bc7b52 100644
  
  /** force exporting through swig */
 diff --git a/src/libcec/CMakeLists.txt b/src/libcec/CMakeLists.txt
-index d3eefa3..125512b 100644
+index 5c88807..df60214 100644
 --- a/src/libcec/CMakeLists.txt
 +++ b/src/libcec/CMakeLists.txt
-@@ -87,6 +87,9 @@ set(CEC_HEADERS devices/CECRecordingDevice.h
+@@ -88,6 +88,9 @@ set(CEC_HEADERS devices/CECRecordingDevice.h
                  adapter/Exynos/ExynosCEC.h
                  adapter/Exynos/ExynosCECAdapterDetection.h
                  adapter/Exynos/ExynosCECAdapterCommunication.h
@@ -70,7 +70,7 @@ index d3eefa3..125512b 100644
                  adapter/AOCEC/AOCECAdapterDetection.h
                  adapter/AOCEC/AOCECAdapterCommunication.h
 diff --git a/src/libcec/adapter/AdapterFactory.cpp b/src/libcec/adapter/AdapterFactory.cpp
-index 1e946e6..a539394 100644
+index 91195ea..47e8978 100644
 --- a/src/libcec/adapter/AdapterFactory.cpp
 +++ b/src/libcec/adapter/AdapterFactory.cpp
 @@ -58,6 +58,11 @@
@@ -85,7 +85,7 @@ index 1e946e6..a539394 100644
  #if defined(HAVE_AOCEC_API)
  #include "AOCEC/AOCECAdapterDetection.h"
  #include "AOCEC/AOCECAdapterCommunication.h"
-@@ -143,6 +148,18 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
+@@ -143,8 +148,20 @@ int8_t CAdapterFactory::DetectAdapters(cec_adapter_descriptor *deviceList, uint8
    }
  #endif
  
@@ -102,8 +102,11 @@ index 1e946e6..a539394 100644
 +#endif
 +
  
- #if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_AOCEC_API)
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_AOCEC_API)
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_AOCEC_API) && !defined(HAVE_AMLOGIC_API)
  #error "libCEC doesn't have support for any type of adapter. please check your build system or configuration"
+ #endif
+ 
 @@ -173,11 +190,16 @@ IAdapterCommunication *CAdapterFactory::GetInstance(const char *strPort, uint16_
      return new CRPiCECAdapterCommunication(m_lib->m_cec);
  #endif
@@ -117,8 +120,8 @@ index 1e946e6..a539394 100644
    return new CUSBCECAdapterCommunication(m_lib->m_cec, strPort, iBaudRate);
  #endif
  
--#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API)
-+#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_AMLOGIC_API)
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_AOCEC_API)
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_AOCEC_API) && !defined(HAVE_AMLOGIC_API)
    return NULL;
  #endif
  }
@@ -700,7 +703,7 @@ index 0000000..8a7418d
 +  };
 +}
 diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
-index 532f213..382c39c 100644
+index 6875606..61a43d0 100644
 --- a/src/libcec/cmake/CheckPlatformSupport.cmake
 +++ b/src/libcec/cmake/CheckPlatformSupport.cmake
 @@ -11,6 +11,7 @@
@@ -731,7 +734,7 @@ index 532f213..382c39c 100644
    if (${HAVE_AOCEC_API})
      set(LIB_INFO "${LIB_INFO}, AOCEC")
 diff --git a/src/libcec/cmake/DisplayPlatformSupport.cmake b/src/libcec/cmake/DisplayPlatformSupport.cmake
-index 7ec10f5..7a38d32 100644
+index 83a778a..c7088f3 100644
 --- a/src/libcec/cmake/DisplayPlatformSupport.cmake
 +++ b/src/libcec/cmake/DisplayPlatformSupport.cmake
 @@ -56,5 +56,11 @@ else()
@@ -747,10 +750,10 @@ index 7ec10f5..7a38d32 100644
  message(STATUS "lib info: ${LIB_INFO}")
  
 diff --git a/src/libcec/env.h.in b/src/libcec/env.h.in
-index fe6c83d..09304e1 100644
+index 0774a1c..35af30d 100644
 --- a/src/libcec/env.h.in
 +++ b/src/libcec/env.h.in
-@@ -78,6 +78,9 @@
+@@ -82,6 +82,9 @@
  /* Define to 1 for nVidia EDID parsing support (on selected models) */
  #cmakedefine HAVE_NVIDIA_EDID_PARSER @HAVE_NVIDIA_EDID_PARSER@
  

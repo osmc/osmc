@@ -1,4 +1,4 @@
-From 1154bfbed70b82561962c4e08f67aca367db3500 Mon Sep 17 00:00:00 2001
+From 5d7dd8496f17a166bad53574d1f805a1d522b06a Mon Sep 17 00:00:00 2001
 From: wolfgar <stephan.rafin@laposte.net>
 Date: Sat, 28 Sep 2013 13:31:13 +0200
 Subject: [PATCH] Early support for i.MX6 Fix compiler warning (or even error
@@ -1198,7 +1198,7 @@ index 0d0cf17..f6c818a 100644
          return "unknown";
        }
 diff --git a/src/libcec/adapter/AdapterFactory.cpp b/src/libcec/adapter/AdapterFactory.cpp
-index 1e946e6..115bc4b 100644
+index 91195ea..7d38eeb 100644
 --- a/src/libcec/adapter/AdapterFactory.cpp
 +++ b/src/libcec/adapter/AdapterFactory.cpp
 @@ -58,6 +58,11 @@
@@ -1256,8 +1256,8 @@ index 1e946e6..115bc4b 100644
    return new CUSBCECAdapterCommunication(m_lib->m_cec, strPort, iBaudRate);
  #endif
  
--#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API)
-+#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_IMX_API)
+-#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_AOCEC_API)
++#if !defined(HAVE_RPI_API) && !defined(HAVE_P8_USB) && !defined(HAVE_TDA995X_API) && !defined(HAVE_EXYNOS_API) && !defined(HAVE_AOCEC_API) && !defined(HAVE_IMX_API)
    return NULL;
  #endif
  }
