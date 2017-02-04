@@ -23,7 +23,7 @@ echo Moving files in to place
 mkdir -p files/opt/vero3
 mkdir -p files-dev/opt/vero3
 mkdir -p files/etc/ld.so.conf.d
-cp -ar src/opengl*/opt/vero3/lib files/opt/vero3/
-cp -ar src/opengl*/opt/vero3/include files-dev/opt/vero3
+cp -ar src/vero3-opengl-*/opt/vero3/lib files/opt/vero3
+cp -ar src/vero3-opengl-*/opt/vero3/include files-dev/opt/vero3
 dpkg_build files/ vero3-userland-osmc.deb
 dpkg_build files-dev vero3-userland-dev-osmc.deb
