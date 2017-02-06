@@ -1,8 +1,8 @@
-From ff413a83164b2398549ed9e94277addb9bbc36f8 Mon Sep 17 00:00:00 2001
+From 163a121972b5dac1db08831c2284e93c844cd098 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 21 Jul 2016 15:59:48 +0100
-Subject: [PATCH] [package] [connman-osmc] Fix an issue where DNS servers and
- search domains are added in the reverse order
+Subject: [PATCH] Fix an issue where DNS servers and search domains are added
+ in the reverse order
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/resolver.c b/src/resolver.c
-index fbe4be7..c4adbc6 100644
+index 9d536fd..6b12d17 100644
 --- a/src/resolver.c
 +++ b/src/resolver.c
-@@ -100,9 +100,9 @@ static int resolvfile_export(void)
+@@ -104,9 +104,9 @@ static int resolvfile_export(void)
  	 * MAXDNSRCH/MAXNS entries are used.
  	 */
  
@@ -25,7 +25,7 @@ index fbe4be7..c4adbc6 100644
  		struct resolvfile_entry *entry = list->data;
  
  		if (!entry->domain)
-@@ -118,9 +118,9 @@ static int resolvfile_export(void)
+@@ -122,9 +122,9 @@ static int resolvfile_export(void)
  	if (count)
  		g_string_append_printf(content, "\n");
  
@@ -38,5 +38,5 @@ index fbe4be7..c4adbc6 100644
  
  		if (!entry->server)
 -- 
-2.7.4
+2.1.4
 

@@ -1,4 +1,4 @@
-From 8d57b88611573a8c0b11c94a3fb207c9d65579a5 Mon Sep 17 00:00:00 2001
+From fd3157abe141f0a299eca161d2ecd0ca907f10b5 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 11 Dec 2016 04:44:02 +0000
 Subject: [PATCH] -45dBm is a good signal; we should not block with a scan
@@ -12,12 +12,12 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/plugins/wifi.c b/plugins/wifi.c
-index dfe849f..bba1cb2 100644
+index 015f62b..5873977 100644
 --- a/plugins/wifi.c
 +++ b/plugins/wifi.c
 @@ -63,7 +63,7 @@
  #define INACTIVE_TIMEOUT  12	/* in seconds */
- #define FAVORITE_MAXIMUM_RETRIES 2
+ #define FAVORITE_MAXIMUM_RETRIES 4
  
 -#define BGSCAN_DEFAULT "simple:30:-45:300"
 +#define BGSCAN_DEFAULT "simple:30:-65:300"
@@ -25,5 +25,5 @@ index dfe849f..bba1cb2 100644
  
  #define P2P_FIND_TIMEOUT 30
 -- 
-2.7.4
+2.1.4
 
