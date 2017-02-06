@@ -26,8 +26,13 @@ syspaths="/sys/class/video/axis
 /sys/class/audiodsp/digital_codec
 /sys/module/amlvideodri/parameters/freerun_mode
 /sys/module/amvideo/parameters/omx_pts
+/sys/module/amvideo/parameters/omx_pts_interval_lower
 /sys/class/vfm/map
-/dev/video10"
+/dev/video10
+/sys/class/video/blackout_policy
+/sys/module/di/parameters/bypass_all
+/sys/class/video/freerun_mode
+/sys/module/amlvideodri/parameters/freerun_mode"
 
 for syspath in $syspaths; do
         chgrp -R video $syspath
