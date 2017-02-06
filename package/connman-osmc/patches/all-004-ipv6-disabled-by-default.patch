@@ -1,0 +1,28 @@
+From e73329930d1f4098d075766f59cd4fd7801c25fc Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Tue, 23 Jul 2013 11:28:10 +0300
+Subject: [PATCH] ipv6 disabled by default
+
+---
+ src/ipconfig.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/ipconfig.c b/src/ipconfig.c
+index 0dc702b..94ba2d0 100644
+--- a/src/ipconfig.c
++++ b/src/ipconfig.c
+@@ -1117,10 +1117,7 @@ static struct connman_ipconfig *create_ipv6config(int index)
+ 	ipv6config->index = index;
+ 	ipv6config->type = CONNMAN_IPCONFIG_TYPE_IPV6;
+ 
+-	if (!is_ipv6_supported)
+-		ipv6config->method = CONNMAN_IPCONFIG_METHOD_OFF;
+-	else
+-		ipv6config->method = CONNMAN_IPCONFIG_METHOD_AUTO;
++	ipv6config->method = CONNMAN_IPCONFIG_METHOD_OFF;
+ 
+ 	ipdevice = g_hash_table_lookup(ipdevice_hash, GINT_TO_POINTER(index));
+ 	if (ipdevice)
+-- 
+2.1.4
+

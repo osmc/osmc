@@ -7,7 +7,7 @@ Signed-off-by: Pantelis Antoniou <pantelis.antoniou at konsulko.com>
  4 files changed, 299 insertions(+), 1 deletion(-)
 
 diff --git a/src/connman.h b/src/connman.h
-index ce3ef8d..1a76dc2 100644
+index d5d040a..ae731b2 100644
 --- a/src/connman.h
 +++ b/src/connman.h
 @@ -244,6 +244,9 @@ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex, const
@@ -19,7 +19,7 @@ index ce3ef8d..1a76dc2 100644
 +
  #include <connman/resolver.h>
  
- int __connman_resolver_init(gboolean dnsproxy);
+ int __connman_resolver_init(gboolean dnsproxy, gboolean allowresolvmodify);
 diff --git a/src/device.c b/src/device.c
 index 742b3c4..3bcf5ab 100644
 --- a/src/device.c
@@ -47,7 +47,7 @@ index 742b3c4..3bcf5ab 100644
  }
  
 diff --git a/src/inet.c b/src/inet.c
-index 803f0e6..6733bfa 100644
+index 69ded19..c3443de 100644
 --- a/src/inet.c
 +++ b/src/inet.c
 @@ -2964,3 +2964,284 @@ out:
@@ -336,10 +336,10 @@ index 803f0e6..6733bfa 100644
 +	return nameservers;
 +}
 diff --git a/src/resolver.c b/src/resolver.c
-index c4adbc6..75ea5ba 100644
+index 6b12d17..80a0bec 100644
 --- a/src/resolver.c
 +++ b/src/resolver.c
-@@ -659,6 +659,14 @@ int __connman_resolver_init(gboolean dnsproxy)
+@@ -667,6 +667,14 @@ int __connman_resolver_init(gboolean dnsproxy, gboolean allowresolvmodify)
  
  	DBG("dnsproxy %d", dnsproxy);
  
@@ -356,3 +356,4 @@ index c4adbc6..75ea5ba 100644
  
 -- 
 2.1.4
+

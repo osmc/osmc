@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.30"
+VERSION="1.33"
 pull_source "https://www.kernel.org/pub/linux/network/connman/connman-${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment

@@ -1,6 +1,12 @@
---- a/src/timeserver.c	2015-02-26 06:08:29.104800306 +0000
-+++ b/src/timeserver.c	2015-02-26 06:08:42.996414837 +0000
-@@ -187,8 +187,7 @@
+---
+ src/timeserver.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/timeserver.c b/src/timeserver.c
+index f0d33e5..f39b144 100644
+--- a/src/timeserver.c
++++ b/src/timeserver.c
+@@ -187,8 +187,7 @@ GSList *__connman_timeserver_get_all(struct connman_service *service)
  	char **fallback_ts;
  	int index, i;
  
@@ -10,3 +16,6 @@
  
  	service_ts_config = connman_service_get_timeservers_config(service);
  
+-- 
+2.1.4
+
