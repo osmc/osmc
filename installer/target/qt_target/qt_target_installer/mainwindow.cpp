@@ -209,6 +209,7 @@ void MainWindow::install()
             system("dd if=/dev/zero of=/dev/instaboot bs=1M count=1 conv=fsync");
             system("dd if=/dev/zero of=/dev/system bs=1M count=1 conv=fsync");
             system("dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync");
+            system("dd if=/dev/zero of=/dev/tee bs=256k conv=fsync"); /* Quirk */
             system("pvcreate /dev/data /dev/system /dev/cache /dev/instaboot");
             system("vgcreate vero-nand /dev/data /dev/system /dev/cache /dev/instaboot");
             system("lvcreate -n root -l100%FREE vero-nand");
