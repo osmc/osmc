@@ -1,0 +1,28 @@
+From 1073b75b063214e22edc8e83f812a913307dbe67 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 7 Feb 2017 17:49:18 +0000
+Subject: [PATCH] Don't notify when /boot is mounted. We do this when /boot is
+ first accessed (systemd-auto), which can cause a spurious notification
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/storage/MediaManager.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xbmc/storage/MediaManager.cpp b/xbmc/storage/MediaManager.cpp
+index 62a4676..d78f73e 100644
+--- a/xbmc/storage/MediaManager.cpp
++++ b/xbmc/storage/MediaManager.cpp
+@@ -678,6 +678,9 @@ std::vector<std::string> CMediaManager::GetDiskUsage()
+ 
+ void CMediaManager::OnStorageAdded(const std::string &label, const std::string &path)
+ {
++
++if (path == "/boot")
++  return;
+ #ifdef HAS_DVD_DRIVE
+   if (CSettings::GetInstance().GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || CSettings::GetInstance().GetBool(CSettings::SETTING_DVDS_AUTORUN))
+     if (CSettings::GetInstance().GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) == AUTOCD_RIP)
+-- 
+2.7.4
+
