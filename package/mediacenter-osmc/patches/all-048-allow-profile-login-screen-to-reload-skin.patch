@@ -19,7 +19,7 @@ index 3cbca00..29cbddd 100644
    }
  
 +  // allow add-on updating and skin reloading. they don't need tutorial if they have a profile...
-+  CApplicationMessenger::GetInstance().SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
++  CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
 +
 +
    // reload the add-ons, or we will first load all add-ons from the master account without checking disabled status
