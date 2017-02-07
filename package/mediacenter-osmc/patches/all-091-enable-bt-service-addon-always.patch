@@ -1,0 +1,28 @@
+From 98159c192f5412cd9ff9af3b89b56c360f1e6933 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 7 Feb 2017 17:59:15 +0000
+Subject: [PATCH] [package] [mediacenter-osmc] Ensure that BTPlayer add-on is
+ always enabled. This allows the add-on to be enabled, even if it is installed
+ later.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonManager.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/addons/AddonManager.cpp b/xbmc/addons/AddonManager.cpp
+index c86c6e9..52db771 100644
+--- a/xbmc/addons/AddonManager.cpp
++++ b/xbmc/addons/AddonManager.cpp
+@@ -814,6 +814,8 @@ bool CAddonMgr::IsAddonDisabled(const std::string& ID)
+   std::regex addons_disable("plugin.program.xbmchub.notifications");
+   if (regex_match(ID, addons_disable))
+     return true;
++  std::regex addons_enabled("service.osmc.BTPlayer");
++    return false;
+   return m_disabled.find(ID) != m_disabled.end();
+ }
+ 
+-- 
+2.7.4
+
