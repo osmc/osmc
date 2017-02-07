@@ -118,7 +118,7 @@ if [ "$1" == "vero3" ]
 then
 	echo -e "Installing Vero 3 files"
 	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s vero3_2g_16g.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
-	cp ../build/linux-custom/arch/arm64/boot/dts/amlogic/vero3_2g_16g.dtb /mnt/dtb.img
+	cp vero3_2g_16g.dtb /mnt/dtb.img
 fi
 if [ "$1" == "appletv" ]
 then
