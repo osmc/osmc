@@ -173,6 +173,7 @@ void MainWindow::install()
     {
         logger->addLine("No preseed file was found");
     }
+#ifndef FACTORYV2
     if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
         for (int i = 0; i <= 60; i++)
@@ -182,6 +183,7 @@ void MainWindow::install()
             system("/bin/sleep 1");
         }
     }
+#endif
     /* If !nfs, create necessary partitions */
     if (! useNFS)
     {
