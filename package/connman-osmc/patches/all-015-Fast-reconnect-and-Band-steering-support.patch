@@ -1,0 +1,394 @@
+From f3ac4eee9e1bff86afe6c3b54aa93effbb2d5588 Mon Sep 17 00:00:00 2001
+From: Naveen Singh <nasingh@google.com>
+Date: Fri, 8 Apr 2016 00:29:47 -0700
+Subject: [PATCH] Fast-reconnect and Band-steering support
+
+This patch contains new implementations for following:
+
+1. Band Steering and Load balancing Support: Enterprise AP sometimes
+denies association with assoc status code 17. The reason AP sends
+this code, is to steer to some other AP (in a different band) or for
+doing load balancing (in case this AP is heavily loaded). This will not
+work with current connman as connman would take this disconnect
+notification as normal disconnect and disable the network. This act
+would cause wpa_s search for the next BSSID stop. The next time connect
+attempt is issued from connman, the story would repeat again. The idea
+of this patch is to not interfere with BSSID selection logic of wpa_s.
+wpa_s was sending disconnect reason code on DBUS as a part of
+PropertyChanged signal but there was no notification for assoc status
+code.
+In this commit id of hostapd (c7fb678f3109e62af1ef39be9b12bf8370c35bde)
+wpa_s is also sending assoc status code as a part of DBUS
+PropertyChanged signal. Idea here is that on a disconnect notification
+from wpa_s connman would look into the assoc status code and if it is
+set to 17, it would not proceed. This will let wpa_s continue with its
+own BSSID selection logic.
+
+2. Optimize DBUS call - In case network path is Not NULL (means a
+profile is already plumbed in wpa_s), network_remove should only
+be called if the new network is different from what is sitting in
+wpa_s. The notion of new network here is SSID, security type and
+passphrase. If the new network is same as the one in wpa_s, no need
+to do remove, add and select. This would save 3 DBUS calls to wpa_s.
+
+3. Fast Reconnect: On receiving a deauth with reason code 6, 7 or 4
+wpa_supplicant will immediately try to connect back. Now with current
+implementation of connman, a disconnect notification will cause network
+to get disabled and connection procedure would stop. This also impacts
+the roaming time in case disconnect is because of any other reason code.
+The act of disabling network severly affects wpa_s connection state
+machine as it would generate a deauth to current network when half way
+the connection was done. The idea here is that we do not disable network
+on disconnect and let wpa_s keep trying to find out that network. Only
+when connman has another network this network would be removed and new
+network would be added.
+---
+ gsupplicant/gsupplicant.h |   4 ++
+ gsupplicant/supplicant.c  | 137 +++++++++++++++++++++++++++++++++++++++++++++-
+ plugins/wifi.c            |  53 ++++++++++++++++--
+ 3 files changed, 185 insertions(+), 9 deletions(-)
+
+diff --git a/gsupplicant/gsupplicant.h b/gsupplicant/gsupplicant.h
+index a2a7605..26fd2ca 100644
+--- a/gsupplicant/gsupplicant.h
++++ b/gsupplicant/gsupplicant.h
+@@ -353,6 +353,10 @@ struct _GSupplicantCallbacks {
+ 					GSupplicantPeerState state);
+ 	void (*peer_request) (GSupplicantPeer *peer);
+ 	void (*debug) (const char *str);
++	void (*disconnect_reasoncode)(GSupplicantInterface *interface,
++				int reasoncode);
++	void (*assoc_status_code)(GSupplicantInterface *interface,
++				int reasoncode);
+ };
+ 
+ typedef struct _GSupplicantCallbacks GSupplicantCallbacks;
+diff --git a/gsupplicant/supplicant.c b/gsupplicant/supplicant.c
+index 6506ed1..55dc05c 100644
+--- a/gsupplicant/supplicant.c
++++ b/gsupplicant/supplicant.c
+@@ -150,6 +150,13 @@ struct _GSupplicantWpsCredentials {
+ 	char *key;
+ };
+ 
++struct added_network_information {
++	char * ssid;
++	GSupplicantSecurity security;
++	char * passphrase;
++	char * private_passphrase;
++};
++
+ struct _GSupplicantInterface {
+ 	char *path;
+ 	char *network_path;
+@@ -181,6 +188,7 @@ struct _GSupplicantInterface {
+ 	GHashTable *bss_mapping;
+ 	void *data;
+ 	const char *pending_peer_path;
++	struct added_network_information network_info;
+ };
+ 
+ struct g_supplicant_bss {
+@@ -387,6 +395,70 @@ static GSupplicantState string2state(const char *state)
+ 	return G_SUPPLICANT_STATE_UNKNOWN;
+ }
+ 
++static bool compare_network_parameters(GSupplicantInterface *interface,
++				GSupplicantSSID *ssid)
++{
++	if (memcmp(interface->network_info.ssid, ssid->ssid, ssid->ssid_len))
++		return FALSE;
++
++	if (interface->network_info.security != ssid->security)
++		return FALSE;
++
++	if (interface->network_info.passphrase &&
++			g_strcmp0(interface->network_info.passphrase,
++				ssid->passphrase) != 0) {
++		return FALSE;
++	}
++
++	if (interface->network_info.private_passphrase &&
++			g_strcmp0(interface->network_info.private_passphrase,
++				ssid->private_key_passphrase) != 0) {
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
++static void remove_network_information(GSupplicantInterface * interface)
++{
++	g_free(interface->network_info.ssid);
++	g_free(interface->network_info.passphrase);
++	g_free(interface->network_info.private_passphrase);
++	interface->network_info.ssid = NULL;
++	interface->network_info.passphrase = NULL;
++	interface->network_info.private_passphrase = NULL;
++}
++
++static int store_network_information(GSupplicantInterface * interface,
++				GSupplicantSSID *ssid)
++{
++	interface->network_info.ssid = g_malloc(ssid->ssid_len + 1);
++	if (interface->network_info.ssid != NULL) {
++		memcpy(interface->network_info.ssid, ssid->ssid,
++			ssid->ssid_len);
++		interface->network_info.ssid[ssid->ssid_len] = '\0';
++	} else {
++		return -ENOMEM;
++	}
++
++	interface->network_info.security = ssid->security;
++
++	if ((ssid->security == G_SUPPLICANT_SECURITY_WEP ||
++		ssid->security == G_SUPPLICANT_SECURITY_PSK ||
++		ssid->security == G_SUPPLICANT_SECURITY_NONE) &&
++		ssid->passphrase) {
++		interface->network_info.passphrase = g_strdup(ssid->passphrase);
++	}
++
++	if (ssid->security == G_SUPPLICANT_SECURITY_IEEE8021X &&
++			ssid->private_key_passphrase) {
++		interface->network_info.private_passphrase =
++			g_strdup(ssid->private_key_passphrase);
++	}
++
++	return 0;
++}
++
+ static void callback_system_ready(void)
+ {
+ 	if (system_ready)
+@@ -576,6 +648,33 @@ static void callback_peer_request(GSupplicantPeer *peer)
+ 	callbacks_pointer->peer_request(peer);
+ }
+ 
++static void callback_disconnect_reason_code(GSupplicantInterface *interface,
++					int reason_code)
++{
++	if (!callbacks_pointer)
++		return;
++
++	if (!callbacks_pointer->disconnect_reasoncode)
++		return;
++
++	if (reason_code != 0)
++		callbacks_pointer->disconnect_reasoncode(interface,
++							reason_code);
++}
++
++static void callback_assoc_status_code(GSupplicantInterface *interface,
++				int status_code)
++{
++	if (!callbacks_pointer)
++		return;
++
++	if (!callbacks_pointer->assoc_status_code)
++		return;
++
++	callbacks_pointer->assoc_status_code(interface, status_code);
++
++}
++
+ static void remove_group(gpointer data)
+ {
+ 	GSupplicantGroup *group = data;
+@@ -619,6 +718,7 @@ static void remove_interface(gpointer data)
+ 	g_free(interface->ifname);
+ 	g_free(interface->driver);
+ 	g_free(interface->bridge);
++	remove_network_information(interface);
+ 	g_free(interface);
+ }
+ 
+@@ -2135,9 +2235,22 @@ static void interface_property(const char *key, DBusMessageIter *iter,
+ 	} else if (g_strcmp0(key, "Networks") == 0) {
+ 		supplicant_dbus_array_foreach(iter, interface_network_added,
+ 								interface);
+-	} else
++	} else if (g_strcmp0(key, "DisconnectReason") == 0) {
++		int reason_code;
++		if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INVALID) {
++			dbus_message_iter_get_basic(iter, &reason_code);
++			callback_disconnect_reason_code(interface, reason_code);
++		}
++	} else if (g_strcmp0(key, "AssocStatusCode") == 0) {
++		int status_code;
++		if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INVALID) {
++			dbus_message_iter_get_basic(iter, &status_code);
++			callback_assoc_status_code(interface, status_code);
++		}
++	} else {
+ 		SUPPLICANT_DBG("key %s type %c",
+ 				key, dbus_message_iter_get_arg_type(iter));
++	}
+ }
+ 
+ static void scan_network_update(DBusMessageIter *iter, void *user_data)
+@@ -4111,6 +4224,8 @@ static void interface_add_network_result(const char *error,
+ 
+ 	interface->network_path = g_strdup(path);
+ 
++	store_network_information(interface, data->ssid);
++
+ 	supplicant_dbus_method_call(data->interface->path,
+ 			SUPPLICANT_INTERFACE ".Interface", "SelectNetwork",
+ 			interface_select_network_params,
+@@ -4708,6 +4823,20 @@ int g_supplicant_interface_connect(GSupplicantInterface *interface,
+ 			g_free(data->path);
+ 			dbus_free(data);
+ 
++			/*
++			 * If this add network is for the same network for
++			 * which wpa_supplicant already has a profile then do
++			 * not need to add another profile. Only if the
++			 * profile that needs to get added is different from
++			 * what is there in wpa_s delete the current one. A
++			 * network is identified by its SSID, security_type
++			 * and passphrase (private passphrase in case security
++			 * type is 802.11x).
++			 */
++			if (compare_network_parameters(interface, ssid)) {
++				return -EALREADY;
++			}
++
+ 			intf_data = dbus_malloc0(sizeof(*intf_data));
+ 			if (!intf_data)
+ 				return -ENOMEM;
+@@ -4753,8 +4882,10 @@ static void network_remove_result(const char *error,
+ 			result = -ECONNABORTED;
+ 	}
+ 
+-        g_free(data->interface->network_path);
+-        data->interface->network_path = NULL;
++	g_free(data->interface->network_path);
++	data->interface->network_path = NULL;
++
++	remove_network_information(data->interface);
+ 
+ 	if (data->network_remove_in_progress == TRUE) {
+ 		data->network_remove_in_progress = FALSE;
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 0eb997a..c9d20fa 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -71,6 +71,9 @@
+ #define P2P_LISTEN_PERIOD 500
+ #define P2P_LISTEN_INTERVAL 2000
+ 
++#define ASSOC_STATUS_NO_CLIENT 17
++#define LOAD_SHAPING_MAX_RETRIES 3
++
+ static struct connman_technology *wifi_technology = NULL;
+ static struct connman_technology *p2p_technology = NULL;
+ 
+@@ -128,6 +131,7 @@ struct wifi_data {
+ 	unsigned flags;
+ 	unsigned int watch;
+ 	int retries;
++	int load_shaping_retries;
+ 	struct hidden_params *hidden;
+ 	bool postpone_hidden;
+ 	struct wifi_tethering_info *tethering_param;
+@@ -144,6 +148,8 @@ struct wifi_data {
+ 	bool p2p_connecting;
+ 	bool p2p_device;
+ 	int servicing;
++	int disconnect_code;
++	int assoc_code;
+ };
+ 
+ static GList *iface_list = NULL;
+@@ -2270,6 +2276,19 @@ static bool handle_wps_completion(GSupplicantInterface *interface,
+ 	return true;
+ }
+ 
++static bool handle_assoc_status_code(GSupplicantInterface *interface,
++                                     struct wifi_data *wifi)
++{
++	if (wifi->state == G_SUPPLICANT_STATE_ASSOCIATING &&
++			wifi->assoc_code == ASSOC_STATUS_NO_CLIENT &&
++			wifi->load_shaping_retries < LOAD_SHAPING_MAX_RETRIES) {
++		wifi->load_shaping_retries ++;
++		return TRUE;
++	}
++	wifi->load_shaping_retries = 0;
++	return FALSE;
++}
++
+ static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
+ 					struct connman_network *network,
+ 					struct wifi_data *wifi)
+@@ -2361,6 +2380,10 @@ static void interface_state(GSupplicantInterface *interface)
+ 			break;
+ 
+ 		connman_network_set_connected(network, true);
++
++		wifi->disconnect_code = 0;
++		wifi->assoc_code = 0;
++		wifi->load_shaping_retries = 0;
+ 		break;
+ 
+ 	case G_SUPPLICANT_STATE_DISCONNECTED:
+@@ -2378,6 +2401,9 @@ static void interface_state(GSupplicantInterface *interface)
+ 		if (is_idle(wifi))
+ 			break;
+ 
++		if (handle_assoc_status_code(interface, wifi))
++			break;
++
+ 		/* If previous state was 4way-handshake, then
+ 		 * it's either: psk was incorrect and thus we retry
+ 		 * or if we reach the maximum retries we declare the
+@@ -2386,12 +2412,6 @@ static void interface_state(GSupplicantInterface *interface)
+ 						network, wifi))
+ 			break;
+ 
+-		/* We disable the selected network, if not then
+-		 * wpa_supplicant will loop retrying */
+-		if (g_supplicant_interface_enable_selected_network(interface,
+-						FALSE) != 0)
+-			DBG("Could not disable selected network");
+-
+ 		connman_network_set_connected(network, false);
+ 		connman_network_set_associating(network, false);
+ 		wifi->disconnecting = false;
+@@ -2904,6 +2924,25 @@ static void debug(const char *str)
+ 		connman_debug("%s", str);
+ }
+ 
++static void disconnect_reasoncode(GSupplicantInterface *interface,
++				int reasoncode)
++{
++	struct wifi_data *wifi = g_supplicant_interface_get_data(interface);
++
++	if (wifi != NULL) {
++		wifi->disconnect_code = reasoncode;
++	}
++}
++
++static void assoc_status_code(GSupplicantInterface *interface, int status_code)
++{
++	struct wifi_data *wifi = g_supplicant_interface_get_data(interface);
++
++	if (wifi != NULL) {
++		wifi->assoc_code = status_code;
++	}
++}
++
+ static const GSupplicantCallbacks callbacks = {
+ 	.system_ready		= system_ready,
+ 	.system_killed		= system_killed,
+@@ -2922,6 +2961,8 @@ static const GSupplicantCallbacks callbacks = {
+ 	.peer_changed		= peer_changed,
+ 	.peer_request		= peer_request,
+ 	.debug			= debug,
++	.disconnect_reasoncode  = disconnect_reasoncode,
++	.assoc_status_code      = assoc_status_code,
+ };
+ 
+ 
+-- 
+2.7.4
+
