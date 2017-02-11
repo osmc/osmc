@@ -10,12 +10,12 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.4.27" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.4.27" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero && VERSION="4.4.0" && REV="10" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.104" && REV="11" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
-test $1 == atv && VERSION="4.2.3" && REV="22" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
-test $1 == pc && VERSION="4.2.3" && REV="11" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.4.27" && REV="7" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.4.27" && REV="8" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero && VERSION="4.4.0" && REV="11" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero2 && VERSION="3.10.104" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
+test $1 == atv && VERSION="4.2.3" && REV="23" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
+test $1 == pc && VERSION="4.2.3" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero3 && VERSION="3.14.29" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
@@ -31,7 +31,7 @@ then
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
-if [ $1 == "vero3" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero3" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/newbranchg.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
