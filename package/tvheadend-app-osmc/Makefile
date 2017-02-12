@@ -1,11 +1,14 @@
 all:
-	@echo "Specify a target:\nmake rbp1\nmake armv6l\nmake i386\nmake amd64"
+	@echo "Specify a target:\nmake rbp1\nmake armv6l\nmake i386\nmake amd64\nmake aarch64"
 
 armv6l:
 	sudo bash build.sh "armv6l"
 
 armv7:
 	sudo bash build.sh "armv7"
+
+aarch64:
+	sudo bash build.sh "aarch64"
 
 i386:
 	sudo setarch i686 bash build.sh "i386"
