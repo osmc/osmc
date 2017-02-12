@@ -7,6 +7,9 @@ armv6l:
 armv7:
 	sudo bash build.sh "armv7"
 
+aarch64:
+	sudo bash build.sh "aarch64"
+
 i386:
 	sudo setarch i686 bash build.sh "i386"
 
