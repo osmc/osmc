@@ -5,7 +5,7 @@
 
 . ../common.sh
 VERSION="2.84"
-pull_source "http://download.transmissionbt.com/files/transmission-${VERSION}.tar.xz" "$(pwd)/src"
+pull_source "https://github.com/transmission/transmission-releases/raw/master/transmission-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "transmission-app-osmc"
