@@ -70,12 +70,6 @@ then
 	esac
 	done
 
-	# Wait until /dev/fb1 is ready
-	while [ ! -c /dev/fb1 ] || [ ! -d /sys/class/graphics/fb1 ]
-	do
-	    /bin/busybox sleep 1
-	done
-
 	# Configure framebuffer X and Y size
 
 	case $hdmimode in
