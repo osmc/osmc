@@ -58,7 +58,7 @@ echo 1 > /sys/class/graphics/fb1/blank
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
-echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amlvideo amvideo > /sys/class/vfm/map
 
 # Better entropy
 for part in /sys/block/*/queue/add_random; do
