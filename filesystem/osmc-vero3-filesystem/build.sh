@@ -25,7 +25,7 @@ do
 done
 
 # Configure the target directory
-ARCH="arm64"
+ARCH="armhf"
 DIR="$filestub/"
 RLS="jessie"
 
@@ -40,7 +40,7 @@ fetch_filesystem "--no-check-gpg --arch=${ARCH} --foreign --variant=minbase ${RL
 verify_action
 
 # Configure filesystem (2nd stage)
-emulate_arm "${DIR}" "64"
+emulate_arm "${DIR}" "32"
 
 configure_filesystem "${DIR}"
 verify_action
@@ -95,10 +95,9 @@ verify_action
 echo -e "	* Configuring BusyBox symlinks"
 setup_busybox_links ${DIR}
 verify_action
-
 # Remove QEMU binary
 chroot ${DIR} umount /proc
-remove_emulate_arm "${DIR}" "64"
+remove_emulate_arm "${DIR}" "32"
 
 # Perform filesystem cleanup
 enable_init "${DIR}"
