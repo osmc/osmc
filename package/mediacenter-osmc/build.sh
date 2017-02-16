@@ -411,7 +411,7 @@ then
 	fi
 	if [ "$1" == "vero3" ]
 	then
-	   ADDONS_TO_BUILD="${ADDONS_PVR}"
+	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
 	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero3/include -DCMAKE_LIBRARY_PATH=/opt/vero3/lib"
 	fi
 	if [ "$1" == "atv" ]
