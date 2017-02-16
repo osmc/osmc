@@ -140,6 +140,7 @@ function build_in_env()
 	test $DEP == vero1 && DEP="armv7"
 	test $DEP == vero2 && DEP="armv7"
 	test $DEP == vero3 && DEP="armv7"
+	test $DEP == vero3_64 && DEP="aarch64"
 	test $DEP == rbp1 && DEP="armv6l"
 	test $DEP == atv && DEP="i386"
 	test $DEP == pc && DEP="amd64"
