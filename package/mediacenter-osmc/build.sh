@@ -156,15 +156,15 @@ then
 		handle_dep "vero3-libcec-dev-osmc"
 		handle_dep "vero3-userland-dev-osmc"
 		handle_dep "vero3-libamcodec-dev-osmc"
-		handle_dep "aarch64-libshairplay-dev-osmc"
-                handle_dep "aarch64-librtmp-dev-osmc"
-                handle_dep "aarch64-libnfs-dev-osmc"
-                handle_dep "aarch64-libplatform-dev-osmc"
-                handle_dep "aarch64-libbluray-dev-osmc"
-                handle_dep "aarch64-libsqlite-dev-osmc"
-                handle_dep "aarch64-libcrossguid-dev-osmc"
-                handle_dep "aarch64-cmake-osmc"
-                handle_dep "aarch64-libass-dev-osmc"
+		handle_dep "armv7-libshairplay-dev-osmc"
+                handle_dep "armv7-librtmp-dev-osmc"
+                handle_dep "armv7-libnfs-dev-osmc"
+                handle_dep "armv7-libplatform-dev-osmc"
+                handle_dep "armv7-libbluray-dev-osmc"
+                handle_dep "armv7-libsqlite-dev-osmc"
+                handle_dep "armv7-libcrossguid-dev-osmc"
+                handle_dep "armv7-cmake-osmc"
+                handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
 	then
@@ -376,7 +376,7 @@ then
                 --disable-optimizations \
                 --with-platform=vero3 \
 		--disable-avahi \
-                --build=aarch64-linux
+                --build=arm-linux
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 	$BUILD
@@ -458,7 +458,7 @@ then
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, armv7-libass-osmc" >> files/DEBIAN/control
 	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, armv7-libass-osmc" >> files/DEBIAN/control
 	test "$1" == vero2 && echo "Depends: ${COMMON_DEPENDS}, vero2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero2-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, vero2-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, aarch64-libnfs-osmc, aarch64-librtmp-osmc, aarch64-libshairplay-osmc, aarch64-libbluray-osmc, aarch64-libsqlite-osmc, vero3-userland-osmc, aarch64-splash-osmc, aarch64-libcrossguid-osmc, vero3-libamcodec-osmc, aarch64-libass-osmc" >> files/DEBIAN/control
+	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, vero3-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
