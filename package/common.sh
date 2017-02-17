@@ -198,6 +198,8 @@ function handle_dep()
 			if [ "$1" == "vero2-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero3-libcec-dev-osmc" && remove_conflicting "vero3-libcec-osmc"; fi
 			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc" && remove_conflicting "vero3-libcec-dev-osmc" && remove_conflicting "vero3-libcec-osmc"; fi
 			if [ "$1" == "vero3-libcec-dev-osmc" ]; then remove_conflicting "vero-libcec-dev-osmc" && remove_conflicting "vero-libcec-osmc" && remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc" && remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc"; fi
+			if [ "$1" == "vero3-libamcodec-dev-osmc" ]; then remove_conflicting "vero2-libamcodec-dev-osmc" && remove_conflicting "vero2-libamcodec-osmc"; fi
+			if [ "$1" == "vero2-libamcodec-dev-osmc" ]; then remove_conflicting "vero3-libamcodev-dev-osmc" && remove_conflicting "vero3-libamcodec-osmc"; fi
 			if [ "$use_faster_apt" -eq 1 ]
 			then
 				install_package "${1}" "1"
