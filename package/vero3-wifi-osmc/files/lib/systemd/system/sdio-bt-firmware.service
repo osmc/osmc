@@ -1,11 +1,12 @@
 [Unit]
 Description=Vero3 BT upload
-ConditionPathExists=/dev/ttyS1
+Requires=dev-ttyS1.device
+After=dev-ttyS1.device
+Before=bluetooth.service connman.service
 
 [Service]
-Type=simple
-RemainAfterExit=yes
-ExecStart=/usr/bin/hciattach -n -s 115200 /dev/ttyS1 bcm43xx 2000000
+Type=forking
+ExecStart=/usr/bin/hciattach -s 115200 /dev/ttyS1 bcm43xx 2000000
 
 [Install]
 WantedBy=multi-user.target
