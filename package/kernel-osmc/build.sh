@@ -16,7 +16,7 @@ test $1 == vero && VERSION="4.4.0" && REV="11" && FLAGS_INITRAMFS=$(($INITRAMFS_
 test $1 == vero2 && VERSION="3.10.104" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="23" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero3_64 && VERSION="3.14.29" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero3 && VERSION="3.14.29" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -31,7 +31,7 @@ then
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
-if [ $1 == "vero3_64" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero3" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -39,7 +39,7 @@ then
 	. initramfs-src/VERSIONS
 	pull_source "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
 	pull_source "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
-        if [ "$1" == "vero2" ] || [ "$1" == "vero3_64" ]
+        if [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 	then
 	    pull_source "ftp://sources.redhat.com/pub/lvm2/LVM2.${LVM_VERSION}.tgz" "$(pwd)/initramfs-src/lvm2"
 	fi
@@ -48,7 +48,8 @@ if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 BUILD_OPTS=$(($BUILD_OPTS - $BUILD_OPTION_USE_NOFP))
-build_in_env "${1}" $(pwd) "kernel-osmc" "$BUILD_OPTS"
+if [ "$1" == "vero3" ]; then env_target="vero3_64"; else env_target="${1}"; fi
+build_in_env "${env_target}" $(pwd) "kernel-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
 then
@@ -62,7 +63,7 @@ then
 	handle_dep "cpio"
 	handle_dep "bison"
 	handle_dep "flex"
-        if [ "$1" == "vero2" ]  || [ "$1" == "vero3_64" ]
+        if [ "$1" == "vero2" ]  || [ "$1" == "vero3" ]
         then
             handle_dep "u-boot-tools"
 	    handle_dep "abootimg"
@@ -85,7 +86,7 @@ then
 		$BUILD meson8b_vero2.dtd
 		$BUILD meson8b_vero2.dtb
 	fi
-	if [ "$1" == "vero3_64" ]
+	if [ "$1" == "vero3" ]
 	then
 		# Debian Jessie has an ancient version of make-kpkg without arm64 definitions
 		# So let's manually set up architectures.mk here and remove when Stretch arrives
@@ -149,7 +150,7 @@ then
 		abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm/boot/uImage -r ../../initramfs-src/initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
 		if [ $? != 0 ]; then echo "Building Android image for Vero 2 failed" && exit 1; fi
 	fi
-	if [ "$1" == "vero3_64" ]
+	if [ "$1" == "vero3" ]
         then
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
