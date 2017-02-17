@@ -36,7 +36,6 @@ then
 	handle_dep "curl"
 	handle_dep "cvs"
 	handle_dep "default-jre-headless"
-	if [ "$1" != "vero3" ]; then handle_dep "fp-compiler"; fi
 	handle_dep "gawk"
 	handle_dep "gdc"
 	handle_dep "gettext"
