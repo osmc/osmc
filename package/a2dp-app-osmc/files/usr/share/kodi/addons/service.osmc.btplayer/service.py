@@ -190,23 +190,23 @@ class BTPlayerMonitor(xbmc.Player):
         self.btPlayer = btPlayer
         
     def onPlayBackStopped(self):
-        if self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.stop()
             
     def onPlayBackPaused(self):
-        if self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.pause()
 
     def onPlayBackResumed(self):
-        if xbmc.isBTPlayerActive():
+        if xbmc.isBTPlayerActive() and xbmc.isBTPlayerActive():
             self.btPlayer.play()
     
     def onNextItem(self):
-        if self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.next()
 
     def onPrevItem(self):
-        if (self.btPlayer.isPlaying()):
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.previous()
 
 if __name__ == "__main__":
