@@ -123,7 +123,7 @@ class BTPlayer(threading.Thread):
     def playerHandler(self, interface, changed, invalidated, path):
         """Handle relevant property change signals"""
         iface = interface[interface.rfind(".") + 1:]
-        player_path = path
+        player_path = path[:path.rfind("/") + 1 ] + "player0"
         if __addon__.getSetting("debug") == "true":
             log("Changed : " + str(changed))
             log("Interface : " + str(interface))
@@ -140,14 +140,12 @@ class BTPlayer(threading.Thread):
         elif iface == "MediaTransport1":
             if "State" in changed:
                 if not changed["State"] == self.state:
-                    self.state = changed["State"]
-                    if not self.state  == "active":
-                        xbmc.stopBTPlayer()
-        elif iface == "MediaPlayer1":
-            if "Status" in changed:
-                if not changed["Status"] == self.status:
-                    if changed["Status"] == "playing" and self.state  == "active":
+                    if changed["State"] == "active":
+                        self.state = changed["State"]
                         xbmc.startBTPlayer(player_path);
+                    else:
+                        self.state = changed["State"]
+                        xbmc.stopBTPlayer()
                         
     def isPlaying(self):
         return self.state == "active"
@@ -192,36 +190,24 @@ class BTPlayerMonitor(xbmc.Player):
         self.btPlayer = btPlayer
         
     def onPlayBackStopped(self):
-        if self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.stop()
             
     def onPlayBackPaused(self):
-        if self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
             self.btPlayer.pause()
 
     def onPlayBackResumed(self):
-        if xbmc.isBTPlayerActive():
+        if xbmc.isBTPlayerActive() and xbmc.isBTPlayerActive():
             self.btPlayer.play()
     
     def onNextItem(self):
-        if __addon__.getSetting("debug") == "true":
-            log("Next Item Event Fired")
-        if self.btPlayer.isPlaying():
-            try:
-                self.btPlayer.next()
-            except Exception as e:
-                log("Exception caught trying to request next track: " + str(e))
-                            
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+            self.btPlayer.next()
 
-    def onPreviousItem(self):
-        if __addon__.getSetting("debug") == "true":
-            log("Previous Item Event Fired")
-        if self.btPlayer.isPlaying():
-            try:
-                self.btPlayer.previous()
-            except Exception as e:
-                log("Exception caught trying to request previous track: " + str(e))
-                            
+    def onPrevItem(self):
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+            self.btPlayer.previous()
 
 if __name__ == "__main__":
     if __addon__.getSetting("enabled") == "true":
@@ -240,7 +226,7 @@ if __name__ == "__main__":
                     break
                 
         except Exception as e:
-            log("Exception caught  - service exiting " + str(e))
+            print(e)
         finally:
             btPlayer.end()
         log("BTPlayer ended")
