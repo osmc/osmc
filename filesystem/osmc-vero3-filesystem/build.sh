@@ -64,6 +64,9 @@ disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
 verify_action
+echo -e "Enabling support for Aarch64"
+chroot ${DIR} dpkg --add-architecture arm64
+verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
@@ -95,8 +98,6 @@ verify_action
 echo -e "	* Configuring BusyBox symlinks"
 setup_busybox_links ${DIR}
 verify_action
-echo -e "       * Adding Aarch64 support"
-chroot ${DIR} dpkg --add-architecture arm64
 # Remove QEMU binary
 chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}" "32"
