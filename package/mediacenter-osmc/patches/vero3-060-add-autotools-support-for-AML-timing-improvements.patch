@@ -1,0 +1,25 @@
+From b36b112df7c84c6359d58ca32b222e53d1bda370 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 29 Jan 2017 22:12:58 +0000
+Subject: [PATCH] Add autotools support for AML timing improvements
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/video/videosync/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/video/videosync/Makefile b/xbmc/video/videosync/Makefile
+index fda1c06..6661841 100644
+--- a/xbmc/video/videosync/Makefile
++++ b/xbmc/video/videosync/Makefile
+@@ -5,6 +5,7 @@ SRCS=VideoSyncGLX.cpp \
+      VideoSyncPi.cpp \
+      VideoSyncIMX.cpp \
+      VideoSyncAndroid.cpp \
++     VideoSyncAML.cpp \
+ 
+ LIB=videosync.a
+ 
+-- 
+2.7.4
+
