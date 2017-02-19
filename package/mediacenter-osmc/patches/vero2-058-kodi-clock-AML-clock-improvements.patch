@@ -1,7 +1,7 @@
-From f35b302861b90fb25acad6ea3430e95a58ac394e Mon Sep 17 00:00:00 2001
+From f0147d4547a373cb9aa45b01b1905cedd23ea640 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 18 Nov 2016 14:39:30 +0100
-Subject: [PATCH 01/32] sync kodi clock to AML clock
+Subject: [PATCH 01/34] sync kodi clock to AML clock
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 219 +++++++++++----------
@@ -37,7 +37,7 @@ index c38c223..0ab8567 100644
  #include <linux/videodev2.h>
  
  // amcodec include
-@@ -133,6 +134,11 @@ class DllLibamCodecInterface
+@@ -133,6 +134,11 @@ public:
    virtual int codec_set_cntl_mode(codec_para_t *pcodec, unsigned int mode)=0;
    virtual int codec_set_cntl_avthresh(codec_para_t *pcodec, unsigned int avthresh)=0;
    virtual int codec_set_cntl_syncthresh(codec_para_t *pcodec, unsigned int syncthresh)=0;
@@ -73,7 +73,7 @@ index c38c223..0ab8567 100644
    END_METHOD_RESOLVE()
  
  public:
-@@ -273,7 +289,7 @@ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+@@ -273,7 +289,7 @@ public:
  
  #define PTS_FREQ        90000
  #define UNIT_FREQ       96000
@@ -455,7 +455,7 @@ index 0eb5c3e..33fa0b7 100644
  {
  public:
    CAMLCodec();
-@@ -51,11 +49,13 @@ class CAMLCodec : public CThread
+@@ -51,11 +49,13 @@ public:
    int           GetDataSize();
    double        GetTimeSize();
    void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
@@ -472,7 +472,7 @@ index 0eb5c3e..33fa0b7 100644
  
  private:
    void          ShowMainVideo(const bool show);
-@@ -73,16 +73,15 @@ class CAMLCodec : public CThread
+@@ -73,16 +73,15 @@ private:
  
    DllLibAmCodec   *m_dll;
    bool             m_opened;
@@ -491,7 +491,7 @@ index 0eb5c3e..33fa0b7 100644
  
    CRect            m_dst_rect;
    CRect            m_display_rect;
-@@ -94,8 +93,15 @@ class CAMLCodec : public CThread
+@@ -94,8 +93,15 @@ private:
    int              m_contrast;
    int              m_brightness;
  
@@ -629,7 +629,7 @@ index 2c44241..39f408e 100644
  
    // reference counting
    CDVDAmlogicInfo* Retain();
-@@ -44,6 +44,7 @@ class CDVDAmlogicInfo
+@@ -44,6 +44,7 @@ public:
  
    CAMLCodec *getAmlCodec() const;
    int GetOmxPts() const { return m_omxPts; }
@@ -637,7 +637,7 @@ index 2c44241..39f408e 100644
    void invalidate();
  
  protected:
-@@ -52,7 +53,7 @@ class CDVDAmlogicInfo
+@@ -52,7 +53,7 @@ protected:
  
    CDVDVideoCodecAmlogic* m_codec;
    CAMLCodec* m_amlCodec;
@@ -854,7 +854,7 @@ index d8674c8..c45e94f 100644
  
  #endif
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-index 828f584a..bbef504 100644
+index 828f584..bbef504 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 @@ -24,17 +24,29 @@
@@ -890,7 +890,7 @@ index 828f584a..bbef504 100644
  
    // Player functions
    virtual bool IsGuiLayer();
-@@ -47,16 +59,20 @@ class CRendererAML : public CLinuxRendererGLES
+@@ -47,16 +59,20 @@ public:
  
    virtual EINTERLACEMETHOD AutoInterlaceMethod();
  
@@ -918,11 +918,14 @@ index 828f584a..bbef504 100644
  };
  
  #endif
+-- 
+2.7.4
 
-From 62209dbd993a5dfe1dc5ee6083c061bbc781ff7f Mon Sep 17 00:00:00 2001
+
+From b193a305addddd3e46dfde9e7d6c3d86dc846381 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 18 Nov 2016 18:59:35 +0100
-Subject: [PATCH 02/32] Increase size of render buffers (4)
+Subject: [PATCH 02/34] Increase size of render buffers (4)
 
 ---
  xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h | 2 +-
@@ -932,7 +935,7 @@ diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/x
 index bbef504..0d9f126 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -62,7 +62,7 @@ class CRendererAML : public CBaseRenderer
+@@ -62,7 +62,7 @@ public:
  private:
  
    int m_iRenderBuffer;
@@ -941,11 +944,14 @@ index bbef504..0d9f126 100644
  
    struct BUFFER
    {
+-- 
+2.7.4
 
-From d4742523c14dbed5724e80c5160334cf09cfedc7 Mon Sep 17 00:00:00 2001
+
+From 3fe6195ebce27f8029c9ca8ea431aaad301112da Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 18 Nov 2016 21:38:32 +0100
-Subject: [PATCH 03/32] Limit timesize to be never > 2.0
+Subject: [PATCH 03/34] Limit timesize to be never > 2.0
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 +-
@@ -964,11 +970,14 @@ index 0ab8567..56884af 100644
     rtn |= VC_BUFFER;
  
    if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+-- 
+2.7.4
 
-From 514370bfd06881cc972ebd7a6f29c1948f12c91c Mon Sep 17 00:00:00 2001
+
+From e12aab4bbe04e4a6bb847acec0eed1f4c9ed7e3b Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sat, 19 Nov 2016 20:47:47 +0100
-Subject: [PATCH 04/32] sleep / vfs
+Subject: [PATCH 04/34] sleep / vfs
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 15 ++++++++++++++-
@@ -1013,11 +1022,14 @@ index 56884af..6f2cfa9 100644
        timesize
      );
  
+-- 
+2.7.4
 
-From 383c5cd6fdaddd7be841fe9898398e0812fa56c1 Mon Sep 17 00:00:00 2001
+
+From 4bcd3cb4a8a278438757521dad81dd753633b390 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sun, 20 Nov 2016 11:29:13 +0100
-Subject: [PATCH 05/32] log vfstates / throttle prefill
+Subject: [PATCH 05/34] log vfstates / throttle prefill
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 34 +++++++++++++---------
@@ -1102,11 +1114,14 @@ index 6f2cfa9..920ba29 100644
    CLog::Log(LOGDEBUG, "CAMLCodec::SetSpeed, speed(%d)", speed);
  
    // update internal vars regardless
+-- 
+2.7.4
 
-From e7885610feb970c3b596c158ab09d7eb53bbe4fb Mon Sep 17 00:00:00 2001
+
+From 038d76e9a25066f03e3784ad5c44df0a9efbb21e Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sun, 20 Nov 2016 15:08:31 +0100
-Subject: [PATCH 06/32] throttle during playback as well, not only at prefill
+Subject: [PATCH 06/34] throttle during playback as well, not only at prefill
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 5 +++--
@@ -1135,11 +1150,14 @@ index 920ba29..d038d6a 100644
    if (((rtn & VC_PICTURE) == 0 && timesize < 2.0) || timesize < 1.0)
     rtn |= VC_BUFFER;
  
+-- 
+2.7.4
 
-From 35c24254ab9eafd9bd9f5b0025c94636e3c19889 Mon Sep 17 00:00:00 2001
+
+From e4ed5e882eecf7084600c09eb7255b8c551c2557 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Thu, 24 Nov 2016 10:56:07 +0100
-Subject: [PATCH 07/32] Don't use DTS in case PTS is NO_PTS, instead don't call
+Subject: [PATCH 07/34] Don't use DTS in case PTS is NO_PTS, instead don't call
  checkin_pts
 
 ---
@@ -1205,11 +1223,14 @@ index d038d6a..8c51ac4c 100644
  }
  
  static int write_header(am_private_t *para, am_packet_t *pkt)
+-- 
+2.7.4
 
-From afb5e69423bf5a6b3b3a1e0c654fbfcd7f4c3121 Mon Sep 17 00:00:00 2001
+
+From 1ceb0fb673ab7653a8ae0feceeea2114145d3668 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 25 Nov 2016 16:25:44 +0100
-Subject: [PATCH 08/32] allow streams without PTS (matroska)
+Subject: [PATCH 08/34] allow streams without PTS (matroska)
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 64 ++++++++++------------
@@ -1236,7 +1257,7 @@ index 8c51ac4c..d96c96c 100644
  #include <unistd.h>
  #include <queue>
  #include <vector>
-@@ -295,8 +286,7 @@ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+@@ -295,8 +286,7 @@ public:
  #define TRICKMODE_I     0x01
  #define TRICKMODE_FFFB  0x02
  
@@ -1374,7 +1395,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index 33fa0b7..3a2d986 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -93,13 +93,10 @@ class CAMLCodec
+@@ -93,13 +93,10 @@ private:
    int              m_contrast;
    int              m_brightness;
  
@@ -1391,11 +1412,14 @@ index 33fa0b7..3a2d986 100644
  
    PosixFilePtr     m_amlVideoFile;
    std::string      m_defaultVfmMap;
+-- 
+2.7.4
 
-From f328dec6ca6dde3564c565a674c41bce215f9ab6 Mon Sep 17 00:00:00 2001
+
+From 1a34b2f8384ca6f30a2323a5c95ac40d70508d13 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sun, 4 Dec 2016 17:34:15 +0100
-Subject: [PATCH 09/32] initialize cur_pts at Open / log oob timesizes
+Subject: [PATCH 09/34] initialize cur_pts at Open / log oob timesizes
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 11 +++++++++--
@@ -1442,11 +1466,14 @@ index d96c96c..3e33480 100644
  
    // lie to VideoPlayer, it is hardcoded to a max of 8 seconds,
    // if you buffer more than 8 seconds, it goes nuts.
+-- 
+2.7.4
 
-From a4aa3de63681f34a11b8c6491b2e6f49bc8b75a1 Mon Sep 17 00:00:00 2001
+
+From 9beb7f0402171ff1d512a4187ae955a4c5f2bfc6 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sun, 4 Dec 2016 21:16:17 +0100
-Subject: [PATCH 10/32] Set AV sync to 30 again
+Subject: [PATCH 10/34] Set AV sync to 30 again
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 +-
@@ -1456,7 +1483,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/Vi
 index 3e33480..c1a4359 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -280,7 +280,7 @@ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+@@ -280,7 +280,7 @@ public:
  
  #define PTS_FREQ        90000
  #define UNIT_FREQ       96000
@@ -1465,11 +1492,14 @@ index 3e33480..c1a4359 100644
  
  #define TRICKMODE_NONE  0x00
  #define TRICKMODE_I     0x01
+-- 
+2.7.4
 
-From 11dded59ec9ab893eb2b3e75f0aaec32450d6d95 Mon Sep 17 00:00:00 2001
+
+From 6b319abcd8c7aeaee18bdaeb8de8775e20b27cef Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Sun, 4 Dec 2016 21:43:51 +0100
-Subject: [PATCH 11/32] Disable audio and sub
+Subject: [PATCH 11/34] Disable audio and sub
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 ++
@@ -1488,11 +1518,14 @@ index c1a4359..0d3ca38 100644
  }
  
  
+-- 
+2.7.4
 
-From 569c477ddfc180e4692b7762f47d04330d4fb5d5 Mon Sep 17 00:00:00 2001
+
+From 0d5391c7c372998f48257fcab1dc479c355894cb Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Mon, 5 Dec 2016 17:26:54 +0100
-Subject: [PATCH 12/32] remove videodelay calculation
+Subject: [PATCH 12/34] remove videodelay calculation
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 35 ++++++++--------------
@@ -1579,7 +1612,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index 3a2d986..9cdd258 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -51,7 +51,7 @@ class CAMLCodec
+@@ -51,7 +51,7 @@ public:
    void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
    void          SetVideoRate(int videoRate);
    int64_t       GetCurPts() const { return m_cur_pts; }
@@ -1588,7 +1621,7 @@ index 3a2d986..9cdd258 100644
    static float  OMXPtsToSeconds(int omxpts);
    static int    OMXDurationToNs(int duration);
    int           GetAmlDuration() const;
-@@ -79,8 +79,7 @@ class CAMLCodec
+@@ -79,8 +79,7 @@ private:
    volatile int     m_speed;
    volatile int64_t m_cur_pts;
    volatile int64_t m_vbufsize;
@@ -1598,7 +1631,7 @@ index 3a2d986..9cdd258 100644
    int64_t          m_last_pts;
  
    CRect            m_dst_rect;
-@@ -94,7 +93,6 @@ class CAMLCodec
+@@ -94,7 +93,6 @@ private:
    int              m_brightness;
  
    static const unsigned int STATE_PREFILLED  = 1;
@@ -1606,11 +1639,14 @@ index 3a2d986..9cdd258 100644
  
    unsigned int m_state;
  
+-- 
+2.7.4
 
-From aaa27fee01327a586d74ae04571b91ccd14138e1 Mon Sep 17 00:00:00 2001
+
+From 8a694b8c721394f5126cf4b035724365734e9d31 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Tue, 6 Dec 2016 17:42:38 +0100
-Subject: [PATCH 13/32] enable seek for streams without PTS
+Subject: [PATCH 13/34] enable seek for streams without PTS
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 9 +++++++--
@@ -1660,10 +1696,10 @@ index b41abe7..405e36c 100644
      // some formats need header/data tweaks.
      // the actual write occurs once in write_av_packet
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-index 9cdd258..0e5334bd 100644
+index 9cdd258..0e5334b 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -76,8 +76,8 @@ class CAMLCodec
+@@ -76,8 +76,8 @@ private:
    bool             m_ptsIs64us;
    am_private_t    *am_private;
    CDVDStreamInfo   m_hints;
@@ -1674,7 +1710,7 @@ index 9cdd258..0e5334bd 100644
    volatile int64_t m_vbufsize;
    int64_t          m_start_adj;
    int64_t          m_last_pts;
-@@ -93,6 +93,7 @@ class CAMLCodec
+@@ -93,6 +93,7 @@ private:
    int              m_brightness;
  
    static const unsigned int STATE_PREFILLED  = 1;
@@ -1682,11 +1718,14 @@ index 9cdd258..0e5334bd 100644
  
    unsigned int m_state;
  
+-- 
+2.7.4
 
-From 90249e2a3c6b53aa99a3ce1f4a2d301f798d896d Mon Sep 17 00:00:00 2001
+
+From a627ba99bb7adbe0eef8720c04ee130fbb22acdc Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Wed, 7 Dec 2016 21:16:18 +0100
-Subject: [PATCH 14/32] start with h.264 IDR frame
+Subject: [PATCH 14/34] start with h.264 IDR frame
 
 ---
  .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       | 32 +++++++++++++++++-----
@@ -1773,7 +1812,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbm
 index 39f408e..0a2c6bb 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -99,6 +99,7 @@ class CDVDVideoCodecAmlogic : public CDVDVideoCodec
+@@ -99,6 +99,7 @@ protected:
    mpeg2_sequence *m_mpeg2_sequence;
    double          m_mpeg2_sequence_pts;
    bool            m_drop;
@@ -1782,7 +1821,7 @@ index 39f408e..0a2c6bb 100644
    CBitstreamParser *m_bitparser;
    CBitstreamConverter *m_bitstream;
 diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
-index d0a4c20..f42c50c4 100644
+index d0a4c20..f42c50c 100644
 --- a/xbmc/utils/BitstreamConverter.cpp
 +++ b/xbmc/utils/BitstreamConverter.cpp
 @@ -269,35 +269,25 @@ bool CBitstreamParser::FindIdrSlice(const uint8_t *buf, int buf_size)
@@ -1839,7 +1878,7 @@ diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
 index 9045ef9..8b66f0f 100644
 --- a/xbmc/utils/BitstreamConverter.h
 +++ b/xbmc/utils/BitstreamConverter.h
-@@ -157,6 +157,7 @@ class CBitstreamConverter
+@@ -157,6 +157,7 @@ public:
    int               GetConvertSize() const;
    uint8_t*          GetExtraData(void) const;
    int               GetExtraSize() const;
@@ -1847,11 +1886,14 @@ index 9045ef9..8b66f0f 100644
  
    static void       bits_reader_set( bits_reader_t *br, uint8_t *buf, int len );
    static uint32_t   read_bits( bits_reader_t *br, int nbits );
+-- 
+2.7.4
 
-From 3164250375995ae6af361f5c946540c2199fe053 Mon Sep 17 00:00:00 2001
+
+From fa721b580e659bcc43b5f7548f679c16ae1e47e0 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Thu, 8 Dec 2016 08:37:36 +0100
-Subject: [PATCH 15/32] IDR and SEI:recovery are keyframes -> implement
+Subject: [PATCH 15/34] IDR and SEI:recovery are keyframes -> implement
  SEI:recovery_count
 
 ---
@@ -1900,7 +1942,7 @@ index 4a0598c..386aac2 100644
  
  bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pDvdVideoPicture)
 diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
-index f42c50c4..6cb25fd 100644
+index f42c50c..6cb25fd 100644
 --- a/xbmc/utils/BitstreamConverter.cpp
 +++ b/xbmc/utils/BitstreamConverter.cpp
 @@ -72,6 +72,34 @@ enum {
@@ -2094,7 +2136,7 @@ diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
 index 8b66f0f..d953907 100644
 --- a/xbmc/utils/BitstreamConverter.h
 +++ b/xbmc/utils/BitstreamConverter.h
-@@ -137,7 +137,7 @@ class CBitstreamParser
+@@ -137,7 +137,7 @@ public:
  
    static bool Open();
    static void Close();
@@ -2103,7 +2145,7 @@ index 8b66f0f..d953907 100644
  
  protected:
    static const uint8_t* find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
-@@ -157,7 +157,8 @@ class CBitstreamConverter
+@@ -157,7 +157,8 @@ public:
    int               GetConvertSize() const;
    uint8_t*          GetExtraData(void) const;
    int               GetExtraSize() const;
@@ -2113,18 +2155,21 @@ index 8b66f0f..d953907 100644
  
    static void       bits_reader_set( bits_reader_t *br, uint8_t *buf, int len );
    static uint32_t   read_bits( bits_reader_t *br, int nbits );
-@@ -208,5 +209,6 @@ class CBitstreamConverter
+@@ -208,5 +209,6 @@ protected:
    bool              m_convert_3byteTo4byteNALSize;
    bool              m_convert_bytestream;
    AVCodecID         m_codec;
 +  bool              m_has_keyframe;
  };
  
+-- 
+2.7.4
 
-From ea31d4f1ae26060752caaa87e71f840134768b5b Mon Sep 17 00:00:00 2001
+
+From 026c34d9aaf4568fbd2c89204782690e10c5a79a Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Thu, 8 Dec 2016 14:47:02 +0100
-Subject: [PATCH 16/32] Fix BitsreamParser SEI start adress
+Subject: [PATCH 16/34] Fix BitsreamParser SEI start adress
 
 ---
  .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   | 14 +++++++-------
@@ -2193,7 +2238,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbm
 index 0a2c6bb..a494ace 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -99,7 +99,7 @@ class CDVDVideoCodecAmlogic : public CDVDVideoCodec
+@@ -99,7 +99,7 @@ protected:
    mpeg2_sequence *m_mpeg2_sequence;
    double          m_mpeg2_sequence_pts;
    bool            m_drop;
@@ -2215,11 +2260,14 @@ index 6cb25fd..be942a1 100644
          buf = find_start_code(buf, buf_end, &state) - 4;
          if (has_sei_recovery_point(buf_begin, buf))
            rtn = true;
+-- 
+2.7.4
 
-From 2400cddfebd2d0120a396aff5cc7e3259273ea35 Mon Sep 17 00:00:00 2001
+
+From 9418c41a14989d0781684fba56bf084932d35012 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Tue, 13 Dec 2016 12:07:00 +0100
-Subject: [PATCH 17/32] wait for next displayed frame for sync measurement
+Subject: [PATCH 17/34] wait for next displayed frame for sync measurement
 
 ---
  .../VideoRenderers/HwDecRender/RendererAML.cpp     | 45 ++++++++++++++--------
@@ -2314,7 +2362,7 @@ diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/x
 index 0d9f126..7b4203b 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -70,7 +70,7 @@ class CRendererAML : public CBaseRenderer
+@@ -70,7 +70,7 @@ private:
      int duration;
    } m_buffers[m_numRenderBuffers];
  
@@ -2323,11 +2371,14 @@ index 0d9f126..7b4203b 100644
    bool m_bConfigured;
    int m_diff_counter;
  };
+-- 
+2.7.4
 
-From d675e0689584f84627604a07f6a5b3d62baba88a Mon Sep 17 00:00:00 2001
+
+From ecba99ea2e02d2c3d82622796c7de01992de716a Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Tue, 13 Dec 2016 21:23:34 +0100
-Subject: [PATCH 18/32] check for amlclodec != 0
+Subject: [PATCH 18/34] check for amlclodec != 0
 
 ---
  xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp | 3 ++-
@@ -2347,11 +2398,14 @@ index 54a2588..cb000bb 100644
    }
  }
  
+-- 
+2.7.4
 
-From a2260af19fce474edf1378fc636feecbfc84b03d Mon Sep 17 00:00:00 2001
+
+From 21c2eef86629b8e113705fa4192c57abf12b0274 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Tue, 13 Dec 2016 23:18:27 +0100
-Subject: [PATCH 19/32] resume aml on time we got first picture
+Subject: [PATCH 19/34] resume aml on time we got first picture
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp               | 8 ++++++--
@@ -2407,11 +2461,14 @@ index cb000bb..e6b39f3 100644
      {
        set_pts("/sys/class/tsync/pts_pcrscr", pts);
        CLog::Log(LOGDEBUG, "RenderUpdate: Adjusting: ptsclock:%d ptsscr:%d vpts:%d dur:%d diff:%d diffsum:%d", pts, pcrscr, videopts,amli->GetAmlDuration(), diff, m_diff_counter);
+-- 
+2.7.4
 
-From 94031c39a596e7ac14f77170565a1a2c0f969802 Mon Sep 17 00:00:00 2001
+
+From b3942834f85679a74803725984e62c696a4beeab Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Wed, 14 Dec 2016 14:22:11 +0100
-Subject: [PATCH 20/32] more log / fix start-adjusting
+Subject: [PATCH 20/34] more log / fix start-adjusting
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 9 ++++++---
@@ -2447,10 +2504,10 @@ index 47fca3c..4935453 100644
        static_cast<int>(m_cur_pts),
        vfs.vf_pool_size, vfs.buf_free_num,vfs.buf_recycle_num,vfs.buf_avail_num,
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-index 0e5334bd..b18e6e2 100644
+index 0e5334b..b18e6e2 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -50,8 +50,8 @@ class CAMLCodec
+@@ -50,8 +50,8 @@ public:
    double        GetTimeSize();
    void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
    void          SetVideoRate(int videoRate);
@@ -2461,11 +2518,14 @@ index 0e5334bd..b18e6e2 100644
    static float  OMXPtsToSeconds(int omxpts);
    static int    OMXDurationToNs(int duration);
    int           GetAmlDuration() const;
+-- 
+2.7.4
 
-From 2dec8f56f8aa7614b48527739d98b6fc2d0e246d Mon Sep 17 00:00:00 2001
+
+From 13123e2c14845eda4118271836b8b24b1a95944e Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Tue, 20 Dec 2016 13:53:03 +0100
-Subject: [PATCH 21/32] [AML] queue_buf
+Subject: [PATCH 21/34] queue_buf
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 87 ++++++++++++++++------
@@ -2665,7 +2725,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index b18e6e2..6348647 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -51,11 +51,12 @@ class CAMLCodec
+@@ -51,11 +51,12 @@ public:
    void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
    void          SetVideoRate(int videoRate);
    int64_t       GetCurPts() const { return m_cur_pts + m_start_adj; }
@@ -2679,7 +2739,7 @@ index b18e6e2..6348647 100644
  
  private:
    void          ShowMainVideo(const bool show);
-@@ -69,6 +70,7 @@ class CAMLCodec
+@@ -69,6 +70,7 @@ private:
    void          CloseAmlVideo();
    std::string   GetVfmMap(const std::string &name);
    void          SetVfmMap(const std::string &name, const std::string &map);
@@ -2720,11 +2780,14 @@ index e6b39f3..d390c08 100644
  }
  
  #endif
+-- 
+2.7.4
 
-From e1557505b865a912a87e80258b5ad8ad3306cf6a Mon Sep 17 00:00:00 2001
+
+From 356ca7e2ffc0fb15cd1c5c57ce77d2d3e35f27cc Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Wed, 21 Dec 2016 23:38:53 +0100
-Subject: [PATCH 22/32] videosync impl. / cleanup
+Subject: [PATCH 22/34] videosync impl. / cleanup
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 39 ++++------
@@ -2831,7 +2894,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index 6348647..1fb95b1 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -70,7 +70,6 @@ class CAMLCodec
+@@ -70,7 +70,6 @@ private:
    void          CloseAmlVideo();
    std::string   GetVfmMap(const std::string &name);
    void          SetVfmMap(const std::string &name, const std::string &map);
@@ -2960,7 +3023,7 @@ diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/x
 index 7b4203b..cd68401 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -72,7 +72,6 @@ class CRendererAML : public CBaseRenderer
+@@ -72,7 +72,6 @@ private:
  
    int m_prevVPts;
    bool m_bConfigured;
@@ -2992,11 +3055,11 @@ index a8dbdaf..e8755a1 100644
  
      if (m_pVideoSync)
 diff --git a/xbmc/video/videosync/CMakeLists.txt b/xbmc/video/videosync/CMakeLists.txt
-index 421af44..75c9011 100644
+index 82f7169..177c656 100644
 --- a/xbmc/video/videosync/CMakeLists.txt
 +++ b/xbmc/video/videosync/CMakeLists.txt
-@@ -35,6 +35,11 @@ if(CORE_SYSTEM_NAME STREQUAL android)
-   list(APPEND HEADERS VideoSyncAndroid.h)
+@@ -40,6 +40,11 @@ if(IMX_FOUND)
+   list(APPEND HEADERS VideoSyncIMX.h)
  endif()
  
 +if(AML_FOUND)
@@ -3146,11 +3209,14 @@ index 0000000..f48e3b4
 +};
 +
 +#endif
+-- 
+2.7.4
 
-From fcc5dfb9a8a7edaa66bda89424fbf68802a83198 Mon Sep 17 00:00:00 2001
+
+From ef1f3425fc8963c7cff4ad04ed9f15fb6bcd7502 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 23 Dec 2016 16:17:47 +0100
-Subject: [PATCH 23/32] pts -> buffer-index
+Subject: [PATCH 23/34] pts -> buffer-index
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 45 +++++++++-------------
@@ -3285,7 +3351,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index 1fb95b1..b2b0950 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -52,11 +52,12 @@ class CAMLCodec
+@@ -52,11 +52,12 @@ public:
    void          SetVideoRate(int videoRate);
    int64_t       GetCurPts() const { return m_cur_pts + m_start_adj; }
    int           GetOMXPts() const { return static_cast<int>(m_cur_pts); }
@@ -3299,7 +3365,7 @@ index 1fb95b1..b2b0950 100644
  
  private:
    void          ShowMainVideo(const bool show);
-@@ -70,7 +71,7 @@ class CAMLCodec
+@@ -70,7 +71,7 @@ private:
    void          CloseAmlVideo();
    std::string   GetVfmMap(const std::string &name);
    void          SetVfmMap(const std::string &name, const std::string &map);
@@ -3308,7 +3374,7 @@ index 1fb95b1..b2b0950 100644
  
    DllLibAmCodec   *m_dll;
    bool             m_opened;
-@@ -79,9 +80,10 @@ class CAMLCodec
+@@ -79,9 +80,10 @@ private:
    CDVDStreamInfo   m_hints;
    int              m_speed;
    int64_t          m_cur_pts;
@@ -3362,7 +3428,7 @@ index a494ace..c28d1c4 100644
  
    // reference counting
    CDVDAmlogicInfo* Retain();
-@@ -45,6 +45,7 @@ class CDVDAmlogicInfo
+@@ -45,6 +45,7 @@ public:
    CAMLCodec *getAmlCodec() const;
    int GetOmxPts() const { return m_omxPts; }
    int GetAmlDuration() const { return m_amlDuration; }
@@ -3370,7 +3436,7 @@ index a494ace..c28d1c4 100644
    void invalidate();
  
  protected:
-@@ -54,6 +55,7 @@ class CDVDAmlogicInfo
+@@ -54,6 +55,7 @@ protected:
    CDVDVideoCodecAmlogic* m_codec;
    CAMLCodec* m_amlCodec;
    int m_omxPts, m_amlDuration;
@@ -3393,11 +3459,14 @@ index 9ebcbf6..5bd0a0f 100644
        amlcodec->SetVideoRect(m_sourceRect, m_destRect);
        m_prevVPts = pts;
      }
+-- 
+2.7.4
 
-From 29cbcbe1fa813473431d1f3322d6ecd67295dc1e Mon Sep 17 00:00:00 2001
+
+From 25fdf980d3ac5d057c9467a59c8fa43105f86d2a Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Mon, 26 Dec 2016 15:01:08 +0100
-Subject: [PATCH 24/32] implement frame drop
+Subject: [PATCH 24/34] implement frame drop
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 49 ++++++++++++++--------
@@ -3540,7 +3609,7 @@ index b2b0950..d5d5723 100644
  
  typedef struct am_private_t am_private_t;
  
-@@ -56,8 +57,10 @@ class CAMLCodec
+@@ -56,8 +57,10 @@ public:
    static float  OMXPtsToSeconds(int omxpts);
    static int    OMXDurationToNs(int duration);
    int           GetAmlDuration() const;
@@ -3553,7 +3622,7 @@ index b2b0950..d5d5723 100644
  
  private:
    void          ShowMainVideo(const bool show);
-@@ -102,5 +105,7 @@ class CAMLCodec
+@@ -102,5 +105,7 @@ private:
  
    PosixFilePtr     m_amlVideoFile;
    std::string      m_defaultVfmMap;
@@ -3578,7 +3647,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbm
 index c28d1c4..bbebf57 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -47,6 +47,8 @@ class CDVDAmlogicInfo
+@@ -47,6 +47,8 @@ public:
    int GetAmlDuration() const { return m_amlDuration; }
    uint32_t GetBufferIndex() const { return m_bufferIndex; };
    void invalidate();
@@ -3587,7 +3656,7 @@ index c28d1c4..bbebf57 100644
  
  protected:
    long m_refs;
-@@ -56,6 +58,7 @@ class CDVDAmlogicInfo
+@@ -56,6 +58,7 @@ protected:
    CAMLCodec* m_amlCodec;
    int m_omxPts, m_amlDuration;
    uint32_t m_bufferIndex;
@@ -3631,11 +3700,14 @@ index 5bd0a0f..292f07b 100644
  }
  
  #endif
+-- 
+2.7.4
 
-From 1aa22d7a3526d21a5d9abe1ac2106828bbd86c2c Mon Sep 17 00:00:00 2001
+
+From 99c4a8287cf6c6291c66dc19dee87002a67cf6fb Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Wed, 28 Dec 2016 23:40:19 +0100
-Subject: [PATCH 25/32] log pts/dts as double, sleep in dequeue at least 10ms
+Subject: [PATCH 25/34] log pts/dts as double, sleep in dequeue at least 10ms
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 25 +++++++++++++++++++---
@@ -3710,11 +3782,14 @@ index 95307ae..861801f 100644
  
    // lie to VideoPlayer, it is hardcoded to a max of 8 seconds,
    // if you buffer more than 8 seconds, it goes nuts.
+-- 
+2.7.4
 
-From 795416b9dea2e7ab9de696176845c237bcdcee0d Mon Sep 17 00:00:00 2001
+
+From 7867d7c269394e9c57a90f1b303a16caa5129d3f Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Thu, 29 Dec 2016 17:01:44 +0100
-Subject: [PATCH 26/32] pass readjusted PTS value in GetPicture()
+Subject: [PATCH 26/34] pass readjusted PTS value in GetPicture()
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 +-
@@ -3733,11 +3808,14 @@ index 861801f..db544ce 100644
  
    return true;
  }
+-- 
+2.7.4
 
-From bd1554621f0310c40b133e0fa3b9296b55bc75a8 Mon Sep 17 00:00:00 2001
+
+From e5a9e4e2034e8ec0001782069d48badaeb242676 Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Mon, 2 Jan 2017 18:10:35 +0100
-Subject: [PATCH 27/32] Remove GetDataSize() / GetTimeSize()
+Subject: [PATCH 27/34] Remove GetDataSize() / GetTimeSize()
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 80 +++++-----------------
@@ -3883,7 +3961,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index d5d5723..04146a0 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -47,8 +47,6 @@ class CAMLCodec
+@@ -47,8 +47,6 @@ public:
  
    bool          GetPicture(DVDVideoPicture* pDvdVideoPicture);
    void          SetSpeed(int speed);
@@ -3892,7 +3970,7 @@ index d5d5723..04146a0 100644
    void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
    void          SetVideoRate(int videoRate);
    int64_t       GetCurPts() const { return m_cur_pts + m_start_adj; }
-@@ -83,7 +81,7 @@ class CAMLCodec
+@@ -83,7 +81,7 @@ private:
    CDVDStreamInfo   m_hints;
    int              m_speed;
    int64_t          m_cur_pts;
@@ -3932,7 +4010,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbm
 index bbebf57..9e57295 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -77,8 +77,6 @@ class CDVDVideoCodecAmlogic : public CDVDVideoCodec
+@@ -77,8 +77,6 @@ public:
    virtual bool ClearPicture(DVDVideoPicture* pDvdVideoPicture);
    virtual void SetSpeed(int iSpeed);
    virtual void SetDropState(bool bDrop);
@@ -3941,11 +4019,14 @@ index bbebf57..9e57295 100644
    virtual const char* GetName(void) { return (const char*)m_pFormatName; }
  
  protected:
+-- 
+2.7.4
 
-From 48da105c90fd4518f2541b25ac8fcee3085f64fd Mon Sep 17 00:00:00 2001
+
+From 94240b749a99233c2341bd01fd6239eb3d03fd65 Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Wed, 4 Jan 2017 14:28:46 +0100
-Subject: [PATCH 28/32] increase buffer level
+Subject: [PATCH 28/34] increase buffer level
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 ++--
@@ -3966,11 +4047,14 @@ index 2cfb486..cedc177 100644
    }
  
    if (DequeueBuffer() == 0)
+-- 
+2.7.4
 
-From 52a6360260c590e3a7a08c5fa7a39816c4760f8d Mon Sep 17 00:00:00 2001
+
+From 102df8c40f80ff6626eeb6e1913e24e301c6f0d4 Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Thu, 5 Jan 2017 14:58:20 +0100
-Subject: [PATCH 29/32] prefeed based on frame durations
+Subject: [PATCH 29/34] prefeed based on frame durations
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 54 +++++++++++++++-------
@@ -4102,7 +4186,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/Vide
 index 04146a0..2885a88 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -73,6 +73,7 @@ class CAMLCodec
+@@ -73,6 +73,7 @@ private:
    std::string   GetVfmMap(const std::string &name);
    void          SetVfmMap(const std::string &name, const std::string &map);
    int           DequeueBuffer();
@@ -4110,7 +4194,7 @@ index 04146a0..2885a88 100644
  
    DllLibAmCodec   *m_dll;
    bool             m_opened;
-@@ -104,6 +105,9 @@ class CAMLCodec
+@@ -104,6 +105,9 @@ private:
    PosixFilePtr     m_amlVideoFile;
    std::string      m_defaultVfmMap;
  
@@ -4120,11 +4204,14 @@ index 04146a0..2885a88 100644
    static long  m_pollSync;
    static int   m_pollDevice;
  };
+-- 
+2.7.4
 
-From 087c11d45925912921fe1d7434fb4eee50cbf0fd Mon Sep 17 00:00:00 2001
+
+From 1e9d9b9d847aceb2cfa54fa54dc1d23e9be9943c Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Mon, 9 Jan 2017 11:14:31 +0100
-Subject: [PATCH 30/32] disable h/w flv1 / vsync clock for s/w
+Subject: [PATCH 30/34] disable h/w flv1 / vsync clock for s/w
 
 ---
  .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp |  3 +--
@@ -4260,11 +4347,14 @@ index fb744e2..02c613e 100644
    }
  }
  
+-- 
+2.7.4
 
-From 2a9c9c7e4a9f1980b00b4f67719d4581db3155f5 Mon Sep 17 00:00:00 2001
+
+From c4906cf1308981be4d55ed579d7c5fb29b66055d Mon Sep 17 00:00:00 2001
 From: peak3d <pfau@peak3d.de>
 Date: Fri, 13 Jan 2017 17:55:05 +0100
-Subject: [PATCH 31/32] keyframe_pts_only for vc-1
+Subject: [PATCH 31/34] keyframe_pts_only for vc-1
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 7 ++++++-
@@ -4295,11 +4385,14 @@ index 38dcd23..62b5da2 100644
      }
      // We use this to determine the fill state if no PTS is given
      if (m_cur_pts == INT64_0)
+-- 
+2.7.4
 
-From 6c9899a90a6cbc8eb8bb1c426c743830b939333c Mon Sep 17 00:00:00 2001
+
+From ea907ebf5f47338bb66661babeaf89cfa3c3af24 Mon Sep 17 00:00:00 2001
 From: Markus Pfau <pfau@peak3d.de>
 Date: Fri, 13 Jan 2017 22:13:35 +0100
-Subject: [PATCH 32/32] KEYFRAME_PTS_ONLY changes (mpeg4)
+Subject: [PATCH 32/34] KEYFRAME_PTS_ONLY changes (mpeg4)
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp       |  8 +++++---
@@ -4373,3 +4466,67 @@ index da46973..bcf5247 100644
    }
  
    if (m_hints.ptsinvalid)
+-- 
+2.7.4
+
+
+From 39ad962a0a8c9c06061b1dd3c45921989180ee4d Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Fri, 10 Feb 2017 14:30:45 +0100
+Subject: [PATCH 33/34] fix scale for orientation 90 / 270
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index a5bc749..11b08b5 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2197,7 +2197,8 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+     case 1:
+     case 3:
+       {
+-        int diff = (int) ((dst_rect.Height() - dst_rect.Width()) / 2);
++        double scale = (double)dst_rect.Height() / dst_rect.Width();
++        int diff = (int) ((dst_rect.Height()*scale - dst_rect.Width()) / 2);
+         dst_rect = CRect(DestRect.x1 - diff, DestRect.y1, DestRect.x2 + diff, DestRect.y2);
+       }
+ 
+-- 
+2.7.4
+
+
+From 6260e03bfd46ab0d36359b2d00232a104fbaff13 Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Fri, 10 Feb 2017 14:31:34 +0100
+Subject: [PATCH 34/34] use SPS as Decode-Start sign for h.264
+
+---
+ xbmc/utils/BitstreamConverter.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
+index be942a1..5256d81 100644
+--- a/xbmc/utils/BitstreamConverter.cpp
++++ b/xbmc/utils/BitstreamConverter.cpp
+@@ -342,6 +342,7 @@ bool CBitstreamParser::HasKeyframe(const uint8_t *buf, int buf_size)
+           rtn = true;
+         break;
+       case AVC_NAL_SPS:
++        rtn = true;
+         break;
+       case AVC_NAL_PPS:
+         break;
+@@ -967,7 +968,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+     if (m_sps_pps_context.first_idr && (unit_type == nal_sps || unit_type == nal_pps))
+       m_sps_pps_context.idr_sps_pps_seen = 1;
+ 
+-    if (!m_has_keyframe && (IsIDR(unit_type) || (unit_type == nal_sei && has_sei_recovery_point(buf, buf + nal_size))))
++    if (!m_has_keyframe && (unit_type == nal_sps || IsIDR(unit_type) || (unit_type == nal_sei && has_sei_recovery_point(buf, buf + nal_size))))
+       m_has_keyframe = true;
+ 
+     // prepend only to the first access unit of an IDR picture, if no sps/pps already present
+-- 
+2.7.4
+
