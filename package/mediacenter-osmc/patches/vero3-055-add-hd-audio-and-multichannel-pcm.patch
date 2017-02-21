@@ -46,8 +46,8 @@ index d66993a..b3a32ad 100644
 +      snd_config_delete(config);
 +      InitializeHW(m_inconfig, m_outconfig);
 +
-+      /* Passthrough is supported only by device 1 */
-+      device = "hw:AMLM8AUDIO,1";
++      /* Passthrough is supported only by HDMI (device 1) */
++      device = "hdmi:CARD=AMLM8AUDIO,DEV=0";
 +
 +      switch(format.m_streamInfo.m_type)
 +      {
