@@ -32,8 +32,6 @@ esac
 /bin/busybox fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
 /bin/busybox fbset -fb /dev/fb1 -g 32 32 32 32 32
 
-/bin/busybox sleep 1 # avoid race
-
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
 echo 1 > /sys/class/video/disable_video
