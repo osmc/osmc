@@ -20,16 +20,20 @@ do
 esac
 done
 
-# Configure framebuffer X and Y size
+preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
+then
+  hdmimode="$preferred"
+  echo "$hdmimode" > /sys/class/display/mode
+fi
 
-case $hdmimode in
-  480*)            X=720  Y=480  ;;
-  576*)            X=720  Y=576  ;;
-  720p*)           X=1280 Y=720  ;;
-  *)               X=1920 Y=1080 ;;
-esac
+# Configure framebuffer with double buffer
 
-/bin/busybox fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+xres=$(busybox sed 's/x.*$//g' /sys/class/video/device_resolution)
+yres=$(busybox sed 's/^.*x//g' /sys/class/video/device_resolution)
+ydouble=$((yres * 2))
+
+/bin/busybox fbset -fb /dev/fb0 -g $xres $yres $xres $ydouble 32
 /bin/busybox fbset -fb /dev/fb1 -g 32 32 32 32 32
 
 echo 0 > /sys/class/graphics/fb0/free_scale
