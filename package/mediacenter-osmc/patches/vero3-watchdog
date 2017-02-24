@@ -6,6 +6,7 @@
 fb_restore() {
 	echo 0 >/sys/class/graphics/fb0/free_scale
 	echo 0 >/sys/class/graphics/fb1/free_scale
+	echo 1 >/sys/class/vtconsole/vtcon1/bind
 	[ -e /var/run/fb_resolution ] && /bin/fbset $(cat /var/run/fb_resolution)
 }
 
@@ -102,6 +103,7 @@ while true; do
 	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
 	KODI=/usr/lib/kodi/kodi.bin
 	setcap 'cap_net_bind_service=+ep' $KODI
+	echo 0 >/sys/class/vtconsole/vtcon1/bind
 	starttime=$(date +%s)
 	echo "Starting Kodi..."
 	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
