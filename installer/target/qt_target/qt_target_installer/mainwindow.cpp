@@ -174,6 +174,17 @@ void MainWindow::install()
         logger->addLine("No preseed file was found");
     }
 #ifndef FACTORYV2
+    /* Check for correct flash */
+    if (! utils->v4k_checkflash())
+    {
+        logger->addLine("Flash does not seem correct");
+        haltInstall("Please contact support. Hardware is faulty");
+        return ;
+    }
+    else
+    {
+        logger->addLine("Flash looks OK");
+    }
     if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
         for (int i = 0; i <= 60; i++)
@@ -203,11 +214,6 @@ void MainWindow::install()
     system("/bin/sync");
     utils->rebootSystem();
     }
-#endif
-#ifndef FACTORYV2
-    /* Make sure we have been programmed properly */
-    if (! utils->v4k_checkflash())
-        haltInstall("Please contact support. Hardware issue");
 #endif
     /* If !nfs, create necessary partitions */
     if (! useNFS)
