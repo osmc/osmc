@@ -28,6 +28,8 @@ public:
     bool unmountPartition(Target *device, QString path);
     int getPartSize(QString device, QString fstype);
     void updateDevTable();
+    bool v4k_checkflash();
+    int v4k_setflash();
 
 private:
     Logger *logger;

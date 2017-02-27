@@ -184,6 +184,31 @@ void MainWindow::install()
         }
     }
 #endif
+#ifdef FACTORYV2
+    if (! utils->v4k_checkflash())
+    {
+        system("/usr/sbin/fw_setenv upgrade_step 2");
+        QFile dtbFile(QString(MNT_BOOT) + "/dtb.img");
+        if (! dtbFile.exists())
+            haltInstall("No DTB for upload");
+
+    QString ddCmd = "dd if=" + QString(MNT_BOOT) + "/dtb.img" + " of=/dev/dtb bs=256k conv=sync";
+    system(ddCmd.toLocal8Bit().data());
+    system("dd if=/dev/zero of=/dev/data bs=1M count=1 conv=fsync");
+    system("dd if=/dev/zero of=/dev/instaboot bs=1M count=1 conv=fsync");
+    system("dd if=/dev/zero of=/dev/system bs=1M count=1 conv=fsync");
+    system("dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync");
+    system("dd if=/dev/zero of=/dev/tee bs=256k conv=fsync"); /* Quirk */
+    utils->v4k_setflash();
+    system("/bin/sync");
+    utils->rebootSystem();
+    }
+#endif
+#ifndef FACTORYV2
+    /* Make sure we have been programmed properly */
+    if (! utils->v4k_checkflash())
+        haltInstall("Please contact support. Hardware issue");
+#endif
     /* If !nfs, create necessary partitions */
     if (! useNFS)
     {

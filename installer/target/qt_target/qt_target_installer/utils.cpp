@@ -177,3 +177,13 @@ bool Utils::unmountPartition(Target *device, QString path)
     }
 
 }
+
+int Utils::v4k_setflash()
+{
+    return (system("/usr/sbin/fw_setenv v4kflash verify"));
+}
+
+bool Utils::v4k_checkflash()
+{
+    return ((system("/usr/sbin/fw_printenv v4kflash") == 0) ? true : false);
+}
