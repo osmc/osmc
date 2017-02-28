@@ -22,6 +22,10 @@
 #include "extractworker.h"
 #include <QTimer>
 //#define FACTORYV2
+#ifdef FACTORYV2
+    #include <unistd.h>
+    #include <sys/reboot.h>
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -347,6 +351,7 @@ void MainWindow::setupBootLoader()
         system("/bin/sync");
         ui->statusLabel->setText(tr("OSMC installed successfully"));
         qApp->processEvents(); /* Force GUI update */
+        reboot(0x4321fedc);
 #else
     ui->statusLabel->setText(tr("OSMC installed successfully"));
     qApp->processEvents(); /* Force GUI update */
