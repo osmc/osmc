@@ -1,8 +1,8 @@
 [Unit]
-Description=Vero3 BT upload
+Description=Vero3 Bluetooth support
 Requires=dev-ttyS1.device
 After=dev-ttyS1.device
-Before=bluetooth.service connman.service
+StopWhenUnneeded=true
 
 [Service]
 Type=forking

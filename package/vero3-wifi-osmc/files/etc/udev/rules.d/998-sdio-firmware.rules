@@ -1,2 +1,7 @@
-SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ACTION=="add", \
-  TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.service"
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev.29", ATTR{type}=="bluetooth", \
+  ACTION=="add|change", ATTR{soft}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.service", \
+  ENV{SYSTEMD_READY}="1"
+
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev.29", ATTR{type}=="bluetooth", \
+  ACTION=="change", ATTR{soft}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.service", \
+  ENV{SYSTEMD_READY}="0"
