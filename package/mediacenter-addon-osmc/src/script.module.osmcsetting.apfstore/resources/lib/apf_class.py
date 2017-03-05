@@ -122,7 +122,7 @@ class APF_obj(xbmcgui.ListItem):
 
 		if self.iconhash == 'NA':
 
-			return os.path.join(ADDONART, 'osmc_logo.png')
+			return os.path.join(ADDONART, 'osmc_osmclogo.png')
 
 		icon_name = iconurl.split('/')[-1]
 
@@ -138,7 +138,7 @@ class APF_obj(xbmcgui.ListItem):
 
 		else:
 
-			current_icon = os.path.join(ADDONART, 'osmc_logo.png')
+			current_icon = os.path.join(ADDONART, 'osmc_osmclogo.png')
 
 		log('current icon = %s' % current_icon)
 

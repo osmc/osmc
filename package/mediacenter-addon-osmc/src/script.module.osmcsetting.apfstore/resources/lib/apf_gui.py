@@ -58,7 +58,7 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 		self.list = self.getControl(500)
 		self.list.setVisible(True)
 		for x, y in self.apf_dict.iteritems():
-			# self.current_icon = '/home/kubkev/.kodi/addons/script.module.osmcsetting.apfstore/resources/skins/Default/media/osmc_logo.png'
+			# self.current_icon = '/home/kubkev/.kodi/addons/script.module.osmcsetting.apfstore/resources/skins/Default/media/osmc_osmclogo.png'
 
 			self.list.addItem(y)
 			self.apf_order_list.append(x)
