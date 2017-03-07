@@ -1,0 +1,9 @@
+[Unit]
+Description=sdio device path monitor
+StopWhenUnneeded=true
+
+[Path]
+PathExists=/var/run/sdio_0x02d0:0xa9bf
+
+[Install]
+WantedBy=multi-user.target
