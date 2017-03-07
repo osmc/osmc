@@ -1478,11 +1478,12 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.show_busy_dialogue()
             
             try:
-                self.bluetooth_discovering = not self.bluetooth_discovering;
-                if self.bluetooth_discovering:
-                    osmc_bluetooth.start_discovery()
-                else:
-                    osmc_bluetooth.stop_discovery()
+                if osmc_bluetooth.is_bluetooth_active():
+                    self.bluetooth_discovering = not self.bluetooth_discovering
+                    if self.bluetooth_discovering:
+                        osmc_bluetooth.start_discovery()
+                    else:
+                        osmc_bluetooth.stop_discovery()
             except:
                 pass
             

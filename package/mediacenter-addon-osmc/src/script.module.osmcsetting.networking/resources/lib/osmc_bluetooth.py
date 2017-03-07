@@ -45,6 +45,11 @@ def is_bluetooth_available():
 
 def is_bluetooth_enabled():
     connman_status = connman.is_technology_enabled('bluetooth')
+    return connman_status
+
+
+def is_bluetooth_active():
+    connman_status = connman.is_technology_enabled('bluetooth')
     service_status = osmc_systemd.is_service_running(BLUETOOTH_SERVICE)
     adapterFound = False
     if connman_status and service_status:
