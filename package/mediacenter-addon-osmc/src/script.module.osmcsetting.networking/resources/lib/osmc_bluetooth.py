@@ -62,12 +62,7 @@ def is_bluetooth_active():
 
 
 def toggle_bluetooth_state(state):
-    if state:
-        if not osmc_systemd.is_service_running(BLUETOOTH_SERVICE):
-            osmc_systemd.toggle_service(BLUETOOTH_SERVICE, state)
-        connman.toggle_technology_state('bluetooth', state)
-    else:
-        connman.toggle_technology_state('bluetooth', state)
+    connman.toggle_technology_state('bluetooth', state)
 
 
 def get_adapter_property(key):
