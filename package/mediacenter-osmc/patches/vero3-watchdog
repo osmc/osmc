@@ -4,11 +4,17 @@
 # email@samnazarko.co.uk
 
 fb_restore() {
-	[ -e /var/run/fb_mode ] && cmp /var/run/fb_mode /sys/class/display/mode >/dev/null || cat /var/run/fb_mode >/sys/class/display/mode
-	echo 0 >/sys/class/graphics/fb0/free_scale
-	echo 0 >/sys/class/graphics/fb1/free_scale
-	echo 1 >/sys/class/vtconsole/vtcon1/bind
-	[ -e /var/run/fb_resolution ] && /bin/fbset $(cat /var/run/fb_resolution)
+	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
+	then
+		cmp /var/run/fb_mode /sys/class/display/mode >/dev/null || cat /var/run/fb_mode >/sys/class/display/mode
+		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
+		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
+		cat /var/run/fb_scale_width >/sys/class/graphics/fb0/scale_width
+		cat /var/run/fb_scale_height >/sys/class/graphics/fb0/scale_height
+		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
+		echo 1 >/sys/class/vtconsole/vtcon1/bind
+		/bin/fbset $(cat /var/run/fb_resolution)
+	fi
 }
 
 export TERM=linux
@@ -98,6 +104,11 @@ esac
 if [ ! -e /var/run/fb_resolution ]; then
 	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
 	cat /sys/class/display/mode >/var/run/fb_mode
+	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
+	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
+	cat /sys/class/graphics/fb0/scale_width | sed 's/^.*://' >/var/run/fb_scale_width
+	cat /sys/class/graphics/fb0/scale_height | sed 's/^.*://' >/var/run/fb_scale_height
+	cat /sys/class/graphics/fb0/free_scale | sed -e 's/^.*\[//' -e 's/\].*$//g' >/var/run/fb_free_scale
 fi
 
 
