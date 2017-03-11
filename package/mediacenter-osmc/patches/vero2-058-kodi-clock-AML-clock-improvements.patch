@@ -4173,7 +4173,7 @@ index cedc177..db36553 100644
 +    m_frameSizeSum -= m_frameSizes.front();
 +    m_frameSizes.pop_front();
 +  }
-+  if (bs.free_len < bs.data_len)
++  if (bs.free_len < (bs.data_len >> 1))
 +    return 7.0;
 +
 +  return (float)(m_frameSizes.size() * am_private->video_rate) / UNIT_FREQ;
