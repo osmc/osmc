@@ -23,7 +23,8 @@ then
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
         VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
         echo $VERSION_DEV >> files-dev/DEBIAN/control
-        echo "Depends: ${1}-libbluray-osmc (=${VERSION_NUM}), libfreetype6, libxml2, liblzma5, libpng12-0, libfontconfig1" >> files-dev/DEBIAN/control
+	echo "Depends: libfreetype6, libxml2, liblzma5, libpng12-0, libfontconfig1" >> files/DEBIAN/control
+        echo "Depends: ${1}-libbluray-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libfreetype6-dev"
 	handle_dep "libxml2-dev"
