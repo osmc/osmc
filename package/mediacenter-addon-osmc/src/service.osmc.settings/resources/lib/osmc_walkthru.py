@@ -824,7 +824,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 		if action == 10 or action == 92:
 
-			self.close()
+			self.exit_proceedure()
 
 
 	def networking_special_handling(self, next_panel):
