@@ -1,0 +1,221 @@
+diff --git a/Documentation/video4linux/CARDLIST.em28xx b/Documentation/video4linux/CARDLIST.em28xx
+index 6720999..09ff940 100644
+--- a/Documentation/video4linux/CARDLIST.em28xx
++++ b/Documentation/video4linux/CARDLIST.em28xx
+@@ -96,3 +96,4 @@
+  95 -> Leadtek VC100                            (em2861)        [0413:6f07]
+  96 -> Terratec Cinergy T2 Stick HD             (em28178)
+  97 -> Elgato EyeTV Hybrid 2008 INT             (em2884)        [0fd9:0018]
++ 98 -> Hauppauge WinTV-dualHD DVB               (em28174)       [2040:0265]
+diff --git a/drivers/media/usb/em28xx/em28xx-cards.c b/drivers/media/usb/em28xx/em28xx-cards.c
+index 930e3e3..5a57f75 100644
+--- a/drivers/media/usb/em28xx/em28xx-cards.c
++++ b/drivers/media/usb/em28xx/em28xx-cards.c
+@@ -492,6 +492,29 @@ static struct em28xx_reg_seq terratec_t2_stick_hd[] = {
+ 	{-1,                             -1,   -1,     -1},
+ };
+ 
++/* 2040:0265 Hauppauge WinTV-dualHD DVB
++ * reg 0x80/0x84:
++ * GPIO_0: Yellow LED tuner 1, 0=on, 1=off
++ * GPIO_1: Green LED tuner 1, 0=on, 1=off
++ * GPIO_2: Yellow LED tuner 2, 0=on, 1=off
++ * GPIO_3: Green LED tuner 2, 0=on, 1=off
++ * GPIO_5: Reset #2, 0=active
++ * GPIO_6: Reset #1, 0=active
++ */
++static struct em28xx_reg_seq hauppauge_dualhd_dvb[] = {
++	{EM2874_R80_GPIO_P0_CTRL,      0xff, 0xff,      0},
++	{0x0d,                         0xff, 0xff,    200},
++	{0x50,                         0x04, 0xff,    300},
++	{EM2874_R80_GPIO_P0_CTRL,      0xbf, 0xff,    100}, /* demod 1 reset */
++	{EM2874_R80_GPIO_P0_CTRL,      0xff, 0xff,    100},
++	{EM2874_R80_GPIO_P0_CTRL,      0xdf, 0xff,    100}, /* demod 2 reset */
++	{EM2874_R80_GPIO_P0_CTRL,      0xff, 0xff,    100},
++	{EM2874_R5F_TS_ENABLE,         0x44, 0xff,     50},
++	{EM2874_R5D_TS1_PKT_SIZE,      0x05, 0xff,     50},
++	{EM2874_R5E_TS2_PKT_SIZE,      0x05, 0xff,     50},
++	{-1,                             -1,   -1,     -1},
++};
++
+ /*
+  *  Button definitions
+  */
+@@ -571,6 +594,22 @@ static struct em28xx_led terratec_grabby_leds[] = {
+ 	{-1, 0, 0, 0},
+ };
+ 
++static struct em28xx_led hauppauge_dualhd_leds[] = {
++	{
++		.role      = EM28XX_LED_DIGITAL_CAPTURING,
++		.gpio_reg  = EM2874_R80_GPIO_P0_CTRL,
++		.gpio_mask = EM_GPIO_1,
++		.inverted  = 1,
++	},
++	{
++		.role      = EM28XX_LED_DIGITAL_CAPTURING_TS2,
++		.gpio_reg  = EM2874_R80_GPIO_P0_CTRL,
++		.gpio_mask = EM_GPIO_3,
++		.inverted  = 1,
++	},
++	{-1, 0, 0, 0},
++};
++
+ /*
+  *  Board definitions
+  */
+@@ -2306,6 +2345,18 @@ struct em28xx_board em28xx_boards[] = {
+ 		.has_dvb       = 1,
+ 		.ir_codes      = RC_MAP_TERRATEC_SLIM_2,
+ 	},
++	/* 2040:0265 Hauppauge WinTV-dualHD (DVB version).
++	 * Empia EM28274, 2x Silicon Labs Si2168, 2x Silicon Labs Si2157 */
++	[EM28174_BOARD_HAUPPAUGE_WINTV_DUALHD_DVB] = {
++		.name          = "Hauppauge WinTV-dualHD DVB",
++		.def_i2c_bus   = 1,
++		.i2c_speed     = EM28XX_I2C_CLK_WAIT_ENABLE | EM28XX_I2C_FREQ_400_KHZ,
++		.tuner_type    = TUNER_ABSENT,
++		.tuner_gpio    = hauppauge_dualhd_dvb,
++		.has_dvb       = 1,
++		.ir_codes      = RC_MAP_HAUPPAUGE,
++		.leds          = hauppauge_dualhd_leds,
++	},
+ };
+ EXPORT_SYMBOL_GPL(em28xx_boards);
+ 
+@@ -2429,6 +2480,8 @@ struct usb_device_id em28xx_id_table[] = {
+ 			.driver_info = EM2883_BOARD_HAUPPAUGE_WINTV_HVR_950 },
+ 	{ USB_DEVICE(0x2040, 0x651f),
+ 			.driver_info = EM2883_BOARD_HAUPPAUGE_WINTV_HVR_850 },
++	{ USB_DEVICE(0x2040, 0x0265),
++			.driver_info = EM28174_BOARD_HAUPPAUGE_WINTV_DUALHD_DVB },
+ 	{ USB_DEVICE(0x0438, 0xb002),
+ 			.driver_info = EM2880_BOARD_AMD_ATI_TV_WONDER_HD_600 },
+ 	{ USB_DEVICE(0x2001, 0xf112),
+@@ -2861,6 +2914,7 @@ static void em28xx_card_setup(struct em28xx *dev)
+ 	case EM2883_BOARD_HAUPPAUGE_WINTV_HVR_850:
+ 	case EM2883_BOARD_HAUPPAUGE_WINTV_HVR_950:
+ 	case EM2884_BOARD_HAUPPAUGE_WINTV_HVR_930C:
++	case EM28174_BOARD_HAUPPAUGE_WINTV_DUALHD_DVB:
+ 	{
+ 		struct tveeprom tv;
+ 
+diff --git a/drivers/media/usb/em28xx/em28xx-dvb.c b/drivers/media/usb/em28xx/em28xx-dvb.c
+index 5d209c7..94b88f1 100644
+--- a/drivers/media/usb/em28xx/em28xx-dvb.c
++++ b/drivers/media/usb/em28xx/em28xx-dvb.c
+@@ -1762,6 +1762,70 @@ static int em28xx_dvb_init(struct em28xx *dev)
+ 			dvb->i2c_client_tuner = client;
+ 		}
+ 		break;
++	case EM28174_BOARD_HAUPPAUGE_WINTV_DUALHD_DVB:
++		{
++			struct i2c_adapter *adapter;
++			struct i2c_client *client;
++			struct i2c_board_info info;
++			struct si2168_config si2168_config;
++			struct si2157_config si2157_config;
++
++			/* attach demod */
++			memset(&si2168_config, 0, sizeof(si2168_config));
++			si2168_config.i2c_adapter = &adapter;
++			si2168_config.fe = &dvb->fe[0];
++			si2168_config.ts_mode = SI2168_TS_SERIAL;
++			memset(&info, 0, sizeof(struct i2c_board_info));
++			strlcpy(info.type, "si2168", I2C_NAME_SIZE);
++			info.addr = 0x64;
++			info.platform_data = &si2168_config;
++			request_module(info.type);
++			client = i2c_new_device(&dev->i2c_adap[dev->def_i2c_bus], &info);
++			if (client == NULL || client->dev.driver == NULL) {
++				result = -ENODEV;
++				goto out_free;
++			}
++
++			if (!try_module_get(client->dev.driver->owner)) {
++				i2c_unregister_device(client);
++				result = -ENODEV;
++				goto out_free;
++			}
++
++			dvb->i2c_client_demod = client;
++
++			/* attach tuner */
++			memset(&si2157_config, 0, sizeof(si2157_config));
++			si2157_config.fe = dvb->fe[0];
++			si2157_config.if_port = 1;
++#ifdef CONFIG_MEDIA_CONTROLLER_DVB
++			si2157_config.mdev = dev->media_dev;
++#endif
++			memset(&info, 0, sizeof(struct i2c_board_info));
++			strlcpy(info.type, "si2157", I2C_NAME_SIZE);
++			info.addr = 0x60;
++			info.platform_data = &si2157_config;
++			request_module(info.type);
++			client = i2c_new_device(adapter, &info);
++			if (client == NULL || client->dev.driver == NULL) {
++				module_put(dvb->i2c_client_demod->dev.driver->owner);
++				i2c_unregister_device(dvb->i2c_client_demod);
++				result = -ENODEV;
++				goto out_free;
++			}
++
++			if (!try_module_get(client->dev.driver->owner)) {
++				i2c_unregister_device(client);
++				module_put(dvb->i2c_client_demod->dev.driver->owner);
++				i2c_unregister_device(dvb->i2c_client_demod);
++				result = -ENODEV;
++				goto out_free;
++			}
++
++			dvb->i2c_client_tuner = client;
++
++		}
++		break;
+ 	default:
+ 		em28xx_errdev("/2: The frontend of your DVB/ATSC card"
+ 				" isn't supported yet\n");
+diff --git a/drivers/media/usb/em28xx/em28xx-reg.h b/drivers/media/usb/em28xx/em28xx-reg.h
+index 13cbb7f..afe7a66 100644
+--- a/drivers/media/usb/em28xx/em28xx-reg.h
++++ b/drivers/media/usb/em28xx/em28xx-reg.h
+@@ -193,6 +193,19 @@
+ /* em2874 registers */
+ #define EM2874_R50_IR_CONFIG    0x50
+ #define EM2874_R51_IR           0x51
++#define EM2874_R5D_TS1_PKT_SIZE 0x5d
++#define EM2874_R5E_TS2_PKT_SIZE 0x5e
++	/*
++	 * For both TS1 and TS2, In isochronous mode:
++	 *  0x01  188 bytes
++	 *  0x02  376 bytes
++	 *  0x03  564 bytes
++	 *  0x04  752 bytes
++	 *  0x05  940 bytes
++	 * In bulk mode:
++	 *  0x01..0xff  total packet count in 188-byte
++	 */
++
+ #define EM2874_R5F_TS_ENABLE    0x5f
+ 
+ /* em2874/174/84, em25xx, em276x/7x/8x GPIO registers */
+diff --git a/drivers/media/usb/em28xx/em28xx.h b/drivers/media/usb/em28xx/em28xx.h
+index 2674449..61f6e6d 100644
+--- a/drivers/media/usb/em28xx/em28xx.h
++++ b/drivers/media/usb/em28xx/em28xx.h
+@@ -145,6 +145,7 @@
+ #define EM2861_BOARD_LEADTEK_VC100                95
+ #define EM28178_BOARD_TERRATEC_T2_STICK_HD        96
+ #define EM2884_BOARD_ELGATO_EYETV_HYBRID_2008     97
++#define EM28174_BOARD_HAUPPAUGE_WINTV_DUALHD_DVB  98
+ 
+ /* Limits minimum and default number of buffers */
+ #define EM28XX_MIN_BUF 4
+@@ -406,6 +407,7 @@ enum em28xx_adecoder {
+ enum em28xx_led_role {
+ 	EM28XX_LED_ANALOG_CAPTURING = 0,
+ 	EM28XX_LED_DIGITAL_CAPTURING,
++	EM28XX_LED_DIGITAL_CAPTURING_TS2,
+ 	EM28XX_LED_ILLUMINATION,
+ 	EM28XX_NUM_LED_ROLES, /* must be the last */
+ };
