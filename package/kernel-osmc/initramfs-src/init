@@ -78,6 +78,8 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	    ;;
 	  root=*)
 		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox sed 's/"//g')
+		PARTUUID=$(echo "$OPTION_ROOT" | /bin/busybox grep "^PARTUUID=" | /bin/busybox sed 's/^PARTUUID=//g')
+		if [ -n "$PARTUUID" ]; then OPTION_ROOT=$(/bin/busybox readlink -f /dev/disk/by-partuuid/${PARTUUID}); fi
 		;;
 	  rootfstype=*)
 		OPTION_FILESYSTEM="${option#*=}"
