@@ -1,0 +1,9 @@
+[Unit]
+Description=sdio device path monitor
+
+[Path]
+PathExists=/dev/serial1
+Unit=brcm43xx.service
+
+[Install]
+WantedBy=multi-user.target

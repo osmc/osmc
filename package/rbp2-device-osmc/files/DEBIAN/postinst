@@ -15,7 +15,8 @@ if [ "$1" = "configure" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	systemctl daemon-reload
-	systemctl enable brcm43xx.service >/dev/null 2>&1
+	systemctl disable brcm43xx.service >/dev/null 2>&1
+	systemctl enable bt-firmware.path >/dev/null 2>&1
 	if ischroot; then exit 0; fi
 	touch /tmp/reboot-needed
 fi
