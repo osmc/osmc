@@ -1,11 +1,11 @@
 [Unit]
 Description=Broadcom 43xx bluetooth HCI
-ConditionPathExists=/dev/serial1
 Before=bluetooth.service
-After=dev-ttyS0.device
+PartOf=bt-firmware.path
+ConditionPathIsDirectory=/proc/device-tree/soc/gpio@7e200000/bt_pins
 
 [Service]
-Type=simple
+Type=forking
 ExecStart=/usr/bin/rpi-btuart
 
 [Install]
