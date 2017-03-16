@@ -24,8 +24,6 @@ then
 else
    dev="rbp1"
 fi
-# We really don't want automated fscking
-tune2fs -c 0 $part2
 # Temporary mounting directory
 mkdir -p /tmp/mount
 # Fix the cmdline.txt
