@@ -44,7 +44,7 @@ umount /tmp/mount
 sync
 # Fix the fstab
 mount $part2 /tmp/mount
-echo "$part1  /boot    vfat     defaults,noatime    0   0
+echo "$part1  /boot    vfat     defaults,noatime,noauto,x-systemd.automount    0   0
 ">/tmp/mount/etc/fstab
 umount /tmp/mount
 # Wait
