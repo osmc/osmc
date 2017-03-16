@@ -27,8 +27,8 @@ fi
 # Temporary mounting directory
 mkdir -p /tmp/mount
 # Fix the cmdline.txt
-mount $part1 /tmp/mount
-echo "root=$part2 osmcdev=$dev rootfstype=ext4 rootwait quiet" > /tmp/mount/cmdline.txt
+mount $id1 /tmp/mount
+echo "root=$id2 osmcdev=$dev rootfstype=ext4 rootwait quiet" > /tmp/mount/cmdline.txt
 # Check for Pi Zero
 is_pi_zero
 pi_zero=$?
@@ -41,8 +41,8 @@ umount /tmp/mount
 # Wait
 sync
 # Fix the fstab
-mount $part2 /tmp/mount
-echo "$part1  /boot    vfat     defaults,noatime,noauto,x-systemd.automount    0   0
+mount $id2 /tmp/mount
+echo "$id1  /boot    vfat     defaults,noatime,noauto,x-systemd.automount    0   0
 ">/tmp/mount/etc/fstab
 umount /tmp/mount
 # Wait
