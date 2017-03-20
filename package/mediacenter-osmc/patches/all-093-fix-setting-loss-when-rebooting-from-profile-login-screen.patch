@@ -1,0 +1,35 @@
+From be86a7b9fc3a6cfe3bb4300c15a56d0c3e90fbf9 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 20 Mar 2017 02:45:58 +0000
+Subject: [PATCH] Ensure that add-ons can run before shutdown / reboot. This
+ allows correct teardown when rebooting or shutting down from the Profile
+ screen before login when add-ons are still being suppressed
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 021084a..1a39709 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2443,6 +2443,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+   switch (pMsg->dwMessage)
+   {
+   case TMSG_POWERDOWN:
++    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
+     m_ShuttingDown = true;
+     g_powerManager.Powerdown();
+     Stop(EXITCODE_POWERDOWN);
+@@ -2470,6 +2471,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+ 
+   case TMSG_RESTART:
+   case TMSG_RESET:
++    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
+     m_ShuttingDown = true;
+     g_powerManager.Reboot();
+     Stop(EXITCODE_REBOOT);
+-- 
+2.7.4
+
