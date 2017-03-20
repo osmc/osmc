@@ -1,0 +1,41 @@
+From 91f3550cf7d88f647c9679d99a45d71789ff2687 Mon Sep 17 00:00:00 2001
+From: "Chris \"koying\" Browet" <cbro@semperpax.com>
+Date: Wed, 27 Apr 2016 18:44:34 +0200
+Subject: [PATCH] FIX: save skin setting changes immediately
+
+---
+ xbmc/settings/SkinSettings.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/settings/SkinSettings.cpp b/xbmc/settings/SkinSettings.cpp
+index b53e4a2..bec45a3 100644
+--- a/xbmc/settings/SkinSettings.cpp
++++ b/xbmc/settings/SkinSettings.cpp
+@@ -59,6 +59,7 @@ const std::string& CSkinSettings::GetString(int setting) const
+ void CSkinSettings::SetString(int setting, const std::string &label)
+ {
+   g_SkinInfo->SetString(setting, label);
++  g_SkinInfo->SaveSettings();
+ }
+ 
+ int CSkinSettings::TranslateBool(const std::string &setting)
+@@ -74,16 +75,19 @@ bool CSkinSettings::GetBool(int setting) const
+ void CSkinSettings::SetBool(int setting, bool set)
+ {
+   g_SkinInfo->SetBool(setting, set);
++  g_SkinInfo->SaveSettings();
+ }
+ 
+ void CSkinSettings::Reset(const std::string &setting)
+ {
+   g_SkinInfo->Reset(setting);
++  g_SkinInfo->SaveSettings();
+ }
+ 
+ void CSkinSettings::Reset()
+ {
+   g_SkinInfo->Reset();
++  g_SkinInfo->SaveSettings();
+ 
+   g_infoManager.ResetCache();
+ }
