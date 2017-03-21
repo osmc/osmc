@@ -178,16 +178,19 @@ void MainWindow::install()
         logger->addLine("No preseed file was found");
     }
 #ifndef FACTORYV2
-    /* Check for correct flash */
-    if (! utils->v4k_checkflash())
+    if (utils->getOSMCDev() == "vero4k")
     {
-        logger->addLine("Flash does not seem correct");
-        haltInstall("Please contact support. Hardware is faulty");
-        return ;
-    }
-    else
-    {
-        logger->addLine("Flash looks OK");
+        /* Check for correct flash */
+        if (! utils->v4k_checkflash())
+        {
+            logger->addLine("Flash does not seem correct");
+            haltInstall("Please contact support. Hardware is faulty");
+            return ;
+        }
+        else
+        {
+            logger->addLine("Flash looks OK");
+        }
     }
     if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
