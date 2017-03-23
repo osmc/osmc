@@ -178,7 +178,7 @@ void MainWindow::install()
         logger->addLine("No preseed file was found");
     }
 #ifndef FACTORYV2
-    if (utils->getOSMCDev() == "vero4k")
+    if (utils->getOSMCDev() == "vero3")
     {
         /* Check for correct flash */
         if (! utils->v4k_checkflash())
