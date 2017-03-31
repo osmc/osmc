@@ -1,0 +1,73 @@
+From cf2f80904d7713c021f996b94d60142548536dc0 Mon Sep 17 00:00:00 2001
+From: Kai Sommerfeld <kai.sommerfeld@gmx.com>
+Date: Tue, 21 Mar 2017 23:09:05 +0100
+Subject: [PATCH] [PVR] Guide window: Optimize re-opening of the window (re-use
+ item list if no changes came in while window was not active).
+
+---
+ xbmc/pvr/windows/GUIWindowPVRGuide.cpp | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/pvr/windows/GUIWindowPVRGuide.cpp b/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
+index b74cc36..9c4d338 100644
+--- a/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
++++ b/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
+@@ -51,6 +51,8 @@ CGUIWindowPVRGuide::CGUIWindowPVRGuide(bool bRadio) :
+ CGUIWindowPVRGuide::~CGUIWindowPVRGuide(void)
+ {
+   g_EpgContainer.UnregisterObserver(this);
++
++  m_bRefreshTimelineItems = false;
+   StopRefreshTimelineItemsThread();
+ }
+ 
+@@ -68,8 +70,13 @@ void CGUIWindowPVRGuide::Init()
+     epgGridContainer->GoToNow();
+   }
+ 
++  if (!m_refreshTimelineItemsThread)
++  {
++    CSingleLock lock(m_critSection);
++    m_bRefreshTimelineItems = true; // force data update on first window open
++  }
++
+   StartRefreshTimelineItemsThread();
+-  m_bRefreshTimelineItems = true; // force data update on window open/re-open
+ }
+ 
+ void CGUIWindowPVRGuide::ClearData()
+@@ -98,6 +105,16 @@ void CGUIWindowPVRGuide::OnDeinitWindow(int nextWindowID)
+ {
+   StopRefreshTimelineItemsThread();
+ 
++  {
++    CSingleLock lock(m_critSection);
++    if (m_vecItems && !m_newTimeline)
++    {
++      // speedup: save a copy of current items for reuse when re-opening the window
++      m_newTimeline.reset(new CFileItemList);
++      m_newTimeline->Copy(*m_vecItems);
++    }
++  }
++
+   CGUIWindowPVRBase::OnDeinitWindow(nextWindowID);
+ }
+ 
+@@ -111,16 +128,12 @@ void CGUIWindowPVRGuide::StartRefreshTimelineItemsThread()
+ void CGUIWindowPVRGuide::StopRefreshTimelineItemsThread()
+ {
+   if (m_refreshTimelineItemsThread)
+-  {
+-    m_bRefreshTimelineItems = false;
+     m_refreshTimelineItemsThread->Stop();
+-  }
+ }
+ 
+ void CGUIWindowPVRGuide::Notify(const Observable &obs, const ObservableMessage msg)
+ {
+-  if (IsActive() &&
+-      m_viewControl.GetCurrentControl() == GUIDE_VIEW_TIMELINE &&
++  if (m_viewControl.GetCurrentControl() == GUIDE_VIEW_TIMELINE &&
+       (msg == ObservableMessageEpg ||
+        msg == ObservableMessageEpgContainer ||
+        msg == ObservableMessageChannelGroupReset ||

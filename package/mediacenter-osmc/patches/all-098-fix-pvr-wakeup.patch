@@ -1,0 +1,38 @@
+From 0cfdd9e73c2b24c404217294d2274cd75003c14a Mon Sep 17 00:00:00 2001
+From: Kai Sommerfeld <kai.sommerfeld@gmx.com>
+Date: Wed, 29 Mar 2017 20:07:57 +0200
+Subject: [PATCH] [PVR] Krypton: Quick and dirty fix for trac #17374.
+
+---
+ xbmc/Application.cpp    | 3 +++
+ xbmc/pvr/PVRManager.cpp | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index b8ff91b..947f093 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2932,6 +2932,9 @@ void CApplication::Stop(int exitCode)
+     CLog::Log(LOGNOTICE, "stop player");
+     m_pPlayer->ClosePlayer();
+ 
++    // quick and dirty Krypton-only fix for http://trac.kodi.tv/ticket/17374
++    g_PVRManager.SetWakeupCommand();
++
+     StopServices();
+ 
+ #ifdef HAS_ZEROCONF
+diff --git a/xbmc/pvr/PVRManager.cpp b/xbmc/pvr/PVRManager.cpp
+index 52a8e1b..18f8fbd 100644
+--- a/xbmc/pvr/PVRManager.cpp
++++ b/xbmc/pvr/PVRManager.cpp
+@@ -493,9 +493,6 @@ void CPVRManager::Unload()
+ 
+ void CPVRManager::Shutdown()
+ {
+-  // set system wakeup data
+-  SetWakeupCommand();
+-
+   Unload();
+ 
+   // release addons
