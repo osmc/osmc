@@ -192,21 +192,21 @@ class BTPlayerMonitor(xbmc.Player):
         self.btPlayer = btPlayer
         
     def onPlayBackStopped(self):
-        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying() and self.btPlayer.player:
             self.btPlayer.stop()
             
     def onPlayBackPaused(self):
-        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying() and self.btPlayer.player:
             self.btPlayer.pause()
 
     def onPlayBackResumed(self):
-        if xbmc.isBTPlayerActive():
+        if xbmc.isBTPlayerActive() and self.btPlayer.player:
             self.btPlayer.play()
     
     def onNextItem(self):
         if __addon__.getSetting("debug") == "true":
             log("Next Item Event Fired")
-        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying() and self.btPlayer.player:
             try:
                 self.btPlayer.next()
             except Exception as e:
@@ -216,7 +216,7 @@ class BTPlayerMonitor(xbmc.Player):
     def onPreviousItem(self):
         if __addon__.getSetting("debug") == "true":
             log("Previous Item Event Fired")
-        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying():
+        if xbmc.isBTPlayerActive() and self.btPlayer.isPlaying() and self.btPlayer.player:
             try:
                 self.btPlayer.previous()
             except Exception as e:
