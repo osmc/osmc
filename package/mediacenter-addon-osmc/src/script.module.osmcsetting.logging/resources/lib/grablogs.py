@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import argparse
+from datetime import datetime
 import os
 import sys
 import time
@@ -349,7 +350,23 @@ SETS =	{
 										  ], 													
 								},
 
-		'kodi' 				: {	'order' : 19, 
+		'disp_edid' 		: {	'order' : 18, 
+								'active': False, 
+								'help'  : 'Contents of /sys/class/amhdmitx/amhdmitx0/disp_cap, disp_mode, edid',
+								'dest'  : 'disp_edid',
+								'action': 'store_true',
+								'flags' : ['-e', '--edid'],
+								'logs'  : [
+											{
+												'name': 'Display & EDID',
+												'key' : 'Q10gho215',
+												'ltyp': 'cl_log', 
+												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_cap && cat /sys/class/amhdmitx/amhdmitx0/disp_mode && cat /sys/class/amhdmitx/amhdmitx0/edid',
+											},
+										  ], 													
+								},
+
+		'kodi' 				: {	'order' : 20, 
 								'active': False, 
 								'help'  : 'Kodi log files (includes log from previous boot)',
 								'dest'  : 'kodi',
@@ -387,6 +404,26 @@ def lang(id):
 
 	except:
 		return '%s'
+
+
+def right_now(raw=False):
+	''' Returns the current time. 
+		raw=True will return the raw datetime, but default is to convert it into a string.
+
+		Sometimes dt.now() throws some sort of "lock" error,
+		so we will give the function 1 second to throw errors and retrieve the time.
+	'''
+
+	for _ in range(5):
+		try:
+			if raw:
+				return datetime.now()
+			else:
+				return datetime.now().strftime('%Y-%m-%d %H:%M')
+		except:
+			time.sleep(0.2)
+
+	return 'Failed to retrieve time'
 
 
 def parse_arguments():
@@ -518,6 +555,9 @@ class Main(object):
 
 	def add_content_index(self):
 		''' Adds the quick look-up references to the start of the log file '''
+
+		# insert the date at the very top
+		self.log_blotter.append('Logs created on: %s' % right_now())		
 
 		for k, v in self.arguments:
 
