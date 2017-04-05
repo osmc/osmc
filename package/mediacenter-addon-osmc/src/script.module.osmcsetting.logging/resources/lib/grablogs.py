@@ -384,7 +384,23 @@ SETS =	{
 										  ], 													
 								},
 
-		'kodi' 				: {	'order' : 20, 
+		'ifconfig'			: {	'order' : 20, 
+								'active': False, 
+								'help'  : 'ifconfig',
+								'dest'  : 'ifconfig',
+								'action': 'store_true',
+								'flags' : ['-z', '--ifconfig'],
+								'logs'  : [
+											{
+												'name': 'ifconfig',
+												'key' : 'pi3lDrO1',
+												'ltyp': 'cl_log', 
+												'actn': 'ifconfig',
+											},
+										  ], 													
+								},
+
+		'kodi' 				: {	'order' : 21, 
 								'active': False, 
 								'help'  : 'Kodi log files (includes log from previous boot)',
 								'dest'  : 'kodi',
