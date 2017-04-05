@@ -349,12 +349,12 @@ SETS =	{
 										  ], 													
 								},
 
-		'disp_cap' 		: {	'order' : 19, 
+		'disp_info' 		: {	'order' : 19, 
 								'active': False, 
-								'help'  : 'Contents of /sys/class/amhdmitx/amhdmitx0/disp_cap',
-								'dest'  : 'disp_cap',
+								'help'  : 'Display Information (disp_cap, disp_mode, edid)',
+								'dest'  : 'disp_info',
 								'action': 'store_true',
-								'flags' : ['-y', '--disp_cap'],
+								'flags' : ['-z', '--disp_info'],
 								'logs'  : [
 											{
 												'name': 'Display Cap',
@@ -362,38 +362,18 @@ SETS =	{
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_cap',
 											},
-										  ], 													
-								},
-
-		'disp_mode' 		: {	'order' : 20, 
-								'active': False, 
-								'help'  : 'Contents of /sys/class/amhdmitx/amhdmitx0/disp_mode',
-								'dest'  : 'disp_mode',
-								'action': 'store_true',
-								'flags' : ['-z', '--disp_mode'],
-								'logs'  : [
 											{
 												'name': 'Display Mode',
 												'key' : 'Q72ho215',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_mode',
-											},
-										  ], 													
-								},
-
-		'edid' 				: {	'order' : 21, 
-								'active': False, 
-								'help'  : 'Contents of /sys/class/amhdmitx/amhdmitx0/edid',
-								'dest'  : 'edid',
-								'action': 'store_true',
-								'flags' : ['-e', '--edid'],
-								'logs'  : [
+											},		
 											{
 												'name': 'EDID',
 												'key' : 'wE0go885',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/edid',
-											},
+											},																				
 										  ], 													
 								},	
 
