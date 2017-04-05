@@ -22,6 +22,10 @@ if [ "$1" = "configure" ]; then
 			sed 's/^IPv6.method.*$/IPv6.method=off/g' -i "$file"
 		done
 	fi
+        if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade" ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "1.3.3-4"; then
+		# delete symlink to resolv.conf
+		rm -f /etc/resolv.conf
+        fi
 	rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"
 
 	systemctl daemon-reload
