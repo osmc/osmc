@@ -84,3 +84,5 @@ echo 8 > /proc/irq/62/smp_affinity   # dwc_otg, dwc_otg_hcd:usb2, dwc_otg_pcd
 # Set up NAND
 # ToDo: only if bootfromsd
 /usr/sbin/lvchange -aly /dev/vero-nand/root --ignorelockingfailure >/dev/null 2>&1
+
+echo 1 > /sys/class/amhdmitx/amhdmitx0/frac_rate_policy
