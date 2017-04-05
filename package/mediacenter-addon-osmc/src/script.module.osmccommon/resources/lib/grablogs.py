@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import sys
 import time
+import traceback
 
 try:
 
@@ -47,7 +48,7 @@ SETS =	{
 											{
 												'name': 'cmdline',
 												'key' : '0wwYYuO5',
-												'ltyp': 'cl_log', 
+												'ltyp': 'file_log', 
 												'actn': '/proc/cmdline',
 											},
 										  ],
@@ -359,21 +360,21 @@ SETS =	{
 											{
 												'name': 'Display Cap',
 												'key' : 'g0gjk991',
-												'ltyp': 'cl_log', 
-												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_cap',
+												'ltyp': 'file_log', 
+												'actn': '/sys/class/amhdmitx/amhdmitx0/disp_cap',
 											},
 											{
 												'name': 'Display Mode',
 												'key' : 'Q72ho215',
-												'ltyp': 'cl_log', 
-												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_mode',
+												'ltyp': 'file_log', 
+												'actn': '/sys/class/amhdmitx/amhdmitx0/disp_mode',
 											},		
 											{
 												'name': 'EDID',
 												'key' : 'wE0go885',
-												'ltyp': 'cl_log', 
-												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/edid',
-											},	
+												'ltyp': 'file_log', 
+												'actn': '/sys/class/amhdmitx/amhdmitx0/edid',
+											},																				
 											{
 												'name': 'Audio Cap',
 												'key' : 'k3dRrf31',
@@ -397,7 +398,13 @@ SETS =	{
 												'key' : 'zsl2D3rt',
 												'ltyp': 'cl_log', 
 												'actn': '/opt/vc/bin/tvservice -m DMT',
-											},												
+											},			
+											{
+												'name': 'Pi Audio Cap',
+												'key' : 'szl3J3wq',
+												'ltyp': 'cl_log', 
+												'actn': '/opt/vc/bin/tvservice -a',
+											},																							
 											{
 												'name': 'MPG2 codec_enabled',
 												'key' : 'DjfSD1Fa',
@@ -409,9 +416,9 @@ SETS =	{
 												'key' : 'dDR3l5zx',
 												'ltyp': 'cl_log', 
 												'actn': 'vcgencmd codec_enabled WVC1',
-											},																														
+											},																																															
 										  ], 													
-								},	
+								},
 
 		'ifconfig'			: {	'order' : 20, 
 								'active': False, 
@@ -467,6 +474,7 @@ def lang(id):
 
 	except:
 		return '%s'
+
 
 def right_now(raw=False):
 	''' Returns the current time. 
@@ -619,7 +627,7 @@ class Main(object):
 		''' Adds the quick look-up references to the start of the log file '''
 
 		# insert the date at the very top
-		self.log_blotter.append('Logs created on: %s\n\n' % right_now())
+		self.log_blotter.append('Logs created on: %s\n\n' % right_now())		
 
 		for k, v in self.arguments:
 
@@ -677,9 +685,13 @@ class Main(object):
 
 	def write_to_temp_file(self):
 		''' Writes the logs to a single temporary file '''
+		# clean up the blotter
+		self.log_blotter = [x.replace('\0', '') for x in self.log_blotter]
+		
 		try:
 			with open(TEMP_LOG_FILE, 'w') as f:
 
+				# write the blotter contents
 				f.writelines(self.log_blotter)
 
 			return True
@@ -712,24 +724,46 @@ class Main(object):
 
 		else:
 
-			try:
-				with os.popen('curl -X POST -s -T "%s" %s/documents' % (TEMP_LOG_FILE, UPLOAD_LOC)) as f:
+			attempts = 	[
+						'curl -X POST -s    -T',
+						'curl -X POST -s -0 -T'
+						]
 
-					line = f.readline()
-					
-					key = line.replace('{"key":"','').replace('"}','').replace('\n','')
-					
-					if CALLER != 'user':
-						log('pastio line: %s' % repr(line))
+			upload_exception = None
+			key = None
+			
+			for attempt in attempts:
+				try:
+					with os.popen('%s "%s" %s/documents' % (attempt, TEMP_LOG_FILE, UPLOAD_LOC)) as f:
+
+						line = f.readline()
 						
-			except:
+						key = line.replace('{"key":"','').replace('"}','').replace('\n','')
+						
+						if CALLER != 'user':
+							log('pastio line: %s' % repr(line))
 
-				key = False
+					if not key:
+						# the upload returning an empty string is considered a specific Exception
+						# every other exception is caught and will be printed as well
+						# but only for the second (fallback) attempt
+						raise ValueError('Upload Returned Empty String')
+
+					else:
+						break
+
+				except Exception as e:
+
+					upload_exception = traceback.format_exc()
 
 			self.pDialog.close()
 			time.sleep(0.5)
 
 			if not key:
+
+				if upload_exception:
+					log('Exception Details:\n')
+					log(upload_exception)
 
 				if CALLER == 'kodi':
 

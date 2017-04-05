@@ -398,7 +398,13 @@ SETS =	{
 												'key' : 'zsl2D3rt',
 												'ltyp': 'cl_log', 
 												'actn': '/opt/vc/bin/tvservice -m DMT',
-											},												
+											},			
+											{
+												'name': 'Pi Audio Cap',
+												'key' : 'szl3J3wq',
+												'ltyp': 'cl_log', 
+												'actn': '/opt/vc/bin/tvservice -a',
+											},																							
 											{
 												'name': 'MPG2 codec_enabled',
 												'key' : 'DjfSD1Fa',
