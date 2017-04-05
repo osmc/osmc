@@ -358,7 +358,7 @@ SETS =	{
 								'logs'  : [
 											{
 												'name': 'Display Cap',
-												'key' : 'g0gho215',
+												'key' : 'g0gjk991',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_cap',
 											},
@@ -587,7 +587,7 @@ class Main(object):
 		''' Adds the quick look-up references to the start of the log file '''
 
 		# insert the date at the very top
-		self.log_blotter.append('Logs created on: %s' % right_now())
+		self.log_blotter.append('Logs created on: %s\n\n' % right_now())
 
 		for k, v in self.arguments:
 
