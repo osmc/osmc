@@ -557,7 +557,7 @@ class Main(object):
 		''' Adds the quick look-up references to the start of the log file '''
 
 		# insert the date at the very top
-		self.log_blotter.append('Logs created on: %s' % right_now())		
+		self.log_blotter.append('Logs created on: %s\n' % right_now())		
 
 		for k, v in self.arguments:
 
