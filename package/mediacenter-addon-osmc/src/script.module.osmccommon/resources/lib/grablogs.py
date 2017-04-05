@@ -358,7 +358,7 @@ SETS =	{
 								'logs'  : [
 											{
 												'name': 'Display Cap',
-												'key' : 'gg0gho215',
+												'key' : 'g0gho215',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_cap',
 											},
@@ -374,7 +374,7 @@ SETS =	{
 								'logs'  : [
 											{
 												'name': 'Display Mode',
-												'key' : 'Q72gho215',
+												'key' : 'Q72ho215',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/disp_mode',
 											},
@@ -390,7 +390,7 @@ SETS =	{
 								'logs'  : [
 											{
 												'name': 'EDID',
-												'key' : 'wE0gho885',
+												'key' : 'wE0go885',
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/edid',
 											},
