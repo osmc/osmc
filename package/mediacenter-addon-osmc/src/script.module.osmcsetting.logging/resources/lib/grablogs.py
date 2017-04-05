@@ -375,6 +375,12 @@ SETS =	{
 												'ltyp': 'cl_log', 
 												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/edid',
 											},																				
+											{
+												'name': 'Audio Cap',
+												'key' : 'k3dRrf31',
+												'ltyp': 'cl_log', 
+												'actn': 'cat /sys/class/amhdmitx/amhdmitx0/aud_cap',
+											},														
 										  ], 													
 								},
 
