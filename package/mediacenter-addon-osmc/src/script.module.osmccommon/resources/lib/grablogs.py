@@ -382,7 +382,7 @@ SETS =	{
 								'help'  : 'ifconfig',
 								'dest'  : 'ifconfig',
 								'action': 'store_true',
-								'flags' : ['-z', '--ifconfig'],
+								'flags' : ['-n', '--ifconfig'],
 								'logs'  : [
 											{
 												'name': 'ifconfig',
