@@ -679,9 +679,13 @@ class Main(object):
 
 	def write_to_temp_file(self):
 		''' Writes the logs to a single temporary file '''
+		# clean up the blotter
+		self.log_blotter = [x.replace('\0', '') for x in self.log_blotter]
+		
 		try:
 			with open(TEMP_LOG_FILE, 'w') as f:
 
+				# write the blotter contents
 				f.writelines(self.log_blotter)
 
 			return True
