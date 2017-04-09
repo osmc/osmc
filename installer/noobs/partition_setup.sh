@@ -26,9 +26,14 @@ else
 fi
 # Temporary mounting directory
 mkdir -p /tmp/mount
+# To UUID or not to UUID
+vfat_part=$part1
+ext4_part=$part2
+if [ -n $id1 ]; then vfat_part=$id1; fi
+if [ -n $id2 ]; then ext4_part=$id2; fi
 # Fix the cmdline.txt
-mount $id1 /tmp/mount
-echo "root=$id2 osmcdev=$dev rootfstype=ext4 rootwait quiet" > /tmp/mount/cmdline.txt
+mount $part1 /tmp/mount
+echo "root=$ext4_part osmcdev=$dev rootfstype=ext4 rootwait quiet" > /tmp/mount/cmdline.txt
 # Check for Pi Zero
 is_pi_zero
 pi_zero=$?
@@ -41,8 +46,8 @@ umount /tmp/mount
 # Wait
 sync
 # Fix the fstab
-mount $id2 /tmp/mount
-echo "$id1  /boot    vfat     defaults,noatime,noauto,x-systemd.automount    0   0
+mount $part2 /tmp/mount
+echo "$vfat_part  /boot    vfat     defaults,noatime,noauto,x-systemd.automount    0   0
 ">/tmp/mount/etc/fstab
 umount /tmp/mount
 # Wait
