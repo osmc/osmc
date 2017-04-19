@@ -1,17 +1,17 @@
 #!/bin/bash
 
 if [ $# -ne 0 ]; then
-	response=$(curl -X POST -s -T "$1" http://paste.osmc.io/documents) || response=$(curl -X POST -s -0 -T "$1" http://paste.osmc.io/documents)
+	response=$(curl -X POST -s -T "$1" https://paste.osmc.tv/documents) || response=$(curl -X POST -s -0 -T "$1" https://paste.osmc.tv/documents)
 else
 	tmp=$(mktemp)
 	trap "rm -f $tmp" EXIT
 	cat >| $tmp
 
-	response=$(curl -X POST -s -T "$tmp" http://paste.osmc.io/documents) || response=$(curl -X POST -s -0 -T "$tmp" http://paste.osmc.io/documents)
+	response=$(curl -X POST -s -T "$tmp" https://paste.osmc.tv/documents) || response=$(curl -X POST -s -0 -T "$tmp" https://paste.osmc.tv/documents)
 fi
 
 if [ "$?" -eq 0 ]; then
-	echo "$response" | awk -F '"' '{print "http://paste.osmc.io/"$4}'
+	echo "$response" | awk -F '"' '{print "https://paste.osmc.tv/"$4}'
 else
 	echo "Unable to upload log. Please check your internet connection."
 fi
