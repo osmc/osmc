@@ -13,7 +13,7 @@ while true; do
 
 	cd /opt/osmc-tc/jenkins-slave/
 	curl -O -L http://$SERVER/jnlpJars/slave.jar
-	java -jar slave.jar -jnlpUrl "http://$SERVER/computer/$SLAVENAME/slave-agent.jnlp" -secret "$SECRET"
+	java -jar slave.jar -jnlpUrl "https://$SERVER/computer/$SLAVENAME/slave-agent.jnlp" -secret "$SECRET"
 	echo "Java exited with return code $? - relaunching in 60 seconds."
 	sleep 60
 done
