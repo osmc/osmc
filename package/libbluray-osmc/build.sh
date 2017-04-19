@@ -18,6 +18,7 @@ then
 	if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
+	sed '/Depends/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
         sed '/Version/d' -i files-dev/DEBIAN/control
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
