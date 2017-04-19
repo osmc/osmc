@@ -29,7 +29,7 @@ SECTION_START = '\n====================== %s =================== %s\n'
 SECTION_END   = '\n---------------------- %s END --------------- %s\n\n'
 USERDATA  	  = '/home/osmc/.kodi/userdata/'
 TEMP_LOG_FILE = '/var/tmp/uploadlog.txt'
-UPLOAD_LOC    = 'http://paste.osmc.io'
+UPLOAD_LOC    = 'https://paste.osmc.tv'
 
 SETS =	{
 		'uname' 			: { 'order' : 1,

@@ -272,7 +272,7 @@ class HotFix(object):
 
 		''' Uploads the results stored in the temporary file to paste.osmc.io and provide the user with the URL '''
 
-		with os.popen('curl -X POST -s -T "%s" http://paste.osmc.io/documents' % self.tmp_hfo_location) as f:
+		with os.popen('curl -X POST -s -T "%s" https://paste.osmc.tv/documents' % self.tmp_hfo_location) as f:
 
 			line = f.readline()
 			
@@ -292,7 +292,7 @@ class HotFix(object):
 
 		else:
 
-			url = 'http://paste.osmc.io/ %s' % key
+			url = 'https://paste.osmc.tv/ %s' % key
 
 			log(label="HotFix output uploaded to", message=url.replace(' ',''))
 
