@@ -1,0 +1,103 @@
+From 9b73ba320ac8c076427a1032524146d9d93559f6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 19 Apr 2017 17:41:18 +0100
+Subject: [PATCH] Add option to enable registering of nameservers as routes
+ (off by default). This is unnecessary. When using OpenVPN independently of
+ ConnMan, there is a potential for DNS leaks.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/connman.h |  2 +-
+ src/main.c    |  6 +++++-
+ src/service.c | 10 +++++++++-
+ 3 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/src/connman.h b/src/connman.h
+index ae731b2..4345461 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -654,7 +654,7 @@ int __connman_provider_init(void);
+ 
+ #include <connman/service.h>
+ 
+-int __connman_service_init(void);
++int __connman_service_init(gboolean routeresolver);
+ void __connman_service_cleanup(void);
+ int __connman_service_load_modifiable(struct connman_service *service);
+ 
+diff --git a/src/main.c b/src/main.c
+index 8b9230b..4ab485f 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -471,6 +471,7 @@ static gchar *option_wifi = NULL;
+ static gboolean option_detach = TRUE;
+ static gboolean option_dnsproxy = TRUE;
+ static gboolean option_allowresolvmodify = TRUE;
++static gboolean option_routeresolver = FALSE;
+ static gboolean option_backtrace = TRUE;
+ static gboolean option_version = FALSE;
+ 
+@@ -511,6 +512,9 @@ static GOptionEntry options[] = {
+ 	{ "noresolvmodify", 's', G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_allowresolvmodify,
+ 				"Don't allow resolv.conf changes. Useful if ignoring the primary interface" },
++        { "routeresolver", 's', G_OPTION_FLAG_REVERSE,
++                               G_OPTION_ARG_NONE, &option_allowresolvmodify,
++                               "Establish a route for a nameserver. This can cause DNS leaks for VPN" },
+ 	{ "nobacktrace", 0, G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_backtrace,
+ 				"Don't print out backtrace information" },
+@@ -664,7 +668,7 @@ int main(int argc, char *argv[])
+ 	__connman_technology_init();
+ 	__connman_notifier_init();
+ 	__connman_agent_init();
+-	__connman_service_init();
++	__connman_service_init(option_routeresolver);
+ 	__connman_peer_service_init();
+ 	__connman_peer_init();
+ 	__connman_provider_init();
+diff --git a/src/service.c b/src/service.c
+index 768426b..9419148 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -48,6 +48,7 @@ static unsigned int autoconnect_timeout = 0;
+ static unsigned int vpn_autoconnect_timeout = 0;
+ static struct connman_service *current_default = NULL;
+ static bool services_dirty = false;
++static bool routeresolver_enabled = false;
+ 
+ struct connman_stats {
+ 	bool valid;
+@@ -1223,6 +1224,9 @@ void __connman_service_nameserver_clear(struct connman_service *service)
+ static void add_nameserver_route(int family, int index, char *nameserver,
+ 				const char *gw)
+ {
++	if (! routeresolver_enabled)
++                return;
++
+ 	switch (family) {
+ 	case AF_INET:
+ 		if (connman_inet_compare_subnet(index, nameserver))
+@@ -7085,7 +7089,7 @@ static struct connman_agent_driver agent_driver = {
+ 	.context_unref	= agent_context_unref,
+ };
+ 
+-int __connman_service_init(void)
++int __connman_service_init(gboolean routeresolver)
+ {
+ 	int err;
+ 
+@@ -7098,6 +7102,10 @@ int __connman_service_init(void)
+ 		return err;
+ 	}
+ 
++        DBG("routeresolver %d", routeresolver);
++
++        routeresolver_enabled = routeresolver;
++
+ 	connection = connman_dbus_get_connection();
+ 
+ 	service_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+-- 
+2.7.4
+
