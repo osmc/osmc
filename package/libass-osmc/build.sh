@@ -19,11 +19,13 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
+	sed '/Depends/d' -i files/DEBIAN/control
         sed '/Version/d' -i files-dev/DEBIAN/control
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
         VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
         echo $VERSION_DEV >> files-dev/DEBIAN/control
-        echo "Depends: ${1}-libass-osmc (=${VERSION_NUM}), libenca0, libfontconfig1, libfreetype6, libfribidi0, libharfbuzz0b" >> files-dev/DEBIAN/control
+        echo "Depends: libenca0, libfontconfig1, libfreetype6, libfribidi0, libharfbuzz0b" >> files/DEBIAN/control
+        echo "Depends: ${1}-libass-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libenca-dev"
 	handle_dep "libfontconfig1-dev"
