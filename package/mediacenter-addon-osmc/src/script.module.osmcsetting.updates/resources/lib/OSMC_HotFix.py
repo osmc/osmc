@@ -100,7 +100,7 @@ class HotFix(object):
 		''' Takes a five-digit hotfix key and retrieve the hotfix from paste.osmc.io. 
 			Returns the raw contents at that location as a string. '''
 
-		URL = 'http://paste.osmc.io/raw/%s' % hf_cypher
+		URL = 'https://paste.osmc.tv/raw/%s' % hf_cypher
 
 		log(label='Retrieving hotfix from', message=URL)
 
