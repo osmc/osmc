@@ -73,7 +73,9 @@ verify_action
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
-
+echo -e "Configuring uname"
+install_archlib ${DIR} "armv7l"
+verify_action
 # Remove QEMU binary
 chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}" "32"
