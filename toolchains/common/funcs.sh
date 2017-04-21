@@ -29,6 +29,16 @@ function configure_ccache()
 	mkdir -p ${1}/root/.ccache
 }
 
+function install_archlib()
+{
+	cp ../common/uname-osmc.c ${1}
+	chroot ${1} gcc -DTARGET_ARCH=\"${2}\" -fPIC -c /uname-osmc.c
+	chroot ${1} gcc -shared -o /usr/lib/uname-osmc.so uname-osmc.o
+	echo "/usr/lib/uname-osmc.so" >> ${1}/etc/ld.so.preload
+	rm -f ${1}/uname-osmc.o
+	rm -f ${1}/uname-osmc.c
+}
+
 CHROOT_PKGS="build-essential nano sudo libeatmydata1"
 export CHROOT_PKGS
 
