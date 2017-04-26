@@ -128,7 +128,7 @@ class OSMCSettingClass(threading.Thread):
 
 		self.description = 	""
 
-		self.reset_file = '/home/OSMC/.factoryreset'
+		self.reset_file = '/home/osmc/.factoryreset'
 
 		self.setting_data_method = 	{}
 
