@@ -37,6 +37,7 @@ OPTION_INIT="/sbin/splash_early"
 OPTION_MOUNT_OPTIONS=""
 OPTION_MOUNT_PATH="/real_root"
 OPTION_NFS_IP_TYPE="dhcp"
+OPTION_REBOOT_ON_ROOT_FS_ERROR="0"
 
 # Set up our mounts
 
@@ -101,6 +102,9 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 		;;
 	  forcefsck)
 		OPTION_FORCE_FSCK="1"
+		;;
+	  rebootonerror)
+		OPTION_REBOOT_ON_ROOT_FS_ERROR="1"
 		;;
 	  rescue)
 		echo "          OSMC initramfs Rescue Console."
@@ -255,8 +259,16 @@ then
 	busybox_shell
 else
 	echo -e "FATAL ERROR: OSMC cannot mount $OPTION_ROOT of $OPTION_FILESYSTEM filesystem\n"
-	# Drop to a shell
-		echo "          OSMC initramfs Rescue Console."
-		echo -e "          For help and support see https://osmc.tv/\n"
-	busybox_shell
+	if [ "$OPTION_REBOOT_ON_ROOT_FS_ERROR" -eq 1 ]
+	then
+		echo -e "Rebooting in 10 seconds.\n\n\n\n"
+		/bin/busybox sleep 10
+		echo 1 > /proc/sys/kernel/sysrq
+		echo b > /proc/sysrq-trigger
+	else
+		# Drop to a shell
+			echo "          OSMC initramfs Rescue Console."
+			echo -e "          For help and support see https://osmc.tv/\n"
+		busybox_shell
+	fi
 fi
