@@ -87,6 +87,9 @@
 # XBMC Modules
 import xbmcaddon
 import xbmc
+
+import os
+import subprocess
 import threading
 
 
@@ -123,11 +126,9 @@ class OSMCSettingClass(threading.Thread):
 		# this is what is displayed in the main settings gui
 		self.shortname = 'Updates'
 
-		self.description = 	"""OSMC is contantly in development, with new features and up-stream bug fixes becoming available periodically.
-[CR]Keep an eye out for the 'Update Available' icon on the Home screen of Kodi.
-[CR]The primary purpose of this module is to allow you to set the time at which OSMC will check for updates.
-If your device is on all the time, you may want to set this to be very early in the morning.
-"""
+		self.description = 	""
+
+		self.reset_file = '/home/OSMC/.factoryreset'
 
 		self.setting_data_method = 	{}
 
@@ -193,60 +194,29 @@ If your device is on all the time, you may want to set this to be very early in 
 			own user interfaces.
 		'''
 
+		# check if kodi_reset file is present, if it is then set the bool as true, else set as false
+
+		addon = xbmcaddon.Addon(self.addonid)
+
+		if os.path.isfile(self.reset_file):
+			log('Kodi reset file found')
+			addon.setSetting('kodi_reset', 'true')
+		else:
+			log('Kodi reset file not found')
+			addon.setSetting('kodi_reset', 'false')
+
 		self.me.openSettings()
 
-		# code placed here will run when the modules settings window is closed
-		# the code below ensures that the apply_settings method is called immediately after closing the settings window
-		# self.apply_settings()
+		# check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file	
+		if addon.getSetting('kodi_reset') == 'true':
+			log('creating kodi reset file')
+			subprocess.call(['sudo', 'touch', self.reset_file])
+		else:
+			subprocess.call(['sudo', 'rm', self.reset_file])
 
 		log('END')
 		for x, k in self.setting_data_method.iteritems():
 			log("%s = %s" % (x, k.get('setting_value','no setting value')))
-
-
-	def apply_settings(self):
-
-		'''
-			This method will apply all of the settings. It calls the first_method, if it exists. 
-			Then it calls the method listed in setting_data_method for each setting. Then it calls the
-			final_method, again, if it exists.
-		'''
-
-		# retrieve the current settings from the settings.xml (this is where the user has made changes)
-		new_settings = self.settings_retriever_xml()
-
-		# call the first method, if there is one
-		try:
-			self.first_method()
-		except:
-			pass
-
-
-		# apply the individual settings changes
-		for k, v in self.setting_data_method.iteritems():
-
-			# get the application method and stored setting value from the dictionary
-			method = v.get('apply', False)
-			value  = v.get('setting_value', '')
-
-			# if the new setting is different to the stored setting then change the dict and run the 'apply' method
-			if new_settings[k] != value:
-
-				# change stored setting_value to the new value
-				self.setting_data_method[k]['setting_value'] = new_settings[k]
-
-				# if a specific apply method exists for the setting, then call that
-				try:
-					method(setting_value)
-				except:
-					pass
-
-
-		# call the final method if there is one
-		try:
-			self.final_method()
-		except:
-			pass
 
 
 
