@@ -1,0 +1,41 @@
+From d954020974f98a8b4db9a0fbfac26777639b3931 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 29 Apr 2017 16:15:19 +0100
+Subject: [PATCH] getmuxlist: don't use Git to get the mux list
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ support/getmuxlist | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/support/getmuxlist b/support/getmuxlist
+index 5fe4c72..eaa0075 100755
+--- a/support/getmuxlist
++++ b/support/getmuxlist
+@@ -7,20 +7,9 @@
+ DIR=$1
+ [ -z "$DIR" ] && DIR=$(dirname "$0")/../data/dvb-scan
+ 
+-# Update
+-if [ -d "${DIR}/.git" ]; then
+-  LAST=$(pwd)
+-  cd "${DIR}" || exit 1
+-  git fetch > /dev/null 2>&1 || exit 1
+-  git reset --hard > /dev/null 2>&1 || exit 1
+-  git pull > /dev/null 2>&1 || exit 1
+-  cd "${LAST}" || exit 1
+-# Fetch
+-elif [ ! -d "${DIR}" ]; then
+-  URL=https://github.com/tvheadend/dtv-scan-tables.git
+-  BRANCH=tvheadend
+-  git clone -b $BRANCH $URL "${DIR}" > /dev/null 2>&1 || exit 1
+-fi
++mkdir -p "$DIR"
++wget https://github.com/tvheadend/dtv-scan-tables/archive/tvheadend.tar.gz
++tar -xvf tvheadend.tar.gz --strip-components=1 -C "${DIR}" || exit 1
+ 
+ # Note: will not update existing set (if not .git)
+ exit 0
+-- 
+2.7.4
+

@@ -22,7 +22,6 @@ then
 	handle_dep "libavahi-client-dev"
 	handle_dep "libcurl3"
 	handle_dep "libcurl4-gnutls-dev"
-	handle_dep "git" # for dvbscan info?
 	handle_dep "ca-certificates"
 	handle_dep "zlib1g-dev"
 	handle_dep "liburiparser-dev"
@@ -41,6 +40,7 @@ then
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
+	install_patch "../../patches" "all"
 	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-inotify --enable-zlib --enable-libav \
 	--disable-epoll --enable-uriparser --disable-tvhcsa --disable-bundle --disable-dvbcsa --disable-dvben50221 --disable-kqueue --enable-dbus_1 --disable-android --disable-tsdebug --disable-gtimer_check --enable-dvbscan
 	sed -e "s/-Werror//" -i Makefile
