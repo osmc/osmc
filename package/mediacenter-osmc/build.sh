@@ -375,7 +375,6 @@ then
                 --disable-pulse \
                 --disable-optimizations \
                 --with-platform=vero3 \
-		--disable-avahi \
                 --build=arm-linux
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
