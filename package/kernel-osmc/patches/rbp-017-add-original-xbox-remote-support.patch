@@ -1,35 +1,53 @@
---- a/drivers/staging/media/lirc/Makefile	2013-05-12 05:36:28.676547269 +0100
-+++ b/drivers/staging/media/lirc/Makefile	2013-05-12 05:37:31.584546726 +0100
-@@ -8,6 +8,7 @@
- obj-$(CONFIG_LIRC_IMON)		+= lirc_imon.o
- obj-$(CONFIG_LIRC_PARALLEL)	+= lirc_parallel.o
- obj-$(CONFIG_LIRC_RPI)		+= lirc_rpi.o
-+obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
- obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
- obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
- obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+From e9af15a51f2549a992bdf1ddb4a1feaa12e6747a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 29 Apr 2017 13:46:04 +0100
+Subject: [PATCH] Add Xbox Remote driver
 
---- a/drivers/staging/media/lirc/Kconfig	2013-05-12 05:37:44.264546616 +0100
-+++ b/drivers/staging/media/lirc/Kconfig	2013-05-12 05:38:31.596546208 +0100
-@@ -44,6 +44,12 @@
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ drivers/staging/media/lirc/Kconfig     |   7 +
+ drivers/staging/media/lirc/Makefile    |   1 +
+ drivers/staging/media/lirc/lirc_xbox.c | 995 +++++++++++++++++++++++++++++++++
+ 3 files changed, 1003 insertions(+)
+ create mode 100644 drivers/staging/media/lirc/lirc_xbox.c
+
+diff --git a/drivers/staging/media/lirc/Kconfig b/drivers/staging/media/lirc/Kconfig
+index 6879c46..551361d 100644
+--- a/drivers/staging/media/lirc/Kconfig
++++ b/drivers/staging/media/lirc/Kconfig
+@@ -57,10 +57,17 @@ config LIRC_SIR
  	help
- 	  Driver for Homebrew GPIO Port Receiver/Transmitter for the RaspberryPi
+ 	  Driver for the SIR IrDA port
  
 +config LIRC_XBOX
-+	tristate "Original XBOX DVD Remote"
++	tristate "XBOX USB IR Remote"
 +	depends on LIRC && USB
 +	help
-+	  Driver for the original XBOX DVD Remote
++	  Driver for the Microsoft XBOX USB IR Remote
 +
- config LIRC_SASEM
- 	tristate "Sasem USB IR Remote"
- 	depends on LIRC && USB
-
+ config LIRC_ZILOG
+ 	tristate "Zilog/Hauppauge IR Transmitter"
+ 	depends on LIRC && I2C
+ 	help
+ 	  Driver for the Zilog/Hauppauge IR Transmitter, found on
+ 	  PVR-150/500, HVR-1200/1250/1700/1800, HD-PVR and other cards
++
+ endif
+diff --git a/drivers/staging/media/lirc/Makefile b/drivers/staging/media/lirc/Makefile
+index 5430adf..0f3292c 100644
+--- a/drivers/staging/media/lirc/Makefile
++++ b/drivers/staging/media/lirc/Makefile
+@@ -10,3 +10,4 @@ obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
+ obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
+ obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+ obj-$(CONFIG_LIRC_ZILOG)	+= lirc_zilog.o
++obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
-index e69de29..0ad0f5a 100644
---- a/drivers/staging/media/lirc/lirc_xbox.c
+new file mode 100644
+index 0000000..c269d5d
+--- /dev/null
 +++ b/drivers/staging/media/lirc/lirc_xbox.c
-@@ -0,0 +1,965 @@
+@@ -0,0 +1,995 @@
 +/*
 + * lirc_xbox - USB remote support for LIRC
 + * (supports Microsoft XBOX DVD Dongle)
@@ -68,6 +86,12 @@ index e69de29..0ad0f5a 100644
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 + */
 +
++#include <linux/version.h>
++
++//#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
++//#include <linux/autoconf.h>
++//#endif
++
 +#include <linux/kernel.h>
 +#include <linux/errno.h>
 +#include <linux/init.h>
@@ -81,8 +105,14 @@ index e69de29..0ad0f5a 100644
 +#include <linux/wait.h>
 +#include <linux/list.h>
 +
++//#include "drivers/kcompat.h"
++//#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35)
 +#include <media/lirc.h>
 +#include <media/lirc_dev.h>
++//#else
++//#include "drivers/lirc.h"
++//#include "drivers/lirc_dev/lirc_dev.h"
++//#endif
 +
 +#define DRIVER_VERSION		"$Revision: 0.01 $"
 +#define DRIVER_AUTHOR		"Jason Martin <austinspartan@users.sourceforge.net>"
@@ -92,6 +122,10 @@ index e69de29..0ad0f5a 100644
 +#define CODE_LENGTH		6
 +#define CODE_MIN_LENGTH		6
 +#define DECODE_LENGTH		1
++
++#ifndef URB_ASYNC_UNLINK
++#define URB_ASYNC_UNLINK 0
++#endif
 +
 +/* module parameters */
 +#ifdef CONFIG_USB_DEBUG
@@ -266,6 +300,7 @@ index e69de29..0ad0f5a 100644
 +
 +	set_current_state(TASK_RUNNING);
 +	remove_wait_queue(&oep->wait, &wait);
++	oep->urb->transfer_flags |= URB_ASYNC_UNLINK;
 +	usb_unlink_urb(oep->urb);
 +}
 +
@@ -397,7 +432,11 @@ index e69de29..0ad0f5a 100644
 +	return 0;
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19)
++static void usb_remote_recv(struct urb *urb, struct pt_regs *regs)
++#else
 +static void usb_remote_recv(struct urb *urb)
++#endif
 +{
 +	struct in_endpt *iep;
 +	int len, result = -1;
@@ -406,6 +445,7 @@ index e69de29..0ad0f5a 100644
 +		return;
 +	iep = urb->context;
 +	if (!iep) {
++		urb->transfer_flags |= URB_ASYNC_UNLINK;
 +		usb_unlink_urb(urb);
 +		return;
 +	}
@@ -420,7 +460,7 @@ index e69de29..0ad0f5a 100644
 +
 +	case 0:
 +	        result = code_check_xbox(iep, len);
-+	  
++
 +	        if (result < 0)
 +	        break;
 +
@@ -431,6 +471,7 @@ index e69de29..0ad0f5a 100644
 +	case -ECONNRESET:
 +	case -ENOENT:
 +	case -ESHUTDOWN:
++		urb->transfer_flags |= URB_ASYNC_UNLINK;
 +		usb_unlink_urb(urb);
 +		return;
 +
@@ -442,7 +483,11 @@ index e69de29..0ad0f5a 100644
 +	usb_submit_urb(urb, GFP_ATOMIC);
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19)
++static void usb_remote_send(struct urb *urb, struct pt_regs *regs)
++#else
 +static void usb_remote_send(struct urb *urb)
++#endif
 +{
 +	struct out_endpt *oep;
 +
@@ -450,6 +495,7 @@ index e69de29..0ad0f5a 100644
 +		return;
 +	oep = urb->context;
 +	if (!oep) {
++		urb->transfer_flags |= URB_ASYNC_UNLINK;
 +		usb_unlink_urb(urb);
 +		return;
 +	}
@@ -497,6 +543,7 @@ index e69de29..0ad0f5a 100644
 +			"from list\n", ir->devnum, iep->ep->bEndpointAddress);
 +	case 4:
 +		if (iep->urb) {
++			iep->urb->transfer_flags |= URB_ASYNC_UNLINK;
 +			usb_unlink_urb(iep->urb);
 +			usb_free_urb(iep->urb);
 +			iep->urb = 0;
@@ -588,6 +635,7 @@ index e69de29..0ad0f5a 100644
 +	case FREE_ALL:
 +	case 4:
 +		if (oep->urb) {
++			oep->urb->transfer_flags |= URB_ASYNC_UNLINK;
 +			usb_unlink_urb(oep->urb);
 +			usb_free_urb(oep->urb);
 +			oep->urb = 0;
@@ -800,7 +848,7 @@ index e69de29..0ad0f5a 100644
 +}
 +
 +/*
-+ * If the USB interface has an out endpoint for control. 
++ * If the USB interface has an out endpoint for control.
 + */
 +static void send_outbound_init(struct xbox_dev *ir)
 +{
@@ -984,14 +1032,17 @@ index e69de29..0ad0f5a 100644
 +MODULE_LICENSE("GPL");
 +MODULE_DEVICE_TABLE(usb, usb_remote_table);
 +
-+module_param(debug, bool, S_IRUGO | S_IWUSR);
++module_param(debug, uint, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(debug, "Debug enabled or not (default: 0)");
 +
-+module_param(mask, int, S_IRUGO | S_IWUSR);
++module_param(mask, uint, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(mask, "Set channel acceptance bit mask (default: 0xFFFF)");
 +
-+module_param(unique, bool, S_IRUGO | S_IWUSR);
++module_param(unique, uint, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(unique, "Enable channel-specific codes (default: 0)");
 +
-+module_param(repeat, int, S_IRUGO | S_IWUSR);
++module_param(repeat, uint, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(repeat, "Repeat timeout (1/100 sec) (default: 10)");
+-- 
+2.7.4
+

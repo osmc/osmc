@@ -9,18 +9,15 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/staging/rtl8188eu/os_dep/os_intfs.c b/drivers/staging/rtl8188eu/os_dep/os_intfs.c
-index 750c87b..32e019b 100644
+index 40691f1..7c73fa9 100644
 --- a/drivers/staging/rtl8188eu/os_dep/os_intfs.c
 +++ b/drivers/staging/rtl8188eu/os_dep/os_intfs.c
-@@ -52,7 +52,7 @@ static int rtw_preamble = PREAMBLE_LONG;/* long, short, auto */
- static int rtw_scan_mode = 1;/* active, passive */
- static int rtw_adhoc_tx_pwr = 1;
- static int rtw_soft_ap;
+@@ -39,7 +39,7 @@ static int rtw_vcs_type = RTS_CTS;/*  */
+ static int rtw_rts_thresh = 2347;/*  */
+ static int rtw_frag_thresh = 2346;/*  */
+ static int rtw_preamble = PREAMBLE_LONG;/* long, short, auto */
 -static int rtw_power_mgnt = 1;
 +static int rtw_power_mgnt = 0;
  static int rtw_ips_mode = IPS_NORMAL;
  
  static int rtw_smart_ps = 2;
--- 
-2.1.0
-
