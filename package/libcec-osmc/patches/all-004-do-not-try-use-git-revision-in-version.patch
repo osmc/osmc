@@ -1,0 +1,39 @@
+From c1708d402da1a5b637d8887a7aef3c36100e0338 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 30 Apr 2017 09:48:13 +0100
+Subject: [PATCH] Don't try and use git revision in version
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/cmake/git-rev.sh | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
+
+diff --git a/src/libcec/cmake/git-rev.sh b/src/libcec/cmake/git-rev.sh
+index db682c1..f238c13 100755
+--- a/src/libcec/cmake/git-rev.sh
++++ b/src/libcec/cmake/git-rev.sh
+@@ -1,20 +1,4 @@
+ #!/bin/sh
+ 
+ ## cmake doesn't read the variable when it doesn't end with a newline, and I haven't figured out how to have it add a newline directly...
+-if git rev-parse --git-dir > /dev/null 2>&1; then
+-  last_tag=`git describe --tags --abbrev=0`
+-  last_hash=`git --no-pager log --abbrev=7 -n 1 --pretty=format:"%h"`
+-  commits_since_tag=`git log ${last_tag}..HEAD --oneline | wc -l`
+-  git_dirty=`git diff HEAD | wc -l`
+-  if [ $commits_since_tag -gt 0 ]; then
+-    dirty=""
+-    if [ $git_dirty -gt 0 ]; then
+-      dirty="~dirty"
+-    fi
+-    echo "${last_tag}+${commits_since_tag}-${last_hash}${dirty}"
+-  else
+-    echo $last_tag
+-  fi
+-else
+-  echo "<unknown>"
+-fi
++echo "<osmc>"
+-- 
+2.7.4
+
