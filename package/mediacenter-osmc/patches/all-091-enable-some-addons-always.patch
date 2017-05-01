@@ -1,9 +1,7 @@
-From 6febf70e657922cf55319f7331b48af9f89ac14d Mon Sep 17 00:00:00 2001
+From 6dce68f5ab579e87900ba38f4b2c15c55bcfb368 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Tue, 7 Feb 2017 17:59:15 +0000
-Subject: [PATCH] [package] [mediacenter-osmc] Ensure that BTPlayer add-on is
- always enabled. This allows the add-on to be enabled, even if it is installed
- later.
+Date: Mon, 1 May 2017 19:42:19 +0100
+Subject: [PATCH] Ensure that some add-ons are always enabled
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -11,14 +9,14 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 3 insertions(+)
 
 diff --git a/xbmc/addons/AddonManager.cpp b/xbmc/addons/AddonManager.cpp
-index c86c6e9..f6e593d 100644
+index 180d6aa..d6f3fe7 100644
 --- a/xbmc/addons/AddonManager.cpp
 +++ b/xbmc/addons/AddonManager.cpp
 @@ -814,6 +814,9 @@ bool CAddonMgr::IsAddonDisabled(const std::string& ID)
    std::regex addons_disable("plugin.program.xbmchub.notifications");
    if (regex_match(ID, addons_disable))
      return true;
-+  std::regex addons_enabled("service.osmc.BTPlayer");
++  std::regex addons_enabled("service.osmc.BTPlayer|inputstream.rtmp|inputstream.adaptive");
 +  if (regex_match(ID, addons_enabled))
 +    return false;
    return m_disabled.find(ID) != m_disabled.end();
