@@ -1,0 +1,26 @@
+From 2326b4d9845f8225589c239240dde26b279086c6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 1 May 2017 18:13:22 +0100
+Subject: [PATCH] Vero 2: allow passthrough when watching LiveTV.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
+index f310338..232f9b7 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
+@@ -690,7 +690,7 @@ void CDVDInputStreamPVRManager::UpdateStreamMap()
+     dStream->language[1] = stream.strLanguage[1];
+     dStream->language[2] = stream.strLanguage[2];
+     dStream->language[3] = stream.strLanguage[3];
+-    dStream->realtime = true;
++    dStream->realtime = false;
+ 
+     m_newStreamMap[stream.iPID] = dStream;
+   }
+-- 
+2.7.4
+
