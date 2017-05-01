@@ -63,13 +63,7 @@ function build_fs_image()
 	sed -e s/UNC_TS_SIZE_BOOT/${UNC_TS_SIZE_BOOT}/ -i partitions-pi$(echo ${1:3:4}).json
 	sed -e s/UNC_TS_SIZE_ROOT/${UNC_TS_SIZE_ROOT}/ -i partitions-pi$(echo ${1:3:4}).json
 	echo -e "Creating marketing tarball"
-	mkdir vga_slides
-	SLIDES="A B C D E"
-	for slide in $SLIDES
-	do
-	    cp assets/$slide.png vga_slides/
-	done
-	tar -cf marketing.tar vga_slides
+	tar -cf marketing.tar slides_vga slides
 	rm -rf output
 	rm -rf vga_slides
 }
