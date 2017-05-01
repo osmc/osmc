@@ -59,6 +59,8 @@ fi
 while true; do
         if [ -f /home/osmc/.factoryreset ]; then rm -rf /home/osmc/.kodi && rm /home/osmc/.factoryreset; fi
 	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
+	# clean zero-byte database files that prevent migration/startup
+	for file in /home/osmc/.kodi/userdata/Database/*.db; do [ -s $file ] || rm -f $file; done
 	KODI=/usr/lib/kodi/kodi.bin
 	setcap 'cap_net_bind_service=+ep' $KODI
 	starttime=$(date +%s)
