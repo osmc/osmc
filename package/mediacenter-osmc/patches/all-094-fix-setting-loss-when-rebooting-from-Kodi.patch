@@ -1,24 +1,33 @@
-From f070e9627b78a2f17dbc586e8c6f09e919acf9df Mon Sep 17 00:00:00 2001
+From 9b4cc4a7c714fe4a02d521a1d1261aabf439c4a3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Fri, 31 Mar 2017 19:02:11 +0100
-Subject: [PATCH] Do not save skin settings when Kodi is exiting. We instead
- save skin settings when changes are made. This change was added upstream to
- prevent hangs from causing loss of settings; but our sigterm handler already
- handles this as expected.
+Date: Mon, 1 May 2017 19:18:35 +0100
+Subject: [PATCH] Don't save settings when exiting Kodi; this isn't necessary.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 7 -------
- 1 file changed, 7 deletions(-)
+ xbmc/Application.cpp | 19 -------------------
+ 1 file changed, 19 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index b8ff91b..9b0417e 100644
+index 75a6cb1..f658404 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2904,13 +2904,6 @@ void CApplication::Stop(int exitCode)
-     else
-       CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
+@@ -2943,25 +2943,6 @@ void CApplication::Stop(int exitCode)
+     if( m_bSystemScreenSaverEnable )
+       g_Windowing.EnableSystemScreenSaver(true);
  
+-    CLog::Log(LOGNOTICE, "Storing total System Uptime");
+-    g_sysinfo.SetTotalUptime(g_sysinfo.GetTotalUptime() + (int)(CTimeUtils::GetFrameTime() / 60000));
+-
+-    // Update the settings information (volume, uptime etc. need saving)
+-    if (CFile::Exists(CProfilesManager::GetInstance().GetSettingsFile()))
+-    {
+-      CLog::Log(LOGNOTICE, "Saving settings");
+-      CSettings::GetInstance().Save();
+-    }
+-    else
+-      CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
+-
 -    // kodi may crash or deadlock during exit (shutdown / reboot) due to
 -    // either a bug in core or misbehaving addons. so try saving
 -    // skin settings early
