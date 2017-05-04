@@ -23,7 +23,9 @@ SyslogFacility AUTH
 LogLevel INFO
 
 # Authentication:
-LoginGraceTime 120
+LoginGraceTime 30
+MaxAuthTries 2
+AllowUsers osmc
 PermitRootLogin no
 StrictModes yes
 
