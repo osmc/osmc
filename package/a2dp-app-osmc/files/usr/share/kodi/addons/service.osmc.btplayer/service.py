@@ -242,7 +242,10 @@ if __name__ == "__main__":
         except Exception as e:
             log("Exception caught  - service exiting " + str(e))
         finally:
-            btPlayer.end()
+            try:
+                btPlayer.end()
+            except:
+                pass
         log("BTPlayer ended")
     else:
         log("BTPlayer disabled in addon settings")
