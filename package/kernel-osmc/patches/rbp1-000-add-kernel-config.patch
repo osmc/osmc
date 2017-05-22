@@ -1,9 +1,9 @@
 --- /dev/null	2017-04-03 16:47:01.027231711 +0100
-+++ b/.config	2017-04-29 13:48:21.013441460 +0100
-@@ -0,0 +1,5118 @@
++++ b/.config	2017-05-22 12:21:24.264983794 +0100
+@@ -0,0 +1,5125 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
-+# Linux/arm 4.9.20 Kernel Configuration
++# Linux/arm 4.9.29 Kernel Configuration
 +#
 +CONFIG_ARM=y
 +CONFIG_ARM_HAS_SG_CHAIN=y
@@ -485,7 +485,9 @@
 +# CONFIG_ZSWAP is not set
 +# CONFIG_ZPOOL is not set
 +# CONFIG_ZBUD is not set
-+# CONFIG_ZSMALLOC is not set
++CONFIG_ZSMALLOC=m
++# CONFIG_PGTABLE_MAPPING is not set
++# CONFIG_ZSMALLOC_STAT is not set
 +CONFIG_GENERIC_EARLY_IOREMAP=y
 +# CONFIG_IDLE_PAGE_TRACKING is not set
 +CONFIG_FRAME_VECTOR=y
@@ -1327,6 +1329,7 @@
 +# CONFIG_PARPORT is not set
 +CONFIG_BLK_DEV=y
 +# CONFIG_BLK_DEV_NULL_BLK is not set
++# CONFIG_ZRAM is not set
 +# CONFIG_BLK_DEV_COW_COMMON is not set
 +CONFIG_BLK_DEV_LOOP=y
 +CONFIG_BLK_DEV_LOOP_MIN_COUNT=8
@@ -2865,6 +2868,11 @@
 +#
 +# Sensors used on soc_camera driver
 +#
++
++#
++# Media SPI Adapters
++#
++# CONFIG_CXD2880_SPI_DRV is not set
 +CONFIG_MEDIA_TUNER=m
 +CONFIG_MEDIA_TUNER_SIMPLE=m
 +CONFIG_MEDIA_TUNER_TDA8290=m
@@ -4014,7 +4022,6 @@
 +# CONFIG_KS7010 is not set
 +# CONFIG_GREYBUS is not set
 +CONFIG_BCM2708_VCHIQ=y
-+CONFIG_DVB_HDHOMERUN=m
 +# CONFIG_GOLDFISH is not set
 +# CONFIG_CHROME_PLATFORMS is not set
 +CONFIG_CLKDEV_LOOKUP=y
