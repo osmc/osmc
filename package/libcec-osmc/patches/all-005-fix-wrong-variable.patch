@@ -1,0 +1,23 @@
+From a28be4a3425b2c2ad02d446111603660df83313e Mon Sep 17 00:00:00 2001
+From: flubshi <flubshi@web.de>
+Date: Fri, 26 May 2017 02:39:07 +0200
+Subject: [PATCH] Fix: set wrong variable
+
+This fixes many cec reconnect problems
+---
+ src/libcec/devices/CECBusDevice.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index d71ac0e1..05925a07 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -1506,7 +1506,7 @@ bool CCECBusDevice::TransmitMuteAudio(const cec_logical_address source)
+ 
+ void CCECBusDevice::SetActiveSourceSent(bool setto /* = true */)
+ {
+-  m_bActiveSource = setto;
++  m_bActiveSourceSent = setto;
+ }
+ 
+ bool CCECBusDevice::ActiveSourceSent(void) const
