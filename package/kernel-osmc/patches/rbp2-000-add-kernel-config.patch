@@ -1,6 +1,6 @@
 --- /dev/null	2017-04-03 16:47:01.027231711 +0100
-+++ b/.config	2017-05-24 17:50:17.288171994 +0100
-@@ -0,0 +1,5256 @@
++++ b/.config	2017-05-30 20:14:14.812918077 +0100
+@@ -0,0 +1,5263 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 4.9.29 Kernel Configuration
@@ -643,7 +643,8 @@
 +# CONFIG_FPE_FASTFPE is not set
 +CONFIG_VFP=y
 +CONFIG_VFPv3=y
-+# CONFIG_NEON is not set
++CONFIG_NEON=y
++CONFIG_KERNEL_MODE_NEON=y
 +
 +#
 +# Userspace binary formats
@@ -5176,9 +5177,15 @@
 +#
 +CONFIG_ARM_CRYPTO=y
 +CONFIG_CRYPTO_SHA1_ARM=m
++CONFIG_CRYPTO_SHA1_ARM_NEON=m
++# CONFIG_CRYPTO_SHA1_ARM_CE is not set
++# CONFIG_CRYPTO_SHA2_ARM_CE is not set
 +CONFIG_CRYPTO_SHA256_ARM=m
 +# CONFIG_CRYPTO_SHA512_ARM is not set
 +CONFIG_CRYPTO_AES_ARM=m
++# CONFIG_CRYPTO_AES_ARM_BS is not set
++# CONFIG_CRYPTO_AES_ARM_CE is not set
++# CONFIG_CRYPTO_GHASH_ARM_CE is not set
 +CONFIG_BINARY_PRINTF=y
 +
 +#
