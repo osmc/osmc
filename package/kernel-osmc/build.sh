@@ -262,10 +262,13 @@ then
                 cp -a "${kernel_path}/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
                 cp -a "${kernel_path}/include/media/videobuf-res.h" "linux/include/media/"
                 echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
+		cp "../drivers/media/rc/meson-ir.c" "linux/drivers/media/rc/meson-ir.c"
+		sed -i 's,allowed_protos,allowed_protocols,g' "linux/drivers/media/rc/meson-ir.c"
+		echo "obj-m += meson-ir.o" >> "linux/drivers/media/rc/Makefile"
                 $BUILD VER=${VERSION} SRCDIR=$(pwd)/../
                 popd
                 mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
-                find media_build/v4l/ -name \*.ko -exec cp {} ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
+		cp media_build/v4l/*.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
         fi
 	# Unset architecture
 	ARCH=$(arch)
