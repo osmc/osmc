@@ -26,6 +26,9 @@ then
 	update_sources
 	handle_dep "libasound2-dev"
 	echo "Package: ${1}-libamcodec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libamcodec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
+	RP_FLAGS=" -Wl,-rpath=/usr/osmc/lib"
+	export CXXFLAGS+="${RP_FLAGS}"
+	export CFLAGS+="${RP_FLAGS}"
 	mkdir -p ${out}/usr/osmc/lib
 	mkdir -p files-dev/usr/osmc/include/amcodec/ppmgr
 	mkdir -p files-dev/usr/osmc/include/amcodec/amports
