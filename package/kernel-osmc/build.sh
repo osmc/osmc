@@ -16,7 +16,7 @@ test $1 == vero && VERSION="4.4.0" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_
 test $1 == vero2 && VERSION="3.10.105" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="25" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="20" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="21" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -262,8 +262,6 @@ then
                 cp -a "${kernel_path}/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
                 cp -a "${kernel_path}/include/media/videobuf-res.h" "linux/include/media/"
                 echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
-		cp "../drivers/media/rc/meson-ir.c" "v4l2/meson-ir.c"
-		echo "obj-m += meson-ir.o" >> "linux/drivers/media/rc/Makefile"
                 $BUILD VER=${VERSION} SRCDIR=$(pwd)/../
                 popd
                 mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport

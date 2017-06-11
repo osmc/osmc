@@ -1,6 +1,6 @@
 --- /dev/null	2017-04-03 16:47:01.027231711 +0100
-+++ b/.config	2017-06-05 03:14:17.258869104 +0100
-@@ -0,0 +1,3653 @@
++++ b/.config	2017-06-10 23:44:32.651375527 +0100
+@@ -0,0 +1,3716 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 3.14.29 Kernel Configuration
@@ -2289,7 +2289,68 @@
 +# CONFIG_REGULATOR_TPS6507X is not set
 +# CONFIG_REGULATOR_TPS6524X is not set
 +# CONFIG_REGULATOR_VEXPRESS is not set
-+# CONFIG_MEDIA_SUPPORT is not set
++CONFIG_MEDIA_SUPPORT=y
++
++#
++# Multimedia core support
++#
++# CONFIG_MEDIA_CAMERA_SUPPORT is not set
++# CONFIG_MEDIA_ANALOG_TV_SUPPORT is not set
++# CONFIG_MEDIA_DIGITAL_TV_SUPPORT is not set
++# CONFIG_MEDIA_RADIO_SUPPORT is not set
++CONFIG_MEDIA_RC_SUPPORT=y
++# CONFIG_VIDEO_ADV_DEBUG is not set
++# CONFIG_VIDEO_FIXED_MINOR_RANGES is not set
++# CONFIG_TTPCI_EEPROM is not set
++
++#
++# Media drivers
++#
++CONFIG_RC_CORE=y
++CONFIG_RC_MAP=y
++CONFIG_RC_DECODERS=y
++CONFIG_LIRC=y
++CONFIG_IR_LIRC_CODEC=y
++CONFIG_IR_NEC_DECODER=y
++CONFIG_IR_RC5_DECODER=y
++CONFIG_IR_RC6_DECODER=y
++CONFIG_IR_JVC_DECODER=y
++CONFIG_IR_SONY_DECODER=y
++CONFIG_IR_RC5_SZ_DECODER=y
++CONFIG_IR_SANYO_DECODER=y
++CONFIG_IR_MCE_KBD_DECODER=y
++CONFIG_RC_DEVICES=y
++CONFIG_RC_ATI_REMOTE=m
++CONFIG_IR_IMON=m
++CONFIG_IR_MCEUSB=m
++CONFIG_IR_MESON=m
++CONFIG_IR_REDRAT3=m
++CONFIG_IR_STREAMZAP=m
++CONFIG_IR_IGUANA=m
++CONFIG_IR_TTUSBIR=m
++CONFIG_RC_LOOPBACK=m
++CONFIG_IR_GPIO_CIR=m
++# CONFIG_MEDIA_USB_SUPPORT is not set
++
++#
++# Supported MMC/SDIO adapters
++#
++# CONFIG_CYPRESS_FIRMWARE is not set
++
++#
++# Media ancillary drivers (tuners, sensors, i2c, frontends)
++#
++
++#
++# Customise DVB Frontends
++#
++# CONFIG_DVB_TUNER_DIB0070 is not set
++# CONFIG_DVB_TUNER_DIB0090 is not set
++
++#
++# Tools to develop new frontends
++#
++# CONFIG_DVB_DUMMY_FE is not set
 +
 +#
 +# Graphics support
@@ -2484,6 +2545,7 @@
 +CONFIG_HID_PICOLCD_BACKLIGHT=y
 +CONFIG_HID_PICOLCD_LCD=y
 +CONFIG_HID_PICOLCD_LEDS=y
++# CONFIG_HID_PICOLCD_CIR is not set
 +# CONFIG_HID_PRIMAX is not set
 +# CONFIG_HID_ROCCAT is not set
 +# CONFIG_HID_SAITEK is not set
@@ -2957,6 +3019,7 @@
 +# CONFIG_TOUCHSCREEN_CLEARPAD_TM1217 is not set
 +# CONFIG_TOUCHSCREEN_SYNAPTICS_I2C_RMI4 is not set
 +CONFIG_STAGING_MEDIA=y
++# CONFIG_LIRC_STAGING is not set
 +
 +#
 +# Android
