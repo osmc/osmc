@@ -10,6 +10,7 @@ processimage()
         echo "Could not upload kernel to NAND" >&2
         exit $STATUS
     fi
+    rm -rf /lib/modules/${1}_kernel_*
 }
 
 processimage $1
