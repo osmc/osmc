@@ -92,7 +92,7 @@ void BootloaderConfig::configureMounts()
         if (! device->getRoot().contains(":/")) {
             if (utils->getOSMCDev() != "atv")
             {
-                fstabStringList.append("# rootfs is not mounted in fstab as we do it via initramfs. Uncomment for remount (slower boot)");
+                fstabStringList.append("# rootfs is not mounted in fstab as we do it via initramfs. Uncomment for remount (slower boot)\n");
                 fstabStringList.append("#" + device->getRoot() + "  /" + "    " + "ext4" + "      defaults,noatime    0   0\n" );
             }
             else
