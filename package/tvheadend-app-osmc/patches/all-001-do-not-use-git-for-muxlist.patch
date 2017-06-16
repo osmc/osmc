@@ -1,34 +1,40 @@
-From d954020974f98a8b4db9a0fbfac26777639b3931 Mon Sep 17 00:00:00 2001
+From c03578ebf6b1b4d5fa340f1193b844c7022c054d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 29 Apr 2017 16:15:19 +0100
 Subject: [PATCH] getmuxlist: don't use Git to get the mux list
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- support/getmuxlist | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+ support/getmuxlist | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
 diff --git a/support/getmuxlist b/support/getmuxlist
-index 5fe4c72..eaa0075 100755
+index 999ba3e..c2ff414 100755
 --- a/support/getmuxlist
 +++ b/support/getmuxlist
-@@ -7,20 +7,9 @@
- DIR=$1
- [ -z "$DIR" ] && DIR=$(dirname "$0")/../data/dvb-scan
+@@ -8,26 +8,9 @@
+ [ -z "$URL" ] && URL=https://github.com/tvheadend/dtv-scan-tables.git
+ DIR="$1" && [ -z "$DIR" ] && DIR=$(dirname "$0")/../data/dvb-scan
  
 -# Update
 -if [ -d "${DIR}/.git" ]; then
 -  LAST=$(pwd)
 -  cd "${DIR}" || exit 1
--  git fetch > /dev/null 2>&1 || exit 1
--  git reset --hard > /dev/null 2>&1 || exit 1
--  git pull > /dev/null 2>&1 || exit 1
+-  git fetch --tags > /dev/null 2>&1 || exit 1
+-  hash1=$(git rev-parse HEAD)
+-  hash2=$(git rev-parse origin/${BRANCH})
+-  if [ "$hash1" != "$hash2" ]; then
+-    git reset --hard origin/master > /dev/null 2>&1 || exit 1
+-    git pull > /dev/null 2>&1 || exit 1
+-  else
+-    if [ ! -r README ]; then
+-      git reset --hard > /dev/null 2>&1 || exit 1
+-    fi
+-  fi
 -  cd "${LAST}" || exit 1
 -# Fetch
 -elif [ ! -d "${DIR}" ]; then
--  URL=https://github.com/tvheadend/dtv-scan-tables.git
--  BRANCH=tvheadend
--  git clone -b $BRANCH $URL "${DIR}" > /dev/null 2>&1 || exit 1
+-  git clone -b "${BRANCH}" "${URL}" "${DIR}" > /dev/null 2>&1 || exit 1
 -fi
 +mkdir -p "$DIR"
 +wget https://github.com/tvheadend/dtv-scan-tables/archive/tvheadend.tar.gz
