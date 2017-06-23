@@ -1,33 +1,86 @@
-#!/bin/bash
+#! /bin/bash
 
 if [ "$1" = "configure" ]; then
 
 	systemctl daemon-reload
 
-	if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ] && [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+	# check for existing user called osmc
+	OSMCUSERFILE=$(grep -l "\"username\": \"osmc\"" /home/osmc/.hts/tvheadend/accesscontrol/* )
+	echo userfile is: $OSMCUSERFILE
 
-		echo "Creating TVHeadend default access control file"
-		mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
+	if [ -z "$OSMCUSERFILE" ]; then
+		if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then                                                        
+			echo "Creating OSMC default access control file"
+			mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
+			mkdir -p /home/osmc/.hts/tvheadend/passwd
 
-		cat <<- 'EOF' > /home/osmc/.hts/tvheadend/accesscontrol/1
-		{
-			"enabled": 1,
-		        "username": "osmc",
-		        "password": "osmc",
-		        "comment": "Default access entry",
-		        "prefix": "0.0.0.0/0,::/0",
-		        "streaming": 1,
-		        "dvr": 1,
-		        "dvrallcfg": 1,
-		        "webui": 1,
-		        "admin": 1,
-		        "id": "1"
-		}
-		EOF
+			OSMCUSERFILE=/home/osmc/.hts/tvheadend/accesscontrol/ef332059f7bb54d72ce2e028f71e1540
 
-		chown -R osmc:osmc /home/osmc/.hts/
+			cat <<- 'EOF' > $OSMCUSERFILE
+			{
+				"index": 1,
+				"enabled": true,
+				"username": "osmc",
+				"prefix": "0.0.0.0/0",
+				"change": [
+				"change_rights",
+				"change_chrange",
+				"change_chtags",
+				"change_dvr_configs",
+				"change_profiles",
+				"change_conn_limit",
+				"change_lang",
+				"change_lang_ui",
+				"change_theme",
+				"change_uilevel"
+				],
+				"uilevel": -1,
+				"uilevel_nochange": -1,
+				"streaming": [
+				"basic",
+				"advanced",
+				"htsp"
+				],
+				"profile": [
+				],
+				"dvr": [
+				"basic",
+				"htsp",
+				"failed"
+				],
+				"htsp_anonymize": false,
+				"dvr_config": [
+				],
+				"webui": true,
+				"admin": true,
+				"conn_limit_type": 0,
+				"conn_limit": 0,
+				"channel_min": 0,
+				"channel_max": 0,
+				"channel_tag_exclude": false,
+				"channel_tag": [
+				],
+				"comment": "OSMC default user",
+				"wizard": true
+			}
+
+			EOF
+
+
+			cat <<- 'EOF' > /home/osmc/.hts/tvheadend/passwd/c247bc5760446f232f0d4853fda9c1ff
+			{
+				"enabled": true,
+				"username": "osmc",
+				"password2": "VFZIZWFkZW5kLUhpZGUtb3NtYw==",
+				"wizard": true
+			}
+
+			EOF
+			chown -R osmc:video /home/osmc/.hts/
+		else
+			echo User osmc already exists
+		fi
 	fi
-
 
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
@@ -41,6 +94,61 @@ if [ "$1" = "configure" ]; then
 		fi
 	fi
 
-	if ischroot; then exit 0; fi
+	# start tvh so that it updates any old user files
+	echo Starting tvheadend to finalise setup for osmc
 	if systemctl is-enabled tvheadend.service >/dev/null; then systemctl start tvheadend.service; fi
+	#systemctl restart tvheadend
+	sleep 5
+
+	# add failed privilege and htsp to all users
+	function addparameter(){
+		if [ $(sed -n /\"$1\":/,/\]/{/$2/p} "$USERDIR/$f" | wc -l) -eq 0 ]; then
+			if [ $(sed -nr /\"$1\":/,/\]/{/[a-z]/p} "$USERDIR/$f" | wc -l) -gt 1 ]; then
+				sed -i /\"$1\":/a\\\"$2\", "$USERDIR/$f"
+			else
+				sed -i /\"$1\":/a\\\"$2\" "$USERDIR/$f"
+			fi
+#			echo $2 added to $1 in "$USERDIR/$f"
+#		else
+#			echo $2 already in $1 in "$USERDIR/$f"
+		fi
+	}
+
+	USERDIR=/home/osmc/.hts/tvheadend/accesscontrol
+	USERS=($(ls $USERDIR))
+	for f in ${USERS[@]}; do
+		for f in ${USERS[@]}; do
+			addparameter dvr failed 
+			for p in streaming dvr; do
+				addparameter $p htsp 
+			done
+		done
+	done
+
+	# osmc must have a password if tvh is not to ignore it
+	if [ -n $OSMCUSERFILE ] && ! grep "\"username\": \"osmc\"" /home/osmc/.hts/tvheadend/passwd/* > /dev/null; then
+		echo Creating default password for user osmc
+		mkdir -p /home/osmc/.hts/tvheadend/passwd
+		cat <<- 'EOF' > /home/osmc/.hts/tvheadend/passwd/c247bc5760446f232f0d4853fda9c1ff
+		{
+			"enabled": true,
+			"username": "osmc",
+			"password2": "VFZIZWFkZW5kLUhpZGUtb3NtYw==",
+			"wizard": true
+		}
+
+		EOF
+	fi
+
+	# make sure ownerships are good
+	chown -R osmc:video /home/osmc/.hts/
+
+	if ischroot; then
+		systemctl stop tvheadend
+		exit 0
+	else
+		# re-load config to make the changes
+		systemctl restart tvheadend
+	fi
 fi
+
