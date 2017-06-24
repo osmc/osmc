@@ -314,7 +314,7 @@ def lirc_rpi_validation(config_value):
 
 def gpio_pin_validation(config_value):
 
-	return generic_range_validation(config_value, range(1,26))
+	return generic_range_validation(config_value, range(1,28))
 
 
 def gpio_updown_validation(config_value):
