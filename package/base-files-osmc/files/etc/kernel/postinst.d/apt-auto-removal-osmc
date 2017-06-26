@@ -43,6 +43,10 @@ set -e
 # The original code has only been modified to accommodate the different kernel
 # naming schemes.
 
+# List of suitable kernels for removable is introduced by *-device-osmc, so
+# check that we have that, or leave the cleanup for another day
+
+if [ ! -f /etc/apt/apt.conf.d/01autoremove-osmc ] ; then exit 0; fi
 
 eval $(apt-config shell APT_CONF_D Dir::Etc::parts/d)
 test -n "${APT_CONF_D}" || APT_CONF_D="/etc/apt/apt.conf.d"
