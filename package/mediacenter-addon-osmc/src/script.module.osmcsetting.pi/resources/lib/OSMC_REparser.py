@@ -292,7 +292,9 @@ def soundcard_dac_validation(config_value):
                 'justboom-digi'                 : '7',
 		'justboom-digi-overlay'		: '7',
 		'allo-piano-dac-pcm512x-audio-overlay'	: '8',
-		'allo-piano-dac-pcm512x-audio'	: '8',
+		'allo-piano-dac-pcm512x-audio'		: '8',
+		'allo-boss-dac-pcm512x-audio-overlay'	: '9',
+		'allo-boss-dac-pcm512x-audio'		: '9',
 		}
 
 	try:
@@ -650,7 +652,8 @@ def soundcard_dac_config_set(kodi_setting, all_settings):
 		'iqaudio-dacplus-overlay,unmute_amp',
 		'justboom-dac-overlay',
 		'justboom-digi-overlay',
-		'allo-piano-dac-pcm512x-audio-overlay'
+		'allo-piano-dac-pcm512x-audio-overlay',
+		'allo-boss-dac-pcm512x-audio-overlay'
 		]
 
 	try:
@@ -1186,8 +1189,8 @@ MASTER_SETTINGS =    {
 				},
 			"config_get_patterns": [
 				{
-				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*[-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d)",
-				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d)[-\w\d]*)"
+				"identify"      : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*[-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d|allo-boss-d)",
+				"extract"       : r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*(?:hifiberry-d|iqaudio-d|justboom-d|allo-piano-d|allo-boss-d)[-\w\d]*)"
 				},
 
 				],
