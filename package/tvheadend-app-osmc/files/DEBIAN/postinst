@@ -1,33 +1,182 @@
-#!/bin/bash
+#! /bin/bash
 
 if [ "$1" = "configure" ]; then
 
 	systemctl daemon-reload
+#set -x
+	# going to read existing config files even if installing
+	# unless version is 4.2 when we can trust tvh to do it
+	EXISTINGVER=$(egrep "full_?version" /home/osmc/.hts/tvheadend/config | sed 's/.*: \+\"\(.*\)\".*/\1/' 2> /dev/null)
+	
+	if $(dpkg --compare-versions "$2" lt "4.2.0") || [[ "$EXISTINGVER" < "4.2.0" ]] \
+		|| [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+#	if ((1)); then
+		# check for existing user called osmc
+		if OSMCUSERFILES=$(ls -t /home/osmc/.hts/tvheadend/accesscontrol/* 2> /dev/null); then
+			OSMCUSERFILES=($(grep -l "\"username\": \"osmc\"" $OSMCUSERFILES  2> /dev/null))
+			#echo ${OSMCUSERFILES[@]}
+			OSMCUSERFILE=${OSMCUSERFILES[0]}
+		fi
+		if OSMCPASSFILES=$(ls -t /home/osmc/.hts/tvheadend/passwd/*  2> /dev/null); then
+			OSMCPASSFILES=($(grep -l "\"username\": \"osmc\"" $OSMCPASSFILES  2> /dev/null))
+			OSMCPASSFILE=${OSMCPASSFILES[0]}
+		fi
 
-	if [ ! -f /home/osmc/.hts/tvheadend/accesscontrol/1 ] && [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		# save any passwords
+		if [ -n "$OSMCUSERFILE" ] && [ -z $OSMCPASSFILE ]; then
+			OSMCUSERPASS=$(grep "\"password2\":" "$OSMCUSERFILE")
+		else
+			OSMCUSERPASS=$(grep "\"password2\":" "$OSMCPASSFILE")
+		fi
+		OSMCUSERPASS=${OSMCUSERPASS%,}
 
-		echo "Creating TVHeadend default access control file"
+		#echo userfile is: $OSMCUSERFILE
+		#echo password file is: $OSMCPASSFILE
+		#echo password: $OSMCUSERPASS
+		#echo current version: $EXISTINGVER
+
 		mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
+		mkdir -p /home/osmc/.hts/tvheadend/passwd
 
-		cat <<- 'EOF' > /home/osmc/.hts/tvheadend/accesscontrol/1
-		{
-			"enabled": 1,
-		        "username": "osmc",
-		        "password": "osmc",
-		        "comment": "Default access entry",
-		        "prefix": "0.0.0.0/0,::/0",
-		        "streaming": 1,
-		        "dvr": 1,
-		        "dvrallcfg": 1,
-		        "webui": 1,
-		        "admin": 1,
-		        "id": "1"
+		function addparameter(){
+			if ! grep "$2" "$1" > /dev/null; then
+				LINE=$(sed -n '$=' "$1")
+				#echo $LINE
+				while [[ $(sed -n $LINE's/.*[]\"].*/found/p' "$1") != 'found' ]] && [[ $LINE > 0 ]] ; do
+					LINE=$(($LINE -1))
+				done
+				if [[ $LINE == 0 ]]; then
+					echo Problem with user file $1 - edit or delete it
+					exit 1
+				fi
+				sed -i $LINE'{
+					s/.*[^,]$/&,/
+					a'"$2"'
+				}' "$1"
+			fi
 		}
+
+		if [ -z "$OSMCUSERFILE" ]; then
+			OSMCUSERFILE=/home/osmc/.hts/tvheadend/accesscontrol/ef332059f7bb54d72ce2e028f71e1540
+
+			echo "Creating OSMC default access control file"
+
+			if [[ "$EXISTINGVER" < "4.2.0" ]];then
+				# make a 4.0.9 version user file (as posted by Jaroslav in tvh forum)
+				cat <<- 'EOF' > "$OSMCUSERFILE"
+				{
+					"index": 1,
+					"enabled": true,
+					"username": "osmc",
+					"prefix": "0.0.0.0/0,::/0",
+					"streaming": true,
+					"adv_streaming": true,
+					"htsp_streaming": true,
+					"profile": "",
+					"dvr": true,
+					"htsp_dvr": true,
+					"all_dvr": true,
+					"all_rw_dvr": true,
+					"dvr_config": "",
+					"webui": true,
+					"admin": true,
+					"conn_limit": 0,
+					"channel_min": 0,
+					"channel_max": 0,
+					"channel_tag": "",
+					"comment": "OSMC default user",
+					"failed_dvr": true,
+					"wizard": true
+				}
+
+				EOF
+			else
+				# this is the same as the tvh 4.2.2 wizard creates for user osmc
+				# except for the comment
+				cat <<- 'EOF' > "$OSMCUSERFILE"
+				{
+					"index": 1,
+					"enabled": true,
+					"username": "osmc",
+					"prefix": "0.0.0.0/0",
+					"change": [
+					"change_rights",
+					"change_chrange",
+					"change_chtags",
+					"change_dvr_configs",
+					"change_profiles",
+					"change_conn_limit",
+					"change_lang",
+					"change_lang_ui",
+					"change_theme",
+					"change_uilevel"
+					],
+					"uilevel": -1,
+					"uilevel_nochange": -1,
+					"streaming": [
+					"basic",
+					"advanced",
+					"htsp"
+					],
+					"profile": [
+					],
+					"dvr": [
+					"basic",
+					"htsp",
+					"failed"
+					],
+					"htsp_anonymize": false,
+					"dvr_config": [
+					],
+					"webui": true,
+					"admin": true,
+					"conn_limit_type": 0,
+					"conn_limit": 0,
+					"channel_min": 0,
+					"channel_max": 0,
+					"channel_tag_exclude": false,
+					"channel_tag": [
+					],
+					"comment": "OSMC default user",
+					"wizard": true
+				}
+
+				EOF
+			fi
+		else
+			# make some adjustments to existing files for a smooth transition
+			sed -i /htsp_streaming/d "$OSMCUSERFILE"
+			sed -i /htsp_dvr/d "$OSMCUSERFILE"
+			sed -i /failed_dvr/d "$OSMCUSERFILE"
+			addparameter "$OSMCUSERFILE" '\"htsp_streaming\": true'
+			addparameter "$OSMCUSERFILE" '\"htsp_dvr\": true'
+			addparameter "$OSMCUSERFILE" '\"failed_dvr\": true'
+		fi
+		addparameter "$OSMCUSERFILE" "\"wizard\": true"
+
+		# delete password line if present - note: it should never be the last line
+		sed -i /password/d "$OSMCUSERFILE"
+
+		if [ -z "$OSMCPASSFILE" ]; then
+			OSMCPASSFILE=/home/osmc/.hts/tvheadend/passwd/c247bc5760446f232f0d4853fda9c1ff
+			if [ -z "$OSMCUSERPASS" ]; then
+				OSMCUSERPASS='"password2": "VFZIZWFkZW5kLUhpZGUtb3NtYw=="'
+			fi
+		else
+			rm ${OSMCPASSFILES[@]}
+		fi
+
+		cat <<- 'EOF' > "$OSMCPASSFILE"
+		{
+			"enabled": true,
+			"username": "osmc",
+			"wizard": true,
 		EOF
 
-		chown -R osmc:osmc /home/osmc/.hts/
-	fi
+		echo -e "$OSMCUSERPASS\n}" >> "$OSMCPASSFILE"
 
+		chown -R osmc:video /home/osmc/.hts/
+	fi
 
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
@@ -40,7 +189,6 @@ if [ "$1" = "configure" ]; then
 			systemctl enable tvheadend.service >/dev/null 2>&1
 		fi
 	fi
-
-	if ischroot; then exit 0; fi
 	if systemctl is-enabled tvheadend.service >/dev/null; then systemctl start tvheadend.service; fi
 fi
+
