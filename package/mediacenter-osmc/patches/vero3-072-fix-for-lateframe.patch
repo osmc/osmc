@@ -1,0 +1,33 @@
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp	2017-04-21 14:42:16.371525222 +0200
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp	2017-04-21 14:43:32.295525222 +0200
+@@ -1287,7 +1287,7 @@
+     double err = fmod(renderPts - nextFramePts, frametime);
+     m_clockSync.m_error += err;
+     m_clockSync.m_errCount ++;
+-    if (m_clockSync.m_errCount > 30)
++    if (m_clockSync.m_errCount > 120)
+     {
+       double average = m_clockSync.m_error / m_clockSync.m_errCount;
+       m_clockSync.m_syncOffset = average;
+@@ -1315,9 +1315,11 @@
+       // renderer/drivers have internal queues, being slightliy late here does not mean that
+       // we are really late. The likelihood that we recover decreases the greater m_lateframes
+       // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
+-      double x = (m_lateframes <= 6) ? 0.98 : 0;
++      double x = (m_lateframes <= 6) ? 1.9 : 0;
+       if (renderPts < m_Queue[*iter].pts + x * frametime)
+         break;
++      CLog::Log(LOGDEBUG, "CRenderManager::PrepareNextRender m_QueueSkip:%d iter.pts:%0.3f front.pts:%0.3f renderPts:%0.3f  latency:%0.3f",
++          m_QueueSkip, m_Queue[*iter].pts / DVD_TIME_BASE, nextFramePts / DVD_TIME_BASE, renderPts / DVD_TIME_BASE,  totalLatency / DVD_TIME_BASE);
+       idx = *iter;
+       ++iter;
+     }
+@@ -1327,7 +1329,7 @@ void CRenderManager::PrepareNextRender()
+ 
+     int lateframes = (renderPts - m_Queue[idx].pts) * m_fps / DVD_TIME_BASE;
+     if (lateframes)
+-      m_lateframes += lateframes;
++      m_lateframes = lateframes;
+     else
+       m_lateframes = 0;
+     
