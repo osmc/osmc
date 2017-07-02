@@ -1,0 +1,224 @@
+From 9cb0f8d033ce6a04567880dca167e2d123844d5b Mon Sep 17 00:00:00 2001
+From: Memphiz <memphis@machzwo.de>
+Date: Tue, 20 Jun 2017 21:50:45 +0200
+Subject: [PATCH 1/2] [AMLCodec]: - added software fallback for rendering 3d to
+ 2d if ppmgr_3d is not available
+
+---
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 52 +++++++++++++++++++---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h  |  2 +-
+ 2 files changed, 46 insertions(+), 8 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index c38c22318d8a..f67f17194a75 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2066,10 +2066,20 @@ void CAMLCodec::SetVideoSaturation(const int saturation)
+   SysfsUtils::SetInt("/sys/class/video/saturation", saturation);
+ }
+ 
+-void CAMLCodec::SetVideo3dMode(const int mode3d)
++bool CAMLCodec::SetVideo3dMode(const int mode3d)
+ {
+-  CLog::Log(LOGDEBUG, "CAMLCodec::SetVideo3dMode:mode3d(0x%x)", mode3d);
+-  SysfsUtils::SetInt("/sys/class/ppmgr/ppmgr_3d_mode", mode3d);
++  bool result = true;
++  if (SysfsUtils::Has("/sys/class/ppmgr/ppmgr_3d_mode"))
++  {
++    CLog::Log(LOGDEBUG, "CAMLCodec::SetVideo3dMode:mode3d(0x%x)", mode3d);
++    SysfsUtils::SetInt("/sys/class/ppmgr/ppmgr_3d_mode", mode3d);
++  }
++  else
++  {
++    CLog::Log(LOGINFO, "CAMLCodec::SetVideo3dMode: ppmgr_3d support not found in kernel.");
++    result = false;
++  }
++  return result;
+ }
+ 
+ std::string CAMLCodec::GetStereoMode()
+@@ -2197,13 +2207,41 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   {
+     std::string mode = GetStereoMode();
+     if (mode == "left_right")
+-      SetVideo3dMode(MODE_3D_TO_2D_L);
++    {
++      if (!SetVideo3dMode(MODE_3D_TO_2D_L))
++      {
++        // fall back to software scaling if no hw support
++        // was found
++        dst_rect.x2 *= 2.0;
++      }
++    }
+     else if (mode == "right_left")
+-      SetVideo3dMode(MODE_3D_TO_2D_R);
++    {
++      if (!SetVideo3dMode(MODE_3D_TO_2D_R))
++      {
++        // fall back to software scaling if no hw support
++        // was found
++        dst_rect.x2 *= 2.0;
++      }
++    }
+     else if (mode == "top_bottom")
+-      SetVideo3dMode(MODE_3D_TO_2D_T);
++    {
++      if (!SetVideo3dMode(MODE_3D_TO_2D_T))
++      {
++        // fall back to software scaling if no hw support
++        // was found
++        dst_rect.y2 *= 2.0;
++      }
++    }
+     else if (mode == "bottom_top")
+-      SetVideo3dMode(MODE_3D_TO_2D_B);
++    {
++      if (!SetVideo3dMode(MODE_3D_TO_2D_B))
++      {
++        // fall back to software scaling if no hw support
++        // was found
++        dst_rect.y2 *= 2.0;
++      }
++    }
+     else
+       SetVideo3dMode(MODE_3D_DISABLE);
+   }
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+index 0eb5c3e5fb30..0c8f1259f2d6 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+@@ -63,7 +63,7 @@ class CAMLCodec : public CThread
+   void          SetVideoContrast(const int contrast);
+   void          SetVideoBrightness(const int brightness);
+   void          SetVideoSaturation(const int saturation);
+-  void          SetVideo3dMode(const int mode3d);
++  bool          SetVideo3dMode(const int mode3d);
+   std::string   GetStereoMode();
+   bool          OpenAmlVideo(const CDVDStreamInfo &hints);
+   void          CloseAmlVideo();
+
+From e8a651dc9a172aaba048b8f32b7be5ba53a4a130 Mon Sep 17 00:00:00 2001
+From: Memphiz <memphis@machzwo.de>
+Date: Tue, 20 Jun 2017 21:51:34 +0200
+Subject: [PATCH 2/2] [windowing/AML] - added display 3d mode switching via
+ amhdmitx0/config sysfs interface
+
+---
+ xbmc/utils/AMLUtils.cpp                     | 45 +++++++++++++++++++++++++++++
+ xbmc/utils/AMLUtils.h                       |  2 ++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 14 ++++++---
+ 3 files changed, 57 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index cd19ec75cb13..b38ac5a9120f 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -327,6 +327,51 @@ bool aml_IsHdmiConnected()
+   return 0;
+ }
+ 
++void aml_handle_display_stereo_mode(RENDER_STEREO_MODE stereo_mode)
++{
++  static std::string lastHdmiTxConfig = "3doff";
++  
++  std::string command = "3doff";
++  CLog::Log(LOGDEBUG, "AMLUtils::aml_handle_display_stereo_mode switching 3d modes");
++  switch (stereo_mode)
++  {
++    case RENDER_STEREO_MODE_SPLIT_VERTICAL:
++      command = "3dlr";
++      break;
++    case RENDER_STEREO_MODE_SPLIT_HORIZONTAL:
++      command = "3dtb";
++      break;
++    default:
++      // nothing - command is already initialised to "3doff"
++      break;
++  }
++  
++  CLog::Log(LOGDEBUG, "AMLUtils::aml_handle_display_stereo_mode old mode %s new mode %s", lastHdmiTxConfig.c_str(), command.c_str());
++  // there is no way to read back current mode from sysfs
++  // so we track state internal. Because even
++  // when setting the same mode again - kernel driver
++  // will initiate a new hdmi handshake which is not
++  // what we want of course.
++  // for 3d mode we are called 2 times and need to allow both calls
++  // to succeed. Because the first call doesn't switch mode (i guessi its
++  // timing issue between switching the refreshrate and switching to 3d mode
++  // which needs to occure in the correct order, else switching refresh rate
++  // might reset 3dmode).
++  // So we set the 3d mode - if the last command is different from the current
++  // command - or in case they are the same - we ensure that its not the 3doff
++  // command that gets repeated here.
++  if (lastHdmiTxConfig != command || command != "3doff")
++  {
++    CLog::Log(LOGDEBUG, "AMLUtils::aml_handle_display_stereo_mode setting new mode");
++    lastHdmiTxConfig = command;
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", command);
++  }
++  else
++  {
++    CLog::Log(LOGDEBUG, "AMLUtils::aml_handle_display_stereo_mode - no change needed");
++  }
++}
++
+ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+ {
+   if (!res)
+diff --git a/xbmc/utils/AMLUtils.h b/xbmc/utils/AMLUtils.h
+index ba8b49357460..d8458f22be10 100644
+--- a/xbmc/utils/AMLUtils.h
++++ b/xbmc/utils/AMLUtils.h
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "guilib/Resolution.h"
++#include "rendering/RenderSystem.h"
+ 
+ enum AML_DEVICE_TYPE
+ {
+@@ -59,4 +60,5 @@ bool aml_support_hevc_10bit();
+ AML_SUPPORT_H264_4K2K aml_support_h264_4k2k();
+ void aml_set_audio_passthrough(bool passthrough);
+ bool aml_IsHdmiConnected();
++void aml_handle_display_stereo_mode(RENDER_STEREO_MODE stereo_mode);
+ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res);
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 88cd385842df..d3769d320f81 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "EGLNativeTypeAmlogic.h"
++#include "guilib/GraphicContext.h"
+ #include "guilib/gui3d.h"
+ #include "utils/AMLUtils.h"
+ #include "utils/StringUtils.h"
+@@ -133,6 +134,7 @@ bool CEGLNativeTypeAmlogic::GetNativeResolution(RESOLUTION_INFO *res) const
+ 
+ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+ {
++  bool result = false;
+ #if defined(_FBDEV_WINDOW_H_)
+   if (m_nativeWindow)
+   {
+@@ -144,10 +146,14 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+   // Don't set the same mode as current
+   std::string mode;
+   SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  if (res.strId == mode)
+-    return false;
+-
+-  return SetDisplayResolution(res.strId.c_str());
++  
++  if (res.strId != mode)
++    result = SetDisplayResolution(res.strId.c_str());
++
++  RENDER_STEREO_MODE stereo_mode = g_graphicsContext.GetStereoMode();
++  aml_handle_display_stereo_mode(stereo_mode);
++  
++  return result;
+ }
+ 
+ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
