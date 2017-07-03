@@ -35,7 +35,7 @@
 		<!--<setting enable="false" id="max_usb_current_warning" label="32073" type="lsep" visible="eq(-1,true)"/>-->
 	</category>
 	<category label="32074">
-		<setting default="0" id="soundcard_dac" label="32094" values="none|hifiberry-dac-overlay|hifiberry-dacplus-overlay|hifiberry-digi-overlay|iqaudio-dac-overlay|iqaudio-dacplus-overlay|justboom-dac-overlay|justboom-digi-overlay|allo-piano-dac-pcm512x-audio-overlay" type="enum" />
+		<setting default="0" id="soundcard_dac" label="32094" values="none|hifiberry-dac-overlay|hifiberry-dacplus-overlay|hifiberry-digi-overlay|iqaudio-dac-overlay|iqaudio-dacplus-overlay|justboom-dac-overlay|justboom-digi-overlay|allo-piano-dac-pcm512x-audio-overlay|allo-boss-dac-pcm512x-audio-overlay" type="enum" />
 		<!-- <setting default="false" id="dacplus" label="32093" type="bool" visible="eq(-1,1)|eq(-1,2)"/> -->
 		<!-- <setting default="false" id="hifiberry-dac-overlay" label="32075" type="bool" visible="eq(-1, false)"/> -->
 		<!-- <setting default="false" id="iqaudio-dac-overlay" label="32078" type="bool" visible="eq(-2, false)"/> -->
@@ -45,6 +45,7 @@
 		<!-- <setting default="false" id="justboom-dac-overlay" label="32101" type="bool" visible="eq(-6, true)"/> -->
 		<!-- <setting default="false" id="justboom-digi-overlay" label="32102" type="bool" visible="eq(-7, true)"/> -->
 		<!-- <setting default="false" id="allo-piano-dac-pcm512x-audio-overlay" label="32103" type="bool" visible="eq(-8, true)"/> -->
+		<!-- <setting default="false" id="allo-boss-dac-pcm512x-audio-overlay"  label="32104" type="bool" visible="eq(-9, true)"/> -->
 		<setting type="lsep" label="[COLOR red]Warning[/COLOR]: GPIO remote support with default pins incompatible with HiFiBerry and iqaudio." visible="gt(-1,0)+eq(1,true)" />
 		<setting default="false" id="lirc-rpi-overlay" label="32080" type="bool"/>
 		<setting default="17" id="gpio_out_pin" label="gpio_out_pin" option="int" range="1,1,27" type="slider" visible="eq(-1,true)" subsetting="true"/>
