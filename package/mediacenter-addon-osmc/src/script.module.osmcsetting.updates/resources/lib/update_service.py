@@ -52,7 +52,7 @@ def log(message, label = ''):
 	logmsg       = '%s : %s - %s ' % (__addonid__ , str(label), str(message))
 	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
 
-@clog(log)
+#@clog(log)
 def exit_osmc_settings_addon():
 	address = '/var/tmp/osmc.settings.sockfile'
 	sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -89,14 +89,14 @@ class Monitah(xbmc.Monitor):
 
 		self.parent_queue = kwargs['parent_queue']
 
-	@clog(log)
+	#@clog(log)
 	def onAbortRequested(self):
 
 		msg = json.dumps(('kill_yourself', {}))
 
 		self.parent_queue.put(msg)
 
-	@clog(log)
+	#@clog(log)
 	def onSettingsChanged(self):
 
 		msg = json.dumps(('update_settings', {}))
@@ -245,7 +245,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log, nowait=True)
+	#@clog(log, nowait=True)
 	def _daemon(self):
 
 		self.keep_alive = True
@@ -294,7 +294,7 @@ class Main(object):
 
 
 	# HOLDING PATTERN METHOD
-	@clog(log, nowait=True)
+	#@clog(log, nowait=True)
 	def holding_pattern_update(self):
 
 		check, _ = self.check_update_conditions()
@@ -307,7 +307,7 @@ class Main(object):
 
 
 	# HOLDING PATTERN METHOD
-	@clog(log)
+	#@clog(log)
 	def holding_pattern_fetched(self, bypass=False):
 
 		# stay in the holding pattern until the user returns to the Home screen
@@ -378,7 +378,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log)
+	#@clog(log)
 	def exit_procedure(self):
 
 		# stop the listener
@@ -435,7 +435,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log)
+	#@clog(log)
 	def check_update_conditions(self, connection_only=False):
 		''' Checks the users update conditions are met. 
 			Checks for:
@@ -471,7 +471,7 @@ class Main(object):
 		return True, ''
 
 	# MAIN METHOD
-	@clog(log)
+	#@clog(log)
 	def takedown_notification(self):
 
 		try:
@@ -481,7 +481,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log)
+	#@clog(log)
 	def call_child_script(self, action):
 
 		# check whether the install is an alpha version
@@ -564,7 +564,7 @@ class Main(object):
 
 
 	# MAIN METHOD
-	@clog(log, maxlength=1000)
+	#@clog(log, maxlength=1000)
 	def update_settings(self):
 		''' Updates the settings for the service while the service is still running '''
 
@@ -794,7 +794,7 @@ class Main(object):
 			ok = DIALOG.ok(lang(32090), lang(32091))
 
 	# ACTION METHOD
-	# @clog(log, maxlength=2500)
+	# #@clog(log, maxlength=2500)
 	def progress_bar(self, **kwargs):
 
 		''' Controls the creation and updating of the background prgress bar in kodi.
@@ -862,14 +862,14 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def kill_yourself(self):
 
 		self.keep_alive = False 
 
 
 	# ACTION METHOD
-	@clog(log, nowait=True)
+	#@clog(log, nowait=True)
 	def update_now(self):
 		''' Calls for an update check via the external script. This method checks if media is playing or whether the system has 
 			been idle for two minutes before allowing the update. If an update is requested, but media is playing or the system
@@ -914,7 +914,7 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def user_update_now(self):
 		''' Similar to update_now, but as this is a users request, forego all the player and idle checks. '''
 
@@ -925,7 +925,7 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def pre_backup_complete(self):
 		''' This method is called when the pre-update backup is completed. No need to worry about checking the 
 		update conditions, just run the update. '''
@@ -934,7 +934,7 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def apt_commit_complete(self):
 
 		# on commit complete, remove the notification from the Home window
@@ -977,7 +977,7 @@ class Main(object):
 			
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def apt_fetch_complete(self):
 
 		# Download and display icon
@@ -1012,7 +1012,7 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def settings_command(self, action):
 		''' Dispatch user call from the addons settings. '''
 
@@ -1157,7 +1157,7 @@ class Main(object):
 
 
 	#ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def check_for_broken_installs(self):
 
 		try:
@@ -1200,7 +1200,7 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def check_for_legit_updates(self):
 
 		self.UPDATE_WARNING = False
@@ -1309,14 +1309,14 @@ class Main(object):
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def apt_update_manual_complete(self):
 
 		self.apt_update_complete(data='manual_update_complete')
 
 
 	# ACTION METHOD
-	@clog(log)
+	#@clog(log)
 	def apt_update_complete(self, data=None):
 		
 		check, result = self.check_for_legit_updates()
@@ -1406,7 +1406,7 @@ class Main(object):
 			return 'Download, install, prompt if restart needed'
 
 
-	@clog(log)
+	#@clog(log)
 	def check_for_major_release(self, pkg):
 		''' Checks a package to see whether it is a major release. This should trigger a warning to users that things might break'''
 
@@ -1442,7 +1442,7 @@ class Main(object):
 		return False
 
 
-	@clog(log)
+	#@clog(log)
 	def check_if_reboot_required(self):
 		''' Checks for the existence of two specific files that indicate an installed package mandates a reboot. '''
 
