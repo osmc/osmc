@@ -1,20 +1,17 @@
-#! /bin/bash
+#!/bin/bash
 
 if [ "$1" = "configure" ]; then
 
 	systemctl daemon-reload
-#set -x
 	# going to read existing config files even if installing
 	# unless version is 4.2 when we can trust tvh to do it
 	EXISTINGVER=$(egrep "full_?version" /home/osmc/.hts/tvheadend/config | sed 's/.*: \+\"\(.*\)\".*/\1/' 2> /dev/null)
 	
 	if $(dpkg --compare-versions "$2" lt "4.2.0") || [[ "$EXISTINGVER" < "4.2.0" ]] \
 		|| [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
-#	if ((1)); then
 		# check for existing user called osmc
 		if OSMCUSERFILES=$(ls -t /home/osmc/.hts/tvheadend/accesscontrol/* 2> /dev/null); then
 			OSMCUSERFILES=($(grep -l "\"username\": \"osmc\"" $OSMCUSERFILES  2> /dev/null))
-			#echo ${OSMCUSERFILES[@]}
 			OSMCUSERFILE=${OSMCUSERFILES[0]}
 		fi
 		if OSMCPASSFILES=$(ls -t /home/osmc/.hts/tvheadend/passwd/*  2> /dev/null); then
@@ -30,18 +27,12 @@ if [ "$1" = "configure" ]; then
 		fi
 		OSMCUSERPASS=${OSMCUSERPASS%,}
 
-		#echo userfile is: $OSMCUSERFILE
-		#echo password file is: $OSMCPASSFILE
-		#echo password: $OSMCUSERPASS
-		#echo current version: $EXISTINGVER
-
 		mkdir -p /home/osmc/.hts/tvheadend/accesscontrol
 		mkdir -p /home/osmc/.hts/tvheadend/passwd
 
 		function addparameter(){
 			if ! grep "$2" "$1" > /dev/null; then
 				LINE=$(sed -n '$=' "$1")
-				#echo $LINE
 				while [[ $(sed -n $LINE's/.*[]\"].*/found/p' "$1") != 'found' ]] && [[ $LINE > 0 ]] ; do
 					LINE=$(($LINE -1))
 				done
