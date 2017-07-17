@@ -388,7 +388,8 @@ void MainWindow::showSuccessDialog()
     io::unmount(nd->getDiskPath(), true);
 
     utils::writeLog("Mounting " + diskPath + " to " + mountDir.absolutePath());
-    if (! io::mount(diskPath, mountDir.absolutePath()))
+    QString mountPoint = io::mount(diskPath, mountDir.absolutePath());
+    if (mountPoint == NULL)
     {
         utils::writeLog("Could not mount filesystem!");
         utils::displayError(tr("Mount failed!"), tr("Could not mount device ") + diskPath + ". " + tr("Check the log for error messages. OSMC must exit now."), true);
@@ -399,7 +400,7 @@ void MainWindow::showSuccessDialog()
     {
         utils::writeLog("Filesystem is mounted");
         utils::writeLog("Writing the preseeder to filesystem");
-        QFile preseedFile(QString(mountDir.absolutePath() + "/preseed.cfg"));
+        QFile preseedFile(QString(mountPoint + "/preseed.cfg"));
         preseedFile.open(QIODevice::WriteOnly | QIODevice::Text);
     #ifdef Q_OS_LINUX
         // Set the owner and group the same as the home path

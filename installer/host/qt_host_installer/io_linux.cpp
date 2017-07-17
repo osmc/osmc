@@ -117,9 +117,13 @@ bool writeImage(QString devicePath, QString deviceImage, QObject *caller)
     return true;
 }
 
-bool mount(QString diskPath, QString mountDir)
+QString mount(QString diskPath, QString mountDir)
 {
-    return mount(diskPath.toLocal8Bit(), mountDir.toLocal8Bit(), "vfat", 0, "") == 0;
+    if (mount(diskPath.toLocal8Bit(), mountDir.toLocal8Bit(), "vfat", 0, "") == 0) {
+        return mountDir;
+    } else {
+        return NULL;
+    }
 }
 
 bool unmount(QString devicePath, bool isDisk)
