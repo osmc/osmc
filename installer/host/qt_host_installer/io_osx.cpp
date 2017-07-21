@@ -131,13 +131,13 @@ namespace io
        }
    }
 
-   bool mount(QString devicePath, QString mountDir)
+   QString mount(QString devicePath, QString mountDir)
    {
        QString aScript ="diskutil";
 
        QStringList processArguments;
        QProcess p;
-       processArguments << "mount" << "-mountPoint" << mountDir << devicePath;
+       processArguments << "mount" << devicePath;
 
        p.start(aScript, processArguments);
 
@@ -152,12 +152,23 @@ namespace io
        if (exitCode != 0)
        {
            utils::writeLog("Could not mount "
-                           + devicePath + ". Messages are: stdErr: " + QString(stderrArray)
+                           + devicePath + " to " + mountDir + ". Messages are: stdErr: " + QString(stderrArray)
                            + "\n stdOut: " + QString(stdoutArray));
-           return false;
+           return NULL;
        }
-       else
-          return true;
+       else {
+          // Since Sierra 10.12.5, the previous approach with giving the exact mountpoint
+          // no longer works - no idea why.
+          // we now mount to the default mountpoint and try to extract it from the actual
+          // console output - this is really fishy
+          QString stdoutString  = QString(stdoutArray);
+          QStringList stdList = stdoutString.split("Volume ");
+          QString volume = stdList.at(1).split(" on ").at(0);
+          QString actualMountPoint = QString("/Volumes/" + volume);
+          utils::writeLog("mounted " + devicePath + " with message " + stdoutString);
+          utils::writeLog("Assuming mountpoint: " + actualMountPoint);
+          return actualMountPoint;
+       }
    }
 
    bool unmount(QString devicePath, bool isDisk)
@@ -176,6 +187,7 @@ namespace io
        p.start(aScript, processArguments);
 
        p.write(aScript.toUtf8());
+
        p.closeWriteChannel();
        p.waitForReadyRead(-1);
        p.waitForFinished(-1);
@@ -186,7 +198,7 @@ namespace io
        /* Non-0 exit code indicates failure */
        if (exitCode != 0)
        {
-           utils::writeLog("Could not mount " + devicePath + ". Messages are: stdErr: " + QString(stderrArray) + "\n stdOut: " + QString(stdoutArray));
+           utils::writeLog("Could not unmount " + devicePath + ". Messages are: stdErr: " + QString(stderrArray) + "\n stdOut: " + QString(stdoutArray));
            return false;
        }
        else

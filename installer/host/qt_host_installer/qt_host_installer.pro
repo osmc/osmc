@@ -37,6 +37,7 @@ SOURCES += main.cpp\
 macx {
 SOURCES += \
     io_osx.cpp
+QMAKE_MAC_SDK = macosx10.12
 }
 
 unix:!macx {
@@ -91,7 +92,7 @@ FORMS    += mainwindow.ui \
     extractprogress.ui \
     successdialog.ui
 
-VERSION = 127
+VERSION = 128
 
 TRANSLATIONS = osmc.ts \
     osmc_da.ts \
