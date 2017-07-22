@@ -17,6 +17,8 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	install_divert /etc/samba/smb.conf.distributed /etc/samba/smb.conf
 	install_divert /etc/init.d/samba.distributed /etc/init.d/samba
 	install_divert /lib/systemd/system/samba.service.distributed /lib/systemd/system/samba.service
+	echo "set samba-common/do_debconf false" | debconf-communicate
+	echo "fset samba-common/do_debconf seen true" | debconf-communicate
 fi
 if [ "$1" = "install" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"; fi
 if [ "$1" = "upgrade" ]; then touch "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"; else rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_upgrade"; fi
