@@ -1,0 +1,28 @@
+From 7a084f2cee264af73c31757bdde0491516ac7d5c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 27 Jul 2017 18:25:56 +0100
+Subject: [PATCH] Disable background scanning by default. This has to be done
+ in source as our ConnMan.conf is a conffile and this would affect new
+ installations only.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.c b/src/main.c
+index 3e6449a..acd45db 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -80,7 +80,7 @@ static struct {
+ 	char *vendor_class_id;
+ 	bool enable_online_check;
+ } connman_settings  = {
+-	.bg_scan = true,
++	.bg_scan = false,
+ 	.pref_timeservers = NULL,
+ 	.auto_connect = NULL,
+ 	.preferred_techs = NULL,
+-- 
+2.7.4
+
