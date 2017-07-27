@@ -54,10 +54,10 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://ftp.debian.org/debian jessie main contrib non-free
-deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
-deb http://security.debian.org/ jessie/updates main contrib non-free
-deb http://apt.osmc.tv jessie-devel main
+echo "deb http://ftp.debian.org/debian $RLS main contrib non-free
+deb http://ftp.debian.org/debian/ $RLS-updates main contrib non-free
+deb http://security.debian.org/ $RLS/updates main contrib non-free
+deb http://apt.osmc.tv $RLS-devel main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
