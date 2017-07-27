@@ -16,7 +16,7 @@ test $1 == vero && VERSION="4.4.0" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_
 test $1 == vero2 && VERSION="3.10.105" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="25" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="25" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -169,8 +169,9 @@ then
 	    ARCH=$(echo $ARCH | tr -d v7l | tr -d v6)
 	fi
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
+	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
 	export ARCH
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 		then
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
@@ -250,7 +251,6 @@ then
         # Build V4L2 drivers for Vero 4K
         if [ "$1" == "vero364" ]
         then
-		export ARCH=arm64
 		kernel_path=$(pwd)
                 pushd media_build
                 make untar
