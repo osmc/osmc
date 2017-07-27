@@ -61,7 +61,7 @@ deb http://apt.osmc.tv jessie-devel main
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
 add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-add_apt_key "${DIR}" "http://mirrordirector.raspbian.org/raspbian.public.key"
+add_apt_key "${DIR}" "https://www.raspberrypi.org/raspberrypi.gpg.key"
 verify_action
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
