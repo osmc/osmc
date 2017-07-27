@@ -51,8 +51,8 @@ enable_nw_chroot "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://mirrordirector.raspbian.org/raspbian jessie main contrib non-free
-deb http://apt.osmc.tv jessie main
+echo "deb http://mirrordirector.raspbian.org/raspbian $RLS main contrib non-free
+deb http://apt.osmc.tv $RLS main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
