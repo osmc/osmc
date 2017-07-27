@@ -41,7 +41,8 @@ syspaths="/sys/class/video/axis
 /sys/class/video/blackout_policy
 /sys/module/di/parameters/bypass_all
 /sys/class/video/freerun_mode
-/sys/module/amlvideodri/parameters/freerun_mode"
+/sys/module/amlvideodri/parameters/freerun_mode
+/sys/class/amhdmitx/amhdmitx0/frac_rate_policy"
 
 for syspath in $syspaths; do
         chgrp -R video $syspath
