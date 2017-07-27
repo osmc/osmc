@@ -31,7 +31,7 @@ done
 # Configure the target directory
 ARCH="arm64"
 DIR="opt/osmc-tc/${tcstub}"
-RLS="jessie"
+RLS="stretch"
 URL=""
 
 # Remove existing build

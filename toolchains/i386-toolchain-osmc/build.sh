@@ -28,7 +28,7 @@ done
 # Configure the target directory
 ARCH="i386"
 DIR="opt/osmc-tc/${tcstub}"
-RLS="jessie"
+RLS="stretch"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
