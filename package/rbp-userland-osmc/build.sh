@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="0f315f88ac91f9be93544bfd757f8d55ca4cf099"
+REV="9b85acd3fff8e1a57ceca9c57b56f82763051d2e"
 
 echo -e "Building package rbp-userland"
 out=$(pwd)/files
