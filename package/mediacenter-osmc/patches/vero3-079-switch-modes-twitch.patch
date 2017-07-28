@@ -1,0 +1,32 @@
+From 998dc9a432130bfcedde5787e149bfa06e6ce741 Mon Sep 17 00:00:00 2001
+From: RealJohnGalt <johngalt@fake.mail>
+Date: Fri, 2 Jun 2017 00:07:08 -0700
+Subject: [PATCH 2/2] EGLNativeTypeAmlogic: Set the same mode as current
+
+We must set a mode to pass colorspace changes.
+---
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index d983e8f..64423b4 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -152,13 +152,7 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+   }
+ #endif
+ 
+-  // Don't set the same mode as current
+-
+-  RESOLUTION_INFO current_resolution;
+-  GetNativeResolution(&current_resolution);
+-  if (current_resolution.strId != res.strId ||
+-    current_resolution.fRefreshRate != res.fRefreshRate)
+-    result = SetDisplayResolution(res);
++  result = SetDisplayResolution(res);
+ 
+   DealWithScale(res);
+ 
+-- 
+2.7.4
+

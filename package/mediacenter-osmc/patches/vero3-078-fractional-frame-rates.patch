@@ -1,0 +1,116 @@
+From f019b37ceb65a2ee121218db6c0c57b2c4095fd5 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 8 Apr 2017 01:54:37 +0200
+Subject: [PATCH 1/2] EGLNativeTypeAmlogic: implement Nougat-kernel style
+ fractional frame rates
+
+---
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 46 ++++++++++++++++++++++-------
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  2 +-
+ 2 files changed, 37 insertions(+), 11 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 8d6a2b4..d983e8f 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -30,6 +30,7 @@
+ #include <linux/fb.h>
+ #include <sys/ioctl.h>
+ #include <EGL/egl.h>
++#include <math.h>
+ 
+ CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
+ {
+@@ -129,7 +130,15 @@ bool CEGLNativeTypeAmlogic::GetNativeResolution(RESOLUTION_INFO *res) const
+ {
+   std::string mode;
+   SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  return aml_mode_to_resolution(mode.c_str(), res);
++
++  bool result = aml_mode_to_resolution(mode.c_str(), res);
++
++  int fractional_rate;
++  SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++  if (fractional_rate == 1)
++    res->fRefreshRate /= 1.001;
++
++  return result;
+ }
+ 
+ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+@@ -144,11 +153,12 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+ #endif
+ 
+   // Don't set the same mode as current
+-  std::string mode;
+-  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  
+-  if (res.strId != mode)
+-    result = SetDisplayResolution(res.strId.c_str());
++
++  RESOLUTION_INFO current_resolution;
++  GetNativeResolution(&current_resolution);
++  if (current_resolution.strId != res.strId ||
++    current_resolution.fRefreshRate != res.fRefreshRate)
++    result = SetDisplayResolution(res);
+ 
+   DealWithScale(res);
+ 
+@@ -170,6 +180,18 @@ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resol
+   {
+     if(aml_mode_to_resolution(i->c_str(), &res))
+       resolutions.push_back(res);
++
++    switch ((int)res.fRefreshRate)
++    {
++      case 24:
++      case 30:
++      case 60:
++        res.fRefreshRate /= 1.001;
++        res.strMode       = StringUtils::Format("%dx%d @ %.2f%s - Full Screen", res.iScreenWidth, res.iScreenHeight, res.fRefreshRate,
++          res.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
++        resolutions.push_back(res);
++        break;
++    }
+   }
+   return resolutions.size() > 0;
+ 
+@@ -194,14 +216,18 @@ bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
+   return true;
+ }
+ 
+-bool CEGLNativeTypeAmlogic::SetDisplayResolution(const char *resolution)
++bool CEGLNativeTypeAmlogic::SetDisplayResolution(const RESOLUTION_INFO &res)
+ {
+-  std::string mode = resolution;
++  std::string mode = res.strId.c_str();
++
+   // switch display resolution
++  SysfsUtils::SetString("/sys/class/display/mode", "null");
++
++  int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
+ 
+-  RESOLUTION_INFO res;
+-  aml_mode_to_resolution(mode.c_str(), &res);
+   SetFramebufferResolution(res);
+ 
+   return true;
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+index 96aa6f7..b7c053b 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+@@ -51,7 +51,7 @@ public:
+   virtual bool  ShowWindow(bool show);
+ 
+ protected:
+-  bool SetDisplayResolution(const char *resolution);
++  bool SetDisplayResolution(const RESOLUTION_INFO &res);
+   void SetupVideoScaling(const char *mode);
+   void DealWithScale(const RESOLUTION_INFO &res);
+   void EnableFreeScale(const RESOLUTION_INFO &res);
+-- 
+2.7.4
+
