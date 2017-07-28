@@ -1,0 +1,31 @@
+From d08ad045a20862ed0fb56ac8f1263e5dc4475982 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 28 Jul 2017 01:56:23 +0100
+Subject: [PATCH] SMB fixes for OSMC and Windows systems in 2017
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/filesystem/SMBFile.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+index e53d555..00f3879 100644
+--- a/xbmc/filesystem/SMBFile.cpp
++++ b/xbmc/filesystem/SMBFile.cpp
+@@ -120,6 +120,13 @@ void CSMB::Init()
+         fprintf(f, "\tsocket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=65536 SO_SNDBUF=65536\n");      
+         fprintf(f, "\tlock directory = %s/.smb/\n", getenv("HOME"));
+ 
++        // smb fixes osmc
++        fprintf(f, "\tclient use spnego = no\n");
++	fprint(f, "\tclient use spnego principal = no\n");
++        fprintf(f, "\tclient ntlmv2 auth = no\n");
++	fprintf(f, "\tclient min protocol = SMB2\n");
++	fprintf(f, "\tclient max protocol = SMB3\n");
++
+         // set wins server if there's one. name resolve order defaults to 'lmhosts host wins bcast'.
+         // if no WINS server has been specified the wins method will be ignored.
+         if (CSettings::GetInstance().GetString(CSettings::SETTING_SMB_WINSSERVER).length() > 0 && !StringUtils::EqualsNoCase(CSettings::GetInstance().GetString(CSettings::SETTING_SMB_WINSSERVER), "0.0.0.0") )
+-- 
+2.7.4
+
