@@ -1,0 +1,41 @@
+From 14455374d6ad240ac9e02ef9f8bd7a196ccbab26 Mon Sep 17 00:00:00 2001
+From: Lukas Obermann <obermann.lukas@gmail.com>
+Date: Mon, 26 Jun 2017 22:40:39 +0200
+Subject: [PATCH] [imdb] fix crash on empty videoInfoTag
+
+---
+ xbmc/video/dialogs/GUIDialogVideoInfo.cpp | 5 +++++
+ xbmc/video/windows/GUIWindowVideoBase.cpp | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/xbmc/video/dialogs/GUIDialogVideoInfo.cpp b/xbmc/video/dialogs/GUIDialogVideoInfo.cpp
+index 7b2d3cf3dd44..f4b55b32bdb0 100644
+--- a/xbmc/video/dialogs/GUIDialogVideoInfo.cpp
++++ b/xbmc/video/dialogs/GUIDialogVideoInfo.cpp
+@@ -306,6 +306,11 @@ void CGUIDialogVideoInfo::SetMovie(const CFileItem *item)
+ 
+   // setup cast list
+   ClearCastList();
++  
++  // When the scraper throws an error, the video tag can be null here
++  if (!item->HasVideoInfoTag())
++    return;
++  
+   MediaType type = item->GetVideoInfoTag()->m_type;
+ 
+   m_startUserrating = m_movieItem->GetVideoInfoTag()->m_iUserRating;
+diff --git a/xbmc/video/windows/GUIWindowVideoBase.cpp b/xbmc/video/windows/GUIWindowVideoBase.cpp
+index 3a5c8b237136..908cd2c8ff71 100644
+--- a/xbmc/video/windows/GUIWindowVideoBase.cpp
++++ b/xbmc/video/windows/GUIWindowVideoBase.cpp
+@@ -398,6 +398,10 @@ bool CGUIWindowVideoBase::ShowIMDB(CFileItemPtr item, const ScraperPtr &info2, b
+     CGUIDialogOK::ShowAndGetInput(CVariant{13346}, CVariant{14057});
+     return false;
+   }
++  
++  // If the scraper failed above and no videoinfotag was created, return
++  if (!item->HasVideoInfoTag())
++    return false;
+ 
+   bool listNeedsUpdating = false;
+   // 3. Run a loop so that if we Refresh we re-run this block
