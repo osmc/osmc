@@ -18,7 +18,7 @@ index e53d555..00f3879 100644
  
 +        // smb fixes osmc
 +        fprintf(f, "\tclient use spnego = no\n");
-+	fprint(f, "\tclient use spnego principal = no\n");
++	fprintf(f, "\tclient use spnego principal = no\n");
 +        fprintf(f, "\tclient ntlmv2 auth = no\n");
 +	fprintf(f, "\tclient min protocol = SMB2\n");
 +	fprintf(f, "\tclient max protocol = SMB3\n");
