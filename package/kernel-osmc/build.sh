@@ -193,7 +193,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
 		then
 		# Build RTL8192DU model
 		pushd drivers/net/wireless/rtl8192du
