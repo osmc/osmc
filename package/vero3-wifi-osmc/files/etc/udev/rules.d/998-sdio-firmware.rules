@@ -1,10 +1,10 @@
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa9bf", ACTION=="add", TAG+="systemd", \
   RUN+="/bin/touch /var/run/sdio_0x02d0:0xa9bf"
 
-SUBSYSTEM=="rfkill", KERNELS=="bt-dev.29", ATTR{type}=="bluetooth", \
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
   ACTION=="add|change", ATTR{soft}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.path", \
   ENV{SYSTEMD_READY}="1"
 
-SUBSYSTEM=="rfkill", KERNELS=="bt-dev.29", ATTR{type}=="bluetooth", \
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
   ACTION=="change", ATTR{soft}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.path", \
   ENV{SYSTEMD_READY}="0"
