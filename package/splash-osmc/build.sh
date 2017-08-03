@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="ac553c7f91ad9ec413a135013ad8b1fe6f85b1c0"
+REV="8e4e16f058ec053f9008c08eacbcad0ae1431737"
 pull_source "https://github.com/osmc/ply-lite/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
