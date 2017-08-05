@@ -1,0 +1,57 @@
+From 933492790bcf14c86d435a04d78eef6195cc36ef Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 4 Aug 2017 21:13:59 +0100
+Subject: [PATCH] Fix a crash caused by multiple calls to ReloadSkin() before
+ the first one completes
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 11 ++++++++++-
+ xbmc/Application.h   |  3 +++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 106b87c..3f43f09 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -1575,13 +1575,22 @@ void CApplication::ReloadSkin(bool confirm/*=false*/)
+      return;
+   }
+ 
++  if (m_SkinReloading) {
++    CLog::Log(LOGINFO, "Suppressing skin reload as we are already doing so");
++    return;
++  }
++
+   std::string oldSkin = g_SkinInfo->ID();
+ 
+   CGUIMessage msg(GUI_MSG_LOAD_SKIN, -1, g_windowManager.GetActiveWindow());
+   g_windowManager.SendMessage(msg);
+ 
+   std::string newSkin = CSettings::GetInstance().GetString(CSettings::SETTING_LOOKANDFEEL_SKIN);
+-  if (LoadSkin(newSkin))
++  m_SkinReloading = true;
++  bool skinLoaded = LoadSkin(newSkin);
++  m_SkinReloading = false;
++
++  if (skinLoaded)
+   {
+     /* The Reset() or SetString() below will cause recursion, so the m_confirmSkinChange boolean is set so as to not prompt the
+        user as to whether they want to keep the current skin. */
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index f2fcb3a..49f9bcb 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -414,6 +414,9 @@ public:
+   bool m_ShuttingDown;
+   bool isShuttingDown() { return m_ShuttingDown; }
+ 
++  /*! \Ensure that we only handle one request to reload the skin at once */
++  bool m_SkinReloading;
++
+   /*!
+   \brief Locks calls from outside kodi (e.g. python) until framemove is processed.
+   */
+-- 
+2.7.4
+
