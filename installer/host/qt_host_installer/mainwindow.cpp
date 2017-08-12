@@ -273,7 +273,7 @@ void MainWindow::setNetworkAdvanced(QString ip, QString mask, QString gw, QStrin
 
 void MainWindow::setWiFiConfiguration(QString ssid, int key_type, QString key_value)
 {
-    utils::writeLog("Wireless network configured with SSID " + ssid + " key value " + key_value);
+    utils::writeLog("Wireless network configured with SSID " + ssid);
     nss->setWirelessSSID(ssid);
     nss->setWirelessKeyType(key_type);
     /* No point if open */

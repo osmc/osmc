@@ -92,7 +92,7 @@ FORMS    += mainwindow.ui \
     extractprogress.ui \
     successdialog.ui
 
-VERSION = 128
+VERSION = 129
 
 TRANSLATIONS = osmc.ts \
     osmc_da.ts \
