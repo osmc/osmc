@@ -21,9 +21,19 @@ esac
 done
 
 preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
-if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
+if echo $hdmimode | busybox grep -q force
+then
+    force_hdmi = 1
+fi
+if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ] && [ "$force_hdmi" -eq 0 ]
 then
   hdmimode="$preferred"
+  echo "$hdmimode" > /sys/class/display/mode
+fi
+
+if [ "$force_hdmi" -eq 1 ]
+then
+  hdmimode=$(echo $hdmimode | /bin/busybox sed 's/force//g')
   echo "$hdmimode" > /sys/class/display/mode
 fi
 
