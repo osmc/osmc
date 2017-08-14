@@ -38,7 +38,7 @@ if [ "$1" = "configure" ]; then
 				done
 				if [[ $LINE == 0 ]]; then
 					echo Problem with user file $1 - edit or delete it
-					exit 1
+					return
 				fi
 				sed -i $LINE'{
 					s/.*[^,]$/&,/
