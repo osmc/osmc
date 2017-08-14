@@ -1,0 +1,13 @@
+diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
+index eba6353..5e57b2b 100644
+--- a/xbmc/utils/SystemInfo.cpp
++++ b/xbmc/utils/SystemInfo.cpp
+@@ -638,6 +638,8 @@ std::string CSysInfo::GetOsName(bool emptyIfUnknown /* = false*/)
+   if (emptyIfUnknown && osName == "Unknown OS")
+     return "";
+ 
++osName = "Linux";
++
+   return osName;
+ }
+ 
