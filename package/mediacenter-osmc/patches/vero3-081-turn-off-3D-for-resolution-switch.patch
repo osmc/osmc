@@ -1,0 +1,25 @@
+From 06ca5f8db5a0c837b245624ba43ffbeca4018b2b Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Tue, 15 Aug 2017 00:06:47 +0200
+Subject: [PATCH] EGLNativeTypeAmlogic: turn 3D off for resolution switch
+
+---
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index ff965f8..3ef43d3 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -153,6 +153,8 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+   }
+ #endif
+ 
++  aml_handle_display_stereo_mode(RENDER_STEREO_MODE_OFF);
++
+   result = SetDisplayResolution(res);
+   DealWithScale(res);
+ 
+-- 
+2.7.4
+
