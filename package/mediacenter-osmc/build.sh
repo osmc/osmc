@@ -239,7 +239,7 @@ then
 		--disable-pulse \
 		--enable-x11 \
 		--disable-openmax \
-		--enable-optical-drive \
+		--disable-optical-drive \
 		--enable-libbluray \
                 --disable-debug \
                 --enable-libcec \
@@ -259,7 +259,7 @@ then
 		--disable-pulse \
 		--enable-x11 \
 		--disable-openmax \
-		--enable-optical-drive \
+		--disable-optical-drive \
 		--enable-libbluray \
 		--disable-debug \
 		--disable-optimizations
