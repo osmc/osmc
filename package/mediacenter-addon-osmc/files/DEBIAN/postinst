@@ -12,6 +12,18 @@ function is_rbp()
 	fi
 }
 
+function is_atv()
+{
+    if ischroot
+    then
+               dpkg -l | grep -q "atv-bootloader-osmc"
+               return
+    else
+               grep -q osmcdev=atv /proc/cmdline > /dev/null 2>&1
+               return
+    fi
+}
+
 function is_vero()
 {
         if ischroot
@@ -27,6 +39,7 @@ function is_vero()
 if [ "$1" = "configure" ]
 then
 	if ! is_rbp; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.pi* >/dev/null 2>&1; fi
+	if is_atv; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.updates >/dev/null 2>&1; fi
 	if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
 	chown -R $OWNER /usr/share/kodi/addons/script.module.elementtree
 	chown -R $OWNER /usr/share/kodi/addons/script.module.xmltodict
