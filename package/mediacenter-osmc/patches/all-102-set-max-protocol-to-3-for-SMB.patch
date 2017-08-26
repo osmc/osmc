@@ -1,0 +1,26 @@
+From e7be01c692870f5c596454bb13ab8c6a9c517dee Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 26 Aug 2017 19:40:41 +0100
+Subject: [PATCH] Set maxprotocol to 3 for SMB
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index a57d06c..f4e072c 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -1959,7 +1959,7 @@
+         <setting id="smb.maxprotocol" type="integer" label="36621" help="36622">
+           <level>2</level>
+           <visible>false</visible>
+-          <default>0</default>
++          <default>3</default>
+           <constraints>
+             <options>
+               <option label="36623">0</option>
+-- 
+2.7.4
+
