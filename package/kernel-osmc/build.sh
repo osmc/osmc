@@ -57,7 +57,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	update_sources
-	handle_dep "kernel-package"
+#	handle_dep "kernel-package"
 	handle_dep "liblz4-tool"
 	handle_dep "cpio"
 	handle_dep "bison"
