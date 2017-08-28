@@ -1,0 +1,26 @@
+From 76dc35ccf6dad457ae10cde1541dfe535da4ce20 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 23 Aug 2017 12:11:11 +0100
+Subject: [PATCH] Ensure that the web server is running on Port 80 by default
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index e6b61d8..a57d06c 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -1712,7 +1712,7 @@
+         </setting>
+         <setting id="services.webserverport" type="integer" parent="services.webserver" label="730" help="36329">
+           <level>1</level>
+-          <default>8080</default>
++          <default>80</default>
+           <constraints>
+             <minimum>1</minimum>
+             <step>1</step>
+-- 
+2.7.4
+

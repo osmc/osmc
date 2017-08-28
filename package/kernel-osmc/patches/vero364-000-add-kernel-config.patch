@@ -1,6 +1,6 @@
---- /dev/null	2017-07-30 17:25:18.599050672 +0100
-+++ b/.config	2017-07-31 04:55:19.262366180 +0100
-@@ -0,0 +1,3736 @@
+--- /dev/null	2017-08-24 11:54:43.519086647 +0100
++++ b/.config	2017-08-26 13:48:09.531772899 +0100
+@@ -0,0 +1,3742 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 3.14.29 Kernel Configuration
@@ -996,7 +996,13 @@
 +# Amlogic Backlight Support
 +#
 +# CONFIG_AML_BACKLIGHT is not set
-+# CONFIG_AMLOGIC_LED is not set
++CONFIG_AMLOGIC_LED=y
++CONFIG_AML_LED_SYS=y
++CONFIG_AML_LED_PWM=y
++CONFIG_AML_LED_TRIGGER_BREATHE=y
++CONFIG_AML_LED_TRIGGER_SCPI=y
++CONFIG_AML_LED_TRIGGER_SCPISTOP=y
++CONFIG_AML_LED_TRIGGER_DISTURB=y
 +
 +#
 +# Canvas management driver

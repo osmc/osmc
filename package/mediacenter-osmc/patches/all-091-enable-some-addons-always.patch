@@ -16,7 +16,7 @@ index 180d6aa..d6f3fe7 100644
    std::regex addons_disable("plugin.program.xbmchub.notifications");
    if (regex_match(ID, addons_disable))
      return true;
-+  std::regex addons_enabled("service.osmc.BTPlayer|inputstream.rtmp|inputstream.adaptive");
++  std::regex addons_enabled("service.osmc.BTPlayer|inputstream.rtmp|inputstream.adaptive|resource.language.\\w{2}_\\w{2}");
 +  if (regex_match(ID, addons_enabled))
 +    return false;
    return m_disabled.find(ID) != m_disabled.end();

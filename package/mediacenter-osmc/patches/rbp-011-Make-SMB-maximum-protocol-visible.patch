@@ -1,0 +1,31 @@
+From 3feb511f5c9457c4f8b10780c8ce0a5926e29c13 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 27 Aug 2017 17:34:40 +0100
+Subject: [PATCH] RBP: Make SMB maximum protocol visible
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/rbp.xml | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/system/settings/rbp.xml b/system/settings/rbp.xml
+index 0ce6735..21c2f3a 100644
+--- a/system/settings/rbp.xml
++++ b/system/settings/rbp.xml
+@@ -132,4 +132,13 @@
+       </group>
+     </category>
+   </section>
++  <section id="services">
++    <category id="smb">
++      <group id="2">
++        <setting id="smb.maxprotocol">
++          <visible>true</visible>
++        </setting>
++      </group>
++    </category>
++  </section>
+ </settings>
+-- 
+2.7.4
+

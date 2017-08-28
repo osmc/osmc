@@ -1,0 +1,20 @@
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 64423b4..13b70d0 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -24,6 +24,7 @@
+ #include "utils/AMLUtils.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
++#include "utils/log.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -218,6 +219,7 @@ bool CEGLNativeTypeAmlogic::SetDisplayResolution(const RESOLUTION_INFO &res)
+   SysfsUtils::SetString("/sys/class/display/mode", "null");
+ 
+   int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
++  CLog::Log(LOGDEBUG, "%s%d", "Setting frac_rate_policy to ", fractional_rate);
+   SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
+ 
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
