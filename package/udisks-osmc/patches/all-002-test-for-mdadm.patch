@@ -1,0 +1,13 @@
+Index: udisks/data/80-udisks.rules
+===================================================================
+--- udisks.orig/data/80-udisks.rules	2011-08-30 00:39:55.772873612 +0200
++++ udisks/data/80-udisks.rules	2011-10-21 08:28:05.308180232 +0200
+@@ -99,7 +99,7 @@
+ # avoid probing if it has already been done earlier
+ #
+ ENV{MD_LEVEL}!="", GOTO="md_end"
+-IMPORT{program}="/sbin/mdadm --examine --export $tempnode"
++TEST=="/sbin/mdadm", IMPORT{program}="/sbin/mdadm --examine --export $tempnode"
+ 
+ LABEL="md_end"
+ 

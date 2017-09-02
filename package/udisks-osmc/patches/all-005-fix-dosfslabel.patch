@@ -1,0 +1,61 @@
+diff --git a/src/daemon.c b/src/daemon.c
+index 6072502..3ed2b94 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -247,7 +247,7 @@ static const Filesystem known_file_systems[] =
+       FALSE, /* supports_unix_owners */
+       TRUE, /* can_mount */
+       TRUE, /* can_create */
+-      254, /* max_label_len */
++      11, /* max_label_len */
+       TRUE, /* supports_label_rename */
+       FALSE, /* supports_online_label_rename*/
+       TRUE, /* supports_fsck */
+diff --git a/src/helpers/job-change-filesystem-label.c b/src/helpers/job-change-filesystem-label.c
+index fcdee76..3426323 100644
+--- a/src/helpers/job-change-filesystem-label.c
++++ b/src/helpers/job-change-filesystem-label.c
+@@ -91,7 +91,7 @@ main (int argc,
+     }
+   else if (strcmp (fstype, "vfat") == 0)
+     {
+-      if (!validate_and_escape_label (&new_label, 254))
++      if (!validate_and_escape_label (&new_label, 11))
+         goto out;
+       /* VFAT does not allow some characters */
+       for (c = "\"*/:<>?\\|"; *c; ++c)
+@@ -103,11 +103,7 @@ main (int argc,
+ 	    }
+           }
+ 
+-      g_setenv ("MTOOLS_SKIP_CHECK", "1", TRUE);
+-      if (strlen (new_label) == 0)
+-        command_line = g_strdup_printf ("mlabel -c -i %s ::", device);
+-      else
+-        command_line = g_strdup_printf ("mlabel -i %s \"::%s\"", device, new_label);
++      command_line = g_strdup_printf ("dosfslabel %s \"%s\"", device, new_label);
+ 
+     }
+   else if (strcmp (fstype, "ntfs") == 0)
+diff --git a/src/helpers/job-mkfs.c b/src/helpers/job-mkfs.c
+index 2ab7400..a06b89d 100644
+--- a/src/helpers/job-mkfs.c
++++ b/src/helpers/job-mkfs.c
+@@ -109,7 +109,7 @@ main (int argc,
+           if (g_str_has_prefix (options[n], "label="))
+             {
+               label = strdup (options[n] + sizeof("label=") - 1);
+-              if (!validate_and_escape_label (&label, 254))
++              if (!validate_and_escape_label (&label, 11))
+                 {
+                   g_string_free (s, TRUE);
+                   goto out;
+@@ -498,7 +498,7 @@ main (int argc,
+ 
+       if (strcmp (fstype, "vfat") == 0)
+         {
+-          command_line = g_strdup_printf ("mlabel -i %s \"::%s\"", device, label);
++          command_line = g_strdup_printf ("dosfslabel %s \"%s\"", device, label);
+         }
+       else
+         {

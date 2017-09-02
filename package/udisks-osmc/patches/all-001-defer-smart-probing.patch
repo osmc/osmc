@@ -1,0 +1,67 @@
+From d4e54c5a60e99dfa2aed912cdf5478417267f841 Mon Sep 17 00:00:00 2001
+From: Martin Pitt <martin.pitt@ubuntu.com>
+Date: Wed, 24 Feb 2010 12:45:03 +0100
+Subject: [PATCH] =?UTF-8?q?Bug=2026725=20=E2=80=94=20defer=20initial=20ATA=20SMART=20probing?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The initial ATA SMART probing in device_new() is very expensive (takes about
+0.5 s of CPU/IO time on a Dell Mini 10). Defer the check by half a minute, so
+that we don't block CPU/IO when we need it much more urgently (on desktop
+session startup or when hotplugging a new device.
+
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=26725
+---
+ src/device.c |   31 ++++++++++++++++++++++++++++---
+ 1 files changed, 28 insertions(+), 3 deletions(-)
+
+Index: udisks/src/device.c
+===================================================================
+--- udisks.orig/src/device.c	2014-03-10 11:02:07.508715776 +0100
++++ udisks/src/device.c	2014-03-10 11:02:07.504715776 +0100
+@@ -5094,6 +5094,32 @@
+   force_removal (device, NULL, NULL);
+ }
+ 
++static gboolean
++device_initial_ata_smart_refresh (gpointer data)
++{
++  Device *device = (Device *) data;
++  static gchar *ata_smart_refresh_data_options[] = { NULL };
++
++  /* if we are inhibited, try again */
++  if (daemon_local_is_inhibited (device->priv->daemon))
++    {
++      g_print("**** INITIAL ATA SMART POLL for %s: Daemon inhibited, trying again\n", device->priv->device_file);
++      return TRUE;
++    }
++
++  /* if the SMART status was manually updated, or the device got removed in the
++   * meantime, don't bother */
++  if (device->priv->drive_ata_smart_status == (SkSmartOverall) - 1 &&
++      !device->priv->removed)
++    {
++      g_print("**** INITIAL ATA SMART POLL for %s\n", device->priv->device_file);
++      device_drive_ata_smart_refresh_data (device, ata_smart_refresh_data_options, NULL);
++    }
++
++  g_object_unref (device);
++  return FALSE;
++}
++
+ Device *
+ device_new (Daemon *daemon,
+             GUdevDevice *d)
+@@ -5147,9 +5173,8 @@
+   /* if just added, update the smart data if applicable */
+   if (device->priv->drive_ata_smart_is_available)
+     {
+-      PROFILE ("device_new(native_path=%s): refresh ATA SMART DATA", native_path);
+-      gchar *ata_smart_refresh_data_options[] = { NULL };
+-      device_drive_ata_smart_refresh_data (device, ata_smart_refresh_data_options, NULL);
++      g_print("**** QUEUEING initial ata smart refresh for %s\n", device->priv->device_file);
++      g_timeout_add_seconds (30, device_initial_ata_smart_refresh, g_object_ref (device));
+     }
+ 
+   PROFILE ("device_new(native_path=%s): end", native_path);

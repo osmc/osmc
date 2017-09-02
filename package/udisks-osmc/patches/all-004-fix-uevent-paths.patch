@@ -1,0 +1,63 @@
+From 4f8c6d0c8141ee440032796c4a14f01d018a1a75 Mon Sep 17 00:00:00 2001
+From: Martin Pitt <martinpitt@gnome.org>
+Date: Mon, 2 Apr 2012 09:18:47 +0200
+Subject: [PATCH] =?UTF-8?q?Bug=2048173=20=E2=80=94=20Ignore=20add/change=20e?=
+ =?UTF-8?q?vents=20for=20a=20nonexisting=20native=20path?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Devices that need to poll for media sometimes send out change uevents after
+they got removed:
+
+  UDEV [26112.087644] change /sdb (block)
+  ACTION=change
+  DEVNAME=/dev/sdb
+  DEVPATH=/sdb
+  DEVTYPE=disk
+  DISK_MEDIA_CHANGE=1
+  SUBSYSTEM=block
+
+(Note the weird device path.) Our current logic treats this change event as
+add, and creates an /org/freedesktop/UDisks/devices/sdb device for it:
+
+  **** TREATING CHANGE AS ADD /sys/sdb
+  **** ADDING /sys/sdb
+  **** UPDATING /sys/sdb
+
+But as the device does not really exist, this is invalid and useless.
+
+If a real /dev/sdb comes back later on with an add event, udisks sees that the
+device already exists, and crashes:
+
+  (udisks-daemon:24900): udisks-daemon-ERROR **: **** HACK: Wanting to register
+  object at path `/org/freedesktop/UDisks/devices/sdb' but there is already an
+  object there. This is an internal error in the daemon. Aborting.
+
+To prevent this, ensure that the native device actually exists before adding an
+udisks object for it.
+
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=48173
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/899757
+---
+ src/device.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
+
+Index: udisks/src/device.c
+===================================================================
+--- udisks.orig/src/device.c	2014-03-10 11:02:13.924715974 +0100
++++ udisks/src/device.c	2014-03-10 11:02:13.920715974 +0100
+@@ -5141,6 +5141,13 @@
+       goto out;
+     }
+ 
++  /* ignore bogus events */
++  if (!g_file_test (native_path, G_FILE_TEST_EXISTS))
++    {
++      g_warning ("Ignoring device with nonexisting native path: %s", native_path);
++      goto out;
++    }
++
+   PROFILE ("device_new(native_path=%s): start", native_path);
+ 
+   device = DEVICE (g_object_new (TYPE_DEVICE, NULL));
