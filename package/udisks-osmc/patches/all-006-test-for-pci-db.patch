@@ -1,0 +1,18 @@
+Description: Test for pci-db before using it
+ In newer udev versions, pci-db has been replaced by the hwdb builtin.
+ Instead of removing the pci-db import completely, we check if the
+ helper exists before running it to be compatible with both old and new udev.
+Author: Michael Biebl <biebl@debian.org>
+diff --git a/data/80-udisks.rules b/data/80-udisks.rules
+index 6720394..147ef6b 100644
+--- a/data/80-udisks.rules
++++ b/data/80-udisks.rules
+@@ -3,7 +3,7 @@
+ 
+ # import names for PCI storage controllers
+ #
+-SUBSYSTEM=="pci", ACTION=="add|change", ENV{ID_MODEL_FROM_DATABASE}=="", ATTR{class}=="0x01*", IMPORT{program}="pci-db %p"
++SUBSYSTEM=="pci", ACTION=="add|change", ENV{ID_MODEL_FROM_DATABASE}=="", ATTR{class}=="0x01*", TEST=="/lib/udev/pci-db", IMPORT{program}="pci-db %p"
+ 
+ # Set eSATA port type for known eSATA CardBus adapters - first we want to ensure
+ # the device is on a cardbus controller (upper PCI device) - then we check

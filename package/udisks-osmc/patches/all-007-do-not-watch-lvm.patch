@@ -1,0 +1,19 @@
+Description: Stop udev-watching devmapper devices. It is not necessary any more with current kernels/LVM and breaks removal of snapshots.
+Bug-Debian: https://bugs.debian.org/721303
+Bug-Fedora: https://bugzilla.redhat.com/show_bug.cgi?id=577798
+
+Index: udisks/data/80-udisks.rules
+===================================================================
+--- udisks.orig/data/80-udisks.rules	2014-03-05 14:34:18.799660864 +0100
++++ udisks/data/80-udisks.rules	2014-03-05 14:34:57.775660509 +0100
+@@ -56,10 +56,6 @@
+ #
+ KERNEL=="dm-*", IMPORT{program}="udisks-dm-export %M %m"
+ 
+-# Make udevd synthesize a 'change' uevent when last opener of a rw-fd closes the fd - this
+-# should be part of the device-mapper rules
+-KERNEL=="dm-*", OPTIONS+="watch"
+-
+ ##############################################################################################################
+ # Probe LVM2 Physical Volumes - this will eventually be part of the LVM2 package
+ 

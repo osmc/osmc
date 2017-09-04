@@ -14,7 +14,7 @@ fi
 
 VERSION="5.39"
 pull_source "https://www.kernel.org/pub/linux/bluetooth/bluez-${VERSION}.tar.xz" "$(pwd)/src"
-if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
+if [ $? != 0 ]; then echo -e "Error fetching bluez source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "bluez-osmc"
 build_return=$?
