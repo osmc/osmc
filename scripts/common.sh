@@ -21,9 +21,10 @@ function verify_action()
 function enable_nw_chroot()
 {
 	echo -e "Enabling networking"
-	cp /etc/resolv.conf $1/etc/
+	cp /etc/resolv.conf $1/etc/resolv.conf
 	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
-	cp /etc/network/interfaces $1/etc/network
+	mkdir -p $1/etc/network
+	cp /etc/network/interfaces $1/etc/network/interfaces
 	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
 }
 
