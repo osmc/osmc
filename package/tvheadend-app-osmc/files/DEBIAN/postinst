@@ -5,7 +5,10 @@ if [ "$1" = "configure" ]; then
 	systemctl daemon-reload
 	# going to read existing config files even if installing
 	# unless version is 4.2 when we can trust tvh to do it
-	EXISTINGVER=$(egrep "full_?version" /home/osmc/.hts/tvheadend/config | sed 's/.*: \+\"\(.*\)\".*/\1/' 2> /dev/null)
+	EXISTINGVER=
+	if [ -f /home/osmc/.hts/tvheadend/config ]; then
+		EXISTINGVER=$(egrep "full_?version" /home/osmc/.hts/tvheadend/config | sed 's/.*: \+\"\(.*\)\".*/\1/' 2> /dev/null)
+	fi
 	
 	if $(dpkg --compare-versions "$2" lt "4.2.0") || [[ "$EXISTINGVER" < "4.2.0" ]] \
 		|| [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
@@ -52,7 +55,7 @@ if [ "$1" = "configure" ]; then
 
 			echo "Creating OSMC default access control file"
 
-			if [[ "$EXISTINGVER" < "4.2.0" ]];then
+			if [ ! -z $EXISTINGVER ] && [[ "$EXISTINGVER" < "4.2.0" ]];then
 				# make a 4.0.9 version user file (as posted by Jaroslav in tvh forum)
 				cat <<- 'EOF' > "$OSMCUSERFILE"
 				{
