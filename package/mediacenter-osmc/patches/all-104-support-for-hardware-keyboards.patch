@@ -1,5 +1,5 @@
 diff --git a/xbmc/input/linux/LinuxInputDevices.cpp b/xbmc/input/linux/LinuxInputDevices.cpp
-index ef0d494..e46d9bb
+index ef0d494..2141982
 --- a/xbmc/input/linux/LinuxInputDevices.cpp
 +++ b/xbmc/input/linux/LinuxInputDevices.cpp
 @@ -92,6 +92,8 @@ typedef unsigned long kernel_ulong_t;
@@ -53,6 +53,15 @@ index ef0d494..e46d9bb
  
    switch (type)
    {
+@@ -366,7 +378,7 @@ int CLinuxInputDevice::KeyboardGetSymbol(unsigned short value)
+     case 0x7f:
+       return XBMCK_BACKSPACE;
+     case 0xa4:
+-      return XBMCK_EURO; /* euro currency sign */
++      return 0x20ac; /* euro currency sign */
+     default:
+       return index;
+     }
 @@ -404,6 +416,16 @@ int CLinuxInputDevice::KeyboardGetSymbol(unsigned short value)
        return (DFBInputDeviceKeySymbol) (DIKS_0 + index);
      break;
@@ -219,7 +228,7 @@ index ef0d494..e46d9bb
 +          CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: using 0x%04x as unicode", keyMapValue);
 +        }
 +        // use the extended character set but only if an 'ascii' key was pressed
-+        else if (keyMapValue < 256 && keyMapValue > 0x20 && devt.key.keysym.sym < 128)
++        else if (keyMapValue < 256 && keyMapValue > 0x1f && devt.key.keysym.sym < 128)
          {
 +          devt.key.keysym.sym = (XBMCKey) keyMapValue;
            devt.key.keysym.unicode = devt.key.keysym.sym;
