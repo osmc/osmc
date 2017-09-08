@@ -23,10 +23,12 @@ if [ "$1" = "configure" ]; then
 		fi
 
 		# save any passwords
-		if [ -n "$OSMCUSERFILE" ] && [ -z $OSMCPASSFILE ]; then
-			OSMCUSERPASS=$(grep "\"password2\":" "$OSMCUSERFILE")
-		else
-			OSMCUSERPASS=$(grep "\"password2\":" "$OSMCPASSFILE")
+		if [ -n "$OSMCUSERFILE" ]; then
+			if [ -z $OSMCPASSFILE ]; then
+				OSMCUSERPASS=$(grep "\"password2\":" "$OSMCUSERFILE")
+			else
+				OSMCUSERPASS=$(grep "\"password2\":" "$OSMCPASSFILE")
+			fi
 		fi
 		OSMCUSERPASS=${OSMCUSERPASS%,}
 
