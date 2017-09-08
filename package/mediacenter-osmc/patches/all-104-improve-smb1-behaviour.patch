@@ -1,0 +1,30 @@
+From c3d57eddd3cd4b49f4f24c56f466d547aec5e183 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 8 Sep 2017 04:17:00 +0100
+Subject: [PATCH] Samba fixes for SMBv1 based devices
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/filesystem/SMBFile.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+index e5301b0..8e9226b 100644
+--- a/xbmc/filesystem/SMBFile.cpp
++++ b/xbmc/filesystem/SMBFile.cpp
+@@ -120,8 +120,11 @@ void CSMB::Init()
+         // set maximum smbclient protocol version
+         if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) > 0)
+         {
+-          if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) == 1)
++          if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) == 1) {
+             fprintf(f, "\tclient max protocol = NT1\n");
++	    fprintf(f, "\tclient lanmath auth = yes\n");
++	    fprintf(f, "\tlanman auth = yes\n");
++	}
+           else
+             fprintf(f, "\tclient max protocol = SMB%d\n", CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL));
+         }
+-- 
+2.7.4
+
