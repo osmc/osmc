@@ -14,9 +14,6 @@ if [ "$1" = "remove" ]; then
 	# remove all diverts that this version _and_ all prior versions of the package once added:
 	# remove_divert PATH_DIV PATH_ORIG
 
-	remove_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
-	remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
-	remove_divert /lib/udev/rules.d/60-cdrom_id.rules.distributed /lib/udev/rules.d/60-cdrom_id.rules
 	udevadm control --reload
 	exit 0
 fi
