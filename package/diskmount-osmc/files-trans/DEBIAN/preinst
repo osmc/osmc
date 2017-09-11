@@ -14,7 +14,9 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install all diverts needed by this version of the package:
 	# install_divert PATH_DIV PATH_ORIG
 
-	remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+	remove_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
+        remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+        remove_divert /lib/udev/rules.d/60-cdrom_id.rules.distributed /lib/udev/rules.d/60-cdrom_id.rules
 
 	systemctl stop udisks-glue.service >/dev/null 2>&1
 	exit 0

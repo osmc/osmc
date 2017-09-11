@@ -14,9 +14,8 @@ if [ "$1" = "configure" ]; then
     then
         # Purge conf files
 	>/var/lib/dpkg/info/diskmount-osmc.list
-    fi
-fi
-
         remove_divert /etc/udisks-glue.conf.distributed /etc/udisks-glue.conf
         remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
         remove_divert /lib/udev/rules.d/60-cdrom_id.rules.distributed /lib/udev/rules.d/60-cdrom_id.rules
+    fi
+fi
