@@ -14,6 +14,8 @@ if [ "$1" = "remove" ]; then
 	# remove all diverts that this version _and_ all prior versions of the package once added:
 	# remove_divert PATH_DIV PATH_ORIG
 
+	remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+
 	udevadm control --reload
 	exit 0
 fi

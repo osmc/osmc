@@ -14,6 +14,8 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install all diverts needed by this version of the package:
 	# install_divert PATH_DIV PATH_ORIG
 
+	install_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
+
 	systemctl stop udisks-glue.service >/dev/null 2>&1
 	exit 0
 fi
