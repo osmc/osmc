@@ -42,7 +42,7 @@ then
 	handle_dep "uuid-dev"
 	handle_dep "libselinux1-dev"
 	handle_dep "intltool"
-	sed '/Package/d' -i files/DEBIAN/control
+	sed '/^Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-udisks-osmc" >> files/DEBIAN/control
 	pushd src/udisks-osmc-${VERSION}
     	install_patch "../../patches" "all"
