@@ -1,9 +1,10 @@
 Origin: OSMC
-Version: 1.3.5-3
+Version: 1.3.5-4
 Section: utils
 Essential: No
 Priority: optional
 Maintainer: Sam G Nazarko <email@samnazarko.co.uk>
 Description: udisks for OSMC
 Depends: libconfuse0, libdbus-1-3, libdbus-glib-1-2, libglib2.0-0
-Pre-Depends: udisks-glue (>=9.99-10)
+Breaks: udisks-glue (<<9.99-11)
+Replaces: udisks-glue
