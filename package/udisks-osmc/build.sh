@@ -42,11 +42,11 @@ then
 	handle_dep "uuid-dev"
 	handle_dep "libselinux1-dev"
 	handle_dep "intltool"
-	sed '/Package/d' -i files/DEBIAN/control
+	sed '/^Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-udisks-osmc" >> files/DEBIAN/control
 	pushd src/udisks-osmc-${VERSION}
     	install_patch "../../patches" "all"
-	./configure --prefix=/usr --enable-man-pages=no
+	./configure --prefix=/usr --enable-man-pages=no --with-systemdsystemunitdir=/lib/systemd/system --disable-dmmp --enable-lvm2 --libexecdir=/usr/lib/udisks
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi

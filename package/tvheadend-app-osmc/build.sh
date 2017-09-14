@@ -36,12 +36,13 @@ then
 	handle_dep "gettext"
 	handle_dep "${1}-cmake-osmc"
 	handle_dep "wget"
+	handle_dep "libdvbcsa-dev"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-tvheadend-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-tvheadend-app-osmc"
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
 	install_patch "../../patches" "all"
-	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-ffmpeg_static --disable-libx264 --disable_libx264_static --disable-libx265 --disable-libx265_static --disable-libvpx --disable-libvpx_static --disable-libtheora --disable-libtheorsa_static --disable-libvorbis --disable-libvorbis_static --disable-libfdkaac --disable-libfdkaac_static --disable-nvenc --disable-libmfx_static --disable-android --enable-libsystemd_daemon --disable-kqueue --enable-dbus_1 --disable-tsdebug --disable-gtimer_check --enable-dvbscan --disable-bundle --disable-tvhcsa --enable-uriparser --disable-epoll --enable-zlib --disable-inotify --enable-dvben50221 --disable-dvbcsa --nowerror
+	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-ffmpeg_static --disable-libx264 --disable_libx264_static --disable-libx265 --disable-libx265_static --disable-libvpx --disable-libvpx_static --disable-libtheora --disable-libtheorsa_static --disable-libvorbis --disable-libvorbis_static --disable-libfdkaac --disable-libfdkaac_static --disable-nvenc --disable-libmfx_static --disable-android --enable-libsystemd_daemon --disable-kqueue --enable-dbus_1 --disable-tsdebug --disable-gtimer_check --enable-dvbscan --disable-bundle --disable-tvhcsa --enable-uriparser --disable-epoll --enable-zlib --disable-inotify --enable-dvben50221 --disable-dvbcsa --nowerror --enable-dvbcsa --enable-tvhcsa
 	sed -e "s/0.0.0~unknown/${VERSION}~osmc/" -i support/version
 	$BUILD
 	make install DESTDIR=${out}

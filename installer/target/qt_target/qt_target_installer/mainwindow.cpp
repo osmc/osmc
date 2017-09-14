@@ -93,6 +93,12 @@ void MainWindow::install()
         device->setRoot("/dev/sda2");
         device->setBootNeedsFormat(false);
     }
+    if (! hasMount && utils->getOSMCDev() == "vero3")
+    {
+        /* Booting from USB */
+        device->setBoot("/dev/sda1");
+        hasMount = utils->mountPartition(device, MNT_BOOT);
+    }
     if (! hasMount)
     {
         haltInstall("could not mount bootfs");
@@ -240,7 +246,7 @@ void MainWindow::install()
             system("lvcreate -n root -l100%FREE vero-nand");
             utils->fmtpart(device->getRoot(), "ext4");
         }
-        if (utils->getOSMCDev() == "vero3" && ! device->hasBootChanged())
+        if (utils->getOSMCDev() == "vero3")
         {
             /* Set up LVM */
             system("dd if=/dev/zero of=/dev/data bs=1M count=1 conv=fsync");

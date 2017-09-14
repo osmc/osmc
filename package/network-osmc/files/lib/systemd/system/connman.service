@@ -1,6 +1,6 @@
 [Unit]
 Description=Connman connection service
-After=dbus.service network-pre.target
+After=dbus.service network-pre.target wpa_supplicant.service
 Wants=network.target remote-fs-pre.target
 Before=remote-fs-pre.target network.target
 
