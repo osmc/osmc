@@ -33,7 +33,7 @@ then
 	echo "Package: ${1}-udisks-glue-osmc" >> files/DEBIAN/control
 	pushd src/udisks-glue-osmc-${VERSION}
 	./autogen.sh
-	./configure --prefix=/usr
+	./configure --prefix=/usr --sysconfdir=/etc
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
