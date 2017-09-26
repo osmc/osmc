@@ -40,7 +40,7 @@ if [ -n "$err" ]; then sleep 4; dialog --backtitle "Package configuration" --tit
 
 rm -f $failed
 tmp=$(mktemp)
-if ! debconf-apt-progress --logfile $tmp -- apt-get -f -y dist-upgrade > /dev/tty1
+if ! debconf-apt-progress --logfile $tmp -- apt-get-noninteractive -f -y dist-upgrade > /dev/tty1
 then
 	pkg=$(basename $(grep -i -A 1 "Errors were encountered while processing" $tmp | tail -n 1)); pkgarr=(${pkg//_/ })
 	package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
@@ -59,7 +59,7 @@ else
 
 	if [ -n "$removable_kernels" ] && [ "$OSMC_KERNEL_AUTOREMOVE" = "1" ]
 	then
-		if ! debconf-apt-progress --logfile $tmp -- apt-get -y purge $removable_kernels > /dev/tty1
+		if ! debconf-apt-progress --logfile $tmp -- apt-get-noninteractive -y purge $removable_kernels > /dev/tty1
 		then
 			dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred removing no longer required kernel packages.\n\n    Please report this problem on the OSMC forum, making sure to\n    include debug logs. Attempting to restart Kodi in 30 seconds...\n" 9 74 > /dev/tty1
 			echo -e "\nError removing old kernels during manual-update:" >> /var/log/apt/term.log
