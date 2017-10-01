@@ -141,7 +141,7 @@ class BTPlayer(threading.Thread):
             if "State" in changed:
                 if not changed["State"] == self.state:
                     self.state = changed["State"]
-                    if not self.state  == "active":
+                    if self.state not in ("active","idle"):
                         xbmc.stopBTPlayer()
         elif iface == "MediaPlayer1":
             if "Status" in changed:
