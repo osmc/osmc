@@ -19,4 +19,5 @@ if [ "$1" = "configure" ]; then
 
 	if ischroot; then exit 0; fi
 	systemctl restart udisks-glue.service
+	exit 0
 fi
