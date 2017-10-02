@@ -15,8 +15,4 @@ if [ "$1" = "configure" ]; then
 	# remove_divert PATH_DIV PATH_ORIG
 
 	systemctl daemon-reload
-	systemctl enable udisks.service >/dev/null 2>&1
-
-	if ischroot; then exit 0; fi
-	systemctl restart udisks.service
 fi
