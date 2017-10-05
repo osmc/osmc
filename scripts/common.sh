@@ -37,6 +37,13 @@ function add_apt_key()
 	rm ${1}/tmp/key > /dev/null 2>&1
 }
 
+function add_apt_key_gpg()
+{
+	echo -e "Adding apt key to trusted.gpg.d"
+	wget ${2} -O ${1}/etc/apt/trusted.gpg.d/${3}
+	verify_action
+}
+
 function emulate_arm()
 {
 	echo Copying ARM QEMU binary
