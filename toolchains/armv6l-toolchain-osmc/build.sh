@@ -60,7 +60,7 @@ deb http://apt.osmc.tv $RLS-devel main
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
+add_apt_key_gpg "${DIR}" "http://apt.osmc.tv/osmc_repository.gpg" "osmc_repository.gpg"
 add_apt_key "${DIR}" "https://www.raspberrypi.org/raspberrypi.gpg.key"
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
