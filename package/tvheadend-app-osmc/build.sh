@@ -34,7 +34,7 @@ then
 	handle_dep "libsystemd-daemon-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "gettext"
-	handle_dep "${1}-cmake-osmc"
+	if [ "$1" != "vero3" ]; then handle_dep "${1}-cmake-osmc"; else handle_dep "armv7-cmake-osmc"; fi
 	handle_dep "wget"
 	handle_dep "libdvbcsa-dev"
 	mkdir -p files/etc/osmc/apps.d
