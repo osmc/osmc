@@ -1,0 +1,107 @@
+From 217a9999a13bad28a9b743a566a13ec3fccd18fc Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Mon, 2 Oct 2017 22:06:50 +0200
+Subject: [PATCH] DVDVideoCodecAmlogic: remove pts-based frame rate tracking
+
+---
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       | 64 ----------------------
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.h         |  1 -
+ 2 files changed, 65 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 8ea3617..abfb580 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -45,7 +45,6 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo) : CDVDVi
+   m_Codec(NULL),
+   m_pFormatName("amcodec"),
+   m_opened(false),
+-  m_last_pts(0.0),
+   m_frame_queue(NULL),
+   m_queue_depth(0),
+   m_framerate(0.0),
+@@ -597,69 +596,6 @@ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double
+ 
+     pthread_mutex_unlock(&m_queue_mutex);
+ 
+-    float duration = cur_pts - m_last_pts;
+-    m_last_pts = cur_pts;
+-
+-    // clamp duration to sensible range,
+-    // 66 fsp to 20 fsp
+-    if (duration >= 15000.0 && duration <= 50000.0)
+-    {
+-      double framerate;
+-      switch((int)(0.5 + duration))
+-      {
+-        // 59.940 (16683.333333)
+-        case 16000 ... 17000:
+-          framerate = 60000.0 / 1001.0;
+-          break;
+-
+-        // 50.000 (20000.000000)
+-        case 20000:
+-          framerate = 50000.0 / 1000.0;
+-          break;
+-
+-        // 49.950 (20020.000000)
+-        case 20020:
+-          framerate = 50000.0 / 1001.0;
+-          break;
+-
+-        // 29.970 (33366.666656)
+-        case 32000 ... 35000:
+-          framerate = 30000.0 / 1001.0;
+-          break;
+-
+-        // 25.000 (40000.000000)
+-        case 39900 ... 40100:
+-          framerate = 25000.0 / 1000.0;
+-          break;
+-
+-        // 23.976 (41708.33333)
+-        case 40200 ... 43200:
+-          // 23.976 seems to have the crappiest encodings :)
+-          framerate = 24000.0 / 1001.0;
+-          break;
+-
+-        default:
+-          framerate = 0.0;
+-          //CLog::Log(LOGDEBUG, "%s: unknown duration(%f), cur_pts(%f)",
+-          //  __MODULE_NAME__, duration, cur_pts);
+-          break;
+-      }
+-
+-      if (framerate > 0.0 && (int)m_framerate != (int)framerate)
+-      {
+-        m_framerate = framerate;
+-        m_video_rate = (int)(0.5 + (96000.0 / framerate));
+-
+-        if (m_Codec)
+-          m_Codec->SetVideoRate(m_video_rate);
+-
+-        m_processInfo.SetVideoFps(m_framerate);
+-
+-        CLog::Log(LOGDEBUG, "%s: detected new framerate(%f), video_rate(%d)",
+-          __MODULE_NAME__, m_framerate, m_video_rate);
+-      }
+-    }
+-
+     FrameQueuePop();
+   }
+ }
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+index 4b1872e..cd98889 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+@@ -94,7 +94,6 @@ protected:
+   DVDVideoPicture m_videobuffer;
+   bool            m_opened;
+   CDVDStreamInfo  m_hints;
+-  double          m_last_pts;
+   frame_queue    *m_frame_queue;
+   int32_t         m_queue_depth;
+   pthread_mutex_t m_queue_mutex;
+-- 
+2.7.4
+
