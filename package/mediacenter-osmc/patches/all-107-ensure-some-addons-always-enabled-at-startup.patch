@@ -25,7 +25,7 @@ index f56fbc2..915515c 100644
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='service.osmc.BTPlayer'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.adaptive'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.rtmp'"));
-+    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=0 WHERE addonID LIKE 'resource.language.%%'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'resource.language.%%'"));
 +
      CommitTransaction();
    }
