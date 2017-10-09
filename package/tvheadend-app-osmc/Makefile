@@ -1,5 +1,5 @@
 all:
-	@echo "Specify a target:\nmake rbp1\nmake armv6l\nmake i386\nmake amd64\nmake aarch64\nmake vero3"
+	@echo "Specify a target:\nmake rbp1\nmake armv6l\nmake i386\nmake amd64\nmake aarch64\n"
 
 armv6l:
 	sudo bash build.sh "armv6l"
@@ -15,9 +15,6 @@ i386:
 
 amd64:
 	sudo bash build.sh "amd64"
-
-vero3:
-	sudo bash build.sh "vero3"
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1

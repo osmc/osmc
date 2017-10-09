@@ -34,7 +34,6 @@ then
 	handle_dep "libsystemd-daemon-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "gettext"
-	if [ "$1" != "vero3" ]; then handle_dep "${1}-cmake-osmc"; else handle_dep "armv7-cmake-osmc"; fi
 	handle_dep "wget"
 	handle_dep "libdvbcsa-dev"
 	mkdir -p files/etc/osmc/apps.d
@@ -42,7 +41,6 @@ then
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
 	install_patch "../../patches" "all"
-	install_patch "../../patches" "${1}"
 	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-ffmpeg_static --disable-libx264 --disable_libx264_static --disable-libx265 --disable-libx265_static --disable-libvpx --disable-libvpx_static --disable-libtheora --disable-libtheorsa_static --disable-libvorbis --disable-libvorbis_static --disable-libfdkaac --disable-libfdkaac_static --disable-nvenc --disable-libmfx_static --disable-android --enable-libsystemd_daemon --disable-kqueue --enable-dbus_1 --disable-tsdebug --disable-gtimer_check --enable-dvbscan --disable-bundle --disable-tvhcsa --enable-uriparser --disable-epoll --enable-zlib --disable-inotify --enable-dvben50221 --disable-dvbcsa --nowerror --enable-dvbcsa --enable-tvhcsa
 	sed -e "s/0.0.0~unknown/${VERSION}~osmc/" -i support/version
 	$BUILD
