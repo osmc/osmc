@@ -222,6 +222,12 @@ SETS =  {
                                                 'ltyp': 'cl_log',
                                                 'actn': 'ls -al /etc/apt/preferences.d',
                                             },
+                                            {
+                                                'name': 'APT sources.list.d',
+                                                'key' : 'KjLq37hD',
+                                                'ltyp': 'cl_log',
+                                                'actn': 'ls -al /etc/apt/sources.list.d',
+                                            },
                                           ],
                                 },
 
