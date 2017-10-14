@@ -173,6 +173,7 @@ function build_in_env()
 function teardown_env()
 {
 	TCDIR="/opt/osmc-tc/$1-toolchain-osmc"
+	swapoff /opt/osmc-tc/swap >/dev/null 2>&1
 	umount ${TCDIR}/mnt >/dev/null 2>&1
 }
 
