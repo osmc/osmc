@@ -86,17 +86,17 @@ index 11b08b5..b1954d4 100644
  
    if (g_advancedSettings.CanLogComponent(LOGVIDEO))
    {
--    CLog::Log(LOGDEBUG, "CAMLCodec::Decode: ret: %d, sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], ptsOut:%0.4f, amlpts:%d, idx:%u, timesize:%0.4f, overflow:%llx",
-+    CLog::Log(LOGDEBUG, "CAMLCodec::Decode: ret: %d, sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], ptsOut:%0.4f, amlpts:%d, idx:%u, timesize:%0.4f, overflow:%llx, drain: %d",
+-    CLog::Log(LOGDEBUG, "CAMLCodec::Decode: ret: %d, sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], adj:%llu, ptsOut:%0.4f, amlpts:%d, idx:%u, timesize:%0.4f",
++    CLog::Log(LOGDEBUG, "CAMLCodec::Decode: ret: %d, sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], adj:%llu, ptsOut:%0.4f, amlpts:%d, idx:%u, timesize:%0.4f, drain: %d",
        rtn,
        static_cast<unsigned int>(iSize),
        dts / DVD_TIME_BASE, am_private->am_pkt.avdts,
 @@ -1907,7 +1923,8 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+       static_cast<float>(m_cur_pts)/PTS_FREQ,
        static_cast<int>(m_cur_pts),
        m_bufferIndex,
-       timesize,
--      m_ptsOverflow
-+      m_ptsOverflow,
+-      timesize
++      timesize,
 +      m_drain
      );
    }
