@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# even with our sudo preservation hack, we can't set this up as a profile.d function and export it
+# this stops people running apt upgrade and breaking their system
+
+REAL_APT="/usr/bin/apt-real"
+
+    for arg in "$@"; do
+        case $arg in
+        upgrade)
+            echo "Running apt upgrade on your system can cause adverse effects on your system"
+            echo "Use apt full-upgrade, which is the proper way to administer a Debian / Ubuntu system"
+            echo "For more information about updates, see https://osmc.tv/wiki/general/keeping-your-osmc-system-up-to-date/"
+            exit 1
+        ;;
+        nowarn-upgrade)
+            echo "Waiting 10 seconds before running potentially dangerous apt upgrade. Press CTRL + C to abort"
+            sleep 10
+            new_args=("${new_args[@]}" "upgrade")
+        ;;
+        *)
+            new_args=("${new_args[@]}" "$arg")
+        ;;
+        esac
+    done
+
+"$REAL_APT" "${new_args[@]}"
