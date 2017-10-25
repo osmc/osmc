@@ -15,7 +15,8 @@ function check_platform()
 
 function verify_action()
 {
-	if [ $? != 0 ]; then echo -e "Exiting build" && exit 1; fi
+	code=$?
+	if [ $code != 0 ]; then echo -e "Exiting build with return code ${code}" && exit 1; fi
 }
 
 function enable_nw_chroot()
