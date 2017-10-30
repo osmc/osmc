@@ -1,0 +1,32 @@
+From 30429a280e81d9b3bf748600aab9d8563539908a Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Mon, 22 May 2017 12:44:14 +0200
+Subject: [PATCH] SMBFile: Remove year old workaround
+
+---
+ xbmc/filesystem/SMBFile.cpp | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+index 8e9226b..3cfab4c 100644
+--- a/xbmc/filesystem/SMBFile.cpp
++++ b/xbmc/filesystem/SMBFile.cpp
+@@ -518,15 +518,6 @@ ssize_t CSMBFile::Read(void *lpBuf, size_t uiBufSize)
+ 
+   CSingleLock lock(smb); // Init not called since it has to be "inited" by now
+   smb.SetActivityTime();
+-  /* work around stupid bug in samba */
+-  /* some samba servers has a bug in it where the */
+-  /* 17th bit will be ignored in a request of data */
+-  /* this can lead to a very small return of data */
+-  /* also worse, a request of exactly 64k will return */
+-  /* as if eof, client has a workaround for windows */
+-  /* thou it seems other servers are affected too */
+-  if( uiBufSize >= 64*1024-2 )
+-    uiBufSize = 64*1024-2;
+ 
+   ssize_t bytesRead = smbc_read(m_fd, lpBuf, (int)uiBufSize);
+ 
+-- 
+2.7.4
+

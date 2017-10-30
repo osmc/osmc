@@ -1,4 +1,4 @@
-From 1c89d69671ba208a55a812b5bce5dfb20d37724b Mon Sep 17 00:00:00 2001
+From 22aefb3fad42466d105e5b78f766d62556148aa6 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 17:49:02 +0100
 Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
@@ -6,14 +6,14 @@ Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                  | 17 +++++++++++++++++
- xbmc/messaging/ApplicationMessenger.h |  1 +
- 2 files changed, 18 insertions(+)
+ xbmc/messaging/ApplicationMessenger.h |  2 ++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 79ed347..c8d2ce0 100644
+index a2448dc..59cac21 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2604,6 +2604,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2508,6 +2508,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    }
    break;
  
@@ -38,17 +38,18 @@ index 79ed347..c8d2ce0 100644
      getNetwork().NetworkMessage((CNetwork::EMESSAGE)pMsg->param1, pMsg->param2);
      break;
 diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
-index b54b1c8..abc9ed7 100644
+index 5f15c6d..87f0362 100644
 --- a/xbmc/messaging/ApplicationMessenger.h
 +++ b/xbmc/messaging/ApplicationMessenger.h
-@@ -90,6 +90,7 @@
- #define TMSG_LOADPROFILE                  TMSG_MASK_APPLICATION + 27
+@@ -91,6 +91,8 @@
  #define TMSG_VIDEORESIZE                  TMSG_MASK_APPLICATION + 28
  #define TMSG_SETAUDIODSPSTATE             TMSG_MASK_APPLICATION + 29
-+#define TMSG_SETOSMCWALKTHROUGHSTATE	  TMSG_MASK_APPLICATION + 30
+ #define TMSG_SYSTEM_POWERDOWN             TMSG_MASK_APPLICATION + 30
++#define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 31
++
  
  #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
  #define TMSG_GUI_INFOBOOL                 TMSG_MASK_GUIINFOMANAGER + 1
 -- 
-2.1.0
+2.7.4
 

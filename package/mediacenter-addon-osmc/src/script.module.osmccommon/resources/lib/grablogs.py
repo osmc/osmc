@@ -184,7 +184,7 @@ SETS =	{
 
 		'apt' 				: { 'order' : 10, 	
 								'active': False, 
-								'help'  : 'APT term.log, history.log, sources.list, apt.conf.d, preferences.d',
+								'help'  : 'APT term.log, history.log, sources.list, apt.conf.d, preferences.d, sources.list.d',
 								'dest'  : 'apt',
 								'action': 'store_true',
 								'flags' : ['-a', '--apt'],
@@ -218,7 +218,13 @@ SETS =	{
 												'key' : 'vSKj25Lq',
 												'ltyp': 'cl_log', 
 												'actn': 'ls -al /etc/apt/preferences.d',
-											},																																	
+											},
+                                                                                        {
+                                                                                                'name': 'APT sources.list.d',
+                                                                                                'key' : 'KjLq37hD',
+                                                                                                'ltyp': 'cl_log',
+                                                                                                'actn': 'ls -al /etc/apt/sources.list.d',
+                                                                                        },																																	
 										  ], 										 
 								},
 

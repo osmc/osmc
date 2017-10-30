@@ -1,0 +1,30 @@
+From 8122db986ad66b7395ccc51fb0771b0cd8f2dd58 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Tue, 24 Oct 2017 15:42:01 -0700
+Subject: [PATCH] Fix crash on startup when peripheral.joystick is disabled
+
+When peripheral.joystick is disabled, Kodi fails to load button maps for
+the controller and CPeripheralJoystick::m_joystickMonitor is not
+initialized. Attempting to unregister the null pointer causes a segfault.
+---
+ xbmc/peripherals/devices/PeripheralJoystick.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/peripherals/devices/PeripheralJoystick.cpp b/xbmc/peripherals/devices/PeripheralJoystick.cpp
+index a6fc7e36837c..f4a281724319 100644
+--- a/xbmc/peripherals/devices/PeripheralJoystick.cpp
++++ b/xbmc/peripherals/devices/PeripheralJoystick.cpp
+@@ -51,8 +51,11 @@ CPeripheralJoystick::CPeripheralJoystick(const PeripheralScanResult& scanResult,
+ CPeripheralJoystick::~CPeripheralJoystick(void)
+ {
+   m_defaultInputHandler.AbortRumble();
+-  UnregisterJoystickInputHandler(m_joystickMonitor.get());
+-  m_joystickMonitor.reset();
++  if (m_joystickMonitor)
++  {
++    UnregisterJoystickInputHandler(m_joystickMonitor.get());
++    m_joystickMonitor.reset();
++  }
+   UnregisterJoystickInputHandler(&m_defaultInputHandler);
+   m_deadzoneFilter.reset();
+   m_buttonMap.reset();

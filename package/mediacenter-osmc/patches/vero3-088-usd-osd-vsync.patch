@@ -1,0 +1,29 @@
+From cfa1d19c9f2389f9b7a0abd8397de88626646194 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Tue, 26 Sep 2017 23:10:41 +0200
+Subject: [PATCH] RenderSystemGLES: always let the driver choose vsync
+ implementation
+
+Setting eglSwapInterval to 1 makes smoothness suffer on Amlogic.
+---
+ xbmc/windowing/egl/EGLWrapper.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLWrapper.cpp b/xbmc/windowing/egl/EGLWrapper.cpp
+index 30f5757..1383d39 100644
+--- a/xbmc/windowing/egl/EGLWrapper.cpp
++++ b/xbmc/windowing/egl/EGLWrapper.cpp
+@@ -384,8 +384,8 @@ bool CEGLWrapper::SetVSync(EGLDisplay display, bool enable)
+   EGLBoolean status;
+   // depending how buffers are setup, eglSwapInterval
+   // might fail so let caller decide if this is an error.
+-  status = eglSwapInterval(display, enable ? 1 : 0);
+-  CheckError();
++  status = EGL_TRUE; // eglSwapInterval(display, enable ? 1 : 0);
++  // CheckError();
+   return status;
+ }
+ 
+-- 
+2.7.4
+

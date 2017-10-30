@@ -5,17 +5,14 @@
 
 . ../common.sh
 
-echo -e "Building package DVB firmware"
-
-FW_SCRIPT="https://www.kernel.org/doc/Documentation/dvb/get_dvb_firmware"
-
+REV="eeee911dbd53819578a40cf94655305f1979c232"
+echo -e "Building package dvb-firmware-osmc"
+out=$(pwd)/files
 make clean
-wget $FW_SCRIPT -O get_dvb_firmware
-chmod +x get_dvb_firmware
-install_patch "patches/" "all"
-
-./get_dvb_firmware
+echo Downloading firmware
+pull_source "https://github.com/osmc/dvb-firmware-osmc/archive/${REV}.tar.gz" "$(pwd)/src"
+if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
+echo Moving files in to place
 mkdir -p files/lib/firmware
-mv *.fw files/lib/firmware
-
+cp -ar src/dvb-firmware-osmc-${REV}/* files/lib/firmware
 dpkg_build files/ dvb-firmware-osmc.deb

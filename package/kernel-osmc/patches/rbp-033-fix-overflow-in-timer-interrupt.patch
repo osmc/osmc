@@ -1,0 +1,38 @@
+From 9ef8b23b94b98ec9b270e6fca5eadb97c96d809a Mon Sep 17 00:00:00 2001
+From: Matija Glavinic Pecotic <matija.glavinic-pecotic.ext@nokia.com>
+Date: Tue, 1 Aug 2017 09:11:52 +0200
+Subject: [PATCH] timers: Fix overflow in get_next_timer_interrupt
+
+commit 34f41c0316ed52b0b44542491d89278efdaa70e4 upstream.
+
+For e.g. HZ=100, timer being 430 jiffies in the future, and 32 bit
+unsigned int, there is an overflow on unsigned int right-hand side
+of the expression which results with wrong values being returned.
+
+Type cast the multiplier to 64bit to avoid that issue.
+
+Fixes: 46c8f0b077a8 ("timers: Fix get_next_timer_interrupt() computation")
+Signed-off-by: Matija Glavinic Pecotic <matija.glavinic-pecotic.ext@nokia.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
+Cc: khilman@baylibre.com
+Cc: akpm@linux-foundation.org
+Link: http://lkml.kernel.org/r/a7900f04-2a21-c9fd-67be-ab334d459ee5@nokia.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ kernel/time/timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index c611c47de8849..944ad64277a69 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1536,7 +1536,7 @@ u64 get_next_timer_interrupt(unsigned long basej, u64 basem)
+ 		base->is_idle = false;
+ 	} else {
+ 		if (!is_max_delta)
+-			expires = basem + (nextevt - basej) * TICK_NSEC;
++			expires = basem + (u64)(nextevt - basej) * TICK_NSEC;
+ 		/*
+ 		 * If we expect to sleep more than a tick, mark the base idle:
+ 		 */

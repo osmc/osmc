@@ -5,13 +5,6 @@
 
 . ../common.sh
 
-if [ "$1" == "trans" ]
-then
-    echo -e "Building transitional package"
-    dpkg_build files-trans ${1}-udisks-osmc.deb
-    exit 0
-fi
-
 VERSION="fe132af7f85fd03a353eec1ec5f8cd8f6a72e191"
 pull_source "https://github.com/osmc/udisks-osmc/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching udisks source" && exit 1; fi
@@ -46,7 +39,7 @@ then
 	echo "Package: ${1}-udisks-osmc" >> files/DEBIAN/control
 	pushd src/udisks-osmc-${VERSION}
     	install_patch "../../patches" "all"
-	./configure --prefix=/usr --enable-man-pages=no --with-systemdsystemunitdir=/lib/systemd/system --disable-dmmp --enable-lvm2 --libexecdir=/usr/lib/udisks
+	./configure --prefix=/usr --enable-man-pages=no --with-systemdsystemunitdir=/lib/systemd/system --disable-dmmp --enable-lvm2 --libexecdir=/usr/lib/udisks --sysconfdir=/etc
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi

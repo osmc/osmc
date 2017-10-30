@@ -34,7 +34,6 @@ then
 	handle_dep "libsystemd-daemon-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "gettext"
-	handle_dep "${1}-cmake-osmc"
 	handle_dep "wget"
 	handle_dep "libdvbcsa-dev"
 	mkdir -p files/etc/osmc/apps.d

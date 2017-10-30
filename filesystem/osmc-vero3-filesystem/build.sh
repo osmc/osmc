@@ -62,8 +62,7 @@ deb http://apt.osmc.tv $RLS main
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
-add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-verify_action
+add_apt_key_gpg "${DIR}" "http://apt.osmc.tv/osmc_repository.gpg" "osmc_repository.gpg"
 echo -e "Enabling support for Aarch64"
 chroot ${DIR} dpkg --add-architecture arm64
 verify_action

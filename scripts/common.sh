@@ -15,7 +15,8 @@ function check_platform()
 
 function verify_action()
 {
-	if [ $? != 0 ]; then echo -e "Exiting build" && exit 1; fi
+	code=$?
+	if [ $code != 0 ]; then echo -e "Exiting build with return code ${code}" && exit 1; fi
 }
 
 function enable_nw_chroot()
@@ -33,7 +34,15 @@ function add_apt_key()
 	echo -e "Adding apt key"
 	wget ${2} -O ${1}/tmp/key
 	chroot ${1} apt-key add /tmp/key
+	verify_action
 	rm ${1}/tmp/key > /dev/null 2>&1
+}
+
+function add_apt_key_gpg()
+{
+	echo -e "Adding apt key to trusted.gpg.d"
+	wget ${2} -O ${1}/etc/apt/trusted.gpg.d/${3}
+	verify_action
 }
 
 function emulate_arm()

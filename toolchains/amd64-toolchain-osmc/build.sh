@@ -59,8 +59,7 @@ deb http://apt.osmc.tv $RLS-devel main
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-add_apt_key "${DIR}" "http://apt.osmc.tv/apt.key"
-verify_action
+add_apt_key_gpg "${DIR}" "http://apt.osmc.tv/osmc_repository.gpg" "osmc_repository.gpg"
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action

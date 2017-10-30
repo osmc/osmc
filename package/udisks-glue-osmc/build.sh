@@ -5,13 +5,6 @@
 
 . ../common.sh
 
-if [ "$1" == "trans" ]
-then
-    echo -e "Building transitional package"
-    dpkg_build files-trans ${1}-udisks-glue-osmc.deb
-    exit 0
-fi
-
 VERSION="6b114c8ae066e20277dd8f95447d0083b9bc163f"
 pull_source "https://github.com/osmc/udisks-glue-osmc/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching udisks source" && exit 1; fi
@@ -33,7 +26,7 @@ then
 	echo "Package: ${1}-udisks-glue-osmc" >> files/DEBIAN/control
 	pushd src/udisks-glue-osmc-${VERSION}
 	./autogen.sh
-	./configure --prefix=/usr
+	./configure --prefix=/usr --sysconfdir=/etc
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi

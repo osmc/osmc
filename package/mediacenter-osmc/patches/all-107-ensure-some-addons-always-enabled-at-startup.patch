@@ -1,0 +1,35 @@
+From f7127f0f45209ebebffd64450bea48b32646b738 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 8 Oct 2017 18:38:32 +0100
+Subject: [PATCH] Ensure that some add-ons are always enabled at Kodi startup
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/AddonDatabase.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
+index f56fbc2..915515c 100644
+--- a/xbmc/addons/AddonDatabase.cpp
++++ b/xbmc/addons/AddonDatabase.cpp
+@@ -365,6 +365,17 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+           ORIGIN_SYSTEM, id.c_str()));
+     }
+ 
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'script.module.osmcsetting.%%'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.osmccommon'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.xmltodict'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.elementtree'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='service.osmc.settings'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='skin.osmc'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='service.osmc.BTPlayer'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.adaptive'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.rtmp'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'resource.language.%%'"));
++
+     CommitTransaction();
+   }
+   catch (...)
+-- 
+2.7.4
+
