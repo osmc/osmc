@@ -1,0 +1,16 @@
+From: afl1
+Date: 2017/10/10
+Subject: [PATCH] VideoPlayer: disable framerate calculating
+
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-10-10 11:43:26.070289000 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-10-10 14:40:25.212804912 +0200
+@@ -1017,7 +1017,7 @@
+     if (m_iFrameRateCount >= MathUtils::round_int(framerate) * m_iFrameRateLength)
+     {
+       //store the calculated framerate if it differs too much from m_fFrameRate
+-      if (fabs(m_fFrameRate - (m_fStableFrameRate / m_iFrameRateCount)) > MAXFRAMERATEDIFF || m_bFpsInvalid)
++      if (m_bFpsInvalid)
+       {
+         CLog::Log(LOGDEBUG,"%s framerate was:%f calculated:%f", __FUNCTION__, m_fFrameRate, m_fStableFrameRate / m_iFrameRateCount);
+         m_fFrameRate = m_fStableFrameRate / m_iFrameRateCount;
+--
