@@ -1,0 +1,342 @@
+diff --git a/xbmc/input/linux/LinuxInputDevices.cpp b/xbmc/input/linux/LinuxInputDevices.cpp
+index ef0d494..2141982
+--- a/xbmc/input/linux/LinuxInputDevices.cpp
++++ b/xbmc/input/linux/LinuxInputDevices.cpp
+@@ -92,6 +92,8 @@ typedef unsigned long kernel_ulong_t;
+ #include <stdio.h>
+ 
+ #include "guilib/GraphicContext.h"
++#include "guilib/WindowIDs.h"
++#include "guilib/GUIWindowManager.h"
+ #include "input/XBMC_keysym.h"
+ #include "LinuxInputDevices.h"
+ #include "input/MouseStat.h"
+@@ -112,6 +114,15 @@ typedef unsigned long kernel_ulong_t;
+ 
+ #define MAX_LINUX_INPUT_DEVICES 16
+ 
++// extra keymap table definitions
++#define K_ALTGRTAB  0x02 // aka K_ALTTAB in kd.h
++#define K_CTRLTAB   0x04
++#define K_ALTLTAB   0x08
++#define K_SHIFTLTAB 0x10
++#define K_SHIFTRTAB 0x20
++#define K_CTRLLTAB  0x40
++#define K_CTRLRTAB  0x80
++
+ typedef struct {
+   unsigned short Key;
+   XBMCKey xbmcKey;
+@@ -213,7 +224,7 @@ KeyMap keyMap[] = {
+   { KEY_RIGHTCTRL     , XBMCK_RCTRL       },
+   { KEY_KPSLASH       , XBMCK_KP_DIVIDE   },
+   { KEY_SYSRQ         , XBMCK_PRINT       },
+-  { KEY_RIGHTALT      , XBMCK_MODE        },
++  { KEY_RIGHTALT      , XBMCK_RALT        },
+   { KEY_HOME          , XBMCK_HOME        },
+   { KEY_UP            , XBMCK_UP          },
+   { KEY_PAGEUP        , XBMCK_PAGEUP      },
+@@ -311,6 +322,7 @@ CLinuxInputDevice::CLinuxInputDevice(const std::string& fileName, int index):
+   m_deviceIndex = index;
+   m_keyMods = XBMCKMOD_NONE;
+   m_lastKeyMods = XBMCKMOD_NONE;
++  m_kbMods = XBMCKMOD_NONE;
+   strcpy(m_deviceName, "");
+   m_deviceType = 0;
+   m_devicePreferredId = 0;
+@@ -349,7 +361,7 @@ XBMCKey CLinuxInputDevice::TranslateKey(unsigned short code)
+ int CLinuxInputDevice::KeyboardGetSymbol(unsigned short value)
+ {
+   unsigned char type = KTYP(value);
+-  unsigned char index = KVAL(value);
++  unsigned short index = KVAL(value);
+ 
+   switch (type)
+   {
+@@ -366,7 +378,7 @@ int CLinuxInputDevice::KeyboardGetSymbol(unsigned short value)
+     case 0x7f:
+       return XBMCK_BACKSPACE;
+     case 0xa4:
+-      return XBMCK_EURO; /* euro currency sign */
++      return 0x20ac; /* euro currency sign */
+     default:
+       return index;
+     }
+@@ -404,6 +416,16 @@ int CLinuxInputDevice::KeyboardGetSymbol(unsigned short value)
+       return (DFBInputDeviceKeySymbol) (DIKS_0 + index);
+     break;
+ */
++  case KT_LOCK:
++  case KT_SPEC:
++    return value; // send the whole thing back
++    break;
++
++  default:
++    // ignore all other types and pass through unicode
++    if (type > 14)
++      return value;
++
+   }
+ 
+   return XBMCK_UNKNOWN;
+@@ -438,6 +460,7 @@ XBMCMod CLinuxInputDevice::UpdateModifiers(XBMC_Event& devt)
+     case XBMCK_RCTRL: modifier = XBMCKMOD_RCTRL; break;
+     case XBMCK_LALT: modifier = XBMCKMOD_LALT; break;
+     case XBMCK_RALT: modifier = XBMCKMOD_RALT; break;
++// kodi doesn't use these ('Windows keys') afaict
+     case XBMCK_LMETA: modifier = XBMCKMOD_LMETA; break;
+     case XBMCK_RMETA: modifier = XBMCKMOD_RMETA; break;
+     default: break;
+@@ -474,7 +497,48 @@ XBMCMod CLinuxInputDevice::UpdateModifiers(XBMC_Event& devt)
+ 
+   return (XBMCMod) m_keyMods;
+ }
++/* lock modifiers which some keymaps use to toggle different charsets
++ */
+ 
++XBMCMod CLinuxInputDevice::UpdateKeyboardModifiers(int index)
++{
++  int modifier = XBMCKMOD_NONE;
++  switch (KVAL(index))
++  {
++    case KG_ALTGR:
++      modifier = XBMCKMOD_RALT;
++      break;
++      // keyboards should never lock Ctrl or Alt
++      /*      case KG_CTRL:
++              modifier =  XBMCKMOD_LCTRL & XBMCKMOD_RCTRL;
++              break;
++              case KG_ALT:
++              modifier =  XBMCKMOD_LALT;
++              break;
++              */
++    case KG_CTRLL:
++      modifier = XBMCKMOD_LCTRL;
++      break;
++    case KG_CTRLR:
++      modifier = XBMCKMOD_RCTRL;
++      break;
++    case KG_CAPSSHIFT:
++      modifier = XBMCKMOD_CAPS;
++      break;
++    default: break;
++  }
++  CLog::Log(LOGDEBUG, "CLinuxInputDevice::UpdateKeyboardModifiers modifier 0x%04x mkeymods 0x%04x", modifier, m_kbMods);
++  if (m_kbMods & modifier)
++  {
++    m_kbMods = 0;
++  }
++  else
++  {
++    m_kbMods = modifier;
++  }
++
++  return (XBMCMod) m_kbMods;
++}
+ /*
+  * Translates key and button events.
+  */
+@@ -535,41 +599,102 @@ bool CLinuxInputDevice::KeyEvent(const struct input_event& levt, XBMC_Event& dev
+   }
+   else
+   {
++    // translate the raw scancode into the XBMC equivalent
+     XBMCKey key = TranslateKey(code);
++    CLog::Log(LOGDEBUG, "-------------Keyboard keyevent----------------");
++    CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: TranslateKey with event type 0x%04x, code 0x%04x, value 0x%04x returned XBMCKey = 0x%04x", (int) levt.type, code, (int) levt.value, (int) key);
+ 
+     if (key == XBMCK_UNKNOWN)
+     {
+       CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: TranslateKey returned XBMCK_UNKNOWN from code(%d)", code);
+       return false;
+     }
++    // are we in a keyboard screen?
++    int iWin = g_windowManager.GetActiveWindowID();
++    bool useKeyboard = (iWin == WINDOW_DIALOG_KEYBOARD || iWin == WINDOW_DIALOG_NUMERIC);
+ 
++    // reset the kb modifiers
++    if ( ! useKeyboard ) m_kbMods = 0;
++    
+     devt.type = levt.value ? XBMC_KEYDOWN : XBMC_KEYUP;
+     devt.key.type = devt.type;
+     // warning, key.keysym.scancode is unsigned char so 0 - 255 only
+     devt.key.keysym.scancode = code;
+     devt.key.keysym.sym = key;
+-    devt.key.keysym.mod = UpdateModifiers(devt);
+     devt.key.keysym.unicode = 0;
+ 
+-    KeymapEntry entry;
+-    entry.code = code;
+-    if (GetKeymapEntry(entry))
++    unsigned short keyMapTable = K_NORMTAB;
++
++    if (m_keyMods & (XBMCKMOD_SHIFT | XBMCKMOD_CAPS)) keyMapTable = keyMapTable|K_SHIFTTAB;
++    if (m_keyMods & XBMCKMOD_ALT) keyMapTable = keyMapTable|K_ALTTAB; // set by the left alt key only
++    //if (allMods & XBMCKMOD_META) keyMapTable = keyMapTable|K_ALTSHIFTTAB; // the windows keys
++    // XBMCKMOD_META is in the kodi master branch but why use windows keys as modifiers?
++    if (m_keyMods & XBMCKMOD_CTRL) keyMapTable = keyMapTable|K_CTRLTAB;
++    if (useKeyboard)
+     {
+-      int keyMapValue;
+-      if (devt.key.keysym.mod & (XBMCKMOD_SHIFT | XBMCKMOD_CAPS)) keyMapValue = entry.shift;
+-      else if (devt.key.keysym.mod & XBMCKMOD_ALT) keyMapValue = entry.alt;
+-      else if (devt.key.keysym.mod & XBMCKMOD_META) keyMapValue = entry.altShift;
+-      else keyMapValue = entry.base;
++      if (m_kbMods & XBMCKMOD_RALT) keyMapTable = keyMapTable|K_ALTTAB;
++      if (m_kbMods & XBMCKMOD_LALT) keyMapTable = keyMapTable|K_ALTLTAB; 
++      if (m_kbMods & XBMCKMOD_LSHIFT) keyMapTable = keyMapTable|K_SHIFTLTAB;
++      if (m_kbMods & XBMCKMOD_RSHIFT) keyMapTable = keyMapTable|K_SHIFTRTAB;
++      if (m_kbMods & XBMCKMOD_LCTRL) keyMapTable = keyMapTable|K_CTRLLTAB;
++      if (m_kbMods & XBMCKMOD_RCTRL) keyMapTable = keyMapTable|K_CTRLRTAB;
++    }
++
++    CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: keyMods 0x%04x kbMods 0x%04x keyMapTable 0x%04x", m_keyMods, m_kbMods, keyMapTable);
++
++    unsigned short keyMapValue = GetKeymapEntry(keyMapTable, code);
+ 
+-      if (keyMapValue != XBMCK_UNKNOWN)
++    /* the return value should be either a usable ascii code (< 256), a unicode value > 256
++     *  or a linux keyboard message which needs interpretation
++     *  */
++    //CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: keymapvalue 0x%04x returned from linux keymap", keyMapValue);
++
++    if (useKeyboard) // && keyMapValue > XBMCK_UNKNOWN)
++    {
++      // if there is an error, re set the kbMods (probably changed soft layouts)
++      if ( keyMapValue == K_HOLE || keyMapValue == K_NOSUCHMAP)
++        m_kbMods = 0;
++      
++      // check if the shift state has changed and prefer this to kodi's interpretation
++      if (KTYP(keyMapValue) == KT_LOCK  && devt.key.type == XBMC_KEYDOWN 
++          && (! (keyMapTable & K_SHIFTTAB) || m_keyMods & XBMCKMOD_SHIFT)) // eg shift-alt but not shiftlock-alt
+       {
+-        devt.key.keysym.sym = (XBMCKey) keyMapValue;
+-        if (keyMapValue > 0 && keyMapValue < 127)
++        m_kbMods = UpdateKeyboardModifiers(keyMapValue);
++        devt.key.keysym.sym = XBMCK_UNKNOWN; //NFA
++        CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: kb modifier changed to 0x%04x and keyMods is 0x%04x", m_kbMods, m_keyMods);
++      }
++
++      else
++      {
++        devt.key.keysym.mod = UpdateModifiers(devt);
++        if (keyMapValue & 0x8000) // assume unicode (utf-16)
++        {
++          devt.key.keysym.unicode = keyMapValue ^ 0xf000;
++          // if we have unicode, use it and stop kodi using sym
++          devt.key.keysym.sym = XBMCK_UNKNOWN;
++          CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: using 0x%04x as unicode", keyMapValue);
++        }
++        // use the extended character set but only if an 'ascii' key was pressed
++        else if (keyMapValue < 256 && keyMapValue > 0x1f && devt.key.keysym.sym < 128)
+         {
++          devt.key.keysym.sym = (XBMCKey) keyMapValue;
+           devt.key.keysym.unicode = devt.key.keysym.sym;
++          CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: using 0x%04x as assumed unicode", keyMapValue);
+         }
+       }
+     }
++    else
++    // apply key layout but ony for 'ascii' keys
++    {
++      devt.key.keysym.mod = UpdateModifiers(devt);
++
++      if (keyMapValue < 128 && keyMapValue > 0x20 && devt.key.keysym.sym < 128)
++      {
++        devt.key.keysym.sym = (XBMCKey) keyMapValue;
++        devt.key.keysym.unicode = devt.key.keysym.sym;
++        CLog::Log(LOGDEBUG, "CLinuxInputDevice::KeyEvent: using 0x%04x as ascii", keyMapValue);
++      }
++    }
+   }
+ 
+   return true;
+@@ -1382,13 +1507,11 @@ driver_open_device_error:
+ }
+ 
+ /*
+- * Fetch one entry from the kernel keymap.
++ * Fetch just one entry from the kernel keymap.
+  */
+-bool CLinuxInputDevice::GetKeymapEntry(KeymapEntry& entry)
++unsigned short CLinuxInputDevice::GetKeymapEntry(unsigned short table, int code)
+ {
+-  int code = entry.code;
+-  unsigned short value;
+-  //DFBInputDeviceKeyIdentifier identifier;
++  unsigned short value, rawvalue;
+ 
+   if (m_vt_fd < 0)
+     return false;
+@@ -1399,43 +1522,20 @@ bool CLinuxInputDevice::GetKeymapEntry(KeymapEntry& entry)
+     code = K(KTYP(code),53);
+   }
+ 
+-  /* fetch the base level */
+-  value = KeyboardGetSymbol(KeyboardReadValue(K_NORMTAB, code));
+-  //printf("base=%d typ=%d code %d\n", KVAL(value), KTYP(value), code);
+-
+-  /* write base level symbol to entry */
+-  entry.base = value; //KeyboardGetSymbol(code, value, LI_KEYLEVEL_BASE);
+-
+-  /* fetch the shifted base level */
+-  value = KeyboardGetSymbol(KeyboardReadValue(K_SHIFTTAB, entry.code));
+-  //printf("shift=%d\n", value);
+-
+-  /* write shifted base level symbol to entry */
+-  entry.shift = value; //KeyboardGetSymbol(code, value, LI_KEYLEVEL_SHIFT);
++  value = KeyboardReadValue(table, code);
++    CLog::Log(LOGDEBUG, "CLinuxInputDevice::GetKeymapEntry table 0x%04x code 0x%04x value returned by KeyboardReadValue 0x%04x\n", table, code, value);
++  value = KeyboardGetSymbol(value);
++    CLog::Log(LOGDEBUG, "CLinuxInputDevice::GetKeymapEntry values after KeyboardGetSymbol ktyp=0x%02x kval=0x%02x\n", KTYP(value), KVAL(value));
+ 
+   // to support '+'  and '/' with Boxee's remote control we could do ugly something like this for now
+   if (KVAL(code) == 78)
+   {
+     //code = K(KTYP(code),13);
+     //entry.code = K(KTYP(code),13);
+-    entry.base = K(KTYP(code),43);
++    value = K(KTYP(code),43);
+   }
+ 
+-  /* fetch the alternative level */
+-  value = KeyboardGetSymbol(KeyboardReadValue(K_ALTTAB, entry.code));
+-  //printf("alt=%d\n", value);
+-
+-  /* write alternative level symbol to entry */
+-  entry.alt = value; //KeyboardGetSymbol(code, value, LI_KEYLEVEL_ALT);
+-
+-  /* fetch the shifted alternative level */
+-  value = KeyboardGetSymbol(KeyboardReadValue(K_ALTSHIFTTAB, entry.code));
+-  //printf("altshift=%d\n", value);
+-
+-  /* write shifted alternative level symbol to entry */
+-  entry.altShift = value; //KeyboardGetSymbol(code, value, LI_KEYLEVEL_ALT_SHIFT);
+-
+-  return true;
++  return value;
+ }
+ 
+ /*
+diff --git a/xbmc/input/linux/LinuxInputDevices.h b/xbmc/input/linux/LinuxInputDevices.h
+index 44a05fe..06fe09e 100644
+--- a/xbmc/input/linux/LinuxInputDevices.h
++++ b/xbmc/input/linux/LinuxInputDevices.h
+@@ -61,7 +61,9 @@ private:
+   void Close();
+   unsigned short KeyboardReadValue(unsigned char table, unsigned char index);
+   XBMCMod UpdateModifiers(XBMC_Event& devt);
++  XBMCMod UpdateKeyboardModifiers(int index);
+   bool GetKeymapEntry(KeymapEntry& entry);
++  unsigned short GetKeymapEntry(unsigned short table, int code);
+   int KeyboardGetSymbol(unsigned short value);
+   bool mtAbsEvent(const struct input_event& levt);
+   bool mtSynEvent(const struct input_event& levt);
+@@ -76,6 +78,7 @@ private:
+   int m_deviceIndex;
+   int m_keyMods;
+   int m_lastKeyMods;
++  int m_kbMods;
+   char m_deviceName[256];
+   int m_deviceType;
+   int m_devicePreferredId;

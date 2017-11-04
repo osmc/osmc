@@ -1,0 +1,91 @@
+From: afl1
+Date: 2017/10/05
+Subject: [PATCH] VideoPlayer: chapter seek fix
+
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -2619,6 +2641,7 @@ void CVideoPlayer::HandleMessages()
+       {
+         FlushBuffers(start, true, true);
+         offset = DVD_TIME_TO_MSEC(start) - beforeSeek;
++        CLog::Log(LOGDEBUG, "VideoPlayer: SeekChapter:%d beforeSeek:%0.3f start:%0.3f",  msg.GetChapter(), beforeSeek / 1000.0, start / 1000000.0); 
+         m_callback.OnPlayBackSeekChapter(msg.GetChapter());
+       }
+ 
+@@ -2692,12 +2692,14 @@
+             mode.accurate = true;
+             mode.trickplay = true;
+             mode.sync = true;
++            CLog::Log(LOGDEBUG, "VideoPlayer: Videostream seek: %d", mode.time); 
+             m_messenger.Put(new CDVDMsgPlayerSeek(mode));
+           }
+         }
+         else
+         {
+           CloseStream(m_CurrentVideo, false);
++          CLog::Log(LOGDEBUG, "VideoPlayer: Reopen Videostream: %d id:%d", st.demuxerId, st.id); 
+           OpenStream(m_CurrentVideo, st.demuxerId, st.id, st.source);
+           CDVDMsgPlayerSeek::CMode mode;
+           mode.time = (int)GetTime();
+@@ -2705,6 +2707,7 @@
+           mode.accurate = true;
+           mode.trickplay = true;
+           mode.sync = true;
++          CLog::Log(LOGDEBUG, "VideoPlayer: Videostream seek: %d", mode.time); 
+           m_messenger.Put(new CDVDMsgPlayerSeek(mode));
+         }
+       }
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp	2017-08-22 23:43:15.624322029 +0200
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp	2017-08-23 08:52:34.490227481 +0200
+@@ -1118,6 +1118,7 @@
+   if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE && !ismp3)
+     seek_pts += m_pFormatContext->start_time;
+ 
++  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seek pts:%0.4f start_time:%lld", __FUNCTION__, (double)seek_pts/AV_TIME_BASE, m_pFormatContext->start_time);
+   int ret;
+   {
+     CSingleLock lock(m_critSection);
+@@ -1146,11 +1146,28 @@
+   if(m_currentPts == DVD_NOPTS_VALUE)
+     CLog::Log(LOGDEBUG, "%s - unknown position after seek", __FUNCTION__);
+   else
+-    CLog::Log(LOGDEBUG, "%s - seek ended up on time %d", __FUNCTION__, (int)(m_currentPts / DVD_TIME_BASE * 1000));
+-
++  {
++    CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seek ended up on time %0.3fs", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
++    double diff = (double)seek_pts/AV_TIME_BASE - m_currentPts / DVD_TIME_BASE;
++    if (diff > 1.0)
++    {
++      ret = av_seek_frame(m_pFormatContext, -1, seek_pts + (int)(diff *  AV_TIME_BASE / 2), backwards ? AVSEEK_FLAG_BACKWARD : 0);
++      if (ret >= 0)
++        UpdateCurrentPTS();
++      CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - 2.seek ended up on time %0.3fs", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
++      double diff1 = (double)seek_pts/AV_TIME_BASE - m_currentPts / DVD_TIME_BASE;
++      if (diff1 > 1.0)
++      {
++        ret = av_seek_frame(m_pFormatContext, -1, seek_pts + (int)((diff + diff1) *  AV_TIME_BASE / 2), backwards ? AVSEEK_FLAG_BACKWARD : 0);
++        if (ret >= 0)
++          UpdateCurrentPTS();
++        CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - 3.seek ended up on time %0.3fs", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
++      }  
++    }  
++  }
+   // in this case the start time is requested time
+   if (startpts)
+-    *startpts = DVD_MSEC_TO_TIME(time);
++    *startpts = DVD_MSEC_TO_TIME(m_currentPts/1000);
+
+  if (ret >= 0)
+  {
+@@ -1717,7 +1717,9 @@
+ 
+   AVChapter *ch = m_pFormatContext->chapters[chapter-1];
+   double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
+-  return SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  bool rtn = SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seeking chapter:%d start:%0.3f startpts:%0.3f ", __FUNCTION__, chapter, (double)ch->start * ch->time_base.num  / ch->time_base.den, DVD_TIME_TO_MSEC(*startpts) / 1000.0);
++  return rtn;
+ }
+ 
+ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+--

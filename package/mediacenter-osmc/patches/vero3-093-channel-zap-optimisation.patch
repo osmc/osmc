@@ -1,0 +1,90 @@
+From: afl1
+Date: 2017/10/5
+Subject: [PATCH] VideoPlayer: channel zapping optimalization
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index ce0f01a..1adf29d 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1895,5 +1895,6 @@ void CVideoPlayer::HandlePlaySpeed()
+ 
+   if (m_caching == CACHESTATE_INIT)
+   {
++//    m_clock.Discontinuity(DVD_MSEC_TO_TIME(-300));
+     // if all enabled streams have been inited we are done
+     if ((m_CurrentVideo.id >= 0 || m_CurrentAudio.id >= 0) &&
+@@ -1963,15 +1963,17 @@ void CVideoPlayer::HandlePlaySpeed()
+       // care for live streams
+       else if (m_pInputStream->IsRealtime())
+       {
+-        if (m_CurrentAudio.id >= 0)
++        if (m_CurrentAudio.id >= 0 && m_clock.GetClock() > DVD_MSEC_TO_TIME(1000))
+         {
+           double adjust = -1.0; // a unique value
+-          if (m_clock.GetSpeedAdjust() >= 0 && m_VideoPlayerAudio->GetLevel() < 5)
+-            adjust = -0.05;
+-
+-          if (m_clock.GetSpeedAdjust() < 0 && m_VideoPlayerAudio->GetLevel() > 10)
++          if (m_clock.GetSpeedAdjust() >= 0 && m_VideoPlayerAudio->GetLevel() < 1) {
++            CLog::Log(LOGDEBUG, "VideoPlayer:Speed adjust:-0.05 aq:%d", m_VideoPlayerAudio->GetLevel());  
++             adjust = -0.05;
++          }
++          if (m_clock.GetSpeedAdjust() < 0 && m_VideoPlayerAudio->GetLevel() > 4) {
++            CLog::Log(LOGDEBUG, "VideoPlayer:Speed adjust:0.0 aq:%d", m_VideoPlayerAudio->GetLevel());  
+             adjust = 0.0;
+-
++          }
+           if (adjust != -1.0)
+           {
+             m_clock.SetSpeedAdjust(adjust);
+@@ -2008,11 +2027,11 @@ void CVideoPlayer::HandlePlaySpeed()
+     {
+       double clock = 0;
+       if (m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
+-        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Audio - pts: %f, cache: %f, totalcache: %f",
+-                             m_CurrentAudio.starttime, m_CurrentAudio.cachetime, m_CurrentAudio.cachetotal);
++        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Audio - pts: %0.3f, cache: %0.3f, totalcache: %0.3f, packets:%d",
++                             m_CurrentAudio.starttime/1000, m_CurrentAudio.cachetime/1000, m_CurrentAudio.cachetotal/1000, m_CurrentAudio.packets);
+       if (m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
+-        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Video - pts: %f, cache: %f, totalcache: %f",
+-                             m_CurrentVideo.starttime, m_CurrentVideo.cachetime, m_CurrentVideo.cachetotal);
++        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Video - pts: %0.3f, cache: %0.3f, totalcache: %0.3f, packets:%d",
++                             m_CurrentVideo.starttime/1000, m_CurrentVideo.cachetime/1000, m_CurrentVideo.cachetotal/1000, m_CurrentVideo.packets);
+ 
+       if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && m_CurrentVideo.packets > 0 &&
+           m_playSpeed == DVD_PLAYSPEED_PAUSE)
+@@ -2028,9 +2047,9 @@ void CVideoPlayer::HandlePlaySpeed()
+       else if (m_CurrentAudio.starttime != DVD_NOPTS_VALUE && m_CurrentAudio.packets > 0)
+       {
+         if (m_pInputStream->IsRealtime())
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(400);
++          clock = m_CurrentAudio.starttime - DVD_MSEC_TO_TIME(200); //- m_CurrentAudio.cachetime + 14000.0 * static_cast<double>(static_cast<int>(m_CurrentAudio.packets) - 60);
+         else
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
++          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime - DVD_MSEC_TO_TIME(750);
+         if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE &&
+             (m_CurrentVideo.packets > 0) &&
+             m_CurrentVideo.starttime - m_CurrentVideo.cachetotal < clock)
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+index 38428e2..4279440 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -293,12 +293,14 @@ void CVideoPlayerAudio::Process()
+         // while AE sync is active, we still have time to fill buffers
+         if (m_syncTimer.IsTimePast())
+         {
+-          CLog::Log(LOGNOTICE, "CVideoPlayerAudio::Process - stream stalled");
++          CLog::Log(LOGNOTICE, "CVideoPlayerAudio::Process - stream stalled timeout:%d initialTimeout:%d startTime:%d MillisLeft:%d", timeout, m_syncTimer.GetInitialTimeoutValue(), m_syncTimer.GetStartTime(), m_syncTimer.MillisLeft());
+           m_stalled = true;
+         }
+       }
+-      if (timeout == 0)
+-        Sleep(10);
++      if (timeout == 0) {
++        CLog::Log(LOGNOTICE, "CVideoPlayerAudio::Process - sleep 0.05 sec");
++        usleep(50000);
++      }
+       continue;
+     }
+ 
+--
