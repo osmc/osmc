@@ -31,7 +31,7 @@ then
 	handle_dep "libdvbv5-0"
 	handle_dep "bzip2"
 	handle_dep "gzip"
-	handle_dep "libsystemd-daemon-dev"
+	handle_dep "libsystemd-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "gettext"
 	handle_dep "wget"
