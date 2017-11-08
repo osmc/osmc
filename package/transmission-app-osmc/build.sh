@@ -28,7 +28,7 @@ then
 	handle_dep "libglib2.0-dev"
 	handle_dep "libevent-dev"
 	handle_dep "libminiupnpc-dev"
-	handle_dep "libsystemd-daemon-dev"
+	handle_dep "libsystemd-dev"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-transmission-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-transmission-app-osmc"
     echo -e "Transmission Client\ntransmission.service" > $APP_FILE
