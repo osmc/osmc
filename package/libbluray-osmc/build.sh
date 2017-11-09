@@ -30,7 +30,7 @@ then
 	handle_dep "libfreetype6-dev"
 	handle_dep "libxml2-dev"
 	handle_dep "liblzma-dev"
-	handle_dep "libpng12-dev"
+	handle_dep "libpng-dev"
 	handle_dep "libfontconfig1-dev"
 	handle_dep "pkg-config"
 	handle_dep "autoconf"
