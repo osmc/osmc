@@ -1,0 +1,26 @@
+From 985bf484ffd34246c508dbeac0a1a8172872e1ef Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 Nov 2017 04:56:49 +0000
+Subject: [PATCH] Fix libsystemd support for Debian Stretch
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 1004b79..5bca43c 100755
+--- a/configure
++++ b/configure
+@@ -674,7 +674,7 @@ fi
+ # systemd
+ #
+ if enabled_or_auto libsystemd_daemon; then
+-  if check_pkg libsystemd-daemon; then
++  if check_pkg libsystemd-daemon || check_pkg libsystemd; then
+     enable libsystemd_daemon
+   elif enabled libsystemd_daemon; then
+     die "libsystemd-daemon development support not found (use --disable-systemd_daemon)"
+-- 
+2.7.4
+
