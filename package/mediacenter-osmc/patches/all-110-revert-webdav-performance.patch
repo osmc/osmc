@@ -1,0 +1,37 @@
+From 553905a67844021240e9ab02fd38fbfed0d87e4a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 17 Nov 2017 02:49:01 +0000
+Subject: [PATCH] WebDAV: revert patch which causes performance regressions
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/video/VideoInfoScanner.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/video/VideoInfoScanner.cpp b/xbmc/video/VideoInfoScanner.cpp
+index fb0f2a3..eccedf4 100644
+--- a/xbmc/video/VideoInfoScanner.cpp
++++ b/xbmc/video/VideoInfoScanner.cpp
+@@ -429,8 +429,8 @@ namespace VIDEO
+         continue;
+ 
+       // Discard all exclude files defined by regExExclude
+-      if (IsExcluded(pItem->GetPath(), (content == CONTENT_TVSHOWS) ? g_advancedSettings.m_tvshowExcludeFromScanRegExps
+-                                                                    : g_advancedSettings.m_moviesExcludeFromScanRegExps))
++      if (CUtil::ExcludeFileOrFolder(pItem->GetPath(), (content == CONTENT_TVSHOWS) ? g_advancedSettings.m_tvshowExcludeFromScanRegExps
++                                                                                    : g_advancedSettings.m_moviesExcludeFromScanRegExps))
+         continue;
+ 
+       if (info2->Content() == CONTENT_MOVIES || info2->Content() == CONTENT_MUSICVIDEOS)
+@@ -881,7 +881,7 @@ namespace VIDEO
+         continue;
+ 
+       // Discard all exclude files defined by regExExcludes
+-      if (IsExcluded(items[i]->GetPath(), regexps))
++      if (CUtil::ExcludeFileOrFolder(items[i]->GetPath(), regexps))
+         continue;
+ 
+       /*
+-- 
+2.7.4
+
