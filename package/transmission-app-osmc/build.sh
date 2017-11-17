@@ -33,6 +33,9 @@ then
 	echo "Package: ${1}-transmission-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-transmission-app-osmc"
     echo -e "Transmission Client\ntransmission.service" > $APP_FILE
     pushd src/transmission*
+    install_patch "../../patches" "all"
+    rm m4/glib-gettext.m4 # Fix m4_copy error
+    autoreconf -vif .
     ./configure --prefix=/usr --without-inotify --without-gtk --with-systemd-daemon --enable-lightweight CFLAGS="-O3 -fomit-frame-pointer"
     $BUILD
     make install DESTDIR=${out}
