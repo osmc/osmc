@@ -171,7 +171,6 @@ then
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
 	export ARCH
-	export CFLAGS+="-Wno-error"
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 		then
 		# Build RTL8812AU module
