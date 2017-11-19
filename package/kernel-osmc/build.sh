@@ -31,14 +31,14 @@ then
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/61e46c27242dc51d377888ff16688dbe72bd8529.tar.gz"; fi
-if [ $1 == "vero364" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
 then
 	. initramfs-src/VERSIONS
-	pull_source "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
-	pull_source "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
+	pull_source "https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
+	pull_source "https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
         if [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 	then
 	    pull_source "https://mirrors.kernel.org/sourceware/lvm2/LVM2.${LVM_VERSION}.tgz" "$(pwd)/initramfs-src/lvm2"
