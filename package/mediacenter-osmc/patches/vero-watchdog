@@ -35,6 +35,7 @@ case $CODE in
 	exit 0
 	;;
 5)
+	if [ -e /dist_upgrade_wanted ]; then apt-get clean; fi
 	rm /dist_upgrade_wanted
 	vres=$(/bin/fbset | grep geometry | awk '{print $3}')
 	if ((vres<=660))
