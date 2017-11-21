@@ -19,9 +19,9 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
         sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-splash-osmc" >> files/DEBIAN/control
-	echo "Depends: fbset, libpng12-0" >> files/DEBIAN/control
+	echo "Depends: fbset, libpng16-16" >> files/DEBIAN/control
 	update_sources
-	handle_dep "libpng12-dev"
+	handle_dep "libpng-dev"
 	pushd src/ply-lite*
 	$BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
