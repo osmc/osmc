@@ -90,6 +90,7 @@ then
 	handle_dep "git"
 	handle_dep "uuid-dev"
 	handle_dep "libcrossguid-dev"
+	handle_dep "cmake"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
@@ -107,7 +108,6 @@ then
 		handle_dep "armv6l-libplatform-dev-osmc"
 		handle_dep "armv6l-libbluray-dev-osmc"
 		handle_dep "armv6l-libsqlite-dev-osmc"
-		handle_dep "armv6l-cmake-osmc"
 		handle_dep "armv6l-libass-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
@@ -119,7 +119,6 @@ then
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "vero" ]
@@ -131,7 +130,6 @@ then
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
 	fi
         if [ "$1" == "vero2" ]
@@ -145,7 +143,6 @@ then
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
         fi
 	if [ "$1" == "vero3" ]
@@ -159,7 +156,6 @@ then
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-                handle_dep "armv7-cmake-osmc"
                 handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
@@ -176,7 +172,6 @@ then
 		handle_dep "libxrandr-dev"
 		handle_dep "libegl1-mesa-dev"
 		handle_dep "libglew-dev"
-		handle_dep "i386-cmake-osmc"
 		handle_dep "i386-libass-dev-osmc"
 	fi
 	if [ "$1" == "pc" ]
@@ -192,7 +187,6 @@ then
 		handle_dep "x11proto-randr-dev"
 		handle_dep "libegl1-mesa-dev"
 		handle_dep "libglew-dev"
-		handle_dep "amd64-cmake-osmc"
 		handle_dep "amd64-libass-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
