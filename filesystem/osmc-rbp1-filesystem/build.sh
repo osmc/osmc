@@ -27,7 +27,7 @@ done
 # Configure the target directory
 ARCH="armhf"
 DIR="$filestub/"
-RLS="jessie"
+RLS="stretch"
 URL="http://mirrordirector.raspbian.org/raspbian"
 
 # Remove existing build
