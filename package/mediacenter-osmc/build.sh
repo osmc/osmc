@@ -379,7 +379,8 @@ then
 	mkdir build
 	cd build
         ADDONS_ADSP="adsp.basic adsp.biquad.filters adsp.freesurround" # These are all broken
-        ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.sidplay audiodecoder.snesapu"
+        #ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.sidplay audiodecoder.snesapu"
+	ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.snesapu"
         ADDONS_AUDIO_ENCODERS="audioencoder.flac audioencoder.lame audioencoder.vorbis audioencoder.wav"
         ADDONS_INPUTSTREAM="inputstream.mpd inputstream.adaptive inputstream.rtmp"
         ADDONS_PERIPHERAL="peripheral.joystick"
