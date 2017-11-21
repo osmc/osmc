@@ -10,13 +10,13 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.9.29" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.9.29" && REV="10" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero && VERSION="4.4.0" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.105" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
-test $1 == atv && VERSION="4.2.3" && REV="25" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
-test $1 == pc && VERSION="4.2.3" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="42" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.9.29" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.9.29" && REV="11" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero && VERSION="4.4.0" && REV="14" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero2 && VERSION="3.10.105" && REV="5" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
+test $1 == atv && VERSION="4.2.3" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
+test $1 == pc && VERSION="4.2.3" && REV="14" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="43" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
