@@ -27,8 +27,8 @@ then
 	fi
 	if [ "$1" == "rbp2" ]
 	then
-	    cp -ar libarmmem-a7.so $out/usr/lib/libarmmem.so
-	    cp -ar libarmmem-a7.a $out/usr/lib/libarmmem.a
+	    cp -ar libarmmem.so $out/usr/lib/libarmmem.so
+	    cp -ar libarmmem.a $out/usr/lib/libarmmem.a
 	fi
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
