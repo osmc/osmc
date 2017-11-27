@@ -19,8 +19,7 @@ archlist = [ 'binary-amd64', 'binary-armhf', 'binary-arm64' ]
 for arch in archlist:
 
 	staging = urllib.urlopen('http://apt.osmc.tv/dists/' + repo + '-devel/main/' + arch + '/Packages').read()
-	release = urllib.urlopen('http://apt.osmc.tv/dists/' + repo + ' /main/' + arch + '/Packages').read()
-
+	release = urllib.urlopen('http://apt.osmc.tv/dists/' + repo + '/main/' + arch + '/Packages').read()
 	staging_packages = staging.split('\n\n')
 	release_packages = release.split('\n\n')
 
