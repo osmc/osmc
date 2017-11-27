@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/osmc/eventlircd/archive/36bf969f5a18d57a7792d1fb5d1f9acc5929ad2e.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/osmc/eventlircd/archive/73b184e7d2cf29bf1a50d33cdc0cac1194cc68ed.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching eventlircd source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "eventlircd-osmc"
