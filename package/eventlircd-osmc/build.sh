@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/osmc/eventlircd/archive/c5fef763a915f1476864d3c94f216e6634009429.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/osmc/eventlircd/archive/2f8353ecffbe05983553bca55bd0b230c7283afa.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching eventlircd source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "eventlircd-osmc"
@@ -27,7 +27,7 @@ then
 	echo "Depends: ${1}-lirc-osmc, udev" >> files/DEBIAN/control
 	pushd src/eventlircd*
 	sed -i 's/\s\-Werror//' configure.ac # Disable warnings being errors
-	autoreconf -i
+	autoreconf -vif
 	./configure --prefix=/usr --sysconfdir=/etc --with-lircd-socket=/run/lirc/lircd --with-evmap-dir=/etc/eventlircd.d --with-udev-dir=/lib/udev
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
