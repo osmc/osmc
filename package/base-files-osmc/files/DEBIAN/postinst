@@ -13,24 +13,26 @@ dist_upgrade_migrate ()
 	SRCSFILE="/etc/apt/sources.list"
 	# Fix legacy issue in October 2015 builds
 	sed 's/http:\/\/staging.apt.osmc.tv/http:\/\/apt.osmc.tv/g' -i $SRCSFILE
+	# Remove gmc test build repo with unsigned packages to avoid migration issue
+	sed '/^deb http:\/\/download.osmc.tv\/dev\/gmc-18.*$/d' -i $SRCSFILE
 	# Update APT sources.list
 	sed 's/jessie main/stretch main/g' -i $SRCSFILE
 	sed 's/jessie-updates/stretch-updates/g' -i $SRCSFILE
 	sed 's/jessie\/updates/stretch\/updates/g' -i $SRCSFILE
 	sed 's/jessie-devel main/stretch-devel main/g' -i $SRCSFILE
-	# Signal we want a dist-upgrade
-	touch /dist_upgrade_wanted
+	# Signal we want a dist-upgrade and a reboot
+	touch /dist_upgrade_wanted /tmp/reboot-needed
 }
 
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-#if [ "$1" = "configure" ]; then
+if [ "$1" = "configure" ]; then
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
-#	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.3.6"; then
-#	dist_upgrade_migrate
-#	fi
+	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.0"; then
+	dist_upgrade_migrate
+	fi
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
-#fi
+fi
 
