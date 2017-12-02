@@ -5,15 +5,15 @@ Subject: [PATCH] Fix ACC conformance testing when building with GCC6
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- package/lzo/lzo-fix-gcc6.patch | 26 ++++++++++++++++++++++++++
+ package/lzop/lzop-fix-gcc6.patch | 26 ++++++++++++++++++++++++++
  1 file changed, 26 insertions(+)
- create mode 100644 package/lzo/lzo-fix-gcc6.patch
+ create mode 100644 package/lzop/lzop-fix-gcc6.patch
 
-diff --git a/package/lzo/lzo-fix-gcc6.patch b/package/lzo/lzo-fix-gcc6.patch
+diff --git a/package/lzop/lzop-fix-gcc6.patch b/package/lzop/lzop-fix-gcc6.patch
 new file mode 100644
 index 0000000..847631a
 --- /dev/null
-+++ b/package/lzo/lzo-fix-gcc6.patch
++++ b/package/lzop/lzop-fix-gcc6.patch
 @@ -0,0 +1,26 @@
 +--- a/src/miniacc.h.old
 ++++ a/src/miniacc.h
