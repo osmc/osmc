@@ -34,8 +34,8 @@ if [ "$1" = "configure" ]; then
 	chmod +s /bin/busybox 2>/dev/null
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
-	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.5"; then
-	dist_upgrade_migrate
-	fi
+#	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.5"; then
+#	dist_upgrade_migrate
+#	fi
 fi
 exit 0
