@@ -25,18 +25,17 @@ dist_upgrade_migrate ()
 }
 
 if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
-if [ "$1" = "triggered" -a "$2" = "/bin/busybox" ]; then
+if [ "$1" = "triggered" ]; then
 	echo "Fixing permissions on busybox."
-	chmod +s /bin/busybox
+	chmod +s /bin/busybox 2>/dev/null
 fi
-#if [ "$1" = "configure" ]; then
+if [ "$1" = "configure" ]; then
+	echo "Fixing permissions on busybox."
+	chmod +s /bin/busybox 2>/dev/null
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
-#	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.3"; then
-#	dist_upgrade_migrate
-#	fi
-
-	# remove only diverts that prior versions of this package added which are no longer needed:
-	# remove_divert PATH_DIV PATH_ORIG
-#fi
+	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.5"; then
+	dist_upgrade_migrate
+	fi
+fi
 exit 0
