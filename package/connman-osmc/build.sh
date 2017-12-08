@@ -28,9 +28,9 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
 	pushd src
+	install_path "../patches" "all"
 	aclocal
 	autoreconf -vif .
-	install_patch "../patches" "all"
 	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-openvpn
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
