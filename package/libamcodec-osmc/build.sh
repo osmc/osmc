@@ -6,7 +6,7 @@
 . ../common.sh
 
 REV="9c9276ec3e34725077db28f2a1cdcf05d40e789e"
-pull_source "https://github.com/osmc/libamcodec/archive/{REV}.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/osmc/libamcodec/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching libamcodec source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libamcodec-osmc"
