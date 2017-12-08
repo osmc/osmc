@@ -202,7 +202,7 @@ void MainWindow::install()
     {
         for (int i = 0; i <= 60; i++)
         {
-            ui->statusLabel->setText(tr("You have ") + " " + QString::number(60 - i) + " " + ("seconds to unpower before the device is formatted"));
+            ui->statusLabel->setText(tr("You have ") + " " + QString::number(60 - i) + " " + ("seconds to power down before the device is formatted"));
             qApp->processEvents();
             system("/bin/sleep 1");
         }
