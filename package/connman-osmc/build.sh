@@ -28,7 +28,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
 	pushd src
-	install_path "../patches" "all"
+	install_patch "../patches" "all"
 	aclocal
 	autoreconf -vif .
 	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-openvpn
@@ -40,7 +40,6 @@ then
 	mkdir -p ${out}/usr/share/polkit-1/actions
 	cp -ar src/connman-dbus-osmc.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
 	cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
-	rm -rf ${out}/usr/lib/tmpfiles.d
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
