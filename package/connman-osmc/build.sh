@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.34"
+VERSION="1.35"
 pull_source "git://git.kernel.org/pub/scm/network/connman/connman.git" "$(pwd)/src" "${VERSION}"
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment
