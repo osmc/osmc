@@ -381,7 +381,7 @@ then
         ADDONS_PVR="pvr.argustv pvr.demo pvr.dvblink pvr.dvbviewer pvr.filmon pvr.hdhomerun pvr.hts pvr.iptvsimple pvr.mediaportal.tvserver pvr.mythtv pvr.nextpvr pvr.njoy pvr.pctv pvr.stalker pvr.vbox pvr.vdr.vnsi pvr.vuplus pvr.wmc"
         ADDONS_SCREENSAVERS="screensaver.asteroids screensaver.biogenesis screensaver.greynetic screensaver.matrixtrails screensaver.pingpong screensaver.pyro screensavers.rsxs screensaver.stars screensaver.shadertoy"
         ADDONS_VISUALIZATIONS="visualization.fishbmc visualization.goom visualization.projectm visualization.shadertoy visualization.spectrum visualization.vsxu visualization.waveform"
-	ADDONS_GLES_EXCL="screensaver.shadertoy visualization.shadertoy"
+	#ADDONS_GLES_EXCL="screensaver.shadertoy"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 	    ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_GLES_EXCL}"
