@@ -5,6 +5,13 @@
 
 . ../common.sh
 
+if [ "$1" == "trans" ]
+then
+    echo -e "Building transitional package"
+    dpkg_build files-trans ${1}-bluez-osmc.deb
+    exit 0
+fi
+
 VERSION="5.43"
 pull_source "https://www.kernel.org/pub/linux/bluetooth/bluez-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching bluez source" && exit 1; fi
