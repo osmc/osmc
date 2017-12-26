@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QDirIterator>
 //#define FACTORYV2
+//#define CUSTOMER_LOGO_BRANDING
 
 BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
@@ -57,6 +58,14 @@ void BootloaderConfig::copyBootFiles()
             system(ddCmd.toLocal8Bit().data());
         }
         system("dd if=/mnt/root/boot/splash of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        #ifdef CUSTOMER_LOGO_BRANDING
+        if (utils->getOSMCDev() == "vero3") {
+            /* Set custom logo flag */
+            system("/usr/sbin/fw_setenv cuslogo true");
+            /* Upload logo to eMMC */
+            system("dd if=/mnt/root/boot/cuslogo of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        }
+        #endif
     }
     if (utils->getOSMCDev() == "vero3")
     {
