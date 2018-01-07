@@ -528,7 +528,10 @@ def right_now(raw=False):
             if raw:
                 return datetime.now()
             else:
-                return datetime.now().strftime('%Y-%m-%d %H:%M')
+                with open('/proc/uptime', 'r') as f:
+                    uptime_seconds = f.readline().split()[0]
+                
+                return datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " - (Uptime = " + uptime_seconds + ")"
         except:
             time.sleep(0.2)
 
