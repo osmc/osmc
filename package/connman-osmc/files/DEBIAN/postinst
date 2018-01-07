@@ -32,5 +32,10 @@ if [ "$1" = "configure" ]; then
 	systemctl enable connman.service >/dev/null 2>&1
 
 	if ischroot; then exit 0; fi
-	systemctl restart connman.service
+	if ! systemctl is-active connman.service >/dev/null
+	then
+		systemctl stop wpa_supplicant.service
+		systemctl start connman.service
+	fi
+	exit 0
 fi

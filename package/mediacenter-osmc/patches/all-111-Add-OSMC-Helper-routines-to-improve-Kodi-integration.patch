@@ -1,0 +1,116 @@
+From 81759b4da3b0e8e8562211b227b985e2b81151ac Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 21 Dec 2017 11:38:02 +0000
+Subject: [PATCH] Add OSMC Helper routines to improve Kodi integration with
+ OSMC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Makefile.in    |  1 +
+ xbmc/OSMCHelper.cpp | 36 ++++++++++++++++++++++++++++++++++++
+ xbmc/OSMCHelper.h   | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+)
+ create mode 100644 xbmc/OSMCHelper.cpp
+ create mode 100644 xbmc/OSMCHelper.h
+
+diff --git a/xbmc/Makefile.in b/xbmc/Makefile.in
+index 21502b4..b47a01f 100644
+--- a/xbmc/Makefile.in
++++ b/xbmc/Makefile.in
+@@ -37,6 +37,7 @@ SRCS=Application.cpp \
+      Util.cpp \
+      XBApplicationEx.cpp \
+      XBDateTime.cpp \
++     OSMCHelper.cpp \
+ 
+ LIB=xbmc.a
+ 
+diff --git a/xbmc/OSMCHelper.cpp b/xbmc/OSMCHelper.cpp
+new file mode 100644
+index 0000000..febc8c6
+--- /dev/null
++++ b/xbmc/OSMCHelper.cpp
+@@ -0,0 +1,36 @@
++/*
++ *      Copyright (C) 2005-2013 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++// OSMCHelper.cpp: implementation of OSMC helper routines
++//
++//////////////////////////////////////////////////////////////////////
++
++extern "C" {
++#include "OSMCHelper.h"
++   #if defined(__arm__)
++     /* Ensure that uname returns arm, or machine model will reflect kernel bitness only */
++     int uname(struct utsname *buf)
++     {
++       int r;
++       r = syscall(SYS_uname, buf);
++       strcpy(buf->machine, "arm");
++       return r;
++     }
++   #endif // __arm__
++}
+diff --git a/xbmc/OSMCHelper.h b/xbmc/OSMCHelper.h
+new file mode 100644
+index 0000000..04bd5fe
+--- /dev/null
++++ b/xbmc/OSMCHelper.h
+@@ -0,0 +1,38 @@
++/*
++ *      Copyright (C) 2005-2013 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++// OSMCHelper.h: routines to improve behaviour of Kodi on OSMC
++//
++//////////////////////////////////////////////////////////////////////
++
++#pragma once
++
++#include <sys/syscall.h>
++#include <sys/types.h>
++#include <sys/utsname.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <string.h>
++
++extern "C" {
++    #if defined(__arm__)
++      /* Fix up uname for 64-bit kernels with 32-bit userland */
++      int uname(struct utsname *buf);
++    #endif // __arm__
++}
+-- 
+2.7.4
+

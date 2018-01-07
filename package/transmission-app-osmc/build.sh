@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="2.84"
+VERSION="2.92"
 pull_source "https://github.com/transmission/transmission-releases/raw/master/transmission-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -21,18 +21,21 @@ then
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	handle_dep "intltool"
-	handle_dep "libssl-dev"
+	handle_dep "libssl1.0-dev"
 	handle_dep "zlib1g-dev"
+	handle_dep "libcurl4-openssl-dev"
 	handle_dep "libnatpmp-dev"
-	handle_dep "libcurl4-gnutls-dev"
 	handle_dep "libglib2.0-dev"
 	handle_dep "libevent-dev"
 	handle_dep "libminiupnpc-dev"
-	handle_dep "libsystemd-daemon-dev"
+	handle_dep "libsystemd-dev"
 	mkdir -p files/etc/osmc/apps.d
 	echo "Package: ${1}-transmission-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-transmission-app-osmc"
     echo -e "Transmission Client\ntransmission.service" > $APP_FILE
     pushd src/transmission*
+    install_patch "../../patches" "all"
+    rm m4/glib-gettext.m4 # Fix m4_copy error
+    autoreconf -vif .
     ./configure --prefix=/usr --without-inotify --without-gtk --with-systemd-daemon --enable-lightweight CFLAGS="-O3 -fomit-frame-pointer"
     $BUILD
     make install DESTDIR=${out}

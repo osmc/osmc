@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QDirIterator>
 //#define FACTORYV2
+//#define CUSTOMER_LOGO_BRANDING
 
 BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
@@ -28,6 +29,11 @@ void BootloaderConfig::copyBootFiles()
         system("mv /mnt/boot/boot.efi /tmp/boot.efi");
         system("mv /mnt/boot/System /tmp/System");
     }
+    if (utils->getOSMCDev() == "vero1")
+    {
+        system("mv /mnt/boot/SPL /tmp/SPL");
+        system("mv /mnt/boot/u-boot.img /tmp/u-boot.img");
+    }
     system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
 #ifndef FACTORYV2
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
@@ -40,6 +46,11 @@ void BootloaderConfig::copyBootFiles()
         system("mv /tmp/BootLogo.png /mnt/boot/BootLogo.png");
         system("mv /tmp/boot.efi /mnt/boot/boot.efi");
         system("mv /tmp/System /mnt/boot");
+    }
+    if (utils->getOSMCDev() == "vero1")
+    {
+        system("mv /tmp/SPL /mnt/boot/SPL");
+        system("mv /tmp/u-boot.img mnt/boot/u-boot.img");
     }
     if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
@@ -57,6 +68,14 @@ void BootloaderConfig::copyBootFiles()
             system(ddCmd.toLocal8Bit().data());
         }
         system("dd if=/mnt/root/boot/splash of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        #ifdef CUSTOMER_LOGO_BRANDING
+        if (utils->getOSMCDev() == "vero3") {
+            /* Set custom logo flag */
+            system("/usr/sbin/fw_setenv cuslogo true");
+            /* Upload logo to eMMC */
+            system("dd if=/mnt/root/boot/cuslogo of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        }
+        #endif
     }
     if (utils->getOSMCDev() == "vero3")
     {

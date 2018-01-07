@@ -20,7 +20,7 @@ verify_action
 # Configure the target directory
 ARCH="amd64"
 DIR="$filestub/"
-RLS="jessie"
+RLS="stretch"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"

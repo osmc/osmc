@@ -32,9 +32,7 @@ if [ "$1" = "remove" ]; then
 	remove_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf
 	remove_divert /etc/dbus-1/system.d/bluetooth.conf.distributed /etc/dbus-1/system.d/bluetooth.conf
 
-	gpasswd -d osmc pulse-access
 	if is_rbp; then rm -rf  /etc/modules-load.d/snd_bcm2835.conf > /dev/null 2>&1; fi
-	rm -f /home/osmc/.esd_auth
 
 	systemctl restart bluetooth.service > /dev/null 2>&1
 	exit 0

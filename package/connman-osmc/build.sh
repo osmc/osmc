@@ -4,8 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.34"
-pull_source "https://www.kernel.org/pub/linux/network/connman/connman-${VERSION}.tar.gz" "$(pwd)/src"
+VERSION="1.35"
+pull_source "git://git.kernel.org/pub/scm/network/connman/connman.git" "$(pwd)/src" "${VERSION}"
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "connman-osmc"
@@ -24,10 +24,13 @@ then
 	handle_dep "libgnutls28-dev"
 	handle_dep "libglib2.0-dev"
 	handle_dep "openvpn"
+	handle_dep "autoconf"
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
-	pushd src/connman-$VERSION
-    install_patch "../../patches" "all"
+	pushd src
+	install_patch "../patches" "all"
+	aclocal
+	autoreconf -vif .
 	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-openvpn
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
@@ -37,8 +40,6 @@ then
 	mkdir -p ${out}/usr/share/polkit-1/actions
 	cp -ar src/connman-dbus-osmc.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
 	cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
-	cp -ar client/connmanctl ${out}/usr/sbin/connmanctl
-	rm -rf ${out}/usr/lib/tmpfiles.d
 	popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"

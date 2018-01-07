@@ -3,6 +3,13 @@
 if ischroot; then exit 0; fi
 
 if [ "$1" = "configure" ]; then
+    print_env="/usr/bin/fw_printenv"
+    if [ -f "$print_env" ]
+    then
+        ${print_env} cuslogo >/dev/null 2>&1
+        cuslogo=$?
+    fi
+    if [ "$cuslogo" == 0 ]; then exit 0; fi
     LANG=C /bin/dd if=/boot/splash of=/dev/logo bs=1M conv=fsync
     STATUS=$?
     if [ "$STATUS" != 0 ]

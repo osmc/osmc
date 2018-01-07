@@ -210,6 +210,17 @@ ENV{ID_VENDOR_ID}=="2252", ENV{ID_MODEL_ID}=="1037", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="osmc_rf.evmap"
 
+# OSMC RF 2nd generation remote
+ENV{ID_VENDOR_ID}=="2017", ENV{ID_MODEL_ID}=="1688", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="osmc_rf2.evmap"
+
+# FreeWay T3 RF/IR Air-Mouse remote
+# https://www.amazon.com/Keenest-Wireless-Keyboard-Multifunctional-3-Gsensor/dp/B01CEWV2BW/189-2112597-2293766
+ENV{ID_VENDOR_ID}=="1d57", ENV{ID_MODEL_ID}=="ad03", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="t3_airmouse.evmap"
+
 # Enable wake-on-usb for the USB remotes.
 ENV{eventlircd_enable}=="true", RUN+="wakeup_enable"
 

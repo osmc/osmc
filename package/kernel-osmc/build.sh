@@ -10,13 +10,13 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.9.29" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.9.29" && REV="10" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero && VERSION="4.4.0" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.105" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
-test $1 == atv && VERSION="4.2.3" && REV="25" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
-test $1 == pc && VERSION="4.2.3" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="42" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.9.29" && REV="15" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.9.29" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero && VERSION="4.4.0" && REV="17" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero2 && VERSION="3.10.105" && REV="8" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
+test $1 == atv && VERSION="4.2.3" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
+test $1 == pc && VERSION="4.2.3" && REV="15" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="51" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -30,15 +30,15 @@ then
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
 if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
-if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/61e46c27242dc51d377888ff16688dbe72bd8529.tar.gz"; fi
-if [ $1 == "vero364" ]; then SOURCE_LINUX="http://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
 then
 	. initramfs-src/VERSIONS
-	pull_source "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
-	pull_source "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
+	pull_source "https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
+	pull_source "https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
         if [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 	then
 	    pull_source "https://mirrors.kernel.org/sourceware/lvm2/LVM2.${LVM_VERSION}.tgz" "$(pwd)/initramfs-src/lvm2"
@@ -57,7 +57,11 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	update_sources
+<<<<<<< HEAD
 #	handle_dep "kernel-package"
+=======
+	handle_dep "kernel-package-osmc"
+>>>>>>> c2ba2a780503c90faf6a968a542e1df7f2cf3800
 	handle_dep "liblz4-tool"
 	handle_dep "cpio"
 	handle_dep "bison"

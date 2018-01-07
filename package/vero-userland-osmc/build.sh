@@ -42,14 +42,14 @@ then
 	cp -ar headers /
 	cp -ar headers/include ../files-dev/opt/vero
 	rm -rf headers > /dev/null 2>&1
-	pushd imx-lib*
+	pushd imx-lib*/
 	sed -i */Makefile -e s/-O2/-O3/
 	$BUILD PLATFORM=IMX6Q C_INCLUDE_PATH=/headers/include/ all
 	make install PLATFORM=IMX6Q DEST_DIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	popd
 	sh firmware-imx.bin --auto-accept
-	pushd firmware-imx*
+	pushd firmware-imx*/
 	rm -rf firmware/ar3k
 	rm -rf firmware/ath6k
 	rm firmware/LICENCE.atheros_firmware
@@ -59,19 +59,19 @@ then
 	cp -ar firmware ${out}/lib
 	popd
 	sh viv-g2d.bin --auto-accept
-	pushd gpu-viv-g2d*
+	pushd gpu-viv-g2d*/
 	cp -ar usr/include ../../files-dev/opt/vero
 	cp -ar usr/lib ${out}/opt/vero
 	popd
 	sh imx-vpu.bin --auto-accept
-	pushd imx-vpu*
+	pushd imx-vpu*/
 	sed -i */Makefile -e s/-O2/-O3/
 	$BUILD PLATFORM=IMX6Q
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
 	make install PLATFORM=IMX6Q DEST_DIR=${out} # of course, Freescale like to hop between DESTDIR and DEST_DIR
 	popd
 	sh libfslvpuwrap.bin --auto-accept
-	pushd libfslvpuwrap*
+	pushd libfslvpuwrap*/
 	CFLAGS="-I../../files/usr/include -L../../files/usr/lib" ./autogen.sh --prefix=/opt/vero
 	$BUILD all
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
@@ -81,7 +81,7 @@ then
 	# Remove samples
 	rm -rf gpu-viv-bin-mx6q*/opt
 	# Remove conflicting libraries
-	pushd gpu-viv-bin-mx6q*
+	pushd gpu-viv-bin-mx6q*/
 	pushd usr/lib
 	rm libGAL.so libVIVANTE.so libEGL.so *-wl.so* *wayland* *-dfb.so* *-x11.so*
 	ln -s libEGL-fb.so libEGL.so

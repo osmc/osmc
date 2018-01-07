@@ -1,6 +1,6 @@
 [Unit]
 Description = media center application
-After = remote-fs.target network-online.target mysql.service
+After = remote-fs.target network-online.target mysql.service mariadb.service
 Wants = network-online.target
 
 [Service]
