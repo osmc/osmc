@@ -98,13 +98,13 @@ echo -e "       * Enabling support for legacy ELF"
 enable_legacy_elf ${DIR}
 verify_action
 
-# Remove QEMU binary
-chroot ${DIR} umount /proc
-remove_emulate_arm "${DIR}" "32"
-
 # Perform filesystem cleanup
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
+
+# Remove QEMU binary
+chroot ${DIR} umount /proc
+remove_emulate_arm "${DIR}" "32"
 
 # Create filesystem tarball
 create_fs_tarball "${DIR}" "${filestub}"
