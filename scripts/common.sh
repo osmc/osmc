@@ -122,13 +122,12 @@ function cleanup_filesystem()
 	echo -e "Cleaning up filesystem"
 	rm -f ${1}/etc/resolv.conf
 	rm -f ${1}/etc/network/interfaces
-	rm -rf ${1}/usr/share/man/* 
-	rm -rf ${1}/var/cache/apt/archives/*
+	rm -rf ${1}/usr/share/man/*
 	rm -rf ${1}/var/lib/apt/lists/*
 	rm -f ${1}/var/log/*.log
 	rm -f ${1}/var/log/apt/*.log
 	rm -f ${1}/tmp/reboot-needed
-	rm -f ${1}/var/cache/apt/pkgcache.bin
+	chroot ${1} apt-get clean
 }
 
 function remove_existing_filesystem()
