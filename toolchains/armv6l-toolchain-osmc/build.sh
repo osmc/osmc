@@ -75,12 +75,12 @@ echo -e "Configuring uname"
 install_archlib ${DIR} "armv7l"
 verify_action
 
+# Perform filesystem cleanup
+cleanup_filesystem "${DIR}"
+
 # Remove QEMU binary
 chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}" "32"
-
-# Perform filesystem cleanup
-cleanup_filesystem "${DIR}"
 
 # Build Debian package
 echo "Building Debian package"
