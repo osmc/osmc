@@ -75,6 +75,13 @@ SUBSYSTEM=="input", ATTRS{idVendor}=="1c73", ATTRS{idProduct}=="861f", \
   ENV{eventlircd_evmap}="anysee.evmap"
 
 #-------------------------------------------------------------------------------
+# Xiaomi Mi Box remote
+#-------------------------------------------------------------------------------
+ATTRS{name}=="Xiaomi Remote|小米蓝牙遥控器", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="xiaomibtremote.evmap"
+
+#-------------------------------------------------------------------------------
 # Ask eventlircd to handle USB HID devices that show up as event devices and are
 # known to be remote controls. For simplicity, the event map file names have the
 # format <BUSTYPE>_<VENDOR>_<PRODUCT>.evmap.
