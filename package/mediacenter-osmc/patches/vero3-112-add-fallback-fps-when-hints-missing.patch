@@ -1,0 +1,28 @@
+From b374fba6c5a8330c4ea492e7309de0adf245f3ec Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Jan 2018 19:20:24 +0000
+Subject: [PATCH] AMLCodec: Fix missing FPS hints (thx afl1)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index f67f171..3427105 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1459,6 +1459,10 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+     // then ffmpeg avg_frame_rate next
+     am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
+   }
++  else {
++    am_private->video_rate = 0.5 + (float)UNIT_FREQ * 1001 / 30000;
++    CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder we have no fps hints so we will create a fallback");
++  }
+ 
+   // check for 1920x1080, interlaced, 25 fps
+   // incorrectly reported as 50 fps (yes, video_rate == 1920)
+-- 
+2.7.4
+
