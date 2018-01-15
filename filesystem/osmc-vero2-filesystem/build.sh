@@ -97,6 +97,9 @@ verify_action
 echo -e "       * Enabling support for legacy ELF"
 enable_legacy_elf ${DIR}
 verify_action
+echo -e "       * Configuring rc.local"
+create_rc_local ${DIR}
+verify_action
 
 # Perform filesystem cleanup
 enable_init "${DIR}"
