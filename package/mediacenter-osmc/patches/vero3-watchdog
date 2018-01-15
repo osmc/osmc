@@ -59,7 +59,8 @@ syspaths="/sys/class/video/axis
 /sys/class/amhdmitx/amhdmitx0/frac_rate_policy
 /sys/module/di/parameters/bypass_prog
 /sys/class/amhdmitx/amhdmitx0/debug
-/sys/class/amhdmitx/amhdmitx0/attr"
+/sys/class/amhdmitx/amhdmitx0/attr
+/sys/class/amhdmitx/amhdmitx0/output_rgb"
 
 for syspath in $syspaths; do
         chgrp -R video $syspath
