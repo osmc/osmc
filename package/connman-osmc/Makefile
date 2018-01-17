@@ -19,3 +19,5 @@ aarch64:
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files/usr > /dev/null 2>&1
+	sudo rm -rf files/etc >/dev/null 2>&1
+	sudo rm -rf files/lib >/dev/null 2>&1
