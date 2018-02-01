@@ -1,5 +1,5 @@
 diff --git a/drivers/media/rc/ir-rc6-decoder.c b/drivers/media/rc/ir-rc6-decoder.c
-index 5cc54c9..55b8b10 100644
+index 5d0d2fe..3d8cc1a 100644
 --- a/drivers/media/rc/ir-rc6-decoder.c
 +++ b/drivers/media/rc/ir-rc6-decoder.c
 @@ -39,7 +39,6 @@
@@ -15,16 +15,16 @@ index 5cc54c9..55b8b10 100644
  				break;
  			case 32:
 -				if ((scancode & RC6_6A_LCC_MASK) == RC6_6A_MCE_CC) {
--					protocol = RC_TYPE_RC6_MCE;
+-					protocol = RC_PROTO_RC6_MCE;
 -					toggle = !!(scancode & RC6_6A_MCE_TOGGLE_MASK);
 -					scancode &= ~RC6_6A_MCE_TOGGLE_MASK;
 -				} else {
--					protocol = RC_TYPE_RC6_6A_32;
+-					protocol = RC_PROTO_RC6_6A_32;
 -					toggle = 0;
 -				}
-+                                protocol = RC_TYPE_RC6_MCE;
-+                                toggle = !!(scancode & RC6_6A_MCE_TOGGLE_MASK);
-+                                scancode &= ~RC6_6A_MCE_TOGGLE_MASK;
++				protocol = RC_PROTO_RC6_MCE;
++				toggle = !!(scancode & RC6_6A_MCE_TOGGLE_MASK);
++				scancode &= ~RC6_6A_MCE_TOGGLE_MASK;
  				break;
  			default:
  				IR_dprintk(1, "RC6(6A) unsupported length\n");

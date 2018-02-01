@@ -1,23 +1,10 @@
-From e9af15a51f2549a992bdf1ddb4a1feaa12e6747a Mon Sep 17 00:00:00 2001
-From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sat, 29 Apr 2017 13:46:04 +0100
-Subject: [PATCH] Add Xbox Remote driver
-
-Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
----
- drivers/staging/media/lirc/Kconfig     |   7 +
- drivers/staging/media/lirc/Makefile    |   1 +
- drivers/staging/media/lirc/lirc_xbox.c | 995 +++++++++++++++++++++++++++++++++
- 3 files changed, 1003 insertions(+)
- create mode 100644 drivers/staging/media/lirc/lirc_xbox.c
-
 diff --git a/drivers/staging/media/lirc/Kconfig b/drivers/staging/media/lirc/Kconfig
-index 6879c46..551361d 100644
+index 3e350a9..935dcc2 100644
 --- a/drivers/staging/media/lirc/Kconfig
 +++ b/drivers/staging/media/lirc/Kconfig
-@@ -57,10 +57,17 @@ config LIRC_SIR
- 	help
- 	  Driver for the SIR IrDA port
+@@ -12,10 +12,17 @@ menuconfig LIRC_STAGING
+ 
+ if LIRC_STAGING
  
 +config LIRC_XBOX
 +	tristate "XBOX USB IR Remote"
@@ -34,20 +21,20 @@ index 6879c46..551361d 100644
 +
  endif
 diff --git a/drivers/staging/media/lirc/Makefile b/drivers/staging/media/lirc/Makefile
-index 5430adf..0f3292c 100644
+index 6655624..becf234 100644
 --- a/drivers/staging/media/lirc/Makefile
 +++ b/drivers/staging/media/lirc/Makefile
-@@ -10,3 +10,4 @@ obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
- obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
- obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+@@ -4,3 +4,4 @@
+ # Each configuration option enables a list of files.
+ 
  obj-$(CONFIG_LIRC_ZILOG)	+= lirc_zilog.o
 +obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
 new file mode 100644
-index 0000000..c269d5d
+index 0000000..5b0bfdc
 --- /dev/null
 +++ b/drivers/staging/media/lirc/lirc_xbox.c
-@@ -0,0 +1,995 @@
+@@ -0,0 +1,993 @@
 +/*
 + * lirc_xbox - USB remote support for LIRC
 + * (supports Microsoft XBOX DVD Dongle)
@@ -799,8 +786,6 @@ index 0000000..c269d5d
 +	driver->code_length = dclen * 8;
 +	driver->features = LIRC_CAN_REC_LIRCCODE;
 +	driver->data = ir;
-+	driver->set_use_inc = &set_use_inc;
-+	driver->set_use_dec = &set_use_dec;
 +	driver->dev = &intf->dev;
 +	driver->owner = THIS_MODULE;
 +	ir->usbdev = dev;
@@ -1043,6 +1028,3 @@ index 0000000..c269d5d
 +
 +module_param(repeat, uint, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(repeat, "Repeat timeout (1/100 sec) (default: 10)");
--- 
-2.7.4
-

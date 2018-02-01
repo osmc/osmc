@@ -20547,10 +20547,10 @@ index 0000000..be3195d
 +}
 diff --git a/rtl8192du/core/rtw_pwrctrl.c b/drivers/net/wireless/rtl8192du/core/rtw_pwrctrl.c
 new file mode 100644
-index 0000000..21b2ca6
+index 0000000..67a368d
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/core/rtw_pwrctrl.c
-@@ -0,0 +1,1173 @@
+@@ -0,0 +1,1187 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -20742,9 +20742,19 @@ index 0000000..21b2ca6
 +	return;
 +}
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++static void pwr_state_check_handler(struct timer_list *t)
++#else
 +static void pwr_state_check_handler(void *FunctionContext)
++#endif
 +{
-+	struct rtw_adapter *padapter = (struct rtw_adapter *)FunctionContext;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	struct rtw_adapter *padapter =
++		from_timer(padapter, t,
++			   pwrctrlpriv.pwr_state_check_timer);
++#else
++	struct rtw_adapter *padapter = (struct adapter *)FunctionContext;
++#endif
 +
 +	rtw_ps_cmd(padapter);
 +}
@@ -21366,8 +21376,12 @@ index 0000000..21b2ca6
 +
 +	pwrctrlpriv->tog = 0x80;
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	timer_setup(&pwrctrlpriv->pwr_state_check_timer, pwr_state_check_handler, 0);
++#else
 +	_init_timer(&(pwrctrlpriv->pwr_state_check_timer), padapter->pnetdev,
 +		    pwr_state_check_handler, (u8 *)padapter);
++#endif
 +
 +#ifdef CONFIG_RESUME_IN_WORKQUEUE
 +	_init_workitem(&pwrctrlpriv->resume_work, resume_workitem_callback,
@@ -21726,10 +21740,10 @@ index 0000000..21b2ca6
 +}
 diff --git a/rtl8192du/core/rtw_recv.c b/drivers/net/wireless/rtl8192du/core/rtw_recv.c
 new file mode 100644
-index 0000000..aaeadd4
+index 0000000..1360f11
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/core/rtw_recv.c
-@@ -0,0 +1,2585 @@
+@@ -0,0 +1,2600 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -21759,7 +21773,11 @@ index 0000000..aaeadd4
 +#include <usb_osintf.h>
 +#include <linux/vmalloc.h>
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++void rtw_signal_stat_timer_hdl(struct timer_list *t);
++#else
 +void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS);
++#endif
 +
 +void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv)
 +{
@@ -21827,8 +21845,11 @@ index 0000000..aaeadd4
 +	precvpriv->read_port_complete_EINPROGRESS_cnt = 0;
 +	precvpriv->read_port_complete_other_urb_err_cnt = 0;
 +
-+	_init_timer(&precvpriv->signal_stat_timer, padapter->pnetdev,
-+		    RTW_TIMER_HDL_NAME(signal_stat), padapter);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	timer_setup(&precvpriv->signal_stat_timer, rtw_signal_stat_timer_hdl, 0);
++#else
++	_init_timer(&precvpriv->signal_stat_timer, padapter->pnetdev, RTW_TIMER_HDL_NAME(signal_stat), padapter);
++#endif
 +
 +	precvpriv->signal_stat_sampling_interval = 1000;	/* ms */
 +
@@ -24235,9 +24256,17 @@ index 0000000..aaeadd4
 +	return ret;
 +}
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++void rtw_signal_stat_timer_hdl(struct timer_list *t)
++#else
 +void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS)
++#endif
 +{
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	struct rtw_adapter *adapter = from_timer(adapter, t, recvpriv.signal_stat_timer);
++#else
 +	struct rtw_adapter *adapter = (struct rtw_adapter *)FunctionContext;
++#endif
 +	struct recv_priv *recvpriv = &adapter->recvpriv;
 +
 +	u32 tmp_s, tmp_q;
@@ -47146,10 +47175,10 @@ index 0000000..22f1ad7
 +}
 diff --git a/rtl8192du/hal/rtl8192du_led.c b/drivers/net/wireless/rtl8192du/hal/rtl8192du_led.c
 new file mode 100644
-index 0000000..78ea371
+index 0000000..20be756
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/hal/rtl8192du_led.c
-@@ -0,0 +1,2425 @@
+@@ -0,0 +1,2438 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -47195,7 +47224,11 @@ index 0000000..78ea371
 +/*	Prototype of protected function. */
 +/*  */
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++static void BlinkTimerCallback(struct timer_list *t);
++#else
 +static void BlinkTimerCallback(unsigned long data);
++#endif
 +
 +static void
 +BlinkWorkItemCallback(
@@ -47242,7 +47275,11 @@ index 0000000..78ea371
 +	pLed->BlinkTimes = 0;
 +	pLed->BlinkingLedState = LED_UNKNOWN;
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	timer_setup(&pLed->BlinkTimer, BlinkTimerCallback, 0);
++#else
 +	_init_timer(&(pLed->BlinkTimer), padapter->pnetdev, BlinkTimerCallback, pLed);
++#endif
 +
 +	_init_workitem(&(pLed->BlinkWorkItem), BlinkWorkItemCallback, pLed);
 +}
@@ -48273,12 +48310,17 @@ index 0000000..78ea371
 +/*		Callback function of LED BlinkTimer, */
 +/*		it just schedules to corresponding BlinkWorkItem. */
 +/*  */
-+static void
-+BlinkTimerCallback(
-+	unsigned long data
-+	)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++static void BlinkTimerCallback(struct timer_list *t)
++#else
++static void BlinkTimerCallback(unsigned long data)
++#endif
 +{
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	struct LED_871X *	 pLed = from_timer(pLed, t, BlinkTimer);
++#else
 +	struct LED_871X *	 pLed = (struct LED_871X *)data;
++#endif
 +	struct rtw_adapter		*padapter = pLed->padapter;
 +
 +	 if ((padapter->bSurpriseRemoved == true) || (padapter->bDriverStopped == true))
@@ -61940,10 +61982,10 @@ index 0000000..47f7e9e
 +#endif	/* _OSDEP_INTF_H_ */
 diff --git a/rtl8192du/include/osdep_service.h b/drivers/net/wireless/rtl8192du/include/osdep_service.h
 new file mode 100644
-index 0000000..a19282a
+index 0000000..a402577
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/include/osdep_service.h
-@@ -0,0 +1,586 @@
+@@ -0,0 +1,592 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -61962,6 +62004,10 @@ index 0000000..a19282a
 +#ifndef __OSDEP_SERVICE_H_
 +#define __OSDEP_SERVICE_H_
 +
++#include <linux/version.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++#include <linux/sched/signal.h>
++#endif
 +#include <drv_conf.h>
 +#include <basic_types.h>
 +
@@ -62105,12 +62151,14 @@ index 0000000..a19282a
 +#endif
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +static inline void _init_timer(struct timer_list *timer, struct net_device * nic_hdl, void *pfunc, void *cntx)
 +{
 +	timer->function = pfunc;
 +	timer->data = (unsigned long)cntx;
 +	init_timer(timer);
 +}
++#endif
 +
 +static inline void _set_timer(struct timer_list *timer,u32 delay_time)
 +{
@@ -68899,10 +68947,10 @@ index 0000000..d3740a5
 +#endif /* __RTW_LED_H_ */
 diff --git a/rtl8192du/include/rtw_mlme.h b/drivers/net/wireless/rtl8192du/include/rtw_mlme.h
 new file mode 100644
-index 0000000..c57caf2
+index 0000000..71e7b27
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/include/rtw_mlme.h
-@@ -0,0 +1,649 @@
+@@ -0,0 +1,654 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -69370,8 +69418,13 @@ index 0000000..c57caf2
 +extern void rtw_cpwm_event_callback(struct rtw_adapter *adapter, u8 *pbuf);
 +
 +extern int event_thread(void *context);
-+extern void rtw_join_timeout_handler(void* FunctionContext);
-+extern void _rtw_scan_timeout_handler(void* FunctionContext);
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++void rtw_join_timeout_handler (void *FunctionContext);
++void _rtw_scan_timeout_handler(void *FunctionContext);
++#else
++void rtw_join_timeout_handler (struct timer_list *t);
++void _rtw_scan_timeout_handler (struct timer_list *t);
++#endif
 +extern void rtw_free_network_queue(struct rtw_adapter *adapter,u8 isfreeall);
 +extern int rtw_init_mlme_priv(struct rtw_adapter *adapter);/*  (struct mlme_priv *pmlmepriv); */
 +extern void rtw_free_mlme_priv (struct mlme_priv *pmlmepriv);
@@ -76669,10 +76722,10 @@ index 0000000..2e230bf
 +#endif /* __XMIT_OSDEP_H_ */
 diff --git a/rtl8192du/os_dep/ioctl_cfg80211.c b/drivers/net/wireless/rtl8192du/os_dep/ioctl_cfg80211.c
 new file mode 100644
-index 0000000..3be9cf1
+index 0000000..a518345
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/os_dep/ioctl_cfg80211.c
-@@ -0,0 +1,3898 @@
+@@ -0,0 +1,3928 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
@@ -77127,6 +77180,19 @@ index 0000000..3be9cf1
 +		#endif
 +
 +		DBG_8192D("%s call cfg80211_roamed\n", __func__);
++		#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++		{
++			struct cfg80211_roam_info roam_info = {
++				.channel = notify_channel,
++				.bssid = cur_network->network.MacAddress,
++				.req_ie = pmlmepriv->assoc_req+sizeof(struct rtw_ieee80211_hdr_3addr)+2,
++				.req_ie_len = pmlmepriv->assoc_req_len-sizeof(struct rtw_ieee80211_hdr_3addr)-2,
++				.resp_ie = pmlmepriv->assoc_rsp+sizeof(struct rtw_ieee80211_hdr_3addr)+6,
++				.resp_ie_len = pmlmepriv->assoc_rsp_len-sizeof(struct rtw_ieee80211_hdr_3addr)-6,
++			};
++			cfg80211_roamed(padapter->pnetdev, &roam_info, GFP_ATOMIC);
++		}
++		#else
 +		cfg80211_roamed(padapter->pnetdev
 +			#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39)
 +			, notify_channel
@@ -77137,6 +77203,7 @@ index 0000000..3be9cf1
 +			, pmlmepriv->assoc_rsp+sizeof(struct rtw_ieee80211_hdr_3addr)+6
 +			, pmlmepriv->assoc_rsp_len-sizeof(struct rtw_ieee80211_hdr_3addr)-6
 +			, GFP_ATOMIC);
++		#endif
 +	}
 +	else
 +	#endif
@@ -78000,10 +78067,17 @@ index 0000000..3be9cf1
 +extern int netdev_if2_open(struct net_device *pnetdev);
 +#endif
 +
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
++				     struct net_device *ndev,
++				     enum nl80211_iftype type,
++				     struct vif_params *params)
++#else
 +static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 +				     struct net_device *ndev,
 +				     enum nl80211_iftype type, u32 *flags,
 +				     struct vif_params *params)
++#endif
 +{
 +	enum nl80211_iftype old_type;
 +	enum NDIS_802_11_NETWORK_INFRASTRUCTURE networkType ;
@@ -79393,7 +79467,12 @@ index 0000000..3be9cf1
 +	mon_ndev->type = ARPHRD_IEEE80211_RADIOTAP;
 +	strncpy(mon_ndev->name, name, IFNAMSIZ);
 +	mon_ndev->name[IFNAMSIZ - 1] = 0;
++#if (LINUX_VERSION_CODE>=KERNEL_VERSION(4,11,9))
++	mon_ndev->needs_free_netdev = false;
++	mon_ndev->priv_destructor = rtw_ndev_destructor;
++#else
 +	mon_ndev->destructor = rtw_ndev_destructor;
++#endif
 +
 +#if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 +	mon_ndev->netdev_ops = &rtw_cfg80211_monitor_if_ops;
@@ -79460,7 +79539,11 @@ index 0000000..3be9cf1
 +	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 +		unsigned char name_assign_type,
 +	#endif
++	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0))
++		enum nl80211_iftype type, struct vif_params *params)
++	#else
 +		enum nl80211_iftype type, u32 *flags, struct vif_params *params)
++	#endif
 +{
 +	int ret = 0;
 +	struct net_device* ndev = NULL;
@@ -86310,10 +86393,10 @@ index 0000000..8966989
 +#endif
 diff --git a/rtl8192du/os_dep/mlme_linux.c b/drivers/net/wireless/rtl8192du/os_dep/mlme_linux.c
 new file mode 100644
-index 0000000..d4c1a93
+index 0000000..0ccf18d
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/os_dep/mlme_linux.c
-@@ -0,0 +1,416 @@
+@@ -0,0 +1,494 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -86337,21 +86420,47 @@ index 0000000..d4c1a93
 +#include <drv_types.h>
 +#include <mlme_osdep.h>
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +void rtw_join_timeout_handler (void *FunctionContext)
++#else
++void rtw_join_timeout_handler (struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *adapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *adapter = from_timer(adapter, t, mlmepriv.assoc_timer);
++#endif
++
 +	_rtw_join_timeout_handler(adapter);
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +void _rtw_scan_timeout_handler (void *FunctionContext)
++#else
++void _rtw_scan_timeout_handler (struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *adapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *adapter = from_timer(adapter, t, mlmepriv.scan_to_timer);
++#endif
++
 +	rtw_scan_timeout_handler(adapter);
 +}
 +
-+static void _dynamic_check_timer_handlder (void *FunctionContext)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++static void _dynamic_check_timer_handlder(void *FunctionContext)
++#else
++static void _dynamic_check_timer_handlder(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *adapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *adapter = from_timer(adapter, t, mlmepriv.dynamic_chk_timer);
++#endif
 +
 +	rtw_dynamic_check_timer_handlder(adapter);
 +
@@ -86359,9 +86468,17 @@ index 0000000..d4c1a93
 +}
 +
 +#ifdef CONFIG_SET_SCAN_DENY_TIMER
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +static void _rtw_set_scan_deny_timer_hdl(void *FunctionContext)
++#else
++static void _rtw_set_scan_deny_timer_hdl(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *adapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *adapter = from_timer(adapter, t, mlmepriv.set_scan_deny_timer);
++#endif
 +	rtw_set_scan_deny_timer_hdl(adapter);
 +}
 +#endif
@@ -86370,6 +86487,7 @@ index 0000000..d4c1a93
 +{
 +	struct	mlme_priv *pmlmepriv = &padapter->mlmepriv;
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	_init_timer(&(pmlmepriv->assoc_timer), padapter->pnetdev, rtw_join_timeout_handler, padapter);
 +	_init_timer(&(pmlmepriv->scan_to_timer), padapter->pnetdev, _rtw_scan_timeout_handler, padapter);
 +
@@ -86378,6 +86496,14 @@ index 0000000..d4c1a93
 +	#ifdef CONFIG_SET_SCAN_DENY_TIMER
 +	_init_timer(&(pmlmepriv->set_scan_deny_timer), padapter->pnetdev, _rtw_set_scan_deny_timer_hdl, padapter);
 +	#endif
++#else
++	timer_setup(&pmlmepriv->assoc_timer, rtw_join_timeout_handler, 0);
++	timer_setup(&pmlmepriv->scan_to_timer, _rtw_scan_timeout_handler, 0);
++	timer_setup(&pmlmepriv->dynamic_chk_timer, _dynamic_check_timer_handlder, 0);
++	#ifdef CONFIG_SET_SCAN_DENY_TIMER
++	timer_setup(&pmlmepriv->set_scan_deny_timer, _rtw_set_scan_deny_timer_hdl, 0);
++	#endif
++#endif
 +}
 +
 +void rtw_os_indicate_connect(struct rtw_adapter *adapter)
@@ -86507,29 +86633,59 @@ index 0000000..d4c1a93
 +
 +}
 +
-+static void _survey_timer_hdl (void *FunctionContext)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++static void _survey_timer_hdl(void *FunctionContext)
++#else
++static void _survey_timer_hdl(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *padapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *padapter = from_timer(padapter, t, mlmeextpriv.survey_timer);
++#endif
 +
 +	survey_timer_hdl(padapter);
 +}
 +
-+static void _link_timer_hdl (void *FunctionContext)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++static void _link_timer_hdl(void *FunctionContext)
++#else
++static void _link_timer_hdl(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct rtw_adapter *padapter = (struct rtw_adapter *)FunctionContext;
++#else
++	struct rtw_adapter *padapter = from_timer(padapter, t, mlmeextpriv.link_timer);
++#endif
++
 +	link_timer_hdl(padapter);
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +static void _addba_timer_hdl(void *FunctionContext)
++#else
++static void _addba_timer_hdl(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct sta_info *psta = (struct sta_info *)FunctionContext;
++#else
++	struct sta_info *psta = from_timer(psta, t, addba_retry_timer);
++#endif
++
 +	addba_timer_hdl(psta);
 +}
 +
 +void init_addba_retry_timer(struct rtw_adapter *padapter, struct sta_info *psta)
 +{
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	_init_timer(&psta->addba_retry_timer, padapter->pnetdev, _addba_timer_hdl, psta);
++#else
++	timer_setup(&psta->addba_retry_timer, _addba_timer_hdl, 0);
++#endif
 +}
 +
 +/*
@@ -86550,8 +86706,13 @@ index 0000000..d4c1a93
 +{
 +	struct	mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	_init_timer(&pmlmeext->survey_timer, padapter->pnetdev, _survey_timer_hdl, padapter);
 +	_init_timer(&pmlmeext->link_timer, padapter->pnetdev, _link_timer_hdl, padapter);
++#else
++	timer_setup(&pmlmeext->survey_timer, _survey_timer_hdl, 0);
++	timer_setup(&pmlmeext->link_timer, _link_timer_hdl, 0);
++#endif
 +}
 +
 +#ifdef CONFIG_92D_AP_MODE
@@ -89801,10 +89962,10 @@ index 0000000..e9650dd
 +}
 diff --git a/rtl8192du/os_dep/recv_linux.c b/drivers/net/wireless/rtl8192du/os_dep/recv_linux.c
 new file mode 100644
-index 0000000..7b27c17
+index 0000000..8ff779b
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/os_dep/recv_linux.c
-@@ -0,0 +1,315 @@
+@@ -0,0 +1,328 @@
 +/******************************************************************************
 + *
 + * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
@@ -90108,9 +90269,18 @@ index 0000000..7b27c17
 +		rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 +}
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +static void _rtw_reordering_ctrl_timeout_handler (void *FunctionContext)
++#else
++static void _rtw_reordering_ctrl_timeout_handler(struct timer_list *t)
++#endif
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	struct recv_reorder_ctrl *preorder_ctrl = (struct recv_reorder_ctrl *)FunctionContext;
++#else
++	struct recv_reorder_ctrl *preorder_ctrl = from_timer(preorder_ctrl, t, reordering_ctrl_timer);
++#endif
++
 +	rtw_reordering_ctrl_timeout_handler(preorder_ctrl);
 +}
 +
@@ -90118,7 +90288,11 @@ index 0000000..7b27c17
 +{
 +	struct rtw_adapter *padapter = preorder_ctrl->padapter;
 +
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 +	_init_timer(&(preorder_ctrl->reordering_ctrl_timer), padapter->pnetdev, _rtw_reordering_ctrl_timeout_handler, preorder_ctrl);
++#else
++	timer_setup(&preorder_ctrl->reordering_ctrl_timer, _rtw_reordering_ctrl_timeout_handler, 0);
++#endif
 +}
 diff --git a/rtl8192du/os_dep/rtw_android.c b/drivers/net/wireless/rtl8192du/os_dep/rtw_android.c
 new file mode 100644
