@@ -62,6 +62,7 @@ then
 	handle_dep "cpio"
 	handle_dep "bison"
 	handle_dep "flex"
+	handle_dep "rename"
         if [ "$1" == "vero2" ]  || [ "$1" == "vero364" ]
         then
             handle_dep "u-boot-tools"
