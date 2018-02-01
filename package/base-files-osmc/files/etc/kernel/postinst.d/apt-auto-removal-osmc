@@ -29,8 +29,8 @@ set -e
 # OSMC prefixes the package with the kernel's architecture and removes the
 # linux part. For example, packages for the Raspberry Pi 1 architecture are
 # naned:
-#   rbp1-images-<something>
-#   rbp1-headers-<something> 
+#   rbp1-image-<something>-osmc
+#   rbp1-headers-<something>-osmc
 # This naming standard breaks the standard Debian code, resulting in all but
 # the most recently installed kernel and headers becoming autoremove candidates.
 #
@@ -45,6 +45,21 @@ set -e
 
 # List of suitable kernels for removable is introduced by *-device-osmc, so
 # check that we have that, or leave the cleanup for another day
+#
+# Jan 2018: Amended to allow for a quirk introduced on Debian stretch WRT the
+# Vero4K. In stretch, package names from a foreign architecture have the 
+# architecture appended to the package name when running "dpkg -l". 
+# So while the Vero4K declares an architecture of arnhf, kernel packages are 
+# built as arm64, which is treated as a foreign architecture.
+#
+# For example, on the Pi2/3 a kernel package will be named something like:
+#   rbp2-image-4.9.29-13-osmc
+# whereas on a Vero4K, under Debian stretch it will be something like:
+#   vero364-image-3.14.29-51-osmc:arm64
+#
+# The workaround chosen is to add an addition field separator into an awk
+# command so that spaces and a colon are both used as field separators.
+# This will work as long as the package name does not contain any colons.
 
 if [ ! -f /etc/apt/apt.conf.d/01autoremove-osmc ] ; then exit 0; fi
 
@@ -79,7 +94,8 @@ image_list=$(apt-config dump --no-empty --format '%v%n' 'APT::OSMCKernelPackages
 image_regexp=$(echo $image_list | sed 's/ /\|/g')
 
 # Get list of installed kernel images based on regular expression
-list=$(dpkg -l | egrep "^ii  *(${image_regexp})-[0-9][0-9]*.*-osmc$" | awk '{print $2}' | sed 's/.*-image-//')
+# Jan 2018: Add additional field separator to awk command. Now uses (one or more) spaces or a single colon.
+list=$(dpkg -l | egrep "^ii  *(${image_regexp})-[0-9][0-9]*.*-osmc$" | awk -F " +?|:" '{print $2}' | sed 's/.*-image-//')
 
 latest_version=""
 previous_version=""
