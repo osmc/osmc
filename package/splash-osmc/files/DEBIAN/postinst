@@ -1,1 +1,17 @@
 #!/bin/bash
+
+# Allow custom logo on Vero
+
+if ischroot
+then
+    exit 0
+else
+    grep -q osmcdev=vero3 /proc/cmdline >/dev/null 2>&1
+    if [ $? -ne 0 ]; then exit 0; fi
+    fw_printenv cuslogo >/dev/null 2>&1
+    if [ $? -ne 0 ]; then exit 0; fi
+    if [ -f /usr/splash_custom.png ]
+    then
+        cp /usr/splash_custom.png /usr/splash.png
+    fi
+fi
