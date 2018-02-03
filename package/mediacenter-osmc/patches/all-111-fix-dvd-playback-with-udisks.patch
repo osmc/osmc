@@ -1,0 +1,28 @@
+From 18e9b47ab0978e319c004b59c50ce5578616db3a Mon Sep 17 00:00:00 2001
+From: cjr2 <github@roberts.me.uk>
+Date: Mon, 29 Jan 2018 11:37:35 +0000
+Subject: [PATCH] Fix for DVDs not playing under Linux when using UDisks.  In
+ this situation, the DVD drive shows up in GetRemovableDrives,  BUT the DVD
+ isn't mounted (which I believe is correct for Kodi playing DVDs), so although
+ the m_iDriveType is set to SOURCE_TYPE_DVD, strPath isn't set, as that only
+ gets a value when the DVD is mounted. The fix checks to see if strPath has a
+ value, and only returns if it does. If it doesn't have a value, it runs the
+ DetectMediaPath code.
+
+---
+ xbmc/storage/MediaManager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/storage/MediaManager.cpp b/xbmc/storage/MediaManager.cpp
+index e179a8df74f9..0b6ca2eb4592 100644
+--- a/xbmc/storage/MediaManager.cpp
++++ b/xbmc/storage/MediaManager.cpp
+@@ -606,7 +606,7 @@ std::string CMediaManager::GetDiscPath()
+   m_platformStorage->GetRemovableDrives(drives);
+   for(unsigned i = 0; i < drives.size(); ++i)
+   {
+-    if(drives[i].m_iDriveType == CMediaSource::SOURCE_TYPE_DVD)
++    if(drives[i].m_iDriveType == CMediaSource::SOURCE_TYPE_DVD && !drives[i].strPath.empty())
+       return drives[i].strPath;
+   }
+ 
