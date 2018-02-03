@@ -20547,7 +20547,7 @@ index 0000000..be3195d
 +}
 diff --git a/rtl8192du/core/rtw_pwrctrl.c b/drivers/net/wireless/rtl8192du/core/rtw_pwrctrl.c
 new file mode 100644
-index 0000000..67a368d
+index 0000000..2051b55
 --- /dev/null
 +++ b/drivers/net/wireless/rtl8192du/core/rtw_pwrctrl.c
 @@ -0,0 +1,1187 @@
@@ -20742,13 +20742,13 @@ index 0000000..67a368d
 +	return;
 +}
 +
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
 +static void pwr_state_check_handler(struct timer_list *t)
 +#else
 +static void pwr_state_check_handler(void *FunctionContext)
 +#endif
 +{
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
 +	struct rtw_adapter *padapter =
 +		from_timer(padapter, t,
 +			   pwrctrlpriv.pwr_state_check_timer);
@@ -21376,7 +21376,7 @@ index 0000000..67a368d
 +
 +	pwrctrlpriv->tog = 0x80;
 +
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
 +	timer_setup(&pwrctrlpriv->pwr_state_check_timer, pwr_state_check_handler, 0);
 +#else
 +	_init_timer(&(pwrctrlpriv->pwr_state_check_timer), padapter->pnetdev,
