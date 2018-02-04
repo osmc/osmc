@@ -1,0 +1,58 @@
+From 1c7f58b7b7eeefa225b82511309e30a0120d4cd9 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Feb 2018 18:42:49 +0000
+Subject: [PATCH] allowsharing needs to be set for mounted drives to be
+ streamed properly. See
+ https://discourse.osmc.tv/t/yatse-and-osmc-2017-12-1-local-streaming/70370/24.
+ Pre-define a source and make sure they are always set if there is no
+ sources.xml (first-run).
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ userdata/sources.xml | 21 +++++++++++++++++++++
+ xbmc/Application.cpp |  1 +
+ 2 files changed, 22 insertions(+)
+ create mode 100644 userdata/sources.xml
+
+diff --git a/userdata/sources.xml b/userdata/sources.xml
+new file mode 100644
+index 0000000..5b681fc
+--- /dev/null
++++ b/userdata/sources.xml
+@@ -0,0 +1,21 @@
++<sources>
++    <video>
++        <default pathversion="1"></default>
++        <source>
++            <name>Auto-mounted drives</name>
++            <path pathversion="1">/media/</path>
++            <allowsharing>true</allowsharing>
++        </source>
++    </video>
++    <music>
++        <default pathversion="1"></default>
++        <source>
++            <name>Auto-mounted drives</name>
++            <path pathversion="1">/media/</path>
++            <allowsharing>true</allowsharing>
++        </source>
++    </music>
++    <files>
++        <default pathversion="1"></default>
++    </files>
++</sources>
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 9c465a6..6925404 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -485,6 +485,7 @@ bool CApplication::Create()
+   CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
+   CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
+   CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
++  CopyUserDataIfNeeded("special://masterprofile/", "sources.xml");
+   
+   //! @todo - move to CPlatformXXX
+   #ifdef TARGET_DARWIN_IOS
+-- 
+2.7.4
+
