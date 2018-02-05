@@ -5,7 +5,7 @@ rbp1:
 	sudo bash build.sh "rbp1"
 
 rbp2:
-	sudo bash -x build.sh "rbp2"
+	sudo bash build.sh "rbp2"
 
 vero:
 	sudo bash build.sh "vero"
