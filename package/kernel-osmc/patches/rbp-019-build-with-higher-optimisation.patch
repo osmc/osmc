@@ -1,20 +1,21 @@
 diff --git a/Makefile b/Makefile
-index 4496018..8d558b1 100644
+index 90a4bff..f5e64d5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -301,8 +301,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+@@ -301,9 +301,9 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
  
  HOSTCC       = gcc
  HOSTCXX      = g++
--HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
--HOSTCXXFLAGS = -O2
-+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -std=gnu89
-+HOSTCXXFLAGS = -O3
+-HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
++HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 \
+ 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+-HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
++HOSTCXXFLAGS := -O3 $(HOST_LFS_CFLAGS)
+ HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+ HOST_LOADLIBES := $(HOST_LFS_LIBS)
  
- ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
- HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
-@@ -639,9 +639,9 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+@@ -641,9 +641,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
  else
  ifdef CONFIG_PROFILE_ALL_BRANCHES
 -KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)

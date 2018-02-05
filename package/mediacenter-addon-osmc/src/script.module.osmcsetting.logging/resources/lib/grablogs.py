@@ -54,6 +54,12 @@ SETS =  {
                                                 'ltyp': 'file_log',
                                                 'actn': '/proc/cmdline',
                                             },
+                                            {
+                                                'name': 'Debian version',
+                                                'key' : 'm4ls932a',
+                                                'ltyp': 'file_log',
+                                                'actn': '/etc/debian_version',
+                                            },
                                           ],
                                 },
 

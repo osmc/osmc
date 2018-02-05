@@ -1,0 +1,29 @@
+From 5c5bd35c8ce6263309850c6c804df0b54ce69a7a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 11 Jan 2018 02:12:40 +0000
+Subject: [PATCH] Fix for IPTV channel switching delays.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 33d1e5a..41c2b4e 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -428,6 +428,11 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
+   }
+   else if (!iformat || (strcmp(iformat->name, "mpegts") != 0))
+   {
++    if (m_streaminfo == false) {
++	av_opt_set_int(m_pFormatContext, "analyzeduration", 500000, 0);
++	m_checkvideo = true;
++	skipCreateStreams = true;
++    }
+     m_streaminfo = true;
+   }
+ 
+-- 
+2.7.4
+

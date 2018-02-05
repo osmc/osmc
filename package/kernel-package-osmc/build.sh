@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="2855919f3acd83f4ea416d90b83f5ef3299abf3c"
+REV="86dda6e2eca03469e9d41fbffcfa5dc8d80f5db0"
 
 echo -e "Building package kernel-package-osmc"
 out=$(pwd)/files

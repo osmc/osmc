@@ -1,0 +1,153 @@
+From f170af9b3e07243f9266a55b616777953ea24072 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 15 Jan 2018 02:34:41 +0000
+Subject: [PATCH] Add option to force RGB output, lock HPD and disable HDMI
+ audio out
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ .../resource.language.en_gb/resources/strings.po   | 31 ++++++++++++++++++++++
+ system/settings/settings.xml                       | 15 +++++++++++
+ xbmc/settings/Settings.cpp                         |  3 +++
+ xbmc/settings/Settings.h                           |  3 +++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp        | 17 ++++++++++++
+ 5 files changed, 69 insertions(+)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index dd051b7..e04ee65 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -5845,6 +5845,21 @@ msgctxt "#13132"
+ msgid "Blank displays"
+ msgstr ""
+ 
++#: unknown
++msgctxt "#13133"
++msgid "Force RGB output"
++msgstr ""
++
++#: unknown
++msgctxt "#13134"
++msgid "Lock HDMI HPD"
++msgstr ""
++
++#: unknown
++msgctxt "#13135"
++msgid "Mute HDMI audio output"
++msgstr ""
++
+ #empty strings from id 13133 to 13139
+ 
+ #: xbmc/network/NetworkServices.cpp
+@@ -19817,3 +19832,19 @@ msgstr ""
+ msgctxt "#39010"
+ msgid "Select sort method"
+ msgstr ""
++
++#: Description of display setting with label # 13133
++msgctxt "#39011"
++msgid "Enable this to force RGB output for some legacy TVs such as Philips 2009 era TVs. Fixes blue / green screen flashes. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13134
++msgctxt "#39012"
++msgid "Disables HPD events. Can fix sound issues. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13135
++msgctxt "#39013"
++msgid "Turns off HDMI audio. Useful if you're using SPDIF audio and don't want audio on HDMI. Requires reboot."
++msgstr ""
++
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 1f744f1..344cdb8 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2070,6 +2070,21 @@
+           </dependencies>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoscreen.forcergb" type="boolean" parent="videoscreen.screen" label="13133" help="39011">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.lockhpd" type="boolean" parent="videoscreen.screen" label="13134" help="39012">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.mutehdmi" type="boolean" parent="videoscreen.screen" label="13135" help="39013">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
+           <level>2</level>
+           <default>0</default>
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 3758375..72098b5 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -341,6 +341,9 @@ const std::string CSettings::SETTING_VIDEOSCREEN_RESOLUTION = "videoscreen.resol
+ const std::string CSettings::SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
+ const std::string CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
++const std::string CSettings::SETTING_VIDEOSCREEN_FORCERGB = "videoscreen.forcergb";
++const std::string CSettings::SETTING_VIDEOSCREEN_LOCKHPD = "videoscreen.lockhpd";
++const std::string CSettings::SETTING_VIDEOSCREEN_MUTEHDMI = "videoscreen.mutehdmi";
+ const std::string CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE = "videoscreen.preferedstereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_NOOFBUFFERS = "videoscreen.noofbuffers";
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index ab67709..439b2b4 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -297,6 +297,9 @@ public:
+   static const std::string SETTING_VIDEOSCREEN_SCREENMODE;
+   static const std::string SETTING_VIDEOSCREEN_FAKEFULLSCREEN;
+   static const std::string SETTING_VIDEOSCREEN_BLANKDISPLAYS;
++  static const std::string SETTING_VIDEOSCREEN_FORCERGB;
++  static const std::string SETTING_VIDEOSCREEN_LOCKHPD;
++  static const std::string SETTING_VIDEOSCREEN_MUTEHDMI;
+   static const std::string SETTING_VIDEOSCREEN_STEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_NOOFBUFFERS;
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 3a5e8f7..f3dd16c 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -25,6 +25,7 @@
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
+ #include "utils/log.h"
++#include "settings/Settings.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -67,6 +68,22 @@ void CEGLNativeTypeAmlogic::Initialize()
+ {
+   aml_permissions();
+   DisableFreeScale();
++
++ /* Take in to account custom OSMC parameters */
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing RGB");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
++ }
++
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
++ }
++
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- muting HDMI");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
++ }
+ }
+ void CEGLNativeTypeAmlogic::Destroy()
+ {
+-- 
+2.7.4
+

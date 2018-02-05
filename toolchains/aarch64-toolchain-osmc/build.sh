@@ -73,12 +73,12 @@ echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
 
+# Perform filesystem cleanup
+cleanup_filesystem "${DIR}"
+
 # Remove QEMU binary
 chroot ${DIR} umount /proc
 remove_emulate_arm "${DIR}" "64"
-
-# Perform filesystem cleanup
-cleanup_filesystem "${DIR}"
 
 # Build Debian package
 echo "Building Debian package"
