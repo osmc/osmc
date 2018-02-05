@@ -57,11 +57,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	update_sources
-<<<<<<< HEAD
-#	handle_dep "kernel-package"
-=======
 	handle_dep "kernel-package-osmc"
->>>>>>> c2ba2a780503c90faf6a968a542e1df7f2cf3800
 	handle_dep "liblz4-tool"
 	handle_dep "cpio"
 	handle_dep "bison"
