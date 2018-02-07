@@ -89,7 +89,7 @@ class AdvancedSettingsEditor(object):
 		return False
 
 
-	def validate_advset_dict(self, dictionary, reject_empty=False, exclude_name=False):
+	def validate_advset_dict(self, dictionary, reject_empty=False, exclude_name=False, no_pw_ok=False):
 		''' Checks whether the provided dictionary is fully populated with MySQL settings info.
 			If reject_empty is False, then Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed.
 			If reject_empty is True,  then Blank dictionaries are rejected, AND dictionaries with no video or music database dicts are also rejected.
@@ -106,17 +106,22 @@ class AdvancedSettingsEditor(object):
 		else:
 			sql_subitems = ['name', 'host', 'port', 'user', 'pass']
 
+                if no_pw_ok:
+                        sql_subitems.remove('pass') # Don't require a password
+
 		if 'videodatabase' in main:
 			# fail if the items aren't filled in or are the default up value
 			for item in sql_subitems:
 				subitem = main.get('videodatabase',{}).get(item, False)
 				if not subitem or subitem == '___ : ___ : ___ : ___':
-					return False, 'missing mysql'
+                                        self.log('Missing MySQL Video setting: {}'.format(item))
+			                return False, 'missing mysql'
 
 		if 'musicdatabase' in main:
 			for item in sql_subitems:
 				subitem = main.get('musicdatabase',{}).get(item, False)
 				if not subitem or subitem == '___ : ___ : ___ : ___':
+                                        self.log('Missing MySQL Music setting: {}'.format(item))
 					return False, 'missing mysql'
 
 		if reject_empty:

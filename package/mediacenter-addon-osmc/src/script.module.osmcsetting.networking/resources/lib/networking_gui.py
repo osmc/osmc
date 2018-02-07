@@ -686,7 +686,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             name.setLabel(video.get('name', 'MyVideos'))
             host.setLabel(video.get('host', '___ : ___ : ___ : ___'))
-            port.setLabel(video.get('port', ''))
+            port.setLabel(video.get('port', '3306'))
             user.setLabel(video.get('user', 'kodi'))
             try:
                 pswd.setLabel('*' * len(video.get('pass', 'kodi')))
@@ -694,8 +694,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             except:
                 pswd.setLabel('kodi')
                 hpwd.setLabel('kodi')
-            impw.setSelected(vidlb.get('importwatchedstate', 'true') == 'true')
-            impr.setSelected(vidlb.get('importresumepoint', 'true') == 'true')
+            try:
+                impw.setSelected(vidlb.get('importwatchedstate', 'true') == 'true')
+            except:
+                impw.setSelected(False)
+            try:
+                impr.setSelected(vidlb.get('importresumepoint', 'true') == 'true')
+            except:
+                impr.setSelected(False)
 
         else:
             self.getControl(MYSQL_VIDEO_TOGGLE).setSelected(False)
@@ -708,7 +714,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             name.setLabel(music.get('name', 'MyMusic'))
             host.setLabel(music.get('host', '___ : ___ : ___ : ___'))
-            port.setLabel(music.get('port', ''))
+            port.setLabel(music.get('port', '3306'))
             user.setLabel(music.get('user', 'kodi'))
             try:
                 pswd.setLabel('*' * len(music.get('pass', 'kodi')))
@@ -735,10 +741,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if self.getControl(MYSQL_VIDEO_TOGGLE).isSelected():
 
+            defaults = {'name': 'MyVideos',
+                        'port': '3306'}
             for sql_item, ctl in zip(sql_subitems, MYSQL_VIDEO_VALUES):
                 if ctl in MYSQL_PASS:
                     ctl -= 100000
                 video[sql_item] = self.getControl(ctl).getLabel()
+                if sql_item in defaults and not video[sql_item]:
+                    video[sql_item] = defaults[sql_item]
 
                 log('ctl %s : sql item %s : %s' %(ctl, sql_item, self.getControl(ctl).getLabel()))
     
@@ -769,10 +779,14 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if self.getControl(MYSQL_MUSIC_TOGGLE).isSelected():
 
+            defaults = {'name': 'MyMusic',
+                        'port': '3306'}
             for sql_item, ctl in zip(sql_subitems, MYSQL_MUSIC_VALUES):
                 if ctl in MYSQL_PASS:
                     ctl = ctl - 100000
                 music[sql_item] = self.getControl(ctl).getLabel()
+                if sql_item in defaults and not music[sql_item]:
+                    music[sql_item] = defaults[sql_item]
 
             sub_dict['musicdatabase'] = music
 
@@ -789,7 +803,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         ''' Takes a dictionary and writes it to the advancedsettings.xml file '''
 
         # check the dictionary to see if it is valid
-        dictionary_valid, invalidity_type = self.ASE.validate_advset_dict(dictionary)
+        dictionary_valid, invalidity_type = self.ASE.validate_advset_dict(dictionary, no_pw_ok=True)
 
         if not dictionary_valid:
             if invalidity_type == 'missing mysql':
