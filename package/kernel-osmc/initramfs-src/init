@@ -14,6 +14,10 @@ install_symlinks()
 busybox_shell()
 {
 	install_symlinks
+        if [ ! -z $OPTION_SERIAL_PORT ]
+        then
+                /bin/busybox getty -n -L $OPTION_SERIAL_PORT 115200 vt100 &
+        fi
 	/bin/busybox setsid /bin/busybox sh -c 'exec /bin/busybox sh </dev/tty1 >/dev/tty1 2>&1'
 }
 
