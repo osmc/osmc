@@ -1,0 +1,1223 @@
+Backport of Geniatech T230C support from kernel v4.12
+
+ Cherry picked from the following commits:
+ 8393c00369f1fe68182295b7adca80a73646fdd3 [media] si2168: implement ber statistics
+ c62d29c81736c6f3a6a9cc6ba2f5aad1cfa6afbc [media] si2168: implement ucb statistics
+ 50d644620781024da229e35722538f75fd779672 [media] si2168: Si2168-D60 support
+ 5fa88151ecdbfc9f2092cf1add7966c546b95dfa [media] dvb-usb-cxusb: Geniatech T230 - resync TS FIFO after lock
+ 517b500713fd321f1519996904a7c21a141ad3e9 [media] cxusb: port to rc-core
+ f8585ce655e9cdeabc38e8e2580b05735110e4a5 [media] dvb-usb-cxusb: Geniatech T230C support
+ 3a2824c72ab5d9b2b93d49461f09d5ae342d994c [media] si2157: Add support for Si2141-A10
+
+diff --git a/drivers/media/dvb-frontends/si2168.c b/drivers/media/dvb-frontends/si2168.c
+index 20b4a65..172fc36 100644
+--- a/drivers/media/dvb-frontends/si2168.c
++++ b/drivers/media/dvb-frontends/si2168.c
+@@ -85,7 +85,8 @@ static int si2168_read_status(struct dvb_frontend *fe, enum fe_status *status)
+ 	struct i2c_client *client = fe->demodulator_priv;
+ 	struct si2168_dev *dev = i2c_get_clientdata(client);
+ 	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+-	int ret;
++	int ret, i;
++	unsigned int utmp, utmp1, utmp2;
+ 	struct si2168_cmd cmd;
+ 
+ 	*status = 0;
+@@ -144,6 +145,61 @@ static int si2168_read_status(struct dvb_frontend *fe, enum fe_status *status)
+ 	dev_dbg(&client->dev, "status=%02x args=%*ph\n",
+ 			*status, cmd.rlen, cmd.args);
+ 
++	/* BER */
++	if (*status & FE_HAS_VITERBI) {
++		memcpy(cmd.args, "\x82\x00", 2);
++		cmd.wlen = 2;
++		cmd.rlen = 3;
++		ret = si2168_cmd_execute(client, &cmd);
++		if (ret)
++			goto err;
++
++		/*
++		 * Firmware returns [0, 255] mantissa and [0, 8] exponent.
++		 * Convert to DVB API: mantissa * 10^(8 - exponent) / 10^8
++		 */
++		utmp = clamp(8 - cmd.args[1], 0, 8);
++		for (i = 0, utmp1 = 1; i < utmp; i++)
++			utmp1 = utmp1 * 10;
++
++		utmp1 = cmd.args[2] * utmp1;
++		utmp2 = 100000000; /* 10^8 */
++
++		dev_dbg(&client->dev,
++			"post_bit_error=%u post_bit_count=%u ber=%u*10^-%u\n",
++			utmp1, utmp2, cmd.args[2], cmd.args[1]);
++
++		c->post_bit_error.stat[0].scale = FE_SCALE_COUNTER;
++		c->post_bit_error.stat[0].uvalue += utmp1;
++		c->post_bit_count.stat[0].scale = FE_SCALE_COUNTER;
++		c->post_bit_count.stat[0].uvalue += utmp2;
++	} else {
++		c->post_bit_error.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++		c->post_bit_count.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++	}
++
++	/* UCB */
++	if (*status & FE_HAS_SYNC) {
++		memcpy(cmd.args, "\x84\x01", 2);
++		cmd.wlen = 2;
++		cmd.rlen = 3;
++		ret = si2168_cmd_execute(client, &cmd);
++		if (ret)
++			goto err;
++
++		utmp1 = cmd.args[2] << 8 | cmd.args[1] << 0;
++		dev_dbg(&client->dev, "block_error=%u\n", utmp1);
++
++		/* Sometimes firmware returns bogus value */
++		if (utmp1 == 0xffff)
++			utmp1 = 0;
++
++		c->block_error.stat[0].scale = FE_SCALE_COUNTER;
++		c->block_error.stat[0].uvalue += utmp1;
++	} else {
++		c->block_error.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++	}
++
+ 	return 0;
+ err:
+ 	dev_dbg(&client->dev, "failed=%d\n", ret);
+@@ -355,6 +411,7 @@ static int si2168_init(struct dvb_frontend *fe)
+ {
+ 	struct i2c_client *client = fe->demodulator_priv;
+ 	struct si2168_dev *dev = i2c_get_clientdata(client);
++	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	int ret, len, remaining;
+ 	const struct firmware *fw;
+ 	struct si2168_cmd cmd;
+@@ -493,10 +550,19 @@ static int si2168_init(struct dvb_frontend *fe)
+ 
+ 	dev->warm = true;
+ warm:
++	/* Init stats here to indicate which stats are supported */
++	c->cnr.len = 1;
++	c->cnr.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++	c->post_bit_error.len = 1;
++	c->post_bit_error.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++	c->post_bit_count.len = 1;
++	c->post_bit_count.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++	c->block_error.len = 1;
++	c->block_error.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
++
+ 	dev->active = true;
+ 
+ 	return 0;
+-
+ err_release_firmware:
+ 	release_firmware(fw);
+ err:
+@@ -674,6 +740,9 @@ static int si2168_probe(struct i2c_client *client,
+ 	case SI2168_CHIP_ID_B40:
+ 		dev->firmware_name = SI2168_B40_FIRMWARE;
+ 		break;
++	case SI2168_CHIP_ID_D60:
++		dev->firmware_name = SI2168_D60_FIRMWARE;
++		break;
+ 	default:
+ 		dev_dbg(&client->dev, "unknown chip version Si21%d-%c%c%c\n",
+ 			cmd.args[2], cmd.args[1], cmd.args[3], cmd.args[4]);
+@@ -761,3 +830,4 @@ MODULE_LICENSE("GPL");
+ MODULE_FIRMWARE(SI2168_A20_FIRMWARE);
+ MODULE_FIRMWARE(SI2168_A30_FIRMWARE);
+ MODULE_FIRMWARE(SI2168_B40_FIRMWARE);
++MODULE_FIRMWARE(SI2168_D60_FIRMWARE);
+diff --git a/drivers/media/dvb-frontends/si2168_priv.h b/drivers/media/dvb-frontends/si2168_priv.h
+index 7843ccb..737cf41 100644
+--- a/drivers/media/dvb-frontends/si2168_priv.h
++++ b/drivers/media/dvb-frontends/si2168_priv.h
+@@ -21,10 +21,12 @@
+ #include "dvb_frontend.h"
+ #include <linux/firmware.h>
+ #include <linux/i2c-mux.h>
++#include <linux/kernel.h>
+ 
+ #define SI2168_A20_FIRMWARE "dvb-demod-si2168-a20-01.fw"
+ #define SI2168_A30_FIRMWARE "dvb-demod-si2168-a30-01.fw"
+ #define SI2168_B40_FIRMWARE "dvb-demod-si2168-b40-01.fw"
++#define SI2168_D60_FIRMWARE "dvb-demod-si2168-d60-01.fw"
+ #define SI2168_B40_FIRMWARE_FALLBACK "dvb-demod-si2168-02.fw"
+ 
+ /* state struct */
+@@ -37,6 +39,7 @@ struct si2168_dev {
+ 	#define SI2168_CHIP_ID_A20 ('A' << 24 | 68 << 16 | '2' << 8 | '0' << 0)
+ 	#define SI2168_CHIP_ID_A30 ('A' << 24 | 68 << 16 | '3' << 8 | '0' << 0)
+ 	#define SI2168_CHIP_ID_B40 ('B' << 24 | 68 << 16 | '4' << 8 | '0' << 0)
++	#define SI2168_CHIP_ID_D60 ('D' << 24 | 68 << 16 | '6' << 8 | '0' << 0)
+ 	unsigned int chip_id;
+ 	unsigned int version;
+ 	const char *firmware_name;
+diff --git a/drivers/media/rc/keymaps/Makefile b/drivers/media/rc/keymaps/Makefile
+index d7b13fa..11d5d5a 100644
+--- a/drivers/media/rc/keymaps/Makefile
++++ b/drivers/media/rc/keymaps/Makefile
+@@ -21,6 +21,7 @@ obj-$(CONFIG_RC_MAP) += rc-adstech-dvb-t-pci.o \
+ 			rc-cec.o \
+ 			rc-cinergy-1400.o \
+ 			rc-cinergy.o \
++			rc-d680-dmb.o \
+ 			rc-delock-61959.o \
+ 			rc-dib0700-nec.o \
+ 			rc-dib0700-rc5.o \
+@@ -31,6 +32,8 @@ obj-$(CONFIG_RC_MAP) += rc-adstech-dvb-t-pci.o \
+ 			rc-dntv-live-dvbt-pro.o \
+ 			rc-dtt200u.o \
+ 			rc-dvbsky.o \
++			rc-dvico-mce.o \
++			rc-dvico-portable.o \
+ 			rc-em-terratec.o \
+ 			rc-encore-enltv2.o \
+ 			rc-encore-enltv.o \
+diff --git a/drivers/media/rc/keymaps/rc-d680-dmb.c b/drivers/media/rc/keymaps/rc-d680-dmb.c
+new file mode 100644
+index 0000000..bb5745d
+--- /dev/null
++++ b/drivers/media/rc/keymaps/rc-d680-dmb.c
+@@ -0,0 +1,75 @@
++/*
++ * keymap imported from cxusb.c
++ *
++ * Copyright (C) 2016 Sean Young
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2.
++ */
++
++#include <media/rc-map.h>
++#include <linux/module.h>
++
++static struct rc_map_table rc_map_d680_dmb_table[] = {
++	{ 0x0038, KEY_SWITCHVIDEOMODE },	/* TV/AV */
++	{ 0x080c, KEY_ZOOM },
++	{ 0x0800, KEY_0 },
++	{ 0x0001, KEY_1 },
++	{ 0x0802, KEY_2 },
++	{ 0x0003, KEY_3 },
++	{ 0x0804, KEY_4 },
++	{ 0x0005, KEY_5 },
++	{ 0x0806, KEY_6 },
++	{ 0x0007, KEY_7 },
++	{ 0x0808, KEY_8 },
++	{ 0x0009, KEY_9 },
++	{ 0x000a, KEY_MUTE },
++	{ 0x0829, KEY_BACK },
++	{ 0x0012, KEY_CHANNELUP },
++	{ 0x0813, KEY_CHANNELDOWN },
++	{ 0x002b, KEY_VOLUMEUP },
++	{ 0x082c, KEY_VOLUMEDOWN },
++	{ 0x0020, KEY_UP },
++	{ 0x0821, KEY_DOWN },
++	{ 0x0011, KEY_LEFT },
++	{ 0x0810, KEY_RIGHT },
++	{ 0x000d, KEY_OK },
++	{ 0x081f, KEY_RECORD },
++	{ 0x0017, KEY_PLAYPAUSE },
++	{ 0x0816, KEY_PLAYPAUSE },
++	{ 0x000b, KEY_STOP },
++	{ 0x0827, KEY_FASTFORWARD },
++	{ 0x0026, KEY_REWIND },
++	{ 0x081e, KEY_UNKNOWN },    /* Time Shift */
++	{ 0x000e, KEY_UNKNOWN },    /* Snapshot */
++	{ 0x082d, KEY_UNKNOWN },    /* Mouse Cursor */
++	{ 0x000f, KEY_UNKNOWN },    /* Minimize/Maximize */
++	{ 0x0814, KEY_SHUFFLE },    /* Shuffle */
++	{ 0x0025, KEY_POWER },
++};
++
++static struct rc_map_list d680_dmb_map = {
++	.map = {
++		.scan    = rc_map_d680_dmb_table,
++		.size    = ARRAY_SIZE(rc_map_d680_dmb_table),
++		.rc_type = RC_TYPE_UNKNOWN,	/* Legacy IR type */
++		.name    = RC_MAP_D680_DMB,
++	}
++};
++
++static int __init init_rc_map_d680_dmb(void)
++{
++	return rc_map_register(&d680_dmb_map);
++}
++
++static void __exit exit_rc_map_d680_dmb(void)
++{
++	rc_map_unregister(&d680_dmb_map);
++}
++
++module_init(init_rc_map_d680_dmb)
++module_exit(exit_rc_map_d680_dmb)
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Mauro Carvalho Chehab");
+diff --git a/drivers/media/rc/keymaps/rc-dvico-mce.c b/drivers/media/rc/keymaps/rc-dvico-mce.c
+new file mode 100644
+index 0000000..e5f098c
+--- /dev/null
++++ b/drivers/media/rc/keymaps/rc-dvico-mce.c
+@@ -0,0 +1,85 @@
++/*
++ * keymap imported from cxusb.c
++ *
++ * Copyright (C) 2016 Sean Young
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2.
++ */
++
++#include <media/rc-map.h>
++#include <linux/module.h>
++
++static struct rc_map_table rc_map_dvico_mce_table[] = {
++	{ 0xfe02, KEY_TV },
++	{ 0xfe0e, KEY_MP3 },
++	{ 0xfe1a, KEY_DVD },
++	{ 0xfe1e, KEY_FAVORITES },
++	{ 0xfe16, KEY_SETUP },
++	{ 0xfe46, KEY_POWER2 },
++	{ 0xfe0a, KEY_EPG },
++	{ 0xfe49, KEY_BACK },
++	{ 0xfe4d, KEY_MENU },
++	{ 0xfe51, KEY_UP },
++	{ 0xfe5b, KEY_LEFT },
++	{ 0xfe5f, KEY_RIGHT },
++	{ 0xfe53, KEY_DOWN },
++	{ 0xfe5e, KEY_OK },
++	{ 0xfe59, KEY_INFO },
++	{ 0xfe55, KEY_TAB },
++	{ 0xfe0f, KEY_PREVIOUSSONG },/* Replay */
++	{ 0xfe12, KEY_NEXTSONG },	/* Skip */
++	{ 0xfe42, KEY_ENTER	 },	/* Windows/Start */
++	{ 0xfe15, KEY_VOLUMEUP },
++	{ 0xfe05, KEY_VOLUMEDOWN },
++	{ 0xfe11, KEY_CHANNELUP },
++	{ 0xfe09, KEY_CHANNELDOWN },
++	{ 0xfe52, KEY_CAMERA },
++	{ 0xfe5a, KEY_TUNER },	/* Live */
++	{ 0xfe19, KEY_OPEN },
++	{ 0xfe0b, KEY_1 },
++	{ 0xfe17, KEY_2 },
++	{ 0xfe1b, KEY_3 },
++	{ 0xfe07, KEY_4 },
++	{ 0xfe50, KEY_5 },
++	{ 0xfe54, KEY_6 },
++	{ 0xfe48, KEY_7 },
++	{ 0xfe4c, KEY_8 },
++	{ 0xfe58, KEY_9 },
++	{ 0xfe13, KEY_ANGLE },	/* Aspect */
++	{ 0xfe03, KEY_0 },
++	{ 0xfe1f, KEY_ZOOM },
++	{ 0xfe43, KEY_REWIND },
++	{ 0xfe47, KEY_PLAYPAUSE },
++	{ 0xfe4f, KEY_FASTFORWARD },
++	{ 0xfe57, KEY_MUTE },
++	{ 0xfe0d, KEY_STOP },
++	{ 0xfe01, KEY_RECORD },
++	{ 0xfe4e, KEY_POWER },
++};
++
++static struct rc_map_list dvico_mce_map = {
++	.map = {
++		.scan    = rc_map_dvico_mce_table,
++		.size    = ARRAY_SIZE(rc_map_dvico_mce_table),
++		.rc_type = RC_TYPE_UNKNOWN,	/* Legacy IR type */
++		.name    = RC_MAP_DVICO_MCE,
++	}
++};
++
++static int __init init_rc_map_dvico_mce(void)
++{
++	return rc_map_register(&dvico_mce_map);
++}
++
++static void __exit exit_rc_map_dvico_mce(void)
++{
++	rc_map_unregister(&dvico_mce_map);
++}
++
++module_init(init_rc_map_dvico_mce)
++module_exit(exit_rc_map_dvico_mce)
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Mauro Carvalho Chehab");
+diff --git a/drivers/media/rc/keymaps/rc-dvico-portable.c b/drivers/media/rc/keymaps/rc-dvico-portable.c
+new file mode 100644
+index 0000000..94ceeee
+--- /dev/null
++++ b/drivers/media/rc/keymaps/rc-dvico-portable.c
+@@ -0,0 +1,76 @@
++/*
++ * keymap imported from cxusb.c
++ *
++ * Copyright (C) 2016 Sean Young
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2.
++ */
++
++#include <media/rc-map.h>
++#include <linux/module.h>
++
++static struct rc_map_table rc_map_dvico_portable_table[] = {
++	{ 0xfc02, KEY_SETUP },       /* Profile */
++	{ 0xfc43, KEY_POWER2 },
++	{ 0xfc06, KEY_EPG },
++	{ 0xfc5a, KEY_BACK },
++	{ 0xfc05, KEY_MENU },
++	{ 0xfc47, KEY_INFO },
++	{ 0xfc01, KEY_TAB },
++	{ 0xfc42, KEY_PREVIOUSSONG },/* Replay */
++	{ 0xfc49, KEY_VOLUMEUP },
++	{ 0xfc09, KEY_VOLUMEDOWN },
++	{ 0xfc54, KEY_CHANNELUP },
++	{ 0xfc0b, KEY_CHANNELDOWN },
++	{ 0xfc16, KEY_CAMERA },
++	{ 0xfc40, KEY_TUNER },	/* ATV/DTV */
++	{ 0xfc45, KEY_OPEN },
++	{ 0xfc19, KEY_1 },
++	{ 0xfc18, KEY_2 },
++	{ 0xfc1b, KEY_3 },
++	{ 0xfc1a, KEY_4 },
++	{ 0xfc58, KEY_5 },
++	{ 0xfc59, KEY_6 },
++	{ 0xfc15, KEY_7 },
++	{ 0xfc14, KEY_8 },
++	{ 0xfc17, KEY_9 },
++	{ 0xfc44, KEY_ANGLE },	/* Aspect */
++	{ 0xfc55, KEY_0 },
++	{ 0xfc07, KEY_ZOOM },
++	{ 0xfc0a, KEY_REWIND },
++	{ 0xfc08, KEY_PLAYPAUSE },
++	{ 0xfc4b, KEY_FASTFORWARD },
++	{ 0xfc5b, KEY_MUTE },
++	{ 0xfc04, KEY_STOP },
++	{ 0xfc56, KEY_RECORD },
++	{ 0xfc57, KEY_POWER },
++	{ 0xfc41, KEY_UNKNOWN },    /* INPUT */
++	{ 0xfc00, KEY_UNKNOWN },    /* HD */
++};
++
++static struct rc_map_list dvico_portable_map = {
++	.map = {
++		.scan    = rc_map_dvico_portable_table,
++		.size    = ARRAY_SIZE(rc_map_dvico_portable_table),
++		.rc_type = RC_TYPE_UNKNOWN,	/* Legacy IR type */
++		.name    = RC_MAP_DVICO_PORTABLE,
++	}
++};
++
++static int __init init_rc_map_dvico_portable(void)
++{
++	return rc_map_register(&dvico_portable_map);
++}
++
++static void __exit exit_rc_map_dvico_portable(void)
++{
++	rc_map_unregister(&dvico_portable_map);
++}
++
++module_init(init_rc_map_dvico_portable)
++module_exit(exit_rc_map_dvico_portable)
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Mauro Carvalho Chehab");
+diff --git a/drivers/media/tuners/si2157.c b/drivers/media/tuners/si2157.c
+index 57b2508..e35b1fa 100644
+--- a/drivers/media/tuners/si2157.c
++++ b/drivers/media/tuners/si2157.c
+@@ -106,6 +106,9 @@ static int si2157_init(struct dvb_frontend *fe)
+ 	if (dev->chiptype == SI2157_CHIPTYPE_SI2146) {
+ 		memcpy(cmd.args, "\xc0\x05\x01\x00\x00\x0b\x00\x00\x01", 9);
+ 		cmd.wlen = 9;
++	} else if (dev->chiptype == SI2157_CHIPTYPE_SI2141) {
++		memcpy(cmd.args, "\xc0\x00\x0d\x0e\x00\x01\x01\x01\x01\x03", 10);
++		cmd.wlen = 10;
+ 	} else {
+ 		memcpy(cmd.args, "\xc0\x00\x0c\x00\x00\x01\x01\x01\x01\x01\x01\x02\x00\x00\x01", 15);
+ 		cmd.wlen = 15;
+@@ -115,6 +118,15 @@ static int si2157_init(struct dvb_frontend *fe)
+ 	if (ret)
+ 		goto err;
+ 
++	/* Si2141 needs a second command before it answers the revision query */
++	if (dev->chiptype == SI2157_CHIPTYPE_SI2141) {
++		memcpy(cmd.args, "\xc0\x08\x01\x02\x00\x00\x01", 7);
++		cmd.wlen = 7;
++		ret = si2157_cmd_execute(client, &cmd);
++		if (ret)
++			goto err;
++	}
++
+ 	/* query chip revision */
+ 	memcpy(cmd.args, "\x02", 1);
+ 	cmd.wlen = 1;
+@@ -131,12 +143,16 @@ static int si2157_init(struct dvb_frontend *fe)
+ 	#define SI2157_A30 ('A' << 24 | 57 << 16 | '3' << 8 | '0' << 0)
+ 	#define SI2147_A30 ('A' << 24 | 47 << 16 | '3' << 8 | '0' << 0)
+ 	#define SI2146_A10 ('A' << 24 | 46 << 16 | '1' << 8 | '0' << 0)
++	#define SI2141_A10 ('A' << 24 | 41 << 16 | '1' << 8 | '0' << 0)
+ 
+ 	switch (chip_id) {
+ 	case SI2158_A20:
+ 	case SI2148_A20:
+ 		fw_name = SI2158_A20_FIRMWARE;
+ 		break;
++	case SI2141_A10:
++		fw_name = SI2141_A10_FIRMWARE;
++		break;
+ 	case SI2157_A30:
+ 	case SI2147_A30:
+ 	case SI2146_A10:
+@@ -371,7 +387,7 @@ static int si2157_get_if_frequency(struct dvb_frontend *fe, u32 *frequency)
+ 
+ static const struct dvb_tuner_ops si2157_ops = {
+ 	.info = {
+-		.name           = "Silicon Labs Si2146/2147/2148/2157/2158",
++		.name           = "Silicon Labs Si2141/Si2146/2147/2148/2157/2158",
+ 		.frequency_min  = 42000000,
+ 		.frequency_max  = 870000000,
+ 	},
+@@ -471,6 +487,7 @@ static int si2157_probe(struct i2c_client *client,
+ #endif
+ 
+ 	dev_info(&client->dev, "Silicon Labs %s successfully attached\n",
++			dev->chiptype == SI2157_CHIPTYPE_SI2141 ?  "Si2141" :
+ 			dev->chiptype == SI2157_CHIPTYPE_SI2146 ?
+ 			"Si2146" : "Si2147/2148/2157/2158");
+ 
+@@ -508,6 +525,7 @@ static int si2157_remove(struct i2c_client *client)
+ static const struct i2c_device_id si2157_id_table[] = {
+ 	{"si2157", SI2157_CHIPTYPE_SI2157},
+ 	{"si2146", SI2157_CHIPTYPE_SI2146},
++	{"si2141", SI2157_CHIPTYPE_SI2141},
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(i2c, si2157_id_table);
+@@ -524,7 +542,8 @@ static struct i2c_driver si2157_driver = {
+ 
+ module_i2c_driver(si2157_driver);
+ 
+-MODULE_DESCRIPTION("Silicon Labs Si2146/2147/2148/2157/2158 silicon tuner driver");
++MODULE_DESCRIPTION("Silicon Labs Si2141/Si2146/2147/2148/2157/2158 silicon tuner driver");
+ MODULE_AUTHOR("Antti Palosaari <crope@iki.fi>");
+ MODULE_LICENSE("GPL");
+ MODULE_FIRMWARE(SI2158_A20_FIRMWARE);
++MODULE_FIRMWARE(SI2141_A10_FIRMWARE);
+diff --git a/drivers/media/tuners/si2157_priv.h b/drivers/media/tuners/si2157_priv.h
+index d6b2c7b..e6436f7 100644
+--- a/drivers/media/tuners/si2157_priv.h
++++ b/drivers/media/tuners/si2157_priv.h
+@@ -42,6 +42,7 @@ struct si2157_dev {
+ 
+ #define SI2157_CHIPTYPE_SI2157 0
+ #define SI2157_CHIPTYPE_SI2146 1
++#define SI2157_CHIPTYPE_SI2141 2
+ 
+ /* firmware command struct */
+ #define SI2157_ARGLEN      30
+@@ -52,5 +53,6 @@ struct si2157_cmd {
+ };
+ 
+ #define SI2158_A20_FIRMWARE "dvb-tuner-si2158-a20-01.fw"
++#define SI2141_A10_FIRMWARE "dvb-tuner-si2141-a10-01.fw"
+ 
+ #endif
+diff --git a/drivers/media/usb/dvb-usb/cxusb.c b/drivers/media/usb/dvb-usb/cxusb.c
+index 9fd43a3..9a7665f 100644
+--- a/drivers/media/usb/dvb-usb/cxusb.c
++++ b/drivers/media/usb/dvb-usb/cxusb.c
+@@ -370,6 +370,26 @@ static int cxusb_aver_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
+ 	return 0;
+ }
+ 
++static int cxusb_read_status(struct dvb_frontend *fe,
++				  enum fe_status *status)
++{
++	struct dvb_usb_adapter *adap = (struct dvb_usb_adapter *)fe->dvb->priv;
++	struct cxusb_state *state = (struct cxusb_state *)adap->dev->priv;
++	int ret;
++
++	ret = state->fe_read_status(fe, status);
++
++	/* it need resync slave fifo when signal change from unlock to lock.*/
++	if ((*status & FE_HAS_LOCK) && (!state->last_lock)) {
++		mutex_lock(&state->stream_mutex);
++		cxusb_streaming_ctrl(adap, 1);
++		mutex_unlock(&state->stream_mutex);
++	}
++
++	state->last_lock = (*status & FE_HAS_LOCK) ? 1 : 0;
++	return ret;
++}
++
+ static void cxusb_d680_dmb_drain_message(struct dvb_usb_device *d)
+ {
+ 	int       ep = d->props.generic_bulk_ctrl_endpoint;
+@@ -431,209 +451,46 @@ static int cxusb_d680_dmb_streaming_ctrl(
+ 	}
+ }
+ 
+-static int cxusb_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
++static int cxusb_rc_query(struct dvb_usb_device *d)
+ {
+-	struct rc_map_table *keymap = d->props.rc.legacy.rc_map_table;
+ 	u8 ircode[4];
+-	int i;
+ 
+ 	cxusb_ctrl_msg(d, CMD_GET_IR_CODE, NULL, 0, ircode, 4);
+ 
+-	*event = 0;
+-	*state = REMOTE_NO_KEY_PRESSED;
+-
+-	for (i = 0; i < d->props.rc.legacy.rc_map_size; i++) {
+-		if (rc5_custom(&keymap[i]) == ircode[2] &&
+-		    rc5_data(&keymap[i]) == ircode[3]) {
+-			*event = keymap[i].keycode;
+-			*state = REMOTE_KEY_PRESSED;
+-
+-			return 0;
+-		}
+-	}
+-
++	if (ircode[2] || ircode[3])
++		rc_keydown(d->rc_dev, RC_TYPE_UNKNOWN,
++			   RC_SCANCODE_RC5(ircode[2], ircode[3]), 0);
+ 	return 0;
+ }
+ 
+-static int cxusb_bluebird2_rc_query(struct dvb_usb_device *d, u32 *event,
+-				    int *state)
++static int cxusb_bluebird2_rc_query(struct dvb_usb_device *d)
+ {
+-	struct rc_map_table *keymap = d->props.rc.legacy.rc_map_table;
+ 	u8 ircode[4];
+-	int i;
+ 	struct i2c_msg msg = { .addr = 0x6b, .flags = I2C_M_RD,
+ 			       .buf = ircode, .len = 4 };
+ 
+-	*event = 0;
+-	*state = REMOTE_NO_KEY_PRESSED;
+-
+ 	if (cxusb_i2c_xfer(&d->i2c_adap, &msg, 1) != 1)
+ 		return 0;
+ 
+-	for (i = 0; i < d->props.rc.legacy.rc_map_size; i++) {
+-		if (rc5_custom(&keymap[i]) == ircode[1] &&
+-		    rc5_data(&keymap[i]) == ircode[2]) {
+-			*event = keymap[i].keycode;
+-			*state = REMOTE_KEY_PRESSED;
+-
+-			return 0;
+-		}
+-	}
+-
++	if (ircode[1] || ircode[2])
++		rc_keydown(d->rc_dev, RC_TYPE_UNKNOWN,
++			   RC_SCANCODE_RC5(ircode[1], ircode[2]), 0);
+ 	return 0;
+ }
+ 
+-static int cxusb_d680_dmb_rc_query(struct dvb_usb_device *d, u32 *event,
+-		int *state)
++static int cxusb_d680_dmb_rc_query(struct dvb_usb_device *d)
+ {
+-	struct rc_map_table *keymap = d->props.rc.legacy.rc_map_table;
+ 	u8 ircode[2];
+-	int i;
+-
+-	*event = 0;
+-	*state = REMOTE_NO_KEY_PRESSED;
+ 
+ 	if (cxusb_ctrl_msg(d, 0x10, NULL, 0, ircode, 2) < 0)
+ 		return 0;
+ 
+-	for (i = 0; i < d->props.rc.legacy.rc_map_size; i++) {
+-		if (rc5_custom(&keymap[i]) == ircode[0] &&
+-		    rc5_data(&keymap[i]) == ircode[1]) {
+-			*event = keymap[i].keycode;
+-			*state = REMOTE_KEY_PRESSED;
+-
+-			return 0;
+-		}
+-	}
+-
++	if (ircode[0] || ircode[1])
++		rc_keydown(d->rc_dev, RC_TYPE_UNKNOWN,
++			   RC_SCANCODE_RC5(ircode[0], ircode[1]), 0);
+ 	return 0;
+ }
+ 
+-static struct rc_map_table rc_map_dvico_mce_table[] = {
+-	{ 0xfe02, KEY_TV },
+-	{ 0xfe0e, KEY_MP3 },
+-	{ 0xfe1a, KEY_DVD },
+-	{ 0xfe1e, KEY_FAVORITES },
+-	{ 0xfe16, KEY_SETUP },
+-	{ 0xfe46, KEY_POWER2 },
+-	{ 0xfe0a, KEY_EPG },
+-	{ 0xfe49, KEY_BACK },
+-	{ 0xfe4d, KEY_MENU },
+-	{ 0xfe51, KEY_UP },
+-	{ 0xfe5b, KEY_LEFT },
+-	{ 0xfe5f, KEY_RIGHT },
+-	{ 0xfe53, KEY_DOWN },
+-	{ 0xfe5e, KEY_OK },
+-	{ 0xfe59, KEY_INFO },
+-	{ 0xfe55, KEY_TAB },
+-	{ 0xfe0f, KEY_PREVIOUSSONG },/* Replay */
+-	{ 0xfe12, KEY_NEXTSONG },	/* Skip */
+-	{ 0xfe42, KEY_ENTER	 },	/* Windows/Start */
+-	{ 0xfe15, KEY_VOLUMEUP },
+-	{ 0xfe05, KEY_VOLUMEDOWN },
+-	{ 0xfe11, KEY_CHANNELUP },
+-	{ 0xfe09, KEY_CHANNELDOWN },
+-	{ 0xfe52, KEY_CAMERA },
+-	{ 0xfe5a, KEY_TUNER },	/* Live */
+-	{ 0xfe19, KEY_OPEN },
+-	{ 0xfe0b, KEY_1 },
+-	{ 0xfe17, KEY_2 },
+-	{ 0xfe1b, KEY_3 },
+-	{ 0xfe07, KEY_4 },
+-	{ 0xfe50, KEY_5 },
+-	{ 0xfe54, KEY_6 },
+-	{ 0xfe48, KEY_7 },
+-	{ 0xfe4c, KEY_8 },
+-	{ 0xfe58, KEY_9 },
+-	{ 0xfe13, KEY_ANGLE },	/* Aspect */
+-	{ 0xfe03, KEY_0 },
+-	{ 0xfe1f, KEY_ZOOM },
+-	{ 0xfe43, KEY_REWIND },
+-	{ 0xfe47, KEY_PLAYPAUSE },
+-	{ 0xfe4f, KEY_FASTFORWARD },
+-	{ 0xfe57, KEY_MUTE },
+-	{ 0xfe0d, KEY_STOP },
+-	{ 0xfe01, KEY_RECORD },
+-	{ 0xfe4e, KEY_POWER },
+-};
+-
+-static struct rc_map_table rc_map_dvico_portable_table[] = {
+-	{ 0xfc02, KEY_SETUP },       /* Profile */
+-	{ 0xfc43, KEY_POWER2 },
+-	{ 0xfc06, KEY_EPG },
+-	{ 0xfc5a, KEY_BACK },
+-	{ 0xfc05, KEY_MENU },
+-	{ 0xfc47, KEY_INFO },
+-	{ 0xfc01, KEY_TAB },
+-	{ 0xfc42, KEY_PREVIOUSSONG },/* Replay */
+-	{ 0xfc49, KEY_VOLUMEUP },
+-	{ 0xfc09, KEY_VOLUMEDOWN },
+-	{ 0xfc54, KEY_CHANNELUP },
+-	{ 0xfc0b, KEY_CHANNELDOWN },
+-	{ 0xfc16, KEY_CAMERA },
+-	{ 0xfc40, KEY_TUNER },	/* ATV/DTV */
+-	{ 0xfc45, KEY_OPEN },
+-	{ 0xfc19, KEY_1 },
+-	{ 0xfc18, KEY_2 },
+-	{ 0xfc1b, KEY_3 },
+-	{ 0xfc1a, KEY_4 },
+-	{ 0xfc58, KEY_5 },
+-	{ 0xfc59, KEY_6 },
+-	{ 0xfc15, KEY_7 },
+-	{ 0xfc14, KEY_8 },
+-	{ 0xfc17, KEY_9 },
+-	{ 0xfc44, KEY_ANGLE },	/* Aspect */
+-	{ 0xfc55, KEY_0 },
+-	{ 0xfc07, KEY_ZOOM },
+-	{ 0xfc0a, KEY_REWIND },
+-	{ 0xfc08, KEY_PLAYPAUSE },
+-	{ 0xfc4b, KEY_FASTFORWARD },
+-	{ 0xfc5b, KEY_MUTE },
+-	{ 0xfc04, KEY_STOP },
+-	{ 0xfc56, KEY_RECORD },
+-	{ 0xfc57, KEY_POWER },
+-	{ 0xfc41, KEY_UNKNOWN },    /* INPUT */
+-	{ 0xfc00, KEY_UNKNOWN },    /* HD */
+-};
+-
+-static struct rc_map_table rc_map_d680_dmb_table[] = {
+-	{ 0x0038, KEY_UNKNOWN },	/* TV/AV */
+-	{ 0x080c, KEY_ZOOM },
+-	{ 0x0800, KEY_0 },
+-	{ 0x0001, KEY_1 },
+-	{ 0x0802, KEY_2 },
+-	{ 0x0003, KEY_3 },
+-	{ 0x0804, KEY_4 },
+-	{ 0x0005, KEY_5 },
+-	{ 0x0806, KEY_6 },
+-	{ 0x0007, KEY_7 },
+-	{ 0x0808, KEY_8 },
+-	{ 0x0009, KEY_9 },
+-	{ 0x000a, KEY_MUTE },
+-	{ 0x0829, KEY_BACK },
+-	{ 0x0012, KEY_CHANNELUP },
+-	{ 0x0813, KEY_CHANNELDOWN },
+-	{ 0x002b, KEY_VOLUMEUP },
+-	{ 0x082c, KEY_VOLUMEDOWN },
+-	{ 0x0020, KEY_UP },
+-	{ 0x0821, KEY_DOWN },
+-	{ 0x0011, KEY_LEFT },
+-	{ 0x0810, KEY_RIGHT },
+-	{ 0x000d, KEY_OK },
+-	{ 0x081f, KEY_RECORD },
+-	{ 0x0017, KEY_PLAYPAUSE },
+-	{ 0x0816, KEY_PLAYPAUSE },
+-	{ 0x000b, KEY_STOP },
+-	{ 0x0827, KEY_FASTFORWARD },
+-	{ 0x0026, KEY_REWIND },
+-	{ 0x081e, KEY_UNKNOWN },    /* Time Shift */
+-	{ 0x000e, KEY_UNKNOWN },    /* Snapshot */
+-	{ 0x082d, KEY_UNKNOWN },    /* Mouse Cursor */
+-	{ 0x000f, KEY_UNKNOWN },    /* Minimize/Maximize */
+-	{ 0x0814, KEY_UNKNOWN },    /* Shuffle */
+-	{ 0x0025, KEY_POWER },
+-};
+-
+ static int cxusb_dee1601_demod_init(struct dvb_frontend* fe)
+ {
+ 	static u8 clock_config []  = { CLOCK_CTL,  0x38, 0x28 };
+@@ -981,7 +838,7 @@ static int cxusb_dualdig4_frontend_attach(struct dvb_usb_adapter *adap)
+ 		return -EIO;
+ 
+ 	/* try to determine if there is no IR decoder on the I2C bus */
+-	for (i = 0; adap->dev->props.rc.legacy.rc_map_table != NULL && i < 5; i++) {
++	for (i = 0; adap->dev->props.rc.core.rc_codes && i < 5; i++) {
+ 		msleep(20);
+ 		if (cxusb_i2c_xfer(&adap->dev->i2c_adap, &msg, 1) != 1)
+ 			goto no_IR;
+@@ -989,7 +846,7 @@ static int cxusb_dualdig4_frontend_attach(struct dvb_usb_adapter *adap)
+ 			continue;
+ 		if (ircode[2] + ircode[3] != 0xff) {
+ no_IR:
+-			adap->dev->props.rc.legacy.rc_map_table = NULL;
++			adap->dev->props.rc.core.rc_codes = NULL;
+ 			info("No IR receiver detected on this device.");
+ 			break;
+ 		}
+@@ -1373,6 +1230,88 @@ static int cxusb_mygica_t230_frontend_attach(struct dvb_usb_adapter *adap)
+ 
+ 	st->i2c_client_tuner = client_tuner;
+ 
++	/* hook fe: need to resync the slave fifo when signal locks. */
++	mutex_init(&st->stream_mutex);
++	st->last_lock = 0;
++	st->fe_read_status = adap->fe_adap[0].fe->ops.read_status;
++	adap->fe_adap[0].fe->ops.read_status = cxusb_read_status;
++
++	return 0;
++}
++
++static int cxusb_mygica_t230c_frontend_attach(struct dvb_usb_adapter *adap)
++{
++	struct dvb_usb_device *d = adap->dev;
++	struct cxusb_state *st = d->priv;
++	struct i2c_adapter *adapter;
++	struct i2c_client *client_demod;
++	struct i2c_client *client_tuner;
++	struct i2c_board_info info;
++	struct si2168_config si2168_config;
++	struct si2157_config si2157_config;
++
++	/* Select required USB configuration */
++	if (usb_set_interface(d->udev, 0, 0) < 0)
++		err("set interface failed");
++
++	/* Unblock all USB pipes */
++	usb_clear_halt(d->udev,
++		usb_sndbulkpipe(d->udev, d->props.generic_bulk_ctrl_endpoint));
++	usb_clear_halt(d->udev,
++		usb_rcvbulkpipe(d->udev, d->props.generic_bulk_ctrl_endpoint));
++	usb_clear_halt(d->udev,
++		usb_rcvbulkpipe(d->udev, d->props.adapter[0].fe[0].stream.endpoint));
++
++	/* attach frontend */
++	memset(&si2168_config, 0, sizeof(si2168_config));
++	si2168_config.i2c_adapter = &adapter;
++	si2168_config.fe = &adap->fe_adap[0].fe;
++	si2168_config.ts_mode = SI2168_TS_PARALLEL;
++	si2168_config.ts_clock_inv = 1;
++	memset(&info, 0, sizeof(struct i2c_board_info));
++	strlcpy(info.type, "si2168", I2C_NAME_SIZE);
++	info.addr = 0x64;
++	info.platform_data = &si2168_config;
++	request_module(info.type);
++	client_demod = i2c_new_device(&d->i2c_adap, &info);
++	if (client_demod == NULL || client_demod->dev.driver == NULL)
++		return -ENODEV;
++
++	if (!try_module_get(client_demod->dev.driver->owner)) {
++		i2c_unregister_device(client_demod);
++		return -ENODEV;
++	}
++
++	/* attach tuner */
++	memset(&si2157_config, 0, sizeof(si2157_config));
++	si2157_config.fe = adap->fe_adap[0].fe;
++	memset(&info, 0, sizeof(struct i2c_board_info));
++	strlcpy(info.type, "si2141", I2C_NAME_SIZE);
++	info.addr = 0x60;
++	info.platform_data = &si2157_config;
++	request_module("si2157");
++	client_tuner = i2c_new_device(adapter, &info);
++	if (client_tuner == NULL || client_tuner->dev.driver == NULL) {
++		module_put(client_demod->dev.driver->owner);
++		i2c_unregister_device(client_demod);
++		return -ENODEV;
++	}
++	if (!try_module_get(client_tuner->dev.driver->owner)) {
++		i2c_unregister_device(client_tuner);
++		module_put(client_demod->dev.driver->owner);
++		i2c_unregister_device(client_demod);
++		return -ENODEV;
++	}
++
++	st->i2c_client_demod = client_demod;
++	st->i2c_client_tuner = client_tuner;
++
++	/* hook fe: need to resync the slave fifo when signal locks. */
++	mutex_init(&st->stream_mutex);
++	st->last_lock = 0;
++	st->fe_read_status = adap->fe_adap[0].fe->ops.read_status;
++	adap->fe_adap[0].fe->ops.read_status = cxusb_read_status;
++
+ 	return 0;
+ }
+ 
+@@ -1458,6 +1397,7 @@ static struct dvb_usb_device_properties cxusb_aver_a868r_properties;
+ static struct dvb_usb_device_properties cxusb_d680_dmb_properties;
+ static struct dvb_usb_device_properties cxusb_mygica_d689_properties;
+ static struct dvb_usb_device_properties cxusb_mygica_t230_properties;
++static struct dvb_usb_device_properties cxusb_mygica_t230c_properties;
+ 
+ static int cxusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+@@ -1490,6 +1430,8 @@ static int cxusb_probe(struct usb_interface *intf,
+ 				     THIS_MODULE, NULL, adapter_nr) ||
+ 	    0 == dvb_usb_device_init(intf, &cxusb_mygica_t230_properties,
+ 				     THIS_MODULE, NULL, adapter_nr) ||
++	    0 == dvb_usb_device_init(intf, &cxusb_mygica_t230c_properties,
++				     THIS_MODULE, NULL, adapter_nr) ||
+ 	    0)
+ 		return 0;
+ 
+@@ -1541,6 +1483,7 @@ enum cxusb_table_index {
+ 	CONEXANT_D680_DMB,
+ 	MYGICA_D689,
+ 	MYGICA_T230,
++	MYGICA_T230C,
+ 	NR__cxusb_table_index
+ };
+ 
+@@ -1608,6 +1551,9 @@ static struct usb_device_id cxusb_table[NR__cxusb_table_index + 1] = {
+ 	[MYGICA_T230] = {
+ 		USB_DEVICE(USB_VID_CONEXANT, USB_PID_MYGICA_T230)
+ 	},
++	[MYGICA_T230C] = {
++		USB_DEVICE(USB_VID_CONEXANT, USB_PID_MYGICA_T230+1)
++	},
+ 	{}		/* Terminating entry */
+ };
+ MODULE_DEVICE_TABLE (usb, cxusb_table);
+@@ -1695,11 +1641,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_lgh064f_properties = {
+ 
+ 	.i2c_algo         = &cxusb_i2c_algo,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_portable_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_portable_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_PORTABLE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+@@ -1751,11 +1698,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_dee1601_properties = {
+ 
+ 	.i2c_algo         = &cxusb_i2c_algo,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 150,
+-		.rc_map_table     = rc_map_dvico_mce_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_mce_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_MCE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+@@ -1815,11 +1763,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_lgz201_properties = {
+ 
+ 	.i2c_algo         = &cxusb_i2c_algo,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_portable_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_portable_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_PORTABLE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+@@ -1870,11 +1819,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_dtt7579_properties = {
+ 
+ 	.i2c_algo         = &cxusb_i2c_algo,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_portable_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_portable_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_PORTABLE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+@@ -1924,11 +1874,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_dualdig4_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_mce_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_mce_table),
+-		.rc_query         = cxusb_bluebird2_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_MCE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_bluebird2_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -1977,11 +1928,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_nano2_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_portable_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_portable_table),
+-		.rc_query         = cxusb_bluebird2_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_PORTABLE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query       = cxusb_bluebird2_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2032,11 +1984,12 @@ static struct dvb_usb_device_properties cxusb_bluebird_nano2_needsfirmware_prope
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_portable_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_portable_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_PORTABLE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2130,11 +2083,12 @@ struct dvb_usb_device_properties cxusb_bluebird_dualdig4_rev2_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_dvico_mce_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_dvico_mce_table),
+-		.rc_query         = cxusb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_DVICO_MCE,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query	= cxusb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2183,11 +2137,12 @@ static struct dvb_usb_device_properties cxusb_d680_dmb_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_d680_dmb_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_d680_dmb_table),
+-		.rc_query         = cxusb_d680_dmb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_D680_DMB,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query       = cxusb_d680_dmb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2237,11 +2192,12 @@ static struct dvb_usb_device_properties cxusb_mygica_d689_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_d680_dmb_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_d680_dmb_table),
+-		.rc_query         = cxusb_d680_dmb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_D680_DMB,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query       = cxusb_d680_dmb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2290,11 +2246,12 @@ static struct dvb_usb_device_properties cxusb_mygica_t230_properties = {
+ 
+ 	.generic_bulk_ctrl_endpoint = 0x01,
+ 
+-	.rc.legacy = {
+-		.rc_interval      = 100,
+-		.rc_map_table     = rc_map_d680_dmb_table,
+-		.rc_map_size      = ARRAY_SIZE(rc_map_d680_dmb_table),
+-		.rc_query         = cxusb_d680_dmb_rc_query,
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_TOTAL_MEDIA_IN_HAND_02,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query       = cxusb_d680_dmb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
+ 	},
+ 
+ 	.num_device_descs = 1,
+@@ -2307,6 +2264,60 @@ static struct dvb_usb_device_properties cxusb_mygica_t230_properties = {
+ 	}
+ };
+ 
++static struct dvb_usb_device_properties cxusb_mygica_t230c_properties = {
++	.caps = DVB_USB_IS_AN_I2C_ADAPTER,
++
++	.usb_ctrl         = CYPRESS_FX2,
++
++	.size_of_priv     = sizeof(struct cxusb_state),
++
++	.num_adapters = 1,
++	.adapter = {
++		{
++		.num_frontends = 1,
++		.fe = {{
++			.streaming_ctrl   = cxusb_streaming_ctrl,
++			.frontend_attach  = cxusb_mygica_t230c_frontend_attach,
++
++			/* parameter for the MPEG2-data transfer */
++			.stream = {
++				.type = USB_BULK,
++				.count = 5,
++				.endpoint = 0x02,
++				.u = {
++					.bulk = {
++						.buffersize = 8192,
++					}
++				}
++			},
++		} },
++		},
++	},
++
++	.power_ctrl       = cxusb_d680_dmb_power_ctrl,
++
++	.i2c_algo         = &cxusb_i2c_algo,
++
++	.generic_bulk_ctrl_endpoint = 0x01,
++
++	.rc.core = {
++		.rc_interval	= 100,
++		.rc_codes	= RC_MAP_TOTAL_MEDIA_IN_HAND_02,
++		.module_name	= KBUILD_MODNAME,
++		.rc_query       = cxusb_d680_dmb_rc_query,
++		.allowed_protos = RC_BIT_UNKNOWN,
++	},
++
++	.num_device_descs = 1,
++	.devices = {
++		{
++			"Mygica T230C DVB-T/T2/C",
++			{ NULL },
++			{ &cxusb_table[MYGICA_T230C], NULL },
++		},
++	}
++};
++
+ static struct usb_driver cxusb_driver = {
+ 	.name		= "dvb_usb_cxusb",
+ 	.probe		= cxusb_probe,
+diff --git a/drivers/media/usb/dvb-usb/cxusb.h b/drivers/media/usb/dvb-usb/cxusb.h
+index 18acda1..66429d7 100644
+--- a/drivers/media/usb/dvb-usb/cxusb.h
++++ b/drivers/media/usb/dvb-usb/cxusb.h
+@@ -37,6 +37,11 @@ struct cxusb_state {
+ 	struct i2c_client *i2c_client_tuner;
+ 
+ 	unsigned char data[MAX_XFER_SIZE];
++
++	struct mutex stream_mutex;
++	u8 last_lock;
++	int (*fe_read_status)(struct dvb_frontend *fe,
++		enum fe_status *status);
+ };
+ 
+ #endif
+diff --git a/include/media/rc-map.h b/include/media/rc-map.h
+index e1cc14c..82feb2d 100644
+--- a/include/media/rc-map.h
++++ b/include/media/rc-map.h
+@@ -198,6 +198,7 @@ struct rc_map *rc_map_get(const char *name);
+ #define RC_MAP_CEC                       "rc-cec"
+ #define RC_MAP_CINERGY_1400              "rc-cinergy-1400"
+ #define RC_MAP_CINERGY                   "rc-cinergy"
++#define RC_MAP_D680_DMB                  "rc-d680-dmb"
+ #define RC_MAP_DELOCK_61959              "rc-delock-61959"
+ #define RC_MAP_DIB0700_NEC_TABLE         "rc-dib0700-nec"
+ #define RC_MAP_DIB0700_RC5_TABLE         "rc-dib0700-rc5"
+@@ -208,6 +209,8 @@ struct rc_map *rc_map_get(const char *name);
+ #define RC_MAP_DNTV_LIVE_DVB_T           "rc-dntv-live-dvb-t"
+ #define RC_MAP_DTT200U                   "rc-dtt200u"
+ #define RC_MAP_DVBSKY                    "rc-dvbsky"
++#define RC_MAP_DVICO_MCE		 "rc-dvico-mce"
++#define RC_MAP_DVICO_PORTABLE		 "rc-dvico-portable"
+ #define RC_MAP_EMPTY                     "rc-empty"
+ #define RC_MAP_EM_TERRATEC               "rc-em-terratec"
+ #define RC_MAP_ENCORE_ENLTV2             "rc-encore-enltv2"
