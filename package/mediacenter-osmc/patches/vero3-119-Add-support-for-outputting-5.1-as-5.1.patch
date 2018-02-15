@@ -1,0 +1,47 @@
+From 27138559ffeb079f1d46e3316c663dd3619ad9f7 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 15 Feb 2018 17:57:51 +0000
+Subject: [PATCH] Add support for outputting 5.1 as 5.1 instead of 7.1 with two
+ empty channels. The I2S doesn't support a 5.1 mode; so when Kodi fails to
+ open ALSA with 6 channels, we can handle this case and mask the two channels
+ via HDMI TX.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 2b5d059..4a67a3c 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -242,6 +242,18 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
+ 
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
++
++  if (format.m_channelLayout.Count() == 6 && info.Count() == 8) {
++	CLog::Log(LOGINFO, "CAESinkALSA::GetChannelLayout - masking for 5.1 audio output");
++	/* Mute to avoid pop */
++	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
++	/* Set mask */
++	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "6:7");
++	/* Unmute */
++	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_on");
++  }
++
+   return info;
+ }
+ 
+@@ -589,6 +601,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+     }
+ 
+     aml_set_audio_passthrough(m_passthrough);
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
+     SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+   }
+ 
+-- 
+2.7.4
+
