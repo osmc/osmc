@@ -1,32 +1,42 @@
-From 27138559ffeb079f1d46e3316c663dd3619ad9f7 Mon Sep 17 00:00:00 2001
+From 57eb9933bf5196663a743680545a6b408e8bab93 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 15 Feb 2018 17:57:51 +0000
-Subject: [PATCH] Add support for outputting 5.1 as 5.1 instead of 7.1 with two
- empty channels. The I2S doesn't support a 5.1 mode; so when Kodi fails to
- open ALSA with 6 channels, we can handle this case and mask the two channels
- via HDMI TX.
+Subject: [PATCH] Add support for outputting formats in their proper container
+ format. When ALSA sink can't be opened in this mode, we mask channels via
+ HDMI TX instead.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 2b5d059..4a67a3c 100644
+index 2b5d059..6fedd1b 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -242,6 +242,18 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+@@ -242,6 +242,29 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
    CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
    CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
  
-+  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0"); /* Reset old mask */
 +
-+  if (format.m_channelLayout.Count() == 6 && info.Count() == 8) {
-+	CLog::Log(LOGINFO, "CAESinkALSA::GetChannelLayout - masking for 5.1 audio output");
++  std::string channel_mask;
++
++  if (info.Count() == 8) { /* Not 2 ch pcm */
++    if (format.m_channelLayout.Count() == 6 || format.m_channelLayout.Count() == 5)
++       channel_mask = "6:7";
++    if (format.m_channelLayout.Count() == 3)
++       channel_mask = "4:3";
++    if (format.m_channelLayout.Count() == 4 && ! format.m_channelLayout.HasChannel(AE_CH_LFE))
++       channel_mask = "6:7"; /* 4.0 special case */
++  }
++
++  if (! channel_mask.empty()) {
++	CLog::Log(LOGINFO, "CAESinkALSA::GetChannelLayout - masking for audio output wih a mask of %s", channel_mask.c_str());
 +	/* Mute to avoid pop */
 +	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
 +	/* Set mask */
-+	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "6:7");
++	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", channel_mask);
 +	/* Unmute */
 +	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_on");
 +  }
@@ -34,7 +44,7 @@ index 2b5d059..4a67a3c 100644
    return info;
  }
  
-@@ -589,6 +601,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -589,6 +612,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      }
  
      aml_set_audio_passthrough(m_passthrough);
