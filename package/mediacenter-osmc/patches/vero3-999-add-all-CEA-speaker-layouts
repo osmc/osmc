@@ -1,0 +1,114 @@
+diff --git a/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 6fedd1b4..4c3a734f 100755
+--- a/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -103,6 +103,7 @@ static int CheckNP2(unsigned x)
+     else return x >> 1;
+ }
+ 
++int CEA_speaker_layout = 0;
+ 
+ CAESinkALSA::CAESinkALSA() :
+   m_bufferSize(0),
+@@ -238,32 +239,10 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+     }
+   }
+ 
++
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Input Channel Count: %d Output Channel Count: %d", format.m_channelLayout.Count(), info.Count());
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
+-  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
+-
+-  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0"); /* Reset old mask */
+-
+-  std::string channel_mask;
+-
+-  if (info.Count() == 8) { /* Not 2 ch pcm */
+-    if (format.m_channelLayout.Count() == 6 || format.m_channelLayout.Count() == 5)
+-       channel_mask = "6:7";
+-    if (format.m_channelLayout.Count() == 3)
+-       channel_mask = "4:3";
+-    if (format.m_channelLayout.Count() == 4 && ! format.m_channelLayout.HasChannel(AE_CH_LFE))
+-       channel_mask = "6:7"; /* 4.0 special case */
+-  }
+-
+-  if (! channel_mask.empty()) {
+-	CLog::Log(LOGINFO, "CAESinkALSA::GetChannelLayout - masking for audio output wih a mask of %s", channel_mask.c_str());
+-	/* Mute to avoid pop */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
+-	/* Set mask */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", channel_mask);
+-	/* Unmute */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_on");
+-  }
++  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s) (CEA: %d)", std::string(info).c_str(), alsaMapStr.c_str(), CEA_speaker_layout);
+ 
+   return info;
+ }
+@@ -555,6 +534,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   inconfig.format = format.m_dataFormat;
+   inconfig.sampleRate = format.m_sampleRate;
+ 
++    CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Requested layout: %s", std::string(format.m_channelLayout).c_str());
++
+   /*
+    * We can't use the better GetChannelLayout() at this point as the device
+    * is not opened yet, and we need inconfig.channels to select the correct
+@@ -612,7 +593,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+     }
+ 
+     aml_set_audio_passthrough(m_passthrough);
+-    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
++   // SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
+     SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+   }
+ 
+@@ -676,10 +657,39 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ #ifdef SND_CHMAP_API_VERSION
+   if (selectedChmap)
+   {
++	  /* Channel layout should match one of those offered by the sink
++	   * Find out which one it is
++	   */
++
++	  snd_pcm_chmap_query_t** supportedMaps;
++	  supportedMaps = snd_pcm_query_chmaps(m_pcm);
++	  /* set default stereo */
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++      int i = 0;
++	  for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
++			  supportedMap; supportedMap = supportedMaps[i++])
++	  {
++		  if (ALSAchmapToString(&supportedMap->map) == ALSAchmapToString(selectedChmap)) {
++			  CEA_speaker_layout = --i;
++			  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", CEA_speaker_layout);
++			  break;
++		  }
++	  }
++
+     /* failure is OK, that likely just means the selected chmap is fixed already */
+     snd_pcm_set_chmap(m_pcm, selectedChmap);
+     free(selectedChmap);
+   }
++  else
++  {
++  		CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch");
++	  /* while i2s driver is broken, this is essential */
++	  if (outconfig.channels == 2)
++		  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++	  else
++		  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 19);
++  }
++
+ #endif
+ 
+   // we want it blocking
+@@ -833,7 +843,7 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
+   bufferSize  = std::min(bufferSize, (snd_pcm_uframes_t) sampleRate / 5);
+ #if defined(HAS_LIBAMCODEC)
+   bufferSize  = CheckNP2(bufferSize);
+-#endif;
++#endif
+   
+   /* 
+    According to upstream we should set buffer size first - so make sure it is always at least
