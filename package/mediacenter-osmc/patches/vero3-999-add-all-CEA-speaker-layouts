@@ -1,0 +1,306 @@
+diff --git a/package/mediacenter-osmc/files/usr/bin/mediacenter b/package/mediacenter-osmc/files/usr/bin/mediacenter
+new file mode 100755
+index 00000000..254bca1f
+--- /dev/null
++++ b/package/mediacenter-osmc/files/usr/bin/mediacenter
+@@ -0,0 +1,186 @@
++#!/bin/bash
++
++# (c) 2014-2015 Sam Nazarko
++# email@samnazarko.co.uk
++
++fb_restore() {
++	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
++	then
++		cmp /var/run/fb_mode /sys/class/display/mode >/dev/null || cat /var/run/fb_mode >/sys/class/display/mode
++		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
++		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
++		cat /var/run/fb_scale_width >/sys/class/graphics/fb0/scale_width
++		cat /var/run/fb_scale_height >/sys/class/graphics/fb0/scale_height
++		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
++		echo 1 >/sys/class/vtconsole/vtcon1/bind
++		/bin/fbset $(cat /var/run/fb_resolution)
++	fi
++}
++
++set_font() {
++	vres=$(/bin/fbset | grep geometry | awk '{print $3}')
++	if ((vres<=660))
++	then
++		setfont OSMC-Lat15-Terminus14.psf.gz
++	elif ((661<=vres && vres<=890))
++	then
++		setfont OSMC-Lat15-TerminusBold22x11.psf.gz
++	elif ((891<=vres))
++	then
++		setfont OSMC-Lat15-TerminusBold28x14.psf.gz
++	fi
++}
++
++export TERM=linux
++
++if [ "$1" = "stop" ]; then
++	fb_restore
++	exit
++fi
++
++syspaths="/sys/class/video/axis
++/sys/class/video/screen_mode
++/sys/class/video/disable_video
++/sys/class/tsync/pts_pcrscr
++/sys/class/tsync/enable
++/sys/class/audiodsp/digital_raw
++/sys/class/ppmgr/ppmgr_3d_mode
++/sys/class/display/mode
++/sys/class/audiodsp/digital_codec
++/sys/module/amlvideodri/parameters/freerun_mode
++/sys/module/amvideo/parameters/omx_pts
++/sys/module/amvideo/parameters/omx_pts_interval_lower
++/sys/class/vfm/map
++/dev/video10
++/sys/class/video/blackout_policy
++/sys/module/di/parameters/bypass_all
++/sys/class/video/freerun_mode
++/sys/module/amlvideodri/parameters/freerun_mode
++/sys/class/amhdmitx/amhdmitx0/frac_rate_policy
++/sys/module/di/parameters/bypass_prog
++/sys/class/amhdmitx/amhdmitx0/debug
++/sys/class/amhdmitx/amhdmitx0/attr
++/sys/class/amhdmitx/amhdmitx0/output_rgb
++/sys/class/amhdmitx/amhdmitx0/config
++/sys/class/amhdmitx/amhdmitx0/aud_ch"
++
++for syspath in $syspaths; do
++        chgrp -R video $syspath
++        chmod -R g+u $syspath
++done
++
++trap 'wait; exit 0' SIGTERM
++
++chmod a+rw /dev/tty1
++/usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
++
++boot_space=$(df -B 1M /boot | sed 1d | awk '{ print $4}')
++root_space=$(df -B 1M / | sed 1d | awk '{ print $4}')
++
++/sbin/checkmodifier; CODE=$?
++if [ $CODE -eq 0 ] && [ -e /dist_upgrade_wanted ]; then CODE=5; fi
++case $CODE in
++4)
++	/usr/bin/setterm --cursor on >/dev/tty1
++	systemctl start getty@tty1
++	exit 0
++	;;
++5)
++	if [ -e /dist_upgrade_wanted ]; then apt-get clean; fi
++	rm /dist_upgrade_wanted
++
++	set_font
++	if [ $boot_space -lt 30 ] || [ $root_space -lt 300 ]; then
++		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n        WARNING! Insufficient disk space available to complete update.\n\n30MB required on /boot (${boot_space}MB available) and 300MB required on root partition. (${root_space}MB available)\n\nPlease free sufficient disk space and check for updates to try again. Rebooting in 60 seconds..." 11 85 > /dev/tty1
++		sleep 60; reboot
++	fi
++
++	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
++
++	count=60
++	while [ $count -gt 0 ]; do
++		if grep -q nfsroot /proc/cmdline; then
++			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
++		else
++			if connmanctl state | grep -iq 'online'; then break; fi
++		fi
++		sleep 5; let count-=5
++	done
++
++	if [ $count -lt 1 ]
++	then
++		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
++		sleep 20; reboot
++	fi
++        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
++        err=$(apt-get -qq update); if [ -n "$err" ]
++        then
++                dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
++                sleep 20
++        fi
++        systemctl start manual-update
++        exit 0
++        ;;
++esac
++
++if [ ! -e /var/run/fb_resolution ]; then
++	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
++	cat /sys/class/display/mode >/var/run/fb_mode
++	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
++	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
++	cat /sys/class/graphics/fb0/scale_width | sed 's/^.*://' >/var/run/fb_scale_width
++	cat /sys/class/graphics/fb0/scale_height | sed 's/^.*://' >/var/run/fb_scale_height
++	cat /sys/class/graphics/fb0/free_scale | sed -e 's/^.*\[//' -e 's/\].*$//g' >/var/run/fb_free_scale
++fi
++
++if [ $root_space -lt 100 ]; then
++	set_font
++	dialog --infobox "\n            WARNING! Free disk space remaining is only ${root_space}MB.\n\nKodi will be unable to start if disk space is completely exhausted. Please free sufficient disk space as soon as possible. Continuing in 10 seconds..." 8 80 > /dev/tty1
++	sleep 10
++fi
++
++while true; do
++        if [ -f /home/osmc/.factoryreset ]; then rm -rf /home/osmc/.kodi && rm /home/osmc/.factoryreset; fi
++	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
++        # clean zero-byte database files that prevent migration/startup
++        for file in /home/osmc/.kodi/userdata/Database/*.db; do [ -s $file ] || rm -f $file; done
++	KODI=/usr/lib/kodi/kodi.bin
++	setcap 'cap_net_bind_service=+ep' $KODI
++	echo 0 >/sys/class/vtconsole/vtcon1/bind
++	starttime=$(date +%s)
++	echo "Starting Kodi..."
++	sudo -u osmc $KODI --standalone -fs --lircdev /var/run/lirc/lircd; CODE="$?"
++	endtime=$(date +%s)
++	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
++	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
++
++	fb_restore
++	case $CODE in
++	64|66 )
++		exit 0;;
++	esac
++	chmod a+rw /dev/tty1
++	systemctl status getty@tty1 >/dev/null; GETTY=$?
++	if [ "$GETTY" -ne 0 ]; then
++		chvt 1
++		/usr/bin/setterm --cursor off >/dev/tty1
++		/usr/bin/clear >/dev/tty1
++		/usr/bin/ply-image "$CODE"
++		read -n 1 -s -t 10 key </dev/tty1
++	fi
++	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
++		/usr/bin/setterm --cursor on >/dev/tty1
++		systemctl start getty@tty1
++		count=30
++		while [ $count -gt 0 ]; do
++			who | awk '{print $2}' | grep -q tty1
++			if [ "$?" -eq 0 ]; then
++				count=5
++			else
++				let count=count-5
++			fi
++			sleep 5
++		done
++		systemctl stop getty@tty1
++	fi
++done
+diff --git a/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 6fedd1b4..4c3a734f 100755
+--- a/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/package/mediacenter-osmc/src/xbmc-a9a7a20071bfd759e72e7053cee92e6f5cfb5e48/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -103,6 +103,7 @@ static int CheckNP2(unsigned x)
+     else return x >> 1;
+ }
+ 
++int CEA_speaker_layout = 0;
+ 
+ CAESinkALSA::CAESinkALSA() :
+   m_bufferSize(0),
+@@ -238,32 +239,10 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+     }
+   }
+ 
++
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Input Channel Count: %d Output Channel Count: %d", format.m_channelLayout.Count(), info.Count());
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
+-  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
+-
+-  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0"); /* Reset old mask */
+-
+-  std::string channel_mask;
+-
+-  if (info.Count() == 8) { /* Not 2 ch pcm */
+-    if (format.m_channelLayout.Count() == 6 || format.m_channelLayout.Count() == 5)
+-       channel_mask = "6:7";
+-    if (format.m_channelLayout.Count() == 3)
+-       channel_mask = "4:3";
+-    if (format.m_channelLayout.Count() == 4 && ! format.m_channelLayout.HasChannel(AE_CH_LFE))
+-       channel_mask = "6:7"; /* 4.0 special case */
+-  }
+-
+-  if (! channel_mask.empty()) {
+-	CLog::Log(LOGINFO, "CAESinkALSA::GetChannelLayout - masking for audio output wih a mask of %s", channel_mask.c_str());
+-	/* Mute to avoid pop */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
+-	/* Set mask */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", channel_mask);
+-	/* Unmute */
+-	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_on");
+-  }
++  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s) (CEA: %d)", std::string(info).c_str(), alsaMapStr.c_str(), CEA_speaker_layout);
+ 
+   return info;
+ }
+@@ -555,6 +534,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   inconfig.format = format.m_dataFormat;
+   inconfig.sampleRate = format.m_sampleRate;
+ 
++    CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Requested layout: %s", std::string(format.m_channelLayout).c_str());
++
+   /*
+    * We can't use the better GetChannelLayout() at this point as the device
+    * is not opened yet, and we need inconfig.channels to select the correct
+@@ -612,7 +593,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+     }
+ 
+     aml_set_audio_passthrough(m_passthrough);
+-    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
++   // SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/aud_output_chs", "0");
+     SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+   }
+ 
+@@ -676,10 +657,39 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ #ifdef SND_CHMAP_API_VERSION
+   if (selectedChmap)
+   {
++	  /* Channel layout should match one of those offered by the sink
++	   * Find out which one it is
++	   */
++
++	  snd_pcm_chmap_query_t** supportedMaps;
++	  supportedMaps = snd_pcm_query_chmaps(m_pcm);
++	  /* set default stereo */
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++      int i = 0;
++	  for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
++			  supportedMap; supportedMap = supportedMaps[i++])
++	  {
++		  if (ALSAchmapToString(&supportedMap->map) == ALSAchmapToString(selectedChmap)) {
++			  CEA_speaker_layout = --i;
++			  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", CEA_speaker_layout);
++			  break;
++		  }
++	  }
++
+     /* failure is OK, that likely just means the selected chmap is fixed already */
+     snd_pcm_set_chmap(m_pcm, selectedChmap);
+     free(selectedChmap);
+   }
++  else
++  {
++  		CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch");
++	  /* while i2s driver is broken, this is essential */
++	  if (outconfig.channels == 2)
++		  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++	  else
++		  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 19);
++  }
++
+ #endif
+ 
+   // we want it blocking
+@@ -833,7 +843,7 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
+   bufferSize  = std::min(bufferSize, (snd_pcm_uframes_t) sampleRate / 5);
+ #if defined(HAS_LIBAMCODEC)
+   bufferSize  = CheckNP2(bufferSize);
+-#endif;
++#endif
+   
+   /* 
+    According to upstream we should set buffer size first - so make sure it is always at least
