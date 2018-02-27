@@ -1,0 +1,123 @@
+From 54f7a3fcf2ca6c50ac8bd2e923c02a05ebb328b7 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 27 Feb 2018 23:33:31 +0000
+Subject: [PATCH] Vero 4K: add standby support
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp                  | 39 +++++++++++++++++++++++++++++++++++
+ xbmc/Application.h                    |  3 +++
+ xbmc/powermanagement/PowerManager.cpp |  5 ++++-
+ 3 files changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 6925404..f3be71b 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -216,6 +216,7 @@
+ 
+ #if defined(HAS_LIBAMCODEC)
+ #include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
+ #endif
+ 
+ #include "cores/FFmpeg.h"
+@@ -4026,6 +4027,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+ 
+ bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
+ {
++  // was vero in standby?
++  if (m_bVeroStandby)
++        ToggleStandby(m_bVeroStandby);
+   if (m_iScreenSaveLock == 2)
+     return false;
+ 
+@@ -4130,6 +4134,41 @@ void CApplication::CheckScreenSaverAndDPMS()
+   }
+ }
+ 
++//activate screensaver for OSMC
++void CApplication::ActivateScreenSaverStandby()
++{
++  CLog::Log(LOGINFO, "Activating Vero standby mode");
++  ToggleStandby(m_bVeroStandby);
++  m_bScreenSave = true;
++  m_screenSaver.reset();
++  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
++  //ADDON::CAddonMgr::GetInstance().GetAddon("screensaver.xbmc.builtin.black", m_screenSaver);
++  g_windowManager.CloseDialogs(true);
++  //g_windowManager.ActivateWindow(WINDOW_SCREENSAVER);
++}
++
++void CApplication::ToggleStandby(bool sleeping)
++{
++  CLog::Log(LOGINFO, "Toggle standby state is %s", sleeping ? "waking" : "sleeping");
++  int sysfs_toggle = m_bVeroStandby;
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle TMDS clock to %d", sysfs_toggle);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to %d", sysfs_toggle);
++  SysfsUtils::SetInt("/sys/class/leds/led-sys/brightness", sysfs_toggle);
++  std::string systemd_toggle = "stop";
++  if (m_bVeroStandby)
++        systemd_toggle = "start";
++  std::string cmd = "/bin/systemctl " + systemd_toggle + " connman";
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- networking will now %s", systemd_toggle.c_str());
++  system(cmd.c_str());
++  std::string cpu_governor = "powersave";
++  if (m_bVeroStandby)
++        cpu_governor = "ondemand";
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- governor will now be %s", cpu_governor.c_str());
++  m_bVeroStandby = ! m_bVeroStandby; //invert state
++  return;
++}
++
+ // activate the screensaver.
+ // if forceType is true, we ignore the various conditions that can alter
+ // the type of screensaver displayed
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 49f9bcb..67db49a 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -218,6 +218,8 @@ public:
+   // Checks whether the screensaver and / or DPMS should become active.
+   void CheckScreenSaverAndDPMS();
+   void ActivateScreenSaver(bool forceType = false);
++  void ActivateScreenSaverStandby();
++  void ToggleStandby(bool sleeping);
+   bool SetupNetwork();
+   void CloseNetworkShares();
+ 
+@@ -460,6 +462,7 @@ protected:
+ #endif
+   // screensaver
+   bool m_bScreenSave;
++  bool m_bVeroStandby;
+   ADDON::AddonPtr m_screenSaver;
+ 
+   // timer information
+diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
+index 33c4eb4..fdd70cd 100644
+--- a/xbmc/powermanagement/PowerManager.cpp
++++ b/xbmc/powermanagement/PowerManager.cpp
+@@ -38,6 +38,7 @@
+ #include "utils/log.h"
+ #include "utils/Weather.h"
+ #include "windowing/WindowingFactory.h"
++#include "addons/AddonManager.h"
+ 
+ #if defined(TARGET_DARWIN)
+ #include "osx/CocoaPowerSyscall.h"
+@@ -185,7 +186,9 @@ bool CPowerManager::Powerdown()
+ 
+ bool CPowerManager::Suspend()
+ {
+-  return (CanSuspend() && m_instance->Suspend());
++  CLog::Log(LOGNOTICE, "Activating standby mode");
++  g_application.ActivateScreenSaverStandby();
++  return true;
+ }
+ 
+ bool CPowerManager::Hibernate()
+-- 
+2.7.4
+
