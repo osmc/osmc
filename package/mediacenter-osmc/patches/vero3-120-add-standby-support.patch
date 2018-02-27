@@ -1,4 +1,4 @@
-From 54f7a3fcf2ca6c50ac8bd2e923c02a05ebb328b7 Mon Sep 17 00:00:00 2001
+From d6811b315fc7ea6528d4d31bd011fa561b70da0f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
@@ -11,7 +11,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  3 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6925404..f3be71b 100644
+index 6925404..2eda701 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -28,7 +28,7 @@ index 6925404..f3be71b 100644
  {
 +  // was vero in standby?
 +  if (m_bVeroStandby)
-+        ToggleStandby(m_bVeroStandby);
++        ToggleStandby();
    if (m_iScreenSaveLock == 2)
      return false;
  
@@ -40,7 +40,7 @@ index 6925404..f3be71b 100644
 +void CApplication::ActivateScreenSaverStandby()
 +{
 +  CLog::Log(LOGINFO, "Activating Vero standby mode");
-+  ToggleStandby(m_bVeroStandby);
++  ToggleStandby();
 +  m_bScreenSave = true;
 +  m_screenSaver.reset();
 +  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
@@ -49,9 +49,9 @@ index 6925404..f3be71b 100644
 +  //g_windowManager.ActivateWindow(WINDOW_SCREENSAVER);
 +}
 +
-+void CApplication::ToggleStandby(bool sleeping)
++void CApplication::ToggleStandby()
 +{
-+  CLog::Log(LOGINFO, "Toggle standby state is %s", sleeping ? "waking" : "sleeping");
++  CLog::Log(LOGINFO, "Toggle standby state is %s", m_bVeroStandby ? "waking" : "sleeping");
 +  int sysfs_toggle = m_bVeroStandby;
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle TMDS clock to %d", sysfs_toggle);
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
@@ -75,7 +75,7 @@ index 6925404..f3be71b 100644
  // if forceType is true, we ignore the various conditions that can alter
  // the type of screensaver displayed
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 49f9bcb..67db49a 100644
+index 49f9bcb..8e6f514 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -218,6 +218,8 @@ public:
@@ -83,7 +83,7 @@ index 49f9bcb..67db49a 100644
    void CheckScreenSaverAndDPMS();
    void ActivateScreenSaver(bool forceType = false);
 +  void ActivateScreenSaverStandby();
-+  void ToggleStandby(bool sleeping);
++  void ToggleStandby();
    bool SetupNetwork();
    void CloseNetworkShares();
  
