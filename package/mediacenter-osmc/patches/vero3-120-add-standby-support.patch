@@ -1,17 +1,17 @@
-From d6811b315fc7ea6528d4d31bd011fa561b70da0f Mon Sep 17 00:00:00 2001
+From b32966909b9d549b32e5e63aeed6031ccb416e81 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 39 +++++++++++++++++++++++++++++++++++
+ xbmc/Application.cpp                  | 31 +++++++++++++++++++++++++++++++
  xbmc/Application.h                    |  3 +++
- xbmc/powermanagement/PowerManager.cpp |  5 ++++-
- 3 files changed, 46 insertions(+), 1 deletion(-)
+ xbmc/powermanagement/PowerManager.cpp |  4 +++-
+ 3 files changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6925404..2eda701 100644
+index 6925404..5b00ad6 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -32,7 +32,7 @@ index 6925404..2eda701 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4130,6 +4134,41 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4130,6 +4134,33 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -44,9 +44,7 @@ index 6925404..2eda701 100644
 +  m_bScreenSave = true;
 +  m_screenSaver.reset();
 +  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
-+  //ADDON::CAddonMgr::GetInstance().GetAddon("screensaver.xbmc.builtin.black", m_screenSaver);
 +  g_windowManager.CloseDialogs(true);
-+  //g_windowManager.ActivateWindow(WINDOW_SCREENSAVER);
 +}
 +
 +void CApplication::ToggleStandby()
@@ -57,12 +55,6 @@ index 6925404..2eda701 100644
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to %d", sysfs_toggle);
 +  SysfsUtils::SetInt("/sys/class/leds/led-sys/brightness", sysfs_toggle);
-+  std::string systemd_toggle = "stop";
-+  if (m_bVeroStandby)
-+        systemd_toggle = "start";
-+  std::string cmd = "/bin/systemctl " + systemd_toggle + " connman";
-+  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- networking will now %s", systemd_toggle.c_str());
-+  system(cmd.c_str());
 +  std::string cpu_governor = "powersave";
 +  if (m_bVeroStandby)
 +        cpu_governor = "ondemand";
@@ -96,18 +88,10 @@ index 49f9bcb..8e6f514 100644
  
    // timer information
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
-index 33c4eb4..fdd70cd 100644
+index 33c4eb4..4ca5441 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
 +++ b/xbmc/powermanagement/PowerManager.cpp
-@@ -38,6 +38,7 @@
- #include "utils/log.h"
- #include "utils/Weather.h"
- #include "windowing/WindowingFactory.h"
-+#include "addons/AddonManager.h"
- 
- #if defined(TARGET_DARWIN)
- #include "osx/CocoaPowerSyscall.h"
-@@ -185,7 +186,9 @@ bool CPowerManager::Powerdown()
+@@ -185,7 +185,9 @@ bool CPowerManager::Powerdown()
  
  bool CPowerManager::Suspend()
  {
