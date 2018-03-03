@@ -79,6 +79,23 @@ SETS =  {
                                           ],
                                 },
 
+	'guisettings'	    : { 'order' : 2.5,
+                                'active': False,
+                                'help'  : 'guisettings.xml',
+                                'dest'  : 'guisettings',
+                                'action': 'store_true',
+                                'flags' : ['-g','--guiset'],
+				'logs'  : [
+					    {
+                                                'name': 'guisettings.xml',
+                                                'key' : 'zm2LhjK1',
+                                                'ltyp': 'file_log', 
+                                                'actn': USERDATA + 'guisettings.xml',
+                                             },
+                                          ],
+
+                              },
+
         'advancedsettings'  : { 'order' : 3,
                                 'active': False,
                                 'help'  : 'advancedsettings.xml',
