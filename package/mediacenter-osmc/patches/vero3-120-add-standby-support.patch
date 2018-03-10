@@ -1,4 +1,4 @@
-From b32966909b9d549b32e5e63aeed6031ccb416e81 Mon Sep 17 00:00:00 2001
+From c60149cdd049c06df11b90f1bb2b27a58323b927 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
@@ -6,12 +6,13 @@ Subject: [PATCH] Vero 4K: add standby support
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                  | 31 +++++++++++++++++++++++++++++++
- xbmc/Application.h                    |  3 +++
+ xbmc/Application.h                    |  5 +++++
+ xbmc/network/Network.cpp              |  5 +++++
  xbmc/powermanagement/PowerManager.cpp |  4 +++-
- 3 files changed, 37 insertions(+), 1 deletion(-)
+ 4 files changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6925404..5b00ad6 100644
+index 5fdda85..a72bd4d 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -22,7 +23,7 @@ index 6925404..5b00ad6 100644
  #endif
  
  #include "cores/FFmpeg.h"
-@@ -4026,6 +4027,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -4025,6 +4026,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -32,7 +33,7 @@ index 6925404..5b00ad6 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4130,6 +4134,33 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4129,6 +4133,33 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -67,7 +68,7 @@ index 6925404..5b00ad6 100644
  // if forceType is true, we ignore the various conditions that can alter
  // the type of screensaver displayed
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 49f9bcb..8e6f514 100644
+index 49f9bcb..374cdff 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -218,6 +218,8 @@ public:
@@ -79,7 +80,16 @@ index 49f9bcb..8e6f514 100644
    bool SetupNetwork();
    void CloseNetworkShares();
  
-@@ -460,6 +462,7 @@ protected:
+@@ -427,6 +429,8 @@ public:
+   */
+   void UnlockFrameMoveGuard();
+ 
++  bool IsVeroStandby() const { return m_bVeroStandby; }
++
+ protected:
+   virtual bool OnSettingsSaving() const override;
+ 
+@@ -460,6 +464,7 @@ protected:
  #endif
    // screensaver
    bool m_bScreenSave;
@@ -87,6 +97,29 @@ index 49f9bcb..8e6f514 100644
    ADDON::AddonPtr m_screenSaver;
  
    // timer information
+diff --git a/xbmc/network/Network.cpp b/xbmc/network/Network.cpp
+index 25645f6..2d3f695 100644
+--- a/xbmc/network/Network.cpp
++++ b/xbmc/network/Network.cpp
+@@ -32,6 +32,7 @@
+ #include "utils/CharsetConverter.h"
+ #endif
+ #include "utils/StringUtils.h"
++#include "Application.h"
+ 
+ using namespace KODI::MESSAGING;
+ 
+@@ -289,6 +290,10 @@ void CNetwork::NetworkMessage(EMESSAGE message, int param)
+ 
+ bool CNetwork::WakeOnLan(const char* mac)
+ {
++  /* Don't do this in standby */
++  if (g_application.IsVeroStandby())
++	return true;
++
+   int i, j, packet;
+   unsigned char ethaddr[8];
+   unsigned char buf [128];
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
 index 33c4eb4..4ca5441 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
