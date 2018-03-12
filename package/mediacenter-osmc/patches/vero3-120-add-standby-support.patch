@@ -1,18 +1,18 @@
-From c60149cdd049c06df11b90f1bb2b27a58323b927 Mon Sep 17 00:00:00 2001
+From 00a9768ee1ba3b096cb20c17f0dbdf7871d8f748 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 31 +++++++++++++++++++++++++++++++
+ xbmc/Application.cpp                  | 33 +++++++++++++++++++++++++++++++++
  xbmc/Application.h                    |  5 +++++
  xbmc/network/Network.cpp              |  5 +++++
  xbmc/powermanagement/PowerManager.cpp |  4 +++-
- 4 files changed, 44 insertions(+), 1 deletion(-)
+ 4 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 5fdda85..a72bd4d 100644
+index 5fdda85..3974f26 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -33,7 +33,7 @@ index 5fdda85..a72bd4d 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4129,6 +4133,33 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4129,6 +4133,35 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -41,6 +41,8 @@ index 5fdda85..a72bd4d 100644
 +void CApplication::ActivateScreenSaverStandby()
 +{
 +  CLog::Log(LOGINFO, "Activating Vero standby mode");
++    if (g_application.m_pPlayer->IsPlayingVideo())
++      g_application.StopPlaying();
 +  ToggleStandby();
 +  m_bScreenSave = true;
 +  m_screenSaver.reset();
