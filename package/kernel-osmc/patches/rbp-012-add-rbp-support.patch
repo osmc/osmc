@@ -264,14 +264,13 @@ index 36ae445..be0fd43 100644
  PHONY += dtbs dtbs_install
  
 diff --git a/arch/arm/boot/.gitignore b/arch/arm/boot/.gitignore
-index 3c79f85..eaaeb17 100644
+index ce1c5ff..eaaeb17 100644
 --- a/arch/arm/boot/.gitignore
 +++ b/arch/arm/boot/.gitignore
-@@ -3,4 +3,4 @@ zImage
+@@ -3,3 +3,4 @@ zImage
  xipImage
  bootpImage
  uImage
--*.dtb
 +*.dtb*
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
 index eff87a3..d85b3a4 100644
@@ -317,15 +316,16 @@ index eff87a3..d85b3a4 100644
 +endif
 diff --git a/arch/arm/boot/dts/bcm2708-rpi-0-w.dts b/arch/arm/boot/dts/bcm2708-rpi-0-w.dts
 new file mode 100644
-index 0000000..8299f8a
+index 0000000..ef0b0f0
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2708-rpi-0-w.dts
-@@ -0,0 +1,165 @@
+@@ -0,0 +1,166 @@
 +/dts-v1/;
 +
 +#include "bcm2708.dtsi"
 +
 +/ {
++	compatible = "raspberrypi,model-zero-w", "brcm,bcm2835";
 +	model = "Raspberry Pi Zero W";
 +
 +	chosen {
@@ -858,10 +858,10 @@ index 0000000..d0299e3
 +};
 diff --git a/arch/arm/boot/dts/bcm2708-rpi.dtsi b/arch/arm/boot/dts/bcm2708-rpi.dtsi
 new file mode 100644
-index 0000000..36dcd48
+index 0000000..d105d4e
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2708-rpi.dtsi
-@@ -0,0 +1,166 @@
+@@ -0,0 +1,161 @@
 +/* Downstream version of bcm2835-rpi.dtsi */
 +
 +#include <dt-bindings/power/raspberrypi-power.h>
@@ -945,11 +945,6 @@ index 0000000..36dcd48
 +			status = "okay";
 +		};
 +
-+		thermal: thermal@7e212000 {
-+			#thermal-sensor-cells = <0>;
-+			status = "okay";
-+		};
-+
 +		/* Onboard audio */
 +		audio: audio {
 +			compatible = "brcm,bcm2835-audio";
@@ -1030,24 +1025,15 @@ index 0000000..36dcd48
 +};
 diff --git a/arch/arm/boot/dts/bcm2708.dtsi b/arch/arm/boot/dts/bcm2708.dtsi
 new file mode 100644
-index 0000000..756bd36
+index 0000000..768c7da
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2708.dtsi
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,11 @@
 +#include "bcm2835.dtsi"
 +#include "bcm270x.dtsi"
 +#include "bcm2708-rpi.dtsi"
 +
 +/ {
-+	soc {
-+		timer@7e003000 {
-+			compatible = "brcm,bcm2835-system-timer";
-+			reg = <0x7e003000 0x1000>;
-+			interrupts = <1 0>, <1 1>, <1 2>, <1 3>;
-+			clock-frequency = <1000000>;
-+		};
-+	};
-+
 +	/delete-node/ cpus;
 +
 +	__overrides__ {
@@ -1056,16 +1042,17 @@ index 0000000..756bd36
 +};
 diff --git a/arch/arm/boot/dts/bcm2709-rpi-2-b.dts b/arch/arm/boot/dts/bcm2709-rpi-2-b.dts
 new file mode 100644
-index 0000000..b7d4834
+index 0000000..442d2eb
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2709-rpi-2-b.dts
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +/dts-v1/;
 +
 +#include "bcm2709.dtsi"
 +#include "bcm283x-rpi-smsc9514.dtsi"
 +
 +/ {
++	compatible = "raspberrypi,2-model-b", "brcm,bcm2836";
 +	model = "Raspberry Pi 2 Model B";
 +};
 +
@@ -1184,10 +1171,10 @@ index 0000000..b7d4834
 +};
 diff --git a/arch/arm/boot/dts/bcm2709.dtsi b/arch/arm/boot/dts/bcm2709.dtsi
 new file mode 100644
-index 0000000..c3aedc6
+index 0000000..715f5ac
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2709.dtsi
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,19 @@
 +#include "bcm2836.dtsi"
 +#include "bcm270x.dtsi"
 +#include "bcm2708-rpi.dtsi"
@@ -1196,6 +1183,8 @@ index 0000000..c3aedc6
 +	soc {
 +		ranges = <0x7e000000 0x3f000000 0x01000000>,
 +		         <0x40000000 0x40000000 0x00040000>;
++
++		/delete-node/ timer@7e003000;
 +	};
 +
 +	__overrides__ {
@@ -1207,12 +1196,12 @@ index 0000000..c3aedc6
 +};
 diff --git a/arch/arm/boot/dts/bcm270x.dtsi b/arch/arm/boot/dts/bcm270x.dtsi
 new file mode 100644
-index 0000000..a3544c1
+index 0000000..5c12450
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm270x.dtsi
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,174 @@
 +/* Downstream bcm283x.dtsi diff */
-+#include "dt-bindings/power/raspberrypi-power.h"
++#include <dt-bindings/power/raspberrypi-power.h>
 +
 +/ {
 +	chosen {
@@ -1221,13 +1210,7 @@ index 0000000..a3544c1
 +
 +	soc: soc {
 +
-+		/delete-node/ timer@7e003000;
-+
 +		watchdog: watchdog@7e100000 {
-+			/* Add alias */
-+		};
-+
-+		cprman: cprman@7e101000 {
 +			/* Add alias */
 +		};
 +
@@ -1280,7 +1263,7 @@ index 0000000..a3544c1
 +		/delete-node/ sdhci@7e300000;
 +
 +		mmc: mmc@7e300000 {
-+			compatible = "brcm,bcm2835-mmc";
++			compatible = "brcm,bcm2835-mmc", "brcm,bcm2835-sdhci";
 +			reg = <0x7e300000 0x100>;
 +			interrupts = <2 30>;
 +			clocks = <&clocks BCM2835_CLOCK_EMMC>;
@@ -1309,7 +1292,7 @@ index 0000000..a3544c1
 +			reg = <0x7e600000 0x100>;
 +			interrupts = <2 16>;
 +			clocks = <&clocks BCM2835_CLOCK_SMI>;
-+			assigned-clocks = <&cprman BCM2835_CLOCK_SMI>;
++			assigned-clocks = <&clocks BCM2835_CLOCK_SMI>;
 +			assigned-clock-rates = <125000000>;
 +			dmas = <&dma 4>;
 +			dma-names = "rx-tx";
@@ -1336,11 +1319,6 @@ index 0000000..a3544c1
 +		v3d@7ec00000 { /* vd3 */
 +			compatible = "brcm,vc4-v3d";
 +			power-domains = <&power RPI_POWER_DOMAIN_V3D>;
-+			status = "disabled";
-+		};
-+
-+		gpu: gpu {
-+			/* Add alias */
 +			status = "disabled";
 +		};
 +
@@ -1392,12 +1370,16 @@ index 0000000..a3544c1
 +	interrupt-parent = <&aux>;
 +	interrupts = <2>;
 +};
++
++&vc4 {
++	status = "disabled";
++};
 diff --git a/arch/arm/boot/dts/bcm2710-rpi-3-b.dts b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
 new file mode 100644
-index 0000000..a72c2fe
+index 0000000..3d16b70
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,195 @@
 +/dts-v1/;
 +
 +#ifdef RPI364
@@ -1408,6 +1390,7 @@ index 0000000..a72c2fe
 +#include "bcm283x-rpi-smsc9514.dtsi"
 +
 +/ {
++	compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
 +	model = "Raspberry Pi 3 Model B";
 +
 +	chosen {
@@ -1729,10 +1712,10 @@ index 0000000..2500641
 +};
 diff --git a/arch/arm/boot/dts/bcm2710.dtsi b/arch/arm/boot/dts/bcm2710.dtsi
 new file mode 100644
-index 0000000..2169fbd
+index 0000000..6fb5ed6
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2710.dtsi
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,29 @@
 +#include "bcm2837.dtsi"
 +#include "bcm270x.dtsi"
 +#include "bcm2708-rpi.dtsi"
@@ -1751,6 +1734,8 @@ index 0000000..2169fbd
 +			interrupt-parent = <&local_intc>;
 +			interrupts = <9>;
 +		};
++
++		/delete-node/ timer@7e003000;
 +	};
 +
 +	__overrides__ {
@@ -1762,10 +1747,10 @@ index 0000000..2169fbd
 +};
 diff --git a/arch/arm/boot/dts/overlays/Makefile b/arch/arm/boot/dts/overlays/Makefile
 new file mode 100644
-index 0000000..3c82220
+index 0000000..64ea686
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/Makefile
-@@ -0,0 +1,135 @@
+@@ -0,0 +1,139 @@
 +# Overlays for the Raspberry Pi platform
 +
 +dtbo-$(CONFIG_ARCH_BCM2835) += \
@@ -1844,6 +1829,7 @@ index 0000000..3c82220
 +	pi3-disable-bt.dtbo \
 +	pi3-disable-wifi.dtbo \
 +	pi3-miniuart-bt.dtbo \
++	pibell.dtbo \
 +	piscreen.dtbo \
 +	piscreen2r.dtbo \
 +	pisound.dtbo \
@@ -1856,7 +1842,6 @@ index 0000000..3c82220
 +	pwm-2chan.dtbo \
 +	pwm-ir-tx.dtbo \
 +	qca7000.dtbo \
-+	raspidac3.dtbo \
 +	rotary-encoder.dtbo \
 +	rpi-backlight.dtbo \
 +	rpi-cirrus-wm5102.dtbo \
@@ -1868,6 +1853,7 @@ index 0000000..3c82220
 +	rpi-tv.dtbo \
 +	rra-digidac1-wm8741-audio.dtbo \
 +	sc16is750-i2c.dtbo \
++	sc16is752-i2c.dtbo \
 +	sc16is752-spi1.dtbo \
 +	sdhost.dtbo \
 +	sdio.dtbo \
@@ -1886,9 +1872,12 @@ index 0000000..3c82220
 +	spi2-1cs.dtbo \
 +	spi2-2cs.dtbo \
 +	spi2-3cs.dtbo \
++	superaudioboard.dtbo \
 +	tinylcd35.dtbo \
 +	uart0.dtbo \
 +	uart1.dtbo \
++	upstream.dtbo \
++	upstream-aux-interrupt.dtbo \
 +	vc4-fkms-v3d.dtbo \
 +	vc4-kms-v3d.dtbo \
 +	vga666.dtbo \
@@ -1903,10 +1892,10 @@ index 0000000..3c82220
 +clean-files	:= *.dtbo
 diff --git a/arch/arm/boot/dts/overlays/README b/arch/arm/boot/dts/overlays/README
 new file mode 100644
-index 0000000..88f67db
+index 0000000..a850674
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/README
-@@ -0,0 +1,1792 @@
+@@ -0,0 +1,1831 @@
 +Introduction
 +============
 +
@@ -2266,8 +2255,9 @@ index 0000000..88f67db
 +
 +Name:   audioinjector-addons
 +Info:   Configures the audioinjector.net audio add on soundcards
-+Load:   dtoverlay=audioinjector-addons
-+Params: <None>
++Load:   dtoverlay=audioinjector-addons,<param>=<val>
++Params: non-stop-clocks         Keeps the clocks running even when the stream
++                                is paused or stopped (default off)
 +
 +
 +Name:   audioinjector-wm8731-audio
@@ -2601,6 +2591,13 @@ index 0000000..88f67db
 +
 +        i2c_gpio_delay_us       Clock delay in microseconds
 +                                (default "2" = ~100kHz)
++
++        bus                     Set to a unique, non-zero value if wanting
++                                multiple i2c-gpio busses. If set, will be used
++                                as the preferred bus number (/dev/i2c-<n>). If
++                                not set, the default value is 0, but the bus
++                                number will be dynamically assigned - probably
++                                3.
 +
 +
 +Name:   i2c-mux
@@ -3084,6 +3081,13 @@ index 0000000..88f67db
 +Params: <None>
 +
 +
++Name:   pibell
++Info:   Configures the pibell audio card.
++Load:   dtoverlay=pibell,<param>=<val>
++Params: alsaname                Set the name as it appears in ALSA (default
++                                "PiBell")
++
++
 +Name:   piscreen
 +Info:   PiScreen display by OzzMaker.com
 +Load:   dtoverlay=piscreen,<param>=<val>
@@ -3245,18 +3249,12 @@ index 0000000..88f67db
 +        speed                   SPI bus speed (default 12 MHz)
 +
 +
-+Name:   raspidac3
-+Info:   Configures the RaspiDAV Rev.3x audio card
-+Load:   dtoverlay=raspidac3
-+Params: <None>
-+
-+
 +Name:   rotary-encoder
 +Info:   Overlay for GPIO connected rotary encoder.
 +Load:   dtoverlay=rotary-encoder,<param>=<val>
-+Params: rotary0_pin_a           GPIO connected to rotary encoder channel A
++Params: pin_a                   GPIO connected to rotary encoder channel A
 +                                (default 4).
-+        rotary0_pin_b           GPIO connected to rotary encoder channel B
++        pin_b                   GPIO connected to rotary encoder channel B
 +                                (default 17).
 +        relative_axis           register a relative axis rather than an
 +                                absolute one. Relative axis will only
@@ -3349,12 +3347,21 @@ index 0000000..88f67db
 +
 +Name:   sc16is750-i2c
 +Info:   Overlay for the NXP SC16IS750 UART with I2C Interface
-+        Enables the chip on I2C1 at 0x48. To select another address,
-+        please refer to table 10 in reference manual.
-+
++        Enables the chip on I2C1 at 0x48 (or the "addr" parameter value). To
++        select another address, please refer to table 10 in reference manual.
 +Load:   dtoverlay=sc16is750-i2c,<param>=<val>
 +Params: int_pin                 GPIO used for IRQ (default 24)
 +        addr                    Address (default 0x48)
++
++
++Name:   sc16is752-i2c
++Info:   Overlay for the NXP SC16IS752 dual UART with I2C Interface
++        Enables the chip on I2C1 at 0x48 (or the "addr" parameter value). To
++        select another address, please refer to table 10 in reference manual.
++Load:   dtoverlay=sc16is752-i2c,<param>=<val>
++Params: int_pin                 GPIO used for IRQ (default 24)
++        addr                    Address (default 0x48)
++        xtal                    On-board crystal frequency (default 14745600)
 +
 +
 +Name:   sc16is752-spi1
@@ -3567,6 +3574,12 @@ index 0000000..88f67db
 +                                is 'okay' or enabled).
 +
 +
++Name:   superaudioboard
++Info:   Configures the SuperAudioBoard sound card
++Load:   dtoverlay=superaudioboard,<param>=<val>
++Params: gpiopin                 GPIO pin for codec reset
++
++
 +Name:   tinylcd35
 +Info:   3.5" Color TFT Display by www.tinylcd.com
 +        Options: Touch, RTC, keypad
@@ -3615,6 +3628,21 @@ index 0000000..88f67db
 +Params: txd1_pin                GPIO pin for TXD1 (14, 32 or 40 - default 14)
 +
 +        rxd1_pin                GPIO pin for RXD1 (15, 33 or 41 - default 15)
++
++
++Name:   upstream
++Info:   Allow usage of downstream .dtb with upstream kernel. Comprises
++        vc4-kms-v3d, dwc2 and upstream-aux-interrupt overlays.
++Load:   dtoverlay=upstream
++Params: <None>
++
++
++Name:   upstream-aux-interrupt
++Info:   Allow usage of downstream .dtb with upstream kernel by binding AUX
++        devices directly to the shared AUX interrupt line. One of the parts
++        of the 'upstream' overlay
++Load:   dtoverlay=upstream-aux-interrupt
++Params: <None>
 +
 +
 +Name:   vc4-fkms-v3d
@@ -4530,10 +4558,10 @@ index 0000000..880c753
 +};
 diff --git a/arch/arm/boot/dts/overlays/audioinjector-addons-overlay.dts b/arch/arm/boot/dts/overlays/audioinjector-addons-overlay.dts
 new file mode 100644
-index 0000000..a40bb11
+index 0000000..60b2e94
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/audioinjector-addons-overlay.dts
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,59 @@
 +// Definitions for audioinjector.net audio add on soundcard
 +/dts-v1/;
 +/plugin/;
@@ -4578,7 +4606,7 @@ index 0000000..a40bb11
 +
 +	fragment@2 {
 +		target = <&sound>;
-+		__overlay__ {
++		snd: __overlay__ {
 +			compatible = "ai,audioinjector-octo-soundcard";
 +			mult-gpios = <&gpio 27 0>, <&gpio 22 0>, <&gpio 23 0>,
 +				     <&gpio 24 0>;
@@ -4587,6 +4615,10 @@ index 0000000..a40bb11
 +			codec = <&cs42448>;
 +			status = "okay";
 +		};
++	};
++
++	__overrides__ {
++		non-stop-clocks = <&snd>, "non-stop-clocks?";
 +	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/audioinjector-wm8731-audio-overlay.dts b/arch/arm/boot/dts/overlays/audioinjector-wm8731-audio-overlay.dts
@@ -5318,10 +5350,10 @@ index 0000000..9a9e9a0
 +};
 diff --git a/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts b/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts
 new file mode 100644
-index 0000000..af5baf7
+index 0000000..1bd9bb9
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/gpio-ir-overlay.dts
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,48 @@
 +// Definitions for ir-gpio module
 +/dts-v1/;
 +/plugin/;
@@ -5332,8 +5364,10 @@ index 0000000..af5baf7
 +        fragment@0 {
 +                target-path = "/";
 +                __overlay__ {
-+                        gpio_ir: ir-receiver {
++                        gpio_ir: ir-receiver@12 {
 +                                compatible = "gpio-ir-receiver";
++                                pinctrl-names = "default";
++                                pinctrl-0 = <&gpio_ir_pins>;
 +
 +                                // pin number, high or low
 +                                gpios = <&gpio 18 1>;
@@ -5349,7 +5383,7 @@ index 0000000..af5baf7
 +        fragment@1 {
 +                target = <&gpio>;
 +                __overlay__ {
-+                        gpio_ir_pins: gpio_ir_pins {
++                        gpio_ir_pins: gpio_ir_pins@12 {
 +                                brcm,pins = <18>;                       // pin 18
 +                                brcm,function = <0>;                    // in
 +                                brcm,pull = <1>;                        // down
@@ -5359,8 +5393,10 @@ index 0000000..af5baf7
 +
 +        __overrides__ {
 +                // parameters
-+                gpio_pin =      <&gpio_ir>,"gpios:4",
-+                                        <&gpio_ir_pins>,"brcm,pins:0";  // pin number
++                gpio_pin =      <&gpio_ir>,"gpios:4",           // pin number
++                                <&gpio_ir>,"reg:0",
++                                <&gpio_ir_pins>,"brcm,pins:0",
++                                <&gpio_ir_pins>,"reg:0";
 +                gpio_pull = <&gpio_ir_pins>,"brcm,pull:0";              // pull-up/down state
 +
 +                rc-map-name = <&gpio_ir>,"linux,rc-map-name";           // default rc map
@@ -5368,10 +5404,10 @@ index 0000000..af5baf7
 +};
 diff --git a/arch/arm/boot/dts/overlays/gpio-ir-tx-overlay.dts b/arch/arm/boot/dts/overlays/gpio-ir-tx-overlay.dts
 new file mode 100644
-index 0000000..a2e271f
+index 0000000..e054ba3
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/gpio-ir-tx-overlay.dts
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,36 @@
 +/dts-v1/;
 +/plugin/;
 +
@@ -5381,7 +5417,7 @@ index 0000000..a2e271f
 +	fragment@0 {
 +		target = <&gpio>;
 +		__overlay__ {
-+			gpio_ir_tx_pins: gpio_ir_tx_pins {
++			gpio_ir_tx_pins: gpio_ir_tx_pins@12 {
 +				brcm,pins = <18>;
 +				brcm,function = <1>;	// out
 +			};
@@ -5391,7 +5427,7 @@ index 0000000..a2e271f
 +	fragment@1 {
 +		target-path = "/";
 +		__overlay__ {
-+			gpio_ir_tx: gpio-ir-transmitter {
++			gpio_ir_tx: gpio-ir-transmitter@12 {
 +				compatible = "gpio-ir-tx";
 +				pinctrl-names = "default";
 +				pinctrl-0 = <&gpio_ir_tx_pins>;
@@ -5401,8 +5437,10 @@ index 0000000..a2e271f
 +	};
 +
 +	__overrides__ {
-+		gpio_pin = <&gpio_ir_tx>, "gpios:4",
-+			   <&gpio_ir_tx_pins>, "brcm,pins:0";	// pin number
++		gpio_pin = <&gpio_ir_tx>, "gpios:4",           	// pin number
++			   <&gpio_ir_tx>, "reg:0",
++			   <&gpio_ir_tx_pins>, "brcm,pins:0",
++			   <&gpio_ir_tx_pins>, "reg:0";
 +		invert = <&gpio_ir_tx>, "gpios:8";		// 1 = active low
 +	};
 +};
@@ -6106,7 +6144,7 @@ index 0000000..0afc6b4
 +};
 diff --git a/arch/arm/boot/dts/overlays/i2c-gpio-overlay.dts b/arch/arm/boot/dts/overlays/i2c-gpio-overlay.dts
 new file mode 100644
-index 0000000..b72b32e
+index 0000000..3f692c1
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/i2c-gpio-overlay.dts
 @@ -0,0 +1,43 @@
@@ -6150,9 +6188,9 @@ index 0000000..b72b32e
 +		i2c_gpio_sda = <&i2c_gpio>,"gpios:4";
 +		i2c_gpio_scl = <&i2c_gpio>,"gpios:16";
 +		i2c_gpio_delay_us = <&i2c_gpio>,"i2c-gpio,delay-us:0";
++		bus = <&i2c_gpio>, "reg:0";
 +	};
 +};
-+
 diff --git a/arch/arm/boot/dts/overlays/i2c-mux-overlay.dts b/arch/arm/boot/dts/overlays/i2c-mux-overlay.dts
 new file mode 100644
 index 0000000..976d38e
@@ -9531,6 +9569,93 @@ index 0000000..9838165
 +		};
 +	};
 +};
+diff --git a/arch/arm/boot/dts/overlays/pibell-overlay.dts b/arch/arm/boot/dts/overlays/pibell-overlay.dts
+new file mode 100644
+index 0000000..6e71c15
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/pibell-overlay.dts
+@@ -0,0 +1,81 @@
++/dts-v1/;
++/plugin/;
++
++/ {
++    compatible = "brcm,bcm2708";
++
++    fragment@0 {
++        target-path = "/";
++        __overlay__ {
++            codec_out: spdif-transmitter {
++                #address-cells = <0>;
++                #size-cells = <0>;
++                #sound-dai-cells = <0>;
++                compatible = "linux,spdif-dit";
++                status = "okay";
++            };
++
++            codec_in: card-codec {
++                #sound-dai-cells = <0>;
++                compatible = "invensense,ics43432";
++                status = "okay";
++            };
++        };
++    };
++
++    fragment@1 {
++        target = <&i2s>;
++        __overlay__ {
++            #sound-dai-cells = <0>;
++            status = "okay";
++        };
++    };
++
++    fragment@2 {
++        target = <&sound>;
++        snd: __overlay__ {
++            compatible = "simple-audio-card";
++            simple-audio-card,name = "PiBell";
++
++            status="okay";
++
++            capture_link: simple-audio-card,dai-link@0 {
++                format = "i2s";
++
++                r_cpu_dai: cpu {
++                    sound-dai = <&i2s>;
++
++/* example TDM slot configuration
++                    dai-tdm-slot-num = <2>;
++                    dai-tdm-slot-width = <32>;
++*/
++                };
++
++                r_codec_dai: codec {
++                    sound-dai = <&codec_in>;
++                };
++            };
++
++            playback_link: simple-audio-card,dai-link@1 {
++                format = "i2s";
++
++                p_cpu_dai: cpu {
++                    sound-dai = <&i2s>;
++
++/* example TDM slot configuration
++                    dai-tdm-slot-num = <2>;
++                    dai-tdm-slot-width = <32>;
++*/
++                };
++
++                p_codec_dai: codec {
++                    sound-dai = <&codec_out>;
++                };
++            };
++        };
++    };
++
++    __overrides__ {
++        alsaname = <&snd>, "simple-audio-card,name";
++    };
++};
 diff --git a/arch/arm/boot/dts/overlays/piscreen-overlay.dts b/arch/arm/boot/dts/overlays/piscreen-overlay.dts
 new file mode 100644
 index 0000000..40a1f29
@@ -10552,67 +10677,12 @@ index 0000000..b4e6013
 +		speed   = <&eth1>, "spi-max-frequency:0";
 +	};
 +};
-diff --git a/arch/arm/boot/dts/overlays/raspidac3-overlay.dts b/arch/arm/boot/dts/overlays/raspidac3-overlay.dts
-new file mode 100644
-index 0000000..2c3c978
---- /dev/null
-+++ b/arch/arm/boot/dts/overlays/raspidac3-overlay.dts
-@@ -0,0 +1,49 @@
-+// Definitions for RaspiDACv3
-+/dts-v1/;
-+/plugin/;
-+
-+/ {
-+	compatible = "brcm,bcm2708";
-+
-+	fragment@0 {
-+		target = <&i2s>;
-+		__overlay__ {
-+			status = "okay";
-+		};
-+	};
-+
-+	fragment@1 {
-+		target = <&i2c1>;
-+		__overlay__ {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			status = "okay";
-+
-+			pcm5122@4c {
-+				#sound-dai-cells = <0>;
-+				compatible = "ti,pcm5122";
-+				reg = <0x4c>;
-+				AVDD-supply = <&vdd_3v3_reg>;
-+				DVDD-supply = <&vdd_3v3_reg>;
-+				CPVDD-supply = <&vdd_3v3_reg>;
-+				status = "okay";
-+			};
-+
-+			tpa6130a2: tpa6130a2@60 {
-+				compatible = "ti,tpa6130a2";
-+				reg = <0x60>;
-+				Vdd-supply = <&vdd_3v3_reg>;
-+				status = "okay";
-+			};
-+		};
-+	};
-+
-+	fragment@2 {
-+		target = <&sound>;
-+		__overlay__ {
-+			compatible = "jg,raspidacv3";
-+			i2s-controller = <&i2s>;
-+			status = "okay";
-+		};
-+	};
-+};
 diff --git a/arch/arm/boot/dts/overlays/rotary-encoder-overlay.dts b/arch/arm/boot/dts/overlays/rotary-encoder-overlay.dts
 new file mode 100644
-index 0000000..f88f8a3
+index 0000000..819f400
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/rotary-encoder-overlay.dts
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,59 @@
 +// Device tree overlay for GPIO connected rotary encoder.
 +/dts-v1/;
 +/plugin/;
@@ -10623,7 +10693,7 @@ index 0000000..f88f8a3
 +	fragment@0 {
 +		target = <&gpio>;
 +		__overlay__ {
-+			rotary0_pins: rotary0_pins {
++			rotary_pins: rotary_pins@4 {
 +				brcm,pins = <4 17>; /* gpio 4 17 */
 +				brcm,function = <0 0>; /* input */
 +				brcm,pull = <2 2>; /* pull-up */
@@ -10635,34 +10705,42 @@ index 0000000..f88f8a3
 +	fragment@1 {
 +		target-path = "/";
 +		__overlay__ {
-+			rotary0: rotary@0 {
-+					compatible = "rotary-encoder";
-+					status = "okay";
-+					pinctrl-names = "default";
-+					pinctrl-0 = <&rotary0_pins>;
-+					gpios = <&gpio 4 0>, <&gpio 17 0>;
-+					linux,axis = <0>; /* REL_X */
-+					rotary-encoder,encoding = "gray";
-+					rotary-encoder,steps = <24>; /* 24 default */
-+					rotary-encoder,steps-per-period = <1>; /* corresponds to full period mode. See README */
++			rotary: rotary@4 {
++				compatible = "rotary-encoder";
++				status = "okay";
++				pinctrl-names = "default";
++				pinctrl-0 = <&rotary_pins>;
++				gpios = <&gpio 4 0>, <&gpio 17 0>;
++				linux,axis = <0>; /* REL_X */
++				rotary-encoder,encoding = "gray";
++				rotary-encoder,steps = <24>; /* 24 default */
++				rotary-encoder,steps-per-period = <1>; /* corresponds to full period mode. See README */
 +			};
 +		};
 +
 +	};  
 +
 +	__overrides__ {
-+		rotary0_pin_a =     <&rotary0>,"gpios:4",
-+		                    <&rotary0_pins>,"brcm,pins:0";
-+		rotary0_pin_b =     <&rotary0>,"gpios:16",
-+		                    <&rotary0_pins>,"brcm,pins:4";
-+		relative_axis =     <&rotary0>,"rotary-encoder,relative-axis?";
-+		linux_axis =        <&rotary0>,"linux,axis:0";
-+		rollover =          <&rotary0>,"rotary-encoder,rollover?";
-+		steps-per-period =  <&rotary0>,"rotary-encoder,steps-per-period:0";
-+		steps =             <&rotary0>,"rotary-encoder,steps:0";
-+		wakeup =            <&rotary0>,"wakeup-source?";
-+		encoding =          <&rotary0>,"rotary-encoder,encoding";
-+	};  
++		pin_a =		    <&rotary>,"gpios:4",
++				    <&rotary_pins>,"brcm,pins:0",
++				    /* modify reg values to allow multiple instantiation */
++				    <&rotary>,"reg:0",
++				    <&rotary_pins>,"reg:0";
++		pin_b =		    <&rotary>,"gpios:16",
++				    <&rotary_pins>,"brcm,pins:4";
++		relative_axis =     <&rotary>,"rotary-encoder,relative-axis?";
++		linux_axis =        <&rotary>,"linux,axis:0";
++		rollover =          <&rotary>,"rotary-encoder,rollover?";
++		steps-per-period =  <&rotary>,"rotary-encoder,steps-per-period:0";
++		steps =             <&rotary>,"rotary-encoder,steps:0";
++		wakeup =            <&rotary>,"wakeup-source?";
++		encoding =          <&rotary>,"rotary-encoder,encoding";
++                /* legacy parameters*/
++		rotary0_pin_a =     <&rotary>,"gpios:4",
++		                    <&rotary_pins>,"brcm,pins:0";
++		rotary0_pin_b =     <&rotary>,"gpios:16",
++		                    <&rotary_pins>,"brcm,pins:4";
++	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/rpi-backlight-overlay.dts b/arch/arm/boot/dts/overlays/rpi-backlight-overlay.dts
 new file mode 100644
@@ -10982,7 +11060,7 @@ index 0000000..533b5c1
 +};
 diff --git a/arch/arm/boot/dts/overlays/rpi-ft5406-overlay.dts b/arch/arm/boot/dts/overlays/rpi-ft5406-overlay.dts
 new file mode 100644
-index 0000000..d4607b9
+index 0000000..1915ce1
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/rpi-ft5406-overlay.dts
 @@ -0,0 +1,30 @@
@@ -11000,7 +11078,7 @@ index 0000000..d4607b9
 +				firmware = <&firmware>;
 +				status = "okay";
 +				touchscreen-size-x = <800>;
-+				touchscreen-size-y = <600>;
++				touchscreen-size-y = <480>;
 +				touchscreen-inverted-x = <0>;
 +				touchscreen-inverted-y = <0>;
 +				touchscreen-swapped-x-y = <0>;
@@ -11249,6 +11327,52 @@ index 0000000..339d0d1
 +	};
 +
 +};
+diff --git a/arch/arm/boot/dts/overlays/sc16is752-i2c-overlay.dts b/arch/arm/boot/dts/overlays/sc16is752-i2c-overlay.dts
+new file mode 100644
+index 0000000..e43e81d
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/sc16is752-i2c-overlay.dts
+@@ -0,0 +1,40 @@
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target = <&i2c1>;
++
++		frag1: __overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "okay";
++
++			sc16is752: sc16is752@48 {
++				compatible = "nxp,sc16is752";
++				reg = <0x48>; // i2c address
++				clocks = <&sc16is752_clk>;
++				interrupt-parent = <&gpio>;
++				interrupts = <24 0x2>; /* IRQ_TYPE_EDGE_FALLING */
++				gpio-controller;
++				#gpio-cells = <0>;
++				i2c-max-frequency = <400000>;
++				status = "okay";
++
++				sc16is752_clk: sc16is752_clk {
++					compatible = "fixed-clock";
++					#clock-cells = <0>;
++					clock-frequency = <14745600>;
++				};
++			};
++		};
++	};
++
++	__overrides__ {
++		int_pin = <&sc16is752>,"interrupts:0";
++		addr = <&sc16is752>,"reg:0";
++		xtal = <&sc16is752>,"clock-frequency:0";
++	};
++};
 diff --git a/arch/arm/boot/dts/overlays/sc16is752-spi1-overlay.dts b/arch/arm/boot/dts/overlays/sc16is752-spi1-overlay.dts
 new file mode 100644
 index 0000000..d0a9e82
@@ -11355,10 +11479,10 @@ index 0000000..de3d1b0
 +};
 diff --git a/arch/arm/boot/dts/overlays/sdio-1bit-overlay.dts b/arch/arm/boot/dts/overlays/sdio-1bit-overlay.dts
 new file mode 100644
-index 0000000..0b7f2c6
+index 0000000..297daae
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/sdio-1bit-overlay.dts
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,63 @@
 +/dts-v1/;
 +/plugin/;
 +
@@ -11369,21 +11493,39 @@ index 0000000..0b7f2c6
 +
 +	fragment@0 {
 +		target = <&mmc>;
-+		sdio_mmc: __overlay__ {
-+			compatible = "brcm,bcm2835-mmc";
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&sdio_pins>;
-+			non-removable;
-+			bus-width = <1>;
-+			brcm,overclock-50 = <0>;
-+			status = "okay";
++		__overlay__ {
++			status = "disabled";
 +		};
 +	};
 +
 +	fragment@1 {
++		target = <&soc>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			sdio_1bit: sdio@7e300000 {
++				compatible = "brcm,bcm2835-mmc",
++					     "brcm,bcm2835-sdhci";
++				reg = <0x7e300000 0x100>;
++				interrupts = <2 30>;
++				clocks = <&clocks 28/*BCM2835_CLOCK_EMMC*/>;
++				dmas = <&dma 11>;
++				dma-names = "rx-tx";
++				brcm,overclock-50 = <0>;
++				status = "okay";
++				pinctrl-names = "default";
++				pinctrl-0 = <&sdio_1bit_pins>;
++				non-removable;
++				bus-width = <1>;
++			};
++		};
++	};
++
++	fragment@2 {
 +		target = <&gpio>;
 +		__overlay__ {
-+			sdio_pins: sdio_pins {
++			sdio_1bit_pins: sdio_1bit_pins {
 +				brcm,pins = <22 23 24 25>;
 +				brcm,function = <7>; /* ALT3 = SD1 */
 +				brcm,pull = <0 2 2 2>;
@@ -11391,17 +11533,25 @@ index 0000000..0b7f2c6
 +		};
 +	};
 +
++	fragment@3 {
++		target-path = "/aliases";
++		__overlay__ {
++			mmc1 = "/soc/sdio@7e300000";
++		};
++	};
++
++
 +	__overrides__ {
-+		poll_once = <&sdio_mmc>,"non-removable?";
-+		sdio_overclock = <&sdio_mmc>,"brcm,overclock-50:0";
++		poll_once = <&sdio_1bit>,"non-removable?";
++		sdio_overclock = <&sdio_1bit>,"brcm,overclock-50:0";
 +	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/sdio-overlay.dts b/arch/arm/boot/dts/overlays/sdio-overlay.dts
 new file mode 100644
-index 0000000..215d5e3
+index 0000000..685b65a
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/sdio-overlay.dts
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,63 @@
 +/dts-v1/;
 +/plugin/;
 +
@@ -11412,20 +11562,39 @@ index 0000000..215d5e3
 +
 +	fragment@0 {
 +		target = <&mmc>;
-+		sdio_mmc: __overlay__ {
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&sdio_pins>;
-+			non-removable;
-+			bus-width = <4>;
-+			brcm,overclock-50 = <0>;
-+			status = "okay";
++		__overlay__ {
++			status = "disabled";
 +		};
 +	};
 +
 +	fragment@1 {
++		target = <&soc>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			sdio_ovl: sdio@7e300000 {
++				compatible = "brcm,bcm2835-mmc",
++					     "brcm,bcm2835-sdhci";
++				reg = <0x7e300000 0x100>;
++				interrupts = <2 30>;
++				clocks = <&clocks 28/*BCM2835_CLOCK_EMMC*/>;
++				dmas = <&dma 11>;
++				dma-names = "rx-tx";
++				brcm,overclock-50 = <0>;
++				status = "okay";
++				pinctrl-names = "default";
++				pinctrl-0 = <&sdio_ovl_pins>;
++				non-removable;
++				bus-width = <1>;
++			};
++		};
++	};
++
++	fragment@2 {
 +		target = <&gpio>;
 +		__overlay__ {
-+			sdio_pins: sdio_pins {
++			sdio_ovl_pins: sdio_ovl_pins {
 +				brcm,pins = <22 23 24 25 26 27>;
 +				brcm,function = <7>; /* ALT3 = SD1 */
 +				brcm,pull = <0 2 2 2 2 2>;
@@ -11433,10 +11602,17 @@ index 0000000..215d5e3
 +		};
 +	};
 +
++	fragment@3 {
++		target-path = "/aliases";
++		__overlay__ {
++			mmc1 = "/soc/sdio@7e300000";
++		};
++	};
++
 +	__overrides__ {
-+		poll_once = <&sdio_mmc>,"non-removable?";
-+		bus_width = <&sdio_mmc>,"bus-width:0";
-+		sdio_overclock = <&sdio_mmc>,"brcm,overclock-50:0";
++		poll_once = <&sdio_ovl>,"non-removable?";
++		bus_width = <&sdio_ovl>,"bus-width:0";
++		sdio_overclock = <&sdio_ovl>,"brcm,overclock-50:0";
 +	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/sdtweak-overlay.dts b/arch/arm/boot/dts/overlays/sdtweak-overlay.dts
@@ -12203,6 +12379,85 @@ index 0000000..a62e107
 +		cs2_spidev = <&spidev2_2>,"status";
 +	};
 +};
+diff --git a/arch/arm/boot/dts/overlays/superaudioboard-overlay.dts b/arch/arm/boot/dts/overlays/superaudioboard-overlay.dts
+new file mode 100755
+index 0000000..e625fae
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/superaudioboard-overlay.dts
+@@ -0,0 +1,73 @@
++// Definitions for SuperAudioBoard
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2708";
++
++	fragment@0 {
++		target = <&sound>;
++		__overlay__ {
++			compatible = "simple-audio-card";
++			i2s-controller = <&i2s>;
++			status = "okay";
++
++			simple-audio-card,name = "SuperAudioBoard";
++
++			simple-audio-card,widgets =
++				"Line", "Line In",
++				"Line", "Line Out";
++
++			simple-audio-card,routing =
++				"Line Out","AOUTA+",
++				"Line Out","AOUTA-",
++				"Line Out","AOUTB+",
++				"Line Out","AOUTB-",
++				"AINA","Line In",
++				"AINB","Line In";
++
++			simple-audio-card,format = "i2s";
++
++			simple-audio-card,bitclock-master = <&sound_master>;
++			simple-audio-card,frame-master = <&sound_master>;
++
++			simple-audio-card,cpu {
++				sound-dai = <&i2s>;
++				dai-tdm-slot-num = <2>;
++				dai-tdm-slot-width = <32>;
++			};
++
++			sound_master: simple-audio-card,codec {
++				sound-dai = <&cs4271>;
++				system-clock-frequency = <24576000>;
++			};
++		};
++	};
++
++	fragment@1 {
++		target = <&i2s>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++    
++	fragment@2 {
++		target = <&i2c1>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "okay";
++
++			cs4271: cs4271@10 {
++				#sound-dai-cells = <0>;
++				compatible = "cirrus,cs4271";
++				reg = <0x10>;
++				status = "okay";
++				reset-gpio = <&gpio 26 0>; /* Pin 26, active high */
++			};
++		};
++	};
++	__overrides__ {
++		gpiopin = <&cs4271>,"reset-gpio:4";
++	};
++};
 diff --git a/arch/arm/boot/dts/overlays/tinylcd35-overlay.dts b/arch/arm/boot/dts/overlays/tinylcd35-overlay.dts
 new file mode 100644
 index 0000000..ed2b053
@@ -12515,9 +12770,208 @@ index 0000000..fa73e1f
 +		rxd1_pin = <&uart1_pins>,"brcm,pins:4";
 +	};
 +};
+diff --git a/arch/arm/boot/dts/overlays/upstream-aux-interrupt-overlay.dts b/arch/arm/boot/dts/overlays/upstream-aux-interrupt-overlay.dts
+new file mode 100644
+index 0000000..04e271b
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/upstream-aux-interrupt-overlay.dts
+@@ -0,0 +1,33 @@
++// Overlay for missing AUX interrupt controller
++// Instead we bind all AUX devices to the generic AUX interrupt line
++/dts-v1/;
++/plugin/;
++
++/ {
++    compatible = "brcm,bcm2708";
++
++    fragment@0 {
++        target = <&uart1>;
++        __overlay__ {
++            interrupt-parent = <&intc>;
++            interrupts = <0x1 0x1d>;
++        };
++    };
++
++    fragment@1 {
++        target = <&spi1>;
++        __overlay__ {
++            interrupt-parent = <&intc>;
++            interrupts = <0x1 0x1d>;
++        };
++    };
++
++    fragment@2 {
++        target = <&spi2>;
++        __overlay__ {
++            interrupt-parent = <&intc>;
++            interrupts = <0x1 0x1d>;
++        };
++    };
++};
++
+diff --git a/arch/arm/boot/dts/overlays/upstream-overlay.dts b/arch/arm/boot/dts/overlays/upstream-overlay.dts
+new file mode 100644
+index 0000000..3890d90
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/upstream-overlay.dts
+@@ -0,0 +1,154 @@
++// redo: ovmerge -c vc4-kms-v3d-overlay.dts,cma-96 dwc2-overlay.dts,dr_mode=otg upstream-aux-interrupt-overlay.dts,
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/clock/bcm2835.h>
++
++/ {
++	compatible = "brcm,bcm2835", "brcm,bcm2708", "brcm,bcm2709";
++	fragment@0 {
++		target-path = "/chosen";
++		__dormant__ {
++			bootargs = "cma=256M";
++		};
++	};
++	fragment@1 {
++		target-path = "/chosen";
++		__dormant__ {
++			bootargs = "cma=192M";
++		};
++	};
++	fragment@2 {
++		target-path = "/chosen";
++		__dormant__ {
++			bootargs = "cma=128M";
++		};
++	};
++	fragment@3 {
++		target-path = "/chosen";
++		__overlay__ {
++			bootargs = "cma=96M";
++		};
++	};
++	fragment@4 {
++		target-path = "/chosen";
++		__dormant__ {
++			bootargs = "cma=64M";
++		};
++	};
++	fragment@5 {
++		target = <&i2c2>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++	fragment@6 {
++		target = <&fb>;
++		__overlay__ {
++			status = "disabled";
++		};
++	};
++	fragment@7 {
++		target = <&pixelvalve0>;
++		__overlay__ {
++			interrupts = <2 13>;
++			status = "okay";
++		};
++	};
++	fragment@8 {
++		target = <&pixelvalve1>;
++		__overlay__ {
++			interrupts = <2 14>;
++			status = "okay";
++		};
++	};
++	fragment@9 {
++		target = <&pixelvalve2>;
++		__overlay__ {
++			interrupts = <2 10>;
++			status = "okay";
++		};
++	};
++	fragment@10 {
++		target = <&hvs>;
++		__overlay__ {
++			interrupts = <2 1>;
++			status = "okay";
++		};
++	};
++	fragment@11 {
++		target = <&hdmi>;
++		__overlay__ {
++			interrupts = <2 8>, <2 9>;
++			status = "okay";
++		};
++	};
++	fragment@12 {
++		target = <&v3d>;
++		__overlay__ {
++			interrupts = <1 10>;
++			status = "okay";
++		};
++	};
++	fragment@13 {
++		target = <&vc4>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++	fragment@14 {
++		target-path = "/soc/dma";
++		__overlay__ {
++			brcm,dma-channel-mask = <0x7f35>;
++		};
++	};
++	fragment@15 {
++		target = <&clocks>;
++		__overlay__ {
++			claim-clocks = <BCM2835_PLLD_DSI0 BCM2835_PLLD_DSI1 BCM2835_PLLH_AUX BCM2835_PLLH_PIX>;
++		};
++	};
++	fragment@16 {
++		target = <&vec>;
++		__overlay__ {
++			status = "okay";
++		};
++	};
++	fragment@17 {
++		target = <&usb>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		dwc2_usb: __overlay__ {
++			compatible = "brcm,bcm2835-usb";
++			reg = <0x7e980000 0x10000>;
++			interrupts = <1 9>;
++			dr_mode = "otg";
++			g-np-tx-fifo-size = <32>;
++			g-rx-fifo-size = <256>;
++			g-tx-fifo-size = <512 512 512 512 512 768>;
++			status = "okay";
++		};
++	};
++	fragment@18 {
++		target = <&uart1>;
++		__overlay__ {
++			interrupt-parent = <&intc>;
++			interrupts = <0x1 0x1d>;
++		};
++	};
++	fragment@19 {
++		target = <&spi1>;
++		__overlay__ {
++			interrupt-parent = <&intc>;
++			interrupts = <0x1 0x1d>;
++		};
++	};
++	fragment@20 {
++		target = <&spi2>;
++		__overlay__ {
++			interrupt-parent = <&intc>;
++			interrupts = <0x1 0x1d>;
++		};
++	};
++};
 diff --git a/arch/arm/boot/dts/overlays/vc4-fkms-v3d-overlay.dts b/arch/arm/boot/dts/overlays/vc4-fkms-v3d-overlay.dts
 new file mode 100644
-index 0000000..36fbf6c
+index 0000000..14f7687
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/vc4-fkms-v3d-overlay.dts
 @@ -0,0 +1,89 @@
@@ -12589,7 +13043,7 @@ index 0000000..36fbf6c
 +	};
 +
 +	fragment@8 {
-+		target = <&gpu>;
++		target = <&vc4>;
 +		__overlay__  {
 +			status = "okay";
 +		};
@@ -12612,10 +13066,10 @@ index 0000000..36fbf6c
 +};
 diff --git a/arch/arm/boot/dts/overlays/vc4-kms-v3d-overlay.dts b/arch/arm/boot/dts/overlays/vc4-kms-v3d-overlay.dts
 new file mode 100644
-index 0000000..8baa7f7
+index 0000000..4896796
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/vc4-kms-v3d-overlay.dts
-@@ -0,0 +1,158 @@
+@@ -0,0 +1,151 @@
 +/*
 + * vc4-kms-v3d-overlay.dts
 + */
@@ -12671,20 +13125,13 @@ index 0000000..8baa7f7
 +	};
 +
 +	fragment@6 {
-+		target = <&cprman>;
-+		__overlay__  {
-+			status = "okay";
-+		};
-+	};
-+
-+	fragment@7 {
 +		target = <&fb>;
 +		__overlay__  {
 +			status = "disabled";
 +		};
 +	};
 +
-+	fragment@8 {
++	fragment@7 {
 +		target = <&pixelvalve0>;
 +		__overlay__  {
 +			interrupts = <2 13>; /* pwa0 */
@@ -12692,7 +13139,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@9 {
++	fragment@8 {
 +		target = <&pixelvalve1>;
 +		__overlay__  {
 +			interrupts = <2 14>; /* pwa1 */
@@ -12700,7 +13147,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@10 {
++	fragment@9 {
 +		target = <&pixelvalve2>;
 +		__overlay__  {
 +			interrupts = <2 10>; /* pixelvalve */
@@ -12708,7 +13155,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@11 {
++	fragment@10 {
 +		target = <&hvs>;
 +		__overlay__  {
 +			interrupts = <2 1>;
@@ -12716,7 +13163,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@12 {
++	fragment@11 {
 +		target = <&hdmi>;
 +		__overlay__  {
 +			interrupts = <2 8>, <2 9>;
@@ -12724,7 +13171,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@13 {
++	fragment@12 {
 +		target = <&v3d>;
 +		__overlay__  {
 +			interrupts = <1 10>;
@@ -12732,14 +13179,14 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@14 {
-+		target = <&gpu>;
++	fragment@13 {
++		target = <&vc4>;
 +		__overlay__  {
 +			status = "okay";
 +		};
 +	};
 +
-+	fragment@15 {
++	fragment@14 {
 +		target-path = "/soc/dma";
 +		__overlay__ {
 +			brcm,dma-channel-mask = <0x7f35>;
@@ -12747,7 +13194,7 @@ index 0000000..8baa7f7
 +	};
 +
 +
-+	fragment@16 {
++	fragment@15 {
 +		target = <&clocks>;
 +		__overlay__  {
 +			claim-clocks = <
@@ -12759,7 +13206,7 @@ index 0000000..8baa7f7
 +		};
 +	};
 +
-+	fragment@17 {
++	fragment@16 {
 +		target = <&vec>;
 +		__overlay__  {
 +			status = "okay";
@@ -12958,10 +13405,10 @@ index 0000000..8498134
 +};
 diff --git a/arch/arm/configs/bcm2709_defconfig b/arch/arm/configs/bcm2709_defconfig
 new file mode 100644
-index 0000000..f1dcc7d
+index 0000000..cbc3a78
 --- /dev/null
 +++ b/arch/arm/configs/bcm2709_defconfig
-@@ -0,0 +1,1341 @@
+@@ -0,0 +1,1356 @@
 +CONFIG_LOCALVERSION="-v7"
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
@@ -13579,9 +14026,9 @@ index 0000000..f1dcc7d
 +CONFIG_PPS_CLIENT_LDISC=m
 +CONFIG_PPS_CLIENT_GPIO=m
 +CONFIG_PINCTRL_MCP23S08=m
-+CONFIG_GPIO_SYSFS=y
 +CONFIG_GPIO_BCM_EXP=y
 +CONFIG_GPIO_BCM_VIRT=y
++CONFIG_GPIO_MOCKUP=m
 +CONFIG_GPIO_PCF857X=m
 +CONFIG_GPIO_ARIZONA=m
 +CONFIG_GPIO_STMPE=y
@@ -13828,6 +14275,7 @@ index 0000000..f1dcc7d
 +CONFIG_SND_USB_CAIAQ=m
 +CONFIG_SND_USB_CAIAQ_INPUT=y
 +CONFIG_SND_USB_6FIRE=m
++CONFIG_SND_USB_HIFACE=m
 +CONFIG_SND_SOC=m
 +CONFIG_SND_BCM2835_SOC_I2S=m
 +CONFIG_SND_BCM2708_SOC_GOOGLEVOICEHAT_SOUNDCARD=m
@@ -13842,7 +14290,6 @@ index 0000000..f1dcc7d
 +CONFIG_SND_BCM2708_SOC_JUSTBOOM_DIGI=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DAC=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DIGI=m
-+CONFIG_SND_BCM2708_SOC_RASPIDAC3=m
 +CONFIG_SND_BCM2708_SOC_ADAU1977_ADC=m
 +CONFIG_SND_AUDIOINJECTOR_PI_SOUNDCARD=m
 +CONFIG_SND_AUDIOINJECTOR_OCTO_SOUNDCARD=m
@@ -13858,9 +14305,11 @@ index 0000000..f1dcc7d
 +CONFIG_SND_SOC_ADAU1701=m
 +CONFIG_SND_SOC_ADAU7002=m
 +CONFIG_SND_SOC_AK4554=m
++CONFIG_SND_SOC_CS4271_I2C=m
 +CONFIG_SND_SOC_SPDIF=m
 +CONFIG_SND_SOC_WM8804_I2C=m
 +CONFIG_SND_SIMPLE_CARD=m
++CONFIG_SND_AUDIO_GRAPH_CARD=m
 +CONFIG_HID_BATTERY_STRENGTH=y
 +CONFIG_HIDRAW=y
 +CONFIG_UHID=m
@@ -14018,6 +14467,19 @@ index 0000000..f1dcc7d
 +CONFIG_USB_UEAGLEATM=m
 +CONFIG_USB_XUSBATM=m
 +CONFIG_USB_GADGET=m
++CONFIG_USB_ZERO=m
++CONFIG_USB_AUDIO=m
++CONFIG_USB_ETH=m
++CONFIG_USB_GADGETFS=m
++CONFIG_USB_MASS_STORAGE=m
++CONFIG_USB_G_SERIAL=m
++CONFIG_USB_MIDI_GADGET=m
++CONFIG_USB_G_PRINTER=m
++CONFIG_USB_CDC_COMPOSITE=m
++CONFIG_USB_G_ACM_MS=m
++CONFIG_USB_G_MULTI=m
++CONFIG_USB_G_HID=m
++CONFIG_USB_G_WEBCAM=m
 +CONFIG_MMC=y
 +CONFIG_MMC_BLOCK_MINORS=32
 +CONFIG_MMC_BCM2835_MMC=y
@@ -14305,10 +14767,10 @@ index 0000000..f1dcc7d
 +CONFIG_LIBCRC32C=y
 diff --git a/arch/arm/configs/bcmrpi_defconfig b/arch/arm/configs/bcmrpi_defconfig
 new file mode 100644
-index 0000000..f2563f6
+index 0000000..e2cb997
 --- /dev/null
 +++ b/arch/arm/configs/bcmrpi_defconfig
-@@ -0,0 +1,1346 @@
+@@ -0,0 +1,1348 @@
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
 +CONFIG_POSIX_MQUEUE=y
@@ -14921,7 +15383,7 @@ index 0000000..f2563f6
 +CONFIG_PPS_CLIENT_LDISC=m
 +CONFIG_PPS_CLIENT_GPIO=m
 +CONFIG_PINCTRL_MCP23S08=m
-+CONFIG_GPIO_SYSFS=y
++CONFIG_GPIO_MOCKUP=m
 +CONFIG_GPIO_PCF857X=m
 +CONFIG_GPIO_ARIZONA=m
 +CONFIG_GPIO_STMPE=y
@@ -15168,6 +15630,7 @@ index 0000000..f2563f6
 +CONFIG_SND_USB_CAIAQ=m
 +CONFIG_SND_USB_CAIAQ_INPUT=y
 +CONFIG_SND_USB_6FIRE=m
++CONFIG_SND_USB_HIFACE=m
 +CONFIG_SND_SOC=m
 +CONFIG_SND_BCM2835_SOC_I2S=m
 +CONFIG_SND_BCM2708_SOC_GOOGLEVOICEHAT_SOUNDCARD=m
@@ -15182,7 +15645,6 @@ index 0000000..f2563f6
 +CONFIG_SND_BCM2708_SOC_JUSTBOOM_DIGI=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DAC=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DIGI=m
-+CONFIG_SND_BCM2708_SOC_RASPIDAC3=m
 +CONFIG_SND_BCM2708_SOC_ADAU1977_ADC=m
 +CONFIG_SND_AUDIOINJECTOR_PI_SOUNDCARD=m
 +CONFIG_SND_AUDIOINJECTOR_OCTO_SOUNDCARD=m
@@ -15198,9 +15660,11 @@ index 0000000..f2563f6
 +CONFIG_SND_SOC_ADAU1701=m
 +CONFIG_SND_SOC_ADAU7002=m
 +CONFIG_SND_SOC_AK4554=m
++CONFIG_SND_SOC_CS4271_I2C=m
 +CONFIG_SND_SOC_SPDIF=m
 +CONFIG_SND_SOC_WM8804_I2C=m
 +CONFIG_SND_SIMPLE_CARD=m
++CONFIG_SND_AUDIO_GRAPH_CARD=m
 +CONFIG_HID_BATTERY_STRENGTH=y
 +CONFIG_HIDRAW=y
 +CONFIG_UHID=m
@@ -17328,11 +17792,27 @@ index 5d2925e..78e9f6e 100644
  config ARCH_BCM_63XX
  	bool "Broadcom BCM63xx DSL SoC"
  	depends on ARCH_MULTI_V7
+diff --git a/arch/arm/mach-bcm/Makefile b/arch/arm/mach-bcm/Makefile
+index 980f585..62a5900 100644
+--- a/arch/arm/mach-bcm/Makefile
++++ b/arch/arm/mach-bcm/Makefile
+@@ -43,6 +43,11 @@ endif
+ 
+ # BCM2835
+ obj-$(CONFIG_ARCH_BCM2835)	+= board_bcm2835.o
++ifeq ($(CONFIG_ARCH_BCM2835),y)
++ifeq ($(CONFIG_ARM),y)
++obj-$(CONFIG_SMP)		+= platsmp.o
++endif
++endif
+ 
+ # BCM5301X
+ obj-$(CONFIG_ARCH_BCM_5301X)	+= bcm_5301x.o
 diff --git a/arch/arm/mach-bcm/board_bcm2835.c b/arch/arm/mach-bcm/board_bcm2835.c
-index 0c1edfc..9131e56 100644
+index 0c1edfc..54f807a 100644
 --- a/arch/arm/mach-bcm/board_bcm2835.c
 +++ b/arch/arm/mach-bcm/board_bcm2835.c
-@@ -16,13 +16,31 @@
+@@ -16,13 +16,32 @@
  #include <linux/irqchip.h>
  #include <linux/of_address.h>
  #include <linux/clk/bcm2835.h>
@@ -17341,6 +17821,7 @@ index 0c1edfc..9131e56 100644
  #include <asm/mach/arch.h>
  #include <asm/mach/map.h>
  
++#include "platsmp.h"
 +#include <linux/dma-mapping.h>
 +
  static void __init bcm2835_init(void)
@@ -17364,13 +17845,95 @@ index 0c1edfc..9131e56 100644
  }
  
  static const char * const bcm2835_compat[] = {
-@@ -37,5 +55,6 @@ static const char * const bcm2835_compat[] = {
+@@ -31,11 +50,14 @@ static const char * const bcm2835_compat[] = {
+ #endif
+ #ifdef CONFIG_ARCH_MULTI_V7
+ 	"brcm,bcm2836",
++	"brcm,bcm2837",
+ #endif
+ 	NULL
+ };
  
  DT_MACHINE_START(BCM2835, "BCM2835")
  	.init_machine = bcm2835_init,
+-	.dt_compat = bcm2835_compat
 +	.init_early = bcm2835_init_early,
- 	.dt_compat = bcm2835_compat
++	.dt_compat = bcm2835_compat,
++	.smp = smp_ops(bcm2836_smp_ops),
  MACHINE_END
+diff --git a/arch/arm/mach-bcm/platsmp.c b/arch/arm/mach-bcm/platsmp.c
+index 9e3f275..34506a60 100644
+--- a/arch/arm/mach-bcm/platsmp.c
++++ b/arch/arm/mach-bcm/platsmp.c
+@@ -17,6 +17,7 @@
+ #include <linux/errno.h>
+ #include <linux/init.h>
+ #include <linux/io.h>
++#include <linux/irqchip/irq-bcm2836.h>
+ #include <linux/jiffies.h>
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+@@ -287,6 +288,35 @@ static int nsp_boot_secondary(unsigned int cpu, struct task_struct *idle)
+ 	return ret;
+ }
+ 
++static int bcm2836_boot_secondary(unsigned int cpu, struct task_struct *idle)
++{
++	void __iomem *intc_base;
++	struct device_node *dn;
++	char *name;
++
++	name = "brcm,bcm2836-l1-intc";
++	dn = of_find_compatible_node(NULL, NULL, name);
++	if (!dn) {
++		pr_err("unable to find intc node\n");
++		return -ENODEV;
++	}
++
++	intc_base = of_iomap(dn, 0);
++	of_node_put(dn);
++
++	if (!intc_base) {
++		pr_err("unable to remap intc base register\n");
++		return -ENOMEM;
++	}
++
++	writel(virt_to_phys(secondary_startup),
++	       intc_base + LOCAL_MAILBOX3_SET0 + 16 * cpu);
++
++	iounmap(intc_base);
++
++	return 0;
++}
++
+ static const struct smp_operations kona_smp_ops __initconst = {
+ 	.smp_prepare_cpus	= bcm_smp_prepare_cpus,
+ 	.smp_boot_secondary	= kona_boot_secondary,
+@@ -305,3 +335,8 @@ static const struct smp_operations nsp_smp_ops __initconst = {
+ 	.smp_boot_secondary	= nsp_boot_secondary,
+ };
+ CPU_METHOD_OF_DECLARE(bcm_smp_nsp, "brcm,bcm-nsp-smp", &nsp_smp_ops);
++
++const struct smp_operations bcm2836_smp_ops __initconst = {
++	.smp_boot_secondary	= bcm2836_boot_secondary,
++};
++CPU_METHOD_OF_DECLARE(bcm_smp_bcm2836, "brcm,bcm2836-smp", &bcm2836_smp_ops);
+diff --git a/arch/arm/mach-bcm/platsmp.h b/arch/arm/mach-bcm/platsmp.h
+new file mode 100644
+index 0000000..b8b8b3f
+--- /dev/null
++++ b/arch/arm/mach-bcm/platsmp.h
+@@ -0,0 +1,10 @@
++/*
++ * Copyright (C) 2017 Stefan Wahren <stefan.wahren@i2se.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation version 2.
++ *
++ */
++
++extern const struct smp_operations bcm2836_smp_ops;
 diff --git a/arch/arm/mm/cache-v6.S b/arch/arm/mm/cache-v6.S
 index 2465995..1ee5bc3 100644
 --- a/arch/arm/mm/cache-v6.S
@@ -17618,10 +18181,10 @@ index 0000000..ded0864
 \ No newline at end of file
 diff --git a/arch/arm64/configs/bcmrpi3_defconfig b/arch/arm64/configs/bcmrpi3_defconfig
 new file mode 100644
-index 0000000..003209b
+index 0000000..43052ca
 --- /dev/null
 +++ b/arch/arm64/configs/bcmrpi3_defconfig
-@@ -0,0 +1,1289 @@
+@@ -0,0 +1,1291 @@
 +CONFIG_LOCALVERSION="-v8"
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
@@ -18266,7 +18829,7 @@ index 0000000..003209b
 +CONFIG_SENSORS_SHTC1=m
 +CONFIG_SENSORS_INA2XX=m
 +CONFIG_THERMAL=y
-+CONFIG_THERMAL_BCM2835=y
++CONFIG_BCM2835_THERMAL=y
 +CONFIG_WATCHDOG=y
 +CONFIG_BCM2835_WDT=y
 +CONFIG_UCB1400_CORE=m
@@ -18487,7 +19050,6 @@ index 0000000..003209b
 +CONFIG_SND_BCM2708_SOC_JUSTBOOM_DIGI=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DAC=m
 +CONFIG_SND_BCM2708_SOC_IQAUDIO_DIGI=m
-+CONFIG_SND_BCM2708_SOC_RASPIDAC3=m
 +CONFIG_SND_BCM2708_SOC_ADAU1977_ADC=m
 +CONFIG_SND_AUDIOINJECTOR_PI_SOUNDCARD=m
 +CONFIG_SND_DIGIDAC1_SOUNDCARD=m
@@ -18496,6 +19058,7 @@ index 0000000..003209b
 +CONFIG_SND_PISOUND=m
 +CONFIG_SND_SOC_ADAU1701=m
 +CONFIG_SND_SOC_AK4554=m
++CONFIG_SND_SOC_CS4271_I2C=m
 +CONFIG_SND_SOC_WM8804_I2C=m
 +CONFIG_SND_SIMPLE_CARD=m
 +CONFIG_SOUND_PRIME=m
@@ -18911,6 +19474,8 @@ index 0000000..003209b
 +CONFIG_ARM64_CRYPTO=y
 +CONFIG_CRC_ITU_T=y
 +CONFIG_LIBCRC32C=y
++CONFIG_MMC_BCM2835_MMC=y
++CONFIG_MMC_SDHCI_IPROC=m
 diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
 index d06fbe4..877b7c9 100644
 --- a/arch/arm64/kernel/armv8_deprecated.c
@@ -26177,11 +26742,29 @@ index 6204cc3..599c218 100644
  MODULE_ALIAS("platform:bcm2835-dma");
  MODULE_DESCRIPTION("BCM2835 DMA engine driver");
 diff --git a/drivers/firmware/raspberrypi.c b/drivers/firmware/raspberrypi.c
-index dd506cd3..f261b64 100644
+index dd506cd3..d0d36c1 100644
 --- a/drivers/firmware/raspberrypi.c
 +++ b/drivers/firmware/raspberrypi.c
-@@ -28,6 +28,8 @@ struct rpi_firmware {
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/of_platform.h>
+ #include <linux/platform_device.h>
++#include <linux/workqueue.h>
+ #include <soc/bcm2835/raspberrypi-firmware.h>
+ 
+ #define MBOX_MSG(chan, data28)		(((data28) & ~0xf) | ((chan) & 0xf))
+@@ -21,13 +22,18 @@
+ #define MBOX_DATA28(msg)		((msg) & ~0xf)
+ #define MBOX_CHAN_PROPERTY		8
+ 
++#define UNDERVOLTAGE_BIT		BIT(0)
++
+ struct rpi_firmware {
+ 	struct mbox_client cl;
+ 	struct mbox_chan *chan; /* The property channel. */
+ 	struct completion c;
  	u32 enabled;
++	struct delayed_work get_throttled_poll_work;
  };
  
 +static struct platform_device *g_pdev;
@@ -26189,7 +26772,7 @@ index dd506cd3..f261b64 100644
  static DEFINE_MUTEX(transaction_lock);
  
  static void response_callback(struct mbox_client *cl, void *msg)
-@@ -40,7 +42,7 @@ static void response_callback(struct mbox_client *cl, void *msg)
+@@ -40,7 +46,7 @@ static void response_callback(struct mbox_client *cl, void *msg)
   * Sends a request to the firmware through the BCM2835 mailbox driver,
   * and synchronously waits for the reply.
   */
@@ -26198,7 +26781,7 @@ index dd506cd3..f261b64 100644
  rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
  {
  	u32 message = MBOX_MSG(chan, data);
-@@ -61,6 +63,7 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
+@@ -61,6 +67,7 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
  
  	return ret;
  }
@@ -26206,23 +26789,147 @@ index dd506cd3..f261b64 100644
  
  /**
   * rpi_firmware_property_list - Submit firmware property list
-@@ -207,6 +210,7 @@ static int rpi_firmware_probe(struct platform_device *pdev)
+@@ -163,6 +170,101 @@ int rpi_firmware_property(struct rpi_firmware *fw,
+ }
+ EXPORT_SYMBOL_GPL(rpi_firmware_property);
+ 
++static int rpi_firmware_get_throttled(struct rpi_firmware *fw, u32 *value)
++{
++	static ktime_t old_timestamp;
++	static u32 old_value;
++	u32 new_sticky, old_sticky, new_uv, old_uv;
++	ktime_t new_timestamp;
++	s64 elapsed_ms;
++	int ret;
++
++	if (!fw)
++		return -EBUSY;
++
++	/*
++	 * We can't run faster than the sticky shift (100ms) since we get
++	 * flipping in the sticky bits that are cleared.
++	 * This happens on polling, so just return the previous value.
++	 */
++	new_timestamp = ktime_get();
++	elapsed_ms = ktime_ms_delta(new_timestamp, old_timestamp);
++	if (elapsed_ms < 150) {
++		*value = old_value;
++		return 0;
++	}
++	old_timestamp = new_timestamp;
++
++	/* Clear sticky bits */
++	*value = 0xffff;
++
++	ret = rpi_firmware_property(fw, RPI_FIRMWARE_GET_THROTTLED,
++				    value, sizeof(*value));
++	if (ret)
++		return ret;
++
++	new_sticky = *value >> 16;
++	old_sticky = old_value >> 16;
++	old_value = *value;
++
++	/* Only notify about changes in the sticky bits */
++	if (new_sticky == old_sticky)
++		return 0;
++
++	new_uv = new_sticky & UNDERVOLTAGE_BIT;
++	old_uv = old_sticky & UNDERVOLTAGE_BIT;
++
++	if (new_uv != old_uv) {
++		if (new_uv)
++			pr_crit("Under-voltage detected! (0x%08x)\n", *value);
++		else
++			pr_info("Voltage normalised (0x%08x)\n", *value);
++	}
++
++	sysfs_notify(&fw->cl.dev->kobj, NULL, "get_throttled");
++
++	return 0;
++}
++
++static void get_throttled_poll(struct work_struct *work)
++{
++	struct rpi_firmware *fw = container_of(work, struct rpi_firmware,
++					       get_throttled_poll_work.work);
++	u32 dummy;
++	int ret;
++
++	ret = rpi_firmware_get_throttled(fw, &dummy);
++	if (ret)
++		pr_debug("%s: Failed to read value (%d)", __func__, ret);
++
++	schedule_delayed_work(&fw->get_throttled_poll_work, 2 * HZ);
++}
++
++static ssize_t get_throttled_show(struct device *dev,
++				  struct device_attribute *attr, char *buf)
++{
++	struct rpi_firmware *fw = dev_get_drvdata(dev);
++	u32 value;
++	int ret;
++
++	ret = rpi_firmware_get_throttled(fw, &value);
++	if (ret)
++		return ret;
++
++	return sprintf(buf, "%x\n", value);
++}
++
++static DEVICE_ATTR_RO(get_throttled);
++
++static struct attribute *rpi_firmware_dev_attrs[] = {
++	&dev_attr_get_throttled.attr,
++	NULL,
++};
++
++static const struct attribute_group rpi_firmware_dev_group = {
++	.attrs = rpi_firmware_dev_attrs,
++};
++
+ static void
+ rpi_firmware_print_firmware_revision(struct rpi_firmware *fw)
+ {
+@@ -187,6 +289,11 @@ static int rpi_firmware_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct rpi_firmware *fw;
++	int ret;
++
++	ret = devm_device_add_group(dev, &rpi_firmware_dev_group);
++	if (ret)
++		return ret;
+ 
+ 	fw = devm_kzalloc(dev, sizeof(*fw), GFP_KERNEL);
+ 	if (!fw)
+@@ -205,11 +312,15 @@ static int rpi_firmware_probe(struct platform_device *pdev)
+ 	}
+ 
  	init_completion(&fw->c);
++	INIT_DELAYED_WORK(&fw->get_throttled_poll_work, get_throttled_poll);
  
  	platform_set_drvdata(pdev, fw);
 +	g_pdev = pdev;
  
  	rpi_firmware_print_firmware_revision(fw);
  
-@@ -218,6 +222,7 @@ static int rpi_firmware_remove(struct platform_device *pdev)
++	schedule_delayed_work(&fw->get_throttled_poll_work, 0);
++
+ 	return 0;
+ }
+ 
+@@ -217,7 +328,9 @@ static int rpi_firmware_remove(struct platform_device *pdev)
+ {
  	struct rpi_firmware *fw = platform_get_drvdata(pdev);
  
++	cancel_delayed_work_sync(&fw->get_throttled_poll_work);
  	mbox_free_channel(fw->chan);
 +	g_pdev = NULL;
  
  	return 0;
  }
-@@ -230,7 +235,7 @@ static int rpi_firmware_remove(struct platform_device *pdev)
+@@ -230,7 +343,7 @@ static int rpi_firmware_remove(struct platform_device *pdev)
   */
  struct rpi_firmware *rpi_firmware_get(struct device_node *firmware_node)
  {
@@ -26231,7 +26938,7 @@ index dd506cd3..f261b64 100644
  
  	if (!pdev)
  		return NULL;
-@@ -253,7 +258,18 @@ static struct platform_driver rpi_firmware_driver = {
+@@ -253,7 +366,18 @@ static struct platform_driver rpi_firmware_driver = {
  	.probe		= rpi_firmware_probe,
  	.remove		= rpi_firmware_remove,
  };
@@ -26809,7 +27516,7 @@ index d73d3e6..6975da6 100644
  obj-$(CONFIG_DRM_PANEL_SAMSUNG_S6E8AA0) += panel-samsung-s6e8aa0.o
 diff --git a/drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.c b/drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.c
 new file mode 100644
-index 0000000..b57b7ad
+index 0000000..128523d
 --- /dev/null
 +++ b/drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.c
 @@ -0,0 +1,522 @@
@@ -27058,7 +27765,7 @@ index 0000000..b57b7ad
 +	return container_of(panel, struct rpi_touchscreen, base);
 +}
 +
-+static u8 rpi_touchscreen_i2c_read(struct rpi_touchscreen *ts, u8 reg)
++static int rpi_touchscreen_i2c_read(struct rpi_touchscreen *ts, u8 reg)
 +{
 +	return i2c_smbus_read_byte_data(ts->bridge_i2c, reg);
 +}
@@ -27786,7 +28493,7 @@ index 3afdbf4..2decc8e 100644
  	return 0;
  }
 diff --git a/drivers/gpu/drm/vc4/vc4_crtc.c b/drivers/gpu/drm/vc4/vc4_crtc.c
-index ce1e3b9..2e9f75e 100644
+index ce1e3b9..6fca0f6 100644
 --- a/drivers/gpu/drm/vc4/vc4_crtc.c
 +++ b/drivers/gpu/drm/vc4/vc4_crtc.c
 @@ -164,6 +164,9 @@ bool vc4_crtc_get_scanoutpos(struct drm_device *dev, unsigned int crtc_id,
@@ -27799,38 +28506,6 @@ index ce1e3b9..2e9f75e 100644
  	/* preempt_disable_rt() should go right here in PREEMPT_RT patchset. */
  
  	/* Get optional system timestamp before query. */
-@@ -682,8 +685,15 @@ static void vc4_crtc_atomic_flush(struct drm_crtc *crtc,
- 
- static int vc4_enable_vblank(struct drm_crtc *crtc)
- {
-+	struct drm_device *dev = crtc->dev;
-+	struct vc4_dev *vc4 = to_vc4_dev(dev);
- 	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
- 
-+	if (vc4->firmware_kms) {
-+		/* XXX: Can we mask the SMI interrupt? */
-+		return 0;
-+	}
-+
- 	CRTC_WRITE(PV_INTEN, PV_INT_VFP_START);
- 
- 	return 0;
-@@ -691,8 +701,15 @@ static int vc4_enable_vblank(struct drm_crtc *crtc)
- 
- static void vc4_disable_vblank(struct drm_crtc *crtc)
- {
-+	struct drm_device *dev = crtc->dev;
-+	struct vc4_dev *vc4 = to_vc4_dev(dev);
- 	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
- 
-+	if (vc4->firmware_kms) {
-+		/* XXX: Can we mask the SMI interrupt? */
-+		return;
-+	}
-+
- 	CRTC_WRITE(PV_INTEN, 0);
- }
- 
 diff --git a/drivers/gpu/drm/vc4/vc4_drv.c b/drivers/gpu/drm/vc4/vc4_drv.c
 index 1c96edc..982ec1b 100644
 --- a/drivers/gpu/drm/vc4/vc4_drv.c
@@ -27972,10 +28647,48 @@ index 87f2d8e..0d71831 100644
  /* vc4_hdmi.c */
  extern struct platform_driver vc4_hdmi_driver;
 diff --git a/drivers/gpu/drm/vc4/vc4_dsi.c b/drivers/gpu/drm/vc4/vc4_dsi.c
-index 04796d7..9a1a559 100644
+index 04796d7..a3f416c 100644
 --- a/drivers/gpu/drm/vc4/vc4_dsi.c
 +++ b/drivers/gpu/drm/vc4/vc4_dsi.c
-@@ -1383,6 +1383,27 @@ static void dsi_handle_error(struct vc4_dsi *dsi,
+@@ -753,6 +753,11 @@ static void vc4_dsi_ulps(struct vc4_dsi *dsi, bool ulps)
+ 			 (dsi->lanes > 2 ? DSI1_STAT_PHY_D2_STOP : 0) |
+ 			 (dsi->lanes > 3 ? DSI1_STAT_PHY_D3_STOP : 0));
+ 	int ret;
++	bool ulps_currently_enabled = (DSI_PORT_READ(PHY_AFEC0) &
++				       DSI_PORT_BIT(PHY_AFEC0_LATCH_ULPS));
++
++	if (ulps == ulps_currently_enabled)
++		return;
+ 
+ 	DSI_PORT_WRITE(STAT, stat_ulps);
+ 	DSI_PORT_WRITE(PHYC, DSI_PORT_READ(PHYC) | phyc_ulps);
+@@ -859,11 +864,7 @@ static bool vc4_dsi_encoder_mode_fixup(struct drm_encoder *encoder,
+ 	pll_clock = parent_rate / divider;
+ 	pixel_clock_hz = pll_clock / dsi->divider;
+ 
+-	/* Round up the clk_set_rate() request slightly, since
+-	 * PLLD_DSI1 is an integer divider and its rate selection will
+-	 * never round up.
+-	 */
+-	adjusted_mode->clock = pixel_clock_hz / 1000 + 1;
++	adjusted_mode->clock = pixel_clock_hz / 1000;
+ 
+ 	/* Given the new pixel clock, adjust HFP to keep vrefresh the same. */
+ 	adjusted_mode->htotal = adjusted_mode->clock * mode->htotal /
+@@ -901,7 +902,11 @@ static void vc4_dsi_encoder_enable(struct drm_encoder *encoder)
+ 		vc4_dsi_dump_regs(dsi);
+ 	}
+ 
+-	phy_clock = pixel_clock_hz * dsi->divider;
++	/* Round up the clk_set_rate() request slightly, since
++	 * PLLD_DSI1 is an integer divider and its rate selection will
++	 * never round up.
++	 */
++	phy_clock = (pixel_clock_hz + 1000) * dsi->divider;
+ 	ret = clk_set_rate(dsi->pll_phy_clock, phy_clock);
+ 	if (ret) {
+ 		dev_err(&dsi->pdev->dev,
+@@ -1383,6 +1388,27 @@ static void dsi_handle_error(struct vc4_dsi *dsi,
  	*ret = IRQ_HANDLED;
  }
  
@@ -28003,7 +28716,7 @@ index 04796d7..9a1a559 100644
  static irqreturn_t vc4_dsi_irq_handler(int irq, void *data)
  {
  	struct vc4_dsi *dsi = data;
-@@ -1566,8 +1587,15 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
+@@ -1566,8 +1592,15 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
  	/* Clear any existing interrupt state. */
  	DSI_PORT_WRITE(INT_STAT, DSI_PORT_READ(INT_STAT));
  
@@ -28023,10 +28736,10 @@ index 04796d7..9a1a559 100644
  			dev_err(dev, "Failed to get interrupt: %d\n", ret);
 diff --git a/drivers/gpu/drm/vc4/vc4_firmware_kms.c b/drivers/gpu/drm/vc4/vc4_firmware_kms.c
 new file mode 100644
-index 0000000..766f700
+index 0000000..60e9d8f
 --- /dev/null
 +++ b/drivers/gpu/drm/vc4/vc4_firmware_kms.c
-@@ -0,0 +1,748 @@
+@@ -0,0 +1,770 @@
 +/*
 + * Copyright (C) 2016 Broadcom
 + *
@@ -28046,6 +28759,7 @@ index 0000000..766f700
 +#include "drm/drm_atomic_helper.h"
 +#include "drm/drm_plane_helper.h"
 +#include "drm/drm_crtc_helper.h"
++#include "drm/drm_fourcc.h"
 +#include "linux/clk.h"
 +#include "linux/debugfs.h"
 +#include "drm/drm_fb_cma_helper.h"
@@ -28065,12 +28779,11 @@ index 0000000..766f700
 +	struct drm_crtc base;
 +	struct drm_encoder *encoder;
 +	struct drm_connector *connector;
-+	struct drm_plane *primary;
-+	struct drm_plane *cursor;
 +	void __iomem *regs;
 +
 +	struct drm_pending_vblank_event *event;
 +	u32 overscan[4];
++	bool vblank_enabled;
 +};
 +
 +static inline struct vc4_crtc *to_vc4_crtc(struct drm_crtc *crtc)
@@ -28164,6 +28877,10 @@ index 0000000..766f700
 +	fbinfo->yoffset = state->crtc_y;
 +	fbinfo->base = bo->paddr + fb->offsets[0];
 +	fbinfo->pitch = fb->pitches[0];
++
++	if (fb->modifier == DRM_FORMAT_MOD_BROADCOM_VC4_T_TILED)
++		fbinfo->bpp |= BIT(31);
++
 +	/* A bug in the firmware makes it so that if the fb->base is
 +	 * set to nonzero, the configured pitch gets overwritten with
 +	 * the previous pitch.  So, to get the configured pitch
@@ -28227,10 +28944,6 @@ index 0000000..766f700
 +		state->crtc_y,
 +		0
 +	};
-+	u32 packet_info[] = { state->crtc_w, state->crtc_h,
-+			      0, /* unused */
-+			      bo->paddr + fb->offsets[0],
-+			      0, 0, /* hotx, hoty */};
 +	WARN_ON_ONCE(fb->pitches[0] != state->crtc_w * 4);
 +
 +	DRM_DEBUG_ATOMIC("[PLANE:%d:%s] update %dx%d cursor at %d,%d (0x%08x/%d)",
@@ -28255,12 +28968,26 @@ index 0000000..766f700
 +	if (ret || packet_state[0] != 0)
 +		DRM_ERROR("Failed to set cursor state: 0x%08x\n", packet_state[0]);
 +
-+	ret = rpi_firmware_property(vc4->firmware,
-+				    RPI_FIRMWARE_SET_CURSOR_INFO,
-+				    &packet_info,
-+				    sizeof(packet_info));
-+	if (ret || packet_info[0] != 0)
-+		DRM_ERROR("Failed to set cursor info: 0x%08x\n", packet_info[0]);
++	/* Note: When the cursor contents change, the modesetting
++	 * driver calls drm_mode_cursor_univeral() with
++	 * DRM_MODE_CURSOR_BO, which means a new fb will be allocated.
++	 */
++	if (!old_state ||
++	    state->crtc_w != old_state->crtc_w ||
++	    state->crtc_h != old_state->crtc_h ||
++	    fb != old_state->fb) {
++		u32 packet_info[] = { state->crtc_w, state->crtc_h,
++				      0, /* unused */
++				      bo->paddr + fb->offsets[0],
++				      0, 0, /* hotx, hoty */};
++
++		ret = rpi_firmware_property(vc4->firmware,
++					    RPI_FIRMWARE_SET_CURSOR_INFO,
++					    &packet_info,
++					    sizeof(packet_info));
++		if (ret || packet_info[0] != 0)
++			DRM_ERROR("Failed to set cursor info: 0x%08x\n", packet_info[0]);
++	}
 +}
 +
 +static void vc4_cursor_plane_atomic_disable(struct drm_plane *plane,
@@ -28369,29 +29096,24 @@ index 0000000..766f700
 +
 +static void vc4_crtc_disable(struct drm_crtc *crtc, struct drm_crtc_state *old_state)
 +{
-+	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
-+
 +	/* Always turn the planes off on CRTC disable. In DRM, planes
 +	 * are enabled/disabled through the update/disable hooks
 +	 * above, and the CRTC enable/disable independently controls
 +	 * whether anything scans out at all, but the firmware doesn't
 +	 * give us a CRTC-level control for that.
 +	 */
-+	vc4_cursor_plane_atomic_disable(vc4_crtc->cursor,
-+					vc4_crtc->cursor->state);
-+	vc4_plane_set_primary_blank(vc4_crtc->primary, true);
++	vc4_cursor_plane_atomic_disable(crtc->cursor, crtc->cursor->state);
++	vc4_plane_set_primary_blank(crtc->primary, true);
 +}
 +
 +static void vc4_crtc_enable(struct drm_crtc *crtc, struct drm_crtc_state *old_state)
 +{
-+	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
-+
 +	/* Unblank the planes (if they're supposed to be displayed). */
-+	if (vc4_crtc->primary->state->fb)
-+		vc4_plane_set_primary_blank(vc4_crtc->primary, false);
-+	if (vc4_crtc->cursor->state->fb) {
-+		vc4_cursor_plane_atomic_update(vc4_crtc->cursor,
-+					       vc4_crtc->cursor->state);
++	if (crtc->primary->state->fb)
++		vc4_plane_set_primary_blank(crtc->primary, false);
++	if (crtc->cursor->state->fb) {
++		vc4_cursor_plane_atomic_update(crtc->cursor,
++					       crtc->cursor->state);
 +	}
 +}
 +
@@ -28444,7 +29166,8 @@ index 0000000..766f700
 +
 +	if (stat & SMICS_INTERRUPTS) {
 +		writel(0, vc4_crtc->regs + SMICS);
-+		drm_crtc_handle_vblank(&vc4_crtc->base);
++		if (vc4_crtc->vblank_enabled)
++			drm_crtc_handle_vblank(&vc4_crtc->base);
 +		vc4_crtc_handle_page_flip(vc4_crtc);
 +		ret = IRQ_HANDLED;
 +	}
@@ -28465,6 +29188,19 @@ index 0000000..766f700
 +	return drm_atomic_helper_page_flip(crtc, fb, event, flags, ctx);
 +}
 +
++static int vc4_fkms_enable_vblank(struct drm_crtc *crtc)
++{
++	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
++
++	vc4_crtc->vblank_enabled = true;
++
++	return 0;
++}
++
++static void vc4_fkms_disable_vblank(struct drm_crtc *crtc)
++{
++}
++
 +static const struct drm_crtc_funcs vc4_crtc_funcs = {
 +	.set_config = drm_atomic_helper_set_config,
 +	.destroy = drm_crtc_cleanup,
@@ -28475,6 +29211,8 @@ index 0000000..766f700
 +	.reset = drm_atomic_helper_crtc_reset,
 +	.atomic_duplicate_state = drm_atomic_helper_crtc_duplicate_state,
 +	.atomic_destroy_state = drm_atomic_helper_crtc_destroy_state,
++	.enable_vblank = vc4_fkms_enable_vblank,
++	.disable_vblank = vc4_fkms_disable_vblank,
 +};
 +
 +static const struct drm_crtc_helper_funcs vc4_crtc_helper_funcs = {
@@ -28686,9 +29424,6 @@ index 0000000..766f700
 +	primary_plane->crtc = crtc;
 +	cursor_plane->crtc = crtc;
 +
-+	vc4_crtc->primary = primary_plane;
-+	vc4_crtc->cursor = cursor_plane;
-+
 +	vc4_encoder = devm_kzalloc(dev, sizeof(*vc4_encoder), GFP_KERNEL);
 +	if (!vc4_encoder)
 +		return -ENOMEM;
@@ -28776,7 +29511,7 @@ index 0000000..766f700
 +	},
 +};
 diff --git a/drivers/gpu/drm/vc4/vc4_gem.c b/drivers/gpu/drm/vc4/vc4_gem.c
-index d0c6bfb..e3e868c 100644
+index d31b3d0..c94cce9 100644
 --- a/drivers/gpu/drm/vc4/vc4_gem.c
 +++ b/drivers/gpu/drm/vc4/vc4_gem.c
 @@ -188,11 +188,22 @@ vc4_save_hang_state(struct drm_device *dev)
@@ -28792,7 +29527,7 @@ index d0c6bfb..e3e868c 100644
 +			WARN_ON(!refcount_read(&bo->usecnt));
 +			refcount_inc(&bo->usecnt);
  			drm_gem_object_get(&exec[i]->bo[j]->base);
- 			kernel_state->bo[j + prev_idx] = &exec[i]->bo[j]->base;
+ 			kernel_state->bo[k++] = &exec[i]->bo[j]->base;
  		}
  
  		list_for_each_entry(bo, &exec[i]->unref_list, unref_head) {
@@ -28800,8 +29535,8 @@ index d0c6bfb..e3e868c 100644
 +			 * because they are naturally unpurgeable.
 +			 */
  			drm_gem_object_get(&bo->base.base);
- 			kernel_state->bo[j + prev_idx] = &bo->base.base;
- 			j++;
+ 			kernel_state->bo[k++] = &bo->base.base;
+ 		}
 @@ -233,6 +244,26 @@ vc4_save_hang_state(struct drm_device *dev)
  	state->fdbgs = V3D_READ(V3D_FDBGS);
  	state->errstat = V3D_READ(V3D_ERRSTAT);
@@ -28938,15 +29673,8 @@ index d0c6bfb..e3e868c 100644
  	return ret;
  }
  
-@@ -829,12 +909,18 @@ vc4_complete_exec(struct drm_device *dev, struct vc4_exec_info *exec)
- 	/* If we got force-completed because of GPU reset rather than
- 	 * through our IRQ handler, signal the fence now.
- 	 */
--	if (exec->fence)
-+	if (exec->fence) {
- 		dma_fence_signal(exec->fence);
-+		dma_fence_put(exec->fence);
-+	}
+@@ -835,8 +915,12 @@ vc4_complete_exec(struct drm_device *dev, struct vc4_exec_info *exec)
+ 	}
  
  	if (exec->bo) {
 -		for (i = 0; i < exec->bo_count; i++)
@@ -28959,7 +29687,7 @@ index d0c6bfb..e3e868c 100644
  		kvfree(exec->bo);
  	}
  
-@@ -1091,13 +1177,14 @@ vc4_gem_init(struct drm_device *dev)
+@@ -1093,13 +1177,14 @@ vc4_gem_init(struct drm_device *dev)
  	spin_lock_init(&vc4->job_lock);
  
  	INIT_WORK(&vc4->hangcheck.reset_work, vc4_reset_work);
@@ -28977,7 +29705,7 @@ index d0c6bfb..e3e868c 100644
  }
  
  void
-@@ -1121,3 +1208,81 @@ vc4_gem_destroy(struct drm_device *dev)
+@@ -1123,3 +1208,81 @@ vc4_gem_destroy(struct drm_device *dev)
  	if (vc4->hang_state)
  		vc4_free_hang_state(dev, vc4->hang_state);
  }
@@ -29060,7 +29788,7 @@ index d0c6bfb..e3e868c 100644
 +	return ret;
 +}
 diff --git a/drivers/gpu/drm/vc4/vc4_hdmi.c b/drivers/gpu/drm/vc4/vc4_hdmi.c
-index 8f71157..8ab20c1 100644
+index 8f71157..54fe4ce 100644
 --- a/drivers/gpu/drm/vc4/vc4_hdmi.c
 +++ b/drivers/gpu/drm/vc4/vc4_hdmi.c
 @@ -309,16 +309,13 @@ static const struct drm_connector_helper_funcs vc4_hdmi_connector_helper_funcs =
@@ -29119,27 +29847,46 @@ index 8f71157..8ab20c1 100644
  	.disable = vc4_hdmi_encoder_disable,
  	.enable = vc4_hdmi_encoder_enable,
  };
-diff --git a/drivers/gpu/drm/vc4/vc4_irq.c b/drivers/gpu/drm/vc4/vc4_irq.c
-index 7d7af3a..3dd62d7 100644
---- a/drivers/gpu/drm/vc4/vc4_irq.c
-+++ b/drivers/gpu/drm/vc4/vc4_irq.c
-@@ -139,6 +139,7 @@ vc4_irq_finish_render_job(struct drm_device *dev)
- 	list_move_tail(&exec->head, &vc4->job_done_list);
- 	if (exec->fence) {
- 		dma_fence_signal_locked(exec->fence);
-+		dma_fence_put(exec->fence);
- 		exec->fence = NULL;
- 	}
- 	vc4_submit_next_render_job(dev);
-@@ -225,6 +226,9 @@ vc4_irq_uninstall(struct drm_device *dev)
- 	/* Clear any pending interrupts we might have left. */
- 	V3D_WRITE(V3D_INTCTL, V3D_DRIVER_IRQS);
+@@ -1124,7 +1130,7 @@ static int vc4_hdmi_audio_init(struct vc4_hdmi *hdmi)
+ 	 * snd_soc_card_get_drvdata() if needed.
+ 	 */
+ 	snd_soc_card_set_drvdata(card, hdmi);
+-	ret = devm_snd_soc_register_card(dev, card);
++	ret = snd_soc_register_card(card);
+ 	if (ret) {
+ 		dev_err(dev, "Could not register sound card: %d\n", ret);
+ 		goto unregister_codec;
+@@ -1141,13 +1147,16 @@ static int vc4_hdmi_audio_init(struct vc4_hdmi *hdmi)
+ static void vc4_hdmi_audio_cleanup(struct vc4_hdmi *hdmi)
+ {
+ 	struct device *dev = &hdmi->pdev->dev;
++	struct snd_soc_card *card = &hdmi->audio.card;
  
-+	/* Finish any interrupt handler still in flight. */
-+	disable_irq(dev->irq);
-+
- 	cancel_work_sync(&vc4->overflow_mem_work);
+ 	/*
+ 	 * If drvdata is not set this means the audio card was not
+ 	 * registered, just skip codec unregistration in this case.
+ 	 */
+-	if (dev_get_drvdata(dev))
++	if (dev_get_drvdata(dev)) {
++		snd_soc_unregister_card(card);
+ 		snd_soc_unregister_codec(dev);
++	}
  }
+ 
+ #ifdef CONFIG_DRM_VC4_HDMI_CEC
+diff --git a/drivers/gpu/drm/vc4/vc4_kms.c b/drivers/gpu/drm/vc4/vc4_kms.c
+index 50c4959..f73343e 100644
+--- a/drivers/gpu/drm/vc4/vc4_kms.c
++++ b/drivers/gpu/drm/vc4/vc4_kms.c
+@@ -53,7 +53,8 @@ vc4_atomic_complete_commit(struct drm_atomic_state *state)
+ 	 * display lists before we free it and potentially reallocate
+ 	 * and overwrite the dlist memory with a new modeset.
+ 	 */
+-	state->legacy_cursor_update = false;
++	if (!vc4->firmware_kms)
++		state->legacy_cursor_update = false;
+ 
+ 	drm_atomic_helper_commit_hw_done(state);
  
 diff --git a/drivers/gpu/drm/vc4/vc4_plane.c b/drivers/gpu/drm/vc4/vc4_plane.c
 index 2968b3e..44a956c 100644
@@ -29316,20 +30063,30 @@ index ad7b1ea..deafb32 100644
 -#define TRACE_INCLUDE_PATH .
 +#define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/vc4
  #include <trace/define_trace.h>
-diff --git a/drivers/gpu/drm/vc4/vc4_v3d.c b/drivers/gpu/drm/vc4/vc4_v3d.c
-index 622cd43..493f392b 100644
---- a/drivers/gpu/drm/vc4/vc4_v3d.c
-+++ b/drivers/gpu/drm/vc4/vc4_v3d.c
-@@ -327,6 +327,9 @@ static int vc4_v3d_runtime_resume(struct device *dev)
- 		return ret;
+diff --git a/drivers/hid/usbhid/hid-core.c b/drivers/hid/usbhid/hid-core.c
+index 045b5da..45abcba 100644
+--- a/drivers/hid/usbhid/hid-core.c
++++ b/drivers/hid/usbhid/hid-core.c
+@@ -48,7 +48,7 @@
+  * Module parameters.
+  */
  
- 	vc4_v3d_init_hw(vc4->dev);
-+
-+	/* We disabled the IRQ as part of vc4_irq_uninstall in suspend. */
-+	enable_irq(vc4->dev->irq);
- 	vc4_irq_postinstall(vc4->dev);
+-static unsigned int hid_mousepoll_interval;
++static unsigned int hid_mousepoll_interval = ~0;
+ module_param_named(mousepoll, hid_mousepoll_interval, uint, 0644);
+ MODULE_PARM_DESC(mousepoll, "Polling interval of mice");
  
- 	return 0;
+@@ -1098,7 +1098,9 @@ static int usbhid_start(struct hid_device *hid)
+ 		/* Change the polling interval of mice and joysticks. */
+ 		switch (hid->collection->usage) {
+ 		case HID_GD_MOUSE:
+-			if (hid_mousepoll_interval > 0)
++			if (hid_mousepoll_interval == ~0 && interval < 16)
++				interval = 16;
++			else if (hid_mousepoll_interval != ~0 && hid_mousepoll_interval != 0)
+ 				interval = hid_mousepoll_interval;
+ 			break;
+ 		case HID_GD_JOYSTICK:
 diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
 index 45a3f3ca..9dbd9e7 100644
 --- a/drivers/i2c/busses/Kconfig
@@ -29892,10 +30649,10 @@ index 0000000..962f2e5c
 +MODULE_LICENSE("GPL v2");
 +MODULE_ALIAS("platform:" DRV_NAME);
 diff --git a/drivers/i2c/busses/i2c-bcm2835.c b/drivers/i2c/busses/i2c-bcm2835.c
-index cd07a69..47167f4 100644
+index 44deae7..b7110eb 100644
 --- a/drivers/i2c/busses/i2c-bcm2835.c
 +++ b/drivers/i2c/busses/i2c-bcm2835.c
-@@ -53,6 +53,18 @@
+@@ -56,6 +56,18 @@
  #define BCM2835_I2C_CDIV_MIN	0x0002
  #define BCM2835_I2C_CDIV_MAX	0xFFFE
  
@@ -29914,7 +30671,7 @@ index cd07a69..47167f4 100644
  struct bcm2835_i2c_dev {
  	struct device *dev;
  	void __iomem *regs;
-@@ -66,8 +78,78 @@ struct bcm2835_i2c_dev {
+@@ -69,8 +81,78 @@ struct bcm2835_i2c_dev {
  	u32 msg_err;
  	u8 *msg_buf;
  	size_t msg_buf_remaining;
@@ -29993,7 +30750,7 @@ index cd07a69..47167f4 100644
  static inline void bcm2835_i2c_writel(struct bcm2835_i2c_dev *i2c_dev,
  				      u32 reg, u32 val)
  {
-@@ -170,6 +252,7 @@ static void bcm2835_i2c_start_transfer(struct bcm2835_i2c_dev *i2c_dev)
+@@ -189,6 +271,7 @@ static void bcm2835_i2c_start_transfer(struct bcm2835_i2c_dev *i2c_dev)
  	bcm2835_i2c_writel(i2c_dev, BCM2835_I2C_A, msg->addr);
  	bcm2835_i2c_writel(i2c_dev, BCM2835_I2C_DLEN, msg->len);
  	bcm2835_i2c_writel(i2c_dev, BCM2835_I2C_C, c);
@@ -30001,7 +30758,7 @@ index cd07a69..47167f4 100644
  }
  
  /*
-@@ -187,6 +270,7 @@ static irqreturn_t bcm2835_i2c_isr(int this_irq, void *data)
+@@ -206,6 +289,7 @@ static irqreturn_t bcm2835_i2c_isr(int this_irq, void *data)
  	u32 val, err;
  
  	val = bcm2835_i2c_readl(i2c_dev, BCM2835_I2C_S);
@@ -30009,7 +30766,7 @@ index cd07a69..47167f4 100644
  
  	err = val & (BCM2835_I2C_S_CLKT | BCM2835_I2C_S_ERR);
  	if (err) {
-@@ -253,6 +337,13 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
+@@ -272,6 +356,13 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
  	unsigned long time_left;
  	int i, ret;
  
@@ -30023,7 +30780,7 @@ index cd07a69..47167f4 100644
  	for (i = 0; i < (num - 1); i++)
  		if (msgs[i].flags & I2C_M_RD) {
  			dev_warn_once(i2c_dev->dev,
-@@ -272,6 +363,10 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
+@@ -291,6 +382,10 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
  
  	time_left = wait_for_completion_timeout(&i2c_dev->completion,
  						adap->timeout);
@@ -30034,7 +30791,7 @@ index cd07a69..47167f4 100644
  	if (!time_left) {
  		bcm2835_i2c_writel(i2c_dev, BCM2835_I2C_C,
  				   BCM2835_I2C_C_CLEAR);
-@@ -282,7 +377,9 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
+@@ -301,7 +396,9 @@ static int bcm2835_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
  	if (!i2c_dev->msg_err)
  		return num;
  
@@ -30045,6 +30802,21 @@ index cd07a69..47167f4 100644
  
  	if (i2c_dev->msg_err & BCM2835_I2C_S_ERR)
  		return -EREMOTEIO;
+diff --git a/drivers/i2c/busses/i2c-gpio.c b/drivers/i2c/busses/i2c-gpio.c
+index 0ef8fcc..147dd69 100644
+--- a/drivers/i2c/busses/i2c-gpio.c
++++ b/drivers/i2c/busses/i2c-gpio.c
+@@ -220,7 +220,9 @@ static int i2c_gpio_probe(struct platform_device *pdev)
+ 	adap->dev.parent = &pdev->dev;
+ 	adap->dev.of_node = pdev->dev.of_node;
+ 
+-	adap->nr = pdev->id;
++	if (pdev->id != PLATFORM_DEVID_NONE || !pdev->dev.of_node ||
++	    of_property_read_u32(pdev->dev.of_node, "reg", &adap->nr))
++		adap->nr = pdev->id;
+ 	ret = i2c_bit_add_numbered_bus(adap);
+ 	if (ret)
+ 		return ret;
 diff --git a/drivers/input/joystick/Kconfig b/drivers/input/joystick/Kconfig
 index f3c2f6e..c6a85b0 100644
 --- a/drivers/input/joystick/Kconfig
@@ -31051,10 +31823,75 @@ index d2da8a1..ecb0147 100644
  }
  
 diff --git a/drivers/irqchip/irq-bcm2836.c b/drivers/irqchip/irq-bcm2836.c
-index dc8c1e3..963415c 100644
+index dc8c1e3..738ed5e 100644
 --- a/drivers/irqchip/irq-bcm2836.c
 +++ b/drivers/irqchip/irq-bcm2836.c
-@@ -83,6 +83,9 @@ struct bcm2836_arm_irqchip_intc {
+@@ -19,62 +19,9 @@
+ #include <linux/of_irq.h>
+ #include <linux/irqchip.h>
+ #include <linux/irqdomain.h>
+-#include <asm/exception.h>
+-
+-#define LOCAL_CONTROL			0x000
+-#define LOCAL_PRESCALER			0x008
++#include <linux/irqchip/irq-bcm2836.h>
+ 
+-/*
+- * The low 2 bits identify the CPU that the GPU IRQ goes to, and the
+- * next 2 bits identify the CPU that the GPU FIQ goes to.
+- */
+-#define LOCAL_GPU_ROUTING		0x00c
+-/* When setting bits 0-3, enables PMU interrupts on that CPU. */
+-#define LOCAL_PM_ROUTING_SET		0x010
+-/* When setting bits 0-3, disables PMU interrupts on that CPU. */
+-#define LOCAL_PM_ROUTING_CLR		0x014
+-/*
+- * The low 4 bits of this are the CPU's timer IRQ enables, and the
+- * next 4 bits are the CPU's timer FIQ enables (which override the IRQ
+- * bits).
+- */
+-#define LOCAL_TIMER_INT_CONTROL0	0x040
+-/*
+- * The low 4 bits of this are the CPU's per-mailbox IRQ enables, and
+- * the next 4 bits are the CPU's per-mailbox FIQ enables (which
+- * override the IRQ bits).
+- */
+-#define LOCAL_MAILBOX_INT_CONTROL0	0x050
+-/*
+- * The CPU's interrupt status register.  Bits are defined by the the
+- * LOCAL_IRQ_* bits below.
+- */
+-#define LOCAL_IRQ_PENDING0		0x060
+-/* Same status bits as above, but for FIQ. */
+-#define LOCAL_FIQ_PENDING0		0x070
+-/*
+- * Mailbox write-to-set bits.  There are 16 mailboxes, 4 per CPU, and
+- * these bits are organized by mailbox number and then CPU number.  We
+- * use mailbox 0 for IPIs.  The mailbox's interrupt is raised while
+- * any bit is set.
+- */
+-#define LOCAL_MAILBOX0_SET0		0x080
+-#define LOCAL_MAILBOX3_SET0		0x08c
+-/* Mailbox write-to-clear bits. */
+-#define LOCAL_MAILBOX0_CLR0		0x0c0
+-#define LOCAL_MAILBOX3_CLR0		0x0cc
+-
+-#define LOCAL_IRQ_CNTPSIRQ	0
+-#define LOCAL_IRQ_CNTPNSIRQ	1
+-#define LOCAL_IRQ_CNTHPIRQ	2
+-#define LOCAL_IRQ_CNTVIRQ	3
+-#define LOCAL_IRQ_MAILBOX0	4
+-#define LOCAL_IRQ_MAILBOX1	5
+-#define LOCAL_IRQ_MAILBOX2	6
+-#define LOCAL_IRQ_MAILBOX3	7
+-#define LOCAL_IRQ_GPU_FAST	8
+-#define LOCAL_IRQ_PMU_FAST	9
+-#define LAST_IRQ		LOCAL_IRQ_PMU_FAST
++#include <asm/exception.h>
+ 
+ struct bcm2836_arm_irqchip_intc {
+ 	struct irq_domain *domain;
+@@ -83,6 +30,9 @@ struct bcm2836_arm_irqchip_intc {
  
  static struct bcm2836_arm_irqchip_intc intc  __read_mostly;
  
@@ -31064,7 +31901,7 @@ index dc8c1e3..963415c 100644
  static void bcm2836_arm_irqchip_mask_per_cpu_irq(unsigned int reg_offset,
  						 unsigned int bit,
  						 int cpu)
-@@ -145,6 +148,27 @@ static void bcm2836_arm_irqchip_unmask_gpu_irq(struct irq_data *d)
+@@ -145,6 +95,27 @@ static void bcm2836_arm_irqchip_unmask_gpu_irq(struct irq_data *d)
  {
  }
  
@@ -31092,7 +31929,7 @@ index dc8c1e3..963415c 100644
  static struct irq_chip bcm2836_arm_irqchip_gpu = {
  	.name		= "bcm2836-gpu",
  	.irq_mask	= bcm2836_arm_irqchip_mask_gpu_irq,
-@@ -157,7 +181,7 @@ static void bcm2836_arm_irqchip_register_irq(int hwirq, struct irq_chip *chip)
+@@ -157,7 +128,7 @@ static void bcm2836_arm_irqchip_register_irq(int hwirq, struct irq_chip *chip)
  
  	irq_set_percpu_devid(irq);
  	irq_set_chip_and_handler(irq, chip, handle_percpu_devid_irq);
@@ -31101,7 +31938,7 @@ index dc8c1e3..963415c 100644
  }
  
  static void
-@@ -175,6 +199,7 @@ __exception_irq_entry bcm2836_arm_irqchip_handle_irq(struct pt_regs *regs)
+@@ -175,6 +146,7 @@ __exception_irq_entry bcm2836_arm_irqchip_handle_irq(struct pt_regs *regs)
  		u32 ipi = ffs(mbox_val) - 1;
  
  		writel(1 << ipi, mailbox0);
@@ -31109,17 +31946,43 @@ index dc8c1e3..963415c 100644
  		handle_IPI(ipi, regs);
  #endif
  	} else if (stat) {
-@@ -226,6 +251,9 @@ static int __init bcm2836_smp_boot_secondary(unsigned int cpu,
- 	writel(secondary_startup_phys,
- 	       intc.base + LOCAL_MAILBOX3_SET0 + 16 * cpu);
- 
-+	dsb(sy); /* Ensure write has completed before waking the other CPUs */
-+	sev();
-+
+@@ -215,24 +187,6 @@ static int bcm2836_cpu_dying(unsigned int cpu)
+ 					     cpu);
  	return 0;
  }
+-
+-#ifdef CONFIG_ARM
+-static int __init bcm2836_smp_boot_secondary(unsigned int cpu,
+-					     struct task_struct *idle)
+-{
+-	unsigned long secondary_startup_phys =
+-		(unsigned long)virt_to_phys((void *)secondary_startup);
+-
+-	writel(secondary_startup_phys,
+-	       intc.base + LOCAL_MAILBOX3_SET0 + 16 * cpu);
+-
+-	return 0;
+-}
+-
+-static const struct smp_operations bcm2836_smp_ops __initconst = {
+-	.smp_boot_secondary	= bcm2836_smp_boot_secondary,
+-};
+-#endif
+ #endif
  
-@@ -285,6 +313,8 @@ static int __init bcm2836_arm_irqchip_l1_intc_of_init(struct device_node *node,
+ static const struct irq_domain_ops bcm2836_arm_irqchip_intc_ops = {
+@@ -249,10 +203,6 @@ bcm2836_arm_irqchip_smp_init(void)
+ 			  bcm2836_cpu_dying);
+ 
+ 	set_smp_cross_call(bcm2836_arm_irqchip_send_ipi);
+-
+-#ifdef CONFIG_ARM
+-	smp_set_ops(&bcm2836_smp_ops);
+-#endif
+ #endif
+ }
+ 
+@@ -285,6 +235,8 @@ static int __init bcm2836_arm_irqchip_l1_intc_of_init(struct device_node *node,
  		panic("%pOF: unable to map local interrupt registers\n", node);
  	}
  
@@ -50325,10 +51188,10 @@ index 0000000..b7f5fd9
 +MODULE_AUTHOR("Gellert Weisz");
 diff --git a/drivers/mmc/host/bcm2835-sdhost.c b/drivers/mmc/host/bcm2835-sdhost.c
 new file mode 100644
-index 0000000..6c0dafe
+index 0000000..273b1be
 --- /dev/null
 +++ b/drivers/mmc/host/bcm2835-sdhost.c
-@@ -0,0 +1,2193 @@
+@@ -0,0 +1,2194 @@
 +/*
 + * BCM2835 SD host driver.
 + *
@@ -50383,6 +51246,7 @@ index 0000000..6c0dafe
 +#include <linux/time.h>
 +#include <linux/workqueue.h>
 +#include <linux/interrupt.h>
++#include <linux/highmem.h>
 +#include <soc/bcm2835/raspberrypi-firmware.h>
 +
 +/* For mmc_card_blockaddr */
@@ -52840,7 +53704,7 @@ index f3f05fe..6c2d3ab 100644
  				   flags | IRQF_ONESHOT, DEVICE_NAME, priv);
  	if (ret) {
 diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 0161f77..2fcad36 100644
+index a8dd1c7..da0b0bc 100644
 --- a/drivers/net/usb/lan78xx.c
 +++ b/drivers/net/usb/lan78xx.c
 @@ -37,6 +37,7 @@
@@ -52896,7 +53760,7 @@ index 0161f77..2fcad36 100644
  
  	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
  	buf |= HW_CFG_LRST_;
-@@ -2403,6 +2419,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+@@ -2404,6 +2420,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
  
  	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
  	buf |= HW_CFG_MEF_;
@@ -52906,7 +53770,7 @@ index 0161f77..2fcad36 100644
  	ret = lan78xx_write_reg(dev, HW_CFG, buf);
  
  	ret = lan78xx_read_reg(dev, USB_CFG0, &buf);
-@@ -2449,6 +2468,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+@@ -2450,6 +2469,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
  	/* LAN7801 only has RGMII mode */
  	if (dev->chipid == ID_REV_CHIP_ID_7801_)
  		buf &= ~MAC_CR_GMII_EN_;
@@ -52916,7 +53780,7 @@ index 0161f77..2fcad36 100644
  	ret = lan78xx_write_reg(dev, MAC_CR, buf);
  
  	ret = lan78xx_read_reg(dev, MAC_TX, &buf);
-@@ -2495,7 +2517,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
+@@ -2496,7 +2518,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
  	dev->stats.rollover_max.eee_tx_lpi_transitions = 0xFFFFFFFF;
  	dev->stats.rollover_max.eee_tx_lpi_time = 0xFFFFFFFF;
  
@@ -53632,7 +54496,7 @@ index e6e9b00..3c87157 100644
  
  
 diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-index b3fa8ae..103fd53 100644
+index eccd25f..952d883 100644
 --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
 +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
 @@ -609,6 +609,7 @@ BRCMF_FW_NVRAM_DEF(4329, "brcmfmac4329-sdio.bin", "brcmfmac4329-sdio.txt");
@@ -55623,11 +56487,129 @@ index 0000000..84f0d94
 +
 +module_param(debug, bool, S_IRUGO | S_IWUSR);
 +MODULE_PARM_DESC(debug, "Enable debugging messages");
+diff --git a/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.c b/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.c
+index be936b8..f01eea3 100644
+--- a/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.c
++++ b/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.c
+@@ -341,44 +341,48 @@ static void buffer_cb(struct vchiq_mmal_instance *instance,
+ 		}
+ 	} else {
+ 		if (dev->capture.frame_count) {
+-			if (dev->capture.vc_start_timestamp != -1 &&
+-			    pts != 0) {
+-				struct timeval timestamp;
++			if (dev->capture.vc_start_timestamp == -1) {
++				buf->vb.vb2_buf.timestamp = ktime_get_ns();
++				v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev,
++				 "Buffer time set as current time - %lld",
++				 buf->vb.vb2_buf.timestamp);
++
++			} else if(pts != 0) {
+ 				s64 runtime_us = pts -
+ 				    dev->capture.vc_start_timestamp;
+-				u32 div = 0;
+-				u32 rem = 0;
+-
+-				div =
+-				    div_u64_rem(runtime_us, USEC_PER_SEC, &rem);
+-				timestamp.tv_sec =
+-				    dev->capture.kernel_start_ts.tv_sec + div;
+-				timestamp.tv_usec =
+-				    dev->capture.kernel_start_ts.tv_usec + rem;
+-
+-				if (timestamp.tv_usec >=
+-				    USEC_PER_SEC) {
+-					timestamp.tv_sec++;
+-					timestamp.tv_usec -=
+-					    USEC_PER_SEC;
+-				}
++				buf->vb.vb2_buf.timestamp = (runtime_us * NSEC_PER_USEC) +
++				    dev->capture.kernel_start_timestamp;
+ 				v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev,
+-					 "Convert start time %d.%06d and %llu "
+-					 "with offset %llu to %d.%06d\n",
+-					 (int)dev->capture.kernel_start_ts.
+-					 tv_sec,
+-					 (int)dev->capture.kernel_start_ts.
+-					 tv_usec,
+-					 dev->capture.vc_start_timestamp, pts,
+-					 (int)timestamp.tv_sec,
+-					 (int)timestamp.tv_usec);
+-				buf->vb.vb2_buf.timestamp = timestamp.tv_sec * 1000000000ULL +
+-					timestamp.tv_usec * 1000ULL;
++					 "Buffer time set as converted timestamp - %llu "
++					 "= (pts [%lld usec] - vc start time [%llu usec]) "
++					 "+ kernel start time [%llu nsec]\n",
++					 buf->vb.vb2_buf.timestamp,
++					 pts, dev->capture.vc_start_timestamp,
++					 dev->capture.kernel_start_timestamp);
+ 			} else {
+-				buf->vb.vb2_buf.timestamp = ktime_get_ns();
++				if (dev->capture.last_timestamp) {
++					buf->vb.vb2_buf.timestamp = dev->capture.last_timestamp;
++					v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev,
++					 "Buffer time set as last timestamp - %lld",
++					 buf->vb.vb2_buf.timestamp);
++				}
++				else {
++					buf->vb.vb2_buf.timestamp =
++					dev->capture.kernel_start_timestamp;
++					v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev,
++					 "Buffer time set as start timestamp - %lld",
++					 buf->vb.vb2_buf.timestamp);
++				}
+ 			}
++			dev->capture.last_timestamp = buf->vb.vb2_buf.timestamp;
+ 
+ 			vb2_set_plane_payload(&buf->vb.vb2_buf, 0, length);
++			if (mmal_flags & MMAL_BUFFER_HEADER_FLAG_KEYFRAME)
++				buf->vb.flags |= V4L2_BUF_FLAG_KEYFRAME;
++
++			v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev,
++				"Buffer has ts %llu",
++				dev->capture.last_timestamp);
+ 			vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
+ 
+ 			if (mmal_flags & MMAL_BUFFER_HEADER_FLAG_EOS &&
+@@ -547,7 +551,9 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
+ 			 "Start time %lld size %d\n",
+ 			 dev->capture.vc_start_timestamp, parameter_size);
+ 
+-	v4l2_get_timestamp(&dev->capture.kernel_start_ts);
++	dev->capture.last_timestamp = 0;
++
++	dev->capture.kernel_start_timestamp = ktime_get_ns();
+ 
+ 	/* enable the camera port */
+ 	dev->capture.port->cb_ctx = dev;
+diff --git a/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.h b/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.h
+index 4040374..31333f5 100644
+--- a/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.h
++++ b/drivers/staging/vc04_services/bcm2835-camera/bcm2835-camera.h
+@@ -92,7 +92,9 @@ struct bm2835_mmal_dev {
+ 		/* VC start timestamp for streaming */
+ 		s64         vc_start_timestamp;
+ 		/* Kernel start timestamp for streaming */
+-		struct timeval kernel_start_ts;
++		u64         kernel_start_timestamp;
++		/* Timestamp of last frame */
++		u64 		last_timestamp;
+ 
+ 		struct vchiq_mmal_port  *port; /* port being used for capture */
+ 		/* camera port being used for capture */
 diff --git a/drivers/staging/vc04_services/interface/vchiq_arm/vchiq_arm.c b/drivers/staging/vc04_services/interface/vchiq_arm/vchiq_arm.c
-index 314ffac..e4bad87 100644
+index 314ffac..fe99c96 100644
 --- a/drivers/staging/vc04_services/interface/vchiq_arm/vchiq_arm.c
 +++ b/drivers/staging/vc04_services/interface/vchiq_arm/vchiq_arm.c
-@@ -1749,11 +1749,7 @@ vchiq_open(struct inode *inode, struct file *file)
+@@ -1732,7 +1732,6 @@ vchiq_open(struct inode *inode, struct file *file)
+ 	vchiq_log_info(vchiq_arm_log_level, "vchiq_open");
+ 	switch (dev) {
+ 	case VCHIQ_MINOR: {
+-		int ret;
+ 		VCHIQ_STATE_T *state = vchiq_get_state();
+ 		VCHIQ_INSTANCE_T instance;
+ 
+@@ -1749,11 +1748,7 @@ vchiq_open(struct inode *inode, struct file *file)
  		instance->state = state;
  		instance->pid = current->tgid;
  
@@ -55774,6 +56756,59 @@ index 111e6a9..3b743cf 100644
  	uap->reg_offset = vendor->reg_offset;
  	uap->vendor = vendor;
  	uap->fifosize = vendor->get_fifosize(dev);
+diff --git a/drivers/tty/serial/sc16is7xx.c b/drivers/tty/serial/sc16is7xx.c
+index ca54ce0..e8b9288 100644
+--- a/drivers/tty/serial/sc16is7xx.c
++++ b/drivers/tty/serial/sc16is7xx.c
+@@ -662,7 +662,7 @@ static void sc16is7xx_handle_tx(struct uart_port *port)
+ 		uart_write_wakeup(port);
+ }
+ 
+-static void sc16is7xx_port_irq(struct sc16is7xx_port *s, int portno)
++static bool sc16is7xx_port_irq(struct sc16is7xx_port *s, int portno)
+ {
+ 	struct uart_port *port = &s->p[portno].port;
+ 
+@@ -671,7 +671,7 @@ static void sc16is7xx_port_irq(struct sc16is7xx_port *s, int portno)
+ 
+ 		iir = sc16is7xx_port_read(port, SC16IS7XX_IIR_REG);
+ 		if (iir & SC16IS7XX_IIR_NO_INT_BIT)
+-			break;
++			return false;
+ 
+ 		iir &= SC16IS7XX_IIR_ID_MASK;
+ 
+@@ -693,16 +693,26 @@ static void sc16is7xx_port_irq(struct sc16is7xx_port *s, int portno)
+ 					    port->line, iir);
+ 			break;
+ 		}
+-	} while (1);
++	} while (0);
++	return true;
+ }
+ 
+ static void sc16is7xx_ist(struct kthread_work *ws)
+ {
+ 	struct sc16is7xx_port *s = to_sc16is7xx_port(ws, irq_work);
+-	int i;
+ 
+-	for (i = 0; i < s->devtype->nr_uart; ++i)
+-		sc16is7xx_port_irq(s, i);
++	while (1)
++	{
++		bool keep_polling = false;
++		int i;
++
++		for (i = 0; i < s->devtype->nr_uart; ++i)
++		{
++			keep_polling |= sc16is7xx_port_irq(s, i);
++		}
++		if (!keep_polling)
++			break;
++	}
+ }
+ 
+ static irqreturn_t sc16is7xx_irq(int irq, void *dev_id)
 diff --git a/drivers/usb/Makefile b/drivers/usb/Makefile
 index 060643a..0080910 100644
 --- a/drivers/usb/Makefile
@@ -59741,10 +60776,10 @@ index 0000000..a896d73
 +}
 +module_exit(fsg_cleanup);
 diff --git a/drivers/usb/host/Kconfig b/drivers/usb/host/Kconfig
-index fa5692d..9eeb88a 100644
+index 92b1972..9205b08 100644
 --- a/drivers/usb/host/Kconfig
 +++ b/drivers/usb/host/Kconfig
-@@ -771,6 +771,16 @@ config USB_HWA_HCD
+@@ -763,6 +763,16 @@ config USB_HWA_HCD
  	  To compile this driver a module, choose M here: the module
  	  will be called "hwa-hc".
  
@@ -89660,7 +90695,7 @@ index 0000000..6a8be63
 +#endif
 diff --git a/drivers/usb/host/dwc_otg/dwc_otg_fiq_fsm.c b/drivers/usb/host/dwc_otg/dwc_otg_fiq_fsm.c
 new file mode 100644
-index 0000000..ec804c7
+index 0000000..ca362db
 --- /dev/null
 +++ b/drivers/usb/host/dwc_otg/dwc_otg_fiq_fsm.c
 @@ -0,0 +1,1418 @@
@@ -90257,8 +91292,8 @@ index 0000000..ec804c7
 +		}
 +
 +	} else {
-+		switch (st->hcchar_copy.b.multicnt) {
 +		st->hctsiz_copy.b.xfersize = nrpackets * st->hcchar_copy.b.mps;
++		switch (st->hcchar_copy.b.multicnt) {
 +		case 1:
 +			st->hctsiz_copy.b.pid = DWC_PID_DATA0;
 +			break;
@@ -91572,10 +92607,10 @@ index 0000000..ffa8d21
 +END(_dwc_otg_fiq_stub)
 diff --git a/drivers/usb/host/dwc_otg/dwc_otg_hcd.c b/drivers/usb/host/dwc_otg/dwc_otg_hcd.c
 new file mode 100644
-index 0000000..0c28a6e
+index 0000000..e59747c
 --- /dev/null
 +++ b/drivers/usb/host/dwc_otg/dwc_otg_hcd.c
-@@ -0,0 +1,4287 @@
+@@ -0,0 +1,4301 @@
 +
 +/* ==========================================================================
 + * $File: //dwh/usb_iip/dev/software/otg/linux/drivers/dwc_otg_hcd.c $
@@ -91767,13 +92802,21 @@ index 0000000..0c28a6e
 +
 +		}
 +		if(qh->channel) {
++			int n = qh->channel->hc_num;
 +			/* Using hcchar.chen == 1 is not a reliable test.
 +			 * It is possible that the channel has already halted
 +			 * but not yet been through the IRQ handler.
 +			 */
 +			if (fiq_fsm_enable && (hcd->fiq_state->channel[qh->channel->hc_num].fsm != FIQ_PASSTHROUGH)) {
++				local_fiq_disable();
++				fiq_fsm_spin_lock(&hcd->fiq_state->lock);
 +				qh->channel->halt_status = DWC_OTG_HC_XFER_URB_DEQUEUE;
 +				qh->channel->halt_pending = 1;
++				if (hcd->fiq_state->channel[n].fsm == FIQ_HS_ISOC_TURBO ||
++					hcd->fiq_state->channel[n].fsm == FIQ_HS_ISOC_SLEEPING)
++					hcd->fiq_state->channel[n].fsm = FIQ_HS_ISOC_ABORTED;
++				fiq_fsm_spin_unlock(&hcd->fiq_state->lock);
++				local_fiq_enable();
 +			} else {
 +				dwc_otg_hc_halt(hcd->core_if, qh->channel,
 +						DWC_OTG_HC_XFER_URB_DEQUEUE);
@@ -92174,9 +93217,15 @@ index 0000000..0c28a6e
 +			/* In FIQ FSM mode, we need to shut down carefully.
 +			 * The FIQ may attempt to restart a disabled channel */
 +			if (fiq_fsm_enable && (hcd->fiq_state->channel[n].fsm != FIQ_PASSTHROUGH)) {
++				local_fiq_disable();
++				fiq_fsm_spin_lock(&hcd->fiq_state->lock);
 +				qh->channel->halt_status = DWC_OTG_HC_XFER_URB_DEQUEUE;
 +				qh->channel->halt_pending = 1;
-+				//hcd->fiq_state->channel[n].fsm = FIQ_DEQUEUE_ISSUED;
++				if (hcd->fiq_state->channel[n].fsm == FIQ_HS_ISOC_TURBO ||
++					hcd->fiq_state->channel[n].fsm == FIQ_HS_ISOC_SLEEPING)
++					hcd->fiq_state->channel[n].fsm = FIQ_HS_ISOC_ABORTED;
++				fiq_fsm_spin_unlock(&hcd->fiq_state->lock);
++				local_fiq_enable();
 +			} else {
 +				dwc_otg_hc_halt(hcd->core_if, qh->channel,
 +						DWC_OTG_HC_XFER_URB_DEQUEUE);
@@ -101067,10 +102116,10 @@ index 0000000..6947e98
 +#endif /* DWC_DEVICE_ONLY */
 diff --git a/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c b/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c
 new file mode 100644
-index 0000000..992269d
+index 0000000..2ccd2a8
 --- /dev/null
 +++ b/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c
-@@ -0,0 +1,1079 @@
+@@ -0,0 +1,1088 @@
 +
 +/* ==========================================================================
 + * $File: //dwh/usb_iip/dev/software/otg/linux/drivers/dwc_otg_hcd_linux.c $
@@ -101592,6 +102641,11 @@ index 0000000..992269d
 +		DWC_ERROR("Can't get FIQ irq");
 +		return;
 +	}
++	/*
++	 * We could take an interrupt immediately after enabling the FIQ.
++	 * Ensure coherency of hcd->fiq_state.
++	 */
++	smp_mb();
 +	enable_fiq(irq);
 +	local_fiq_enable();
 +#endif
@@ -101671,7 +102725,11 @@ index 0000000..992269d
 +
 +	if (fiq_enable) {
 +		if (num_online_cpus() > 1) {
-+			/* bcm2709: can run the FIQ on a separate core to IRQs */
++			/*
++			 * bcm2709: can run the FIQ on a separate core to IRQs.
++			 * Ensure driver state is visible to other cores before setting up the FIQ.
++			 */
++			smp_mb();
 +			smp_call_function_single(1, hcd_init_fiq, otg_dev, 1);
 +		} else {
 +			smp_call_function_single(0, hcd_init_fiq, otg_dev, 1);
@@ -121620,6 +122678,82 @@ index 0000000..a4492b9
 +/* ---- Function Prototypes ---------------------------------------------- */
 +
 +#endif /* __VMCS_SM_IOCTL_H__INCLUDED__ */
+diff --git a/include/linux/irqchip/irq-bcm2836.h b/include/linux/irqchip/irq-bcm2836.h
+new file mode 100644
+index 0000000..218a6e1
+--- /dev/null
++++ b/include/linux/irqchip/irq-bcm2836.h
+@@ -0,0 +1,70 @@
++/*
++ * Root interrupt controller for the BCM2836 (Raspberry Pi 2).
++ *
++ * Copyright 2015 Broadcom
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#define LOCAL_CONTROL			0x000
++#define LOCAL_PRESCALER			0x008
++
++/*
++ * The low 2 bits identify the CPU that the GPU IRQ goes to, and the
++ * next 2 bits identify the CPU that the GPU FIQ goes to.
++ */
++#define LOCAL_GPU_ROUTING		0x00c
++/* When setting bits 0-3, enables PMU interrupts on that CPU. */
++#define LOCAL_PM_ROUTING_SET		0x010
++/* When setting bits 0-3, disables PMU interrupts on that CPU. */
++#define LOCAL_PM_ROUTING_CLR		0x014
++/*
++ * The low 4 bits of this are the CPU's timer IRQ enables, and the
++ * next 4 bits are the CPU's timer FIQ enables (which override the IRQ
++ * bits).
++ */
++#define LOCAL_TIMER_INT_CONTROL0	0x040
++/*
++ * The low 4 bits of this are the CPU's per-mailbox IRQ enables, and
++ * the next 4 bits are the CPU's per-mailbox FIQ enables (which
++ * override the IRQ bits).
++ */
++#define LOCAL_MAILBOX_INT_CONTROL0	0x050
++/*
++ * The CPU's interrupt status register.  Bits are defined by the the
++ * LOCAL_IRQ_* bits below.
++ */
++#define LOCAL_IRQ_PENDING0		0x060
++/* Same status bits as above, but for FIQ. */
++#define LOCAL_FIQ_PENDING0		0x070
++/*
++ * Mailbox write-to-set bits.  There are 16 mailboxes, 4 per CPU, and
++ * these bits are organized by mailbox number and then CPU number.  We
++ * use mailbox 0 for IPIs.  The mailbox's interrupt is raised while
++ * any bit is set.
++ */
++#define LOCAL_MAILBOX0_SET0		0x080
++#define LOCAL_MAILBOX3_SET0		0x08c
++/* Mailbox write-to-clear bits. */
++#define LOCAL_MAILBOX0_CLR0		0x0c0
++#define LOCAL_MAILBOX3_CLR0		0x0cc
++
++#define LOCAL_IRQ_CNTPSIRQ	0
++#define LOCAL_IRQ_CNTPNSIRQ	1
++#define LOCAL_IRQ_CNTHPIRQ	2
++#define LOCAL_IRQ_CNTVIRQ	3
++#define LOCAL_IRQ_MAILBOX0	4
++#define LOCAL_IRQ_MAILBOX1	5
++#define LOCAL_IRQ_MAILBOX2	6
++#define LOCAL_IRQ_MAILBOX3	7
++#define LOCAL_IRQ_GPU_FAST	8
++#define LOCAL_IRQ_PMU_FAST	9
++#define LAST_IRQ		LOCAL_IRQ_PMU_FAST
 diff --git a/include/linux/leds.h b/include/linux/leds.h
 index bf6db4f..8741dca 100644
 --- a/include/linux/leds.h
@@ -121987,7 +123121,7 @@ index 5b29729..b3558b7 100644
  		u8, w1_slave_found_callback);
  };
 diff --git a/include/soc/bcm2835/raspberrypi-firmware.h b/include/soc/bcm2835/raspberrypi-firmware.h
-index cb979ad..cbd1674 100644
+index cb979ad..95cb67b 100644
 --- a/include/soc/bcm2835/raspberrypi-firmware.h
 +++ b/include/soc/bcm2835/raspberrypi-firmware.h
 @@ -12,6 +12,8 @@
@@ -122007,12 +123141,13 @@ index cb979ad..cbd1674 100644
  	RPI_FIRMWARE_ALLOCATE_MEMORY =                        0x0003000c,
  	RPI_FIRMWARE_LOCK_MEMORY =                            0x0003000d,
  	RPI_FIRMWARE_UNLOCK_MEMORY =                          0x0003000e,
-@@ -72,12 +75,22 @@ enum rpi_firmware_property_tag {
+@@ -72,12 +75,23 @@ enum rpi_firmware_property_tag {
  	RPI_FIRMWARE_SET_ENABLE_QPU =                         0x00030012,
  	RPI_FIRMWARE_GET_DISPMANX_RESOURCE_MEM_HANDLE =       0x00030014,
  	RPI_FIRMWARE_GET_EDID_BLOCK =                         0x00030020,
 +	RPI_FIRMWARE_GET_CUSTOMER_OTP =                       0x00030021,
  	RPI_FIRMWARE_GET_DOMAIN_STATE =                       0x00030030,
++	RPI_FIRMWARE_GET_THROTTLED =                          0x00030046,
  	RPI_FIRMWARE_SET_CLOCK_STATE =                        0x00038001,
  	RPI_FIRMWARE_SET_CLOCK_RATE =                         0x00038002,
  	RPI_FIRMWARE_SET_VOLTAGE =                            0x00038003,
@@ -122030,7 +123165,7 @@ index cb979ad..cbd1674 100644
  
  	/* Dispmanx TAGS */
  	RPI_FIRMWARE_FRAMEBUFFER_ALLOCATE =                   0x00040001,
-@@ -91,6 +104,8 @@ enum rpi_firmware_property_tag {
+@@ -91,6 +105,8 @@ enum rpi_firmware_property_tag {
  	RPI_FIRMWARE_FRAMEBUFFER_GET_VIRTUAL_OFFSET =         0x00040009,
  	RPI_FIRMWARE_FRAMEBUFFER_GET_OVERSCAN =               0x0004000a,
  	RPI_FIRMWARE_FRAMEBUFFER_GET_PALETTE =                0x0004000b,
@@ -122039,7 +123174,7 @@ index cb979ad..cbd1674 100644
  	RPI_FIRMWARE_FRAMEBUFFER_RELEASE =                    0x00048001,
  	RPI_FIRMWARE_FRAMEBUFFER_TEST_PHYSICAL_WIDTH_HEIGHT = 0x00044003,
  	RPI_FIRMWARE_FRAMEBUFFER_TEST_VIRTUAL_WIDTH_HEIGHT =  0x00044004,
-@@ -100,6 +115,7 @@ enum rpi_firmware_property_tag {
+@@ -100,6 +116,7 @@ enum rpi_firmware_property_tag {
  	RPI_FIRMWARE_FRAMEBUFFER_TEST_VIRTUAL_OFFSET =        0x00044009,
  	RPI_FIRMWARE_FRAMEBUFFER_TEST_OVERSCAN =              0x0004400a,
  	RPI_FIRMWARE_FRAMEBUFFER_TEST_PALETTE =               0x0004400b,
@@ -122047,7 +123182,7 @@ index cb979ad..cbd1674 100644
  	RPI_FIRMWARE_FRAMEBUFFER_SET_PHYSICAL_WIDTH_HEIGHT =  0x00048003,
  	RPI_FIRMWARE_FRAMEBUFFER_SET_VIRTUAL_WIDTH_HEIGHT =   0x00048004,
  	RPI_FIRMWARE_FRAMEBUFFER_SET_DEPTH =                  0x00048005,
-@@ -108,6 +124,10 @@ enum rpi_firmware_property_tag {
+@@ -108,6 +125,10 @@ enum rpi_firmware_property_tag {
  	RPI_FIRMWARE_FRAMEBUFFER_SET_VIRTUAL_OFFSET =         0x00048009,
  	RPI_FIRMWARE_FRAMEBUFFER_SET_OVERSCAN =               0x0004800a,
  	RPI_FIRMWARE_FRAMEBUFFER_SET_PALETTE =                0x0004800b,
@@ -122058,7 +123193,7 @@ index cb979ad..cbd1674 100644
  
  	RPI_FIRMWARE_VCHIQ_INIT =                             0x00048010,
  
-@@ -139,5 +159,6 @@ static inline struct rpi_firmware *rpi_firmware_get(struct device_node *firmware
+@@ -139,5 +160,6 @@ static inline struct rpi_firmware *rpi_firmware_get(struct device_node *firmware
  	return NULL;
  }
  #endif
@@ -122219,7 +123354,7 @@ index 9b5f044..f8a9af6 100644
  	for (;;) {
  		tmp = *p;
 diff --git a/kernel/softirq.c b/kernel/softirq.c
-index 4e09821..58bb6f6 100644
+index e89c3b0..3f3fbc2 100644
 --- a/kernel/softirq.c
 +++ b/kernel/softirq.c
 @@ -78,17 +78,6 @@ static void wakeup_softirqd(void)
@@ -122260,10 +123395,10 @@ index 4e09821..58bb6f6 100644
  #ifdef CONFIG_HAVE_IRQ_EXIT_ON_IRQ_STACK
  		/*
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index d51c208..fd094c3 100644
+index 6627cae..e05215c 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -7645,8 +7645,6 @@ int alloc_contig_range(unsigned long start, unsigned long end,
+@@ -7631,8 +7631,6 @@ int alloc_contig_range(unsigned long start, unsigned long end,
  
  	/* Make sure the range is really isolated. */
  	if (test_pages_isolated(outer_start, end, false)) {
@@ -122314,7 +123449,7 @@ index c8ba6e7..e1190dd 100644
  
  .PHONY: $(PHONY)
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 04b5633..d523d1e 100644
+index 0b46136..f7b6143 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
 @@ -316,6 +316,17 @@ cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
@@ -122781,10 +123916,10 @@ index 0000000..d72e152
 +	return $trailer;
 +}
 diff --git a/sound/soc/bcm/Kconfig b/sound/soc/bcm/Kconfig
-index edf3671..381d32b 100644
+index edf3671..e601eb0 100644
 --- a/sound/soc/bcm/Kconfig
 +++ b/sound/soc/bcm/Kconfig
-@@ -16,4 +16,182 @@ config SND_SOC_CYGNUS
+@@ -16,4 +16,175 @@ config SND_SOC_CYGNUS
  	  Say Y if you want to add support for ASoC audio on Broadcom
  	  Cygnus chips (bcm958300, bcm958305, bcm911360)
  
@@ -122878,14 +124013,6 @@ index edf3671..381d32b 100644
 +        help
 +         Say Y or M if you want to add support for IQAudIO Digital IO board.
 +
-+config SND_BCM2708_SOC_RASPIDAC3
-+	tristate "Support for RaspiDAC Rev.3x"
-+	depends on SND_BCM2708_SOC_I2S || SND_BCM2835_SOC_I2S
-+	select SND_SOC_PCM512x_I2C
-+	select SND_SOC_TPA6130A2
-+	help
-+	  Say Y or M if you want to add support for RaspiDAC Rev.3x.
-+
 +config SND_BCM2708_SOC_ADAU1977_ADC
 +	tristate "Support for ADAU1977 ADC"
 +	depends on SND_BCM2708_SOC_I2S || SND_BCM2835_SOC_I2S
@@ -122967,13 +124094,14 @@ index edf3671..381d32b 100644
 +config SND_PISOUND
 +	tristate "Support for Blokas Labs pisound"
 +	depends on SND_BCM2708_SOC_I2S || SND_BCM2835_SOC_I2S
++	select SND_RAWMIDI
 +	help
 +	  Say Y or M if you want to add support for Blokas Labs pisound.
 diff --git a/sound/soc/bcm/Makefile b/sound/soc/bcm/Makefile
-index fc739d0..53ea822 100644
+index fc739d0..2b99630 100644
 --- a/sound/soc/bcm/Makefile
 +++ b/sound/soc/bcm/Makefile
-@@ -8,3 +8,59 @@ snd-soc-cygnus-objs := cygnus-pcm.o cygnus-ssp.o
+@@ -8,3 +8,57 @@ snd-soc-cygnus-objs := cygnus-pcm.o cygnus-ssp.o
  
  obj-$(CONFIG_SND_SOC_CYGNUS) += snd-soc-cygnus.o
  
@@ -122994,7 +124122,6 @@ index fc739d0..53ea822 100644
 +snd-soc-rpi-proto-objs := rpi-proto.o
 +snd-soc-iqaudio-dac-objs := iqaudio-dac.o
 +snd-soc-iqaudio-digi-objs := iqaudio_digi.o
-+snd-soc-raspidac3-objs := raspidac3.o
 +snd-soc-audioinjector-pi-soundcard-objs := audioinjector-pi-soundcard.o
 +snd-soc-audioinjector-octo-soundcard-objs := audioinjector-octo-soundcard.o
 +snd-soc-digidac1-soundcard-objs := digidac1-soundcard.o
@@ -123021,7 +124148,6 @@ index fc739d0..53ea822 100644
 +obj-$(CONFIG_SND_BCM2708_SOC_RPI_PROTO) += snd-soc-rpi-proto.o
 +obj-$(CONFIG_SND_BCM2708_SOC_IQAUDIO_DAC) += snd-soc-iqaudio-dac.o
 +obj-$(CONFIG_SND_BCM2708_SOC_IQAUDIO_DIGI) += snd-soc-iqaudio-digi.o
-+obj-$(CONFIG_SND_BCM2708_SOC_RASPIDAC3) += snd-soc-raspidac3.o
 +obj-$(CONFIG_SND_AUDIOINJECTOR_PI_SOUNDCARD) += snd-soc-audioinjector-pi-soundcard.o
 +obj-$(CONFIG_SND_AUDIOINJECTOR_OCTO_SOUNDCARD) += snd-soc-audioinjector-octo-soundcard.o
 +obj-$(CONFIG_SND_DIGIDAC1_SOUNDCARD) += snd-soc-digidac1-soundcard.o
@@ -123166,10 +124292,10 @@ index 0000000..f3d7e5d
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/allo-boss-dac.c b/sound/soc/bcm/allo-boss-dac.c
 new file mode 100644
-index 0000000..203ab76
+index 0000000..08b710c
 --- /dev/null
 +++ b/sound/soc/bcm/allo-boss-dac.c
-@@ -0,0 +1,461 @@
+@@ -0,0 +1,456 @@
 +/*
 + * ALSA ASoC Machine Driver for Allo Boss DAC
 + *
@@ -123394,14 +124520,6 @@ index 0000000..203ab76
 +	return 0;
 +}
 +
-+static int snd_allo_boss_set_bclk_ratio_pro(
-+	struct snd_soc_dai *cpu_dai, struct snd_pcm_hw_params *params)
-+{
-+	int bratio = snd_pcm_format_physical_width(params_format(params))
-+		* params_channels(params);
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, bratio);
-+}
-+
 +static void snd_allo_boss_gpio_mute(struct snd_soc_card *card)
 +{
 +	if (mute_gpio)
@@ -123453,9 +124571,8 @@ index 0000000..203ab76
 +{
 +	int ret = 0;
 +	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
++	int channels = params_channels(params);
++	int width = snd_pcm_format_physical_width(params_format(params));
 +
 +	if (snd_soc_allo_boss_master) {
 +		struct snd_soc_codec *codec = rtd->codec;
@@ -123463,14 +124580,18 @@ index 0000000..203ab76
 +		snd_allo_boss_set_sclk(codec,
 +			params_rate(params));
 +
-+		ret = snd_allo_boss_set_bclk_ratio_pro(cpu_dai,
-+			params);
-+		if (!ret)
-+			ret = snd_allo_boss_update_rate_den(
-+				substream, params);
-+	} else {
-+		ret = snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
++		ret = snd_allo_boss_update_rate_den(
++			substream, params);
++		if (ret)
++			return ret;
 +	}
++
++	ret = snd_soc_dai_set_tdm_slot(rtd->cpu_dai, 0x03, 0x03,
++		channels, width);
++	if (ret)
++		return ret;
++	ret = snd_soc_dai_set_tdm_slot(rtd->codec_dai, 0x03, 0x03,
++		channels, width);
 +	return ret;
 +}
 +
@@ -123904,10 +125025,10 @@ index 0000000..9387b05
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/allo-piano-dac-plus.c b/sound/soc/bcm/allo-piano-dac-plus.c
 new file mode 100644
-index 0000000..1800f5e
+index 0000000..bede9bd
 --- /dev/null
 +++ b/sound/soc/bcm/allo-piano-dac-plus.c
-@@ -0,0 +1,1014 @@
+@@ -0,0 +1,1008 @@
 +/*
 + * ALSA ASoC Machine Driver for Allo Piano DAC Plus Subwoofer
 + *
@@ -124614,11 +125735,10 @@ index 0000000..1800f5e
 +	struct snd_soc_card *card = rtd->card;
 +	struct glb_pool *glb_ptr;
 +
-+	glb_ptr = kmalloc(sizeof(struct glb_pool), GFP_KERNEL);
++	glb_ptr = kzalloc(sizeof(struct glb_pool), GFP_KERNEL);
 +	if (!glb_ptr)
 +		return -ENOMEM;
 +
-+	memset(glb_ptr, 0x00, sizeof(glb_ptr));
 +	card->drvdata = glb_ptr;
 +	glb_ptr->dual_mode = 2;
 +	glb_ptr->set_mode = 0;
@@ -124705,9 +125825,6 @@ index 0000000..1800f5e
 +		struct snd_pcm_hw_params *params)
 +{
 +	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
 +	unsigned int rate = params_rate(params);
 +	struct snd_soc_card *card = rtd->card;
 +	struct glb_pool *glb_ptr = card->drvdata;
@@ -124748,8 +125865,6 @@ index 0000000..1800f5e
 +						glb_ptr->set_lowpass);
 +	if (ret < 0)
 +		return ret;
-+
-+	ret = snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
 +
 +	return ret;
 +}
@@ -124924,10 +126039,10 @@ index 0000000..1800f5e
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/allo-piano-dac.c b/sound/soc/bcm/allo-piano-dac.c
 new file mode 100644
-index 0000000..eaf50fb
+index 0000000..cfe81c9
 --- /dev/null
 +++ b/sound/soc/bcm/allo-piano-dac.c
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,126 @@
 +/*
 + * ALSA ASoC Machine Driver for Allo Piano DAC
 + *
@@ -124972,23 +126087,6 @@ index 0000000..eaf50fb
 +	return 0;
 +}
 +
-+static int snd_allo_piano_dac_hw_params(
-+	struct snd_pcm_substream *substream, struct snd_pcm_hw_params *params)
-+{
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
-+
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
-+}
-+
-+/* machine stream operations */
-+static struct snd_soc_ops snd_allo_piano_dac_ops = {
-+	.hw_params = snd_allo_piano_dac_hw_params,
-+};
-+
 +static struct snd_soc_dai_link snd_allo_piano_dac_dai[] = {
 +{
 +	.name		= "Piano DAC",
@@ -125000,7 +126098,6 @@ index 0000000..eaf50fb
 +	.dai_fmt	= SND_SOC_DAIFMT_I2S |
 +			  SND_SOC_DAIFMT_NB_NF |
 +			  SND_SOC_DAIFMT_CBS_CFS,
-+	.ops		= &snd_allo_piano_dac_ops,
 +	.init		= snd_allo_piano_dac_init,
 +},
 +};
@@ -125074,10 +126171,10 @@ index 0000000..eaf50fb
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/audioinjector-octo-soundcard.c b/sound/soc/bcm/audioinjector-octo-soundcard.c
 new file mode 100644
-index 0000000..5e79f4e
+index 0000000..2ad83c4
 --- /dev/null
 +++ b/sound/soc/bcm/audioinjector-octo-soundcard.c
-@@ -0,0 +1,341 @@
+@@ -0,0 +1,344 @@
 +/*
 + * ASoC Driver for AudioInjector Pi octo channel soundcard (hat)
 + *
@@ -125109,6 +126206,7 @@ index 0000000..5e79f4e
 +static struct gpio_descs *mult_gpios;
 +static struct gpio_desc *codec_rst_gpio;
 +static unsigned int audioinjector_octo_rate;
++static bool non_stop_clocks;
 +
 +static const unsigned int audioinjector_octo_rates[] = {
 +	96000, 48000, 32000, 24000, 16000, 8000, 88200, 44100, 29400, 22050, 14700,
@@ -125213,12 +126311,16 @@ index 0000000..5e79f4e
 +static int audioinjector_octo_trigger(struct snd_pcm_substream *substream,
 +								int cmd){
 +	int mult[4];
-+	mult[0] = 0;
-+	mult[1] = 0;
-+	mult[2] = 0;
-+	mult[3] = 0;
++
++	memset(mult, 0, sizeof(mult));
 +
 +	switch (cmd) {
++	case SNDRV_PCM_TRIGGER_STOP:
++	case SNDRV_PCM_TRIGGER_SUSPEND:
++	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
++		if (!non_stop_clocks)
++			break;
++		/* Drop through... */
 +	case SNDRV_PCM_TRIGGER_START:
 +	case SNDRV_PCM_TRIGGER_RESUME:
 +	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
@@ -125256,10 +126358,6 @@ index 0000000..5e79f4e
 +		default:
 +			return -EINVAL;
 +		}
-+		break;
-+	case SNDRV_PCM_TRIGGER_STOP:
-+	case SNDRV_PCM_TRIGGER_SUSPEND:
-+	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
 +		break;
 +	default:
 +		return -EINVAL;
@@ -125355,6 +126453,8 @@ index 0000000..5e79f4e
 +								GPIOD_OUT_LOW);
 +		if (IS_ERR(codec_rst_gpio))
 +			return PTR_ERR(codec_rst_gpio);
++
++		non_stop_clocks = of_property_read_bool(pdev->dev.of_node, "non-stop-clocks");
 +
 +		if (codec_rst_gpio)
 +			gpiod_set_value(codec_rst_gpio, 1);
@@ -126612,10 +127712,10 @@ index 0000000..f200688
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/dionaudio_loco-v2.c b/sound/soc/bcm/dionaudio_loco-v2.c
 new file mode 100644
-index 0000000..a009c49
+index 0000000..8f522de
 --- /dev/null
 +++ b/sound/soc/bcm/dionaudio_loco-v2.c
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,121 @@
 +/*
 + * ASoC Driver for Dion Audio LOCO-V2 DAC-AMP
 + *
@@ -126659,24 +127759,6 @@ index 0000000..a009c49
 +	return 0;
 +}
 +
-+static int snd_rpi_dionaudio_loco_v2_hw_params(
-+	struct snd_pcm_substream *substream,
-+	struct snd_pcm_hw_params *params)
-+{
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
-+
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
-+}
-+
-+/* machine stream operations */
-+static struct snd_soc_ops snd_rpi_dionaudio_loco_v2_ops = {
-+	.hw_params = snd_rpi_dionaudio_loco_v2_hw_params,
-+};
-+
 +static struct snd_soc_dai_link snd_rpi_dionaudio_loco_v2_dai[] = {
 +{
 +	.name		= "DionAudio LOCO-V2",
@@ -126687,7 +127769,6 @@ index 0000000..a009c49
 +	.codec_name	= "pcm512x.1-004d",
 +	.dai_fmt	= SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 +			  SND_SOC_DAIFMT_CBS_CFS,
-+	.ops		= &snd_rpi_dionaudio_loco_v2_ops,
 +	.init		= snd_rpi_dionaudio_loco_v2_init,
 +},};
 +
@@ -127648,10 +128729,10 @@ index 0000000..ee9f133
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/hifiberry_dacplus.c b/sound/soc/bcm/hifiberry_dacplus.c
 new file mode 100644
-index 0000000..16697dd
+index 0000000..e36c4ba
 --- /dev/null
 +++ b/sound/soc/bcm/hifiberry_dacplus.c
-@@ -0,0 +1,360 @@
+@@ -0,0 +1,357 @@
 +/*
 + * ASoC Driver for HiFiBerry DAC+ / DAC Pro
 + *
@@ -127870,35 +128951,32 @@ index 0000000..16697dd
 +	return 0;
 +}
 +
-+static int snd_rpi_hifiberry_dacplus_set_bclk_ratio_pro(
-+	struct snd_soc_dai *cpu_dai, struct snd_pcm_hw_params *params)
-+{
-+	int bratio = snd_pcm_format_physical_width(params_format(params))
-+		* params_channels(params);
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, bratio);
-+}
-+
 +static int snd_rpi_hifiberry_dacplus_hw_params(
 +	struct snd_pcm_substream *substream, struct snd_pcm_hw_params *params)
 +{
-+	int ret;
++	int ret = 0;
 +	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
++	int channels = params_channels(params);
++	int width = 32;
 +
 +	if (snd_rpi_hifiberry_is_dacpro) {
 +		struct snd_soc_codec *codec = rtd->codec;
 +
++		width = snd_pcm_format_physical_width(params_format(params));
++
 +		snd_rpi_hifiberry_dacplus_set_sclk(codec,
 +			params_rate(params));
 +
-+		ret = snd_rpi_hifiberry_dacplus_set_bclk_ratio_pro(cpu_dai,
-+			params);
-+		if (!ret)
-+			ret = snd_rpi_hifiberry_dacplus_update_rate_den(
-+				substream, params);
-+	} else {
-+		ret = snd_soc_dai_set_bclk_ratio(cpu_dai, 64);
++		ret = snd_rpi_hifiberry_dacplus_update_rate_den(
++			substream, params);
 +	}
++
++	ret = snd_soc_dai_set_tdm_slot(rtd->cpu_dai, 0x03, 0x03,
++		channels, width);
++	if (ret)
++		return ret;
++	ret = snd_soc_dai_set_tdm_slot(rtd->codec_dai, 0x03, 0x03,
++		channels, width);
 +	return ret;
 +}
 +
@@ -128296,10 +129374,10 @@ index 0000000..7620dd0
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/iqaudio-dac.c b/sound/soc/bcm/iqaudio-dac.c
 new file mode 100644
-index 0000000..1ee4097
+index 0000000..4583d19
 --- /dev/null
 +++ b/sound/soc/bcm/iqaudio-dac.c
-@@ -0,0 +1,239 @@
+@@ -0,0 +1,221 @@
 +/*
 + * ASoC Driver for IQaudIO DAC
 + *
@@ -128343,18 +129421,6 @@ index 0000000..1ee4097
 +	}
 +
 +	return 0;
-+}
-+
-+static int snd_rpi_iqaudio_dac_hw_params(struct snd_pcm_substream *substream,
-+	struct snd_pcm_hw_params *params)
-+{
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
-+
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
 +}
 +
 +static void snd_rpi_iqaudio_gpio_mute(struct snd_soc_card *card)
@@ -128411,11 +129477,6 @@ index 0000000..1ee4097
 +	return 0;
 +}
 +
-+/* machine stream operations */
-+static struct snd_soc_ops snd_rpi_iqaudio_dac_ops = {
-+	.hw_params = snd_rpi_iqaudio_dac_hw_params,
-+};
-+
 +static struct snd_soc_dai_link snd_rpi_iqaudio_dac_dai[] = {
 +{
 +	.cpu_dai_name	= "bcm2708-i2s.0",
@@ -128424,7 +129485,6 @@ index 0000000..1ee4097
 +	.codec_name	= "pcm512x.1-004c",
 +	.dai_fmt	= SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 +				SND_SOC_DAIFMT_CBS_CFS,
-+	.ops		= &snd_rpi_iqaudio_dac_ops,
 +	.init		= snd_rpi_iqaudio_dac_init,
 +},
 +};
@@ -128786,10 +129846,10 @@ index 0000000..33aa2be
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/justboom-dac.c b/sound/soc/bcm/justboom-dac.c
 new file mode 100644
-index 0000000..9bab6cf
+index 0000000..217626c
 --- /dev/null
 +++ b/sound/soc/bcm/justboom-dac.c
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,151 @@
 +/*
 + * ASoC Driver for JustBoom DAC Raspberry Pi HAT Sound Card
 + *
@@ -128841,17 +129901,6 @@ index 0000000..9bab6cf
 +	return 0;
 +}
 +
-+static int snd_rpi_justboom_dac_hw_params(struct snd_pcm_substream *substream,
-+				       struct snd_pcm_hw_params *params)
-+{
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+	/*return snd_soc_dai_set_bclk_ratio(cpu_dai, 64);*/
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
-+}
-+
 +static int snd_rpi_justboom_dac_startup(struct snd_pcm_substream *substream) {
 +	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 +	struct snd_soc_codec *codec = rtd->codec;
@@ -128867,7 +129916,6 @@ index 0000000..9bab6cf
 +
 +/* machine stream operations */
 +static struct snd_soc_ops snd_rpi_justboom_dac_ops = {
-+	.hw_params = snd_rpi_justboom_dac_hw_params,
 +	.startup = snd_rpi_justboom_dac_startup,
 +	.shutdown = snd_rpi_justboom_dac_shutdown,
 +};
@@ -129177,7 +130225,7 @@ index 0000000..909cf89
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/pisound.c b/sound/soc/bcm/pisound.c
 new file mode 100644
-index 0000000..09739d5
+index 0000000..00ae628
 --- /dev/null
 +++ b/sound/soc/bcm/pisound.c
 @@ -0,0 +1,1202 @@
@@ -129496,7 +130544,7 @@ index 0000000..09739d5
 +	struct spi_transfer transfer;
 +	struct spi_message msg;
 +
-+	memset(rxbuf, 0, sizeof(txbuf));
++	memset(rxbuf, 0, len);
 +
 +	if (!pisnd_spi_device) {
 +		printe("pisnd_spi_device null, returning\n");
@@ -130382,198 +131430,6 @@ index 0000000..09739d5
 +
 +MODULE_AUTHOR("Giedrius Trainavicius <giedrius@blokas.io>");
 +MODULE_DESCRIPTION("ASoC Driver for Pisound, https://blokas.io/pisound");
-+MODULE_LICENSE("GPL v2");
-diff --git a/sound/soc/bcm/raspidac3.c b/sound/soc/bcm/raspidac3.c
-new file mode 100644
-index 0000000..ad2b5b8
---- /dev/null
-+++ b/sound/soc/bcm/raspidac3.c
-@@ -0,0 +1,186 @@
-+/*
-+ * ASoC Driver for RaspiDAC v3
-+ *
-+ * Author:	Jan Grulich <jan@grulich.eu>
-+ *		Copyright 2015
-+ *              based on code by Daniel Matuschek <daniel@hifiberry.com>
-+ *		based on code by Florian Meier <florian.meier@koalo.de>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * version 2 as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+
-+#include <sound/core.h>
-+#include <sound/pcm.h>
-+#include <sound/pcm_params.h>
-+#include <sound/soc.h>
-+#include <sound/jack.h>
-+#include <sound/soc-dapm.h>
-+
-+#include "../codecs/pcm512x.h"
-+#include "../codecs/tpa6130a2.h"
-+
-+/* sound card init */
-+static int snd_rpi_raspidac3_init(struct snd_soc_pcm_runtime *rtd)
-+{
-+	int ret;
-+	struct snd_soc_card *card = rtd->card;
-+	struct snd_soc_codec *codec = rtd->codec;
-+	snd_soc_update_bits(codec, PCM512x_GPIO_EN, 0x08, 0x08);
-+	snd_soc_update_bits(codec, PCM512x_GPIO_OUTPUT_4, 0xf, 0x02);
-+	snd_soc_update_bits(codec, PCM512x_GPIO_CONTROL_1, 0x08,0x00);
-+
-+	ret = snd_soc_limit_volume(card, "Digital Playback Volume", 207);
-+	if (ret < 0)
-+		dev_warn(card->dev, "Failed to set volume limit: %d\n", ret);
-+	else {
-+		struct snd_kcontrol *kctl;
-+
-+		ret = snd_soc_limit_volume(card,
-+					   "TPA6130A2 Headphone Playback Volume",
-+					   54);
-+		if (ret < 0)
-+			dev_warn(card->dev, "Failed to set TPA6130A2 volume limit: %d\n",
-+				 ret);
-+		kctl = snd_soc_card_get_kcontrol(card,
-+						 "TPA6130A2 Headphone Playback Volume");
-+		if (kctl) {
-+			strcpy(kctl->id.name, "Headphones Playback Volume");
-+			/* disable the volume dB scale so alsamixer works */
-+			kctl->vd[0].access = SNDRV_CTL_ELEM_ACCESS_READWRITE;
-+		}
-+
-+		kctl = snd_soc_card_get_kcontrol(card,
-+						 "TPA6130A2 Headphone Playback Switch");
-+		if (kctl)
-+			strcpy(kctl->id.name, "Headphones Playback Switch");
-+	}
-+
-+	return 0;
-+}
-+
-+/* set hw parameters */
-+static int snd_rpi_raspidac3_hw_params(struct snd_pcm_substream *substream,
-+				       struct snd_pcm_hw_params *params)
-+{
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-+
-+	unsigned int sample_bits =
-+		snd_pcm_format_physical_width(params_format(params));
-+
-+	return snd_soc_dai_set_bclk_ratio(cpu_dai, sample_bits * 2);
-+}
-+
-+/* startup */
-+static int snd_rpi_raspidac3_startup(struct snd_pcm_substream *substream) {
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_codec *codec = rtd->codec;
-+	snd_soc_update_bits(codec, PCM512x_GPIO_CONTROL_1, 0x08,0x08);
-+	return 0;
-+}
-+
-+/* shutdown */
-+static void snd_rpi_raspidac3_shutdown(struct snd_pcm_substream *substream) {
-+	struct snd_soc_pcm_runtime *rtd = substream->private_data;
-+	struct snd_soc_codec *codec = rtd->codec;
-+	snd_soc_update_bits(codec, PCM512x_GPIO_CONTROL_1, 0x08,0x00);
-+}
-+
-+/* machine stream operations */
-+static struct snd_soc_ops snd_rpi_raspidac3_ops = {
-+	.hw_params = snd_rpi_raspidac3_hw_params,
-+	.startup = snd_rpi_raspidac3_startup,
-+	.shutdown = snd_rpi_raspidac3_shutdown,
-+};
-+
-+/* interface setup */
-+static struct snd_soc_dai_link snd_rpi_raspidac3_dai[] = {
-+{
-+	.name		= "RaspiDAC Rev.3x",
-+	.stream_name	= "RaspiDAC HiFi",
-+	.cpu_dai_name	= "bcm2708-i2s.0",
-+	.codec_dai_name	= "pcm512x-hifi",
-+	.platform_name	= "bcm2708-i2s.0",
-+	.codec_name	= "pcm512x.1-004c",
-+	.dai_fmt	= SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
-+				SND_SOC_DAIFMT_CBS_CFS,
-+	.ops		= &snd_rpi_raspidac3_ops,
-+	.init		= snd_rpi_raspidac3_init,
-+},
-+};
-+
-+/* audio machine driver */
-+static struct snd_soc_card snd_rpi_raspidac3 = {
-+	.name         = "RaspiDAC Rev.3x HiFi Audio Card",
-+	.owner        = THIS_MODULE,
-+	.dai_link     = snd_rpi_raspidac3_dai,
-+	.num_links    = ARRAY_SIZE(snd_rpi_raspidac3_dai),
-+};
-+
-+/* sound card test */
-+static int snd_rpi_raspidac3_probe(struct platform_device *pdev)
-+{
-+	int ret = 0;
-+
-+	snd_rpi_raspidac3.dev = &pdev->dev;
-+
-+	if (pdev->dev.of_node) {
-+	    struct device_node *i2s_node;
-+	    struct snd_soc_dai_link *dai = &snd_rpi_raspidac3_dai[0];
-+	    i2s_node = of_parse_phandle(pdev->dev.of_node,
-+					"i2s-controller", 0);
-+
-+	    if (i2s_node) {
-+		dai->cpu_dai_name = NULL;
-+		dai->cpu_of_node = i2s_node;
-+		dai->platform_name = NULL;
-+		dai->platform_of_node = i2s_node;
-+	    }
-+	}
-+
-+	ret = snd_soc_register_card(&snd_rpi_raspidac3);
-+	if (ret && ret != -EPROBE_DEFER)
-+		dev_err(&pdev->dev,
-+			"snd_soc_register_card() failed: %d\n", ret);
-+
-+	return ret;
-+}
-+
-+/* sound card disconnect */
-+static int snd_rpi_raspidac3_remove(struct platform_device *pdev)
-+{
-+	return snd_soc_unregister_card(&snd_rpi_raspidac3);
-+}
-+
-+static const struct of_device_id raspidac3_of_match[] = {
-+	{ .compatible = "jg,raspidacv3", },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, raspidac3_of_match);
-+
-+/* sound card platform driver */
-+static struct platform_driver snd_rpi_raspidac3_driver = {
-+	.driver = {
-+		.name   = "snd-rpi-raspidac3",
-+		.owner  = THIS_MODULE,
-+		.of_match_table = raspidac3_of_match,
-+	},
-+	.probe          = snd_rpi_raspidac3_probe,
-+	.remove         = snd_rpi_raspidac3_remove,
-+};
-+
-+module_platform_driver(snd_rpi_raspidac3_driver);
-+
-+MODULE_AUTHOR("Jan Grulich <jan@grulich.eu>");
-+MODULE_DESCRIPTION("ASoC Driver for RaspiDAC Rev.3x");
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/bcm/rpi-cirrus.c b/sound/soc/bcm/rpi-cirrus.c
 new file mode 100644
@@ -132030,19 +132886,62 @@ index 0000000..afe1b41
 +MODULE_AUTHOR("Florian Meier <florian.meier@koalo.de>");
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/codecs/pcm512x.c b/sound/soc/codecs/pcm512x.c
-index 68feae2..f7b0977 100644
+index 68feae2..795e9eb 100644
 --- a/sound/soc/codecs/pcm512x.c
 +++ b/sound/soc/codecs/pcm512x.c
-@@ -851,7 +851,8 @@ static int pcm512x_set_dividers(struct snd_soc_dai *dai,
+@@ -53,6 +53,7 @@ struct pcm512x_priv {
+ 	unsigned long overclock_pll;
+ 	unsigned long overclock_dac;
+ 	unsigned long overclock_dsp;
++	int lrclk_div;
+ };
+ 
+ /*
+@@ -851,7 +852,10 @@ static int pcm512x_set_dividers(struct snd_soc_dai *dai,
  	int fssp;
  	int gpio;
  
 -	lrclk_div = snd_soc_params_to_frame_size(params);
-+	lrclk_div = snd_pcm_format_physical_width(params_format(params))
-+		* params_channels(params);
++	if (pcm512x->lrclk_div)
++		lrclk_div = pcm512x->lrclk_div;
++	else
++		lrclk_div = snd_soc_params_to_frame_size(params);
  	if (lrclk_div == 0) {
  		dev_err(dev, "No LRCLK?\n");
  		return -EINVAL;
+@@ -1319,10 +1323,32 @@ static int pcm512x_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
+ 	return 0;
+ }
+ 
++static int pcm512x_set_tdm_slot(struct snd_soc_dai *dai,
++	unsigned int tx_mask, unsigned int rx_mask,
++	int slots, int width)
++{
++	struct snd_soc_codec *codec = dai->codec;
++	struct pcm512x_priv *pcm512x = snd_soc_codec_get_drvdata(codec);
++
++	switch (slots) {
++	case 0:
++		pcm512x->lrclk_div = 0;
++		return 0;
++	case 2:
++		if (tx_mask != 0x03 || rx_mask != 0x03)
++			return -EINVAL;
++		pcm512x->lrclk_div = slots * width;
++		return 0;
++	default:
++		return -EINVAL;
++	}
++}
++
+ static const struct snd_soc_dai_ops pcm512x_dai_ops = {
+ 	.startup = pcm512x_dai_startup,
+ 	.hw_params = pcm512x_hw_params,
+ 	.set_fmt = pcm512x_set_fmt,
++	.set_tdm_slot = pcm512x_set_tdm_slot,
+ };
+ 
+ static struct snd_soc_dai_driver pcm512x_dai = {
 diff --git a/sound/soc/codecs/tas5713.c b/sound/soc/codecs/tas5713.c
 new file mode 100644
 index 0000000..560234d
@@ -132636,36 +133535,6 @@ index 0000000..8f019e0
 +
 +
 +#endif  /* _TAS5713_H */
-diff --git a/sound/soc/codecs/wm8804.c b/sound/soc/codecs/wm8804.c
-index fc69b87..d8fdce8 100644
---- a/sound/soc/codecs/wm8804.c
-+++ b/sound/soc/codecs/wm8804.c
-@@ -304,6 +304,7 @@ static int wm8804_hw_params(struct snd_pcm_substream *substream,
- 		blen = 0x1;
- 		break;
- 	case 24:
-+	case 32:
- 		blen = 0x2;
- 		break;
- 	default:
-@@ -515,7 +516,7 @@ static const struct snd_soc_dai_ops wm8804_dai_ops = {
- };
- 
- #define WM8804_FORMATS (SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE | \
--			SNDRV_PCM_FMTBIT_S24_LE)
-+			SNDRV_PCM_FMTBIT_S24_3LE | SNDRV_PCM_FMTBIT_S32_LE)
- 
- #define WM8804_RATES (SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 | \
- 		      SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_64000 | \
-@@ -543,7 +544,7 @@ static struct snd_soc_dai_driver wm8804_dai = {
- };
- 
- static const struct snd_soc_codec_driver soc_codec_dev_wm8804 = {
--	.idle_bias_off = true,
-+	.idle_bias_off = false,
- 
- 	.component_driver = {
- 		.dapm_widgets		= wm8804_dapm_widgets,
 diff --git a/sound/soc/soc-core.c b/sound/soc/soc-core.c
 index fee4b0e..c728a41 100644
 --- a/sound/soc/soc-core.c
