@@ -180,8 +180,8 @@ then
 		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
 		popd
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		strip --strip-unneeded drivers/net/wireless/rtl8812au/8812au.ko
-		cp drivers/net/wireless/rtl8812au/8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
+		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
+		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero364" ]
 		then
