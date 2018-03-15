@@ -273,10 +273,10 @@ index ce1c5ff..eaaeb17 100644
  uImage
 +*.dtb*
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index eff87a3..d85b3a4 100644
+index eff87a3..37982e8 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -1,6 +1,15 @@
+@@ -1,6 +1,16 @@
  # SPDX-License-Identifier: GPL-2.0
  ifeq ($(CONFIG_OF),y)
  
@@ -287,12 +287,13 @@ index eff87a3..d85b3a4 100644
 +	bcm2708-rpi-0-w.dtb \
 +	bcm2709-rpi-2-b.dtb \
 +	bcm2710-rpi-3-b.dtb \
++	bcm2710-rpi-3-b-plus.dtb \
 +	bcm2710-rpi-cm3.dtb
 +
  dtb-$(CONFIG_ARCH_ALPINE) += \
  	alpine-db.dtb
  dtb-$(CONFIG_MACH_ARTPEC6) += \
-@@ -1069,10 +1078,21 @@ dtb-$(CONFIG_ARCH_ZX) += zx296702-ad1.dtb
+@@ -1069,10 +1079,21 @@ dtb-$(CONFIG_ARCH_ZX) += zx296702-ad1.dtb
  dtb-$(CONFIG_ARCH_ASPEED) += aspeed-bmc-opp-palmetto.dtb \
  	aspeed-bmc-opp-romulus.dtb \
  	aspeed-ast2500-evb.dtb
@@ -1374,17 +1375,202 @@ index 0000000..5c12450
 +&vc4 {
 +	status = "disabled";
 +};
-diff --git a/arch/arm/boot/dts/bcm2710-rpi-3-b.dts b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
+diff --git a/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts b/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts
 new file mode 100644
-index 0000000..3d16b70
+index 0000000..7641360
 --- /dev/null
-+++ b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
-@@ -0,0 +1,195 @@
++++ b/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts
+@@ -0,0 +1,183 @@
 +/dts-v1/;
 +
-+#ifdef RPI364
-+/memreserve/ 0x00000000 0x00001000;
-+#endif
++#include "bcm2710.dtsi"
++#include "bcm283x-rpi-lan7515.dtsi"
++
++/ {
++	compatible = "raspberrypi,3-model-b-plus", "brcm,bcm2837";
++	model = "Raspberry Pi 3 Model B+";
++
++	chosen {
++		bootargs = "8250.nr_uarts=1";
++	};
++
++	aliases {
++		serial0 = &uart1;
++		serial1 = &uart0;
++	};
++};
++
++&gpio {
++	spi0_pins: spi0_pins {
++		brcm,pins = <9 10 11>;
++		brcm,function = <4>; /* alt0 */
++	};
++
++	spi0_cs_pins: spi0_cs_pins {
++		brcm,pins = <8 7>;
++		brcm,function = <1>; /* output */
++	};
++
++	i2c0_pins: i2c0 {
++		brcm,pins = <0 1>;
++		brcm,function = <4>;
++	};
++
++	i2c1_pins: i2c1 {
++		brcm,pins = <2 3>;
++		brcm,function = <4>;
++	};
++
++	i2s_pins: i2s {
++		brcm,pins = <18 19 20 21>;
++		brcm,function = <4>; /* alt0 */
++	};
++
++	sdio_pins: sdio_pins {
++		brcm,pins =     <34 35 36 37 38 39>;
++		brcm,function = <7>; // alt3 = SD1
++		brcm,pull =     <0 2 2 2 2 2>;
++	};
++
++	bt_pins: bt_pins {
++		brcm,pins = <43>;
++		brcm,function = <4>; /* alt0:GPCLK2 */
++		brcm,pull = <0>;
++	};
++
++	uart0_pins: uart0_pins {
++		brcm,pins = <32 33>;
++		brcm,function = <7>; /* alt3=UART0 */
++		brcm,pull = <0 2>;
++	};
++
++	uart1_pins: uart1_pins {
++		brcm,pins;
++		brcm,function;
++		brcm,pull;
++	};
++
++	audio_pins: audio_pins {
++		brcm,pins = <40 41>;
++		brcm,function = <4>;
++	};
++};
++
++&mmc {
++	pinctrl-names = "default";
++	pinctrl-0 = <&sdio_pins>;
++	non-removable;
++	bus-width = <4>;
++	status = "okay";
++	brcm,overclock-50 = <0>;
++};
++
++&soc {
++	expgpio: expgpio {
++		compatible = "brcm,bcm2835-expgpio";
++		gpio-controller;
++		#gpio-cells = <2>;
++		firmware = <&firmware>;
++		status = "okay";
++	};
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_pins &bt_pins>;
++	status = "okay";
++};
++
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>;
++	status = "okay";
++};
++
++&spi0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi0_pins &spi0_cs_pins>;
++	cs-gpios = <&gpio 8 1>, <&gpio 7 1>;
++
++	spidev0: spidev@0{
++		compatible = "spidev";
++		reg = <0>;	/* CE0 */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		spi-max-frequency = <125000000>;
++	};
++
++	spidev1: spidev@1{
++		compatible = "spidev";
++		reg = <1>;	/* CE1 */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		spi-max-frequency = <125000000>;
++	};
++};
++
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins>;
++	clock-frequency = <100000>;
++};
++
++&i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c1_pins>;
++	clock-frequency = <100000>;
++};
++
++&i2c2 {
++	clock-frequency = <100000>;
++};
++
++&i2s {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_pins>;
++};
++
++&leds {
++	act_led: act {
++		label = "led0";
++		linux,default-trigger = "mmc0";
++		gpios = <&gpio 29 0>;
++	};
++
++	pwr_led: pwr {
++		label = "led1";
++		linux,default-trigger = "default-on";
++		gpios = <&expgpio 2 GPIO_ACTIVE_LOW>;
++	};
++};
++
++&hdmi {
++	hpd-gpios = <&expgpio 4 GPIO_ACTIVE_LOW>;
++};
++
++&audio {
++	pinctrl-names = "default";
++	pinctrl-0 = <&audio_pins>;
++};
++
++/ {
++	__overrides__ {
++		act_led_gpio = <&act_led>,"gpios:4";
++		act_led_activelow = <&act_led>,"gpios:8";
++		act_led_trigger = <&act_led>,"linux,default-trigger";
++
++		pwr_led_gpio = <&pwr_led>,"gpios:4";
++		pwr_led_activelow = <&pwr_led>,"gpios:8";
++		pwr_led_trigger = <&pwr_led>,"linux,default-trigger";
++	};
++};
+diff --git a/arch/arm/boot/dts/bcm2710-rpi-3-b.dts b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
+new file mode 100644
+index 0000000..3f84e2a
+--- /dev/null
++++ b/arch/arm/boot/dts/bcm2710-rpi-3-b.dts
+@@ -0,0 +1,191 @@
++/dts-v1/;
 +
 +#include "bcm2710.dtsi"
 +#include "bcm283x-rpi-smsc9514.dtsi"
@@ -1745,6 +1931,48 @@ index 0000000..6fb5ed6
 +		       <&cpu3>, "clock-frequency:0";
 +	};
 +};
+diff --git a/arch/arm/boot/dts/bcm283x-rpi-lan7515.dtsi b/arch/arm/boot/dts/bcm283x-rpi-lan7515.dtsi
+new file mode 100644
+index 0000000..1b1075d
+--- /dev/null
++++ b/arch/arm/boot/dts/bcm283x-rpi-lan7515.dtsi
+@@ -0,0 +1,36 @@
++/ {
++	aliases {
++		ethernet0 = &ethernet;
++	};
++};
++
++&usb {
++	usb1@1 {
++		compatible = "usb424,2514";
++		reg = <1>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		usb1_1@1 {
++			compatible = "usb424,2514";
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			ethernet: usbether@1 {
++				compatible = "usb424,7800";
++				reg = <1>;
++				microchip,eee-enabled;
++				microchip,tx-lpi-timer = <600>; /* non-aggressive*/
++			};
++		};
++	};
++};
++
++
++/ {
++	__overrides__ {
++		eee = <&ethernet>,"microchip,eee-enabled?";
++		tx_lpi_timer = <&ethernet>,"microchip,tx-lpi-timer:0";
++	};
++};
 diff --git a/arch/arm/boot/dts/overlays/Makefile b/arch/arm/boot/dts/overlays/Makefile
 new file mode 100644
 index 0000000..64ea686
@@ -1892,10 +2120,10 @@ index 0000000..64ea686
 +clean-files	:= *.dtbo
 diff --git a/arch/arm/boot/dts/overlays/README b/arch/arm/boot/dts/overlays/README
 new file mode 100644
-index 0000000..a850674
+index 0000000..3e260a9
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/README
-@@ -0,0 +1,1831 @@
+@@ -0,0 +1,1842 @@
 +Introduction
 +============
 +
@@ -1987,6 +2215,10 @@ index 0000000..a850674
 +        audio                   Set to "on" to enable the onboard ALSA audio
 +                                interface (default "off")
 +
++        eee                     Enable Energy Efficient Ethernet support for
++                                compatible devices (default "on"). See also
++                                "tx_lpi_timer".
++
 +        i2c_arm                 Set to "on" to enable the ARM's i2c interface
 +                                (default "off")
 +
@@ -2022,6 +2254,10 @@ index 0000000..a850674
 +                                SD card (default 1)
 +
 +        sd_debug                Enable debug output from SD driver (default off)
++
++        tx_lpi_timer            Set the delay in microseconds between going idle
++                                and entering the low power state (default 600).
++                                Requires EEE to be enabled - see "eee".
 +
 +        uart0                   Set to "off" to disable uart0 (default "on")
 +
@@ -3185,7 +3421,10 @@ index 0000000..a850674
 +Load:   dtoverlay=pps-gpio,<param>=<val>
 +Params: gpiopin                 Input GPIO (default "18")
 +        assert_falling_edge     When present, assert is indicated by a falling
-+                                edge, rather than by a rising edge
++                                edge, rather than by a rising edge (default
++                                off)
++        capture_clear           Generate clear events on the trailing edge
++                                (default off)
 +
 +
 +Name:   pwm
@@ -10430,10 +10669,10 @@ index 0000000..25cb5cc
 +};
 diff --git a/arch/arm/boot/dts/overlays/pps-gpio-overlay.dts b/arch/arm/boot/dts/overlays/pps-gpio-overlay.dts
 new file mode 100644
-index 0000000..9ee4bdf
+index 0000000..af29b87
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/pps-gpio-overlay.dts
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,38 @@
 +/dts-v1/;
 +/plugin/;
 +
@@ -10469,6 +10708,7 @@ index 0000000..9ee4bdf
 +			  <&pps_pins>,"brcm,pins:0",
 +			  <&pps_pins>,"reg:0";
 +		assert_falling_edge = <&pps>,"assert-falling-edge?";
++		capture_clear = <&pps>,"capture-clear?";
 +	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/pwm-2chan-overlay.dts b/arch/arm/boot/dts/overlays/pwm-2chan-overlay.dts
@@ -13405,7 +13645,7 @@ index 0000000..8498134
 +};
 diff --git a/arch/arm/configs/bcm2709_defconfig b/arch/arm/configs/bcm2709_defconfig
 new file mode 100644
-index 0000000..cbc3a78
+index 0000000..ec3d11b
 --- /dev/null
 +++ b/arch/arm/configs/bcm2709_defconfig
 @@ -0,0 +1,1356 @@
@@ -13872,7 +14112,7 @@ index 0000000..cbc3a78
 +CONFIG_USB_PEGASUS=m
 +CONFIG_USB_RTL8150=m
 +CONFIG_USB_RTL8152=m
-+CONFIG_USB_LAN78XX=m
++CONFIG_USB_LAN78XX=y
 +CONFIG_USB_USBNET=y
 +CONFIG_USB_NET_AX8817X=m
 +CONFIG_USB_NET_AX88179_178A=m
@@ -53704,7 +53944,7 @@ index f3f05fe..6c2d3ab 100644
  				   flags | IRQF_ONESHOT, DEVICE_NAME, priv);
  	if (ret) {
 diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index a8dd1c7..da0b0bc 100644
+index a8dd1c7..53c6dba 100644
 --- a/drivers/net/usb/lan78xx.c
 +++ b/drivers/net/usb/lan78xx.c
 @@ -37,6 +37,7 @@
@@ -53748,7 +53988,35 @@ index a8dd1c7..da0b0bc 100644
  			addr_lo = addr[0] | (addr[1] << 8) |
  				  (addr[2] << 16) | (addr[3] << 24);
  			addr_hi = addr[4] | (addr[5] << 8);
-@@ -2351,6 +2362,11 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+@@ -2006,6 +2017,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+ {
+ 	int ret;
+ 	u32 mii_adv;
++	u32 led_modes;
+ 	struct phy_device *phydev = dev->net->phydev;
+ 
+ 	phydev = phy_find_first(dev->mdiobus);
+@@ -2078,6 +2090,19 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+ 	mii_adv = (u32)mii_advertise_flowctrl(dev->fc_request_control);
+ 	phydev->advertising |= mii_adv_to_ethtool_adv_t(mii_adv);
+ 
++	/* Change LED defaults:
++	 *   orange = link1000/activity
++	 *   green  = link10/link100/activity
++	 * led: 0=link/activity          1=link1000/activity
++	 *      2=link100/activity       3=link10/activity
++	 *      4=link100/1000/activity  5=link10/1000/activity
++	 *      6=link10/100/activity    14=off    15=on
++	 */
++	led_modes = phy_read(phydev, 0x1d);
++	led_modes &= ~0xff;
++	led_modes |= (1 << 0) | (6 << 4);
++	(void)phy_write(phydev, 0x1d, led_modes);
++
+ 	genphy_config_aneg(phydev);
+ 
+ 	dev->fc_autoneg = phydev->autoneg;
+@@ -2351,6 +2376,11 @@ static int lan78xx_reset(struct lan78xx_net *dev)
  	u32 buf;
  	int ret = 0;
  	unsigned long timeout;
@@ -53760,7 +54028,7 @@ index a8dd1c7..da0b0bc 100644
  
  	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
  	buf |= HW_CFG_LRST_;
-@@ -2404,6 +2420,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+@@ -2404,6 +2434,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
  
  	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
  	buf |= HW_CFG_MEF_;
@@ -53770,7 +54038,7 @@ index a8dd1c7..da0b0bc 100644
  	ret = lan78xx_write_reg(dev, HW_CFG, buf);
  
  	ret = lan78xx_read_reg(dev, USB_CFG0, &buf);
-@@ -2450,6 +2469,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+@@ -2450,6 +2483,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
  	/* LAN7801 only has RGMII mode */
  	if (dev->chipid == ID_REV_CHIP_ID_7801_)
  		buf &= ~MAC_CR_GMII_EN_;
@@ -53780,7 +54048,7 @@ index a8dd1c7..da0b0bc 100644
  	ret = lan78xx_write_reg(dev, MAC_CR, buf);
  
  	ret = lan78xx_read_reg(dev, MAC_TX, &buf);
-@@ -2496,7 +2518,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
+@@ -2496,7 +2532,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
  	dev->stats.rollover_max.eee_tx_lpi_transitions = 0xFFFFFFFF;
  	dev->stats.rollover_max.eee_tx_lpi_time = 0xFFFFFFFF;
  
@@ -53789,6 +54057,29 @@ index a8dd1c7..da0b0bc 100644
  }
  
  static int lan78xx_open(struct net_device *net)
+@@ -2516,6 +2552,22 @@ static int lan78xx_open(struct net_device *net)
+ 	if (ret < 0)
+ 		goto done;
+ 
++	if (of_property_read_bool(dev->udev->dev.of_node,
++				  "microchip,eee-enabled")) {
++		struct ethtool_eee edata;
++		memset(&edata, 0, sizeof(edata));
++		edata.cmd = ETHTOOL_SEEE;
++		edata.advertised = ADVERTISED_1000baseT_Full |
++				   ADVERTISED_100baseT_Full;
++		edata.eee_enabled = true;
++		edata.tx_lpi_enabled = true;
++		if (of_property_read_u32(dev->udev->dev.of_node,
++					 "microchip,tx-lpi-timer",
++					 &edata.tx_lpi_timer))
++			edata.tx_lpi_timer = 600; /* non-aggressive */
++		(void)lan78xx_set_eee(net, &edata);
++	}
++
+ 	/* for Link Check */
+ 	if (dev->urb_intr) {
+ 		ret = usb_submit_urb(dev->urb_intr, GFP_KERNEL);
 diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
 index 309b88a..4d9704d 100644
 --- a/drivers/net/usb/smsc95xx.c
@@ -55626,6 +55917,20 @@ index be3d81f..a030ae9 100644
  		dev_err(&pdev->dev,
  			"%s: pm_power_off function already registered",
  		       __func__);
+diff --git a/drivers/pps/clients/pps-gpio.c b/drivers/pps/clients/pps-gpio.c
+index 333ad7d..ec9c4de 100644
+--- a/drivers/pps/clients/pps-gpio.c
++++ b/drivers/pps/clients/pps-gpio.c
+@@ -119,6 +119,9 @@ static int pps_gpio_probe(struct platform_device *pdev)
+ 
+ 		if (of_get_property(np, "assert-falling-edge", NULL))
+ 			data->assert_falling_edge = true;
++
++                if (of_get_property(np, "capture-clear", NULL))
++                        data->capture_clear = true;
+ 	}
+ 
+ 	/* GPIO setup */
 diff --git a/drivers/pwm/sysfs.c b/drivers/pwm/sysfs.c
 index a813239..83f2b0b 100644
 --- a/drivers/pwm/sysfs.c
