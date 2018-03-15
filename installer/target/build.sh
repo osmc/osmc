@@ -85,6 +85,8 @@ then
 	echo -e "Installing Pi files"
 	mv zImage /mnt/kernel.img
 	mv INSTALLER/* /mnt
+	mv *.dtb /mnt
+	mv overlays /mnt
 fi
 if [ "$1" == "vero1" ]
 then
