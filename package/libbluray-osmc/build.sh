@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/0.9.3/libbluray-0.9.3.tar.bz2" "$(pwd)/src"
+pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/1.0.1/libbluray-1.0.1.tar.bz2" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libbluray-osmc"
@@ -39,7 +39,7 @@ then
 	install_patch "../../patches" "all"
 	aclocal
 	autoconf
-	./configure --prefix=/usr/osmc --disable-bdjava --enable-udf --with-freetype --with-fontconfig --with-libxml2 --disable-examples
+	./configure --prefix=/usr/osmc --disable-bdjava-jar --with-freetype --with-fontconfig --with-libxml2 --disable-examples
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
