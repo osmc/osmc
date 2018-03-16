@@ -70,7 +70,7 @@ then
         ## configure too old for arm64
         patch -p1 < ../../vero3-add-arm64-support.patch
     fi
-    ./configure --prefix=/usr
+    ./configure --prefix=/usr --disable-selinux
     $BUILD
     mkdir out
     $BUILD DESTDIR=$(pwd)/out install
