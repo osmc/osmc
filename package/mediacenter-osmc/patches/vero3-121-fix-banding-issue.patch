@@ -1,0 +1,26 @@
+From 71b135fe79c464615dfdea69fd7e6d8e59e0e20d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 17 Mar 2018 16:16:11 +0000
+Subject: [PATCH] Fix potential banding issue with some material
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 65d3a73..c5dbaeb 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -3641,6 +3641,8 @@ void CApplication::OnPlayBackEnded()
+ void CApplication::OnPlayBackStarted()
+ {
+   CSingleLock lock(m_playStateMutex);
++  CLog::Log(LOGINFO, "Fix potential banding issue with material");
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+   CLog::LogF(LOGDEBUG,"play state was %d, starting %d", m_ePlayState, m_bPlaybackStarting);
+   m_ePlayState = PLAY_STATE_PLAYING;
+   if(m_bPlaybackStarting)
+-- 
+2.7.4
+
