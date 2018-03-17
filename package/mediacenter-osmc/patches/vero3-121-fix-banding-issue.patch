@@ -1,26 +1,43 @@
-From 71b135fe79c464615dfdea69fd7e6d8e59e0e20d Mon Sep 17 00:00:00 2001
+From 0a3e4757d2a2dcbb56d11ebe88916545e1012bdd Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sat, 17 Mar 2018 16:16:11 +0000
-Subject: [PATCH] Fix potential banding issue with some material
+Date: Sat, 17 Mar 2018 20:01:17 +0000
+Subject: [PATCH] Prevent banding during playback
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 2 ++
- 1 file changed, 2 insertions(+)
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 65d3a73..c5dbaeb 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -3641,6 +3641,8 @@ void CApplication::OnPlayBackEnded()
- void CApplication::OnPlayBackStarted()
- {
-   CSingleLock lock(m_playStateMutex);
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index bdd32af..10d84a6 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -86,6 +86,11 @@
+ #include "windowing/WindowingFactory.h"
+ #include "DVDCodecs/DVDCodecUtils.h"
+ 
++#if defined(HAS_LIBAMCODEC)
++#include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
++#endif
++
+ #include <iterator>
+ 
+ using namespace PVR;
+@@ -1345,9 +1350,13 @@ void CVideoPlayer::Process()
+   if(m_PlayerOptions.identify == false)
+     m_callback.OnPlayBackStarted();
+ 
++
+   // we are done initializing now, set the readyevent
+   m_ready.Set();
+ 
 +  CLog::Log(LOGINFO, "Fix potential banding issue with material");
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
-   CLog::LogF(LOGDEBUG,"play state was %d, starting %d", m_ePlayState, m_bPlaybackStarting);
-   m_ePlayState = PLAY_STATE_PLAYING;
-   if(m_bPlaybackStarting)
++
+   SetCaching(CACHESTATE_FLUSH);
+ 
+   while (!m_bAbortRequest)
 -- 
 2.7.4
 
