@@ -16,7 +16,7 @@ test $1 == vero && VERSION="4.4.0" && REV="18" && FLAGS_INITRAMFS=$(($INITRAMFS_
 test $1 == vero2 && VERSION="3.10.105" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="68" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="69" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -250,24 +250,24 @@ then
 		cp drivers/staging/nv-osmc/nvidia.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
 		fi
         # Build V4L2 drivers for Vero 4K
-        if [ "$1" == "vero364" ]
-        then
-		kernel_path=$(pwd)
-                pushd media_build
-                make untar
-                cp -a "../drivers/amlogic/video_dev" "linux/drivers/media/"
-                sed -i 's,common/,,g; s,"trace/,",g' $(find linux/drivers/media/video_dev/ -type f)
-                sed -i 's,\$(CONFIG_V4L_AMLOGIC_VIDEO),m,g' "linux/drivers/media/video_dev/Makefile"
-                echo "obj-y += video_dev/" >> "linux/drivers/media/Makefile"
-                echo "source drivers/media/video_dev/Kconfig " >> "linux/drivers/media/Kconfig"
-                cp -a "${kernel_path}/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
-                cp -a "${kernel_path}/include/media/videobuf-res.h" "linux/include/media/"
-                echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
-                $BUILD VER=${VERSION} SRCDIR=$(pwd)/../
-                popd
-                mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
-		cp media_build/v4l/*.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
-        fi
+#        if [ "$1" == "vero364" ]
+#        then
+#		kernel_path=$(pwd)
+#                pushd media_build
+#                make untar
+#                cp -a "../drivers/amlogic/video_dev" "linux/drivers/media/"
+#                sed -i 's,common/,,g; s,"trace/,",g' $(find linux/drivers/media/video_dev/ -type f)
+#                sed -i 's,\$(CONFIG_V4L_AMLOGIC_VIDEO),m,g' "linux/drivers/media/video_dev/Makefile"
+#                echo "obj-y += video_dev/" >> "linux/drivers/media/Makefile"
+#                echo "source drivers/media/video_dev/Kconfig " >> "linux/drivers/media/Kconfig"
+#                cp -a "${kernel_path}/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
+#                cp -a "${kernel_path}/include/media/videobuf-res.h" "linux/include/media/"
+#                echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
+#                $BUILD VER=${VERSION} SRCDIR=$(pwd)/../
+#                popd
+#                mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
+#		cp media_build/v4l/*.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
+#        fi
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
