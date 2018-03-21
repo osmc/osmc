@@ -1,4 +1,4 @@
-From f170af9b3e07243f9266a55b616777953ea24072 Mon Sep 17 00:00:00 2001
+From 1b8ab2beb22784528136a66d576b16a6b2a975f5 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 15 Jan 2018 02:34:41 +0000
 Subject: [PATCH] Add option to force RGB output, lock HPD and disable HDMI
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  system/settings/settings.xml                       | 15 +++++++++++
  xbmc/settings/Settings.cpp                         |  3 +++
  xbmc/settings/Settings.h                           |  3 +++
- xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp        | 17 ++++++++++++
- 5 files changed, 69 insertions(+)
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp        | 13 +++++++++
+ 5 files changed, 65 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index dd051b7..e04ee65 100644
+index 4ec43fa..e40a6e5 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -5845,6 +5845,21 @@ msgctxt "#13132"
@@ -39,7 +39,7 @@ index dd051b7..e04ee65 100644
  #empty strings from id 13133 to 13139
  
  #: xbmc/network/NetworkServices.cpp
-@@ -19817,3 +19832,19 @@ msgstr ""
+@@ -19829,3 +19844,19 @@ msgstr ""
  msgctxt "#39010"
  msgid "Select sort method"
  msgstr ""
@@ -56,11 +56,11 @@ index dd051b7..e04ee65 100644
 +
 +#: Description of display setting with label # 13135
 +msgctxt "#39013"
-+msgid "Turns off HDMI audio. Useful if you're using SPDIF audio and don't want audio on HDMI. Requires reboot."
++msgid "Turns off HDMI audio. Useful if you're using SPDIF audio and don't want audio on HDMI."
 +msgstr ""
 +
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 1f744f1..344cdb8 100644
+index e0de83b..0a29cb7 100644
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -2070,6 +2070,21 @@
@@ -114,18 +114,18 @@ index ab67709..439b2b4 100644
    static const std::string SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
    static const std::string SETTING_VIDEOSCREEN_NOOFBUFFERS;
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-index 3a5e8f7..f3dd16c 100644
+index d04df45..5c6ec85 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-@@ -25,6 +25,7 @@
- #include "utils/StringUtils.h"
+@@ -26,6 +26,7 @@
  #include "utils/SysfsUtils.h"
+ #include "filesystem/SpecialProtocol.h"
  #include "utils/log.h"
 +#include "settings/Settings.h"
  
  #include <stdio.h>
  #include <stdlib.h>
-@@ -67,6 +68,22 @@ void CEGLNativeTypeAmlogic::Initialize()
+@@ -68,6 +69,18 @@ void CEGLNativeTypeAmlogic::Initialize()
  {
    aml_permissions();
    DisableFreeScale();
@@ -141,10 +141,6 @@ index 3a5e8f7..f3dd16c 100644
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
 + }
 +
-+ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
-+    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- muting HDMI");
-+    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
-+ }
  }
  void CEGLNativeTypeAmlogic::Destroy()
  {
