@@ -74,7 +74,7 @@ index 2b5d059..6a9a3fe 100644
    }
  
 -  AEDeviceType devType = AEDeviceTypeFromName(device);
-+ if (CSettings::GetInstance().GetBool(CSettings::SETTING_AUDIOOUTPUT_MUTEHDMI)) {
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
 +    CLog::Log(LOGDEBUG, "CAESinkALSA::Initialize -- muting HDMI");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
 + }
