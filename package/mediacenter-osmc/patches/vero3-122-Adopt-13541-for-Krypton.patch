@@ -1,0 +1,43 @@
+From 650677903258413bfec9d8358e05901a724b323d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 18 Feb 2018 18:56:02 +0000
+Subject: [PATCH] Adopt #13541 for Krypton. Return VC_EOF when draining
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index bbfc960..be46bce 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2025,6 +2025,9 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+ 
+   float timesize(GetTimeSize());
+ 
++  if (!m_drain && timesize < 0.2)
++     rtn |= VC_BUFFER;
++
+   if (timesize > 0.5 || m_drain)
+     if (DequeueBuffer() == 0)
+     {
+@@ -2035,9 +2038,14 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+   if (++m_noPictureLoop == 100 || timesize == 0.0) // EOS or stalled
+     rtn |= VC_BUFFER;
+ 
++  if (m_drain)
++    rtn |= VC_EOF;
++
+   if (!m_drain)
+-    if (timesize < 1.0)
++    if (timesize < 1.0) {
+       rtn |= VC_BUFFER;
++      usleep(5000);
++    }
+ 
+   if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+   {
+-- 
+2.7.4
+
