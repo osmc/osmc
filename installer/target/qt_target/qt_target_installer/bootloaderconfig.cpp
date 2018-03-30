@@ -148,38 +148,6 @@ void BootloaderConfig::configureEnvironment()
         QStringList configStringList;
         if (utils->getOSMCDev() == "rbp1")
         {
-            QFile cpuinfo("/proc/cpuinfo");
-            int rev = 0x0000;
-            if (cpuinfo.open(QIODevice::ReadOnly))
-            {
-                QTextStream in(&cpuinfo);
-                while (!in.atEnd())
-                {
-                    QString line = in.readLine();
-                    if (line.contains("Revision"))
-                    {
-                        logger->addLine("Found device revision. It is " + line);
-                        line.replace(" ", "");
-                        QStringList lines = line.split(":");
-                        rev = lines[1].toUInt(NULL, 16);
-                        break;
-                    }
-
-                }
-                cpuinfo.close();
-            }
-            logger->addLine("The revision for this device is " + rev);
-            if ((rev >> 23) & 1)
-            {
-                if ((rev >> 4 & 0xFF) != 9)
-                       /* Not a Pi Zero */
-                       configStringList << "arm_freq=850\n" << "core_freq=375\n";
-            }
-            else
-            {
-                /* Not a Pi Zero */
-                configStringList << "arm_freq=850\n" << "core_freq=375\n";
-            }
             configStringList << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
             cmdlineStringList << "osmcdev=rbp1";
         }
