@@ -69,3 +69,8 @@ load-module module-native-protocol-tcp auth-anonymous=1
 load-module module-zeroconf-publish
 
 load-module module-switch-on-connect
+
+.ifexists module-card-restore.so
+ load-module module-card-restore
+.endif
+
