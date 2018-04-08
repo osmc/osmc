@@ -70,6 +70,7 @@ syspaths="/sys/class/video/axis
 for syspath in $syspaths; do
         chgrp -R video $syspath
         chmod -R g+u $syspath
+        chmod 664 $syspath
 done
 
 trap 'wait; exit 0' SIGTERM
