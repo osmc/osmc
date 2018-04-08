@@ -1,4 +1,4 @@
-From e9e8c67098ebb475a490bc533e70f0ef77d3f2e5 Mon Sep 17 00:00:00 2001
+From 6fdbcd37acccb592e8d7f5afcbd9b41bfbc1ab24 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 8 Apr 2018 06:36:49 +0100
 Subject: [PATCH] Fix banding issues
@@ -6,7 +6,8 @@ Subject: [PATCH] Fix banding issues
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 3 +++
- 1 file changed, 3 insertions(+)
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp         | 2 ++
+ 2 files changed, 5 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 index 56bcc6b..bdf9f41 100644
@@ -22,6 +23,19 @@ index 56bcc6b..bdf9f41 100644
    if (pData)
    {
      m_frameSizes.push_back(iSize);
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 5c6ec85..5c90f16 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -81,6 +81,8 @@ void CEGLNativeTypeAmlogic::Initialize()
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
+  }
+ 
++ SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
++
+ }
+ void CEGLNativeTypeAmlogic::Destroy()
+ {
 -- 
 2.7.4
 
