@@ -13,7 +13,5 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 
 	# install all diverts needed by this version of the package:
 	# install_divert PATH_DIV PATH_ORIG
-        systemctl stop hdr.timer >/dev/null 2>&1
-        systemctl stop hdr.service >/dev/null 2>&1
 	install_divert /etc/lvm/lvm.conf.distributed /etc/lvm/lvm.conf
 fi
