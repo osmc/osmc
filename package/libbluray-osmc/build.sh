@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/0.9.3/libbluray-0.9.3.tar.bz2" "$(pwd)/src"
+pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/1.0.1/libbluray-1.0.1.tar.bz2" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libbluray-osmc"
@@ -24,13 +24,12 @@ then
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
         VERSION_NUM=$(echo $VERSION_DEV | awk {'print $2'})
         echo $VERSION_DEV >> files-dev/DEBIAN/control
-	echo "Depends: libfreetype6, libxml2, liblzma5, libpng12-0, libfontconfig1" >> files/DEBIAN/control
         echo "Depends: ${1}-libbluray-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
 	handle_dep "libfreetype6-dev"
 	handle_dep "libxml2-dev"
 	handle_dep "liblzma-dev"
-	handle_dep "libpng12-dev"
+	handle_dep "libpng-dev"
 	handle_dep "libfontconfig1-dev"
 	handle_dep "pkg-config"
 	handle_dep "autoconf"
@@ -40,7 +39,7 @@ then
 	install_patch "../../patches" "all"
 	aclocal
 	autoconf
-	./configure --prefix=/usr/osmc --disable-bdjava --enable-udf --with-freetype --with-fontconfig --with-libxml2 --disable-examples
+	./configure --prefix=/usr/osmc --disable-bdjava-jar --with-freetype --with-fontconfig --with-libxml2 --disable-examples
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi

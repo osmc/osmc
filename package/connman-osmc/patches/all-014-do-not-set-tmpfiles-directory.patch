@@ -1,0 +1,27 @@
+From 3fd8377d4a35ed817746283384f46835a9075172 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 8 Dec 2017 17:26:22 +0000
+Subject: [PATCH] Do not set tmpfiles directory for symlinked resolv config
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 97f1c87..b5221ec 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -70,9 +70,6 @@ if SYSTEMD
+ systemdunitdir = @SYSTEMD_UNITDIR@
+ systemdunit_DATA = src/connman.service src/connman-wait-online.service
+ 
+-tmpfilesdir = @SYSTEMD_TMPFILESDIR@
+-nodist_tmpfiles_DATA = scripts/connman_resolvconf.conf
+-
+ if VPN
+ systemdunit_DATA += vpn/connman-vpn.service
+ endif
+-- 
+2.7.4
+

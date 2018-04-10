@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QDirIterator>
 //#define FACTORYV2
+//#define CUSTOMER_LOGO_BRANDING
 
 BootloaderConfig::BootloaderConfig(Target *device, Network *network, Utils *utils, Logger *logger, PreseedParser *preseed)
 {
@@ -28,6 +29,11 @@ void BootloaderConfig::copyBootFiles()
         system("mv /mnt/boot/boot.efi /tmp/boot.efi");
         system("mv /mnt/boot/System /tmp/System");
     }
+    if (utils->getOSMCDev() == "vero1")
+    {
+        system("mv /mnt/boot/SPL /tmp/SPL");
+        system("mv /mnt/boot/u-boot.img /tmp/u-boot.img");
+    }
     system("mv /mnt/boot/preseed.cfg /tmp/preseed.cfg");
 #ifndef FACTORYV2
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
@@ -40,6 +46,11 @@ void BootloaderConfig::copyBootFiles()
         system("mv /tmp/BootLogo.png /mnt/boot/BootLogo.png");
         system("mv /tmp/boot.efi /mnt/boot/boot.efi");
         system("mv /tmp/System /mnt/boot");
+    }
+    if (utils->getOSMCDev() == "vero1")
+    {
+        system("mv /tmp/SPL /mnt/boot/SPL");
+        system("mv /tmp/u-boot.img mnt/boot/u-boot.img");
     }
     if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
@@ -57,6 +68,14 @@ void BootloaderConfig::copyBootFiles()
             system(ddCmd.toLocal8Bit().data());
         }
         system("dd if=/mnt/root/boot/splash of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        #ifdef CUSTOMER_LOGO_BRANDING
+        if (utils->getOSMCDev() == "vero3") {
+            /* Set custom logo flag */
+            system("/usr/sbin/fw_setenv cuslogo true");
+            /* Upload logo to eMMC */
+            system("dd if=/mnt/root/boot/cuslogo of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
+        }
+        #endif
     }
     if (utils->getOSMCDev() == "vero3")
     {
@@ -129,38 +148,6 @@ void BootloaderConfig::configureEnvironment()
         QStringList configStringList;
         if (utils->getOSMCDev() == "rbp1")
         {
-            QFile cpuinfo("/proc/cpuinfo");
-            int rev = 0x0000;
-            if (cpuinfo.open(QIODevice::ReadOnly))
-            {
-                QTextStream in(&cpuinfo);
-                while (!in.atEnd())
-                {
-                    QString line = in.readLine();
-                    if (line.contains("Revision"))
-                    {
-                        logger->addLine("Found device revision. It is " + line);
-                        line.replace(" ", "");
-                        QStringList lines = line.split(":");
-                        rev = lines[1].toUInt(NULL, 16);
-                        break;
-                    }
-
-                }
-                cpuinfo.close();
-            }
-            logger->addLine("The revision for this device is " + rev);
-            if ((rev >> 23) & 1)
-            {
-                if ((rev >> 4 & 0xFF) != 9)
-                       /* Not a Pi Zero */
-                       configStringList << "arm_freq=850\n" << "core_freq=375\n";
-            }
-            else
-            {
-                /* Not a Pi Zero */
-                configStringList << "arm_freq=850\n" << "core_freq=375\n";
-            }
             configStringList << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
             cmdlineStringList << "osmcdev=rbp1";
         }

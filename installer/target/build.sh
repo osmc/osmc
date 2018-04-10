@@ -23,11 +23,6 @@ parted
 cpio
 python"
 
-if [ "$1" == "appletv" ]
-then
-   packages="hfsprogs $packages"
-fi
-
 if [ "$1" == "vero2" ]
 then
    packages="abootimg u-boot-tools $packages"
@@ -73,7 +68,7 @@ else
 fi
 if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "appletv" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
 date=$(date +%Y%m%d)
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
@@ -85,22 +80,13 @@ then
 	mkfs.vfat -F32 /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt
 fi
-if [ "$1" == "appletv" ]
-then
-	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
-	parted -s OSMC_TGT_${1}_${date}.img mklabel gpt
-	parted -s OSMC_TGT_${1}_${date}.img mkpart primary hfs+ 40s 256M
-	parted -s OSMC_TGT_${1}_${date}.img set 1 atvrecv on
-	kpartx -a OSMC_TGT_${1}_${date}.img
-	/sbin/partprobe
-	mkfs.hfsplus /dev/mapper/loop0p1
-	mount /dev/mapper/loop0p1 /mnt
-fi
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 then
 	echo -e "Installing Pi files"
 	mv zImage /mnt/kernel.img
 	mv INSTALLER/* /mnt
+	mv *.dtb /mnt
+	mv overlays /mnt
 fi
 if [ "$1" == "vero1" ]
 then
@@ -119,21 +105,6 @@ then
 	echo -e "Installing Vero 3 files"
 	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s vero3_2g_16g.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
 	cp vero3_2g_16g.dtb /mnt/dtb.img
-fi
-if [ "$1" == "appletv" ]
-then
-	echo -e "Installing AppleTV files"
-	mv com.apple.Boot.plist /mnt
-	sed -e "s:BOOTFLAGS:console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=atv video=vesafb intel_idle.max_cstate=1 processor.max_cstate=2 nohpet:" -i /mnt/com.apple.Boot.plist
-	mv BootLogo.png /mnt
-	mv boot.efi /mnt
-	mv System /mnt
-	echo -e "Building mach_kernel" # Had to be done after kernel image was built
-	mv bzImage ../build/atv-bootloader-master/vmlinuz
-	pushd ../build/atv-bootloader-master
-	make
-	popd
-	mv ../build/atv-bootloader-master/mach_kernel /mnt
 fi
 echo -e "Installing filesystem"
 mv $(pwd)/../../../filesystem.tar.xz /mnt/

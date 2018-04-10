@@ -36,6 +36,8 @@ if [ "$1" = "configure" ]; then
 	ln -sf /var/run/pulse/.esd_auth /home/osmc/.esd_auth
 
 	systemctl daemon-reload
+	pkill pulseaudio
+
 	systemctl enable pulseaudio.service > /dev/null 2>&1
 	if ischroot; then exit 0; fi
 	systemctl start pulseaudio.service > /dev/null 2>&1

@@ -2,26 +2,29 @@ diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngin
 index cfbb63d..0ae6b1a 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -85,6 +85,18 @@ static unsigned int ALSASampleRateList[] =
+@@ -85,6 +85,21 @@ static unsigned int ALSASampleRateList[] =
    0
  };
  
 +static int CheckNP2(unsigned x)
 +{
++    unsigned orig = x;
 +    --x;
 +    x |= x >> 1;
 +    x |= x >> 2;
 +    x |= x >> 4;
 +    x |= x >> 8;
 +    x |= x >> 16;
-+    return ++x;
++    ++x;
++    if (x == orig) return x;
++    else return x >> 1;
 +}
 +
 +
  CAESinkALSA::CAESinkALSA() :
    m_bufferSize(0),
    m_formatSampleRateMul(0.0),
-@@ -755,12 +767,18 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
+@@ -758,12 +770,18 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
    */
    periodSize  = std::min(periodSize, (snd_pcm_uframes_t) sampleRate / 20);
    bufferSize  = std::min(bufferSize, (snd_pcm_uframes_t) sampleRate / 5);

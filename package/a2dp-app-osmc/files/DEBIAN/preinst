@@ -15,7 +15,10 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 	# install_divert PATH_DIV PATH_ORIG
 
 	systemctl stop pulseaudio.service >/dev/null 2>&1
+	sudo -u osmc systemctl --user stop pulseaudio.service >/dev/null 2>&1
+	sudo -u osmc systemctl --user disable pulseaudio.service >/dev/null 2>&1
 
+	install_divert /etc/pulse/client.conf.distributed /etc/pulse/client.conf
 	install_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
 	install_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
 	install_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf

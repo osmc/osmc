@@ -1,7 +1,7 @@
-From e9af15a51f2549a992bdf1ddb4a1feaa12e6747a Mon Sep 17 00:00:00 2001
+From 1703a19f6145da438812bb83bf46d16e3a9f61dd Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sat, 29 Apr 2017 13:46:04 +0100
-Subject: [PATCH] Add Xbox Remote driver
+Date: Sat, 10 Mar 2018 17:34:37 +0000
+Subject: [PATCH] Add support for XBOX original remote
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -12,12 +12,12 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  create mode 100644 drivers/staging/media/lirc/lirc_xbox.c
 
 diff --git a/drivers/staging/media/lirc/Kconfig b/drivers/staging/media/lirc/Kconfig
-index 6879c46..551361d 100644
+index 2224542..7f3f034 100644
 --- a/drivers/staging/media/lirc/Kconfig
 +++ b/drivers/staging/media/lirc/Kconfig
-@@ -57,10 +57,17 @@ config LIRC_SIR
+@@ -18,10 +18,17 @@ config LIRC_RPI
  	help
- 	  Driver for the SIR IrDA port
+ 	  Driver for Homebrew GPIO Port Receiver/Transmitter for the RaspberryPi
  
 +config LIRC_XBOX
 +	tristate "XBOX USB IR Remote"
@@ -34,17 +34,17 @@ index 6879c46..551361d 100644
 +
  endif
 diff --git a/drivers/staging/media/lirc/Makefile b/drivers/staging/media/lirc/Makefile
-index 5430adf..0f3292c 100644
+index 9bb9f14..ab2d400 100644
 --- a/drivers/staging/media/lirc/Makefile
 +++ b/drivers/staging/media/lirc/Makefile
-@@ -10,3 +10,4 @@ obj-$(CONFIG_LIRC_SASEM)	+= lirc_sasem.o
- obj-$(CONFIG_LIRC_SERIAL)	+= lirc_serial.o
- obj-$(CONFIG_LIRC_SIR)		+= lirc_sir.o
+@@ -5,3 +5,4 @@
+ 
+ obj-$(CONFIG_LIRC_RPI)		+= lirc_rpi.o
  obj-$(CONFIG_LIRC_ZILOG)	+= lirc_zilog.o
 +obj-$(CONFIG_LIRC_XBOX)         += lirc_xbox.o
 diff --git a/drivers/staging/media/lirc/lirc_xbox.c b/drivers/staging/media/lirc/lirc_xbox.c
 new file mode 100644
-index 0000000..c269d5d
+index 0000000..fd53f67
 --- /dev/null
 +++ b/drivers/staging/media/lirc/lirc_xbox.c
 @@ -0,0 +1,995 @@
@@ -798,9 +798,9 @@ index 0000000..c269d5d
 +	driver->minor = -1;
 +	driver->code_length = dclen * 8;
 +	driver->features = LIRC_CAN_REC_LIRCCODE;
-+	driver->data = ir;
 +	driver->set_use_inc = &set_use_inc;
 +	driver->set_use_dec = &set_use_dec;
++	driver->data = ir;
 +	driver->dev = &intf->dev;
 +	driver->owner = THIS_MODULE;
 +	ir->usbdev = dev;

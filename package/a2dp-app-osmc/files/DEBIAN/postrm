@@ -27,6 +27,7 @@ if [ "$1" = "remove" ]; then
 	# remove all diverts that this version _and_ all prior versions of the package once added:
 	# remove_divert PATH_DIV PATH_ORIG
 
+	remove_divert /etc/pulse/client.conf.distributed /etc/pulse/client.conf
 	remove_divert /etc/pulse/daemon.conf.distributed /etc/pulse/daemon.conf
 	remove_divert /etc/pulse/system.pa.distributed /etc/pulse/system.pa
 	remove_divert /etc/bluetooth/main.conf.distributed /etc/bluetooth/main.conf

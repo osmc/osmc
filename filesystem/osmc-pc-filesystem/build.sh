@@ -20,7 +20,7 @@ verify_action
 # Configure the target directory
 ARCH="amd64"
 DIR="$filestub/"
-RLS="jessie"
+RLS="stretch"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
@@ -84,6 +84,9 @@ conf_tty ${DIR}
 verify_action
 echo -e "	* Configuring BusyBox symlinks"
 setup_busybox_links ${DIR}
+verify_action
+echo -e "       * Configuring rc.local"
+create_rc_local ${DIR}
 verify_action
 
 # Perform filesystem cleanup

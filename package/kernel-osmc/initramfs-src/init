@@ -14,6 +14,10 @@ install_symlinks()
 busybox_shell()
 {
 	install_symlinks
+        if [ ! -z $OPTION_SERIAL_PORT ]
+        then
+                /bin/busybox getty -n -L $OPTION_SERIAL_PORT 115200 vt100 &
+        fi
 	/bin/busybox setsid /bin/busybox sh -c 'exec /bin/busybox sh </dev/tty1 >/dev/tty1 2>&1'
 }
 
@@ -187,7 +191,7 @@ then
 		if [ "$(( $fsck_result & 12 ))" -gt 0 ]
 		then
 			# Something is wrong that we can't fix. Warn the user but let them attempt to boot anyway in case some data can be backed up.
-			echo -e "WARNING: OSMC cannot repair the filesystem and serious corruption may still exit. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds.\n\n\n\n"
+			echo -e "WARNING: OSMC cannot repair the filesystem and serious corruption may still exist. We recommend backing up any critical data and performing a fresh install of OSMC. Attempting to resume startup in 30 seconds.\n\n\n\n"
 			/bin/busybox sleep 30
 		else
 			if [ "$fsck_result" -eq 0 ]

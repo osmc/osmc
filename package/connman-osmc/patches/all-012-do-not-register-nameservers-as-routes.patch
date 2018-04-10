@@ -1,0 +1,26 @@
+From b54f81502f78a9bf03cd533847a0701e5b4f5586 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 Nov 2017 17:31:34 +0000
+Subject: [PATCH] Do not establish nameservers as routes. This can cause DNS
+ leaks when using a VPN service that ConnMan is not aware of.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/service.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/service.c b/src/service.c
+index 2289d54..3b37c73 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -1266,6 +1266,7 @@ void __connman_service_nameserver_clear(struct connman_service *service)
+ static void add_nameserver_route(int family, int index, char *nameserver,
+ 				const char *gw)
+ {
++	return;
+ 	switch (family) {
+ 	case AF_INET:
+ 		if (connman_inet_compare_subnet(index, nameserver))
+-- 
+2.7.4
+

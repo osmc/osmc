@@ -54,6 +54,12 @@ SETS =  {
                                                 'ltyp': 'file_log',
                                                 'actn': '/proc/cmdline',
                                             },
+                                            {
+                                                'name': 'Debian version',
+                                                'key' : 'm4ls932a',
+                                                'ltyp': 'file_log',
+                                                'actn': '/etc/debian_version',
+                                            },
                                           ],
                                 },
 
@@ -72,6 +78,23 @@ SETS =  {
                                             },
                                           ],
                                 },
+
+	'guisettings'	    : { 'order' : 2.5,
+                                'active': False,
+                                'help'  : 'guisettings.xml',
+                                'dest'  : 'guisettings',
+                                'action': 'store_true',
+                                'flags' : ['-g','--guiset'],
+				'logs'  : [
+					    {
+                                                'name': 'guisettings.xml',
+                                                'key' : 'zm2LhjK1',
+                                                'ltyp': 'file_log', 
+                                                'actn': USERDATA + 'guisettings.xml',
+                                             },
+                                          ],
+
+                              },
 
         'advancedsettings'  : { 'order' : 3,
                                 'active': False,

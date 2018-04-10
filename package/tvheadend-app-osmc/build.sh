@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="v4.2.4"
+VERSION="v4.2.6"
 pull_source "https://github.com/tvheadend/tvheadend/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -18,10 +18,10 @@ then
 	rm -f files/etc/osmc/apps.d/*tvheadend-app-osmc
 	update_sources
 	handle_dep "pkg-config"
-	handle_dep "libssl-dev"
+	handle_dep "libssl1.0-dev"
 	handle_dep "libavahi-client-dev"
 	handle_dep "libcurl3"
-	handle_dep "libcurl4-gnutls-dev"
+	handle_dep "libcurl4-openssl-dev"
 	handle_dep "ca-certificates"
 	handle_dep "zlib1g-dev"
 	handle_dep "liburiparser-dev"
@@ -31,7 +31,7 @@ then
 	handle_dep "libdvbv5-0"
 	handle_dep "bzip2"
 	handle_dep "gzip"
-	handle_dep "libsystemd-daemon-dev"
+	handle_dep "libsystemd-dev"
 	handle_dep "liburiparser-dev"
 	handle_dep "gettext"
 	handle_dep "wget"

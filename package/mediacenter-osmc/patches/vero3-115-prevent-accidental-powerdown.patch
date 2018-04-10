@@ -1,0 +1,26 @@
+From 2228bc74548bea6985a1e07d9d618ad01b5efb93 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 17 Jan 2018 02:11:57 +0000
+Subject: [PATCH] Prevent accidental powerdown of Vero 4K
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/keymaps/remote.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/keymaps/remote.xml b/system/keymaps/remote.xml
+index 88b06b7..58427cc 100644
+--- a/system/keymaps/remote.xml
++++ b/system/keymaps/remote.xml
+@@ -50,7 +50,7 @@
+       <volumeplus>VolumeUp</volumeplus>
+       <volumeminus>VolumeDown</volumeminus>
+       <mute>Mute</mute>
+-      <power>ShutDown()</power>
++      <power>noop</power>
+       <myvideo>ActivateWindow(Videos)</myvideo>
+       <mymusic>ActivateWindow(Music)</mymusic>
+       <mypictures>ActivateWindow(Pictures)</mypictures>
+-- 
+2.7.4
+

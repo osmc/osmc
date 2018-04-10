@@ -1,0 +1,78 @@
+From b08d551752311fff05a6c1695407c3105457afbe Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 6 Feb 2018 11:49:53 +0000
+Subject: [PATCH] Add support to mix LFE in to stereo channels
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ addons/resource.language.en_gb/resources/strings.po          | 12 ++++++++++++
+ system/settings/settings.xml                                 | 12 ++++++++++++
+ .../AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp  |  6 ++++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index fb0b04d..f016f6f 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -18482,6 +18482,18 @@ msgstr ""
+ 
+ #empty strings from id 36443 to 36459
+ 
++msgctxt "#36457"
++msgid "Include LFE in stereo downmix"
++msgstr ""
++
++msgctxt "#36458"
++msgid "Include low frequency effects channel in stereo downmix. 100% - Full LFE volume. 10% to 90% - reduced LFE volume. 0% - LFE excluded from stereo downmix. Note: To avoid damaging your speakers only enable LFE downmix if your speakers can handle very low bass frequencies."
++msgstr ""
++
++msgctxt "#36459"
++msgid "%i %%"
++msgstr ""
++
+ #. Description of settings with label #14112 "Enable event logging"
+ #: system/settings/settings.xml
+ msgctxt "#36460"
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 4186174..cef03fd 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2406,6 +2406,18 @@
+             <formatlabel>38009</formatlabel>
+           </control>
+         </setting>
++        <setting id="audiooutput.mixlfe" type="integer" label="36457" help="36458">
++          <level>2</level>
++          <default>0</default>
++          <constraints>
++            <minimum>0</minimum>
++            <step>10</step>
++            <maximum>100</maximum>
++          </constraints>
++          <control type="spinner" format="string">
++            <formatlabel>36459</formatlabel>
++          </control>
++        </setting>
+         <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
+           <requirement>HAS_AE_QUALITY_LEVELS</requirement>
+           <level>2</level>
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+index d7165de..fb87a3c 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+@@ -75,6 +75,12 @@ bool CActiveAEResampleFFMPEG::Init(uint64_t dst_chan_layout, int dst_channels, i
+     return false;
+   }
+ 
++  double mix_lfe = (float) CSettings::GetInstance().GetInt("audiooutput.mixlfe") / (float) 100;
++  if (mix_lfe)
++  {
++    av_opt_set_double(m_pContext, "lfe_mix_level", mix_lfe, 0);
++  }
++
+   if(quality == AE_QUALITY_HIGH)
+   {
+     av_opt_set_double(m_pContext, "cutoff", 1.0, 0);
+-- 
+2.7.4
+

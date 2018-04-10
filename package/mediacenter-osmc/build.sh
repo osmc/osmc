@@ -56,14 +56,14 @@ then
 	handle_dep "libmad0-dev"
 	handle_dep "libmicrohttpd-dev"
 	handle_dep "libmodplug-dev"
-	handle_dep "libmysqlclient-dev"
+	handle_dep "libmariadbclient-dev-compat"
 	handle_dep "libpcre3-dev"
 	handle_dep "libplist-dev"
-	handle_dep "libpng12-dev"
+	handle_dep "libpng-dev"
 	handle_dep "libsmbclient-dev"
 	handle_dep "libssh-dev"
 	handle_dep "libavahi-client-dev"
-	handle_dep "libssl-dev"
+	handle_dep "libssl1.0-dev"
 	handle_dep "libtinyxml-dev"
 	handle_dep "libtool"
 	handle_dep "libudev-dev"
@@ -89,6 +89,8 @@ then
 	handle_dep "libgnutls28-dev"
 	handle_dep "git"
 	handle_dep "uuid-dev"
+	handle_dep "libcrossguid-dev"
+	handle_dep "cmake"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
@@ -106,8 +108,6 @@ then
 		handle_dep "armv6l-libplatform-dev-osmc"
 		handle_dep "armv6l-libbluray-dev-osmc"
 		handle_dep "armv6l-libsqlite-dev-osmc"
-		handle_dep "armv6l-libcrossguid-dev-osmc"
-		handle_dep "armv6l-cmake-osmc"
 		handle_dep "armv6l-libass-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
@@ -119,8 +119,6 @@ then
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-libcrossguid-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "vero" ]
@@ -132,8 +130,6 @@ then
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-libcrossguid-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
 	fi
         if [ "$1" == "vero2" ]
@@ -147,8 +143,6 @@ then
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-libcrossguid-dev-osmc"
-		handle_dep "armv7-cmake-osmc"
 		handle_dep "armv7-libass-dev-osmc"
         fi
 	if [ "$1" == "vero3" ]
@@ -162,8 +156,6 @@ then
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-                handle_dep "armv7-libcrossguid-dev-osmc"
-                handle_dep "armv7-cmake-osmc"
                 handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "atv" ] # later we change this to if_x11..
@@ -178,10 +170,8 @@ then
 		handle_dep "i386-libcrystalhd-dev-osmc"
 		handle_dep "xserver-xorg-dev"
 		handle_dep "libxrandr-dev"
-		handle_dep "i386-libcrossguid-dev-osmc"
 		handle_dep "libegl1-mesa-dev"
 		handle_dep "libglew-dev"
-		handle_dep "i386-cmake-osmc"
 		handle_dep "i386-libass-dev-osmc"
 	fi
 	if [ "$1" == "pc" ]
@@ -195,10 +185,8 @@ then
 		handle_dep "xserver-xorg-dev"
 		handle_dep "libxrandr-dev"
 		handle_dep "x11proto-randr-dev"
-		handle_dep "amd64-libcrossguid-dev-osmc"
 		handle_dep "libegl1-mesa-dev"
 		handle_dep "libglew-dev"
-		handle_dep "amd64-cmake-osmc"
 		handle_dep "amd64-libass-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
@@ -385,31 +373,33 @@ then
 	mkdir build
 	cd build
         ADDONS_ADSP="adsp.basic adsp.biquad.filters adsp.freesurround" # These are all broken
-        ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.sidplay audiodecoder.snesapu"
+        #ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.sidplay audiodecoder.snesapu"
+	ADDONS_AUDIO_DECODERS="audiodecoder.modplug audiodecoder.nosefart audiodecoder.snesapu"
         ADDONS_AUDIO_ENCODERS="audioencoder.flac audioencoder.lame audioencoder.vorbis audioencoder.wav"
         ADDONS_INPUTSTREAM="inputstream.mpd inputstream.adaptive inputstream.rtmp"
         ADDONS_PERIPHERAL="peripheral.joystick"
         ADDONS_PVR="pvr.argustv pvr.demo pvr.dvblink pvr.dvbviewer pvr.filmon pvr.hdhomerun pvr.hts pvr.iptvsimple pvr.mediaportal.tvserver pvr.mythtv pvr.nextpvr pvr.njoy pvr.pctv pvr.stalker pvr.vbox pvr.vdr.vnsi pvr.vuplus pvr.wmc"
         ADDONS_SCREENSAVERS="screensaver.asteroids screensaver.biogenesis screensaver.greynetic screensaver.matrixtrails screensaver.pingpong screensaver.pyro screensavers.rsxs screensaver.stars screensaver.shadertoy"
         ADDONS_VISUALIZATIONS="visualization.fishbmc visualization.goom visualization.projectm visualization.shadertoy visualization.spectrum visualization.vsxu visualization.waveform"
+	#ADDONS_GLES_EXCL="screensaver.shadertoy"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
-	    ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
+	    ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_GLES_EXCL}"
 	    PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vc/include:/opt/vc/include/interface:/opt/vc/include/interface/vcos/pthreads:/opt/vc/include/interface/vmcs_host/linux -DCMAKE_LIBRARY_PATH=/opt/vc/lib"
 	fi
 	if [ "$1" == "vero" ]
 	then
-           ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
+           ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_GLES_EXCL}"
            PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero/include -DCMAKE_LIBRARY_PATH=/opt/vero/lib"
 	fi
 	if [ "$1" == "vero2" ]
 	then
-	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
+	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_GLES_EXCL}"
 	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero2/include -DCMAKE_LIBRARY_PATH=/opt/vero2/lib"
 	fi
 	if [ "$1" == "vero3" ]
 	then
-	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
+	   ADDONS_TO_BUILD="${ADDONS_AUDIO_DECODERS} ${ADDONS_AUDIO_ENCODERS} ${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR} ${ADDONS_GLES_EXCL}"
 	   PLATFORM="-DCMAKE_INCLUDE_PATH=/opt/vero3/include -DCMAKE_LIBRARY_PATH=/opt/vero3/lib"
 	fi
 	if [ "$1" == "atv" ]
@@ -455,14 +445,14 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2, libmad0, libmicrohttpd10, libyajl2, libmysqlclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng12-0, libsamplerate0, libtag1-vanilla, libfribidi0, libgif4, libcdio13, libpcrecpp0, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.0.0, libplist2, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc"
-	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, i386-libcec-osmc, i386-libnfs-osmc, i386-librtmp-osmc, i386-libshairplay-osmc, i386-libbluray-osmc, i386-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, i386-libcrystalhd-osmc, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-nvidia-legacy-304xx, nvidia-xconfig, i386-libcrossguid-osmc, i386-libass-osmc" >> files/DEBIAN/control
-	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, amd64-libnfs-osmc, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, amd64-libcrossguid-osmc, xserver-xorg-video-intel, amd64-libass-osmc" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, armv6l-libbluray-osmc, armv6l-libsqlite-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-libcrossguid-osmc, armv6l-libass-osmc" >> files/DEBIAN/control
-	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero2 && echo "Depends: ${COMMON_DEPENDS}, vero2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero2-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, vero2-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, armv7-libcrossguid-osmc, vero3-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadbclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio13, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.0.2, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin"
+	test "$1" == atv && echo "Depends: ${COMMON_DEPENDS}, i386-libcec-osmc, i386-libnfs-osmc, i386-librtmp-osmc, i386-libshairplay-osmc, i386-libbluray-osmc, i386-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, i386-libcrystalhd-osmc, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-nvidia-legacy-304xx, nvidia-xconfig, i386-libass-osmc" >> files/DEBIAN/control
+	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, amd64-libnfs-osmc, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-intel, amd64-libass-osmc" >> files/DEBIAN/control
+	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, armv6l-libbluray-osmc, armv6l-libsqlite-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-libass-osmc" >> files/DEBIAN/control
+	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libass-osmc" >> files/DEBIAN/control
+	test "$1" == vero && echo "Depends: ${COMMON_DEPENDS}, vero-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero-userland-osmc, armv7-splash-osmc, armv7-libass-osmc" >> files/DEBIAN/control
+	test "$1" == vero2 && echo "Depends: ${COMMON_DEPENDS}, vero2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero2-userland-osmc, armv7-splash-osmc, vero2-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
+	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, vero3-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter

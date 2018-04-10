@@ -1,0 +1,25 @@
+From d463b1dfc7c15468a2c34996c9d39ae290c676cd Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Fri, 10 Nov 2017 07:15:26 +0100
+Subject: [PATCH] Pictures: fix video in slideshow
+
+---
+ xbmc/pictures/GUIWindowSlideShow.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/pictures/GUIWindowSlideShow.cpp b/xbmc/pictures/GUIWindowSlideShow.cpp
+index 6d0a0157742c..fadeead34d90 100644
+--- a/xbmc/pictures/GUIWindowSlideShow.cpp
++++ b/xbmc/pictures/GUIWindowSlideShow.cpp
+@@ -622,6 +622,11 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
+     g_infoManager.SetCurrentSlide(*m_slides.at(m_iCurrentSlide));
+ 
+   RenderPause();
++  if (m_slides.at(m_iCurrentSlide)->IsVideo() &&
++      g_application.m_pPlayer->IsRenderingGuiLayer())
++  {
++    MarkDirtyRegion();
++  }
+   CGUIWindow::Process(currentTime, regions);
+   m_renderRegion.SetRect(0, 0, (float)g_graphicsContext.GetWidth(), (float)g_graphicsContext.GetHeight());
+ }

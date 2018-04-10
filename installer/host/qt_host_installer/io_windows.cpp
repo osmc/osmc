@@ -11,6 +11,7 @@
 #include <QStringList>
 #include "diskdevice.h"
 #include "writeimageworker.h"
+#include <QSettings>
 
 namespace io
 {
@@ -64,6 +65,9 @@ namespace io
 
    bool writeImage(QString devicePath, QString deviceImage, QObject* caller) /* We are really passing deviceID on Windows, but call it devicePath still */
    {
+       utils::writeLog("Workaround Windows 10 card protection");
+       QSettings settingStorageDevicePolicy;
+       settingStorageDevicePolicy.setValue("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\StorageDevicePolicies\WriteProtect", 0);
        utils::writeLog("Writing 512 bytes to erase MBR");
        QProcess process;
        process.start(QDir::temp().filePath("usbitcmd.exe"), QStringList() << "r" << devicePath << QDir::temp().filePath("bs.img") << "/d", QIODevice::ReadOnly | QIODevice::Text);

@@ -1,0 +1,29 @@
+From 0cf36fee372f4a56fa6270a60956d463ebb29935 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 5 Dec 2017 18:25:42 +0000
+Subject: [PATCH] Don't include manual pages
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ Makefile.am | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e67a7a5..27e813f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -430,11 +430,6 @@ EXTRA_DIST += src/main.conf \
+ 		src/eduroam.config \
+ 		scripts/connman_resolvconf.conf.in
+ 
+-MANUAL_PAGES += doc/connmanctl.1 doc/connman.conf.5 \
+-		doc/connman-service.config.5 doc/connman-vpn.conf.5 \
+-		doc/connman-vpn-provider.config.5 \
+-		doc/connman.8 doc/connman-vpn.8
+-
+ nodist_man_MANS = $(MANUAL_PAGES)
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+-- 
+2.7.4
+

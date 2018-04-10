@@ -31,18 +31,18 @@ then
 	handle_dep "wget" # Hack for poor man's pull_source
 	handle_dep "ca-certificates" # kernel.org redirects to HTTPS
 	# Use wget to get resources, as pull_source not compatible in chroot. Do not use in production
-	wget "http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2"
+	wget "https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2"
 	if [ $? != 0 ]; then echo "Could not get busybox sources" && exit 1; fi
 	mkdir -p $(pwd)/busybox
 	tar -xvf busybox-${BUSYBOX_VERSION}.tar.bz2 -C "$(pwd)/busybox"
-	wget "http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz"
+	wget "https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz"
 	if [ $? != 0 ]; then echo "Could not get e2fsprogs sources" && exit 1; fi
 	mkdir -p $(pwd)/e2fsprogs
 	tar -xvf e2fsprogs-${E2FSPROGS_VERSION}.tar.gz -C "$(pwd)/e2fsprogs"
 	if [ "$2" == "vero2" ] || [ "$2" == "vero364" ]
 	then
             # LVM support
-	    wget "ftp://sources.redhat.com/pub/lvm2/LVM2.${LVM_VERSION}.tgz"
+	    wget "https://mirrors.kernel.org/sourceware/lvm2/LVM2.${LVM_VERSION}.tgz"
 	    if [ $? != 0 ]; then echo "Could not get LVM sources" && exit 1; fi
 	    mkdir -p $(pwd)/lvm2
 	    tar -xzvf LVM2.${LVM_VERSION}.tgz -C "$(pwd)/lvm2"
@@ -70,7 +70,7 @@ then
         ## configure too old for arm64
         patch -p1 < ../../vero3-add-arm64-support.patch
     fi
-    ./configure --prefix=/usr
+    ./configure --prefix=/usr --disable-selinux
     $BUILD
     mkdir out
     $BUILD DESTDIR=$(pwd)/out install

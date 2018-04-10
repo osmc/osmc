@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="8e4e16f058ec053f9008c08eacbcad0ae1431737"
+REV="ab5055497d37deaebc3474f5981ba59676389a7e"
 pull_source "https://github.com/osmc/ply-lite/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -19,9 +19,9 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
         sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-splash-osmc" >> files/DEBIAN/control
-	echo "Depends: fbset, libpng12-0" >> files/DEBIAN/control
+	echo "Depends: fbset, libpng16-16" >> files/DEBIAN/control
 	update_sources
-	handle_dep "libpng12-dev"
+	handle_dep "libpng-dev"
 	pushd src/ply-lite*
 	$BUILD
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi

@@ -5,7 +5,9 @@
 
 . ../common.sh
 # Build in native environment
-pull_source "https://github.com/bavison/arm-mem/archive/master.zip" "$(pwd)/src"
+if [ $1 == "rbp1" ]; then REV="cd2c8f9202137c79f7afb77ecb87e713a0800d3c"; fi
+if [ $1 == "rbp2" ]; then REV="4418bb4f751f6bb5f5298b2a08c543b512dc724f"; fi
+pull_source "https://github.com/bavison/arm-mem/archive/${REV}.zip" "$(pwd)/src"
 build_in_env "${1}" $(pwd) "rbp-armmem-osmc"
 build_return=$?
 if [ $build_return == 99 ]
