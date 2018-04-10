@@ -115,6 +115,9 @@ function create_rc_local()
 
 exit 0
 EOF
+
+chmod +x ${1}/etc/rc.local
+
 }
 
 export -f setup_osmc_user
