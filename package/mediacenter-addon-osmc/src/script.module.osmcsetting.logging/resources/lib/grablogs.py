@@ -687,6 +687,7 @@ class Main(object):
 
             self.dispatch_logs()
 
+        os.popen('sudo rm %s' % TEMP_LOG_FILE)
 
     def add_content_index(self):
         ''' Adds the quick look-up references to the start of the log file '''
