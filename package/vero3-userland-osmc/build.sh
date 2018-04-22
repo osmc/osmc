@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-REV="a890ad9f4e540225eaae2a392b2ec35e3f395197"
+REV="33dec60dcfb04e8f003247f46ad6f853a762a290"
 
 echo -e "Building package vero3-userland"
 out=$(pwd)/files
