@@ -1,4 +1,4 @@
-From e0d62d55012ff2b13cf6b2a2d194a29229984493 Mon Sep 17 00:00:00 2001
+From 00a9768ee1ba3b096cb20c17f0dbdf7871d8f748 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
@@ -12,7 +12,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  4 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6925404..a7aa59c 100644
+index 5fdda85..3974f26 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -23,7 +23,7 @@ index 6925404..a7aa59c 100644
  #endif
  
  #include "cores/FFmpeg.h"
-@@ -4026,6 +4027,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -4025,6 +4026,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -33,7 +33,7 @@ index 6925404..a7aa59c 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4130,6 +4134,35 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4129,6 +4133,35 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -45,6 +45,7 @@ index 6925404..a7aa59c 100644
 +      g_application.StopPlaying();
 +  ToggleStandby();
 +  m_bScreenSave = true;
++  m_screenSaver.reset();
 +  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
 +  g_windowManager.CloseDialogs(true);
 +}
@@ -62,7 +63,6 @@ index 6925404..a7aa59c 100644
 +        cpu_governor = "ondemand";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- governor will now be %s", cpu_governor.c_str());
 +  m_bVeroStandby = ! m_bVeroStandby; //invert state
-+  m_screenSaver.reset();
 +  return;
 +}
 +
