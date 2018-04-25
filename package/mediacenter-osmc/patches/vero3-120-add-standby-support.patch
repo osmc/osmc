@@ -1,18 +1,18 @@
-From 00a9768ee1ba3b096cb20c17f0dbdf7871d8f748 Mon Sep 17 00:00:00 2001
+From 5f3f3a08b61d8bcb80611f0de160b558c943557b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 33 +++++++++++++++++++++++++++++++++
+ xbmc/Application.cpp                  | 38 +++++++++++++++++++++++++++++++++++
  xbmc/Application.h                    |  5 +++++
  xbmc/network/Network.cpp              |  5 +++++
  xbmc/powermanagement/PowerManager.cpp |  4 +++-
- 4 files changed, 46 insertions(+), 1 deletion(-)
+ 4 files changed, 51 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 5fdda85..3974f26 100644
+index 6925404..0a902bb 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -23,7 +23,7 @@ index 5fdda85..3974f26 100644
  #endif
  
  #include "cores/FFmpeg.h"
-@@ -4025,6 +4026,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -4026,6 +4027,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -33,7 +33,7 @@ index 5fdda85..3974f26 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4129,6 +4133,35 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4130,6 +4134,40 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -62,6 +62,11 @@ index 5fdda85..3974f26 100644
 +  if (m_bVeroStandby)
 +        cpu_governor = "ondemand";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- governor will now be %s", cpu_governor.c_str());
++  for (int i = 0; i < 4; i++) {
++	std::stringstream ss_govpath;
++	ss_govpath << "/sys/devices/system/cpu/cpu" << i << "/cpufreq/scaling_governor";
++	SysfsUtils::SetString(ss_govpath.str(), cpu_governor);
++  }
 +  m_bVeroStandby = ! m_bVeroStandby; //invert state
 +  return;
 +}
