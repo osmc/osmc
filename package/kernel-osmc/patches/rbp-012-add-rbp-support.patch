@@ -859,10 +859,10 @@ index 0000000..d0299e3
 +};
 diff --git a/arch/arm/boot/dts/bcm2708-rpi.dtsi b/arch/arm/boot/dts/bcm2708-rpi.dtsi
 new file mode 100644
-index 0000000..d105d4e
+index 0000000..fe2694a
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm2708-rpi.dtsi
-@@ -0,0 +1,161 @@
+@@ -0,0 +1,162 @@
 +/* Downstream version of bcm2835-rpi.dtsi */
 +
 +#include <dt-bindings/power/raspberrypi-power.h>
@@ -980,6 +980,7 @@ index 0000000..d105d4e
 +		sd_force_pio = <&sdhost>,"brcm,force-pio?";
 +		sd_pio_limit = <&sdhost>,"brcm,pio-limit:0";
 +		sd_debug     = <&sdhost>,"brcm,debug";
++		sdio_overclock = <&mmc>,"brcm,overclock-50:0";
 +		axiperf      = <&axiperf>,"status";
 +	};
 +};
@@ -1983,10 +1984,10 @@ index 0000000..154d48b
 +};
 diff --git a/arch/arm/boot/dts/overlays/Makefile b/arch/arm/boot/dts/overlays/Makefile
 new file mode 100644
-index 0000000..dcc64b5
+index 0000000..18cb057
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/Makefile
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,142 @@
 +# Overlays for the Raspberry Pi platform
 +
 +dtbo-$(CONFIG_ARCH_BCM2835) += \
@@ -1998,6 +1999,7 @@ index 0000000..dcc64b5
 +	akkordion-iqdacplus.dtbo \
 +	allo-boss-dac-pcm512x-audio.dtbo \
 +	allo-digione.dtbo \
++	allo-katana-dac-audio.dtbo \
 +	allo-piano-dac-pcm512x-audio.dtbo \
 +	allo-piano-dac-plus-pcm512x-audio.dtbo \
 +	applepi-dac.dtbo \
@@ -2044,6 +2046,7 @@ index 0000000..dcc64b5
 +	iqaudio-dac.dtbo \
 +	iqaudio-dacplus.dtbo \
 +	iqaudio-digi-wm8804-audio.dtbo \
++	jedec-spi-nor.dtbo \
 +	justboom-dac.dtbo \
 +	justboom-digi.dtbo \
 +	lirc-rpi.dtbo \
@@ -2129,10 +2132,10 @@ index 0000000..dcc64b5
 +clean-files	:= *.dtbo
 diff --git a/arch/arm/boot/dts/overlays/README b/arch/arm/boot/dts/overlays/README
 new file mode 100644
-index 0000000..dd2575c
+index 0000000..e00c7e1
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/README
-@@ -0,0 +1,1871 @@
+@@ -0,0 +1,1900 @@
 +Introduction
 +============
 +
@@ -2273,6 +2276,9 @@ index 0000000..dd2575c
 +                                SD card (default 1)
 +
 +        sd_debug                Enable debug output from SD driver (default off)
++
++        sdio_overclock          Clock (in MHz) to use when the MMC framework
++                                requests 50MHz for the SDIO/WiFi interface.
 +
 +        tx_lpi_timer            Set the delay in microseconds between going idle
 +                                and entering the low power state (default 600).
@@ -2446,6 +2452,12 @@ index 0000000..dd2575c
 +Name:   allo-digione
 +Info:   Configures the Allo Digione audio card
 +Load:   dtoverlay=allo-digione
++Params: <None>
++
++
++Name:   allo-katana-dac-audio
++Info:   Configures the Allo Katana DAC audio card
++Load:   dtoverlay=allo-katana-dac-audio
 +Params: <None>
 +
 +
@@ -2956,8 +2968,8 @@ index 0000000..dd2575c
 +Info:   Adds support for a number of I2C barometric pressure and temperature
 +        sensors on i2c_arm
 +Load:   dtoverlay=i2c-sensor,<param>=<val>
-+Params: addr                    Set the address for the BME280, BMP280, TMP102,
-+                                HDC100X, LM75 or SHT3x
++Params: addr                    Set the address for the BME280, BMP280, DS1621,
++                                HDC100X, LM75, SHT3x or TMP102
 +
 +        bme280                  Select the Bosch Sensortronic BME280
 +                                Valid addresses 0x76-0x77, default 0x76
@@ -2969,6 +2981,9 @@ index 0000000..dd2575c
 +        bmp280                  Select the Bosch Sensortronic BMP280
 +                                Valid addresses 0x76-0x77, default 0x76
 +
++        ds1621                  Select the Dallas Semiconductors DS1621 temp
++                                sensor. Valid addresses 0x48-0x4f, default 0x48
++
 +        hdc100x                 Select the Texas Instruments HDC100x temp sensor
 +                                Valid addresses 0x40-0x43, default 0x40
 +
@@ -2978,6 +2993,10 @@ index 0000000..dd2575c
 +                                Valid addresses 0x48-0x4f, default 0x4f
 +
 +        lm75addr                Deprecated - use addr parameter instead
++
++        sht3x                   Select the Sensiron SHT3x temperature and
++                                humidity sensor. Valid addresses 0x44-0x45,
++                                default 0x44
 +
 +        si7020                  Select the Silicon Labs Si7013/20/21 humidity/
 +                                temperature sensor
@@ -2991,14 +3010,11 @@ index 0000000..dd2575c
 +        veml6070                Select the Vishay VEML6070 ultraviolet light
 +                                sensor
 +
-+        sht3x                   Select the Sensiron SHT3x temperature and
-+                                humidity sensor. Valid addresses 0x44-0x45,
-+                                default 0x44
-+
 +
 +Name:   i2c0-bcm2708
-+Info:   Enable the i2c_bcm2708 driver for the i2c0 bus. Not all pin combinations
-+        are usable on all platforms.
++Info:   Change i2c0 pin usage. Not all pin combinations are usable on all
++        platforms - platforms other then Compute Modules can only use this
++        to disable transaction combining.
 +Load:   dtoverlay=i2c0-bcm2708,<param>=<val>
 +Params: sda0_pin                GPIO pin for SDA0 (deprecated - use pins_*)
 +        scl0_pin                GPIO pin for SCL0 (deprecated - use pins_*)
@@ -3006,15 +3022,22 @@ index 0000000..dd2575c
 +        pins_28_29              Use pins 28 and 29
 +        pins_44_45              Use pins 44 and 45
 +        pins_46_47              Use pins 46 and 47
++        combine                 Allow transactions to be combined (default
++                                "yes")
 +
 +
 +Name:   i2c1-bcm2708
++Info:   Change i2c1 pin usage. Not all pin combinations are usable on all
++        platforms - platforms other then Compute Modules can only use this
++        to disable transaction combining.
 +Info:   Enable the i2c_bcm2708 driver for the i2c1 bus
 +Load:   dtoverlay=i2c1-bcm2708,<param>=<val>
 +Params: sda1_pin                GPIO pin for SDA1 (2 or 44 - default 2)
 +        scl1_pin                GPIO pin for SCL1 (3 or 45 - default 3)
 +        pin_func                Alternative pin function (4 (alt0), 6 (alt2) -
 +                                default 4)
++        combine                 Allow transactions to be combined (default
++                                "yes")
 +
 +
 +Name:   i2s-gpio28-31
@@ -3072,6 +3095,15 @@ index 0000000..dd2575c
 +        dai_name                Override the default, "IQAudIO Digi", dai name.
 +        dai_stream_name         Override the default, "IQAudIO Digi HiFi",
 +                                dai stream name.
++
++
++Name:   jedec-spi-nor
++Info:   Adds support for JEDEC-compliant SPI NOR flash devices.  (Note: The
++        "jedec,spi-nor" kernel driver was formerly known as "m25p80".)
++Load:   dtoverlay=jedec-spi-nor,<param>=<val>
++Params: flash-spi<n>-<m>        Enables flash device on SPI<n>, CS#<m>.
++        flash-fastr-spi<n>-<m>  Enables flash device with fast read capability
++                                on SPI<n>, CS#<m>.
 +
 +
 +Name:   justboom-dac
@@ -4586,6 +4618,69 @@ index 0000000..101277a
 +		};
 +	};
 +};
+diff --git a/arch/arm/boot/dts/overlays/allo-katana-dac-audio-overlay.dts b/arch/arm/boot/dts/overlays/allo-katana-dac-audio-overlay.dts
+new file mode 100644
+index 0000000..6dc4acf
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/allo-katana-dac-audio-overlay.dts
+@@ -0,0 +1,57 @@
++/*
++ * Definitions for Allo Katana DAC boards
++ */
++
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2708";
++
++	fragment@0 {
++		target = <&i2s>;
++		__overlay__ {
++			#sound-dai-cells = <0>;
++			status = "okay";
++			cpu_port: port {
++				cpu_endpoint: endpoint {
++					remote-endpoint = <&codec_endpoint>;
++					bitclock-master = <&codec_endpoint>;
++					frame-master = <&codec_endpoint>;
++					dai-format = "i2s";
++				};
++			};
++		};
++	};
++
++	fragment@1 {
++		target = <&i2c1>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "okay";
++
++			allo-katana-codec@30 {
++				#sound-dai-cells = <0>;
++				compatible = "allo,allo-katana-codec";
++				reg = <0x30>;
++				port {
++					codec_endpoint: endpoint {
++					remote-endpoint = <&cpu_endpoint>;
++					};
++				};
++			};
++		};
++	};
++
++	fragment@2 {
++		target = <&sound>;
++		katana_dac: __overlay__ {
++			compatible = "audio-graph-card";
++			label = "Allo Katana";
++			dais = <&cpu_port>;
++			status = "okay";
++		};
++	};
++};
++
 diff --git a/arch/arm/boot/dts/overlays/allo-piano-dac-pcm512x-audio-overlay.dts b/arch/arm/boot/dts/overlays/allo-piano-dac-pcm512x-audio-overlay.dts
 new file mode 100644
 index 0000000..a5468d8
@@ -7023,10 +7118,10 @@ index 0000000..fcb846a
 +};
 diff --git a/arch/arm/boot/dts/overlays/i2c-sensor-overlay.dts b/arch/arm/boot/dts/overlays/i2c-sensor-overlay.dts
 new file mode 100644
-index 0000000..0b9bc8f
+index 0000000..4b5be86
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/i2c-sensor-overlay.dts
-@@ -0,0 +1,206 @@
+@@ -0,0 +1,223 @@
 +// Definitions for I2C based sensors using the Industrial IO or HWMON interface.
 +/dts-v1/;
 +/plugin/;
@@ -7215,9 +7310,25 @@ index 0000000..0b9bc8f
 +		};
 +	};
 +
++	fragment@12 {
++		target = <&i2c_arm>;
++		__dormant__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "okay";
++
++			ds1621: ds1621@48 {
++				compatible = "ds1621";
++				reg = <0x48>;
++				status = "okay";
++			};
++		};
++	};
++
 +	__overrides__ {
 +		addr =  <&bme280>,"reg:0", <&bmp280>,"reg:0", <&tmp102>,"reg:0",
-+			<&lm75>,"reg:0", <&hdc100x>,"reg:0", <&sht3x>,"reg:0";
++			<&lm75>,"reg:0", <&hdc100x>,"reg:0", <&sht3x>,"reg:0",
++			<&ds1621>,"reg:0";
 +		bme280 = <0>,"+0";
 +		bmp085 = <0>,"+1";
 +		bmp180 = <0>,"+2";
@@ -7231,14 +7342,15 @@ index 0000000..0b9bc8f
 +		tsl4531 = <0>,"+9";
 +		veml6070 = <0>,"+10";
 +		sht3x = <0>,"+11";
++		ds1621 = <0>,"+12";
 +	};
 +};
 diff --git a/arch/arm/boot/dts/overlays/i2c0-bcm2708-overlay.dts b/arch/arm/boot/dts/overlays/i2c0-bcm2708-overlay.dts
 new file mode 100644
-index 0000000..1f4fc7b
+index 0000000..9b5776f
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/i2c0-bcm2708-overlay.dts
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,69 @@
 +/*
 + * Device tree overlay for i2c_bcm2708, i2c0 bus
 + *
@@ -7291,6 +7403,13 @@ index 0000000..1f4fc7b
 +      };
 +   };
 +
++   fragment@5 {
++      target = <&i2c0>;
++      __dormant__ {
++         compatible = "brcm,bcm2708-i2c";
++      };
++   };
++
 +   __overrides__ {
 +      sda0_pin = <&frag1>,"brcm,pins:0";
 +      scl0_pin = <&frag1>,"brcm,pins:4";
@@ -7298,14 +7417,15 @@ index 0000000..1f4fc7b
 +      pins_28_29 = <0>,"-1+2-3-4";
 +      pins_44_45 = <0>,"-1-2+3-4";
 +      pins_46_47 = <0>,"-1-2-3+4";
++      combine = <0>, "!5";
 +   };
 +};
 diff --git a/arch/arm/boot/dts/overlays/i2c1-bcm2708-overlay.dts b/arch/arm/boot/dts/overlays/i2c1-bcm2708-overlay.dts
 new file mode 100644
-index 0000000..7c69047
+index 0000000..c9da3ee
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlays/i2c1-bcm2708-overlay.dts
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,43 @@
 +/*
 + * Device tree overlay for i2c_bcm2708, i2c1 bus
 + *
@@ -7334,10 +7454,19 @@ index 0000000..7c69047
 +         brcm,function = <4>; /* alt 0 */
 +      };
 +   };
++
++   fragment@2 {
++      target = <&i2c1>;
++      __dormant__ {
++         compatible = "brcm,bcm2708-i2c";
++      };
++   };
++
 +   __overrides__ {
 +      sda1_pin = <&pins>,"brcm,pins:0";
 +      scl1_pin = <&pins>,"brcm,pins:4";
 +      pin_func = <&pins>,"brcm,function:0";
++      combine = <0>, "!2";
 +   };
 +};
 diff --git a/arch/arm/boot/dts/overlays/i2s-gpio28-31-overlay.dts b/arch/arm/boot/dts/overlays/i2s-gpio28-31-overlay.dts
@@ -7524,6 +7653,321 @@ index 0000000..b86e1e5
 +		dai_stream_name = <&wm8804_digi>,"wm8804-digi,dai-stream-name";
 +	};
 +};
+diff --git a/arch/arm/boot/dts/overlays/jedec-spi-nor-overlay.dts b/arch/arm/boot/dts/overlays/jedec-spi-nor-overlay.dts
+new file mode 100644
+index 0000000..279e22e
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/jedec-spi-nor-overlay.dts
+@@ -0,0 +1,309 @@
++// Overlay for JEDEC SPI-NOR Flash Devices (aka m25p80)
++
++// dtparams:
++//     flash-spi<n>-<m>        - Enables flash device on SPI<n>, CS#<m>.
++//     flash-fastr-spi<n>-<m>  - Enables flash device with fast read capability on SPI<n>, CS#<m>.
++//
++// If devices are present on SPI1 or SPI2, those interfaces must be enabled with one of the spi1-1/2/3cs and/or spi2-1/2/3cs overlays.
++//
++// Example: A single flash device with fast read capability on SPI0, CS#0:
++// dtoverlay=jedec-spi-nor:flash-fastr-spi0-0
++
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2835", "brcm,bcm2708", "brcm,bcm2709";
++
++	// disable spi-dev on spi0.0
++	fragment@0 {
++		target = <&spidev0>;
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi0.1
++	fragment@1 {
++		target = <&spidev1>;
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi1.0
++	fragment@2 {
++		target-path = "spi1/spidev@0";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi1.1
++	fragment@3 {
++		target-path = "spi1/spidev@1";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi1.2
++	fragment@4 {
++		target-path = "spi1/spidev@2";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi2.0
++	fragment@5 {
++		target-path = "spi2/spidev@0";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi2.1
++	fragment@6 {
++		target-path = "spi2/spidev@1";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// disable spi-dev on spi2.2
++	fragment@7 {
++		target-path = "spi2/spidev@2";
++		__dormant__ {
++			status = "disabled";
++		};
++	};
++
++	// enable flash on spi0.0
++	fragment@8 {
++		target = <&spi0>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_00: spi_nor@0 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <0>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi0.1
++	fragment@9 {
++		target = <&spi0>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_01: spi_nor@1 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <1>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi1.0
++	fragment@10 {
++		target = <&spi1>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_10: spi_nor@0 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <0>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi1.1
++	fragment@11 {
++		target = <&spi1>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_11: spi_nor@1 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <1>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi1.2
++	fragment@12 {
++		target = <&spi1>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_12: spi_nor@2 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <2>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi2.0
++	fragment@13 {
++		target = <&spi2>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_20: spi_nor@0 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <0>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi2.1
++	fragment@14 {
++		target = <&spi2>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_21: spi_nor@1 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <1>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// enable flash on spi2.2
++	fragment@15 {
++		target = <&spi2>;
++		__dormant__ {
++			status = "okay";
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++			spi_nor_22: spi_nor@2 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "jedec,spi-nor";
++				reg = <2>;
++				spi-max-frequency = <500000>;
++			};
++		};
++	};
++
++	// Enable fast read for device on spi0.0.
++	// Use default active low interrupt signalling.
++	fragment@16 {
++		target = <&spi_nor_00>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi0.1.
++	// Use default active low interrupt signalling.
++	fragment@17 {
++		target = <&spi_nor_01>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi1.0.
++	// Use default active low interrupt signalling.
++	fragment@18 {
++		target = <&spi_nor_10>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi1.1.
++	// Use default active low interrupt signalling.
++	fragment@19 {
++		target = <&spi_nor_11>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi1.2.
++	// Use default active low interrupt signalling.
++	fragment@20 {
++		target = <&spi_nor_12>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi2.0.
++	// Use default active low interrupt signalling.
++	fragment@21 {
++		target = <&spi_nor_20>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi2.1.
++	// Use default active low interrupt signalling.
++	fragment@22 {
++		target = <&spi_nor_21>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	// Enable fast read for device on spi2.2.
++	// Use default active low interrupt signalling.
++	fragment@23 {
++		target = <&spi_nor_22>;
++		__dormant__ {
++			m25p,fast-read;
++		};
++	};
++
++	__overrides__ {
++		flash-spi0-0       = <0>,"+0+8";
++		flash-spi0-1       = <0>,"+1+9";
++		flash-spi1-0       = <0>,"+2+10";
++		flash-spi1-1       = <0>,"+3+11";
++		flash-spi1-2       = <0>,"+4+12";
++		flash-spi2-0       = <0>,"+5+13";
++		flash-spi2-1       = <0>,"+6+14";
++		flash-spi2-2       = <0>,"+7+15";
++		flash-fastr-spi0-0 = <0>,"+0+8+16";
++		flash-fastr-spi0-1 = <0>,"+1+9+17";
++		flash-fastr-spi1-0 = <0>,"+2+10+18";
++		flash-fastr-spi1-1 = <0>,"+3+11+19";
++		flash-fastr-spi1-2 = <0>,"+4+12+20";
++		flash-fastr-spi2-0 = <0>,"+5+13+21";
++		flash-fastr-spi2-1 = <0>,"+6+14+22";
++		flash-fastr-spi2-2 = <0>,"+7+15+23";
++	};
++};
++
 diff --git a/arch/arm/boot/dts/overlays/justboom-dac-overlay.dts b/arch/arm/boot/dts/overlays/justboom-dac-overlay.dts
 new file mode 100644
 index 0000000..2b8dba0
@@ -15395,10 +15839,10 @@ index 0000000..8498134
 +};
 diff --git a/arch/arm/configs/bcm2709_defconfig b/arch/arm/configs/bcm2709_defconfig
 new file mode 100644
-index 0000000..ec3d11b
+index 0000000..2f902b6
 --- /dev/null
 +++ b/arch/arm/configs/bcm2709_defconfig
-@@ -0,0 +1,1356 @@
+@@ -0,0 +1,1363 @@
 +CONFIG_LOCALVERSION="-v7"
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
@@ -15747,6 +16191,7 @@ index 0000000..ec3d11b
 +CONFIG_NET_ACT_CSUM=m
 +CONFIG_BATMAN_ADV=m
 +CONFIG_OPENVSWITCH=m
++CONFIG_NET_L3_MASTER_DEV=y
 +CONFIG_NET_PKTGEN=m
 +CONFIG_HAMRADIO=y
 +CONFIG_AX25=m
@@ -15774,6 +16219,7 @@ index 0000000..ec3d11b
 +CONFIG_BT_HCIBTUSB=m
 +CONFIG_BT_HCIUART=m
 +CONFIG_BT_HCIUART_3WIRE=y
++CONFIG_BT_HCIUART_BCM=y
 +CONFIG_BT_HCIBCM203X=m
 +CONFIG_BT_HCIBPA10X=m
 +CONFIG_BT_HCIBFUSB=m
@@ -15837,6 +16283,7 @@ index 0000000..ec3d11b
 +CONFIG_DUMMY=m
 +CONFIG_IFB=m
 +CONFIG_MACVLAN=m
++CONFIG_IPVLAN=m
 +CONFIG_VXLAN=m
 +CONFIG_NETCONSOLE=m
 +CONFIG_TUN=m
@@ -15996,6 +16443,7 @@ index 0000000..ec3d11b
 +CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
 +CONFIG_SERIAL_SC16IS7XX=m
 +CONFIG_SERIAL_SC16IS7XX_SPI=y
++CONFIG_SERIAL_DEV_BUS=m
 +CONFIG_TTY_PRINTK=y
 +CONFIG_HW_RANDOM=y
 +CONFIG_RAW_DRIVER=y
@@ -16044,6 +16492,7 @@ index 0000000..ec3d11b
 +CONFIG_POWER_RESET_GPIO=y
 +CONFIG_BATTERY_DS2760=m
 +CONFIG_HWMON=m
++CONFIG_SENSORS_DS1621=m
 +CONFIG_SENSORS_JC42=m
 +CONFIG_SENSORS_LM75=m
 +CONFIG_SENSORS_SHT21=m
@@ -16290,6 +16739,7 @@ index 0000000..ec3d11b
 +CONFIG_SND_BCM2708_SOC_ALLO_PIANO_DAC_PLUS=m
 +CONFIG_SND_BCM2708_SOC_ALLO_BOSS_DAC=m
 +CONFIG_SND_BCM2708_SOC_ALLO_DIGIONE=m
++CONFIG_SND_BCM2708_SOC_ALLO_KATANA_DAC=m
 +CONFIG_SND_BCM2708_SOC_FE_PI_AUDIO=m
 +CONFIG_SND_PISOUND=m
 +CONFIG_SND_SOC_ADAU1701=m
@@ -16667,6 +17117,7 @@ index 0000000..ec3d11b
 +CONFIG_NFS_V3_ACL=y
 +CONFIG_NFS_V4=y
 +CONFIG_NFS_SWAP=y
++CONFIG_NFS_V4_1=y
 +CONFIG_ROOT_NFS=y
 +CONFIG_NFS_FSCACHE=y
 +CONFIG_NFSD=m
@@ -16757,10 +17208,10 @@ index 0000000..ec3d11b
 +CONFIG_LIBCRC32C=y
 diff --git a/arch/arm/configs/bcmrpi_defconfig b/arch/arm/configs/bcmrpi_defconfig
 new file mode 100644
-index 0000000..e2cb997
+index 0000000..d92421a
 --- /dev/null
 +++ b/arch/arm/configs/bcmrpi_defconfig
-@@ -0,0 +1,1348 @@
+@@ -0,0 +1,1355 @@
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
 +CONFIG_POSIX_MQUEUE=y
@@ -17104,6 +17555,7 @@ index 0000000..e2cb997
 +CONFIG_NET_ACT_CSUM=m
 +CONFIG_BATMAN_ADV=m
 +CONFIG_OPENVSWITCH=m
++CONFIG_NET_L3_MASTER_DEV=y
 +CONFIG_NET_PKTGEN=m
 +CONFIG_HAMRADIO=y
 +CONFIG_AX25=m
@@ -17131,6 +17583,7 @@ index 0000000..e2cb997
 +CONFIG_BT_HCIBTUSB=m
 +CONFIG_BT_HCIUART=m
 +CONFIG_BT_HCIUART_3WIRE=y
++CONFIG_BT_HCIUART_BCM=y
 +CONFIG_BT_HCIBCM203X=m
 +CONFIG_BT_HCIBPA10X=m
 +CONFIG_BT_HCIBFUSB=m
@@ -17194,6 +17647,7 @@ index 0000000..e2cb997
 +CONFIG_DUMMY=m
 +CONFIG_IFB=m
 +CONFIG_MACVLAN=m
++CONFIG_IPVLAN=m
 +CONFIG_VXLAN=m
 +CONFIG_NETCONSOLE=m
 +CONFIG_TUN=m
@@ -17353,6 +17807,7 @@ index 0000000..e2cb997
 +CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
 +CONFIG_SERIAL_SC16IS7XX=m
 +CONFIG_SERIAL_SC16IS7XX_SPI=y
++CONFIG_SERIAL_DEV_BUS=m
 +CONFIG_TTY_PRINTK=y
 +CONFIG_HW_RANDOM=y
 +CONFIG_RAW_DRIVER=y
@@ -17399,6 +17854,7 @@ index 0000000..e2cb997
 +CONFIG_POWER_RESET_GPIO=y
 +CONFIG_BATTERY_DS2760=m
 +CONFIG_HWMON=m
++CONFIG_SENSORS_DS1621=m
 +CONFIG_SENSORS_JC42=m
 +CONFIG_SENSORS_LM75=m
 +CONFIG_SENSORS_SHT21=m
@@ -17645,6 +18101,7 @@ index 0000000..e2cb997
 +CONFIG_SND_BCM2708_SOC_ALLO_PIANO_DAC_PLUS=m
 +CONFIG_SND_BCM2708_SOC_ALLO_BOSS_DAC=m
 +CONFIG_SND_BCM2708_SOC_ALLO_DIGIONE=m
++CONFIG_SND_BCM2708_SOC_ALLO_KATANA_DAC=m
 +CONFIG_SND_BCM2708_SOC_FE_PI_AUDIO=m
 +CONFIG_SND_PISOUND=m
 +CONFIG_SND_SOC_ADAU1701=m
@@ -18022,6 +18479,7 @@ index 0000000..e2cb997
 +CONFIG_NFS_V3_ACL=y
 +CONFIG_NFS_V4=y
 +CONFIG_NFS_SWAP=y
++CONFIG_NFS_V4_1=y
 +CONFIG_ROOT_NFS=y
 +CONFIG_NFS_FSCACHE=y
 +CONFIG_NFSD=m
@@ -20023,7 +20481,7 @@ index 06d890a..30d96e8 100644
  
  ENTRY(cpu_v6_dcache_clean_area)
 diff --git a/arch/arm/vfp/vfpmodule.c b/arch/arm/vfp/vfpmodule.c
-index a71a48e..d6c0a5a 100644
+index aa7496b..d514ace 100644
 --- a/arch/arm/vfp/vfpmodule.c
 +++ b/arch/arm/vfp/vfpmodule.c
 @@ -179,8 +179,11 @@ static int vfp_notifier(struct notifier_block *self, unsigned long cmd, void *v)
@@ -20189,10 +20647,10 @@ index 0000000..ded0864
 \ No newline at end of file
 diff --git a/arch/arm64/configs/bcmrpi3_defconfig b/arch/arm64/configs/bcmrpi3_defconfig
 new file mode 100644
-index 0000000..50acf25
+index 0000000..ff5d079
 --- /dev/null
 +++ b/arch/arm64/configs/bcmrpi3_defconfig
-@@ -0,0 +1,1292 @@
+@@ -0,0 +1,1276 @@
 +CONFIG_LOCALVERSION="-v8"
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
@@ -20547,20 +21005,6 @@ index 0000000..50acf25
 +CONFIG_CAN=m
 +CONFIG_CAN_VCAN=m
 +CONFIG_CAN_MCP251X=m
-+CONFIG_IRDA=m
-+CONFIG_IRLAN=m
-+CONFIG_IRNET=m
-+CONFIG_IRCOMM=m
-+CONFIG_IRDA_ULTRA=y
-+CONFIG_IRDA_CACHE_LAST_LSAP=y
-+CONFIG_IRDA_FAST_RR=y
-+CONFIG_IRTTY_SIR=m
-+CONFIG_KINGSUN_DONGLE=m
-+CONFIG_KSDAZZLE_DONGLE=m
-+CONFIG_KS959_DONGLE=m
-+CONFIG_USB_IRDA=m
-+CONFIG_SIGMATEL_FIR=m
-+CONFIG_MCS_FIR=m
 +CONFIG_BT=m
 +CONFIG_BT_RFCOMM=m
 +CONFIG_BT_RFCOMM_TTY=y
@@ -20620,7 +21064,6 @@ index 0000000..50acf25
 +CONFIG_ISCSI_BOOT_SYSFS=m
 +CONFIG_MD=y
 +CONFIG_MD_LINEAR=m
-+CONFIG_MD_RAID0=m
 +CONFIG_BLK_DEV_DM=m
 +CONFIG_DM_CRYPT=m
 +CONFIG_DM_SNAPSHOT=m
@@ -20640,7 +21083,6 @@ index 0000000..50acf25
 +CONFIG_TUN=m
 +CONFIG_VETH=m
 +CONFIG_ENC28J60=m
-+CONFIG_QCA7000=m
 +CONFIG_MDIO_BITBANG=m
 +CONFIG_PPP=m
 +CONFIG_PPP_BSDCOMP=m
@@ -20661,6 +21103,7 @@ index 0000000..50acf25
 +CONFIG_USB_PEGASUS=m
 +CONFIG_USB_RTL8150=m
 +CONFIG_USB_RTL8152=m
++CONFIG_USB_LAN78XX=y
 +CONFIG_USB_USBNET=y
 +CONFIG_USB_NET_AX8817X=m
 +CONFIG_USB_NET_AX88179_178A=m
@@ -20674,7 +21117,6 @@ index 0000000..50acf25
 +CONFIG_USB_NET_SR9800=m
 +CONFIG_USB_NET_SMSC75XX=m
 +CONFIG_USB_NET_SMSC95XX=y
-+CONFIG_USB_LAN78XX=y
 +CONFIG_USB_NET_GL620A=m
 +CONFIG_USB_NET_NET1080=m
 +CONFIG_USB_NET_PLUSB=m
@@ -20735,7 +21177,6 @@ index 0000000..50acf25
 +CONFIG_IEEE802154_MRF24J40=m
 +CONFIG_IEEE802154_CC2520=m
 +CONFIG_INPUT_POLLDEV=m
-+# CONFIG_INPUT_MOUSEDEV_PSAUX is not set
 +CONFIG_INPUT_JOYDEV=m
 +CONFIG_INPUT_EVDEV=m
 +# CONFIG_KEYBOARD_ATKBD is not set
@@ -20773,7 +21214,7 @@ index 0000000..50acf25
 +CONFIG_GAMEPORT_L4=m
 +CONFIG_BRCM_CHAR_DRIVERS=y
 +CONFIG_BCM_VCIO=y
-+# CONFIG_BCM2835_DEVGPIOMEM is not set
++CONFIG_BCM2835_DEVGPIOMEM=y
 +# CONFIG_BCM2835_SMI_DEV is not set
 +# CONFIG_LEGACY_PTYS is not set
 +CONFIG_SERIAL_8250=y
@@ -20790,6 +21231,7 @@ index 0000000..50acf25
 +CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
 +CONFIG_SERIAL_SC16IS7XX=m
 +CONFIG_SERIAL_SC16IS7XX_SPI=y
++CONFIG_SERIAL_DEV_BUS=m
 +CONFIG_TTY_PRINTK=y
 +CONFIG_HW_RANDOM=y
 +CONFIG_RAW_DRIVER=y
@@ -20811,7 +21253,6 @@ index 0000000..50acf25
 +CONFIG_GPIO_BCM_VIRT=y
 +CONFIG_GPIO_ARIZONA=m
 +CONFIG_GPIO_STMPE=y
-+CONFIG_GPIO_MCP23S08=m
 +CONFIG_W1=m
 +CONFIG_W1_MASTER_DS2490=m
 +CONFIG_W1_MASTER_DS2482=m
@@ -20829,7 +21270,6 @@ index 0000000..50acf25
 +CONFIG_W1_SLAVE_DS2780=m
 +CONFIG_W1_SLAVE_DS2781=m
 +CONFIG_W1_SLAVE_DS28E04=m
-+CONFIG_W1_SLAVE_BQ27000=m
 +CONFIG_POWER_RESET_GPIO=y
 +CONFIG_BATTERY_DS2760=m
 +CONFIG_HWMON=m
@@ -20841,19 +21281,11 @@ index 0000000..50acf25
 +CONFIG_BCM2835_THERMAL=y
 +CONFIG_WATCHDOG=y
 +CONFIG_BCM2835_WDT=y
-+CONFIG_UCB1400_CORE=m
 +CONFIG_MFD_STMPE=y
 +CONFIG_STMPE_SPI=y
 +CONFIG_MFD_ARIZONA_I2C=m
 +CONFIG_MFD_ARIZONA_SPI=m
 +CONFIG_MFD_WM5102=y
-+CONFIG_MEDIA_SUPPORT=m
-+CONFIG_MEDIA_CAMERA_SUPPORT=y
-+CONFIG_MEDIA_ANALOG_TV_SUPPORT=y
-+CONFIG_MEDIA_DIGITAL_TV_SUPPORT=y
-+CONFIG_MEDIA_RADIO_SUPPORT=y
-+CONFIG_MEDIA_RC_SUPPORT=y
-+CONFIG_MEDIA_CONTROLLER=y
 +CONFIG_LIRC=m
 +CONFIG_RC_DEVICES=y
 +CONFIG_RC_ATI_REMOTE=m
@@ -20865,6 +21297,12 @@ index 0000000..50acf25
 +CONFIG_IR_TTUSBIR=m
 +CONFIG_RC_LOOPBACK=m
 +CONFIG_IR_GPIO_CIR=m
++CONFIG_MEDIA_SUPPORT=m
++CONFIG_MEDIA_CAMERA_SUPPORT=y
++CONFIG_MEDIA_ANALOG_TV_SUPPORT=y
++CONFIG_MEDIA_DIGITAL_TV_SUPPORT=y
++CONFIG_MEDIA_RADIO_SUPPORT=y
++CONFIG_MEDIA_CONTROLLER=y
 +CONFIG_MEDIA_USB_SUPPORT=y
 +CONFIG_USB_VIDEO_CLASS=m
 +CONFIG_USB_M5602=m
@@ -20925,7 +21363,6 @@ index 0000000..50acf25
 +CONFIG_VIDEO_HDPVR=m
 +CONFIG_VIDEO_USBVISION=m
 +CONFIG_VIDEO_STK1160_COMMON=m
-+CONFIG_VIDEO_STK1160_AC97=y
 +CONFIG_VIDEO_GO7007=m
 +CONFIG_VIDEO_GO7007_USB=m
 +CONFIG_VIDEO_GO7007_USB_S2250_BOARD=m
@@ -21011,9 +21448,9 @@ index 0000000..50acf25
 +CONFIG_VIDEO_MT9V011=m
 +CONFIG_DRM=m
 +CONFIG_DRM_LOAD_EDID_FIRMWARE=y
++CONFIG_DRM_UDL=m
 +CONFIG_DRM_PANEL_SIMPLE=m
 +CONFIG_DRM_PANEL_RASPBERRYPI_TOUCHSCREEN=m
-+CONFIG_DRM_UDL=m
 +CONFIG_DRM_VC4=m
 +CONFIG_FB=y
 +CONFIG_FB_BCM2708=y
@@ -21029,19 +21466,15 @@ index 0000000..50acf25
 +# CONFIG_LOGO_LINUX_VGA16 is not set
 +CONFIG_SOUND=y
 +CONFIG_SND=m
++CONFIG_SND_HRTIMER=m
 +CONFIG_SND_SEQUENCER=m
 +CONFIG_SND_SEQ_DUMMY=m
-+CONFIG_SND_MIXER_OSS=m
-+CONFIG_SND_PCM_OSS=m
-+CONFIG_SND_SEQUENCER_OSS=y
-+CONFIG_SND_HRTIMER=m
 +CONFIG_SND_DUMMY=m
 +CONFIG_SND_ALOOP=m
 +CONFIG_SND_VIRMIDI=m
 +CONFIG_SND_MTPAV=m
 +CONFIG_SND_SERIAL_U16550=m
 +CONFIG_SND_MPU401=m
-+CONFIG_SND_BCM2835=m
 +CONFIG_SND_USB_AUDIO=m
 +CONFIG_SND_USB_UA101=m
 +CONFIG_SND_USB_CAIAQ=m
@@ -21070,7 +21503,6 @@ index 0000000..50acf25
 +CONFIG_SND_SOC_CS4271_I2C=m
 +CONFIG_SND_SOC_WM8804_I2C=m
 +CONFIG_SND_SIMPLE_CARD=m
-+CONFIG_SOUND_PRIME=m
 +CONFIG_HIDRAW=y
 +CONFIG_UHID=m
 +CONFIG_HID_A4TECH=m
@@ -21226,12 +21658,14 @@ index 0000000..50acf25
 +CONFIG_USB_XUSBATM=m
 +CONFIG_MMC=y
 +CONFIG_MMC_BLOCK_MINORS=32
-+CONFIG_MMC_BCM2835=y
++CONFIG_MMC_BCM2835_MMC=y
 +CONFIG_MMC_BCM2835_DMA=y
 +CONFIG_MMC_BCM2835_SDHOST=y
 +CONFIG_MMC_SDHCI=y
 +CONFIG_MMC_SDHCI_PLTFM=y
++CONFIG_MMC_SDHCI_IPROC=m
 +CONFIG_MMC_SPI=m
++CONFIG_MMC_BCM2835=y
 +CONFIG_LEDS_CLASS=y
 +CONFIG_LEDS_GPIO=y
 +CONFIG_LEDS_TRIGGER_TIMER=y
@@ -21285,6 +21719,20 @@ index 0000000..50acf25
 +CONFIG_UIO=m
 +CONFIG_UIO_PDRV_GENIRQ=m
 +CONFIG_STAGING=y
++CONFIG_IRDA=m
++CONFIG_IRLAN=m
++CONFIG_IRNET=m
++CONFIG_IRCOMM=m
++CONFIG_IRDA_ULTRA=y
++CONFIG_IRDA_CACHE_LAST_LSAP=y
++CONFIG_IRDA_FAST_RR=y
++CONFIG_IRTTY_SIR=m
++CONFIG_KINGSUN_DONGLE=m
++CONFIG_KSDAZZLE_DONGLE=m
++CONFIG_KS959_DONGLE=m
++CONFIG_USB_IRDA=m
++CONFIG_SIGMATEL_FIR=m
++CONFIG_MCS_FIR=m
 +CONFIG_PRISM2_USB=m
 +CONFIG_R8712U=m
 +CONFIG_R8188EU=m
@@ -21293,9 +21741,7 @@ index 0000000..50acf25
 +CONFIG_SPEAKUP_SYNTH_SOFT=m
 +CONFIG_STAGING_MEDIA=y
 +CONFIG_LIRC_STAGING=y
-+CONFIG_LIRC_IMON=m
 +CONFIG_LIRC_RPI=m
-+CONFIG_LIRC_SASEM=m
 +CONFIG_FB_TFT=m
 +CONFIG_FB_TFT_AGM1264K_FL=m
 +CONFIG_FB_TFT_BD663474=m
@@ -21326,6 +21772,7 @@ index 0000000..50acf25
 +CONFIG_FB_TFT_WATTEROTT=m
 +CONFIG_FB_FLEX=m
 +CONFIG_FB_TFT_FBTFT_DEVICE=m
++CONFIG_SND_BCM2835=m
 +CONFIG_MAILBOX=y
 +CONFIG_BCM2835_MBOX=y
 +# CONFIG_IOMMU_SUPPORT is not set
@@ -21412,7 +21859,6 @@ index 0000000..50acf25
 +CONFIG_CIFS_POSIX=y
 +CONFIG_CIFS_ACL=y
 +CONFIG_CIFS_DFS_UPCALL=y
-+CONFIG_CIFS_SMB2=y
 +CONFIG_CIFS_FSCACHE=y
 +CONFIG_9P_FS=m
 +CONFIG_9P_FS_POSIX_ACL=y
@@ -21459,13 +21905,11 @@ index 0000000..50acf25
 +CONFIG_BOOT_PRINTK_DELAY=y
 +CONFIG_DEBUG_MEMORY_INIT=y
 +CONFIG_DETECT_HUNG_TASK=y
-+CONFIG_TIMER_STATS=y
 +CONFIG_LATENCYTOP=y
 +CONFIG_IRQSOFF_TRACER=y
 +CONFIG_SCHED_TRACER=y
 +CONFIG_STACK_TRACER=y
 +CONFIG_BLK_DEV_IO_TRACE=y
-+# CONFIG_KPROBE_EVENT is not set
 +CONFIG_FUNCTION_PROFILER=y
 +CONFIG_KGDB=y
 +CONFIG_KGDB_KDB=y
@@ -21483,8 +21927,6 @@ index 0000000..50acf25
 +CONFIG_ARM64_CRYPTO=y
 +CONFIG_CRC_ITU_T=y
 +CONFIG_LIBCRC32C=y
-+CONFIG_MMC_BCM2835_MMC=y
-+CONFIG_MMC_SDHCI_IPROC=m
 diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
 index d06fbe4..877b7c9 100644
 --- a/arch/arm64/kernel/armv8_deprecated.c
@@ -27575,7 +28017,7 @@ index bd750cf..41e0702 100644
  			       BCM2835_AUX_CLOCK_COUNT, GFP_KERNEL);
  	if (!onecell)
 diff --git a/drivers/clk/bcm/clk-bcm2835.c b/drivers/clk/bcm/clk-bcm2835.c
-index 58ce6af..caa05e5 100644
+index eec5273..8745054 100644
 --- a/drivers/clk/bcm/clk-bcm2835.c
 +++ b/drivers/clk/bcm/clk-bcm2835.c
 @@ -45,6 +45,7 @@
@@ -27603,7 +28045,7 @@ index 58ce6af..caa05e5 100644
  	spinlock_t regs_lock; /* spinlock for all clocks */
  
  	/*
-@@ -1026,6 +1030,30 @@ static unsigned long bcm2835_clock_get_rate(struct clk_hw *hw,
+@@ -1030,6 +1034,30 @@ static unsigned long bcm2835_clock_get_rate(struct clk_hw *hw,
  	return bcm2835_clock_rate_from_divisor(clock, parent_rate, div);
  }
  
@@ -27634,7 +28076,7 @@ index 58ce6af..caa05e5 100644
  static void bcm2835_clock_wait_busy(struct bcm2835_clock *clock)
  {
  	struct bcm2835_cprman *cprman = clock->cprman;
-@@ -1315,7 +1343,7 @@ static int bcm2835_vpu_clock_is_on(struct clk_hw *hw)
+@@ -1319,7 +1347,7 @@ static int bcm2835_vpu_clock_is_on(struct clk_hw *hw)
   */
  static const struct clk_ops bcm2835_vpu_clock_clk_ops = {
  	.is_prepared = bcm2835_vpu_clock_is_on,
@@ -27643,7 +28085,7 @@ index 58ce6af..caa05e5 100644
  	.set_rate = bcm2835_clock_set_rate,
  	.determine_rate = bcm2835_clock_determine_rate,
  	.set_parent = bcm2835_clock_set_parent,
-@@ -1323,6 +1351,8 @@ static const struct clk_ops bcm2835_vpu_clock_clk_ops = {
+@@ -1327,6 +1355,8 @@ static const struct clk_ops bcm2835_vpu_clock_clk_ops = {
  	.debug_init = bcm2835_clock_debug_init,
  };
  
@@ -27652,7 +28094,7 @@ index 58ce6af..caa05e5 100644
  static struct clk_hw *bcm2835_register_pll(struct bcm2835_cprman *cprman,
  					   const struct bcm2835_pll_data *data)
  {
-@@ -1339,6 +1369,9 @@ static struct clk_hw *bcm2835_register_pll(struct bcm2835_cprman *cprman,
+@@ -1343,6 +1373,9 @@ static struct clk_hw *bcm2835_register_pll(struct bcm2835_cprman *cprman,
  	init.ops = &bcm2835_pll_clk_ops;
  	init.flags = CLK_IGNORE_UNUSED;
  
@@ -27662,7 +28104,7 @@ index 58ce6af..caa05e5 100644
  	pll = kzalloc(sizeof(*pll), GFP_KERNEL);
  	if (!pll)
  		return NULL;
-@@ -1391,6 +1424,13 @@ bcm2835_register_pll_divider(struct bcm2835_cprman *cprman,
+@@ -1395,6 +1428,13 @@ bcm2835_register_pll_divider(struct bcm2835_cprman *cprman,
  	divider->div.hw.init = &init;
  	divider->div.table = NULL;
  
@@ -27676,7 +28118,7 @@ index 58ce6af..caa05e5 100644
  	divider->cprman = cprman;
  	divider->data = data;
  
-@@ -1444,6 +1484,15 @@ static struct clk_hw *bcm2835_register_clock(struct bcm2835_cprman *cprman,
+@@ -1448,6 +1488,15 @@ static struct clk_hw *bcm2835_register_clock(struct bcm2835_cprman *cprman,
  	init.flags = data->flags | CLK_IGNORE_UNUSED;
  
  	/*
@@ -27692,7 +28134,7 @@ index 58ce6af..caa05e5 100644
  	 * Pass the CLK_SET_RATE_PARENT flag if we are allowed to propagate
  	 * rate changes on at least of the parents.
  	 */
-@@ -2141,6 +2190,8 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
+@@ -2145,6 +2194,8 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
  		.ctl_reg = CM_PERIICTL),
  };
  
@@ -27701,7 +28143,7 @@ index 58ce6af..caa05e5 100644
  /*
   * Permanently take a reference on the parent of the SDRAM clock.
   *
-@@ -2160,6 +2211,19 @@ static int bcm2835_mark_sdc_parent_critical(struct clk *sdc)
+@@ -2164,6 +2215,19 @@ static int bcm2835_mark_sdc_parent_critical(struct clk *sdc)
  	return clk_prepare_enable(parent);
  }
  
@@ -27721,7 +28163,7 @@ index 58ce6af..caa05e5 100644
  static int bcm2835_clk_probe(struct platform_device *pdev)
  {
  	struct device *dev = &pdev->dev;
-@@ -2168,7 +2232,9 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
+@@ -2172,7 +2236,9 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
  	struct resource *res;
  	const struct bcm2835_clk_desc *desc;
  	const size_t asize = ARRAY_SIZE(clk_desc_array);
@@ -27731,7 +28173,7 @@ index 58ce6af..caa05e5 100644
  	int ret;
  
  	cprman = devm_kzalloc(dev, sizeof(*cprman) +
-@@ -2184,6 +2250,21 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
+@@ -2188,6 +2254,21 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
  	if (IS_ERR(cprman->regs))
  		return PTR_ERR(cprman->regs);
  
@@ -27753,7 +28195,7 @@ index 58ce6af..caa05e5 100644
  	memcpy(cprman->real_parent_names, cprman_parent_names,
  	       sizeof(cprman_parent_names));
  	of_clk_parent_fill(dev->of_node, cprman->real_parent_names,
-@@ -2214,8 +2295,15 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
+@@ -2218,8 +2299,15 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
  	if (ret)
  		return ret;
  
@@ -27770,7 +28212,7 @@ index 58ce6af..caa05e5 100644
  }
  
  static const struct of_device_id bcm2835_clk_of_match[] = {
-@@ -2232,7 +2320,11 @@ static struct platform_driver bcm2835_clk_driver = {
+@@ -2236,7 +2324,11 @@ static struct platform_driver bcm2835_clk_driver = {
  	.probe          = bcm2835_clk_probe,
  };
  
@@ -28751,7 +29193,7 @@ index 6204cc3..599c218 100644
  MODULE_ALIAS("platform:bcm2835-dma");
  MODULE_DESCRIPTION("BCM2835 DMA engine driver");
 diff --git a/drivers/firmware/raspberrypi.c b/drivers/firmware/raspberrypi.c
-index dd506cd3..d0d36c1 100644
+index dd506cd3..3c96a27 100644
 --- a/drivers/firmware/raspberrypi.c
 +++ b/drivers/firmware/raspberrypi.c
 @@ -14,6 +14,7 @@
@@ -28762,11 +29204,43 @@ index dd506cd3..d0d36c1 100644
  #include <soc/bcm2835/raspberrypi-firmware.h>
  
  #define MBOX_MSG(chan, data28)		(((data28) & ~0xf) | ((chan) & 0xf))
-@@ -21,13 +22,18 @@
+@@ -21,13 +22,50 @@
  #define MBOX_DATA28(msg)		((msg) & ~0xf)
  #define MBOX_CHAN_PROPERTY		8
  
 +#define UNDERVOLTAGE_BIT		BIT(0)
++
++
++/*
++ * This section defines some rate limited logging that prevent
++ * repeated messages at much lower Hz than the default kernel settings.
++ * It's usually 5s, this is 5 minutes.
++ * Burst 3 means you may get three messages 'quickly', before
++ * the ratelimiting kicks in.
++ */
++#define LOCAL_RATELIMIT_INTERVAL (5 * 60 * HZ)
++#define LOCAL_RATELIMIT_BURST 3
++
++#ifdef CONFIG_PRINTK
++#define printk_ratelimited_local(fmt, ...)	\
++({						\
++	static DEFINE_RATELIMIT_STATE(_rs,	\
++		LOCAL_RATELIMIT_INTERVAL,	\
++		LOCAL_RATELIMIT_BURST);		\
++						\
++	if (__ratelimit(&_rs))			\
++		printk(fmt, ##__VA_ARGS__);	\
++})
++#else
++#define printk_ratelimited_local(fmt, ...)	\
++	no_printk(fmt, ##__VA_ARGS__)
++#endif
++
++#define pr_crit_ratelimited_local(fmt, ...)              \
++	printk_ratelimited_local(KERN_CRIT pr_fmt(fmt), ##__VA_ARGS__)
++#define pr_info_ratelimited_local(fmt, ...)              \
++	printk_ratelimited_local(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
++
 +
  struct rpi_firmware {
  	struct mbox_client cl;
@@ -28781,7 +29255,7 @@ index dd506cd3..d0d36c1 100644
  static DEFINE_MUTEX(transaction_lock);
  
  static void response_callback(struct mbox_client *cl, void *msg)
-@@ -40,7 +46,7 @@ static void response_callback(struct mbox_client *cl, void *msg)
+@@ -40,7 +78,7 @@ static void response_callback(struct mbox_client *cl, void *msg)
   * Sends a request to the firmware through the BCM2835 mailbox driver,
   * and synchronously waits for the reply.
   */
@@ -28790,7 +29264,7 @@ index dd506cd3..d0d36c1 100644
  rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
  {
  	u32 message = MBOX_MSG(chan, data);
-@@ -61,6 +67,7 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
+@@ -61,6 +99,7 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
  
  	return ret;
  }
@@ -28798,7 +29272,7 @@ index dd506cd3..d0d36c1 100644
  
  /**
   * rpi_firmware_property_list - Submit firmware property list
-@@ -163,6 +170,101 @@ int rpi_firmware_property(struct rpi_firmware *fw,
+@@ -163,6 +202,105 @@ int rpi_firmware_property(struct rpi_firmware *fw,
  }
  EXPORT_SYMBOL_GPL(rpi_firmware_property);
  
@@ -28848,9 +29322,13 @@ index dd506cd3..d0d36c1 100644
 +
 +	if (new_uv != old_uv) {
 +		if (new_uv)
-+			pr_crit("Under-voltage detected! (0x%08x)\n", *value);
++			pr_crit_ratelimited_local(
++				"Under-voltage detected! (0x%08x)\n",
++				 *value);
 +		else
-+			pr_info("Voltage normalised (0x%08x)\n", *value);
++			pr_info_ratelimited_local(
++				"Voltage normalised (0x%08x)\n",
++				 *value);
 +	}
 +
 +	sysfs_notify(&fw->cl.dev->kobj, NULL, "get_throttled");
@@ -28900,7 +29378,7 @@ index dd506cd3..d0d36c1 100644
  static void
  rpi_firmware_print_firmware_revision(struct rpi_firmware *fw)
  {
-@@ -187,6 +289,11 @@ static int rpi_firmware_probe(struct platform_device *pdev)
+@@ -187,6 +325,11 @@ static int rpi_firmware_probe(struct platform_device *pdev)
  {
  	struct device *dev = &pdev->dev;
  	struct rpi_firmware *fw;
@@ -28912,7 +29390,7 @@ index dd506cd3..d0d36c1 100644
  
  	fw = devm_kzalloc(dev, sizeof(*fw), GFP_KERNEL);
  	if (!fw)
-@@ -205,11 +312,15 @@ static int rpi_firmware_probe(struct platform_device *pdev)
+@@ -205,11 +348,15 @@ static int rpi_firmware_probe(struct platform_device *pdev)
  	}
  
  	init_completion(&fw->c);
@@ -28928,7 +29406,7 @@ index dd506cd3..d0d36c1 100644
  	return 0;
  }
  
-@@ -217,7 +328,9 @@ static int rpi_firmware_remove(struct platform_device *pdev)
+@@ -217,7 +364,9 @@ static int rpi_firmware_remove(struct platform_device *pdev)
  {
  	struct rpi_firmware *fw = platform_get_drvdata(pdev);
  
@@ -28938,7 +29416,7 @@ index dd506cd3..d0d36c1 100644
  
  	return 0;
  }
-@@ -230,7 +343,7 @@ static int rpi_firmware_remove(struct platform_device *pdev)
+@@ -230,7 +379,7 @@ static int rpi_firmware_remove(struct platform_device *pdev)
   */
  struct rpi_firmware *rpi_firmware_get(struct device_node *firmware_node)
  {
@@ -28947,7 +29425,7 @@ index dd506cd3..d0d36c1 100644
  
  	if (!pdev)
  		return NULL;
-@@ -253,7 +366,18 @@ static struct platform_driver rpi_firmware_driver = {
+@@ -253,7 +402,18 @@ static struct platform_driver rpi_firmware_driver = {
  	.probe		= rpi_firmware_probe,
  	.remove		= rpi_firmware_remove,
  };
@@ -29492,6 +29970,37 @@ index 0000000..c372554
 +MODULE_AUTHOR("Dom Cobley <popcornmix@gmail.com>");
 +MODULE_DESCRIPTION("brcmvirt GPIO driver");
 +MODULE_ALIAS("platform:brcmvirt-gpio");
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index b4c8b25..c22ff56 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -53,6 +53,8 @@
+ #define	extra_checks	0
+ #endif
+ 
++#define dont_test_bit(b,d) (0)
++
+ /* Device and char device-related information */
+ static DEFINE_IDA(gpio_ida);
+ static dev_t gpio_devt;
+@@ -2301,7 +2303,7 @@ static int _gpiod_direction_output_raw(struct gpio_desc *desc, int value)
+ 	int ret;
+ 
+ 	/* GPIOs used for IRQs shall not be set as output */
+-	if (test_bit(FLAG_USED_AS_IRQ, &desc->flags)) {
++	if (dont_test_bit(FLAG_USED_AS_IRQ, &desc->flags)) {
+ 		gpiod_err(desc,
+ 			  "%s: tried to set a GPIO tied to an IRQ as output\n",
+ 			  __func__);
+@@ -2816,7 +2818,7 @@ int gpiochip_lock_as_irq(struct gpio_chip *chip, unsigned int offset)
+ 			set_bit(FLAG_IS_OUT, &desc->flags);
+ 	}
+ 
+-	if (test_bit(FLAG_IS_OUT, &desc->flags)) {
++	if (dont_test_bit(FLAG_IS_OUT, &desc->flags)) {
+ 		chip_err(chip,
+ 			  "%s: tried to flag a GPIO set as output for IRQ\n",
+ 			  __func__);
 diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
 index d84a031..d6f1969 100644
 --- a/drivers/gpu/drm/panel/Kconfig
@@ -51413,10 +51922,10 @@ index 0000000..1261540
 +MODULE_DESCRIPTION("Device driver for BCM2835's secondary memory interface");
 +MODULE_AUTHOR("Luke Wren <luke@raspberrypi.org>");
 diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 9c6f2ce..a21b7c1 100644
+index 4281fdc..e7c4eff 100644
 --- a/drivers/mmc/core/block.c
 +++ b/drivers/mmc/core/block.c
-@@ -130,6 +130,13 @@ static DEFINE_MUTEX(open_lock);
+@@ -131,6 +131,13 @@ static DEFINE_MUTEX(open_lock);
  module_param(perdev_minors, int, 0444);
  MODULE_PARM_DESC(perdev_minors, "Minors numbers to allocate per device");
  
@@ -51430,7 +51939,7 @@ index 9c6f2ce..a21b7c1 100644
  static inline int mmc_blk_part_switch(struct mmc_card *card,
  				      unsigned int part_type);
  
-@@ -2485,6 +2492,7 @@ static int mmc_blk_probe(struct mmc_card *card)
+@@ -2504,6 +2511,7 @@ static int mmc_blk_probe(struct mmc_card *card)
  {
  	struct mmc_blk_data *md, *part_md;
  	char cap_str[10];
@@ -51438,7 +51947,7 @@ index 9c6f2ce..a21b7c1 100644
  
  	/*
  	 * Check that the card supports the command class(es) we need.
-@@ -2492,7 +2500,16 @@ static int mmc_blk_probe(struct mmc_card *card)
+@@ -2511,7 +2519,16 @@ static int mmc_blk_probe(struct mmc_card *card)
  	if (!(card->csd.cmdclass & CCC_BLOCK_READ))
  		return -ENODEV;
  
@@ -51456,7 +51965,7 @@ index 9c6f2ce..a21b7c1 100644
  
  	md = mmc_blk_alloc(card);
  	if (IS_ERR(md))
-@@ -2500,9 +2517,14 @@ static int mmc_blk_probe(struct mmc_card *card)
+@@ -2519,9 +2536,14 @@ static int mmc_blk_probe(struct mmc_card *card)
  
  	string_get_size((u64)get_capacity(md->disk), 512, STRING_UNITS_2,
  			cap_str, sizeof(cap_str));
@@ -51524,7 +52033,7 @@ index ad88deb..2b42460 100644
  		kfree(host);
  		return NULL;
 diff --git a/drivers/mmc/core/quirks.h b/drivers/mmc/core/quirks.h
-index 75d3176..5f38d6a 100644
+index 5153577..223f3fd 100644
 --- a/drivers/mmc/core/quirks.h
 +++ b/drivers/mmc/core/quirks.h
 @@ -99,6 +99,14 @@ static const struct mmc_fixup mmc_blk_fixups[] = {
@@ -55713,7 +56222,7 @@ index f3f05fe..6c2d3ab 100644
  				   flags | IRQF_ONESHOT, DEVICE_NAME, priv);
  	if (ret) {
 diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index a8dd1c7..5259336 100644
+index 89d82c4..28c4734 100644
 --- a/drivers/net/usb/lan78xx.c
 +++ b/drivers/net/usb/lan78xx.c
 @@ -37,6 +37,7 @@
@@ -55724,7 +56233,15 @@ index a8dd1c7..5259336 100644
  #include "lan78xx.h"
  
  #define DRIVER_AUTHOR	"WOOJUNG HUH <woojung.huh@microchip.com>"
-@@ -928,7 +929,8 @@ static int lan78xx_read_otp(struct lan78xx_net *dev, u32 offset,
+@@ -63,6 +64,7 @@
+ #define DEFAULT_RX_CSUM_ENABLE		(true)
+ #define DEFAULT_TSO_CSUM_ENABLE		(true)
+ #define DEFAULT_VLAN_FILTER_ENABLE	(true)
++#define DEFAULT_VLAN_RX_OFFLOAD		(true)
+ #define TX_OVERHEAD			(8)
+ #define RXW_PADDING			2
+ 
+@@ -928,7 +930,8 @@ static int lan78xx_read_otp(struct lan78xx_net *dev, u32 offset,
  			offset += 0x100;
  		else
  			ret = -EINVAL;
@@ -55734,22 +56251,23 @@ index a8dd1c7..5259336 100644
  	}
  
  	return ret;
-@@ -1639,6 +1641,14 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
- 	u32 addr_lo, addr_hi;
- 	int ret;
- 	u8 addr[6];
-+	const u8 *mac_addr;
-+
-+	/* maybe the boot loader passed the MAC address in devicetree */
-+	mac_addr = of_get_mac_address(dev->udev->dev.of_node);
-+	if (mac_addr) {
-+		ether_addr_copy(addr, mac_addr);
-+		goto set_mac_addr;
-+	}
+@@ -1651,6 +1654,15 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
+ 	addr[5] = (addr_hi >> 8) & 0xFF;
  
- 	ret = lan78xx_read_reg(dev, RX_ADDRL, &addr_lo);
- 	ret = lan78xx_read_reg(dev, RX_ADDRH, &addr_hi);
-@@ -1667,6 +1677,7 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
+ 	if (!is_valid_ether_addr(addr)) {
++		const u8 *mac_addr;
++
++		/* maybe the boot loader passed the MAC address in devicetree */
++		mac_addr = of_get_mac_address(dev->udev->dev.of_node);
++		if (mac_addr) {
++			ether_addr_copy(addr, mac_addr);
++			goto set_mac_addr;
++		}
++
+ 		/* reading mac address from EEPROM or OTP */
+ 		if ((lan78xx_read_eeprom(dev, EEPROM_MAC_OFFSET, ETH_ALEN,
+ 					 addr) == 0) ||
+@@ -1667,6 +1679,7 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
  					  "MAC address set to random addr");
  			}
  
@@ -55757,7 +56275,7 @@ index a8dd1c7..5259336 100644
  			addr_lo = addr[0] | (addr[1] << 8) |
  				  (addr[2] << 16) | (addr[3] << 24);
  			addr_hi = addr[4] | (addr[5] << 8);
-@@ -2006,6 +2017,9 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+@@ -2006,6 +2019,9 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
  {
  	int ret;
  	u32 mii_adv;
@@ -55767,80 +56285,11 @@ index a8dd1c7..5259336 100644
  	struct phy_device *phydev = dev->net->phydev;
  
  	phydev = phy_find_first(dev->mdiobus);
-@@ -2078,6 +2092,28 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+@@ -2078,13 +2094,47 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
  	mii_adv = (u32)mii_advertise_flowctrl(dev->fc_request_control);
  	phydev->advertising |= mii_adv_to_ethtool_adv_t(mii_adv);
  
-+	/* Set LED modes:
-+	 * led: 0=link/activity          1=link1000/activity
-+	 *      2=link100/activity       3=link10/activity
-+	 *      4=link100/1000/activity  5=link10/1000/activity
-+	 *      6=link10/100/activity    14=off    15=on
-+	 */
-+
-+	memset(led_modes, ~0, sizeof(led_modes));
-+
-+	of_property_read_u32_array(dev->udev->dev.of_node,
-+				   "microchip,led-modes",
-+				   led_modes, ARRAY_SIZE(led_modes));
-+
-+	led_modes_reg = phy_read(phydev, 0x1d);
-+	for (i = 0; i < ARRAY_SIZE(led_modes); i++) {
-+		if (led_modes[i] != ~0) {
-+			led_modes_reg &= ~(0xf << (i * 4));
-+			led_modes_reg |= (led_modes[i] & 0xf) << (i * 4);
-+		}
-+	}
-+	(void)phy_write(phydev, 0x1d, led_modes_reg);
-+
- 	genphy_config_aneg(phydev);
- 
- 	dev->fc_autoneg = phydev->autoneg;
-@@ -2351,6 +2387,11 @@ static int lan78xx_reset(struct lan78xx_net *dev)
- 	u32 buf;
- 	int ret = 0;
- 	unsigned long timeout;
-+	bool has_eeprom;
-+	bool has_otp;
-+
-+	has_eeprom = !lan78xx_read_eeprom(dev, 0, 0, NULL);
-+	has_otp = !lan78xx_read_otp(dev, 0, 0, NULL);
- 
- 	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
- 	buf |= HW_CFG_LRST_;
-@@ -2404,6 +2445,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
- 
- 	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
- 	buf |= HW_CFG_MEF_;
-+	/* If no valid EEPROM and no valid OTP, enable the LEDs by default */
-+	if (!has_eeprom && !has_otp)
-+	    buf |= HW_CFG_LED0_EN_ | HW_CFG_LED1_EN_;
- 	ret = lan78xx_write_reg(dev, HW_CFG, buf);
- 
- 	ret = lan78xx_read_reg(dev, USB_CFG0, &buf);
-@@ -2450,6 +2494,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
- 	/* LAN7801 only has RGMII mode */
- 	if (dev->chipid == ID_REV_CHIP_ID_7801_)
- 		buf &= ~MAC_CR_GMII_EN_;
-+	/* If no valid EEPROM and no valid OTP, enable AUTO negotiation */
-+	if (!has_eeprom && !has_otp)
-+	    buf |= MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_;
- 	ret = lan78xx_write_reg(dev, MAC_CR, buf);
- 
- 	ret = lan78xx_read_reg(dev, MAC_TX, &buf);
-@@ -2496,7 +2543,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
- 	dev->stats.rollover_max.eee_tx_lpi_transitions = 0xFFFFFFFF;
- 	dev->stats.rollover_max.eee_tx_lpi_time = 0xFFFFFFFF;
- 
--	lan78xx_defer_kevent(dev, EVENT_STAT_UPDATE);
-+	set_bit(EVENT_STAT_UPDATE, &dev->flags);
- }
- 
- static int lan78xx_open(struct net_device *net)
-@@ -2516,6 +2563,22 @@ static int lan78xx_open(struct net_device *net)
- 	if (ret < 0)
- 		goto done;
- 
+-	genphy_config_aneg(phydev);
 +	if (of_property_read_bool(dev->udev->dev.of_node,
 +				  "microchip,eee-enabled")) {
 +		struct ethtool_eee edata;
@@ -55854,12 +56303,245 @@ index a8dd1c7..5259336 100644
 +					 "microchip,tx-lpi-timer",
 +					 &edata.tx_lpi_timer))
 +			edata.tx_lpi_timer = 600; /* non-aggressive */
-+		(void)lan78xx_set_eee(net, &edata);
++		(void)lan78xx_set_eee(dev->net, &edata);
 +	}
+ 
+-	dev->fc_autoneg = phydev->autoneg;
++	/* Set LED modes:
++	 * led: 0=link/activity          1=link1000/activity
++	 *      2=link100/activity       3=link10/activity
++	 *      4=link100/1000/activity  5=link10/1000/activity
++	 *      6=link10/100/activity    14=off    15=on
++	 */
+ 
+-	phy_start(phydev);
++	memset(led_modes, ~0, sizeof(led_modes));
+ 
+-	netif_dbg(dev, ifup, dev->net, "phy initialised successfully");
++	of_property_read_u32_array(dev->udev->dev.of_node,
++				   "microchip,led-modes",
++				   led_modes, ARRAY_SIZE(led_modes));
 +
++	led_modes_reg = phy_read(phydev, 0x1d);
++	for (i = 0; i < ARRAY_SIZE(led_modes); i++) {
++		if (led_modes[i] != ~0) {
++			led_modes_reg &= ~(0xf << (i * 4));
++			led_modes_reg |= (led_modes[i] & 0xf) << (i * 4);
++		}
++	}
++	(void)phy_write(phydev, 0x1d, led_modes_reg);
++
++	genphy_config_aneg(phydev);
++
++	dev->fc_autoneg = phydev->autoneg;
+ 
+ 	return 0;
+ 
+@@ -2181,7 +2231,7 @@ static int lan78xx_change_mtu(struct net_device *netdev, int new_mtu)
+ 	if ((ll_mtu % dev->maxpacket) == 0)
+ 		return -EDOM;
+ 
+-	ret = lan78xx_set_rx_max_frame_length(dev, new_mtu + ETH_HLEN);
++	ret = lan78xx_set_rx_max_frame_length(dev, new_mtu + VLAN_ETH_HLEN);
+ 
+ 	netdev->mtu = new_mtu;
+ 
+@@ -2247,6 +2297,11 @@ static int lan78xx_set_features(struct net_device *netdev,
+ 	}
+ 
+ 	if (features & NETIF_F_HW_VLAN_CTAG_RX)
++		pdata->rfe_ctl |= RFE_CTL_VLAN_STRIP_;
++	else
++		pdata->rfe_ctl &= ~RFE_CTL_VLAN_STRIP_;
++
++	if (features & NETIF_F_HW_VLAN_CTAG_FILTER)
+ 		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
+ 	else
+ 		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
+@@ -2351,6 +2406,11 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 	u32 buf;
+ 	int ret = 0;
+ 	unsigned long timeout;
++	bool has_eeprom;
++	bool has_otp;
++
++	has_eeprom = !lan78xx_read_eeprom(dev, 0, 0, NULL);
++	has_otp = !lan78xx_read_otp(dev, 0, 0, NULL);
+ 
+ 	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
+ 	buf |= HW_CFG_LRST_;
+@@ -2404,6 +2464,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 
+ 	ret = lan78xx_read_reg(dev, HW_CFG, &buf);
+ 	buf |= HW_CFG_MEF_;
++	/* If no valid EEPROM and no valid OTP, enable the LEDs by default */
++	if (!has_eeprom && !has_otp)
++	    buf |= HW_CFG_LED0_EN_ | HW_CFG_LED1_EN_;
+ 	ret = lan78xx_write_reg(dev, HW_CFG, buf);
+ 
+ 	ret = lan78xx_read_reg(dev, USB_CFG0, &buf);
+@@ -2450,6 +2513,9 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 	/* LAN7801 only has RGMII mode */
+ 	if (dev->chipid == ID_REV_CHIP_ID_7801_)
+ 		buf &= ~MAC_CR_GMII_EN_;
++	/* If no valid EEPROM and no valid OTP, enable AUTO negotiation */
++	if (!has_eeprom && !has_otp)
++	    buf |= MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_;
+ 	ret = lan78xx_write_reg(dev, MAC_CR, buf);
+ 
+ 	ret = lan78xx_read_reg(dev, MAC_TX, &buf);
+@@ -2460,7 +2526,8 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 	buf |= FCT_TX_CTL_EN_;
+ 	ret = lan78xx_write_reg(dev, FCT_TX_CTL, buf);
+ 
+-	ret = lan78xx_set_rx_max_frame_length(dev, dev->net->mtu + ETH_HLEN);
++	ret = lan78xx_set_rx_max_frame_length(dev,
++					      dev->net->mtu + VLAN_ETH_HLEN);
+ 
+ 	ret = lan78xx_read_reg(dev, MAC_RX, &buf);
+ 	buf |= MAC_RX_RXEN_;
+@@ -2496,7 +2563,7 @@ static void lan78xx_init_stats(struct lan78xx_net *dev)
+ 	dev->stats.rollover_max.eee_tx_lpi_transitions = 0xFFFFFFFF;
+ 	dev->stats.rollover_max.eee_tx_lpi_time = 0xFFFFFFFF;
+ 
+-	lan78xx_defer_kevent(dev, EVENT_STAT_UPDATE);
++	set_bit(EVENT_STAT_UPDATE, &dev->flags);
+ }
+ 
+ static int lan78xx_open(struct net_device *net)
+@@ -2508,13 +2575,9 @@ static int lan78xx_open(struct net_device *net)
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = lan78xx_reset(dev);
+-	if (ret < 0)
+-		goto done;
++	phy_start(net->phydev);
+ 
+-	ret = lan78xx_phy_init(dev);
+-	if (ret < 0)
+-		goto done;
++	netif_dbg(dev, ifup, dev->net, "phy initialised successfully");
+ 
  	/* for Link Check */
  	if (dev->urb_intr) {
- 		ret = usb_submit_urb(dev->urb_intr, GFP_KERNEL);
+@@ -2575,13 +2638,8 @@ static int lan78xx_stop(struct net_device *net)
+ 	if (timer_pending(&dev->stat_monitor))
+ 		del_timer_sync(&dev->stat_monitor);
+ 
+-	phy_unregister_fixup_for_uid(PHY_KSZ9031RNX, 0xfffffff0);
+-	phy_unregister_fixup_for_uid(PHY_LAN8835, 0xfffffff0);
+-
+-	phy_stop(net->phydev);
+-	phy_disconnect(net->phydev);
+-
+-	net->phydev = NULL;
++	if (net->phydev)
++		phy_stop(net->phydev);
+ 
+ 	clear_bit(EVENT_DEV_OPEN, &dev->flags);
+ 	netif_stop_queue(net);
+@@ -2857,6 +2915,12 @@ static int lan78xx_bind(struct lan78xx_net *dev, struct usb_interface *intf)
+ 	if (DEFAULT_TSO_CSUM_ENABLE)
+ 		dev->net->features |= NETIF_F_TSO | NETIF_F_TSO6 | NETIF_F_SG;
+ 
++	if (DEFAULT_VLAN_RX_OFFLOAD)
++		dev->net->features |= NETIF_F_HW_VLAN_CTAG_RX;
++
++	if (DEFAULT_VLAN_FILTER_ENABLE)
++		dev->net->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
++
+ 	dev->net->hw_features = dev->net->features;
+ 
+ 	ret = lan78xx_setup_irq_domain(dev);
+@@ -2921,8 +2985,13 @@ static void lan78xx_rx_csum_offload(struct lan78xx_net *dev,
+ 				    struct sk_buff *skb,
+ 				    u32 rx_cmd_a, u32 rx_cmd_b)
+ {
++	/* HW Checksum offload appears to be flawed if used when not stripping
++	 * VLAN headers.
++	 */
+ 	if (!(dev->net->features & NETIF_F_RXCSUM) ||
+-	    unlikely(rx_cmd_a & RX_CMD_A_ICSM_)) {
++	    unlikely(rx_cmd_a & RX_CMD_A_ICSM_) ||
++	    ((rx_cmd_a & RX_CMD_A_FVTG_) &&
++	     !(dev->net->features & NETIF_F_HW_VLAN_CTAG_RX))) {
+ 		skb->ip_summed = CHECKSUM_NONE;
+ 	} else {
+ 		skb->csum = ntohs((u16)(rx_cmd_b >> RX_CMD_B_CSUM_SHIFT_));
+@@ -2930,6 +2999,16 @@ static void lan78xx_rx_csum_offload(struct lan78xx_net *dev,
+ 	}
+ }
+ 
++static void lan78xx_rx_vlan_offload(struct lan78xx_net *dev,
++				    struct sk_buff *skb,
++				    u32 rx_cmd_a, u32 rx_cmd_b)
++{
++	if ((dev->net->features & NETIF_F_HW_VLAN_CTAG_RX) &&
++	    (rx_cmd_a & RX_CMD_A_FVTG_))
++		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q),
++				       (rx_cmd_b & 0xffff));
++}
++
+ static void lan78xx_skb_return(struct lan78xx_net *dev, struct sk_buff *skb)
+ {
+ 	int		status;
+@@ -2994,6 +3073,8 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb)
+ 			if (skb->len == size) {
+ 				lan78xx_rx_csum_offload(dev, skb,
+ 							rx_cmd_a, rx_cmd_b);
++				lan78xx_rx_vlan_offload(dev, skb,
++							rx_cmd_a, rx_cmd_b);
+ 
+ 				skb_trim(skb, skb->len - 4); /* remove fcs */
+ 				skb->truesize = size + sizeof(struct sk_buff);
+@@ -3012,6 +3093,7 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb)
+ 			skb_set_tail_pointer(skb2, size);
+ 
+ 			lan78xx_rx_csum_offload(dev, skb2, rx_cmd_a, rx_cmd_b);
++			lan78xx_rx_vlan_offload(dev, skb2, rx_cmd_a, rx_cmd_b);
+ 
+ 			skb_trim(skb2, skb2->len - 4); /* remove fcs */
+ 			skb2->truesize = size + sizeof(struct sk_buff);
+@@ -3496,8 +3578,13 @@ static void lan78xx_disconnect(struct usb_interface *intf)
+ 		return;
+ 
+ 	udev = interface_to_usbdev(intf);
+-
+ 	net = dev->net;
++
++	phy_unregister_fixup_for_uid(PHY_KSZ9031RNX, 0xfffffff0);
++	phy_unregister_fixup_for_uid(PHY_LAN8835, 0xfffffff0);
++
++	phy_disconnect(net->phydev);
++
+ 	unregister_netdev(net);
+ 
+ 	cancel_delayed_work_sync(&dev->wq);
+@@ -3657,8 +3744,14 @@ static int lan78xx_probe(struct usb_interface *intf,
+ 	pm_runtime_set_autosuspend_delay(&udev->dev,
+ 					 DEFAULT_AUTOSUSPEND_DELAY);
+ 
++	ret = lan78xx_phy_init(dev);
++	if (ret < 0)
++		goto out4;
++
+ 	return 0;
+ 
++out4:
++	unregister_netdev(netdev);
+ out3:
+ 	lan78xx_unbind(dev, intf);
+ out2:
+@@ -4006,7 +4099,7 @@ static int lan78xx_reset_resume(struct usb_interface *intf)
+ 
+ 	lan78xx_reset(dev);
+ 
+-	lan78xx_phy_init(dev);
++	phy_start(dev->net->phydev);
+ 
+ 	return lan78xx_resume(intf);
+ }
 diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
 index 309b88a..4d9704d 100644
 --- a/drivers/net/usb/smsc95xx.c
@@ -56509,10 +57191,10 @@ index e0d22fe..b99dc2b 100644
 +
  #endif /* FWIL_TYPES_H_ */
 diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c
-index 2ce675a..1c450c0 100644
+index 450f221..30f4b06 100644
 --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c
 +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c
-@@ -1853,7 +1853,6 @@ s32 brcmf_p2p_notify_rx_mgmt_p2p_probereq(struct brcmf_if *ifp,
+@@ -1851,7 +1851,6 @@ s32 brcmf_p2p_notify_rx_mgmt_p2p_probereq(struct brcmf_if *ifp,
  	struct afx_hdl *afx_hdl = &p2p->afx_hdl;
  	struct brcmf_cfg80211_vif *vif = ifp->vif;
  	struct brcmf_rx_mgmt_data *rxframe = (struct brcmf_rx_mgmt_data *)data;
@@ -56520,7 +57202,7 @@ index 2ce675a..1c450c0 100644
  	struct brcmu_chan ch;
  	u8 *mgmt_frame;
  	u32 mgmt_frame_len;
-@@ -1906,7 +1905,7 @@ s32 brcmf_p2p_notify_rx_mgmt_p2p_probereq(struct brcmf_if *ifp,
+@@ -1904,7 +1903,7 @@ s32 brcmf_p2p_notify_rx_mgmt_p2p_probereq(struct brcmf_if *ifp,
  	cfg80211_rx_mgmt(&vif->wdev, freq, 0, mgmt_frame, mgmt_frame_len, 0);
  
  	brcmf_dbg(INFO, "mgmt_frame_len (%d) , e->datalen (%d), chanspec (%04x), freq (%d)\n",
@@ -104201,10 +104883,10 @@ index 0000000..6947e98
 +#endif /* DWC_DEVICE_ONLY */
 diff --git a/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c b/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c
 new file mode 100644
-index 0000000..2ccd2a8
+index 0000000..ed96940
 --- /dev/null
 +++ b/drivers/usb/host/dwc_otg/dwc_otg_hcd_linux.c
-@@ -0,0 +1,1088 @@
+@@ -0,0 +1,1074 @@
 +
 +/* ==========================================================================
 + * $File: //dwh/usb_iip/dev/software/otg/linux/drivers/dwc_otg_hcd_linux.c $
@@ -105219,25 +105901,11 @@ index 0000000..2ccd2a8
 +static void endpoint_reset(struct usb_hcd *hcd, struct usb_host_endpoint *ep)
 +{
 +	dwc_irqflags_t flags;
-+	struct usb_device *udev = NULL;
-+	int epnum = usb_endpoint_num(&ep->desc);
-+	int is_out = usb_endpoint_dir_out(&ep->desc);
-+	int is_control = usb_endpoint_xfer_control(&ep->desc);
 +	dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd(hcd);
-+        struct device *dev = DWC_OTG_OS_GETDEV(dwc_otg_hcd->otg_dev->os_dep);
-+
-+	if (dev)
-+		udev = to_usb_device(dev);
-+	else
-+		return;
 +
 +	DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD EP RESET: Endpoint Num=0x%02d\n", epnum);
 +
 +	DWC_SPINLOCK_IRQSAVE(dwc_otg_hcd->lock, &flags);
-+	usb_settoggle(udev, epnum, is_out, 0);
-+	if (is_control)
-+		usb_settoggle(udev, epnum, !is_out, 0);
-+
 +	if (ep->hcpriv) {
 +		dwc_otg_hcd_endpoint_reset(dwc_otg_hcd, ep->hcpriv);
 +	}
@@ -125367,10 +126035,10 @@ index 6cd9b19..f36c92c 100644
  	__u32 dx;	/* screen-relative */
  	__u32 dy;
 diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 030e428..c9b7a0c 100644
+index 76c0ef2..b866bfb 100644
 --- a/kernel/cgroup/cgroup.c
 +++ b/kernel/cgroup/cgroup.c
-@@ -5137,6 +5137,8 @@ int __init cgroup_init_early(void)
+@@ -5147,6 +5147,8 @@ int __init cgroup_init_early(void)
  }
  
  static u16 cgroup_disable_mask __initdata;
@@ -125379,7 +126047,7 @@ index 030e428..c9b7a0c 100644
  
  /**
   * cgroup_init - cgroup initialization
-@@ -5175,6 +5177,12 @@ int __init cgroup_init(void)
+@@ -5185,6 +5187,12 @@ int __init cgroup_init(void)
  
  	mutex_unlock(&cgroup_mutex);
  
@@ -125392,7 +126060,7 @@ index 030e428..c9b7a0c 100644
  	for_each_subsys(ss, ssid) {
  		if (ss->early_init) {
  			struct cgroup_subsys_state *css =
-@@ -5555,6 +5563,28 @@ static int __init cgroup_disable(char *str)
+@@ -5565,6 +5573,28 @@ static int __init cgroup_disable(char *str)
  }
  __setup("cgroup_disable=", cgroup_disable);
  
@@ -125480,10 +126148,10 @@ index e89c3b0..3f3fbc2 100644
  #ifdef CONFIG_HAVE_IRQ_EXIT_ON_IRQ_STACK
  		/*
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 6627cae..e05215c 100644
+index 1d7693c3..5872325 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -7631,8 +7631,6 @@ int alloc_contig_range(unsigned long start, unsigned long end,
+@@ -7622,8 +7622,6 @@ int alloc_contig_range(unsigned long start, unsigned long end,
  
  	/* Make sure the range is really isolated. */
  	if (test_pages_isolated(outer_start, end, false)) {
@@ -126001,10 +126669,10 @@ index 0000000..d72e152
 +	return $trailer;
 +}
 diff --git a/sound/soc/bcm/Kconfig b/sound/soc/bcm/Kconfig
-index edf3671..e601eb0 100644
+index edf3671..21622ed 100644
 --- a/sound/soc/bcm/Kconfig
 +++ b/sound/soc/bcm/Kconfig
-@@ -16,4 +16,175 @@ config SND_SOC_CYGNUS
+@@ -16,4 +16,184 @@ config SND_SOC_CYGNUS
  	  Say Y if you want to add support for ASoC audio on Broadcom
  	  Cygnus chips (bcm958300, bcm958305, bcm911360)
  
@@ -126169,6 +126837,15 @@ index edf3671..e601eb0 100644
 +	help
 +	  Say Y or M if you want to add support for Allo DigiOne.
 +
++config SND_BCM2708_SOC_ALLO_KATANA_DAC
++	tristate "Support for Allo Katana DAC"
++	depends on SND_BCM2708_SOC_I2S || SND_BCM2835_SOC_I2S
++	depends on I2C
++	select REGMAP_I2C
++	select SND_AUDIO_GRAPH_CARD
++	help
++	  Say Y or M if you want to add support for Allo Katana DAC.
++
 +config SND_BCM2708_SOC_FE_PI_AUDIO
 +	tristate "Support for Fe-Pi-Audio"
 +	depends on SND_BCM2708_SOC_I2S || SND_BCM2835_SOC_I2S
@@ -126183,10 +126860,10 @@ index edf3671..e601eb0 100644
 +	help
 +	  Say Y or M if you want to add support for Blokas Labs pisound.
 diff --git a/sound/soc/bcm/Makefile b/sound/soc/bcm/Makefile
-index fc739d0..2b99630 100644
+index fc739d0..e96022b 100644
 --- a/sound/soc/bcm/Makefile
 +++ b/sound/soc/bcm/Makefile
-@@ -8,3 +8,57 @@ snd-soc-cygnus-objs := cygnus-pcm.o cygnus-ssp.o
+@@ -8,3 +8,59 @@ snd-soc-cygnus-objs := cygnus-pcm.o cygnus-ssp.o
  
  obj-$(CONFIG_SND_SOC_CYGNUS) += snd-soc-cygnus.o
  
@@ -126216,6 +126893,7 @@ index fc739d0..2b99630 100644
 +snd-soc-allo-piano-dac-objs := allo-piano-dac.o
 +snd-soc-allo-piano-dac-plus-objs := allo-piano-dac-plus.o
 +snd-soc-allo-digione-objs := allo-digione.o
++snd-soc-allo-katana-codec-objs := allo-katana-codec.o
 +snd-soc-pisound-objs := pisound.o
 +snd-soc-fe-pi-audio-objs := fe-pi-audio.o
 +
@@ -126242,6 +126920,7 @@ index fc739d0..2b99630 100644
 +obj-$(CONFIG_SND_BCM2708_SOC_ALLO_PIANO_DAC) += snd-soc-allo-piano-dac.o
 +obj-$(CONFIG_SND_BCM2708_SOC_ALLO_PIANO_DAC_PLUS) += snd-soc-allo-piano-dac-plus.o
 +obj-$(CONFIG_SND_BCM2708_SOC_ALLO_DIGIONE) += snd-soc-allo-digione.o
++obj-$(CONFIG_SND_BCM2708_SOC_ALLO_KATANA_DAC) += snd-soc-allo-katana-codec.o
 +obj-$(CONFIG_SND_PISOUND) += snd-soc-pisound.o
 +obj-$(CONFIG_SND_BCM2708_SOC_FE_PI_AUDIO) += snd-soc-fe-pi-audio.o
 diff --git a/sound/soc/bcm/adau1977-adc.c b/sound/soc/bcm/adau1977-adc.c
@@ -127108,6 +127787,375 @@ index 0000000..9387b05
 +MODULE_AUTHOR("Baswaraj <jaikumar@cem-solutions.net>");
 +MODULE_DESCRIPTION("ASoC Driver for Allo DigiOne");
 +MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/bcm/allo-katana-codec.c b/sound/soc/bcm/allo-katana-codec.c
+new file mode 100644
+index 0000000..2b4892f
+--- /dev/null
++++ b/sound/soc/bcm/allo-katana-codec.c
+@@ -0,0 +1,363 @@
++/*
++ * Driver for the ALLO KATANA CODEC
++ *
++ * Author: Jaikumar <jaikumar@cem-solutions.net>
++ *		Copyright 2018
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ */
++
++
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/clk.h>
++#include <linux/kernel.h>
++#include <linux/regmap.h>
++#include <linux/regulator/consumer.h>
++#include <linux/gcd.h>
++#include <sound/soc.h>
++#include <sound/soc-dapm.h>
++#include <sound/pcm_params.h>
++#include <sound/tlv.h>
++#include <linux/i2c.h>
++
++
++#define KATANA_CODEC_CHIP_ID		0x30
++#define KATANA_CODEC_VIRT_BASE		0x100
++#define KATANA_CODEC_PAGE			0
++
++#define KATANA_CODEC_CHIP_ID_REG	(KATANA_CODEC_VIRT_BASE + 0)
++#define KATANA_CODEC_RESET			(KATANA_CODEC_VIRT_BASE + 1)
++#define KATANA_CODEC_VOLUME_1		(KATANA_CODEC_VIRT_BASE + 2)
++#define KATANA_CODEC_VOLUME_2		(KATANA_CODEC_VIRT_BASE + 3)
++#define KATANA_CODEC_MUTE			(KATANA_CODEC_VIRT_BASE + 4)
++#define KATANA_CODEC_DSP_PROGRAM	(KATANA_CODEC_VIRT_BASE + 5)
++#define KATANA_CODEC_DEEMPHASIS		(KATANA_CODEC_VIRT_BASE + 6)
++#define KATANA_CODEC_DOP			(KATANA_CODEC_VIRT_BASE + 7)
++#define KATANA_CODEC_FORMAT			(KATANA_CODEC_VIRT_BASE + 8)
++#define KATANA_CODEC_COMMAND		(KATANA_CODEC_VIRT_BASE + 9)
++#define KATANA_CODEC_MAX_REGISTER	(KATANA_CODEC_VIRT_BASE + 9)
++
++#define KATANA_CODEC_FMT			0xff
++#define KATANA_CODEC_CHAN_MONO		0x00
++#define KATANA_CODEC_CHAN_STEREO	0x80
++#define KATANA_CODEC_ALEN_16		0x10
++#define KATANA_CODEC_ALEN_24		0x20
++#define KATANA_CODEC_ALEN_32		0x30
++#define KATANA_CODEC_RATE_11025		0x01
++#define KATANA_CODEC_RATE_22050		0x02
++#define KATANA_CODEC_RATE_32000		0x03
++#define KATANA_CODEC_RATE_44100		0x04
++#define KATANA_CODEC_RATE_48000		0x05
++#define KATANA_CODEC_RATE_88200		0x06
++#define KATANA_CODEC_RATE_96000		0x07
++#define KATANA_CODEC_RATE_176400	0x08
++#define KATANA_CODEC_RATE_192000	0x09
++#define KATANA_CODEC_RATE_352800	0x0a
++#define KATANA_CODEC_RATE_384000	0x0b
++
++
++struct katana_codec_priv {
++	struct regmap *regmap;
++	int fmt;
++};
++
++static const struct reg_default katana_codec_reg_defaults[] = {
++	{ KATANA_CODEC_RESET,		0x00 },
++	{ KATANA_CODEC_VOLUME_1,	0xF0 },
++	{ KATANA_CODEC_VOLUME_2,	0xF0 },
++	{ KATANA_CODEC_MUTE,		0x00 },
++	{ KATANA_CODEC_DSP_PROGRAM,	0x04 },
++	{ KATANA_CODEC_DEEMPHASIS,	0x00 },
++	{ KATANA_CODEC_DOP,			0x01 },
++	{ KATANA_CODEC_FORMAT,		0xb4 },
++};
++
++static const char * const katana_codec_dsp_program_texts[] = {
++	"Linear Phase Fast Roll-off Filter",
++	"Linear Phase Slow Roll-off Filter",
++	"Minimum Phase Fast Roll-off Filter",
++	"Minimum Phase Slow Roll-off Filter",
++	"Apodizing Fast Roll-off Filter",
++	"Corrected Minimum Phase Fast Roll-off Filter",
++	"Brick Wall Filter",
++};
++
++static const unsigned int katana_codec_dsp_program_values[] = {
++	0,
++	1,
++	2,
++	3,
++	4,
++	6,
++	7,
++};
++
++static SOC_VALUE_ENUM_SINGLE_DECL(katana_codec_dsp_program,
++				  KATANA_CODEC_DSP_PROGRAM, 0, 0x07,
++				  katana_codec_dsp_program_texts,
++				  katana_codec_dsp_program_values);
++
++static const char * const katana_codec_deemphasis_texts[] = {
++	"Bypass",
++	"32kHz",
++	"44.1kHz",
++	"48kHz",
++};
++
++static const unsigned int katana_codec_deemphasis_values[] = {
++	0,
++	1,
++	2,
++	3,
++};
++
++static SOC_VALUE_ENUM_SINGLE_DECL(katana_codec_deemphasis,
++				  KATANA_CODEC_DEEMPHASIS, 0, 0x03,
++				  katana_codec_deemphasis_texts,
++				  katana_codec_deemphasis_values);
++
++static const SNDRV_CTL_TLVD_DECLARE_DB_MINMAX(master_tlv, -12700, 0);
++
++static const struct snd_kcontrol_new katana_codec_controls[] = {
++	SOC_DOUBLE_R_TLV("Master Playback Volume", KATANA_CODEC_VOLUME_1,
++			KATANA_CODEC_VOLUME_2, 0, 255, 1, master_tlv),
++	SOC_DOUBLE("Master Playback Switch", KATANA_CODEC_MUTE, 0, 0, 1, 1),
++	SOC_ENUM("DSP Program Route", katana_codec_dsp_program),
++	SOC_ENUM("Deemphasis Route", katana_codec_deemphasis),
++	SOC_SINGLE("DoP Playback Switch", KATANA_CODEC_DOP, 0, 1, 1)
++};
++
++static bool katana_codec_readable_register(struct device *dev, unsigned int reg)
++{
++	switch (reg) {
++	case KATANA_CODEC_CHIP_ID_REG:
++		return true;
++	default:
++		return reg < 0xff;
++	}
++}
++
++static int katana_codec_hw_params(struct snd_pcm_substream *substream,
++			     struct snd_pcm_hw_params *params,
++			     struct snd_soc_dai *dai)
++{
++	struct snd_soc_codec *codec = dai->codec;
++	struct katana_codec_priv *katana_codec = snd_soc_codec_get_drvdata(codec);
++	int fmt = 0;
++	int ret;
++
++	dev_dbg(codec->dev, "hw_params %u Hz, %u channels\n",
++			params_rate(params),
++			params_channels(params));
++
++	switch (katana_codec->fmt & SND_SOC_DAIFMT_MASTER_MASK) {
++	case SND_SOC_DAIFMT_CBM_CFM: // master
++		if (params_channels(params) == 2)
++			fmt = KATANA_CODEC_CHAN_STEREO;
++		else
++			fmt = KATANA_CODEC_CHAN_MONO;
++
++		switch (params_width(params)) {
++		case 16:
++			fmt |= KATANA_CODEC_ALEN_16;
++			break;
++		case 24:
++			fmt |= KATANA_CODEC_ALEN_24;
++			break;
++		case 32:
++			fmt |= KATANA_CODEC_ALEN_32;
++			break;
++		default:
++			dev_err(codec->dev, "Bad frame size: %d\n",
++					params_width(params));
++			return -EINVAL;
++		}
++
++		switch (params_rate(params)) {
++		case 44100:
++			fmt |= KATANA_CODEC_RATE_44100;
++			break;
++		case 48000:
++			fmt |= KATANA_CODEC_RATE_48000;
++			break;
++		case 88200:
++			fmt |= KATANA_CODEC_RATE_88200;
++			break;
++		case 96000:
++			fmt |= KATANA_CODEC_RATE_96000;
++			break;
++		case 176400:
++			fmt |= KATANA_CODEC_RATE_176400;
++			break;
++		case 192000:
++			fmt |= KATANA_CODEC_RATE_192000;
++			break;
++		case 352800:
++			fmt |= KATANA_CODEC_RATE_352800;
++			break;
++		case 384000:
++			fmt |= KATANA_CODEC_RATE_384000;
++			break;
++		default:
++			dev_err(codec->dev, "Bad sample rate: %d\n",
++					params_rate(params));
++			return -EINVAL;
++		}
++
++		ret = regmap_write(katana_codec->regmap, KATANA_CODEC_FORMAT, fmt);
++		if (ret != 0) {
++			dev_err(codec->dev, "Failed to set format: %d\n", ret);
++			return ret;
++		}
++		break;
++
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int katana_codec_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
++{
++	struct snd_soc_codec *codec = dai->codec;
++	struct katana_codec_priv *katana_codec = snd_soc_codec_get_drvdata(codec);
++
++	katana_codec->fmt = fmt;
++
++	return 0;
++}
++
++static const struct snd_soc_dai_ops katana_codec_dai_ops = {
++	.hw_params = katana_codec_hw_params,
++	.set_fmt = katana_codec_set_fmt,
++};
++
++static struct snd_soc_dai_driver katana_codec_dai = {
++	.name = "allo-katana-codec",
++	.playback = {
++		.stream_name = "Playback",
++		.channels_min = 2,
++		.channels_max = 2,
++		.rates = SNDRV_PCM_RATE_CONTINUOUS,
++		.rate_min = 44100,
++		.rate_max = 384000,
++		.formats = SNDRV_PCM_FMTBIT_S16_LE |
++			SNDRV_PCM_FMTBIT_S32_LE
++	},
++	.ops = &katana_codec_dai_ops,
++};
++
++static struct snd_soc_codec_driver katana_codec_codec_driver = {
++	.idle_bias_off = false,
++
++	.component_driver = {
++		.controls		= katana_codec_controls,
++		.num_controls	= ARRAY_SIZE(katana_codec_controls),
++	},
++};
++
++static const struct regmap_range_cfg katana_codec_range = {
++	.name = "Pages", .range_min = KATANA_CODEC_VIRT_BASE,
++	.range_max = KATANA_CODEC_MAX_REGISTER,
++	.selector_reg = KATANA_CODEC_PAGE,
++	.selector_mask = 0xff,
++	.window_start = 0, .window_len = 0x100,
++};
++
++const struct regmap_config katana_codec_regmap = {
++	.reg_bits = 8,
++	.val_bits = 8,
++
++	.ranges = &katana_codec_range,
++	.num_ranges = 1,
++
++	.max_register = KATANA_CODEC_MAX_REGISTER,
++	.readable_reg = katana_codec_readable_register,
++	.reg_defaults = katana_codec_reg_defaults,
++	.num_reg_defaults = ARRAY_SIZE(katana_codec_reg_defaults),
++	.cache_type = REGCACHE_RBTREE,
++};
++
++static int allo_katana_codec_probe(struct i2c_client *i2c,
++			     const struct i2c_device_id *id)
++{
++	struct regmap *regmap;
++	struct regmap_config config = katana_codec_regmap;
++	struct device *dev = &i2c->dev;
++	struct katana_codec_priv *katana_codec;
++	unsigned int chip_id = 0;
++	int ret;
++
++	regmap = devm_regmap_init_i2c(i2c, &config);
++	if (IS_ERR(regmap))
++		return PTR_ERR(regmap);
++
++	katana_codec = devm_kzalloc(dev, sizeof(struct katana_codec_priv),
++								GFP_KERNEL);
++	if (!katana_codec)
++		return -ENOMEM;
++
++	dev_set_drvdata(dev, katana_codec);
++	katana_codec->regmap = regmap;
++
++	ret = regmap_read(regmap, KATANA_CODEC_CHIP_ID_REG, &chip_id);
++	if ((ret != 0) || (chip_id != KATANA_CODEC_CHIP_ID)) {
++		dev_err(dev, "Failed to read Chip or wrong Chip id: %d\n", ret);
++		return ret;
++	}
++	regmap_update_bits(regmap, KATANA_CODEC_RESET, 0x01, 0x01);
++	msleep(10);
++
++	ret = snd_soc_register_codec(dev, &katana_codec_codec_driver,
++				    &katana_codec_dai, 1);
++	if (ret != 0) {
++		dev_err(dev, "failed to register codec: %d\n", ret);
++		return ret;
++	}
++
++	return 0;
++}
++
++static int allo_katana_codec_remove(struct i2c_client *i2c)
++{
++	snd_soc_unregister_codec(&i2c->dev);
++	return 0;
++}
++
++static const struct i2c_device_id allo_katana_codec_id[] = {
++	{ "allo-katana-codec", },
++	{ }
++};
++MODULE_DEVICE_TABLE(i2c, allo_katana_codec_id);
++
++static const struct of_device_id allo_katana_codec_of_match[] = {
++	{ .compatible = "allo,allo-katana-codec", },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, allo_katana_codec_of_match);
++
++static struct i2c_driver allo_katana_codec_driver = {
++	.probe		= allo_katana_codec_probe,
++	.remove		= allo_katana_codec_remove,
++	.id_table	= allo_katana_codec_id,
++	.driver		= {
++		.name	= "allo-katana-codec",
++		.of_match_table = allo_katana_codec_of_match,
++	},
++};
++
++module_i2c_driver(allo_katana_codec_driver);
++
++MODULE_DESCRIPTION("ASoC Allo Katana Codec Driver");
++MODULE_AUTHOR("Jaikumar <jaikumar@cem-solutions.net>");
++MODULE_LICENSE("GPL v2");
++
 diff --git a/sound/soc/bcm/allo-piano-dac-plus.c b/sound/soc/bcm/allo-piano-dac-plus.c
 new file mode 100644
 index 0000000..bede9bd
