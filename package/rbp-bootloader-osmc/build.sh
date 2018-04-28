@@ -9,7 +9,7 @@ echo -e "Building package rbp-bootloader-osmc"
 
 BOOT="files/boot"
 FWFILES=( "LICENCE.broadcom" "start_x.elf" "fixup_x.dat" "bootcode.bin" )
-REV="086a8488de0f485e8879ac14ff505ff1d922eeed"
+REV="983b091aa491dc6b47e5cc62abb281dbcb75088d"
 
 make clean
 
