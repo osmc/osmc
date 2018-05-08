@@ -13,7 +13,6 @@ if grep -q "osmcdev=vero3" /proc/cmdline; then
    OSMC_DEV_SUBDEVICE=$(cat /proc/device-tree/model)
 fi
 DEVICE_ID=$(cat /.osmcguid)
-UPTIME=$(cat /proc/uptime | awk '{print $1}')
 ENDPOINT_URL="http://stats.osmc.tv"
 
 curl -X POST \
@@ -21,5 +20,4 @@ curl -X POST \
         -F "OSMC_DEV=$OSMC_DEV" \
         -F "OSMC_DEV_SUBDEVICE=$OSMC_DEV_SUBDEVICE" \
         -F "DEVICE_ID=$DEVICE_ID" \
-        -F "UPTIME=$UPTIME" \
 $ENDPOINT_URL
