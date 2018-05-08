@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# This creates a unique machine based ID from HW serial number which persists over
+# reboots, updates and reinstallations. If this is not possible, then DBus machine-id
+# is used instead
+
+# This ID is a non personal identifier used to collect basic installation statistics
+# on OSMC users and provide advanced integration with MyOSMC.com
+
+GUID_FILE="/.osmcguid"
+ETH_ADDR="/sys/class/net/eth0/address"
+
+if grep -q 'vero\|rbp' /proc/cmdline; then
+	GUID=$(cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2)
+else
+	if [ -f "$ETH_ADDR" ]; then
+		GUID=$(cat "$ETH_ADDR")
+	fi
+fi
+
+# Anonymise GUID if we have one
+
+if [ ! -z "$GUID" ]; then
+	GUID=$(echo "$GUID" | sha256sum | cut -d ' ' -f 1)
+else
+	GUID=$(cat /etc/machine-id) # Fallback so that we always have something
+fi
+
+echo "$GUID" > "$GUID_FILE"
