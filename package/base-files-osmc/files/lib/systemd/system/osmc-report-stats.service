@@ -1,0 +1,10 @@
+[Unit]
+Description=Setup OSMC machine ID
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/osmc/myosmc-report-installs
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
