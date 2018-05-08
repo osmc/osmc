@@ -15,9 +15,9 @@ fi
 DEVICE_ID=$(cat /.osmcguid)
 ENDPOINT_URL="http://stats.osmc.tv"
 
-curl -X POST \
+curl -s -S -X POST \
         -F "OSMC_VERSION=$OSMC_VERSION" \
         -F "OSMC_DEV=$OSMC_DEV" \
         -F "OSMC_DEV_SUBDEVICE=$OSMC_DEV_SUBDEVICE" \
         -F "DEVICE_ID=$DEVICE_ID" \
-$ENDPOINT_URL
+$ENDPOINT_URL >/dev/null
