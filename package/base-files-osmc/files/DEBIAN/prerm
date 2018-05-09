@@ -1,2 +1,8 @@
 #!/bin/bash
 
+if [ "$1" = "remove" ]; then
+	systemctl disable osmc-id-generator.service osmc-report-stats.timer
+	systemctl stop osmc-id-generator.service osmc-report-stats.timer
+	exit 0
+fi
+

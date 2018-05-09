@@ -33,6 +33,10 @@ if [ "$1" = "configure" ]; then
 	echo "Fixing permissions on busybox."
 	chmod +s /bin/busybox 2>/dev/null
 
+	systemctl daemon-reload
+	systemctl enable osmc-id-generator.service osmc-report-stats.timer
+	systemctl start osmc-id-generator.service osmc-report-stats.timer
+
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
 #	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.5"; then
 #	dist_upgrade_migrate
