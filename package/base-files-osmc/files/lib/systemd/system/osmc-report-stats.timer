@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer to report anonymous OSMC install statistics
+After=osmc-id-generator.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1d
+
+[Install]
+WantedBy=timers.target
