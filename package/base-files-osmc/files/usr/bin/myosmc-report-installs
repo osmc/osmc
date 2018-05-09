@@ -17,7 +17,7 @@ if grep -q "osmcdev=vero3" /proc/cmdline; then
    OSMC_DEV_SUBDEVICE=$(cat /proc/device-tree/model)
 fi
 DEVICE_ID=$(cat /.osmcguid)
-ENDPOINT_URL="http://stats.osmc.tv"
+ENDPOINT_URL="https://stats.osmc.tv"
 
 curl -s -S -X POST \
         -F "OSMC_VERSION=$OSMC_VERSION" \
