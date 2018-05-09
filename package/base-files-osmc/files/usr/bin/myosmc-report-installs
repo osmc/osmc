@@ -3,6 +3,10 @@
 # This script reports non personally identifiable information to OSMC so that we can
 # see active user statistics.
 
+[ -e /etc/osmc/prefs.d/stats_preferences ] && . /etc/osmc/prefs.d/stats_preferences
+
+if [ "$OSMC_REPORT_STATS" != 1 ]; then echo "Reporting statistics is disabled"; exit 0; fi
+
 OSMC_VERSION=$(cat /etc/os-release | grep VERSION_ID | cut -d '=' -f 2)
 OSMC_DEV="$(sed 's/\ /\n/g' /proc/cmdline | grep "^osmcdev=" | sed 's/^osmcdev=//g')"
 OSMC_DEV_SUBDEVICE=$OSMC_DEV
