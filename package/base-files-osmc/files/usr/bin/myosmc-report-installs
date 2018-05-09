@@ -7,7 +7,7 @@
 
 if [ "$OSMC_REPORT_STATS" != 1 ]; then echo "Reporting statistics is disabled"; exit 0; fi
 
-OSMC_VERSION=$(cat /etc/os-release | grep VERSION_ID | cut -d '=' -f 2)
+OSMC_VERSION=$(cat /etc/os-release | grep VERSION_ID | cut -d '=' -f 2 | tr -d '"')
 OSMC_DEV="$(sed 's/\ /\n/g' /proc/cmdline | grep "^osmcdev=" | sed 's/^osmcdev=//g')"
 OSMC_DEV_SUBDEVICE=$OSMC_DEV
 if grep -q "osmcdev=rbp" /proc/cmdline; then
