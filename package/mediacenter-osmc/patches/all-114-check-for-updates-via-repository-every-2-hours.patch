@@ -1,0 +1,26 @@
+From 552ca4c2efa78177be2df5a38fca07c484e4709a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 11 May 2018 04:53:50 +0100
+Subject: [PATCH] Check for updates via repository every 2 hours
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/RepositoryUpdater.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/addons/RepositoryUpdater.cpp b/xbmc/addons/RepositoryUpdater.cpp
+index eb7e437..4f895db 100644
+--- a/xbmc/addons/RepositoryUpdater.cpp
++++ b/xbmc/addons/RepositoryUpdater.cpp
+@@ -188,7 +188,7 @@ CDateTime CRepositoryUpdater::LastUpdated() const
+ 
+ void CRepositoryUpdater::ScheduleUpdate()
+ {
+-  const CDateTimeSpan interval(0, 24, 0, 0);
++  const CDateTimeSpan interval(0, 2, 0, 0);
+ 
+   CSingleLock lock(m_criticalSection);
+   m_timer.Stop(true);
+-- 
+2.7.4
+
