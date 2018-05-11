@@ -1,0 +1,70 @@
+From 152583cfa59eaf4519d303938ec7a189dabc6231 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 23 Aug 2015 22:24:39 +0100
+Subject: [PATCH] Allow OSMCWalkthroughState to be set via xbmc Python
+ interface
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/legacy/ModuleXbmc.cpp |  5 +++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+index a599e4c..953fc27 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
++++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
+@@ -115,6 +115,11 @@ namespace XBMCAddon
+         CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, function);
+     }
+ 
++    void setosmcwalkthroughstatus(int state)
++    {
++      CApplicationMessenger::GetInstance().SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
++    }
++
+     String executeJSONRPC(const char* jsonrpccommand)
+     {
+       XBMC_TRACE;
+diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
+index 59e43d9..11efb35 100644
+--- a/xbmc/interfaces/legacy/ModuleXbmc.h
++++ b/xbmc/interfaces/legacy/ModuleXbmc.h
+@@ -219,6 +219,34 @@ namespace XBMCAddon
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
++    /// @brief \python_func{ xbmc.setosmcwalkthroughstatus(state) }
++    ///-----------------------------------------------------------------------
++    /// Change the OSMC Walkthrough Status
++    ///
++    /// @param          state       int - state of the walkthrough progress
++    ///
++    ///
++    ///
++    /// List of commands -
++    ///
++    ///
++    /// ------------------------------------------------------------------------
++    ///
++    /// **Example:**
++    /// ~~~~~~~~~~~~~{.py}
++    /// ..
++    /// xbmc.setosmcwalkthroughstatus(1)
++    /// ..
++    /// ~~~~~~~~~~~~~
++    ///
++    setosmcwalkthroughstatus(...);
++#else
++    void setosmcwalkthroughstatus(int state);
++#endif
++
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
+     /// @brief \python_func{ xbmc.sleep(time) }
+     ///-----------------------------------------------------------------------
+     /// Sleeps for 'time' msec.
+-- 
+2.7.4
+
