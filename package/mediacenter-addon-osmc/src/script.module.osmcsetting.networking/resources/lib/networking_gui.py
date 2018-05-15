@@ -757,6 +757,9 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if 'videolibrary' not in sub_dict:
                 sub_dict['videolibrary'] = {}
 
+            if sub_dict['videolibrary'] is None:
+                sub_dict['videolibrary'] = {}
+
             if self.getControl(MYSQL_IMPORT_WATCHED).isSelected():
                 sub_dict['videolibrary']['importwatchedstate'] = 'true'
 
