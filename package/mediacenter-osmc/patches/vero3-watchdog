@@ -65,7 +65,8 @@ syspaths="/sys/class/video/axis
 /sys/class/amhdmitx/amhdmitx0/aud_ch
 /sys/class/amhdmitx/amhdmitx0/phy
 /sys/class/leds/led-sys/brightness
-/sys/devices/system/cpu/cpu0/cpufreq"
+/sys/devices/system/cpu/cpu0/cpufreq
+/dev/amvideocap0"
 
 for syspath in $syspaths; do
 	chgrp -R video $syspath
