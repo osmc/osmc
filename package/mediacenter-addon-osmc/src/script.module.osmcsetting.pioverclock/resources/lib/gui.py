@@ -28,66 +28,61 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		# {'core': 500, 'arm': 800, 'sdram': 700, 'gpu': 275, 'ov': 2, 'sdrov': 6}
 
 		self.oc_profile = namedtuple('Profile', 'arm_freq sdram_freq core_freq initial_turbo over_voltage over_voltage_sdram force_turbo')
+                self.normal_profile = self.oc_profile(self.model['normal']['arm_freq'],
+                                                      self.model['normal']['sdram_freq'],
+                                                      self.model['normal']['core_freq'],
+                                                      self.model['normal']['initial_turbo'],
+                                                      self.model['normal']['over_voltage'],
+                                                      self.model['normal']['over_voltage_sdram'],
+                                                      self.model['normal']['force_turbo'])
+                if self.model['medium'] is None:
+                        self.medium_profile = 'nothing'
+                else:
+                        self.medium_profile = self.oc_profile(self.model['medium']['arm_freq'],
+                                                              self.model['medium']['sdram_freq'],
+                                                              self.model['medium']['core_freq'],
+                                                              self.model['medium']['initial_turbo'],
+                                                              self.model['medium']['over_voltage'],
+                                                              self.model['medium']['over_voltage_sdram'],
+                                                              self.model['medium']['force_turbo'])
+                if self.model['higher'] is None:
+                        self.higher_profile = 'nothing'
+                else:
+                        self.higher_profile = self.oc_profile(self.model['higher']['arm_freq'],
+                                                              self.model['higher']['sdram_freq'],
+                                                              self.model['higher']['core_freq'],
+                                                              self.model['higher']['initial_turbo'],
+                                                              self.model['higher']['over_voltage'],
+                                                              self.model['higher']['over_voltage_sdram'],
+                                                              self.model['higher']['force_turbo'])
 
-		if self.model != 'Pi2':
-			self.normal_profile = self.oc_profile(850, 400, 375, 0, 0, 0, 0)
-			self.medium_profile = self.oc_profile(900, 400, 375, 0, 0, 0, 0)
-			self.higher_profile = self.oc_profile(950, 450, 450, 0, 6, 0, 0)
-			self.custom_profile = self.oc_profile(
-				self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
-				self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
-				self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
-				self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
-				self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
-				self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
-				self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
-				)
+                self.custom_profile = self.oc_profile(
+                        self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
+                        self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
+                        self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
+                        self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
+                        self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
+                        self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
+                        self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
+                        )
 
-			self.overclock_profiles = [self.normal_profile, self.medium_profile, self.higher_profile, self.custom_profile]
+                self.overclock_profiles = [self.normal_profile, self.medium_profile, self.higher_profile, self.custom_profile]
 
-			self.descriptions = {
-				101  :  lang(32088) % self.normal_profile,
-				102  :  lang(32089) % self.medium_profile,
-				103  :  lang(32090) % self.higher_profile,
-				104  :  lang(32091) % self.custom_profile,
-				402  :  lang(32092) % 700,
-				502  :  lang(32093) % 400,
-				602  :  lang(32094) % 250,
-				702  :  lang(32095),
-				802  :	lang(32096),
-				902  :  lang(32097),
-				1002 :  lang(32098),
-				}
-
-
-		else:
-			# raspberry Pi2 profiles, there is not higher, only normal and turbo
-			self.normal_profile = self.oc_profile(900, 450, 450, 0, 0, 0, 0)
-			self.medium_profile = self.oc_profile(1000, 500, 500, 0, 2, 0, 0)
-			self.custom_profile = self.oc_profile(
-				self.setting_values.get('arm_freq', 			self.normal_profile.arm_freq),
-				self.setting_values.get('sdram_freq', 			self.normal_profile.sdram_freq),
-				self.setting_values.get('core_freq', 			self.normal_profile.core_freq),
-				self.setting_values.get('initial_turbo', 		self.normal_profile.initial_turbo),
-				self.setting_values.get('over_voltage', 		self.normal_profile.over_voltage),
-				self.setting_values.get('over_voltage_sdram', 	self.normal_profile.over_voltage_sdram),
-				self.setting_values.get('force_turbo', 			self.normal_profile.force_turbo),
-				)
-
-			self.overclock_profiles = [self.normal_profile, self.medium_profile, 'nothing', self.custom_profile]
-
-			self.descriptions = {
-				101  :  lang(32088) % self.normal_profile,
-				102  :  lang(32089) % self.medium_profile,
-				104  :  lang(32091) % self.custom_profile,
-				402  :  lang(32092) % 900,
-				502  :  lang(32093) % 450,
-				602  :  lang(32094) % 250,
-				702  :  lang(32095),
-				802  :	lang(32106),
-				902  :  lang(32097),
-				1002 :  lang(32098),
-				}
+                self.descriptions = {
+                        101  :  lang(32088) % self.normal_profile,
+                        104  :  lang(32091) % self.custom_profile,
+                        402  :  lang(32092) % self.model['normal']['arm_freq'],
+                        502  :  lang(32093) % self.model['normal']['sdram_freq'],
+                        602  :  lang(32094) % self.model['normal']['core_freq'],
+                        702  :  lang(32095),
+                        802  :	lang(32106),
+                        902  :  lang(32097),
+                        1002 :  lang(32098),
+                        }
+                if self.medium_profile != 'nothing':
+                        self.descriptions[102] = lang(32089) % self.medium_profile
+                if self.higher_profile != 'nothing':
+                        self.descriptions[103] = lang(32090) % self.higher_profile
 
 
 		self.control_matching = {
@@ -119,30 +114,39 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
 	def onInit(self):
 
-		if self.model == 'Pi2':
-			# the number of cores is counted, more than 1 is Pi2
-			hbutton = self.getControl(103)
-			hbutton.setEnabled(False)
-			hbutton.setVisible(False)
+                if not self.model['higher']:
+                        # If no highest was found, turn off the label
+                        hbutton = self.getControl(103)
+                        hbutton.setEnabled(False)
+                        hbutton.setVisible(False)
 
-			hgroup = self.getControl(3)
-			hgroup.setEnabled(False)
-			hgroup.setVisible(False)
-
-			mbutton = self.getControl(102)
-			mbutton.setLabel(lang(32100))
-
-			cbutton = self.getControl(104)
-
-			mbutton.controlUp(self.getControl(101))
-			cbutton.controlDown(self.getControl(101))
-
-		else:
-			hbutton = self.getControl(103)
+                        hgroup = self.getControl(3)
+                        hgroup.setEnabled(False)
+                        hgroup.setVisible(False)
+                else:
+                        hbutton = self.getControl(103)
 			hbutton.setEnabled(True)
 			hgroup = self.getControl(3)
 			hgroup.setEnabled(True)
 
+                if self.model['medium'] is None:
+                        # If no medium turn that one off also
+                        hbutton = self.getControl(102)
+                        hbutton.setEnabled(False)
+                        hbutton.setVisible(False)
+
+                        hgroup = self.getControl(2)
+                        hgroup.setEnabled(False)
+                        hgroup.setVisible(False)
+                else:
+                        if not self.model['higher']:
+                                # If medium but no high call it Turbo
+                                mbutton = self.getControl(102)
+			        mbutton.setLabel(lang(32100))
+                                cbutton = self.getControl(104)
+
+			        mbutton.controlUp(self.getControl(101))
+			        cbutton.controlDown(self.getControl(101))
 
 		# apply the users current settings (custom)
 		self.apply_profile(104)
