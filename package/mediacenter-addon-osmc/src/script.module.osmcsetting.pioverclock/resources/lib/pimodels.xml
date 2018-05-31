@@ -1,0 +1,120 @@
+<!-- Pi model names and overclock settings.
+     There are 3 levels of overclock, normal, middle and higher.
+     Normal is required and should be the default.
+     If higher is defined then middle is required also.
+     If middle is defined and higher is not, then the GUI will display the setting as Turbo.
+
+     If no normal profile is defined, then overclocking will not be available
+     for that model. -->
+     
+<pimodels>
+  <model code="legacy" name="B">
+    <normal>
+      <arm_freq>850</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>375</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+    <middle>
+      <arm_freq>900</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>375</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </middle>
+    <higher>
+      <arm_freq>950</arm_freq>
+      <sdram_freq>450</sdram_freq>
+      <core_freq>450</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>6</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </higher>
+  </model>
+ 
+  <model code="0x2" name="A+">
+    <normal>
+      <arm_freq>700</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>400</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+  </model>
+
+  <model code="0x3" name="B+">
+    <normal>
+      <arm_freq>700</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>400</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+  </model>
+  
+  <model code="0x4" name="2B">
+    <normal>
+      <arm_freq>900</arm_freq>
+      <sdram_freq>450</sdram_freq>
+      <core_freq>450</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+    <medium>
+      <arm_freq>1000</arm_freq>
+      <sdram_freq>500</sdram_freq>
+      <core_freq>500</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>2</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </medium>
+  </model>
+
+  <model code="0x8" name="3B">
+    <normal>
+      <arm_freq>1200</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>400</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+  </model>
+
+  <!-- Do not allow custom OC for the Pi Zero/Zero W -->
+  <model code="0x9" name="Zero" />
+  <model code="0xc" name="Zero W" />
+
+  <model code="0xd" name="3B+">
+    <normal>
+      <arm_freq>1400</arm_freq>
+      <sdram_freq>400</sdram_freq>
+      <core_freq>400</core_freq>
+      <initial_turbo>0</initial_turbo>
+      <over_voltage>0</over_voltage>
+      <over_voltage_sdram>0</over_voltage_sdram>
+      <force_turbo>0</force_turbo>
+    </normal>
+  </model>
+
+  <!--No infomation about these models. Probably test models?
+      Since there is no normal profile defined, then these models
+      cannot be overclocked. -->
+  <model code="0x5" name="Alpha" />
+  <model code="0x6" name="CM1" />
+  <model code="0xa" name="CM3" />
+</pimodels>

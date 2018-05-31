@@ -100,7 +100,7 @@ sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddo
 # OSMC SETTING Modules
 import OSMC_OCparser as parser
 from gui import overclock_gui
-
+import cpu_info
 
 def log(message):
 
@@ -115,32 +115,6 @@ def log(message):
 def lang(id):
 	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
 	return san 
-
-
-def is_pi_zero():
-
-	try:
-		with open('/proc/cpuinfo','r') as f:
-			lines = f.readlines()
-			for line in lines:
-				if line[0:8]=='Revision':
-					myrevision = line[11:len(line)-1]
-			else:
-				raise
-	except:
-		myrevision = "0000"
-
-	try: # Pi2 revision starts with 'a'
-		revisionInt = int(myrevision, 16)
-
-	except ValueError:
-		return False
-
-	if revisionInt >> 23 & 1 == True:
-		if (revisionInt >> 4) & 0X7FF == 9:
-			raise
-
-	return False
 
 
 class OSMCSettingClass(threading.Thread):
@@ -158,7 +132,12 @@ class OSMCSettingClass(threading.Thread):
 			setting_value has changed and the existing setting_value. 
 		'''
 
-		is_pi_zero()
+                pi = cpu_info.get_proc_info()
+                self.pimodel = cpu_info.get_clock_settings(pi)
+
+                if not self.pimodel['normal']:
+                        # No normal settings, so don't show overclock
+                        raise
 
 		super(OSMCSettingClass, self).__init__()
 
@@ -182,16 +161,6 @@ The module allows you to manually adjust:
 
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
-
-		with open('/proc/cpuinfo', 'r') as f:
-			lines = f.readlines()
-
-		cpu_count = sum([1 for x in lines if x.startswith('processor')])
-
-		if cpu_count == 1:
-			self.pimodel = 'PiB'
-		else:
-			self.pimodel = 'Pi2'
 
 		log('Model = %s' % self.pimodel)
 		

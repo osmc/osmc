@@ -34,7 +34,13 @@ NEEDS A FINAL CHECK FOR HDMI_SAFE to make sure the entries related to it are rem
 
 '''
 import re
+import cpu_info
 
+# Get the normal setting for the Pi version as a global
+try:
+        PI_CPU_INFO = cpu_info.get_clock_settings(cpu_info.get_proc_info())['normal']
+except:
+        PI_CPU_INFO = None
 
 def config_to_kodi(MASTER_SETTINGS, config):
 	''' Takes the existing config and uses the protocols in the MASTER_SETTINGS to extract the settings 
@@ -260,68 +266,19 @@ def hdmi_boost_custom_default():
 	return '2'
 
 
-def PiVersion():
-	''' Determines the version of Pi currently being used '''
-
-	with open('/proc/cpuinfo', 'r') as f:
-
-		cpu_count = sum([1 for x in f.readlines() if x.startswith('processor')])
-
-	if cpu_count == 1:
-		return 'PiB'
-	else:
-		return 'Pi2'
-
-
 def arm_freq_custom_default():
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-		return 850
-
-	elif version == 'Pi2':
-		return 900
-
-	else:
-		return 850
+        return PI_CPU_INFO['arm_freq']
 
 
 def sdram_freq_custom_default():
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-		return 400
-
-	elif version == 'Pi2':
-		return 450
-
-	else:
-		return 400
+        return PI_CPU_INFO['sdram_freq']
 
 
 def core_freq_custom_default():
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-		return 375
-
-	elif version == 'Pi2':
-		return 450
-
-	else:
-		return 375
+        return PI_CPU_INFO['core_freq']
 
 
 '''
@@ -348,18 +305,7 @@ def arm_freq_config_set(kodi_setting, all_settings):
 	''' Checks if the frequency setting is the same as the default Pi setting.
 	If so, then remove the line from the config.txt as it is not needed. '''
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-
-		if int(kodi_setting) == 700: return 'remove_this_line'
-
-	elif version == 'Pi2':
-
-		if int(kodi_setting) == 900: return 'remove_this_line'
+        if int(kodi_setting) == PI_CPU_INFO['arm_freq']: return 'remove_this_line'
 
 	return kodi_setting
 
@@ -368,16 +314,7 @@ def sdram_freq_config_set(kodi_setting, all_settings):
 	''' Checks if the frequency setting is the same as the default Pi setting.
 	If so, then remove the line from the config.txt as it is not needed. '''
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-		if int(kodi_setting) == 400: return 'remove_this_line' 
-
-	elif version == 'Pi2':
-		if int(kodi_setting) == 450: return 'remove_this_line'
+        if int(kodi_setting) == PI_CPU_INFO['sdram_freq']: return 'remove_this_line'
 
 	return kodi_setting
 
@@ -386,16 +323,7 @@ def core_freq_config_set(kodi_setting, all_settings):
 	''' Checks if the frequency setting is the same as the default Pi setting.
 	If so, then remove the line from the config.txt as it is not needed. '''
 
-	try:
-		version = PiVersion()
-	except IOError:
-		version = "PiB"
-
-	if version == 'PiB':
-		if int(kodi_setting) == 250: return 'remove_this_line'
-
-	elif version == 'Pi2':
-		if int(kodi_setting) == 450: return 'remove_this_line'
+        if int(kodi_setting) == PI_CPU_INFO['core_freq']: return 'remove_this_line'
 
 	return kodi_setting
 
@@ -454,7 +382,7 @@ MASTER_SETTINGS =    {
 		"arm_freq": { 
 			"default"   : { 
 				"function"      : arm_freq_custom_default, 
-				"value"         : 850
+				"value"         : PI_CPU_INFO['arm_freq']
 				},
 			"config_get_patterns": [
 				{
@@ -473,7 +401,7 @@ MASTER_SETTINGS =    {
 		"sdram_freq": { 
 			"default"   : { 
 				"function"      : sdram_freq_custom_default, 
-				"value"         : 400
+				"value"         : PI_CPU_INFO['sdram_freq']
 				},
 			"config_get_patterns": [
 				{
@@ -492,7 +420,7 @@ MASTER_SETTINGS =    {
 		"core_freq": { 
 			"default"   : { 
 				"function"      : core_freq_custom_default, 
-				"value"         : 375
+				"value"         : PI_CPU_INFO['core_freq']
 				},
 			"config_get_patterns": [
 				{
