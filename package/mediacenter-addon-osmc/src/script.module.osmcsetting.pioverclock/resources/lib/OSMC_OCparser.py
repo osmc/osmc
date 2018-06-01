@@ -264,23 +264,12 @@ def PiVersion():
 	''' Determines the version of Pi currently being used '''
 
 	with open('/proc/cpuinfo', 'r') as f:
-                lines = f.readlines()
-
-	cpu_count = sum([1 for x in lines if x.startswith('processor')])
+	        cpu_count = sum([1 for x in f.readlines() if x.startswith('processor')])
 
 	if cpu_count == 1:
 		return 'PiB'
 	else:
-                # Check for Pi3/Pi3+ by looking at the Features. Only check CPU 0
-                try:
-                        feat = [fl for fl in lines if x.startswith('Features')][0].split()
-                except:
-                        # Feat was empty, so default to Pi2
-                        feat = []
-                if 'crc32' in feat:
-                        return 'Pi3'
-                else:
-		        return 'Pi2'
+	        return 'Pi2'
 
 
 def arm_freq_custom_default():

@@ -47,11 +47,7 @@ def get_clock_settings(procinfo):
     settings = {'name': m.get('name')}
     for preset in ('normal', 'medium', 'higher'):
         try:
-            for i in m.find(preset).iter():
-                try:
-                    settings[preset][i.tag] = i.text
-                except KeyError:
-                    settings[preset] = {i.tag: i.text}
+            settings[preset] = {i.tag: i.text for i in m.find(preset).iter()}
         except AttributeError:
             settings[preset] = None
     return settings
