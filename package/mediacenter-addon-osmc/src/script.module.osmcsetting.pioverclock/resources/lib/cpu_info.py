@@ -35,6 +35,7 @@ def get_clock_settings(procinfo):
     et = ElementTree.parse(curdir + '/pimodels.xml').getroot()
 
     if not procinfo['new']:
+        # Lump all older versions of the Pi as a legacy model
         ptype = 'legacy'
     else:
         ptype = procinfo['type']
