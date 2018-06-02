@@ -132,6 +132,13 @@ class OSMCSettingClass(threading.Thread):
 			setting_value has changed and the existing setting_value. 
 		'''
 
+                pi = cpu_info.get_proc_info()
+                self.pimodel = cpu_info.get_clock_settings(pi)
+
+                if not self.pimodel['normal']:
+                        # No normal settings, so don't show overclock
+                        raise
+
 		super(OSMCSettingClass, self).__init__()
 
 		self.addonid = "script.module.osmcsetting.pioverclock"
@@ -154,9 +161,6 @@ The module allows you to manually adjust:
 
 		# a flag to determine whether a setting change requires a reboot to take effect
 		self.reboot_required = False
-
-                pi = cpu_info.get_proc_info()
-                self.pimodel = cpu_info.get_clock_settings(pi)
 
 		log('Model = %s' % self.pimodel)
 		
