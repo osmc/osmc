@@ -95,29 +95,9 @@
     </normal>
   </model>
 
-  <model code="0x9" name="Zero">
-    <normal>
-      <arm_freq>1000</arm_freq>
-      <sdram_freq>400</sdram_freq>
-      <core_freq>400</core_freq>
-      <initial_turbo>0</initial_turbo>
-      <over_voltage>0</over_voltage>
-      <over_voltage_sdram>0</over_voltage_sdram>
-      <force_turbo>0</force_turbo>
-    </normal>
-  </model>
-
-  <model code="0xc" name="Zero W">
-    <normal>
-      <arm_freq>1000</arm_freq>
-      <sdram_freq>400</sdram_freq>
-      <core_freq>400</core_freq>
-      <initial_turbo>0</initial_turbo>
-      <over_voltage>0</over_voltage>
-      <over_voltage_sdram>0</over_voltage_sdram>
-      <force_turbo>0</force_turbo>
-    </normal>
-  </model>
+  <!-- Do not allow custom OC for the Pi Zero/Zero W -->
+  <model code="0x9" name="Zero" />
+  <model code="0xc" name="Zero W" />
 
   <model code="0xd" name="3B+">
     <normal>
