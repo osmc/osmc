@@ -130,7 +130,7 @@ esac
 
 if [ ! -e /var/run/fb_resolution ]; then
 	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
-	cat /sys/class/display/mode >/var/run/fb_mode
+	cat /sys/class/display/mode | head -n 1 >/var/run/fb_mode
 	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
 	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
 	cat /sys/class/graphics/fb0/scale_width | sed 's/^.*://' >/var/run/fb_scale_width
