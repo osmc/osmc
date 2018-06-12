@@ -154,12 +154,13 @@ then
         then
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
-                abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm64/boot/Image.gz -r ../../initramfs-src/initrd.img.gz -s arch/arm64/boot/dts/amlogic/vero3_2g_16g.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
+		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic
+                abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm64/boot/Image.gz -r ../../initramfs-src/initrd.img.gz -s multi.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
                 if [ $? != 0 ]; then echo "Building Android image for Vero 3 failed" && exit 1; fi
 		# Hacks for lack of ARM64 native in kernel-package for Jessie
 		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
 		# Device tree for uploading to eMMC
-		cp -ar arch/arm64/boot/dts/amlogic/vero3_2g_16g.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
+		cp -ar multi.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
         fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
