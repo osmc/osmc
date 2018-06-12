@@ -103,8 +103,9 @@ fi
 if [ "$1" == "vero3" ]
 then
 	echo -e "Installing Vero 3 files"
-	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s vero3_2g_16g.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
-	cp vero3_2g_16g.dtb /mnt/dtb.img
+	../.././output/build/linux-master/scripts/multidtb/multidtb -o multi.dtb --dtc-path $(pwd)/../../output/build/linux-master/scripts/dtc/ $(pwd)/../../output/build/linux-master/arch/arm64/boot/dts/amlogic
+	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s multi.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
+	cp multi.dtb /mnt/dtb.img
 fi
 echo -e "Installing filesystem"
 mv $(pwd)/../../../filesystem.tar.xz /mnt/
