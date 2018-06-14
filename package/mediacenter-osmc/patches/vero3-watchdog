@@ -38,9 +38,7 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
-syspaths="/sys/class/video/axis
-/sys/class/video/screen_mode
-/sys/class/video/disable_video
+syspaths="/sys/class/video/
 /sys/class/tsync/pts_pcrscr
 /sys/class/tsync/enable
 /sys/class/audiodsp/digital_raw
@@ -52,9 +50,7 @@ syspaths="/sys/class/video/axis
 /sys/module/amvideo/parameters/omx_pts_interval_lower
 /sys/class/vfm/map
 /dev/video10
-/sys/class/video/blackout_policy
 /sys/module/di/parameters/bypass_all
-/sys/class/video/freerun_mode
 /sys/module/amlvideodri/parameters/freerun_mode
 /sys/class/amhdmitx/amhdmitx0/frac_rate_policy
 /sys/module/di/parameters/bypass_prog
