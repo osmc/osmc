@@ -67,6 +67,7 @@ then
         then
             handle_dep "u-boot-tools"
 	    handle_dep "abootimg"
+	    handle_dep "libproc-processtable-perl"
         fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
