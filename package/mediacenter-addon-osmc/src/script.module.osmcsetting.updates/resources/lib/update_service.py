@@ -256,10 +256,10 @@ class Main(object):
 
 			# periodic announcement to confirm the service is alive
 			# FOR TESTING ONLY
-			if not count % 100:									# FOR TESTING ONLY
-				xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
-				log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
-			count += 1 								# FOR TESTING ONLY
+			# if not count % 100:									# FOR TESTING ONLY
+			# 	xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
+			# 	log('blurp %s - %s' % (self.randomid, xml))					# FOR TESTING ONLY
+			# count += 1 								# FOR TESTING ONLY
 			# FOR TESTING ONLY
 
 			# freespace checker, (runs 5 minutes after boot)
