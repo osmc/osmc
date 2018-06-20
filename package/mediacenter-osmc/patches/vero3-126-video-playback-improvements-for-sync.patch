@@ -1,0 +1,54 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index aace6ee..9cbb00f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1229,7 +1229,7 @@ int pre_header_feeding(am_private_t *para, am_packet_t *pkt)
+                 || (CODEC_TAG_VC_1 == para->video_codec_tag)
+                 || (CODEC_TAG_WMVA == para->video_codec_tag)) {
+             CLog::Log(LOGDEBUG, "CODEC_TAG_WVC1 == para->video_codec_tag");
+-            ret = wvc1_write_header(para, pkt);
++            ret = wmv3_write_header(para, pkt);
+             if (ret != PLAYER_SUCCESS) {
+                 return ret;
+             }
+@@ -2188,7 +2188,7 @@ bool CAMLCodec::GetPicture(DVDVideoPicture *pDvdVideoPicture)
+   if (m_last_pts <= 0)
+     pDvdVideoPicture->iDuration = (double)(am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
+   else
+-    pDvdVideoPicture->iDuration = (double)((m_cur_pts - m_last_pts) * DVD_TIME_BASE) / PTS_FREQ;
++    pDvdVideoPicture->iDuration = (double)((0x7FFFFFFF & (m_cur_pts - m_last_pts)) * DVD_TIME_BASE) / PTS_FREQ;
+ 
+   pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
+   pDvdVideoPicture->pts = (double)GetCurPts() / PTS_FREQ * DVD_TIME_BASE;
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index bdd32af..e107a7d 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -2024,7 +2024,7 @@ void CVideoPlayer::HandlePlaySpeed()
+       else if (m_CurrentAudio.starttime != DVD_NOPTS_VALUE && m_CurrentAudio.packets > 0)
+       {
+         if (m_pInputStream->IsRealtime())
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(400);
++	  clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
+         else
+           clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
+         if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE &&
+@@ -2129,7 +2129,7 @@ void CVideoPlayer::HandlePlaySpeed()
+           error /= errorwin;
+         }
+ 
+-        if (error > DVD_MSEC_TO_TIME(1000))
++        if (std::abs(error) > DVD_MSEC_TO_TIME(1000))
+         {
+           error  = (int)DVD_TIME_TO_MSEC(m_clock.GetClock()) - m_SpeedState.lastseekpts;
+ 
+@@ -4003,8 +4003,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+     }
+   }
+ 
+-  if(pts != DVD_NOPTS_VALUE && sync)
+-    m_clock.Discontinuity(pts);
++  m_CurrentVideo.lastdts = DVD_NOPTS_VALUE;
+   UpdatePlayState(0);
+ 
+   if (m_omxplayer_mode)
