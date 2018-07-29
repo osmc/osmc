@@ -1,0 +1,301 @@
+From e9ea6d7a85b2d2901592a730f3a7787832b628ae Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sun, 29 Jul 2018 13:34:32 +0100
+Subject: [PATCH] Separating HRA from MA
+
+---
+ xbmc/cores/AudioEngine/AEFactory.cpp               |  2 +
+ .../AudioEngine/Engines/ActiveAE/ActiveAESink.cpp  |  1 +
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        | 21 +++---
+ xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp |  6 +-
+ xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp      | 75 ++++++++++++++++++----
+ xbmc/cores/AudioEngine/Utils/AEUtil.cpp            |  2 +
+ 6 files changed, 83 insertions(+), 24 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/AEFactory.cpp b/xbmc/cores/AudioEngine/AEFactory.cpp
+index 6577ed3..41552c1 100644
+--- a/xbmc/cores/AudioEngine/AEFactory.cpp
++++ b/xbmc/cores/AudioEngine/AEFactory.cpp
+@@ -197,6 +197,8 @@ bool CAEFactory::SupportsRaw(AEAudioFormat &format)
+     return false;
+   if (format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_DTSHD && !CSettings::GetInstance().GetBool(CSettings::SETTING_AUDIOOUTPUT_DTSHDPASSTHROUGH))
+     return false;
++  if (format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_DTSHD_XLL && !CSettings::GetInstance().GetBool(CSettings::SETTING_AUDIOOUTPUT_DTSHDPASSTHROUGH))
++    return false;
+ 
+   if(AE)
+     return AE->SupportsRaw(format);
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+index 84d56db..1adfa76 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+@@ -151,6 +151,7 @@ bool CActiveAESink::SupportsFormat(const std::string &device, AEAudioFormat &for
+                 break;
+ 
+               case CAEStreamInfo::STREAM_TYPE_DTSHD:
++              case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+                 samplerate = 192000;
+                 break;
+ 
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 69b89bd..27eaf23 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -131,10 +131,11 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayoutRaw(const AEAudioFormat& form
+ 
+   switch (format.m_streamInfo.m_type)
+   {
+-    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+     case CAEStreamInfo::STREAM_TYPE_TRUEHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       count = 8;
+       break;
++    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+     case CAEStreamInfo::STREAM_TYPE_DTS_512:
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+@@ -572,15 +573,16 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+         case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+           aml_digital_codec = 3;
+           break;
+-
+-        case CAEStreamInfo::STREAM_TYPE_EAC3:
+-          aml_digital_codec = 4;
+-          break;
+-
+         case CAEStreamInfo::STREAM_TYPE_DTSHD:
++          aml_digital_codec = 5;
++          break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+           aml_digital_codec = 8;
+           break;
+ 
++        case CAEStreamInfo::STREAM_TYPE_EAC3:
++          aml_digital_codec = 4;
++          break;
+         case CAEStreamInfo::STREAM_TYPE_TRUEHD:
+           aml_digital_codec = 7;
+           break;
+@@ -614,7 +616,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   if (m_passthrough || devType == AE_DEVTYPE_HDMI || devType == AE_DEVTYPE_IEC958)
+     GetAESParams(format, AESParams);
+ 
+-  CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Attempting to open device \"%s\"", device.c_str());
++  CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Attempting to open device \"%s\"\n with %s", device.c_str(), AESParams.c_str());
+ 
+   /* get the sound config */
+   snd_config_t *config;
+@@ -1196,8 +1198,8 @@ bool CAESinkALSA::OpenPCMDevice(const std::string &name, const std::string &para
+       if (devPos != std::string::npos)
+         nameWithoutDev.erase(nameWithoutDev.begin() + devPos, nameWithoutDev.begin() + devPos + 6);
+ 
+-      if (TryDeviceWithParams("sysdefault" + nameWithoutDev, params, pcmp, lconf)
+-          || TryDeviceWithParams("default" + nameWithoutDev, params, pcmp, lconf))
++      if (TryDeviceWithParams("default" + nameWithoutDev, params, pcmp, lconf)
++          || TryDeviceWithParams("sysdefault" + nameWithoutDev, params, pcmp, lconf))
+         return true;
+     }
+ 
+@@ -1665,6 +1667,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_AC3);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD_CORE);
++    info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD_XLL);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_1024);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_2048);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_512);
+diff --git a/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp b/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
+index 3a6ede1..d3dae94 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
+@@ -64,6 +64,7 @@ void CAEBitstreamPacker::Pack(CAEStreamInfo &info, uint8_t* data, int size)
+       break;
+ 
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       PackDTSHD (info, data, size);
+       break;
+ 
+@@ -109,6 +110,7 @@ void CAEBitstreamPacker::PackPause(CAEStreamInfo &info, unsigned int millis, boo
+ 
+     case CAEStreamInfo::STREAM_TYPE_AC3:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+     case CAEStreamInfo::STREAM_TYPE_DTS_512:
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+@@ -275,6 +277,7 @@ unsigned int CAEBitstreamPacker::GetOutputRate(CAEStreamInfo &info)
+       rate = info.m_sampleRate;
+       break;
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       rate = 192000;
+       break;
+     default:
+@@ -295,11 +298,12 @@ CAEChannelInfo CAEBitstreamPacker::GetOutputChannelMap(CAEStreamInfo &info)
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+     case CAEStreamInfo::STREAM_TYPE_DTS_2048:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+       channels = 2;
+       break;
+ 
+     case CAEStreamInfo::STREAM_TYPE_TRUEHD:
+-    case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       channels = 8;
+       break;
+ 
+diff --git a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
+index d1962e2..6a247c5 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
+@@ -28,6 +28,12 @@
+ #define DTS_PREAMBLE_16BE  0x7FFE8001
+ #define DTS_PREAMBLE_16LE  0xFE7F0180
+ #define DTS_PREAMBLE_HD    0x64582025
++#define DTS_PREAMBLE_XCH   0x5a5a5a5a
++#define DTS_PREAMBLE_XXCH  0x47004a03
++#define DTS_PREAMBLE_X96K  0x1d95f262
++#define DTS_PREAMBLE_XBR   0x655e315e
++#define DTS_PREAMBLE_LBR   0x0a801921
++#define DTS_PREAMBLE_XLL   0x41a29547
+ #define DTS_SFREQ_COUNT    16
+ #define MAX_EAC3_BLOCKS    6
+ 
+@@ -107,6 +113,7 @@ double CAEStreamInfo::GetDuration()
+     case STREAM_TYPE_DTS_512:
+     case STREAM_TYPE_DTSHD_CORE:
+     case STREAM_TYPE_DTSHD:
++    case STREAM_TYPE_DTSHD_XLL:
+       duration = 512.0 / m_sampleRate;
+       break;
+     case STREAM_TYPE_DTS_1024:
+@@ -504,6 +511,7 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+     unsigned int dtsBlocks;
+     unsigned int amode;
+     unsigned int sfreq;
++    unsigned int target_rate, extension, ext_type;
+     unsigned int lfe;
+     int bits;
+ 
+@@ -547,6 +555,9 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+         m_fsize = (((((data[5] & 0x3) << 8) | data[6]) << 4) | ((data[7] & 0xF0) >> 4)) + 1;
+         amode = ((data[7] & 0x0F) << 2) | ((data[8] & 0xC0) >> 6);
+         sfreq = (data[8] & 0x3C) >> 2;
++        target_rate = ((data[8] & 0x03) << 3) | ((data[9] & 0xe0) >> 5);
++        extension = (data[10] & 0x10) >> 4;
++        ext_type = (data[10] & 0xe0) >> 5;
+         lfe = (data[10] >> 1) & 0x3;
+         m_info.m_dataIsLE = false;
+         bits = 16;
+@@ -616,11 +627,27 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+       else
+         hd_size = (((data[m_fsize + 6] & 0x1f) << 11) | (data[m_fsize + 7] << 3) | ((data[m_fsize + 8] & 0xe0) >> 5)) + 1;
+ 
++	  int header_size;
++	  if (blownup)
++		header_size = (((data[m_fsize + 5] & 0x1f) << 7) | ((data[m_fsize + 6] & 0xfe) >> 1)) + 1;
++	  else
++		header_size = (((data[m_fsize + 5] & 0x1f) << 3) | ((data[m_fsize + 6] & 0xe0) >> 5)) + 1;
++
++	  hd_sync = data[m_fsize + header_size] << 24 | data[m_fsize + header_size + 1] << 16 | data[m_fsize + header_size + 2] << 8 | data[m_fsize + header_size + 3];
++
+       /* set the type according to core or not */
+-      if (m_coreOnly)
+-        dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
+-      else
+-        dataType = CAEStreamInfo::STREAM_TYPE_DTSHD;
++	  if (m_coreOnly)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
++	  else if (hd_sync == DTS_PREAMBLE_XLL)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_XLL;
++	  else if (hd_sync == DTS_PREAMBLE_XCH
++			  || hd_sync == DTS_PREAMBLE_XXCH
++			  || hd_sync == DTS_PREAMBLE_X96K
++			  || hd_sync == DTS_PREAMBLE_XBR
++			  || hd_sync == DTS_PREAMBLE_LBR)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD;
++	  else
++		dataType = m_info.m_type;
+ 
+       m_coreSize = m_fsize;
+       m_fsize += hd_size;
+@@ -636,15 +663,17 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+       m_info.m_channels = DTSChannels[amode] + (lfe ? 1 : 0);
+       m_syncFunc = &CAEStreamParser::SyncDTS;
+       m_info.m_repeat = 1;
+-
+-      if (dataType == CAEStreamInfo::STREAM_TYPE_DTSHD)
+-      {
+-        m_info.m_channels += 2; /* FIXME: this needs to be read out, not sure how to do that yet */
+-        m_info.m_dtsPeriod = (192000 * (8 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
+-      }
+-      else
++      switch (dataType)
+       {
+-        m_info.m_dtsPeriod = (m_info.m_sampleRate * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++	        m_info.m_channels += 2; /* FIXME: this needs to be read out, not sure how to do that yet */
++	        m_info.m_dtsPeriod = (192000 * (8 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++			break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD:
++	        m_info.m_dtsPeriod = (192000 * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++			break;
++		default:
++	        m_info.m_dtsPeriod = (m_info.m_sampleRate * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
+       }
+ 
+       std::string type;
+@@ -656,15 +685,33 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+         case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+           type = "dtsHD (core)";
+           break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++          type = "dtsHD MA";
++          break;
+         default:
+           type = "dts";
+           break;
+       }
+ 
+-      CLog::Log(LOGINFO, "CAEStreamParser::SyncDTS - %s stream detected (%d channels, %dHz, %dbit %s, period: %u)",
++	  if (extension) switch (ext_type)
++	  {
++		  case 0:
++			  type += " XCH";
++			  break;
++		  case 2:
++			  type += " X96";
++			  break;
++		  case 6:
++			  type += " XXCH";
++			  break;
++		  default:
++			  type += " ext unknown";
++	  }
++
++      CLog::Log(LOGINFO, "CAEStreamParser::SyncDTS - %s stream detected (%d channels, %dHz, %dbit %s, period: %u, syncword: 0x%x, target rate: 0x%x, framesize %u)",
+                 type.c_str(), m_info.m_channels, m_info.m_sampleRate,
+                 bits, m_info.m_dataIsLE ? "LE" : "BE",
+-                m_info.m_dtsPeriod);
++                m_info.m_dtsPeriod, hd_sync, target_rate, m_fsize);
+     }
+ 
+     return skip;
+diff --git a/xbmc/cores/AudioEngine/Utils/AEUtil.cpp b/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
+index 3d8edba..e6c876c 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
+@@ -170,6 +170,8 @@ const char* CAEUtil::StreamTypeToStr(const enum CAEStreamInfo::DataType dataType
+       return "STREAM_TYPE_AC3";
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
+       return "STREAM_TYPE_DTSHD";
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++      return "STREAM_TYPE_DTSHD_MA";
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+       return "STREAM_TYPE_DTSHD_CORE";
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+-- 
+2.11.0
+
