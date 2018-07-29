@@ -1,4 +1,4 @@
-From e02769cd2ebea00b8e61b861ff83fef9c3ebd692 Mon Sep 17 00:00:00 2001
+From 72a11355628a9b674ee56b1a7cc9004ef959a283 Mon Sep 17 00:00:00 2001
 From: kszaq <kszaquitto@gmail.com>
 Date: Sun, 4 Sep 2016 00:51:03 +0200
 Subject: [PATCH] aml: Multichannel-PCM and HD Audio passthrough
@@ -8,11 +8,11 @@ Subject: [PATCH] aml: Multichannel-PCM and HD Audio passthrough
 3. Amlogic wants 48kHz for EAC3 passthrough.
 4. Identify Amlogic audio output as HDMI.
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 61 +++++++++++++++++++++++++++--
- 1 file changed, 58 insertions(+), 3 deletions(-)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 50 +++++++++++++++++++++++++++--
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index d66993a..b3a32ad 100644
+index 0886020..cd41add 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 @@ -38,6 +38,7 @@
@@ -23,7 +23,7 @@ index d66993a..b3a32ad 100644
  #endif
  
  #ifdef TARGET_POSIX
-@@ -534,12 +535,47 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -534,12 +535,50 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    {
      m_passthrough   = false;
    }
@@ -67,6 +67,9 @@ index d66993a..b3a32ad 100644
 +      device = "@:CARD=AMLM8AUDIO,DEV=0";
 +    }
 +
++    else if (device.find("M8AUDIO") != std::string::npos)
++        device = "@:CARD=AMLM8AUDIO,DEV=0";
++
      aml_set_audio_passthrough(m_passthrough);
 +    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
    }
@@ -74,7 +77,7 @@ index d66993a..b3a32ad 100644
  
    if (inconfig.channels == 0)
    {
-@@ -1549,6 +1599,11 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1554,6 +1593,11 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
        info.m_dataFormats.push_back(i);
    }
  
@@ -87,5 +90,5 @@ index d66993a..b3a32ad 100644
    {
      // we don't trust ELD information and push back our supported formats explicitely
 -- 
-1.8.3.1
+2.7.4
 
