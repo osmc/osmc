@@ -1,4 +1,4 @@
-From df3fa58ff1a9b67faf3cd915619119df4d765abd Mon Sep 17 00:00:00 2001
+From 9415f37d9cba26a03e31c390f8f2530a53656779 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Sun, 29 Jul 2018 13:34:32 +0100
 Subject: [PATCH] Separating HRA from MA
@@ -9,9 +9,9 @@ Subject: [PATCH] Separating HRA from MA
  xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        | 21 +++---
  xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp |  6 +-
  xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp      | 75 ++++++++++++++++++----
- xbmc/cores/AudioEngine/Utils/AEStreamInfo.h        |  1 +
+ xbmc/cores/AudioEngine/Utils/AEStreamInfo.h        |  3 +-
  xbmc/cores/AudioEngine/Utils/AEUtil.cpp            |  2 +
- 7 files changed, 84 insertions(+), 24 deletions(-)
+ 7 files changed, 85 insertions(+), 25 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/AEFactory.cpp b/xbmc/cores/AudioEngine/AEFactory.cpp
 index 6577ed3..41552c1 100644
@@ -285,13 +285,15 @@ index d1962e2..6a247c50 100644
  
      return skip;
 diff --git a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
-index a753707..5a43970 100644
+index a753707..fa9ac16 100644
 --- a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
 +++ b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
-@@ -49,6 +49,7 @@ public:
+@@ -48,7 +48,8 @@ public:
+     STREAM_TYPE_DTSHD_CORE,
      STREAM_TYPE_EAC3,
      STREAM_TYPE_MLP,
-     STREAM_TYPE_TRUEHD
+-    STREAM_TYPE_TRUEHD
++    STREAM_TYPE_TRUEHD,
 +    STREAM_TYPE_DTSHD_XLL
    };
    DataType m_type;
