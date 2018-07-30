@@ -1,4 +1,4 @@
-From 8925a795c1177ff3182f6bd3de13330373652db0 Mon Sep 17 00:00:00 2001
+From 9013a7366b9d3f162cafbc24bfa658b7324dc322 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Sun, 29 Jul 2018 13:34:32 +0100
 Subject: [PATCH] Separating HRA from MA
@@ -6,12 +6,12 @@ Subject: [PATCH] Separating HRA from MA
 ---
  xbmc/cores/AudioEngine/AEFactory.cpp               |  2 +
  .../AudioEngine/Engines/ActiveAE/ActiveAESink.cpp  |  1 +
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        | 23 ++++---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        | 25 ++++----
  xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp |  6 +-
  xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp      | 75 ++++++++++++++++++----
  xbmc/cores/AudioEngine/Utils/AEStreamInfo.h        |  3 +-
  xbmc/cores/AudioEngine/Utils/AEUtil.cpp            |  2 +
- 7 files changed, 86 insertions(+), 26 deletions(-)
+ 7 files changed, 85 insertions(+), 29 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/AEFactory.cpp b/xbmc/cores/AudioEngine/AEFactory.cpp
 index 6577ed3..41552c1 100644
@@ -39,7 +39,7 @@ index 84d56db..1adfa76 100644
                  break;
  
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 051e232..288e287 100644
+index 051e232..705fcbf 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 @@ -131,10 +131,11 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayoutRaw(const AEAudioFormat& form
@@ -55,7 +55,7 @@ index 051e232..288e287 100644
      case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
      case CAEStreamInfo::STREAM_TYPE_DTS_512:
      case CAEStreamInfo::STREAM_TYPE_DTS_1024:
-@@ -572,15 +573,16 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -572,24 +573,21 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
          case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
            aml_digital_codec = 3;
            break;
@@ -77,16 +77,16 @@ index 051e232..288e287 100644
          case CAEStreamInfo::STREAM_TYPE_TRUEHD:
            aml_digital_codec = 7;
            break;
-@@ -591,7 +593,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
-       device = "@:CARD=AMLM8AUDIO,DEV=0";
+       }
      }
+-    else
+-    {
+-      device = "@:CARD=AMLM8AUDIO,DEV=0";
+-    }
  
--    else if (device.find("M8AUDIO") != std::string::npos)
-+    if (device.find("M8AUDIO") != std::string::npos)
+     else if (device.find("M8AUDIO") != std::string::npos)
          device = "@:CARD=AMLM8AUDIO,DEV=0";
- 
-     aml_set_audio_passthrough(m_passthrough);
-@@ -621,7 +623,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -621,7 +619,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    if (m_passthrough || devType == AE_DEVTYPE_HDMI || devType == AE_DEVTYPE_IEC958)
      GetAESParams(format, AESParams);
  
@@ -95,7 +95,7 @@ index 051e232..288e287 100644
  
    /* get the sound config */
    snd_config_t *config;
-@@ -1203,8 +1205,8 @@ bool CAESinkALSA::OpenPCMDevice(const std::string &name, const std::string &para
+@@ -1203,8 +1201,8 @@ bool CAESinkALSA::OpenPCMDevice(const std::string &name, const std::string &para
        if (devPos != std::string::npos)
          nameWithoutDev.erase(nameWithoutDev.begin() + devPos, nameWithoutDev.begin() + devPos + 6);
  
@@ -106,7 +106,7 @@ index 051e232..288e287 100644
          return true;
      }
  
-@@ -1672,6 +1674,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1672,6 +1670,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
      info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_AC3);
      info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD);
      info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD_CORE);
