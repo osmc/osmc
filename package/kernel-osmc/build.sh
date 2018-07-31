@@ -16,7 +16,7 @@ test $1 == vero && VERSION="4.4.0" && REV="18" && FLAGS_INITRAMFS=$(($INITRAMFS_
 test $1 == vero2 && VERSION="3.10.105" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == atv && VERSION="4.2.3" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="110" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="111" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -154,7 +154,7 @@ then
         then
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
-		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic
+		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic --verbose --page-size 2048
                 abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm64/boot/Image.gz -r ../../initramfs-src/initrd.img.gz -s multi.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
                 if [ $? != 0 ]; then echo "Building Android image for Vero 3 failed" && exit 1; fi
 		# Hacks for lack of ARM64 native in kernel-package for Jessie
