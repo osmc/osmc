@@ -431,7 +431,7 @@ then
         for language in ${languages}
         do
             echo "Downloading language file for ${language}"
-            language_file=$(wget ${base_url}/resource.language.${language} -O- | grep -o '<a .*href=.*>' | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | tail -n 1)
+            language_file=$(wget ${base_url}/resource.language.${language} -O- | grep -o '<a .*href=.*>' | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | grep 'resource.language' | sort --version-sort | tail -n 1)
             if [ $? != 0 ]; then echo "Can't determine language file" && exit 1; fi
 	    wget ${base_url}/resource.language.${language}/${language_file}
             if [ $? != 0 ]; then echo "Couldn't download language file ${language_file}" && exit 1; fi
