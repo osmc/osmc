@@ -219,13 +219,13 @@ SETS =  {
                                                 'name': 'APT term.log',
                                                 'key' : 'RcBRrsRs',
                                                 'ltyp': 'cl_log',
-                                                'actn': 'grep -v "^(Reading database" /var/log/apt/term.log | tail -n 500',
+                                                'actn': 'grep -v -a"^(Reading database" /var/log/apt/term.log | tail -n 500',
                                             },
                                             {
                                                 'name': 'APT history.log',
                                                 'key' : 'B8sj7DO8',
                                                 'ltyp': 'cl_log',
-                                                'actn': 'grep -v "^(Reading database" /var/log/apt/history.log | tail -n 500',
+                                                'actn': 'grep -v -a"^(Reading database" /var/log/apt/history.log | tail -n 500',
                                             },
                                             {
                                                 'name': 'APT sources.list',
