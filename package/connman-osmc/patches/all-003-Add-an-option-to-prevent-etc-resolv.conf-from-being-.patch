@@ -1,4 +1,4 @@
-From 454fcc80e52e91f4bf84db23f971a808ce927810 Mon Sep 17 00:00:00 2001
+From 7f67a8fe6a2af13375ed80ccc86d4b19db8ab5c6 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 3 Sep 2015 16:58:42 +0100
 Subject: [PATCH] Add an option to prevent /etc/resolv.conf from being modified
@@ -6,15 +6,15 @@ Subject: [PATCH] Add an option to prevent /etc/resolv.conf from being modified
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  src/connman.h  |  2 +-
- src/main.c     |  3 ++-
+ src/main.c     |  6 +++++-
  src/resolver.c | 10 +++++++++-
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/src/connman.h b/src/connman.h
-index 82e77d3..f7f4f74 100644
+index 706ab98..ec825b2 100644
 --- a/src/connman.h
 +++ b/src/connman.h
-@@ -253,7 +253,7 @@ char **__connman_inet_get_pnp_nameservers(const char *pnp_file);
+@@ -254,7 +254,7 @@ char **__connman_inet_get_pnp_nameservers(const char *pnp_file);
  
  #include <connman/resolver.h>
  
@@ -24,10 +24,10 @@ index 82e77d3..f7f4f74 100644
  void __connman_resolver_append_fallback_nameservers(void);
  int __connman_resolvfile_append(int index, const char *domain, const char *server);
 diff --git a/src/main.c b/src/main.c
-index 318bf02..18dbd26 100644
+index 3f8221e..e1e4931 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -534,6 +534,7 @@ static gchar *option_noplugin = NULL;
+@@ -577,6 +577,7 @@ static gchar *option_noplugin = NULL;
  static gchar *option_wifi = NULL;
  static gboolean option_detach = TRUE;
  static gboolean option_dnsproxy = TRUE;
@@ -35,7 +35,17 @@ index 318bf02..18dbd26 100644
  static gboolean option_backtrace = TRUE;
  static gboolean option_version = FALSE;
  
-@@ -791,7 +792,7 @@ int main(int argc, char *argv[])
+@@ -638,6 +639,9 @@ static GOptionEntry options[] = {
+ 	{ "nodnsproxy", 'r', G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_dnsproxy,
+ 				"Don't support DNS resolving" },
++        { "noresolvmodify", 's', G_OPTION_FLAG_REVERSE,
++                                G_OPTION_ARG_NONE, &option_allowresolvmodify,
++                                "Don't allow resolv.conf changes. Useful if ignoring the primary interface" },
+ 	{ "nobacktrace", 0, G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_backtrace,
+ 				"Don't print out backtrace information" },
+@@ -843,7 +847,7 @@ int main(int argc, char *argv[])
  
  	__connman_plugin_init(option_plugin, option_noplugin);
  
