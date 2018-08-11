@@ -1,6 +1,6 @@
---- /dev/null	2018-04-25 22:28:10.430000000 +0000
-+++ b/.config	2018-04-27 18:52:33.636391610 +0000
-@@ -0,0 +1,3729 @@
+--- /dev/null	2018-08-09 00:32:30.243226267 +0100
++++ b/.config	2018-08-11 17:57:03.338176160 +0100
+@@ -0,0 +1,3733 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 3.14.29 Kernel Configuration
@@ -353,7 +353,9 @@
 +CONFIG_CMA_AREAS=7
 +# CONFIG_ZBUD is not set
 +# CONFIG_ZSWAP is not set
-+# CONFIG_ZSMALLOC is not set
++CONFIG_ZSMALLOC=y
++# CONFIG_ZSMALLOC_STAT is not set
++CONFIG_PGTABLE_MAPPING=y
 +CONFIG_GENERIC_EARLY_IOREMAP=y
 +# CONFIG_KEXEC is not set
 +# CONFIG_CRASH_DUMP is not set
@@ -1397,6 +1399,8 @@
 +# CONFIG_PARPORT is not set
 +CONFIG_BLK_DEV=y
 +# CONFIG_BLK_DEV_NULL_BLK is not set
++CONFIG_ZRAM=m
++# CONFIG_ZRAM_DEBUG is not set
 +# CONFIG_BLK_DEV_COW_COMMON is not set
 +CONFIG_BLK_DEV_LOOP=y
 +CONFIG_BLK_DEV_LOOP_MIN_COUNT=8
