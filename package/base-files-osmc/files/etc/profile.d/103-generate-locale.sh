@@ -1,5 +1,5 @@
 user=$(whoami)
-if [ "$user" != "osmc" ]; then export LANG=C && export LC_ALL=C && return 0; fi
+if [ "$user" != "osmc" ] && [ -z "$LC_ALL" ] && [ -z "$LANG" ]; then export LANG=C && export LC_ALL=C && return 0; fi
 
 if [ ! -z $LANG ]
 then
