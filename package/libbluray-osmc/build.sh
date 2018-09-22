@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/1.0.1/libbluray-1.0.1.tar.bz2" "$(pwd)/src"
+pull_source "ftp://ftp.videolan.org/pub/videolan/libbluray/1.0.2/libbluray-1.0.2.tar.bz2" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libbluray-osmc"
@@ -18,7 +18,6 @@ then
 	if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-dev/DEBIAN/control
-	sed '/Depends/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files-dev/DEBIAN/control
         sed '/Version/d' -i files-dev/DEBIAN/control
         VERSION_DEV=$(grep Version ${out}/DEBIAN/control)
