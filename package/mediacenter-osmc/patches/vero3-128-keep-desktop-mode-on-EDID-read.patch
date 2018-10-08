@@ -1,0 +1,115 @@
+From 3d64ede603bc098402f5d7426c8b1582e0d6a751 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Mon, 8 Oct 2018 12:52:24 +0100
+Subject: [PATCH] Prefer desktop mode in settings to current mode when updating
+ display caps
+
+---
+ xbmc/windowing/egl/WinSystemEGL.cpp | 48 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 42 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/windowing/egl/WinSystemEGL.cpp b/xbmc/windowing/egl/WinSystemEGL.cpp
+index 852f337..3560881 100644
+--- a/xbmc/windowing/egl/WinSystemEGL.cpp
++++ b/xbmc/windowing/egl/WinSystemEGL.cpp
+@@ -36,6 +36,7 @@
+ #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecIMX.h"
+ #endif
+ #include "utils/log.h"
++#include "utils/StringUtils.h"
+ #include "EGLWrapper.h"
+ #include "EGLQuirks.h"
+ #include <vector>
+@@ -358,11 +359,32 @@ bool CWinSystemEGL::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool bl
+   return true;
+ }
+ 
++static std::string ModeFlagsToString(unsigned int flags, bool identifier)
++{
++  std::string res;
++  if(flags & D3DPRESENTFLAG_INTERLACED)
++    res += "i";
++  else
++    res += "p";
++
++  if(!identifier)
++    res += " ";
++
++  if(flags & D3DPRESENTFLAG_MODE3DSBS)
++    res += "sbs";
++  else if(flags & D3DPRESENTFLAG_MODE3DTB)
++    res += "tab";
++  else if(identifier)
++    res += "std";
++  return res;
++}
++
+ void CWinSystemEGL::UpdateResolutions()
+ {
+   CWinSystemBase::UpdateResolutions();
+ 
+   RESOLUTION_INFO resDesktop, curDisplay;
++  std::string curDesktopSetting;
+   std::vector<RESOLUTION_INFO> resolutions;
+ 
+   if (!m_egl->ProbeResolutions(resolutions) || resolutions.empty())
+@@ -380,7 +402,8 @@ void CWinSystemEGL::UpdateResolutions()
+       return;
+     }
+   }
+-
++  curDesktopSetting = CSettings::GetInstance().GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
++  CLog::Log(LOGNOTICE, "Desktop setting is %s", curDesktopSetting.c_str());
+   /* ProbeResolutions includes already all resolutions.
+    * Only get desktop resolution so we can replace xbmc's desktop res
+    */
+@@ -390,6 +413,7 @@ void CWinSystemEGL::UpdateResolutions()
+ 
+   RESOLUTION ResDesktop = RES_INVALID;
+   RESOLUTION res_index  = RES_DESKTOP;
++  bool resExactMatch = false;
+ 
+   for (size_t i = 0; i < resolutions.size(); i++)
+   {
+@@ -413,14 +437,25 @@ void CWinSystemEGL::UpdateResolutions()
+       resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resolutions[i].fRefreshRate);
+ 
++    if (curDesktopSetting == StringUtils::Format("%1i%05i%05i%09.5f%s", resolutions[i].iScreen,
++          resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
++          ModeFlagsToString(resolutions[i].dwFlags, true).c_str())){
++      ResDesktop = res_index;
++      resExactMatch = true;
++      CLog::Log(LOGNOTICE, "Desktop resolution found at 16 + %d", i);
++    }
+     if(resDesktop.iWidth == resolutions[i].iWidth &&
+-       resDesktop.iHeight == resolutions[i].iHeight &&
+-       resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
+-       resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
+-       (resDesktop.dwFlags & D3DPRESENTFLAG_MODEMASK) == (resolutions[i].dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+-       fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON)
++        resDesktop.iHeight == resolutions[i].iHeight &&
++        resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
++        resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
++        (resDesktop.dwFlags & D3DPRESENTFLAG_MODEMASK) == (resolutions[i].dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON &&
++        !resExactMatch)
+     {
+       ResDesktop = res_index;
++      if (resDesktop.fRefreshRate == resolutions[i].fRefreshRate)
++        resExactMatch = true;
++      CLog::Log(LOGNOTICE, "Current resolution found at 16 + %d, exact = %d", i, resExactMatch);
+     }
+ 
+     res_index = (RESOLUTION)((int)res_index + 1);
+@@ -429,6 +464,7 @@ void CWinSystemEGL::UpdateResolutions()
+   // swap desktop index for desktop res if available
+   if (ResDesktop != RES_INVALID)
+   {
++    resDesktop = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
+     CLog::Log(LOGNOTICE, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
+       resDesktop.iWidth, resDesktop.iHeight,
+       resDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+-- 
+2.11.0
+
