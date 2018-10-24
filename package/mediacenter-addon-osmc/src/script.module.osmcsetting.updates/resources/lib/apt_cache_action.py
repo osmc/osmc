@@ -417,7 +417,8 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 	def __init__(self, partial_heading='Downloading'):
 		super(Download_Progress, self).__init__()
 		self.partial_heading = partial_heading
-		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message':'Starting Download',})
+		self.fetching = 'Starting Download'
+		call_parent('progress_bar', {'percent': 0,  'heading': 'Downloading Update', 'message': self.fetching,})
 
 	
 	def start(self):
@@ -447,7 +448,7 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		return 'Fetch' + item.description + '++++++++++++++++++++++++++++++'
 
 	
-	def pulse(self, owner):
+	def pulse(self, owner=None):
 		''' Periodically invoked as something is being downloaded. '''
 
 		# if the pulse is less than one second since the last one then ignore the pulse
@@ -465,14 +466,18 @@ class Download_Progress(apt.progress.base.AcquireProgress):
 		
 			print 'Pulse ==========================================='
 			print 'current_items', self.current_items
-			print 'total_items', self.total_items 
+			print 'total_items', self.total_items
 			print 'total_bytes', self.total_bytes
-			print 'fetched_bytes', self.fetched_bytes 
+			print 'fetched_bytes', self.fetched_bytes
 			print 'current_bytes', self.current_bytes
-			print 'current_cps', self.current_cps 
+			print 'current_cps', self.current_cps
 			print 'Pulse ==========================================='
 
-			pct = int(self.current_bytes / float(self.total_bytes) * 100)
+			if self.total_bytes == 0:
+				# Protecting against division by 0.
+				pct = 0
+			else:
+				pct = int(self.current_bytes / float(self.total_bytes) * 100)
 
 			cps = self.current_cps / 1024.0
 
