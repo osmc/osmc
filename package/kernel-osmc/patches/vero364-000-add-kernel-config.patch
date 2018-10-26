@@ -1,6 +1,6 @@
---- /dev/null	2018-09-14 01:04:38.547003491 +0100
-+++ b/.config	2018-10-07 01:51:22.418473986 +0100
-@@ -0,0 +1,3733 @@
+--- /dev/null	2018-10-15 16:22:31.311045574 +0100
++++ b/.config	2018-10-26 16:53:16.594709527 +0100
+@@ -0,0 +1,3730 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 3.14.29 Kernel Configuration
@@ -530,7 +530,7 @@
 +# CONFIG_ANDROID_PARANOID_NETWORK is not set
 +# CONFIG_NET_ACTIVITY_STATS is not set
 +# CONFIG_NETWORK_SECMARK is not set
-+# CONFIG_NETWORK_PHY_TIMESTAMPING is not set
++CONFIG_NETWORK_PHY_TIMESTAMPING=y
 +CONFIG_NETFILTER=y
 +# CONFIG_NETFILTER_DEBUG is not set
 +CONFIG_NETFILTER_ADVANCED=y
@@ -802,7 +802,7 @@
 +# Network testing
 +#
 +# CONFIG_NET_PKTGEN is not set
-+# CONFIG_NET_DROP_MONITOR is not set
++CONFIG_NET_DROP_MONITOR=y
 +# CONFIG_HAMRADIO is not set
 +# CONFIG_CAN is not set
 +# CONFIG_IRDA is not set
@@ -1991,10 +1991,7 @@
 +# PTP clock support
 +#
 +CONFIG_PTP_1588_CLOCK=y
-+
-+#
-+# Enable PHYLIB and NETWORK_PHY_TIMESTAMPING to see the additional clocks.
-+#
++# CONFIG_DP83640_PHY is not set
 +CONFIG_PINCTRL=y
 +
 +#
