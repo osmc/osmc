@@ -1,0 +1,183 @@
+From 2c8253dd9985623b3d094dcaa5d267e6504519cd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 24 Oct 2018 20:41:48 +0100
+Subject: [PATCH] CEGLNativeTypeAmlogic: Update resolutions on HDMI HPD events
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp                        | 11 ++++
+ xbmc/messaging/ApplicationMessenger.h       |  1 +
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 83 +++++++++++++++++++++++++++++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  4 ++
+ 4 files changed, 99 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index a7f1ba2..4633eab 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2570,6 +2570,17 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+       break;
+   }
+ 
++  case TMSG_AML_RESIZE:
++  {
++    if (! g_application.m_pPlayer->IsPlayingVideo()) {
++      CDisplaySettings::GetInstance().ClearCustomResolutions();
++      g_Windowing.UpdateResolutions();
++      CDisplaySettings::GetInstance().SetCurrentResolution(RES_DESKTOP);
++      g_graphicsContext.SetVideoResolution(RES_DESKTOP, true);
++      CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
++    }
++  }
++
+   case TMSG_NETWORKMESSAGE:
+     getNetwork().NetworkMessage((CNetwork::EMESSAGE)pMsg->param1, pMsg->param2);
+     break;
+diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
+index fc10086..cf93240 100644
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -92,6 +92,7 @@
+ #define TMSG_SETAUDIODSPSTATE             TMSG_MASK_APPLICATION + 29
+ #define TMSG_SYSTEM_POWERDOWN             TMSG_MASK_APPLICATION + 30
+ #define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 31
++#define TMSG_AML_RESIZE			  TMSG_MASK_APPLICATION + 32
+ 
+ 
+ #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 5c90f16..e6c8f54 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -27,6 +27,7 @@
+ #include "filesystem/SpecialProtocol.h"
+ #include "utils/log.h"
+ #include "settings/Settings.h"
++#include "messaging/ApplicationMessenger.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -35,6 +36,14 @@
+ #include <EGL/egl.h>
+ #include <math.h>
+ 
++#include <libudev.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <locale.h>
++#include <unistd.h>
++
++using namespace KODI::MESSAGING;
++
+ CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
+ {
+   const char *env_framebuffer = getenv("FRAMEBUFFER");
+@@ -83,9 +92,83 @@ void CEGLNativeTypeAmlogic::Initialize()
+ 
+  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+ 
++ StartMonitorHWEvent();
++
+ }
++
++void hwMon() {
++
++        struct udev *udev;
++        struct udev_enumerate *enumerate;
++        struct udev_list_entry *devices, *dev_list_entry;
++        struct udev_device *dev;
++
++        struct udev_monitor *mon;
++        int fd;
++
++        /* Create the udev object */
++        udev = udev_new();
++        if (!udev) {
++                return;
++        }
++
++        mon = udev_monitor_new_from_netlink(udev, "udev");
++        udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
++
++        udev_monitor_enable_receiving(mon);
++        fd = udev_monitor_get_fd(mon);
++
++        /* Poll for events */
++
++        while (1) {
++
++                fd_set fds;
++                struct timeval tv;
++                int ret;
++
++                FD_ZERO(&fds);
++                FD_SET(fd, &fds);
++                tv.tv_sec = 0;
++                tv.tv_usec = 0;
++
++                ret = select(fd+1, &fds, NULL, NULL, &tv);
++
++                /* Check if FD has received data */
++
++                if (ret > 0 && FD_ISSET(fd, &fds)) {
++
++                        dev = udev_monitor_receive_device(mon);
++                        if (dev) {
++                                CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic: Detected HDMI switch");
++                                int state;
++                                SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
++                                if (state)
++                                    CApplicationMessenger::GetInstance().PostMsg(TMSG_AML_RESIZE);
++                                udev_device_unref(dev);
++                        }
++                        else {
++                                CLog::Log(LOGERROR, "CEGLNativeTypeAmlogic: can't get device from receive_device");
++                        }
++                }
++                usleep(250*1000);
++        }
++}
++
++void CEGLNativeTypeAmlogic::StartMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
++    m_monitorThread = std::thread(hwMon);
++    return;
++}
++
++void CEGLNativeTypeAmlogic::StopMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++    m_monitorThread.join();
++    return;
++}
++
+ void CEGLNativeTypeAmlogic::Destroy()
+ {
++  StopMonitorHWEvent();
+   return;
+ }
+ 
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+index b7c053b..bd3b463 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+@@ -22,6 +22,7 @@
+ 
+ #include <string>
+ #include <vector>
++#include <thread>
+ 
+ #include "EGLNativeType.h"
+ class CEGLNativeTypeAmlogic : public CEGLNativeType
+@@ -60,6 +61,9 @@ protected:
+ private:
+   void SetFramebufferResolution(const RESOLUTION_INFO &res) const;
+   void SetFramebufferResolution(int width, int height) const;
++  void StartMonitorHWEvent();
++  void StopMonitorHWEvent();
++  std::thread m_monitorThread;
+ 
+   std::string m_framebuffer_name;
+ };
+-- 
+2.7.4
+
