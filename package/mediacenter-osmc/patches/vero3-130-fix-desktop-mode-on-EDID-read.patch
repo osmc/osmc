@@ -1,0 +1,95 @@
+From 037344cd9d09e629df728f621c9ae8dd9dc6c691 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sat, 27 Oct 2018 15:20:48 +0100
+Subject: [PATCH] Fix desktop mode on EDID read (bits missing from latest
+ build)
+
+---
+ xbmc/windowing/egl/WinSystemEGL.cpp | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/xbmc/windowing/egl/WinSystemEGL.cpp b/xbmc/windowing/egl/WinSystemEGL.cpp
+index 3560881..147dad2 100644
+--- a/xbmc/windowing/egl/WinSystemEGL.cpp
++++ b/xbmc/windowing/egl/WinSystemEGL.cpp
+@@ -403,17 +403,25 @@ void CWinSystemEGL::UpdateResolutions()
+     }
+   }
+   curDesktopSetting = CSettings::GetInstance().GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
+-  CLog::Log(LOGNOTICE, "Desktop setting is %s", curDesktopSetting.c_str());
+   /* ProbeResolutions includes already all resolutions.
+    * Only get desktop resolution so we can replace xbmc's desktop res
+    */
+   if (m_egl->GetNativeResolution(&curDisplay))
+     resDesktop = curDisplay;
+ 
++  if (curDesktopSetting == "DESKTOP")
++    curDesktopSetting = StringUtils::Format("%1i%05i%05i%09.5f%s", resDesktop.iScreen,
++          resDesktop.iScreenWidth, resDesktop.iScreenHeight, resDesktop.fRefreshRate,
++          ModeFlagsToString(resDesktop.dwFlags, true).c_str());
++
++  CLog::Log(LOGNOTICE, "Desktop setting is %s", curDesktopSetting.c_str());
+ 
+   RESOLUTION ResDesktop = RES_INVALID;
+   RESOLUTION res_index  = RES_DESKTOP;
++//  RESOLUTION ResCurrent = RES_INVALID;
+   bool resExactMatch = false;
++  std::string ResString;
++  std::string ResFallback = "00480024.00000i000";
+ 
+   for (size_t i = 0; i < resolutions.size(); i++)
+   {
+@@ -437,14 +445,16 @@ void CWinSystemEGL::UpdateResolutions()
+       resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resolutions[i].fRefreshRate);
+ 
+-    if (curDesktopSetting == StringUtils::Format("%1i%05i%05i%09.5f%s", resolutions[i].iScreen,
++    ResString = StringUtils::Format("%1i%05i%05i%09.5f%s", resolutions[i].iScreen,
+           resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
+-          ModeFlagsToString(resolutions[i].dwFlags, true).c_str())){
++          ModeFlagsToString(resolutions[i].dwFlags, true).c_str());
++
++    if (curDesktopSetting == ResString){
+       ResDesktop = res_index;
+       resExactMatch = true;
+       CLog::Log(LOGNOTICE, "Desktop resolution found at 16 + %d", i);
+     }
+-    if(resDesktop.iWidth == resolutions[i].iWidth &&
++/*    if(resDesktop.iWidth == resolutions[i].iWidth &&
+         resDesktop.iHeight == resolutions[i].iHeight &&
+         resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
+         resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
+@@ -452,10 +462,18 @@ void CWinSystemEGL::UpdateResolutions()
+         fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON &&
+         !resExactMatch)
+     {
++      ResCurrent = res_index;
++      CLog::Log(LOGNOTICE, "Current resolution found at 16 + %d", i);
++    }*/
++//      CLog::Log(LOGNOTICE, "curDesk %s, ResString %s, ResFallback %s",
++//			 curDesktopSetting.substr(6,18).c_str(), ResString.substr(6,18).c_str(), ResFallback.c_str());
++    /* fall back to the highest resolution available but not more than current desktop */
++    if(curDesktopSetting.substr(6,18) >= ResString.substr(6,18) &&
++        ResString.substr(6,18) > ResFallback && ! resExactMatch)
++    {
+       ResDesktop = res_index;
+-      if (resDesktop.fRefreshRate == resolutions[i].fRefreshRate)
+-        resExactMatch = true;
+-      CLog::Log(LOGNOTICE, "Current resolution found at 16 + %d, exact = %d", i, resExactMatch);
++      ResFallback = ResString.substr(6,18);
++      CLog::Log(LOGNOTICE, "Fallback resolution at 16 + %d", i);
+     }
+ 
+     res_index = (RESOLUTION)((int)res_index + 1);
+@@ -466,7 +484,7 @@ void CWinSystemEGL::UpdateResolutions()
+   {
+     resDesktop = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
+     CLog::Log(LOGNOTICE, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
+-      resDesktop.iWidth, resDesktop.iHeight,
++      resDesktop.iScreenWidth, resDesktop.iScreenHeight,
+       resDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resDesktop.fRefreshRate,
+       (int)ResDesktop, (int)RES_DESKTOP);
+-- 
+2.11.0
+
