@@ -1,4 +1,4 @@
-From 2c8253dd9985623b3d094dcaa5d267e6504519cd Mon Sep 17 00:00:00 2001
+From 5bfd9ad564e96db75f8928f576ec13372e52e6f2 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 24 Oct 2018 20:41:48 +0100
 Subject: [PATCH] CEGLNativeTypeAmlogic: Update resolutions on HDMI HPD events
@@ -7,9 +7,9 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                        | 11 ++++
  xbmc/messaging/ApplicationMessenger.h       |  1 +
- xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 83 +++++++++++++++++++++++++++++
- xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  4 ++
- 4 files changed, 99 insertions(+)
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 85 +++++++++++++++++++++++++++++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  6 ++
+ 4 files changed, 103 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
 index a7f1ba2..4633eab 100644
@@ -46,7 +46,7 @@ index fc10086..cf93240 100644
  
  #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-index 5c90f16..e6c8f54 100644
+index 5c90f16..a0bb050 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 @@ -27,6 +27,7 @@
@@ -72,7 +72,7 @@ index 5c90f16..e6c8f54 100644
  CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
  {
    const char *env_framebuffer = getenv("FRAMEBUFFER");
-@@ -83,9 +92,83 @@ void CEGLNativeTypeAmlogic::Initialize()
+@@ -83,9 +92,85 @@ void CEGLNativeTypeAmlogic::Initialize()
  
   SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
  
@@ -80,7 +80,7 @@ index 5c90f16..e6c8f54 100644
 +
  }
 +
-+void hwMon() {
++void hwMon(CEGLNativeTypeAmlogic *instance) {
 +
 +        struct udev *udev;
 +        struct udev_enumerate *enumerate;
@@ -104,7 +104,7 @@ index 5c90f16..e6c8f54 100644
 +
 +        /* Poll for events */
 +
-+        while (1) {
++        while (1 && instance->m_monitorEvents) {
 +
 +                fd_set fds;
 +                struct timeval tv;
@@ -140,12 +140,14 @@ index 5c90f16..e6c8f54 100644
 +
 +void CEGLNativeTypeAmlogic::StartMonitorHWEvent() {
 +    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
-+    m_monitorThread = std::thread(hwMon);
++    m_monitorEvents = true;
++    m_monitorThread = std::thread(hwMon, this);
 +    return;
 +}
 +
 +void CEGLNativeTypeAmlogic::StopMonitorHWEvent() {
 +    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++    m_monitorEvents = false;
 +    m_monitorThread.join();
 +    return;
 +}
@@ -157,7 +159,7 @@ index 5c90f16..e6c8f54 100644
  }
  
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
-index b7c053b..bd3b463 100644
+index b7c053b..512d12c 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
 @@ -22,6 +22,7 @@
@@ -168,7 +170,16 @@ index b7c053b..bd3b463 100644
  
  #include "EGLNativeType.h"
  class CEGLNativeTypeAmlogic : public CEGLNativeType
-@@ -60,6 +61,9 @@ protected:
+@@ -50,6 +51,8 @@ public:
+ 
+   virtual bool  ShowWindow(bool show);
+ 
++  bool m_monitorEvents;
++
+ protected:
+   bool SetDisplayResolution(const RESOLUTION_INFO &res);
+   void SetupVideoScaling(const char *mode);
+@@ -60,6 +63,9 @@ protected:
  private:
    void SetFramebufferResolution(const RESOLUTION_INFO &res) const;
    void SetFramebufferResolution(int width, int height) const;
