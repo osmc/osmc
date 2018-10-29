@@ -79,21 +79,36 @@ SETS =  {
                                           ],
                                 },
 
-	'guisettings'	    : { 'order' : 2.5,
+        'guisettings_ab'    : { 'order' : 2.25,
+                                'active': False,
+                                'help'  : 'GUI Settings (abridged)',
+                                'dest'  : 'guisettings_ab',
+                                'action': 'store_true',
+                                'flags' : ['-G','--guisetab'],
+                                'logs'  : [
+                                            {
+                                                'name': 'GUI Settings (abridged)',
+                                                'key' : 'z9Z12KgS',
+                                                'ltyp': 'cl_log', 
+                                                'actn': '/usr/bin/readgui'
+                                            },
+                                          ],
+                              },
+    
+        'guisettings'       : { 'order' : 2.5,
                                 'active': False,
                                 'help'  : 'guisettings.xml',
                                 'dest'  : 'guisettings',
                                 'action': 'store_true',
                                 'flags' : ['-g','--guiset'],
-				'logs'  : [
-					    {
+                                'logs'  : [
+                                        {
                                                 'name': 'guisettings.xml',
                                                 'key' : 'zm2LhjK1',
                                                 'ltyp': 'file_log', 
                                                 'actn': USERDATA + 'guisettings.xml',
-                                             },
+                                            },
                                           ],
-
                               },
 
         'advancedsettings'  : { 'order' : 3,
@@ -687,7 +702,6 @@ class Main(object):
 
             self.dispatch_logs()
 
-        os.popen('sudo rm %s' % TEMP_LOG_FILE)
 
     def add_content_index(self):
         ''' Adds the quick look-up references to the start of the log file '''
