@@ -6,7 +6,27 @@
 fb_restore() {
 	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
 	then
-		cmp /var/run/fb_mode /sys/class/display/mode >/dev/null || cat /var/run/fb_mode >/sys/class/display/mode
+		for arg in $(cat /proc/cmdline)
+		do
+			case ${arg} in
+			hdmimode=*)
+				hdmimode=${arg#*=}
+			;;
+			esac
+		done
+
+		fb_mode=$(cat /var/run/fb_mode)
+		if ! echo $hdmimode | grep -q force && ! grep -qw $fb_mode /sys/class/amhdmitx/amhdmitx0/disp_cap
+		then
+			preferred=$(grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | sed 's/\*//g')
+			if [ "$preferred" ]
+			then
+				fb_mode="$preferred"
+			else
+				fb_mode=720p60hz
+			fi
+		fi
+		echo $fb_mode | cmp /sys/class/display/mode >/dev/null || echo "$fb_mode" >/sys/class/display/mode
 		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
 		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
 		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
