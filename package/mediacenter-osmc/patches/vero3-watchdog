@@ -9,8 +9,6 @@ fb_restore() {
 		cmp /var/run/fb_mode /sys/class/display/mode >/dev/null || cat /var/run/fb_mode >/sys/class/display/mode
 		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
 		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
-		cat /var/run/fb_scale_width >/sys/class/graphics/fb0/scale_width
-		cat /var/run/fb_scale_height >/sys/class/graphics/fb0/scale_height
 		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
 		echo 1 >/sys/class/vtconsole/vtcon1/bind
 		/bin/fbset $(cat /var/run/fb_resolution)
@@ -129,8 +127,6 @@ if [ ! -e /var/run/fb_resolution ]; then
 	cat /sys/class/display/mode | head -n 1 >/var/run/fb_mode
 	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
 	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
-	cat /sys/class/graphics/fb0/scale_width | sed 's/^.*://' >/var/run/fb_scale_width
-	cat /sys/class/graphics/fb0/scale_height | sed 's/^.*://' >/var/run/fb_scale_height
 	cat /sys/class/graphics/fb0/free_scale | sed -e 's/^.*\[//' -e 's/\].*$//g' >/var/run/fb_free_scale
 fi
 
