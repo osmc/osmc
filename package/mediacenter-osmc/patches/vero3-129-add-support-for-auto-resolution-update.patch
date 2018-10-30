@@ -1,4 +1,4 @@
-From 5bfd9ad564e96db75f8928f576ec13372e52e6f2 Mon Sep 17 00:00:00 2001
+From 03d2863ea3a15179b66bcd74e81b2de155eeaeb3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 24 Oct 2018 20:41:48 +0100
 Subject: [PATCH] CEGLNativeTypeAmlogic: Update resolutions on HDMI HPD events
@@ -7,9 +7,9 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                        | 11 ++++
  xbmc/messaging/ApplicationMessenger.h       |  1 +
- xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 85 +++++++++++++++++++++++++++++
- xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  6 ++
- 4 files changed, 103 insertions(+)
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 92 +++++++++++++++++++++++++++++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  8 +++
+ 4 files changed, 112 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
 index a7f1ba2..4633eab 100644
@@ -46,7 +46,7 @@ index fc10086..cf93240 100644
  
  #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-index 5c90f16..a0bb050 100644
+index 5c90f16..8ef6f2f 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 @@ -27,6 +27,7 @@
@@ -72,10 +72,12 @@ index 5c90f16..a0bb050 100644
  CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
  {
    const char *env_framebuffer = getenv("FRAMEBUFFER");
-@@ -83,9 +92,85 @@ void CEGLNativeTypeAmlogic::Initialize()
+@@ -83,9 +92,92 @@ void CEGLNativeTypeAmlogic::Initialize()
  
   SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
  
++ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
++
 + StartMonitorHWEvent();
 +
  }
@@ -126,8 +128,13 @@ index 5c90f16..a0bb050 100644
 +                                CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic: Detected HDMI switch");
 +                                int state;
 +                                SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
-+                                if (state)
++				std::string newEdid;
++				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
++
++                                if (state && newEdid == instance->m_lastEdid) {
 +                                    CApplicationMessenger::GetInstance().PostMsg(TMSG_AML_RESIZE);
++				    instance->m_lastEdid = newEdid;
++				}
 +                                udev_device_unref(dev);
 +                        }
 +                        else {
@@ -159,7 +166,7 @@ index 5c90f16..a0bb050 100644
  }
  
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
-index b7c053b..512d12c 100644
+index b7c053b..0476f3f 100644
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
 @@ -22,6 +22,7 @@
@@ -170,16 +177,18 @@ index b7c053b..512d12c 100644
  
  #include "EGLNativeType.h"
  class CEGLNativeTypeAmlogic : public CEGLNativeType
-@@ -50,6 +51,8 @@ public:
+@@ -50,6 +51,10 @@ public:
  
    virtual bool  ShowWindow(bool show);
  
 +  bool m_monitorEvents;
 +
++  std::string m_lastEdid;
++
  protected:
    bool SetDisplayResolution(const RESOLUTION_INFO &res);
    void SetupVideoScaling(const char *mode);
-@@ -60,6 +63,9 @@ protected:
+@@ -60,6 +65,9 @@ protected:
  private:
    void SetFramebufferResolution(const RESOLUTION_INFO &res) const;
    void SetFramebufferResolution(int width, int height) const;
