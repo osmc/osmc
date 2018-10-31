@@ -131,7 +131,7 @@ index 5c90f16..8ef6f2f 100644
 +				std::string newEdid;
 +				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
 +
-+                                if (state && newEdid == instance->m_lastEdid) {
++                                if (state && newEdid != instance->m_lastEdid) {
 +                                    CApplicationMessenger::GetInstance().PostMsg(TMSG_AML_RESIZE);
 +				    instance->m_lastEdid = newEdid;
 +				}
