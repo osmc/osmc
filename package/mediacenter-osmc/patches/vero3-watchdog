@@ -26,7 +26,8 @@ fb_restore() {
 				fb_mode=720p60hz
 			fi
 		fi
-		echo $fb_mode | cmp /sys/class/display/mode >/dev/null || echo "$fb_mode" >/sys/class/display/mode
+		mode=$(head -n 1 /sys/class/display/mode)
+		[ "$mode" != "$fb_mode" ] && echo "$fb_mode" >/sys/class/display/mode
 		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
 		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
 		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
