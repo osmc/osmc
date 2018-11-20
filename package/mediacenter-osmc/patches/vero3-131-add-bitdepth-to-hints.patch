@@ -1,0 +1,70 @@
+From ef106dd741c95e9634810a1964a3d23a44eafde6 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Tue, 20 Nov 2018 15:11:08 +0000
+Subject: [PATCH] Add bitdepth to hints
+
+---
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp |  4 ++--
+ .../VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp     | 23 +++++++++++++++-------
+ 2 files changed, 18 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index bdf9f41..4a33723 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1664,8 +1664,8 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder "
+     "hints.width(%d), hints.height(%d), hints.codec(%d), hints.codec_tag(%d)",
+     hints.width, hints.height, hints.codec, hints.codec_tag);
+-  CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.fpsrate(%d), hints.fpsscale(%d), video_rate(%d)",
+-    hints.fpsrate, hints.fpsscale, am_private->video_rate);
++  CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.fpsrate(%d), hints.fpsscale(%d), video_rate(%d), hints.bitsperpixel(%d)",
++    hints.fpsrate, hints.fpsscale, am_private->video_rate, hints.bitsperpixel);
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.aspect(%f), video_ratio.num(%d), video_ratio.den(%d)",
+     hints.aspect, video_ratio.num, video_ratio.den);
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.orientation(%d), hints.forced_aspect(%d), hints.extrasize(%d)",
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index e3a7330..5fe1284 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -57,6 +57,7 @@
+ extern "C" {
+ #include "libavutil/dict.h"
+ #include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
+ }
+ 
+ 
+@@ -1407,14 +1408,22 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+         st->iHeight = pStream->codec->height;
+         st->fAspect = SelectAspect(pStream, st->bForcedAspect) * pStream->codec->width / pStream->codec->height;
+         st->iOrientation = 0;
+-        st->iBitsPerPixel = pStream->codec->bits_per_coded_sample;
+-
+-        AVDictionaryEntry *rtag = av_dict_get(pStream->metadata, "rotate", NULL, 0);
+-        if (rtag) 
+-          st->iOrientation = atoi(rtag->value);
++          st->iBitsPerPixel = pStream->codec->bits_per_raw_sample;
++          if (st->iBitsPerPixel == 0){
++            if (pStream->codec->color_trc == AVCOL_TRC_BT2020_12)
++              st->iBitsPerPixel = 12;
++            else if (pStream->codec->color_trc >= AVCOL_TRC_BT2020_10)
++              /* assume all 10-bit until 12-bit gets common */
++              st->iBitsPerPixel = 10;
++            else
++              st->iBitsPerPixel = 8;
++          }
++          AVDictionaryEntry *rtag = av_dict_get(pStream->metadata, "rotate", NULL, 0);
++          if (rtag) 
++            st->iOrientation = atoi(rtag->value);
+ 
+-        // detect stereoscopic mode
+-        std::string stereoMode = GetStereoModeFromMetadata(pStream->metadata);
++          // detect stereoscopic mode
++          std::string stereoMode = GetStereoModeFromMetadata(pStream->metadata);
+           // check for metadata in file if detection in stream failed
+         if (stereoMode.empty())
+           stereoMode = GetStereoModeFromMetadata(m_pFormatContext->metadata);
+-- 
+2.11.0
+
