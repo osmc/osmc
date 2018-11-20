@@ -1,0 +1,31 @@
+From 62b49fec11b411fa19af4b58540161489edf907a Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Tue, 20 Nov 2018 15:25:30 +0000
+Subject: [PATCH] Don't return DESKTOP as resolution
+
+---
+ xbmc/settings/DisplaySettings.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index ef95bc2..e3592fa 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -622,13 +622,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+   if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
+   {
+     const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
+-    // also handle RES_DESKTOP resolutions with non-default refresh rates
+-    if (resolution != RES_DESKTOP || (refreshrate > 0.0f && refreshrate != info.fRefreshRate))
+-    {
+-      return StringUtils::Format("%1i%05i%05i%09.5f%s", info.iScreen,
++    return StringUtils::Format("%1i%05i%05i%09.5f%s", info.iScreen,
+                                  info.iScreenWidth, info.iScreenHeight,
+                                  refreshrate > 0.0f ? refreshrate : info.fRefreshRate, ModeFlagsToString(info.dwFlags, true).c_str());
+-    }
+   }
+ 
+   return "DESKTOP";
+-- 
+2.11.0
+
