@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="2.93"
+VERSION="2.94"
 pull_source "https://github.com/transmission/transmission-releases/raw/master/transmission-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
