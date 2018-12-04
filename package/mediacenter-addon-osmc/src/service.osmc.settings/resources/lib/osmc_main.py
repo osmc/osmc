@@ -178,12 +178,6 @@ class Main(object):
 		# run the ubiquifonts script to import the needed fonts into the Font.xml
 		response = osmc_ubiquifonts.import_osmc_fonts()
 
-		if response == 'reload_please':
-
-			log('Skin reload requested')
-
-			xbmc.executebuiltin('ReloadSkin()')
-			
 		# daemon
 		self._daemon()
 
