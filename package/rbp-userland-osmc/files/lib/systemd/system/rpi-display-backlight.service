@@ -1,0 +1,12 @@
+[Unit]
+Description=Turns off Raspberry Pi display backlight on shutdown/reboot
+ConditionPathIsDirectory=/proc/device-tree/rpi_backlight
+DefaultDependencies=no
+Before=umount.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c ‘/bin/echo 1 > /sys/class/backlight/rpi_backlight/bl_power’
+
+[Install]
+WantedBy=reboot.target halt.target poweroff.target
