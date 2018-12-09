@@ -1,0 +1,71 @@
+From 887e63d6ba247a9394cb8f8ff400b000c52be9ae Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sun, 9 Dec 2018 23:57:44 +0000
+Subject: [PATCH] add rangeswitch
+
+---
+ system/settings/settings.xml      |  1 +
+ xbmc/settings/DisplaySettings.cpp | 12 ++++++++++++
+ xbmc/settings/Settings.cpp        |  1 +
+ 3 files changed, 14 insertions(+)
+ mode change 100644 => 100755 system/settings/settings.xml
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+old mode 100644
+new mode 100755
+index e2379f9..cfc6408
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2098,6 +2098,7 @@
+             <or>
+               <condition>HAS_GL</condition>
+               <condition>HAS_DX</condition>
++              <condition>true<\condition>
+             </or>
+           </requirement>
+           <level>3</level>
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index e3592fa..8c7cbf5 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -42,6 +42,7 @@
+ #include "threads/SingleLock.h"
+ #include "utils/log.h"
+ #include "utils/StringUtils.h"
++#include "utils/SysfsUtils.h"
+ #include "utils/Variant.h"
+ #include "utils/XMLUtils.h"
+ #include "windowing/WindowingFactory.h"
+@@ -326,6 +327,17 @@ bool CDisplaySettings::OnSettingChanging(const CSetting *setting)
+ 
+     return true;
+   }
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE)
++  {
++    int range_control;
++    SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++    if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE))
++      range_control &= 1;
++    else
++      range_control |= 2;
++    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting quantization range to %s", range_control & 2 ? "full" : "limited");
++    SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++  }
+ #if defined(HAS_GLX)
+   else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
+   {
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 72098b5..ab585dc 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -1061,6 +1061,7 @@ void CSettings::InitializeISettingCallbacks()
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
+-- 
+2.11.0
+
