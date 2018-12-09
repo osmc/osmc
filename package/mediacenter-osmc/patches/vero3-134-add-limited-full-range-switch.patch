@@ -1,0 +1,4962 @@
+From 2e239a9d507bce6c8f7bea1325139ab9520fe07c Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Tue, 4 Dec 2018 18:29:13 +0000
+Subject: [PATCH] Sync VERO series up to
+ vero3-133-4k-don't-default-to-420.patch
+
+Signed-off-by: Graham Horner <graham@hornercs.co.uk>
+---
+ .../resource.language.en_gb/resources/strings.po   |  61 ++
+ configure.ac                                       |  11 +
+ system/keymaps/remote.xml                          |   2 +-
+ system/peripherals.xml                             |   4 +-
+ system/settings/settings.xml                       |  37 +-
+ tools/depends/target/ffmpeg/autobuild.sh           |  12 +-
+ xbmc/Application.cpp                               |  55 ++
+ xbmc/Application.h                                 |   5 +
+ xbmc/Makefile.in                                   |   1 +
+ xbmc/OSMCHelper.cpp                                |  36 ++
+ xbmc/OSMCHelper.h                                  |  38 ++
+ xbmc/cores/AudioEngine/AEFactory.cpp               |   2 +
+ .../Engines/ActiveAE/ActiveAEBuffer.cpp            |   4 +
+ .../Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp    |   7 +
+ .../AudioEngine/Engines/ActiveAE/ActiveAESink.cpp  |   1 +
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        | 135 ++++-
+ xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp |   6 +-
+ xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp      |  75 ++-
+ xbmc/cores/AudioEngine/Utils/AEStreamInfo.h        |   3 +-
+ xbmc/cores/AudioEngine/Utils/AEUtil.cpp            |   2 +
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 651 ++++++++++++++-------
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h  |  54 +-
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       | 294 ++++------
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.h         |  19 +-
+ .../VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp     |  49 +-
+ .../cores/VideoPlayer/DVDDemuxers/DVDDemuxPacket.h |   3 +
+ .../VideoPlayer/DVDDemuxers/DVDDemuxUtils.cpp      |   7 +-
+ .../DVDInputStreams/DVDInputStreamPVRManager.cpp   |   2 +-
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp             |   4 +-
+ .../VideoRenderers/HwDecRender/RendererAML.cpp     | 113 +++-
+ .../VideoRenderers/HwDecRender/RendererAML.h       |  37 +-
+ .../VideoPlayer/VideoRenderers/RenderManager.cpp   |   9 +-
+ xbmc/filesystem/FileCache.cpp                      |   2 +-
+ xbmc/filesystem/NFSFile.h                          |   2 +-
+ xbmc/filesystem/SMBFile.cpp                        |   3 +-
+ xbmc/interfaces/generic/LanguageInvokerThread.cpp  |   3 +
+ xbmc/messaging/ApplicationMessenger.h              |   1 +
+ xbmc/network/Network.cpp                           |   5 +
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp  |  21 +-
+ xbmc/pictures/GUIWindowSlideShow.cpp               |   5 +
+ xbmc/powermanagement/PowerManager.cpp              |   4 +-
+ xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp       |   1 +
+ xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp          |   1 +
+ xbmc/settings/DisplaySettings.cpp                  |   6 +-
+ xbmc/settings/Settings.cpp                         |   3 +
+ xbmc/settings/Settings.h                           |   3 +
+ xbmc/utils/AMLUtils.cpp                            |  35 +-
+ xbmc/utils/AMLUtils.h                              |   1 +
+ xbmc/utils/BitstreamConverter.cpp                  | 429 +++++++++++++-
+ xbmc/utils/BitstreamConverter.h                    |  14 +-
+ xbmc/utils/ScreenshotAML.cpp                       |  43 +-
+ xbmc/video/VideoReferenceClock.cpp                 |   5 +
+ .../dialogs/GUIDialogAudioSubtitleSettings.cpp     |   4 +-
+ xbmc/video/dialogs/GUIDialogSubtitles.cpp          |   2 +-
+ xbmc/video/dialogs/GUIDialogVideoOSD.cpp           |   2 +-
+ xbmc/video/dialogs/GUIDialogVideoSettings.cpp      |   4 +-
+ xbmc/video/videosync/CMakeLists.txt                |   5 +
+ xbmc/video/videosync/Makefile                      |   1 +
+ xbmc/video/videosync/VideoSyncAML.cpp              | 113 ++++
+ xbmc/video/videosync/VideoSyncAML.h                |  41 ++
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp        | 189 +++++-
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h          |  12 +-
+ xbmc/windowing/egl/EGLWrapper.cpp                  |   4 +-
+ xbmc/windowing/egl/WinSystemEGL.cpp                |  70 ++-
+ 64 files changed, 2142 insertions(+), 631 deletions(-)
+ create mode 100644 xbmc/OSMCHelper.cpp
+ create mode 100644 xbmc/OSMCHelper.h
+ create mode 100644 xbmc/video/videosync/VideoSyncAML.cpp
+ create mode 100644 xbmc/video/videosync/VideoSyncAML.h
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 7cd9c3b..e40a6e5 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -5845,6 +5845,21 @@ msgctxt "#13132"
+ msgid "Blank displays"
+ msgstr ""
+ 
++#: unknown
++msgctxt "#13133"
++msgid "Force RGB output"
++msgstr ""
++
++#: unknown
++msgctxt "#13134"
++msgid "Lock HDMI HPD"
++msgstr ""
++
++#: unknown
++msgctxt "#13135"
++msgid "Mute HDMI audio output"
++msgstr ""
++
+ #empty strings from id 13133 to 13139
+ 
+ #: xbmc/network/NetworkServices.cpp
+@@ -19439,6 +19454,21 @@ msgstr ""
+ 
+ #empty strings from id 37046 to 38009
+ 
++#: system/settings/settings.xml
++msgctxt "#38007"
++msgid "Boost centre channel when downmixing"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#38008"
++msgid "Increase this value to make the dialogue louder compared to background sounds when downmixing multichannel audio"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#38009"
++msgid "%i dB"
++msgstr ""
++
+ #: system/settings/rbp.xml
+ msgctxt "#38010"
+ msgid "GPU accelerated"
+@@ -19504,6 +19534,21 @@ msgctxt "#38023"
+ msgid "Set my rating"
+ msgstr ""
+ 
++#: system/peripherals.xml
++msgctxt "#38050"
++msgid "Remote button press delay before repeating (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38051"
++msgid "Remote button press repeat rate (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38052"
++msgid "Remote button press release time (ms)"
++msgstr ""
++
+ #: /xbmc/settings/dialogs/GUIDialogContentSettings.cpp
+ msgctxt "#38024"
+ msgid "Information provider selection"
+@@ -19799,3 +19844,19 @@ msgstr ""
+ msgctxt "#39010"
+ msgid "Select sort method"
+ msgstr ""
++
++#: Description of display setting with label # 13133
++msgctxt "#39011"
++msgid "Enable this to force RGB output for some legacy TVs such as Philips 2009 era TVs. Fixes blue / green screen flashes. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13134
++msgctxt "#39012"
++msgid "Disables HPD events. Can fix sound issues. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13135
++msgctxt "#39013"
++msgid "Turns off HDMI audio. Useful if you're using SPDIF audio and don't want audio on HDMI."
++msgstr ""
++
+diff --git a/configure.ac b/configure.ac
+index 106b7fb..0a673f7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -681,6 +681,17 @@ case $use_platform in
+      use_neon=yes
+      use_cpu=cortex-a7
+      ;;
++   vero3)
++     use_static_ffmpeg=yes
++     use_joystick=no
++     use_sdl=no
++     use_hardcoded_tables="yes"
++     CFLAGS="$CFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations -fomit-frame-pointer"
++     CXXFLAGS="$CXXFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations -fomit-frame-pointer"
++     FFMPEG_EXTRACFLAGS="$FFMPEG_EXTRACFLAGS -pipe -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mabi=aapcs-linux -Wno-psabi -Wa,-mno-warn-deprecated -Wno-deprecated-declarations -fomit-frame-pointer"
++     use_cpu=cortex-a9
++     use_neon=yes
++     ;;
+ esac
+ 
+ if test "$target_platform" = "target_raspberry_pi" ; then
+diff --git a/system/keymaps/remote.xml b/system/keymaps/remote.xml
+index 88b06b7..58427cc 100644
+--- a/system/keymaps/remote.xml
++++ b/system/keymaps/remote.xml
+@@ -50,7 +50,7 @@
+       <volumeplus>VolumeUp</volumeplus>
+       <volumeminus>VolumeDown</volumeminus>
+       <mute>Mute</mute>
+-      <power>ShutDown()</power>
++      <power>noop</power>
+       <myvideo>ActivateWindow(Videos)</myvideo>
+       <mymusic>ActivateWindow(Music)</mymusic>
+       <mypictures>ActivateWindow(Pictures)</mypictures>
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index 83d7fea..99e320c 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -31,7 +31,9 @@
+     <setting key="device_type" type="int" value="1" configurable="0" />
+     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
+-    <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
++    <setting key="double_tap_timeout_ms" type="int" min="50" max="1000" step="50" value="300" label="38050" order="16" />
++    <setting key="button_repeat_rate_ms" type="int" min="0" max="250" step="10" value="0" label="38051" order="17" />
++    <setting key="button_release_delay_ms" type="int" min="0" max="500" step="50" value="0" label="38052" order="18" />
+   </peripheral>
+ 
+   <peripheral vendor_product="2548:1001,2548:1002" bus="usb" name="Pulse-Eight CEC Adapter" mapTo="cec">
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 475e1bd..e2379f9 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2070,6 +2070,21 @@
+           </dependencies>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoscreen.forcergb" type="boolean" parent="videoscreen.screen" label="13133" help="39011">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.lockhpd" type="boolean" parent="videoscreen.screen" label="13134" help="39012">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.mutehdmi" type="boolean" parent="videoscreen.screen" label="13135" help="39013">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
+           <level>2</level>
+           <default>0</default>
+@@ -2341,7 +2356,7 @@
+         </setting>
+         <setting id="audiooutput.config" type="integer" label="337" help="36361">
+           <level>2</level>
+-          <default>2</default>
++          <default>3</default>
+           <constraints>
+             <options>
+               <option label="338">1</option>
+@@ -2386,6 +2401,18 @@
+             <formatlabel>36459</formatlabel>
+           </control>
+         </setting>
++        <setting id="audiooutput.boostcenter" type="integer" label="38007" help="38008">
++          <level>2</level>
++          <default>0</default>
++          <constraints>
++            <minimum>0</minimum>
++            <step>1</step>
++            <maximum>30</maximum>
++          </constraints>
++          <control type="spinner" format="string">
++            <formatlabel>38009</formatlabel>
++          </control>
++        </setting>
+         <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
+           <requirement>HAS_AE_QUALITY_LEVELS</requirement>
+           <level>2</level>
+@@ -2429,7 +2456,7 @@
+         </setting>
+         <setting id="audiooutput.streamsilence" type="integer" label="421" help="34111">
+           <level>2</level>
+-          <default>1</default>
++          <default>0</default>
+           <constraints>
+             <options>audiostreamsilence</options>
+           </constraints>
+@@ -2437,7 +2464,7 @@
+         </setting>
+         <setting id="audiooutput.streamnoise" type="boolean" label="34112" help="34113">
+           <level>2</level>
+-          <default>true</default>
++          <default>false</default>
+           <control type="toggle" />
+         </setting>
+       </group>
+@@ -2850,12 +2877,12 @@
+         </setting>
+         <setting id="debug.extralogging" type="boolean" label="666" help="36394">
+           <level>1</level>
+-          <default>true</default>
++          <default>false</default>
+           <control type="toggle" />
+         </setting>
+         <setting id="debug.setextraloglevel" type="list[integer]" parent="debug.extralogging" label="668" help="36534">
+           <level>1</level>
+-          <default>32768</default>
++          <default></default>
+           <constraints>
+             <options>loggingcomponents</options>
+             <delimiter>,</delimiter>
+diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
+index 5c29762..6081eab 100755
+--- a/tools/depends/target/ffmpeg/autobuild.sh
++++ b/tools/depends/target/ffmpeg/autobuild.sh
+@@ -131,6 +131,8 @@ fi
+ mkdir -p "ffmpeg-${VERSION}"
+ cd "ffmpeg-${VERSION}" || exit 2
+ tar --strip-components=1 -xf $MYDIR/${ARCHIVE}
++cp ../*.patch .
++for file in *.patch; do patch -p1 < $file; done
+ 
+ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ ./configure --prefix=$FFMPEG_PREFIX \
+@@ -145,8 +147,14 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+ 	--enable-gpl \
+ 	--enable-runtime-cpudetect \
+ 	--enable-postproc \
+-	--enable-vaapi \
+-	--enable-vdpau \
++	--disable-vaapi \
++	--disable-vdpau \
++	--disable-libxcb \
++	--disable-libxcb-shape \
++	--disable-libxcb-shm \
++	--disable-libxcb-xfixes \
++	--disable-x11grab \
++	--disable-xlib \
+ 	--enable-bzlib \
+ 	--enable-gnutls \
+ 	--enable-muxer=spdif \
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 5fdda85..4633eab 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -216,6 +216,7 @@
+ 
+ #if defined(HAS_LIBAMCODEC)
+ #include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
+ #endif
+ 
+ #include "cores/FFmpeg.h"
+@@ -523,6 +524,7 @@ bool CApplication::Create()
+ //#elif defined(some_ID) // uncomment for special version/fork
+ //  specialVersion = " (version for XXXX)";
+ #endif
++  specialVersion = " (version for Vero)";
+   CLog::Log(LOGNOTICE, "Using %s %s x%d build%s", buildType.c_str(), CSysInfo::GetAppName().c_str(), g_sysinfo.GetXbmcBitness(), specialVersion.c_str());
+   CLog::Log(LOGNOTICE, "%s compiled " __DATE__ " by %s for %s %s %d-bit %s (%s)", CSysInfo::GetAppName().c_str(), g_sysinfo.GetUsedCompilerNameAndVer().c_str(), g_sysinfo.GetBuildTargetPlatformName().c_str(),
+             g_sysinfo.GetBuildTargetCpuFamily().c_str(), g_sysinfo.GetXbmcBitness(), g_sysinfo.GetBuildTargetPlatformVersionDecoded().c_str(),
+@@ -2568,6 +2570,17 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+       break;
+   }
+ 
++  case TMSG_AML_RESIZE:
++  {
++    if (! g_application.m_pPlayer->IsPlayingVideo()) {
++      CDisplaySettings::GetInstance().ClearCustomResolutions();
++      g_Windowing.UpdateResolutions();
++      CDisplaySettings::GetInstance().SetCurrentResolution(RES_DESKTOP);
++      g_graphicsContext.SetVideoResolution(RES_DESKTOP, true);
++      CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
++    }
++  }
++
+   case TMSG_NETWORKMESSAGE:
+     getNetwork().NetworkMessage((CNetwork::EMESSAGE)pMsg->param1, pMsg->param2);
+     break;
+@@ -4025,6 +4038,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+ 
+ bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
+ {
++  // was vero in standby?
++  if (m_bVeroStandby)
++        ToggleStandby();
+   if (m_iScreenSaveLock == 2)
+     return false;
+ 
+@@ -4129,6 +4145,45 @@ void CApplication::CheckScreenSaverAndDPMS()
+   }
+ }
+ 
++//activate screensaver for OSMC
++void CApplication::ActivateScreenSaverStandby()
++{
++  CLog::Log(LOGINFO, "Activating Vero standby mode");
++    if (g_application.m_pPlayer->IsPlayingVideo())
++      g_application.StopPlaying();
++  ToggleStandby();
++  m_bScreenSave = true;
++  m_screenSaver.reset();
++  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
++  g_windowManager.CloseDialogs(true);
++}
++
++void CApplication::ToggleStandby()
++{
++  CLog::Log(LOGINFO, "Toggle standby state is %s", m_bVeroStandby ? "waking" : "sleeping");
++  int sysfs_toggle = m_bVeroStandby;
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle TMDS clock to %d", sysfs_toggle);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to %d", sysfs_toggle);
++  SysfsUtils::SetInt("/sys/class/leds/led-sys/brightness", sysfs_toggle);
++  std::string cpu_governor = "powersave";
++  if (m_bVeroStandby)
++        cpu_governor = "ondemand";
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- governor will now be %s", cpu_governor.c_str());
++  for (int i = 0; i < 4; i++) {
++	std::stringstream ss_govpath;
++	ss_govpath << "/sys/devices/system/cpu/cpu" << i << "/cpufreq/scaling_governor";
++	SysfsUtils::SetString(ss_govpath.str(), cpu_governor);
++  }
++  std::string hpdlock = "hpd_lock1";
++  if (m_bVeroStandby && ! CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
++	hpdlock = "hpd_lock0";
++  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- HPD locking will now be %s", hpdlock.c_str());
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", hpdlock);
++  m_bVeroStandby = ! m_bVeroStandby; //invert state
++  return;
++}
++
+ // activate the screensaver.
+ // if forceType is true, we ignore the various conditions that can alter
+ // the type of screensaver displayed
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 49f9bcb..374cdff 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -218,6 +218,8 @@ public:
+   // Checks whether the screensaver and / or DPMS should become active.
+   void CheckScreenSaverAndDPMS();
+   void ActivateScreenSaver(bool forceType = false);
++  void ActivateScreenSaverStandby();
++  void ToggleStandby();
+   bool SetupNetwork();
+   void CloseNetworkShares();
+ 
+@@ -427,6 +429,8 @@ public:
+   */
+   void UnlockFrameMoveGuard();
+ 
++  bool IsVeroStandby() const { return m_bVeroStandby; }
++
+ protected:
+   virtual bool OnSettingsSaving() const override;
+ 
+@@ -460,6 +464,7 @@ protected:
+ #endif
+   // screensaver
+   bool m_bScreenSave;
++  bool m_bVeroStandby;
+   ADDON::AddonPtr m_screenSaver;
+ 
+   // timer information
+diff --git a/xbmc/Makefile.in b/xbmc/Makefile.in
+index 21502b4..b47a01f 100644
+--- a/xbmc/Makefile.in
++++ b/xbmc/Makefile.in
+@@ -37,6 +37,7 @@ SRCS=Application.cpp \
+      Util.cpp \
+      XBApplicationEx.cpp \
+      XBDateTime.cpp \
++     OSMCHelper.cpp \
+ 
+ LIB=xbmc.a
+ 
+diff --git a/xbmc/OSMCHelper.cpp b/xbmc/OSMCHelper.cpp
+new file mode 100644
+index 0000000..febc8c6
+--- /dev/null
++++ b/xbmc/OSMCHelper.cpp
+@@ -0,0 +1,36 @@
++/*
++ *      Copyright (C) 2005-2013 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++// OSMCHelper.cpp: implementation of OSMC helper routines
++//
++//////////////////////////////////////////////////////////////////////
++
++extern "C" {
++#include "OSMCHelper.h"
++   #if defined(__arm__)
++     /* Ensure that uname returns arm, or machine model will reflect kernel bitness only */
++     int uname(struct utsname *buf)
++     {
++       int r;
++       r = syscall(SYS_uname, buf);
++       strcpy(buf->machine, "arm");
++       return r;
++     }
++   #endif // __arm__
++}
+diff --git a/xbmc/OSMCHelper.h b/xbmc/OSMCHelper.h
+new file mode 100644
+index 0000000..04bd5fe
+--- /dev/null
++++ b/xbmc/OSMCHelper.h
+@@ -0,0 +1,38 @@
++/*
++ *      Copyright (C) 2005-2013 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++// OSMCHelper.h: routines to improve behaviour of Kodi on OSMC
++//
++//////////////////////////////////////////////////////////////////////
++
++#pragma once
++
++#include <sys/syscall.h>
++#include <sys/types.h>
++#include <sys/utsname.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <string.h>
++
++extern "C" {
++    #if defined(__arm__)
++      /* Fix up uname for 64-bit kernels with 32-bit userland */
++      int uname(struct utsname *buf);
++    #endif // __arm__
++}
+diff --git a/xbmc/cores/AudioEngine/AEFactory.cpp b/xbmc/cores/AudioEngine/AEFactory.cpp
+index 6577ed3..41552c1 100644
+--- a/xbmc/cores/AudioEngine/AEFactory.cpp
++++ b/xbmc/cores/AudioEngine/AEFactory.cpp
+@@ -197,6 +197,8 @@ bool CAEFactory::SupportsRaw(AEAudioFormat &format)
+     return false;
+   if (format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_DTSHD && !CSettings::GetInstance().GetBool(CSettings::SETTING_AUDIOOUTPUT_DTSHDPASSTHROUGH))
+     return false;
++  if (format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_DTSHD_XLL && !CSettings::GetInstance().GetBool(CSettings::SETTING_AUDIOOUTPUT_DTSHDPASSTHROUGH))
++    return false;
+ 
+   if(AE)
+     return AE->SupportsRaw(format);
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
+index d38afea..a0c0b72 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
+@@ -162,7 +162,11 @@ CActiveAEBufferPoolResample::CActiveAEBufferPoolResample(AEAudioFormat inputForm
+     m_inputFormat.m_channelLayout += AE_CH_FC;
+   }
+   m_resampler = NULL;
++#ifdef HAS_LIBAMCODEC
++  m_fillPackets = true;
++#else
+   m_fillPackets = false;
++#endif
+   m_drain = false;
+   m_empty = true;
+   m_procSample = NULL;
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+index 0a5412c..fb87a3c 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+@@ -20,6 +20,7 @@
+ 
+ #include "cores/AudioEngine/Utils/AEUtil.h"
+ #include "ActiveAEResampleFFMPEG.h"
++#include "settings/Settings.h"
+ #include "utils/log.h"
+ 
+ extern "C" {
+@@ -110,6 +111,12 @@ bool CActiveAEResampleFFMPEG::Init(uint64_t dst_chan_layout, int dst_channels, i
+   {
+      av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
+   }
++  int boost_center = CSettings::GetInstance().GetInt("audiooutput.boostcenter");
++  if (boost_center)
++  {
++    float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
++    av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
++  }
+ 
+   if (remapLayout)
+   {
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+index 84d56db..1adfa76 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+@@ -151,6 +151,7 @@ bool CActiveAESink::SupportsFormat(const std::string &device, AEAudioFormat &for
+                 break;
+ 
+               case CAEStreamInfo::STREAM_TYPE_DTSHD:
++              case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+                 samplerate = 192000;
+                 break;
+ 
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 0886020..705fcbf 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -35,9 +35,11 @@
+ #include "utils/MathUtils.h"
+ #include "utils/SystemInfo.h"
+ #include "threads/SingleLock.h"
++#include "settings/Settings.h"
+ #include "settings/AdvancedSettings.h"
+ #if defined(HAS_LIBAMCODEC)
+ #include "utils/AMLUtils.h"
++#include "utils/SysfsUtils.h"
+ #endif
+ 
+ #ifdef TARGET_POSIX
+@@ -88,6 +90,22 @@ static unsigned int ALSASampleRateList[] =
+   0
+ };
+ 
++static int CheckNP2(unsigned x)
++{
++    unsigned orig = x;
++    --x;
++    x |= x >> 1;
++    x |= x >> 2;
++    x |= x >> 4;
++    x |= x >> 8;
++    x |= x >> 16;
++    ++x;
++    if (x == orig) return x;
++    else return x >> 1;
++}
++
++int speaker_layout = 0;
++
+ CAESinkALSA::CAESinkALSA() :
+   m_bufferSize(0),
+   m_formatSampleRateMul(0.0),
+@@ -113,10 +131,11 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayoutRaw(const AEAudioFormat& form
+ 
+   switch (format.m_streamInfo.m_type)
+   {
+-    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+     case CAEStreamInfo::STREAM_TYPE_TRUEHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       count = 8;
+       break;
++    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+     case CAEStreamInfo::STREAM_TYPE_DTS_512:
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+@@ -222,9 +241,10 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+     }
+   }
+ 
++
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Input Channel Count: %d Output Channel Count: %d", format.m_channelLayout.Count(), info.Count());
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
+-  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
++  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s) (CEA: %d)", std::string(info).c_str(), alsaMapStr.c_str(), speaker_layout);
+ 
+   return info;
+ }
+@@ -516,6 +536,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   inconfig.format = format.m_dataFormat;
+   inconfig.sampleRate = format.m_sampleRate;
+ 
++    CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Requested layout: %s", std::string(format.m_channelLayout).c_str());
++
+   /*
+    * We can't use the better GetChannelLayout() at this point as the device
+    * is not opened yet, and we need inconfig.channels to select the correct
+@@ -534,12 +556,45 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   {
+     m_passthrough   = false;
+   }
+-#if defined(HAS_LIBAMCODEC)
+-  if (aml_present())
+-  {
++
++    int aml_digital_codec = 0;
++
++    if (m_passthrough)
++    {
++      switch(format.m_streamInfo.m_type)
++      {
++        case CAEStreamInfo::STREAM_TYPE_AC3:
++          aml_digital_codec = 2;
++          break;
++
++        case CAEStreamInfo::STREAM_TYPE_DTS_512:
++        case CAEStreamInfo::STREAM_TYPE_DTS_1024:
++        case CAEStreamInfo::STREAM_TYPE_DTS_2048:
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
++          aml_digital_codec = 3;
++          break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD:
++          aml_digital_codec = 5;
++          break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++          aml_digital_codec = 8;
++          break;
++
++        case CAEStreamInfo::STREAM_TYPE_EAC3:
++          aml_digital_codec = 4;
++          break;
++        case CAEStreamInfo::STREAM_TYPE_TRUEHD:
++          aml_digital_codec = 7;
++          break;
++      }
++    }
++
++    else if (device.find("M8AUDIO") != std::string::npos)
++        device = "@:CARD=AMLM8AUDIO,DEV=0";
++
+     aml_set_audio_passthrough(m_passthrough);
+-  }
+-#endif
++    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
++    CLog::Log(LOGINFO, "CAESinkALSA::Initialize - set digital_codec %d", aml_digital_codec);
+ 
+   if (inconfig.channels == 0)
+   {
+@@ -547,7 +602,16 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+     return false;
+   }
+ 
+-  AEDeviceType devType = AEDeviceTypeFromName(device);
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
++    CLog::Log(LOGDEBUG, "CAESinkALSA::Initialize -- muting HDMI");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
++ }
++ else {
++    CLog::Log(LOGDEBUG, "CAESinkALSA::Initialize -- unmuting HDMI");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_on");
++ }
++
++ AEDeviceType devType = AEDeviceTypeFromName(device);
+ 
+   std::string AESParams;
+   /* digital interfaces should have AESx set, though in practice most
+@@ -555,7 +619,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   if (m_passthrough || devType == AE_DEVTYPE_HDMI || devType == AE_DEVTYPE_IEC958)
+     GetAESParams(format, AESParams);
+ 
+-  CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Attempting to open device \"%s\"", device.c_str());
++  CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Attempting to open device \"%s\"\n with %s", device.c_str(), AESParams.c_str());
+ 
+   /* get the sound config */
+   snd_config_t *config;
+@@ -601,10 +665,45 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ #ifdef SND_CHMAP_API_VERSION
+   if (selectedChmap)
+   {
++	  /* Channel layout should match one of those offered by the sink
++	   * Find out which one it is
++	   */
++
++	  snd_pcm_chmap_query_t** supportedMaps;
++	  supportedMaps = snd_pcm_query_chmaps(m_pcm);
++	  /* set default stereo */
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++      int i = 0;
++	  for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
++			  supportedMap; supportedMap = supportedMaps[i++])
++	  {
++		  if (ALSAchmapToString(&supportedMap->map) == ALSAchmapToString(selectedChmap)) {
++			  speaker_layout = --i;
++			  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", speaker_layout);
++			  break;
++		  }
++	  }
++
+     /* failure is OK, that likely just means the selected chmap is fixed already */
+     snd_pcm_set_chmap(m_pcm, selectedChmap);
+     free(selectedChmap);
+   }
++  else
++  {
++	  /* while i2s driver is broken, this is essential */
++	  if (outconfig.channels == 2 || m_passthrough)
++	  {
++		  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++  		CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch to 0");
++	  }
++	  else
++	  {
++		SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 19);
++   		CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch to 19");
++	  }
++
++  }
++
+ #endif
+ 
+   // we want it blocking
+@@ -756,12 +855,18 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
+   */
+   periodSize  = std::min(periodSize, (snd_pcm_uframes_t) sampleRate / 20);
+   bufferSize  = std::min(bufferSize, (snd_pcm_uframes_t) sampleRate / 5);
++#if defined(HAS_LIBAMCODEC)
++  bufferSize  = CheckNP2(bufferSize);
++#endif
+   
+   /* 
+    According to upstream we should set buffer size first - so make sure it is always at least
+    4x period size to not get underruns (some systems seem to have issues with only 2 periods)
+   */
+   periodSize = std::min(periodSize, bufferSize / 4);
++#if defined(HAS_LIBAMCODEC)
++  periodSize  = CheckNP2(periodSize);
++#endif
+ 
+   CLog::Log(LOGDEBUG, "CAESinkALSA::InitializeHW - Request: periodSize %lu, bufferSize %lu", periodSize, bufferSize);
+ 
+@@ -889,7 +994,7 @@ void CAESinkALSA::Stop()
+ {
+   if (!m_pcm)
+     return;
+-  snd_pcm_drop(m_pcm);
++  snd_pcm_drain(m_pcm);
+ }
+ 
+ void CAESinkALSA::GetDelay(AEDelayStatus& status)
+@@ -1096,8 +1201,8 @@ bool CAESinkALSA::OpenPCMDevice(const std::string &name, const std::string &para
+       if (devPos != std::string::npos)
+         nameWithoutDev.erase(nameWithoutDev.begin() + devPos, nameWithoutDev.begin() + devPos + 6);
+ 
+-      if (TryDeviceWithParams("sysdefault" + nameWithoutDev, params, pcmp, lconf)
+-          || TryDeviceWithParams("default" + nameWithoutDev, params, pcmp, lconf))
++      if (TryDeviceWithParams("default" + nameWithoutDev, params, pcmp, lconf)
++          || TryDeviceWithParams("sysdefault" + nameWithoutDev, params, pcmp, lconf))
+         return true;
+     }
+ 
+@@ -1554,12 +1659,18 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+       info.m_dataFormats.push_back(i);
+   }
+ 
++  if (info.m_displayName.find("M8AUDIO") != std::string::npos && info.m_deviceType != AE_DEVTYPE_HDMI)
++  {
++    info.m_displayNameExtra = "PCM";
++  }
++
+   if (info.m_deviceType == AE_DEVTYPE_HDMI)
+   {
+     // we don't trust ELD information and push back our supported formats explicitely
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_AC3);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD_CORE);
++    info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTSHD_XLL);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_1024);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_2048);
+     info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_512);
+diff --git a/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp b/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
+index 3a6ede1..d3dae94 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEBitstreamPacker.cpp
+@@ -64,6 +64,7 @@ void CAEBitstreamPacker::Pack(CAEStreamInfo &info, uint8_t* data, int size)
+       break;
+ 
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       PackDTSHD (info, data, size);
+       break;
+ 
+@@ -109,6 +110,7 @@ void CAEBitstreamPacker::PackPause(CAEStreamInfo &info, unsigned int millis, boo
+ 
+     case CAEStreamInfo::STREAM_TYPE_AC3:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+     case CAEStreamInfo::STREAM_TYPE_DTS_512:
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+@@ -275,6 +277,7 @@ unsigned int CAEBitstreamPacker::GetOutputRate(CAEStreamInfo &info)
+       rate = info.m_sampleRate;
+       break;
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       rate = 192000;
+       break;
+     default:
+@@ -295,11 +298,12 @@ CAEChannelInfo CAEBitstreamPacker::GetOutputChannelMap(CAEStreamInfo &info)
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+     case CAEStreamInfo::STREAM_TYPE_DTS_2048:
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD:
+       channels = 2;
+       break;
+ 
+     case CAEStreamInfo::STREAM_TYPE_TRUEHD:
+-    case CAEStreamInfo::STREAM_TYPE_DTSHD:
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
+       channels = 8;
+       break;
+ 
+diff --git a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
+index d1962e2..6a247c5 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.cpp
+@@ -28,6 +28,12 @@
+ #define DTS_PREAMBLE_16BE  0x7FFE8001
+ #define DTS_PREAMBLE_16LE  0xFE7F0180
+ #define DTS_PREAMBLE_HD    0x64582025
++#define DTS_PREAMBLE_XCH   0x5a5a5a5a
++#define DTS_PREAMBLE_XXCH  0x47004a03
++#define DTS_PREAMBLE_X96K  0x1d95f262
++#define DTS_PREAMBLE_XBR   0x655e315e
++#define DTS_PREAMBLE_LBR   0x0a801921
++#define DTS_PREAMBLE_XLL   0x41a29547
+ #define DTS_SFREQ_COUNT    16
+ #define MAX_EAC3_BLOCKS    6
+ 
+@@ -107,6 +113,7 @@ double CAEStreamInfo::GetDuration()
+     case STREAM_TYPE_DTS_512:
+     case STREAM_TYPE_DTSHD_CORE:
+     case STREAM_TYPE_DTSHD:
++    case STREAM_TYPE_DTSHD_XLL:
+       duration = 512.0 / m_sampleRate;
+       break;
+     case STREAM_TYPE_DTS_1024:
+@@ -504,6 +511,7 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+     unsigned int dtsBlocks;
+     unsigned int amode;
+     unsigned int sfreq;
++    unsigned int target_rate, extension, ext_type;
+     unsigned int lfe;
+     int bits;
+ 
+@@ -547,6 +555,9 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+         m_fsize = (((((data[5] & 0x3) << 8) | data[6]) << 4) | ((data[7] & 0xF0) >> 4)) + 1;
+         amode = ((data[7] & 0x0F) << 2) | ((data[8] & 0xC0) >> 6);
+         sfreq = (data[8] & 0x3C) >> 2;
++        target_rate = ((data[8] & 0x03) << 3) | ((data[9] & 0xe0) >> 5);
++        extension = (data[10] & 0x10) >> 4;
++        ext_type = (data[10] & 0xe0) >> 5;
+         lfe = (data[10] >> 1) & 0x3;
+         m_info.m_dataIsLE = false;
+         bits = 16;
+@@ -616,11 +627,27 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+       else
+         hd_size = (((data[m_fsize + 6] & 0x1f) << 11) | (data[m_fsize + 7] << 3) | ((data[m_fsize + 8] & 0xe0) >> 5)) + 1;
+ 
++	  int header_size;
++	  if (blownup)
++		header_size = (((data[m_fsize + 5] & 0x1f) << 7) | ((data[m_fsize + 6] & 0xfe) >> 1)) + 1;
++	  else
++		header_size = (((data[m_fsize + 5] & 0x1f) << 3) | ((data[m_fsize + 6] & 0xe0) >> 5)) + 1;
++
++	  hd_sync = data[m_fsize + header_size] << 24 | data[m_fsize + header_size + 1] << 16 | data[m_fsize + header_size + 2] << 8 | data[m_fsize + header_size + 3];
++
+       /* set the type according to core or not */
+-      if (m_coreOnly)
+-        dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
+-      else
+-        dataType = CAEStreamInfo::STREAM_TYPE_DTSHD;
++	  if (m_coreOnly)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
++	  else if (hd_sync == DTS_PREAMBLE_XLL)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD_XLL;
++	  else if (hd_sync == DTS_PREAMBLE_XCH
++			  || hd_sync == DTS_PREAMBLE_XXCH
++			  || hd_sync == DTS_PREAMBLE_X96K
++			  || hd_sync == DTS_PREAMBLE_XBR
++			  || hd_sync == DTS_PREAMBLE_LBR)
++		  dataType = CAEStreamInfo::STREAM_TYPE_DTSHD;
++	  else
++		dataType = m_info.m_type;
+ 
+       m_coreSize = m_fsize;
+       m_fsize += hd_size;
+@@ -636,15 +663,17 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+       m_info.m_channels = DTSChannels[amode] + (lfe ? 1 : 0);
+       m_syncFunc = &CAEStreamParser::SyncDTS;
+       m_info.m_repeat = 1;
+-
+-      if (dataType == CAEStreamInfo::STREAM_TYPE_DTSHD)
+-      {
+-        m_info.m_channels += 2; /* FIXME: this needs to be read out, not sure how to do that yet */
+-        m_info.m_dtsPeriod = (192000 * (8 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
+-      }
+-      else
++      switch (dataType)
+       {
+-        m_info.m_dtsPeriod = (m_info.m_sampleRate * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++	        m_info.m_channels += 2; /* FIXME: this needs to be read out, not sure how to do that yet */
++	        m_info.m_dtsPeriod = (192000 * (8 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++			break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD:
++	        m_info.m_dtsPeriod = (192000 * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
++			break;
++		default:
++	        m_info.m_dtsPeriod = (m_info.m_sampleRate * (2 >> 1)) * (m_dtsBlocks << 5) / m_info.m_sampleRate;
+       }
+ 
+       std::string type;
+@@ -656,15 +685,33 @@ unsigned int CAEStreamParser::SyncDTS(uint8_t *data, unsigned int size)
+         case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+           type = "dtsHD (core)";
+           break;
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++          type = "dtsHD MA";
++          break;
+         default:
+           type = "dts";
+           break;
+       }
+ 
+-      CLog::Log(LOGINFO, "CAEStreamParser::SyncDTS - %s stream detected (%d channels, %dHz, %dbit %s, period: %u)",
++	  if (extension) switch (ext_type)
++	  {
++		  case 0:
++			  type += " XCH";
++			  break;
++		  case 2:
++			  type += " X96";
++			  break;
++		  case 6:
++			  type += " XXCH";
++			  break;
++		  default:
++			  type += " ext unknown";
++	  }
++
++      CLog::Log(LOGINFO, "CAEStreamParser::SyncDTS - %s stream detected (%d channels, %dHz, %dbit %s, period: %u, syncword: 0x%x, target rate: 0x%x, framesize %u)",
+                 type.c_str(), m_info.m_channels, m_info.m_sampleRate,
+                 bits, m_info.m_dataIsLE ? "LE" : "BE",
+-                m_info.m_dtsPeriod);
++                m_info.m_dtsPeriod, hd_sync, target_rate, m_fsize);
+     }
+ 
+     return skip;
+diff --git a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
+index a753707..fa9ac16 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
++++ b/xbmc/cores/AudioEngine/Utils/AEStreamInfo.h
+@@ -48,7 +48,8 @@ public:
+     STREAM_TYPE_DTSHD_CORE,
+     STREAM_TYPE_EAC3,
+     STREAM_TYPE_MLP,
+-    STREAM_TYPE_TRUEHD
++    STREAM_TYPE_TRUEHD,
++    STREAM_TYPE_DTSHD_XLL
+   };
+   DataType m_type;
+   unsigned int m_sampleRate;
+diff --git a/xbmc/cores/AudioEngine/Utils/AEUtil.cpp b/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
+index 3d8edba..e6c876c 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEUtil.cpp
+@@ -170,6 +170,8 @@ const char* CAEUtil::StreamTypeToStr(const enum CAEStreamInfo::DataType dataType
+       return "STREAM_TYPE_AC3";
+     case CAEStreamInfo::STREAM_TYPE_DTSHD:
+       return "STREAM_TYPE_DTSHD";
++    case CAEStreamInfo::STREAM_TYPE_DTSHD_XLL:
++      return "STREAM_TYPE_DTSHD_MA";
+     case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
+       return "STREAM_TYPE_DTSHD_CORE";
+     case CAEStreamInfo::STREAM_TYPE_DTS_1024:
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index f67f171..4a33723 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -26,41 +26,39 @@
+ #include "cores/VideoPlayer/DVDClock.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderFlags.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderManager.h"
++#include "settings/AdvancedSettings.h"
+ #include "guilib/GraphicContext.h"
+ #include "settings/DisplaySettings.h"
+ #include "settings/MediaSettings.h"
+ #include "settings/Settings.h"
++#include "threads/Atomics.h"
+ #include "utils/AMLUtils.h"
+ #include "utils/log.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
+ #include "utils/TimeUtils.h"
+ 
+-#if defined(TARGET_ANDROID)
+-#include "platform/android/activity/AndroidFeatures.h"
+-#include "utils/BitstreamConverter.h"
+-#endif
+-
+-extern "C" {
+-#include "libavutil/avutil.h"
+-}  // extern "C"
+-
+ #include <unistd.h>
+ #include <queue>
+ #include <vector>
+ #include <signal.h>
+-#include <semaphore.h>
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/ioctl.h>
++#include <sys/utsname.h>
+ #include <linux/videodev2.h>
++#include <sys/poll.h>
++#include <chrono>
++#include <thread>
+ 
+ // amcodec include
+ extern "C" {
+ #include <amcodec/codec.h>
+ }  // extern "C"
+ 
++CEvent g_aml_sync_event;
++
+ class PosixFile
+ {
+ public:
+@@ -133,6 +131,11 @@ public:
+   virtual int codec_set_cntl_mode(codec_para_t *pcodec, unsigned int mode)=0;
+   virtual int codec_set_cntl_avthresh(codec_para_t *pcodec, unsigned int avthresh)=0;
+   virtual int codec_set_cntl_syncthresh(codec_para_t *pcodec, unsigned int syncthresh)=0;
++
++  virtual int codec_set_av_threshold(codec_para_t *pcodec, int threshold)=0;
++  virtual int codec_set_video_delay_limited_ms(codec_para_t *pcodec,int delay_ms)=0;
++  virtual int codec_get_video_delay_limited_ms(codec_para_t *pcodec,int *delay_ms)=0;
++  virtual int codec_get_video_cur_delay_ms(codec_para_t *pcodec,int *delay_ms)=0;
+ };
+ 
+ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+@@ -156,6 +159,11 @@ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+   DEFINE_METHOD2(int, codec_set_cntl_avthresh,  (codec_para_t *p1, unsigned int p2))
+   DEFINE_METHOD2(int, codec_set_cntl_syncthresh,(codec_para_t *p1, unsigned int p2))
+ 
++  DEFINE_METHOD2(int, codec_set_av_threshold,   (codec_para_t *p1, int p2))
++  DEFINE_METHOD2(int, codec_set_video_delay_limited_ms, (codec_para_t *p1, int p2))
++  DEFINE_METHOD2(int, codec_get_video_delay_limited_ms, (codec_para_t *p1, int *p2))
++  DEFINE_METHOD2(int, codec_get_video_cur_delay_ms, (codec_para_t *p1, int *p2))
++
+   BEGIN_METHOD_RESOLVE()
+     RESOLVE_METHOD(codec_init)
+     RESOLVE_METHOD(codec_close)
+@@ -172,6 +180,11 @@ class DllLibAmCodec : public DllDynamic, DllLibamCodecInterface
+     RESOLVE_METHOD(codec_set_cntl_mode)
+     RESOLVE_METHOD(codec_set_cntl_avthresh)
+     RESOLVE_METHOD(codec_set_cntl_syncthresh)
++
++    RESOLVE_METHOD(codec_set_av_threshold)
++    RESOLVE_METHOD(codec_set_video_delay_limited_ms)
++    RESOLVE_METHOD(codec_get_video_delay_limited_ms)
++    RESOLVE_METHOD(codec_get_video_cur_delay_ms)
+   END_METHOD_RESOLVE()
+ 
+ public:
+@@ -279,14 +292,17 @@ public:
+ #define TRICKMODE_I     0x01
+ #define TRICKMODE_FFFB  0x02
+ 
+-// same as AV_NOPTS_VALUE
+-#define INT64_0         INT64_C(0x8000000000000000)
++static const int64_t INT64_0 = 0x8000000000000000ULL;
+ 
+ #define EXTERNAL_PTS    (1)
+ #define SYNC_OUTSIDE    (2)
++#define KEYFRAME_PTS_ONLY 0x100
+ 
+ // missing tags
++#ifndef CODEC_TAG_VC_1
+ #define CODEC_TAG_VC_1  (0x312D4356)
++#endif
++
+ #define CODEC_TAG_RV30  (0x30335652)
+ #define CODEC_TAG_RV40  (0x30345652)
+ #define CODEC_TAG_MJPEG (0x47504a4d)
+@@ -371,6 +387,19 @@ typedef struct am_private_t
+   bool              dumpdemux;
+ } am_private_t;
+ 
++typedef struct vframe_states
++{
++  int vf_pool_size;
++  int buf_free_num;
++  int buf_recycle_num;
++  int buf_avail_num;
++} vframe_states_t;
++
++#ifndef AMSTREAM_IOC_VF_STATUS
++#define AMSTREAM_IOC_MAGIC  'S'
++#define AMSTREAM_IOC_VF_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x60, unsigned long)
++#endif
++
+ /*************************************************************************/
+ /*************************************************************************/
+ void dumpfile_open(am_private_t *para)
+@@ -442,6 +471,9 @@ static vformat_t codecid_to_vformat(enum AVCodecID id)
+     case AV_CODEC_ID_WMV3:
+       format = VFORMAT_VC1;
+       break;
++    case AV_CODEC_ID_VP9:
++      format = VFORMAT_VP9;
++      break;
+     case AV_CODEC_ID_AVS:
+     case AV_CODEC_ID_CAVS:
+       format = VFORMAT_AVS;
+@@ -553,6 +585,9 @@ static vdec_type_t codec_tag_to_vdec_type(unsigned int codec_tag)
+       // vp6
+       dec_type = VIDEO_DEC_FORMAT_SW;
+       break;
++    case AV_CODEC_ID_VP9:
++      dec_type = VIDEO_DEC_FORMAT_VP9;
++      break;
+     case AV_CODEC_ID_CAVS:
+     case AV_CODEC_ID_AVS:
+       // avs
+@@ -579,7 +614,7 @@ static void am_packet_init(am_packet_t *pkt)
+   pkt->avduration = 0;
+   pkt->isvalid    = 0;
+   pkt->newflag    = 0;
+-  pkt->lastpts    = 0;
++  pkt->lastpts    = INT64_0;
+   pkt->data       = NULL;
+   pkt->buf        = NULL;
+   pkt->data_size  = 0;
+@@ -604,46 +639,14 @@ void am_packet_release(am_packet_t *pkt)
+ 
+ int check_in_pts(am_private_t *para, am_packet_t *pkt)
+ {
+-    int last_duration = 0;
+-    static int last_v_duration = 0;
+-    int64_t pts = 0;
+-
+-    last_duration = last_v_duration;
+-
+-    if (para->stream_type == AM_STREAM_ES) {
+-        if ((int64_t)INT64_0 != pkt->avpts) {
+-            pts = pkt->avpts;
+-
+-            if (para->m_dll->codec_checkin_pts(pkt->codec, pts) != 0) {
+-                CLog::Log(LOGDEBUG, "ERROR check in pts error!");
+-                return PLAYER_PTS_ERROR;
+-            }
+-
+-        } else if ((int64_t)INT64_0 != pkt->avdts) {
+-            pts = pkt->avdts * last_duration;
+-
+-            if (para->m_dll->codec_checkin_pts(pkt->codec, pts) != 0) {
+-                CLog::Log(LOGDEBUG, "ERROR check in dts error!");
+-                return PLAYER_PTS_ERROR;
+-            }
+-
+-            last_v_duration = pkt->avduration ? pkt->avduration : 1;
+-        } else {
+-            if (!para->check_first_pts) {
+-                if (para->m_dll->codec_checkin_pts(pkt->codec, 0) != 0) {
+-                    CLog::Log(LOGDEBUG, "ERROR check in 0 to video pts error!");
+-                    return PLAYER_PTS_ERROR;
+-                }
+-            }
+-        }
+-        if (!para->check_first_pts) {
+-            para->check_first_pts = 1;
+-        }
+-    }
+-    if (pts > 0)
+-      pkt->lastpts = pts;
+-
+-    return PLAYER_SUCCESS;
++  if (para->stream_type == AM_STREAM_ES
++    && INT64_0 != pkt->avpts
++    && para->m_dll->codec_checkin_pts(pkt->codec, pkt->avpts) != 0)
++  {
++    CLog::Log(LOGDEBUG, "ERROR check in pts error!");
++    return PLAYER_PTS_ERROR;
++  }
++  return PLAYER_SUCCESS;
+ }
+ 
+ static int write_header(am_private_t *para, am_packet_t *pkt)
+@@ -713,7 +716,7 @@ int write_av_packet(am_private_t *para, am_packet_t *pkt)
+         }
+         pkt->newflag = 0;
+     }
+-	
++
+     buf = pkt->data;
+     size = pkt->data_size ;
+     if (size == 0 && pkt->isvalid) {
+@@ -960,6 +963,116 @@ static int hevc_write_header(am_private_t *para, am_packet_t *pkt)
+     return ret;
+ }
+ 
++int vp9_update_frame_header(am_packet_t *pkt) {
++
++    int dsize = pkt->data_size;
++    unsigned char *buf = pkt->data;
++    unsigned char marker;
++    int frame_number;
++    int cur_frame, cur_mag, mag, index_sz, offset[9], size[8], tframesize[9];
++    int mag_ptr;
++    int ret;
++    unsigned char *old_header = NULL;
++    int total_datasize = 0;
++
++    pkt->avpkt.data = pkt->data;
++    pkt->avpkt.size = pkt->data_size;
++
++    if (buf == NULL) return PLAYER_SUCCESS; /*something error. skip add header*/
++    marker = buf[dsize - 1];
++    if ((marker & 0xe0) == 0xc0) {
++        frame_number = (marker & 0x7) + 1;
++        mag = ((marker >> 3) & 0x3) + 1;
++        index_sz = 2 + mag * frame_number;
++        CLog::Log(LOGDEBUG, " frame_number : %d, mag : %d; index_sz : %d\n", frame_number, mag, index_sz);
++        offset[0] = 0;
++        mag_ptr = dsize - mag * frame_number - 2;
++        if (buf[mag_ptr] != marker) {
++            CLog::Log(LOGDEBUG, " Wrong marker2 : 0x%X --> 0x%X\n", marker, buf[mag_ptr]);
++            return PLAYER_SUCCESS;
++        }
++        mag_ptr++;
++        for (cur_frame = 0; cur_frame < frame_number; cur_frame++) {
++            size[cur_frame] = 0; // or size[0] = bytes_in_buffer - 1; both OK
++            for (cur_mag = 0; cur_mag < mag; cur_mag++) {
++                size[cur_frame] = size[cur_frame]  | (buf[mag_ptr] << (cur_mag*8) );
++                mag_ptr++;
++            }
++            offset[cur_frame+1] = offset[cur_frame] + size[cur_frame];
++            if (cur_frame == 0)
++                tframesize[cur_frame] = size[cur_frame];
++            else
++                tframesize[cur_frame] = tframesize[cur_frame - 1] + size[cur_frame];
++            total_datasize += size[cur_frame];
++        }
++    } else {
++        frame_number = 1;
++        offset[0] = 0;
++        size[0] = dsize; // or size[0] = bytes_in_buffer - 1; both OK
++        total_datasize += dsize;
++        tframesize[0] = dsize;
++    }
++    if (total_datasize > dsize) {
++        CLog::Log(LOGDEBUG, "DATA overflow : 0x%X --> 0x%X\n", total_datasize, dsize);
++        return PLAYER_SUCCESS;
++    }
++    if (frame_number >= 1) {
++        /*
++        if only one frame ,can used headers.
++        */
++        int need_more = total_datasize + frame_number * 16 - dsize;
++
++        av_buffer_unref(&pkt->avpkt.buf);
++        ret = av_grow_packet(&(pkt->avpkt), need_more);
++        if (ret < 0) {
++            CLog::Log(LOGDEBUG, "ERROR!!! grow_packet for apk failed.!!!\n");
++            return ret;
++        }
++
++        pkt->data = pkt->avpkt.data;
++        pkt->data_size = pkt->avpkt.size;
++    }
++    for (cur_frame = frame_number - 1; cur_frame >= 0; cur_frame--) {
++        AVPacket *avpkt = &(pkt->avpkt);
++        int framesize = size[cur_frame];
++        int oldframeoff = tframesize[cur_frame] - framesize;
++        int outheaderoff = oldframeoff + cur_frame * 16;
++        uint8_t *fdata = avpkt->data + outheaderoff;
++        uint8_t *old_framedata = avpkt->data + oldframeoff;
++        memmove(fdata + 16, old_framedata, framesize);
++        framesize += 4;/*add 4. for shift.....*/
++
++        /*add amlogic frame headers.*/
++        fdata[0] = (framesize >> 24) & 0xff;
++        fdata[1] = (framesize >> 16) & 0xff;
++        fdata[2] = (framesize >> 8) & 0xff;
++        fdata[3] = (framesize >> 0) & 0xff;
++        fdata[4] = ((framesize >> 24) & 0xff) ^0xff;
++        fdata[5] = ((framesize >> 16) & 0xff) ^0xff;
++        fdata[6] = ((framesize >> 8) & 0xff) ^0xff;
++        fdata[7] = ((framesize >> 0) & 0xff) ^0xff;
++        fdata[8] = 0;
++        fdata[9] = 0;
++        fdata[10] = 0;
++        fdata[11] = 1;
++        fdata[12] = 'A';
++        fdata[13] = 'M';
++        fdata[14] = 'L';
++        fdata[15] = 'V';
++        framesize -= 4;/*del 4 to real framesize for check.....*/
++       if (!old_header) {
++           ///nothing
++       } else if (old_header > fdata + 16 + framesize) {
++           CLog::Log(LOGDEBUG, "data has gaps,set to 0\n");
++           memset(fdata + 16 + framesize, 0, (old_header - fdata + 16 + framesize));
++       } else if (old_header < fdata + 16 + framesize) {
++           CLog::Log(LOGDEBUG, "ERROR!!! data over writed!!!! over write %d\n", fdata + 16 + framesize - old_header);
++       }
++       old_header = fdata;
++    }
++    return PLAYER_SUCCESS;
++}
++
+ static int wmv3_write_header(am_private_t *para, am_packet_t *pkt)
+ {
+     CLog::Log(LOGDEBUG, "wmv3_write_header");
+@@ -1373,6 +1486,9 @@ int set_header_info(am_private_t *para)
+             pkt->hdr->size = 4;
+             pkt->newflag = 1;
+         }
++    } else if (para->video_format == VFORMAT_VP9) {
++
++        vp9_update_frame_header(pkt);
+     }
+   }
+   return PLAYER_SUCCESS;
+@@ -1380,9 +1496,14 @@ int set_header_info(am_private_t *para)
+ 
+ /*************************************************************************/
+ CAMLCodec::CAMLCodec()
+-  : CThread("CAMLCodec")
++  : m_opened(false)
++  , m_ptsIs64us(false)
++  , m_cur_pts(INT64_0)
++  , m_last_pts(0)
++  , m_bufferIndex(-1)
++  , m_state(0)
++  , m_frameSizeSum(0)
+ {
+-  m_opened = false;
+   am_private = new am_private_t;
+   memset(am_private, 0, sizeof(am_private_t));
+   m_dll = new DllLibAmCodec;
+@@ -1402,12 +1523,26 @@ CAMLCodec::CAMLCodec()
+ 
+ CAMLCodec::~CAMLCodec()
+ {
+-  StopThread();
+   delete am_private;
+   am_private = NULL;
+   delete m_dll, m_dll = NULL;
+ }
+ 
++float CAMLCodec::OMXPtsToSeconds(int omxpts)
++{
++  return static_cast<float>(omxpts) / PTS_FREQ;
++}
++
++int CAMLCodec::OMXDurationToNs(int duration)
++{
++  return static_cast<int>(static_cast<float>(duration) / PTS_FREQ * 1000000 );
++}
++
++int CAMLCodec::GetAmlDuration() const
++{
++  return am_private ? (am_private->video_rate * PTS_FREQ) / UNIT_FREQ : 0;
++};
++
+ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+ {
+ #ifdef TARGET_ANDROID
+@@ -1415,16 +1550,18 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+ #endif
+ 
+   m_speed = DVD_PLAYSPEED_NORMAL;
+-  m_1st_pts = 0;
+-  m_cur_pts = 0;
++  m_drain = false;
++  m_cur_pts = INT64_0;
+   m_dst_rect.SetRect(0, 0, 0, 0);
+   m_zoom = -1;
+   m_contrast = -1;
+   m_brightness = -1;
+-  m_vbufsize = 500000 * 2;
+-  m_start_dts = 0;
+-  m_start_pts = 0;
++  m_start_adj = 0;
+   m_hints = hints;
++  m_state = 0;
++  m_frameSizes.clear();
++  m_frameSizeSum = 0;
++  m_noPictureLoop = 0;
+ 
+   if (!OpenAmlVideo(hints))
+   {
+@@ -1459,6 +1596,10 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+     // then ffmpeg avg_frame_rate next
+     am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
+   }
++  else {
++    am_private->video_rate = 0.5 + (float)UNIT_FREQ * 1001 / 30000;
++    CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder we have no fps hints so we will create a fallback");
++  }
+ 
+   // check for 1920x1080, interlaced, 25 fps
+   // incorrectly reported as 50 fps (yes, video_rate == 1920)
+@@ -1523,8 +1664,8 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder "
+     "hints.width(%d), hints.height(%d), hints.codec(%d), hints.codec_tag(%d)",
+     hints.width, hints.height, hints.codec, hints.codec_tag);
+-  CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.fpsrate(%d), hints.fpsscale(%d), video_rate(%d)",
+-    hints.fpsrate, hints.fpsscale, am_private->video_rate);
++  CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.fpsrate(%d), hints.fpsscale(%d), video_rate(%d), hints.bitsperpixel(%d)",
++    hints.fpsrate, hints.fpsscale, am_private->video_rate, hints.bitsperpixel);
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.aspect(%f), video_ratio.num(%d), video_ratio.den(%d)",
+     hints.aspect, video_ratio.num, video_ratio.den);
+   CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder hints.orientation(%d), hints.forced_aspect(%d), hints.extrasize(%d)",
+@@ -1543,12 +1684,19 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   am_private->gcodec.ratio64     = am_private->video_ratio64;
+   am_private->gcodec.param       = NULL;
+ 
++  if (am_private->video_format == VFORMAT_VC1)
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
++  else
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
++
+   switch(am_private->video_format)
+   {
+     default:
+       break;
+     case VFORMAT_MPEG4:
+       am_private->gcodec.param = (void*)EXTERNAL_PTS;
++      if (m_hints.ptsinvalid)
++        am_private->gcodec.param = (void*)(EXTERNAL_PTS | KEYFRAME_PTS_ONLY);
+       break;
+     case VFORMAT_H264:
+     case VFORMAT_H264MVC:
+@@ -1591,7 +1739,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+     case VFORMAT_VC1:
+       // vc1 in an avi file
+       if (m_hints.ptsinvalid)
+-        am_private->gcodec.param = (void*)EXTERNAL_PTS;
++        am_private->gcodec.param = (void*)KEYFRAME_PTS_ONLY;
+       break;
+     case VFORMAT_HEVC:
+       am_private->gcodec.format = VIDEO_DEC_FORMAT_HEVC;
+@@ -1599,6 +1747,12 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+       if (m_hints.ptsinvalid)
+         am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
+       break;
++    case VFORMAT_VP9:
++      am_private->gcodec.format = VIDEO_DEC_FORMAT_VP9;
++      am_private->gcodec.param  = (void*)EXTERNAL_PTS;
++      if (m_hints.ptsinvalid)
++        am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
++      break;
+   }
+   am_private->gcodec.param = (void *)((std::uintptr_t)am_private->gcodec.param | (am_private->video_rotation_degree << 16));
+ 
+@@ -1615,9 +1769,10 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   am_private->dumpdemux = false;
+   dumpfile_open(am_private);
+ 
+-  //! @bug make sure we are not stuck in pause (amcodec bug)
+-  m_dll->codec_resume(&am_private->vcodec);
++  m_dll->codec_pause(&am_private->vcodec);
++
+   m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_NONE);
++  m_dll->codec_set_video_delay_limited_ms(&am_private->vcodec, 1000);
+ 
+   m_dll->codec_set_cntl_avthresh(&am_private->vcodec, AV_SYNC_THRESH);
+   m_dll->codec_set_cntl_syncthresh(&am_private->vcodec, 0);
+@@ -1627,8 +1782,6 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   am_private->am_pkt.codec = &am_private->vcodec;
+   pre_header_feeding(am_private, &am_private->am_pkt);
+ 
+-  Create();
+-
+   m_display_rect = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iHeight);
+ 
+   std::string strScaler;
+@@ -1636,21 +1789,25 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   if (strScaler.find("enabled") == std::string::npos)     // Scaler not enabled, use screen size
+     m_display_rect = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iScreenWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iScreenHeight);
+ 
+-/*
+-  // if display is set to 1080xxx, then disable deinterlacer for HD content
+-  // else bandwidth usage is too heavy and it will slow down video decoder.
+-  char display_mode[256] = {0};
+-  SysfsUtils::GetString("/sys/class/display/mode", display_mode, 255);
+-  if (strstr(display_mode,"1080"))
+-    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 1);
+-  else
+-    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 0);
+-*/
++  SysfsUtils::SetInt("/sys/class/video/freerun_mode", 1);
++
++
++  struct utsname un;
++  if (uname(&un) == 0)
++  {
++    int linuxversion[2];
++    sscanf(un.release,"%d.%d", &linuxversion[0], &linuxversion[1]);
++    if (linuxversion[0] > 3 || (linuxversion[0] == 3 && linuxversion[1] >= 14))
++      m_ptsIs64us = true;
++  }
++
++  CLog::Log(LOGNOTICE, "CAMLCodec::OpenDecoder - using V4L2 pts format: %s", m_ptsIs64us ? "64Bit":"32Bit");
+ 
+   m_opened = true;
+   // vcodec is open, update speed if it was
+   // changed before VideoPlayer called OpenDecoder.
+   SetSpeed(m_speed);
++  SetPollDevice(am_private->vcodec.cntl_handle);
+ 
+   return true;
+ }
+@@ -1669,7 +1826,7 @@ bool CAMLCodec::OpenAmlVideo(const CDVDStreamInfo &hints)
+   m_defaultVfmMap = GetVfmMap("default");
+   SetVfmMap("default", "decoder ppmgr deinterlace amlvideo amvideo");
+ 
+-  SysfsUtils::SetInt("/sys/module/amlvideodri/parameters/freerun_mode", 1);
++  SysfsUtils::SetInt("/sys/module/amlvideodri/parameters/freerun_mode", 3);
+ 
+   return true;
+ }
+@@ -1705,12 +1862,13 @@ void CAMLCodec::SetVfmMap(const std::string &name, const std::string &map)
+ void CAMLCodec::CloseDecoder()
+ {
+   CLog::Log(LOGDEBUG, "CAMLCodec::CloseDecoder");
+-  StopThread();
++
++  SetPollDevice(-1);
+ 
+   // never leave vcodec ff/rw or paused.
+   if (m_speed != DVD_PLAYSPEED_NORMAL)
+   {
+-    m_dll->codec_resume(&am_private->vcodec);
++    //m_dll->codec_resume(&am_private->vcodec);
+     m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_NONE);
+   }
+   m_dll->codec_close(&am_private->vcodec);
+@@ -1741,6 +1899,8 @@ void CAMLCodec::Reset()
+   if (!m_opened)
+     return;
+ 
++  SetPollDevice(-1);
++
+   // set the system blackout_policy to leave the last frame showing
+   int blackout_policy;
+   SysfsUtils::GetInt("/sys/class/video/blackout_policy", blackout_policy);
+@@ -1749,11 +1909,14 @@ void CAMLCodec::Reset()
+   // restore the speed (some amcodec versions require this)
+   if (m_speed != DVD_PLAYSPEED_NORMAL)
+   {
+-    m_dll->codec_resume(&am_private->vcodec);
+     m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_NONE);
+   }
++  m_dll->codec_pause(&am_private->vcodec);
++
+   // reset the decoder
+   m_dll->codec_reset(&am_private->vcodec);
++  m_dll->codec_set_video_delay_limited_ms(&am_private->vcodec, 1000);
++
+   dumpfile_close(am_private);
+   dumpfile_open(am_private);
+ 
+@@ -1767,19 +1930,34 @@ void CAMLCodec::Reset()
+   SysfsUtils::SetInt("/sys/class/video/blackout_policy", blackout_policy);
+ 
+   // reset some interal vars
+-  m_1st_pts = 0;
+-  m_cur_pts = 0;
+-  m_ptsQueue.clear();
++  m_cur_pts = INT64_0;
++  m_state = 0;
++  m_start_adj = 0;
++  m_frameSizes.clear();
++  m_frameSizeSum = 0;
++  m_drain = false;
++  m_noPictureLoop = 0;
++
+   SetSpeed(m_speed);
++
++  SetPollDevice(am_private->vcodec.cntl_handle);
+ }
+ 
+ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+ {
+   if (!m_opened)
+-    return VC_BUFFER;
++    return VC_ERROR;
++
++  int rtn(0);
++
++  // bandfix
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+ 
+   if (pData)
+   {
++    m_frameSizes.push_back(iSize);
++    m_frameSizeSum += iSize;
++
+     am_private->am_pkt.data = pData;
+     am_private->am_pkt.data_size = iSize;
+ 
+@@ -1790,31 +1968,39 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+     // handle pts, including 31bit wrap, aml can only handle 31
+     // bit pts as it uses an int in kernel.
+     if (m_hints.ptsinvalid || pts == DVD_NOPTS_VALUE)
+-      am_private->am_pkt.avpts = AV_NOPTS_VALUE;
++      am_private->am_pkt.avpts = INT64_0;
+     else
+     {
+       am_private->am_pkt.avpts = 0.5 + (pts * PTS_FREQ) / DVD_TIME_BASE;\
+-      if (!m_start_pts && am_private->am_pkt.avpts >= 0x7fffffff)
+-        m_start_pts = am_private->am_pkt.avpts & ~0x0000ffff;
++      if (!m_start_adj && am_private->am_pkt.avpts >= 0x7fffffff)
++        m_start_adj = am_private->am_pkt.avpts & ~0x0000ffff;
++      am_private->am_pkt.avpts -= m_start_adj;
++      m_state |= STATE_HASPTS;
+     }
+-    if (am_private->am_pkt.avpts != (int64_t)AV_NOPTS_VALUE)
+-      am_private->am_pkt.avpts -= m_start_pts;
+ 
+     // handle dts, including 31bit wrap, aml can only handle 31
+     // bit dts as it uses an int in kernel.
+     if (dts == DVD_NOPTS_VALUE)
+-      am_private->am_pkt.avdts = AV_NOPTS_VALUE;
++      am_private->am_pkt.avdts = am_private->am_pkt.avpts;
+     else
+     {
+       am_private->am_pkt.avdts = 0.5 + (dts * PTS_FREQ) / DVD_TIME_BASE;
+-      if (!m_start_dts && am_private->am_pkt.avdts >= 0x7fffffff)
+-        m_start_dts = am_private->am_pkt.avdts & ~0x0000ffff;
+-    }
+-    if (am_private->am_pkt.avdts != (int64_t)AV_NOPTS_VALUE)
+-      am_private->am_pkt.avdts -= m_start_dts;
++      if (!m_start_adj && am_private->am_pkt.avdts >= 0x7fffffff)
++        m_start_adj = am_private->am_pkt.avdts & ~0x0000ffff;
++      am_private->am_pkt.avdts -= m_start_adj;
+ 
+-    //CLog::Log(LOGDEBUG, "CAMLCodec::Decode: iSize(%d), dts(%f), pts(%f), avdts(%llx), avpts(%llx)",
+-    //  iSize, dts, pts, am_private->am_pkt.avdts, am_private->am_pkt.avpts);
++      // For VC1 AML decoder uses PTS only on I-Frames
++      if (am_private->am_pkt.avpts == INT64_0 && (((size_t)am_private->gcodec.param) & KEYFRAME_PTS_ONLY))
++        am_private->am_pkt.avpts = am_private->am_pkt.avdts;
++    }
++    // We use this to determine the fill state if no PTS is given
++    if (m_cur_pts == INT64_0)
++    {
++      m_cur_pts = am_private->am_pkt.avdts;
++      // No PTS given -> use first DTS for AML ptsserver initialization
++      if ((m_state & STATE_HASPTS) == 0)
++         am_private->am_pkt.avpts = am_private->am_pkt.avdts;
++    }
+ 
+     // some formats need header/data tweaks.
+     // the actual write occurs once in write_av_packet
+@@ -1836,80 +2022,154 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+       loop++;
+     }
+     if (loop == 100)
+-    {
+       // Decoder got stuck; Reset
+       Reset();
+-    }
+-
+-    // if we seek, then GetTimeSize is wrong as
+-    // reports lastpts - cur_pts and hw decoder has
+-    // not started outputing new pts values yet.
+-    // so we grab the 1st pts sent into driver and
+-    // use that to calc GetTimeSize.
+-    if (m_1st_pts == 0)
+-      m_1st_pts = am_private->am_pkt.lastpts;
+   }
+ 
+-  // if we have still frames, demux size will be small
+-  // and we need to pre-buffer more.
+-  double target_timesize = 1.0;
+-  if (iSize < 20)
+-    target_timesize = 2.0;
++  float timesize(GetTimeSize());
++
++  if (!m_drain && timesize < 0.2)
++     rtn |= VC_BUFFER;
+ 
+-  int rtn = 0;
++  if (timesize > 0.5 || m_drain)
++    if (DequeueBuffer() == 0)
++    {
++      rtn |= VC_PICTURE;
++      m_noPictureLoop = 0;
++    }
+ 
+-  // keep hw buffered demux above 1 second
+-  if (GetTimeSize() < target_timesize)
++  if (++m_noPictureLoop == 100 || timesize == 0.0) // EOS or stalled
+     rtn |= VC_BUFFER;
+ 
+-  // wait until we get a new frame or 25ms,
+-  if (m_ptsQueue.size() == 0)
+-    m_ready_event.WaitMSec(25);
++  if (!m_drain)
++    if (timesize < 1.0) {
++      rtn |= VC_BUFFER;
++      usleep(5000);
++    }
+ 
+-  if (m_ptsQueue.size() > 0)
++  if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+   {
+-    CSingleLock lock(m_ptsQueueMutex);
+-    m_cur_pts = m_ptsQueue.front();
+-    m_ptsQueue.pop_front();
+-    rtn |= VC_PICTURE;
++    CLog::Log(LOGDEBUG, "CAMLCodec::Decode: ret: %d, sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], adj:%llu, ptsOut:%0.4f, amlpts:%d, idx:%u, timesize:%0.4f, drain: %d",
++      rtn,
++      static_cast<unsigned int>(iSize),
++      dts / DVD_TIME_BASE, am_private->am_pkt.avdts,
++      pts / DVD_TIME_BASE, am_private->am_pkt.avpts,
++      m_start_adj,
++      static_cast<float>(m_cur_pts)/PTS_FREQ,
++      static_cast<int>(m_cur_pts),
++      m_bufferIndex,
++      timesize,
++      m_drain
++    );
+   }
+-/*
+-  CLog::Log(LOGDEBUG, "CAMLCodec::Decode: "
+-    "rtn(%d), m_cur_pictcnt(%lld), m_cur_pts(%f), lastpts(%f), GetTimeSize(%f), GetDataSize(%d)",
+-    rtn, m_cur_pictcnt, (float)m_cur_pts/PTS_FREQ, (float)am_private->am_pkt.lastpts/PTS_FREQ, GetTimeSize(), GetDataSize());
+-*/
++
+   return rtn;
+ }
+ 
+-int CAMLCodec::DequeueBuffer(int64_t &pts)
++long CAMLCodec::m_pollSync = 0;
++int CAMLCodec::m_pollDevice;
++
++int CAMLCodec::PollFrame()
++{
++  CAtomicSpinLock lock(m_pollSync);
++  if (m_pollDevice < 0)
++    return 0;
++
++  struct pollfd codec_poll_fd[1];
++
++  codec_poll_fd[0].fd = m_pollDevice;
++  codec_poll_fd[0].events = POLLOUT;
++
++  if (poll(codec_poll_fd, 1, 100) > 0)
++  {
++    g_aml_sync_event.Set();
++    return 1;
++  }
++  return 0;
++}
++
++void CAMLCodec::SetPollDevice(int dev)
++{
++  CAtomicSpinLock lock(m_pollSync);
++  m_pollDevice = dev;
++}
++
++int CAMLCodec::ReleaseFrame(const uint32_t index, bool drop)
++{
++  int ret;
++  v4l2_buffer vbuf = { 0 };
++  vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
++  vbuf.index = index;
++
++  if (drop)
++    vbuf.flags |= V4L2_BUF_FLAG_DONE;
++
++  if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++    CLog::Log(LOGDEBUG, "CAMLCodec::ReleaseFrame idx:%u", index);
++
++  if ((ret = m_amlVideoFile->IOControl(VIDIOC_QBUF, &vbuf)) < 0)
++    CLog::Log(LOGERROR, "CAMLCodec::ReleaseFrame - VIDIOC_QBUF failed: %s", strerror(errno));
++  return ret;
++}
++
++int CAMLCodec::DequeueBuffer()
+ {
+   v4l2_buffer vbuf = { 0 };
+   vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+ 
++  //Driver change from 10 to 0ms latency, throttle here
++  std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
++
+   if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
+   {
+     if (errno != EAGAIN)
+       CLog::Log(LOGERROR, "CAMLCodec::DequeueBuffer - VIDIOC_DQBUF failed: %s", strerror(errno));
++
++    std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
++
++    if (elapsed < std::chrono::milliseconds(10))
++      std::this_thread::sleep_for(std::chrono::milliseconds(10) - elapsed);
++
+     return -errno;
+   }
+ 
+   // Since kernel 3.14 Amlogic changed length and units of PTS values reported here.
+   // To differentiate such PTS values we check for existence of omx_pts_interval_lower
+   // parameter, because it was introduced since kernel 3.14.
+-  if (access("/sys/module/amvideo/parameters/omx_pts_interval_lower", F_OK) != -1)
++  m_last_pts = m_cur_pts;
++
++  if (m_ptsIs64us)
+   {
+-    pts = vbuf.timestamp.tv_sec & 0xFFFFFFFF;
+-    pts <<= 32;
+-    pts += vbuf.timestamp.tv_usec & 0xFFFFFFFF;
+-    pts = (pts * PTS_FREQ) / DVD_TIME_BASE;
++    m_cur_pts = vbuf.timestamp.tv_sec & 0xFFFFFFFF;
++    m_cur_pts <<= 32;
++    m_cur_pts += vbuf.timestamp.tv_usec & 0xFFFFFFFF;
++    m_cur_pts = (m_cur_pts * PTS_FREQ) / DVD_TIME_BASE;
+   }
+   else
+   {
+-    pts = vbuf.timestamp.tv_usec;
++    m_cur_pts = vbuf.timestamp.tv_usec;
+   }
++  m_bufferIndex = vbuf.index;
+   return 0;
+ }
+ 
++float CAMLCodec::GetTimeSize()
++{
++  struct buf_status bs;
++  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
++
++  //CLog::Log(LOGDEBUG, "CAMLCodec::Decode: buf status: s:%d dl:%d fl:%d rp:%u wp:%u",bs.size, bs.data_len, bs.free_len, bs.read_pointer, bs.write_pointer);  
++  while (m_frameSizeSum >  (unsigned int)bs.data_len)
++  {
++    m_frameSizeSum -= m_frameSizes.front();
++    m_frameSizes.pop_front();
++  }
++  if (bs.free_len < (bs.data_len >> 1))
++    return 7.0;
++
++  return (float)(m_frameSizes.size() * am_private->video_rate) / UNIT_FREQ;
++}
++
+ bool CAMLCodec::GetPicture(DVDVideoPicture *pDvdVideoPicture)
+ {
+   if (!m_opened)
+@@ -1917,24 +2177,23 @@ bool CAMLCodec::GetPicture(DVDVideoPicture *pDvdVideoPicture)
+ 
+   pDvdVideoPicture->iFlags = DVP_FLAG_ALLOCATED;
+   pDvdVideoPicture->format = RENDER_FMT_AML;
+-  pDvdVideoPicture->iDuration = (double)(am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
+ 
+-  pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
+-  if (m_speed == DVD_PLAYSPEED_NORMAL)
+-    pDvdVideoPicture->pts = (double)m_cur_pts / PTS_FREQ * DVD_TIME_BASE;
++  if (m_last_pts <= 0)
++    pDvdVideoPicture->iDuration = (double)(am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
+   else
+-  {
+-    if (m_cur_pts == 0)
+-      pDvdVideoPicture->pts = (double)m_1st_pts / PTS_FREQ * DVD_TIME_BASE;
+-    else
+-      pDvdVideoPicture->pts = (double)m_cur_pts / PTS_FREQ * DVD_TIME_BASE;
+-  }
++    pDvdVideoPicture->iDuration = (double)((m_cur_pts - m_last_pts) * DVD_TIME_BASE) / PTS_FREQ;
++
++  pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
++  pDvdVideoPicture->pts = (double)GetCurPts() / PTS_FREQ * DVD_TIME_BASE;
+ 
+   return true;
+ }
+ 
+ void CAMLCodec::SetSpeed(int speed)
+ {
++  if (m_speed == speed)
++    return;
++
+   CLog::Log(LOGDEBUG, "CAMLCodec::SetSpeed, speed(%d)", speed);
+ 
+   // update internal vars regardless
+@@ -1947,15 +2206,15 @@ void CAMLCodec::SetSpeed(int speed)
+   switch(speed)
+   {
+     case DVD_PLAYSPEED_PAUSE:
+-      m_dll->codec_pause(&am_private->vcodec);
++      //m_dll->codec_pause(&am_private->vcodec);
+       m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_NONE);
+       break;
+     case DVD_PLAYSPEED_NORMAL:
+-      m_dll->codec_resume(&am_private->vcodec);
++      //m_dll->codec_resume(&am_private->vcodec);
+       m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_NONE);
+       break;
+     default:
+-      m_dll->codec_resume(&am_private->vcodec);
++      //m_dll->codec_resume(&am_private->vcodec);
+       if ((am_private->video_format == VFORMAT_H264) || (am_private->video_format == VFORMAT_H264_4K2K))
+         m_dll->codec_set_cntl_mode(&am_private->vcodec, TRICKMODE_FFFB);
+       else
+@@ -1964,68 +2223,6 @@ void CAMLCodec::SetSpeed(int speed)
+   }
+ }
+ 
+-int CAMLCodec::GetDataSize()
+-{
+-  if (!m_opened)
+-    return 0;
+-
+-  struct buf_status vbuf ={0};
+-  if (m_dll->codec_get_vbuf_state(&am_private->vcodec, &vbuf) >= 0)
+-    m_vbufsize = vbuf.size;
+-
+-  return vbuf.data_len;
+-}
+-
+-double CAMLCodec::GetTimeSize()
+-{
+-  if (!m_opened)
+-    return 0;
+-
+-  // if m_cur_pts is zero, hw decoder was not started yet
+-  // so we use the pts of the 1st demux packet that was send
+-  // to hw decoder to calc timesize.
+-  if (m_cur_pts == 0)
+-    m_timesize = (double)(am_private->am_pkt.lastpts - m_1st_pts) / PTS_FREQ;
+-  else
+-    m_timesize = (double)(am_private->am_pkt.lastpts - GetOMXPts()) / PTS_FREQ;
+-
+-  // lie to VideoPlayer, it is hardcoded to a max of 8 seconds,
+-  // if you buffer more than 8 seconds, it goes nuts.
+-  double timesize = m_timesize;
+-  if (timesize < 0.0)
+-    timesize = 0.0;
+-  else if (timesize > 7.0)
+-    timesize = 7.0;
+-
+-  return timesize;
+-}
+-
+-void CAMLCodec::Process()
+-{
+-  CLog::Log(LOGDEBUG, "CAMLCodec::Process Started");
+-
+-  while (!m_bStop)
+-  {
+-    if (m_dll->codec_poll_cntl(&am_private->vcodec) < 0)
+-    {
+-      CLog::Log(LOGDEBUG, "CAMLCodec::Process: codec_poll_cntl failed");
+-      Sleep(10);
+-    }
+-
+-    {
+-      CSingleLock lock(m_ptsQueueMutex);
+-      int64_t pts = 0;
+-      if (DequeueBuffer(pts) == 0)
+-      {
+-        m_ptsQueue.push_back(pts + m_start_pts);
+-        m_ready_event.Set();
+-      }
+-    }
+-  }
+-
+-  CLog::Log(LOGDEBUG, "CAMLCodec::Process Stopped");
+-}
+-
+ void CAMLCodec::ShowMainVideo(const bool show)
+ {
+   static int saved_disable_video = -1;
+@@ -2162,7 +2359,8 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+     case 1:
+     case 3:
+       {
+-        int diff = (int) ((dst_rect.Height() - dst_rect.Width()) / 2);
++        double scale = (double)dst_rect.Height() / dst_rect.Width();
++        int diff = (int) ((dst_rect.Height()*scale - dst_rect.Width()) / 2);
+         dst_rect = CRect(DestRect.x1 - diff, DestRect.y1, DestRect.x2 + diff, DestRect.y2);
+       }
+ 
+@@ -2174,6 +2372,13 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+     update = true;
+   }
+ 
++  RESOLUTION video_res = g_graphicsContext.GetVideoResolution();
++  if (m_video_res != video_res)
++  {
++    m_video_res = video_res;
++    update = true;
++  }
++
+   if (!update)
+   {
+     // mainvideo 'should' be showing already if we get here, make sure.
+@@ -2182,12 +2387,13 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   }
+ 
+   CRect gui, display;
+-  gui = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iHeight);
+-
+ #ifdef TARGET_ANDROID
+   display = m_display_rect;
++  gui = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iHeight);
+ #else
+-  display = gui;
++  const RESOLUTION_INFO& video_res_info = CDisplaySettings::GetInstance().GetResolutionInfo(video_res);
++  display = m_display_rect = CRect(0, 0, video_res_info.iScreenWidth, video_res_info.iScreenHeight);
++  gui = CRect(0, 0, video_res_info.iWidth, video_res_info.iHeight);
+ #endif
+   if (gui != display)
+   {
+@@ -2303,11 +2509,18 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   char video_axis[256] = {};
+   sprintf(video_axis, "%d %d %d %d", (int)dst_rect.x1, (int)dst_rect.y1, (int)dst_rect.x2, (int)dst_rect.y2);
+ 
++  int screen_mode = CDisplaySettings::GetInstance().IsNonLinearStretched() ? 4 : 1;
++
+   SysfsUtils::SetString("/sys/class/video/axis", video_axis);
+-  // make sure we are in 'full stretch' so we can stretch
+-  SysfsUtils::SetInt("/sys/class/video/screen_mode", 1);
++  SysfsUtils::SetInt("/sys/class/video/screen_mode", screen_mode);
+ 
+   // we only get called once gui has changed to something
+   // that would show video playback, so show it.
+   ShowMainVideo(true);
+ }
++
++void CAMLCodec::SetVideoRate(int videoRate)
++{
++  if (am_private)
++    am_private->video_rate = videoRate;
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+index 0c8f125..b074aa8 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+@@ -24,7 +24,6 @@
+ #include "cores/IPlayer.h"
+ #include "guilib/Geometry.h"
+ #include "rendering/RenderSystem.h"
+-#include "threads/Thread.h"
+ #include <deque>
+ 
+ typedef struct am_private_t am_private_t;
+@@ -34,7 +33,7 @@ class DllLibAmCodec;
+ class PosixFile;
+ typedef std::shared_ptr<PosixFile> PosixFilePtr;
+ 
+-class CAMLCodec : public CThread
++class CAMLCodec
+ {
+ public:
+   CAMLCodec();
+@@ -48,14 +47,19 @@ public:
+ 
+   bool          GetPicture(DVDVideoPicture* pDvdVideoPicture);
+   void          SetSpeed(int speed);
+-  int           GetDataSize();
+-  double        GetTimeSize();
++  void          SetDrain(bool drain){m_drain = drain;};
+   void          SetVideoRect(const CRect &SrcRect, const CRect &DestRect);
+-  int64_t       GetCurPts() const { return m_cur_pts; }
+-  int       	GetOMXPts() const { return static_cast<int>(m_cur_pts - m_start_pts); }
++  void          SetVideoRate(int videoRate);
++  int64_t       GetCurPts() const { return m_cur_pts + m_start_adj; }
++  int           GetOMXPts() const { return static_cast<int>(m_cur_pts); }
++  uint32_t      GetBufferIndex() const { return m_bufferIndex; };
++  static float  OMXPtsToSeconds(int omxpts);
++  static int    OMXDurationToNs(int duration);
++  int           GetAmlDuration() const;
++  int           ReleaseFrame(const uint32_t index, bool bDrop = false);
+ 
+-protected:
+-  virtual void  Process();
++  static int    PollFrame();
++  static void   SetPollDevice(int device);
+ 
+ private:
+   void          ShowMainVideo(const bool show);
+@@ -69,20 +73,22 @@ private:
+   void          CloseAmlVideo();
+   std::string   GetVfmMap(const std::string &name);
+   void          SetVfmMap(const std::string &name, const std::string &map);
+-  int           DequeueBuffer(int64_t &pts);
++  int           DequeueBuffer();
++  float         GetTimeSize();
+ 
+   DllLibAmCodec   *m_dll;
+   bool             m_opened;
++  bool             m_ptsIs64us;
++  bool             m_drain;
++  int              m_noPictureLoop;
+   am_private_t    *am_private;
+   CDVDStreamInfo   m_hints;
+-  volatile int     m_speed;
+-  volatile int64_t m_1st_pts;
+-  volatile int64_t m_cur_pts;
+-  volatile double  m_timesize;
+-  volatile int64_t m_vbufsize;
+-  int64_t          m_start_dts;
+-  int64_t          m_start_pts;
+-  CEvent           m_ready_event;
++  int              m_speed;
++  int64_t          m_cur_pts;
++  uint32_t         m_max_frame_size;
++  int64_t          m_start_adj;
++  int64_t          m_last_pts;
++  uint32_t         m_bufferIndex;
+ 
+   CRect            m_dst_rect;
+   CRect            m_display_rect;
+@@ -93,9 +99,19 @@ private:
+   float            m_zoom;
+   int              m_contrast;
+   int              m_brightness;
++  RESOLUTION       m_video_res;
++
++  static const unsigned int STATE_PREFILLED  = 1;
++  static const unsigned int STATE_HASPTS     = 2;
++
++  unsigned int m_state;
+ 
+   PosixFilePtr     m_amlVideoFile;
+   std::string      m_defaultVfmMap;
+-  std::deque<int64_t>  m_ptsQueue;
+-  CCriticalSection m_ptsQueueMutex;
++
++  std::deque<uint32_t> m_frameSizes;
++  std::uint32_t m_frameSizeSum;
++
++  static long  m_pollSync;
++  static int   m_pollDevice;
+ };
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index a27d3e3..689ada3 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -30,6 +30,7 @@
+ #include "utils/SysfsUtils.h"
+ #include "threads/Atomics.h"
+ #include "settings/Settings.h"
++#include "threads/Thread.h"
+ 
+ #define __MODULE_NAME__ "DVDVideoCodecAmlogic"
+ 
+@@ -43,16 +44,15 @@ typedef struct frame_queue {
+ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo) : CDVDVideoCodec(processInfo),
+   m_Codec(NULL),
+   m_pFormatName("amcodec"),
+-  m_last_pts(0.0),
+-  m_frame_queue(NULL),
+-  m_queue_depth(0),
++  m_opened(false),
+   m_framerate(0.0),
+   m_video_rate(0),
+   m_mpeg2_sequence(NULL),
++  m_h264_sequence(NULL),
++  m_drop(false),
++  m_has_keyframe(false),
+   m_bitparser(NULL),
+-  m_bitstream(NULL),
+-  m_opened(false),
+-  m_drop(false)
++  m_bitstream(NULL)
+ {
+   pthread_mutex_init(&m_queue_mutex, NULL);
+ }
+@@ -118,6 +118,16 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+         // 4K is supported only on Amlogic S802/S812 chip
+         return false;
+       }
++
++      if (m_hints.aspect == 0.0f)
++      {
++        m_h264_sequence_pts = 0;
++        m_h264_sequence = new h264_sequence;
++        m_h264_sequence->width  = m_hints.width;
++        m_h264_sequence->height = m_hints.height;
++        m_h264_sequence->ratio  = m_hints.aspect;
++      }
++
+       m_pFormatName = "am-h264";
+       // convert h264-avcC to h264-annex-b as h264-avcC
+       // under streamers can have issues when seeking.
+@@ -125,14 +135,29 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+       {
+         m_bitstream = new CBitstreamConverter;
+         m_bitstream->Open(m_hints.codec, (uint8_t*)m_hints.extradata, m_hints.extrasize, true);
++        m_bitstream->ResetKeyframe();
+         // make sure we do not leak the existing m_hints.extradata
+         free(m_hints.extradata);
+         m_hints.extrasize = m_bitstream->GetExtraSize();
+         m_hints.extradata = malloc(m_hints.extrasize);
+         memcpy(m_hints.extradata, m_bitstream->GetExtraData(), m_hints.extrasize);
+       }
+-      //m_bitparser = new CBitstreamParser();
+-      //m_bitparser->Open();
++      else
++      {
++        m_bitparser = new CBitstreamParser();
++        m_bitparser->Open();
++      }
++
++      // if we have SD PAL content assume it is widescreen
++      // correct aspect ratio will be detected later anyway
++      if (m_hints.width == 720 && m_hints.height == 576 && m_hints.aspect == 0.0f)
++          m_hints.aspect = 1.8181818181818181;
++
++      // assume widescreen for "HD Lite" channels
++      // correct aspect ratio will be detected later anyway
++      if ((m_hints.width == 1440 || m_hints.width ==1280) && m_hints.height == 1080 && m_hints.aspect == 0.0f)
++          m_hints.aspect = 1.7777777777777778;
++
+       break;
+     case AV_CODEC_ID_MPEG4:
+     case AV_CODEC_ID_MSMPEG4V2:
+@@ -147,9 +172,9 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+       // amcodec can't handle h263
+       return false;
+       break;
+-    case AV_CODEC_ID_FLV1:
+-      m_pFormatName = "am-flv1";
+-      break;
++//    case AV_CODEC_ID_FLV1:
++//      m_pFormatName = "am-flv1";
++//      break;
+     case AV_CODEC_ID_RV10:
+     case AV_CODEC_ID_RV20:
+     case AV_CODEC_ID_RV30:
+@@ -168,6 +193,13 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+     case AV_CODEC_ID_CAVS:
+       m_pFormatName = "am-avs";
+       break;
++    case AV_CODEC_ID_VP9:
++      if (!aml_support_vp9())
++      {
++        return false;
++      }
++      m_pFormatName = "am-vp9";
++      break;
+     case AV_CODEC_ID_HEVC:
+       if (aml_support_hevc()) {
+         if (!aml_support_hevc_4k2k() && ((m_hints.width > 1920) || (m_hints.height > 1088)))
+@@ -236,6 +268,9 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+   m_processInfo.SetVideoDecoderName(m_pFormatName, true);
+   m_processInfo.SetVideoDimensions(m_hints.width, m_hints.height);
+   m_processInfo.SetVideoDeintMethod("hardware");
++  m_processInfo.SetVideoDAR(m_hints.aspect);
++
++  m_has_keyframe = false;
+ 
+   CLog::Log(LOGINFO, "%s: Opened Amlogic Codec", __MODULE_NAME__);
+   return true;
+@@ -255,15 +290,14 @@ void CDVDVideoCodecAmlogic::Dispose(void)
+     m_videobuffer.iFlags = 0;
+   if (m_mpeg2_sequence)
+     delete m_mpeg2_sequence, m_mpeg2_sequence = NULL;
++  if (m_h264_sequence)
++    delete m_h264_sequence, m_h264_sequence = NULL;
+ 
+   if (m_bitstream)
+     delete m_bitstream, m_bitstream = NULL;
+ 
+   if (m_bitparser)
+     delete m_bitparser, m_bitparser = NULL;
+-
+-  while (m_queue_depth)
+-    FrameQueuePop();
+ }
+ 
+ int CDVDVideoCodecAmlogic::Decode(uint8_t *pData, int iSize, double dts, double pts)
+@@ -277,21 +311,35 @@ int CDVDVideoCodecAmlogic::Decode(uint8_t *pData, int iSize, double dts, double
+       if (!m_bitstream->Convert(pData, iSize))
+         return VC_ERROR;
+ 
++      if (!m_bitstream->HasKeyframe())
++      {
++        CLog::Log(LOGDEBUG, "%s::Decode waiting for keyframe (bitstream)", __MODULE_NAME__);
++        return VC_BUFFER;
++      }
+       pData = m_bitstream->GetConvertBuffer();
+       iSize = m_bitstream->GetConvertSize();
+     }
+-
+-    if (m_bitparser)
+-      m_bitparser->FindIdrSlice(pData, iSize);
+-
++    else if (!m_has_keyframe && m_bitparser)
++    {
++      if (!m_bitparser->HasKeyframe(pData, iSize))
++      {
++        CLog::Log(LOGDEBUG, "%s::Decode waiting for keyframe (bitparser)", __MODULE_NAME__);
++        return VC_BUFFER;
++      }
++      else
++        m_has_keyframe = true;
++    }
+     FrameRateTracking( pData, iSize, dts, pts);
+-  }
+ 
+-  if (!m_opened)
+-  {
+-    if (m_Codec && !m_Codec->OpenDecoder(m_hints))
+-      CLog::Log(LOGERROR, "%s: Failed to open Amlogic Codec", __MODULE_NAME__);
+-    m_opened = true;
++    if (!m_opened)
++    {
++      if (pts == DVD_NOPTS_VALUE)
++        m_hints.ptsinvalid = true;
++
++      if (m_Codec && !m_Codec->OpenDecoder(m_hints))
++        CLog::Log(LOGERROR, "%s: Failed to open Amlogic Codec", __MODULE_NAME__);
++      m_opened = true;
++    }
+   }
+ 
+   if (m_hints.ptsinvalid)
+@@ -302,11 +350,11 @@ int CDVDVideoCodecAmlogic::Decode(uint8_t *pData, int iSize, double dts, double
+ 
+ void CDVDVideoCodecAmlogic::Reset(void)
+ {
+-  while (m_queue_depth)
+-    FrameQueuePop();
+-
+   m_Codec->Reset();
+   m_mpeg2_sequence_pts = 0;
++  m_has_keyframe = false;
++  if (m_bitstream && m_hints.codec == AV_CODEC_ID_H264)
++    m_bitstream->ResetKeyframe();
+ }
+ 
+ bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+@@ -315,7 +363,8 @@ bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+     m_Codec->GetPicture(&m_videobuffer);
+   *pDvdVideoPicture = m_videobuffer;
+ 
+-  CDVDAmlogicInfo* info = new CDVDAmlogicInfo(this, m_Codec, m_Codec->GetOMXPts());
++  CDVDAmlogicInfo* info = new CDVDAmlogicInfo(this, m_Codec, 
++   m_Codec->GetOMXPts(), m_Codec->GetAmlDuration(), m_Codec->GetBufferIndex());
+ 
+   {
+     CSingleLock lock(m_secure);
+@@ -328,6 +377,10 @@ bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+   if (m_mpeg2_sequence && pDvdVideoPicture->pts >= m_mpeg2_sequence_pts)
+     m_aspect_ratio = m_mpeg2_sequence->ratio;
+ 
++  // check for h264 aspect ratio changes
++  if (m_h264_sequence && pDvdVideoPicture->pts >= m_h264_sequence_pts)
++    m_aspect_ratio = m_h264_sequence->ratio;
++
+   pDvdVideoPicture->iDisplayWidth  = pDvdVideoPicture->iWidth;
+   pDvdVideoPicture->iDisplayHeight = pDvdVideoPicture->iHeight;
+   if (m_aspect_ratio > 1.0 && !m_hints.forced_aspect)
+@@ -363,91 +416,19 @@ void CDVDVideoCodecAmlogic::SetDropState(bool bDrop)
+   // Freerun mode causes amvideo driver to ignore timing and process frames
+   // as quickly as they are coming from decoder. By enabling freerun mode we can
+   // skip rendering of the frames that are requested to be dropped by VideoPlayer.
+-  SysfsUtils::SetInt("/sys/class/video/freerun_mode", bDrop ? 1 : 0);
+-}
+-
+-void CDVDVideoCodecAmlogic::SetSpeed(int iSpeed)
+-{
+-  if (m_Codec)
+-    m_Codec->SetSpeed(iSpeed);
++  //SysfsUtils::SetInt("/sys/class/video/freerun_mode", bDrop ? 1 : 0);
+ }
+ 
+-int CDVDVideoCodecAmlogic::GetDataSize(void)
++void CDVDVideoCodecAmlogic::SetCodecControl(int flags)
+ {
+   if (m_Codec)
+-    return m_Codec->GetDataSize();
+-
+-  return 0;
++    m_Codec->SetDrain((flags & DVD_CODEC_CTRL_DRAIN) != 0);
+ }
+ 
+-double CDVDVideoCodecAmlogic::GetTimeSize(void)
++void CDVDVideoCodecAmlogic::SetSpeed(int iSpeed)
+ {
+   if (m_Codec)
+-    return m_Codec->GetTimeSize();
+-
+-  return 0.0;
+-}
+-
+-void CDVDVideoCodecAmlogic::FrameQueuePop(void)
+-{
+-  if (!m_frame_queue || m_queue_depth == 0)
+-    return;
+-
+-  pthread_mutex_lock(&m_queue_mutex);
+-  // pop the top frame off the queue
+-  frame_queue *top = m_frame_queue;
+-  m_frame_queue = top->nextframe;
+-  m_queue_depth--;
+-  pthread_mutex_unlock(&m_queue_mutex);
+-
+-  // and release it
+-  free(top);
+-}
+-
+-void CDVDVideoCodecAmlogic::FrameQueuePush(double dts, double pts)
+-{
+-  frame_queue *newframe = (frame_queue*)calloc(sizeof(frame_queue), 1);
+-  newframe->dts = dts;
+-  newframe->pts = pts;
+-  // if both dts or pts are good we use those, else use decoder insert time for frame sort
+-  if ((newframe->pts != DVD_NOPTS_VALUE) || (newframe->dts != DVD_NOPTS_VALUE))
+-  {
+-    // if pts is borked (stupid avi's), use dts for frame sort
+-    if (newframe->pts == DVD_NOPTS_VALUE)
+-      newframe->sort_time = newframe->dts;
+-    else
+-      newframe->sort_time = newframe->pts;
+-  }
+-
+-  pthread_mutex_lock(&m_queue_mutex);
+-  frame_queue *queueWalker = m_frame_queue;
+-  if (!queueWalker || (newframe->sort_time < queueWalker->sort_time))
+-  {
+-    // we have an empty queue, or this frame earlier than the current queue head.
+-    newframe->nextframe = queueWalker;
+-    m_frame_queue = newframe;
+-  }
+-  else
+-  {
+-    // walk the queue and insert this frame where it belongs in display order.
+-    bool ptrInserted = false;
+-    frame_queue *nextframe = NULL;
+-    //
+-    while (!ptrInserted)
+-    {
+-      nextframe = queueWalker->nextframe;
+-      if (!nextframe || (newframe->sort_time < nextframe->sort_time))
+-      {
+-        // if the next frame is the tail of the queue, or our new frame is earlier.
+-        newframe->nextframe = nextframe;
+-        queueWalker->nextframe = newframe;
+-        ptrInserted = true;
+-      }
+-      queueWalker = nextframe;
+-    }
+-  }
+-  m_queue_depth++;
+-  pthread_mutex_unlock(&m_queue_mutex);	
++    m_Codec->SetSpeed(iSpeed);
+ }
+ 
+ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double dts, double pts)
+@@ -466,8 +447,7 @@ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double
+       m_framerate = m_mpeg2_sequence->rate;
+       m_video_rate = (int)(0.5 + (96000.0 / m_framerate));
+ 
+-      CLog::Log(LOGDEBUG, "%s: detected mpeg2 aspect ratio(%f), framerate(%f), video_rate(%d)",
+-        __MODULE_NAME__, m_mpeg2_sequence->ratio, m_framerate, m_video_rate);
++      m_processInfo.SetVideoFps(m_framerate);
+ 
+       // update m_hints for 1st frame fixup.
+       switch(m_mpeg2_sequence->rate_info)
+@@ -513,91 +493,22 @@ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double
+     return;
+   }
+ 
+-  // everything else
+-  FrameQueuePush(dts, pts);
+-
+-  // we might have out-of-order pts,
+-  // so make sure we wait for at least 8 values in sorted queue.
+-  if (m_queue_depth > 16)
++  // h264 aspect ratio handling
++  if (m_h264_sequence)
+   {
+-    pthread_mutex_lock(&m_queue_mutex);
+-
+-    float cur_pts = m_frame_queue->pts;
+-    if (cur_pts == DVD_NOPTS_VALUE)
+-      cur_pts = m_frame_queue->dts;
+-
+-    pthread_mutex_unlock(&m_queue_mutex);	
+-
+-    float duration = cur_pts - m_last_pts;
+-    m_last_pts = cur_pts;
+-
+-    // clamp duration to sensible range,
+-    // 66 fsp to 20 fsp
+-    if (duration >= 15000.0 && duration <= 50000.0)
++    // probe demux for SPS NAL and decode aspect ratio
++    if (CBitstreamConverter::h264_sequence_header(pData, iSize, m_h264_sequence))
+     {
+-      double framerate;
+-      switch((int)(0.5 + duration))
+-      {
+-        // 59.940 (16683.333333)
+-        case 16000 ... 17000:
+-          framerate = 60000.0 / 1001.0;
+-          break;
+-
+-        // 50.000 (20000.000000)
+-        case 20000:
+-          framerate = 50000.0 / 1000.0;
+-          break;
+-
+-        // 49.950 (20020.000000)
+-        case 20020:
+-          framerate = 50000.0 / 1001.0;
+-          break;
+-
+-        // 29.970 (33366.666656)
+-        case 32000 ... 35000:
+-          framerate = 30000.0 / 1001.0;
+-          break;
+-
+-        // 25.000 (40000.000000)
+-        case 40000:
+-          framerate = 25000.0 / 1000.0;
+-          break;
+-
+-        // 24.975 (40040.000000)
+-        case 40040:
+-          framerate = 25000.0 / 1001.0;
+-          break;
+-
+-        /*
+-        // 24.000 (41666.666666)
+-        case 41667:
+-          framerate = 24000.0 / 1000.0;
+-          break;
+-        */
+-
+-        // 23.976 (41708.33333)
+-        case 40200 ... 43200:
+-          // 23.976 seems to have the crappiest encodings :)
+-          framerate = 24000.0 / 1001.0;
+-          break;
+-
+-        default:
+-          framerate = 0.0;
+-          //CLog::Log(LOGDEBUG, "%s: unknown duration(%f), cur_pts(%f)",
+-          //  __MODULE_NAME__, duration, cur_pts);
+-          break;
+-      }
+-
+-      if (framerate > 0.0 && (int)m_framerate != (int)framerate)
+-      {
+-        m_framerate = framerate;
+-        m_video_rate = (int)(0.5 + (96000.0 / framerate));
+-        CLog::Log(LOGDEBUG, "%s: detected new framerate(%f), video_rate(%d)",
+-          __MODULE_NAME__, m_framerate, m_video_rate);
+-      }
++      m_h264_sequence_pts = pts;
++      if (m_h264_sequence_pts == DVD_NOPTS_VALUE)
++          m_h264_sequence_pts = dts;
++
++      CLog::Log(LOGDEBUG, "%s: detected h264 aspect ratio(%f)",
++        __MODULE_NAME__, m_h264_sequence->ratio);
++      m_hints.width    = m_h264_sequence->width;
++      m_hints.height   = m_h264_sequence->height;
++      m_hints.aspect   = m_h264_sequence->ratio;
+     }
+-
+-    FrameQueuePop();
+   }
+ }
+ 
+@@ -607,11 +518,14 @@ void CDVDVideoCodecAmlogic::RemoveInfo(CDVDAmlogicInfo *info)
+   m_inflight.erase(m_inflight.find(info));
+ }
+ 
+-CDVDAmlogicInfo::CDVDAmlogicInfo(CDVDVideoCodecAmlogic *codec, CAMLCodec *amlcodec, int omxPts)
++CDVDAmlogicInfo::CDVDAmlogicInfo(CDVDVideoCodecAmlogic *codec, CAMLCodec *amlcodec, int omxPts, int amlDuration, uint32_t bufferIndex)
+   : m_refs(0)
+   , m_codec(codec)
+   , m_amlCodec(amlcodec)
+   , m_omxPts(omxPts)
++  , m_amlDuration(amlDuration)
++  , m_bufferIndex(bufferIndex)
++  , m_rendered(false)
+ {
+ }
+ 
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+index 2c44241..6000c5e 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
+@@ -28,6 +28,7 @@
+ class CAMLCodec;
+ struct frame_queue;
+ struct mpeg2_sequence;
++struct h264_sequence;
+ class CBitstreamParser;
+ class CBitstreamConverter;
+ 
+@@ -36,7 +37,7 @@ class CDVDVideoCodecAmlogic;
+ class CDVDAmlogicInfo
+ {
+ public:
+-  CDVDAmlogicInfo(CDVDVideoCodecAmlogic *codec, CAMLCodec *amlcodec, int omxPts);
++  CDVDAmlogicInfo(CDVDVideoCodecAmlogic *codec, CAMLCodec *amlcodec, int omxPts, int amlDuration, uint32_t bufferIndex);
+ 
+   // reference counting
+   CDVDAmlogicInfo* Retain();
+@@ -44,7 +45,11 @@ public:
+ 
+   CAMLCodec *getAmlCodec() const;
+   int GetOmxPts() const { return m_omxPts; }
++  int GetAmlDuration() const { return m_amlDuration; }
++  uint32_t GetBufferIndex() const { return m_bufferIndex; };
+   void invalidate();
++  void SetRendered() { m_rendered = true; };
++  bool IsRendered() { return m_rendered; };
+ 
+ protected:
+   long m_refs;
+@@ -52,7 +57,9 @@ protected:
+ 
+   CDVDVideoCodecAmlogic* m_codec;
+   CAMLCodec* m_amlCodec;
+-  int m_omxPts;
++  int m_omxPts, m_amlDuration;
++  uint32_t m_bufferIndex;
++  bool m_rendered;
+ };
+ 
+ class CDVDVideoCodecAmlogic : public CDVDVideoCodec
+@@ -71,8 +78,7 @@ public:
+   virtual bool ClearPicture(DVDVideoPicture* pDvdVideoPicture);
+   virtual void SetSpeed(int iSpeed);
+   virtual void SetDropState(bool bDrop);
+-  virtual int  GetDataSize(void);
+-  virtual double GetTimeSize(void);
++  virtual void SetCodecControl(int flags);
+   virtual const char* GetName(void) { return (const char*)m_pFormatName; }
+ 
+ protected:
+@@ -88,8 +94,6 @@ protected:
+   DVDVideoPicture m_videobuffer;
+   bool            m_opened;
+   CDVDStreamInfo  m_hints;
+-  double          m_last_pts;
+-  frame_queue    *m_frame_queue;
+   int32_t         m_queue_depth;
+   pthread_mutex_t m_queue_mutex;
+   double          m_framerate;
+@@ -97,7 +101,10 @@ protected:
+   float           m_aspect_ratio;
+   mpeg2_sequence *m_mpeg2_sequence;
+   double          m_mpeg2_sequence_pts;
++  h264_sequence  *m_h264_sequence;
++  double          m_h264_sequence_pts;
+   bool            m_drop;
++  bool            m_has_keyframe;
+ 
+   CBitstreamParser *m_bitparser;
+   CBitstreamConverter *m_bitstream;
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 33d1e5a..5fe1284 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -57,6 +57,7 @@
+ extern "C" {
+ #include "libavutil/dict.h"
+ #include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
+ }
+ 
+ 
+@@ -293,10 +294,10 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
+       if (trySPDIFonly || (iformat && strcmp(iformat->name, "wav") == 0))
+       {
+         AVProbeData pd;
+-        uint8_t probe_buffer[FFMPEG_FILE_BUFFER_SIZE + AVPROBE_PADDING_SIZE];
++        std::unique_ptr<uint8_t[]> probe_buffer (new uint8_t[FFMPEG_FILE_BUFFER_SIZE + AVPROBE_PADDING_SIZE]);
+ 
+         // init probe data
+-        pd.buf = probe_buffer;
++        pd.buf = probe_buffer.get();
+         pd.filename = strFile.c_str();
+ 
+         // av_probe_input_buffer might have changed the buffer_size beyond our allocated amount
+@@ -428,6 +429,11 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
+   }
+   else if (!iformat || (strcmp(iformat->name, "mpegts") != 0))
+   {
++    if (m_streaminfo == false) {
++	av_opt_set_int(m_pFormatContext, "analyzeduration", 500000, 0);
++	m_checkvideo = true;
++	skipCreateStreams = true;
++    }
+     m_streaminfo = true;
+   }
+ 
+@@ -921,7 +927,7 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
+           {
+             if(m_pkt.pkt.stream_index == (int)m_pFormatContext->programs[m_program]->stream_index[i])
+             {
+-              pPacket = CDVDDemuxUtils::AllocateDemuxPacket(m_pkt.pkt.size);
++              pPacket = CDVDDemuxUtils::AllocateDemuxPacket(0);
+               break;
+             }
+           }
+@@ -930,7 +936,7 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
+             bReturnEmpty = true;
+         }
+         else
+-          pPacket = CDVDDemuxUtils::AllocateDemuxPacket(m_pkt.pkt.size);
++          pPacket = CDVDDemuxUtils::AllocateDemuxPacket(0);
+       }
+       else
+         bReturnEmpty = true;
+@@ -960,9 +966,13 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
+         // copy contents into our own packet
+         pPacket->iSize = m_pkt.pkt.size;
+ 
+-        // maybe we can avoid a memcpy here by detecting where pkt.destruct is pointing too?
+         if (m_pkt.pkt.data)
+-          memcpy(pPacket->pData, m_pkt.pkt.data, pPacket->iSize);
++        {
++          pPacket->pData = m_pkt.pkt.data;
++          // so we can free AVPacket when DemuxPacket is freed
++          pPacket->pkt = new AVPacket(m_pkt.pkt);
++        }
++
+ 
+         pPacket->pts = ConvertTimestamp(m_pkt.pkt.pts, stream->time_base.den, stream->time_base.num);
+         pPacket->dts = ConvertTimestamp(m_pkt.pkt.dts, stream->time_base.den, stream->time_base.num);
+@@ -1016,7 +1026,10 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
+         pPacket->iStreamId = m_pkt.pkt.stream_index;
+       }
+       m_pkt.result = -1;
+-      av_packet_unref(&m_pkt.pkt);
++      if (pPacket && pPacket->pkt)
++        memset(&m_pkt.pkt, 0, sizeof(AVPacket));
++      else
++        av_packet_unref(&m_pkt.pkt);
+     }
+   }
+   } // end of lock scope
+@@ -1395,14 +1408,22 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+         st->iHeight = pStream->codec->height;
+         st->fAspect = SelectAspect(pStream, st->bForcedAspect) * pStream->codec->width / pStream->codec->height;
+         st->iOrientation = 0;
+-        st->iBitsPerPixel = pStream->codec->bits_per_coded_sample;
+-
+-        AVDictionaryEntry *rtag = av_dict_get(pStream->metadata, "rotate", NULL, 0);
+-        if (rtag) 
+-          st->iOrientation = atoi(rtag->value);
++          st->iBitsPerPixel = pStream->codec->bits_per_raw_sample;
++          if (st->iBitsPerPixel == 0){
++            if (pStream->codec->color_trc == AVCOL_TRC_BT2020_12)
++              st->iBitsPerPixel = 12;
++            else if (pStream->codec->color_trc >= AVCOL_TRC_BT2020_10)
++              /* assume all 10-bit until 12-bit gets common */
++              st->iBitsPerPixel = 10;
++            else
++              st->iBitsPerPixel = 8;
++          }
++          AVDictionaryEntry *rtag = av_dict_get(pStream->metadata, "rotate", NULL, 0);
++          if (rtag) 
++            st->iOrientation = atoi(rtag->value);
+ 
+-        // detect stereoscopic mode
+-        std::string stereoMode = GetStereoModeFromMetadata(pStream->metadata);
++          // detect stereoscopic mode
++          std::string stereoMode = GetStereoModeFromMetadata(pStream->metadata);
+           // check for metadata in file if detection in stream failed
+         if (stereoMode.empty())
+           stereoMode = GetStereoModeFromMetadata(m_pFormatContext->metadata);
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxPacket.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxPacket.h
+index 4f47118..2280578 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxPacket.h
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxPacket.h
+@@ -25,6 +25,8 @@
+ #define DMX_SPECIALID_STREAMINFO    -10
+ #define DMX_SPECIALID_STREAMCHANGE  -11
+ 
++struct AVPacket;
++
+ typedef struct DemuxPacket
+ {
+   unsigned char* pData;   // data
+@@ -36,6 +38,7 @@ typedef struct DemuxPacket
+   double pts; // pts in DVD_TIME_BASE
+   double dts; // dts in DVD_TIME_BASE
+   double duration; // duration in DVD_TIME_BASE if available
++  AVPacket *pkt; // to allow packet to be freed
+ 
+   int dispTime;
+ } DemuxPacket;
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxUtils.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxUtils.cpp
+index df0f35b..b4b591a 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxUtils.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxUtils.cpp
+@@ -39,7 +39,12 @@ void CDVDDemuxUtils::FreeDemuxPacket(DemuxPacket* pPacket)
+   if (pPacket)
+   {
+     try {
+-      if (pPacket->pData) _aligned_free(pPacket->pData);
++      if (pPacket->pkt)
++      {
++        av_free_packet(pPacket->pkt);
++        delete pPacket->pkt;
++      }
++      else if (pPacket->pData) _aligned_free(pPacket->pData);
+       delete pPacket;
+     }
+     catch(...) {
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
+index f310338..232f9b7 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
+@@ -690,7 +690,7 @@ void CDVDInputStreamPVRManager::UpdateStreamMap()
+     dStream->language[1] = stream.strLanguage[1];
+     dStream->language[2] = stream.strLanguage[2];
+     dStream->language[3] = stream.strLanguage[3];
+-    dStream->realtime = true;
++    dStream->realtime = false;
+ 
+     m_newStreamMap[stream.iPID] = dStream;
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index f909c8e..bdd32af 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1321,7 +1321,7 @@ void CVideoPlayer::Process()
+     double startpts = DVD_NOPTS_VALUE;
+     if (m_pDemuxer)
+     {
+-      if (m_pDemuxer->SeekTime(starttime, false, &startpts))
++      if (m_pDemuxer->SeekTime(starttime, true, &startpts))
+         CLog::Log(LOGDEBUG, "%s - starting demuxer from: %d", __FUNCTION__, starttime);
+       else
+         CLog::Log(LOGDEBUG, "%s - failed to start demuxing from: %d", __FUNCTION__, starttime);
+@@ -1329,7 +1329,7 @@ void CVideoPlayer::Process()
+ 
+     if (m_pSubtitleDemuxer)
+     {
+-      if(m_pSubtitleDemuxer->SeekTime(starttime, false, &startpts))
++      if(m_pSubtitleDemuxer->SeekTime(starttime, true, &startpts))
+         CLog::Log(LOGDEBUG, "%s - starting subtitle demuxer from: %d", __FUNCTION__, starttime);
+       else
+         CLog::Log(LOGDEBUG, "%s - failed to start subtitle demuxing from: %d", __FUNCTION__, starttime);
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index d8674c8..4586e16 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -21,54 +21,111 @@
+ #include "RendererAML.h"
+ 
+ #if defined(HAS_LIBAMCODEC)
+-#include "cores/IPlayer.h"
+-#include "windowing/egl/EGLWrapper.h"
+ #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h"
+ #include "cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h"
+ #include "utils/log.h"
+-#include "utils/GLUtils.h"
+ #include "utils/SysfsUtils.h"
++#include "utils/ScreenshotAML.h"
+ #include "settings/MediaSettings.h"
+ #include "windowing/WindowingFactory.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderCapture.h"
++#include "settings/AdvancedSettings.h"
+ 
+ CRendererAML::CRendererAML()
++ : m_prevVPts(-1)
++ , m_bConfigured(false)
++ , m_iRenderBuffer(0)
+ {
+-  m_prevPts = -1;
+ }
+ 
+ CRendererAML::~CRendererAML()
+ {
+ }
+ 
++bool CRendererAML::Configure(unsigned int width, unsigned int height, unsigned int d_width, unsigned int d_height, float fps, unsigned flags, ERenderFormat format, unsigned extended_formatl, unsigned int orientation)
++{
++  m_sourceWidth = width;
++  m_sourceHeight = height;
++  m_renderOrientation = orientation;
++
++  // Save the flags.
++  m_iFlags = flags;
++  m_format = format;
++
++  // Calculate the input frame aspect ratio.
++  CalculateFrameAspectRatio(d_width, d_height);
++  SetViewMode(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode);
++  ManageRenderArea();
++
++  m_bConfigured = true;
++
++  for (int i = 0 ; i < m_numRenderBuffers ; ++i)
++    m_buffers[i].hwDec = 0;
++
++  return true;
++}
++
++CRenderInfo CRendererAML::GetRenderInfo()
++{
++  CRenderInfo info;
++  info.formats.push_back(RENDER_FMT_BYPASS);
++  info.max_buffer_size = m_numRenderBuffers;
++  info.optimal_buffer_size = m_numRenderBuffers;
++  return info;
++}
++
+ bool CRendererAML::RenderCapture(CRenderCapture* capture)
+ {
+   capture->BeginRender();
+   capture->EndRender();
++  CScreenshotAML::CaptureVideoFrame((unsigned char *)capture->GetRenderBuffer(), capture->GetWidth(), capture->GetHeight());
+   return true;
+ }
+ 
++int CRendererAML::GetImage(YV12Image *image, int source, bool readonly)
++{
++  if (image == nullptr)
++    return -1;
++
++  /* take next available buffer */
++  if (source == -1)
++   source = (m_iRenderBuffer + 1) % m_numRenderBuffers;
++
++  return source;
++}
++
+ void CRendererAML::AddVideoPictureHW(DVDVideoPicture &picture, int index)
+ {
+-  YUVBUFFER &buf = m_buffers[index];
++  BUFFER &buf = m_buffers[index];
+   if (picture.amlcodec)
+     buf.hwDec = picture.amlcodec->Retain();
+ }
+ 
+ void CRendererAML::ReleaseBuffer(int idx)
+ {
+-  YUVBUFFER &buf = m_buffers[idx];
++  BUFFER &buf = m_buffers[idx];
+   if (buf.hwDec)
+   {
+     CDVDAmlogicInfo *amli = static_cast<CDVDAmlogicInfo *>(buf.hwDec);
+-    SAFE_RELEASE(amli);
++    if (amli)
++    {
++      CAMLCodec *amlcodec;
++      if (!amli->IsRendered() && (amlcodec = amli->getAmlCodec()))
++        amlcodec->ReleaseFrame(amli->GetBufferIndex(), true);
++      SAFE_RELEASE(amli);
++    }
+     buf.hwDec = NULL;
+   }
+ }
+ 
+-int CRendererAML::GetImageHook(YV12Image *image, int source, bool readonly)
++void CRendererAML::FlipPage(int source)
+ {
+-  return source;
++  if( source >= 0 && source < m_numRenderBuffers )
++    m_iRenderBuffer = source;
++  else
++    m_iRenderBuffer = (m_iRenderBuffer + 1) % m_numRenderBuffers;
++
++  return;
+ }
+ 
+ bool CRendererAML::IsGuiLayer()
+@@ -91,6 +148,7 @@ bool CRendererAML::Supports(ERENDERFEATURE feature)
+   if (feature == RENDERFEATURE_ZOOM ||
+       feature == RENDERFEATURE_CONTRAST ||
+       feature == RENDERFEATURE_BRIGHTNESS ||
++      feature == RENDERFEATURE_NONLINSTRETCH ||
+       feature == RENDERFEATURE_STRETCH ||
+       feature == RENDERFEATURE_PIXEL_RATIO ||
+       feature == RENDERFEATURE_ROTATION)
+@@ -104,37 +162,30 @@ EINTERLACEMETHOD CRendererAML::AutoInterlaceMethod()
+   return VS_INTERLACEMETHOD_NONE;
+ }
+ 
+-bool CRendererAML::LoadShadersHook()
++void CRendererAML::Reset()
+ {
+-  CLog::Log(LOGNOTICE, "GL: Using AML render method");
+-  m_textureTarget = GL_TEXTURE_2D;
+-  m_renderMethod = RENDER_BYPASS;
+-  return false;
++  m_prevVPts = -1;
+ }
+ 
+-bool CRendererAML::RenderHook(int index)
+-{
+-  return true;// nothing to be done for aml
+-}
+-
+-bool CRendererAML::RenderUpdateVideoHook(bool clear, DWORD flags, DWORD alpha)
++void CRendererAML::RenderUpdate(bool clear, DWORD flags, DWORD alpha)
+ {
+   ManageRenderArea();
+ 
+-  CDVDAmlogicInfo *amli = static_cast<CDVDAmlogicInfo *>(m_buffers[m_iYV12RenderBuffer].hwDec);
+-  if (amli && amli->GetOmxPts() != m_prevPts)
+-  {
+-    m_prevPts = amli->GetOmxPts();
+-    SysfsUtils::SetInt("/sys/module/amvideo/parameters/omx_pts", amli->GetOmxPts());
++  CDVDAmlogicInfo *amli = static_cast<CDVDAmlogicInfo *>(m_buffers[m_iRenderBuffer].hwDec);
++  CAMLCodec *amlcodec = amli ? amli->getAmlCodec() : 0;
+ 
+-    CAMLCodec *amlcodec = amli->getAmlCodec();
+-    if (amlcodec)
++  if(amlcodec)
++  {
++    int pts = amli->GetOmxPts();
++    if (pts != m_prevVPts)
++    {
++      amlcodec->ReleaseFrame(amli->GetBufferIndex());
+       amlcodec->SetVideoRect(m_sourceRect, m_destRect);
++      amli->SetRendered();
++      m_prevVPts = pts;
++    }
+   }
+-
+-  usleep(10000);
+-
+-  return true;
++  CAMLCodec::PollFrame();
+ }
+ 
+ #endif
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+index 828f584..cd68401 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+@@ -24,17 +24,29 @@
+ 
+ #if defined(HAS_LIBAMCODEC)
+ 
+-#include "cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h"
++#include "cores/VideoPlayer/VideoRenderers/BaseRenderer.h"
+ 
+-class CRendererAML : public CLinuxRendererGLES
++class CRendererAML : public CBaseRenderer
+ {
+ public:
+   CRendererAML();
+   virtual ~CRendererAML();
+-  
++
+   virtual bool RenderCapture(CRenderCapture* capture);
+   virtual void AddVideoPictureHW(DVDVideoPicture &picture, int index);
+   virtual void ReleaseBuffer(int idx);
++  virtual bool Configure(unsigned int width, unsigned int height, unsigned int d_width, unsigned int d_height, float fps, unsigned flags, ERenderFormat format, unsigned extended_formatl, unsigned int orientation);
++  virtual bool IsConfigured(){ return m_bConfigured; };
++  virtual CRenderInfo GetRenderInfo();
++  virtual int GetImage(YV12Image *image, int source = -1, bool readonly = false);
++  virtual void ReleaseImage(int source, bool preserve = false){};
++  virtual void FlipPage(int source);
++  virtual void PreInit(){};
++  virtual void UnInit(){};
++  virtual void Reset();
++  virtual void Update(){};
++  virtual void RenderUpdate(bool clear, unsigned int flags = 0, unsigned int alpha = 255);
++  virtual bool SupportsMultiPassRendering(){ return false; };
+ 
+   // Player functions
+   virtual bool IsGuiLayer();
+@@ -47,16 +59,19 @@ public:
+ 
+   virtual EINTERLACEMETHOD AutoInterlaceMethod();
+ 
+-protected:
++private:
++
++  int m_iRenderBuffer;
++  static const int m_numRenderBuffers = 4;
+ 
+-  // hooks for hw dec renderer
+-  virtual bool LoadShadersHook();
+-  virtual bool RenderHook(int index);  
+-  virtual int  GetImageHook(YV12Image *image, int source = AUTOSOURCE, bool readonly = false);
+-  virtual bool RenderUpdateVideoHook(bool clear, DWORD flags = 0, DWORD alpha = 255);
++  struct BUFFER
++  {
++    void *hwDec;
++    int duration;
++  } m_buffers[m_numRenderBuffers];
+ 
+-private:
+-  int m_prevPts;
++  int m_prevVPts;
++  bool m_bConfigured;
+ };
+ 
+ #endif
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 420b5b5..f2942b5 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1287,7 +1287,7 @@ void CRenderManager::PrepareNextRender()
+     double err = fmod(renderPts - nextFramePts, frametime);
+     m_clockSync.m_error += err;
+     m_clockSync.m_errCount ++;
+-    if (m_clockSync.m_errCount > 30)
++    if (m_clockSync.m_errCount > 120)
+     {
+       double average = m_clockSync.m_error / m_clockSync.m_errCount;
+       m_clockSync.m_syncOffset = average;
+@@ -1315,9 +1315,11 @@ void CRenderManager::PrepareNextRender()
+       // renderer/drivers have internal queues, being slightliy late here does not mean that
+       // we are really late. The likelihood that we recover decreases the greater m_lateframes
+       // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
+-      double x = (m_lateframes <= 6) ? 0.98 : 0;
++      double x = (m_lateframes <= 6) ? 1.9 : 0;
+       if (renderPts < m_Queue[*iter].pts + x * frametime)
+         break;
++      CLog::Log(LOGDEBUG, "CRenderManager::PrepareNextRender m_QueueSkip:%d iter.pts:%0.3f front.pts:%0.3f renderPts:%0.3f  latency:%0.3f",
++          m_QueueSkip, m_Queue[*iter].pts / DVD_TIME_BASE, nextFramePts / DVD_TIME_BASE, renderPts / DVD_TIME_BASE,  totalLatency / DVD_TIME_BASE);
+       idx = *iter;
+       ++iter;
+     }
+@@ -1326,12 +1328,11 @@ void CRenderManager::PrepareNextRender()
+     while (m_queued.front() != idx)
+     {
+       requeue(m_discard, m_queued);
+-      m_QueueSkip++;
+     }
+ 
+     int lateframes = (renderPts - m_Queue[idx].pts) * m_fps / DVD_TIME_BASE;
+     if (lateframes)
+-      m_lateframes += lateframes;
++      m_lateframes = lateframes;
+     else
+       m_lateframes = 0;
+     
+diff --git a/xbmc/filesystem/FileCache.cpp b/xbmc/filesystem/FileCache.cpp
+index 4519266..331960e 100644
+--- a/xbmc/filesystem/FileCache.cpp
++++ b/xbmc/filesystem/FileCache.cpp
+@@ -43,7 +43,7 @@
+ 
+ using namespace XFILE;
+ 
+-#define READ_CACHE_CHUNK_SIZE (64*1024)
++#define READ_CACHE_CHUNK_SIZE (128*1024)
+ 
+ class CWriteRate
+ {
+diff --git a/xbmc/filesystem/NFSFile.h b/xbmc/filesystem/NFSFile.h
+index fc474e5..a3e2957 100644
+--- a/xbmc/filesystem/NFSFile.h
++++ b/xbmc/filesystem/NFSFile.h
+@@ -147,7 +147,7 @@ namespace XFILE
+     //implement iocontrol for seek_possible for preventing the stat in File class for
+     //getting this info ...
+     virtual int IoControl(EIoControl request, void* param){ if(request == IOCTRL_SEEK_POSSIBLE) return 1;return -1;};    
+-    virtual int  GetChunkSize() {return 1;}
++    virtual int  GetChunkSize() {return gNfsConnection.GetMaxReadChunkSize();}
+     
+     virtual bool OpenForWrite(const CURL& url, bool bOverWrite = false);
+     virtual bool Delete(const CURL& url);
+diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+index 65d457f..931237a 100644
+--- a/xbmc/filesystem/SMBFile.cpp
++++ b/xbmc/filesystem/SMBFile.cpp
+@@ -499,8 +499,7 @@ int CSMBFile::Truncate(int64_t size)
+ 
+ ssize_t CSMBFile::Read(void *lpBuf, size_t uiBufSize)
+ {
+-  if (uiBufSize > SSIZE_MAX)
+-    uiBufSize = SSIZE_MAX;
++  uiBufSize = 32768;
+ 
+   if (m_fd == -1)
+     return -1;
+diff --git a/xbmc/interfaces/generic/LanguageInvokerThread.cpp b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
+index fcdd063..4c35d9c 100644
+--- a/xbmc/interfaces/generic/LanguageInvokerThread.cpp
++++ b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
+@@ -50,6 +50,9 @@ bool CLanguageInvokerThread::execute(const std::string &script, const std::vecto
+   m_args = arguments;
+ 
+   Create();
++  /* low prio */
++  SetPriority(GetPriority()-1);
++
+   return true;
+ }
+ 
+diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
+index fc10086..cf93240 100644
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -92,6 +92,7 @@
+ #define TMSG_SETAUDIODSPSTATE             TMSG_MASK_APPLICATION + 29
+ #define TMSG_SYSTEM_POWERDOWN             TMSG_MASK_APPLICATION + 30
+ #define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 31
++#define TMSG_AML_RESIZE			  TMSG_MASK_APPLICATION + 32
+ 
+ 
+ #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
+diff --git a/xbmc/network/Network.cpp b/xbmc/network/Network.cpp
+index 25645f6..2d3f695 100644
+--- a/xbmc/network/Network.cpp
++++ b/xbmc/network/Network.cpp
+@@ -32,6 +32,7 @@
+ #include "utils/CharsetConverter.h"
+ #endif
+ #include "utils/StringUtils.h"
++#include "Application.h"
+ 
+ using namespace KODI::MESSAGING;
+ 
+@@ -289,6 +290,10 @@ void CNetwork::NetworkMessage(EMESSAGE message, int param)
+ 
+ bool CNetwork::WakeOnLan(const char* mac)
+ {
++  /* Don't do this in standby */
++  if (g_application.IsVeroStandby())
++	return true;
++
+   int i, j, packet;
+   unsigned char ethaddr[8];
+   unsigned char buf [128];
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 16e0b87..3b985cc 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -800,7 +800,10 @@ void CPeripheralCecAdapter::PushCecKeypress(const CecButtonPress &key)
+   CLog::Log(LOGDEBUG, "%s - received key %2x duration %d", __FUNCTION__, key.iButton, key.iDuration);
+ 
+   CSingleLock lock(m_critSection);
+-  if (key.iDuration > 0)
++  // avoid the queue getting too long
++  if (m_configuration.iButtonRepeatRateMs && m_buttonQueue.size() > 5)
++    return;
++  if (m_configuration.iButtonRepeatRateMs == 0 && key.iDuration > 0)
+   {
+     if (m_currentButton.iButton == key.iButton && m_currentButton.iDuration == 0)
+     {
+@@ -1295,6 +1298,20 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+ 
+   m_configuration.bPowerOffOnStandby = config.bPowerOffOnStandby;
+ 
++#if defined(CEC_DOUBLE_TAP_TIMEOUT_MS_OLD)
++  m_configuration.iDoubleTapTimeout50Ms = config.iDoubleTapTimeout50Ms;
++  bChanged |= SetSetting("double_tap_timeout_ms", (int)m_configuration.iDoubleTapTimeout50Ms * 50);
++#else
++  m_configuration.iDoubleTapTimeoutMs = config.iDoubleTapTimeoutMs;
++  bChanged |= SetSetting("double_tap_timeout_ms", (int)m_configuration.iDoubleTapTimeoutMs);
++#endif
++
++  m_configuration.iButtonRepeatRateMs = config.iButtonRepeatRateMs;
++  bChanged |= SetSetting("button_repeat_rate_ms", (int)m_configuration.iButtonRepeatRateMs);
++
++  m_configuration.iButtonReleaseDelayMs = config.iButtonReleaseDelayMs;
++  bChanged |= SetSetting("button_release_delay_ms", (int)m_configuration.iButtonReleaseDelayMs);
++
+   m_configuration.iFirmwareVersion = config.iFirmwareVersion;
+ 
+   memcpy(m_configuration.strDeviceLanguage, config.strDeviceLanguage, 3);
+@@ -1394,6 +1411,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+ #else
+   // backwards compatibility. will be removed once the next major release of libCEC is out
+   m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
++  m_configuration.iButtonRepeatRateMs = GetSettingInt("button_repeat_rate_ms");
++  m_configuration.iButtonReleaseDelayMs = GetSettingInt("button_release_delay_ms");
+ #endif
+ 
+   if (GetSettingBool("pause_playback_on_deactivate"))
+diff --git a/xbmc/pictures/GUIWindowSlideShow.cpp b/xbmc/pictures/GUIWindowSlideShow.cpp
+index 34553e8..9d23744 100644
+--- a/xbmc/pictures/GUIWindowSlideShow.cpp
++++ b/xbmc/pictures/GUIWindowSlideShow.cpp
+@@ -627,6 +627,11 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
+     g_infoManager.SetCurrentSlide(*m_slides.at(m_iCurrentSlide));
+ 
+   RenderPause();
++  if (m_slides.at(m_iCurrentSlide)->IsVideo() &&
++      g_application.m_pPlayer->IsRenderingGuiLayer())
++  {
++    MarkDirtyRegion();
++  }
+   CGUIWindow::Process(currentTime, regions);
+   m_renderRegion.SetRect(0, 0, (float)g_graphicsContext.GetWidth(), (float)g_graphicsContext.GetHeight());
+ }
+diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
+index 33c4eb4..4ca5441 100644
+--- a/xbmc/powermanagement/PowerManager.cpp
++++ b/xbmc/powermanagement/PowerManager.cpp
+@@ -185,7 +185,9 @@ bool CPowerManager::Powerdown()
+ 
+ bool CPowerManager::Suspend()
+ {
+-  return (CanSuspend() && m_instance->Suspend());
++  CLog::Log(LOGNOTICE, "Activating standby mode");
++  g_application.ActivateScreenSaverStandby();
++  return true;
+ }
+ 
+ bool CPowerManager::Hibernate()
+diff --git a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
+index 1beb856..ca7c90b 100644
+--- a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
++++ b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
+@@ -49,6 +49,7 @@ using namespace KODI::MESSAGING;
+ CGUIDialogPVRChannelsOSD::CGUIDialogPVRChannelsOSD() :
+     CGUIDialog(WINDOW_DIALOG_PVR_OSD_CHANNELS, "DialogPVRChannelsOSD.xml")
+ {
++  m_loadType = LOAD_ON_GUI_INIT;
+   m_vecItems = new CFileItemList;
+ }
+ 
+diff --git a/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
+index 8b47243..be1f64d 100644
+--- a/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
++++ b/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
+@@ -36,6 +36,7 @@ using namespace PVR;
+ CGUIDialogPVRGuideOSD::CGUIDialogPVRGuideOSD()
+     : CGUIDialog(WINDOW_DIALOG_PVR_OSD_GUIDE, "DialogPVRGuideOSD.xml")
+ {
++  m_loadType = LOAD_ON_GUI_INIT;
+   m_vecItems = new CFileItemList;
+ }
+ 
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index ef95bc2..e3592fa 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -622,13 +622,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+   if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
+   {
+     const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
+-    // also handle RES_DESKTOP resolutions with non-default refresh rates
+-    if (resolution != RES_DESKTOP || (refreshrate > 0.0f && refreshrate != info.fRefreshRate))
+-    {
+-      return StringUtils::Format("%1i%05i%05i%09.5f%s", info.iScreen,
++    return StringUtils::Format("%1i%05i%05i%09.5f%s", info.iScreen,
+                                  info.iScreenWidth, info.iScreenHeight,
+                                  refreshrate > 0.0f ? refreshrate : info.fRefreshRate, ModeFlagsToString(info.dwFlags, true).c_str());
+-    }
+   }
+ 
+   return "DESKTOP";
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 3758375..72098b5 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -341,6 +341,9 @@ const std::string CSettings::SETTING_VIDEOSCREEN_RESOLUTION = "videoscreen.resol
+ const std::string CSettings::SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
+ const std::string CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
++const std::string CSettings::SETTING_VIDEOSCREEN_FORCERGB = "videoscreen.forcergb";
++const std::string CSettings::SETTING_VIDEOSCREEN_LOCKHPD = "videoscreen.lockhpd";
++const std::string CSettings::SETTING_VIDEOSCREEN_MUTEHDMI = "videoscreen.mutehdmi";
+ const std::string CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE = "videoscreen.preferedstereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_NOOFBUFFERS = "videoscreen.noofbuffers";
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index ab67709..439b2b4 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -297,6 +297,9 @@ public:
+   static const std::string SETTING_VIDEOSCREEN_SCREENMODE;
+   static const std::string SETTING_VIDEOSCREEN_FAKEFULLSCREEN;
+   static const std::string SETTING_VIDEOSCREEN_BLANKDISPLAYS;
++  static const std::string SETTING_VIDEOSCREEN_FORCERGB;
++  static const std::string SETTING_VIDEOSCREEN_LOCKHPD;
++  static const std::string SETTING_VIDEOSCREEN_MUTEHDMI;
+   static const std::string SETTING_VIDEOSCREEN_STEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_NOOFBUFFERS;
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index b38ac5a..f68ad61 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -148,20 +148,6 @@ bool aml_permissions()
+     {
+       CLog::Log(LOGERROR, "AML: no rw on /sys/class/tsync/enable");
+     }
+-#ifndef TARGET_ANDROID
+-    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"))
+-    {
+-      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq");
+-    }
+-    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"))
+-    {
+-      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq");
+-    }
+-    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"))
+-    {
+-      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
+-    }
+-#endif
+   }
+ 
+   return permissions_ok == 1;
+@@ -235,6 +221,23 @@ AML_SUPPORT_H264_4K2K aml_support_h264_4k2k()
+   return has_h264_4k2k;
+ }
+ 
++bool aml_support_vp9()
++{
++  static int has_vp9 = -1;
++
++  if (has_vp9 == -1)
++  {
++    CRegExp regexp;
++    regexp.RegComp("vp9:.*compressed");
++    std::string valstr;
++    if (SysfsUtils::GetString("/sys/class/amstream/vcodec_profile", valstr) != 0)
++      has_vp9 = 0;
++    else
++      has_vp9 = (regexp.RegFind(valstr) >= 0) ? 1 : 0;
++  }
++  return (has_vp9 == 1);
++}
++
+ void aml_set_audio_passthrough(bool passthrough)
+ {
+   SysfsUtils::SetInt("/sys/class/audiodsp/digital_raw", passthrough ? 2:0);
+@@ -588,7 +591,7 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+     res->fRefreshRate = 30;
+     res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
+   }
+-  else if (StringUtils::EqualsNoCase(fromMode, "2160p50hz420"))
++  else if (StringUtils::EqualsNoCase(fromMode, "2160p50hz"))
+   {
+     res->iWidth = 1920;
+     res->iHeight= 1080;
+@@ -597,7 +600,7 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+     res->fRefreshRate = 50;
+     res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
+   }
+-  else if (StringUtils::EqualsNoCase(fromMode, "2160p60hz420"))
++  else if (StringUtils::EqualsNoCase(fromMode, "2160p60hz"))
+   {
+     res->iWidth = 1920;
+     res->iHeight= 1080;
+diff --git a/xbmc/utils/AMLUtils.h b/xbmc/utils/AMLUtils.h
+index d8458f2..805e04d 100644
+--- a/xbmc/utils/AMLUtils.h
++++ b/xbmc/utils/AMLUtils.h
+@@ -58,6 +58,7 @@ bool aml_support_hevc();
+ bool aml_support_hevc_4k2k();
+ bool aml_support_hevc_10bit();
+ AML_SUPPORT_H264_4K2K aml_support_h264_4k2k();
++bool aml_support_vp9();
+ void aml_set_audio_passthrough(bool passthrough);
+ bool aml_IsHdmiConnected();
+ void aml_handle_display_stereo_mode(RENDER_STEREO_MODE stereo_mode);
+diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
+index d0a4c20..cefcf8c 100644
+--- a/xbmc/utils/BitstreamConverter.cpp
++++ b/xbmc/utils/BitstreamConverter.cpp
+@@ -72,6 +72,34 @@ enum {
+     HEVC_NAL_SEI_SUFFIX = 40
+ };
+ 
++enum {
++  SEI_BUFFERING_PERIOD = 0,
++  SEI_PIC_TIMING,
++  SEI_PAN_SCAN_RECT,
++  SEI_FILLER_PAYLOAD,
++  SEI_USER_DATA_REGISTERED_ITU_T_T35,
++  SEI_USER_DATA_UNREGISTERED,
++  SEI_RECOVERY_POINT,
++  SEI_DEC_REF_PIC_MARKING_REPETITION,
++  SEI_SPARE_PIC,
++  SEI_SCENE_INFO,
++  SEI_SUB_SEQ_INFO,
++  SEI_SUB_SEQ_LAYER_CHARACTERISTICS,
++  SEI_SUB_SEQ_CHARACTERISTICS,
++  SEI_FULL_FRAME_FREEZE,
++  SEI_FULL_FRAME_FREEZE_RELEASE,
++  SEI_FULL_FRAME_SNAPSHOT,
++  SEI_PROGRESSIVE_REFINEMENT_SEGMENT_START,
++  SEI_PROGRESSIVE_REFINEMENT_SEGMENT_END,
++  SEI_MOTION_CONSTRAINED_SLICE_GROUP_SET,
++  SEI_FILM_GRAIN_CHARACTERISTICS,
++  SEI_DEBLOCKING_FILTER_DISPLAY_PREFERENCE,
++  SEI_STEREO_VIDEO_INFO,
++  SEI_POST_FILTER_HINTS,
++  SEI_TONE_MAPPING
++};
++
++
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////////////
+ // GStreamer h264 parser
+@@ -156,6 +184,18 @@ static int nal_bs_read_ue(nal_bitstream *bs)
+   return ((1 << i) - 1 + nal_bs_read(bs, i));
+ }
+ 
++// read signed Exp-Golomb code
++static int nal_bs_read_se(nal_bitstream *bs)
++{
++  int i = 0;
++
++  i = nal_bs_read_ue (bs);
++  /* (-1)^(i+1) Ceil (i / 2) */
++  i = (i + 1) / 2 * (i & 1 ? 1 : -1);
++
++  return i;
++}
++
+ static const uint8_t* avc_find_startcode_internal(const uint8_t *p, const uint8_t *end)
+ {
+   const uint8_t *a = p + 4 - ((intptr_t)p & 3);
+@@ -205,6 +245,34 @@ static const uint8_t* avc_find_startcode(const uint8_t *p, const uint8_t *end)
+   return out;
+ }
+ 
++static bool has_sei_recovery_point(const uint8_t *p, const uint8_t *end)
++{
++  int pt(0), ps(0), offset(1);
++
++  do
++  {
++    pt = 0;
++    do {
++      pt += p[offset];
++    } while (p[offset++] == 0xFF);
++
++    ps = 0;
++    do {
++      ps += p[offset];
++    } while (p[offset++] == 0xFF);
++
++    if (pt == SEI_RECOVERY_POINT)
++    {
++      nal_bitstream bs;
++      nal_bs_init(&bs, p + offset, ps);
++      return nal_bs_read_ue(&bs) >= 0;
++    }
++    offset += ps;
++  } while(p + offset < end && p[offset] != 0x80);
++
++  return false;
++}
++
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////////////
+ CBitstreamParser::CBitstreamParser()
+@@ -255,49 +323,44 @@ const uint8_t* CBitstreamParser::find_start_code(const uint8_t *p,
+   return p + 4;
+ }
+ 
+-bool CBitstreamParser::FindIdrSlice(const uint8_t *buf, int buf_size)
++bool CBitstreamParser::HasKeyframe(const uint8_t *buf, int buf_size)
+ {
+   if (!buf)
+     return false;
+ 
+   bool rtn = false;
+   uint32_t state = -1;
+-  const uint8_t *buf_end = buf + buf_size;
++  const uint8_t *buf_begin, *buf_end = buf + buf_size;
+ 
+-  for(;;)
++  for(;rtn == false;)
+   {
+     buf = find_start_code(buf, buf_end, &state);
+     if (buf >= buf_end)
+     {
+-      //CLog::Log(LOGDEBUG, "FindIdrSlice: buf(%p), buf_end(%p)", buf, buf_end);
+       break;
+     }
+ 
+-    --buf;
+-    int src_length = buf_end - buf;
+     switch (state & 0x1f)
+     {
+-      default:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found nal_type(%d)", state & 0x1f);
+-        break;
+       case AVC_NAL_SLICE:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found NAL_SLICE");
+         break;
+       case AVC_NAL_IDR_SLICE:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found NAL_IDR_SLICE");
+         rtn = true;
+         break;
+       case AVC_NAL_SEI:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found NAL_SEI");
++        buf_begin = buf - 1;
++        buf = find_start_code(buf, buf_end, &state) - 4;
++        if (has_sei_recovery_point(buf_begin, buf))
++          rtn = true;
+         break;
+       case AVC_NAL_SPS:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found NAL_SPS");
++        rtn = true;
+         break;
+       case AVC_NAL_PPS:
+-        CLog::Log(LOGDEBUG, "FindIdrSlice: found NAL_PPS");
++        break;
++      default:
+         break;
+     }
+-    buf += src_length;
+   }
+ 
+   return rtn;
+@@ -318,6 +381,7 @@ CBitstreamConverter::CBitstreamConverter()
+   m_convert_3byteTo4byteNALSize = false;
+   m_convert_bytestream = false;
+   m_sps_pps_context.sps_pps_data = NULL;
++  m_has_keyframe = true;
+ }
+ 
+ CBitstreamConverter::~CBitstreamConverter()
+@@ -397,7 +461,7 @@ bool CBitstreamConverter::Open(enum AVCodecID codec, uint8_t *in_extradata, int
+             // are valid, setup to convert 3 byte NAL sizes to 4 byte.
+             in_extradata[4] = 0xFF;
+             m_convert_3byteTo4byteNALSize = true;
+-           
++
+             m_extradata = (uint8_t *)av_malloc(in_extrasize);
+             memcpy(m_extradata, in_extradata, in_extrasize);
+             m_extrasize = in_extrasize;
+@@ -508,7 +572,7 @@ void CBitstreamConverter::Close(void)
+ bool CBitstreamConverter::Convert(uint8_t *pData, int iSize)
+ {
+   if (m_convertBuffer)
+-  {  
++  {
+     av_free(m_convertBuffer);
+     m_convertBuffer = NULL;
+   }
+@@ -558,7 +622,7 @@ bool CBitstreamConverter::Convert(uint8_t *pData, int iSize)
+       {
+         m_inputSize = iSize;
+         m_inputBuffer = pData;
+-  
++
+         if (m_convert_bytestream)
+         {
+           if(m_convertBuffer)
+@@ -646,6 +710,16 @@ int CBitstreamConverter::GetExtraSize() const
+     return m_extrasize;
+ }
+ 
++void CBitstreamConverter::ResetKeyframe(void)
++{
++  m_has_keyframe = false;
++}
++
++bool CBitstreamConverter::HasKeyframe() const
++{
++  return m_has_keyframe;
++}
++
+ bool CBitstreamConverter::BitstreamConvertInitAVC(void *in_extradata, int in_extrasize)
+ {
+   // based on h264_mp4toannexb_bsf.c (ffmpeg)
+@@ -860,7 +934,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+   int i;
+   uint8_t *buf = pData;
+   uint32_t buf_size = iSize;
+-  uint8_t  unit_type, nal_sps, nal_pps;
++  uint8_t  unit_type, nal_sps, nal_pps, nal_sei;
+   int32_t  nal_size;
+   uint32_t cumul_size = 0;
+   const uint8_t *buf_end = buf + buf_size;
+@@ -870,10 +944,12 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+     case AV_CODEC_ID_H264:
+       nal_sps = AVC_NAL_SPS;
+       nal_pps = AVC_NAL_PPS;
++      nal_sei = AVC_NAL_SEI;
+       break;
+     case AV_CODEC_ID_HEVC:
+       nal_sps = HEVC_NAL_SPS;
+       nal_pps = HEVC_NAL_PPS;
++      nal_sei = HEVC_NAL_SEI_PREFIX;
+       break;
+     default:
+       return false;
+@@ -904,7 +980,10 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+     if (m_sps_pps_context.first_idr && (unit_type == nal_sps || unit_type == nal_pps))
+       m_sps_pps_context.idr_sps_pps_seen = 1;
+ 
+-      // prepend only to the first access unit of an IDR picture, if no sps/pps already present
++    if (!m_has_keyframe && (unit_type == nal_sps || IsIDR(unit_type) || (unit_type == nal_sei && has_sei_recovery_point(buf, buf + nal_size))))
++      m_has_keyframe = true;
++
++    // prepend only to the first access unit of an IDR picture, if no sps/pps already present
+     if (m_sps_pps_context.first_idr && IsIDR(unit_type) && !m_sps_pps_context.idr_sps_pps_seen)
+     {
+       BitstreamAllocAndCopy(poutbuf, poutbuf_size,
+@@ -1371,6 +1450,316 @@ bool CBitstreamConverter::mpeg2_sequence_header(const uint8_t *data, const uint3
+   return changed;
+ }
+ 
++bool CBitstreamConverter::h264_sequence_header(const uint8_t *data, const uint32_t size, h264_sequence *sequence)
++{
++    // parse nal units until SPS is found
++    // and return the width, height and aspect ratio if changed.
++    bool changed = false;
++
++    if (!data)
++        return changed;
++
++    const uint8_t *p = data;
++    const uint8_t *end = p + size;
++    const uint8_t *nal_start, *nal_end;
++
++    int profile_idc;
++    int chroma_format_idc = 1;
++    uint8_t pic_order_cnt_type;
++    uint8_t aspect_ratio_idc = 0;
++    uint8_t separate_colour_plane_flag = 0;
++    int8_t frame_mbs_only_flag = -1;
++    unsigned int pic_width, pic_width_cropped;
++    unsigned int pic_height, pic_height_cropped;
++    unsigned int frame_crop_right_offset = 0;
++    unsigned int frame_crop_bottom_offset = 0;
++    unsigned int sar_width = 0;
++    unsigned int sar_height = 0;
++    uint32_t unitsInTick = 0;
++    uint32_t timeScale = 0;
++
++    int lastScale;
++    int nextScale;
++    int deltaScale;
++
++    nal_start = avc_find_startcode(p, end);
++
++    while (nal_start < end)
++    {
++        while (!*(nal_start++));
++
++        nal_end = avc_find_startcode(nal_start, end);
++
++        if ((*nal_start & 0x1f) == 7) // SPS
++        {
++            nal_bitstream bs;
++            nal_bs_init(&bs, nal_start, end - nal_start);
++
++            nal_bs_read(&bs, 8); // NAL unit type
++
++            profile_idc = nal_bs_read(&bs, 8);  // profile_idc
++
++            nal_bs_read(&bs, 1);  // constraint_set0_flag
++            nal_bs_read(&bs, 1);  // constraint_set1_flag
++            nal_bs_read(&bs, 1);  // constraint_set2_flag
++            nal_bs_read(&bs, 1);  // constraint_set3_flag
++            nal_bs_read(&bs, 4);  // reserved
++            nal_bs_read(&bs, 8);  // level_idc
++            nal_bs_read_ue(&bs);  // sps_id
++
++            if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 ||
++                profile_idc == 244 || profile_idc == 44  || profile_idc == 83  ||
++                profile_idc == 86  || profile_idc == 118 || profile_idc == 128 )
++            {
++
++                chroma_format_idc = nal_bs_read_ue(&bs); // chroma_format_idc
++                // high_profile
++                if (chroma_format_idc == 3)
++                {
++                    separate_colour_plane_flag = nal_bs_read(&bs, 1); // separate_colour_plane_flag
++                }
++
++                nal_bs_read_ue(&bs); // bit_depth_luma_minus8
++                nal_bs_read_ue(&bs); // bit_depth_chroma_minus8
++                nal_bs_read(&bs, 1); // qpprime_y_zero_transform_bypass_flag
++
++                if (nal_bs_read (&bs, 1)) // seq_scaling_matrix_present_flag
++                {
++
++                    for (int idx = 0; idx < ((chroma_format_idc != 3) ? 8 : 12); ++idx)
++                    {
++                        if (nal_bs_read(&bs, 1)) // scaling list present
++                        {
++                            lastScale = nextScale = 8;
++                            int sl_n = ((idx < 6) ? 16 : 64);
++
++                            for(int sl_i = 0; sl_i < sl_n; ++sl_i)
++                            {
++                                if (nextScale != 0)
++                                {
++                                    deltaScale = nal_bs_read_se(&bs);
++                                    nextScale = (lastScale + deltaScale + 256) % 256;
++
++                                }
++                                lastScale = (nextScale == 0) ? lastScale : nextScale;
++                            }
++                        }
++                    }
++                }
++            }
++
++            nal_bs_read_ue(&bs); // log2_max_frame_num_minus4
++
++            pic_order_cnt_type = nal_bs_read_ue(&bs); // pic_order_cnt_type
++
++            if (pic_order_cnt_type == 0)
++                nal_bs_read_ue(&bs); //  log2_max_pic_order_cnt_lsb_minus4
++            else if (pic_order_cnt_type == 1)
++            {
++                nal_bs_read(&bs, 1); // delta_pic_order_always_zero_flag
++                nal_bs_read_se(&bs); // offset_for_non_ref_pic
++                nal_bs_read_se(&bs); // offset_for_top_to_bottom_field
++
++                unsigned int tmp, idx;
++                tmp =  nal_bs_read_ue(&bs);
++                for (idx = 0; idx < tmp; ++idx)
++                    nal_bs_read_se(&bs); // offset_for_ref_frame[i]
++            }
++
++            nal_bs_read_ue(&bs); // num_ref_frames
++            nal_bs_read(&bs, 1); // gaps_in_frame_num_allowed_flag
++
++            pic_width = (nal_bs_read_ue(&bs) + 1) * 16 ; // pic_width
++            pic_height = (nal_bs_read_ue(&bs) + 1) * 16; // pic_height
++
++            frame_mbs_only_flag = nal_bs_read(&bs, 1); // frame_mbs_only_flag
++            if (!frame_mbs_only_flag)
++            {
++                pic_height *= 2;
++                nal_bs_read(&bs, 1); // mb_adaptive_frame_field_flag
++            }
++
++            nal_bs_read(&bs, 1); // direct_8x8_inference_flag
++
++            if (nal_bs_read(&bs, 1)) // frame_cropping_flag
++            {
++                nal_bs_read_ue(&bs); // frame_crop_left_offset
++                frame_crop_right_offset = nal_bs_read_ue(&bs); // frame_crop_right_offset
++                nal_bs_read_ue(&bs); // frame_crop_top_offset
++                frame_crop_bottom_offset = nal_bs_read_ue(&bs); // frame_crop_bottom_offset
++            }
++
++            if (nal_bs_read(&bs, 1)) // vui_parameters_present_flag
++            {
++                if (nal_bs_read(&bs, 1)) //aspect_ratio_info_present_flag
++                {
++                    aspect_ratio_idc = nal_bs_read(&bs, 8); // aspect_ratio_idc
++
++                    if (aspect_ratio_idc == 255) // EXTENDED_SAR
++                    {
++                        sar_width  = nal_bs_read(&bs, 16);
++                        sar_height = nal_bs_read(&bs, 16);
++
++                    }
++                }
++
++                if (nal_bs_read(&bs, 1)) //overscan_info_present_flag
++                    nal_bs_read(&bs, 1); //overscan_appropriate_flag
++
++                if (nal_bs_read(&bs, 1))  //video_signal_type_present_flag
++                {
++                    nal_bs_read(&bs, 3); //video_format
++                    nal_bs_read(&bs, 1); //video_full_range_flag
++                    if (nal_bs_read(&bs, 1)) // colour_description_present_flag
++                    {
++                        nal_bs_read(&bs, 8); // colour_primaries
++                        nal_bs_read(&bs, 8); // transfer_characteristics
++                        nal_bs_read(&bs, 8); // matrix_coefficients
++                    }
++                }
++
++                if (nal_bs_read(&bs, 1)) //chroma_loc_info_present_flag
++                {
++                    nal_bs_read_ue(&bs); //chroma_sample_loc_type_top_field ue(v)
++                    nal_bs_read_ue(&bs); //chroma_sample_loc_type_bottom_field ue(v)
++                }
++
++                if (nal_bs_read(&bs, 1)) //timing_info_present_flag
++                {
++                    unitsInTick = nal_bs_read(&bs, 32); //num_units_in_tick
++                    timeScale = nal_bs_read(&bs, 32); //time_scale
++                    nal_bs_read(&bs, 1); // fixed rate
++                }
++            }
++
++            unsigned int ChromaArrayType, crop;
++            ChromaArrayType = separate_colour_plane_flag ? 0 : chroma_format_idc;
++
++            // cropped width
++            unsigned int CropUnitX, SubWidthC;
++            CropUnitX = 1;
++            SubWidthC = chroma_format_idc == 3 ? 1 : 2;
++            if (ChromaArrayType != 0)
++                CropUnitX = SubWidthC;
++            crop = CropUnitX * frame_crop_right_offset;
++            pic_width_cropped = pic_width - crop;
++
++            if (pic_width_cropped != sequence->width)
++            {
++                changed = true;
++                sequence->width = pic_width_cropped;
++            }
++
++            // cropped height
++            unsigned int CropUnitY, SubHeightC;
++            CropUnitY = 2 - frame_mbs_only_flag;
++            SubHeightC = chroma_format_idc <= 1 ? 2 : 1;
++            if (ChromaArrayType != 0)
++                CropUnitY *= SubHeightC;
++            crop = CropUnitY * frame_crop_bottom_offset;
++            pic_height_cropped = pic_height - crop;
++
++            if (pic_height_cropped != sequence->height)
++            {
++                changed = true;
++                sequence->height = pic_height_cropped;
++            }
++
++            // aspect ratio
++            float ratio = sequence->ratio;
++            if (pic_height_cropped)
++                ratio = pic_width_cropped / (double) pic_height_cropped;
++            switch (aspect_ratio_idc)
++            {
++                case 0:
++                    // Unspecified
++                    break;
++                case 1:
++                    // 1:1
++                    break;
++                case 2:
++                    // 12:11
++                    ratio *= 1.0909090909090908;
++                    break;
++                case 3:
++                    // 10:11
++                    ratio *= 0.90909090909090906;
++                    break;
++                case 4:
++                    // 16:11
++                    ratio *= 1.4545454545454546;
++                    break;
++                case 5:
++                    // 40:33
++                    ratio *= 1.2121212121212122;
++                    break;
++                case 6:
++                    // 24:11
++                    ratio *= 2.1818181818181817;
++                    break;
++                case 7:
++                    // 20:11
++                    ratio *= 1.8181818181818181;
++                    break;
++                case 8:
++                    // 32:11
++                    ratio *= 2.9090909090909092;
++                    break;
++                case 9:
++                    // 80:33
++                    ratio *= 2.4242424242424243;
++                    break;
++                case 10:
++                    // 18:11
++                    ratio *= 1.6363636363636365;
++                    break;
++                case 11:
++                    // 15:11
++                    ratio *= 1.3636363636363635;
++                    break;
++                case 12:
++                    // 64:33
++                    ratio *= 1.9393939393939394;
++                    break;
++                case 13:
++                    // 160:99
++                    ratio *= 1.6161616161616161;
++                    break;
++                case 14:
++                    // 4:3
++                    ratio *= 1.3333333333333333;
++                    break;
++                case 15:
++                    // 3:2
++                    ratio *= 1.5;
++                    break;
++                case 16:
++                    // 2:1
++                    ratio *= 2.0;
++                    break;
++                case 255:
++                    // EXTENDED_SAR
++                    if (sar_height)
++                        ratio *= sar_width / (double)sar_height;
++                    else
++                        ratio = 0.0;
++                    break;
++            } // switch
++            if (aspect_ratio_idc != sequence->ratio_info)
++            {
++                changed = true;
++                sequence->ratio = ratio;
++                sequence->ratio_info = aspect_ratio_idc;
++            }
++
++            break;
++        } // SPS
++        nal_start = nal_end;
++    }
++
++    return changed;
++}
++
+ void CBitstreamConverter::parseh264_sps(const uint8_t *sps, const uint32_t sps_size, bool *interlaced, int32_t *max_ref_frames)
+ {
+   nal_bitstream bs;
+diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
+index 9045ef9..ee64f7e 100644
+--- a/xbmc/utils/BitstreamConverter.h
++++ b/xbmc/utils/BitstreamConverter.h
+@@ -95,6 +95,14 @@ typedef struct mpeg2_sequence
+   uint32_t  ratio_info;
+ } mpeg2_sequence;
+ 
++typedef struct h264_sequence
++{
++  uint32_t  width;
++  uint32_t  height;
++  float     ratio;
++  uint32_t  ratio_info;
++} h264_sequence;
++
+ typedef struct
+ {
+   int profile_idc;
+@@ -137,7 +145,7 @@ public:
+ 
+   static bool Open();
+   static void Close();
+-  static bool FindIdrSlice(const uint8_t *buf, int buf_size);
++  static bool HasKeyframe(const uint8_t *buf, int buf_size);
+ 
+ protected:
+   static const uint8_t* find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
+@@ -157,6 +165,8 @@ public:
+   int               GetConvertSize() const;
+   uint8_t*          GetExtraData(void) const;
+   int               GetExtraSize() const;
++  void              ResetKeyframe(void);
++  bool              HasKeyframe() const;
+ 
+   static void       bits_reader_set( bits_reader_t *br, uint8_t *buf, int len );
+   static uint32_t   read_bits( bits_reader_t *br, int nbits );
+@@ -170,6 +180,7 @@ public:
+ 
+   static void       parseh264_sps(const uint8_t *sps, const uint32_t sps_size, bool *interlaced, int32_t *max_ref_frames);
+   static bool       mpeg2_sequence_header(const uint8_t *data, const uint32_t size, mpeg2_sequence *sequence);
++  static bool       h264_sequence_header(const uint8_t *data, const uint32_t size, h264_sequence *sequence);
+ 
+ protected:
+   static const int  avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size);
+@@ -207,5 +218,6 @@ protected:
+   bool              m_convert_3byteTo4byteNALSize;
+   bool              m_convert_bytestream;
+   AVCodecID         m_codec;
++  bool              m_has_keyframe;
+ };
+ 
+diff --git a/xbmc/utils/ScreenshotAML.cpp b/xbmc/utils/ScreenshotAML.cpp
+index 3e73437..e0d1d22 100644
+--- a/xbmc/utils/ScreenshotAML.cpp
++++ b/xbmc/utils/ScreenshotAML.cpp
+@@ -43,7 +43,8 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
+   int captureFd = open(CAPTURE_DEVICEPATH, O_RDWR, 0);
+   if (captureFd >= 0)
+   {
+-    int buffSize = iWidth * iHeight * 3;
++    int stride = ((iWidth + 31) & ~31) * 3;
++    int buffSize = stride * iHeight;
+     int readSize = 0;
+     // videobuffer should be rgb according to docu - but it is bgr ...
+     unsigned char *videoBuffer = new unsigned char[buffSize];
+@@ -51,7 +52,7 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
+     if (videoBuffer != NULL)
+     {
+       // configure destination
+-      ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, iWidth);
++      ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, stride / 3);
+       ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_HEIGHT, iHeight);
+       readSize = pread(captureFd, videoBuffer, buffSize, 0);
+     }
+@@ -60,33 +61,35 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
+ 
+     if (readSize == buffSize)
+     {
+-      unsigned char *videoPtr = videoBuffer;
+-
+       if (!bBlendToBuffer)
+       {
+         memset(buffer, 0xff, buffSize);
+       }
+ 
+-      for (int processedBytes = 0; processedBytes < buffSize; processedBytes += 3, buffer+=4)
++      for (int y = 0; y < iHeight; ++y)
+       {
+-        float alpha = buffer[3] / (float)255;
++        unsigned char *videoPtr = videoBuffer + y * stride;
+ 
+-        if (bBlendToBuffer)
+-        {
+-          //B
+-          buffer[0] = alpha * (float)buffer[0] + (1 - alpha) * (float)videoPtr[0];
+-          //G
+-          buffer[1] = alpha * (float)buffer[1] + (1 - alpha) * (float)videoPtr[1];
+-          //R
+-          buffer[2] = alpha * (float)buffer[2] + (1 - alpha) * (float)videoPtr[2];
+-          //A
+-          buffer[3] = 0xff;// we are solid now
+-        }
+-        else
++        for (int x = 0; x < iWidth; ++x, buffer += 4, videoPtr += 3)
+         {
+-          memcpy(buffer, videoPtr, 3);
++          float alpha = buffer[3] / (float)255;
++
++          if (bBlendToBuffer)
++          {
++            //B
++            buffer[0] = alpha * (float)buffer[0] + (1 - alpha) * (float)videoPtr[0];
++            //G
++            buffer[1] = alpha * (float)buffer[1] + (1 - alpha) * (float)videoPtr[1];
++            //R
++            buffer[2] = alpha * (float)buffer[2] + (1 - alpha) * (float)videoPtr[2];
++            //A
++            buffer[3] = 0xff;// we are solid now
++          }
++          else
++          {
++            memcpy(buffer, videoPtr, 3);
++          }
+         }
+-        videoPtr += 3;
+       }
+     }
+     delete [] videoBuffer;
+diff --git a/xbmc/video/VideoReferenceClock.cpp b/xbmc/video/VideoReferenceClock.cpp
+index a8dbdaf..e8755a1 100644
+--- a/xbmc/video/VideoReferenceClock.cpp
++++ b/xbmc/video/VideoReferenceClock.cpp
+@@ -49,6 +49,9 @@
+ #if defined(TARGET_ANDROID)
+ #include "video/videosync/VideoSyncAndroid.h"
+ #endif
++#if defined(HAS_LIBAMCODEC)
++#include "video/videosync/VideoSyncAML.h"
++#endif
+ 
+ #ifdef TARGET_POSIX
+ #include "linux/XTimeUtils.h"
+@@ -125,6 +128,8 @@ void CVideoReferenceClock::Process()
+     m_pVideoSync = new CVideoSyncIMX(this);
+ #elif defined(TARGET_ANDROID)
+     m_pVideoSync = new CVideoSyncAndroid(this);
++#elif defined(HAS_LIBAMCODEC)
++    m_pVideoSync = new CVideoSyncAML(this);
+ #endif
+ 
+     if (m_pVideoSync)
+diff --git a/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp b/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
+index eb67552..f31572b 100644
+--- a/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
++++ b/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
+@@ -68,7 +68,9 @@ CGUIDialogAudioSubtitleSettings::CGUIDialogAudioSubtitleSettings()
+   : CGUIDialogSettingsManualBase(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "DialogSettings.xml"),
+     m_passthrough(false),
+     m_dspEnabled(false)
+-{ }
++{
++  m_loadType = LOAD_ON_GUI_INIT;
++}
+ 
+ CGUIDialogAudioSubtitleSettings::~CGUIDialogAudioSubtitleSettings()
+ { }
+diff --git a/xbmc/video/dialogs/GUIDialogSubtitles.cpp b/xbmc/video/dialogs/GUIDialogSubtitles.cpp
+index 398558e..4e8a9b1 100644
+--- a/xbmc/video/dialogs/GUIDialogSubtitles.cpp
++++ b/xbmc/video/dialogs/GUIDialogSubtitles.cpp
+@@ -103,7 +103,7 @@ CGUIDialogSubtitles::CGUIDialogSubtitles(void)
+     , m_pausedOnRun(false)
+     , m_updateSubsList(false)
+ {
+-  m_loadType = KEEP_IN_MEMORY;
++  m_loadType  = LOAD_ON_GUI_INIT;
+ }
+ 
+ CGUIDialogSubtitles::~CGUIDialogSubtitles(void)
+diff --git a/xbmc/video/dialogs/GUIDialogVideoOSD.cpp b/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
+index e498e1f..a6648d0 100644
+--- a/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
++++ b/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
+@@ -30,7 +30,7 @@ using namespace PVR;
+ CGUIDialogVideoOSD::CGUIDialogVideoOSD(void)
+     : CGUIDialog(WINDOW_DIALOG_VIDEO_OSD, "VideoOSD.xml")
+ {
+-  m_loadType = KEEP_IN_MEMORY;
++  m_loadType = LOAD_ON_GUI_INIT;
+ }
+ 
+ CGUIDialogVideoOSD::~CGUIDialogVideoOSD(void)
+diff --git a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+index 0534828..5a86dfc 100644
+--- a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
++++ b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+@@ -66,7 +66,9 @@
+ CGUIDialogVideoSettings::CGUIDialogVideoSettings()
+     : CGUIDialogSettingsManualBase(WINDOW_DIALOG_VIDEO_OSD_SETTINGS, "DialogSettings.xml"),
+       m_viewModeChanged(false)
+-{ }
++{
++  m_loadType = LOAD_ON_GUI_INIT;
++}
+ 
+ CGUIDialogVideoSettings::~CGUIDialogVideoSettings()
+ { }
+diff --git a/xbmc/video/videosync/CMakeLists.txt b/xbmc/video/videosync/CMakeLists.txt
+index 82f7169..177c656 100644
+--- a/xbmc/video/videosync/CMakeLists.txt
++++ b/xbmc/video/videosync/CMakeLists.txt
+@@ -40,6 +40,11 @@ if(IMX_FOUND)
+   list(APPEND HEADERS VideoSyncIMX.h)
+ endif()
+ 
++if(AML_FOUND)
++  list(APPEND SOURCES VideoSyncAML.cpp)
++  list(APPEND HEADERS VideoSyncAML.h)
++endif()
++
+ if(SOURCES AND HEADERS)
+   core_add_library(video_sync)
+ endif()
+diff --git a/xbmc/video/videosync/Makefile b/xbmc/video/videosync/Makefile
+index fda1c06..6661841 100644
+--- a/xbmc/video/videosync/Makefile
++++ b/xbmc/video/videosync/Makefile
+@@ -5,6 +5,7 @@ SRCS=VideoSyncGLX.cpp \
+      VideoSyncPi.cpp \
+      VideoSyncIMX.cpp \
+      VideoSyncAndroid.cpp \
++     VideoSyncAML.cpp \
+ 
+ LIB=videosync.a
+ 
+diff --git a/xbmc/video/videosync/VideoSyncAML.cpp b/xbmc/video/videosync/VideoSyncAML.cpp
+new file mode 100644
+index 0000000..3751cae
+--- /dev/null
++++ b/xbmc/video/videosync/VideoSyncAML.cpp
+@@ -0,0 +1,113 @@
++/*
++ *      Copyright (C) 2005-2014 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "system.h"
++
++#if defined(HAS_LIBAMCODEC)
++
++#include "video/videosync/VideoSyncAML.h"
++#include "guilib/GraphicContext.h"
++#include "windowing/WindowingFactory.h"
++#include "utils/TimeUtils.h"
++#include "utils/log.h"
++#include "threads/Thread.h"
++#include <sys/poll.h>
++
++#include <chrono>
++#include <thread>
++
++extern CEvent g_aml_sync_event;
++
++CVideoSyncAML::CVideoSyncAML(CVideoReferenceClock *clock)
++: CVideoSync(clock)
++, m_abort(false)
++{
++}
++
++CVideoSyncAML::~CVideoSyncAML()
++{
++}
++
++bool CVideoSyncAML::Setup(PUPDATECLOCK func)
++{
++  UpdateClock = func;
++
++  m_abort = false;
++
++  g_Windowing.Register(this);
++  CLog::Log(LOGDEBUG, "CVideoReferenceClock: setting up AML");
++
++  return true;
++}
++
++void CVideoSyncAML::Run(std::atomic<bool>& stop)
++{
++  // We use the wall clock for timout handling (no AML h/w, startup)
++  std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
++  unsigned int waittime (3000 / m_fps);
++  uint64_t numVBlanks (0);
++
++  /* This shouldn't be very busy and timing is important so increase priority */
++  CThread::GetCurrentThread()->SetPriority(CThread::GetCurrentThread()->GetPriority()+1);
++
++  while (!stop && !m_abort)
++  {
++    int countVSyncs(1);
++    if( !g_aml_sync_event.WaitMSec(waittime))
++    {
++      std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
++      uint64_t curVBlanks = (m_fps * elapsed.count()) / 1000;
++      int64_t lastVBlankTime((curVBlanks * 1000) / m_fps);
++      if (elapsed.count() > lastVBlankTime)
++      {
++        lastVBlankTime = (++curVBlanks * 1000) / m_fps;
++        std::this_thread::sleep_for(std::chrono::milliseconds(lastVBlankTime - elapsed.count()));
++      }
++      countVSyncs = curVBlanks - numVBlanks;
++      numVBlanks = curVBlanks;
++    }
++    else
++      ++numVBlanks;
++
++    uint64_t now = CurrentHostCounter();
++
++    UpdateClock(countVSyncs, now, m_refClock);
++  }
++}
++
++void CVideoSyncAML::Cleanup()
++{
++  CLog::Log(LOGDEBUG, "CVideoReferenceClock: cleaning up AML");
++  g_Windowing.Unregister(this);
++}
++
++float CVideoSyncAML::GetFps()
++{
++  m_fps = g_graphicsContext.GetFPS();
++  CLog::Log(LOGDEBUG, "CVideoReferenceClock: fps: %.3f", m_fps);
++  return m_fps;
++}
++
++void CVideoSyncAML::OnResetDisplay()
++{
++  m_abort = true;
++}
++
++#endif
+diff --git a/xbmc/video/videosync/VideoSyncAML.h b/xbmc/video/videosync/VideoSyncAML.h
+new file mode 100644
+index 0000000..f48e3b4
+--- /dev/null
++++ b/xbmc/video/videosync/VideoSyncAML.h
+@@ -0,0 +1,41 @@
++#pragma once
++/*
++ *      Copyright (C) 2005-2016 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#if defined(HAS_LIBAMCODEC)
++
++#include "video/videosync/VideoSync.h"
++#include "guilib/DispResource.h"
++
++class CVideoSyncAML : public CVideoSync, IDispResource
++{
++public:
++  CVideoSyncAML(CVideoReferenceClock *clock);
++  virtual ~CVideoSyncAML();
++  virtual bool Setup(PUPDATECLOCK func);
++  virtual void Run(std::atomic<bool>& stop);
++  virtual void Cleanup();
++  virtual float GetFps();
++  virtual void OnResetDisplay();
++private:
++  volatile bool m_abort;
++};
++
++#endif
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index d3769d3..4a8da2c 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -24,12 +24,25 @@
+ #include "utils/AMLUtils.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
++#include "filesystem/SpecialProtocol.h"
++#include "utils/log.h"
++#include "settings/Settings.h"
++#include "messaging/ApplicationMessenger.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <linux/fb.h>
+ #include <sys/ioctl.h>
+ #include <EGL/egl.h>
++#include <math.h>
++
++#include <libudev.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <locale.h>
++#include <unistd.h>
++
++using namespace KODI::MESSAGING;
+ 
+ CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
+ {
+@@ -65,9 +78,106 @@ void CEGLNativeTypeAmlogic::Initialize()
+ {
+   aml_permissions();
+   DisableFreeScale();
++
++ /* Take in to account custom OSMC parameters */
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing RGB");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
++ }
++
++ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
++ }
++
++ SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
++
++ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
++
++ StartMonitorHWEvent();
++
++}
++
++void hwMon(CEGLNativeTypeAmlogic *instance) {
++
++        struct udev *udev;
++        struct udev_enumerate *enumerate;
++        struct udev_list_entry *devices, *dev_list_entry;
++        struct udev_device *dev;
++
++        struct udev_monitor *mon;
++        int fd;
++
++        /* Create the udev object */
++        udev = udev_new();
++        if (!udev) {
++                return;
++        }
++
++        mon = udev_monitor_new_from_netlink(udev, "udev");
++        udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
++
++        udev_monitor_enable_receiving(mon);
++        fd = udev_monitor_get_fd(mon);
++
++        /* Poll for events */
++
++        while (1 && instance->m_monitorEvents) {
++
++                fd_set fds;
++                struct timeval tv;
++                int ret;
++
++                FD_ZERO(&fds);
++                FD_SET(fd, &fds);
++                tv.tv_sec = 0;
++                tv.tv_usec = 0;
++
++                ret = select(fd+1, &fds, NULL, NULL, &tv);
++
++                /* Check if FD has received data */
++
++                if (ret > 0 && FD_ISSET(fd, &fds)) {
++
++                        dev = udev_monitor_receive_device(mon);
++                        if (dev) {
++                                CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic: Detected HDMI switch");
++                                int state;
++                                SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
++				std::string newEdid;
++				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
++
++                                if (state && newEdid != instance->m_lastEdid) {
++                                    CApplicationMessenger::GetInstance().PostMsg(TMSG_AML_RESIZE);
++				    instance->m_lastEdid = newEdid;
++				}
++                                udev_device_unref(dev);
++                        }
++                        else {
++                                CLog::Log(LOGERROR, "CEGLNativeTypeAmlogic: can't get device from receive_device");
++                        }
++                }
++                usleep(250*1000);
++        }
++}
++
++void CEGLNativeTypeAmlogic::StartMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
++    m_monitorEvents = true;
++    m_monitorThread = std::thread(hwMon, this);
++    return;
++}
++
++void CEGLNativeTypeAmlogic::StopMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++    m_monitorEvents = false;
++    m_monitorThread.join();
++    return;
+ }
++
+ void CEGLNativeTypeAmlogic::Destroy()
+ {
++  StopMonitorHWEvent();
+   return;
+ }
+ 
+@@ -129,7 +239,15 @@ bool CEGLNativeTypeAmlogic::GetNativeResolution(RESOLUTION_INFO *res) const
+ {
+   std::string mode;
+   SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  return aml_mode_to_resolution(mode.c_str(), res);
++
++  bool result = aml_mode_to_resolution(mode.c_str(), res);
++
++  int fractional_rate;
++  SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++  if (fractional_rate == 1)
++    res->fRefreshRate /= 1.001;
++
++  return result;
+ }
+ 
+ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+@@ -143,12 +261,11 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+   }
+ #endif
+ 
+-  // Don't set the same mode as current
+-  std::string mode;
+-  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  
+-  if (res.strId != mode)
+-    result = SetDisplayResolution(res.strId.c_str());
++  aml_handle_display_stereo_mode(RENDER_STEREO_MODE_OFF);
++
++  result = SetDisplayResolution(res);
++
++  DealWithScale(res);
+ 
+   RENDER_STEREO_MODE stereo_mode = g_graphicsContext.GetStereoMode();
+   aml_handle_display_stereo_mode(stereo_mode);
+@@ -158,8 +275,14 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+ 
+ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
+ {
+-  std::string valstr;
+-  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr);
++  std::string valstr, dcapfile;
++  dcapfile = CSpecialProtocol::TranslatePath("special://home/userdata/disp_cap");
++
++  if (SysfsUtils::GetString(dcapfile, valstr) < 0)
++  {
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0)
++      return false;
++  }
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
+ 
+   resolutions.clear();
+@@ -168,6 +291,18 @@ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resol
+   {
+     if(aml_mode_to_resolution(i->c_str(), &res))
+       resolutions.push_back(res);
++
++    switch ((int)res.fRefreshRate)
++    {
++      case 24:
++      case 30:
++      case 60:
++        res.fRefreshRate /= 1.001;
++        res.strMode       = StringUtils::Format("%dx%d @ %.2f%s - Full Screen", res.iScreenWidth, res.iScreenHeight, res.fRefreshRate,
++          res.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
++        resolutions.push_back(res);
++        break;
++    }
+   }
+   return resolutions.size() > 0;
+ 
+@@ -192,14 +327,19 @@ bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
+   return true;
+ }
+ 
+-bool CEGLNativeTypeAmlogic::SetDisplayResolution(const char *resolution)
++bool CEGLNativeTypeAmlogic::SetDisplayResolution(const RESOLUTION_INFO &res)
+ {
+-  std::string mode = resolution;
++  std::string mode = res.strId.c_str();
++
+   // switch display resolution
++  SysfsUtils::SetString("/sys/class/display/mode", "null");
++
++  int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
++  CLog::Log(LOGDEBUG, "%s%d", "Setting frac_rate_policy to ", fractional_rate);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
+ 
+-  RESOLUTION_INFO res;
+-  aml_mode_to_resolution(mode.c_str(), &res);
+   SetFramebufferResolution(res);
+ 
+   return true;
+@@ -226,6 +366,29 @@ void CEGLNativeTypeAmlogic::SetupVideoScaling(const char *mode)
+   SysfsUtils::SetInt("/sys/class/graphics/fb0/blank", 0);
+ }
+ 
++void CEGLNativeTypeAmlogic::DealWithScale(const RESOLUTION_INFO &res)
++{
++  if (res.iScreenWidth > res.iWidth && res.iScreenHeight > res.iHeight)
++    EnableFreeScale(res);
++  else
++    DisableFreeScale();
++}
++
++void CEGLNativeTypeAmlogic::EnableFreeScale(const RESOLUTION_INFO &res)
++{
++  char fsaxis_str[256] = {0};
++  sprintf(fsaxis_str, "0 0 %d %d", res.iWidth-1, res.iHeight-1);
++  char waxis_str[256] = {0};
++  sprintf(waxis_str, "0 0 %d %d", res.iScreenWidth-1, res.iScreenHeight-1);
++
++  SysfsUtils::SetInt("/sys/class/graphics/fb0/free_scale", 0);
++  SysfsUtils::SetString("/sys/class/graphics/fb0/free_scale_axis", fsaxis_str);
++  SysfsUtils::SetString("/sys/class/graphics/fb0/window_axis", waxis_str);
++  SysfsUtils::SetInt("/sys/class/graphics/fb0/scale_width", res.iWidth);
++  SysfsUtils::SetInt("/sys/class/graphics/fb0/scale_height", res.iHeight);
++  SysfsUtils::SetInt("/sys/class/graphics/fb0/free_scale", 0x10001);
++}
++
+ void CEGLNativeTypeAmlogic::DisableFreeScale()
+ {
+   // turn off frame buffer freescale
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+index cfb33ca..0476f3f 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+@@ -22,6 +22,7 @@
+ 
+ #include <string>
+ #include <vector>
++#include <thread>
+ 
+ #include "EGLNativeType.h"
+ class CEGLNativeTypeAmlogic : public CEGLNativeType
+@@ -50,14 +51,23 @@ public:
+ 
+   virtual bool  ShowWindow(bool show);
+ 
++  bool m_monitorEvents;
++
++  std::string m_lastEdid;
++
+ protected:
+-  bool SetDisplayResolution(const char *resolution);
++  bool SetDisplayResolution(const RESOLUTION_INFO &res);
+   void SetupVideoScaling(const char *mode);
++  void DealWithScale(const RESOLUTION_INFO &res);
++  void EnableFreeScale(const RESOLUTION_INFO &res);
+   void DisableFreeScale();
+ 
+ private:
+   void SetFramebufferResolution(const RESOLUTION_INFO &res) const;
+   void SetFramebufferResolution(int width, int height) const;
++  void StartMonitorHWEvent();
++  void StopMonitorHWEvent();
++  std::thread m_monitorThread;
+ 
+   std::string m_framebuffer_name;
+ };
+diff --git a/xbmc/windowing/egl/EGLWrapper.cpp b/xbmc/windowing/egl/EGLWrapper.cpp
+index 30f5757..1383d39 100644
+--- a/xbmc/windowing/egl/EGLWrapper.cpp
++++ b/xbmc/windowing/egl/EGLWrapper.cpp
+@@ -384,8 +384,8 @@ bool CEGLWrapper::SetVSync(EGLDisplay display, bool enable)
+   EGLBoolean status;
+   // depending how buffers are setup, eglSwapInterval
+   // might fail so let caller decide if this is an error.
+-  status = eglSwapInterval(display, enable ? 1 : 0);
+-  CheckError();
++  status = EGL_TRUE; // eglSwapInterval(display, enable ? 1 : 0);
++  // CheckError();
+   return status;
+ }
+ 
+diff --git a/xbmc/windowing/egl/WinSystemEGL.cpp b/xbmc/windowing/egl/WinSystemEGL.cpp
+index 852f337..147dad2 100644
+--- a/xbmc/windowing/egl/WinSystemEGL.cpp
++++ b/xbmc/windowing/egl/WinSystemEGL.cpp
+@@ -36,6 +36,7 @@
+ #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecIMX.h"
+ #endif
+ #include "utils/log.h"
++#include "utils/StringUtils.h"
+ #include "EGLWrapper.h"
+ #include "EGLQuirks.h"
+ #include <vector>
+@@ -358,11 +359,32 @@ bool CWinSystemEGL::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool bl
+   return true;
+ }
+ 
++static std::string ModeFlagsToString(unsigned int flags, bool identifier)
++{
++  std::string res;
++  if(flags & D3DPRESENTFLAG_INTERLACED)
++    res += "i";
++  else
++    res += "p";
++
++  if(!identifier)
++    res += " ";
++
++  if(flags & D3DPRESENTFLAG_MODE3DSBS)
++    res += "sbs";
++  else if(flags & D3DPRESENTFLAG_MODE3DTB)
++    res += "tab";
++  else if(identifier)
++    res += "std";
++  return res;
++}
++
+ void CWinSystemEGL::UpdateResolutions()
+ {
+   CWinSystemBase::UpdateResolutions();
+ 
+   RESOLUTION_INFO resDesktop, curDisplay;
++  std::string curDesktopSetting;
+   std::vector<RESOLUTION_INFO> resolutions;
+ 
+   if (!m_egl->ProbeResolutions(resolutions) || resolutions.empty())
+@@ -380,16 +402,26 @@ void CWinSystemEGL::UpdateResolutions()
+       return;
+     }
+   }
+-
++  curDesktopSetting = CSettings::GetInstance().GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
+   /* ProbeResolutions includes already all resolutions.
+    * Only get desktop resolution so we can replace xbmc's desktop res
+    */
+   if (m_egl->GetNativeResolution(&curDisplay))
+     resDesktop = curDisplay;
+ 
++  if (curDesktopSetting == "DESKTOP")
++    curDesktopSetting = StringUtils::Format("%1i%05i%05i%09.5f%s", resDesktop.iScreen,
++          resDesktop.iScreenWidth, resDesktop.iScreenHeight, resDesktop.fRefreshRate,
++          ModeFlagsToString(resDesktop.dwFlags, true).c_str());
++
++  CLog::Log(LOGNOTICE, "Desktop setting is %s", curDesktopSetting.c_str());
+ 
+   RESOLUTION ResDesktop = RES_INVALID;
+   RESOLUTION res_index  = RES_DESKTOP;
++//  RESOLUTION ResCurrent = RES_INVALID;
++  bool resExactMatch = false;
++  std::string ResString;
++  std::string ResFallback = "00480024.00000i000";
+ 
+   for (size_t i = 0; i < resolutions.size(); i++)
+   {
+@@ -413,14 +445,35 @@ void CWinSystemEGL::UpdateResolutions()
+       resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resolutions[i].fRefreshRate);
+ 
+-    if(resDesktop.iWidth == resolutions[i].iWidth &&
+-       resDesktop.iHeight == resolutions[i].iHeight &&
+-       resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
+-       resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
+-       (resDesktop.dwFlags & D3DPRESENTFLAG_MODEMASK) == (resolutions[i].dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+-       fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON)
++    ResString = StringUtils::Format("%1i%05i%05i%09.5f%s", resolutions[i].iScreen,
++          resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
++          ModeFlagsToString(resolutions[i].dwFlags, true).c_str());
++
++    if (curDesktopSetting == ResString){
++      ResDesktop = res_index;
++      resExactMatch = true;
++      CLog::Log(LOGNOTICE, "Desktop resolution found at 16 + %d", i);
++    }
++/*    if(resDesktop.iWidth == resolutions[i].iWidth &&
++        resDesktop.iHeight == resolutions[i].iHeight &&
++        resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
++        resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
++        (resDesktop.dwFlags & D3DPRESENTFLAG_MODEMASK) == (resolutions[i].dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON &&
++        !resExactMatch)
++    {
++      ResCurrent = res_index;
++      CLog::Log(LOGNOTICE, "Current resolution found at 16 + %d", i);
++    }*/
++//      CLog::Log(LOGNOTICE, "curDesk %s, ResString %s, ResFallback %s",
++//			 curDesktopSetting.substr(6,18).c_str(), ResString.substr(6,18).c_str(), ResFallback.c_str());
++    /* fall back to the highest resolution available but not more than current desktop */
++    if(curDesktopSetting.substr(6,18) >= ResString.substr(6,18) &&
++        ResString.substr(6,18) > ResFallback && ! resExactMatch)
+     {
+       ResDesktop = res_index;
++      ResFallback = ResString.substr(6,18);
++      CLog::Log(LOGNOTICE, "Fallback resolution at 16 + %d", i);
+     }
+ 
+     res_index = (RESOLUTION)((int)res_index + 1);
+@@ -429,8 +482,9 @@ void CWinSystemEGL::UpdateResolutions()
+   // swap desktop index for desktop res if available
+   if (ResDesktop != RES_INVALID)
+   {
++    resDesktop = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
+     CLog::Log(LOGNOTICE, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
+-      resDesktop.iWidth, resDesktop.iHeight,
++      resDesktop.iScreenWidth, resDesktop.iScreenHeight,
+       resDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resDesktop.fRefreshRate,
+       (int)ResDesktop, (int)RES_DESKTOP);
+-- 
+2.11.0
+
