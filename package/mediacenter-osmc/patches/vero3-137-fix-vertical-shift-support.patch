@@ -1,0 +1,25 @@
+From ceb632a1f25b76b5b3b290ce94f44a9e738b30e4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 12 Dec 2018 19:15:03 +0000
+Subject: [PATCH 3/3] AMLogic: support vertical shift
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index 4586e16..a3af979 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -151,6 +151,7 @@ bool CRendererAML::Supports(ERENDERFEATURE feature)
+       feature == RENDERFEATURE_NONLINSTRETCH ||
+       feature == RENDERFEATURE_STRETCH ||
+       feature == RENDERFEATURE_PIXEL_RATIO ||
++      feature == RENDERFEATURE_VERTICAL_SHIFT ||
+       feature == RENDERFEATURE_ROTATION)
+     return true;
+ 
+-- 
+2.7.4
+
