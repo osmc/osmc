@@ -1,0 +1,40 @@
+From 2ba1a899bb6240b74d966cccf506f120c1941b9c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 12 Dec 2018 18:44:26 +0000
+Subject: [PATCH 2/3] Ensure brightness / contrast takes effect immediately:
+ SetVideoRect is not called on every frame decode
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 4cae223..160f660 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1953,6 +1953,21 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+   // bandfix
+   SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+ 
++  // video contrast adjustment.
++  int contrast = CMediaSettings::GetInstance().GetCurrentVideoSettings().m_Contrast;
++  if (contrast != m_contrast)
++  {
++    SetVideoContrast(contrast);
++    m_contrast = contrast;
++  }
++  // video brightness adjustment.
++  int brightness = CMediaSettings::GetInstance().GetCurrentVideoSettings().m_Brightness;
++  if (brightness != m_brightness)
++  {
++    SetVideoBrightness(brightness);
++    m_brightness = brightness;
++  }
++
+   if (pData)
+   {
+     m_frameSizes.push_back(iSize);
+-- 
+2.7.4
+
