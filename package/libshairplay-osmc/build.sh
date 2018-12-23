@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://github.com/juhovh/shairplay/archive/ce80e005908f41d0e6fde1c4a21e9cb8ee54007b.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/juhovh/shairplay/archive/096b61ad14c90169f438e690d096e3fcf87e504e.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libshairplay-osmc"
