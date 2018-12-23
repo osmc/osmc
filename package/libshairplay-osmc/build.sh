@@ -28,6 +28,7 @@ then
 	handle_dep "libtool"
 	handle_dep "libltdl-dev"
 	handle_dep "automake"
+	handle_dep "libavahi-compat-libdnssd-dev"
 	echo "Package: ${1}-libshairplay-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libshairplay-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/shairplay*
 	./autogen.sh
