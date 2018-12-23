@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-pull_source "https://www.sqlite.org/2017/sqlite-autoconf-3210000.tar.gz" "$(pwd)/src"
+pull_source "https://www.sqlite.org/2017/sqlite-autoconf-3260000.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "libsqlite-osmc"
