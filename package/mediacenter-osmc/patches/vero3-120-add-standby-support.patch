@@ -1,18 +1,18 @@
-From bca025e4c6aaae4a8205c7b3767eaaa7b686c337 Mon Sep 17 00:00:00 2001
+From 59ba64e5fdcc2cf1f2f1c3498641029deb36ca3e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 43 +++++++++++++++++++++++++++++++++++
- xbmc/Application.h                    |  5 ++++
- xbmc/network/Network.cpp              |  5 ++++
- xbmc/powermanagement/PowerManager.cpp |  4 +++-
- 4 files changed, 56 insertions(+), 1 deletion(-)
+ xbmc/Application.cpp                  | 57 +++++++++++++++++++++++++++++++++++
+ xbmc/Application.h                    |  5 +++
+ xbmc/network/Network.cpp              |  5 +++
+ xbmc/powermanagement/PowerManager.cpp |  4 ++-
+ 4 files changed, 70 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6925404..a7f1ba2 100644
+index 368010d..634a53a 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -216,6 +216,7 @@
@@ -23,7 +23,7 @@ index 6925404..a7f1ba2 100644
  #endif
  
  #include "cores/FFmpeg.h"
-@@ -4026,6 +4027,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -4037,6 +4038,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -33,7 +33,7 @@ index 6925404..a7f1ba2 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4130,6 +4134,45 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -4141,6 +4145,59 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -44,8 +44,6 @@ index 6925404..a7f1ba2 100644
 +    if (g_application.m_pPlayer->IsPlayingVideo())
 +      g_application.StopPlaying();
 +  ToggleStandby();
-+  m_bScreenSave = true;
-+  m_screenSaver.reset();
 +  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
 +  g_windowManager.CloseDialogs(true);
 +}
@@ -72,7 +70,23 @@ index 6925404..a7f1ba2 100644
 +	hpdlock = "hpd_lock0";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- HPD locking will now be %s", hpdlock.c_str());
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", hpdlock);
++  if (m_bVeroStandby)
++	CApplicationMessenger::GetInstance().PostMsg(TMSG_CECACTIVATESOURCE); // wake cec
++
++  std::string strStandbyScript;
++  if (m_bVeroStandby)
++	strStandbyScript = CSpecialProtocol::TranslatePath("special://profile/wake.py");
++  else
++	strStandbyScript = CSpecialProtocol::TranslatePath("special://profile/standby.py");
++  CLog::Log(LOGNOTICE, "CApplication::ToggleStandby -- checking for existence of %s", strStandbyScript.c_str());
++
++  if (XFILE::CFile::Exists(strStandbyScript)) {
++    CLog::Log(LOGNOTICE, "CApplication::ToggleStandby -- script %s found", strStandbyScript.c_str());
++    CScriptInvocationManager::GetInstance().ExecuteAsync(strStandbyScript);
++  }
++
 +  m_bVeroStandby = ! m_bVeroStandby; //invert state
++  m_bScreenSave = m_bVeroStandby;
 +  return;
 +}
 +
