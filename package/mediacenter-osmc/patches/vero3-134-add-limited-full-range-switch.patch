@@ -1,38 +1,48 @@
-From 5617daf43051dec296991d6e38a63a4b067d9207 Mon Sep 17 00:00:00 2001
+From c5ef164422e40e8637db60b1ddbff07f89cca7b5 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Mon, 10 Dec 2018 08:46:01 +0000
 Subject: [PATCH] add range switch
 
 ---
- system/settings/settings.xml                |  3 ++-
+ system/settings/settings.xml                | 15 +++++++++++++++
  xbmc/settings/DisplaySettings.cpp           | 12 ++++++++++++
- xbmc/settings/Settings.cpp                  |  1 +
+ xbmc/settings/Settings.cpp                  |  3 ++-
+ xbmc/settings/Settings.h                    |  1 +
  xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 10 ++++++++++
- 4 files changed, 25 insertions(+), 1 deletion(-)
+ 5 files changed, 40 insertions(+), 1 deletion(-)
  mode change 100644 => 100755 system/settings/settings.xml
  mode change 100644 => 100755 xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
 old mode 100644
 new mode 100755
-index e2379f9..b1a9e58
+index e2379f9..d63b821
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2098,10 +2098,11 @@
-             <or>
-               <condition>HAS_GL</condition>
-               <condition>HAS_DX</condition>
-+              <condition>true</condition>
-             </or>
-           </requirement>
-           <level>3</level>
--          <default>false</default>
-+          <default>true</default>
-           <updates>
-             <update type="rename">videoplayer.vdpaustudiolevel</update>
+@@ -2107,6 +2107,21 @@
            </updates>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoscreen.limitedrangeaml" type="boolean" label="36042" help="36359">
++          <requirement>
++            <or>
++              <condition>HAS_GL</condition>
++              <condition>HAS_DX</condition>
++              <condition>true</condition>
++            </or>
++          </requirement>
++          <level>3</level>
++          <default>true</default>
++          <updates>
++            <update type="rename">videoplayer.vdpaustudiolevel</update>
++          </updates>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
+           <requirement>HAS_GL</requirement>
+           <level>3</level>
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
-index e3592fa..8c7cbf5 100644
+index e3592fa..fe17f54 100644
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -42,6 +42,7 @@
@@ -47,11 +57,11 @@ index e3592fa..8c7cbf5 100644
  
      return true;
    }
-+  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE)
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)
 +  {
 +    int range_control;
 +    SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+    if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE))
++    if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML))
 +      range_control &= 1;
 +    else
 +      range_control |= 2;
@@ -62,21 +72,42 @@ index e3592fa..8c7cbf5 100644
    else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
    {
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 72098b5..ab585dc 100644
+index 72098b5..a9395a9 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
+@@ -351,7 +351,7 @@ const std::string CSettings::SETTING_VIDEOSCREEN_3DLUT = "videoscreen.cms3dlut";
+ const std::string CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE = "videoscreen.displayprofile";
+ const std::string CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
+ const std::string CSettings::SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
+-const std::string CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE = "videoscreen.limitedrange";
++const std::string CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML = "videoscreen.limitedrangeaml";
+ const std::string CSettings::SETTING_VIDEOSCREEN_FRAMEPACKING = "videoscreen.framepacking";
+ const std::string CSettings::SETTING_AUDIOOUTPUT_AUDIODEVICE = "audiooutput.audiodevice";
+ const std::string CSettings::SETTING_AUDIOOUTPUT_CHANNELS = "audiooutput.channels";
 @@ -1061,6 +1061,7 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
-+  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index 439b2b4..d461348 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -308,6 +308,7 @@ public:
+   static const std::string SETTING_VIDEOSCREEN_GUICALIBRATION;
+   static const std::string SETTING_VIDEOSCREEN_TESTPATTERN;
+   static const std::string SETTING_VIDEOSCREEN_LIMITEDRANGE;
++  static const std::string SETTING_VIDEOSCREEN_LIMITEDRANGEAML;
+   static const std::string SETTING_VIDEOSCREEN_FRAMEPACKING;
+   static const std::string SETTING_AUDIOOUTPUT_AUDIODEVICE;
+   static const std::string SETTING_AUDIOOUTPUT_CHANNELS;
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 old mode 100644
 new mode 100755
-index 4a8da2c..2628ae8
+index 4a8da2c..3cf9974
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 @@ -85,6 +85,16 @@ void CEGLNativeTypeAmlogic::Initialize()
@@ -85,7 +116,7 @@ index 4a8da2c..2628ae8
  
 +  int range_control;
 +  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+  if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE))
++  if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML))
 +    range_control &= 1;
 +  else
 +    range_control |= 2;
@@ -97,5 +128,5 @@ index 4a8da2c..2628ae8
      CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
      SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
 -- 
-2.11.0
+2.7.4
 
