@@ -1,0 +1,101 @@
+From 0ad6ef2dabbc7dea6da660654318d501a9e0256e Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sun, 6 Jan 2019 12:45:59 +0000
+Subject: [PATCH] fix422
+
+---
+ addons/resource.language.en_gb/resources/strings.po |  2 +-
+ xbmc/settings/DisplaySettings.cpp                   | 20 ++++++++++++++++++++
+ xbmc/settings/Settings.cpp                          |  1 +
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp         | 18 ++++++++++++++++--
+ 4 files changed, 38 insertions(+), 3 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 91ffdc4..54ee42e 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -19867,6 +19867,6 @@ msgstr ""
+ 
+ #: Description of display setting with label # 13136
+ msgctxt "#39014"
+-msgid "Some displays (usually LG) work better with 4:2:2 colour subsampling, especially at 4K resolutions. Requires reboot."
++msgid "Some displays (usually LG) work better with 4:2:2 colour subsampling, especially at 4K resolutions."
+ msgstr ""
+ 
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index fe17f54..f957c31 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -338,6 +338,26 @@ bool CDisplaySettings::OnSettingChanging(const CSetting *setting)
+     CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting quantization range to %s", range_control & 2 ? "full" : "limited");
+     SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
+   }
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_FORCE422){
++    std::string attr = "";
++    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++
++    if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
++      if (attr.find("444") != std::string::npos ||
++          attr.find("422") != std::string::npos ||
++          attr.find("420") != std::string::npos)
++        attr.replace(attr.find("4"),3,"422").append("now");
++      else
++        attr.append("422now");
++    }
++    else {
++      if (attr.find("422") != std::string::npos)
++        attr.erase(attr.find("4"),3);
++      attr.append("now");
++    }
++    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting 422 output, attr = %s", attr.c_str());
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++  }
+ #if defined(HAS_GLX)
+   else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
+   {
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 8c3a9f9..2792710 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -1063,6 +1063,7 @@ void CSettings::InitializeISettingCallbacks()
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_FORCE422);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 0e27e86..9797260 100755
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -100,10 +100,24 @@ void CEGLNativeTypeAmlogic::Initialize()
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
+  }
+ 
++ std::string attr = "";
++ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++
+  if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
+-    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic:: Initialize -- forcing 422 output");
+-    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "422now");
++   if (attr.find("444") != std::string::npos ||
++       attr.find("422") != std::string::npos ||
++       attr.find("420") != std::string::npos)
++     attr.replace(attr.find("4"),3,"422").append("now");
++   else
++     attr.append("422now");
++ }
++ else {
++   if (attr.find("422") != std::string::npos)
++     attr.erase(attr.find("4"),3);
++   attr.append("now");
+  }
++ CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = %s", attr.c_str());
++ SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
+ 
+  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+ 
+-- 
+2.11.0
+
