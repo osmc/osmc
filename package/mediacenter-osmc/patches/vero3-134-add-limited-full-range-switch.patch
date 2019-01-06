@@ -1,25 +1,26 @@
-From c5ef164422e40e8637db60b1ddbff07f89cca7b5 Mon Sep 17 00:00:00 2001
+From 04a7d53441490dd1761e5aaff71e60b56e7d6fd4 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
-Date: Mon, 10 Dec 2018 08:46:01 +0000
+Date: Sun, 6 Jan 2019 17:23:08 +0000
 Subject: [PATCH] add range switch
 
 ---
  system/settings/settings.xml                | 15 +++++++++++++++
- xbmc/settings/DisplaySettings.cpp           | 12 ++++++++++++
+ xbmc/settings/DisplaySettings.cpp           | 17 +++++++++++++++++
  xbmc/settings/Settings.cpp                  |  3 ++-
  xbmc/settings/Settings.h                    |  1 +
  xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 10 ++++++++++
- 5 files changed, 40 insertions(+), 1 deletion(-)
+ 5 files changed, 45 insertions(+), 1 deletion(-)
  mode change 100644 => 100755 system/settings/settings.xml
+ mode change 100644 => 100755 xbmc/settings/DisplaySettings.cpp
  mode change 100644 => 100755 xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
 old mode 100644
 new mode 100755
-index e2379f9..d63b821
+index 7e83815d..c2436b4e
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2107,6 +2107,21 @@
+@@ -2112,6 +2112,21 @@
            </updates>
            <control type="toggle" />
          </setting>
@@ -42,7 +43,9 @@ index e2379f9..d63b821
            <requirement>HAS_GL</requirement>
            <level>3</level>
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
-index e3592fa..fe17f54 100644
+old mode 100644
+new mode 100755
+index e3592faf..b901a3d9
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -42,6 +42,7 @@
@@ -53,13 +56,15 @@ index e3592fa..fe17f54 100644
  #include "utils/Variant.h"
  #include "utils/XMLUtils.h"
  #include "windowing/WindowingFactory.h"
-@@ -326,6 +327,17 @@ bool CDisplaySettings::OnSettingChanging(const CSetting *setting)
+@@ -326,6 +327,22 @@ bool CDisplaySettings::OnSettingChanging(const CSetting *setting)
  
      return true;
    }
 +  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)
 +  {
 +    int range_control;
++    std::string attr = "";
++
 +    SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
 +    if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML))
 +      range_control &= 1;
@@ -67,15 +72,18 @@ index e3592fa..fe17f54 100644
 +      range_control |= 2;
 +    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting quantization range to %s", range_control & 2 ? "full" : "limited");
 +    SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++    attr.append("now");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
 +  }
  #if defined(HAS_GLX)
    else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
    {
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 72098b5..a9395a9 100644
+index 01826a40..8c3a9f95 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -351,7 +351,7 @@ const std::string CSettings::SETTING_VIDEOSCREEN_3DLUT = "videoscreen.cms3dlut";
+@@ -352,7 +352,7 @@ const std::string CSettings::SETTING_VIDEOSCREEN_3DLUT = "videoscreen.cms3dlut";
  const std::string CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE = "videoscreen.displayprofile";
  const std::string CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
  const std::string CSettings::SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
@@ -84,7 +92,7 @@ index 72098b5..a9395a9 100644
  const std::string CSettings::SETTING_VIDEOSCREEN_FRAMEPACKING = "videoscreen.framepacking";
  const std::string CSettings::SETTING_AUDIOOUTPUT_AUDIODEVICE = "audiooutput.audiodevice";
  const std::string CSettings::SETTING_AUDIOOUTPUT_CHANNELS = "audiooutput.channels";
-@@ -1061,6 +1061,7 @@ void CSettings::InitializeISettingCallbacks()
+@@ -1062,6 +1062,7 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
@@ -93,10 +101,10 @@ index 72098b5..a9395a9 100644
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 439b2b4..d461348 100644
+index 3b46960d..5be3f9bc 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -308,6 +308,7 @@ public:
+@@ -309,6 +309,7 @@ public:
    static const std::string SETTING_VIDEOSCREEN_GUICALIBRATION;
    static const std::string SETTING_VIDEOSCREEN_TESTPATTERN;
    static const std::string SETTING_VIDEOSCREEN_LIMITEDRANGE;
@@ -107,7 +115,7 @@ index 439b2b4..d461348 100644
 diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 old mode 100644
 new mode 100755
-index 4a8da2c..3cf9974
+index 4194a52d..0e27e865
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 @@ -85,6 +85,16 @@ void CEGLNativeTypeAmlogic::Initialize()
@@ -128,5 +136,5 @@ index 4a8da2c..3cf9974
      CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
      SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
 -- 
-2.7.4
+2.11.0
 
