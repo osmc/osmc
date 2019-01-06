@@ -160,7 +160,7 @@ SETS =  {
                                           ],
                                 },
 
-        'fstab'             : { 'order' : 7,
+        'fstabmounts'       : { 'order' : 7,
                                 'active': False,
                                 'help'  : 'fstab file',
                                 'dest'  : 'fstab',
@@ -173,6 +173,12 @@ SETS =  {
                                                 'ltyp': 'file_log',
                                                 'actn': '/etc/fstab',
                                             },
+                                            {
+                                                'name': 'mounts',
+                                                'key' : 'eWl77s9A',
+                                                'ltyp': 'file_log',
+                                                'actn': '/proc/mounts',
+                                            },                                            
                                           ],
                                 },
 
