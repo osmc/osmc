@@ -1,5 +1,5 @@
 user=$(whoami)
-if [ "$user" != "osmc" ] && [ -z "$LC_ALL" ] && [ -z "$LANG" ]; then export LANG=C && export LC_ALL=C && return 0; fi
+if [ "$user" != "osmc" ] && [ -z "$LC_ALL" ] && [ -z "$LANG" ]; then export LANG=C LC_ALL=C && return 0; fi
 
 if [ ! -z $LANG ]
 then
@@ -9,6 +9,5 @@ then
         sudo /usr/sbin/locale-gen ${LANG}
     fi
 else
-    export LANG=C
-    export LC_ALL=C
+    export LANG=C LC_ALL=C
 fi
