@@ -1,6 +1,0 @@
-#!/bin/sh
-if ischroot; then exit 0; fi
-
-if ! mountpoint /boot >/dev/null 2>&1; then echo "/boot is not mounted!" >&2; exit 1; fi
-
-exit 0
