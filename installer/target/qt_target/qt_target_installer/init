@@ -70,6 +70,19 @@ then
 	esac
 	done
 
+	preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+	if echo $hdmimode | busybox grep -q force
+	then
+    		hdmimode=$(echo $hdmimode | /bin/busybox sed 's/force//g')
+    		echo "$hdmimode" > /sys/class/display/mode
+	else
+	if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
+	then
+  		hdmimode="$preferred"
+  		echo "$hdmimode" > /sys/class/display/mode
+	fi
+fi
+
 	# Configure framebuffer X and Y size
 
 	case $hdmimode in
