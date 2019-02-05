@@ -68,7 +68,7 @@ else
 fi
 if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
 date=$(date +%Y%m%d)
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
@@ -88,13 +88,6 @@ then
 	mv *.dtb /mnt
 	mv overlays /mnt
 fi
-if [ "$1" == "vero1" ]
-then
-	echo -e "Installing Vero files"
-	mv zImage /mnt
-	mv *.dtb /mnt
-	echo "mmcargs=setenv bootargs console=tty1 root=/dev/ram0 quiet init=/init loglevel=2 osmcdev=vero1 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24,bpp=32" > /mnt/uEnv.txt
-fi
 if [ "$1" == "vero2" ]
 then
 	echo -e "Installing Vero 2 files"
@@ -112,12 +105,6 @@ mv $(pwd)/../../../filesystem.tar.xz /mnt/
 umount /mnt
 sync
 kpartx -d OSMC_TGT_${1}_${date}.img
-if [ "$1" == "vero1" ]
-then
-	echo -e "Flashing bootloader"
-	dd conv=notrunc if=SPL of=OSMC_TGT_${1}_${date}.img bs=1K seek=1
-	dd conv=notrunc if=u-boot.img of=OSMC_TGT_${1}_${date}.img bs=1K seek=42
-fi
 echo -e "Compressing image"
 gzip OSMC_TGT_${1}_${date}.img
 md5sum OSMC_TGT_${1}_${date}.img.gz > OSMC_TGT_${1}_${date}.md5
