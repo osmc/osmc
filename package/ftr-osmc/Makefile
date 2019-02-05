@@ -1,17 +1,11 @@
 all:
-        @echo "Specify a target:\nmake rbp1\nmake rbp2\nmake atv\nmake vero1\nmake vero2\nmake vero3"
+        @echo "Specify a target:\nmake rbp1\nmake rbp2\nmake vero2\nmake vero3"
 
 rbp1:
 	sudo bash build.sh "rbp1"
 
 rbp2:
 	sudo bash build.sh "rbp2"
-
-atv:
-	sudo setarch i686 bash build.sh "atv"
-
-vero1:
-	sudo bash build.sh "vero1"
 
 vero2:
 	sudo bash build.sh "vero2"
