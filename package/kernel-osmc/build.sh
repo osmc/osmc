@@ -12,12 +12,10 @@ INITRAMFS_NOBUILD=4
 . ../common.sh
 test $1 == rbp1 && VERSION="4.14.78" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="4.14.78" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero && VERSION="4.4.0" && REV="18" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
-test $1 == atv && VERSION="4.2.3" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_NOBUILD)) && IMG_TYPE="zImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero364 && VERSION="3.14.29" && REV="138" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
-if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "atv" ] || [ $1 == "pc" ]
+if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 	MAJOR=$(echo ${VERSION:0:1})
@@ -29,7 +27,6 @@ then
 	fi
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
-if [ $1 == "vero" ]; then SOURCE_LINUX="https://github.com/osmc/vero-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
@@ -129,9 +126,7 @@ then
 	# Make modules directory
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
-	if [ "$1" == "vero" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc; fi
 	if [ "$1" == "vero2" ]; then mkdir -p ../../files-image/boot; fi
-	if [ "$1" == "atv" ]; then mkdir -p ../../files-image/boot; fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		$BUILD dtbs
@@ -174,7 +169,7 @@ then
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
 	export ARCH
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 		then
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
@@ -185,7 +180,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
 		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero364" ]
 		then
 		# Build RTL8192CU module
 		pushd drivers/net/wireless/rtl8192cu
@@ -196,7 +191,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 		then
 		# Build RTL8192DU model
 		pushd drivers/net/wireless/rtl8192du
@@ -207,7 +202,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192du/8192du.ko
 		cp drivers/net/wireless/rtl8192du/8192du.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 		then
 		# Build RTL8192EU model
 		pushd drivers/net/wireless/rtl8192eu
@@ -218,7 +213,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192eu/8192eu.ko
 		cp drivers/net/wireless/rtl8192eu/8192eu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "atv" ] || [ "$1" == "vero" ] || [ "$1" == "vero2" ]
+		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
 		then
                 # Build MT7610U model
                 pushd drivers/net/wireless/mt7610u
@@ -229,28 +224,6 @@ then
 		strip --strip-unneeded drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko
                 cp drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
                 fi
-		if [ "$1" == "atv" ]
-		then
-		# Build CrystalHD
-		pushd drivers/staging/chd
-		$BUILD
-		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
-		popd
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/chd/
-		strip --strip-unneeded drivers/staging/chd/crystalhd.ko
-		cp drivers/staging/chd/crystalhd.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
-		fi
-		if [ "$1" == "atv" ]
-		then
-		# Build NVIDIA module
-		pushd drivers/staging/nv-osmc
-		$BUILD SYSSRC=$(pwd)/../../../
-		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
-		popd
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging/nv-osmc
-		strip --strip-unneeded drivers/staging/nv-osmc/nvidia.ko
-		cp drivers/staging/nv-osmc/nvidia.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/staging
-		fi
         # Build V4L2 drivers for Vero 4K
         if [ "$1" == "vero364" ]
         then
