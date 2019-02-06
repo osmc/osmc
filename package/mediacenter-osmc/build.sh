@@ -365,7 +365,6 @@ then
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
-	test "$1" == vero && cp patches/${1}-hdmi-trace ${out}/usr/bin/hdmi-trace && chmod +x ${out}/usr/bin/hdmi-trace
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-debug/DEBIAN/control"
 	dpkg_build files/ ${1}-mediacenter-osmc.deb
