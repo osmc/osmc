@@ -6,11 +6,11 @@
 . ../common.sh
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "pc" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/a9a7a20071bfd759e72e7053cee92e6f5cfb5e48.tar.gz" "$(pwd)/src"
-API_VERSION="17"
+pull_source "https://github.com/xbmc/xbmc/archive/d81c34c4651a4dfbc9ab0e893fec40f92b5e31e4.tar.gz" "$(pwd)/src"
+API_VERSION="18"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
-API_VERSION="18"
+API_VERSION="19"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
