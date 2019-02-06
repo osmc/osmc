@@ -333,9 +333,8 @@ then
         # Languages
         mkdir languages/
         pushd languages
-        if [ "$API_VERSION" = "16" ]; then api_name="jarvis"; fi
-        if [ "$API_VERSION" = "17" ]; then api_name="krypton"; fi
-	if [ "$API_VERSION" = "18" ]; then api_name="tbc"; fi
+        if [ "$API_VERSION" = "18" ]; then api_name="leia"; fi
+	if [ "$API_VERSION" = "19" ]; then api_name="tbc"; fi
         base_url="http://mirror.us.leaseweb.net/xbmc/addons/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
         languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
