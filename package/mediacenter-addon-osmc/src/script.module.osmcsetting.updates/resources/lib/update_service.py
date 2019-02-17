@@ -616,18 +616,19 @@ class Main(object):
 			self.s['backup_keymaps']          = True if 	__setting__('backup_keymaps')			== 'true' else False
 			self.s['backup_library']          = True if 	__setting__('backup_library')			== 'true' else False
 			self.s['backup_playlists']        = True if 	__setting__('backup_playlists')			== 'true' else False
+			self.s['backup_profilesF']        = True if 	__setting__('backup_profilesF')			== 'true' else False
 			self.s['backup_Thumbnails']       = True if 	__setting__('backup_Thumbnails')		== 'true' else False
 			self.s['backup_favourites']       = True if 	__setting__('backup_favourites')		== 'true' else False
 			self.s['backup_keyboard']         = True if 	__setting__('backup_keyboard')			== 'true' else False
 			self.s['backup_remote']           = True if 	__setting__('backup_remote')			== 'true' else False
-			self.s['backup_LCD']              = True if 	__setting__('backup_LCD')				== 'true' else False
+			self.s['backup_LCD']              = True if 	__setting__('backup_LCD')			== 'true' else False
 			self.s['backup_profiles']         = True if 	__setting__('backup_profiles')			== 'true' else False
 			self.s['backup_RssFeeds']         = True if 	__setting__('backup_RssFeeds')			== 'true' else False
 			self.s['backup_sources']          = True if 	__setting__('backup_sources')			== 'true' else False
 			self.s['backup_upnpserver']       = True if 	__setting__('backup_upnpserver')		== 'true' else False
 			self.s['backup_peripheral_data']  = True if 	__setting__('backup_peripheral_data')	== 'true' else False
 			self.s['backup_guisettings']      = True if 	__setting__('backup_guisettings')		== 'true' else False
-			self.s['backup_fstab']     		  = True if 	__setting__('backup_fstab')				== 'true' else False
+			self.s['backup_fstab']     	  = True if 	__setting__('backup_fstab')				== 'true' else False
 			self.s['backup_advancedsettings'] = True if 	__setting__('backup_advancedsettings')	== 'true' else False
 
 
@@ -672,6 +673,7 @@ class Main(object):
 			tmp_s['backup_keymaps']          = True if 		__setting__('backup_keymaps')			== 'true' else False
 			tmp_s['backup_library']          = True if 		__setting__('backup_library')			== 'true' else False
 			tmp_s['backup_playlists']        = True if 		__setting__('backup_playlists')			== 'true' else False
+			tmp_s['backup_profilesF']        = True if 		__setting__('backup_profilesF')		        == 'true' else False
 			tmp_s['backup_Thumbnails']       = True if 		__setting__('backup_Thumbnails')		== 'true' else False
 			tmp_s['backup_favourites']       = True if 		__setting__('backup_favourites')		== 'true' else False
 			tmp_s['backup_keyboard']         = True if 		__setting__('backup_keyboard')			== 'true' else False
