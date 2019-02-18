@@ -5,24 +5,35 @@ Subject: [PATCH] AMLCodec: Fix missing FPS hints (thx afl1)
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 ++++
- 1 file changed, 4 insertions(+)
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 index f67f171..3427105 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -1459,6 +1459,10 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
-     // then ffmpeg avg_frame_rate next
-     am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
-   }
-+  else {
-+    am_private->video_rate = 0.5 + (float)UNIT_FREQ * 1001 / 30000;
-+    CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder we have no fps hints so we will create a fallback");
+@@ -1553,8 +1553,19 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   // handle video rate
+   if (hints.fpsrate > 0 && hints.fpsscale != 0)
+   {
+-    // then ffmpeg avg_frame_rate next
+-    am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
++    // ensure the hints yield a sensible refresh rate
++    if (hints.fpsrate / hints.fpsscale <= 120)
++    {
++      // then ffmpeg avg_frame_rate next
++      am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
++    }
 +  }
++
++  //if we had invalid fps hints then fallback to current refresh rate
++  if (!am_private->video_rate) {
++    static float target_fps = CDisplaySettings::GetInstance().GetCurrentResolutionInfo().fRefreshRate;
++    CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder we have invalid fps hints so fallback to monitor refresh rate: %f fps", target_fps);
++    am_private->video_rate = 0.5 + (float)UNIT_FREQ * 1 / target_fps;
+   }
  
    // check for 1920x1080, interlaced, 25 fps
-   // incorrectly reported as 50 fps (yes, video_rate == 1920)
 -- 
 2.7.4
 
