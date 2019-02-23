@@ -163,7 +163,7 @@ SETS =  {
         'fstabmounts'       : { 'order' : 7,
                                 'active': False,
                                 'help'  : 'fstab file',
-                                'dest'  : 'fstab',
+                                'dest'  : 'fstabmounts',
                                 'action': 'store_true',
                                 'flags' : ['-f','--fstab'],
                                 'logs'  : [
