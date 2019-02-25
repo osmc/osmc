@@ -40,6 +40,7 @@ then
 	handle_dep "gdc"
 	handle_dep "gettext"
 	handle_dep "gperf"
+	handle_dep "liblirc-dev"
 	handle_dep "libasound2-dev"
 	handle_dep "libbz2-dev"
 	handle_dep "libcap-dev"
@@ -49,6 +50,8 @@ then
 	handle_dep "libfontconfig1-dev"
 	handle_dep "libfreetype6-dev"
 	handle_dep "libfribidi-dev"
+	handle_dep "libfstrcmp-dev"
+	handle_dep "libinput-dev"
 	handle_dep "libgif-dev"
 	handle_dep "libiso9660-dev"
 	handle_dep "libjpeg62-turbo-dev"
@@ -73,6 +76,7 @@ then
 	handle_dep "libxslt1-dev"
 	handle_dep "libxt-dev"
 	handle_dep "libyajl-dev"
+        handle_dep "libxkbcommon-dev"
 	handle_dep "nasm"
 	handle_dep "pmount"
 	handle_dep "python-dev"
@@ -91,6 +95,8 @@ then
 	handle_dep "uuid-dev"
 	handle_dep "libcrossguid-dev"
 	handle_dep "cmake"
+	handle_dep "rapidjson-dev"
+        handle_dep "libgcrypt11-dev"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
@@ -179,34 +185,35 @@ then
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then install_patch "../../patches" "arm"; fi
 	test "$1" == vero2 && install_patch "../../patches" "vero2"
 	test "$1" == vero3 && install_patch "../../patches" "vero3"
-	./bootstrap
-	# PC configuration
-	test "$1" == pc && \
-	COMPFLAGS="-O3 -fomit-frame-pointer -Wl,-rpath=/usr/osmc/lib -L/usr/osmc/lib " && \
-	export CFLAGS+=${COMPFLAGS} && \
-	export CXXFLAGS+=${COMPFLAGS} && \
-	export CPPFLAGS+=${COMPFLAGS} && \
-	export LDFLAGS="" && \
-	./configure \
-		--prefix=/usr \
-		--enable-vaapi \
-		--disable-vdpau \
-		--disable-pulse \
-		--enable-x11 \
-		--disable-openmax \
-		--disable-optical-drive \
-		--enable-libbluray \
-		--disable-debug \
-		--disable-optimizations
+        if [ "$1" == "pc" ]; then
+        COMPFLAGS="-O3 -fomit-frame-pointer -Wl,-rpath=/usr/osmc/lib -L/usr/osmc/lib " && \
+        export CFLAGS+=${COMPFLAGS} && \
+        export CXXFLAGS+=${COMPFLAGS} && \
+        export CPPFLAGS+=${COMPFLAGS} && \
+        export LDFLAGS="" && \
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+            -DGBM_RENDER_SYSTEM=gl \
+            -DCMAKE_INCLUDE_PATH=/usr/osmc/include \
+            -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
+            -DENABLE_OPTICAL=1 \
+            -DENABLE_DVDCSS=1 \
+            -DCORE_SYSTEM_NAME=linux \
+            -DCORE_PLATFORM_NAME=gbm \
+            -DENABLE_APP_AUTONAME=OFF \
+            -DENABLE_INTERNAL_FMT=ON \
+            -DENABLE_INTERNAL_FLATBUFFERS=ON \
+         .
+	fi
 	# Raspberry Pi Configuration
 	if [ "$1" == "rbp1" ]
 	then
-		PIDEV="raspberry-pi";
-		COMPFLAGS="-O3 -fomit-frame-pointer "
+		CPU="arm1176jzf-s"
+		COMPFLAGS="-O3 -fomit-frame-pointer -mfpu=vfp "
 	fi
 	if [ "$1" == "rbp2" ]
 	then
-		PIDEV="raspberry-pi2"
+		CPU="cortex-a7"
 		COMPFLAGS="-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -O3 -mfpu=neon-vfpv4 -fomit-frame-pointer "
 	fi
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then
@@ -216,22 +223,24 @@ then
 	export CXXFLAGS+=${COMPFLAGS} && \
 	export CPPFLAGS+=${COMPFLAGS} && \
 	export LDFLAGS="-L/opt/vc/lib" && \
-	./configure \
-		--prefix=/usr \
-		--enable-gles \
-		--disable-x11 \
-		--disable-openmax \
-		--enable-optical-drive \
-		--enable-libbluray \
-		--disable-debug \
-		--disable-vaapi \
-		--disable-vdpau \
-		--disable-pulse \
-		--with-platform=$PIDEV \
-		--disable-optimizations \
-		--enable-libcec \
-		--enable-player=omxplayer \
-		--build=arm-linux
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+            -DCMAKE_PREFIX_PATH=/opt/vc \
+            -DCMAKE_INCLUDE_PATH=/usr/osmc/include \
+            -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
+            -DASS_INCLUDE_DIR=/usr/osmc/lib \
+            -DENABLE_OPENGLES=ON \
+            -DENABLE_OPENGL=OFF \
+            -DENABLE_OPTICAL=1 \
+            -DENABLE_DVDCSS=1 \
+            -DCORE_SYSTEM_NAME=linux \
+            -DCORE_PLATFORM_NAME=rbpi \
+            -DWITH_ARCH=arm \
+            -DWITH_CPU=${CPU} \
+            -DENABLE_APP_AUTONAME=OFF \
+            -DENABLE_INTERNAL_FMT=ON \
+            -DENABLE_INTERNAL_FLATBUFFERS=ON \
+        .
 	fi
         if [ "$1" == "vero2" ]; then
         LIBRARY_PATH+="/opt/vero2/lib" && \
@@ -240,26 +249,29 @@ then
         export CXXFLAGS+=${COMPFLAGS} && \
         export CPPFLAGS+=${COMPFLAGS} && \
         export LDFLAGS="-L/opt/vero2/lib" && \
-        ./configure \
-                --prefix=/usr \
-                --disable-x11 \
-                --disable-openmax \
-                --disable-vdpau \
-                --disable-vaapi \
-                --enable-gles \
-                --enable-codec=amcodec \
-		--enable-player=amplayer \
-		--enable-alsa \
-                --enable-libcec \
-                --disable-debug \
-                --disable-texturepacker \
-                --enable-optical-drive \
-                --enable-libbluray \
-                --disable-pulse \
-                --disable-optimizations \
-                --with-platform=vero2 \
-                --build=arm-linux
-        fi
+    	cmake -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+            -DCMAKE_PREFIX_PATH=/opt/vero2 \
+            -DCMAKE_INCLUDE_PATH=/opt/vero2/include \
+            -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
+            -DOPENGLES_gl_LIBRARY=/opt/vero2/lib \
+            -DENABLE_AML=ON \
+            -DASS_INCLUDE_DIR=/usr/osmc/lib \
+            -DAML_INCLUDE_DIR=/opt/vero2/include \
+            -DRapidJSON_INCLUDE_DIR=/opt/vero2/include \
+            -DENABLE_OPENGLES=ON \
+            -DENABLE_OPENGL=OFF \
+            -DENABLE_OPTICAL=1 \
+            -DENABLE_DVDCSS=1 \
+            -DWITH_ARCH=arm \
+            -DWITH_CPU="cortex-a5" \
+            -DCORE_PLATFORM_NAME=aml \
+            -DCORE_SYSTEM_NAME=linux \
+            -DENABLE_APP_AUTONAME=OFF \
+            -DENABLE_INTERNAL_FMT=ON \
+            -DENABLE_INTERNAL_FLATBUFFERS=ON \
+        .
+	fi
         if [ "$1" == "vero3" ]; then
         LIBRARY_PATH+="/opt/vero3/lib" && \
         COMPFLAGS="-I/opt/vero3/include -Wl,-rpath=/usr/osmc/lib -L/usr/osmc/lib " && \
@@ -267,31 +279,34 @@ then
         export CXXFLAGS+=${COMPFLAGS} && \
         export CPPFLAGS+=${COMPFLAGS} && \
         export LDFLAGS="-L/opt/vero3/lib" && \
-        ./configure \
-                --prefix=/usr \
-                --disable-x11 \
-                --disable-openmax \
-                --disable-vdpau \
-                --disable-vaapi \
-                --enable-gles \
-                --enable-codec=amcodec \
-                --enable-player=amplayer \
-                --enable-alsa \
-                --enable-libcec \
-                --disable-debug \
-                --disable-texturepacker \
-                --enable-optical-drive \
-                --enable-libbluray \
-                --disable-pulse \
-                --disable-optimizations \
-                --with-platform=vero3 \
-                --build=arm-linux
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+            -DCMAKE_PREFIX_PATH=/opt/vero3 \
+            -DCMAKE_INCLUDE_PATH=/opt/vero3/include \
+            -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
+            -DOPENGLES_gl_LIBRARY=/opt/vero3/lib \
+            -DENABLE_AML=ON \
+            -DASS_INCLUDE_DIR=/usr/osmc/lib \
+            -DAML_INCLUDE_DIR=/opt/vero3/include \
+            -DRapidJSON_INCLUDE_DIR=/opt/vero3/include \
+            -DENABLE_OPENGLES=ON \
+            -DENABLE_OPENGL=OFF \
+            -DENABLE_OPTICAL=1 \
+            -DENABLE_DVDCSS=1 \
+            -DWITH_ARCH=arm \
+            -DWITH_CPU="cortex-a53" \
+            -DCORE_PLATFORM_NAME=aml \
+            -DCORE_SYSTEM_NAME=linux \
+            -DENABLE_APP_AUTONAME=OFF \
+            -DENABLE_INTERNAL_FMT=ON \
+            -DENABLE_INTERNAL_FLATBUFFERS=ON \
+        .
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-	pushd project/cmake/addons/
+	pushd cmake/addons/
 	mkdir build
 	cd build
         ADDONS_ADSP="adsp.basic adsp.biquad.filters adsp.freesurround" # These are all broken
@@ -324,7 +339,7 @@ then
            ADDONS_TO_BUILD="${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
            PLATFORM=""
 	fi
-	cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" "$PLATFORM" ../
+        cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DBUILD_SHARED_LIBS=OFF -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" "$PLATFORM" ../
 	if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
 	cd ../
 	$BUILD kodiplatform_DIR=$(pwd) CMAKE_PREFIX_PATH=/usr/osmc -C build/
@@ -356,7 +371,7 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadbclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio13, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.0.2, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin"
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadbclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio13, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.0.2, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-8"
 	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, amd64-libnfs-osmc, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-intel, amd64-libass-osmc" >> files/DEBIAN/control
 	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, armv6l-libbluray-osmc, armv6l-libsqlite-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-libass-osmc" >> files/DEBIAN/control
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libass-osmc" >> files/DEBIAN/control
