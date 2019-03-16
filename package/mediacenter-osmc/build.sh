@@ -24,6 +24,9 @@ build_in_env "${1}" $(pwd) "mediacenter-osmc" "$BUILD_OPTS"
 build_return=$?
 if [ $build_return == 99 ]
 then
+	# Fix Kodi CMake issues where local dependencies are introduced in the toolchain
+	rm -rf /usr/local/include/* >/dev/null 2>&1
+	rm -rf /usr/local/lib/* >/dev/null 2>&1
 	echo -e "Building package Kodi"
 	out=$(pwd)/files
 	make clean
@@ -240,6 +243,12 @@ then
             -DENABLE_APP_AUTONAME=OFF \
             -DENABLE_INTERNAL_FMT=ON \
             -DENABLE_INTERNAL_FLATBUFFERS=ON \
+            -DENABLE_MDNS=OFF \
+            -DENABLE_BLUETOOTH=OFF \
+            -DENABLE_PULSEAUDIO=OFF \
+            -DENABLE_LCMS2=OFF \
+            -DENABLE_SNDIO=OFF \
+            -DENABLE_MARIADBCLIENT=OFF \
         .
 	fi
         if [ "$1" == "vero2" ]; then
@@ -259,6 +268,7 @@ then
             -DASS_INCLUDE_DIR=/usr/osmc/lib \
             -DAML_INCLUDE_DIR=/opt/vero2/include \
             -DRapidJSON_INCLUDE_DIR=/opt/vero2/include \
+            -DSHAIRPLAY_INCLUDE_DIR=/usr/osmc/include/shairplay/ \
             -DENABLE_OPENGLES=ON \
             -DENABLE_OPENGL=OFF \
             -DENABLE_OPTICAL=1 \
@@ -270,6 +280,12 @@ then
             -DENABLE_APP_AUTONAME=OFF \
             -DENABLE_INTERNAL_FMT=ON \
             -DENABLE_INTERNAL_FLATBUFFERS=ON \
+            -DENABLE_MDNS=OFF \
+            -DENABLE_BLUETOOTH=OFF \
+            -DENABLE_PULSEAUDIO=OFF \
+            -DENABLE_LCMS2=OFF \
+            -DENABLE_SNDIO=OFF \
+            -DENABLE_MARIADBCLIENT=OFF \
         .
 	fi
         if [ "$1" == "vero3" ]; then
@@ -289,6 +305,7 @@ then
             -DASS_INCLUDE_DIR=/usr/osmc/lib \
             -DAML_INCLUDE_DIR=/opt/vero3/include \
             -DRapidJSON_INCLUDE_DIR=/opt/vero3/include \
+            -DSHAIRPLAY_INCLUDE_DIR=/usr/osmc/include/shairplay/ \
             -DENABLE_OPENGLES=ON \
             -DENABLE_OPENGL=OFF \
             -DENABLE_OPTICAL=1 \
@@ -300,6 +317,12 @@ then
             -DENABLE_APP_AUTONAME=OFF \
             -DENABLE_INTERNAL_FMT=ON \
             -DENABLE_INTERNAL_FLATBUFFERS=ON \
+	    -DENABLE_MDNS=OFF \
+	    -DENABLE_BLUETOOTH=OFF \
+	    -DENABLE_PULSEAUDIO=OFF \
+	    -DENABLE_LCMS2=OFF \
+	    -DENABLE_SNDIO=OFF \
+	    -DENABLE_MARIADBCLIENT=OFF \
         .
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
