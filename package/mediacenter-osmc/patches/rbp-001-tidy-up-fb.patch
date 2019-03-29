@@ -1,4 +1,4 @@
-From f8d57c0b613066bde3c56317d0a91fbdb8e34ace Mon Sep 17 00:00:00 2001
+From c9f57f302f84bf7d987a7364c474f59575367457 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:01:21 +0100
 Subject: [PATCH] Tidy up Raspberry Pi framebuffer after Kodi EGL windowing
@@ -6,23 +6,23 @@ Subject: [PATCH] Tidy up Raspberry Pi framebuffer after Kodi EGL windowing
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp | 15 +++++++++++++++
+ xbmc/windowing/rpi/RPIUtils.cpp | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
-diff --git a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-index bbe501d..cbb3cfb 100644
---- a/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-+++ b/xbmc/windowing/egl/EGLNativeTypeRaspberryPI.cpp
-@@ -32,6 +32,7 @@
+diff --git a/xbmc/windowing/rpi/RPIUtils.cpp b/xbmc/windowing/rpi/RPIUtils.cpp
+index 116b3bf..0d7a889 100644
+--- a/xbmc/windowing/rpi/RPIUtils.cpp
++++ b/xbmc/windowing/rpi/RPIUtils.cpp
+@@ -21,6 +21,7 @@
  #include "guilib/StereoscopicsManager.h"
  #include "rendering/RenderSystem.h"
  #include <cassert>
 +#include <stdlib.h>
  #ifdef TARGET_POSIX
- #include "linux/XTimeUtils.h"
+ #include "platform/linux/XTimeUtils.h"
  #endif
-@@ -111,6 +112,20 @@ void CEGLNativeTypeRaspberryPI::Initialize()
- 
+@@ -52,6 +53,20 @@ CRPIUtils::CRPIUtils()
+ {
    m_DllBcmHost = new DllBcmHost;
    m_DllBcmHost->Load();
 +  CLog::Log(LOGDEBUG, "Unbind vtcon0 to save resources");
@@ -39,9 +39,9 @@ index bbe501d..cbb3cfb 100644
 + {
 +      CLog::Log(LOGDEBUG, "Could not open vtcon1 for writing. You probably ran this independent of the watchdog!");
 + }
- #endif
- }
  
+   m_dispman_element = DISPMANX_NO_HANDLE;
+   m_dispman_display = DISPMANX_NO_HANDLE;
 -- 
 2.7.4
 

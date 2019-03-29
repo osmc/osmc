@@ -1,34 +1,27 @@
-From 0f509ba3a88a421693d07ef14c6e82e7d9321ed2 Mon Sep 17 00:00:00 2001
+From 158bc3345d07436d984fef29ca1bd5594165e466 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 15 Sep 2015 05:38:51 +0100
 Subject: [PATCH 1/2] Ensure that Kodi is not built against any X libraries
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
----
- tools/depends/target/ffmpeg/autobuild.sh | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/tools/depends/target/ffmpeg/autobuild.sh b/tools/depends/target/ffmpeg/autobuild.sh
-index 196c347..7804609 100755
---- a/tools/depends/target/ffmpeg/autobuild.sh
-+++ b/tools/depends/target/ffmpeg/autobuild.sh
-@@ -138,8 +138,14 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
- 	--enable-gpl \
- 	--enable-runtime-cpudetect \
- 	--enable-postproc \
--	--enable-vaapi \
--	--enable-vdpau \
-+	--disable-vaapi \
-+	--disable-vdpau \
-+	--disable-libxcb \
-+	--disable-libxcb-shape \
-+	--disable-libxcb-shm \
-+	--disable-libxcb-xfixes \
-+	--disable-x11grab \
-+	--disable-xlib \
- 	--enable-bzlib \
- 	--enable-gnutls \
- 	--enable-muxer=spdif \
+---
+ tools/depends/target/ffmpeg/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/depends/target/ffmpeg/CMakeLists.txt b/tools/depends/target/ffmpeg/CMakeLists.txt
+index bf8a7f7..0ca5719 100644
+--- a/tools/depends/target/ffmpeg/CMakeLists.txt
++++ b/tools/depends/target/ffmpeg/CMakeLists.txt
+@@ -45,7 +45,7 @@ endif()
+ 
+ if(CORE_SYSTEM_NAME STREQUAL linux OR CORE_SYSTEM_NAME STREQUAL freebsd)
+   if(CORE_PLATFORM_NAME STREQUAL rbpi)
+-    list(APPEND ffmpeg_conf --cpu=${CPU} --disable-vaapi --disable-vdpau)
++    list(APPEND ffmpeg_conf --cpu=${CPU} --disable-vaapi --disable-vdpau --disable-libxcb --disable-libxcb-shape --disable-libxcb-shm --disable-libxcb-xfixes --disable-xlib)
+   else()
+     list(APPEND ffmpeg_conf --enable-pic)
+     if(ENABLE_VAAPI)
 -- 
-2.1.0
+2.7.4
 

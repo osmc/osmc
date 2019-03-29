@@ -1,0 +1,34 @@
+From 578ec35da030d7f2d34660a31b09d3df8da26f11 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 31 Dec 2017 17:08:42 +0000
+Subject: [PATCH] CWinSystemRpi: ensure that we register the ALSA sink as well
+ as PiSink. This is needed for external DACs
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windowing/rpi/WinSystemRpi.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/windowing/rpi/WinSystemRpi.cpp b/xbmc/windowing/rpi/WinSystemRpi.cpp
+index bdeb68c..db360c5 100644
+--- a/xbmc/windowing/rpi/WinSystemRpi.cpp
++++ b/xbmc/windowing/rpi/WinSystemRpi.cpp
+@@ -23,6 +23,7 @@
+ #include "utils/log.h"
+ #include "cores/AudioEngine/AESinkFactory.h"
+ #include "cores/AudioEngine/Sinks/AESinkPi.h"
++#include "cores/AudioEngine/Sinks/AESinkALSA.h"
+ #include "platform/linux/powermanagement/LinuxPowerSyscall.h"
+ 
+ #include <EGL/egl.h>
+@@ -45,6 +46,7 @@ CWinSystemRpi::CWinSystemRpi() :
+   AE::CAESinkFactory::ClearSinks();
+ 
+   CAESinkPi::Register();
++  CAESinkALSA::Register();
+   std::string envSink;
+   if (getenv("KODI_AE_SINK"))
+     envSink = getenv("KODI_AE_SINK");
+-- 
+2.7.4
+
