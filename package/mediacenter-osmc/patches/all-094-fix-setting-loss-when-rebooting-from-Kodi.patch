@@ -1,4 +1,4 @@
-From 9b4cc4a7c714fe4a02d521a1d1261aabf439c4a3 Mon Sep 17 00:00:00 2001
+From 6f5356910b66c2adecdd25fe07da19ced62b350f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 1 May 2017 19:18:35 +0100
 Subject: [PATCH] Don't save settings when exiting Kodi; this isn't necessary.
@@ -9,21 +9,21 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 19 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 75a6cb1..f658404 100644
+index 2564a94..5c0af96 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2943,25 +2943,6 @@ void CApplication::Stop(int exitCode)
-     if( m_bSystemScreenSaverEnable )
-       g_Windowing.EnableSystemScreenSaver(true);
+@@ -2588,25 +2588,6 @@ void CApplication::Stop(int exitCode)
+ 
+     g_alarmClock.StopThread();
  
 -    CLog::Log(LOGNOTICE, "Storing total System Uptime");
 -    g_sysinfo.SetTotalUptime(g_sysinfo.GetTotalUptime() + (int)(CTimeUtils::GetFrameTime() / 60000));
 -
 -    // Update the settings information (volume, uptime etc. need saving)
--    if (CFile::Exists(CProfilesManager::GetInstance().GetSettingsFile()))
+-    if (CFile::Exists(CServiceBroker::GetSettingsComponent()->GetProfileManager()->GetSettingsFile()))
 -    {
 -      CLog::Log(LOGNOTICE, "Saving settings");
--      CSettings::GetInstance().Save();
+-      CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
 -    }
 -    else
 -      CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
@@ -36,8 +36,8 @@ index 75a6cb1..f658404 100644
 -      g_SkinInfo->SaveSettings();
 -
      m_bStop = true;
-     m_AppFocused = false;
-     m_ExitCode = exitCode;
+     // Add this here to keep the same ordering behaviour for now
+     // Needs cleaning up
 -- 
 2.7.4
 

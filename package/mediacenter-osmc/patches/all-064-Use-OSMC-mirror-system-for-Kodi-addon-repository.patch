@@ -1,4 +1,4 @@
-From 1162dd63f5000424c60da40da940b42cc0dd1ccb Mon Sep 17 00:00:00 2001
+From 3fddcb3f97e177615dae3554421649ffaf10f38f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 25 Jun 2016 20:45:11 +0100
 Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
@@ -6,32 +6,35 @@ Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- addons/repository.xbmc.org/addon.xml | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ addons/repository.xbmc.org/addon.xml | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/addons/repository.xbmc.org/addon.xml b/addons/repository.xbmc.org/addon.xml
-index 73ef3ca..2ddd605 100644
+index c431c0f..4950d74 100644
 --- a/addons/repository.xbmc.org/addon.xml
 +++ b/addons/repository.xbmc.org/addon.xml
-@@ -1,16 +1,16 @@
+@@ -1,18 +1,18 @@
  <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
  <addon id="repository.xbmc.org"
  		name="Kodi Add-on repository"
--		version="2.5.10"
-+		version="9.9.9"
+-		version="3.1.5"
++               version="9.9.10"
  		provider-name="Team Kodi">
    <requires>
      <import addon="xbmc.addon" version="12.0.0"/>
    </requires>
  	<extension point="xbmc.addon.repository">
--		<info>http://mirrors.kodi.tv/addons/krypton/addons.xml.gz</info>
--		<checksum>http://mirrors.kodi.tv/addons/krypton/addons.xml.gz.md5</checksum>
--		<datadir>http://mirrors.kodi.tv/addons/krypton</datadir>
--		<hashes>true</hashes>
-+               <info>http://download.osmc.tv/kodi/addons/krypton/addons.xml.gz</info>
-+               <checksum>http://download.osmc.tv/kodi/addons/krypton/addons.xml.gz.md5</checksum>
-+               <datadir>http://download.osmc.tv/kodi/addons/krypton</datadir>
-+               <hashes>false</hashes>
+ 		<!-- Do not forget to bump add-on version when changing paths to force a repo refresh -->
+-		<info>http://mirrors.kodi.tv/addons/leia/addons.xml.gz</info>
+-		<checksum verify="sha256">http://mirrors.kodi.tv/addons/leia/addons.xml.gz?sha256</checksum>
+-		<datadir>https://mirrors.kodi.tv/addons/leia</datadir>
+-		<artdir>http://mirrors.kodi.tv/addons/leia</artdir>
+-		<hashes>sha256</hashes>
++               <info>http://download.osmc.tv/kodi/addons/leia/addons.xml.gz</info>
++               <checksum verify="sha256">http://download.osmc.tv/kodi/addons/leia/addons.xml.gz?sha256</checksum>
++               <datadir>http://download.osmc.tv/kodi/addons/leia</datadir>
++               <artdir>http://download.osmc.tv/kodi/addons/leia</artdir>
++	       <hashes>sha256</hashes>
  	</extension>
  	<extension point="xbmc.addon.metadata">
  		<summary lang="af_ZA">Installeer Byvoegsels vanaf Kodi.tv</summary>

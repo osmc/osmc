@@ -1,4 +1,4 @@
-From 636b75ab1a9ec6fb851a3beb3d707b0ccc93e589 Mon Sep 17 00:00:00 2001
+From 9b470aa23bef469c8ecb21460cc53715bc84776a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -11,53 +11,62 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp             |  1 +
- xbmc/GUIInfoManager.cpp          |  6 +++++-
- xbmc/network/NetworkServices.cpp | 17 +++++++++++++++++
- xbmc/settings/Settings.cpp       |  1 +
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ xbmc/Application.cpp                  |  1 +
+ xbmc/guilib/guiinfo/SystemGUIInfo.cpp |  9 +++++++--
+ xbmc/network/NetworkServices.cpp      | 17 +++++++++++++++++
+ 3 files changed, 25 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index af16cab..469a612 100644
+index 71ca854..2d25128 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -627,6 +627,7 @@ bool CApplication::Create()
+@@ -543,6 +543,7 @@ bool CApplication::Create(const CAppParamParser &params)
      return false;
-   }
-   CSettings::GetInstance().SetLoaded();
-+  CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
  
    CLog::Log(LOGINFO, "creating subdirectories");
-   CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(CProfilesManager::GetInstance().GetProfileUserDataFolder()).c_str());
-diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index d683351..17bb28b 100644
---- a/xbmc/GUIInfoManager.cpp
-+++ b/xbmc/GUIInfoManager.cpp
-@@ -6583,7 +6583,11 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
-     }
-     break;
-   case SYSTEM_FRIENDLY_NAME:
--    strLabel = CSysInfo::GetDeviceName();
++  CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
+   const std::shared_ptr<CProfileManager> profileManager = m_pSettingsComponent->GetProfileManager();
+   const std::shared_ptr<CSettings> settings = m_pSettingsComponent->GetSettings();
+   CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(profileManager->GetProfileUserDataFolder()).c_str());
+diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+index a27bda4..e76ed82 100644
+--- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
++++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+@@ -137,6 +137,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
+ 
+ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int contextWindow, const CGUIInfo &info, std::string *fallback) const
+ {
++  std::string strLabel;
+   switch (info.m_info)
+   {
+     ///////////////////////////////////////////////////////////////////////////////////////////////
+@@ -277,8 +278,12 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+       value = g_langInfo.GetTemperatureUnitString();
+       return true;
+     case SYSTEM_FRIENDLY_NAME:
+-      value = CSysInfo::GetDeviceName();
+-      return true;
 +    {
-+      std::string hostname("osmc");
-+      g_application.getNetwork().GetHostName(hostname);
-+      strLabel = hostname.c_str();
++       std::string hostname("osmc");
++       CServiceBroker::GetNetwork().GetHostName(hostname); 
++       strLabel = hostname.c_str();
++       return true;
 +    }
-     break;
-   case SYSTEM_STEREOSCOPIC_MODE:
+     case SYSTEM_STEREOSCOPIC_MODE:
      {
+       int iStereoMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE);
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index 393dabc..27c6074 100644
+index cbbac07..605bed8 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
-@@ -449,6 +449,23 @@ void CNetworkServices::OnSettingChanged(const CSetting *setting)
+@@ -448,6 +448,23 @@ void CNetworkServices::OnSettingChanged(std::shared_ptr<const CSetting> setting)
        CApplicationMessenger::GetInstance().PostMsg(TMSG_RESTARTAPP);
      }
    }
 +
 +  if (settingId == "services.devicename")
 +  {
-+     std::string newHostName = CSettings::GetInstance().GetString("services.devicename");
++     std::string newHostName = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString("services.devicename"); 
 +     FILE *fp;
 +     fp = fopen("/tmp/hostname", "w");
 +     if (fp)
@@ -73,19 +82,7 @@ index 393dabc..27c6074 100644
 +
  }
  
- bool CNetworkServices::OnSettingUpdate(CSetting* &setting, const char *oldSettingId, const TiXmlNode *oldSettingNode)
-diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index f76c152..18083f9 100644
---- a/xbmc/settings/Settings.cpp
-+++ b/xbmc/settings/Settings.cpp
-@@ -1160,6 +1160,7 @@ void CSettings::InitializeISettingCallbacks()
-   settingSet.insert(CSettings::SETTING_SERVICES_ESCONTINUOUSDELAY);
-   settingSet.insert(CSettings::SETTING_SMB_WINSSERVER);
-   settingSet.insert(CSettings::SETTING_SMB_WORKGROUP);
-+  settingSet.insert(CSettings::SETTING_SERVICES_DEVICENAME);
-   settingSet.insert(CSettings::SETTING_SMB_MAXPROTOCOL);
-   m_settingsManager->RegisterCallback(&CNetworkServices::GetInstance(), settingSet);
- 
+ bool CNetworkServices::OnSettingUpdate(std::shared_ptr<CSetting> setting, const char *oldSettingId, const TiXmlNode *oldSettingNode)
 -- 
 2.7.4
 

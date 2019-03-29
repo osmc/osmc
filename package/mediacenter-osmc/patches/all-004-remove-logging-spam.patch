@@ -1,0 +1,53 @@
+From 7779be18a141dc3269d09361e277aec40150f348 Mon Sep 17 00:00:00 2001
+From: Greg McCarthy <greg@gjmccarthy.co.uk>
+Date: Sun, 24 Feb 2019 09:14:31 +0000
+Subject: [PATCH] kodi: remove annoying, excessively repetitive addon logging
+
+---
+ xbmc/addons/AddonVersion.cpp | 2 +-
+ xbmc/addons/Repository.cpp   | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/addons/AddonVersion.cpp b/xbmc/addons/AddonVersion.cpp
+index 425fec8c1a..5360a1f6cd 100644
+--- a/xbmc/addons/AddonVersion.cpp
++++ b/xbmc/addons/AddonVersion.cpp
+@@ -41,7 +41,7 @@ namespace ADDON
+       mRevision = mUpstream.substr(pos+1);
+       if (mRevision.find_first_not_of(VALID_ADDON_VERSION_CHARACTERS) != std::string::npos)
+       {
+-        CLog::Log(LOGERROR, "AddonVersion: {} is not a valid revision number", mRevision);
++        CLog::Log(LOGDEBUG, "AddonVersion: {} is not a valid revision number", mRevision);
+         mRevision = "";
+       }
+       mUpstream.erase(pos);
+diff --git a/xbmc/addons/Repository.cpp b/xbmc/addons/Repository.cpp
+index 9c97aaac19..c61984a297 100644
+--- a/xbmc/addons/Repository.cpp
++++ b/xbmc/addons/Repository.cpp
+@@ -128,7 +128,7 @@ CRepository::DirInfo CRepository::ParseDirConfiguration(cp_cfg_element_t* config
+     dir.hashType = CDigest::TypeFromString(hashStr);
+     if (dir.hashType == CDigest::Type::MD5)
+     {
+-      CLog::Log(LOGWARNING, "Repository has MD5 hashes enabled - this hash function is broken and will only guard against unintentional data corruption");
++      CLog::Log(LOGDEBUG, "Repository has MD5 hashes enabled - this hash function is broken and will only guard against unintentional data corruption");
+     }
+   }
+ 
+@@ -170,11 +170,11 @@ CRepository::CRepository(CAddonInfo addonInfo, DirList dirs)
+     CURL datadir(dir.datadir);
+     if (datadir.IsProtocol("http"))
+     {
+-      CLog::Log(LOGWARNING, "Repository add-on {} uses plain HTTP for add-on downloads in path {} - this is insecure and will make your Kodi installation vulnerable to attacks if enabled!", ID(), datadir.GetRedacted());
++      CLog::Log(LOGDEBUG, "Repository add-on {} uses plain HTTP for add-on downloads in path {} - this is insecure and will make your Kodi installation vulnerable to attacks if enabled!", ID(), datadir.GetRedacted());
+     }
+     else if (datadir.IsProtocol("https") && datadir.HasProtocolOption("verifypeer") && datadir.GetProtocolOption("verifypeer") == "false")
+     {
+-      CLog::Log(LOGWARNING, "Repository add-on {} disabled peer verification for add-on downloads in path {} - this is insecure and will make your Kodi installation vulnerable to attacks if enabled!", ID(), datadir.GetRedacted());
++      CLog::Log(LOGDEBUG, "Repository add-on {} disabled peer verification for add-on downloads in path {} - this is insecure and will make your Kodi installation vulnerable to attacks if enabled!", ID(), datadir.GetRedacted());
+     }
+   }
+ }
+-- 
+2.16.4
+

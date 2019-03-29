@@ -22,7 +22,7 @@ index 953fc27..1c9b1c6 100644
 +      XBMC_TRACE;
 +      if (! skin)
 +      return;
-+      CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
++      CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
 +    }
 +
      String executeJSONRPC(const char* jsonrpccommand)

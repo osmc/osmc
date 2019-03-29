@@ -1,4 +1,4 @@
-From e5a55f807cad45d5d563f1cb58ab2318625277d9 Mon Sep 17 00:00:00 2001
+From 96634093eae4000aaeffc32bf3e667bcaf856a0d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 37 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 1c9b1c6..8587c9b 100644
+index 65be2aa..7cc610f 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -128,6 +128,15 @@ namespace XBMCAddon
-       CSettings::GetInstance().SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
+@@ -135,6 +135,15 @@ namespace XBMCAddon
+       CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
      }
  
 +    void sethostname(const char* hostname)
@@ -22,7 +22,7 @@ index 1c9b1c6..8587c9b 100644
 +      XBMC_TRACE;
 +      if (! hostname)
 +      return;
-+      CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
++      CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
 +    }
 +
 +
@@ -30,10 +30,10 @@ index 1c9b1c6..8587c9b 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 8616ca8..58ff7a3 100644
+index 7df8770..18e1179 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -275,6 +275,34 @@ namespace XBMCAddon
+@@ -266,6 +266,34 @@ namespace XBMCAddon
  #ifdef DOXYGEN_SHOULD_USE_THIS
      ///
      /// \ingroup python_xbmc

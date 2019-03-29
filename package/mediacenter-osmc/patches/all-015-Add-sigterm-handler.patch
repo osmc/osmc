@@ -1,4 +1,4 @@
-From 550115412955f6757bb11f05031cb13b636ac545 Mon Sep 17 00:00:00 2001
+From 0abf1ba56736167f19d525b8de5e62b85ea8fb60 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 21 Dec 2015 04:32:14 +0000
 Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
@@ -8,16 +8,16 @@ Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/platform/posix/main.cpp | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ xbmc/platform/posix/main.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/xbmc/platform/posix/main.cpp b/xbmc/platform/posix/main.cpp
-index b6b7035..ce2a211 100644
+index f0d8d9b..8594876 100644
 --- a/xbmc/platform/posix/main.cpp
 +++ b/xbmc/platform/posix/main.cpp
-@@ -42,6 +42,18 @@
- #endif
- #include "platform/XbmcContext.h"
+@@ -34,6 +34,17 @@
+ 
+ #include <locale.h>
  
 +#include "Application.h"
 +#include "messaging/ApplicationMessenger.h"
@@ -30,10 +30,9 @@ index b6b7035..ce2a211 100644
 +       if (! g_application.isShuttingDown())
 +          CApplicationMessenger::GetInstance().PostMsg(TMSG_QUIT);
 +}
-+
- #ifdef __cplusplus
- extern "C"
- #endif
+ namespace
+ {
+ 
 -- 
 2.7.4
 

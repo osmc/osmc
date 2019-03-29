@@ -12,11 +12,15 @@ diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
 index f56fbc2..915515c 100644
 --- a/xbmc/addons/AddonDatabase.cpp
 +++ b/xbmc/addons/AddonDatabase.cpp
-@@ -365,6 +365,17 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+@@ -365,6 +365,21 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
            ORIGIN_SYSTEM, id.c_str()));
      }
  
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'script.module.osmcsetting.%%'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.skin.helper.service'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.skin.helper.skinbackup'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.skin.helper.widgets'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.skinshortcuts'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.osmccommon'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.xmltodict'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID='script.module.elementtree'"));

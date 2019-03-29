@@ -1,4 +1,4 @@
-From 2069653510bf4db6b443809066a63d8d43e694c6 Mon Sep 17 00:00:00 2001
+From 9e9238a1b8b494e39dc527f22c3e8835e901ab7a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 22 Sep 2015 01:07:46 +0100
 Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 36 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 8587c9b..bb0968d 100644
+index 7cc610f..76fabdf 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -136,6 +136,14 @@ namespace XBMCAddon
-       CSettings::GetInstance().SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
+@@ -143,6 +143,14 @@ namespace XBMCAddon
+       CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
      }
  
 +    void settimezone(const char* timezone)
@@ -22,17 +22,17 @@ index 8587c9b..bb0968d 100644
 +      XBMC_TRACE;
 +      if (! timezone)
 +      return;
-+      CSettings::GetInstance().SetString(CSettings::SETTING_LOCALE_TIMEZONE, timezone);
++      CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_LOCALE_TIMEZONE, timezone);
 +    }
 +
  
      String executeJSONRPC(const char* jsonrpccommand)
      {
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 58ff7a3..1d86cd3 100644
+index 18e1179..c1d6446 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -303,6 +303,34 @@ namespace XBMCAddon
+@@ -294,6 +294,34 @@ namespace XBMCAddon
  #ifdef DOXYGEN_SHOULD_USE_THIS
      ///
      /// \ingroup python_xbmc

@@ -1,4 +1,4 @@
-From be86a7b9fc3a6cfe3bb4300c15a56d0c3e90fbf9 Mon Sep 17 00:00:00 2001
+From d2baef5bcbddf7786ca2f08f09fc699a6021b6db Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 20 Mar 2017 02:45:58 +0000
 Subject: [PATCH] Ensure that add-ons can run before shutdown / reboot. This
@@ -11,24 +11,24 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 2 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 021084a..1a39709 100644
+index 2d25128..2564a94 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2443,6 +2443,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
-   switch (pMsg->dwMessage)
+@@ -2040,6 +2040,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+   switch (msg)
    {
    case TMSG_POWERDOWN:
 +    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
      m_ShuttingDown = true;
-     g_powerManager.Powerdown();
+     CServiceBroker::GetPowerManager().Powerdown();
      Stop(EXITCODE_POWERDOWN);
-@@ -2470,6 +2471,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2067,6 +2068,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
  
    case TMSG_RESTART:
    case TMSG_RESET:
 +    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
      m_ShuttingDown = true;
-     g_powerManager.Reboot();
+     CServiceBroker::GetPowerManager().Reboot();
      Stop(EXITCODE_REBOOT);
 -- 
 2.7.4

@@ -1,4 +1,4 @@
-From d71ad6cc37813a75d0a052210760d394ebb88bee Mon Sep 17 00:00:00 2001
+From 6b87cec475189c841dcc5782009df95bca11a1f0 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:13:22 +0100
 Subject: [PATCH] Do not allow \ to disable full screen mode. Causes more
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/system/keymaps/keyboard.xml b/system/keymaps/keyboard.xml
-index 261d438..19e8a10 100644
+index 99b3020..7ee4066 100644
 --- a/system/keymaps/keyboard.xml
 +++ b/system/keymaps/keyboard.xml
-@@ -93,7 +93,7 @@
+@@ -91,7 +91,7 @@
        <numpadseven>Number7</numpadseven>
        <numpadeight>Number8</numpadeight>
        <numpadnine>Number9</numpadnine>
@@ -21,7 +21,7 @@ index 261d438..19e8a10 100644
 +      <!--backslash>ToggleFullScreen</backslash-->
        <home>FirstPage</home>
        <end>LastPage</end>
-       <power>ActivateWindow(shutdownmenu)</power>
+       <power>ActivateWindow(ShutdownMenu)</power>
 -- 
-2.1.0
+2.7.4
 

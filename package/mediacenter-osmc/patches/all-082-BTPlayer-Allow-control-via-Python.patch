@@ -1,18 +1,18 @@
-From e9064f5f5b03320b5e77168649744a4ac626eaee Mon Sep 17 00:00:00 2001
-From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Tue, 20 Dec 2016 22:49:37 +0000
-Subject: [PATCH 4/5] [BTPlayer] Allow control via Python
+From 5184acc05cc7de78f62004d0d6ce2f2d2c760ba4 Mon Sep 17 00:00:00 2001
+From: Gerald Barker <gerald.barker@gmail.com>
+Date: Tue, 26 Feb 2019 13:44:59 +0000
+Subject: [PATCH] [BTPlayer] Allow Control via Python
 
 ---
- xbmc/interfaces/legacy/ModuleXbmc.cpp | 32 +++++++++++++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 68 +++++++++++++++++++++++++++++++++++
- 2 files changed, 100 insertions(+)
+ xbmc/interfaces/legacy/ModuleXbmc.cpp | 32 +++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 69 +++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 0b921a8..c3f3bc5 100644
+index 8e194e59bfde..ec1db639d3d7 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -61,6 +61,10 @@
+@@ -48,6 +48,11 @@
  #include <vector>
  #include "utils/log.h"
  
@@ -20,15 +20,15 @@ index 0b921a8..c3f3bc5 100644
 +#include "cores/playercorefactory/PlayerCoreConfig.h"
 +#include "cores/playercorefactory/PlayerCoreFactory.h"
 +
++
+ using namespace KODI;
  using namespace KODI::MESSAGING;
  
- #ifdef TARGET_POSIX
-@@ -529,6 +533,34 @@ namespace XBMCAddon
+@@ -544,6 +549,33 @@ namespace XBMCAddon
        return CSysInfo::GetUserAgent();
      }
  
-+
-+    void startBTPlayer(const char* dbus_path)
++void startBTPlayer(const char* dbus_path)
 +    {
 +      XBMC_TRACE
 +      CFileItemList list;
@@ -53,19 +53,23 @@ index 0b921a8..c3f3bc5 100644
 +    {
 +      return g_application.GetCurrentPlayer() == "BTPlayer";
 +    }
-+  
-+    
++
++
      int getSERVER_WEBSERVER() { return CApplication::ES_WEBSERVER; }
      int getSERVER_AIRPLAYSERVER() { return CApplication::ES_AIRPLAYSERVER; }
      int getSERVER_UPNPSERVER() { return CApplication::ES_UPNPSERVER; }
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index fcdb253..ae187a7 100644
+index 189752da1cd6..c9d83fd3704a 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -985,6 +985,74 @@ namespace XBMCAddon
- #ifdef DOXYGEN_SHOULD_USE_THIS
-     ///
-     /// \ingroup python_xbmc
+@@ -971,6 +971,75 @@ namespace XBMCAddon
+ #else
+     String convertLanguage(const char* language, int format);
+ #endif
++
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.startBTPlayer(dbus_path) }
 +    ///-----------------------------------------------------------------------
 +    /// Starts BTPlayer
@@ -130,13 +134,7 @@ index fcdb253..ae187a7 100644
 +#else
 +    bool isBTPlayerActive();
 +#endif
-+    
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
-     /// @brief \python_func{ executehttpapi(httpcommand) }
-     ///-----------------------------------------------------------------------
-     /// @python_v12 Completely removed.
--- 
-2.7.4
-
++
+     //@}
+ #ifndef DOXYGEN_SHOULD_SKIP_THIS
+     SWIG_CONSTANT_FROM_GETTER(int, SERVER_WEBSERVER);

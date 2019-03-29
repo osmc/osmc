@@ -1,4 +1,4 @@
-From 12f19922c851caeae605cd01092c82e74bd3fccb Mon Sep 17 00:00:00 2001
+From 285af97da4939724d5cab0e21b6dee5ce6613b0d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:22:04 +0100
 Subject: [PATCH] Allow legacy interface to be used for saving GUISettings
@@ -10,26 +10,26 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 26 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 0b921a8..a599e4c 100644
+index 8e194e5..10b2f15 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -496,6 +496,11 @@ namespace XBMCAddon
-       CAEFactory::Resume();
+@@ -511,6 +511,11 @@ namespace XBMCAddon
+         ae->Resume();
      }
  
 +   void saveSettings()
 +   {
-+      CSettings::GetInstance().Save();
++      CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
 +   }
 +
      String convertLanguage(const char* language, int format)
      {
        std::string convertedLanguage;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 22e5fcf..59e43d9 100644
+index 189752d..ec2818f 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -919,6 +919,27 @@ namespace XBMCAddon
+@@ -913,6 +913,27 @@ namespace XBMCAddon
  #ifdef DOXYGEN_SHOULD_USE_THIS
      ///
      /// \ingroup python_xbmc

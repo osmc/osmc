@@ -5,13 +5,13 @@ Subject: [PATCH] Fix an issue when passing multiple addons to ADDONS_TO_BUILD
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- project/cmake/addons/CMakeLists.txt | 2 +-
+ cmake/addons/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/project/cmake/addons/CMakeLists.txt b/project/cmake/addons/CMakeLists.txt
+diff --git a/cmake/addons/CMakeLists.txt b/cmake/addons/CMakeLists.txt
 index 96e544b..ee4abf4 100644
---- a/project/cmake/addons/CMakeLists.txt
-+++ b/project/cmake/addons/CMakeLists.txt
+--- a/cmake/addons/CMakeLists.txt
++++ b/cmake/addons/CMakeLists.txt
 @@ -214,7 +214,7 @@ if(NOT addons)
                    WORKING_DIRECTORY ${BOOTSTRAP_BUILD_DIR})
  

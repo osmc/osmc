@@ -1,4 +1,4 @@
-From 1c7f58b7b7eeefa225b82511309e30a0120d4cd9 Mon Sep 17 00:00:00 2001
+From a76523e08bc0ef060c3be6f3e511fde6f6fb2979 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Feb 2018 18:42:49 +0000
 Subject: [PATCH] allowsharing needs to be set for mounted drives to be
@@ -16,7 +16,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 
 diff --git a/userdata/sources.xml b/userdata/sources.xml
 new file mode 100644
-index 0000000..5b681fc
+index 0000000..1fc93b5
 --- /dev/null
 +++ b/userdata/sources.xml
 @@ -0,0 +1,21 @@
@@ -42,15 +42,15 @@ index 0000000..5b681fc
 +    </files>
 +</sources>
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 9c465a6..6925404 100644
+index 57831ef..e64e495 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -485,6 +485,7 @@ bool CApplication::Create()
+@@ -419,6 +419,7 @@ bool CApplication::Create(const CAppParamParser &params)
    CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
    CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
    CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
 +  CopyUserDataIfNeeded("special://masterprofile/", "sources.xml");
-   
+ 
    //! @todo - move to CPlatformXXX
    #ifdef TARGET_DARWIN_IOS
 -- 

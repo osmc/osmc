@@ -1,28 +1,27 @@
-From 9072444d0ee1b94e001ea285ec202841e4cf337d Mon Sep 17 00:00:00 2001
-From: Gerald Barker <gezb@users.noreply.github.com>
-Date: Tue, 20 Dec 2016 22:44:07 +0000
-Subject: [PATCH 1/5] [BTPlayer] New Python Events on Next Item and Previous
- Item
+From 8862458a874094b23c75bc5cd106d46aeac3d77b Mon Sep 17 00:00:00 2001
+From: Gerald Barker <gerald.barker@gmail.com>
+Date: Mon, 25 Feb 2019 21:55:18 +0000
+Subject: [PATCH] [BTPlayer] New Python Events on Next Item and Previous Item
 
 ---
- xbmc/Application.cpp                | 26 ++++++++++++++++++++++++++
- xbmc/Application.h                  |  4 +++-
+ xbmc/Application.cpp                | 27 ++++++++++++++++++++++++++
+ xbmc/Application.h                  |  2 ++
  xbmc/cores/IPlayerCallback.h        |  2 ++
- xbmc/interfaces/legacy/Player.cpp   | 22 ++++++++++++++++++++++
- xbmc/interfaces/legacy/Player.h     | 31 +++++++++++++++++++++++++++++++
- xbmc/interfaces/python/XBPython.cpp | 24 ++++++++++++++++++++++++
- xbmc/interfaces/python/XBPython.h   |  2 ++
- 7 files changed, 110 insertions(+), 1 deletion(-)
+ xbmc/interfaces/legacy/Player.cpp   | 23 ++++++++++++++++++++++
+ xbmc/interfaces/legacy/Player.h     | 30 +++++++++++++++++++++++++++++
+ xbmc/interfaces/python/XBPython.cpp | 22 +++++++++++++++++++++
+ xbmc/interfaces/python/XBPython.h   |  3 ++-
+ 7 files changed, 108 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 1570714..a493970 100644
+index 2dc0989ded0c..64e02677ddb6 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2174,6 +2174,17 @@ bool CApplication::OnAction(const CAction &action)
+@@ -1738,6 +1738,17 @@ bool CApplication::OnAction(const CAction &action)
      return true;
    }
  
-+   // fire python events
++  // fire python events
 +   if (action.GetID() == ACTION_PREV_ITEM)
 +     {
 +       OnPreviousItem();
@@ -34,15 +33,15 @@ index 1570714..a493970 100644
 +     }
 +
    // Now check with the playlist player if action can be handled.
-   // In case of the action PREV_ITEM, we only allow the playlist player to take it if we're less than 3 seconds into playback.
-   if (!(action.GetID() == ACTION_PREV_ITEM && m_pPlayer->CanSeek() && GetTime() > 3) )
-@@ -3724,6 +3735,21 @@ void CApplication::OnPlayBackSeekChapter(int iChapter)
- #endif
+   // In case of ACTION_PREV_ITEM, we only allow the playlist player to take it if we're less than ACTION_PREV_ITEM_THRESHOLD seconds into playback.
+   if (!(action.GetID() == ACTION_PREV_ITEM && m_appPlayer.CanSeek() && GetTime() > ACTION_PREV_ITEM_THRESHOLD) )
+@@ -3290,6 +3301,22 @@ void CApplication::StoreVideoSettings(const CFileItem &fileItem, CVideoSettings
+   }
  }
  
 +void CApplication::OnPreviousItem()
 +{
-+  
++
 +#ifdef HAS_PYTHON
 +  g_pythonParser.OnPreviousItem();
 +#endif
@@ -55,41 +54,40 @@ index 1570714..a493970 100644
 +#endif
 +}
 +
++
  bool CApplication::IsPlayingFullScreenVideo() const
  {
-   return m_pPlayer->IsPlayingVideo() && g_graphicsContext.IsFullScreenVideo();
+   return m_appPlayer.IsPlayingVideo() && CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenVideo();
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index a9d9bf5..b975385 100644
+index 30cf6e7d3246..09eb115073e6 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -179,7 +179,9 @@ public:
-   virtual void OnPlayBackSeek(int iTime, int seekOffset) override;
-   virtual void OnPlayBackSeekChapter(int iChapter) override;
-   virtual void OnPlayBackSpeedChanged(int iSpeed) override;
--
-+  virtual void OnPreviousItem() override;
-+  virtual void OnNextItem() override;
-+  
-   virtual int  GetMessageMask() override;
-   virtual void OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg) override;
- 
+@@ -179,6 +179,8 @@ friend class CAppInboundProtocol;
+   void OnPlayBackSeek(int64_t iTime, int64_t seekOffset) override;
+   void OnPlayBackSeekChapter(int iChapter) override;
+   void OnPlayBackSpeedChanged(int iSpeed) override;
++  void OnPreviousItem() override;
++  void OnNextItem() override;
+   void OnAVChange() override;
+   void OnAVStarted(const CFileItem &file) override;
+   void RequestVideoSettings(const CFileItem &fileItem) override;
 diff --git a/xbmc/cores/IPlayerCallback.h b/xbmc/cores/IPlayerCallback.h
-index a89d8b7..0698564 100644
+index e3a0055fb63b..2e3542504980 100644
 --- a/xbmc/cores/IPlayerCallback.h
 +++ b/xbmc/cores/IPlayerCallback.h
-@@ -33,4 +33,6 @@ public:
-   virtual void OnPlayBackSeek(int iTime, int seekOffset) {};
-   virtual void OnPlayBackSeekChapter(int iChapter) {};
-   virtual void OnPlayBackSpeedChanged(int iSpeed) {};
+@@ -33,4 +33,6 @@ class IPlayerCallback
+   virtual void OnAVStarted(const CFileItem &file) {};
+   virtual void RequestVideoSettings(const CFileItem &fileItem) {};
+   virtual void StoreVideoSettings(const CFileItem &fileItem, CVideoSettings vs) {};
 +  virtual void OnPreviousItem() {};
 +  virtual void OnNextItem() {};
  };
 diff --git a/xbmc/interfaces/legacy/Player.cpp b/xbmc/interfaces/legacy/Player.cpp
-index 6934a59..7932975 100644
+index b0288d77dea6..4da826435a23 100644
 --- a/xbmc/interfaces/legacy/Player.cpp
 +++ b/xbmc/interfaces/legacy/Player.cpp
-@@ -238,6 +238,18 @@ namespace XBMCAddon
-       invokeCallback(new CallbackFunction<Player,int>(this,&Player::onPlayBackSeekChapter,chapter));
+@@ -185,6 +185,18 @@ namespace XBMCAddon
+       invokeCallback(new CallbackFunction<Player>(this, &Player::onPlayBackStarted));
      }
  
 +    void Player::OnPreviousItem()
@@ -104,10 +102,10 @@ index 6934a59..7932975 100644
 +      invokeCallback(new CallbackFunction<Player>(this,&Player::onNextItem));
 +    }
 +
-     void Player::onPlayBackStarted()
+     void Player::OnAVStarted(const CFileItem &file)
      {
-       XBMC_TRACE;
-@@ -283,6 +295,16 @@ namespace XBMCAddon
+       // We only have fileItem due to us having to
+@@ -314,6 +326,17 @@ namespace XBMCAddon
        XBMC_TRACE;
      }
  
@@ -121,14 +119,15 @@ index 6934a59..7932975 100644
 +      XBMC_TRACE;
 +    }
 +
++
      bool Player::isPlaying()
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/Player.h b/xbmc/interfaces/legacy/Player.h
-index 4d97d76..9a4ea07 100644
+index 387c2c3b3a34..a8a4b5f18c92 100644
 --- a/xbmc/interfaces/legacy/Player.h
 +++ b/xbmc/interfaces/legacy/Player.h
-@@ -346,6 +346,35 @@ namespace XBMCAddon
+@@ -388,6 +388,34 @@ namespace XBMCAddon
  #else
        virtual void onPlayBackSeekChapter(int chapter);
  #endif
@@ -160,32 +159,30 @@ index 4d97d76..9a4ea07 100644
 +#else
 +      virtual void onNextItem();
 +#endif
-+
        /// @}
  
  #ifdef DOXYGEN_SHOULD_USE_THIS
-@@ -720,6 +749,8 @@ namespace XBMCAddon
-       SWIGHIDDENVIRTUAL void    OnPlayBackSpeedChanged(int iSpeed);
-       SWIGHIDDENVIRTUAL void    OnPlayBackSeek(int iTime, int seekOffset);
-       SWIGHIDDENVIRTUAL void    OnPlayBackSeekChapter(int iChapter);
+@@ -804,6 +832,8 @@ namespace XBMCAddon
+       SWIGHIDDENVIRTUAL void OnPlayBackSpeedChanged(int iSpeed) override;
+       SWIGHIDDENVIRTUAL void OnPlayBackSeek(int64_t iTime, int64_t seekOffset) override;
+       SWIGHIDDENVIRTUAL void OnPlayBackSeekChapter(int iChapter) override;
 +      SWIGHIDDENVIRTUAL void OnPreviousItem();
 +      SWIGHIDDENVIRTUAL void OnNextItem();
  #endif
  
      protected:
 diff --git a/xbmc/interfaces/python/XBPython.cpp b/xbmc/interfaces/python/XBPython.cpp
-index bc84af9..55991ae 100644
+index 81e0d7c55e7d..e68748a306be 100644
 --- a/xbmc/interfaces/python/XBPython.cpp
 +++ b/xbmc/interfaces/python/XBPython.cpp
-@@ -229,6 +229,30 @@ void XBPython::OnQueueNextItem()
+@@ -250,6 +250,28 @@ void XBPython::OnQueueNextItem()
    }
  }
  
-+
 +void XBPython::OnPreviousItem()
 +{
 +  XBMC_TRACE;
-+  LOCK_AND_COPY(std::vector<PVOID>,tmp,m_vecPlayerCallbackList);
++  LOCK_AND_COPY(std::vector<void*>,tmp,m_vecPlayerCallbackList);
 +  for (PlayerCallbackList::iterator it = tmp.begin(); (it != tmp.end()); ++it)
 +  {
 +    if (CHECK_FOR_ENTRY(m_vecPlayerCallbackList,(*it)))
@@ -196,7 +193,7 @@ index bc84af9..55991ae 100644
 +void XBPython::OnNextItem()
 +{
 +  XBMC_TRACE;
-+  LOCK_AND_COPY(std::vector<PVOID>,tmp,m_vecPlayerCallbackList);
++  LOCK_AND_COPY(std::vector<void*>,tmp,m_vecPlayerCallbackList);
 +  for (PlayerCallbackList::iterator it = tmp.begin(); (it != tmp.end()); ++it)
 +  {
 +    if (CHECK_FOR_ENTRY(m_vecPlayerCallbackList,(*it)))
@@ -204,23 +201,20 @@ index bc84af9..55991ae 100644
 +  }
 +}
 +
-+
  void XBPython::RegisterPythonPlayerCallBack(IPlayerCallback* pCallback)
  {
    XBMC_TRACE;
 diff --git a/xbmc/interfaces/python/XBPython.h b/xbmc/interfaces/python/XBPython.h
-index 2689451..a035188 100644
+index 0c922fb71181..a425e6d7e8f8 100644
 --- a/xbmc/interfaces/python/XBPython.h
 +++ b/xbmc/interfaces/python/XBPython.h
-@@ -77,6 +77,8 @@ public:
-   virtual void OnPlayBackSeek(int iTime, int seekOffset);
-   virtual void OnPlayBackSeekChapter(int iChapter);
-   virtual void OnQueueNextItem();
-+  virtual void OnPreviousItem();
-+  virtual void OnNextItem();
- 
-   virtual void Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data);
+@@ -68,7 +68,8 @@ class XBPython :
+   void OnPlayBackSeek(int64_t iTime, int64_t seekOffset) override;
+   void OnPlayBackSeekChapter(int iChapter) override;
+   void OnQueueNextItem() override;
+-
++  void OnPreviousItem();
++  void OnNextItem();
+   void Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data) override;
    void RegisterPythonPlayerCallBack(IPlayerCallback* pCallback);
--- 
-2.7.4
-
+   void UnregisterPythonPlayerCallBack(IPlayerCallback* pCallback);

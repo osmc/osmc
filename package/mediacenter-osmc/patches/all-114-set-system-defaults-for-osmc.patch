@@ -1,0 +1,63 @@
+From a1de2a8b5fb5f36d26ea749b4e5cd4618d27f2e1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 29 Mar 2019 18:18:12 +0000
+Subject: [PATCH] Set system defaults for OSMC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/appliance.xml | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100644 system/settings/appliance.xml
+
+diff --git a/system/settings/appliance.xml b/system/settings/appliance.xml
+new file mode 100644
+index 0000000..afcdd78
+--- /dev/null
++++ b/system/settings/appliance.xml
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="utf-8" ?>
++<settings version="1">
++
++  <section id="interface">
++   <category id="skin">
++    <group id="1">
++     <setting id="lookandfeel.skin">
++      <default>"skin.osmc"</default>
++     </setting>
++    </group>
++   </category>
++  </section>
++
++  <section id="services">
++    <category id="airplay">
++      <group id="1">
++        <setting id="services.airplay">
++          <default>true</default>
++        </setting>
++      </group>
++    </category>
++
++    <category id="control">
++      <group id="1">
++        <setting id="services.webserver">
++          <default>true</default>
++        </setting>
++	<setting id="services.webserverusername">
++	  <default>""</default>
++        </setting>
++      </group>
++    </category>
++
++    <category id="smb">
++      <group id="2">
++        <setting id="smb.maxprotocol">
++          <default>3</default>
++        </setting>
++      </group>
++    </category>
++  </section>
++
++</settings>
+-- 
+2.7.4
+
