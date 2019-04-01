@@ -371,9 +371,9 @@ then
         pushd languages
         if [ "$API_VERSION" = "18" ]; then api_name="leia"; fi
 	if [ "$API_VERSION" = "19" ]; then api_name="tbc"; fi
-        base_url="http://mirror.us.leaseweb.net/xbmc/addons/${api_name}"
+	base_url="http://mirror.ox.ac.uk/sites/xbmc.org/addons/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
-        languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d /)
+        languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d / | grep -v 'img src')
         if [ $? != 0 ]; then echo "Can't get list of languages" && exit 1; fi
         for language in ${languages}
         do
