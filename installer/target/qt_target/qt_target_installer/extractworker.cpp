@@ -21,7 +21,11 @@ void ExtractWorker::extract()
     process = new QProcess();
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readFromStdOut()));
     connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readFromStdErr()));
-    process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xaf - -C " + destName + "\"");
+    if (sourceName.endsWith("xz"))
+        process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
+    else
+        process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xf - -C " + destName + "\"");
+
     process->waitForFinished(-1);
     if (process->exitCode() != 0)
     {
