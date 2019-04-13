@@ -8,10 +8,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  xbmc/filesystem/SMBFile.cpp | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/xbmc/filesystem/SMBFile.cpp b/xbmc/filesystem/SMBFile.cpp
+diff --git a/xbmc/platform/posix/filesystem/SMBFile.cpp b/xbmc/platform/posix/filesystem/SMBFile.cpp
 index 3cfab4c..d0157d4 100644
---- a/xbmc/filesystem/SMBFile.cpp
-+++ b/xbmc/filesystem/SMBFile.cpp
+--- a/xbmc/platform/posix/filesystem/SMBFile.cpp
++++ b/xbmc/platform/posix/filesystem/SMBFile.cpp
 @@ -502,8 +502,7 @@ int CSMBFile::Truncate(int64_t size)
  
  ssize_t CSMBFile::Read(void *lpBuf, size_t uiBufSize)

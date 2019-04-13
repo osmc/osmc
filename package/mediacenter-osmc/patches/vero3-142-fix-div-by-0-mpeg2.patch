@@ -1,0 +1,23 @@
+From fae2d0991bb6c24959a693bdb90d01758bf4e7b0 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Sun, 17 Mar 2019 20:59:04 +0100
+Subject: [PATCH] DVDVideoCodecAmlogic: fix div by 0 in FrameRateTracking
+
+---
+ .../cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 53463e30cbea..11fd9b4bb96f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -471,6 +471,9 @@ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double
+     // decode aspect ratio and frame rate.
+     if (CBitstreamConverter::mpeg2_sequence_header(pData, iSize, m_mpeg2_sequence))
+     {
++      if (!m_mpeg2_sequence->fps_scale)
++	return; 
++
+       m_mpeg2_sequence_pts = pts;
+       if (m_mpeg2_sequence_pts == DVD_NOPTS_VALUE)
+         m_mpeg2_sequence_pts = dts;

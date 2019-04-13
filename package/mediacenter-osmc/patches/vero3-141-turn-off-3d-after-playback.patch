@@ -1,0 +1,39 @@
+From 44cf0b2d34274e2a0d0764e0a8279f3ef62d601d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Apr 2019 21:09:55 +0100
+Subject: [PATCH] Turn off 3D after playback (from LE)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/Application.cpp                                | 1 +
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 9a28ce2..96ef478 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -1338,6 +1338,7 @@ bool CApplication::LoadSkin(const std::string& skinID)
+   CServiceBroker::GetGUI()->GetWindowManager().AddMsgTarget(this);
+   CServiceBroker::GetGUI()->GetWindowManager().AddMsgTarget(&CServiceBroker::GetPlaylistPlayer());
+   CServiceBroker::GetGUI()->GetWindowManager().AddMsgTarget(&g_fontManager);
++  CServiceBroker::GetGUI()->GetWindowManager().AddMsgTarget(&CServiceBroker::GetGUI()->GetStereoscopicsManager());
+   CServiceBroker::GetGUI()->GetWindowManager().SetCallback(*this);
+   //@todo should be done by GUIComponents
+   CServiceBroker::GetGUI()->GetWindowManager().Initialize();
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 456cf37..f466a3d 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -25,6 +25,8 @@
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
+ #include "utils/TimeUtils.h"
++#include "settings/SettingsComponent.h"
++#include "ServiceBroker.h"
+ 
+ #include <unistd.h>
+ #include <queue>
+-- 
+2.7.4
+
