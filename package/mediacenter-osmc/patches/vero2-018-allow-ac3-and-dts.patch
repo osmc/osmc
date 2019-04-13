@@ -1,4 +1,4 @@
-From 8ecb89576dd33a6e59cc1793e85975aaa10f9453 Mon Sep 17 00:00:00 2001
+From 408be8f8ab3cad4d96ecc61f8d13b4dd8a1fd52d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 13 Feb 2016 04:32:53 +0000
 Subject: [PATCH] Hacky way to enable passthrough on Vero 2
@@ -9,18 +9,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 35 insertions(+)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 531f308..2d4af06 100644
+index f684c53..afbcb22 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -38,6 +38,7 @@
- #include "settings/AdvancedSettings.h"
+@@ -27,6 +27,7 @@
+ #include "settings/SettingsComponent.h"
  #if defined(HAS_LIBAMCODEC)
  #include "utils/AMLUtils.h"
 +#include "utils/SysfsUtils.h"
  #endif
  
  #ifdef TARGET_POSIX
-@@ -538,6 +539,40 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -506,6 +507,40 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    if (aml_present())
    {
      aml_set_audio_passthrough(m_passthrough);
