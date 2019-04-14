@@ -1,4 +1,4 @@
-From 9b470aa23bef469c8ecb21460cc53715bc84776a Mon Sep 17 00:00:00 2001
+From 7e0c2d40b6a24418740dab9f06bf39c6ba595f9f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -13,14 +13,14 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                  |  1 +
  xbmc/guilib/guiinfo/SystemGUIInfo.cpp |  9 +++++++--
- xbmc/network/NetworkServices.cpp      | 17 +++++++++++++++++
- 3 files changed, 25 insertions(+), 2 deletions(-)
+ xbmc/network/NetworkServices.cpp      | 20 +++++++++++++++++++-
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 71ca854..2d25128 100644
+index 3bd24ef..ac1f4f5 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -543,6 +543,7 @@ bool CApplication::Create(const CAppParamParser &params)
+@@ -542,6 +542,7 @@ bool CApplication::Create(const CAppParamParser &params)
      return false;
  
    CLog::Log(LOGINFO, "creating subdirectories");
@@ -56,10 +56,20 @@ index a27bda4..e76ed82 100644
      {
        int iStereoMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE);
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index cbbac07..605bed8 100644
+index cbbac07..18faef5 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
-@@ -448,6 +448,23 @@ void CNetworkServices::OnSettingChanged(std::shared_ptr<const CSetting> setting)
+@@ -131,7 +131,8 @@ CNetworkServices::CNetworkServices()
+     CSettings::SETTING_SMB_WORKGROUP,
+     CSettings::SETTING_SMB_MINPROTOCOL,
+     CSettings::SETTING_SMB_MAXPROTOCOL,
+-    CSettings::SETTING_SMB_LEGACYSECURITY
++    CSettings::SETTING_SMB_LEGACYSECURITY,
++    CSettings::SETTING_SERVICES_DEVICENAME
+   };
+   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+   m_settings->GetSettingsManager()->RegisterCallback(this, settingSet);
+@@ -448,6 +449,23 @@ void CNetworkServices::OnSettingChanged(std::shared_ptr<const CSetting> setting)
        CApplicationMessenger::GetInstance().PostMsg(TMSG_RESTARTAPP);
      }
    }
