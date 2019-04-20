@@ -1,0 +1,158 @@
+From 475ae79fa3bd5abfb2c2c313e40216cfdbbdb1fe Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sat, 20 Apr 2019 22:27:03 +0100
+Subject: [PATCH] UpdateResolutions now falls back to sane values if 1080p not
+ available
+
+---
+ xbmc/Application.cpp                        |  2 +-
+ xbmc/settings/DisplaySettings.cpp           | 11 ++----
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 60 ++++++++++++++++++++++++-----
+ 3 files changed, 54 insertions(+), 19 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 5c723e397b..fe5f2b36a9
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2157,7 +2157,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+     if (! m_appPlayer.IsPlayingVideo()) {
+       CDisplaySettings::GetInstance().ClearCustomResolutions();
+       CServiceBroker::GetWinSystem()->UpdateResolutions();
+-      CDisplaySettings::GetInstance().SetCurrentResolution(RES_DESKTOP);
++      CDisplaySettings::GetInstance().SetCurrentResolution(RES_DESKTOP, true);
+       CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(RES_DESKTOP, true);
+       CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
+     }
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index 9f94a191bc..e24ce2ddc9
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -258,7 +258,6 @@ bool CDisplaySettings::OnSettingChanging(std::shared_ptr<const CSetting> setting
+ {
+   if (setting == NULL)
+     return false;
+-
+   const std::string &settingId = setting->GetId();
+   if (settingId == CSettings::SETTING_VIDEOSCREEN_RESOLUTION ||
+       settingId == CSettings::SETTING_VIDEOSCREEN_SCREEN)
+@@ -695,13 +694,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+   if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
+   {
+     const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
+-    // also handle RES_DESKTOP resolutions with non-default refresh rates
+-    if (resolution != RES_DESKTOP || (refreshrate > 0.0f && refreshrate != info.fRefreshRate))
+-    {
+-      return StringUtils::Format("%05i%05i%09.5f%s",
+-                                 info.iScreenWidth, info.iScreenHeight,
+-                                 refreshrate > 0.0f ? refreshrate : info.fRefreshRate, ModeFlagsToString(info.dwFlags, true).c_str());
+-    }
++    return StringUtils::Format("%05i%05i%09.5f%s",
++        info.iScreenWidth, info.iScreenHeight,
++        refreshrate > 0.0f ? refreshrate : info.fRefreshRate, ModeFlagsToString(info.dwFlags, true).c_str());
+   }
+ 
+   return "DESKTOP";
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index 99fc7084c0..ddc88490b1
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -304,11 +304,32 @@ bool CWinSystemAmlogic::DestroyWindow()
+   return true;
+ }
+ 
++static std::string ModeFlagsToString(unsigned int flags, bool identifier)
++{
++  std::string res;
++  if(flags & D3DPRESENTFLAG_INTERLACED)
++    res += "i";
++  else
++    res += "p";
++
++  if(!identifier)
++    res += " ";
++
++  if(flags & D3DPRESENTFLAG_MODE3DSBS)
++    res += "sbs";
++  else if(flags & D3DPRESENTFLAG_MODE3DTB)
++    res += "tab";
++  else if(identifier)
++    res += "std";
++  return res;
++}
++
+ void CWinSystemAmlogic::UpdateResolutions()
+ {
+   CWinSystemBase::UpdateResolutions();
+ 
+   RESOLUTION_INFO resDesktop, curDisplay;
++  std::string curDesktopSetting, curResolution, newRes;
+   std::vector<RESOLUTION_INFO> resolutions;
+ 
+   if (!aml_probe_resolutions(resolutions) || resolutions.empty())
+@@ -324,8 +345,20 @@ void CWinSystemAmlogic::UpdateResolutions()
+     resDesktop = curDisplay;
+   }
+ 
++  curDesktopSetting = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
++
++  curResolution = StringUtils::Format("%05i%05i%09.5f%s",
++      resDesktop.iScreenWidth, resDesktop.iScreenHeight, resDesktop.fRefreshRate,
++      ModeFlagsToString(resDesktop.dwFlags, true).c_str());
++
++  CLog::Log(LOGNOTICE, "Current display setting is %s", curDesktopSetting.c_str());
++  CLog::Log(LOGNOTICE, "Current output resolution is %s", curResolution.c_str());
++
+   RESOLUTION ResDesktop = RES_INVALID;
+   RESOLUTION res_index  = RES_DESKTOP;
++  bool resExactMatch = false;
++  std::string ResString;
++  std::string ResFallback = "00480024.00000istd";
+ 
+   for (size_t i = 0; i < resolutions.size(); i++)
+   {
+@@ -348,14 +381,24 @@ void CWinSystemAmlogic::UpdateResolutions()
+       resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+       resolutions[i].fRefreshRate);
+ 
+-    if(resDesktop.iWidth == resolutions[i].iWidth &&
+-       resDesktop.iHeight == resolutions[i].iHeight &&
+-       resDesktop.iScreenWidth == resolutions[i].iScreenWidth &&
+-       resDesktop.iScreenHeight == resolutions[i].iScreenHeight &&
+-       (resDesktop.dwFlags & D3DPRESENTFLAG_MODEMASK) == (resolutions[i].dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+-       fabs(resDesktop.fRefreshRate - resolutions[i].fRefreshRate) < FLT_EPSILON)
++    ResString = StringUtils::Format("%05i%05i%09.5f%s",
++          resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
++          ModeFlagsToString(resolutions[i].dwFlags, true).c_str());
++    if (curDesktopSetting == ResString){
++      ResDesktop = res_index;
++      resExactMatch = true;
++      newRes = ResString;
++      CLog::Log(LOGNOTICE, "Current resolution setting found at 16 + %d", i);
++    }
++
++    /* fall back to the highest resolution available but not more than current desktop */
++    if(curDesktopSetting.substr(5,18).compare(ResString.substr(5,18)) >= 0 &&
++        ResString.substr(5,18).compare(ResFallback) > 0 && ! resExactMatch)
+     {
+       ResDesktop = res_index;
++      ResFallback = ResString.substr(5,18);
++      newRes = ResString;
++      CLog::Log(LOGNOTICE, "Fallback resolution at 16 + %d %s", i, ResFallback.c_str());
+     }
+ 
+     res_index = (RESOLUTION)((int)res_index + 1);
+@@ -364,10 +407,7 @@ void CWinSystemAmlogic::UpdateResolutions()
+   // set RES_DESKTOP
+   if (ResDesktop != RES_INVALID)
+   {
+-    CLog::Log(LOGNOTICE, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
+-      resDesktop.iWidth, resDesktop.iHeight,
+-      resDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
+-      resDesktop.fRefreshRate,
++    CLog::Log(LOGNOTICE, "Found best resolution %s at %d, setting to RES_DESKTOP at %d", newRes,
+       (int)ResDesktop, (int)RES_DESKTOP);
+ 
+     CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
+-- 
+2.11.0
+
