@@ -1,4 +1,4 @@
-From 475ae79fa3bd5abfb2c2c313e40216cfdbbdb1fe Mon Sep 17 00:00:00 2001
+From dc5f578cefb9a37098ae4af5c6824778aa025a6a Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Sat, 20 Apr 2019 22:27:03 +0100
 Subject: [PATCH] UpdateResolutions now falls back to sane values if 1080p not
@@ -6,15 +6,15 @@ Subject: [PATCH] UpdateResolutions now falls back to sane values if 1080p not
 
 ---
  xbmc/Application.cpp                        |  2 +-
- xbmc/settings/DisplaySettings.cpp           | 11 ++----
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 60 ++++++++++++++++++++++++-----
- 3 files changed, 54 insertions(+), 19 deletions(-)
+ xbmc/settings/DisplaySettings.cpp           | 11 ++---
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 63 ++++++++++++++++++++++++-----
+ 3 files changed, 57 insertions(+), 19 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 5c723e397b..fe5f2b36a9
+index 9b9b0ea..e75883f 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2157,7 +2157,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2156,7 +2156,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
      if (! m_appPlayer.IsPlayingVideo()) {
        CDisplaySettings::GetInstance().ClearCustomResolutions();
        CServiceBroker::GetWinSystem()->UpdateResolutions();
@@ -24,7 +24,7 @@ index 5c723e397b..fe5f2b36a9
        CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
      }
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
-index 9f94a191bc..e24ce2ddc9
+index 9f94a19..e24ce2d 100755
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -258,7 +258,6 @@ bool CDisplaySettings::OnSettingChanging(std::shared_ptr<const CSetting> setting
@@ -53,7 +53,7 @@ index 9f94a191bc..e24ce2ddc9
  
    return "DESKTOP";
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 99fc7084c0..ddc88490b1
+index 99fc708..d6f8ec1 100755
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -304,11 +304,32 @@ bool CWinSystemAmlogic::DestroyWindow()
@@ -89,7 +89,7 @@ index 99fc7084c0..ddc88490b1
    std::vector<RESOLUTION_INFO> resolutions;
  
    if (!aml_probe_resolutions(resolutions) || resolutions.empty())
-@@ -324,8 +345,20 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -324,8 +345,23 @@ void CWinSystemAmlogic::UpdateResolutions()
      resDesktop = curDisplay;
    }
  
@@ -98,6 +98,9 @@ index 99fc7084c0..ddc88490b1
 +  curResolution = StringUtils::Format("%05i%05i%09.5f%s",
 +      resDesktop.iScreenWidth, resDesktop.iScreenHeight, resDesktop.fRefreshRate,
 +      ModeFlagsToString(resDesktop.dwFlags, true).c_str());
++
++  if (curDesktopSetting == "DESKTOP")
++    curDesktopSetting = curResolution;
 +
 +  CLog::Log(LOGNOTICE, "Current display setting is %s", curDesktopSetting.c_str());
 +  CLog::Log(LOGNOTICE, "Current output resolution is %s", curResolution.c_str());
@@ -110,7 +113,7 @@ index 99fc7084c0..ddc88490b1
  
    for (size_t i = 0; i < resolutions.size(); i++)
    {
-@@ -348,14 +381,24 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -348,14 +384,24 @@ void CWinSystemAmlogic::UpdateResolutions()
        resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
        resolutions[i].fRefreshRate);
  
@@ -141,7 +144,7 @@ index 99fc7084c0..ddc88490b1
      }
  
      res_index = (RESOLUTION)((int)res_index + 1);
-@@ -364,10 +407,7 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -364,10 +410,7 @@ void CWinSystemAmlogic::UpdateResolutions()
    // set RES_DESKTOP
    if (ResDesktop != RES_INVALID)
    {
@@ -154,5 +157,5 @@ index 99fc7084c0..ddc88490b1
  
      CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
 -- 
-2.11.0
+2.7.4
 
