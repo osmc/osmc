@@ -17,15 +17,20 @@ ExtractWorker::ExtractWorker(QString sourcename, QString targetname, Logger *log
 
 void ExtractWorker::extract()
 {
-    logger->addLine("Starting extract progress...");
+    logger->addLine("Starting extract process ...");
     process = new QProcess();
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readFromStdOut()));
     connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readFromStdErr()));
     if (sourceName.endsWith("xz"))
+    {
+        logger->addLine("Extracting from " + sourceName);
         process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
+    }
     else
-        process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xf - -C " + destName + "\"");
-
+    {
+        logger->addLine("Running " + sourceName);
+        process->start("/bin/sh -c \"" + sourceName + "\"");
+    }
     process->waitForFinished(-1);
     if (process->exitCode() != 0)
     {
