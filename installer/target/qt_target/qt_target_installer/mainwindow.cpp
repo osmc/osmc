@@ -104,17 +104,18 @@ void MainWindow::install()
         haltInstall("could not mount bootfs");
         return;
     }
-    /* Sanity check: need filesystem.tar.xz or filesystem.tar */
+    /* Sanity check: need filesystem.tar.xz or filesystem.sh */
     QFile fileSystem(QString(MNT_BOOT) + "/filesystem.tar.xz");
     if (! fileSystem.exists())
     {
-        QFile fileSystem(QString(MNT_BOOT) + "/filesystem.tar");
+        fileSystem.setFileName(QString(MNT_BOOT) + "/filesystem.sh");
         if (! fileSystem.exists())
         {
             haltInstall("no filesystem found");
             return;
         }
     }
+    logger->addLine("Filesystem defined by " + fileSystem.fileName());
     /* Load in preseeded values */
     preseed = new PreseedParser();
     if (preseed->isLoaded())
