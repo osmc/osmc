@@ -1,4 +1,4 @@
-ACTION=="add", SUBSYSTEM=="input", KERNEL=="event[0-9]*", GOTO="start"
+ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="event[0-9]*", GOTO="start"
 GOTO="end"
 LABEL="start"
 
