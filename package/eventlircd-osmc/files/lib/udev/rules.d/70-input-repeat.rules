@@ -1,0 +1,8 @@
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event[0-9]*", GOTO="start"
+GOTO="end"
+LABEL="start"
+
+# set default repeat delay to 500ms like rc remotes
+RUN+="/usr/bin/ir-keytable --delay=500 --period=33 --device=$devnode"
+
+LABEL="end"
