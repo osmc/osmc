@@ -99,12 +99,12 @@
     </message>
     <message>
         <location filename="deviceselection.ui" line="40"/>
-        <source>device selection</source>
+        <source>media selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="deviceselection.ui" line="66"/>
-        <source>where would you like to install OSMC?</source>
+        <source>where would you like to write the OSMC install files to?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -197,7 +197,7 @@
     </message>
     <message>
         <location filename="extractprogress.ui" line="69"/>
-        <source>OSMC is now being installed to your device</source>
+        <source>OSMC is now being installed for your device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -218,17 +218,17 @@
     </message>
     <message>
         <location filename="extractprogress.cpp" line="53"/>
-        <source>Unmounting device</source>
+        <source>Unmounting media</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="extractprogress.cpp" line="59"/>
-        <source>Do you want to image the device you selected previously? OSMC is not responsible for loss of personal data</source>
+        <source>Are you sure you want to write OSMC to the media you selected?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="extractprogress.cpp" line="62"/>
-        <source>Do you want to image the device </source>
+        <source>Are you sure you want to write OSMC to </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -248,7 +248,7 @@
     </message>
     <message>
         <location filename="extractprogress.cpp" line="71"/>
-        <source>Could not unmount device </source>
+        <source>Could not unmount media </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -464,7 +464,7 @@ Please consult the logfile.</source>
     </message>
     <message>
         <location filename="preseeddevice.ui" line="105"/>
-        <source>where would you like to install OSMC?</source>
+        <source>where would you like to run OSMC from?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -474,22 +474,22 @@ Please consult the logfile.</source>
     </message>
     <message>
         <location filename="preseeddevice.ui" line="179"/>
-        <source>on an NFS share</source>
+        <source>from an NFS share</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="preseeddevice.ui" line="206"/>
-        <source>on a USB stick</source>
+        <source>from a USB stick</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="preseeddevice.ui" line="233"/>
-        <source>on an SD card</source>
+        <source>from an SD card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="preseeddevice.ui" line="263"/>
-        <source>on internal storage</source>
+        <source>from internal storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
