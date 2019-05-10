@@ -56,16 +56,16 @@ void ExtractProgress::writeImageToDisk()
     ui->extractDetailsLabel->setText(tr("Unmounting") + " " + this->devicePath + tr("\n(This might take a few seconds!)"));
 #endif
 #if defined (Q_OS_WIN) || defined(Q_OS_WIN32)
-    ui->extractDetailsLabel->setText(tr("Unmounting device"));
+    ui->extractDetailsLabel->setText(tr("Unmounting media"));
 #endif
     utils::writeLog("Requesting confirmation from user");
     /* We don't always have drive letter on Windows, plus, we use ID not disk */
 
 #if defined(Q_OS_WIN) || defined(Q_OS_WIN32)
-    QString message = tr("Are you sure you want to install OSMC on the device you selected?") + "\n" + tr("OSMC is not responsible for loss of personal data");
+    QString message = tr("Are you sure you want to write OSMC to the media you selected?") + "\n" + tr("OSMC is not responsible for loss of personal data");
 #endif
 #if defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-    QString message = tr("Are you sure you want to install OSMC on ") + this->devicePath + "?\n" + tr("OSMC is not responsible for loss of personal data");
+    QString message = tr("Are you sure you want to write OSMC to ") + this->devicePath + "?\n" + tr("OSMC is not responsible for loss of personal data");
 #endif
     if (utils::promptYesNo(tr("Are you sure"), message))
     {
@@ -74,7 +74,7 @@ void ExtractProgress::writeImageToDisk()
 
         if (unmountSuccess == false)
         {
-            utils::displayError(tr("Unmount failed!"), tr("Could not unmount device ") + devicePath + "." + tr("Check the log for error messages. OSMC must exit now."), true);
+            utils::displayError(tr("Unmount failed!"), tr("Could not unmount media ") + devicePath + "." + tr("Check the log for error messages. OSMC must exit now."), true);
             QApplication::quit();
             return;
         }
@@ -82,7 +82,7 @@ void ExtractProgress::writeImageToDisk()
         ui->extractDetailsLabel->setText(tr("Writing image to ") + this->devicePath + "\n" + tr("Please be patient"));
 #endif
 #if defined (Q_OS_WIN) || defined (Q_OS_WIN32)
-        ui->extractDetailsLabel->setText(tr(("Writing image to your device")));
+        ui->extractDetailsLabel->setText(tr(("Writing image to your media")));
 #endif
 
 #if defined (Q_OS_MAC) || defined (Q_OS_WIN) || defined (Q_OS_WIN32)
@@ -179,7 +179,7 @@ void ExtractProgress::finished()
 
 void ExtractProgress::writeFinished()
 {
-    utils::writeLog("Image successfully written to device");
+    utils::writeLog("Image successfully written to media");
     utils::writeLog("Deleting the uncompressed image to save space");
     QFile uncompressedFile(QString(deviceImage).remove(".gz"));
     if (uncompressedFile.exists())
