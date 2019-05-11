@@ -700,7 +700,7 @@ class Main(object):
         # insert the date at the very top
         self.log_blotter.append('Logs created on: %s\n\n' % right_now())
 
-        for k, v in self.arguments:
+        for k, v in self.arguments,items():
 
             if v.get('active', False):
 
@@ -716,7 +716,7 @@ class Main(object):
 
         # add the logs themselves
         count = 0
-        for k, v in self.arguments:
+        for k, v in self.arguments.items():
 
             if v.get('active',False):
 
