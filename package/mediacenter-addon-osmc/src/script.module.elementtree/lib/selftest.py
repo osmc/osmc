@@ -9,7 +9,7 @@
 # TODO: add xml/html parsing tests
 # TODO: etc
 
-import sys, cStringIO
+import sys, io
 
 from elementtree import ElementTree
 from elementtree import ElementPath
@@ -18,8 +18,8 @@ from elementtree import HTMLTreeBuilder
 from elementtree import SimpleXMLWriter
 
 def serialize(elem, encoding=None):
-    import cStringIO
-    file = cStringIO.StringIO()
+    import io
+    file = io.StringIO()
     tree = ElementTree.ElementTree(elem)
     if encoding:
         tree.write(file, encoding)
@@ -31,7 +31,7 @@ def summarize(elem):
     return elem.tag
 
 def summarize_list(seq):
-    return map(summarize, seq)
+    return list(map(summarize, seq))
 
 def normalize_crlf(tree):
     for elem in tree.getiterator():
@@ -55,7 +55,7 @@ def check_string(string):
     len(string)
     for char in string:
         if len(char) != 1:
-            print "expected one-character string, got %r" % char
+            print("expected one-character string, got %r" % char)
     new_string = string + ""
     new_string = string + " "
     string[:0]
@@ -67,23 +67,23 @@ def check_string_or_none(value):
 
 def check_mapping(mapping):
     len(mapping)
-    keys = mapping.keys()
-    items = mapping.items()
+    keys = list(mapping.keys())
+    items = list(mapping.items())
     for key in keys:
         item = mapping[key]
     mapping["key"] = "value"
     if mapping["key"] != "value":
-        print "expected value string, got %r" % mapping["key"]
+        print("expected value string, got %r" % mapping["key"])
 
 def check_element(element):
     if not hasattr(element, "tag"):
-        print "no tag member"
+        print("no tag member")
     if not hasattr(element, "attrib"):
-        print "no attrib member"
+        print("no attrib member")
     if not hasattr(element, "text"):
-        print "no text member"
+        print("no text member")
     if not hasattr(element, "tail"):
-        print "no tail member"
+        print("no tail member")
     check_string(element.tag)
     check_mapping(element.attrib)
     check_string_or_none(element.text)
@@ -1005,4 +1005,4 @@ def bug_xmltoolkit55():
 if __name__ == "__main__":
     import doctest, selftest
     failed, tested = doctest.testmod(selftest)
-    print tested - failed, "tests ok."
+    print(tested - failed, "tests ok.")

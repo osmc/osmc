@@ -1,4 +1,4 @@
-import connman
+from . import connman
 import dbus
 import time
 import subprocess
@@ -8,7 +8,7 @@ import os
 import os.path
 import requests
 import socket
-import osmc_systemd
+from . import osmc_systemd
 
 WIRELESS_AGENT = 'osmc_wireless_agent.py'
 
@@ -321,7 +321,7 @@ def wifi_connect(path, password=None, ssid=None, script_base_path = None):
         keyfile.close()
         agent_script = script_base_path + WIRELESS_AGENT
         process = subprocess.Popen([sys.executable, agent_script, 'fromfile'])
-    print ('Attempting connection to ' + path )
+    print(('Attempting connection to ' + path ))
     service = connman.get_service_interface(path)
     connected = 1
     connectionAttempts = 20
@@ -329,15 +329,15 @@ def wifi_connect(path, password=None, ssid=None, script_base_path = None):
         try:
              service.Connect(timeout=15000)
              connected = 0
-        except dbus.DBusException, e:
+        except dbus.DBusException as e:
             if len(e.args) > 0 and e.args[0] == 'Not registered' and agentNeeded:
                 connected += 1
                 time.sleep(1)
-                print 'Connection agent not started yet, waiting a second'
+                print('Connection agent not started yet, waiting a second')
             else: # another type of exception jump out of the loop
                 connected = (connectionAttempts+1)
-                print 'DBusException Raised: ' +  str(e)
-    print ('Connection to ' + path + ' : ' + str(connected == 0))
+                print('DBusException Raised: ' +  str(e))
+    print(('Connection to ' + path + ' : ' + str(connected == 0)))
     if agentNeeded:
         process.kill()
         os.remove('/tmp/preseed_data')
@@ -348,7 +348,7 @@ def wifi_disconnect(path):
     service = connman.get_service_interface(path)
     try:
         service.Disconnect()
-    except dbus.DBusException, e:
+    except dbus.DBusException as e:
         print ('DBusException disconnecting')
         connected = False
 
@@ -357,14 +357,14 @@ def wifi_remove(path):
     service = connman.get_service_interface(path)
     try:
         service.Remove()
-    except dbus.DBusException, e:
+    except dbus.DBusException as e:
         print ('DBusException removing')
         connected = False
 
 
 def get_connected_wifi():
-    for address, wifis in get_wifi_networks().iteritems():
-        for ssid, value in wifis.iteritems():
+    for address, wifis in get_wifi_networks().items():
+        for ssid, value in wifis.items():
             if value['State'] in ('online', 'ready'):
                 return value
     return {}
@@ -387,8 +387,8 @@ def has_network_connection(online):
                             return check_MS_NCSI_response()
                         else: # if we on NFS we have network
                             True
-    for address, wifis in get_wifi_networks().iteritems():
-        for ssid in wifis.keys():
+    for address, wifis in get_wifi_networks().items():
+        for ssid in list(wifis.keys()):
             info = wifis[ssid]
             if online:
                 if info['State'] == 'online':

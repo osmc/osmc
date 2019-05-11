@@ -103,11 +103,11 @@ def _ironparse(source):
             yield "start", tag, attrib
             if reader.IsEmptyElement:
                 yield "end", tag
-                for i in xrange(namespaces.pop()):
+                for i in range(namespaces.pop()):
                     yield "end-ns", None
         elif node == END:
             yield "end", tags[reader.NamespaceURI, reader.LocalName]
-            for i in xrange(namespaces.pop()):
+            for i in range(namespaces.pop()):
                 yield "end-ns", None
         elif node == DATA_TEXT or node == DATA_SPACE or node == DATA_CDATA:
             yield "data", reader.Value

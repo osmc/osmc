@@ -142,7 +142,7 @@ class XMLToDictTestCase(unittest.TestCase):
 
     def test_unicode(self):
         try:
-            value = unichr(39321)
+            value = chr(39321)
         except NameError:
             value = chr(39321)
         self.assertEqual({'a': value},
@@ -150,7 +150,7 @@ class XMLToDictTestCase(unittest.TestCase):
 
     def test_encoded_string(self):
         try:
-            value = unichr(39321)
+            value = chr(39321)
         except NameError:
             value = chr(39321)
         xml = '<a>%s</a>' % value

@@ -48,7 +48,7 @@ def get_addon_folder(alien_skin_folder):
 			folder = res.attrib['folder']
 			break
 
-	except Exception, e:
+	except Exception as e:
 		log(e.args)
 		log(traceback.format_exc())
 

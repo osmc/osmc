@@ -209,7 +209,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# load the settings into kodi
 		log('Settings extracted from the config.txt')
-		for k, v in extracted_settings.iteritems():
+		for k, v in extracted_settings.items():
 
 			log("%s : %s" % (k, v))
 			self.me.setSetting(k, str(v))
@@ -221,7 +221,7 @@ Overclock settings are set using the Pi Overclock module."""
 		new_settings = self.settings_retriever_xml()
 
 		log('New settings applied to the config.txt')
-		for k, v in new_settings.iteritems():
+		for k, v in new_settings.items():
 			log("%s : %s" % (k, v))
 
 		# read the config into a list of lines again
@@ -255,7 +255,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		addon = xbmcaddon.Addon(self.addonid)
 
-		for key in parser.MASTER_SETTINGS.keys():
+		for key in list(parser.MASTER_SETTINGS.keys()):
 
 			latest_settings[key] = addon.getSetting(key)
 

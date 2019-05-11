@@ -72,7 +72,7 @@ class wifiScanner(threading.Thread):
 			
 	def getWifiNetworksList(self):
 		result = []
-		for k,v in self.wifiNetworks.iteritems():
+		for k,v in self.wifiNetworks.items():
 			result.append(v)				
 		return result
 		
@@ -213,7 +213,7 @@ class wifiScanner(threading.Thread):
 # If there is more than one then create window to select the wireless interface.
 wirelessInterfaces = Utilities().getWirelessInterfacesList()
 
-print wirelessInterfaces
+print(wirelessInterfaces)
 
 iface = wirelessInterfaces[0]
 
@@ -229,15 +229,15 @@ scanner.start()
 
 for x in range(20):
 	time.sleep(2)
-	print len(scanner.wifiNetworks)
+	print(len(scanner.wifiNetworks))
 
-print 'scan over'
-print scanner.wifiNetworks
+print('scan over')
+print(scanner.wifiNetworks)
 
-for k, connection in scanner.wifiNetworks.iteritems():
-	print "Name: %s   Strength: %s" % (connection[1], (int(float(connection[5]) * 1000.0)) / 10.0)
+for k, connection in scanner.wifiNetworks.items():
+	print("Name: %s   Strength: %s" % (connection[1], (int(float(connection[5]) * 1000.0)) / 10.0))
 
-print 'Ended'
+print('Ended')
 
 # # set timer to scan for 10 seconds then display results
 

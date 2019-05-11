@@ -33,12 +33,12 @@ if not os.path.isfile('/walkthrough_completed'):
 	try:
 		xbmc.setosmcwalkthroughstatus(1)
 	except Exception as e:
-		print traceback.format_exc()
+		print(traceback.format_exc())
 
 # Standard modules
 import datetime
 import json
-import Queue
+import queue
 import re
 import shutil
 import socket
@@ -49,10 +49,10 @@ import time
 
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
-import osmc_walkthru
-import osmc_settingsGUI
-import osmc_comms
-import osmc_ubiquifonts
+from . import osmc_walkthru
+from . import osmc_settingsGUI
+from . import osmc_comms
+from . import osmc_ubiquifonts
 
 
 __addon__        = xbmcaddon.Addon()
@@ -157,7 +157,7 @@ class Main(object):
 				log(traceback.format_exc())
 
 		# queue for communication with the comm and Main
-		self.parent_queue = Queue.Queue()
+		self.parent_queue = queue.Queue()
 
 		# create socket, listen for comms
 		self.listener = osmc_comms.communicator(self.parent_queue, socket_file='/var/tmp/osmc.settings.sockfile')
@@ -466,7 +466,7 @@ class Main(object):
 		result_raw = xbmc.executeJSONRPC(xbmc_request)
 		result = json.loads(result_raw)
 		media_dict_raw = result.get('result', {}).get('sources', {})
-		media_list_raw = [v.get('file', '') for k, v in media_dict_raw.iteritems()]
+		media_list_raw = [v.get('file', '') for k, v in media_dict_raw.items()]
 		media_string = ''.join(media_list_raw)
 
 		return media_string

@@ -7,7 +7,7 @@ import sys
 import threading
 import time
 import traceback
-import xmltodict
+from . import xmltodict
 
 # XBMC Modules
 import xbmcaddon
@@ -20,9 +20,9 @@ DIALOG    = xbmcgui.Dialog()
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib')))
 
-import osmc_bluetooth
-import osmc_network
-from osmc_advset_editor import AdvancedSettingsEditor
+from . import osmc_bluetooth
+from . import osmc_network
+from .osmc_advset_editor import AdvancedSettingsEditor
 
 WIFI_THREAD_NAME      = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
@@ -567,7 +567,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
     def hide_controls(self, control_ids):
 
-        map(lambda x:  self.getControl(x).setVisible(False), control_ids)
+        list(map(lambda x:  self.getControl(x).setVisible(False), control_ids))
 
 
     def get_wired_config(self):
@@ -1068,7 +1068,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             while changed_state != 0 and changed_state < 20:
                 settings = osmc_network.get_ethernet_settings()
                 log(settings)
-                if settings and 'State' in settings.keys() and settings['State'] in ('ready', 'online'):
+                if settings and 'State' in list(settings.keys()) and settings['State'] in ('ready', 'online'):
                      changed_state = 0;
                 else:
                     changed_state += 1
@@ -1099,7 +1099,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         if ssid is not None:
 
             wifi = None
-            for adapterAddress, wifis in osmc_network.get_wifi_networks().iteritems():
+            for adapterAddress, wifis in osmc_network.get_wifi_networks().items():
                 wifi = wifis.get(ssid, None)
 
             if wifi:
@@ -1326,7 +1326,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             self.clear_busy_dialogue()
 
         wifi = None
-        for adapterAddress, wifis in osmc_network.get_wifi_networks().iteritems():
+        for adapterAddress, wifis in osmc_network.get_wifi_networks().items():
 
             wifi = wifis.get(ssid, None)
 
@@ -1840,7 +1840,7 @@ class bluetooth_population_thread(threading.Thread):
             listItem = list_control.getListItem(itemIndex)
             address  = listItem.getProperty('address')
 
-            if address in devices_dict.keys():
+            if address in list(devices_dict.keys()):
 
                 connected = listItem.getProperty('connected') == 'True'
 
@@ -1862,7 +1862,7 @@ class bluetooth_population_thread(threading.Thread):
             except:
                 pass
 
-        map(lambda (address, info): list_control.addItem(self.create_bluetooth_item(address, info)), devices_dict.iteritems())
+        list(map(lambda address_info: list_control.addItem(self.create_bluetooth_item(address_info[0], address_info[1])), iter(devices_dict.items())))
 
 
     def create_bluetooth_item(self, address, info):
@@ -1899,7 +1899,7 @@ class bluetooth_population_thread(threading.Thread):
         except:
             pass
         
-        for address in devices.keys():
+        for address in list(devices.keys()):
 
             bluetooth_dict[address] = {
                                         'alias'     : osmc_bluetooth.get_device_property(address, 'Alias'), 
@@ -1966,7 +1966,7 @@ class wifi_populate_bot(threading.Thread):
 
                 running_dict.update(wifis)
 
-                self.update_list_control(running_dict, len(wifis.keys()) > 1)
+                self.update_list_control(running_dict, len(list(wifis.keys())) > 1)
 
 
              # every minute re-scan wifi unless the thread has been asked to exit
@@ -2002,8 +2002,8 @@ class wifi_populate_bot(threading.Thread):
             listItemSSID           = listItem.getProperty('SSID')
             listItemConnected      = listItem.getProperty('Connected') == 'True'
             
-            if listItemAdapterAddress in running_dict.keys():
-                    if listItemSSID in running_dict[listItemAdapterAddress].keys():
+            if listItemAdapterAddress in list(running_dict.keys()):
+                    if listItemSSID in list(running_dict[listItemAdapterAddress].keys()):
 
                         wifi             = running_dict[listItemAdapterAddress][listItemSSID]
                         networkConnected = wifi['State'] in ('ready', 'online')
@@ -2023,10 +2023,10 @@ class wifi_populate_bot(threading.Thread):
         for itemIndex in reversed(items_to_be_removed):
             self.WFP.removeItem(itemIndex)
 
-        if len(running_dict.keys()) > 0:
-            for adapterAddress, wifis in running_dict.iteritems():
+        if len(list(running_dict.keys())) > 0:
+            for adapterAddress, wifis in running_dict.items():
 
-                for ssid, info in wifis.iteritems():
+                for ssid, info in wifis.items():
                     self.WFP.addItem(self.convert_wifi_to_listitem(info, multiAdpter))
                     connected = True if info['State'] in ('ready', 'online') else False
 

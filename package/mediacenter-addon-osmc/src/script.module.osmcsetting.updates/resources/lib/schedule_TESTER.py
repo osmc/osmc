@@ -2,7 +2,7 @@
 import datetime
 import random
 import sys
-from simple_scheduler import SimpleScheduler
+from .simple_scheduler import SimpleScheduler
 
 
 '''
@@ -50,7 +50,7 @@ def test(settings):
 
     for single_date in (start_date + datetime.timedelta(n) for n in range(370)):
 
-	print single_date
+	print(single_date)
 	s = SimpleScheduler(settings)
 	s.set_trigger(single_date)
 	# print s.trigger_time
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
 	for f in _freq:
 
-	    print 'freq started'
+	    print('freq started')
 
 	    for t in _time:
 
@@ -71,8 +71,8 @@ if __name__ == "__main__":
 
 			sett = pop_set(f, t, w, d, 22, 30)
 
-			print sett
+			print(sett)
 
 			test(sett)
 
-		print 'freq_ended'
+		print('freq_ended')

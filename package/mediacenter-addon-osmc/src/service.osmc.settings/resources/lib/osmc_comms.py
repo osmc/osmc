@@ -74,7 +74,7 @@ class communicator(threading.Thread):
 
 			log('Exit message sent to socket.')
 				
-		except Exception, e:
+		except Exception as e:
 
 			log('Comms error trying to stop: {}'.format(e))
 
@@ -138,7 +138,7 @@ class communicator(threading.Thread):
 
 		try:
 			os.remove(self.address)
-		except Exception, e:
+		except Exception as e:
 			log('Comms error trying to delete socket: {}'.format(e))	
 
 		log('Comms Ended')

@@ -155,7 +155,7 @@ class _SimpleElementPath:
         return result
 
 try:
-    import ElementPath
+    from . import ElementPath
 except ImportError:
     # FIXME: issue warning in this case?
     ElementPath = _SimpleElementPath()
@@ -433,7 +433,7 @@ class _ElementInterface:
     # @defreturn list of strings
 
     def keys(self):
-        return self.attrib.keys()
+        return list(self.attrib.keys())
 
     ##
     # Gets element attributes, as a sequence.  The attributes are
@@ -443,7 +443,7 @@ class _ElementInterface:
     # @defreturn list of (string, string) tuples
 
     def items(self):
-        return self.attrib.items()
+        return list(self.attrib.items())
 
     ##
     # Creates a tree iterator.  The iterator loops over this element
@@ -706,7 +706,7 @@ class ElementTree:
         elif tag is ProcessingInstruction:
             file.write("<?%s?>" % _escape_cdata(node.text, encoding))
         else:
-            items = node.items()
+            items = list(node.items())
             xmlns_items = [] # new namespaces in this scope
             try:
                 if isinstance(tag, QName) or tag[:1] == "{":
@@ -967,7 +967,7 @@ class _iterparse:
                     append((event, None))
                 parser.EndNamespaceDeclHandler = handler
 
-    def next(self):
+    def __next__(self):
         while 1:
             try:
                 item = self._events[self._index]
@@ -997,7 +997,7 @@ class _iterparse:
             return self
     except NameError:
         def __getitem__(self, index):
-            return self.next()
+            return next(self)
 
 ##
 # Parses an XML document from a string constant.  This function can
@@ -1215,7 +1215,7 @@ class XMLTreeBuilder:
         fixname = self._fixname
         tag = fixname(tag)
         attrib = {}
-        for key, value in attrib_in.items():
+        for key, value in list(attrib_in.items()):
             attrib[fixname(key)] = self._fixtext(value)
         return self._target.start(tag, attrib)
 
@@ -1309,7 +1309,7 @@ class XMLTreeBuilder:
 
 if sys.platform == "cli":
     try:
-        import ElementIron
+        from . import ElementIron
     except ImportError:
         pass # fall back on optional pyexpat emulation
     else:

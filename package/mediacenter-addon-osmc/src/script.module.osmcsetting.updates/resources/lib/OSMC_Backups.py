@@ -196,7 +196,7 @@ class osmc_backup(object):
 
 		backup_candidates = []
 
-		for setting, location in LOCATIONS.iteritems():
+		for setting, location in LOCATIONS.items():
 
 			if self.s[setting]:
 
@@ -570,7 +570,7 @@ class osmc_backup(object):
 				# xml files or they are the base folder
 
 				menu_items = []
-				for k, v in LABELS.iteritems():
+				for k, v in LABELS.items():
 					for member in members:
 						if k.endswith(member.name):
 							menu_items.append((member, v))

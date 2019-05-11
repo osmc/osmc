@@ -18,9 +18,9 @@ import xml.etree.ElementTree as ET
 sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
 
 # Custom Modules
-import osmc_timezones
-import LICENSE
-import WARRANTY
+from . import osmc_timezones
+from . import LICENSE
+from . import WARRANTY
 
 EULA       = LICENSE.license
 WARR       = WARRANTY.warranty
@@ -175,7 +175,7 @@ def close_walkthru_on_error(func):
 
         try:
             return func(parent, *args, **kwargs)
-        except Exception, e:
+        except Exception as e:
 
             log('============= Walkthru Error ====================', xbmc.LOGERROR)
             log(traceback.format_exc(), xbmc.LOGERROR)
@@ -202,10 +202,10 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		self.testing = testing
 
 		# the order of the panels, this list can be changed depending on the specific need
-		self.panel_order 	= sorted(PANEL_MAP.keys(), key=lambda x: PANEL_MAP[x]['order'])
+		self.panel_order 	= sorted(list(PANEL_MAP.keys()), key=lambda x: PANEL_MAP[x]['order'])
 
 		# the specific controlIDs for the main menu items and others, this is used by onFocus and saves recreating the list every time
-		self.menu_controls 	= [v['panel_menu_item_id'] for v in PANEL_MAP.values()]
+		self.menu_controls 	= [v['panel_menu_item_id'] for v in list(PANEL_MAP.values())]
 		self.tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
 		self.skin_controls 	= [80010, 80020]
 
@@ -352,7 +352,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 	def populate_timezone_controls(self):
 
 		# populate the timezone controls
-		for region, countries in self.timezones.iteritems():
+		for region, countries in self.timezones.items():
 
 			for country in countries:
 
@@ -483,7 +483,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 		if self.selected_country != None:
 
 			# set timezone
-			for reg, cnt in self.timezones.iteritems():
+			for reg, cnt in self.timezones.items():
 
 				if self.selected_country in cnt:
 					self.selected_region = reg
@@ -887,7 +887,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
 	def show_panel(self, controlID):
 
-		for panel_name, control_dict in PANEL_MAP.iteritems():
+		for panel_name, control_dict in PANEL_MAP.items():
 
 			if controlID == panel_name or controlID == control_dict['panel_menu_item_id']:
 

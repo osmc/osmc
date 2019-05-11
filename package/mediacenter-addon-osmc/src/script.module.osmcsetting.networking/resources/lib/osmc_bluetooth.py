@@ -1,6 +1,6 @@
-import connman
-import bluetooth
-import osmc_systemd
+from . import connman
+from . import bluetooth
+from . import osmc_systemd
 import sys
 import pexpect
 import json
@@ -145,8 +145,8 @@ def disconnect_device(deviceAddress):
 def list_devices(filterkey=None, expectedvalue=None):
     devices = {}
     managed_objects = bluetooth.get_managed_objects()
-    for path in managed_objects.keys():
-        if path.startswith('/org/bluez/hci') and DEVICE_PATH in managed_objects[path].keys():
+    for path in list(managed_objects.keys()):
+        if path.startswith('/org/bluez/hci') and DEVICE_PATH in list(managed_objects[path].keys()):
                 dbus_dict = managed_objects[path][DEVICE_PATH]
                 device_dict = {}
                 # remove dbus.String from the key
@@ -163,7 +163,7 @@ def encode_return(result, messages):
 
 
 def pair_device(deviceAddress, scriptBasePath = ''):
-    print 'Attempting to pair with ' + deviceAddress
+    print('Attempting to pair with ' + deviceAddress)
     paired = False
     paired = pair_using_agent(deviceAddress, scriptBasePath)
     if not paired:
@@ -179,7 +179,7 @@ def pair_using_agent(deviceAddress, scriptBasePath = ''):
     script_path = scriptBasePath + PAIRING_AGENT
     script = str.join(' ', [sys.executable, script_path,deviceAddress])
     paired = False
-    print 'calling agent "' + script + '"'
+    print('calling agent "' + script + '"')
     child = pexpect.spawn(script)
     while True:
         try:
@@ -188,8 +188,8 @@ def pair_using_agent(deviceAddress, scriptBasePath = ''):
             if len(split[0]) >0:
                 log('Output From Pairing Agent ' + split[0])
             d = json.loads(split[1])
-            return_value = d.keys()[0]
-            messages = d.values()[0]
+            return_value = list(d.keys())[0]
+            messages = list(d.values())[0]
             log(['return_value = '+ return_value, 'Messages = ' + str(messages)])
             if return_value == 'PAIRING_OK':
                 paired = True

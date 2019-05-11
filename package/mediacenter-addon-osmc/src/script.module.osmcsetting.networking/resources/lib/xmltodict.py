@@ -5,10 +5,10 @@ from xml.parsers import expat
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesImpl
 try:  # pragma no cover
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:  # pragma no cover
     try:
-        from StringIO import StringIO
+        from io import StringIO
     except ImportError:
         from io import StringIO
 try:  # pragma no cover
@@ -20,11 +20,11 @@ except ImportError:  # pragma no cover
         OrderedDict = dict
 
 try:  # pragma no cover
-    _basestring = basestring
+    _basestring = str
 except NameError:  # pragma no cover
     _basestring = str
 try:  # pragma no cover
-    _unicode = unicode
+    _unicode = str
 except NameError:  # pragma no cover
     _unicode = str
 
@@ -84,7 +84,7 @@ class _DictSAXHandler(object):
     def _attrs_to_dict(self, attrs):
         if isinstance(attrs, dict):
             return attrs
-        return self.dict_constructor(zip(attrs[0::2], attrs[1::2]))
+        return self.dict_constructor(list(zip(attrs[0::2], attrs[1::2])))
 
     def startElement(self, full_name, attrs):
         name = self._build_name(full_name)
@@ -95,7 +95,7 @@ class _DictSAXHandler(object):
             if self.xml_attribs:
                 attrs = self.dict_constructor(
                     (self.attr_prefix+self._build_name(key), value)
-                    for (key, value) in attrs.items())
+                    for (key, value) in list(attrs.items()))
             else:
                 attrs = None
             self.item = attrs or None
@@ -279,7 +279,7 @@ def _emit(key, value, content_handler,
         cdata = None
         attrs = OrderedDict()
         children = []
-        for ik, iv in v.items():
+        for ik, iv in list(v.items()):
             if ik == cdata_key:
                 cdata = iv
                 continue
@@ -330,7 +330,7 @@ def unparse(input_dict, output=None, encoding='utf-8', full_document=True,
     content_handler = XMLGenerator(output, encoding)
     if full_document:
         content_handler.startDocument()
-    for key, value in input_dict.items():
+    for key, value in list(input_dict.items()):
         _emit(key, value, content_handler, full_document=full_document,
               **kwargs)
     if full_document:

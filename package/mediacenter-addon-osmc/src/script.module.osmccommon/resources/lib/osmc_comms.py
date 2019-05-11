@@ -78,7 +78,7 @@ class OSMC_Communicator(threading.Thread):
 
 			self.log('Exit message sent to socket.')
 				
-		except Exception, e:
+		except Exception as e:
 
 			self.log('Comms error trying to stop: {}'.format(e))
 
@@ -141,7 +141,7 @@ class OSMC_Communicator(threading.Thread):
 		try:
 			os.remove(self.address)
 
-		except Exception, e:
+		except Exception as e:
 			self.log('Comms error trying to delete socket: {}'.format(e))	
 
 		self.log('Comms Ended')

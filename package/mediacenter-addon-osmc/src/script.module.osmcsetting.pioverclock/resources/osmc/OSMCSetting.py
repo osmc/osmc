@@ -202,7 +202,7 @@ The module allows you to manually adjust:
 
 		# print the settings
 		log('Settings extracted from the config.txt')
-		for k, v in extracted_settings.iteritems():
+		for k, v in extracted_settings.items():
 
 			log("%s : %s" % (k, v))
 			# self.me.setSetting(k, str(v))
@@ -219,7 +219,7 @@ The module allows you to manually adjust:
 		new_settings = GUI.snapshot()
 
 		log('New settings applied to the config.txt')
-		for k, v in new_settings.iteritems():
+		for k, v in new_settings.items():
 			log("%s : %s" % (k, v))
 
 		del GUI

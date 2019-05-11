@@ -5,7 +5,7 @@ import xbmcgui
 import xbmc
 from collections import OrderedDict
 import glob
-from CompLogger import comprehensive_logger as clog
+from .CompLogger import comprehensive_logger as clog
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK      = 92
@@ -159,7 +159,7 @@ class service_selection(xbmcgui.WindowXMLDialog):
 
         item_pos = 0
 
-        for s_name, service_tup in self.service_list.iteritems():
+        for s_name, service_tup in self.service_list.items():
             # populate the list
             s_entry, service_name, running, enabled = service_tup
 

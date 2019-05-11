@@ -6,7 +6,7 @@ import xbmc
 TEST_LOG_BOOL = True
 
 def test_logger(msg):
-	print 'test-' + msg
+	print('test-' + msg)
 
 
 def lang(id):
@@ -56,7 +56,7 @@ def ComprehensiveLogger(logger=None, logging=True, maxlength=250, nowait=False):
 
 	def default_logger(msg):
 
-		print msg
+		print(msg)
 
 
 	if logger == None:
@@ -74,7 +74,7 @@ def ComprehensiveLogger(logger=None, logging=True, maxlength=250, nowait=False):
 
 			all_args.append(itm)
 
-		for k, v in kwargs.iteritems():
+		for k, v in kwargs.items():
 
 			itm = str(k) + ": " + str(v)[:maxlength]
 
@@ -125,11 +125,11 @@ clog = comprehensive_logger
 @clog(logging=TEST_LOG_BOOL)
 def arg_tester(a, b, cdef):
 
-	print 'a: ' + str(a)
+	print('a: ' + str(a))
 	
-	print 'b: ' + str(b)
+	print('b: ' + str(b))
 	
-	print 'cdef: ' + str(cdef)
+	print('cdef: ' + str(cdef))
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ NEEDS A FINAL CHECK FOR HDMI_SAFE to make sure the entries related to it are rem
 
 '''
 import re
-import cpu_info
+from . import cpu_info
 
 # Get the normal setting for the Pi version as a global
 try:
@@ -50,7 +50,7 @@ def config_to_kodi(MASTER_SETTINGS, config):
 
 	extracted_settings_for_kodi = {}
 
-	for setting, protocols in MASTER_SETTINGS.iteritems():
+	for setting, protocols in MASTER_SETTINGS.items():
 
 		value = general_config_get(config, **protocols)
 
@@ -124,7 +124,7 @@ def kodi_to_config(MASTER_SETTINGS, config, new_settings):
 
 		Returns a brand new config (list of lines)'''
 
-	for setting, new_value in new_settings.iteritems():
+	for setting, new_value in new_settings.items():
 
 		setting_protocols = MASTER_SETTINGS.get(setting, None)
 
@@ -614,6 +614,6 @@ if __name__ == "__main__":
 	
 	new_settings = kodi_to_config(MASTER_SETTINGS, config, extracted_settings)
 
-	print new_settings
+	print(new_settings)
 
 	write_config_file('C:\\temp\\results.txt', new_settings)

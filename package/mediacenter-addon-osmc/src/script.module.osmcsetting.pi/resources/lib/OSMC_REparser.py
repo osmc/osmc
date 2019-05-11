@@ -44,7 +44,7 @@ def config_to_kodi(MASTER_SETTINGS, config):
 
 	extracted_settings_for_kodi = {}
 
-	for setting, protocols in MASTER_SETTINGS.iteritems():
+	for setting, protocols in MASTER_SETTINGS.items():
 
 		value = general_config_get(config, **protocols)
 
@@ -118,7 +118,7 @@ def kodi_to_config(MASTER_SETTINGS, config, new_settings):
 
 		Returns a brand new config (list of lines)'''
 
-	for setting, new_value in new_settings.iteritems():
+	for setting, new_value in new_settings.items():
 
 		setting_protocols = MASTER_SETTINGS.get(setting, None)
 
@@ -271,7 +271,7 @@ def onoff_validation(config_value):
 
 def config_hdmi_boost_validation(config_value):
 
-	return generic_range_validation(config_value, range(1,12))
+	return generic_range_validation(config_value, list(range(1,12)))
 
 
 def soundcard_dac_validation(config_value):
@@ -318,7 +318,7 @@ def lirc_rpi_validation(config_value):
 
 def gpio_pin_validation(config_value):
 
-	return generic_range_validation(config_value, range(1,28))
+	return generic_range_validation(config_value, list(range(1,28)))
 
 
 def gpio_updown_validation(config_value):
@@ -357,42 +357,42 @@ def display_rotate_validation(config_value):
 
 def gpu_mem_1024_validation(config_value):
 
-	return generic_range_validation(config_value, range(16,321))
+	return generic_range_validation(config_value, list(range(16,321)))
 
 
 def gpu_mem_512_validation(config_value):
 
-	return generic_range_validation(config_value, range(16,257))
+	return generic_range_validation(config_value, list(range(16,257)))
 
 
 def gpu_mem_256_validation(config_value):
 
-	return generic_range_validation(config_value, range(16,193))
+	return generic_range_validation(config_value, list(range(16,193)))
 
 
 def hdmi_group_validation(config_value):
 
-	return generic_range_validation(config_value, range(0,3))
+	return generic_range_validation(config_value, list(range(0,3)))
 
 
 def hdmi_mode_validation(config_value):
 
-	return generic_range_validation(config_value, range(1,87))
+	return generic_range_validation(config_value, list(range(1,87)))
 
 
 def hdmi_pixel_encoding_validation(config_value):
 
-	return generic_range_validation(config_value, range(0,5))
+	return generic_range_validation(config_value, list(range(0,5)))
 
 
 def sdtv_aspect_validation(config_value):
 
-	return generic_range_validation(config_value, range(1,4))
+	return generic_range_validation(config_value, list(range(1,4)))
 
 
 def sdtv_mode_validation(config_value):
 
-	return generic_range_validation(config_value, range(0,4))
+	return generic_range_validation(config_value, list(range(0,4)))
 
 
 def w1gpio_validation(config_value):
@@ -1446,11 +1446,11 @@ if __name__ == "__main__":
 
 		write_config_file('C:\\temp\\results.txt', new_settings)
 
-		print new_settings
-		print '\n'
-		print 'extracted_settings'
-		print extracted_settings
-		print '\n'
+		print(new_settings)
+		print('\n')
+		print('extracted_settings')
+		print(extracted_settings)
+		print('\n')
 
 
 	possible_results_from_kodi = {

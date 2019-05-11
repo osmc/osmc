@@ -41,8 +41,8 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.identity and not self.passphrase and not self.wpspin:
-            print "Service credentials requested, type cancel to cancel"
-            args = raw_input('Answer: ')
+            print("Service credentials requested, type cancel to cancel")
+            args = input('Answer: ')
 
             for arg in args.split():
                 if arg.startswith("cancel"):
@@ -71,9 +71,9 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.username and not self.password:
-            print "User login requested, type cancel to cancel"
-            print "or browser to login through the browser by yourself."
-            args = raw_input('Answer: ')
+            print("User login requested, type cancel to cancel")
+            print("or browser to login through the browser by yourself.")
+            args = input('Answer: ')
 
             for arg in args.split():
                 if arg.startswith("cancel") or arg.startswith("browser"):
@@ -96,7 +96,7 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.name and not self.ssid:
-            args = raw_input('Answer ')
+            args = input('Answer ')
 
             for arg in args.split():
                 if arg.startswith("Name="):
@@ -119,18 +119,18 @@ class Agent(dbus.service.Object):
                          in_signature='oa{sv}',
                          out_signature='a{sv}')
     def RequestInput(self, path, fields):
-        print "RequestInput (%s,%s)" % (path, fields)
+        print("RequestInput (%s,%s)" % (path, fields))
 
         response = {}
 
-        if fields.has_key("Name"):
+        if "Name" in fields:
             response.update(self.input_hidden())
-        if fields.has_key("Passphrase"):
+        if "Passphrase" in fields:
             response.update(self.input_passphrase())
-        if fields.has_key("Username"):
+        if "Username" in fields:
             response.update(self.input_username())
 
-        if response.has_key("Error"):
+        if "Error" in response:
             if response["Error"] == "cancel":
                 raise Canceled("canceled")
                 return
@@ -138,7 +138,7 @@ class Agent(dbus.service.Object):
                 raise LaunchBrowser("launch browser")
                 return
 
-        print "returning (%s)" % (response)
+        print("returning (%s)" % (response))
 
         return response
 
@@ -146,12 +146,12 @@ class Agent(dbus.service.Object):
                          in_signature='os',
                          out_signature='')
     def RequestBrowser(self, path, url):
-        print "RequestBrowser (%s,%s)" % (path, url)
+        print("RequestBrowser (%s,%s)" % (path, url))
 
-        print "Please login through the given url in a browser"
-        print "Then press enter to accept or some text to cancel"
+        print("Please login through the given url in a browser")
+        print("Then press enter to accept or some text to cancel")
 
-        args = raw_input('> ')
+        args = input('> ')
 
         if len(args) > 0:
             raise Canceled("canceled")
@@ -162,8 +162,8 @@ class Agent(dbus.service.Object):
                          in_signature='os',
                          out_signature='')
     def ReportError(self, path, error):
-        print "ReportError %s, %s" % (path, error)
-        retry = raw_input("Retry service (yes/no): ")
+        print("ReportError %s, %s" % (path, error))
+        retry = input("Retry service (yes/no): ")
         if (retry == "yes"):
             class Retry(dbus.DBusException):
                 _dbus_error_name = "net.connman.Agent.Error.Retry"
@@ -176,7 +176,7 @@ class Agent(dbus.service.Object):
     @dbus.service.method("net.connman.Agent",
                          in_signature='', out_signature='')
     def Cancel(self):
-        print "Cancel"
+        print("Cancel")
 
 
 if __name__ == '__main__':
@@ -206,7 +206,7 @@ if __name__ == '__main__':
 try:
     manager.RegisterAgent(path)
 except:
-    print "Cannot register connman agent."
+    print("Cannot register connman agent.")
 
 mainloop = gobject.MainLoop()
 mainloop.run()

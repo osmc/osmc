@@ -10,14 +10,14 @@ import imp
 import json
 import os
 import pickle
-import Queue
+import queue
 import select
 import socket
 import sys
 import threading
 import time
 import traceback
-from CompLogger import comprehensive_logger as clog
+from .CompLogger import comprehensive_logger as clog
 
 path       = xbmcaddon.Addon().getAddonInfo('path')
 lib        = os.path.join(path, 'resources','lib')
@@ -504,7 +504,7 @@ class OSMCGui(threading.Thread):
 		log('OSMC Setting Module __ %s __ found and imported' % sub_folder)
 
 		# DETERMINE ORDER OF ADDONS, THIS CAN BE HARDCODED FOR SOME OR THE USER SHOULD BE ABLE TO CHOOSE THEIR OWN ORDER
-		if sub_folder in self.known_modules_order.keys():
+		if sub_folder in list(self.known_modules_order.keys()):
 			order = self.known_modules_order[sub_folder]
 		else:
 			order = self.module_tally

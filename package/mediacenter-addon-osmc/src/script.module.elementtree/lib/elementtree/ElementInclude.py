@@ -45,7 +45,7 @@
 # Limited XInclude support for the ElementTree package.
 ##
 
-import ElementTree
+from . import ElementTree
 
 def copy(elem):
     e = ElementTree.Element(elem.tag, elem.attrib)

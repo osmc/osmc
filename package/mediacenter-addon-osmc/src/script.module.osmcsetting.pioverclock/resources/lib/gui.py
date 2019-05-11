@@ -108,7 +108,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 			}
 
 		self.variable_lists = {}
-		for k, v in self.metrics.iteritems():
+		for k, v in self.metrics.items():
 			self.variable_lists[k] = self.create_list(v)
 
 
@@ -156,7 +156,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 	def create_list(self, metric):
 		''' generates a list holding the items for each variable control '''
 
-		var_list = [metric.min + (metric.step * x) for x in xrange((metric.range / metric.step) + 1)]
+		var_list = [metric.min + (metric.step * x) for x in range((metric.range / metric.step) + 1)]
 		var_list.append(int(metric.custom))
 		var_list = list(set(var_list))
 		var_list.sort()
@@ -185,7 +185,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
 		idx = (control % 100) - 1 
 		pfl = self.overclock_profiles[ idx ]._asdict()
-		for k, v in self.control_matching.iteritems():
+		for k, v in self.control_matching.items():
 			ctl = self.getControl(v)
 			if 'force_turbo' in k:
 				if int(pfl[k]):
@@ -202,7 +202,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 		''' Returns the current settings in a dictionary. '''
 
 		tmp = {}
-		for k, v in self.control_matching.iteritems():
+		for k, v in self.control_matching.items():
 			ctl = self.getControl(v)
 			if 'force' in k:
 				tmp[k] = 1 if ctl.isSelected() else 0	

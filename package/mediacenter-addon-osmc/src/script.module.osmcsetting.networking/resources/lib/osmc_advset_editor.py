@@ -12,7 +12,7 @@ __addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
 # Custom modules
 sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib')))
 
-import xmltodict as xmltodict
+from . import xmltodict as xmltodict
 
 
 class AdvancedSettingsEditor(object):

@@ -189,7 +189,7 @@ class OSMCSettingClass(threading.Thread):
 		self.reboot_required = False
 
 		log('START')
-		for x, k in self.setting_data_method.iteritems():
+		for x, k in self.setting_data_method.items():
 			log("%s = %s" % (x, k.get('setting_value','no setting value')))
 
 
@@ -203,7 +203,7 @@ class OSMCSettingClass(threading.Thread):
 		latest_settings = self.settings_retriever_xml()
 
 		# cycle through the setting_data_method dict, and populate with the settings values
-		for key in self.setting_data_method.keys():
+		for key in list(self.setting_data_method.keys()):
 
 			# grab the translate method (if there is one)
 			translate_method = self.setting_data_method.get(key,{}).get('translate',{})
@@ -262,7 +262,7 @@ class OSMCSettingClass(threading.Thread):
 
 
 		# apply the individual settings changes
-		for k, v in self.setting_data_method.iteritems():
+		for k, v in self.setting_data_method.items():
 
 			# get the application method and stored setting value from the dictionary
 			method = v.get('apply', False)
@@ -300,7 +300,7 @@ class OSMCSettingClass(threading.Thread):
 
 		addon = xbmcaddon.Addon(self.addonid)
 
-		for key in self.setting_data_method.keys():
+		for key in list(self.setting_data_method.keys()):
 
 			latest_settings[key] = addon.getSetting(key)
 

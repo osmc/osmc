@@ -9,7 +9,7 @@ try:
     from gi.repository import GObject
 except ImportError:
     import gobject as GObject
-import bluezutils
+from . import bluezutils
 import json
 
 PEXPECT_SOL = 'SOL@'
@@ -25,14 +25,14 @@ dev_path = None
 
 def return_status(result, messages):
     return_dict = {result : messages}
-    print PEXPECT_SOL+ json.dumps(return_dict) + PEXPECT_EOL
+    print(PEXPECT_SOL+ json.dumps(return_dict) + PEXPECT_EOL)
 
 def decode_response(message):
     if message.startswith(PEXPECT_SOL):
         jsonStr = message.replace(PEXPECT_SOL,'').replace(PEXPECT_EOL,'')
         returnValue = json.loads(jsonStr)
-        if returnValue.keys()[0] == 'RETURN_VALUE':
-            return str(returnValue.values()[0][0])
+        if list(returnValue.keys())[0] == 'RETURN_VALUE':
+            return str(list(returnValue.values())[0][0])
         return None
     return message
     
@@ -67,7 +67,7 @@ class Agent(dbus.service.Object):
     def AuthorizeService(self, device, uuid):
         message_list = ['AUTHORIZE_SERVICE', device, uuid]
         return_status('YESNO_INPUT', message_list)
-        returnStr = raw_input('Confirm Passkey:')
+        returnStr = input('Confirm Passkey:')
         returnValue = decode_response(returnStr)
         if returnValue == 'YES':
                 return
@@ -78,7 +78,7 @@ class Agent(dbus.service.Object):
     def RequestPinCode(self, device):
         message_list = [ 'REQUEST_PIN', device ]
         return_status('NUMERIC_INPUT', message_list)
-        returnStr = raw_input('Enter Pin: ')
+        returnStr = input('Enter Pin: ')
         returnValue = decode_response(returnStr)
         pin = '0000'
         if not returnValue == None:
@@ -93,7 +93,7 @@ class Agent(dbus.service.Object):
     def RequestPasskey(self, device):
         message_list = [ 'REQUEST_PIN', device ]
         return_status('NUMERIC_INPUT', message_list)
-        returnStr = raw_input('Enter Pin: ')
+        returnStr = input('Enter Pin: ')
         returnValue = decode_response(returnStr)
         pin = '0000'
         if not returnValue == None:
@@ -119,7 +119,7 @@ class Agent(dbus.service.Object):
     def RequestConfirmation(self, device, passkey):
         message_list = ['CONFIRM_PASSKEY', passkey]
         return_status('YESNO_INPUT', message_list)
-        returnStr = raw_input('Confirm Passkey:')
+        returnStr = input('Confirm Passkey:')
         returnValue = decode_response(returnStr)
         if returnValue == 'YES':
                 return
@@ -131,9 +131,9 @@ class Agent(dbus.service.Object):
     def RequestAuthorization(self, device):
         message_list = ['AUTHORIZE_DEVICE', device]
         return_status('YESNO_INPUT', message_list)
-        returnStr = raw_input('AUTHORIZE Device:')
+        returnStr = input('AUTHORIZE Device:')
         returnValue = decode_response(returnStr)
-        if returnValue.keys()[0] == 'RETURN_VALUE':
+        if list(returnValue.keys())[0] == 'RETURN_VALUE':
             if returnValue == 'YES':
                 return
             raise Rejected("Passkey doesn't match")

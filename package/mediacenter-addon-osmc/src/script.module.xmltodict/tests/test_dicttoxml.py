@@ -116,7 +116,7 @@ class DictToXMLTestCase(unittest.TestCase):
 
     def test_encoding(self):
         try:
-            value = unichr(39321)
+            value = chr(39321)
         except NameError:
             value = chr(39321)
         obj = {'a': value}

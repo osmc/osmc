@@ -11,7 +11,7 @@ import hashlib
 import threading
 import json
 import requests
-import Queue
+import queue
 import shutil
 import apt
 import traceback
@@ -27,9 +27,9 @@ __setting__ = __addon__.getSetting
 sys.path.append(os.path.join(__path__, 'resources','lib'))
 
 # OSMC SETTING Modules
-from CompLogger import comprehensive_logger as clog
-from apf_class import APF_obj
-from apf_gui import apf_GUI
+from .CompLogger import comprehensive_logger as clog
+from .apf_class import APF_obj
+from .apf_gui import apf_GUI
 
 
 ADDONART = os.path.join(__path__, 'resources','skins', 'Default', 'media')
@@ -306,9 +306,9 @@ class APF_STORE(object):
 	@clog(logger=log)
 	def retrieve_icons(self):
 
-		thread_queue = Queue.Queue()
+		thread_queue = queue.Queue()
 
-		for ident, apf in self.apf_dict.iteritems():
+		for ident, apf in self.apf_dict.items():
 
 			if apf.retrieve_icon:
 
@@ -348,7 +348,7 @@ class APF_STORE(object):
 
 				q_item.refresh_icon()
 
-			except Queue.Empty:
+			except queue.Empty:
 
 				log('Queue.Empty error')
 
@@ -362,9 +362,9 @@ class APF_STORE(object):
 		with os.popen('dpkg -l') as f:
 			self.package_list = ''.join(f.readlines())
 
-		thread_queue = Queue.Queue()
+		thread_queue = queue.Queue()
 
-		for ident, apf in self.apf_dict.iteritems():
+		for ident, apf in self.apf_dict.items():
 
 			thread_queue.put(apf)
 
@@ -408,7 +408,7 @@ class APF_STORE(object):
 				
 				thread_queue.task_done()
 
-			except Queue.Empty:
+			except queue.Empty:
 
 				log('Queue.Empty error')
 

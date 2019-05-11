@@ -1,5 +1,5 @@
 import dbus
-import bluezutils
+from . import bluezutils
       
 BLUEZ_OBJECT_PATH = 'org.bluez'
 BLUEZ_ADAPTER = 'org.bluez.Adapter1'

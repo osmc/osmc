@@ -517,7 +517,7 @@ def log(message):
     try:
         xbmc.log('OSMC LOGGING ' + str(message), level=xbmc.LOGDEBUG)
     except:
-        print message
+        print(message)
 
 
 def lang(id):
@@ -589,7 +589,7 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(description='Uploads vital logs to %s. If the network is unavailable, logs are copied to the SD Card.' % UPLOAD_LOC)
 
-    arguments = [v for k, v in SETS.iteritems()]
+    arguments = [v for k, v in SETS.items()]
     arguments.sort(key = lambda x: x.get('order', 99))
 
     parser.add_argument('-A', '--all',   action='store_true', dest='all',          help='Include all logs')
@@ -617,12 +617,12 @@ def parse_arguments():
     # if 'all' is specified then include all logs
     if args.all:
 
-        for k, v in SETS.iteritems():
+        for k, v in SETS.items():
             SETS[k]['active'] = True
 
     else:
 
-        for k, arg in vars(args).iteritems():
+        for k, arg in vars(args).items():
             if k not in ignored_args:
                 SETS[k]['active'] = arg
 
@@ -683,11 +683,11 @@ class Main(object):
         except:
             self.pDialog = Dummy_Progress_Dialog()
 
-        self.number_of_actions = sum(1 for k, v in SETS.iteritems() if v.get('active', False))
+        self.number_of_actions = sum(1 for k, v in SETS.items() if v.get('active', False))
 
         self.pDialog.create(lang(32024), lang(32025))
 
-        self.arguments = [(k, v) for k, v in SETS.iteritems()]
+        self.arguments = [(k, v) for k, v in SETS.items()]
 
         self.arguments.sort(key = lambda x: x[1].get('order', 99))
 
@@ -766,7 +766,7 @@ class Main(object):
 
     def write_to_screen(self):
 
-        print ''.join(self.log_blotter)
+        print(''.join(self.log_blotter))
 
 
     def write_to_temp_file(self):

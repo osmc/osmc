@@ -4,7 +4,7 @@ from datetime import datetime
 import decimal
 import json
 import os
-import Queue
+import queue
 import random
 import socket
 import subprocess
@@ -19,10 +19,10 @@ import xbmcgui
 # Custom modules
 __libpath__ = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib'))
 sys.path.append(__libpath__)
-import comms
-import simple_scheduler as sched
-import OSMC_Backups
-from CompLogger import comprehensive_logger as clog
+from . import comms
+from . import simple_scheduler as sched
+from . import OSMC_Backups
+from .CompLogger import comprehensive_logger as clog
 
 __addon__              	= xbmcaddon.Addon()
 __addonid__            	= __addon__.getAddonInfo('id')
@@ -168,7 +168,7 @@ class Main(object):
 							}
 
 		# queue for communication with the comm and Main
-		self.parent_queue = Queue.Queue()
+		self.parent_queue = queue.Queue()
 
 		self.randomid = random.randint(0,1000)
 
@@ -429,7 +429,7 @@ class Main(object):
 
 					log(comm_from_script, 'instruction has no assigned method')
 
-		except Queue.Empty:
+		except queue.Empty:
 			# the only exception that should be handled is when the queue is empty
 			pass
 
@@ -694,7 +694,7 @@ class Main(object):
 
 		# check the items in the temp dict and if they are differenct from the current settings, change the current settings,
 		# prompt action if certain settings are changed (like the scheduler settings)
-		for k, v in tmp_s.iteritems():
+		for k, v in tmp_s.items():
 
 			if v == self.s[k]:
 				continue

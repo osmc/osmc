@@ -151,8 +151,8 @@ def test(settings=None):
 	for z in range(3700):
 		right_now += datetime.timedelta(days=1)
 
-		print z
-		print right_now
+		print(z)
+		print(right_now)
 		s = SimpleScheduler(x, right_now)
-		print  '%s\n' % s.trigger_time
+		print('%s\n' % s.trigger_time)
 

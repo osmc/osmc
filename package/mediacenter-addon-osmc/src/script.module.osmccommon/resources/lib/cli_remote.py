@@ -33,21 +33,21 @@ try:
 		settings.update(raw_sets)
 except:
 
-	print 'USAGE     : cli-remote i=Your_ip_address p=your_port u=your_username w=your_password'
-	print 'All the settings are optional. The default will be used in their place if you dont specifiy them.'
-	print 'Defaults:'
-	print '		ip   : 127.0.0.1'
-	print '		port : 80'       
-	print '		user : ""'
-	print '		pass : ""'
-	print ''
-	print 'If you are using this script on the device (via ssh or something) then you dont need to put in the IP address.'
-	print 'The default of 127.0.0.1 already points to the local host.'
-	print ''
-	print 'Alternatively, you can save a file called /home/osmc/cli_remote.conf with this:'
-	print '{"ip": "your_ip", "port": "your_port", "user" : "your_user", "pssw": "your_pass"}'
-	print 'Or just {"port": "your_port"} if that is all you would like to change.'
-	print ''
+	print('USAGE     : cli-remote i=Your_ip_address p=your_port u=your_username w=your_password')
+	print('All the settings are optional. The default will be used in their place if you dont specifiy them.')
+	print('Defaults:')
+	print('		ip   : 127.0.0.1')
+	print('		port : 80')       
+	print('		user : ""')
+	print('		pass : ""')
+	print('')
+	print('If you are using this script on the device (via ssh or something) then you dont need to put in the IP address.')
+	print('The default of 127.0.0.1 already points to the local host.')
+	print('')
+	print('Alternatively, you can save a file called /home/osmc/cli_remote.conf with this:')
+	print('{"ip": "your_ip", "port": "your_port", "user" : "your_user", "pssw": "your_pass"}')
+	print('Or just {"port": "your_port"} if that is all you would like to change.')
+	print('')
 
 	for arg in sys.argv[1:]:
 		try:
@@ -151,9 +151,9 @@ key_map = {
 try:
 	test(settings)
 except requests.ConnectionError:
-	print 'Failed to connect.'
-	print 'Ensure that Kodi is able to be controlled via HTTP'
-	print 'Open the Kodi settings, Service, Web Server, and Enable HTTP remote.'
+	print('Failed to connect.')
+	print('Ensure that Kodi is able to be controlled via HTTP')
+	print('Open the Kodi settings, Service, Web Server, and Enable HTTP remote.')
 	sys.exit()
 
 

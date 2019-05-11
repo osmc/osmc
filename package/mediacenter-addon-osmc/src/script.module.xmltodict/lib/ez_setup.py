@@ -224,7 +224,7 @@ def download_file_insecure(url, target):
     try:
         from urllib.request import urlopen
     except ImportError:
-        from urllib2 import urlopen
+        from urllib.request import urlopen
     src = dst = None
     try:
         src = urlopen(url)
