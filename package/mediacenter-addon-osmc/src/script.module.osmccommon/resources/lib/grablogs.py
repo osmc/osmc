@@ -700,7 +700,7 @@ class Main(object):
         # insert the date at the very top
         self.log_blotter.append('Logs created on: %s\n\n' % right_now())
 
-        for k, v in self.arguments,items():
+        for k, v in self.arguments:
 
             if v.get('active', False):
 
@@ -716,7 +716,7 @@ class Main(object):
 
         # add the logs themselves
         count = 0
-        for k, v in self.arguments.items():
+        for k, v in self.arguments:
 
             if v.get('active',False):
 
@@ -757,7 +757,7 @@ class Main(object):
     def write_to_temp_file(self):
         ''' Writes the logs to a single temporary file '''
         # clean up the blotter
-        self.log_blotter = [x.replace('\0', '') for x in self.log_blotter]
+        self.log_blotter = [str(x).replace('\0', '') for x in self.log_blotter]
 
         try:
             with open(TEMP_LOG_FILE, 'w') as f:
