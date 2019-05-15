@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="v4.2.6"
+VERSION="v4.2.8"
 pull_source "https://github.com/tvheadend/tvheadend/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
