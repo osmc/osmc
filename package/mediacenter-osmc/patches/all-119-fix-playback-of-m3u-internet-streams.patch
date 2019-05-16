@@ -1,0 +1,26 @@
+From e5c42a8590ba6f8c6bd55c07d1c046497d6e061f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 May 2019 17:39:35 +0100
+Subject: [PATCH 1/2] Fix playback of M3U internet streams
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/playlists/PlayListFactory.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/playlists/PlayListFactory.cpp b/xbmc/playlists/PlayListFactory.cpp
+index f98c230..273d3bf 100644
+--- a/xbmc/playlists/PlayListFactory.cpp
++++ b/xbmc/playlists/PlayListFactory.cpp
+@@ -118,7 +118,7 @@ bool CPlayListFactory::IsPlaylist(const CFileItem& item)
+ */
+ 
+   // online m3u8 files are hls:// -- do not treat as playlist
+-  if (item.IsInternetStream() && item.IsType(".m3u8"))
++  if (item.IsInternetStream() && (item.IsType(".m3u8") || item.IsType("m3u")))
+     return false;
+ 
+   if(strMimeType == "audio/x-pn-realaudio"
+-- 
+2.7.4
+
