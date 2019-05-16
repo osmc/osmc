@@ -1,0 +1,27 @@
+From 6371a0cab41cec3872279f70ba123f8c82cde0e5 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 May 2019 19:58:05 +0100
+Subject: [PATCH] HACK: wait for network for 1 sec to fix static IP being
+ initialised too fast on Wired
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/network/Network.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/network/Network.cpp b/xbmc/network/Network.cpp
+index bfd59c1..7e12f41 100644
+--- a/xbmc/network/Network.cpp
++++ b/xbmc/network/Network.cpp
+@@ -520,7 +520,7 @@ void CNetworkBase::WaitForNet()
+ {
+   const int timeout = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_POWERMANAGEMENT_WAITFORNETWORK);
+   if (timeout <= 0)
+-    return; // wait for network is disabled
++    timeout = 1;
+ 
+   // check if we have at least one network interface to wait for
+   if (!IsAvailable())
+-- 
+2.7.4
+
