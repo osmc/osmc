@@ -1,0 +1,26 @@
+From 5e709d58615cc5e294d43d78d5d3daf7a8c2c8d3 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 May 2019 17:50:15 +0100
+Subject: [PATCH 2/2] Fix erroneous source too slow message
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index ed197fe..15758fa 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1872,7 +1872,7 @@ void CVideoPlayer::HandlePlaySpeed()
+     {
+       if (level < 0.0)
+       {
+-        CGUIDialogKaiToast::QueueNotification(g_localizeStrings.Get(21454), g_localizeStrings.Get(21455));
++        //CGUIDialogKaiToast::QueueNotification(g_localizeStrings.Get(21454), g_localizeStrings.Get(21455));
+         SetCaching(CACHESTATE_INIT);
+       }
+       if (level >= 1.0)
+-- 
+2.7.4
+
