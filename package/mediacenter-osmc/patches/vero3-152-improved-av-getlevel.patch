@@ -1,0 +1,146 @@
+From 242e4df79b7b33c80cdf8e9d3b8baac7645d05e8 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 May 2019 17:24:48 +0100
+Subject: [PATCH] Improved av GetLevel (from LE)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp |  4 +++-
+ xbmc/cores/VideoPlayer/VideoPlayerAudio.h   |  4 +++-
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp | 11 +++++++----
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.h   |  3 +++
+ 4 files changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+index cb40171..554cf4c 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -221,6 +221,7 @@ void CVideoPlayerAudio::Process()
+   audioframe.nb_frames = 0;
+   audioframe.framesOut = 0;
+   m_audioStats.Start();
++  m_pts = DVD_NOPTS_VALUE;
+ 
+   bool onlyPrioMsgs = false;
+ 
+@@ -329,6 +330,7 @@ void CVideoPlayerAudio::Process()
+       m_stalled = true;
+       m_audioClock = 0;
+       audioframe.nb_frames = 0;
++      m_pts = DVD_NOPTS_VALUE;
+ 
+       if (sync)
+       {
+@@ -410,7 +412,7 @@ void CVideoPlayerAudio::Process()
+       {
+         onlyPrioMsgs = true;
+       }
+-
++      m_pts = pPacket->pts;
+     } // demuxer packet
+ 
+     pMsg->Release();
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.h b/xbmc/cores/VideoPlayer/VideoPlayerAudio.h
+index 5aedd08..248f1be 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.h
+@@ -40,7 +40,8 @@ public:
+   // waits until all available data has been rendered
+   bool AcceptsData() const override;
+   bool HasData() const override { return m_messageQueue.GetDataSize() > 0; }
+-  int  GetLevel() const override { return m_messageQueue.GetLevel(); }
++  int  GetLevel() const override { return (m_pts == DVD_NOPTS_VALUE) || (m_pts < m_pClock->GetClock() + 80000) ?
++                                           m_messageQueue.GetLevel() : m_messageQueue.GetLevel() + int((m_pts - m_pClock->GetClock() - 80000) / 80000);}
+   bool IsInited() const override { return m_messageQueue.IsInited(); }
+   void SendMessage(CDVDMsg* pMsg, int priority = 0) override { m_messageQueue.Put(pMsg, priority); }
+   void FlushMessages() override { m_messageQueue.Flush(); }
+@@ -94,6 +95,7 @@ protected:
+ 
+   bool   m_prevskipped;
+   double m_maxspeedadjust;
++  double	   m_pts;
+ 
+   struct SInfo
+   {
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index ba27f5b..44970d1 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -275,25 +275,25 @@ bool CVideoPlayerVideo::IsInited() const
+ inline void CVideoPlayerVideo::SendMessage(CDVDMsg* pMsg, int priority)
+ {
+   m_messageQueue.Put(pMsg, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline void CVideoPlayerVideo::SendMessageBack(CDVDMsg* pMsg, int priority)
+ {
+   m_messageQueue.PutBack(pMsg, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline void CVideoPlayerVideo::FlushMessages()
+ {
+   m_messageQueue.Flush();
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline MsgQueueReturnCode CVideoPlayerVideo::GetMessage(CDVDMsg** pMsg, unsigned int iTimeoutInMilliSeconds, int &priority)
+ {
+   MsgQueueReturnCode ret = m_messageQueue.Get(pMsg, iTimeoutInMilliSeconds, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+   return ret;
+ }
+ 
+@@ -314,6 +314,7 @@ void CVideoPlayerVideo::Process()
+   m_iDroppedFrames = 0;
+   m_rewindStalled = false;
+   m_outputSate = OUTPUT_NORMAL;
++  m_pts = DVD_NOPTS_VALUE;
+ 
+   while (!m_bStop)
+   {
+@@ -451,6 +452,7 @@ void CVideoPlayerVideo::Process()
+       m_packets.clear();
+       pts = 0;
+       m_rewindStalled = false;
++      m_pts = DVD_NOPTS_VALUE;
+ 
+       m_ptsTracker.Flush();
+       //we need to recalculate the framerate
+@@ -578,6 +580,7 @@ void CVideoPlayerVideo::Process()
+         {
+           onlyPrioMsgs = true;
+         }
++        m_pts = pPacket->pts;
+       }
+       else
+       {
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+index 689948c..b4b5cde 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+@@ -75,6 +75,7 @@ public:
+   // classes
+   CDVDOverlayContainer* m_pOverlayContainer;
+   CDVDClock* m_pClock;
++  double m_pts;
+ 
+ protected:
+ 
+@@ -100,6 +101,8 @@ protected:
+   void ResetFrameRateCalc();
+   void CalcFrameRate();
+   int CalcDropRequirement(double pts);
++  void SetLevel(){ m_processInfo.SetLevelVQ((m_pts == DVD_NOPTS_VALUE) || (m_pts < m_pClock->GetClock() + 80000) ?
++                     m_messageQueue.GetLevel() : m_messageQueue.GetLevel() + int((m_pts - m_pClock->GetClock() - 80000) / 80000));}
+ 
+   double m_iSubtitleDelay;
+ 
+-- 
+2.7.4
+
