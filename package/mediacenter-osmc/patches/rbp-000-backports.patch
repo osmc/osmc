@@ -1,4 +1,4 @@
-From 7c0a2cc27678aed721972053d6ad9b63bb711a59 Mon Sep 17 00:00:00 2001
+From 60660d8d492c4644df682292f332c6a0ccf4a8f6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 4 Nov 2014 18:50:00 +0000
 Subject: [PATCH 01/49] Temp - more logging
@@ -56,7 +56,7 @@ index 1691c0f..410841a 100644
 2.7.4
 
 
-From d5bef957eb413b0f396d287808d6bba98c2329de Mon Sep 17 00:00:00 2001
+From ff81459ed08556f08cb33b2171030edfbdc37059 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 7 Apr 2014 18:19:32 +0100
 Subject: [PATCH 02/49] When opening a stream don't try to update gui so often
@@ -85,7 +85,7 @@ index a0ed9fd..111e52e 100644
 2.7.4
 
 
-From 9d44525fa4bc6eac1dd6353a021a90ac07e2c4f6 Mon Sep 17 00:00:00 2001
+From 8ebc7b213ed59f450b9b609ae1093851473263f1 Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Thu, 1 May 2014 16:28:39 +0100
 Subject: [PATCH 03/49] Improved file buffering in CArchive
@@ -151,7 +151,7 @@ index e6bf427..185f22c 100644
 2.7.4
 
 
-From 6db49754e801ee2c2328d4795f684257d07b8053 Mon Sep 17 00:00:00 2001
+From c461d3a4be3991f69a45be3b64ba9bf0822ae7c3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 13:06:57 +0000
 Subject: [PATCH 04/49] Make cachemembuffersize default depend on memory size
@@ -217,7 +217,7 @@ index aaddd14..c7859fc 100644
    void Deinitialize();
    int GetArmMem() { return m_arm_mem; }
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 35b0921..4c314a3 100644
+index 11cbbf1..8603ba4 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
 @@ -38,6 +38,9 @@
@@ -258,7 +258,7 @@ index 35b0921..4c314a3 100644
 2.7.4
 
 
-From f53cf910d8be22591e4ab518f026d88b95976b81 Mon Sep 17 00:00:00 2001
+From 960c09256352b424dedb453e10cfab9812e62bee Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 27 Oct 2014 15:23:51 +0000
 Subject: [PATCH 05/49] Default extract thumbnails to false
@@ -290,7 +290,7 @@ index f6c2282..4ebf63e 100644
 2.7.4
 
 
-From 922c44eebd9fda80461261f06795d6cfa574e364 Mon Sep 17 00:00:00 2001
+From 571bae8ca4277a36120260ac407d9d342fc1e8b9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 27 Nov 2014 16:31:56 +0000
 Subject: [PATCH 06/49] Reduce priority of python threads
@@ -322,7 +322,7 @@ index c1000e2..ba04024 100644
 2.7.4
 
 
-From 5bb420b7bcb3be1fd57b08712b19b85d36df5110 Mon Sep 17 00:00:00 2001
+From a1194c5c3f633541970814aa5b23f44d93866e7f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 29 Nov 2014 15:25:16 +0000
 Subject: [PATCH 07/49] hack: wait for splash to complete before changing hdmi
@@ -411,7 +411,7 @@ index 743a7fc..116b3bf 100644
 2.7.4
 
 
-From 71f971153c209e8dbd64c7fc7210db074af65878 Mon Sep 17 00:00:00 2001
+From 7b852d3ad118e880a86eb2160ac55680170bd919 Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Thu, 11 Sep 2014 21:30:43 +0200
 Subject: [PATCH 08/49] Disable autoscrolling while on screensaver and while
@@ -427,10 +427,10 @@ Subject: [PATCH 08/49] Disable autoscrolling while on screensaver and while
  6 files changed, 23 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6e87c6f..3704fa3 100644
+index f156ea0..e67f949 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -4878,3 +4878,13 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
+@@ -4888,3 +4888,13 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
  
    return false;
  }
@@ -547,7 +547,7 @@ index d838213..96996fa 100644
 2.7.4
 
 
-From d8ab5027babe37cead09426b757a4c21653859a0 Mon Sep 17 00:00:00 2001
+From 771b43f4d162b2e4573fe6f4e34060286297788e Mon Sep 17 00:00:00 2001
 From: anaconda <anaconda@menakite.eu>
 Date: Wed, 25 Feb 2015 18:22:21 +0100
 Subject: [PATCH 09/49] Load OSD dialogs on startup.
@@ -648,7 +648,7 @@ index 71b0e16..4db077e 100644
 2.7.4
 
 
-From b0dfc810932cb1ff7ea97b1c51dd021daae991e9 Mon Sep 17 00:00:00 2001
+From 370c1fccd7901bba51657fcb7b0282715d2e353c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 14 Apr 2015 20:51:14 +0100
 Subject: [PATCH 10/49] Also limit GUI updates when in non full-screen video
@@ -659,7 +659,7 @@ Subject: [PATCH 10/49] Also limit GUI updates when in non full-screen video
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 3704fa3..d6c8b0a 100644
+index e67f949..d94429d 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -2434,7 +2434,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
@@ -675,7 +675,7 @@ index 3704fa3..d6c8b0a 100644
 2.7.4
 
 
-From 87856e1ddd21a6ab2ffec15a63e2272a2d8f94cd Mon Sep 17 00:00:00 2001
+From a72eacf7868448c1f52fef23db514241e8dcd7d3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 5 May 2015 23:58:06 +0100
 Subject: [PATCH 11/49] Leave GUI contents available for screensaver
@@ -710,7 +710,7 @@ index 3b1e63d..137ee2a 100644
 2.7.4
 
 
-From 8d6a9a6f7e377ac13527511f55cf46e48345c508 Mon Sep 17 00:00:00 2001
+From 7252d6d59d934e8ebc33b267937ba4313421a2ad Mon Sep 17 00:00:00 2001
 From: Claudio-Sjo <Claudio.Porfiri@gmail.com>
 Date: Mon, 16 Feb 2015 14:51:26 +0100
 Subject: [PATCH 12/49] - allow reads < CDIO_CD_FRAMESIZE_RAW by using a buffer
@@ -908,7 +908,7 @@ index 61bfac2..d421053 100644
 2.7.4
 
 
-From 2c799d266ad58618681a70b4a73236364eda0343 Mon Sep 17 00:00:00 2001
+From 54492aeff79084ef87f9fd957b254326ecdff9b1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Jun 2016 19:38:13 +0100
 Subject: [PATCH 13/49] codecoverlay: Include codec name in overlay
@@ -1008,7 +1008,7 @@ index f184cd0..ba6a9e9 100644
 2.7.4
 
 
-From ea16edb1bef162cd1fbf3a96f8860ce409f24428 Mon Sep 17 00:00:00 2001
+From 7f2637e9f9c33cebe45703d0bcbb87b9541a6562 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Tue, 8 Mar 2016 21:20:58 +0300
 Subject: [PATCH 14/49] Add cpu usage info.
@@ -1175,7 +1175,7 @@ index f5120a6..487024f 100644
 2.7.4
 
 
-From 0f3ddf690ac863ae5f7b8d2edded42dbf881ecb0 Mon Sep 17 00:00:00 2001
+From afd8989e469c7d2ec4662d7b049abdd108586425 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Sep 2015 19:05:12 +0100
 Subject: [PATCH 15/49] Make MVC a valid 3D filename tag
@@ -1207,7 +1207,7 @@ index 89c9a69..839f453 100644
  }
  
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 4c314a3..1207bc9 100644
+index 8603ba4..28e660a 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
 @@ -448,6 +448,7 @@ void CAdvancedSettings::Initialize()
@@ -1242,7 +1242,7 @@ index 1de3b00..627ba21 100644
 2.7.4
 
 
-From 1c1dde418f7ac97e3f06cc155a2eae0d90e99bb2 Mon Sep 17 00:00:00 2001
+From fea0beedebc9fc8ac324bdf4bd867c5bb3d8c52d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 5 Oct 2015 14:58:05 +0100
 Subject: [PATCH 16/49] Swap top/bottom sides of GUI
@@ -1268,7 +1268,7 @@ index 1ced496..47036f8 100644
 2.7.4
 
 
-From ccd50c3b68964696667268dda8c60c0e90647d3a Mon Sep 17 00:00:00 2001
+From 6728de614641dcd10656eabc7f2a0d633c8c1cac Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 21 Dec 2015 22:17:25 +0000
 Subject: [PATCH 17/49] Fall back to arm jpeg encode/decode when gpu is busy
@@ -1516,7 +1516,7 @@ index 55c85bd..46064d4 100644
 2.7.4
 
 
-From 40589c89747b24c831d49057832e3279a875458f Mon Sep 17 00:00:00 2001
+From 690c4a19e62797e215c0618d6f84a5ff8508d9ce Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 19 Sep 2014 11:54:49 +0100
 Subject: [PATCH 18/49] Add pi specific option to maintain vsync with pll
@@ -1541,7 +1541,7 @@ or drop/dupe audio packets which is normally required.
  12 files changed, 145 insertions(+), 21 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 41aaa8a..22a9aca 100644
+index 3614374..5fc3a34 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -21712,3 +21712,36 @@ msgstr ""
@@ -1964,7 +1964,7 @@ index c7859fc..af835cf 100644
 2.7.4
 
 
-From 013937d88e1d76541875b3a2a0780bb977877093 Mon Sep 17 00:00:00 2001
+From 6b877ace2f465bad9505a90c324e7a8ddf157c5a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 7 May 2015 15:35:43 +0100
 Subject: [PATCH 19/49] rbp: Support zero copy interface with hevc acceleration
@@ -2014,7 +2014,7 @@ index 2cf3575..3c452be 100644
 2.7.4
 
 
-From beae7c78ba5b4a8706137661eb0013b044046be2 Mon Sep 17 00:00:00 2001
+From b00c88cff0a22e5ab9cf3d44154e913099e1e793 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Fri, 29 Jan 2016 17:18:50 +0300
 Subject: [PATCH 20/49] Settings: Added setting to enable/disable MVC decoder.
@@ -2049,7 +2049,7 @@ index 095a627..29b7d70 100644
 2.7.4
 
 
-From fa7fbd2f57d5c4a77c82b8c705d6eb3adbe5721f Mon Sep 17 00:00:00 2001
+From 5690680e30005d75524086cb28299aa11ebd641c Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Wed, 20 Jan 2016 17:02:16 +0300
 Subject: [PATCH 21/49] DemuxFFmpeg: Properly demuxing h264_mvc streams.
@@ -2117,7 +2117,7 @@ index ce559f0..539615a 100644
 2.7.4
 
 
-From a8a6380d1a9d0f64b239906191c5b09cfc1b5e86 Mon Sep 17 00:00:00 2001
+From f0ac4814f2b3e0b473d7e841b373f65e9abe08db Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <anightik@gmail.com>
 Date: Thu, 25 Feb 2016 11:21:25 +0300
 Subject: [PATCH 22/49] Added block_lr and block_rl to supported modes.
@@ -2172,7 +2172,7 @@ index 839f453..d04458f 100644
 2.7.4
 
 
-From 93f247d80d8afb42d24c1011bfca9c2c21650dbc Mon Sep 17 00:00:00 2001
+From b24fd5a785fd06c6134f9d80e431892bfbe69559 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Sat, 23 Jan 2016 10:21:32 +0300
 Subject: [PATCH 23/49] Fix possible wrong aspect.
@@ -2198,7 +2198,7 @@ index c5404c3..7f414fa 100644
 2.7.4
 
 
-From a0e464110244c1097aad2606c0a6393f828220cb Mon Sep 17 00:00:00 2001
+From b0ad32af0e8151e9ed3db75a32d69867d16dbe06 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Fri, 22 Jan 2016 18:18:33 +0300
 Subject: [PATCH 24/49] DemuxFFmpeg: ssif remux
@@ -2219,8 +2219,7 @@ fix for compiling with libbluray disabled
  xbmc/cores/VideoPlayer/IVideoPlayer.h              |   1 +
  xbmc/cores/VideoPlayer/VideoPlayer.cpp             |   4 +
  xbmc/cores/VideoPlayer/VideoPlayerVideo.h          |   1 +
- xbmc/settings/AdvancedSettings.cpp                 |   2 +-
- 15 files changed, 874 insertions(+), 16 deletions(-)
+ 14 files changed, 873 insertions(+), 15 deletions(-)
  create mode 100644 xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp
  create mode 100644 xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h
  create mode 100644 xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp
@@ -3515,24 +3514,11 @@ index 689948c..83d4bb0 100644
  
    // classes
    CDVDOverlayContainer* m_pOverlayContainer;
-diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 1207bc9..b45b4b4 100644
---- a/xbmc/settings/AdvancedSettings.cpp
-+++ b/xbmc/settings/AdvancedSettings.cpp
-@@ -437,7 +437,7 @@ void CAdvancedSettings::Initialize()
- 
-   m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.rss|.webp|.jp2|.apng";
-   m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b";
--  m_videoExtensions = ".m4v|.3g2|.3gp|.nsv|.tp|.ts|.ty|.strm|.pls|.rm|.rmvb|.mpd|.m3u|.m3u8|.ifo|.mov|.qt|.divx|.xvid|.bivx|.vob|.nrg|.img|.iso|.udf|.pva|.wmv|.asf|.asx|.ogm|.m2v|.avi|.bin|.dat|.mpg|.mpeg|.mp4|.mkv|.mk3d|.avc|.vp3|.svq3|.nuv|.viv|.dv|.fli|.flv|.001|.wpl|.xspf|.zip|.vdr|.dvr-ms|.xsp|.mts|.m2t|.m2ts|.evo|.ogv|.sdp|.avs|.rec|.url|.pxml|.vc1|.h264|.rcv|.rss|.mpls|.webm|.bdmv|.wtv|.trp|.f4v";
-+  m_videoExtensions = ".m4v|.3g2|.3gp|.nsv|.tp|.ts|.ty|.strm|.pls|.rm|.rmvb|.mpd|.m3u|.m3u8|.ifo|.mov|.qt|.divx|.xvid|.bivx|.vob|.nrg|.img|.iso|.udf|.pva|.wmv|.asf|.asx|.ogm|.m2v|.avi|.bin|.dat|.mpg|.mpeg|.mp4|.mkv|.mk3d|.avc|.vp3|.svq3|.nuv|.viv|.dv|.fli|.flv|.001|.wpl|.xspf|.zip|.vdr|.dvr-ms|.xsp|.mts|.m2t|.m2ts|.evo|.ogv|.sdp|.avs|.rec|.url|.pxml|.vc1|.h264|.rcv|.rss|.mpls|.webm|.bdmv|.wtv|.trp|.f4v|.ssif";
-   m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|.ass|.idx|.ifo|.zip";
-   m_discStubExtensions = ".disc";
-   // internal music extensions
 -- 
 2.7.4
 
 
-From 0e37f5b7a23d1f8257d8d68ab8965b5641cad1c5 Mon Sep 17 00:00:00 2001
+From d84af4d3e16ee6eaf21e10255de0dda41d8e0124 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <anightik@gmail.com>
 Date: Fri, 11 Mar 2016 16:58:53 +0300
 Subject: [PATCH 25/49] HasVideo returns true if video stream exists. This
@@ -3559,7 +3545,7 @@ index 339c985..063f57f 100644
 2.7.4
 
 
-From 3386e6eef7565f9803023e779e6451e08149bec7 Mon Sep 17 00:00:00 2001
+From e2ef350b601b3244e8ab09c1cf4e2b320b435652 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <anightik@gmail.com>
 Date: Fri, 16 Sep 2016 11:37:48 +0300
 Subject: [PATCH 26/49] move SETTING_VIDEOPLAYER_SUPPORTMVC from platform
@@ -3591,7 +3577,7 @@ index 56ef2b5..6e3dba4 100644
    </section>
    <section id="media">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index e2f5319..41abd44 100755
+index 0971c85..e4b3b63 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -244,6 +244,12 @@
@@ -3638,7 +3624,7 @@ index 5320ce3..b675957 100644
 2.7.4
 
 
-From a4b49f7dc7f772ec89d50cd2807123f02d475533 Mon Sep 17 00:00:00 2001
+From 9fac43e2b1953d39edd6ef44504a6e0a37480d1c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 29 Feb 2016 17:00:50 +0000
 Subject: [PATCH 27/49] libbluray: Bump to Nevcairie's patches
@@ -5969,7 +5955,7 @@ index 0000000..ca961f1
 2.7.4
 
 
-From 3896192f228cc3f4e70bca2e2ae1dccf5f6e116c Mon Sep 17 00:00:00 2001
+From 12821c0f5bca6264ed5eac21c0f37b9453c84e2d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 6 Mar 2016 12:54:59 +0000
 Subject: [PATCH 28/49] mvc: Automatically enable stereo mode
@@ -6037,7 +6023,7 @@ index 28bd3ec..eda4b54 100644
 2.7.4
 
 
-From c03144b15faf0e0d107a5b2627dfe18dc74a33d6 Mon Sep 17 00:00:00 2001
+From 566d9cd1e44233c4229068686f8615159efdb875 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 11 Nov 2016 15:53:53 +0000
 Subject: [PATCH 29/49] stereoscopicmanager: fixups for rbp
@@ -6268,7 +6254,7 @@ index d04458f..dcda384 100644
 2.7.4
 
 
-From 988faaa217120af8fd4414da423927ad60ef8820 Mon Sep 17 00:00:00 2001
+From a755064f68824f8cab2a15cbbdce5741c6cd4a94 Mon Sep 17 00:00:00 2001
 From: Rainer Hochecker <fernetmenta@online.de>
 Date: Tue, 22 Mar 2016 09:51:52 +0100
 Subject: [PATCH 30/49] python: use kodi provided cert if available
@@ -6298,7 +6284,7 @@ index 81e0d7c..b33b623 100644
 2.7.4
 
 
-From 6d6b7397bdb8a2ae07a616ca116f203b6ce52854 Mon Sep 17 00:00:00 2001
+From 78ebad7a8bdcd94f45d2a98f43519c94d12244b5 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 25 May 2016 18:31:17 +0100
 Subject: [PATCH 31/49] rbp: Hard code the number of buffers to improve audio
@@ -6329,7 +6315,7 @@ index 6e3dba4..1db0d32 100644
 2.7.4
 
 
-From 460ef8c29c2bcf55f48f9bbdc17b165aad0b186b Mon Sep 17 00:00:00 2001
+From 7ab87f0169a8984e57c0f4938d270111079073a6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 19 Jul 2016 20:39:18 +0100
 Subject: [PATCH 32/49] mmalrender: Add sharpness control
@@ -6341,7 +6327,7 @@ Subject: [PATCH 32/49] mmalrender: Add sharpness control
  3 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 22a9aca..5017db7 100644
+index 5fc3a34..722307d 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -8924,7 +8924,7 @@ msgstr ""
@@ -6407,7 +6393,7 @@ index 9718fb0..40d82e5 100644
 2.7.4
 
 
-From be6b028a749184417dda594957d74b153a987295 Mon Sep 17 00:00:00 2001
+From 63e8422df757be0eaeab482faea2ad9a6e401ba1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 14 Oct 2016 15:37:53 +0100
 Subject: [PATCH 33/49] MMALFFMpeg: Report as SW decode in codec overlay info
@@ -6433,7 +6419,7 @@ index a4f01a8..0f0bf4d 100644
 2.7.4
 
 
-From 17241ba459c2ac3c67f3d7391dc032d8c4ba96f9 Mon Sep 17 00:00:00 2001
+From b1d1ccababd4c55e435cf9d12d84a8de591df31c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 19 Dec 2017 16:02:40 +0000
 Subject: [PATCH 34/49] VideoPlayer: Fix stereo mode detection from filename in
@@ -6468,7 +6454,7 @@ index 063f57f..4dd2403 100644
 2.7.4
 
 
-From fe9ff02e941ac4491d68288936964d940cb31e93 Mon Sep 17 00:00:00 2001
+From 9721061ca1770d7e426f55d14756f404adf037b8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 2 Feb 2018 14:35:34 +0000
 Subject: [PATCH 35/49] stereoscopics: Remove instances of mono
@@ -6591,7 +6577,7 @@ index 35f71e4..30d7219 100644
 2.7.4
 
 
-From 48def6d534dbcb6d54b9647b2e903af70df9ce92 Mon Sep 17 00:00:00 2001
+From 228045ebedae3fb8e2d53cdae4de8161637601f1 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 29 May 2018 22:31:57 +0100
 Subject: [PATCH 36/49] RenderManager: Revert show_video commit minimally
@@ -6618,7 +6604,7 @@ index 487024f..7d857ae 100644
 2.7.4
 
 
-From 82b0c5373fa20e1c7088b9412c147d30572c8024 Mon Sep 17 00:00:00 2001
+From 29021b55c84df39809bb5531df44846f9d656473 Mon Sep 17 00:00:00 2001
 From: Nuno Senica <nsenica@gmail.com>
 Date: Tue, 27 Dec 2016 20:59:56 +0000
 Subject: [PATCH 37/49] Apply ffmpeg patches automatically after downloading
@@ -6655,7 +6641,7 @@ index ef74671..9ba4bff 100644
 2.7.4
 
 
-From cdf5ce4e1183130a679c4a2ee24b397fc83d1b4f Mon Sep 17 00:00:00 2001
+From e0ee39adf4f0a70b1fbf639bc32895b1ec81806f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Nuno=20S=C3=A9nica?= <nuno.senica@booking.com>
 Date: Tue, 28 Mar 2017 22:33:00 +0200
 Subject: [PATCH 38/49] Adds -DRPI=1 to the compiler flags so that ffmpeg can
@@ -6684,7 +6670,7 @@ index 4a26222..5ab4feb 100644
 2.7.4
 
 
-From 07988d953d6056a050faa7151c60f56afe5e7d03 Mon Sep 17 00:00:00 2001
+From 9fe4864dc2308cfc98504b2ee082232c1c4957ea Mon Sep 17 00:00:00 2001
 From: diogomsantos <diogomsantos@hotmail.com>
 Date: Mon, 3 Apr 2017 23:24:38 +0100
 Subject: [PATCH 39/49] Fix compilling with latest ffmpeg patches which depends
@@ -6711,7 +6697,7 @@ index 5ab4feb..b688175 100644
 2.7.4
 
 
-From 0089a97f206c39f0dc472fd7b3d864e92c6a8a51 Mon Sep 17 00:00:00 2001
+From 9daf0ab56b2cbd723306184d97d9e8ef9793fc4b Mon Sep 17 00:00:00 2001
 From: Nuno Senica <nsenica@gmail.com>
 Date: Tue, 28 Nov 2017 15:09:46 +0000
 Subject: [PATCH 40/49] Apply ffmpeg patches automatically after downloading
@@ -6772,7 +6758,7 @@ index dc990b8..fb6bea6 100755
 2.7.4
 
 
-From 761e9a086489d138b2949268ac5101011826ccaf Mon Sep 17 00:00:00 2001
+From 716114459d36015e4105a5dd8cc35f6134430a99 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 23 Jun 2018 10:18:38 +0100
 Subject: [PATCH 41/49] ffmpeg: hevc: Add gpu based hevc optimisation
@@ -51446,7 +51432,7 @@ index 0000000..c64d5e5
 2.7.4
 
 
-From 2a983de7eeb7ed2daff87c07acbe6f94754b85ef Mon Sep 17 00:00:00 2001
+From e96cf6f2365ea474daf4ae63fc28084d0f1b15e4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 4 Mar 2017 19:25:40 +0000
 Subject: [PATCH 42/49] ffmpeg: Call get_format to fix an issue with MMAL
@@ -51543,7 +51529,7 @@ index 0bb9eb3..5a3d3a9 100644
 2.7.4
 
 
-From c26d48c7a33fd67f4254bf006530eb737bf2d238 Mon Sep 17 00:00:00 2001
+From 0fe69582aa0e8465123bbdc384d0ee66c75e6495 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sun, 21 Jan 2018 20:12:07 +0000
 Subject: [PATCH 43/49] ffmpeg: Automatic switch to software decode for GMC
@@ -51764,7 +51750,7 @@ index 23c1b5a..6993dc0 100644
 2.7.4
 
 
-From a3837648ba61cc29ff75f5a042b70ffb5557c479 Mon Sep 17 00:00:00 2001
+From 2ce9ba4ba962fcab91ed33f2d904be061d2d8f84 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 25 Jan 2018 15:23:34 +0000
 Subject: [PATCH 44/49] ffmpeg: use upstream mvc patches
@@ -52089,7 +52075,7 @@ index 0000000..551a271
 2.7.4
 
 
-From 34e13bb2c1469b59737c60df37887051c88f27e0 Mon Sep 17 00:00:00 2001
+From 832c15d15607fbea7d27f85c684a7045f682d58c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 23 May 2018 12:22:17 +0100
 Subject: [PATCH 45/49] ffmpeg: Ensure correct arch gets passed to ffmpeg
@@ -52130,7 +52116,7 @@ index e305a76..2692f0d 100644
 2.7.4
 
 
-From 9919aa930ec30acea01eb4e84d036e6d84b909ec Mon Sep 17 00:00:00 2001
+From 261c4b88af357982bce3ea467adcca83793b3890 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 26 Jun 2017 20:17:09 +0100
 Subject: [PATCH 46/49] MMAL: Add hevc support by allowing 4 planes
@@ -52193,7 +52179,7 @@ index 7e1ad58..edfccfc 100644
 2.7.4
 
 
-From 5235c6b24bff73a0290141964a25e449b89afe00 Mon Sep 17 00:00:00 2001
+From 55d6358a5f81a4ab760a8a5e4aa24adc53d68551 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 8 Sep 2017 12:17:34 +0100
 Subject: [PATCH 47/49] DVDInputStreamBluray: Possible fix for 3D main movie
@@ -52227,7 +52213,7 @@ index 601b5cd..05068bd 100644
 2.7.4
 
 
-From 56d2662c4208cae8f31237dc642a12b49ae4e9ca Mon Sep 17 00:00:00 2001
+From 0763bafd25d8bca4de4373abe39a8bccc838dc8e Mon Sep 17 00:00:00 2001
 From: Nuno Senica <nsenica@gmail.com>
 Date: Wed, 19 Sep 2018 09:36:09 +0200
 Subject: [PATCH 48/49] Tell ffmpeg to compile with raspberry pi support thus
@@ -52257,7 +52243,7 @@ index b688175..bf8a7f7 100644
 2.7.4
 
 
-From f898507d555d4d8885c6a370ff7d8142309094f2 Mon Sep 17 00:00:00 2001
+From 3ef4dabccc0846b00f94a8ee4ce2b27617380a3e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 26 Oct 2018 19:06:52 +0100
 Subject: [PATCH 49/49] MMALRender: Destroy deinterlace component when method
