@@ -11,34 +11,31 @@ On the other hand, bypassing it for VC-1 makes playback 2x slower,
 do bypass it only for other formats.
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ 1 file changed, 11 insertions(+), 0 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 10ef7d3..c21bb79 100644
+index 10e73cc74f..faa42d66cb 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -1641,10 +1641,19 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+@@ -1640,6 +1640,17 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
    am_private->gcodec.ratio64     = am_private->video_ratio64;
    am_private->gcodec.param       = NULL;
  
--  if (am_private->video_format == VFORMAT_VC1)
-+  if (am_private->video_format == VFORMAT_VC1) {
-     SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
--  else
++  if (am_private->video_format == VFORMAT_VC1)
++  {
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
 +    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 0);
 +  }
-+  else {
-     SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
++  else
++  {
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
 +    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 1);
 +  }
 +
-+  if (am_private->video_format == VFORMAT_VC1)
-+    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 0);
-+  else
-+    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_all", 1);
- 
    switch(am_private->video_format)
    {
+     default:
+
 -- 
 2.7.4
 
