@@ -1,0 +1,155 @@
+From 41b2a8772045039962a1fee8dff114ada4844fd0 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Thu, 16 May 2019 17:05:12 +0100
+Subject: [PATCH] Sort whitelist lowres to highres and match exact framerate at
+ higher resolutions
+
+---
+ xbmc/settings/DisplaySettings.cpp |  2 +-
+ xbmc/utils/Variant.cpp            | 24 ++++++++++++++++++++++++
+ xbmc/utils/Variant.h              |  1 +
+ xbmc/windowing/Resolution.cpp     | 37 ++++++++++++++++++++++++++++++++++---
+ 4 files changed, 60 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index 9d09dc2e14..ed530829d4 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -682,7 +682,7 @@ RESOLUTION CDisplaySettings::GetResolutionForScreen()
+ 
+ static inline bool ModeSort(StringSettingOption i,StringSettingOption j)
+ {
+-  return (i.value > j.value);
++  return (i.value < j.value);
+ }
+ 
+ void CDisplaySettings::SettingOptionsModesFiller(std::shared_ptr<const CSetting> setting, std::vector<StringSettingOption> &list, std::string &current, void *data)
+diff --git a/xbmc/utils/Variant.cpp b/xbmc/utils/Variant.cpp
+index 66ab15ef7d..8b091e82a9 100644
+--- a/xbmc/utils/Variant.cpp
++++ b/xbmc/utils/Variant.cpp
+@@ -682,6 +682,30 @@ bool CVariant::operator==(const CVariant &rhs) const
+   return false;
+ }
+ 
++bool CVariant::operator<(const CVariant &rhs) const
++{
++  if (m_type == rhs.m_type)
++  {
++    switch (m_type)
++    {
++    case VariantTypeInteger:
++      return m_data.integer < rhs.m_data.integer;
++    case VariantTypeUnsignedInteger:
++      return m_data.unsignedinteger < rhs.m_data.unsignedinteger;
++    case VariantTypeDouble:
++      return m_data.dvalue < rhs.m_data.dvalue;
++    case VariantTypeString:
++      return *m_data.string < *rhs.m_data.string;
++    case VariantTypeWideString:
++      return *m_data.wstring < *rhs.m_data.wstring;
++    default:
++      break;
++    }
++  }
++
++  return false;
++}
++
+ void CVariant::push_back(const CVariant &variant)
+ {
+   if (m_type == VariantTypeNull)
+diff --git a/xbmc/utils/Variant.h b/xbmc/utils/Variant.h
+index fc5e06fcfe..08f6d16b08 100644
+--- a/xbmc/utils/Variant.h
++++ b/xbmc/utils/Variant.h
+@@ -101,6 +101,7 @@ public:
+   CVariant &operator=(CVariant &&rhs);
+   bool operator==(const CVariant &rhs) const;
+   bool operator!=(const CVariant &rhs) const { return !(*this == rhs); }
++  bool operator<(const CVariant &rhs) const;
+ 
+   void push_back(const CVariant &variant);
+   void push_back(CVariant &&variant);
+diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
+index 19a2dde602..d538d3d5bd 100644
+--- a/xbmc/windowing/Resolution.cpp
++++ b/xbmc/windowing/Resolution.cpp
+@@ -70,6 +70,11 @@ RESOLUTION CResolutionUtils::ChooseBestResolution(float fps, int width, int heig
+   return res;
+ }
+ 
++static inline bool ModeSort(CVariant i, CVariant j)
++{
++  return (i < j);
++}
++
+ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int height, bool is3D, RESOLUTION &resolution)
+ {
+   RESOLUTION_INFO curr = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo(resolution);
+@@ -103,6 +108,8 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+     }
+   }
+ 
++  std::sort(indexList.begin(), indexList.end(), ModeSort);
++
+   CLog::Log(LOGDEBUG, "Trying to find exact refresh rate");
+ 
+   for (const auto& mode : indexList)
+@@ -163,7 +170,8 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+     }
+   }
+ 
+-  CLog::Log(LOGDEBUG, "No 3:2 pullback refresh rate whitelisted resolution matched, trying current resolution");
++  CLog::Log(LOGDEBUG, "No 3:2 pullback whitelisted resolution matched, trying current resolution %s (%d)", 
++      curr.strMode.c_str(), resolution);
+ 
+   if (width <= curr.iScreenWidth
+     && height <= curr.iScreenHeight
+@@ -174,10 +182,33 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+     return;
+   }
+ 
+-  CLog::Log(LOGDEBUG, "Current resolution doesn't match, trying default resolution");
++  /* Prefer upscaling at the correct framerate if available and specifically whitelisted 
++   * eg for displays with 2160p25/50 but no 1080p25/50
++   */
++  if (HasWhitelist())
++  {
++    CLog::Log(LOGDEBUG, "Current resolution doesn't match, trying higher resolutions");
++    for (const auto& mode : indexList)
++    {
++      auto i = CDisplaySettings::GetInstance().GetResFromString(mode.asString());
++      const RESOLUTION_INFO info = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo(i);
++
++      // pick the lowest resolution that has a matching refresh rate
++      if ((info.iScreenHeight >= height || info.iScreenWidth >= width) &&
++          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++          MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
++      {
++        resolution = i;
++        CLog::Log(LOGDEBUG, "Matched fuzzy whitelisted Resolution %s (%d)", info.strMode.c_str(), i);
++        return;
++      }
++    }
++  }
+ 
+   const RESOLUTION_INFO desktop_info = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo(CDisplaySettings::GetInstance().GetCurrentResolution());
+ 
++  CLog::Log(LOGDEBUG, "Current resolution doesn't match, trying default resolution %s", desktop_info.strMode.c_str());
++
+   for (const auto& mode : indexList)
+   {
+     auto i = CDisplaySettings::GetInstance().GetResFromString(mode.asString());
+@@ -194,7 +225,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+     }
+   }
+ 
+-  CLog::Log(LOGDEBUG, "Default resolution doesn't provide reqired refreshrate, trying default resolution with double refreshrate");
++  CLog::Log(LOGDEBUG, "Default resolution doesn't provide required refreshrate, trying default resolution with double refreshrate");
+ 
+   for (const auto& mode : indexList)
+   {
+-- 
+2.11.0
+
