@@ -202,7 +202,7 @@ index 7c3a971943c2..aa204e619a91 100644
 +    m_clock.Discontinuity(pPacket->pts - DVD_TIME_BASE/2);
 +
 +  m_CurrentVideo.lastdts = pPacket->dts;
-+  CLog::Log(LOGDEBUG, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
 +    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
    m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
    m_CurrentVideo.packets++;
@@ -251,7 +251,7 @@ index 2721d7ee83c1..a0a737488f46 100644
    if (m_speed > DVD_PLAYSPEED_NORMAL)
      maxWaitTime = std::max(timeToDisplay, 0);
    int buffer = m_renderManager.WaitForBuffer(m_bAbortOutput, maxWaitTime);
-+  CLog::Log(LOGDEBUG,"CVideoPlayerVideo::%s - ttd:%dms pts:%0.3lf Clock:%0.3f Level:%d elapsed:%0.3fms",
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayerVideo::%s - ttd:%dms pts:%0.3lf Clock:%0.3f Level:%d elapsed:%0.3fms",
 +        __FUNCTION__, timeToDisplay, pPicture->pts/1000000, iPlayingClock/1000000.0, buffer, std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count() / 1000.0);
    if (buffer < 0)
    {
