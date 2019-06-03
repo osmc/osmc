@@ -1,0 +1,40 @@
+From 57c59faceec9c06c4ebd6b79841db5d2188cea38 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Apr 2019 21:06:02 +0100
+Subject: [PATCH] Increase number of renderer buffers (originally from LE)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h            | 2 +-
+ xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
+index 7282fdd..85d5072 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
+@@ -18,7 +18,7 @@
+ #include "cores/VideoPlayer/Process/VideoBuffer.h"
+ 
+ #define MAX_FIELDS 3
+-#define NUM_BUFFERS 6
++#define NUM_BUFFERS 8
+ 
+ class CSetting;
+ 
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+index 89ae7de..769f631 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+@@ -42,7 +42,7 @@ public:
+ private:
+   void Reset();
+ 
+-  static const int m_numRenderBuffers = 4;
++  static const int m_numRenderBuffers = 8;
+ 
+   struct BUFFER
+   {
+-- 
+2.7.4
+

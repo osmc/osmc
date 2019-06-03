@@ -1,28 +1,26 @@
-From 128285c122eb8aef45283d17b95abb99429fc7ce Mon Sep 17 00:00:00 2001
+From e01f85f6e9af15ca56aaea0d80158c4e237bbdc8 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 17:56:35 +0100
 Subject: [PATCH] Cosmetic changes to the System Information dialog
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/windows/GUIWindowSystemInfo.cpp | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ xbmc/windows/GUIWindowSystemInfo.cpp | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 3bde0c9..ed69e0e 100644
+index 3bde0c9..82bae19 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -47,8 +47,8 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
+@@ -47,7 +47,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
      case GUI_MSG_WINDOW_INIT:
      {
        CGUIWindow::OnMessage(message);
 -      SET_CONTROL_LABEL(52, CSysInfo::GetAppName() + " " + CSysInfo::GetVersion());
--      SET_CONTROL_LABEL(53, CSysInfo::GetBuildDate());
-+      SET_CONTROL_LABEL(52, "Open Source Media Center running");
-+      SET_CONTROL_LABEL(53, CSysInfo::GetAppName() + " " + CSysInfo::GetVersion());
++      SET_CONTROL_LABEL(52, "OSMC running " + CSysInfo::GetAppName() + " " + CSysInfo::GetVersion());
+       SET_CONTROL_LABEL(53, CSysInfo::GetBuildDate());
        CONTROL_ENABLE_ON_CONDITION(CONTROL_BT_PVR, CServiceBroker::GetPVRManager().IsStarted());
        return true;
-     }
 @@ -97,7 +97,6 @@ void CGUIWindowSystemInfo::FrameMove()
      SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
      SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);

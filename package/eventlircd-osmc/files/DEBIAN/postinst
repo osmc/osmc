@@ -17,6 +17,8 @@ if [ "$1" = "configure" ]; then
 	systemctl daemon-reload
 	systemctl enable eventlircd.service >/dev/null 2>&1
 	if ischroot; then exit 0; fi
+	udevadm control --reload
+	udevadm trigger --subsystem-match=input
 	systemctl start eventlircd.service >/dev/null 2>&1
 	exit 0
 fi

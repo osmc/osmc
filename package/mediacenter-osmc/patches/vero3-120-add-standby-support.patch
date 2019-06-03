@@ -1,4 +1,4 @@
-From 59ba64e5fdcc2cf1f2f1c3498641029deb36ca3e Mon Sep 17 00:00:00 2001
+From 110913561f5123b20b465582e771cfd1a5017f73 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
@@ -12,18 +12,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  4 files changed, 70 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 368010d..634a53a 100644
+index e64e495..9a28ce2 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -216,6 +216,7 @@
+@@ -186,6 +186,7 @@
  
  #if defined(HAS_LIBAMCODEC)
  #include "utils/AMLUtils.h"
 +#include "utils/SysfsUtils.h"
  #endif
  
- #include "cores/FFmpeg.h"
-@@ -4037,6 +4038,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+ //TODO: XInitThreads
+@@ -3456,6 +3457,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -33,7 +33,7 @@ index 368010d..634a53a 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -4141,6 +4145,59 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -3632,6 +3636,59 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -41,11 +41,11 @@ index 368010d..634a53a 100644
 +void CApplication::ActivateScreenSaverStandby()
 +{
 +  CLog::Log(LOGINFO, "Activating Vero standby mode");
-+    if (g_application.m_pPlayer->IsPlayingVideo())
-+      g_application.StopPlaying();
++    if (m_appPlayer.IsPlayingVideo())
++      StopPlaying();
 +  ToggleStandby();
-+  CAnnouncementManager::GetInstance().Announce(GUI, "xbmc", "OnScreensaverActivated");
-+  g_windowManager.CloseDialogs(true);
++  CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::GUI, "xbmc", "OnScreensaverActivated");
++  CServiceBroker::GetGUI()->GetWindowManager().CloseDialogs(true);
 +}
 +
 +void CApplication::ToggleStandby()
@@ -66,7 +66,7 @@ index 368010d..634a53a 100644
 +	SysfsUtils::SetString(ss_govpath.str(), cpu_governor);
 +  }
 +  std::string hpdlock = "hpd_lock1";
-+  if (m_bVeroStandby && ! CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
++  if (m_bVeroStandby && ! CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
 +	hpdlock = "hpd_lock0";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- HPD locking will now be %s", hpdlock.c_str());
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", hpdlock);
@@ -86,7 +86,7 @@ index 368010d..634a53a 100644
 +  }
 +
 +  m_bVeroStandby = ! m_bVeroStandby; //invert state
-+  m_bScreenSave = m_bVeroStandby;
++  m_screensaverActive = m_bVeroStandby;
 +  return;
 +}
 +
@@ -94,50 +94,50 @@ index 368010d..634a53a 100644
  // if forceType is true, we ignore the various conditions that can alter
  // the type of screensaver displayed
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 49f9bcb..374cdff 100644
+index 8a54e4a..b8466ba 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
-@@ -218,6 +218,8 @@ public:
+@@ -215,6 +215,8 @@ public:
    // Checks whether the screensaver and / or DPMS should become active.
    void CheckScreenSaverAndDPMS();
    void ActivateScreenSaver(bool forceType = false);
 +  void ActivateScreenSaverStandby();
 +  void ToggleStandby();
-   bool SetupNetwork();
    void CloseNetworkShares();
  
-@@ -427,6 +429,8 @@ public:
-   */
-   void UnlockFrameMoveGuard();
+   void ShowAppMigrationMessage();
+@@ -372,6 +374,8 @@ public:
+ 
+   void SetRenderGUI(bool renderGUI);
  
 +  bool IsVeroStandby() const { return m_bVeroStandby; }
 +
  protected:
-   virtual bool OnSettingsSaving() const override;
- 
-@@ -460,6 +464,7 @@ protected:
+   bool OnSettingsSaving() const override;
+   bool Load(const TiXmlNode *settings) override;
+@@ -418,6 +422,7 @@ protected:
  #endif
    // screensaver
-   bool m_bScreenSave;
+   bool m_screensaverActive = false;
 +  bool m_bVeroStandby;
-   ADDON::AddonPtr m_screenSaver;
- 
-   // timer information
+   std::string m_screensaverIdInUse;
+   ADDON::AddonPtr m_pythonScreenSaver; // @warning: Fallback for Python interface, for binaries not needed!
+   // OS screen saver inhibitor that is always active if user selected a Kodi screen saver
 diff --git a/xbmc/network/Network.cpp b/xbmc/network/Network.cpp
-index 25645f6..2d3f695 100644
+index 8b7fe93..bfd59c1 100644
 --- a/xbmc/network/Network.cpp
 +++ b/xbmc/network/Network.cpp
-@@ -32,6 +32,7 @@
- #include "utils/CharsetConverter.h"
+@@ -26,6 +26,7 @@
+ #include "platform/linux/XTimeUtils.h"
  #endif
  #include "utils/StringUtils.h"
 +#include "Application.h"
  
  using namespace KODI::MESSAGING;
  
-@@ -289,6 +290,10 @@ void CNetwork::NetworkMessage(EMESSAGE message, int param)
+@@ -283,6 +284,10 @@ void CNetworkBase::NetworkMessage(EMESSAGE message, int param)
  
- bool CNetwork::WakeOnLan(const char* mac)
+ bool CNetworkBase::WakeOnLan(const char* mac)
  {
 +  /* Don't do this in standby */
 +  if (g_application.IsVeroStandby())
@@ -147,10 +147,10 @@ index 25645f6..2d3f695 100644
    unsigned char ethaddr[8];
    unsigned char buf [128];
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
-index 33c4eb4..4ca5441 100644
+index 9c13b85..d6fdb24 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
 +++ b/xbmc/powermanagement/PowerManager.cpp
-@@ -185,7 +185,9 @@ bool CPowerManager::Powerdown()
+@@ -110,7 +110,9 @@ bool CPowerManager::Powerdown()
  
  bool CPowerManager::Suspend()
  {

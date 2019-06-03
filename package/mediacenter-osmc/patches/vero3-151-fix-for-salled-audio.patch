@@ -1,0 +1,29 @@
+From ea03d162a0650eb45f6248d37823cd1b133fa4ea Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 May 2019 17:23:37 +0100
+Subject: [PATCH] Fix for stalled audio (from LE)
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+index 7b15b42..cb40171 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -275,9 +275,9 @@ void CVideoPlayerAudio::Process()
+           !m_stalled && m_syncState == IDVDStreamPlayer::SYNC_INSYNC)
+       {
+         // while AE sync is active, we still have time to fill buffers
+-        if (m_syncTimer.IsTimePast())
++        if (m_syncTimer.IsTimePast() && m_audioClock < m_pClock->GetClock())
+         {
+-          CLog::Log(LOGNOTICE, "CVideoPlayerAudio::Process - stream stalled");
++          CLog::Log(LOGNOTICE, "CVideoPlayerAudio::Process - stream stalled pts:%0.3f clock:%0.3f ", m_audioClock / DVD_TIME_BASE, m_pClock->GetClock() / DVD_TIME_BASE);
+           m_stalled = true;
+         }
+       }
+-- 
+2.7.4
+

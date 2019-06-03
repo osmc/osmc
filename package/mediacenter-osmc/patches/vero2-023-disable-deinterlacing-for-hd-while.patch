@@ -1,4 +1,4 @@
-From 08d5395fdfc69a5558f263a2cd85547d4325f25d Mon Sep 17 00:00:00 2001
+From eaf17a45bf10b5d01440a0ef2ca741f22ac338cb Mon Sep 17 00:00:00 2001
 From: Alex Deryskyba <alex@codesnake.com>
 Date: Tue, 3 Feb 2015 17:58:19 +0100
 Subject: [PATCH] Disable deinterlacing for HD content while video is being
@@ -9,11 +9,11 @@ Subject: [PATCH] Disable deinterlacing for HD content while video is being
  1 file changed, 5 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index f9b4138..c82159b 100644
+index 82bf705..de12b36 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -2256,6 +2256,11 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
-   CLog::Log(LOGDEBUG, "CAMLCodec::SetVideoRect:m_stereo_view(%d)", m_stereo_view);
+@@ -2372,6 +2372,11 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   CLog::Log(LOGDEBUG, "CAMLCodec::SetVideoRect:m_guiStereoView(%d)", m_guiStereoView);
  #endif
  
 +  if (dst_rect.Width() < display.Width() || dst_rect.Height() < display.Height())

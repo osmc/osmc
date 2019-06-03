@@ -1,0 +1,232 @@
+From 3a175032812590e5c8b0348c788a40e369c6df56 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Thu, 18 Apr 2019 16:17:07 +0100
+Subject: [PATCH] Fix Vero2 HDMI hotplugging and provide fallback video.
+
+---
+ xbmc/Application.cpp                        | 14 ++++-
+ xbmc/messaging/ApplicationMessenger.h       |  1 +
+ xbmc/utils/AMLUtils.cpp                     | 11 +++-
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 91 +++++++++++++++++++++++++++++
+ xbmc/windowing/amlogic/WinSystemAmlogic.h   |  8 +++
+ 5 files changed, 122 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index ec6c9bf5ae..5c723e397b
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2152,7 +2152,19 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+       break;
+   }
+ 
+-  case TMSG_NETWORKMESSAGE:
++  case TMSG_AML_RESIZE:
++  {
++    if (! m_appPlayer.IsPlayingVideo()) {
++      CDisplaySettings::GetInstance().ClearCustomResolutions();
++      CServiceBroker::GetWinSystem()->UpdateResolutions();
++      CDisplaySettings::GetInstance().SetCurrentResolution(RES_DESKTOP);
++      CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(RES_DESKTOP, true);
++      CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
++    }
++  }
++
++
++ case TMSG_NETWORKMESSAGE:
+     m_ServiceManager->GetNetwork().NetworkMessage((CNetwork::EMESSAGE)pMsg->param1, pMsg->param2);
+     break;
+ 
+diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
+index 5b312e4ff5..0f63275fd4
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -81,6 +81,7 @@
+ #define TMSG_RENDERER_PREINIT             TMSG_MASK_APPLICATION + 31
+ #define TMSG_RENDERER_UNINIT              TMSG_MASK_APPLICATION + 32
+ #define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 33
++#define TMSG_AML_RESIZE                   TMSG_MASK_APPLICATION + 34
+ 
+ #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
+ #define TMSG_GUI_INFOBOOL                 TMSG_MASK_GUIINFOMANAGER + 1
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 995891bb32..1881e4078b
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -490,8 +490,15 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
+ 
+   if (SysfsUtils::GetString(dcapfile, valstr) < 0)
+   {
+-    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0)
+-      return false;
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0 || valstr.length() == 0)
++    {
++      CLog::Log(LOGDEBUG, "Cannot read EDID - falling back to current display mode");
++      if (SysfsUtils::GetString("/sys/class/display/mode", valstr) < 0)
++      {
++        CLog::Log(LOGDEBUG, "Cannot get current display mode");
++        return false;
++      }
++    }
+ 
+     if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0)
+       valstr += "\n" + vesastr;
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index e4dddce719..99fc7084c0 100755
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -32,10 +32,19 @@
+ #include "utils/SysfsUtils.h"
+ #include "threads/SingleLock.h"
+ 
++#include "messaging/ApplicationMessenger.h"
++
+ #include <linux/fb.h>
+ 
+ #include <EGL/egl.h>
+ 
++#include <libudev.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <locale.h>
++#include <unistd.h>
++
++using namespace KODI::MESSAGING;
+ using namespace KODI;
+ 
+ CWinSystemAmlogic::CWinSystemAmlogic() :
+@@ -104,6 +113,9 @@ CWinSystemAmlogic::CWinSystemAmlogic() :
+  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = %s", attr.c_str());
+  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
+ 
++ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
++
++ StartMonitorHWEvent();
+ 
+   // Register sink
+   AE::CAESinkFactory::ClearSinks();
+@@ -115,12 +127,91 @@ CWinSystemAmlogic::CWinSystemAmlogic() :
+ 
+ CWinSystemAmlogic::~CWinSystemAmlogic()
+ {
++  StopMonitorHWEvent();
++
+   if(m_nativeWindow)
+   {
+     m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
+   }
+ }
+ 
++void hwMon(CWinSystemAmlogic *instance) {
++
++        struct udev *udev;
++        struct udev_enumerate *enumerate;
++        struct udev_list_entry *devices, *dev_list_entry;
++        struct udev_device *dev;
++
++        struct udev_monitor *mon;
++        int fd;
++
++        /* Create the udev object */
++        udev = udev_new();
++        if (!udev) {
++                return;
++        }
++
++        mon = udev_monitor_new_from_netlink(udev, "udev");
++        udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
++
++        udev_monitor_enable_receiving(mon);
++        fd = udev_monitor_get_fd(mon);
++
++        /* Poll for events */
++
++        while (1 && instance->m_monitorEvents) {
++
++                fd_set fds;
++                struct timeval tv;
++                int ret;
++
++                FD_ZERO(&fds);
++                FD_SET(fd, &fds);
++                tv.tv_sec = 0;
++                tv.tv_usec = 0;
++
++                ret = select(fd+1, &fds, NULL, NULL, &tv);
++
++                /* Check if FD has received data */
++
++                if (ret > 0 && FD_ISSET(fd, &fds)) {
++
++                        dev = udev_monitor_receive_device(mon);
++                        if (dev) {
++                                CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic: Detected HDMI switch");
++                                int state;
++                                SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
++				std::string newEdid;
++				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
++
++                                if (state && newEdid != instance->m_lastEdid) {
++                                    CApplicationMessenger::GetInstance().PostMsg(TMSG_AML_RESIZE);
++				    instance->m_lastEdid = newEdid;
++				}
++                                udev_device_unref(dev);
++                        }
++                        else {
++                                CLog::Log(LOGERROR, "CEGLNativeTypeAmlogic: can't get device from receive_device");
++                        }
++                }
++                usleep(250*1000);
++        }
++}
++
++void CWinSystemAmlogic::StartMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
++    m_monitorEvents = true;
++    m_monitorThread = std::thread(hwMon, this);
++    return;
++}
++
++void CWinSystemAmlogic::StopMonitorHWEvent() {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++    m_monitorEvents = false;
++    m_monitorThread.join();
++    return;
++}
++
+ bool CWinSystemAmlogic::InitWindowSystem()
+ {
+   m_nativeDisplay = EGL_DEFAULT_DISPLAY;
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
+index a4b2fc77d4..318c98de87
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.h
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
+@@ -15,6 +15,7 @@
+ #include "windowing/WinSystem.h"
+ #include "threads/SystemClock.h"
+ #include "EGL/egl.h"
++#include <thread>
+ 
+ class IDispResource;
+ 
+@@ -38,6 +39,10 @@ public:
+   bool Show(bool show = true) override;
+   virtual void Register(IDispResource *resource);
+   virtual void Unregister(IDispResource *resource);
++
++  bool m_monitorEvents;
++  std::string m_lastEdid;
++  
+ protected:
+   std::string m_framebuffer_name;
+   EGLDisplay m_nativeDisplay;
+@@ -55,4 +60,7 @@ protected:
+   std::vector<IDispResource*> m_resources;
+   std::unique_ptr<OPTIONALS::CLircContainer, OPTIONALS::delete_CLircContainer> m_lirc;
+   std::unique_ptr<CLibInputHandler> m_libinput;
++  void StartMonitorHWEvent();
++  void StopMonitorHWEvent();
++  std::thread m_monitorThread;
+ };
+-- 
+2.11.0
+

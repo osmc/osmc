@@ -1,26 +1,24 @@
-From 864fa88d425f1dbcbd0eae37531c2928afc98f9b Mon Sep 17 00:00:00 2001
-From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sun, 19 Feb 2017 16:01:29 +0000
+From 002d8787a5df3c18363836e5129baf6a021abe6d Mon Sep 17 00:00:00 2001
+From: Greg McCarthy <greg@gjmccarthy.co.uk>
+Date: Sun, 17 Sep 2017 19:42:09 +0100
 Subject: [PATCH] Fixup removed m_has_keyframe variable
 
-Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 9fd10f8..446a104 100644
+index 2f6e622eb8..2e4a2723a6 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -52,7 +52,7 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo) : CDVDVi
-   m_video_rate(0),
-   m_mpeg2_sequence(NULL),
-   m_drop(false),
--  m_has_keyframe(false),
-+//  m_has_keyframe(false),
-   m_bitparser(NULL),
-   m_bitstream(NULL)
+@@ -91,7 +91,7 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo)
+   , m_framerate(0.0)
+   , m_video_rate(0)
+   , m_mpeg2_sequence(NULL)
+-  , m_has_keyframe(false)
++//  , m_has_keyframe(false)
+   , m_bitparser(NULL)
+   , m_bitstream(NULL)
  {
 -- 
-2.7.4
-
+2.12.3

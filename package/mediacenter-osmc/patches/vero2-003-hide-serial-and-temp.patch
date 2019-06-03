@@ -9,23 +9,20 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 7 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index a8da2ba..aed48d3 100644
+index 3bde0c9181..da81377627 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -145,13 +145,6 @@ void CGUIWindowSystemInfo::FrameMove()
-   {
-     SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
-     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
--#if defined(__arm__) && defined(TARGET_LINUX)
--    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());
+@@ -149,11 +149,7 @@ void CGUIWindowSystemInfo::FrameMove()
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());
+     if (!g_sysinfo.GetCPUSoC().empty())
+       SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSoC());
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUHardware());
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPURevision());
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());
--#endif
+ #endif
 -    SetControlLabel(i++, "%s %s", 22011, SYSTEM_CPU_TEMPERATURE);
  #if (!defined(__arm__) && !defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
      SetControlLabel(i++, "%s %s", 13284, SYSTEM_CPUFREQUENCY);
  #endif
 -- 
-2.7.4
-
+2.16.4

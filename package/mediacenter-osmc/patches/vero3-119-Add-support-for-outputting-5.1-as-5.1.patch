@@ -1,4 +1,4 @@
-From ae0c87b71e2ba0ec9801a224e6d7ababca58a602 Mon Sep 17 00:00:00 2001
+From 00a4206e55cef01ecea3fedc6006c58b36d421b0 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 19:17:58 +0000
 Subject: [PATCH] Add support for outputting formats in their proper container
@@ -7,30 +7,32 @@ Subject: [PATCH] Add support for outputting formats in their proper container
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 61 +++++++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 7 deletions(-)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 61 ++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 6 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 3ff00c2..051e232 100644
+index 7dc6713..d216439 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -35,6 +35,7 @@
+@@ -23,6 +23,8 @@
  #include "utils/MathUtils.h"
  #include "utils/SystemInfo.h"
  #include "threads/SingleLock.h"
 +#include "settings/Settings.h"
++#include "ServiceBroker.h"
  #include "settings/AdvancedSettings.h"
+ #include "settings/SettingsComponent.h"
  #if defined(HAS_LIBAMCODEC)
- #include "utils/AMLUtils.h"
-@@ -103,6 +104,7 @@ static int CheckNP2(unsigned x)
-     else return x >> 1;
- }
+@@ -74,6 +76,8 @@ static unsigned int ALSASampleRateList[] =
+   0
+ };
  
 +int speaker_layout = 0;
- 
++
  CAESinkALSA::CAESinkALSA() :
-   m_bufferSize(0),
-@@ -238,9 +240,10 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+   m_pcm(NULL)
+ {
+@@ -219,9 +223,10 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
      }
    }
  
@@ -42,7 +44,7 @@ index 3ff00c2..051e232 100644
  
    return info;
  }
-@@ -532,6 +535,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -485,6 +490,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    inconfig.format = format.m_dataFormat;
    inconfig.sampleRate = format.m_sampleRate;
  
@@ -51,7 +53,7 @@ index 3ff00c2..051e232 100644
    /*
     * We can't use the better GetChannelLayout() at this point as the device
     * is not opened yet, and we need inconfig.channels to select the correct
-@@ -551,8 +556,6 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -504,8 +511,6 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      m_passthrough   = false;
    }
  
@@ -60,7 +62,7 @@ index 3ff00c2..051e232 100644
      int aml_digital_codec = 0;
  
      if (m_passthrough)
-@@ -593,7 +596,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -546,7 +551,7 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
  
      aml_set_audio_passthrough(m_passthrough);
      SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
@@ -69,12 +71,12 @@ index 3ff00c2..051e232 100644
  
    if (inconfig.channels == 0)
    {
-@@ -601,7 +604,16 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -554,7 +559,16 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      return false;
    }
  
 -  AEDeviceType devType = AEDeviceTypeFromName(device);
-+ if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
++ if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
 +    CLog::Log(LOGDEBUG, "CAESinkALSA::Initialize -- muting HDMI");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
 + }
@@ -87,8 +89,8 @@ index 3ff00c2..051e232 100644
  
    std::string AESParams;
    /* digital interfaces should have AESx set, though in practice most
-@@ -655,10 +667,45 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
- #ifdef SND_CHMAP_API_VERSION
+@@ -603,10 +617,45 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ 
    if (selectedChmap)
    {
 +	  /* Channel layout should match one of those offered by the sink
@@ -130,19 +132,10 @@ index 3ff00c2..051e232 100644
 +
 +  }
 +
- #endif
  
    // we want it blocking
-@@ -812,7 +859,7 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
-   bufferSize  = std::min(bufferSize, (snd_pcm_uframes_t) sampleRate / 5);
- #if defined(HAS_LIBAMCODEC)
-   bufferSize  = CheckNP2(bufferSize);
--#endif;
-+#endif
-   
-   /* 
-    According to upstream we should set buffer size first - so make sure it is always at least
-@@ -949,7 +996,7 @@ void CAESinkALSA::Stop()
+   snd_pcm_nonblock(m_pcm, 0);
+@@ -899,7 +948,7 @@ void CAESinkALSA::Stop()
  {
    if (!m_pcm)
      return;

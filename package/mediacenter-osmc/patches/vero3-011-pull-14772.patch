@@ -1,0 +1,47 @@
+From 3b11077c538766ec1a97e385268154abdb3aab9a Mon Sep 17 00:00:00 2001
+From: Greg McCarthy <greg@gjmccarthy.co.uk>
+Date: Sat, 24 Nov 2018 16:15:10 +0000
+Subject: [PATCH] Revert #14772
+
+---
+ xbmc/rendering/gles/RenderSystemGLES.cpp | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git a/xbmc/rendering/gles/RenderSystemGLES.cpp b/xbmc/rendering/gles/RenderSystemGLES.cpp
+index 60eecd2d59..08e8fbc779 100644
+--- a/xbmc/rendering/gles/RenderSystemGLES.cpp
++++ b/xbmc/rendering/gles/RenderSystemGLES.cpp
+@@ -76,30 +76,6 @@ bool CRenderSystemGLES::InitRenderSystem()
+ 
+   m_RenderExtensions += " ";
+ 
+-//! @todo remove TARGET_RASPBERRY_PI when Raspberry Pi updates their GL headers
+-#if defined(GL_KHR_debug) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI)
+-  if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_openGlDebugging)
+-  {
+-    if (IsExtSupported("GL_KHR_debug"))
+-    {
+-      auto glDebugMessageCallback = CEGLUtils::GetRequiredProcAddress<PFNGLDEBUGMESSAGECALLBACKKHRPROC>("glDebugMessageCallbackKHR");
+-      auto glDebugMessageControl = CEGLUtils::GetRequiredProcAddress<PFNGLDEBUGMESSAGECONTROLKHRPROC>("glDebugMessageControlKHR");
+-
+-      glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
+-      glDebugMessageCallback(KODI::UTILS::GL::GlErrorCallback, nullptr);
+-
+-      // ignore shader compilation information
+-      glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER_KHR, GL_DEBUG_TYPE_OTHER_KHR, GL_DONT_CARE, 0, nullptr, GL_FALSE);
+-
+-      CLog::Log(LOGDEBUG, "OpenGL(ES): debugging enabled");
+-    }
+-    else
+-    {
+-      CLog::Log(LOGDEBUG, "OpenGL(ES): debugging requested but the required extension isn't available (GL_KHR_debug)");
+-    }
+-  }
+-#endif
+-
+   LogGraphicsInfo();
+ 
+   m_bRenderCreated = true;
+-- 
+2.16.4
+

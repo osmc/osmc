@@ -1594,7 +1594,7 @@
             </control>
             <!-- VIDEO GROUP -->
             <control description="MySQL Video Group" type="group">
-                <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
+                <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
                  <!-- <itemgap>34</itemgap> -->
                 <posx>75</posx>
                 <posy>180</posy>
@@ -1877,7 +1877,7 @@
                     </control>
                 </control>
                 <control id="10580" type="radiobutton">
-                    <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
+                    <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
                     <label>Import Watched State</label>
                     <posx>0</posx>
                     <posy>460</posy>
@@ -1904,7 +1904,7 @@
                     <onright>10520</onright>
                 </control>
                 <control id="10590" type="radiobutton">
-                    <visible>Control.IsEnabled(10510) + SubString(Control.GetLabel(10510),*)</visible>
+                    <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
                     <description>Enable MySQL Video Database</description>
                     <label>Import Resume Points</label>
                     <posx>0</posx>
@@ -1963,7 +1963,7 @@
             </control>
             <!-- MUSIC GROUP -->
             <control description="MySQL MUSIC Group" type="group">
-                <visible>Control.IsEnabled(10520) + SubString(Control.GetLabel(10520),*)</visible>
+                <visible>Control.IsEnabled(10520) + String.Contains(Control.GetLabel(10520),*)</visible>
                 <itemgap>34</itemgap>
                 <posx>750</posx>
                 <posy>180</posy>

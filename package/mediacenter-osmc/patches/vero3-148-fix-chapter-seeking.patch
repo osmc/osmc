@@ -1,0 +1,51 @@
+From 2f4190e9718666cab6d2cfb19795993c660064f6 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Mon, 11 Mar 2019 19:16:02 +0100
+Subject: [PATCH] Chapter seek patch.
+
+In professional movies chapters are always on keyframes, but this is not true for remuxes.
+This commit implement seeking the closest keyframe to chapter time.
+
+Patch: kodi-le-034-chapter-seek-fix.patch
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index e87b7ad..d45f376 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -1182,7 +1182,7 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double *startpts)
+   if(m_currentPts == DVD_NOPTS_VALUE)
+     CLog::Log(LOGDEBUG, "%s - unknown position after seek", __FUNCTION__);
+   else
+-    CLog::Log(LOGDEBUG, "%s - seek ended up on time %d", __FUNCTION__, (int)(m_currentPts / DVD_TIME_BASE * 1000));
++    CLog::Log(LOGDEBUG, "%s - seek ended up on time %0.3f", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
+ 
+   // in this case the start time is requested time
+   if (startpts)
+@@ -1838,7 +1838,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+ 
+   AVChapter *ch = m_pFormatContext->chapters[chapter-1];
+   double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
+-  return SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  bool rtn = SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  if (rtn)
++  {
++    double startpts_b;
++    if (SeekTime(DVD_TIME_TO_MSEC(dts), false, &startpts_b))
++    {
++      if (*startpts - dts < dts -startpts_b)
++        rtn = SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++      else
++        *startpts = startpts_b;
++    }
++  }
++  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seeking chapter:%d start:%0.3f key-frame:%0.3f ", __FUNCTION__, chapter, DVD_TIME_TO_MSEC(dts) / 1000.0, m_currentPts / DVD_TIME_BASE);
++  return rtn;
+ }
+ 
+ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+-- 
+2.7.4
+

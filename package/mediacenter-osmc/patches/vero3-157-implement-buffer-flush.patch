@@ -1,0 +1,39 @@
+From 798cef4baa2298304931fd1d1814d2901edfe359 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 20 Mar 2019 01:55:36 +0100
+Subject: [PATCH] RendereAML: add Flush()
+
+---
+ .../VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp  | 6 ++++++
+ .../VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h    | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index c545374a549a..6fa5e513f840 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -141,6 +141,12 @@ void CRendererAML::Reset()
+   }
+ }
+ 
++bool CRendererAML::Flush(bool saveBuffers)
++{
++  Reset();
++  return saveBuffers;
++};
++
+ void CRendererAML::RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha)
+ {
+   ManageRenderArea();
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+index 769f6319832b..eac38c09bb15 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
+@@ -31,6 +31,7 @@ class CRendererAML : public CBaseRenderer
+   virtual void Update() override {};
+   virtual void RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha) override;
+   virtual bool SupportsMultiPassRendering()override { return false; };
++  virtual bool Flush(bool saveBuffers) override;
+ 
+   // Player functions
+   virtual bool IsGuiLayer() override { return false; };

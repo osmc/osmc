@@ -1,0 +1,296 @@
+From fb226539fafde4749da88bb988f6f866c4f10029 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 13 Apr 2019 20:43:16 +0100
+Subject: [PATCH] Add AMLogic specific display and audio settings
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ .../resource.language.en_gb/resources/strings.po   | 41 ++++++++++++++++++++++
+ system/settings/settings.xml                       | 35 ++++++++++++++++++
+ xbmc/settings/DisplaySettings.cpp                  | 37 +++++++++++++++++++
+ xbmc/settings/Settings.cpp                         |  8 ++++-
+ xbmc/settings/Settings.h                           |  5 +++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 41 ++++++++++++++++++++++
+ 6 files changed, 166 insertions(+), 1 deletion(-)
+ mode change 100644 => 100755 xbmc/settings/DisplaySettings.cpp
+ mode change 100644 => 100755 xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 1e81362..c6a6d5d 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -6273,6 +6273,26 @@ msgctxt "#13132"
+ msgid "Blank displays"
+ msgstr ""
+ 
++#: unknown
++msgctxt "#13133"
++msgid "Force RGB output"
++msgstr ""
++
++#: unknown
++msgctxt "#13134"
++msgid "Lock HDMI HPD"
++msgstr ""
++
++#: unknown
++msgctxt "#13135"
++msgid "Mute HDMI audio output"
++msgstr ""
++
++#: unknown
++msgctxt "#13136"
++msgid "Force 422 colour subsampling"
++msgstr ""
++
+ #empty strings from id 13133 to 13139
+ 
+ #: xbmc/network/NetworkServices.cpp
+@@ -21638,3 +21658,24 @@ msgstr ""
+ msgctxt "#39116"
+ msgid "Episode plot"
+ msgstr ""
++
++#: Description of display setting with label # 13133
++msgctxt "#39117"
++msgid "Enable this to force RGB output for some legacy TVs such as Philips 2009 era TVs. Fixes blue / green screen flashes. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13134
++msgctxt "#39118"
++msgid "Disables HPD events. Can fix sound issues. Requires reboot."
++msgstr ""
++
++#: Description of display setting with label # 13135
++msgctxt "#39119"
++msgid "Turns off HDMI audio. Useful if you're using SPDIF audio and don't want audio on HDMI."
++msgstr ""
++
++#: Description of display setting with label # 13136
++msgctxt "#39120"
++msgid "Some displays (usually LG) work better with 4:2:2 colour subsampling, especially at 4K resolutions."
++msgstr ""
++
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 9ddc882..418952b 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2170,6 +2170,26 @@
+           </dependencies>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoscreen.forcergb" type="boolean" parent="videoscreen.screen" label="13133" help="39117">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.lockhpd" type="boolean" parent="videoscreen.screen" label="13134" help="39118">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.mutehdmi" type="boolean" parent="videoscreen.screen" label="13135" help="39119">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="videoscreen.force422" type="boolean" parent="videoscreen.screen" label="13136" help="39120">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
+           <level>2</level>
+           <default>0</default>
+@@ -2178,6 +2198,21 @@
+           </constraints>
+           <control type="spinner" format="string" />
+         </setting>
++        <setting id="videoscreen.limitedrangeaml" type="boolean" label="36042" help="36359">
++          <requirement>
++            <or>
++              <condition>HAS_GL</condition>
++              <condition>HAS_DX</condition>
++              <condition>true</condition>
++            </or>
++          </requirement>
++          <level>3</level>
++          <default>true</default>
++          <updates>
++            <update type="rename">videoplayer.vdpaustudiolevel</update>
++          </updates>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
+           <requirement>
+             <or>
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+old mode 100644
+new mode 100755
+index e808eaa..9f94a19
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -31,6 +31,7 @@
+ #include "threads/SingleLock.h"
+ #include "utils/log.h"
+ #include "utils/StringUtils.h"
++#include "utils/SysfsUtils.h"
+ #include "utils/Variant.h"
+ #include "utils/XMLUtils.h"
+ #include "rendering/RenderSystem.h"
+@@ -329,6 +330,42 @@ bool CDisplaySettings::OnSettingChanging(std::shared_ptr<const CSetting> setting
+ 
+     return true;
+   }
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_FORCE422){
++    std::string attr = "";
++    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++
++    if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
++      if (attr.find("444") != std::string::npos ||
++          attr.find("422") != std::string::npos ||
++          attr.find("420") != std::string::npos)
++        attr.replace(attr.find("4"),3,"422").append("now");
++      else
++        attr.append("422now");
++    }
++    else {
++      if (attr.find("422") != std::string::npos)
++        attr.erase(attr.find("4"),3);
++      attr.append("now");
++    }
++    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting 422 output, attr = %s", attr.c_str());
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++  }
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)
++  {
++    int range_control;
++    std::string attr = "";
++
++    SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++    if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)) 
++      range_control &= 1;
++    else
++      range_control |= 2;
++    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting quantization range to %s", range_control & 2 ? "full" : "limited");
++    SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++    attr.append("now");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++  }
+ #if defined(HAVE_X11) || defined(TARGET_WINDOWS_DESKTOP)
+   else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
+   {
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 3360e1c..0d23b8f 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -333,6 +333,10 @@ const std::string CSettings::SETTING_VIDEOSCREEN_RESOLUTION = "videoscreen.resol
+ const std::string CSettings::SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
+ const std::string CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
++const std::string CSettings::SETTING_VIDEOSCREEN_FORCERGB = "videoscreen.forcergb";
++const std::string CSettings::SETTING_VIDEOSCREEN_LOCKHPD = "videoscreen.lockhpd";
++const std::string CSettings::SETTING_VIDEOSCREEN_MUTEHDMI = "videoscreen.mutehdmi";
++const std::string CSettings::SETTING_VIDEOSCREEN_FORCE422 = "videoscreen.force422";
+ const std::string CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE = "videoscreen.preferedstereoscopicmode";
+ const std::string CSettings::SETTING_VIDEOSCREEN_NOOFBUFFERS = "videoscreen.noofbuffers";
+@@ -340,7 +344,7 @@ const std::string CSettings::SETTING_VIDEOSCREEN_3DLUT = "videoscreen.cms3dlut";
+ const std::string CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE = "videoscreen.displayprofile";
+ const std::string CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
+ const std::string CSettings::SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
+-const std::string CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE = "videoscreen.limitedrange";
++const std::string CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML = "videoscreen.limitedrangeaml";
+ const std::string CSettings::SETTING_VIDEOSCREEN_FRAMEPACKING = "videoscreen.framepacking";
+ const std::string CSettings::SETTING_AUDIOOUTPUT_AUDIODEVICE = "audiooutput.audiodevice";
+ const std::string CSettings::SETTING_AUDIOOUTPUT_CHANNELS = "audiooutput.channels";
+@@ -854,6 +858,8 @@ void CSettings::InitializeISettingCallbacks()
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_FORCE422);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
+   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index d0743b3..d33dc4c 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -291,6 +291,10 @@ public:
+   static const std::string SETTING_VIDEOSCREEN_SCREENMODE;
+   static const std::string SETTING_VIDEOSCREEN_FAKEFULLSCREEN;
+   static const std::string SETTING_VIDEOSCREEN_BLANKDISPLAYS;
++  static const std::string SETTING_VIDEOSCREEN_FORCERGB;
++  static const std::string SETTING_VIDEOSCREEN_LOCKHPD;
++  static const std::string SETTING_VIDEOSCREEN_MUTEHDMI;
++  static const std::string SETTING_VIDEOSCREEN_FORCE422;
+   static const std::string SETTING_VIDEOSCREEN_STEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
+   static const std::string SETTING_VIDEOSCREEN_NOOFBUFFERS;
+@@ -299,6 +303,7 @@ public:
+   static const std::string SETTING_VIDEOSCREEN_GUICALIBRATION;
+   static const std::string SETTING_VIDEOSCREEN_TESTPATTERN;
+   static const std::string SETTING_VIDEOSCREEN_LIMITEDRANGE;
++  static const std::string SETTING_VIDEOSCREEN_LIMITEDRANGEAML;
+   static const std::string SETTING_VIDEOSCREEN_FRAMEPACKING;
+   static const std::string SETTING_AUDIOOUTPUT_AUDIODEVICE;
+   static const std::string SETTING_AUDIOOUTPUT_CHANNELS;
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+old mode 100644
+new mode 100755
+index 0637f83..e4dddce
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -64,6 +64,47 @@ CWinSystemAmlogic::CWinSystemAmlogic() :
+   aml_permissions();
+   aml_disable_freeScale();
+ 
++ /* Take in to account custom OSMC parameters */
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing RGB");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
++ }
++
++  int range_control;
++  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML))
++    range_control &= 1;
++  else
++    range_control |= 2;
++  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting quantization range to %s",
++      range_control & 2 ? "full" : "limited");
++  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++
++ if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
++    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
++ }
++
++ std::string attr = "";
++ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++
++ if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
++   if (attr.find("444") != std::string::npos ||
++       attr.find("422") != std::string::npos ||
++       attr.find("420") != std::string::npos)
++     attr.replace(attr.find("4"),3,"422").append("now");
++   else
++     attr.append("422now");
++ }
++ else {
++   if (attr.find("422") != std::string::npos)
++     attr.erase(attr.find("4"),3);
++   attr.append("now");
++ }
++ CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = %s", attr.c_str());
++ SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++
++
+   // Register sink
+   AE::CAESinkFactory::ClearSinks();
+   CAESinkALSA::Register();
+-- 
+2.7.4
+

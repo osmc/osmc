@@ -1,4 +1,4 @@
-From 72a11355628a9b674ee56b1a7cc9004ef959a283 Mon Sep 17 00:00:00 2001
+From 4146b70099385a78243b981d2cf219f425a8a3f4 Mon Sep 17 00:00:00 2001
 From: kszaq <kszaquitto@gmail.com>
 Date: Sun, 4 Sep 2016 00:51:03 +0200
 Subject: [PATCH] aml: Multichannel-PCM and HD Audio passthrough
@@ -12,18 +12,18 @@ Subject: [PATCH] aml: Multichannel-PCM and HD Audio passthrough
  1 file changed, 47 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 0886020..cd41add 100644
+index f684c53..7dc6713 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -38,6 +38,7 @@
- #include "settings/AdvancedSettings.h"
+@@ -27,6 +27,7 @@
+ #include "settings/SettingsComponent.h"
  #if defined(HAS_LIBAMCODEC)
  #include "utils/AMLUtils.h"
 +#include "utils/SysfsUtils.h"
  #endif
  
  #ifdef TARGET_POSIX
-@@ -534,12 +535,50 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -502,12 +503,50 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    {
      m_passthrough   = false;
    }
@@ -77,7 +77,7 @@ index 0886020..cd41add 100644
  
    if (inconfig.channels == 0)
    {
-@@ -1554,6 +1593,11 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1525,6 +1564,11 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
        info.m_dataFormats.push_back(i);
    }
  
@@ -88,7 +88,7 @@ index 0886020..cd41add 100644
 +
    if (info.m_deviceType == AE_DEVTYPE_HDMI)
    {
-     // we don't trust ELD information and push back our supported formats explicitely
+     // we don't trust ELD information and push back our supported formats explicitly
 -- 
 2.7.4
 
