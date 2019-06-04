@@ -32,6 +32,8 @@ DEFAULT_SETTINGSLIST = [
     ('videoplayer', 'useamcodecmpeg2'),
     ('videoplayer', 'useamcodecmpeg4'),
     ('videoplayer', 'useamcodech264'),
+    ("videoscreen", "force422"),
+    ("videoscreen", "screenmode"),
 ]
 
 class GuiParser(object):
@@ -119,6 +121,9 @@ class GuiParser(object):
                 system_settings[_id]['options'] = {}
                 for o in options:
                     system_settings[_id]['options'][o.text] = o.attrib['label']
+            default = setting.find('default')
+            if default is not None:
+                system_settings[_id]['default'] = default.text
 
         self.system_settings = system_settings
 
@@ -170,7 +175,17 @@ class GuiParser(object):
             else:
                 t = setting.text
 
-            self.parsed_values.append('{}: {}'.format(lb, t))
+            setting_formatted = "{}: {}".format(lb, t)
+            if self.system_settings[sj]['default'] != setting.text:
+                try:
+                    setting_formatted += " ===> Default: {}".format(
+                        self.system_strings[
+                            section['options'][
+                                self.system_settings[sj]['default']
+                            ]])
+                except Exception:
+                    setting_formatted += ""  # Unknown default value
+            self.parsed_values.append(setting_formatted)
 
         return self.parsed_values
 
