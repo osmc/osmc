@@ -338,8 +338,10 @@ void MainWindow::setupBootLoader()
     if (device->hasBootChanged())
     {
         logger->addLine("Boot changed. Re-mounting the real /boot");
-        utils->unmountPartition(device, MNT_BOOT);
-        utils->mountPartition(device, MNT_BOOT);
+        if (! utils->unmountPartition(device, MNT_BOOT))
+            logger->addLine("Could not unmount old boot partition");
+        if (! utils->mountPartition(device, MNT_BOOT))
+            logger->addLine("Could not mount new boot partition");
     }
     logger->addLine("Configuring bootloader: moving /boot to appropriate boot partition");
     bc->copyBootFiles();
@@ -359,9 +361,12 @@ void MainWindow::setupBootLoader()
     QTimer::singleShot(0, this, SLOT(val));
     /* Reboot */
     /* Unmount. May not alway succeed but limits chance of journal recovery */
-    utils->unmountPartition(device, MNT_BOOT);
-    utils->unmountPartition(device, MNT_ROOT);
+    if (!utils->unmountPartition(device, MNT_BOOT))
+        logger->addLine("Could not unmount boot partition");
+    if (! utils->unmountPartition(device, MNT_ROOT))
+        logger->addLine("Could not unmount root partition");
 #ifdef FACTORYV2
+        system("/bin/sync");
         system("/bin/sync");
         ui->statusLabel->setText(tr("OSMC installed successfully"));
         qApp->processEvents(); /* Force GUI update */
