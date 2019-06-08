@@ -17,10 +17,10 @@ index 9d09dc2e14..ed530829d4 100644
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -682,7 +682,7 @@ RESOLUTION CDisplaySettings::GetResolutionForScreen()
  
- static inline bool ModeSort(StringSettingOption i,StringSettingOption j)
+ static inline bool ModeSort(std::pair<std::string, std::string> i,std::pair<std::string, std::string> j)
  {
--  return (i.value > j.value);
-+  return (i.value < j.value);
+-  return (i.second > j.second);
++  return (i.second < j.second);
  }
  
  void CDisplaySettings::SettingOptionsModesFiller(std::shared_ptr<const CSetting> setting, std::vector<StringSettingOption> &list, std::string &current, void *data)
