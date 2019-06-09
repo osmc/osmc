@@ -1,0 +1,41 @@
+From 2d18396e5ef1310a8baea949ca7588faf182d369 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 9 Jun 2019 19:25:39 +0100
+Subject: [PATCH] Use legacy DVB API for AMLogic 3.14 kernel
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/input/mpegts/linuxdvb/linuxdvb_frontend.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/input/mpegts/linuxdvb/linuxdvb_frontend.c b/src/input/mpegts/linuxdvb/linuxdvb_frontend.c
+index f6d149e..604b665 100644
+--- a/src/input/mpegts/linuxdvb/linuxdvb_frontend.c
++++ b/src/input/mpegts/linuxdvb/linuxdvb_frontend.c
+@@ -32,6 +32,8 @@
+ #include <assert.h>
+ #include <linux/dvb/dmx.h>
+ #include <linux/dvb/frontend.h> 
++#include <string.h>
++#include <sys/utsname.h>
+ 
+ #define NOSIGNAL(x) (((x) & FE_HAS_SIGNAL) == 0)
+ 
+@@ -848,6 +850,14 @@ linuxdvb_frontend_monitor ( void *aux )
+     return;
+   }
+ 
++struct utsname ret;
++if (uname(&ret) == 0) {
++  char stabrls[] = "3.14.29";
++  if (strncmp(ret.release, stabrls, strlen(stabrls)) == 0) {
++     lfe->lfe_old_status = 1;
++  }
++}
++
+   /* Check accessibility */
+   if (lfe->lfe_fe_fd <= 0) {
+     if (lfe->lfe_fe_path && access(lfe->lfe_fe_path, R_OK | W_OK)) {
+-- 
+2.7.4
+
