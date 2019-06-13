@@ -1,0 +1,65 @@
+From 5be22537abd40cec32f099a87411aee87ea0dd57 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Wed, 12 Jun 2019 15:30:33 +0100
+Subject: [PATCH] 16:9 rendered full-screen when display is 720 wide 4:3
+ rendered with postbox
+
+---
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 34 +++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 9bd4c6c8bd..928538ae60 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1547,7 +1547,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   // handle video ratio
+   AVRational video_ratio       = av_d2q(1, SHRT_MAX);
+   //if (!hints.forced_aspect)
+-  //  video_ratio = av_d2q(hints.aspect, SHRT_MAX);
++    video_ratio = av_d2q(hints.aspect, SHRT_MAX);
+   am_private->video_ratio      = ((int32_t)video_ratio.num << 16) | video_ratio.den;
+   am_private->video_ratio64    = ((int64_t)video_ratio.num << 32) | video_ratio.den;
+ 
+@@ -2391,6 +2391,38 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+     dst_rect.y2 *= 2.0;
+   }
+ 
++  /* passthrough non-square pixels if available */
++  if (m_guiStereoMode == RENDER_STEREO_MODE_OFF &&
++      video_res_info.iScreenWidth == 720 &&
++      am_private->video_width <= 720)
++  {
++    if (dst_rect.Width()/dst_rect.Height() > 1.5f)
++    {
++      am_private->video_ratio      = ((int32_t)16 << 16) | 9;
++      am_private->video_ratio64    = ((int64_t)16 << 32) | 9;
++    }
++    else
++    {
++      am_private->video_ratio      = ((int32_t)4 << 16) | 3;
++      am_private->video_ratio64    = ((int64_t)4 << 32) | 3;
++    }
++    if (am_private->video_ratio == ((16 << 16) | 9))
++    {
++      CLog::Log(LOGDEBUG, "CAMLCodec::SetVideoRect: 16x9");
++      dst_rect.x1 = dst_rect.y1 = 0;
++      dst_rect.x2 = 720;
++      dst_rect.y2 = am_private->video_height;
++    }
++    /* TODO: set 4:3 using signalling instead of postboxing */
++    else if (am_private->video_ratio == ((4 << 16) | 3))
++    {
++      CLog::Log(LOGDEBUG, "GFH CAMLCodec::SetVideoRect: 4x3");
++      dst_rect.x1 = 90;
++      dst_rect.y1 = 0;
++      dst_rect.x2 = 630;
++      dst_rect.y2 = gui.y2;
++    }
++  }
+ #if 1
+   std::string s_dst_rect = StringUtils::Format("%i,%i,%i,%i",
+     (int)dst_rect.x1, (int)dst_rect.y1,
+-- 
+2.11.0
+
