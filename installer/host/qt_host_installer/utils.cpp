@@ -38,10 +38,7 @@ namespace utils
             logStream << timestamp.toString() << " " << strLog << '\n';
             logFile.close();
         }
-        else
-        {
             qDebug() << timestamp.toString() << " " << strLog;
-        }
     }
 
     void displayError(QString title, QString message, bool isCritical)
