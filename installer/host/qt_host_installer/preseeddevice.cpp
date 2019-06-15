@@ -13,16 +13,6 @@ PreseedDevice::PreseedDevice(QWidget *parent, SupportedDevice dev) :
     ui(new Ui::PreseedDevice)
 {
     ui->setupUi(this);
-    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal())
-    {
-        utils::writeLog("This device does not support preseeding at all.");
-        emit preseedSelected(utils::INSTALL_NOPRESEED);
-    }
-    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal() && dev.allowsPreseedingPartitioning())
-    {
-        utils::writeLog("This device is a traditional partitionable target, i.e. desktop");
-        emit preseedSelected(utils::INSTALL_PARTITIONER);
-    }
     if (!dev.allowsPreseedingNFS())
     {
         utils::writeLog("Disabling NFS install for device " + dev.getDeviceName() + " as it does not support it");
@@ -48,6 +38,19 @@ PreseedDevice::PreseedDevice(QWidget *parent, SupportedDevice dev) :
 PreseedDevice::~PreseedDevice()
 {
     delete ui;
+}
+
+void PreseedDevice::checkPreseedSkipDevice(SupportedDevice dev) {
+    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal())
+    {
+        utils::writeLog("This device does not support preseeding at all.");
+        emit (preseedSelected(utils::INSTALL_NOPRESEED));
+    }
+    if (!dev.allowsPreseedingNFS() && !dev.allowsPreseedingUSB() && !dev.allowsPreseedingSD() && !dev.allowsPreseedingInternal() && dev.allowsPreseedingPartitioning())
+    {
+        utils::writeLog("This device is a traditional partitionable target, i.e. desktop");
+        emit preseedSelected(utils::INSTALL_PARTITIONER);
+    }
 }
 
 void PreseedDevice::on_installoptionsnextButton_clicked()

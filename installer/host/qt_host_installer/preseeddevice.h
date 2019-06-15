@@ -24,6 +24,7 @@ class PreseedDevice : public QWidget
 
 public:
     explicit PreseedDevice(QWidget *parent = 0, SupportedDevice dev = SupportedDevice());
+    void checkPreseedSkipDevice(SupportedDevice dev);
     ~PreseedDevice();
     
 private slots:
