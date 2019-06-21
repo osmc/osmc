@@ -1,8 +1,20 @@
-From 4661ab78a60da1c3a809d7fd8b578947b45210e6 Mon Sep 17 00:00:00 2001
-From: afl1 <afl2001@gmail.com>
-Date: Wed, 10 Apr 2019 10:22:49 +0200
+From 8d6d60d75dfff0fb24fc5a4174f7557d92056a67 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 21 Jun 2019 10:37:26 +0100
+Subject: [PATCH] AMLCodec control fixes from LE with negative PTS handling
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 110 +++++++++++++--------
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h  |   3 +
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       |   1 +
+ xbmc/cores/VideoPlayer/DVDStreamInfo.h             |   2 +
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp             |   6 ++
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp        |  10 +-
+ 6 files changed, 88 insertions(+), 44 deletions(-)
+
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 63aeda5..1739a62 100644
+index 63aeda5..0ca720c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -247,7 +247,7 @@ static const int64_t INT64_0 = 0x8000000000000000ULL;
@@ -59,21 +71,20 @@ index 63aeda5..1739a62 100644
  }
  
  void CAMLCodec::Reset()
-@@ -1914,6 +1916,13 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -1914,6 +1916,12 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
  
    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
  
 +  struct buf_status bs;
 +  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
 +  if (iSize > (size_t)bs.free_len) {
-+    CLog::Log(LOGERROR, "CAMLCodec::AddData: packet to big: %d, probably corrupted", iSize);
++    CLog::Log(LOGERROR, "CAMLCodec::AddData: packet to big: %d, probably corrupted", iSize);  
 +    return false;
 +  }
-+
    m_frameSizes.push_back(iSize);
    m_frameSizeSum += iSize;
  
-@@ -1952,18 +1961,18 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -1952,18 +1960,18 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
    {
      if (am_private->am_pkt.avpts != INT64_0)
      {
@@ -95,7 +106,7 @@ index 63aeda5..1739a62 100644
    {
      m_cur_pts = am_private->am_pkt.avdts;
      // No PTS given -> use first DTS for AML ptsserver initialization
-@@ -1996,11 +2005,15 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -1996,11 +2004,15 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
      Reset();
      return false;
    }
@@ -114,7 +125,7 @@ index 63aeda5..1739a62 100644
        m_ptsOverflow
      );
    return true;
-@@ -2008,6 +2021,8 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -2008,6 +2020,8 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
  
  std::atomic_flag CAMLCodec::m_pollSync = ATOMIC_FLAG_INIT;
  int CAMLCodec::m_pollDevice;
@@ -123,7 +134,7 @@ index 63aeda5..1739a62 100644
  
  int CAMLCodec::PollFrame()
  {
-@@ -2016,16 +2031,17 @@ int CAMLCodec::PollFrame()
+@@ -2016,16 +2030,17 @@ int CAMLCodec::PollFrame()
      return 0;
  
    struct pollfd codec_poll_fd[1];
@@ -147,7 +158,7 @@ index 63aeda5..1739a62 100644
  }
  
  void CAMLCodec::SetPollDevice(int dev)
-@@ -2062,7 +2078,8 @@ int CAMLCodec::DequeueBuffer()
+@@ -2062,7 +2077,8 @@ int CAMLCodec::DequeueBuffer()
    //Driver change from 10 to 0ms latency, throttle here
    std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
  
@@ -157,7 +168,7 @@ index 63aeda5..1739a62 100644
  DRAIN:
    if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
    {
-@@ -2074,6 +2091,9 @@ DRAIN:
+@@ -2074,6 +2090,9 @@ DRAIN:
      if (elapsed < std::chrono::milliseconds(waitTime))
        std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
  
@@ -167,7 +178,7 @@ index 63aeda5..1739a62 100644
      if (m_drain && elapsed < std::chrono::milliseconds(100))
      {
        waitTime += 10;
-@@ -2088,17 +2108,13 @@ DRAIN:
+@@ -2088,17 +2107,13 @@ DRAIN:
    // parameter, because it was introduced since kernel 3.14.
    m_last_pts = m_cur_pts;
  
@@ -192,7 +203,7 @@ index 63aeda5..1739a62 100644
    m_bufferIndex = vbuf.index;
    return 0;
  }
-@@ -2108,16 +2124,20 @@ float CAMLCodec::GetTimeSize()
+@@ -2108,16 +2123,20 @@ float CAMLCodec::GetTimeSize()
    struct buf_status bs;
    m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
  
@@ -216,7 +227,7 @@ index 63aeda5..1739a62 100644
  }
  
  CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
-@@ -2126,33 +2146,40 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+@@ -2126,33 +2145,40 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
      return CDVDVideoCodec::VC_ERROR;
  
    float timesize(GetTimeSize());
@@ -287,6 +298,38 @@ index 2f67ed7..d50face 100644
 +  static double m_ttd;
    CProcessInfo &m_processInfo;
  };
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 14e11b3..98d6282 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -117,6 +117,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+   m_opened = false;
+ 
+   m_hints = hints;
++  m_hints.pClock = hints.pClock;
+ 
+   CLog::Log(LOGDEBUG, "CDVDVideoCodecAmlogic::Opening: codec %d profile:%d extra_size:%d", m_hints.codec, hints.profile, hints.extrasize);
+ 
+diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.h b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+index aed2b30..dca0ba4 100644
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+@@ -13,6 +13,7 @@
+ extern "C" {
+ #include <libavcodec/avcodec.h>
+ }
++#include "DVDClock.h"
+ 
+ #define CODEC_FORCE_SOFTWARE 0x01
+ #define CODEC_ALLOW_FALLBACK 0x02
+@@ -60,6 +61,7 @@ public:
+   int orientation; // orientation of the video in degrees counter clockwise
+   int bitsperpixel;
+   std::string stereo_mode; // stereoscopic 3d mode
++  CDVDClock *pClock;
+ 
+   // AUDIO
+   int channels;
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 index c2ffbe1..9f3e891 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
@@ -305,10 +348,18 @@ index c2ffbe1..9f3e891 100644
    m_CurrentVideo.packets++;
  }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-index 6ee84c5..b19d985 100644
+index 6ee84c5..cf34f1a 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-@@ -116,7 +116,8 @@ bool CVideoPlayerVideo::OpenStream(CDVDStreamInfo hint)
+@@ -23,6 +23,7 @@
+ #include <numeric>
+ #include <iterator>
+ #include "utils/log.h"
++#include <chrono>
+ 
+ class CDVDMsgVideoCodecChange : public CDVDMsg
+ {
+@@ -116,7 +117,8 @@ bool CVideoPlayerVideo::OpenStream(CDVDStreamInfo hint)
        return false;
    }
  
@@ -318,7 +369,7 @@ index 6ee84c5..b19d985 100644
  
    if (m_messageQueue.IsInited())
    {
-@@ -200,7 +201,8 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+@@ -200,7 +202,8 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
    }
    if (!codec)
    {
@@ -328,7 +379,7 @@ index 6ee84c5..b19d985 100644
      hint.codecOptions |= CODEC_ALLOW_FALLBACK;
      codec = CDVDFactoryCodec::CreateVideoCodec(hint, m_processInfo);
      if (!codec)
-@@ -904,6 +906,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+@@ -904,6 +907,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
    }
  
    int timeToDisplay = DVD_TIME_TO_MSEC(pPicture->pts - iPlayingClock);
@@ -336,12 +387,15 @@ index 6ee84c5..b19d985 100644
  
    // make sure waiting time is not negative
    int maxWaitTime = std::min(std::max(timeToDisplay + 500, 50), 500);
-@@ -911,6 +914,8 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+@@ -911,6 +915,8 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
    if (m_speed > DVD_PLAYSPEED_NORMAL)
      maxWaitTime = std::max(timeToDisplay, 0);
    int buffer = m_renderManager.WaitForBuffer(m_bAbortOutput, maxWaitTime);
-+  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayerVideo::%s - ttd:%dms pts:%0.3lf Clock:%0.3f Level:%d elapsed:%0.3fms",
++  CLog::Log(LOGDEBUG,LOGVIDEO, "CVideoPlayerVideo::%s - ttd:%dms pts:%0.3lf Clock:%0.3f Level:%d elapsed:%0.3fms",
 +        __FUNCTION__, timeToDisplay, pPicture->pts/1000000, iPlayingClock/1000000.0, buffer, std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count() / 1000.0);
    if (buffer < 0)
    {
      return OUTPUT_AGAIN;
+-- 
+2.7.4
+
