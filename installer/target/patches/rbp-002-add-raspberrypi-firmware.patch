@@ -1,8 +1,5 @@
-diff --git a/package/rpi-firmware-osmc/Config.in b/package/rpi-firmware-osmc/Config.in
-new file mode 100644
-index 0000000..3bc006e
---- /dev/null
-+++ b/package/rpi-firmware-osmc/Config.in
+--- /dev/null	2019-06-25 11:48:10.527137248 +0100
++++ b/package/rpi-firmware-osmc/Config.in	2019-06-25 15:30:48.351294862 +0100
 @@ -0,0 +1,48 @@
 +config BR2_PACKAGE_RPI_FIRMWARE_OSMC
 +	bool "package/rpi-firmware-osmc"
@@ -52,21 +49,15 @@ index 0000000..3bc006e
 +	default "_cd"   if BR2_PACKAGE_RPI_FIRMWARE_OSMC_CD
 +
 +endif # BR2_PACKAGE_RPI_FIRMWARE_OSMC
-diff --git a/package/rpi-firmware-osmc/config.txt b/package/rpi-firmware-osmc/config.txt
-new file mode 100644
-index 0000000..8d6f2ed
---- /dev/null
-+++ b/package/rpi-firmware-osmc/config.txt
+--- /dev/null	2019-06-25 11:48:10.527137248 +0100
++++ b/package/rpi-firmware-osmc/config.txt	2019-06-25 15:30:48.351294862 +0100
 @@ -0,0 +1,3 @@
 +disable_overscan=1
 +framebuffer_depth=32
 +gpu_mem=16
-diff --git a/package/rpi-firmware-osmc/rpi-firmware-osmc.mk b/package/rpi-firmware-osmc/rpi-firmware-osmc.mk
-new file mode 100644
-index 0000000..6a3a63b
---- /dev/null
-+++ b/package/rpi-firmware-osmc/rpi-firmware-osmc.mk
-@@ -0,0 +1,20 @@
+--- /dev/null	2019-06-25 11:48:10.527137248 +0100
++++ b/package/rpi-firmware-osmc/rpi-firmware-osmc.mk	2019-06-25 15:35:25.018520745 +0100
+@@ -0,0 +1,22 @@
 +################################################################################
 +#
 +# package/rpi-firmware-osmc
@@ -82,6 +73,8 @@ index 0000000..6a3a63b
 +	$(INSTALL) -D -m 0644 $(@D)/boot/bootcode.bin $(BINARIES_DIR)/INSTALLER/bootcode.bin
 +	$(INSTALL) -D -m 0644 $(@D)/boot/start_cd.elf $(BINARIES_DIR)/INSTALLER/start_cd.elf
 +	$(INSTALL) -D -m 0644 $(@D)/boot/fixup_cd.dat $(BINARIES_DIR)/INSTALLER/fixup_cd.dat
++        $(INSTALL) -D -m 0644 $(@D)/boot/start4cd.elf $(BINARIES_DIR)/INSTALLER/start4cd.elf
++        $(INSTALL) -D -m 0644 $(@D)/boot/fixup4cd.dat $(BINARIES_DIR)/INSTALLER/fixup4cd.dat
 +	$(INSTALL) -D -m 0644 package/rpi-firmware-osmc/config.txt $(BINARIES_DIR)/INSTALLER/config.txt
 +	$(INSTALL) -D -m 0644 package/rpi-firmware-osmc/cmdline.txt $(BINARIES_DIR)/INSTALLER/cmdline.txt
 +endef
