@@ -192,7 +192,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "vero2" ]
+		if [ "$1" == "rbp1" || "$1" == "rbp2" || "$1" == "vero2" ]
 		then
                 # Build MT7610U model
                 pushd drivers/net/wireless/mt7610u
