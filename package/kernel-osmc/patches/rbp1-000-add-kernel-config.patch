@@ -1,13 +1,13 @@
---- /dev/null	2019-06-25 11:48:10.527137248 +0100
-+++ b/.config	2019-06-25 13:54:57.768805356 +0100
-@@ -0,0 +1,5646 @@
+--- /dev/null	2019-06-27 20:47:54.967007161 +0100
++++ b/.config	2019-06-29 12:20:42.476151965 +0100
+@@ -0,0 +1,5647 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 4.19.55 Kernel Configuration
 +#
 +
 +#
-+# Compiler: arm-linux-gnueabihf-gcc (Ubuntu/Linaro 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
++# Compiler: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.11) 5.4.0 20160609
 +#
 +CONFIG_CC_IS_GCC=y
 +CONFIG_GCC_VERSION=50400
@@ -586,9 +586,9 @@
 +CONFIG_IOSCHED_NOOP=y
 +# CONFIG_IOSCHED_DEADLINE is not set
 +# CONFIG_IOSCHED_CFQ is not set
-+CONFIG_DEFAULT_NOOP=y
-+# CONFIG_DEFAULT_BFQ is not set
-+CONFIG_DEFAULT_IOSCHED="noop"
++# CONFIG_DEFAULT_NOOP is not set
++CONFIG_DEFAULT_BFQ=y
++CONFIG_DEFAULT_IOSCHED="bfq"
 +# CONFIG_MQ_IOSCHED_DEADLINE is not set
 +# CONFIG_MQ_IOSCHED_KYBER is not set
 +CONFIG_IOSCHED_BFQ=y
@@ -2748,6 +2748,7 @@
 +CONFIG_IR_GPIO_CIR=m
 +# CONFIG_IR_SERIAL is not set
 +# CONFIG_IR_SIR is not set
++CONFIG_RC_XBOX_DVD=m
 +CONFIG_MEDIA_SUPPORT=m
 +
 +#
