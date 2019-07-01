@@ -1,65 +1,76 @@
-From 5be22537abd40cec32f099a87411aee87ea0dd57 Mon Sep 17 00:00:00 2001
+From c0036062fea94941bd25ef64974553bd24b935dd Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
-Date: Wed, 12 Jun 2019 15:30:33 +0100
-Subject: [PATCH] 16:9 rendered full-screen when display is 720 wide 4:3
- rendered with postbox
+Date: Mon, 1 Jul 2019 19:55:48 +0100
+Subject: [PATCH] Re-work PAL/NTSC aspect ratios for hw and sw decoding
 
+Allow stretch to 16:9 to work properly
 ---
- .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 34 +++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   |  5 +++++
+ xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp     | 14 +++++++++++++-
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp                |  2 ++
+ 3 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 9bd4c6c8bd..928538ae60 100644
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -1547,7 +1547,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
-   // handle video ratio
-   AVRational video_ratio       = av_d2q(1, SHRT_MAX);
-   //if (!hints.forced_aspect)
--  //  video_ratio = av_d2q(hints.aspect, SHRT_MAX);
-+    video_ratio = av_d2q(hints.aspect, SHRT_MAX);
-   am_private->video_ratio      = ((int32_t)video_ratio.num << 16) | video_ratio.den;
-   am_private->video_ratio64    = ((int64_t)video_ratio.num << 32) | video_ratio.den;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 98d6282ea7..b957929a6f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -393,6 +393,11 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecAmlogic::GetPicture(VideoPicture* pVideoP
  
-@@ -2391,6 +2391,38 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
-     dst_rect.y2 *= 2.0;
-   }
+   pVideoPicture->iDisplayWidth  = pVideoPicture->iWidth;
+   pVideoPicture->iDisplayHeight = pVideoPicture->iHeight;
++
++  if (m_aspect_ratio < 0.1f)
++	  //set default if there is no other information
++	  m_aspect_ratio = 16.0f / 9.0f;
++
+   if (m_aspect_ratio > 1.0 && !m_hints.forced_aspect)
+   {
+     pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+index e4900f4649..2f9ffdad08 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+@@ -118,6 +118,18 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
  
-+  /* passthrough non-square pixels if available */
-+  if (m_guiStereoMode == RENDER_STEREO_MODE_OFF &&
-+      video_res_info.iScreenWidth == 720 &&
-+      am_private->video_width <= 720)
+   float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
+ 
++  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
 +  {
-+    if (dst_rect.Width()/dst_rect.Height() > 1.5f)
-+    {
-+      am_private->video_ratio      = ((int32_t)16 << 16) | 9;
-+      am_private->video_ratio64    = ((int64_t)16 << 32) | 9;
-+    }
++    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight == 480)
++      outputFrameRatio = inputFrameRatio / 8.0f * 9.0f;
 +    else
-+    {
-+      am_private->video_ratio      = ((int32_t)4 << 16) | 3;
-+      am_private->video_ratio64    = ((int64_t)4 << 32) | 3;
-+    }
-+    if (am_private->video_ratio == ((16 << 16) | 9))
-+    {
-+      CLog::Log(LOGDEBUG, "CAMLCodec::SetVideoRect: 16x9");
-+      dst_rect.x1 = dst_rect.y1 = 0;
-+      dst_rect.x2 = 720;
-+      dst_rect.y2 = am_private->video_height;
-+    }
-+    /* TODO: set 4:3 using signalling instead of postboxing */
-+    else if (am_private->video_ratio == ((4 << 16) | 3))
-+    {
-+      CLog::Log(LOGDEBUG, "GFH CAMLCodec::SetVideoRect: 4x3");
-+      dst_rect.x1 = 90;
-+      dst_rect.y1 = 0;
-+      dst_rect.x2 = 630;
-+      dst_rect.y2 = gui.y2;
-+    }
++      outputFrameRatio = inputFrameRatio / 16.0f * 15.0f;
++
++    if (CDisplaySettings::GetInstance().GetPixelRatio() == 1.0f ||
++        inputFrameRatio > 1.5f)
++      outputFrameRatio *= 3.0f / 4.0f;
 +  }
- #if 1
-   std::string s_dst_rect = StringUtils::Format("%i,%i,%i,%i",
-     (int)dst_rect.x1, (int)dst_rect.y1,
++
+   // allow a certain error to maximize size of render area
+   float fCorrection = width / height / outputFrameRatio - 1.0f;
+   float fAllowed = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ERRORINASPECT) * 0.01f;
+@@ -418,7 +430,7 @@ void CBaseRenderer::SetViewMode(int viewMode)
+     CDisplaySettings::GetInstance().SetZoomAmount(1.0);
+     // stretch to the limits of the 16:9 screen.
+     // incorrect behaviour, but it's what the users want, so...
+-    CDisplaySettings::GetInstance().SetPixelRatio((screenWidth / screenHeight) * info.fPixelRatio / sourceFrameRatio);
++    CDisplaySettings::GetInstance().SetPixelRatio((16.0f / 9.0f) * info.fPixelRatio / sourceFrameRatio);
+     bool nonlin = (is43 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeStretch16x9Nonlin) ||
+                   m_videoSettings.m_ViewMode == ViewModeStretch16x9Nonlin;
+     CDisplaySettings::GetInstance().SetNonLinearStretched(nonlin);
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index d6f8ec1753..efd603803b 100755
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -353,6 +353,8 @@ void CWinSystemAmlogic::UpdateResolutions()
+ 
+   if (curDesktopSetting == "DESKTOP")
+     curDesktopSetting = curResolution;
++  else if (curDesktopSetting.length() == 24)
++    curDesktopSetting = StringUtils::Right(curDesktopSetting, 23);
+ 
+   CLog::Log(LOGNOTICE, "Current display setting is %s", curDesktopSetting.c_str());
+   CLog::Log(LOGNOTICE, "Current output resolution is %s", curResolution.c_str());
 -- 
 2.11.0
 
