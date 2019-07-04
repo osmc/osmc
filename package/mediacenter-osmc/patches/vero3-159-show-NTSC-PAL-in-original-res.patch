@@ -1,26 +1,41 @@
-From 6435cddf79defd431b04c934b8b7bd116844ad18 Mon Sep 17 00:00:00 2001
+From c0036062fea94941bd25ef64974553bd24b935dd Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
-Date: Wed, 3 Jul 2019 11:43:23 +0100
-Subject: [PATCH] Allow stretch to 16:9 to work properly
+Date: Mon, 1 Jul 2019 19:55:48 +0100
+Subject: [PATCH] Re-work PAL/NTSC aspect ratios for hw and sw decoding
 
+Allow stretch to 16:9 to work properly
 ---
- xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   |  5 +++++
+ xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp     | 14 +++++++++++++-
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp                |  2 ++
+ 3 files changed, 20 insertions(+), 1 deletion(-)
 
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 98d6282ea7..b957929a6f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -393,6 +393,11 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecAmlogic::GetPicture(VideoPicture* pVideoP
+ 
+   pVideoPicture->iDisplayWidth  = pVideoPicture->iWidth;
+   pVideoPicture->iDisplayHeight = pVideoPicture->iHeight;
++
++  if (m_aspect_ratio < 0.1f)
++	  //set default if there is no other information
++	  m_aspect_ratio = 16.0f / 9.0f;
++
+   if (m_aspect_ratio > 1.0 && !m_hints.forced_aspect)
+   {
+     pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-index 05b82fb1a7..2f9ffdad08 100644
+index e4900f4649..2f9ffdad08 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-@@ -120,12 +120,14 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
+@@ -118,6 +118,18 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
  
-   if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
-   {
--	  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight == 480)
--		  outputFrameRatio = inputFrameRatio / 8.0f * 9.0f;
--	  else
--		  outputFrameRatio = inputFrameRatio / 16.0f * 15.0f;
--//	  if (inputFrameRatio > 1.5f)
--		  outputFrameRatio *= 3.0f / 4.0f;
+   float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
+ 
++  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
++  {
 +    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight == 480)
 +      outputFrameRatio = inputFrameRatio / 8.0f * 9.0f;
 +    else
@@ -29,10 +44,12 @@ index 05b82fb1a7..2f9ffdad08 100644
 +    if (CDisplaySettings::GetInstance().GetPixelRatio() == 1.0f ||
 +        inputFrameRatio > 1.5f)
 +      outputFrameRatio *= 3.0f / 4.0f;
-   }
- 
++  }
++
    // allow a certain error to maximize size of render area
-@@ -428,7 +430,7 @@ void CBaseRenderer::SetViewMode(int viewMode)
+   float fCorrection = width / height / outputFrameRatio - 1.0f;
+   float fAllowed = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ERRORINASPECT) * 0.01f;
+@@ -418,7 +430,7 @@ void CBaseRenderer::SetViewMode(int viewMode)
      CDisplaySettings::GetInstance().SetZoomAmount(1.0);
      // stretch to the limits of the 16:9 screen.
      // incorrect behaviour, but it's what the users want, so...
@@ -41,6 +58,19 @@ index 05b82fb1a7..2f9ffdad08 100644
      bool nonlin = (is43 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeStretch16x9Nonlin) ||
                    m_videoSettings.m_ViewMode == ViewModeStretch16x9Nonlin;
      CDisplaySettings::GetInstance().SetNonLinearStretched(nonlin);
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index d6f8ec1753..efd603803b 100755
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -353,6 +353,8 @@ void CWinSystemAmlogic::UpdateResolutions()
+ 
+   if (curDesktopSetting == "DESKTOP")
+     curDesktopSetting = curResolution;
++  else if (curDesktopSetting.length() == 24)
++    curDesktopSetting = StringUtils::Right(curDesktopSetting, 23);
+ 
+   CLog::Log(LOGNOTICE, "Current display setting is %s", curDesktopSetting.c_str());
+   CLog::Log(LOGNOTICE, "Current output resolution is %s", curResolution.c_str());
 -- 
 2.11.0
 
