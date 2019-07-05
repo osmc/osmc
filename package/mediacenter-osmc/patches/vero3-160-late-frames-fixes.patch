@@ -1,0 +1,278 @@
+From a176924ff90212c7ff10fce334aeaf8c26e2ed7f Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Apr 2019 07:14:37 +0000
+Subject: [PATCH] Render: keep FIFO order on late frames
+
+---
+ .../HwDecRender/RendererAML.cpp               | 22 +++++++++++++++++--
+ .../VideoRenderers/RenderManager.cpp          |  6 +++--
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index 6fa5e513f840..1db05c5e6285 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -130,13 +130,31 @@ bool CRendererAML::Supports(ERENDERFEATURE feature)
+ 
+ void CRendererAML::Reset()
+ {
++  std::array<int, 2> reset_arr[m_numRenderBuffers];
+   m_prevVPts = -1;
++
+   for (int i = 0 ; i < m_numRenderBuffers ; ++i)
+   {
++    reset_arr[i][0] = i;
++
+     if (m_buffers[i].videoBuffer)
++      reset_arr[i][1] = dynamic_cast<CAMLVideoBuffer *>(m_buffers[i].videoBuffer)->m_bufferIndex;
++    else
++      reset_arr[i][1] = 0;
++  }
++
++  std::sort(std::begin(reset_arr), std::end(reset_arr),
++    [](const std::array<int, 2>& u, const std::array<int, 2>& v)
++    {
++      return u[1] < v[1];
++    });
++
++  for (int i = 0; i < m_numRenderBuffers; ++i)
++  {
++    if (m_buffers[reset_arr[i][0]].videoBuffer)
+     {
+-      m_buffers[i].videoBuffer->Release();
+-      m_buffers[i].videoBuffer = nullptr;
++      m_buffers[reset_arr[i][0]].videoBuffer->Release();
++      m_buffers[reset_arr[i][0]].videoBuffer = nullptr;
+     }
+   }
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index f5120a6a8710..d56a32b6b54b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1151,13 +1151,15 @@ void CRenderManager::PrepareNextRender()
+     // skip late frames
+     while (m_queued.front() != idx)
+     {
++      m_presentsourcePast = m_queued.front();
++      m_queued.pop_front();
++
+       if (m_presentsourcePast >= 0)
+       {
+         m_discard.push_back(m_presentsourcePast);
+         m_QueueSkip++;
++        m_presentsourcePast = -1;
+       }
+-      m_presentsourcePast = m_queued.front();
+-      m_queued.pop_front();
+     }
+ 
+     int lateframes = static_cast<int>((renderPts - m_Queue[idx].pts) * m_fps / DVD_TIME_BASE);
+From bb7d8b5e6522eeb6bf492b3f33c41101f1bff9db Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Apr 2019 08:36:45 +0000
+Subject: [PATCH] AMLCodec: decrease DequeueBuffer polling interval A too high
+ polling interval will cause late frames
+
+---
+ .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  | 22 ++++++++++---------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 447ae231c7c0..b1e9c0f4459d 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2079,30 +2079,32 @@ int CAMLCodec::DequeueBuffer()
+   //Driver change from 10 to 0ms latency, throttle here
+   std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
+ 
+-  unsigned int waitTime(10);
++  unsigned int waitTime(500);
+ DRAIN:
+   if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
+   {
+     if (errno != EAGAIN)
+       CLog::Log(LOGERROR, "CAMLCodec::DequeueBuffer - VIDIOC_DQBUF failed: %s", strerror(errno));
+ 
+-    std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
++    std::chrono::microseconds elapsed(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count());
+ 
+-    if (elapsed < std::chrono::milliseconds(waitTime))
+-      std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
+-
+-    int waited = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
+-    CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer waited:%0.3fms", waited / 1000.0);
++    if (elapsed < std::chrono::microseconds(waitTime))
++      std::this_thread::sleep_for(std::chrono::microseconds(waitTime) - elapsed);
+ 
+     if (m_drain && elapsed < std::chrono::milliseconds(300))
+-    {
+-      waitTime += 10;
+       goto DRAIN;
+-    }
++
++    if (!m_drain && elapsed < std::chrono::milliseconds(300))
++      CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer skipped by %s", strerror(errno));
++    else if (m_drain && elapsed > std::chrono::milliseconds(300))
++      CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer timeout!");
+ 
+     return -errno;
+   }
+ 
++  int waited = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
++  CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer waited:%0.3fms", waited / 1000.0);
++
+   // Since kernel 3.14 Amlogic changed length and units of PTS values reported here.
+   // To differentiate such PTS values we check for existence of omx_pts_interval_lower
+   // parameter, because it was introduced since kernel 3.14.
+From 37b9da6a19090994d11f4fc758d60e03077d53d9 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Apr 2019 10:23:17 +0000
+Subject: [PATCH] Render: rework late frame counter Now the late frame counter
+ depends on the skipped frames count
+
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index d56a32b6b54b..573e93ec6fb5 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1134,7 +1134,7 @@ void CRenderManager::PrepareNextRender()
+     // see if any future queued frames are already due
+     auto iter = m_queued.begin();
+     int idx = *iter;
+-    ++iter;
++    int lateframes = 0;
+     while (iter != m_queued.end())
+     {
+       // the slot for rendering in time is [pts .. (pts +  x * frametime)]
+@@ -1144,6 +1144,7 @@ void CRenderManager::PrepareNextRender()
+       double x = (m_lateframes <= 6) ? 0.98 : 0;
+       if (renderPts < m_Queue[*iter].pts + x * frametime)
+         break;
++      lateframes++;
+       idx = *iter;
+       ++iter;
+     }
+@@ -1162,7 +1163,6 @@ void CRenderManager::PrepareNextRender()
+       }
+     }
+ 
+-    int lateframes = static_cast<int>((renderPts - m_Queue[idx].pts) * m_fps / DVD_TIME_BASE);
+     if (lateframes)
+       m_lateframes += lateframes;
+     else
+From 0fd22c99a5f9a7b9963b3ba26bcab5d374fe3c22 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Thu, 18 Apr 2019 06:02:18 +0000
+Subject: [PATCH] AMLCodec: speedup and optimized DequeueBuffer RenderManager:
+ added queue size in late frame calculation
+
+---
+ .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  | 36 ++++++++++---------
+ .../VideoRenderers/RenderManager.cpp          |  5 ++-
+ 2 files changed, 23 insertions(+), 18 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index b1e9c0f4459d..ba9103363d43 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2079,31 +2079,37 @@ int CAMLCodec::DequeueBuffer()
+   //Driver change from 10 to 0ms latency, throttle here
+   std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
+ 
+-  unsigned int waitTime(500);
++  unsigned int waitTime(5);
++  bool timeout(false);
+ DRAIN:
+   if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
+   {
+     if (errno != EAGAIN)
+       CLog::Log(LOGERROR, "CAMLCodec::DequeueBuffer - VIDIOC_DQBUF failed: %s", strerror(errno));
+ 
+-    std::chrono::microseconds elapsed(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count());
++    std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
+ 
+-    if (elapsed < std::chrono::microseconds(waitTime))
+-      std::this_thread::sleep_for(std::chrono::microseconds(waitTime) - elapsed);
++    if (elapsed < std::chrono::milliseconds(waitTime))
++      std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
+ 
+-    if (m_drain && elapsed < std::chrono::milliseconds(300))
++    timeout = elapsed >= std::chrono::milliseconds(300);
++
++    if (m_drain && !timeout)
+       goto DRAIN;
+ 
+-    if (!m_drain && elapsed < std::chrono::milliseconds(300))
+-      CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer skipped by %s", strerror(errno));
+-    else if (m_drain && elapsed > std::chrono::milliseconds(300))
++    if (m_drain && timeout)
+       CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer timeout!");
+ 
+     return -errno;
+   }
+ 
+-  int waited = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
+-  CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer waited:%0.3fms", waited / 1000.0);
++  if (m_drain)
++  {
++    int waited = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count();
++    CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer waited:%0.3fms", waited / 1000.0);
++  }
++  else
++    CLog::Log(LOGDEBUG, LOGAVTIMING, "CAMLCodec::DequeueBuffer vidioc_dqbuf successful");
+ 
+   // Since kernel 3.14 Amlogic changed length and units of PTS values reported here.
+   // To differentiate such PTS values we check for existence of omx_pts_interval_lower
+@@ -2164,7 +2170,7 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+       pVideoPicture->iDuration = static_cast<double>((0x7FFFFFFF & (m_cur_pts - m_last_pts)) * DVD_TIME_BASE) / PTS_FREQ;
+ 
+     pVideoPicture->dts = DVD_NOPTS_VALUE;
+-    pVideoPicture->pts = static_cast<double>(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
++    pVideoPicture->pts = static_cast<double>(m_cur_pts + m_ptsOverflow) * DVD_TIME_BASE / PTS_FREQ;
+ 
+     CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: %u, pts: %0.4lf[%llX], overflow: %llX",m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, m_cur_pts, m_ptsOverflow);
+ 
+@@ -2172,12 +2178,8 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+   }
+   else if (m_drain)
+     return CDVDVideoCodec::VC_EOF;
+-  else
+-  {
+-    if (timesize < 1.0)
+-      return CDVDVideoCodec::VC_BUFFER;
+-    usleep(5000);
+-  }
++  else if (timesize < 1.0)
++    return CDVDVideoCodec::VC_BUFFER;
+ 
+   return CDVDVideoCodec::VC_NONE;
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 573e93ec6fb5..aa5b71970f6f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1135,6 +1135,8 @@ void CRenderManager::PrepareNextRender()
+     auto iter = m_queued.begin();
+     int idx = *iter;
+     int lateframes = 0;
++    int queue_size = m_queued.size();
++
+     while (iter != m_queued.end())
+     {
+       // the slot for rendering in time is [pts .. (pts +  x * frametime)]
+@@ -1142,9 +1144,10 @@ void CRenderManager::PrepareNextRender()
+       // we are really late. The likelihood that we recover decreases the greater m_lateframes
+       // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
+       double x = (m_lateframes <= 6) ? 0.98 : 0;
+-      if (renderPts < m_Queue[*iter].pts + x * frametime)
++      if ((renderPts - frametime * queue_size) < (m_Queue[*iter].pts + x * frametime))
+         break;
+       lateframes++;
++      queue_size--;
+       idx = *iter;
+       ++iter;
+     }
