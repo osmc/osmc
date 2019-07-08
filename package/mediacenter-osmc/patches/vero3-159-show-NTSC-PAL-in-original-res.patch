@@ -1,9 +1,11 @@
-From c0036062fea94941bd25ef64974553bd24b935dd Mon Sep 17 00:00:00 2001
+From 3555b2e58b4c530e6d28bfecafa82728e01a6229 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Mon, 1 Jul 2019 19:55:48 +0100
 Subject: [PATCH] Re-work PAL/NTSC aspect ratios for hw and sw decoding
 
 Allow stretch to 16:9 to work properly
+
+Fix wrong aspect ratio for 1920x816 etc.
 ---
  .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   |  5 +++++
  xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp     | 14 +++++++++++++-
@@ -11,7 +13,7 @@ Allow stretch to 16:9 to work properly
  3 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 98d6282ea7..b957929a6f 100644
+index 98d6282ea7..2c64f3e584 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 @@ -393,6 +393,11 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecAmlogic::GetPicture(VideoPicture* pVideoP
@@ -19,9 +21,9 @@ index 98d6282ea7..b957929a6f 100644
    pVideoPicture->iDisplayWidth  = pVideoPicture->iWidth;
    pVideoPicture->iDisplayHeight = pVideoPicture->iHeight;
 +
-+  if (m_aspect_ratio < 0.1f)
-+	  //set default if there is no other information
-+	  m_aspect_ratio = 16.0f / 9.0f;
++  //set default if there is no other information for TV/DVD modes
++  if (pVideoPicture->iWidth > 640 && pVideoPicture->iWidth <=720 && m_aspect_ratio < 0.1f)
++      m_aspect_ratio = 16.0f / 9.0f;
 +
    if (m_aspect_ratio > 1.0 && !m_hints.forced_aspect)
    {
