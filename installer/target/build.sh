@@ -21,7 +21,9 @@ kpartx
 dosfstools
 parted
 cpio
-python"
+python
+bison
+flex"
 
 if [ "$1" == "vero2" ]
 then
