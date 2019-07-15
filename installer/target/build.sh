@@ -77,7 +77,7 @@ then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
 	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 1M 256M
-	kpartx -a OSMC_TGT_${1}_${date}.img
+	kpartx -s -a OSMC_TGT_${1}_${date}.img
 	/sbin/partprobe
 	mkfs.vfat -F32 /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt
