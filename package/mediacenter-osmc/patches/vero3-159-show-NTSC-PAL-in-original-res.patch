@@ -1,17 +1,29 @@
-From e5679dd346cf6e90d1cd646860e5d4ca8fcc7526 Mon Sep 17 00:00:00 2001
+From a6bd7e9a5ffff19f2c2c661e6eb3d132e0851ddd Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
-Date: Mon, 1 Jul 2019 19:55:48 +0100
-Subject: [PATCH] Re-work PAL/NTSC aspect ratios for hw and sw decoding
+Date: Wed, 31 Jul 2019 12:53:21 +0100
+Subject: [PATCH] Add aspect ratio switching by AVI infoframe
 
-Allow stretch to 16:9 to work properly
-
-Fix wrong aspect ratio for 1920x816 etc.
 ---
- .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   |  6 ++++++
- xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp     | 14 +++++++++++++-
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp                |  2 ++
- 3 files changed, 21 insertions(+), 1 deletion(-)
+ xbmc/Application.cpp                             |  1 +
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp     |  6 ++++++
+ .../VideoPlayer/VideoRenderers/BaseRenderer.cpp  | 16 ++++++++++++++++
+ xbmc/utils/AMLUtils.cpp                          |  4 ++++
+ xbmc/windowing/GraphicContext.cpp                |  2 +-
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp      |  2 ++
+ 6 files changed, 30 insertions(+), 1 deletion(-)
 
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 8cfd83e138..8c2b32163a 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -3041,6 +3041,7 @@ void CApplication::PlaybackCleanup()
+     else
+     {
+       //  resets to res_desktop or look&feel resolution (including refreshrate)
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
+       CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false);
+     }
+ #ifdef TARGET_DARWIN_IOS
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 index 98d6282ea7..028c31e07c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
@@ -30,39 +42,69 @@ index 98d6282ea7..028c31e07c 100644
    {
      pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-index e4900f4649..2f9ffdad08 100644
+index e4900f4649..cfe60356c0 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-@@ -118,6 +118,18 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
+@@ -19,6 +19,7 @@
+ #include "guilib/LocalizeStrings.h"
+ #include "utils/log.h"
+ #include "utils/MathUtils.h"
++#include "utils/SysfsUtils.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderFlags.h"
+ 
+ 
+@@ -118,6 +119,21 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
  
    float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
  
-+  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
++  if (MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) &&
++    (m_videoSettings.m_ViewMode == ViewModeNormal))
 +  {
-+    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight == 480)
-+      outputFrameRatio = inputFrameRatio / 8.0f * 9.0f;
-+    else
-+      outputFrameRatio = inputFrameRatio / 16.0f * 15.0f;
-+
-+    if (CDisplaySettings::GetInstance().GetPixelRatio() == 1.0f ||
-+        inputFrameRatio > 1.5f)
-+      outputFrameRatio *= 3.0f / 4.0f;
++      CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 4:3");
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 1);
++      outputFrameRatio = ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth) /
++          ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight);
 +  }
-+
++  else
++  {
++    CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 16:9");
++    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
++      outputFrameRatio *= 3.0f / 4.0f;
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
++  }
    // allow a certain error to maximize size of render area
    float fCorrection = width / height / outputFrameRatio - 1.0f;
    float fAllowed = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ERRORINASPECT) * 0.01f;
-@@ -418,7 +430,7 @@ void CBaseRenderer::SetViewMode(int viewMode)
-     CDisplaySettings::GetInstance().SetZoomAmount(1.0);
-     // stretch to the limits of the 16:9 screen.
-     // incorrect behaviour, but it's what the users want, so...
--    CDisplaySettings::GetInstance().SetPixelRatio((screenWidth / screenHeight) * info.fPixelRatio / sourceFrameRatio);
-+    CDisplaySettings::GetInstance().SetPixelRatio((16.0f / 9.0f) * info.fPixelRatio / sourceFrameRatio);
-     bool nonlin = (is43 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeStretch16x9Nonlin) ||
-                   m_videoSettings.m_ViewMode == ViewModeStretch16x9Nonlin;
-     CDisplaySettings::GetInstance().SetNonLinearStretched(nonlin);
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 1881e4078b..ba044c729f 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -446,6 +446,10 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+   res->bFullScreen   = true;
+   res->iSubtitles    = (int)(0.965 * res->iHeight);
+   res->fPixelRatio   = 1.0f;
++  if (res->iHeight == 576)
++    res->fPixelRatio = 16.0f / 15.0f;
++  if (res->iHeight == 480)
++    res->fPixelRatio = 8.0f / 9.0f;
+   res->strId         = fromMode;
+   res->strMode       = StringUtils::Format("%dx%d @ %.2f%s - Full Screen", res->iScreenWidth, res->iScreenHeight, res->fRefreshRate,
+     res->dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
+diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
+index 1ced49671b..8b056f6ee3 100644
+--- a/xbmc/windowing/GraphicContext.cpp
++++ b/xbmc/windowing/GraphicContext.cpp
+@@ -349,7 +349,7 @@ void CGraphicContext::SetFullScreenVideo(bool bOnOff)
+     }
+   }
+   else
+-    SetVideoResolution(RES_WINDOW, false);
++    SetVideoResolution(RES_DESKTOP, false);
+ }
+ 
+ bool CGraphicContext::IsFullScreenVideo() const
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index d6f8ec1753..efd603803b 100755
+index d6f8ec1753..efd603803b 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -353,6 +353,8 @@ void CWinSystemAmlogic::UpdateResolutions()
@@ -75,5 +117,5 @@ index d6f8ec1753..efd603803b 100755
    CLog::Log(LOGNOTICE, "Current display setting is %s", curDesktopSetting.c_str());
    CLog::Log(LOGNOTICE, "Current output resolution is %s", curResolution.c_str());
 -- 
-2.11.0
+2.17.1
 
