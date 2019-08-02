@@ -1,16 +1,16 @@
-From a6bd7e9a5ffff19f2c2c661e6eb3d132e0851ddd Mon Sep 17 00:00:00 2001
+From 71b020c44aaebc25def2830f3ce047fab09a56d1 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Wed, 31 Jul 2019 12:53:21 +0100
 Subject: [PATCH] Add aspect ratio switching by AVI infoframe
 
 ---
- xbmc/Application.cpp                             |  1 +
- .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp     |  6 ++++++
- .../VideoPlayer/VideoRenderers/BaseRenderer.cpp  | 16 ++++++++++++++++
- xbmc/utils/AMLUtils.cpp                          |  4 ++++
- xbmc/windowing/GraphicContext.cpp                |  2 +-
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp      |  2 ++
- 6 files changed, 30 insertions(+), 1 deletion(-)
+ xbmc/Application.cpp                          |  1 +
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  |  6 +++++
+ .../VideoRenderers/BaseRenderer.cpp           | 25 +++++++++++++++++++
+ xbmc/utils/AMLUtils.cpp                       |  4 +++
+ xbmc/windowing/GraphicContext.cpp             |  2 +-
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp   |  2 ++
+ 6 files changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
 index 8cfd83e138..8c2b32163a 100644
@@ -42,36 +42,46 @@ index 98d6282ea7..028c31e07c 100644
    {
      pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-index e4900f4649..cfe60356c0 100644
+index e4900f4649..46f27b84fd 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-@@ -19,6 +19,7 @@
+@@ -19,7 +19,9 @@
  #include "guilib/LocalizeStrings.h"
  #include "utils/log.h"
  #include "utils/MathUtils.h"
 +#include "utils/SysfsUtils.h"
  #include "cores/VideoPlayer/VideoRenderers/RenderFlags.h"
++#include "xbmc/Application.h"
  
  
-@@ -118,6 +119,21 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
+ CBaseRenderer::CBaseRenderer()
+@@ -118,6 +120,29 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
  
    float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
  
-+  if (MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) &&
-+    (m_videoSettings.m_ViewMode == ViewModeNormal))
++  std::string hdmiAspect;
++  if ((MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) &&
++      !g_application.GetAppPlayer().IsPaused()) &&
++      (m_videoSettings.m_ViewMode == ViewModeNormal))
 +  {
-+      CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 4:3");
-+      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 1);
-+      outputFrameRatio = ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth) /
-+          ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight);
++    CLog::Log(LOGDEBUG, "Setting aspect to 4:3");
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 1);
 +  }
 +  else
 +  {
-+    CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 16:9");
-+    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
-+      outputFrameRatio *= 3.0f / 4.0f;
++    CLog::Log(LOGDEBUG, "Setting aspect to 16:9");
 +    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
 +  }
++  
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/aspect", hdmiAspect);
++  if (StringUtils::EndsWith(hdmiAspect, "0x01/0x08"))
++  {
++    outputFrameRatio = ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth) /
++        ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight);
++  }
++  else if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
++    outputFrameRatio *= 3.0f / 4.0f;
++
    // allow a certain error to maximize size of render area
    float fCorrection = width / height / outputFrameRatio - 1.0f;
    float fAllowed = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ERRORINASPECT) * 0.01f;
