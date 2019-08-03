@@ -3,7 +3,7 @@
 # Let OSIRIS see what we are doing
 set -x
 
-# Are we Pi1 or Pi2
+# Are we Pi1 or Pi2 or Pi4
 grep -q ARMv7 /proc/cpuinfo
 if [ $? -eq 0 ]
 then
