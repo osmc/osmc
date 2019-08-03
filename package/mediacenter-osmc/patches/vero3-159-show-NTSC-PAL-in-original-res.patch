@@ -1,17 +1,49 @@
-From 71b020c44aaebc25def2830f3ce047fab09a56d1 Mon Sep 17 00:00:00 2001
+From bbe20f787bff3fdb33a600d270d335da2266cff1 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Wed, 31 Jul 2019 12:53:21 +0100
-Subject: [PATCH] Add aspect ratio switching by AVI infoframe
+Subject: [PATCH] Add aspect ratio switching by AVI infoframe With HDMI AVI
+ setting in globals
 
 ---
+ .../resources/strings.po                      |  5 +++++
+ system/settings/settings.xml                  |  1 +
  xbmc/Application.cpp                          |  1 +
  .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  |  6 +++++
- .../VideoRenderers/BaseRenderer.cpp           | 25 +++++++++++++++++++
- xbmc/utils/AMLUtils.cpp                       |  4 +++
+ .../VideoRenderers/BaseRenderer.cpp           | 22 +++++++++++++++++++
+ xbmc/cores/VideoSettings.h                    |  3 ++-
+ xbmc/utils/AMLUtils.cpp                       |  4 ++++
  xbmc/windowing/GraphicContext.cpp             |  2 +-
  xbmc/windowing/amlogic/WinSystemAmlogic.cpp   |  2 ++
- 6 files changed, 39 insertions(+), 1 deletion(-)
+ 9 files changed, 44 insertions(+), 2 deletions(-)
 
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index b92f906eb8..e8a8f0363c 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -2929,6 +2929,11 @@ msgctxt "#636"
+ msgid "Custom"
+ msgstr ""
+ 
++#: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
++msgctxt "#10636"
++msgid "Use HDMI AVI signalling"
++msgstr "Send 4:3 a/r signal through HDMI"
++
+ msgctxt "#637"
+ msgid "ReplayGain"
+ msgstr ""
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 24560a00ab..55d41e7595 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -87,6 +87,7 @@
+               <option label="634">4</option> <!-- ViewModeStretch16x9 -->
+               <option label="644">7</option> <!-- ViewModeStretch16x9 - nonlinear -->
+               <option label="631">1</option> <!-- ViewModeZoom -->
++              <option label="10636">10</option> <!-- ViewModeHDMIAVI -->
+             </options>
+           </constraints>
+           <control type="list" format="string" />
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
 index 8cfd83e138..8c2b32163a 100644
 --- a/xbmc/Application.cpp
@@ -42,7 +74,7 @@ index 98d6282ea7..028c31e07c 100644
    {
      pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-index e4900f4649..46f27b84fd 100644
+index e4900f4649..57b1d5b122 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 @@ -19,7 +19,9 @@
@@ -55,36 +87,47 @@ index e4900f4649..46f27b84fd 100644
  
  
  CBaseRenderer::CBaseRenderer()
-@@ -118,6 +120,29 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
+@@ -118,6 +120,26 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
  
    float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
  
 +  std::string hdmiAspect;
-+  if ((MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) &&
-+      !g_application.GetAppPlayer().IsPaused()) &&
-+      (m_videoSettings.m_ViewMode == ViewModeNormal))
-+  {
-+    CLog::Log(LOGDEBUG, "Setting aspect to 4:3");
-+    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 1);
-+  }
-+  else
-+  {
-+    CLog::Log(LOGDEBUG, "Setting aspect to 16:9");
-+    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
-+  }
-+  
 +  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/aspect", hdmiAspect);
-+  if (StringUtils::EndsWith(hdmiAspect, "0x01/0x08"))
++  if ((MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) ||
++      (g_application.GetAppPlayer().IsPaused() &&
++      StringUtils::EndsWith(hdmiAspect, "0x01/0x08"))) &&
++      CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeHDMIAVI)
 +  {
++    CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 4:3");
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 1);
 +    outputFrameRatio = ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth) /
 +        ((float) CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iHeight);
 +  }
-+  else if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
-+    outputFrameRatio *= 3.0f / 4.0f;
++  else
++  {
++    CLog::Log(LOGDEBUG, "CBaseRenderer::CalcNormalRenderRect Setting aspect to 16:9");
++    if (CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().iWidth == 720)
++      outputFrameRatio *= 3.0f / 4.0f;
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
++  }
 +
    // allow a certain error to maximize size of render area
    float fCorrection = width / height / outputFrameRatio - 1.0f;
    float fAllowed = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ERRORINASPECT) * 0.01f;
+diff --git a/xbmc/cores/VideoSettings.h b/xbmc/cores/VideoSettings.h
+index bedeb37dcd..d5e4587901 100644
+--- a/xbmc/cores/VideoSettings.h
++++ b/xbmc/cores/VideoSettings.h
+@@ -76,7 +76,8 @@ enum ViewMode
+   ViewModeCustom,
+   ViewModeStretch16x9Nonlin,
+   ViewModeZoom120Width,
+-  ViewModeZoom110Width
++  ViewModeZoom110Width,
++  ViewModeHDMIAVI
+ };
+ 
+ class CVideoSettings
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 index 1881e4078b..ba044c729f 100644
 --- a/xbmc/utils/AMLUtils.cpp
