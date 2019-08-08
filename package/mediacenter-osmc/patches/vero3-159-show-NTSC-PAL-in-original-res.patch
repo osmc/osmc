@@ -1,20 +1,21 @@
-From 39e8f2145704157aa69499d108e0a6ba197c3600 Mon Sep 17 00:00:00 2001
+From 230da284c67cecd23f53788b1bd023c1e22972db Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Wed, 31 Jul 2019 12:53:21 +0100
 Subject: [PATCH] Add aspect ratio switching by AVI infoframe With HDMI AVI
- setting in globals Add delay after pause for a/r to revert to 4:3
+ setting in globals Add delay after pause for a/r to revert to 4:3 Exclude >
+ 720 wide from signalling and add back Normal requirement
 
 ---
  .../resources/strings.po                      |  5 +++
  system/settings/settings.xml                  |  1 +
  xbmc/Application.cpp                          |  1 +
  .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  |  6 +++
- .../VideoRenderers/BaseRenderer.cpp           | 37 +++++++++++++++++++
+ .../VideoRenderers/BaseRenderer.cpp           | 40 +++++++++++++++++++
  xbmc/cores/VideoSettings.h                    |  3 +-
  xbmc/utils/AMLUtils.cpp                       |  4 ++
  xbmc/windowing/GraphicContext.cpp             |  2 +-
  xbmc/windowing/amlogic/WinSystemAmlogic.cpp   |  2 +
- 9 files changed, 59 insertions(+), 2 deletions(-)
+ 9 files changed, 62 insertions(+), 2 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
 index b92f906eb8..e8a8f0363c 100644
@@ -74,7 +75,7 @@ index 98d6282ea7..028c31e07c 100644
    {
      pVideoPicture->iDisplayWidth  = ((int)lrint(pVideoPicture->iHeight * m_aspect_ratio)) & ~3;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
-index e4900f4649..7a96eacaf4 100644
+index e4900f4649..2e730dba6b 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
 @@ -19,7 +19,9 @@
@@ -87,7 +88,7 @@ index e4900f4649..7a96eacaf4 100644
  
  
  CBaseRenderer::CBaseRenderer()
-@@ -117,6 +119,41 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
+@@ -117,6 +119,44 @@ void CBaseRenderer::CalcNormalRenderRect(float offsetX, float offsetY, float wid
    // and the output pixel ratio setting)
  
    float outputFrameRatio = inputFrameRatio / CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo().fPixelRatio;
@@ -96,9 +97,12 @@ index e4900f4649..7a96eacaf4 100644
 +
 +  std::string hdmiAspect;
 +  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/aspect", hdmiAspect);
-+  if ((MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) ||
-+      StringUtils::EndsWith(hdmiAspect, "0x01/0x08")) &&
-+      CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeHDMIAVI)
++  
++  if (((MathUtils::FloatEquals(inputFrameRatio, 4.0f / 3.0f, 0.01f) &&
++      !MathUtils::FloatEquals(inputFrameRatio, (float) m_sourceWidth / (float) m_sourceHeight, 0.01f)) ||
++      (StringUtils::EndsWith(hdmiAspect, "0x01/0x08") && countdown > 0)) &&
++      CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STRETCH43) == ViewModeHDMIAVI &&
++      m_videoSettings.m_ViewMode == ViewModeNormal)
 +  {
 +    if (g_application.GetAppPlayer().IsPaused())
 +      countdown = 20;
