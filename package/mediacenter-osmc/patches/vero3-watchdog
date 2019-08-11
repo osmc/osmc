@@ -85,7 +85,8 @@ syspaths="/sys/class/video/
 /dev/amvideocap0
 /sys/module/am_vecm/parameters/range_control
 /sys/kernel/debug/aml_reg/paddr
-/sys/module/amvideo/parameters/framepacking_support"
+/sys/module/amvideo/parameters/framepacking_support
+/sys/module/amvdec_h264mvc/parameters/view_mode"
 
 for syspath in $syspaths; do
 	chgrp -R video $syspath
