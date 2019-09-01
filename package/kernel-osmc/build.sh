@@ -67,7 +67,6 @@ then
         fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
-	export KBUILD_BUILD_TIMESTAMP="osmc-ccachefix" # Fix build timestamp to optimise ccache
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
