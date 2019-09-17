@@ -1,0 +1,49 @@
+From 3fcfb144ade13f3a8bdb59839cbc2742aec83f74 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 7 Jul 2019 01:29:02 +0100
+Subject: [PATCH] Fix an issue which can cause AVR to turn back on repeatedly.
+ See https://forum.kodi.tv/showthread.php?tid=327971 for details.
+
+Thanks to ztank for suggestion
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/implementations/CECCommandHandler.cpp | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/libcec/implementations/CECCommandHandler.cpp b/src/libcec/implementations/CECCommandHandler.cpp
+index f3bbf4a..2abdfde 100644
+--- a/src/libcec/implementations/CECCommandHandler.cpp
++++ b/src/libcec/implementations/CECCommandHandler.cpp
+@@ -37,6 +37,7 @@
+ #include "devices/CECBusDevice.h"
+ #include "devices/CECAudioSystem.h"
+ #include "devices/CECPlaybackDevice.h"
++#include "devices/CECTV.h"
+ #include "CECClient.h"
+ #include "CECProcessor.h"
+ #include "LibCEC.h"
+@@ -548,9 +549,17 @@ int CCECCommandHandler::HandleRequestActiveSource(const cec_command &command)
+     LIB_CEC->AddLog(CEC_LOG_DEBUG, ">> %i requests active source", (uint8_t) command.initiator);
+     m_processor->GetDevice(command.initiator)->SetPowerStatus(CEC_POWER_STATUS_ON);
+ 
+-    std::vector<CCECBusDevice *> devices;
+-    for (size_t iDevicePtr = 0; iDevicePtr < GetMyDevices(devices); iDevicePtr++)
+-      devices[iDevicePtr]->TransmitActiveSource(true);
++    // Do not transmit active source if TV is off, to prevent AVR from turning back on
++    // after TV is powered off
++    cec_power_status tv_state = m_processor->GetTV()->GetCurrentPowerStatus();
++    LIB_CEC->AddLog(CEC_LOG_DEBUG, "Got TV power status: %i", (uint8_t) tv_state);
++
++    if (tv_state == CEC_POWER_STATUS_ON)
++    {
++      std::vector<CCECBusDevice *> devices;
++      for (size_t iDevicePtr = 0; iDevicePtr < GetMyDevices(devices); iDevicePtr++)
++        devices[iDevicePtr]->TransmitActiveSource(true);
++    }
+   }
+ 
+   return COMMAND_HANDLED;
+-- 
+2.7.4
+

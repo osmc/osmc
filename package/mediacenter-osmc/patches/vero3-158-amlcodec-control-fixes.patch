@@ -1,22 +1,23 @@
-From 4661ab78a60da1c3a809d7fd8b578947b45210e6 Mon Sep 17 00:00:00 2001
-From: afl1 <afl2001@gmail.com>
-Date: Wed, 10 Apr 2019 10:22:49 +0200
-Subject: [PATCH] VideoPlayer: AMLCodec control fixies
+From c0b1d7d864780aa9daac6011a9a35ea0d2a9c54e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 5 Jul 2019 15:20:07 +0100
+Subject: [PATCH] AMLCodec control fixes from LE with negative PTS handling
 
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  | 51 ++++++++++++++-----
- .../VideoPlayer/DVDCodecs/Video/AMLCodec.h    |  1 +
- .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  |  1 +
- xbmc/cores/VideoPlayer/DVDStreamInfo.h        |  2 +
- xbmc/cores/VideoPlayer/VideoPlayer.cpp        |  6 +++
- xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp   | 10 +++-
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 51 ++++++++++++++++------
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h  |  1 +
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       |  1 +
+ xbmc/cores/VideoPlayer/DVDStreamInfo.h             |  2 +
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp             |  6 +++
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp        | 10 ++++-
  6 files changed, 56 insertions(+), 15 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 8f0918e6ac2d..447ae231c7c0 100644
+index 663e348..9bd4c6c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -249,7 +249,7 @@ static const int64_t INT64_0 = 0x8000000000000000ULL;
+@@ -247,7 +247,7 @@ static const int64_t INT64_0 = 0x8000000000000000ULL;
  #define CODEC_TAG_jpeg  (0x6765706a)
  #define CODEC_TAG_mjpa  (0x61706a6d)
  
@@ -25,7 +26,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
  
  #define P_PRE           (0x02000000)
  #define F_PRE           (0x03000000)
-@@ -671,7 +671,7 @@ int write_av_packet(am_private_t *para, am_packet_t *pkt)
+@@ -669,7 +669,7 @@ int write_av_packet(am_private_t *para, am_packet_t *pkt)
                  pkt->data += len;
                  pkt->data_size -= len;
                  usleep(RW_WAIT_TIME);
@@ -34,7 +35,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
                  return PLAYER_SUCCESS;
              }
          } else {
-@@ -1524,6 +1524,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+@@ -1522,6 +1522,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
    m_state = 0;
    m_frameSizes.clear();
    m_frameSizeSum = 0;
@@ -42,7 +43,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
  
    if (!OpenAmlVideo(hints))
    {
-@@ -1856,6 +1857,7 @@ void CAMLCodec::CloseAmlVideo()
+@@ -1854,6 +1855,7 @@ void CAMLCodec::CloseAmlVideo()
  {
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
@@ -50,9 +51,9 @@ index 8f0918e6ac2d..447ae231c7c0 100644
  }
  
  void CAMLCodec::Reset()
-@@ -1912,6 +1914,12 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
-   if (!m_opened || !pData)
-     return false;
+@@ -1914,6 +1916,12 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+ 
+   SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
  
 +  struct buf_status bs;
 +  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
@@ -63,7 +64,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
    m_frameSizes.push_back(iSize);
    m_frameSizeSum += iSize;
  
-@@ -1994,11 +2002,21 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -1996,11 +2004,21 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
      Reset();
      return false;
    }
@@ -88,7 +89,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
        m_ptsOverflow
      );
    return true;
-@@ -2006,6 +2024,7 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+@@ -2008,6 +2026,7 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
  
  std::atomic_flag CAMLCodec::m_pollSync = ATOMIC_FLAG_INIT;
  int CAMLCodec::m_pollDevice;
@@ -96,7 +97,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
  
  int CAMLCodec::PollFrame()
  {
-@@ -2014,16 +2033,16 @@ int CAMLCodec::PollFrame()
+@@ -2016,16 +2035,16 @@ int CAMLCodec::PollFrame()
      return 0;
  
    struct pollfd codec_poll_fd[1];
@@ -119,7 +120,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
  }
  
  void CAMLCodec::SetPollDevice(int dev)
-@@ -2072,7 +2091,10 @@ int CAMLCodec::DequeueBuffer()
+@@ -2074,7 +2093,10 @@ DRAIN:
      if (elapsed < std::chrono::milliseconds(waitTime))
        std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
  
@@ -131,7 +132,7 @@ index 8f0918e6ac2d..447ae231c7c0 100644
      {
        waitTime += 10;
        goto DRAIN;
-@@ -2106,11 +2128,14 @@ float CAMLCodec::GetTimeSize()
+@@ -2108,11 +2130,14 @@ float CAMLCodec::GetTimeSize()
    struct buf_status bs;
    m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
  
@@ -148,10 +149,10 @@ index 8f0918e6ac2d..447ae231c7c0 100644
    if (bs.free_len < (bs.data_len >> 1))
      return 7.0;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-index 2f67ed72a6a6..652a31a7a761 100644
+index 2f67ed7..652a31a 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -104,5 +104,6 @@ class CAMLCodec
+@@ -104,5 +104,6 @@ private:
  
    static std::atomic_flag  m_pollSync;
    static int m_pollDevice;
@@ -159,10 +160,10 @@ index 2f67ed72a6a6..652a31a7a761 100644
    CProcessInfo &m_processInfo;
  };
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index afbf11c659df..92ebc930ec3c 100644
+index 4ece9e7..b957929 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -118,6 +118,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -117,6 +117,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
    m_opened = false;
  
    m_hints = hints;
@@ -171,7 +172,7 @@ index afbf11c659df..92ebc930ec3c 100644
    CLog::Log(LOGDEBUG, "CDVDVideoCodecAmlogic::Opening: codec %d profile:%d extra_size:%d", m_hints.codec, hints.profile, hints.extrasize);
  
 diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.h b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
-index aed2b3078dc8..dca0ba4878c4 100644
+index aed2b30..dca0ba4 100644
 --- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h
 +++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
 @@ -13,6 +13,7 @@
@@ -182,7 +183,7 @@ index aed2b3078dc8..dca0ba4878c4 100644
  
  #define CODEC_FORCE_SOFTWARE 0x01
  #define CODEC_ALLOW_FALLBACK 0x02
-@@ -60,6 +61,7 @@ class CDVDStreamInfo
+@@ -60,6 +61,7 @@ public:
    int orientation; // orientation of the video in degrees counter clockwise
    int bitsperpixel;
    std::string stereo_mode; // stereoscopic 3d mode
@@ -191,10 +192,10 @@ index aed2b3078dc8..dca0ba4878c4 100644
    // AUDIO
    int channels;
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 7c3a971943c2..aa204e619a91 100644
+index c2ffbe1..e2af0be 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1752,6 +1752,12 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1749,6 +1749,12 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
@@ -208,7 +209,7 @@ index 7c3a971943c2..aa204e619a91 100644
    m_CurrentVideo.packets++;
  }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-index 2721d7ee83c1..a0a737488f46 100644
+index 6ee84c5..a78a3b4 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 @@ -23,6 +23,7 @@
@@ -229,7 +230,7 @@ index 2721d7ee83c1..a0a737488f46 100644
  
    if (m_messageQueue.IsInited())
    {
-@@ -214,7 +216,8 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+@@ -200,7 +202,8 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
    }
    if (!codec)
    {
@@ -239,7 +240,7 @@ index 2721d7ee83c1..a0a737488f46 100644
      hint.codecOptions |= CODEC_ALLOW_FALLBACK;
      codec = CDVDFactoryCodec::CreateVideoCodec(hint, m_processInfo);
      if (!codec)
-@@ -927,6 +930,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+@@ -904,6 +907,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
    }
  
    int timeToDisplay = DVD_TIME_TO_MSEC(pPicture->pts - iPlayingClock);
@@ -247,7 +248,7 @@ index 2721d7ee83c1..a0a737488f46 100644
  
    // make sure waiting time is not negative
    int maxWaitTime = std::min(std::max(timeToDisplay + 500, 50), 500);
-@@ -934,6 +938,8 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+@@ -911,6 +915,8 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
    if (m_speed > DVD_PLAYSPEED_NORMAL)
      maxWaitTime = std::max(timeToDisplay, 0);
    int buffer = m_renderManager.WaitForBuffer(m_bAbortOutput, maxWaitTime);
@@ -256,3 +257,6 @@ index 2721d7ee83c1..a0a737488f46 100644
    if (buffer < 0)
    {
      return OUTPUT_AGAIN;
+-- 
+2.7.4
+

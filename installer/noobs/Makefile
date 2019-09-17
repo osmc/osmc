@@ -7,6 +7,9 @@ rbp1:
 rbp2:
 	sudo bash build.sh rbp2
 
+rbp4:
+	sudo bash build.sh rbp4
+
 clean:
 	sudo rm -rf output > /dev/null 2>&1
 	sudo rm -f boot*.tar.xz > /dev/null 2>&1

@@ -37,7 +37,7 @@ SOURCES += main.cpp\
 macx {
 SOURCES += \
     io_osx.cpp
-QMAKE_MAC_SDK = macosx10.12
+QMAKE_MAC_SDK = macosx10.14
 }
 
 unix:!macx {

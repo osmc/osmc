@@ -10,11 +10,11 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.14.78" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp2 && VERSION="4.14.78" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp1 && VERSION="4.19.55" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp2 && VERSION="4.19.55" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="143" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="155" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -67,7 +67,6 @@ then
         fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
-	export KBUILD_BUILD_TIMESTAMP="osmc-ccachefix" # Fix build timestamp to optimise ccache
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
@@ -170,7 +169,7 @@ then
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
 	export ARCH
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
 		then
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
@@ -181,7 +180,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
 		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "vero364" ]
 		then
 		# Build RTL8192CU module
 		pushd drivers/net/wireless/rtl8192cu
@@ -192,29 +191,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
 		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
-		then
-		# Build RTL8192DU model
-		pushd drivers/net/wireless/rtl8192du
-		$BUILD
-		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
-		popd
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		strip --strip-unneeded drivers/net/wireless/rtl8192du/8192du.ko
-		cp drivers/net/wireless/rtl8192du/8192du.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
-		then
-		# Build RTL8192EU model
-		pushd drivers/net/wireless/rtl8192eu
-		$BUILD
-		if [ $? != 0 ]; then echo -e "Building kernel module failed" && exit 1; fi
-		popd
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		strip --strip-unneeded drivers/net/wireless/rtl8192eu/8192eu.ko
-		cp drivers/net/wireless/rtl8192eu/8192eu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
+		if [ "$1" == "rbp1" || "$1" == "rbp2" || "$1" == "vero2" ]
 		then
                 # Build MT7610U model
                 pushd drivers/net/wireless/mt7610u

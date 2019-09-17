@@ -38,10 +38,7 @@ namespace utils
             logStream << timestamp.toString() << " " << strLog << '\n';
             logFile.close();
         }
-        else
-        {
             qDebug() << timestamp.toString() << " " << strLog;
-        }
     }
 
     void displayError(QString title, QString message, bool isCritical)
@@ -75,7 +72,7 @@ namespace utils
     {
         utils::writeLog("Enumerating supported devices");
         QList<SupportedDevice * > devices;
-        SupportedDevice *VERO3 = new SupportedDevice("Vero 4K", "VERO3", false, false, false, false, false, false);
+        SupportedDevice *VERO3 = new SupportedDevice("Vero 4K / 4K+", "VERO3", false, false, false, false, false, false);
         SupportedDevice *VERO2 = new SupportedDevice("Vero 2", "VERO2", false, false, false, false, false, false);
         SupportedDevice *VERO = new SupportedDevice("Vero", "VERO1", true, false, false, false, true, false);
         SupportedDevice *RBP = new SupportedDevice("Raspberry Pi 1 / Zero", "RBP", true, true, true, false, true, false);

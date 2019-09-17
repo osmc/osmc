@@ -1,0 +1,39 @@
+From f2057fbcaf927dbfe5c1ccbab03a19d4799e5055 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 1 Aug 2019 01:41:39 +0100
+Subject: [PATCH] Fix audio issues: do not search backwards for keyframe as
+ this can be unreliable; do not flush buffer for resume
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index e2af0be..0002021 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1336,18 +1336,15 @@ void CVideoPlayer::Prepare()
+     double startpts = DVD_NOPTS_VALUE;
+     if (m_pDemuxer)
+     {
+-      if (m_pDemuxer->SeekTime(starttime, true, &startpts))
+-      {
+-        FlushBuffers(starttime / 1000 * AV_TIME_BASE, true, true);
++      if (m_pDemuxer->SeekTime(starttime, false, &startpts))
+         CLog::Log(LOGDEBUG, "%s - starting demuxer from: %d", __FUNCTION__, starttime);
+-      }
+       else
+         CLog::Log(LOGDEBUG, "%s - failed to start demuxing from: %d", __FUNCTION__, starttime);
+     }
+ 
+     if (m_pSubtitleDemuxer)
+     {
+-      if(m_pSubtitleDemuxer->SeekTime(starttime, true, &startpts))
++      if(m_pSubtitleDemuxer->SeekTime(starttime, false, &startpts))
+         CLog::Log(LOGDEBUG, "%s - starting subtitle demuxer from: %d", __FUNCTION__, starttime);
+       else
+         CLog::Log(LOGDEBUG, "%s - failed to start subtitle demuxing from: %d", __FUNCTION__, starttime);
+-- 
+2.7.4
+

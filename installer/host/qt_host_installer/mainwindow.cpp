@@ -183,6 +183,7 @@ void MainWindow::setVersion(bool isOnline, QUrl image)
     connect(ps, SIGNAL(preseedSelected(int)), this, SLOT(setPreseed(int)));
     connect(ps, SIGNAL(preseedSelected(int, QString)), this, SLOT(setPreseed(int,QString)));
     rotateWidget(vs, ps);
+    ps->checkPreseedSkipDevice(this->device);
 }
 
 void MainWindow::setPreseed(int installType)

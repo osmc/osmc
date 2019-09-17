@@ -21,7 +21,9 @@ kpartx
 dosfstools
 parted
 cpio
-python"
+python
+bison
+flex"
 
 if [ "$1" == "vero2" ]
 then
@@ -68,14 +70,14 @@ else
 fi
 if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=256; fi
+if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]; then size=320; fi
 date=$(date +%Y%m%d)
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
-	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 1M 256M
-	kpartx -a OSMC_TGT_${1}_${date}.img
+	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 4Mib 100%
+	kpartx -s -a OSMC_TGT_${1}_${date}.img
 	/sbin/partprobe
 	mkfs.vfat -F32 /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt

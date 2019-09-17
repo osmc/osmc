@@ -1,4 +1,4 @@
-From 3fddcb3f97e177615dae3554421649ffaf10f38f Mon Sep 17 00:00:00 2001
+From 09562014ce7040e0c5f3b6be61624a26d0dbc3ad Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 25 Jun 2016 20:45:11 +0100
 Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
@@ -10,15 +10,15 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/addons/repository.xbmc.org/addon.xml b/addons/repository.xbmc.org/addon.xml
-index c431c0f..4950d74 100644
+index d65cc29..0424c5b 100644
 --- a/addons/repository.xbmc.org/addon.xml
 +++ b/addons/repository.xbmc.org/addon.xml
 @@ -1,18 +1,18 @@
  <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
  <addon id="repository.xbmc.org"
  		name="Kodi Add-on repository"
--		version="3.1.5"
-+               version="9.9.10"
+-		version="3.1.6"
++		version="9.9.11"
  		provider-name="Team Kodi">
    <requires>
      <import addon="xbmc.addon" version="12.0.0"/>
@@ -34,7 +34,7 @@ index c431c0f..4950d74 100644
 +               <checksum verify="sha256">http://download.osmc.tv/kodi/addons/leia/addons.xml.gz?sha256</checksum>
 +               <datadir>http://download.osmc.tv/kodi/addons/leia</datadir>
 +               <artdir>http://download.osmc.tv/kodi/addons/leia</artdir>
-+	       <hashes>sha256</hashes>
++              <hashes>sha256</hashes>
  	</extension>
  	<extension point="xbmc.addon.metadata">
  		<summary lang="af_ZA">Installeer Byvoegsels vanaf Kodi.tv</summary>
