@@ -60,8 +60,18 @@ def config_to_kodi(MASTER_SETTINGS, config):
         extracted_settings_for_kodi[setting] = value
 
         # print "Setting"
-
     # print "==--==--"*20
+
+    # The gpio_pin_out has a default value of 17 when the lirc-rpi overlay is present.
+    # Some configs may not report a gpio_out_pin for this reason.
+    # We must presume if the lirc-rpi overlay is found that the gpio_pin setting
+    # in kodi should be set at 17.
+    lirc_is_present = extracted_settings_for_kodi['lirc-rpi-overlay'] != 'defunct'
+    gpio_out_pin_is_not_present = extracted_settings_for_kodi['gpio_out_pin'] == 'defunct'
+    gpio_pin_is_not_present = extracted_settings_for_kodi['gpio_pin'] == '0'
+    if lirc_is_present & gpio_out_pin_is_not_present & gpio_pin_is_not_present:
+        extracted_settings_for_kodi['gpio_pin'] = '17'
+
     return extracted_settings_for_kodi
 
 
