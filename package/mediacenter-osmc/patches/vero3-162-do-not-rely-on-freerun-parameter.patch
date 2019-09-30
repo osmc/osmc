@@ -1,0 +1,25 @@
+From e1c5d0004c01b8e4ecb83e630326e41c40644f65 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 30 Sep 2019 18:38:44 +0100
+Subject: [PATCH] Don't treat lack of freerun_mode sysfs parameter as failure
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/AMLUtils.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index ba044c7..45d2558 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -104,7 +104,6 @@ bool aml_permissions()
+     if (!SysfsUtils::HasRW("/sys/module/amlvideodri/parameters/freerun_mode"))
+     {
+       CLog::Log(LOGERROR, "AML: no rw on /sys/module/amlvideodri/parameters/freerun_mode");
+-      permissions_ok = 0;
+     }
+     if (!SysfsUtils::HasRW("/sys/class/video/freerun_mode"))
+     {
+-- 
+2.7.4
+
