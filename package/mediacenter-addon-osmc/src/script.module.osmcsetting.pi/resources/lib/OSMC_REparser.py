@@ -62,14 +62,14 @@ def config_to_kodi(MASTER_SETTINGS, config):
         # print "Setting"
     # print "==--==--"*20
 
-    # The gpio_pin_out has a default value of 17 when the lirc-rpi overlay is present.
-    # Some configs may not report a gpio_out_pin for this reason.
+    # The gpio_pin_in has a default value of 17 when the lirc-rpi overlay is present.
+    # Some configs may not report a gpio_in_pin for this reason.
     # We must presume if the lirc-rpi overlay is found that the gpio_pin setting
     # in kodi should be set at 17.
     lirc_is_present = extracted_settings_for_kodi['lirc-rpi-overlay'] != 'defunct'
-    gpio_out_pin_is_not_present = extracted_settings_for_kodi['gpio_out_pin'] == 'defunct'
+    gpio_in_pin_is_not_present = extracted_settings_for_kodi['gpio_in_pin'] == 'defunct'
     gpio_pin_is_not_present = extracted_settings_for_kodi['gpio_pin'] == '0'
-    if lirc_is_present & gpio_out_pin_is_not_present & gpio_pin_is_not_present:
+    if lirc_is_present & gpio_in_pin_is_not_present & gpio_pin_is_not_present:
         extracted_settings_for_kodi['gpio_pin'] = '17'
 
     return extracted_settings_for_kodi
@@ -1018,20 +1018,7 @@ MASTER_SETTINGS = {
         "already_set": False,
         "setting_stub": "",
     },
-    "gpio_in_pin": {
-        "default": {"function": None, "value": "defunct"},
-        "config_get_patterns": [
-            {
-                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
-                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
-            }
-        ],
-        "config_set": legacy_gpio_removal,
-        "config_validation": blank_check_validation,
-        "kodi_set": generic_passthrough_kodi_set,
-        "already_set": False,
-        "setting_stub": "",
-    },
+
     "gpio_in_pull": {
         "default": {"function": None, "value": "defunct"},
         "config_get_patterns": [
@@ -1048,7 +1035,7 @@ MASTER_SETTINGS = {
     },
     "gpio-ir-overlay": {
         # This group looks for the new gpio-ir setting and deletes it when found.
-        # The gpio_out_pin or gpio_pin settings control whether dtoverlay=gpio-ir
+        # The gpio_in_pin or gpio_pin settings control whether dtoverlay=gpio-ir
         # is added to the config.txt.
         "default": {"function": None, "value": "defunct"},
         "config_get_patterns": [
@@ -1071,6 +1058,20 @@ MASTER_SETTINGS = {
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\w*)",
             }
         ],
+        "config_set": legacy_gpio_removal,
+        "config_validation": blank_check_validation,
+        "kodi_set": generic_passthrough_kodi_set,
+        "already_set": False,
+        "setting_stub": "",
+    },
+    "gpio_in_pin": {
+        "default": {"function": None, "value": "defunct"},
+        "config_get_patterns": [
+            {
+                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
+                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
+            }
+        ],
         "config_set": legacy_gpio_removal,  # Coming from Kodi to the config.txt
         "config_validation": gpio_pin_validation,  # Coming from the config.txt to Kodi
         "kodi_set": generic_passthrough_kodi_set,  # Coming from the config.txt to Kodi
@@ -1084,9 +1085,9 @@ MASTER_SETTINGS = {
                 "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:gpio-ir:)?.*gpio_pin[-\w\d]*=",
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:gpio-ir:)?.*gpio_pin[-\w\d]*=\s*(\w*)",
             },
-            {  # Legacy pin out extraction
-                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=",
-                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\w*)",
+            {  # Legacy pin in extraction
+                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
+                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
             },
         ],
         "config_set": gpio_pin_config_set,
@@ -1149,25 +1150,11 @@ def clean_config(config, patterns):
 
 if __name__ == "__main__":
 
-    import pprint
+    import subprocess
 
-    """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-        Anything in here is only run when the script is called directly rather than imported
-
-        I use this section for testing only.
-
-       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
-
-    line = sys.argv[1]
-
-    config = [line]
-
-    ccfg = clean_config(config, patterns=[])
-
-    # for x in ccfg:
-    #     print(x)
-
-    extracted_settings = config_to_kodi(MASTER_SETTINGS, ccfg)
-
-    pprint.pprint(extracted_settings)
+    config = read_config_file('/boot/config.txt')
+    original_config = config[::]
+    extracted_settings = config_to_kodi(MASTER_SETTINGS, config)
+    new_settings = kodi_to_config(MASTER_SETTINGS, original_config, extracted_settings)
+    write_config_file('/var/tmp/config.txt', new_settings)
+    subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config.txt'])
