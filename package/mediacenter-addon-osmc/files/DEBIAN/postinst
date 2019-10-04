@@ -45,4 +45,9 @@ then
 	chown -R $OWNER /usr/share/kodi/addons/script.module.xmltodict
 	chown -R $OWNER /usr/share/kodi/addons/script.module.osmcsetting.*
 	chown -R $OWNER /usr/share/kodi/addons/service.osmc.settings
+	if is_rbp && [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.0.678"
+	then
+		/usr/bin/env python /usr/share/kodi/addons/script.module.osmcsetting.pi/resources/lib/OSMC_REparser.py
+		touch /tmp/reboot-needed
+	fi
 fi
