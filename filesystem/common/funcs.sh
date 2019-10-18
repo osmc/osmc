@@ -53,7 +53,8 @@ function create_fs_tarball()
 {
 	echo -e "Creating filesystem tarball"
 	pushd ${1}
-	tar -cf - * | xz -9 -c - > ../${2}-$(date +%Y%m%d).tar.xz 
+	tar -cf - * | xz -9 -c - > ../${2}-$(date +%Y%m%d).tar.xz
+	echo $(md5sum ../${2}-$(date +%Y%m%d).tar.xz | cut -f 1 -d ' ') filesystem.tar.xz > ../${2}-$(date +%Y%m%d).md5
 	popd
 	rm -rf ${1}
 }
