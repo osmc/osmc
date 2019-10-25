@@ -3,12 +3,13 @@ import time
 
 TEST_LOG_BOOL = True
 
+
 def test_logger(msg):
-	print 'test-' + msg
+    print("test-" + msg)
 
 
 def comprehensive_logger(logger=None, logging=True, maxlength=250, nowait=False):
-	'''
+    """
 		Decorator to log the inputs and outputs of functions, as well as the time taken
 		to run the function.
 		Requires: time, functools
@@ -16,71 +17,82 @@ def comprehensive_logger(logger=None, logging=True, maxlength=250, nowait=False)
 		logging: 	[opt] boolean, turn logging on and off, default is True
 		maxlength:	[opt] integer, sets the maximum length an argument or returned variable cant take, default 25
 		nowait:		[opt] boolean, instructs the logger not to wait for the function to finish, default is False
-	'''
+	"""
 
-	def default_logger(msg):
+    def default_logger(msg):
 
-		print msg
+        print(msg)
 
+    if logger == None:
 
-	if logger == None:
+        logger = default_logger
 
-		logger = default_logger
+    def get_args(*args, **kwargs):
 
+        all_args = []
 
-	def get_args(*args, **kwargs):
+        for i, arg in enumerate(args):
 
-		all_args = []
+            itm = "pos" + str(i) + ": " + str(arg)[:maxlength]
 
-		for i, arg in enumerate(args):
+            all_args.append(itm)
 
-			itm = 'pos' + str(i) + ": " + str(arg)[:maxlength]
+        for k, v in kwargs.items():
 
-			all_args.append(itm)
+            itm = str(k) + ": " + str(v)[:maxlength]
 
-		for k, v in kwargs.iteritems():
+            all_args.append(itm)
 
-			itm = str(k) + ": " + str(v)[:maxlength]
+        return all_args
 
-			all_args.append(itm)
+    def decorater(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
 
-		return all_args
+            if logging and logger != None:
 
+                logger(
+                    func.__module__
+                    + "."
+                    + func.__name__
+                    + " received: "
+                    + ", ".join(get_args(*args, **kwargs))
+                )
 
-	def decorater(func):
+            if nowait:
 
-		@wraps(func)
-		def wrapper(*args, **kwargs):
+                func(*args, **kwargs)
 
-			if logging and logger != None:
-			
-				logger(func.__module__ + '.' + func.__name__ + " received: " + ", ".join(get_args(*args, **kwargs)))
+                logger(func.__module__ + "." + func.__name__ + " -nowait")
 
-			if nowait:
-				
-				func(*args, **kwargs)
+                return
 
-				logger(func.__module__ + '.' + func.__name__ + " -nowait")
+            else:
 
-				return
+                start = time.time()
 
-			else:
-	
-				start 	= time.time()
-				
-				result 	= func(*args, **kwargs)
+                result = func(*args, **kwargs)
 
-				end 	= time.time()
+                end = time.time()
 
-				if logging and logger != None:
-				
-					logger(func.__module__ + '.' + func.__name__ + " [" + str(end-start) + "] " + ' returns: ' + str(result)[:maxlength])
+                if logging and logger != None:
 
-				return result
+                    logger(
+                        func.__module__
+                        + "."
+                        + func.__name__
+                        + " ["
+                        + str(end - start)
+                        + "] "
+                        + " returns: "
+                        + str(result)[:maxlength]
+                    )
 
-		return wrapper
+                return result
 
-	return decorater
+        return wrapper
+
+    return decorater
 
 
 clog = comprehensive_logger
@@ -89,12 +101,16 @@ clog = comprehensive_logger
 @clog(logging=TEST_LOG_BOOL)
 def arg_tester(a, b, cdef):
 
-	print 'a: ' + str(a)
-	
-	print 'b: ' + str(b)
-	
-	print 'cdef: ' + str(cdef)
+    print("a: " + str(a))
+
+    print("b: " + str(b))
+
+    print("cdef: " + str(cdef))
 
 
 if __name__ == "__main__":
-	arg_tester('han', ['chewie', 'luke'], cdef='123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890')
+    arg_tester(
+        "han",
+        ["chewie", "luke"],
+        cdef="123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+    )

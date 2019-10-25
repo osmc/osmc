@@ -1,16 +1,16 @@
 import dbus
-import bluezutils
-      
-BLUEZ_OBJECT_PATH = 'org.bluez'
-BLUEZ_ADAPTER = 'org.bluez.Adapter1'
-BLUEZ_DEVICE = 'org.bluez.Device1'
+from . import bluezutils
+
+BLUEZ_OBJECT_PATH = "org.bluez"
+BLUEZ_ADAPTER = "org.bluez.Adapter1"
+BLUEZ_DEVICE = "org.bluez.Device1"
 
 bus = dbus.SystemBus()
 
 
 def get_adapter_property(key, adapteraddress=None):
     adapter = get_adapter_interface(adapteraddress)
-    value =  adapter.Get(BLUEZ_ADAPTER, key)
+    value = adapter.Get(BLUEZ_ADAPTER, key)
     if isinstance(value, dbus.Boolean):
         return bool(value)
     return value
@@ -23,7 +23,10 @@ def set_adapter_property(key, value, adapteraddress=None):
 
 def get_adapter_interface(adapteraddress=None):
     adapter_path = bluezutils.find_adapter(adapteraddress).object_path
-    return dbus.Interface(bus.get_object(BLUEZ_OBJECT_PATH, adapter_path), "org.freedesktop.DBus.Properties")
+    return dbus.Interface(
+        bus.get_object(BLUEZ_OBJECT_PATH, adapter_path),
+        "org.freedesktop.DBus.Properties",
+    )
 
 
 def get_adapter(adapteraddress=None):
@@ -47,7 +50,9 @@ def remove_device(deviceaddress, adapteraddress=None):
 
 
 def get_manager():
-    return dbus.Interface(bus.get_object(BLUEZ_OBJECT_PATH, "/"),"org.freedesktop.DBus.ObjectManager")
+    return dbus.Interface(
+        bus.get_object(BLUEZ_OBJECT_PATH, "/"), "org.freedesktop.DBus.ObjectManager"
+    )
 
 
 def get_managed_objects():
@@ -66,12 +71,14 @@ def connect_device(deviceaddress):
 def disconnect_device(deviceaddress):
     device = bluezutils.find_device(deviceaddress)
     device.Disconnect()
-    
+
 
 def get_device_interface(deviceaddress):
     device = get_device(deviceaddress)
     path = device.object_path
-    return dbus.Interface(bus.get_object("org.bluez", path), "org.freedesktop.DBus.Properties")
+    return dbus.Interface(
+        bus.get_object("org.bluez", path), "org.freedesktop.DBus.Properties"
+    )
 
 
 def get_device_property(deviceaddress, key):
@@ -85,4 +92,3 @@ def get_device_property(deviceaddress, key):
 def set_device_property(deviceaddress, key, value):
     device = get_device_interface(deviceaddress)
     device.Set(BLUEZ_DEVICE, key, value)
-

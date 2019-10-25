@@ -1,4 +1,4 @@
-'''
+"""
 
 	The settings for OSMC are handled by the OSMC Settings Addon (OSA).
 
@@ -88,7 +88,7 @@
 	settings window closes by editing the open_settings_window. The method apply_settings will still be called by OSA, so 
 	keep that in mind.
 
-'''
+"""
 
 
 # XBMC Modules
@@ -100,10 +100,14 @@ import os
 import threading
 
 addonid = "script.module.osmcsetting.apfstore"
-__addon__  = xbmcaddon.Addon(addonid)
+__addon__ = xbmcaddon.Addon(addonid)
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
+sys.path.append(
+    xbmc.translatePath(
+        os.path.join(xbmcaddon.Addon(addonid).getAddonInfo("path"), "resources", "lib")
+    )
+)
 
 # OSMC SETTING Modules
 from CompLogger import comprehensive_logger as clog
@@ -112,108 +116,103 @@ from apf_store import APF_STORE
 
 def log(message):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
-		
-	xbmc.log('OSMC APFStore ' + str(message), level=xbmc.LOGDEBUG)
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
+
+    xbmc.log("OSMC APFStore " + str(message), level=xbmc.LOGDEBUG)
+
 
 class OSMCSettingClass(threading.Thread):
 
-	''' 
+    """ 
 		A OSMCSettingClass is way to substantiate the settings of an OSMC settings module, and make them available to the 
 		OSMC Settings Addon (OSA).
 
-	'''
+	"""
 
-	def __init__(self):
+    def __init__(self):
 
-		''' 
+        """ 
 			The logger simply runs specific logs. All this module does is open the Settings window.
-		'''
+		"""
 
-		super(OSMCSettingClass, self).__init__()
+        super(OSMCSettingClass, self).__init__()
 
-		self.addonid = addonid
-		self.me = xbmcaddon.Addon(self.addonid)
+        self.addonid = addonid
+        self.me = xbmcaddon.Addon(self.addonid)
 
-		# this is what is displayed in the main settings gui
-		self.shortname = 'App Store'
+        # this is what is displayed in the main settings gui
+        self.shortname = "App Store"
 
+        self.description = (
+            """This module is where you can grab awesome APFs like ... """
+        )
 
-		self.description = 	"""This module is where you can grab awesome APFs like ... """
+    @clog(log, nowait=True)
+    def run(self):
 
-
-
-	@clog(log, nowait=True)
-	def run(self):
-
-		'''
+        """
 			The method determines what happens when the item is clicked in the settings GUI.
 			Usually this would be __addon__.OpenSettings(), but it could be any other script.
 			This allows the creation of action buttons in the GUI, as well as allowing developers to script and skin their 
 			own user interfaces.
-		'''
+		"""
 
-		me = APF_STORE()
+        me = APF_STORE()
 
+    @clog(log)
+    def apply_settings(self):
 
-	@clog(log)
-	def apply_settings(self):
-
-		'''
+        """
 			This method will apply all of the settings. It calls the first_method, if it exists. 
 			Then it calls the method listed in pi_settings_dict for each setting. Then it calls the
 			final_method, again, if it exists.
-		'''
+		"""
 
-		pass
+        pass
 
+    ##############################################################################################################################
+    # 																															 #
+    def first_method(self):
 
-
-	##############################################################################################################################
-	#																															 #
-	def first_method(self):
-
-		''' 
+        """ 
 			The method to call before all the other setting methods are called.
 
 			For example, this could be a call to stop a service. The final method could then restart the service again. 
 			This can be used to apply the setting changes.
 
-		'''	
+		"""
 
-	@clog(log)
-	def final_method(self):
+    @clog(log)
+    def final_method(self):
 
-		''' 
+        """ 
 			The method to call after all the other setting methods have been called.
 
 			For example, in the case of the Raspberry Pi's settings module, the final writing to the config.txt can be delayed
 			until all the settings have been updated in the pi_settings_dict. 
 
-		'''
+		"""
 
-		''' This method will write the changed settings to the config.txt file. '''
+        """ This method will write the changed settings to the config.txt file. """
 
-		pass
+        pass
 
-	#																															 #
-	##############################################################################################################################
+    # 																															 #
+    ##############################################################################################################################
 
+    ##############################################################################################################################
+    # 																															 #
 
-	##############################################################################################################################
-	#																															 #
-
-	''' 
+    """ 
 		Methods beyond this point are for specific settings. 
-	'''
+	"""
 
+    # 																															 #
+    ##############################################################################################################################
 
-	#																															 #
-	##############################################################################################################################
 
 if __name__ == "__main__":
-	pass
-
+    pass

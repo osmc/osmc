@@ -1,41 +1,46 @@
-
 def get_timezones():
 
-	''' Returns a dictionary or regions, which hold lists of countries within those regions. '''
+    """ Returns a dictionary or regions, which hold lists of countries within those regions. """
 
-	with open('/usr/share/zoneinfo/zone.tab', 'r') as f:
+    with open("/usr/share/zoneinfo/zone.tab", "r") as f:
 
-		lines = f.readlines()
+        lines = f.readlines()
 
-		lines = [line for line in lines if line and not line.startswith('#') and '/' in line]
+        lines = [
+            line for line in lines if line and not line.startswith("#") and "/" in line
+        ]
 
-	tmp = []
-	timezones = {'UTC': ['UTC']}
+    tmp = []
+    timezones = {"UTC": ["UTC"]}
 
-	for line in lines:
+    for line in lines:
 
-		columns = line.split('\t')
+        columns = line.split("\t")
 
-		try:
-			tz_raw = columns[2].replace('\n','')
-		except:
-			continue
+        try:
+            tz_raw = columns[2].replace("\n", "")
+        except:
+            continue
 
-		tmp.append(tz_raw)
+        tmp.append(tz_raw)
 
-	tmp.sort()
+    tmp.sort()
 
-	for tz_raw in tmp:
+    for tz_raw in tmp:
 
-		tz_region, tz_country = tz_raw[:tz_raw.index('/')], tz_raw[tz_raw.index('/')+1:]
+        tz_region, tz_country = (
+            tz_raw[: tz_raw.index("/")],
+            tz_raw[tz_raw.index("/") + 1 :],
+        )
 
-		t = timezones.get(tz_region, [])
+        t = timezones.get(tz_region, [])
 
-		t.append(tz_country)
+        t.append(tz_country)
 
-		timezones[tz_region] = t
+        timezones[tz_region] = t
 
-	return timezones
+    return timezones
+
 
 # tz = get_timezones()
 

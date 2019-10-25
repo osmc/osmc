@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
  Copyright (C) 2014 KodeKarnage
 
  This Program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  along with XBMC; see the file COPYING.  If not, write to
  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  http://www.gnu.org/copyleft/gpl.html
-'''
+"""
 
 # KODI modules
 import xbmc
@@ -28,21 +28,18 @@ import resources.lib.osmc_main as m
 
 def log(message):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
 
-	xbmc.log('OSMC ADDON MAIN ' + str(message), level=xbmc.LOGDEBUG)
+    xbmc.log("OSMC ADDON MAIN " + str(message), level=xbmc.LOGDEBUG)
 
 
 if __name__ == "__main__":
 
-	m.set_version()
+    m.set_version()
 
-	Main_Service = m.Main()
+    Main_Service = m.Main()
 
-	log('Exiting OSMC Settings')
-
-
-
+    log("Exiting OSMC Settings")

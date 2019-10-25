@@ -1,5 +1,3 @@
-
-
 # XBMC modules
 import xbmc
 import xbmcaddon
@@ -15,967 +13,1069 @@ import threading
 import traceback
 import xml.etree.ElementTree as ET
 
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources','lib')))
+sys.path.append(
+    xbmc.translatePath(
+        os.path.join(xbmcaddon.Addon().getAddonInfo("path"), "resources", "lib")
+    )
+)
 
 # Custom Modules
-import osmc_timezones
-import LICENSE
-import WARRANTY
+from . import osmc_timezones
+from . import LICENSE
+from . import WARRANTY
 
-EULA       = LICENSE.license
-WARR       = WARRANTY.warranty
-DIALOG     = xbmcgui.Dialog()
+EULA = LICENSE.license
+WARR = WARRANTY.warranty
+DIALOG = xbmcgui.Dialog()
 
-__addon__  = xbmcaddon.Addon()
-scriptPath = __addon__.getAddonInfo('path')
+__addon__ = xbmcaddon.Addon()
+scriptPath = __addon__.getAddonInfo("path")
 
 
 PANEL_MAP = {
-	'language': {
-				'order'					:			1,
-				'panel_menu_item_id'	:			1002,
-				'visibility_controller' :			92000,
-				'default_control'		:			20010,
-				},
-	'timezone': {
-				'order'					:			2,
-				'panel_menu_item_id'	:			1003,
-				'visibility_controller' :			93000,
-				'default_control'		:			3001,
-				},	
-	'hostname': {
-				'order'					:			3,
-				'panel_menu_item_id'	:			10035,
-				'visibility_controller' :			125000,
-				'default_control'		:			350010,
-				},
-	'SSH': 		{
-				'order'					:			4,
-				'panel_menu_item_id'	:			10037,
-				'visibility_controller' :			127000,
-				'default_control'		:			370010,
-				},		
-	'TandC': 	{
-				'order'					:			5,
-				'panel_menu_item_id'	:			1004,
-				'visibility_controller' :			94000,
-				'default_control'		:			40010,
-				},
-	'warranty': {
-				'order'					:			6,
-				'panel_menu_item_id'	:			1007,
-				'visibility_controller' :			97000,
-				'default_control'		:			70010,
-				},	
-	'networking':{
-				'order'					:			7,
-				'panel_menu_item_id'	:			1006,
-				'visibility_controller' :			96000,
-				'default_control'		:			60010,
-				},
-	'skin': 	{
-				'order'					:			8,
-				'panel_menu_item_id'	:			1008,
-				'visibility_controller' :			98000,
-				'default_control'		:			80010,
-				},		
-	'newsletter':{				
-				'order'					:			9,
-				'panel_menu_item_id'	:			1009,
-				'visibility_controller' :			99000,
-				'default_control'		:			90010,
-				},	
-	'exit': 	{
-				'order'					:			10,
-				'panel_menu_item_id'	:			1005,
-				'visibility_controller' :			95000,
-				'default_control'		:			1005,
-				},	
+    "language": {
+        "order": 1,
+        "panel_menu_item_id": 1002,
+        "visibility_controller": 92000,
+        "default_control": 20010,
+    },
+    "timezone": {
+        "order": 2,
+        "panel_menu_item_id": 1003,
+        "visibility_controller": 93000,
+        "default_control": 3001,
+    },
+    "hostname": {
+        "order": 3,
+        "panel_menu_item_id": 10035,
+        "visibility_controller": 125000,
+        "default_control": 350010,
+    },
+    "SSH": {
+        "order": 4,
+        "panel_menu_item_id": 10037,
+        "visibility_controller": 127000,
+        "default_control": 370010,
+    },
+    "TandC": {
+        "order": 5,
+        "panel_menu_item_id": 1004,
+        "visibility_controller": 94000,
+        "default_control": 40010,
+    },
+    "warranty": {
+        "order": 6,
+        "panel_menu_item_id": 1007,
+        "visibility_controller": 97000,
+        "default_control": 70010,
+    },
+    "networking": {
+        "order": 7,
+        "panel_menu_item_id": 1006,
+        "visibility_controller": 96000,
+        "default_control": 60010,
+    },
+    "skin": {
+        "order": 8,
+        "panel_menu_item_id": 1008,
+        "visibility_controller": 98000,
+        "default_control": 80010,
+    },
+    "newsletter": {
+        "order": 9,
+        "panel_menu_item_id": 1009,
+        "visibility_controller": 99000,
+        "default_control": 90010,
+    },
+    "exit": {
+        "order": 10,
+        "panel_menu_item_id": 1005,
+        "visibility_controller": 95000,
+        "default_control": 1005,
+    },
 }
 
 
 def log(message, level=xbmc.LOGDEBUG):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
 
-	xbmc.log(str(message), level=level)
+    xbmc.log(str(message), level=level)
 
 
 def lang(id):
-	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-	return san 
+    san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
+    return san
 
 
 class mock_Networking_caller(object):
+    def __init__(self, parent, net_call):
 
-	def __init__(self, parent, net_call):
+        self.ftr_running = False
+        self.timeout = 0
+        self.parent = parent
+        self.parent.internet_connected = True
 
-		self.ftr_running = False
-		self.timeout     = 0
-		self.parent = parent
-		self.parent.internet_connected = True
+    def start(self):
 
-	def start(self):
+        pass
 
-		pass
+    def setDaemon(self, bool):
 
-	def setDaemon(self, bool):
-
-		pass
+        pass
 
 
 class Networking_caller(threading.Thread):
+    def __init__(self, parent, net_call):
 
-	def __init__(self, parent, net_call):
+        super(Networking_caller, self).__init__()
 
-		super(Networking_caller, self).__init__()
+        self.daemon = True
+        self.cancelled = False
+        self.parent = parent
+        self.net_call = net_call
+        self.ftr_running = True
+        self.timeout = 0
 
-		self.daemon      = True
-		self.cancelled   = False
-		self.parent      = parent
-		self.net_call    = net_call
-		self.ftr_running = True
-		self.timeout     = 0
+    def run(self):
+        """Calls Barkers method to check for network connection"""
 
+        log("checking internet connection")
 
-	def run(self):
-		"""Calls Barkers method to check for network connection"""
+        while self.ftr_running and self.timeout < 12:
 
-		log('checking internet connection')
+            self.ftr_running = self.net_call.is_ftr_running()
 
-		while self.ftr_running and self.timeout < 12:
+            # break early if ftr is not running
+            if not self.ftr_running:
+                break
 
-			self.ftr_running = self.net_call.is_ftr_running()
+            self.timeout += 1
 
-			# break early if ftr is not running
-			if not self.ftr_running: break
+            xbmc.sleep(10000)
 
-			self.timeout += 1
+        if not self.ftr_running:
 
-			xbmc.sleep(10000)
+            self.parent.internet_connected = self.net_call.check_network(False)
 
-		if not self.ftr_running:
+        else:
+            # ftr_running has timed out, consider it ended and leave internet_connected as False
+            self.ftr_running = False
 
-			self.parent.internet_connected = self.net_call.check_network(False)
-
-		else:
-			# ftr_running has timed out, consider it ended and leave internet_connected as False
-			self.ftr_running = False
-
-		log('network connection is %s' % self.parent.internet_connected)
-		log('internet connection is %s' % self.net_call.check_network(True))
+        log("network connection is %s" % self.parent.internet_connected)
+        log("internet connection is %s" % self.net_call.check_network(True))
 
 
 def close_walkthru_on_error(func):
-
     def wrapper(parent, *args, **kwargs):
 
         try:
             return func(parent, *args, **kwargs)
-        except Exception, e:
+        except Exception as e:
 
-            log('============= Walkthru Error ====================', xbmc.LOGERROR)
+            log("============= Walkthru Error ====================", xbmc.LOGERROR)
             log(traceback.format_exc(), xbmc.LOGERROR)
-            log('=================================', xbmc.LOGERROR)
+            log("=================================", xbmc.LOGERROR)
 
             parent.close()
 
     return wrapper
 
 
-
-
 class walkthru_gui(xbmcgui.WindowXMLDialog):
+    def __init__(
+        self,
+        strXMLname,
+        strFallbackPath,
+        strDefaultName,
+        networking_instance,
+        lang_rerun,
+        selected_language,
+        testing=False,
+    ):
 
-	def __init__(	self, 
-					strXMLname, 
-					strFallbackPath, 
-					strDefaultName, 
-					networking_instance, 
-					lang_rerun, 
-					selected_language,
-					testing=False):
+        self.testing = testing
 
-		self.testing = testing
+        # the order of the panels, this list can be changed depending on the specific need
+        self.panel_order = sorted(
+            list(PANEL_MAP.keys()), key=lambda x: PANEL_MAP[x]["order"]
+        )
 
-		# the order of the panels, this list can be changed depending on the specific need
-		self.panel_order 	= sorted(PANEL_MAP.keys(), key=lambda x: PANEL_MAP[x]['order'])
+        # the specific controlIDs for the main menu items and others, this is used by onFocus and saves recreating the list every time
+        self.menu_controls = [v["panel_menu_item_id"] for v in list(PANEL_MAP.values())]
+        self.tz_controls = [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
+        self.skin_controls = [80010, 80020]
 
-		# the specific controlIDs for the main menu items and others, this is used by onFocus and saves recreating the list every time
-		self.menu_controls 	= [v['panel_menu_item_id'] for v in PANEL_MAP.values()]
-		self.tz_controls 	= [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]
-		self.skin_controls 	= [80010, 80020]
+        # switch that identifies whether the internet is connected, there is also a flag to determine if the
+        # networking panel has already been revealed.
+        self.internet_connected = False
+        self.networking_panel_revealed = False
 
-		# switch that identifies whether the internet is connected, there is also a flag to determine if the
-		# networking panel has already been revealed.
-		self.internet_connected = False
-		self.networking_panel_revealed = False
+        # start a new thread that begins checking for an internet connection
+        self.start_checking_for_internet(networking_instance)
 
-		#start a new thread that begins checking for an internet connection
-		self.start_checking_for_internet(networking_instance)
+        # this flag tells us whether the GUI has been reloaded due to language selection
+        self.lang_rerun = lang_rerun
 
-		# this flag tells us whether the GUI has been reloaded due to language selection
-		self.lang_rerun = lang_rerun
+        # get the list of timezones in /etc/timezone
+        self.timezones = osmc_timezones.get_timezones()
 
-		# get the list of timezones in /etc/timezone
-		self.timezones = osmc_timezones.get_timezones()
+        # this attribute denotes the skin the user wants to have applied when the walkthru closes
+        self.selected_skin = "OSMC"
 
-		# this attribute denotes the skin the user wants to have applied when the walkthru closes
-		self.selected_skin = 'OSMC'
+        # this is the default hostname for the device
+        self.device_name = "current name: osmc"
 
-		# this is the default hostname for the device
-		self.device_name = 'current name: osmc'
+        # this holds the users desired SSH state (True for enabled)
+        self.ssh_state = True
 
-		# this holds the users desired SSH state (True for enabled)
-		self.ssh_state = True
+        # this holds the users ssh password
+        self.ssh_pass = "osmc"
 
-		# this holds the users ssh password
-		self.ssh_pass = 'osmc'
+        # newsletter email address
+        self.email = ""
 
-		# newsletter email address
-		self.email = ''
+        # get the languages
+        self.languages = self.get_languages()
+        self.languages = list(set(self.languages))
+        self.languages.sort()
 
-		# get the languages
-		self.languages = self.get_languages()
-		self.languages = list(set(self.languages))
-		self.languages.sort()
+        self.tz_control_map = {
+            "Africa": 30010,
+            "America": 30020,
+            "Asia": 30030,
+            "Atlantic": 30040,
+            "Australia": 30050,
+            "Europe": 30060,
+            "Indian": 30070,
+            "Pacific": 30080,
+            "UTC": 30090,
+        }
 
-		self.tz_control_map = {
-						'Africa'	: 30010,
-						'America'	: 30020,
-						'Asia'		: 30030,		
-						'Atlantic'	: 30040,
-						'Australia'	: 30050,
-						'Europe'	: 30060,
-						'Indian'	: 30070,
-						'Pacific'	: 30080,
-						'UTC'		: 30090,
-						}
+        self.selected_language = selected_language
+        self.selected_region = None
+        self.selected_country = None
 
-		self.selected_language = selected_language
-		self.selected_region   = None
-		self.selected_country  = None
+        # textures for the skin image
+        media_path = xbmc.translatePath(
+            os.path.join(
+                xbmcaddon.Addon().getAddonInfo("path"),
+                "resources",
+                "skins",
+                "Default",
+                "media",
+            )
+        )
+        self.osmc_skin_image = os.path.join(media_path, "osmc_preview.jpg")
+        self.conf_skin_image = os.path.join(media_path, "conf_preview.jpg")
 
-		# textures for the skin image
-		media_path = xbmc.translatePath(os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
-		self.osmc_skin_image = os.path.join(media_path, 'osmc_preview.jpg')
-		self.conf_skin_image = os.path.join(media_path, 'conf_preview.jpg')
+        # if the device is not recognised as a vero, then remove the warranty panel from the walkthrough
+        if not self.is_Vero():
+            self.panel_order.remove("warranty")
 
-		# if the device is not recognised as a vero, then remove the warranty panel from the walkthrough
-		if not self.is_Vero():
-			self.panel_order.remove('warranty')
+        # this attribute is used to determine when the user is allowed to exit the walkthru using the Esc or Back buttons
+        self.prevent_escape = True
 
-		# this attribute is used to determine when the user is allowed to exit the walkthru using the Esc or Back buttons
-		self.prevent_escape = True
+    def onInit(self):
 
+        global EULA
+        global WARR
 
-	def onInit(self):
+        self.hide_controls_on_init()
 
-		global EULA
-		global WARR
+        self.populate_language_controls()
+        self.populate_timezone_controls()
 
-		self.hide_controls_on_init()
+        # populate the terms and conditions and the warranty
+        self.getControl(555).setText(EULA)
+        self.getControl(777).setText(WARR)
 
-		self.populate_language_controls()
-		self.populate_timezone_controls()
+        # set the image for the skin preview control
+        self.set_skin_image("OSMC")
 
-		# populate the terms and conditions and the warranty
-		self.getControl(555).setText(EULA)
-		self.getControl(777).setText(WARR)		
+        # set the SSH toggle to ON
+        self.getControl(370010).setSelected(True)
 
-		# set the image for the skin preview control
-		self.set_skin_image('OSMC')
+        self.remove_coversheet()
 
-		# set the SSH toggle to ON
-		self.getControl(370010).setSelected(True)
+        # this will only be True, if the language has been selected and the GUI has reloaded
+        if self.lang_rerun:
+            # set the flag to False so the GUI doesnt reload on exit
+            self.lang_rerun = False
+            self.reveal_next_panel("language")
 
-		self.remove_coversheet()
+    def start_checking_for_internet(self, networking_instance):
+        self.net_call = networking_instance
 
-		# this will only be True, if the language has been selected and the GUI has reloaded
-		if self.lang_rerun:
-			# set the flag to False so the GUI doesnt reload on exit
-			self.lang_rerun = False
-			self.reveal_next_panel('language')
+        self.internet_check = False
+        if not self.testing:
+            self.internet_checker = Networking_caller(self, self.net_call)
+        else:
+            self.internet_checker = mock_Networking_caller(self, self.net_call)
+        self.internet_checker.setDaemon(True)
+        self.internet_checker.start()
 
-
-	def start_checking_for_internet(self, networking_instance):
-		self.net_call = networking_instance
-
-		self.internet_check = False
-		if not self.testing:
-			self.internet_checker = Networking_caller(self, self.net_call)
-		else:
-			self.internet_checker = mock_Networking_caller(self, self.net_call)
-		self.internet_checker.setDaemon(True)
-		self.internet_checker.start()
-
-
-	def remove_coversheet(self):
-		''' When the window is first loaded, this coversheet (repeated of the background) covers everything.
+    def remove_coversheet(self):
+        """ When the window is first loaded, this coversheet (repeated of the background) covers everything.
 			This allows the controls in the background to be hidden discretely. This method simply removes the cover
-			sheet as the final step of the Init. '''
+			sheet as the final step of the Init. """
 
-		self.getControl(123456789).setVisible(False)
+        self.getControl(123456789).setVisible(False)
 
+    def hide_controls_on_init(self):
 
-	def hide_controls_on_init(self):
+        # hide all timezone, TandC and Apply buttons
+        for hide_this in [1003, 10035, 10037, 1004, 1005, 1006, 1007, 1008, 1009]:
 
-		#hide all timezone, TandC and Apply buttons
-		for hide_this in [1003, 10035, 10037, 1004, 1005, 1006, 1007, 1008, 1009]:
+            self.getControl(hide_this).setVisible(False)
 
-			self.getControl(hide_this).setVisible(False)
+        # hide the controls that determine panel visibility
+        for visibility_control in [
+            93000,
+            125000,
+            127000,
+            94000,
+            95000,
+            96000,
+            97000,
+            98000,
+            99000,
+        ]:
 
-		# hide the controls that determine panel visibility
-		for visibility_control in [93000,125000,127000,94000,95000, 96000, 97000, 98000, 99000]:
+            self.getControl(visibility_control).setVisible(False)
 
-			self.getControl(visibility_control).setVisible(False)
+        # hide the language sub menus
+        for tz in [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]:
 
-		# hide the language sub menus
-		for tz in [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009]:
+            self.getControl(tz * 10).setVisible(False)
 
-			self.getControl(tz*10).setVisible(False)
+    def populate_language_controls(self):
 
+        # populate the language control
+        for language in self.languages:
 
-	def populate_language_controls(self):
+            self.tmp = xbmcgui.ListItem(label=language, label2="", thumbnailImage="")
 
-		# populate the language control
-		for language in self.languages:
+            self.getControl(20010).addItem(self.tmp)
 
-			self.tmp = xbmcgui.ListItem(label=language, label2='', thumbnailImage='')
+    def populate_timezone_controls(self):
 
-			self.getControl(20010).addItem(self.tmp)
+        # populate the timezone controls
+        for region, countries in self.timezones.items():
 
+            for country in countries:
 
-	def populate_timezone_controls(self):
+                ctl_id = self.tz_control_map.get(region, False)
 
-		# populate the timezone controls
-		for region, countries in self.timezones.iteritems():
+                if not ctl_id:
+                    continue
 
-			for country in countries:
+                self.tmp = xbmcgui.ListItem(label=country, label2="", thumbnailImage="")
 
-				ctl_id = self.tz_control_map.get(region, False)
+                self.getControl(ctl_id).addItem(self.tmp)
 
-				if not ctl_id: continue
+    def get_languages(self):
+        # try and find language files (Kodi 14.x)
+        try:
+            return [folder for folder in os.listdir("/usr/share/kodi/language/")]
+        except:
+            pass
+        # if we have not found yet try looking for laonguage addons (Kodi 15.x)
+        languages = ["English"]
+        languagedirs = ["/home/osmc/.kodi/addons", "/usr/share/kodi/addons"]
+        language_folder_contents = []
 
-				self.tmp = xbmcgui.ListItem(label=country, label2='', thumbnailImage='')
+        try:
+            log("Contents of %s: %s" % (languagedirs[0], os.listdir(languagedirs[0])))
+            language_folder_contents = os.listdir(languagedirs[0])
+        except:
+            log("%s not found" % languagedirs[0])
 
-				self.getControl(ctl_id).addItem(self.tmp)		
+        try:
+            log("Contents of %s: %s" % (languagedirs[1], os.listdir(languagedirs[1])))
+            language_folder_contents = os.listdir(languagedirs[1])
+        except:
+            log("%s not found" % languagedirs[1])
 
+        for folder in language_folder_contents:
+            if folder.startswith("resource.language."):
+                try:
+                    tree = ET.parse(
+                        "/home/osmc/.kodi/addons/" + folder + os.sep + "addon.xml"
+                    )
+                except:
+                    tree = ET.parse(
+                        "/usr/share/kodi/addons/" + folder + os.sep + "addon.xml"
+                    )
+                root = tree.getroot()
+                log("Name from %s: %s" % (folder, root.attrib["name"]))
+                languages.append(root.attrib["name"])
+        return languages
 
-	def get_languages(self):
-		# try and find language files (Kodi 14.x)
-		try:
-			return [folder for folder in os.listdir('/usr/share/kodi/language/')]
-		except:
-			pass
-		# if we have not found yet try looking for laonguage addons (Kodi 15.x)
-		languages = ['English']
-		languagedirs = ["/home/osmc/.kodi/addons", "/usr/share/kodi/addons" ]
-		language_folder_contents = []
+    def set_skin_image(self, skin):
 
-		try:
-			log("Contents of %s: %s" % (languagedirs[0], os.listdir(languagedirs[0])))
-			language_folder_contents = os.listdir(languagedirs[0])
-		except:
-			log('%s not found' % languagedirs[0])
-		
-		try:
-			log("Contents of %s: %s" % (languagedirs[1], os.listdir(languagedirs[1])))
-			language_folder_contents = os.listdir(languagedirs[1])
-		except:
-			log('%s not found' % languagedirs[1])
+        """ Sets the image for the skin preview """
 
-		for folder in language_folder_contents:
-			if folder.startswith('resource.language.'):
-				try:
-					tree = ET.parse('/home/osmc/.kodi/addons/' + folder + os.sep + 'addon.xml')
-				except:
-					tree = ET.parse('/usr/share/kodi/addons/' + folder + os.sep + 'addon.xml')
-				root = tree.getroot()
-				log('Name from %s: %s' % (folder, root.attrib['name']))
-				languages.append(root.attrib['name'])
-		return languages
- 
+        if skin == "CONF":
+            self.getControl(88888).setImage(self.conf_skin_image)
+        else:
+            self.getControl(88888).setImage(self.osmc_skin_image)
 
-	def set_skin_image(self, skin):
-
-		''' Sets the image for the skin preview '''
-
-		if skin == 'CONF':
-			self.getControl(88888).setImage(self.conf_skin_image)
-		else:
-			self.getControl(88888).setImage(self.osmc_skin_image)
-
-
-	def is_Vero(self):
-		'''
+    def is_Vero(self):
+        """
 			Checks whether this is a Vero and whether the warranty info should be shown 
-		'''
+		"""
 
-		# generate the URL
-		with open('/proc/cmdline', 'r') as f:
+        # generate the URL
+        with open("/proc/cmdline", "r") as f:
 
-			line = f.readline()
+            line = f.readline()
 
-			settings = line.split(' ')
+            settings = line.split(" ")
 
-			for setting in settings:
+            for setting in settings:
 
-				if setting.startswith('osmcdev='):
+                if setting.startswith("osmcdev="):
 
-					if 'vero' in setting or 'vero2' in setting:
+                    if "vero" in setting or "vero2" in setting:
 
-						log('Hardware is Vero')
+                        log("Hardware is Vero")
 
-						return True
+                        return True
 
-		log('Hardware not Vero')
+        log("Hardware not Vero")
 
-		return False
+        return False
 
+    def apply_SSH_state_password(self):
 
-	def apply_SSH_state_password(self):
+        try:
 
+            if self.ssh_state != True:
 
-		try:
+                log("Disabling SSH service")
 
-			if self.ssh_state != True:
+                os.system("/usr/bin/sudo /bin/systemctl disable ssh")
+                os.system("/usr/bin/sudo /bin/systemctl stop ssh")
 
-				log('Disabling SSH service')
+            else:
 
-				os.system("/usr/bin/sudo /bin/systemctl disable ssh")
-				os.system("/usr/bin/sudo /bin/systemctl stop ssh")
+                log("Leaving SSH service enabled")
 
-			else:
+        except:
 
-				log('Leaving SSH service enabled')
+            log("ssh state change failed")
+            log(traceback.format_exc())
 
-		except:
+    def apply_hostname_change(self):
 
-			log('ssh state change failed')
-			log(traceback.format_exc())
+        # INTERFACE TO CHANGE THE HOSTNAME
+        try:
 
+            log(
+                "changing hostname to %s"
+                % self.device_name.replace("current name: ", "")
+            )
+            xbmc.sethostname(self.device_name.replace("current name: ", ""))
 
-	def apply_hostname_change(self):
+        except:
 
-		# INTERFACE TO CHANGE THE HOSTNAME
-		try:
+            log("hostname change failed")
+            log(traceback.format_exc())
 
-			log('changing hostname to %s' % self.device_name.replace('current name: ', ''))
-			xbmc.sethostname(self.device_name.replace('current name: ', '')) 
+    @close_walkthru_on_error
+    def exit_proceedure(self):
 
-		except:
+        self.apply_hostname_change()
 
-			log('hostname change failed')
-			log(traceback.format_exc())
+        self.apply_SSH_state_password()
 
+        if self.selected_country != None:
 
-	@close_walkthru_on_error
-	def exit_proceedure(self):
+            # set timezone
+            for reg, cnt in self.timezones.items():
 
-		self.apply_hostname_change()
+                if self.selected_country in cnt:
+                    self.selected_region = reg
+                    break
 
-		self.apply_SSH_state_password()
+        if self.selected_country != None and self.selected_region != None:
 
-		if self.selected_country != None:
+            users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
 
-			# set timezone
-			for reg, cnt in self.timezones.iteritems():
+            log("users timezone: %s" % users_timezone)
 
-				if self.selected_country in cnt:
-					self.selected_region = reg
-					break
+            try:
+                xbmc.settimezone(users_timezone)
+            except:
+                log("Failed to set users timezone: %s" % users_timezone)
+                log(traceback.format_exc())
 
-		if self.selected_country != None and self.selected_region != None:
+        # delete skin update block file
+        subprocess.call(["sudo", "rm", "/tmp/NO_UPDATE"])
 
-			users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
+        self.close()
 
-			log('users timezone: %s' % users_timezone)
+    def still_checking_for_network(self):
+        """ Checks to see if the internet checker has finished, and if not, shows a progress bar until complete or exit. 
+			The internet checker will toggle the internet_connected bool if a connection is made."""
 
-			try:
-				xbmc.settimezone(users_timezone)
-			except:
-				log('Failed to set users timezone: %s' % users_timezone)
-				log(traceback.format_exc())
-		
-		# delete skin update block file
-		subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
+        if self.internet_checker.ftr_running == True:
+            # only display Please Wait Progress Bar if the ftr is still running
+            self.pDialog = xbmcgui.DialogProgress()
+            self.pDialog.create(lang(32025), lang(32024))
 
-		self.close()
+        # the starting point of the progress bar is the current cycle on the ftr_running loop * 10
+        # this will allow more frequent updates to the progress bar than using the timeout value would permit
+        cnt = self.internet_checker.timeout * 10.0
 
+        while self.internet_checker.ftr_running == True:
+            # ftr is still running, tell the user to Please Wait, and try again
+            # this will time out after 2 minutes
 
-	def still_checking_for_network(self):
-		''' Checks to see if the internet checker has finished, and if not, shows a progress bar until complete or exit. 
-			The internet checker will toggle the internet_connected bool if a connection is made.'''
+            cnt += 1
 
-		if self.internet_checker.ftr_running == True:
-			# only display Please Wait Progress Bar if the ftr is still running
-			self.pDialog = xbmcgui.DialogProgress()
-			self.pDialog.create(lang(32025), lang(32024))
+            prog = int(min(max(int(cnt / 120.0 * 100), 1), 100))
 
-		# the starting point of the progress bar is the current cycle on the ftr_running loop * 10
-		# this will allow more frequent updates to the progress bar than using the timeout value would permit
-		cnt = self.internet_checker.timeout * 10.0
+            self.pDialog.update(percent=prog)
 
-		while self.internet_checker.ftr_running == True:
-			# ftr is still running, tell the user to Please Wait, and try again
-			# this will time out after 2 minutes
+            # break early if the user instructs to do so
+            if self.pDialog.iscanceled():
+                self.internet_checker.ftr_running = False
+                break
 
-			cnt += 1
-			
-			prog = int(min(max(int(cnt/120.0*100),1),100))
+            xbmc.sleep(1000)
 
-			self.pDialog.update(percent=prog)
+        try:
+            # wrapped in a Try as pDialog is not always created
+            self.pDialog.close()
+        except:
+            pass
 
-			# break early if the user instructs to do so
-			if self.pDialog.iscanceled(): 
-				self.internet_checker.ftr_running = False
-				break
+    def enter_password(self, pass_store, confirm=True, hidden=True):
 
-			xbmc.sleep(1000)
+        mypass = None
 
-		try:
-			# wrapped in a Try as pDialog is not always created
-			self.pDialog.close()
-		except:
-			pass
+        # show keyboard for the first password
+        kb = xbmc.Keyboard(pass_store, "Please enter your password", hidden=hidden)
 
+        kb.doModal()
 
-	def enter_password(self, pass_store, confirm=True, hidden=True):
+        # only move on if the device has been given a name
+        if kb.isConfirmed():
 
-		mypass = None
+            pass1 = kb.getText()
 
-		# show keyboard for the first password
-		kb = xbmc.Keyboard(pass_store, 'Please enter your password', hidden=hidden)
+            if not confirm:
 
-		kb.doModal()
+                # if we dont want password confirmation, then just return the first password entered
+                mypass = pass1
 
-		# only move on if the device has been given a name
-		if kb.isConfirmed():
+            else:
 
-			pass1 = kb.getText()
+                if pass1 == pass_store:
+                    passhint = pass_store
+                else:
+                    passhint = ""
 
-			if not confirm:
+                # show keyboard
+                kb = xbmc.Keyboard(
+                    passhint, "Please confirm your password", hidden=hidden
+                )
 
-				# if we dont want password confirmation, then just return the first password entered
-				mypass = pass1
+                kb.doModal()
 
-			else:
+                if not kb.isConfirmed():
 
-				if pass1 == pass_store:
-					passhint = pass_store
-				else:
-					passhint = ''
+                    # if the user escapes the entry, then just return None
 
-				# show keyboard
-				kb = xbmc.Keyboard(passhint, 'Please confirm your password', hidden=hidden)
+                    mypass = None
 
-				kb.doModal()
-				
-				if not kb.isConfirmed():
+                else:
 
-					# if the user escapes the entry, then just return None
+                    pass2 = kb.getText()
 
-					mypass = None
+                    # if the passwords dont match, then give the user the option of entering via hidden or plain text kayboards
+                    if pass1 != pass2 and hidden == True:
 
-				else:
+                        plain_text_pass = DIALOG.yesno(
+                            "Password mismatch",
+                            "Would you like to enter your password in plain text?",
+                        )
 
-					pass2 = kb.getText()
+                        if plain_text_pass:
 
-					# if the passwords dont match, then give the user the option of entering via hidden or plain text kayboards
-					if pass1 != pass2 and hidden == True:
+                            mypass = self.enter_password(
+                                pass_store, confirm=confirm, hidden=False
+                            )
 
-						plain_text_pass = DIALOG.yesno('Password mismatch', 'Would you like to enter your password in plain text?')
+                        else:
 
-						if plain_text_pass:
+                            mypass = self.enter_password(
+                                pass_store, confirm=confirm, hidden=True
+                            )
 
-							mypass = self.enter_password(pass_store, confirm=confirm, hidden=False)
+                    # if the passwords dont match and they aren't hidden then alert the user and reshow the entry dialog
+                    elif pass1 != pass2:
 
-						else:
+                        ok = DIALOG.ok(
+                            "Password mismatch", "Your password entries did not match"
+                        )
 
-							mypass = self.enter_password(pass_store, confirm=confirm, hidden=True)
+                        mypass = self.enter_password(
+                            pass_store, confirm=confirm, hidden=hidden
+                        )
 
-					# if the passwords dont match and they aren't hidden then alert the user and reshow the entry dialog
-					elif pass1 != pass2:
+                    else:
 
-						ok = DIALOG.ok('Password mismatch', 'Your password entries did not match')
+                        mypass = pass1
 
-						mypass = self.enter_password(pass_store, confirm=confirm, hidden=hidden)
+        return mypass
 
-					else:
+    def language_clicked(self, controlID):
 
-						mypass = pass1
+        self.previous_language = self.selected_language
 
-		return mypass
+        self.selected_language = self.getControl(controlID).getSelectedItem().getLabel()
 
+        # display confirmation dialog
+        user_confirmation = DIALOG.yesno(
+            "Confirm", self.selected_language, autoclose=10000
+        )
 
-	def language_clicked(self, controlID):
+        if user_confirmation == True:
+            # if user CONFIRMS, check whether a skin reload is required
 
-		self.previous_language = self.selected_language
+            if "english" not in self.selected_language.lower():
+                # if skin reload required, then close the window, change system language, reload the window and jump to TERMS
 
-		self.selected_language = self.getControl(controlID).getSelectedItem().getLabel()
+                # when lang_rerun set is True, the walkthru is reloaded and skips to the setting after language
+                self.lang_rerun = True
+                self.close()
 
-		# display confirmation dialog
-		user_confirmation = DIALOG.yesno('Confirm', self.selected_language, autoclose=10000)
+            else:
+                # jump to the setting AFTER language
+                pass
+        else:
+            # if not, then revert to the previous_language
+            self.selected_language = self.previous_language
 
-		if user_confirmation == True:
-			# if user CONFIRMS, check whether a skin reload is required
+    def choose_hostname(self):
 
-			if 'english' not in self.selected_language.lower():
-				# if skin reload required, then close the window, change system language, reload the window and jump to TERMS
-				
-				# when lang_rerun set is True, the walkthru is reloaded and skips to the setting after language
-				self.lang_rerun = True
-				self.close()
+        # show keyboard
+        kb = xbmc.Keyboard(
+            self.device_name.replace("current name: ", ""), "Name your device"
+        )
 
-			else:
-				# jump to the setting AFTER language
-				pass
-		else:
-			# if not, then revert to the previous_language
-			self.selected_language = self.previous_language
+        kb.doModal()
 
+        # only move on if the device has been given a name
+        if kb.isConfirmed():
 
-	def choose_hostname(self):
+            self.device_name = kb.getText()
 
-		# show keyboard
-		kb = xbmc.Keyboard(self.device_name.replace('current name: ', ''), 'Name your device')
+            self.getControl(350010).setLabel(
+                "current name: " + self.device_name.replace("_", "")
+            )
 
-		kb.doModal()
+            self.getControl(350012).setVisible(True)
 
-		# only move on if the device has been given a name
-		if kb.isConfirmed():
+    def requesting_random_name(self):
 
-			self.device_name = kb.getText()
+        self.device_name = self.random_name()
 
-			self.getControl(350010).setLabel('current name: ' + self.device_name.replace('_',''))
+        self.getControl(350010).setLabel("current name: " + self.device_name)
 
-			self.getControl(350012).setVisible(True)
+        self.getControl(350012).setVisible(True)
 
+    def toggle_ssh(self):
 
-	def requesting_random_name(self):
+        ctl = self.getControl(370010)
 
-		self.device_name = self.random_name()
+        if ctl.isSelected():
+            # change to ENABLED
+            self.ssh_state = True
+            ctl.setLabel(lang(32036))
+            self.setFocusId(370012)
 
-		self.getControl(350010).setLabel('current name: ' + self.device_name)
+        else:
+            # change to DISABLED
+            self.ssh_state = False
+            ctl.setLabel(lang(32037))
+            self.setFocusId(370012)
 
-		self.getControl(350012).setVisible(True)		
+    def enter_ssh_password(self):
 
+        # show keyboard for the first password
+        user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
 
-	def toggle_ssh(self):
+        if user_pass is not None:
 
-		ctl = self.getControl(370010)
+            self.ssh_pass = user_pass
 
-		if ctl.isSelected():
-			# change to ENABLED
-			self.ssh_state = True
-			ctl.setLabel(lang(32036))
-			self.setFocusId(370012)
+            self.getControl(370011).setLabel(
+                "Click here to change/confirm password:    "
+                + self.ssh_pass.replace("_", "")
+            )
 
-		else:
-			# change to DISABLED
-			self.ssh_state = False
-			ctl.setLabel(lang(32037))
-			self.setFocusId(370012)
+            self.getControl(370012).setVisible(True)
 
+    def newsletter_signup(self, controlID):
 
-	def enter_ssh_password(self):
+        if controlID == 90010:
 
-		# show keyboard for the first password
-		user_pass = self.enter_password(self.ssh_pass, confirm=True, hidden=True)
+            # show keyboard
+            kb = xbmc.Keyboard(self.email, "Please enter your email")
+            kb.doModal()
+            if kb.isConfirmed():
+                self.email = kb.getText()
+                requests.post(
+                    "https://osmc.tv/osmc/api/newsletter/?p=subscribe&id=1",
+                    data={
+                        "email": self.email,
+                        "subscribe": "subscribe",
+                        "list[7]": "signup",
+                        "listname[7]": "Device",
+                    },
+                )
 
-		if user_pass is not None:
+    def get_selected_country(self, controlID):
 
-			self.ssh_pass = user_pass
+        self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
 
-			self.getControl(370011).setLabel('Click here to change/confirm password:    ' + self.ssh_pass.replace('_',''))
+    @close_walkthru_on_error
+    def onClick(self, controlID):
 
-			self.getControl(370012).setVisible(True)	
+        if controlID == 1005:  # Exit control
 
+            self.exit_proceedure()
 
-	def newsletter_signup(self, controlID):
+        elif controlID == 20010:  # language container
 
-		if controlID == 90010:
+            self.language_clicked(controlID)
 
-			# show keyboard
-			kb = xbmc.Keyboard(self.email, 'Please enter your email')
-			kb.doModal()
-			if kb.isConfirmed():
-				self.email = kb.getText()
-				requests.post('https://osmc.tv/osmc/api/newsletter/?p=subscribe&id=1', 
-								data={'email': self.email, 'subscribe': 'subscribe', 'list[7]': 'signup', 'listname[7]': 'Device'}
-							)
+            self.reveal_next_panel(current_panel="language")
 
+        elif controlID in [
+            30010,
+            30020,
+            30030,
+            30040,
+            30050,
+            30060,
+            30070,
+            30080,
+            30090,
+        ]:  # timezone containers
 
-	def get_selected_country(self, controlID):
-		
-		self.selected_country = self.getControl(controlID).getSelectedItem().getLabel()
+            self.get_selected_country(controlID)
 
+            self.reveal_next_panel(current_panel="timezone")
 
-	@close_walkthru_on_error
-	def onClick(self, controlID):
+        elif controlID == 350010:  # choosing the hostname
 
-		if controlID == 1005:				# Exit control
+            self.choose_hostname()
 
-			self.exit_proceedure()
+        elif controlID == 350011:  # user has asked for a random name
 
-		elif controlID == 20010:			# language container
+            self.requesting_random_name()
 
-			self.language_clicked(controlID)
+        elif controlID == 350012:  # user has accepted the hostname
 
-			self.reveal_next_panel(current_panel='language')
+            self.reveal_next_panel(current_panel="hostname")
 
-		elif controlID in [30010, 30020, 30030,	30040, 30050, 30060, 30070, 30080, 30090]: # timezone containers
-			
-			self.get_selected_country(controlID)
+        elif controlID == 370010:  # user wants to disable SSH service
 
-			self.reveal_next_panel(current_panel='timezone')
+            self.toggle_ssh()
 
-		elif controlID == 350010:			# choosing the hostname
+        elif controlID == 370011:  # user wants to change the SSH password DEPRECATED
 
-			self.choose_hostname()
+            # self.enter_ssh_password()
+            pass
 
-		elif controlID == 350011:			# user has asked for a random name
+        elif controlID == 370012:  # user has accepted the SSH settings
 
-			self.requesting_random_name()
+            self.reveal_next_panel(current_panel="SSH")
 
-		elif controlID == 350012: 			# user has accepted the hostname
+        elif controlID == 40010:  # terms and conditions I Agree button
 
-			self.reveal_next_panel(current_panel='hostname')
+            self.reveal_next_panel(current_panel="TandC")
 
-		elif controlID == 370010: 			# user wants to disable SSH service
+        elif controlID == 70010:  # warranty I Agree button
 
-			self.toggle_ssh()
+            self.reveal_next_panel(current_panel="warranty")
 
-		elif controlID == 370011: 			# user wants to change the SSH password DEPRECATED
+        elif controlID == 40020:  # unused scroll bar for TandC
 
-			# self.enter_ssh_password()
-			pass
+            self.getControl(555).scroll(10)
 
-		elif controlID == 370012: 			# user has accepted the SSH settings
+        elif controlID == 40030:  # unused scroll bar for TandC
 
-			self.reveal_next_panel(current_panel='SSH')	
+            self.getControl(555).scroll(-10)
 
-		elif controlID == 40010:			# terms and conditions I Agree button	
+        elif controlID == 60090:  # skip networking button
 
-			self.reveal_next_panel(current_panel='TandC')
+            self.reveal_next_panel(current_panel="networking")
 
-		elif controlID == 70010:			# warranty I Agree button
-			
-			self.reveal_next_panel(current_panel='warranty')
+        elif controlID == 60010:  # open networking gui
 
-		elif controlID == 40020:			# unused scroll bar for TandC		
+            self.net_call.run(False)
 
-			self.getControl(555).scroll(10)
+            self.reveal_next_panel(current_panel="networking")
 
-		elif controlID == 40030:			# unused scroll bar for TandC
-			
-			self.getControl(555).scroll(-10)
+        elif controlID in [80010, 80020]:  # user has selected a skin
 
-		elif controlID == 60090:			# skip networking button
+            self.selected_skin = "OSMC" if controlID == 80010 else "Estuary"
 
-			self.reveal_next_panel(current_panel='networking')
+            self.reveal_next_panel(current_panel="skin")
 
-		elif controlID == 60010:			# open networking gui
-			
-			self.net_call.run(False)
+        elif controlID in [90010, 90020]:  # newsletter sign up
 
-			self.reveal_next_panel(current_panel='networking')
+            self.newsletter_signup(controlID)
 
-		elif controlID in [80010, 80020]:	# user has selected a skin
+            self.reveal_next_panel(current_panel="newsletter")
 
-			self.selected_skin = 'OSMC' if controlID == 80010 else 'Estuary'
+            # allow the user to exit
+            self.prevent_escape = False
 
-			self.reveal_next_panel(current_panel='skin')
+    def random_name(self):
 
-		elif controlID in [90010, 90020]:	# newsletter sign up
+        names = [
+            "Alfonse",
+            "Barnaby",
+            "Aloysius",
+            "Archibald",
+            "Algernon",
+            "Basil",
+            "Bertram",
+            "Carston",
+            "Cavendish",
+            "Cecil",
+            "Cyril",
+            "Danforth",
+            "Cuthbert",
+            "Alastair",
+            "Preston",
+            "Giles",
+            "Cortland",
+            "Atticus",
+            "Edmund",
+            "Gilbert",
+            "Ethelbert",
+            "Frederick",
+            "Geoffrey",
+            "Gideon",
+            "Giggleswick",
+            "Grumbole",
+            "Hamilton",
+            "Ignatius",
+            "Ebenezer",
+            "Herbert",
+            "Clement",
+            "Humphrey",
+            "Ian",
+            "Ichabod",
+            "Jonathan",
+            "Malcolm",
+            "Mervyn",
+            "Mortimer",
+            "Nigel",
+            "Percy",
+            "Prentis",
+            "Reginald",
+            "Ridgewell",
+            "Royston",
+            "Theophilus",
+            "Tobias",
+            "Tristram",
+            "Ulysses",
+            "Ulrich",
+            "Virgil",
+            "Vivian",
+            "Waldo",
+            "Wesley",
+            "Wilbur",
+            "Wilfred",
+            "Willard",
+            "Willoughby",
+        ]
 
-			self.newsletter_signup(controlID)
+        return "osmc-" + random.choice(names)
 
-			self.reveal_next_panel(current_panel='newsletter')
+    @close_walkthru_on_error
+    def onAction(self, action):
 
-			# allow the user to exit
-			self.prevent_escape = False
+        if self.prevent_escape:
+            return
 
+        if action == 10 or action == 92:
 
-	def random_name(self):
+            self.close()
 
-		names = [	
-				"Alfonse", "Barnaby", "Aloysius", "Archibald", "Algernon", "Basil", "Bertram", "Carston", "Cavendish", "Cecil", 
-				"Cyril", "Danforth", "Cuthbert", "Alastair", "Preston", "Giles", "Cortland", "Atticus",
-				"Edmund", "Gilbert", "Ethelbert", "Frederick", "Geoffrey", "Gideon", "Giggleswick", "Grumbole", "Hamilton",
-				"Ignatius", "Ebenezer", "Herbert", "Clement", "Humphrey", "Ian", "Ichabod", "Jonathan", "Malcolm",
-				"Mervyn", "Mortimer", "Nigel", "Percy", "Prentis", "Reginald", "Ridgewell", "Royston",
-				"Theophilus", "Tobias", "Tristram", "Ulysses", "Ulrich", "Virgil", "Vivian", "Waldo",
-				"Wesley", "Wilbur", "Wilfred", "Willard", "Willoughby",
-				]
+    def networking_special_handling(self, next_panel):
 
-		return "osmc-" + random.choice(names)
+        if not self.networking_panel_revealed:
 
+            if self.internet_connected:
 
-	@close_walkthru_on_error
-	def onAction(self, action):
+                # if the internet is connected and the networking panel has not already been revealed, then just jump to the
+                # next panel after networking
+                next_panel = self.panel_order[self.panel_order.index("networking") + 1]
+                self.panel_order.remove("networking")
 
-		if self.prevent_escape:
-			return
+            else:
+                # if the internet is NOT connected, and the networking panel has NOT been revealed then show the internet checker progress bar.
+                # Once that is complete (or cancelled) then check for the internet connection again
+                # and show the networking panel if negative, or jump to the next panel if positive.
+                self.still_checking_for_network()
 
-		if action == 10 or action == 92:
+                if self.internet_connected:
+                    next_panel = self.panel_order[
+                        self.panel_order.index("networking") + 1
+                    ]
+                    self.panel_order.remove("networking")
 
-			self.close()
+                self.networking_panel_revealed = True
 
+        return next_panel
 
-	def networking_special_handling(self, next_panel):
+    def reveal_next_panel(self, current_panel):
+        """ Builds the menu as we proceed.
+			Current_panel is the string name of the panel we are moving from. """
 
-		if not self.networking_panel_revealed:
+        try:
+            next_panel = self.panel_order[self.panel_order.index(current_panel) + 1]
+        except IndexError:
+            next_panel = "exit"
 
-			if self.internet_connected:
+        log("Changing from %s to %s" % (current_panel, next_panel))
 
-				# if the internet is connected and the networking panel has not already been revealed, then just jump to the
-				# next panel after networking
-				next_panel = self.panel_order[self.panel_order.index('networking') + 1]
-				self.panel_order.remove('networking')
+        # special workaround to only show the networking panel if we havent been able to connect to the internet
+        if next_panel == "networking":
+            next_panel = self.networking_special_handling(next_panel)
 
-			else:
-				# if the internet is NOT connected, and the networking panel has NOT been revealed then show the internet checker progress bar. 
-				# Once that is complete (or cancelled) then check for the internet connection again
-				# and show the networking panel if negative, or jump to the next panel if positive.
-				self.still_checking_for_network()
+        # show the next panels menu item
+        self.getControl(PANEL_MAP[next_panel]["panel_menu_item_id"]).setVisible(True)
 
-				if self.internet_connected:
-					next_panel = self.panel_order[self.panel_order.index('networking') + 1]
-					self.panel_order.remove('networking')
+        # display the next panel
+        self.show_panel(next_panel)
 
-				self.networking_panel_revealed = True
+        # focus on the default control on that new panel
+        self.setFocusId(PANEL_MAP[next_panel]["default_control"])
 
-		return next_panel
+        # set the up/down controls for the menu item
+        old_menuitem_id = PANEL_MAP[current_panel]["panel_menu_item_id"]
+        new_menuitem_id = PANEL_MAP[next_panel]["panel_menu_item_id"]
 
+        self.getControl(new_menuitem_id).controlUp(self.getControl(old_menuitem_id))
+        self.getControl(old_menuitem_id).controlDown(self.getControl(new_menuitem_id))
 
-	def reveal_next_panel(self, current_panel):
-		''' Builds the menu as we proceed.
-			Current_panel is the string name of the panel we are moving from. '''
+    def show_panel(self, controlID):
 
-		try:
-			next_panel = self.panel_order[self.panel_order.index(current_panel) + 1]
-		except IndexError:
-			next_panel = 'exit'
+        for panel_name, control_dict in PANEL_MAP.items():
 
-		log('Changing from %s to %s' % (current_panel, next_panel))
+            if (
+                controlID == panel_name
+                or controlID == control_dict["panel_menu_item_id"]
+            ):
 
-		# special workaround to only show the networking panel if we havent been able to connect to the internet
-		if next_panel == 'networking':
-			next_panel = self.networking_special_handling(next_panel)
+                self.getControl(control_dict["visibility_controller"]).setVisible(True)
 
-		# show the next panels menu item
-		self.getControl(PANEL_MAP[next_panel]['panel_menu_item_id']).setVisible(True)
+            else:
 
-		# display the next panel
-		self.show_panel(next_panel)
+                self.getControl(control_dict["visibility_controller"]).setVisible(False)
 
-		# focus on the default control on that new panel
-		self.setFocusId(PANEL_MAP[next_panel]['default_control'])
+    @close_walkthru_on_error
+    def onFocus(self, controlID):
 
-		# set the up/down controls for the menu item
-		old_menuitem_id = PANEL_MAP[current_panel]['panel_menu_item_id']
-		new_menuitem_id = PANEL_MAP[next_panel]['panel_menu_item_id']
+        if controlID in self.menu_controls:
 
-		self.getControl(new_menuitem_id).controlUp(self.getControl(old_menuitem_id))
-		self.getControl(old_menuitem_id).controlDown(self.getControl(new_menuitem_id))
+            self.show_panel(controlID)
 
+        elif controlID in self.tz_controls:
 
-	def show_panel(self, controlID):
+            for tz in self.tz_controls:
 
-		for panel_name, control_dict in PANEL_MAP.iteritems():
+                ctl = self.getControl(tz * 10)
 
-			if controlID == panel_name or controlID == control_dict['panel_menu_item_id']:
+                if tz == controlID:
 
-				self.getControl(control_dict['visibility_controller']).setVisible(True)
+                    ctl.setVisible(True)
 
-			else:
+                else:
 
-				self.getControl(control_dict['visibility_controller']).setVisible(False)
+                    ctl.setVisible(False)
 
+        elif controlID in self.skin_controls:
 
-	@close_walkthru_on_error
-	def onFocus(self, controlID):
+            if controlID == 80010:
 
+                # display the OSMC skin image
+                self.set_skin_image("OSMC")
 
-		if controlID in self.menu_controls:
+            elif controlID == 80020:
 
-			self.show_panel(controlID)
-
-		elif controlID in self.tz_controls:
-
-			for tz in self.tz_controls:
-
-				ctl = self.getControl(tz * 10)
-
-				if tz == controlID:
-
-					ctl.setVisible(True)
-
-				else:
-
-					ctl.setVisible(False)
-
-		elif controlID in self.skin_controls:
-
-			if controlID == 80010:
-
-				# display the OSMC skin image
-				self.set_skin_image('OSMC')
-
-			elif controlID == 80020:
-
-				# display the confluence skin image
-				self.set_skin_image('CONF')
+                # display the confluence skin image
+                self.set_skin_image("CONF")
 
 
 def open_gui(networking_instance, testing=False):
 
-	__addon__        = xbmcaddon.Addon()
-	scriptPath       = __addon__.getAddonInfo('path')
+    __addon__ = xbmcaddon.Addon()
+    scriptPath = __addon__.getAddonInfo("path")
 
-	xml = "walkthru_720.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "walkthru.xml"
+    xml = (
+        "walkthru_720.xml"
+        if xbmcgui.Window(10000).getProperty("SkinHeight") == "720"
+        else "walkthru.xml"
+    )
 
-	lang_rerun 			= False
-	first_run 			= True
+    lang_rerun = False
+    first_run = True
 
-	selected_language 	= None
+    selected_language = None
 
-	while first_run or lang_rerun:
+    while first_run or lang_rerun:
 
-		first_run = False
-		try:
-			GUI = walkthru_gui(xml, scriptPath, 'Default', networking_instance=networking_instance, lang_rerun=lang_rerun, selected_language=selected_language, testing=testing)
-			GUI.doModal()
-		except:
-			log(traceback.format_exc(), xbmc.LOGERROR)
-			return
+        first_run = False
+        try:
+            GUI = walkthru_gui(
+                xml,
+                scriptPath,
+                "Default",
+                networking_instance=networking_instance,
+                lang_rerun=lang_rerun,
+                selected_language=selected_language,
+                testing=testing,
+            )
+            GUI.doModal()
+        except:
+            log(traceback.format_exc(), xbmc.LOGERROR)
+            return
 
-		selected_language 	= GUI.selected_language
-		skin_choice 		= GUI.selected_skin
-		lang_rerun 			= GUI.lang_rerun
+        selected_language = GUI.selected_language
+        skin_choice = GUI.selected_skin
+        lang_rerun = GUI.lang_rerun
 
-		# set language
-		xbmc.executebuiltin('xbmc.SetGUILanguage(%s)' % selected_language)
-		
-		xbmc.sleep(1000)
+        # set language
+        xbmc.executebuiltin("xbmc.SetGUILanguage(%s)" % selected_language)
 
-		log('users language: %s' % selected_language)
-		log('lang_rerun: %s' % lang_rerun)
-		log('skin_choice: %s' % skin_choice)
-		
-	# -- THIS SECTION SHOULD BE SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
-	if skin_choice != 'OSMC':
+        xbmc.sleep(1000)
 
-		log('Loading Estuary')
-		try:
-			xbmc.setskin('skin.estuary')
-		except:
-			log('Loading Estuary failed.')
+        log("users language: %s" % selected_language)
+        log("lang_rerun: %s" % lang_rerun)
+        log("skin_choice: %s" % skin_choice)
 
-	log('Exiting GUI')
+    # -- THIS SECTION SHOULD BE SUPPRESSED WHILE THE SKIN CHANGE METHOD IS WORKED ON  --
+    if skin_choice != "OSMC":
 
+        log("Loading Estuary")
+        try:
+            xbmc.setskin("skin.estuary")
+        except:
+            log("Loading Estuary failed.")
+
+    log("Exiting GUI")

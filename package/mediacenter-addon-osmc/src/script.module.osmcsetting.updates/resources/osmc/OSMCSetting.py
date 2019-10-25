@@ -1,4 +1,4 @@
-'''
+"""
 
 	The settings for OSMC are handled by the OSMC Settings Addon (OSA).
 
@@ -81,7 +81,7 @@
 	settings window closes by editing the open_settings_window. The method apply_settings will still be called by OSG, so 
 	keep that in mind.
 
-'''
+"""
 
 
 # XBMC Modules
@@ -95,222 +95,217 @@ import threading
 
 def log(message):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
 
-	xbmc.log(msg = 'OSMC UPDATES ' + str(message), level=xbmc.LOGDEBUG)
+    xbmc.log(msg="OSMC UPDATES " + str(message), level=xbmc.LOGDEBUG)
 
 
 class OSMCSettingClass(threading.Thread):
 
-	''' 
+    """ 
 		A OSMCSettingClass is way to substantiate the settings of an OSMC settings module, and make them available to the 
 		OSMC Settings Addon (OSA).
 
-	'''
+	"""
 
-	def __init__(self):
+    def __init__(self):
 
-		''' 
+        """ 
 			The setting_data_method contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
-		'''
+		"""
 
-		super(OSMCSettingClass, self).__init__()
+        super(OSMCSettingClass, self).__init__()
 
-		self.addonid = "script.module.osmcsetting.updates"
-		self.me = xbmcaddon.Addon(self.addonid)
+        self.addonid = "script.module.osmcsetting.updates"
+        self.me = xbmcaddon.Addon(self.addonid)
 
-		# this is what is displayed in the main settings gui
-		self.shortname = 'Updates'
+        # this is what is displayed in the main settings gui
+        self.shortname = "Updates"
 
-		self.description = 	""
+        self.description = ""
 
-		self.reset_file = '/home/osmc/.factoryreset'
+        self.reset_file = "/home/osmc/.factoryreset"
 
-		self.setting_data_method = 	{}
+        self.setting_data_method = {}
 
-		# 'mercury': 	{
-		# 					'setting_value' : '',
-		# 					'apply'			: self.method_to_apply_changes_X,
-		# 					'translate'		: self.translate_on_populate_X,
-		# 					},
+        # 'mercury': 	{
+        # 					'setting_value' : '',
+        # 					'apply'			: self.method_to_apply_changes_X,
+        # 					'translate'		: self.translate_on_populate_X,
+        # 					},
 
-		# 'venus': 	{'setting_value' : ''},
-		# 'earth': 	{'setting_value' : ''},
-		# 'mars': 	{'setting_value' : ''},
-		# 'jupiter': 	{'setting_value' : ''},
-		# 'saturn': 	{'setting_value' : ''},
-		# 'uranus': 	{'setting_value' : ''},
-		# 'neptune': 	{'setting_value' : ''},
-		# 'pluto': 	{'setting_value' : ''},									
+        # 'venus': 	{'setting_value' : ''},
+        # 'earth': 	{'setting_value' : ''},
+        # 'mars': 	{'setting_value' : ''},
+        # 'jupiter': 	{'setting_value' : ''},
+        # 'saturn': 	{'setting_value' : ''},
+        # 'uranus': 	{'setting_value' : ''},
+        # 'neptune': 	{'setting_value' : ''},
+        # 'pluto': 	{'setting_value' : ''},
 
-		# }
+        # }
 
-		# populate the settings data in the setting_data_method
-		self.populate_setting_data_method()
+        # populate the settings data in the setting_data_method
+        self.populate_setting_data_method()
 
-		# a flag to determine whether a setting change requires a reboot to take effect
-		self.reboot_required = False
+        # a flag to determine whether a setting change requires a reboot to take effect
+        self.reboot_required = False
 
-		log('START')
-		for x, k in self.setting_data_method.iteritems():
-			log("%s = %s" % (x, k.get('setting_value','no setting value')))
+        log("START")
+        for x, k in self.setting_data_method.items():
+            log("%s = %s" % (x, k.get("setting_value", "no setting value")))
 
+    def populate_setting_data_method(self):
 
-	def populate_setting_data_method(self):
-
-		'''
+        """
 			Populates the setting_value in the setting_data_method.
-		'''
+		"""
 
-		# this is the method to use if you are populating the dict from the settings.xml
-		latest_settings = self.settings_retriever_xml()
+        # this is the method to use if you are populating the dict from the settings.xml
+        latest_settings = self.settings_retriever_xml()
 
-		# cycle through the setting_data_method dict, and populate with the settings values
-		for key in self.setting_data_method.keys():
+        # cycle through the setting_data_method dict, and populate with the settings values
+        for key in list(self.setting_data_method.keys()):
 
-			# grab the translate method (if there is one)
-			translate_method = self.setting_data_method.get(key,{}).get('translate',{})
+            # grab the translate method (if there is one)
+            translate_method = self.setting_data_method.get(key, {}).get(
+                "translate", {}
+            )
 
-			# get the setting value, translate it if needed
-			if translate_method:
-				setting_value = translate_method(latest_settings[key])
-			else:
-				setting_value = latest_settings[key]
+            # get the setting value, translate it if needed
+            if translate_method:
+                setting_value = translate_method(latest_settings[key])
+            else:
+                setting_value = latest_settings[key]
 
-			# add it to the dictionary
-			self.setting_data_method[key]['setting_value'] = setting_value
+            # add it to the dictionary
+            self.setting_data_method[key]["setting_value"] = setting_value
 
+    def run(self):
 
-	def run(self):
-
-		'''
+        """
 			The method that determines what happens when the item is clicked in the settings GUI.
 			Usually this would be __addon__.OpenSettings(), but it could be any other script.
 			This allows the creation of action buttons in the GUI, as well as allowing developers to script and skin their 
 			own user interfaces.
-		'''
+		"""
 
-		# check if kodi_reset file is present, if it is then set the bool as true, else set as false
+        # check if kodi_reset file is present, if it is then set the bool as true, else set as false
 
-		addon = xbmcaddon.Addon(self.addonid)
+        addon = xbmcaddon.Addon(self.addonid)
 
-		if os.path.isfile(self.reset_file):
-			log('Kodi reset file found')
-			addon.setSetting('kodi_reset', 'true')
-		else:
-			log('Kodi reset file not found')
-			addon.setSetting('kodi_reset', 'false')
+        if os.path.isfile(self.reset_file):
+            log("Kodi reset file found")
+            addon.setSetting("kodi_reset", "true")
+        else:
+            log("Kodi reset file not found")
+            addon.setSetting("kodi_reset", "false")
 
-		self.me.openSettings()
+        self.me.openSettings()
 
-		# check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file	
-		if addon.getSetting('kodi_reset') == 'true':
-			log('creating kodi reset file')
-			subprocess.call(['sudo', 'touch', self.reset_file])
-		else:
-			subprocess.call(['sudo', 'rm', self.reset_file])
+        # check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file
+        if addon.getSetting("kodi_reset") == "true":
+            log("creating kodi reset file")
+            subprocess.call(["sudo", "touch", self.reset_file])
+        else:
+            subprocess.call(["sudo", "rm", self.reset_file])
 
-		log('END')
-		for x, k in self.setting_data_method.iteritems():
-			log("%s = %s" % (x, k.get('setting_value','no setting value')))
+        log("END")
+        for x, k in self.setting_data_method.items():
+            log("%s = %s" % (x, k.get("setting_value", "no setting value")))
 
+    def settings_retriever_xml(self):
 
-
-	def settings_retriever_xml(self):
-
-		''' 
+        """ 
 			Reads the stored settings (in settings.xml) and returns a dictionary with the setting_name: setting_value. This 
 			method cannot be overwritten.
-		'''
+		"""
 
-		latest_settings = {}
+        latest_settings = {}
 
-		addon = xbmcaddon.Addon(self.addonid)
+        addon = xbmcaddon.Addon(self.addonid)
 
-		for key in self.setting_data_method.keys():
+        for key in list(self.setting_data_method.keys()):
 
-			latest_settings[key] = addon.getSetting(key)
+            latest_settings[key] = addon.getSetting(key)
 
-		return latest_settings
+        return latest_settings
 
+    ##############################################################################################################################
+    # 																															 #
+    def first_method(self):
 
-	##############################################################################################################################
-	#																															 #
-	def first_method(self):
-
-		''' 
+        """ 
 			The method to call before all the other setting methods are called.
 
 			For example, this could be a call to stop a service. The final method could then restart the service again. 
 			This can be used to apply the setting changes.
 
-		'''	
+		"""
 
-		pass
+        pass
 
+    def final_method(self):
 
-	def final_method(self):
-
-		''' 
+        """ 
 			The method to call after all the other setting methods have been called.
 
 			For example, in the case of the Raspberry Pi's settings module, the final writing to the config.txt can be delayed
 			until all the settings have been updated in the setting_data_method. 
 
-		'''
+		"""
 
-		pass
+        pass
 
+    def boot_method(self):
 
-	def boot_method(self):
-
-		''' 
+        """ 
 			The method to call when the OSA is first activated (on reboot)
 
-		'''
+		"""
 
-		pass
+        pass
 
-	#																															 #
-	##############################################################################################################################
+    # 																															 #
+    ##############################################################################################################################
 
+    ##############################################################################################################################
+    # 																															 #
 
-	##############################################################################################################################
-	#																															 #
-
-	''' 
+    """ 
 		Methods beyond this point are for specific settings. 
-	'''
+	"""
 
-	# SETTING METHOD
-	def method_to_apply_changes_X(self, data):
+    # SETTING METHOD
+    def method_to_apply_changes_X(self, data):
 
-		'''
+        """
 			Method for implementing changes to setting x.
 
-		'''
+		"""
 
-		log('hells yeah!')
+        log("hells yeah!")
 
-	def translate_on_populate_X(self, data, reverse=False):
+    def translate_on_populate_X(self, data, reverse=False):
 
-		'''
+        """
 			Method to translate the data before adding to the setting_data_method dict.
 
 			This is useful if you are getting the populating from an external source like the Pi's config.txt.
 			This method could end with a call to another method to populate the settings.xml from that same source.
-		'''
+		"""
 
-		# this is how you would negate the translateing of the data when the settings window closes.
-		if reverse:
-			return data
+        # this is how you would negate the translateing of the data when the settings window closes.
+        if reverse:
+            return data
 
-	#																															 #
-	##############################################################################################################################
+    # 																															 #
+    ##############################################################################################################################
+
 
 if __name__ == "__main__":
-	pass
+    pass

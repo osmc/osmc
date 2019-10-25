@@ -1,4 +1,3 @@
-
 # STANDARD Modules
 import datetime as dt
 import glob
@@ -17,910 +16,957 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
-__addonid__	= 'OSMC Backup'
+__addonid__ = "OSMC Backup"
 DIALOG = xbmcgui.Dialog()
 
-TIME_PATTERN = '%Y_%m_%d_%H_%M_%S'
-READ_PATTERN = '%Y-%m-%d %H:%M:%S'
-APPENDAGE	 = '[0-9|_]*'
-FILE_PATTERN = 'OSMCBACKUP_%s.tar.gz'
+TIME_PATTERN = "%Y_%m_%d_%H_%M_%S"
+READ_PATTERN = "%Y-%m-%d %H:%M:%S"
+APPENDAGE = "[0-9|_]*"
+FILE_PATTERN = "OSMCBACKUP_%s.tar.gz"
 LOCATIONS = {
+    "backup_addons": "{kodi_folder}addons/",
+    "backup_addon_data": "{kodi_folder}userdata/addon_data/",
+    "backup_Database": "{kodi_folder}userdata/Database/",
+    "backup_keymaps": "{kodi_folder}userdata/keymaps/",
+    "backup_library": "{kodi_folder}userdata/library/",
+    "backup_playlists": "{kodi_folder}userdata/playlists/",
+    "backup_profilesF": "{kodi_folder}userdata/profiles/",
+    "backup_Thumbnails": "{kodi_folder}userdata/Thumbnails/",
+    "backup_favourites": "{kodi_folder}userdata/favourites.xml",
+    "backup_keyboard": "{kodi_folder}userdata/keyboard.xml",
+    "backup_remote": "{kodi_folder}userdata/remote.xml",
+    "backup_LCD": "{kodi_folder}userdata/LCD.xml",
+    "backup_profiles": "{kodi_folder}userdata/profiles.xml",
+    "backup_RssFeeds": "{kodi_folder}userdata/RssFeeds.xml",
+    "backup_sources": "{kodi_folder}userdata/sources.xml",
+    "backup_upnpserver": "{kodi_folder}userdata/upnpserver.xml",
+    "backup_peripheral_data": "{kodi_folder}userdata/peripheral_data.xml",
+    "backup_guisettings": "{kodi_folder}userdata/guisettings.xml",
+    "backup_fstab": "{kodi_folder}userdata/fstab",
+    "backup_advancedsettings": "{kodi_folder}userdata/advancedsettings.xml",
+}
 
-			'backup_addons'				:	'{kodi_folder}addons/',
-			'backup_addon_data'			:	'{kodi_folder}userdata/addon_data/',
-			'backup_Database'			:	'{kodi_folder}userdata/Database/',
-			'backup_keymaps'			:	'{kodi_folder}userdata/keymaps/',
-			'backup_library'			:	'{kodi_folder}userdata/library/',
-			'backup_playlists'			:	'{kodi_folder}userdata/playlists/',
-			'backup_profilesF'			:	'{kodi_folder}userdata/profiles/',
-			'backup_Thumbnails'			:	'{kodi_folder}userdata/Thumbnails/',
-			'backup_favourites'			:	'{kodi_folder}userdata/favourites.xml',
-			'backup_keyboard'			:	'{kodi_folder}userdata/keyboard.xml',
-			'backup_remote'				:	'{kodi_folder}userdata/remote.xml',
-			'backup_LCD'				:	'{kodi_folder}userdata/LCD.xml',
-			'backup_profiles'			:	'{kodi_folder}userdata/profiles.xml',
-			'backup_RssFeeds'			:	'{kodi_folder}userdata/RssFeeds.xml',
-			'backup_sources'			:	'{kodi_folder}userdata/sources.xml',
-			'backup_upnpserver'			:	'{kodi_folder}userdata/upnpserver.xml',
-			'backup_peripheral_data'	:	'{kodi_folder}userdata/peripheral_data.xml',
-			'backup_guisettings'		:	'{kodi_folder}userdata/guisettings.xml',
-			'backup_fstab'				:	'{kodi_folder}userdata/fstab',
-			'backup_advancedsettings'	:	'{kodi_folder}userdata/advancedsettings.xml',
-
-			}
-
-LABELS = 	{
-
-			'{kodi_folder}/addons'							: 'Directory - Addons',
-			'{kodi_folder}/userdata/addon_data'				: 'Directory - Addon Data',
-			'{kodi_folder}/userdata/Database'				: 'Directory - Database',
-			'{kodi_folder}/userdata/keymaps'				: 'Directory - Keymaps',
-			'{kodi_folder}/userdata/library'				: 'Directory - Library',
-			'{kodi_folder}/userdata/playlists'				: 'Directory - Playlists',
-			'{kodi_folder}/userdata/profiles'				: 'Directory - Profiles',
-			'{kodi_folder}/userdata/Thumbnails'				: 'Directory - Thumbnails',
-			'{kodi_folder}/userdata/advancedsettings.xml'	: 'File - advancedsettings.xml',
-			'{kodi_folder}/userdata/guisettings.xml'		: 'File - guisettings.xml',
-			'{kodi_folder}/userdata/fstab'					: 'File - fstab',
-			'{kodi_folder}/userdata/sources.xml'			: 'File - sources.xml',
-			'{kodi_folder}/userdata/profiles.xml'			: 'File - profiles.xml',
-			'{kodi_folder}/userdata/favourites.xml' 		: 'File - favourites.xml',
-			'{kodi_folder}/userdata/keyboard.xml'			: 'File - keyboard.xml',
-			'{kodi_folder}/userdata/remote.xml'				: 'File - remote.xml',
-			'{kodi_folder}/userdata/LCD.xml'				: 'File - LCD.xml',
-			'{kodi_folder}/userdata/RssFeeds.xml'			: 'File - RssFeeds.xml',
-			'{kodi_folder}/userdata/upnpserver.xml'			: 'File - upnpserver.xml',
-			'{kodi_folder}/userdata/peripheral_data.xml'	: 'File - peripheral_data.xml',
-
-			}
+LABELS = {
+    "{kodi_folder}/addons": "Directory - Addons",
+    "{kodi_folder}/userdata/addon_data": "Directory - Addon Data",
+    "{kodi_folder}/userdata/Database": "Directory - Database",
+    "{kodi_folder}/userdata/keymaps": "Directory - Keymaps",
+    "{kodi_folder}/userdata/library": "Directory - Library",
+    "{kodi_folder}/userdata/playlists": "Directory - Playlists",
+    "{kodi_folder}/userdata/profiles": "Directory - Profiles",
+    "{kodi_folder}/userdata/Thumbnails": "Directory - Thumbnails",
+    "{kodi_folder}/userdata/advancedsettings.xml": "File - advancedsettings.xml",
+    "{kodi_folder}/userdata/guisettings.xml": "File - guisettings.xml",
+    "{kodi_folder}/userdata/fstab": "File - fstab",
+    "{kodi_folder}/userdata/sources.xml": "File - sources.xml",
+    "{kodi_folder}/userdata/profiles.xml": "File - profiles.xml",
+    "{kodi_folder}/userdata/favourites.xml": "File - favourites.xml",
+    "{kodi_folder}/userdata/keyboard.xml": "File - keyboard.xml",
+    "{kodi_folder}/userdata/remote.xml": "File - remote.xml",
+    "{kodi_folder}/userdata/LCD.xml": "File - LCD.xml",
+    "{kodi_folder}/userdata/RssFeeds.xml": "File - RssFeeds.xml",
+    "{kodi_folder}/userdata/upnpserver.xml": "File - upnpserver.xml",
+    "{kodi_folder}/userdata/peripheral_data.xml": "File - peripheral_data.xml",
+}
 
 
 def lang(id):
-	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-	return san
+    san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
+    return san
 
 
-def log(message, label = ''):
+def log(message, label=""):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
 
-	try:
-		label = str(label)
-	except UnicodeEncodeError:
-		label = label.encode('utf-8', 'ignore' )
+    try:
+        label = str(label)
+    except UnicodeEncodeError:
+        label = label.encode("utf-8", "ignore")
 
-	logmsg       = '%s : %s - %s ' % ('OSMC BACKUP: ' , str(label), str(message))
-	xbmc.log(msg = logmsg, level=xbmc.LOGDEBUG)
+    logmsg = "%s : %s - %s " % ("OSMC BACKUP: ", str(label), str(message))
+    xbmc.log(msg=logmsg, level=xbmc.LOGDEBUG)
 
 
 class osmc_backup(object):
+    def __init__(self, settings_dict, progress_function, parent_queue=None):
 
-	def __init__(self, settings_dict, progress_function, parent_queue=None):
+        log("osmc_backup INIT")
 
-		log('osmc_backup INIT')
+        self.s = settings_dict
 
-		self.s = settings_dict
+        self.parent_queue = parent_queue
 
-		self.parent_queue = parent_queue
+        self.progress = progress_function
 
-		self.progress = progress_function
+        self.restoring_guisettings = False
+        self.restoring_fstab = False
 
-		self.restoring_guisettings = False
-		self.restoring_fstab = False
+        # backup candidates is a list of tuples that contain the folder/file path and the size in bytes of the entry
+        self.backup_candidates = (
+            self.create_backup_file_list()
+        )  # if self.s.get('create_tarball', False) else None
 
-		# backup candidates is a list of tuples that contain the folder/file path and the size in bytes of the entry
-		self.backup_candidates = self.create_backup_file_list() #if self.s.get('create_tarball', False) else None
+    def start_backup(self):
 
+        """ This is the main method that walks through the backup process """
 
-	def start_backup(self):
+        if self.check_backup_location():
 
-		''' This is the main method that walks through the backup process '''
+            # if self.s['export_library']:
 
-		if self.check_backup_location():
+            # 	self.export_libraries()
 
-			# if self.s['export_library']:
+            # if self.s['create_tarball']:
 
-			# 	self.export_libraries()
+            self.create_tarball()
 
-			# if self.s['create_tarball']:
+            msg = json.dumps(("pre_backup_complete", {}))
 
-			self.create_tarball()
+            try:
 
-			msg = json.dumps(('pre_backup_complete', {}))
+                self.parent_queue.put(msg)
 
-			try:
+            except:
 
-				self.parent_queue.put(msg)
+                pass
 
-			except:
+    def check_backup_location(self):
 
-				pass
+        """ Tests the backup location for disk space and writeability """
 
+        self.location = self.s.get("backup_location", None)
 
-	def check_backup_location(self):
+        if not self.location:
 
-		''' Tests the backup location for disk space and writeability '''
+            log("Location for backup not provided.")
 
-		self.location = self.s.get('backup_location', None)
+            ok = DIALOG.ok(
+                "OSMC Backup",
+                "Location for backup not provided.",
+                "Set the backup folder in MyOSMC.",
+            )
 
-		if not self.location:
+            return False
 
-			log('Location for backup not provided.')
+        # check for available disk space at backup location
+        if not self.check_target_location_for_size(self.location):
 
-			ok = DIALOG.ok('OSMC Backup', 'Location for backup not provided.', 'Set the backup folder in MyOSMC.')
+            log("Insufficent diskspace at target location")
 
-			return False
+            ok = DIALOG.ok("OSMC Backup", "Insufficent diskspace at target location")
 
-		# check for available disk space at backup location
-		if not self.check_target_location_for_size(self.location):
+            return False
 
-			log('Insufficent diskspace at target location')
+        else:
+            log("Sufficent diskspace at target location")
 
-			ok = DIALOG.ok('OSMC Backup', 'Insufficent diskspace at target location')
+        # check for write permission at backup location
+        if not self.check_target_writeable(self.location):
 
-			return False
+            log("Backup location not writeable.")
 
-		else:
-			log('Sufficent diskspace at target location')
+            ok = DIALOG.ok("OSMC Backup", "Backup location not writeable")
 
-		# check for write permission at backup location
-		if not self.check_target_writeable(self.location):
+            return False
 
-			log('Backup location not writeable.')
+        else:
+            log("Backup location writeable.")
 
-			ok = DIALOG.ok('OSMC Backup', 'Backup location not writeable')
+        return True
 
-			return False
+    def kodi_location(self):
 
-		else:
-			log('Backup location writeable.')
+        """ returns the location of the kodi folder """
 
-		return True
+        return xbmc.translatePath("special://home")
 
+    def create_backup_file_list(self):
 
-	def kodi_location(self):
+        """ creates a list of the items to back-up """
 
-		''' returns the location of the kodi folder '''
+        kodi_folder = self.kodi_location()
 
-		return xbmc.translatePath('special://home')
+        backup_candidates = []
 
+        for setting, location in LOCATIONS.items():
 
-	def create_backup_file_list(self):
+            if self.s[setting]:
 
-		''' creates a list of the items to back-up '''
+                # if the user is backing up guisettings.xml, then call for the settings to be saved using
+                # custom method
+                if setting == "backup_guisettings":
 
-		kodi_folder = self.kodi_location()
+                    log("Trying to backup guisettings, running xbmc.saveSettings")
+                    try:
+                        xbmc.saveSettings()
+                    except Exception as e:
+                        log("xbmc.saveSetting failed")
+                        log(type(e).__name__)
+                        log(e.args)
+                        log(traceback.format_exc())
 
-		backup_candidates = []
+                path = location.format(kodi_folder=kodi_folder)
 
-		for setting, location in LOCATIONS.iteritems():
+                size = self.calculate_byte_size(path)
 
-			if self.s[setting]:
+                backup_candidates.append((path, size))
 
-				# if the user is backing up guisettings.xml, then call for the settings to be saved using
-				# custom method
-				if setting == 'backup_guisettings':
+        return backup_candidates
 
-					log('Trying to backup guisettings, running xbmc.saveSettings')
-					try:
-						xbmc.saveSettings()
-					except Exception as e:
-						log('xbmc.saveSetting failed')
-						log(type(e).__name__)
-						log(e.args)
-						log(traceback.format_exc())
+    def check_target_location_for_size(self, location):
 
-				path = location.format(kodi_folder=kodi_folder)
+        """ Checks the target location to see if there is sufficient space for the tarball.
+			Returns True if there is sufficient disk space """
 
-				size = self.calculate_byte_size(path)
+        # the backup file gets created locally first, and then gets transfered, so we have to make sure both location
+        # have sufficient free space.
+        # linux cannot query freespace from remote locations, so we just have to copy and hope
 
-				backup_candidates.append((path, size))
+        # check locally
+        try:
+            st = os.statvfs(xbmc.translatePath("special://temp"))
 
-		return backup_candidates
+            requirement = self.estimate_disk_requirement()
+            if st.f_frsize:
+                available = st.f_frsize * st.f_bavail
+            else:
+                available = st.f_bsize * st.f_bavail
+            # available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
 
+            log("local required disk space: %s" % requirement)
+            log("local available disk space: %s" % available)
 
-	def check_target_location_for_size(self, location):
+            if not requirement < available:
+                return False
+        except:
+            pass
 
-		''' Checks the target location to see if there is sufficient space for the tarball.
-			Returns True if there is sufficient disk space '''
+        # check remote
+        try:
+            st = os.statvfs(location)
 
-		# the backup file gets created locally first, and then gets transfered, so we have to make sure both location
-		# have sufficient free space.
-		# linux cannot query freespace from remote locations, so we just have to copy and hope
+            requirement = self.estimate_disk_requirement()
+            if st.f_frsize:
+                available = st.f_frsize * st.f_bavail
+            else:
+                available = st.f_bsize * st.f_bavail
+            # available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
 
-		# check locally
-		try:
-			st = os.statvfs(xbmc.translatePath('special://temp'))
+            log("remote required disk space: %s" % requirement)
+            log("remote available disk space: %s" % available)
 
-			requirement = self.estimate_disk_requirement()
-			if st.f_frsize:
-				available = st.f_frsize * st.f_bavail
-			else:
-				available = st.f_bsize * st.f_bavail
-			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+            return requirement < available
+        except:
+            return True
 
-			log('local required disk space: %s' % requirement)
-			log('local available disk space: %s' % available)
+    def check_target_writeable(self, location):
 
-			if not requirement < available:
-				return False
-		except:
-			pass
+        """ tests backup location for writeability, returns True is writeable """
 
-		# check remote
-		try:
-			st = os.statvfs(location)
+        temp_file = os.path.join(location, "temp_write_test")
 
-			requirement = self.estimate_disk_requirement()
-			if st.f_frsize:
-				available = st.f_frsize * st.f_bavail
-			else:
-				available = st.f_bsize * st.f_bavail
-			# available	= st.f_bfree/float(st.f_blocks) * 100 * st.f_bsize
+        f = xbmcvfs.File(temp_file, "w")
 
-			log('remote required disk space: %s' % requirement)
-			log('remote available disk space: %s' % available)
+        try:
+            result = f.write("buffer")
+        except:
+            log("%s is not writeable" % location)
+            f.close()
+            return False
 
-			return requirement < available
-		except:
-			return True
+        f.close()
 
+        try:
+            xbmcvfs.delete(temp_file)
+        except:
+            log("Cannot delete temp file at %s" % location)
 
-	def check_target_writeable(self, location):
+        return True
 
-		''' tests backup location for writeability, returns True is writeable '''
+    def estimate_disk_requirement(self, func=None):
 
-		temp_file = os.path.join(location, 'temp_write_test')
+        sizes = [x[1] for x in self.backup_candidates]
 
-		f = xbmcvfs.File(temp_file, 'w')
+        if func == "log":
 
-		try:
-			result = f.write('buffer')
-		except:
-			log('%s is not writeable' % location)
-			f.close()
-			return False
+            sizes = [math.log(x) for x in sizes if x]
 
-		f.close()
+        return sum(sizes)
 
-		try:
-			xbmcvfs.delete(temp_file)
-		except:
-			log('Cannot delete temp file at %s' % location)
+    def copy_fstab_to_userdata(self, location):
+        """ Copy /etc/fstab to the userdata folder so that it can be backed up. """
 
-		return True
+        try:
+            xbmcvfs.delete(location)
+        except:
+            log("Failed to delete temporary fstab")
 
+        success = xbmcvfs.copy("/etc/fstab", location)
 
-	def estimate_disk_requirement(self, func=None):
+        if success:
+            log("fstab file successfully copied to userdata")
 
-		sizes = [x[1] for x in self.backup_candidates]
+        else:
+            log("Failed to copy fstab file to userdata.")
+            raise
 
-		if func == 'log':
+    def copy_fstab_to_etc(self, location):
+        """ Copy /etc/fstab to the userdata folder so that it can be backed up. """
 
-			sizes = [math.log(x) for x in sizes if x]
+        try:
+            subprocess.Popen(["sudo", "mv", location, "/etc"])
 
-		return sum(sizes)
+        except:
+            log("Failed to copy fstab file to /etc.")
+            raise
 
+    def create_tarball(self):
 
-	def copy_fstab_to_userdata(self, location):
-		''' Copy /etc/fstab to the userdata folder so that it can be backed up. '''
+        """ takes the file list and creates a tarball in the backup location """
 
-		try:
-			xbmcvfs.delete(location)
-		except:
-			log('Failed to delete temporary fstab')
+        location = self.s["backup_location"]
 
-		success = xbmcvfs.copy('/etc/fstab', location)
+        # get list of tarballs in backup location
+        tarballs = self.list_current_tarballs(location)
 
-		if success:
-			log('fstab file successfully copied to userdata')
+        # check the users desired number of backups
+        permitted_tarball_count = self.s["tarball_count"]
 
-		else:
-			log('Failed to copy fstab file to userdata.')
-			raise
+        # determine how many extra tarballs there are
+        extras = len(tarballs) - permitted_tarball_count + 1
 
+        if extras > 0 and permitted_tarball_count != 0:
+            remove_these = tarballs[:extras]
+        else:
+            remove_these = []
 
-	def copy_fstab_to_etc(self, location):
-		''' Copy /etc/fstab to the userdata folder so that it can be backed up. '''
+        # get the tag for the backup file
+        tag = self.generate_tarball_name()
 
-		try:
-			subprocess.Popen(['sudo', 'mv', location, '/etc'])
+        # generate name for temporary tarball
+        local_tarball_name = os.path.join(
+            xbmc.translatePath("special://temp"), FILE_PATTERN % tag
+        )
 
-		except:
-			log('Failed to copy fstab file to /etc.')
-			raise			
+        # generate name for remote tarball
+        remote_tarball_name = os.path.join(location, FILE_PATTERN % tag)
 
+        # get the size of all the files that are being backed up
+        total_size = max(1, self.estimate_disk_requirement(func="log"))
+        progress_total = 0
 
-	def create_tarball(self):
-
-		''' takes the file list and creates a tarball in the backup location '''
-
-		location = self.s['backup_location']
-
-		# get list of tarballs in backup location
-		tarballs = self.list_current_tarballs(location)
-
-		# check the users desired number of backups
-		permitted_tarball_count = self.s['tarball_count']
-
-		# determine how many extra tarballs there are
-		extras = len(tarballs) - permitted_tarball_count + 1
-
-		if extras > 0 and permitted_tarball_count != 0:
-			remove_these = tarballs[:extras]
-		else:
-			remove_these = []
-
-		# get the tag for the backup file
-		tag = self.generate_tarball_name()
-
-		# generate name for temporary tarball
-		local_tarball_name = os.path.join(xbmc.translatePath('special://temp'), FILE_PATTERN % tag)
-
-		# generate name for remote tarball
-		remote_tarball_name = os.path.join(location, FILE_PATTERN % tag)
-
-		# get the size of all the files that are being backed up
-		total_size 		= max(1, self.estimate_disk_requirement(func='log'))
-		progress_total 	= 0
-
-		# create a progress bar
-		''' Controls the creation and updating of the background prgress bar in kodi.
+        # create a progress bar
+        """ Controls the creation and updating of the background prgress bar in kodi.
 			The data gets sent from the apt_cache_action script via the socket
 			percent, 	must be an integer
 			heading,	string containing the running total of items, bytes and speed
 			message, 	string containing the name of the package or the active process.
-		'''
-		pct = 0
+		"""
+        pct = 0
 
-		self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': 'Starting tar ball backup' })
+        self.progress(
+            **{
+                "percent": pct,
+                "heading": "OSMC Backup",
+                "message": "Starting tar ball backup",
+            }
+        )
 
-		new_root = xbmc.translatePath('special://home')
+        new_root = xbmc.translatePath("special://home")
 
-		try:
+        try:
 
-			f = xbmcvfs.File(local_tarball_name,'w')
+            f = xbmcvfs.File(local_tarball_name, "w")
 
-			tar = tarfile.open(fileobj=f, mode="w:gz")
+            tar = tarfile.open(fileobj=f, mode="w:gz")
 
-			for name, size in self.backup_candidates:
+            for name, size in self.backup_candidates:
 
-				# if the user wants to backup the fstab file, then copy it to userdata
-				if name.endswith('fstab'):
-					try:
-						self.copy_fstab_to_userdata(name)
-					except:
-						continue
+                # if the user wants to backup the fstab file, then copy it to userdata
+                if name.endswith("fstab"):
+                    try:
+                        self.copy_fstab_to_userdata(name)
+                    except:
+                        continue
 
-				self.progress(**{'percent':  pct, 'heading':  'OSMC Backup', 'message': '%s' % name})
+                self.progress(
+                    **{"percent": pct, "heading": "OSMC Backup", "message": "%s" % name}
+                )
 
-				try:
-					new_path = os.path.relpath(name, new_root)
-					tar.add(name, arcname=new_path)
-				except:
-					log('%s failed to backup to tarball' % name)
-					continue
+                try:
+                    new_path = os.path.relpath(name, new_root)
+                    tar.add(name, arcname=new_path)
+                except:
+                    log("%s failed to backup to tarball" % name)
+                    continue
 
-				progress_total += math.log(max(size, 1))
+                progress_total += math.log(max(size, 1))
 
-				pct = int( (progress_total / float(total_size) ) * 100.0 )
+                pct = int((progress_total / float(total_size)) * 100.0)
 
-			tar.close()
+            tar.close()
 
-			f.close()
+            f.close()
 
-			# copy the local file to remote location
-			self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Transferring backup file'})
+            # copy the local file to remote location
+            self.progress(
+                **{
+                    "percent": 100,
+                    "heading": "OSMC Backup",
+                    "message": "Transferring backup file",
+                }
+            )
 
-			log('local tarball name: %s'   % local_tarball_name)
-			log('local tarball exists: %s' % os.path.isfile(local_tarball_name))
-			log('remote tarball name: %s'  % remote_tarball_name)
-			log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
+            log("local tarball name: %s" % local_tarball_name)
+            log("local tarball exists: %s" % os.path.isfile(local_tarball_name))
+            log("remote tarball name: %s" % remote_tarball_name)
+            log("remote tarball exists: %s" % os.path.isfile(remote_tarball_name))
 
-			success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+            success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
-			if success:
-				log('Backup file successfully transferred')
+            if success:
+                log("Backup file successfully transferred")
 
-				try:
-					xbmcvfs.delete(local_tarball_name)
-				except:
-					log('Cannot delete temp file at %s' % local_tarball_name)
+                try:
+                    xbmcvfs.delete(local_tarball_name)
+                except:
+                    log("Cannot delete temp file at %s" % local_tarball_name)
 
-			else:
-				log('Transfer of backup file not successful: %s' % success)
+            else:
+                log("Transfer of backup file not successful: %s" % success)
 
-				self.progress(kill=True)
+                self.progress(kill=True)
 
-				ok = DIALOG.ok('Backup failed', 'Backup failed to copy the tar file.')
+                ok = DIALOG.ok("Backup failed", "Backup failed to copy the tar file.")
 
-				try:
-						xbmcvfs.delete(local_tarball_name)
-				except:
-						log('Cannot delete temp file at %s' % local_tarball_name)
+                try:
+                    xbmcvfs.delete(local_tarball_name)
+                except:
+                    log("Cannot delete temp file at %s" % local_tarball_name)
 
-				return 'failed'
+                return "failed"
 
-			# remove the unneeded backups (this will only occur if the tarball is successfully created)
-			log('Removing these files: %s' % remove_these)
-			for r in remove_these:
-				try:
-					self.progress(**{'percent':  100, 'heading':  'OSMC Backup', 'message': 'Removing old backup file: %s' % r})
-					xbmcvfs.delete(os.path.join(location, r))
-				except Exception as e:
-					log('Deleting tarball failed: %s' % r)
-					log(type(e).__name__)
-					log(e.args)
-					log(traceback.format_exc())
+            # remove the unneeded backups (this will only occur if the tarball is successfully created)
+            log("Removing these files: %s" % remove_these)
+            for r in remove_these:
+                try:
+                    self.progress(
+                        **{
+                            "percent": 100,
+                            "heading": "OSMC Backup",
+                            "message": "Removing old backup file: %s" % r,
+                        }
+                    )
+                    xbmcvfs.delete(os.path.join(location, r))
+                except Exception as e:
+                    log("Deleting tarball failed: %s" % r)
+                    log(type(e).__name__)
+                    log(e.args)
+                    log(traceback.format_exc())
 
-			self.progress(kill=True)
+            self.progress(kill=True)
 
-		except Exception as e:
+        except Exception as e:
 
-			self.progress(kill=True)
+            self.progress(kill=True)
 
-			log('Creating tarball failed')
-			log(type(e).__name__)
-			log(e.args)
-			log(traceback.format_exc())
+            log("Creating tarball failed")
+            log(type(e).__name__)
+            log(e.args)
+            log(traceback.format_exc())
 
-			return 'failed'
+            return "failed"
 
+    def start_restore(self):
 
-	def start_restore(self):
-
-		''' Posts a list of backup files in the location, allows the user to choose one (including browse to a different location,
+        """ Posts a list of backup files in the location, allows the user to choose one (including browse to a different location,
 			allows the user to choose what to restore, including an ALL option.
-		'''
+		"""
 
-		location = self.s['backup_location']
+        location = self.s["backup_location"]
 
-		self.success = 'Full'
+        self.success = "Full"
 
-		current_tarballs = self.list_current_tarballs(location)
+        current_tarballs = self.list_current_tarballs(location)
 
-		# the first entry on the list dialog
-		dialog_list = [(None, 'Browse for backup file')]
+        # the first entry on the list dialog
+        dialog_list = [(None, "Browse for backup file")]
 
-		# strip the boilerplate from the file and just show the name
-		current_tarballs = [(name, self.strip_name(name, location)) for name in current_tarballs]
+        # strip the boilerplate from the file and just show the name
+        current_tarballs = [
+            (name, self.strip_name(name, location)) for name in current_tarballs
+        ]
 
-		# sort the list by date stamp (reverse)
-		current_tarballs.sort(key=lambda x: x[1], reverse=True)
+        # sort the list by date stamp (reverse)
+        current_tarballs.sort(key=lambda x: x[1], reverse=True)
 
-		# join the complete list together
-		dialog_list.extend(current_tarballs)
+        # join the complete list together
+        dialog_list.extend(current_tarballs)
 
-		back_to_select = True
+        back_to_select = True
 
-		while back_to_select:
+        while back_to_select:
 
-			# display the list
-			file_selection = DIALOG.select('Select a backup file', [x[1] for x in dialog_list])
+            # display the list
+            file_selection = DIALOG.select(
+                "Select a backup file", [x[1] for x in dialog_list]
+            )
 
-			if file_selection == -1:
-				back_to_select = False
-				continue
+            if file_selection == -1:
+                back_to_select = False
+                continue
 
-			elif file_selection == 0:
-				# open the browse dialog
+            elif file_selection == 0:
+                # open the browse dialog
 
-				backup_file = DIALOG.browse(1, 'Browse to backup file', 'files')
+                backup_file = DIALOG.browse(1, "Browse to backup file", "files")
 
-				log('User selected backup file: %s' % backup_file)
+                log("User selected backup file: %s" % backup_file)
 
-				if not backup_file:
-					# return to select window
-					log('User has not selected backup file.')
-					continue
+                if not backup_file:
+                    # return to select window
+                    log("User has not selected backup file.")
+                    continue
 
-			else:
-				# read the tar_file, post dialog with the contents
+            else:
+                # read the tar_file, post dialog with the contents
 
-				# get file_selection
-				remote_file = os.path.join(location, dialog_list[file_selection][0])
-				basename = os.path.basename(remote_file)
+                # get file_selection
+                remote_file = os.path.join(location, dialog_list[file_selection][0])
+                basename = os.path.basename(remote_file)
 
-				log('User selected backup file: %s' % remote_file)
+                log("User selected backup file: %s" % remote_file)
 
-				# this requires copying the tar_file from its stored location, to kodi/temp 
-				# xbmcvfs cannot read into tar files without copying the whole thing to memory
-				temp_copy = os.path.join(xbmc.translatePath('special://temp'), basename)
+                # this requires copying the tar_file from its stored location, to kodi/temp
+                # xbmcvfs cannot read into tar files without copying the whole thing to memory
+                temp_copy = os.path.join(xbmc.translatePath("special://temp"), basename)
 
-				result = xbmcvfs.copy(remote_file, temp_copy)
+                result = xbmcvfs.copy(remote_file, temp_copy)
 
-				if not result:
-					# copy of file failed
+                if not result:
+                    # copy of file failed
 
-					log('Failed to copy file to special://temp location')
+                    log("Failed to copy file to special://temp location")
 
-					ok = DIALOG.ok('Restore failed', 'Restore failed to copy the file.')
-					back_to_select = False
-					continue
+                    ok = DIALOG.ok("Restore failed", "Restore failed to copy the file.")
+                    back_to_select = False
+                    continue
 
-				backup_file = temp_copy
+                backup_file = temp_copy
 
-			# open local copy and check for contents
-			try:
-				with tarfile.open(backup_file, 'r:gz') as t:
-					members = t.getmembers()
+            # open local copy and check for contents
+            try:
+                with tarfile.open(backup_file, "r:gz") as t:
+                    members = t.getmembers()
 
-					# log('tarfile members: %s' % members)
+                    # log('tarfile members: %s' % members)
 
-			except Exception as e:
+            except Exception as e:
 
-				log('Opening and reading tarball failed')
-				log(type(e).__name__)
-				log(e.args)
-				log(traceback.format_exc())
+                log("Opening and reading tarball failed")
+                log(type(e).__name__)
+                log(e.args)
+                log(traceback.format_exc())
 
-				ok = DIALOG.ok('Restore failed', 'Failure to read the file.')
+                ok = DIALOG.ok("Restore failed", "Failure to read the file.")
 
-				continue
+                continue
 
-			if members:
+            if members:
 
-				# the first entry on the list dialog, tuple is (member, display name, name in tarfile, restore location)
-				tar_contents_list = [(None, 'Everything')]
+                # the first entry on the list dialog, tuple is (member, display name, name in tarfile, restore location)
+                tar_contents_list = [(None, "Everything")]
 
-				# create list of items in the tar_file for the user to select from, these are prime members; either they are the
-				# xml files or they are the base folder
+                # create list of items in the tar_file for the user to select from, these are prime members; either they are the
+                # xml files or they are the base folder
 
-				menu_items = []
-				for k, v in LABELS.iteritems():
-					for member in members:
-						if k.endswith(member.name):
-							menu_items.append((member, v))
-							break
+                menu_items = []
+                for k, v in LABELS.items():
+                    for member in members:
+                        if k.endswith(member.name):
+                            menu_items.append((member, v))
+                            break
+
+                menu_items.sort(key=lambda x: x[1])
+                tar_contents_list.extend(menu_items)
+
+                if len(tar_contents_list) < 2:
+
+                    log("Could not identify contents of backup file")
+
+                    ok = DIALOG.ok(
+                        "Restore", "Could not identify contents of backup file."
+                    )
+
+                    continue
+
+                # at the moment this only allows for a single item to be selected, however we can build our own dialog that
+                # can allow multiple selection, with the action only taking place on users OK
+                item_selection = DIALOG.select(
+                    "Select items to restore", [x[1] for x in tar_contents_list]
+                )
+
+                if item_selection == -1:
+
+                    continue
+
+                elif item_selection == 0:
+
+                    log("User has chosen to restore all items")
+                    # restore all items
+
+                    restore_items = members
+
+                else:
+
+                    # restore single item
+                    restore_item = tar_contents_list[item_selection]
+
+                    # if the item is a single xml file, then restore that member, otherwise loop through the file members
+                    # and collect the ones in the relevant folder
+                    # the identification of a single file is hackish relying upon the presence of .xml, but for the moment
+                    # we arent backing up any other single files
+
+                    if restore_item[0].name.endswith(".xml"):
+                        restore_items = []
+                        restore_items.append(restore_item[0])
+
+                        log(
+                            "User has chosen to restore a single item: %s"
+                            % restore_item[1]
+                        )
+
+                    else:
+                        log("User is restoring a folder: %s" % restore_item[1])
+                        restore_items = []
+                        for member in members:
+                            if member.name.startswith(restore_item[0].name):
+                                restore_items.append(member)
+
+                # confirm with user that they want to overwrite existing files OR extract to a different location
+                overwrite = DIALOG.select(
+                    "OSMC Restore",
+                    ["Overwrite existing files", "Select new restore folder"],
+                )
+
+                if overwrite == -1:
+                    log("User has escaped restore dialog")
+                    continue
 
-				menu_items.sort(key=lambda x: x[1])
-				tar_contents_list.extend(menu_items)
+                if overwrite == 0:
+                    # restore over existing files
+                    log("User has chosen to overwrite existing files.")
+                    restore_location = xbmc.translatePath("special://home")
 
-				if len(tar_contents_list) < 2:
+                    # check the restore_items for guisettings.xml, if found then restore that to the addon_data folder,
+                    # create the /RESET_GUISETTINGS file and write in the location of the restored guisettings.xml
+                    # change the restoring_guisettings flag so the user is informed that this change requires a restart,
+                    # or will take effect on next boot
+                    if any(
+                        [
+                            True
+                            for x in restore_items
+                            if x.name.endswith("userdata/guisettings.xml")
+                        ]
+                    ):
+                        self.restoring_guisettings = True
 
-					log('Could not identify contents of backup file')
+                    if any(
+                        [
+                            True
+                            for x in restore_items
+                            if x.name.endswith("userdata/fstab")
+                        ]
+                    ):
+                        self.restoring_fstab = True
 
-					ok = DIALOG.ok('Restore', 'Could not identify contents of backup file.')
+                elif overwrite == 1:
+                    # select new folder
+                    log("User has chosen to browse for a new restore location")
+                    restore_location = DIALOG.browse(
+                        3, "Browse to restore location", "files"
+                    )
 
-					continue
+                else:
+                    log("User has escaped restore dialog")
+                    continue
 
-				# at the moment this only allows for a single item to be selected, however we can build our own dialog that
-				# can allow multiple selection, with the action only taking place on users OK
-				item_selection = DIALOG.select('Select items to restore', [x[1] for x in tar_contents_list])
+                if restore_location == "":
+                    log("User has failed to select a restore location")
+                    continue
 
-				if item_selection == -1:
+                with tarfile.open(backup_file, "r") as t:
+                    for member in restore_items:
 
-					continue
+                        log(
+                            "attempting to restore %s to %s"
+                            % (member.name, restore_location)
+                        )
+
+                        try:
+                            # if the item is userdata/guisettings.xml then restore it to /tmp and rename it
+                            # the external script will pick it up there and overwrite the live version
+                            if (
+                                member.name.endswith("userdata/guisettings.xml")
+                                and self.restoring_guisettings
+                            ):
 
-				elif item_selection == 0:
+                                member.name = os.path.basename(member.name)
 
-					log('User has chosen to restore all items')
-					# restore all items
+                                t.extract(member, "/tmp/")
 
-					restore_items = members
+                                os.rename(
+                                    "/tmp/guisettings.xml", "/tmp/guisettings.restore"
+                                )
 
-				else:
+                            elif (
+                                member.name.endswith("userdata/fstab")
+                                and self.restoring_fstab
+                            ):
 
-					# restore single item
-					restore_item = tar_contents_list[item_selection]
+                                # restore temp version back to userdata
+                                t.extract(member, restore_location)
 
-					# if the item is a single xml file, then restore that member, otherwise loop through the file members
-					# and collect the ones in the relevant folder
-					# the identification of a single file is hackish relying upon the presence of .xml, but for the moment
-					# we arent backing up any other single files
+                                fstab_loc = os.path.join(
+                                    restore_location, os.path.basename(member.name)
+                                )
 
-					if restore_item[0].name.endswith('.xml'):
-						restore_items = []
-						restore_items.append(restore_item[0])
+                                self.restore_fstab(fstab_loc)
 
-						log('User has chosen to restore a single item: %s' % restore_item[1])
+                            else:
 
-					else:
-						log('User is restoring a folder: %s' % restore_item[1])
-						restore_items = []
-						for member in members:
-							if member.name.startswith(restore_item[0].name):
-								restore_items.append(member)
+                                t.extract(member, restore_location)
 
-				# confirm with user that they want to overwrite existing files OR extract to a different location
-				overwrite = DIALOG.select('OSMC Restore', ['Overwrite existing files', 'Select new restore folder'])
+                        except Exception as e:
 
-				if overwrite == -1:
-					log('User has escaped restore dialog')
-					continue
+                            log("Extraction of %s failed" % member.name)
+                            log(type(e).__name__)
+                            log(e.args)
+                            log(traceback.format_exc())
 
-				if overwrite == 0:
-					# restore over existing files
-					log('User has chosen to overwrite existing files.')
-					restore_location = xbmc.translatePath('special://home')
+                            if self.success == "Full":
+                                self.success = []
 
-					# check the restore_items for guisettings.xml, if found then restore that to the addon_data folder,
-					# create the /RESET_GUISETTINGS file and write in the location of the restored guisettings.xml
-					# change the restoring_guisettings flag so the user is informed that this change requires a restart,
-					# or will take effect on next boot
-					if any( [True for x in restore_items if x.name.endswith('userdata/guisettings.xml') ] ):
-						self.restoring_guisettings = True
+                            self.success.append(member.name)
 
-					if any( [True for x in restore_items if x.name.endswith('userdata/fstab') ] ):
-						self.restoring_fstab = True
+                            continue
 
+            if self.success == "Full" and not self.restoring_guisettings:
+                ok = DIALOG.ok("OSMC Restore", "Items successfully restored")
 
-				elif overwrite == 1:
-					# select new folder
-					log('User has chosen to browse for a new restore location')
-					restore_location = DIALOG.browse(3, 'Browse to restore location', 'files')
+            elif self.success == "Full" and self.restoring_guisettings:
 
-				else:
-					log('User has escaped restore dialog')
-					continue
+                back_to_select = False
 
-				if restore_location == '':
-					log('User has failed to select a restore location')
-					continue
+            else:
+                back_to_select = False
 
+            try:
+                xbmcvfs.delete(temp_copy)
+            except:
+                log("Deleting temp_copy failed. Dont worry, it might not exist.")
 
-				with tarfile.open(backup_file, 'r') as t:
-					for member in restore_items:
+        self.progress(kill=True)
 
-						log('attempting to restore %s to %s' % (member.name, restore_location))
+    def strip_name(self, name, location):
 
-						try:
-							# if the item is userdata/guisettings.xml then restore it to /tmp and rename it
-							# the external script will pick it up there and overwrite the live version
-							if member.name.endswith('userdata/guisettings.xml') and self.restoring_guisettings:
+        """ Returns the tarball file name with the boilerplate removed """
 
-								member.name = os.path.basename(member.name)
+        f = xbmcvfs.File(os.path.join(location, name))
+        s = f.size()
+        f.close()
 
-								t.extract(member, '/tmp/')
+        date_string = name.replace(".tar.gz", "").replace("OSMCBACKUP_", "")
 
-								os.rename('/tmp/guisettings.xml', '/tmp/guisettings.restore')
+        letters = []
+        count = 0
+        for char in date_string:
+            if char == "_":
+                if count < 2:
+                    letters.append("-")
+                elif count == 2:
+                    letters.append("  ")
+                else:
+                    letters.append(":")
+                count += 1
+            else:
+                letters.append(char)
 
-							elif member.name.endswith('userdata/fstab') and self.restoring_fstab:
+        if s:
+            return "Backup File  -  %s  -  %.*f MB" % (
+                "".join(letters),
+                1,
+                float(s) / 1024 / 1024,
+            )
+        else:
+            return "Backup File  -  %s" % "".join(letters)
 
-								# restore temp version back to userdata
-								t.extract(member, restore_location)
+    def generate_tarball_name(self):
 
-								fstab_loc = os.path.join(restore_location, os.path.basename(member.name))
+        """ Returns the name for the new tarball """
 
-								self.restore_fstab(fstab_loc)
+        file_tag = dt.datetime.strftime(dt.datetime.now(), TIME_PATTERN)
 
-							else:
+        return file_tag
 
-								t.extract(member, restore_location)
+    def list_current_tarballs(self, location):
 
-						except Exception as e:
+        """ Returns a list of the tarballs in the current backup location, from youngest to oldest """
 
-							log('Extraction of %s failed' % member.name)
-							log(type(e).__name__)
-							log(e.args)
-							log(traceback.format_exc())
+        pattern = FILE_PATTERN % APPENDAGE
 
-							if self.success == 'Full':	self.success = []
+        dirs, tarball_list = xbmcvfs.listdir(location)
 
-							self.success.append(member.name)
+        log("Contents of remote location: %s" % tarball_list)
 
-							continue
+        regex = re.compile(pattern)
+        tarball_list = [i for i in tarball_list if regex.search(i)]
 
-			if self.success == 'Full' and not self.restoring_guisettings:
-				ok = DIALOG.ok('OSMC Restore', 'Items successfully restored')
+        tarball_list.sort(key=lambda x: self.time_from_filename(x, pattern, location))
 
-			elif self.success == 'Full' and self.restoring_guisettings:
+        log("tarball list from location: %s" % tarball_list)
 
-				back_to_select = False
+        return tarball_list
 
-			else:
-				back_to_select = False
+    def time_from_filename(self, filename, pattern, location):
 
-			try:
-				xbmcvfs.delete(temp_copy)
-			except:
-				log('Deleting temp_copy failed. Dont worry, it might not exist.')
+        """ Returns the date of the backup that is embedded in the backup filename """
 
-		self.progress(kill=True)
+        prefix = FILE_PATTERN % APPENDAGE
 
+        # extract just the relevant part of the string
+        string = filename.replace(prefix[: prefix.index(APPENDAGE)], "").replace(
+            ".tar.gz", ""
+        )
 
-	def strip_name(self, name, location):
+        try:
+            return dt.datetime.strptime(string, TIME_PATTERN)
 
-		''' Returns the tarball file name with the boilerplate removed '''
+        except:
+            return dt.datetime(1, 1, 1, 1)
 
-		f = xbmcvfs.File(os.path.join(location, name))
-		s = f.size()
-		f.close()
+    def calculate_byte_size(self, candidate):
 
-		date_string = name.replace('.tar.gz', '').replace('OSMCBACKUP_','')
+        if os.path.isfile(candidate):
 
-		letters = []
-		count = 0
-		for char in date_string:
-			if char == '_':
-				if count < 2:
-					letters.append('-')
-				elif count == 2:
-					letters.append('  ')
-				else:
-					letters.append(':')
-				count += 1
-			else:
-				letters.append(char)
+            return os.path.getsize(candidate)
 
-		if s:
-			return 'Backup File  -  %s  -  %.*f MB' % (''.join(letters), 1, float(s)/1024/1024)
-		else:
-			return 'Backup File  -  %s' % ''.join(letters)
+        if os.path.isdir(candidate):
+            total_size = 0
+            for dirpath, dirnames, filenames in os.walk(candidate):
+                for f in filenames:
+                    fp = os.path.join(dirpath, f)
+                    try:
+                        total_size += os.path.getsize(fp)
+                    except:
+                        pass
 
+            return total_size
 
-	def generate_tarball_name(self):
+        return 0
 
-		''' Returns the name for the new tarball '''
+    def count_stored_tarballs(self, location):
 
-		file_tag = dt.datetime.strftime(dt.datetime.now(), TIME_PATTERN)
+        """ Counts the number of tarballs that are stored. Returns the count, along with the date of the earliest ball. """
 
-		return file_tag
+    def export_libraries(self):
 
+        """ calls on kodi to export the selected libraries to a single .xml file """
 
-	def list_current_tarballs(self, location):
+        # exportlibrary(music,false,filepath)
+        # The music library will be exported to a single file stored at filepath location.
 
-		''' Returns a list of the tarballs in the current backup location, from youngest to oldest '''
+        # exportlibrary(video,true,thumbs,overwrite,actorthumbs)
+        # The video library is exported to multiple files with the given options.
+        # Here thumbs, overwrite and actorthumbs are boolean values (true or false).
 
-		pattern = FILE_PATTERN % APPENDAGE
-
-		dirs, tarball_list = xbmcvfs.listdir(location)
-
-		log('Contents of remote location: %s' % tarball_list)
-
-		regex = re.compile(pattern)
-		tarball_list = [i for i in tarball_list if regex.search(i)]
-
-		tarball_list.sort(key = lambda x: self.time_from_filename(x, pattern, location))
-
-		log('tarball list from location: %s' % tarball_list)
-
-		return tarball_list
-
-
-	def time_from_filename(self, filename, pattern, location):
-
-		''' Returns the date of the backup that is embedded in the backup filename '''
-
-		prefix = FILE_PATTERN % APPENDAGE
-
-		# extract just the relevant part of the string
-		string = filename.replace(prefix[:prefix.index(APPENDAGE)], '').replace('.tar.gz', '')
-
-		try:
-			return dt.datetime.strptime(string, TIME_PATTERN)
-
-		except:
-			return dt.datetime(1,1,1,1)
-
-
-	def calculate_byte_size(self, candidate):
-
-		if os.path.isfile(candidate):
-
-			return os.path.getsize(candidate)
-
-		if os.path.isdir(candidate):
-			total_size = 0
-			for dirpath, dirnames, filenames in os.walk(candidate):
-				for f in filenames:
-					fp = os.path.join(dirpath, f)
-					try:
-						total_size += os.path.getsize(fp)
-					except:
-						pass
-
-			return total_size
-
-		return 0
-
-
-	def count_stored_tarballs(self, location):
-
-		''' Counts the number of tarballs that are stored. Returns the count, along with the date of the earliest ball. '''
-
-
-	def export_libraries(self):
-
-		''' calls on kodi to export the selected libraries to a single .xml file '''
-
-		# exportlibrary(music,false,filepath)
-		# The music library will be exported to a single file stored at filepath location.
-
-		# exportlibrary(video,true,thumbs,overwrite,actorthumbs)
-		# The video library is exported to multiple files with the given options.
-		# Here thumbs, overwrite and actorthumbs are boolean values (true or false).
-
-
-	def uniquify(self, list_with_duplicates):
-		'''Takes a list with duplicates and removes the duplicated lines, 
+    def uniquify(self, list_with_duplicates):
+        """Takes a list with duplicates and removes the duplicated lines, 
 		excluding blank lines or lines with only whitespace. Normally we
 		could just use list(set(list_with_duplicates)) but that screws with
-		the ordering of the list.'''
+		the ordering of the list."""
 
-		seen = []
-		list_without_duplicates = []
+        seen = []
+        list_without_duplicates = []
 
-		for item in list_with_duplicates:
+        for item in list_with_duplicates:
 
-			# if the line is pure whitespace, then retain it, and move on
-			if not item.strip(' \n\t\r'):
+            # if the line is pure whitespace, then retain it, and move on
+            if not item.strip(" \n\t\r"):
 
-				list_without_duplicates.append(item)
-				continue
+                list_without_duplicates.append(item)
+                continue
 
-			# if we've already added this line, then move to the next one    
-			if item in seen:
-				continue
+            # if we've already added this line, then move to the next one
+            if item in seen:
+                continue
 
-			seen.append(item)
-			list_without_duplicates.append(item)
+            seen.append(item)
+            list_without_duplicates.append(item)
 
-		return list_without_duplicates
+        return list_without_duplicates
 
+    def restore_fstab(self, location_of_backedup_fstab):
+        """ Restores the mounts in the fstab file  """
 
-	def restore_fstab(self, location_of_backedup_fstab):
-		''' Restores the mounts in the fstab file  '''
+        # run the backup file through millhams function to get a list of valid entries
+        backup_mnts = {}  # milham_mod(location_of_backedup_fstab)
+        unused_mnts = backup_mnts.copy()
+        new_lines = []
 
-		# run the backup file through millhams function to get a list of valid entries
-		backup_mnts = {}#milham_mod(location_of_backedup_fstab)
-		unused_mnts = backup_mnts.copy()
-		new_lines   = []
+        # read the current fstab file, process it line by line
+        with open("/etc/fstab", "r") as current_fstab:
 
-		# read the current fstab file, process it line by line
-		with open('/etc/fstab', 'r') as current_fstab:
-			
-			# process each line in the current fstab files
-			for line in current_fstab.readlines():
+            # process each line in the current fstab files
+            for line in current_fstab.readlines():
 
-				# determine if the line contains a valid mount
-				tup = {}#milham_mod_mini(line)
+                # determine if the line contains a valid mount
+                tup = {}  # milham_mod_mini(line)
 
-				# if not, or if the type of mount is no on this permitted list, then 
-				# add the line as-is to the new version, and then go to the next line
-				if not tup or tup.fs_vfstype not in ['nfs','cifs','bind']:
-					new_lines.append(line)
-					continue
+                # if not, or if the type of mount is no on this permitted list, then
+                # add the line as-is to the new version, and then go to the next line
+                if not tup or tup.fs_vfstype not in ["nfs", "cifs", "bind"]:
+                    new_lines.append(line)
+                    continue
 
-				# if there is a valid mount, then check that local mount point against those
-				# found in the backup file we are restoring
-				for mnt in backup_mnts:
+                # if there is a valid mount, then check that local mount point against those
+                # found in the backup file we are restoring
+                for mnt in backup_mnts:
 
-					# if the local mount point is the same, then add the existing line to the new file,
-					# put the backup mnt into new file as a comment, then remove the mnt from the
-					# list of unused backup mnts
-					if mnt.fs_file == tup.fs_file:
-						new_lines.append(line)
-						new_lines.append('#' + mnt.unparsed)
-						unused_mnts.remove(mnt)
-						break
+                    # if the local mount point is the same, then add the existing line to the new file,
+                    # put the backup mnt into new file as a comment, then remove the mnt from the
+                    # list of unused backup mnts
+                    if mnt.fs_file == tup.fs_file:
+                        new_lines.append(line)
+                        new_lines.append("#" + mnt.unparsed)
+                        unused_mnts.remove(mnt)
+                        break
 
-				else:   # no break
+                else:  # no break
 
-					# if there is no match, then just add the line as-is to the new file
-					new_lines.append(line)
+                    # if there is no match, then just add the line as-is to the new file
+                    new_lines.append(line)
 
-			# add on all the unused mnts from the backup up file at then end
-			new_lines.extend(unused_mnts)
+            # add on all the unused mnts from the backup up file at then end
+            new_lines.extend(unused_mnts)
 
-		if new_lines:
+        if new_lines:
 
-			# create the new, replacement fstab file
-			# we have to unquify the list first, as the proceedure above could result in multiple 
-			# commented out lines appearing in the restored fstab
-			# it's just easier to remove them here than avoid adding them in the first place
-			with open('/tmp/fstab', 'w') as f:
-				f.writelines(uniquify(new_lines))
+            # create the new, replacement fstab file
+            # we have to unquify the list first, as the proceedure above could result in multiple
+            # commented out lines appearing in the restored fstab
+            # it's just easier to remove them here than avoid adding them in the first place
+            with open("/tmp/fstab", "w") as f:
+                f.writelines(uniquify(new_lines))
 
-			# finally, copy the temp fstab over the live fstab
-			res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
-
-
+            # finally, copy the temp fstab over the live fstab
+            res = subprocess.call(["sudo", "mv", "/tmp/fstab", "/etc/fstab"])
 
 
 if __name__ == "__main__":
 
-	osmc_backup()
+    osmc_backup()

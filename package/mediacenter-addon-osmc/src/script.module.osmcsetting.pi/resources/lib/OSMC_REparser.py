@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 """
 DICT OF ITEMS IN CONFIG WHICH AFFECT THIS KODI SETTING
 
@@ -39,6 +37,7 @@ NEEDS A FINAL CHECK FOR HDMI_SAFE to make sure the entries related to it are rem
 import re
 import sys
 
+
 def config_to_kodi(MASTER_SETTINGS, config):
     """ Takes the existing config and uses the protocols in the MASTER_SETTINGS to extract the settings
         for use in kodi.
@@ -51,10 +50,10 @@ def config_to_kodi(MASTER_SETTINGS, config):
     # print "Settings being extracted from config.txt"
     # print "==--==--"*20
 
-    for setting, protocols in MASTER_SETTINGS.iteritems():
-        
+    for setting, protocols in MASTER_SETTINGS.items():
+
         value = general_config_get(config, **protocols)
-        
+
         # print "%s: %s" % (setting, value)
 
         extracted_settings_for_kodi[setting] = value
@@ -62,20 +61,24 @@ def config_to_kodi(MASTER_SETTINGS, config):
         # print "Setting"
     # print "==--==--"*20
 
-    # The gpio_pin_in has a default value of 17 when the lirc-rpi overlay is present.
-    # Some configs may not report a gpio_in_pin for this reason.
+    # The gpio_pin_out has a default value of 17 when the lirc-rpi overlay is present.
+    # Some configs may not report a gpio_out_pin for this reason.
     # We must presume if the lirc-rpi overlay is found that the gpio_pin setting
     # in kodi should be set at 17.
-    lirc_is_present = extracted_settings_for_kodi['lirc-rpi-overlay'] != 'defunct'
-    gpio_in_pin_is_not_present = extracted_settings_for_kodi['gpio_in_pin'] == 'defunct'
-    gpio_pin_is_not_present = extracted_settings_for_kodi['gpio_pin'] == '0'
-    if lirc_is_present & gpio_in_pin_is_not_present & gpio_pin_is_not_present:
-        extracted_settings_for_kodi['gpio_pin'] = '17'
+    lirc_is_present = extracted_settings_for_kodi["lirc-rpi-overlay"] != "defunct"
+    gpio_out_pin_is_not_present = (
+        extracted_settings_for_kodi["gpio_out_pin"] == "defunct"
+    )
+    gpio_pin_is_not_present = extracted_settings_for_kodi["gpio_pin"] == "0"
+    if lirc_is_present & gpio_out_pin_is_not_present & gpio_pin_is_not_present:
+        extracted_settings_for_kodi["gpio_pin"] = "17"
 
     return extracted_settings_for_kodi
 
 
-def general_config_get(config, config_get_patterns, config_validation, kodi_set, default, **kwargs):
+def general_config_get(
+    config, config_get_patterns, config_validation, kodi_set, default, **kwargs
+):
     """ Searches the config.txt for specific settings and returns the values when they are found.
 
         Uses the validation and kodi_set protocols to convert the config settings into kodi settings.
@@ -134,7 +137,7 @@ def kodi_to_config(MASTER_SETTINGS, config, new_settings):
 
         Returns a brand new config (list of lines)"""
 
-    # print "==--==--"*20 
+    # print "==--==--"*20
 
     # print "Settings being sent to config.txt"
 
@@ -144,8 +147,8 @@ def kodi_to_config(MASTER_SETTINGS, config, new_settings):
     # as the overlay entry is simply there to pick up legacy entries and eliminate
     # them. The non-overlay entry is the one used to put them back into the config.txt
     # file. Dictionaries aren't order in python 2, so we have to do the ordering
-    # using a sorted list of keys. (!!!!) 
-    new_setting_keys = new_settings.keys()
+    # using a sorted list of keys. (!!!!)
+    new_setting_keys = list(new_settings.keys())
     new_setting_keys.sort()
 
     for setting in new_setting_keys:
@@ -159,7 +162,9 @@ def kodi_to_config(MASTER_SETTINGS, config, new_settings):
             # print "No setting protocol for %s" % setting
             continue
         # print "RUNNING CONFIG SET FOR %s" % setting
-        config = general_config_set(config, new_settings, new_value, **setting_protocols)
+        config = general_config_set(
+            config, new_settings, new_value, **setting_protocols
+        )
 
     return config
 
@@ -300,7 +305,7 @@ def onoff_validation(config_value):
 
 def config_hdmi_boost_validation(config_value):
 
-    return generic_range_validation(config_value, range(1, 12))
+    return generic_range_validation(config_value, list(range(1, 12)))
 
 
 def soundcard_dac_validation(config_value):
@@ -336,7 +341,7 @@ def soundcard_dac_validation(config_value):
 
 def gpio_pin_validation(config_value):
 
-    return generic_range_validation(config_value, range(1, 28))
+    return generic_range_validation(config_value, list(range(1, 28)))
 
 
 def blank_check_validation(config_value):
@@ -355,42 +360,42 @@ def display_rotate_validation(config_value):
 
 def gpu_mem_1024_validation(config_value):
 
-    return generic_range_validation(config_value, range(16, 321))
+    return generic_range_validation(config_value, list(range(16, 321)))
 
 
 def gpu_mem_512_validation(config_value):
 
-    return generic_range_validation(config_value, range(16, 257))
+    return generic_range_validation(config_value, list(range(16, 257)))
 
 
 def gpu_mem_256_validation(config_value):
 
-    return generic_range_validation(config_value, range(16, 193))
+    return generic_range_validation(config_value, list(range(16, 193)))
 
 
 def hdmi_group_validation(config_value):
 
-    return generic_range_validation(config_value, range(0, 3))
+    return generic_range_validation(config_value, list(range(0, 3)))
 
 
 def hdmi_mode_validation(config_value):
 
-    return generic_range_validation(config_value, range(1, 87))
+    return generic_range_validation(config_value, list(range(1, 87)))
 
 
 def hdmi_pixel_encoding_validation(config_value):
 
-    return generic_range_validation(config_value, range(0, 5))
+    return generic_range_validation(config_value, list(range(0, 5)))
 
 
 def sdtv_aspect_validation(config_value):
 
-    return generic_range_validation(config_value, range(1, 4))
+    return generic_range_validation(config_value, list(range(1, 4)))
 
 
 def sdtv_mode_validation(config_value):
 
-    return generic_range_validation(config_value, range(0, 4))
+    return generic_range_validation(config_value, list(range(0, 4)))
 
 
 def w1gpio_validation(config_value):
@@ -755,7 +760,10 @@ MASTER_SETTINGS = {
     "decode_MPG2": {
         "default": {"function": None, "value": ""},
         "config_get_patterns": [
-            {"identify": r"\s*decode_MPG2\s*=\s*", "extract": r"\s*decode_MPG2\s*=\s*(\w+)"}
+            {
+                "identify": r"\s*decode_MPG2\s*=\s*",
+                "extract": r"\s*decode_MPG2\s*=\s*(\w+)",
+            }
         ],
         "config_set": generic_passthrough_config_set,
         "config_validation": blank_check_validation,
@@ -766,7 +774,10 @@ MASTER_SETTINGS = {
     "decode_WVC1": {
         "default": {"function": None, "value": ""},
         "config_get_patterns": [
-            {"identify": r"\s*decode_WVC1\s*=\s*", "extract": r"\s*decode_WVC1\s*=\s*(\w+)"}
+            {
+                "identify": r"\s*decode_WVC1\s*=\s*",
+                "extract": r"\s*decode_WVC1\s*=\s*(\w+)",
+            }
         ],
         "config_set": generic_passthrough_config_set,
         "config_validation": blank_check_validation,
@@ -777,7 +788,10 @@ MASTER_SETTINGS = {
     "display_rotate": {
         "default": {"function": None, "value": "0"},
         "config_get_patterns": [
-            {"identify": r"\s*display_rotate\s*=\s*", "extract": r"\s*display_rotate\s*=\s*(\w+)"}
+            {
+                "identify": r"\s*display_rotate\s*=\s*",
+                "extract": r"\s*display_rotate\s*=\s*(\w+)",
+            }
         ],
         "config_set": display_rotate_config_set,
         "config_validation": display_rotate_validation,
@@ -788,7 +802,10 @@ MASTER_SETTINGS = {
     "gpu_mem_1024": {
         "default": {"function": None, "value": "256"},
         "config_get_patterns": [
-            {"identify": r"\s*gpu_mem_1024\s*=", "extract": r"\s*gpu_mem_1024\s*=\s*(\d+)"},
+            {
+                "identify": r"\s*gpu_mem_1024\s*=",
+                "extract": r"\s*gpu_mem_1024\s*=\s*(\d+)",
+            },
             {"identify": r"\s*gpu_mem\s*=", "extract": r"\s*gpu_mem\s*=\s*(\d+)"},
         ],
         "config_set": generic_passthrough_config_set,
@@ -800,7 +817,10 @@ MASTER_SETTINGS = {
     "gpu_mem_512": {
         "default": {"function": None, "value": "144"},
         "config_get_patterns": [
-            {"identify": r"\s*gpu_mem_512\s*=", "extract": r"\s*gpu_mem_512\s*=\s*(\d+)"},
+            {
+                "identify": r"\s*gpu_mem_512\s*=",
+                "extract": r"\s*gpu_mem_512\s*=\s*(\d+)",
+            },
             {"identify": r"\s*gpu_mem\s*=", "extract": r"\s*gpu_mem\s*=\s*(\d+)"},
         ],
         "config_set": generic_passthrough_config_set,
@@ -812,7 +832,10 @@ MASTER_SETTINGS = {
     "gpu_mem_256": {
         "default": {"function": None, "value": "112"},
         "config_get_patterns": [
-            {"identify": r"\s*gpu_mem_256\s*=", "extract": r"\s*gpu_mem_256\s*=\s*(\d+)"},
+            {
+                "identify": r"\s*gpu_mem_256\s*=",
+                "extract": r"\s*gpu_mem_256\s*=\s*(\d+)",
+            },
             {"identify": r"\s*gpu_mem\s*=", "extract": r"\s*gpu_mem\s*=\s*(\d+)"},
         ],
         "config_set": generic_passthrough_config_set,
@@ -838,7 +861,10 @@ MASTER_SETTINGS = {
     "hdmi_edid_file": {
         "default": {"function": None, "value": "false"},
         "config_get_patterns": [
-            {"identify": r"\s*hdmi_edid_file\s*=", "extract": r"\s*hdmi_edid_file\s*=\s*(\d+)"}
+            {
+                "identify": r"\s*hdmi_edid_file\s*=",
+                "extract": r"\s*hdmi_edid_file\s*=\s*(\d+)",
+            }
         ],
         "config_set": generic_bool_config_set,
         "config_validation": generic_bool_validation,
@@ -860,7 +886,10 @@ MASTER_SETTINGS = {
     "hdmi_ignore_cec": {
         "default": {"function": None, "value": "false"},
         "config_get_patterns": [
-            {"identify": r"\s*hdmi_ignore_cec\s*=", "extract": r"\s*hdmi_ignore_cec\s*=\s*(\d+)"}
+            {
+                "identify": r"\s*hdmi_ignore_cec\s*=",
+                "extract": r"\s*hdmi_ignore_cec\s*=\s*(\d+)",
+            }
         ],
         "config_set": generic_bool_config_set,
         "config_validation": generic_bool_validation,
@@ -885,7 +914,10 @@ MASTER_SETTINGS = {
     "hdmi_ignore_edid": {
         "default": {"function": None, "value": "false"},
         "config_get_patterns": [
-            {"identify": r"\s*hdmi_ignore_edid\s*=", "extract": r"\s*hdmi_ignore_edid\s*=\s*(\w+)"}
+            {
+                "identify": r"\s*hdmi_ignore_edid\s*=",
+                "extract": r"\s*hdmi_ignore_edid\s*=\s*(\w+)",
+            }
         ],
         "config_set": hdmi_ignore_edid_config_set,
         "config_validation": hdmi_ignore_edid_validation,
@@ -932,7 +964,10 @@ MASTER_SETTINGS = {
     "sdtv_aspect": {
         "default": {"function": None, "value": "1"},
         "config_get_patterns": [
-            {"identify": r"\s*sdtv_aspect\s*=", "extract": r"\s*sdtv_aspect\s*=\s*(\d+)"}
+            {
+                "identify": r"\s*sdtv_aspect\s*=",
+                "extract": r"\s*sdtv_aspect\s*=\s*(\d+)",
+            }
         ],
         "config_set": sdtv_aspect_config_set,
         "config_validation": sdtv_aspect_validation,
@@ -1018,7 +1053,20 @@ MASTER_SETTINGS = {
         "already_set": False,
         "setting_stub": "",
     },
-
+    "gpio_in_pin": {
+        "default": {"function": None, "value": "defunct"},
+        "config_get_patterns": [
+            {
+                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
+                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
+            }
+        ],
+        "config_set": legacy_gpio_removal,
+        "config_validation": blank_check_validation,
+        "kodi_set": generic_passthrough_kodi_set,
+        "already_set": False,
+        "setting_stub": "",
+    },
     "gpio_in_pull": {
         "default": {"function": None, "value": "defunct"},
         "config_get_patterns": [
@@ -1035,7 +1083,7 @@ MASTER_SETTINGS = {
     },
     "gpio-ir-overlay": {
         # This group looks for the new gpio-ir setting and deletes it when found.
-        # The gpio_in_pin or gpio_pin settings control whether dtoverlay=gpio-ir
+        # The gpio_out_pin or gpio_pin settings control whether dtoverlay=gpio-ir
         # is added to the config.txt.
         "default": {"function": None, "value": "defunct"},
         "config_get_patterns": [
@@ -1058,20 +1106,6 @@ MASTER_SETTINGS = {
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\w*)",
             }
         ],
-        "config_set": legacy_gpio_removal,
-        "config_validation": blank_check_validation,
-        "kodi_set": generic_passthrough_kodi_set,
-        "already_set": False,
-        "setting_stub": "",
-    },
-    "gpio_in_pin": {
-        "default": {"function": None, "value": "defunct"},
-        "config_get_patterns": [
-            {
-                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
-                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
-            }
-        ],
         "config_set": legacy_gpio_removal,  # Coming from Kodi to the config.txt
         "config_validation": gpio_pin_validation,  # Coming from the config.txt to Kodi
         "kodi_set": generic_passthrough_kodi_set,  # Coming from the config.txt to Kodi
@@ -1085,9 +1119,9 @@ MASTER_SETTINGS = {
                 "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:gpio-ir:)?.*gpio_pin[-\w\d]*=",
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:gpio-ir:)?.*gpio_pin[-\w\d]*=\s*(\w*)",
             },
-            {  # Legacy pin in extraction
-                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=",
-                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_in_pin[-\w\d]*=\s*(\w*)",
+            {  # Legacy pin out extraction
+                "identify": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=",
+                "extract": r"\s*(?:dtoverlay|device_tree_overlay|dtparam|dtparams|device_tree_param|device_tree_params)\s*=(?:lirc-rpi:)?.*gpio_out_pin[-\w\d]*=\s*(\w*)",
             },
         ],
         "config_set": gpio_pin_config_set,
@@ -1109,7 +1143,9 @@ def read_config_file(location):
 def write_config_file(location, new_config):
 
     new_config = [
-        x + "\n" if not x.endswith("\n") else x for x in new_config if "remove_this_line" not in x
+        x + "\n" if not x.endswith("\n") else x
+        for x in new_config
+        if "remove_this_line" not in x
     ]
     # print "J" * 50
     # print new_config
@@ -1143,18 +1179,49 @@ def clean_config(config, patterns):
         # eliminate lines that match any of the patterns
         if any([re.search(pat, pure_line) for pat in patterns]):
             comment_out_list.append(line)
-    new_config = [line if line not in comment_out_list else "#" + line for line in config]
+    new_config = [
+        line if line not in comment_out_list else "#" + line for line in config
+    ]
 
     return new_config
 
 
 if __name__ == "__main__":
 
-    import subprocess
+    final_raw_inputs = []
+    final_inputs = []
+    final_outputs = []
 
-    config = read_config_file('/boot/config.txt')
-    original_config = config[::]
-    extracted_settings = config_to_kodi(MASTER_SETTINGS, config)
-    new_settings = kodi_to_config(MASTER_SETTINGS, original_config, extracted_settings)
-    write_config_file('/var/tmp/config.txt', new_settings)
-    subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config.txt'])
+    from glob import glob
+
+    fyles = glob("configs/config*.txt")
+    fyles.sort()
+    print(fyles)
+
+    for fyle in fyles:
+        with open(fyle, "r") as f:
+            lines = f.readlines()
+        from_config = config_to_kodi(MASTER_SETTINGS, lines)
+        from_kodi = kodi_to_config(MASTER_SETTINGS, lines, from_config)
+
+        final_raw_inputs.append(lines)
+        final_inputs.append(from_config)
+        final_outputs.append(from_kodi)
+
+    with open("combined_config_example.txt", "w") as f:
+        for fyle, raw, inp, outp in zip(
+            fyles, final_raw_inputs, final_inputs, final_outputs
+        ):
+            f.write("File: %s\n" % fyle)
+            f.write("--== Raw Input ==--\n")
+            f.writelines(
+                ["\t%s" % x if x.endswith("\n") else "\t%s\n" % x for x in raw]
+            )
+            f.write("--== Going to Kodi ==--\n")
+            conf_lines = ["\t%s: %s\n" % (k, v) for k, v in inp.items()]
+            conf_lines.sort()
+            f.writelines(conf_lines)
+            f.write("--== Going Back to Config.txt ==--\n")
+            outp.sort()
+            f.writelines([x + "\n" for x in outp])
+            f.write("\n\n")

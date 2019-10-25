@@ -1,4 +1,3 @@
-
 import os
 import re
 import subprocess
@@ -7,144 +6,150 @@ import sys
 import xbmc
 import xbmcaddon
 
-__addon__ = xbmcaddon.Addon('script.module.osmcsetting.networking')
+__addon__ = xbmcaddon.Addon("script.module.osmcsetting.networking")
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib')))
+sys.path.append(
+    xbmc.translatePath(os.path.join(__addon__.getAddonInfo("path"), "resources", "lib"))
+)
 
-import xmltodict as xmltodict
+from . import xmltodict as xmltodict
 
 
 class AdvancedSettingsEditor(object):
+    def __init__(self, logging_function=None):
 
+        if logging_function is None:
+            self.log = self.null_log
 
-	def __init__(self, logging_function=None):
+        else:
+            self.log = logging_function
 
-		if logging_function is None:
-			self.log = self.null_log
+    def null_log(self):
 
-		else:
-			self.log = logging_function
+        pass
 
+    def parse_advanced_settings(self):
+        """ Parses the advancedsettings.xml file. Returns a dict with ALL the details. """
 
-	def null_log(self):
+        user_data = xbmc.translatePath("special://userdata")
+        loc = os.path.join(user_data, "advancedsettings.xml")
 
-		pass
+        null_doc = {"advancedsettings": {}}
 
+        self.log("advancedsettings file exists = %s" % os.path.isfile(loc))
 
-	def parse_advanced_settings(self):
-		''' Parses the advancedsettings.xml file. Returns a dict with ALL the details. '''
+        if not os.path.isfile(loc):
+            return null_doc
 
-		user_data = xbmc.translatePath( 'special://userdata')
-		loc       = os.path.join(user_data,'advancedsettings.xml')
+        try:
+            with open(loc, "r") as f:
+                lines = f.readlines()
 
-		null_doc  = {'advancedsettings': {}}
+            if not lines:
+                self.log("advancedsettings.xml file is empty")
+                raise
 
-		self.log('advancedsettings file exists = %s' % os.path.isfile(loc))
+            with open(loc, "r") as f:
+                doc = xmltodict.parse(f)
 
-		if not os.path.isfile(loc): return null_doc
+            # ensure empty advancedsettings nodes are ignored
+            if not doc.get("advancedsettings", None):
+                self.log("advancedsettings node in advancedsettings.xml file is empty")
+                raise
 
-		try:
-			with open(loc, 'r') as f:
-				lines = f.readlines()
-			
-			if not lines:
-				self.log('advancedsettings.xml file is empty')
-				raise
+            else:
+                return doc
 
-			with open(loc, 'r') as f:
-				doc = xmltodict.parse(f)
+        except:
+            self.log("error occured reading advancedsettings.xml file")
 
-			# ensure empty advancedsettings nodes are ignored
-			if not doc.get('advancedsettings', None):
-				self.log('advancedsettings node in advancedsettings.xml file is empty')
-				raise
+            return null_doc
 
-			else:
-				return doc
+    def server_not_localhost(self, dictionary):
+        """ Checks the MySQL settings to ensure neither server is on the localhost """
 
-		except:
-			self.log('error occured reading advancedsettings.xml file')
+        dbs = [
+            dictionary.get("advancedsettings", {}).get("musicdatabase", {}),
+            dictionary.get("advancedsettings", {}).get("videodatabase", {}),
+        ]
 
-			return null_doc
+        pattern = re.compile(r"(127.\d+.\d+.\d+|localhost|::1)")
 
+        # local_indicators = ['127.0.0.1', '127.0.1.1','localhost', '::1']
 
+        for db in dbs:
+            host = db.get("host", None)
+            if host:
+                if not pattern.match(host):
+                    return True
 
-	def server_not_localhost(self, dictionary):
-		''' Checks the MySQL settings to ensure neither server is on the localhost '''
+        return False
 
-		dbs = [ dictionary.get('advancedsettings',{}).get('musicdatabase',{}), 
-				dictionary.get('advancedsettings',{}).get('videodatabase',{})]
+    def validate_advset_dict(
+        self, dictionary, reject_empty=False, exclude_name=False, no_pw_ok=False
+    ):
+        """ Checks whether the provided dictionary is fully populated with MySQL settings info.
+            If reject_empty is False, then Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed.
+            If reject_empty is True,  then Blank dictionaries are rejected, AND dictionaries with no video or music database dicts are also rejected.
+            exclude_name means that the name sql item can be ignored (it is not strictly required, but the GUI ALWAYS adds it."""
 
-		pattern = re.compile(r'(127.\d+.\d+.\d+|localhost|::1)')
+        main = dictionary.get("advancedsettings", {})
 
-		# local_indicators = ['127.0.0.1', '127.0.1.1','localhost', '::1']
+        if not main:
 
-		for db in dbs:
-			host = db.get('host', None)
-			if host:
-				if not pattern.match(host):
-					return True
+            return False, "empty"
 
-		return False
+        if exclude_name:
+            sql_subitems = ["host", "port", "user", "pass"]
+        else:
+            sql_subitems = ["name", "host", "port", "user", "pass"]
 
+        if no_pw_ok:
+            sql_subitems.remove("pass")  # Don't require a password
 
-	def validate_advset_dict(self, dictionary, reject_empty=False, exclude_name=False, no_pw_ok=False):
-		''' Checks whether the provided dictionary is fully populated with MySQL settings info.
-			If reject_empty is False, then Blank dictionaries are rejected, but dictionaries with no video or music database dicts are passed.
-			If reject_empty is True,  then Blank dictionaries are rejected, AND dictionaries with no video or music database dicts are also rejected.
-			exclude_name means that the name sql item can be ignored (it is not strictly required, but the GUI ALWAYS adds it.'''
+        if "videodatabase" in main:
+            # fail if the items aren't filled in or are the default up value
+            for item in sql_subitems:
+                subitem = main.get("videodatabase", {}).get(item, False)
+                if not subitem or subitem == "___ : ___ : ___ : ___":
+                    self.log("Missing MySQL Video setting: {}".format(item))
+                    return False, "missing mysql"
 
-		main = dictionary.get('advancedsettings', {})
+        if "musicdatabase" in main:
+            for item in sql_subitems:
+                subitem = main.get("musicdatabase", {}).get(item, False)
+                if not subitem or subitem == "___ : ___ : ___ : ___":
+                    self.log("Missing MySQL Music setting: {}".format(item))
+                    return False, "missing mysql"
 
-		if not main:
+        if reject_empty:
+            if not any(["musicdatabase" in main, "videodatabase" in main]):
+                return False, "empty db fields"
 
-			return False, 'empty'
+        return True, "complete"
 
-		if exclude_name:
-			sql_subitems = ['host', 'port', 'user', 'pass']	
-		else:
-			sql_subitems = ['name', 'host', 'port', 'user', 'pass']
+    def write_advancedsettings(self, loc, dictionary):
+        """ Writes the supplied dictionary back to the advancedsettings.xml file """
 
-                if no_pw_ok:
-                        sql_subitems.remove('pass') # Don't require a password
+        if not dictionary.get("advancedsettings", None):
 
-		if 'videodatabase' in main:
-			# fail if the items aren't filled in or are the default up value
-			for item in sql_subitems:
-				subitem = main.get('videodatabase',{}).get(item, False)
-				if not subitem or subitem == '___ : ___ : ___ : ___':
-                                        self.log('Missing MySQL Video setting: {}'.format(item))
-			                return False, 'missing mysql'
+            self.log(
+                "Empty dictionary passed to advancedsettings file writer. Preventing write, backing up and removing file."
+            )
 
-		if 'musicdatabase' in main:
-			for item in sql_subitems:
-				subitem = main.get('musicdatabase',{}).get(item, False)
-				if not subitem or subitem == '___ : ___ : ___ : ___':
-                                        self.log('Missing MySQL Music setting: {}'.format(item))
-					return False, 'missing mysql'
+            subprocess.call(
+                [
+                    "sudo",
+                    "cp",
+                    loc,
+                    loc.replace("advancedsettings.xml", "advancedsettings_backup.xml"),
+                ]
+            )
 
-		if reject_empty:
-			if not any(['musicdatabase' in main, 'videodatabase' in main]):
-				return False, 'empty db fields'
+            subprocess.call(["sudo", "rm", "-f", loc])
 
-		return True, 'complete'
+            return
 
-
-	def write_advancedsettings(self, loc, dictionary):
-		''' Writes the supplied dictionary back to the advancedsettings.xml file '''
-
-		if not dictionary.get('advancedsettings', None):
-
-			self.log('Empty dictionary passed to advancedsettings file writer. Preventing write, backing up and removing file.')
-
-			subprocess.call(['sudo', 'cp', loc, loc.replace('advancedsettings.xml', 'advancedsettings_backup.xml')])
-
-			subprocess.call(['sudo', 'rm', '-f', loc])
-
-			return
-
-		with open(loc, 'w') as f:
-			xmltodict.unparse(  input_dict = dictionary, 
-								output = f, 
-								pretty = True)
+        with open(loc, "w") as f:
+            xmltodict.unparse(input_dict=dictionary, output=f, pretty=True)

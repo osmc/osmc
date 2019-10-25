@@ -1,4 +1,4 @@
-'''
+"""
 
 	The settings for OSMC are handled by the OSMC Settings Addon (OSA).
 
@@ -88,7 +88,7 @@
 	settings window closes by editing the open_settings_window. The method apply_settings will still be called by OSA, so 
 	keep that in mind.
 
-'''
+"""
 
 
 # XBMC Modules
@@ -101,196 +101,195 @@ import os
 import threading
 
 addonid = "script.module.osmcsetting.services"
-__addon__  = xbmcaddon.Addon(addonid)
+__addon__ = xbmcaddon.Addon(addonid)
 
 # Custom modules
-sys.path.append(xbmc.translatePath(os.path.join(xbmcaddon.Addon(addonid).getAddonInfo('path'), 'resources','lib')))
+sys.path.append(
+    xbmc.translatePath(
+        os.path.join(xbmcaddon.Addon(addonid).getAddonInfo("path"), "resources", "lib")
+    )
+)
 
 # OSMC SETTING Modules
 from service_selection_gui import service_selection
 
+
 def log(message):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
 
-	xbmc.log('OSMC SERVICES ' + str(message), level=xbmc.LOGDEBUG)
+    xbmc.log("OSMC SERVICES " + str(message), level=xbmc.LOGDEBUG)
 
 
 class OSMCSettingClass(threading.Thread):
 
-	''' 
+    """ 
 		A OSMCSettingClass is way to substantiate the settings of an OSMC settings module, and make them available to the 
 		OSMC Settings Addon (OSA).
 
-	'''
+	"""
 
-	def __init__(self):
+    def __init__(self):
 
-		''' 
+        """ 
 			The setting_data_method contains all the settings in the settings group, as well as the methods to call when a
 			setting_value has changed and the existing setting_value. 
-		'''
+		"""
 
-		super(OSMCSettingClass, self).__init__()
+        super(OSMCSettingClass, self).__init__()
 
-		self.addonid = "script.module.osmcsetting.services"
-		self.me = xbmcaddon.Addon(self.addonid)
+        self.addonid = "script.module.osmcsetting.services"
+        self.me = xbmcaddon.Addon(self.addonid)
 
-		# this is what is displayed in the main settings gui
-		self.shortname = 'Services'
+        # this is what is displayed in the main settings gui
+        self.shortname = "Services"
 
-		self.description = 	"""
+        self.description = """
 								This is the text that is shown on the OSG. It should describe what the settings module is for,
 								the settings it controls, and anything else you want, I suppose.
 							"""
 
-		self.setting_data_method = 	{
+        self.setting_data_method = {"none": {"setting_value": ""}}
 
-									'none': 	{
-														'setting_value' : '',
-														}								
+        # populate the settings data in the setting_data_method
+        self.populate_setting_data_method()
 
-									}
+        # a flag to determine whether a setting change requires a reboot to take effect
+        self.reboot_required = False
 
-		# populate the settings data in the setting_data_method
-		self.populate_setting_data_method()
+    def populate_setting_data_method(self):
 
-
-		# a flag to determine whether a setting change requires a reboot to take effect
-		self.reboot_required = False
-
-
-
-
-	def populate_setting_data_method(self):
-
-		'''
+        """
 			Constructs list of service tuples (service name, status[active, inactive]).
-		'''
+		"""
 
-		pass
+        pass
 
+    def run(self):
 
-	def run(self):
-
-		'''
+        """
 			The method that determines what happens when the item is clicked in the settings GUI.
 			Usually this would be __addon__.OpenSettings(), but it could be any other script.
 			This allows the creation of action buttons in the GUI, as well as allowing developers to script and skin their 
 			own user interfaces.
-		'''
+		"""
 
-		me = xbmcaddon.Addon(self.addonid)
-		scriptPath = me.getAddonInfo('path')
+        me = xbmcaddon.Addon(self.addonid)
+        scriptPath = me.getAddonInfo("path")
 
-		# 						( s_entry, service_name, running, enabled )
+        # 						( s_entry, service_name, running, enabled )
 
-		service_list = {'test1b': ('test1', 'test1a', ' (running)', True), 'test2b': ('test2','test2a', ' (enabled)', True), 'test3b': ('test3', 'test3a', '', False)}
+        service_list = {
+            "test1b": ("test1", "test1a", " (running)", True),
+            "test2b": ("test2", "test2a", " (enabled)", True),
+            "test3b": ("test3", "test3a", "", False),
+        }
 
-		xml = "ServiceBrowser_720OSMC.xml" if xbmcgui.Window(10000).getProperty("SkinHeight") == '720' else "ServiceBrowser_OSMC.xml"
+        xml = (
+            "ServiceBrowser_720OSMC.xml"
+            if xbmcgui.Window(10000).getProperty("SkinHeight") == "720"
+            else "ServiceBrowser_OSMC.xml"
+        )
 
-		creation = service_selection(xml, scriptPath, 'Default', service_list=service_list, logger=log)
-		creation.doModal()
-		del creation
+        creation = service_selection(
+            xml, scriptPath, "Default", service_list=service_list, logger=log
+        )
+        creation.doModal()
+        del creation
 
+    def apply_settings(self):
 
-	def apply_settings(self):
-
-		'''
+        """
 			This method will apply all of the settings. It calls the first_method, if it exists. 
 			Then it calls the method listed in setting_data_method for each setting. Then it calls the
 			final_method, again, if it exists.
-		'''
+		"""
 
-		pass
+        pass
 
+    def settings_retriever_xml(self):
 
-	def settings_retriever_xml(self):
-
-		''' 
+        """ 
 			Reads the stored settings (in settings.xml) and returns a dictionary with the setting_name: setting_value. This 
 			method cannot be overwritten.
-		'''
+		"""
 
-		pass
+        pass
 
+    ##############################################################################################################################
+    # 																															 #
+    def first_method(self):
 
-	##############################################################################################################################
-	#																															 #
-	def first_method(self):
-
-		''' 
+        """ 
 			The method to call before all the other setting methods are called.
 
 			For example, this could be a call to stop a service. The final method could then restart the service again. 
 			This can be used to apply the setting changes.
 
-		'''	
+		"""
 
-		pass
+        pass
 
+    def final_method(self):
 
-	def final_method(self):
-
-		''' 
+        """ 
 			The method to call after all the other setting methods have been called.
 
 			For example, in the case of the Raspberry Pi's settings module, the final writing to the config.txt can be delayed
 			until all the settings have been updated in the setting_data_method. 
 
-		'''
+		"""
 
-		pass
+        pass
 
+    def boot_method(self):
 
-	def boot_method(self):
-
-		''' 
+        """ 
 			The method to call when the OSA is first activated (on reboot)
 
-		'''
+		"""
 
-		pass
+        pass
 
-	#																															 #
-	##############################################################################################################################
+    # 																															 #
+    ##############################################################################################################################
 
+    ##############################################################################################################################
+    # 																															 #
 
-	##############################################################################################################################
-	#																															 #
-
-	''' 
+    """ 
 		Methods beyond this point are for specific settings. 
-	'''
+	"""
 
-	# SETTING METHOD
-	def method_to_apply_changes_X(self, data):
+    # SETTING METHOD
+    def method_to_apply_changes_X(self, data):
 
-		'''
+        """
 			Method for implementing changes to setting x.
 
-		'''
+		"""
 
-		log('hells yeah!')
+        log("hells yeah!")
 
-	def translate_on_populate_X(self, data, reverse=False):
+    def translate_on_populate_X(self, data, reverse=False):
 
-		'''
+        """
 			Method to translate the data before adding to the setting_data_method dict.
 
 			This is useful if you are getting the populating from an external source like the Pi's config.txt.
 			This method could end with a call to another method to populate the settings.xml from that same source.
-		'''
+		"""
 
-		# this is how you would negate the translateing of the data when the settings window closes.
-		if reverse:
-			return data
+        # this is how you would negate the translateing of the data when the settings window closes.
+        if reverse:
+            return data
 
-	#																															 #
-	##############################################################################################################################
+    # 																															 #
+    ##############################################################################################################################
+
 
 if __name__ == "__main__":
-	pass
+    pass

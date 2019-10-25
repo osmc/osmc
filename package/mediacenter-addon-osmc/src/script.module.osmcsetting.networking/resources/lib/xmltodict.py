@@ -4,11 +4,12 @@
 from xml.parsers import expat
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesImpl
+
 try:  # pragma no cover
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:  # pragma no cover
     try:
-        from StringIO import StringIO
+        from io import StringIO
     except ImportError:
         from io import StringIO
 try:  # pragma no cover
@@ -20,17 +21,17 @@ except ImportError:  # pragma no cover
         OrderedDict = dict
 
 try:  # pragma no cover
-    _basestring = basestring
+    _basestring = str
 except NameError:  # pragma no cover
     _basestring = str
 try:  # pragma no cover
-    _unicode = unicode
+    _unicode = str
 except NameError:  # pragma no cover
     _unicode = str
 
-__author__ = 'Martin Blech'
-__version__ = '0.9.2'
-__license__ = 'MIT'
+__author__ = "Martin Blech"
+__version__ = "0.9.2"
+__license__ = "MIT"
 
 
 class ParsingInterrupted(Exception):
@@ -38,19 +39,21 @@ class ParsingInterrupted(Exception):
 
 
 class _DictSAXHandler(object):
-    def __init__(self,
-                 item_depth=0,
-                 item_callback=lambda *args: True,
-                 xml_attribs=True,
-                 attr_prefix='@',
-                 cdata_key='#text',
-                 force_cdata=False,
-                 cdata_separator='',
-                 postprocessor=None,
-                 dict_constructor=OrderedDict,
-                 strip_whitespace=True,
-                 namespace_separator=':',
-                 namespaces=None):
+    def __init__(
+        self,
+        item_depth=0,
+        item_callback=lambda *args: True,
+        xml_attribs=True,
+        attr_prefix="@",
+        cdata_key="#text",
+        force_cdata=False,
+        cdata_separator="",
+        postprocessor=None,
+        dict_constructor=OrderedDict,
+        strip_whitespace=True,
+        namespace_separator=":",
+        namespaces=None,
+    ):
         self.path = []
         self.stack = []
         self.data = None
@@ -74,7 +77,7 @@ class _DictSAXHandler(object):
         i = full_name.rfind(self.namespace_separator)
         if i == -1:
             return full_name
-        namespace, name = full_name[:i], full_name[i+1:]
+        namespace, name = full_name[:i], full_name[i + 1 :]
         short_namespace = self.namespaces.get(namespace, namespace)
         if not short_namespace:
             return name
@@ -84,7 +87,7 @@ class _DictSAXHandler(object):
     def _attrs_to_dict(self, attrs):
         if isinstance(attrs, dict):
             return attrs
-        return self.dict_constructor(zip(attrs[0::2], attrs[1::2]))
+        return self.dict_constructor(list(zip(attrs[0::2], attrs[1::2])))
 
     def startElement(self, full_name, attrs):
         name = self._build_name(full_name)
@@ -94,8 +97,9 @@ class _DictSAXHandler(object):
             self.stack.append((self.item, self.data))
             if self.xml_attribs:
                 attrs = self.dict_constructor(
-                    (self.attr_prefix+self._build_name(key), value)
-                    for (key, value) in attrs.items())
+                    (self.attr_prefix + self._build_name(key), value)
+                    for (key, value) in list(attrs.items())
+                )
             else:
                 attrs = None
             self.item = attrs or None
@@ -152,8 +156,14 @@ class _DictSAXHandler(object):
         return item
 
 
-def parse(xml_input, encoding=None, expat=expat, process_namespaces=False,
-          namespace_separator=':', **kwargs):
+def parse(
+    xml_input,
+    encoding=None,
+    expat=expat,
+    process_namespaces=False,
+    namespace_separator=":",
+    **kwargs
+):
     """Parse the given XML input and convert it into a dictionary.
 
     `xml_input` can either be a `string` or a file-like object.
@@ -221,18 +231,14 @@ def parse(xml_input, encoding=None, expat=expat, process_namespaces=False,
         OrderedDict([(u'a', u'hello')])
 
     """
-    handler = _DictSAXHandler(namespace_separator=namespace_separator,
-                              **kwargs)
+    handler = _DictSAXHandler(namespace_separator=namespace_separator, **kwargs)
     if isinstance(xml_input, _unicode):
         if not encoding:
-            encoding = 'utf-8'
+            encoding = "utf-8"
         xml_input = xml_input.encode(encoding)
     if not process_namespaces:
         namespace_separator = None
-    parser = expat.ParserCreate(
-        encoding,
-        namespace_separator
-    )
+    parser = expat.ParserCreate(encoding, namespace_separator)
     try:
         parser.ordered_attributes = True
     except AttributeError:
@@ -249,27 +255,33 @@ def parse(xml_input, encoding=None, expat=expat, process_namespaces=False,
     return handler.item
 
 
-def _emit(key, value, content_handler,
-          attr_prefix='@',
-          cdata_key='#text',
-          depth=0,
-          preprocessor=None,
-          pretty=False,
-          newl='\n',
-          indent='\t',
-          full_document=True):
+def _emit(
+    key,
+    value,
+    content_handler,
+    attr_prefix="@",
+    cdata_key="#text",
+    depth=0,
+    preprocessor=None,
+    pretty=False,
+    newl="\n",
+    indent="\t",
+    full_document=True,
+):
     if preprocessor is not None:
         result = preprocessor(key, value)
         if result is None:
             return
         key, value = result
-    if (not hasattr(value, '__iter__')
-            or isinstance(value, _basestring)
-            or isinstance(value, dict)):
+    if (
+        not hasattr(value, "__iter__")
+        or isinstance(value, _basestring)
+        or isinstance(value, dict)
+    ):
         value = [value]
     for index, v in enumerate(value):
         if full_document and depth == 0 and index > 0:
-            raise ValueError('document with multiple roots')
+            raise ValueError("document with multiple roots")
         if v is None:
             v = OrderedDict()
         elif not isinstance(v, dict):
@@ -279,12 +291,12 @@ def _emit(key, value, content_handler,
         cdata = None
         attrs = OrderedDict()
         children = []
-        for ik, iv in v.items():
+        for ik, iv in list(v.items()):
             if ik == cdata_key:
                 cdata = iv
                 continue
             if ik.startswith(attr_prefix):
-                attrs[ik[len(attr_prefix):]] = iv
+                attrs[ik[len(attr_prefix) :]] = iv
                 continue
             children.append((ik, iv))
         if pretty:
@@ -293,9 +305,18 @@ def _emit(key, value, content_handler,
         if pretty and children:
             content_handler.ignorableWhitespace(newl)
         for child_key, child_value in children:
-            _emit(child_key, child_value, content_handler,
-                  attr_prefix, cdata_key, depth+1, preprocessor,
-                  pretty, newl, indent)
+            _emit(
+                child_key,
+                child_value,
+                content_handler,
+                attr_prefix,
+                cdata_key,
+                depth + 1,
+                preprocessor,
+                pretty,
+                newl,
+                indent,
+            )
         if cdata is not None:
             content_handler.characters(cdata)
         if pretty and children:
@@ -305,8 +326,7 @@ def _emit(key, value, content_handler,
             content_handler.ignorableWhitespace(newl)
 
 
-def unparse(input_dict, output=None, encoding='utf-8', full_document=True,
-            **kwargs):
+def unparse(input_dict, output=None, encoding="utf-8", full_document=True, **kwargs):
     """Emit an XML document for the given `input_dict` (reverse of `parse`).
 
     The resulting XML document is returned as a string, but if `output` (a
@@ -322,7 +342,7 @@ def unparse(input_dict, output=None, encoding='utf-8', full_document=True,
 
     """
     if full_document and len(input_dict) != 1:
-        raise ValueError('Document must have exactly one root.')
+        raise ValueError("Document must have exactly one root.")
     must_return = False
     if output is None:
         output = StringIO()
@@ -330,9 +350,8 @@ def unparse(input_dict, output=None, encoding='utf-8', full_document=True,
     content_handler = XMLGenerator(output, encoding)
     if full_document:
         content_handler.startDocument()
-    for key, value in input_dict.items():
-        _emit(key, value, content_handler, full_document=full_document,
-              **kwargs)
+    for key, value in list(input_dict.items()):
+        _emit(key, value, content_handler, full_document=full_document, **kwargs)
     if full_document:
         content_handler.endDocument()
     if must_return:
@@ -343,7 +362,8 @@ def unparse(input_dict, output=None, encoding='utf-8', full_document=True,
             pass
         return value
 
-if __name__ == '__main__':  # pragma: no cover
+
+if __name__ == "__main__":  # pragma: no cover
     import sys
     import marshal
 
@@ -355,10 +375,12 @@ if __name__ == '__main__':  # pragma: no cover
         return True
 
     try:
-        root = parse(sys.stdin,
-                     item_depth=item_depth,
-                     item_callback=handle_item,
-                     dict_constructor=dict)
+        root = parse(
+            sys.stdin,
+            item_depth=item_depth,
+            item_callback=handle_item,
+            dict_constructor=dict,
+        )
         if item_depth == 0:
             handle_item([], root)
     except KeyboardInterrupt:

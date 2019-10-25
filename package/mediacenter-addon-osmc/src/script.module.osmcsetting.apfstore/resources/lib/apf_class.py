@@ -1,4 +1,3 @@
-
 # KODI modules
 import xbmc
 import xbmcaddon
@@ -11,36 +10,36 @@ import hashlib
 import random
 
 
-addonid 	= "script.module.osmcsetting.apfstore"
-__addon__  	= xbmcaddon.Addon(addonid)
-__path__ 	= xbmc.translatePath(xbmcaddon.Addon(addonid).getAddonInfo('path'))
+addonid = "script.module.osmcsetting.apfstore"
+__addon__ = xbmcaddon.Addon(addonid)
+__path__ = xbmc.translatePath(xbmcaddon.Addon(addonid).getAddonInfo("path"))
 
 # Custom module path
-sys.path.append(os.path.join(__path__, 'resources','lib'))
+sys.path.append(os.path.join(__path__, "resources", "lib"))
 
 # OSMC SETTING Modules
-from CompLogger import comprehensive_logger as clog
+from .CompLogger import comprehensive_logger as clog
 
-ADDONART = os.path.join(__path__, 'resources','skins', 'Default', 'media')
-USERART  = os.path.join(xbmc.translatePath('special://userdata/'),'addon_data', addonid)
+ADDONART = os.path.join(__path__, "resources", "skins", "Default", "media")
+USERART = os.path.join(xbmc.translatePath("special://userdata/"), "addon_data", addonid)
 
 
 def log(message):
 
-	try:
-		message = str(message)
-	except UnicodeEncodeError:
-		message = message.encode('utf-8', 'ignore' )
-		
-	xbmc.log('OSMC APFStore class : ' + str(message), level=xbmc.LOGDEBUG)
+    try:
+        message = str(message)
+    except UnicodeEncodeError:
+        message = message.encode("utf-8", "ignore")
+
+    xbmc.log("OSMC APFStore class : " + str(message), level=xbmc.LOGDEBUG)
 
 
 def lang(id):
-	san = __addon__.getLocalizedString(id).encode( 'utf-8', 'ignore' )
-	return san 
+    san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
+    return san
 
 
-'''
+"""
 =========================
 APF JSON STRUCTURE
 =========================
@@ -58,95 +57,90 @@ APF JSON STRUCTURE
        }
    ]
 }
-'''
+"""
 
 
 class APF_obj(xbmcgui.ListItem):
+    def __init__(self):
 
-	def __init__(self):
+        xbmcgui.ListItem.__init__(self)
 
-		xbmcgui.ListItem.__init__(self)
+    def populate(self, data):
 
+        self.id = data.get("id", "none")
+        self.name = data.get("name", "none")
+        self.shortdesc = data.get("shortdesc", "")
+        self.longdesc = data.get("longdesc", "")
+        self.maintainedby = data.get("maintained-by", "")
+        self.version = data.get("version", "")
+        self.lastupdated = data.get("lastupdated", "")
+        self.iconurl = data.get("iconurl", "/none")
+        self.iconhash = data.get("iconhash", 0)
+        self.retrieve_icon = False
+        self.current_icon = self.check_icon(self.iconurl)
 
-	def populate(self, data):
+        self.installed = False
 
-		self.id 			= data.get('id', 'none')
-		self.name 			= data.get('name', 'none')
-		self.shortdesc 		= data.get('shortdesc', '')
-		self.longdesc 		= data.get('longdesc', '')
-		self.maintainedby 	= data.get('maintained-by', '')
-		self.version 		= data.get('version', '')
-		self.lastupdated 	= data.get('lastupdated', '')
-		self.iconurl 		= data.get('iconurl', '/none')
-		self.iconhash 		= data.get('iconhash', 0)
-		self.retrieve_icon  = False
-		self.current_icon   = self.check_icon(self.iconurl)
+        self.setLabel(self.name)
+        self.setProperty("Addon.Description", self.longdesc)
+        self.setProperty("Addon.Creator", self.maintainedby)
+        self.setProperty("Addon.Name", self.name)
+        self.setProperty("Addon.Version", self.version)
 
-		self.installed 		= False
+        self.setIconImage(self.current_icon)
 
-		self.setLabel(self.name)
-		self.setProperty('Addon.Description', self.longdesc)
-		self.setProperty('Addon.Creator', self.maintainedby)
-		self.setProperty('Addon.Name', self.name)
-		self.setProperty('Addon.Version', self.version)
+        return self
 
-		self.setIconImage(self.current_icon)
+    def set_installed(self, status):
 
-		return self
-		
+        if status == True:
 
-	def set_installed(self, status):
+            self.installed = True
+            self.setLabel2(lang(32005))
 
-		if status == True:
+    def refresh_icon(self):
 
-			self.installed = True
-			self.setLabel2(lang(32005))
+        self.current_icon = self.check_icon(self.iconurl)
 
+        self.setIconImage(self.current_icon)
 
-	def refresh_icon(self):
-
-		self.current_icon = self.check_icon(self.iconurl)
-
-		self.setIconImage(self.current_icon)
-
-
-	@clog(logger=log)
-	def check_icon(self, iconurl):
-		''' Checks the addon data folder for the icon,
+    @clog(logger=log)
+    def check_icon(self, iconurl):
+        """ Checks the addon data folder for the icon,
 				if not found, check for an icon stored in the addon/media folder, 
 					if not found there, mark the new icon for download by Main in a different thread, 
 					use default substitute in the meantime
 				if found, check the hash matches, if not mark new icon for download by Main in another thread,
 					use existing in meantime
-		'''
+		"""
 
-		if self.iconhash == 'NA':
+        if self.iconhash == "NA":
 
-			return os.path.join(ADDONART, 'osmc_osmclogo.png')
+            return os.path.join(ADDONART, "osmc_osmclogo.png")
 
-		icon_name = iconurl.split('/')[-1]
+        icon_name = iconurl.split("/")[-1]
 
-		if os.path.isfile(os.path.join(USERART, icon_name)):
-			# check userdata folder
+        if os.path.isfile(os.path.join(USERART, icon_name)):
+            # check userdata folder
 
-			current_icon = os.path.join(USERART, icon_name)
+            current_icon = os.path.join(USERART, icon_name)
 
-		elif os.path.isfile(os.path.join(ADDONART, icon_name)):
-			# check addon art folder
+        elif os.path.isfile(os.path.join(ADDONART, icon_name)):
+            # check addon art folder
 
-			current_icon = os.path.join(ADDONART, icon_name)
+            current_icon = os.path.join(ADDONART, icon_name)
 
-		else:
+        else:
 
-			current_icon = os.path.join(ADDONART, 'osmc_osmclogo.png')
+            current_icon = os.path.join(ADDONART, "osmc_osmclogo.png")
 
-		log('current icon = %s' % current_icon)
+        log("current icon = %s" % current_icon)
 
-		# get the hash
-		icon_hash = hashlib.md5(open(current_icon).read()).hexdigest()
+        # get the hash
+        icon_hash = hashlib.md5(open(current_icon).read()).hexdigest()
 
-		if icon_hash != self.iconhash:
+        if icon_hash != self.iconhash:
 
-			self.retrieve_icon  = True
+            self.retrieve_icon = True
 
-		return current_icon
+        return current_icon
