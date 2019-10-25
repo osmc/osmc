@@ -119,7 +119,7 @@ class ConditionCallBack(threading.Thread):
         self.condition = kwargs.get("condition", "")
         self.timing = max(kwargs.get("timing", 0), 3000)
 
-        super(ConditionCallBack, self).__init__()
+        super().__init__()
 
     def run(self):
 

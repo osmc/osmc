@@ -315,7 +315,7 @@ class OSMCGui(threading.Thread):
 
         self.queue = kwargs["queue"]
 
-        super(OSMCGui, self).__init__()
+        super().__init__()
 
         self.create_gui()
 

@@ -139,7 +139,7 @@ class OSMCSettingClass(threading.Thread):
 			setting_value has changed and the existing setting_value. 
 		"""
 
-        super(OSMCSettingClass, self).__init__()
+        super().__init__()
 
         self.addonid = "script.module.osmcsetting.services"
         self.me = xbmcaddon.Addon(self.addonid)

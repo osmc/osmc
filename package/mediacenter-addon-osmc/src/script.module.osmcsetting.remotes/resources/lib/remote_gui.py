@@ -526,7 +526,7 @@ class service_checker(threading.Thread):
 
     def __init__(self, parent):
 
-        super(service_checker, self).__init__(name="service_checker")
+        super().__init__(name="service_checker")
         self.parent = parent
         self.exit = False
 
@@ -578,7 +578,7 @@ class service_checker(threading.Thread):
 class countdown_timer(threading.Thread):
     def __init__(self, parent):
 
-        super(countdown_timer, self).__init__(name="countdown_timer")
+        super().__init__(name="countdown_timer")
         self.parent = parent
         self.exit = False
         self.countdown = self.parent.countdown_limit

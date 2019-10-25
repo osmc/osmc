@@ -334,7 +334,7 @@ class Main(object):
 
 class Operation_Progress(apt.progress.base.OpProgress):
     def __init__(self):
-        super(Operation_Progress, self).__init__()
+        super().__init__()
 
     def update(self):
 
@@ -354,7 +354,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
         self.parent = parent
 
-        super(Install_Progress, self).__init__()
+        super().__init__()
 
         call_parent(
             "progress_bar",
@@ -443,7 +443,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
 class Download_Progress(apt.progress.base.AcquireProgress):
     def __init__(self, partial_heading="Downloading"):
-        super(Download_Progress, self).__init__()
+        super().__init__()
         self.partial_heading = partial_heading
         self.fetching = "Starting Download"
         call_parent(

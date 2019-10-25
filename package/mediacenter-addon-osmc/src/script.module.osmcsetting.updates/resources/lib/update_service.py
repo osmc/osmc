@@ -90,7 +90,7 @@ def get_hardware_prefix():
 
 class Monitah(xbmc.Monitor):
     def __init__(self, **kwargs):
-        super(Monitah, self).__init__()
+        super().__init__()
 
         self.parent_queue = kwargs["parent_queue"]
 

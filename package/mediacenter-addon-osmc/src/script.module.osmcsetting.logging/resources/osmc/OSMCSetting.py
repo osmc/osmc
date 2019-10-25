@@ -137,7 +137,7 @@ class OSMCSettingClass(threading.Thread):
 			The logger simply runs specific logs. All this module does is open the Settings window.
 		"""
 
-        super(OSMCSettingClass, self).__init__()
+        super().__init__()
 
         self.addonid = addonid
         self.me = xbmcaddon.Addon(self.addonid)

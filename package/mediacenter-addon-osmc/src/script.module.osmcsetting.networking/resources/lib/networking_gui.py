@@ -2042,7 +2042,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 class bluetooth_population_thread(threading.Thread):
     def __init__(self, discovered_list_control, trusted_list_control):
 
-        super(bluetooth_population_thread, self).__init__(name=BLUETOOTH_THREAD_NAME)
+        super().__init__(name=BLUETOOTH_THREAD_NAME)
 
         self.exit = False
 
@@ -2185,7 +2185,7 @@ class bluetooth_population_thread(threading.Thread):
 class wifi_scanner_bot(threading.Thread):
     def __init__(self):
 
-        super(wifi_scanner_bot, self).__init__(name=WIFI_SCAN_THREAD_NAME)
+        super().__init__(name=WIFI_SCAN_THREAD_NAME)
 
     def run(self):
 
@@ -2195,7 +2195,7 @@ class wifi_scanner_bot(threading.Thread):
 class wifi_populate_bot(threading.Thread):
     def __init__(self, scan, wifi_list_control, conn_ssid):
 
-        super(wifi_populate_bot, self).__init__(name=WIFI_THREAD_NAME)
+        super().__init__(name=WIFI_THREAD_NAME)
 
         self.scan = scan
         self.WFP = wifi_list_control
