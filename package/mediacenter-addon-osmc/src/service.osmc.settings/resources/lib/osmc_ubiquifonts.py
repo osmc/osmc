@@ -78,7 +78,7 @@ def get_addon_folder(alien_skin_folder):
                 width = pos_loc[2]
                 break
 
-            except:
+            except Exception:
 
                 pass
 

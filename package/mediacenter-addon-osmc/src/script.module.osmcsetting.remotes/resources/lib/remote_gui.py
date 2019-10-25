@@ -98,7 +98,7 @@ def test_custom(conf):
         else:
             return False
 
-    except:
+    except Exception:
         return False
 
 
@@ -139,7 +139,7 @@ class remote_gui_launcher(object):
             try:
                 if os.stat(conf).st_size == 0:
                     continue
-            except:
+            except Exception:
                 continue
 
             local_confs.append(construct_listitem(conf))
@@ -196,7 +196,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 
         try:
             self.getControl(50).setVisible(False)
-        except:
+        except Exception:
             pass
 
         # check for RC6 file, then set the radiobutton appropriately
@@ -501,7 +501,7 @@ class remote_test(xbmcgui.WindowXMLDialog):
             self.countdown_timer.exit = True
             try:
                 self.service_checker.exit = True
-            except:
+            except Exception:
                 pass
             self.close()
 
@@ -514,7 +514,7 @@ class remote_test(xbmcgui.WindowXMLDialog):
             log("User has decided to revert to the previous conf.")
             try:
                 self.service_checker.exit = True
-            except:
+            except Exception:
                 pass
             self.countdown_timer.exit = True
             self.close()

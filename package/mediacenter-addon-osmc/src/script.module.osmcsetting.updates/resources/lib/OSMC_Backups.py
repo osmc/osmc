@@ -130,7 +130,7 @@ class osmc_backup(object):
 
                 self.parent_queue.put(msg)
 
-            except:
+            except Exception:
 
                 pass
 
@@ -242,7 +242,7 @@ class osmc_backup(object):
 
             if not requirement < available:
                 return False
-        except:
+        except Exception:
             pass
 
         # check remote
@@ -260,7 +260,7 @@ class osmc_backup(object):
             log("remote available disk space: %s" % available)
 
             return requirement < available
-        except:
+        except Exception:
             return True
 
     def check_target_writeable(self, location):
@@ -273,7 +273,7 @@ class osmc_backup(object):
 
         try:
             result = f.write("buffer")
-        except:
+        except Exception:
             log("%s is not writeable" % location)
             f.close()
             return False
@@ -282,7 +282,7 @@ class osmc_backup(object):
 
         try:
             xbmcvfs.delete(temp_file)
-        except:
+        except Exception:
             log("Cannot delete temp file at %s" % location)
 
         return True
@@ -302,7 +302,7 @@ class osmc_backup(object):
 
         try:
             xbmcvfs.delete(location)
-        except:
+        except Exception:
             log("Failed to delete temporary fstab")
 
         success = xbmcvfs.copy("/etc/fstab", location)
@@ -320,7 +320,7 @@ class osmc_backup(object):
         try:
             subprocess.Popen(["sudo", "mv", location, "/etc"])
 
-        except:
+        except Exception:
             log("Failed to copy fstab file to /etc.")
             raise
 
@@ -390,7 +390,7 @@ class osmc_backup(object):
                 if name.endswith("fstab"):
                     try:
                         self.copy_fstab_to_userdata(name)
-                    except:
+                    except Exception:
                         continue
 
                 self.progress(
@@ -400,7 +400,7 @@ class osmc_backup(object):
                 try:
                     new_path = os.path.relpath(name, new_root)
                     tar.add(name, arcname=new_path)
-                except:
+                except Exception:
                     log("%s failed to backup to tarball" % name)
                     continue
 
@@ -433,7 +433,7 @@ class osmc_backup(object):
 
                 try:
                     xbmcvfs.delete(local_tarball_name)
-                except:
+                except Exception:
                     log("Cannot delete temp file at %s" % local_tarball_name)
 
             else:
@@ -445,7 +445,7 @@ class osmc_backup(object):
 
                 try:
                     xbmcvfs.delete(local_tarball_name)
-                except:
+                except Exception:
                     log("Cannot delete temp file at %s" % local_tarball_name)
 
                 return "failed"
@@ -767,7 +767,7 @@ class osmc_backup(object):
 
             try:
                 xbmcvfs.delete(temp_copy)
-            except:
+            except Exception:
                 log("Deleting temp_copy failed. Dont worry, it might not exist.")
 
         self.progress(kill=True)
@@ -846,7 +846,7 @@ class osmc_backup(object):
         try:
             return dt.datetime.strptime(string, TIME_PATTERN)
 
-        except:
+        except Exception:
             return dt.datetime(1, 1, 1, 1)
 
     def calculate_byte_size(self, candidate):
@@ -862,7 +862,7 @@ class osmc_backup(object):
                     fp = os.path.join(dirpath, f)
                     try:
                         total_size += os.path.getsize(fp)
-                    except:
+                    except Exception:
                         pass
 
             return total_size

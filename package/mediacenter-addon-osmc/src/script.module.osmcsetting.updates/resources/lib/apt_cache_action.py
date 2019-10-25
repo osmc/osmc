@@ -305,7 +305,7 @@ class Main(object):
 
             os.remove(self.block_update_file)
 
-        except:
+        except Exception:
 
             return "Failed to remove block_update_file"
 
@@ -380,7 +380,7 @@ class Install_Progress(apt.progress.base.InstallProgress):
 
                 self.parent.error_package += " (" + pkgname[1] + ")"
 
-        except:
+        except Exception:
 
             self.parent.error_package = "(unknown package)"
 

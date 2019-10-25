@@ -28,7 +28,7 @@ try:
     sock.sendall("open")
     sock.close()
 
-except:
+except Exception:
 
     log("default failed to open")
 

@@ -19,7 +19,7 @@ def get_timezones():
 
         try:
             tz_raw = columns[2].replace("\n", "")
-        except:
+        except Exception:
             continue
 
         tmp.append(tz_raw)

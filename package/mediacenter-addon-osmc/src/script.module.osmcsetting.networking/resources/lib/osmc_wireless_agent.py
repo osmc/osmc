@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
 try:
     manager.RegisterAgent(path)
-except:
+except Exception:
     print("Cannot register connman agent.")
 
 mainloop = gobject.MainLoop()

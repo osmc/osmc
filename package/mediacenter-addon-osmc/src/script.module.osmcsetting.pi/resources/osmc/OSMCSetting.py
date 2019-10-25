@@ -181,7 +181,7 @@ Overclock settings are set using the Pi Overclock module."""
 
             self.populate_misc_info()
 
-        except:
+        except Exception:
 
             # if anything fails above, assume we are testing and look for the config
             # in the testing location

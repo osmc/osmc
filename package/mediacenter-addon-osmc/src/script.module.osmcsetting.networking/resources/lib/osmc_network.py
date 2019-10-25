@@ -290,7 +290,7 @@ def is_wifi_available():
 def is_wifi_enabled():
     try:
         return connman.is_technology_enabled("wifi")
-    except:
+    except Exception:
         return False
 
 
@@ -447,7 +447,7 @@ def check_MS_NCSI_response():
         response = requests.get("http://www.msftncsi.com/ncsi.txt")
         if response.status_code == 200 and response.text == "Microsoft NCSI":
             return True
-    except:
+    except Exception:
         pass
     return False
 
@@ -536,7 +536,7 @@ def is_valid_ipv4_address(ip):
     try:
         socket.inet_aton(ip)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -544,7 +544,7 @@ def is_valid_ipv6_address(ip):
     try:
         socket.inet_pton(socket.AF_INET6, ip)
         return True
-    except:
+    except Exception:
         return False
 
 

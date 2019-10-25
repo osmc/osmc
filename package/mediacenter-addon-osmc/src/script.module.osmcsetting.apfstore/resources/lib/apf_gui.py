@@ -63,7 +63,7 @@ class apf_GUI(xbmcgui.WindowXMLDialog):
 
         try:
             self.getControl(50).setVisible(False)
-        except:
+        except Exception:
             pass
 
         self.check_action_dict()

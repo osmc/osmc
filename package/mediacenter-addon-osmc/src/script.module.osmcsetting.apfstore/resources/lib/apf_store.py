@@ -186,7 +186,7 @@ class APF_STORE(object):
 
             return json.loads(self.json_cache)
 
-        except:
+        except Exception:
 
             return "failed"
 
@@ -206,7 +206,7 @@ class APF_STORE(object):
             date_object = dt.strptime(
                 self.json_lastupdated_record, self.TIME_STRING_PATTERN
             )
-        except:
+        except Exception:
             return False
 
         trigger = date_object + dt.timedelta(hours=self.CACHETIMEOUT)
@@ -238,7 +238,7 @@ class APF_STORE(object):
 
             try:
                 return dt.datetime.now()
-            except:
+            except Exception:
                 pass
 
         else:
@@ -277,7 +277,7 @@ class APF_STORE(object):
 
                     # return 'failed'
 
-        except:
+        except Exception:
 
             self.URL = "http://download.osmc.tv/apps/rbp2"
 
@@ -288,7 +288,7 @@ class APF_STORE(object):
                 self.URL.replace("\n", "").replace("\t", "").replace("\n", "")
             )
 
-        except:
+        except Exception:
             log("Connection to %s failed" % self.URL)
 
             return "failed"
@@ -309,7 +309,7 @@ class APF_STORE(object):
 
             return q
 
-        except:
+        except Exception:
 
             log("JSON couldnt be read: %s" % r.text)
 

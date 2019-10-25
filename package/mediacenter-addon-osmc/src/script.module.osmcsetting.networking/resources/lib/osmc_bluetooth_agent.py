@@ -192,7 +192,7 @@ if __name__ == "__main__":
     if len(args) > 0:
         try:
             device = bluezutils.find_device(args[0], options.adapter_pattern)
-        except:
+        except Exception:
             return_status("DEVICE_NOT_FOUND", ["Device not Found"])
             exit(1)
         dev_path = device.object_path

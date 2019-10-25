@@ -381,7 +381,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
         # try and find language files (Kodi 14.x)
         try:
             return [folder for folder in os.listdir("/usr/share/kodi/language/")]
-        except:
+        except Exception:
             pass
         # if we have not found yet try looking for laonguage addons (Kodi 15.x)
         languages = ["English"]
@@ -391,13 +391,13 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
         try:
             log("Contents of %s: %s" % (languagedirs[0], os.listdir(languagedirs[0])))
             language_folder_contents = os.listdir(languagedirs[0])
-        except:
+        except Exception:
             log("%s not found" % languagedirs[0])
 
         try:
             log("Contents of %s: %s" % (languagedirs[1], os.listdir(languagedirs[1])))
             language_folder_contents = os.listdir(languagedirs[1])
-        except:
+        except Exception:
             log("%s not found" % languagedirs[1])
 
         for folder in language_folder_contents:
@@ -406,7 +406,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
                     tree = ET.parse(
                         "/home/osmc/.kodi/addons/" + folder + os.sep + "addon.xml"
                     )
-                except:
+                except Exception:
                     tree = ET.parse(
                         "/usr/share/kodi/addons/" + folder + os.sep + "addon.xml"
                     )
@@ -465,7 +465,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
                 log("Leaving SSH service enabled")
 
-        except:
+        except Exception:
 
             log("ssh state change failed")
             log(traceback.format_exc())
@@ -481,7 +481,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
             )
             xbmc.sethostname(self.device_name.replace("current name: ", ""))
 
-        except:
+        except Exception:
 
             log("hostname change failed")
             log(traceback.format_exc())
@@ -510,7 +510,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
 
             try:
                 xbmc.settimezone(users_timezone)
-            except:
+            except Exception:
                 log("Failed to set users timezone: %s" % users_timezone)
                 log(traceback.format_exc())
 
@@ -552,7 +552,7 @@ class walkthru_gui(xbmcgui.WindowXMLDialog):
         try:
             # wrapped in a Try as pDialog is not always created
             self.pDialog.close()
-        except:
+        except Exception:
             pass
 
     def enter_password(self, pass_store, confirm=True, hidden=True):
@@ -1052,7 +1052,7 @@ def open_gui(networking_instance, testing=False):
                 testing=testing,
             )
             GUI.doModal()
-        except:
+        except Exception:
             log(traceback.format_exc(), xbmc.LOGERROR)
             return
 
@@ -1075,7 +1075,7 @@ def open_gui(networking_instance, testing=False):
         log("Loading Estuary")
         try:
             xbmc.setskin("skin.estuary")
-        except:
+        except Exception:
             log("Loading Estuary failed.")
 
     log("Exiting GUI")

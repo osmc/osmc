@@ -192,7 +192,7 @@ The module allows you to manually adjust:
             config_location = "/boot/config.txt"
             config = parser.read_config_file(config_location)
 
-        except:
+        except Exception:
             config_location = "/home/plaskev/Documents/config.txt"
             config = parser.read_config_file(config_location)
 

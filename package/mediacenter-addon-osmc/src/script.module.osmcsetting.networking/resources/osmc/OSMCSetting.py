@@ -272,7 +272,7 @@ class OSMCSettingClass(threading.Thread):
         # call the first method, if there is one
         try:
             self.first_method()
-        except:
+        except Exception:
             pass
 
         # apply the individual settings changes
@@ -291,13 +291,13 @@ class OSMCSettingClass(threading.Thread):
                 # if a specific apply method exists for the setting, then call that
                 try:
                     method(setting_value)
-                except:
+                except Exception:
                     pass
 
         # call the final method if there is one
         try:
             self.final_method()
-        except:
+        except Exception:
             pass
 
     def settings_retriever_xml(self):

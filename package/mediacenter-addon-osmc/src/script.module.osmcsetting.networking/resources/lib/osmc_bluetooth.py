@@ -12,7 +12,7 @@ try:
     import xbmc
     import xbmcgui
     import xbmcaddon
-except:
+except Exception:
     RUNNING_IN_KODI = False
 
 
@@ -56,7 +56,7 @@ def is_bluetooth_active():
         try:
             bluetooth.get_adapter()
             adapterFound = True
-        except:  #  catch issue where connman reports BT but Bluez can't find an adapter
+        except Exception:  #  catch issue where connman reports BT but Bluez can't find an adapter
             adapterFound = False
     return connman_status and service_status and adapterFound
 
@@ -131,7 +131,7 @@ def connect_device(deviceAddress):
     try:
         bluetooth.connect_device(deviceAddress)
         set_device_trusted(deviceAddress, True)
-    except:
+    except Exception:
         return False
     return True
 
@@ -175,7 +175,7 @@ def pair_device(deviceAddress, scriptBasePath=""):
     if not paired:
         try:
             bluetooth.remove_device(deviceAddress)
-        except:
+        except Exception:
             pass
         return False
     return paired

@@ -527,7 +527,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
             elif controlID == EXIT_CONTROL:
                 self.shutdown_process()
-        except:
+        except Exception:
             self.clear_busy_dialogue()
             log(
                 "Unhandled Exception thrown in Networking GUI\n%s"
@@ -639,7 +639,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             try:
                 socket.inet_aton(user_input)
 
-            except:
+            except Exception:
                 "The address provided is not a valid IP address.", "OSMC Network Setup"
                 ok = DIALOG.ok(lang(32004), lang(32005))
 
@@ -657,21 +657,21 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         # call the wifi checking bot to exit, if it exists
         try:
             self.wifi_populate_bot.stop_thread()
-        except:
+        except Exception:
             pass
 
     def stop_bluetooth_population_thread(self):
         if self.is_thread_running(BLUETOOTH_THREAD_NAME):
             try:
                 self.bluetooth_population_thread.stop_thread()
-            except:
+            except Exception:
                 pass
         # also make sure we have turned discocery off
         if self.bluetooth_discovering:
             self.bluetooth_discovering = not self.bluetooth_discovering
             try:
                 osmc_bluetooth.stop_discovery()
-            except:
+            except Exception:
                 pass
 
     def show_busy_dialogue(self):
@@ -826,16 +826,16 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             try:
                 pswd.setLabel("*" * len(video.get("pass", "kodi")))
                 hpwd.setLabel(video.get("pass", "kodi"))
-            except:
+            except Exception:
                 pswd.setLabel("kodi")
                 hpwd.setLabel("kodi")
             try:
                 impw.setSelected(vidlb.get("importwatchedstate", "true") == "true")
-            except:
+            except Exception:
                 impw.setSelected(False)
             try:
                 impr.setSelected(vidlb.get("importresumepoint", "true") == "true")
-            except:
+            except Exception:
                 impr.setSelected(False)
 
         else:
@@ -856,7 +856,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             try:
                 pswd.setLabel("*" * len(music.get("pass", "kodi")))
                 hpwd.setLabel(music.get("pass", "kodi"))
-            except:
+            except Exception:
                 pswd.setLabel("kodi")
                 hpwd.setLabel("kodi")
 
@@ -907,15 +907,15 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         else:
             try:
                 del sub_dict["videodatabase"]
-            except:
+            except Exception:
                 pass
             try:
                 del sub_dict["videolibrary"]["importwatchedstate"]
-            except:
+            except Exception:
                 pass
             try:
                 del sub_dict["videolibrary"]["importresumepoint"]
-            except:
+            except Exception:
                 pass
 
         if self.getControl(MYSQL_MUSIC_TOGGLE).isSelected():
@@ -933,7 +933,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         else:
             try:
                 del sub_dict["musicdatabase"]
-            except:
+            except Exception:
                 pass
 
         return {"advancedsettings": sub_dict}
@@ -1011,7 +1011,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     try:
                         self.ASE.write_advancedsettings(loc, dictionary)
 
-                    except:
+                    except Exception:
                         ok = DIALOG.ok(
                             "OSMC",
                             "Failed to write to advancedsettings.xml again.",
@@ -1028,7 +1028,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         "More details may be found in the log.",
                     )
                     log("subprocess chmod returned non-zero response")
-        except:
+        except Exception:
             log(
                 "Failed to write to advancedsettings.xml.\n\n%s"
                 % traceback.format_exc()
@@ -1047,7 +1047,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             current = self.getControl(
                 controlID + 900000 - (100000 if controlID in MYSQL_PASS else 0)
             ).getLabel()
-        except:
+        except Exception:
             log("control non-existent or has no label: %s" % controlID)
             return
 
@@ -1670,7 +1670,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
             if itm.getProperty("Connected") == "True":
                 # make sure the connected network is always at the top
                 metric += 100
-        except:
+        except Exception:
             metric = 0
 
         return metric
@@ -1714,7 +1714,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                     osmc_bluetooth.toggle_bluetooth_state(False)
                 else:
                     osmc_bluetooth.toggle_bluetooth_state(True)
-            except:
+            except Exception:
                 pass
 
             self.clear_busy_dialogue()
@@ -1730,7 +1730,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         osmc_bluetooth.start_discovery()
                     else:
                         osmc_bluetooth.stop_discovery()
-            except:
+            except Exception:
                 pass
 
             self.clear_busy_dialogue()
@@ -1760,7 +1760,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
                         try:
                             if self.connect_bluetooth(address, alias):
                                 self.bluetooth_population_thread.update_bluetooth_lists()
-                        except:
+                        except Exception:
                             pass
                         self.clear_busy_dialogue()
 
@@ -1824,7 +1824,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
         connected = False
         try:
             connected = osmc_bluetooth.connect_device(address)
-        except:
+        except Exception:
             pass
 
         if not connected:
@@ -2113,7 +2113,7 @@ class bluetooth_population_thread(threading.Thread):
         for itemIndex in items_to_be_removed:
             try:
                 list_control.removeItem(itemIndex)
-            except:
+            except Exception:
                 pass
 
         list(
@@ -2129,7 +2129,7 @@ class bluetooth_population_thread(threading.Thread):
         label = ""
         try:
             label = info["alias"].encode("utf-8")
-        except:
+        except Exception:
             log("Failed to encode BT Device Label.")
             label = address
         icon_image = "bluetooth_nc.png"
@@ -2159,7 +2159,7 @@ class bluetooth_population_thread(threading.Thread):
                 if paired
                 else osmc_bluetooth.list_discovered_devices()
             )
-        except:
+        except Exception:
             pass
 
         for address in list(devices.keys()):
@@ -2176,7 +2176,7 @@ class bluetooth_population_thread(threading.Thread):
 
         try:
             metric = int(itm.getProperty("alias"))
-        except:
+        except Exception:
             metric = 0
 
         return metric

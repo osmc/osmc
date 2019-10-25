@@ -71,7 +71,7 @@ class GuiParser(object):
 
         try:
             self.version = self.gui_settings.attrib["version"]
-        except:
+        except Exception:
             self.version = "1"
 
     def read_strings(self, *args, **kwargs):
@@ -97,7 +97,7 @@ class GuiParser(object):
                                         "string failed - %s" % line
                                     )
                                 break
-        except:
+        except Exception:
             tb = traceback.format_exc()
             system_strings["ERROR"] = tb
 
@@ -155,7 +155,7 @@ class GuiParser(object):
 
             try:
                 setting_text = setting.text.strip()
-            except:
+            except Exception:
                 setting_text = None
 
             if not setting_text:
@@ -163,15 +163,15 @@ class GuiParser(object):
 
             try:
                 section = self.system_settings[sj]
-            except:
+            except Exception:
                 try:
                     self.parsed_values.append("{}: {}".format(sj, setting_text))
-                except:
+                except Exception:
                     pass
                 continue
             try:
                 lb = self.system_strings[section["label"]]
-            except:
+            except Exception:
                 lb = s
             if section.get("options", None):
                 l = section.get("options", {}).get(setting.text, "failed")
@@ -206,7 +206,7 @@ class GuiParser(object):
                         settings = settings + self._parent_map(
                             self.gui_settings.find(sec)
                         )
-                    except:
+                    except Exception:
                         settings = settings + [
                             "=" * 40 + "\nBad section: {}\n".format(sec) + "=" * 40
                         ]
@@ -219,7 +219,7 @@ class GuiParser(object):
                         and t[0] in self.section_subset.split(",")
                     ) or self.section_subset == "all":
                         settings.append(t)
-                except:
+                except Exception:
                     pass
 
         self.settings_list = settings
@@ -252,7 +252,7 @@ class GuiParser(object):
 
         try:
             self.gui_settings = ET.parse(self.guifile).getroot()
-        except:
+        except Exception:
             return self.failure(failed_to="read guisettings file")
 
         self.set_version()
@@ -262,12 +262,12 @@ class GuiParser(object):
 
         try:
             self.read_strings()
-        except:
+        except Exception:
             return self.failure(failed_to="parse system strings")
 
         try:
             self.parse_settings()
-        except:
+        except Exception:
             return self.failure(failed_to="parse system settings")
 
         return self.parse()

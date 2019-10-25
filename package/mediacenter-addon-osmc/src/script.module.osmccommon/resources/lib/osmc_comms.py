@@ -44,7 +44,7 @@ class OSMC_Communicator(threading.Thread):
             try:
                 # I need this for testing on my laptop
                 os.remove(self.address)
-            except:
+            except Exception:
                 self.log("Connection failed to delete socket file.")
                 pass
 
@@ -92,7 +92,7 @@ class OSMC_Communicator(threading.Thread):
                 conn, addr = self.sock.accept()
             except socket.timeout:
                 continue
-            except:
+            except Exception:
                 self.log("An error occured while waiting for a connection.")
                 break
 
@@ -111,7 +111,7 @@ class OSMC_Communicator(threading.Thread):
                     data = conn.recv(81920)
                     passed = True
                     self.log("data = %s" % data)
-                except:
+                except Exception:
                     total_wait += wait
                     xbmc.sleep(wait)
 

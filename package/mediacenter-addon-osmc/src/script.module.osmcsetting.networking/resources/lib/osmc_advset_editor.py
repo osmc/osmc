@@ -61,7 +61,7 @@ class AdvancedSettingsEditor(object):
             else:
                 return doc
 
-        except:
+        except Exception:
             self.log("error occured reading advancedsettings.xml file")
 
             return null_doc

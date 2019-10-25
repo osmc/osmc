@@ -332,7 +332,7 @@ class Main(object):
                 try:
                     log("skin changed, reloading gui")
                     del self.stored_gui
-                except:
+                except Exception:
                     pass
 
                 self.create_gui()
@@ -357,7 +357,7 @@ class Main(object):
                         del (
                             self.stored_gui
                         )  # TESTING: this will mean that the gui is populated and loaded every time it opens
-                    except:
+                    except Exception:
                         pass
                     self.open_gui()
 
@@ -478,7 +478,7 @@ class Main(object):
         # 	# self.stored_gui.close()
         # 	# del self.stored_gui
 
-        # except:
+        # except Exception:
         # 	log('Failed to stop/delete stored_gui. (in wait)')
 
         try:
@@ -488,7 +488,7 @@ class Main(object):
             del self.listener
             log("Listener deleted.")
 
-        except:
+        except Exception:
             log("Failed to stop/delete listener. (in wait)")
 
     def get_sources_list(self):
@@ -515,7 +515,7 @@ class Main(object):
             self.gui_last_accessed = datetime.datetime.now()
             self.skip_check = False
 
-        except:
+        except Exception:
             # if that doesnt work then it is probably because the gui was too old and has been deleted
             # so recreate the gui and open it
 

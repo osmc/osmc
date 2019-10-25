@@ -19,7 +19,7 @@ try:
         single = "".join(lines)
         raw_sets = json.loads(single)
         settings.update(raw_sets)
-except:
+except Exception:
 
     print(
         "USAGE     : cli-remote i=Your_ip_address p=your_port u=your_username w=your_password"
@@ -54,7 +54,7 @@ except:
             if key is not None:
                 settings[key] = v
 
-        except:
+        except Exception:
             continue
 
 

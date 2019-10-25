@@ -243,7 +243,7 @@ class Main(object):
 
             try:
                 os.remove(fail_check_file)
-            except:
+            except Exception:
                 pass
 
         self.freespace_supressor = 172200
@@ -516,7 +516,7 @@ class Main(object):
         try:
             screen_height = self.window.getProperty("SkinHeight")
             screen_width = self.window.getProperty("SkinWidth")
-        except:
+        except Exception:
             screen_height = 1080
             screen_width = 1920
 
@@ -968,7 +968,7 @@ class Main(object):
                 self.pDialog.close()
                 del self.pDialog
                 return "Killed pDialog"
-            except:
+            except Exception:
                 pass
                 return "Failed to kill pDialog"
 
@@ -1007,7 +1007,7 @@ class Main(object):
                 self.pDialog.close()
                 del self.pDialog
                 return "Killed pDialog"
-            except:
+            except Exception:
                 pass
                 return "Failed to kill pDialog"
 
@@ -1098,7 +1098,7 @@ class Main(object):
         # remove the file that blocks further update checks
         try:
             os.remove(self.block_update_file)
-        except:
+        except Exception:
             pass
 
         # run an apt-cache clean
@@ -1337,7 +1337,7 @@ class Main(object):
 
             return "bail", "global lock placed on package system"
 
-        except:
+        except Exception:
 
             return "bail", "apt_pkg cache failed to open"
 
@@ -1363,7 +1363,7 @@ class Main(object):
 
                 return "passed", "no broken packages found"
 
-        except:
+        except Exception:
 
             return "bail", "check for partially installed packages failed"
 
@@ -1408,7 +1408,7 @@ class Main(object):
 
             return "bail", "global lock placed on package system"
 
-        except:
+        except Exception:
 
             return "bail", "apt cache failed to open"
 
@@ -1416,7 +1416,7 @@ class Main(object):
 
             self.cache.upgrade(True)
 
-        except:
+        except Exception:
 
             return "bail", "apt cache failed to upgrade"
 
@@ -1447,7 +1447,7 @@ class Main(object):
             # delete the block_update_file if it exists, so that the icon doesnt display on next boot
             try:
                 os.remove(self.block_update_file)
-            except:
+            except Exception:
                 pass
 
             return "bail", "There are no osmc packages"
@@ -1626,7 +1626,7 @@ class Main(object):
         try:
             if int(lv) < int(rv):
                 return True
-        except:
+        except Exception:
             pass
 
         return False
@@ -1646,7 +1646,7 @@ class Main(object):
 
         try:
             os.system("sudo apt-cache clean")
-        except:
+        except Exception:
             pass
 
     def check_for_unsupported_version(self):
@@ -1694,7 +1694,7 @@ class Main(object):
 
             return mb_to_b < available, available / 1048570
 
-        except:
+        except Exception:
 
             return False, 0
 

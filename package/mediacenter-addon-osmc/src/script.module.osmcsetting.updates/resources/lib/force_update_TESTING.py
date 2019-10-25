@@ -21,7 +21,7 @@ class Logger(object):
 
 # try:
 # 	sys.stdout = Logger("/home/kubkev/test.txt")
-# except:
+# except Exception:
 # 	pass
 
 

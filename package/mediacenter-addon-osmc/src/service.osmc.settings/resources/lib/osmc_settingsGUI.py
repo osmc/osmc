@@ -74,7 +74,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
                 try:
                     self.getControl(contr).setVisible(False)
                     contr += 100
-                except:
+                except Exception:
                     break
 
             # hide the left labels
@@ -93,7 +93,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
                 try:
                     shortname = module["SET"].shortname
-                except:
+                except Exception:
                     shortname = ""
 
                 # set the icon (texturefocus, texturenofocus)
@@ -106,7 +106,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
                 # this is a TRY just in case the module doesnt have a self.description
                 try:
                     desc = module["SET"].description
-                except:
+                except Exception:
                     desc = ""
 
                 list_item.setProperty("description", str(desc))
@@ -233,7 +233,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
                 # module_holder['SET'] = instance
                 # instance.setDaemon(True)
                 setting_instance.start()
-            # except:
+            # except Exception:
             # log('Settings window for __ %s __ failed to open' % module.get('id', "Unknown"))
 
     def left_label_toggle(self, controlID):
@@ -261,7 +261,7 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
             self.getControl(2).setText(
                 self.getControl(controlID).getSelectedItem().getProperty("description")
             )
-        except:
+        except Exception:
             pass
 
         module_icons = [
@@ -298,12 +298,12 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
         try:
             pos4 = self.getControl((self.active_page * 100) + 4)
-        except:
+        except Exception:
             pos4 = pos5
 
         try:
             pos6 = self.getControl((self.active_page * 100) + 6)
-        except:
+        except Exception:
             pos6 = pos5
 
         prev_button.setNavigation(pos5, pos5, next_button, pos4)
@@ -420,7 +420,7 @@ class OSMCGui(threading.Thread):
             m = module.get("SET", False)
             try:
                 m.apply_settings()
-            except:
+            except Exception:
                 log("apply_settings failed for %s" % m.addonid)
 
         # check is a reboot is required
@@ -431,7 +431,7 @@ class OSMCGui(threading.Thread):
                 if m.reboot_required:
                     reboot = True
                     break
-            except:
+            except Exception:
                 pass
 
         if reboot:
@@ -447,7 +447,7 @@ class OSMCGui(threading.Thread):
             self.GUI.active_page = 1
             self.GUI.next_prev_direction_changer()
             self.GUI.setFocusId(105)
-        except:
+        except Exception:
             pass
 
     @clog(log)
@@ -529,7 +529,7 @@ class OSMCGui(threading.Thread):
             log(dir(OSMCSetting))
             setting_instance = OSMCSetting.OSMCSettingClass()
             setting_instance.setDaemon(True)
-        except:
+        except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log("OSMCSetting __ %s __ failed to import" % sub_folder)
             log(exc_type)

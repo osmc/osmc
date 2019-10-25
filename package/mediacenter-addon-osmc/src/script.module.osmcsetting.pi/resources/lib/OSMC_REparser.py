@@ -335,7 +335,7 @@ def soundcard_dac_validation(config_value):
 
     try:
         return permitted.get(config_value, None)
-    except:
+    except Exception:
         return None
 
 

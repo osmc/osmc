@@ -57,7 +57,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
             with open(self.config, "r") as f:
                 self.lines = f.readlines()
 
-        except:
+        except Exception:
 
             # FOR TESTING
             self.config = "/home/plaskev/Documents/config.txt"
@@ -171,7 +171,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
                     # THIS IS JUST FOR TESTING, LAPTOP DOESNT LIKE SUDO HERE
                     try:
                         subprocess.call(["mv", tmp_loc, self.config])
-                    except:
+                    except Exception:
                         pass
 
                     log("writing ended")

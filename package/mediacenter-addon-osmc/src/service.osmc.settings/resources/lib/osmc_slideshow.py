@@ -127,7 +127,7 @@ class ConditionCallBack(threading.Thread):
 
         try:
             self.control.setVisibleCondition(self.condition)
-        except:
+        except Exception:
             log("ConditionCallBack failed")
 
 

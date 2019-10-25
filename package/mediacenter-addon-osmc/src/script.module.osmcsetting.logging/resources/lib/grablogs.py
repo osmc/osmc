@@ -502,7 +502,7 @@ SETS = {
 def log(message):
     try:
         xbmc.log("OSMC LOGGING " + str(message), level=xbmc.LOGDEBUG)
-    except:
+    except Exception:
         print(message)
 
 
@@ -511,7 +511,7 @@ def lang(id):
         san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
         return san
 
-    except:
+    except Exception:
         return "%s"
 
 
@@ -568,7 +568,7 @@ def right_now(raw=False):
                     + uptime_seconds
                     + ")"
                 )
-        except:
+        except Exception:
             time.sleep(0.2)
 
     return "Failed to retrieve time"
@@ -699,7 +699,7 @@ class Main(object):
 
         try:
             self.pDialog = xbmcgui.DialogProgressBG()
-        except:
+        except Exception:
             self.pDialog = Dummy_Progress_Dialog()
 
         self.number_of_actions = sum(
@@ -775,7 +775,7 @@ class Main(object):
         try:
             with func(actn) as f:
                 self.log_blotter.extend(f.readlines())
-        except:
+        except Exception:
             self.log_blotter.extend(["%s error" % name])
 
         self.log_blotter.extend([SECTION_END % (name, key)])
@@ -797,7 +797,7 @@ class Main(object):
 
             return True
 
-        except:
+        except Exception:
 
             log("Unable to write temporary log to %s" % TEMP_LOG_FILE)
             log("Failed")

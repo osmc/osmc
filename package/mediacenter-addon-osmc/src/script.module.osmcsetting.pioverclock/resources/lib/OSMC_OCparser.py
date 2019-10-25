@@ -39,7 +39,7 @@ from . import cpu_info
 # Get the normal setting for the Pi version as a global
 try:
     PI_CPU_INFO = cpu_info.get_clock_settings(cpu_info.get_proc_info())["normal"]
-except:
+except Exception:
     PI_CPU_INFO = None
 
 
@@ -257,7 +257,7 @@ def generic_number_validation(config_value):
 
     try:
         return int(config_value)
-    except:
+    except Exception:
         return None
 
 
@@ -312,7 +312,7 @@ def generic_number_config_set(kodi_setting, all_settings):
 
     try:
         return str(kodi_setting)
-    except:
+    except Exception:
         return "remove_this_line"
 
 
@@ -354,7 +354,7 @@ def zero_value_config_set(kodi_setting, all_settings):
     try:
         if int(kodi_setting) == 0:
             return "remove_this_line"
-    except:
+    except Exception:
         pass
 
     return kodi_setting

@@ -40,7 +40,7 @@ class communicator(threading.Thread):
             try:
                 # I need this for testing on my laptop
                 os.remove(self.address)
-            except:
+            except Exception:
                 log("Connection failed to delete socket file.")
                 pass
 
@@ -88,7 +88,7 @@ class communicator(threading.Thread):
                 conn, addr = self.sock.accept()
             except socket.timeout:
                 continue
-            except:
+            except Exception:
                 log("An error occured while waiting for a connection.")
                 break
 
@@ -107,7 +107,7 @@ class communicator(threading.Thread):
                     data = conn.recv(81920)
                     passed = True
                     log("data = %s" % data)
-                except:
+                except Exception:
                     total_wait += wait
                     xbmc.sleep(wait)
 
