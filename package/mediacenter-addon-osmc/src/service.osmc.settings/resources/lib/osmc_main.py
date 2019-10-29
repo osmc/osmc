@@ -39,7 +39,7 @@ if not os.path.isfile("/walkthrough_completed"):
 # Standard modules
 import datetime
 import json
-import Queue
+import queue
 import re
 import shutil
 import socket
@@ -166,7 +166,7 @@ class Main(object):
                 log(traceback.format_exc())
 
         # queue for communication with the comm and Main
-        self.parent_queue = Queue.Queue()
+        self.parent_queue = queue.Queue()
 
         # create socket, listen for comms
         self.listener = osmc_comms.communicator(

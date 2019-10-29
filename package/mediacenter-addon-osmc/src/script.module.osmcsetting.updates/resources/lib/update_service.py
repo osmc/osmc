@@ -4,7 +4,7 @@ from datetime import datetime
 import decimal
 import json
 import os
-import Queue
+import queue
 import random
 import socket
 import subprocess
@@ -173,7 +173,7 @@ class Main(object):
         }
 
         # queue for communication with the comm and Main
-        self.parent_queue = Queue.Queue()
+        self.parent_queue = queue.Queue()
 
         self.randomid = random.randint(0, 1000)
 
@@ -433,7 +433,7 @@ class Main(object):
 
                     log(comm_from_script, "instruction has no assigned method")
 
-        except Queue.Empty:
+        except queue.Empty:
             # the only exception that should be handled is when the queue is empty
             pass
 
