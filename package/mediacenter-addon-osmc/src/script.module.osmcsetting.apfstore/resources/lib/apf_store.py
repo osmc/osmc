@@ -10,7 +10,7 @@ import hashlib
 import threading
 import json
 import requests
-import queue
+import Queue
 import shutil
 import apt
 import traceback
@@ -318,7 +318,7 @@ class APF_STORE(object):
     @clog(logger=log)
     def retrieve_icons(self):
 
-        thread_queue = queue.Queue()
+        thread_queue = Queue.Queue()
 
         for ident, apf in self.apf_dict.items():
 
@@ -359,7 +359,7 @@ class APF_STORE(object):
 
                 q_item.refresh_icon()
 
-            except queue.Empty:
+            except Queue.Empty:
 
                 log("Queue.Empty error")
 
@@ -371,7 +371,7 @@ class APF_STORE(object):
         with os.popen("dpkg -l") as f:
             self.package_list = "".join(f.readlines())
 
-        thread_queue = queue.Queue()
+        thread_queue = Queue.Queue()
 
         for ident, apf in self.apf_dict.items():
 
@@ -416,7 +416,7 @@ class APF_STORE(object):
 
                 thread_queue.task_done()
 
-            except queue.Empty:
+            except Queue.Empty:
 
                 log("Queue.Empty error")
 

@@ -10,7 +10,6 @@ import imp
 import json
 import os
 import pickle
-import queue
 import select
 import socket
 import sys
