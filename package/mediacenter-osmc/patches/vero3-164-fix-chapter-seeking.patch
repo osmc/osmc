@@ -1,0 +1,48 @@
+From fd918b5aa90a8e36d962534a351ce4086176e2ad Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 30 Oct 2019 19:58:12 +0000
+Subject: [PATCH] Chapter seeking fix from LE
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 8cfc77a..6421e66 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -1248,7 +1248,7 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double *startpts)
+   if(m_currentPts == DVD_NOPTS_VALUE)
+     CLog::Log(LOGDEBUG, "%s - unknown position after seek", __FUNCTION__);
+   else
+-    CLog::Log(LOGDEBUG, "%s - seek ended up on time %d", __FUNCTION__, (int)(m_currentPts / DVD_TIME_BASE * 1000));
++    CLog::Log(LOGDEBUG, "%s - seek ended up on time %0.3f", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
+ 
+   // in this case the start time is requested time
+   if (startpts)
+@@ -1908,7 +1908,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+ 
+   AVChapter *ch = m_pFormatContext->chapters[chapter-1];
+   double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
+-  return SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  bool rtn = SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++  if (rtn)
++  {
++    double startpts_b;
++    if (SeekTime(DVD_TIME_TO_MSEC(dts), false, &startpts_b))
++    {
++      if (*startpts - dts < dts -startpts_b)
++        rtn = SeekTime(DVD_TIME_TO_MSEC(dts), true, startpts);
++      else
++        *startpts = startpts_b;
++    }
++  }
++  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seeking chapter:%d start:%0.3f key-frame:%0.3f ", __FUNCTION__, chapter, DVD_TIME_TO_MSEC(dts) / 1000.0, m_currentPts / DVD_TIME_BASE);
++  return rtn;
+ }
+ 
+ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+-- 
+2.7.4
+
