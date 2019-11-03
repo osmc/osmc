@@ -54,10 +54,10 @@ sys.path.append(
         os.path.join(xbmcaddon.Addon().getAddonInfo("path"), "resources", "lib")
     )
 )
-from . import osmc_walkthru
-from . import osmc_settingsGUI
-from . import osmc_comms
-from . import osmc_ubiquifonts
+import osmc_walkthru
+import osmc_settingsGUI
+import osmc_comms
+import osmc_ubiquifonts
 
 
 __addon__ = xbmcaddon.Addon()

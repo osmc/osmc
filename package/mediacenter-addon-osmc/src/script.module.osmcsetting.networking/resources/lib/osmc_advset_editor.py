@@ -13,7 +13,7 @@ sys.path.append(
     xbmc.translatePath(os.path.join(__addon__.getAddonInfo("path"), "resources", "lib"))
 )
 
-from . import xmltodict as xmltodict
+import xmltodict as xmltodict
 
 
 class AdvancedSettingsEditor(object):

@@ -1,6 +1,6 @@
-from . import connman
-from . import bluetooth
-from . import osmc_systemd
+import connman
+import bluetooth
+import osmc_systemd
 import sys
 import pexpect
 import json

@@ -34,7 +34,7 @@ NEEDS A FINAL CHECK FOR HDMI_SAFE to make sure the entries related to it are rem
 
 """
 import re
-from . import cpu_info
+import cpu_info
 
 # Get the normal setting for the Pi version as a global
 try:

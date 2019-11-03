@@ -10,7 +10,7 @@ try:
     from gi.repository import GObject
 except ImportError:
     import gobject as GObject
-from . import bluezutils
+import bluezutils
 import json
 
 PEXPECT_SOL = "SOL@"

@@ -18,7 +18,7 @@ __path__ = xbmc.translatePath(xbmcaddon.Addon(addonid).getAddonInfo("path"))
 sys.path.append(os.path.join(__path__, "resources", "lib"))
 
 # OSMC SETTING Modules
-from .CompLogger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 
 ADDONART = os.path.join(__path__, "resources", "skins", "Default", "media")

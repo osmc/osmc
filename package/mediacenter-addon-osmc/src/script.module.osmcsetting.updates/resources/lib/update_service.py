@@ -21,10 +21,10 @@ __libpath__ = xbmc.translatePath(
     os.path.join(xbmcaddon.Addon().getAddonInfo("path"), "resources", "lib")
 )
 sys.path.append(__libpath__)
-from . import comms
-from . import simple_scheduler as sched
-from . import OSMC_Backups
-from .CompLogger import comprehensive_logger as clog
+import comms
+import simple_scheduler as sched
+import OSMC_Backups
+from CompLogger import comprehensive_logger as clog
 
 __addon__ = xbmcaddon.Addon()
 __addonid__ = __addon__.getAddonInfo("id")

@@ -1,7 +1,7 @@
 import datetime
 import random
 import sys
-from .simple_scheduler import SimpleScheduler
+from simple_scheduler import SimpleScheduler
 
 
 """

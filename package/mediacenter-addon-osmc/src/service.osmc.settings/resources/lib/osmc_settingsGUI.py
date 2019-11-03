@@ -17,7 +17,7 @@ import sys
 import threading
 import time
 import traceback
-from .CompLogger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 path = xbmcaddon.Addon().getAddonInfo("path")
 lib = os.path.join(path, "resources", "lib")

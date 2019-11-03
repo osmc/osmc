@@ -19,7 +19,7 @@ DIALOG = xbmcgui.Dialog()
 sys.path.append(os.path.join(__path__, "resources", "lib"))
 
 # OSMC SETTING Modules
-from .CompLogger import comprehensive_logger as clog
+from CompLogger import comprehensive_logger as clog
 
 
 ACTION_PREVIOUS_MENU = 10

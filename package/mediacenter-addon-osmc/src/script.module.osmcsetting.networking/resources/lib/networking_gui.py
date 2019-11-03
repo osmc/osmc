@@ -7,7 +7,7 @@ import sys
 import threading
 import time
 import traceback
-from . import xmltodict
+import xmltodict
 
 # XBMC Modules
 import xbmcaddon
@@ -22,9 +22,9 @@ sys.path.append(
     xbmc.translatePath(os.path.join(__addon__.getAddonInfo("path"), "resources", "lib"))
 )
 
-from . import osmc_bluetooth
-from . import osmc_network
-from .osmc_advset_editor import AdvancedSettingsEditor
+import osmc_bluetooth
+import osmc_network
+from osmc_advset_editor import AdvancedSettingsEditor
 
 WIFI_THREAD_NAME = "wifi_population_thread"
 BLUETOOTH_THREAD_NAME = "bluetooth_population_thread"

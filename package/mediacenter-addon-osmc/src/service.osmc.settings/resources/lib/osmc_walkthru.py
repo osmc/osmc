@@ -20,9 +20,9 @@ sys.path.append(
 )
 
 # Custom Modules
-from . import osmc_timezones
-from . import LICENSE
-from . import WARRANTY
+import osmc_timezones
+import LICENSE
+import WARRANTY
 
 EULA = LICENSE.license
 WARR = WARRANTY.warranty

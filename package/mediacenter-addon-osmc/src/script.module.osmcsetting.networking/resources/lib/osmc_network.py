@@ -1,4 +1,4 @@
-from . import connman
+import connman
 import dbus
 import time
 import subprocess
@@ -8,7 +8,7 @@ import os
 import os.path
 import requests
 import socket
-from . import osmc_systemd
+import osmc_systemd
 
 WIRELESS_AGENT = "osmc_wireless_agent.py"
 

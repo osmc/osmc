@@ -26,9 +26,9 @@ __setting__ = __addon__.getSetting
 sys.path.append(os.path.join(__path__, "resources", "lib"))
 
 # OSMC SETTING Modules
-from .CompLogger import comprehensive_logger as clog
-from .apf_class import APF_obj
-from .apf_gui import apf_GUI
+from CompLogger import comprehensive_logger as clog
+from apf_class import APF_obj
+from apf_gui import apf_GUI
 
 
 ADDONART = os.path.join(__path__, "resources", "skins", "Default", "media")
