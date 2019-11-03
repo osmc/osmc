@@ -17,7 +17,7 @@ if len(sys.argv) > 1:
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.connect(address)
 
-    sock.sendall(message)
+    sock.sendall(message.encode("utf-8"))
     sock.close()
 
     print("OSMC settings sent response, %s" % msg)

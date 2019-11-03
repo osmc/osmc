@@ -398,7 +398,7 @@ class APF_STORE(object):
 
                 try:
                     output = subprocess.check_output(install_query, stderr=fnull)
-
+                    output = output.decode("utf-8")
                 except subprocess.CalledProcessError as e:
                     # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
                     output = e.output

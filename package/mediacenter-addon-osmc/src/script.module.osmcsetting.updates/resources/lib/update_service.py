@@ -62,7 +62,7 @@ def exit_osmc_settings_addon():
     address = "/var/tmp/osmc.settings.sockfile"
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.connect(address)
-    sock.sendall("exit")
+    sock.sendall("exit".encode("utf-8"))
     sock.close()
 
     return "OSMC Settings addon called to exit"
@@ -1604,7 +1604,7 @@ class Main(object):
         # get version of current package, raw_local_version_string
         rlv = subprocess.check_output(
             ["/usr/bin/dpkg-query", "-W", "-f", "'${version}\n'", pkg.shortname]
-        )
+        ).decode("utf-8")
         log("dpkg query results: %s" % rlv)
 
         lv = "".join([x for x in rlv[: rlv.index(".")] if x in list(dig)])

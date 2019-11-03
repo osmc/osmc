@@ -28,7 +28,7 @@ def call_parent(raw_message, data={}):
 
         sock.connect(address)
 
-        sock.sendall(message)
+        sock.sendall(message.encode("utf-8"))
 
         sock.close()
 

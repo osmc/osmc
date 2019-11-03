@@ -270,9 +270,9 @@ Overclock settings are set using the Pi Overclock module."""
     def populate_misc_info(self):
 
         # grab the Pi serial number and check to see whether the codec licences are enabled
-        mpg = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "MPG2"])
-        wvc = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "WVC1"])
-        serial_raw = subprocess.check_output(["cat", "/proc/cpuinfo"])
+        mpg = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "MPG2"]).decode("utf-8")
+        wvc = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "WVC1"]).decode("utf-8")
+        serial_raw = subprocess.check_output(["cat", "/proc/cpuinfo"]).decode("utf-8")
 
         # grab just the serial number
         serial = (

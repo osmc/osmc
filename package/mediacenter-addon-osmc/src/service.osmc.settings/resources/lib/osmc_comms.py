@@ -68,7 +68,7 @@ class communicator(threading.Thread):
             self.stopped = True
             sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             sock.connect(self.address)
-            sock.send("exit")
+            sock.send("exit".encode("utf-8"))
             sock.close()
             self.sock.close()
 

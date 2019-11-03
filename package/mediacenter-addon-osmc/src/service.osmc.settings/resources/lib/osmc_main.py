@@ -272,7 +272,7 @@ class Main(object):
 
                                 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
                                 sock.connect(address)
-                                sock.sendall(message)
+                                sock.sendall(message.encode("utf-8"))
                                 sock.close()
 
                             except Exception as e:
@@ -346,7 +346,7 @@ class Main(object):
 
             if not self.parent_queue.empty():
 
-                response = self.parent_queue.get()
+                response = self.parent_queue.get().decode('utf-8')
 
                 log("response : %s" % response)
 

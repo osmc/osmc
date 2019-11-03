@@ -529,7 +529,7 @@ class CommandLine(object):
             )
             ps = subprocess.Popen(chunk, stdin=ps.stdout, stdout=subprocess.PIPE)
 
-        res = subprocess.check_output(self.command_list, stdin=ps.stdout)
+        res = subprocess.check_output(self.command_list, stdin=ps.stdout).decode("utf-8")
 
         return res
 
