@@ -401,7 +401,7 @@ class APF_STORE(object):
                     output = output.decode("utf-8")
                 except subprocess.CalledProcessError as e:
                     # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-                    output = e.output
+                    output = e.output.decode("utf-8")
 
                 fnull.close()
 
