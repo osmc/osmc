@@ -73,7 +73,8 @@ def construct_listitem(conf):
 
     if os.path.isfile(image_path):
 
-        tmp = xbmcgui.ListItem(label=name, label2=name2, thumbnailImage=image_path)
+        tmp = xbmcgui.ListItem(label=name, label2=name2)
+        tmp.setArt({"thumb": image_path})
 
     else:
 

@@ -98,8 +98,10 @@ class OSMC_gui(xbmcgui.WindowXMLDialog):
 
                 # set the icon (texturefocus, texturenofocus)
                 list_item = xbmcgui.ListItem(
-                    label=shortname, label2="", thumbnailImage=module["FX_Icon"]
-                )
+                    label=shortname, label2="")
+
+                list_item.setArt({"thumb": module["FX_Icon"]})
+                
                 list_item.setProperty("FO_ICON", module["FO_Icon"])
 
                 # grab the modules description for display in the textbox

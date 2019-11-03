@@ -157,7 +157,8 @@ class OSMC_Slideshow_GUI(xbmcgui.WindowXMLDialog):
         # populate the image list as well as the navi list
         for image in self.images:
 
-            li = xbmcgui.ListItem(label=image, label2="", thumbnailImage=image)
+            li = xbmcgui.ListItem(label=image, label2="")
+            lig.setArt({"thumb": image})
 
             self.image_list.addItem(li)
             self.navi_list.addItem(li)

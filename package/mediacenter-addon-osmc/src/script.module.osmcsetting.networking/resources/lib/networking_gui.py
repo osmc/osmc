@@ -2141,7 +2141,7 @@ class bluetooth_population_thread(threading.Thread):
 
         item = xbmcgui.ListItem(label)
 
-        item.setIconImage(icon_image)
+        item.setArt({"icon": icon_image})
 
         item.setProperty("address", address)
         item.setProperty("alias", info["alias"])
@@ -2333,7 +2333,8 @@ class wifi_populate_bot(threading.Thread):
 
         item = xbmcgui.ListItem(self.getListItemLabel(wifi, multiAdapter))
 
-        item.setIconImage(icon_image)
+        item.setArt({"icon": icon_image})
+        # item.setIconImage(icon_image)
 
         item.setProperty("Strength", str(strength))
         item.setProperty("Encrypted", str(encrypted))

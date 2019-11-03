@@ -87,7 +87,8 @@ class APF_obj(xbmcgui.ListItem):
         self.setProperty("Addon.Name", self.name)
         self.setProperty("Addon.Version", self.version)
 
-        self.setIconImage(self.current_icon)
+        # self.setIconImage(self.current_icon)
+        self.setArt({"icon": self.current_icon})
 
         return self
 
@@ -102,7 +103,8 @@ class APF_obj(xbmcgui.ListItem):
 
         self.current_icon = self.check_icon(self.iconurl)
 
-        self.setIconImage(self.current_icon)
+        # self.setIconImage(self.current_icon)
+        self.setArt({"icon": self.current_icon})
 
     @clog(logger=log)
     def check_icon(self, iconurl):
