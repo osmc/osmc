@@ -1262,7 +1262,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if net_type == "WIRED":
             if (
-                cmp(self.get_wired_config(), self.current_network_config) == 0
+                (self.get_wired_config() == self.current_network_config) == 0
                 or not self.get_wired_config()
             ):
                 self.toggle_controls(False, [WIRED_RESET_BUTTON, WIRED_APPLY_BUTTON])
@@ -1272,7 +1272,7 @@ class networking_gui(xbmcgui.WindowXMLDialog):
 
         if net_type == "WIRELESS":
             wireless_config = self.get_wireless_config(self.conn_ssid)
-            if cmp(wireless_config, self.current_network_config) == 0:
+            if (wireless_config == self.current_network_config) == 0:
                 self.toggle_controls(
                     False, [WIRELESS_RESET_BUTTON, WIRELESS_APPLY_BUTTON]
                 )
