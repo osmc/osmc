@@ -509,7 +509,7 @@ def log(message):
 def lang(id):
     try:
         san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-        return san
+        return san.decode("utf-8")
 
     except Exception:
         return "%s"

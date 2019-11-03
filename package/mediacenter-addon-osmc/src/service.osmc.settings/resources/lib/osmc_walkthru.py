@@ -108,7 +108,7 @@ def log(message, level=xbmc.LOGDEBUG):
 
 def lang(id):
     san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")
 
 
 class mock_Networking_caller(object):

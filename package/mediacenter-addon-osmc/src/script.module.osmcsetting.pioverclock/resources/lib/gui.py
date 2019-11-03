@@ -12,7 +12,7 @@ __addon__ = xbmcaddon.Addon("script.module.osmcsetting.pioverclock")
 
 def lang(id):
     san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")
 
 
 class overclock_gui(xbmcgui.WindowXMLDialog):

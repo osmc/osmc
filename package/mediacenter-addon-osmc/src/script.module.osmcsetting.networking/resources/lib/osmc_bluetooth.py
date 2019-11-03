@@ -261,4 +261,4 @@ def handleAgentInteraction(deviceAlias, command, messages):
 def lang(id):
     addon = xbmcaddon.Addon("script.module.osmcsetting.networking")
     san = addon.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")

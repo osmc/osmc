@@ -68,7 +68,7 @@ DIALOG = xbmcgui.Dialog()
 
 def lang(id):
     san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")
 
 
 def log(message):

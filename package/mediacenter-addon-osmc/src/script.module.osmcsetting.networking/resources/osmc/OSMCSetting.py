@@ -130,7 +130,7 @@ def log(message):
 
 def lang(id):
     san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")
 
 
 class OSMCSettingClass(threading.Thread):

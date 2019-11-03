@@ -22,4 +22,4 @@ class LangRetriever(object):
         else:
             san = ""
 
-        return san
+        return san.decode("utf-8")

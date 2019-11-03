@@ -21,7 +21,7 @@ IMAGE = os.path.join(scriptPath, "resources", "osmc", "FO_Icon.png")
 
 def lang(id):
     san = __addon__.getLocalizedString(id).encode("utf-8", "ignore")
-    return san
+    return san.decode("utf-8")
 
 
 def log(message):
