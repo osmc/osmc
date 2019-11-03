@@ -58,15 +58,22 @@ def construct_listitem(conf):
     path, filename = os.path.split(conf)
 
     # get conf name; check first line in file for "# name:"
-    with open(conf, "r") as f:
-        lines = f.readlines()
-        first_line = lines[0]
-        if first_line.startswith("# name:"):
-            name = first_line[len("# name:") :]
-            name2 = filename
-        else:
-            name = filename.replace(".conf", "")
-            name2 = conf
+    try:
+        with open(conf, "r") as f:
+            lines = f.readlines()
+
+    except UnicodeDecodeError:
+        with open(conf, "rb") as f:
+            lines = f.readlines()
+            lines = [x.decode("utf-8") for x in lines]
+
+    first_line = lines[0]
+    if first_line.startswith("# name:"):
+        name = first_line[len("# name:") :]
+        name2 = filename
+    else:
+        name = filename.replace(".conf", "")
+        name2 = conf        
 
     # check for remote image, use it if it is available
     image_path = os.path.join(path, filename.replace(".conf", ".png"))

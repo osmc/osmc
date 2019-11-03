@@ -181,7 +181,7 @@ class overclock_gui(xbmcgui.WindowXMLDialog):
 
         var_list = [
             metric.min + (metric.step * x)
-            for x in range((metric.range / metric.step) + 1)
+            for x in range(int(metric.range / metric.step) + 1)
         ]
         var_list.append(int(metric.custom))
         var_list = list(set(var_list))
