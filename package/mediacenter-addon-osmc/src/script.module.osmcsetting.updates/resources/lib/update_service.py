@@ -415,7 +415,10 @@ class Main(object):
             self.parent_queue.task_done()
 
             # de-serialise the message into its original tuple
-            comm_from_script = json.loads(raw_comm_from_script)
+            try:
+                comm_from_script = json.loads(raw_comm_from_script.decode("utf-8"))
+            except AttributeError:
+                comm_from_script = json.loads(raw_comm_from_script)
 
             log(comm_from_script, "comm_from_script")
 
@@ -493,7 +496,7 @@ class Main(object):
             return
 
         subprocess.Popen(
-            ["sudo", "python", "%s/apt_cache_action.py" % __libpath__, action]
+            ["sudo", "python3", "%s/apt_cache_action.py" % __libpath__, action]
         )
 
     # MAIN METHOD
@@ -902,7 +905,7 @@ class Main(object):
             subprocess.Popen(
                 [
                     "sudo",
-                    "python",
+                    "python3",
                     "%s/apt_cache_action.py" % __libpath__,
                     "action_list",
                     action,
