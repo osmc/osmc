@@ -63,7 +63,7 @@ int Utils::getPartSize(QString device, QString fstype)
 {
     if (fstype == "hfsplus")
         fstype = "hfs+"; /* ATV hack */
-    QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " print | grep " + fstype + " | awk {'print $4'} | tr -d MB");
+    QString command("/usr/sbin/parted -s " + device.toLocal8Bit() + " unit MiB print | grep " + fstype + " | awk {'print $3'} | tr -d MiB");
     QProcess partedProcess;
     partedProcess.start("/bin/sh -c \"" + command + "\"");
     partedProcess.waitForFinished(-1);
