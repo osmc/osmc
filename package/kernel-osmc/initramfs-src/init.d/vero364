@@ -83,9 +83,8 @@ done
 #    CPU 2    0100         4
 #    CPU 3    1000         8
 
-echo 2 > /proc/irq/231/smp_affinity  # hdmi_aocec
-echo 4 > /proc/irq/63/smp_affinity   # dwc_otg, dwc_otg_hcd:usb1
-echo 8 > /proc/irq/62/smp_affinity   # dwc_otg, dwc_otg_hcd:usb2, dwc_otg_pcd
+echo 2 > /proc/irq/40/smp_affinity  # hdmi_aocec
+echo 4 > /proc/irq/37/smp_affinity   # xhci
 
 # DEC_CONTROL_FLAG_DISABLE_FAST_POC
 echo 4 > /sys/module/amvdec_h264/parameters/dec_control
