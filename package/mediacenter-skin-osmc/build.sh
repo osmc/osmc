@@ -7,7 +7,7 @@
 
 make clean
 
-REV="3e0404d88d744d0c654641c4ed02adcb2265d11c"
+REV="69b47df945ac10e882e5e71e8e5274cd1bc00036"
 echo -e "Building package mediacenter-skin-osmc"
 echo -e "Downloading skin"
 pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
