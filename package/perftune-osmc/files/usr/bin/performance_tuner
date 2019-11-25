@@ -62,6 +62,7 @@ fi
 
 if [ "$OPTION_OSMCDEV" = "vero2" ] || [ "$OPTION_OSMCDEV" = "vero3" ]
 then
+     if grep -q 4kplus /proc/cmdline; then echo 5 > /sys/class/mpgpu/cur_freq; fi
      sleep 30
      fstrim -v /
 fi
