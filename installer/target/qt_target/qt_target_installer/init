@@ -78,7 +78,7 @@ then
 	else
 	if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
 	then
-  		hdmimode="$preferred"
+		if ! echo $preferred | busybox grep -q 2160p; then hdmimode="$preferred"; fi
   		echo "$hdmimode" > /sys/class/display/mode
 	fi
 fi
