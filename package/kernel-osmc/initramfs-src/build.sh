@@ -116,6 +116,7 @@ mknod target/dev/null c 1 3
 mknod target/dev/tty c 5 0
 for line in $(ldd target/bin/e2fsck); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
 for line in $(ldd target/bin/busybox); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
+strip target/bin/e2fsck
 if [ "$2" == "vero2" ] || [ "$2" == "vero364" ]
 then
     for line in $(ldd target/usr/sbin/lvchange); do if (echo $line | grep -q /lib); then cp $line target/lib; fi; done
@@ -126,6 +127,7 @@ then
     # Dependency of a dependency..
     if [ "$2" == "vero2" ]; then cp /lib/arm-linux-gnueabihf/libsepol.so.1 target/lib/; fi
     if [ "$2" == "vero364" ]; then cp /lib/aarch64-linux-gnu/libsepol.so.1 target/lib; fi
+    strip target/usr/sbin/lvchange
 fi
 if [ "$1" == "cpio" ]
 then
