@@ -1,29 +1,34 @@
-From 5863f6badc000b2cb997c11fe0ddb1e696d1c147 Mon Sep 17 00:00:00 2001
+From 1f6d631e8319e2db60526dc52073d6fab762080f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Sun, 24 Nov 2019 17:00:08 +0000
+Date: Fri, 27 Dec 2019 19:57:47 +0000
 Subject: [PATCH] Fix VC-1 playback
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 5 +++++
- 1 file changed, 5 insertions(+)
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index a645df7..edbe905 100644
+index 8c51b3f..1ba1e74 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -1641,6 +1641,11 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+@@ -1640,10 +1640,14 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
    am_private->gcodec.ratio64     = am_private->video_ratio64;
    am_private->gcodec.param       = NULL;
  
-+  if (am_private->video_format == VFORMAT_VC1) 					/* workaround to fix slowdown VC1 progressive */
-+    SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0x10000);
-+  else
-+    SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0);
-+
+-  if (am_private->video_format == VFORMAT_VC1) 					/* workaround to fix slowdown VC1 progressive */
++  if (am_private->video_format == VFORMAT_VC1) { 					/* workaround to fix slowdown VC1 progressive */
+     SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0x10000);
+-  else
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
++  }
++  else {
+     SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0);
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
++  }
+ 
    switch(am_private->video_format)
    {
-     default:
 -- 
 2.7.4
 
