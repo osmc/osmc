@@ -134,7 +134,7 @@ then
     pushd target
     # cpio
     find . | cpio -H newc -o > initramfs.cpio
-    cat initramfs.cpio | gzip > initramfs.gz
+    cat initramfs.cpio | gzip -9 > initramfs.gz
     mv initramfs.gz ../
 fi
 echo "Initramfs built successfully"
