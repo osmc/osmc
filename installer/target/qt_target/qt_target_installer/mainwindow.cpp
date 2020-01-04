@@ -21,7 +21,7 @@
 #include <QThread>
 #include "extractworker.h"
 #include <QTimer>
-#define FACTORYV2
+//#define FACTORYV2
 #ifdef FACTORYV2
     #include <unistd.h>
     #include <sys/reboot.h>

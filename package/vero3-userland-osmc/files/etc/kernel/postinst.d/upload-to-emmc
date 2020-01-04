@@ -1,17 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-verify_sane()
-{
-    dt=$(tr -d '\0' </proc/device-tree/model)
-    if [ "$dt" != "Vero4K" ] && [ "$dt" != "Vero4KPlus" ]; then echo "Unsupported device" && exit 1; fi
-    if [ "$dt" == "Vero4K" ]; then if grep -q revision=4kplus /proc/cmdline; then echo "Bootloader and device mismatch" && exit 1; fi; fi
-    if [ "$dt" == "Vero4KPlus" ]; then if ! grep -q revision=4kplus /proc/cmdline; then echo "Bootloader and device mismatch" && exit 1; fi; fi
-}
-
-do_jump()
-{
-    if grep -q revision=4kplus /proc/cmdline; then echo "Injecting jump for V4K+" && /usr/bin/fw_setenv storeboot 'if imgread kernel boot ${loadaddr}; then mw 0x1000000 0; bootm ${loadaddr}; fi; run update;' || exit 1; fi
-}
 processimage()
 {
     if ischroot; then exit 0; fi
@@ -25,6 +13,19 @@ processimage()
     rm -rf /lib/modules/${1}_kernel_*
 }
 
-verify_sane
-do_jump
+processdtb()
+{
+    if ischroot; then exit 0; fi
+    # Need permission to do an upload
+    /usr/bin/fw_setenv upgrade_step 2
+    LANG=C /bin/dd if=/boot/dtb-${1}.img of=/dev/dtb bs=256k
+    STATUS=$?
+    if [ "$STATUS" != 0 ]
+    then
+        echo "Could not upload DTB to eMMC" >&2
+        exit $STATUS
+    fi
+}
+
 processimage $1
+processdtb $1
