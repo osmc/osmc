@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+	if ischroot; then exit 0; fi
+	dt=$(tr -d '\0' </proc/device-tree/model)
+	if [ "$dt" != "Vero4K" ] && [ "$dt" != "Vero4KPlus" ]; then echo "Unsupported device" && exit 1; fi
+	if [ "$dt" == "Vero4K" ]; then if grep -q revision=4kplus /proc/cmdline; then echo "Bootloader and device mismatch" && exit 1; fi; fi
+	if [ "$dt" == "Vero4KPlus" ]; then if ! grep -q revision=4kplus /proc/cmdline; then echo "Bootloader and device mismatch" && exit 1; fi; fi
+        if grep -q revision=4kplus /proc/cmdline; then UBOOT="uboot-vero4kplus.bin"; else UBOOT="uboot-vero4k.bin"; fi
+	if [ ! -f /opt/vero3/${UBOOT} ]; then echo "U-Boot file missing" && exit 1; fi
+	dd if=/opt/vero3/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=1 count=11
+	dd if=/opt/vero3/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1
+	touch /tmp/reboot-needed
+fi
