@@ -5,6 +5,13 @@
 
 REAL_APT="/usr/bin/apt-get-real"
 
+    # Allow non-root users regardless of command so they can run simulations (for e.g. monitoring solutions),
+    # they don't have write access to /var/lib/apt anyways (checking EUID also prevents sudo'd users from running 'upgrade')
+    if [[ $EUID -ne 0 && ! -w /var/lib/apt ]]; then
+        "$REAL_APT" "$@"
+        exit 0
+    fi
+
     for arg in "$@"; do
         case $arg in
         upgrade)
