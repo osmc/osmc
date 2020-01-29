@@ -5,6 +5,12 @@
 
 # Read /proc/cmdline arguments
 
+tweak_cpu_params() {
+        echo 50 > ${1}/up_threshold
+        echo 100000 > ${1}/sampling_rate
+        echo 50 > ${1}/sampling_down_factor
+}
+
 for option in $(cat /proc/cmdline); do
 	case $option in
 	  osmcdev=*)
@@ -71,10 +77,11 @@ if [ ! -f /safe_mode ]
 then
 	# 30 seconds of accelerated boot. we set curgov to ondemand so the next check only doesn't flip us back if we had performance to begin with
 	sleep 30
-	echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
-	echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
-	echo 100000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
-	echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
+	if [ "$OPTION_OSMCDEV" = "vero3" ]; then
+		tweak_cpu_params "/sys/devices/system/cpu/cpufreq/policy0/ondemand"
 	else
-	echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+		tweak_cpu_params "/sys/devices/system/cpu/cpufreq/ondemand"
+	fi
+	else
+		echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 fi
