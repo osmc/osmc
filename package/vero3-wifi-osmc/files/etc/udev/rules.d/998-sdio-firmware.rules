@@ -7,4 +7,4 @@ SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
 
 SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
   ACTION=="change", ATTR{soft}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.path", \
-  ENV{SYSTEMD_READY}="0"
+  ENV{SYSTEMD_READY}="0", PROGRAM="/bin/systemctl stop sdio-bt-firmware.service"
