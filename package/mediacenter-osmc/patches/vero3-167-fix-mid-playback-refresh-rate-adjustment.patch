@@ -127,7 +127,7 @@ index 13e78d2..3cbab94 100644
 -  m_seekStream = -1;
 -
 -  if (m_checkTransportStream && m_streaminfo)
-+  if (m_checkvideo && m_streaminfo)
++  if (m_streaminfo)
    {
      int64_t duration = m_pFormatContext->duration;
      std::shared_ptr<CDVDInputStream> pInputStream = m_pInput;
@@ -260,7 +260,7 @@ index 13e78d2..3cbab94 100644
 -            m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
 -            m_seekStream = i;
 -          }
-+  	  m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den)
++  	  m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den);
            return TRANSPORT_STREAM_STATE::READY;
          }
          hasAudio = true;
@@ -273,7 +273,7 @@ index 13e78d2..3cbab94 100644
 -            m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
 -            m_seekStream = i;
 -          }
-+	  m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den)
++	  m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den);
            return TRANSPORT_STREAM_STATE::READY;
          }
          hasAudio = true;
@@ -286,7 +286,7 @@ index 13e78d2..3cbab94 100644
 -            m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
 -            m_seekStream = i;
 -          }
-+          m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den)
++          m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den);
            return TRANSPORT_STREAM_STATE::READY;
          }
          hasVideo = true;
@@ -299,7 +299,7 @@ index 13e78d2..3cbab94 100644
 -            m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
 -            m_seekStream = i;
 -          }
-+          m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den)
++          m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den);
            return TRANSPORT_STREAM_STATE::READY;
          }
          hasVideo = true;
