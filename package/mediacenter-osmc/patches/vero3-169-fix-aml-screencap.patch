@@ -1,0 +1,40 @@
+From 76a1e182f9a680e5739871ad82a875b9b69fffb2 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Mon, 2 Mar 2020 17:54:25 +0100
+Subject: [PATCH] bug fix: don't use blending for bookmark capturing and use
+ correct size when initializing buffer
+
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp | 2 +-
+ xbmc/utils/ScreenshotAML.cpp                                      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index 1db05c5..c261306 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -78,7 +78,7 @@ bool CRendererAML::RenderCapture(CRenderCapture* capture)
+ {
+   capture->BeginRender();
+   capture->EndRender();
+-  CScreenshotAML::CaptureVideoFrame((unsigned char *)capture->GetRenderBuffer(), capture->GetWidth(), capture->GetHeight());
++  CScreenshotAML::CaptureVideoFrame((unsigned char *)capture->GetRenderBuffer(), capture->GetWidth(), capture->GetHeight(), false);
+   return true;
+ }
+ 
+diff --git a/xbmc/utils/ScreenshotAML.cpp b/xbmc/utils/ScreenshotAML.cpp
+index 8b67673..a46e01a 100644
+--- a/xbmc/utils/ScreenshotAML.cpp
++++ b/xbmc/utils/ScreenshotAML.cpp
+@@ -51,7 +51,7 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
+     {
+       if (!bBlendToBuffer)
+       {
+-        memset(buffer, 0xff, buffSize);
++        memset(buffer, 0xff, iHeight * iWidth * 4);
+       }
+ 
+       for (int y = 0; y < iHeight; ++y)
+-- 
+2.7.4
+

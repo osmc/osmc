@@ -1,0 +1,517 @@
+From 485866ea8e1029a1503f7d9ddb7f6ad748bc037d Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 3 Mar 2020 02:40:11 +0000
+Subject: [PATCH] Add support for OSMC long press
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/keymaps/osmc/osmc_remote.xml | 329 ++++++++++++++++++++++++++++++++++++
+ system/keymaps/osmc_classic.xml     | 141 ++++++++++++++++
+ system/peripherals.xml              |   5 +
+ 3 files changed, 475 insertions(+)
+ create mode 100644 system/keymaps/osmc/osmc_remote.xml
+ create mode 100644 system/keymaps/osmc_classic.xml
+
+diff --git a/system/keymaps/osmc/osmc_remote.xml b/system/keymaps/osmc/osmc_remote.xml
+new file mode 100644
+index 0000000..b7c6cec
+--- /dev/null
++++ b/system/keymaps/osmc/osmc_remote.xml
+@@ -0,0 +1,329 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- The second and third generation OSMC remotes use i and c keys that stop functioning with some keyboard languages in OSMC.				-->
++<!-- We have remapped those keys in OSMC to kpleftparen and kprightparen with udev to overcome this issue. This file maps those keys to		-->
++<!-- Kodi actions and adds tweaks to provide enhanced function. Home was remapped in v1&2 for consistency. The buttons map in Kodi as...	-->
++<!-- 																																		-->
++<!-- OSMC with udev remap						non-OSMCv1				non-OSMCv2				non-OSMCv3									-->
++<!-- Home  = escape        <key id="61467">		Home  = home			Home  = home			Home  = escape								-->
++<!-- Info  = leftbracket   <key id="61480">		Info  = 				Info  = i				Info  = i									-->
++<!-- Up    = up            <key id="61568">		Up    = up				Up    = up				Up    = up									-->
++<!-- Down  = down          <key id="61569">		Down  = down			Down  = down			Down  = down								-->
++<!-- Left  = left          <key id="61570">		Left  = left			Left  = left			Left  = left								-->
++<!-- Right = right         <key id="61571">		Right = right			Right = right			Right = right								-->
++<!-- OK    = return        <key id="61453">		OK    = return			OK    = return			OK    = return								-->
++<!-- Back  = browser_back  <key id="61616">		Back  = browser_back	Back  = browser_back	Back  = browser_back						-->
++<!-- Menu  = rightbracket  <key id="61481">		Menu  = 				Menu  = c				Menu  = c									-->
++<!-- Play  = play_pause    <key id="61629">		Play  = play_pause		Play  = play_pause		Play  = play_pause							-->
++<!-- Stop  = stop          <key id="61628">		Stop  = stop			Stop  = stop			Stop  = stop								-->
++<!-- Vol-  = volume_down   <key id="61624">		RW    = rewind			Vol-  = minus			Vol-  = minus								-->
++<!-- Vol+  = volume_up     <key id="61625">		FF    = fastforward		Vol+  = equals			Vol+  = equals								-->
++<!-- 																																		-->
++<!-- Keymap created by DarwinDesign version 20-03-2																							-->
++<!-- 																																		-->
++<keymap>
++	<global>
++		<keyboard>
++			<escape>ActivateWindow(Home)</escape> <!-- Home v3 -->
++			<home>ActivateWindow(Home)</home> <!-- Home v1 -->
++			<escape mod="longpress">fullscreen</escape> <!-- Home v3 -->
++			<home mod="longpress">fullscreen</home> <!-- Home v1 -->
++			<leftbracket>Info</leftbracket> <!-- Info remap -->
++			<i>Info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Info remap -->
++			<i mod="longpress">noop</i> <!-- Info v3 -->
++			<browser_back>Back</browser_back> <!-- Back -->
++			<rightbracket>ContextMenu</rightbracket> <!-- Menu remap -->
++			<c>ContextMenu</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">Menu</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">Menu</c> <!-- Menu v3 -->
++			<f2>Notification(OSMC Remote Controller, Low Battery Please Replace,5000)</f2> <!-- Gen 3 OSMC remote low battery -->
++		</keyboard>
++	</global>
++	<Home>
++		<keyboard>
++			<escape>CECActivateSource</escape> <!-- Home v3 -->
++			<home>CECActivateSource</home> <!-- Home v1 -->
++			<escape mod="longpress">CECStandby</escape> <!-- Home v3 -->
++			<home mod="longpress">CECStandby</home> <!-- Home v1 -->
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<browser_back mod="longpress">ActivateWindow(ShutdownMenu)</browser_back> <!-- Back -->
++			<return mod="longpress">ReloadSkin()</return>
++			<play_pause mod="longpress">UpdateLibrary(video)</play_pause>
++		</keyboard>
++	</Home>
++	<VirtualKeyboard>
++		<keyboard>
++			<rightbracket mod="longpress">noop</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">noop</c> <!-- Menu v3 -->
++			<up mod="longpress">Shift</up>
++			<down mod="longpress">Symbols</down>
++			<return mod="longpress">Enter</return>
++		</keyboard>
++	</VirtualKeyboard>
++	<FileManager>
++		<keyboard>
++			<right mod="longpress">Highlight</right>
++			<left mod="longpress">Highlight</left>
++		</keyboard>
++	</FileManager>
++	<FullscreenVideo>
++		<keyboard>
++			<escape>ActivateWindow(videobookmarks)</escape> <!-- Home v3 -->
++			<home>ActivateWindow(videobookmarks)</home> <!-- Home v1 -->
++			<escape mod="longpress">playerdebug</escape> <!-- Home v3 -->
++			<home mod="longpress">playerdebug</home> <!-- Home v1 -->
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<return mod="longpress">Playlist</return>
++			<up mod="longpress">SkipNext</up>
++			<down mod="longpress">SkipPrevious</down>
++			<left mod="longpress">AudioDelay</left>
++			<right mod="longpress">subtitledelay</right>
++			<rightbracket>ActivateWindow(osdvideosettings)</rightbracket> <!-- Menu remap -->
++			<c>ActivateWindow(osdvideosettings)</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">ActivateWindow(osdaudiosettings)</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">ActivateWindow(osdaudiosettings)</c> <!-- Menu v3 -->
++			<play_pause mod="longpress">showsubtitles</play_pause>
++			<stop mod="longpress">ActivateWindow(osdsubtitlesettings)</stop>
++		</keyboard>
++	</FullscreenVideo>
++	<FullscreenGame>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>OSD</rightbracket> <!-- Menu remap -->
++			<c>OSD</c> <!-- Menu v3 -->
++		</keyboard>
++	</FullscreenGame>
++	<FullscreenInfo>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</FullscreenInfo>
++	<Visualisation>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<escape></escape> <!-- removes default home to fullscreen -->
++		</keyboard>
++	</Visualisation>
++	<MusicOSD>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket></rightbracket> <!-- removes mapping from osmc-classic -->
++		</keyboard>
++	</MusicOSD>
++	<VisualisationPresetList>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++		</keyboard>
++	</VisualisationPresetList>
++	<slideshow>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<play_pause>pause</play_pause>
++			<up mod="longpress">ZoomIn</up>
++			<down mod="longpress">ZoomOut</down>
++			<return mod="longpress">ZoomNormal</return>
++			<rightbracket></rightbracket> <!-- removes mapping from osmc-classic -->
++		</keyboard>
++	</slideshow>
++	<VideoOSD>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++		</keyboard>
++	</VideoOSD>
++	<VideoMenu>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<escape></escape> <!-- removes default home to fullscreen -->
++			<rightbracket></rightbracket> <!-- removes mapping from osmc-classic -->
++		</keyboard>
++	</VideoMenu>
++	<OSDVideoSettings>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>back</rightbracket> <!-- Menu remap -->
++			<c>back</c> <!-- Menu v3 -->
++			<stop>back</stop>
++		</keyboard>
++	</OSDVideoSettings>
++	<OSDAudioSettings>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>back</rightbracket> <!-- Menu remap -->
++			<c>back</c> <!-- Menu v3 -->
++			<stop>back</stop>
++		</keyboard>
++	</OSDAudioSettings>
++	<osdsubtitlesettings>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>back</rightbracket> <!-- Menu remap -->
++			<c>back</c> <!-- Menu v3 -->
++			<stop>back</stop>
++		</keyboard>
++	</osdsubtitlesettings>
++	<VideoBookmarks>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<rightbracket mod="longpress">back</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">back</c> <!-- Menu v3 -->
++		</keyboard>
++	</VideoBookmarks>
++	<Videos>
++		<keyboard>
++			<return mod="longpress">SendClick(14)</return> <!-- OK toggle view of unwatched or all videos -->
++			<right mod="longpress">togglewatched</right>
++		</keyboard>
++	</Videos>
++	<VideoPlaylist>
++		<keyboard>
++			<return mod="longpress">Back</return>
++		</keyboard>
++	</VideoPlaylist>
++	<ContextMenu>
++		<keyboard>
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</ContextMenu>
++	<MusicInformation>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Fixes dialog cycling -->
++			<i mod="longpress">noop</i> <!-- Fixes dialog cycling -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</MusicInformation>
++	<SongInformation>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Fixes dialog cycling -->
++			<i mod="longpress">noop</i> <!-- Fixes dialog cycling -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</SongInformation>
++	<MovieInformation>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Fixes dialog cycling -->
++			<i mod="longpress">noop</i> <!-- Fixes dialog cycling -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</MovieInformation>
++	<PictureInfo>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Fixes dialog cycling -->
++			<i mod="longpress">noop</i> <!-- Fixes dialog cycling -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</PictureInfo>
++	<FullscreenLiveTV>
++		<keyboard>
++			<rightbracket>ActivateWindow(PVROSDChannels)</rightbracket> <!-- Menu remap -->
++			<c>ActivateWindow(PVROSDChannels)</c> <!-- Menu v3 -->
++			<leftbracket>info</leftbracket> <!-- Info remap -->
++			<i>info</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
++			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<left mod="longpress">AudioDelay</left>
++			<right mod="longpress">subtitledelay</right>
++			<play_pause mod="longpress">showsubtitles</play_pause>
++			<stop mod="longpress">ActivateWindow(Teletext)</stop>
++		</keyboard>
++	</FullscreenLiveTV>
++	<FullscreenRadio>
++		<keyboard>
++			<rightbracket>ActivateWindow(PVROSDChannels)</rightbracket> <!-- Menu remap -->
++			<c>ActivateWindow(PVROSDChannels)</c> <!-- Menu v3 -->
++		</keyboard>
++	</FullscreenRadio>
++	<PVROSDChannels>
++		<keyboard>
++			<escape></escape> <!-- removes default home to fullscreen -->
++		</keyboard>
++	</PVROSDChannels>
++	<PVRChannelGuide>
++		<keyboard>
++			<escape></escape> <!-- removes default home to fullscreen -->
++		</keyboard>
++	</PVRChannelGuide>
++	<AddonInformation>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++			<leftbracket>Back</leftbracket> <!-- Info remap -->
++			<i>Back</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Fixes dialog cycling -->
++			<i mod="longpress">noop</i> <!-- Fixes dialog cycling -->
++			<rightbracket>Back</rightbracket> <!-- Menu remap -->
++			<c>Back</c> <!-- Menu v3 -->
++		</keyboard>
++	</AddonInformation>
++	<PlayerProcessInfo>
++		<keyboard>
++			<leftbracket>back</leftbracket> <!-- Info remap -->
++			<i>back</i> <!-- Info v3 -->
++			<rightbracket>ActivateWindow(osdvideosettings)</rightbracket> <!-- Menu remap -->
++			<c>ActivateWindow(osdvideosettings)</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">noop</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">noop</c> <!-- Menu v3 -->
++			<stop mod="longpress">ActivateWindow(osdsubtitlesettings)</stop>
++		</keyboard>
++	</PlayerProcessInfo>
++</keymap>
+\ No newline at end of file
+diff --git a/system/keymaps/osmc_classic.xml b/system/keymaps/osmc_classic.xml
+new file mode 100644
+index 0000000..084a12c
+--- /dev/null
++++ b/system/keymaps/osmc_classic.xml
+@@ -0,0 +1,141 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- The second and third generation OSMC remotes use i and c keys that stop functioning with some keyboard languages in OSMC.				 -->
++<!-- We have remapped those keys to kpleftparen and kprightparen with udev to overcome this issue. This file fixes what that change breaks	 -->
++<!-- as well as emulates the original remote behavior it had while using lirc. The behaviors that were not emulated was the home key during	 -->
++<!-- fullscreen video and visualazation playback. The modified layout maps in Kodi as...													 -->
++<!-- 																																		 -->
++<!-- Home  = escape        <key id="61467">																									 -->
++<!-- Info  = leftbracket   <key id="61480">																									 -->
++<!-- Up    = up            <key id="61568">																									 -->
++<!-- Down  = down          <key id="61569">																									 -->
++<!-- Left  = left          <key id="61570">																									 -->
++<!-- Right = right         <key id="61571">																									 -->
++<!-- OK    = return        <key id="61453">																									 -->
++<!-- Back  = browser_back  <key id="61616">																									 -->
++<!-- Menu  = rightbracket  <key id="61481">																									 -->
++<!-- Play  = play_pause    <key id="61629">																									 -->
++<!-- Stop  = stop          <key id="61628">																									 -->
++<!-- Vol-  = volume_down   <key id="61624">																									 -->
++<!-- Vol+  = volume_up     <key id="61625">																									 -->
++<!-- 																																		 -->
++<!-- Keymap created by DarwinDesign version 20-02-27																						 -->
++<!-- 																																		 -->
++<keymap>
++	<global>
++		<keyboard>
++			<leftbracket>Info</leftbracket> <!-- I Button -->
++			<rightbracket>ContextMenu</rightbracket> <!-- Menu Button -->
++			<f2>Notification(OSMC Remote Controller, Low battery please replace,5000)</f2> <!-- Gen 3 OSMC remote low battery -->
++		</keyboard>
++	</global>
++	<Home>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++		</keyboard>
++	</Home>
++	<FullscreenVideo>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++			<rightbracket>PlayerProcessInfo</rightbracket> <!-- Menu Button -->
++			<!-- <escape>PreviousMenu</escape> --> <!-- Old Remote Behavior -->
++		</keyboard>
++	</FullscreenVideo>
++	<FullscreenGame>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++			<rightbracket>CodecInfo</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</FullscreenGame>
++	<FullscreenInfo>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- I Button -->
++			<rightbracket>PlayerProcessInfo</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</FullscreenInfo>
++	<Visualisation>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++			<rightbracket>PlayerProcessInfo</rightbracket> <!-- Menu Button -->
++			<!-- <escape>PreviousMenu</escape> --> <!-- Old Remote Behavior -->
++		</keyboard>
++	</Visualisation>
++	<MusicOSD>
++		<keyboard>
++			<leftbracket>PlayerProcessInfo</leftbracket> <!-- I Button -->
++			<rightbracket>Info</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</MusicOSD>
++	<VisualisationPresetList>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++		</keyboard>
++	</VisualisationPresetList>
++	<slideshow>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++			<rightbracket>info</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</slideshow>
++	<VideoOSD>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++		</keyboard>
++	</VideoOSD>
++	<VideoMenu>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++			<rightbracket>PlayerProcessInfo</rightbracket> <!-- Menu Button -->
++			<!-- <escape>PreviousMenu</escape> --> <!-- Old Remote Behavior -->
++		</keyboard>
++	</VideoMenu>
++	<OSDVideoSettings>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++		</keyboard>
++	</OSDVideoSettings>
++	<OSDAudioSettings>
++		<keyboard>
++			<leftbracket>info</leftbracket> <!-- I Button -->
++		</keyboard>
++	</OSDAudioSettings>
++	<ContextMenu>
++		<keyboard>
++			<rightbracket>Back</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</ContextMenu>
++	<MusicInformation>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- I Button -->
++		</keyboard>
++	</MusicInformation>
++	<MovieInformation>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- I Button -->
++		</keyboard>
++	</MovieInformation>
++	<PictureInfo>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- I Button -->
++		</keyboard>
++	</PictureInfo>
++	<FullscreenLiveTV>
++		<keyboard>
++			<rightbracket>ActivateWindow(PVROSDChannels)</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</FullscreenLiveTV>
++	<FullscreenRadio>
++		<keyboard>
++			<rightbracket>ActivateWindow(PVROSDChannels)</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</FullscreenRadio>
++	<AddonInformation>
++		<keyboard>
++			<leftbracket>Back</leftbracket> <!-- I Button -->
++		</keyboard>
++	</AddonInformation>
++	<PlayerProcessInfo>
++		<keyboard>
++			<rightbracket>PlayerProcessInfo</rightbracket> <!-- Menu Button -->
++		</keyboard>
++	</PlayerProcessInfo>
++</keymap>
+\ No newline at end of file
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index ff303e9..4d7d3bb 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -52,6 +52,11 @@
+     <setting key="keymap" value="wetek-play" label="35007" configurable="0" />
+   </peripheral>
+ 
++  <peripheral vendor_product="2252:1037,2017:1688,2017:1689" bus="usb" name="OSMC RF Remote" mapTo="hid">
++     <setting key="do_not_use_custom_keymap" type="bool" value="1" label="35009" order="1"/>
++     <setting key="keymap" value="osmc" label="35007" configurable="1"/>
++  </peripheral>
++
+   <peripheral class="joystick" mapTo="joystick">
+     <setting key="left_stick_deadzone" type="float" label="35078" order="1" value="0.2" min="0.0" step="0.05" max="1.0" />
+     <setting key="right_stick_deadzone" type="float" label="35079" order="2" value="0.2" min="0.0" step="0.05" max="1.0" />
+-- 
+2.7.4
+
