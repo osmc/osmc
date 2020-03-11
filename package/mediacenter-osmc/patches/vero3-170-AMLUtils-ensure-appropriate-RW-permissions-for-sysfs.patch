@@ -1,0 +1,33 @@
+From 035f9f2ac7d5ee9e31f515da7a2c18a487c8c25f Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Wed, 21 Aug 2019 10:02:51 +0200
+Subject: [PATCH 1/7] AMLUtils: ensure appropriate RW permissions for sysfs
+ nodes
+
+---
+ xbmc/utils/AMLUtils.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 995891b..a0f2f00 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -151,6 +151,15 @@ bool aml_permissions()
+     {
+       CLog::Log(LOGERROR, "AML: no rw on /sys/class/display/mode");
+     }
++    if (!SysfsUtils::HasRW("/sys/class/amhdmitx/amhdmitx0/phy"))
++    {
++      CLog::Log(LOGERROR, "AML: no rw on /sys/class/amhdmitx/amhdmitx0/phy");
++    }
++    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_support"))
++    {
++      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_support");
++    }
++
+   }
+ 
+   return permissions_ok == 1;
+-- 
+2.7.4
+
