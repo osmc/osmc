@@ -1,0 +1,46 @@
+From 80d4397d7e37e41d70022a0569c38325cb47e5c9 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Wed, 21 Aug 2019 10:11:48 +0200
+Subject: [PATCH 4/7] AMLUtils: we always need to set the mode
+
+---
+ xbmc/utils/AMLUtils.cpp | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 0f6cb00..92f74e2 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -559,23 +559,15 @@ bool aml_get_preferred_resolution(RESOLUTION_INFO *res)
+ bool aml_set_display_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name)
+ {
+   std::string mode = res.strId.c_str();
+-  std::string cur_mode;
+ 
+-  SysfsUtils::GetString("/sys/class/display/mode", cur_mode);
++  // switch display resolution
++  SysfsUtils::SetString("/sys/class/display/mode", "null");
+ 
+-  if (aml_has_frac_rate_policy())
+-  {
+-    if (cur_mode == mode)
+-      SysfsUtils::SetString("/sys/class/display/mode", "null");
++  int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
++  CLog::Log(LOGDEBUG, "AMLUtils::aml_set_display_resolution setting frac_rate_policy to %d", fractional_rate);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
+ 
+-    int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
+-    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
+-  }
+-  else if (cur_mode == mode)
+-  {
+-    // Don't set the same mode as current
+-    return true;
+-  }
++  CLog::Log(LOGDEBUG, "AMLUtils::aml_set_display_resolution new video mode is %s", mode.c_str());
+ 
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
+ 
+-- 
+2.7.4
+
