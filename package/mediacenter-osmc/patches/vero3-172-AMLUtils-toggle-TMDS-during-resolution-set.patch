@@ -1,0 +1,34 @@
+From a13daed267c53f721ad500e9c38fc89d304d883b Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Wed, 21 Aug 2019 10:05:26 +0200
+Subject: [PATCH 3/7] AMLUtils: toggle TMDS during resolution set
+
+---
+ xbmc/utils/AMLUtils.cpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 13fe209..0f6cb00 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -488,11 +488,14 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+ {
+   bool result = false;
+ 
+-  aml_handle_display_stereo_mode(RENDER_STEREO_MODE_OFF);
+-  result = aml_set_display_resolution(res, framebuffer_name);
++  aml_enable_PHY(false);
+ 
+-  aml_handle_scale(res);
+   aml_handle_display_stereo_mode(stereo_mode);
++  result = aml_set_display_resolution(res, framebuffer_name);
++  aml_handle_scale(res);
++
++  aml_enable_PHY(true);
++
+ 
+   return result;
+ }
+-- 
+2.7.4
+
