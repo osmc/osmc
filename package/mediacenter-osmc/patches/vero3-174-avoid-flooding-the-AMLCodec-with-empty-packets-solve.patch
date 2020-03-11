@@ -1,0 +1,27 @@
+From 1f5e34ed5809754b0ec5ed135a487e44c5b68c4e Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Sun, 1 Sep 2019 09:56:32 +0200
+Subject: [PATCH 5/7] avoid flooding the AMLCodec with empty packets (solves
+ the BD seamless branching problem)
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 14e11b3..3eac6f9 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -317,6 +317,9 @@ bool CDVDVideoCodecAmlogic::AddData(const DemuxPacket &packet)
+   uint8_t *pData(packet.pData);
+   int iSize(packet.iSize);
+ 
++  if (iSize == 0) // we ignore empty packets
++    return true;
++
+   if (pData)
+   {
+     if (m_bitstream)
+-- 
+2.7.4
+
