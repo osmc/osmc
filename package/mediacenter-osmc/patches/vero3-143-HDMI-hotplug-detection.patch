@@ -1,4 +1,4 @@
-From 3a175032812590e5c8b0348c788a40e369c6df56 Mon Sep 17 00:00:00 2001
+From f67d5135d5425dc2b71cf90c93141e43f668de08 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Thu, 18 Apr 2019 16:17:07 +0100
 Subject: [PATCH] Fix Vero2 HDMI hotplugging and provide fallback video.
@@ -7,12 +7,12 @@ Subject: [PATCH] Fix Vero2 HDMI hotplugging and provide fallback video.
  xbmc/Application.cpp                        | 14 ++++-
  xbmc/messaging/ApplicationMessenger.h       |  1 +
  xbmc/utils/AMLUtils.cpp                     | 11 +++-
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 91 +++++++++++++++++++++++++++++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 92 +++++++++++++++++++++++++++++
  xbmc/windowing/amlogic/WinSystemAmlogic.h   |  8 +++
- 5 files changed, 122 insertions(+), 3 deletions(-)
+ 5 files changed, 123 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index ec6c9bf5ae..5c723e397b
+index c49c185..dfc1610 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -2152,7 +2152,19 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
@@ -37,7 +37,7 @@ index ec6c9bf5ae..5c723e397b
      break;
  
 diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
-index 5b312e4ff5..0f63275fd4
+index 5b312e4..0f63275 100644
 --- a/xbmc/messaging/ApplicationMessenger.h
 +++ b/xbmc/messaging/ApplicationMessenger.h
 @@ -81,6 +81,7 @@
@@ -49,7 +49,7 @@ index 5b312e4ff5..0f63275fd4
  #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
  #define TMSG_GUI_INFOBOOL                 TMSG_MASK_GUIINFOMANAGER + 1
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 995891bb32..1881e4078b
+index 995891b..1881e40 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -490,8 +490,15 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
@@ -71,7 +71,7 @@ index 995891bb32..1881e4078b
      if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0)
        valstr += "\n" + vesastr;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index e4dddce719..99fc7084c0 100755
+index e4dddce..6f812d5 100755
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -32,10 +32,19 @@
@@ -104,7 +104,7 @@ index e4dddce719..99fc7084c0 100755
  
    // Register sink
    AE::CAESinkFactory::ClearSinks();
-@@ -115,12 +127,91 @@ CWinSystemAmlogic::CWinSystemAmlogic() :
+@@ -115,12 +127,92 @@ CWinSystemAmlogic::CWinSystemAmlogic() :
  
  CWinSystemAmlogic::~CWinSystemAmlogic()
  {
@@ -134,6 +134,7 @@ index e4dddce719..99fc7084c0 100755
 +
 +        mon = udev_monitor_new_from_netlink(udev, "udev");
 +        udev_monitor_filter_add_match_subsystem_devtype(mon, "extcon", NULL);
++	udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
 +
 +        udev_monitor_enable_receiving(mon);
 +        fd = udev_monitor_get_fd(mon);
@@ -197,7 +198,7 @@ index e4dddce719..99fc7084c0 100755
  {
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-index a4b2fc77d4..318c98de87
+index a4b2fc7..318c98d 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.h
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 @@ -15,6 +15,7 @@
@@ -228,5 +229,5 @@ index a4b2fc77d4..318c98de87
 +  std::thread m_monitorThread;
  };
 -- 
-2.11.0
+2.7.4
 
