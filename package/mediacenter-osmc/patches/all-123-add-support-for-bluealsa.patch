@@ -1,0 +1,69 @@
+From f740fed510ffe993b91d0d8f159c2756ae643e6b Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Thu, 12 Mar 2020 19:11:27 +0000
+Subject: [PATCH] Add support for bluealsa
+
+Adds bluetooth to ALSADeviceMonitor and provides for BT device to be
+recognised from asoundrc.
+The correct way is to probe dbus for BT audio devices
+but using ALSA alone, this is the most user-friendly way to provide
+for multiple BT sinks pending a solution using dbus.
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp      | 16 ++++++++++++++++
+ .../AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp | 14 +++++++++++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 14117da18c..eb483fe9e3 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -1441,6 +1456,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+   if (!OpenPCMDevice(device, "", ALSA_MAX_CHANNELS, &pcmhandle, config))
+     return;
+ 
++  CLog::Log(LOGINFO, "CAESinkALSA::EnumerateDevice - device %s description %s", device.c_str(), description.c_str());
+   snd_pcm_info_t *pcminfo;
+   snd_pcm_info_alloca(&pcminfo);
+   memset(pcminfo, 0, snd_pcm_info_sizeof());
+diff --git a/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp b/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
+index 7cdbc86bca..1ec7a98b60 100644
+--- a/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
+@@ -52,6 +52,13 @@ void CALSADeviceMonitor::Start()
+       goto err_unref_monitor;
+     }
+ 
++    err = udev_monitor_filter_add_match_subsystem_devtype(m_udevMonitor, "bluetooth", NULL);
++    if (err)
++    {
++      CLog::Log(LOGERROR, "CALSADeviceMonitor::Start - udev_monitor_filter_add_match_subsystem_devtype() for bluetooth failed");
++      goto err_unref_monitor;
++    }
++
+     err = udev_monitor_enable_receiving(m_udevMonitor);
+     if (err)
+     {
+@@ -99,7 +106,7 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
+     const char* action = udev_device_get_action(device);
+     const char* soundInitialized = udev_device_get_property_value(device, "SOUND_INITIALIZED");
+ 
+-    if (!action || !soundInitialized)
++    if (!action || (!soundInitialized && strcmp(udev_device_get_subsystem(device),"sound") == 0))
+       continue;
+ 
+     /* cardX devices emit a "change" event when ready (i.e. all subdevices added) */
+@@ -108,6 +115,11 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
+       CLog::Log(LOGDEBUG, "CALSADeviceMonitor - ALSA card added (\"%s\", \"%s\")", udev_device_get_syspath(device), udev_device_get_devpath(device));
+       audioDevicesChanged = true;
+     }
++    else if (strcmp(action, "add") == 0 && strcmp(udev_device_get_subsystem(device),"bluetooth") == 0)
++    {
++      usleep(2000 * 1000); // really need to probe dbus here
++      audioDevicesChanged = true;
++    }
+     else if (strcmp(action, "remove") == 0)
+     {
+       CLog::Log(LOGDEBUG, "CALSADeviceMonitor - ALSA card removed");
+-- 
+2.17.1
+
