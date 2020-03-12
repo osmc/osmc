@@ -1,45 +1,45 @@
-From 485866ea8e1029a1503f7d9ddb7f6ad748bc037d Mon Sep 17 00:00:00 2001
+From a95782f3f6ed7c80747bf59c3e15142d91863756 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 3 Mar 2020 02:40:11 +0000
 Subject: [PATCH] Add support for OSMC long press
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/keymaps/osmc/osmc_remote.xml | 329 ++++++++++++++++++++++++++++++++++++
- system/keymaps/osmc_classic.xml     | 141 ++++++++++++++++
+ system/keymaps/osmc/osmc_remote.xml | 395 ++++++++++++++++++++++++++++++++++++
+ system/keymaps/osmc_classic.xml     | 141 +++++++++++++
  system/peripherals.xml              |   5 +
- 3 files changed, 475 insertions(+)
+ 3 files changed, 541 insertions(+)
  create mode 100644 system/keymaps/osmc/osmc_remote.xml
  create mode 100644 system/keymaps/osmc_classic.xml
 
 diff --git a/system/keymaps/osmc/osmc_remote.xml b/system/keymaps/osmc/osmc_remote.xml
 new file mode 100644
-index 0000000..b7c6cec
+index 0000000..8904b9d
 --- /dev/null
 +++ b/system/keymaps/osmc/osmc_remote.xml
-@@ -0,0 +1,329 @@
+@@ -0,0 +1,395 @@
 +<?xml version="1.0" encoding="UTF-8"?>
-+<!-- The second and third generation OSMC remotes use i and c keys that stop functioning with some keyboard languages in OSMC.				-->
-+<!-- We have remapped those keys in OSMC to kpleftparen and kprightparen with udev to overcome this issue. This file maps those keys to		-->
-+<!-- Kodi actions and adds tweaks to provide enhanced function. Home was remapped in v1&2 for consistency. The buttons map in Kodi as...	-->
-+<!-- 																																		-->
-+<!-- OSMC with udev remap						non-OSMCv1				non-OSMCv2				non-OSMCv3									-->
-+<!-- Home  = escape        <key id="61467">		Home  = home			Home  = home			Home  = escape								-->
-+<!-- Info  = leftbracket   <key id="61480">		Info  = 				Info  = i				Info  = i									-->
-+<!-- Up    = up            <key id="61568">		Up    = up				Up    = up				Up    = up									-->
-+<!-- Down  = down          <key id="61569">		Down  = down			Down  = down			Down  = down								-->
-+<!-- Left  = left          <key id="61570">		Left  = left			Left  = left			Left  = left								-->
-+<!-- Right = right         <key id="61571">		Right = right			Right = right			Right = right								-->
-+<!-- OK    = return        <key id="61453">		OK    = return			OK    = return			OK    = return								-->
-+<!-- Back  = browser_back  <key id="61616">		Back  = browser_back	Back  = browser_back	Back  = browser_back						-->
-+<!-- Menu  = rightbracket  <key id="61481">		Menu  = 				Menu  = c				Menu  = c									-->
-+<!-- Play  = play_pause    <key id="61629">		Play  = play_pause		Play  = play_pause		Play  = play_pause							-->
-+<!-- Stop  = stop          <key id="61628">		Stop  = stop			Stop  = stop			Stop  = stop								-->
-+<!-- Vol-  = volume_down   <key id="61624">		RW    = rewind			Vol-  = minus			Vol-  = minus								-->
-+<!-- Vol+  = volume_up     <key id="61625">		FF    = fastforward		Vol+  = equals			Vol+  = equals								-->
-+<!-- 																																		-->
-+<!-- Keymap created by DarwinDesign version 20-03-2																							-->
-+<!-- 																																		-->
++<!-- The second and third generation OSMC remotes use i and c keys that stop functioning with some keyboard languages in OSMC.           -->
++<!-- We have remapped those keys in OSMC to kpleftparen and kprightparen with udev to overcome this issue. This file maps those keys to  -->
++<!-- Kodi actions and adds tweaks to provide enhanced function. Home was remapped in v1&2 for consistency. The buttons map in Kodi as... -->
++<!--                                                                                                                                     -->
++<!-- OSMC with udev remap                            non-OSMCv1                 non-OSMCv2                 non-OSMCv3                    -->
++<!-- Home  = escape        <key id="61467">          Home  = home               Home  = home               Home  = escape                -->
++<!-- Info  = leftbracket   <key id="61480">          Info  =                    Info  = i                  Info  = i                     -->
++<!-- Up    = up            <key id="61568">          Up    = up                 Up    = up                 Up    = up                    -->
++<!-- Down  = down          <key id="61569">          Down  = down               Down  = down               Down  = down                  -->
++<!-- Left  = left          <key id="61570">          Left  = left               Left  = left               Left  = left                  -->
++<!-- Right = right         <key id="61571">          Right = right              Right = right              Right = right                 -->
++<!-- OK    = return        <key id="61453">          OK    = return             OK    = return             OK    = return                -->
++<!-- Back  = browser_back  <key id="61616">          Back  = browser_back       Back  = browser_back       Back  = browser_back          -->
++<!-- Menu  = rightbracket  <key id="61481">          Menu  =                    Menu  = c                  Menu  = c                     -->
++<!-- Play  = play_pause    <key id="61629">          Play  = play_pause         Play  = play_pause         Play  = play_pause            -->
++<!-- Stop  = stop          <key id="61628">          Stop  = stop               Stop  = stop               Stop  = stop                  -->
++<!-- Vol-  = volume_down   <key id="61624">          RW    = rewind             Vol-  = minus              Vol-  = minus                 -->
++<!-- Vol+  = volume_up     <key id="61625">          FF    = fastforward        Vol+  = equals             Vol+  = equals                -->
++<!--                                                                                                                                     -->
++<!-- Keymap created by DarwinDesign version 20-03-11                                                                                     -->
++<!--                                                                                                                                     -->
 +<keymap>
 +	<global>
 +		<keyboard>
@@ -49,13 +49,15 @@ index 0000000..b7c6cec
 +			<home mod="longpress">fullscreen</home> <!-- Home v1 -->
 +			<leftbracket>Info</leftbracket> <!-- Info remap -->
 +			<i>Info</i> <!-- Info v3 -->
-+			<leftbracket mod="longpress">noop</leftbracket> <!-- Info remap -->
-+			<i mod="longpress">noop</i> <!-- Info v3 -->
++			<leftbracket mod="longpress">noop</leftbracket> <!-- Info remap stops cycling -->
++			<i mod="longpress">noop</i> <!-- Info v3  stops cycling -->
++			<return mod="longpress">noop</return> <!-- removes default context menu  & stops cycling -->
 +			<browser_back>Back</browser_back> <!-- Back -->
 +			<rightbracket>ContextMenu</rightbracket> <!-- Menu remap -->
 +			<c>ContextMenu</c> <!-- Menu v3 -->
 +			<rightbracket mod="longpress">Menu</rightbracket> <!-- Menu remap -->
 +			<c mod="longpress">Menu</c> <!-- Menu v3 -->
++			<play_pause mod="longpress">noop</play_pause> <!-- removes default info & stops cycling -->
 +			<f2>Notification(OSMC Remote Controller, Low Battery Please Replace,5000)</f2> <!-- Gen 3 OSMC remote low battery -->
 +		</keyboard>
 +	</global>
@@ -137,15 +139,25 @@ index 0000000..b7c6cec
 +			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
 +			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
 +			<escape></escape> <!-- removes default home to fullscreen -->
++			<return mod="longpress">ActivateWindow(MusicPlaylist)</return>
++			<rightbracket>Addon.Default.OpenSettings(xbmc.player.musicviz)</rightbracket> <!-- Menu remap -->
++			<c>Addon.Default.OpenSettings(xbmc.player.musicviz)</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">ActivateWindow(VisualisationPresetList)</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">ActivateWindow(VisualisationPresetList)</c> <!-- Menu v3 -->
 +		</keyboard>
 +	</Visualisation>
 +	<MusicOSD>
 +		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
 +			<leftbracket>info</leftbracket> <!-- Info remap -->
 +			<i>info</i> <!-- Info v3 -->
 +			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
 +			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
-+			<rightbracket></rightbracket> <!-- removes mapping from osmc-classic -->
++			<return mod="longpress">back</return>
++			<rightbracket>Addon.Default.OpenSettings(xbmc.player.musicviz)</rightbracket> <!-- Menu remap -->
++			<c>Addon.Default.OpenSettings(xbmc.player.musicviz)</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">ActivateWindow(VisualisationPresetList)</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">ActivateWindow(VisualisationPresetList)</c> <!-- Menu v3 -->
 +		</keyboard>
 +	</MusicOSD>
 +	<VisualisationPresetList>
@@ -154,6 +166,8 @@ index 0000000..b7c6cec
 +			<i>info</i> <!-- Info v3 -->
 +			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
 +			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<rightbracket>back</rightbracket> <!-- Menu remap -->
++			<c>back</c> <!-- Menu v3 -->
 +		</keyboard>
 +	</VisualisationPresetList>
 +	<slideshow>
@@ -171,10 +185,25 @@ index 0000000..b7c6cec
 +	</slideshow>
 +	<VideoOSD>
 +		<keyboard>
++			<escape>ActivateWindow(videobookmarks)</escape> <!-- Home v3 -->
++			<home>ActivateWindow(videobookmarks)</home> <!-- Home v1 -->
++			<escape mod="longpress">playerdebug</escape> <!-- Home v3 -->
++			<home mod="longpress">playerdebug</home> <!-- Home v1 -->
 +			<leftbracket>info</leftbracket> <!-- Info remap -->
 +			<i>info</i> <!-- Info v3 -->
 +			<leftbracket mod="longpress">playerprocessinfo</leftbracket> <!-- Info remap -->
 +			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
++			<up mod="longpress">SkipNext</up>
++			<down mod="longpress">SkipPrevious</down>
++			<left mod="longpress">AudioDelay</left>
++			<right mod="longpress">subtitledelay</right>
++			<rightbracket>ActivateWindow(osdvideosettings)</rightbracket> <!-- Menu remap -->
++			<return mod="longpress">back</return>
++			<c>ActivateWindow(osdvideosettings)</c> <!-- Menu v3 -->
++			<rightbracket mod="longpress">ActivateWindow(osdaudiosettings)</rightbracket> <!-- Menu remap -->
++			<c mod="longpress">ActivateWindow(osdaudiosettings)</c> <!-- Menu v3 -->
++			<play_pause mod="longpress">showsubtitles</play_pause>
++			<stop mod="longpress">ActivateWindow(osdsubtitlesettings)</stop>
 +		</keyboard>
 +	</VideoOSD>
 +	<VideoMenu>
@@ -231,7 +260,7 @@ index 0000000..b7c6cec
 +	<Videos>
 +		<keyboard>
 +			<return mod="longpress">SendClick(14)</return> <!-- OK toggle view of unwatched or all videos -->
-+			<right mod="longpress">togglewatched</right>
++			<play_pause mod="longpress">togglewatched</play_pause>
 +		</keyboard>
 +	</Videos>
 +	<VideoPlaylist>
@@ -257,6 +286,11 @@ index 0000000..b7c6cec
 +			<c>Back</c> <!-- Menu v3 -->
 +		</keyboard>
 +	</MusicInformation>
++  <MusicPlaylist>
++    <keyboard>
++			<return mod="longpress">back</return>
++    </keyboard>
++  </MusicPlaylist>
 +	<SongInformation>
 +		<keyboard>
 +			<escape>back</escape> <!-- Home v3 -->
@@ -303,10 +337,16 @@ index 0000000..b7c6cec
 +			<i mod="longpress">playerprocessinfo</i> <!-- Info v3 -->
 +			<left mod="longpress">AudioDelay</left>
 +			<right mod="longpress">subtitledelay</right>
++			<return mod="longpress">Record</return>
 +			<play_pause mod="longpress">showsubtitles</play_pause>
 +			<stop mod="longpress">ActivateWindow(Teletext)</stop>
 +		</keyboard>
 +	</FullscreenLiveTV>
++	<TVGuide>
++		<keyboard>
++			<return mod="longpress">Record</return>
++		</keyboard>
++	</TVGuide>
 +	<FullscreenRadio>
 +		<keyboard>
 +			<rightbracket>ActivateWindow(PVROSDChannels)</rightbracket> <!-- Menu remap -->
@@ -346,8 +386,33 @@ index 0000000..b7c6cec
 +			<stop mod="longpress">ActivateWindow(osdsubtitlesettings)</stop>
 +		</keyboard>
 +	</PlayerProcessInfo>
++	<yesnodialog> <!-- Added to allow CEC when update dialog box appears -->
++		<keyboard>
++			<escape>CECActivateSource</escape> <!-- Home v3 -->
++			<home>CECActivateSource</home> <!-- Home v1 -->
++			<escape mod="longpress">CECStandby</escape> <!-- Home v3 -->
++			<home mod="longpress">CECStandby</home> <!-- Home v1 -->
++		</keyboard>
++	</yesnodialog>
++	<selectdialog>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++		</keyboard>
++	</selectdialog>
++	<contextmenu>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++		</keyboard>
++	</contextmenu>
++	<addonsettings>
++		<keyboard>
++			<escape>back</escape> <!-- Home v3 -->
++			<home>back</home> <!-- Home v1 -->
++		</keyboard>
++	</addonsettings>
 +</keymap>
-\ No newline at end of file
 diff --git a/system/keymaps/osmc_classic.xml b/system/keymaps/osmc_classic.xml
 new file mode 100644
 index 0000000..084a12c
