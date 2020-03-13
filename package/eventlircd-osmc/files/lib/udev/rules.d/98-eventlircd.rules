@@ -216,16 +216,6 @@ ENV{ID_VENDOR_ID}=="05a4", ENV{ID_MODEL_ID}=="9881", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="03_$env{ID_VENDOR_ID}_$env{ID_MODEL_ID}.evmap"
 
-# OSMC RF remote
-ENV{ID_VENDOR_ID}=="2252", ENV{ID_MODEL_ID}=="1037", \
-  ENV{eventlircd_enable}="true", \
-  ENV{eventlircd_evmap}="osmc_rf.evmap"
-
-# OSMC RF 2nd generation remote
-ENV{ID_VENDOR_ID}=="2017", ENV{ID_MODEL_ID}=="1688", \
-  ENV{eventlircd_enable}="true", \
-  ENV{eventlircd_evmap}="osmc_rf2.evmap"
-
 # Enable wake-on-usb for the USB remotes.
 ENV{eventlircd_enable}=="true", RUN+="wakeup_enable"
 
