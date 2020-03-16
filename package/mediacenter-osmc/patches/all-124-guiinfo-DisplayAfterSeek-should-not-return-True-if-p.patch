@@ -1,0 +1,48 @@
+From 05828366eb07e61f93661e490b23504ec2753e94 Mon Sep 17 00:00:00 2001
+From: ronie <ronie@kodi.tv>
+Date: Sun, 2 Feb 2020 19:34:16 +0100
+Subject: [PATCH] [guiinfo] DisplayAfterSeek should not return True if playback
+ is paused
+
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp     | 7 +++++--
+ xbmc/video/windows/GUIWindowFullScreen.cpp | 3 ++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index f7571be37f..683db81709 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -2808,10 +2808,13 @@ void CVideoPlayer::HandleMessages()
+       }
+ 
+       if (speed != DVD_PLAYSPEED_PAUSE && m_playSpeed != DVD_PLAYSPEED_PAUSE && speed != m_playSpeed)
++      {
+         m_callback.OnPlayBackSpeedChanged(speed / DVD_PLAYSPEED_NORMAL);
+ 
+-      // notify GUI, skins may want to show the seekbar
+-      CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPlayerInfoProvider().SetDisplayAfterSeek();
++        // notify GUI, skins may want to show the seekbar
++        CServiceBroker::GetGUI()->
++          GetInfoManager().GetInfoProviders().GetPlayerInfoProvider().SetDisplayAfterSeek();
++      }
+ 
+       if (m_pInputStream->IsStreamType(DVDSTREAM_TYPE_PVRMANAGER) && speed != m_playSpeed)
+       {
+diff --git a/xbmc/video/windows/GUIWindowFullScreen.cpp b/xbmc/video/windows/GUIWindowFullScreen.cpp
+index fd19a30779..f94a8fce75 100644
+--- a/xbmc/video/windows/GUIWindowFullScreen.cpp
++++ b/xbmc/video/windows/GUIWindowFullScreen.cpp
+@@ -291,7 +291,8 @@ EVENT_RESULT CGUIWindowFullScreen::OnMouseEvent(const CPoint &point, const CMous
+ void CGUIWindowFullScreen::FrameMove()
+ {
+   float playspeed = g_application.GetAppPlayer().GetPlaySpeed();
+-  if (playspeed != 1.0 && !g_application.GetAppPlayer().HasGame())
++  if (playspeed != 1.0 && !g_application.GetAppPlayer().HasGame() &&
++      !g_application.GetAppPlayer().IsPausedPlayback())
+     CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPlayerInfoProvider().SetDisplayAfterSeek();
+ 
+   if (!g_application.GetAppPlayer().HasPlayer())
+-- 
+2.17.1
+
