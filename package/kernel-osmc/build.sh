@@ -14,7 +14,7 @@ test $1 == rbp1 && VERSION="4.19.55" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS
 test $1 == rbp2 && VERSION="4.19.55" && REV="6" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="12" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="156" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="3.14.29" && REV="157" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -231,6 +231,7 @@ then
 	# Disassemble kernel image package to add device tree overlays, additional out of tree modules etc
 	dpkg -x ${1}-image*.deb files-image/
 	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
+	if [ "$1" == "vero364" ]; then sed -ie 's/^Depends:.*$/&, vero3-bootloader-osmc:armhf (>= 1.0.0)/g' files-image/DEBIAN/control; fi
 	rm ${1}-image*.deb
 	dpkg_build files-image ${1}-image-${VERSION}-${REV}-osmc.deb
 	# Disassemble kernel headers package to include full headers (upstream Debian bug...)
