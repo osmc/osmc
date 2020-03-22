@@ -63,6 +63,14 @@ Ensure we don't get issues with missing libgcc or libstdc++ DLLs by adding this 
 
 ````QMAKE_LFLAGS		= -static````
 
+Change
+
+```QMAKE_CXXFLAGS		= $$QMAKE_CFLAGS```
+
+to:
+
+```QMAKE_CXXFLAGS		= $$QMAKE_CFLAGS -std=gnu++98```
+
 Now, open a command prompt (cmd.exe). cd in to the C:\MinGW\qt\qt-everywhere-opensource-src-4.8.6 directory. Add MinGW binaries to your PATH:
 
 ````
