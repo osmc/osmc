@@ -204,7 +204,7 @@ class Main(object):
 		self.try_count = 0
 		self.position_icon()
 		self.window.addControl(self.update_image)
-		self.update_image.setVisibleCondition('[SubString(Window(Home).Property(OSMC_notification), true, left)]')
+		self.update_image.setVisibleCondition('[String.Contains(Window(Home).Property(OSMC_notification), true)]')
 		# self.window.setProperty('OSMC_notification', 'true')    # USE THIS TO TEST THE UPDATE_ICON
 
 		# this flag is present when updates have been downloaded but the user wants to choose when to install using
