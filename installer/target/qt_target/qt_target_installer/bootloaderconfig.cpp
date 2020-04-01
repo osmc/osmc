@@ -95,6 +95,19 @@ void BootloaderConfig::copyBootFiles()
             QString ddCmd = "dd if=" + dtbName + " of=/dev/dtb bs=256k conv=sync";
             system(ddCmd.toLocal8Bit().data());
         }
+        /* Upload the bootloader to eMMC */
+        QString bootloaderName;
+        if (utils->is4kplus() == "4kplus") {
+            bootloaderName = "uboot-vero4kplus.bin";
+        }
+        else {
+            bootloaderName = "uboot-vero4k.bin";
+        }
+        logger->addLine("Vero 4K family: bootloader to be flashed is " + bootloaderName);
+	QString ddCmd = "dd if=/mnt/root/opt/vero3/" + bootloaderName + " of=/dev/mmcblk0 conv=fsync bs=1 count=11";
+	system(ddCmd.toLocal8Bit().data());
+	ddCmd = "dd if=/mnt/root/opt/vero3/" + bootloaderName + " of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1";
+        system(ddCmd.toLocal8Bit().data());
     }
 }
 

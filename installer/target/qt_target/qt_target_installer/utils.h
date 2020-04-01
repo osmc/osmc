@@ -18,6 +18,7 @@ class Utils
 public:
     Utils(Logger *logger);
     QString getOSMCDev();
+    QString is4kplus();
     void rebootSystem();
     bool mklabel(QString device, bool isGPT);
     bool setflag(QString device, QString flag, bool on);

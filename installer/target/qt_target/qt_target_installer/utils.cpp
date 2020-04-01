@@ -24,6 +24,14 @@ QString Utils::getOSMCDev()
     get_cmdline_option("osmcdev=", osmcdev, sizeof(osmcdev));
     return (QString(osmcdev).simplified());
 }
+
+QString Utils::is4kplus()
+{
+    char rev[7];
+    get_cmdline_option("revision=", rev, sizeof(rev));
+    return (QString(rev).simplified());
+}
+
 void Utils::rebootSystem()
 {
     /* Only reboot on real system */
