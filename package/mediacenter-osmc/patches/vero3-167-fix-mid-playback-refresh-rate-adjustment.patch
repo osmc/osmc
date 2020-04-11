@@ -1,4 +1,4 @@
-From d5d0d4cca779dc33786e1ddbb008d0f7821af63b Mon Sep 17 00:00:00 2001
+From 69c19fec520d8957c42c52721c5cbdf84f1fb63c Mon Sep 17 00:00:00 2001
 From: tanio99 <tanio99@wolke7.net>
 Date: Sun, 29 Mar 2020 12:05:20 +0200
 Subject: [PATCH 1/3] CDVDDemuxFFmpeg: also check for extradata_size change
@@ -26,43 +26,88 @@ index b24eb92..4550bd4 100644
 2.7.4
 
 
-From 41c88ffa263dcfd024e1df4bf1eaed21b154250b Mon Sep 17 00:00:00 2001
+From 9a1f9cb1f0e71b0a4e2e3afda206a7258d1a61ee Mon Sep 17 00:00:00 2001
 From: tanio99 <tanio99@wolke7.net>
 Date: Fri, 3 Apr 2020 16:04:50 +0200
-Subject: [PATCH 2/3] CDVDDemuxFFmpeg: use real base framerate for mkv files if
- avg frame rate seems to be nonsense
+Subject: [PATCH 2/3] CDVDDemuxFFmpeg: when adding video streams ignore frame
+ rates which seem to be nonsense
 
 ---
- xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ .../VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp     | 28 ++++++++++++++++++++++
+ .../cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 4550bd4..c8e5607 100644
+index 4550bd4..add5545 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-@@ -1532,8 +1532,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1475,6 +1475,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+   m_parsers.clear();
+ }
+ 
++bool CDVDDemuxFFmpeg::isFpsNonsense(const AVRational &frameRate)
++{
++  if (frameRate.num == 0 || frameRate.den == 0)
++  {
++	return true;
++  }
++
++  const double fps = (double) frameRate.num / (double) frameRate.den;
++  return fps > 500.;
++}
++
+ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+ {
+   AVStream* pStream = m_pFormatContext->streams[streamIdx];
+@@ -1529,6 +1540,18 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+ 
+         AVRational r_frame_rate = pStream->r_frame_rate;
+ 
++        if (isFpsNonsense(r_frame_rate))
++        {
++          r_frame_rate.num = 0;
++          r_frame_rate.den = 0;
++        }
++
++        if (isFpsNonsense(pStream->avg_frame_rate))
++        {
++          pStream->avg_frame_rate.num = 0;
++          pStream->avg_frame_rate.den = 0;
++        }
++
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
--          st->iFpsRate = pStream->avg_frame_rate.num;
--          st->iFpsScale = pStream->avg_frame_rate.den;
-+          double fps = (double) pStream->avg_frame_rate.num / (double) pStream->avg_frame_rate.den;
-+          if (fps > 500. && r_frame_rate.num > 0 && r_frame_rate.den > 0) {
-+            // fps seems to be nonsense so we're use real base framerate instead
-+            st->iFpsRate = r_frame_rate.num;
-+            st->iFpsScale = r_frame_rate.den;
-+          } else {
-+            st->iFpsRate = pStream->avg_frame_rate.num;
-+            st->iFpsScale = pStream->avg_frame_rate.den;
-+          }
+@@ -1540,6 +1563,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+           st->iFpsRate = r_frame_rate.num;
+           st->iFpsScale = r_frame_rate.den;
          }
-         else if(r_frame_rate.den && r_frame_rate.num)
++        else if(pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
++        {
++          st->iFpsRate = pStream->avg_frame_rate.num;
++          st->iFpsScale = pStream->avg_frame_rate.den;
++        }
+         else
          {
+           st->iFpsRate  = 0;
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
+index 3412924..6746dab 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
+@@ -174,5 +174,8 @@ protected:
+   double m_dtsAtDisplayTime;
+   bool m_seekToKeyFrame = false;
+   double m_startTime = 0;
++
++private:
++  bool isFpsNonsense(const AVRational &frameRate);
+ };
+ 
 -- 
 2.7.4
 
 
-From bb17f08c654a5f7a8ee286a9f805c9936ac13a39 Mon Sep 17 00:00:00 2001
+From e8bef0ded30bd692f28db4d9841b896a9c65fc6a Mon Sep 17 00:00:00 2001
 From: tanio99 <tanio99@wolke7.net>
 Date: Fri, 3 Apr 2020 16:06:31 +0200
 Subject: [PATCH 3/3] CDVDDemuxFFmpeg: don't close/reopen stream
@@ -72,7 +117,7 @@ Subject: [PATCH 3/3] CDVDDemuxFFmpeg: don't close/reopen stream
  1 file changed, 10 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index c8e5607..b0aa8d3 100644
+index add5545..3a4ed56 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -598,16 +598,6 @@ bool CDVDDemuxFFmpeg::Open(std::shared_ptr<CDVDInputStream> pInput, bool streami
@@ -94,5 +139,4 @@ index c8e5607..b0aa8d3 100644
    if (m_pFormatContext->iformat && strcmp(m_pFormatContext->iformat->name, "hls,applehttp") == 0)
 -- 
 2.7.4
-
 
