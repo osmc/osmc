@@ -1,0 +1,78 @@
+From cfec9bb8e71522c043f4dbcbd4ac68449c783f99 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Thu, 9 Apr 2020 17:37:17 +0200
+Subject: [PATCH] BitstreamConverter: fix signed/unsigned mismatches and
+ a pointer arithmetic issue causing an overrun
+
+---
+ xbmc/utils/BitstreamConverter.cpp | 10 +++++-----
+ xbmc/utils/BitstreamConverter.h   |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
+index ff481c8..663ed62 100644
+--- a/xbmc/utils/BitstreamConverter.cpp
++++ b/xbmc/utils/BitstreamConverter.cpp
+@@ -533,7 +533,7 @@ bool CBitstreamConverter::Convert(uint8_t *pData, int iSize)
+         if (m_convert_bitstream)
+         {
+           // convert demuxer packet from bitstream to bytestream (AnnexB)
+-          int bytestream_size = 0;
++          uint32_t bytestream_size = 0;
+           uint8_t *bytestream_buff = NULL;
+ 
+           BitstreamConvert(demuxer_content, demuxer_bytes, &bytestream_buff, &bytestream_size);
+@@ -878,7 +878,7 @@ bool CBitstreamConverter::IsSlice(uint8_t unit_type)
+   }
+ }
+ 
+-bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **poutbuf, int *poutbuf_size)
++bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **poutbuf, uint32_t *poutbuf_size)
+ {
+   // based on h264_mp4toannexb_bsf.c (ffmpeg)
+   // which is Copyright (c) 2007 Benoit Fouet <benoit.fouet@free.fr>
+@@ -888,7 +888,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+   uint8_t *buf = pData;
+   uint32_t buf_size = iSize;
+   uint8_t  unit_type, nal_sps, nal_pps, nal_sei;
+-  int32_t  nal_size;
++  uint32_t nal_size;
+   uint32_t cumul_size = 0;
+   const uint8_t *buf_end = buf + buf_size;
+ 
+@@ -926,7 +926,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+         unit_type = (*buf >> 1) & 0x3f;
+     }
+ 
+-    if (buf + nal_size > buf_end || nal_size <= 0)
++    if (nal_size > (buf_end - buf) || nal_size == 0)
+       goto fail;
+ 
+     // Don't add sps/pps if the unit already contain them
+@@ -965,7 +965,7 @@ fail:
+   return false;
+ }
+ 
+-void CBitstreamConverter::BitstreamAllocAndCopy( uint8_t **poutbuf, int *poutbuf_size,
++void CBitstreamConverter::BitstreamAllocAndCopy( uint8_t **poutbuf, uint32_t *poutbuf_size,
+     const uint8_t *sps_pps, uint32_t sps_pps_size, const uint8_t *in, uint32_t in_size)
+ {
+   // based on h264_mp4toannexb_bsf.c (ffmpeg)
+diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
+index 9244870..7340063 100644
+--- a/xbmc/utils/BitstreamConverter.h
++++ b/xbmc/utils/BitstreamConverter.h
+@@ -108,8 +108,8 @@ protected:
+   bool              IsSlice(uint8_t unit_type);
+   bool              BitstreamConvertInitAVC(void *in_extradata, int in_extrasize);
+   bool              BitstreamConvertInitHEVC(void *in_extradata, int in_extrasize);
+-  bool              BitstreamConvert(uint8_t* pData, int iSize, uint8_t **poutbuf, int *poutbuf_size);
+-  static void       BitstreamAllocAndCopy(uint8_t **poutbuf, int *poutbuf_size,
++  bool              BitstreamConvert(uint8_t* pData, int iSize, uint8_t **poutbuf, uint32_t *poutbuf_size);
++  static void       BitstreamAllocAndCopy(uint8_t **poutbuf, uint32_t *poutbuf_size,
+                       const uint8_t *sps_pps, uint32_t sps_pps_size, const uint8_t *in, uint32_t in_size);
+ 
+   typedef struct omx_bitstream_ctx {
+-- 
+2.7.4
+
