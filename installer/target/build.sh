@@ -75,7 +75,7 @@ if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == 
 date=$(date +%Y%m%d)
 if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero1" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
 then
-	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size}
+	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size} conv=sparse
 	parted -s OSMC_TGT_${1}_${date}.img mklabel msdos
 	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 4Mib 100%
 	kpartx -s -a OSMC_TGT_${1}_${date}.img
