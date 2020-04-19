@@ -25,11 +25,6 @@ python
 bison
 flex"
 
-if [ "$1" == "vero2" ]
-then
-   packages="abootimg u-boot-tools $packages"
-fi
-
 for package in $packages
 do
 	install_package $package
@@ -94,13 +89,14 @@ fi
 if [ "$1" == "vero2" ]
 then
 	echo -e "Installing Vero 2 files"
-	abootimg --create /mnt/kernel.img -k uImage -r rootfs.cpio.gz -s ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
+	../../output/build/linux-master/scripts/mkbootimg --kernel uImage --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_vero2.dtb --output /mnt/kernel.img
+
 fi
 if [ "$1" == "vero3" ]
 then
 	echo -e "Installing Vero 3 files"
 	../.././output/build/linux-master/scripts/multidtb/multidtb -o multi.dtb --dtc-path $(pwd)/../../output/build/linux-master/scripts/dtc/ $(pwd)/../../output/build/linux-master/arch/arm64/boot/dts/amlogic --verbose --page-size 2048
-	abootimg --create /mnt/kernel.img -k Image.gz -r rootfs.cpio.gz -s multi.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
+        ../../output/build/linux-master/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output /mnt/kernel.img
 	cp multi.dtb /mnt/dtb.img
 fi
 echo -e "Installing filesystem"
