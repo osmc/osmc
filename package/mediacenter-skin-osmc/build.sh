@@ -7,19 +7,28 @@
 
 make clean
 
-REV="4935ce489f9a5f96b007e6d6378cb0415c8e21a0"
-echo -e "Building package mediacenter-skin-osmc"
-echo -e "Downloading skin"
-pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
-if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
-echo -e "Moving files in to place"
+process_skin() {
+echo -e "Moving ${2} files in to place"
 mkdir -p files/usr/share/kodi/addons
-cp -ar src/skin.osmc-${REV}/ files/usr/share/kodi/addons/skin.osmc
-if [ -f files/usr/share/kodi/addons/skin.osmc/media/Textures.xbt ]
+cp -ar src/skin.osmc-${1} files/usr/share/kodi/addons/${2} # Always called skin.osmc in src because of repo name
+if [ -f files/usr/share/kodi/addons/${2}/media/Textures.xbt ]
 then
     echo "TexturePacked file detected, deleting unneeded artefacts"
-    pushd files/usr/share/kodi/addons/skin.osmc/media
+    pushd files/usr/share/kodi/addons/${2}/media
     find . ! -name 'Textures.xbt' -delete
     popd
 fi
+}
+
+REV="37d42ef509f09d84f37979bc7f67c9fa025e6332"
+SCOPE_REV="1c37a413d052a098002fc0d88eea809e80fb0a68"
+echo -e "Building package mediacenter-skin-osmc"
+echo -e "Downloading skin"
+pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
+if [ $? != 0 ]; then echo -e "Error downloading classic skin" && exit 1; fi
+process_skin "$REV" "skin.osmc"
+echo -e "Downloading scope skin"
+pull_source "https://github.com/osmc/skin.osmc/archive/${SCOPE_REV}.tar.gz" "$(pwd)/src"
+if [ $? != 0 ]; then echo -e "Error downloading classic skin" && exit 1; fi
+process_skin "$SCOPE_REV" "skin.osmc.scope"
 dpkg_build files/ mediacenter-skin-osmc.deb
