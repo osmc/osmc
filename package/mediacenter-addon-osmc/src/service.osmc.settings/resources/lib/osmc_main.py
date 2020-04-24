@@ -212,7 +212,7 @@ class Main(object):
 							log('/tmp/walkthrough_completed written')
 							pass
 							
-						subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
+						subprocess.check_call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
 						try:
 							xbmc.setosmcwalkthroughstatus(2)
 						except Exception as e:

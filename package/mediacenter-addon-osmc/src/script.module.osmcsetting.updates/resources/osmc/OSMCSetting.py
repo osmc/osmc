@@ -210,9 +210,9 @@ class OSMCSettingClass(threading.Thread):
 		# check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file	
 		if addon.getSetting('kodi_reset') == 'true':
 			log('creating kodi reset file')
-			subprocess.call(['sudo', 'touch', self.reset_file])
+			subprocess.check_call(['sudo', 'touch', self.reset_file])
 		else:
-			subprocess.call(['sudo', 'rm', self.reset_file])
+			subprocess.check_call(['sudo', 'rm', self.reset_file])
 
 		log('END')
 		for x, k in self.setting_data_method.iteritems():

@@ -916,7 +916,7 @@ class osmc_backup(object):
 				f.writelines(uniquify(new_lines))
 
 			# finally, copy the temp fstab over the live fstab
-			res = subprocess.call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
+			res = subprocess.check_call(["sudo", "mv", '/tmp/fstab', '/etc/fstab' ])
 
 
 

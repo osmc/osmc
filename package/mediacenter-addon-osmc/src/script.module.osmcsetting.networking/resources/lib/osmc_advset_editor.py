@@ -138,9 +138,9 @@ class AdvancedSettingsEditor(object):
 
 			self.log('Empty dictionary passed to advancedsettings file writer. Preventing write, backing up and removing file.')
 
-			subprocess.call(['sudo', 'cp', loc, loc.replace('advancedsettings.xml', 'advancedsettings_backup.xml')])
+			subprocess.check_call(['sudo', 'cp', loc, loc.replace('advancedsettings.xml', 'advancedsettings_backup.xml')])
 
-			subprocess.call(['sudo', 'rm', '-f', loc])
+			subprocess.check_call(['sudo', 'rm', '-f', loc])
 
 			return
 

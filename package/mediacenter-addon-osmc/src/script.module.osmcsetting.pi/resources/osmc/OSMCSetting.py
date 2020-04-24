@@ -234,7 +234,7 @@ Overclock settings are set using the Pi Overclock module."""
 		parser.write_config_file('/var/tmp/config.txt', new_settings)
 
 		# copy over the temp config.txt to /boot/ as superuser
-		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
+		subprocess.check_call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
 
 		ok = DIALOG.notification(lang(32095), lang(32096))
 
@@ -294,7 +294,7 @@ Overclock settings are set using the Pi Overclock module."""
 		parser.write_config_file('/var/tmp/config.txt', new_config)
 
 		# copy over the temp config.txt to /boot/ as superuser
-		subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
+		subprocess.check_call(["sudo", "mv",  '/var/tmp/config.txt', self.config_location])
 
 
 if __name__ == "__main__":
