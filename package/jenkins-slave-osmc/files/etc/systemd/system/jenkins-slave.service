@@ -4,6 +4,8 @@ After = network-online.target
 
 [Service]
 Type = simple
+User=root
+Group=root
 EnvironmentFile=/etc/jenkins-slave.conf
 ExecStart = /opt/osmc-tc/jenkins-slave/jenkins-slave
 
