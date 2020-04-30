@@ -62,8 +62,7 @@ then
 	handle_dep "rename"
         if [ "$1" == "vero2" ]  || [ "$1" == "vero364" ]
         then
-            handle_dep "u-boot-tools"
-	    handle_dep "abootimg"
+	    handle_dep "python"
         fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
@@ -143,7 +142,7 @@ then
 	if [ "$1" == "vero2" ]
 	then
 		# Special packaging for Android
-		abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm/boot/uImage -r ../../initramfs-src/initrd.img.gz -s arch/arm/boot/dts/amlogic/meson8b_vero2.dtb
+                ./scripts/mkbootimg --kernel arch/arm/boot/uImage --ramdisk ../../initramfs-src/initrd.img.gz --second arch/arm/boot/dts/amlogic/meson8b_vero2.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
 		if [ $? != 0 ]; then echo "Building Android image for Vero 2 failed" && exit 1; fi
 	fi
 	if [ "$1" == "vero364" ]
@@ -151,7 +150,7 @@ then
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
 		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic --verbose --page-size 2048
-                abootimg --create ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img -k arch/arm64/boot/Image.gz -r ../../initramfs-src/initrd.img.gz -s multi.dtb -c "kerneladdr=0x1080000" -c "pagesize=0x800" -c "ramdiskaddr=0x1000000" -c "secondaddr=0xf00000" -c "tagsaddr=0x100"
+		./scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
                 if [ $? != 0 ]; then echo "Building Android image for Vero 3 failed" && exit 1; fi
 		# Hacks for lack of ARM64 native in kernel-package for Jessie
 		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
