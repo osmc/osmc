@@ -64,6 +64,7 @@ then
         then
 	    handle_dep "python"
         fi
+	if [ "$1" == "vero2" ]; then handle_dep "u-boot-tools"; fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
