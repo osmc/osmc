@@ -34,11 +34,6 @@ then
 	mkdir -p files-dev/usr/osmc/include/amcodec/ppmgr
 	mkdir -p files-dev/usr/osmc/include/amcodec/amports
 	pushd src/libamcodec*
-	$BUILD -C amavutils PREFIX="/usr/osmc"
-	if [ $? != 0 ]; then echo "Error occured building amavutils" && exit 1; fi
-	cp -ar amavutils/*.so ${out}/usr/osmc/lib
-	$BUILD -C amadec PREFIX="/usr/osmc"
-	if [ $? != 0 ]; then echo "Error occured building amadec" && exit 1; fi
 	cp -ar amadec/*.so ${out}/usr/osmc/lib
 	$BUILD -C amcodec PREFIX="/usr/osmc"
 	if [ $? != 0 ]; then echo "Error occured building amcodec" && exit 1; fi
