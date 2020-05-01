@@ -25,6 +25,11 @@ python
 bison
 flex"
 
+if [ "$1" == "vero2" ]
+then
+   packages="u-boot-tools $packages"
+fi
+
 for package in $packages
 do
 	install_package $package
