@@ -12,7 +12,7 @@ build_in_env "${1}" $(pwd) "bluez-alsa-app-osmc"
 build_return=$?
 if [ $build_return == 99 ]
 then
-	echo -e "Building package bluez-alsa"
+	echo -e "Building package bluez-alsa-app-osmc"
 	out=$(pwd)/files
 	make clean
 	update_sources
@@ -21,6 +21,7 @@ then
 	handle_dep "libdbus-1-dev"
 	handle_dep "libsbc-dev"
 	handle_dep "libglib2.0-dev"
+	handle_dep "libfdk-aac-dev"
 	handle_dep "automake"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
