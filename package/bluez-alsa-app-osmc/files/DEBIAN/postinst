@@ -35,15 +35,19 @@ if [ "$1" = "configure" ]; then
 
 	systemctl daemon-reload
 
-	systemctl enable bluealsa.service > /dev/null 2>&1
-	systemctl enable bluealsa-aplay.service > /dev/null 2>&1
+	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
+		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
+		systemctl enable bluealsa.service > /dev/null 2>&1
+		systemctl enable bluealsa-aplay.service > /dev/null 2>&1
+		echo Please see .asoundrc.example in your home directory to set up your BT devices
+	fi
+
 	if ischroot; then exit 0; fi
-	systemctl restart bluetooth.service > /dev/null 2>&1
-	systemctl restart bluealsa.service > /dev/null 2>&1
-	systemctl restart bluealsa-aplay.service > /dev/null 2>&1
+
+	if systemctl is-active bluetooth.target >/dev/null 2>&1; then
+		if systemctl is-enabled bluealsa.service; then systemctl restart bluealsa.service; fi >/dev/null 2>&1
+		if systemctl is-enabled bluealsa-aplay.service; then systemctl restart bluealsa-aplay.service; fi >/dev/null 2>&1
+	fi
 	exit 0
 fi
 
-chmod +x /usr/bin/bluealsa*
-
-echo Please see .asoundrc.example in your home directory to set up your BT devices
