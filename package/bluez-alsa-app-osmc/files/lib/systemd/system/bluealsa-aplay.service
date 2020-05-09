@@ -2,6 +2,7 @@
 Description=A2DP Playback
 After=bluealsa.service syslog.service
 Requires=bluealsa.service
+StopWhenUnneeded=true
 
 [Service]
 ExecStartPre=/bin/sleep 3
