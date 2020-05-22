@@ -37,7 +37,7 @@ def is_service_active(service_name):
 
 def update_service(service_name, service_status):
     fnull = open(os.devnull, 'w')
-    subprocess.call(['sudo', '/bin/systemctl', service_status, service_name], stderr=fnull, stdout=fnull)
+    subprocess.check_call(['sudo', '/bin/systemctl', service_status, service_name], stderr=fnull, stdout=fnull)
     fnull.close()
     time.sleep(1)
 

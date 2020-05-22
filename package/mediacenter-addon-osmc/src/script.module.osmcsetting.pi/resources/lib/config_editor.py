@@ -143,15 +143,15 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 
 					# backup existing config
 					suffix = '_' + str(time.time()).split('.')[0]
-					subprocess.call(["sudo", "cp", self.config, '/home/pi/' ])
-					subprocess.call(["sudo", "mv", '/home/pi/config.txt', '/home/pi/config' + suffix + '.txt' ])
+					subprocess.check_call(["sudo", "cp", self.config, '/home/pi/' ])
+					subprocess.check_call(["sudo", "mv", '/home/pi/config.txt', '/home/pi/config' + suffix + '.txt' ])
 
 					# copy over the temp config.txt to /boot/ as superuser
-					subprocess.call(["sudo", "mv", tmp_loc, self.config ])
+					subprocess.check_call(["sudo", "mv", tmp_loc, self.config ])
 
 					# THIS IS JUST FOR TESTING, LAPTOP DOESNT LIKE SUDO HERE
 					try:
-						subprocess.call(["mv", tmp_loc, self.config ])
+						subprocess.check_call(["mv", tmp_loc, self.config ])
 					except:
 						pass
 

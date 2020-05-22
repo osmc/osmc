@@ -242,7 +242,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 			with open('/var/tmp/blacklist-rc6.conf', 'w') as f:
 				f.write('blacklist ir_rc6_decoder\ninstall ir_rc6_decoder /bin/true')
 
-			subprocess.call(["sudo", "mv", '/var/tmp/blacklist-rc6.conf', self.rc6_file_loc])
+			subprocess.check_call(["sudo", "mv", '/var/tmp/blacklist-rc6.conf', self.rc6_file_loc])
 
 			log('RC6 blacklist file moved')
 
@@ -250,7 +250,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 
 			log('RC6 blacklist file removed')
 
-			subprocess.call(["sudo", "rm", "-f", self.rc6_file])
+			subprocess.check_call(["sudo", "rm", "-f", self.rc6_file])
 
 
 	def onClick(self, controlID):
@@ -357,7 +357,7 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 			log('Original lircd_path target: %s' % original_target)
 			
 			# symlink the master conf to the new selection
-			subprocess.call(['sudo', 'ln', '-sf', self.remote_selection, LIRCD_PATH])
+			subprocess.check_call(['sudo', 'ln', '-sf', self.remote_selection, LIRCD_PATH])
 
 
 			# open test dialog
@@ -370,9 +370,9 @@ class remote_GUI(xbmcgui.WindowXMLDialog):
 			# if the test wasnt successful, then revert to the previous conf
 			if not self.remote_test.test_successful:
 
-				subprocess.call(['sudo', 'ln', '-sf', original_target, LIRCD_PATH])
+				subprocess.check_call(['sudo', 'ln', '-sf', original_target, LIRCD_PATH])
 
-				subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
+				subprocess.check_call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
 
 				# add busy dialog, loop until service restarts
 

@@ -1157,4 +1157,4 @@ if __name__ == "__main__":
     extracted_settings = config_to_kodi(MASTER_SETTINGS, config)
     new_settings = kodi_to_config(MASTER_SETTINGS, original_config, extracted_settings)
     write_config_file('/var/tmp/config.txt', new_settings)
-    subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config.txt'])
+    subprocess.check_call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config.txt'])
