@@ -1,18 +1,22 @@
-From 110913561f5123b20b465582e771cfd1a5017f73 Mon Sep 17 00:00:00 2001
+From 51d1726793e6877fd776d38d809bdbbc0b58b76e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 27 Feb 2018 23:33:31 +0000
 Subject: [PATCH] Vero 4K: add standby support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  | 57 +++++++++++++++++++++++++++++++++++
- xbmc/Application.h                    |  5 +++
- xbmc/network/Network.cpp              |  5 +++
- xbmc/powermanagement/PowerManager.cpp |  4 ++-
- 4 files changed, 70 insertions(+), 1 deletion(-)
+ xbmc/Application.cpp                              | 63 +++++++++++++++++++++++
+ xbmc/Application.h                                |  5 ++
+ xbmc/messaging/ApplicationMessenger.h             |  1 +
+ xbmc/network/Network.cpp                          |  5 ++
+ xbmc/peripherals/Peripherals.cpp                  |  4 ++
+ xbmc/peripherals/devices/Peripheral.h             |  3 +-
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp |  9 +++-
+ xbmc/powermanagement/PowerManager.cpp             |  4 +-
+ 8 files changed, 91 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index e64e495..9a28ce2 100644
+index 3ad01c1..c58777c 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -186,6 +186,7 @@
@@ -23,7 +27,7 @@ index e64e495..9a28ce2 100644
  #endif
  
  //TODO: XInitThreads
-@@ -3456,6 +3457,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -3467,6 +3468,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -33,13 +37,18 @@ index e64e495..9a28ce2 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -3632,6 +3636,59 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -3643,6 +3647,65 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
 +//activate screensaver for OSMC
 +void CApplication::ActivateScreenSaverStandby()
 +{
++  if (m_bVeroStandby) {
++	CLog::Log(LOGINFO, "Ignoring standby request: we are already in standby");
++	return;
++  }
++
 +  CLog::Log(LOGINFO, "Activating Vero standby mode");
 +    if (m_appPlayer.IsPlayingVideo())
 +      StopPlaying();
@@ -70,8 +79,9 @@ index e64e495..9a28ce2 100644
 +	hpdlock = "hpd_lock0";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- HPD locking will now be %s", hpdlock.c_str());
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", hpdlock);
-+  if (m_bVeroStandby)
-+	CApplicationMessenger::GetInstance().PostMsg(TMSG_CECACTIVATESOURCE); // wake cec
++  if (m_bVeroStandby) {
++	CApplicationMessenger::GetInstance().PostMsg(TMSG_CECACTIVATESOURCEOSMCWAKEUP); // wake cec
++  }
 +
 +  std::string strStandbyScript;
 +  if (m_bVeroStandby)
@@ -94,7 +104,7 @@ index e64e495..9a28ce2 100644
  // if forceType is true, we ignore the various conditions that can alter
  // the type of screensaver displayed
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 8a54e4a..b8466ba 100644
+index 8d165b3..26b3fcc 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -215,6 +215,8 @@ public:
@@ -123,6 +133,18 @@ index 8a54e4a..b8466ba 100644
    std::string m_screensaverIdInUse;
    ADDON::AddonPtr m_pythonScreenSaver; // @warning: Fallback for Python interface, for binaries not needed!
    // OS screen saver inhibitor that is always active if user selected a Kodi screen saver
+diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
+index 5b312e4..f15719c 100644
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -89,6 +89,7 @@
+ #define TMSG_CECTOGGLESTATE               TMSG_MASK_PERIPHERALS + 1
+ #define TMSG_CECACTIVATESOURCE            TMSG_MASK_PERIPHERALS + 2
+ #define TMSG_CECSTANDBY                   TMSG_MASK_PERIPHERALS + 3
++#define TMSG_CECACTIVATESOURCEOSMCWAKEUP  TMSG_MASK_PERIPHERALS + 4
+ 
+ #define TMSG_GUI_DIALOG_OPEN              TMSG_MASK_WINDOWMANAGER + 1
+ #define TMSG_GUI_ACTIVATE_WINDOW          TMSG_MASK_WINDOWMANAGER + 2
 diff --git a/xbmc/network/Network.cpp b/xbmc/network/Network.cpp
 index 8b7fe93..bfd59c1 100644
 --- a/xbmc/network/Network.cpp
@@ -146,6 +168,55 @@ index 8b7fe93..bfd59c1 100644
    int i, j, packet;
    unsigned char ethaddr[8];
    unsigned char buf [128];
+diff --git a/xbmc/peripherals/Peripherals.cpp b/xbmc/peripherals/Peripherals.cpp
+index 00346e1..e41d221 100644
+--- a/xbmc/peripherals/Peripherals.cpp
++++ b/xbmc/peripherals/Peripherals.cpp
+@@ -949,6 +949,10 @@ void CPeripherals::OnApplicationMessage(MESSAGING::ThreadMessage* pMsg)
+     ToggleDeviceState(STATE_ACTIVATE_SOURCE);
+     break;
+ 
++  case TMSG_CECACTIVATESOURCEOSMCWAKEUP:
++    ToggleDeviceState(STATE_ACTIVATE_SOURCE_OSMC_WAKEUP);
++    break;
++
+   case TMSG_CECSTANDBY:
+     ToggleDeviceState(STATE_STANDBY);
+     break;
+diff --git a/xbmc/peripherals/devices/Peripheral.h b/xbmc/peripherals/devices/Peripheral.h
+index c083ff1..c8f4633 100644
+--- a/xbmc/peripherals/devices/Peripheral.h
++++ b/xbmc/peripherals/devices/Peripheral.h
+@@ -55,7 +55,8 @@ namespace PERIPHERALS
+   {
+     STATE_SWITCH_TOGGLE,
+     STATE_ACTIVATE_SOURCE,
+-    STATE_STANDBY
++    STATE_STANDBY,
++    STATE_ACTIVATE_SOURCE_OSMC_WAKEUP
+   } CecStateChange;
+ 
+   class CPeripheral : public KODI::JOYSTICK::IInputProvider,
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 1691c0f..1ae6402 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -1736,7 +1736,14 @@ bool CPeripheralCecAdapter::ToggleDeviceState(CecStateChange mode /*= STATE_SWIT
+ {
+   if (!IsRunning())
+     return false;
+-  if (m_cecAdapter->IsLibCECActiveSource() && (mode == STATE_SWITCH_TOGGLE || mode == STATE_STANDBY))
++  if (mode == STATE_ACTIVATE_SOURCE_OSMC_WAKEUP) {
++	if (m_configuration.bActivateSource) {
++		CLog::Log(LOGINFO, "%s - activating CEC device", __FUNCTION__);
++		ActivateSource();
++	}
++	return true;
++  }
++  else if (m_cecAdapter->IsLibCECActiveSource() && (mode == STATE_SWITCH_TOGGLE || mode == STATE_STANDBY))
+   {
+     CLog::Log(LOGDEBUG, "%s - putting CEC device on standby...", __FUNCTION__);
+     StandbyDevices();
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
 index 9c13b85..d6fdb24 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
