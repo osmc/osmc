@@ -1,4 +1,4 @@
-From 7e0c2d40b6a24418740dab9f06bf39c6ba595f9f Mon Sep 17 00:00:00 2001
+From 0179053b45d5840ba750e6235114f080a5ed1bc7 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -12,15 +12,15 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/Application.cpp                  |  1 +
- xbmc/guilib/guiinfo/SystemGUIInfo.cpp |  9 +++++++--
+ xbmc/guilib/guiinfo/SystemGUIInfo.cpp | 10 ++++++++--
  xbmc/network/NetworkServices.cpp      | 20 +++++++++++++++++++-
- 3 files changed, 27 insertions(+), 3 deletions(-)
+ 3 files changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 3bd24ef..ac1f4f5 100644
+index 46911d3..95c2272 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -542,6 +542,7 @@ bool CApplication::Create(const CAppParamParser &params)
+@@ -544,6 +544,7 @@ bool CApplication::Create(const CAppParamParser &params)
      return false;
  
    CLog::Log(LOGINFO, "creating subdirectories");
@@ -29,7 +29,7 @@ index 3bd24ef..ac1f4f5 100644
    const std::shared_ptr<CSettings> settings = m_pSettingsComponent->GetSettings();
    CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(profileManager->GetProfileUserDataFolder()).c_str());
 diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-index a27bda4..e76ed82 100644
+index a27bda4..c091f73 100644
 --- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 +++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 @@ -137,6 +137,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
@@ -40,7 +40,7 @@ index a27bda4..e76ed82 100644
    switch (info.m_info)
    {
      ///////////////////////////////////////////////////////////////////////////////////////////////
-@@ -277,8 +278,12 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+@@ -277,8 +278,13 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
        value = g_langInfo.GetTemperatureUnitString();
        return true;
      case SYSTEM_FRIENDLY_NAME:
@@ -50,6 +50,7 @@ index a27bda4..e76ed82 100644
 +       std::string hostname("osmc");
 +       CServiceBroker::GetNetwork().GetHostName(hostname); 
 +       strLabel = hostname.c_str();
++       value = strLabel;
 +       return true;
 +    }
      case SYSTEM_STEREOSCOPIC_MODE:
