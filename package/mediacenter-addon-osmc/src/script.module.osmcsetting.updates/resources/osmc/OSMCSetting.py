@@ -198,12 +198,7 @@ class OSMCSettingClass(threading.Thread):
 
 		addon = xbmcaddon.Addon(self.addonid)
 
-		if os.path.isfile(self.reset_file):
-			log('Kodi reset file found')
-			addon.setSetting('kodi_reset', 'true')
-		else:
-			log('Kodi reset file not found')
-			addon.setSetting('kodi_reset', 'false')
+		#addon.setSetting('kodi_reset', 'true')
 
 		self.me.openSettings()
 
@@ -211,8 +206,6 @@ class OSMCSettingClass(threading.Thread):
 		if addon.getSetting('kodi_reset') == 'true':
 			log('creating kodi reset file')
 			subprocess.call(['sudo', 'touch', self.reset_file])
-		else:
-			subprocess.call(['sudo', 'rm', self.reset_file])
 
 		log('END')
 		for x, k in self.setting_data_method.iteritems():
