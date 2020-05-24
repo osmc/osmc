@@ -1,4 +1,4 @@
-if [ ! -f /var/cache/apt/pkgcache.bin ]
+if test -z "$(find /var/lib/apt/lists/ -maxdepth 1 -type f \( ! -name 'lock' \))"
 then
     echo -e "Updating APT cache. Please be patient."
     sudo apt-get update >/dev/null 2>&1
