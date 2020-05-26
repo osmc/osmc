@@ -17,6 +17,9 @@ if grep -q "osmcdev=vero3" /proc/cmdline; then
    OSMC_DEV_SUBDEVICE=$(cat /proc/device-tree/model)
 fi
 DEVICE_ID=$(cat /.osmcguid)
+KERNEL_VERSION=$(/bin/uname -r)
+KODI_VERSION=$(/usr/bin/dpkg -l | grep mediacenter-osmc | head -n1 | awk {'print $3'})
+
 ENDPOINT_URL="https://stats.osmc.tv"
 
 curl -s -S -X POST \
@@ -24,4 +27,6 @@ curl -s -S -X POST \
         -F "OSMC_DEV=$OSMC_DEV" \
         -F "OSMC_DEV_SUBDEVICE=$OSMC_DEV_SUBDEVICE" \
         -F "DEVICE_ID=$DEVICE_ID" \
+        -F "KERNEL_VERSION=$KERNEL_VERSION" \
+        -F "KODI_VERSION=$KODI_VERSION" \
 $ENDPOINT_URL >/dev/null
