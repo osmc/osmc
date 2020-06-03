@@ -43,14 +43,6 @@ index 84c10c4b35..14117da18c 100644
  
      aml_set_audio_passthrough(m_passthrough);
      SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
-@@ -1274,6 +1275,7 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
-        * "plughw", "dsnoop"). */
- 
-       else if (baseName != "default"
-+            && baseName != "sysdefault"
-             && baseName != "surround40"
-             && baseName != "surround41"
-             && baseName != "surround50"
 @@ -1548,6 +1550,10 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
        info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_512);
        info.m_dataFormats.push_back(AE_FMT_RAW);
