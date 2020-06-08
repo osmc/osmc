@@ -1,0 +1,95 @@
+From ad8d98342ff90fad0745049528ec85327c959943 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 8 Jun 2020 23:44:43 +0100
+Subject: [PATCH] Add support for adjusting chunk size read to resolve issues
+ with SMBV2 High MTU implementation
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ addons/resource.language.en_gb/resources/strings.po | 8 ++++++++
+ system/settings/settings.xml                        | 5 +++++
+ xbmc/platform/posix/filesystem/SMBFile.cpp          | 7 +++++--
+ xbmc/settings/Settings.cpp                          | 1 +
+ xbmc/settings/Settings.h                            | 1 +
+ 5 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 07a6646614..2c89004f6f 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -20483,6 +20483,14 @@ msgctxt "#36631"
+ msgid "Force weak SMBv1 security for compatibility with the USB sharing features on some WiFi routers and NAS devices."
+ msgstr ""
+ 
++msgctxt "#36632"
++msgid "Fix issues MTU issues with SMBv2 NAS devices"
++msgstr ""
++
++msgctxt "#36633"
++msgid "This resolves issues with NAS devices which implement SMBv2 with the expectation of high MTU. Disable this option if you experience crashes with music files such as WMA"
++msgstr ""
++
+ #empty strings from id 36632 to 36898
+ 
+ #. Description of setting with label #729 "Enable SSL"
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 19cfe2db18..e24f2432cf 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2006,6 +2006,11 @@
+             </dependency>
+           </dependencies>
+         </setting>
++        <setting id="smb2.fixmtu" type="boolean" label="36632" help="36633">
++          <level>2</level>
++          <default>true</default>
++          <control type="toggle" />
++        </setting>
+       </group>
+     </category>
+     <category id="weather" label="8" help="36316">
+diff --git a/xbmc/platform/posix/filesystem/SMBFile.cpp b/xbmc/platform/posix/filesystem/SMBFile.cpp
+index 71e6ec5a6c..82e1767015 100644
+--- a/xbmc/platform/posix/filesystem/SMBFile.cpp
++++ b/xbmc/platform/posix/filesystem/SMBFile.cpp
+@@ -510,8 +510,11 @@ int CSMBFile::Truncate(int64_t size)
+ 
+ ssize_t CSMBFile::Read(void *lpBuf, size_t uiBufSize)
+ {
+-  if (uiBufSize > SSIZE_MAX)
+-    uiBufSize = SSIZE_MAX;
++
++  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++
++  if (settings->GetBool(CSettings::SETTING_SMB2_FIXMTU))
++    uiBufSize = 32768;
+ 
+   if (m_fd == -1)
+     return -1;
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 829e7b5af6..f9aab1a1e3 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -324,6 +324,7 @@ const std::string CSettings::SETTING_SMB_WORKGROUP = "smb.workgroup";
+ const std::string CSettings::SETTING_SMB_MINPROTOCOL = "smb.minprotocol";
+ const std::string CSettings::SETTING_SMB_MAXPROTOCOL = "smb.maxprotocol";
+ const std::string CSettings::SETTING_SMB_LEGACYSECURITY = "smb.legacysecurity";
++const std::string CSettings::SETTING_SMB2_FIXMTU = "smb2.fixmtu";
+ const std::string CSettings::SETTING_VIDEOSCREEN_MONITOR = "videoscreen.monitor";
+ const std::string CSettings::SETTING_VIDEOSCREEN_SCREEN = "videoscreen.screen";
+ const std::string CSettings::SETTING_VIDEOSCREEN_WHITELIST = "videoscreen.whitelist";
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index d0743b32d3..e6b593dd84 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -284,6 +284,7 @@ public:
+   static const std::string SETTING_SMB_MINPROTOCOL;
+   static const std::string SETTING_SMB_MAXPROTOCOL;
+   static const std::string SETTING_SMB_LEGACYSECURITY;
++  static const std::string SETTING_SMB2_FIXMTU;
+   static const std::string SETTING_VIDEOSCREEN_MONITOR;
+   static const std::string SETTING_VIDEOSCREEN_SCREEN;
+   static const std::string SETTING_VIDEOSCREEN_WHITELIST;
+-- 
+2.17.1
+
