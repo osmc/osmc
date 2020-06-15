@@ -28,7 +28,7 @@ done
 # Configure the target directory
 ARCH="amd64"
 DIR="opt/osmc-tc/${tcstub}"
-RLS="stretch"
+RLS="buster"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
