@@ -54,7 +54,6 @@ deb http://ftp.debian.org/debian/ $RLS-updates main contrib
 
 deb http://security.debian.org/ $RLS/updates main contrib
 
-deb http://apt.osmc.tv $RLS-devel main
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
@@ -66,6 +65,8 @@ verify_action
 echo -e "Installing packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
+echo -e "Adding OSMC repository"
+echo "deb http://apt.osmc.tv $RLS-devel main" >> ${DIR}/etc/apt/sources.list
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
