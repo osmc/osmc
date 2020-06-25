@@ -27,7 +27,6 @@ then
 	handle_dep "libpolkit-gobject-1-dev"
 	handle_dep "libparted-dev"
 	handle_dep "libdevmapper-dev"
-	handle_dep "liblvm2-dev"
 	handle_dep "libatasmart-dev"
 	handle_dep "libsgutils2-dev"
 	handle_dep "zlib1g-dev"
@@ -39,7 +38,7 @@ then
 	echo "Package: ${1}-udisks-osmc" >> files/DEBIAN/control
 	pushd src/udisks-osmc-${VERSION}
     	install_patch "../../patches" "all"
-	./configure --prefix=/usr --enable-man-pages=no --with-systemdsystemunitdir=/lib/systemd/system --disable-dmmp --enable-lvm2 --libexecdir=/usr/lib/udisks --sysconfdir=/etc
+	./configure --prefix=/usr --enable-man-pages=no --with-systemdsystemunitdir=/lib/systemd/system --disable-dmmp --libexecdir=/usr/lib/udisks --sysconfdir=/etc
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
