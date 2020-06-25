@@ -46,7 +46,7 @@ configure_filesystem "${DIR}"
 verify_action
 
 # Enable networking
-enable_nw_chroot "${DIR}"
+configure_build_env_nw "${DIR}"
 verify_action
 
 # Set up sources.list
