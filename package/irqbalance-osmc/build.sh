@@ -23,6 +23,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	update_sources
 	handle_dep "autoconf"
+	handle_dep "automake"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	echo "Package: ${1}-irqbalance-osmc" >> files/DEBIAN/control
