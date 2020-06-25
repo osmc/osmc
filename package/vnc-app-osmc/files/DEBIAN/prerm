@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [ "$1" = "remove" ]; then
-	systemctl disable vnc.service >/dev/null 2>&1
-	systemctl stop vnc.service >/dev/null 2>&1
-	exit 0
-fi
