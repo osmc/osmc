@@ -19,14 +19,20 @@ function verify_action()
 	if [ $code != 0 ]; then echo -e "Exiting build with return code ${code}" && exit 1; fi
 }
 
-function enable_nw_chroot()
+function configure_build_env_nw()
 {
-	echo -e "Enabling networking"
-	cp /etc/resolv.conf $1/etc/resolv.conf
-	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
-	mkdir -p $1/etc/network
-	cp /etc/network/interfaces $1/etc/network/interfaces
-	if [ $? != 0 ]; then echo -e "Can't copy networking file" && return 1; fi
+        if [ -f "/etc/resolv.conf" ]
+        then
+                echo -e "Installing /etc/resolv.conf"
+                cp /etc/resolv.conf ${1}/etc/resolv.conf
+        fi
+        if [ -f "/etc/network/interfaces" ]
+        then
+                echo -e "Installing /etc/network/interfaces"
+                cp /etc/network/interfaces ${1}/etc/network/interfaces
+        fi
+        HOSTNAME=$(cat /etc/hostname)
+        echo "127.0.0.1 $HOSTNAME" > ${1}/etc/hosts
 }
 
 function add_apt_key()
@@ -246,7 +252,7 @@ export BUILD="make -j${cores}"
 
 export -f check_platform
 export -f verify_action
-export -f enable_nw_chroot
+export -f configure_build_env_nw
 export -f add_apt_key
 export -f emulate_arm
 export -f remove_emulate_arm
