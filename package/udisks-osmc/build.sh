@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-VERSION="fe132af7f85fd03a353eec1ec5f8cd8f6a72e191"
+VERSION="b4a1539d2c1e941f74b64256d40966e02bb7ab39"
 pull_source "https://github.com/osmc/udisks-osmc/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching udisks source" && exit 1; fi
 # Build in native environment
