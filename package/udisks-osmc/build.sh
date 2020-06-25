@@ -25,7 +25,7 @@ then
 	handle_dep "libdbus-1-dev"
 	handle_dep "libgudev-1.0-dev"
 	handle_dep "libpolkit-gobject-1-dev"
-	handle_dep "libparted0-dev"
+	handle_dep "libparted-dev"
 	handle_dep "libdevmapper-dev"
 	handle_dep "liblvm2-dev"
 	handle_dep "libatasmart-dev"
