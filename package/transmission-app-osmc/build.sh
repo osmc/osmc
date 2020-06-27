@@ -21,7 +21,7 @@ then
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	handle_dep "intltool"
-	handle_dep "libssl1.0-dev"
+	handle_dep "libssl-dev"
 	handle_dep "zlib1g-dev"
 	handle_dep "libcurl4-openssl-dev"
 	handle_dep "libnatpmp-dev"
