@@ -1,0 +1,34 @@
+From d3dc115d60076cb4af0651dc4652dcc1c458f140 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Sat, 27 Jun 2020 16:10:51 +0100
+Subject: [PATCH] Fix cheap USB soundcard that repeats SL and SR for 7.1
+
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 3362dfc2cd..6d2fbea603 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -311,8 +311,15 @@ CAEChannelInfo CAESinkALSA::ALSAchmapToAEChannelMap(snd_pcm_chmap_t* alsaMap)
+   CAEChannelInfo info;
+ 
+   for (unsigned int i = 0; i < alsaMap->channels; i++)
+-    info += ALSAChannelToAEChannel(alsaMap->pos[i]);
+-
++  {
++    /* handle double side speaker quirk */
++    if (alsaMap->pos[i] == SND_CHMAP_SL && info.HasChannel(AE_CH_SL))
++      info += AE_CH_BL;
++    else if (alsaMap->pos[i] == SND_CHMAP_SR && info.HasChannel(AE_CH_SR))
++      info += AE_CH_BR;
++    else
++      info += ALSAChannelToAEChannel(alsaMap->pos[i]);
++  }
+   return info;
+ }
+ 
+-- 
+2.17.1
+
