@@ -24,7 +24,7 @@ then
         echo $VERSION_DEV >> files-dev/DEBIAN/control
         echo "Depends: ${1}-librtmp-osmc (=${VERSION_NUM})" >> files-dev/DEBIAN/control
 	update_sources
-	handle_dep "libssl1.0-dev"
+	handle_dep "libssl-dev"
 	echo "Package: ${1}-librtmp-osmc" >> files/DEBIAN/control && echo "Package: ${1}-librtmp-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src
 	install_patch "../patches" "all"
