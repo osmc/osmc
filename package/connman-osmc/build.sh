@@ -16,7 +16,7 @@ then
 	out=$(pwd)/files
 	make clean
 	update_sources
-	handle_dep "xtables-addons-source"
+	handle_dep "libxtables-dev"
 	handle_dep "libreadline-dev"
 	handle_dep "libdbus-1-dev"
 	handle_dep "wpasupplicant"
@@ -24,7 +24,8 @@ then
 	handle_dep "libgnutls28-dev"
 	handle_dep "libglib2.0-dev"
 	handle_dep "openvpn"
-	handle_dep "autoconf"
+	handle_dep "automake"
+	handle_dep "libtool"
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
 	pushd src
