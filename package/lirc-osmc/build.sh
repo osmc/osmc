@@ -20,6 +20,7 @@ then
 	handle_dep "autoconf"
 	handle_dep "automake"
 	handle_dep "libtool"
+	handle_dep "xsltproc"
 	echo "Package: ${1}-lirc-osmc" >> files/DEBIAN/control
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
