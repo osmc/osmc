@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-pull_source "http://pkgs.fedoraproject.org/repo/pkgs/lirc/lirc-0.9.0.tar.bz2/b232aef26f23fe33ea8305d276637086/lirc-0.9.0.tar.bz2" "$(pwd)/src"
+pull_source "https://src.fedoraproject.org/repo/pkgs/lirc/lirc-0.9.4c.tar.gz/a7c17a7ec11756e0278d31e8d965a384/lirc-0.9.4c.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "lirc-osmc"
@@ -23,7 +23,7 @@ then
 	echo "Package: ${1}-lirc-osmc" >> files/DEBIAN/control
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
-	autoreconf -vif
+	autoreconf -vif .
 	./configure --prefix=/usr --without-x --with-driver=userspace
 	$BUILD
 	make install DESTDIR=${out}
