@@ -62,14 +62,14 @@ then
 	handle_dep "libmad0-dev"
 	handle_dep "libmicrohttpd-dev"
 	handle_dep "libmodplug-dev"
-	handle_dep "libmariadbclient-dev-compat"
+	handle_dep "libmariadbd-dev"
 	handle_dep "libpcre3-dev"
 	handle_dep "libplist-dev"
 	handle_dep "libpng-dev"
 	handle_dep "libsmbclient-dev"
 	handle_dep "libssh-dev"
 	handle_dep "libavahi-client-dev"
-	handle_dep "libssl-dev"
+	handle_dep "libssl-dev" # We need this as well as libcurl4-openssl-dev because openssl libs are only suggestions
 	handle_dep "libtinyxml-dev"
 	handle_dep "libtool"
 	handle_dep "libudev-dev"
@@ -83,7 +83,7 @@ then
 	handle_dep "nasm"
 	handle_dep "pmount"
 	handle_dep "python-dev"
-	handle_dep "python-imaging"
+	handle_dep "python-pil"
 	handle_dep "python-sqlite"
 	handle_dep "swig"
 	handle_dep "unzip"
@@ -99,7 +99,10 @@ then
 	handle_dep "libcrossguid-dev"
 	handle_dep "cmake"
 	handle_dep "rapidjson-dev"
-        handle_dep "libgcrypt11-dev"
+        handle_dep "libgcrypt20-dev"
+        handle_dep "libnfs-dev"
+        handle_dep "libass-dev"
+	handle_dep "libunistring-dev"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp-userland-dev-osmc"
@@ -109,22 +112,18 @@ then
 		handle_dep "rbp1-libcec-dev-osmc"
 		handle_dep "armv6l-libshairplay-dev-osmc"
 		handle_dep "armv6l-librtmp-dev-osmc"
-		handle_dep "armv6l-libnfs-dev-osmc"
 		handle_dep "armv6l-libplatform-dev-osmc"
 		handle_dep "armv6l-libbluray-dev-osmc"
 		handle_dep "armv6l-libsqlite-dev-osmc"
-		handle_dep "armv6l-libass-dev-osmc"
 	fi
 	if [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp2-libcec-dev-osmc"
 		handle_dep "armv7-libshairplay-dev-osmc"
 		handle_dep "armv7-librtmp-dev-osmc"
-		handle_dep "armv7-libnfs-dev-osmc"
 		handle_dep "armv7-libplatform-dev-osmc"
 		handle_dep "armv7-libbluray-dev-osmc"
 		handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-libass-dev-osmc"
 	fi
         if [ "$1" == "vero2" ]
         then
@@ -133,11 +132,9 @@ then
 		handle_dep "vero2-libamcodec-dev-osmc"
                 handle_dep "armv7-libshairplay-dev-osmc"
                 handle_dep "armv7-librtmp-dev-osmc"
-                handle_dep "armv7-libnfs-dev-osmc"
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-		handle_dep "armv7-libass-dev-osmc"
         fi
 	if [ "$1" == "vero3" ]
 	then
@@ -146,17 +143,14 @@ then
 		handle_dep "vero3-libamcodec-dev-osmc"
 		handle_dep "armv7-libshairplay-dev-osmc"
                 handle_dep "armv7-librtmp-dev-osmc"
-                handle_dep "armv7-libnfs-dev-osmc"
                 handle_dep "armv7-libplatform-dev-osmc"
                 handle_dep "armv7-libbluray-dev-osmc"
                 handle_dep "armv7-libsqlite-dev-osmc"
-                handle_dep "armv7-libass-dev-osmc"
 	fi
 	if [ "$1" == "pc" ]
 	then
 		handle_dep "amd64-libshairplay-dev-osmc"
 		handle_dep "amd64-librtmp-dev-osmc"
-		handle_dep "amd64-libnfs-dev-osmc"
 		handle_dep "amd64-libplatform-dev-osmc"
 		handle_dep "amd64-libbluray-dev-osmc"
 		handle_dep "amd64-libsqlite-dev-osmc"
@@ -165,7 +159,6 @@ then
 		handle_dep "x11proto-randr-dev"
 		handle_dep "libegl1-mesa-dev"
 		handle_dep "libglew-dev"
-		handle_dep "amd64-libass-dev-osmc"
 	fi
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
@@ -247,7 +240,7 @@ then
             -DENABLE_PULSEAUDIO=OFF \
             -DENABLE_LCMS2=OFF \
             -DENABLE_SNDIO=OFF \
-            -DENABLE_MARIADBCLIENT=OFF \
+            -DENABLE_MARIADBCLIENT=ON \
         .
 	fi
         if [ "$1" == "vero2" ]; then
@@ -282,7 +275,7 @@ then
             -DENABLE_PULSEAUDIO=OFF \
             -DENABLE_LCMS2=OFF \
             -DENABLE_SNDIO=OFF \
-            -DENABLE_MARIADBCLIENT=OFF \
+            -DENABLE_MARIADBCLIENT=ON \
         .
 	fi
         if [ "$1" == "vero3" ]; then
@@ -318,7 +311,7 @@ then
 	    -DENABLE_PULSEAUDIO=OFF \
 	    -DENABLE_LCMS2=OFF \
 	    -DENABLE_SNDIO=OFF \
-	    -DENABLE_MARIADBCLIENT=OFF \
+	    -DENABLE_MARIADBCLIENT=ON \
         .
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
@@ -391,12 +384,12 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-imaging, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadbclient18, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio13, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-8, libnss3, libnspr4"
-	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, amd64-libnfs-osmc, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-intel, amd64-libass-osmc" >> files/DEBIAN/control
-	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-libnfs-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, armv6l-libbluray-osmc, armv6l-libsqlite-osmc, rbp-userland-osmc, armv6l-splash-osmc, armv6l-libass-osmc" >> files/DEBIAN/control
-	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero2 && echo "Depends: ${COMMON_DEPENDS}, vero2-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero2-userland-osmc, armv7-splash-osmc, vero2-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
-	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-libnfs-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, vero3-libamcodec-osmc, armv7-libass-osmc" >> files/DEBIAN/control
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python, python-pil, python-unidecode, libsmbclient, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadbd19, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio13, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl3, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-8, libnss3, libnspr4, libnfs12, libass9, libunistring2"
+	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, libnfs12, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-intel" >> files/DEBIAN/control
+	test "$1" == rbp1 && echo "Depends: ${COMMON_DEPENDS}, rbp1-libcec-osmc, armv6l-librtmp-osmc, armv6l-libshairplay-osmc, armv6l-libbluray-osmc, armv6l-libsqlite-osmc, rbp-userland-osmc, armv6l-splash-osmc" >> files/DEBIAN/control
+	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc" >> files/DEBIAN/control
+	test "$1" == vero2 && echo "Depends: ${COMMON_DEPENDS}, vero2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero2-userland-osmc, armv7-splash-osmc, vero2-libamcodec-osmc" >> files/DEBIAN/control
+	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, vero3-libamcodec-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
