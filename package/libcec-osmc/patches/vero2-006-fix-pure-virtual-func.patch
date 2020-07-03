@@ -1,0 +1,10 @@
+--- a/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.h	2020-07-03 02:37:46.773663328 +0000
++++ b/src/libcec/adapter/Amlogic/AmlogicCECAdapterCommunication.h	2020-07-03 02:36:05.921940267 +0000
+@@ -83,6 +83,7 @@
+     uint16_t GetAdapterProductId(void) const { return 1; }
+     void HandleLogicalAddressLost(cec_logical_address oldAddress);
+     void SetActiveSource(bool UNUSED(bSetTo), bool UNUSED(bClientUnregistered)) {}
++    bool SetAutoMode(bool UNUSED(automode)) { return false; }
+     ///}
+ 
+     /** @name P8PLATFORM::CThread implementation */
