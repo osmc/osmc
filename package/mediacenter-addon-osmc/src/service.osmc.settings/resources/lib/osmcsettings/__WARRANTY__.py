@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-warranty = """Limited warranty
+__warranty__ = """Limited warranty
 
 Sam Nazarko Trading Ltd warrants the original purchaser only that the Product will be free from defects in material and workmanship under normal use for a period of twelve months after the date of original shipment from Sam Nazarko Trading Ltd. Warranty shall not apply: 1) to any Product subject to accident, misuse, neglect, alteration, acts of God, improper transport, improper storage, improper use or application, improper installation, improper testing or unauthorised repair; or 2) to cosmetic problems or defects that result from normal wear and tear under ordinary use and do not affect the performance or use of the product 3) if the "rubber pads" have been interfered with indicating unauthorised opening of the unit. Sam Nazarko Trading Ltd warranty applies only to a product that is manufactured by or for Sam Nazarko Trading Ltd. If the products develops a covered defect within the warranty period, Sam Nazarko Trading Ltd, will at its option, either repair or replace the Product without charge, provided that the product is returned within the warranty period. The buyer is responsible for all freight charges relating to the return of the unit for repair or replacement.
 

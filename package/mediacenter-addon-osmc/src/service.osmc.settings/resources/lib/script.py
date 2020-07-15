@@ -8,4 +8,7 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['script', 'service', 'osmcsettings']
+from osmcsettings import script_entry
+
+if __name__ == '__main__':
+    script_entry.run()
