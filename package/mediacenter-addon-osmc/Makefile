@@ -1,5 +1,11 @@
 all:
-	sudo bash build.sh
+	sudo bash build.sh "py2"
+
+py2:
+	sudo bash build.sh "py2"
+
+py3:
+	sudo bash build.sh "py3"
 
 clean:
 	sudo rm -f *.deb >/dev/null 2>&1
