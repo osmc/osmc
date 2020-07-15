@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -8,4 +9,8 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['script', 'service', 'osmcsettings']
+import xbmcgui
+from osmcsettings import service_entry
+
+if __name__ == '__main__':
+    service_entry.Main(window=xbmcgui.Window(10000))

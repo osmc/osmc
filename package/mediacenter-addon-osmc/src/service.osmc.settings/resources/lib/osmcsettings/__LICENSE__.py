@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-old_license = """End-User License Agreement for OSMC
+__old_license__ = """End-User License Agreement for OSMC
 
 This End-User License Agreement (EULA) is a legal agreement between you (either an individual or a single entity) and the mentioned author (OSMC) of this Software for the software product identified above, which includes computer software and may include associated media, printed materials, and "online" or electronic documentation ("SOFTWARE PRODUCT").
 
@@ -22,8 +21,7 @@ NO LIABILITY FOR DAMAGES.
 
 In no event shall the author of this Software be liable for any special, consequential, incidental or indirect damages whatsoever (including, without limitation, damages for loss of business profits, business interruption, loss of business information, or any other pecuniary loss) arising out of the use of or inability to use this product, even if the Author of this Software is aware of the possibility of such damages and known defects."""
 
-
-license = """ GNU GENERAL PUBLIC LICENSE
+__license__ = """ GNU GENERAL PUBLIC LICENSE
  Version 2, June 1991
 
  Copyright (C) 1989, 1991 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
