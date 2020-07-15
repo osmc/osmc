@@ -1,64 +1,65 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-	<category label="32001">
-		<setting id="display_rotate" label="32003" lvalues="32004|32005|32006|32007|32008" type="enum"/>
-		<setting default="false" id="hdmi_safe" label="32009" type="bool"/>
-		<setting enable="false" label="32010" visible="eq(-1,true)"/>
-		<setting default="false" id="hdmi_ignore_edid" label="32011" type="bool"/>
-		<!-- <setting default="false" id="store_hdmi_to_file" label="32012" type="bool"/> -->
-		<setting default="false" id="hdmi_edid_file" label="32099" type="bool"/>
-		<setting default="false" id="hdmi_force_hotplug" label="32100" type="bool"/>
-		<!-- hdmi_edid needs force hotplug but force hotplug doesn't need hdmi_edid, hope this makes sense -->
-		<setting enable="false" label="32013" visible="eq(-1,true)"/>
-		<!-- hdmi_force_hotplug should be disabled before using a different tv or hdmi port -->
-		<setting default="false" id="hdmi_ignore_cec" label="32014" type="bool"/>
-		<setting default="0" id="config_hdmi_boost" label="32015" option="int" range="0,1,11" type="slider"/>
-		<setting type="lsep" label="32098" visible="!eq(-1,0)" />
-		<setting default="0" id="hdmi_group" label="32016" lvalues="32017|32018|32019" type="enum"/>
-		<setting default="0" id="hdmi_mode" label="32020" option="int" range="0,1,86" type="slider"/>
-		<setting default="0" id="hdmi_pixel_encoding" label="32087" lvalues="32088|32089|32090|32091|32092" type="enum"/>
-		<setting default="0" id="sdtv_mode" label="32021" lvalues="32022|32023|32024|32025" type="enum"/>
-		<setting default="0" id="sdtv_aspect" label="32026" lvalues="32085|32027|32028|32029" type="enum"/>
-		<setting default="false" id="hdmi_ignore_cec_init" label="hdmi_ignore_cec_init" type="bool" visible="false"/>
-	</category>
-	<category label="32002">
-		<setting enable="false" id="serial" label="32068" type="text"/>
-		<setting enable="false" id="codec_check" label="32069" type="text"/>
-		<setting id="decode_MPG2" label="32032" type="text"/>
-		<setting id="decode_WVC1" label="32033" type="text"/>
-		<!-- <setting id="wvc_check" label="WVC1 codec status:" type="text" enable="false" />-->
-		<setting enable="false" id="mem_free" label="32071" type="text"/>
-		<setting default="112" id="gpu_mem_256" label="32030" option="int" range="16,1,192" type="slider"/>
-		<setting default="144" id="gpu_mem_512" label="32031" option="int" range="16,1,256" type="slider"/>
-		<setting default="256" id="gpu_mem_1024" label="32084" option="int" range="16,1,320" type="slider"/>
-		<!--<setting default="false" id="max_usb_current" label="32072" type="bool"/> DEPRECATED-->
-		<!--<setting enable="false" id="max_usb_current_warning" label="32073" type="lsep" visible="eq(-1,true)"/>-->
-	</category>
-	<category label="32074">
-		<setting default="0" id="soundcard_dac" label="32094" values="none|hifiberry-dac-overlay|hifiberry-dacplus-overlay|hifiberry-digi-overlay|iqaudio-dac-overlay|iqaudio-dacplus-overlay|justboom-dac-overlay|justboom-digi-overlay|allo-piano-dac-pcm512x-audio-overlay|allo-boss-dac-pcm512x-audio-overlay|allo-digione-overlay" type="enum" />
-		<!-- <setting default="false" id="dacplus" label="32093" type="bool" visible="eq(-1,1)|eq(-1,2)"/> -->
-		<!-- <setting default="false" id="hifiberry-dac-overlay" label="32075" type="bool" visible="eq(-1, false)"/> -->
-		<!-- <setting default="false" id="iqaudio-dac-overlay" label="32078" type="bool" visible="eq(-2, false)"/> -->
-		<!-- <setting default="false" id="hifiberry-digi-overlay" label="32077" type="bool"/> -->
-		<!-- <setting default="false" id="hifiberry-dacplus-overlay" label="32076" type="bool" visible="eq(-4, true)"/> -->
-		<!-- <setting default="false" id="iq-audio-dacplus-overlay" label="32079" type="bool" visible="eq(-5, true)"/> -->
-		<!-- <setting default="false" id="justboom-dac-overlay" label="32101" type="bool" visible="eq(-6, true)"/> -->
-		<!-- <setting default="false" id="justboom-digi-overlay" label="32102" type="bool" visible="eq(-7, true)"/> -->
-		<!-- <setting default="false" id="allo-piano-dac-pcm512x-audio-overlay" label="32103" type="bool" visible="eq(-8, true)"/> -->
-		<!-- <setting default="false" id="allo-boss-dac-pcm512x-audio-overlay"  label="32104" type="bool" visible="eq(-9, true)"/> -->
- 		<!-- <setting default="false" id="allo-digione-overlay" label="32105" type="bool" visible="eq(-10, true)"/> -->
+    <category label="32001">
+        <setting id="display_rotate" label="32003" lvalues="32004|32005|32006|32007|32008" type="enum"/>
+        <setting default="false" id="hdmi_safe" label="32009" type="bool"/>
+        <setting enable="false" label="32010" visible="eq(-1,true)"/>
+        <setting default="false" id="hdmi_ignore_edid" label="32011" type="bool"/>
+        <!-- <setting default="false" id="store_hdmi_to_file" label="32012" type="bool"/> -->
+        <setting default="false" id="hdmi_edid_file" label="32099" type="bool"/>
+        <setting default="false" id="hdmi_force_hotplug" label="32100" type="bool"/>
+        <!-- hdmi_edid needs force hotplug but force hotplug doesn't need hdmi_edid, hope this makes sense -->
+        <setting enable="false" label="32013" visible="eq(-1,true)"/>
+        <!-- hdmi_force_hotplug should be disabled before using a different tv or hdmi port -->
+        <setting default="false" id="hdmi_ignore_cec" label="32014" type="bool"/>
+        <setting default="0" id="config_hdmi_boost" label="32015" option="int" range="0,1,11" type="slider"/>
+        <setting type="lsep" label="32098" visible="!eq(-1,0)"/>
+        <setting default="0" id="hdmi_group" label="32016" lvalues="32017|32018|32019" type="enum"/>
+        <setting default="0" id="hdmi_mode" label="32020" option="int" range="0,1,86" type="slider"/>
+        <setting default="0" id="hdmi_pixel_encoding" label="32087" lvalues="32088|32089|32090|32091|32092" type="enum"/>
+        <setting default="0" id="sdtv_mode" label="32021" lvalues="32022|32023|32024|32025" type="enum"/>
+        <setting default="0" id="sdtv_aspect" label="32026" lvalues="32085|32027|32028|32029" type="enum"/>
+        <setting default="false" id="hdmi_ignore_cec_init" label="hdmi_ignore_cec_init" type="bool" visible="false"/>
+    </category>
+    <category label="32002">
+        <setting enable="false" id="serial" label="32068" type="text"/>
+        <setting enable="false" id="codec_check" label="32069" type="text"/>
+        <setting id="decode_MPG2" label="32032" type="text"/>
+        <setting id="decode_WVC1" label="32033" type="text"/>
+        <!-- <setting id="wvc_check" label="WVC1 codec status:" type="text" enable="false" />-->
+        <setting enable="false" id="mem_free" label="32071" type="text"/>
+        <setting default="112" id="gpu_mem_256" label="32030" option="int" range="16,1,192" type="slider"/>
+        <setting default="144" id="gpu_mem_512" label="32031" option="int" range="16,1,256" type="slider"/>
+        <setting default="256" id="gpu_mem_1024" label="32084" option="int" range="16,1,320" type="slider"/>
+        <!--<setting default="false" id="max_usb_current" label="32072" type="bool"/> DEPRECATED-->
+        <!--<setting enable="false" id="max_usb_current_warning" label="32073" type="lsep" visible="eq(-1,true)"/>-->
+    </category>
+    <category label="32074">
+        <setting default="0" id="soundcard_dac" label="32094"
+                 values="none|hifiberry-dac-overlay|hifiberry-dacplus-overlay|hifiberry-digi-overlay|iqaudio-dac-overlay|iqaudio-dacplus-overlay|justboom-dac-overlay|justboom-digi-overlay|allo-piano-dac-pcm512x-audio-overlay|allo-boss-dac-pcm512x-audio-overlay|allo-digione-overlay" type="enum"/>
+        <!-- <setting default="false" id="dacplus" label="32093" type="bool" visible="eq(-1,1)|eq(-1,2)"/> -->
+        <!-- <setting default="false" id="hifiberry-dac-overlay" label="32075" type="bool" visible="eq(-1, false)"/> -->
+        <!-- <setting default="false" id="iqaudio-dac-overlay" label="32078" type="bool" visible="eq(-2, false)"/> -->
+        <!-- <setting default="false" id="hifiberry-digi-overlay" label="32077" type="bool"/> -->
+        <!-- <setting default="false" id="hifiberry-dacplus-overlay" label="32076" type="bool" visible="eq(-4, true)"/> -->
+        <!-- <setting default="false" id="iq-audio-dacplus-overlay" label="32079" type="bool" visible="eq(-5, true)"/> -->
+        <!-- <setting default="false" id="justboom-dac-overlay" label="32101" type="bool" visible="eq(-6, true)"/> -->
+        <!-- <setting default="false" id="justboom-digi-overlay" label="32102" type="bool" visible="eq(-7, true)"/> -->
+        <!-- <setting default="false" id="allo-piano-dac-pcm512x-audio-overlay" label="32103" type="bool" visible="eq(-8, true)"/> -->
+        <!-- <setting default="false" id="allo-boss-dac-pcm512x-audio-overlay"  label="32104" type="bool" visible="eq(-9, true)"/> -->
+        <!-- <setting default="false" id="allo-digione-overlay" label="32105" type="bool" visible="eq(-10, true)"/> -->
 
-		<setting type="lsep" label="[COLOR red]Warning[/COLOR]: GPIO remote support with default pins incompatible with HiFiBerry and iqaudio." visible="gt(-1,0)+eq(1,true)" />
-		<setting default="0" id="gpio_pin" label="gpio_pin (0 for disabled)" option="int" range="0,1,27" type="slider"/>
-		<!-- <setting default="false" id="w1-gpio-overlay" label="32081" type="bool"/> -->
-		<!-- <setting default="false" id="w1-gpio-pullup-overlay" label="32082" type="bool"/> -->
-		<setting default="0" id="w1gpio" label="w1gpio" values="none|w1-gpio-overlay|w1-gpio-pullup-overlay" type="enum"/>
-		<setting default="false" id="spi-bcm2835-overlay" label="32086" type="bool"/>
-		<!-- <setting default="false" id="suppress_dtoverlay" label="32083" type="bool"/> -->
-		<setting default="false" id="audio" label="" type="bool" visible="false"/>
-	</category>
-	<category label="32070">
-		<setting action="RunScript($CWD/resources/lib/config_editor.py)" id="non_addon_settings" label="32034" option="close" type="action"/>
-		<!-- <setting id="other_settings_string" type="text" visible="false" default=''/>-->
-	</category>
+        <setting type="lsep" label="[COLOR red]Warning[/COLOR]: GPIO remote support with default pins incompatible with HiFiBerry and iqaudio." visible="gt(-1,0)+eq(1,true)"/>
+        <setting default="0" id="gpio_pin" label="gpio_pin (0 for disabled)" option="int" range="0,1,27" type="slider"/>
+        <!-- <setting default="false" id="w1-gpio-overlay" label="32081" type="bool"/> -->
+        <!-- <setting default="false" id="w1-gpio-pullup-overlay" label="32082" type="bool"/> -->
+        <setting default="0" id="w1gpio" label="w1gpio" values="none|w1-gpio-overlay|w1-gpio-pullup-overlay" type="enum"/>
+        <setting default="false" id="spi-bcm2835-overlay" label="32086" type="bool"/>
+        <!-- <setting default="false" id="suppress_dtoverlay" label="32083" type="bool"/> -->
+        <setting default="false" id="audio" label="" type="bool" visible="false"/>
+    </category>
+    <category label="32070">
+        <setting action="RunScript($CWD/resources/lib/osmcpi/config_editor.py)" id="non_addon_settings" label="32034" option="close" type="action"/>
+        <!-- <setting id="other_settings_string" type="text" visible="false" default=''/>-->
+    </category>
 </settings>
