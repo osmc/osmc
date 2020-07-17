@@ -29,6 +29,7 @@ function configure_build_env_nw()
         if [ -f "/etc/network/interfaces" ]
         then
                 echo -e "Installing /etc/network/interfaces"
+		mkdir -p ${1}/etc/network
                 cp /etc/network/interfaces ${1}/etc/network/interfaces
         fi
         HOSTNAME=$(cat /etc/hostname)
