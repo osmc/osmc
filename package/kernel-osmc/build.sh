@@ -56,6 +56,7 @@ then
 	sed '/Depends/d' -i files/DEBIAN/control
 	update_sources
 	handle_dep "kernel-package-osmc"
+	handle_dep "libssl-dev"
 	handle_dep "liblz4-tool"
 	handle_dep "cpio"
 	handle_dep "bison"
