@@ -8,11 +8,11 @@ VERSION="2.1.0-osmc"
 pull_source "https://github.com/Arkq/bluez-alsa/archive/49ad348808a15485aa7cb2df0a4d13654cc0cee3.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching bluez-alsa source" && exit 1; fi
 # Build in native environment
-build_in_env "${1}" $(pwd) "bluez-alsa-app-osmc"
+build_in_env "${1}" $(pwd) "bluez-alsa-osmc"
 build_return=$?
 if [ $build_return == 99 ]
 then
-	echo -e "Building package bluez-alsa-app-osmc"
+	echo -e "Building package bluez-alsa-osmc"
 	out=$(pwd)/files
 	make clean
 	update_sources
@@ -26,7 +26,7 @@ then
 	handle_dep "libtool"
 	handle_dep "pkg-config"
 	sed '/Package/d' -i files/DEBIAN/control
-	echo "Package: ${1}-bluez-alsa-app-osmc" >> files/DEBIAN/control
+	echo "Package: ${1}-bluez-alsa-osmc" >> files/DEBIAN/control
 	pushd src
 	SOURCE=$(ls)
 	pushd $SOURCE
@@ -46,7 +46,7 @@ then
 	popd; popd; popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
-	dpkg_build files/ ${1}-bluez-alsa-app-osmc.deb
+	dpkg_build files/ ${1}-bluez-alsa-osmc.deb
 	build_return=$?
 fi
 teardown_env "${1}"
