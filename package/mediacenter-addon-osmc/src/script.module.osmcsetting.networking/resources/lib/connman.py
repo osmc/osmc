@@ -34,7 +34,7 @@ def toggle_technology_state(technology, state):
                                 'net.connman.Technology')
     try:
         technology_interface.SetProperty('Powered', state)
-    except dbus.DBusException, e:
+    except dbus.DBusException as e:
         print('DBus Exception ' + str(e))
         return False
     return True
@@ -44,7 +44,7 @@ def get_manager_interface():
     bus = dbus.SystemBus()
     try:
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, '/'), 'net.connman.Manager')
-    except dbus.DBusException, error:
+    except dbus.DBusException as error:
         print('Could not get connman manager interface')
 
 
@@ -52,7 +52,7 @@ def get_service_interface(path):
     bus = dbus.SystemBus()
     try:
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, path), 'net.connman.Service')
-    except dbus.DBusException, error:
+    except dbus.DBusException as error:
        print('Could not get connman service interface')
 
 
@@ -61,7 +61,7 @@ def get_technology_interface(technology):
     try:
         return dbus.Interface(bus.get_object(CONNMAN_OBJECT_PATH, '/net/connman/technology/'+technology),
                               "net.connman.Technology")
-    except dbus.DBusException, error:
+    except dbus.DBusException as error:
         print('Could not get connman technology' + technology + 'interface')
 
 
@@ -81,21 +81,21 @@ def tethering_enable(technology, ssid, passphrase):
     if ssid and len(ssid) > 0:
         try:
             technology_interface.SetProperty("TetheringIdentifier", ssid)
-        except dbus.DBusException, error:
+        except dbus.DBusException as error:
             print('Error setting Tethering SSID ' + str(error))
             return False
 
     if passphrase and len(passphrase) > 0:
         try:
             technology_interface.SetProperty("TetheringPassphrase", passphrase)
-        except dbus.DBusException, error:
+        except dbus.DBusException as error:
             print('Error setting Tethering Passphrase ' + str(error))
             return False
 
     print "Enabling %s tethering" % technology
     try:
         technology_interface.SetProperty("Tethering", True)
-    except dbus.DBusException, error:
+    except dbus.DBusException as error:
         print('Error enabling Tethering ' + str(error))
         return False
     return True
@@ -107,7 +107,7 @@ def tethering_disable(technology):
                                 'net.connman.Technology')
     try:
         technology_interface.SetProperty('Tethering', False)
-    except dbus.DBusException, e:
+    except dbus.DBusException as e:
         print('DBus Exception ' + str(e))
         return False
     return True
