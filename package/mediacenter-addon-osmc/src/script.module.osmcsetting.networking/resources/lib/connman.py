@@ -92,7 +92,7 @@ def tethering_enable(technology, ssid, passphrase):
             print('Error setting Tethering Passphrase ' + str(error))
             return False
 
-    print "Enabling %s tethering" % technology
+    print ("Enabling %s tethering" % technology)
     try:
         technology_interface.SetProperty("Tethering", True)
     except dbus.DBusException as error:
