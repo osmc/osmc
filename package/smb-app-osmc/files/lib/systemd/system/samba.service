@@ -1,12 +1,12 @@
 [Unit]
 Description = Samba Server
-After = network.target
+After = network.target network-online.target nmbd.service smbd.service
+BindsTo = nmbd.service smbd.service
 
 [Service]
 Type = oneshot
 RemainAfterExit = yes
-ExecStart = /etc/init.d/samba.distributed start
-ExecStop = /etc/init.d/samba.distributed stop
+ExecStart = /bin/true
 
 [Install]
 WantedBy = multi-user.target
