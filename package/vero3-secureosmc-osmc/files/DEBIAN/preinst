@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" = "install" -o "$1" = "upgrade" ]; then
+	systemctl stop apploader.service >/dev/null 2>&1
+	systemctl stop videofirmware.service >/dev/null 2>&1
+        exit 0
+fi
+
