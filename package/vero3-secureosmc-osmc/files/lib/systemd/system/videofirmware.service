@@ -1,11 +1,10 @@
 [Unit]
 Description=VideoFirmware loader for OSMC SecureOS
-After=apploader.service
-
-[Install]
-WantedBy=multi-user.target
+After=apploader.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/sleep 5
 ExecStart=/opt/securevero/secureos/bin/load_video_fw_osmc
+
+[Install]
+WantedBy=apploader.target
