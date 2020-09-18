@@ -5,6 +5,7 @@ ldconfig
 if [ "$1" = "configure" ]; then
 
         systemctl daemon-reload
+	systemctl enable apploader.path >/dev/null 2>&1
 	systemctl enable videofirmware.service >/dev/null 2>&1
         if ischroot; then exit 0; fi
         touch /tmp/reboot-needed

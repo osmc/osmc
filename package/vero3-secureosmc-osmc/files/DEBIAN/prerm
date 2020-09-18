@@ -4,6 +4,7 @@ if [ "$1" = "remove" ]; then
 	systemctl stop videofirmware.service >/dev/null 2>&1
 	systemctl stop apploader.service >/dev/null 2>&1
 	systemctl disable videofirmware.service >/dev/null 2>&1
+	systemctl disable apploader.path >/dev/null 2>&1
         exit 0
 fi
 
