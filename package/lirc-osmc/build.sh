@@ -21,6 +21,8 @@ then
 	handle_dep "automake"
 	handle_dep "libtool"
 	handle_dep "xsltproc"
+	handle_dep "pkg-config"
+	handle_dep "python3-dev"
 	echo "Package: ${1}-lirc-osmc" >> files/DEBIAN/control
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
