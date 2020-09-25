@@ -5,4 +5,4 @@ ConditionPathExists = /var/run/lirc/lircd-%i.uinput
 
 [Service]
 Type = simple
-ExecStart = /usr/sbin/lircd-uinput /var/run/lirc/lircd-%i
+ExecStart = /usr/sbin/lircd-uinput --release-suffix=_KEYUP /var/run/lirc/lircd-%i
