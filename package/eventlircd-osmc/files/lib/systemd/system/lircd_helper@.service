@@ -1,9 +1,11 @@
 [Unit]
 Description = lircd remote support
 BindsTo = eventlircd.service
+Requires = lircd-uinput@%i.service
+Before = lircd-uinput@%i.service
 
 [Service]
 Type = forking
-PIDFile = /var/run/lirc/lircd-%I.pid
-ExecStart = /bin/sh -c "/var/run/lirc/lircd-%I.sh"
-ExecStopPost = /bin/rm -f /var/run/lirc/lircd-%I.pid /var/run/lirc/lircd-%I
+PIDFile = /var/run/lirc/lircd-%i.pid
+ExecStart = /bin/sh -c "/var/run/lirc/lircd-%i.sh"
+ExecStopPost = /bin/rm -f /var/run/lirc/lircd-%i.pid /var/run/lirc/lircd-%i

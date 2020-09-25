@@ -1,0 +1,8 @@
+[Unit]
+Description = lircd-uinput helper
+BindsTo = lircd_helper@%i.service
+ConditionPathExists = /var/run/lirc/lircd-%i.uinput
+
+[Service]
+Type = simple
+ExecStart = /usr/sbin/lircd-uinput /var/run/lirc/lircd-%i
