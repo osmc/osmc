@@ -11,15 +11,11 @@ remove_divert ()
 dist_upgrade_migrate ()
 {
 	SRCSFILE="/etc/apt/sources.list"
-	# Fix legacy issue in October 2015 builds
-	sed 's/http:\/\/staging.apt.osmc.tv/http:\/\/apt.osmc.tv/g' -i $SRCSFILE
-	# Remove gmc test build repo with unsigned packages to avoid migration issue
-	sed '/^deb http:\/\/download.osmc.tv\/dev\/gmc-18.*$/d' -i $SRCSFILE
 	# Update APT sources.list
-	sed 's/jessie main/stretch main/g' -i $SRCSFILE
-	sed 's/jessie-updates/stretch-updates/g' -i $SRCSFILE
-	sed 's/jessie\/updates/stretch\/updates/g' -i $SRCSFILE
-	sed 's/jessie-devel main/stretch-devel main/g' -i $SRCSFILE
+	sed 's/stretch main/buster main/g' -i $SRCSFILE
+	sed 's/stretch-updates/buster-updates/g' -i $SRCSFILE
+	sed 's/stretch\/updates/buster\/updates/g' -i $SRCSFILE
+	sed 's/stretch-devel main/buster-devel main/g' -i $SRCSFILE
 	# Signal we want a dist-upgrade and a reboot
 	touch /dist_upgrade_wanted /tmp/reboot-needed
 }
@@ -38,8 +34,8 @@ if [ "$1" = "configure" ]; then
 	systemctl start osmc-id-generator.service osmc-report-stats.timer
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
-#	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.4.5"; then
-#	dist_upgrade_migrate
-#	fi
+	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "2.9.4"; then
+	dist_upgrade_migrate
+	fi
 fi
 exit 0
