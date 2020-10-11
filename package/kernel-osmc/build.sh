@@ -96,8 +96,8 @@ then
 		export kimagedest=$(pwd)/vmlinuz
 		export kelfimagedest=$(pwd)/vmlinux
 		export KERNEL_ARCH=arm64
-		$BUILD vero3_2g_16g.dtb || vero3_2g_16g.dtb
-		$BUILD vero3plus_2g_16g.dtb || vero3plus_2g_16g.dtb
+		$BUILD vero3_2g_16g.dtb || $BUILD vero3_2g_16g.dtb
+		$BUILD vero3plus_2g_16g.dtb || $BUILD vero3plus_2g_16g.dtb
 	fi
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
