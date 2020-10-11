@@ -29,7 +29,7 @@ then
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
-if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/OpenLinux4.9-53eaa3a821536e82cd97f92df7c71f5ec7dfc189-1602426999.tar.gz"; fi
+if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/osmc-openlinux-4.9.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
