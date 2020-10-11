@@ -15,7 +15,7 @@ test $1 == rbp1 && VERSION="4.19.122" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMF
 test $1 == rbp2 && VERSION="4.19.122" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero364 && VERSION="3.14.29" && REV="160" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
+test $1 == vero364 && VERSION="4.9.113" && REV="23" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -29,7 +29,7 @@ then
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
 if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
-if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/master.tar.gz"; fi
+if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/OpenLinux4.9-53eaa3a821536e82cd97f92df7c71f5ec7dfc189-1602426999.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -171,7 +171,7 @@ then
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
 	export ARCH
-		if [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
+		if [ "$1" == "vero2" ]
 		then
 		# Build RTL8812AU module
 		pushd drivers/net/wireless/rtl8812au
@@ -181,17 +181,6 @@ then
 		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
 		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		fi
-		if [ "$1" == "vero364" ]
-		then
-		# Build RTL8192CU module
-		pushd drivers/net/wireless/rtl8192cu
-		$BUILD
-		if [ $? != 0 ]; then echo "Building kernel module failed" && exit 1; fi
-		popd
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
-		strip --strip-unneeded drivers/net/wireless/rtl8192cu/8192cu.ko
-		cp drivers/net/wireless/rtl8192cu/8192cu.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
 		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
 		then
@@ -204,26 +193,18 @@ then
 		strip --strip-unneeded drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko
                 cp drivers/net/wireless/mt7610u/os/linux/mt7610u_sta.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
                 fi
-        # Build V4L2 drivers for Vero 4K
         if [ "$1" == "vero364" ]
-        then
-		kernel_path=$(pwd)
-		cp mb.config media_build/v4l/.config
-                pushd media_build
-                make untar
-                cp -a "../drivers/amlogic/video_dev" "linux/drivers/media/"
-                sed -i 's,common/,,g; s,"trace/,",g' $(find linux/drivers/media/video_dev/ -type f)
-                sed -i 's,\$(CONFIG_V4L_AMLOGIC_VIDEO),m,g' "linux/drivers/media/video_dev/Makefile"
-                echo "obj-y += video_dev/" >> "linux/drivers/media/Makefile"
-                echo "source drivers/media/video_dev/Kconfig " >> "linux/drivers/media/Kconfig"
-                cp -a "${kernel_path}/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
-                cp -a "${kernel_path}/include/media/videobuf-res.h" "linux/include/media/"
-                echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
-                $BUILD VER=${VERSION} SRCDIR=$(pwd)/../
-                popd
-                mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
-		cp media_build/v4l/*.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/backport
-        fi
+	then
+		# Build V4L2 modules for Vero 4K
+		$BUILD M=drivers/osmc/media_modules CONFIG_AMLOGIC_MEDIA_VDEC_OSMC=m
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc
+		for file in $(find drivers/osmc/media_modules/ -name "*.ko"); do cp $file ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc; done
+		# Build OpTEE modules for secureOSMC
+		$BUILD M=drivers/osmc/secureosmc
+		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
+		cp drivers/osmc/secureosmc/optee/optee_armtz.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
+		cp drivers/osmc/secureosmc/optee.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
+	fi
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
