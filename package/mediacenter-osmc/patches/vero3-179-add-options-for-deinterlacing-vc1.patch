@@ -1,0 +1,69 @@
+From afa1e37e048eaf27f0ec91e50b1daab808ce1b06 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Mon, 5 Oct 2020 19:34:06 +0100
+Subject: [PATCH] Add configurable deinterlace methods for VC-1
+
+---
+ .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  | 37 ++++++++++++++++---
+ 1 file changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 2c429183f7..a7478f94df 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1640,14 +1640,26 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   am_private->gcodec.ratio64     = am_private->video_ratio64;
+   am_private->gcodec.param       = NULL;
+ 
+-  if (am_private->video_format == VFORMAT_VC1) {
+-      SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0x10000);
+-      SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
++  std::list<EINTERLACEMETHOD> methods;
++
++  if (am_private->video_format == VFORMAT_VC1)
++  {
++    /* add deinterlace options */
++    methods.push_back(EINTERLACEMETHOD::VS_INTERLACEMETHOD_NONE);
++    methods.push_back(EINTERLACEMETHOD::VS_INTERLACEMETHOD_DEINTERLACE);
++    methods.push_back(EINTERLACEMETHOD::VS_INTERLACEMETHOD_AUTO);
++    m_processInfo.SetDeinterlacingMethodDefault(EINTERLACEMETHOD::VS_INTERLACEMETHOD_DEINTERLACE);
++    /* engage deinterlacer for progressive streams */
++    SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0x10000);
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
+   }
+-  else {
+-      SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0);
+-      SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
++  else
++  {
++    methods.clear();
++    SysfsUtils::SetInt("/sys/module/di/parameters/di_debug_flag", 0);
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
+   }
++  m_processInfo.UpdateDeinterlacingMethods(methods);
+ 
+   switch(am_private->video_format)
+   {
+@@ -1916,6 +1928,19 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+ 
+   SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
+ 
++  /* stop VC-1 decoder sending two fields */
++  if (am_private->video_format == VFORMAT_VC1)
++  {
++    if (m_processInfo.GetVideoSettings().m_InterlaceMethod == VS_INTERLACEMETHOD_NONE)
++    {
++      SysfsUtils::SetInt("/sys/module/amvdec_vc1/parameters/force_prog", 1);
++    }
++    else
++    {
++      SysfsUtils::SetInt("/sys/module/amvdec_vc1/parameters/force_prog", 0);
++    }
++  }
++
+   struct buf_status bs;
+   m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
+   if (iSize > (size_t)bs.free_len) {
+-- 
+2.25.1
+
