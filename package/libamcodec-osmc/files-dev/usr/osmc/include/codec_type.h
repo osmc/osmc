@@ -48,6 +48,17 @@ typedef enum {
     STREAM_TYPE_RM,
 } stream_type_t;
 
+typedef enum {
+    DECODER_TYPE_SINGLE_MODE,
+    DECODER_TYPE_FRAME_MODE,
+    DECODER_TYPE_STREAM_MODE,
+} decoder_type_t;
+
+typedef enum {
+    DISPLAY_MODE_AMVIDEO,
+    DISPLAY_MODE_PIPVIDEO,
+} display_mode_type_t;
+
 typedef struct {
     unsigned int    format;  ///< video format, such as H264, MPEG2...
     unsigned int    width;   ///< video source width
@@ -116,11 +127,14 @@ unsigned int noblock:
     int dspdec_not_supported;//check some profile that audiodsp decoder can not support,we switch to arm decoder
     int switch_audio_flag;      //<switch audio flag switching(1) else(0)
     int automute_flag;
+    decoder_type_t decoder_type;
+    display_mode_type_t display_mode;
     char *sub_filename;
     int associate_dec_supported;//support associate or not
     int mixing_level;
     int use_hardabuf;
     unsigned int drmmode;
+    enum FRAME_BASE_VIDEO_PATH video_path;
     void *osmc;
 } codec_para_t;
 

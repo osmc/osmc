@@ -33,7 +33,6 @@
 #include "codec_type.h"
 #include "codec_error.h"
 
-
 int codec_init(codec_para_t *);
 int codec_close(codec_para_t *);
 void codec_close_audio_async(codec_para_t *pcodec);
@@ -147,6 +146,6 @@ int codec_utils_set_video_position(int x, int y, int w, int h, int rotation);
 int codec_amsub_read_outdata(codec_para_t *pcodec,amsub_info_t *amsub_info);
 void codec_close_subtitle(codec_para_t *pcodec);
 void codec_resume_subtitle(codec_para_t *pcodec, unsigned int has_sub);
-
+int codec_set_eos(codec_para_t *pcodec, int is_eos);
 void codec_set_log_callback(void (*logf)(const char *, ...));
 #endif

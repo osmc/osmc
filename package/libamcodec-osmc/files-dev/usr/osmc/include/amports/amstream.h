@@ -55,6 +55,7 @@
 #include "vformat.h"
 #include "aformat.h"
 
+
 #define PORT_FLAG_IN_USE    0x0001
 #define PORT_FLAG_VFORMAT   0x0002
 #define PORT_FLAG_AFORMAT   0x0004
@@ -195,6 +196,21 @@
 #define AMAUDIO_IOC_SET_RESAMPLE_TYPE       _IOW(AMAUDIO_IOC_MAGIC, 0x1b, unsigned long)
 #define AMAUDIO_IOC_GET_RESAMPLE_TYPE       _IOR(AMAUDIO_IOC_MAGIC, 0x1c, unsigned long)
 #define AMAUDIO_IOC_SET_RESAMPLE_DELTA      _IOW(AMAUDIO_IOC_MAGIC, 0x1d, unsigned long)
+
+enum FRAME_BASE_VIDEO_PATH {
+    FRAME_BASE_PATH_IONVIDEO = 0,
+    FRAME_BASE_PATH_AMLVIDEO_AMVIDEO,
+    FRAME_BASE_PATH_AMLVIDEO1_AMVIDEO2,
+    FRAME_BASE_PATH_DI_AMVIDEO,
+    FRAME_BASE_PATH_AMVIDEO,
+    FRAME_BASE_PATH_AMVIDEO2,
+    FRAME_BASE_PATH_V4L_VIDEO,
+    FRAME_BASE_PATH_TUNNEL_MODE,
+    FRAME_BASE_PATH_V4L_OSD,
+    FRAME_BASE_PATH_DI_V4LVIDEO,
+    FRAME_BASE_PATH_PIP_TUNNEL_MODE,
+    FRAME_BASE_PATH_MAX
+};
 
 struct buf_status {
     int size;
@@ -343,11 +359,21 @@ struct userdata_poc_info_t {
 #define AMSTREAM_SET_3D_TYPE 0x171
 #define AMSTREAM_SET_VSYNC_UPINT 0x172
 #define AMSTREAM_SET_VSYNC_SLOW_FACTOR 0x173
+#define AMSTREAM_SET_FRAME_BASE_PATH 0x174
+#define AMSTREAM_SET_EOS 0x175
+#define AMSTREAM_SET_RECEIVE_ID 0x176
+#define AMSTREAM_SET_IS_RESET 0x177
+
+#define AMSTREAM_SET_NO_POWERDOWN 0x178
+#define AMSTREAM_SET_DVMETAWITHEL 0x179
+
+
 /*  video set ex cmd */
 #define AMSTREAM_SET_EX_VIDEO_AXIS 0x260
 #define AMSTREAM_SET_EX_VIDEO_CROP 0x261
 /*  amstream set ptr cmd */
 #define AMSTREAM_SET_PTR_AUDIO_INFO 0x300
+#define AMSTREAM_SET_PTR_CONFIGS 0x301
 
 /*  amstream get cmd */
 #define AMSTREAM_GET_SUB_LENGTH 0x800
@@ -431,7 +457,7 @@ struct am_ioctl_parm_ptr {
         char data[8];
     };
     unsigned int cmd;
-    char reserved[4];
+    unsigned int len;
 };
 
 void set_vdec_func(int (*vdec_func)(struct vdec_status *));
