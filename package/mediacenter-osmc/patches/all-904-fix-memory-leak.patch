@@ -1,0 +1,305 @@
+From 5dc076aa62f508161f0fb29193389695b518fd02 Mon Sep 17 00:00:00 2001
+From: Vasyl Gello <vasek.gello@gmail.com>
+Date: Tue, 1 Sep 2020 13:03:34 +0300
+Subject: [PATCH] TexturePacker: Do not leak image data memory
+
+Building Kodi with asan+lsan+ubsan breaks with the following error:
+
+=================================================================
+==241706==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 69370335 byte(s) in 661 object(s) allocated from:
+    #0 0x7fb290a737a7 in operator new[](unsigned long) (/usr/lib/x86_64-linux-gnu/libasan.so.6+0xab7a7)
+    #1 0x563e2bed8b09 in PNGDecoder::LoadFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, DecodedFrames&) (/build/kodi-18.8+dfsg1/kodi_build_x11/build/texturepacker/TexturePacker+0x17cb09)
+    #2 0x563e2be71392 in DecoderManager::LoadFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, DecodedFrames&) (/build/kodi-18.8+dfsg1/kodi_build_x11/build/texturepacker/TexturePacker+0x115392)
+    #3 0x563e2be7d1bf in createBundle(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, double, unsigned int, bool) (/build/kodi-18.8+dfsg1/kodi_build_x11/build/texturepacker/TexturePacker+0x1211bf)
+    #4 0x563e2be69990 in main (/build/kodi-18.8+dfsg1/kodi_build_x11/build/texturepacker/TexturePacker+0x10d990)
+    #5 0x7fb28fbc7cc9 in __libc_start_main ../csu/libc-start.c:308
+
+SUMMARY: AddressSanitizer: 69370335 byte(s) leaked in 661 allocation(s).
+
+The root cause of the leak is decoder's FreeDecodedFrames never called.
+
+This commit fixes the leak by refactoring the following aspects:
+
+ * Introducing the pointer to decoder object in the decoded frame,
+ * Changing IDecoder::FreeDecodedFrames to IDecoder::FreeDecodedFrame
+   cleaning single frame at a time
+ * Moving iteration over frames to DecoderManager::FreeDecodedFrames
+ * Removing unnecessary DecodedFrames.user
+
+Signed-off-by: Vasyl Gello <vasek.gello@gmail.com>
+---
+ .../TexturePacker/src/decoder/GIFDecoder.cpp  | 22 ++----
+ .../TexturePacker/src/decoder/GIFDecoder.h    |  2 +-
+ .../TexturePacker/src/decoder/IDecoder.h      | 73 ++++++++++++-------
+ .../TexturePacker/src/decoder/JPGDecoder.cpp  | 13 ++--
+ .../TexturePacker/src/decoder/JPGDecoder.h    |  2 +-
+ .../TexturePacker/src/decoder/PNGDecoder.cpp  | 13 ++--
+ .../TexturePacker/src/decoder/PNGDecoder.h    |  2 +-
+ 7 files changed, 66 insertions(+), 61 deletions(-)
+
+diff --git a/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.cpp b/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.cpp
+index 7e5179b0cc33..d7c5e2ac5505 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.cpp
++++ b/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.cpp
+@@ -31,6 +31,8 @@ bool GIFDecoder::CanDecode(const std::string &filename)
+ bool GIFDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+ {
+   int n = 0;
++  bool result = false;
++
+   GifHelper *gifImage = new GifHelper();
+   if (gifImage->LoadGif(filename.c_str()))
+   {
+@@ -53,28 +55,20 @@ bool GIFDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+         frame.rgbaImage.bbp = 32;
+         frame.rgbaImage.pitch = pitch;
+         frame.delay = extractedFrames[i]->m_delay;
++        frame.decoder = this;
+ 
+         frames.frameList.push_back(frame);
+       }
+     }
+-    frames.user = gifImage;
+-    return true;
+-  }
+-  else
+-  {
+-    delete gifImage;
+-    return false;
++    result = true;
+   }
++  delete gifImage;
++  return result;
+ }
+ 
+-void GIFDecoder::FreeDecodedFrames(DecodedFrames &frames)
++void GIFDecoder::FreeDecodedFrame(DecodedFrame &frame)
+ {
+-  for (unsigned int i = 0; i < frames.frameList.size(); i++)
+-  {
+-    delete [] frames.frameList[i].rgbaImage.pixels;
+-  }
+-  delete (GifHelper *)frames.user;
+-  frames.clear();
++  delete [] frame.rgbaImage.pixels;
+ }
+ 
+ void GIFDecoder::FillSupportedExtensions()
+diff --git a/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.h b/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.h
+index 6e9ea6c4be4b..8f0b42d822e9 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.h
++++ b/tools/depends/native/TexturePacker/src/decoder/GIFDecoder.h
+@@ -28,7 +28,7 @@ class GIFDecoder : public IDecoder
+     ~GIFDecoder() override = default;
+     bool CanDecode(const std::string &filename) override;
+     bool LoadFile(const std::string &filename, DecodedFrames &frames) override;
+-    void FreeDecodedFrames(DecodedFrames &frames) override;
++    void FreeDecodedFrame(DecodedFrame &frame) override;
+     const char* GetImageFormatName() override { return "GIF"; }
+     const char* GetDecoderName() override { return "libgif"; }
+   protected:
+diff --git a/tools/depends/native/TexturePacker/src/decoder/IDecoder.h b/tools/depends/native/TexturePacker/src/decoder/IDecoder.h
+index b197296d9b0e..28243acbf100 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/IDecoder.h
++++ b/tools/depends/native/TexturePacker/src/decoder/IDecoder.h
+@@ -23,6 +23,34 @@
+ #include <string>
+ #include <vector>
+ 
++/* forward declarations */
++
++class DecodedFrame;
++class DecodedFrames;
++
++class IDecoder
++{
++  public:
++    virtual ~IDecoder() = default;
++    virtual bool CanDecode(const std::string &filename) = 0;
++    virtual bool LoadFile(const std::string &filename, DecodedFrames &frames) = 0;
++    virtual void FreeDecodedFrame(DecodedFrame &frame) = 0;
++    virtual const char* GetImageFormatName() = 0;
++    virtual const char* GetDecoderName() = 0;
++
++    const std::vector<std::string>& GetSupportedExtensions()
++    {
++      m_supportedExtensions.clear();
++      FillSupportedExtensions();
++      return m_supportedExtensions;
++    }
++
++  protected:
++    virtual void FillSupportedExtensions() = 0;
++    //fill this with extensions in FillSupportedExtensions like ".png"
++    std::vector<std::string> m_supportedExtensions;
++};
++
+ class RGBAImage
+ {
+ public:
+@@ -39,43 +67,32 @@ class DecodedFrame
+ {
+   public:
+    DecodedFrame() : delay(0) { }
+-   RGBAImage	rgbaImage;				/* rgbaimage for this frame */
+-   int				delay;					/* Frame delay in ms */
++   RGBAImage rgbaImage; /* rgbaimage for this frame */
++   int delay = 0; /* Frame delay in ms */
++   IDecoder* decoder = nullptr; /* Pointer to decoder */
+ };
+ 
+ class DecodedFrames
+ {
+   public:
+-    DecodedFrames(): user(NULL) {}
++    DecodedFrames() = default;
+     std::vector<DecodedFrame> frameList;
+-    void     *user;         /* used internally*/
+ 
+     void clear()
+     {
++      for (auto f : frameList)
++      {
++        if (f.decoder != NULL)
++        {
++          f.decoder->FreeDecodedFrame(f);
++        }
++        else
++        {
++          fprintf(stderr,
++            "ERROR: %s - can not determine decoder type for frame!\n",
++            __FUNCTION__);
++        }
++      }
+       frameList.clear();
+-      user = NULL;
+     }
+ };
+-
+-class IDecoder
+-{
+-  public:
+-    virtual ~IDecoder() = default;
+-    virtual bool CanDecode(const std::string &filename) = 0;
+-    virtual bool LoadFile(const std::string &filename, DecodedFrames &frames) = 0;
+-    virtual void FreeDecodedFrames(DecodedFrames &frames) = 0;
+-    virtual const char* GetImageFormatName() = 0;
+-    virtual const char* GetDecoderName() = 0;
+-
+-    const std::vector<std::string>& GetSupportedExtensions()
+-    {
+-      m_supportedExtensions.clear();
+-      FillSupportedExtensions();
+-      return m_supportedExtensions;
+-    }
+-
+-  protected:
+-    virtual void FillSupportedExtensions() = 0;
+-    //fill this with extensions in FillSupportedExtensions like ".png"
+-    std::vector<std::string> m_supportedExtensions;
+-};
+diff --git a/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.cpp b/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.cpp
+index 4022dc719f2a..15a646f95bdb 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.cpp
++++ b/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.cpp
+@@ -84,7 +84,6 @@ bool JPGDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+   // Image Size is calculated as (width * height * bytes per pixel = 4
+   ImageSize = cinfo.image_width * cinfo.image_height * 4;
+ 
+-  frames.user = NULL;
+   DecodedFrame frame;
+ 
+   frame.rgbaImage.pixels = (char *)new char[ImageSize];
+@@ -115,20 +114,18 @@ bool JPGDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+   frame.rgbaImage.width = cinfo.image_width;
+   frame.rgbaImage.bbp = 32;
+   frame.rgbaImage.pitch = 4 * cinfo.image_width;
++
++  frame.decoder = this;
++
+   frames.frameList.push_back(frame);
+ 
+   delete arq;
+   return true;
+ }
+ 
+-void JPGDecoder::FreeDecodedFrames(DecodedFrames &frames)
++void JPGDecoder::FreeDecodedFrame(DecodedFrame &frame)
+ {
+-  for (unsigned int i = 0; i < frames.frameList.size(); i++)
+-  {
+-    delete [] frames.frameList[i].rgbaImage.pixels;
+-  }
+-
+-  frames.clear();
++  delete [] frame.rgbaImage.pixels;
+ }
+ 
+ void JPGDecoder::FillSupportedExtensions()
+diff --git a/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.h b/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.h
+index 30430e79f994..bbf23ba7b377 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.h
++++ b/tools/depends/native/TexturePacker/src/decoder/JPGDecoder.h
+@@ -28,7 +28,7 @@ class JPGDecoder : public IDecoder
+     ~JPGDecoder() override = default;
+     bool CanDecode(const std::string &filename) override;
+     bool LoadFile(const std::string &filename, DecodedFrames &frames) override;
+-    void FreeDecodedFrames(DecodedFrames &frames) override;
++    void FreeDecodedFrame(DecodedFrame &frame) override;
+     const char* GetImageFormatName() override { return "JPG"; }
+     const char* GetDecoderName() override { return "libjpeg"; }
+   protected:
+diff --git a/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.cpp b/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.cpp
+index 96ca0b461ffd..e5ca91b5c606 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.cpp
++++ b/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.cpp
+@@ -214,7 +214,6 @@ bool PNGDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+   // read the png into image_data through row_pointers
+   png_read_image(png_ptr, row_pointers);
+ 
+-  frames.user = NULL;
+   DecodedFrame frame;
+ 
+   frame.rgbaImage.pixels = (char *)image_data;
+@@ -222,6 +221,9 @@ bool PNGDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+   frame.rgbaImage.width = temp_width;
+   frame.rgbaImage.bbp = 32;
+   frame.rgbaImage.pitch = 4 * temp_width;
++
++  frame.decoder = this;
++
+   frames.frameList.push_back(frame);
+   // clean up
+   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+@@ -229,14 +231,9 @@ bool PNGDecoder::LoadFile(const std::string &filename, DecodedFrames &frames)
+   return true;
+ }
+ 
+-void PNGDecoder::FreeDecodedFrames(DecodedFrames &frames)
++void PNGDecoder::FreeDecodedFrame(DecodedFrame &frame)
+ {
+-  for (unsigned int i = 0; i < frames.frameList.size(); i++)
+-  {
+-    delete [] frames.frameList[i].rgbaImage.pixels;
+-  }
+-
+-  frames.clear();
++  delete [] frame.rgbaImage.pixels;
+ }
+ 
+ void PNGDecoder::FillSupportedExtensions()
+diff --git a/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.h b/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.h
+index 3b62a23e93f6..c7dba764cb84 100644
+--- a/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.h
++++ b/tools/depends/native/TexturePacker/src/decoder/PNGDecoder.h
+@@ -28,7 +28,7 @@ class PNGDecoder : public IDecoder
+     ~PNGDecoder() override = default;
+     bool CanDecode(const std::string &filename) override;
+     bool LoadFile(const std::string &filename, DecodedFrames &frames) override;
+-    void FreeDecodedFrames(DecodedFrames &frames) override;
++    void FreeDecodedFrame(DecodedFrame &frame) override;
+     const char* GetImageFormatName() override { return "PNG"; }
+     const char* GetDecoderName() override { return "libpng"; }
+   protected:
