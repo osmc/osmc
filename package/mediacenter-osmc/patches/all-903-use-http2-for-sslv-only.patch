@@ -1,0 +1,24 @@
+From 32a6c112585006b45f78ffb5bfabf7c06a33db9b Mon Sep 17 00:00:00 2001
+From: wsnipex <wsnipex@a1.net>
+Date: Fri, 16 Oct 2020 08:39:08 +0200
+Subject: [PATCH] [curl] only use HTTP2 with SSL
+
+Cloudflare decided in it's infinite wisdom not to follow standards
+that allow HTTP2 requests without encryption.
+---
+ xbmc/filesystem/CurlFile.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/filesystem/CurlFile.cpp b/xbmc/filesystem/CurlFile.cpp
+index 872cc781baf8..f302c5825c11 100644
+--- a/xbmc/filesystem/CurlFile.cpp
++++ b/xbmc/filesystem/CurlFile.cpp
+@@ -636,7 +636,7 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
+     g_curlInterface.easy_setopt(h, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+   else
+     // enable HTTP2 support. default: CURL_HTTP_VERSION_1_1. Curl >= 7.62.0 defaults to CURL_HTTP_VERSION_2TLS
+-    g_curlInterface.easy_setopt(h, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
++    g_curlInterface.easy_setopt(h, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+ }
+ 
+ void CCurlFile::SetRequestHeaders(CReadState* state)
