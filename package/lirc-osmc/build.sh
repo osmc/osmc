@@ -27,7 +27,7 @@ then
 	pushd src/lirc-*
 	install_patch "../../patches" "all"
 	autoreconf -vif .
-	./configure --prefix=/usr --without-x
+	SH_PATH=/bin/sh ./configure --prefix=/usr --without-x
 	$BUILD
 	make install DESTDIR=${out}
 	if [ $? != 0 ]; then echo "Error occured during build" && exit 1; fi
