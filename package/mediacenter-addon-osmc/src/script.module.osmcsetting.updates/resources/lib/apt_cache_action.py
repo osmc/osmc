@@ -235,10 +235,29 @@ class Main(object):
 
 		self.cache = apt.Cache()
 
-		self.cache.update(fetch_progress=dprg, pulse_interval=1000)
+		print '%s %s updating...' % (t.now(), 'apt_cache_action.py')
 
-		# call the parent and kill the pDialog, now handled in on exit
-		call_parent('progress_bar', {'percent': 100,  'heading': self.heading, 'message':'Cache Updated - please wait'})
+		try:
+			self.cache.update(fetch_progress=dprg, pulse_interval=1000)
+
+		except apt.cache.FetchFailedException:
+			self.error_message = 'Connectivity issue while checking for updates...'
+			print '%s %s ERROR Connectivity issue while updating...' % (t.now(), 'apt_cache_action.py')
+
+			return '%s %s connectivty issues' % (t.now(), 'apt_cache_action.py')
+
+		finally:
+			# call the parent and kill the pDialog, now handled in on exit
+			call_parent('progress_bar', {
+				'percent': 100,
+				'heading': self.heading,
+				'message': self.error_message or 'Cache Updated - please wait'
+			})
+
+			if self.error_message:
+				call_parent('progress_bar', {
+					'kill': True
+				})
 
 		return '%s %s cache updated' % (t.now(), 'apt_cache_action.py')
 
