@@ -72,11 +72,12 @@ then
 	# 30 seconds of accelerated boot. we set curgov to ondemand so the next check only doesn't flip us back if we had performance to begin with
 	sleep 30
 	echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1 #all platforms
-	find /sys/devices/system/cpu/cpufreq -name ondemand | while read od ; do
-		(echo     50 > $od/up_threshold)
-		(echo 100000 > $od/sampling_rate)
-		(echo     50 > $od/sampling_down_factor)
-	done
+	ondemand=/sys/devices/system/cpu/cpufreq/policy0/ondemand
+	# the following line can be removed once 3.14 kernels are history
+	[ -d $ondemand ] || ondemand=/sys/devices/system/cpu/cpufreq/ondemand
+	(echo     50 > $ondemand/up_threshold)
+	(echo 100000 > $ondemand/sampling_rate)
+	(echo     50 > $ondemand/sampling_down_factor)
 	else
 		echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
 fi
