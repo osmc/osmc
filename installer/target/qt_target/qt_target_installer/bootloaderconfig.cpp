@@ -115,7 +115,7 @@ void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv" || utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "rbp4" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv" || utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
     {
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
@@ -141,7 +141,7 @@ void BootloaderConfig::configureMounts()
 
 void BootloaderConfig::configureEnvironment()
 {
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "rbp4")
     {
         QFile cmdlineFile("/mnt/boot/cmdline.txt");
         QStringList cmdlineStringList;
@@ -159,6 +159,7 @@ void BootloaderConfig::configureEnvironment()
         }
         QFile configFile("/mnt/boot/config.txt");
         QStringList configStringList;
+	/* ToDo: make this part of rbp-bootloader-osmc and have custom includes for distroconfig */
         if (utils->getOSMCDev() == "rbp1")
         {
             configStringList << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
