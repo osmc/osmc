@@ -1,0 +1,12 @@
+[Unit]
+Description=Broadcom 43xx bluetooth HCI
+Before=bluetooth.service
+PartOf=bt-firmware.path
+ConditionPathIsDirectory=/proc/device-tree/soc/gpio@7e200000/bt_pins
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/rpi-btuart
+
+[Install]
+WantedBy=multi-user.target

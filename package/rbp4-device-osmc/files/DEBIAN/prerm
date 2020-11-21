@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Block removal of essential OSMC package due to broken dependencies.
+if [ "$1" = "remove" ]; then
+	echo "WARNING: You have tried to remove a package that is essential to OSMC's operation."
+	echo "To undo these changes, run 'sudo apt-get -f install'."
+	exit 1
+fi
