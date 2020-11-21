@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    Copyright (C) 2014-2020 OSMC (KodeKarnage)
+
+    This file is part of script.module.osmcsetting.networking
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+    See LICENSES/GPL-2.0-or-later for more information.
+"""
+
 import dbus
 
 SERVICE_NAME = "org.bluez"
@@ -18,7 +28,7 @@ def find_adapter(pattern=None):
 
 def find_adapter_in_objects(objects, pattern=None):
     bus = dbus.SystemBus()
-    for path, ifaces in objects.iteritems():
+    for path, ifaces in objects.items():
         adapter = ifaces.get(ADAPTER_INTERFACE)
         if adapter is None:
             continue
@@ -40,7 +50,7 @@ def find_device_in_objects(objects, device_address, adapter_pattern=None):
     if adapter_pattern:
         adapter = find_adapter_in_objects(objects, adapter_pattern)
         path_prefix = adapter.object_path
-    for path, ifaces in objects.iteritems():
+    for path, ifaces in objects.items():
         device = ifaces.get(DEVICE_INTERFACE)
         if device is None:
             continue

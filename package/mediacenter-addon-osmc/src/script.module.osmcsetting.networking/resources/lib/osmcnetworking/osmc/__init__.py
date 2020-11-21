@@ -8,4 +8,4 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['osmcnetworking']
+__all__ = ['osmc_setting']
