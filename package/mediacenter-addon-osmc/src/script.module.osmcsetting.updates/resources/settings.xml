@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-	<!-- 32001: Update Schedule -->
-	<category label="32001">
-		<!-- 32002: How often do you want to check for updates? -->
-		<setting default="1" id="check_freq" label="32002" lvalues="32003|32004|32005|32006" type="enum"/>
-		<!-- 32003: Never, 32004: Daily, 32005: Weekly, 32006: Monthly -->
-		<!-- . -->
-		<!-- 32007: Day -->
-		<setting default="1" id="check_weekday" label="32007" lvalues="32008|32009|32010|32011|32012|32013|32014" subsetting="true" type="enum" visible="eq(-1,2)"/>
-		<!-- 32008: Monday ... 32014: Sunday -->
-		<!-- . -->
-		<!-- 32015: Days before/after month-end -->
-		<setting default="0" id="check_day" label="32015" option="int" range="-16,1,16" subsetting="true" type="slider" visible="eq(-2,3)"/>
-		<!-- 32016: Do you want to choose a specific time to check? -->
-		<setting default="0" id="check_time" label="32016" lvalues="32017|32018" subsetting="true" type="enum" visible="!eq(-3,0)"/>
-		<!-- 32017: random, 32018: specific -->
-		<!-- . -->
-		<!-- 32019: Hour -->
-		<setting default="12" id="check_hour" label="32019" option="int" range="0,1,23" subsetting="true" type="slider" visible="!eq(-4,0)+eq(-1,1)"/>
-		<!-- 32111: Minute -->
-		<setting default="0" id="check_minute" label="32111" option="int" range="0,1,59" subsetting="true" type="slider" visible="!eq(-5,0)+eq(-2,1)"/>
-		<!-- 32069: Only check for updates if system is idle for 1 minute -->
-		<setting default="true" id="update_on_idle" label="32069" type="bool"/>
-	</category>
-	<category label="32093">
-		<!-- 32064: Action when updates are found -->
-		<setting default="0" id="on_upd_detected" label="32059" lvalues="32057|32058|32095|32060" type="enum"/>
-		<!-- 32057: "Prompt for all actions" -->
-		<!-- 32058: "Display icon on home screen only" -->
-		<!-- 32095: "Download updates, then prompt" -->
-		<!-- 32060: "Download and display icon" -->
-		<!-- 32061: "Download and install automatically" *********deprecated -->
-		<!-- 32062: "Download, install, auto-restart if needed" *********deprecated-->
-		<!-- . -->
-		<!-- 32065: Only show prompts on the Home screen -->
-		<setting default="false" id="home_prompts_only" label="32065" type="bool" visible="eq(-1, 0)"/>
-		<!-- 32046: Suppress on-screen progress updates -->
-		<setting default="false" id="suppress_progress" label="32046" type="bool"/>
-		<!-- 32068: Do not show icon on home screen -->
-		<setting default="false" id="suppress_icon" label="32068" type="bool"/>
-		<!-- 32066: Icon Position X (% of screen) -->
-		 <setting default="4" id="pos_x" label="32066" option="int" range="0,1,100" type="slider" visible="!eq(-1,true)"/>
-		<!-- 32067: Icon Position Y (% of screen) -->
-		 <setting default="95" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-2,true)"/>
-	</category>
-	<category label="32109">
-		<!-- backup before updating -->
-		<setting default="false" id="backup_on_update" label="32107" type="bool"/>
-		<!-- . -->
-		<!-- export the libraries -->
-		<!-- . -->
-		<!-- <setting default="false" id="export_library" label="Export libraries" type="bool"/> -->
-		<!-- <setting visible="eq(-1,true)" subsetting="true" default="false" id="export_video" label="Export Video Library" type="bool"/> -->
-		<!-- <setting visible="eq(-1,true)+eq(-2,true)" subsetting="true" default="false" id="multifile_vid_export" label="Export individual xml files to the video locations" type="bool"/> -->
-		<!-- <setting visible="eq(-3,true)" subsetting="true" default="false" id="export_music" label="Export Music Library" type="bool"/> -->
-		<!-- . -->
-		<!-- create tarball of folders and files -->
-		<!-- . -->
-		<!-- <setting default="true" id="create_tarball" label="create_tarball" type="bool"/> -->
-		<!-- location of backup -->
-		<setting id="location_selection" type="enum" lvalues="32021|32022" default="0" label="32020"/>
-		<setting subsetting="true" id="backup_location" label="32024" source="auto" option="writeable" type="folder" visible="eq(-1,0)" />
-		<setting id="backup_location_typed" type="text" label="32023" default="" visible="eq(-2,1)" subsetting="true" />
-		<!-- number of backup tarballs to keep -->
-		<setting default="1" id="tarball_count" label="32108" option="int" range="0,1,25" type="slider"/>
-		<!-- folders and files to tarball -->
-		<setting label="32025" type="lsep"/>
-		<setting subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_keymaps" label="Keymaps Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_library" label="Library Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_peripheral_data" label="Peripheral_data Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_playlists" label="Playlists Folder" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_profilesF" label="Profiles Folder" type="bool"/>
-		<setting subsetting="true" default="false" id="backup_Thumbnails" label="Thumbnails Folder (very large)" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_favourites" label="favourites.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_guisettings" label="guisettings.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_keyboard" label="keyboard.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_remote" label="remote.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_LCD" label="LCD.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_profiles" label="profiles.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_RssFeeds" label="RssFeeds.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_sources" label="sources.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_upnpserver" label="upnpserver.xml" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_fstab" label="/etc/fstab" type="bool"/>
-		<setting subsetting="true" default="true" id="backup_advancedsettings" label="advancedsettings.xml" type="bool"/>
+    <!-- 32001: Update Schedule -->
+    <category label="32001">
+        <!-- 32002: How often do you want to check for updates? -->
+        <setting default="1" id="check_freq" label="32002" lvalues="32003|32004|32005|32006" type="enum"/>
+        <!-- 32003: Never, 32004: Daily, 32005: Weekly, 32006: Monthly -->
+        <!-- . -->
+        <!-- 32007: Day -->
+        <setting default="1" id="check_weekday" label="32007" lvalues="32008|32009|32010|32011|32012|32013|32014" subsetting="true" type="enum" visible="eq(-1,2)"/>
+        <!-- 32008: Monday ... 32014: Sunday -->
+        <!-- . -->
+        <!-- 32015: Days before/after month-end -->
+        <setting default="0" id="check_day" label="32015" option="int" range="-16,1,16" subsetting="true" type="slider" visible="eq(-2,3)"/>
+        <!-- 32016: Do you want to choose a specific time to check? -->
+        <setting default="0" id="check_time" label="32016" lvalues="32017|32018" subsetting="true" type="enum" visible="!eq(-3,0)"/>
+        <!-- 32017: random, 32018: specific -->
+        <!-- . -->
+        <!-- 32019: Hour -->
+        <setting default="12" id="check_hour" label="32019" option="int" range="0,1,23" subsetting="true" type="slider" visible="!eq(-4,0)+eq(-1,1)"/>
+        <!-- 32111: Minute -->
+        <setting default="0" id="check_minute" label="32111" option="int" range="0,1,59" subsetting="true" type="slider" visible="!eq(-5,0)+eq(-2,1)"/>
+        <!-- 32069: Only check for updates if system is idle for 1 minute -->
+        <setting default="true" id="update_on_idle" label="32069" type="bool"/>
+    </category>
+    <category label="32093">
+        <!-- 32064: Action when updates are found -->
+        <setting default="0" id="on_upd_detected" label="32059" lvalues="32057|32058|32095|32060" type="enum"/>
+        <!-- 32057: "Prompt for all actions" -->
+        <!-- 32058: "Display icon on home screen only" -->
+        <!-- 32095: "Download updates, then prompt" -->
+        <!-- 32060: "Download and display icon" -->
+        <!-- 32061: "Download and install automatically" *********deprecated -->
+        <!-- 32062: "Download, install, auto-restart if needed" *********deprecated-->
+        <!-- . -->
+        <!-- 32065: Only show prompts on the Home screen -->
+        <setting default="false" id="home_prompts_only" label="32065" type="bool" visible="eq(-1, 0)"/>
+        <!-- 32046: Suppress on-screen progress updates -->
+        <setting default="false" id="suppress_progress" label="32046" type="bool"/>
+        <!-- 32068: Do not show icon on home screen -->
+        <setting default="false" id="suppress_icon" label="32068" type="bool"/>
+        <!-- 32066: Icon Position X (% of screen) -->
+        <setting default="4" id="pos_x" label="32066" option="int" range="0,1,100" type="slider" visible="!eq(-1,true)"/>
+        <!-- 32067: Icon Position Y (% of screen) -->
+        <setting default="95" id="pos_y" label="32067" option="int" range="0,1,100" type="slider" visible="!eq(-2,true)"/>
+    </category>
+    <category label="32109">
+        <!-- backup before updating -->
+        <setting default="false" id="backup_on_update" label="32107" type="bool"/>
+        <!-- . -->
+        <!-- export the libraries -->
+        <!-- . -->
+        <!-- <setting default="false" id="export_library" label="Export libraries" type="bool"/> -->
+        <!-- <setting visible="eq(-1,true)" subsetting="true" default="false" id="export_video" label="Export Video Library" type="bool"/> -->
+        <!-- <setting visible="eq(-1,true)+eq(-2,true)" subsetting="true" default="false" id="multifile_vid_export" label="Export individual xml files to the video locations" type="bool"/> -->
+        <!-- <setting visible="eq(-3,true)" subsetting="true" default="false" id="export_music" label="Export Music Library" type="bool"/> -->
+        <!-- . -->
+        <!-- create tarball of folders and files -->
+        <!-- . -->
+        <!-- <setting default="true" id="create_tarball" label="create_tarball" type="bool"/> -->
+        <!-- location of backup -->
+        <setting id="location_selection" type="enum" lvalues="32021|32022" default="0" label="32020"/>
+        <setting subsetting="true" id="backup_location" label="32024" source="auto" option="writeable" type="folder" visible="eq(-1,0)"/>
+        <setting id="backup_location_typed" type="text" label="32023" default="" visible="eq(-2,1)" subsetting="true"/>
+        <!-- number of backup tarballs to keep -->
+        <setting default="1" id="tarball_count" label="32108" option="int" range="0,1,25" type="slider"/>
+        <!-- folders and files to tarball -->
+        <setting label="32025" type="lsep"/>
+        <setting subsetting="true" default="false" id="backup_addons" label="Addons Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_addon_data" label="Addon Data Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_Database" label="Database Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_keymaps" label="Keymaps Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_library" label="Library Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_peripheral_data" label="Peripheral_data Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_playlists" label="Playlists Folder" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_profilesF" label="Profiles Folder" type="bool"/>
+        <setting subsetting="true" default="false" id="backup_Thumbnails" label="Thumbnails Folder (very large)" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_favourites" label="favourites.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_guisettings" label="guisettings.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_keyboard" label="keyboard.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_remote" label="remote.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_LCD" label="LCD.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_profiles" label="profiles.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_RssFeeds" label="RssFeeds.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_sources" label="sources.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_upnpserver" label="upnpserver.xml" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_fstab" label="/etc/fstab" type="bool"/>
+        <setting subsetting="true" default="true" id="backup_advancedsettings" label="advancedsettings.xml" type="bool"/>
 
-	</category>
-	<category label="32094">
-		<!-- 32056: Scan for updates now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
-		<!-- install now visibility bool -->
-		<setting visible="false" default="false" id="install_now_visible" label="" type="bool"/>
-		<!-- install now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, install)" id="install_now" label="32053" option="close" type="action" visible="eq(-1,true)"/>
-		<!-- backup now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, backup)" id="backup_now" label="32105" option="close" type="action"/>
-		<!-- restore now -->
-		<setting action="RunScript($CWD/resources/lib/call_parent.py, restore)" id="restore_now" label="32106" option="close" type="action"/>
-		<setting action="RunScript($CWD/resources/lib/OSMC_HotFix.py, restore)" id="hotfix_now" label="32114" option="close" type="action"/>
-		<!-- 32134: Kodi Reset -->
-		<setting default="false" label="32134" id="kodi_reset" type="bool"/>
-		<setting label="32135" type="lsep" visible="eq(-1,true)"/>
-	</category>
+    </category>
+    <category label="32094">
+        <!-- 32056: Scan for updates now -->
+        <setting action="RunScript($CWD/resources/lib/osmcupdates/call_parent.py, update)" id="update_now" label="32056" option="close" type="action"/>
+        <!-- install now visibility bool -->
+        <setting visible="false" default="false" id="install_now_visible" label="" type="bool"/>
+        <!-- install now -->
+        <setting action="RunScript($CWD/resources/lib/osmcupdates/call_parent.py, install)" id="install_now" label="32053" option="close" type="action" visible="eq(-1,true)"/>
+        <!-- backup now -->
+        <setting action="RunScript($CWD/resources/lib/osmcupdates/call_parent.py, backup)" id="backup_now" label="32105" option="close" type="action"/>
+        <!-- restore now -->
+        <setting action="RunScript($CWD/resources/lib/osmcupdates/call_parent.py, restore)" id="restore_now" label="32106" option="close" type="action"/>
+        <setting action="RunScript($CWD/resources/lib/osmcupdates/osmc_hotfix.py, restore)" id="hotfix_now" label="32114" option="close" type="action"/>
+        <!-- 32134: Kodi Reset -->
+        <setting default="false" label="32134" id="kodi_reset" type="bool"/>
+        <setting label="32135" type="lsep" visible="eq(-1,true)"/>
+    </category>
 </settings>
