@@ -31,6 +31,7 @@ then
 	handle_dep "python3-mako"
 	handle_dep "flex"
 	handle_dep "pkg-config"
+	handle_dep "bison"
 	# Mount procfs so we can get correct core count for meson
 	# Need meson build 0.52 or later
 	if [ ! -f /usr/local/bin/meson ]
