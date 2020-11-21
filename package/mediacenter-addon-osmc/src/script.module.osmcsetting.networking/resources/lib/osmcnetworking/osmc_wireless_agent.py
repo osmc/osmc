@@ -1,17 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#
-# /usr/bin/net-agent
-#
-#  Copyright 2007-2012 Intel Corporation
-#  Copyright 2014 Sam Nazarko <email@samnazarko.co.uk>
+"""
+    Copyright (C) 2014-2020 OSMC (KodeKarnage)
 
-import gobject
+    This file is part of script.module.osmcsetting.networking
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+    See LICENSES/GPL-2.0-or-later for more information.
+"""
+
+import sys
 
 import dbus
-import dbus.service
 import dbus.mainloop.glib
-import sys
+import dbus.service
+
+try:
+    from gi.repository import GObject
+except ImportError:
+    import gobject as GObject
+
+try:
+    input = raw_input
+except NameError:
+    pass
 
 
 class Canceled(dbus.DBusException):
@@ -31,8 +43,7 @@ class Agent(dbus.service.Object):
     username = None
     password = None
 
-    @dbus.service.method("net.connman.Agent",
-                         in_signature='', out_signature='')
+    @dbus.service.method("net.connman.Agent", in_signature='', out_signature='')
     def Release(self):
         print("Release")
         mainloop.quit()
@@ -41,8 +52,8 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.identity and not self.passphrase and not self.wpspin:
-            print "Service credentials requested, type cancel to cancel"
-            args = raw_input('Answer: ')
+            print("Service credentials requested, type cancel to cancel")
+            args = input('Answer: ')
 
             for arg in args.split():
                 if arg.startswith("cancel"):
@@ -71,9 +82,9 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.username and not self.password:
-            print "User login requested, type cancel to cancel"
-            print "or browser to login through the browser by yourself."
-            args = raw_input('Answer: ')
+            print("User login requested, type cancel to cancel")
+            print("or browser to login through the browser by yourself.")
+            args = input('Answer: ')
 
             for arg in args.split():
                 if arg.startswith("cancel") or arg.startswith("browser"):
@@ -96,7 +107,7 @@ class Agent(dbus.service.Object):
         response = {}
 
         if not self.name and not self.ssid:
-            args = raw_input('Answer ')
+            args = input('Answer ')
 
             for arg in args.split():
                 if arg.startswith("Name="):
@@ -107,6 +118,7 @@ class Agent(dbus.service.Object):
                     ssid = arg.replace("SSID", "", 1)
                     response["SSID"] = ssid
                     break
+
         else:
             if self.name:
                 response["Name"] = self.name
@@ -115,99 +127,91 @@ class Agent(dbus.service.Object):
 
         return response
 
-    @dbus.service.method("net.connman.Agent",
-                         in_signature='oa{sv}',
-                         out_signature='a{sv}')
+    @dbus.service.method("net.connman.Agent", in_signature='oa{sv}', out_signature='a{sv}')
     def RequestInput(self, path, fields):
-        print "RequestInput (%s,%s)" % (path, fields)
+        print("RequestInput (%s,%s)" % (path, fields))
 
         response = {}
 
-        if fields.has_key("Name"):
+        if "Name" in fields:
             response.update(self.input_hidden())
-        if fields.has_key("Passphrase"):
+        if "Passphrase" in fields:
             response.update(self.input_passphrase())
-        if fields.has_key("Username"):
+        if "Username" in fields:
             response.update(self.input_username())
 
-        if response.has_key("Error"):
+        if "Error" in response:
             if response["Error"] == "cancel":
                 raise Canceled("canceled")
-                return
             if response["Error"] == "browser":
                 raise LaunchBrowser("launch browser")
-                return
 
-        print "returning (%s)" % (response)
+        print("returning (%s)" % response)
 
         return response
 
-    @dbus.service.method("net.connman.Agent",
-                         in_signature='os',
-                         out_signature='')
+    @dbus.service.method("net.connman.Agent", in_signature='os', out_signature='')
     def RequestBrowser(self, path, url):
-        print "RequestBrowser (%s,%s)" % (path, url)
+        print("RequestBrowser (%s,%s)" % (path, url))
 
-        print "Please login through the given url in a browser"
-        print "Then press enter to accept or some text to cancel"
+        print("Please login through the given url in a browser")
+        print("Then press enter to accept or some text to cancel")
 
-        args = raw_input('> ')
+        args = input('> ')
 
         if len(args) > 0:
             raise Canceled("canceled")
 
         return
 
-    @dbus.service.method("net.connman.Agent",
-                         in_signature='os',
-                         out_signature='')
+    @dbus.service.method("net.connman.Agent", in_signature='os', out_signature='')
     def ReportError(self, path, error):
-        print "ReportError %s, %s" % (path, error)
-        retry = raw_input("Retry service (yes/no): ")
-        if (retry == "yes"):
+        print("ReportError %s, %s" % (path, error))
+        retry = input("Retry service (yes/no): ")
+        if retry == "yes":
             class Retry(dbus.DBusException):
                 _dbus_error_name = "net.connman.Agent.Error.Retry"
 
             raise Retry("retry service")
+
         else:
             return
 
-
-    @dbus.service.method("net.connman.Agent",
-                         in_signature='', out_signature='')
+    @dbus.service.method("net.connman.Agent", in_signature='', out_signature='')
     def Cancel(self):
-        print "Cancel"
+        print("Cancel")
+
+
+def argv():
+    return sys.argv
 
 
 if __name__ == '__main__':
-
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     bus = dbus.SystemBus()
-    manager = dbus.Interface(bus.get_object('net.connman', "/"),
-                             'net.connman.Manager')
+    manager = dbus.Interface(bus.get_object('net.connman', "/"), 'net.connman.Manager')
 
-    path = "/test/agent"
-    object = Agent(bus, path)
+    _path = "/test/agent"
+    obj = Agent(bus, _path)
 
-    if len(sys.argv) >= 2:
-        for arg in sys.argv[1:]:
-            if arg.startswith("fromfile"):
-                keyfile = open("/tmp/preseed_data")
-                data = keyfile.read()
-                keyfile.close()
+    if len(argv()) >= 2:
+        for _arg in argv()[1:]:
+            if _arg.startswith("fromfile"):
+                with open("/tmp/preseed_data") as key_file:
+                    data = key_file.read()
+
                 lines = data.split('\n')
                 if len(lines) > 0 and len(lines[0]) > 0:
-                    object.passphrase = lines[0]
+                    obj.passphrase = lines[0]
                 if len(lines) > 1 and len(lines[1]) > 0:
-                    object.name = lines[1]
-                    object.ssid = lines[1]
+                    obj.name = lines[1]
+                    obj.ssid = lines[1]
 
-try:
-    manager.RegisterAgent(path)
-except:
-    print "Cannot register connman agent."
+    try:
+        manager.RegisterAgent(_path)
+    except:
+        print("Cannot register connman agent.")
 
-mainloop = gobject.MainLoop()
-mainloop.run()
-
+    mainloop = GObject.MainLoop()
+    mainloop.run()
