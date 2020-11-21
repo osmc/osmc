@@ -8,4 +8,5 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['osmcupdates', 'service']
+__all__ = ['apt_cache_action', 'call_osmc_parent', 'call_parent', 'osmc_backups', 'osmc_hotfix',
+           'service_entry', 'osmc', 'tests']
