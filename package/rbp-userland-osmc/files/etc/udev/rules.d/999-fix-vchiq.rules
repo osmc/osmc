@@ -2,5 +2,8 @@
 SUBSYSTEM=="vchiq",  GROUP="video", MODE="0660"
 # sharedmem
 SUBSYSTEM=="vc-sm",   GROUP="video", MODE="0660"
+KERNEL=="vcsm-cma", GROUP="video", MODE="0660"
 # vcio
 SUBSYSTEM=="bcm2708_vcio",   GROUP="video", MODE="0660"
+#dma 
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"
