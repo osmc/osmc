@@ -1,17 +1,31 @@
-From a13daed267c53f721ad500e9c38fc89d304d883b Mon Sep 17 00:00:00 2001
+From 1228e6c6c49d7a225737c097dfe05b2aef10d4b4 Mon Sep 17 00:00:00 2001
 From: tanio99 <tanio99@wolke7.net>
 Date: Wed, 21 Aug 2019 10:05:26 +0200
-Subject: [PATCH 3/7] AMLUtils: toggle TMDS during resolution set
+Subject: [PATCH] AMLUtils: toggle TMDS during resolution set
 
 ---
- xbmc/utils/AMLUtils.cpp | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ xbmc/utils/AMLUtils.cpp | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 13fe209..0f6cb00 100644
+index 4c36f6d..3471022 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -488,11 +488,14 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+@@ -484,6 +484,13 @@ bool aml_get_native_resolution(RESOLUTION_INFO *res)
+ 
+ static void aml_enable_PHY(bool enable)
+ {
++    int phy_delay = 0;
++    char *phy_env = getenv("phydelay");
++    if (phy_env != NULL) {
++        phy_delay = atoi(phy_env);
++    }
++    CLog::Log(LOGDEBUG, "Waiting %d milliseconds for PHY toggling", phy_delay);
++    usleep(phy_delay * 1000);
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/phy", enable ? "1" : "0");
+ }
+ 
+@@ -491,11 +498,14 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
  {
    bool result = false;
  
