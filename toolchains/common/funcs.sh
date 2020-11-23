@@ -39,7 +39,7 @@ function install_archlib()
 	rm -f ${1}/uname-osmc.c
 }
 
-CHROOT_PKGS="build-essential nano sudo libeatmydata1"
+CHROOT_PKGS="build-essential nano sudo libeatmydata1 ca-certificates"
 export CHROOT_PKGS
 
 export -f build_deb_package
