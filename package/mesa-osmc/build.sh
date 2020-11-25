@@ -31,7 +31,11 @@ then
 	handle_dep "python3-mako"
 	handle_dep "flex"
 	handle_dep "pkg-config"
-	handle_dep "bison"
+	handle_dep "bison" # meson dep
+	handle_dep "git" # meson dep
+	handle_dep "cmake" # meson dep
+	handle_dep "zlib1g-dev"
+	handle_dep "libexpat1-dev"
 	# Mount procfs so we can get correct core count for meson
 	# Need meson build 0.52 or later
 	if [ ! -f /usr/local/bin/meson ]
@@ -39,6 +43,12 @@ then
 		pip3 install meson
 		if [ $? != 0 ]; then echo "Could not install meson build system" && exit 1; fi
 		ln -s /usr/local/bin/meson /usr/bin/meson
+	fi
+	if [ ! -f /usr/local/bin/ninja ]
+	then
+		pip3 install ninja
+		if [ $? != 0 ]; then echo "Could not install ninja system" && exit 1; fi
+		ln -s /usr/local/bin/ninja /usr/bin/ninja
 	fi
 	echo "Package: ${1}-mesa-osmc" >> files/DEBIAN/control && echo "Package: ${1}-mesa-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/mesa-*
@@ -85,6 +95,7 @@ then
 	popd
 	mkdir -p files-dev/usr/osmc
 	mv files/usr/osmc/include  files-dev/usr/osmc
+        strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
 	dpkg_build files ${1}-mesa-osmc.deb
