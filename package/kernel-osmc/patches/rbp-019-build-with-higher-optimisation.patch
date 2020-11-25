@@ -1,29 +1,27 @@
 diff --git a/Makefile b/Makefile
-index 3addd4c..527fc59 100644
+index d806ae1..c99e789 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -360,10 +360,10 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
+@@ -415,11 +415,11 @@ HOSTCXX	= g++
+ endif
  
- HOSTCC       = gcc
- HOSTCXX      = g++
--KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
-+KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 \
- 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
- 		$(HOSTCFLAGS)
--KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
-+KBUILD_HOSTCXXFLAGS := -O3 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+ export KBUILD_USERCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
+-			      -O2 -fomit-frame-pointer -std=gnu89
++			      -O3 -fomit-frame-pointer -std=gnu89
+ export KBUILD_USERLDFLAGS :=
+ 
+ KBUILD_HOSTCFLAGS   := $(KBUILD_USERCFLAGS) $(HOST_LFS_CFLAGS) $(HOSTCFLAGS)
+-KBUILD_HOSTCXXFLAGS := -Wall -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
++KBUILD_HOSTCXXFLAGS := -Wall -O3 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
  KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
  KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
  
-@@ -657,9 +657,9 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
- else
- ifdef CONFIG_PROFILE_ALL_BRANCHES
--KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
-+KBUILD_CFLAGS	+= -O3 $(call cc-disable-warning,maybe-uninitialized,)
- else
--KBUILD_CFLAGS   += -O2
-+KBUILD_CFLAGS   += -O3
- endif
- endif
+@@ -734,7 +734,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
  
+ ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+-KBUILD_CFLAGS += -O2
++KBUILD_CFLAGS += -O3
+ else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
+ KBUILD_CFLAGS += -O3
+ else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
