@@ -369,7 +369,7 @@ then
 	#ADDONS_SCREENSAVERS="screensaver.shadertoy screensaver.spectrum screensaver.waveform"
 	ADDONS_VFS="vfs.libarchive vfs.rar vfs.sftp vfs.sacd"
         #ADDONS_VISUALIZATIONS="visualization.fishbmc visualization.goom visualization.projectm visualization.shadertoy visualization.spectrum visualization.vsxu visualization.waveform"
-	ADDONS_GAME="game.libretro game.libretro.2048 game.libretro.beetle-gba game.libretro.fceumm game.libretro.gw game.libretro.beetle-pce-fast game.libretro.bnes game.libretro.nestopia game.libretro.bsnes-mercury-balanced game.libretro.mame2000 game.libretro.mame2003 game.libretro.bluemsx game.libretro.mame2003_plus game.libretro.gambatte game.libretro.beetle-bsnes game.libretro.meteor game.libretro.mgba game.libretro.vba-next game.libretro.quicknes game.libretro.scummvm game.libretro.snes9x game.libretro.stella game.libretro.dosbox game.libretro.vbam game.libretro.genplus"
+	ADDONS_GAME="game.libretro game.libretro.2048 game.libretro.beetle-gba game.libretro.fceumm game.libretro.gw game.libretro.beetle-pce-fast game.libretro.bnes game.libretro.nestopia game.libretro.bsnes-mercury-balanced game.libretro.mame2000 game.libretro.mame2003 game.libretro.bluemsx game.libretro.mame2003_plus game.libretro.gambatte game.libretro.beetle-bsnes game.libretro.meteor game.libretro.mgba game.libretro.vba-next game.libretro.quicknes game.libretro.snes9x game.libretro.stella game.libretro.dosbox game.libretro.vbam game.libretro.genplus"
 	ADDONS_IMAGE_DECODERS="imagedecoder.raw imagedecoder.mpo"
 	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
