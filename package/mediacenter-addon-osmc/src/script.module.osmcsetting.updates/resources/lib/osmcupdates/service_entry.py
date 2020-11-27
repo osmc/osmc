@@ -133,7 +133,7 @@ class Main(object):
         # the time that the service started
         self.service_start = datetime.now()
 
-        # dictionary containing the permissable actions (communicated from the child apt scripts)
+        # dictionary containing the permissible actions (communicated from the child apt scripts)
         # and the corresponding methods in the parent
         self.action_dict = {
             'apt_cache update complete': self.apt_update_complete,
@@ -410,16 +410,31 @@ class Main(object):
             # the only exception that should be handled is when the queue is empty
             pass
 
+    @staticmethod
+    def check_platform_conditions():
+        if os.path.isfile('/platform_no_longer_updates'):
+            return False, 'Update CONDITION : platform no longer receives updates'
+
+        return True, ''
+
     def check_update_conditions(self, connection_only=False):
         """
             Checks the users update conditions are met.
             Checks for:
+                    - /platform_no_longer_updates file
                     - active player
                     - idle time
                     - internet connectivity
                 connection_only, limits the check to just the internet connection
         """
+
         if not connection_only:
+            check_platform, _ = self.check_platform_conditions()
+
+            if not check_platform:
+                log('Update CONDITION : platform no longer maintained')
+                return False, 'Update CONDITION : platform no longer maintained'
+
             result_raw = xbmc.executeJSONRPC('{"jsonrpc": "2.0", '
                                              '"method": "Player.GetActivePlayers", '
                                              '"id": 1}')
@@ -843,6 +858,12 @@ class Main(object):
             Similar to update_now, but as this is a users request, forego all the player and idle checks.
         """
         # check whether the install is an alpha version
+        check_platform, _ = self.check_platform_conditions()
+
+        if not check_platform:
+            _ = DIALOG.ok(self.lang(32136), self.lang(32166))
+            return
+
         if self.check_for_unsupported_version() == 'alpha':
             return
 
@@ -941,8 +962,13 @@ class Main(object):
             User called for a manual update
         """
         check_connection, _ = self.check_update_conditions(connection_only=True)
+        check_platform, _ = self.check_platform_conditions()
 
-        if not check_connection:
+        if not check_platform:
+            _ = DIALOG.ok(self.lang(32136), self.lang(32166))
+            return 'manual update cancelled, platform no longer maintained'
+
+        elif not check_connection:
             _ = DIALOG.ok(self.lang(32136), '[CR]'.join([self.lang(32137), self.lang(32138)]))
             return 'manual update cancelled, no connection'
 
