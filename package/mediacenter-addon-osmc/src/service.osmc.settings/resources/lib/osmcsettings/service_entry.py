@@ -79,6 +79,19 @@ class Main(object):
         # run the ubiquifonts script to import the needed fonts into the Font.xml
         _ = self.fonts.import_osmc_fonts()
 
+        if not os.path.isfile('/walkthrough_completed'):
+            # Tell Kodi that OSMC is running the walkthrough
+            try:
+                xbmc.setosmcwalkthroughstatus(1)
+            except Exception:
+                log(traceback.format_exc())
+        else:
+            try:
+                # Tell Kodi that OSMC is done
+                xbmc.setosmcwalkthroughstatus(2)
+            except Exception:
+                log(traceback.format_exc())
+
         # daemon
         self._daemon()
 
@@ -92,7 +105,8 @@ class Main(object):
     def _daemon(self):
         log('daemon started')
 
-        self._walk_through()  # start walk through
+        if not os.path.isfile('/walkthrough_completed'):
+            self._walk_through()  # start walk through
 
         while not self.monitor.abortRequested():
             if not self.monitor.abortRequested() and not self.parent_queue.empty():
@@ -281,11 +295,6 @@ class Main(object):
         return False
 
     def _walk_through(self):
-        walk_through = not os.path.isfile('/walkthrough_completed')
-        if not walk_through:
-            self.set_walkthrough_status(2)
-            return
-
         # Tell Kodi that OSMC is running the walkthrough
         self.window.setProperty("walkthrough_is_running", 'any_value')
         self.set_walkthrough_status(1)
