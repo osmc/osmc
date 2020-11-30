@@ -12,6 +12,7 @@ import os
 import sys
 import threading
 import traceback
+from io import open
 from itertools import cycle
 
 import xbmc
@@ -270,6 +271,8 @@ class GuiThread(threading.Thread):
         self.window = kwargs.get('window', xbmcgui.Window(10000))
         self.script_path = self.addon.getAddonInfo('path')
 
+        self._hardware_prefix = ''
+
         self.known_modules_order = {
             "osmcpi": 0,
             "osmcupdates": 1,
@@ -430,6 +433,9 @@ class GuiThread(threading.Thread):
         # if you got this far then this is almost certainly an OSMC setting
         log('Inspecting OSMC Setting module __ %s __' % module_name)
         try:
+            if module_name == 'osmcpi' and not self.hardware_prefix.startswith('rbp'):
+                return -1, None
+
             module_instance = __import__('%s.osmc.osmc_setting' % module_name, fromlist=[''])
             class_instance = module_instance.OSMCSettingClass()
             class_instance.setDaemon(True)
@@ -459,3 +465,24 @@ class GuiThread(threading.Thread):
             'class_instance': class_instance,
             'module_instance': module_instance
         })
+
+    @property
+    def hardware_prefix(self):
+        """ Returns the prefix for the hardware type. rbp, rbp2, etc """
+
+        if self._hardware_prefix:
+            return self._hardware_prefix
+
+        self._hardware_prefix = ''
+
+        with open('/proc/cmdline', 'r', encoding='utf-8') as f:
+            line = f.readline()
+
+        settings = line.split(' ')
+
+        for setting in settings:
+            if setting.startswith('osmcdev='):
+                self._hardware_prefix = setting[len('osmcdev='):]
+                break
+
+        return self._hardware_prefix
