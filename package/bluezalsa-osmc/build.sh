@@ -4,8 +4,8 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="2.1.0-osmc"
-pull_source "https://github.com/Arkq/bluez-alsa/archive/49ad348808a15485aa7cb2df0a4d13654cc0cee3.tar.gz" "$(pwd)/src"
+REV="49ad348808a15485aa7cb2df0a4d13654cc0cee3"
+pull_source "https://github.com/Arkq/bluez-alsa/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching bluez-alsa source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "bluez-alsa-app-osmc"
