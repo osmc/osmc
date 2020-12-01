@@ -157,31 +157,6 @@ void BootloaderConfig::configureEnvironment()
                 cmdlineStringList << " ip=" + network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off:" + network->getDNS1() + ":" + network->getDNS2();
             cmdlineStringList << " rootwait quiet ";
         }
-        QFile configFile("/mnt/boot/config.txt");
-        QStringList configStringList;
-	/* ToDo: make this part of rbp-bootloader-osmc and have custom includes for distroconfig */
-        if (utils->getOSMCDev() == "rbp1")
-        {
-            configStringList << "gpu_mem_256=112\n" << "gpu_mem_512=144\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
-            cmdlineStringList << "osmcdev=rbp1";
-        }
-        if (utils->getOSMCDev() == "rbp2")
-        {
-            configStringList << "gpu_mem_1024=256\n" << "hdmi_ignore_cec_init=1\n" << "disable_overscan=1\n" << "start_x=1\n" << "disable_splash=1\n";
-            cmdlineStringList << "osmcdev=rbp2";
-        }
-        if (preseed->getBoolValue("vendor/dtoverlay"))
-            if (preseed->getBoolValue("vendor/dtoverlay")) {
-                QStringList dtOverlayList = preseed->getStringValue("vendor/dtoverlayparam").split("?");
-                for (int i = 0; i < dtOverlayList.count(); i++) {
-                    configStringList << "dtoverlay=" << dtOverlayList.at(i) << "\n";
-                }
-            }
-        if (preseed->getBoolValue("alsaoff"))
-                configStringList << "dtparam=audio=off\n";
-        utils->writeToFile(configFile, configStringList, false);
-        utils->writeToFile(cmdlineFile, cmdlineStringList, false);
-        configFile.close();
         cmdlineFile.close();
     }
     if (utils->getOSMCDev() == "vero1") /* We only use 1x identifier for WiFi chip, so make it 'vero' later */
