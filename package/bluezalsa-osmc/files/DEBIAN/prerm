@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$1" = "remove" ]; then
+	systemctl disable bluealsa-aplay.service > /dev/null 2>&1
+	systemctl disable bluealsa.service > /dev/null 2>&1
+	systemctl stop bluealsa-aplay.service > /dev/null 2>&1
+	systemctl stop bluealsa.service > /dev/null 2>&1
+	exit 0
+fi
