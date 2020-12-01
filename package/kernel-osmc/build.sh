@@ -63,6 +63,7 @@ then
 	handle_dep "bison"
 	handle_dep "flex"
 	handle_dep "rsync"
+	handle_dep "openssl"
         if [ "$1" == "vero2" ]  || [ "$1" == "vero364" ]
         then
 	    handle_dep "python"
