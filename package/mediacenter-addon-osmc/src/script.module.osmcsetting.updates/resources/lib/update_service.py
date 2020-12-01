@@ -433,18 +433,31 @@ class Main(object):
 			# the only exception that should be handled is when the queue is empty
 			pass
 
+	@staticmethod
+	def check_platform_conditions():
+		if os.path.isfile('/platform_no_longer_updates'):
+			return False, 'Update CONDITION : platform no longer receives updates'
+
+		return True, ''
 
 	# MAIN METHOD
 	#@clog(log)
 	def check_update_conditions(self, connection_only=False):
 		''' Checks the users update conditions are met. 
 			Checks for:
+					- /platform_no_longer_updates file
 					- active player 
 					- idle time
 					- internet connectivity
 				connection_only, limits the check to just the internet connection
 					'''
 		if not connection_only:
+
+			check_platform, _ = self.check_platform_conditions()
+
+			if not check_platform:
+				log('Update CONDITION : platform no longer maintained')
+				return False, 'Update CONDITION : platform no longer maintained'
 
 			result_raw = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1 }')
 
@@ -919,6 +932,11 @@ class Main(object):
 	#@clog(log)
 	def user_update_now(self):
 		''' Similar to update_now, but as this is a users request, forego all the player and idle checks. '''
+		check_platform, _ = self.check_platform_conditions()
+
+		if not check_platform:
+			_ = DIALOG.ok(lang(32136), lang(32137))
+			return
 
 		# check whether the install is an alpha version
 		if self.check_for_unsupported_version() == 'alpha': return
