@@ -77,7 +77,7 @@ def get_hardware_prefix():
 
 			if setting.startswith('osmcdev='):
 
-				return setting[len('osmcdev='):]
+				return setting[len('osmcdev='):].strip()
 
 	return None
 
