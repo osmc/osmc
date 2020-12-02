@@ -1222,6 +1222,10 @@ class Main(object):
 	# ACTION METHOD
 	#@clog(log)
 	def check_for_legit_updates(self):
+		check_platform, _ = self.check_platform_conditions()
+
+		if not check_platform:
+			return 'bail', 'Platform no longer maintained'
 
 		self.UPDATE_WARNING = False
 
@@ -1343,14 +1347,19 @@ class Main(object):
 
 		if check == 'bail':
 
-			if 'Sufficient freespace:' in result:
+			if 'no longer maintained' in result:
+				_ = DIALOG.ok(lang(32136), lang(32137))
+
+				self.progress_bar(kill=True)
+
+			elif 'Sufficient freespace:' in result:
 
 				# send kill message to progress bar
 				self.progress_bar(kill=True)
 
 			elif data == 'manual_update_complete':
 
-				okey_dokey = DIALOG.ok(lang(32077), lang(32092))
+				_ = DIALOG.ok(lang(32077), lang(32092))
 
 				# send kill message to progress bar
 				self.progress_bar(kill=True)
