@@ -13,7 +13,7 @@ INITRAMFS_NOBUILD=4
 . ../common.sh
 test $1 == rbp1 && VERSION="4.19.122" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="5.9.6" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == rbp464 && VERSION="5.9.6" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
+test $1 == rbp464 && VERSION="5.9.6" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero364 && VERSION="4.9.113" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
@@ -171,6 +171,11 @@ then
 		# Device tree for uploading to eMMC
 		cp -ar multi.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
         fi
+	if [ "$1" == "rbp464" ]
+	then
+		# For Aarch64 we need to ensure installation on target
+		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
+	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
 	ARCH=$(arch)
@@ -181,6 +186,7 @@ then
 	fi
 	if [ $ARCH == "i686" ]; then ARCH="i386"; fi
 	if [ "$1" == "vero364" ]; then ARCH=arm64; fi
+	if [ "$1" == "rbp464" ]; then ARCH=arm64; fi
 	export ARCH
 		if [ "$1" == "vero2" ]
 		then
