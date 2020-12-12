@@ -4,11 +4,12 @@
 #!/bin/bash
 
 . ../common.sh
-REV="49ad348808a15485aa7cb2df0a4d13654cc0cee3"
+#REV="49ad348808a15485aa7cb2df0a4d13654cc0cee3"
+REV="de58004c440f34078b6b138f8c7155ae36b26a10"
 pull_source "https://github.com/Arkq/bluez-alsa/archive/${REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching bluez-alsa source" && exit 1; fi
 # Build in native environment
-build_in_env "${1}" $(pwd) "bluez-alsa-app-osmc"
+build_in_env "${1}" $(pwd) "bluezalsa-osmc"
 build_return=$?
 if [ $build_return == 99 ]
 then
@@ -39,10 +40,6 @@ then
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
 	make install DESTDIR=${out}
-	#mkdir -p ${out}/etc/dbus-1/system.d
-	#mkdir -p ${out}/usr/share/polkit-1/actions
-	#cp -ar src/connman-dbus-osmc.conf ${out}/etc/dbus-1/system.d/connman-dbus.conf
-	#cp -ar plugins/polkit.policy ${out}/usr/share/polkit-1/actions/net.connman.policy
 	popd; popd; popd
 	strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"

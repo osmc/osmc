@@ -33,14 +33,14 @@ if [ "$1" = "configure" ]; then
 		modprobe snd_bcm2835
 	fi
 
-	systemctl daemon-reload
-
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
 		systemctl enable bluealsa.service > /dev/null 2>&1
 		systemctl enable bluealsa-aplay.service > /dev/null 2>&1
 		echo Please see .asoundrc.example in your home directory to set up your BT devices
 	fi
+
+	systemctl daemon-reload
 
 	if ischroot; then exit 0; fi
 
