@@ -631,6 +631,7 @@ class Main(object):
 			self.s['backup_playlists']        = True if 	__setting__('backup_playlists')			== 'true' else False
 			self.s['backup_profilesF']        = True if 	__setting__('backup_profilesF')			== 'true' else False
 			self.s['backup_Thumbnails']       = True if 	__setting__('backup_Thumbnails')		== 'true' else False
+			self.s['backup_Savestates']       = True if 	__setting__('backup_Savestates')		== 'true' else False
 			self.s['backup_favourites']       = True if 	__setting__('backup_favourites')		== 'true' else False
 			self.s['backup_keyboard']         = True if 	__setting__('backup_keyboard')			== 'true' else False
 			self.s['backup_remote']           = True if 	__setting__('backup_remote')			== 'true' else False
@@ -688,6 +689,7 @@ class Main(object):
 			tmp_s['backup_playlists']        = True if 		__setting__('backup_playlists')			== 'true' else False
 			tmp_s['backup_profilesF']        = True if 		__setting__('backup_profilesF')		        == 'true' else False
 			tmp_s['backup_Thumbnails']       = True if 		__setting__('backup_Thumbnails')		== 'true' else False
+			tmp_s['backup_Savestates']       = True if 	__setting__('backup_Savestates')		== 'true' else False
 			tmp_s['backup_favourites']       = True if 		__setting__('backup_favourites')		== 'true' else False
 			tmp_s['backup_keyboard']         = True if 		__setting__('backup_keyboard')			== 'true' else False
 			tmp_s['backup_remote']           = True if 		__setting__('backup_remote')			== 'true' else False
