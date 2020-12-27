@@ -3,10 +3,10 @@ index 68a7e1c..97bb294 100644
 --- a/arch/arm/boot/dts/bcm270x-rpi.dtsi
 +++ b/arch/arm/boot/dts/bcm270x-rpi.dtsi
 @@ -149,6 +149,6 @@
-        audio: bcm2835_audio {
-                compatible = "brcm,bcm2835-audio";
-                brcm,pwm-channels = <8>;
--               status = "disabled";
-+               status = "enabled";
-        };
+ 	audio: bcm2835_audio {
+ 		compatible = "brcm,bcm2835-audio";
+ 		brcm,pwm-channels = <8>;
+-		status = "disabled";
++		status = "enabled";
+ 	};
  };

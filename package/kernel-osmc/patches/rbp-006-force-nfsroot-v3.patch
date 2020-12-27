@@ -1,13 +1,13 @@
 diff --git a/fs/nfs/nfsroot.c b/fs/nfs/nfsroot.c
-index 8d32788..e573076 100644
+index fa14830..6c10f5b 100644
 --- a/fs/nfs/nfsroot.c
 +++ b/fs/nfs/nfsroot.c
-@@ -88,7 +88,7 @@
- #define NFS_ROOT		"/tftpboot/%s"
- 
- /* Default NFSROOT mount options. */
--#define NFS_DEF_OPTIONS		"vers=2,tcp,rsize=4096,wsize=4096"
-+#define NFS_DEF_OPTIONS         "vers=3,tcp,rsize=4096,wsize=4096"
+@@ -93,7 +93,7 @@
+ #elif defined(CONFIG_NFS_V3)
+ #define NFS_DEF_OPTIONS		"vers=3,tcp,rsize=4096,wsize=4096"
+ #else
+-#define NFS_DEF_OPTIONS		"vers=4,tcp,rsize=4096,wsize=4096"
++#define NFS_DEF_OPTIONS		"vers=3,tcp,rsize=4096,wsize=4096"
+ #endif
  
  /* Parameters passed from the kernel command line */
- static char nfs_root_parms[NFS_MAXPATHLEN + 1] __initdata = "";
