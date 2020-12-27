@@ -25,11 +25,6 @@ python
 bison
 flex"
 
-if [ "$1" == "vero2" ]
-then
-   packages="u-boot-tools $packages"
-fi
-
 for package in $packages
 do
 	install_package $package
@@ -41,7 +36,7 @@ verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
 install_patch "../patches" "$1"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 then
 	install_patch "../patches" "rbp"
 	sed s/rpi-firmware/rpi-firmware-osmc/ -i package/Config.in # Use our own firmware package
@@ -71,7 +66,7 @@ else
 fi
 if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
 then
         size=320
         date=$(date +%Y%m%d)
@@ -83,19 +78,13 @@ then
 	mkfs.vfat -F32 /dev/mapper/loop0p1
 	mount /dev/mapper/loop0p1 /mnt
 fi
-if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 then
 	echo -e "Installing Pi files"
 	mv zImage /mnt/kernel.img
 	mv INSTALLER/* /mnt
 	mv *.dtb /mnt
 	mv overlays /mnt
-fi
-if [ "$1" == "vero2" ]
-then
-	echo -e "Installing Vero 2 files"
-	../../output/build/linux-master/scripts/mkbootimg --kernel uImage --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second ../build/linux-master/arch/arm/boot/dts/amlogic/meson8b_vero2.dtb --output /mnt/kernel.img
-
 fi
 if [ "$1" == "vero3" ]
 then
