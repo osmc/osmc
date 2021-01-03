@@ -1,20 +1,21 @@
-From dc5f578cefb9a37098ae4af5c6824778aa025a6a Mon Sep 17 00:00:00 2001
+From c5638fb7794d564cbb0276e0056276acf77c7967 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Sat, 20 Apr 2019 22:27:03 +0100
 Subject: [PATCH] UpdateResolutions now falls back to sane values if 1080p not
  available
 
+Fixed VESA modes popping up when not selected as desktop
 ---
  xbmc/Application.cpp                        |  2 +-
- xbmc/settings/DisplaySettings.cpp           | 11 ++---
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 63 ++++++++++++++++++++++++-----
- 3 files changed, 57 insertions(+), 19 deletions(-)
+ xbmc/settings/DisplaySettings.cpp           | 11 +---
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 65 +++++++++++++++++----
+ 3 files changed, 59 insertions(+), 19 deletions(-)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 9b9b0ea..e75883f 100644
+index 870a6bb92c..1e3118ca31 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2156,7 +2156,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -2157,7 +2157,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
      if (! m_appPlayer.IsPlayingVideo()) {
        CDisplaySettings::GetInstance().ClearCustomResolutions();
        CServiceBroker::GetWinSystem()->UpdateResolutions();
@@ -24,10 +25,10 @@ index 9b9b0ea..e75883f 100644
        CLog::Log(LOGNOTICE, "Updated resolutions and set desktop");
      }
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
-index 9f94a19..e24ce2d 100755
+index 430f7d1b91..2f41270abb 100644
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
-@@ -258,7 +258,6 @@ bool CDisplaySettings::OnSettingChanging(std::shared_ptr<const CSetting> setting
+@@ -259,7 +259,6 @@ bool CDisplaySettings::OnSettingChanging(std::shared_ptr<const CSetting> setting
  {
    if (setting == NULL)
      return false;
@@ -35,7 +36,7 @@ index 9f94a19..e24ce2d 100755
    const std::string &settingId = setting->GetId();
    if (settingId == CSettings::SETTING_VIDEOSCREEN_RESOLUTION ||
        settingId == CSettings::SETTING_VIDEOSCREEN_SCREEN)
-@@ -695,13 +694,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -696,13 +695,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -53,10 +54,10 @@ index 9f94a19..e24ce2d 100755
  
    return "DESKTOP";
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 99fc708..d6f8ec1 100755
+index 6f812d5bbd..646207701a 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -304,11 +304,32 @@ bool CWinSystemAmlogic::DestroyWindow()
+@@ -305,11 +305,32 @@ bool CWinSystemAmlogic::DestroyWindow()
    return true;
  }
  
@@ -89,7 +90,7 @@ index 99fc708..d6f8ec1 100755
    std::vector<RESOLUTION_INFO> resolutions;
  
    if (!aml_probe_resolutions(resolutions) || resolutions.empty())
-@@ -324,8 +345,23 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -325,8 +346,23 @@ void CWinSystemAmlogic::UpdateResolutions()
      resDesktop = curDisplay;
    }
  
@@ -113,7 +114,7 @@ index 99fc708..d6f8ec1 100755
  
    for (size_t i = 0; i < resolutions.size(); i++)
    {
-@@ -348,14 +384,24 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -349,14 +385,26 @@ void CWinSystemAmlogic::UpdateResolutions()
        resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
        resolutions[i].fRefreshRate);
  
@@ -132,7 +133,9 @@ index 99fc708..d6f8ec1 100755
 +      newRes = ResString;
 +      CLog::Log(LOGNOTICE, "Current resolution setting found at 16 + %d", i);
 +    }
-+
++    /* prefer CTA to VESA modes */
++    if (ResString.substr(5,5).compare(ResFallback.substr(0,5)) < 0)
++        resExactMatch = true;
 +    /* fall back to the highest resolution available but not more than current desktop */
 +    if(curDesktopSetting.substr(5,18).compare(ResString.substr(5,18)) >= 0 &&
 +        ResString.substr(5,18).compare(ResFallback) > 0 && ! resExactMatch)
@@ -144,7 +147,7 @@ index 99fc708..d6f8ec1 100755
      }
  
      res_index = (RESOLUTION)((int)res_index + 1);
-@@ -364,10 +410,7 @@ void CWinSystemAmlogic::UpdateResolutions()
+@@ -365,10 +413,7 @@ void CWinSystemAmlogic::UpdateResolutions()
    // set RES_DESKTOP
    if (ResDesktop != RES_INVALID)
    {
@@ -157,5 +160,5 @@ index 99fc708..d6f8ec1 100755
  
      CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
 -- 
-2.7.4
+2.25.1
 
