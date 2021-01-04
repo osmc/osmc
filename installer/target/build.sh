@@ -23,7 +23,8 @@ parted
 cpio
 python
 bison
-flex"
+flex
+libssl-dev"
 
 for package in $packages
 do
