@@ -1,0 +1,47 @@
+From 81b081d57b1cd7fdd735a990182670ccdffb4c9f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 30 Mar 2021 23:58:27 +0100
+Subject: [PATCH] Add support for local strings for each language. This allows
+ us to overwrite strings, as well as add our own downstream and facilitiate
+ their translation without having to translate the entire Kodi strings file.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/addons/LanguageResource.cpp | 3 ++-
+ xbmc/guilib/LocalizeStrings.cpp  | 6 +++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/addons/LanguageResource.cpp b/xbmc/addons/LanguageResource.cpp
+index b9d1c41eed..d4e0f65a36 100644
+--- a/xbmc/addons/LanguageResource.cpp
++++ b/xbmc/addons/LanguageResource.cpp
+@@ -112,7 +112,8 @@ bool CLanguageResource::IsAllowed(const std::string &file) const
+ {
+   return file.empty() ||
+          StringUtils::EqualsNoCase(file.c_str(), "langinfo.xml") ||
+-         StringUtils::EqualsNoCase(file.c_str(), "strings.po");
++         StringUtils::EqualsNoCase(file.c_str(), "strings.po") ||
++         StringUtils::EqualsNoCase(file.c_str(), "strings-osmc.po") ;
+ }
+ 
+ std::string CLanguageResource::GetAddonId(const std::string& locale)
+diff --git a/xbmc/guilib/LocalizeStrings.cpp b/xbmc/guilib/LocalizeStrings.cpp
+index 6410ce44fa..2c616a9eaf 100644
+--- a/xbmc/guilib/LocalizeStrings.cpp
++++ b/xbmc/guilib/LocalizeStrings.cpp
+@@ -112,7 +112,11 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
+ 
+   bool useSourceLang = StringUtils::EqualsNoCase(language, LANGUAGE_DEFAULT) || StringUtils::EqualsNoCase(language, LANGUAGE_OLD_DEFAULT);
+ 
+-  return LoadPO(URIUtils::AddFileToFolder(pathname, "strings.po"), strings, encoding, offset, useSourceLang);
++  int ret = LoadPO(URIUtils::AddFileToFolder(pathname, "strings.po"), strings, encoding, offset, useSourceLang);
++
++  LoadPO(URIUtils::AddFileToFolder(pathname, "strings-osmc.po"), strings, encoding, offset, useSourceLang);
++
++  return ret;
+ }
+ 
+ static bool LoadWithFallback(const std::string& path, const std::string& language, std::map<uint32_t, LocStr>& strings)
+-- 
+2.25.1
+

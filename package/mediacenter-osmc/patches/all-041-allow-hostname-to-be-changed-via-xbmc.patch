@@ -1,4 +1,4 @@
-From 96634093eae4000aaeffc32bf3e667bcaf856a0d Mon Sep 17 00:00:00 2001
+From 2b599dc5be3c3dfcca8f628fcfa95d16158f51e5 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
@@ -6,14 +6,14 @@ Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  9 +++++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 +++++++++++++++++++++++++++
  2 files changed, 37 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 65be2aa..7cc610f 100644
+index 37069f580d..539da3fc31 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -135,6 +135,15 @@ namespace XBMCAddon
+@@ -128,6 +128,15 @@ namespace XBMCAddon
        CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
      }
  
@@ -30,13 +30,16 @@ index 65be2aa..7cc610f 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 7df8770..18e1179 100644
+index 7ef062d11e..2a28822052 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -266,6 +266,34 @@ namespace XBMCAddon
- #ifdef DOXYGEN_SHOULD_USE_THIS
-     ///
-     /// \ingroup python_xbmc
+@@ -230,6 +230,34 @@ namespace XBMCAddon
+     void setskin(const char *skin);
+ #endif
+ 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.sethostname(hostname) }
 +    ///-----------------------------------------------------------------------
 +    /// Change the XBMC skin
@@ -62,12 +65,9 @@ index 7df8770..18e1179 100644
 +    void sethostname(const char *hostname);
 +#endif
 +
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
-     /// @brief \python_func{ xbmc.sleep(time) }
-     ///-----------------------------------------------------------------------
-     /// Sleeps for 'time' msec.
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
 -- 
-2.7.4
+2.25.1
 

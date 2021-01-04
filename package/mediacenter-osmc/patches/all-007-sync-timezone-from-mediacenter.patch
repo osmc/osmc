@@ -9,10 +9,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  xbmc/platform/linux/LinuxTimezone.cpp | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
-diff --git a/xbmc/platform/linux/LinuxTimezone.cpp b/xbmc/platform/linux/LinuxTimezone.cpp
+diff --git a/xbmc/platform/posix/PosixTimezone.cpp b/xbmc/platform/poxis/PosixTimezone.cpp
 index 37130d8..2c1fe1c 100644
---- a/xbmc/platform/linux/LinuxTimezone.cpp
-+++ b/xbmc/platform/linux/LinuxTimezone.cpp
+--- a/xbmc/platform/posix/PosixTimezone.cpp
++++ b/xbmc/platform/posix/PosixTimezone.cpp
 @@ -214,6 +214,23 @@ void CLinuxTimezone::SetTimezone(std::string timezoneName)
      sprintf(env_var, "TZ=:%s", timezoneName.c_str());
      putenv(env_var);

@@ -1,4 +1,4 @@
-From 2b5cb47a05a11f54a6f1a8bb6d76c3fcf2f58280 Mon Sep 17 00:00:00 2001
+From 5372f9f95dd9481b6bbff7fb0104d1883db9b22f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 17:18:13 +0100
 Subject: [PATCH] Add enumerated type OSMCSettingsState
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index f877516..510be06 100644
+index 606fe0edf7..4f5e75c689 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -229,6 +229,7 @@ CApplication::CApplication(void)
+@@ -228,6 +228,7 @@ CApplication::CApplication(void)
  #endif
    m_itemCurrentFile(new CFileItem)
    , m_pInertialScrollingHandler(new CInertialScrollingHandler())
@@ -21,8 +21,8 @@ index f877516..510be06 100644
    , m_WaitingExternalCalls(0)
    , m_playerEvent(true, true)
  {
-@@ -2650,6 +2651,12 @@ void CApplication::Stop(int exitCode)
-   Sleep(200);
+@@ -2733,6 +2734,12 @@ void CApplication::Stop(int exitCode)
+   KODI::TIME::Sleep(200);
  }
  
 +void CApplication::SetOSMCWalkthroughState(OSMCWalkthroughState state)
@@ -33,9 +33,9 @@ index f877516..510be06 100644
 +
  bool CApplication::PlayMedia(CFileItem& item, const std::string &player, int iPlaylist)
  {
-   //If item is a plugin, expand out
+   // If item is a plugin, expand out
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index b38409a..0edd896 100644
+index 774e56a57f..fbbbf2ed8f 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -157,6 +157,18 @@ public:
@@ -54,9 +54,9 @@ index b38409a..0edd896 100644
 +  OSMCWalkthroughState m_eOSMCWalkthroughState;
 +  void SetOSMCWalkthroughState(OSMCWalkthroughState state);
 +
-   void UnloadSkin(bool forReload = false);
+   void UnloadSkin();
    bool LoadCustomWindows();
    void ReloadSkin(bool confirm = false);
 -- 
-2.7.4
+2.25.1
 

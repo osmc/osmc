@@ -16,22 +16,22 @@ index 2564a94..5c0af96 100644
  
      g_alarmClock.StopThread();
  
--    CLog::Log(LOGNOTICE, "Storing total System Uptime");
+-    CLog::Log(LOGINFO, "Storing total System Uptime");
 -    g_sysinfo.SetTotalUptime(g_sysinfo.GetTotalUptime() + (int)(CTimeUtils::GetFrameTime() / 60000));
 -
 -    // Update the settings information (volume, uptime etc. need saving)
 -    if (CFile::Exists(CServiceBroker::GetSettingsComponent()->GetProfileManager()->GetSettingsFile()))
 -    {
--      CLog::Log(LOGNOTICE, "Saving settings");
+-      CLog::Log(LOGINFO, "Saving settings");
 -      CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
 -    }
 -    else
--      CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
+-      CLog::Log(LOGINFO, "Not saving settings (settings.xml is not present)");
 -
 -    // kodi may crash or deadlock during exit (shutdown / reboot) due to
 -    // either a bug in core or misbehaving addons. so try saving
 -    // skin settings early
--    CLog::Log(LOGNOTICE, "Saving skin settings");
+-    CLog::Log(LOGINFO, "Saving skin settings");
 -    if (g_SkinInfo != nullptr)
 -      g_SkinInfo->SaveSettings();
 -

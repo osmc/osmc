@@ -13,34 +13,37 @@ diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripheral
 index 6aacc0c..1128a48 100644
 --- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 +++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-@@ -318,9 +318,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
-   // open the CEC adapter
-   CLog::Log(LOGDEBUG, "%s - opening a connection to the CEC adapter: %s", __FUNCTION__, m_strComPort.c_str());
- 
--  // scanning the CEC bus takes about 5 seconds, so display a notification to inform users that we're busy
--  std::string strMessage = StringUtils::Format(g_localizeStrings.Get(21336).c_str(), g_localizeStrings.Get(36000).c_str());
--  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), strMessage);
- 
+@@ -297,13 +297,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
+   CLog::Log(LOGDEBUG, "%s - opening a connection to the CEC adapter: %s", __FUNCTION__,
+             m_strComPort.c_str());
+
+-  // scanning the CEC bus takes about 5 seconds, so display a notification to inform users that
+-  // we're busy
+-  std::string strMessage = StringUtils::Format(g_localizeStrings.Get(21336).c_str(),
+-                                               g_localizeStrings.Get(36000).c_str());
+-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000),
+-                                        strMessage);
+-
    bool bConnectionFailedDisplayed(false);
- 
-@@ -1604,12 +1601,7 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
-   std::string strAmpName = UpdateAudioSystemStatus();
-   if (!strAmpName.empty())
-     strNotification += StringUtils::Format("- %s", strAmpName.c_str());
--
+
+   while (!m_bStop && !bIsOpen)
+@@ -1625,10 +1618,6 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+
    m_adapter->m_bIsReady = true;
--
+
 -  // and let the gui know that we're done
--  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), strNotification);
+-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000),
+-                                        strNotification);
 -
    CSingleLock lock(m_critSection);
    m_bIsUpdating = false;
    return true;
-@@ -1655,8 +1647,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
+@@ -1674,9 +1663,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
          UpdateAudioSystemStatus();
        }
- 
--      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000), g_localizeStrings.Get(bConfigSet ? 36023 : 36024));
+
+-      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36000),
+-                                            g_localizeStrings.Get(bConfigSet ? 36023 : 36024));
 -
        {
          CSingleLock lock(m_critSection);

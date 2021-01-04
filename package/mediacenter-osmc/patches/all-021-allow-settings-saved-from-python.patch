@@ -1,4 +1,4 @@
-From 285af97da4939724d5cab0e21b6dee5ce6613b0d Mon Sep 17 00:00:00 2001
+From 8b64e09a7081d1a1eeff80f2ac7bf20a684017fe Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:22:04 +0100
 Subject: [PATCH] Allow legacy interface to be used for saving GUISettings
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 26 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 8e194e5..10b2f15 100644
+index 45cc7b7226..0a09260950 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -511,6 +511,11 @@ namespace XBMCAddon
+@@ -496,6 +496,11 @@ namespace XBMCAddon
          ae->Resume();
      }
  
@@ -26,13 +26,16 @@ index 8e194e5..10b2f15 100644
      {
        std::string convertedLanguage;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 189752d..ec2818f 100644
+index 625cbace3c..69adfa5cab 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -913,6 +913,27 @@ namespace XBMCAddon
- #ifdef DOXYGEN_SHOULD_USE_THIS
-     ///
-     /// \ingroup python_xbmc
+@@ -830,6 +830,27 @@ namespace XBMCAddon
+     void audioResume();
+ #endif
+ 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.saveSettings() }
 +    ///-----------------------------------------------------------------------
 +    /// Save Kodi settings.
@@ -51,12 +54,9 @@ index 189752d..ec2818f 100644
 +    void saveSettings();
 +#endif
 +
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
-     /// @brief \python_func{ xbmc.getUserAgent() }
-     ///-----------------------------------------------------------------------
-     /// @brief Returns Kodi's HTTP UserAgent string
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
 -- 
-2.7.4
+2.25.1
 

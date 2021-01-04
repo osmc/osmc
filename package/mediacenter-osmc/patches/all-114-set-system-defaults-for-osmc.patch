@@ -1,20 +1,20 @@
-From a1de2a8b5fb5f36d26ea749b4e5cd4618d27f2e1 Mon Sep 17 00:00:00 2001
+From 8c7675fceb716dea8d71f16637654d17d7861b43 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 29 Mar 2019 18:18:12 +0000
 Subject: [PATCH] Set system defaults for OSMC
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/settings/appliance.xml | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ system/settings/appliance.xml | 46 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
  create mode 100644 system/settings/appliance.xml
 
 diff --git a/system/settings/appliance.xml b/system/settings/appliance.xml
 new file mode 100644
-index 0000000..afcdd78
+index 0000000000..1a8b0e52b5
 --- /dev/null
 +++ b/system/settings/appliance.xml
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,46 @@
 +<?xml version="1.0" encoding="utf-8" ?>
 +<settings version="1">
 +
@@ -43,7 +43,10 @@ index 0000000..afcdd78
 +          <default>true</default>
 +        </setting>
 +	<setting id="services.webserverusername">
-+	  <default>""</default>
++	  <default>osmc</default>
++        </setting>
++        <setting id="services.webserverpassword">
++          <default>osmc</default>
 +        </setting>
 +      </group>
 +    </category>
@@ -59,5 +62,5 @@ index 0000000..afcdd78
 +
 +</settings>
 -- 
-2.7.4
+2.25.1
 

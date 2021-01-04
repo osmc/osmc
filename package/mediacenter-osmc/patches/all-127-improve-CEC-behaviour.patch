@@ -1,0 +1,26 @@
+From 1bf4c585f60a781a13b77789193182ef4f94fdb6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 8 Mar 2021 19:40:04 +0000
+Subject: [PATCH] Improve CEC behaviour
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/peripherals.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index 1fbb4bc924..286d756dea 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -12,7 +12,7 @@
+     <setting key="enabled" type="bool" value="1" label="305" order="1" />
+     <setting key="activate_source" type="bool" value="1" label="36020" order="2" />
+     <setting key="wake_devices" type="enum" value="36037" label="36007" lvalues="36037|36038|36039|231" order="3" />
+-    <setting key="standby_devices" type="enum" value="36037" label="36008" lvalues="36037|36038|36039|231" order="4" />
++    <setting key="standby_devices" type="enum" value="231" label="36008" lvalues="36037|36038|36039|231" order="4" />
+     <setting key="send_inactive_source" type="bool" value="1" label="36025" order="5" />
+     <setting key="cec_standby_screensaver" type="bool" value="0" label="36009" order="6" />
+     <setting key="cec_wake_screensaver" type="bool" value="1" label="36010" order="7" />
+-- 
+2.25.1
+

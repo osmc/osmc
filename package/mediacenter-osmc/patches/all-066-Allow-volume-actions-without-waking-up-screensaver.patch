@@ -1,31 +1,31 @@
-From 9095a8bc4f2c67fba1064d7c567b636d1ed3ce7a Mon Sep 17 00:00:00 2001
+From 212c158edd7455277af1a54d001bcaee2e15abe9 Mon Sep 17 00:00:00 2001
 From: Jeffrey Larson <jeffothy@gmail.com>
 Date: Mon, 8 Aug 2016 18:15:30 +0000
-Subject: [PATCH 1/1] Allow volume actions without waking up screensaver
+Subject: [PATCH] Allow volume actions without waking up screensaver
 
 ---
  xbmc/input/InputManager.cpp | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/input/InputManager.cpp b/xbmc/input/InputManager.cpp
-index 1e21e7b..85a7615 100644
+index 097245822e..2d0e3e5732 100644
 --- a/xbmc/input/InputManager.cpp
 +++ b/xbmc/input/InputManager.cpp
-@@ -589,7 +589,7 @@ bool CInputManager::OnKey(const CKey& key)
+@@ -545,7 +545,7 @@ bool CInputManager::HandleKey(const CKey& key)
    g_application.ResetScreenSaver();
  
    // allow some keys to be processed while the screensaver is active
 -  if (g_application.WakeUpScreenSaverAndDPMS(processKey) && !processKey)
 +  if (!processKey && g_application.WakeUpScreenSaverAndDPMS(processKey))
    {
-     CLog::LogF(LOGDEBUG, "%s pressed, screen saver/dpms woken up", m_Keyboard.GetKeyName((int)key.GetButtonCode()).c_str());
-     return true;
-@@ -713,7 +713,10 @@ bool CInputManager::AlwaysProcess(const CAction& action)
-         || builtInFunction == "suspend"
-         || builtInFunction == "hibernate"
-         || builtInFunction == "quit"
--        || builtInFunction == "shutdown")
-+        || builtInFunction == "shutdown"
+     CLog::LogF(LOGDEBUG, "%s pressed, screen saver/dpms woken up",
+                m_Keyboard.GetKeyName((int)key.GetButtonCode()).c_str());
+@@ -682,7 +682,10 @@ bool CInputManager::AlwaysProcess(const CAction& action)
+     if (builtInFunction == "powerdown" || builtInFunction == "reboot" ||
+         builtInFunction == "restart" || builtInFunction == "restartapp" ||
+         builtInFunction == "suspend" || builtInFunction == "hibernate" ||
+-        builtInFunction == "quit" || builtInFunction == "shutdown")
++        builtInFunction == "quit" || builtInFunction == "shutdown" 
 +        || builtInFunction == "volumeup"
 +        || builtInFunction == "volumedown"
 +        || builtInFunction == "mute")
@@ -33,5 +33,5 @@ index 1e21e7b..85a7615 100644
        return true;
      }
 -- 
-2.1.4
+2.25.1
 

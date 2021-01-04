@@ -1,0 +1,27 @@
+From b63a12183ab16ea9d7dd71dd02780499daa0c9c6 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 24 May 2021 12:53:57 +0100
+Subject: [PATCH] We don't fetch a Git tree when building. Instead of
+ displaying 'nogitfound', show something better cosmetically
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ cmake/scripts/common/Macros.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/scripts/common/Macros.cmake b/cmake/scripts/common/Macros.cmake
+index 757d3eebbb..d64f835ba7 100644
+--- a/cmake/scripts/common/Macros.cmake
++++ b/cmake/scripts/common/Macros.cmake
+@@ -606,7 +606,7 @@ function(core_find_git_rev stamp)
+       if(EXISTS ${CMAKE_SOURCE_DIR}/VERSION)
+         file(STRINGS ${CMAKE_SOURCE_DIR}/VERSION HASH LIMIT_INPUT 16)
+       else()
+-        set(HASH "nogitfound")
++        set(HASH "osmc")
+       endif()
+     endif()
+     cmake_parse_arguments(arg "FULL" "" "" ${ARGN})
+-- 
+2.25.1
+
