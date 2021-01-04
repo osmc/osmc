@@ -1,4 +1,4 @@
-From df672e7fedbf4766f8e71984456da13a49c00ed6 Mon Sep 17 00:00:00 2001
+From 644a970bc0d954b2cdcd2909faec4ff164c71cb2 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:41:13 +0100
 Subject: [PATCH] Allow skin to be changed via xbmc() legacy Python interface
@@ -6,11 +6,11 @@ Subject: [PATCH] Allow skin to be changed via xbmc() legacy Python interface
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  8 ++++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 +++++++++++++++++++++++++++
  2 files changed, 36 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 953fc27..1c9b1c6 100644
+index eaa9af2809..37069f580d 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
 @@ -120,6 +120,14 @@ namespace XBMCAddon
@@ -29,13 +29,16 @@ index 953fc27..1c9b1c6 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 11efb35..8616ca8 100644
+index b9b021b53c..7ef062d11e 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -247,6 +247,34 @@ namespace XBMCAddon
- #ifdef DOXYGEN_SHOULD_USE_THIS
-     ///
-     /// \ingroup python_xbmc
+@@ -202,6 +202,34 @@ namespace XBMCAddon
+     String executeJSONRPC(const char* jsonrpccommand);
+ #endif
+ 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.setskin(skinname) }
 +    ///-----------------------------------------------------------------------
 +    /// Change the XBMC skin
@@ -61,12 +64,9 @@ index 11efb35..8616ca8 100644
 +    void setskin(const char *skin);
 +#endif
 +
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
-     /// @brief \python_func{ xbmc.sleep(time) }
-     ///-----------------------------------------------------------------------
-     /// Sleeps for 'time' msec.
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
 -- 
-2.7.4
+2.25.1
 

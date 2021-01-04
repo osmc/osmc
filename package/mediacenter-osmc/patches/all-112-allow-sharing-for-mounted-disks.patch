@@ -46,13 +46,13 @@ index 57831ef..e64e495 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -419,6 +419,7 @@ bool CApplication::Create(const CAppParamParser &params)
-   CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
-   CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
-   CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
-+  CopyUserDataIfNeeded("special://masterprofile/", "sources.xml");
+   CUtil::CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
+   CUtil::CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
+   CUtil::CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
++  CUtil::CopyUserDataIfNeeded("special://masterprofile/", "sources.xml");
  
-   //! @todo - move to CPlatformXXX
-   #ifdef TARGET_DARWIN_IOS
+   CServiceBroker::GetLogging().Initialize(CSpecialProtocol::TranslatePath("special://logpath"));
+
 -- 
 2.7.4
 

@@ -61,16 +61,13 @@ syspaths="/sys/class/video/
 /sys/class/tsync/pts_pcrscr
 /sys/class/tsync/enable
 /sys/class/audiodsp/digital_raw
-/sys/class/ppmgr/ppmgr_3d_mode
 /sys/class/display/mode
 /sys/class/audiodsp/digital_codec
-/sys/module/amlvideodri/parameters/freerun_mode
 /sys/module/amvideo/parameters/omx_pts
 /sys/module/amvideo/parameters/omx_pts_interval_lower
 /sys/class/vfm/map
 /dev/video10
 /sys/module/di/parameters/bypass_all
-/sys/module/amlvideodri/parameters/freerun_mode
 /sys/class/amhdmitx/amhdmitx0/frac_rate_policy
 /sys/module/di/parameters/bypass_prog
 /sys/class/amhdmitx/amhdmitx0/debug
@@ -89,7 +86,10 @@ syspaths="/sys/class/video/
 /sys/module/amvdec_h264mvc/parameters/view_mode
 /sys/module/di/parameters/di_debug_flag
 /sys/class/codec_mm/tvp_enable
-/sys/module/amvdec_vc1/parameters/force_prog"
+/sys/module/amvdec_vc1/parameters/force_prog
+/sys/class/ppmgr/orientation
+/sys/module/am_vecm/parameters/customer_panel_lumin
+/sys/module/am_vecm/parameters/hdr_mode"
 
 for syspath in $syspaths; do
 	chgrp -R video $syspath

@@ -1,4 +1,4 @@
-From 42323e3fbb859afaf498a91f7b864e448764a757 Mon Sep 17 00:00:00 2001
+From 4ca05c928d946aefeae043ab8e5026dcbc23ee24 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:20:39 +0100
 Subject: [PATCH] Use the OSMC RSS feed by default if it is enabled
@@ -9,7 +9,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/userdata/RssFeeds.xml b/userdata/RssFeeds.xml
-index 48b99e8..dc60dea 100644
+index 48b99e81ae..7ec0be4b06 100644
 --- a/userdata/RssFeeds.xml
 +++ b/userdata/RssFeeds.xml
 @@ -3,8 +3,6 @@
@@ -19,9 +19,9 @@ index 48b99e8..dc60dea 100644
 -    <feed updateinterval="30">http://feeds.kodi.tv/xbmc</feed>
 -    <feed updateinterval="30">http://feeds.kodi.tv/latest_xbmc_addons</feed>
 -    <feed updateinterval="30">http://feeds.kodi.tv/updated_xbmc_addons</feed>
-+    <feed updateinterval="240">https://blog-cdn.osmc.tv/rss/</feed>
++    <feed updateinterval="240">https://osmc.tv/rss/</feed>
    </set>
  </rssfeeds>
 -- 
-2.1.0
+2.25.1
 

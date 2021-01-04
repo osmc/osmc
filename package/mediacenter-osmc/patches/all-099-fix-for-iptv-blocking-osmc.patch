@@ -1,8 +1,18 @@
+From c36cfca51cb6b28546aa3a31c502251e45bd8d79 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 4 Jan 2021 17:09:13 +0000
+Subject: [PATCH] Fix IPTV blocking OSMC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/utils/SystemInfo.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index eba6353..5e57b2b 100644
+index bd691aac53..b3d7429eaf 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -638,6 +638,8 @@ std::string CSysInfo::GetOsName(bool emptyIfUnknown /* = false*/)
+@@ -614,6 +614,8 @@ std::string CSysInfo::GetOsName(bool emptyIfUnknown /* = false*/)
    if (emptyIfUnknown && osName == "Unknown OS")
      return "";
  
@@ -11,3 +21,6 @@ index eba6353..5e57b2b 100644
    return osName;
  }
  
+-- 
+2.25.1
+

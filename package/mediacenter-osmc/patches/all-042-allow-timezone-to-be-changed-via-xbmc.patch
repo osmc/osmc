@@ -1,4 +1,4 @@
-From 9e9238a1b8b494e39dc527f22c3e8835e901ab7a Mon Sep 17 00:00:00 2001
+From b21a4a282fc2b00448042e6783d165fe5ea590e1 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 22 Sep 2015 01:07:46 +0100
 Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
@@ -6,14 +6,14 @@ Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/interfaces/legacy/ModuleXbmc.cpp |  8 ++++++++
- xbmc/interfaces/legacy/ModuleXbmc.h   | 28 ++++++++++++++++++++++++++++
+ xbmc/interfaces/legacy/ModuleXbmc.h   | 28 +++++++++++++++++++++++++++
  2 files changed, 36 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 7cc610f..76fabdf 100644
+index 539da3fc31..de3d5e2f64 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -143,6 +143,14 @@ namespace XBMCAddon
+@@ -136,6 +136,14 @@ namespace XBMCAddon
        CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
      }
  
@@ -29,13 +29,16 @@ index 7cc610f..76fabdf 100644
      String executeJSONRPC(const char* jsonrpccommand)
      {
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 18e1179..c1d6446 100644
+index 2a28822052..0f1081aeef 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -294,6 +294,34 @@ namespace XBMCAddon
- #ifdef DOXYGEN_SHOULD_USE_THIS
-     ///
-     /// \ingroup python_xbmc
+@@ -258,6 +258,34 @@ namespace XBMCAddon
+     void sethostname(const char *hostname);
+ #endif
+ 
++#ifdef DOXYGEN_SHOULD_USE_THIS
++    ///
++    /// \ingroup python_xbmc
 +    /// @brief \python_func{ xbmc.settimezone(timezone) }
 +    ///-----------------------------------------------------------------------
 +    /// Change the timezone
@@ -61,12 +64,9 @@ index 18e1179..c1d6446 100644
 +    void settimezone(const char *timezone);
 +#endif
 +
-+#ifdef DOXYGEN_SHOULD_USE_THIS
-+    ///
-+    /// \ingroup python_xbmc
-     /// @brief \python_func{ xbmc.sleep(time) }
-     ///-----------------------------------------------------------------------
-     /// Sleeps for 'time' msec.
+ #ifdef DOXYGEN_SHOULD_USE_THIS
+     ///
+     /// \ingroup python_xbmc
 -- 
-2.7.4
+2.25.1
 

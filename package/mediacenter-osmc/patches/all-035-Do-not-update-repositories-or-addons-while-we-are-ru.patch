@@ -1,4 +1,4 @@
-From a6690503c3de6fc84def5e303b728f90643c7802 Mon Sep 17 00:00:00 2001
+From fb1c92fe91082a7785af57b5b4bc71636d7bc2cd Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 16:45:44 +0100
 Subject: [PATCH] Do not allow repository updates while we are in the My OSMC
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 5 insertions(+)
 
 diff --git a/xbmc/addons/RepositoryUpdater.cpp b/xbmc/addons/RepositoryUpdater.cpp
-index c0ed40b..cf14b1c 100644
+index 9bac6bd6ad..5d606cdb1d 100644
 --- a/xbmc/addons/RepositoryUpdater.cpp
 +++ b/xbmc/addons/RepositoryUpdater.cpp
-@@ -208,6 +208,11 @@ void CRepositoryUpdater::ScheduleUpdate()
-   if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_ADDONS_AUTOUPDATES) == AUTO_UPDATES_NEVER)
+@@ -227,6 +227,11 @@ void CRepositoryUpdater::ScheduleUpdate()
+   if (CAddonSystemSettings::GetInstance().GetAddonAutoUpdateMode() == AUTO_UPDATES_NEVER)
      return;
  
 +  if (g_application.m_eOSMCWalkthroughState != 2) {
@@ -26,5 +26,5 @@ index c0ed40b..cf14b1c 100644
      return;
  
 -- 
-2.7.4
+2.25.1
 

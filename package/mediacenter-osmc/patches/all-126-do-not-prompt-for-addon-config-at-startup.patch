@@ -1,0 +1,26 @@
+From 41fee012023ca9e0550268dc6f86d287c36832e4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 1 Mar 2021 14:42:11 +0000
+Subject: [PATCH] Don't prompt for enabling add-ons on startup
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/platform/linux/PlatformLinux.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/platform/linux/PlatformLinux.h b/xbmc/platform/linux/PlatformLinux.h
+index c45d41143a..95c68bdefe 100644
+--- a/xbmc/platform/linux/PlatformLinux.h
++++ b/xbmc/platform/linux/PlatformLinux.h
+@@ -21,7 +21,7 @@ public:
+   ~CPlatformLinux() override = default;
+ 
+   bool Init() override;
+-  bool IsConfigureAddonsAtStartupEnabled() override { return true; };
++  bool IsConfigureAddonsAtStartupEnabled() override { return false; };
+ 
+ private:
+   std::unique_ptr<OPTIONALS::CLircContainer, OPTIONALS::delete_CLircContainer> m_lirc;
+-- 
+2.25.1
+

@@ -1,0 +1,95 @@
+From 090988127339c7029ca7e3eec285881de1a3aa7e Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Tue, 18 May 2021 22:39:24 +0100
+Subject: [PATCH] POParser: support override of strings with custom po files
+
+Default is that strings will not be overwritten so that custom po files
+must be loaded first. Had to remove the previous behaviour of
+substituting English where the translation file's English string
+differs.
+Added prints to warn of this and otherwise where strings differ so that
+devs can correct if necessary.
+A translation file will now overwrite a string entry that has only a
+(matching) en_gb string (was previously ignored).
+---
+ xbmc/guilib/LocalizeStrings.cpp | 52 ++++++++++++++++++++++++---------
+ 1 file changed, 39 insertions(+), 13 deletions(-)
+
+diff --git a/xbmc/guilib/LocalizeStrings.cpp b/xbmc/guilib/LocalizeStrings.cpp
+index 2c616a9eaf..4423fa8137 100644
+--- a/xbmc/guilib/LocalizeStrings.cpp
++++ b/xbmc/guilib/LocalizeStrings.cpp
+@@ -47,20 +47,46 @@ static bool LoadPO(const std::string &filename, std::map<uint32_t, LocStr>& stri
+ 
+       if (bSourceLanguage && !PODoc.GetMsgid().empty())
+       {
+-        if (bStrInMem && (strings[id + offset].strOriginal.empty() ||
+-                          PODoc.GetMsgid() == strings[id + offset].strOriginal))
+-          continue;
+-        else if (bStrInMem)
+-          CLog::Log(LOGDEBUG,
+-              "POParser: id:%i was recently re-used in the English string file, which is not yet "
+-                  "changed in the translated file. Using the English string instead", id);
+-        strings[id + offset].strTranslated = PODoc.GetMsgid();
++        if (bStrInMem)
++        {
++          if (!strings[id + offset].strOriginal.empty() &&
++              strings[id + offset].strOriginal != "")
++          {
++            if (strings[id + offset].strOriginal == PODoc.GetMsgid())
++              continue;
++            CLog::Log(LOGDEBUG,
++              "POParser: string for id:%i is different in the English string file.\n"
++              "The translation file may need updating.\n"
++              "%s -> %s", id, strings[id + offset].strOriginal.c_str(), PODoc.GetMsgid().c_str());
++          }
++          else if (strings[id + offset].strTranslated != PODoc.GetMsgid())
++          {
++            CLog::Log(LOGDEBUG, "POParser: string for id %i is different:\n\t"
++            "in memory: %s\n\tin file: %s\n\tignoring",
++              id, strings[id + offset].strTranslated.c_str(), PODoc.GetMsgid().c_str());
++            continue;
++          }
++        }
++        else
++          strings[id + offset].strTranslated = PODoc.GetMsgid();
+         counter++;
+       }
+-      else if (!bSourceLanguage && !bStrInMem && !PODoc.GetMsgstr().empty())
++      else if (!bSourceLanguage && !PODoc.GetMsgstr().empty())
+       {
+-        strings[id + offset].strTranslated = PODoc.GetMsgstr();
+-        strings[id + offset].strOriginal = PODoc.GetMsgid();
++        if (bStrInMem && !strings[id + offset].strOriginal.empty() &&
++            (strings[id + offset].strOriginal != PODoc.GetMsgid() ||
++            strings[id + offset].strTranslated != PODoc.GetMsgstr()))
++          CLog::Log(LOGDEBUG, "POParser: strings for id %i are different:\n\t"
++          "in memory: %s %s\n\tin file: %s %s\n"
++          "\t%s",
++            id, strings[id + offset].strOriginal, strings[id + offset].strTranslated,
++            PODoc.GetMsgid(), PODoc.GetMsgstr(),
++              strings[id + offset].strTranslated == PODoc.GetMsgid() ? "adding translation" : "ignoring");
++        if (!bStrInMem || strings[id + offset].strTranslated == PODoc.GetMsgid())
++        {
++          strings[id + offset].strTranslated = PODoc.GetMsgstr();
++          strings[id + offset].strOriginal = PODoc.GetMsgid();
++        }
+         counter++;
+       }
+     }
+@@ -112,10 +138,10 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
+ 
+   bool useSourceLang = StringUtils::EqualsNoCase(language, LANGUAGE_DEFAULT) || StringUtils::EqualsNoCase(language, LANGUAGE_OLD_DEFAULT);
+ 
+-  int ret = LoadPO(URIUtils::AddFileToFolder(pathname, "strings.po"), strings, encoding, offset, useSourceLang);
+-
+   LoadPO(URIUtils::AddFileToFolder(pathname, "strings-osmc.po"), strings, encoding, offset, useSourceLang);
+ 
++  int ret = LoadPO(URIUtils::AddFileToFolder(pathname, "strings.po"), strings, encoding, offset, useSourceLang);
++
+   return ret;
+ }
+ 
+-- 
+2.25.1
+
