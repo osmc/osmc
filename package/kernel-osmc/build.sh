@@ -11,13 +11,12 @@ INITRAMFS_EMBED=2
 INITRAMFS_NOBUILD=4
 
 . ../common.sh
-test $1 == rbp1 && VERSION="4.19.122" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp2 && VERSION="5.10.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp464 && VERSION="5.10.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero2 && VERSION="3.10.105" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero364 && VERSION="4.9.113" && REV="29" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
-if [ $1 == "rbp1" ] || [ $1 == "rbp2" ] || [ $1 == "rbp464" ] || [ $1 == "pc" ]
+if [[ $1 == "rbp2" ] || [ $1 == "rbp464" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
 	MAJOR=$(echo ${VERSION:0:1})
@@ -73,12 +72,12 @@ then
 	export KPKG_EMAIL="email@samnazarko.co.uk"
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
+	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
 	then
 		install_patch "../../patches" "rbp"
 	fi
 	install_patch "../../patches" "${1}"
-        if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
+        if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
         then
                 # We have to do this here separately because we need .config present first
                 ./scripts/config --set-val CONFIG_ARM64_TLB_RANGE y
@@ -138,9 +137,9 @@ then
 	if [ $? != 0 ]; then echo "Building kernel source package failed" && exit 1; fi
 	# Make modules directory
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
+	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
 	if [ "$1" == "vero2" ]; then mkdir -p ../../files-image/boot; fi
-        if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
+        if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
         then
                 $BUILD dtbs
                 mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
@@ -199,7 +198,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
 		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
+		if [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
 		then
                 # Build MT7610U model
                 pushd drivers/net/wireless/mt7610u
