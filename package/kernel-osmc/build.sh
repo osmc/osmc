@@ -13,7 +13,6 @@ INITRAMFS_NOBUILD=4
 . ../common.sh
 test $1 == rbp2 && VERSION="5.10.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == rbp464 && VERSION="5.10.3" && REV="1" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
-test $1 == vero2 && VERSION="3.10.105" && REV="13" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="uImage"
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage"
 test $1 == vero364 && VERSION="4.9.113" && REV="29" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage"
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ] || [ $1 == "pc" ]
@@ -28,7 +27,6 @@ then
 	fi
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
-if [ $1 == "vero2" ]; then SOURCE_LINUX="https://github.com/osmc/vero2-linux/archive/master.tar.gz"; fi
 if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/osmc-openlinux-4.9.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
@@ -37,7 +35,7 @@ then
 	. initramfs-src/VERSIONS
 	pull_source "https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2" "$(pwd)/initramfs-src/busybox"
 	pull_source "https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${E2FSPROGS_VERSION}/e2fsprogs-${E2FSPROGS_VERSION}.tar.gz" "$(pwd)/initramfs-src/e2fsprogs"
-        if [ "$1" == "vero2" ] || [ "$1" == "vero364" ]
+        if [ "$1" == "vero364" ]
 	then
 	    pull_source "https://mirrors.kernel.org/sourceware/lvm2/LVM2.${LVM_VERSION}.tgz" "$(pwd)/initramfs-src/lvm2"
 	fi
@@ -62,11 +60,10 @@ then
 	handle_dep "flex"
 	handle_dep "rsync"
 	handle_dep "openssl"
-        if [ "$1" == "vero2" ]  || [ "$1" == "vero364" ]
+        if [ "$1" == "vero364" ]
         then
 	    handle_dep "python"
         fi
-	if [ "$1" == "vero2" ]; then handle_dep "u-boot-tools"; fi
 	export KPKG_MAINTAINER="Sam G Nazarko"
 	export KPKG_EMAIL="email@samnazarko.co.uk"
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
@@ -87,12 +84,6 @@ then
 	# Set up DTC
 	$BUILD scripts
 	DTC=$(pwd)"/scripts/dtc/dtc"
-	# Conver DTD to DTB
-	if [ "$1" == "vero2" ]
-	then
-		$BUILD meson8b_vero2.dtd
-		$BUILD meson8b_vero2.dtb
-	fi
 	if [ "$1" == "vero364" ] || [ "$1" == "rbp464" ]
 	then
 		export kimage=vmlinuz
@@ -137,7 +128,6 @@ then
 	# Make modules directory
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
-	if [ "$1" == "vero2" ]; then mkdir -p ../../files-image/boot; fi
         if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
         then
                 $BUILD dtbs
@@ -146,17 +136,6 @@ then
                 mv arch/arm*/boot/dts/overlays/*.dtbo ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
                 mv arch/arm/boot/dts/overlays/README ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays
         fi
-	if [ "$1" == "vero" ]
-	then
-		make imx6dl-vero.dtb
-		mv arch/arm/boot/dts/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/
-	fi
-	if [ "$1" == "vero2" ]
-	then
-		# Special packaging for Android
-                ./scripts/mkbootimg --kernel arch/arm/boot/uImage --ramdisk ../../initramfs-src/initrd.img.gz --second arch/arm/boot/dts/amlogic/meson8b_vero2.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
-		if [ $? != 0 ]; then echo "Building Android image for Vero 2 failed" && exit 1; fi
-	fi
 	if [ "$1" == "vero364" ]
         then
 		mkdir -p ../../files-image/boot #hack
@@ -197,7 +176,7 @@ then
 		strip --strip-unneeded drivers/net/wireless/rtl8812au/*8812au.ko
 		cp drivers/net/wireless/rtl8812au/*8812au.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/net/wireless/
 		fi
-		if [ "$1" == "rbp2" ] || [ "$1" == "vero2" ]
+		if [ "$1" == "rbp2" ]
 		then
                 # Build MT7610U model
                 pushd drivers/net/wireless/mt7610u
