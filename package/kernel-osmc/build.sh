@@ -64,8 +64,6 @@ then
         then
 	    handle_dep "python"
         fi
-	export KPKG_MAINTAINER="Sam G Nazarko"
-	export KPKG_EMAIL="email@samnazarko.co.uk"
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
@@ -86,6 +84,7 @@ then
 	DTC=$(pwd)"/scripts/dtc/dtc"
 	if [ "$1" == "vero364" ] || [ "$1" == "rbp464" ]
 	then
+		# Do we still need this!?
 		export kimage=vmlinuz
 		export target=Image.gz
 		export NEED_DIRECT_GZIP_IMAGE=YES
@@ -93,11 +92,6 @@ then
 		export kimagedest=$(pwd)/vmlinuz
 		export kelfimagedest=$(pwd)/vmlinux
 		export KERNEL_ARCH=arm64
-	fi
-        if [ "$1" == "vero364" ]
-	then
-		$BUILD vero3_2g_16g.dtb || $BUILD vero3_2g_16g.dtb
-		$BUILD vero3plus_2g_16g.dtb || $BUILD vero3plus_2g_16g.dtb
 	fi
 	# Initramfs time
 	if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -118,13 +112,20 @@ then
 			popd
 		fi
 	fi
-	if [ "$IMG_TYPE" == "zImage" ] || [ -z "$IMG_TYPE" ]; then make-kpkg --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
-	if [ "$IMG_TYPE" == "uImage" ]; then make-kpkg --uimage --stem $1 kernel_image --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV; fi
-	if [ $? != 0 ]; then echo "Building kernel image package failed" && exit 1; fi
-	make-kpkg --stem $1 kernel_headers --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
-	if [ $? != 0 ]; then echo "Building kernel headers package failed" && exit 1; fi
-	make-kpkg --stem $1 kernel_source --append-to-version -${REV}-osmc --jobs $JOBS --revision $REV
-	if [ $? != 0 ]; then echo "Building kernel source package failed" && exit 1; fi
+        if [ "$IMG_TYPE" == "uImage" ]; then export KBUILD_IMAGE=uImage; fi
+        export KDEB_PKGVERSION="${VERSION}-${REV}"
+        export LOCALVERSION="-osmc"
+        export DEBFULLNAME="Sam G Nazarko"
+	export DEBEMAIL="email@samnazarko.co.uk"
+        export KDEB_PKGVERSION="${REV}-osmc"
+	export KDEB_CHANGELOG_DIST="stable"
+	SCRIPTFILE="scripts/package/builddeb"
+	sed s/packagename=linux-image-\$version/packagename=${1}-image-${VERSION}-${REV}-osmc/ -i $SCRIPTFILE
+	sed s/kernel_headers_packagename=linux-headers-\$version/kernel_headers_packagename=${1}-headers-${VERSION}-${REV}-osmc/ -i $SCRIPTFILE
+	sed s/dbg_packagename=\$packagename-dbg/dbg_packagename=${1}-image-dbg-${VERSION}-${REV}-osmc/ -i $SCRIPTFILE
+        make deb-pkg -j $JOBS
+	exit 1
+	if [ $? != 0 ]; then echo "Building kernel packages failed" && exit 1; fi
 	# Make modules directory
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]; then mkdir -p ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays; fi
@@ -138,20 +139,22 @@ then
         fi
 	if [ "$1" == "vero364" ]
         then
+                $BUILD vero3_2g_16g.dtb || $BUILD vero3_2g_16g.dtb
+                $BUILD vero3plus_2g_16g.dtb || $BUILD vero3plus_2g_16g.dtb
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
 		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic --verbose --page-size 2048
 		./scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
                 if [ $? != 0 ]; then echo "Building Android image for Vero 3 failed" && exit 1; fi
 		# Hacks for lack of ARM64 native in kernel-package for Jessie
-		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
+		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc # Do we still need this?
 		# Device tree for uploading to eMMC
 		cp -ar multi.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
         fi
 	if [ "$1" == "rbp464" ]
 	then
 		# For Aarch64 we need to ensure installation on target
-		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
+		cp -ar vmlinuz ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc # Do we still need this?
 	fi
 	# Add out of tree modules that lack a proper Kconfig and Makefile
 	# Fix CPU architecture
@@ -206,21 +209,11 @@ then
 	# Move all of the Debian packages so they are where we would expect them
 	mv src/${1}-*.deb .
 	# Disassemble kernel image package to add device tree overlays, additional out of tree modules etc
-	dpkg -x ${1}-image*.deb files-image/
-	dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
+	#dpkg -x ${1}-image*.deb files-image/
+	#dpkg-deb -e ${1}-image*.deb files-image/DEBIAN
 	if [ "$1" == "vero364" ]; then sed -ie 's/^Depends:.*$/&, vero3-bootloader-osmc:armhf (>= 1.0.0)/g' files-image/DEBIAN/control; fi
 	rm ${1}-image*.deb
-	dpkg_build files-image ${1}-image-${VERSION}-${REV}-osmc.deb
-	# Disassemble kernel headers package to include full headers (upstream Debian bug...)
-	if [ "$ARCH" == "armv7l" ]
-	then
-		mkdir -p files-headers/
-		dpkg -x ${1}-headers*.deb files-headers/
-		dpkg-deb -e ${1}-headers*.deb files-headers/DEBIAN
-		rm ${1}-headers*.deb
-		cp -ar src/*linux*/arch/arm/include/ files-headers/usr/src/*-headers-${VERSION}-${REV}-osmc/include
-		dpkg_build files-headers ${1}-headers-${VERSION}-${REV}-osmc.deb
-	fi
+	#dpkg_build files-image ${1}-image-${VERSION}-${REV}-osmc.deb
 	echo "Package: ${1}-kernel-osmc" >> files/DEBIAN/control
 	echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
