@@ -48,8 +48,7 @@ then
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
-	if [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp" && PLATFORM="-DRPI_INCLUDE_DIR=/opt/vc/include -DRPI_LIB_DIR=/opt/vc/lib -DHAVE_LINUX_API=1"; fi
-	if [ "$1" == "vero2" ]; then install_patch "../../patches" "vero2" && PLATFORM="-DHAVE_AMLOGIC_API=1"; fi
+	if [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp" && PLATFORM="-DHAVE_LINUX_API=1"; fi
 	if [ "$1" == "vero3" ]; then install_patch "../../patches" "vero3" && PLATFORM="-DHAVE_AOCEC_API=1"; fi
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/osmc -DCMAKE_INSTALL_LIBDIR=/usr/osmc/lib -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/osmc/lib -DBUILD_SHARED_LIBS=1 -DCMAKE_INSTALL_RPATH=/usr/osmc/lib $PLATFORM .
 	$BUILD
