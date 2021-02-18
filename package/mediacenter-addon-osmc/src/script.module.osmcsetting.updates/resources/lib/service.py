@@ -8,4 +8,7 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['osmcupdates', 'service']
+from osmcupdates import service_entry
+
+if __name__ == "__main__":
+    service_entry.Main()

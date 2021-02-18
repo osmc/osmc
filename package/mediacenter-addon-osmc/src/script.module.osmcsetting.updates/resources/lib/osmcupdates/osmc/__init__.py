@@ -8,4 +8,4 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-__all__ = ['osmcupdates', 'service']
+__all__ = ['osmc_setting']
