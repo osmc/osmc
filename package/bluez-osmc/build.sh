@@ -35,7 +35,7 @@ then
 	handle_dep "libdbus-glib-1-dev"
 	handle_dep "libglib2.0-dev"
 	handle_dep "libical-dev"
-	handle_dep "python-dev"
+	handle_dep "python3-dev"
 	handle_dep "libreadline-dev"
 	handle_dep "${1}-libsqlite-dev-osmc"
 	handle_dep "libudev-dev"
