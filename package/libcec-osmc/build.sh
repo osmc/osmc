@@ -29,7 +29,7 @@ then
 	handle_dep "autoconf"
 	handle_dep "libtool"
 	handle_dep "pkg-config"
-	handle_dep "python-dev"
+	handle_dep "python3-dev"
 	handle_dep "swig"
 	handle_dep "cmake"
 	if [ "$1" == "rbp1" ];
