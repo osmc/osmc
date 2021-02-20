@@ -24,7 +24,7 @@ then
 	handle_dep "ca-certificates"
 	handle_dep "zlib1g-dev"
 	handle_dep "liburiparser-dev"
-	handle_dep "python-minimal"
+	handle_dep "python3-minimal"
 	handle_dep "libhdhomerun-dev"
 	handle_dep "dvb-tools"
 	handle_dep "libdvbv5-0"
@@ -40,7 +40,7 @@ then
     	echo -e "TVHeadend Server\ntvheadend.service" > $APP_FILE
 	pushd src/tvheadend*
 	install_patch "../../patches" "all"
-	./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-ffmpeg_static --disable-libx264 --disable_libx264_static --disable-libx265 --disable-libx265_static --disable-libvpx --disable-libvpx_static --disable-libtheora --disable-libtheorsa_static --disable-libvorbis --disable-libvorbis_static --disable-libfdkaac --disable-libfdkaac_static --disable-nvenc --disable-libmfx_static --disable-android --enable-libsystemd_daemon --disable-kqueue --enable-dbus_1 --disable-tsdebug --disable-gtimer_check --enable-dvbscan --disable-bundle --disable-tvhcsa --enable-uriparser --disable-epoll --enable-zlib --disable-inotify --enable-dvben50221 --disable-dvbcsa --nowerror --enable-dvbcsa --enable-tvhcsa
+	PYTHON=python3 ./configure --prefix=/usr --enable-hdhomerun_client --disable-hdhomerun_static --disable-ffmpeg_static --disable-libx264 --disable_libx264_static --disable-libx265 --disable-libx265_static --disable-libvpx --disable-libvpx_static --disable-libtheora --disable-libtheorsa_static --disable-libvorbis --disable-libvorbis_static --disable-libfdkaac --disable-libfdkaac_static --disable-nvenc --disable-libmfx_static --disable-android --enable-libsystemd_daemon --disable-kqueue --enable-dbus_1 --disable-tsdebug --disable-gtimer_check --enable-dvbscan --disable-bundle --disable-tvhcsa --enable-uriparser --disable-epoll --enable-zlib --disable-inotify --enable-dvben50221 --disable-dvbcsa --nowerror --enable-dvbcsa --enable-tvhcsa
 	sed -e "s/0.0.0~unknown/${VERSION}~osmc/" -i support/version
 	$BUILD
 	make install DESTDIR=${out}
