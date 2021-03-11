@@ -13,7 +13,7 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
 
 	# install all diverts needed by this version of the package:
 	# install_divert PATH_DIV PATH_ORIG
-
+	install_divert /usr/share/alsa/cards/vc4-hdmi.conf.distributed /usr/share/alsa/cards/vc4-hdmi.conf
 	systemctl stop brcm43xx.service >/dev/null 2>&1
 	exit 0
 fi
