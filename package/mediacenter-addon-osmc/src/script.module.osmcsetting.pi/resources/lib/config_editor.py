@@ -48,7 +48,7 @@ class ConfigEditor(xbmcgui.WindowXMLDialog):
 		self.del_string = ' [' + lang(32056) + ']'
 
 		try:
-			self.config = '/boot/config.txt'
+			self.config = '/boot/config-user.txt'
 
 			with open(self.config, 'r') as f:
 				self.lines = f.readlines()			

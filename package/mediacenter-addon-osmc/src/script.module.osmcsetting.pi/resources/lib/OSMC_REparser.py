@@ -1152,9 +1152,9 @@ if __name__ == "__main__":
 
     import subprocess
 
-    config = read_config_file('/boot/config.txt')
+    config = read_config_file('/boot/config-user.txt')
     original_config = config[::]
     extracted_settings = config_to_kodi(MASTER_SETTINGS, config)
     new_settings = kodi_to_config(MASTER_SETTINGS, original_config, extracted_settings)
     write_config_file('/var/tmp/config.txt', new_settings)
-    subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config.txt'])
+    subprocess.call(["sudo", "mv",  '/var/tmp/config.txt', '/boot/config-user.txt'])

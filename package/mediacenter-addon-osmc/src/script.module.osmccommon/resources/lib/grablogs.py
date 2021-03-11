@@ -74,7 +74,7 @@ SETS =  {
                                                 'name': 'Pi config',
                                                 'key' : 'Ul2H1CLu',
                                                 'ltyp': 'file_log',
-                                                'actn': '/boot/config.txt',
+                                                'actn': '/boot/config-user.txt',
                                             },
                                           ],
                                 },

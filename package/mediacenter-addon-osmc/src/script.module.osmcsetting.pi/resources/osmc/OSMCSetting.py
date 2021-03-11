@@ -174,7 +174,7 @@ Overclock settings are set using the Pi Overclock module."""
 
 		# the location of the config file FOR TESTING ONLY
 		try:								
-			self.config_location = '/boot/config.txt'
+			self.config_location = '/boot/config-user.txt'
 
 			self.populate_misc_info()
 
