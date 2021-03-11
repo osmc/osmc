@@ -24,8 +24,6 @@ if [ "$1" = "install" -o "$1" = "upgrade" ]; then
         else
             rm -f /boot/testrw
         fi
-        # This prevents vfat symlink errors
-        rm -f /boot/config.txt
 	systemctl stop brcm43xx.service >/dev/null 2>&1
 	exit 0
 fi
