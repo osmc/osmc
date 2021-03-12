@@ -1,0 +1,46 @@
+From 965ef2c10fb32b114cdb682be4b95f77f47da7fe Mon Sep 17 00:00:00 2001
+From: Dom Cobley <popcornmix@gmail.com>
+Date: Thu, 11 Mar 2021 19:20:01 +0000
+Subject: [PATCH] drm/vc4: crtc: Reduce PV fifo threshold on hvs4
+
+Experimentally have found PV on hv4 reports fifo full
+error with expected settings and does not with one less
+
+This appears as:
+[drm:drm_atomic_helper_wait_for_flip_done] *ERROR* [CRTC:82:crtc-3] flip_done timed out
+
+with bit 10 of PV_STAT set "HVS driving pixels when the PV FIFO is full"
+
+Signed-off-by: Dom Cobley <popcornmix@gmail.com>
+---
+ drivers/gpu/drm/vc4/vc4_crtc.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/gpu/drm/vc4/vc4_crtc.c b/drivers/gpu/drm/vc4/vc4_crtc.c
+index a3439756594c6..5b762ae6715b1 100644
+--- a/drivers/gpu/drm/vc4/vc4_crtc.c
++++ b/drivers/gpu/drm/vc4/vc4_crtc.c
+@@ -210,6 +210,9 @@ static u32 vc4_get_fifo_full_level(struct vc4_crtc *vc4_crtc, u32 format)
+ {
+ 	const struct vc4_crtc_data *crtc_data = vc4_crtc_to_vc4_crtc_data(vc4_crtc);
+ 	const struct vc4_pv_data *pv_data = vc4_crtc_to_vc4_pv_data(vc4_crtc);
++	struct drm_crtc *crtc = &vc4_crtc->base;
++	struct drm_device *dev = crtc->dev;
++	struct vc4_dev *vc4 = to_vc4_dev(dev);
+ 	u32 fifo_len_bytes = pv_data->fifo_depth;
+ 
+ 	/*
+@@ -238,6 +241,13 @@ static u32 vc4_get_fifo_full_level(struct vc4_crtc *vc4_crtc, u32 format)
+ 		if (crtc_data->hvs_output == 5)
+ 			return 32;
+ 
++		/*
++		 * Experimentally have found PV on hv4 reports fifo full
++		 * error with expected settings and does not with one less
++		 */
++		if (!vc4->hvs->hvs5)
++			return fifo_len_bytes - 3 * HVS_FIFO_LATENCY_PIX - 1;
++
+ 		return fifo_len_bytes - 3 * HVS_FIFO_LATENCY_PIX;
+ 	}
+ }
