@@ -157,6 +157,8 @@ void BootloaderConfig::configureEnvironment()
                 cmdlineStringList << " ip=" + network->getIP() + "::" + network->getGW() + ":" + network->getMask() + ":osmc:eth0:off:" + network->getDNS1() + ":" + network->getDNS2();
             cmdlineStringList << " rootwait quiet ";
         }
+	cmdlineStringList << "osmcdev=" << utils->getOSMCDev();
+        utils->writeToFile(cmdlineFile, cmdlineStringList, false);
         cmdlineFile.close();
     }
     if (utils->getOSMCDev() == "vero1") /* We only use 1x identifier for WiFi chip, so make it 'vero' later */
