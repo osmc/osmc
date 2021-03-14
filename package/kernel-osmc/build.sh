@@ -180,6 +180,7 @@ then
                 mv arch/arm64/boot/dts/broadcom/*.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/ || true
                 mv arch/arm*/boot/dts/overlays/*.dtbo ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays || true
                 mv arch/arm/boot/dts/overlays/README ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays || true
+                mv arch/arm/boot/dts/overlays/overlay_map.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/ || true # This is a hack for Pi 4, because overlay_map.dtb isn't present in arm64 directory
         fi
 	if [ "$1" == "vero364" ]
         then
