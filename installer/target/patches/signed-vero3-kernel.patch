@@ -1,0 +1,10 @@
+--- a/linux/linux.mk	2021-03-17 21:29:27.386052266 +0000
++++ b/linux/linux.mk	2021-03-17 22:51:56.512510478 +0000
+@@ -207,6 +207,7 @@
+ 	$(if $(BR2_LINUX_KERNEL_APPENDED_DTB),
+ 		$(call KCONFIG_ENABLE_OPT,CONFIG_ARM_APPENDED_DTB,$(@D)/.config))
+ 	yes '' | $(TARGET_MAKE_ENV) $(MAKE1) $(LINUX_MAKE_FLAGS) -C $(@D) oldconfig
++	cd $(@D); ARCH=arm64 scripts/kconfig/merge_config.sh .config arch/arm64/configs/enforce-kernel-module-signature.fragment
+ endef
+ 
+ ifeq ($(BR2_LINUX_KERNEL_DTS_SUPPORT),y)
