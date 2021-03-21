@@ -100,6 +100,18 @@ then
 	mv INSTALLER/* /mnt
 	mv *.dtb /mnt
 	mv overlays /mnt
+	if [ "$1" == "rbp4" ]
+	then
+		rm /mnt/*rpi-b*.dtb
+		rm /mnt/*rpi-*3*.dtb
+		rm /mnt/*rpi-*2*.dtb
+		rm /mnt/bcm2835*.dtb
+		rm /mnt/bcm2708*.dtb
+	fi
+	if [ "$1" == "rbp2" ]
+	then
+		rm /mnt/bcm2711-rpi-*.dtb
+	fi
 fi
 if [ "$1" == "vero3" ]
 then
