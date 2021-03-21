@@ -31,8 +31,8 @@ function fix_arch_ctl()
 function strip_files()
 {
 	echo -e "Stripping binaries"
-	strip -s "${1}/usr/osmc/lib/*.so.*" > /dev/null 2>&1
-	strip -s "${1}/usr/osmc/lib/*.a" > /dev/null 2>&1
+	for file in $(find ${1}/usr/osmc/lib/ -type f -name "*.so*"); do strip -s $file; done
+	for file in $(find ${1}/usr/osmc/lib/ -type f -name "*.a"); do strip -s $file; done
 	strip -s "${1}/usr/bin/*" >/dev/null 2>&1
 	strip -s "${1}/usr/sbin/*" >/dev/null 2>&1
 }
