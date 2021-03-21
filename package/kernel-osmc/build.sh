@@ -181,6 +181,18 @@ then
                 mv arch/arm*/boot/dts/overlays/*.dtbo ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays || true
                 mv arch/arm/boot/dts/overlays/README ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays || true
                 mv arch/arm/boot/dts/overlays/overlay_map.dtb ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/overlays || true # This is a hack for Pi 4, because overlay_map.dtb isn't present in arm64 directory
+                if [ "$1" == "rbp2" ]
+                then
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/bcm2711-rpi-*.dtb
+                fi
+                if [ "$1" == "rbp464" ]
+                then
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/*rpi-b*.dtb
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/*rpi-*3*.dtb
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/*rpi-*2*.dtb
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/bcm2835*.dtb
+                        rm ../../files-image/boot/dtb-${VERSION}-${REV}-osmc/bcm2708*.dtb
+               fi
         fi
 	if [ "$1" == "vero364" ]
         then
