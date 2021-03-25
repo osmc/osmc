@@ -1,6 +1,6 @@
---- /dev/null	2021-01-22 17:43:19.442968374 +0000
-+++ b/.config	2021-03-06 17:43:50.405516345 +0000
-@@ -0,0 +1,5989 @@
+--- /dev/null	2021-03-25 22:18:28.982818921 +0000
++++ b/.config	2021-03-25 19:46:27.632268410 +0000
+@@ -0,0 +1,5995 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 4.9.113 Kernel Configuration
@@ -5122,7 +5122,12 @@
 +# FPGA Configuration Support
 +#
 +# CONFIG_FPGA is not set
-+# CONFIG_TEE is not set
++CONFIG_TEE=y
++
++#
++# TEE drivers
++#
++CONFIG_OPTEE=y
 +
 +#
 +# Mali GPU OpenGL device driver
@@ -5173,6 +5178,7 @@
 +# CONFIG_RTL8822BS_OARS_CONCUR is not set
 +CONFIG_RTL8822CS=m
 +# CONFIG_RTL8822CS_OARS_CONCUR is not set
++CONFIG_OSMC_VIDEOENHANCEMENT=y
 +
 +#
 +# Firmware Drivers
