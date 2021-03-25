@@ -249,13 +249,6 @@ then
 		sign_module $file
 		cp $file ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc
 		done
-		# Build OpTEE modules for secureOSMC
-		$BUILD M=drivers/osmc/secureosmc
-		mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
-		sign_module "drivers/osmc/secureosmc/optee/optee_armtz.ko"
-		sign_module "drivers/osmc/secureosmc/optee.ko"
-		cp drivers/osmc/secureosmc/optee/optee_armtz.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
-		cp drivers/osmc/secureosmc/optee.ko ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc/secureosmc
 	fi
 	# Unset architecture
 	ARCH=$(arch)
