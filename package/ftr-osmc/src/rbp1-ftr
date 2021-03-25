@@ -16,7 +16,7 @@ depmod
 if [ -f $PRESEED_FILE ]
 then
     sed 's/^M$//' -i $PRESEED_FILE
-    python /usr/bin/preseed &
+    python3 /usr/bin/preseed &
 fi
 if [ -f $POSTINST_FILE ]
 then
