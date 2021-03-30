@@ -38,9 +38,9 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         self.short_name_i18n = 32054
 
         self.description = 'The Raspberry Pi doesn\'t have a conventional BIOS. ' \
-                           'System configuration parameters are stored in a "config.txt" file. ' \
+                           'System configuration parameters are stored in a "config-user.txt" file. ' \
                            'For more detail, visit http://elinux.org/RPiconfig[CR]This settings ' \
-                           'module allows you to edit your config.txt from within OSMC using a ' \
+                           'module allows you to edit your config-user.txt from within OSMC using a ' \
                            'graphical interface.[CR][CR]The module includes:' \
                            '[CR]- display rotation[CR]- hdmi_safe & hdmi_boost' \
                            '[CR]- hdmi_group & hdmi_mode[CR]- function to save edid to file[CR]' \
@@ -48,11 +48,11 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
                            '- MPG2 & WVC1 licences (including status)[CR]' \
                            '- your Pi\'s serial number[CR][CR]Finally, there is a Config Editor ' \
                            'that will allow you to quickly add, edit, or delete lines in your ' \
-                           'config.txt.[CR][CR]Overclock settings are set using the ' \
+                           'config-user.txt.[CR][CR]Overclock settings are set using the ' \
                            'Pi Overclock module.'
         self.description_i18n = 32055
 
-        self.config_location = '/boot/config.txt'
+        self.config_location = '/boot/config-user.txt'
         self.populate_misc_info()
 
         try:
@@ -63,15 +63,15 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
             log(traceback.format_exc())
 
     def run(self):
-        # read the config.txt file every time the settings are opened. This is unavoidable because
-        # it is possible for the user to have made manual changes to the config.txt while
+        # read the config-user.txt file every time the settings are opened. This is unavoidable because
+        # it is possible for the user to have made manual changes to the config-user.txt while
         # OSG is active.
         config = osmc_reparser.read_config_file(self.config_location)
 
         extracted_settings = osmc_reparser.config_to_kodi(osmc_reparser.MASTER_SETTINGS, config)
 
         # load the settings into kodi
-        log('Settings extracted from the config.txt')
+        log('Settings extracted from the config-user.txt')
         for k, v in extracted_settings.items():
             log("%s : %s" % (k, v))
             self.me.setSetting(k, str(v))
@@ -82,7 +82,7 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         # retrieve the new settings from kodi
         new_settings = self.settings_retriever_xml()
 
-        log('New settings applied to the config.txt')
+        log('New settings applied to the config-user.txt')
         for k, v in new_settings.items():
             log("%s : %s" % (k, v))
 
@@ -94,10 +94,10 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
                                                     config, new_settings)
 
         # write the new lines to the temporary config file
-        osmc_reparser.write_config_file('/var/tmp/config.txt', new_settings)
+        osmc_reparser.write_config_file('/var/tmp/config-user.txt', new_settings)
 
-        # copy over the temp config.txt to /boot/ as superuser
-        subprocess.call(["sudo", "mv", '/var/tmp/config.txt', self.config_location])
+        # copy over the temp config-user.txt to /boot/ as superuser
+        subprocess.call(["sudo", "mv", '/var/tmp/config-user.txt', self.config_location])
 
         DIALOG.notification(self.lang(32095), self.lang(32096))
 
@@ -134,7 +134,7 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         self.me.setSetting('serial', serial)
 
     def clean_user_config(self):
-        """ Comment out problematic lines in the users config.txt """
+        """ Comment out problematic lines in the users config-user.txt """
         patterns = [
             r".*=.*\[remove\].*",
             r".*=remove",
@@ -144,7 +144,7 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         new_config = osmc_reparser.clean_config(config, patterns)
 
         # write the new lines to the temporary config file
-        osmc_reparser.write_config_file('/var/tmp/config.txt', new_config)
+        osmc_reparser.write_config_file('/var/tmp/config-user.txt', new_config)
 
-        # copy over the temp config.txt to /boot/ as superuser
-        subprocess.call(["sudo", "mv", '/var/tmp/config.txt', self.config_location])
+        # copy over the temp config-user.txt to /boot/ as superuser
+        subprocess.call(["sudo", "mv", '/var/tmp/config-user.txt', self.config_location])
