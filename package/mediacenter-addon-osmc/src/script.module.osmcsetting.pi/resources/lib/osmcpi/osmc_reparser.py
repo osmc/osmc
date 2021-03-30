@@ -1253,12 +1253,12 @@ def clean_config(config, patterns):
 
 
 if __name__ == "__main__":
-    _config_txt = read_config_file('/boot/config.txt')
+    _config_txt = read_config_file('/boot/config-user.txt')
     _original_config = _config_txt[::]
 
     _extracted_settings = config_to_kodi(MASTER_SETTINGS, _config_txt)
     _new_settings = kodi_to_config(MASTER_SETTINGS, _original_config, _extracted_settings)
 
-    write_config_file('/var/tmp/config.txt', _new_settings)
+    write_config_file('/var/tmp/config-user.txt', _new_settings)
 
-    subprocess.call(["sudo", "mv", '/var/tmp/config.txt', '/boot/config.txt'])
+    subprocess.call(["sudo", "mv", '/var/tmp/config-user.txt', '/boot/config-user.txt'])
