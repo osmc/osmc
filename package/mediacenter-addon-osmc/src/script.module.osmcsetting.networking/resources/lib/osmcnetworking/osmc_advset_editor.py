@@ -13,7 +13,7 @@ import re
 import subprocess
 from io import open
 
-import xbmc
+import xbmcvfs
 import xmltodict as xmltodict
 
 
@@ -33,7 +33,7 @@ class AdvancedSettingsEditor(object):
         """
             Parses the advancedsettings.xml file. Returns a dict with ALL the details.
         """
-        user_data = xbmc.translatePath('special://userdata')
+        user_data = xbmcvfs.translatePath('special://userdata')
         loc = os.path.join(user_data, 'advancedsettings.xml')
 
         null_doc = {
