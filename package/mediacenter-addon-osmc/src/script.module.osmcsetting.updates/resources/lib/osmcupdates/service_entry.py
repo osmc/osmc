@@ -24,6 +24,7 @@ import apt
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 from osmccommon import osmc_comms
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
@@ -263,8 +264,8 @@ class Main(object):
     @property
     def lib_path(self):
         if not self._lib_path:
-            self._lib_path = xbmc.translatePath(os.path.join(self.path, 'resources',
-                                                             'lib', 'osmcupdates'))
+            self._lib_path = xbmcvfs.translatePath(os.path.join(self.path, 'resources',
+                                                                'lib', 'osmcupdates'))
         return self._lib_path
 
     def _daemon(self):

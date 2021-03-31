@@ -15,9 +15,9 @@ import traceback
 from io import open
 from xml.etree import ElementTree
 
-import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 from osmccommon.osmc_logging import StandardLogger
 
 ADDON_ID = 'service.osmc.settings'
@@ -34,11 +34,11 @@ class UbiquiFonts:
         _logger = StandardLogger(addon_id, os.path.basename(__file__))
         self.log = _logger.log
 
-        self.resource_folder = xbmc.translatePath(
+        self.resource_folder = xbmcvfs.translatePath(
             os.path.join(addon.getAddonInfo('path'), 'resources')
         )
 
-        self.font_folder = xbmc.translatePath(
+        self.font_folder = xbmcvfs.translatePath(
             os.path.join(self.resource_folder, 'skins', 'Default', 'fonts')
         )
 
@@ -116,7 +116,7 @@ class UbiquiFonts:
         return os.path.join(skin_folder, folder)
 
     def import_osmc_fonts(self):
-        skin_folder = xbmc.translatePath('special://skin')
+        skin_folder = xbmcvfs.translatePath('special://skin')
 
         self.log('skin_folder: %s' % skin_folder)
 

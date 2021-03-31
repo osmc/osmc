@@ -19,9 +19,9 @@ from io import open
 
 import requests
 
-import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 from osmccommon.osmc_logging import clog
@@ -57,7 +57,7 @@ APF JSON STRUCTURE
 """
 
 ADDON_ID = "script.module.osmcsetting.apfstore"
-ADDON_DATA = xbmc.translatePath('special://userdata/addon_data/%s/' % ADDON_ID)
+ADDON_DATA = xbmcvfs.translatePath('special://userdata/addon_data/%s/' % ADDON_ID)
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 

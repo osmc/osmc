@@ -22,6 +22,7 @@ import requests
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 
@@ -249,8 +250,8 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
         self.selected_country = None
 
         # textures for the skin image
-        media_path = xbmc.translatePath(os.path.join(strFallbackPath, 'resources',
-                                                     'skins', 'Default', 'media'))
+        media_path = xbmcvfs.translatePath(os.path.join(strFallbackPath, 'resources',
+                                                        'skins', 'Default', 'media'))
         self.osmc_skin_image = os.path.join(media_path, 'osmc_preview.jpg')
         self.conf_skin_image = os.path.join(media_path, 'conf_preview.jpg')
 

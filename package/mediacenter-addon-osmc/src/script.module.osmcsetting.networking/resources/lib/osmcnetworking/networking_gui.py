@@ -19,6 +19,7 @@ from io import open
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 
@@ -858,7 +859,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 # if the dictionary is empty, don't write anything
                 return
 
-        user_data = xbmc.translatePath("special://userdata")
+        user_data = xbmcvfs.translatePath("special://userdata")
         loc = os.path.join(user_data, 'advancedsettings.xml')
 
         try:

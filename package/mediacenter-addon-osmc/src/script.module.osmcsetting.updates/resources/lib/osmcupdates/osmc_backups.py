@@ -171,7 +171,7 @@ class OSMCBackup(object):
         """
             returns the location of the kodi folder
         """
-        return xbmc.translatePath('special://home')
+        return xbmcvfs.translatePath('special://home')
 
     def create_backup_file_list(self):
         """
@@ -213,7 +213,7 @@ class OSMCBackup(object):
 
         # check locally
         try:
-            st = os.statvfs(xbmc.translatePath('special://temp'))
+            st = os.statvfs(xbmcvfs.translatePath('special://temp'))
 
             requirement = self.estimate_disk_requirement()
             if st.f_frsize:
@@ -329,7 +329,7 @@ class OSMCBackup(object):
         # get the tag for the backup file
         tag = self.generate_tarball_name()
         # generate name for temporary tarball
-        local_tarball_name = os.path.join(xbmc.translatePath('special://temp'), FILE_PATTERN % tag)
+        local_tarball_name = os.path.join(xbmcvfs.translatePath('special://temp'), FILE_PATTERN % tag)
         # generate name for remote tarball
         remote_tarball_name = os.path.join(location, FILE_PATTERN % tag)
         # get the size of all the files that are being backed up
@@ -351,7 +351,7 @@ class OSMCBackup(object):
             'message': self.lang(32159)
         })
 
-        new_root = xbmc.translatePath('special://home')
+        new_root = xbmcvfs.translatePath('special://home')
 
         try:
             with tarfile.open(name=local_tarball_name, mode="w:gz") as tar:
@@ -489,7 +489,7 @@ class OSMCBackup(object):
 
                 # this requires copying the tar_file from its stored location, to kodi/temp
                 # xbmcvfs cannot read into tar files without copying the whole thing to memory
-                temp_copy = os.path.join(xbmc.translatePath('special://temp'), basename)
+                temp_copy = os.path.join(xbmcvfs.translatePath('special://temp'), basename)
 
                 result = xbmcvfs.copy(remote_file, temp_copy)
                 if not result:
@@ -583,7 +583,7 @@ class OSMCBackup(object):
                 if overwrite == 0:
                     # restore over existing files
                     log('User has chosen to overwrite existing files.')
-                    restore_location = xbmc.translatePath('special://home')
+                    restore_location = xbmcvfs.translatePath('special://home')
 
                     # check the restore_items for guisettings.xml, if found then restore that
                     # to the addon_data folder, create the /RESET_GUISETTINGS file and write
