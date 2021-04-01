@@ -82,6 +82,7 @@ then
 	handle_dep "rsync"
 	handle_dep "openssl"
 	handle_dep "bc"
+	handle_dep "kmod"
         if [ "$1" == "vero364" ]
         then
 	    handle_dep "python"
