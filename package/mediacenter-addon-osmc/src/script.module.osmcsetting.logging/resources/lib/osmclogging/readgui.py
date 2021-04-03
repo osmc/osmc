@@ -132,7 +132,8 @@ class GuiParser(object):
             if options is not None:
                 system_settings[_id]['options'] = {}
                 for o in options:
-                    system_settings[_id]['options'][o.text] = o.attrib['label']
+                    if 'label' in o.attrib:
+                        system_settings[_id]['options'][o.text] = o.attrib['label']
 
             default = setting.find('default')
             if default is not None:
