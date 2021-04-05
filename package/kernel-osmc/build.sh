@@ -24,10 +24,10 @@ fi
 }
 
 . ../common.sh
-test $1 == rbp2 && VERSION="5.10.22" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == rbp464 && VERSION="5.10.22" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == rbp2 && VERSION="5.10.22" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == rbp464 && VERSION="5.10.22" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == vero364 && VERSION="4.9.113" && REV="33" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == vero364 && VERSION="4.9.113" && REV="34" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -170,7 +170,26 @@ then
 	mkdir -p ../../files-debug/var/osmc
 	cp vmlinux ../../files-debug/var/osmc/${1}-debug-${VERSION}-${REV}-osmc
 	# Install headers in to headers package
-        $BUILD headers_install INSTALL_HDR_PATH=../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
+	mkdir -p ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
+       find arch block certs crypto Documentation drivers fs init ipc kernel lib mm net samples security sound tools usr virt \
+       -type f \
+       \( -name Kconfig\* -o -name Kbuild\* -o -name Makefile\* -o -name \*\.pl \) \
+       -print0  | rsync  -a --files-from=- --from0 . ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
+       find arch/$ARCH  \
+       -type f \
+       \( -name Kconfig\* -o -name Kbuild\* -o -name Makefile\* -o -name \*\.[hS] -o -name \*\.lds \
+       -o -name \*\.pl -o -name \*\.sh -o -name \*\.tbl -o -name \*-type \) \
+       -print0 | rsync -a --files-from=- --from0 . ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
+       cp -ar include Kconfig Kbuild Makefile Module.symvers scripts  ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
+       find ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/scripts -type f \( -name \*\.cmd -o -name \*\.o \) -delete
+	# Fix symbolic links 1) first remove wrong ones from kernel image.
+	rm ../../files-image/lib/modules/${VERSION}-${REV}-osmc/source
+	rm ../../files-image/lib/modules/${VERSION}-${REV}-osmc/build
+	# Fix symbolic links 2) add source and build symbolic links to appropriate packages
+	mkdir -p ../../files-headers/lib/modules/${VERSION}-${REV}-osmc
+	mkdir -p ../../files-source/lib/modules/${VERSION}-${REV}-osmc
+	ln -s /usr/src/${1}-headers-${VERSION}-${REV}-osmc ../../files-headers/lib/modules/${VERSION}-${REV}-osmc/build
+	ln -s /usr/src/${1}-source-${VERSION}-${REV}-osmc ../../files-source/lib/modules/${VERSION}-${REV}-osmc/source
 	if [ $? != 0 ]; then echo "Building kernel packages failed" && exit 1; fi
 	# Make modules directory
 	mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers
