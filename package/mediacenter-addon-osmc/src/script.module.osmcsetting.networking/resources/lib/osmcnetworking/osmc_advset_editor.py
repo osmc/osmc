@@ -33,8 +33,7 @@ class AdvancedSettingsEditor(object):
         """
             Parses the advancedsettings.xml file. Returns a dict with ALL the details.
         """
-        user_data = xbmcvfs.translatePath('special://userdata')
-        loc = os.path.join(user_data, 'advancedsettings.xml')
+        loc = xbmcvfs.translatePath('special://userdata/advancedsettings.xml')
 
         null_doc = {
             'advancedsettings': {}
@@ -54,7 +53,7 @@ class AdvancedSettingsEditor(object):
                 raise
 
             with open(loc, 'r', encoding='utf-8') as open_file:
-                doc = xmltodict.parse(open_file)
+                doc = xmltodict.parse(open_file.read(), encoding='utf-8')
 
             # ensure empty advancedsettings nodes are ignored
             if not doc.get('advancedsettings', None):
