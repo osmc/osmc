@@ -827,8 +827,12 @@ class Main(object):
         self.log_blotter.extend([SECTION_END % (name, key)])
 
     def write_to_screen(self):
+        self.write_to_temp_file()
 
-        print(''.join(self.log_blotter))
+        with open(TEMP_LOG_FILE, 'r', encoding='utf-8') as f:
+            screen_dump = ''.join(f.readlines())
+
+        print(screen_dump)
 
     def write_to_temp_file(self):
         """ Writes the logs to a single temporary file """
