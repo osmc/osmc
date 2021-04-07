@@ -55,6 +55,15 @@ SETTINGS_LIST = [
     ('videoscreen', 'whitelist'),
 ]
 
+STRING_MAP = [
+    (('videoplayer', 'useamcodecmpeg2'), 'Accelerate MPEG2'),
+    (('videoplayer', 'useamcodecmpeg4'), 'Accelerate MPEG4'),
+    (('videoplayer', 'useamcodech264'), 'Accelerate h264'),
+    (('videoscreen', 'force422'), 'Force 422 colour subsampling'),
+    (('videoscreen', 'forcergb'), 'Force RGB output'),
+    (('videoscreen', 'lockhpd'), 'Lock HDMI HPD'),
+]
+
 
 class GuiParser(object):
 
@@ -104,6 +113,9 @@ class GuiParser(object):
                                 except IndexError:
                                     system_strings[msgctxt] = 'string failed - %s' % line # noqa E501
                                 break
+
+            # strings that have been since removed
+            system_strings['39000'] = 'HD and up'
 
         except Exception:
             tb = traceback.format_exc()
@@ -220,7 +232,10 @@ class GuiParser(object):
             try:
                 label = self.system_strings[section['label']]
             except Exception:
-                label = _setting
+                try:
+                    label = next(string[1] for string in STRING_MAP if string[0] == _setting)
+                except Exception:
+                    label = _setting
 
             if section.get('options', None):
                 lo = section.get('options', {}).get(setting.text, 'failed')
