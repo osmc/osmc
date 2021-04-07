@@ -575,6 +575,7 @@ class CommandLine(object):
             ps = subprocess.Popen(chunk, stdin=ps.stdout, stdout=subprocess.PIPE)
 
         res = subprocess.check_output(self.command_list, stdin=ps.stdout)
+        res = res.decode('utf-8')
 
         return res
 
@@ -816,7 +817,7 @@ class Main(object):
 
         try:
             if ltyp == 'file_log':
-                with open(actn, encoding='utf-8') as f:
+                with open(actn, 'r', encoding='utf-8') as f:
                     self.log_blotter.extend(f.readlines())
             else:
                 with CommandLineInterface(actn) as f:
@@ -829,7 +830,7 @@ class Main(object):
     def write_to_screen(self):
         self.write_to_temp_file()
 
-        with open(TEMP_LOG_FILE, 'r', encoding='utf-8') as f:
+        with open(TEMP_LOG_FILE, 'rb') as f:
             screen_dump = ''.join(f.readlines())
 
         print(screen_dump)
@@ -837,15 +838,11 @@ class Main(object):
     def write_to_temp_file(self):
         """ Writes the logs to a single temporary file """
         # clean up the blotter
-        self.log_blotter = [x.replace('\0', '') for x in self.log_blotter if hasattr(x, 'replace')]
-        if PY2:
-            self.log_blotter = [
-                x.decode('utf-8', 'ignore') if isinstance(x, str) else x
-                for x in self.log_blotter
-            ]
-        try:
-            with open(TEMP_LOG_FILE, 'w', encoding='utf-8') as f:
+        self.log_blotter = [x.replace('\0', '').replace('\ufeff', '').encode('utf-8')
+                            for x in self.log_blotter if hasattr(x, 'replace')]
 
+        try:
+            with open(TEMP_LOG_FILE, 'wb') as f:
                 # write the blotter contents
                 f.writelines(self.log_blotter)
 
