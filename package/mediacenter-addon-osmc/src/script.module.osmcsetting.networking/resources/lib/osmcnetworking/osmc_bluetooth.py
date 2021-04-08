@@ -71,7 +71,7 @@ class OSMCBluetooth:
     @property
     def lib_path(self):
         if not self._lib_path:
-            self._lib_path = os.path.join(self.path, 'resources', 'lib').rstrip('/') + '/'
+            self._lib_path = os.path.join(self.path, 'resources', 'lib', 'osmcnetworking').rstrip('/') + '/'
         return self._lib_path
 
     @staticmethod

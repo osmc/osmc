@@ -1808,8 +1808,10 @@ class BluetoothPopulationThread(threading.Thread):
             except:
                 pass
 
-        map(lambda addr, info: list_control.addItem(self.create_bluetooth_item(addr, info)),
-            devices_dict.items())
+        devices = list(devices_dict.items())
+        for device in devices:
+            bluetooth_item = self.create_bluetooth_item(device[0], device[1])
+            list_control.addItem(bluetooth_item)
 
     @staticmethod
     def create_bluetooth_item(address, info):
