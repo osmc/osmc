@@ -380,7 +380,7 @@ def get_wifi_networks():
                 wifi_settings['Security'] = str(security_props[0])
 
             if 'hidden' not in path:
-                wifi_settings['SSID'] = dbus_properties['Name'].encode('UTF-8')
+                wifi_settings['SSID'] = dbus_properties['Name']
 
             else:
                 wifi_settings['SSID'] = '< Hidden (' + wifi_settings['Security'] + ') >'
@@ -410,13 +410,6 @@ def wifi_connect(path, password=None, ssid=None, script_base_path=None):
         agent_needed = True
         print('Starting Wireless Agent')
         with open('/tmp/preseed_data', 'w', encoding='utf-8') as key_file:
-            if PY2:
-                if not isinstance(password, unicode):
-                    password = password.decode('utf-8')
-
-                if not isinstance(ssid, unicode):
-                    ssid = ssid.decode('utf-8')
-
             if password:
                 print('Setting password')
                 key_file.write(password)

@@ -277,7 +277,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
     @property
     def lib_path(self):
         if not self._lib_path:
-            self._lib_path = os.path.join(self.path, 'resources', 'lib').rstrip('/') + '/'
+            self._lib_path = os.path.join(self.path, 'resources', 'lib', 'osmcnetworking').rstrip('/') + '/'
         return self._lib_path
 
     @property
@@ -1336,6 +1336,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             if connect or hiddenssid:
                 self.show_busy_dialogue()
 
+                hiddenssid = hiddenssid or ssid
                 # try without a password see if connman has the password
                 connection_status = osmc_network.wifi_connect(path, None,
                                                               hiddenssid, self.lib_path)
