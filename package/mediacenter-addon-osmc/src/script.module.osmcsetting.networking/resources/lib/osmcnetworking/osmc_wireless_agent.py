@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     if len(argv()) >= 2:
         for _arg in argv()[1:]:
             if _arg.startswith("fromfile"):
-                with open("/tmp/preseed_data") as key_file:
+                with open("/tmp/preseed_data", 'r', encoding='utf-8') as key_file:
                     data = key_file.read()
 
                 lines = data.split('\n')
