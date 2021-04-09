@@ -1,0 +1,12 @@
+[Unit]
+Description=VideoEnhancement prober for OSMC SecureOS
+After=apploader.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 5
+ExecStart=/bin/sh -c "echo 'osmc_videoenhancement' > /sys/bus/tee/drivers_probe"
+
+[Install]
+WantedBy=apploader.target
+
