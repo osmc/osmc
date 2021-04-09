@@ -1,3 +1,4 @@
+#!usr/bin/python3
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -21,8 +22,6 @@ from datetime import datetime
 
 import apt
 
-PY3 = sys.version_info.major == 3
-
 
 def argv():
     return sys.argv
@@ -39,8 +38,7 @@ def call_parent(raw_message, data=None):
     try:
         with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
             open_socket.connect('/var/tmp/osmc.settings.update.sockfile')
-            if PY3 and not isinstance(message, (bytes, bytearray)):
-                message = message.encode('utf-8')
+            message = message.encode('utf-8')
             open_socket.sendall(message)
 
     except Exception as e:

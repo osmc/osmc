@@ -264,8 +264,8 @@ class Main(object):
     @property
     def lib_path(self):
         if not self._lib_path:
-            self._lib_path = xbmcvfs.translatePath(os.path.join(self.path, 'resources',
-                                                                'lib', 'osmcupdates'))
+            self._lib_path = xbmcvfs.translatePath(
+                os.path.join(self.path, 'resources', 'lib', 'osmcupdates')).rstrip('/') + '/'
         return self._lib_path
 
     def _daemon(self):
@@ -451,7 +451,7 @@ class Main(object):
         if self.check_for_unsupported_version() == 'alpha':
             return
 
-        subprocess.Popen(['sudo', 'python', '%s/apt_cache_action.py' % self.lib_path, action])
+        subprocess.Popen(['sudo', 'python3', os.path.join(self.lib_path, 'apt_cache_action.py'), action])
 
     def position_icon(self):
         """
@@ -707,7 +707,7 @@ class Main(object):
         # check for sufficient space, only proceed if it is available
         root_space, _ = self.check_target_location_for_size(location='/', requirement=300)
         if root_space:
-            subprocess.Popen(['sudo', 'python', '%s/apt_cache_action.py' % self.lib_path,
+            subprocess.Popen(['sudo', 'python3', os.path.join(self.lib_path, 'apt_cache_action.py'),
                               'action_list', action])
 
         else:
