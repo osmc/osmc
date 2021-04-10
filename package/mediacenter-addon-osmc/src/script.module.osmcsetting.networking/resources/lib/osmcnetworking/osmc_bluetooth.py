@@ -185,6 +185,9 @@ class OSMCBluetooth:
                 dbus_dict = managed_objects[path][DEVICE_PATH]
                 device_dict = {}
 
+                if 'Class' not in dbus_dict:
+                    continue
+
                 # remove dbus.String from the key
                 for key in dbus_dict:
                     device_dict[str(key)] = dbus_dict[key]
