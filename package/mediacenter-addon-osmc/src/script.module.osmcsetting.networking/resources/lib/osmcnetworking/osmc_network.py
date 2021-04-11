@@ -466,6 +466,10 @@ def wifi_remove(path):
     except dbus.DBusException:
         print('DBusException removing')
 
+    file_path = path.replace('/net/connman/service/', '/var/lib/connman/')
+    if file_path.startswith('/var/lib/connman/') and os.path.isdir(file_path):
+        subprocess.call(['sudo', 'rm', '-rf', file_path])
+
 
 def get_connected_wifi():
     for address, wifis in get_wifi_networks().items():

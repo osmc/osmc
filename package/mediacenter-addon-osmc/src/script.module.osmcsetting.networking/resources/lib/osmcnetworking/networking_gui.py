@@ -1271,7 +1271,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         if connected == 'False':
             if not self.conn_ssid:  # if we are not connected to a network connect
-                self.connect_to_wifi(ssid, encrypted)
+                self.connect_to_wifi(ssid, encrypted, opt_forget=True)
             else:  # Display a toast asking the user to disconnect first
                 # 'Please disconnect from the current network before connecting'
                 # 'Wireless'
@@ -1306,7 +1306,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 self.clear_busy_dialogue()
 
-    def connect_to_wifi(self, ssid, encrypted, password=None, scan=False):
+    def connect_to_wifi(self, ssid, encrypted, password=None, scan=False, opt_forget=False):
         if scan:
             self.show_busy_dialogue()
             osmc_network.scan_wifi()
@@ -1329,9 +1329,21 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 hiddenssid = DIALOG.input(self.lang(32073))
 
             else:
-                # 'Wireless'   'Connect to'
-                if DIALOG.yesno(self.lang(32041), self.lang(32052) + ' ' + ssid + '?'):
-                    connect = True
+                if not opt_forget or not os.path.isdir(path.replace('/net/connman/service/', '/var/lib/connman/')):
+                    # 'Wireless'   'Connect to'
+                    if DIALOG.yesno(self.lang(32041), self.lang(32052) + ' ' + ssid + '?'):
+                        connect = True
+                else:
+                    selection = DIALOG.select('%s: %s' % (self.lang(32041), self.conn_ssid),
+                                              [self.lang(32052) + ' ' + ssid + '?',
+                                               self.lang(32094) % ssid])
+                    if selection == 0:
+                        connect = True
+
+                    if selection == 1:
+                        self.show_busy_dialogue()
+                        osmc_network.wifi_remove(path)
+                        self.clear_busy_dialogue()
 
             if connect or hiddenssid:
                 self.show_busy_dialogue()
