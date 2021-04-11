@@ -47,10 +47,7 @@
 
 import re
 import subprocess
-import sys
 from io import open
-
-PY2 = sys.version_info.major == 2
 
 
 def config_to_kodi(settings, config):
@@ -1213,11 +1210,6 @@ def write_config_file(location, new_config):
     new_config = [
         x + "\n" if not x.endswith("\n") else x for x in new_config if "remove_this_line" not in x
     ]
-
-    if PY2:
-        new_config = [
-            x.decode('utf-8') if isinstance(x, str) else x for x in new_config
-        ]
 
     with open(location, "w", encoding='utf-8') as f:
         f.writelines(new_config)

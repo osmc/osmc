@@ -10,7 +10,6 @@
 
 import os
 import subprocess
-import sys
 import time
 from io import open
 
@@ -28,7 +27,6 @@ ACTION_SELECT_ITEM = 7
 
 ADDON_ID = "script.module.osmcsetting.pi"
 DIALOG = xbmcgui.Dialog()
-PY2 = sys.version_info.major == 2
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -148,8 +146,6 @@ class ConfigEditorGui(xbmcgui.WindowXMLDialog):
                     with open(tmp_loc, 'w', encoding='utf-8') as open_file:
                         for line in new_config:
                             _line = line.replace(" = ", "=") + '\n'
-                            if PY2 and isinstance(_line, str):
-                                _line = _line.decode('utf-8')
                             open_file.write(_line)
                             log('' + _line)
 

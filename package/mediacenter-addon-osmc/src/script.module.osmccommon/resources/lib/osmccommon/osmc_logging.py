@@ -8,7 +8,6 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-import sys
 import time
 from functools import wraps
 
@@ -18,7 +17,6 @@ except:
     xbmc = None
 
 TEST_LOG_BOOL = True
-PY2 = sys.version_info.major == 2
 
 
 def test_logger(msg):
@@ -46,14 +44,8 @@ class StandardLogger(object):
         if isinstance(message, bytes):
             message = message.decode('utf-8', 'ignore')
 
-        if PY2 and isinstance(message, unicode):
-            message = message.encode('utf-8')
-
         if isinstance(label, bytes):
             label = label.decode('utf-8', 'ignore')
-
-        if PY2 and isinstance(label, unicode):
-            label = label.encode('utf-8')
 
         if label and self.module:
             logmsg = '%s[%s] : %s - %s ' % (self.addon_id, self.module, label, message)

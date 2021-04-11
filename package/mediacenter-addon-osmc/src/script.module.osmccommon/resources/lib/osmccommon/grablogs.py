@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -49,8 +49,6 @@ except ValueError:
 
     def log(value):
         print(value)
-
-PY2 = sys.version_info.major == 2
 
 SECTION_START = '\n====================== %s =================== %s\n'
 SECTION_END = '\n---------------------- %s END --------------- %s\n\n'

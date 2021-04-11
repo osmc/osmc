@@ -23,11 +23,6 @@ try:
 except ImportError:
     import gobject as GObject
 
-try:
-    input = raw_input
-except NameError:
-    pass
-
 PEXPECT_SOL = 'SOL@'
 PEXPECT_EOL = '@EOL'
 

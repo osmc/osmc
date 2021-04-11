@@ -10,7 +10,6 @@
 
 import os
 import subprocess
-import sys
 import traceback
 
 import xbmcaddon
@@ -22,7 +21,6 @@ from .. import osmc_reparser
 
 ADDON_ID = "script.module.osmcsetting.pi"
 DIALOG = xbmcgui.Dialog()
-PY3 = sys.version_info.major == 3
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -117,13 +115,12 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         wvc = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "WVC1"])
         serial_raw = subprocess.check_output(["cat", "/proc/cpuinfo"])
 
-        if PY3:
-            if isinstance(mpg, (bytes, bytearray)):
-                mpg = mpg.decode('utf-8', 'ignore')
-            if isinstance(wvc, (bytes, bytearray)):
-                wvc = wvc.decode('utf-8', 'ignore')
-            if isinstance(serial_raw, (bytes, bytearray)):
-                serial_raw = serial_raw.decode('utf-8', 'ignore')
+        if isinstance(mpg, (bytes, bytearray)):
+            mpg = mpg.decode('utf-8', 'ignore')
+        if isinstance(wvc, (bytes, bytearray)):
+            wvc = wvc.decode('utf-8', 'ignore')
+        if isinstance(serial_raw, (bytes, bytearray)):
+            serial_raw = serial_raw.decode('utf-8', 'ignore')
 
         # grab just the serial number
         serial = serial_raw[serial_raw.index('Serial') + len('Serial'):].replace('\n', '') \

@@ -11,7 +11,6 @@
 import os
 import socket
 import subprocess
-import sys
 import threading
 import traceback
 from io import open
@@ -29,7 +28,6 @@ from .osmc_advset_editor import AdvancedSettingsEditor
 
 ADDON_ID = 'script.module.osmcsetting.networking'
 DIALOG = xbmcgui.Dialog()
-PY2 = sys.version_info.major == 2
 
 WIFI_THREAD_NAME = 'wifi_population_thread'
 BLUETOOTH_THREAD_NAME = 'bluetooth_population_thread'
@@ -1029,7 +1027,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 if (self.current_network_config[self.internet_protocol]['Method'] in
                         ['nfs_dhcp', 'nfs_manual']):
                     with open(self.reboot_required_file, 'w', encoding='utf-8') as open_file:
-                        open_file.write(u'd' if PY2 else 'd')
+                        open_file.write('d')
                     # 'NFS Network Settings'
                     # 'Your Settings will not take effect until you reboot. Reboot Now?''
                     if DIALOG.yesno(self.lang(32036), self.lang(32037)):

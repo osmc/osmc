@@ -20,11 +20,6 @@ try:
 except ImportError:
     import gobject as GObject
 
-try:
-    input = raw_input
-except NameError:
-    pass
-
 
 class Canceled(dbus.DBusException):
     _dbus_error_name = "net.connman.Error.Canceled"

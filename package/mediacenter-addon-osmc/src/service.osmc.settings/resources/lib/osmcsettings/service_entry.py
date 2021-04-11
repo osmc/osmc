@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -14,7 +14,6 @@ import json
 import os
 import socket
 import subprocess
-import sys
 import traceback
 from contextlib import closing
 from copy import deepcopy
@@ -40,7 +39,6 @@ ADDON_ID = 'service.osmc.settings'
 ADDON = xbmcaddon.Addon(ADDON_ID)
 
 DIALOG = xbmcgui.Dialog()
-PY3 = sys.version_info.major == 3
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 lang = LangRetriever(ADDON).lang
@@ -342,7 +340,7 @@ class Main(object):
 
                     with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
                         open_socket.connect('/var/tmp/osmc.settings.update.sockfile')
-                        if PY3 and not isinstance(message, (bytes, bytearray)):
+                        if not isinstance(message, (bytes, bytearray)):
                             message = message.encode('utf-8', 'ignore')
                         open_socket.sendall(message)
 

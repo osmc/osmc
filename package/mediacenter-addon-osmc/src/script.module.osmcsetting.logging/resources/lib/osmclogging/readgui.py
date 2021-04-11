@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
     Copyright (C) 2014-2020 OSMC (KodeKarnage)
@@ -14,11 +14,6 @@ import os.path
 import traceback
 from io import open
 from xml.etree import ElementTree
-
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 GUI_FILE = '.kodi/userdata/guisettings.xml'
 STRINGS_FILE = '/usr/share/kodi/addons/resource.language.en_gb/resources/strings.po'  # noqa E501
@@ -102,16 +97,16 @@ class GuiParser(object):
                 for line in open_file:
                     if line.startswith('msgctxt'):
                         try:
-                            msgctxt = line.split(' ')[1].strip().split('"')[1][1:] # noqa E501
+                            msgctxt = line.split(' ')[1].strip().split('"')[1][1:]  # noqa E501
                         except IndexError:
                             continue
 
                         for line in open_file:
                             if line.startswith('msgid'):
                                 try:
-                                    system_strings[msgctxt] = line.split(' ', 1)[1].strip().split('"')[1] # noqa E501
+                                    system_strings[msgctxt] = line.split(' ', 1)[1].strip().split('"')[1]  # noqa E501
                                 except IndexError:
-                                    system_strings[msgctxt] = 'string failed - %s' % line # noqa E501
+                                    system_strings[msgctxt] = 'string failed - %s' % line  # noqa E501
                                 break
 
             # strings that have been since removed
@@ -314,7 +309,7 @@ class GuiParser(object):
     def go(self):
         try:
             self.gui_settings = ElementTree.parse(self.gui_file).getroot()
-        except FileNotFoundError:
+        except IOError:
             return ['Unable to open guisettings file: {}'.format(self.gui_file)]
         except ElementTree.ParseError as e:
             return ['There was a problem parsing {}'.format(self.gui_file), e]
