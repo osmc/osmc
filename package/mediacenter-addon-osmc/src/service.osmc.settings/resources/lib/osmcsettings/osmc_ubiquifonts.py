@@ -10,7 +10,6 @@
 
 import os
 import subprocess
-import sys
 import traceback
 from io import open
 from xml.etree import ElementTree
@@ -21,7 +20,6 @@ import xbmcvfs
 from osmccommon.osmc_logging import StandardLogger
 
 ADDON_ID = 'service.osmc.settings'
-PY2 = sys.version_info.major == 2
 
 
 class UbiquiFonts:
@@ -167,11 +165,6 @@ class UbiquiFonts:
 
             else:
                 new_lines.append(line)
-
-        if PY2:
-            new_lines = [
-                x.decode('utf-8') if isinstance(x, str) else x for x in new_lines
-            ]
 
         # make backup of original Font.xml
         backup_file = os.path.join(fonts_folder, 'backup_Font.xml')

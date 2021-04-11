@@ -9,7 +9,6 @@
 """
 
 import os
-import sys
 
 import xbmcaddon
 import xbmcgui
@@ -23,7 +22,6 @@ from ..osmc_advset_editor import AdvancedSettingsEditor
 addon_id = "script.module.osmcsetting.networking"
 
 DIALOG = xbmcgui.Dialog()
-PY2 = sys.version_info.major == 2
 
 log = StandardLogger(addon_id, os.path.basename(__file__)).log
 

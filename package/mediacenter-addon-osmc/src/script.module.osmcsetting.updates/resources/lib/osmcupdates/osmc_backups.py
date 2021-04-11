@@ -14,7 +14,6 @@ import math
 import os
 import re
 import subprocess
-import sys
 import tarfile
 import traceback
 from io import open
@@ -80,8 +79,6 @@ LABELS = {
 
 ADDON_ID = 'script.module.osmcsetting.updates'
 DIALOG = xbmcgui.Dialog()
-
-PY2 = sys.version_info.major == 2
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -844,10 +841,7 @@ class OSMCBackup(object):
             # we have to uniquify the list first, as the procedure above could result in multiple
             # commented out lines appearing in the restored fstab
             # it's just easier to remove them here than avoid adding them in the first place
-            if PY2:
-                new_lines = [
-                    x.decode('utf-8') if isinstance(x, str) else x for x in new_lines
-                ]
+
             with open('/tmp/fstab', 'w', encoding='utf-8') as f:
                 f.writelines(self.uniquify(new_lines))
 

@@ -12,8 +12,6 @@ import socket
 import sys
 from contextlib import closing
 
-PY3 = sys.version_info.major == 3
-
 
 def argv():
     return sys.argv
@@ -25,7 +23,7 @@ if len(argv()) > 1:
 
     with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
         open_socket.connect('/var/tmp/osmc.settings.sockfile')
-        if PY3 and not isinstance(message, (bytes, bytearray)):
+        if not isinstance(message, (bytes, bytearray)):
             message = message.encode('utf-8')
         open_socket.sendall(message)
 

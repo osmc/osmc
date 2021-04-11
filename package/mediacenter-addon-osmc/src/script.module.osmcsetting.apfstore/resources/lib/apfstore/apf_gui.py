@@ -11,7 +11,6 @@
 import json
 import os
 import socket
-import sys
 from contextlib import closing
 
 import xbmcaddon
@@ -21,7 +20,6 @@ from osmccommon.osmc_logging import StandardLogger
 from osmccommon.osmc_logging import clog
 
 ADDON_ID = "script.module.osmcsetting.apfstore"
-PY3 = sys.version_info.major == 3
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -172,7 +170,7 @@ class APFGui(xbmcgui.WindowXMLDialog):
 
         with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
             open_socket.connect('/var/tmp/osmc.settings.update.sockfile')
-            if PY3 and not isinstance(message, (bytes, bytearray)):
+            if not isinstance(message, (bytes, bytearray)):
                 message = message.encode('utf-8', 'ignore')
             open_socket.sendall(message)
 

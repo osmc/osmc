@@ -11,15 +11,12 @@
 import os
 import socket
 import subprocess
-import sys
 import threading
 from contextlib import closing
 
 import xbmc
 
 from .osmc_logging import StandardLogger
-
-PY3 = sys.version_info.major == 3
 
 log = StandardLogger('script.module.osmccommon', os.path.basename(__file__)).log
 
@@ -74,11 +71,9 @@ class Communicator(threading.Thread):
             log('Connection stopping.')
             self.stopped = True
 
-            message = 'exit'
+            message = b'exit'
             with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
                 open_socket.connect(self.address)
-                if PY3 and not isinstance(message, (bytes, bytearray)):
-                    message = message.encode('utf-8', 'ignore')
                 open_socket.send(message)
 
             self.sock.close()

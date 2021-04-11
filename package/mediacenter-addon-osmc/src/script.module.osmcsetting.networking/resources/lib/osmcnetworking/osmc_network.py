@@ -24,8 +24,6 @@ import dbus
 from . import connman
 from . import osmc_systemd
 
-PY2 = sys.version_info.major == 2
-
 WIRELESS_AGENT = 'osmc_wireless_agent.py'
 
 ETHERNET_PATH = '/net/connman/service/ethernet'
@@ -217,8 +215,6 @@ def update_cmdline_file(file_path, key, value):
 
     updated_cmdline = ' '.join(cmdline_values)  # join the list with a space
     with open('/tmp/cmdline.txt', 'w', encoding='utf-8') as cmdline_file:
-        if PY2 and not isinstance(updated_cmdline, unicode):
-            updated_cmdline = updated_cmdline.decode('utf-8')
         cmdline_file.write(updated_cmdline)
 
     subprocess.call(['sudo', 'mv', '/tmp/cmdline.txt', file_path])

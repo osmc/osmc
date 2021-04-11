@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
    Original work Copyright 2010 Filia Dova, Georgios Migdos
@@ -11,12 +11,9 @@
 """
 
 import subprocess
-import sys
 import threading
 import time
 from io import open
-
-PY3 = sys.version_info.major == 3
 
 
 class WifiUtilities:
@@ -29,9 +26,7 @@ class WifiUtilities:
         (stdoutdata, stderrdata) = process.communicate()
         lines = stdoutdata.splitlines()
         for line in lines:
-            search_string = "IEEE 802.11"
-            if PY3:
-                search_string = search_string.encode('utf-8')
+            search_string = "IEEE 802.11".encode('utf-8')
             if line.find(search_string) != -1:
                 interfaces.append(line.split()[0])
         return interfaces

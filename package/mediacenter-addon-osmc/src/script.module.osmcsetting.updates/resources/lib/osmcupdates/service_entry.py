@@ -14,7 +14,6 @@ import os
 import random
 import socket
 import subprocess
-import sys
 import traceback
 from contextlib import closing
 from datetime import datetime
@@ -39,8 +38,6 @@ except ImportError:
 
 ADDON_ID = 'script.module.osmcsetting.updates'
 DIALOG = xbmcgui.Dialog()
-PY2 = sys.version_info.major == 2
-PY3 = sys.version_info.major == 3
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -49,7 +46,7 @@ def exit_osmc_settings_addon():
     message = 'exit'
     with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
         open_socket.connect('/var/tmp/osmc.settings.sockfile')
-        if PY3 and not isinstance(message, (bytes, bytearray)):
+        if not isinstance(message, (bytes, bytearray)):
             message = message.encode('utf-8', 'ignore')
         open_socket.sendall(message)
 
@@ -369,7 +366,7 @@ class Main(object):
         # create the file that will prevent further update checks until the updates
         # have been installed
         with open(self.block_update_file, 'w', encoding='utf-8') as f:
-            f.write(u'd' if PY2 else 'd')
+            f.write('d')
 
         # trigger the flag to skip update checks
         self.skip_update_check = True
@@ -901,7 +898,7 @@ class Main(object):
             # create the file that will prevent further update checks until
             # the updates have been installed
             with open(self.block_update_file, 'w', encoding='utf-8') as f:
-                f.write(u'd' if PY2 else 'd')
+                f.write('d')
 
             # turn on the "install now" setting in Settings.xml
             self.addon.setSettingBool('install_now_visible', True)
@@ -1199,7 +1196,7 @@ class Main(object):
                     # create the file that will prevent further update checks until the
                     # updates have been installed
                     with open(self.block_update_file, 'w', encoding='utf-8') as f:
-                        f.write(u'd' if PY2 else 'd')
+                        f.write('d')
 
                     # trigger the flag to skip update checks
                     self.skip_update_check = True
@@ -1244,7 +1241,7 @@ class Main(object):
                                        pkg.shortname])
         log('dpkg query results: %s' % rlv)
 
-        lv = ''.join([x for x in rlv[:rlv.index(b"." if PY3 else ".")] if x in list(dig)])
+        lv = ''.join([x for x in rlv[:rlv.index(b".")] if x in list(dig)])
         log('Local version number: %s' % lv)
 
         # get version of updating package, raw_remote_version_string

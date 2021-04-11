@@ -16,8 +16,6 @@ import sys
 from contextlib import closing
 from datetime import datetime
 
-PY3 = sys.version_info.major == 3
-
 
 def argv():
     return sys.argv
@@ -33,7 +31,7 @@ def call_parent(raw_message, data=None):
     try:
         with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
             open_socket.connect('/var/tmp/osmc.settings.update.sockfile')
-            if PY3 and not isinstance(message, (bytes, bytearray)):
+            if not isinstance(message, (bytes, bytearray)):
                 message = message.encode('utf-8', 'ignore')
             open_socket.sendall(message)
 

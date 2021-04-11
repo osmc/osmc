@@ -10,7 +10,6 @@
 
 import os
 import socket
-import sys
 from contextlib import closing
 
 import xbmcaddon
@@ -19,7 +18,6 @@ from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 
 ADDON_ID = 'service.osmc.settings'
-PY3 = sys.version_info.major == 3
 
 
 def run():
@@ -31,7 +29,7 @@ def run():
         message = 'open'
         with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
             open_socket.connect('/var/tmp/osmc.settings.sockfile')
-            if PY3 and not isinstance(message, (bytes, bytearray)):
+            if not isinstance(message, (bytes, bytearray)):
                 message = message.encode('utf-8', 'ignore')
             open_socket.sendall(message)
 

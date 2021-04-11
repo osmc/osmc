@@ -8,10 +8,6 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
-import sys
-
-PY2 = sys.version_info.major == 2
-
 
 class LangRetriever(object):
     """ Used to retrieve localised strings from the addons po files.
@@ -34,10 +30,6 @@ class LangRetriever(object):
             return str(string_id)
 
         if self.addon is not None:
-
-            if PY2:
-                return self.addon.getLocalizedString(string_id).encode('utf-8', 'ignore')
-
             return self.addon.getLocalizedString(string_id)
 
         return ''

@@ -11,7 +11,6 @@
 import os
 import shlex
 import subprocess
-import sys
 import traceback
 from io import open
 
@@ -24,7 +23,6 @@ from osmccommon.osmc_logging import StandardLogger
 
 ADDON_ID = 'script.module.osmcsetting.updates'
 DIALOG = xbmcgui.Dialog()
-PY2 = sys.version_info.major == 2
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -279,10 +277,6 @@ class HotFix(object):
         """
             Saves the hotfix output to a temporary file
         """
-        if PY2:
-            results = [
-                x.decode('utf-8') if isinstance(x, str) else x for x in results
-            ]
 
         with open(self.tmp_hfo_location, 'w', encoding='utf-8') as f:
             f.writelines(results)
