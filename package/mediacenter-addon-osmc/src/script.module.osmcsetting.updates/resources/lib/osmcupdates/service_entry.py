@@ -574,7 +574,8 @@ class Main(object):
                 'backup_guisettings': self.addon.getSettingBool('backup_guisettings'),
                 'backup_fstab': self.addon.getSettingBool('backup_fstab'),
                 'backup_advancedsettings': self.addon.getSettingBool('backup_advancedsettings'),
-                'on_upd_detected': self.addon.getSettingInt('on_upd_detected')
+                'backup_authorized_keys': self.addon.getSettingBool('backup_authorized_keys'),
+                'on_upd_detected': self.addon.getSettingInt('on_upd_detected'),
             }
             # this is to deprecate the automatic installation of non-system updates
             # changed to Download, and Prompt
@@ -627,7 +628,8 @@ class Main(object):
                 'backup_peripheral_data': self.addon.getSettingBool('backup_peripheral_data'),
                 'backup_guisettings': self.addon.getSettingBool('backup_guisettings'),
                 'backup_fstab': self.addon.getSettingBool('backup_fstab'),
-                'backup_advancedsettings': self.addon.getSettingBool('backup_advancedsettings')
+                'backup_advancedsettings': self.addon.getSettingBool('backup_advancedsettings'),
+                'backup_authorized_keys': self.addon.getSettingBool('backup_authorized_keys'),
             }
 
         # flags to determine whether the update scheduler needs to be
