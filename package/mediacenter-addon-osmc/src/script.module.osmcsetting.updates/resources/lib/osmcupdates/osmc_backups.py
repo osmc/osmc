@@ -51,6 +51,7 @@ LOCATIONS = {
     'backup_guisettings': '{kodi_folder}userdata/guisettings.xml',
     'backup_fstab': '{kodi_folder}userdata/fstab',
     'backup_advancedsettings': '{kodi_folder}userdata/advancedsettings.xml',
+    'backup_authorized_keys': '{kodi_folder}userdata/authorized_keys',
 }
 
 LABELS = {
@@ -75,6 +76,7 @@ LABELS = {
     '{kodi_folder}/userdata/RssFeeds.xml': 'File - RssFeeds.xml',
     '{kodi_folder}/userdata/upnpserver.xml': 'File - upnpserver.xml',
     '{kodi_folder}/userdata/peripheral_data.xml': 'File - peripheral_data.xml',
+    '{kodi_folder}userdata/authorized_keys': 'File - Authorized SSH Keys',
 }
 
 ADDON_ID = 'script.module.osmcsetting.updates'
@@ -98,6 +100,7 @@ class OSMCBackup(object):
 
         self.restoring_guisettings = False
         self.restoring_fstab = False
+        self.restoring_authorized_keys = False
 
         self.location = None
         self.success = []
@@ -280,6 +283,42 @@ class OSMCBackup(object):
         return sum(sizes)
 
     @staticmethod
+    def copy_authorized_keys_to_userdata(location):
+        """
+            Copy ~/.ssh/authorized_keys to the userdata folder so that it can be backed up.
+            """
+        try:
+            xbmcvfs.delete(location)
+        except:
+            log('Failed to delete temporary authorized_keys')
+
+        success = xbmcvfs.copy('/home/osmc/.ssh/authorized_keys', location)
+        if success:
+            log('authorized_keys file successfully copied to userdata')
+
+        else:
+            log('Failed to copy authorized_keys file to userdata.')
+            raise
+
+    @staticmethod
+    def copy_authorized_keys_to_ssh(location):
+        """
+            Copy /etc/authorized_keys to the userdata folder so that it can be backed up.
+        """
+        if not os.path.isdir('/home/osmc/.ssh/'):
+            try:
+                os.mkdir('/home/osmc/.ssh/')
+            except:
+                pass
+
+        try:
+            subprocess.Popen(['sudo', 'mv', location, '/home/osmc/.ssh/'])
+
+        except:
+            log('Failed to copy authorized_keys file to ~/.ssh/')
+            raise
+
+    @staticmethod
     def copy_fstab_to_userdata(location):
         """
             Copy /etc/fstab to the userdata folder so that it can be backed up.
@@ -359,6 +398,12 @@ class OSMCBackup(object):
                     if name.endswith('fstab'):
                         try:
                             self.copy_fstab_to_userdata(name)
+                        except:
+                            continue
+
+                    elif name.endswith('authorized_keys'):
+                        try:
+                            self.copy_authorized_keys_to_userdata(name)
                         except:
                             continue
 
@@ -596,6 +641,9 @@ class OSMCBackup(object):
                     if any([True for x in restore_items if x.name.endswith('userdata/fstab')]):
                         self.restoring_fstab = True
 
+                    if any([True for x in restore_items if x.name.endswith('userdata/authorized_keys')]):
+                        self.restoring_authorized_keys = True
+
                 elif overwrite == 1:
                     # select new folder
                     log('User has chosen to browse for a new restore location')
@@ -628,6 +676,12 @@ class OSMCBackup(object):
                                 fstab_loc = os.path.join(restore_location,
                                                          os.path.basename(member.name))
                                 self.restore_fstab(fstab_loc)
+
+                            elif member.name.endswith('userdata/authorized_keys') and self.restoring_authorized_keys:
+                                # restore temp version back to userdata
+                                t.extract(member, restore_location)
+                                authorized_keys_loc = os.path.join(restore_location, member.name)
+                                self.copy_authorized_keys_to_ssh(authorized_keys_loc)
 
                             else:
                                 t.extract(member, restore_location)
