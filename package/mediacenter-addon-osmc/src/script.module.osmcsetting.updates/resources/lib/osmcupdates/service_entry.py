@@ -562,6 +562,7 @@ class Main(object):
                 'backup_profilesF': self.addon.getSettingBool('backup_profilesF'),
                 'backup_Thumbnails': self.addon.getSettingBool('backup_Thumbnails'),
                 'backup_Savestates': self.addon.getSettingBool('backup_Savestates'),
+                'backup_tvheadend': self.addon.getSettingBool('backup_tvheadend'),
                 'backup_favourites': self.addon.getSettingBool('backup_favourites'),
                 'backup_passwords': self.addon.getSettingBool('backup_passwords'),
                 'backup_mediasources': self.addon.getSettingBool('backup_mediasources'),
@@ -574,6 +575,8 @@ class Main(object):
                 'backup_guisettings': self.addon.getSettingBool('backup_guisettings'),
                 'backup_fstab': self.addon.getSettingBool('backup_fstab'),
                 'backup_advancedsettings': self.addon.getSettingBool('backup_advancedsettings'),
+                'backup_samba_local': self.addon.getSettingBool('backup_samba_local'),
+                'backup_autofs': self.addon.getSettingBool('backup_autofs'),
                 'backup_authorized_keys': self.addon.getSettingBool('backup_authorized_keys'),
                 'on_upd_detected': self.addon.getSettingInt('on_upd_detected'),
             }
@@ -617,6 +620,7 @@ class Main(object):
                 'backup_profilesF': self.addon.getSettingBool('backup_profilesF'),
                 'backup_Thumbnails': self.addon.getSettingBool('backup_Thumbnails'),
                 'backup_Savestates': self.addon.getSettingBool('backup_Savestates'),
+                'backup_tvheadend': self.addon.getSettingBool('backup_tvheadend'),
                 'backup_favourites': self.addon.getSettingBool('backup_favourites'),
                 'backup_passwords': self.addon.getSettingBool('backup_passwords'),
                 'backup_mediasources': self.addon.getSettingBool('backup_mediasources'),
@@ -629,6 +633,8 @@ class Main(object):
                 'backup_guisettings': self.addon.getSettingBool('backup_guisettings'),
                 'backup_fstab': self.addon.getSettingBool('backup_fstab'),
                 'backup_advancedsettings': self.addon.getSettingBool('backup_advancedsettings'),
+                'backup_samba_local': self.addon.getSettingBool('backup_samba_local'),
+                'backup_autofs': self.addon.getSettingBool('backup_autofs'),
                 'backup_authorized_keys': self.addon.getSettingBool('backup_authorized_keys'),
             }
 
