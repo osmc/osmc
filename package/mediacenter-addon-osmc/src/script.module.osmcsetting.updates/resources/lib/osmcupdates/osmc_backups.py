@@ -16,6 +16,7 @@ import re
 import subprocess
 import tarfile
 import traceback
+from copy import deepcopy
 from io import open
 
 import xbmc
@@ -39,6 +40,7 @@ LOCATIONS = {
     'backup_profilesF': '{kodi_folder}userdata/profiles/',
     'backup_Thumbnails': '{kodi_folder}userdata/Thumbnails/',
     'backup_Savestates': '{kodi_folder}userdata/Savestates/',
+    'backup_tvheadend': '{kodi_folder}userdata/.hts/',
     'backup_favourites': '{kodi_folder}userdata/favourites.xml',
     'backup_passwords': '{kodi_folder}userdata/passwords.xml',
     'backup_mediasources': '{kodi_folder}userdata/mediasources.xml',
@@ -51,6 +53,8 @@ LOCATIONS = {
     'backup_guisettings': '{kodi_folder}userdata/guisettings.xml',
     'backup_fstab': '{kodi_folder}userdata/fstab',
     'backup_advancedsettings': '{kodi_folder}userdata/advancedsettings.xml',
+    'backup_samba_local': '{kodi_folder}userdata/smb-local.conf',
+    'backup_autofs': '{kodi_folder}userdata/autofs',
     'backup_authorized_keys': '{kodi_folder}userdata/authorized_keys',
 }
 
@@ -63,7 +67,8 @@ LABELS = {
     '{kodi_folder}/userdata/playlists': 'Directory - Playlists',
     '{kodi_folder}/userdata/profiles': 'Directory - Profiles',
     '{kodi_folder}/userdata/Thumbnails': 'Directory - Thumbnails',
-    '{kodi_folder}userdata/Savestates': 'Directory - Save States',
+    '{kodi_folder}/userdata/Savestates': 'Directory - Save States',
+    '{kodi_folder}/userdata/.hts': 'Directory - Tvheadend',
     '{kodi_folder}/userdata/advancedsettings.xml': 'File - advancedsettings.xml',
     '{kodi_folder}/userdata/guisettings.xml': 'File - guisettings.xml',
     '{kodi_folder}/userdata/fstab': 'File - fstab',
@@ -76,8 +81,32 @@ LABELS = {
     '{kodi_folder}/userdata/RssFeeds.xml': 'File - RssFeeds.xml',
     '{kodi_folder}/userdata/upnpserver.xml': 'File - upnpserver.xml',
     '{kodi_folder}/userdata/peripheral_data.xml': 'File - peripheral_data.xml',
-    '{kodi_folder}userdata/authorized_keys': 'File - Authorized SSH Keys',
+    '{kodi_folder}/userdata/smb-local.conf': 'File - smb-local.conf',
+    '{kodi_folder}/userdata/authorized_keys': 'File - Authorized SSH Keys',
+    '{kodi_folder}/userdata/autofs': 'Mixed - Autofs',
 }
+
+AUTOFS_SOURCE_FILES = [
+    '/etc/auto.master',
+    '/etc/auto.misc',
+    '/etc/auto.net',
+    '/etc/auto.nfs.shares',
+    '/etc/auto.smb',
+    '/etc/auto.smb.shares',
+    '/etc/autofs.conf',
+    '/etc/auto.master.d/',
+]
+
+AUTOFS_DEST_FILES = [
+    '{kodi_folder}userdata/auto.master',
+    '{kodi_folder}userdata/auto.misc',
+    '{kodi_folder}userdata/auto.net',
+    '{kodi_folder}userdata/auto.nfs.shares',
+    '{kodi_folder}userdata/auto.smb',
+    '{kodi_folder}userdata/auto.smb.shares',
+    '{kodi_folder}userdata/autofs.conf',
+    '{kodi_folder}userdata/auto.master.d/',
+]
 
 ADDON_ID = 'script.module.osmcsetting.updates'
 DIALOG = xbmcgui.Dialog()
@@ -100,7 +129,6 @@ class OSMCBackup(object):
 
         self.restoring_guisettings = False
         self.restoring_fstab = False
-        self.restoring_authorized_keys = False
 
         self.location = None
         self.success = []
@@ -182,7 +210,14 @@ class OSMCBackup(object):
         kodi_folder = self.kodi_location()
 
         backup_candidates = []
-        for setting, location in LOCATIONS.items():
+
+        locations = list(deepcopy(LOCATIONS).items())
+
+        if self.settings_dict['backup_autofs']:  # expand autofs files
+            locations = [(setting, destination_file) for setting, destination_file in locations if setting != 'backup_autofs']
+            locations += [('backup_autofs', destination_file) for destination_file in AUTOFS_DEST_FILES]
+
+        for setting, location in locations:
             if self.settings_dict[setting]:
                 # if the user is backing up guisettings.xml, then call for the settings to be saved using
                 # custom method
@@ -283,69 +318,53 @@ class OSMCBackup(object):
         return sum(sizes)
 
     @staticmethod
-    def copy_authorized_keys_to_userdata(location):
+    def copy_to_backup(source_location, destination_location):
         """
-            Copy ~/.ssh/authorized_keys to the userdata folder so that it can be backed up.
-            """
+            Copy `source_location` to the userdata `destination_location` folder so that it can be backed up.
+        """
+
         try:
-            xbmcvfs.delete(location)
+            if destination_location.endswith('/'):
+                xbmcvfs.rmdir(destination_location, force=True)
+
+            else:
+                xbmcvfs.delete(destination_location)
         except:
-            log('Failed to delete temporary authorized_keys')
+            log('Failed to delete temporary %s' % destination_location)
 
-        success = xbmcvfs.copy('/home/osmc/.ssh/authorized_keys', location)
-        if success:
-            log('authorized_keys file successfully copied to userdata')
+        try:
+            subprocess.Popen(['cp', '-rf', source_location, destination_location])
 
-        else:
-            log('Failed to copy authorized_keys file to userdata.')
+            log('%s successfully copied to %s' % (source_location, destination_location))
+
+        except:
+            log('Failed to copy %s file to %s')
             raise
 
     @staticmethod
-    def copy_authorized_keys_to_ssh(location):
+    def move_to_restore(source_location, destination_location, sudo=False):
         """
-            Copy /etc/authorized_keys to the userdata folder so that it can be backed up.
+            Move `source_location` to the `destination_location`
         """
-        if not os.path.isdir('/home/osmc/.ssh/'):
+        if destination_location.endswith('/') and not os.path.isdir(destination_location):
             try:
-                os.mkdir('/home/osmc/.ssh/')
+                if sudo:
+                    subprocess.Popen(['sudo', 'mkdir', destination_location])
+                else:
+                    os.mkdir(destination_location)
             except:
+                log(traceback.format_exc())
                 pass
 
         try:
-            subprocess.Popen(['sudo', 'mv', location, '/home/osmc/.ssh/'])
+            if sudo:
+                subprocess.Popen(['sudo', 'mv', source_location, destination_location])
+            else:
+                subprocess.Popen(['mv', source_location, destination_location])
 
         except:
-            log('Failed to copy authorized_keys file to ~/.ssh/')
-            raise
-
-    @staticmethod
-    def copy_fstab_to_userdata(location):
-        """
-            Copy /etc/fstab to the userdata folder so that it can be backed up.
-            """
-        try:
-            xbmcvfs.delete(location)
-        except:
-            log('Failed to delete temporary fstab')
-
-        success = xbmcvfs.copy('/etc/fstab', location)
-        if success:
-            log('fstab file successfully copied to userdata')
-
-        else:
-            log('Failed to copy fstab file to userdata.')
-            raise
-
-    @staticmethod
-    def copy_fstab_to_etc(location):
-        """
-            Copy /etc/fstab to the userdata folder so that it can be backed up.
-        """
-        try:
-            subprocess.Popen(['sudo', 'mv', location, '/etc'])
-
-        except:
-            log('Failed to copy fstab file to /etc.')
+            log(traceback.format_exc())
+            log('Failed to move %s file to %s')
             raise
 
     def create_tarball(self):
@@ -395,23 +414,44 @@ class OSMCBackup(object):
             with tarfile.open(name=local_tarball_name, mode="w:gz") as tar:
                 for name, size in self.backup_candidates:
                     # if the user wants to backup the fstab file, then copy it to userdata
+                    base_name = [f for f in name.split('/') if f][-1]
+                    autofs_source = next((f for f in AUTOFS_SOURCE_FILES
+                                          if f.endswith((base_name, base_name + '/'))), '')
+
                     if name.endswith('fstab'):
                         try:
-                            self.copy_fstab_to_userdata(name)
+                            self.copy_to_backup('/etc/fstab', name)
                         except:
                             continue
 
                     elif name.endswith('authorized_keys'):
                         try:
-                            self.copy_authorized_keys_to_userdata(name)
+                            self.copy_to_backup('/home/osmc/.ssh/authorized_keys', name)
                         except:
                             continue
+
+                    elif name.endswith('/.hts/'):
+                        try:
+                            self.copy_to_backup('/home/osmc/.hts/', name)
+                        except:
+                            continue
+
+                    elif name.endswith('smb-local.conf'):
+                        try:
+                            self.copy_to_backup('/etc/samba/smb-local.conf', name)
+                        except:
+                            continue
+
+                    elif autofs_source:
+                        self.copy_to_backup(autofs_source, name)
 
                     self.progress(**{
                         'percent': pct,
                         'heading': self.lang(32147),
                         'message': '%s' % name
                     })
+
+                    xbmc.sleep(150)  # sleep for 150ms to resolve invalid FileNotFound
 
                     try:
                         new_path = os.path.relpath(name, new_root)
@@ -572,7 +612,8 @@ class OSMCBackup(object):
                 menu_items = []
                 for k, v in LABELS.items():
                     for member in members:
-                        if k.endswith(member.name):
+                        if k.endswith(member.name) or \
+                                (k.endswith('userdata/autofs') and 'userdata/auto' in member.name):
                             menu_items.append((member, v))
                             break
 
@@ -610,6 +651,12 @@ class OSMCBackup(object):
                         restore_items = [restore_item[0]]
                         log('User has chosen to restore a single item: %s' % restore_item[1])
 
+                    elif restore_item[1] == 'Mixed - Autofs':
+                        log('User is restoring: %s' % restore_item[1])
+                        restore_items = []
+                        for member in members:
+                            if 'userdata/auto' in member.name:
+                                restore_items.append(member)
                     else:
                         log('User is restoring a folder: %s' % restore_item[1])
                         restore_items = []
@@ -641,9 +688,6 @@ class OSMCBackup(object):
                     if any([True for x in restore_items if x.name.endswith('userdata/fstab')]):
                         self.restoring_fstab = True
 
-                    if any([True for x in restore_items if x.name.endswith('userdata/authorized_keys')]):
-                        self.restoring_authorized_keys = True
-
                 elif overwrite == 1:
                     # select new folder
                     log('User has chosen to browse for a new restore location')
@@ -673,15 +717,35 @@ class OSMCBackup(object):
                             elif member.name.endswith('userdata/fstab') and self.restoring_fstab:
                                 # restore temp version back to userdata
                                 t.extract(member, restore_location)
-                                fstab_loc = os.path.join(restore_location,
-                                                         os.path.basename(member.name))
+                                fstab_loc = os.path.join(restore_location, member.name)
                                 self.restore_fstab(fstab_loc)
 
-                            elif member.name.endswith('userdata/authorized_keys') and self.restoring_authorized_keys:
+                            elif member.name.endswith('userdata/authorized_keys'):
                                 # restore temp version back to userdata
                                 t.extract(member, restore_location)
                                 authorized_keys_loc = os.path.join(restore_location, member.name)
-                                self.copy_authorized_keys_to_ssh(authorized_keys_loc)
+                                self.move_to_restore(authorized_keys_loc, '/home/osmc/.ssh/',
+                                                     sudo=False)
+
+                            elif member.name.endswith('userdata/smb-local.conf'):
+                                # restore temp version back to userdata
+                                t.extract(member, restore_location)
+                                samba_local_conf = os.path.join(restore_location, member.name)
+                                self.move_to_restore(samba_local_conf, '/etc/samba/', sudo=True)
+
+                            elif 'userdata/.hts/' in member.name:
+                                # restore temp version back to userdata
+                                t.extract(member, restore_location)
+                                tvheadend_loc = os.path.join(restore_location, member.name)
+                                self.move_to_restore(tvheadend_loc, '/home/osmc/.hts/',
+                                                     sudo=False)
+
+                            elif 'userdata/auto' in member.name and \
+                                    not member.name.endswith('userdata/autofs'):
+                                # restore temp version back to userdata
+                                t.extract(member, restore_location)
+                                autofs_file = os.path.join(restore_location, member.name)
+                                self.move_to_restore(autofs_file, '/etc/', sudo=True)
 
                             else:
                                 t.extract(member, restore_location)
