@@ -57,6 +57,8 @@ TEMP_LOG_FILENAME = 'uploadlog.txt'
 TEMP_LOG_FILE = '/var/tmp/' + TEMP_LOG_FILENAME
 UPLOAD_LOC = 'https://paste.osmc.tv'
 
+HARDWARE_PREFIX = ''
+
 SETS = {
     'uname': {
         'order': 1,
@@ -100,6 +102,7 @@ SETS = {
                 'key': 'Ul2H1CLu',
                 'ltyp': 'file_log',
                 'actn': '/boot/config.txt',
+                'hwid': 'rbp',
             },
         ],
     },
@@ -484,36 +487,42 @@ SETS = {
                 'key': 'wes0DM2l',
                 'ltyp': 'cl_log',
                 'actn': '/opt/vc/bin/tvservice -s',
+                'hwid': 'rbp',
             },
             {
                 'name': 'Pi CEA',
                 'key': 'su34JRse',
                 'ltyp': 'cl_log',
                 'actn': '/opt/vc/bin/tvservice -m CEA',
+                'hwid': 'rbp',
             },
             {
                 'name': 'Pi DMT',
                 'key': 'zsl2D3rt',
                 'ltyp': 'cl_log',
                 'actn': '/opt/vc/bin/tvservice -m DMT',
+                'hwid': 'rbp',
             },
             {
                 'name': 'Pi Audio Cap',
                 'key': 'szl3J3wq',
                 'ltyp': 'cl_log',
                 'actn': '/opt/vc/bin/tvservice -a',
+                'hwid': 'rbp',
             },
             {
                 'name': 'MPG2 codec_enabled',
                 'key': 'DjfSD1Fa',
                 'ltyp': 'cl_log',
                 'actn': 'vcgencmd codec_enabled MPG2',
+                'hwid': 'rbp',
             },
             {
                 'name': 'WVC1 codec_enabled',
                 'key': 'dDR3l5zx',
                 'ltyp': 'cl_log',
                 'actn': 'vcgencmd codec_enabled WVC1',
+                'hwid': 'rbp',
             },
         ],
     },
@@ -779,6 +788,10 @@ class Main(object):
             if v.get('active', False):
 
                 for log_entry in v.get('logs', default_entry):
+                    if log_entry.get('hwid', '') == 'rbp' and not hardware_prefix().startswith('rbp'):
+                        # raspberry pi only log on non-rbp
+                        continue
+
                     self.log_blotter.append(log_entry['key'] + '  :  ' + log_entry['name'] + '\n')
 
         self.log_blotter.append('\n')
@@ -808,8 +821,12 @@ class Main(object):
         self.progress_dialog.update(percent=100, message=lang(32005))
         self.progress_dialog.close()
 
-    def grab_log(self, ltyp, actn, name, key):
+    def grab_log(self, ltyp, actn, name, key, hwid=''):
         """ Method grabs the logs from either a file or the command line."""
+
+        if hwid == 'rbp' and not hardware_prefix().startswith(hwid):
+            # raspberry pi only log on non-rbp
+            return
 
         self.log_blotter.extend([SECTION_START % (name, key)])
 
@@ -829,7 +846,10 @@ class Main(object):
         self.write_to_temp_file()
 
         with open(TEMP_LOG_FILE, 'rb') as f:
-            screen_dump = ''.join(f.readlines())
+            lines = f.readlines()
+
+        lines = [line.decode('utf-8') if isinstance(line, bytes) else line for line in lines]
+        screen_dump = ''.join(lines)
 
         print(screen_dump)
 
@@ -955,6 +975,26 @@ class Main(object):
 
                     log("Logs successfully uploaded.")
                     log("Logs available at %s" % self.url.replace(' ', ''))
+
+
+def hardware_prefix():
+    """ Returns the prefix for the hardware type. rbp, rbp2, etc """
+    global HARDWARE_PREFIX
+
+    if HARDWARE_PREFIX:
+        return HARDWARE_PREFIX
+
+    with open('/proc/cmdline', 'r', encoding='utf-8') as f:
+        line = f.readline()
+
+    settings = line.split(' ')
+
+    for setting in settings:
+        if setting.startswith('osmcdev='):
+            HARDWARE_PREFIX = setting[len('osmcdev='):]
+            break
+
+    return HARDWARE_PREFIX
 
 
 if __name__ == "__main__":
