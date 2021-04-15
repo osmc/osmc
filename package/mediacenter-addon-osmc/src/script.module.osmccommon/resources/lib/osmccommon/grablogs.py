@@ -104,6 +104,13 @@ SETS = {
                 'actn': '/boot/config.txt',
                 'hwid': 'rbp',
             },
+            {
+                'name': 'Pi config-user',
+                'key': '7kfykHPJ',
+                'ltyp': 'file_log',
+                'actn': '/boot/config-user.txt',
+                'hwid': 'rbp',
+            },
         ],
     },
 
