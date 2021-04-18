@@ -24,10 +24,10 @@ fi
 }
 
 . ../common.sh
-test $1 == rbp2 && VERSION="5.10.22" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == rbp464 && VERSION="5.10.22" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == rbp2 && VERSION="5.10.22" && REV="4" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == rbp464 && VERSION="5.10.22" && REV="5" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == pc && VERSION="4.2.3" && REV="16" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == vero364 && VERSION="4.9.113" && REV="36" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == vero364 && VERSION="4.9.113" && REV="37" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ] || [ $1 == "pc" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -104,10 +104,11 @@ then
         if [ $? == 0 ]
             then
                 ARCH=$(echo $ARCH | tr -d v7l | tr -d v6)
+		KHARCH=arm
         fi
         if [ $ARCH == "i686" ]; then ARCH="i386"; fi
-        if [ "$1" == "vero364" ]; then ARCH=arm64; fi
-        if [ "$1" == "rbp464" ]; then ARCH=arm64; fi
+        if [ "$1" == "vero364" ]; then KHARCH=arm* && ARCH=arm64; fi
+        if [ "$1" == "rbp464" ]; then KHARCH=arm* && ARCH=arm64; fi
         export ARCH
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
 	then
@@ -175,7 +176,7 @@ then
        -type f \
        \( -name Kconfig\* -o -name Kbuild\* -o -name Makefile\* -o -name \*\.pl \) \
        -print0  | rsync  -a --files-from=- --from0 . ../../files-headers/usr/src/${1}-headers-${VERSION}-${REV}-osmc/
-       find arch/$ARCH  \
+       find arch/$KHARCH  \
        -type f \
        \( -name Kconfig\* -o -name Kbuild\* -o -name Makefile\* -o -name \*\.[hS] -o -name \*\.lds \
        -o -name \*\.pl -o -name \*\.sh -o -name \*\.tbl -o -name \*-type \) \
