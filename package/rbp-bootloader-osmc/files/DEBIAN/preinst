@@ -15,4 +15,6 @@ then
 
 	# This prevents vfat symlink errors
 	rm -rf /boot/LICENCE.broadcom /boot/start_x.elf /boot/fixup_x.dat /boot/bootcode.bin /boot/fixup4x.dat /boot/start4x.elf /boot/config.txt
+
+	if [ ! -f /boot/config-user.txt ]; then touch /boot/config-user.txt; fi
 fi
