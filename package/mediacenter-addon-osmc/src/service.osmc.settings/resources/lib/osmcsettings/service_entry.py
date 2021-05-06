@@ -272,7 +272,7 @@ class Main(object):
 
                         xml = xbmc.getInfoLabel('Window.Property(xmlfile)')
 
-                        if xml not 'DialogConfirm.xml':
+                        if xml != 'DialogConfirm.xml':
                             log('Skin reload requested')
 
                             xbmc.executebuiltin('ReloadSkin()')
