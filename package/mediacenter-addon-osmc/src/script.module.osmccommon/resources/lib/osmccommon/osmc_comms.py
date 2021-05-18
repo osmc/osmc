@@ -12,6 +12,7 @@ import os
 import socket
 import subprocess
 import threading
+import traceback
 from contextlib import closing
 
 import xbmc
@@ -97,6 +98,7 @@ class Communicator(threading.Thread):
                 continue
             except:
                 log('An error occurred while waiting for a connection.')
+                log(traceback.format_exc())
                 break
 
             log('Connection active.')
