@@ -45,6 +45,7 @@
 
 """
 
+import os
 import re
 import subprocess
 from io import open
@@ -1201,7 +1202,18 @@ MASTER_SETTINGS = {
 }
 
 
+def touch_user_config():
+    if not os.path.exists('/boot/config-user.txt'):
+        with open('/var/tmp/config-user.txt', 'a+'):
+            pass
+
+        # copy over the temp config-user.txt to /boot/ as superuser
+        subprocess.call(["sudo", "mv", '/var/tmp/config-user.txt', '/boot/config-user.txt'])
+
+
 def read_config_file(location):
+    touch_user_config()
+
     with open(location, "r", encoding='utf-8') as f:
         return f.readlines()
 
