@@ -41,14 +41,7 @@ class Communicator(threading.Thread):
         # create the listening socket, it creates new connections when connected to
         self.address = socket_file
 
-        if os.path.exists(self.address):
-            subprocess.call(['sudo', 'rm', self.address])
-            try:
-                # I need this for testing on my laptop
-                os.remove(self.address)
-            except:
-                log('Connection failed to delete socket file.')
-                pass
+        self.delete_sockfile()
 
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
@@ -60,6 +53,19 @@ class Communicator(threading.Thread):
         self.sock.listen(1)
 
         self.stopped = False
+
+    def delete_sockfile(self):
+        if os.path.exists(self.address):
+            subprocess.call(['sudo', 'rm', self.address])
+            if os.path.exists(self.address):
+                try:
+                    # I need this for testing on my laptop
+                    os.remove(self.address)
+                except:
+                    pass
+
+        if os.path.exists(self.address):
+            log('Failed to delete socket file @ %s.' % self.address)
 
     def stop(self):
         """ Orderly shutdown of the socket, sends message to run loop
@@ -97,8 +103,15 @@ class Communicator(threading.Thread):
             except socket.timeout:
                 continue
             except:
+                exception_message = traceback.format_exc()
+
+                if 'socket.timeout: timed out' in exception_message:
+                    # required for edge case
+                    # TODO: identify and resolve underlying issue
+                    continue
+
                 log('An error occurred while waiting for a connection.')
-                log(traceback.format_exc())
+                log(exception_message)
                 break
 
             log('Connection active.')
@@ -143,7 +156,7 @@ class Communicator(threading.Thread):
                 conn.close()
 
         try:
-            os.remove(self.address)
+            self.delete_sockfile()
         except Exception as e:
             log('Comms error trying to delete socket: {}'.format(e))
 
