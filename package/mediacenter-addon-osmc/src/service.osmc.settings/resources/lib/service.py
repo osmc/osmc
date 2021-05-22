@@ -21,5 +21,5 @@ log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
 if __name__ == "__main__":
     log('Service starting ...')
-    service_entry.Main(service_entry.Main(window=xbmcgui.Window(10000)))
+    service_entry.Main(window=xbmcgui.Window(10000))
     log('Service shutdown.')
