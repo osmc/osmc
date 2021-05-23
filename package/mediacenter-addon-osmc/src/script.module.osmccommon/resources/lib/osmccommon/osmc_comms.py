@@ -67,6 +67,10 @@ class Communicator(threading.Thread):
         if os.path.exists(self.address):
             log('Failed to delete socket file @ %s.' % self.address)
 
+    def close_socket(self):
+        self.sock.close()
+        self.delete_sockfile()
+
     def stop(self):
         """ Orderly shutdown of the socket, sends message to run loop
             to exit. """
@@ -82,8 +86,6 @@ class Communicator(threading.Thread):
             with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
                 open_socket.connect(self.address)
                 open_socket.send(message)
-
-            self.sock.close()
 
             log('Exit message sent to socket.')
 
@@ -155,9 +157,6 @@ class Communicator(threading.Thread):
             finally:
                 conn.close()
 
-        try:
-            self.delete_sockfile()
-        except Exception as e:
-            log('Comms error trying to delete socket: {}'.format(e))
+        self.close_socket()
 
         log('Comms Ended')
