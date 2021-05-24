@@ -13,7 +13,6 @@ import socket
 import subprocess
 import threading
 import traceback
-from contextlib import closing
 
 import xbmc
 
@@ -78,20 +77,17 @@ class Communicator(threading.Thread):
         log('Connection stop called')
 
         try:
-
-            log('Connection stopping.')
             self.stopped = True
 
-            message = b'exit'
-            with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as open_socket:
                 open_socket.connect(self.address)
-                open_socket.send(message)
+                open_socket.send(b'exit')
 
-            log('Exit message sent to socket.')
+            log('Exit message sent to socket... %s' % self.address)
 
-        except Exception as e:
-
-            log('Comms error trying to stop: {}'.format(e))
+        except:
+            log('Communications error trying to shutdown... %s' % self.address)
+            log(traceback.format_exc())
 
     def run(self):
 

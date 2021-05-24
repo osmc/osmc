@@ -15,7 +15,6 @@ import random
 import socket
 import subprocess
 import traceback
-from contextlib import closing
 from datetime import datetime
 from io import open
 
@@ -43,12 +42,9 @@ log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
 
 def exit_osmc_settings_addon():
-    message = 'exit'
-    with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as open_socket:
         open_socket.connect('/var/tmp/osmc.settings.sockfile')
-        if not isinstance(message, (bytes, bytearray)):
-            message = message.encode('utf-8', 'ignore')
-        open_socket.sendall(message)
+        open_socket.sendall(b'exit')
 
     return 'OSMC Settings addon called to exit'
 
