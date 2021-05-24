@@ -74,7 +74,7 @@ class Communicator(threading.Thread):
         """ Orderly shutdown of the socket, sends message to run loop
             to exit. """
 
-        log('Connection stop called')
+        log('Communications shutting down... %s' % self.address)
 
         try:
             self.stopped = True
@@ -91,7 +91,7 @@ class Communicator(threading.Thread):
 
     def run(self):
 
-        log('Comms started')
+        log('Communications started... %s' % self.address)
 
         while not self.monitor.abortRequested() and not self.stopped:
 
@@ -108,11 +108,11 @@ class Communicator(threading.Thread):
                     # TODO: identify and resolve underlying issue
                     continue
 
-                log('An error occurred while waiting for a connection.')
+                log('An error occurred while waiting for a connection... %s' % self.address)
                 log(exception_message)
                 break
 
-            log('Connection active.')
+            log('Connection is active... %s' % self.address)
             try:
                 # turn off blocking for this temporary connection
                 # this will allow the loop to collect all parts of the message
@@ -125,25 +125,27 @@ class Communicator(threading.Thread):
                 while not passed and total_wait < 0.5:
                     try:
                         data = conn.recv(8192)
-                        passed = True
-                        if isinstance(data, bytes):
-                            data = data.decode('utf-8')
-                        log('data = %s' % data)
                     except:
                         total_wait += wait
                         if self.monitor.waitForAbort(wait):
                             break
 
+                        continue
+
+                    passed = True
+                    data = data.decode('utf-8')
+                    log('Connection received partial data... %s @ %s' % (data, self.address))
+
                 if not passed:
-                    log('Connection failed to collect data.')
+                    log('Connection received no data... %s' % self.address)
                     self.stopped = True
                     break
 
-                log('data = %s' % data)
+                log('Connection received data... %s @ %s' % (data, self.address))
 
                 # if the message is to stop, then kill the loop
                 if data == 'exit':
-                    log('Connection called to "exit"')
+                    log('Connection called to shutdown...  %s' % self.address)
                     self.stopped = True
                     break
 
@@ -154,5 +156,4 @@ class Communicator(threading.Thread):
                 conn.close()
 
         self.close_socket()
-
-        log('Comms Ended')
+        log('Communications shutdown... %s' % self.address)
