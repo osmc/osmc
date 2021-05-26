@@ -10,7 +10,6 @@
 
 import os
 import socket
-from contextlib import closing
 
 import xbmcaddon
 import xbmcgui
@@ -26,12 +25,9 @@ def run():
     log('My OSMC opening')
     try:
 
-        message = 'open'
-        with closing(socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)) as open_socket:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as open_socket:
             open_socket.connect('/var/tmp/osmc.settings.sockfile')
-            if not isinstance(message, (bytes, bytearray)):
-                message = message.encode('utf-8', 'ignore')
-            open_socket.sendall(message)
+            open_socket.sendall(b'open')
 
     except:
         log('My OSMC failed to open')
