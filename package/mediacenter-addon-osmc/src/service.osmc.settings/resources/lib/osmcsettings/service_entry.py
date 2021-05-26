@@ -107,16 +107,20 @@ class Main(object):
             self._walk_through()  # start walk through
 
         while not self.monitor.abortRequested():
-            if not self.monitor.abortRequested() and not self.parent_queue.empty():
-                response = self.parent_queue.get()
+            if not self.parent_queue.empty():
+                try:
+                    response = self.parent_queue.get()
+                    log('response : %s' % response)
 
-                log('response : %s' % response)
+                    abort_requested = self._handle_response(response=response)
+                    if abort_requested:
+                        break
 
-                self.parent_queue.task_done()
-
-                abort_requested = self._handle_response(response=response)
-                if abort_requested:
-                    break
+                finally:
+                    try:
+                        self.parent_queue.task_done()
+                    except:
+                        pass
 
             # sleep for one second, exit if Kodi is shutting down
             if self.monitor.waitForAbort(1):
