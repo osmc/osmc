@@ -11,6 +11,7 @@ process_skin() {
 echo -e "Moving ${2} files in to place"
 mkdir -p files/usr/share/kodi/addons
 cp -ar src/skin.osmc-${1} files/usr/share/kodi/addons/${2} # Always called skin.osmc in src because of repo name
+if [ "$2" == "skin.osmc.scope" ]; then cp -ar files/usr/share/kodi/addons/skin.osmc/language/resource.language.* files/usr/share/kodi/addons/${2}/language/; fi
 if [ -f files/usr/share/kodi/addons/${2}/media/Textures.xbt ]
 then
     echo "TexturePacked file detected, deleting unneeded artefacts"
@@ -20,8 +21,8 @@ then
 fi
 }
 
-REV="027f331e0975d17c307be9ff0eadc8e7730ddb20"
-SCOPE_REV="b455c22fb7679a615b81abf80de2ac1808d3acdb"
+REV="256a8342ef5174fc0af964225c300e1523be726e"
+SCOPE_REV="615d3486f518343564180745d7a17d2e77fce863"
 echo -e "Building package mediacenter-skin-osmc"
 echo -e "Downloading skin"
 pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
