@@ -14,6 +14,7 @@ if [ $build_return == 99 ]
 then
 	echo -e "Building libbluray"
 	out=$(pwd)/files
+	make clean
 	if [ -d files/usr ]; then rm -rf files/usr; fi
 	if [ -d files-dev/usr ]; then rm -rf files-dev/usr; fi
 	sed '/Package/d' -i files/DEBIAN/control
