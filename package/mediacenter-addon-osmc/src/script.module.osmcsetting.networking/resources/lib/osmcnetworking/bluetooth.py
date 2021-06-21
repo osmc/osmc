@@ -6,8 +6,6 @@ BLUEZ_OBJECT_PATH = 'org.bluez'
 BLUEZ_ADAPTER = 'org.bluez.Adapter1'
 BLUEZ_DEVICE = 'org.bluez.Device1'
 
-bus = dbus.SystemBus()
-
 
 def get_adapter_property(key, adapter_address=None):
     adapter = get_adapter_interface(adapter_address)
@@ -24,7 +22,7 @@ def set_adapter_property(key, value, adapter_address=None):
 
 def get_adapter_interface(adapter_address=None):
     adapter_path = bluezutils.find_adapter(adapter_address).object_path
-    return dbus.Interface(bus.get_object(BLUEZ_OBJECT_PATH, adapter_path),
+    return dbus.Interface(dbus.SystemBus().get_object(BLUEZ_OBJECT_PATH, adapter_path),
                           "org.freedesktop.DBus.Properties")
 
 
@@ -49,7 +47,7 @@ def remove_device(device_address, adapter_address=None):
 
 
 def get_manager():
-    return dbus.Interface(bus.get_object(BLUEZ_OBJECT_PATH, "/"),
+    return dbus.Interface(dbus.SystemBus().get_object(BLUEZ_OBJECT_PATH, "/"),
                           "org.freedesktop.DBus.ObjectManager")
 
 
@@ -74,7 +72,7 @@ def disconnect_device(device_address):
 def get_device_interface(device_address):
     device = get_device(device_address)
     path = device.object_path
-    return dbus.Interface(bus.get_object("org.bluez", path),
+    return dbus.Interface(dbus.SystemBus().get_object("org.bluez", path),
                           "org.freedesktop.DBus.Properties")
 
 
