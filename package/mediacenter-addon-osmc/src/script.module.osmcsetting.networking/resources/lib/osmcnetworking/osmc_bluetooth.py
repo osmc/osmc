@@ -185,7 +185,10 @@ class OSMCBluetooth:
                 dbus_dict = managed_objects[path][DEVICE_PATH]
                 device_dict = {}
 
-                if 'Class' not in dbus_dict:
+                if not dbus_dict.get('Name') or \
+                        (dbus_dict.get('Alias') and dbus_dict.get('Alias') in
+                         [dbus_dict.get('Address', ''),
+                          dbus_dict.get('Address', '').replace(':', '-')]):
                     continue
 
                 # remove dbus.String from the key
