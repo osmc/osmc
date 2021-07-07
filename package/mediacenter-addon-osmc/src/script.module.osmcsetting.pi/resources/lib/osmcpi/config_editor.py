@@ -232,7 +232,8 @@ class ConfigEditorGui(xbmcgui.WindowXMLDialog):
     def check_for_duplicates(self, d, edit=False):
         if '=' in d:
             dupe_check_raw = self.grab_item_strings()
-            dupe_check = [x.split('=')[0] for x in dupe_check_raw]
+            dupe_check = [x.split('=')[0] for x in dupe_check_raw
+                          if not x.split('=')[0].startswith('#')]
 
             dupe = d.split('=')[0]
 
