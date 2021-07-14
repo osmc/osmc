@@ -70,6 +70,7 @@ int codec_set_dec_reset(codec_para_t *pcodec);
 
 int codec_write(codec_para_t *pcodec, void *buffer, int len);
 int codec_checkin_pts(codec_para_t *pcodec, unsigned long pts);
+int codec_checkin_pts64(codec_para_t *pcodec, unsigned long long pts64);
 int codec_get_vbuf_state(codec_para_t *, struct buf_status *);
 int codec_get_abuf_state(codec_para_t *, struct buf_status *);
 int codec_get_vdec_state(codec_para_t *, struct vdec_status *);
