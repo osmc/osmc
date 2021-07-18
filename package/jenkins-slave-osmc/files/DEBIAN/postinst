@@ -8,6 +8,22 @@ if [ "$1" = "configure" ]; then
 	        echo "Please make sure you edit /etc/jenkins-slave.conf to add your device's slave name and secret"
 	        echo "then restart the slave with 'sudo systemctl restart jenkins-slave.service'"
 	fi
+        while true; do
+            read -r -p "Should jenkins-slave be run by another user other than root? [Y/n] " input
+            case $input in
+                [yY][eE][sS]|[yY])
+                    read -p "Which user will run jenkins-slave? " user
+                    sed -i "s/root/$user/g" /etc/systemd/system/jenkins-slave.service
+                    systemctl daemon-reload
+                    systemctl daemon-reexec
+                    chown "$user" /opt/osmc-tc/jenkins-slave
+                    break
+                ;;
+                [nN][oO]|[nN])
+                    break
+                ;;
+            esac
+        done
 	if systemctl is-enabled jenkins-slave.service >/dev/null; then systemctl start jenkins-slave.service; fi
 	exit 0
 fi
