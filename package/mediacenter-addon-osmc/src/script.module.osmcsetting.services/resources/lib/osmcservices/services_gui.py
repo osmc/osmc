@@ -247,16 +247,18 @@ class ServiceSelectionGui(xbmcgui.WindowXMLDialog):
             self.getControl(1102).setText(' ')
             return
 
-        todo_list = '-= Pending Actions =-\n\n'
+        todo_list = '-= %s =-\n\n' % self.lang(32006)
 
         if self.initiants:
-            todo_list += "Enable:\n   - " + '\n   - '.join([x[0] for x in self.initiants])
+            todo_list += "%s:\n   - " % self.lang(32007)
+            todo_list += '\n   - '.join([x[0] for x in self.initiants])
 
             if self.finitiants:
                 todo_list += '\n\n'
 
         if self.finitiants:
-            todo_list += "Disable:\n   - " + '\n   - '.join([x[0] for x in self.finitiants])
+            todo_list += "%s:\n   - " % self.lang(32008)
+            todo_list += '\n   - '.join([x[0] for x in self.finitiants])
 
         self.getControl(1102).setText(todo_list)
 

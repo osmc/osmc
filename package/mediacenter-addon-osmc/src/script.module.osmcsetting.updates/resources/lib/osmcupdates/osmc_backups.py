@@ -26,6 +26,10 @@ import xbmcvfs
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 
+ADDON_ID = 'script.module.osmcsetting.updates'
+ADDON = xbmcaddon.Addon(ADDON_ID)
+LANG = LangRetriever(ADDON)
+
 TIME_PATTERN = '%Y_%m_%d_%H_%M_%S'
 READ_PATTERN = '%Y-%m-%d %H:%M:%S'
 APPENDAGE = '[0-9|_]*'
@@ -59,31 +63,31 @@ LOCATIONS = {
 }
 
 LABELS = {
-    '{kodi_folder}/addons': 'Directory - Addons',
-    '{kodi_folder}/userdata/addon_data': 'Directory - Addon Data',
-    '{kodi_folder}/userdata/Database': 'Directory - Database',
-    '{kodi_folder}/userdata/keymaps': 'Directory - Keymaps',
-    '{kodi_folder}/userdata/library': 'Directory - Library',
-    '{kodi_folder}/userdata/playlists': 'Directory - Playlists',
-    '{kodi_folder}/userdata/profiles': 'Directory - Profiles',
-    '{kodi_folder}/userdata/Thumbnails': 'Directory - Thumbnails',
-    '{kodi_folder}/userdata/Savestates': 'Directory - Save States',
-    '{kodi_folder}/userdata/.hts': 'Directory - Tvheadend',
-    '{kodi_folder}/userdata/advancedsettings.xml': 'File - advancedsettings.xml',
-    '{kodi_folder}/userdata/guisettings.xml': 'File - guisettings.xml',
-    '{kodi_folder}/userdata/fstab': 'File - fstab',
-    '{kodi_folder}/userdata/sources.xml': 'File - sources.xml',
-    '{kodi_folder}/userdata/profiles.xml': 'File - profiles.xml',
-    '{kodi_folder}/userdata/favourites.xml': 'File - favourites.xml',
-    '{kodi_folder}/userdata/passwords.xml': 'File - passwords.xml',
-    '{kodi_folder}/userdata/mediasources.xml': 'File - mediasources.xml',
-    '{kodi_folder}/userdata/LCD.xml': 'File - LCD.xml',
-    '{kodi_folder}/userdata/RssFeeds.xml': 'File - RssFeeds.xml',
-    '{kodi_folder}/userdata/upnpserver.xml': 'File - upnpserver.xml',
-    '{kodi_folder}/userdata/peripheral_data.xml': 'File - peripheral_data.xml',
-    '{kodi_folder}/userdata/smb-local.conf': 'File - smb-local.conf',
-    '{kodi_folder}/userdata/authorized_keys': 'File - Authorized SSH Keys',
-    '{kodi_folder}/userdata/autofs': 'Mixed - Autofs',
+    '{kodi_folder}/addons': '%s - %s' % (LANG(32189), LANG(32179)),
+    '{kodi_folder}/userdata/addon_data': '%s - %s' % (LANG(32189), LANG(32180)),
+    '{kodi_folder}/userdata/Database': '%s - %s' % (LANG(32189), LANG(32181)),
+    '{kodi_folder}/userdata/keymaps': '%s - %s' % (LANG(32189), LANG(32182)),
+    '{kodi_folder}/userdata/library': '%s - %s' % (LANG(32189), LANG(32183)),
+    '{kodi_folder}/userdata/playlists': '%s - %s' % (LANG(32189), LANG(32184)),
+    '{kodi_folder}/userdata/profiles': '%s - %s' % (LANG(32189), LANG(32185)),
+    '{kodi_folder}/userdata/Thumbnails': '%s - %s' % (LANG(32189), LANG(32186)),
+    '{kodi_folder}/userdata/Savestates': '%s - %s' % (LANG(32189), LANG(32187)),
+    '{kodi_folder}/userdata/.hts': '%s - %s' % (LANG(32189), LANG(32188)),
+    '{kodi_folder}/userdata/advancedsettings.xml': '%s - advancedsettings.xml' % LANG(32191),
+    '{kodi_folder}/userdata/guisettings.xml': '%s - guisettings.xml' % LANG(32191),
+    '{kodi_folder}/userdata/fstab': '%s - fstab' % LANG(32191),
+    '{kodi_folder}/userdata/sources.xml': '%s - sources.xml' % LANG(32191),
+    '{kodi_folder}/userdata/profiles.xml': '%s - profiles.xml' % LANG(32191),
+    '{kodi_folder}/userdata/favourites.xml': '%s - favourites.xml' % LANG(32191),
+    '{kodi_folder}/userdata/passwords.xml': '%s - passwords.xml' % LANG(32191),
+    '{kodi_folder}/userdata/mediasources.xml': '%s - mediasources.xml' % LANG(32191),
+    '{kodi_folder}/userdata/LCD.xml': '%s - LCD.xml' % LANG(32191),
+    '{kodi_folder}/userdata/RssFeeds.xml': '%s - RssFeeds.xml' % LANG(32191),
+    '{kodi_folder}/userdata/upnpserver.xml': '%s - upnpserver.xml' % LANG(32191),
+    '{kodi_folder}/userdata/peripheral_data.xml': '%s - peripheral_data.xml' % LANG(32191),
+    '{kodi_folder}/userdata/smb-local.conf': '%s - smb-local.conf' % LANG(32191),
+    '{kodi_folder}/userdata/authorized_keys': '%s - %s' % (LANG(32191), LANG(32192)),
+    '{kodi_folder}/userdata/autofs': '%s - %s' % (LANG(32190), LANG(32193)),
 }
 
 AUTOFS_SOURCE_FILES = [
@@ -108,7 +112,6 @@ AUTOFS_DEST_FILES = [
     '{kodi_folder}userdata/auto.master.d/',
 ]
 
-ADDON_ID = 'script.module.osmcsetting.updates'
 DIALOG = xbmcgui.Dialog()
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
@@ -119,7 +122,6 @@ class OSMCBackup(object):
     def __init__(self, settings_dict, progress_function, parent_queue=None, addon=None):
         log('osmc_backup INIT')
         self._addon = addon
-        self._lang = None
 
         self.settings_dict = settings_dict
 
@@ -143,11 +145,9 @@ class OSMCBackup(object):
             self._addon = xbmcaddon.Addon(ADDON_ID)
         return self._addon
 
-    def lang(self, value):
-        if not self._lang:
-            retriever = LangRetriever(self.addon)
-            self._lang = retriever.lang
-        return self._lang(value)
+    @staticmethod
+    def lang(value):
+        return LANG(value)
 
     def start_backup(self):
         """
@@ -651,7 +651,7 @@ class OSMCBackup(object):
                         restore_items = [restore_item[0]]
                         log('User has chosen to restore a single item: %s' % restore_item[1])
 
-                    elif restore_item[1] == 'Mixed - Autofs':
+                    elif restore_item[1] == '%s - %s' % (LANG(32190), LANG(32193)):
                         log('User is restoring: %s' % restore_item[1])
                         restore_items = []
                         for member in members:
