@@ -1048,7 +1048,7 @@ class Main(object):
         try:
             for pkg in self.cache.packages:
                 if pkg.current_state in dirty_states:
-                    log(' found in a partially installed state', pkg.name)
+                    log('found in a partially installed state', pkg.name)
                     self.EXTERNAL_UPDATE_REQUIRED = 1
                     return 'broken install found', 'EXTERNAL_UPDATE_REQUIRED set to 1'
 
