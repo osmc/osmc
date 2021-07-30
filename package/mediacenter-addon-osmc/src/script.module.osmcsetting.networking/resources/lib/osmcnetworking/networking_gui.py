@@ -1369,7 +1369,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 if not connection_status:
                     # 'Connection to '                  'failed'
-                    message = self.lang(32043) + ' ' + ssid + ' ' + self.lang(32025)
+                    message = self.lang(32024) + ' ' + ssid + ' ' + self.lang(32025)
                     #                                                   'Wireless'
                     DIALOG.notification(self.lang(32041), message, time=2500, sound=False)
 
@@ -1540,7 +1540,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                         #         'Connection to '                       'failed'
                         message = self.lang(32024) + ' ' + alias + ' ' + self.lang(32025)
                         #                                                     'Bluetooth'
-                        DIALOG.notification(self.lang(32020), message, time=2500, sound=False)
+                        DIALOG.notification(self.lang(32003), message, time=2500, sound=False)
                         self.clear_busy_dialogue()
                         return
 
@@ -1561,7 +1561,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             #         'Connection to'                       'failed'
             message = self.lang(32024) + ' ' + alias + ' ' + self.lang(32025)
             #                   'Bluetooth'
-            DIALOG.notification(self.lang(32020), message, time=2500, sound=False)
+            DIALOG.notification(self.lang(32003), message, time=2500, sound=False)
 
         return connected
 

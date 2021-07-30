@@ -86,8 +86,8 @@ LABELS = {
     '{kodi_folder}/userdata/upnpserver.xml': '%s - upnpserver.xml' % LANG(32191),
     '{kodi_folder}/userdata/peripheral_data.xml': '%s - peripheral_data.xml' % LANG(32191),
     '{kodi_folder}/userdata/smb-local.conf': '%s - smb-local.conf' % LANG(32191),
-    '{kodi_folder}/userdata/authorized_keys': '%s - %s' % (LANG(32191), LANG(32192)),
-    '{kodi_folder}/userdata/autofs': '%s - %s' % (LANG(32190), LANG(32193)),
+    '{kodi_folder}/userdata/authorized_keys': '%s - %s' % (LANG(32191), LANG(32178)),
+    '{kodi_folder}/userdata/autofs': '%s - %s' % (LANG(32190), LANG(32177)),
 }
 
 AUTOFS_SOURCE_FILES = [
@@ -651,7 +651,7 @@ class OSMCBackup(object):
                         restore_items = [restore_item[0]]
                         log('User has chosen to restore a single item: %s' % restore_item[1])
 
-                    elif restore_item[1] == '%s - %s' % (LANG(32190), LANG(32193)):
+                    elif restore_item[1] == '%s - %s' % (LANG(32190), LANG(32177)):
                         log('User is restoring: %s' % restore_item[1])
                         restore_items = []
                         for member in members:

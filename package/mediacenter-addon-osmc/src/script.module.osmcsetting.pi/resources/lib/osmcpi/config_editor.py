@@ -206,7 +206,7 @@ class ConfigEditorGui(xbmcgui.WindowXMLDialog):
 
                     else:
                         # edit
-                        result = DIALOG.input(self.lang(32063), current_label,
+                        result = DIALOG.input(self.lang(32060), current_label,
                                               type=xbmcgui.INPUT_ALPHANUM)
 
                         if result:
