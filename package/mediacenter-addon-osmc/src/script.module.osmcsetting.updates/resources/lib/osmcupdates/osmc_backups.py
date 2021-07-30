@@ -28,7 +28,7 @@ from osmccommon.osmc_logging import StandardLogger
 
 ADDON_ID = 'script.module.osmcsetting.updates'
 ADDON = xbmcaddon.Addon(ADDON_ID)
-LANG = LangRetriever(ADDON)
+LANG = LangRetriever(ADDON).lang
 
 TIME_PATTERN = '%Y_%m_%d_%H_%M_%S'
 READ_PATTERN = '%Y-%m-%d %H:%M:%S'
