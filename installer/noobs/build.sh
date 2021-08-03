@@ -24,37 +24,6 @@ function build_fs_image()
 	tar -xJf filesystem.tar.xz -C output/
 	rm -rf filesystem.tar.xz
 	pushd output
-	pushd boot
-	if [ "$1" == "rbp1" ]
-	then
-		# Add Pi1 config.txt
-		echo "arm_freq=850" >> config.txt
-		echo "core_freq=375" >> config.txt
-		echo "gpu_mem_256=112" >> config.txt
-		echo "gpu_mem_512=144" >> config.txt
-		echo "hdmi_ignore_cec_init=1" >> config.txt
-		echo "disable_overscan=1" >> config.txt
-		echo "start_x=1" >> config.txt
-		echo "disable_splash=1" >> config.txt
-	fi
-	if [ "$1" == "rbp2" ]
-	then
-		# Add Pi2 config.txt
-		echo "gpu_mem_1024=256" >> config.txt
-		echo "hdmi_ignore_cec_init=1" >> config.txt
-		echo "disable_overscan=1" >> config.txt
-		echo "start_x=1" >> config.txt
-		echo "disable_splash=1" >> config.txt
-	fi
-	if [ "$1" == "rbp4" ]
-	then
-		# Add Pi4 config.txt
-                echo "gpu_mem=320" >> config.txt
-                echo "hdmi_ignore_cec_init=1" >> config.txt
-                echo "disable_overscan=1" >> config.txt
-                echo "start_x=1" >> config.txt
-                echo "disable_splash=1" >> config.txt
-	fi
 	echo -e "Creating boot tarball"
 	UNC_TS_SIZE_BOOT=$(du -h --max-depth=0 . | awk {'print $1'} | tr -d 'M')
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
