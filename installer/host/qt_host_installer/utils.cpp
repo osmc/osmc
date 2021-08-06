@@ -77,12 +77,14 @@ namespace utils
         SupportedDevice *VERO = new SupportedDevice("Vero", "VERO1", true, false, false, false, true, false);
         SupportedDevice *RBP = new SupportedDevice("Raspberry Pi 1 / Zero", "RBP", true, true, true, false, true, false);
         SupportedDevice *RBP2 = new SupportedDevice("Raspberry Pi 2 / 3", "RBP2", true, true, true, false, true, false);
+        SupportedDevice *RBP4 = new SupportedDevice("Raspberry Pi 4 / 400", "RBP4", true, true, true, false, true, false);
         SupportedDevice *ATV = new SupportedDevice("Apple TV", "appletv", false, false, false, false, false, false);
         devices.append(VERO3);
         devices.append(VERO2);
         devices.append(VERO);
-        devices.append(RBP);
+        devices.append(RBP4);
         devices.append(RBP2);
+        devices.append(RBP);
         devices.append(ATV);
         return devices;
     }
