@@ -25,6 +25,7 @@ function build_fs_image()
 	rm -rf filesystem.tar.xz
 	pushd output
 	echo -e "Creating boot tarball"
+	pushd boot
 	UNC_TS_SIZE_BOOT=$(du -h --max-depth=0 . | awk {'print $1'} | tr -d 'M')
 	tar -cf - * | xz -9 -c - > boot-${1}.tar.xz
 	mv boot-${1}.tar.xz ../../
