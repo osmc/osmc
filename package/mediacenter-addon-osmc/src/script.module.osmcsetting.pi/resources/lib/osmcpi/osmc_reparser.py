@@ -306,25 +306,15 @@ def config_hdmi_boost_validation(config_value):
 
 def soundcard_dac_validation(config_value):
     permitted = {
-        "hifiberry-dac-overlay": "1",
         "hifiberry-dac": "1",
-        "hifiberry-dacplus-overlay": "2",
         "hifiberry-dacplus": "2",
-        "hifiberry-digi-overlay": "3",
         "hifiberry-digi": "3",
-        "iqaudio-dac-overlay": "4",
         "iqaudio-dac": "4",
-        "iqaudio-dacplus-overlay": "5",
         "iqaudio-dacplus": "5",
         "justboom-dac": "6",
-        "justboom-dac-overlay": "6",
         "justboom-digi": "7",
-        "justboom-digi-overlay": "7",
-        "allo-piano-dac-pcm512x-audio-overlay": "8",
         "allo-piano-dac-pcm512x-audio": "8",
-        "allo-boss-dac-pcm512x-audio-overlay": "9",
         "allo-boss-dac-pcm512x-audio": "9",
-        "allo-digione-overlay": "10",
         "allo-digione": "10",
     }
 
@@ -564,16 +554,16 @@ def w1gpio_config_set(kodi_setting, all_settings):
 def soundcard_dac_config_set(kodi_setting, all_settings):
     permitted = [
         "remove_this_line",
-        "hifiberry-dac-overlay",
-        "hifiberry-dacplus-overlay",
-        "hifiberry-digi-overlay",
-        "iqaudio-dac-overlay,unmute_amp",
-        "iqaudio-dacplus-overlay,unmute_amp",
-        "justboom-dac-overlay",
-        "justboom-digi-overlay",
-        "allo-piano-dac-pcm512x-audio-overlay",
-        "allo-boss-dac-pcm512x-audio-overlay",
-        "allo-digione-overlay",
+        "hifiberry-dac",
+        "hifiberry-dacplus",
+        "hifiberry-digi",
+        "iqaudio-dac,unmute_amp",
+        "iqaudio-dacplus,unmute_amp",
+        "justboom-dac",
+        "justboom-digi",
+        "allo-piano-dac-pcm512x-audio",
+        "allo-boss-dac-pcm512x-audio",
+        "allo-digione",
     ]
 
     try:
