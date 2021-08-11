@@ -1,1 +1,1 @@
-ICON_PATH="/usr/share/pixmaps/xbmc/"
+ICON_PATH = "/usr/share/pixmaps/xbmc/"

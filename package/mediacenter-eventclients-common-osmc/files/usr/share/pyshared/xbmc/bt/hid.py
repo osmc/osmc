@@ -15,10 +15,16 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from bluetooth import *
-import fcntl
-import bluetooth._bluetooth as _bt
 import array
+import struct
+from fcntl import ioctl
+
+from bluetooth import BluetoothSocket
+from bluetooth import HCI
+from bluetooth import L2CAP
+from bluetooth import _bluetooth
+from bluetooth import set_l2cap_mtu
+
 
 class HID:
     def __init__(self, bdaddress=None):
@@ -31,14 +37,14 @@ class HID:
             self.address = bdaddress
 
         # create the HID control socket
-        self.csock = BluetoothSocket( L2CAP )
+        self.csock = BluetoothSocket(L2CAP)
         self.csock.bind((self.address, self.cport))
         set_l2cap_mtu(self.csock, 64)
         self.csock.settimeout(2)
         self.csock.listen(self.backlog)
 
         # create the HID interrupt socket
-        self.isock = BluetoothSocket( L2CAP )
+        self.isock = BluetoothSocket(L2CAP)
         self.isock.bind((self.address, self.iport))
         set_l2cap_mtu(self.isock, 64)
         self.isock.settimeout(2)
@@ -46,36 +52,40 @@ class HID:
 
         self.connected = False
 
+        self.client_csock = None
+        self.caddress = None
+        self.client_isock = None
+        self.iaddress = None
 
     def listen(self):
         try:
             (self.client_csock, self.caddress) = self.csock.accept()
-            print "Accepted Control connection from %s" % self.caddress[0]
+            print("Accepted Control connection from %s" % self.caddress[0])
             (self.client_isock, self.iaddress) = self.isock.accept()
-            print "Accepted Interrupt connection from %s" % self.iaddress[0]
+            print("Accepted Interrupt connection from %s" % self.iaddress[0])
             self.connected = True
             return True
-        except Exception, e:
+        except Exception as _:
             self.connected = False
             return False
 
-    def get_local_address(self):
-        hci = BluetoothSocket( HCI )
-        fd  = hci.fileno()
+    @staticmethod
+    def get_local_address():
+        hci = BluetoothSocket(HCI)
+        fd = hci.fileno()
         buf = array.array('B', [0] * 96)
-        fcntl.ioctl(fd, _bt.HCIGETDEVINFO, buf, 1)
+        ioctl(fd, _bluetooth.HCIGETDEVINFO, buf, 1)
         data = struct.unpack_from("H8s6B", buf.tostring())
         return data[2:8][::-1]
 
     def get_control_socket(self):
         if self.connected:
-            return (self.client_csock, self.caddress)
+            return self.client_csock, self.caddress
         else:
             return None
 
-
     def get_interrupt_socket(self):
         if self.connected:
-            return (self.client_isock, self.iaddress)
+            return self.client_isock, self.iaddress
         else:
             return None

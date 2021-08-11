@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-# File intentionally left blank
+__all__ = ['bt', 'ps3', 'defs', 'ps3_remote', 'xbmcclient', 'zeroconf']
