@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-# File intentionally left blank
+__all__ = ['keymaps', 'sixaxis', 'sixpair', 'sixwatch']
