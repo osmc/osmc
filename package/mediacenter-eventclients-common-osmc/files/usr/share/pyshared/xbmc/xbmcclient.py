@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#   Copyright (C) 2008-2009 Team XBMC http://www.xbmc.org
+#   Copyright (C) 2008-2013 Team XBMC
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -37,11 +37,16 @@ at least once every 60 seconds. To "ping" XBMC with an empty packet use
 PacketPING or XBMCClient.ping(). See the documentation for details.
 """
 
-__author__  = "d4rk@xbmc.org"
-__version__ = "0.0.3"
+from __future__ import unicode_literals, print_function, absolute_import, division
 
+__author__  = "d4rk@xbmc.org"
+__version__ = "0.1.0"
+
+import sys
+if sys.version_info.major == 2:
+    str = unicode
 from struct import pack
-from socket import *
+from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 import time
 
 MAX_PACKET_SIZE  = 1024
@@ -96,7 +101,7 @@ ACTION_BUTTON      = 0x02
 
 def format_string(msg):
     """ """
-    return msg + "\0"
+    return msg.encode('utf-8') + b"\0"
 
 def format_uint32(num):
     """ """
@@ -139,17 +144,15 @@ class Packet:
          -----------------------------
     """
     def __init__(self):
-        self.sig = "XBMC"
+        self.sig = b"XBMC"
         self.minver = 0
         self.majver = 2
         self.seq = 1
         self.maxseq = 1
         self.payloadsize = 0
         self.uid = UNIQUE_IDENTIFICATION
-        self.reserved = "\0" * 10
-        self.payload = ""
-        return
-
+        self.reserved = b"\0" * 10
+        self.payload = b""
 
     def append_payload(self, blob):
         """Append to existing payload
@@ -157,6 +160,8 @@ class Packet:
         Arguments:
         blob -- binary data to append to the current payload
         """
+        if isinstance(blob, str):
+            blob = blob.encode()
         self.set_payload(self.payload + blob)
 
 
@@ -166,6 +171,8 @@ class Packet:
         Arguments:
         payload -- binary data that contains the payload
         """
+        if isinstance(payload, str):
+            payload = payload.encode()
         self.payload = payload
         self.payloadsize = len(self.payload)
         self.maxseq = int((self.payloadsize + (MAX_PAYLOAD_SIZE - 1)) / MAX_PAYLOAD_SIZE)
@@ -191,8 +198,8 @@ class Packet:
         if packettype < 0:
             packettype = self.packettype
         header = self.sig
-        header += chr(self.majver)
-        header += chr(self.minver)
+        header += chr(self.majver).encode()
+        header += chr(self.minver).encode()
         header += format_uint16(packettype)
         header += format_uint32(seq)
         header += format_uint32(maxseq)
@@ -225,8 +232,8 @@ class Packet:
                      (default 1)
         """
         if packetnum > self.num_packets() or packetnum < 1:
-            return ""
-        header = ""
+            return b""
+        header = b""
         if packetnum==1:
             header = self.get_header(self.packettype, packetnum, self.maxseq,
                                      self.get_payload_size(packetnum))
@@ -249,11 +256,7 @@ class Packet:
         """
         self.uid = uid
         for a in range ( 0, self.num_packets() ):
-            try:
-                sock.sendto(self.get_udp_message(a+1), addr)
-            except:
-                return False
-        return True
+            sock.sendto(self.get_udp_message(a+1), addr)
 
 
 class PacketHELO (Packet):
@@ -279,7 +282,9 @@ class PacketHELO (Packet):
         self.append_payload( format_uint32 (0) ) # reserved1
         self.append_payload( format_uint32 (0) ) # reserved2
         if icon_type != ICON_NONE and icon_file:
-            self.append_payload( file(icon_file).read() )
+            with open(icon_file, 'rb') as f:
+                self.append_payload(f.read())
+
 
 class PacketNOTIFICATION (Packet):
     """A NOTIFICATION packet
@@ -305,7 +310,8 @@ class PacketNOTIFICATION (Packet):
         self.append_payload( chr (icon_type) )
         self.append_payload( format_uint32 (0) ) # reserved
         if icon_type != ICON_NONE and icon_file:
-            self.append_payload( file(icon_file).read() )
+            with open(icon_file, 'rb') as f:
+                self.append_payload(f.read())
 
 class PacketBUTTON (Packet):
     """A BUTTON packet
@@ -337,7 +343,7 @@ class PacketBUTTON (Packet):
                     "LI:devicename" => LIRC remote map where 'devicename' is the
                     actual device's name
         button_name -- a button name defined in the map specified in map_name.
-                       For example, if map_name is "KB" refering to the
+                       For example, if map_name is "KB" referring to the
                        <keyboard> section in Keymap.xml then, valid
                        button_names include "printscreen", "minus", "x", etc.
         amount -- unimplemented for now; in the future it will be used for
@@ -388,7 +394,7 @@ class PacketMOUSE (Packet):
     def __init__(self, x, y):
         """
         Arguments:
-        x -- horitontal position ranging from 0 to 65535
+        x -- horizontal position ranging from 0 to 65535
         y -- vertical position ranging from 0 to 65535
 
         The range will be mapped to the screen width and height in XBMC
@@ -431,14 +437,14 @@ class PacketLOG (Packet):
         Keyword arguments:
         loglevel -- the loglevel, follows XBMC standard.
         logmessage -- the message to log
-        autoprint -- if the logmessage should automaticly be printed to stdout
+        autoprint -- if the logmessage should automatically be printed to stdout
         """
         Packet.__init__(self)
         self.packettype = PT_LOG
         self.append_payload( chr (loglevel) )
         self.append_payload( format_string(logmessage) )
         if (autoprint):
-          print logmessage
+            print(logmessage)
 
 class PacketACTION (Packet):
     """An ACTION packet
@@ -451,7 +457,7 @@ class PacketACTION (Packet):
         Keyword arguments:
         loglevel -- the loglevel, follows XBMC standard.
         logmessage -- the message to log
-        autoprint -- if the logmessage should automaticly be printed to stdout
+        autoprint -- if the logmessage should automatically be printed to stdout
         """
         Packet.__init__(self)
         self.packettype = PT_ACTION
@@ -495,25 +501,25 @@ class XBMCClient:
             self.port = int(port)
         self.addr = (self.ip, self.port)
         packet = PacketHELO(self.name, self.icon_type, self.icon_file)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
 
     def close(self):
         """Close the current connection"""
         packet = PacketBYE()
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
 
     def ping(self):
         """Send a PING packet"""
         packet = PacketPING()
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
 
     def send_notification(self, title="", message="", icon_file=None):
         """Send a notification to the connected XBMC
         Keyword Arguments:
-        title -- The title/heading for the notifcation
+        title -- The title/heading for the notification
         message -- The message to be displayed
         icon_file -- location of an icon file, if any (png, jpg, gif)
         """
@@ -521,7 +527,7 @@ class XBMCClient:
         packet = PacketNOTIFICATION(title, message,
                                     self._get_icon_type(icon_file),
                                     icon_file)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
 
     def send_keyboard_button(self, button=None):
@@ -531,7 +537,7 @@ class XBMCClient:
         """
         if not button:
             return
-        return self.send_button(map="KB", button=button)
+        self.send_button(map="KB", button=button)
 
 
     def send_remote_button(self, button=None):
@@ -541,13 +547,13 @@ class XBMCClient:
         """
         if not button:
             return
-        return self.send_button(map="R1", button=button)
+        self.send_button(map="R1", button=button)
 
 
     def release_button(self):
         """Release all buttons"""
         packet = PacketBUTTON(code=0x01, down=0)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
 
     def send_button(self, map="", button="", amount=0):
@@ -564,12 +570,12 @@ class XBMCClient:
                    "LI:devicename" => LIRC remote map where 'devicename' is the
                                       actual device's name
         button -- a button name defined in the map specified in map, above.
-                  For example, if map is "KB" refering to the <keyboard>
+                  For example, if map is "KB" referring to the <keyboard>
                   section in Keymap.xml then, valid buttons include
                   "printscreen", "minus", "x", etc.
         """
         packet = PacketBUTTON(map_name=str(map), button_name=str(button), amount=amount)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
     def send_button_state(self, map="", button="", amount=0, down=0, axis=0):
         """Send a button event to XBMC
@@ -585,18 +591,15 @@ class XBMCClient:
                    "LI:devicename" => LIRC remote map where 'devicename' is the
                                       actual device's name
         button -- a button name defined in the map specified in map, above.
-                  For example, if map is "KB" refering to the <keyboard>
+                  For example, if map is "KB" referring to the <keyboard>
                   section in Keymap.xml then, valid buttons include
                   "printscreen", "minus", "x", etc.
         """
         if axis:
-          if amount == 0:
-            down = 0
-          else:
-            down = 1
+            down = int(amount != 0)
 
         packet = PacketBUTTON(map_name=str(map), button_name=str(button), amount=amount, down=down, queue=1, axis=axis)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
     def send_mouse_position(self, x=0, y=0):
         """Send a mouse event to XBMC
@@ -606,17 +609,17 @@ class XBMCClient:
         y -- same a 'x' but relates to the screen height
         """
         packet = PacketMOUSE(int(x), int(y))
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
     def send_log(self, loglevel=0, logmessage="", autoprint=True):
         """
         Keyword arguments:
         loglevel -- the loglevel, follows XBMC standard.
         logmessage -- the message to log
-        autoprint -- if the logmessage should automaticly be printed to stdout
+        autoprint -- if the logmessage should automatically be printed to stdout
         """
         packet = PacketLOG(loglevel, logmessage)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
     def send_action(self, actionmessage="", actiontype=ACTION_EXECBUILTIN):
         """
@@ -625,7 +628,7 @@ class XBMCClient:
         actiontype -- The ActionType the ActionString should be sent to.
         """
         packet = PacketACTION(actionmessage, actiontype)
-        return packet.send(self.sock, self.addr, self.uid)
+        packet.send(self.sock, self.addr, self.uid)
 
     def _get_icon_type(self, icon_file):
         if icon_file:
