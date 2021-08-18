@@ -86,6 +86,12 @@ SETS = {
                 'ltyp': 'file_log',
                 'actn': '/etc/debian_version',
             },
+            {
+                'name': 'OSMC Build Information',
+                'key': 'ps9k90Ws',
+                'ltyp': 'file_log',
+                'actn': '/etc/osmc_build_info',
+            },
         ],
     },
 
