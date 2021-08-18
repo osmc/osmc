@@ -474,24 +474,28 @@ SETS = {
                 'key': 'g0gjk991',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/disp_cap',
+                'hwid': '!rbp',
             },
             {
                 'name': 'Display Mode',
                 'key': 'Q72ho215',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/disp_mode',
+                'hwid': '!rbp',
             },
             {
                 'name': 'EDID',
                 'key': 'wE0go885',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/edid',
+                'hwid': '!rbp',
             },
             {
                 'name': 'Audio Cap',
                 'key': 'k3dRrf31',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/aud_cap',
+                'hwid': '!rbp',
             },
             {
                 'name': 'Pi EDID',
