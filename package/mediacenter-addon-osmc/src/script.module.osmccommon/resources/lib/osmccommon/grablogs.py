@@ -10,7 +10,9 @@
 """
 
 import argparse
+import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -866,6 +868,18 @@ class Main(object):
         self.log_blotter = [x.replace('\0', '').replace('\ufeff', '').encode('utf-8')
                             for x in self.log_blotter if hasattr(x, 'replace')]
 
+        if os.path.isfile(TEMP_LOG_FILE):
+            slept = 0
+            sleep_inc = 0.5
+            with os.popen('sudo rm %s' % TEMP_LOG_FILE) as _:
+                pass
+
+            while slept <= 3:
+                if not os.path.isfile(TEMP_LOG_FILE):
+                    break
+                time.sleep(sleep_inc)
+                slept += sleep_inc
+
         try:
             with open(TEMP_LOG_FILE, 'wb') as f:
                 # write the blotter contents
@@ -922,12 +936,20 @@ class Main(object):
                     with os.popen('%s "%s" %s/documents' %
                                   (attempt, TEMP_LOG_FILE, UPLOAD_LOC)) as open_file:
 
-                        line = open_file.readline()
+                        response = open_file.read()
 
-                        key = line.replace('{"key":"', '').replace('"}', '').replace('\n', '')
+                    key = None
+                    try:
+                        payload = json.loads(response)
+                        if 'key' in payload:
+                            key = payload['key']
+                    except:
+                        match = re.search(r'"key":"(?P<key>[^"]+?)"', response)
+                        if match:
+                            key = match.group('key')
 
-                        if xbmc:
-                            log('pastio line: %s' % repr(line))
+                    if xbmc:
+                        log('pastio response: %s' % repr(response))
 
                     self.progress_dialog.update(percent=pct, message=lang(32010))
 
