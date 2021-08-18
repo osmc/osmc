@@ -57,8 +57,6 @@ TEMP_LOG_FILENAME = 'uploadlog.txt'
 TEMP_LOG_FILE = '/var/tmp/' + TEMP_LOG_FILENAME
 UPLOAD_LOC = 'https://paste.osmc.tv'
 
-HARDWARE_PREFIX = ''
-
 SETS = {
     'uname': {
         'order': 1,
@@ -757,6 +755,59 @@ class Main(object):
 
         self.arguments.sort(key=lambda x: x[1].get('order', 99))
 
+        self._hwid = ''
+
+    def hwid(self):
+        if self._hwid:
+            return self._hwid
+
+        with open('/proc/cmdline', 'r', encoding='utf-8') as f:
+            line = f.readline()
+
+        settings = line.split(' ')
+        settings = [item.split('=', maxsplit=1) for item in settings]
+        settings = [item for item in settings if not (len(item) == 1 and not item[0])]
+        settings = [item + [''] if len(item) == 1 else [item[0], item[1].strip('\n')]
+                    for item in settings]
+
+        for setting, value in settings:
+            if setting == 'osmcdev':
+                self._hwid = value
+                break
+
+        return self._hwid
+
+    def valid_hardware(self, hwid):
+        if not hwid:
+            return True
+
+        actual_hwid = self.hwid()
+
+        # hwid of 'vero' matches all vero hardware, 'vero3' matches exactly vero3
+        generic_match = not hwid[-1].isdigit()
+        # hwid of '!rpb' will matches all non rbp hardware
+        negative_match = hwid.startswith('!')
+
+        if negative_match:
+            # we know it's a negative match, remove ! for future comparisons
+            hwid = hwid.lstrip('!')
+
+        if generic_match:
+            # we know it's a generic match, remove the digit from our 
+            # actual hardware id for future comparisons
+            if actual_hwid[-1].isdigit():
+                actual_hwid = actual_hwid[:-1]
+
+        hardware_match = actual_hwid == hwid
+        if hwid == 'rbp1':
+            # exception to the rule, rbp1 == rbp
+            hardware_match = actual_hwid == hwid[-1]
+
+        if negative_match:
+            return not hardware_match
+
+        return hardware_match
+
     def stage_dialog(self):
         try:
             if self.progress_dialog:
@@ -801,8 +852,7 @@ class Main(object):
             if v.get('active', False):
 
                 for log_entry in v.get('logs', default_entry):
-                    if log_entry.get('hwid', '') == 'rbp' and not hardware_prefix().startswith('rbp'):
-                        # raspberry pi only log on non-rbp
+                    if not self.valid_hardware(log_entry.get('hwid', '')):
                         continue
 
                     self.log_blotter.append(log_entry['key'] + '  :  ' + log_entry['name'] + '\n')
@@ -837,8 +887,7 @@ class Main(object):
     def grab_log(self, ltyp, actn, name, key, hwid=''):
         """ Method grabs the logs from either a file or the command line."""
 
-        if hwid == 'rbp' and not hardware_prefix().startswith(hwid):
-            # raspberry pi only log on non-rbp
+        if not self.valid_hardware(hwid):
             return
 
         self.log_blotter.extend([SECTION_START % (name, key)])
@@ -989,25 +1038,6 @@ class Main(object):
                     log("Logs successfully uploaded.")
                     log("Logs available at %s" % self.url.replace(' ', ''))
 
-
-def hardware_prefix():
-    """ Returns the prefix for the hardware type. rbp, rbp2, etc """
-    global HARDWARE_PREFIX
-
-    if HARDWARE_PREFIX:
-        return HARDWARE_PREFIX
-
-    with open('/proc/cmdline', 'r', encoding='utf-8') as f:
-        line = f.readline()
-
-    settings = line.split(' ')
-
-    for setting in settings:
-        if setting.startswith('osmcdev='):
-            HARDWARE_PREFIX = setting[len('osmcdev='):]
-            break
-
-    return HARDWARE_PREFIX
 
 
 if __name__ == "__main__":
