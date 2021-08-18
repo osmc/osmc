@@ -103,6 +103,9 @@ verify_action
 echo -e "       * Configuring rc.local"
 create_rc_local ${DIR}
 verify_action
+echo -e "       * Adding system release information"
+add_rls_info ${DIR}
+verify_action
 
 # Perform filesystem cleanup
 enable_init "${DIR}"
