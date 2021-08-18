@@ -121,6 +121,14 @@ chmod +x ${1}/etc/rc.local
 
 }
 
+function add_rls_info()
+{
+debootstrap_version=$(debootstrap --version | awk {'print $2'})
+build_date=$(date)
+hostname=$(hostname)
+echo -e "OSMC filesystem assembled on ${hostname} at ${build_date} using Debootstrap version ${debootstrap_version}" > ${1}/etc/osmc_build_info
+}
+
 export -f setup_osmc_user
 export -f setup_hostname
 export -f setup_hosts
@@ -132,3 +140,4 @@ export -f conf_tty
 export -f setup_busybox_links
 export -f enable_legacy_elf
 export -f create_rc_local
+export -f add_rls_info
