@@ -206,7 +206,10 @@ class HotFix(object):
                 results.append('>>>>> INSTRUCTION >>>>> %s\n' % ' '.join(instruct))
 
                 try:
-                    results.append(subprocess.check_output(instruct))
+                    output = subprocess.check_output(instruct)
+                    if isinstance(output, bytes):
+                        output = output.decode('utf-8')
+                    results.append(output)
 
                 except subprocess.CalledProcessError as e:
                     # raise RuntimeError("command '{}' return with error (code {}): {}"
