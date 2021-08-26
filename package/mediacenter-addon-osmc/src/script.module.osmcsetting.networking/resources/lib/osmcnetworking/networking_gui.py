@@ -9,6 +9,7 @@
 """
 
 import os
+import re
 import socket
 import subprocess
 import threading
@@ -254,6 +255,11 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         self.hotspot_ssid = None
         self.hotspot_passphrase = None
 
+        # CRDA
+        self._crda_file = '/etc/default/crda'
+        self.kodi_region = None
+        self.default_crda_region = None
+
     @property
     def addon(self):
         if not self._addon:
@@ -349,6 +355,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             self.setup_networking_from_preseed()
 
         self.getControl(MYSQL_PANEL).setVisible(False)
+
+        self.set_crda_region_code()
 
     def setup_networking_from_preseed(self):
 
@@ -1736,6 +1744,70 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             ])
 
             self.toggle_controls(False, [TETHERING_DISABLE])
+
+    def _get_kodi_region_code(self):
+        language = xbmc.getLanguage(xbmc.ISO_639_1, region=True)
+        region = 'US'
+        if '-' in language:
+            region = language.split('-', maxsplit=1)[1]
+
+        log('Found Kodi region code: %s' % region)
+        self.kodi_region = region
+
+    def _get_crda_region_code(self):
+        if not os.path.isfile(self._crda_file):
+            log('No CRDA file found.')
+            self.default_crda_region = None
+
+        with open(self._crda_file, 'r', encoding='utf-8') as file_handle:
+            crda = file_handle.read()
+
+        match = re.search(r'^REGDOMAIN=(?P<region_code>[A-Z]{2,3})*\s*$', crda)
+        if match:
+            region = match.group('region_code')
+            if region:
+                log('Found CRDA region code: %s' % region)
+            else:
+                log('CRDA region is unconfigured.')
+            self.default_crda_region = region
+            return
+
+        log('REGDOMAIN not found in CRDA file.')
+
+    def _set_crda_region_code(self):
+        if not os.path.isfile(self._crda_file):
+            log('No CRDA file found.')
+            self.default_crda_region = None
+
+        if self.default_crda_region == self.kodi_region or not self.kodi_region:
+            log('CRDA and Kodi region matches or is None.')
+            return
+
+        with open(self._crda_file, 'r', encoding='utf-8') as file_handle:
+            crda = file_handle.read()
+
+        region = '' if not self.default_crda_region else self.default_crda_region
+        payload = crda.replace(
+            'REGDOMAIN=%s' % region,
+            'REGDOMAIN=%s' % self.kodi_region
+        )
+
+        if payload == crda:
+            log('No modifications made to CRDA file.')
+            return
+
+        with open(self._crda_file, 'w', encoding='utf-8') as file_handle:
+            file_handle.write(payload)
+
+        log('CRDA region code was updated from %s to %s.' %
+            (self.default_crda_region, self.kodi_region))
+        self.default_crda_region = self.kodi_region
+
+    def set_crda_region_code(self):
+        log('Configuring CRDA')
+        self._get_kodi_region_code()
+        self._get_crda_region_code()
+        self._set_crda_region_code()
 
 
 class BluetoothPopulationThread(threading.Thread):
