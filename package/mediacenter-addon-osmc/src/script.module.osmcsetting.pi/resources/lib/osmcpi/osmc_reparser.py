@@ -339,19 +339,6 @@ def display_rotate_validation(config_value):
     if config_value in permitted:
         return config_value
 
-
-def gpu_mem_1024_validation(config_value):
-    return generic_range_validation(config_value, range(16, 321))
-
-
-def gpu_mem_512_validation(config_value):
-    return generic_range_validation(config_value, range(16, 257))
-
-
-def gpu_mem_256_validation(config_value):
-    return generic_range_validation(config_value, range(16, 193))
-
-
 def hdmi_group_validation(config_value):
     return generic_range_validation(config_value, range(0, 3))
 
@@ -572,7 +559,7 @@ def soundcard_dac_config_set(kodi_setting, all_settings):
         return "remove_this_line"
 
 
-def legacy_gpio_removal(kodi_setting, all_settings):
+def deprecated_or_blacklisted_removal(kodi_setting, all_settings):
     """
         This entry is deprecated and should always be removed from the config.txt.
     """
@@ -738,7 +725,7 @@ MASTER_SETTINGS = {
     "gpu_mem_1024": {
         "default": {
             "function": None,
-            "value": "256"
+            "value": "defunct"
         },
         "config_get_patterns": [
             {
@@ -750,8 +737,8 @@ MASTER_SETTINGS = {
                 "extract": r"\s*gpu_mem\s*=\s*(\d+)"
             },
         ],
-        "config_set": generic_passthrough_config_set,
-        "config_validation": gpu_mem_1024_validation,
+        "config_set": deprecated_or_blacklisted_removal,
+        "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
         "setting_stub": "gpu_mem_1024=%s",
@@ -759,7 +746,7 @@ MASTER_SETTINGS = {
     "gpu_mem_512": {
         "default": {
             "function": None,
-            "value": "144"
+            "value": "defunct"
         },
         "config_get_patterns": [
             {
@@ -771,8 +758,8 @@ MASTER_SETTINGS = {
                 "extract": r"\s*gpu_mem\s*=\s*(\d+)"
             },
         ],
-        "config_set": generic_passthrough_config_set,
-        "config_validation": gpu_mem_512_validation,
+        "config_set": deprecated_or_blacklisted_removal,
+        "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
         "setting_stub": "gpu_mem_512=%s",
@@ -780,7 +767,7 @@ MASTER_SETTINGS = {
     "gpu_mem_256": {
         "default": {
             "function": None,
-            "value": "112"
+            "value": "defunct"
         },
         "config_get_patterns": [
             {
@@ -792,8 +779,8 @@ MASTER_SETTINGS = {
                 "extract": r"\s*gpu_mem\s*=\s*(\d+)"
             },
         ],
-        "config_set": generic_passthrough_config_set,
-        "config_validation": gpu_mem_256_validation,
+        "config_set": deprecated_or_blacklisted_removal,
+        "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
         "setting_stub": "gpu_mem_256=%s",
@@ -1070,7 +1057,7 @@ MASTER_SETTINGS = {
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*lirc-rpi[-\w\d]*)",
             }
         ],
-        "config_set": legacy_gpio_removal,
+        "config_set": deprecated_or_blacklisted_removal,
         "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
@@ -1092,7 +1079,7 @@ MASTER_SETTINGS = {
                            r".*gpio_in_pull[-\w\d]*=\s*(\w*)",
             }
         ],
-        "config_set": legacy_gpio_removal,
+        "config_set": deprecated_or_blacklisted_removal,
         "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
@@ -1112,7 +1099,7 @@ MASTER_SETTINGS = {
                 "extract": r"\s*(?:dtoverlay|device_tree_overlay)\s*=\s*([-\w\d]*gpio-ir[-\w\d]*)",
             }
         ],
-        "config_set": legacy_gpio_removal,
+        "config_set": deprecated_or_blacklisted_removal,
         "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
@@ -1133,7 +1120,7 @@ MASTER_SETTINGS = {
                            r".*gpio_out_pin[-\w\d]*=\s*(\w*)",
             }
         ],
-        "config_set": legacy_gpio_removal,
+        "config_set": deprecated_or_blacklisted_removal,
         "config_validation": blank_check_validation,
         "kodi_set": generic_passthrough_kodi_set,
         "already_set": False,
@@ -1154,7 +1141,7 @@ MASTER_SETTINGS = {
                            r".*gpio_in_pin[-\w\d]*=\s*(\w*)",
             }
         ],
-        "config_set": legacy_gpio_removal,  # Coming from Kodi to the config.txt
+        "config_set": deprecated_or_blacklisted_removal,  # Coming from Kodi to the config.txt
         "config_validation": gpio_pin_validation,  # Coming from the config.txt to Kodi
         "kodi_set": generic_passthrough_kodi_set,  # Coming from the config.txt to Kodi
         "already_set": False,
