@@ -476,6 +476,11 @@ class OSMCBackup(object):
             log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
 
             success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+            if not success:
+                subprocess.Popen(['cp', local_tarball_name, remote_tarball_name])
+                xbmc.sleep(300)
+                success = os.path.isfile(remote_tarball_name)
+
             if success:
                 log('Backup file successfully transferred')
                 try:
