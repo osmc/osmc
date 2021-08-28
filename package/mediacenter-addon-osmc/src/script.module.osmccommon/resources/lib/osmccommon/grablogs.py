@@ -472,10 +472,31 @@ SETS = {
         'flags': ['-z', '--disp_info'],
         'logs': [
             {
-                'name': 'Display Cap',
+                'name': 'Display Cap CTA',
                 'key': 'g0gjk991',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/disp_cap',
+                'hwid': '!rbp',
+            },
+            {
+                'name': 'Display Cap VESA',
+                'key': 'xyGFZe4j',
+                'ltyp': 'file_log',
+                'actn': '/sys/class/amhdmitx/amhdmitx0/vesa_cap',
+                'hwid': '!rbp',
+            },
+            {
+                'name': 'Display Cap 3D',
+                'key': 'knxJbydS',
+                'ltyp': 'file_log',
+                'actn': '/sys/class/amhdmitx/amhdmitx0/disp_cap_3d',
+                'hwid': '!rbp',
+            },
+            {
+                'name': 'User Display Overrides',
+                'key': 'BzKtAx6S',
+                'ltyp': 'cl_log',
+                'actn': 'bash -c "for f in disp_cap vesa_cap disp_cap_3d; do echo -e \\"$f file\\n\\"; cat /home/osmc/.kodi/userdata/$f 2> /dev/null; echo; done"',
                 'hwid': '!rbp',
             },
             {
