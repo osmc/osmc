@@ -1,318 +1,488 @@
 #!/usr/bin/env python-3
 # -*- coding: utf-8 -*-
-#
-#  /usr/bin/preseed
-#
-#  Copyright 2014 Sam Nazarko <email@samnazarko.co.uk>
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA 02110-1301, USA.
-#
+"""
+    /usr/bin/preseed
 
-# shell return codes
-# 0 = preseeding successful
-# 1 = reserved (python interpreter unhandled exception)
-# 2 = reserved (python interpreter file not found)
-# 3 = preseed.cfg not found
-# 4 = ethernet interface not connected
-# 5 = wireless network not found
-# 6 = wireless network found but could not connect
-# 7 = Agent failed to start
+    Copyright 2014 Sam Nazarko <email@samnazarko.co.uk>
 
-import syslog  # NOQA
-import os.path
-import dbus
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+    MA 02110-1301, USA.
+
+    usage: preseed [-h] [-p [FILE]] [-c [FILE]]
+
+    OSMC Networking Preseed
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      -p [FILE]   Path to preseed file
+      -c [FILE]   Path to connman provisioning file
+
+    shell return codes:
+        0 = preseeding successful
+        1 = reserved (python interpreter unhandled exception)
+        2 = reserved (python interpreter file not found)
+        3 = preseed file not found
+        4 = no write access to provisioning file
+        5 = unknown interface type encountered
+        6 = nfs install detected
+"""
+
+import argparse
+import base64
+import configparser
 import os
-import time
 import sys
-import subprocess
 
-from io import open
+from collections import OrderedDict
+
+try:
+    import syslog  # NOQA
+except ImportError:
+    # pylint: disable=too-few-public-methods
+    class SysLog:
+        """
+        Mock syslog for windows
+        """
+
+        @staticmethod
+        def syslog(value):
+            """
+            Mock syslog.syslog() for windows
+            :param value: string to print
+            :type value: str
+            """
+            print('syslog: %s' % value)
 
 
-def getvalue(valuestring):
-    splitvalue = valuestring.split(' ', 3)
-    line = splitvalue[3]
-    return line
+    syslog = SysLog()
+
+PRESEED = '/boot/preseed.cfg'
+PRESEED_PROVISIONING = '/tmp/conmann.preseed.config'
+CONNMAN_PROVISIONING = '/var/lib/connman/osmc.config'
+
+if hasattr(sys, 'getwindowsversion'):
+    # for testing on windows
+    PRESEED = os.path.join(os.getcwd(), '.tests', 'preseed.cfg')
+    PRESEED_PROVISIONING = os.path.join(os.getcwd(), '.tests', 'conmann.preseed.config')
+    CONNMAN_PROVISIONING = os.path.join(os.getcwd(), '.tests', 'osmc.config')
+    try:
+        os.makedirs(os.path.join(os.getcwd(), '.tests'))
+    except FileExistsError:
+        pass
 
 
-def format_ip(ipstring):
-    a = ipstring.split('.')
-    for i, s in enumerate(a):
-        a[i] = str(int(s, base=10))
-    return a[0] + '.' + a[1] + '.' + a[2] + '.' + a[3]
+class ConfigParser(configparser.ConfigParser):
+    """
+    configparser.ConfigParser with optionxform set to str so the casing of options remains intact
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.optionxform = str
+
+    def sections_dict(self):
+        """
+        Method to access protected attribute self._sections
+        :return: self._sections
+        :rtype: dict
+        """
+        return self._sections
 
 
-def make_variant(string):
-    return dbus.String(string, variant_level=1)
+def format_ip(string):
+    """
+    Format string as an IP address
+    :param string: IP address string to format
+    :type string: str
+    :return: formatted IP address string
+    :rtype: str
+    """
+    parts = string.split('.')
+    for idx, num in enumerate(parts):
+        parts[idx] = str(int(num, base=10))
+
+    return '.'.join(parts)
 
 
-def main():
-    syslog.syslog("Preseed parser starting...")
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    else:
-        filename = "/boot/preseed.cfg"
+def privacy_mask(string):
+    """
+    Mask a string with * for privacy
+    :param string: string to mask
+    :type string:str
+    :return: masked string ie. 'A*******3'
+    :rtype: str
+    """
+    length = len(string)
+    if length > 2:
+        mask = (length - 2) * '*'
+        return mask.join([string[0], string[-1]])
 
-    if not os.path.isfile(filename):
-        syslog.syslog("No preseed file found")
+    return '%s*' % string[0]
+
+
+def valid_provisioning_file(provisioning_file):
+    """
+    Check if the provisioning file exists and is not empty
+    :param provisioning_file: path with filename to the provisioning file
+    :type provisioning_file: str
+    :return: if the provisioning file exists and is not empty
+    :rtype: bool
+    """
+    return os.path.isfile(provisioning_file) and os.path.getsize(provisioning_file) != 0
+
+
+def parse_preseed(contents):
+    """
+    Parse to `preseed.cfg` to a dict for conversion with `preseed_to_connman_provisioning()`
+    :param contents: contents of `preseed.cfg`
+    :type contents: list
+    :return: a parsed version of the preseed lines as a dict
+        Possible keys:
+            payload = {
+                'interface': '',
+                'auto': 'true',
+                'hidden': 'false',
+                'ip': '',
+                'mask': '',
+                'dns1': '',
+                'dns2': '',
+                'gw': '',
+                'ssid': ''
+                'wlan_keytype': '',
+                'wlan_key': ''
+            }
+    :rtype: dict
+    """
+    syslog.syslog('Preseed parser initialised...\n%s' % str(contents))
+
+    transform_map = {
+        'ip': {
+            'format': format_ip,
+        },
+        'mask': {
+            'format': format_ip,
+        },
+        'dns1': {
+            'format': format_ip,
+        },
+        'dns2': {
+            'format': format_ip,
+        },
+        'gw': {
+            'format': format_ip,
+        },
+        'wlan_key': {
+            'log_format': privacy_mask,
+        },
+    }
+
+    payload = {
+        'interface': 'eth',
+        'auto': 'true',
+        'hidden': 'false'
+    }
+
+    for line in contents:
+        if not line.startswith('d-i network/'):
+            continue
+
+        parameters = line.split('/', maxsplit=1)[1]
+        setting_name, _, setting_value = parameters.split(' ', maxsplit=2)
+
+        value = setting_value
+
+        formatting_func = transform_map.get(setting_name, {}).get('format')
+        if formatting_func:
+            value = formatting_func(setting_value)
+
+        log_value = value
+        log_formatting_func = transform_map.get(setting_name, {}).get('log_format')
+        if log_formatting_func:
+            log_value = log_formatting_func(setting_value)
+
+        payload[setting_name] = value
+
+        syslog.syslog('Preseed %s has value of %s' % (setting_name, log_value))
+
+    log_payload = payload.copy()
+    if 'wlan_key' in log_payload:
+        log_payload['wlan_key'] = privacy_mask(log_payload['wlan_key'])
+
+    syslog.syslog('Parsing completed.\n%s' % str(log_payload))
+    return payload
+
+
+def preseed_to_connman_provisioning(parsed_preseed):
+    """
+    Convert the parsed preseed.cfg to a `ConfigParser()` file at `PRESEED_PROVISIONING`
+    :param parsed_preseed: parsed values from the preseed config `parse_preseed()`
+    :type parsed_preseed: dict
+    """
+    syslog.syslog('Converting preseed to connman provisioning format...')
+
+    if parsed_preseed['interface'] not in ('eth', 'wlan'):
+        syslog.syslog('Unknown interface type: %s' % parsed_preseed['interface'])
+        sys.exit(5)
+
+    security_types = {
+        '0': 'none',
+        '1': 'psk',
+        '2': 'wep',
+    }
+
+    common = {
+        'Type': '',
+        'IPv4': '',
+        'IPv6': 'off',
+    }
+
+    ethernet_section = common.copy()
+    ethernet_section['Type'] = 'ethernet'
+
+    wifi_section = common.copy()
+    wifi_section['Type'] = 'wifi'
+    wifi_section.update({
+        'Name': '',
+        'Security': '',
+        'Hidden': '',
+    })
+
+    config = {
+        'global': {
+            'Name': 'OSMC Provisioning File',
+            'Description': 'This provisioning file is created and updated by '
+                           'My OSMC and OSMC installation',
+        },
+    }
+
+    section_name = 'service_ethernet'
+    if parsed_preseed['interface'] == 'eth':
+        config['service_ethernet'] = ethernet_section
+
+        if parsed_preseed['auto'] == 'true':
+            config[section_name]['IPv4'] = 'dhcp'
+        else:
+            config[section_name]['IPv4'] = '/'.join([parsed_preseed['ip'],
+                                                     parsed_preseed['mask'],
+                                                     parsed_preseed['gw']])
+            config[section_name]['Nameservers'] = ','.join([parsed_preseed['dns1'],
+                                                            parsed_preseed['dns2']])
+
+    elif parsed_preseed['interface'] == 'wlan':
+        base64_ssid = base64.b64encode(parsed_preseed['ssid']).decode('utf-8')
+        base64_ssid = base64_ssid.rstrip('=')
+        section_ssid = '_%s' % base64_ssid if base64_ssid else ''
+        section_name = 'service_wifi%s' % section_ssid
+
+        config[section_name] = wifi_section
+        config[section_name]['Name'] = parsed_preseed['ssid']
+        config[section_name]['Hidden'] = parsed_preseed['hidden']
+        config[section_name]['Security'] = \
+            security_types.get(parsed_preseed['wlan_keytype'], 'wep')
+
+        if config[section_name]['Security'] != 'none':
+            config[section_name]['Passphrase'] = parsed_preseed['wlan_key']
+
+        if parsed_preseed['auto'] == 'true':
+            config[section_name]['IPv4'] = 'dhcp'
+        else:
+            config[section_name]['IPv4'] = '/'.join([parsed_preseed['ip'],
+                                                     parsed_preseed['mask'],
+                                                     parsed_preseed['gw']])
+            config[section_name]['Nameservers'] = ','.join([parsed_preseed['dns1'],
+                                                            parsed_preseed['dns2']])
+
+    preseed_provisioning = ConfigParser()
+    preseed_provisioning.read_dict(config)
+
+    with open(PRESEED_PROVISIONING, 'w', encoding='utf-8') as handle:
+        preseed_provisioning.write(handle, space_around_delimiters=False)
+
+    log_config = config.copy()
+    if 'Passphrase' in log_config[section_name]:
+        log_config[section_name]['Passphrase'] = \
+            privacy_mask(log_config[section_name]['Passphrase'])
+
+    syslog.syslog('Conversion completed.\n%s' % str(log_config))
+
+
+def merge_provisioning_files(filename):
+    """
+    Merge the temp provisioning file created by `preseed_to_connman_provisioning()` at
+    `PRESEED_PROVISIONING` with the connman provisioning file specified
+    :param filename: connman provisioning file to merge `PRESEED_PROVISIONING` with
+    :type filename: str
+    """
+    syslog.syslog('Merging provisioning files: %s -> %s...' % (PRESEED_PROVISIONING, filename))
+
+    preseed_provisioning = ConfigParser()
+    connman_provisioning = ConfigParser()
+
+    if valid_provisioning_file(PRESEED_PROVISIONING):
+        with open(PRESEED_PROVISIONING, 'r', encoding='utf8') as handle:
+            preseed_provisioning.read_file(handle)
+
+    if valid_provisioning_file(filename):
+        with open(filename, 'r', encoding='utf8') as handle:
+            connman_provisioning.read_file(handle)
+
+    preseed_sections = preseed_provisioning.sections_dict().copy()
+    connman_sections = connman_provisioning.sections_dict().copy()
+
+    for section, options in preseed_sections.items():
+        if section in connman_sections:
+            del connman_sections[section]
+
+        connman_sections[section] = options
+        continue
+
+    if connman_sections == connman_provisioning.sections_dict() or not connman_sections:
+        syslog.syslog('Merging provisioning files completed. No modifications made.')
+        return
+
+    # move global section to first
+    sections = list(connman_sections.items())
+    for index, section in enumerate(sections):
+        if section[0].lower() != 'global':
+            continue
+        sections.insert(0, sections.pop(index))
+        break
+
+    sections = OrderedDict(sections)
+    payload_provisioning = ConfigParser()
+    payload_provisioning.read_dict(sections)
+
+    with open(filename, 'w', encoding='utf-8') as handle:
+        payload_provisioning.write(handle, space_around_delimiters=False)
+
+    log_sections = dict(sections).copy()
+    for section, option in log_sections.items():
+        if 'Passphrase' in option:
+            log_sections[section]['Passphrase'] = \
+                privacy_mask(log_sections[section]['Passphrase'])
+
+    syslog.syslog('Merging provisioning files completed.\n%s' % str(log_sections))
+
+
+def preseed_contents(parser, arg):
+    """
+    Check for existence of the `preseed.cfg`, and return it's contents
+    :param parser: reference to `argparse.ArgumentParser()` calling this function
+    :type parser: argparse.ArgumentParser
+    :param arg: path to the `preseed.cfg` with filename
+    :type arg: str
+    :return: the contents of the `preseed.cfg` with no empty lines
+    :rtype: list
+    :exitcode: 3 - preseed file not found
+    """
+    if not os.path.isfile(arg):
+        syslog.syslog('Preseed file does not exist: %s' % arg)
+        parser.error('Preseed file does not exist: %s' % arg)
         sys.exit(3)
 
-    with open(filename, 'r', encoding='utf-8') as preseed_file:
-        preseed_lines = preseed_file.readlines()
-
-    with open("/proc/cmdline") as cmdfile:
-        cmdline = cmdfile.read()
-
-    network = {
-        "interface": "eth",
-        "auto": "true",
-        "hidden": "false"
-    }
-    preseed_lines = [line.strip() for line in preseed_lines]
-    bus = dbus.SystemBus()
-    manager = dbus.Interface(bus.get_object('net.connman', '/'), 'net.connman.Manager')
-
-    syslog.syslog("Preseed parser initialised...\n%s" % str(preseed_lines))
-
-    for line in preseed_lines:
-        if line.startswith("d-i network/interface string"):
-            syslog.syslog("Detected interface definition of " + getvalue(line))
-            network["interface"] = getvalue(line)
-            continue
-        if line.startswith("d-i network/auto boolean"):
-            syslog.syslog("DHCP is set to " + getvalue(line))
-            network["auto"] = getvalue(line)
-            continue
-        if line.startswith("d-i network/ip string"):
-            syslog.syslog("IP address is set to " + format_ip(getvalue(line)))
-            network["ip"] = format_ip(getvalue(line))
-            continue
-        if line.startswith("d-i network/mask string"):
-            syslog.syslog("Subnet mask is set to " + format_ip(getvalue(line)))
-            network["mask"] = format_ip(getvalue(line))
-            continue
-        if line.startswith("d-i network/dns1 string"):
-            syslog.syslog("DNS1 is set to " + format_ip(getvalue(line)))
-            network["dns1"] = format_ip(getvalue(line))
-            continue
-        if line.startswith("d-i network/dns2 string"):
-            syslog.syslog("DNS2 is set to " + format_ip(getvalue(line)))
-            network["dns2"] = format_ip(getvalue(line))
-            continue
-        if line.startswith("d-i network/gw string"):
-            syslog.syslog("Gateway is set to " + format_ip(getvalue(line)))
-            network["gw"] = format_ip(getvalue(line))
-            continue
-        if line.startswith("d-i network/ssid string"):
-            syslog.syslog("SSID is set to " + getvalue(line))
-            network["ssid"] = getvalue(line)
-            continue
-        if line.startswith("d-i network/wlan_keytype string"):
-            syslog.syslog("WLAN key type is set to " + getvalue(line))
-            network["keytype"] = getvalue(line)
-            continue
-        if line.startswith("d-i network/wlan_key string"):
-            wlan_key = getvalue(line)
-            key_length = len(wlan_key)
-            if key_length > 2:
-                log_key = wlan_key[0] + (key_length - 2) * '*' + wlan_key[-1]
-            else:
-                log_key = wlan_key
-            syslog.syslog("WLAN key is set to " + log_key)
-            network["keyvalue"] = wlan_key
-            continue
-        if line.startswith("d-i network/hidden boolean"):
-            syslog.syslog("hidden is set to " + getvalue(line))
-            network["hidden"] = getvalue(line)
-            continue
-
-    syslog.syslog("Parsing completed. Performing setup...\n%s" % str(network))
-    if (network["interface"] == "wlan") or (network["auto"] == "false") and "nfs" not in cmdline:
-        syslog.syslog("Non-standard network setup specified")
-        if network["interface"] == "eth":
-            syslog.syslog("Configuring static Ethernet connection")
-            ethernet_found = False
-            path = ''
-            services = manager.GetServices()
-            for entry in services:
-                path = entry[0]
-                _ = entry[1]
-                ethernet_found = path.startswith("/net/connman/service/ethernet")
-                if ethernet_found:
-                    break
-
-            if ethernet_found:
-                syslog.syslog("Ethernet device identified has entry point " + path)
-                service = dbus.Interface(bus.get_object('net.connman', path), 'net.connman.Service')
-                _ = service.GetProperties()
-                syslog.syslog("Setting ip, mask and gateway")
-                ipv4_configuration = {
-                    "Method": make_variant("manual"),
-                    "Address": make_variant(network["ip"]),
-                    "Netmask": make_variant(network["mask"]),
-                    "Gateway": make_variant(network["gw"])
-                }
-                service.SetProperty("IPv4.Configuration", ipv4_configuration)
-                time.sleep(2)
-                syslog.syslog("Setting nameservers")
-                dns = {network["dns1"], network["dns2"]}
-                # duplicate SetProperty message works around connman dns forwarder bug
-                service.SetProperty("Nameservers.Configuration",
-                                    dbus.Array(dns, signature=dbus.Signature('s')))
-                service.SetProperty("Nameservers.Configuration",
-                                    dbus.Array(dns, signature=dbus.Signature('s')))
-
-            else:
-                syslog.syslog("Cannot find a wired network adapter")
-                sys.exit(4)
-
-        if network["interface"] == "wlan":
-            syslog.syslog("Configuring Wireless connection")
-            syslog.syslog("Enabling wireless connection")
-            technology = dbus.Interface(
-                bus.get_object("net.connman", "/net/connman/technology/wifi"),
-                "net.connman.Technology"
-            )
-            try:
-                technology.SetProperty("Powered", True)
-            except dbus.DBusException:
-                syslog.syslog("Wireless connectivity is already enabled. "
-                              "If you are running this script again, you probably "
-                              "shouldn't be unless you know what you are doing")
-            time.sleep(2)
-            syslog.syslog("Scanning for WiFi networks")
-            try:
-                technology.Scan()
-            except dbus.DBusException:
-                # technology.Scan() will sometimes time out if connman is "busy".
-                # Catch exception and retry.
-                syslog.syslog("First technology.Scan() failed, retrying...")
-                try:
-                    time.sleep(2)
-                    technology.Scan()
-                except dbus.DBusException:
-                    syslog.syslog("Second technology.Scan() failed.")
-            time.sleep(10)
-
-            syslog.syslog("Mapping SSID to service")
-            network_found = False
-            service = None
-            services = manager.GetServices()
-            for entry in services:
-                path = entry[0]
-                properties = entry[1]
-                if network["hidden"] == "false":
-                    if not path.startswith("/net/connman/service/wifi"):
-                        continue
-                    if "Name" not in properties:
-                        syslog.syslog("Detected hidden wireless network during scan")
-                        continue
-                    svcname = properties["Name"]
-                    syslog.syslog("Detected wireless network " +
-                                  properties["Name"] + " during scan")
-                    if network["ssid"] == svcname:
-                        syslog.syslog("Found SSID entry point for " +
-                                      network["ssid"] + " at " + path)
-                        network_found = True
-                        service = dbus.Interface(bus.get_object("net.connman", path),
-                                                 "net.connman.Service")
-                        break
-                else:  # hidden network
-                    syslog.syslog('Looking for hidden network entry ' + path)
-                    if network["keytype"] == "0":
-                        if path.endswith("hidden_managed_none"):
-                            syslog.syslog("Found open but hidden network at " + path)
-                            network_found = True
-                            service = dbus.Interface(bus.get_object("net.connman", path),
-                                                     "net.connman.Service")
-                            break
-                    else:
-                        if path.endswith("_hidden_managed_psk"):
-                            syslog.syslog("Found (psk) encrypted hidden network at " + path)
-                            network_found = True
-                            service = dbus.Interface(bus.get_object("net.connman", path),
-                                                     "net.connman.Service")
-                            break
-
-            if network_found is False:
-                syslog.syslog("Unable to find wireless network " + network["ssid"])
-                sys.exit(5)
-
-            agent_required = not network["keytype"] == "0" or network["hidden"] == "true"
-            process = None
-            if agent_required:
-                syslog.syslog("Hidden and or protected network need to setup an agent")
-                with open("/tmp/preseed_data", "w", encoding="utf-8") as preseed_data:
-                    if not network["keytype"] == "0":
-                        syslog.syslog('Protected Network - Writing key to preseed_data for agent')
-                        preseed_data.write(network["keyvalue"])
-                    preseed_data.write('\n')
-                    if network["hidden"] == "true":
-                        syslog.syslog('Encrypted Network - Writing SSID to preseed_data for agent')
-                        preseed_data.write(network["ssid"])
-                    preseed_data.write('\n')
-                process = subprocess.Popen([sys.executable, '/usr/bin/preseed-agent', 'fromfile'])
-
-            syslog.syslog("Attempting connection now")
-            connected = 1
-            while service and connected != 0 and connected < 16:
-                try:
-                    service.Connect(timeout=15000)
-                    connected = 0
-                except dbus.DBusException as e:
-                    if len(e.args) > 0 and e.args[0] == 'Not registered' and agent_required:
-                        connected += 1
-                        time.sleep(1)
-                        syslog.syslog('Connection agent not started yet, waiting a second')
-                    else:  # another type of exception jump out of the loop
-                        connected = 2
-                        syslog.syslog('DBusException Raised: ' + str(e))
-
-            syslog.syslog("Cleaning up deleting /tmp/preseed_data and killing Agent")
-            if agent_required:
-                if os.path.exists('/tmp/preseed_data'):
-                    os.remove('/tmp/preseed_data')
-                if process:
-                    process.kill()
-
-            if not connected == 0:
-                if connected == 15:  # agent has not started in time
-                    sys.exit(7)
-                else:
-                    sys.exit(6)  # could not connect
-
-            if network["auto"] == "false":
-                syslog.syslog("Configuring static wireless connection")
-                _ = service.GetProperties()
-                syslog.syslog("Setting ip, mask and gateway")
-                ipv4_configuration = {
-                    "Method": make_variant("manual"),
-                    "Address": make_variant(network["ip"]),
-                    "Netmask": make_variant(network["mask"]),
-                    "Gateway": make_variant(network["gw"])
-                }
-                service.SetProperty("IPv4.Configuration", ipv4_configuration)
-                time.sleep(2)
-                syslog.syslog("Setting nameservers")
-                dns = {network["dns1"], network["dns2"]}
-                # duplicate SetProperty message works around connman dns forwarder bug
-                service.SetProperty("Nameservers.Configuration",
-                                    dbus.Array(dns, signature=dbus.Signature('s')))
-                service.SetProperty("Nameservers.Configuration",
-                                    dbus.Array(dns, signature=dbus.Signature('s')))
+    with open(arg, 'r', encoding='utf-8') as file_handle:
+        return [line.strip() for line in file_handle.readlines()]
 
 
-main()
+def connman_provisioning_filename(parser, arg):
+    """
+    Check for write access to connman provisioning file and return it
+    :param parser: reference to `argparse.ArgumentParser()` calling this function
+    :type parser: argparse.ArgumentParser
+    :param arg: path to the `osmc.config` with filename
+    :type arg: str
+    :return: path to the `osmc.config` with filename
+    :rtype: str
+    :exitcode: 4 - no write access to provisioning file
+    """
+    if not os.access(os.path.dirname(arg), os.W_OK):
+        syslog.syslog('No write access to connman provisioning file: %s' % arg)
+        parser.error('No write access to connman provisioning file: %s' % arg)
+        sys.exit(4)
+
+    return arg
+
+
+def parse_args():
+    """
+    Parse command line arguments
+    :return: arguments after being parsed by `argparse.ArgumentParser()`
+    :rtype: argparse.Namespace
+    """
+
+    epliog = '''
+shell return codes:
+    0 = preseeding successful
+    1 = reserved (python interpreter unhandled exception)
+    2 = reserved (python interpreter file not found)
+    3 = preseed file not found
+    4 = no write access to provisioning file
+    5 = unknown interface type encountered
+    6 = nfs install detected
+    '''
+
+    parser = argparse.ArgumentParser(description='OSMC Networking Preseed',
+                                     epilog=epliog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument('-p', dest='preseed_contents', metavar='FILE',
+                        nargs='?', const=PRESEED, default=PRESEED,
+                        type=lambda x: preseed_contents(parser, x),
+                        help='Path to preseed file')
+
+    parser.add_argument('-c', dest='connman_filename', action='store', metavar='FILE',
+                        nargs='?', const=CONNMAN_PROVISIONING, default=CONNMAN_PROVISIONING,
+                        type=lambda x: connman_provisioning_filename(parser, x),
+                        help='Path to connman provisioning file')
+
+    return parser.parse_args()
+
+
+def nfs_install():
+    """
+    Check for NFS install
+    :return: if "root=/dev/nfs" in "/proc/cmdline"
+    :rtype: bool
+    """
+    if not os.path.isfile('/proc/cmdline'):
+        return False
+
+    with open('/proc/cmdline', 'r', encoding='utf-8') as handle:
+        return 'root=/dev/nfs' in handle.read()
+
+
+def spread_seed():
+    """
+    Entry Point
+    """
+    syslog.syslog('OSMC Networking Preseed starting...')
+
+    if nfs_install():
+        syslog.syslog('NFS install detected, aborting...')
+        sys.exit(6)
+
+    args = parse_args()
+
+    parsed_preseed = parse_preseed(args.preseed_contents)
+
+    preseed_to_connman_provisioning(parsed_preseed)
+
+    merge_provisioning_files(args.connman_filename)
+
+    syslog.syslog('OSMC Networking Preseed completed.')
+
+
+if __name__ == '__main__':
+    spread_seed()
