@@ -20,7 +20,7 @@ do
 esac
 done
 
-preferred=$(busybox grep \1080.60hz /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+preferred=$(busybox grep 1080p60hz /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
 if ! [ "$preferred" ]
 then
 	preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
