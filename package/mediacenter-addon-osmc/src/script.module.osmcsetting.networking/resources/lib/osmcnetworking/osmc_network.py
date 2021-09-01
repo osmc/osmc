@@ -7,7 +7,9 @@
     SPDX-License-Identifier: GPL-2.0-or-later
     See LICENSES/GPL-2.0-or-later for more information.
 """
-
+import base64
+import configparser
+import json
 import os
 import os.path
 import re
@@ -15,7 +17,7 @@ import socket
 import subprocess
 import sys
 import time
-from io import open
+from collections import OrderedDict
 
 import requests
 
@@ -33,10 +35,24 @@ WIFI_PATH = '/net/connman/service/wifi'
 RUNNING_NETWORK_DETAILS_FILE = '/proc/cmdline'
 # but we want to update here - this gets copied to /proc/ as part of boot
 UPDATE_NETWORK_DETAILS_FILE = '/boot/cmdline.txt'
-PREESEED_TEMP_LOCATION = '/tmp/preseed.tmp'
-PREESEED_LOCATION = '/boot/preseed.cfg'
-
+PRESEED_TEMP_LOCATION = '/tmp/preseed.tmp'
+PRESEED_LOCATION = '/boot/preseed.cfg'
+PRESEED_PROVISIONING = '/tmp/conmann.preseed.config'
+CONNMAN_PROVISIONING = '/var/lib/connman/osmc.config'
 WAIT_FOR_NETWORK_SERVICE = 'connman-wait-for-network.service'
+
+
+class ConfigParser(configparser.ConfigParser):
+    """
+    configparser.ConfigParser with optionxform set to str so the casing of options remains intact
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.optionxform = str
+
+    def sections_dict(self):
+        return self._sections
 
 
 def is_ethernet_enabled():
@@ -92,10 +108,10 @@ def get_nfs_ip_cmdline_value():
     ip_value = None
     nfs_install = False
 
-    with open(RUNNING_NETWORK_DETAILS_FILE, 'r', encoding='utf-8') as cmdline:
-        cmdline_data = cmdline.read()
+    with open(RUNNING_NETWORK_DETAILS_FILE, 'r', encoding='utf-8') as handle:
+        cmdline = handle.read()
 
-    for cmdline_value in cmdline_data.split(' '):
+    for cmdline_value in cmdline.split(' '):
         if 'root=/dev/nfs' in cmdline_value:
             nfs_install = True
 
@@ -103,10 +119,164 @@ def get_nfs_ip_cmdline_value():
         if cmdline_value.startswith('ip='):
             ip_value = cmdline_value[3:]
 
+        if nfs_install and ip_value:
+            break
+
     if nfs_install:
         return ip_value
 
     return None
+
+
+def save_provisioning(provisioning):
+    sections = provisioning.sections_dict().copy()
+
+    # move global section to first
+    sections = list(sections.items())
+    for index, section in enumerate(sections):
+        if section[0].lower() != 'global':
+            continue
+        sections.insert(0, sections.pop(index))
+        break
+
+    sections = OrderedDict(sections)
+    provisioning = ConfigParser()
+    provisioning.read_dict(sections)
+
+    subprocess.call(['sudo', 'rm', PRESEED_PROVISIONING])
+
+    with open(PRESEED_PROVISIONING, 'w', encoding='utf-8') as handle:
+        provisioning.write(handle, space_around_delimiters=False)
+
+    subprocess.call(['sudo', 'mv', PRESEED_PROVISIONING, CONNMAN_PROVISIONING])
+
+
+def get_provisioning():
+    provisioning = ConfigParser()
+
+    if os.path.isfile(CONNMAN_PROVISIONING) and os.path.getsize(CONNMAN_PROVISIONING) != 0:
+        with open(CONNMAN_PROVISIONING, 'r', encoding='utf8') as handle:
+            provisioning.read_file(handle)
+
+    return provisioning
+
+
+def remove_provisioning_section(provisioning, section_name):
+    sections = provisioning.sections_dict().copy()
+
+    for section, options in sections.items():
+        if section == section_name:
+            del sections[section]
+            break
+
+    if sections == provisioning.sections_dict():
+        return provisioning
+
+    sections = OrderedDict(sections)
+    provisioning = ConfigParser()
+    provisioning.read_dict(sections)
+
+    return provisioning
+
+
+def to_provisioning(settings_dict):
+    common = {
+        'Type': '',
+        'IPv4': '',
+        'IPv6': 'off',
+    }
+
+    ethernet_section = common.copy()
+    ethernet_section['Type'] = 'ethernet'
+
+    wifi_section = common.copy()
+    wifi_section['Type'] = 'wifi'
+    wifi_section.update({
+        'Name': '',
+        'Security': '',
+        'Hidden': '',
+    })
+
+    config = {
+        'global': {
+            'Name': 'OSMC Provisioning File',
+            'Description': 'This provisioning file is created and updated by '
+                           'My OSMC and OSMC installation',
+        },
+    }
+
+    ipv4_dict = settings_dict['IPV4']
+    nameservers_dict = settings_dict['Nameservers']
+    nameservers = []
+    if 'DNS_1' in nameservers_dict and nameservers_dict['DNS_1']:
+        nameservers.append(nameservers_dict['DNS_1'])
+
+    if 'DNS_2' in nameservers_dict and nameservers_dict['DNS_2']:
+        nameservers.append(nameservers_dict['DNS_2'])
+
+    section_name = 'service_ethernet'
+    if settings_dict['Interface'].startswith('eth'):
+        config['service_ethernet'] = ethernet_section
+
+        if ipv4_dict['Method'] == 'dhcp':
+            config[section_name]['IPv4'] = 'dhcp'
+            config[section_name]['MAC'] = settings_dict['AdapterAddress']
+        else:
+            config[section_name]['IPv4'] = '/'.join([ipv4_dict['Address'],
+                                                     ipv4_dict['Netmask'],
+                                                     ipv4_dict['Gateway']])
+            config[section_name]['Nameservers'] = ','.join(nameservers)
+            config[section_name]['MAC'] = settings_dict['AdapterAddress']
+
+    elif settings_dict['Interface'].startswith('wlan'):
+        base64_ssid = base64.b64encode(
+            bytes(settings_dict['SSID'],encoding='utf-8')
+        ).decode('utf-8')
+        base64_ssid = base64_ssid.rstrip('=')
+        section_ssid = '_%s' % base64_ssid if base64_ssid else ''
+        section_name = 'service_wifi%s' % section_ssid
+
+        config[section_name] = wifi_section
+        config[section_name]['Name'] = settings_dict['SSID']
+        config[section_name]['Hidden'] = settings_dict['Hidden']
+        config[section_name]['MAC'] = settings_dict['AdapterAddress']
+        config[section_name]['Security'] = settings_dict['Security']
+
+        if config[section_name]['Security'] != 'none':
+            config[section_name]['Passphrase'] = settings_dict['Passphrase']
+
+        if ipv4_dict['Method'] == 'dhcp':
+            config[section_name]['IPv4'] = 'dhcp'
+        else:
+            config[section_name]['IPv4'] = '/'.join([ipv4_dict['Address'],
+                                                     ipv4_dict['Netmask'],
+                                                     ipv4_dict['Gateway']])
+            config[section_name]['Nameservers'] = ','.join(nameservers)
+
+    provisioning = ConfigParser()
+    provisioning.read_dict(config)
+
+    return provisioning
+
+
+def merge_into_provisioning(provisioning):
+    active_provisioning = get_provisioning()
+
+    provisioning_sections = provisioning.sections_dict().copy()
+    sections = active_provisioning.sections_dict().copy()
+
+    for section, options in provisioning_sections.items():
+        if section in sections:
+            del sections[section]
+
+        sections[section] = options
+        continue
+
+    sections = OrderedDict(sections)
+    provisioning = ConfigParser()
+    provisioning.read_dict(sections)
+
+    return provisioning
 
 
 def extract_network_properties(dbus_properties):
@@ -185,6 +355,10 @@ def apply_network_changes(settings_dict, internet_protocol):
                             dbus.Array(dns, signature=dbus.Signature('s')))
         service.SetProperty('Nameservers.Configuration',
                             dbus.Array(dns, signature=dbus.Signature('s')))
+
+        provisioning = to_provisioning(settings_dict)
+        provisioning = merge_into_provisioning(provisioning)
+        save_provisioning(provisioning)
 
     elif settings_dict[internet_protocol]['Method'].startswith('nfs_'):
         ip_value = None
@@ -377,9 +551,10 @@ def get_wifi_networks():
 
             if 'hidden' not in path:
                 wifi_settings['SSID'] = dbus_properties['Name']
-
+                wifi_settings['Hidden'] = False
             else:
                 wifi_settings['SSID'] = '< Hidden (' + wifi_settings['Security'] + ') >'
+                wifi_settings['Hidden'] = True
 
             if not str(dbus_properties['State']) == 'idle':
                 settings = extract_network_properties(dbus_properties)
@@ -399,28 +574,27 @@ def get_wifi_networks():
     return interfaces
 
 
-def wifi_connect(path, password=None, ssid=None, script_base_path=None):
-    agent_needed = False
+def wifi_connect(wifi, script_base_path=None):
     process = None
-    if password or ssid:
-        agent_needed = True
+
+    wireless_preseed = {}
+    if 'SSID' in wifi and wifi['SSID']:
+        wireless_preseed['ssid'] = wifi['SSID']
+    if 'Passphrase' in wifi and wifi['Passphrase']:
+        wireless_preseed['passphrase'] = wifi['Passphrase']
+
+    agent_needed = not wireless_preseed
+
+    if agent_needed:
         print('Starting Wireless Agent')
-        with open('/tmp/preseed_data', 'w', encoding='utf-8') as key_file:
-            if password:
-                print('Setting password')
-                key_file.write(password)
-
-            key_file.write('\n')
-
-            if ssid:
-                print('Setting SSID')
-                key_file.write(ssid)
+        with open('/tmp/myosmc_wireless_preseed.json', 'w', encoding='utf-8') as handle:
+            json.dump(wireless_preseed, handle)
 
         agent_script = script_base_path + WIRELESS_AGENT
         process = subprocess.Popen([sys.executable, agent_script, 'fromfile'])
 
-    print('Attempting connection to ' + path)
-    service = connman.get_service_interface(path)
+    print('Attempting connection to ' + wifi['path'])
+    service = connman.get_service_interface(wifi['path'])
 
     connected = 1
     connection_attempts = 20
@@ -438,13 +612,28 @@ def wifi_connect(path, password=None, ssid=None, script_base_path=None):
                 connected = (connection_attempts + 1)
                 print('DBusException Raised: ' + str(e))
 
-    print('Connection to ' + path + ' : ' + str(connected == 0))
+    print('Connection to ' + wifi['path'] + ' : ' + str(connected == 0))
     if agent_needed:
         if process:
             process.kill()
-        os.remove('/tmp/preseed_data')
+        os.remove('/tmp/myosmc_wireless_preseed.json')
 
-    return connected == 0
+    status = connected == 0
+
+    if status:
+        connection_details = get_connected_wifi()
+        connection_details['Passphrase'] = wifi.get('Passphrase', '')
+        ipv4 = connection_details.get('IPV4', {})
+        if not ipv4.get('Gateway'):
+            gateway = ipv4['Address'].split('.')
+            gateway[-1] = '1'
+            gateway = '.'.join(gateway)
+            connection_details['IPV4']['Gateway'] = gateway
+        provisioning = to_provisioning(connection_details)
+        provisioning = merge_into_provisioning(provisioning)
+        save_provisioning(provisioning)
+
+    return status
 
 
 def wifi_disconnect(path):
@@ -455,7 +644,7 @@ def wifi_disconnect(path):
         print('DBusException disconnecting')
 
 
-def wifi_remove(path):
+def wifi_remove(path, ssid):
     service = connman.get_service_interface(path)
     try:
         service.Remove()
@@ -465,6 +654,14 @@ def wifi_remove(path):
     file_path = path.replace('/net/connman/service/', '/var/lib/connman/')
     if file_path.startswith('/var/lib/connman/') and os.path.isdir(file_path):
         subprocess.call(['sudo', 'rm', '-rf', file_path])
+
+    section_ssid = ssid.replace(' ', '_')
+    section_ssid = '_%s' % section_ssid if section_ssid else ''
+    section_name = 'service_wifi%s' % section_ssid
+
+    provisioning = get_provisioning()
+    provisioning = remove_provisioning_section(provisioning, section_name)
+    save_provisioning(provisioning)
 
 
 def get_connected_wifi():
@@ -523,19 +720,18 @@ def check_ms_ncsi_response():
 
 def parse_preseed():
     network_settings = None
-    if os.path.isfile(PREESEED_LOCATION):
-        with open(PREESEED_LOCATION, 'r', encoding='utf-8') as preseed_file:
-            preseed_data = preseed_file.read()
+    if os.path.isfile(PRESEED_LOCATION):
+        with open(PRESEED_LOCATION, 'r', encoding='utf-8') as handle:
+            contents = [line.strip() for line in handle.readlines()]
 
         preseed_info = {}
-        for entry in preseed_data.split("\n"):
-            if entry.startswith('d-i network/') and len(entry.strip()) > 0:
-                string = entry.replace('d-i network/', '')
-                key = string[:string.find(' ')]
-                string = string[string.find(' ') + 1:]
-                _type = string[:string.find(' ')]
-                value = string[string.find(' ') + 1:]
-                preseed_info[key] = value
+        for line in contents:
+            if not line.startswith('d-i network/'):
+                continue
+
+            parameters = line.split('/', maxsplit=1)[1]
+            setting_name, _, setting_value = parameters.split(' ', maxsplit=2)
+            preseed_info[setting_name] = setting_value
 
         # convert preseed format into the same format we are using in the rest of the code
         network_settings = {
