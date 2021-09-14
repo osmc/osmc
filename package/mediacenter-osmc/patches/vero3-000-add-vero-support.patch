@@ -812,7 +812,7 @@ index 0000000000..d92dc8dd95
 +2.25.1
 +
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 9617d61cce..267a275da5 100644
+index a0f3e5b471..7260a8e4ce 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -189,6 +189,11 @@
@@ -883,7 +883,7 @@ index 9617d61cce..267a275da5 100644
      m_ServiceManager->GetNetwork().NetworkMessage((CNetwork::EMESSAGE)pMsg->param1, pMsg->param2);
      break;
  
-@@ -3146,6 +3180,7 @@ void CApplication::PlaybackCleanup()
+@@ -3153,6 +3187,7 @@ void CApplication::PlaybackCleanup()
      else
      {
        //  resets to res_desktop or look&feel resolution (including refreshrate)
@@ -891,7 +891,7 @@ index 9617d61cce..267a275da5 100644
        CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false);
      }
  #ifdef TARGET_DARWIN_EMBEDDED
-@@ -3588,6 +3623,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -3602,6 +3637,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -901,7 +901,7 @@ index 9617d61cce..267a275da5 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -3774,6 +3812,65 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -3788,6 +3826,65 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -968,7 +968,7 @@ index 9617d61cce..267a275da5 100644
  // if forceType is true, we ignore the various conditions that can alter
  // the type of screensaver displayed
 diff --git a/xbmc/Application.h b/xbmc/Application.h
-index c489df5eaa..860961f4db 100644
+index 08b7fc0ba9..bf10239b25 100644
 --- a/xbmc/Application.h
 +++ b/xbmc/Application.h
 @@ -217,6 +217,8 @@ public:
@@ -5007,7 +5007,7 @@ index 5e025945f5..d5cb42b5a3 100644
    qstride = 0;
    qscale_type = 0;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
-index a9c0e149f0..555407f51f 100644
+index 708678cb59..099b610758 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 @@ -58,6 +58,8 @@ public:
@@ -5019,7 +5019,7 @@ index a9c0e149f0..555407f51f 100644
    int8_t* qp_table;                //< Quantization parameters, primarily used by filters
    int qstride;
    int qscale_type;
-@@ -235,6 +237,11 @@ public:
+@@ -237,6 +239,11 @@ public:
     */
    virtual void Reopen() {};
  
@@ -6688,7 +6688,7 @@ index 8547d91c5d..17a2316256 100644
            }
  
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
-index 270c9bdff3..ab770ade62 100644
+index 64e0c56596..ed3111d1dc 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
 @@ -45,6 +45,7 @@ namespace XFILE
@@ -6699,7 +6699,7 @@ index 270c9bdff3..ab770ade62 100644
  
  class CDVDInputStream
  {
-@@ -135,6 +136,17 @@ public:
+@@ -136,6 +137,17 @@ public:
      virtual void SetVideoResolution(int width, int height) {};
    };
  
@@ -6718,7 +6718,7 @@ index 270c9bdff3..ab770ade62 100644
    {
      NEXTSTREAM_NONE,
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index 00d52add9f..c2c5b9bfef 100644
+index 52ab473abb..fb060005cf 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -10,6 +10,8 @@
@@ -6825,7 +6825,7 @@ index 00d52add9f..c2c5b9bfef 100644
    switch (m_event.event) {
  
     /* errors */
-@@ -506,14 +513,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -508,14 +515,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYLIST %d",
          m_event.param);
      m_playlist = m_event.param;
@@ -6845,7 +6845,7 @@ index 00d52add9f..c2c5b9bfef 100644
      break;
  
    case BD_EVENT_CHAPTER:
-@@ -596,6 +606,25 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -600,6 +610,25 @@ void CDVDInputStreamBluray::ProcessEvent() {
  
    /* event has been consumed */
    m_event.event = BD_EVENT_NONE;
@@ -6871,7 +6871,7 @@ index 00d52add9f..c2c5b9bfef 100644
  }
  
  int CDVDInputStreamBluray::Read(uint8_t* buf, int buf_size)
-@@ -909,9 +938,15 @@ bool CDVDInputStreamBluray::PosTime(int ms)
+@@ -915,9 +944,15 @@ bool CDVDInputStreamBluray::PosTime(int ms)
    if(bd_seek_time(m_bd, ms * 90) < 0)
      return false;
  
@@ -6887,7 +6887,7 @@ index 00d52add9f..c2c5b9bfef 100644
    return true;
  }
  
-@@ -936,9 +971,15 @@ bool CDVDInputStreamBluray::SeekChapter(int ch)
+@@ -942,9 +977,15 @@ bool CDVDInputStreamBluray::SeekChapter(int ch)
    if(m_titleInfo && bd_seek_chapter(m_bd, ch-1) < 0)
      return false;
  
@@ -6903,7 +6903,7 @@ index 00d52add9f..c2c5b9bfef 100644
    return true;
  }
  
-@@ -1156,6 +1197,131 @@ bool CDVDInputStreamBluray::HasMenu()
+@@ -1172,6 +1213,131 @@ bool CDVDInputStreamBluray::HasMenu()
    return m_navmode;
  }
  
@@ -7036,7 +7036,7 @@ index 00d52add9f..c2c5b9bfef 100644
  {
    int region = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_BLURAY_PLAYERREGION);
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-index f5c45bbb1e..4a3eb3baaf 100644
+index 16ccb98416..0721ba3fa8 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 @@ -11,6 +11,7 @@
@@ -7063,7 +7063,7 @@ index f5c45bbb1e..4a3eb3baaf 100644
  {
  public:
    CDVDInputStreamBluray() = delete;
-@@ -112,6 +115,8 @@ public:
+@@ -113,6 +116,8 @@ public:
  
    void GetStreamInfo(int pid, std::string &language);
  
@@ -7072,7 +7072,7 @@ index f5c45bbb1e..4a3eb3baaf 100644
    void OverlayCallback(const BD_OVERLAY * const);
  #ifdef HAVE_LIBBLURAY_BDJ
    void OverlayCallbackARGB(const struct bd_argb_overlay_s * const);
-@@ -121,6 +126,11 @@ public:
+@@ -122,6 +127,11 @@ public:
    BLURAY_TITLE_INFO* GetTitleFile(const std::string& name);
  
    void ProcessEvent();
@@ -7084,7 +7084,7 @@ index f5c45bbb1e..4a3eb3baaf 100644
  
  protected:
    struct SPlane;
-@@ -129,6 +139,11 @@ protected:
+@@ -130,6 +140,11 @@ protected:
    void OverlayClose();
    static void OverlayClear(SPlane& plane, int x, int y, int w, int h);
    static void OverlayInit (SPlane& plane, int w, int h);
@@ -7096,8 +7096,8 @@ index f5c45bbb1e..4a3eb3baaf 100644
  
    IVideoPlayer* m_player = nullptr;
    BLURAY* m_bd = nullptr;
-@@ -140,6 +155,19 @@ protected:
-   bool m_menu = false;
+@@ -143,6 +158,19 @@ protected:
+   bool m_hasOverlay = false;
    bool m_navmode = false;
    int m_dispTimeBeforeRead = 0;
 +  int                 m_nTitles = -1;
@@ -7200,10 +7200,10 @@ index 0a6bc07033..ea15db410a 100644
      }
    };
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 7b09562342..6a713fabdc 100644
+index 0530f0fc60..9f742f5c3b 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1283,18 +1283,15 @@ void CVideoPlayer::Prepare()
+@@ -1285,18 +1285,15 @@ void CVideoPlayer::Prepare()
      double startpts = DVD_NOPTS_VALUE;
      if (m_pDemuxer)
      {
@@ -7224,7 +7224,7 @@ index 7b09562342..6a713fabdc 100644
          CLog::Log(LOGDEBUG, "%s - starting subtitle demuxer from: %d", __FUNCTION__, starttime);
        else
          CLog::Log(LOGDEBUG, "%s - failed to start subtitle demuxing from: %d", __FUNCTION__, starttime);
-@@ -1513,6 +1510,11 @@ void CVideoPlayer::Process()
+@@ -1515,6 +1512,11 @@ void CVideoPlayer::Process()
      CheckBetterStream(m_CurrentTeletext, pStream);
      CheckBetterStream(m_CurrentRadioRDS, pStream);
  
@@ -7236,7 +7236,7 @@ index 7b09562342..6a713fabdc 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1666,6 +1668,9 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1668,6 +1670,9 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
@@ -7246,7 +7246,7 @@ index 7b09562342..6a713fabdc 100644
    m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
    m_CurrentVideo.packets++;
  }
-@@ -1785,7 +1790,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1787,7 +1792,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (level < 0.0)
        {
@@ -7255,7 +7255,7 @@ index 7b09562342..6a713fabdc 100644
          SetCaching(CACHESTATE_INIT);
        }
        if (level >= 1.0)
-@@ -1887,10 +1892,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1889,10 +1894,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -7268,7 +7268,7 @@ index 7b09562342..6a713fabdc 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -1929,6 +1934,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1931,6 +1936,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -7276,7 +7276,7 @@ index 7b09562342..6a713fabdc 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(new CDVDMsgDouble(CDVDMsg::GENERAL_RESYNC, m_clock.GetClock()), 1);
-@@ -2079,17 +2085,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2081,17 +2087,19 @@ void CVideoPlayer::HandlePlaySpeed()
              errorwin = 8;
            error /= errorwin;
          }
@@ -7298,7 +7298,7 @@ index 7b09562342..6a713fabdc 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2574,10 +2582,9 @@ void CVideoPlayer::HandleMessages()
+@@ -2576,10 +2584,9 @@ void CVideoPlayer::HandleMessages()
        if (m_pInputStream->GetIPosTime() == nullptr)
          time -= m_State.time_offset/1000l;
  
@@ -7310,7 +7310,7 @@ index 7b09562342..6a713fabdc 100644
          if(m_pSubtitleDemuxer)
          {
            if(!m_pSubtitleDemuxer->SeekTime(time, msg.GetBackward()))
-@@ -2591,6 +2598,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2593,6 +2600,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -7318,7 +7318,7 @@ index 7b09562342..6a713fabdc 100644
        }
        else if (m_pDemuxer)
        {
-@@ -2960,7 +2968,8 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -2962,7 +2970,8 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -7328,7 +7328,7 @@ index 7b09562342..6a713fabdc 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3624,6 +3633,10 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3626,6 +3635,10 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
  
      player->SendMessage(new CDVDMsgBool(CDVDMsg::GENERAL_PAUSE, m_displayLost), 1);
  
@@ -7339,7 +7339,7 @@ index 7b09562342..6a713fabdc 100644
      // look for any EDL files
      m_Edl.Clear();
      float fFramesPerSecond = 0.0f;
-@@ -3788,6 +3801,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3790,6 +3803,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -7347,7 +7347,7 @@ index 7b09562342..6a713fabdc 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -3833,11 +3847,11 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3835,11 +3849,11 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -7361,7 +7361,7 @@ index 7b09562342..6a713fabdc 100644
  }
  
  // since we call ffmpeg functions to decode, this is being called in the same thread as ::Process() is
-@@ -4660,15 +4674,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4676,15 +4690,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -7600,10 +7600,10 @@ index 8c78f1beac..7545d686f2 100644
  
    // Scale the movie up by set zoom amount
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
-index 7f9864d268..e1082b1ebb 100644
+index 6f3c605028..8cfad101c4 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h
-@@ -18,7 +18,7 @@
+@@ -19,7 +19,7 @@
  #include <vector>
  
  #define MAX_FIELDS 3
@@ -7613,10 +7613,10 @@ index 7f9864d268..e1082b1ebb 100644
  class CSetting;
  struct IntegerSettingOption;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/CMakeLists.txt
-index 3bc0cc7f65..abc7fce3d6 100644
+index 40aa37a9f6..64d5a5e9ef 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/CMakeLists.txt
-@@ -43,6 +43,7 @@ endif()
+@@ -44,6 +44,7 @@ endif()
  if(OPENGLES_FOUND AND ("android" IN_LIST CORE_PLATFORM_NAME_LC OR
                         "ios" IN_LIST CORE_PLATFORM_NAME_LC OR
                         "tvos" IN_LIST CORE_PLATFORM_NAME_LC OR
@@ -8052,10 +8052,10 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 7cbaf7d0f1..42c788b70b 100644
+index ee3963ddb3..41ecaa3b96 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-@@ -1126,7 +1126,9 @@ void CRenderManager::PrepareNextRender()
+@@ -1145,7 +1145,9 @@ void CRenderManager::PrepareNextRender()
      // see if any future queued frames are already due
      auto iter = m_queued.begin();
      int idx = *iter;
@@ -8066,7 +8066,7 @@ index 7cbaf7d0f1..42c788b70b 100644
      while (iter != m_queued.end())
      {
        // the slot for rendering in time is [pts .. (pts +  x * frametime)]
-@@ -1134,8 +1136,10 @@ void CRenderManager::PrepareNextRender()
+@@ -1153,8 +1155,10 @@ void CRenderManager::PrepareNextRender()
        // we are really late. The likelihood that we recover decreases the greater m_lateframes
        // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
        double x = (m_lateframes <= 6) ? 0.98 : 0;
@@ -8078,7 +8078,7 @@ index 7cbaf7d0f1..42c788b70b 100644
        idx = *iter;
        ++iter;
      }
-@@ -1143,16 +1147,17 @@ void CRenderManager::PrepareNextRender()
+@@ -1162,16 +1166,17 @@ void CRenderManager::PrepareNextRender()
      // skip late frames
      while (m_queued.front() != idx)
      {
@@ -8480,10 +8480,10 @@ index 23db6a7428..fb7e89885f 100644
  
  bool CPowerManager::Hibernate()
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 264b81d124..a1444b52ef 100644
+index bbedbcc81b..6d1b8acf56 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
-@@ -406,7 +406,7 @@ void CAdvancedSettings::Initialize()
+@@ -407,7 +407,7 @@ void CAdvancedSettings::Initialize()
  
    m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.rss|.webp|.jp2|.apng";
    m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b|.dtshd";
@@ -8492,7 +8492,7 @@ index 264b81d124..a1444b52ef 100644
    m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|.ass|.idx|.ifo|.zip";
    m_discStubExtensions = ".disc";
    // internal music extensions
-@@ -417,6 +417,7 @@ void CAdvancedSettings::Initialize()
+@@ -418,6 +418,7 @@ void CAdvancedSettings::Initialize()
    m_stereoscopicregex_3d = "[-. _]3d[-. _]";
    m_stereoscopicregex_sbs = "[-. _]h?sbs[-. _]";
    m_stereoscopicregex_tab = "[-. _]h?tab[-. _]";
@@ -8500,7 +8500,7 @@ index 264b81d124..a1444b52ef 100644
  
    m_videoAssFixedWorks = false;
  
-@@ -574,6 +575,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+@@ -580,6 +581,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
      XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
      XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
      XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);
@@ -8509,7 +8509,7 @@ index 264b81d124..a1444b52ef 100644
      XMLUtils::GetFloat(pElement, "audiodelayrange", m_videoAudioDelayRange, 10, 600);
      XMLUtils::GetString(pElement, "defaultplayer", m_videoDefaultPlayer);
 diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
-index 3461ebf5f9..1cd127aa1d 100644
+index 4d56c7639a..34d8bf3814 100644
 --- a/xbmc/settings/AdvancedSettings.h
 +++ b/xbmc/settings/AdvancedSettings.h
 @@ -366,6 +366,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
@@ -10270,46 +10270,10 @@ index 653e913a1a..391a3cdd25 100644
      curr.Overscan.bottom = info.Overscan.bottom * 2 + info.iBlanking;
      curr.iSubtitles      = info.iSubtitles      * 2 + info.iBlanking;
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index ae69c0ea72..ae260c885d 100644
+index 55ffecca89..7a53386dfd 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
-@@ -146,7 +146,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
-     // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
-     if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
-          (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
--        (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-         MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
-     {
-       CLog::Log(LOGDEBUG,
-@@ -180,7 +180,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
-       // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
-       if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
-            (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
--          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-           MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
-       {
-         CLog::Log(LOGDEBUG,
-@@ -219,7 +219,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
-       // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
-       if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
-            (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
--          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+          ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-           MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
-       {
-         CLog::Log(
-@@ -253,7 +253,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
- 
-     // allow resolutions that are desktop resolution but have the correct refresh rate
-     if (info.iScreenWidth == desktop_info.iScreenWidth &&
--        (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-         MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
-     {
-       CLog::Log(LOGDEBUG,
-@@ -280,7 +280,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -306,7 +306,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
  
        // pick the lowest resolution that has a matching refresh rate
        if ((info.iScreenHeight >= height || info.iScreenWidth >= width) &&
@@ -10318,26 +10282,6 @@ index ae69c0ea72..ae260c885d 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
        {
          resolution = i;
-@@ -304,8 +304,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
- 
-       // allow resolutions that are desktop resolution but have double the refresh rate
-       if (info.iScreenWidth == desktop_info.iScreenWidth &&
--          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) ==
--              (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-           MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
-       {
-         CLog::Log(LOGDEBUG,
-@@ -333,8 +332,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
- 
-       // allow resolutions that are desktop resolution but have 2.5 times the refresh rate
-       if (info.iScreenWidth == desktop_info.iScreenWidth &&
--          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) ==
--              (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-           MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
-       {
-         CLog::Log(
 diff --git a/xbmc/windowing/amlogic/CMakeLists.txt b/xbmc/windowing/amlogic/CMakeLists.txt
 new file mode 100644
 index 0000000000..5df7176c70
