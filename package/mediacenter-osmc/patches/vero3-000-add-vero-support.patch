@@ -2212,10 +2212,10 @@ index 59479c049a..afd0d0f2ce 100644
        {
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 new file mode 100644
-index 0000000000..b88a1f8215
+index 0000000000..32da6fae31
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -0,0 +1,2637 @@
+@@ -0,0 +1,2638 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4233,36 +4233,37 @@ index 0000000000..b88a1f8215
 +    }
 +  }
 +
-+  /* if passing through HDR, ignore contrast and brightness */
++  /* if passing through HDR, ignore contrast and brightness
++   * thus users can view HDR on both HDR and SDR screens without faff */
 +  int curCscType, hdrProcessMode;
 +  std::string cur_csc_type;
 +  SysfsUtils::GetString("/sys/module/am_vecm/parameters/cur_csc_type", cur_csc_type);
 +  curCscType = std::stoi(cur_csc_type.substr(0,2));
 +  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/hdr_process_mode", hdrProcessMode);
-+  if (curCscType == 64 && hdrProcessMode == 0)
++  bool isHDR = curCscType == 64 && hdrProcessMode == 0;
++  // video contrast adjustment.
++  int contrast = m_processInfo.GetVideoSettings().m_Contrast;
++  if (isHDR)
++    contrast = 50;
++  std::string AmContrast;
++  SysfsUtils::GetString("/sys/class/video/contrast", AmContrast);
++  m_contrast = std::stoi(AmContrast) * 50.0f / 127.0f + 50.5f;
++  if (contrast != m_contrast)
 +  {
-+	  SetVideoContrast(50);
-+	  SetVideoBrightness(50);
++    SetVideoContrast(contrast);
++    m_contrast = contrast;
 +  }
-+  else
++  // video brightness adjustment.
++  int brightness = m_processInfo.GetVideoSettings().m_Brightness;
++  if (isHDR)
++    brightness = 50;
++  std::string AmBrightness;
++  SysfsUtils::GetString("/sys/class/video/brightness", AmBrightness);
++  m_brightness = std::stoi(AmBrightness) * 50.0f / 255.0f + 50.5f;
++  if (brightness != m_brightness)
 +  {
-+    // video contrast adjustment.
-+    int contrast = m_processInfo.GetVideoSettings().m_Contrast;
-+    std::string AmContrast;
-+    SysfsUtils::GetString("/sys/class/video/contrast", AmContrast);
-+    m_contrast = std::stoi(AmContrast) * 50.0f / 127.0f + 50.5f;
-+    if (contrast != m_contrast && contrast != 50)
-+    {
-+      SetVideoContrast(contrast);
-+      m_contrast = contrast;
-+    }
-+    // video brightness adjustment.
-+    int brightness = m_processInfo.GetVideoSettings().m_Brightness;
-+    if (brightness != m_brightness)
-+    {
-+      SetVideoBrightness(brightness);
-+      m_brightness = brightness;
-+    }
++    SetVideoBrightness(brightness);
++    m_brightness = brightness;
 +  }
 +
 +  // band fix
@@ -4779,7 +4780,7 @@ index 0000000000..b88a1f8215
 +      m_dll->codec_set_3d_video_mode(&am_private->vcodec, VIDEO_MODE_3D_MVC_HTAB);
 +      SetMvcViewMode(view_mode);
 +    }
-+    else if (m_guiStereoMode == RENDER_STEREO_MODE_MONO)
++    else if (m_guiStereoMode == RENDER_STEREO_MODE_MONO || m_guiStereoMode == RENDER_STEREO_MODE_OFF)
 +    {
 +      SetFramepackingSupport(false);
 +      m_dll->codec_set_3d_video_mode(&am_private->vcodec, VIDEO_MODE_3D_MVC_MONO);
@@ -5032,10 +5033,10 @@ index a9c0e149f0..555407f51f 100644
  };
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..420bcb3420
+index 0000000000..0831853d54
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -0,0 +1,470 @@
+@@ -0,0 +1,471 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5316,6 +5317,7 @@ index 0000000000..420bcb3420
 +  m_processInfo.SetVideoDimensions(m_hints.width, m_hints.height);
 +  m_processInfo.SetVideoDeintMethod("hardware");
 +  m_processInfo.SetVideoDAR(m_hints.aspect);
++  m_processInfo.SetVideoStereoMode(m_hints.stereo_mode);
 +
 +  m_has_keyframe = false;
 +
@@ -5664,7 +5666,7 @@ index 795b9c11e1..57b211d42a 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 95043cc579..b031f40a64 100644
+index 95043cc579..11f35d7f66 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -17,6 +17,8 @@
@@ -5918,7 +5920,7 @@ index 95043cc579..b031f40a64 100644
          st->colorPrimaries = pStream->codecpar->color_primaries;
          st->colorSpace = pStream->codecpar->color_space;
          st->colorTransferCharacteristic = pStream->codecpar->color_trc;
-@@ -1670,7 +1741,56 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1670,7 +1741,57 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          }
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
@@ -5970,12 +5972,13 @@ index 95043cc579..b031f40a64 100644
 +          else if (CDVDCodecUtils::ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size))
 +          {
 +            pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
++            st->stereo_mode = "block_lr"; // can't tell whether lr or br
 +          }
 +        }
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1696,6 +1816,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1696,6 +1817,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -5992,7 +5995,7 @@ index 95043cc579..b031f40a64 100644
            break;
          }
        }
-@@ -1991,7 +2121,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -1991,7 +2122,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -6014,7 +6017,7 @@ index 95043cc579..b031f40a64 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2022,6 +2165,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+@@ -2022,6 +2166,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
  
  bool CDVDDemuxFFmpeg::IsProgramChange()
  {
@@ -8754,10 +8757,10 @@ index 8276c8a5aa..c9aae5c5fa 100644
    static constexpr auto SETTING_AUDIOOUTPUT_CHANNELS = "audiooutput.channels";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..ad282f3b37
+index 0000000000..050b771b3c
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,834 @@
+@@ -0,0 +1,860 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -9337,7 +9340,10 @@ index 0000000000..ad282f3b37
 +
 +  dcap3dfile = CSpecialProtocol::TranslatePath("special://home/userdata/disp_cap_3d");
 +
-+  if (SysfsUtils::GetString(dcap3dfile, valstr) >= 0 ||
++  if (!SysfsUtils::Has(dcap3dfile))
++    CLog::Log(LOGINFO, "No %s to read", dcap3dfile.c_str());
++
++  if ((SysfsUtils::Has(dcap3dfile) && SysfsUtils::GetString(dcap3dfile, valstr) >= 0) ||
 +      SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap_3d", valstr) >= 0)
 +  {
 +    std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
@@ -9353,9 +9359,12 @@ index 0000000000..ad282f3b37
 +  std::string valstr, vesastr, dcapfile;
 +  dcapfile = CSpecialProtocol::TranslatePath("special://home/userdata/disp_cap");
 +
-+  if (SysfsUtils::GetString(dcapfile, valstr) < 0)
++  if (!SysfsUtils::Has(dcapfile))
++    CLog::Log(LOGINFO, "No %s to read", dcapfile.c_str());
++
++  if (!SysfsUtils::Has(dcapfile) || SysfsUtils::GetString(dcapfile, valstr) < 0)
 +  {
-+    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0 || valstr.length() == 0)
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0 || valstr.empty())
 +    {
 +      CLog::Log(LOGDEBUG, "Cannot read EDID - falling back to current display mode");
 +      if (SysfsUtils::GetString("/sys/class/display/mode", valstr) < 0)
@@ -9364,10 +9373,30 @@ index 0000000000..ad282f3b37
 +        return false;
 +      }
 +    }
++  }
 +
-+    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0)
++  if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0 && !vesastr.empty())
++  {
++    // If EDID returns VESA modes then check if we should override them
++    std::string vesacapfile = CSpecialProtocol::TranslatePath("special://home/userdata/vesa_cap");
++
++    if (SysfsUtils::Has(vesacapfile))
++    {
++      if (SysfsUtils::GetString(vesacapfile, vesastr) == 0)
++        CLog::Log(LOGINFO, "Using %s to override VESA modes reported by EDID", vesacapfile.c_str());
++      else
++      {
++        CLog::Log(LOGERROR, "Error reading %s", vesacapfile.c_str());
++        vesastr.clear();
++      }
++    }
++    else
++      CLog::Log(LOGINFO, "No %s to read", vesacapfile.c_str());
++
++    if (!vesastr.empty())
 +      valstr += "\n" + vesastr;
 +  }
++
 +  std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
 +
 +  return aml_modes_to_resolutions(probe_str, resolutions);
@@ -10463,10 +10492,10 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..93a543e271
+index 0000000000..a22e3e4466
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,534 @@
+@@ -0,0 +1,535 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10974,6 +11003,7 @@ index 0000000000..93a543e271
 +    CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
 +  }
 +  Update3dResolutions();
++  CDisplaySettings::GetInstance().ApplyCalibrations();
 +}
 +
 +bool CWinSystemAmlogic::Hide()
