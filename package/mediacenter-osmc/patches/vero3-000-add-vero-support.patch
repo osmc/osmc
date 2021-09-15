@@ -10270,18 +10270,65 @@ index 653e913a1a..391a3cdd25 100644
      curr.Overscan.bottom = info.Overscan.bottom * 2 + info.iBlanking;
      curr.iSubtitles      = info.iSubtitles      * 2 + info.iBlanking;
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index 55ffecca89..7a53386dfd 100644
+index 7e27d7b8a4..260be1efb4 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
-@@ -306,7 +306,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
- 
-       // pick the lowest resolution that has a matching refresh rate
-       if ((info.iScreenHeight >= height || info.iScreenWidth >= width) &&
+@@ -151,7 +151,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+     // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
+     if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
+          (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
+-        (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+         MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
+     {
+       CLog::Log(LOGDEBUG,
+@@ -185,7 +185,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+       // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
+       if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
+            (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
 -          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
 +        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-           MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
+           MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
        {
-         resolution = i;
+         CLog::Log(LOGDEBUG,
+@@ -224,7 +224,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+       // allow macroblock alignement / padding errors (e.g. 1080 mod16 == 8)
+       if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
+            (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
+-          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++          ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+           MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
+       {
+         CLog::Log(
+@@ -283,7 +283,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+ 
+     // allow resolutions that are desktop resolution but have the correct refresh rate
+     if (info.iScreenWidth == desktop_info.iScreenWidth &&
+-        (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+         MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
+     {
+       CLog::Log(LOGDEBUG,
+@@ -310,8 +310,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+ 
+       // allow resolutions that are desktop resolution but have double the refresh rate
+       if (info.iScreenWidth == desktop_info.iScreenWidth &&
+-          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) ==
+-              (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+           MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
+       {
+         CLog::Log(LOGDEBUG,
+@@ -339,8 +338,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+ 
+       // allow resolutions that are desktop resolution but have 2.5 times the refresh rate
+       if (info.iScreenWidth == desktop_info.iScreenWidth &&
+-          (info.dwFlags & D3DPRESENTFLAG_MODEMASK) ==
+-              (desktop_info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
+           MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
+       {
+         CLog::Log(
 diff --git a/xbmc/windowing/amlogic/CMakeLists.txt b/xbmc/windowing/amlogic/CMakeLists.txt
 new file mode 100644
 index 0000000000..5df7176c70
