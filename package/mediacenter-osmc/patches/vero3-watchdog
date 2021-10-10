@@ -89,7 +89,11 @@ syspaths="/sys/class/video/
 /sys/module/amvdec_vc1/parameters/force_prog
 /sys/class/ppmgr/orientation
 /sys/module/am_vecm/parameters/customer_panel_lumin
-/sys/module/am_vecm/parameters/hdr_mode"
+/sys/module/am_vecm/parameters/hdr_mode
+/sys/module/amvideo/parameters/framepacking_width
+/sys/module/amvideo/parameters/framepacking_height
+/sys/module/amvideo/parameters/framepacking_blank
+"
 
 for syspath in $syspaths; do
 	chgrp -R video $syspath
