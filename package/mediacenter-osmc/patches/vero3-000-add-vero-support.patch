@@ -812,7 +812,7 @@ index 0000000000..d92dc8dd95
 +2.25.1
 +
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index a0f3e5b471..7260a8e4ce 100644
+index 2ceb8f0d5f..fab9411fb3 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -189,6 +189,11 @@
@@ -891,7 +891,7 @@ index a0f3e5b471..7260a8e4ce 100644
        CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false);
      }
  #ifdef TARGET_DARWIN_EMBEDDED
-@@ -3602,6 +3637,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
+@@ -3599,6 +3634,9 @@ bool CApplication::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPressed /* = false
  
  bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -901,7 +901,7 @@ index a0f3e5b471..7260a8e4ce 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -3788,6 +3826,65 @@ void CApplication::CheckScreenSaverAndDPMS()
+@@ -3785,6 +3823,65 @@ void CApplication::CheckScreenSaverAndDPMS()
    }
  }
  
@@ -1718,7 +1718,7 @@ index 821be98b36..744a0f4ef8 100644
      }
  
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
-index 6a1baf43b4..a38a63a7ce 100644
+index 8e89306030..a38a63a7ce 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 @@ -23,6 +23,8 @@
@@ -1755,6 +1755,15 @@ index 6a1baf43b4..a38a63a7ce 100644
  static int AEStreamFormatToATFormat(const CAEStreamInfo::DataType& dt)
  {
    switch (dt)
+@@ -267,7 +287,7 @@ bool CAESinkAUDIOTRACK::VerifySinkConfiguration(int sampleRate,
+ 
+   // make sure to have enough buffer as minimum might not be enough to open
+   if (!isRaw)
+-    minBufferSize *= 2;
++    minBufferSize *= 4;
+ 
+   if (supported)
+   {
 @@ -411,6 +431,10 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
        atChannelMask = CJNIAudioFormat::CHANNEL_OUT_STEREO;
    }
@@ -1766,14 +1775,25 @@ index 6a1baf43b4..a38a63a7ce 100644
    while (!m_at_jni)
    {
      CLog::Log(LOGINFO, "Trying to open: samplerate: %u, channelMask: %d, encoding: %d",
-@@ -488,8 +512,28 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
+@@ -488,33 +512,39 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
      }
      else
      {
+-      m_format.m_frameSize = m_format.m_channelLayout.Count() * (CAEUtil::DataFormatToBits(m_format.m_dataFormat) / 8);
+-      m_sink_frameSize = m_format.m_frameSize;
+-      bool isHDiec = ((m_format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_TRUEHD) ||
+-                      (m_format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_DTSHD_MA));
+-      if (m_passthrough && isHDiec)
 +      m_min_buffer_size *= 2;
 +
 +      if (m_passthrough)
-+      {
+       {
+-        // Certain boxes have issues opening DTS-HD / TrueHD with this large amount of data
+-        // adjust accordingly
+-        m_min_buffer_size *= 2;
+-        m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / 2;
+-        m_audiotrackbuffer_sec =
+-            static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
 +        // AML in old mode needs more buffer or it stutters when faking PT
 +        if (aml_present() && m_passthrough && m_info.m_wantsIECPassthrough && (CJNIAudioFormat::ENCODING_IEC61937 == -1))
 +        {
@@ -1782,21 +1802,40 @@ index 6a1baf43b4..a38a63a7ce 100644
 +          else if (m_sink_sampleRate < m_format.m_sampleRate) // eac3
 +            m_min_buffer_size *= (m_format.m_sampleRate / m_sink_sampleRate);
 +        }
-+      }
+       }
 +
-       m_format.m_frameSize = m_format.m_channelLayout.Count() * (CAEUtil::DataFormatToBits(m_format.m_dataFormat) / 8);
--      m_sink_frameSize = m_format.m_frameSize;
++      m_format.m_frameSize = m_format.m_channelLayout.Count() * (CAEUtil::DataFormatToBits(m_format.m_dataFormat) / 8);
 +
 +      // again a workaround for AML old code
 +      if (m_passthrough && aml_present() && m_info.m_wantsIECPassthrough && (CJNIAudioFormat::ENCODING_IEC61937 == -1))
 +        m_sink_frameSize = 2 * CAEUtil::DataFormatToBits(AE_FMT_S16LE) / 8; // sending via 2 channels 2 * 16 / 8 = 4
-+      else
+       else
 +        m_sink_frameSize = m_format.m_frameSize;
 +
-       // aim at 200 ms buffer and 50 ms periods
-       m_audiotrackbuffer_sec =
-           static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
-@@ -604,7 +648,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
++      // aim at 200 ms buffer and 50 ms periods
++      m_audiotrackbuffer_sec =
++          static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
++      while (m_audiotrackbuffer_sec < 0.15)
+       {
+-        // aim at 200 ms buffer and 50 ms periods
++        m_min_buffer_size += min_buffer;
+         m_audiotrackbuffer_sec =
+             static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
+-        while (m_audiotrackbuffer_sec < 0.15)
+-        {
+-          m_min_buffer_size += min_buffer;
+-          m_audiotrackbuffer_sec =
+-              static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
+-        }
+-        // division by 4 -> 4 periods into one buffer
+-        m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / 4;
+       }
++      // division by 4 -> 4 periods into one buffer
++      m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / 4;
+     }
+ 
+     if (m_passthrough && !m_info.m_wantsIECPassthrough)
+@@ -618,7 +648,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
    // and add head_pos which wrapped around, e.g. 0x0001 0000 0000 -> 0x0001 0000 0004
    m_headPos = (m_headPos & UINT64_UPPER_BYTES) | (uint64_t)head_pos;
  
@@ -1814,7 +1853,7 @@ index 6a1baf43b4..a38a63a7ce 100644
  
    // if sink is run dry without buffer time written anymore
    if (gone > m_duration_written)
-@@ -996,6 +1049,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
+@@ -1010,6 +1049,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
        }
      }
  
@@ -1840,7 +1879,7 @@ index 6a1baf43b4..a38a63a7ce 100644
      if (CJNIAudioManager::GetSDKVersion() >= 23)
      {
        if (CJNIAudioFormat::ENCODING_DTS_HD != -1)
-@@ -1093,15 +1165,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
+@@ -1107,15 +1165,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
      CLog::Log(LOGINFO, "Multi channel Float is supported");
    }
  
@@ -2212,10 +2251,10 @@ index 59479c049a..afd0d0f2ce 100644
        {
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 new file mode 100644
-index 0000000000..32da6fae31
+index 0000000000..00101e53b0
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -0,0 +1,2638 @@
+@@ -0,0 +1,2646 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4612,6 +4651,13 @@ index 0000000000..32da6fae31
 +  SysfsUtils::SetInt("/sys/module/amvideo/parameters/framepacking_support", enable ? 1 : 0);
 +}
 +
++void CAMLCodec::SetFramepackingResolution(const int width, const int height, const int blanking)
++{
++  SysfsUtils::SetInt("/sys/module/amvideo/parameters/framepacking_width", width);
++  SysfsUtils::SetInt("/sys/module/amvideo/parameters/framepacking_height", height * 2 + blanking);
++  SysfsUtils::SetInt("/sys/module/amvideo/parameters/framepacking_blank", blanking);
++}
++
 +void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
 +{
 +  // this routine gets called every video frame
@@ -4754,6 +4800,7 @@ index 0000000000..32da6fae31
 +    // (will work in fullscreen mode only)
 +    RESOLUTION_INFO info = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
 +    dst_rect.y2 = info.iHeight * 2 + info.iBlanking;
++    SetFramepackingResolution(info.iWidth, info.iHeight, info.iBlanking);
 +  }
 +
 +  bool isMvc = videoStereoMode == "block_lr" || videoStereoMode == "block_rl";
@@ -4856,10 +4903,10 @@ index 0000000000..32da6fae31
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
 new file mode 100644
-index 0000000000..424c6a0172
+index 0000000000..13729a19ea
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
-@@ -0,0 +1,115 @@
+@@ -0,0 +1,116 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4927,6 +4974,7 @@ index 0000000000..424c6a0172
 +  void          SetVideoSaturation(const int saturation);
 +  void          SetMvcViewMode(const int viewMode);
 +  void          SetFramepackingSupport(const bool enable);
++  void          SetFramepackingResolution(const int width, const int height, const int blanking);
 +  bool          OpenAmlVideo(const CDVDStreamInfo &hints);
 +  void          CloseAmlVideo();
 +  std::string   GetVfmMap(const std::string &name);
@@ -7200,7 +7248,7 @@ index 0a6bc07033..ea15db410a 100644
      }
    };
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 0530f0fc60..9f742f5c3b 100644
+index a8c784704a..780b0709ae 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 @@ -1285,18 +1285,15 @@ void CVideoPlayer::Prepare()
@@ -7379,7 +7427,7 @@ index 0530f0fc60..9f742f5c3b 100644
      m_processInfo->SetStateRealtime(realtime);
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index a0ca6696cc..bf3c886f29 100644
+index d4383b81e1..7240445cf1 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 @@ -79,7 +79,7 @@ CVideoPlayerAudio::~CVideoPlayerAudio()
@@ -7414,10 +7462,10 @@ index a0ca6696cc..bf3c886f29 100644
            m_stalled = true;
          }
        }
-@@ -606,7 +604,7 @@ bool CVideoPlayerAudio::AcceptsData() const
- bool CVideoPlayerAudio::SwitchCodecIfNeeded()
- {
-   CLog::Log(LOGDEBUG, "CVideoPlayerAudio: stream props changed, checking for passthrough");
+@@ -628,7 +626,7 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
+ 
+   m_displayReset = false;
+ 
 -  bool allowpassthrough = !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK);
 +  bool allowpassthrough = true;
    if (m_processInfo.IsRealtimeStream() || m_synctype == SYNC_RESAMPLE)
@@ -8480,10 +8528,10 @@ index 23db6a7428..fb7e89885f 100644
  
  bool CPowerManager::Hibernate()
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index bbedbcc81b..6d1b8acf56 100644
+index 4faa27b48a..1747b3c035 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
-@@ -407,7 +407,7 @@ void CAdvancedSettings::Initialize()
+@@ -406,7 +406,7 @@ void CAdvancedSettings::Initialize()
  
    m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.rss|.webp|.jp2|.apng";
    m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b|.dtshd";
@@ -8492,7 +8540,7 @@ index bbedbcc81b..6d1b8acf56 100644
    m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|.ass|.idx|.ifo|.zip";
    m_discStubExtensions = ".disc";
    // internal music extensions
-@@ -418,6 +418,7 @@ void CAdvancedSettings::Initialize()
+@@ -417,6 +417,7 @@ void CAdvancedSettings::Initialize()
    m_stereoscopicregex_3d = "[-. _]3d[-. _]";
    m_stereoscopicregex_sbs = "[-. _]h?sbs[-. _]";
    m_stereoscopicregex_tab = "[-. _]h?tab[-. _]";
@@ -8500,7 +8548,7 @@ index bbedbcc81b..6d1b8acf56 100644
  
    m_videoAssFixedWorks = false;
  
-@@ -580,6 +581,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+@@ -579,6 +580,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
      XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
      XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
      XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);
@@ -8509,10 +8557,10 @@ index bbedbcc81b..6d1b8acf56 100644
      XMLUtils::GetFloat(pElement, "audiodelayrange", m_videoAudioDelayRange, 10, 600);
      XMLUtils::GetString(pElement, "defaultplayer", m_videoDefaultPlayer);
 diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
-index 4d56c7639a..34d8bf3814 100644
+index 11a6c0201e..1a18df81ba 100644
 --- a/xbmc/settings/AdvancedSettings.h
 +++ b/xbmc/settings/AdvancedSettings.h
-@@ -366,6 +366,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+@@ -360,6 +360,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
      std::string m_stereoscopicregex_3d;
      std::string m_stereoscopicregex_sbs;
      std::string m_stereoscopicregex_tab;
@@ -8757,10 +8805,10 @@ index 8276c8a5aa..c9aae5c5fa 100644
    static constexpr auto SETTING_AUDIOOUTPUT_CHANNELS = "audiooutput.channels";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..050b771b3c
+index 0000000000..8049c03aac
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,860 @@
+@@ -0,0 +1,872 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -8910,6 +8958,18 @@ index 0000000000..050b771b3c
 +    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_support"))
 +    {
 +      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_support");
++    }
++    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_width"))
++    {
++      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_width");
++    }
++    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_height"))
++    {
++      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_height");
++    }
++    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_blank"))
++    {
++      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_blank");
 +    }
 +    if (!SysfsUtils::HasRW("/sys/module/amvdec_h264mvc/parameters/view_mode"))
 +    {

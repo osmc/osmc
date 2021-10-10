@@ -1,4 +1,4 @@
-From 17552b3b8613d94e15e0980714399395af3cf4e1 Mon Sep 17 00:00:00 2001
+From a298380830c631814bdf5252c2acf35775f75e28 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:56:15 +0100
 Subject: [PATCH 01/13] Fix UPower capability detection on Vero
@@ -27,7 +27,7 @@ index 5e400772b1..398cd6596e 100644
 2.25.1
 
 
-From b7313473e29a77d2882e682d5ba45c93ed978009 Mon Sep 17 00:00:00 2001
+From 92cb428bfb304182ff1e8d0b5dd14c24d32a615e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 6 Mar 2021 18:29:22 +0000
 Subject: [PATCH 02/13] Enable DRM-PRIME for Raspberry Pi
@@ -69,7 +69,7 @@ index 6d1fb9cd49..c45ca1772c 100644
 2.25.1
 
 
-From aa83365f6ab4d389ec5247ae96e42202ae531459 Mon Sep 17 00:00:00 2001
+From 2e00c878152d259f0ce3dd5544d04d3a0fe2c749 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 20 Jan 2020 16:53:52 +0000
 Subject: [PATCH 03/13] ffmpeg: Add v4l2 support
@@ -63771,7 +63771,7 @@ index e358775911..df2fa1e8b4 100644
 2.25.1
 
 
-From 384738cf69703831ebe26beca4e1c3a327cee004 Mon Sep 17 00:00:00 2001
+From aa16ada2d5f5138f43cddc6a81d517fc674903fe Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Mar 2020 15:14:11 +0000
 Subject: [PATCH 04/13] VideoPlayer: Add setting to disable non-hevc accel
@@ -63785,7 +63785,7 @@ Subject: [PATCH 04/13] VideoPlayer: Add setting to disable non-hevc accel
  5 files changed, 38 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 098ae9dad9..30edb97cec 100644
+index 97daa187f9..3878a32526 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -7291,6 +7291,16 @@ msgctxt "#13467"
@@ -63902,7 +63902,7 @@ index 8276c8a5aa..00967cf908 100644
 2.25.1
 
 
-From a23ff2e5e5503ea7acca927014d38271927483e0 Mon Sep 17 00:00:00 2001
+From efd06863efd52cb3d8717e88c7f3e59cd0b6049a Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 4 Nov 2020 14:21:34 +0000
 Subject: [PATCH 05/13] appliance: add default gbm settings in appliance.xml
@@ -63947,7 +63947,7 @@ index 1a8b0e52b5..e1b0cefa06 100644
 2.25.1
 
 
-From 961655acdebf1725ecdd6f1fa3c5216467735f10 Mon Sep 17 00:00:00 2001
+From 3670d0848d2ea191c27c0599b5471c2812d94d48 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 9 Nov 2020 20:07:10 +0000
 Subject: [PATCH 06/13] hack: avoid assert
@@ -63972,7 +63972,7 @@ index 2178955750..14e5ffab1c 100644
 2.25.1
 
 
-From d20f1252e82d72e92815c3ccf920465e22dff23f Mon Sep 17 00:00:00 2001
+From e42e6c0bb1538c2d1dad04a18990a180ce47de70 Mon Sep 17 00:00:00 2001
 From: Lukas Rusak <lorusak@gmail.com>
 Date: Mon, 29 Apr 2019 18:48:45 -0700
 Subject: [PATCH 07/13] CVideoLayerBridgeDRMPRIME add colourspace connector
@@ -64064,7 +64064,7 @@ index 4f07ffc0b8..c78636b680 100644
 2.25.1
 
 
-From 3fbf8b3227a42d99a76e074e80356ab5ade7ee67 Mon Sep 17 00:00:00 2001
+From f8aa4cc8d3da7bc1493a30a0e51d98658863a8c6 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 18 Dec 2020 17:49:01 +0000
 Subject: [PATCH 08/13] appliance: default videoplayer.disablenonhevc to false
@@ -64091,7 +64091,7 @@ index e1b0cefa06..6807f4e4de 100644
 2.25.1
 
 
-From 62a6ef5a29b1bd9521b73ea2402e08e17475d7ba Mon Sep 17 00:00:00 2001
+From 4ffc84327727e40a2a0ada14476083fed9516f63 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 8 Apr 2020 11:19:22 +0100
 Subject: [PATCH 09/13] pi4: hack: Try to hide pixel wrap issue
@@ -64182,7 +64182,7 @@ index 5d61a699d4..de02d84758 100644
 2.25.1
 
 
-From 8c9e174c4c694dbd42d40e4415ed8146d2fcd829 Mon Sep 17 00:00:00 2001
+From 9d50537815b74a68c64c170769f2bacab551ef0d Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 6 Apr 2021 16:43:11 +0100
 Subject: [PATCH 10/13] Revert "windowing/gbm: hide and disable setting Use
@@ -64215,7 +64215,7 @@ index d86d3775a4..6552993348 100644
 2.25.1
 
 
-From 1221e5022db4b4970a0f5cd545496a891e1b18a8 Mon Sep 17 00:00:00 2001
+From 1d2434dff8e9377168e307bb0c4fc909f3febad4 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 18 Dec 2019 19:57:54 +0000
 Subject: [PATCH 11/13] windowing/gbm: Add display clock
@@ -64459,7 +64459,7 @@ index 6ec6f47cd1..12e3966784 100644
 2.25.1
 
 
-From ecbefca7593730545641dc7a4ce51ec0ed48e992 Mon Sep 17 00:00:00 2001
+From 79bb5c0e86f6e2be55e1d1705b43067b5adc446d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 21 Dec 2017 11:38:02 +0000
 Subject: [PATCH 12/13] Add OSMC Helper routines to improve Kodi integration
@@ -64584,7 +64584,7 @@ index 0000000000..709d21afbe
 2.25.1
 
 
-From 79b78382a6f83d8731b82c6c34a4685b9fd1064d Mon Sep 17 00:00:00 2001
+From f829a433afd827333f22bdb9e86a4cfe4480709e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 14 Jan 2021 18:36:57 +0000
 Subject: [PATCH 13/13] DVDVideoCodecDRMPRIME: Discard corrupt frames
