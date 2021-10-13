@@ -277,7 +277,7 @@ then
         ADDONS_INPUTSTREAM="inputstream.adaptive inputstream.rtmp inputstream.ffmpegdirect"
 	ADDONS_PERIPHERAL="peripheral.xarcade peripheral.joystick"
 	ADDONS_PVR="pvr.argustv pvr.dvblink pvr.dvbviewer pvr.filmon pvr.freebox pvr.hdhomerun pvr.hts pvr.iptvsimple pvr.mediaportal.tvserver pvr.mythtv pvr.nextpvr pvr.njoy pvr.octonet pvr.pctv pvr.sledovanitv.cz pvr.stalker pvr.teleboy pvr.vbox pvr.vdr.vnsi pvr.vuplus pvr.waipu pvr.wmc pvr.zattoo"
-	ADDONS_SCREENSAVERS="screensaver.asteroids screensaver.asterwave screensaver.biogenesis screensaver.cpblobs screensaver.greynetic screensaver.matrixtrails screensaver.pingpong screensaver.pyro screensaver.shadertoy screensavers.rsxs"
+	ADDONS_SCREENSAVERS="screensaver.asteroids screensaver.asterwave screensaver.biogenesis screensaver.cpblobs screensaver.greynetic screensaver.matrixtrails screensaver.pingpong screensaver.pyro screensaver.shadertoy"
 	ADDONS_VFS="vfs.libarchive vfs.rar vfs.sftp"
         ADDONS_VISUALIZATIONS="visualization.fishbmc visualization.goom visualization.matrix visualization.milkdrop visualization.milkdrop2 visualization.pictureit visualization.shadertoy visualization.spectrum visualization.starburst visualization.waveform"
 	ADDONS_GAME="game.libretro game.libretro.2048" # Needs updating from https://github.com/kodi-game/repo-binary-addons
