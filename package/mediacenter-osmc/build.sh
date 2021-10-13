@@ -187,7 +187,7 @@ then
 	    # We have some installed, let's find them
 	    headers_version=$(dpkg -l | grep rbp2-headers | grep 5 | awk '{print $2'})
 	else
-	    headers_version=$(apt-cache search rbp2-headers | grep 5 | head -n 1 | awk {'print $1'})
+	    headers_version=$(apt-cache search rbp2-headers | grep 5 | tail -n 1 | awk {'print $1'})
 	    handle_dep "${headers_version}"
 	fi
         COMPFLAGS+="-I/usr/osmc/include/ -I/usr/osmc/include/EGL -I/usr/src/${headers_version}/include -L/usr/osmc/lib -Wl,-rpath=/usr/osmc/lib" && \
