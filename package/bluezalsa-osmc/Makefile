@@ -18,5 +18,7 @@ aarch64:
 
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
-	sudo rm -rf files/usr >/dev/null 2>&1
-	sudo rm -rf files/etc >/dev/null 2>&1
+	sudo rm -rf files/etc/dbus-1 >/dev/null 2>&1
+	sudo rm -rf files/usr/lib >/dev/null 2>&1
+	sudo rm -rf files/usr/bin >/dev/null 2>&1
+	sudo rm -f files/usr/share/alsa/alsa.conf.d/20-bluealsa.conf >/dev/null 2>&1
