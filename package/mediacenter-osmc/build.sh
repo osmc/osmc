@@ -272,7 +272,7 @@ then
 	mkdir build
 	cd build
 	# One day we might need to change this in to ADDONS_XYZ_PLAT
-        ADDONS_AUDIO_DECODERS="audiodecoder.2sf audiodecoder.asap audiodecoder.dumb audiodecoder.fluidsynth audiodecoder.gme audiodecoder.gsf audiodecoder.modplug audiodecoder.ncsf audiodecoder.nosefart audiodecoder.openmpt audiodecoder.organya audiodecoder.qsf audiodecoder.sacd audiodecoder.sidplay audiodecoder.snesapu audiodecoder.ssf audiodecoder.stsound audiodecoder.timidity audiodecoder.upse audiodecoder.vgmstream audiodecoder.wsr"
+        ADDONS_AUDIO_DECODERS="audiodecoder.2sf audiodecoder.asap audiodecoder.dumb audiodecoder.gme audiodecoder.gsf audiodecoder.modplug audiodecoder.ncsf audiodecoder.nosefart audiodecoder.openmpt audiodecoder.organya audiodecoder.qsf audiodecoder.sacd audiodecoder.sidplay audiodecoder.snesapu audiodecoder.ssf audiodecoder.stsound audiodecoder.timidity audiodecoder.upse audiodecoder.vgmstream audiodecoder.wsr audiodecoder.hvl"
         ADDONS_AUDIO_ENCODERS="audioencoder.flac audioencoder.lame audioencoder.vorbis audioencoder.wav"
         ADDONS_INPUTSTREAM="inputstream.adaptive inputstream.rtmp inputstream.ffmpegdirect"
 	ADDONS_PERIPHERAL="peripheral.xarcade peripheral.joystick"
