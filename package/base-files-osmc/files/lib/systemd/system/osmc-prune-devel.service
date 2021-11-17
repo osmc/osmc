@@ -1,0 +1,9 @@
+[Unit]
+Description=Service to prune devel source
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/osmc-prune-devel
+
+[Install]
+WantedBy=multi-user.target

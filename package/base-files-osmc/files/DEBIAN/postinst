@@ -30,6 +30,7 @@ if [ "$1" = "configure" ]; then
 	chmod +s /bin/busybox 2>/dev/null
 
 	systemctl daemon-reload
+	systemctl enable osmc-prune-devel.timer
 	systemctl enable osmc-id-generator.service osmc-report-stats.timer
 	systemctl start osmc-id-generator.service osmc-report-stats.timer
 
