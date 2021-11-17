@@ -1,0 +1,13 @@
+#!/bin/bash
+# Automatically remove /etc/apt/sources.list.d/osmc-devel after two weeks unless preference prevents this
+
+PREFERENCES="/etc/osmc/prefs.d/devel_update_preferences"
+SOURCES="/etc/apt/sources.list.d/osmc-devel"
+
+[ -f "$PREFERENCES" ] && . "$PREFERENCES"
+
+if [ "$KEEP_STAGING" = "1" ] || [ ! -f "$SOURCES" ]; then
+	exit;
+fi
+
+find "$SOURCES" -mtime +14 -delete
