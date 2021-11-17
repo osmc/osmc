@@ -180,14 +180,14 @@ then
 		COMPFLAGS="-march=armv7-a -mfloat-abi=hard -O3 -marm -mfpu=neon -fomit-frame-pointer "
 	fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]; then
-	# Check if we have headers
-	dpkg -l | grep rbp2-headers | grep 5
+	# Check if we have headers for kernel 5.x
+	dpkg -l | grep rbp2-headers-sanitised | grep 5
 	if [ $? -eq 0 ]
 	then
 	    # We have some installed, let's find them
-	    headers_version=$(dpkg -l | grep rbp2-headers | grep 5 | awk '{print $2'})
+	    headers_version=$(dpkg -l | grep rbp2-headers-sanitised | grep 5 | awk '{print $2'})
 	else
-	    headers_version=$(apt-cache search rbp2-headers | grep 5 | tail -n 1 | awk {'print $1'})
+	    headers_version=$(apt-cache search rbp2-headers-sanitised | grep 5 | tail -n 1 | awk {'print $1'})
 	    handle_dep "${headers_version}"
 	fi
         COMPFLAGS+="-I/usr/osmc/include/ -I/usr/osmc/include/EGL -I/usr/src/${headers_version}/include -L/usr/osmc/lib -Wl,-rpath=/usr/osmc/lib" && \
