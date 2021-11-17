@@ -8753,7 +8753,7 @@ index 2b9dae1301..f6ec127854 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 29d270c812..4cc9ff3540
+index 29d270c812..7b92fd8006
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -32,6 +32,7 @@
@@ -8781,7 +8781,26 @@ index 29d270c812..4cc9ff3540
    const std::string &settingId = setting->GetId();
    if (settingId == CSettings::SETTING_VIDEOSCREEN_RESOLUTION ||
        settingId == CSettings::SETTING_VIDEOSCREEN_SCREEN)
-@@ -340,6 +342,49 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
+@@ -307,6 +309,18 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
+     {
+       if (!m_resolutionChangeAborted)
+       {
++	/* If new resolution is 4K, then warn user this is not advised */
++	RESOLUTION_INFO resInfo = GetResolutionInfo(newRes);
++	if (resInfo.iHeight >= 2160)
++	{
++            CLog::Log(LOGWARNING, "The user has chosen a UHD resolution. We wll warn them not to apply this");
++	    if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{13124}, CVariant{""}, CVariant{""}, 15000) !=
++              DialogResponse::YES)
++              {
++                  m_resolutionChangeAborted = true;
++                  return false;
++              }
++	}
+         if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{13111}, CVariant{""}, CVariant{""}, 15000) !=
+           DialogResponse::YES)
+         {
+@@ -340,6 +354,49 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
  
      return true;
    }
@@ -8831,7 +8850,7 @@ index 29d270c812..4cc9ff3540
  #if defined(HAVE_X11) || defined(TARGET_WINDOWS_DESKTOP) || defined(TARGET_DARWIN_OSX)
    else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
    {
-@@ -498,24 +543,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
+@@ -498,24 +555,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
    CSingleLock lock(m_critical);
    RESOLUTION_INFO res(resolution);
  
@@ -8856,7 +8875,7 @@ index 29d270c812..4cc9ff3540
    m_resolutions.push_back(res);
  }
  
-@@ -662,6 +689,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -662,6 +701,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
        flags |= D3DPRESENTFLAG_MODE3DSBS;
      else if(StringUtils::Mid(strResolution, 20,3) == "tab")
        flags |= D3DPRESENTFLAG_MODE3DTB;
@@ -8865,7 +8884,7 @@ index 29d270c812..4cc9ff3540
  
      std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
      for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
-@@ -673,6 +702,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -673,6 +714,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
    return RES_DESKTOP;
  }
  
@@ -8899,7 +8918,7 @@ index 29d270c812..4cc9ff3540
  std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, float refreshrate /* = 0.0f */)
  {
    if (resolution == RES_WINDOW)
-@@ -681,13 +737,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -681,13 +749,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -8916,7 +8935,7 @@ index 29d270c812..4cc9ff3540
    }
  
    return "DESKTOP";
-@@ -720,13 +772,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
+@@ -720,13 +784,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
      const auto mode = CDisplaySettings::GetInstance().GetResolutionInfo(index);
  
      if (mode.dwFlags ^ D3DPRESENTFLAG_INTERLACED)
@@ -8932,7 +8951,7 @@ index 29d270c812..4cc9ff3540
    }
  
    std::sort(list.begin(), list.end(), ModeSort);
-@@ -797,10 +844,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
+@@ -797,10 +856,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
      std::vector<RESOLUTION_WHR> resolutions = CServiceBroker::GetWinSystem()->ScreenResolutions(info.fRefreshRate);
      for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
      {
