@@ -18,5 +18,6 @@ clean:
 	sudo rm -rf files-image/lib >/dev/null 2>&1
 	sudo rm -rf files-image/boot >/dev/null 2>&1
 	sudo rm -rf files-headers/usr/ >/dev/null 2>&1
+	sudo rm -rf files-headers-sanitised/usr >/dev/null 2>&1
 	sudo rm -rf files-source/usr >/dev/null 2>&1
 	sudo rm -rf files-debug/var >/dev/null 2>&1
