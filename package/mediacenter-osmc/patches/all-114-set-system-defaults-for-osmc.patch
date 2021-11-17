@@ -1,20 +1,20 @@
-From 8c7675fceb716dea8d71f16637654d17d7861b43 Mon Sep 17 00:00:00 2001
+From f9fbf74c79dc0e7a2a3f3bad52100b3e828fcae2 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 29 Mar 2019 18:18:12 +0000
 Subject: [PATCH] Set system defaults for OSMC
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/settings/appliance.xml | 46 +++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ system/settings/appliance.xml | 55 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
  create mode 100644 system/settings/appliance.xml
 
 diff --git a/system/settings/appliance.xml b/system/settings/appliance.xml
 new file mode 100644
-index 0000000000..1a8b0e52b5
+index 0000000000..982f041699
 --- /dev/null
 +++ b/system/settings/appliance.xml
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,55 @@
 +<?xml version="1.0" encoding="utf-8" ?>
 +<settings version="1">
 +
@@ -60,6 +60,15 @@ index 0000000000..1a8b0e52b5
 +    </category>
 +  </section>
 +
++  <section id="player">
++    <category id="videoplayer">
++      <group id="2">
++        <setting id="videoplayer.adjustrefreshrate">
++          <default>2</default>
++        </setting>
++      </group>
++    </category>
++  </section>
 +</settings>
 -- 
 2.25.1
