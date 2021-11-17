@@ -340,6 +340,7 @@ then
         cp -ar resource.language.* ${out}/usr/share/kodi/addons
 	popd
 	popd
+	cp -ar patches/resource.language.*/ ${out}/usr/share/kodi/addons/
 	rm -rf ${out}/usr/share/kodi/addons/service.*.versioncheck
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
