@@ -92,6 +92,9 @@ void BootloaderConfig::copyBootFiles()
         {
             /* Ensure we have permission to write it out */
             system("/usr/sbin/fw_setenv upgrade_step 2");
+	    /* Ensure that we reset any environment to match new bootloader */
+	    /* ToDo: fix cuslogo for B2B */
+	    system("/usr/sbin/fw_setenv osmc_defenv true");
             QString ddCmd = "dd if=" + dtbName + " of=/dev/dtb bs=256k conv=sync";
             system(ddCmd.toLocal8Bit().data());
         }
