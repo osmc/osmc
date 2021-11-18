@@ -21,4 +21,8 @@ if [ "$1" = "configure" ]; then
 
         if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
         chown -R $OWNER /usr/share/kodi/addons/resource.language.*
+
+	if ischroot; then exit 1; fi
+	# Invalidate local language cache, we may have updated OSMC strings but the language version may not be newer
+	rm -rf /home/osmc/.kodi/addons/resource.language.* >/dev/null 2>&1 || true
 fi
