@@ -105,6 +105,7 @@ then
         handle_dep "libnfs-dev"
         handle_dep "libass-dev"
 	handle_dep "libunistring-dev"
+	handle_dep "xmlstarlet"
 	if [ "$1" == "rbp2" ]
 	then
 		handle_dep "rbp2-libcec-dev-osmc"
@@ -338,6 +339,8 @@ then
 	    rm ${language_file}
         done
         cp -ar resource.language.* ${out}/usr/share/kodi/addons
+	# Prevent language updates
+	for language in ${out}/usr/share/kodi/addons/resource.language.*; do xmlstarlet edit --inplace --update '/addon/@version' -v "999.999.999" $language/addon.xml; done
 	popd
 	popd
 	cp -ar patches/resource.language.*/ ${out}/usr/share/kodi/addons/
