@@ -36,6 +36,7 @@ disable_overscan=1
 start_x=1
 disable_splash=1
 disable_fw_kms_setup=1
+hdmi_ignore_cec_init=1
 include config-user.txt" > $BOOT/config.txt
 
 dpkg_build files/ rbp-bootloader-osmc.deb
