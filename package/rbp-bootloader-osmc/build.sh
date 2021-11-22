@@ -37,6 +37,10 @@ start_x=1
 disable_splash=1
 disable_fw_kms_setup=1
 hdmi_ignore_cec_init=1
-include config-user.txt" > $BOOT/config.txt
+include config-user.txt
+
+[pi02]
+dtoverlay=vc4-kms-v3d,cma-256
+" > $BOOT/config.txt
 
 dpkg_build files/ rbp-bootloader-osmc.deb
