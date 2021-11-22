@@ -52,12 +52,14 @@ def main(args):
 
         			if line.startswith('Depends:'):
         				package_depends = str(line.split('Depends:',1)[1].lstrip())
+        				package_depends_list = [x.strip() for x in package_depends.split(',')]
 
         			if line.startswith('Architecture:'):
         				package_architecture = str(line.split('Architecture:',1)[1].lstrip())
                 # Find the active kernel
                 if package_name.endswith('-kernel-osmc') and package_depends:
                     active_kernel = package_name.split('-kernel-osmc')[0]
+                    package_depends = [ s for s in package_depends_list if "-image-" in s ][0]
                     print(package_depends + " is an active kernel")
                     active_kernels.append(package_depends)
                 # Find all other kernels
