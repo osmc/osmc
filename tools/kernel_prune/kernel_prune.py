@@ -13,7 +13,7 @@ import re
 
 def main(args):
     use_web = False
-    repositories = ['stretch', 'stretch-devel']
+    repositories = ['buster', 'buster-devel']
     arches = [ 'i386', 'amd64', 'armhf', 'arm64']
     kernel_regex = re.compile('(vero364|pc|vero2|vero|rbp1|rbp2|atv)-image-(\d).\d{1,3}.\d{1,3}-\d{1,3}-osmc')
     parser = argparse.ArgumentParser(description="Kernel pruner 0.1")
