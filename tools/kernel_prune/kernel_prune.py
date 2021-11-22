@@ -69,13 +69,18 @@ def main(args):
             for kernel in set.difference(set(all_kernels), set(active_kernels)):
                 if args.dry_run == True:
                     print ("We should remove " + kernel + " from " + arch + " in " + repository)
-                    print kernel.replace("image", "headers")
+                    print ("We should remove " + kernel.replace("image", "headers") + " from " + arch + " in " + repository)
+                    print ("We should remove " + kernel.replace("image", "source") + " from " + arch + " in " + repository)
+                    print ("We should remove " + kernel.replace("image", "headers-sanitised") + " from " + arch + " in " + repository)
+                    print ("We should remove " + kernel.replace("image", "debug") + " from " + arch + " in " + repository)
                 else:
                     print ("Removing " + kernel + " from " + arch + " in " + repository)
                     os.chdir("/var/repos/apt/debian")
                     os.system("/usr/bin/reprepro remove " + repository + " " + kernel)
                     os.system("/usr/bin/reprepro remove " + repository + " " + kernel.replace("image", "headers"))
                     os.system("/usr/bin/reprepro remove " + repository + " " + kernel.replace("image", "source"))
+                    os.system("/usr/bin/reprepro remove " + repository + " " + kernel.replace("image", "headers-sanitised"))
+                    os.system("/usr/bin/reprepro remove " + repository + " " + kernel.replace("image", "debug"))
     return 0
 
 if __name__ == '__main__':
