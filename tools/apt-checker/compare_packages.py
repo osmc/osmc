@@ -38,6 +38,7 @@ for arch in archlist:
 
 			if line.startswith('Depends:'):
 				package_depends = str(line.split('Depends:',1)[1].lstrip())
+				package_depends_list = [x.strip() for x in package_depends.split(',')]
 
 			if line.startswith('Architecture:'):
 				package_architecture = str(line.split('Architecture:',1)[1].lstrip())
@@ -58,6 +59,7 @@ for arch in archlist:
 			if package_name.endswith('-kernel-osmc') and package_depends:
 				kernel_prefix = package_name.split('-kernel-osmc')[0]
 				kernel_name = '(Active ' + kernel_prefix + ' Kernel)'
+				package_depends = [ s for s in package_depends_list if "-image-" in s ][0]
 				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
 
 				try:
@@ -85,6 +87,7 @@ for arch in archlist:
 
 			if line.startswith('Depends:'):
 				package_depends = str(line.split('Depends:',1)[1].lstrip())
+				package_depends_list = [x.strip() for x in package_depends.split(',')]
 
 			if line.startswith('Architecture:'):
 				package_architecture = str(line.split('Architecture:',1)[1].lstrip())
@@ -105,6 +108,7 @@ for arch in archlist:
 			if package_name.endswith('-kernel-osmc') and package_depends:
 				kernel_prefix = package_name.split('-kernel-osmc')[0]
 				kernel_name = '(Active ' + kernel_prefix + ' Kernel)'
+				package_depends = [ s for s in package_depends_list if "-image-" in s ][0]
 				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
 
 				try:
