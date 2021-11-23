@@ -85,6 +85,7 @@
                         <shadowcolor>44000000</shadowcolor>
                         <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
                         <visible>IsEmpty(ListItem.Label2)</visible>
+						<scroll>true</scroll>
                     </control>
                     <control type="group">
                         <visible>!IsEmpty(ListItem.Label2)</visible>
@@ -100,6 +101,7 @@
                             <selectedcolor>ffe0b074</selectedcolor>
                             <shadowcolor>44000000</shadowcolor>
                             <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
+							<scroll>true</scroll>
                         </control>
                         <control type="label">
                             <left>32</left>
@@ -114,6 +116,7 @@
                             <selectedcolor>ffe0b074</selectedcolor>
                             <shadowcolor>44000000</shadowcolor>
                             <!-- <animation condition="!Control.HasFocus(500)" easing="out" effect="fade" end="50" reversible="true" start="100" time="200" tween="cubic">Conditional</animation>-->
+							<scroll>true</scroll>
                         </control>
                     </control>
                 </focusedlayout>
@@ -187,7 +190,7 @@
                 <control id="8" type="radiobutton">
                     <width>250</width>
                     <height>44</height>
-                    <label>disable-rc6</label>
+                    <label>$ADDON[script.module.osmcsetting.remotes 32012]</label>
                     <font>osmc_addon_Small</font>
                     <texturefocus>TextShade.png</texturefocus>
                     <texturenofocus>single_pixel.png</texturenofocus>
@@ -207,8 +210,7 @@
                 <control id="62" type="button">
                     <width>231</width>
                     <height>44</height>
-                    <!-- <label>$ADDON[script.module.osmcsetting.remotes 32003]</label>-->
-                    <label>browse</label>
+                    <label>$ADDON[script.module.osmcsetting.remotes 32003]</label>
                     <font>osmc_addon_720_Small</font>
                     <texturefocus>TextShade.png</texturefocus>
                     <texturenofocus>single_pixel.png</texturenofocus>
@@ -220,8 +222,7 @@
                 <control id="7" type="button">
                     <width>231</width>
                     <height>44</height>
-                    <!-- <label>$ADDON[script.module.osmcsetting.remotes 32004]</label>-->
-                    <label>exit</label>
+                    <label>$ADDON[script.module.osmcsetting.remotes 32004]</label>
                     <font>osmc_addon_720_Small</font>
                     <texturefocus>TextShade.png</texturefocus>
                     <texturenofocus>single_pixel.png</texturenofocus>

@@ -106,7 +106,7 @@
             <top>100</top>
             <width>247</width>
             <height>44</height>
-            <texture>osmcosmclogo.png</texture>
+            <texture>osmclogo.png</texture>
         </control>
         <!-- Left Menu button List -->
         <control id="1000" type="grouplist">
@@ -153,7 +153,7 @@
             <control id="10035" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Hostname</label>
+                <label>$ADDON[service.osmc.settings 32003]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -168,7 +168,7 @@
             <control id="10037" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>SSH</label>
+                <label>$ADDON[service.osmc.settings 32004]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -228,7 +228,7 @@
             <control id="1008" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Look + Feel</label>
+                <label>$ADDON[service.osmc.settings 32064]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -243,7 +243,7 @@
             <control id="1009" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Sign-Up</label>
+                <label>$ADDON[service.osmc.settings 32065]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -258,7 +258,7 @@
             <control id="1005" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Exit</label>
+                <label>$ADDON[service.osmc.settings 32066]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -314,6 +314,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -439,6 +440,7 @@
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>center</aligny>
+				<scroll>true</scroll>
             </control>
             <control type="label">
                 <width>1600</width>
@@ -448,6 +450,7 @@
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>center</aligny>
+				<scroll>true</scroll>
             </control>
             <control id="60010" type="button">
                 <width>1300</width>
@@ -489,11 +492,11 @@
             <onup>noop</onup>
             <ondown>noop</ondown>
             <orientation>vertical</orientation>
-            <!-- OSMC skin label -->
+            <!-- OSMC Skin label -->
             <control id="80010" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>OSMC</label>
+                <label>$ADDON[service.osmc.settings 32018]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -503,11 +506,11 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
             </control>
-            <!-- Confluence skin label -->
+            <!-- Estuary skin label -->
             <control id="80020" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Classic</label>
+                <label>$ADDON[service.osmc.settings 32019]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -527,7 +530,7 @@
             <texture>osmc_preview.png</texture>
             <visible>Control.IsVisible(98000)</visible>
         </control>
-        <!-- hostname change panel                -->
+        <!-- hostname change panel -->
         <control id="35000" type="grouplist">
             <left>480</left>
             <top>244</top>
@@ -543,16 +546,17 @@
             <control type="label">
                 <width>1800</width>
                 <height>42</height>
-                <label>Give your device a name</label>
+                <label>$ADDON[service.osmc.settings 32020]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>center</aligny>
+				<scroll>true</scroll>
             </control>
             <control id="350010" type="button">
                 <width>1600</width>
                 <height>42</height>
-                <label>current name: osmc</label>
+                <label>$ADDON[service.osmc.settings 32021]</label>
                 <font>osmc_addon_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -565,7 +569,7 @@
             <control id="350011" type="button">
                 <width>1600</width>
                 <height>42</height>
-                <label>(suggest a random name)</label>
+                <label>$ADDON[service.osmc.settings 32022]</label>
                 <font>osmc_addon_XSmall</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -579,7 +583,7 @@
                 <width>1600</width>
                 <height>42</height>
                 <visible>!SubString(Control.GetLabel(350010),.............)</visible>
-                <label>Accept</label>
+                <label>$ADDON[service.osmc.settings 32034]</label>
                 <font>osmc_addon_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -590,7 +594,7 @@
                 <onclick>noop</onclick>
             </control>
         </control>
-        <!-- SSH disabling and password reset panel                -->
+        <!-- SSH disabling and password reset panel -->
         <control id="37000" type="grouplist">
             <left>480</left>
             <top>244</top>
@@ -606,20 +610,12 @@
             <control type="label">
                 <width>1800</width>
                 <height>42</height>
-                <label>SSH gives you full control of your device and is accessible</label>
+                <label>$ADDON[service.osmc.settings 32067]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <width>1800</width>
-                <height>60</height>
-                <label>via your network. This is very useful for troubleshooting.</label>
-                <font>osmc_addon_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>top</aligny>
+				<scroll>true</scroll>
             </control>
             <control id="370010" type="radiobutton">
                 <posx>15</posx>
@@ -639,7 +635,7 @@
             <control id="370012" type="button">
                 <width>1600</width>
                 <height>42</height>
-                <label>Accept</label>
+                <label>$ADDON[service.osmc.settings 32034]</label>
                 <font>osmc_addon_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -650,7 +646,7 @@
                 <onclick>noop</onclick>
             </control>
         </control>
-        <!-- newsletter signup                  -->
+        <!-- newsletter signup -->
         <control id="9000" type="grouplist">
             <left>480</left>
             <top>244</top>
@@ -666,16 +662,17 @@
             <control type="label">
                 <width>1800</width>
                 <height>42</height>
-                <label>Would you like to receive the newsletter?</label>
+                <label>$ADDON[service.osmc.settings 32068]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <align>left</align>
                 <aligny>center</aligny>
+				<scroll>true</scroll>
             </control>
             <control id="90010" type="button">
                 <width>1600</width>
                 <height>42</height>
-                <label>Sure, sign me up</label>
+                <label>$ADDON[service.osmc.settings 32069]</label>
                 <font>osmc_addon_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -688,7 +685,7 @@
             <control id="90020" type="button">
                 <width>1600</width>
                 <height>42</height>
-                <label>No thanks</label>
+                <label>$ADDON[service.osmc.settings 32070]</label>
                 <font>osmc_addon_Med</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -700,88 +697,27 @@
             </control>
         </control>
         <!-- Exit sub menu -->
-        <control id="5000" type="grouplist">
+        <control id="5000" type="group">
             <left>480</left>
             <top>244</top>
             <width>1200</width>
             <height>726</height>
-            <itemgap>34</itemgap>
             <onleft>1000</onleft>
             <onright>9999</onright>
             <visible>Control.IsVisible(95000)</visible>
             <onup>noop</onup>
             <ondown>noop</ondown>
-            <orientation>vertical</orientation>
             <!-- welcome message -->
-            <control type="label">
+            <control id="666" type="textbox">
                 <top>0</top>
                 <width>1200</width>
-                <height>42</height>
+                <height>726</height>
                 <font>osmc_addon_Med</font>
                 <label>$ADDON[service.osmc.settings 32017]</label>
                 <textcolor>66ffffff</textcolor>
                 <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>45</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32018]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>45</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32033]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>45</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32019]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>45</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32020]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>45</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32034]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <top>90</top>
-                <width>1200</width>
-                <height>42</height>
-                <font>osmc_addon_Med</font>
-                <label>$ADDON[service.osmc.settings 32021]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
-                <aligny>center</aligny>
+				<scrolltime>75</scrolltime>
+				<autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(666)</autoscroll>
             </control>
         </control>
         <!-- Timezone sub menu -->
@@ -801,7 +737,7 @@
             <control id="3001" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Africa</label>
+                <label>$ADDON[service.osmc.settings 32071]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -815,7 +751,7 @@
             <control id="3002" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>America</label>
+                <label>$ADDON[service.osmc.settings 32072]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -829,7 +765,7 @@
             <control id="3003" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Asia</label>
+                <label>$ADDON[service.osmc.settings 32073]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -843,7 +779,7 @@
             <control id="3004" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Atlantic</label>
+                <label>$ADDON[service.osmc.settings 32074]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -857,7 +793,7 @@
             <control id="3005" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Australia</label>
+                <label>$ADDON[service.osmc.settings 32075]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -871,7 +807,7 @@
             <control id="3006" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Europe</label>
+                <label>$ADDON[service.osmc.settings 32076]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -881,11 +817,11 @@
                 <aligny>center</aligny>
                 <onclick>noop</onclick>
             </control>
-            <!-- Indian -->
+            <!-- India -->
             <control id="3007" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Indian</label>
+                <label>$ADDON[service.osmc.settings 32077]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -899,7 +835,7 @@
             <control id="3008" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>Pacific</label>
+                <label>$ADDON[service.osmc.settings 32078]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -913,7 +849,7 @@
             <control id="3009" type="button">
                 <width>300</width>
                 <height>42</height>
-                <label>UTC</label>
+                <label>$ADDON[service.osmc.settings 32079]</label>
                 <font>osmc_addon_Large</font>
                 <textcolor>66ffffff</textcolor>
                 <focusedcolor>ffe0b074</focusedcolor>
@@ -959,6 +895,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -994,6 +931,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1029,6 +967,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1064,6 +1003,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1099,6 +1039,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1134,6 +1075,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1169,6 +1111,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1204,6 +1147,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>
@@ -1239,6 +1183,7 @@
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>ffe0b074</textcolor>
                         <shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
                     </control>
                 </focusedlayout>
             </control>

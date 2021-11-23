@@ -204,7 +204,7 @@ class RemoteGui(xbmcgui.WindowXMLDialog):
         return self._path
 
     def onInit(self):
-        self.getControl(8).setLabel(self.lang(32014))  # Disable RC6
+        self.getControl(8).setLabel(self.lang(32012))  # Disable RC6
         self.getControl(62).setLabel(self.lang(32003))  # Browse
         self.getControl(7).setLabel(self.lang(32004))  # Exit
 
