@@ -1,2139 +1,2332 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-    <defaultcontrol always="true">101</defaultcontrol>
-    <animation effect="fade" time="250">WindowOpen</animation>
-    <animation effect="fade" time="500">WindowClose</animation>
-    <controls>
-        <!-- Background -->
-        <control type="image">
-            <left>0</left>
-            <top>0</top>
-            <width>1920</width>
-            <height>1080</height>
-            <texture colordiffuse="ff0b2430">white.png</texture>
-        </control>
-        <!-- Curve -->
-        <control type="image">
-            <left>1900</left>
-            <top>20</top>
-            <width>1280</width>
-            <height>1040</height>
-            <texture border="40,0,0,0">Curve.png</texture>
-        </control>
-        <control description="osmc icon" type="image">
-            <left>100</left>
-            <top>100</top>
-            <width>247</width>
-            <height>44</height>
-            <texture>osmclogo.png</texture>
-        </control>
-        <!-- Main Menu List -->
-        <control id="1000" type="grouplist">
-            <left>120</left>
-            <top>260</top>
-            <width>300</width>
-            <height>870</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onup>666</onup>
-            <ondown>666</ondown>
-            <orientation>vertical</orientation>
-            <!-- Wired -->
-            <control id="101" type="button">
-                <visible>Control.IsEnabled(101)</visible>
-                <width>300</width>
-                <height>42</height>
-                <description>Wired</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32060]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>1010</onright>
-            </control>
-            <!-- Wireless -->
-            <control id="102" type="button">
-                <visible>Control.IsEnabled(102)</visible>
-                <width>300</width>
-                <height>42</height>
-                <description>Wireless</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32041]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>10217</onright>
-            </control>
-            <!-- Bluetooth -->
-            <control id="103" type="button">
-                <visible>Control.IsEnabled(103)</visible>
-                <width>300</width>
-                <height>42</height>
-                <description>Bluetooth</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32003]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>1030</onright>
-            </control>
-            <!-- Tethering -->
-            <control id="104" type="button">
-                <visible>Control.IsEnabled(104)</visible>
-                <width>300</width>
-                <height>42</height>
-                <description>Tethering</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32001]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>1040</onright>
-            </control>
-            <!-- MySQL -->
-            <control id="105" type="button">
-                <visible>Control.IsEnabled(105)</visible>
-                <width>300</width>
-                <height>42</height>
-                <description>MySQL</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32077]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>1050</onright>
-            </control>
-        </control>
-        <!-- EXIT CONTROL -->
-        <control id="666" type="button">
-            <visible>Control.IsEnabled(105)</visible>
-            <width>300</width>
-            <height>42</height>
-            <left>120</left>
-            <bottom>100</bottom>
-            <description>Exit control</description>
-            <label>$ADDON[script.module.osmcsetting.networking 32002]</label>
-            <font>osmc_addon_720_Large</font>
-            <textcolor>66ffffff</textcolor>
-            <focusedcolor>ffe0b074</focusedcolor>
-            <texturefocus>single_pixel.png</texturefocus>
-            <texturenofocus>single_pixel.png</texturenofocus>
-            <align>left</align>
-            <aligny>center</aligny>
-            <onclick>noop</onclick>
-            <onright>noop</onright>
-            <onup>105</onup>
-            <ondown>101</ondown>
-        </control>
-        <!-- ## Wired Panel ## -->
-        <control id="1010" type="group">
-            <description>Wired Network Panel</description>
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
-            <height>726</height>
-            <onright>101</onright>
-            <onleft>101</onleft>
-            <control id="10120" type="radiobutton">
-                <visible>Control.IsEnabled(10120)</visible>
-                <description>Enable Adapter</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
-                <posx>100</posx>
-                <posy>90</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>101</onup>
-                <ondown>10111</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10111" type="button">
-                <visible>Control.IsEnabled(10111)</visible>
-                <description>Automatically configure the network toggle</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32020]</label>
-                <posx>100</posx>
-                <posy>160</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10120</onup>
-                <ondown>10112</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10112" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>IP Address</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32007]</label>
-                <posx>100</posx>
-                <posy>300</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10111</onup>
-                <ondown>10113</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10113" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Subnet Mask</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32008]</label>
-                <posx>100</posx>
-                <posy>370</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10112</onup>
-                <ondown>10114</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10114" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Default Gateway</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32009]</label>
-                <posx>100</posx>
-                <posy>440</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10113</onup>
-                <ondown>10115</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10115" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Primary DNS</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32010]</label>
-                <posx>100</posx>
-                <posy>510</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10114</onup>
-                <ondown>10116</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="10116" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Secondary DNS</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32011]</label>
-                <posx>100</posx>
-                <posy>580</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10115</onup>
-                <ondown>10118</ondown>
-                <onleft>101</onleft>
-                <onright>101</onright>
-            </control>
-            <control id="910112" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10112)+Control.isVisible(10112)</visible>
-                <label/>
-                <posx>730</posx>
-                <posy>300</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
+	<!-- Network settings -->
+	<defaultcontrol always="true">101</defaultcontrol>
+	<animation effect="fade" time="250">WindowOpen</animation>
+	<animation effect="fade" time="500">WindowClose</animation>
+	<controls>
+	
+		<!-- Background -->
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="ff0b2430">white.png</texture>
+		</control>
+		
+		<!-- OSMC logo -->
+		<control description="osmc icon" type="image">
+			<left>120</left>
+			<top>105</top>
+			<width>50</width>
+			<height>50</height>
+			<texture>logo.png</texture>
+		</control>
+		
+		<!-- Main Menu List -->
+		<control id="1000" type="grouplist">
+			<left>120</left>
+			<top>260</top>
+			<width>300</width>
+			<height>380</height>
+			<itemgap>34</itemgap>
+			<onleft>1000</onleft>
+			<onup>666</onup>
+			<ondown>666</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- Wired -->
+			<control id="101" type="button">
+				<visible>Control.IsEnabled(101)</visible>
+				<height>42</height>
+				<description>Wired</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32060]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>1010</onright>
+			</control>
+			
+			<!-- Wireless -->
+			<control id="102" type="button">
+				<visible>Control.IsEnabled(102)</visible>
+				<height>42</height>
+				<description>Wireless</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32041]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>10217</onright>
+			</control>
+			
+			<!-- Bluetooth -->
+			<control id="103" type="button">
+				<visible>Control.IsEnabled(103)</visible>
+				<height>42</height>
+				<description>Bluetooth</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32003]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>1030</onright>
+			</control>
+			
+			<!-- Tethering -->
+			<control id="104" type="button">
+				<visible>Control.IsEnabled(104)</visible>
+				<height>42</height>
+				<description>Tethering</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32001]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>1040</onright>
+			</control>
+			
+			<!-- MySQL -->
+			<control id="105" type="button">
+				<visible>Control.IsEnabled(105)</visible>
+				<height>42</height>
+				<description>MySQL</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32077]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>1050</onright>
+			</control>
+			
+		</control>
+		
+		<!-- EXIT CONTROL -->
+		<control id="666" type="button">
+			<visible>Control.IsEnabled(105)</visible>
+			<left>120</left>
+			<bottom>260</bottom>
+			<width>300</width>
+			<height>42</height>
+			<description>Exit control</description>
+			<label>$ADDON[script.module.osmcsetting.networking 32002]</label>
+			<font>osmc_addon_720_Large</font>
+			<textcolor>66ffffff</textcolor>
+			<focusedcolor>ffe0b074</focusedcolor>
+			<shadowcolor>44000000</shadowcolor>
+			<texturefocus>single_pixel.png</texturefocus>
+			<texturenofocus>single_pixel.png</texturenofocus>
+			<align>left</align>
+			<aligny>center</aligny>
+			<onclick>noop</onclick>
+			<onright>noop</onright>
+			<onup>105</onup>
+			<ondown>101</ondown>
+		</control>
+		
+		<!-- ## Wired Panel ## -->
+		<control id="1010" type="group">
+			<description>Wired Network Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onright>noop</onright>
+			<onleft>101</onleft>
+			
+			<!-- Enable Adapter -->
+			<control id="10120" type="radiobutton">
+				<visible>Control.IsEnabled(10120)</visible>
+				<description>Enable Adapter</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32039]</label>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10121</onup>
+				<ondown>10111</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Automatically configure the network -->
+			<control id="10111" type="button">
+				<visible>Control.IsEnabled(10111)</visible>
+				<description>Automatically configure the network toggle</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32020]</label>
+				<top>70</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10120</onup>
+				<ondown>10112</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- IP Address -->
+			<control id="10112" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>IP Address</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32007]</label>
+				<top>210</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10111</onup>
+				<ondown>10113</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- IP Address VALUE -->
+			<control id="910112" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10112)+Control.isVisible(10112)</visible>
+				<label/>
+				<left>690</left>
+				<top>210</top>
+				<width>630</width>
+				<height>70</height>
+				<description>IP Address VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10112)+Control.isVisible(10112)</visible>
+				<label>$INFO[Control.GetLabel(910112)]</label>
+				<left>690</left>
+				<top>210</top>
+				<width>630</width>
+				<height>70</height>
+				<description>IP Address VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control type="label">
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10112)+Control.isVisible(10112)</visible>
-                <label>$INFO[Control.GetLabel(910112)]</label>
-                <posx>730</posx>
-                <posy>300</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>IP Address VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Subnet Mask -->
+			<control id="10113" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Subnet Mask</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32008]</label>
+				<top>280</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10112</onup>
+				<ondown>10114</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Subnet Mask VALUE -->
+			<control id="910113" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10113)+Control.isVisible(10113)</visible>
+				<label/>
+				<left>690</left>
+				<top>280</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Subnet Mask VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10113)+Control.isVisible(10113)</visible>
+				<label>$INFO[Control.GetLabel(910113)]</label>
+				<left>690</left>
+				<top>280</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Subnet Mask VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="910113" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10113)+Control.isVisible(10113)</visible>
-                <label/>
-                <posx>730</posx>
-                <posy>370</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Subnet Mask VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10113)+Control.isVisible(10113)</visible>
-                <label>$INFO[Control.GetLabel(910113)]</label>
-                <posx>730</posx>
-                <posy>370</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>ISubnet Mask VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Default Gateway -->
+			<control id="10114" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Default Gateway</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32009]</label>
+				<top>350</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10113</onup>
+				<ondown>10115</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Default Gateway VALUE -->
+			<control id="910114" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10114)+Control.isVisible(10114)</visible>
+				<label/>
+				<left>690</left>
+				<top>350</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Default Gateway VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10114)+Control.isVisible(10114)</visible>
+				<label>$INFO[Control.GetLabel(910114)]</label>
+				<left>690</left>
+				<top>350</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Default Gateway VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="910114" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10114)+Control.isVisible(10114)</visible>
-                <label/>
-                <posx>730</posx>
-                <posy>440</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10114)+Control.isVisible(10114)</visible>
-                <label>$INFO[Control.GetLabel(910114)]</label>
-                <posx>730</posx>
-                <posy>440</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Default Gateway VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Primary DNS -->
+			<control id="10115" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Primary DNS</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32010]</label>
+				<top>420</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10114</onup>
+				<ondown>10116</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Primary DNS VALUE -->
+			<control id="910115" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10115)+Control.isVisible(10115)</visible>
+				<label/>
+				<left>690</left>
+				<top>420</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Primary DNS VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10115)+Control.isVisible(10115)</visible>
+				<label>$INFO[Control.GetLabel(910115)]</label>
+				<left>690</left>
+				<top>420</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Primary DNS VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="910115" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10115)+Control.isVisible(10115)</visible>
-                <label/>
-                <posx>730</posx>
-                <posy>510</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10115)+Control.isVisible(10115)</visible>
-                <label>$INFO[Control.GetLabel(910115)]</label>
-                <posx>730</posx>
-                <posy>510</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Primary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Secondary DNS -->
+			<control id="10116" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Secondary DNS</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32011]</label>
+				<top>490</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10115</onup>
+				<ondown>10118</ondown>
+				<onleft>101</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Secondary DNS VALUE -->
+			<control id="910116" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10116)+Control.isVisible(10116)</visible>
+				<label/>
+				<left>690</left>
+				<top>490</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Secondary DNS VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<visible>Control.IsEnabled(910116)</visible>
+				<align>right</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10116)+Control.isVisible(10116)</visible>
+				<label>$INFO[Control.GetLabel(910116)]</label>
+				<left>690</left>
+				<top>490</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Secondary DNS VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="910116" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10116)+Control.isVisible(10116)</visible>
-                <label/>
-                <posx>730</posx>
-                <posy>580</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <visible>Control.IsEnabled(910116)</visible>
-                <align>right</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10116)+Control.isVisible(10116)</visible>
-                <label>$INFO[Control.GetLabel(910116)]</label>
-                <posx>730</posx>
-                <posy>580</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Secondary DNS VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- connected or not connected label -->
+			<control id="81000" type="label">
+				<description>connection status</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32043]</label>
+				<top>585</top>
+				<width>1320</width>
+				<height>70</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <!-- connected or not connected label -->
-            <control id="81000" type="label">
-                <description>connection status</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32043]</label>
-                <posx>100</posx>
-                <posy>675</posy>
-                <width>880</width>
-                <height>70</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-				<scroll>true</scroll>
-            </control>
-            <!-- apply and reset buttons -->
-            <control id="10118" type="button">
-                <visible>Control.IsEnabled(10118)</visible>
-                <description>Apply</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
-                <posx>250</posx>
-                <posy>750</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onright>10119</onright>
-                <onup>10116</onup>
-                <onleft>101</onleft>
-                <ondown>10121</ondown>
-            </control>
-            <control id="10119" type="button">
-                <visible>Control.IsEnabled(10119)</visible>
-                <description>Reset</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
-                <posx>600</posx>
-                <posy>750</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onright>101</onright>
-                <onleft>10118</onleft>
-                <onup>10116</onup>
-                <ondown>10121</ondown>
-            </control>
-            <!-- Wait For Network -->
-            <control id="10121" type="radiobutton">
-                <description>Wired Enable Wait-for-network Service</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32054]</label>
-                <posx>100</posx>
-                <posy>850</posy>
-                <width>600</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10118</onup>
-            </control>
-        </control>
-        <!-- ## Wireless Panel ## -->
-        <control id="1020" type="group">
-            <description>Wireless Network Panel</description>
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
-            <height>726</height>
-            <onright>102</onright>
-            <onleft>102</onleft>
-            <control id="777" type="group">
-                <control id="10217" type="radiobutton">
-                    <visible>Control.IsEnabled(10217)</visible>
-                    <description>Enable Adapter</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32039]</label>
-                    <posx>100</posx>
-                    <posy>90</posy>
-                    <width>400</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <radiowidth>16</radiowidth>
-                    <radioheight>16</radioheight>
-                    <texturenofocus>-</texturenofocus>
-                    <texturefocus>-</texturefocus>
-                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                    <onup>noop</onup>
-                    <ondown>10211</ondown>
-                    <onleft>102</onleft>
-                    <onright>5000</onright>
-                </control>
-                <control id="10211" type="button">
-                    <visible>Control.IsEnabled(10211)</visible>
-                    <description>Automatically configure the network toggle</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32006]</label>
-                    <posx>100</posx>
-                    <posy>160</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10217</onup>
-                    <ondown>10212</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="10212" type="button">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>IP Address</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32007]</label>
-                    <posx>100</posx>
-                    <posy>300</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10211</onup>
-                    <ondown>10213</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="10213" type="button">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Subnet Mask</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32008]</label>
-                    <posx>100</posx>
-                    <posy>370</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10212</onup>
-                    <ondown>10214</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="10214" type="button">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Default Gateway</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32009]</label>
-                    <posx>100</posx>
-                    <posy>440</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10213</onup>
-                    <ondown>10215</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="10215" type="button">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Primary DNS</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32010]</label>
-                    <posx>100</posx>
-                    <posy>510</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10214</onup>
-                    <ondown>10216</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="10216" type="button">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Secondary DNS</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32011]</label>
-                    <posx>100</posx>
-                    <posy>580</posy>
-                    <width>700</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onup>10215</onup>
-                    <ondown>10218</ondown>
-                    <onright>5000</onright>
-                    <onleft>102</onleft>
-                </control>
-                <control id="910212" type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>IP Address VALUE</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10212)+Control.isVisible(10212)</visible>
-                    <posx>730</posx>
-                    <posy>300</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>IP Address VALUE</description>
-                    <label>$INFO[Control.GetLabel(910212)]</label>
-                    <visible>Control.HasFocus(10212)+Control.isVisible(10212)</visible>
-                    <posx>730</posx>
-                    <posy>300</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>ff808080</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
+			</control>
+			
+			<!-- apply and reset buttons -->
+			<control id="10118" type="button">
+				<visible>Control.IsEnabled(10118)</visible>
+				<description>Apply</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32034]</label>
+				<top>660</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onright>10119</onright>
+				<onup>10116</onup>
+				<onleft>101</onleft>
+				<ondown>10121</ondown>
+			</control>
+			
+			<control id="10119" type="button">
+				<visible>Control.IsEnabled(10119)</visible>
+				<description>Reset</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32035]</label>
+				<left>690</left>
+				<top>660</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onright>noop</onright>
+				<onleft>10118</onleft>
+				<onup>10116</onup>
+				<ondown>10121</ondown>
+			</control>
+			
+			<!-- Wait For Network -->
+			<control id="10121" type="radiobutton">
+				<description>Wired Enable Wait-for-network Service</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32054]</label>
+				<top>760</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onright>noop</onright>
+				<onleft>101</onleft>
+				<onup>10118</onup>
+				<ondown>10120</ondown>
+			</control>
+			
+		</control>
+		
+		<!-- ## Wireless Panel ## -->
+		<control id="1020" type="group">
+			<description>Wireless Network Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>630</width>
+			<height>870</height>
+			<onright>5000</onright>
+			<onleft>102</onleft>
+			<control id="777" type="group">
+			
+				<!-- Enable Adapter -->
+				<control id="10217" type="radiobutton">
+					<visible>Control.IsEnabled(10217)</visible>
+					<description>Enable Adapter</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32039]</label>
+					<width>630</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<textwidth>564</textwidth>
+					<radiowidth>16</radiowidth>
+					<radioheight>16</radioheight>
+					<texturenofocus></texturenofocus>
+					<texturefocus></texturefocus>
+					<textureradioonfocus>RadioOn.png</textureradioonfocus>
+					<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+					<textureradioofffocus>RadioOff.png</textureradioofffocus>
+					<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+					<onup>noop</onup>
+					<ondown>10211</ondown>
+					<onleft>102</onleft>
+					<onright>5000</onright>
+				</control>
+				
+				<!-- Automatically configure the network -->
+				<control id="10211" type="button">
+					<visible>Control.IsEnabled(10211)</visible>
+					<description>Automatically configure the network toggle</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32006]</label>
+					<top>70</top>
+					<width>630</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10217</onup>
+					<ondown>10212</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- IP Address -->
+				<control id="10212" type="button">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>IP Address</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32007]</label>
+					<top>210</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10211</onup>
+					<ondown>10213</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- IP Address VALUE -->
+				<control id="910212" type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>IP Address VALUE</description>
+					<label/>
+					<visible>!Control.HasFocus(10212)+Control.isVisible(10212)</visible>
+					<left>330</left>
+					<top>210</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
+				</control>
+				
+				<control type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>IP Address VALUE</description>
+					<label>$INFO[Control.GetLabel(910212)]</label>
+					<visible>Control.HasFocus(10212)+Control.isVisible(10212)</visible>
+					<left>330</left>
+					<top>210</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
 					<scroll>true</scroll>
-                </control>
-                <control id="910213" type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Subnet Mask VALUE</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10213)+Control.isVisible(10213)</visible>
-                    <posx>730</posx>
-                    <posy>370</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Subnet Mask VALUE</description>
-                    <label>$INFO[Control.GetLabel(910213)]</label>
-                    <visible>Control.HasFocus(10213)+Control.isVisible(10213)</visible>
-                    <posx>730</posx>
-                    <posy>370</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>ff808080</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
+				</control>
+				
+				<!-- Subnet Mask -->
+				<control id="10213" type="button">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Subnet Mask</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32008]</label>
+					<top>280</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10212</onup>
+					<ondown>10214</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- Subnet Mask VALUE -->
+				<control id="910213" type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Subnet Mask VALUE</description>
+					<label/>
+					<visible>!Control.HasFocus(10213)+Control.isVisible(10213)</visible>
+					<left>330</left>
+					<top>280</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
+				</control>
+				
+				<control type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Subnet Mask VALUE</description>
+					<label>$INFO[Control.GetLabel(910213)]</label>
+					<visible>Control.HasFocus(10213)+Control.isVisible(10213)</visible>
+					<left>330</left>
+					<top>280</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
 					<scroll>true</scroll>
-                </control>
-                <control id="910214" type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Default Gateway VALUE</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10214)+Control.isVisible(10214)</visible>
-                    <posx>730</posx>
-                    <posy>440</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Default Gateway VALUE</description>
-                    <label>$INFO[Control.GetLabel(910214)]</label>
-                    <visible>Control.HasFocus(10214)+Control.isVisible(10214)</visible>
-                    <posx>730</posx>
-                    <posy>440</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>ff808080</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
+				</control>
+				
+				<!-- Default Gateway -->
+				<control id="10214" type="button">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Default Gateway</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32009]</label>
+					<top>350</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10213</onup>
+					<ondown>10215</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- Default Gateway VALUE -->
+				<control id="910214" type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Default Gateway VALUE</description>
+					<label/>
+					<visible>!Control.HasFocus(10214)+Control.isVisible(10214)</visible>
+					<left>330</left>
+					<top>350</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
+				</control>
+				
+				<control type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Default Gateway VALUE</description>
+					<label>$INFO[Control.GetLabel(910214)]</label>
+					<visible>Control.HasFocus(10214)+Control.isVisible(10214)</visible>
+					<left>330</left>
+					<top>350</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
 					<scroll>true</scroll>
-                </control>
-                <control id="910215" type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Default Gateway VALUE</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10215)+Control.isVisible(10215)</visible>
-                    <posx>730</posx>
-                    <posy>510</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Default Gateway VALUE</description>
-                    <label>$INFO[Control.GetLabel(910215)]</label>
-                    <visible>Control.HasFocus(10215)+Control.isVisible(10215)</visible>
-                    <posx>730</posx>
-                    <posy>510</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>ff808080</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
+				</control>
+				
+				<!-- Primary DNS -->
+				<control id="10215" type="button">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Primary DNS</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32010]</label>
+					<top>420</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10214</onup>
+					<ondown>10216</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- Primary DNS VALUE -->
+				<control id="910215" type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Primary DNS VALUE</description>
+					<label/>
+					<visible>!Control.HasFocus(10215)+Control.isVisible(10215)</visible>
+					<left>330</left>
+					<top>420</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
+				</control>
+				
+				<control type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Primary DNS VALUE</description>
+					<label>$INFO[Control.GetLabel(910215)]</label>
+					<visible>Control.HasFocus(10215)+Control.isVisible(10215)</visible>
+					<left>330</left>
+					<top>420</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
 					<scroll>true</scroll>
-                </control>
-                <control id="910216" type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Secondary DNS VALUE</description>
-                    <label/>
-                    <visible>!Control.HasFocus(10216)+Control.isVisible(10216)</visible>
-                    <posx>730</posx>
-                    <posy>580</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                </control>
-                <control type="label">
-                    <disabledcolor>ff000000</disabledcolor>
-                    <description>Secondary DNS VALUE</description>
-                    <label>$INFO[Control.GetLabel(910216)]</label>
-                    <visible>Control.HasFocus(10216)+Control.isVisible(10216)</visible>
-                    <posx>730</posx>
-                    <posy>580</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>ff808080</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
+				</control>
+				
+				<!-- Secondary DNS -->
+				<control id="10216" type="button">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Secondary DNS</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32011]</label>
+					<top>490</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onup>10215</onup>
+					<ondown>10218</ondown>
+					<onright>5000</onright>
+					<onleft>102</onleft>
+				</control>
+				
+				<!-- Secondary DNS VALUE -->
+				<control id="910216" type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Secondary DNS VALUE</description>
+					<label/>
+					<visible>!Control.HasFocus(10216)+Control.isVisible(10216)</visible>
+					<left>330</left>
+					<top>490</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
+				</control>
+				
+				<control type="label">
+					<disabledcolor>ff000000</disabledcolor>
+					<description>Secondary DNS VALUE</description>
+					<label>$INFO[Control.GetLabel(910216)]</label>
+					<visible>Control.HasFocus(10216)+Control.isVisible(10216)</visible>
+					<left>330</left>
+					<top>490</top>
+					<width>300</width>
+					<height>70</height>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<align>right</align>
+					<aligny>center</aligny>
 					<scroll>true</scroll>
-                </control>
-                <!-- connected or not connected label -->
-                <control id="82000" type="label">
-                    <description>connection status</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32043]</label>
-                    <posx>100</posx>
-                    <posy>675</posy>
-                    <width>880</width>
-                    <height>70</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
+				</control>
+				
+				<!-- connected or not connected label -->
+				<control id="82000" type="label">
+					<description>connection status</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32043]</label>
+					<top>585</top>
+					<width>630</width>
+					<height>70</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<shadowcolor>44000000</shadowcolor>
 					<scroll>true</scroll>
-                </control>
-                <!-- apply and reset buttons -->
-                <control id="10218" type="button">
-                    <visible>Control.IsEnabled(10218)</visible>
-                    <description>Apply</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32034]</label>
-                    <posx>250</posx>
-                    <posy>750</posy>
-                    <width>400</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onright>10219</onright>
-                    <onup>10216</onup>
-                    <onleft>102</onleft>
-                    <ondown>10221</ondown>
-                </control>
-                <control id="10219" type="button">
-                    <visible>Control.IsEnabled(10219)</visible>
-                    <description>Reset</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32035]</label>
-                    <posx>600</posx>
-                    <posy>750</posy>
-                    <width>400</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textoffsetx>0</textoffsetx>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <texturefocus>-</texturefocus>
-                    <texturenofocus>-</texturenofocus>
-                    <onleft>10218</onleft>
-                    <onup>10216</onup>
-                    <onright>5000</onright>
-                    <ondown>10221</ondown>
-                </control>
-                <control id="10221" type="radiobutton">
-                    <description>Wireless Enable Wait-for-network Service</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32054]</label>
-                    <posx>100</posx>
-                    <posy>850</posy>
-                    <width>600</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <radiowidth>16</radiowidth>
-                    <radioheight>16</radioheight>
-                    <texturenofocus>-</texturenofocus>
-                    <texturefocus>-</texturefocus>
-                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                    <onup>10218</onup>
-                </control>
-            </control>
-            <!-- background of wifi list -->
-            <control type="image">
-                <description>encryption + signal strength icon</description>
-                <posx>800</posx>
-                <posy>75</posy>
-                <width>680</width>
-                <height>850</height>
-                <texture>TextShade.png</texture>
-            </control>
-            <!-- wifi list -->
-            <control id="5000" type="list">
-                <visible>Control.IsEnabled(5000)</visible>
-                <description>WIFI list</description>
-                <posx>820</posx>
-                <posy>100</posy>
-                <width>680</width>
-                <height>800</height>
-                <onleft>777</onleft>
-                <orientation>vertical</orientation>
-                <autoscroll>false</autoscroll>
-                <scrolltime easing="out" tween="sine">200</scrolltime>
-                <itemlayout height="70" width="680">
-                    <control type="image">
-                        <description>encryption + signal strength icon</description>
-                        <posx>10</posx>
-                        <posy>15</posy>
-                        <width>200</width>
-                        <height>40</height>
-                        <info>ListItem.Icon</info>
-                    </control>
-                    <control type="label">
-                        <description>network name</description>
-                        <posx>235</posx>
-                        <posy>10</posy>
-                        <width>640</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <textcolor>66ffffff</textcolor>
-                        <info>ListItem.Label</info>
-                        <selectedcolor>FF8FF5EE</selectedcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="70" width="680">
-                    <control type="image">
-                        <description>encryption + signal strength icon</description>
-                        <posx>10</posx>
-                        <posy>15</posy>
-                        <width>200</width>
-                        <height>40</height>
-                        <info>ListItem.Icon</info>
-                    </control>
-                    <control type="label">
-                        <description>network name</description>
-                        <posx>235</posx>
-                        <posy>10</posy>
-                        <width>640</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <textcolor>ffffffff</textcolor>
-                        <info>ListItem.Label</info>
-                        <selectedcolor>FF8FF5EE</selectedcolor>
+				</control>
+				
+				<!-- apply and reset buttons -->
+				<control id="10218" type="button">
+					<visible>Control.IsEnabled(10218)</visible>
+					<description>Apply</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32034]</label>
+					<top>660</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onright>10219</onright>
+					<onup>10216</onup>
+					<onleft>102</onleft>
+					<ondown>10221</ondown>
+				</control>
+				
+				<control id="10219" type="button">
+					<visible>Control.IsEnabled(10219)</visible>
+					<description>Reset</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32035]</label>
+					<left>330</left>
+					<top>660</top>
+					<width>300</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<onleft>10218</onleft>
+					<onup>10216</onup>
+					<onright>5000</onright>
+					<ondown>10221</ondown>
+				</control>
+				
+				<!-- Wait For Network -->
+				<control id="10221" type="radiobutton">
+					<description>Wireless Enable Wait-for-network Service</description>
+					<label>$ADDON[script.module.osmcsetting.networking 32054]</label>
+					<top>760</top>
+					<width>630</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<textwidth>564</textwidth>
+					<radiowidth>16</radiowidth>
+					<radioheight>16</radioheight>
+					<texturenofocus></texturenofocus>
+					<texturefocus></texturefocus>
+					<textureradioonfocus>RadioOn.png</textureradioonfocus>
+					<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+					<textureradioofffocus>RadioOff.png</textureradioofffocus>
+					<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+					<onleft>102</onleft>
+					<onup>10218</onup>
+					<onright>5000</onright>
+					<ondown>10217</ondown>
+				</control>
+				
+			</control>
+			
+			<!-- wifi list background -->
+			<control type="image">
+				<left>690</left>
+				<width>630</width>
+				<height>870</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- wifi list -->
+			<control id="5000" type="list">
+				<visible>Control.IsEnabled(5000)</visible>
+				<description>WIFI list</description>
+				<left>715</left>
+				<width>580</width>
+				<height>820</height>
+				<onleft>777</onleft>
+				<onup>5000</onup>
+				<onright>noop</onright>
+				<ondown>5000</ondown>
+				<orientation>vertical</orientation>
+				<autoscroll>false</autoscroll>
+				<scrolltime easing="out" tween="sine">200</scrolltime>
+				
+				<itemlayout height="82" width="580">
+					<control type="image">
+						<description>encryption + signal strength icon</description>
+						<top>21</top>
+						<width>200</width>
+						<height>40</height>
+						<info>ListItem.Icon</info>
+					</control>
+					<control type="label">
+						<description>network name</description>
+						<left>230</left>
+						<top>16</top>
+						<width>350</width>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>left</align>
+						<aligny>center</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<info>ListItem.Label</info>
+						<selectedcolor>FF8FF5EE</selectedcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="82" width="580">
+					<control type="image">
+						<description>encryption + signal strength icon</description>
+						<top>21</top>
+						<width>200</width>
+						<height>40</height>
+						<info>ListItem.Icon</info>
+					</control>
+					<control type="label">
+						<description>network name</description>
+						<left>230</left>
+						<top>16</top>
+						<width>350</width>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>left</align>
+						<aligny>center</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<info>ListItem.Label</info>
+						<selectedcolor>FF8FF5EE</selectedcolor>
 						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-        </control>
-        <!-- ## Bluetooth Panel ## -->
-        <control id="1030" type="group">
-            <description>Bluetooth Panel</description>
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
-            <height>726</height>
-            <onleft>103</onleft>
-            <onright>103</onright>
-            <control id="10301" type="radiobutton">
-                <visible>Control.IsEnabled(10301)</visible>
-                <description>Enable Adapter</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32015]</label>
-                <posx>100</posx>
-                <posy>125</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <ondown>6000</ondown>
-                <onright>10303</onright>
-                <onleft>103</onleft>
-            </control>
-            <control id="10303" type="radiobutton">
-                <visible>Control.IsEnabled(10303)</visible>
-                <description>Start/Stop Discovery</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32017]</label>
-                <posx>820</posx>
-                <posy>125</posy>
-                <width>450</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10301</onup>
-                <ondown>7000</ondown>
-                <onleft>10301</onleft>
-            </control>
-            <!-- Bluetooth paired list -->
-            <control type="image">
-                <description>Bluetooth paired list</description>
-                <posx>80</posx>
-                <posy>230</posy>
-                <width>650</width>
-                <height>650</height>
-                <texture>TextShade.png</texture>
-            </control>
-            <control type="label">
-                <description>Paired Devices</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32018]</label>
-                <posx>500</posx>
-                <posy>240</posy>
-                <width>230</width>
-                <height>70</height>
-                <font>osmc_addon_720_XSmall</font>
-                <textcolor>66ffffff</textcolor>
-                <align>right</align>
-                <aligny>top</aligny>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+		</control>
+		
+		<!-- ## Bluetooth Panel ## -->
+		<control id="1030" type="group">
+			<description>Bluetooth Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>103</onleft>
+			<onright>noop</onright>
+			
+			<!-- Bluetooth enable button -->
+			<control id="10301" type="radiobutton">
+				<visible>Control.IsEnabled(10301)</visible>
+				<description>Enable Adapter</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32015]</label>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>564</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<ondown>6000</ondown>
+				<onright>10303</onright>
+				<onleft>103</onleft>
+			</control>
+			
+			<!-- Bluetooth discovery button -->
+			<control id="10303" type="radiobutton">
+				<visible>Control.IsEnabled(10303)</visible>
+				<description>Start/Stop Discovery</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32017]</label>
+				<left>690</left>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>564</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10301</onup>
+				<ondown>7000</ondown>
+				<onleft>10301</onleft>
+			</control>
+			
+			<!-- Bluetooth paired list background -->
+			<control type="image">
+				<top>105</top>
+				<width>630</width>
+				<height>765</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- Heading -->
+			<control type="label">
+				<description>Paired Devices</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32018]</label>
+				<left>25</left>
+				<top>115</top>
+				<width>580</width>
+				<height>70</height>
+				<font>osmc_addon_720_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>center</align>
+				<aligny>top</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="6000" type="list">
-                <visible>Control.IsEnabled(6000)</visible>
-                <description>Bluetooth paired list</description>
-                <posx>100</posx>
-                <posy>300</posy>
-                <width>600</width>
-                <height>600</height>
-                <onup>10301</onup>
-                <onleft>103</onleft>
-                <onright>7000</onright>
-                <orientation>vertical</orientation>
-                <autoscroll>false</autoscroll>
-                <scrolltime easing="out" tween="sine">200</scrolltime>
-                <itemlayout height="70" width="500">
-                    <control type="image">
-                        <description>paired and trusted icons</description>
-                        <posx>25</posx>
-                        <posy>15</posy>
-                        <width>45</width>
-                        <height>40</height>
-                        <info>ListItem.Icon</info>
-                    </control>
-                    <control type="label">
-                        <description>device name</description>
-                        <posx>80</posx>
-                        <posy>10</posy>
-                        <width>500</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <textcolor>66ffffff</textcolor>
-                        <info>ListItem.Label</info>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="70" width="500">
-                    <control type="image">
-                        <description>paired and connected icons</description>
-                        <posx>25</posx>
-                        <posy>15</posy>
-                        <width>45</width>
-                        <height>40</height>
-                        <info>ListItem.Icon</info>
-                    </control>
-                    <control type="label">
-                        <description>device name</description>
-                        <posx>80</posx>
-                        <posy>10</posy>
-                        <width>500</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <textcolor>ffffffff</textcolor>
-                        <info>ListItem.Label</info>
-                        <selectedcolor>FF8FF5EE</selectedcolor>
+			</control>
+			
+			<!-- Bluetooth paired list -->
+			<control id="6000" type="list">
+				<visible>Control.IsEnabled(6000)</visible>
+				<description>Bluetooth paired list</description>
+				<left>25</left>
+				<top>175</top>
+				<width>580</width>
+				<height>693</height>
+				<onup>10301</onup>
+				<onleft>103</onleft>
+				<onright>7000</onright>
+				<orientation>vertical</orientation>
+				<autoscroll>false</autoscroll>
+				<scrolltime easing="out" tween="sine">200</scrolltime>
+				
+				<itemlayout height="77" width="580">
+					<control type="image">
+						<description>paired and trusted icons</description>
+						<top>19</top>
+						<width>45</width>
+						<height>40</height>
+						<info>ListItem.Icon</info>
+					</control>
+					<control type="label">
+						<description>device name</description>
+						<left>55</left>
+						<top>14</top>
+						<width>495</width>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>left</align>
+						<aligny>center</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<info>ListItem.Label</info>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="77" width="580">
+					<control type="image">
+						<description>paired and connected icons</description>
+						<top>19</top>
+						<width>45</width>
+						<height>40</height>
+						<info>ListItem.Icon</info>
+					</control>
+					<control type="label">
+						<description>device name</description>
+						<left>55</left>
+						<top>14</top>
+						<width>495</width>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>left</align>
+						<aligny>center</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<info>ListItem.Label</info>
+						<selectedcolor>FF8FF5EE</selectedcolor>
 						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <!-- background of available list -->
-            <control type="image">
-                <description>Bluetooth paired list</description>
-                <posx>800</posx>
-                <posy>230</posy>
-                <width>650</width>
-                <height>650</height>
-                <texture>TextShade.png</texture>
-            </control>
-            <control type="label">
-                <description>Available Devices</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32019]</label>
-                <posx>1220</posx>
-                <posy>240</posy>
-                <width>230</width>
-                <height>70</height>
-                <font>osmc_addon_720_XSmall</font>
-                <textcolor>66ffffff</textcolor>
-                <align>right</align>
-                <aligny>top</aligny>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Bluetooth available list background -->
+			<control type="image">
+				<left>690</left>
+				<top>105</top>
+				<width>630</width>
+				<height>765</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- Heading -->
+			<control type="label">
+				<description>Available Devices</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32019]</label>
+				<left>715</left>
+				<top>115</top>
+				<width>580</width>
+				<height>70</height>
+				<font>osmc_addon_720_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>center</align>
+				<aligny>top</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="7000" type="list">
-                <visible>Control.IsEnabled(7000)</visible>
-                <description>Bluetooth available list</description>
-                <posx>820</posx>
-                <posy>300</posy>
-                <width>600</width>
-                <height>600</height>
-                <onup>10303</onup>
-                <onleft>6000</onleft>
-                <orientation>vertical</orientation>
-                <autoscroll>false</autoscroll>
-                <scrolltime easing="out" tween="sine">200</scrolltime>
-                <itemlayout height="70" width="500">
-                    <control type="label">
-                        <description>device name</description>
-                        <posx>80</posx>
-                        <posy>10</posy>
-                        <width>450</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>centre</align>
-                        <aligny>center</aligny>
-                        <textcolor>66ffffff</textcolor>
-                        <info>ListItem.Label</info>
-                        <selectedcolor>FF8FF5EE</selectedcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="70" width="500">
-                    <control type="label">
-                        <description>device name</description>
-                        <posx>80</posx>
-                        <posy>10</posy>
-                        <width>500</width>
-                        <height>50</height>
-                        <font>osmc_addon_720_Med</font>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <textcolor>ffffffff</textcolor>
-                        <info>ListItem.Label</info>
-                        <selectedcolor>FF8FF5EE</selectedcolor>
+			</control>
+			
+			<!-- Bluetooth available list -->
+			<control id="7000" type="list">
+				<visible>Control.IsEnabled(7000)</visible>
+				<description>Bluetooth available list</description>
+				<left>715</left>
+				<top>175</top>
+				<width>580</width>
+				<height>693</height>
+				<onup>10303</onup>
+				<onleft>6000</onleft>
+				<orientation>vertical</orientation>
+				<autoscroll>false</autoscroll>
+				<scrolltime easing="out" tween="sine">200</scrolltime>
+				
+				<itemlayout height="77" width="580">
+					<control type="label">
+						<description>device name</description>
+						<top>14</top>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>centre</align>
+						<aligny>center</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<info>ListItem.Label</info>
+						<selectedcolor>FF8FF5EE</selectedcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="77" width="580">
+					<control type="label">
+						<description>device name</description>
+						<top>14</top>
+						<height>50</height>
+						<font>osmc_addon_720_Med</font>
+						<align>left</align>
+						<aligny>center</aligny>
+						<info>ListItem.Label</info>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-        </control>
-        <!-- ## Tethering Panel ## -->
-        <control id="1040" type="group">
-            <description>Tethering Panel</description>
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
-            <height>726</height>
-            <onleft>104</onleft>
-            <onright>104</onright>
-            <control type="label">
-                <align>left</align>
-                <aligny>center</aligny>
-                <label>$ADDON[script.module.osmcsetting.networking 32063]</label>
-                <posx>100</posx>
-                <posy>100</posy>
-                <width>880</width>
-                <height>70</height>
-                <description>Header</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+		</control>
+		
+		<!-- ## Tethering Panel ## -->
+		<control id="1040" type="group">
+			<description>Tethering Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>104</onleft>
+			<onright>noop</onright>
+			
+			<!-- Heading -->
+			<control type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<label>$ADDON[script.module.osmcsetting.networking 32063]</label>
+				<width>1320</width>
+				<height>70</height>
+				<description>Header</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="10401" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Hotspot SSID</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32061]</label>
-                <posx>100</posx>
-                <posy>200</posy>
-                <width>1900</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>noop</onup>
-                <ondown>10402</ondown>
-                <onleft>104</onleft>
-                <onright>104</onright>
-            </control>
-            <control id="910401" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>left</align>
-                <aligny>center</aligny>
-                <visible>!Control.HasFocus(10401)+Control.isVisible(10401)</visible>
-                <label/>
-                <posx>500</posx>
-                <posy>200</posy>
-                <width>1000</width>
-                <height>70</height>
-                <description>Hotspit SSID VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <align>left</align>
-                <aligny>center</aligny>
-                <visible>Control.HasFocus(10401)+Control.isVisible(10401)</visible>
-                <label>$INFO[Control.GetLabel(910401)]</label>
-                <posx>500</posx>
-                <posy>200</posy>
-                <width>1000</width>
-                <height>70</height>
-                <description>Hotspot Passphrase VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Hotspot SSID -->
+			<control id="10401" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Hotspot SSID</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32061]</label>
+				<top>100</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>noop</onup>
+				<ondown>10402</ondown>
+				<onleft>104</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Hotspot SSID VALUE -->
+			<control id="910401" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>left</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10401)+Control.isVisible(10401)</visible>
+				<label/>
+				<left>690</left>
+				<top>100</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Hotspot SSID VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10401)+Control.isVisible(10401)</visible>
+				<label>$INFO[Control.GetLabel(910401)]</label>
+				<left>690</left>
+				<top>100</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Hotspot Passphrase VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="10402" type="button">
-                <disabledcolor>ff000000</disabledcolor>
-                <description>Hotspot passphrase</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32062]</label>
-                <posx>100</posx>
-                <posy>300</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10401</onup>
-                <ondown>10403</ondown>
-                <onleft>104</onleft>
-                <onright>104</onright>
+			</control>
+			
+			<!-- Hotspot passphrase -->
+			<control id="10402" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Hotspot passphrase</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32062]</label>
+				<top>200</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10401</onup>
+				<ondown>10403</ondown>
+				<onleft>104</onleft>
+				<onright>noop</onright>
 				<scroll>true</scroll>
-            </control>
-            <control id="910402" type="label">
-                <disabledcolor>ff000000</disabledcolor>
-                <align>left</align>
-                <aligny>top</aligny>
-                <visible>!Control.HasFocus(10402)+Control.isVisible(10402)</visible>
-                <label/>
-                <posx>500</posx>
-                <posy>300</posy>
-                <width>1000</width>
-                <height>140</height>
-                <wrapmultiline>true</wrapmultiline>
-                <description>Hotspot passphrase VALUE</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-            </control>
-            <control type="label">
-                <align>left</align>
-                <aligny>top</aligny>
-                <visible>Control.HasFocus(10402)+Control.isVisible(10402)</visible>
-                <label>$INFO[Control.GetLabel(910402)]</label>
-                <posx>500</posx>
-                <posy>300</posy>
-                <height>149</height>
-                <width>1000</width>
-                <description>Hotspot passphrase VALUE</description>
-                <wrapmultiline>true</wrapmultiline>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Hotspot passphrase VALUE -->
+			<control id="910402" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>left</align>
+				<aligny>top</aligny>
+				<visible>!Control.HasFocus(10402)+Control.isVisible(10402)</visible>
+				<label/>
+				<left>690</left>
+				<top>200</top>
+				<width>630</width>
+				<height>140</height>
+				<wrapmultiline>true</wrapmultiline>
+				<description>Hotspot passphrase VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>left</align>
+				<aligny>top</aligny>
+				<visible>Control.HasFocus(10402)+Control.isVisible(10402)</visible>
+				<label>$INFO[Control.GetLabel(910402)]</label>
+				<left>690</left>
+				<top>200</top>
+				<height>140</height>
+				<width>630</width>
+				<description>Hotspot passphrase VALUE</description>
+				<wrapmultiline>true</wrapmultiline>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <control id="10403" type="radiobutton">
-                <description>Ethernet to WiFi</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32064]</label>
-                <posx>100</posx>
-                <posy>500</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10402</onup>
-                <ondown>10404</ondown>
-                <onleft>104</onleft>
-            </control>
-            <control id="10404" type="radiobutton">
-                <description>WiFi to Ethernet</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32065]</label>
-                <posx>100</posx>
-                <posy>560</posy>
-                <width>700</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10403</onup>
-                <ondown>10405</ondown>
-                <onleft>104</onleft>
-            </control>
-            <control id="10407" type="label">
-                <align>left</align>
-                <aligny>center</aligny>
-                <label>$ADDON[script.module.osmcsetting.networking 32040]</label>
-                <posx>100</posx>
-                <posy>700</posy>
-                <width>1400</width>
-                <height>70</height>
-                <description>Do not connect this device to a wired network with a DHCP server</description>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>ff808080</textcolor>
+			</control>
+			
+			<!-- Ethernet to WiFi -->
+			<control id="10403" type="radiobutton">
+				<description>Ethernet to WiFi</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32064]</label>
+				<top>400</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10402</onup>
+				<ondown>10404</ondown>
+				<onleft>104</onleft>
+			</control>
+			
+			<!-- WiFi to Ethernet -->
+			<control id="10404" type="radiobutton">
+				<description>WiFi to Ethernet</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32065]</label>
+				<top>470</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10403</onup>
+				<ondown>10405</ondown>
+				<onleft>104</onleft>
+			</control>
+			
+			<!-- Warning label -->
+			<control id="10407" type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<label>$ADDON[script.module.osmcsetting.networking 32040]</label>
+				<top>540</top>
+				<width>1320</width>
+				<height>70</height>
+				<description>Do not connect this device to a wired network with a DHCP server</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scroll>true</scroll>
-            </control>
-            <!-- Enable and Disable buttons -->
-            <control id="10405" type="button">
-                <description>Enable</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32066]</label>
-                <posx>250</posx>
-                <posy>800</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10403</onup>
-                <ondown>noop</ondown>
-                <onleft>104</onleft>
-                <onright>10406</onright>
-            </control>
-            <control id="10406" type="button">
-                <description>Disable</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32067]</label>
-                <posx>600</posx>
-                <posy>800</posy>
-                <width>400</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <label>-</label>
-                <textoffsetx>0</textoffsetx>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-                <onup>10404</onup>
-                <ondown>noop</ondown>
-                <onleft>10405</onleft>
-                <onright>noop</onright>
-            </control>
-        </control>
-        <!-- ## MySQL Panel ## -->
-        <control id="1050" type="group">
-            <description>MySQL Panel</description>
-            <left>380</left>
-            <top>85</top>
-            <width>1400</width>
-            <height>726</height>
-            <onright>noop</onright>
-            <onleft>105</onleft>
-            <!-- <itemgap>60</itemgap>-->
-            <!-- VIDEO TOGGLE -->
-            <control id="10510" type="radiobutton">
-                <visible>Control.IsEnabled(10510)</visible>
-                <description>Enable MySQL Video Database</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32095]</label>
-                <posx>25</posx>
-                <posy>90</posy>
-                <width>600</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10590</onup>
-                <ondown>10511</ondown>
-                <onleft>105</onleft>
-                <onright>10520</onright>
-            </control>
-            <!-- VIDEO GROUP -->
-            <control description="MySQL Video Group" type="group">
-                <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
-                <!-- <itemgap>34</itemgap> -->
-                <posx>75</posx>
-                <posy>180</posy>
-                <orientation>vertical</orientation>
-                <control type="group">
-                    <!-- NAME BUTTON -->
-                    <control id="10511" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>NAME</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32096]</label>
-                        <posx>0</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <label>-</label>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10510</onup>
-                        <ondown>10512</ondown>
-                        <onleft>105</onleft>
-                        <onright>10521</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910511" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10511)+Control.isVisible(10511)</visible>
-                        <label>$ADDON[script.module.osmcsetting.networking 32097]</label>
-                        <posx>530</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Name VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+			</control>
+			
+			<!-- Enable and Disable buttons -->
+			<control id="10405" type="button">
+				<description>Enable</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32066]</label>
+				<top>640</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10403</onup>
+				<ondown>noop</ondown>
+				<onleft>104</onleft>
+				<onright>10406</onright>
+			</control>
+			
+			<control id="10406" type="button">
+				<description>Disable</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32067]</label>
+				<left>690</left>
+				<top>640</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10404</onup>
+				<ondown>noop</ondown>
+				<onleft>10405</onleft>
+				<onright>noop</onright>
+			</control>
+			
+		</control>
+		
+		<!-- ## MySQL Panel ## -->
+		<control id="1050" type="group">
+			<description>MySQL Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onright>noop</onright>
+			<onleft>105</onleft>
+			
+			<!-- VIDEO TOGGLE -->
+			<control id="10510" type="radiobutton">
+				<visible>Control.IsEnabled(10510)</visible>
+				<description>Enable MySQL Video Database</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32095]</label>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>564</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10590</onup>
+				<ondown>10511</ondown>
+				<onleft>105</onleft>
+				<onright>10520</onright>
+			</control>
+			
+			<!-- VIDEO GROUP -->
+			<control description="MySQL Video Group" type="group">
+				<visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
+				<top>90</top>
+				<orientation>vertical</orientation>
+				
+				<control type="group">
+				
+					<!-- NAME BUTTON -->
+					<control id="10511" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>NAME</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32096]</label>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10510</onup>
+						<ondown>10512</ondown>
+						<onleft>105</onleft>
+						<onright>10521</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910511" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+						<label>$ADDON[script.module.osmcsetting.networking 32097]</label>
+						<left>330</left>
+						<width>300</width>
+						<height>70</height>
+						<description>Name VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10511)+Control.isVisible(10511)</visible>
-                        <label>$INFO[Control.GetLabel(910511)]</label>
-                        <posx>530</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Name VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10511)+Control.isVisible(10511)</visible>
+						<label>$INFO[Control.GetLabel(910511)]</label>
+						<left>330</left>
+						<width>300</width>
+						<height>70</height>
+						<description>Name VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- IPADDRESS BUTTON -->
-                    <control id="10512" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>IP Address</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32098]</label>
-                        <posx>0</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <label>-</label>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10511</onup>
-                        <ondown>10513</ondown>
-                        <onleft>105</onleft>
-                        <onright>10522</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910512" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10512)+Control.isVisible(10512)</visible>
-                        <label>___ : ___ : ___ : ___</label>
-                        <posx>530</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- IPADDRESS BUTTON -->
+					<control id="10512" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>IP Address</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32098]</label>
+						<top>90</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10511</onup>
+						<ondown>10513</ondown>
+						<onleft>105</onleft>
+						<onright>10522</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910512" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10512)+Control.isVisible(10512)</visible>
+						<label>___ : ___ : ___ : ___</label>
+						<left>330</left>
+						<top>90</top>
+						<width>300</width>
+						<height>70</height>
+						<description>IP Address VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10512)+Control.isVisible(10512)</visible>
-                        <label>$INFO[Control.GetLabel(910512)]</label>
-                        <posx>530</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10512)+Control.isVisible(10512)</visible>
+						<label>$INFO[Control.GetLabel(910512)]</label>
+						<left>330</left>
+						<top>90</top>
+						<width>300</width>
+						<height>70</height>
+						<description>IP Address VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- PORT BUTTON -->
-                    <control id="10513" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>Port</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32099]</label>
-                        <posx>0</posx>
-                        <posy>180</posy>
-                        <width>600</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <label>-</label>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10512</onup>
-                        <ondown>10514</ondown>
-                        <onleft>105</onleft>
-                        <onright>10523</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910513" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10513)+Control.isVisible(10513)</visible>
-                        <label>3306</label>
-                        <posx>530</posx>
-                        <posy>180</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- PORT BUTTON -->
+					<control id="10513" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>Port</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32099]</label>
+						<top>180</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10512</onup>
+						<ondown>10514</ondown>
+						<onleft>105</onleft>
+						<onright>10523</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910513" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10513)+Control.isVisible(10513)</visible>
+						<label>3306</label>
+						<left>330</left>
+						<top>180</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Port VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10513)+Control.isVisible(10513)</visible>
-                        <label>$INFO[Control.GetLabel(910513)]</label>
-                        <posx>530</posx>
-                        <posy>180</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10513)+Control.isVisible(10513)</visible>
+						<label>$INFO[Control.GetLabel(910513)]</label>
+						<left>330</left>
+						<top>180</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Port VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- USER BUTTON -->
-                    <control id="10514" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>User</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32100]</label>
-                        <posx>0</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10513</onup>
-                        <ondown>10515</ondown>
-                        <onleft>105</onleft>
-                        <onright>10524</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910514" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10514)+Control.isVisible(10514)</visible>
-                        <label>-</label>
-                        <posx>530</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- USER BUTTON -->
+					<control id="10514" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>User</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32100]</label>
+						<left>0</left>
+						<top>270</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10513</onup>
+						<ondown>10515</ondown>
+						<onleft>105</onleft>
+						<onright>10524</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910514" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10514)+Control.isVisible(10514)</visible>
+						<label></label>
+						<left>330</left>
+						<top>270</top>
+						<width>300</width>
+						<height>70</height>
+						<description>User VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10514)+Control.isVisible(10514)</visible>
-                        <label>$INFO[Control.GetLabel(910514)]</label>
-                        <posx>530</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10514)+Control.isVisible(10514)</visible>
+						<label>$INFO[Control.GetLabel(910514)]</label>
+						<left>330</left>
+						<top>270</top>
+						<width>300</width>
+						<height>70</height>
+						<description>User VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- PASS BUTTON -->
-                    <control id="10515" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>User</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32101]</label>
-                        <posx>0</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10514</onup>
-                        <ondown>10580</ondown>
-                        <onleft>105</onleft>
-                        <onright>10525</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910515" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10515)+Control.isVisible(10515)</visible>
-                        <label>-</label>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- PASS BUTTON -->
+					<control id="10515" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>User</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32101]</label>
+						<left>0</left>
+						<top>360</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10514</onup>
+						<ondown>10580</ondown>
+						<onleft>105</onleft>
+						<onright>10525</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910515" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10515)+Control.isVisible(10515)</visible>
+						<label></label>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Pass VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10515)+Control.isVisible(10515)</visible>
-                        <label>$INFO[Control.GetLabel(910515)]</label>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10515)+Control.isVisible(10515)</visible>
+						<label>$INFO[Control.GetLabel(910515)]</label>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Pass VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIDDEN -->
-                    <control id="810515" type="label">
-                        <visible>false</visible>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Password value, hidden control, normal control displays stars</description>
-                    </control>
-                </control>
-                <control id="10580" type="radiobutton">
-                    <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
-                    <label>$ADDON[script.module.osmcsetting.networking 32102]</label>
-                    <posx>0</posx>
-                    <posy>460</posy>
-                    <width>500</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <radiowidth>16</radiowidth>
-                    <radioheight>16</radioheight>
-                    <texturenofocus>-</texturenofocus>
-                    <texturefocus>-</texturefocus>
-                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                    <onup>10515</onup>
-                    <ondown>10590</ondown>
-                    <onleft>105</onleft>
-                    <onright>10520</onright>
-                </control>
-                <control id="10590" type="radiobutton">
-                    <visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
-                    <description>Enable MySQL Video Database</description>
-                    <label>$ADDON[script.module.osmcsetting.networking 32103]</label>
-                    <posx>0</posx>
-                    <posy>550</posy>
-                    <width>500</width>
-                    <height>66</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>osmc_addon_720_Med</font>
-                    <textcolor>66ffffff</textcolor>
-                    <focusedcolor>ffe0b074</focusedcolor>
-                    <radiowidth>16</radiowidth>
-                    <radioheight>16</radioheight>
-                    <texturenofocus>-</texturenofocus>
-                    <texturefocus>-</texturefocus>
-                    <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                    <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                    <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                    <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                    <onup>10580</onup>
-                    <ondown>10510</ondown>
-                    <onleft>105</onleft>
-                    <onright>10520</onright>
-                </control>
-            </control>
-            <!-- MUSIC TOGGLE -->
-            <control id="10520" type="radiobutton">
-                <visible>Control.IsEnabled(10520)</visible>
-                <description>Enable MySQL MusicDB</description>
-                <label>$ADDON[script.module.osmcsetting.networking 32104]</label>
-                <posx>700</posx>
-                <posy>90</posy>
-                <width>620</width>
-                <height>66</height>
-                <align>left</align>
-                <aligny>center</aligny>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <radiowidth>16</radiowidth>
-                <radioheight>16</radioheight>
-                <texturenofocus>-</texturenofocus>
-                <texturefocus>-</texturefocus>
-                <textureradioonfocus>RadioOn.png</textureradioonfocus>
-                <textureradioonnofocus>RadioOn.png</textureradioonnofocus>
-                <textureradioofffocus>RadioOff.png</textureradioofffocus>
-                <textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
-                <onup>10525</onup>
-                <ondown>10521</ondown>
-                <onleft>10510</onleft>
-                <onright>noop</onright>
-            </control>
-            <!-- MUSIC GROUP -->
-            <control description="MySQL MUSIC Group" type="group">
-                <visible>Control.IsEnabled(10520) + String.Contains(Control.GetLabel(10520),*)</visible>
-                <itemgap>34</itemgap>
-                <posx>750</posx>
-                <posy>180</posy>
-                <orientation>vertical</orientation>
-                <control type="group">
-                    <!-- NAME BUTTON -->
-                    <control id="10521" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>NAME</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32096]</label>
-                        <posx>0</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <label>-</label>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10520</onup>
-                        <ondown>10522</ondown>
-                        <onleft>10511</onleft>
-                        <onright>noop</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910521" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10521)+Control.isVisible(10521)</visible>
-                        <label>$ADDON[script.module.osmcsetting.networking 32105]</label>
-                        <posx>530</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Name VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+					<!-- VALUE HIDDEN -->
+					<control id="810515" type="label">
+						<visible>false</visible>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Password value, hidden control, normal control displays stars</description>
+					</control>
+					
+				</control>
+				
+				<!-- Import Watched State -->
+				<control id="10580" type="radiobutton">
+					<visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
+					<label>$ADDON[script.module.osmcsetting.networking 32102]</label>
+					<top>460</top>
+					<width>630</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<textwidth>564</textwidth>
+					<radiowidth>16</radiowidth>
+					<radioheight>16</radioheight>
+					<texturenofocus></texturenofocus>
+					<texturefocus></texturefocus>
+					<textureradioonfocus>RadioOn.png</textureradioonfocus>
+					<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+					<textureradioofffocus>RadioOff.png</textureradioofffocus>
+					<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+					<onup>10515</onup>
+					<ondown>10590</ondown>
+					<onleft>105</onleft>
+					<onright>10520</onright>
+				</control>
+				
+				<!-- Import Resume Points -->
+				<control id="10590" type="radiobutton">
+					<visible>Control.IsEnabled(10510) + String.Contains(Control.GetLabel(10510),*)</visible>
+					<label>$ADDON[script.module.osmcsetting.networking 32103]</label>
+					<top>550</top>
+					<width>630</width>
+					<height>66</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>osmc_addon_720_Med</font>
+					<textcolor>66ffffff</textcolor>
+					<focusedcolor>ffe0b074</focusedcolor>
+					<shadowcolor>44000000</shadowcolor>
+					<textwidth>564</textwidth>
+					<radiowidth>16</radiowidth>
+					<radioheight>16</radioheight>
+					<texturenofocus></texturenofocus>
+					<texturefocus></texturefocus>
+					<textureradioonfocus>RadioOn.png</textureradioonfocus>
+					<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+					<textureradioofffocus>RadioOff.png</textureradioofffocus>
+					<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+					<onup>10580</onup>
+					<ondown>10510</ondown>
+					<onleft>105</onleft>
+					<onright>10520</onright>
+				</control>
+				
+			</control>
+			
+			<!-- MUSIC TOGGLE -->
+			<control id="10520" type="radiobutton">
+				<visible>Control.IsEnabled(10520)</visible>
+				<description>Enable MySQL MusicDB</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32104]</label>
+				<left>690</left>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>564</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10525</onup>
+				<ondown>10521</ondown>
+				<onleft>10510</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- MUSIC GROUP -->
+			<control description="MySQL MUSIC Group" type="group">
+				<visible>Control.IsEnabled(10520) + String.Contains(Control.GetLabel(10520),*)</visible>
+				<left>690</left>
+				<top>90</top>
+				<orientation>vertical</orientation>
+				
+				<control type="group">
+				
+					<!-- NAME BUTTON -->
+					<control id="10521" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>NAME</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32096]</label>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10520</onup>
+						<ondown>10522</ondown>
+						<onleft>10511</onleft>
+						<onright>noop</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910521" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+						<label>$ADDON[script.module.osmcsetting.networking 32105]</label>
+						<left>330</left>
+						<top>0</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Name VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10521)+Control.isVisible(10521)</visible>
-                        <label>$INFO[Control.GetLabel(910521)]</label>
-                        <posx>530</posx>
-                        <posy>0</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Name VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10521)+Control.isVisible(10521)</visible>
+						<label>$INFO[Control.GetLabel(910521)]</label>
+						<left>330</left>
+						<top>0</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Name VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- IPADDRESS BUTTON -->
-                    <control id="10522" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>IP Address</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32098]</label>
-                        <posx>0</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10521</onup>
-                        <ondown>10523</ondown>
-                        <onleft>10512</onleft>
-                        <onright>noop</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910522" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10522)+Control.isVisible(10522)</visible>
-                        <label>___ : ___ : ___ : ___</label>
-                        <posx>530</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- IPADDRESS BUTTON -->
+					<control id="10522" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>IP Address</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32098]</label>
+						<top>90</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10521</onup>
+						<ondown>10523</ondown>
+						<onleft>10512</onleft>
+						<onright>noop</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910522" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10522)+Control.isVisible(10522)</visible>
+						<label>___ : ___ : ___ : ___</label>
+						<left>330</left>
+						<top>90</top>
+						<width>300</width>
+						<height>70</height>
+						<description>IP Address VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10522)+Control.isVisible(10522)</visible>
-                        <label>$INFO[Control.GetLabel(910522)]</label>
-                        <posx>530</posx>
-                        <posy>90</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>IP Address VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10522)+Control.isVisible(10522)</visible>
+						<label>$INFO[Control.GetLabel(910522)]</label>
+						<left>330</left>
+						<top>90</top>
+						<width>300</width>
+						<height>70</height>
+						<description>IP Address VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- PORT BUTTON -->
-                    <control id="10523" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>Port</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32099]</label>
-                        <posx>0</posx>
-                        <posy>180</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10522</onup>
-                        <ondown>10524</ondown>
-                        <onleft>10513</onleft>
-                        <onright>noop</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910523" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10523)+Control.isVisible(10523)</visible>
-                        <label>3306</label>
-                        <posx>530</posx>
-                        <posy>180</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- PORT BUTTON -->
+					<control id="10523" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>Port</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32099]</label>
+						<top>180</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10522</onup>
+						<ondown>10524</ondown>
+						<onleft>10513</onleft>
+						<onright>noop</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910523" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10523)+Control.isVisible(10523)</visible>
+						<label>3306</label>
+						<left>330</left>
+						<top>180</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Port VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10523)+Control.isVisible(10523)</visible>
-                        <label>$INFO[Control.GetLabel(910523)]</label>
-                        <posx>530</posx>
-                        <posy>180</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Port VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10523)+Control.isVisible(10523)</visible>
+						<label>$INFO[Control.GetLabel(910523)]</label>
+						<left>330</left>
+						<top>180</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Port VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- USER BUTTON -->
-                    <control id="10524" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>User</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32100]</label>
-                        <posx>0</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10523</onup>
-                        <ondown>10525</ondown>
-                        <onleft>10514</onleft>
-                        <onright>noop</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910524" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10524)+Control.isVisible(10524)</visible>
-                        <label>-</label>
-                        <posx>530</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- USER BUTTON -->
+					<control id="10524" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>User</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32100]</label>
+						<top>270</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10523</onup>
+						<ondown>10525</ondown>
+						<onleft>10514</onleft>
+						<onright>noop</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910524" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10524)+Control.isVisible(10524)</visible>
+						<label></label>
+						<left>330</left>
+						<top>270</top>
+						<width>300</width>
+						<height>70</height>
+						<description>User VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10524)+Control.isVisible(10524)</visible>
-                        <label>$INFO[Control.GetLabel(910524)]</label>
-                        <posx>530</posx>
-                        <posy>270</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>User VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10524)+Control.isVisible(10524)</visible>
+						<label>$INFO[Control.GetLabel(910524)]</label>
+						<left>330</left>
+						<top>270</top>
+						<width>300</width>
+						<height>70</height>
+						<description>User VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </control>
-                <control type="group">
-                    <!-- PASS BUTTON -->
-                    <control id="10525" type="button">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <description>User</description>
-                        <label>$ADDON[script.module.osmcsetting.networking 32101]</label>
-                        <posx>0</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>66</height>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <font>osmc_addon_720_Med</font>
-                        <textoffsetx>0</textoffsetx>
-                        <textcolor>66ffffff</textcolor>
-                        <focusedcolor>ffe0b074</focusedcolor>
-                        <texturefocus>-</texturefocus>
-                        <texturenofocus>-</texturenofocus>
-                        <onup>10524</onup>
-                        <ondown>10520</ondown>
-                        <onleft>10515</onleft>
-                        <onright>noop</onright>
-                    </control>
-                    <!-- VALUE -->
-                    <control id="910525" type="label">
-                        <disabledcolor>ff000000</disabledcolor>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>!Control.HasFocus(10525)+Control.isVisible(10525)</visible>
-                        <label>-</label>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>66ffffff</textcolor>
+					</control>
+					
+				</control>
+				
+				<control type="group">
+				
+					<!-- PASS BUTTON -->
+					<control id="10525" type="button">
+						<disabledcolor>ff000000</disabledcolor>
+						<description>User</description>
+						<label>$ADDON[script.module.osmcsetting.networking 32101]</label>
+						<top>360</top>
+						<width>300</width>
+						<height>66</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<focusedcolor>ffe0b074</focusedcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<texturefocus></texturefocus>
+						<texturenofocus></texturenofocus>
+						<onup>10524</onup>
+						<ondown>10520</ondown>
+						<onleft>10515</onleft>
+						<onright>noop</onright>
+					</control>
+					
+					<!-- VALUE -->
+					<control id="910525" type="label">
+						<disabledcolor>ff000000</disabledcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>!Control.HasFocus(10525)+Control.isVisible(10525)</visible>
+						<label></label>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Pass VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIGHLIGHT -->
-                    <control type="label">
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <visible>Control.HasFocus(10525)+Control.isVisible(10525)</visible>
-                        <label>$INFO[Control.GetLabel(910525)]</label>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Pass VALUE</description>
-                        <font>osmc_addon_720_Med</font>
-                        <textcolor>ff808080</textcolor>
+					</control>
+					
+					<!-- VALUE HIGHLIGHT -->
+					<control type="label">
+						<align>right</align>
+						<aligny>center</aligny>
+						<visible>Control.HasFocus(10525)+Control.isVisible(10525)</visible>
+						<label>$INFO[Control.GetLabel(910525)]</label>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Pass VALUE</description>
+						<font>osmc_addon_720_Med</font>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                    <!-- VALUE HIDDEN -->
-                    <control id="810525" type="label">
-                        <visible>false</visible>
-                        <posx>530</posx>
-                        <posy>360</posy>
-                        <width>650</width>
-                        <height>70</height>
-                        <description>Password value, hidden control, normal control displays stars</description>
-                    </control>
-                </control>
-            </control>
-        </control>
-    </controls>
+					</control>
+					
+					<!-- VALUE HIDDEN -->
+					<control id="810525" type="label">
+						<visible>false</visible>
+						<left>330</left>
+						<top>360</top>
+						<width>300</width>
+						<height>70</height>
+						<description>Password value, hidden control, normal control displays stars</description>
+					</control>
+					
+				</control>
+				
+			</control>
+			
+		</control>
+		
+	</controls>
 </window>
