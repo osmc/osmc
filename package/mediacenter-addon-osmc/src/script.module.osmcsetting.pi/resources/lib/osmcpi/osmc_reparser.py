@@ -586,13 +586,7 @@ def gpio_pin_config_set(kodi_setting, all_settings):
 
 
 def audio_config_set(kodi_setting, all_settings):
-    if all_settings.get("soundcard_dac", "0") != "0":
-
-        return "off"
-    else:
-
-        return "remove_this_line"
-
+    return "remove_this_line"
 
 def hdmi_force_hotplug_config_set(kodi_setting, all_settings):
     """

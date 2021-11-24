@@ -1,1202 +1,1339 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-    <defaultcontrol always="true">20010</defaultcontrol>
-    <controls>
-        <!-- VISIBILITY CONTROLLERS -->
-        <control type="grouplist">
-            <control id="92000" type="label">
-                <description>visibility controller - language</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="93000" type="label">
-                <description>visibility controller - timezone</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="125000" type="label">
-                <description>visibility controller - hostname</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="127000" type="label">
-                <description>visibility controller - SSH</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="94000" type="label">
-                <description>visibility controller - Terms and Conditions</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="95000" type="label">
-                <description>visibility controller - Exit</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="96000" type="label">
-                <description>visibility controller - networking</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="97000" type="label">
-                <description>visibility controller - warranty</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="98000" type="label">
-                <description>visibility controller - skin selection</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-            <control id="99000" type="label">
-                <description>visibility controller - Newsletter</description>
-                <posx>20</posx>
-                <posy>20</posy>
-                <width>1</width>
-                <height>1</height>
-                <label/>
-            </control>
-        </control>
-        <!-- Background -->
-        <control type="image">
-            <left>0</left>
-            <top>0</top>
-            <width>1920</width>
-            <height>1080</height>
-            <texture colordiffuse="ff0b2430">white.png</texture>
-        </control>
-        <!-- Curve -->
-        <control type="image">
-            <left>1900</left>
-            <top>20</top>
-            <width>1280</width>
-            <height>1040</height>
-            <texture border="40,0,0,0">Curve.png</texture>
-        </control>
-        <control type="image">
-            <left>100</left>
-            <top>100</top>
-            <width>247</width>
-            <height>44</height>
-            <texture>osmclogo.png</texture>
-        </control>
-        <!-- Left Menu button List -->
-        <control id="1000" type="grouplist">
-            <left>120</left>
-            <top>280</top>
-            <width>300</width>
-            <height>870</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <!-- Language -->
-            <control id="1002" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32008]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>2000</onright>
-            </control>
-            <!-- Timezone -->
-            <control id="1003" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32009]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>3000</onright>
-            </control>
-            <!-- Hostname -->
-            <control id="10035" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32003]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>350010</onright>
-            </control>
-            <!-- SSH -->
-            <control id="10037" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32004]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>370010</onright>
-            </control>
-            <!-- T&C -->
-            <control id="1004" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32010]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>40010</onright>
-            </control>
-            <!-- Warranty -->
-            <control id="1007" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32023]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>70010</onright>
-            </control>
-            <!-- Networking -->
-            <control id="1006" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32011]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>60010</onright>
-            </control>
-            <!-- Skin Selection -->
-            <control id="1008" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32064]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>80010</onright>
-            </control>
-            <!-- Newsletter Signup -->
-            <control id="1009" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32065]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>90010</onright>
-            </control>
-            <!-- Exit -->
-            <control id="1005" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32066]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onright>-</onright>
-            </control>
-        </control>
-        <!-- Language sub menu -->
-        <control id="2000" type="grouplist">
-            <left>480</left>
-            <top>185</top>
-            <width>1250</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <visible>Control.IsVisible(92000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control id="20010" type="wraplist">
-                <left>480</left>
-                <width>1300</width>
-                <height>726</height>
-                <onup>20010</onup>
-                <ondown>20010</ondown>
-                <onleft>1002</onleft>
-                <onright>noop</onright>
-                <focusposition>0</focusposition>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1280</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1280</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
+	<!-- OSMC first setup -->
+	<defaultcontrol always="true">20010</defaultcontrol>
+	<animation effect="fade" time="250">WindowOpen</animation>
+	<animation effect="fade" time="500">WindowClose</animation>
+	<controls>
+	
+		<!-- VISIBILITY CONTROLLERS -->
+		<control type="grouplist">
+		
+			<control id="92000" type="label">
+				<description>visibility controller - language</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="93000" type="label">
+				<description>visibility controller - timezone</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="125000" type="label">
+				<description>visibility controller - hostname</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="127000" type="label">
+				<description>visibility controller - SSH</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="94000" type="label">
+				<description>visibility controller - Terms and Conditions</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="97000" type="label">
+				<description>visibility controller - warranty</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="96000" type="label">
+				<description>visibility controller - networking</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="98000" type="label">
+				<description>visibility controller - skin selection</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="99000" type="label">
+				<description>visibility controller - Newsletter</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+			<control id="95000" type="label">
+				<description>visibility controller - Exit</description>
+				<left>20</left>
+				<top>20</top>
+				<width>1</width>
+				<height>1</height>
+				<label/>
+			</control>
+			
+		</control>
+		
+		<!-- Background -->
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="ff0b2430">white.png</texture>
+		</control>
+		
+		<!-- OSMC logo -->
+		<control type="image">
+			<left>120</left>
+			<top>105</top>
+			<width>50</width>
+			<height>50</height>
+			<texture>logo.png</texture>
+		</control>
+		
+		<!-- Left Menu button List -->
+		<control id="1000" type="grouplist">
+			<left>120</left>
+			<top>260</top>
+			<width>300</width>
+			<height>726</height>
+			<itemgap>34</itemgap>
+			<onup>1000</onup>
+			<ondown>1000</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- Language -->
+			<control id="1002" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32008]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>2000</onright>
+			</control>
+			
+			<!-- Timezone -->
+			<control id="1003" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32009]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>3000</onright>
+			</control>
+			
+			<!-- Hostname -->
+			<control id="10035" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32003]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>350010</onright>
+			</control>
+			
+			<!-- SSH -->
+			<control id="10037" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32004]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>370010</onright>
+			</control>
+			
+			<!-- T&C -->
+			<control id="1004" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32010]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>40010</onright>
+			</control>
+			
+			<!-- Warranty -->
+			<control id="1007" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32023]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>70010</onright>
+			</control>
+			
+			<!-- Networking -->
+			<control id="1006" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32011]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>60010</onright>
+			</control>
+			
+			<!-- Skin Selection -->
+			<control id="1008" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32064]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>80010</onright>
+			</control>
+			
+			<!-- Newsletter Signup -->
+			<control id="1009" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32065]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>90010</onright>
+			</control>
+			
+			<!-- Exit -->
+			<control id="1005" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32066]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright></onright>
+			</control>
+			
+		</control>
+		
+		<!-- Language sub menu -->
+		<control id="2000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>836</height>
+			<itemgap>34</itemgap>
+			<onleft>1002</onleft>
+			<visible>Control.IsVisible(92000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<control id="20010" type="wraplist">
+				<width>1320</width>
+				<height>836</height>
+				<onup>20010</onup>
+				<ondown>20010</ondown>
+				<onleft>1002</onleft>
+				<onright>noop</onright>
+				<focusposition>0</focusposition>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="1320">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="1320">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
 						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-        </control>
-        <!-- Terms sub menu -->
-        <control id="4000" type="group">
-            <left>580</left>
-            <top>144</top>
-            <width>1000</width>
-            <height>726</height>
-            <onleft>1000</onleft>
-            <visible>Control.IsVisible(94000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <control type="image">
-                <description>text background</description>
-                <posx>0</posx>
-                <posy>0</posy>
-                <width>900</width>
-                <height>800</height>
-                <texture>TextShade.png</texture>
-            </control>
-            <control id="555" type="textbox">
-                <description>terms and conditions</description>
-                <posx>50</posx>
-                <posy>50</posy>
-                <width>800</width>
-                <height>700</height>
-                <wraptext>true</wraptext>
-                <colordiffuse>ff0b2430</colordiffuse>
-                <font>osmc_addon_720_XSmall</font>
-                <textcolor>66ffffff</textcolor>
-                <scrolltime>75</scrolltime>
-                <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
-            </control>
-            <!-- I Agree -->
-            <control id="40010" type="button">
-                <left>1100</left>
-                <top>200</top>
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32013]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onleft>1004</onleft>
-                <onright>noop</onright>
-            </control>
-        </control>
-        <!-- Warranty sub menu -->
-        <control id="7000" type="group">
-            <left>580</left>
-            <top>144</top>
-            <width>1000</width>
-            <height>726</height>
-            <onleft>1000</onleft>
-            <visible>Control.IsVisible(97000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <control type="image">
-                <description>text background</description>
-                <posx>0</posx>
-                <posy>0</posy>
-                <width>900</width>
-                <height>800</height>
-                <texture>TextShade.png</texture>
-            </control>
-            <control id="777" type="textbox">
-                <description>warranty</description>
-                <posx>50</posx>
-                <posy>50</posy>
-                <width>800</width>
-                <height>700</height>
-                <wraptext>true</wraptext>
-                <colordiffuse>ff0b2430</colordiffuse>
-                <font>osmc_addon_720_XSmall</font>
-                <textcolor>66ffffff</textcolor>
-                <scrolltime>75</scrolltime>
-                <autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(777)</autoscroll>
-            </control>
-            <!-- I Agree -->
-            <control id="70010" type="button">
-                <left>1100</left>
-                <top>200</top>
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32013]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-                <onleft>1007</onleft>
-                <onright>noop</onright>
-            </control>
-        </control>
-        <!-- Networking -->
-        <control id="6000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1400</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(96000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control type="label">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32014]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+		</control>
+		
+		<!-- Timezone sub menu -->
+		<control id="3000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>630</width>
+			<height>836</height>
+			<itemgap>34</itemgap>
+			<onleft>1003</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(93000)</visible>
+			<onup>3000</onup>
+			<ondown>3000</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- Africa -->
+			<control id="3001" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32071]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- America -->
+			<control id="3002" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32072]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Asia -->
+			<control id="3003" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32073]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Atlantic -->
+			<control id="3004" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32074]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Australia -->
+			<control id="3005" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32075]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Europe -->
+			<control id="3006" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32076]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- India -->
+			<control id="3007" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32077]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Pacific -->
+			<control id="3008" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32078]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- UTC -->
+			<control id="3009" type="button">
+				<width>630</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32079]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- timezone sub sub menu holder -->
+		<control id="9999" type="group">
+			<visible>Control.IsVisible(93000)</visible>
+			<description>timezone sub sub menu holder</description>
+			
+			<!-- Africa -->
+			<control id="30010" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30010</onup>
+				<ondown>30010</ondown>
+				<onleft>3001</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- America -->
+			<control id="30020" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30020</onup>
+				<ondown>30020</ondown>
+				<onleft>3002</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Asia -->
+			<control id="30030" type="wraplist">
+			   <left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30030</onup>
+				<ondown>30030</ondown>
+				<onleft>3003</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Atlantic -->
+			<control id="30040" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30040</onup>
+				<ondown>30040</ondown>
+				<onleft>3004</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Australia -->
+			<control id="30050" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30050</onup>
+				<ondown>30050</ondown>
+				<onleft>3005</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Europe -->
+			<control id="30060" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30060</onup>
+				<ondown>30060</ondown>
+				<onleft>3006</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- India -->
+			<control id="30070" type="wraplist">
+			   <left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30070</onup>
+				<ondown>30070</ondown>
+				<onleft>3007</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- Pacific -->
+			<control id="30080" type="wraplist">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30080</onup>
+				<ondown>30080</ondown>
+				<onleft>3008</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+			<!-- UTC -->
+			<control id="30090" type="list">
+				<left>840</left>
+				<top>105</top>
+				<width>630</width>
+				<height>836</height>
+				<onup>30090</onup>
+				<ondown>3000</ondown>
+				<onleft>3009</onleft>
+				<onright>noop</onright>
+				<orientation>vertical</orientation>
+				<scrolltime easing="out" tween="sine">240</scrolltime>
+				
+				<itemlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<selectedcolor>ffffffff</selectedcolor>
+						<textcolor>66ffffff</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+					</control>
+				</itemlayout>
+				
+				<focusedlayout height="76" width="630">
+					<control type="label">
+						<height>76</height>
+						<font>osmc_addon_720_Large</font>
+						<label>$INFO[ListItem.Label]</label>
+						<aligny>top</aligny>
+						<textcolor>ffe0b074</textcolor>
+						<shadowcolor>44000000</shadowcolor>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+				
+			</control>
+			
+		</control>
+		
+		<!-- hostname change panel -->
+		<control id="35000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<onleft>10035</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(125000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- Give your device a name -->
+			<control type="label">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32020]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>left</align>
+				<aligny>center</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control type="label">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32032]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
+			</control>
+			
+			<!-- Current name: osmc -->
+			<control id="350010" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32021]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- (Suggest a random name) -->
+			<control id="350011" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32034]</label>
+				<font>osmc_addon_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Accept -->
+			<control id="350012" type="button">
+				<height>42</height>
+				<visible>!SubString(Control.GetLabel(350010),.............)</visible>
+				<label>$ADDON[service.osmc.settings 32080]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- SSH disabling and password reset panel -->
+		<control id="37000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<onleft>10037</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(127000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- SSH gives you full control of your device and is accessible via your network. This is very useful for troubleshooting. -->
+			<control type="label">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32067]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>left</align>
+				<aligny>center</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="60010" type="button">
-                <width>1300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32015]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="60090" type="button">
-                <width>1300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32016]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <!-- Skin Selection -->
-        <control id="8000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1400</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(98000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <!-- OSMC Skin label -->
-            <control id="80010" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32018]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Estuary skin label -->
-            <control id="80020" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32019]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <!-- OSMC skin image -->
-        <control id="88888" type="image">
-            <left>690</left>
-            <top>240</top>
-            <width>1170</width>
-            <height>780</height>
-            <texture>osmc_preview.png</texture>
-            <visible>Control.IsVisible(98000)</visible>
-        </control>
-        <!-- hostname change panel -->
-        <control id="35000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1200</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(125000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control type="label">
-                <width>1800</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32020]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
+			</control>
+			
+			<!-- SSH Service is Enabled -->
+			<control id="370010" type="radiobutton">
+				<width>1320</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32036]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Accept -->
+			<control id="370012" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32080]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- Terms sub menu -->
+		<control id="4000" type="group">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>1004</onleft>
+			<visible>Control.IsVisible(94000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			
+			<!-- text background -->
+			<control type="image">
+				<description>text background</description>
+				<height>794</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- terms and conditions -->
+			<control id="555" type="textbox">
+				<description>terms and conditions</description>
+				<left>50</left>
+				<top>50</top>
+				<width>1220</width>
+				<height>694</height>
+				<wraptext>true</wraptext>
+				<colordiffuse>ff0b2430</colordiffuse>
+				<font>osmc_addon_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<scrolltime>75</scrolltime>
+				<autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(555)</autoscroll>
+			</control>
+			
+			<!-- I Agree -->
+			<control id="40010" type="button">
+				<bottom>0</bottom>
+				<width>1320</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32013]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>center</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onleft>1004</onleft>
+				<onright>noop</onright>
+			</control>
+			
+		</control>
+		
+		<!-- Warranty sub menu -->
+		<control id="7000" type="group">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>1007</onleft>
+			<visible>Control.IsVisible(97000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			
+			<!-- text background -->
+			<control type="image">
+				<description>text background</description>
+				<height>794</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- warranty -->
+			<control id="777" type="textbox">
+				<description>warranty</description>
+				<left>50</left>
+				<top>50</top>
+				<width>1220</width>
+				<height>694</height>
+				<wraptext>true</wraptext>
+				<colordiffuse>ff0b2430</colordiffuse>
+				<font>osmc_addon_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<scrolltime>75</scrolltime>
+				<autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(777)</autoscroll>
+			</control>
+			
+			<!-- I Agree -->
+			<control id="70010" type="button">
+			   <bottom>0</bottom>
+				<width>1320</width>
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32013]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>center</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onleft>1007</onleft>
+				<onright>noop</onright>
+			</control>
+			
+		</control>
+		
+		<!-- Networking -->
+		<control id="6000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<onleft>1006</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(96000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- OSMC could not automatically connect to the Internet. -->
+			<control type="label">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32014]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>left</align>
+				<aligny>center</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="350010" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32021]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="350011" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32022]</label>
-                <font>osmc_addon_720_XSmall</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="350012" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <visible>!SubString(Control.GetLabel(350010),.............)</visible>
-                <label>$ADDON[service.osmc.settings 32034]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <!-- SSH disabling and password reset panel -->
-        <control id="37000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1200</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(127000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control type="label">
-                <width>1800</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32067]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
+			</control>
+			
+			<!-- What would you like to do? -->
+			<control type="label">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32032]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>left</align>
+				<aligny>center</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="370010" type="radiobutton">
-                <posx>15</posx>
-                <posy>40</posy>
-                <width>600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32036]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="370012" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32034]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <!-- newsletter signup -->
-        <control id="9000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>1200</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(99000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <control type="label">
-                <width>1800</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32068]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <align>left</align>
-                <aligny>center</aligny>
+			</control>
+			
+			<!-- I'd like to set up networking manually -->
+			<control id="60010" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32015]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- I'll set up networking later -->
+			<control id="60090" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32016]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- Skin Selection -->
+		<control id="8000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<onleft>1008</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(98000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- OSMC Skin label -->
+			<control id="80010" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32018]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- Estuary skin label -->
+			<control id="80020" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32019]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- Skin image -->
+		<control id="88888" type="image">
+			<left>756</left>
+			<bottom>105</bottom>
+			<width>768</width>
+			<height>432</height>
+			<texture>osmc_preview.jpg</texture>
+			<aspectratio>scale</aspectratio>
+			<visible>Control.IsVisible(98000)</visible>
+		</control>
+		
+		<!-- newsletter signup -->
+		<control id="9000" type="grouplist">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<itemgap>34</itemgap>
+			<onleft>1009</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(99000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+			<orientation>vertical</orientation>
+			
+			<!-- Would you like to receive the newsletter? -->
+			<control type="label">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32068]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<align>left</align>
+				<aligny>center</aligny>
 				<scroll>true</scroll>
-            </control>
-            <control id="90010" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32069]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <control id="90020" type="button">
-                <width>1600</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32070]</label>
-                <font>osmc_addon_720_Med</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <!-- Exit sub menu -->
-        <control id="5000" type="group">
-            <left>480</left>
-            <top>244</top>
-            <width>1200</width>
-            <height>726</height>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(95000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <!-- welcome message -->
-            <control id="666" type="textbox">
-                <top>0</top>
-                <width>1200</width>
-                <height>726</height>
-                <font>osmc_addon_720_Med</font>
-                <label>$ADDON[service.osmc.settings 32017]</label>
-                <textcolor>66ffffff</textcolor>
-                <align>center</align>
+			</control>
+			
+			<!-- Sure, sign me up -->
+			<control id="90010" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32069]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+			<!-- No thanks -->
+			<control id="90020" type="button">
+				<height>42</height>
+				<label>$ADDON[service.osmc.settings 32070]</label>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+			</control>
+			
+		</control>
+		
+		<!-- Exit sub menu -->
+		<control id="5000" type="group">
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>1005</onleft>
+			<onright>9999</onright>
+			<visible>Control.IsVisible(95000)</visible>
+			<onup>noop</onup>
+			<ondown>noop</ondown>
+
+			<!-- text background -->
+			<control type="image">
+				<description>text background</description>
+				<height>794</height>
+				<texture>TextShade.png</texture>
+			</control>
+			
+			<!-- welcome message -->
+			<control id="666" type="textbox">
+				<left>50</left>
+				<top>50</top>
+				<width>1220</width>
+				<height>694</height>
+				<wraptext>true</wraptext>
+				<colordiffuse>ff0b2430</colordiffuse>
+				<font>osmc_addon_720_XSmall</font>
+				<label>$ADDON[service.osmc.settings 32017]</label>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
 				<scrolltime>75</scrolltime>
 				<autoscroll delay="3000" repeat="10000" time="1000">!Control.HasFocus(666)</autoscroll>
-            </control>
-        </control>
-        <!-- Timezone sub menu -->
-        <control id="3000" type="grouplist">
-            <left>480</left>
-            <top>244</top>
-            <width>400</width>
-            <height>726</height>
-            <itemgap>34</itemgap>
-            <onleft>1000</onleft>
-            <onright>9999</onright>
-            <visible>Control.IsVisible(93000)</visible>
-            <onup>noop</onup>
-            <ondown>noop</ondown>
-            <orientation>vertical</orientation>
-            <!-- Africa -->
-            <control id="3001" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32071]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- America -->
-            <control id="3002" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32072]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Asia -->
-            <control id="3003" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32073]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Atlantic -->
-            <control id="3004" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32074]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Australia -->
-            <control id="3005" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32075]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Europe -->
-            <control id="3006" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32076]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- India -->
-            <control id="3007" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32077]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- Pacific -->
-            <control id="3008" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32078]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-            <!-- UTC -->
-            <control id="3009" type="button">
-                <width>300</width>
-                <height>42</height>
-                <label>$ADDON[service.osmc.settings 32079]</label>
-                <font>osmc_addon_720_Large</font>
-                <textcolor>66ffffff</textcolor>
-                <focusedcolor>ffe0b074</focusedcolor>
-                <texturefocus>single_pixel.png</texturefocus>
-                <texturenofocus>single_pixel.png</texturenofocus>
-                <align>left</align>
-                <aligny>center</aligny>
-                <onclick>noop</onclick>
-            </control>
-        </control>
-        <control id="9999" type="group">
-            <visible>Control.IsVisible(93000)</visible>
-            <description>timezone sub sub menu holder</description>
-            <control id="30010" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30010</onup>
-                <ondown>30010</ondown>
-                <onleft>3001</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>120</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30020" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30020</onup>
-                <ondown>30020</ondown>
-                <onleft>3002</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30030" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30030</onup>
-                <ondown>30030</ondown>
-                <onleft>3003</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30040" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30040</onup>
-                <ondown>30040</ondown>
-                <onleft>3004</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30050" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30050</onup>
-                <ondown>30050</ondown>
-                <onleft>3005</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30060" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30060</onup>
-                <ondown>30060</ondown>
-                <onleft>3006</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30070" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30070</onup>
-                <ondown>30070</ondown>
-                <onleft>3007</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30080" type="wraplist">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30080</onup>
-                <ondown>30080</ondown>
-                <onleft>3008</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-            <control id="30090" type="list">
-                <left>880</left>
-                <top>200</top>
-                <width>1250</width>
-                <height>726</height>
-                <onup>30090</onup>
-                <ondown>3000</ondown>
-                <onleft>3009</onleft>
-                <onright>noop</onright>
-                <orientation>vertical</orientation>
-                <scrolltime easing="out" tween="sine">240</scrolltime>
-                <itemlayout height="90" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>90</height>
-                        <font>osmc_addon_720_Med</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>66ffffff</textcolor>
-                    </control>
-                </itemlayout>
-                <focusedlayout height="180" width="1050">
-                    <control type="label">
-                        <left>32</left>
-                        <top>0</top>
-                        <width>1218</width>
-                        <height>180</height>
-                        <font>osmc_addon_720_XLarge</font>
-                        <label>$INFO[ListItem.Label]</label>
-                        <textcolor>ffe0b074</textcolor>
-                        <shadowcolor>44000000</shadowcolor>
-						<scroll>true</scroll>
-                    </control>
-                </focusedlayout>
-            </control>
-        </control>
+			</control>
+			
+		</control>
 
-        <!-- COVER, provides a sheet over all the controls when the window loads -->
-        <control type="image" id="123456789">
-            <left>0</left>
-            <top>0</top>
-            <width>1920</width>
-            <height>1080</height>
-            <texture colordiffuse="ff0b2430">white.png</texture>
-        </control>
+		<!-- COVER, provides a sheet over all the controls when the window loads -->
+		<control type="image" id="123456789">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="ff0b2430">white.png</texture>
+		</control>
 
-    </controls>
+	</controls>
 </window>
