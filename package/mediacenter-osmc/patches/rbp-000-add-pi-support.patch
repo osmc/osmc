@@ -1,7 +1,7 @@
 From f8d2d385b6c475cd5427679fc4e337d905588a3f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:56:15 +0100
-Subject: [PATCH 1/8] Fix UPower capability detection on Vero
+Subject: [PATCH 1/7] Fix UPower capability detection on Vero
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -30,7 +30,7 @@ index 5e400772b1..398cd6596e 100644
 From 230f6c9e9a610d1799e065916ba1bb3c63411a40 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 6 Mar 2021 18:29:22 +0000
-Subject: [PATCH 2/8] Enable DRM-PRIME for Raspberry Pi
+Subject: [PATCH 2/7] Enable DRM-PRIME for Raspberry Pi
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -72,7 +72,7 @@ index 6d1fb9cd49..c45ca1772c 100644
 From 3640e092d04f8754fa98c8dd457dc9e39077998a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 21 Dec 2017 11:38:02 +0000
-Subject: [PATCH 3/8] Add OSMC Helper routines to improve Kodi integration with
+Subject: [PATCH 3/7] Add OSMC Helper routines to improve Kodi integration with
  OSMC
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
@@ -197,7 +197,7 @@ index 0000000000..709d21afbe
 From c84c9f3485519a595532128cd0a2551d72eb1d86 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 20 Jan 2020 16:53:52 +0000
-Subject: [PATCH 4/8] ffmpeg: Add v4l2 support
+Subject: [PATCH 4/7] ffmpeg: Add v4l2 support
 
 ---
  cmake/modules/FindFFMPEG.cmake                |     5 +-
@@ -63896,141 +63896,10 @@ index e358775911..df2fa1e8b4 100644
 2.25.1
 
 
-From 40ad0122d112b062ee38dd77042de51b7083dc3d Mon Sep 17 00:00:00 2001
-From: popcornmix <popcornmix@gmail.com>
-Date: Fri, 27 Mar 2020 15:14:11 +0000
-Subject: [PATCH 5/8] VideoPlayer: Add setting to disable non-hevc accel
-
----
- addons/resource.language.en_gb/resources/strings.po | 10 ++++++++++
- system/settings/linux.xml                           | 12 ++++++++++++
- .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp       | 13 +++++++++++++
- xbmc/settings/Settings.cpp                          |  2 ++
- xbmc/settings/Settings.h                            |  1 +
- 5 files changed, 38 insertions(+)
-
-diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 97daa187f9..3878a32526 100644
---- a/addons/resource.language.en_gb/resources/strings.po
-+++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -7291,6 +7291,16 @@ msgctxt "#13467"
- msgid "Unlimited / 1080 (>30Hz)"
- msgstr ""
- 
-+#: system/settings/settings.xml
-+msgctxt "#13500"
-+msgid "Only allow acceleration for HEVC"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#13501"
-+msgid "This option disables acceleration for other codecs as they don't currently support seeking with V4L2"
-+msgstr ""
-+
- #empty strings from id 13468 to 13504
- 
- #: system/settings/settings.xml
-diff --git a/system/settings/linux.xml b/system/settings/linux.xml
-index c45ca1772c..435b8b7016 100644
---- a/system/settings/linux.xml
-+++ b/system/settings/linux.xml
-@@ -168,6 +168,18 @@
-           <default>true</default>
-           <control type="toggle" />
-         </setting>
-+        <setting id="videoplayer.disablenonhevc" type="boolean" parent="videoplayer.useprimedecoderforhw" label="13500" help="13501">
-+          <requirement>HAS_GLES</requirement>
-+          <visible>false</visible>
-+          <dependencies>
-+            <dependency type="enable">
-+              <condition setting="videoplayer.useprimedecoderforhw" operator="is">true</condition>
-+            </dependency>
-+          </dependencies>
-+          <level>3</level>
-+          <default>true</default>
-+          <control type="toggle" />
-+        </setting>
-         <setting id="videoplayer.useprimerenderer" type="integer" label="13462" help="13463">
-           <requirement>HAS_GLES</requirement>
-           <visible>false</visible>
-diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-index b27db92b5f..afe69afd8c 100644
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-@@ -37,6 +37,7 @@ namespace
- {
- 
- constexpr const char* SETTING_VIDEOPLAYER_USEPRIMEDECODERFORHW{"videoplayer.useprimedecoderforhw"};
-+constexpr const char* SETTING_VIDEOPLAYER_DISABLENONHEVC{"videoplayer.disablenonhevc"};
- 
- static void ReleaseBuffer(void* opaque, uint8_t* data)
- {
-@@ -123,6 +124,15 @@ void CDVDVideoCodecDRMPRIME::Register()
- 
-   setting->SetVisible(true);
- 
-+  setting = settings->GetSetting(SETTING_VIDEOPLAYER_DISABLENONHEVC);
-+  if (!setting)
-+  {
-+    CLog::Log(LOGERROR, "Failed to load setting for: {}", SETTING_VIDEOPLAYER_DISABLENONHEVC);
-+    return;
-+  }
-+
-+  setting->SetVisible(true);
-+
-   CDVDFactoryCodec::RegisterHWVideoCodec("drm_prime", CDVDVideoCodecDRMPRIME::Create);
- }
- 
-@@ -144,6 +154,9 @@ static const AVCodecHWConfig* FindHWConfig(const AVCodec* codec)
-   if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-           SETTING_VIDEOPLAYER_USEPRIMEDECODERFORHW))
-     return nullptr;
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-+          SETTING_VIDEOPLAYER_DISABLENONHEVC) && codec->id != AV_CODEC_ID_HEVC)
-+    return nullptr;
- 
-   const AVCodecHWConfig* config = nullptr;
-   for (int n = 0; (config = avcodec_get_hw_config(codec, n)); n++)
-diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 87293c8774..cc2d796891 100644
---- a/xbmc/settings/Settings.cpp
-+++ b/xbmc/settings/Settings.cpp
-@@ -142,6 +142,7 @@ constexpr const char* CSettings::SETTING_VIDEOPLAYER_RENDERMETHOD;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_HQSCALERS;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_USEMEDIACODEC;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE;
-+constexpr const char* CSettings::SETTING_VIDEOPLAYER_DISABLE_NON_HEVC;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_USEVDPAU;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_USEVDPAUMIXER;
- constexpr const char* CSettings::SETTING_VIDEOPLAYER_USEVDPAUMPEG2;
-@@ -995,6 +996,7 @@ void CSettings::InitializeISettingCallbacks()
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_TESTPATTERN);
-   settingSet.insert(CSettings::SETTING_VIDEOPLAYER_USEMEDIACODEC);
-   settingSet.insert(CSettings::SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE);
-+  settingSet.insert(CSettings::SETTING_VIDEOPLAYER_DISABLE_NON_HEVC);
-   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_VOLUMESTEPS);
-   settingSet.insert(CSettings::SETTING_SOURCE_VIDEOS);
-   settingSet.insert(CSettings::SETTING_SOURCE_MUSIC);
-diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 8276c8a5aa..00967cf908 100644
---- a/xbmc/settings/Settings.h
-+++ b/xbmc/settings/Settings.h
-@@ -118,6 +118,7 @@ public:
-   static constexpr auto SETTING_VIDEOPLAYER_USEMEDIACODEC = "videoplayer.usemediacodec";
-   static constexpr auto SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE =
-       "videoplayer.usemediacodecsurface";
-+  static constexpr auto SETTING_VIDEOPLAYER_DISABLE_NON_HEVC = "videoplayer.disablenonhevc";
-   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAU = "videoplayer.usevdpau";
-   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMIXER = "videoplayer.usevdpaumixer";
-   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMPEG2 = "videoplayer.usevdpaumpeg2";
--- 
-2.25.1
-
-
-From 6798c407ce1ea808635e572096ee04da21ab63ab Mon Sep 17 00:00:00 2001
+From b03fc79630a3dfe94679bc630faf9f9cd0c5a9f5 Mon Sep 17 00:00:00 2001
 From: Lukas Rusak <lorusak@gmail.com>
 Date: Mon, 29 Apr 2019 18:48:45 -0700
-Subject: [PATCH 6/8] CVideoLayerBridgeDRMPRIME add colourspace connector
+Subject: [PATCH 5/7] CVideoLayerBridgeDRMPRIME add colourspace connector
  property
 
 ---
@@ -64119,10 +63988,10 @@ index 4f07ffc0b8..c78636b680 100644
 2.25.1
 
 
-From ddcedc4418968a3fb57d46783eb33a239fe58fc3 Mon Sep 17 00:00:00 2001
+From 9a8a36f67ca248bbc8a5172fefd263ce45019f32 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Tue, 6 Apr 2021 16:43:11 +0100
-Subject: [PATCH 7/8] Revert "windowing/gbm: hide and disable setting Use
+Subject: [PATCH 6/7] Revert "windowing/gbm: hide and disable setting Use
  Display As Clock"
 
 This reverts commit cacf60139cd5aa334b43defc04d15356cb1aa4da.
@@ -64152,10 +64021,10 @@ index d86d3775a4..6552993348 100644
 2.25.1
 
 
-From aaf614511b0322f3eeaaa27b2909ea26040fe498 Mon Sep 17 00:00:00 2001
+From ad3c460fbcc0fb23fdfd893e127cf9d05181e479 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 18 Dec 2019 19:57:54 +0000
-Subject: [PATCH 8/8] windowing/gbm: Add display clock
+Subject: [PATCH 7/7] windowing/gbm: Add display clock
 
 This allows use of "sync video to display"
 and features like resampling for smooth playback
