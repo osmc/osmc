@@ -2,6 +2,7 @@
 <window>
 	<!-- Store addon info -->
 	<defaultcontrol always="true">9000</defaultcontrol>
+	<onload>AlarmClock(WindowDialogFocus,Control.SetFocus(9000),00:00,silent)</onload>
 	<animation type="WindowOpen">
 		<effect center="auto" easing="inout" end="100" start="70" time="300" tween="back" type="zoom"/>
 		<effect end="100" start="0" time="300" type="fade"/>
@@ -10,6 +11,7 @@
 		<effect center="auto" end="70" start="100" time="100" type="zoom"/>
 		<effect end="0" start="100" time="100" type="fade"/>
 	</animation>
+	
 	<controls>
 	
 		<!-- Background -->
