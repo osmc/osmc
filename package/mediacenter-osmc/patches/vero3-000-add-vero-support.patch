@@ -812,7 +812,7 @@ index 0000000000..d92dc8dd95
 +2.25.1
 +
 diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 2ceb8f0d5f..571e7e7983 100644
+index 2ceb8f0d5f..600009cb35 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
 @@ -189,6 +189,11 @@
@@ -964,7 +964,7 @@ index 2ceb8f0d5f..571e7e7983 100644
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle TMDS clock to %d", sysfs_toggle);
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to %d", sysfs_toggle);
-+  SysfsUtils::SetInt("/sys/class/leds/led-sys/brightness", sysfs_toggle);
++  SysfsUtils::SetInt("/sys/class/leds/standby/brightness", ! sysfs_toggle);
 +  std::string cpu_governor = "powersave";
 +  if (m_bVeroStandby)
 +        cpu_governor = "ondemand";
