@@ -11284,7 +11284,7 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..65d5f90266
+index 0000000000..9a39576570
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -0,0 +1,498 @@
@@ -11750,9 +11750,9 @@ index 0000000000..65d5f90266
 +  if (ResDesktop != RES_INVALID)
 +  {
 +    CLog::Log(LOGINFO, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
-+      resDesktop.iWidth, resDesktop.iHeight,
-+      resDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
-+      resDesktop.fRefreshRate,
++      ResDesktop.iWidth, ResDesktop.iHeight,
++      ResDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
++      ResDesktop.fRefreshRate,
 +      (int)ResDesktop, (int)RES_DESKTOP);
 +
 +    CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
