@@ -11284,10 +11284,10 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..9a39576570
+index 0000000000..50ce68c40b
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,498 @@
+@@ -0,0 +1,496 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11749,11 +11749,9 @@ index 0000000000..9a39576570
 +  // set RES_DESKTOP
 +  if (ResDesktop != RES_INVALID)
 +  {
-+    CLog::Log(LOGINFO, "Found (%dx%d%s@%f) at %d, setting to RES_DESKTOP at %d",
-+      ResDesktop.iWidth, ResDesktop.iHeight,
-+      ResDesktop.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
-+      ResDesktop.fRefreshRate,
-+      (int)ResDesktop, (int)RES_DESKTOP);
++    CLog::Log(LOGINFO, "Found %s at %d, setting to RES_DESKTOP at %d",
++        newRes,
++        (int) ResDesktop, (int) RES_DESKTOP);
 +
 +    CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
 +  }
