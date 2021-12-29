@@ -65,6 +65,7 @@ then
 	make clean
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
+	sed '/Provides/d' -i files/DEBIAN/control
 	sed '/Package/d' -i files-image/DEBIAN/control
 	sed '/Version/d' -i files-image/DEBIAN/control
         sed '/Package/d' -i files-headers/DEBIAN/control
@@ -367,6 +368,14 @@ EOF
 	else
 		echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
 	fi
+	case "$1" in
+		rbp464|vero364)
+			echo "Provides: wireguard-modules:armhf (= 2.0.0)" >> files/DEBIAN/control
+			;;
+		*)
+			echo "Provides: wireguard-modules (= 2.0.0)" >> files/DEBIAN/control
+			;;
+	esac
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-kernel-${VERSION}-${REV}-osmc.deb
 	build_return=$?
