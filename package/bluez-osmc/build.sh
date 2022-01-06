@@ -44,7 +44,7 @@ then
 	echo "Package: ${1}-bluez-osmc" >> files/DEBIAN/control
 	pushd src/bluez-$VERSION
     	install_patch "../../patches" "all"
-	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-udevdir=/lib/udev --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/etc/systemd/user --enable-sixaxis
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-udevdir=/lib/udev --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/etc/systemd/user --enable-sixaxis --disable-obex --disable-cups --enable-udev --disable-manpages
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
