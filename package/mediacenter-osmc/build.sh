@@ -315,8 +315,8 @@ then
         cd ../
 	# Update Matrix screensaver logo
 	cp ../../../../patches/logo.png visualization.matrix/visualization.matrix/resources/textures/logo.png || true # Just in case user isn't building binaddons
-	#$BUILD -C build/
-	make -j1 -C build/
+	$BUILD -C build/
+	#make -j1 -C build/
 	if [ $? != 0 ]; then echo "Building binary addons failed" && exit 1; fi
 	popd
         # Languages
