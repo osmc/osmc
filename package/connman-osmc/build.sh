@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.36"
+VERSION="1.40"
 pull_source "git://git.kernel.org/pub/scm/network/connman/connman.git" "$(pwd)/src" "${VERSION}"
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment
@@ -26,6 +26,7 @@ then
 	handle_dep "openvpn"
 	handle_dep "automake"
 	handle_dep "libtool"
+	handle_dep "libmnl-dev"
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
 	pushd src
