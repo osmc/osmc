@@ -12,7 +12,7 @@ then
     exit 0
 fi
 
-VERSION="5.43"
+VERSION="5.62"
 pull_source "https://www.kernel.org/pub/linux/bluetooth/bluez-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error fetching bluez source" && exit 1; fi
 # Build in native environment
@@ -44,7 +44,7 @@ then
 	echo "Package: ${1}-bluez-osmc" >> files/DEBIAN/control
 	pushd src/bluez-$VERSION
     	install_patch "../../patches" "all"
-	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-udevdir=/lib/udev --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/etc/systemd/user --enable-sixaxis --disable-obex --disable-cups --enable-udev --disable-manpages
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-udevdir=/lib/udev --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/etc/systemd/user --enable-sixaxis --disable-obex --disable-cups --enable-udev --disable-manpages --enable-deprecated
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
