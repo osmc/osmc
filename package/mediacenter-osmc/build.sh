@@ -106,7 +106,7 @@ then
         handle_dep "libass-dev"
 	handle_dep "libunistring-dev"
 	handle_dep "xmlstarlet"
-	if [ "$1" == "rbp2" ]
+	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		handle_dep "rbp2-libcec-dev-osmc"
 		handle_dep "armv7-libshairplay-dev-osmc"
