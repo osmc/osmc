@@ -479,13 +479,17 @@ class Main(object):
                 self.try_count += 1
                 return
 
+        try:
+            screen_height = int(screen_height)
+        except ValueError:
+            screen_height = 1080
+
         # if the screen width is blank (for whatever reason) use the screen height to
         # estimate the width this should be very, VERY rare, and might only happen
         # due to freakish timing
         if screen_width == '':
             screen_width = screen_height * 1.7777777777
 
-        screen_height = int(screen_height)
         screen_width = int(screen_width)
 
         # determine new dimensions of the image
