@@ -35,9 +35,11 @@ class HotFix(object):
 
         self.tmp_hfo_location = '/var/tmp/uploadHotFixOutput.txt'
 
+        # hf_key = 'ucawobahij'  # https://discourse.osmc.tv/t/kodi-v19-troubleshooting-faq/89968
+
         hf_key = self.user_enters_key()
-        hf_cypher = self.convert_key_to_cypher(hf_key)
-        hf_raw_text = self.retrieve_hotfix(hf_cypher)
+        # hf_cypher = self.convert_key_to_cypher(hf_key)
+        hf_raw_text = self.retrieve_hotfix(hf_key)
         hf_parsed = self.parse_hotfix(hf_raw_text)
         user_confirmation = self.confirm_instruction()
 
@@ -280,6 +282,8 @@ class HotFix(object):
         """
             Saves the hotfix output to a temporary file
         """
+        if isinstance(results, bytes):
+            results = results.decode('utf-8')
 
         with open(self.tmp_hfo_location, 'w', encoding='utf-8') as f:
             f.writelines(results)
