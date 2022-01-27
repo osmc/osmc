@@ -41,8 +41,10 @@ VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
 sed -e s/VERVAL/${VERSION}/ -i old ${TARGET}.app/Contents/Info.plist
 # Update on server
 echo Packaging installer
-macdeployqt ${TARGET}.app -dmg
 popd
-echo ${VERSION} > latest_mac
-mv ${TARGET}/${TARGET}.dmg osmc-installer.dmg
+pkgbuild --identifier 1 \
+         --version 28.1 \
+         --root qt_host_installer/qt_host_installer.app \
+         --scripts Scripts/ \
+         --install-location /Applications/osmc-installer.app osmc-installer.pkg
 echo Build complete

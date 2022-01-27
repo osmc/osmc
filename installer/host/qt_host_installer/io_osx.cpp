@@ -95,7 +95,9 @@ namespace io
    {
        devicePath.replace(" ", "\\ ");
        deviceImage.replace(" ", "\\ ");
-       QString aScript ="do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync && sync\" with administrator privileges";
+       QString aScript =(
+		"do shell script \"echo Escalation\" with administrator privileges\n"
+                "do shell script \"dd if="+ deviceImage + " of="+ devicePath +" bs=1m conv=sync && sync\"");
 
        QString osascript = "/usr/bin/osascript";
        QStringList processArguments;
