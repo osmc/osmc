@@ -1,0 +1,26 @@
+From 2f016385adac1cf9fc3ac072d1699f2916bfbbfa Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 7 Feb 2022 04:27:25 +0000
+Subject: [PATCH] NFSTimeout: increase to 30s
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/settings/AdvancedSettings.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index 729d5c0fbe..2faed5a6c8 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -426,7 +426,7 @@ void CAdvancedSettings::Initialize()
+ 
+   m_userAgent = g_sysinfo.GetUserAgent();
+ 
+-  m_nfsTimeout = 5;
++  m_nfsTimeout = 30;
+   m_nfsRetries = -1;
+ 
+   m_initialized = true;
+-- 
+2.25.1
+
