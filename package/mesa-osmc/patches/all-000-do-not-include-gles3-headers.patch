@@ -1,0 +1,17 @@
+--- a/include/meson.build	2022-02-28 00:20:21.754665910 +0000
++++ b/include/meson.build	2022-02-28 00:20:32.310758480 +0000
+@@ -51,14 +51,6 @@
+       'GLES2/gl2platform.h',
+       subdir : 'GLES2',
+     )
+-    install_headers(
+-      'GLES3/gl3.h',
+-      'GLES3/gl31.h',
+-      'GLES3/gl32.h',
+-      'GLES3/gl3ext.h',
+-      'GLES3/gl3platform.h',
+-      subdir : 'GLES3',
+-    )
+   endif
+ 
+   if with_opengl
