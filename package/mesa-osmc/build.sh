@@ -52,6 +52,7 @@ then
 	fi
 	echo "Package: ${1}-mesa-osmc" >> files/DEBIAN/control && echo "Package: ${1}-mesa-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/mesa-*
+	install_patch "../../patches" "all"
 	rm -rf build
 	mkdir -p build
 	pushd build
