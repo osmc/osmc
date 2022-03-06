@@ -1754,7 +1754,7 @@ index 821be98b36..744a0f4ef8 100644
      }
  
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
-index 8e89306030..a38a63a7ce 100644
+index 5414928069..a38a63a7ce 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 @@ -23,6 +23,8 @@
@@ -1766,6 +1766,15 @@ index 8e89306030..a38a63a7ce 100644
  // This is an alternative to the linear weighted delay smoothing
  // advantages: only one history value needs to be stored
  // in tests the linear weighted average smoother yield better results
+@@ -34,7 +36,7 @@ using namespace jni;
+ // is the max TrueHD package
+ const unsigned int MAX_RAW_AUDIO_BUFFER_HD = 61440;
+ const unsigned int MAX_RAW_AUDIO_BUFFER = 16384;
+-const unsigned int MOVING_AVERAGE_MAX_MEMBERS = 3;
++const unsigned int MOVING_AVERAGE_MAX_MEMBERS = 5;
+ const uint64_t UINT64_LOWER_BYTES = 0x00000000FFFFFFFF;
+ const uint64_t UINT64_UPPER_BYTES = 0xFFFFFFFF00000000;
+ 
 @@ -42,6 +44,24 @@ static const AEChannel KnownChannels[] = {AE_CH_FL, AE_CH_FR,   AE_CH_FC,   AE_C
                                            AE_CH_SL, AE_CH_SR,   AE_CH_BL,   AE_CH_BR,
                                            AE_CH_BC, AE_CH_BLOC, AE_CH_BROC, AE_CH_NULL};
@@ -1811,7 +1820,7 @@ index 8e89306030..a38a63a7ce 100644
    while (!m_at_jni)
    {
      CLog::Log(LOGINFO, "Trying to open: samplerate: %u, channelMask: %d, encoding: %d",
-@@ -488,33 +512,39 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
+@@ -488,36 +512,39 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
      }
      else
      {
@@ -1853,25 +1862,28 @@ index 8e89306030..a38a63a7ce 100644
 +          static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
 +      while (m_audiotrackbuffer_sec < 0.15)
        {
--        // aim at 200 ms buffer and 50 ms periods
+-        // aim at 200 ms buffer and 50 ms periods but at least two periods of min_buffer
+-        m_min_buffer_size *= 2;
 +        m_min_buffer_size += min_buffer;
          m_audiotrackbuffer_sec =
              static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
+-
+-        int c = 2;
 -        while (m_audiotrackbuffer_sec < 0.15)
 -        {
 -          m_min_buffer_size += min_buffer;
+-          c++;
 -          m_audiotrackbuffer_sec =
 -              static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
 -        }
--        // division by 4 -> 4 periods into one buffer
--        m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / 4;
+-        m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / c;
        }
 +      // division by 4 -> 4 periods into one buffer
 +      m_format.m_frames = static_cast<int>(m_min_buffer_size / m_format.m_frameSize) / 4;
      }
  
      if (m_passthrough && !m_info.m_wantsIECPassthrough)
-@@ -618,7 +648,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
+@@ -621,7 +648,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
    // and add head_pos which wrapped around, e.g. 0x0001 0000 0000 -> 0x0001 0000 0004
    m_headPos = (m_headPos & UINT64_UPPER_BYTES) | (uint64_t)head_pos;
  
@@ -1889,7 +1901,56 @@ index 8e89306030..a38a63a7ce 100644
  
    // if sink is run dry without buffer time written anymore
    if (gone > m_duration_written)
-@@ -1010,6 +1049,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
+@@ -702,13 +738,6 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
+   }
+ 
+   delay += m_hw_delay;
+-
+-  // stop smoothing if we have the new API available
+-  // though normal RAW still is really bad delay wise
+-  bool rawPt = m_passthrough && !m_info.m_wantsIECPassthrough;
+-  if ((m_hw_delay != 0) && !rawPt)
+-    m_linearmovingaverage.clear();
+-
+   if (usesAdvancedLogging)
+   {
+     CLog::Log(LOGINFO, "Combined Delay: {} ms", delay * 1000);
+@@ -756,9 +785,6 @@ unsigned int CAESinkAUDIOTRACK::AddPackets(uint8_t **data, unsigned int frames,
+   uint8_t *out_buf = buffer;
+   int size = frames * m_format.m_frameSize;
+ 
+-  // TrueHD IEC has 12 audio units (half packet and half duration) on CDVDAudioCodecPassthrough
+-  double ratio = (m_format.m_streamInfo.m_type == CAEStreamInfo::STREAM_TYPE_TRUEHD) ? 2.0 : 1.0;
+-
+   // write as many frames of audio as we can fit into our internal buffer.
+   int written = 0;
+   int loop_written = 0;
+@@ -822,12 +848,7 @@ unsigned int CAESinkAUDIOTRACK::AddPackets(uint8_t **data, unsigned int frames,
+         }
+       }
+       else
+-      {
+-        double duration =
+-            (static_cast<double>(loop_written) / m_format.m_frameSize) / m_format.m_sampleRate;
+-        duration /= ratio;
+-        m_duration_written += duration;
+-      }
++        m_duration_written += ((double) loop_written / m_format.m_frameSize) / m_format.m_sampleRate;
+ 
+       // just try again to care for fragmentation
+       if (written < size)
+@@ -983,10 +1004,6 @@ void CAESinkAUDIOTRACK::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+   UpdateAvailablePassthroughCapabilities(isRaw);
+   m_info_raw = m_info;
+ 
+-  // no need to display two PCM sinks - as they are the same
+-  if (!list.empty())
+-    m_info_raw.m_onlyPassthrough = true;
+-
+   list.push_back(m_info_raw);
+ }
+ 
+@@ -1032,6 +1049,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
        }
      }
  
@@ -1915,7 +1976,7 @@ index 8e89306030..a38a63a7ce 100644
      if (CJNIAudioManager::GetSDKVersion() >= 23)
      {
        if (CJNIAudioFormat::ENCODING_DTS_HD != -1)
-@@ -1107,15 +1165,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
+@@ -1129,15 +1165,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
      CLog::Log(LOGINFO, "Multi channel Float is supported");
    }
  
@@ -7375,7 +7436,7 @@ index 0a6bc07033..ea15db410a 100644
      }
    };
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index a8c784704a..51d9b1982d 100644
+index 262ab3c412..1743a5437d 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 @@ -1285,18 +1285,15 @@ void CVideoPlayer::Prepare()
@@ -7411,17 +7472,18 @@ index a8c784704a..51d9b1982d 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1668,6 +1670,9 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1670,6 +1672,10 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
 +  m_CurrentVideo.lastdts = pPacket->dts;
-+  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d",
 +    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
++
    m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
-   m_CurrentVideo.packets++;
- }
-@@ -1787,7 +1792,7 @@ void CVideoPlayer::HandlePlaySpeed()
+ 
+   if (!drop)
+@@ -1791,7 +1797,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (level < 0.0)
        {
@@ -7430,7 +7492,7 @@ index a8c784704a..51d9b1982d 100644
          SetCaching(CACHESTATE_INIT);
        }
        if (level >= 1.0)
-@@ -1889,10 +1894,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1893,10 +1899,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -7443,7 +7505,7 @@ index a8c784704a..51d9b1982d 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -1931,6 +1936,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1935,6 +1941,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -7451,7 +7513,7 @@ index a8c784704a..51d9b1982d 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(new CDVDMsgDouble(CDVDMsg::GENERAL_RESYNC, m_clock.GetClock()), 1);
-@@ -2081,17 +2087,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2085,17 +2092,19 @@ void CVideoPlayer::HandlePlaySpeed()
              errorwin = 8;
            error /= errorwin;
          }
@@ -7473,7 +7535,7 @@ index a8c784704a..51d9b1982d 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2576,10 +2584,9 @@ void CVideoPlayer::HandleMessages()
+@@ -2580,10 +2589,9 @@ void CVideoPlayer::HandleMessages()
        if (m_pInputStream->GetIPosTime() == nullptr)
          time -= m_State.time_offset/1000l;
  
@@ -7485,7 +7547,7 @@ index a8c784704a..51d9b1982d 100644
          if(m_pSubtitleDemuxer)
          {
            if(!m_pSubtitleDemuxer->SeekTime(time, msg.GetBackward()))
-@@ -2593,6 +2600,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2597,6 +2605,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -7493,7 +7555,7 @@ index a8c784704a..51d9b1982d 100644
        }
        else if (m_pDemuxer)
        {
-@@ -2962,7 +2970,8 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -2966,7 +2975,8 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -7503,7 +7565,7 @@ index a8c784704a..51d9b1982d 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3598,19 +3607,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3602,19 +3612,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
    if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
      return false;
  
@@ -7523,7 +7585,7 @@ index a8c784704a..51d9b1982d 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3624,8 +3620,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3628,8 +3625,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -7554,7 +7616,7 @@ index a8c784704a..51d9b1982d 100644
      // look for any EDL files
      m_Edl.Clear();
      float fFramesPerSecond = 0.0f;
-@@ -3790,6 +3808,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3794,6 +3813,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -7562,7 +7624,7 @@ index a8c784704a..51d9b1982d 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -3835,11 +3854,11 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3839,7 +3859,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -7572,11 +7634,7 @@ index a8c784704a..51d9b1982d 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
--
- }
- 
- // since we call ffmpeg functions to decode, this is being called in the same thread as ::Process() is
-@@ -4676,15 +4695,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4681,15 +4702,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -7594,7 +7652,7 @@ index a8c784704a..51d9b1982d 100644
      m_processInfo->SetStateRealtime(realtime);
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index d4383b81e1..7240445cf1 100644
+index ea43f10a56..c2ff76684e 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 @@ -79,7 +79,7 @@ CVideoPlayerAudio::~CVideoPlayerAudio()
@@ -7629,7 +7687,7 @@ index d4383b81e1..7240445cf1 100644
            m_stalled = true;
          }
        }
-@@ -628,7 +626,7 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
+@@ -640,7 +638,7 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
  
    m_displayReset = false;
  
@@ -8267,7 +8325,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index e29835dad6..05ba45838c 100644
+index 53f435a280..5e64a3fab5 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -26,6 +26,8 @@
@@ -8799,7 +8857,7 @@ index 23db6a7428..fb7e89885f 100644
  
  bool CPowerManager::Hibernate()
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 729d5c0fbe..619faa9388 100644
+index 2faed5a6c8..933a18c890 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
 @@ -406,7 +406,7 @@ void CAdvancedSettings::Initialize()
@@ -10689,7 +10747,7 @@ index 0000000000..b173a456bc
 +  static bool HasRW(const std::string &path);
 +};
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index 383bf495c0..94543fd9b8 100644
+index 6ed3a901c7..b643102384 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
 @@ -54,6 +54,9 @@ using namespace winrt::Windows::System::Profile;
