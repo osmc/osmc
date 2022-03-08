@@ -31,7 +31,7 @@ done
 # Configure the target directory
 ARCH="arm64"
 DIR="opt/osmc-tc/${tcstub}"
-RLS="buster"
+RLS="bullseye"
 URL=""
 
 # Remove existing build
