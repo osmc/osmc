@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [ "$1" = "remove" ]; then
-	if [ -n "$(ls -A /opt/osmc-tc/amd64-toolchain-osmc/mnt 2>/dev/null)" ]; then exit 1; fi
-	if [ -n "$(ls -A /opt/osmc-tc/amd64-toolchain-osmc/root/.ccache 2>/dev/null)" ]; then exit 1; fi
-	rm -rf /opt/osmc-tc/amd64-toolchain-osmc/ >/dev/null 2>&1
-fi
