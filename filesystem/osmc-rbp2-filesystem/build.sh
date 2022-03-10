@@ -50,9 +50,9 @@ configure_build_env_nw "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://ftp.debian.org/debian $RLS main contrib non-free
+echo "deb http://deb.debian.org/debian $RLS main contrib non-free
 
-deb http://ftp.debian.org/debian/ $RLS-updates main contrib non-free
+deb http://deb.debian.org/debian/ $RLS-updates main contrib non-free
 
 deb http://security.debian.org/ $RLS/updates main contrib non-free
 
