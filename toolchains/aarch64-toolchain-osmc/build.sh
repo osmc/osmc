@@ -56,7 +56,7 @@ verify_action
 # Set up sources.list
 echo "deb http://ftp.debian.org/debian $RLS main contrib non-free
 deb http://ftp.debian.org/debian/ $RLS-updates main contrib non-free
-deb http://security.debian.org/ $RLS/updates main contrib non-free
+deb http://security.debian.org/ $RLS-security main contrib non-free
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
