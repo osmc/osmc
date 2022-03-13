@@ -42,6 +42,7 @@ sed -e s/VERVAL/${VERSION}/ -i old ${TARGET}.app/Contents/Info.plist
 # Update on server
 echo Packaging installer
 popd
+echo ${VERSION} > latest_mac
 pkgbuild --identifier 1 \
          --version 28.1 \
          --root qt_host_installer/qt_host_installer.app \
