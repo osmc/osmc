@@ -21,7 +21,7 @@ kpartx
 dosfstools
 parted
 cpio
-python
+python3
 bison
 flex
 libssl-dev"
