@@ -917,6 +917,40 @@ class Main(object):
 
         self.log_blotter.extend([SECTION_END % (name, key)])
 
+    def _mask_sensitive(self):
+        # mask potentially sensitive information in blotter
+
+        def _mask(message):
+            message = message.decode('utf-8')
+
+            mask = '**masked*by*grab-logs**'
+
+            # OAuth
+            masked_message = re.sub(r'((?:OAuth|Bearer)\s)[^\'"]+', r'\1' + mask, message)
+            masked_message = re.sub(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+', r'\1' + mask, masked_message)
+            masked_message = re.sub(r'(client_secret=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
+            masked_message = re.sub(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+', r'\1' + mask, masked_message)
+
+            # Pass[word]
+            masked_message = re.sub(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)',
+                                    r'\1' + mask + r'\2', masked_message)
+            masked_message = re.sub(r'(["\']password["\']:\s*[\'"])[^\'"]+', r'\1' + mask, masked_message)
+            masked_message = re.sub(r'(password=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
+
+            # "basic" auth
+            masked_message = re.sub(r'(\w://.+?:).+?(@\w+)', r'\1' + mask + r'\2', masked_message)
+
+            # Plex/Emby tokens in requests
+            masked_message = re.sub(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
+
+            # Generic access tokens in requests
+            masked_message = re.sub(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
+
+            masked_message = masked_message.encode('utf-8')
+            return masked_message
+
+        self.log_blotter = [_mask(line) for line in self.log_blotter]
+
     def write_to_screen(self):
         self.write_to_temp_file()
 
@@ -933,6 +967,9 @@ class Main(object):
         # clean up the blotter
         self.log_blotter = [x.replace('\0', '').replace('\ufeff', '').encode('utf-8')
                             for x in self.log_blotter if hasattr(x, 'replace')]
+
+        # mask potentially sensitive information in blotter
+        self._mask_sensitive()
 
         if os.path.isfile(TEMP_LOG_FILE):
             slept = 0
