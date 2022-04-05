@@ -30,9 +30,6 @@ dtoverlay=rpivid-v4l2
 arm_64bit=1
 kernel=kernel.img
 
-[board-type=0x0e]
-dtoverlay=vc4-kms-v3d,cma-256
-
 [all]
 dtoverlay=vc4-kms-v3d,cma-512
 disable_overscan=1
@@ -44,6 +41,10 @@ include config-user.txt
 
 [pi02]
 dtoverlay=vc4-kms-v3d,cma-256
+
+[board-type=0x0e]
+dtoverlay=vc4-kms-v3d,cma-256
+
 " > $BOOT/config.txt
 
 dpkg_build files/ rbp-bootloader-osmc.deb
