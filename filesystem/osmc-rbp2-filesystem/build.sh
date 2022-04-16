@@ -76,7 +76,7 @@ verify_action
 chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
 verify_action
 # Ensure we have usr directory symlinks even if we use old debootstrap
-chroot ${DIR} apt-get -y install --no-install-recommends mergeusr
+chroot ${DIR} apt-get -y install --no-install-recommends usrmerge
 verify_action
 echo -e "Configuring environment"
 echo -e "	* Adding user osmc"
