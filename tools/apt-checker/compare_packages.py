@@ -11,7 +11,7 @@ print_changes = False
 if len(sys.argv) > 1 and sys.argv[1] == '--changes':
 	print_changes = True
 
-repo = os.getenv('OSMCREPO', "buster")
+repo = os.getenv('OSMCREPO', "bullseye")
 
 results = {}
 archlist = [ 'binary-amd64', 'binary-armhf', 'binary-arm64' ]
