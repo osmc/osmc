@@ -36,20 +36,7 @@ then
 	handle_dep "cmake" # meson dep
 	handle_dep "zlib1g-dev"
 	handle_dep "libexpat1-dev"
-	# Mount procfs so we can get correct core count for meson
-	# Need meson build 0.52 or later
-	if [ ! -f /usr/local/bin/meson ]
-	then
-		pip3 install meson
-		if [ $? != 0 ]; then echo "Could not install meson build system" && exit 1; fi
-		ln -s /usr/local/bin/meson /usr/bin/meson
-	fi
-	if [ ! -f /usr/local/bin/ninja ]
-	then
-		pip3 install ninja
-		if [ $? != 0 ]; then echo "Could not install ninja system" && exit 1; fi
-		ln -s /usr/local/bin/ninja /usr/bin/ninja
-	fi
+	handle_dep "meson"
 	echo "Package: ${1}-mesa-osmc" >> files/DEBIAN/control && echo "Package: ${1}-mesa-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/mesa-*
 	install_patch "../../patches" "all"
