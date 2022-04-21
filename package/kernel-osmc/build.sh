@@ -88,7 +88,7 @@ then
 	handle_dep "kmod"
         if [ "$1" == "vero364" ]
         then
-	    handle_dep "python"
+	    handle_dep "python3"
 	    handle_dep "xxd"
         fi
 	if [ "$SIGN_KERNEL" -eq 1 ]
