@@ -263,7 +263,7 @@ then
 	    -DENABLE_LCMS2=OFF \
 	    -DENABLE_SNDIO=OFF \
             -DENABLE_MARIADBCLIENT=ON \
-            -DENABLE_INTERNAL_DAV1D=ON
+            -DENABLE_INTERNAL_DAV1D=ON \
 	../
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
