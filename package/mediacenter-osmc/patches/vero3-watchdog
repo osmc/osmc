@@ -198,16 +198,23 @@ while true; do
 		/usr/bin/setterm --cursor off >/dev/tty1
 		/usr/bin/clear >/dev/tty1
 		/usr/bin/ply-image "$CODE"
+		read -n 1 -s dump </dev/tty1
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
+		set_font
 		/usr/bin/setterm --cursor on >/dev/tty1
 		systemctl start getty@tty1
 		count=30
+		loggingin=1
 		while [ $count -gt 0 ]; do
-			who | awk '{print $2}' | grep -q tty1
-			if [ "$?" -eq 0 ]; then
+			terminal_live=$(/bin/ps aux | grep -v grep | grep -c ^root.*tty.*login)
+			who | awk '{print $2}' | grep -q tty1; loggedin="$?"
+			if [ $terminal_live -gt 0 ] && [ $loggingin -gt 0 ] && [ $loggedin -ne 0 ]; then
 				count=5
+			elif [ $loggedin -eq 0 ]; then
+				count=5
+				loggingin=0
 			else
 				let count=count-5
 			fi
