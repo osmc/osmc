@@ -86,7 +86,6 @@ then
 	handle_dep "pmount"
 	handle_dep "python3-dev"
 	handle_dep "python3-pil"
-	handle_dep "python-sqlite"
 	handle_dep "swig"
 	handle_dep "unzip"
 	handle_dep "yasm"
