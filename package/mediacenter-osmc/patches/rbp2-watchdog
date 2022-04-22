@@ -128,12 +128,12 @@ while true; do
 		set_font
 		/bin/fbset -depth 8 && /bin/fbset -depth 16
 		/usr/bin/setterm --cursor on >/dev/tty1
-		systemctl start getty@tty1
+		/bin/systemctl start getty@tty1
 		count=30
 		loggingin=1
 		while [ $count -gt 0 ]; do
-			terminal_live=$(/bin/ps aux | grep -v grep | grep -c ^root.*tty.*login)
-			who | awk '{print $2}' | grep -q tty1; loggedin="$?"
+			terminal_live=$(/bin/ps aux | /usr/bin/grep -v grep | /usr/bin/grep -c ^root.*tty.*login)
+			/usr/bin/who | /usr/bin/awk '{print $2}' | /usr/bin/grep -q tty1; loggedin="$?"
 			if [ $terminal_live -gt 0 ] && [ $loggingin -gt 0 ] && [ $loggedin -ne 0 ]; then
 				count=5
 			elif [ $loggedin -eq 0 ]; then
@@ -142,8 +142,8 @@ while true; do
 			else
 				let count=count-5
 			fi
-			sleep 5
+			/bin/sleep 5
 		done
-		systemctl stop getty@tty1
+		/bin/systemctl stop getty@tty1
 	fi
 done
