@@ -32,19 +32,7 @@ then
 	handle_dep "python3-dev"
 	handle_dep "swig"
 	handle_dep "cmake"
-	if [ "$1" == "rbp1" ];
-	then
-		handle_dep "armv6l-libplatform-dev-osmc"
-	fi
-	if [ "$1" == "rbp2" ] || [ "$1" == "vero2" ] || [ "$1" == "vero3" ]
-	then
-		handle_dep "armv7-libplatform-dev-osmc"
-	fi
-	if [ "$1" == "rbp1" ] || [ "$1" == "rbp2" ]; then handle_dep "rbp-userland-dev-osmc"; fi
-	if [ "$1" == "amd64" ]
-	then
-		handle_dep "amd64-libplatform-dev-osmc"
-	fi
+	handle_dep "libp8-platform-dev"
 	echo "Package: ${1}-libcec-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libcec-dev-osmc" >> files-dev/DEBIAN/control >> files-dev/DEBIAN/control
 	pushd src/libcec*
 	install_patch "../../patches" "all"
