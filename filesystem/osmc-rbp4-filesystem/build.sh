@@ -27,7 +27,7 @@ done
 # Configure the target directory
 ARCH="armhf"
 DIR="$filestub/"
-RLS="buster"
+RLS="bullseye"
 
 # Remove existing build
 remove_existing_filesystem "{$wd}/{$DIR}"
@@ -54,7 +54,7 @@ echo "deb http://deb.debian.org/debian $RLS main contrib non-free
 
 deb http://deb.debian.org/debian/ $RLS-updates main contrib non-free
 
-deb http://security.debian.org/ $RLS/updates main contrib non-free
+deb http://security.debian.org/ $RLS-security main contrib non-free
 
 deb http://apt.osmc.tv $RLS main
 " > ${DIR}/etc/apt/sources.list
