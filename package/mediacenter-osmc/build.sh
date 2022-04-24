@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "pc" ] || [ "$1" == "vero3" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/2382f8e725d1865a22b6ef7a24e6b64f078c2e01.tar.gz" "$(pwd)/src"
 API_VERSION="19"
@@ -129,19 +129,6 @@ then
                 handle_dep "armv7-libsqlite-dev-osmc"
 		handle_dep "libamcodec-dev-osmc"
 	fi
-	if [ "$1" == "pc" ]
-	then
-		handle_dep "amd64-libshairplay-dev-osmc"
-		handle_dep "amd64-librtmp-dev-osmc"
-		handle_dep "amd64-libplatform-dev-osmc"
-		handle_dep "amd64-libbluray-dev-osmc"
-		handle_dep "amd64-libsqlite-dev-osmc"
-		handle_dep "xserver-xorg-dev"
-		handle_dep "libxrandr-dev"
-		handle_dep "x11proto-randr-dev"
-		handle_dep "libegl1-mesa-dev"
-		handle_dep "libglew-dev"
-	fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		handle_dep "libdrm-dev"
@@ -161,7 +148,6 @@ then
 	pushd src/xbmc-*
 	install_patch "../../patches" "all"
 	cp -ar ../../patches/resource.language.*/ addons/
-	test "$1" == pc && install_patch "../../patches" "pc"
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		install_patch "../../patches" "rbp"
@@ -310,11 +296,6 @@ then
            echo "set(OPENGLES_gl_LIBRARY /opt/vero3/lib)" >> ../Toolchain.mk
            echo "set(OPENGLES_INCLUDE_DIR /opt/vero3/include)" >> ../Toolchain.mk
 	fi
-	if [ "$1" == "pc" ]
-	then
-           ADDONS_TO_BUILD="${ADDONS_INPUTSTREAM} ${ADDONS_PERIPHERAL} ${ADDONS_PVR}"
-           PLATFORM=""
-	fi
         cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" -DCMAKE_TOOLCHAIN_FILE=../Toolchain.mk ../
         if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
         cd ../
@@ -353,8 +334,7 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.7, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio18, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs12, libass9, libunistring2, libatomic1, libfmt7"
-	test "$1" == pc && echo "Depends: ${COMMON_DEPENDS}, libnfs13, amd64-librtmp-osmc, amd64-libshairplay-osmc, amd64-libbluray-osmc, amd64-libsqlite-osmc, libxrandr2, libglew1.10, libglu1-mesa, xserver-xorg-core, xserver-xorg, xinit, xfonts-base, x11-xserver-utils, xauth, alsa-utils, xserver-xorg-video-intel" >> files/DEBIAN/control
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.7, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio18, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7"
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == rbp4 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control
