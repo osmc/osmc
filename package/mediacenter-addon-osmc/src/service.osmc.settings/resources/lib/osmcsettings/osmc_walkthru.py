@@ -316,7 +316,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
             self.internet_checker = NetworkingCaller(self, self.net_call)
         else:
             self.internet_checker = MockNetworkingCaller(self, self.net_call)
-        self.internet_checker.setDaemon(True)
+        self.internet_checker.daemon = True
         self.internet_checker.start()
 
     def remove_coversheet(self):
