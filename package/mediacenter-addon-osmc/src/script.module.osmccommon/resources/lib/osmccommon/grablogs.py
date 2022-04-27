@@ -44,7 +44,7 @@ try:
 
     log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
     lang = LangRetriever(ADDON).lang
-except (ValueError, ModuleNotFoundError):
+except (ValueError, ModuleNotFoundError, ImportError):
     def lang(value):
         return value
 
