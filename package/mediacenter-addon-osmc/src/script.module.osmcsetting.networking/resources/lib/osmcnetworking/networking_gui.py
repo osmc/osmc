@@ -1113,7 +1113,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
     @staticmethod
     def is_thread_running(thread_name):
         for t in threading.enumerate():
-            if t.getName() == thread_name:
+            if t.name == thread_name:
                 return True
         return False
 
@@ -1125,7 +1125,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                     self.wifi_populate_bot = WIFIPopulateBot(scan, self.getControl(5000),
                                                              self.conn_ssid)
 
-                    self.wifi_populate_bot.setDaemon(True)
+                    self.wifi_populate_bot.daemon = True
                     self.wifi_populate_bot.start()
 
                 self.current_network_config = osmc_network.get_connected_wifi()
@@ -1452,7 +1452,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             self.bluetooth_population_thread = \
                 BluetoothPopulationThread(self.BTD, self.BTP, self.addon)
 
-            self.bluetooth_population_thread.setDaemon(True)
+            self.bluetooth_population_thread.daemon = True
             self.bluetooth_population_thread.start()
 
     def handle_bluetooth_selection(self, control_id):
@@ -1901,7 +1901,7 @@ class WIFIPopulateBot(threading.Thread):
 
         if self.scan:
             self.wifi_scanner_bot = WIFIScannerBot()
-            self.wifi_scanner_bot.setDaemon(True)
+            self.wifi_scanner_bot.daemon = True
             self.wifi_scanner_bot.start()
 
     def run(self):
@@ -1922,7 +1922,7 @@ class WIFIPopulateBot(threading.Thread):
             # every minute re-scan wifi unless the thread has been asked to exit
             if not self.exit and runs % 600 == 0:
                 self.wifi_scanner_bot = WIFIScannerBot()
-                self.wifi_scanner_bot.setDaemon(True)
+                self.wifi_scanner_bot.daemon = True
                 self.wifi_scanner_bot.start()
 
             xbmc.sleep(10)

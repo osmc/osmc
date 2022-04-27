@@ -196,11 +196,11 @@ class OSMCGui(xbmcgui.WindowXMLDialog):
 
             log('Checking instance: %s ' % str(class_instance))
             try:
-                log(class_instance.isAlive())
+                log(class_instance.is_alive())
             except AttributeError:
                 return
 
-            if class_instance.isAlive():
+            if class_instance.is_alive():
                 class_instance.run()
             else:
 
