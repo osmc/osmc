@@ -422,7 +422,7 @@ class RemoteTest(xbmcgui.WindowXMLDialog):
         self.quick_revert = False
 
         self.countdown_timer = CountDownTimer(self)
-        self.countdown_timer.setDaemon(True)
+        self.countdown_timer.daemon = True
 
         self.restarting_service_label = None
         self.check_remote_label = None
@@ -431,7 +431,7 @@ class RemoteTest(xbmcgui.WindowXMLDialog):
 
         # setup the service checker straight away
         self.service_checker = ServiceChecker(self)
-        self.service_checker.setDaemon(True)
+        self.service_checker.daemon = True
 
     def onInit(self):
 

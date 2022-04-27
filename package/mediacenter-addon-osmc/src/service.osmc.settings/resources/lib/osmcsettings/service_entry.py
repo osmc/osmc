@@ -98,7 +98,7 @@ class Main(object):
     def create_gui(self):
         self.stored_gui = osmc_settings_gui.GuiThread(queue=self.parent_queue,
                                                       addon=ADDON, window=self.window)
-        self.stored_gui.setDaemon(True)
+        self.stored_gui.daemon = True
 
     def _daemon(self):
         log('daemon started')
@@ -416,7 +416,7 @@ class Main(object):
                 class_instance = module.get('class_instance', None)
                 module_instance = module.get('module_instance', None)
 
-                if class_instance and class_instance.isAlive():
+                if class_instance and class_instance.is_alive():
                     log('Opening %s from widget' % module_id)
                     class_instance.run()
 
