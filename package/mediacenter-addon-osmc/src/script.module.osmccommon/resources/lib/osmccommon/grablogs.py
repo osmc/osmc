@@ -920,31 +920,32 @@ class Main(object):
     def _mask_sensitive(self):
         # mask potentially sensitive information in blotter
 
+        re_to_mask_00 = re.compile(r'((?:OAuth|Bearer)\s)[^\'"]+')
+        re_to_mask_01 = re.compile(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+')
+        re_to_mask_02 = re.compile(r'(client_secret=).+?(&|$|\|)')
+        re_to_mask_03 = re.compile(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+')
+        re_to_mask_04 = re.compile(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)')
+        re_to_mask_05 = re.compile(r'(["\']password["\']:\s*[\'"])[^\'"]+')
+        re_to_mask_06 = re.compile(r'(password=).+?(&|$|\|)')
+        re_to_mask_07 = re.compile(r'(\w://.+?:).+?(@\w+)')
+        re_to_mask_08 = re.compile(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)')
+        re_to_mask_09 = re.compile(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)')
+
         def _mask(message):
             message = message.decode('utf-8')
 
             mask = '**masked*by*grab-logs**'
 
-            # OAuth
-            masked_message = re.sub(r'((?:OAuth|Bearer)\s)[^\'"]+', r'\1' + mask, message)
-            masked_message = re.sub(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+', r'\1' + mask, masked_message)
-            masked_message = re.sub(r'(client_secret=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
-            masked_message = re.sub(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+', r'\1' + mask, masked_message)
-
-            # Pass[word]
-            masked_message = re.sub(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)',
-                                    r'\1' + mask + r'\2', masked_message)
-            masked_message = re.sub(r'(["\']password["\']:\s*[\'"])[^\'"]+', r'\1' + mask, masked_message)
-            masked_message = re.sub(r'(password=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
-
-            # "basic" auth
-            masked_message = re.sub(r'(\w://.+?:).+?(@\w+)', r'\1' + mask + r'\2', masked_message)
-
-            # Plex/Emby tokens in requests
-            masked_message = re.sub(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
-
-            # Generic access tokens in requests
-            masked_message = re.sub(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)', r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_00.sub(r'\1' + mask, message)
+            masked_message = re_to_mask_01.sub(r'\1' + mask, masked_message)
+            masked_message = re_to_mask_02.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_03.sub(r'\1' + mask, masked_message)
+            masked_message = re_to_mask_04.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_05.sub(r'\1' + mask, masked_message)
+            masked_message = re_to_mask_06.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_07.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_08.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_09.sub(r'\1' + mask + r'\2', masked_message)
 
             masked_message = masked_message.encode('utf-8')
             return masked_message
