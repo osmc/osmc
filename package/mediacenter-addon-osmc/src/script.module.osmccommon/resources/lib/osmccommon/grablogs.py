@@ -920,16 +920,17 @@ class Main(object):
     def _mask_sensitive(self):
         # mask potentially sensitive information in blotter
 
-        re_to_mask_00 = re.compile(r'((?:OAuth|Bearer)\s)[^\'"]+')
-        re_to_mask_01 = re.compile(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+')
-        re_to_mask_02 = re.compile(r'(client_secret=).+?(&|$|\|)')
-        re_to_mask_03 = re.compile(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+')
-        re_to_mask_04 = re.compile(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)')
-        re_to_mask_05 = re.compile(r'(["\']password["\']:\s*[\'"])[^\'"]+')
-        re_to_mask_06 = re.compile(r'(password=).+?(&|$|\|)')
-        re_to_mask_07 = re.compile(r'(\w://.+?:).+?(@\w+)')
-        re_to_mask_08 = re.compile(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)')
-        re_to_mask_09 = re.compile(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)')
+        re_to_mask_00 = re.compile(r'((?:OAuth|Bearer)\s)[^\'"]+')  # oauth tokens
+        re_to_mask_01 = re.compile(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+')  # client secret
+        re_to_mask_02 = re.compile(r'(client_secret=).+?(&|$|\|)')  # client secret
+        re_to_mask_03 = re.compile(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+')  # signature
+        re_to_mask_04 = re.compile(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)')  # pass[word]
+        re_to_mask_05 = re.compile(r'(["\']password["\']:\s*[\'"])[^\'"]+')  # password
+        re_to_mask_06 = re.compile(r'(password=).+?(&|$|\|)')  # password
+        re_to_mask_07 = re.compile(r'(\w://.+?:).+?(@\w+)')  # basic authentication
+        re_to_mask_08 = re.compile(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)')  # access tokens
+        re_to_mask_09 = re.compile(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)')  # access tokens (plex/emby)
+        re_to_mask_10 = re.compile(r'(<setting\s[^>]*password[^>]+>)[^<]+')  # settings v2.0 values with password
 
         def _mask(message):
             message = message.decode('utf-8')
@@ -946,6 +947,7 @@ class Main(object):
             masked_message = re_to_mask_07.sub(r'\1' + mask + r'\2', masked_message)
             masked_message = re_to_mask_08.sub(r'\1' + mask + r'\2', masked_message)
             masked_message = re_to_mask_09.sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = re_to_mask_10.sub(r'\1' + mask, masked_message)
 
             masked_message = masked_message.encode('utf-8')
             return masked_message
