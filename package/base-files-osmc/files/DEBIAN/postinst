@@ -10,9 +10,11 @@ remove_divert ()
 
 dist_upgrade_migrate ()
 {
-	SRCSFILE="/etc/apt/sources.list"
+	SRCSFILES=("/etc/apt/sources.list" "/etc/apt/sources.list.d/*osmc*.list")
 	# Update APT sources.list
-	sed 's/buster\/updates/bullseye-security/g;s/buster/bullseye/g;s/buster-devel/bullseye-devel/g' -i $SRCSFILE
+	for SRCSFILE in ${SRCSFILES[@]}; do
+		sed 's/buster\/updates/bullseye-security/g;s/buster/bullseye/g' -i $SRCSFILE
+	done
 	# Signal we want a dist-upgrade and a reboot
 	touch /dist_upgrade_wanted /tmp/reboot-needed
 }
@@ -32,7 +34,7 @@ if [ "$1" = "configure" ]; then
 	systemctl start osmc-id-generator.service osmc-report-stats.timer
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
-	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.1.7"; then
+	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.1.8"; then
 	dist_upgrade_migrate
 	fi
 fi
