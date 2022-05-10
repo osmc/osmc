@@ -59,6 +59,20 @@ TEMP_LOG_FILENAME = 'uploadlog.txt'
 TEMP_LOG_FILE = '/var/tmp/' + TEMP_LOG_FILENAME
 UPLOAD_LOC = 'https://paste.osmc.tv'
 
+RE_MASKS = {
+    '00': re.compile(r'((?:OAuth|Bearer)\s)[^\'"]+'),  # oauth tokens
+    '01': re.compile(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+'),  # client secret
+    '02': re.compile(r'(client_secret=).+?(&|$|\|)'),  # client secret
+    '03': re.compile(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+'),  # signature
+    '04': re.compile(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)'),  # pass[word]
+    '05': re.compile(r'(["\']password["\']:\s*[\'"])[^\'"]+'),  # password
+    '06': re.compile(r'(password=).+?(&|$|\|)'),  # password
+    '07': re.compile(r'(\w://.+?:).+?(@\w+)'),  # basic authentication
+    '08': re.compile(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)'),  # access tokens
+    '09': re.compile(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)'),  # access tokens (plex/emby)
+    '10': re.compile(r'(<setting\s[^>]*password[^>]+>)[^<]+'),  # settings v2.0 values with password
+}
+
 SETS = {
     'uname': {
         'order': 1,
@@ -132,7 +146,7 @@ SETS = {
                 'name': 'GUI Settings (abridged)',
                 'key': 'z9Z12KgS',
                 'ltyp': 'cl_log',
-                'actn': '/usr/bin/readgui'
+                'actn': '/usr/bin/readgui',
             },
         ],
     },
@@ -150,6 +164,7 @@ SETS = {
                 'key': 'zm2LhjK1',
                 'ltyp': 'file_log',
                 'actn': USERDATA + 'guisettings.xml',
+                'mask': True
             },
         ],
 
@@ -168,6 +183,7 @@ SETS = {
                 'key': 'C7hKmH1p',
                 'ltyp': 'file_log',
                 'actn': USERDATA + 'advancedsettings.xml',
+                'mask': True
             },
         ],
     },
@@ -219,6 +235,7 @@ SETS = {
                 'key': 'SGkuGLGj',
                 'ltyp': 'file_log',
                 'actn': USERDATA + 'sources.xml',
+                'mask': True
             },
         ],
     },
@@ -236,6 +253,7 @@ SETS = {
                 'key': 'qiE9Dtax',
                 'ltyp': 'file_log',
                 'actn': '/etc/fstab',
+                'mask': True
             },
             {
                 'name': 'mounts',
@@ -581,12 +599,14 @@ SETS = {
                 'key': 'HyhIT4UP',
                 'ltyp': 'file_log',
                 'actn': '/home/osmc/.kodi/temp/kodi.log',
+                'mask': True
             },
             {
                 'name': 'Kodi Old Log',
                 'key': '2qaAc90c',
                 'ltyp': 'file_log',
                 'actn': '/home/osmc/.kodi/temp/kodi.old.log',
+                'mask': True
             },
         ],
     },
@@ -806,7 +826,7 @@ class Main(object):
             hwid = hwid.lstrip('!')
 
         if generic_match:
-            # we know it's a generic match, remove the digit from our 
+            # we know it's a generic match, remove the digit from our
             # actual hardware id for future comparisons
             if actual_hwid[-1].isdigit():
                 actual_hwid = actual_hwid[:-1]
@@ -897,62 +917,58 @@ class Main(object):
         self.progress_dialog.update(percent=100, message=lang(32005))
         self.progress_dialog.close()
 
-    def grab_log(self, ltyp, actn, name, key, hwid=''):
+    def grab_log(self, ltyp, actn, name, key, hwid='', mask=False):
         """ Method grabs the logs from either a file or the command line."""
 
         if not self.valid_hardware(hwid):
             return
 
         self.log_blotter.extend([SECTION_START % (name, key)])
-
+        print('Grabbing log {name} ...'.format(name=name))
         try:
             if ltyp == 'file_log':
                 with open(actn, 'r', encoding='utf-8') as f:
-                    self.log_blotter.extend(f.readlines())
+                    readlines = f.readlines()
+                    if mask:
+                        readlines = self._mask_sensitive(readlines)
+                    self.log_blotter.extend(readlines)
             else:
                 with CommandLineInterface(actn) as f:
-                    self.log_blotter.extend(f.readlines())
+                    readlines = f.readlines()
+                    if mask:
+                        readlines = self._mask_sensitive(readlines)
+                    self.log_blotter.extend(readlines)
         except:
             self.log_blotter.extend(['%s error' % name])
 
         self.log_blotter.extend([SECTION_END % (name, key)])
 
-    def _mask_sensitive(self):
+    @staticmethod
+    def _mask_sensitive(lines_to_mask):
         # mask potentially sensitive information in blotter
-
-        re_to_mask_00 = re.compile(r'((?:OAuth|Bearer)\s)[^\'"]+')  # oauth tokens
-        re_to_mask_01 = re.compile(r'(["\']client_secret["\']:\s*[\'"])[^\'"]+')  # client secret
-        re_to_mask_02 = re.compile(r'(client_secret=).+?(&|$|\|)')  # client secret
-        re_to_mask_03 = re.compile(r'(["\'](?:nauth)*sig["\']: ["\'])[^\'"]+')  # signature
-        re_to_mask_04 = re.compile(r'(<[pP]ass(?:word)?>)[^<]+(</[pP]ass(?:word)?>)')  # pass[word]
-        re_to_mask_05 = re.compile(r'(["\']password["\']:\s*[\'"])[^\'"]+')  # password
-        re_to_mask_06 = re.compile(r'(password=).+?(&|$|\|)')  # password
-        re_to_mask_07 = re.compile(r'(\w://.+?:).+?(@\w+)')  # basic authentication
-        re_to_mask_08 = re.compile(r'([aA]ccess[_-]*?[tT]oken=).+?(&|$|\|)')  # access tokens
-        re_to_mask_09 = re.compile(r'([xX]-[a-zA-Z]+?-[tT]oken=).+?(&|$|\|)')  # access tokens (plex/emby)
-        re_to_mask_10 = re.compile(r'(<setting\s[^>]*password[^>]+>)[^<]+')  # settings v2.0 values with password
+        print('Masking private information ...')
 
         def _mask(message):
             message = message.decode('utf-8')
 
             mask = '**masked*by*grab-logs**'
 
-            masked_message = re_to_mask_00.sub(r'\1' + mask, message)
-            masked_message = re_to_mask_01.sub(r'\1' + mask, masked_message)
-            masked_message = re_to_mask_02.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_03.sub(r'\1' + mask, masked_message)
-            masked_message = re_to_mask_04.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_05.sub(r'\1' + mask, masked_message)
-            masked_message = re_to_mask_06.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_07.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_08.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_09.sub(r'\1' + mask + r'\2', masked_message)
-            masked_message = re_to_mask_10.sub(r'\1' + mask, masked_message)
+            masked_message = RE_MASKS['00'].sub(r'\1' + mask, message)
+            masked_message = RE_MASKS['01'].sub(r'\1' + mask, masked_message)
+            masked_message = RE_MASKS['02'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['03'].sub(r'\1' + mask, masked_message)
+            masked_message = RE_MASKS['04'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['05'].sub(r'\1' + mask, masked_message)
+            masked_message = RE_MASKS['06'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['07'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['08'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['09'].sub(r'\1' + mask + r'\2', masked_message)
+            masked_message = RE_MASKS['10'].sub(r'\1' + mask, masked_message)
 
             masked_message = masked_message.encode('utf-8')
             return masked_message
 
-        self.log_blotter = [_mask(line) for line in self.log_blotter]
+        return [_mask(line) for line in lines_to_mask]
 
     def write_to_screen(self):
         self.write_to_temp_file()
@@ -968,11 +984,9 @@ class Main(object):
     def write_to_temp_file(self):
         """ Writes the logs to a single temporary file """
         # clean up the blotter
+        print('Writing logs to temp file ...')
         self.log_blotter = [x.replace('\0', '').replace('\ufeff', '').encode('utf-8')
                             for x in self.log_blotter if hasattr(x, 'replace')]
-
-        # mask potentially sensitive information in blotter
-        self._mask_sensitive()
 
         if os.path.isfile(TEMP_LOG_FILE):
             slept = 0
@@ -1002,6 +1016,7 @@ class Main(object):
 
     def dispatch_logs(self):
         """ Either copies the combined logs to the SD Card or Uploads them to the pastebin. """
+        print('Dispatching logs ...')
         self.stage_dialog()
 
         if self.copy_to_boot:
@@ -1110,7 +1125,6 @@ class Main(object):
 
                     log("Logs successfully uploaded.")
                     log("Logs available at %s" % self.url.replace(' ', ''))
-
 
 
 if __name__ == "__main__":
