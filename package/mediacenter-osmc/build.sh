@@ -109,6 +109,7 @@ then
 	handle_dep "libflatbuffers-dev"
 	handle_dep "libspdlog-dev"
 	handle_dep "libfmt-dev"
+	handle_dep "libudfread-dev"
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		handle_dep "rbp2-libcec-dev-osmc"
@@ -202,7 +203,7 @@ then
             -DENABLE_INTERNAL_FMT=OFF \
             -DENABLE_INTERNAL_FLATBUFFERS=OFF \
             -DENABLE_INTERNAL_SPDLOG=OFF \
-            -DENABLE_INTERNAL_UDFREAD=ON \
+            -DENABLE_INTERNAL_UDFREAD=OFF \
             -DENABLE_MDNS=OFF \
             -DENABLE_BLUETOOTH=OFF \
             -DENABLE_PULSEAUDIO=OFF \
@@ -244,7 +245,7 @@ then
             -DENABLE_INTERNAL_FMT=OFF \
             -DENABLE_INTERNAL_FLATBUFFERS=OFF \
             -DENABLE_INTERNAL_SPDLOG=OFF \
-            -DENABLE_INTERNAL_UDFREAD=ON \
+            -DENABLE_INTERNAL_UDFREAD=OFF \
 	    -DENABLE_MDNS=OFF \
 	    -DENABLE_BLUETOOTH=OFF \
 	    -DENABLE_PULSEAUDIO=OFF \
@@ -334,7 +335,7 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7"
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7, libudfread0"
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == rbp4 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control
