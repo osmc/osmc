@@ -939,7 +939,8 @@ class Main(object):
                         readlines = self._mask_sensitive(readlines)
                     self.log_blotter.extend(readlines)
         except:
-            self.log_blotter.extend(['%s error' % name])
+            print('An error occurred while grabbing %s:\n %s' % (name, traceback.format_exc().splitlines()[-1]))
+            self.log_blotter.extend(['An error occurred while grabbing %s:\n %s' % (name, traceback.format_exc().splitlines()[-1])])
 
         self.log_blotter.extend([SECTION_END % (name, key)])
 
@@ -949,8 +950,6 @@ class Main(object):
         print('Masking private information ...')
 
         def _mask(message):
-            message = message.decode('utf-8')
-
             mask = '**masked*by*grab-logs**'
 
             masked_message = RE_MASKS['00'].sub(r'\1' + mask, message)
@@ -965,7 +964,6 @@ class Main(object):
             masked_message = RE_MASKS['09'].sub(r'\1' + mask + r'\2', masked_message)
             masked_message = RE_MASKS['10'].sub(r'\1' + mask, masked_message)
 
-            masked_message = masked_message.encode('utf-8')
             return masked_message
 
         return [_mask(line) for line in lines_to_mask]
