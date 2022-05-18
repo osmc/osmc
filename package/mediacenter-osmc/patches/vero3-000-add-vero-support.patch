@@ -5902,7 +5902,7 @@ index 795b9c11e1..57b211d42a 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 95043cc579..11f35d7f66 100644
+index 95043cc579..69416bfd35 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -17,6 +17,8 @@
@@ -5935,7 +5935,7 @@ index 95043cc579..11f35d7f66 100644
    if (iformat && (strcmp(iformat->name, "mpegts") == 0) && !fileinfo && !isBluray)
    {
 -    av_opt_set_int(m_pFormatContext, "analyzeduration", 500000, 0);
-+    av_opt_set_int(m_pFormatContext, "analyzeduration", 2000000, 0);
++    av_opt_set_int(m_pFormatContext, "analyzeduration", 20000000, 0);
      m_checkTransportStream = true;
      skipCreateStreams = true;
    }
@@ -6156,7 +6156,7 @@ index 95043cc579..11f35d7f66 100644
          st->colorPrimaries = pStream->codecpar->color_primaries;
          st->colorSpace = pStream->codecpar->color_space;
          st->colorTransferCharacteristic = pStream->codecpar->color_trc;
-@@ -1670,7 +1741,57 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1670,7 +1741,60 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          }
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
@@ -6185,7 +6185,8 @@ index 95043cc579..11f35d7f66 100644
 +              m_pSSIF->SetH264StreamId(streamIdx);
 +              m_pSSIF->SetMVCStreamId(mvcIndex);
 +
-+              st->stereo_mode = "block_lr"; // can't tell whether lr or br
++              // use lr if we don't know what the stereo mode is
++              st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
 +              mvcStream = m_pFormatContext->streams[m_pSSIF->GetMVCStreamId()];
 +            }
 +
@@ -6196,7 +6197,7 @@ index 95043cc579..11f35d7f66 100644
 +              if (pStream->codecpar->extradata_size > 0 && mvcStream->codecpar->extradata_size > 0)
 +              {
 +                uint8_t* extr = pStream->codecpar->extradata;
- 
++
 +                pStream->codecpar->extradata = (uint8_t*)av_mallocz(pStream->codecpar->extradata_size + mvcStream->codecpar->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
 +                memcpy(pStream->codecpar->extradata, extr, pStream->codecpar->extradata_size);
 +                memcpy(pStream->codecpar->extradata + pStream->codecpar->extradata_size, mvcStream->codecpar->extradata, mvcStream->codecpar->extradata_size);
@@ -6208,13 +6209,15 @@ index 95043cc579..11f35d7f66 100644
 +          else if (CDVDCodecUtils::ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size))
 +          {
 +            pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
-+            st->stereo_mode = "block_lr"; // can't tell whether lr or br
+ 
++            // use lr if we don't know what the stereo mode is
++            st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
 +          }
 +        }
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1696,6 +1817,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1696,6 +1820,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -6231,7 +6234,7 @@ index 95043cc579..11f35d7f66 100644
            break;
          }
        }
-@@ -1991,7 +2122,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -1991,7 +2125,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -6253,7 +6256,7 @@ index 95043cc579..11f35d7f66 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2022,6 +2166,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+@@ -2022,6 +2169,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
  
  bool CDVDDemuxFFmpeg::IsProgramChange()
  {
