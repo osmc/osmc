@@ -357,7 +357,7 @@ SETS = {
                 'name': 'System Journal',
                 'key': 'MyqVXi2x',
                 'ltyp': 'cl_log',
-                'actn': 'sudo journalctl',
+                'actn': 'sudo journalctl -n 30000 --since "1 days ago"',
             },
         ],
     },
