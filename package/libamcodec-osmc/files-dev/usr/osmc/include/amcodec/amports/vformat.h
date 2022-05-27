@@ -70,6 +70,7 @@ typedef enum {
     VIDEO_DEC_FORMAT_H264_4K2K,
     VIDEO_DEC_FORMAT_HEVC,
     VIDEO_DEC_FORMAT_VP9 ,
+	VIDEO_DEC_FORMAT_AV1,
     VIDEO_DEC_FORMAT_MAX
 } vdec_type_t;
 
@@ -91,6 +92,7 @@ typedef enum {
     VFORMAT_JPEG_ENC,
     VFORMAT_VP9,
     VFORMAT_AVS2,
+	VFORMAT_AV1,
 
 /*add new here before.*/
     VFORMAT_MAX,
@@ -146,5 +148,5 @@ typedef enum {
 #define CODEC_TAG_FVFW      (0x57465646)
 #define CODEC_TAG_VC_1      (0x312d4356)
 #define CODEC_TAG_vc_1      (0x312d6376)
-
+#define CODEC_TAG_AV1       (0x31307661)
 #endif /* VFORMAT_H */
