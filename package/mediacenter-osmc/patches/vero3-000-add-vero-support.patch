@@ -5624,10 +5624,10 @@ index 0000000000..dd3868b7e2
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MJPEGCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MJPEGCodec.cpp
 new file mode 100644
-index 0000000000..87feda985e
+index 0000000000..df27646ab0
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MJPEGCodec.cpp
-@@ -0,0 +1,132 @@
+@@ -0,0 +1,127 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5653,7 +5653,7 @@ index 0000000000..87feda985e
 +		AMLCodecList::getInstance().registerAmlVideoCodec(this);
 +	}
 +
-+	std::string getCodecName() const { return "H.264/MVC"; }
++	std::string getCodecName() const { return "MJPEG"; }
 +	bool isSecure() const { return false; }
 +	bool canPlay(const CDVDStreamInfo &hints) const {
 +		if (hints.codec != AV_CODEC_ID_MJPEG) {
@@ -5755,11 +5755,6 @@ index 0000000000..87feda985e
 +
 +	return PLAYER_SUCCESS;
 +}
-+
-+
-+
-+
-+
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MJPEGCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MJPEGCodec.h
 new file mode 100644
 index 0000000000..6e7c0cb1fc
