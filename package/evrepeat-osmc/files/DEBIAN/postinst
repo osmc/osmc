@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "configure" ]; then
-	/sbin/udevadm control --reload-rules
-	/sbin/udevadm trigger
+	/bin/udevadm control --reload-rules
+	/bin/udevadm trigger
 	exit 0
 fi
