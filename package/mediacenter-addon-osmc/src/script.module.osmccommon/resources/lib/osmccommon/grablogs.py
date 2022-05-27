@@ -135,7 +135,7 @@ SETS = {
     },
 
     'guisettings_ab': {
-        'order': 2.25,
+        'order': 3,
         'active': False,
         'help': 'GUI Settings (abridged)',
         'dest': 'guisettings_ab',
@@ -152,7 +152,7 @@ SETS = {
     },
 
     'guisettings': {
-        'order': 2.5,
+        'order': 4,
         'active': False,
         'help': 'guisettings.xml',
         'dest': 'guisettings',
@@ -171,7 +171,7 @@ SETS = {
     },
 
     'advancedsettings': {
-        'order': 3,
+        'order': 5,
         'active': False,
         'help': 'advancedsettings.xml',
         'dest': 'advancedsettings',
@@ -184,40 +184,6 @@ SETS = {
                 'ltyp': 'file_log',
                 'actn': USERDATA + 'advancedsettings.xml',
                 'mask': True
-            },
-        ],
-    },
-
-    'keyboard': {
-        'order': 4,
-        'active': False,
-        'help': 'keyboard.xml',
-        'dest': 'keyboard',
-        'action': 'store_true',
-        'flags': ['-k', '--keyboard'],
-        'logs': [
-            {
-                'name': 'keyboard.xml',
-                'key': 'MBom5YV6',
-                'ltyp': 'file_log',
-                'actn': USERDATA + 'keyboard.xml',
-            },
-        ],
-    },
-
-    'remote': {
-        'order': 5,
-        'active': False,
-        'help': 'remote.xml',
-        'dest': 'remote',
-        'action': 'store_true',
-        'flags': ['-r', '--remote'],
-        'logs': [
-            {
-                'name': 'remote.xml',
-                'key': '5jmphjm3',
-                'ltyp': 'file_log',
-                'actn': USERDATA + 'remote.xml',
             },
         ],
     },
@@ -550,20 +516,6 @@ SETS = {
                 'key': 'su34JRse',
                 'ltyp': 'cl_log',
                 'actn': '/usr/bin/edid-decode /sys/class/drm/card0-HDMI-A-1/edid',
-                'hwid': 'rbp',
-            },
-            {
-                'name': 'MPG2 codec_enabled',
-                'key': 'DjfSD1Fa',
-                'ltyp': 'cl_log',
-                'actn': 'vcgencmd codec_enabled MPG2',
-                'hwid': 'rbp',
-            },
-            {
-                'name': 'WVC1 codec_enabled',
-                'key': 'dDR3l5zx',
-                'ltyp': 'cl_log',
-                'actn': 'vcgencmd codec_enabled WVC1',
                 'hwid': 'rbp',
             },
         ],
