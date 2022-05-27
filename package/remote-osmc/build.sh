@@ -13,7 +13,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	sed '/Depends/d' -i files/DEBIAN/control
 	echo "Package: ${1}-remote-osmc" >> files/DEBIAN/control
-	echo "Depends: ${1}-lirc-osmc, ${1}-eventlircd-osmc" >> files/DEBIAN/control
+	echo "Depends: ${1}-lirc-osmc, ${1}-eventlircd-osmc, ${1}-evrepeat-osmc" >> files/DEBIAN/control
 	fix_arch_ctl "files/DEBIAN/control"
 	dpkg_build files/ ${1}-remote-osmc.deb
 	build_return=$?
