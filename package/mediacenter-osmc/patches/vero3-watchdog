@@ -198,7 +198,7 @@ while true; do
 		/usr/bin/setterm --cursor off >/dev/tty1
 		/usr/bin/clear >/dev/tty1
 		/usr/bin/ply-image "$CODE"
-		read -n 1 -s dump </dev/tty1
+		read -n 1 -s -t 1 dump </dev/tty1
 		read -n 1 -s -t 10 key </dev/tty1
 	fi
 	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
