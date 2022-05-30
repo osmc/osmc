@@ -12,7 +12,7 @@ if [ "$pwd_hash_method" = "y" ]
 fi
 
 pwd_method_n_salt=$(echo ${shadow_password_field%"\$$pwd_hash"})
-python_password_field=$(echo $(python -c 'import crypt,sys; print(crypt.crypt(sys.argv[1], sys.argv[2]))' $user $pwd_method_n_salt))
+python_password_field=$(echo $(python3 -c 'import crypt,sys; print(crypt.crypt(sys.argv[1], sys.argv[2]))' $user $pwd_method_n_salt))
 
 if systemctl is-active ssh -q && [ "$shadow_password_field" = "$python_password_field" ] && [ ! -f /home/osmc/.nosshwarn ]
 then
