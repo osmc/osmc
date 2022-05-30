@@ -8,7 +8,7 @@
 function setup_osmc_user()
 {
 	# Sets user and password to 'osmc'
-	chroot ${1} useradd -p \$1\$P.ZH6EFu\$L08/1ZYI6FdHu3aw0us.u0 osmc -k /etc/skel -d /home/osmc -m -s /bin/bash
+	chroot ${1} useradd -p \$y\$j9T\$YO0bsdRQoKHvOxZPFBn5q/\$D5DzjNAvfOy.ftwO5IE2FkbrZNsC2DtiNZO9Q5.9UF1 osmc -k /etc/skel -d /home/osmc -m -s /bin/bash
 	# Locks root
 	chroot ${1} passwd -l root
 	# Makes 'osmc' username and password never expire
