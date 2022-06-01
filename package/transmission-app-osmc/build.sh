@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="2.94"
+VERSION="3.00"
 pull_source "https://github.com/transmission/transmission-releases/raw/master/transmission-${VERSION}.tar.xz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -33,7 +33,6 @@ then
 	echo "Package: ${1}-transmission-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-transmission-app-osmc"
     echo -e "Transmission Client\ntransmission.service" > $APP_FILE
     pushd src/transmission*
-    install_patch "../../patches" "all"
     rm m4/glib-gettext.m4 # Fix m4_copy error
     autoreconf -vif .
     ./configure --prefix=/usr --without-inotify --without-gtk --with-systemd-daemon --enable-lightweight CFLAGS="-O3 -fomit-frame-pointer"
