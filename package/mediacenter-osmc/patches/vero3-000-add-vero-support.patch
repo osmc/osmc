@@ -2429,10 +2429,10 @@ index 708678cb59..099b610758 100644
  };
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..abc656e6fd
+index 0000000000..731e2769bf
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -0,0 +1,305 @@
+@@ -0,0 +1,309 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2502,7 +2502,7 @@ index 0000000000..abc656e6fd
 +CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo)
 +  : CDVDVideoCodec(processInfo)
 +  , m_pFormatName("amcodec")
-+  , m_opened(false)
++  , m_state(NEW)
 +  , m_codecControlFlags(0)
 +{
 +}
@@ -2541,11 +2541,11 @@ index 0000000000..abc656e6fd
 +  // allow only 1 instance here
 +  if (m_InstanceGuard.exchange(true))
 +  {
-+    CLog::Log(LOGERROR, "CDVDVideoCodecAmlogic::Open - InstanceGuard locked\n");
++    CLog::Log(LOGERROR, "CDVDVideoCodecAmlogic::Open - InstanceGuard locked");
 +    return false;
 +  }
 +
-+  m_opened = false;
++  m_state = IN_USE;
 +
 +  m_hints = hints;
 +
@@ -2623,6 +2623,8 @@ index 0000000000..abc656e6fd
 +
 +void CDVDVideoCodecAmlogic::Dispose(void)
 +{
++  CLog::Log(LOGDEBUG, "CDVDVideoCodecAmlogic::Dispose called");
++
 +  m_videoBufferPool = nullptr;
 +
 +  if (m_codec) {
@@ -2631,8 +2633,10 @@ index 0000000000..abc656e6fd
 +
 +  m_videobuffer.iFlags = 0;
 +
-+  m_opened = false;
-+  m_InstanceGuard.exchange(false);
++  if (m_state != NEW) {
++    m_InstanceGuard.exchange(false);
++    m_state = NEW;
++  }
 +}
 +
 +bool CDVDVideoCodecAmlogic::AddData(const DemuxPacket &packet)
@@ -2653,7 +2657,7 @@ index 0000000000..abc656e6fd
 +      return true;
 +  }
 +
-+  if (!m_opened) {
++  if (m_state != OPEN) {
 +    if (packet.pts == DVD_NOPTS_VALUE) {
 +      m_hints.ptsinvalid = true;
 +    }
@@ -2664,7 +2668,7 @@ index 0000000000..abc656e6fd
 +
 +    m_videoBufferPool = std::shared_ptr<CAMLVideoBufferPool>(new CAMLVideoBufferPool());
 +
-+    m_opened = true;
++    m_state = OPEN;
 +  }
 +
 +  return m_codec->addData(pData, iSize, packet.dts, m_hints.ptsinvalid ? DVD_NOPTS_VALUE : packet.pts, packet.subtitlePlane);
@@ -2740,10 +2744,10 @@ index 0000000000..abc656e6fd
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 new file mode 100644
-index 0000000000..769051f211
+index 0000000000..09c3b7f564
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,93 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2824,7 +2828,11 @@ index 0000000000..769051f211
 +
 +  const char     *m_pFormatName;
 +  VideoPicture m_videobuffer;
-+  bool            m_opened;
++
++  enum {
++	  NEW, IN_USE, OPEN
++  } m_state;
++
 +  int             m_codecControlFlags;
 +  CDVDStreamInfo  m_hints;
 +  float           m_aspect_ratio;
