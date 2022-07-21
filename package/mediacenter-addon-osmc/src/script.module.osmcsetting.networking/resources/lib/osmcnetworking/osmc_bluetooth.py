@@ -230,7 +230,7 @@ class OSMCBluetooth:
 
         paired = False
         print('calling agent "' + script + '"')
-        child = pexpect.spawn(script)
+        child = pexpect.spawn(script, encoding='utf-8')
 
         while True:
             try:
@@ -239,8 +239,8 @@ class OSMCBluetooth:
                 if len(split[0]) > 0:
                     log('Output From Pairing Agent ' + split[0])
                 d = json.loads(split[1])
-                return_value = d.keys()[0]
-                messages = d.values()[0]
+                return_value = list(d.keys())[0]
+                messages = list(d.values())[0]
                 log(['return_value = ' + return_value, 'Messages = ' + str(messages)])
                 if return_value == 'PAIRING_OK':
                     paired = True
