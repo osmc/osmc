@@ -13,6 +13,7 @@ if [ "$1" = "configure" ]; then
 
 	# remove only diverts that prior versions of this package added which are no longer needed:
 	# remove_divert PATH_DIV PATH_ORIG
+	remove_divert /sbin/mount.exfat-fuse.distributed /sbin/mount.exfat-fuse
 
 	systemctl daemon-reload
 	systemctl enable udisks-glue.service >/dev/null 2>&1
