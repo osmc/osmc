@@ -1,0 +1,36 @@
+diff -uar udisks.orig/src/device.c udisks/src/device.c
+--- udisks.orig/src/device.c	2022-07-21 19:31:43.907254713 +0000
++++ udisks/src/device.c	2022-07-21 20:20:12.114429246 +0000
+@@ -5912,15 +5912,22 @@
+
+ /* ---------------------- vfat -------------------- */
+
+-static const char *vfat_defaults[] = { "uid=", "gid=", "shortname=mixed", "dmask=0077", "utf8=1", "showexec", NULL };
++static const char *vfat_defaults[] = { "uid=", "gid=", "shortname=mixed", "dmask=0000", "fmask=0111", "utf8=1", "showexec", NULL };
+ static const char *vfat_allow[] = { "flush", "utf8=", "shortname=", "umask=", "dmask=", "fmask=", "codepage=", "iocharset=", "usefree", "showexec", NULL };
+ static const char *vfat_allow_uid_self[] = { "uid=", NULL };
+ static const char *vfat_allow_gid_self[] = { "gid=", NULL };
+
++/* ---------------------- exfat ------------------- */
++
++static const char *exfat_defaults[] = { "uid=", "gid=", "dmask=0000", "fmask=0111", NULL };
++static const char *exfat_allow[] = { "flush", "umask=", "dmask=", "fmask=", "codepage=", "iocharset=", "usefree", NULL };
++static const char *exfat_allow_uid_self[] = { "uid=", NULL };
++static const char *exfat_allow_gid_self[] = { "gid=", NULL };
++
+ /* ---------------------- ntfs -------------------- */
+ /* this is assuming that ntfs-3g is used */
+
+-static const char *ntfs_defaults[] = { "uid=", "gid=", "dmask=0077", "fmask=0177", NULL };
++static const char *ntfs_defaults[] = { "uid=", "gid=", "dmask=0000", "fmask=0111", NULL };
+ static const char *ntfs_allow[] = { "umask=", "dmask=", "fmask=", "locale=", "norecover", "ignore_case", "windows_names", "compression", "nocompression", NULL };
+ static const char *ntfs_allow_uid_self[] = { "uid=", NULL };
+ static const char *ntfs_allow_gid_self[] = { "gid=", NULL };
+@@ -5947,6 +5954,7 @@
+ static const FSMountOptions fs_mount_options[] =
+   {
+     { "vfat", vfat_defaults, vfat_allow, vfat_allow_uid_self, vfat_allow_gid_self },
++    { "exfat", exfat_defaults, exfat_allow, exfat_allow_uid_self, exfat_allow_gid_self },
+     { "ntfs", ntfs_defaults, ntfs_allow, ntfs_allow_uid_self, ntfs_allow_gid_self },
+     { "iso9660", iso9660_defaults, iso9660_allow, iso9660_allow_uid_self, iso9660_allow_gid_self },
+     { "udf", udf_defaults, udf_allow, udf_allow_uid_self, udf_allow_gid_self },
