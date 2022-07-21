@@ -16,12 +16,9 @@ import dbus
 import dbus.mainloop.glib
 import dbus.service
 
-from . import bluezutils
+import bluezutils
 
-try:
-    from gi.repository import GObject
-except ImportError:
-    import gobject as GObject
+from gi.repository import GLib
 
 PEXPECT_SOL = 'SOL@'
 PEXPECT_EOL = '@EOL'
@@ -47,8 +44,8 @@ def decode_response(message):
         json_str = message.replace(PEXPECT_SOL, '').replace(PEXPECT_EOL, '')
 
         return_value = json.loads(json_str)
-        if return_value.keys()[0] == 'RETURN_VALUE':
-            return str(return_value.values()[0][0])
+        if list(return_value.keys())[0] == 'RETURN_VALUE':
+            return str(list(return_value.values())[0][0])
 
         return None
 
@@ -149,7 +146,7 @@ class Agent(dbus.service.Object):
         return_status('YESNO_INPUT', message_list)
         return_str = input('AUTHORIZE Device:')
         return_value = decode_response(return_str)
-        if return_value.keys()[0] == 'RETURN_VALUE':
+        if list(return_value.keys())[0] == 'RETURN_VALUE':
             if return_value == 'YES':
                 return
             raise Rejected("Passkey doesn't match")
@@ -196,7 +193,7 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     agent = Agent(bus, AGENT_PATH)
-    mainloop = GObject.MainLoop()
+    mainloop = GLib.MainLoop()
     obj = bus.get_object(BUS_NAME, "/org/bluez")
     manager = dbus.Interface(obj, "org.bluez.AgentManager1")
     manager.RegisterAgent(AGENT_PATH, options.capability)

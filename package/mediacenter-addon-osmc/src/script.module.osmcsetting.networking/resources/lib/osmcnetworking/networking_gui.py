@@ -1533,9 +1533,9 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 alias = item.getProperty('alias')
 
                 #              'Connect With Device'
-                #              'No'        'Pair and Connect' 'pair'
+                #              'No'        'Pair and Connect'
                 selection = DIALOG.select(self.lang(32022) + ' ' + alias + '?',
-                                          [self.lang(32055), self.lang(32056), self.lang(32057)])
+                                          [self.lang(32055), self.lang(32056)])
 
                 if selection == -1 or selection == 0:
                     return
