@@ -1700,10 +1700,10 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                     DIALOG.ok(self.lang(32063), self.lang(32071))
                     return
 
-            log('Enabling ' + technology + ' Hotspot')
+            log('Enabling tethering: %s' % technology)
 
             if technology is 'wifi':
-                log('Hotspot ssid = ' + ssid)
+                log('Tethering is using SSID: %s' % ssid)
 
             if osmc_network.tethering_enable(technology, ssid, passphrase):
                 self.setFocusId(TETHERING_DISABLE)
@@ -1727,7 +1727,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 DIALOG.ok(self.lang(32063), self.lang(32072))
 
         if control_id == TETHERING_DISABLE:
-            log('Disabling Hotspot')
+            log('Disabling tethering')
             osmc_network.tethering_disable()
 
             self.setFocusId(SELECTOR_TETHERING)
