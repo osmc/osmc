@@ -1758,6 +1758,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         if not os.path.isfile(self._crda_file):
             log('No CRDA file found.')
             self.default_crda_region = None
+            return
 
         with open(self._crda_file, 'r', encoding='utf-8') as file_handle:
             crda = file_handle.read()
@@ -1783,14 +1784,20 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             log('CRDA and Kodi region matches or is None.')
             return
 
-        with open(self._crda_file, 'r', encoding='utf-8') as file_handle:
-            crda = file_handle.read()
+        if not os.path.isfile(self._crda_file):
+            crda = ''
+        else:
+            with open(self._crda_file, 'r', encoding='utf-8') as file_handle:
+                crda = file_handle.read()
 
         region = '' if not self.default_crda_region else self.default_crda_region
-        payload = crda.replace(
-            'REGDOMAIN=%s' % region,
-            'REGDOMAIN=%s' % self.kodi_region
-        )
+        if 'REGDOMAIN' in crda:
+            payload = crda.replace(
+                'REGDOMAIN=%s' % region,
+                'REGDOMAIN=%s' % self.kodi_region
+            )
+        else:
+            payload = 'REGDOMAIN=%s' % self.kodi_region
 
         if payload == crda:
             log('No modifications made to CRDA file.')
