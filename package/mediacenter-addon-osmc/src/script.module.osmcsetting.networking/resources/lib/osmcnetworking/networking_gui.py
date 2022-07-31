@@ -458,8 +458,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         except:
             self.clear_busy_dialogue()
             log("Unhandled Exception thrown in Networking GUI\n%s" % traceback.format_exc())
-            message = "Unhandled Exeption caught - See log for details"
-            DIALOG.notification(self.lang(32004), message, time=2500, sound=False)
+            DIALOG.notification(self.lang(32004), self.lang(32106), time=2500, sound=False)
 
     def shutdown_process(self):
         """
