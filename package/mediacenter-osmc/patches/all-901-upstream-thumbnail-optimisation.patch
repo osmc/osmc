@@ -1,0 +1,114 @@
+From fd5a3a99ce95903e6a7b6d9937de0cf03c173908 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Wed, 18 May 2022 19:44:09 +0200
+Subject: [PATCH 1/2] FFmpegImage: Reduce quality a tiny bit
+
+While reading the forum I have seen that a user copied his Thumbnails
+directory to a PC and "optimized" the jpegs. From this I checked what
+we do in code and have seen that we use the "maximum" possible quality
+when storing in a lossy jpeg format. This results in very large jpegs
+which from quality POV are hardly to distinguish at all from a little
+compressed (reduced quality) image. I chose 4 as a sensible value.
+
+Size comparisons:
+53K Mai 18 19:16 1b005dd9.jpg
+53K Mai 18 19:40 1b005dd9-2.jpg (seems default)
+43K Mai 18 19:40 1b005dd9-3.jpg
+30K Mai 18 19:40 1b005dd9-4.jpg
+28K Mai 18 19:41 1b005dd9-5.jpg
+26K Mai 18 19:41 1b005dd9-6.jpg
+22K Mai 18 19:41 1b005dd9-7.jpg
+21K Mai 18 19:41 1b005dd9-8.jpg
+---
+ xbmc/guilib/FFmpegImage.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/guilib/FFmpegImage.cpp b/xbmc/guilib/FFmpegImage.cpp
+index 6089577bff9ca..e9aed8658364f 100644
+--- a/xbmc/guilib/FFmpegImage.cpp
++++ b/xbmc/guilib/FFmpegImage.cpp
+@@ -582,7 +582,7 @@ bool CFFmpegImage::CreateThumbnailFromSurface(unsigned char* bufferin, unsigned
+   tdm.avOutctx->flags = AV_CODEC_FLAG_QSCALE;
+   tdm.avOutctx->mb_lmin = tdm.avOutctx->qmin * FF_QP2LAMBDA;
+   tdm.avOutctx->mb_lmax = tdm.avOutctx->qmax * FF_QP2LAMBDA;
+-  tdm.avOutctx->global_quality = tdm.avOutctx->qmin * FF_QP2LAMBDA;
++  tdm.avOutctx->global_quality = jpg_output ? 4 * FF_QP2LAMBDA : tdm.avOutctx->qmin * FF_QP2LAMBDA;
+ 
+   unsigned int internalBufOutSize = 0;
+ 
+
+From 9ce5306866489aeb42340340e92250318c825b34 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Wed, 25 May 2022 18:33:59 +0200
+Subject: [PATCH 2/2] FFmpegImage: Allow advanced setting for quality
+
+---
+ xbmc/guilib/FFmpegImage.cpp        | 11 +++++++++--
+ xbmc/settings/AdvancedSettings.cpp |  2 ++
+ xbmc/settings/AdvancedSettings.h   |  2 ++
+ 3 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/guilib/FFmpegImage.cpp b/xbmc/guilib/FFmpegImage.cpp
+index e9aed8658364f..fa255278b74ca 100644
+--- a/xbmc/guilib/FFmpegImage.cpp
++++ b/xbmc/guilib/FFmpegImage.cpp
+@@ -6,9 +6,13 @@
+  *  See LICENSES/README.md for more information.
+  */
+ #include "FFmpegImage.h"
+-#include "utils/log.h"
++
+ #include "cores/FFmpeg.h"
+ #include "guilib/Texture.h"
++#include "settings/AdvancedSettings.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#include "utils/log.h"
+ 
+ #include <algorithm>
+ 
+@@ -582,7 +586,10 @@ bool CFFmpegImage::CreateThumbnailFromSurface(unsigned char* bufferin, unsigned
+   tdm.avOutctx->flags = AV_CODEC_FLAG_QSCALE;
+   tdm.avOutctx->mb_lmin = tdm.avOutctx->qmin * FF_QP2LAMBDA;
+   tdm.avOutctx->mb_lmax = tdm.avOutctx->qmax * FF_QP2LAMBDA;
+-  tdm.avOutctx->global_quality = jpg_output ? 4 * FF_QP2LAMBDA : tdm.avOutctx->qmin * FF_QP2LAMBDA;
++  unsigned int quality =
++      CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_imageQualityJpeg;
++  tdm.avOutctx->global_quality =
++      jpg_output ? quality * FF_QP2LAMBDA : tdm.avOutctx->qmin * FF_QP2LAMBDA;
+ 
+   unsigned int internalBufOutSize = 0;
+ 
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index 1bc0b5fd24975..d46f34ad8efb0 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -287,6 +287,7 @@ void CAdvancedSettings::Initialize()
+   m_fanartRes = 1080;
+   m_imageRes = 720;
+   m_imageScalingAlgorithm = CPictureScalingAlgorithm::Default;
++  m_imageQualityJpeg = 4;
+ 
+   m_sambaclienttimeout = 30;
+   m_sambadoscodepage = "";
+@@ -1086,6 +1087,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+   XMLUtils::GetUInt(pRootElement, "imageres", m_imageRes, 0, 9999);
+   if (XMLUtils::GetString(pRootElement, "imagescalingalgorithm", tmp))
+     m_imageScalingAlgorithm = CPictureScalingAlgorithm::FromString(tmp);
++  XMLUtils::GetUInt(pRootElement, "imagequalityjpeg", m_imageQualityJpeg, 0, 21);
+   XMLUtils::GetBoolean(pRootElement, "playlistasfolders", m_playlistAsFolders);
+   XMLUtils::GetBoolean(pRootElement, "uselocalecollation", m_useLocaleCollation);
+   XMLUtils::GetBoolean(pRootElement, "detectasudf", m_detectAsUdf);
+diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
+index 03cc0bd090319..8528824fb8221 100644
+--- a/xbmc/settings/AdvancedSettings.h
++++ b/xbmc/settings/AdvancedSettings.h
+@@ -229,6 +229,8 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+     unsigned int m_fanartRes; ///< \brief the maximal resolution to cache fanart at (assumes 16x9)
+     unsigned int m_imageRes;  ///< \brief the maximal resolution to cache images at (assumes 16x9)
+     CPictureScalingAlgorithm::Algorithm m_imageScalingAlgorithm;
++    unsigned int
++        m_imageQualityJpeg; ///< \brief the stored jpeg quality the lower the better (default: 4)
+ 
+     int m_sambaclienttimeout;
+     std::string m_sambadoscodepage;
