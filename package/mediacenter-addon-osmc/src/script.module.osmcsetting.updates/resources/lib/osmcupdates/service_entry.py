@@ -419,12 +419,8 @@ class Main(object):
                                              '"id": 1}')
             result = json.loads(result_raw)
 
-            log(result, 'result of Player.GetActivePlayers')
-
             players = result.get('result', False)
             if players:
-                log('Update CONDITION : player playing')
-
                 return False, 'Update CONDITION : player playing'
 
             idle = xbmc.getGlobalIdleTime()
@@ -823,7 +819,7 @@ class Main(object):
         if self.check_for_unsupported_version() == 'alpha':
             return
 
-        check, _ = self.check_update_conditions()
+        check, status = self.check_update_conditions()
         if check:
             if self.setting_dict['backup_on_update']:
                 # run the backup, once the backup is completed the script calls
@@ -844,6 +840,7 @@ class Main(object):
                 self.call_child_script('update')
 
         else:
+            log('Update deferred: %s' % status)
             self.function_holding_pattern = self.holding_pattern_update
 
     def user_update_now(self):
