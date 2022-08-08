@@ -1302,7 +1302,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 osmc_network.wifi_disconnect(path)
 
                 if selection == 2:  # we also want to remove/forget this network
-                    osmc_network.wifi_remove(path, ssid)
+                    osmc_network.wifi_remove(path)
 
                 self.WFP.removeItem(self.WFP.getSelectedPosition())
                 self.toggle_controls(False, [SELECTOR_TETHERING])
@@ -1347,7 +1347,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                     if selection == 1:
                         self.show_busy_dialogue()
-                        osmc_network.wifi_remove(path, ssid)
+                        osmc_network.wifi_remove(path)
                         self.clear_busy_dialogue()
 
             if connect or hiddenssid:
@@ -1355,9 +1355,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 hiddenssid = hiddenssid or ssid
                 # try without a password see if connman has the password
-                wifi_data = wifi.copy()
-                wifi_data['SSID'] = hiddenssid
-                connection_status = osmc_network.wifi_connect(wifi_data, self.lib_path)
+                connection_status = osmc_network.wifi_connect(path, None,
+                                                              hiddenssid, self.lib_path)
 
                 self.clear_busy_dialogue()
 
@@ -1369,10 +1368,10 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                     if password:
                         self.wireless_password = password
-                        wifi_data['Passphrase'] = password
                         self.show_busy_dialogue()
 
-                        connection_status = osmc_network.wifi_connect(wifi_data, self.lib_path)
+                        connection_status = osmc_network.wifi_connect(path, password,
+                                                                      hiddenssid, self.lib_path)
                         self.clear_busy_dialogue()
 
                 if not connection_status:
