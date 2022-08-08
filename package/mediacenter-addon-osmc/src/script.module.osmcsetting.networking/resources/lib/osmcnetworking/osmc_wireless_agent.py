@@ -8,7 +8,7 @@
     SPDX-License-Identifier: GPL-2.0-or-later
     See LICENSES/GPL-2.0-or-later for more information.
 """
-import json
+
 import sys
 
 import dbus
@@ -177,6 +177,10 @@ class Agent(dbus.service.Object):
         print("Cancel")
 
 
+def argv():
+    return sys.argv
+
+
 if __name__ == '__main__':
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -186,18 +190,18 @@ if __name__ == '__main__':
     _path = "/test/agent"
     obj = Agent(bus, _path)
 
-    if len(sys.argv) >= 2:
-        for _arg in sys.argv[1:]:
+    if len(argv()) >= 2:
+        for _arg in argv()[1:]:
             if _arg.startswith("fromfile"):
-                with open("/tmp/myosmc_wireless_preseed.json", 'r', encoding='utf-8') as handle:
-                    data = json.load(handle)
+                with open("/tmp/preseed_data", 'r', encoding='utf-8') as key_file:
+                    data = key_file.read()
 
-                if 'passphrase' in data:
-                    obj.passphrase = data['passphrase']
-
-                if 'ssid' in data:
-                    obj.name = data['ssid']
-                    obj.ssid = data['ssid']
+                lines = data.split('\n')
+                if len(lines) > 0 and len(lines[0]) > 0:
+                    obj.passphrase = lines[0]
+                if len(lines) > 1 and len(lines[1]) > 0:
+                    obj.name = lines[1]
+                    obj.ssid = lines[1]
 
     try:
         manager.RegisterAgent(_path)
