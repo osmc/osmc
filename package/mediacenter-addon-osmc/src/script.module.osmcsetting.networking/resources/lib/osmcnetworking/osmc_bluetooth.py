@@ -10,15 +10,16 @@
 
 import json
 import os
-import sys
 
-import pexpect
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 
 from . import bluetooth
 from . import connman
 from . import osmc_systemd
+from .osmc_bluetooth_agent import pair_with_agent
+
+from . import bluezutils
 
 try:
     import xbmc
@@ -49,6 +50,7 @@ class OSMCBluetooth:
         self._lang = None
         self._path = None
         self._lib_path = None
+        self.device_address = None
 
     @property
     def addon(self):
@@ -210,9 +212,17 @@ class OSMCBluetooth:
     def pair_device(self, device_address, script_path=''):
         if not script_path:
             script_path = self.lib_path
+        self.device_address = device_address
+        paired = False
+        try:
+            device = bluezutils.find_device(device_address)
+        except:
+            device = None
+            print('DEVICE_NOT_FOUND' + device_address)
+            return False
 
         print('Attempting to pair with ' + device_address)
-        paired = self.pair_using_agent(device_address, script_path)
+        paired = pair_with_agent(_osmc_bt = self, device_uuid = device_address)
         if not paired:
             try:
                 bluetooth.remove_device(device_address)
@@ -222,44 +232,28 @@ class OSMCBluetooth:
 
         return paired
 
-    def pair_using_agent(self, device_address, script_path=''):
-        if not script_path:
-            script_path = self.lib_path
-        script_path = script_path + PAIRING_AGENT
-        script = ' '.join([sys.executable, script_path, device_address])
+    def handle_agent_return(self, return_dict):
 
-        paired = False
-        print('calling agent "' + script + '"')
-        child = pexpect.spawn(script, encoding='utf-8')
-
-        while True:
-            try:
-                _ = child.expect(['@EOL'], timeout=None)
-                split = child.before.split('SOL@')
-                if len(split[0]) > 0:
-                    log('Output From Pairing Agent ' + split[0])
-                d = json.loads(split[1])
-                return_value = list(d.keys())[0]
-                messages = list(d.values())[0]
-                log(['return_value = ' + return_value, 'Messages = ' + str(messages)])
-                if return_value == 'PAIRING_OK':
-                    paired = True
-                    break
-                if return_value == 'DEVICE_NOT_FOUND':
-                    return False  # return early no need to call remove_device()
-                if xbmc:
-                    device_alias = self.get_device_property(device_address, 'Alias')
-                    return_value = self.handle_agent_interaction(device_alias,
-                                                                 return_value, messages)
-                    if return_value:
-                        if return_value == 'NO_PIN_ENTERED':
-                            return False
-                        send_str = self.encode_return('RETURN_VALUE', [return_value])
-                        child.sendline(send_str)
-            except pexpect.EOF:
-                break
-
-        return paired
+        log('Output From Pairing Agent ', return_dict)
+        d = return_dict
+        return_value = list(d.keys())[0]
+        messages = list(d.values())[0]
+        log(['return_value = ' + return_value, 'Messages = ' + str(messages)])
+        if return_value == 'PAIRING_OK':
+            return None
+        if return_value == 'DEVICE_NOT_FOUND':
+            return None  # return early no need to call remove_device()
+        if xbmc:
+            device_alias = self.get_device_property(self.device_address, 'Alias')
+            return_value = self.handle_agent_interaction(device_alias,
+                                                         return_value, messages)
+            if return_value:
+                if return_value == 'NO_PIN_ENTERED':
+                    return None
+                send_str = self.encode_return('RETURN_VALUE', [return_value])
+                return send_str
+            else:
+                return None
 
     def handle_agent_interaction(self, device_alias, command, messages):
         supported_commands = ['NOTIFICATION', 'YESNO_INPUT', 'NUMERIC_INPUT']
