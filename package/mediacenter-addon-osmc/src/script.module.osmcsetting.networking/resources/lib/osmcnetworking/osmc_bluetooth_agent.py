@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-    Copyright (C) 2014-2020 OSMC (KodeKarnage)
+    Copyright (C) 2014-2020 OSMC (KodeKarnage), 2020 OSMC (grahamh)
 
     This file is part of script.module.osmcsetting.networking
 
@@ -12,13 +12,25 @@
 import json
 from optparse import OptionParser
 
-import dbus
-import dbus.mainloop.glib
-import dbus.service
+import dbussy as dbsy
+from dbussy import \
+    DBUS
+import ravel
+import asyncio
+try:
+    import nest_asyncio
+except ImportError:
+    pass
 
-import bluezutils
+try:
+    from . import bluezutils
+except ImportError:
+    import bluezutils
 
-from gi.repository import GLib
+try:
+    import xbmc
+except ImportError:
+    xbmc = None
 
 PEXPECT_SOL = 'SOL@'
 PEXPECT_EOL = '@EOL'
@@ -30,13 +42,21 @@ AGENT_PATH = "/test/agent"
 bus = None
 device_obj = None
 dev_path = None
-
+mainloop = None
+error_message = None
+osmc_bt = None
+agent = None
+paired = False
 
 def return_status(result, messages):
     return_dict = {
         result: messages
     }
-    print(PEXPECT_SOL + json.dumps(return_dict) + PEXPECT_EOL)
+    print('Return status: ', return_dict)
+    if xbmc:
+        return osmc_bt.handle_agent_return(return_dict)
+    else:
+        return 'no_kodi'
 
 
 def decode_response(message):
@@ -51,134 +71,255 @@ def decode_response(message):
 
     return message
 
+def handle_reply(reply, action, *args):
+    if reply.type == DBUS.MESSAGE_TYPE_METHOD_RETURN :
+        if callable(action):
+            action(*args)
+        return None, None
+    elif reply.type == DBUS.MESSAGE_TYPE_ERROR :
+        return reply.error_name, reply.expect_objects("s")[0]
+    else :
+        raise ValueError("unexpected reply type %d" % reply.type)
 
-def set_trusted(path, boolean):
-    props = dbus.Interface(bus.get_object("org.bluez", path),
-                           "org.freedesktop.DBus.Properties")
-    props.Set("org.bluez.Device1", "Trusted", boolean)
+def set_trusted(conn, trusted):
+    message = dbsy.Message.new_method_call \
+      (
+        destination = dbsy.valid_bus_name(BUS_NAME),
+        path = dbsy.valid_path(dev_path),
+        iface = "org.freedesktop.DBus.Properties",
+        method = "Set",
+      )
+    message.append_objects('ssv', "org.bluez.Device1", 'Trusted', (dbsy.DBUS.Signature('b'),trusted))
+    error = None
+    reply = conn.connection.send_with_reply_and_block(message, error = error)
+    error_name, error_message = handle_reply(reply, None)
+    if error_name:
+        print('Error setting Trusted: ', error_name, error_message)
 
+@ravel.interface(ravel.INTERFACE.SERVER, name = AGENT_INTERFACE)
+class AgentInterface:
 
-class Rejected(dbus.DBusException):
-    _dbus_error_name = "org.bluez.Error.Rejected"
+    def __init__(self, conn, capability = 'KeyboardDisplay'):
+        self.conn = conn
+        self.conn.register \
+          (
+            path = AGENT_PATH,
+            fallback = True,
+            interface = self
+          )
+        self.handle_agent_manager(True, capability)
 
+    def close(self):
+        self.handle_agent_manager(False)
+        self.conn.unregister(AGENT_PATH)
 
-class Agent(dbus.service.Object):
-    exit_on_release = True
-    return_code = 9
-    error_message = None
+    def handle_agent_manager(self, register, capability = None):
+        error = None
+        success = None
+        message = dbsy.Message.new_method_call \
+            (
+               destination = dbsy.valid_bus_name(BUS_NAME),
+               path = dbsy.valid_path("/org/bluez"),
+               iface = "org.bluez.AgentManager1",
+               method = "RegisterAgent" if register else "UnregisterAgent"
+            )
+        if register:
+            message.append_objects('os', AGENT_PATH, capability)
+            success = 'Agent registered'
+        else:
+            message.append_objects('o', AGENT_PATH)
+            success = 'Agent unregistered'
+        reply = self.conn.connection.send_with_reply_and_block(message, error = error)
+        handle_reply(reply, print, success)
 
-    def set_return(self, return_code, error_message):
-        self.return_code = return_code
-        self.error_message = error_message
-
-    def set_exit_on_release(self, exit_on_release):
-        self.exit_on_release = exit_on_release
-
-    @dbus.service.method(AGENT_INTERFACE, in_signature="", out_signature="")
-    def Release(self):
-        if self.exit_on_release:
-            mainloop.quit()
-
-    @dbus.service.method(AGENT_INTERFACE, in_signature="os", out_signature="")
-    def AuthorizeService(self, device, uuid):
+    @ravel.method(name = 'AuthorizeService', in_signature="os", out_signature="")
+    def _AuthorizeService(self, device, uuid):
         message_list = ['AUTHORIZE_SERVICE', device, uuid]
-        return_status('YESNO_INPUT', message_list)
-        return_str = input('Confirm Passkey:')
+        return_str = return_status('YESNO_INPUT', message_list)
+        if return_str == 'no_kodi':
+            return_str = input('Confirm Passkey: ')
         return_value = decode_response(return_str)
         if return_value == 'YES':
             return
-        raise Rejected("Connection rejected by user")
+        raise dbsy.DBusError("org.bluez.Error.Rejected", "Connection rejected by user")
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="o", out_signature="s")
-    def RequestPinCode(self, device):
+    @ravel.method(name = 'RequestPinCode', in_signature="o", out_signature="s",
+                  arg_keys=['device'], result_keyword='reply')
+    def _RequestPinCode(self, device, reply):
         message_list = ['REQUEST_PIN', device]
-        return_status('NUMERIC_INPUT', message_list)
-        return_str = input('Enter Pin: ')
+        return_str = return_status('NUMERIC_INPUT', message_list)
+        if return_str == 'no_kodi':
+            return_str = input('Enter Pin: ')
         return_value = decode_response(return_str)
         pin = '0000'
         if return_value is not None:
             pin = return_value
         message_list = ['ENTER_PIN', str(pin)]
         return_status('NOTIFICATION', message_list)
-        set_trusted(device, True)
-        return pin
+        reply[0] = pin
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="o", out_signature="u")
-    def RequestPasskey(self, device):
+    @ravel.method(name = 'RequestPasskey', in_signature="o", out_signature="u",
+                  arg_keys=['device'], result_keyword='reply')
+    def _RequestPasskey(self, device, reply):
         message_list = ['REQUEST_PIN', device]
-        return_status('NUMERIC_INPUT', message_list)
-        return_str = input('Enter Pin: ')
+        return_str = return_status('NUMERIC_INPUT', message_list)
+        if return_str == 'no_kodi':
+            return_str = input('Enter Passkey: ')
         return_value = decode_response(return_str)
         pin = '0000'
         if return_value is not None:
             pin = return_value
         message_list = ['ENTER_PIN', str(pin)]
         return_status('NOTIFICATION', message_list)
-        return dbus.UInt32(pin)
+        reply[0] = pin
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="ouq", out_signature="")
-    def DisplayPasskey(self, device, passkey, entered):
+    @ravel.method(name = 'DisplayPasskey', in_signature="ouq", out_signature="")
+    def _DisplayPasskey(self, device, passkey, entered):
         _ = device
         _ = entered
         message_list = ['ENTER_PIN', str(passkey)]
         return_status('NOTIFICATION', message_list)
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="os", out_signature="")
-    def DisplayPinCode(self, device, pincode):
+    @ravel.method(name = 'DisplayPinCode', in_signature="os", out_signature="")
+    def _DisplayPinCode(self, device, pincode):
         _ = device
         message_list = ['ENTER_PIN', str(pincode)]
         return_status('NOTIFICATION', message_list)
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="ou", out_signature="")
-    def RequestConfirmation(self, device, passkey):
+    @ravel.method(name = 'RequestConfirmation', in_signature="ou", out_signature="")
+    def _RequestConfirmation(self, device, passkey):
         _ = device
         message_list = ['CONFIRM_PASSKEY', passkey]
-        return_status('YESNO_INPUT', message_list)
-        return_str = input('Confirm Passkey:')
+        return_str = return_status('YESNO_INPUT', message_list)
+        if return_str == 'no_kodi':
+            return_str = input('Confirm Passkey: ')
         return_value = decode_response(return_str)
-        if return_value == 'YES':
+        if return_value.upper() == 'YES':
             return
-        raise Rejected("Passkey doesn't match")
+        raise dbsy.DBusError("org.bluez.Error.Rejected", "Passkey doesn't match")
 
-    @dbus.service.method(AGENT_INTERFACE, in_signature="o", out_signature="")
-    def RequestAuthorization(self, device):
+    @ravel.method(name = 'RequestAuthorization', in_signature="o", out_signature="")
+    def _RequestAuthorization(self, device):
         message_list = ['AUTHORIZE_DEVICE', device]
-        return_status('YESNO_INPUT', message_list)
-        return_str = input('AUTHORIZE Device:')
+        return_str = return_status('YESNO_INPUT', message_list)
+        if return_str == 'no_kodi':
+            return_str = input('AUTHORIZE Device: ')
         return_value = decode_response(return_str)
         if list(return_value.keys())[0] == 'RETURN_VALUE':
             if return_value == 'YES':
                 return
-            raise Rejected("Passkey doesn't match")
+            raise dbsy.DBusError("org.bluez.Error.Rejected", "Passkey doesn't match")
 
+def pair_with_agent(_osmc_bt, device_uuid, adapter_pattern=None, capability='KeyboardDisplay', timeout=15000):
+    global osmc_bt, mainloop, agent, dev_path, device_obj, paired
+    osmc_bt = _osmc_bt
+    paired = False
 
-def pair_successful():
-    set_trusted(dev_path, True)
-    agent.set_return(0, None)
-    mainloop.quit()
+    try:
+        device = bluezutils.find_device(device_uuid, adapter_pattern)
+    except:
+        device = None
+        return_status('DEVICE_NOT_FOUND', ['Device not Found'])
+        return False
 
+    dev_path = device.object_path
+    rvl_conn = ravel.system_bus()
 
-def pair_error(error):
-    set_trusted(dev_path, False)
-    err_name = error.get_dbus_name()
+    # Check if already paired
+    message = dbsy.Message.new_method_call \
+      (
+        destination = dbsy.valid_bus_name(BUS_NAME),
+        path = dbsy.valid_path(dev_path),
+        iface = "org.freedesktop.DBus.Properties",
+        method = "Get"
+      )
+    message.append_objects('ss', "org.bluez.Device1", 'Paired')
+    error = None
+    reply = rvl_conn.connection.send_with_reply_and_block(message, error = error)
+    if error != None and reply.type == DBUS.MESSAGE_TYPE_ERROR :
+        reply.set_error(error)
+        result = None
+        set_trusted(rvl_conn, False)
+        rvl_conn = None
+        return paired
+    else :
+        result = reply.expect_return_objects("v")[0]
+        if result[0] == 'b' and result[1] == True:
+            print('Already paired')
+            paired = True
+            set_trusted(rvl_conn, True)
+            rvl_conn = None
+            return paired
 
-    if err_name == "org.freedesktop.DBus.Error.NoReply" and device_obj:
-        agent.set_return(1, ' Timed out. Cancelling pairing')
-        device_obj.CancelPairing()
+    # Create the agent object
+    agent = AgentInterface(rvl_conn, capability)
 
+    # This bit needed to run in Spyder3 IDE
+    try:
+        nest_asyncio.apply()
+    except:
+        pass
+
+    # there's probably a more elegant way to do this
+    try:
+        mainloop = asyncio.get_running_loop()
+        if mainloop:
+            mainloop.stop()
+    except:
+        pass
+    mainloop = asyncio.new_event_loop()
+    rvl_conn.attach_asyncio(mainloop)
+
+    message = dbsy.Message.new_method_call \
+      (
+        destination = dbsy.valid_bus_name(BUS_NAME),
+        path = dbsy.valid_path(dev_path),
+        iface = "org.bluez.Device1",
+        method = "Pair"
+      )
+
+    async def pair(conn, message):
+        print('Pairing')
+        await_reply = await conn.connection.send_await_reply(message)
+        print('Finished')
+        return await_reply
+
+    reply = mainloop.run_until_complete(pair(rvl_conn, message))
+    error_name, error_message = handle_reply(reply, None)
+    print(error_name)
+    if error_name == "org.freedesktop.DBus.Error.NoReply" and device:
+        error_message = 'Timed out. Cancelling pairing'
+        message = dbsy.Message.new_method_call \
+          (
+             destination = dbsy.valid_bus_name(BUS_NAME),
+             path = dbsy.valid_path(dev_path),
+             iface = "org.bluez.Device1",
+             method = "CancelPairing"
+          )
+        try:
+            rvl_conn.connection.send_with_reply_and_block(message)
+            set_trusted(rvl_conn, False)
+        except:
+            pass
+
+    if error_message is not None:
+        print('PAIRING_FAILED ' + error_message)
+        return_status('PAIRING_FAILED', [error_message])
+        try:
+            set_trusted(rvl_conn, False)
+        except:
+            pass
     else:
-        if error.get_dbus_message() == 'Already Exists':
-            # we do not want to return an error code in this case
-            agent.set_return(0, None)
-        else:
-            agent.set_return(1, error.get_dbus_message())
+        print('PAIRING_OK')
+        return_status('PAIRING_OK', [])
+        paired = True
+        set_trusted(rvl_conn, True)
 
-        mainloop.quit()
-
+    agent.close()
+    rvl_conn = None
+    return paired
 
 if __name__ == '__main__':
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-    bus = dbus.SystemBus()
     parser = OptionParser()
     parser.add_option("-i", "--adapter", action="store",
                       type="string",
@@ -192,31 +333,6 @@ if __name__ == '__main__':
                       default=60000)
     (options, args) = parser.parse_args()
 
-    agent = Agent(bus, AGENT_PATH)
-    mainloop = GLib.MainLoop()
-    obj = bus.get_object(BUS_NAME, "/org/bluez")
-    manager = dbus.Interface(obj, "org.bluez.AgentManager1")
-    manager.RegisterAgent(AGENT_PATH, options.capability)
-
     if len(args) > 0:
-        try:
-            _device = bluezutils.find_device(args[0],
-                                             options.adapter_pattern)
-        except:
-            _device = None
-            return_status('DEVICE_NOT_FOUND', ['Device not Found'])
-            exit(1)
-
-        dev_path = _device.object_path
-        agent.set_exit_on_release(False)
-        _device.Pair(reply_handler=pair_successful, error_handler=pair_error,
-                     timeout=options.timeout)
-        device_obj = _device
-
-    mainloop.run()
-    manager.UnregisterAgent(AGENT_PATH)
-
-    if agent.error_message is not None:
-        return_status('PAIRING_FAILED', [agent.error_message])
-    else:
-        return_status('PAIRING_OK', [])
+        device_uuid = args[0]
+        paired = pair_with_agent(None, device_uuid, options.adapter_pattern, options.capability, options.timeout)
