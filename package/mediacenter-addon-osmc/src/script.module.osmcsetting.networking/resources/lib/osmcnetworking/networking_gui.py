@@ -587,11 +587,13 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
     @staticmethod
     def show_busy_dialogue():
-        xbmc.executebuiltin("ActivateWindow(busydialog)")
+        pass
+        #xbmc.executebuiltin("ActivateWindow(busydialog)")
 
     @staticmethod
     def clear_busy_dialogue():
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        pass
+        #xbmc.executebuiltin("Dialog.Close(busydialog)")
 
     def toggle_controls(self, enabled, control_ids):
         for control_id in control_ids:
@@ -1500,9 +1502,9 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 alias = item.getProperty('alias')
                 connected = item.getProperty('connected') == 'True'
 
-                #                                'Cancel'     'Re-connect'  'Remove Device'
+                #                                'Cancel'     'Re-connect'  'Disconnect'  'Remove Device'
                 selection = DIALOG.select(alias,
-                                          [self.lang(32051), self.lang(32075), self.lang(32021)])
+                                          [self.lang(32051), self.lang(32075) if not connected else self.lang(32058), self.lang(32021)])
 
                 if selection == -1 or selection == 0:
                     return
@@ -1517,6 +1519,12 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                         except:
                             pass
                         self.clear_busy_dialogue()
+                    else:
+                        try:
+                            if self.disconnect_bluetooth(address, alias):
+                                self.bluetooth_population_thread.update_bluetooth_lists()
+                        except:
+                            pass
 
                 elif selection == 2:
                     self.osmc_bluetooth.remove_device(address)
@@ -1567,6 +1575,21 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         if not connected:
             #         'Connection to'                       'failed'
             message = self.lang(32024) + ' ' + alias + ' ' + self.lang(32025)
+            #                   'Bluetooth'
+            DIALOG.notification(self.lang(32003), message, time=2500, sound=False)
+
+        return connected
+
+    def disconnect_bluetooth(self, address, alias):
+        connected = True
+        try:
+            connected = self.osmc_bluetooth.disconnect_device(address)
+        except:
+            pass
+
+        if connected:
+            #         'Disconnect'                       'failed'
+            message = self.lang(32058) + ' ' + self.lang(32025)
             #                   'Bluetooth'
             DIALOG.notification(self.lang(32003), message, time=2500, sound=False)
 
