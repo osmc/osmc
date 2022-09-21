@@ -103,6 +103,9 @@ verify_action
 echo -e "       * Configuring rc.local"
 create_rc_local ${DIR}
 verify_action
+echo -e "       * Setting iptables to legacy"
+set_iptables_to_legacy ${DIR}
+verify_action
 echo -e "       * Adding system release information"
 add_rls_info ${DIR}
 verify_action

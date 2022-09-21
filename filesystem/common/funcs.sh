@@ -121,6 +121,12 @@ chmod +x ${1}/etc/rc.local
 
 }
 
+function set_iptables_to_legacy()
+{
+	chroot ${1} /usr/bin/update-alternatives --set iptables /usr/sbin/iptables-legacy
+	chroot ${1} /usr/bin/update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+}
+
 function add_rls_info()
 {
 debootstrap_version=$(debootstrap --version | awk {'print $2'})
@@ -140,4 +146,5 @@ export -f conf_tty
 export -f setup_busybox_links
 export -f enable_legacy_elf
 export -f create_rc_local
+export -f set_iptables_to_legacy
 export -f add_rls_info
