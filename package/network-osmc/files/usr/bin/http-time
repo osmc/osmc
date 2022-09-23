@@ -3,14 +3,12 @@
 # (c) 2014-2015 Sam Nazarko
 # email@samnazarko.co.uk
 
-# Set system time during boot using an HTTP request to Google, Apple or Microsoft as a backup for ntpd when port 123 is blocked.
+# Set system time during boot using as a backup for ntpd when port 123 is blocked.
 
 count=60
 while [ $count -gt 0 ]; do
 	if grep -q nfsroot /proc/cmdline; then
-		ping -c 1 -W 2 www.google.com >/dev/null 2>&1 && break
-		ping -c 1 -W 2 www.apple.com >/dev/null 2>&1 && break
-		ping -c 1 -W 2 www.microsoft.com >/dev/null 2>&1 && break
+		ping -c 1 -W 2 time.osmc.tv >/dev/null 2>&1 && break
 	else
 		if connmanctl state | grep -iq 'online'; then break; fi
 	fi
@@ -19,7 +17,7 @@ done
 if [ $count -lt 1 ]; then echo "No internet connectivity was detected within 60 seconds. Will try to send time query anyway."; fi
 
 OLD_DATE=$(date -u)
-for server in www.google.com www.apple.com www.microsoft.com; do
+for server in time.osmc.tv; do
 
 	DATE_STRING=$(LANG=C wget --server-response --timeout=4 --max-redirect 0 --spider "$server" 2>&1 | egrep -o '^ *Date:.*' | sed 's/^ *Date: *//g')
 	if [ -n "$DATE_STRING" ]; then
