@@ -138,6 +138,8 @@ int codec_get_audio_cur_bitrate(codec_para_t *pcodec, int *bitrate);
 
 int codec_get_vdec_is_buffering(codec_para_t *pcodec, unsigned long *buffering);
 
+int codec_set_hdr10p_metadata(codec_para_t *pcodec, void *metadata, int metadata_size);
+
 int codec_set_vsync_upint(codec_para_t *pcodec, unsigned int mode);
 
 int codec_get_last_checkout_apts(codec_para_t* pcodec, unsigned long *apts);
