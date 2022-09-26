@@ -135,6 +135,8 @@ unsigned int noblock:
     int use_hardabuf;
     unsigned int drmmode;
     enum FRAME_BASE_VIDEO_PATH video_path;
+    int config_len;
+    char *config;
 } codec_para_t;
 
 typedef struct {

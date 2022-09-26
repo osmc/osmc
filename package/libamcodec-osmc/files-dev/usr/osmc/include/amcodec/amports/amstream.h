@@ -379,6 +379,7 @@ struct userdata_poc_info_t {
 /*  amstream set ptr cmd */
 #define AMSTREAM_SET_PTR_AUDIO_INFO 0x300
 #define AMSTREAM_SET_PTR_CONFIGS 0x301
+#define AMSTREAM_SET_PTR_HDR10P_DATA 0x302
 
 /*  amstream get cmd */
 #define AMSTREAM_GET_SUB_LENGTH 0x800
