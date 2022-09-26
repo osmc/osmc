@@ -132,10 +132,19 @@ index 6d1fb9cd49..6310a5a527 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 706187adb7..17bf77286c 100755
+index 706187adb7..e79d0f52cd 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -87,6 +87,7 @@
+@@ -54,8 +54,6 @@
+             <options>
+               <option label="351">0</option> <!-- ADJUST_REFRESHRATE_OFF -->
+               <option label="36035">1</option> <!-- ADJUST_REFRESHRATE_ALWAYS -->
+-              <option label="36036">2</option> <!-- ADJUST_REFRESHRATE_ON_STARTSTOP -->
+-              <option label="36050">3</option> <!-- ADJUST_REFRESHRATE_ON_START -->
+             </options>
+           </constraints>
+           <control type="list" format="string" />
+@@ -87,6 +85,7 @@
                <option label="634">4</option> <!-- ViewModeStretch16x9 -->
                <option label="644">7</option> <!-- ViewModeStretch16x9 - nonlinear -->
                <option label="631">1</option> <!-- ViewModeZoom -->
@@ -143,7 +152,7 @@ index 706187adb7..17bf77286c 100755
              </options>
            </constraints>
            <control type="list" format="string" />
-@@ -113,6 +114,104 @@
+@@ -113,6 +112,104 @@
              <formatlabel>14047</formatlabel>
            </control>
          </setting>
@@ -248,7 +257,7 @@ index 706187adb7..17bf77286c 100755
          <setting id="videoplayer.usemediacodecsurface" type="boolean" label="13440" help="36544">
            <requirement>HAS_MEDIACODEC</requirement>
            <level>2</level>
-@@ -2253,6 +2352,11 @@
+@@ -2253,6 +2350,11 @@
              </dependency>
            </dependencies>
          </setting>
@@ -260,7 +269,7 @@ index 706187adb7..17bf77286c 100755
        </group>
      </category>
      <category id="weather" label="8" help="36316">
-@@ -2405,6 +2509,36 @@
+@@ -2405,6 +2507,36 @@
            </dependencies>
            <control type="toggle" />
          </setting>
@@ -297,7 +306,7 @@ index 706187adb7..17bf77286c 100755
          <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
            <level>2</level>
            <default>0</default>
-@@ -2413,6 +2547,21 @@
+@@ -2413,6 +2545,21 @@
            </constraints>
            <control type="spinner" format="string" />
          </setting>
@@ -319,7 +328,7 @@ index 706187adb7..17bf77286c 100755
          <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
            <requirement>
              <or>
-@@ -2633,7 +2782,7 @@
+@@ -2633,7 +2780,7 @@
          </setting>
          <setting id="videoscreen.whitelistpulldown" type="boolean" parent="videoscreen.whitelist" label="14127" help="36444">
            <level>3</level>
@@ -328,7 +337,7 @@ index 706187adb7..17bf77286c 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2641,7 +2790,7 @@
+@@ -2641,7 +2788,7 @@
          </setting>
          <setting id="videoscreen.whitelistdoublerefreshrate" type="boolean" parent="videoscreen.whitelist" label="14128" help="36445">
            <level>3</level>
@@ -337,7 +346,7 @@ index 706187adb7..17bf77286c 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2723,7 +2872,7 @@
+@@ -2723,7 +2870,7 @@
          </setting>
          <setting id="audiooutput.config" type="integer" label="337" help="36361">
            <level>2</level>
@@ -346,7 +355,7 @@ index 706187adb7..17bf77286c 100755
            <constraints>
              <options>
                <option label="338">1</option>
-@@ -2768,6 +2917,18 @@
+@@ -2768,6 +2915,18 @@
              <formatlabel>36459</formatlabel>
            </control>
          </setting>
@@ -365,7 +374,7 @@ index 706187adb7..17bf77286c 100755
          <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
            <requirement>HAS_AE_QUALITY_LEVELS</requirement>
            <level>2</level>
-@@ -2813,7 +2974,7 @@
+@@ -2813,7 +2972,7 @@
          </setting>
          <setting id="audiooutput.streamsilence" type="integer" label="421" help="34111">
            <level>2</level>
@@ -374,7 +383,7 @@ index 706187adb7..17bf77286c 100755
            <constraints>
              <options>audiostreamsilence</options>
            </constraints>
-@@ -2821,7 +2982,7 @@
+@@ -2821,7 +2980,7 @@
          </setting>
          <setting id="audiooutput.streamnoise" type="boolean" label="34112" help="34113">
            <level>2</level>
@@ -2949,10 +2958,10 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..eef782e69b
+index 0000000000..1c43060c3e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1311 @@
+@@ -0,0 +1,1324 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3313,6 +3322,12 @@ index 0000000000..eef782e69b
 +	methods.clear();
 +}
 +
++std::string AMLInsecureVideoCodec::getCodecPrivateConfiguration() const
++{
++	// nothing to configure yet
++	return "";
++}
++
 +void AMLInsecureVideoCodec::setupVideoCodecParams(aml_generic_param &params) const
 +{
 +	params.noblock      = 0;
@@ -3483,6 +3498,13 @@ index 0000000000..eef782e69b
 +
 +	// setup video codec parameters
 +	setupVideoCodecParams(m_am_private->gcodec);
++
++	// setup private, codec specific configuration
++	std::string codecConfig = getCodecPrivateConfiguration();
++	if (!codecConfig.empty()) {
++		m_am_private->gcodec.config = const_cast<char*> (codecConfig.c_str());
++		m_am_private->gcodec.config_len = (int) codecConfig.size();
++	}
 +
 +	m_am_private->gcodec.param = (void *)((std::uintptr_t)m_am_private->gcodec.param | (m_am_private->video_rotation_degree << 16));
 +
@@ -4266,10 +4288,10 @@ index 0000000000..eef782e69b
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..1cc6528ea9
+index 0000000000..c64089529d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,151 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4381,6 +4403,7 @@ index 0000000000..1cc6528ea9
 +	virtual void enableCustomMasterDataDisplay(bool enable = true) const;
 +	virtual void getDeinterlacingMethods(std::list<EINTERLACEMETHOD> &methods) const;
 +	virtual void setupVideoCodecParams(aml_generic_param &params) const;
++	virtual std::string getCodecPrivateConfiguration() const;
 +
 +	virtual int pre_header_feeding(am_private_t *para, am_packet_t *pkt) const;
 +	virtual int set_header_info(am_private_t *para) const;
@@ -5066,10 +5089,10 @@ index 0000000000..1f3fa3e1df
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
 new file mode 100644
-index 0000000000..5a7b5aeebd
+index 0000000000..5b9c49dc1c
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,142 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5159,6 +5182,7 @@ index 0000000000..5a7b5aeebd
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
++	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
@@ -5254,10 +5278,10 @@ index 0000000000..5c8655bd15
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
 new file mode 100644
-index 0000000000..e355be2913
+index 0000000000..9fe5b43f46
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
-@@ -0,0 +1,286 @@
+@@ -0,0 +1,296 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5312,6 +5336,7 @@ index 0000000000..e355be2913
 +
 +  virtual void codec_set_log_callback(void (*logf)(const char *, ...))=0;
 +  virtual int codec_set_3d_video_mode(codec_para_t *pcodec, video_mode_3d_t mode)=0;
++  virtual int codec_set_hdr10p_metadata(codec_para_t *pcodec, void *metadata, int metadata_size)=0;
 +};
 +
 +class amlogic::DllLibAmCodec : public DllDynamic, LibamCodecInterface
@@ -5344,6 +5369,7 @@ index 0000000000..e355be2913
 +
 +  DEFINE_METHOD_FP(void, codec_set_log_callback,   (void (*)(const char *, ...)))
 +  DEFINE_METHOD2(int, codec_set_3d_video_mode, (codec_para_t *p1, video_mode_3d_t p2))
++  DEFINE_METHOD3(int, codec_set_hdr10p_metadata, (codec_para_t *p1, void *p2, int p3))
 +
 +  BEGIN_METHOD_RESOLVE()
 +    RESOLVE_METHOD(codec_init)
@@ -5372,6 +5398,7 @@ index 0000000000..e355be2913
 +
 +    RESOLVE_METHOD_OPTIONAL_FP(codec_set_log_callback)
 +    RESOLVE_METHOD(codec_set_3d_video_mode)
++    RESOLVE_METHOD(codec_set_hdr10p_metadata)
 +  END_METHOD_RESOLVE()
 +
 +public:
@@ -5448,6 +5475,8 @@ index 0000000000..e355be2913
 +	m_codec->stream_type		= gparam.stream_type;
 +	m_codec->decoder_type		= gparam.decoder_type;
 +	m_codec->display_mode		= gparam.display_mode;
++	m_codec->config				= gparam.config;
++	m_codec->config_len			= gparam.config_len;
 +	m_codec->am_sysinfo.format	= gparam.format;
 +	m_codec->am_sysinfo.width	= gparam.width;
 +	m_codec->am_sysinfo.height	= gparam.height;
@@ -5511,6 +5540,11 @@ index 0000000000..e355be2913
 +	return m_dll->codec_set_3d_video_mode(m_codec, mode);
 +}
 +
++int LibAmcodec::setHdr10pMetadata(unsigned char *metadata, int metadata_length)
++{
++	return m_dll->codec_set_hdr10p_metadata(m_codec, metadata, metadata_length);
++}
++
 +int LibAmcodec::getVdecState(struct vdec_status &vs) const
 +{
 +	return m_dll->codec_get_vdec_state(m_codec, &vs);
@@ -5546,10 +5580,10 @@ index 0000000000..e355be2913
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
 new file mode 100644
-index 0000000000..dd3868b7e2
+index 0000000000..171947cd2c
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,82 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5592,6 +5626,8 @@ index 0000000000..dd3868b7e2
 +	unsigned int ratio;
 +	unsigned long long ratio64;
 +	void *param;
++	int config_len;
++	char *config;
 +} aml_generic_param;
 +
 +class amlogic::LibAmcodec
@@ -5626,6 +5662,7 @@ index 0000000000..dd3868b7e2
 +	int setControlSyncThreshold(unsigned int threshold);
 +	int setVideoDelayLimitedMs(int delay);
 +	int set3dVideoMode(video_mode_3d_t mode);
++	int setHdr10pMetadata(unsigned char *metadata, int metadata_length);
 +	void setNoBlockMode(bool noblock);
 +	void setStreamType(stream_type_t type);
 +};
@@ -6719,10 +6756,10 @@ index 0000000000..19a19e3fd5
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp
 new file mode 100644
-index 0000000000..7eac2dd3ce
+index 0000000000..839d6899b5
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp
-@@ -0,0 +1,221 @@
+@@ -0,0 +1,222 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6939,6 +6976,7 @@ index 0000000000..7eac2dd3ce
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
++	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
