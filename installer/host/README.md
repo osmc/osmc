@@ -29,22 +29,28 @@ On Ubuntu or Debian, we can get a minimal build of Qt 4.8.x with the following c
 
 ## OS X Qt Static build 
 
-Only tested on OS X El Capitan:
+Only tested on OS X Catalina:
 
-`git clone git://code.qt.io/qt/qt5.git -b 5.5.1`
+Install Homebrew:
 
-`cd qt5 `
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 
-`./init-repository`
+Install required brew packages:
 
-For configure, make sure you use a working `prefix`. El Capitan has a new security feature in place (http://enwp.org/System_Integrity_Protection). Usually, you want /usr/local anyway, but you might want to choose a different directory, to not mess up other Qt installs in /usr/local (like brew).
+`brew install pcre2 harfbuzz freetype coreutils binutils gnu-sed`
+
+Download latest qt5 sourcecode from mirror,e.g:
+
+`curl -O https://mirrors.ukfast.co.uk/sites/qt.io/archive/qt/5.15/5.15.6/single/qt-everywhere-opensource-src-5.15.6.tar.xz'
+
+Then issue:
 ```
-./configure -opensource -confirm-license -release --prefix=/usr/local -optimized-qmake -no-largefile -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports -static
+tar xf qt-everywhere-opensource-src-5.15.6.tar.xz
+cd qt-everywhere-src-5.15.6
+mkdir build && cd build
+../configure -opensource -confirm-license -release --prefix=/usr/local -optimized-qmake -no-qml-debug -no-sql-sqlite -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds -nomake examples -reduce-exports -static
+`make -j8 && sudo make install`
 ```
-
-Use a -j switch suitable for your processor. General rule of thumb: -jN where N is number of cores/processors +1.
-Also, you may have to `sudo make install`, depending on the prefix used in the configure step 
-`make -j8 && make install`
 
 ## Windows Qt static build ##
 
