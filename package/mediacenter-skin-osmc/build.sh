@@ -21,7 +21,7 @@ then
 fi
 }
 
-REV="0a8ede618b3309425ed55f1c02c8037d397ac8af"
+REV="b38fd4a2310b1b903decfee328ff7eaf9ee41dae"
 SCOPE_REV="0f500143a0c6dc129218debf3e94223928f7b0e4"
 echo -e "Building package mediacenter-skin-osmc"
 echo -e "Downloading skin"
