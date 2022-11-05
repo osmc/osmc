@@ -11953,7 +11953,7 @@ index 29ccc5dea5..1cceacf72d 100644
                current = idx;
              idx++;
 diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
-index 653e913a1a..9199aefd57 100644
+index 653e913a1a..ddd99f7872 100644
 --- a/xbmc/windowing/GraphicContext.cpp
 +++ b/xbmc/windowing/GraphicContext.cpp
 @@ -13,6 +13,7 @@
@@ -11978,15 +11978,6 @@ index 653e913a1a..9199aefd57 100644
    if(m_stereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
    {
      const RESOLUTION_INFO info = GetResInfo();
-@@ -329,7 +337,7 @@ void CGraphicContext::SetFullScreenVideo(bool bOnOff)
-       bTriggerUpdateRes = true;
-     else
-     {
--      bool allowDesktopRes = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) == ADJUST_REFRESHRATE_ALWAYS;
-+      bool allowDesktopRes = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) == ADJUST_REFRESHRATE_ALWAYS || CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) == ADJUST_REFRESHRATE_ON_START;
-       if (!allowDesktopRes)
-       {
-         if (g_application.GetAppPlayer().IsPlayingVideo())
 @@ -352,7 +360,7 @@ void CGraphicContext::SetFullScreenVideo(bool bOnOff)
      }
    }
