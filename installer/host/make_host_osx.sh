@@ -36,6 +36,10 @@ cp ${RESOURCES}/${ICONSET_NAME} ${TARGET}.app/Contents/Resources/
 sed -e s/ICON_HERE/${ICONSET_NAME}/ -i old ${TARGET}.app/Contents/Info.plist
 echo Placing Version
 
+## Copy sudo help file to app
+cp sudo-askpass.osascript.js ${TARGET}.app/Contents/MacOS
+chmod +x ${TARGET}.app/Contents/MacOS/sudo-askpass.osascript.js
+
 ## try to set version in plist
 VERSION=$(cat ${TARGET}.pro | grep VERSION | tail -n 1 | awk {'print $3'})
 sed -e s/VERVAL/${VERSION}/ -i old ${TARGET}.app/Contents/Info.plist
