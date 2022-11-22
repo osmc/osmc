@@ -12169,7 +12169,7 @@ index ce83aa7f8e..90225d6be5 100644
    int GetWidth() const;
    int GetHeight() const;
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index 7e27d7b8a4..a578fa1897 100644
+index 7e27d7b8a4..eb19ee7330 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
 @@ -68,16 +68,16 @@ float RESOLUTION_INFO::DisplayRatio() const
@@ -12267,11 +12267,13 @@ index 7e27d7b8a4..a578fa1897 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
        {
          CLog::Log(
-@@ -260,7 +263,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -259,8 +262,8 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+       const RESOLUTION_INFO info = CDisplaySettings::GetInstance().GetResolutionInfo(i);
  
        // pick the lowest resolution that has a matching refresh rate
-       if ((info.iScreenHeight >= height || info.iScreenWidth >= width) &&
+-      if ((info.iScreenHeight >= height || info.iScreenWidth >= width) &&
 -        (info.dwFlags & D3DPRESENTFLAG_MODEMASK) == (curr.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
++      if ((info.iScreenHeight >= height && info.iScreenWidth >= width) &&
 +        ! (info.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
            MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
        {
