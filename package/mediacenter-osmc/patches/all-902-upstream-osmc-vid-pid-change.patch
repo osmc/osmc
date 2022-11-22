@@ -1,0 +1,24 @@
+From a0cbe5cfb489c1521b592f009abeffe3400c578f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 5 Nov 2022 01:13:36 +0000
+Subject: [PATCH] Update OSMC controller support definition to match new
+ VID/PID
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/peripherals.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index db3d2187ff2d6..5b08ed468bcc8 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -52,7 +52,7 @@
+     <setting key="keymap" value="wetek-play" label="35007" configurable="0" />
+   </peripheral>
+ 
+-  <peripheral vendor_product="2252:1037,2017:1688,2017:1689" bus="usb" name="OSMC RF Remote" mapTo="hid">
++  <peripheral vendor_product="2252:1037,2017:1688,2017:1689,2017:1690" bus="usb" name="OSMC RF Remote" mapTo="hid">
+      <setting key="do_not_use_custom_keymap" type="bool" value="0" label="35009" order="1"/>
+      <setting key="keymap" value="osmc" label="35007" configurable="1"/>
+   </peripheral>
