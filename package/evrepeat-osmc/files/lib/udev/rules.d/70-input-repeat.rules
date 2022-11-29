@@ -9,6 +9,6 @@ ATTRS{name}=="eventlircd", GOTO="end"
 SUBSYSTEMS=="rc", GOTO="end"
 
 # set default repeat delay to 500ms like rc remotes
-RUN+="/usr/bin/evrepeat -d 500 $devnode"
+RUN+="/usr/bin/evrepeat -d 750 $devnode"
 
 LABEL="end"
