@@ -6,6 +6,11 @@
 #include "mainwindow.h"
 #include "utils.h"
 #include <QFontDatabase>
+#include <QFontDatabase>
+    #ifdef __APPLE__
+    #include <iostream>
+    #include "CoreFoundation/CoreFoundation.h"
+    #endif
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +30,19 @@ int main(int argc, char *argv[])
     w.show();
     #ifdef Q_OS_MAC
     w.raise();
+    #endif
+    #ifdef __APPLE__
+        CFBundleRef mainBundle = CFBundleGetMainBundle();
+        CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+        char path[PATH_MAX];
+        if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+        {
+            // error!
+        }
+        CFRelease(resourcesURL);
+
+        chdir(path);
+        std::cout << "Current Path: " << path << std::endl;
     #endif
     w.activateWindow();
     return a.exec();
