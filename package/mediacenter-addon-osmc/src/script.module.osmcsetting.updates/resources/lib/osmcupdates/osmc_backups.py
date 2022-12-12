@@ -367,10 +367,22 @@ class OSMCBackup(object):
             log('Failed to move %s file to %s')
             raise
 
+    @staticmethod
+    def clean_up():
+        # remove old tarballs to avoid having old temp backup files
+        temp_tarballs = os.path.join(xbmcvfs.translatePath('special://temp'), FILE_PATTERN % '*')
+        subprocess.Popen(['sudo', 'rm', temp_tarballs])
+
     def create_tarball(self):
         """
             takes the file list and creates a tarball in the backup location
         """
+
+        try:
+            self.clean_up()
+        except:
+            pass
+
         location = self.settings_dict['backup_location']
         # get list of tarballs in backup location
         tarballs = self.list_current_tarballs(location)
