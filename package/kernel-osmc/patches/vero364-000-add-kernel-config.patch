@@ -1,6 +1,6 @@
---- /dev/null	2022-08-08 21:12:59.512000000 +0100
-+++ b/.config	2022-08-08 21:42:47.734665048 +0100
-@@ -0,0 +1,6100 @@
+--- /dev/null	2022-11-22 20:07:20.999200149 +0000
++++ b/.config	2022-12-16 01:01:26.127248303 +0000
+@@ -0,0 +1,6106 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 4.9.269 Kernel Configuration
@@ -4223,7 +4223,13 @@
 +#
 +# CONFIG_USB_MDC800 is not set
 +# CONFIG_USB_MICROTEK is not set
-+# CONFIG_USBIP_CORE is not set
++CONFIG_USBIP_CORE=m
++CONFIG_USBIP_VHCI_HCD=m
++CONFIG_USBIP_VHCI_HC_PORTS=8
++CONFIG_USBIP_VHCI_NR_HCS=1
++CONFIG_USBIP_HOST=m
++CONFIG_USBIP_VUDC=m
++# CONFIG_USBIP_DEBUG is not set
 +# CONFIG_USB_MUSB_HDRC is not set
 +CONFIG_USB_DWC3=y
 +CONFIG_USB_DWC3_HOST=y
