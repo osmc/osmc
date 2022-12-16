@@ -10,9 +10,6 @@ rbp464:
 vero364:
 	sudo bash build.sh "vero364"
 
-pc:
-	sudo bash build.sh "pc"
-
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
 	sudo rm -rf files-image/lib >/dev/null 2>&1
