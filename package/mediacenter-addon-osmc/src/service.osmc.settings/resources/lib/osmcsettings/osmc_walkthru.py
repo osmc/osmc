@@ -257,7 +257,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
 
         # if the device is not recognised as a vero, then remove the warranty panel
         # from the walkthrough
-        if not self.is_vero():
+        if not is_vero():
             self.panel_order.remove('warranty')
 
         # this attribute is used to determine when the user is allowed to exit the walkthru using
@@ -426,32 +426,6 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
             self.getControl(88888).setImage(self.conf_skin_image)
         else:
             self.getControl(88888).setImage(self.osmc_skin_image)
-
-    @staticmethod
-    def is_vero():
-        """
-            Checks whether this is a Vero and whether the warranty info should be shown
-        """
-
-        # generate the URL
-        with open('/proc/cmdline', 'r', encoding='utf-8') as f:
-
-            line = f.readline()
-
-        settings = line.split(' ')
-
-        for setting in settings:
-
-            if setting.startswith('osmcdev='):
-
-                if 'vero' in setting or 'vero2' in setting:
-                    log('Hardware is Vero')
-
-                    return True
-
-        log('Hardware not Vero')
-
-        return False
 
     def apply_ssh_state_password(self):
 
@@ -958,11 +932,17 @@ def open_gui(addon=None, networking_instance=None, testing=False):
     if not addon:
         addon = xbmcaddon.Addon(ADDON_ID)
 
+    translate = LangRetriever(addon).lang
+
     script_path = addon.getAddonInfo('path')
 
     while first_run or lang_rerun:
 
         first_run = False
+
+        if is_vero(3):
+            xbmcgui.Dialog().ok(translate(32081), translate(32082))  # remote pairing dialog before walkthru
+
         try:
             gui = WalkthruGui(xml, script_path, 'Default', addon=addon,
                               networking_instance=networking_instance, lang_rerun=lang_rerun,
@@ -1000,3 +980,33 @@ def open_gui(addon=None, networking_instance=None, testing=False):
             log('Loading Estuary failed.')
 
     log('Exiting GUI')
+
+
+def is_vero(version=-1):
+    """
+        Checks whether this is a Vero and whether the warranty info should be shown
+    """
+
+    # generate the URL
+    with open('/proc/cmdline', 'r', encoding='utf-8') as f:
+
+        line = f.readline()
+
+    settings = line.split(' ')
+
+    for setting in settings:
+
+        if setting.startswith('osmcdev='):
+
+            if version == -1:
+                if setting.startswith('vero'):
+                    log('Hardware is Vero')
+                    return True
+            else:
+                vero_verion = 'vero' + str(version)
+                if setting == vero_verion:
+                    log('Hardware is Vero' + str(version))
+                    return True
+
+    log('Hardware not Vero')
+    return False
