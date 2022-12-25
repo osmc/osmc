@@ -61,7 +61,7 @@ deb http://security.debian.org/ $RLS-security main contrib non-free
 
 # Performing chroot operation
 chroot ${DIR} mount -t proc proc /proc
-add_apt_key_gpg "${DIR}" "http://apt.osmc.tv/osmc_repository.gpg" "osmc_repository.gpg"
+add_apt_key_gpg "${DIR}" "https://apt.osmc.tv/osmc_repository.gpg" "osmc_repository.gpg"
 echo -e "Updating sources"
 chroot ${DIR} apt-get update
 verify_action
@@ -69,7 +69,7 @@ echo -e "Installing packages"
 chroot ${DIR} apt-get -y install --no-install-recommends $CHROOT_PKGS
 verify_action
 echo -e "Adding OSMC repository"
-echo "deb http://apt.osmc.tv $RLS-devel main" >> ${DIR}/etc/apt/sources.list
+echo "deb https://apt.osmc.tv $RLS-devel main" >> ${DIR}/etc/apt/sources.list
 echo -e "Configuring ccache"
 configure_ccache "${DIR}"
 verify_action
