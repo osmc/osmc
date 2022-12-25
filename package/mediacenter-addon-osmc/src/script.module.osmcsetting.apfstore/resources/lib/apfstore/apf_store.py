@@ -236,15 +236,15 @@ class APFStore(object):
                 for setting in settings:
 
                     if setting.startswith('osmcdev='):
-                        self.url = 'http://download.osmc.tv/apps/%s' % setting[len('osmcdev='):]
+                        self.url = 'https://download.osmc.tv/apps/%s' % setting[len('osmcdev='):]
                         break
 
                 else:
                     # this is for testing only
-                    self.url = 'http://download.osmc.tv/apps/rbp2'
+                    self.url = 'https://download.osmc.tv/apps/rbp2'
 
         except:
-            self.url = 'http://download.osmc.tv/apps/rbp2'
+            self.url = 'https://download.osmc.tv/apps/rbp2'
 
         log('APF data URL: %s' % self.url)
 
