@@ -43,7 +43,7 @@ if [ "$SIGN_KERNEL" -eq 1 ]
                 if [ ! -f $SIG_FILE_AES ] || [ ! -f $SIG_FILES_AESIV ] || [ ! -f $SIG_FILE_KERNELKEY ]; then echo "Missing files needed for encrypting kernel image" && exit 1; fi
         fi
 
-pull_source "http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz" "."
+pull_source "https://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz" "."
 verify_action
 pushd buildroot-${BUILDROOT_VERSION}
 install_patch "../patches" "all"
