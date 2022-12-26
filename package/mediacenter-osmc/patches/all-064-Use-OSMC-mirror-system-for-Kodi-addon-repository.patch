@@ -1,4 +1,4 @@
-From 4c10f613779bd65f665c7e1b4990077836b2ee90 Mon Sep 17 00:00:00 2001
+From f8cf1f9795d300e8b7ce556043fc3c4b6eb92640 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 25 Jun 2016 20:45:11 +0100
 Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
@@ -11,7 +11,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/addons/repository.xbmc.org/addon.xml b/addons/repository.xbmc.org/addon.xml
-index 436d5e5c97..f8e15030d1 100644
+index 436d5e5c97..a521289272 100644
 --- a/addons/repository.xbmc.org/addon.xml
 +++ b/addons/repository.xbmc.org/addon.xml
 @@ -1,18 +1,18 @@
@@ -31,16 +31,16 @@ index 436d5e5c97..f8e15030d1 100644
 -		<datadir>https://mirrors.kodi.tv/addons/matrix</datadir>
 -		<artdir>http://mirrors.kodi.tv/addons/matrix</artdir>
 -		<hashes>sha256</hashes>
-+               <info>http://download.osmc.tv/kodi/addons/matrix/addons.xml.gz</info>
-+               <checksum verify="sha256">http://download.osmc.tv/kodi/addons/matrix/addons.xml.gz?sha256</checksum>
-+               <datadir>http://download.osmc.tv/kodi/addons/matrix</datadir>
-+               <artdir>http://download.osmc.tv/kodi/addons/matrix</artdir>
++               <info>https://download.osmc.tv/kodi/addons/matrix/addons.xml.gz</info>
++               <checksum verify="sha256">https://download.osmc.tv/kodi/addons/matrix/addons.xml.gz?sha256</checksum>
++               <datadir>https://download.osmc.tv/kodi/addons/matrix</datadir>
++               <artdir>https://download.osmc.tv/kodi/addons/matrix</artdir>
 +              <hashes>sha256</hashes>
  	</extension>
  	<extension point="xbmc.addon.metadata">
  		<summary lang="af_ZA">Installeer Byvoegsels vanaf Kodi.tv</summary>
 diff --git a/version.txt b/version.txt
-index 51ac973d53..f2e5ed308a 100644
+index 51ac973d53..0d6239d097 100644
 --- a/version.txt
 +++ b/version.txt
 @@ -7,7 +7,7 @@ VERSION_MINOR 4
@@ -48,7 +48,7 @@ index 51ac973d53..f2e5ed308a 100644
  VERSION_CODE 19.4.0
  ADDON_API 19.1.0
 -ADDON_REPOS repository.xbmc.org|https://mirrors.kodi.tv
-+ADDON_REPOS repository.xbmc.org|http://download.osmc.tv
++ADDON_REPOS repository.xbmc.org|https://download.osmc.tv
  APP_PACKAGE org.xbmc.kodi
  PACKAGE_IDENTITY XBMCFoundation.Kodi
  PACKAGE_PUBLISHER C62BD90A-CDD8-477F-96C3-B25992247B97
