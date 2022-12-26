@@ -59,6 +59,10 @@ deb https://security.debian.org/ $RLS-security main contrib non-free
 deb https://apt.osmc.tv $RLS main
 " > ${DIR}/etc/apt/sources.list
 
+# Debian minbase does not ship ca-certificates yet. Work around this
+inject_tls_patch ${DIR}
+verify_action
+
 # Performing chroot operation
 disable_init "${DIR}"
 chroot ${DIR} mount -t proc proc /proc
@@ -116,6 +120,10 @@ verify_action
 # Perform filesystem cleanup
 enable_init "${DIR}"
 cleanup_filesystem "${DIR}"
+
+# TLS cleanup
+remove_tls_patch ${DIR}
+verify_action
 
 # Remove QEMU binary
 chroot ${DIR} umount /proc
