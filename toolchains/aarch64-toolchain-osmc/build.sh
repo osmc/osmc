@@ -54,9 +54,9 @@ configure_build_env_nw "${DIR}"
 verify_action
 
 # Set up sources.list
-echo "deb http://deb.debian.org/debian $RLS main contrib non-free
-deb http://deb.debian.org/debian/ $RLS-updates main contrib non-free
-deb http://security.debian.org/ $RLS-security main contrib non-free
+echo "deb https://deb.debian.org/debian $RLS main contrib non-free
+deb https://deb.debian.org/debian/ $RLS-updates main contrib non-free
+deb https://security.debian.org/ $RLS-security main contrib non-free
 " > ${DIR}/etc/apt/sources.list
 
 # Performing chroot operation
