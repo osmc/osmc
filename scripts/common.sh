@@ -52,6 +52,18 @@ function add_apt_key_gpg()
 	verify_action
 }
 
+function inject_tls_patch()
+{
+	echo -e "Fixing TLS patch"
+	echo 'Acquire::https::Verify-Peer "false";' > ${1}/etc/apt/apt.conf.d/999-osmc-ignore-tls
+}
+
+function remove_tls_patch()
+{
+	echo -e "Removing TLS patch"
+	rm ${1}/etc/apt/apt.conf.d/999-osmc-ignore-tls
+}
+
 function emulate_arm()
 {
 	echo Copying ARM QEMU binary
@@ -256,6 +268,8 @@ export -f verify_action
 export -f configure_build_env_nw
 export -f add_apt_key
 export -f emulate_arm
+export -f inject_tls_patch
+export -f remove_tls_patch
 export -f remove_emulate_arm
 export -f update_sources
 export -f install_package
