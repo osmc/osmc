@@ -2949,10 +2949,10 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..1c43060c3e
+index 0000000000..a2766a3f21
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1324 @@
+@@ -0,0 +1,1355 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3990,6 +3990,30 @@ index 0000000000..1c43060c3e
 +	return 0;
 +}
 +
++void AMLInsecureVideoCodec::setPictureStereoMode(VideoPicture *pVideoPicture)
++{
++	pVideoPicture->stereoMode = m_hints.stereo_mode;
++
++	if (pVideoPicture->stereoMode.empty() || !m_processInfo.GetVideoSettings().m_StereoInvert) {
++		// either no stereo mode or it shouldn't be inverted
++		return;
++	}
++
++	if (pVideoPicture->stereoMode == "left_right") {
++		pVideoPicture->stereoMode = "right_left";
++	} else if (pVideoPicture->stereoMode == "right_left") {
++		pVideoPicture->stereoMode = "left_right";
++	} else if (pVideoPicture->stereoMode == "top_bottom") {
++		pVideoPicture->stereoMode = "bottom_top";
++	} else if (pVideoPicture->stereoMode == "bottom_top") {
++		pVideoPicture->stereoMode = "top_bottom";
++	} else if (pVideoPicture->stereoMode == "block_lr") {
++		pVideoPicture->stereoMode = "block_rl";
++	} else if (pVideoPicture->stereoMode == "block_rl") {
++		pVideoPicture->stereoMode = "block_lr";
++	}
++}
++
 +CDVDVideoCodec::VCReturn AMLInsecureVideoCodec::getPicture(VideoPicture *pVideoPicture)
 +{
 +	if (!m_opened) {
@@ -4016,6 +4040,8 @@ index 0000000000..1c43060c3e
 +
 +		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: %u, pts: %0.3lf, dur:%0.3lfms",
 +			m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000);
++
++		setPictureStereoMode(pVideoPicture);
 +
 +		return CDVDVideoCodec::VC_PICTURE;
 +	} else if (m_drain) {
@@ -4079,21 +4105,6 @@ index 0000000000..1c43060c3e
 +	} else {
 +		return 0;
 +	}
-+}
-+
-+void AMLInsecureVideoCodec::setMvcViewMode(const int viewMode) const
-+{
-+  // set MVC view mode:
-+  //	0 ... left
-+  //	1 ... right
-+  //	2 ... left<->right
-+  //	3 ... right<->left
-+  SysfsUtils::SetInt("/sys/module/amvdec_h264mvc/parameters/view_mode", viewMode);
-+}
-+
-+void AMLInsecureVideoCodec::setFramepackingSupport(const bool enable) const
-+{
-+  SysfsUtils::SetInt("/sys/module/amvideo/parameters/framepacking_support", enable ? 1 : 0);
 +}
 +
 +void AMLInsecureVideoCodec::setFramepackingResolution(const int width, const int height, const int blanking) const
@@ -4197,7 +4208,7 @@ index 0000000000..1c43060c3e
 +
 +	if (m_guiStereoMode == RENDER_STEREO_MODE_MONO) {
 +		std::string videoStereoMode = m_processInfo.GetVideoStereoMode();
-+		if (videoStereoMode == "left_right" || videoStereoMode == "righ_left")
++		if (videoStereoMode == "left_right" || videoStereoMode == "right_left")
 +			dst_rect.x2 *= 2.0;
 +		else if (videoStereoMode == "top_bottom" || videoStereoMode == "bottom_top")
 +			dst_rect.y2 *= 2.0;
@@ -4213,32 +4224,7 @@ index 0000000000..1c43060c3e
 +		setFramepackingResolution(info.iWidth, info.iHeight, info.iBlanking);
 +	}
 +
-+	bool isMvc = videoStereoMode == "block_lr" || videoStereoMode == "block_rl";
-+
-+	if (isMvc) {
-+		int view_mode = videoStereoMode == "block_lr" ? 3 : 2;
-+
-+		if (m_guiStereoMode == RENDER_STEREO_MODE_HARDWAREBASED) {
-+			setFramepackingSupport(true);
-+			m_libamcodec->set3dVideoMode(VIDEO_MODE_3D_MVC_FP);
-+			setMvcViewMode(view_mode);
-+		} else if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL) {
-+			setFramepackingSupport(false);
-+			m_libamcodec->set3dVideoMode(VIDEO_MODE_3D_MVC_SBS);
-+			setMvcViewMode(view_mode);
-+		} else if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL) {
-+			setFramepackingSupport(false);
-+			m_libamcodec->set3dVideoMode(VIDEO_MODE_3D_MVC_HTAB);
-+			setMvcViewMode(view_mode);
-+		} else if (m_guiStereoMode == RENDER_STEREO_MODE_MONO || m_guiStereoMode == RENDER_STEREO_MODE_OFF) {
-+			setFramepackingSupport(false);
-+			m_libamcodec->set3dVideoMode(VIDEO_MODE_3D_MVC_MONO);
-+			setMvcViewMode(videoStereoMode == "block_lr" ? 0 : 1);
-+		}
-+	} else {
-+		setFramepackingSupport(false);
-+		m_libamcodec->set3dVideoMode(VIDEO_MODE_3D_MVC_MONO);
-+	}
++	setVideoMode(videoStereoMode, m_guiStereoMode);
 +
 +	std::string s_dst_rect = StringUtils::Format("%i,%i,%i,%i", (int) dst_rect.x1, (int) dst_rect.y1, (int) dst_rect.Width(), (int) dst_rect.Height());
 +	std::string s_m_dst_rect = StringUtils::Format("%i,%i,%i,%i", (int) m_dst_rect.x1, (int) m_dst_rect.y1, (int) m_dst_rect.Width(),
@@ -4273,16 +4259,61 @@ index 0000000000..1c43060c3e
 +	showMainVideo(true);
 +}
 +
++void AMLInsecureVideoCodec::setVideoMode(std::string videoInputMode, RENDER_STEREO_MODE videoOutputMode)
++{
++	video_input_mode vimode = VIDEO_INPUT_MODE_2D;
++	video_output_mode vomode = VIDEO_OUTPUT_MODE_2D;
++	bool leftEyeFirst = true;
++
++	if (videoInputMode == "left_right") {
++		vimode = VIDEO_INPUT_MODE_HSBS;
++	} else if (videoInputMode == "right_left") {
++		vimode = VIDEO_INPUT_MODE_HSBS;
++		leftEyeFirst = false;
++	} else if (videoInputMode == "top_bottom") {
++		vimode = VIDEO_INPUT_MODE_HTAB;
++	} else if (videoInputMode == "bottom_top") {
++		vimode = VIDEO_INPUT_MODE_HTAB;
++		leftEyeFirst = false;
++	} else if (videoInputMode == "block_lr") {
++		vimode = VIDEO_INPUT_MODE_MVC;
++	} else if (videoInputMode == "block_rl") {
++		vimode = VIDEO_INPUT_MODE_MVC;
++		leftEyeFirst = false;
++	}
++
++	if (vimode != VIDEO_INPUT_MODE_2D) {
++		switch (videoOutputMode) {
++			case RENDER_STEREO_MODE_SPLIT_VERTICAL:
++				vomode = VIDEO_OUTPUT_MODE_HSBS;
++				break;
++
++			case RENDER_STEREO_MODE_SPLIT_HORIZONTAL:
++				vomode = VIDEO_OUTPUT_MODE_HTAB;
++				break;
++
++			case RENDER_STEREO_MODE_HARDWAREBASED:
++				vomode = VIDEO_OUTPUT_MODE_FP;
++				break;
++
++			default:
++				break;
++		}
++	}
++
++	m_libamcodec->setVideoMode(vimode, vomode, leftEyeFirst);
++}
++
 +double AMLInsecureVideoCodec::getAspectRatio() const
 +{
 +	return m_opened ? m_hints.aspect : 0;
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..c64089529d
+index 0000000000..8981269775
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
-@@ -0,0 +1,151 @@
+@@ -0,0 +1,152 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4330,8 +4361,6 @@ index 0000000000..c64089529d
 +	void setVideoBrightness(const int brightness) const;
 +
 +	void setFramepackingResolution(const int width, const int height, const int blanking) const;
-+	void setFramepackingSupport(const bool enable) const;
-+	void setMvcViewMode(const int viewMode) const;
 +
 +	int getVideoContrast() const;
 +	int getVideoBrightness() const;
@@ -4408,6 +4437,9 @@ index 0000000000..c64089529d
 +	virtual void playbackPause();
 +	virtual void playbackResume();
 +	virtual void playbackResume(int speed);
++
++	virtual void setVideoMode(std::string videoInputMode, RENDER_STEREO_MODE videoOutputMode);
++	virtual void setPictureStereoMode(VideoPicture *pVideoPicture);
 +
 +public:
 +	AMLInsecureVideoCodec(CProcessInfo &processInfo);
@@ -4757,10 +4789,10 @@ index 0000000000..0c7740448b
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
-index 0000000000..8cb5d3b6d8
+index 0000000000..104cc2f66d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
-@@ -0,0 +1,259 @@
+@@ -0,0 +1,251 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4941,14 +4973,6 @@ index 0000000000..8cb5d3b6d8
 +
 +	if (m_isMvc && ret == CDVDVideoCodec::VC_PICTURE) {
 +		pVideoPicture->m_3dSubtitleDepth = m_secureOSMC->getMvcSubtitleDepth(pVideoPicture->pts/DVD_TIME_BASE);
-+
-+		pVideoPicture->stereoMode = m_hints.stereo_mode;
-+
-+		if (pVideoPicture->stereoMode == "block_lr" && m_processInfo.GetVideoSettings().m_StereoInvert) {
-+			pVideoPicture->stereoMode = "block_rl";
-+		} else if (pVideoPicture->stereoMode == "block_rl" && m_processInfo.GetVideoSettings().m_StereoInvert) {
-+			pVideoPicture->stereoMode = "block_lr";
-+		}
 +	}
 +
 +	return ret;
@@ -5269,10 +5293,10 @@ index 0000000000..5c8655bd15
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
 new file mode 100644
-index 0000000000..9fe5b43f46
+index 0000000000..ce0113740e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
-@@ -0,0 +1,296 @@
+@@ -0,0 +1,304 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5327,6 +5351,7 @@ index 0000000000..9fe5b43f46
 +
 +  virtual void codec_set_log_callback(void (*logf)(const char *, ...))=0;
 +  virtual int codec_set_3d_video_mode(codec_para_t *pcodec, video_mode_3d_t mode)=0;
++  virtual int codec_set_video_mode(codec_para_t *pcodec, video_input_mode vimode, video_output_mode vomode, int left_eye_first)=0;
 +  virtual int codec_set_hdr10p_metadata(codec_para_t *pcodec, void *metadata, int metadata_size)=0;
 +};
 +
@@ -5358,8 +5383,9 @@ index 0000000000..9fe5b43f46
 +  DEFINE_METHOD2(int, codec_get_video_delay_limited_ms, (codec_para_t *p1, int *p2))
 +  DEFINE_METHOD2(int, codec_get_video_cur_delay_ms, (codec_para_t *p1, int *p2))
 +
-+  DEFINE_METHOD_FP(void, codec_set_log_callback,   (void (*)(const char *, ...)))
-+  DEFINE_METHOD2(int, codec_set_3d_video_mode, (codec_para_t *p1, video_mode_3d_t p2))
++  DEFINE_METHOD_FP(void, codec_set_log_callback, (void (*)(const char *, ...)))
++  DEFINE_METHOD2(int, codec_set_3d_video_mode,   (codec_para_t *p1, video_mode_3d_t p2))
++  DEFINE_METHOD4(int, codec_set_video_mode,      (codec_para_t *p1, video_input_mode p2, video_output_mode p3, int p4))
 +  DEFINE_METHOD3(int, codec_set_hdr10p_metadata, (codec_para_t *p1, void *p2, int p3))
 +
 +  BEGIN_METHOD_RESOLVE()
@@ -5389,6 +5415,7 @@ index 0000000000..9fe5b43f46
 +
 +    RESOLVE_METHOD_OPTIONAL_FP(codec_set_log_callback)
 +    RESOLVE_METHOD(codec_set_3d_video_mode)
++    RESOLVE_METHOD(codec_set_video_mode)
 +    RESOLVE_METHOD(codec_set_hdr10p_metadata)
 +  END_METHOD_RESOLVE()
 +
@@ -5531,6 +5558,11 @@ index 0000000000..9fe5b43f46
 +	return m_dll->codec_set_3d_video_mode(m_codec, mode);
 +}
 +
++int LibAmcodec::setVideoMode(video_input_mode vimode, video_output_mode vomode, bool leftEyeFirst)
++{
++	return m_dll->codec_set_video_mode(m_codec, vimode, vomode, leftEyeFirst ? 1 : 0);
++}
++
 +int LibAmcodec::setHdr10pMetadata(unsigned char *metadata, int metadata_length)
 +{
 +	return m_dll->codec_set_hdr10p_metadata(m_codec, metadata, metadata_length);
@@ -5571,10 +5603,10 @@ index 0000000000..9fe5b43f46
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
 new file mode 100644
-index 0000000000..171947cd2c
+index 0000000000..d7d36411a1
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,99 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5599,6 +5631,22 @@ index 0000000000..171947cd2c
 +	VIDEO_MODE_3D_MVC_HTAB = 3,
 +	VIDEO_MODE_3D_MVC_MONO = 4
 +} video_mode_3d_t;
++
++typedef enum {
++	VIDEO_INPUT_MODE_2D = 1,
++	VIDEO_INPUT_MODE_HSBS = 2,
++	VIDEO_INPUT_MODE_HTAB = 3,
++	VIDEO_INPUT_MODE_FSBS = 4,
++	VIDEO_INPUT_MODE_FTAB = 5,
++	VIDEO_INPUT_MODE_MVC = 6
++} video_input_mode;
++
++typedef enum {
++	VIDEO_OUTPUT_MODE_2D = 1,
++	VIDEO_OUTPUT_MODE_HSBS = 2,
++	VIDEO_OUTPUT_MODE_HTAB = 3,
++	VIDEO_OUTPUT_MODE_FP = 4
++} video_output_mode;
 +
 +typedef struct {
 +	bool noblock;
@@ -5653,6 +5701,7 @@ index 0000000000..171947cd2c
 +	int setControlSyncThreshold(unsigned int threshold);
 +	int setVideoDelayLimitedMs(int delay);
 +	int set3dVideoMode(video_mode_3d_t mode);
++	int setVideoMode(video_input_mode vimode, video_output_mode vomode, bool leftEyeFirst);
 +	int setHdr10pMetadata(unsigned char *metadata, int metadata_length);
 +	void setNoBlockMode(bool noblock);
 +	void setStreamType(stream_type_t type);
