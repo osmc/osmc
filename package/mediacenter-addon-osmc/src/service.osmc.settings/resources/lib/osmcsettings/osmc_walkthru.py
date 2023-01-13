@@ -940,7 +940,7 @@ def open_gui(addon=None, networking_instance=None, testing=False):
 
         first_run = False
 
-        if is_vero(3):
+        if is_vero():
             xbmcgui.Dialog().ok(translate(32081), translate(32082))  # remote pairing dialog before walkthru
 
         try:
@@ -997,14 +997,14 @@ def is_vero(version=-1):
     for setting in settings:
 
         if setting.startswith('osmcdev='):
-
+            omscdev = setting.strip().split('=')[1]
             if version == -1:
-                if setting.startswith('vero'):
+                if omscdev.startswith('vero'):
                     log('Hardware is Vero')
                     return True
             else:
                 vero_verion = 'vero' + str(version)
-                if setting == vero_verion:
+                if omscdev == vero_verion:
                     log('Hardware is Vero' + str(version))
                     return True
 
