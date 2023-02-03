@@ -228,9 +228,9 @@ then
                 $BUILD vero3plus_2g_16g.dtb || $BUILD vero3plus_2g_16g.dtb
 		mkdir -p ../../files-image/boot #hack
                 # Special packaging for Android
-		./scripts/multidtb/multidtb -p scripts/dtc/ -o multi.dtb arch/arm64/boot/dts/amlogic --verbose --page-size 2048
-		if [ $? != 0 ]; then echo "Packing DTB failed"; fi
 		DTB_FILE="multi.dtb"
+		./scripts/multidtb/multidtb -p scripts/dtc/ -o $DTB_FILE arch/arm64/boot/dts/amlogic --verbose --page-size 2048
+		if [ $? != 0 ]; then echo "Packing DTB failed"; fi
 		if [ "$SIGN_KERNEL" -eq 1 ]
 		then
 			DTB_FILE="multi.dtb.encrypted"
