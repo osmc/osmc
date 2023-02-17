@@ -7820,10 +7820,10 @@ index 0000000000..59d1cd1c3a
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h
 new file mode 100644
-index 0000000000..38028fc153
+index 0000000000..77ddc0ea3e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,61 @@
 +#pragma once
 +
 +/*
@@ -7871,6 +7871,7 @@ index 0000000000..38028fc153
 +  virtual std::string GetFileName();
 +
 +  void SetStartTime(int64_t start_time) { m_start_time = start_time; }
++  int64_t GetStartTime() const { return m_start_time; }
 +
 +  AVStream* GetAVStream();
 +  CDVDInputStream*    m_pInput;
@@ -7882,7 +7883,7 @@ index 0000000000..38028fc153
 +  AVIOContext        *m_ioContext = nullptr;
 +  AVFormatContext    *m_pFormatContext = nullptr;
 +  int                 m_nStreamIndex = -1;
-+  int64_t			  m_start_time;
++  int64_t			  m_start_time = 0;
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp
 new file mode 100644
@@ -8206,7 +8207,7 @@ index 64e0c56596..ed3111d1dc 100644
    {
      NEXTSTREAM_NONE,
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index 52ab473abb..fb060005cf 100644
+index 52ab473abb..470eafc510 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -10,6 +10,8 @@
@@ -8391,7 +8392,7 @@ index 52ab473abb..fb060005cf 100644
    return true;
  }
  
-@@ -1172,6 +1213,131 @@ bool CDVDInputStreamBluray::HasMenu()
+@@ -1172,6 +1213,151 @@ bool CDVDInputStreamBluray::HasMenu()
    return m_navmode;
  }
  
@@ -8454,8 +8455,28 @@ index 52ab473abb..fb060005cf 100644
 +  int clip = m_clipQueue.front();
 +  m_clipQueue.pop();
 +
++  CDemuxMVC *pMVCDemux = dynamic_cast<CDemuxMVC*>(m_pMVCDemux);
++  if (!pMVCDemux) {
++    // either it's not a CDemuxMVC or it's 2D playback
++    CloseMVCDemux();
++    return OpenMVCDemux(clip);
++  }
++
++  // save start time for the next clip
++  int64_t start_time = pMVCDemux->GetStartTime();
++
 +  CloseMVCDemux();
-+  return OpenMVCDemux(clip);
++
++  bool res = OpenMVCDemux(clip);
++  if (res) {
++    CDemuxMVC *nextDemux = dynamic_cast<CDemuxMVC*>(m_pMVCDemux);
++    if (nextDemux) {
++      // set start time for next clip
++      nextDemux->SetStartTime(start_time);
++    }
++  }
++
++  return res;
 +}
 +
 +bool CDVDInputStreamBluray::OpenMVCDemux(int playItem)
