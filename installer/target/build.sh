@@ -37,10 +37,8 @@ SIGN_KERNEL=0
 
 if [ "$SIGN_KERNEL" -eq 1 ]
         then
-                SIG_FILE_AES="/etc/osmc/kernelaes"
-                SIG_FILE_AESIV="/etc/osmc/kernelaesiv"
-                SIG_FILE_KERNELKEY="/etc/osmc/kernelkey.pem"
-                if [ ! -f $SIG_FILE_AES ] || [ ! -f $SIG_FILES_AESIV ] || [ ! -f $SIG_FILE_KERNELKEY ]; then echo "Missing files needed for encrypting kernel image" && exit 1; fi
+		SIG_KEYS_DIR="/etc/osmc/keys"
+		if [ ! -d $SIG_KEYS_DIR ]; then echo "Missing files needed for encrypting kernel image" && exit 1; fi
         fi
 
 pull_source "https://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz" "."
@@ -118,18 +116,21 @@ fi
 if [ "$1" == "vero3" ]
 then
 	echo -e "Installing Vero 3 files"
-	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/multidtb/multidtb -o multi.dtb --dtc-path $(pwd)/../../output/build/linux-osmc-openlinux-4.9/scripts/dtc/ $(pwd)/../../output/build/linux-osmc-openlinux-4.9/arch/arm64/boot/dts/amlogic --verbose --page-size 2048
 	DTB_FILE="multi.dtb"
+	KERNEL_FILE="kernel.img"
+	../.././output/build/linux-osmc-openlinux-4.9/scripts/multidtb/multidtb -o $DTB_FILE --dtc-path $(pwd)/../../output/build/linux-osmc-openlinux-4.9/scripts/dtc/ $(pwd)/../../output/build/linux-osmc-openlinux-4.9/arch/arm64/boot/dts/amlogic --verbose --page-size 2048
         if [ "$SIGN_KERNEL" -eq 1 ]
         then
             DTB_FILE="multi.dtb.encrypted"
-	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/amlogic/stool/sign.sh --sign-kernel -i multi.dtb -k $SIG_FILE_KERNELKEY -a $SIG_FILE_AES --iv $SIG_FILE_AESIV -o multi.dtb.encrypted || true
+	    KERNEL_FILE="kernel.img.encrypted"
             ../.././output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
-            ../.././output/build/linux-osmc-openlinux-4.9/scripts/amlogic/stool/sign.sh --sign-kernel -i kernel.img -k $SIG_FILE_KERNELKEY -a $SIG_FILE_AES --iv $SIG_FILE_AESIV -o /mnt/kernel.img || true
+	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input multi.dtb --output multi.dtb.encrypted
+	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input kernel.img --output kernel.img.encrypted
 	else
-            ../../output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output /mnt/kernel.img
+            ../../output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
 	fi
 	cp $DTB_FILE /mnt/dtb.img
+	cp $KERNEL_FILE /mnt/kernel.img
 fi
 echo -e "Installing filesystem"
 mv $(pwd)/../../../filesystem.tar.xz /mnt/
