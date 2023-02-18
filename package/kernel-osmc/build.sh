@@ -26,7 +26,7 @@ fi
 . ../common.sh
 test $1 == rbp2 && VERSION="5.15.83" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == rbp464 && VERSION="5.15.83" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == vero364 && VERSION="4.9.269" && REV="23" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == vero364 && VERSION="4.9.269" && REV="24" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -91,12 +91,10 @@ then
 	    handle_dep "xxd"
         fi
 	if [ "$SIGN_KERNEL" -eq 1 ]
-	then
-		SIG_FILE_AES="/etc/osmc/kernelaes"
-		SIG_FILE_AESIV="/etc/osmc/kernelaesiv"
-		SIG_FILE_KERNELKEY="/etc/osmc/kernelkey.pem"
-		if [ ! -f $SIG_FILE_AES ] || [ ! -f $SIG_FILES_AESIV ] || [ ! -f $SIG_FILE_KERNELKEY ]; then echo "Missing files needed for encrypting kernel image" && exit 1; fi
-	fi
+        	then
+                	SIG_KEYS_DIR="/etc/osmc/keys"
+                	if [ ! -d $SIG_KEYS_DIR ]; then echo "Missing files needed for encrypting kernel image" && exit 1; fi
+        fi
 	JOBS=$(if [ ! -f /proc/cpuinfo ]; then mount -t proc proc /proc; fi; cat /proc/cpuinfo | grep processor | wc -l && umount /proc/ >/dev/null 2>&1)
 	pushd src/*linux*
         # Add out of tree modules that lack a proper Kconfig and Makefile
@@ -234,12 +232,12 @@ then
 		if [ "$SIGN_KERNEL" -eq 1 ]
 		then
 			DTB_FILE="multi.dtb.encrypted"
-			scripts/amlogic/stool/sign.sh --sign-kernel -i multi.dtb -k $SIG_FILE_KERNELKEY -a $SIG_FILE_AES --iv $SIG_FILE_AESIV -o multi.dtb.encrypted || true
-			if [ $? != 0 ]; then echo "Signing Device Tree failed" && exit 1; fi
 			scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output kernel.img
 			if [ $? != 0 ]; then echo "Creating boot image failed in secure mode" && exit 1; fi
-			scripts/amlogic/stool/sign.sh --sign-kernel -i kernel.img -k $SIG_FILE_KERNELKEY -a $SIG_FILE_AES --iv $SIG_FILE_AESIV -o ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img || true
-			if [ $? != 0 ]; then echo "Signing kernel image failed" && exit 1; fi
+			scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input multi.dtb --output $DTB_FILE
+			if [ $? != 0 ]; then echo "Signing DTB image failed" && exit 1; fi
+			scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input kernel.img --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
+			if [ $? != 0]; then echo "Signing kernel image failed" && exit 1; fi
 		else
 			scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
 			if [ $? != 0 ]; then echo "Creating boot image failed in non-secure mode" && exit 1; fi
