@@ -90,7 +90,7 @@ then
 	kpartx -s -a OSMC_TGT_${1}_${date}.img
 	/sbin/partprobe
 	mkfs.vfat -F32 /dev/mapper/loop0p1
-	fatlabel /dev/mapper/loop*p1 OSMCInstall
+	fatlabel /dev/mapper/loop0p1 OSMCInstall
 	mount /dev/mapper/loop0p1 /mnt
 fi
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
