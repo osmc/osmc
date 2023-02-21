@@ -1025,6 +1025,13 @@ class Main(object):
                     self.progress_dialog.update(percent=pct, message=lang(32010))
 
                     if not key:
+                        match = re.search(r'.*?413\sRequest\sEntity\sToo\sLarge.*?', response)
+                        if match:
+                            if xbmc:
+                                xbmcgui.Dialog().notification(lang(32001), lang(32012), ADDON.getAddonInfo('icon'))
+                                break
+                            else:
+                                raise Exception('Log file too large for upload')
                         # the upload returning an empty string is considered a specific Exception
                         # every other exception is caught and will be printed as well
                         # but only for the second (fallback) attempt
