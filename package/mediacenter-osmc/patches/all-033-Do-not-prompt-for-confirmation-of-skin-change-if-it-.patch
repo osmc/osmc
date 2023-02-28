@@ -1,4 +1,4 @@
-From 051869b0ca74c645c650acd34b08ce44d313f5b8 Mon Sep 17 00:00:00 2001
+From 5eb1d08aa3a5681407094b83a7cbfdf77f7b94b1 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:48:19 +0100
 Subject: [PATCH] Do not prompt for confirmation of skin change if it has been
@@ -6,26 +6,36 @@ Subject: [PATCH] Do not prompt for confirmation of skin change if it has been
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ xbmc/application/ApplicationSkinHandling.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 3b3fe9c..e914de9 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -1410,8 +1410,11 @@ void CApplication::OnSettingChanged(const CSetting *setting)
+diff --git a/xbmc/application/ApplicationSkinHandling.cpp b/xbmc/application/ApplicationSkinHandling.cpp
+index edca76b962..4a28f2b946 100644
+--- a/xbmc/application/ApplicationSkinHandling.cpp
++++ b/xbmc/application/ApplicationSkinHandling.cpp
+@@ -44,6 +44,7 @@
+ #include "utils/XBMCTinyXML.h"
+ #include "utils/log.h"
+ #include "video/dialogs/GUIDialogFullScreenInfo.h"
++#include "Application.h"
+ 
+ using namespace KODI::MESSAGING;
+ 
+@@ -491,8 +492,13 @@ bool CApplicationSkinHandling::OnSettingChanged(const CSetting& setting)
      {
        // now we can finally reload skins
        std::string builtin("ReloadSkin");
 -      if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && m_confirmSkinChange)
-+      if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && m_confirmSkinChange && m_eOSMCWalkthroughState != OSMC_WALKTHROUGH_ISRUNNING)
++      if (settingId == CSettings::SETTING_LOOKANDFEEL_SKIN && m_confirmSkinChange && g_application.m_eOSMCWalkthroughState != g_application.OSMC_WALKTHROUGH_ISRUNNING)
          builtin += "(confirm)";
-+     // We need to set ISDONE first so reloading is allowed
-+     if (m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_ISRUNNING)
-+        m_eOSMCWalkthroughState = OSMC_WALKTHROUGH_ISDONE;
-       CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, builtin);
++
++     // Always make sure ISDONE is set or our changes won't progress. We hit this point if the user has selected a different skin in the OSMC setup wizard.
++     if (g_application.m_eOSMCWalkthroughState == g_application.OSMC_WALKTHROUGH_ISRUNNING)
++        g_application.SetOSMCWalkthroughState(g_application.OSMC_WALKTHROUGH_ISDONE);
++
+       CServiceBroker::GetAppMessenger()->PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, builtin);
      }
    }
 -- 
-2.7.4
+2.25.1
 

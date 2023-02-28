@@ -1,8 +1,19 @@
+From 8571d5d41ab778706afb24c0270e6803ef186b95 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 28 Feb 2023 21:03:39 +0000
+Subject: [PATCH] Support mixing LFE channel
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml                         | 12 ++++++++++++
+ .../Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp      |  9 +++++++++
+ 2 files changed, 21 insertions(+)
+
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index a20f33a1a0..fdcaa0de18 100755
+index 912ba411a5..4d7731df1e 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2756,6 +2756,18 @@
+@@ -2959,6 +2959,18 @@
            </dependencies>
            <control type="toggle" />
          </setting>
@@ -48,3 +59,6 @@ index bfef837114..0badf8b065 100644
    if(quality == AE_QUALITY_HIGH)
    {
      av_opt_set_double(m_pContext, "cutoff", 1.0, 0);
+-- 
+2.25.1
+

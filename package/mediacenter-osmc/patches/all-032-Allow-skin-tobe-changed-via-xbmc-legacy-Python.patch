@@ -1,4 +1,4 @@
-From 644a970bc0d954b2cdcd2909faec4ff164c71cb2 Mon Sep 17 00:00:00 2001
+From e18ce70c7e7350ba9dc420248f36a82b29e6d7a8 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 25 Aug 2015 12:41:13 +0100
 Subject: [PATCH] Allow skin to be changed via xbmc() legacy Python interface
@@ -10,11 +10,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 36 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index eaa9af2809..37069f580d 100644
+index dc1e0194f8..3d9732f1b4 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -120,6 +120,14 @@ namespace XBMCAddon
-       CApplicationMessenger::GetInstance().SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
+@@ -127,6 +127,14 @@ namespace XBMCAddon
+       CServiceBroker::GetAppMessenger()->SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
      }
  
 +    void setskin(const char* skin)
@@ -29,10 +29,10 @@ index eaa9af2809..37069f580d 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index b9b021b53c..7ef062d11e 100644
+index d2df827343..8504db3fdf 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -202,6 +202,34 @@ namespace XBMCAddon
+@@ -205,6 +205,34 @@ namespace XBMCAddon
      String executeJSONRPC(const char* jsonrpccommand);
  #endif
  

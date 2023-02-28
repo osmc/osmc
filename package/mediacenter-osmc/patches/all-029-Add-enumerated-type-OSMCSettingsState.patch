@@ -1,29 +1,29 @@
-From 5372f9f95dd9481b6bbff7fb0104d1883db9b22f Mon Sep 17 00:00:00 2001
+From 5daee67ba49c36cc77ccc26fe7d5b1eb490b8376 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 17:18:13 +0100
 Subject: [PATCH] Add enumerated type OSMCSettingsState
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp |  7 +++++++
- xbmc/Application.h   | 12 ++++++++++++
+ xbmc/application/Application.cpp |  7 +++++++
+ xbmc/application/Application.h   | 12 ++++++++++++
  2 files changed, 19 insertions(+)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 606fe0edf7..4f5e75c689 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -228,6 +228,7 @@ CApplication::CApplication(void)
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 027b6260ef..53c899f0fc 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -227,6 +227,7 @@ CApplication::CApplication(void)
+     m_Autorun(new CAutorun()),
  #endif
-   m_itemCurrentFile(new CFileItem)
-   , m_pInertialScrollingHandler(new CInertialScrollingHandler())
-+  , m_eOSMCWalkthroughState(OSMC_WALKTHROUGH_NOTRUNNING)
-   , m_WaitingExternalCalls(0)
-   , m_playerEvent(true, true)
+     m_pInertialScrollingHandler(new CInertialScrollingHandler()),
++    m_eOSMCWalkthroughState(OSMC_WALKTHROUGH_NOTRUNNING),
+     m_WaitingExternalCalls(0)
  {
-@@ -2733,6 +2734,12 @@ void CApplication::Stop(int exitCode)
-   KODI::TIME::Sleep(200);
- }
+   TiXmlBase::SetCondenseWhiteSpace(false);
+@@ -2217,6 +2218,12 @@ private:
+ };
+ } // namespace
  
 +void CApplication::SetOSMCWalkthroughState(OSMCWalkthroughState state)
 +{
@@ -31,17 +31,17 @@ index 606fe0edf7..4f5e75c689 100644
 + CServiceBroker::GetRepositoryUpdater().ScheduleUpdate();
 +}
 +
- bool CApplication::PlayMedia(CFileItem& item, const std::string &player, int iPlaylist)
+ bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)
  {
-   // If item is a plugin, expand out
-diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 774e56a57f..fbbbf2ed8f 100644
---- a/xbmc/Application.h
-+++ b/xbmc/Application.h
-@@ -157,6 +157,18 @@ public:
+   // if the item is a plugin we need to resolve the plugin paths
+diff --git a/xbmc/application/Application.h b/xbmc/application/Application.h
+index 45df227ac5..8a2a39751a 100644
+--- a/xbmc/application/Application.h
++++ b/xbmc/application/Application.h
+@@ -114,6 +114,18 @@ public:
+   bool InitWindow(RESOLUTION res = RES_INVALID);
  
-   bool IsCurrentThread() const;
-   void Stop(int exitCode);
+   bool Stop(int exitCode);
 +
 +  // osmc signals
 +
@@ -54,9 +54,9 @@ index 774e56a57f..fbbbf2ed8f 100644
 +  OSMCWalkthroughState m_eOSMCWalkthroughState;
 +  void SetOSMCWalkthroughState(OSMCWalkthroughState state);
 +
-   void UnloadSkin();
-   bool LoadCustomWindows();
-   void ReloadSkin(bool confirm = false);
+   const std::string& CurrentFile();
+   CFileItem& CurrentFileItem();
+   std::shared_ptr<CFileItem> CurrentFileItemPtr();
 -- 
 2.25.1
 

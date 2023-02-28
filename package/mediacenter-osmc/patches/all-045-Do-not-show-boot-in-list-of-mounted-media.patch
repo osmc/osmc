@@ -1,4 +1,4 @@
-From 27d46b96da5787c663b718dc8a40edec0800df3e Mon Sep 17 00:00:00 2001
+From ed7e822b60b4551853cba2766d75e8d716a5f191 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 1 Oct 2015 16:18:06 +0100
 Subject: [PATCH] Do not show /boot in the list of mounted media
@@ -8,11 +8,11 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  xbmc/platform/linux/storage/UDevProvider.cpp | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/xbmc/platform/linux/storge/UDevProvider.cpp b/xbmc/platform/linux/storage/UDevProvider.cpp
-index ff0763c..e7bbc33 100644
+diff --git a/xbmc/platform/linux/storage/UDevProvider.cpp b/xbmc/platform/linux/storage/UDevProvider.cpp
+index 1156304226..2d94c39daa 100644
 --- a/xbmc/platform/linux/storage/UDevProvider.cpp
 +++ b/xbmc/platform/linux/storage/UDevProvider.cpp
-@@ -145,6 +145,13 @@ void CUDevProvider::GetDisks(VECSOURCES& disks, bool removable)
+@@ -140,6 +140,13 @@ void CUDevProvider::GetDisks(VECSOURCES& disks, bool removable)
        continue;
      }
  
@@ -27,5 +27,5 @@ index ff0763c..e7bbc33 100644
      if (strstr(mountpoint, "/tmp"))
      {
 -- 
-2.1.0
+2.25.1
 

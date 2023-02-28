@@ -1,4 +1,4 @@
-From f9cba9882a63f2f3b3b0e7223a0c43c7fd897006 Mon Sep 17 00:00:00 2001
+From f0e74c06cfd617d88f2923d5c54536116523f9f8 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -11,28 +11,15 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp                  |  1 +
  xbmc/guilib/guiinfo/SystemGUIInfo.cpp | 10 ++++++++--
- xbmc/network/NetworkServices.cpp      | 20 +++++++++++++++++++-
- 3 files changed, 28 insertions(+), 3 deletions(-)
+ xbmc/network/NetworkServices.cpp      | 18 ++++++++++++++++++
+ 2 files changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 6cd4eb9650..fc48c47264 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -505,6 +505,7 @@ bool CApplication::Create(const CAppParamParser &params)
-     return false;
- 
-   CLog::Log(LOGINFO, "creating subdirectories");
-+  CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
-   const std::shared_ptr<CProfileManager> profileManager = m_pSettingsComponent->GetProfileManager();
-   const std::shared_ptr<CSettings> settings = m_pSettingsComponent->GetSettings();
-   CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(profileManager->GetProfileUserDataFolder()).c_str());
 diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-index a310281956..8793bc4755 100644
+index bc01047b3b..14f41b17f6 100644
 --- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 +++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-@@ -138,6 +138,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
+@@ -143,6 +143,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
  
  bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int contextWindow, const CGUIInfo &info, std::string *fallback) const
  {
@@ -40,7 +27,7 @@ index a310281956..8793bc4755 100644
    switch (info.m_info)
    {
      ///////////////////////////////////////////////////////////////////////////////////////////////
-@@ -283,8 +284,13 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+@@ -303,8 +304,13 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
        value = g_langInfo.GetTemperatureUnitString();
        return true;
      case SYSTEM_FRIENDLY_NAME:
@@ -57,21 +44,19 @@ index a310281956..8793bc4755 100644
      {
        int iStereoMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE);
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index eb519eaac6..db39eff4f9 100644
+index 40094335b9..c449de6947 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
-@@ -132,7 +132,8 @@ CNetworkServices::CNetworkServices()
-     CSettings::SETTING_SMB_WORKGROUP,
-     CSettings::SETTING_SMB_MINPROTOCOL,
-     CSettings::SETTING_SMB_MAXPROTOCOL,
--    CSettings::SETTING_SMB_LEGACYSECURITY
-+    CSettings::SETTING_SMB_LEGACYSECURITY,
-+    CSettings::SETTING_SERVICES_DEVICENAME
+@@ -144,6 +144,7 @@ CNetworkServices::CNetworkServices()
+       CSettings::SETTING_SMB_MAXPROTOCOL,
+       CSettings::SETTING_SMB_LEGACYSECURITY,
+       CSettings::SETTING_SERVICES_WSDISCOVERY,
++      CSettings::SETTING_SERVICES_DEVICENAME,
    };
    m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
    m_settings->GetSettingsManager()->RegisterCallback(this, settingSet);
-@@ -490,6 +491,23 @@ void CNetworkServices::OnSettingChanged(const std::shared_ptr<const CSetting>& s
-       CApplicationMessenger::GetInstance().PostMsg(TMSG_RESTARTAPP);
+@@ -515,6 +516,23 @@ void CNetworkServices::OnSettingChanged(const std::shared_ptr<const CSetting>& s
+       CServiceBroker::GetAppMessenger()->PostMsg(TMSG_RESTARTAPP);
      }
    }
 +

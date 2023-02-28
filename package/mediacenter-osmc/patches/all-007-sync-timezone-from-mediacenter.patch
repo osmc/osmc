@@ -1,4 +1,4 @@
-From 8ef869097b31e8f2dbb28e8f5462e347744fa574 Mon Sep 17 00:00:00 2001
+From 29a99b97d6eb870b4a7a6352e13b89e3a1abd1ab Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:05:25 +0100
 Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
@@ -6,14 +6,14 @@ Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/platform/linux/LinuxTimezone.cpp | 17 +++++++++++++++++
+ xbmc/platform/posix/PosixTimezone.cpp | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
-diff --git a/xbmc/platform/posix/PosixTimezone.cpp b/xbmc/platform/poxis/PosixTimezone.cpp
-index 37130d8..2c1fe1c 100644
+diff --git a/xbmc/platform/posix/PosixTimezone.cpp b/xbmc/platform/posix/PosixTimezone.cpp
+index 6f276a37b2..50f00acebb 100644
 --- a/xbmc/platform/posix/PosixTimezone.cpp
 +++ b/xbmc/platform/posix/PosixTimezone.cpp
-@@ -214,6 +214,23 @@ void CLinuxTimezone::SetTimezone(std::string timezoneName)
+@@ -193,6 +193,23 @@ void CPosixTimezone::SetTimezone(const std::string& timezoneName)
      sprintf(env_var, "TZ=:%s", timezoneName.c_str());
      putenv(env_var);
      tzset();
@@ -38,5 +38,5 @@ index 37130d8..2c1fe1c 100644
  }
  
 -- 
-2.1.0
+2.25.1
 

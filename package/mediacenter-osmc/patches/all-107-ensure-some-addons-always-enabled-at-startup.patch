@@ -1,4 +1,4 @@
-From 8fa3b70e063f2b421a27095e950fef99a21cb204 Mon Sep 17 00:00:00 2001
+From 57d4ab90b033a42d3b1db894f22308957fcc1868 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 8 Oct 2017 18:38:32 +0100
 Subject: [PATCH] Ensure that some add-ons are always enabled at Kodi startup
@@ -9,10 +9,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 9 insertions(+)
 
 diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
-index 6de470a9a0..6a6562ea04 100644
+index dbbf204322..5e303c4120 100644
 --- a/xbmc/addons/AddonDatabase.cpp
 +++ b/xbmc/addons/AddonDatabase.cpp
-@@ -447,6 +447,15 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+@@ -448,6 +448,15 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
                               id.c_str()));
      }
  

@@ -1,4 +1,4 @@
-From e01f85f6e9af15ca56aaea0d80158c4e237bbdc8 Mon Sep 17 00:00:00 2001
+From 4113120cd320f997477571bdaa4a1719fd0e039d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 17:56:35 +0100
 Subject: [PATCH] Cosmetic changes to the System Information dialog
@@ -9,10 +9,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 3bde0c9..82bae19 100644
+index 157b7b83ae..2b524923b4 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -47,7 +47,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
+@@ -49,7 +49,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
      case GUI_MSG_WINDOW_INIT:
      {
        CGUIWindow::OnMessage(message);
@@ -21,23 +21,23 @@ index 3bde0c9..82bae19 100644
        SET_CONTROL_LABEL(53, CSysInfo::GetBuildDate());
        CONTROL_ENABLE_ON_CONDITION(CONTROL_BT_PVR, CServiceBroker::GetPVRManager().IsStarted());
        return true;
-@@ -97,7 +97,6 @@ void CGUIWindowSystemInfo::FrameMove()
-     SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
-     SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
-     SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
--    SetControlLabel(i++, "%s: %s", 12395, SYSTEM_BATTERY_LEVEL);
+@@ -100,7 +100,6 @@ void CGUIWindowSystemInfo::FrameMove()
+     SetControlLabel(i++, "{} {}", 13283, SYSTEM_OS_VERSION_INFO);
+     SetControlLabel(i++, "{}: {}", 12390, SYSTEM_UPTIME);
+     SetControlLabel(i++, "{}: {}", 12394, SYSTEM_TOTALUPTIME);
+-    SetControlLabel(i++, "{}: {}", 12395, SYSTEM_BATTERY_LEVEL);
    }
  
    else if (m_section == CONTROL_BT_STORAGE)
-@@ -120,8 +119,6 @@ void CGUIWindowSystemInfo::FrameMove()
-     SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
-     SetControlLabel(i++, "%s: %s", 13159, NETWORK_SUBNET_MASK);
-     SetControlLabel(i++, "%s: %s", 13160, NETWORK_GATEWAY_ADDRESS);
--    SetControlLabel(i++, "%s: %s", 13161, NETWORK_DNS1_ADDRESS);
--    SetControlLabel(i++, "%s: %s", 20307, NETWORK_DNS2_ADDRESS);
-     SetControlLabel(i++, "%s %s", 13295, SYSTEM_INTERNET_STATE);
+@@ -124,8 +123,6 @@ void CGUIWindowSystemInfo::FrameMove()
+     SetControlLabel(i++, "{}: {}", 150, NETWORK_IP_ADDRESS);
+     SetControlLabel(i++, "{}: {}", 13159, NETWORK_SUBNET_MASK);
+     SetControlLabel(i++, "{}: {}", 13160, NETWORK_GATEWAY_ADDRESS);
+-    SetControlLabel(i++, "{}: {}", 13161, NETWORK_DNS1_ADDRESS);
+-    SetControlLabel(i++, "{}: {}", 20307, NETWORK_DNS2_ADDRESS);
+     SetControlLabel(i++, "{} {}", 13295, SYSTEM_INTERNET_STATE);
    }
  
 -- 
-2.7.4
+2.25.1
 

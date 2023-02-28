@@ -1,4 +1,4 @@
-From d1c3450d5eea8bbf421cb6967810f9c96c4c7a56 Mon Sep 17 00:00:00 2001
+From accfcca8d07940a8034c75e3b259a3acae8f2717 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 7 Feb 2017 17:49:18 +0000
 Subject: [PATCH] Don't notify when /boot is mounted. We do this when /boot is
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 2 insertions(+)
 
 diff --git a/xbmc/storage/MediaManager.cpp b/xbmc/storage/MediaManager.cpp
-index 54bd96ee78..07d6193f7c 100644
+index a1efbd933a..442f8366a8 100644
 --- a/xbmc/storage/MediaManager.cpp
 +++ b/xbmc/storage/MediaManager.cpp
-@@ -687,6 +687,8 @@ std::vector<std::string> CMediaManager::GetDiskUsage()
+@@ -695,6 +695,8 @@ std::vector<std::string> CMediaManager::GetDiskUsage()
  
  void CMediaManager::OnStorageAdded(const MEDIA_DETECT::STORAGE::StorageDevice& device)
  {

@@ -1,4 +1,4 @@
-From 9bead5836d3e5f3831049e256da12130c7252db4 Mon Sep 17 00:00:00 2001
+From 48785ed6fe15a4d2f7d41d34b773827171349ced Mon Sep 17 00:00:00 2001
 From: "Chris \\\"koying\\\" Browet" <cbro@semperpax.com>
 Date: Wed, 27 Apr 2016 18:44:34 +0200
 Subject: [PATCH] FIX: save skin setting changes immediately
@@ -8,10 +8,10 @@ Subject: [PATCH] FIX: save skin setting changes immediately
  1 file changed, 4 insertions(+)
 
 diff --git a/xbmc/settings/SkinSettings.cpp b/xbmc/settings/SkinSettings.cpp
-index b8a962d..7e6d16c 100644
+index 71ff616c6c..1f8216c199 100644
 --- a/xbmc/settings/SkinSettings.cpp
 +++ b/xbmc/settings/SkinSettings.cpp
-@@ -49,6 +49,7 @@ const std::string& CSkinSettings::GetString(int setting) const
+@@ -50,6 +50,7 @@ const std::string& CSkinSettings::GetString(int setting) const
  void CSkinSettings::SetString(int setting, const std::string &label)
  {
    g_SkinInfo->SetString(setting, label);
@@ -19,7 +19,7 @@ index b8a962d..7e6d16c 100644
  }
  
  int CSkinSettings::TranslateBool(const std::string &setting)
-@@ -64,16 +65,19 @@ bool CSkinSettings::GetBool(int setting) const
+@@ -70,11 +71,13 @@ int CSkinSettings::GetInt(int setting) const
  void CSkinSettings::SetBool(int setting, bool set)
  {
    g_SkinInfo->SetBool(setting, set);
@@ -32,6 +32,8 @@ index b8a962d..7e6d16c 100644
 +  g_SkinInfo->SaveSettings();
  }
  
+ std::set<ADDON::CSkinSettingPtr> CSkinSettings::GetSettings() const
+@@ -96,6 +99,7 @@ std::shared_ptr<const ADDON::CSkinSetting> CSkinSettings::GetSetting(
  void CSkinSettings::Reset()
  {
    g_SkinInfo->Reset();
@@ -40,5 +42,5 @@ index b8a962d..7e6d16c 100644
    CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
    infoMgr.ResetCache();
 -- 
-2.7.4
+2.25.1
 

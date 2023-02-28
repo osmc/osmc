@@ -1,18 +1,18 @@
-From 6f5356910b66c2adecdd25fe07da19ced62b350f Mon Sep 17 00:00:00 2001
+From 49caa3d4c40026121c55141996a3099df1d82a9b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 1 May 2017 19:18:35 +0100
 Subject: [PATCH] Don't save settings when exiting Kodi; this isn't necessary.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 19 -------------------
+ xbmc/application/Application.cpp | 19 -------------------
  1 file changed, 19 deletions(-)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 2564a94..5c0af96 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -2588,25 +2588,6 @@ void CApplication::Stop(int exitCode)
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 2817398576..239bf65668 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -2116,25 +2116,6 @@ bool CApplication::Stop(int exitCode)
  
      g_alarmClock.StopThread();
  
@@ -39,5 +39,5 @@ index 2564a94..5c0af96 100644
      // Add this here to keep the same ordering behaviour for now
      // Needs cleaning up
 -- 
-2.7.4
+2.25.1
 

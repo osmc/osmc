@@ -1,4 +1,4 @@
-From 81b081d57b1cd7fdd735a990182670ccdffb4c9f Mon Sep 17 00:00:00 2001
+From 6c1942e0c86770fd1b50712cbd683f45a1ac874c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 30 Mar 2021 23:58:27 +0100
 Subject: [PATCH] Add support for local strings for each language. This allows
@@ -12,10 +12,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/addons/LanguageResource.cpp b/xbmc/addons/LanguageResource.cpp
-index b9d1c41eed..d4e0f65a36 100644
+index c9ec0c8afc..2a0a0143b0 100644
 --- a/xbmc/addons/LanguageResource.cpp
 +++ b/xbmc/addons/LanguageResource.cpp
-@@ -112,7 +112,8 @@ bool CLanguageResource::IsAllowed(const std::string &file) const
+@@ -116,7 +116,8 @@ bool CLanguageResource::IsAllowed(const std::string &file) const
  {
    return file.empty() ||
           StringUtils::EqualsNoCase(file.c_str(), "langinfo.xml") ||
@@ -26,10 +26,10 @@ index b9d1c41eed..d4e0f65a36 100644
  
  std::string CLanguageResource::GetAddonId(const std::string& locale)
 diff --git a/xbmc/guilib/LocalizeStrings.cpp b/xbmc/guilib/LocalizeStrings.cpp
-index 6410ce44fa..2c616a9eaf 100644
+index 659eb3d7c5..5c2ecf2e0f 100644
 --- a/xbmc/guilib/LocalizeStrings.cpp
 +++ b/xbmc/guilib/LocalizeStrings.cpp
-@@ -112,7 +112,11 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
+@@ -116,7 +116,11 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
  
    bool useSourceLang = StringUtils::EqualsNoCase(language, LANGUAGE_DEFAULT) || StringUtils::EqualsNoCase(language, LANGUAGE_OLD_DEFAULT);
  

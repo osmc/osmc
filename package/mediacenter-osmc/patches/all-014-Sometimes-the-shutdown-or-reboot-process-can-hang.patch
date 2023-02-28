@@ -1,4 +1,4 @@
-From a08e094103041ee625b35a5e36f777a61107990a Mon Sep 17 00:00:00 2001
+From e868cd34472d1f9f2c6b4d544684480673862e4c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 13 Dec 2015 18:19:06 +0000
 Subject: [PATCH] Sometimes the shutdown or reboot process can hang:
@@ -9,41 +9,43 @@ Subject: [PATCH] Sometimes the shutdown or reboot process can hang:
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 6 ++++--
- xbmc/Application.h   | 5 +++++
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ xbmc/application/Application.cpp | 8 ++++++--
+ xbmc/application/Application.h   | 5 +++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 3bd24ef..f877516 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -2029,8 +2029,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 4ead646f9b..46312bb687 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -1481,8 +1481,10 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    switch (msg)
    {
    case TMSG_POWERDOWN:
--    Stop(EXITCODE_POWERDOWN);
-+    m_ShuttingDown = true;
-     CServiceBroker::GetPowerManager().Powerdown();
-+    Stop(EXITCODE_POWERDOWN);
+-    if (Stop(EXITCODE_POWERDOWN))
++    if (Stop(EXITCODE_POWERDOWN)) {
++      m_ShuttingDown = true;
+       CServiceBroker::GetPowerManager().Powerdown();
++    }
      break;
  
    case TMSG_QUIT:
-@@ -2055,8 +2056,9 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -1507,8 +1509,10 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
  
    case TMSG_RESTART:
    case TMSG_RESET:
--    Stop(EXITCODE_REBOOT);
-+    m_ShuttingDown = true;
-     CServiceBroker::GetPowerManager().Reboot();
-+    Stop(EXITCODE_REBOOT);
+-    if (Stop(EXITCODE_REBOOT))
++    if (Stop(EXITCODE_REBOOT)) {
++      m_ShuttingDown = true;
+       CServiceBroker::GetPowerManager().Reboot();
++    }
      break;
  
    case TMSG_RESTARTAPP:
-diff --git a/xbmc/Application.h b/xbmc/Application.h
-index 30cf6e7..b38409a 100644
---- a/xbmc/Application.h
-+++ b/xbmc/Application.h
-@@ -340,6 +340,11 @@ public:
+diff --git a/xbmc/application/Application.h b/xbmc/application/Application.h
+index a37dcf733d..45df227ac5 100644
+--- a/xbmc/application/Application.h
++++ b/xbmc/application/Application.h
+@@ -186,6 +186,11 @@ public:
  
    std::unique_ptr<CServiceManager> m_ServiceManager;
  
@@ -56,5 +58,5 @@ index 30cf6e7..b38409a 100644
    \brief Locks calls from outside kodi (e.g. python) until framemove is processed.
    */
 -- 
-2.7.4
+2.25.1
 

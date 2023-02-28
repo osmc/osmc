@@ -1,4 +1,4 @@
-From b21a4a282fc2b00448042e6783d165fe5ea590e1 Mon Sep 17 00:00:00 2001
+From 66c258a4dcaacb7713ed0435a0316bb8a5270758 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 22 Sep 2015 01:07:46 +0100
 Subject: [PATCH] Allow timezone to be changed via xbmc() Python interface
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 36 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 539da3fc31..de3d5e2f64 100644
+index 55eb3baddf..69d0914ec1 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -136,6 +136,14 @@ namespace XBMCAddon
+@@ -143,6 +143,14 @@ namespace XBMCAddon
        CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
      }
  
@@ -29,10 +29,10 @@ index 539da3fc31..de3d5e2f64 100644
      String executeJSONRPC(const char* jsonrpccommand)
      {
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 2a28822052..0f1081aeef 100644
+index 3b87dd5740..d2364055f3 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -258,6 +258,34 @@ namespace XBMCAddon
+@@ -261,6 +261,34 @@ namespace XBMCAddon
      void sethostname(const char *hostname);
  #endif
  
