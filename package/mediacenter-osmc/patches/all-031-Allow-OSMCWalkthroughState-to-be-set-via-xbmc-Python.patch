@@ -1,4 +1,4 @@
-From d280227df0603a6188a2accdf2f6e5c06f1f3be8 Mon Sep 17 00:00:00 2001
+From d43531e77915d7269bae19383c14e3ae4336d2c6 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 22:24:39 +0100
 Subject: [PATCH] Allow OSMCWalkthroughState to be set via xbmc Python
@@ -11,26 +11,26 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 33 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 0a09260950..eaa9af2809 100644
+index ebe6d4355e..dc1e0194f8 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -115,6 +115,11 @@ namespace XBMCAddon
-         CApplicationMessenger::GetInstance().PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, function);
+@@ -122,6 +122,11 @@ namespace XBMCAddon
+                                                    function);
      }
  
 +    void setosmcwalkthroughstatus(int state)
 +    {
-+      CApplicationMessenger::GetInstance().SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
++      CServiceBroker::GetAppMessenger()->SendMsg(TMSG_SETOSMCWALKTHROUGHSTATE, state);
 +    }
 +
      String executeJSONRPC(const char* jsonrpccommand)
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 69adfa5cab..b9b021b53c 100644
+index 693babbf2b..d2df827343 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -238,6 +238,34 @@ namespace XBMCAddon
+@@ -241,6 +241,34 @@ namespace XBMCAddon
      void sleep(long timemillis);
  #endif
  

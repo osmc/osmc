@@ -1,4 +1,4 @@
-From f740fed510ffe993b91d0d8f159c2756ae643e6b Mon Sep 17 00:00:00 2001
+From a68f3b170fe629bfc3aef793e4f6f2aa4f9cfb79 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Thu, 12 Mar 2020 19:11:27 +0000
 Subject: [PATCH] Add support for bluealsa
@@ -9,27 +9,27 @@ The correct way is to probe dbus for BT audio devices
 but using ALSA alone, this is the most user-friendly way to provide
 for multiple BT sinks pending a solution using dbus.
 ---
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp      | 16 ++++++++++++++++
- .../AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp | 14 +++++++++++++-
- 2 files changed, 29 insertions(+), 1 deletion(-)
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp        |  1 +
+ .../AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp   | 14 +++++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 14117da18c..eb483fe9e3 100644
+index 3e7b7b2da1..d57b37ccf8 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -1441,6 +1456,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1355,6 +1355,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
    if (!OpenPCMDevice(device, "", ALSA_MAX_CHANNELS, &pcmhandle, config))
      return;
  
-+  CLog::Log(LOGINFO, "CAESinkALSA::EnumerateDevice - device %s description %s", device.c_str(), description.c_str());
++  CLog::Log(LOGINFO, "CAESinkALSA::EnumerateDevice - device {} description {}", device, description);
    snd_pcm_info_t *pcminfo;
    snd_pcm_info_alloca(&pcminfo);
    memset(pcminfo, 0, snd_pcm_info_sizeof());
 diff --git a/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp b/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
-index 7cdbc86bca..1ec7a98b60 100644
+index 2d2bd788c6..8efaa514ea 100644
 --- a/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/alsa/ALSADeviceMonitor.cpp
-@@ -52,6 +52,13 @@ void CALSADeviceMonitor::Start()
+@@ -54,6 +54,13 @@ void CALSADeviceMonitor::Start()
        goto err_unref_monitor;
      }
  
@@ -43,7 +43,7 @@ index 7cdbc86bca..1ec7a98b60 100644
      err = udev_monitor_enable_receiving(m_udevMonitor);
      if (err)
      {
-@@ -99,7 +106,7 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
+@@ -102,7 +109,7 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
      const char* action = udev_device_get_action(device);
      const char* soundInitialized = udev_device_get_property_value(device, "SOUND_INITIALIZED");
  
@@ -52,8 +52,8 @@ index 7cdbc86bca..1ec7a98b60 100644
        continue;
  
      /* cardX devices emit a "change" event when ready (i.e. all subdevices added) */
-@@ -108,6 +115,11 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
-       CLog::Log(LOGDEBUG, "CALSADeviceMonitor - ALSA card added (\"%s\", \"%s\")", udev_device_get_syspath(device), udev_device_get_devpath(device));
+@@ -112,6 +119,11 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
+                 udev_device_get_syspath(device), udev_device_get_devpath(device));
        audioDevicesChanged = true;
      }
 +    else if (strcmp(action, "add") == 0 && strcmp(udev_device_get_subsystem(device),"bluetooth") == 0)
@@ -65,5 +65,5 @@ index 7cdbc86bca..1ec7a98b60 100644
      {
        CLog::Log(LOGDEBUG, "CALSADeviceMonitor - ALSA card removed");
 -- 
-2.17.1
+2.37.0 (Apple Git-136)
 

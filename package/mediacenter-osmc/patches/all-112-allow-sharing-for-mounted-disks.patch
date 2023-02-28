@@ -1,4 +1,4 @@
-From a76523e08bc0ef060c3be6f3e511fde6f6fb2979 Mon Sep 17 00:00:00 2001
+From cea8dbdc0f18367f06756856762feaf340617cea Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Feb 2018 18:42:49 +0000
 Subject: [PATCH] allowsharing needs to be set for mounted drives to be
@@ -9,14 +9,14 @@ Subject: [PATCH] allowsharing needs to be set for mounted drives to be
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- userdata/sources.xml | 21 +++++++++++++++++++++
- xbmc/Application.cpp |  1 +
+ userdata/sources.xml             | 21 +++++++++++++++++++++
+ xbmc/application/Application.cpp |  1 +
  2 files changed, 22 insertions(+)
  create mode 100644 userdata/sources.xml
 
 diff --git a/userdata/sources.xml b/userdata/sources.xml
 new file mode 100644
-index 0000000..1fc93b5
+index 0000000000..1fc93b51e9
 --- /dev/null
 +++ b/userdata/sources.xml
 @@ -0,0 +1,21 @@
@@ -41,18 +41,18 @@ index 0000000..1fc93b5
 +        <default pathversion="1"></default>
 +    </files>
 +</sources>
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 57831ef..e64e495 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -419,6 +419,7 @@ bool CApplication::Create(const CAppParamParser &params)
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 239bf65668..f0489db9ea 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -384,6 +384,7 @@ bool CApplication::Create()
    CUtil::CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
    CUtil::CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
    CUtil::CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
 +  CUtil::CopyUserDataIfNeeded("special://masterprofile/", "sources.xml");
  
    CServiceBroker::GetLogging().Initialize(CSpecialProtocol::TranslatePath("special://logpath"));
-
+ 
 -- 
-2.7.4
+2.25.1
 

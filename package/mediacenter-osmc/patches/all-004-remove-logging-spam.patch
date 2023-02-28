@@ -1,4 +1,4 @@
-From 7779be18a141dc3269d09361e277aec40150f348 Mon Sep 17 00:00:00 2001
+From 2bfc7184622f0c7e4a967a886572cae332cc5b2b Mon Sep 17 00:00:00 2001
 From: Greg McCarthy <greg@gjmccarthy.co.uk>
 Date: Sun, 24 Feb 2019 09:14:31 +0000
 Subject: [PATCH] kodi: remove annoying, excessively repetitive addon logging
@@ -8,10 +8,10 @@ Subject: [PATCH] kodi: remove annoying, excessively repetitive addon logging
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/addons/Repository.cpp b/xbmc/addons/Repository.cpp
-index c141e2df1d..cec4382d9a 100644
+index 6708e71c2a..869bd2d292 100644
 --- a/xbmc/addons/Repository.cpp
 +++ b/xbmc/addons/Repository.cpp
-@@ -122,11 +122,11 @@ CRepository::CRepository(const AddonInfoPtr& addonInfo)
+@@ -140,11 +140,11 @@ CRepository::CRepository(const AddonInfoPtr& addonInfo) : CAddon(addonInfo, Addo
      CURL datadir(dir.datadir);
      if (datadir.IsProtocol("http"))
      {
@@ -25,7 +25,7 @@ index c141e2df1d..cec4382d9a 100644
      }
    }
  }
-@@ -254,7 +254,7 @@ CRepository::DirInfo CRepository::ParseDirConfiguration(const CAddonExtensions&
+@@ -315,7 +315,7 @@ RepositoryDirInfo CRepository::ParseDirConfiguration(const CAddonExtensions& con
      dir.hashType = CDigest::TypeFromString(hashStr);
      if (dir.hashType == CDigest::Type::MD5)
      {
@@ -35,4 +35,5 @@ index c141e2df1d..cec4382d9a 100644
    }
  
 -- 
-2.16.4
+2.25.1
+

@@ -1,4 +1,4 @@
-From d2baef5bcbddf7786ca2f08f09fc699a6021b6db Mon Sep 17 00:00:00 2001
+From 8f76723d26334f06297f26f88d560eddafb607cf Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 20 Mar 2017 02:45:58 +0000
 Subject: [PATCH] Ensure that add-ons can run before shutdown / reboot. This
@@ -7,29 +7,29 @@ Subject: [PATCH] Ensure that add-ons can run before shutdown / reboot. This
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/Application.cpp | 2 ++
+ xbmc/application/Application.cpp | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 2d25128..2564a94 100644
---- a/xbmc/Application.cpp
-+++ b/xbmc/Application.cpp
-@@ -2040,6 +2040,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
-   switch (msg)
-   {
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 443a9add76..6496ac754e 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -1484,6 +1484,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    case TMSG_POWERDOWN:
-+    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
-     m_ShuttingDown = true;
-     CServiceBroker::GetPowerManager().Powerdown();
-     Stop(EXITCODE_POWERDOWN);
-@@ -2067,6 +2068,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
- 
-   case TMSG_RESTART:
+     if (Stop(EXITCODE_POWERDOWN)) {
+       m_ShuttingDown = true;
++      CServiceBroker::GetAppMessenger()->PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
+       CServiceBroker::GetPowerManager().Powerdown();
+     }
+     break;
+@@ -1512,6 +1513,7 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    case TMSG_RESET:
-+    CApplicationMessenger::GetInstance().PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
-     m_ShuttingDown = true;
-     CServiceBroker::GetPowerManager().Reboot();
-     Stop(EXITCODE_REBOOT);
+     if (Stop(EXITCODE_REBOOT)) {
+       m_ShuttingDown = true;
++      CServiceBroker::GetAppMessenger()->PostMsg(TMSG_SETOSMCWALKTHROUGHSTATE, 2);
+       CServiceBroker::GetPowerManager().Reboot();
+     }
+     break;
 -- 
-2.7.4
+2.25.1
 

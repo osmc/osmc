@@ -1,4 +1,4 @@
-From d3dc115d60076cb4af0651dc4652dcc1c458f140 Mon Sep 17 00:00:00 2001
+From 09ccfef945c2fb5bc1e98bd67594f07dcf368d33 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Sat, 27 Jun 2020 16:10:51 +0100
 Subject: [PATCH] Fix cheap USB soundcard that repeats SL and SR for 7.1
@@ -8,10 +8,10 @@ Subject: [PATCH] Fix cheap USB soundcard that repeats SL and SR for 7.1
  1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index 3362dfc2cd..6d2fbea603 100644
+index f68d05ce9b..843e397340 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -311,8 +311,15 @@ CAEChannelInfo CAESinkALSA::ALSAchmapToAEChannelMap(snd_pcm_chmap_t* alsaMap)
+@@ -307,8 +307,15 @@ CAEChannelInfo CAESinkALSA::ALSAchmapToAEChannelMap(snd_pcm_chmap_t* alsaMap)
    CAEChannelInfo info;
  
    for (unsigned int i = 0; i < alsaMap->channels; i++)
@@ -30,5 +30,5 @@ index 3362dfc2cd..6d2fbea603 100644
  }
  
 -- 
-2.17.1
+2.25.1
 

@@ -1,4 +1,4 @@
-From fb1c92fe91082a7785af57b5b4bc71636d7bc2cd Mon Sep 17 00:00:00 2001
+From 89a8c1f4a531421af65c02a7827e142de2e85a7a Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 16:45:44 +0100
 Subject: [PATCH] Do not allow repository updates while we are in the My OSMC
@@ -6,23 +6,31 @@ Subject: [PATCH] Do not allow repository updates while we are in the My OSMC
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/addons/RepositoryUpdater.cpp | 5 +++++
- 1 file changed, 5 insertions(+)
+ xbmc/addons/RepositoryUpdater.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/xbmc/addons/RepositoryUpdater.cpp b/xbmc/addons/RepositoryUpdater.cpp
-index 9bac6bd6ad..5d606cdb1d 100644
+index 3ea8b9c83d..c4cdc60b10 100644
 --- a/xbmc/addons/RepositoryUpdater.cpp
 +++ b/xbmc/addons/RepositoryUpdater.cpp
-@@ -227,6 +227,11 @@ void CRepositoryUpdater::ScheduleUpdate()
+@@ -31,6 +31,7 @@
+ #include "utils/JobManager.h"
+ #include "utils/ProgressJob.h"
+ #include "utils/log.h"
++#include "application/Application.h"
+ 
+ #include <algorithm>
+ #include <iterator>
+@@ -319,6 +320,11 @@ void CRepositoryUpdater::ScheduleUpdate()
    if (CAddonSystemSettings::GetInstance().GetAddonAutoUpdateMode() == AUTO_UPDATES_NEVER)
      return;
  
-+  if (g_application.m_eOSMCWalkthroughState != 2) {
++  if (g_application.m_eOSMCWalkthroughState != g_application.OSMC_WALKTHROUGH_ISDONE) {
 +       CLog::Log(LOGDEBUG, "CRepositoryUpdater: refusing to update until My OSMC asserts");
 +       return;
 +  }
 +
-   if (!m_addonMgr.HasAddons(ADDON_REPOSITORY))
+   if (!m_addonMgr.HasAddons(AddonType::REPOSITORY))
      return;
  
 -- 

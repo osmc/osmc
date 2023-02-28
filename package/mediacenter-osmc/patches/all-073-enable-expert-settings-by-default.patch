@@ -1,4 +1,4 @@
-From eb3c7df48e60342cb7477bd348c97e71b9fc6455 Mon Sep 17 00:00:00 2001
+From 5e321b0b6d91ac70e94b54b5f42ad22fc7cf9ede Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 6 Sep 2016 16:22:43 +0100
 Subject: [PATCH] Enable Expert Settings by default
@@ -9,7 +9,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/view/ViewStateSettings.cpp b/xbmc/view/ViewStateSettings.cpp
-index 6012426..7961ba5 100644
+index d8833934ae..0c557cece1 100644
 --- a/xbmc/view/ViewStateSettings.cpp
 +++ b/xbmc/view/ViewStateSettings.cpp
 @@ -114,7 +114,7 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
@@ -22,5 +22,5 @@ index 6012426..7961ba5 100644
      const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
      if (pEventLogNode != NULL)
 -- 
-2.7.4
+2.25.1
 

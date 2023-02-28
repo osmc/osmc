@@ -1,7 +1,7 @@
-From e5c42a8590ba6f8c6bd55c07d1c046497d6e061f Mon Sep 17 00:00:00 2001
+From b19a490fb2859c24fa8cef5db68b9be09acf486c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 16 May 2019 17:39:35 +0100
-Subject: [PATCH 1/2] Fix playback of M3U internet streams
+Subject: [PATCH] Fix playback of M3U internet streams
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/playlists/PlayListFactory.cpp b/xbmc/playlists/PlayListFactory.cpp
-index f98c230..273d3bf 100644
+index 8abb1bae92..4d2e7b6ae4 100644
 --- a/xbmc/playlists/PlayListFactory.cpp
 +++ b/xbmc/playlists/PlayListFactory.cpp
-@@ -118,7 +118,7 @@ bool CPlayListFactory::IsPlaylist(const CFileItem& item)
+@@ -120,7 +120,7 @@ bool CPlayListFactory::IsPlaylist(const CFileItem& item)
  */
  
    // online m3u8 files are hls:// -- do not treat as playlist
@@ -22,5 +22,5 @@ index f98c230..273d3bf 100644
  
    if(strMimeType == "audio/x-pn-realaudio"
 -- 
-2.7.4
+2.25.1
 

@@ -7,11 +7,11 @@
 
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/f8fdeb6b1b1a7b753e1559d34a98cea62b4920d9.tar.gz" "$(pwd)/src"
-API_VERSION="19"
+pull_source "https://github.com/xbmc/xbmc/archive/289ec664e379d16a045490ba227dcf90b494628e.tar.gz" "$(pwd)/src"
+API_VERSION="20"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
-API_VERSION="20"
+API_VERSION="21"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
@@ -213,6 +213,7 @@ then
 	    -DENABLE_VAAPI=OFF \
             -DENABLE_VDPAU=OFF \
             -DENABLE_INTERNAL_DAV1D=ON \
+            -DADDONS_CONFIGURE_AT_STARTUP=OFF \
         ../
 	fi
         if [ "$1" == "vero3" ]; then
@@ -253,6 +254,7 @@ then
 	    -DENABLE_SNDIO=OFF \
             -DENABLE_MARIADBCLIENT=ON \
             -DENABLE_INTERNAL_DAV1D=ON \
+            -DADDONS_CONFIGURE_AT_STARTUP=OFF \
 	../
         fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
@@ -309,8 +311,8 @@ then
         # Languages
         mkdir languages/
         pushd languages
-        if [ "$API_VERSION" = "19" ]; then api_name="matrix"; fi
-	if [ "$API_VERSION" = "20" ]; then api_name="tbc"; fi
+        if [ "$API_VERSION" = "20" ]; then api_name="nexus"; fi
+	if [ "$API_VERSION" = "21" ]; then api_name="omega"; fi
 	base_url="http://mirror.ox.ac.uk/sites/xbmc.org/addons/${api_name}"
 	handle_dep "wget" # We do not usually use wget in the build environment
         languages=$(wget ${base_url} -O- | grep resource.language. | sed -e 's/<a/\n<a/g' | sed -e 's/<a .*href=['"'"'"]//' -e 's/["'"'"'].*$//' -e '/^$/ d' | sed '/tr/d' | sed 's/resource.language.//' | tr -d / | grep -v 'img src')
@@ -335,7 +337,7 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7, libudfread0"
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7, libudfread0, libspdlog1"
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == rbp4 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control

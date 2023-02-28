@@ -1,4 +1,4 @@
-From 0abf1ba56736167f19d525b8de5e62b85ea8fb60 Mon Sep 17 00:00:00 2001
+From c4413099673b622ad2651fce67b58215edf2a5e0 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 21 Dec 2015 04:32:14 +0000
 Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
@@ -8,19 +8,20 @@ Subject: [PATCH] Add sigterm handler. Send a Quit signal if we're not shutting
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/platform/posix/main.cpp | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ xbmc/platform/posix/main.cpp | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/xbmc/platform/posix/main.cpp b/xbmc/platform/posix/main.cpp
-index f0d8d9b..8594876 100644
+index 5028aaa286..678370b433 100644
 --- a/xbmc/platform/posix/main.cpp
 +++ b/xbmc/platform/posix/main.cpp
-@@ -34,6 +34,17 @@
+@@ -30,6 +30,19 @@
  
- #include <locale.h>
+ #include <sys/resource.h>
  
-+#include "Application.h"
++#include "application/Application.h"
 +#include "messaging/ApplicationMessenger.h"
++#include "ServiceBroker.h"
 +
 +using namespace KODI::MESSAGING;
 +
@@ -28,11 +29,12 @@ index f0d8d9b..8594876 100644
 +{
 +       CLog::Log(LOGINFO, "OSMC: received signal to tear down Kodi");
 +       if (! g_application.isShuttingDown())
-+          CApplicationMessenger::GetInstance().PostMsg(TMSG_QUIT);
++          CServiceBroker::GetAppMessenger()->PostMsg(TMSG_QUIT);
 +}
++
  namespace
  {
- 
+ extern "C" void XBMC_POSIX_HandleSignal(int sig)
 -- 
-2.7.4
+2.25.1
 
