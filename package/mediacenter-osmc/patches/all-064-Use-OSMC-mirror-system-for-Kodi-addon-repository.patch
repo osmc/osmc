@@ -1,4 +1,4 @@
-From f8cf1f9795d300e8b7ce556043fc3c4b6eb92640 Mon Sep 17 00:00:00 2001
+From 026dcaaf7b7a94691f0933d766c66c88408feaf0 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 25 Jun 2016 20:45:11 +0100
 Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
@@ -6,52 +6,37 @@ Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- addons/repository.xbmc.org/addon.xml | 12 ++++++------
- version.txt                          |  2 +-
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ addons/repository.xbmc.org/addon.xml | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/addons/repository.xbmc.org/addon.xml b/addons/repository.xbmc.org/addon.xml
-index 436d5e5c97..a521289272 100644
+index 5dbddb010e..5a63e1c1be 100644
 --- a/addons/repository.xbmc.org/addon.xml
 +++ b/addons/repository.xbmc.org/addon.xml
-@@ -1,18 +1,18 @@
+@@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
  <addon id="repository.xbmc.org"
  		name="Kodi Add-on repository"
--		version="3.2.5"
-+		version="9.9.11"
+-		version="3.3.1"
++		version="9.9.12"
  		provider-name="Team Kodi">
    <requires>
      <import addon="xbmc.addon" version="12.0.0"/>
-   </requires>
+@@ -9,10 +9,10 @@
  	<extension point="xbmc.addon.repository">
  		<!-- Do not forget to bump add-on version when changing paths to force a repo refresh -->
--		<info>http://mirrors.kodi.tv/addons/matrix/addons.xml.gz</info>
--		<checksum verify="sha256">http://mirrors.kodi.tv/addons/matrix/addons.xml.gz?sha256</checksum>
--		<datadir>https://mirrors.kodi.tv/addons/matrix</datadir>
--		<artdir>http://mirrors.kodi.tv/addons/matrix</artdir>
--		<hashes>sha256</hashes>
-+               <info>https://download.osmc.tv/kodi/addons/matrix/addons.xml.gz</info>
-+               <checksum verify="sha256">https://download.osmc.tv/kodi/addons/matrix/addons.xml.gz?sha256</checksum>
-+               <datadir>https://download.osmc.tv/kodi/addons/matrix</datadir>
-+               <artdir>https://download.osmc.tv/kodi/addons/matrix</artdir>
-+              <hashes>sha256</hashes>
+ 		<dir>
+-			<info>http://mirrors.kodi.tv/addons/nexus/addons.xml.gz</info>
+-			<checksum verify="sha256">http://mirrors.kodi.tv/addons/nexus/addons.xml.gz?sha256</checksum>
+-			<datadir>https://mirrors.kodi.tv/addons/nexus</datadir>
+-			<artdir>http://mirrors.kodi.tv/addons/nexus</artdir>
++			<info>https://download.osmc.tv/kodi/addons/nexus/addons.xml.gz</info>
++			<checksum verify="sha256">https://download.osmc.tv/kodi/addons/nexus/addons.xml.gz?sha256</checksum>
++			<datadir>https://download.osmc.tv/kodi/addons/nexus</datadir>
++			<artdir>https://download.osmc.tv/kodi/addons/nexus</artdir>
+ 			<hashes>sha256</hashes>
+ 		</dir>
  	</extension>
- 	<extension point="xbmc.addon.metadata">
- 		<summary lang="af_ZA">Installeer Byvoegsels vanaf Kodi.tv</summary>
-diff --git a/version.txt b/version.txt
-index 51ac973d53..0d6239d097 100644
---- a/version.txt
-+++ b/version.txt
-@@ -7,7 +7,7 @@ VERSION_MINOR 4
- VERSION_TAG
- VERSION_CODE 19.4.0
- ADDON_API 19.1.0
--ADDON_REPOS repository.xbmc.org|https://mirrors.kodi.tv
-+ADDON_REPOS repository.xbmc.org|https://download.osmc.tv
- APP_PACKAGE org.xbmc.kodi
- PACKAGE_IDENTITY XBMCFoundation.Kodi
- PACKAGE_PUBLISHER C62BD90A-CDD8-477F-96C3-B25992247B97
 -- 
 2.25.1
 

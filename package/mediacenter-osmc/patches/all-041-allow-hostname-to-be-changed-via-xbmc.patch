@@ -1,4 +1,4 @@
-From 2b599dc5be3c3dfcca8f628fcfa95d16158f51e5 Mon Sep 17 00:00:00 2001
+From d017d3cd690d104ed52b8907392d5bf42e596baa Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:45:37 +0100
 Subject: [PATCH] Allow hostname to be changed via xbmc.sethostname()
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 37 insertions(+)
 
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.cpp b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-index 37069f580d..539da3fc31 100644
+index 18f69aa39d..55eb3baddf 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.cpp
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.cpp
-@@ -128,6 +128,15 @@ namespace XBMCAddon
+@@ -135,6 +135,15 @@ namespace XBMCAddon
        CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_LOOKANDFEEL_SKIN, skin);
      }
  
@@ -30,10 +30,10 @@ index 37069f580d..539da3fc31 100644
      {
        XBMC_TRACE;
 diff --git a/xbmc/interfaces/legacy/ModuleXbmc.h b/xbmc/interfaces/legacy/ModuleXbmc.h
-index 7ef062d11e..2a28822052 100644
+index 8504db3fdf..3b87dd5740 100644
 --- a/xbmc/interfaces/legacy/ModuleXbmc.h
 +++ b/xbmc/interfaces/legacy/ModuleXbmc.h
-@@ -230,6 +230,34 @@ namespace XBMCAddon
+@@ -233,6 +233,34 @@ namespace XBMCAddon
      void setskin(const char *skin);
  #endif
  

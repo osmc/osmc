@@ -1,4 +1,4 @@
-From 090988127339c7029ca7e3eec285881de1a3aa7e Mon Sep 17 00:00:00 2001
+From 6eddcb822b719da49784ac26ad02ffd05ec23ab6 Mon Sep 17 00:00:00 2001
 From: Graham Horner <graham@hornercs.co.uk>
 Date: Tue, 18 May 2021 22:39:24 +0100
 Subject: [PATCH] POParser: support override of strings with custom po files
@@ -12,14 +12,14 @@ devs can correct if necessary.
 A translation file will now overwrite a string entry that has only a
 (matching) en_gb string (was previously ignored).
 ---
- xbmc/guilib/LocalizeStrings.cpp | 52 ++++++++++++++++++++++++---------
- 1 file changed, 39 insertions(+), 13 deletions(-)
+ xbmc/guilib/LocalizeStrings.cpp | 55 ++++++++++++++++++++++++---------
+ 1 file changed, 40 insertions(+), 15 deletions(-)
 
 diff --git a/xbmc/guilib/LocalizeStrings.cpp b/xbmc/guilib/LocalizeStrings.cpp
-index 2c616a9eaf..4423fa8137 100644
+index 5c2ecf2e0f..f3445bedc4 100644
 --- a/xbmc/guilib/LocalizeStrings.cpp
 +++ b/xbmc/guilib/LocalizeStrings.cpp
-@@ -47,20 +47,46 @@ static bool LoadPO(const std::string &filename, std::map<uint32_t, LocStr>& stri
+@@ -49,25 +49,50 @@ static bool LoadPO(const std::string &filename, std::map<uint32_t, LocStr>& stri
  
        if (bSourceLanguage && !PODoc.GetMsgid().empty())
        {
@@ -27,9 +27,11 @@ index 2c616a9eaf..4423fa8137 100644
 -                          PODoc.GetMsgid() == strings[id + offset].strOriginal))
 -          continue;
 -        else if (bStrInMem)
--          CLog::Log(LOGDEBUG,
--              "POParser: id:%i was recently re-used in the English string file, which is not yet "
--                  "changed in the translated file. Using the English string instead", id);
+-          CLog::Log(
+-              LOGDEBUG,
+-              "POParser: id:{} was recently re-used in the English string file, which is not yet "
+-              "changed in the translated file. Using the English string instead",
+-              id);
 -        strings[id + offset].strTranslated = PODoc.GetMsgid();
 +        if (bStrInMem)
 +        {
@@ -39,15 +41,15 @@ index 2c616a9eaf..4423fa8137 100644
 +            if (strings[id + offset].strOriginal == PODoc.GetMsgid())
 +              continue;
 +            CLog::Log(LOGDEBUG,
-+              "POParser: string for id:%i is different in the English string file.\n"
++              "POParser: string for id:{} is different in the English string file.\n"
 +              "The translation file may need updating.\n"
-+              "%s -> %s", id, strings[id + offset].strOriginal.c_str(), PODoc.GetMsgid().c_str());
++              "{} -> {}", id, strings[id + offset].strOriginal, PODoc.GetMsgid());
 +          }
 +          else if (strings[id + offset].strTranslated != PODoc.GetMsgid())
 +          {
-+            CLog::Log(LOGDEBUG, "POParser: string for id %i is different:\n\t"
-+            "in memory: %s\n\tin file: %s\n\tignoring",
-+              id, strings[id + offset].strTranslated.c_str(), PODoc.GetMsgid().c_str());
++            CLog::Log(LOGDEBUG, "POParser: string for id {} is different:\n\t"
++            "in memory: {}\n\tin file: {}\n\tignoring",
++              id, strings[id + offset].strTranslated, PODoc.GetMsgid());
 +            continue;
 +          }
 +        }
@@ -63,9 +65,9 @@ index 2c616a9eaf..4423fa8137 100644
 +        if (bStrInMem && !strings[id + offset].strOriginal.empty() &&
 +            (strings[id + offset].strOriginal != PODoc.GetMsgid() ||
 +            strings[id + offset].strTranslated != PODoc.GetMsgstr()))
-+          CLog::Log(LOGDEBUG, "POParser: strings for id %i are different:\n\t"
-+          "in memory: %s %s\n\tin file: %s %s\n"
-+          "\t%s",
++          CLog::Log(LOGDEBUG, "POParser: strings for id {} are different:\n\t"
++          "in memory: {} {}\n\tin file: {} {}\n"
++          "\t{}",
 +            id, strings[id + offset].strOriginal, strings[id + offset].strTranslated,
 +            PODoc.GetMsgid(), PODoc.GetMsgstr(),
 +              strings[id + offset].strTranslated == PODoc.GetMsgid() ? "adding translation" : "ignoring");
@@ -77,7 +79,11 @@ index 2c616a9eaf..4423fa8137 100644
          counter++;
        }
      }
-@@ -112,10 +138,10 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
++
+     else if (PODoc.GetEntryType() == MSGID_FOUND)
+     {
+       //! @todo implement reading of non-id based string entries from the PO files.
+@@ -116,10 +141,10 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
  
    bool useSourceLang = StringUtils::EqualsNoCase(language, LANGUAGE_DEFAULT) || StringUtils::EqualsNoCase(language, LANGUAGE_OLD_DEFAULT);
  
@@ -91,5 +97,5 @@ index 2c616a9eaf..4423fa8137 100644
  }
  
 -- 
-2.25.1
+2.34.1
 
