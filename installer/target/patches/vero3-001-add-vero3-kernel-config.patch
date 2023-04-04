@@ -1,6 +1,6 @@
---- /dev/null	2022-07-25 05:55:19.510797763 +0100
-+++ b/vero3.config	2022-07-27 14:25:32.282014059 +0100
-@@ -0,0 +1,5366 @@
+--- /dev/null	2023-03-21 00:13:27.039168207 +0000
++++ b/vero3.config	2023-04-04 13:40:56.211336522 +0100
+@@ -0,0 +1,5371 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 4.9.269 Kernel Configuration
@@ -4656,7 +4656,12 @@
 +# FPGA Configuration Support
 +#
 +# CONFIG_FPGA is not set
-+# CONFIG_TEE is not set
++CONFIG_TEE=y
++
++#
++# TEE drivers
++#
++CONFIG_OPTEE=y
 +
 +#
 +# Mali GPU OpenGL device driver
