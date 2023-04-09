@@ -25,6 +25,9 @@ index 6cd4eb9650..fc48c47264 100644
  
    CLog::Log(LOGINFO, "creating subdirectories");
 +  CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
++  int n=hostname.length();
++  if ( n > 1 && < 15 )
++     CServiceBroker::CPeripheralCecAdapter::SetSetting("device_name", hostname);
    const std::shared_ptr<CProfileManager> profileManager = m_pSettingsComponent->GetProfileManager();
    const std::shared_ptr<CSettings> settings = m_pSettingsComponent->GetSettings();
    CLog::Log(LOGINFO, "userdata folder: %s", CURL::GetRedacted(profileManager->GetProfileUserDataFolder()).c_str());
