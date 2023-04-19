@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# OSMC init script
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+loopforever()
+{
+    while true
+    do
+        sleep 1
+    done
+}
+
+# Standard busybox init
+/bin/mount -t proc proc /proc
+/bin/mount -o remount,rw,noatime /
+/bin/mount -t sysfs sysfs /sys
+/bin/mount -t devtmpfs dev /dev
+/bin/hostname -F /etc/hostname
+
+# Configure eudev
+
+. /etc/udev/udev.conf
+printf '\000\000\000\000' > /proc/sys/kernel/hotplug
+/sbin/udevd -d
+udevadm trigger
+
+sleep 3 # Wait for /dev population
+
+# Make the TEE directory and mount the partition
+
+mkdir /tee
+mkfs.ext4 /dev/tee
+mount /dev/tee /tee
+
+# Mount the factory partition
+modprobe vfat
+mkdir /factory
+mount /dev/sda1 /factory
+
+# Copy over the TEE files
+
+cp /factory/optee/bin/apploader /bin/apploader
+cp /factory/optee/lib/libteec.so.1.0 /lib/libteec.so.1.0
+cp /factory/optee/bin/tee_osmc /bin/tee_osmc
+mkdir -p /lib/teetz
+cp /factory/optee/ta/23d6d081-0138-46a4-bba5-21b189d1a97e.ta.signed /lib/teetz/23d6d081-0138-46a4-bba5-21b189d1a97e.ta
+chmod +x /bin/apploader
+chmod +x /bin/tee_osmc
+
+# Initialise the supplicant
+apploader &
+
+# Provision the device
+
+tee_osmc -s /factory/optee/genuine_private_key.bin || loopforever
+
+# Clean up
+# Kill the supplicant
+kill -9 $(pidof apploader)
+umount /tee
+sync
+
+# Set the burning flag and reboot
+
+fw_setenv osmc_burn_from_external true
+echo b > /proc/sysrq-trigger
