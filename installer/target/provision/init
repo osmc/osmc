@@ -57,9 +57,16 @@ apploader &
 
 tee_osmc -s /factory/optee/genuine_private_key.bin || loopforever
 
-# Clean up
 # Kill the supplicant
 kill -9 $(pidof apploader)
+
+# Create a backup of the keys, prepare OARS partition
+mkfs.ext4 /dev/oars
+mount /dev/oars /oars
+tar -cvf /oars/tee_provision.tgz /tee/*
+
+# Unmount partitions and write back
+umount /oars
 umount /tee
 sync
 

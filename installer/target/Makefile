@@ -10,6 +10,9 @@ rbp4:
 vero3:
 	sudo bash build.sh "vero3"
 
+vero3provision:
+	sudo PROVISION=1 bash build.sh "vero3"
+
 clean:
 	sudo rm -rf buildroot*/ > /dev/null 2>&1
 	sudo rm -f filesystem.tar.xz >/dev/null 2>&1
