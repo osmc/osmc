@@ -50,6 +50,11 @@ if [ "$SIGN_KERNEL" -eq 1 ]
 then
 	install_patch "../patches" "signed-${1}"
 fi
+if [ "$PROVISION" -eq 1 ]
+then
+       install_patch "../patches" "provision-${1}"
+       sed s/BR2_PACKAGE_OSMC/BR2_PACKAGE_OSMCPROVISION/ -i configs/osmc_defconfig
+fi
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 then
 	install_patch "../patches" "rbp"
@@ -61,9 +66,9 @@ make
 if [ $? != 0 ]; then echo "Build failed" && exit 1; fi
 popd
 pushd buildroot-${BUILDROOT_VERSION}/output/images
-if [ -f ../../../filesystem.tar.xz ]
+if [ -f ../../../filesystem.tar.xz ] || [ "$PROVISION" -eq 1 ]
 then
-    echo -e "Using local filesystem"
+    echo -e "Using local filesystem or filesystem is not needed"
 else
     echo -e "Downloading latest filesystem"
     date=$(date +%Y%m%d)
@@ -78,7 +83,7 @@ else
            let count=count-1
     done
 fi
-if [ ! -f ../../../filesystem.tar.xz ]; then echo -e "No filesystem available for target" && exit 1; fi
+if [ ! -f ../../../filesystem.tar.xz ] && [ "$PROVISION" -ne 1 ]; then echo -e "No filesystem available for target" && exit 1; fi
 echo -e "Building disk image"
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
 then
@@ -129,16 +134,22 @@ then
 	else
             ../../output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
 	fi
-	cp $DTB_FILE /mnt/dtb.img
-	cp $KERNEL_FILE /mnt/kernel.img
+
+        if [ "$PROVISION" -ne 1 ]
+        then
+           cp $DTB_FILE /mnt/dtb.img
+           cp $KERNEL_FILE /mnt/kernel.img
+        fi
 fi
-echo -e "Installing filesystem"
-mv $(pwd)/../../../filesystem.tar.xz /mnt/
-umount /mnt
-sync
-kpartx -d OSMC_TGT_${1}_${date}.img
-echo -e "Compressing image"
-gzip OSMC_TGT_${1}_${date}.img
-md5sum OSMC_TGT_${1}_${date}.img.gz > OSMC_TGT_${1}_${date}.md5
-popd
-echo -e "Build completed"
+if [ "$PROVISION" -ne 1 ]
+then
+    mv $(pwd)/../../../filesystem.tar.xz /mnt/
+    umount /mnt
+    sync
+    kpartx -d OSMC_TGT_${1}_${date}.img
+    echo -e "Compressing image"
+    gzip OSMC_TGT_${1}_${date}.img
+    md5sum OSMC_TGT_${1}_${date}.img.gz > OSMC_TGT_${1}_${date}.md5
+    popd
+    echo -e "Build completed"
+fi
