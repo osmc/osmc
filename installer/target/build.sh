@@ -35,6 +35,13 @@ done
 
 SIGN_KERNEL=0
 
+if [ -z "$PROVISION" ]
+then
+	PROVISION=0
+else
+	PROVISION=1
+fi
+
 if [ "$SIGN_KERNEL" -eq 1 ]
         then
 		SIG_KEYS_DIR="/etc/osmc/keys"
@@ -94,9 +101,9 @@ then
 	parted -s OSMC_TGT_${1}_${date}.img mkpart primary fat32 4Mib 100%
 	kpartx -s -a OSMC_TGT_${1}_${date}.img
 	/sbin/partprobe
-	mkfs.vfat -F32 /dev/mapper/loop0p1
-	fatlabel /dev/mapper/loop0p1 OSMCInstall
-	mount /dev/mapper/loop0p1 /mnt
+	mkfs.vfat -F32 /dev/mapper/loop*p1
+	fatlabel /dev/mapper/loop*p1 OSMCInstall
+	mount /dev/mapper/loop*p1 /mnt
 fi
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 then
