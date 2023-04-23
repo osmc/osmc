@@ -91,9 +91,9 @@ else
     done
 fi
 if [ ! -f ../../../filesystem.tar.xz ] && [ "$PROVISION" -ne 1 ]; then echo -e "No filesystem available for target" && exit 1; fi
-echo -e "Building disk image"
-if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] && [ "$PROVISION" -ne 1 ]
 then
+	echo -e "Building disk image"
         size=320
         date=$(date +%Y%m%d)
 	dd if=/dev/zero of=OSMC_TGT_${1}_${date}.img bs=1M count=${size} conv=sparse
