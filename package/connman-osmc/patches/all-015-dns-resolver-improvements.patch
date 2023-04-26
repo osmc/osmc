@@ -1,0 +1,43 @@
+From 9d1fad6cb8b0a66f16c89576c285a9660ebd28d0 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 26 Apr 2023 02:01:24 +0100
+Subject: [PATCH] dnsproxy: store each DNS response for at least 30 mins. As
+ per systemd-resolve, store each response for a maximum of 2 hours and store
+ up to 4096 DNS responses.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/dnsproxy.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/dnsproxy.c b/src/dnsproxy.c
+index 7ebffbc..48372a2 100644
+--- a/src/dnsproxy.c
++++ b/src/dnsproxy.c
+@@ -212,11 +212,11 @@ struct domain_rr {
+  * By default the TTL (time-to-live) of the DNS response is used
+  * when setting the cache entry life time. The value is in seconds.
+  */
+-#define MAX_CACHE_TTL (60 * 30)
++#define MAX_CACHE_TTL (60 * 60 * 2)
+ /*
+- * Also limit the other end, cache at least for 30 seconds.
++ * Also limit the other end, cache at least for 30 minutes.
+  */
+-#define MIN_CACHE_TTL (30)
++#define MIN_CACHE_TTL (60 * 30)
+ 
+ /*
+  * We limit the cache size to some sane value so that cached data does
+@@ -225,7 +225,7 @@ struct domain_rr {
+  * Example: caching www.connman.net uses 97 bytes memory.
+  * The value is the max amount of cached DNS responses (count).
+  */
+-#define MAX_CACHE_SIZE 256
++#define MAX_CACHE_SIZE 4096
+ 
+ #define DNS_HEADER_SIZE sizeof(struct domain_hdr)
+ #define DNS_HEADER_TCP_EXTRA_BYTES 2
+-- 
+2.7.4
+
