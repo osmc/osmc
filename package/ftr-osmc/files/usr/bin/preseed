@@ -69,13 +69,13 @@ except ImportError:
     syslog = SysLog()
 
 PRESEED = '/boot/preseed.cfg'
-PRESEED_PROVISIONING = '/tmp/conmann.preseed.config'
+PRESEED_PROVISIONING = '/tmp/connman.preseed.config'
 CONNMAN_PROVISIONING = '/var/lib/connman/osmc.config'
 
 if hasattr(sys, 'getwindowsversion'):
     # for testing on windows
     PRESEED = os.path.join(os.getcwd(), '.tests', 'preseed.cfg')
-    PRESEED_PROVISIONING = os.path.join(os.getcwd(), '.tests', 'conmann.preseed.config')
+    PRESEED_PROVISIONING = os.path.join(os.getcwd(), '.tests', 'connman.preseed.config')
     CONNMAN_PROVISIONING = os.path.join(os.getcwd(), '.tests', 'osmc.config')
     try:
         os.makedirs(os.path.join(os.getcwd(), '.tests'))
@@ -281,8 +281,11 @@ def preseed_to_connman_provisioning(parsed_preseed):
                                                             parsed_preseed['dns2']])
 
     elif parsed_preseed['interface'] == 'wlan':
-        base64_ssid = base64.b64encode(parsed_preseed['ssid']).decode('utf-8')
-        base64_ssid = base64_ssid.rstrip('=')
+        base64_ssid = (
+            base64.b64encode(bytes(parsed_preseed['ssid'], encoding='utf-8'))
+            .decode('utf-8')
+            .rstrip('=')
+        )
         section_ssid = '_%s' % base64_ssid if base64_ssid else ''
         section_name = 'service_wifi%s' % section_ssid
 
