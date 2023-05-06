@@ -23,6 +23,9 @@ index 37069f580d..539da3fc31 100644
 +      if (! hostname)
 +      return;
 +      CServiceBroker::GetSettingsComponent()->GetSettings()->SetString(CSettings::SETTING_SERVICES_DEVICENAME, hostname);
++      int n=newhostname.length();
++      if ( n > 1 && < 15 )
++        CServiceBroker::CPeripheralCecAdapter::SetSetting("device_name", newhostname);
 +    }
 +
 +
