@@ -1,0 +1,54 @@
+From c27273f34c1947c8ce77900d2001907c5939380b Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Fri, 4 Aug 2017 21:13:59 +0100
+Subject: [PATCH] Fix a crash caused by multiple calls to ReloadSkin() before
+ the first one completes
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/application/ApplicationSkinHandling.cpp | 11 ++++++++++-
+ xbmc/application/ApplicationSkinHandling.h   |  1 +
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/application/ApplicationSkinHandling.cpp b/xbmc/application/ApplicationSkinHandling.cpp
+index 4a28f2b946..f1a60b8bda 100644
+--- a/xbmc/application/ApplicationSkinHandling.cpp
++++ b/xbmc/application/ApplicationSkinHandling.cpp
+@@ -380,6 +380,11 @@ void CApplicationSkinHandling::ReloadSkin(bool confirm)
+   if (!g_SkinInfo || m_bInitializing)
+     return; // Don't allow reload before skin is loaded by system
+ 
++  if (m_SkinReloading) {
++    CLog::Log(LOGINFO, "Suppressing skin reload as we are already doing so");
++    return;
++  }
++
+   std::string oldSkin = g_SkinInfo->ID();
+ 
+   CGUIMessage msg(GUI_MSG_LOAD_SKIN, -1,
+@@ -388,7 +393,11 @@ void CApplicationSkinHandling::ReloadSkin(bool confirm)
+ 
+   const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+   std::string newSkin = settings->GetString(CSettings::SETTING_LOOKANDFEEL_SKIN);
+-  if (LoadSkin(newSkin))
++  m_SkinReloading = true;
++  bool skinLoaded = LoadSkin(newSkin);
++  m_SkinReloading = false;
++
++  if (skinLoaded)
+   {
+     /* The Reset() or SetString() below will cause recursion, so the m_confirmSkinChange boolean is set so as to not prompt the
+        user as to whether they want to keep the current skin. */
+diff --git a/xbmc/application/ApplicationSkinHandling.h b/xbmc/application/ApplicationSkinHandling.h
+index fc5c3d0df5..ca240a0cdb 100644
+--- a/xbmc/application/ApplicationSkinHandling.h
++++ b/xbmc/application/ApplicationSkinHandling.h
+@@ -50,4 +50,5 @@ protected:
+   IMsgTargetCallback* m_msgCb;
+   IWindowManagerCallback* m_wCb;
+   bool& m_bInitializing;
++  bool m_SkinReloading = false;
+ };
+-- 
+2.34.1
+
