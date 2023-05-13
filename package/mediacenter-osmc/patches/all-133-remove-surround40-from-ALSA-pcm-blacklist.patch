@@ -1,0 +1,50 @@
+From 9f960aee1ca5dfbebac18c9e69dbacd01d67fb28 Mon Sep 17 00:00:00 2001
+From: Ryan Underwood <nemesis@icequake.net>
+Date: Sat, 13 May 2023 18:03:41 -0500
+Subject: [PATCH] Remove surround40 from ALSA pcm blacklist
+
+Signed-off-by: Ryan Underwood <nemesis@icequake.net>
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 86a3d359ee..e8ed0ac737 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -1189,7 +1189,6 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+        * "plughw", "dsnoop"). */
+ 
+       else if (baseName != "default"
+-            && baseName != "surround40"
+             && baseName != "surround41"
+             && baseName != "surround50"
+             && baseName != "surround51"
+@@ -1261,6 +1260,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+ 
+   for (AEDeviceInfoList::iterator it1 = list.begin(); it1 != list.end(); ++it1)
+   {
++    std::string replacementName = "";
++
+     for (AEDeviceInfoList::iterator it2 = it1+1; it2 != list.end(); ++it2)
+     {
+       if (it1->m_displayName == it2->m_displayName
+@@ -1290,10 +1291,14 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+         }
+ 
+         /* if we got here, the configuration is really weird, just append the whole device string */
+-        it1->m_displayName += " (" + it1->m_deviceName + ")";
++        replacementName = it1->m_displayName + " (" + it1->m_deviceName + ")";
+         it2->m_displayName += " (" + it2->m_deviceName + ")";
+       }
+     }
++
++    if (!replacementName.empty()) {
++      it1->m_displayName = replacementName;
++    }
+   }
+ 
+   for (std::set<std::string>::iterator it = cardsToAppend.begin();
+-- 
+2.39.2
+
