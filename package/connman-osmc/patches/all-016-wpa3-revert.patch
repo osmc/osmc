@@ -1,0 +1,218 @@
+diff --git a/gsupplicant/gsupplicant.h b/gsupplicant/gsupplicant.h
+index eab6293f..7935c3a6 100644
+--- a/gsupplicant/gsupplicant.h
++++ b/gsupplicant/gsupplicant.h
+@@ -61,7 +61,6 @@ extern "C" {
+ #define G_SUPPLICANT_KEYMGMT_WPA_EAP	(1 << 7)
+ #define G_SUPPLICANT_KEYMGMT_WPA_EAP_256	(1 << 8)
+ #define G_SUPPLICANT_KEYMGMT_WPS		(1 << 9)
+-#define G_SUPPLICANT_KEYMGMT_SAE		(1 << 10)
+
+ #define G_SUPPLICANT_PROTO_WPA		(1 << 0)
+ #define G_SUPPLICANT_PROTO_RSN		(1 << 1)
+@@ -130,12 +129,6 @@ typedef enum {
+ 	G_SUPPLICANT_PEER_GROUP_FAILED,
+ } GSupplicantPeerState;
+
+-typedef enum {
+-	G_SUPPLICANT_MFP_NONE,
+-	G_SUPPLICANT_MFP_OPTIONAL,
+-	G_SUPPLICANT_MFP_REQUIRED,
+-} GSupplicantMfpOptions;
+-
+ struct _GSupplicantSSID {
+ 	const void *ssid;
+ 	unsigned int ssid_len;
+@@ -162,8 +155,6 @@ struct _GSupplicantSSID {
+ 	dbus_bool_t use_wps;
+ 	const char *pin_wps;
+ 	const char *bgscan;
+-	unsigned int keymgmt;
+-	GSupplicantMfpOptions ieee80211w;
+ };
+
+ typedef struct _GSupplicantSSID GSupplicantSSID;
+@@ -348,7 +339,6 @@ bool g_supplicant_peer_is_in_a_group(GSupplicantPeer *peer);
+ GSupplicantInterface *g_supplicant_peer_get_group_interface(GSupplicantPeer *peer);
+ bool g_supplicant_peer_is_client(GSupplicantPeer *peer);
+ bool g_supplicant_peer_has_requested_connection(GSupplicantPeer *peer);
+-unsigned int g_supplicant_network_get_keymgmt(GSupplicantNetwork *network);
+
+ struct _GSupplicantCallbacks {
+ 	void (*system_ready) (void);
+diff --git a/gsupplicant/supplicant.c b/gsupplicant/supplicant.c
+index 470d99eb..a660863e 100644
+--- a/gsupplicant/supplicant.c
++++ b/gsupplicant/supplicant.c
+@@ -92,7 +92,6 @@ static struct strvalmap keymgmt_map[] = {
+ 	{ "wpa-eap",		G_SUPPLICANT_KEYMGMT_WPA_EAP	},
+ 	{ "wpa-eap-sha256",	G_SUPPLICANT_KEYMGMT_WPA_EAP_256	},
+ 	{ "wps",		G_SUPPLICANT_KEYMGMT_WPS		},
+-	{ "sae",		G_SUPPLICANT_KEYMGMT_SAE		},
+ 	{ }
+ };
+
+@@ -235,7 +234,6 @@ struct _GSupplicantNetwork {
+ 	unsigned int wps_capabilities;
+ 	GHashTable *bss_table;
+ 	GHashTable *config_table;
+-	unsigned int keymgmt;
+ };
+
+ struct _GSupplicantPeer {
+@@ -1429,14 +1427,6 @@ bool g_supplicant_peer_has_requested_connection(GSupplicantPeer *peer)
+ 	return peer->connection_requested;
+ }
+
+-unsigned int g_supplicant_network_get_keymgmt(GSupplicantNetwork *network)
+-{
+-	if (!network)
+-		return 0;
+-
+-	return network->keymgmt;
+-}
+-
+ static void merge_network(GSupplicantNetwork *network)
+ {
+ 	GString *str;
+@@ -1467,8 +1457,7 @@ static void merge_network(GSupplicantNetwork *network)
+ 	else if (g_strcmp0(mode, "1") == 0)
+ 		g_string_append_printf(str, "_adhoc");
+
+-	if ((g_strcmp0(key_mgmt, "WPA-PSK") == 0) ||
+-	    (g_strcmp0(key_mgmt, "SAE") == 0))
++	if (g_strcmp0(key_mgmt, "WPA-PSK") == 0)
+ 		g_string_append_printf(str, "_psk");
+
+ 	group = g_string_free(str, FALSE);
+@@ -1661,7 +1650,6 @@ static int add_or_replace_bss_to_network(struct g_supplicant_bss *bss)
+ 	network->name = create_name(bss->ssid, bss->ssid_len);
+ 	network->mode = bss->mode;
+ 	network->security = bss->security;
+-	network->keymgmt = bss->keymgmt;
+ 	network->ssid_len = bss->ssid_len;
+ 	memcpy(network->ssid, bss->ssid, bss->ssid_len);
+ 	network->signal = bss->signal;
+@@ -1943,8 +1931,7 @@ static void bss_compute_security(struct g_supplicant_bss *bss)
+ 	if (bss->keymgmt &
+ 			(G_SUPPLICANT_KEYMGMT_WPA_PSK |
+ 				G_SUPPLICANT_KEYMGMT_WPA_FT_PSK |
+-				G_SUPPLICANT_KEYMGMT_WPA_PSK_256 |
+-				G_SUPPLICANT_KEYMGMT_SAE))
++				G_SUPPLICANT_KEYMGMT_WPA_PSK_256))
+ 		bss->psk = TRUE;
+
+ 	if (bss->ieee8021x)
+@@ -4903,16 +4890,8 @@ static void add_network_security_proto(DBusMessageIter *dict,
+ 	g_free(proto);
+ }
+
+-static void add_network_ieee80211w(DBusMessageIter *dict, GSupplicantSSID *ssid,
+-				   GSupplicantMfpOptions ieee80211w)
+-{
+-	supplicant_dbus_dict_append_basic(dict, "ieee80211w", DBUS_TYPE_UINT32,
+-					  &ieee80211w);
+-}
+-
+ static void add_network_security(DBusMessageIter *dict, GSupplicantSSID *ssid)
+ {
+-	GSupplicantMfpOptions ieee80211w;
+ 	char *key_mgmt;
+
+ 	switch (ssid->security) {
+@@ -4928,22 +4907,7 @@ static void add_network_security(DBusMessageIter *dict, GSupplicantSSID *ssid)
+ 		add_network_security_ciphers(dict, ssid);
+ 		break;
+ 	case G_SUPPLICANT_SECURITY_PSK:
+-		if (ssid->keymgmt & G_SUPPLICANT_KEYMGMT_SAE) {
+-			if (ssid->keymgmt & G_SUPPLICANT_KEYMGMT_WPA_PSK) {
+-				/*
+-				 * WPA3-Personal transition mode: supports both
+-				 * WPA2-Personal (PSK) and WPA3-Personal (SAE)
+-				 */
+-				key_mgmt = "SAE WPA-PSK";
+-				ieee80211w = G_SUPPLICANT_MFP_OPTIONAL;
+-			} else {
+-				key_mgmt = "SAE";
+-				ieee80211w = G_SUPPLICANT_MFP_REQUIRED;
+-			}
+-			add_network_ieee80211w(dict, ssid, ieee80211w);
+-		} else {
+-			key_mgmt = "WPA-PSK";
+-		}
++		key_mgmt = "WPA-PSK";
+ 		add_network_security_psk(dict, ssid);
+ 		add_network_security_ciphers(dict, ssid);
+ 		add_network_security_proto(dict, ssid);
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index e947b169..760a3311 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -166,10 +166,6 @@ struct wifi_data {
+ 	int assoc_code;
+ };
+
+-struct wifi_network {
+-	unsigned int keymgmt;
+-};
+-
+ struct disconnect_data {
+ 	struct wifi_data *wifi;
+ 	struct connman_network *network;
+@@ -819,7 +815,6 @@ static void remove_networks(struct connman_device *device,
+ 	for (list = wifi->networks; list; list = list->next) {
+ 		struct connman_network *network = list->data;
+
+-		g_free(connman_network_get_data(network));
+ 		connman_device_remove_network(device, network);
+ 		connman_network_unref(network);
+ 	}
+@@ -2162,7 +2157,6 @@ static GSupplicantSecurity network_security(const char *security)
+
+ static void ssid_init(GSupplicantSSID *ssid, struct connman_network *network)
+ {
+-	struct wifi_network *network_data = connman_network_get_data(network);
+ 	const char *security;
+
+ 	memset(ssid, 0, sizeof(*ssid));
+@@ -2172,8 +2166,6 @@ static void ssid_init(GSupplicantSSID *ssid, struct connman_network *network)
+ 	ssid->scan_ssid = 1;
+ 	security = connman_network_get_string(network, "WiFi.Security");
+ 	ssid->security = network_security(security);
+-	ssid->keymgmt = network_data->keymgmt;
+-	ssid->ieee80211w = G_SUPPLICANT_MFP_OPTIONAL;
+ 	ssid->passphrase = connman_network_get_string(network,
+ 						"WiFi.Passphrase");
+
+@@ -2818,7 +2810,6 @@ static void network_added(GSupplicantNetwork *supplicant_network)
+ 	struct connman_network *network;
+ 	GSupplicantInterface *interface;
+ 	struct wifi_data *wifi;
+-	struct wifi_network *network_data;
+ 	const char *name, *identifier, *security, *group, *mode;
+ 	const unsigned char *ssid;
+ 	unsigned int ssid_len;
+@@ -2867,15 +2858,8 @@ static void network_added(GSupplicantNetwork *supplicant_network)
+ 		}
+
+ 		wifi->networks = g_slist_prepend(wifi->networks, network);
+-
+-		network_data = g_new0(struct wifi_network, 1);
+-		connman_network_set_data(network, network_data);
+ 	}
+
+-	network_data = connman_network_get_data(network);
+-	network_data->keymgmt =
+-		g_supplicant_network_get_keymgmt(supplicant_network);
+-
+ 	if (name && name[0] != '\0')
+ 		connman_network_set_name(network, name);
+
+@@ -2943,7 +2927,6 @@ static void network_removed(GSupplicantNetwork *network)
+
+ 	wifi->networks = g_slist_remove(wifi->networks, connman_network);
+
+-	g_free(connman_network_get_data(connman_network));
+ 	connman_device_remove_network(wifi->device, connman_network);
+ 	connman_network_unref(connman_network);
+ }
