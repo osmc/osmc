@@ -10580,7 +10580,7 @@ index 4ba4e7e8b0..40433f443d 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 725bbc46c7..ee6b05051b
+index 725bbc46c7..12432ff14d
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10744,7 +10744,7 @@ index 725bbc46c7..ee6b05051b
 +	  refRate = StringUtils::Format("{:0.2f} Hz ", info.fRefreshRate);
 +  }
 +
-+  return StringUtils::Format("{}x{}{}{}",
++  return StringUtils::Format("{}x{}{} {}{}",
 +      info.iScreenWidth, info.iScreenHeight, info.dwFlags & D3DPRESENTFLAG_INTERLACED ? 'i' : 'p',
 +      refRate, stereo);
 +}
