@@ -1,0 +1,79 @@
+#!/bin/busybox sh
+
+export OPTION_DO_FSCK="1"
+export OPTION_FORCE_FSCK="0"
+export OPTION_ROOT="/dev/osmc-root"
+export OPTION_ROOTDELAY="0"
+export OPTION_FILESYSTEM="ext4"
+export OPTION_INIT="/sbin/splash_early"
+export OPTION_MOUNT_OPTIONS=""
+export OPTION_MOUNT_PATH="/real_root"
+
+hdmimode=720p60hz
+
+for arg in $(/bin/busybox cat /proc/cmdline)
+do
+     case ${arg} in
+	hdmimode=*)
+	   hdmimode=${arg#*=}
+	;;
+esac
+done
+
+preferred=$(busybox grep 1080p60hz /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+if ! [ "$preferred" ]
+then
+	preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+fi
+if echo $hdmimode | busybox grep -q force
+then
+    hdmimode=$(echo $hdmimode | /bin/busybox sed 's/force//g')
+    echo "$hdmimode" > /sys/class/display/mode
+else
+	if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
+	then
+	  if ! echo $preferred | busybox grep -q 2160p; then hdmimode="$preferred"; fi
+	fi
+	echo "$hdmimode" > /sys/class/display/mode
+fi
+
+# Configure framebuffer X and Y size
+
+case $hdmimode in
+  480*)            X=720  Y=480  ;;
+  576*)            X=720  Y=576  ;;
+  720p*)           X=1280 Y=720  ;;
+  *)               X=1920 Y=1080 ;;
+esac
+
+/bin/busybox fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+/bin/busybox fbset -fb /dev/fb1 -g 32 32 32 32 32
+
+echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
+echo 1 > /sys/class/video/disable_video
+
+# Enable scaling for 4K output
+case $hdmimode in
+  4k*|smpte*|2160*)
+    echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
+    echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
+    echo 0x10001 > /sys/class/graphics/fb0/free_scale
+  ;;
+esac
+
+# Enable framebuffer device
+
+echo 0 > /sys/class/graphics/fb0/blank
+
+# Prevent static artefacts
+echo 1 > /sys/class/graphics/fb1/blank
+
+# Include deinterlacer into default VFM map
+echo rm default > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amlvideo amvideo > /sys/class/vfm/map
+
+# Better entropy
+for part in /sys/block/*/queue/add_random; do
+echo 0 > "$part"
+done

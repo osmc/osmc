@@ -27,6 +27,7 @@ fi
 test $1 == rbp2 && VERSION="5.15.83" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == rbp464 && VERSION="5.15.83" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == vero364 && VERSION="4.9.269" && REV="28" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == vero564 && VERSION="4.9.269" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=1
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
@@ -40,6 +41,7 @@ then
 	SOURCE_LINUX="https://www.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${DL_VERSION}.tar.xz"
 fi
 if [ $1 == "vero364" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/osmc-openlinux-4.9.tar.gz"; fi
+if [ $1 == "vero564" ]; then SOURCE_LINUX="https://github.com/osmc/vero3-linux/archive/osmc-openlinux-4.9.tar.gz"; fi
 pull_source "${SOURCE_LINUX}" "$(pwd)/src"
 # We need to download busybox and e2fsprogs here because we run initramfs build within chroot and can't pull_source in a chroot
 if ((($FLAGS_INITRAMFS & $INITRAMFS_NOBUILD) != $INITRAMFS_NOBUILD))
@@ -90,6 +92,11 @@ then
 	    handle_dep "python3"
 	    handle_dep "xxd"
         fi
+        if [ "$1" == "vero564" ]
+        then
+            handle_dep "python3"
+            handle_dep "xxd"
+        fi
 	if [ "$SIGN_KERNEL" -eq 1 ]
         	then
                 	SIG_KEYS_DIR="/etc/osmc/keys"
@@ -108,6 +115,7 @@ then
         fi
         if [ $ARCH == "i686" ]; then ARCH="i386"; fi
         if [ "$1" == "vero364" ]; then KHARCH=arm* && ARCH=arm64; fi
+        if [ "$1" == "vero564" ]; then KHARCH=arm* && ARCH=arm64; fi
         if [ "$1" == "rbp464" ]; then KHARCH=arm* && ARCH=arm64; fi
         export ARCH
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp464" ]
@@ -247,6 +255,32 @@ then
 		# Device tree for uploading to eMMC
 		cp -ar $DTB_FILE ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
         fi
+        if [ "$1" == "vero564" ]
+        then
+                $BUILD vero5_2021.dtb || $BUILD vero5_2021.dtb
+                mkdir -p ../../files-image/boot #hack
+                # Special packaging for Android
+                DTB_FILE="multi.dtb"
+                ./scripts/multidtb/multidtb -p scripts/dtc/ -o $DTB_FILE arch/arm64/boot/dts/amlogic --verbose --page-size 2048
+                if [ $? != 0 ]; then echo "Packing DTB failed"; fi
+                if [ "$SIGN_KERNEL" -eq 1 ]
+                then
+                        DTB_FILE="multi.dtb.encrypted"
+                        scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output kernel.img
+                        if [ $? != 0 ]; then echo "Creating boot image failed in secure mode" && exit 1; fi
+                        scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input multi.dtb --output $DTB_FILE
+                        if [ $? != 0 ]; then echo "Signing DTB image failed" && exit 1; fi
+                        scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input kernel.img --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
+                        if [ $? != 0 ]; then echo "Signing kernel image failed" && exit 1; fi
+                else
+						scripts/mkbootimg --kernel arch/arm64/boot/Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk ../../initramfs-src/initrd.img.gz --second multi.dtb --output ../../files-image/boot/kernel-${VERSION}-${REV}-osmc.img
+                        if [ $? != 0 ]; then echo "Creating boot image failed in non-secure mode" && exit 1; fi
+
+                fi
+                # Hacks for lack of ARM64 native in kernel-package for Jessie
+                # Device tree for uploading to eMMC
+                cp -ar $DTB_FILE ../../files-image/boot/dtb-${VERSION}-${REV}-osmc.img
+        fi
 	if [ "$1" == "rbp464" ]
 	then
 		cp -ar arch/arm64/boot/Image ../../files-image/boot/vmlinuz-${VERSION}-${REV}-osmc
@@ -276,6 +310,16 @@ then
 		cp $file ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc
 		done
 	fi
+        if [ "$1" == "vero564" ]
+        then
+                # Build V4L2 modules for Vero V
+                $BUILD M=drivers/osmc/media_modules CONFIG_AMLOGIC_MEDIA_VDEC_OSMC=m
+                mkdir -p ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc
+                for file in $(find drivers/osmc/media_modules/ -name "*.ko"); do
+                sign_module $file
+                cp $file ../../files-image/lib/modules/${VERSION}-${REV}-osmc/kernel/drivers/osmc
+                done
+        fi
 	# Unset architecture
 	ARCH=$(arch)
 	export ARCH
@@ -362,11 +406,15 @@ EOF
 	if [ "$1" == "vero364" ]
 	then
 		echo "Depends: ${1}-image-${VERSION}-${REV}-osmc, vero3-bootloader-osmc:armhf (>=1.0.0)" >> files/DEBIAN/control
-	else
-		echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
+        else if [ "$1" == "vero564" ]
+        then
+                echo "Depends: ${1}-image-${VERSION}-${REV}-osmc, vero5-bootloader-osmc:armhf (>=1.0.0)" >> files/DEBIAN/control
+        else
+                echo "Depends: ${1}-image-${VERSION}-${REV}-osmc" >> files/DEBIAN/control
+        fi
 	fi
 	case "$1" in
-		rbp464|vero364)
+		rbp464|vero364|vero564)
 			echo "Provides: wireguard-modules:armhf (= 2.0.0)" >> files/DEBIAN/control
 			;;
 		*)
