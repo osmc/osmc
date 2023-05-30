@@ -72,6 +72,7 @@ namespace utils
     {
         utils::writeLog("Enumerating supported devices");
         QList<SupportedDevice * > devices;
+	SupportedDevice *VERO5 = new SupportedDevice("Vero V", "VERO5", false, false, false, false, false, false);
         SupportedDevice *VERO3 = new SupportedDevice("Vero 4K / 4K+", "VERO3", false, false, false, false, false, false);
         SupportedDevice *VERO2 = new SupportedDevice("Vero 2", "VERO2", false, false, false, false, false, false);
         SupportedDevice *VERO = new SupportedDevice("Vero", "VERO1", true, false, false, false, true, false);
@@ -79,6 +80,7 @@ namespace utils
         SupportedDevice *RBP2 = new SupportedDevice("Raspberry Pi 2 / 3 / Zero 2 W", "RBP2", true, true, true, false, true, false);
         SupportedDevice *RBP4 = new SupportedDevice("Raspberry Pi 4 / 400", "RBP4", true, true, true, false, true, false);
         SupportedDevice *ATV = new SupportedDevice("Apple TV", "appletv", false, false, false, false, false, false);
+	devices.append(VERO5);
         devices.append(VERO3);
         devices.append(VERO2);
         devices.append(VERO);
