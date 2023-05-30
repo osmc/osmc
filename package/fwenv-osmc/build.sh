@@ -19,7 +19,7 @@ then
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-fwenv-osmc" >> files/DEBIAN/control
 	pushd src/u-boot-$VERSION
-	if [ "$1" == "vero3" ]; then install_patch "../../patches" "vero3"; fi
+	install_patch "../../patches" "$1"
 	make blank_defconfig
 	make env
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
