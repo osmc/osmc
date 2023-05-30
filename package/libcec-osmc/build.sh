@@ -38,6 +38,7 @@ then
 	install_patch "../../patches" "all"
 	if [ "$1" == "rbp2" ]; then install_patch "../../patches" "rbp" && PLATFORM="-DHAVE_LINUX_API=1"; fi
 	if [ "$1" == "vero3" ]; then install_patch "../../patches" "vero3" && PLATFORM="-DHAVE_AOCEC_API=1"; fi
+        if [ "$1" == "vero5" ]; then install_patch "../../patches" "vero5" && PLATFORM="-DHAVE_AOCEC_API=1"; fi
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/osmc -DCMAKE_INSTALL_LIBDIR=/usr/osmc/lib -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/osmc/lib -DBUILD_SHARED_LIBS=1 -DCMAKE_INSTALL_RPATH=/usr/osmc/lib $PLATFORM .
 	$BUILD
 	make install DESTDIR=${out}

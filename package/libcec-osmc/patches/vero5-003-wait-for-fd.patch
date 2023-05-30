@@ -1,0 +1,27 @@
+From cc5d8b9c1af82254ca2813ea7324ab50b55d3d24 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 6 Jun 2016 22:31:36 +0100
+Subject: [PATCH] wait for valid fd
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp b/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
+index a88d9ba..c07e2f0 100644
+--- a/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
+@@ -265,7 +265,8 @@ void *CAOCECAdapterCommunication::Process(void)
+   {
+     if (m_fd == INVALID_SOCKET_VALUE)
+     {
+-      break;
++       Sleep(250);
++       continue;
+     }
+ 
+     FD_ZERO(&rfds);
+-- 
+2.7.4
+
