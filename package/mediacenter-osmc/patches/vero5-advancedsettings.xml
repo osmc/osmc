@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!-- Do not modify! These are OSMC Optimised Settings for your device  !-->
+  <!-- If you wish to override any of these values, then create a file in /home/osmc/.kodi/userdata/advancedsettings.xml !-->
+  <!-- It will override these settings, and your settings will be preserved across OSMC updates !-->
+<advancedsettings version="1.0">
+    <imageres>540</imageres>
+    <fanartres>720</fanartres>
+    <splash>false</splash>
+    <handlemounting>0</handlemounting>
+    <samba>
+       <clienttimeout>30</clienttimeout>
+    </samba>
+    <cache>
+       <buffermode>1</buffermode>
+       <memorysize>524880000</memorysize>
+       <readfactor>5.0</readfactor>
+    </cache>
+<cputempcommand>/bin/sed -e 's/\([0-9]*\)[0-9]\{3\}.*/\1 C/' /sys/class/thermal/thermal_zone0/temp</cputempcommand>
+<gputempcommand>/bin/sed -e 's/\([0-9]*\)[0-9]\{3\}.*/\1 C/' /sys/class/thermal/thermal_zone0/temp</gputempcommand>
+    <gamesgeneral>
+       <enable>true</enable>
+    </gamesgeneral>
+<smartredraw>true</smartredraw>
+    <videoscreen>
+      <screen>0</screen>
+    </videoscreen>
+<myvideos>
+    <usetags>false</usetags>
+</myvideos>
+</advancedsettings>
