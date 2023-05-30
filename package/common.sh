@@ -125,6 +125,8 @@ function build_in_env()
 	test $DEP == vero1 && DEP="armv7"
 	test $DEP == vero2 && DEP="armv7"
 	test $DEP == vero3 && DEP="armv7"
+	test $DEP == vero5 && DEP="armv7"
+        test $DEP == vero564 && DEP="aarch64"
 	test $DEP == vero364 && DEP="aarch64"
 	test $DEP == rbp4 && DEP="armv7"
 	test $DEP == rbp464 && DEP="aarch64"
