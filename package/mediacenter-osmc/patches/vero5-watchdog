@@ -1,0 +1,225 @@
+#!/bin/bash
+
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
+fb_restore() {
+	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
+	then
+		for arg in $(cat /proc/cmdline)
+		do
+			case ${arg} in
+			hdmimode=*)
+				hdmimode=${arg#*=}
+			;;
+			esac
+		done
+
+		fb_mode=$(cat /var/run/fb_mode)
+		if ! echo $hdmimode | grep -q force && ! grep -qw $fb_mode /sys/class/amhdmitx/amhdmitx0/disp_cap
+		then
+			preferred=$(grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | sed 's/\*//g')
+			if [ "$preferred" ]
+			then
+				fb_mode="$preferred"
+			else
+				fb_mode=720p60hz
+			fi
+		fi
+		mode=$(head -n 1 /sys/class/display/mode)
+		[ "$mode" != "$fb_mode" ] && echo "$fb_mode" >/sys/class/display/mode
+		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
+		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
+		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
+		echo 1 >/sys/class/vtconsole/vtcon1/bind
+		/bin/fbset $(cat /var/run/fb_resolution)
+	fi
+}
+
+set_font() {
+	vres=$(/bin/fbset | grep geometry | awk '{print $3}')
+	if ((vres<=660))
+	then
+		setfont OSMC-Lat15-Terminus14.psf.gz
+	elif ((661<=vres && vres<=890))
+	then
+		setfont OSMC-Lat15-TerminusBold22x11.psf.gz
+	elif ((891<=vres))
+	then
+		setfont OSMC-Lat15-TerminusBold28x14.psf.gz
+	fi
+}
+
+export TERM=linux
+
+if [ "$1" = "stop" ]; then
+	fb_restore
+	exit
+fi
+
+syspaths="/sys/class/video/
+/sys/class/tsync/pts_pcrscr
+/sys/class/tsync/enable
+/sys/class/audiodsp/digital_raw
+/sys/class/display/mode
+/sys/class/audiodsp/digital_codec
+/sys/module/amvideo/parameters/omx_pts
+/sys/module/amvideo/parameters/omx_pts_interval_lower
+/sys/class/vfm/map
+/dev/video10
+/sys/module/di/parameters/bypass_all
+/sys/class/amhdmitx/amhdmitx0/frac_rate_policy
+/sys/module/di/parameters/bypass_prog
+/sys/class/amhdmitx/amhdmitx0/debug
+/sys/class/amhdmitx/amhdmitx0/attr
+/sys/class/amhdmitx/amhdmitx0/output_rgb
+/sys/class/amhdmitx/amhdmitx0/config
+/sys/class/amhdmitx/amhdmitx0/aud_ch
+/sys/class/amhdmitx/amhdmitx0/phy
+/sys/class/amhdmitx/amhdmitx0/aspect
+/sys/class/leds/standby/brightness
+/sys/devices/system/cpu/cpu0/cpufreq
+/dev/amvideocap0
+/sys/module/am_vecm/parameters/range_control
+/sys/kernel/debug/aml_reg/paddr
+/sys/module/amvideo/parameters/framepacking_support
+/sys/module/amvdec_h264mvc/parameters/view_mode
+/sys/module/di/parameters/di_debug_flag
+/sys/class/codec_mm/tvp_enable
+/sys/module/amvdec_vc1/parameters/force_frameint
+/sys/class/ppmgr/orientation
+/sys/module/am_vecm/parameters/customer_panel_lumin
+/sys/module/am_vecm/parameters/hdr_mode
+/sys/module/am_vecm/parameters/customer_master_display_param
+/sys/module/am_vecm/parameters/customer_master_display_en
+/sys/module/amvideo/parameters/framepacking_width
+/sys/module/amvideo/parameters/framepacking_height
+/sys/module/amvideo/parameters/framepacking_blank
+"
+
+for syspath in $syspaths; do
+	chgrp -R video $syspath
+	chmod -R u+rw $syspath
+	chmod -R g+u $syspath
+done
+
+trap 'wait; exit 0' SIGTERM
+
+chmod a+rw /dev/tty1
+/usr/bin/setterm --blank 0 </dev/tty1 >/dev/tty1
+
+boot_space=$(df -B 1M /boot | sed 1d | awk '{ print $4}')
+root_space=$(df -B 1M / | sed 1d | awk '{ print $4}')
+
+/sbin/checkmodifier; CODE=$?
+if [ $CODE -eq 0 ] && [ -e /dist_upgrade_wanted ]; then CODE=5; fi
+case $CODE in
+4)
+	/usr/bin/setterm --cursor on >/dev/tty1
+	systemctl start getty@tty1
+	exit 0
+	;;
+5)
+	if [ -e /dist_upgrade_wanted ]; then apt-get clean; fi
+	rm /dist_upgrade_wanted
+
+	set_font
+	if [ $boot_space -lt 30 ] || [ $root_space -lt 300 ]; then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n        WARNING! Insufficient disk space available to complete update.\n\n30MB required on /boot (${boot_space}MB available) and 300MB required on root partition. (${root_space}MB available)\n\nPlease free sufficient disk space and check for updates to try again. Rebooting in 60 seconds..." 11 85 > /dev/tty1
+		sleep 60; reboot
+	fi
+
+	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
+
+	count=60
+	while [ $count -gt 0 ]; do
+		if grep -q nfsroot /proc/cmdline; then
+			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
+		else
+			if connmanctl state | grep -iq 'online'; then break; fi
+		fi
+		sleep 5; let count-=5
+	done
+
+	if [ $count -lt 1 ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
+		sleep 20; reboot
+	fi
+        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
+        err=$(apt-get -qq update); if [ -n "$err" ]
+        then
+                dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
+                sleep 20
+        fi
+        systemctl start manual-update
+        exit 0
+        ;;
+esac
+
+if [ ! -e /var/run/fb_resolution ]; then
+	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
+	cat /sys/class/display/mode | head -n 1 >/var/run/fb_mode
+	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
+	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
+	cat /sys/class/graphics/fb0/free_scale | sed -e 's/^.*\[//' -e 's/\].*$//g' >/var/run/fb_free_scale
+fi
+
+if [ $root_space -lt 100 ]; then
+	set_font
+	dialog --infobox "\n            WARNING! Free disk space remaining is only ${root_space}MB.\n\nKodi will be unable to start if disk space is completely exhausted. Please free sufficient disk space as soon as possible. Continuing in 10 seconds..." 8 80 > /dev/tty1
+	sleep 10
+fi
+
+while true; do
+        if [ -f /home/osmc/.factoryreset ]; then rm -rf /home/osmc/.kodi && rm /home/osmc/.factoryreset; fi
+	if [ -f /tmp/guisettings.restore ]; then mv /tmp/guisettings.restore /home/osmc/.kodi/userdata/guisettings.xml; fi
+        # clean zero-byte database files that prevent migration/startup
+        for file in /home/osmc/.kodi/userdata/Database/*.db; do [ -s $file ] || rm -f $file; done
+	KODI=/usr/lib/kodi/kodi.bin
+	setcap 'cap_net_bind_service=+ep' $KODI
+	echo 0 >/sys/class/vtconsole/vtcon1/bind
+	starttime=$(date +%s)
+	echo "Starting Kodi..."
+	sudo -u osmc MALLOC_MMAP_THRESHOLD_=8192 LIRC_SOCKET_PATH=/var/run/lirc/lircd $KODI --standalone -fs; CODE="$?"
+	endtime=$(date +%s)
+	seconds=$(($endtime - $starttime)); hours=$((seconds / 3600)); seconds=$((seconds % 3600)); minutes=$((seconds / 60)); seconds=$((seconds % 60))
+	echo "Kodi exited with return code $CODE after $hours hours, $minutes minutes and $seconds seconds"
+
+	fb_restore
+	case $CODE in
+	64|66 )
+		exit 0;;
+	esac
+	chmod a+rw /dev/tty1
+	systemctl status getty@tty1 >/dev/null; GETTY=$?
+	if [ "$GETTY" -ne 0 ]; then
+		chvt 1
+		/usr/bin/setterm --cursor off >/dev/tty1
+		/usr/bin/clear >/dev/tty1
+		/usr/bin/ply-image "$CODE"
+		read -n 1 -s -t 1 dump </dev/tty1
+		read -n 1 -s -t 10 key </dev/tty1
+	fi
+	if [ "$key" = $'\e' -o "$GETTY" -eq 0 ]; then
+		set_font
+		/usr/bin/setterm --cursor on >/dev/tty1
+		/bin/systemctl start getty@tty1
+		count=30
+		loggingin=1
+		while [ $count -gt 0 ]; do
+			terminal_live=$(/bin/ps aux | /usr/bin/grep -v grep | /usr/bin/grep -c ^root.*tty.*login)
+			/usr/bin/who | /usr/bin/awk '{print $2}' | /usr/bin/grep -q tty1; loggedin="$?"
+			if [ $terminal_live -gt 0 ] && [ $loggingin -gt 0 ] && [ $loggedin -ne 0 ]; then
+				count=5
+			elif [ $loggedin -eq 0 ]; then
+				count=5
+				loggingin=0
+			else
+				let count=count-5
+			fi
+			/bin/sleep 5
+		done
+		/bin/systemctl stop getty@tty1
+	fi
+done

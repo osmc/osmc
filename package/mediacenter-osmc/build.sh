@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ]
 then
 pull_source "https://github.com/xbmc/xbmc/archive/289ec664e379d16a045490ba227dcf90b494628e.tar.gz" "$(pwd)/src"
 API_VERSION="20"
@@ -17,7 +17,7 @@ if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
 BUILD_OPTS=$BUILD_OPTION_DEFAULTS
 BUILD_OPTS=$(($BUILD_OPTS - $BUILD_OPTION_USE_CCACHE))
-if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ]
 then
     BUILD_OPTS=$(($BUILD_OPTS + $BUILD_OPTION_NEEDS_SWAP))
 fi
@@ -130,6 +130,17 @@ then
                 handle_dep "armv7-libsqlite-dev-osmc"
 		handle_dep "libamcodec-dev-osmc"
 	fi
+        if [ "$1" == "vero5" ]
+        then
+                handle_dep "vero5-libcec-dev-osmc"
+                handle_dep "vero5-userland-dev-osmc"
+                handle_dep "armv7-libshairplay-dev-osmc"
+                handle_dep "armv7-librtmp-dev-osmc"
+                handle_dep "armv7-libplatform-dev-osmc"
+                handle_dep "armv7-libbluray-dev-osmc"
+                handle_dep "armv7-libsqlite-dev-osmc"
+                handle_dep "libamcodec-dev-osmc"
+        fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		handle_dep "libdrm-dev"
@@ -153,8 +164,9 @@ then
 	then
 		install_patch "../../patches" "rbp"
 	fi
-	if [ "$1" == "rbp2" ] || [ "$1" == "vero3" ]; then install_patch "../../patches" "arm"; fi
+	if [ "$1" == "rbp2" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ]; then install_patch "../../patches" "arm"; fi
 	test "$1" == vero3 && install_patch "../../patches" "vero3"
+	test "$1" == vero5 && install_patch "../../patches" "vero5"
 	mkdir kodi-build
 	pushd kodi-build
 	# Raspberry Pi Configuration
@@ -170,6 +182,10 @@ then
 	then
 		COMPFLAGS="-march=armv7-a -mfloat-abi=hard -O3 -marm -mfpu=neon -fomit-frame-pointer "
 	fi
+        if [ "$1" == "vero5" ]
+        then
+                COMPFLAGS="-march=armv7-a -mfloat-abi=hard -O3 -marm -mfpu=neon -fomit-frame-pointer "
+        fi
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]; then
 	# Check if we have headers for kernel 5.x
 	dpkg -l | grep rbp2-headers-sanitised | grep 5
@@ -257,6 +273,47 @@ then
             -DADDONS_CONFIGURE_AT_STARTUP=OFF \
 	../
         fi
+        if [ "$1" == "vero5" ]; then
+        LIBRARY_PATH+="/opt/vero5/lib" && \
+        COMPFLAGS+="-I/opt/vero5/include -L/opt/vero5/lib -L/usr/osmc/lib -Wl,-rpath=/usr/osmc/lib" && \
+        export CFLAGS="${COMPFLAGS} ${CFLAGS}" && \
+        export CXXFLAGS="${COMPFLAGS} ${CFLAGS}" && \
+        export CPPFLAGS="${COMPFLAGS} ${CFLAGS}" && \
+        export LDFLAGS="-L/opt/vero5/lib" && \
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+            -DCMAKE_PREFIX_PATH=/opt/vero5 \
+            -DCMAKE_INCLUDE_PATH=/opt/vero5/include \
+            -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
+            -DOPENGLES_gl_LIBRARY=/opt/vero5/lib \
+            -DENABLE_AML=ON \
+            -DAPP_RENDER_SYSTEM=gles \
+            -DASS_INCLUDE_DIR=/usr/osmc/lib \
+            -DAML_INCLUDE_DIR=/opt/vero5/include \
+            -DSHAIRPLAY_INCLUDE_DIR=/usr/osmc/include/shairplay/ \
+            -DENABLE_OPENGLES=ON \
+            -DENABLE_OPENGL=OFF \
+            -DENABLE_OPTICAL=1 \
+            -DENABLE_DVDCSS=1 \
+            -DWITH_ARCH=arm \
+            -DWITH_CPU="cortex-a53" \
+            -DCORE_PLATFORM_NAME=aml \
+            -DCORE_SYSTEM_NAME=linux \
+            -DENABLE_APP_AUTONAME=OFF \
+            -DENABLE_INTERNAL_FMT=OFF \
+            -DENABLE_INTERNAL_FLATBUFFERS=OFF \
+            -DENABLE_INTERNAL_SPDLOG=OFF \
+            -DENABLE_INTERNAL_UDFREAD=OFF \
+            -DENABLE_MDNS=OFF \
+            -DENABLE_BLUETOOTH=OFF \
+            -DENABLE_PULSEAUDIO=OFF \
+            -DENABLE_LCMS2=OFF \
+            -DENABLE_SNDIO=OFF \
+            -DENABLE_MARIADBCLIENT=ON \
+            -DENABLE_INTERNAL_DAV1D=ON \
+            -DADDONS_CONFIGURE_AT_STARTUP=OFF \
+        ../
+        fi
 	if [ $? != 0 ]; then echo -e "Configure failed!" && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
@@ -299,6 +356,13 @@ then
            echo "set(OPENGLES_gl_LIBRARY /opt/vero3/lib)" >> ../Toolchain.mk
            echo "set(OPENGLES_INCLUDE_DIR /opt/vero3/include)" >> ../Toolchain.mk
 	fi
+        if [ "$1" == "vero5" ]
+        then
+           ADDONS_TO_BUILD="${ALL}"
+           echo "set(APP_RENDER_SYSTEM gles)" >> ../Toolchain.mk
+           echo "set(OPENGLES_gl_LIBRARY /opt/vero5/lib)" >> ../Toolchain.mk
+           echo "set(OPENGLES_INCLUDE_DIR /opt/vero5/include)" >> ../Toolchain.mk
+        fi
         cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" -DCMAKE_TOOLCHAIN_FILE=../Toolchain.mk ../
         if [ $? != 0 ]; then echo "Configuring binary addons failed" && exit 1; fi
         cd ../
@@ -341,6 +405,7 @@ then
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == rbp4 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2, libglapi-mesa" >> files/DEBIAN/control
 	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control
+        test "$1" == vero5 && echo "Depends: ${COMMON_DEPENDS}, vero5-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero5-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control
 	cp patches/${1}-watchdog ${out}/usr/bin/mediacenter
 	cp patches/${1}-advancedsettings.xml ${out}/usr/share/kodi/system/advancedsettings.xml
 	chmod +x ${out}/usr/bin/mediacenter
