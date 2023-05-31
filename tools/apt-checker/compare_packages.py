@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # Compare and display Staging and Release OSMC package versions - (c) 2015 DBMandrake.
 # Accepts optional command line parameter '--changes' to only display packages whose Staging and Release versions differ.
 
-import urllib
+import urllib.request
 import sys
 import os
 
@@ -18,8 +18,8 @@ archlist = [ 'binary-amd64', 'binary-armhf', 'binary-arm64' ]
 
 for arch in archlist:
 
-	staging = urllib.urlopen('http://apt.osmc.tv/dists/' + repo + '-devel/main/' + arch + '/Packages').read()
-	release = urllib.urlopen('http://apt.osmc.tv/dists/' + repo + '/main/' + arch + '/Packages').read()
+	staging = urllib.request.urlopen('http://apt.osmc.tv/dists/' + repo + '-devel/main/' + arch + '/Packages').read().decode()
+	release = urllib.request.urlopen('http://apt.osmc.tv/dists/' + repo + '/main/' + arch + '/Packages').read().decode()
 	staging_packages = staging.split('\n\n')
 	release_packages = release.split('\n\n')
 
@@ -48,13 +48,13 @@ for arch in archlist:
 
 		if package_name and package_version:
 			try:
-				list = results[package_name]
-				list[0] = package_version
+				tmp_list = results[package_name]
+				tmp_list[0] = package_version
 
 			except KeyError:
-				list = [package_version, 'MISSING']
+				tmp_list = [package_version, 'MISSING']
 
-			results.update({package_name:list})
+			results.update({package_name:tmp_list})
 
 			if package_name.endswith('-kernel-osmc') and package_depends:
 				kernel_prefix = package_name.split('-kernel-osmc')[0]
@@ -63,14 +63,13 @@ for arch in archlist:
 				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
 
 				try:
-					list = results[kernel_name]
-					list[0] = kernel_version
+					tmp_list = results[kernel_name]
+					tmp_list[0] = kernel_version
 
 				except KeyError:
-					list = [kernel_version, 'MISSING' ]
+					tmp_list = [kernel_version, 'MISSING' ]
 
-				results.update({kernel_name:list})
-
+				results.update({kernel_name:tmp_list})
 
 	for package in release_packages:
 		package_name = None
@@ -97,13 +96,13 @@ for arch in archlist:
 
 		if package_name and package_version:
 			try:
-				list = results[package_name]
-				list[1] = package_version
+				tmp_list = results[package_name]
+				tmp_list[1] = package_version
 
 			except KeyError:
-				list = ['MISSING', package_version]
+				tmp_list = ['MISSING', package_version]
 
-			results.update({package_name:list})
+			results.update({package_name:tmp_list})
 
 			if package_name.endswith('-kernel-osmc') and package_depends:
 				kernel_prefix = package_name.split('-kernel-osmc')[0]
@@ -112,21 +111,21 @@ for arch in archlist:
 				kernel_version = package_depends.split(kernel_prefix + '-image-')[1]
 
 				try:
-					list = results[kernel_name]
-					list[1] = kernel_version
+					tmp_list = results[kernel_name]
+					tmp_list[1] = kernel_version
 
 				except KeyError:
-					list = [ 'MISSING', kernel_version ]
+					tmp_list = [ 'MISSING', kernel_version ]
 
-				results.update({kernel_name:list})
+				results.update({kernel_name:tmp_list})
 
 
 package_length = len(max(results, key=len))
 staging_length = max([len(x) for x, y in results.values()])
 release_length = max([len(y) for x, y in results.values()])
 
-print 'Package name' + (package_length - 7) * ' ' + 'Staging' + (staging_length - 2) * ' ' + 'Release' + (release_length - 1) * ' ' + 'Changes'
-print (package_length + staging_length + release_length + 23) * '-' + '\n'
+print('Package name' + (package_length - 7) * ' ' + 'Staging' + (staging_length - 2) * ' ' + 'Release' + (release_length - 1) * ' ' + 'Changes')
+print((package_length + staging_length + release_length + 23) * '-' + '\n')
 
 for pkg in sorted(results):
 	staging_version = results[pkg][0]
@@ -135,9 +134,9 @@ for pkg in sorted(results):
 	if staging_version == release_version and print_changes is True:
 		continue
 
-	print pkg + (package_length + 5 - len(pkg)) * ' ' + staging_version + (staging_length + 5 - len(staging_version)) * ' ' + release_version + (release_length + 5 - len(release_version)) * ' ',
+	print(pkg + (package_length + 5 - len(pkg)) * ' ' + staging_version + (staging_length + 5 - len(staging_version)) * ' ' + release_version + (release_length + 5 - len(release_version)) * ' ', end="")
 
 	if staging_version != release_version:
-		print '<------'
+		print('<------')
 	else:
-		print
+		print()
