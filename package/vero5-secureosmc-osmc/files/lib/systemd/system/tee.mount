@@ -1,0 +1,11 @@
+[Unit]
+Description=OPTEE secure data mount
+
+[Mount]
+What=/dev/tee
+Where=/tee
+Type=ext4
+Options=rw
+
+[Install]
+WantedBy=multi-user.target

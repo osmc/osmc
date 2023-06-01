@@ -1,0 +1,9 @@
+[Unit]
+Description=OpTEE path monitoring service
+StopWhenUnneeded=true
+
+[Path]
+PathExists=/dev/teepriv0
+
+[Install]
+WantedBy=multi-user.target
