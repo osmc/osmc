@@ -488,13 +488,24 @@ class OSMCBackup(object):
             log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
 
             success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+
+            # second try in case of timeout using a hibernated NAS or disk, wait a minute for the awakening
             if not success:
+                log('First attempt to copy backup file to remote address was unsuccessfull, trying again')
+                xbmc.sleep(60000)
+                success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+
+            if not success:
+                log('Second attempt to copy backup file to remote address was unsuccessfull, trying simple cp method')
                 subprocess.Popen(['cp', local_tarball_name, remote_tarball_name])
                 xbmc.sleep(300)
                 success = os.path.isfile(remote_tarball_name)
 
+            if not success:
+                log('Third attempt to copy backup file to remote address was unsuccessfull, giving up')
+
             if success:
-                log('Backup file successfully transferred')
+                log('Finally, backup file successfully transferred')
                 try:
                     xbmcvfs.delete(local_tarball_name)
                 except:
