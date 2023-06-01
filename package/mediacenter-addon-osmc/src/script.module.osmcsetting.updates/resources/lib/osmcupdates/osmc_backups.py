@@ -502,7 +502,7 @@ class OSMCBackup(object):
                 success = os.path.isfile(remote_tarball_name)
 
             if not success:
-                log('The third attempt to copy the backup tarball to the remote address was unsuccessfull, giving up')
+                log('The third attempt to copy the backup tarball to the remote address was unsuccessful, giving up')
 
             if success:
                 log('Finally, backup file successfully transferred')
