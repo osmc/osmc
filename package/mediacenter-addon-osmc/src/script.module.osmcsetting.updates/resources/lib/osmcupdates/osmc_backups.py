@@ -491,18 +491,18 @@ class OSMCBackup(object):
 
             # second try in case of timeout using a hibernated NAS or disk, wait a minute for the awakening
             if not success:
-                log('First attempt to copy backup file to remote address was unsuccessfull, trying again')
+                log('The first attempt to copy the backup tarball to the remote address was unsuccessful, will try again')
                 xbmc.sleep(60000)
                 success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
 
             if not success:
-                log('Second attempt to copy backup file to remote address was unsuccessfull, trying simple cp method')
+                log('The second attempt to copy the backup tarball to the remote address was unsuccessful, trying the simple cp method')
                 subprocess.Popen(['cp', local_tarball_name, remote_tarball_name])
                 xbmc.sleep(300)
                 success = os.path.isfile(remote_tarball_name)
 
             if not success:
-                log('Third attempt to copy backup file to remote address was unsuccessfull, giving up')
+                log('The third attempt to copy the backup tarball to the remote address was unsuccessfull, giving up')
 
             if success:
                 log('Finally, backup file successfully transferred')
