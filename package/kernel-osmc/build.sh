@@ -26,7 +26,7 @@ fi
 . ../common.sh
 test $1 == rbp2 && VERSION="5.15.83" && REV="3" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 test $1 == rbp464 && VERSION="5.15.83" && REV="2" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD + $INITRAMFS_EMBED)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
-test $1 == vero364 && VERSION="4.9.269" && REV="26" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
+test $1 == vero364 && VERSION="4.9.269" && REV="27" && FLAGS_INITRAMFS=$(($INITRAMFS_BUILD)) && IMG_TYPE="zImage" && SIGN_KERNEL=0
 if [ $1 == "rbp2" ] || [ $1 == "rbp464" ]
 then
 	if [ -z $VERSION ]; then echo "Don't have a defined kernel version for this target!" && exit 1; fi
