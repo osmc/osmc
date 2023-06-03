@@ -1,0 +1,12 @@
+[Unit]
+Description=Vero5 Bluetooth support
+Requires=dev-ttyS1.device
+After=dev-ttyS1.device
+PartOf=sdio-bt-firmware.path
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/rtk_hciattach -s 115200 /dev/ttyS1 rtk_h5
+
+[Install]
+WantedBy=multi-user.target

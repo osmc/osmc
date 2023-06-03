@@ -1,0 +1,10 @@
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x024c", ATTRS{device}=="0xc822", ACTION=="add", TAG+="systemd", \
+  RUN+="/bin/touch /var/run/sdio_0x024c:0xc822"
+
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
+  ACTION=="add|change", ATTR{soft}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.path", \
+  ENV{SYSTEMD_READY}="1"
+
+SUBSYSTEM=="rfkill", KERNELS=="bt-dev*", ATTR{type}=="bluetooth", \
+  ACTION=="change", ATTR{soft}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sdio-bt-firmware.path", \
+  ENV{SYSTEMD_READY}="0", PROGRAM="/bin/systemctl stop sdio-bt-firmware.service"
