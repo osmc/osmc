@@ -180,10 +180,12 @@ function handle_dep()
 		else
 			echo -e "Found in APT and will install"
 			# armv7 conflicts -- not caused by lib or headers, but rather, /etc/kernel-img.conf etc
-			if [ "$1" == "vero3-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "rbp2-mesa-dev-osmc" && remove_conflicting "rbp2-mesa-osmc" ; fi
-			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero2-libcec-dev-osmc" && remove_conflicting "vero2-libcec-osmc" && remove_conflicting "vero3-libcec-dev-osmc" && remove_conflicting "vero3-libcec-osmc"; fi
-			if [ "$1" == "vero3-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc"; fi
-			if [ "$1" == "rbp2-mesa-dev-osmc" ]; then remove_conflicting "vero3-userland-dev-osmc" && remove_conflicting "vero3-userland-osmc"; fi
+			if [ "$1" == "vero3-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "rbp2-mesa-dev-osmc" && remove_conflicting "rbp2-mesa-osmc" && remove_conflicting "vero5-userland-dev-osmc" && remove_conflicting "vero5-userland-osmc"; fi
+			if [ "$1" == "vero5-userland-dev-osmc" ]; then remove_conflicting "rbp-userland-dev-osmc" && remove_conflicting "rbp-userland-osmc" && remove_conflicting "rbp2-mesa-dev-osmc" && remove_conflicting "rbp2-mesa-osmc" && remove_conflicting "vero3-userland-dev-osmc" && remove_conflicting "vero3-userland-osmc"; fi
+			if [ "$1" == "rbp2-libcec-dev-osmc" ]; then remove_conflicting "vero3-libcec-dev-osmc" && remove_conflicting "vero3-libcec-osmc" && remove_conflicting "vero5-libcec-dev-osmc" && remove_conflicting "vero5-libcec-osmc"; fi
+			if [ "$1" == "vero3-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero5-libcec-dev-osmc" && remove_conflicting "vero5-libcec-osmc"; fi
+			if [ "$1" == "vero5-libcec-dev-osmc" ]; then remove_conflicting "rbp2-libcec-dev-osmc" && remove_conflicting "rbp2-libcec-osmc" && remove_conflicting "vero3-libcec-dev-osmc" && remove_conflicting "vero3-libcec-osmc"; fi
+			if [ "$1" == "rbp2-mesa-dev-osmc" ]; then remove_conflicting "vero3-userland-dev-osmc" && remove_conflicting "vero3-userland-osmc" && remove_conflicting "vero5-userland-dev-osmc" && remove_conflicting "vero5-userland-osmc"; fi
 			if [ "$use_faster_apt" -eq 1 ]
 			then
 				install_package "${1}" "1"
