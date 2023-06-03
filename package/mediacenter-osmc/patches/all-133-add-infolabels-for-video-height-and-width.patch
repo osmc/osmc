@@ -1,0 +1,59 @@
+From b0ff0552a84713411c20691d3547b400837ea6c8 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Mon, 8 May 2023 15:10:00 +0100
+Subject: [PATCH] Add infolabels for video width and height
+
+Request from skinner to be able to print width and height separately
+from resolution and aspect ratio.
+---
+ xbmc/GUIInfoManager.cpp              | 2 ++
+ xbmc/guilib/guiinfo/GUIInfoLabels.h  | 2 ++
+ xbmc/guilib/guiinfo/VideoGUIInfo.cpp | 6 ++++++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+index 90bf4642de..006e962773 100644
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -6973,6 +6973,8 @@ const infomap listitem_labels[]= {{ "thumb",            LISTITEM_THUMB },
+                                   { "setid",            LISTITEM_SETID },
+                                   { "videocodec",       LISTITEM_VIDEO_CODEC },
+                                   { "videoresolution",  LISTITEM_VIDEO_RESOLUTION },
++                                  { "videowidth",       LISTITEM_VIDEO_WIDTH},
++                                  { "videoheight",      LISTITEM_VIDEO_HEIGHT},
+                                   { "videoaspect",      LISTITEM_VIDEO_ASPECT },
+                                   { "audiocodec",       LISTITEM_AUDIO_CODEC },
+                                   { "audiochannels",    LISTITEM_AUDIO_CHANNELS },
+diff --git a/xbmc/guilib/guiinfo/GUIInfoLabels.h b/xbmc/guilib/guiinfo/GUIInfoLabels.h
+index 3e2b163fdc..029902bbbf 100644
+--- a/xbmc/guilib/guiinfo/GUIInfoLabels.h
++++ b/xbmc/guilib/guiinfo/GUIInfoLabels.h
+@@ -963,6 +963,8 @@
+ #define LISTITEM_ALBUMSTATUS        (LISTITEM_START + 206)
+ #define LISTITEM_ISAUTOUPDATEABLE   (LISTITEM_START + 207)
+ #define LISTITEM_VIDEO_HDR_TYPE     (LISTITEM_START + 208)
++#define LISTITEM_VIDEO_WIDTH        (LISTITEM_START + 209)
++#define LISTITEM_VIDEO_HEIGHT       (LISTITEM_START + 210)
+ 
+ #define LISTITEM_END                (LISTITEM_START + 2500)
+ 
+diff --git a/xbmc/guilib/guiinfo/VideoGUIInfo.cpp b/xbmc/guilib/guiinfo/VideoGUIInfo.cpp
+index 794434f94a..3c00d518a9 100644
+--- a/xbmc/guilib/guiinfo/VideoGUIInfo.cpp
++++ b/xbmc/guilib/guiinfo/VideoGUIInfo.cpp
+@@ -437,6 +437,12 @@ bool CVideoGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
+       case LISTITEM_VIDEO_ASPECT:
+         value = CStreamDetails::VideoAspectToAspectDescription(tag->m_streamDetails.GetVideoAspect());
+         return true;
++      case LISTITEM_VIDEO_WIDTH:
++        value = std::to_string(tag->m_streamDetails.GetVideoWidth());
++        return true;
++      case LISTITEM_VIDEO_HEIGHT:
++        value = std::to_string(tag->m_streamDetails.GetVideoHeight());
++        return true;
+       case LISTITEM_AUDIO_CODEC:
+         value = tag->m_streamDetails.GetAudioCodec();
+         return true;
+-- 
+2.34.1
+
