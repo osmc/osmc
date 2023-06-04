@@ -35,6 +35,8 @@ done
 
 SIGN_KERNEL=0
 
+if [ "$1" == "vero5" ]; then SIGN_KERNEL=1; fi
+
 if [ -z "$PROVISION" ]
 then
 	PROVISION=0
@@ -91,7 +93,7 @@ else
     done
 fi
 if [ ! -f ../../../filesystem.tar.xz ] && [ "$PROVISION" -ne 1 ]; then echo -e "No filesystem available for target" && exit 1; fi
-if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] && [ "$PROVISION" -ne 1 ]
+if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ] && [ "$PROVISION" -ne 1 ]
 then
 	echo -e "Building disk image"
         size=320
@@ -135,12 +137,35 @@ then
         then
             DTB_FILE="multi.dtb.encrypted"
 	    KERNEL_FILE="kernel.img.encrypted"
-            ../.././output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
+	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
 	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input multi.dtb --output multi.dtb.encrypted
 	    ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input kernel.img --output kernel.img.encrypted
 	else
             ../../output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
 	fi
+
+        if [ "$PROVISION" -ne 1 ]
+        then
+           cp $DTB_FILE /mnt/dtb.img
+           cp $KERNEL_FILE /mnt/kernel.img
+        fi
+fi
+if [ "$1" == "vero5" ]
+then
+        echo -e "Installing Vero 5 files"
+        DTB_FILE="multi.dtb"
+        KERNEL_FILE="kernel.img"
+        ../.././output/build/linux-osmc-openlinux-4.9/scripts/multidtb/multidtb -o $DTB_FILE --dtc-path $(pwd)/../../output/build/linux-osmc-openlinux-4.9/scripts/dtc/ $(pwd)/../../output/build/linux-osmc-openlinux-4.9/arch/arm64/boot/dts/amlogic --verbose --page-size 2048
+        if [ "$SIGN_KERNEL" -eq 1 ]
+        then
+            DTB_FILE="multi.dtb.encrypted"
+            KERNEL_FILE="kernel.img.encrypted"
+            ../.././output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --pagesize 2048 --header_version 1 --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
+            ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input multi.dtb --output multi.dtb.encrypted
+            ../.././output/build/linux-osmc-openlinux-4.9/scripts/sign-kernel-boot.sh --sign-kernel --key-dir $SIG_KEYS_DIR --input kernel.img --output kernel.img.encrypted
+        else
+            ../../output/build/linux-osmc-openlinux-4.9/scripts/mkbootimg --kernel Image.gz --base 0x0 --kernel_offset 0x1080000 --ramdisk rootfs.cpio.gz --second multi.dtb --output kernel.img
+        fi
 
         if [ "$PROVISION" -ne 1 ]
         then
