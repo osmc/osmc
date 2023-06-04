@@ -16,6 +16,7 @@ TargetList::TargetList()
     Target *ATV = new Target("/dev/sdb1", false, "hfsplus", true, "/dev/sdb2", true);
     Target *VERO2 = new Target("/dev/mmcblk0p1", false, "fat32", true, "/dev/vero-nand/root", false);
     Target *VERO3 = new Target("/dev/mmcblk1p1", false, "fat32", true, "/dev/vero-nand/root", false);
+    Target *VERO5 = new Target("/dev/mmcblk1p1", false, "fat32", true, "/dev/osmcroot", false);
     /* Add to map */
     /* We can use the same Target for both Pis, identical entries */
     targetMap.insert("rbp1", RBP);
@@ -25,6 +26,7 @@ TargetList::TargetList()
     targetMap.insert("atv", ATV);
     targetMap.insert("vero2", VERO2);
     targetMap.insert("vero3", VERO3);
+    targetMap.insert("vero5", VERO5);
 }
 
 TargetList::~TargetList()

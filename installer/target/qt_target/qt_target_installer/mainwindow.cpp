@@ -93,7 +93,7 @@ void MainWindow::install()
         device->setRoot("/dev/sda2");
         device->setBootNeedsFormat(false);
     }
-    if (! hasMount && utils->getOSMCDev() == "vero3")
+    if (! hasMount && (utils->getOSMCDev() == "vero3" || utils->getOSMCDev() == "vero5"))
     {
         /* Booting from USB */
         device->setBoot("/dev/sda1");
@@ -202,7 +202,7 @@ void MainWindow::install()
             logger->addLine("Flash looks OK");
         }
     }
-    if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
+    if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3" || utils->getOSMCDev() == "vero5")
     {
         for (int i = 0; i <= 60; i++)
         {
@@ -263,6 +263,12 @@ void MainWindow::install()
             system("lvcreate -n root -l100%FREE vero-nand");
             utils->fmtpart(device->getRoot(), "ext4");
         }
+        if (utils->getOSMCDev() == "vero5")
+        {
+            /* Format root partition and OARS partition */
+            utils->fmtpart(device->getRoot(), "ext4");
+            utils->fmtpart("/dev/oars", "ext4");
+        }
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))
             rootBase.chop(2);
@@ -278,7 +284,7 @@ void MainWindow::install()
         }
         else
         {
-            if (! device->doesBootNeedsFormat() && utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3")
+            if (! device->doesBootNeedsFormat() && utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3" && utils->getOSMCDev() != "vero5")
             {
                 int size = utils->getPartSize(rootBase, device->getBootFS());
                 if (size == -1)

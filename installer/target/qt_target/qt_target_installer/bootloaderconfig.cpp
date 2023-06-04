@@ -39,7 +39,7 @@ void BootloaderConfig::copyBootFiles()
     system("rm -rf /mnt/boot/*"); /* Trash existing files */
 #endif
     system("mv /tmp/preseed.cfg /mnt/boot/preseed.cfg");
-    if (utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3")
+    if (utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3" && utils->getOSMCDev() != "vero5")
          system("mv /mnt/root/boot/* /mnt/boot");
     if (utils->getOSMCDev() == "atv")
     {
@@ -52,7 +52,7 @@ void BootloaderConfig::copyBootFiles()
         system("mv /tmp/SPL /mnt/boot/SPL");
         system("mv /tmp/u-boot.img mnt/boot/u-boot.img");
     }
-    if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
+    if (utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3" || utils->getOSMCDev() == "vero5")
     {
         /* We don't have an exact name for the kernel image */
         QDirIterator it ("/mnt/root/boot", QStringList() << "kernel*.img", QDir::Files);
@@ -67,6 +67,7 @@ void BootloaderConfig::copyBootFiles()
             QString ddCmd = "dd if=" + kernelName + " of=/dev/boot bs=1M conv=fsync";
             system(ddCmd.toLocal8Bit().data());
         }
+        if (utils->getOSMCDev() != "vero5") {
         system("dd if=/mnt/root/boot/splash of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
         #ifdef CUSTOMER_LOGO_BRANDING
         if (utils->getOSMCDev() == "vero3") {
@@ -76,6 +77,7 @@ void BootloaderConfig::copyBootFiles()
             system("dd if=/mnt/root/boot/cuslogo of=/dev/logo bs=1M conv=fsync"); /* Custom early splash */
         }
         #endif
+		}
     }
     if (utils->getOSMCDev() == "vero3")
     {
@@ -112,17 +114,43 @@ void BootloaderConfig::copyBootFiles()
 	ddCmd = "dd if=/mnt/root/opt/vero3/" + bootloaderName + " of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1";
         system(ddCmd.toLocal8Bit().data());
     }
+    if (utils->getOSMCDev() == "vero5")
+    {
+        /* Upload the device tree */
+        /* We don't have an exact name for the DTB image */
+        QDirIterator it ("/mnt/root/boot", QStringList() << "dtb*.img", QDir::Files);
+        QString dtbName;
+        while (it.hasNext())
+        {
+            dtbName = it.next();
+            break;
+        }
+        if (! dtbName.isEmpty())
+        {
+	    /* Ensure that we reset any environment to match new bootloader */
+	    system("/usr/sbin/fw_setenv osmc_defenv true");
+            QString ddCmd = "dd if=" + dtbName + " of=/dev/dtb bs=256k conv=sync";
+            system(ddCmd.toLocal8Bit().data());
+        }
+        QString bootloaderName;
+        bootloaderName = "u-boot.bin.sd.bin.device.signed";
+        logger->addLine("Vero V family: bootloader to be flashed is " + bootloaderName);
+	QString ddCmd = "dd if=/mnt/root/opt/vero5/" + bootloaderName + " of=/dev/mmcblk0 conv=fsync bs=1 count=11";
+	system(ddCmd.toLocal8Bit().data());
+	ddCmd = "dd if=/mnt/root/opt/vero5/" + bootloaderName + " of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1";
+        system(ddCmd.toLocal8Bit().data());
+    }
 }
 
 void BootloaderConfig::configureMounts()
 {
     QFile fstabFile("/mnt/root/etc/fstab");
     QStringList fstabStringList;
-    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "rbp4" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv" || utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3")
+    if (utils->getOSMCDev() == "rbp1" || utils->getOSMCDev() == "rbp2" || utils->getOSMCDev() == "rbp4" || utils->getOSMCDev() == "vero1" || utils->getOSMCDev() == "atv" || utils->getOSMCDev() == "vero2" || utils->getOSMCDev() == "vero3" || utils->getOSMCDev() == "vero5")
     {
         QString bootFS = device->getBootFS();
         if (bootFS == "fat32") { bootFS = "vfat"; }
-        if (utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3")
+        if (utils->getOSMCDev() != "vero2" && utils->getOSMCDev() != "vero3" && utils->getOSMCDev() != "vero5")
             fstabStringList.append(device->getBoot() + "  /boot" + "    " + bootFS + "     defaults,noatime,noauto,x-systemd.automount    0   0\n");
         if (! device->getRoot().contains(":/")) {
             if (utils->getOSMCDev() != "atv")

@@ -29,10 +29,11 @@ udevadm trigger
 
 sleep 3 # Wait for /dev population
 
-# Make the TEE directory and mount the partition
+partprobe # just to be safe
 
+# Make the TEE directory and mount the partition
 mkdir /tee
-mkfs.ext4 /dev/tee
+mkfs.ext4 /dev/tee -F
 mount /dev/tee /tee
 
 # Mount the factory partition
@@ -61,14 +62,14 @@ tee_osmc -s /factory/optee/genuine_private_key.bin || loopforever
 kill -9 $(pidof apploader)
 
 # Create a backup of the keys, prepare OARS partition
-mkfs.ext4 /dev/oars
+mkfs.ext4 /dev/oars -F
 mount /dev/oars /oars
 tar -cvf /oars/tee_provision.tgz /tee/*
 
 # Unmount partitions and write back
 umount /oars
 umount /tee
-sync
+sync; sync
 
 # Set the burning flag and reboot
 

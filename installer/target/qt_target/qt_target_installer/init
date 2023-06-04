@@ -116,6 +116,66 @@ fi
 	echo 1 > /sys/class/graphics/fb1/blank
 fi
 
+grep -q vero5 /proc/cmdline
+if [ $? == 0 ]
+then
+	hdmimode=720p60hz
+
+	for arg in $(cat /proc/cmdline)
+	do
+		 case ${arg} in
+			hdmimode=*)
+			   hdmimode=${arg#*=}
+			;;
+	esac
+	done
+
+	preferred=$(busybox grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | busybox sed 's/\*//g')
+	if echo $hdmimode | busybox grep -q force
+	then
+    		hdmimode=$(echo $hdmimode | /bin/busybox sed 's/force//g')
+    		echo "$hdmimode" > /sys/class/display/mode
+	else
+	if [ "$preferred" ] && [ "$hdmimode" != "$preferred" ]
+	then
+		if ! echo $preferred | busybox grep -q 2160p; then hdmimode="$preferred"; fi
+  		echo "$hdmimode" > /sys/class/display/mode
+	fi
+fi
+
+	# Configure framebuffer X and Y size
+
+	case $hdmimode in
+	  480*)            X=720  Y=480  ;;
+	  576*)            X=720  Y=576  ;;
+	  720p*)           X=1280 Y=720  ;;
+	  *)               X=1920 Y=1080 ;;
+	esac
+
+	fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+	fbset -fb /dev/fb1 -g 32 32 32 32 32
+
+	echo 0 > /sys/class/graphics/fb0/free_scale
+	echo 0 > /sys/class/graphics/fb1/free_scale
+	echo 1 > /sys/class/video/disable_video
+
+	# Enable scaling for 4K output
+	case $hdmimode in
+	  4k*|smpte*|2160*)
+		echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
+		echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
+		echo 0x10001 > /sys/class/graphics/fb0/free_scale
+	  ;;
+	esac
+
+	# Enable framebuffer device
+
+	echo 0 > /sys/class/graphics/fb0/blank
+
+	# Prevent static artefacts
+	echo 1 > /sys/class/graphics/fb1/blank
+fi
+
 DEBUG_IP=$(sed 's/\ /\n/g' /proc/cmdline | grep "^debugip=" | sed 's/^debugip=//g')
 if [ -n "$DEBUG_IP" ]
 then
