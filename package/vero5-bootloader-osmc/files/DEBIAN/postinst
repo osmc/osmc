@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+	if ischroot; then exit 0; fi
+	dt=$(tr -d '\0' </proc/device-tree/model)
+	if [ "$dt" != "Vero V" ]; then echo "Unsupported device" && exit 1; fi
+	UBOOT="u-boot.bin.sd.bin.device.signed"
+	if [ ! -f /opt/vero5/${UBOOT} ]; then echo "U-Boot file missing" && exit 1; fi
+	dd if=/opt/vero5/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=1 count=11
+	dd if=/opt/vero5/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1
+	touch /tmp/reboot-needed
+fi
