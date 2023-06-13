@@ -173,14 +173,12 @@ bool Utils::unmountPartition(Target *device, QString path)
     if (path == QString(MNT_BOOT))
     {
         logger->addLine("Trying to unmount MNT_BOOT ("+QString(MNT_BOOT) + ")");
-        logger->addLine("Using device->boot: " + device->getBoot());
-        return (umount(device->getBoot().toLocal8Bit()) == 0) ? true : false;
+        return (umount("/mnt/boot") == 0) ? true : false;
     }
     if (path == QString(MNT_ROOT))
     {
         logger->addLine("Trying to unmount MNT_ROOT ("+QString(MNT_ROOT) + ")");
-        logger->addLine("Using device->root: " + device->getRoot());
-        return (umount(device->getRoot().toLocal8Bit()) == 0) ? true : false;
+        return (umount("/mnt/root") == 0) ? true : false;
     }
 
 }
