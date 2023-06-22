@@ -68,6 +68,7 @@ mount /dev/oars /oars
 tar -cvf /oars/tee_provision.tgz /tee/*
 
 # Unmount partitions and write back
+umount /factory
 umount /oars
 umount /tee
 sync; sync
