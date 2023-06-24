@@ -98,6 +98,7 @@ mount /dev/tee /tee
 
 # Mount the factory partition
 modprobe vfat
+sleep 2 # wait for module to settle
 mkdir /factory
 mount /dev/sda1 /factory
 
@@ -110,9 +111,13 @@ mkdir -p /lib/teetz
 cp /factory/optee/ta/23d6d081-0138-46a4-bba5-21b189d1a97e.ta.signed /lib/teetz/23d6d081-0138-46a4-bba5-21b189d1a97e.ta
 chmod +x /bin/apploader
 chmod +x /bin/tee_osmc
+sync
 
 # Initialise the supplicant
 apploader &
+
+# Wait for supplicant to settle
+sleep 3
 
 # Provision the device
 
