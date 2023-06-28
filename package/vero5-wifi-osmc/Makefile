@@ -1,5 +1,5 @@
 all:
-        sudo bash build.sh
+	sudo bash build.sh
 
 clean:
-        sudo rm -f *.deb >/dev/null 2>&1
+	sudo rm -f *.deb >/dev/null 2>&1
