@@ -8,5 +8,6 @@ if [ "$1" = "configure" ]; then
 	if [ ! -f /opt/vero5/${UBOOT} ]; then echo "U-Boot file missing" && exit 1; fi
 	dd if=/opt/vero5/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=1 count=11
 	dd if=/opt/vero5/${UBOOT} of=/dev/mmcblk0 conv=fsync bs=512 skip=1 seek=1
+	/usr/bin/fw_setenv osmc_defenv true
 	touch /tmp/reboot-needed
 fi
