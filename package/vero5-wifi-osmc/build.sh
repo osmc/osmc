@@ -6,7 +6,8 @@
 . ../common.sh
 
 REV="cd00af6d392d1b8bccc20c431da94339f9e99045"
-pull_source "https://github.com/osmc/vero5-wifi-osmc" "$(pwd)/src" "$REV"
+pull_source "https://github.com/osmc/vero5-wifi-osmc/archive/${REV}.tar.gz" "$(pwd)/src"
+
 if [ $? != 0 ]; then echo -e "Error fetching vero5-wifi-osmc source" && exit 1; fi
 # Build in native environment
 build_in_env "${1}" $(pwd) "vero5-wifi-osmc"
@@ -19,7 +20,7 @@ then
         update_sources
         sed '/Package/d' -i files/DEBIAN/control
         echo "Package: ${1}-wifi-osmc" >> files/DEBIAN/control
-        pushd src/
+        pushd src/vero5-wifi-osmc-$REV
         make
         if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi
         mkdir -p ${out}/usr/bin
