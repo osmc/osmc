@@ -174,7 +174,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index ff555db738..f99545fd76 100755
+index ff555db738..6289c2747c 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,7 @@
@@ -311,19 +311,7 @@ index ff555db738..f99545fd76 100755
          <setting id="videoplayer.usemediacodecsurface" type="boolean" label="13440" help="36544">
            <requirement>HAS_MEDIACODEC</requirement>
            <level>2</level>
-@@ -2373,6 +2493,11 @@
-             </dependency>
-           </dependencies>
-         </setting>
-+        <setting id="smb2.fixmtu" type="boolean" label="36643" help="36644">
-+          <level>2</level>
-+          <default>false</default>
-+          <control type="toggle" />
-+        </setting>
-       </group>
-       <group id="3" label="37047">
-         <setting id="services.wsdiscovery" type="boolean" label="37048" help="37049">
-@@ -2584,6 +2709,36 @@
+@@ -2584,6 +2704,36 @@
            </dependencies>
            <control type="toggle" />
          </setting>
@@ -360,7 +348,7 @@ index ff555db738..f99545fd76 100755
          <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
            <level>2</level>
            <default>0</default>
-@@ -2616,6 +2771,21 @@
+@@ -2616,6 +2766,21 @@
            </constraints>
            <control type="spinner" format="string" />
          </setting>
@@ -382,7 +370,7 @@ index ff555db738..f99545fd76 100755
          <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
            <requirement>
              <or>
-@@ -2836,7 +3006,7 @@
+@@ -2836,7 +3001,7 @@
          </setting>
          <setting id="videoscreen.whitelistpulldown" type="boolean" parent="videoscreen.whitelist" label="14127" help="36444">
            <level>3</level>
@@ -391,7 +379,7 @@ index ff555db738..f99545fd76 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2844,7 +3014,7 @@
+@@ -2844,7 +3009,7 @@
          </setting>
          <setting id="videoscreen.whitelistdoublerefreshrate" type="boolean" parent="videoscreen.whitelist" label="14128" help="36445">
            <level>3</level>
@@ -400,7 +388,7 @@ index ff555db738..f99545fd76 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2926,7 +3096,7 @@
+@@ -2926,7 +3091,7 @@
          </setting>
          <setting id="audiooutput.config" type="integer" label="337" help="36361">
            <level>2</level>
@@ -409,7 +397,7 @@ index ff555db738..f99545fd76 100755
            <constraints>
              <options>
                <option label="338">1</option>
-@@ -2971,6 +3141,18 @@
+@@ -2971,6 +3136,18 @@
              <formatlabel>36459</formatlabel>
            </control>
          </setting>
@@ -428,7 +416,7 @@ index ff555db738..f99545fd76 100755
          <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
            <requirement>HAS_AE_QUALITY_LEVELS</requirement>
            <level>2</level>
-@@ -3016,7 +3198,7 @@
+@@ -3016,7 +3193,7 @@
          </setting>
          <setting id="audiooutput.streamsilence" type="integer" label="421" help="34111">
            <level>2</level>
@@ -437,7 +425,7 @@ index ff555db738..f99545fd76 100755
            <constraints>
              <options>audiostreamsilence</options>
            </constraints>
-@@ -3024,7 +3206,7 @@
+@@ -3024,7 +3201,7 @@
          </setting>
          <setting id="audiooutput.streamnoise" type="boolean" label="34112" help="34113">
            <level>2</level>
@@ -10520,24 +10508,6 @@ index 2d94c39daa..58e17c1882 100644
     {
        udev_device_unref(device);
        continue;
-diff --git a/xbmc/platform/posix/filesystem/SMBFile.cpp b/xbmc/platform/posix/filesystem/SMBFile.cpp
-index 38a82c3114..02771d2bcc 100644
---- a/xbmc/platform/posix/filesystem/SMBFile.cpp
-+++ b/xbmc/platform/posix/filesystem/SMBFile.cpp
-@@ -536,8 +536,11 @@ int CSMBFile::Truncate(int64_t size)
- 
- ssize_t CSMBFile::Read(void *lpBuf, size_t uiBufSize)
- {
--  if (uiBufSize > SSIZE_MAX)
--    uiBufSize = SSIZE_MAX;
-+
-+  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-+
-+  if (settings->GetBool(CSettings::SETTING_SMB2_FIXMTU))
-+    uiBufSize = 32768;
- 
-   if (m_fd == -1)
-     return -1;
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
 index 3c30817331..58eec643ec 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
@@ -10855,7 +10825,7 @@ index bb85e97b67..b4bd620df5 100644
    m_simpleConditions.emplace("has_dx");
    m_simpleConditions.emplace("hasdxva2");
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index c5486af7b8..5a41df3488 100644
+index c5486af7b8..8193b54094 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
 @@ -143,6 +143,11 @@ constexpr const char* CSettings::SETTING_VIDEOPLAYER_STEREOSCOPICPLAYBACKMODE;
@@ -10878,15 +10848,7 @@ index c5486af7b8..5a41df3488 100644
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_USESTAGEFRIGHT;
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE;
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_SUPPORTMVC;
-@@ -352,6 +358,7 @@ constexpr const char* CSettings::SETTING_SMB_MINPROTOCOL;
- constexpr const char* CSettings::SETTING_SMB_MAXPROTOCOL;
- constexpr const char* CSettings::SETTING_SMB_LEGACYSECURITY;
- constexpr const char* CSettings::SETTING_SERVICES_WSDISCOVERY;
-+constexpr const char* CSettings::SETTING_SMB2_FIXMTU;
- constexpr const char* CSettings::SETTING_VIDEOSCREEN_MONITOR;
- constexpr const char* CSettings::SETTING_VIDEOSCREEN_SCREEN;
- constexpr const char* CSettings::SETTING_VIDEOSCREEN_WHITELIST;
-@@ -359,6 +366,11 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_RESOLUTION;
+@@ -359,6 +365,11 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_RESOLUTION;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_SCREENMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS;
@@ -10898,7 +10860,7 @@ index c5486af7b8..5a41df3488 100644
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_NOOFBUFFERS;
-@@ -366,7 +378,7 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_3DLUT;
+@@ -366,7 +377,7 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_3DLUT;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_TESTPATTERN;
@@ -10907,7 +10869,7 @@ index c5486af7b8..5a41df3488 100644
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_FRAMEPACKING;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_10BITSURFACES;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE;
-@@ -982,6 +994,8 @@ void CSettings::InitializeISettingCallbacks()
+@@ -982,6 +993,8 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
@@ -10917,7 +10879,7 @@ index c5486af7b8..5a41df3488 100644
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index cdd2d31ae3..9079a7c445 100644
+index cdd2d31ae3..ae8ee4a8c8 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
 @@ -115,6 +115,11 @@ public:
@@ -10940,15 +10902,7 @@ index cdd2d31ae3..9079a7c445 100644
    static constexpr auto SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
    static constexpr auto SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
    static constexpr auto SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";
-@@ -347,6 +353,7 @@ public:
-   static constexpr auto SETTING_SMB_MAXPROTOCOL = "smb.maxprotocol";
-   static constexpr auto SETTING_SMB_LEGACYSECURITY = "smb.legacysecurity";
-   static constexpr auto SETTING_SERVICES_WSDISCOVERY = "services.wsdiscovery";
-+  static constexpr auto SETTING_SMB2_FIXMTU = "smb2.fixmtu";
-   static constexpr auto SETTING_VIDEOSCREEN_MONITOR = "videoscreen.monitor";
-   static constexpr auto SETTING_VIDEOSCREEN_SCREEN = "videoscreen.screen";
-   static constexpr auto SETTING_VIDEOSCREEN_WHITELIST = "videoscreen.whitelist";
-@@ -354,6 +361,11 @@ public:
+@@ -354,6 +360,11 @@ public:
    static constexpr auto SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
    static constexpr auto SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
    static constexpr auto SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
@@ -10960,7 +10914,7 @@ index cdd2d31ae3..9079a7c445 100644
    static constexpr auto SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
    static constexpr auto SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE =
        "videoscreen.preferedstereoscopicmode";
-@@ -363,6 +375,7 @@ public:
+@@ -363,6 +374,7 @@ public:
    static constexpr auto SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
    static constexpr auto SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
    static constexpr auto SETTING_VIDEOSCREEN_LIMITEDRANGE = "videoscreen.limitedrange";
