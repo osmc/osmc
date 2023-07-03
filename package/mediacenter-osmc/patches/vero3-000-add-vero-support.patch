@@ -12751,10 +12751,16 @@ index 9cd4f32718..c81dd55596 100644
    /* \brief Get UI scaling information from a given resolution to the screen resolution.
     Takes account of overscan and UI zooming.
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index 55392a4dea..a8cece3dcd 100644
+index 55392a4dea..6eb06859c3 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
-@@ -73,11 +73,11 @@ RESOLUTION CResolutionUtils::ChooseBestResolution(float fps, int width, int heig
+@@ -68,16 +68,16 @@ float RESOLUTION_INFO::DisplayRatio() const
+   return iWidth * fPixelRatio / iHeight;
+ }
+ 
+-RESOLUTION CResolutionUtils::ChooseBestResolution(float fps, int width, int height, bool is3D)
++RESOLUTION CResolutionUtils::ChooseBestResolution(float fps, int width, int height, const uint32_t modeflag3d)
+ {
    RESOLUTION res = CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution();
    float weight = 0.0f;
  
