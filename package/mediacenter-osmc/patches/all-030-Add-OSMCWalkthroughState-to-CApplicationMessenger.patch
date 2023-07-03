@@ -1,4 +1,4 @@
-From 7f1930e3c69d762c79871b72bee741cd23210f15 Mon Sep 17 00:00:00 2001
+From b9b74b7af0f2aa839715f2c2274ade4f1bc905bf Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 17:49:02 +0100
 Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
@@ -10,10 +10,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 18 insertions(+)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index 53c899f0fc..2c46eea7e1 100644
+index d0e29d1999..e1a1c234a4 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1574,6 +1574,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -1576,6 +1576,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    }
    break;
  
@@ -38,7 +38,7 @@ index 53c899f0fc..2c46eea7e1 100644
      m_ServiceManager->GetNetwork().NetworkMessage(static_cast<CNetworkBase::EMESSAGE>(pMsg->param1),
                                                    pMsg->param2);
 diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
-index 803a8eab0f..2a529554c1 100644
+index 8f15ef9f16..d09549e215 100644
 --- a/xbmc/messaging/ApplicationMessenger.h
 +++ b/xbmc/messaging/ApplicationMessenger.h
 @@ -82,6 +82,7 @@
@@ -47,8 +47,8 @@ index 803a8eab0f..2a529554c1 100644
  #define TMSG_EVENT                        TMSG_MASK_APPLICATION + 33
 +#define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 34
  
- #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
- #define TMSG_GUI_INFOBOOL                 TMSG_MASK_GUIINFOMANAGER + 1
+ /// @brief Called from the player when its current item is updated
+ #define TMSG_UPDATE_PLAYER_ITEM TMSG_MASK_APPLICATION + 35
 -- 
-2.25.1
+2.34.1
 
