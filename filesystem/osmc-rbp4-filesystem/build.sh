@@ -138,4 +138,8 @@ echo ${MEM_OPTIM} > ${DIR}/etc/ld.so.preload
 create_fs_tarball "${DIR}" "${filestub}"
 verify_action
 
+# Move log
+mv build.log ${filestub}-$(date +%Y%m%d).log
+verify_action
+
 echo -e "Build successful"
