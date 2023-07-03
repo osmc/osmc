@@ -130,4 +130,8 @@ remove_emulate_arm "${DIR}" "32"
 create_fs_tarball "${DIR}" "${filestub}"
 verify_action
 
+# Move log
+mv build.log ${filestub}-$(date +%Y%m%d).log
+verify_action
+
 echo -e "Build successful"
