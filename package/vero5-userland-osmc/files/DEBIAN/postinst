@@ -15,7 +15,6 @@ if [ -z "$DPKG_MAINTSCRIPT_PACKAGE" ]; then exit 1; fi
 	# remove_divert PATH_DIV PATH_ORIG
 #fi
 
-#!/bin/bash
 ischroot
 if [ $? -eq 0 ]; then systemctl enable resizemmc.service; fi
 
