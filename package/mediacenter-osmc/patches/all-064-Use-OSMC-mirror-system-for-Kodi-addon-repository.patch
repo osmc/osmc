@@ -1,4 +1,4 @@
-From 026dcaaf7b7a94691f0933d766c66c88408feaf0 Mon Sep 17 00:00:00 2001
+From 8d7ded3370108a666f638e61d7621bb55351067d Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 25 Jun 2016 20:45:11 +0100
 Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
@@ -7,7 +7,8 @@ Subject: [PATCH] Use OSMC mirror system for Kodi add-on repository; bump repo
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  addons/repository.xbmc.org/addon.xml | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ version.txt                          |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/addons/repository.xbmc.org/addon.xml b/addons/repository.xbmc.org/addon.xml
 index 5dbddb010e..5a63e1c1be 100644
@@ -37,6 +38,19 @@ index 5dbddb010e..5a63e1c1be 100644
  			<hashes>sha256</hashes>
  		</dir>
  	</extension>
+diff --git a/version.txt b/version.txt
+index 456613987d..848258cb23 100644
+--- a/version.txt
++++ b/version.txt
+@@ -7,7 +7,7 @@ VERSION_MINOR 2
+ VERSION_TAG
+ VERSION_CODE 20.2.0
+ ADDON_API 20.2.0
+-ADDON_REPOS repository.xbmc.org|https://mirrors.kodi.tv
++ADDON_REPOS repository.xbmc.org|https://download.osmc.tv
+ APP_PACKAGE org.xbmc.kodi
+ PACKAGE_IDENTITY XBMCFoundation.Kodi
+ PACKAGE_PUBLISHER C62BD90A-CDD8-477F-96C3-B25992247B97
 -- 
-2.25.1
+2.34.1
 
