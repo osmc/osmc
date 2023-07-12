@@ -10569,7 +10569,7 @@ index 4ba4e7e8b0..40433f443d 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 725bbc46c7..12432ff14d
+index 725bbc46c7..cd9e82f4fb
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10612,7 +10612,7 @@ index 725bbc46c7..12432ff14d
 +          if (resInfo.iScreenHeight >= 2160)
 +          {
 +            CLog::Log(LOGWARNING, "The user has chosen a UHD resolution. We will warn them not to apply this");
-+            if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{13124}, CVariant{""}, CVariant{""}, 15000) != DialogResponse::CHOICE_YES)
++            if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{40064}, CVariant{""}, CVariant{""}, 15000) != DialogResponse::CHOICE_YES)
 +            {
 +              m_resolutionChangeAborted = true;
 +              return false;
