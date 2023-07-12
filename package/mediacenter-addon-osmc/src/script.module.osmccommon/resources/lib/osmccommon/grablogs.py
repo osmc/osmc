@@ -562,6 +562,23 @@ SETS = {
             },
         ],
     },
+    'provision': {
+        'order': 22,
+        'active': False,
+        'help': 'OSMC Vero provisioning status',
+        'dest': 'provision',
+        'action': 'store_true',
+        'flags': ['-Y', '--provision'],
+        'logs': [
+            {
+                'name': 'provision',
+                'key': 've5xhi74',
+                'ltyp': 'cl_log',
+                'actn': '/opt/securevero/secureos/bin/tee_osmc -d',
+                'hwid': 'vero5',
+            },
+        ],
+    },
 }
 
 
