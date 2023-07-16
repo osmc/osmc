@@ -2223,17 +2223,32 @@ index bf8ff7a03d..0af5db4a02 100644
    DVDOverlayType m_type;
    bool m_enableTextAlign;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayCodecFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayCodecFFmpeg.cpp
-index 8c26cad306..1cb54c922c 100644
+index 8c26cad306..c4ecbd8b1d 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayCodecFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayCodecFFmpeg.cpp
-@@ -248,6 +248,7 @@ CDVDOverlay* CDVDOverlayCodecFFmpeg::GetOverlay()
+@@ -246,22 +246,6 @@ CDVDOverlay* CDVDOverlayCodecFFmpeg::GetOverlay()
+       }
+     }
  
-     RENDER_STEREO_MODE render_stereo_mode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
-     if (render_stereo_mode != RENDER_STEREO_MODE_OFF &&
-+        render_stereo_mode != RENDER_STEREO_MODE_MONO &&
-         render_stereo_mode != RENDER_STEREO_MODE_HARDWAREBASED)
-     {
-       if (rect.h > m_height / 2)
+-    RENDER_STEREO_MODE render_stereo_mode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
+-    if (render_stereo_mode != RENDER_STEREO_MODE_OFF &&
+-        render_stereo_mode != RENDER_STEREO_MODE_HARDWAREBASED)
+-    {
+-      if (rect.h > m_height / 2)
+-      {
+-        m_height /= 2;
+-        rect.h /= 2;
+-      }
+-      else if (rect.w > m_width / 2)
+-      {
+-        m_width /= 2;
+-        rect.w /= 2;
+-      }
+-    }
+-
+     CDVDOverlayImage* overlay = new CDVDOverlayImage();
+ 
+     overlay->iPTSStartTime = m_StartTime;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
 index 517acc3cd4..dee28926a0 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
@@ -9161,6 +9176,20 @@ index 8a3da27225..8541dbaffa 100644
  
    // CODEC EXTRADATA
    void*        extradata; // extra data for codec to use
+diff --git a/xbmc/cores/VideoPlayer/DVDSubtitles/DVDSubtitlesLibass.cpp b/xbmc/cores/VideoPlayer/DVDSubtitles/DVDSubtitlesLibass.cpp
+index 98d9cdfa19..93510f9fd6 100644
+--- a/xbmc/cores/VideoPlayer/DVDSubtitles/DVDSubtitlesLibass.cpp
++++ b/xbmc/cores/VideoPlayer/DVDSubtitles/DVDSubtitlesLibass.cpp
+@@ -276,7 +276,8 @@ ASS_Image* CDVDSubtitlesLibass::RenderImage(double pts,
+   // Reversed par value
+   // from: >1 tighter pixels, <1 wider pixels
+   // to: <1 tighter pixels, >1 wider pixels
+-  float par = (opts.m_par - 2.0f) * -1;
++  float par = 1.0f / opts.m_par;
++
+   ass_set_pixel_aspect(m_renderer, static_cast<double>(par));
+ 
+   ass_set_frame_size(m_renderer, static_cast<int>(opts.frameWidth),
 diff --git a/xbmc/cores/VideoPlayer/IVideoPlayer.h b/xbmc/cores/VideoPlayer/IVideoPlayer.h
 index cf30266692..5284442a3a 100644
 --- a/xbmc/cores/VideoPlayer/IVideoPlayer.h
@@ -9880,7 +9909,7 @@ index 0000000000..66b1f4a564
 +  bool m_bConfigured;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
-index b6f5e5ea73..974022ab70 100644
+index b6f5e5ea73..58924c801c 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 @@ -258,7 +258,7 @@ void CRenderer::Render(COverlay* o)
@@ -9892,7 +9921,52 @@ index b6f5e5ea73..974022ab70 100644
  
    o->Render(state);
  }
-@@ -602,6 +602,12 @@ COverlay* CRenderer::Convert(CDVDOverlay* o, double pts)
+@@ -435,20 +435,6 @@ COverlay* CRenderer::ConvertLibass(
+   rOpts.frameWidth = m_rv.Width();
+   rOpts.frameHeight = m_rv.Height();
+ 
+-  // Render subtitle of half-sbs and half-ou video in full screen, not in half screen
+-  if (m_stereomode == "left_right" || m_stereomode == "right_left")
+-  {
+-    // only half-sbs video, sbs video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight < 1.2f)
+-      rOpts.sourceWidth = m_rs.Width() * 2;
+-  }
+-  else if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
+-  {
+-    // only half-ou video, ou video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight > 2.5f)
+-      rOpts.sourceHeight = m_rs.Height() * 2;
+-  }
+-
+   // Set position of subtitles based on video calibration settings
+   RESOLUTION_INFO resInfo = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+   // Keep track of subtitle position value change,
+@@ -489,13 +475,21 @@ COverlay* CRenderer::ConvertLibass(
+     // Note also that the displacement compensation will cause a different
+     // default position of the text, different from the other alignment positions
+     double posPx = static_cast<double>(m_subtitlePosition - resInfo.Overscan.top);
++    double frameHeight = static_cast<double>(rOpts.frameHeight);
++
++    if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
++    {
++      // only half-ou video, ou video don't need to correct frame height
++      if (rOpts.sourceWidth / rOpts.sourceHeight > 1.2f)
++        frameHeight *= 2.0;
++    }
+ 
+     int assPlayResY = o->GetLibassHandler()->GetPlayResY();
+     double assVertMargin = static_cast<double>(overlayStyle->marginVertical) *
+                            (static_cast<double>(assPlayResY) / 720);
+-    double vertMarginScaled = assVertMargin / assPlayResY * static_cast<double>(rOpts.frameHeight);
++    double vertMarginScaled = assVertMargin / assPlayResY * frameHeight;
++    double pos = posPx / (frameHeight - vertMarginScaled);
+ 
+-    double pos = posPx / (static_cast<double>(rOpts.frameHeight) - vertMarginScaled);
+     rOpts.position = 100 - pos * 100;
+   }
+   else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
+@@ -602,6 +596,12 @@ COverlay* CRenderer::Convert(CDVDOverlay* o, double pts)
      r = new COverlayImageDX(static_cast<CDVDOverlaySpu*>(o));
  #endif
  
@@ -9920,27 +9994,44 @@ index 54e48c0ee1..4494a76762 100644
      /*!
       * \brief Given the resolution ratio determines if it is a 4/3 resolution
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
-index a21800e067..a064f5aeaa 100644
+index a21800e067..9a79c56f86 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
-@@ -273,11 +273,15 @@ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x)
+@@ -273,18 +273,27 @@ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x)
    return true;
  }
  
 -int GetStereoscopicDepth()
 +int GetStereoscopicDepth(bool isPgs, int subtitleDepth)
  {
-   int depth = 0;
+-  int depth = 0;
++  RENDER_STEREO_MODE stereoMode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
  
 -  if(CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_MONO
-+  if(CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() == RENDER_STEREO_MODE_HARDWAREBASED && isPgs)
-+  {
-+    depth = subtitleDepth * (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
-+  }
-+  else if(CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_MONO
-   && CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_OFF)
+-  && CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_OFF)
++  if (stereoMode == RENDER_STEREO_MODE_MONO || stereoMode == RENDER_STEREO_MODE_OFF)
    {
-     depth  = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
+-    depth  = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
+-    depth *= (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
++    // 2D display, so there's no subtitle depth
++    return 0;
+   }
+ 
+-  return depth;
++  // get configured depth
++  int depth = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
++
++  // in case of MVC playback and PGS subtitles, use the subtitle depth info additionally to the configured one
++  if(stereoMode == RENDER_STEREO_MODE_HARDWAREBASED && isPgs)
++  {
++    depth += subtitleDepth;
++  }
++
++  // correct depth according to the current left/right eye view
++  return depth * (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
+ }
+ 
+ }
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
 index 96db7397a6..e923510417 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
@@ -10569,7 +10660,7 @@ index 4ba4e7e8b0..40433f443d 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 725bbc46c7..cd9e82f4fb
+index 725bbc46c7..bb48ce302c
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10698,7 +10789,40 @@ index 725bbc46c7..cd9e82f4fb
    m_resolutions.push_back(res);
  }
  
-@@ -652,6 +690,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -518,7 +556,14 @@ void CDisplaySettings::ApplyCalibrations()
+     // find resolutions
+     for (size_t res = RES_DESKTOP; res < m_resolutions.size(); ++res)
+     {
+-      if (StringUtils::EqualsNoCase(itCal->strMode, m_resolutions[res].strMode))
++      if (StringUtils::EqualsNoCase(itCal->strMode, m_resolutions[res].strMode) && (m_resolutions[res].dwFlags & D3DPRESENTFLAG_MODE3DMASK))
++      {
++        // in case of 3D resolutions we ignore overscan settings and just update the subtitle position
++        m_resolutions[res].iSubtitles = itCal->iSubtitles;
++        if (m_resolutions[res].iSubtitles < 0)
++          m_resolutions[res].iSubtitles = 0;
++      }
++      else if (StringUtils::EqualsNoCase(itCal->strMode, m_resolutions[res].strMode))
+       {
+         // overscan
+         m_resolutions[res].Overscan.left = itCal->Overscan.left;
+@@ -556,7 +601,6 @@ void CDisplaySettings::ApplyCalibrations()
+           m_resolutions[res].fPixelRatio = 0.5f;
+         if (m_resolutions[res].fPixelRatio > 2.0f)
+           m_resolutions[res].fPixelRatio = 2.0f;
+-        break;
+       }
+     }
+   }
+@@ -586,6 +630,8 @@ void CDisplaySettings::UpdateCalibrations()
+       cal = *res;
+     }
+   }
++
++  ApplyCalibrations();
+ }
+ 
+ void CDisplaySettings::ClearCalibrations()
+@@ -652,6 +698,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
        flags |= D3DPRESENTFLAG_MODE3DSBS;
      else if(StringUtils::Mid(strResolution, 20,3) == "tab")
        flags |= D3DPRESENTFLAG_MODE3DTB;
@@ -10707,7 +10831,7 @@ index 725bbc46c7..cd9e82f4fb
  
      std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
      for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
-@@ -663,6 +703,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -663,6 +711,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
    return RES_DESKTOP;
  }
  
@@ -10741,7 +10865,7 @@ index 725bbc46c7..cd9e82f4fb
  std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, float refreshrate /* = 0.0f */)
  {
    if (resolution == RES_WINDOW)
-@@ -671,13 +738,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -671,13 +746,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -10758,7 +10882,7 @@ index 725bbc46c7..cd9e82f4fb
    }
  
    return "DESKTOP";
-@@ -707,14 +770,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
+@@ -707,14 +778,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
      const auto mode = CDisplaySettings::GetInstance().GetResolutionInfo(index);
  
      if (mode.dwFlags ^ D3DPRESENTFLAG_INTERLACED)
@@ -10775,7 +10899,7 @@ index 725bbc46c7..cd9e82f4fb
    }
  
    std::sort(list.begin(), list.end(), ModeSort);
-@@ -786,10 +843,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
+@@ -786,10 +851,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
      std::vector<RESOLUTION_WHR> resolutions = CServiceBroker::GetWinSystem()->ScreenResolutions(info.fRefreshRate);
      for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
      {
@@ -12705,7 +12829,7 @@ index 9cd4f32718..c81dd55596 100644
    /* \brief Get UI scaling information from a given resolution to the screen resolution.
     Takes account of overscan and UI zooming.
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index 55392a4dea..6eb06859c3 100644
+index 91d8a39ec0..b6e35681cc 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
 @@ -68,16 +68,16 @@ float RESOLUTION_INFO::DisplayRatio() const
@@ -12767,7 +12891,7 @@ index 55392a4dea..6eb06859c3 100644
    CLog::Log(LOGDEBUG, "[WHITELIST] Searching for an exact resolution with an exact refresh rate");
  
    unsigned int penalty = std::numeric_limits<unsigned int>::max();
-@@ -150,7 +157,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -146,7 +153,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
      // allow macroblock alignment / padding errors (e.g. 1080 mod16 == 8)
      if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
           (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
@@ -12776,7 +12900,7 @@ index 55392a4dea..6eb06859c3 100644
          MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
      {
        CLog::Log(LOGDEBUG,
-@@ -184,7 +191,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -180,7 +187,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
        // allow macroblock alignment / padding errors (e.g. 1080 mod16 == 8)
        if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
             (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
@@ -12785,7 +12909,7 @@ index 55392a4dea..6eb06859c3 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
        {
          CLog::Log(LOGDEBUG,
-@@ -223,7 +230,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -219,7 +226,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
        // allow macroblock alignment / padding errors (e.g. 1080 mod16 == 8)
        if (((height == info.iScreenHeight && width <= info.iScreenWidth + 8) ||
             (width == info.iScreenWidth && height <= info.iScreenHeight + 8)) &&
@@ -12794,7 +12918,7 @@ index 55392a4dea..6eb06859c3 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
        {
          CLog::Log(
-@@ -258,8 +265,8 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -254,8 +261,8 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
        const RESOLUTION_INFO info = CDisplaySettings::GetInstance().GetResolutionInfo(i);
  
        // pick the lowest resolution that has a matching refresh rate
@@ -12805,7 +12929,7 @@ index 55392a4dea..6eb06859c3 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
        {
          resolution = i;
-@@ -282,7 +289,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -278,7 +285,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
  
      // allow resolutions that are desktop resolution but have the correct refresh rate
      if (info.iScreenWidth == desktop_info.iScreenWidth &&
@@ -12814,7 +12938,7 @@ index 55392a4dea..6eb06859c3 100644
          MathUtils::FloatEquals(info.fRefreshRate, fps, 0.01f))
      {
        CLog::Log(LOGDEBUG,
-@@ -309,8 +316,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -305,8 +312,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
  
        // allow resolutions that are desktop resolution but have double the refresh rate
        if (info.iScreenWidth == desktop_info.iScreenWidth &&
@@ -12824,7 +12948,7 @@ index 55392a4dea..6eb06859c3 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps * 2, 0.01f))
        {
          CLog::Log(LOGDEBUG,
-@@ -338,8 +344,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -334,8 +340,7 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
  
        // allow resolutions that are desktop resolution but have 2.5 times the refresh rate
        if (info.iScreenWidth == desktop_info.iScreenWidth &&
@@ -12834,7 +12958,7 @@ index 55392a4dea..6eb06859c3 100644
            MathUtils::FloatEquals(info.fRefreshRate, fps * 2.5f, 0.01f))
        {
          CLog::Log(
-@@ -355,10 +360,19 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
+@@ -351,10 +356,19 @@ void CResolutionUtils::FindResolutionFromWhitelist(float fps, int width, int hei
                "[WHITELIST] No match for a desktop resolution with a 3:2 pulldown refresh rate");
    }
  
@@ -12855,7 +12979,7 @@ index 55392a4dea..6eb06859c3 100644
  {
    RESOLUTION_INFO curr = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo(resolution);
  
-@@ -510,3 +524,84 @@ void CResolutionUtils::GetMaxAllowedResolution(unsigned int& width, unsigned int
+@@ -506,3 +520,84 @@ void CResolutionUtils::GetMaxAllowedResolution(unsigned int& width, unsigned int
    width = maxWidth;
    height = maxHeight;
  }
