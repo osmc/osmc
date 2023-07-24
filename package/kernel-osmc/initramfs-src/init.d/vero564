@@ -53,15 +53,6 @@ echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
 echo 1 > /sys/class/video/disable_video
 
-# Enable scaling for 4K output
-case $hdmimode in
-  4k*|smpte*|2160*)
-    echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
-    echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
-    echo 0x10001 > /sys/class/graphics/fb0/free_scale
-  ;;
-esac
-
 # Enable framebuffer device
 
 echo 0 > /sys/class/graphics/fb0/blank
