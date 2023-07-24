@@ -6,31 +6,7 @@
 fb_restore() {
 	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
 	then
-		for arg in $(cat /proc/cmdline)
-		do
-			case ${arg} in
-			hdmimode=*)
-				hdmimode=${arg#*=}
-			;;
-			esac
-		done
-
-		fb_mode=$(cat /var/run/fb_mode)
-		if ! echo $hdmimode | grep -q force && ! grep -qw $fb_mode /sys/class/amhdmitx/amhdmitx0/disp_cap
-		then
-			preferred=$(grep \* /sys/class/amhdmitx/amhdmitx0/disp_cap | sed 's/\*//g')
-			if [ "$preferred" ]
-			then
-				fb_mode="$preferred"
-			else
-				fb_mode=720p60hz
-			fi
-		fi
-		mode=$(head -n 1 /sys/class/display/mode)
-		[ "$mode" != "$fb_mode" ] && echo "$fb_mode" >/sys/class/display/mode
-		cat /var/run/fb_free_scale_axis >/sys/class/graphics/fb0/free_scale_axis
-		cat /var/run/fb_window_axis >/sys/class/graphics/fb0/window_axis
-		cat /var/run/fb_free_scale >/sys/class/graphics/fb0/free_scale
+		cat /var/run/fb_mode >/sys/class/display/mode
 		echo 1 >/sys/class/vtconsole/vtcon1/bind
 		/bin/fbset $(cat /var/run/fb_resolution)
 	fi
@@ -160,9 +136,6 @@ esac
 if [ ! -e /var/run/fb_resolution ]; then
 	/bin/fbset | grep geometry | awk '{print "-xres "$2" -yres "$3" -vxres "$4" -vyres "$5}' > /var/run/fb_resolution
 	cat /sys/class/display/mode | head -n 1 >/var/run/fb_mode
-	cat /sys/class/graphics/fb0/free_scale_axis >/var/run/fb_free_scale_axis
-	cat /sys/class/graphics/fb0/window_axis >/var/run/fb_window_axis
-	cat /sys/class/graphics/fb0/free_scale | sed -e 's/^.*\[//' -e 's/\].*$//g' >/var/run/fb_free_scale
 fi
 
 if [ $root_space -lt 100 ]; then
