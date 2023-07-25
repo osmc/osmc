@@ -1,0 +1,26 @@
+From 72832680cfe6c1bb04d44fc2b39d68b5a4088647 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 01:50:05 +0100
+Subject: [PATCH 2/9] BusyBox: add XZ support
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/busybox/busybox.config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/busybox/busybox.config b/package/busybox/busybox.config
+index 38de13d..8fb6ffc 100644
+--- a/package/busybox/busybox.config
++++ b/package/busybox/busybox.config
+@@ -128,7 +128,7 @@ CONFIG_FEATURE_HWIB=y
+ #
+ # Archival Utilities
+ #
+-# CONFIG_FEATURE_SEAMLESS_XZ is not set
++CONFIG_FEATURE_SEAMLESS_XZ=y
+ # CONFIG_FEATURE_SEAMLESS_LZMA is not set
+ # CONFIG_FEATURE_SEAMLESS_BZ2 is not set
+ # CONFIG_FEATURE_SEAMLESS_GZ is not set
+-- 
+2.34.1
+

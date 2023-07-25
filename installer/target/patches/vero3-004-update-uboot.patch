@@ -1,32 +1,28 @@
-From 785597fd7e8a7f0f9febd9f94d8c8f96aa7deeb7 Mon Sep 17 00:00:00 2001
+From 9e7740070be3cf255e79e6ca4d107de7bea4504c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
-Date: Wed, 11 Jan 2017 06:13:38 +0000
-Subject: [PATCH] Update to UBoot 2016.01, and add patches for Vero 3 support
+Date: Tue, 25 Jul 2023 20:06:20 +0100
+Subject: [PATCH] Add patches for UBoot environment support
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- .../uboot-tools/0001-Allow-multiple-entries.patch  | 38 +++++++++++++++++
- .../0002-Allow-writing-to-nand-emmc.patch          | 49 ++++++++++++++++++++++
- .../0003-Hardcode-Vero-3-parameters.patch          | 38 +++++++++++++++++
- package/uboot-tools/0005-add-blank-defconfig.patch | 21 ++++++++++
- .../uboot-tools-01-drop-configh-from-tools.patch   | 24 +++++++----
- package/uboot-tools/uboot-tools.mk                 |  3 +-
- 6 files changed, 165 insertions(+), 8 deletions(-)
+ .../0001-Allow-multiple-entries.patch         | 38 ++++++++++++++
+ .../0002-Allow-writing-to-eMMC.patch          | 49 +++++++++++++++++++
+ ...Hardcode-Vero-environment-parameters.patch | 38 ++++++++++++++
+ 3 files changed, 125 insertions(+)
  create mode 100644 package/uboot-tools/0001-Allow-multiple-entries.patch
- create mode 100644 package/uboot-tools/0002-Allow-writing-to-nand-emmc.patch
- create mode 100644 package/uboot-tools/0003-Hardcode-Vero-3-parameters.patch
- create mode 100644 package/uboot-tools/0005-add-blank-defconfig.patch
+ create mode 100644 package/uboot-tools/0002-Allow-writing-to-eMMC.patch
+ create mode 100644 package/uboot-tools/0003-Hardcode-Vero-environment-parameters.patch
 
 diff --git a/package/uboot-tools/0001-Allow-multiple-entries.patch b/package/uboot-tools/0001-Allow-multiple-entries.patch
 new file mode 100644
-index 0000000..ea49d88
+index 0000000..288797f
 --- /dev/null
 +++ b/package/uboot-tools/0001-Allow-multiple-entries.patch
 @@ -0,0 +1,38 @@
-+From 1d041653a315c2c573b3f603e22c54396e17cd72 Mon Sep 17 00:00:00 2001
++From 31af0132cb3cebc672fcf3744c3324e7ce467ed5 Mon Sep 17 00:00:00 2001
 +From: Sam Nazarko <email@samnazarko.co.uk>
-+Date: Wed, 11 Jan 2017 04:30:27 +0000
-+Subject: [PATCH 1/4] Allow multiple entries
++Date: Tue, 25 Jul 2023 19:58:29 +0100
++Subject: [PATCH 1/3] Allow multiple entries
 +
 +Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 +---
@@ -34,18 +30,18 @@ index 0000000..ea49d88
 + 1 file changed, 7 insertions(+)
 +
 +diff --git a/tools/env/fw_env.c b/tools/env/fw_env.c
-+index 39f7333..a76fb71 100644
++index a5d7595..784ce3a 100644
 +--- a/tools/env/fw_env.c
 ++++ b/tools/env/fw_env.c
-+@@ -1453,6 +1453,7 @@ static int get_config (char *fname)
-+ 	int rc;
-+ 	char dump[128];
++@@ -1763,6 +1763,7 @@ static int get_config(char *fname)
++ 	char *line = NULL;
++ 	size_t linesize = 0;
 + 	char *devname;
 ++	int fd_test;
 + 
-+ 	fp = fopen (fname, "r");
++ 	fp = fopen(fname, "r");
 + 	if (fp == NULL)
-+@@ -1473,6 +1474,12 @@ static int get_config (char *fname)
++@@ -1781,6 +1782,12 @@ static int get_config(char *fname)
 + 		if (rc < 3)
 + 			continue;
 + 
@@ -57,20 +53,20 @@ index 0000000..ea49d88
 ++
 + 		DEVNAME(i) = devname;
 + 
-+ 		if (rc < 4)
++ 		/* Set defaults for DEVESIZE, ENVSECTORS later once we
 +-- 
-+2.7.4
++2.34.1
 +
-diff --git a/package/uboot-tools/0002-Allow-writing-to-nand-emmc.patch b/package/uboot-tools/0002-Allow-writing-to-nand-emmc.patch
+diff --git a/package/uboot-tools/0002-Allow-writing-to-eMMC.patch b/package/uboot-tools/0002-Allow-writing-to-eMMC.patch
 new file mode 100644
-index 0000000..2a8f47b
+index 0000000..518f358
 --- /dev/null
-+++ b/package/uboot-tools/0002-Allow-writing-to-nand-emmc.patch
++++ b/package/uboot-tools/0002-Allow-writing-to-eMMC.patch
 @@ -0,0 +1,49 @@
-+From 88af2538beeb1ea8ace788afb8a3aeef069372e5 Mon Sep 17 00:00:00 2001
++From 1992b52ac183fd291391c8202470f5699884c55b Mon Sep 17 00:00:00 2001
 +From: Sam Nazarko <email@samnazarko.co.uk>
-+Date: Wed, 11 Jan 2017 04:30:53 +0000
-+Subject: [PATCH 2/4] Allow writing to nand/emmc
++Date: Tue, 25 Jul 2023 20:01:50 +0100
++Subject: [PATCH 2/3] Allow writing to eMMC
 +
 +Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 +---
@@ -78,65 +74,65 @@ index 0000000..2a8f47b
 + 1 file changed, 9 insertions(+), 9 deletions(-)
 +
 +diff --git a/tools/env/fw_env.c b/tools/env/fw_env.c
-+index a76fb71..660e0f9 100644
++index 784ce3a..5c0c33d 100644
 +--- a/tools/env/fw_env.c
 ++++ b/tools/env/fw_env.c
-+@@ -957,12 +957,13 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
++@@ -1100,12 +1100,13 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 + 				}
 + 		}
 + 
-+-		if (lseek (fd, blockstart, SEEK_SET) == -1) {
-+-			fprintf (stderr,
-+-				 "Seek error on %s: %s\n",
-+-				 DEVNAME (dev), strerror (errno));
++-		if (lseek(fd, blockstart, SEEK_SET) == -1) {
++-			fprintf(stderr,
++-				"Seek error on %s: %s\n",
++-				DEVNAME(dev), strerror(errno));
 +-			return -1;
 +-		}
-++		if (blockstart != 0)
-++			if (lseek (fd, blockstart, SEEK_SET) == -1) {
-++				fprintf (stderr,
-++					 "Seek error on %s: %s\n",
-++					 DEVNAME (dev), strerror (errno));
-++				return -1;
-++			}
-+ 
+++               if (blockstart != 0)
+++                       if (lseek (fd, blockstart, SEEK_SET) == -1) {
+++                               fprintf (stderr,
+++                                        "Seek error on %s: %s\n",
+++                                        DEVNAME (dev), strerror (errno));
+++                               return -1;
+++                       }
 + #ifdef DEBUG
-+ 		fprintf(stderr, "Write 0x%x bytes at 0x%llx\n", erasesize,
-+@@ -1105,9 +1106,8 @@ static int flash_read (int fd)
++ 		fprintf(stderr, "Write 0x%llx bytes at 0x%llx\n",
++ 			(unsigned long long)erasesize,
++@@ -1625,9 +1626,8 @@ static int check_device_config(int dev)
 + 		    mtdinfo.type != MTD_NANDFLASH &&
 + 		    mtdinfo.type != MTD_DATAFLASH &&
 + 		    mtdinfo.type != MTD_UBIVOLUME) {
-+-			fprintf (stderr, "Unsupported flash type %u on %s\n",
-+-				 mtdinfo.type, DEVNAME(dev_current));
-+-			return -1;
++-			fprintf(stderr, "Unsupported flash type %u on %s\n",
++-				mtdinfo.type, DEVNAME(dev));
++-			goto err;
 ++			memset(&mtdinfo, 0, sizeof(mtdinfo));
 ++			mtdinfo.type = MTD_ABSENT;
 + 		}
-+ 	} else {
-+ 		memset(&mtdinfo, 0, sizeof(mtdinfo));
++ 		DEVTYPE(dev) = mtdinfo.type;
++ 		if (DEVESIZE(dev) == 0)
 +-- 
-+2.7.4
++2.34.1
 +
-diff --git a/package/uboot-tools/0003-Hardcode-Vero-3-parameters.patch b/package/uboot-tools/0003-Hardcode-Vero-3-parameters.patch
+diff --git a/package/uboot-tools/0003-Hardcode-Vero-environment-parameters.patch b/package/uboot-tools/0003-Hardcode-Vero-environment-parameters.patch
 new file mode 100644
-index 0000000..a5878bc
+index 0000000..2382d3a
 --- /dev/null
-+++ b/package/uboot-tools/0003-Hardcode-Vero-3-parameters.patch
++++ b/package/uboot-tools/0003-Hardcode-Vero-environment-parameters.patch
 @@ -0,0 +1,38 @@
-+From 035c53515739624ca3960196ab9921ef7acaceb2 Mon Sep 17 00:00:00 2001
++From 810e3ef509081c1a556823d89e54068fbff3c31a Mon Sep 17 00:00:00 2001
 +From: Sam Nazarko <email@samnazarko.co.uk>
-+Date: Wed, 11 Jan 2017 04:33:03 +0000
-+Subject: [PATCH 3/4] Hardcode Vero 3 parameters
++Date: Tue, 25 Jul 2023 20:04:49 +0100
++Subject: [PATCH 3/3] Hardcode Vero environment parameters
 +
 +Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 +---
-+ tools/env/fw_env.h | 10 +++++-----
++ tools/env/fw_env_private.h | 10 +++++-----
 + 1 file changed, 5 insertions(+), 5 deletions(-)
 +
-+diff --git a/tools/env/fw_env.h b/tools/env/fw_env.h
-+index 60c0517..b6b1e6a 100644
-+--- a/tools/env/fw_env.h
-++++ b/tools/env/fw_env.h
-+@@ -22,15 +22,15 @@
++diff --git a/tools/env/fw_env_private.h b/tools/env/fw_env_private.h
++index 86be16d..e6e144c 100644
++--- a/tools/env/fw_env_private.h
+++++ b/tools/env/fw_env_private.h
++@@ -21,15 +21,15 @@
 +  * See included "fw_env.config" sample file
 +  * for notes on configuration.
 +  */
@@ -158,102 +154,8 @@ index 0000000..a5878bc
 + #define DEVICE2_OFFSET    0x0000
 + #define ENV2_SIZE         0x4000
 +-- 
-+2.7.4
++2.34.1
 +
-diff --git a/package/uboot-tools/0005-add-blank-defconfig.patch b/package/uboot-tools/0005-add-blank-defconfig.patch
-new file mode 100644
-index 0000000..22bf251
---- /dev/null
-+++ b/package/uboot-tools/0005-add-blank-defconfig.patch
-@@ -0,0 +1,21 @@
-+From 11504d158b46246a1264fa4cd30808c6ec2fb5aa Mon Sep 17 00:00:00 2001
-+From: Sam Nazarko <email@samnazarko.co.uk>
-+Date: Wed, 11 Jan 2017 04:33:32 +0000
-+Subject: [PATCH 4/4] Add blank defconfig
-+
-+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
-+---
-+ configs/blank_defconfig | 1 +
-+ 1 file changed, 1 insertion(+)
-+ create mode 100644 configs/blank_defconfig
-+
-+diff --git a/configs/blank_defconfig b/configs/blank_defconfig
-+new file mode 100644
-+index 0000000..a2666cd
-+--- /dev/null
-++++ b/configs/blank_defconfig
-+@@ -0,0 +1 @@
-++CONFIG_ARM=y
-+-- 
-+2.7.4
-+
-diff --git a/package/uboot-tools/uboot-tools-01-drop-configh-from-tools.patch b/package/uboot-tools/uboot-tools-01-drop-configh-from-tools.patch
-index a36332f..b136645 100644
---- a/package/uboot-tools/uboot-tools-01-drop-configh-from-tools.patch
-+++ b/package/uboot-tools/uboot-tools-01-drop-configh-from-tools.patch
-@@ -1,18 +1,24 @@
--We need to build u-boot tools without a board configuration for the target.
--fw_env just uses config.h to define the default environment of the created
--image, so it really isn't mandatory.
-+From 9ef46e2d3ef95d353224537f15348461d12ea8ed Mon Sep 17 00:00:00 2001
-+From: Sam Nazarko <email@samnazarko.co.uk>
-+Date: Wed, 11 Jan 2017 06:02:41 +0000
-+Subject: [PATCH] Don't pull in config
- 
--Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
-+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
-+---
-+ tools/env/fw_env.h | 11 -----------
-+ 1 file changed, 11 deletions(-)
- 
- diff --git a/tools/env/fw_env.h b/tools/env/fw_env.h
--index aff471b..dfe7439 100644
-+index 60c0517..1c5daaa 100644
- --- a/tools/env/fw_env.h
- +++ b/tools/env/fw_env.h
--@@ -5,14 +5,6 @@
-+@@ -5,17 +5,6 @@
-   * SPDX-License-Identifier:	GPL-2.0+
-   */
-  
- -/* Pull in the current config to define the default environment */
-+-#include <linux/kconfig.h>
-+-
- -#ifndef __ASSEMBLY__
- -#define __ASSEMBLY__ /* get only #defines from config.h */
- -#include <config.h>
-@@ -20,6 +26,10 @@ index aff471b..dfe7439 100644
- -#else
- -#include <config.h>
- -#endif
-- 
-+-
-  /*
-   * To build the utility with the static configuration
-+  * comment out the next line.
-+-- 
-+2.7.4
-+
-diff --git a/package/uboot-tools/uboot-tools.mk b/package/uboot-tools/uboot-tools.mk
-index 0a3d711..ee72206 100644
---- a/package/uboot-tools/uboot-tools.mk
-+++ b/package/uboot-tools/uboot-tools.mk
-@@ -4,13 +4,14 @@
- #
- ################################################################################
- 
--UBOOT_TOOLS_VERSION = 2014.04
-+UBOOT_TOOLS_VERSION = 2016.01
- UBOOT_TOOLS_SOURCE  = u-boot-$(UBOOT_TOOLS_VERSION).tar.bz2
- UBOOT_TOOLS_SITE    = ftp://ftp.denx.de/pub/u-boot
- UBOOT_TOOLS_LICENSE = GPLv2+
- UBOOT_TOOLS_LICENSE_FILES = Licenses/gpl-2.0.txt
- 
- define UBOOT_TOOLS_BUILD_CMDS
-+	$(MAKE) blank_defconfig			\
- 	$(MAKE) -C $(@D) 			\
- 		CROSS_COMPILE="$(TARGET_CROSS)"	\
- 		CFLAGS="$(TARGET_CFLAGS)"	\
 -- 
-2.7.4
+2.34.1
 

@@ -1,0 +1,149 @@
+From 0ad761e6198b1a5266ce44ba5b87de97bc8b6871 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 02:23:28 +0100
+Subject: [PATCH 6/9] Bump fakeroot to 1.30.1
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/fakeroot/0001-hide-dlsym-error.patch  | 34 --------------
+ ...nicate-check-return-status-of-msgrcv.patch | 46 -------------------
+ package/fakeroot/fakeroot.hash                |  8 ++--
+ package/fakeroot/fakeroot.mk                  |  7 ++-
+ 4 files changed, 6 insertions(+), 89 deletions(-)
+ delete mode 100644 package/fakeroot/0001-hide-dlsym-error.patch
+ delete mode 100644 package/fakeroot/0002-communicate-check-return-status-of-msgrcv.patch
+
+diff --git a/package/fakeroot/0001-hide-dlsym-error.patch b/package/fakeroot/0001-hide-dlsym-error.patch
+deleted file mode 100644
+index 2c61fab..0000000
+--- a/package/fakeroot/0001-hide-dlsym-error.patch
++++ /dev/null
+@@ -1,34 +0,0 @@
+-Description: Hide error from dlsym()
+- dlsym(), starting in glibc 2.24 actually reports errors. In our case,
+- we try to get ACL functions which are not in the glibc. This causes
+- failures in test suites, so hide those messages for non-debugging
+- purposes for now. It also makes the build logs annoying to read.
+-Author: Julian Andres Klode <juliank@ubuntu.com>
+-Origin: vendor
+-Bug-Debian: https://bugs.debian.org/830912
+-Forwarded: no
+-Last-Update: 2016-08-12
+-
+-Signed-off-by: Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
+-
+---- a/libfakeroot.c
+-+++ b/libfakeroot.c
+-@@ -256,10 +256,16 @@ void load_library_symbols(void){
+-  /* clear dlerror() just in case dlsym() legitimately returns NULL */
+-     msg = dlerror();
+-     *(next_wrap[i].doit)=dlsym(get_libc(), next_wrap[i].name);
+-+
+-     if ( (msg = dlerror()) != NULL){
+--      fprintf (stderr, "dlsym(%s): %s\n", next_wrap[i].name, msg);
+--/*    abort ();*/
+-+#ifdef LIBFAKEROOT_DEBUGGING
+-+      if (fakeroot_debug) {
+-+        fprintf (stderr, "dlsym(%s): %s\n", next_wrap[i].name, msg);
+-+/*      abort ();*/
+-+      }
+-+#endif
+-     }
+-+
+-   }
+- }
+-
+diff --git a/package/fakeroot/0002-communicate-check-return-status-of-msgrcv.patch b/package/fakeroot/0002-communicate-check-return-status-of-msgrcv.patch
+deleted file mode 100644
+index 3bb4f97..0000000
+--- a/package/fakeroot/0002-communicate-check-return-status-of-msgrcv.patch
++++ /dev/null
+@@ -1,46 +0,0 @@
+-From a853f21633693f9eefc4949660253a5328d2d2f3 Mon Sep 17 00:00:00 2001
+-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+-Date: Sun, 13 Aug 2017 23:21:54 +0200
+-Subject: [PATCH 1/1] communicate: check return status of msgrcv()
+-
+-msgrcv can return with -1 to indicate an error condition.
+-One such error is to have been interrupted by a signal.
+-
+-Being interrupted by a signal is very rare in this code, except in a
+-very special condition: a highly-parallel (1000 jobs!) mksquashfs on
+-a filesystem with extended attributes, where we see errors like (those
+-are mksquashfs errors):
+-    llistxattr for titi/603/883 failed in read_attrs, because Unknown
+-    error 1716527536
+-
+-See: https://bugs.busybox.net/show_bug.cgi?id=10141
+-
+-In this case, we just have to retry the call to msgrcv().
+-
+-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+----
+- communicate.c | 5 ++++-
+- 1 file changed, 4 insertions(+), 1 deletion(-)
+-
+-diff --git a/communicate.c b/communicate.c
+-index 293f404..787bb63 100644
+---- a/communicate.c
+-+++ b/communicate.c
+-@@ -553,10 +553,13 @@ void send_get_fakem(struct fake_msg *buf)
+-       l=msgrcv(msg_get,
+-                (struct my_msgbuf*)buf,
+-                sizeof(*buf)-sizeof(buf->mtype),0,0);
+--    while((buf->serial!=serial)||buf->pid!=pid);
+-+    while(((l==-1)&&(errno==EINTR))||(buf->serial!=serial)||buf->pid!=pid);
+- 
+-     semaphore_down();
+- 
+-+    if(l==-1)
+-+      buf->xattr.flags_rc=errno;
+-+
+-     /*
+-     (nah, may be wrong, due to allignment)
+- 
+--- 
+-2.11.0
+-
+diff --git a/package/fakeroot/fakeroot.hash b/package/fakeroot/fakeroot.hash
+index d1d959d..5c50c83 100644
+--- a/package/fakeroot/fakeroot.hash
++++ b/package/fakeroot/fakeroot.hash
+@@ -1,6 +1,4 @@
+-# From http://snapshot.debian.org/package/fakeroot/1.20.2-1/
+-sha1	367040df07043edb630942b21939e493f3fad888	fakeroot_1.20.2.orig.tar.bz2
+-# Calculated based on the hash above
+-sha256	7c0a164d19db3efa9e802e0fc7cdfeff70ec6d26cdbdc4338c9c2823c5ea230c	fakeroot_1.20.2.orig.tar.bz2
++# From https://deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.30.1-1.dsc
++sha256  32ebb1f421aca0db7141c32a8c104eb95d2b45c393058b9435fbf903dd2b6a75  fakeroot_1.30.1.orig.tar.gz
+ # License files, locally calculated
+-sha256	fc82ca8b6fdb18d4e3e85cfd8ab58d1bcd3f1b29abe782895abd91d64763f8e7	COPYING
++sha256  fc82ca8b6fdb18d4e3e85cfd8ab58d1bcd3f1b29abe782895abd91d64763f8e7  COPYING
+diff --git a/package/fakeroot/fakeroot.mk b/package/fakeroot/fakeroot.mk
+index 4aa27a1..20c75d6 100644
+--- a/package/fakeroot/fakeroot.mk
++++ b/package/fakeroot/fakeroot.mk
+@@ -4,9 +4,9 @@
+ #
+ ################################################################################
+ 
+-FAKEROOT_VERSION = 1.20.2
+-FAKEROOT_SOURCE = fakeroot_$(FAKEROOT_VERSION).orig.tar.bz2
+-FAKEROOT_SITE = http://snapshot.debian.org/archive/debian/20141005T221953Z/pool/main/f/fakeroot
++FAKEROOT_VERSION = 1.30.1
++FAKEROOT_SOURCE = fakeroot_$(FAKEROOT_VERSION).orig.tar.gz
++FAKEROOT_SITE = https://snapshot.debian.org/archive/debian/20221120T030258Z/pool/main/f/fakeroot
+ 
+ HOST_FAKEROOT_DEPENDENCIES = host-acl
+ # Force capabilities detection off
+@@ -15,7 +15,6 @@ HOST_FAKEROOT_DEPENDENCIES = host-acl
+ HOST_FAKEROOT_CONF_ENV = \
+ 	ac_cv_header_sys_capability_h=no \
+ 	ac_cv_func_capset=no
+-
+ FAKEROOT_LICENSE = GPL-3.0+
+ FAKEROOT_LICENSE_FILES = COPYING
+ 
+-- 
+2.34.1
+

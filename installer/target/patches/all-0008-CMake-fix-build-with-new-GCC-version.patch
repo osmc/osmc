@@ -1,0 +1,32 @@
+From 691950e117b27943353117f334f5ae62bd9eb563 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 18:43:26 +0100
+Subject: [PATCH 8/9] CMake: fix build with new GCC version
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/cmake/0003-fix-build-with-new-gcc.patch | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 package/cmake/0003-fix-build-with-new-gcc.patch
+
+diff --git a/package/cmake/0003-fix-build-with-new-gcc.patch b/package/cmake/0003-fix-build-with-new-gcc.patch
+new file mode 100644
+index 0000000..c15791e
+--- /dev/null
++++ b/package/cmake/0003-fix-build-with-new-gcc.patch
+@@ -0,0 +1,12 @@
++--- a/Source/cmServerProtocol.cxx	2023-07-25 17:17:32.397653779 +0100
+++++ b/Source/cmServerProtocol.cxx	2023-07-25 17:18:00.529301119 +0100
++@@ -27,6 +27,9 @@
++ #include <string>
++ #include <vector>
++ 
+++#include <stdexcept>
+++#include <limits>
+++
++ // Get rid of some windows macros:
++ #undef max
++ 
+-- 
+2.34.1
+

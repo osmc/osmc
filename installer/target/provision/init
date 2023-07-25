@@ -29,8 +29,6 @@ udevadm trigger
 
 sleep 3 # Wait for /dev population
 
-partprobe # just to be safe
-
 grep -q vero5 /proc/cmdline
 if [ $? == 0 ]
 then

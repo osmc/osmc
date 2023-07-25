@@ -1,0 +1,25 @@
+From 0caec1c8597b7f76a67fab2b181956b3b2077786 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 4 Sep 2023 01:32:34 +0100
+Subject: [PATCH] Fix fw_env operations and create missing lock directory
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/uboot-tools/uboot-tools.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/uboot-tools/uboot-tools.mk b/package/uboot-tools/uboot-tools.mk
+index 5ac7b1c293..803686bc7f 100644
+--- a/package/uboot-tools/uboot-tools.mk
++++ b/package/uboot-tools/uboot-tools.mk
+@@ -55,6 +55,7 @@ ifeq ($(BR2_PACKAGE_UBOOT_TOOLS_FWPRINTENV),y)
+ define UBOOT_TOOLS_INSTALL_FWPRINTENV
+ 	$(INSTALL) -m 0755 -D $(@D)/tools/env/fw_printenv $(TARGET_DIR)/usr/sbin/fw_printenv
+ 	ln -sf fw_printenv $(TARGET_DIR)/usr/sbin/fw_setenv
++	$(INSTALL) -m 0755 -d $(TARGET_DIR)/var/lock
+ endef
+ endif
+ 
+-- 
+2.34.1
+
