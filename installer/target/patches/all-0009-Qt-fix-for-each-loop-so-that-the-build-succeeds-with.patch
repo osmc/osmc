@@ -1,5 +1,20 @@
---- /dev/null	2022-03-20 22:19:02.595024565 +0000
-+++ b/package/qt/qt-fix-gcc9.patch	2022-03-29 19:19:00.322720052 +0100
+From e193b347032ada64692b899511bf5e58d1944d52 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 18:43:43 +0100
+Subject: [PATCH 9/9] Qt: fix for each loop so that the build succeeds with new
+ GCC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/qt/0016-redo-foreach-loop.patch | 64 +++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+ create mode 100644 package/qt/0016-redo-foreach-loop.patch
+
+diff --git a/package/qt/0016-redo-foreach-loop.patch b/package/qt/0016-redo-foreach-loop.patch
+new file mode 100644
+index 0000000..ae54cdb
+--- /dev/null
++++ b/package/qt/0016-redo-foreach-loop.patch
 @@ -0,0 +1,64 @@
 +From c35a3f519007af44c3b364b9af86f6a336f6411b Mon Sep 17 00:00:00 2001
 +From: Thiago Macieira <thiago.macieira@intel.com>
@@ -65,3 +80,6 @@
 + 
 + #else
 + 
+-- 
+2.34.1
+

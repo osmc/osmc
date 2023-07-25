@@ -1,0 +1,28 @@
+From b07b4b92a52f08669db43850caa1e21111a6361e Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 01:52:04 +0100
+Subject: [PATCH 4/9] Do not use HWDB
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/eudev/eudev.mk | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/package/eudev/eudev.mk b/package/eudev/eudev.mk
+index 11dc937..d9e883a 100644
+--- a/package/eudev/eudev.mk
++++ b/package/eudev/eudev.mk
+@@ -53,4 +53,10 @@ define EUDEV_USERS
+ 	- - input -1 * - - - Input device group
+ endef
+ 
++define EUDEV_REMOVE_HWDB
++    rm -rf $(TARGET_DIR)/etc/udev/hwdb.d/*
++endef
++
++EUDEV_POST_INSTALL_TARGET_HOOKS += EUDEV_REMOVE_HWDB
++
+ $(eval $(autotools-package))
+-- 
+2.34.1
+

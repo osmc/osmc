@@ -1,0 +1,12 @@
+diff --git a/linux/linux.mk b/linux/linux.mk
+index c3f2102..27054a2 100644
+--- a/linux/linux.mk
++++ b/linux/linux.mk
+@@ -367,6 +367,7 @@ define LINUX_KCONFIG_FIXUP_CMDS
+ 		$(call KCONFIG_ENABLE_OPT,CONFIG_FB,$(@D)/.config)
+ 		$(call KCONFIG_ENABLE_OPT,CONFIG_LOGO,$(@D)/.config)
+ 		$(call KCONFIG_ENABLE_OPT,CONFIG_LOGO_LINUX_CLUT224,$(@D)/.config))
++	cd $(@D); ARCH=arm64 scripts/kconfig/merge_config.sh .config arch/arm64/configs/enforce-kernel-module-signature.fragment
+ endef
+ 
+ ifeq ($(BR2_LINUX_KERNEL_DTS_SUPPORT),y)

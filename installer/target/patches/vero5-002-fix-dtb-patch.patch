@@ -1,16 +1,18 @@
---- a/linux/linux.mk	2016-10-31 14:24:05.990067165 +0000
-+++ b/linux/linux.mk	2016-10-31 14:26:22.750286619 +0000
-@@ -216,10 +216,9 @@
- endef
+diff --git a/linux/linux.mk b/linux/linux.mk
+index 864fa77..c3f2102 100644
+--- a/linux/linux.mk
++++ b/linux/linux.mk
+@@ -382,10 +382,9 @@ endef
+ ifeq ($(BR2_LINUX_KERNEL_APPENDED_DTB),)
  define LINUX_INSTALL_DTB
  	# dtbs moved from arch/<ARCH>/boot to arch/<ARCH>/boot/dts since 3.8-rc1
 -	cp $(addprefix \
--		$(KERNEL_ARCH_PATH)/boot/$(if $(wildcard \
--		$(addprefix $(KERNEL_ARCH_PATH)/boot/dts/,$(KERNEL_DTBS))),dts/),$(KERNEL_DTBS)) \
--		$(BINARIES_DIR)/
+-		$(LINUX_ARCH_PATH)/boot/$(if $(wildcard \
+-		$(addprefix $(LINUX_ARCH_PATH)/boot/dts/,$(LINUX_DTBS))),dts/),$(LINUX_DTBS)) \
+-		$(1)
 +        cp $(addprefix \
-+                $(KERNEL_ARCH_PATH)/boot/dts/amlogic/,$(KERNEL_DTBS)) \
++                $(LINUX_ARCH_PATH)/boot/dts/amlogic/,$(LINUX_DTBS)) \
 +                $(BINARIES_DIR)/
  endef
- define LINUX_INSTALL_DTB_TARGET
- 	# dtbs moved from arch/<ARCH>/boot to arch/<ARCH>/boot/dts since 3.8-rc1
+ endif # BR2_LINUX_KERNEL_APPENDED_DTB
+ endif # BR2_LINUX_KERNEL_DTB_IS_SELF_BUILT

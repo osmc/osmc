@@ -1,13 +1,13 @@
---- a/linux/linux.mk	2018-03-13 00:07:54.961242027 +0000
-+++ b/linux/linux.mk	2018-03-13 17:44:37.691351423 +0000
-@@ -287,6 +287,10 @@
+--- a/linux/linux.mk	2023-07-25 18:48:39.263744491 +0100
++++ b/linux/linux.mk	2023-07-25 18:50:45.894247261 +0100
+@@ -468,6 +468,10 @@
  define LINUX_INSTALL_IMAGES_CMDS
- 	cp $(LINUX_IMAGE_PATH) $(BINARIES_DIR)
- 	$(LINUX_INSTALL_DTB)
+ 	$(call LINUX_INSTALL_IMAGE,$(BINARIES_DIR))
+ 	$(call LINUX_INSTALL_DTB,$(BINARIES_DIR))
 +        $(TARGET_MAKE_ENV) $(MAKE) $(LINUX_MAKE_FLAGS) -C $(@D) dtbs
-+	mkdir -p $(BINARIES_DIR)/overlays
-+	cp $(KERNEL_ARCH_PATH)/boot/dts/overlays/*.dtbo $(BINARIES_DIR)/overlays
-+	cp $(KERNEL_ARCH_PATH)/boot/dts/*.dtb $(BINARIES_DIR)
++       mkdir -p $(BINARIES_DIR)/overlays
++       cp $(LINUX_ARCH_PATH)/boot/dts/overlays/*.dtbo $(BINARIES_DIR)/overlays
++       cp $(LINUX_ARCH_PATH)/boot/dts/*.dtb $(BINARIES_DIR)
  endef
  
- define LINUX_INSTALL_TARGET_CMDS
+ ifeq ($(BR2_STRIP_strip),y)

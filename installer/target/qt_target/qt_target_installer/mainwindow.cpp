@@ -260,14 +260,13 @@ void MainWindow::install()
             system("dd if=/dev/zero of=/dev/tee bs=256k conv=fsync"); /* Quirk */
             system("pvcreate /dev/data /dev/system /dev/cache /dev/instaboot");
             system("vgcreate vero-nand /dev/data /dev/system /dev/cache /dev/instaboot");
-            system("lvcreate -n root -l100%FREE vero-nand");
+            system("lvcreate -n root -l100%FREE vero-nand --wipesignatures y --yes --zero y");
             utils->fmtpart(device->getRoot(), "ext4");
         }
         if (utils->getOSMCDev() == "vero5")
         {
-            /* Format root partition and OARS partition */
+            /* Format root partition */
             utils->fmtpart(device->getRoot(), "ext4");
-            utils->fmtpart("/dev/oars", "ext4");
         }
         QString rootBase = device->getRoot();
         if (rootBase.contains("mmcblk"))

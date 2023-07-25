@@ -1,0 +1,27 @@
+From bb75b51f30a38689139c01a3b6657af35b1d9bae Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 19:46:28 +0100
+Subject: [PATCH] Strip kernel modules unconditionally
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ linux/linux.mk | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/linux/linux.mk b/linux/linux.mk
+index 864fa77..e598356 100644
+--- a/linux/linux.mk
++++ b/linux/linux.mk
+@@ -470,9 +470,7 @@ define LINUX_INSTALL_IMAGES_CMDS
+ 	$(call LINUX_INSTALL_DTB,$(BINARIES_DIR))
+ endef
+ 
+-ifeq ($(BR2_STRIP_strip),y)
+ LINUX_MAKE_FLAGS += INSTALL_MOD_STRIP=1
+-endif
+ 
+ define LINUX_INSTALL_TARGET_CMDS
+ 	$(LINUX_INSTALL_KERNEL_IMAGE_TO_TARGET)
+-- 
+2.34.1
+

@@ -1,0 +1,45 @@
+From 3b48fa7c3daf0a44d4d85ad649c0902e8bf765cf Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 01:51:38 +0100
+Subject: [PATCH 3/9] Qt: fix graphics support
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/qt/qt.mk | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/package/qt/qt.mk b/package/qt/qt.mk
+index 23cb94c..cf996c9 100644
+--- a/package/qt/qt.mk
++++ b/package/qt/qt.mk
+@@ -275,27 +275,9 @@ QT_DEPENDENCIES += zlib
+ endif
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_QT_QTJPEG),y)
+ QT_CONFIGURE_OPTS += -qt-libjpeg
+-else
+-ifeq ($(BR2_PACKAGE_QT_SYSTEMJPEG),y)
+-QT_CONFIGURE_OPTS += -system-libjpeg
+-QT_DEPENDENCIES += jpeg
+-else
+-QT_CONFIGURE_OPTS += -no-libjpeg
+-endif
+-endif
+ 
+-ifeq ($(BR2_PACKAGE_QT_QTPNG),y)
+ QT_CONFIGURE_OPTS += -qt-libpng
+-else
+-ifeq ($(BR2_PACKAGE_QT_SYSTEMPNG),y)
+-QT_CONFIGURE_OPTS += -system-libpng
+-QT_DEPENDENCIES += libpng
+-else
+-QT_CONFIGURE_OPTS += -no-libpng
+-endif
+-endif
+ 
+ ifeq ($(BR2_PACKAGE_QT_QTTIFF),y)
+ QT_CONFIGURE_OPTS += -qt-libtiff
+-- 
+2.34.1
+

@@ -1,19 +1,31 @@
+From 2ddfbe8a9d3c350ae6bb6e4f9337322b44c7fbd1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 25 Jul 2023 01:49:03 +0100
+Subject: [PATCH 1/9] Add OSMC package
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ package/Config.in      |  1 +
+ package/osmc/Config.in | 13 +++++++++++++
+ package/osmc/osmc.mk   | 25 +++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+)
+ create mode 100644 package/osmc/Config.in
+ create mode 100644 package/osmc/osmc.mk
+
 diff --git a/package/Config.in b/package/Config.in
-index 3bc8d24..a49709f 100644
+index b60e770..9e6de66 100644
 --- a/package/Config.in
 +++ b/package/Config.in
-@@ -1,6 +1,7 @@
+@@ -1,5 +1,6 @@
  menu "Target packages"
  
- source "package/busybox/Config.in"
-+source "package/osmc/Config.in"
- 
- menu "Audio and video applications"
- source "package/alsa-utils/Config.in"
-
++	source "package/osmc/Config.in"
+ 	source "package/busybox/Config.in"
+ 	source "package/skeleton/Config.in"
+ 	source "package/skeleton-custom/Config.in"
 diff --git a/package/osmc/Config.in b/package/osmc/Config.in
 new file mode 100644
-index 0000000..4c92bbc
+index 0000000..2289eff
 --- /dev/null
 +++ b/package/osmc/Config.in
 @@ -0,0 +1,13 @@
@@ -30,10 +42,9 @@ index 0000000..4c92bbc
 +    select BR2_PACKAGE_NETCAT
 +        help
 +          OSMC device side installer
-
 diff --git a/package/osmc/osmc.mk b/package/osmc/osmc.mk
 new file mode 100644
-index 0000000..5158518
+index 0000000..c6dbbb9
 --- /dev/null
 +++ b/package/osmc/osmc.mk
 @@ -0,0 +1,25 @@
@@ -62,3 +73,6 @@ index 0000000..5158518
 +endef
 +
 +$(eval $(generic-package))
+-- 
+2.34.1
+
