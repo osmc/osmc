@@ -9218,7 +9218,7 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 88b0344658..434a869fdf 100644
+index 88b0344658..39b7b8c8f7 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 @@ -1329,17 +1329,14 @@ void CVideoPlayer::Prepare()
@@ -9252,7 +9252,19 @@ index 88b0344658..434a869fdf 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1866,7 +1868,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1729,6 +1731,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+   if (CheckSceneSkip(m_CurrentVideo))
+     drop = true;
+ 
++  m_CurrentVideo.lastdts = pPacket->dts;
++
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::ProcessVideoData size:{} dts:{:.3f} pts:{:.3f} dur:{:.3f}ms, clock:{:.3f} level:{}",
++    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
++
+   m_VideoPlayerVideo->SendMessage(std::make_shared<CDVDMsgDemuxerPacket>(pPacket, drop));
+ 
+   if (!drop)
+@@ -1866,7 +1873,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (level < 0.0)
        {
@@ -9261,7 +9273,7 @@ index 88b0344658..434a869fdf 100644
          SetCaching(CACHESTATE_INIT);
        }
        if (level >= 1.0)
-@@ -1968,10 +1970,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1968,10 +1975,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -9274,7 +9286,7 @@ index 88b0344658..434a869fdf 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -2011,6 +2013,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2011,6 +2018,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -9282,7 +9294,7 @@ index 88b0344658..434a869fdf 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(
-@@ -2164,18 +2167,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2164,18 +2172,19 @@ void CVideoPlayer::HandlePlaySpeed()
              errorwin = 8;
            error /= errorwin;
          }
@@ -9305,7 +9317,25 @@ index 88b0344658..434a869fdf 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2711,6 +2715,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2694,14 +2703,14 @@ void CVideoPlayer::HandleMessages()
+       if (m_pInputStream->GetIPosTime() == nullptr)
+         time -= m_State.time_offset/1000l;
+ 
+-      CLog::Log(LOGDEBUG, "demuxer seek to: {:f}", time);
++      CLog::Log(LOGDEBUG, "CVideoPlayer::HandleMessages: demuxer seek to: {:f}", time);
+       if (m_pDemuxer && m_pDemuxer->SeekTime(time, msg.GetBackward(), &start))
+       {
+-        CLog::Log(LOGDEBUG, "demuxer seek to: {:f}, success", time);
++        CLog::Log(LOGDEBUG, "CVideoPlayer::HandleMessages: demuxer seek to: {:f}, success", time);
+         if(m_pSubtitleDemuxer)
+         {
+           if(!m_pSubtitleDemuxer->SeekTime(time, msg.GetBackward()))
+-            CLog::Log(LOGDEBUG, "failed to seek subtitle demuxer: {:f}, success", time);
++            CLog::Log(LOGDEBUG, "CVideoPlayer::HandleMessages: failed to seek subtitle demuxer: {:f}, success", time);
+         }
+         // dts after successful seek
+         if (start == DVD_NOPTS_VALUE)
+@@ -2711,6 +2720,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -9313,7 +9343,7 @@ index 88b0344658..434a869fdf 100644
        }
        else if (m_pDemuxer)
        {
-@@ -3078,7 +3083,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -3078,7 +3088,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -9324,7 +9354,7 @@ index 88b0344658..434a869fdf 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3738,20 +3745,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3738,20 +3750,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
    if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
      return false;
  
@@ -9345,7 +9375,7 @@ index 88b0344658..434a869fdf 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3765,8 +3758,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3765,8 +3763,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9376,7 +9406,7 @@ index 88b0344658..434a869fdf 100644
      // look for any EDL files
      m_Edl.Clear();
      float fFramesPerSecond = 0.0f;
-@@ -3952,6 +3967,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3952,6 +3972,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9384,7 +9414,7 @@ index 88b0344658..434a869fdf 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -3998,7 +4014,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3998,7 +4019,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9394,7 +9424,7 @@ index 88b0344658..434a869fdf 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4877,15 +4894,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4877,15 +4899,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
