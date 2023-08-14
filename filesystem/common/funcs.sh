@@ -135,6 +135,11 @@ hostname=$(hostname)
 echo -e "OSMC filesystem assembled on ${hostname} at ${build_date} using Debootstrap version ${debootstrap_version}" > ${1}/etc/osmc_build_info
 }
 
+function disable_persistent_journal()
+{
+rm -rf ${1}/var/log/journal
+}
+
 export -f setup_osmc_user
 export -f setup_hostname
 export -f setup_hosts
@@ -148,3 +153,4 @@ export -f enable_legacy_elf
 export -f create_rc_local
 export -f set_iptables_to_legacy
 export -f add_rls_info
+export -f disable_persistent_journal

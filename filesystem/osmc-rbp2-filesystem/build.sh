@@ -113,6 +113,9 @@ verify_action
 echo -e "	* Adding system release information"
 add_rls_info ${DIR}
 verify_action
+echo -e "	* Disabling persistent journalling"
+disable_persistent_journal ${DIR}
+verify_action
 
 # Perform filesystem cleanup
 enable_init "${DIR}"
