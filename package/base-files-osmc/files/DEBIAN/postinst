@@ -37,5 +37,12 @@ if [ "$1" = "configure" ]; then
 	#if [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.1.8"; then
 	#dist_upgrade_migrate
 	#fi
+
+	# disable persistent journalling if enabled
+	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.3.4"; then
+		journalctl --relinquish-var
+		rm -rf /var/log/journal
+	fi
+
 fi
 exit 0
