@@ -5,7 +5,7 @@
 
 . ../common.sh
 
-MESA_REV="663d464366675bf6d44c5d4d00e04cbdfa3f6057"
+MESA_REV="ea9f8c26bc952c6e0e24e086e364d16aa7841bd9"
 pull_source "https://github.com/mesa3d/mesa/archive/${MESA_REV}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -39,40 +39,42 @@ then
 	handle_dep "meson"
 	echo "Package: ${1}-mesa-osmc" >> files/DEBIAN/control && echo "Package: ${1}-mesa-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/mesa-*
-	install_patch "../../patches" "all"
+	install_patch "../../patches" "{$1}"
 	rm -rf build
 	mkdir -p build
 	pushd build
 	if [ "$1" == "rbp2" ]; then
-		meson --prefix=/usr/osmc \
+		meson setup \
+		--prefix=/usr/osmc \
 		--libdir=/usr/osmc/lib \
-		--includedir=/usr/osmc/include \
-		-Ddri-drivers="" \
 		-Dgallium-drivers=vc4,v3d,kmsro \
 		-Dgallium-extra-hud=false \
-		-Dgallium-xvmc=false \
 		-Dgallium-omx=disabled \
 		-Dgallium-nine=false \
 		-Dgallium-opencl=disabled \
-		-Dvulkan-drivers= \
-		-Dshader-cache=true \
-		-Dshared-glapi=true \
+		-Dshader-cache=enabled \
+		-Dshared-glapi=enabled \
 		-Dopengl=true \
-		-Dgbm=true \
-		-Degl=true \
-		-Dvalgrind=false \
-		-Dlibunwind=false \
-		-Dlmsensors=false \
+		-Dgbm=enabled \
+		-Degl=enabled \
+		-Dvalgrind=disabled \
+		-Dlibunwind=disabled \
+		-Dlmsensors=disabled \
 		-Dbuild-tests=false \
+		-Ddraw-use-llvm=false \
 		-Dselinux=false \
-		-Dosmesa=none \
-		-Dplatforms=drm -Ddri3=false -Dglx=disabled -Dglvnd=false \
-		-Dllvm=false \
-		-Dgallium-vdpau=false \
-		-Dgallium-va=false \
-		-Dgallium-xa=false \
-		-Dgles1=false \
-		-Dgles2=true
+		-Dosmesa=false \
+		-Dplatforms="" \
+		-Ddri3=disabled \
+		-Dglx=disabled \
+		-Dglvnd=false \
+		-Dllvm=disabled \
+		-Dgallium-vdpau=disabled \
+		-Dgallium-va=disabled \
+		-Dgallium-xa=disabled \
+		-Dgles1=disabled \
+		-Dgles2=enabled \
+		-Dvulkan-drivers=""
 	fi
 	if [ $? != 0 ]; then echo -e "MESA configuration failed" && exit 1; fi
 	ninja
