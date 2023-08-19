@@ -2846,10 +2846,10 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..62286bfaeb
+index 0000000000..d993537c48
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1315 @@
+@@ -0,0 +1,1320 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2905,8 +2905,10 @@ index 0000000000..62286bfaeb
 +
 +static const unsigned int STATE_HASPTS = 2;
 +
-+// high water level for decoder input queue
-+static const float highWaterLevel = 0.8;
++// high/low water level for decoder input queue
++static const float highWaterLevel = 0.8f;
++static const float lowWaterLevel = 0.2f;
++static const float minFillLevel = 0.002f;
 +
 +/*************************************************************************/
 +
@@ -3647,11 +3649,6 @@ index 0000000000..62286bfaeb
 +	return (float) bs.data_len / (float) bs.size;
 +}
 +
-+float AMLInsecureVideoCodec::getDecoderBufferingLevel() const
-+{
-+	return 0.2f; // 20 percent
-+}
-+
 +bool AMLInsecureVideoCodec::addData(uint8_t *pData, size_t iSize, double dts, double pts, uint8_t subtitlePlane)
 +{
 +	/* if passing through HDR, ignore contrast and brightness
@@ -3698,7 +3695,11 @@ index 0000000000..62286bfaeb
 +		m_filling = false;
 +		return false;
 +	} else if (!m_filling) {
-+		return false;
++		if (lowWaterLevel < decoderInputLevel) {
++			return false;
++		}
++
++		m_filling = true;
 +	}
 +
 +	// setup packet
@@ -3883,12 +3884,16 @@ index 0000000000..62286bfaeb
 +
 +	if (!m_opened) {
 +		return CDVDVideoCodec::VC_ERROR;
-+	} else if (m_drain) {
-+		return CDVDVideoCodec::VC_EOF;
-+	} else if (!dequeueBuffer()) {
-+		m_filling = level < getDecoderBufferingLevel();
++	} else if (!m_drain && (m_libamcodec->isVCodecBuffering() || level < minFillLevel)) {
++		return CDVDVideoCodec::VC_BUFFER;
++	}
 +
-+		return (m_libamcodec->isVCodecBuffering() || m_filling) ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
++	if (!dequeueBuffer()) {
++		if (m_drain) {
++			return CDVDVideoCodec::VC_EOF;
++		}
++
++		return level < (2.0f * minFillLevel) ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
 +	}
 +
 +	pVideoPicture->iFlags = 0;
@@ -4167,10 +4172,10 @@ index 0000000000..62286bfaeb
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..814e707d74
+index 0000000000..9fb0e3355a
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,152 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4297,7 +4302,6 @@ index 0000000000..814e707d74
 +	virtual void setPictureStereoMode(VideoPicture *pVideoPicture);
 +
 +	virtual float getDecoderInputBufferLevel() const;
-+	virtual float getDecoderBufferingLevel() const;
 +
 +public:
 +	AMLInsecureVideoCodec(CProcessInfo &processInfo);
@@ -6528,10 +6532,10 @@ index 0000000000..75a6d7e81a
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
 new file mode 100644
-index 0000000000..145bbc1b41
+index 0000000000..b7408f0d4e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,41 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6559,8 +6563,6 @@ index 0000000000..145bbc1b41
 +	virtual vdec_type_t getVideoCodecType(const CDVDStreamInfo &hints) const;
 +
 +	virtual void getExtradata(const CDVDStreamInfo &hints, uint8_t *&extradata, unsigned int &extrasize) const;
-+
-+	virtual inline float getDecoderBufferingLevel() const { return 0.02; }
 +
 +public:
 +	MPEG12Codec(CProcessInfo &processInfo, const CDVDStreamInfo &hints);
@@ -7260,10 +7262,10 @@ index 0000000000..80c3321ff5
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.h
 new file mode 100644
-index 0000000000..07ff2598c7
+index 0000000000..19a19e3fd5
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.h
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,42 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7296,8 +7298,6 @@ index 0000000000..07ff2598c7
 +	virtual int pre_header_feeding(am_private_t *para, am_packet_t *pkt) const;
 +	virtual int set_header_info(am_private_t *para) const;
 +	virtual int write_header(am_private_t *para, am_packet_t *pkt) const;
-+
-+	virtual inline float getDecoderBufferingLevel() const { return 0.02; }
 +
 +public:
 +	VC1Codec(CProcessInfo &processInfo, std::string formatName);
