@@ -2846,10 +2846,10 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..d993537c48
+index 0000000000..4638117817
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1320 @@
+@@ -0,0 +1,1357 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2895,20 +2895,16 @@ index 0000000000..d993537c48
 +	#include <libavcodec/packet.h>
 +}
 +
-+using namespace amlogic;
-+
 +CEvent g_aml_codec_sync_event;
 +
-+static const uint64_t UINT64_0 = 0x8000000000000000ULL;
++using namespace amlogic;
++
++static const uint64_t UINT64_0 	= 0x8000000000000000ULL;
 +
 +static const int RW_WAIT_TIME = 5 * 1000; // 5 ms
 +
-+static const unsigned int STATE_HASPTS = 2;
++static const unsigned int STATE_HASPTS     = 2;
 +
-+// high/low water level for decoder input queue
-+static const float highWaterLevel = 0.8f;
-+static const float lowWaterLevel = 0.2f;
-+static const float minFillLevel = 0.002f;
 +
 +/*************************************************************************/
 +
@@ -2928,7 +2924,7 @@ index 0000000000..d993537c48
 +
 +AMLInsecureVideoCodec::AMLInsecureVideoCodec(CProcessInfo &processInfo)
 +	: AMLVideoCodec(processInfo), m_sleepDurationInMs(0), m_opened(false), m_speed(DVD_PLAYSPEED_NORMAL), m_cur_pts(DVD_NOPTS_VALUE),
-+	  m_last_pts(DVD_NOPTS_VALUE) , m_bufferIndex(-1), m_state(0), m_filling(true), m_secureOSMC(&OSMCSecureOS::getInstance())
++	  m_last_pts(DVD_NOPTS_VALUE) , m_bufferIndex(-1), m_state(0), m_frameSizeSum(0), m_secureOSMC(&OSMCSecureOS::getInstance())
 +{
 +	m_am_private = new am_private_t;
 +	memset(m_am_private, 0, sizeof(am_private_t));
@@ -3321,7 +3317,8 @@ index 0000000000..d993537c48
 +	m_brightness = -1;
 +	m_hints = hints;
 +	m_state = 0;
-+	m_filling = true;
++	m_frameSizes.clear();
++	m_frameSizeSum = 0;
 +
 +	if (!openAmlVideo(hints)) {
 +		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::openDecoder - cannot open amlvideo device");
@@ -3641,14 +3638,6 @@ index 0000000000..d993537c48
 +	return PLAYER_SUCCESS;
 +}
 +
-+float AMLInsecureVideoCodec::getDecoderInputBufferLevel() const
-+{
-+	struct buf_status bs;
-+	m_libamcodec->getVbufState(bs);
-+
-+	return (float) bs.data_len / (float) bs.size;
-+}
-+
 +bool AMLInsecureVideoCodec::addData(uint8_t *pData, size_t iSize, double dts, double pts, uint8_t subtitlePlane)
 +{
 +	/* if passing through HDR, ignore contrast and brightness
@@ -3688,19 +3677,14 @@ index 0000000000..d993537c48
 +	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
 +
 +	// check if decoder is still accepting data
-+	float decoderInputLevel = getDecoderInputBufferLevel();
-+
-+	if (m_filling && highWaterLevel < decoderInputLevel) {
-+		CLog::Log(LOGDEBUG, "AMLInsecureVideoCodec::addData: decoder input queue almost full, stop filling up queue");
-+		m_filling = false;
++	struct buf_status bs;
++	m_libamcodec->getVbufState(bs);
++	if (iSize > (size_t) bs.free_len) {
++		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::addData: packet too big: {}, probably corrupted", iSize);
 +		return false;
-+	} else if (!m_filling) {
-+		if (lowWaterLevel < decoderInputLevel) {
-+			return false;
-+		}
-+
-+		m_filling = true;
 +	}
++	m_frameSizes.push_back(iSize);
++	m_frameSizeSum += iSize;
 +
 +	// setup packet
 +	m_am_private->am_pkt.data = pData;
@@ -3773,13 +3757,13 @@ index 0000000000..d993537c48
 +		usleep(2000); // wait 2ms to process larger packets
 +	}
 +
++	m_libamcodec->getVbufState(bs);
 +	if (iSize > 0) {
-+		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::addData: sz:{} dts_in:{:0.3f} pts_in:{:0.3f} ptsOut:{:0.3f} lvl:{:0.3f}",
++		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::addData: dl:{} sum:{} sz:{} dts_in:{:0.3f} pts_in:{:0.3f} ptsOut:{:0.3f}", bs.data_len, m_frameSizeSum,
 +			static_cast<unsigned int>(iSize),
 +			dts / DVD_TIME_BASE,
 +			pts / DVD_TIME_BASE,
-+			static_cast<float>(m_cur_pts) / DVD_TIME_BASE,
-+			getDecoderInputBufferLevel());
++			static_cast<float>(m_cur_pts) / DVD_TIME_BASE);
 +	}
 +
 +	return true;
@@ -3819,7 +3803,8 @@ index 0000000000..d993537c48
 +	// reset some interal vars
 +	m_cur_pts = DVD_NOPTS_VALUE;
 +	m_state = 0;
-+	m_filling = true;
++	m_frameSizes.clear();
++	m_frameSizeSum = 0;
 +
 +	setSpeed(m_speed);
 +}
@@ -3829,17 +3814,67 @@ index 0000000000..d993537c48
 +	m_drain = drain;
 +}
 +
-+bool AMLInsecureVideoCodec::dequeueBuffer()
++float AMLInsecureVideoCodec::getTimeSize()
++{
++	struct buf_status bs;
++
++	m_libamcodec->getVbufState(bs);
++
++	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getTimeSize: len:{} dl:{} fs:{} front:{}",
++		m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front());
++	while (m_frameSizeSum > (unsigned int) bs.data_len) {
++		m_frameSizeSum -= m_frameSizes.front();
++		m_frameSizes.pop_front();
++		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getTimeSize: len:{} dl:{} fs:{} front:{}",
++			m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front());
++	}
++
++	if (bs.free_len < (bs.data_len >> 1)) {
++		return 7.0;
++	}
++
++	return (float) (m_frameSizes.size() * m_am_private->video_rate) / UNIT_FREQ;
++}
++
++int AMLInsecureVideoCodec::dequeueBuffer()
 +{
 +	v4l2_buffer vbuf = { 0 };
 +	vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 +
++	//Driver change from 10 to 0ms latency, throttle here
++	std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
++
++	unsigned int waitTime = 5;
++	bool timeout = false;
++
++DRAIN:
 +	if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0) {
 +		if (errno != EAGAIN) {
 +			CLog::Log(LOGERROR, "AMLInsecureVideoCodec::dequeueBuffer - VIDIOC_DQBUF failed: {}", strerror(errno));
 +		}
 +
-+		return false;
++		std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
++
++		if (elapsed < std::chrono::milliseconds(waitTime)) {
++			std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
++		}
++
++		timeout = elapsed >= std::chrono::milliseconds(300);
++
++		if (m_drain && !timeout) {
++			goto DRAIN;
++		}
++
++		if (m_drain && timeout) {
++			CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer timeout!");
++		}
++
++		return -errno;
++	}
++
++	if (m_drain) {
++		int waited = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count();
++		CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer waited:{:0.3f}ms", waited / 1000.0);
 +	}
 +
 +	m_last_pts = m_cur_pts;
@@ -3851,7 +3886,7 @@ index 0000000000..d993537c48
 +
 +	m_bufferIndex = vbuf.index;
 +
-+	return true;
++	return 0;
 +}
 +
 +void AMLInsecureVideoCodec::setPictureStereoMode(VideoPicture *pVideoPicture)
@@ -3880,39 +3915,41 @@ index 0000000000..d993537c48
 +
 +CDVDVideoCodec::VCReturn AMLInsecureVideoCodec::getPicture(VideoPicture *pVideoPicture)
 +{
-+	float level = getDecoderInputBufferLevel();
-+
 +	if (!m_opened) {
 +		return CDVDVideoCodec::VC_ERROR;
-+	} else if (!m_drain && (m_libamcodec->isVCodecBuffering() || level < minFillLevel)) {
++	}
++
++	float timesize = getTimeSize();
++
++	if (!m_drain && timesize < 0.2) {
 +		return CDVDVideoCodec::VC_BUFFER;
 +	}
 +
-+	if (!dequeueBuffer()) {
-+		if (m_drain) {
-+			return CDVDVideoCodec::VC_EOF;
++	if (dequeueBuffer() == 0) {
++		pVideoPicture->iFlags = 0;
++
++		if (m_last_pts == DVD_NOPTS_VALUE) {
++			pVideoPicture->iDuration = static_cast<double>(m_am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
++		} else {
++			pVideoPicture->iDuration = static_cast<double>(m_cur_pts - m_last_pts);
 +		}
 +
-+		return level < (2.0f * minFillLevel) ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
++		pVideoPicture->dts = DVD_NOPTS_VALUE;
++		pVideoPicture->pts = static_cast<double>(m_cur_pts);
++
++		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
++			m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000);
++
++		setPictureStereoMode(pVideoPicture);
++
++		return CDVDVideoCodec::VC_PICTURE;
++	} else if (m_drain) {
++		return CDVDVideoCodec::VC_EOF;
++	} else if (timesize < 1.0 || m_libamcodec->isVCodecBuffering()) {
++		return CDVDVideoCodec::VC_BUFFER;
 +	}
 +
-+	pVideoPicture->iFlags = 0;
-+
-+	if (m_last_pts == DVD_NOPTS_VALUE) {
-+		pVideoPicture->iDuration = static_cast<double>(m_am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
-+	} else {
-+		pVideoPicture->iDuration = static_cast<double>(m_cur_pts - m_last_pts);
-+	}
-+
-+	pVideoPicture->dts = DVD_NOPTS_VALUE;
-+	pVideoPicture->pts = static_cast<double>(m_cur_pts);
-+
-+	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
-+		m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000);
-+
-+	setPictureStereoMode(pVideoPicture);
-+
-+	return CDVDVideoCodec::VC_PICTURE;
++	return CDVDVideoCodec::VC_NONE;
 +}
 +
 +int AMLInsecureVideoCodec::getOMXPts() const
@@ -4172,7 +4209,7 @@ index 0000000000..d993537c48
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..9fb0e3355a
+index 0000000000..8981269775
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 @@ -0,0 +1,152 @@
@@ -4216,7 +4253,8 @@ index 0000000000..9fb0e3355a
 +
 +	void am_packet_release(am_packet_t *pkt);
 +
-+	bool dequeueBuffer();
++	float getTimeSize();
++	int dequeueBuffer();
 +
 +	void setVideoContrast(const int contrast) const;
 +	void setVideoBrightness(const int brightness) const;
@@ -4243,7 +4281,8 @@ index 0000000000..9fb0e3355a
 +	uint64_t			 m_last_pts;
 +	uint32_t			 m_bufferIndex;
 +	unsigned int		 m_state;
-+	bool				 m_filling;
++	std::uint32_t		 m_frameSizeSum;
++	std::deque<uint32_t> m_frameSizes;
 +
 +	bool			 m_drain = false;
 +	CRect			 m_dst_rect;
@@ -4300,8 +4339,6 @@ index 0000000000..9fb0e3355a
 +
 +	virtual void setVideoMode(std::string videoInputMode, RENDER_STEREO_MODE videoOutputMode);
 +	virtual void setPictureStereoMode(VideoPicture *pVideoPicture);
-+
-+	virtual float getDecoderInputBufferLevel() const;
 +
 +public:
 +	AMLInsecureVideoCodec(CProcessInfo &processInfo);
