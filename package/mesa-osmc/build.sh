@@ -43,6 +43,10 @@ then
 	rm -rf build
 	mkdir -p build
 	pushd build
+	FLAGS=-Wl,-rpath=/usr/osmc/lib
+	export CFLAGS=$FLAGS
+	export CXXFLAGS=$FLAGS
+	export CPPFLAGS=$FLAGS
 	if [ "$1" == "rbp2" ]; then
 		meson setup \
 		--prefix=/usr/osmc \
