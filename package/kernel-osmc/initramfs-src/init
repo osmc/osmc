@@ -82,10 +82,41 @@ for option in $(/bin/busybox cat /proc/cmdline); do
 	    OPTION_ROOTDELAY="${option#*=}"
 	    ;;
 	  root=*)
+		ROOT_DEF=$OPTION_ROOT
 		OPTION_ROOT=$(echo "${option#*=}" | /bin/busybox sed 's/"//g')
+		ROOT_STR=$OPTION_ROOT
 		PARTUUID=$(echo "$OPTION_ROOT" | /bin/busybox grep "^PARTUUID=" | /bin/busybox sed 's/^PARTUUID=//g')
-		if [ -n "$PARTUUID" ]; then OPTION_ROOT=$(/bin/busybox readlink -f /dev/disk/by-partuuid/${PARTUUID}); fi
-		;;
+#		if [ -n "$PARTUUID" ]; then OPTION_ROOT=$(/bin/busybox readlink -f /dev/disk/by-partuuid/${PARTUUID}); fi
+		UUID=$(echo "$OPTION_ROOT" | /bin/busybox grep "^UUID=" | /bin/busybox sed 's/^UUID=//g')
+		if ! [ -z "$UUID$PARTUUID" ]; then
+			# it takes a while for USB partitions to show up
+			count=12
+			OPTION_ROOT=
+			while [ $count -ge 0 -a -z "$OPTION_ROOT" ]; do
+				echo $count seconds
+				echo $(/bin/busybox blkid)
+				if [ -n "$PARTUUID" ]; then OPTION_ROOT=$(/bin/busybox findfs "PARTUUID=${PARTUUID}"); fi
+				if [ -n "$UUID" ]; then OPTION_ROOT=$(/bin/busybox findfs "UUID=${UUID}"); fi
+				if ! [ -z "$OPTION_ROOT" ]; then break; fi
+				count=$((count - 1))
+				/bin/busybox sleep 1
+			done
+		fi
+		# fallbacks if dev or UUIDs not found
+		if [ -z "$OPTION_ROOT" -o ! -b "$OPTION_ROOT" ]; then
+			echo "          Can\'t find filesystem root for $ROOT_STR"
+			# booting from SD card with a root partition
+			if [ -b "/dev/mmcblk0p2" ]; then OPTION_ROOT="/dev/mmcblk0p2"
+			# booting from SD with only a boot partition or USB but UUID not recognised
+			# will fail if root device is not sda2
+			elif [ -b "/dev/sda2" ]; then OPTION_ROOT="/dev/sda2"
+			# booting from SD to disk with no boot partition (legacy setup)
+			elif [ -b "/dev/sda1" ]; then OPTION_ROOT="/dev/sda1"
+			else OPTION_ROOT=$ROOT_DEF
+			fi
+			echo "          Guessing root is on $OPTION_ROOT"
+			/bin/busybox sleep 5
+		fi
 	  rootfstype=*)
 		OPTION_FILESYSTEM="${option#*=}"
 		;;
