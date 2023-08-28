@@ -515,7 +515,7 @@ SETS = {
                 'name': 'edid-decode',
                 'key': 'su34JRse',
                 'ltyp': 'cl_log',
-                'actn': '/usr/bin/edid-decode /sys/class/drm/card0-HDMI-A-1/edid',
+                'actn': '/usr/bin/edid-decode /sys/class/drm/card1-HDMI-A-1/edid',
                 'hwid': 'rbp',
             },
         ],
