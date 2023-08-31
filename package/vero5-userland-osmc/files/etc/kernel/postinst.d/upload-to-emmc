@@ -1,9 +1,11 @@
 #!/bin/sh
 
+export LANG=C
+
 processimage()
 {
     if ischroot; then exit 0; fi
-    LANG=C /bin/dd if=/boot/kernel-${1}.img of=/dev/boot bs=1M conv=fsync
+    /bin/dd if=/boot/kernel-${1}.img of=/dev/boot bs=1M conv=fsync
     STATUS=$?
     if [ "$STATUS" != 0 ]
     then
@@ -18,7 +20,7 @@ processdtb()
     if ischroot; then exit 0; fi
     # Need permission to do an upload
     /usr/bin/fw_setenv upgrade_step 2
-    LANG=C /bin/dd if=/boot/dtb-${1}.img of=/dev/dtb bs=256k
+    /bin/dd if=/boot/dtb-${1}.img of=/dev/dtb bs=256k || sync && /bin/dd if=/boot/dtb-${1}.img of=/dev/dtb bs=256k
     STATUS=$?
     if [ "$STATUS" != 0 ]
     then
