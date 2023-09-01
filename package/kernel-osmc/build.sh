@@ -197,8 +197,8 @@ then
 	# Fix symbolic links 2) add source and build symbolic links to appropriate packages
 	mkdir -p ../../files-headers/lib/modules/${VERSION}-${REV}-osmc
 	mkdir -p ../../files-source/lib/modules/${VERSION}-${REV}-osmc
-	ln -s /usr/src/${1}-headers-${VERSION}-${REV}-osmc ../../files-headers/lib/modules/${VERSION}-${REV}-osmc/build
-	ln -s /usr/src/${1}-source-${VERSION}-${REV}-osmc ../../files-source/lib/modules/${VERSION}-${REV}-osmc/source
+	ln -sf /usr/src/${1}-headers-${VERSION}-${REV}-osmc ../../files-headers/lib/modules/${VERSION}-${REV}-osmc/build
+	ln -sf /usr/src/${1}-source-${VERSION}-${REV}-osmc ../../files-source/lib/modules/${VERSION}-${REV}-osmc/source
 	if [ $? != 0 ]; then echo "Building kernel headers failed" && exit 1; fi
 	# Install sanitised headers in to sanitised headers package
 	mkdir -p ../../files-headers/usr/src/${1}-headers-sanitised-${VERSION}-${REV}-osmc/
