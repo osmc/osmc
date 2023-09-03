@@ -33,6 +33,8 @@ function strip_files()
 	echo -e "Stripping binaries"
 	for file in $(find ${1}/usr/osmc/lib/ -type f -name "*.so*"); do strip -s $file; done
 	for file in $(find ${1}/usr/osmc/lib/ -type f -name "*.a"); do strip -s $file; done
+        for file in $(find ${1}/usr/lib/ -type f -name "*.so*"); do strip -s $file; done
+        for file in $(find ${1}/usr/lib/ -type f -name "*.a"); do strip -s $file; done
 	strip -s "${1}/usr/bin/*" >/dev/null 2>&1
 	strip -s "${1}/usr/sbin/*" >/dev/null 2>&1
 }
