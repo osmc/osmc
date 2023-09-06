@@ -43,12 +43,14 @@ then
 	rm -rf build
 	mkdir -p build
 	pushd build
+	FLAGS=-Wl,-rpath=/usr/osmc/lib
 	export CFLAGS=$FLAGS
 	export CXXFLAGS=$FLAGS
 	export CPPFLAGS=$FLAGS
 	if [ "$1" == "rbp2" ]; then
 		meson setup \
-		--prefix=/usr/ \
+		--prefix=/usr/osmc \
+		--libdir=/usr/osmc/lib \
 		-Dgallium-drivers=vc4,v3d,kmsro \
 		-Dgallium-extra-hud=false \
 		-Dgallium-omx=disabled \
@@ -85,8 +87,8 @@ then
 	if [ $? != 0 ]; then echo -e "MESA installation failed" && exit 1; fi
 	popd
 	popd
-	mkdir -p files-dev/usr/
-	mv files/usr/include files-dev/usr/
+	mkdir -p files-dev/usr/osmc
+	mv files/usr/osmc/include  files-dev/usr/osmc
         strip_files "${out}"
 	fix_arch_ctl "files/DEBIAN/control"
 	fix_arch_ctl "files-dev/DEBIAN/control"
