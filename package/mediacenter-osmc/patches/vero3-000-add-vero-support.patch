@@ -972,10 +972,10 @@ index 0000000000..709d21afbe
 +}                                                                                          
 diff --git a/xbmc/OSMCSecureOS.cpp b/xbmc/OSMCSecureOS.cpp
 new file mode 100644
-index 0000000000..3045b8be01
+index 0000000000..f9182639db
 --- /dev/null
 +++ b/xbmc/OSMCSecureOS.cpp
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,194 @@
 +/*
 + *  Copyright (C) 2005-2020 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -1011,6 +1011,9 @@ index 0000000000..3045b8be01
 +
 +	virtual int mvcsub_get_depth(void *ctx, double pts)=0;
 +	virtual int parse_frame(void *ctx, uint32_t codecTag, uint8_t subtitlePlane, int64_t pts, const uint8_t *data, size_t size)=0;
++
++	virtual int is_Vero4k(void *ctx)=0;
++	virtual int is_VeroV(void *ctx)=0;
 +};
 +
 +class LibsecureOSMC : public DllDynamic, LibsecureOSMCInterface
@@ -1026,6 +1029,9 @@ index 0000000000..3045b8be01
 +	DEFINE_METHOD2(int, mvcsub_get_depth, (void *p1, double p2));
 +	DEFINE_METHOD6(int, parse_frame,      (void *p1, uint32_t p2, uint8_t p3, int64_t p4, const uint8_t *p5, size_t p6))
 +
++	DEFINE_METHOD1(int, is_Vero4k, (void *p1))
++	DEFINE_METHOD1(int, is_VeroV,  (void *p1))
++
 +	BEGIN_METHOD_RESOLVE()
 +		RESOLVE_METHOD_FP(osmc_init)
 +		RESOLVE_METHOD(osmc_close)
@@ -1033,6 +1039,8 @@ index 0000000000..3045b8be01
 +		RESOLVE_METHOD(auth_get_totp)
 +		RESOLVE_METHOD(mvcsub_get_depth)
 +		RESOLVE_METHOD(parse_frame)
++		RESOLVE_METHOD(is_Vero4k)
++		RESOLVE_METHOD(is_VeroV)
 +	END_METHOD_RESOLVE()
 +
 +public:
@@ -1144,12 +1152,30 @@ index 0000000000..3045b8be01
 +		(void) m_dll->parse_frame(m_osmcCtxt, codecTag, subtitlePlane, pts, data, size);
 +	}
 +}
++
++bool OSMCSecureOS::isVero4k() const
++{
++	if (m_dll) {
++		return m_dll->is_Vero4k(m_osmcCtxt) == 1;
++	}
++
++	return false;
++}
++
++bool OSMCSecureOS::isVeroV() const
++{
++	if (m_dll) {
++		return m_dll->is_VeroV(m_osmcCtxt) == 1;
++	}
++
++	return false;
++}
 diff --git a/xbmc/OSMCSecureOS.h b/xbmc/OSMCSecureOS.h
 new file mode 100644
-index 0000000000..2c800133e5
+index 0000000000..3edbe27ec7
 --- /dev/null
 +++ b/xbmc/OSMCSecureOS.h
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,42 @@
 +/*
 + *  Copyright (C) 2005-2020 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -1188,6 +1214,9 @@ index 0000000000..2c800133e5
 +	int getMvcSubtitleDepth(double pts) const;
 +
 +	void parseFrame(uint32_t codecTag, uint8_t subtitlePlane, int64_t pts, const uint8_t *data, size_t size) const;
++
++	bool isVero4k() const;
++	bool isVeroV() const;
 +};
 diff --git a/xbmc/addons/kodi-dev-kit/include/kodi/c-api/addon-instance/inputstream/demux_packet.h b/xbmc/addons/kodi-dev-kit/include/kodi/c-api/addon-instance/inputstream/demux_packet.h
 index 79686abc9b..84aa11512c 100644
@@ -11091,10 +11120,10 @@ index 442f8366a8..a23986f928 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..c52421d237
+index 0000000000..cb3e5951bc
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,903 @@
+@@ -0,0 +1,912 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11119,6 +11148,8 @@ index 0000000000..c52421d237
 +#include "utils/RegExp.h"
 +#include "filesystem/SpecialProtocol.h"
 +#include "rendering/RenderSystem.h"
++
++#include "OSMCSecureOS.h"
 +
 +#include "linux/fb.h"
 +#include <sys/ioctl.h>
@@ -11541,8 +11572,15 @@ index 0000000000..c52421d237
 +      return false;
 +    }
 +
-+    res->iWidth = (width < 3840) ? width : 1920;
-+    res->iHeight= (height < 2160) ? height : 1080;
++    if (OSMCSecureOS::getInstance().isVeroV()) {
++        // it's a V
++        res->iWidth = (width > 4096) ? 1920 : width;
++        res->iHeight= (height > 2160) ? 1080 : height;
++    } else {
++        res->iWidth = (width < 3840) ? width : 1920;
++        res->iHeight= (height < 2160) ? height : 1080;
++    }
++
 +    res->iScreenWidth = width;
 +    res->iScreenHeight = height;
 +    res->dwFlags = (smode == 'p') ? D3DPRESENTFLAG_PROGRESSIVE : D3DPRESENTFLAG_INTERLACED;
@@ -11915,7 +11953,7 @@ index 0000000000..c52421d237
 +        // There seems to be a bug in libMali or the Mali driver which can't handle
 +        // virtual resolutions other than those originally set when libMali was
 +        // initialized.
-+        vinfo.xres_virtual = 1920;
++        vinfo.xres_virtual = 4096;
 +        vinfo.yres_virtual = 4410;
 +      }
 +
@@ -13295,7 +13333,7 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..c95233de44
+index 0000000000..b1691e680d
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -0,0 +1,535 @@
@@ -13540,7 +13578,7 @@ index 0000000000..c95233de44
 +  CRendererAML::Register();
 +  CScreenshotSurfaceAML::Register();
 +
-+  aml_set_framebuffer_resolution(1920, 2205, m_framebuffer_name);
++  aml_set_framebuffer_resolution(4096, 2205, m_framebuffer_name);
 +
 +  return CWinSystemBase::InitWindowSystem();
 +}
