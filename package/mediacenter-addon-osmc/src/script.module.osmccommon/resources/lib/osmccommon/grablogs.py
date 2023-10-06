@@ -642,12 +642,12 @@ def argv():
 
 def parse_arguments():
     """ Parses the arguments provided by the user and activates the entries in SETS.
-        Returns a bool determining whether the user wants to copy the logs to the SD Card.
+        Returns a bool determining whether the user wants to copy the logs to /boot.
         If help is true, then the help dialog is displayed. """
     global SETS
 
     parser = argparse.ArgumentParser(description='Uploads vital logs to %s. If the network is '
-                                                 'unavailable, logs are copied to the SD Card.' %
+                                                 'unavailable, logs are copied to /boot' %
                                                  UPLOAD_LOC)
 
     arguments = [v for k, v in SETS.items()]
@@ -657,7 +657,7 @@ def parse_arguments():
     parser.add_argument('-T', action='store', dest='filename',
                         help='Override default name and location of temporary log file')
     parser.add_argument('-C', '--copy', action='store_true', dest='copy',
-                        help='Copy logs to /boot (SD Card)')
+                        help='Copy logs to /boot')
     parser.add_argument('-P', '--print', action='store_true', dest='termprint',
                         help='Print logs to screen (no upload or copy)')
 
@@ -701,7 +701,7 @@ def parse_arguments():
 
 def retrieve_settings(addon=None):
     """ Gets the settings from Kodi and activates the relevant entries in SETS.
-        Returns a bool determining whether the user wants to copy the logs to the SD Card.  """
+        Returns a bool determining whether the user wants to copy the logs to the /boot directory.  """
     global SETS
 
     if addon is None:
@@ -982,7 +982,7 @@ class Main(object):
             return
 
     def dispatch_logs(self):
-        """ Either copies the combined logs to the SD Card or Uploads them to the pastebin. """
+        """ Either copies the combined logs to the /boot directory or Uploads them to the pastebin. """
         print('Dispatching logs ...')
         self.stage_dialog()
 
@@ -1000,7 +1000,7 @@ class Main(object):
 
             else:
 
-                log('Logs copied to /boot/%s on the SD card FAT partition' % TEMP_LOG_FILENAME)
+                log('Logs copied to /boot/%s ' % TEMP_LOG_FILENAME)
             self.progress_dialog.close()
             del self.progress_dialog
         else:
