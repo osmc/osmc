@@ -37,6 +37,7 @@ then
 	handle_dep "libtool"
 	handle_dep "default-jdk"
 	handle_dep "ant"
+	handle_dep "libudfread-dev"
 	echo "Package: ${1}-libbluray-osmc" >> files/DEBIAN/control && echo "Package: ${1}-libbluray-dev-osmc" >> files-dev/DEBIAN/control
 	pushd src/libbluray-*
 	install_patch "../../patches" "all"
