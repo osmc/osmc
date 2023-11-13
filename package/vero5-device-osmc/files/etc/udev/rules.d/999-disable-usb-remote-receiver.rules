@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="2017", ATTRS{idProduct}=="1690", RUN+="/usr/bin/flock -w 30 /var/lock/usb_remote_manager.lock /usr/bin/usb_remote_manager.sh"
