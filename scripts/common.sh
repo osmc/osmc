@@ -142,6 +142,7 @@ function cleanup_filesystem()
 	rm -f ${1}/etc/resolv.conf
 	rm -f ${1}/etc/network/interfaces
 	rm -rf ${1}/usr/share/man/*
+	for i in {1..8}; do mkdir -p ${1}/usr/share/man/man"$i"; done
 	rm -rf ${1}/var/lib/apt/lists/*
 	rm -f ${1}/var/log/*.log
 	rm -f ${1}/var/log/apt/*.log
