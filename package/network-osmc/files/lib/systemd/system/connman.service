@@ -7,7 +7,7 @@ Before=remote-fs-pre.target network.target
 [Service]
 Type=dbus
 BusName=net.connman
-EnvironmentFile=-/etc/connman.prefs
+EnvironmentFile=-/etc/osmc/prefs.d/connman
 Restart=always
 RestartSec=5
 ExecStart = /usr/bin/start-network
