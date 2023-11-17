@@ -2873,7 +2873,7 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..4638117817
+index 0000000000..dcb4a0da32
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 @@ -0,0 +1,1357 @@
@@ -3067,7 +3067,7 @@ index 0000000000..4638117817
 +
 +	m_defaultVfmMap = getVfmMap("default");
 +
-+	setVfmMap("default", "decoder ppmgr amlvideo amvideo");
++	setVfmMap("default", "decoder ppmgr deinterlace amlvideo amvideo");
 +
 +	int hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
 +
