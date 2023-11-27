@@ -21,8 +21,8 @@ then
 fi
 }
 
-REV="3f8674fd9a1b67d1bb2ee1be9ecb769d82c9d19a"
-SCOPE_REV="364e753c833c6bf34ad30c8932ed114752cfc42f"
+REV="f0506900b1d6aac85fe3e1a3005f2da84036539d"
+SCOPE_REV="9e0c0a576aaab6baea83c9e710da2c433047366a"
 echo -e "Building package mediacenter-skin-osmc"
 echo -e "Downloading skin"
 pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
