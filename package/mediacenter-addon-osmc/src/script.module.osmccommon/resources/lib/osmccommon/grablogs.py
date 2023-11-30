@@ -459,7 +459,7 @@ SETS = {
                 'name': 'Display Cap CTA',
                 'key': 'g0gjk991',
                 'ltyp': 'file_log',
-                'actn': '/sys/class/amhdmitx/amhdmitx0/disp_cap',
+                'actn': '/sys/class/amhdmitx/amhdmitx0/cta_cap',
                 'hwid': '!rbp',
             },
             {
