@@ -1,0 +1,13 @@
+[Unit]
+Description = VNC Server for Vero
+After = network-online.target
+
+[Service]
+Type = simple
+ExecStart = /usr/bin/aml-vnc -p osmc
+TimeoutStopSec = 20
+Restart = always
+RestartSec = 5
+
+[Install]
+WantedBy = multi-user.target
