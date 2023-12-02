@@ -10959,10 +10959,10 @@ index 442f8366a8..a23986f928 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..cb3e5951bc
+index 0000000000..3ab1ad5649
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,912 @@
+@@ -0,0 +1,921 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11604,7 +11604,7 @@ index 0000000000..cb3e5951bc
 +
 +  if (!SysfsUtils::Has(dcapfile) || SysfsUtils::GetString(dcapfile, valstr) < 0)
 +  {
-+    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0 || valstr.empty())
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/cta_cap", valstr) < 0 || valstr.empty())
 +    {
 +      CLog::Log(LOGDEBUG, "Cannot read EDID - falling back to current display mode");
 +      if (SysfsUtils::GetString("/sys/class/display/mode", valstr) < 0)
@@ -11614,7 +11614,11 @@ index 0000000000..cb3e5951bc
 +      }
 +    }
 +  }
-+
++  else if (!valstr.empty())
++  {
++    CLog::Log(LOGWARNING, "Using {} to override display modes reported by EDID valstr {}", dcapfile, valstr);
++  }
++  
 +  if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0 && !vesastr.empty())
 +  {
 +    // If EDID returns VESA modes then check if we should override them
@@ -11622,12 +11626,17 @@ index 0000000000..cb3e5951bc
 +
 +    if (SysfsUtils::Has(vesacapfile))
 +    {
-+      if (SysfsUtils::GetString(vesacapfile, vesastr) == 0)
-+        CLog::Log(LOGINFO, "Using {} to override VESA modes reported by EDID", vesacapfile);
++      if (SysfsUtils::Has(dcapfile))
++        vesastr.clear();
 +      else
 +      {
-+        CLog::Log(LOGERROR, "Error reading {}", vesacapfile);
-+        vesastr.clear();
++        if (SysfsUtils::GetString(vesacapfile, vesastr) == 0)
++          CLog::Log(LOGWARNING, "Using {} to override VESA modes reported by EDID", vesacapfile);
++        else
++        {
++          CLog::Log(LOGERROR, "Error reading {}", vesacapfile);
++          vesastr.clear();
++        }
 +      }
 +    }
 +    else
