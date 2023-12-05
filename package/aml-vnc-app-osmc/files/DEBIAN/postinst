@@ -6,6 +6,9 @@ if [ "$1" = "configure" ]; then
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
 		systemctl enable aml-vnc.service >/dev/null 2>&1
+		echo "For security reasons, it is strongly recommended to change the default password."
+		echo "To do this, you need to edit the '/etc/osmc/prefs.d/aml-vnc.conf' file and then"
+		echo "restart the server with 'sudo systemctl restart aml-vnc.service'."
 	fi
 
 	if ischroot; then exit 0; fi
