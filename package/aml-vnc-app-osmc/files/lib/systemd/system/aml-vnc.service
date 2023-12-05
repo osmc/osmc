@@ -1,10 +1,11 @@
 [Unit]
-Description = VNC Server for Vero
+Description = VNC Server
 After = network-online.target
 
 [Service]
 Type = simple
-ExecStart = /usr/bin/aml-vnc -p osmc
+EnvironmentFile = /etc/osmc/prefs.d/aml-vnc.conf
+ExecStart = /usr/bin/aml-vnc
 TimeoutStopSec = 20
 Restart = always
 RestartSec = 5

@@ -1,7 +1,10 @@
+# (c) 2014-2015 Sam Nazarko
+# email@samnazarko.co.uk
+
 #!/bin/bash
 
 . ../common.sh
-VERSION="0b18659f99b098d202742e94f918206ef469e713"
+VERSION="df9c6501f95a5f5578546fe09c361e0982288e4f"
 pull_source "https://github.com/osmc/aml-vnc-server/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -11,14 +14,16 @@ if [ $build_return == 99 ]
 then
 	echo -e "Building VNC Server for Vero"
 	out=$(pwd)/files
-	make clean
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-aml-vnc-app-osmc" >> files/DEBIAN/control
 	update_sources
 	handle_dep libvncserver-dev
 	handle_dep libpng-dev
 	handle_dep libssl-dev
-	pushd src/aml-vnc-server-${VERSION}
+	mkdir -p files/etc/osmc/apps.d
+	echo "Package: ${1}-aml-vnc-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-aml-vnc-app-osmc"
+	echo -e "VNC Server\naml-vnc.service" > $APP_FILE
+	pushd src/aml-vnc-server*
 	make
 	mkdir -p ${out}/usr/bin
 	cp -ar aml-vnc ${out}/usr/bin
