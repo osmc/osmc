@@ -30,6 +30,7 @@ then
 	strip_files "${out}"
 	popd
 	fix_arch_ctl "files/DEBIAN/control"
+	publish_applications_targeted "$(pwd)" "$1" "aml-vnc-app-osmc"
 	dpkg_build files/ ${1}-aml-vnc-app-osmc.deb
 	build_return=$?
 fi
