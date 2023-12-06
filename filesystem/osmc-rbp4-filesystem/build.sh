@@ -82,6 +82,9 @@ verify_action
 # We have SSH separate so we can remove it later via App Store
 chroot ${DIR} apt-get -y install --no-install-recommends ssh-app-osmc
 verify_action
+# We have cron separate so we can remove it later via App Store
+chroot ${DIR} apt-get -y install --no-install-recommends cron-app-osmc
+verify_action
 # Ensure we have usr directory symlinks even if we use old debootstrap
 chroot ${DIR} apt-get -y install --no-install-recommends usrmerge
 verify_action
