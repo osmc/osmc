@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="df9c6501f95a5f5578546fe09c361e0982288e4f"
+VERSION="1.0.0"
 pull_source "https://github.com/osmc/aml-vnc-server/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -15,7 +15,7 @@ then
 	echo -e "Building VNC Server for Vero"
 	out=$(pwd)/files
 	sed '/Package/d' -i files/DEBIAN/control
-	echo "Package: ${1}-aml-vnc-app-osmc" >> files/DEBIAN/control
+	rm -f files/etc/osmc/apps.d/*aml-vnc-app-osmc
 	update_sources
 	handle_dep libvncserver-dev
 	handle_dep libpng-dev
