@@ -217,7 +217,10 @@ class HotFix(object):
                     # raise RuntimeError("command '{}' return with error (code {}): {}"
                     # .format(e.cmd, e.returncode, e.output))
                     log(label='Non-zero exit code from line', message=e.output)
-                    results.append(e.output)
+                    output = e.output
+                    if isinstance(output, bytes):
+                        output = output.decode('utf-8')
+                    results.append(output)
                     break
 
             except Exception as e:
