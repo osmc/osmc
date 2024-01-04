@@ -174,7 +174,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index ff555db738..6289c2747c 100755
+index ff555db738..c83d1ce71a 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,7 @@
@@ -311,7 +311,7 @@ index ff555db738..6289c2747c 100755
          <setting id="videoplayer.usemediacodecsurface" type="boolean" label="13440" help="36544">
            <requirement>HAS_MEDIACODEC</requirement>
            <level>2</level>
-@@ -2584,6 +2704,36 @@
+@@ -2584,6 +2704,50 @@
            </dependencies>
            <control type="toggle" />
          </setting>
@@ -345,10 +345,24 @@ index ff555db738..6289c2747c 100755
 +          </constraints>
 +          <control type="spinner" format="integer" />
 +        </setting>
++        <setting id="videoscreen.hdrcaps" type="integer" parent="videoscreen.screen" label="34217" help="34216">
++          <level>2</level>
++          <default>0</default>
++          <constraints>
++            <options>
++              <option label="34218">0</option> <!-- AUTO -->
++              <option label="34219">1</option> <!-- HDR10 only -->
++              <option label="34230">3</option> <!-- HDR10 and HLG -->
++              <option label="34231">5</option> <!-- HDR10 and HDR10+ -->
++              <option label="34232">7</option> <!-- HDR10, HLG and HDR10+ -->
++            </options>
++          </constraints>
++          <control type="spinner" format="string" />
++        </setting>
          <setting id="videoscreen.delayrefreshchange" type="integer" parent="videoscreen.screen" label="13550" help="36165">
            <level>2</level>
            <default>0</default>
-@@ -2616,6 +2766,21 @@
+@@ -2616,6 +2780,21 @@
            </constraints>
            <control type="spinner" format="string" />
          </setting>
@@ -370,7 +384,7 @@ index ff555db738..6289c2747c 100755
          <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
            <requirement>
              <or>
-@@ -2836,7 +3001,7 @@
+@@ -2836,7 +3015,7 @@
          </setting>
          <setting id="videoscreen.whitelistpulldown" type="boolean" parent="videoscreen.whitelist" label="14127" help="36444">
            <level>3</level>
@@ -379,7 +393,7 @@ index ff555db738..6289c2747c 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2844,7 +3009,7 @@
+@@ -2844,7 +3023,7 @@
          </setting>
          <setting id="videoscreen.whitelistdoublerefreshrate" type="boolean" parent="videoscreen.whitelist" label="14128" help="36445">
            <level>3</level>
@@ -388,7 +402,7 @@ index ff555db738..6289c2747c 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -2926,7 +3091,7 @@
+@@ -2926,7 +3105,7 @@
          </setting>
          <setting id="audiooutput.config" type="integer" label="337" help="36361">
            <level>2</level>
@@ -397,7 +411,7 @@ index ff555db738..6289c2747c 100755
            <constraints>
              <options>
                <option label="338">1</option>
-@@ -2971,6 +3136,18 @@
+@@ -2971,6 +3150,18 @@
              <formatlabel>36459</formatlabel>
            </control>
          </setting>
@@ -416,7 +430,7 @@ index ff555db738..6289c2747c 100755
          <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
            <requirement>HAS_AE_QUALITY_LEVELS</requirement>
            <level>2</level>
-@@ -3016,7 +3193,7 @@
+@@ -3016,7 +3207,7 @@
          </setting>
          <setting id="audiooutput.streamsilence" type="integer" label="421" help="34111">
            <level>2</level>
@@ -425,7 +439,7 @@ index ff555db738..6289c2747c 100755
            <constraints>
              <options>audiostreamsilence</options>
            </constraints>
-@@ -3024,7 +3201,7 @@
+@@ -3024,7 +3215,7 @@
          </setting>
          <setting id="audiooutput.streamnoise" type="boolean" label="34112" help="34113">
            <level>2</level>
@@ -2873,10 +2887,10 @@ index 0000000000..ef2832e1cb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..dcb4a0da32
+index 0000000000..365208e34a
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1357 @@
+@@ -0,0 +1,1360 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3669,12 +3683,15 @@ index 0000000000..dcb4a0da32
 +{
 +	/* if passing through HDR, ignore contrast and brightness
 +	 * thus users can view HDR on both HDR and SDR screens without faff */
-+	int curCscType, hdrProcessMode;
++	int curCscType, hdrProcessMode, hdr10plusProcessMode, hlgProcessMode;
 +	std::string cur_csc_type;
 +	SysfsUtils::GetString("/sys/module/am_vecm/parameters/cur_csc_type", cur_csc_type);
 +	curCscType = std::stoi(cur_csc_type.substr(0, 2));
 +	SysfsUtils::GetInt("/sys/module/am_vecm/parameters/hdr_process_mode", hdrProcessMode);
-+	bool isHDR = curCscType == 64 && hdrProcessMode == 0;
++	SysfsUtils::GetInt("/sys/module/am_vecm/parameters/hdr10_plus_process_mode", hdr10plusProcessMode);
++	SysfsUtils::GetInt("/sys/module/am_vecm/parameters/hlg_process_mode", hlgProcessMode);
++	bool isHDR = curCscType == 64 && hdrProcessMode == 0
++		&& hdr10plusProcessMode == 0 && hlgProcessMode == 0;
 +
 +	// video contrast adjustment.
 +	int contrast = m_processInfo.GetVideoSettings().m_Contrast;
@@ -10558,7 +10575,7 @@ index 4ba4e7e8b0..40433f443d 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 725bbc46c7..bb48ce302c
+index 725bbc46c7..8f3e66a733
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10612,7 +10629,7 @@ index 725bbc46c7..bb48ce302c
          {
            m_resolutionChangeAborted = true;
            return false;
-@@ -330,6 +343,49 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
+@@ -330,6 +343,58 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
      return true;
  #endif
    }
@@ -10655,14 +10672,23 @@ index 725bbc46c7..bb48ce302c
 +  else if (settingId == CSettings::SETTING_VIDEOSCREEN_MAXLUM)
 +  {
 +     int maxlum = 100;
++
 +     maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
 +     CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting max lum to {}", maxlum);
 +     SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
 +  }
++  else if (settingId == CSettings::SETTING_VIDEOSCREEN_HDRCAPS)
++  {
++    int hdr_caps = 0;
++    std::string attr = "";
++
++    hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
++  }
  #if defined(HAVE_X11) || defined(TARGET_WINDOWS_DESKTOP) || defined(TARGET_DARWIN_OSX)
    else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
    {
-@@ -488,24 +544,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
+@@ -488,24 +553,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
    std::unique_lock<CCriticalSection> lock(m_critical);
    RESOLUTION_INFO res(resolution);
  
@@ -10687,7 +10713,7 @@ index 725bbc46c7..bb48ce302c
    m_resolutions.push_back(res);
  }
  
-@@ -518,7 +556,14 @@ void CDisplaySettings::ApplyCalibrations()
+@@ -518,7 +565,14 @@ void CDisplaySettings::ApplyCalibrations()
      // find resolutions
      for (size_t res = RES_DESKTOP; res < m_resolutions.size(); ++res)
      {
@@ -10703,7 +10729,7 @@ index 725bbc46c7..bb48ce302c
        {
          // overscan
          m_resolutions[res].Overscan.left = itCal->Overscan.left;
-@@ -556,7 +601,6 @@ void CDisplaySettings::ApplyCalibrations()
+@@ -556,7 +610,6 @@ void CDisplaySettings::ApplyCalibrations()
            m_resolutions[res].fPixelRatio = 0.5f;
          if (m_resolutions[res].fPixelRatio > 2.0f)
            m_resolutions[res].fPixelRatio = 2.0f;
@@ -10711,7 +10737,7 @@ index 725bbc46c7..bb48ce302c
        }
      }
    }
-@@ -586,6 +630,8 @@ void CDisplaySettings::UpdateCalibrations()
+@@ -586,6 +639,8 @@ void CDisplaySettings::UpdateCalibrations()
        cal = *res;
      }
    }
@@ -10720,7 +10746,7 @@ index 725bbc46c7..bb48ce302c
  }
  
  void CDisplaySettings::ClearCalibrations()
-@@ -652,6 +698,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -652,6 +707,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
        flags |= D3DPRESENTFLAG_MODE3DSBS;
      else if(StringUtils::Mid(strResolution, 20,3) == "tab")
        flags |= D3DPRESENTFLAG_MODE3DTB;
@@ -10729,7 +10755,7 @@ index 725bbc46c7..bb48ce302c
  
      std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
      for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
-@@ -663,6 +711,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -663,6 +720,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
    return RES_DESKTOP;
  }
  
@@ -10763,7 +10789,7 @@ index 725bbc46c7..bb48ce302c
  std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, float refreshrate /* = 0.0f */)
  {
    if (resolution == RES_WINDOW)
-@@ -671,13 +746,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -671,13 +755,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -10780,7 +10806,7 @@ index 725bbc46c7..bb48ce302c
    }
  
    return "DESKTOP";
-@@ -707,14 +778,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
+@@ -707,14 +787,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
      const auto mode = CDisplaySettings::GetInstance().GetResolutionInfo(index);
  
      if (mode.dwFlags ^ D3DPRESENTFLAG_INTERLACED)
@@ -10797,7 +10823,7 @@ index 725bbc46c7..bb48ce302c
    }
  
    std::sort(list.begin(), list.end(), ModeSort);
-@@ -786,10 +851,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
+@@ -786,10 +860,7 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
      std::vector<RESOLUTION_WHR> resolutions = CServiceBroker::GetWinSystem()->ScreenResolutions(info.fRefreshRate);
      for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
      {
@@ -10847,7 +10873,7 @@ index bb85e97b67..b4bd620df5 100644
    m_simpleConditions.emplace("has_dx");
    m_simpleConditions.emplace("hasdxva2");
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index c5486af7b8..8193b54094 100644
+index c5486af7b8..31a4577049 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
 @@ -143,6 +143,11 @@ constexpr const char* CSettings::SETTING_VIDEOPLAYER_STEREOSCOPICPLAYBACKMODE;
@@ -10870,7 +10896,7 @@ index c5486af7b8..8193b54094 100644
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_USESTAGEFRIGHT;
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE;
  constexpr const char* CSettings::SETTING_VIDEOPLAYER_SUPPORTMVC;
-@@ -359,6 +365,11 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_RESOLUTION;
+@@ -359,6 +365,12 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_RESOLUTION;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_SCREENMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS;
@@ -10879,10 +10905,11 @@ index c5486af7b8..8193b54094 100644
 +constexpr const char* CSettings::SETTING_VIDEOSCREEN_MUTEHDMI;
 +constexpr const char* CSettings::SETTING_VIDEOSCREEN_FORCE422;
 +constexpr const char* CSettings::SETTING_VIDEOSCREEN_MAXLUM;
++constexpr const char* CSettings::SETTING_VIDEOSCREEN_HDRCAPS;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_NOOFBUFFERS;
-@@ -366,7 +377,7 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_3DLUT;
+@@ -366,7 +378,7 @@ constexpr const char* CSettings::SETTING_VIDEOSCREEN_3DLUT;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_TESTPATTERN;
@@ -10891,17 +10918,19 @@ index c5486af7b8..8193b54094 100644
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_FRAMEPACKING;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_10BITSURFACES;
  constexpr const char* CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE;
-@@ -982,6 +993,8 @@ void CSettings::InitializeISettingCallbacks()
+@@ -982,6 +994,10 @@ void CSettings::InitializeISettingCallbacks()
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
 +  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_FORCE422);
 +  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
++  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
    settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index cdd2d31ae3..ae8ee4a8c8 100644
+index cdd2d31ae3..597e5f3339 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
 @@ -115,6 +115,11 @@ public:
@@ -10924,7 +10953,7 @@ index cdd2d31ae3..ae8ee4a8c8 100644
    static constexpr auto SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
    static constexpr auto SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
    static constexpr auto SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";
-@@ -354,6 +360,11 @@ public:
+@@ -354,6 +360,12 @@ public:
    static constexpr auto SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
    static constexpr auto SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
    static constexpr auto SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
@@ -10933,10 +10962,11 @@ index cdd2d31ae3..ae8ee4a8c8 100644
 +  static constexpr auto SETTING_VIDEOSCREEN_MUTEHDMI = "videoscreen.mutehdmi";
 +  static constexpr auto SETTING_VIDEOSCREEN_FORCE422 = "videoscreen.force422";
 +  static constexpr auto SETTING_VIDEOSCREEN_MAXLUM = "videoscreen.maxlum";
++  static constexpr auto SETTING_VIDEOSCREEN_HDRCAPS = "videoscreen.hdrcaps";
    static constexpr auto SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
    static constexpr auto SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE =
        "videoscreen.preferedstereoscopicmode";
-@@ -363,6 +374,7 @@ public:
+@@ -363,6 +375,7 @@ public:
    static constexpr auto SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
    static constexpr auto SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
    static constexpr auto SETTING_VIDEOSCREEN_LIMITEDRANGE = "videoscreen.limitedrange";
@@ -13181,10 +13211,10 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..b1691e680d
+index 0000000000..5620d0e2df
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,535 @@
+@@ -0,0 +1,544 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13263,11 +13293,12 @@ index 0000000000..b1691e680d
 +  aml_permissions();
 +  aml_disable_freeScale();
 +
-+ /* Take in to account custom OSMC parameters */
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
++  /* Take in to account custom OSMC parameters */
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB))
++  {
 +    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing RGB");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
-+ }
++  }
 +
 +  int range_control;
 +  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
@@ -13279,37 +13310,45 @@ index 0000000000..b1691e680d
 +      range_control & 2 ? "full" : "limited");
 +  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
 +
-+ if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
++  {
 +    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
-+ }
++  }
 +
-+ std::string attr = "";
-+ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++  std::string attr = "";
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
 +
-+ if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
-+   if (attr.find("444") != std::string::npos ||
-+       attr.find("422") != std::string::npos ||
-+       attr.find("420") != std::string::npos)
-+     attr.replace(attr.find("4"),3,"422").append("now");
-+   else
-+     attr.append("422now");
-+ }
-+ else {
-+   if (attr.find("422") != std::string::npos)
-+     attr.erase(attr.find("4"),3);
-+   attr.append("now");
-+ }
-+ CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = {}", attr);
-+ SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422))
++  {
++    if (attr.find("444") != std::string::npos ||
++      attr.find("422") != std::string::npos ||
++      attr.find("420") != std::string::npos)
++      attr.replace(attr.find("4"),3,"422").append("now");
++    else
++      attr.append("422now");
++  }
++  else 
++  {
++    if (attr.find("422") != std::string::npos)
++      attr.erase(attr.find("4"),3);
++    attr.append("now");
++  }
++  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = {}", attr);
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
 +
-+ int maxlum = 100;
-+ maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
-+ CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting max lum to {}", maxlum);
-+ SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
++  int maxlum = 100;
++  maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
++  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting max lum to {}", maxlum);
++  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
 +
-+ SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
-+ StartMonitorHWEvent();
++  int hdr_caps = 0;
++  hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
++      CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
++
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
++  StartMonitorHWEvent();
 +
 +  // Register sink
 +  AE::CAESinkFactory::ClearSinks();
