@@ -33,6 +33,18 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+# fix 4k resolutions on V fb
+find /home/osmc/.kodi -type f -name "guisettings.xml" -print0 | while read -d $'\0' file
+do
+    grep -Pzl '(<description>3840)(.*\n){6}(.*right>[0-2][0-9]{3}.*\n)' "$file" >/dev/null
+	if [ $? -eq 0 ] ;
+	then
+		perl -0777 -i.bk -pe 's/^\s*?<resolution>\n^\s*?<description>3840.*?\n(^.*?\n){5}\s*?<right>[0-2][0-9]{3}.*?\n(^.*?\n){2}^\s*?<\/resolution>\n//mg' "$file"
+		chown osmc:osmc "$file"
+	fi
+done
+#endfix
+
 syspaths="/sys/class/video/
 /sys/class/tsync/pts_pcrscr
 /sys/class/tsync/enable
