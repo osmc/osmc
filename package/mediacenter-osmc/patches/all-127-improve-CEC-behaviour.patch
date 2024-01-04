@@ -1,18 +1,18 @@
-From d1559d52759217de8bcc5a5009bf2c1a1e9faf93 Mon Sep 17 00:00:00 2001
+From d219dd86fbc5b6552dcfd245c527abe3715198cb Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 8 Mar 2021 19:40:04 +0000
 Subject: [PATCH] Improve CEC behaviour
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- system/peripherals.xml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ system/peripherals.xml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index 5b08ed468b..f9bad44cdc 100644
+index a110c0db60..c5d2eebf1e 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
-@@ -12,7 +12,7 @@
+@@ -12,11 +12,11 @@
      <setting key="enabled" type="bool" value="1" label="305" order="1" />
      <setting key="activate_source" type="bool" value="1" label="36020" order="2" />
      <setting key="wake_devices" type="enum" value="36037" label="36007" lvalues="36037|36038|36039|231" order="3" />
@@ -21,6 +21,20 @@ index 5b08ed468b..f9bad44cdc 100644
      <setting key="send_inactive_source" type="bool" value="1" label="36025" order="5" />
      <setting key="cec_standby_screensaver" type="bool" value="0" label="36009" order="6" />
      <setting key="cec_wake_screensaver" type="bool" value="1" label="36010" order="7" />
+-    <setting key="standby_pc_on_tv_standby" type="enum" value="13011" label="36029" order="8" lvalues="36028|13005|13011|13010|13009|36044|36045" />
++    <setting key="standby_pc_on_tv_standby" type="enum" value="36028" label="36029" order="8" lvalues="36028|13005|13011|13010|13009|36044|36045" />
+     <setting key="standby_tv_on_pc_standby" type="bool" value="1" label="36026" order="9" />
+     <setting key="use_tv_menu_language" type="bool" value="1" label="36018" order="10" />
+     <setting key="pause_playback_on_deactivate" type="bool" value="1" label="36033" configurable="0" />
+@@ -27,7 +27,7 @@
+     <setting key="power_avr_on_as" type="bool" label="36046" value="0" order="15" />
+ 
+     <setting key="tv_vendor" type="int" value="0" configurable="0" />
+-    <setting key="device_name" type="string" value="Kodi" configurable="0" />
++    <setting key="device_name" type="string" value="OSMC" configurable="0" />
+     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="double_tap_timeout_ms" type="int" min="50" max="1000" step="50" value="300" label="36047" order="16" />
 -- 
-2.25.1
+2.34.1
 
