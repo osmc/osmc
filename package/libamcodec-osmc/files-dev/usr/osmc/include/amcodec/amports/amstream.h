@@ -52,6 +52,8 @@
 #ifndef AMSTREAM_H
 #define AMSTREAM_H
 
+#include <stdint.h>
+
 #include "vformat.h"
 #include "aformat.h"
 
@@ -107,6 +109,7 @@
 #define AMSTREAM_IOC_TS_SKIPBYTE _IOW((AMSTREAM_IOC_MAGIC), 0x1d, int)
 #define AMSTREAM_IOC_SUB_TYPE    _IOW((AMSTREAM_IOC_MAGIC), 0x1e, int)
 #define AMSTREAM_IOC_CLEAR_VIDEO _IOW((AMSTREAM_IOC_MAGIC), 0x1f, int)
+#define AMSTREAM_IOC_VDECINFO    _IOR((AMSTREAM_IOC_MAGIC), 0x20, int)
 
 #define AMSTREAM_IOC_APTS             _IOR((AMSTREAM_IOC_MAGIC), 0x40, int)
 #define AMSTREAM_IOC_VPTS             _IOR((AMSTREAM_IOC_MAGIC), 0x41, int)
@@ -260,6 +263,49 @@ struct vdec_status {
 	enum E_ASPECT_RATIO euAspectRatio;
 };
 
+struct vdec_info {
+	char vdec_name[16];
+	uint32_t ver;
+	uint32_t frame_width;
+	uint32_t frame_height;
+	uint32_t frame_rate;
+	union {
+		uint32_t bit_rate;
+		/* Effective in h265,vp9,avs2 multi-instance */
+		uint32_t bit_depth_luma;
+	};
+	uint32_t frame_dur;
+	union {
+		uint32_t frame_data;
+		/* Effective in h265,vp9,avs2 multi-instance */
+		uint32_t bit_depth_chroma;
+	};
+	uint32_t error_count;
+	uint32_t status;
+	uint32_t frame_count;
+	uint32_t error_frame_count;
+	uint32_t drop_frame_count;
+	uint64_t total_data;
+	union {
+		uint32_t samp_cnt;
+		/* Effective in h265,vp9,avs2 multi-instance */
+		uint32_t double_write_mode;
+	};
+	uint32_t offset;
+	uint32_t ratio_control;
+	char reserved[0];
+	unsigned int i_decoded_frames;/*i frames decoded*/
+	unsigned int i_lost_frames;/*i frames can not be decoded*/
+	unsigned int i_concealed_frames;/*i frames decoded but have some error*/
+	unsigned int p_decoded_frames;
+	unsigned int p_lost_frames;
+	unsigned int p_concealed_frames;
+	unsigned int b_decoded_frames;
+	unsigned int b_lost_frames;
+	unsigned int b_concealed_frames;
+	char endipb_line[0];
+};
+
 struct adec_status {
     unsigned int channels;
     unsigned int sample_rate;
@@ -283,6 +329,19 @@ struct am_io_param {
         struct adec_status astatus;
     };
 };
+
+struct am_io_info {
+	union {
+		int data;
+		int id;
+	};
+	int len;
+	union {
+		char buf[1];
+		struct vdec_info vinfo;
+	};
+};
+
 struct subtitle_info {
 
     unsigned char id;

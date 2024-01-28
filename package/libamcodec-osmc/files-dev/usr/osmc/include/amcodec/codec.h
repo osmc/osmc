@@ -75,6 +75,7 @@ int codec_get_vbuf_state(codec_para_t *, struct buf_status *);
 int codec_get_abuf_state(codec_para_t *, struct buf_status *);
 int codec_get_vdec_state(codec_para_t *, struct vdec_status *);
 int codec_get_adec_state(codec_para_t *, struct adec_status *);
+int codec_get_vdec_info(codec_para_t *, struct vdec_info *);
 
 int codec_pause(codec_para_t *);
 int codec_resume(codec_para_t *);
