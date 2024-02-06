@@ -3,6 +3,7 @@ Description=TrustedApplication loader for OSMC SecureOS
 Before=apploader.target
 Wants=apploader.target
 Requires=tee.mount
+After=tee.mount
 
 [Service]
 Type=simple
