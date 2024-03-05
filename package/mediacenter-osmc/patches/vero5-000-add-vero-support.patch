@@ -1776,10 +1776,10 @@ index 105839c0b9..e5eea36275 100644
      }
  
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
-index a7fb55c9f2..13c3c7e9a3 100644
+index 247ad52eae..a843157b26 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
-@@ -24,6 +24,8 @@
+@@ -26,6 +26,8 @@
  #include <androidjni/Build.h>
  #include <unistd.h>
  
@@ -1788,7 +1788,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
  // This is an alternative to the linear weighted delay smoothing
  // advantages: only one history value needs to be stored
  // in tests the linear weighted average smoother yield better results
-@@ -45,6 +47,24 @@ static const AEChannel KnownChannels[] = {AE_CH_FL, AE_CH_FR,   AE_CH_FC,   AE_C
+@@ -47,6 +49,24 @@ static const AEChannel KnownChannels[] = {AE_CH_FL, AE_CH_FR,   AE_CH_FC,   AE_C
                                            AE_CH_SL, AE_CH_SR,   AE_CH_BL,   AE_CH_BR,
                                            AE_CH_BC, AE_CH_BLOC, AE_CH_BROC, AE_CH_NULL};
  
@@ -1813,7 +1813,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
  static int AEStreamFormatToATFormat(const CAEStreamInfo::DataType& dt)
  {
    switch (dt)
-@@ -430,6 +450,10 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
+@@ -435,6 +455,10 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
        atChannelMask = CJNIAudioFormat::CHANNEL_OUT_STEREO;
    }
  
@@ -1824,7 +1824,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
    bool retried = false;
    while (!m_at_jni)
    {
-@@ -512,8 +536,14 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
+@@ -517,8 +541,14 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
      else
      {
        m_format.m_frameSize = m_format.m_channelLayout.Count() * (CAEUtil::DataFormatToBits(m_format.m_dataFormat) / 8);
@@ -1841,7 +1841,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
        // make sure periods are actually not smaller than 32 ms (32, cause 32 * 2 = 64)
        // but also lower than 64 ms
        // which is large enough to not cause CPU hogging in case 32 ms periods are used
-@@ -531,6 +561,19 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
+@@ -536,6 +566,19 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
          m_min_buffer_size = buffer_frames * m_sink_frameSize;
          c = 5; // 50 ms
        }
@@ -1861,7 +1861,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
        // update potential new buffertime
        m_audiotrackbuffer_sec =
            static_cast<double>(m_min_buffer_size) / (m_sink_frameSize * m_sink_sampleRate);
-@@ -694,7 +737,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
+@@ -699,7 +742,16 @@ void CAESinkAUDIOTRACK::GetDelay(AEDelayStatus& status)
      m_headPosOld = m_headPos;
    }
  
@@ -1879,7 +1879,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
  
    // if sink is run dry without buffer time written anymore
    if (gone > m_duration_written)
-@@ -1134,6 +1186,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
+@@ -1139,6 +1191,25 @@ void CAESinkAUDIOTRACK::UpdateAvailablePassthroughCapabilities(bool isRaw)
        }
      }
  
@@ -1905,7 +1905,7 @@ index a7fb55c9f2..13c3c7e9a3 100644
      if (CJNIAudioManager::GetSDKVersion() >= 23)
      {
        if (CJNIAudioFormat::ENCODING_DTS_HD != -1)
-@@ -1231,15 +1302,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
+@@ -1236,15 +1307,21 @@ void CAESinkAUDIOTRACK::UpdateAvailablePCMCapabilities()
      CLog::Log(LOGINFO, "Multi channel Float is supported");
    }
  
@@ -1934,13 +1934,13 @@ index a7fb55c9f2..13c3c7e9a3 100644
      }
    }
    std::copy(m_sink_sampleRates.begin(), m_sink_sampleRates.end(), std::back_inserter(m_info.m_sampleRates));
-@@ -1283,4 +1360,3 @@ double CAESinkAUDIOTRACK::GetMovingAverageDelay(double newestdelay)
+@@ -1288,4 +1365,3 @@ double CAESinkAUDIOTRACK::GetMovingAverageDelay(double newestdelay)
  
    return sum * denom;
  }
 -
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.h b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.h
-index 6e9ec76a2e..aea3094596 100644
+index c1d73602b9..60f52204bf 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.h
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.h
 @@ -49,6 +49,7 @@ protected:
@@ -10532,7 +10532,7 @@ index 3c30817331..58eec643ec 100644
  
  bool CPowerManager::Hibernate()
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 67c13ab3f0..197ce567c6 100644
+index 24a41d45fe..18372fee94 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
 @@ -433,7 +433,7 @@ void CAdvancedSettings::Initialize()
@@ -10552,7 +10552,7 @@ index 67c13ab3f0..197ce567c6 100644
  
    m_logLevelHint = m_logLevel = LOG_LEVEL_NORMAL;
  
-@@ -607,6 +608,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+@@ -608,6 +609,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
      XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
      XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
      XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);
@@ -10561,10 +10561,10 @@ index 67c13ab3f0..197ce567c6 100644
      XMLUtils::GetFloat(pElement, "audiodelayrange", m_videoAudioDelayRange, 10, 600);
      XMLUtils::GetString(pElement, "defaultplayer", m_videoDefaultPlayer);
 diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
-index 4ba4e7e8b0..40433f443d 100644
+index 0e5c4fc27a..320bf5f27b 100644
 --- a/xbmc/settings/AdvancedSettings.h
 +++ b/xbmc/settings/AdvancedSettings.h
-@@ -376,6 +376,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+@@ -377,6 +377,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
      std::string m_stereoscopicregex_3d;
      std::string m_stereoscopicregex_sbs;
      std::string m_stereoscopicregex_tab;
@@ -12112,10 +12112,10 @@ index 8e1328999f..3a2b962ea4 100644
  
  if(NOT CORE_SYSTEM_NAME STREQUAL windows AND NOT CORE_SYSTEM_NAME STREQUAL windowsstore)
 diff --git a/xbmc/utils/EGLUtils.cpp b/xbmc/utils/EGLUtils.cpp
-index 7c5e70938f..72aaf282b8 100644
+index 85f889dc9f..72aaf282b8 100644
 --- a/xbmc/utils/EGLUtils.cpp
 +++ b/xbmc/utils/EGLUtils.cpp
-@@ -84,40 +84,11 @@ std::map<EGLenum, const char*> eglErrors =
+@@ -84,41 +84,11 @@ std::map<EGLenum, const char*> eglErrors =
  
  std::map<EGLint, const char*> eglErrorType =
  {
@@ -12150,13 +12150,14 @@ index 7c5e70938f..72aaf282b8 100644
 -    typeStr = eglType->second;
 -  }
 -
--  CLog::Log(LOGDEBUG, "EGL Debugging:\nError: {}\nCommand: {}\nType: {}\nMessage: {}", errorStr, command, typeStr, message);
+-  CLog::Log(LOGDEBUG, "EGL Debugging:\nError: {}\nCommand: {}\nType: {}\nMessage: {}", errorStr,
+-            command, typeStr, message ? message : "");
 -}
 -
  std::set<std::string> CEGLUtils::GetClientExtensions()
  {
    const char* extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-@@ -171,19 +142,6 @@ void CEGLUtils::Log(int logLevel, const std::string& what)
+@@ -172,19 +142,6 @@ void CEGLUtils::Log(int logLevel, const std::string& what)
  CEGLContextUtils::CEGLContextUtils(EGLenum platform, std::string const& platformExtension)
  : m_platform{platform}
  {
@@ -12176,7 +12177,7 @@ index 7c5e70938f..72aaf282b8 100644
    m_platformSupported = CEGLUtils::HasClientExtension("EGL_EXT_platform_base") && CEGLUtils::HasClientExtension(platformExtension);
  }
  
-@@ -394,18 +352,9 @@ bool CEGLContextUtils::CreateContext(CEGLAttributesVec contextAttribs)
+@@ -395,18 +352,9 @@ bool CEGLContextUtils::CreateContext(CEGLAttributesVec contextAttribs)
  
    EGLConfig eglConfig{m_eglConfig};
  
