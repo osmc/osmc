@@ -1,0 +1,29 @@
+--- a/hid-ids.h	2024-03-06 21:17:48.748115374 +0100
++++ b/hid-ids.h	2024-03-06 21:17:23.868416628 +0100
+@@ -817,6 +817,7 @@
+ #define USB_VENDOR_ID_ORTEK		0x05a4
+ #define USB_DEVICE_ID_ORTEK_PKB1700	0x1700
+ #define USB_DEVICE_ID_ORTEK_WKB2000	0x2000
++#define USB_DEVICE_ID_ORTEK_IHOME_IMAC_A210S	0x8003
+ 
+ #define USB_VENDOR_ID_PLANTRONICS	0x047f
+ #define USB_DEVICE_ID_PLANTRONICS_BLACKWIRE_3220_SERIES	0xc056
+
+--- a/hid-ortek.c	2024-03-06 21:18:12.807824081 +0100
++++ b/hid-ortek.c	2024-03-06 21:17:10.208582041 +0100
+@@ -5,6 +5,7 @@
+  *
+  *    Ortek PKB-1700
+  *    Ortek WKB-2000
++ *    iHome IMAC-A210S
+  *    Skycable wireless presenter
+  *
+  *  Copyright (c) 2010 Johnathon Harris <jmharris@gmail.com>
+@@ -40,6 +41,7 @@
+ static const struct hid_device_id ortek_devices[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ORTEK, USB_DEVICE_ID_ORTEK_PKB1700) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ORTEK, USB_DEVICE_ID_ORTEK_WKB2000) },
++	{ HID_USB_DEVICE(USB_VENDOR_ID_ORTEK, USB_DEVICE_ID_ORTEK_IHOME_IMAC_A210S) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SKYCABLE, USB_DEVICE_ID_SKYCABLE_WIRELESS_PRESENTER) },
+ 	{ }
+ };
