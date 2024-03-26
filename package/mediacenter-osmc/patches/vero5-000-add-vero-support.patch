@@ -2293,15 +2293,16 @@ index 8c26cad306..c4ecbd8b1d 100644
  
      overlay->iPTSStartTime = m_StartTime;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-index 517acc3cd4..92edb17e66 100644
+index 517acc3cd4..ad257b9e80 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-@@ -11,6 +11,38 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
+@@ -11,6 +11,40 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
    list(APPEND HEADERS DVDVideoPPFFmpeg.h)
  endif()
  
 +if(AML_FOUND)
 +  list(APPEND SOURCES amlogic/AMLCodecList.cpp
++                      amlogic/AMLDecoderInputQueueStats.cpp
 +                      amlogic/AMLInsecureVideoCodec.cpp
 +                      amlogic/AMLVideoCodec.cpp
 +                      amlogic/AV1Codec.cpp
@@ -2314,6 +2315,7 @@ index 517acc3cd4..92edb17e66 100644
 +                      amlogic/VP9Codec.cpp
 +                      DVDVideoCodecAmlogic.cpp)
 +  list(APPEND HEADERS amlogic/AMLCodecList.h
++                      amlogic/AMLDecoderInputQueueStats.h
 +                      amlogic/AMLInsecureVideoCodec.h
 +                      amlogic/AMLVideoCodec.h
 +                      amlogic/AMLVideoCodecConstants.h
@@ -2885,12 +2887,123 @@ index 0000000000..ef2832e1cb
 +	unsigned getCodecCount() const;
 +	AMLVideoCodecInfo &getCodecInfoAt(unsigned index) const;
 +};
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.cpp
+new file mode 100644
+index 0000000000..10b20aea96
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.cpp
+@@ -0,0 +1,65 @@
++/*
++ *  Copyright (C) 2024 OSMC
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "AMLDecoderInputQueueStats.h"
++
++#include "LibAmcodec.h"
++
++using namespace amlogic;
++
++AMLDecoderInputQueueStats::AMLDecoderInputQueueStats(amlogic::LibAmcodec *lib)
++	: m_libamcodec(lib), m_inputBufferLength(0)
++{
++}
++
++AMLDecoderInputQueueStats::~AMLDecoderInputQueueStats()
++{
++}
++
++void AMLDecoderInputQueueStats::addFrame(size_t frameLength)
++{
++	m_frameSizes.push_back(frameLength);
++	m_inputBufferLength += frameLength;
++}
++
++unsigned AMLDecoderInputQueueStats::frameCount()
++{
++	struct buf_status bs;
++
++	m_libamcodec->getVbufState(bs);
++
++	while (m_inputBufferLength > (size_t) bs.data_len) {
++		m_inputBufferLength -= m_frameSizes.front();
++		m_frameSizes.pop_front();
++	}
++
++	return (unsigned) m_frameSizes.size();
++}
++
++bool AMLDecoderInputQueueStats::isAvailable(size_t frameLength) const
++{
++	struct buf_status bs;
++
++	m_libamcodec->getVbufState(bs);
++
++	return frameLength < bs.free_len;
++}
++
++float AMLDecoderInputQueueStats::fillLevel() const
++{
++	struct buf_status bs;
++	m_libamcodec->getVbufState(bs);
++
++	return (float) bs.data_len / (float) (bs.data_len + bs.free_len);
++}
++
++void AMLDecoderInputQueueStats::reset()
++{
++	m_inputBufferLength = 0;
++	m_frameSizes.clear();
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.h
+new file mode 100644
+index 0000000000..a71daa354e
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLDecoderInputQueueStats.h
+@@ -0,0 +1,34 @@
++/*
++ *  Copyright (C) 2024 OSMC
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <sys/types.h>
++
++#include <deque>
++
++#include "namespace.h"
++
++class amlogic::AMLDecoderInputQueueStats
++{
++private:
++	amlogic::LibAmcodec	*m_libamcodec;
++	size_t				 m_inputBufferLength;
++	std::deque<size_t>	 m_frameSizes;
++
++public:
++	AMLDecoderInputQueueStats(amlogic::LibAmcodec *lib);
++	virtual ~AMLDecoderInputQueueStats();
++
++	bool isAvailable(size_t frameLength) const;
++	float fillLevel() const;
++
++	void addFrame(size_t frameLength);
++	unsigned frameCount();
++	void reset();
++};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..365208e34a
+index 0000000000..a1f2c7a18f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1360 @@
+@@ -0,0 +1,1309 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2929,23 +3042,29 @@ index 0000000000..365208e34a
 +#include <unistd.h>
 +#include <linux/videodev2.h>
 +#include <thread>
++#include <chrono>
 +
 +#include "AMLInsecureVideoCodec.h"
++
++#include "AMLDecoderInputQueueStats.h"
 +
 +extern "C" {
 +	#include <libavcodec/packet.h>
 +}
 +
-+CEvent g_aml_codec_sync_event;
-+
++using namespace std::chrono_literals;
 +using namespace amlogic;
 +
-+static const uint64_t UINT64_0 	= 0x8000000000000000ULL;
++CEvent g_aml_codec_sync_event;
++
++static const uint64_t UINT64_0 = 0x8000000000000000ULL;
 +
 +static const int RW_WAIT_TIME = 5 * 1000; // 5 ms
 +
-+static const unsigned int STATE_HASPTS     = 2;
++static const unsigned int STATE_HASPTS = 2;
 +
++// max level for the decoder input queue
++static const float maxDecoderInputLevel = 0.7f;
 +
 +/*************************************************************************/
 +
@@ -2964,13 +3083,16 @@ index 0000000000..365208e34a
 +/*************************************************************************/
 +
 +AMLInsecureVideoCodec::AMLInsecureVideoCodec(CProcessInfo &processInfo)
-+	: AMLVideoCodec(processInfo), m_sleepDurationInMs(0), m_opened(false), m_speed(DVD_PLAYSPEED_NORMAL), m_cur_pts(DVD_NOPTS_VALUE),
-+	  m_last_pts(DVD_NOPTS_VALUE) , m_bufferIndex(-1), m_state(0), m_frameSizeSum(0), m_secureOSMC(&OSMCSecureOS::getInstance())
++	: AMLVideoCodec(processInfo), m_opened(false), m_speed(DVD_PLAYSPEED_NORMAL), m_cur_pts(DVD_NOPTS_VALUE),
++	  m_last_pts(DVD_NOPTS_VALUE), m_bufferIndex(-1), m_state(0), m_filling(true), m_secureOSMC(&OSMCSecureOS::getInstance())
 +{
 +	m_am_private = new am_private_t;
 +	memset(m_am_private, 0, sizeof(am_private_t));
 +
++	m_input_queue_length = 0;
++
 +	m_libamcodec = new LibAmcodec();
++	m_decInputQueue = new AMLDecoderInputQueueStats(m_libamcodec);
 +
 +	// set logging callback
 +	m_libamcodec->setLogCallback(libamlcodec_logger);
@@ -2979,6 +3101,7 @@ index 0000000000..365208e34a
 +AMLInsecureVideoCodec::~AMLInsecureVideoCodec()
 +{
 +	delete m_am_private, m_am_private = nullptr;
++	delete m_decInputQueue, m_decInputQueue = nullptr;
 +	delete m_libamcodec, m_libamcodec = nullptr;
 +}
 +
@@ -2998,47 +3121,6 @@ index 0000000000..365208e34a
 +		return 1;
 +	}
 +	return 0;
-+}
-+
-+int AMLInsecureVideoCodec::calculateSleepDuration()
-+{
-+	// Calculate the thread sleep duration in ms.
-+	//
-+	// The render thread is used to sleep between frames. This keeps the CPU load and CPU
-+	// temperature low. When polling is being used to let the thread sleep until the next
-+	// vsync event occurs, the Linux scheduler wakeup latency might be too high (around 6 ms)
-+	// and could cause some glitches like frame skips. Further, that thread needs another (up
-+	// to) 6 ms to prepare the next frame before it is being displayed. This gives a total
-+	// (worst case) latency of about 12 ms.
-+	//
-+	// The resulting sleep duration depends on the fps. For instance, for 24 fps (42 ms per
-+	// frame) the thread should sleep for 42 - 6 - 6 = 30 ms. BUT: if Kodi sets a different
-+	// refresh rate (eg. 50 Hz instead of 25 Hz) we must rely on that refresh rate.
-+	//
-+	// It doesn't matter that the thread doesn't send a frame exactly every e.g. 42 ms. The
-+	// kernel will display frames only when a vsync event occurs. We just have to make sure
-+	// that there's at least one frame available when the kernel needs it.
-+
-+	double refreshRate = (double) m_hints.fpsrate / (double) m_hints.fpsscale;
-+	RESOLUTION_INFO res;
-+
-+	if (aml_get_native_resolution(&res)) {
-+		refreshRate = res.fRefreshRate;
-+	}
-+
-+	int sleepDurationInMs = int(1000.0 / refreshRate - 0.5) - 6 - 6;
-+
-+	if (sleepDurationInMs < 2) {
-+		// if the sleep duration is too low, we do not sleep at all
-+		sleepDurationInMs = 0;
-+	}
-+
-+	return sleepDurationInMs;
-+}
-+
-+int AMLInsecureVideoCodec::getSleepDurationInMs() const
-+{
-+	return m_sleepDurationInMs;
 +}
 +
 +void AMLInsecureVideoCodec::setVfmMap(const std::string &name, const std::string &map)
@@ -3358,8 +3440,8 @@ index 0000000000..365208e34a
 +	m_brightness = -1;
 +	m_hints = hints;
 +	m_state = 0;
-+	m_frameSizes.clear();
-+	m_frameSizeSum = 0;
++	m_filling = true;
++	m_decInputQueue->reset();
 +
 +	if (!openAmlVideo(hints)) {
 +		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::openDecoder - cannot open amlvideo device");
@@ -3414,6 +3496,7 @@ index 0000000000..365208e34a
 +	CLog::Log(LOGDEBUG,
 +		"AMLInsecureVideoCodec::openDecoder hints.orientation({}), hints.forced_aspect({}), hints.extrasize({})",
 +		hints.orientation, hints.forced_aspect, hints.extrasize);
++	CLog::Log(LOGDEBUG,"AMLInsecureVideoCodec::openDecoder hints.interlaced({})", hints.interlaced);
 +	CLog::Log(LOGDEBUG,
 +		"AMLInsecureVideoCodec::openDecoder hints primaries {}, transfer characteristic {}, colourspace {}",
 +		hints.colorPrimaries, hints.colorTransferCharacteristic, hints.colorSpace);
@@ -3478,8 +3561,6 @@ index 0000000000..365208e34a
 +	// vcodec is open, update speed if it was
 +	// changed before VideoPlayer called OpenDecoder.
 +	setSpeed(m_speed);
-+
-+	m_sleepDurationInMs = calculateSleepDuration();
 +
 +	return true;
 +}
@@ -3681,6 +3762,11 @@ index 0000000000..365208e34a
 +
 +bool AMLInsecureVideoCodec::addData(uint8_t *pData, size_t iSize, double dts, double pts, uint8_t subtitlePlane)
 +{
++	if (!m_decInputQueue->isAvailable(iSize)) {
++		// decoder input queue is almost full
++		return false;
++	}
++
 +	/* if passing through HDR, ignore contrast and brightness
 +	 * thus users can view HDR on both HDR and SDR screens without faff */
 +	int curCscType, hdrProcessMode, hdr10plusProcessMode, hlgProcessMode;
@@ -3720,16 +3806,6 @@ index 0000000000..365208e34a
 +	// band fix
 +	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "round1");
 +
-+	// check if decoder is still accepting data
-+	struct buf_status bs;
-+	m_libamcodec->getVbufState(bs);
-+	if (iSize > (size_t) bs.free_len) {
-+		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::addData: packet too big: {}, probably corrupted", iSize);
-+		return false;
-+	}
-+	m_frameSizes.push_back(iSize);
-+	m_frameSizeSum += iSize;
-+
 +	// setup packet
 +	m_am_private->am_pkt.data = pData;
 +	m_am_private->am_pkt.data_size = iSize;
@@ -3752,15 +3828,13 @@ index 0000000000..365208e34a
 +		m_am_private->am_pkt.avdts = dts;
 +
 +		// For VC1 AML decoder uses PTS only on I-Frames
-+		if (m_am_private->am_pkt.avpts == UINT64_0 && (((size_t) m_am_private->gcodec.param) & KEYFRAME_PTS_ONLY)) {
++		if (m_am_private->am_pkt.avpts == UINT64_0 && (((size_t) m_am_private->gcodec.param) & UNSTABLE_PTS)) {
 +			m_am_private->am_pkt.avpts = m_am_private->am_pkt.avdts;
 +		}
 +	}
 +
 +	// We use this to determine the fill state if no PTS is given
 +	if (m_cur_pts == DVD_NOPTS_VALUE) {
-+		m_cur_pts = m_am_private->am_pkt.avdts;
-+
 +		// No PTS given -> use first DTS for AML ptsserver initialization
 +		if ((m_state & STATE_HASPTS) == 0) {
 +			m_am_private->am_pkt.avpts = m_am_private->am_pkt.avdts;
@@ -3786,7 +3860,7 @@ index 0000000000..365208e34a
 +		}
 +
 +		if (m_am_private->am_pkt.isvalid) {
-+			CLog::Log(LOGDEBUG, "AMLInsecureVideoCodec::addData: write_av_packet looping");
++			CLog::Log(LOGDEBUG, "AMLInsecureVideoCodec::addData: write_av_packet looping, lvl:{:0.3f}", m_decInputQueue->fillLevel());
 +		}
 +		loop++;
 +	}
@@ -3797,17 +3871,18 @@ index 0000000000..365208e34a
 +		return false;
 +	}
 +
-+	if (iSize > 50000) {
-+		usleep(2000); // wait 2ms to process larger packets
-+	}
++	m_decInputQueue->addFrame(iSize);
 +
-+	m_libamcodec->getVbufState(bs);
++	// give decoder some time to settle
++	std::this_thread::sleep_for(2ms);
++
 +	if (iSize > 0) {
-+		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::addData: dl:{} sum:{} sz:{} dts_in:{:0.3f} pts_in:{:0.3f} ptsOut:{:0.3f}", bs.data_len, m_frameSizeSum,
++		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::addData: sz:{} dts_in:{:0.3f} pts_in:{:0.3f} ptsOut:{:0.3f} lvl:{:0.3f}",
 +			static_cast<unsigned int>(iSize),
 +			dts / DVD_TIME_BASE,
 +			pts / DVD_TIME_BASE,
-+			static_cast<float>(m_cur_pts) / DVD_TIME_BASE);
++			static_cast<float>(m_cur_pts) / DVD_TIME_BASE,
++			m_decInputQueue->fillLevel());
 +	}
 +
 +	return true;
@@ -3847,8 +3922,10 @@ index 0000000000..365208e34a
 +	// reset some interal vars
 +	m_cur_pts = DVD_NOPTS_VALUE;
 +	m_state = 0;
-+	m_frameSizes.clear();
-+	m_frameSizeSum = 0;
++	m_filling = true;
++	m_decInputQueue->reset();
++
++	m_input_queue_length = 0;
 +
 +	setSpeed(m_speed);
 +}
@@ -3858,67 +3935,16 @@ index 0000000000..365208e34a
 +	m_drain = drain;
 +}
 +
-+float AMLInsecureVideoCodec::getTimeSize()
-+{
-+	struct buf_status bs;
-+
-+	m_libamcodec->getVbufState(bs);
-+
-+	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getTimeSize: len:{} dl:{} fs:{} front:{}",
-+		m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front());
-+	while (m_frameSizeSum > (unsigned int) bs.data_len) {
-+		m_frameSizeSum -= m_frameSizes.front();
-+		m_frameSizes.pop_front();
-+		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getTimeSize: len:{} dl:{} fs:{} front:{}",
-+			m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front());
-+	}
-+
-+	if (bs.free_len < (bs.data_len >> 1)) {
-+		return 7.0;
-+	}
-+
-+	return (float) (m_frameSizes.size() * m_am_private->video_rate) / UNIT_FREQ;
-+}
-+
-+int AMLInsecureVideoCodec::dequeueBuffer()
++bool AMLInsecureVideoCodec::dequeueBuffer()
 +{
 +	v4l2_buffer vbuf = { 0 };
 +	vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 +
-+	//Driver change from 10 to 0ms latency, throttle here
-+	std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
-+
-+	unsigned int waitTime = 5;
-+	bool timeout = false;
-+
-+DRAIN:
 +	if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0) {
 +		if (errno != EAGAIN) {
 +			CLog::Log(LOGERROR, "AMLInsecureVideoCodec::dequeueBuffer - VIDIOC_DQBUF failed: {}", strerror(errno));
 +		}
-+
-+		std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
-+
-+		if (elapsed < std::chrono::milliseconds(waitTime)) {
-+			std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
-+		}
-+
-+		timeout = elapsed >= std::chrono::milliseconds(300);
-+
-+		if (m_drain && !timeout) {
-+			goto DRAIN;
-+		}
-+
-+		if (m_drain && timeout) {
-+			CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer timeout!");
-+		}
-+
-+		return -errno;
-+	}
-+
-+	if (m_drain) {
-+		int waited = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count();
-+		CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer waited:{:0.3f}ms", waited / 1000.0);
++		return false;
 +	}
 +
 +	m_last_pts = m_cur_pts;
@@ -3926,11 +3952,16 @@ index 0000000000..365208e34a
 +	m_cur_pts = static_cast<uint64_t>(vbuf.timestamp.tv_sec) << 32;
 +	m_cur_pts |= static_cast<uint64_t>(vbuf.timestamp.tv_usec & 0xFFFFFFFF);
 +
-+	CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer: pts:{:0.3f} idx:{}", static_cast<double>(m_cur_pts) / DVD_TIME_BASE, vbuf.index);
-+
 +	m_bufferIndex = vbuf.index;
 +
-+	return 0;
++	// The interlaced flag was initially set when the decoder was opened. But when the decoder
++	// is doing its job, it finds out the truth.
++	m_hints.interlaced = (vbuf.field & V4L2_FIELD_INTERLACED) != 0;
++
++	CLog::Log(LOGDEBUG, LOGAVTIMING, "AMLInsecureVideoCodec::dequeueBuffer: pts: {:0.3f} idx: {} interlaced: {}",
++			  static_cast<double>(m_cur_pts) / DVD_TIME_BASE, vbuf.index, m_hints.interlaced);
++
++	return true;
 +}
 +
 +void AMLInsecureVideoCodec::setPictureStereoMode(VideoPicture *pVideoPicture)
@@ -3963,37 +3994,60 @@ index 0000000000..365208e34a
 +		return CDVDVideoCodec::VC_ERROR;
 +	}
 +
-+	float timesize = getTimeSize();
++	float level = m_decInputQueue->fillLevel();
++	unsigned waitingFrameCount = m_decInputQueue->frameCount();
 +
-+	if (!m_drain && timesize < 0.2) {
++	if (!m_drain && waitingFrameCount < 5 && level < maxDecoderInputLevel) {
 +		return CDVDVideoCodec::VC_BUFFER;
 +	}
 +
-+	if (dequeueBuffer() == 0) {
-+		pVideoPicture->iFlags = 0;
++	// give decoder some time to settle
++	std::this_thread::sleep_for(5ms);
 +
-+		if (m_last_pts == DVD_NOPTS_VALUE) {
-+			pVideoPicture->iDuration = static_cast<double>(m_am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ;
-+		} else {
-+			pVideoPicture->iDuration = static_cast<double>(m_cur_pts - m_last_pts);
++	m_filling = (waitingFrameCount < 10 && level < maxDecoderInputLevel) || m_libamcodec->isVCodecBuffering();
++
++	if (!dequeueBuffer()) {
++		if (m_drain) {
++			return m_input_queue_length > 0 ? CDVDVideoCodec::VC_NONE : CDVDVideoCodec::VC_EOF;
 +		}
 +
-+		pVideoPicture->dts = DVD_NOPTS_VALUE;
-+		pVideoPicture->pts = static_cast<double>(m_cur_pts);
-+
-+		CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
-+			m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000);
-+
-+		setPictureStereoMode(pVideoPicture);
-+
-+		return CDVDVideoCodec::VC_PICTURE;
-+	} else if (m_drain) {
-+		return CDVDVideoCodec::VC_EOF;
-+	} else if (timesize < 1.0 || m_libamcodec->isVCodecBuffering()) {
-+		return CDVDVideoCodec::VC_BUFFER;
++		return m_filling ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
 +	}
 +
-+	return CDVDVideoCodec::VC_NONE;
++	pVideoPicture->iFlags = 0;
++
++	double duration = static_cast<double>((m_am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ);
++
++	if (m_last_pts == DVD_NOPTS_VALUE) {
++		pVideoPicture->iDuration = duration;
++	} else if (m_cur_pts < m_last_pts) {
++		pVideoPicture->iDuration = duration;
++		m_cur_pts = m_last_pts + duration;
++	} else {
++		pVideoPicture->iDuration = static_cast<double>(m_cur_pts - m_last_pts);
++
++		double duration_ratio = pVideoPicture->iDuration / duration;
++
++		// pts order not correct (sometimes, the pts_server in the kernel returns wrong
++		// pts values => try to compensate). If the difference is too big, then we assume
++		// there's a leap in the stream's pts values
++		if (duration_ratio < 0.2 || (duration_ratio > 1.5 && duration_ratio < 4.0)) {
++			pVideoPicture->iDuration = duration;
++			m_cur_pts = m_last_pts + duration;
++		}
++	}
++
++	pVideoPicture->dts = DVD_NOPTS_VALUE;
++	pVideoPicture->pts = static_cast<double>(m_cur_pts);
++
++	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
++		m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000.);
++
++	setPictureStereoMode(pVideoPicture);
++
++	m_input_queue_length++;
++
++	return CDVDVideoCodec::VC_PICTURE;
 +}
 +
 +int AMLInsecureVideoCodec::getOMXPts() const
@@ -4032,6 +4086,8 @@ index 0000000000..365208e34a
 +		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::releaseFrame - VIDIOC_QBUF failed: {}", strerror(errno));
 +	}
 +
++	m_input_queue_length--;
++
 +	return ret;
 +}
 +
@@ -4041,13 +4097,19 @@ index 0000000000..365208e34a
 +		return 0;
 +	}
 +
-+	struct vdec_status vs;
-+	m_libamcodec->getVdecState(vs);
-+	if (vs.fps > 0) {
-+		return static_cast<unsigned int>(0.5 + (static_cast<float>(UNIT_FREQ) / static_cast<float>(vs.fps)));
-+	} else {
++	struct vdec_info vi;
++
++	m_libamcodec->getVdecInfo(vi);
++
++	if (vi.frame_dur == 0) {
 +		return 0;
 +	}
++
++	if (m_hints.interlaced && vi.frame_dur >= 3200) {
++		return vi.frame_dur / 2;
++	}
++
++	return vi.frame_dur;
 +}
 +
 +void AMLInsecureVideoCodec::setFramepackingResolution(const int width, const int height, const int blanking) const
@@ -4253,10 +4315,10 @@ index 0000000000..365208e34a
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..8981269775
+index 0000000000..827e0e69ce
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,151 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4270,6 +4332,7 @@ index 0000000000..8981269775
 +#include <deque>
 +#include <string>
 +#include <list>
++#include <atomic>
 +
 +#include "cores/VideoPlayer/DVDStreamInfo.h"
 +#include "cores/VideoSettings.h"
@@ -4293,12 +4356,9 @@ index 0000000000..8981269775
 +class amlogic::AMLInsecureVideoCodec : public amlogic::AMLVideoCodec
 +{
 +private:
-+	int m_sleepDurationInMs;
-+
 +	void am_packet_release(am_packet_t *pkt);
 +
-+	float getTimeSize();
-+	int dequeueBuffer();
++	bool dequeueBuffer();
 +
 +	void setVideoContrast(const int contrast) const;
 +	void setVideoBrightness(const int brightness) const;
@@ -4325,8 +4385,9 @@ index 0000000000..8981269775
 +	uint64_t			 m_last_pts;
 +	uint32_t			 m_bufferIndex;
 +	unsigned int		 m_state;
-+	std::uint32_t		 m_frameSizeSum;
-+	std::deque<uint32_t> m_frameSizes;
++	bool				 m_filling;
++
++	std::atomic<int>	 m_input_queue_length;
 +
 +	bool			 m_drain = false;
 +	CRect			 m_dst_rect;
@@ -4347,6 +4408,8 @@ index 0000000000..8981269775
 +	std::string		 m_defaultVfmMap;
 +
 +	OSMCSecureOS	*m_secureOSMC;
++
++	AMLDecoderInputQueueStats	*m_decInputQueue;
 +
 +	virtual vformat_t getVideoFormat(const CDVDStreamInfo &hints) const = 0;
 +	virtual vdec_type_t getVideoCodecType(const CDVDStreamInfo &hints) const = 0;
@@ -4374,8 +4437,6 @@ index 0000000000..8981269775
 +	virtual int write_header(am_private_t *para, am_packet_t *pkt) const;
 +
 +	virtual int poll();
-+	virtual int getSleepDurationInMs() const;
-+	virtual int calculateSleepDuration();
 +
 +	virtual void playbackPause();
 +	virtual void playbackResume();
@@ -4411,10 +4472,10 @@ index 0000000000..8981269775
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.cpp
 new file mode 100644
-index 0000000000..877c7baf08
+index 0000000000..3d3e1a838f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.cpp
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,40 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4455,24 +4516,12 @@ index 0000000000..877c7baf08
 +
 +	return m_videoCodec->poll();
 +}
-+
-+/*
-+ * Just sleep a while until we think the next frame could be ready
-+ */
-+void AMLVideoCodec::sleep()
-+{
-+	if (m_videoCodec == nullptr) {
-+		return;
-+	}
-+
-+	std::this_thread::sleep_for(std::chrono::milliseconds(m_videoCodec->getSleepDurationInMs()));
-+}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.h
 new file mode 100644
-index 0000000000..51fc7d2306
+index 0000000000..6cf653553f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodec.h
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,61 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4504,7 +4553,6 @@ index 0000000000..51fc7d2306
 +	CProcessInfo &m_processInfo;
 +
 +	virtual int poll() = 0;
-+	virtual int getSleepDurationInMs() const = 0;
 +
 +public:
 +	AMLVideoCodec(CProcessInfo &processInfo);
@@ -4532,13 +4580,12 @@ index 0000000000..51fc7d2306
 +	virtual void setDrain(bool drain) = 0;
 +
 +	static int pollFrame();
-+	static void sleep();
 +
 +	virtual void reset() = 0;
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodecConstants.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodecConstants.h
 new file mode 100644
-index 0000000000..d84ec3af3d
+index 0000000000..deda336fae
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLVideoCodecConstants.h
 @@ -0,0 +1,40 @@
@@ -4576,7 +4623,7 @@ index 0000000000..d84ec3af3d
 +
 +#define EXTERNAL_PTS    (1)
 +#define SYNC_OUTSIDE    (2)
-+#define KEYFRAME_PTS_ONLY 0x100
++#define UNSTABLE_PTS	0x40
 +
 +#define PTS_FREQ        90000
 +#define UNIT_FREQ       96000
@@ -5384,10 +5431,10 @@ index 0000000000..f88d71e135
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
-index 0000000000..e0c7cc5add
+index 0000000000..3ca2decbc4
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
-@@ -0,0 +1,251 @@
+@@ -0,0 +1,245 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5500,12 +5547,6 @@ index 0000000000..e0c7cc5add
 +vdec_type_t H264Codec::getVideoCodecType(const CDVDStreamInfo &hints) const
 +{
 +	return m_is4k ? VIDEO_DEC_FORMAT_H264_4K2K : VIDEO_DEC_FORMAT_H264;
-+}
-+
-+int H264Codec::calculateSleepDuration()
-+{
-+	// we need a shorter sleep period for MVC playback to avoid Kodi skipping like hell
-+	return AMLInsecureVideoCodec::calculateSleepDuration() / (m_isMvc ? 2 : 1);
 +}
 +
 +void H264Codec::setupVideoCodecParams(aml_generic_param &params) const
@@ -5641,10 +5682,10 @@ index 0000000000..e0c7cc5add
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h
 new file mode 100644
-index 0000000000..1f3fa3e1df
+index 0000000000..7261cebbcb
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,50 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5680,8 +5721,6 @@ index 0000000000..1f3fa3e1df
 +	virtual int pre_header_feeding(am_private_t *para, am_packet_t *pkt) const;
 +
 +	virtual void playbackResume(int speed);
-+
-+	virtual int calculateSleepDuration();
 +
 +public:
 +	H264Codec(CProcessInfo &processInfo, bool request4k, bool requestMvc);
@@ -5888,10 +5927,10 @@ index 0000000000..5c8655bd15
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
 new file mode 100644
-index 0000000000..ce0113740e
+index 0000000000..876e4b7a09
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,312 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5930,6 +5969,7 @@ index 0000000000..ce0113740e
 +  virtual int codec_checkin_pts64(codec_para_t *pcodec, unsigned long long pts64)=0;
 +  virtual int codec_get_vbuf_state(codec_para_t *pcodec, struct buf_status *buf)=0;
 +  virtual int codec_get_vdec_state(codec_para_t *pcodec, struct vdec_status *vdec)=0;
++  virtual int codec_get_vdec_info(codec_para_t *pcodec, struct vdec_info *vdec) = 0;
 +
 +  virtual int codec_get_vdec_is_buffering(codec_para_t *pcodec, unsigned long *buffering)=0;
 +
@@ -5962,8 +6002,9 @@ index 0000000000..ce0113740e
 +  DEFINE_METHOD3(int, codec_write,              (codec_para_t *p1, void *p2, int p3))
 +  DEFINE_METHOD2(int, codec_checkin_pts,        (codec_para_t *p1, unsigned long p2))
 +  DEFINE_METHOD2(int, codec_checkin_pts64,      (codec_para_t *p1, unsigned long long p2))
-+  DEFINE_METHOD2(int, codec_get_vbuf_state,     (codec_para_t *p1, struct buf_status * p2))
-+  DEFINE_METHOD2(int, codec_get_vdec_state,     (codec_para_t *p1, struct vdec_status * p2))
++  DEFINE_METHOD2(int, codec_get_vbuf_state,     (codec_para_t *p1, struct buf_status *p2))
++  DEFINE_METHOD2(int, codec_get_vdec_state,     (codec_para_t *p1, struct vdec_status *p2))
++  DEFINE_METHOD2(int, codec_get_vdec_info,      (codec_para_t *p1, struct vdec_info *p2))
 +
 +  DEFINE_METHOD2(int, codec_get_vdec_is_buffering,     (codec_para_t *p1, unsigned long *p2))
 +
@@ -5994,6 +6035,7 @@ index 0000000000..ce0113740e
 +    RESOLVE_METHOD(codec_checkin_pts64)
 +    RESOLVE_METHOD(codec_get_vbuf_state)
 +    RESOLVE_METHOD(codec_get_vdec_state)
++    RESOLVE_METHOD(codec_get_vdec_info)
 +
 +    RESOLVE_METHOD_OPTIONAL(codec_get_vdec_is_buffering)
 +
@@ -6168,6 +6210,11 @@ index 0000000000..ce0113740e
 +	return m_dll->codec_get_vdec_state(m_codec, &vs);
 +}
 +
++int LibAmcodec::getVdecInfo(struct vdec_info &vi) const
++{
++	return m_dll->codec_get_vdec_info(m_codec, &vi);
++}
++
 +int LibAmcodec::write(unsigned char *buf, unsigned int size)
 +{
 +	return m_dll->codec_write(m_codec, buf, (int) size);
@@ -6198,10 +6245,10 @@ index 0000000000..ce0113740e
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
 new file mode 100644
-index 0000000000..d7d36411a1
+index 0000000000..eaece56f82
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,100 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6286,6 +6333,7 @@ index 0000000000..d7d36411a1
 +
 +	int getVbufState(struct buf_status &bs) const;
 +	int getVdecState(struct vdec_status &vs) const;
++	int getVdecInfo(struct vdec_info &vi) const;
 +	bool isVCodecBuffering() const;
 +
 +	int checkinPts64(uint64_t pts64);
@@ -6303,10 +6351,10 @@ index 0000000000..d7d36411a1
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
 new file mode 100644
-index 0000000000..75a6d7e81a
+index 0000000000..9e4ebe0b71
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,146 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6325,6 +6373,8 @@ index 0000000000..75a6d7e81a
 +#include "settings/Settings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
++
++#include "utils/log.h"
 +
 +using namespace amlogic;
 +
@@ -6424,8 +6474,13 @@ index 0000000000..75a6d7e81a
 +			m_mpeg2_sequence_pts = dts;
 +		}
 +
-+		hints.fpsrate = m_mpeg2_sequence->fps_rate;
-+		hints.fpsscale = m_mpeg2_sequence->fps_scale;
++		CLog::Log(LOGDEBUG, "MPEG12Codec::prepareFrame - interlaced: {}, hints.fps: {}/{}, mpeg2_seq: {}/{}",
++				  hints.interlaced, hints.fpsrate, hints.fpsscale, m_mpeg2_sequence->fps_rate, m_mpeg2_sequence->fps_scale);
++
++		if (!hints.interlaced) {
++			hints.fpsrate = m_mpeg2_sequence->fps_rate;
++			hints.fpsscale = m_mpeg2_sequence->fps_scale;
++		}
 +
 +		m_framerate = static_cast<float>(m_mpeg2_sequence->fps_rate) / m_mpeg2_sequence->fps_scale;
 +
@@ -6435,6 +6490,7 @@ index 0000000000..75a6d7e81a
 +
 +		m_processInfo.SetVideoFps(m_framerate);
 +		m_processInfo.SetVideoDAR(hints.aspect);
++		m_processInfo.SetVideoInterlaced(hints.interlaced);
 +	}
 +
 +	return true;
@@ -6494,10 +6550,10 @@ index 0000000000..b7408f0d4e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp
 new file mode 100644
-index 0000000000..ede8092933
+index 0000000000..211e8644eb
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp
-@@ -0,0 +1,211 @@
+@@ -0,0 +1,208 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6705,9 +6761,6 @@ index 0000000000..ede8092933
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
 +	params.param = (void*) EXTERNAL_PTS;
-+	if (m_hints.ptsinvalid) {
-+		params.param = (void*) (EXTERNAL_PTS | KEYFRAME_PTS_ONLY);
-+	}
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.h
 new file mode 100644
@@ -6800,7 +6853,7 @@ index 0000000000..b590b4d18e
 +
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp
 new file mode 100644
-index 0000000000..80c3321ff5
+index 0000000000..09ba595d0e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp
 @@ -0,0 +1,371 @@
@@ -6885,7 +6938,7 @@ index 0000000000..80c3321ff5
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
 +	if (m_hints.ptsinvalid) {
-+		params.param = (void*) KEYFRAME_PTS_ONLY;
++		params.param = (void*) UNSTABLE_PTS;
 +	}
 +}
 +
@@ -7488,10 +7541,10 @@ index 0000000000..a6bf4c91a7
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
 new file mode 100644
-index 0000000000..31b8415f6c
+index 0000000000..f27363f4a8
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,30 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7505,6 +7558,7 @@ index 0000000000..31b8415f6c
 +namespace amlogic {
 +	// base classes
 +	class AMLCodecList;
++	class AMLDecoderInputQueueStats;
 +	class AMLInsecureVideoCodec;
 +	class AMLVideoCodec;
 +	class AMLVideoCodecInfo;
@@ -7544,10 +7598,19 @@ index 48710f847c..72caa812c0 100644
              DVDDemuxVobsub.h
              DVDFactoryDemuxer.h)
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
-index f4f71618a4..f7289ffc40 100644
+index f4f71618a4..e1501a8142 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
-@@ -187,7 +187,10 @@ public:
+@@ -127,6 +127,8 @@ public:
+   CDemuxStreamVideo() { type = STREAM_VIDEO; }
+ 
+   ~CDemuxStreamVideo() override = default;
++
++  bool interlaced = false;
+   int iFpsScale = 0; // scale of 1000 and a rate of 29970 will result in 29.97 fps
+   int iFpsRate = 0;
+   int iHeight = 0; // height of the stream reported by the demuxer
+@@ -187,7 +189,10 @@ public:
      : CDemuxStream()
    {
      type = STREAM_SUBTITLE;
@@ -7571,7 +7634,7 @@ index 2bdc3ea5a9..e33e03502a 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 739bf51922..e30c10edbb 100644
+index 739bf51922..2c656acf5e 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -18,6 +18,8 @@
@@ -7761,19 +7824,40 @@ index 739bf51922..e30c10edbb 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1657,6 +1701,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1657,12 +1701,29 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
+-        else
 +        else if(pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
-+        {
+         {
+-          st->iFpsRate  = 0;
+-          st->iFpsScale = 0;
 +          st->iFpsRate = pStream->avg_frame_rate.num;
 +          st->iFpsScale = pStream->avg_frame_rate.den;
 +        }
-         else
-         {
-           st->iFpsRate  = 0;
-@@ -1679,7 +1728,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
++
++        st->interlaced = pStream->codecpar->field_order != AV_FIELD_PROGRESSIVE && pStream->codecpar->field_order != AV_FIELD_UNKNOWN;
++
++        float fps = 0.;
++
++        if (st->iFpsScale)
++          fps = static_cast<float>(st->iFpsRate) / static_cast<float>(st->iFpsScale);
++
++        if (st->interlaced && fps > 24.0 && fps < 30.0)
++        {
++          // either PAL or NTSC interlaced
++          st->iFpsRate *= 2;
+         }
+ 
++        CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::AddStream video - interlaced: {}, fps: {:f}, tba: {}/{}, tbr: {}/{}, tbc: {}/{}",
++				  st->interlaced, fps, pStream->avg_frame_rate.num, pStream->avg_frame_rate.den,
++				  r_frame_rate.num, r_frame_rate.den, st->iFpsRate, st->iFpsScale);
++
+         if (pStream->codec_info_nb_frames > 0 &&
+             pStream->codec_info_nb_frames <= 2 &&
+             m_pInput->IsStreamType(DVDSTREAM_TYPE_DVD))
+@@ -1679,7 +1740,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          if (pStream->codecpar->height)
            st->fAspect *= (double)pStream->codecpar->width / pStream->codecpar->height;
          st->iOrientation = 0;
@@ -7791,7 +7875,7 @@ index 739bf51922..e30c10edbb 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1740,7 +1798,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1740,7 +1810,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          }
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
@@ -7831,11 +7915,11 @@ index 739bf51922..e30c10edbb 100644
 +            if (mvcStream)
 +            {
 +              pStream->codecpar->codec_tag = MKTAG('A', 'M', 'V', 'C');
- 
++
 +              if (pStream->codecpar->extradata_size > 0 && mvcStream->codecpar->extradata_size > 0)
 +              {
 +                uint8_t* extr = pStream->codecpar->extradata;
-+
+ 
 +                pStream->codecpar->extradata = (uint8_t*)av_mallocz(pStream->codecpar->extradata_size + mvcStream->codecpar->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
 +                memcpy(pStream->codecpar->extradata, extr, pStream->codecpar->extradata_size);
 +                memcpy(pStream->codecpar->extradata + pStream->codecpar->extradata_size, mvcStream->codecpar->extradata, mvcStream->codecpar->extradata_size);
@@ -7855,7 +7939,7 @@ index 739bf51922..e30c10edbb 100644
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1766,6 +1880,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1766,6 +1892,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7872,7 +7956,7 @@ index 739bf51922..e30c10edbb 100644
            break;
          }
        }
-@@ -2081,7 +2205,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -2081,7 +2217,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -7894,7 +7978,7 @@ index 739bf51922..e30c10edbb 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2112,6 +2249,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+@@ -2112,6 +2261,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
  
  bool CDVDDemuxFFmpeg::IsProgramChange()
  {
@@ -9013,10 +9097,18 @@ index 05af77ecef..7950f712b3 100644
    typedef std::shared_ptr<CDVDOverlayImage> SOverlay;
    typedef std::list<SOverlay> SOverlays;
 diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
-index f8f7c71943..04272b8b5e 100644
+index f8f7c71943..b0b7249edd 100644
 --- a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
-@@ -73,6 +73,7 @@ void CDVDStreamInfo::Clear()
+@@ -44,6 +44,7 @@ void CDVDStreamInfo::Clear()
+   cryptoSession = nullptr;
+   externalInterfaces = nullptr;
+ 
++  interlaced = false;
+   fpsscale = 0;
+   fpsrate  = 0;
+   height   = 0;
+@@ -73,6 +74,7 @@ void CDVDStreamInfo::Clear()
  
    orientation = 0;
    bitdepth = 0;
@@ -9024,7 +9116,17 @@ index f8f7c71943..04272b8b5e 100644
  }
  
  bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
-@@ -160,6 +161,8 @@ bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
+@@ -94,7 +96,8 @@ bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
+ 
+   // VIDEO
+   // clang-format off
+-  if (fpsscale != right.fpsscale
++  if (interlaced != right.interlaced
++  ||fpsscale != right.fpsscale
+   || fpsrate != right.fpsrate
+   || height != right.height
+   || width != right.width
+@@ -160,6 +163,8 @@ bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
      return false;
  
    // SUBTITLE
@@ -9033,7 +9135,15 @@ index f8f7c71943..04272b8b5e 100644
  
    // Crypto
    if ((cryptoSession == nullptr) != (right.cryptoSession == nullptr))
-@@ -244,6 +247,7 @@ void CDVDStreamInfo::Assign(const CDVDStreamInfo& right, bool withextradata)
+@@ -212,6 +217,7 @@ void CDVDStreamInfo::Assign(const CDVDStreamInfo& right, bool withextradata)
+   externalInterfaces = right.externalInterfaces;
+ 
+   // VIDEO
++  interlaced = right.interlaced;
+   fpsscale = right.fpsscale;
+   fpsrate  = right.fpsrate;
+   height   = right.height;
+@@ -244,6 +250,7 @@ void CDVDStreamInfo::Assign(const CDVDStreamInfo& right, bool withextradata)
    channellayout = right.channellayout;
  
    // SUBTITLE
@@ -9041,7 +9151,27 @@ index f8f7c71943..04272b8b5e 100644
  }
  
  void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
-@@ -306,5 +310,7 @@ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
+@@ -285,12 +292,13 @@ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
+   else if (right.type == STREAM_VIDEO)
+   {
+     const CDemuxStreamVideo *stream = static_cast<const CDemuxStreamVideo*>(&right);
+-    fpsscale  = stream->iFpsScale;
+-    fpsrate   = stream->iFpsRate;
+-    height    = stream->iHeight;
+-    width     = stream->iWidth;
+-    aspect    = stream->fAspect;
+-    vfr       = stream->bVFR;
++    interlaced = stream->interlaced;
++    fpsscale   = stream->iFpsScale;
++    fpsrate    = stream->iFpsRate;
++    height     = stream->iHeight;
++    width      = stream->iWidth;
++    aspect     = stream->fAspect;
++    vfr        = stream->bVFR;
+     ptsinvalid = stream->bPTSInvalid;
+     forced_aspect = stream->bForcedAspect;
+     orientation = stream->iOrientation;
+@@ -306,5 +314,7 @@ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
    }
    else if (right.type == STREAM_SUBTITLE)
    {
@@ -9050,10 +9180,18 @@ index f8f7c71943..04272b8b5e 100644
    }
  }
 diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.h b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
-index 8a3da27225..8541dbaffa 100644
+index 8a3da27225..2cc5b68502 100644
 --- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h
 +++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
-@@ -85,6 +85,7 @@ public:
+@@ -54,6 +54,7 @@ public:
+   int codecOptions;
+ 
+   // VIDEO
++  bool interlaced;
+   int fpsscale; // scale of 1001 and a rate of 60000 will result in 59.94 fps
+   int fpsrate;
+   int height; // height of the stream reported by the demuxer
+@@ -85,6 +86,7 @@ public:
    uint64_t channellayout;
  
    // SUBTITLE
@@ -9540,10 +9678,10 @@ index b1286231c4..aff1b4fd41 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..47b2274d22
+index 0000000000..4324beddf7
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,198 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -9741,22 +9879,6 @@ index 0000000000..47b2274d22
 +      m_prevVPts = pts;
 +    }
 +  }
-+
-+#if 0
-+  // Use polling to sync with the kernel's vsync IRQ. It turned out that the
-+  // Linux schedulers wakeup latency varies too much. Wakeup delays of up to 6 ms
-+  // are too big and are causing 'stutters' like skipped/dropped frames. However,
-+  // this can be avoided if we let Kodi run with realtime priority.
-+  //
-+  amlogic::AMLVideoCodec::pollFrame();
-+#else
-+  // We do not use polling in this case. The vsync IRQ will handle 'ready' frames anyway.
-+  // Just sleep a bit here to avoid high CPU usage and temperature.
-+  //
-+  // Note: you want to use polling if you enable the 'sync-to-display' option.
-+  //
-+  amlogic::AMLVideoCodec::sleep();
-+#endif
 +}
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 new file mode 100644
@@ -9987,7 +10109,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index ceeded1e0e..c570bf1042 100644
+index ceeded1e0e..f85010b374 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -24,6 +24,8 @@
@@ -10024,51 +10146,72 @@ index ceeded1e0e..c570bf1042 100644
          CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
          UpdateLatencyTweak();
          if (m_pRenderer)
-@@ -1193,7 +1202,9 @@ void CRenderManager::PrepareNextRender()
-     // see if any future queued frames are already due
-     auto iter = m_queued.begin();
-     int idx = *iter;
+@@ -1175,10 +1184,9 @@ void CRenderManager::PrepareNextRender()
+   }
+ 
+   CLog::LogFC(LOGDEBUG, LOGAVTIMING,
+-              "frameOnScreen: {:f} renderPts: {:f} nextFramePts: {:f} -> diff: {:f}  render: {} "
+-              "forceNext: {}",
+-              frameOnScreen, renderPts, nextFramePts, (renderPts - nextFramePts),
+-              renderPts >= nextFramePts, m_forceNext);
++            "clock: {:.3f}, renderPts: {:.3f}, nextFramePts: {:.3f}, diff: {:.3f}, queue: {}, late: {}, force next: {}",
++            frameOnScreen / 1000000.0, renderPts / 1000000.0, nextFramePts / 1000000.0, (nextFramePts - renderPts) / 1000000.0,
++            m_queued.size(), m_lateframes, m_forceNext);
+ 
+   bool combined = false;
+   if (m_presentsourcePast >= 0)
+@@ -1190,41 +1198,26 @@ void CRenderManager::PrepareNextRender()
+ 
+   if (renderPts >= nextFramePts || m_forceNext)
+   {
+-    // see if any future queued frames are already due
+-    auto iter = m_queued.begin();
+-    int idx = *iter;
 -    ++iter;
-+    int lateframes = 0;
-+    int queue_size = m_queued.size();
-+
-     while (iter != m_queued.end())
-     {
-       // the slot for rendering in time is [pts .. (pts +  x * frametime)]
-@@ -1201,8 +1212,10 @@ void CRenderManager::PrepareNextRender()
-       // we are really late. The likelihood that we recover decreases the greater m_lateframes
-       // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
-       double x = (m_lateframes <= 6) ? 0.98 : 0;
+-    while (iter != m_queued.end())
+-    {
+-      // the slot for rendering in time is [pts .. (pts +  x * frametime)]
+-      // renderer/drivers have internal queues, being slightly late here does not mean that
+-      // we are really late. The likelihood that we recover decreases the greater m_lateframes
+-      // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
+-      double x = (m_lateframes <= 6) ? 0.98 : 0;
 -      if (renderPts < m_Queue[*iter].pts + x * frametime)
-+      if ((renderPts - frametime * queue_size) < (m_Queue[*iter].pts + x * frametime))
-         break;
-+      lateframes++;
-+      queue_size--;
-       idx = *iter;
-       ++iter;
-     }
-@@ -1210,17 +1223,17 @@ void CRenderManager::PrepareNextRender()
-     // skip late frames
-     while (m_queued.front() != idx)
+-        break;
+-      idx = *iter;
+-      ++iter;
+-    }
++    double lateframes = (renderPts - nextFramePts) / frametime;
+ 
+-    // skip late frames
+-    while (m_queued.front() != idx)
++    while (lateframes >= 1.5 && m_queued.size() > 2)
      {
-+      m_presentsourcePast = m_queued.front();
-+      m_queued.pop_front();
-+
++      // skip late frames if possible; if the queue is almost empty, we don't skip
++      // even if we should to avoid emptying the queue too fast
        if (m_presentsourcePast >= 0)
        {
          m_discard.push_back(m_presentsourcePast);
-         m_QueueSkip++;
-+        m_presentsourcePast = -1;
+-        m_QueueSkip++;
        }
--      m_presentsourcePast = m_queued.front();
--      m_queued.pop_front();
+       m_presentsourcePast = m_queued.front();
+       m_queued.pop_front();
++      m_QueueSkip++;
++
++      lateframes = (renderPts - m_Queue[m_queued.front()].pts) / frametime;
      }
  
 -    int lateframes = static_cast<int>((renderPts - m_Queue[idx].pts) *
 -                                      static_cast<double>(m_fps / DVD_TIME_BASE));
-     if (lateframes)
-       m_lateframes += lateframes;
-     else
+-    if (lateframes)
+-      m_lateframes += lateframes;
+-    else
+-      m_lateframes = 0;
++    int idx = m_queued.front();
++
++    m_lateframes = (int) (lateframes > 0. ? lateframes : 0.);
+ 
+     m_presentstep = PRESENT_FLIP;
+     m_discard.push_back(m_presentsource);
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
 index 6b71389043..cc3f52725f 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
@@ -10514,6 +10657,27 @@ index 2d94c39daa..58e17c1882 100644
     {
        udev_device_unref(device);
        continue;
+diff --git a/xbmc/platform/linux/threads/ThreadImplLinux.cpp b/xbmc/platform/linux/threads/ThreadImplLinux.cpp
+index f4810cfe5c..c0654dff30 100644
+--- a/xbmc/platform/linux/threads/ThreadImplLinux.cpp
++++ b/xbmc/platform/linux/threads/ThreadImplLinux.cpp
+@@ -28,11 +28,11 @@ namespace
+ {
+ 
+ constexpr auto nativeThreadPriorityMap = make_map<ThreadPriority, int>({
+-    {ThreadPriority::LOWEST, -1},
+-    {ThreadPriority::BELOW_NORMAL, -1},
+-    {ThreadPriority::NORMAL, 0},
+-    {ThreadPriority::ABOVE_NORMAL, 1},
+-    {ThreadPriority::HIGHEST, 1},
++    {ThreadPriority::LOWEST, -3},
++    {ThreadPriority::BELOW_NORMAL, -3},
++    {ThreadPriority::NORMAL, -2},
++    {ThreadPriority::ABOVE_NORMAL, -1},
++    {ThreadPriority::HIGHEST, -1},
+ });
+ 
+ static_assert(static_cast<size_t>(ThreadPriority::PRIORITY_COUNT) == nativeThreadPriorityMap.size(),
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
 index 3c30817331..58eec643ec 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
@@ -12526,6 +12690,59 @@ index bcdcd03dbf..7d11584baf 100644
  #endif
  
  /* Platform identification */
+diff --git a/xbmc/utils/TimeUtils.cpp b/xbmc/utils/TimeUtils.cpp
+index 95c5069c11..5e02fb376c 100644
+--- a/xbmc/utils/TimeUtils.cpp
++++ b/xbmc/utils/TimeUtils.cpp
+@@ -58,20 +58,36 @@ int64_t CurrentHostFrequency(void)
+ 
+ unsigned int CTimeUtils::frameTime = 0;
+ 
+-void CTimeUtils::UpdateFrameTime(bool flip)
++static inline uint64_t GetTimeInMs()
+ {
+-  auto now = std::chrono::steady_clock::now();
+-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
+-
+-  unsigned int currentTime = duration.count();
+-  unsigned int last = frameTime;
+-  while (frameTime < currentTime)
+-  {
+-    frameTime += (unsigned int)(1000 / CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS());
+-    // observe wrap around
+-    if (frameTime < last)
+-      break;
++  timeval now_time;
++
++  ::gettimeofday(&now_time, nullptr);
++
++  return now_time.tv_sec * 1000ll + now_time.tv_usec / 1000ll;
++}
++
++static unsigned int GetUptimeInMs()
++{
++  static bool start_time_set = false;
++  static uint64_t start_time = 0;
++
++  uint64_t now_ms = GetTimeInMs();
++
++  if (!start_time_set) {
++	start_time = now_ms;
++	start_time_set = true;
+   }
++
++  return (unsigned int) (now_ms - start_time);
++}
++
++void CTimeUtils::UpdateFrameTime(bool flip)
++{
++  unsigned int currentTime = GetUptimeInMs();
++  unsigned int framedur = (unsigned int)(1000.0 / CServiceBroker::GetWinSystem()->GetFPS());
++
++  frameTime += framedur * ((currentTime - frameTime + framedur - 1) / framedur);
+ }
+ 
+ unsigned int CTimeUtils::GetFrameTime()
 diff --git a/xbmc/video/PlayerController.cpp b/xbmc/video/PlayerController.cpp
 index 036fbaed12..254d572cd5 100644
 --- a/xbmc/video/PlayerController.cpp
@@ -13058,6 +13275,21 @@ index cef6940576..fe7c481202 100644
    if (dwFlags & D3DPRESENTFLAG_MODE3DSBS)
      newRes.strMode += "sbs";
    newRes.strOutput = output;
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index cac94b06d6..55e21bdac1 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -181,6 +181,10 @@ public:
+ 
+   virtual std::vector<std::string> GetConnectedOutputs() { return {}; }
+ 
++  // Other than GetFPS from GraphicContext, it does not block access by using a mutex. The refresh rate
++  // is only set during initialization (CreateNewWindow) when GetFPS() isn't called from other threads.
++  virtual inline float GetFPS() const { return m_fRefreshRate; }
++
+ protected:
+   void UpdateDesktopResolution(RESOLUTION_INFO& newRes, const std::string &output, int width, int height, float refreshRate, uint32_t dwFlags);
+   virtual std::unique_ptr<KODI::WINDOWING::IOSScreenSaver> GetOSScreenSaverImpl() { return nullptr; }
 diff --git a/xbmc/windowing/amlogic/CMakeLists.txt b/xbmc/windowing/amlogic/CMakeLists.txt
 new file mode 100644
 index 0000000000..5df7176c70
@@ -13212,10 +13444,10 @@ index 0000000000..961c520493
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..5620d0e2df
+index 0000000000..233d8e4863
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,544 @@
+@@ -0,0 +1,535 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13295,9 +13527,8 @@ index 0000000000..5620d0e2df
 +  aml_disable_freeScale();
 +
 +  /* Take in to account custom OSMC parameters */
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB))
-+  {
-+    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing RGB");
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
++    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- forcing RGB");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
 +  }
 +
@@ -13307,45 +13538,42 @@ index 0000000000..5620d0e2df
 +    range_control &= 1;
 +  else
 +    range_control |= 2;
-+  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting quantization range to {}",
++  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting quantization range to {}",
 +      range_control & 2 ? "full" : "limited");
 +  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
 +
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
-+  {
-+    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- forcing HPD to be locked");
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
++    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- forcing HPD to be locked");
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
 +  }
 +
 +  std::string attr = "";
 +  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
 +
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422))
-+  {
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
 +    if (attr.find("444") != std::string::npos ||
-+      attr.find("422") != std::string::npos ||
-+      attr.find("420") != std::string::npos)
++        attr.find("422") != std::string::npos ||
++        attr.find("420") != std::string::npos)
 +      attr.replace(attr.find("4"),3,"422").append("now");
 +    else
 +      attr.append("422now");
 +  }
-+  else 
-+  {
-+    if (attr.find("422") != std::string::npos)
++  else {
++    if (attr.find("422") != std::string::npos) {
 +      attr.erase(attr.find("4"),3);
++    }
 +    attr.append("now");
 +  }
-+  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting 422 output, attr = {}", attr);
++  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting 422 output, attr = {}", attr);
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
 +
 +  int maxlum = 100;
 +  maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
-+  CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::Initialize -- setting max lum to {}", maxlum);
++  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting max lum to {}", maxlum);
 +  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
 +
 +  int hdr_caps = 0;
-+  hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
-+      CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
++  hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
 +
 +  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
@@ -13367,77 +13595,74 @@ index 0000000000..5620d0e2df
 +  }
 +}
 +
-+void hwMon(CWinSystemAmlogic *instance) {
++static void hwMon(CWinSystemAmlogic *instance)
++{
++	struct udev *udev;
++	struct udev_device *dev;
 +
-+        struct udev *udev;
-+        struct udev_device *dev;
++	struct udev_monitor *mon;
++	int fd;
 +
-+        struct udev_monitor *mon;
-+        int fd;
++	/* Create the udev object */
++	udev = udev_new();
++	if (!udev) {
++		return;
++	}
 +
-+        /* Create the udev object */
-+        udev = udev_new();
-+        if (!udev) {
-+                return;
-+        }
-+
-+        mon = udev_monitor_new_from_netlink(udev, "udev");
-+        udev_monitor_filter_add_match_subsystem_devtype(mon, "extcon", NULL);
++	mon = udev_monitor_new_from_netlink(udev, "udev");
++	udev_monitor_filter_add_match_subsystem_devtype(mon, "extcon", NULL);
 +	udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
 +
-+        udev_monitor_enable_receiving(mon);
-+        fd = udev_monitor_get_fd(mon);
++	udev_monitor_enable_receiving(mon);
++	fd = udev_monitor_get_fd(mon);
 +
-+        /* Poll for events */
++	/* Poll for events */
 +
-+        while (1 && instance->m_monitorEvents) {
++	while (1 && instance->m_monitorEvents) {
++		fd_set fds;
++		struct timeval tv;
++		int ret;
 +
-+                fd_set fds;
-+                struct timeval tv;
-+                int ret;
++		FD_ZERO(&fds);
++		FD_SET(fd, &fds);
++		tv.tv_sec = 0;
++		tv.tv_usec = 0;
 +
-+                FD_ZERO(&fds);
-+                FD_SET(fd, &fds);
-+                tv.tv_sec = 0;
-+                tv.tv_usec = 0;
++		ret = select(fd + 1, &fds, NULL, NULL, &tv);
 +
-+                ret = select(fd+1, &fds, NULL, NULL, &tv);
++		/* Check if FD has received data */
 +
-+                /* Check if FD has received data */
-+
-+                if (ret > 0 && FD_ISSET(fd, &fds)) {
-+
-+                        dev = udev_monitor_receive_device(mon);
-+                        if (dev) {
-+                                CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic: Detected HDMI switch");
-+                                int state;
-+                                SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
++		if (ret > 0 && FD_ISSET(fd, &fds)) {
++			dev = udev_monitor_receive_device(mon);
++			if (dev) {
++				CLog::Log(LOGDEBUG, "CWinSystemAmlogic: Detected HDMI switch");
++				int state;
++				SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
 +				std::string newEdid;
 +				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
 +
-+                                if (state && newEdid != instance->m_lastEdid) {
-+                                    CServiceBroker::GetAppMessenger()->PostMsg(TMSG_AML_RESIZE);
-+				    instance->m_lastEdid = newEdid;
++				if (state && newEdid != instance->m_lastEdid) {
++					CServiceBroker::GetAppMessenger()->PostMsg(TMSG_AML_RESIZE);
++					instance->m_lastEdid = newEdid;
 +				}
-+                                udev_device_unref(dev);
-+                        }
-+                        else {
-+                                CLog::Log(LOGERROR, "CEGLNativeTypeAmlogic: can't get device from receive_device");
-+                        }
-+                }
-+                usleep(250*1000);
-+        }
++				udev_device_unref(dev);
++			} else {
++				CLog::Log(LOGERROR, "CWinSystemAmlogic: can't get device from receive_device");
++			}
++		}
++		usleep(250 * 1000);
++	}
 +}
 +
 +void CWinSystemAmlogic::StartMonitorHWEvent() {
-+    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
++    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
 +    m_monitorEvents = true;
 +    m_monitorThread = std::thread(hwMon, this);
 +    return;
 +}
 +
 +void CWinSystemAmlogic::StopMonitorHWEvent() {
-+    CLog::Log(LOGDEBUG, "CEGLNativeTypeAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
 +    m_monitorEvents = false;
 +    m_monitorThread.join();
 +    return;
@@ -13445,13 +13670,11 @@ index 0000000000..5620d0e2df
 +
 +bool CWinSystemAmlogic::InitWindowSystem()
 +{
-+
-+const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
 +
 +  if (!aml_support_av1()) {
 +	auto setting = settings->GetSetting(CSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1);
-+	if (setting)
-+	{
++	if (setting) {
 +		setting->SetVisible(false);
 +		settings->SetBool(CSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1, false);
 +	}
@@ -13839,10 +14062,10 @@ index 0000000000..528e82f911
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
 new file mode 100644
-index 0000000000..25926a3e6e
+index 0000000000..64d7cbc142
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
-@@ -0,0 +1,177 @@
+@@ -0,0 +1,208 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13851,12 +14074,19 @@ index 0000000000..25926a3e6e
 + *  See LICENSES/README.md for more information.
 + */
 +
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <linux/fb.h>
++
 +#include "VideoSyncAML.h"
 +#include "WinSystemAmlogicGLESContext.h"
 +#include "utils/log.h"
 +#include "threads/SingleLock.h"
 +#include "windowing/WindowSystemFactory.h"
 +#include "windowing/GraphicContext.h"
++
++#include "OSMCSecureOS.h"
 +
 +using namespace KODI;
 +using namespace KODI::WINDOWING::AML;
@@ -13873,6 +14103,17 @@ index 0000000000..25926a3e6e
 +
 +bool CWinSystemAmlogicGLESContext::InitWindowSystem()
 +{
++  m_is_vero_4k = OSMCSecureOS::getInstance().isVero4k();
++  if (m_is_vero_4k) {
++    std::string fb = "/dev/" + m_framebuffer_name;
++
++    m_fb_fd = open(fb.c_str(), O_RDWR);
++    if (m_fb_fd < 0) {
++      CLog::Log(LOGERROR, "CWinSystemAmlogicGLESContext: unable to open frame buffer {}", fb);
++      return false;
++    }
++  }
++
 +  if (!CWinSystemAmlogic::InitWindowSystem())
 +  {
 +    return false;
@@ -13899,6 +14140,15 @@ index 0000000000..25926a3e6e
 +  if (!m_pGLContext.CreateContext(contextAttribs))
 +  {
 +    return false;
++  }
++
++  return true;
++}
++
++bool CWinSystemAmlogicGLESContext::DestroyWindowSystem()
++{
++  if (m_is_vero_4k && m_fb_fd >= 0) {
++    close(m_fb_fd);
 +  }
 +
 +  return true;
@@ -13977,8 +14227,12 @@ index 0000000000..25926a3e6e
 +    for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
 +      (*i)->OnResetDisplay();
 +  }
-+  if (!rendered)
-+    return;
++
++  if (m_is_vero_4k) {
++    // libMali on 4k/4k+ doesn't honor vsync
++    unsigned int zero=0;
++    (void) ioctl(m_fb_fd, FBIO_WAITFORVSYNC, &zero);
++  }
 +
 +  // Ignore errors - eglSwapBuffers() sometimes fails during modeswaps on AML,
 +  // there is probably nothing we can do about it
@@ -14022,10 +14276,10 @@ index 0000000000..25926a3e6e
 +}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
 new file mode 100644
-index 0000000000..0c24698b79
+index 0000000000..eb1b0a451d
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,65 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14051,7 +14305,7 @@ index 0000000000..0c24698b79
 +class CWinSystemAmlogicGLESContext : public CWinSystemAmlogic, public CRenderSystemGLES
 +{
 +public:
-+  CWinSystemAmlogicGLESContext() = default;
++  CWinSystemAmlogicGLESContext() : m_is_vero_4k(false), m_fb_fd(-1) {}
 +  virtual ~CWinSystemAmlogicGLESContext() = default;
 +
 +  static void Register();
@@ -14060,6 +14314,7 @@ index 0000000000..0c24698b79
 +  // Implementation of CWinSystemBase via CWinSystemAmlogic
 +  CRenderSystemBase *GetRenderSystem() override { return this; }
 +  bool InitWindowSystem() override;
++  bool DestroyWindowSystem() override;
 +  bool CreateNewWindow(const std::string& name,
 +                       bool fullScreen,
 +                       RESOLUTION_INFO& res) override;
@@ -14081,6 +14336,9 @@ index 0000000000..0c24698b79
 +
 +private:
 +  CEGLContextUtils m_pGLContext;
++
++  bool m_is_vero_4k;
++  int m_fb_fd;
 +
 +};
 +
