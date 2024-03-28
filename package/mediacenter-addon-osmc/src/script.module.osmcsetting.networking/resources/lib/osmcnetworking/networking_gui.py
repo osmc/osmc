@@ -1723,7 +1723,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
             log('Enabling tethering: %s' % technology)
 
-            if technology is 'wifi':
+            if technology == 'wifi':
                 log('Tethering is using SSID: %s' % ssid)
 
             if osmc_network.tethering_enable(technology, ssid, passphrase):
