@@ -3000,7 +3000,7 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..a1f2c7a18f
+index 0000000000..f3c5e7d225
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 @@ -0,0 +1,1309 @@
@@ -3230,7 +3230,7 @@ index 0000000000..a1f2c7a18f
 +	// incorrectly reported as 50 fps (yes, video_rate == 1920)
 +	if (hints.width == 1920 && video_rate == 1920) {
 +		CLog::Log(LOGDEBUG, "AMLInsecureVideoCodec::getVideoRate: video_rate exception");
-+		video_rate = 0.5 + (float) UNIT_FREQ * 1001 / 25000;
++		video_rate = 0.5 + (float) UNIT_FREQ * 1000 / 25000;
 +	}
 +
 +	return video_rate;
@@ -6351,10 +6351,10 @@ index 0000000000..eaece56f82
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
 new file mode 100644
-index 0000000000..9e4ebe0b71
+index 0000000000..9a8192756a
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,144 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6477,10 +6477,8 @@ index 0000000000..9e4ebe0b71
 +		CLog::Log(LOGDEBUG, "MPEG12Codec::prepareFrame - interlaced: {}, hints.fps: {}/{}, mpeg2_seq: {}/{}",
 +				  hints.interlaced, hints.fpsrate, hints.fpsscale, m_mpeg2_sequence->fps_rate, m_mpeg2_sequence->fps_scale);
 +
-+		if (!hints.interlaced) {
-+			hints.fpsrate = m_mpeg2_sequence->fps_rate;
-+			hints.fpsscale = m_mpeg2_sequence->fps_scale;
-+		}
++		hints.fpsrate = m_mpeg2_sequence->fps_rate;
++		hints.fpsscale = m_mpeg2_sequence->fps_scale;
 +
 +		m_framerate = static_cast<float>(m_mpeg2_sequence->fps_rate) / m_mpeg2_sequence->fps_scale;
 +
@@ -7634,7 +7632,7 @@ index 2bdc3ea5a9..e33e03502a 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 739bf51922..2c656acf5e 100644
+index 739bf51922..e23c0993b6 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -18,6 +18,8 @@
@@ -7824,7 +7822,7 @@ index 739bf51922..2c656acf5e 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1657,12 +1701,29 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1657,12 +1701,24 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
@@ -7835,8 +7833,8 @@ index 739bf51922..2c656acf5e 100644
 -          st->iFpsScale = 0;
 +          st->iFpsRate = pStream->avg_frame_rate.num;
 +          st->iFpsScale = pStream->avg_frame_rate.den;
-+        }
-+
+         }
+ 
 +        st->interlaced = pStream->codecpar->field_order != AV_FIELD_PROGRESSIVE && pStream->codecpar->field_order != AV_FIELD_UNKNOWN;
 +
 +        float fps = 0.;
@@ -7844,20 +7842,15 @@ index 739bf51922..2c656acf5e 100644
 +        if (st->iFpsScale)
 +          fps = static_cast<float>(st->iFpsRate) / static_cast<float>(st->iFpsScale);
 +
-+        if (st->interlaced && fps > 24.0 && fps < 30.0)
-+        {
-+          // either PAL or NTSC interlaced
-+          st->iFpsRate *= 2;
-         }
- 
++        int tbc = st->interlaced && fps > 24.0 && fps < 30.0 ? st->iFpsRate * 2 : st->iFpsRate;
 +        CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::AddStream video - interlaced: {}, fps: {:f}, tba: {}/{}, tbr: {}/{}, tbc: {}/{}",
 +				  st->interlaced, fps, pStream->avg_frame_rate.num, pStream->avg_frame_rate.den,
-+				  r_frame_rate.num, r_frame_rate.den, st->iFpsRate, st->iFpsScale);
++				  r_frame_rate.num, r_frame_rate.den, tbc, st->iFpsScale);
 +
          if (pStream->codec_info_nb_frames > 0 &&
              pStream->codec_info_nb_frames <= 2 &&
              m_pInput->IsStreamType(DVDSTREAM_TYPE_DVD))
-@@ -1679,7 +1740,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1679,7 +1735,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          if (pStream->codecpar->height)
            st->fAspect *= (double)pStream->codecpar->width / pStream->codecpar->height;
          st->iOrientation = 0;
@@ -7875,7 +7868,7 @@ index 739bf51922..2c656acf5e 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1740,7 +1810,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1740,7 +1805,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          }
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
@@ -7886,7 +7879,7 @@ index 739bf51922..2c656acf5e 100644
 +            int mvcIndex;
 +            AVStream *mvcStream = nullptr;
 +            const std::shared_ptr<CDVDInputStream::IExtentionStream> pExt = std::dynamic_pointer_cast<CDVDInputStream::IExtentionStream>(m_pInput);
-+
+ 
 +            if (pExt && pExt->HasExtention())
 +            {
 +              delete m_pSSIF;
@@ -7919,7 +7912,7 @@ index 739bf51922..2c656acf5e 100644
 +              if (pStream->codecpar->extradata_size > 0 && mvcStream->codecpar->extradata_size > 0)
 +              {
 +                uint8_t* extr = pStream->codecpar->extradata;
- 
++
 +                pStream->codecpar->extradata = (uint8_t*)av_mallocz(pStream->codecpar->extradata_size + mvcStream->codecpar->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
 +                memcpy(pStream->codecpar->extradata, extr, pStream->codecpar->extradata_size);
 +                memcpy(pStream->codecpar->extradata + pStream->codecpar->extradata_size, mvcStream->codecpar->extradata, mvcStream->codecpar->extradata_size);
@@ -7939,7 +7932,7 @@ index 739bf51922..2c656acf5e 100644
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1766,6 +1892,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1766,6 +1887,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7956,7 +7949,7 @@ index 739bf51922..2c656acf5e 100644
            break;
          }
        }
-@@ -2081,7 +2217,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -2081,7 +2212,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -7978,7 +7971,7 @@ index 739bf51922..2c656acf5e 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2112,6 +2261,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+@@ -2112,6 +2256,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
  
  bool CDVDDemuxFFmpeg::IsProgramChange()
  {
