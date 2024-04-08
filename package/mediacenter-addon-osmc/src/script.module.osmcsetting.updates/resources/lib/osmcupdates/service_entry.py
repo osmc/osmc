@@ -588,6 +588,9 @@ class Main(object):
             '''
             Construct a temporary dictionary for comparison with the existing settings dict
             '''
+            del self._addon
+            self._addon = None
+
             temp_settings_dict = {
                 'on_upd_detected': self.addon.getSettingInt('on_upd_detected'),
                 'check_freq': self.addon.getSettingInt('check_freq'),
