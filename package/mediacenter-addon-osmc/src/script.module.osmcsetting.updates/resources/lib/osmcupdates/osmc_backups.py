@@ -13,6 +13,7 @@ import json
 import math
 import os
 import re
+import shutil
 import subprocess
 import tarfile
 import traceback
@@ -34,6 +35,10 @@ TIME_PATTERN = '%Y_%m_%d_%H_%M_%S'
 READ_PATTERN = '%Y-%m-%d %H:%M:%S'
 APPENDAGE = '[0-9|_]*'
 FILE_PATTERN = 'OSMCBACKUP_%s.tar.gz'
+
+LOCAL_BACKUP_TEMP = '/tmp/osmc_backup/'
+LOCAL_RESTORE_TEMP = '/tmp/osmc_restore/'
+
 LOCATIONS = {
     'backup_addons': '{kodi_folder}addons/',
     'backup_addon_data': '{kodi_folder}userdata/addon_data/',
@@ -149,10 +154,52 @@ class OSMCBackup(object):
     def lang(value):
         return LANG(value)
 
+    @staticmethod
+    def prepare_backup_temp():
+        try:
+            shutil.rmtree(LOCAL_BACKUP_TEMP)
+        except:
+            pass
+
+        try:
+            os.mkdir(LOCAL_BACKUP_TEMP)
+        except:
+            log(traceback.format_exc())
+            pass
+
+        if not os.path.exists(LOCAL_BACKUP_TEMP):
+            try:
+                subprocess.Popen(['sudo', 'mkdir', LOCAL_BACKUP_TEMP])
+            except:
+                log(traceback.format_exc())
+                pass
+
+    @staticmethod
+    def prepare_restore_temp():
+        try:
+            shutil.rmtree(LOCAL_RESTORE_TEMP)
+        except:
+            pass
+
+        try:
+            os.mkdir(LOCAL_RESTORE_TEMP)
+        except:
+            log(traceback.format_exc())
+            pass
+
+        if not os.path.exists(LOCAL_RESTORE_TEMP):
+            try:
+                subprocess.Popen(['sudo', 'mkdir', LOCAL_RESTORE_TEMP])
+            except:
+                log(traceback.format_exc())
+                pass
+
     def start_backup(self):
         """
             This is the main method that walks through the backup process
         """
+        self.prepare_backup_temp()
+
         if self.check_backup_location():
             self.create_tarball()
 
@@ -250,7 +297,7 @@ class OSMCBackup(object):
 
         # check locally
         try:
-            st = os.statvfs(xbmcvfs.translatePath('special://temp'))
+            st = os.statvfs(LOCAL_BACKUP_TEMP)
 
             requirement = self.estimate_disk_requirement()
             if st.f_frsize:
@@ -367,21 +414,10 @@ class OSMCBackup(object):
             log('Failed to move %s file to %s')
             raise
 
-    @staticmethod
-    def clean_up():
-        # remove old tarballs to avoid having old temp backup files
-        temp_tarballs = os.path.join(xbmcvfs.translatePath('special://temp'), FILE_PATTERN % '*')
-        subprocess.Popen(['sudo', 'rm', temp_tarballs])
-
     def create_tarball(self):
         """
             takes the file list and creates a tarball in the backup location
         """
-
-        try:
-            self.clean_up()
-        except:
-            pass
 
         location = self.settings_dict['backup_location']
         # get list of tarballs in backup location
@@ -398,7 +434,7 @@ class OSMCBackup(object):
         # get the tag for the backup file
         tag = self.generate_tarball_name()
         # generate name for temporary tarball
-        local_tarball_name = os.path.join(xbmcvfs.translatePath('special://temp'), FILE_PATTERN % tag)
+        local_tarball_name = os.path.join(LOCAL_BACKUP_TEMP, FILE_PATTERN % tag)
         # generate name for remote tarball
         remote_tarball_name = os.path.join(location, FILE_PATTERN % tag)
         # get the size of all the files that are being backed up
@@ -547,6 +583,8 @@ class OSMCBackup(object):
             (including browse to a different location, allows the user to choose what to
             restore, including an ALL option.
         """
+        self.prepare_restore_temp()
+
         location = self.settings_dict['backup_location']
 
         self.success = 'Full'
@@ -590,12 +628,12 @@ class OSMCBackup(object):
 
                 # this requires copying the tar_file from its stored location, to kodi/temp
                 # xbmcvfs cannot read into tar files without copying the whole thing to memory
-                temp_copy = os.path.join(xbmcvfs.translatePath('special://temp'), basename)
+                temp_copy = os.path.join(LOCAL_RESTORE_TEMP, basename)
 
                 result = xbmcvfs.copy(remote_file, temp_copy)
                 if not result:
                     # copy of file failed
-                    log('Failed to copy file to special://temp location')
+                    log('Failed to copy file to /tmp location')
 
                     _ = DIALOG.ok(self.lang(32145), self.lang(32156))
                     back_to_select = False
