@@ -152,7 +152,7 @@ def extract_network_properties(dbus_properties):
 
 
 def apply_network_changes(settings_dict, internet_protocol):
-    if settings_dict[internet_protocol]['Method'] in ['manual', 'dhcp']:  # non NFS setup
+    if settings_dict[internet_protocol]['Method'] in ['manual', 'dhcp', 'auto']:  # non NFS setup
         path = settings_dict['path']
         service = connman.get_service_interface(path)
 
@@ -168,7 +168,7 @@ def apply_network_changes(settings_dict, internet_protocol):
 
         service.SetProperty('IPv4.Configuration', ipv4_configuration)
         time.sleep(2)
-        if settings_dict[internet_protocol]['Method'] == 'dhcp':
+        if settings_dict[internet_protocol]['Method'] in ['dhcp', 'auto']:
             dns = ['', '']
 
         else:
