@@ -681,7 +681,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         manual_dhcp_button = self.getControl(button_id)
 
-        if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
+        if self.current_network_config[self.internet_protocol]['Method'] in ['dhcp', 'auto']:
             # 'Configure Network Manually'
             manual_dhcp_button.setLabel(self.lang(32006))
             # if configuration is by DHCP disable controls
@@ -1003,7 +1003,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
     def handle_wired_selection(self, control_id):
         if control_id == WIRED_DHCP_MANUAL_BUTTON:
-            if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
+            if self.current_network_config[self.internet_protocol]['Method'] in ['dhcp', 'auto']:
                 self.current_network_config[self.internet_protocol]['Method'] = 'manual'
 
             elif self.current_network_config[self.internet_protocol]['Method'] == 'nfs_dhcp':
@@ -1018,7 +1018,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             self.update_manual_dhcp_button(WIRED_DHCP_MANUAL_BUTTON,
                                            WIRED_IP_VALUES, WIRED_IP_LABELS)
 
-            if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
+            if self.current_network_config[self.internet_protocol]['Method'] in ['dhcp', 'auto']:
                 self.hide_controls(WIRED_IP_VALUES)
 
         if control_id == WIRED_RESET_BUTTON:
@@ -1207,7 +1207,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             self.handle_selected_wireless_network()
 
         elif control_id == WIRELESS_DHCP_MANUAL_BUTTON:
-            if self.current_network_config[self.internet_protocol]['Method'] == 'dhcp':
+            if self.current_network_config[self.internet_protocol]['Method'] in ['dhcp', 'auto']:
 
                 self.current_network_config[self.internet_protocol]['Method'] = 'manual'
 
@@ -1220,7 +1220,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                                            WIRELESS_IP_VALUES,
                                            WIRELESS_IP_LABELS)
 
-            if 'dhcp' in self.current_network_config[self.internet_protocol]['Method']:
+            if self.current_network_config[self.internet_protocol]['Method'] in ['dhcp', 'auto']:
                 self.hide_controls(WIRELESS_IP_VALUES)
 
         elif control_id == WIRELESS_RESET_BUTTON:
