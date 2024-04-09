@@ -204,6 +204,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
         self.internet_connected = False
         self.networking_panel_revealed = False
 
+        self.networking_instance = networking_instance
         # start a new thread that begins checking for an internet connection
         self.start_checking_for_internet(networking_instance)
 
@@ -496,6 +497,9 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
     def still_checking_for_network(self):
         """ Checks to see if the internet checker has finished, and if not, shows a progress bar until complete or exit.
             The internet checker will toggle the internet_connected bool if a connection is made."""
+
+        if not self.internet_checker:
+            self.start_checking_for_internet(self.networking_instance)
 
         if self.internet_checker.ftr_running is True:
             # only display Please Wait Progress Bar if the ftr is still running
@@ -851,7 +855,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
 
         log('Changing from %s to %s' % (current_panel, next_panel))
 
-        # special workaround to only show the networking panel if we havent been able to
+        # special workaround to only show the networking panel if we haven't been able to
         # connect to the internet
         if next_panel == 'networking':
             next_panel = self.networking_special_handling(next_panel)
