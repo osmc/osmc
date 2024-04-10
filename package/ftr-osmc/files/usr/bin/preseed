@@ -1,4 +1,4 @@
-#!/usr/bin/env python-3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
     /usr/bin/preseed
@@ -199,7 +199,11 @@ def parse_preseed(contents):
             continue
 
         parameters = line.split('/', maxsplit=1)[1]
-        setting_name, _, setting_value = parameters.split(' ', maxsplit=2)
+        try:
+            setting_name, _, setting_value = parameters.split(' ', maxsplit=2)
+        except ValueError:
+            setting_name, _ = parameters.split(' ', maxsplit=1)
+            setting_value = ''
 
         value = setting_value
 
@@ -209,7 +213,7 @@ def parse_preseed(contents):
 
         log_value = value
         log_formatting_func = transform_map.get(setting_name, {}).get('log_format')
-        if log_formatting_func:
+        if log_formatting_func and setting_value:
             log_value = log_formatting_func(setting_value)
 
         payload[setting_name] = value
@@ -217,7 +221,7 @@ def parse_preseed(contents):
         syslog.syslog('Preseed %s has value of %s' % (setting_name, log_value))
 
     log_payload = payload.copy()
-    if 'wlan_key' in log_payload:
+    if 'wlan_key' in log_payload and log_payload['wlan_key']:
         log_payload['wlan_key'] = privacy_mask(log_payload['wlan_key'])
 
     syslog.syslog('Parsing completed.\n%s' % str(log_payload))
