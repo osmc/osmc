@@ -191,7 +191,8 @@ class HotFix(object):
                             break
                     continue
 
-            instruction.append(line.replace('INSTRUCTION:', '').strip())
+            if line:
+                instruction.append(line.replace('INSTRUCTION:', '').strip())
 
         log(label='Description', message=description)
         log(label='Instruction', message=instruction)
