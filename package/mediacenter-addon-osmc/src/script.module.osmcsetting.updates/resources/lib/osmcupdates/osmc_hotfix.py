@@ -9,6 +9,7 @@
 """
 
 import os
+import re
 import shlex
 import subprocess
 import traceback
@@ -39,9 +40,15 @@ class HotFix(object):
 
         hf_key = self.user_enters_key()
         # hf_cypher = self.convert_key_to_cypher(hf_key)
-        hf_raw_text = self.retrieve_hotfix(hf_key)
+
+        hf_from_mirror = True
+        hf_raw_text = self.retrieve_mirror_hotfix(hf_key)
+        if not hf_raw_text:
+            hf_from_mirror = False
+            hf_raw_text = self.retrieve_paste_hotfix(hf_key)
+
         hf_parsed = self.parse_hotfix(hf_raw_text)
-        user_confirmation = self.confirm_instruction()
+        user_confirmation = self.confirm_instruction(mirror=hf_from_mirror)
 
         self.display_description(hf_parsed['description'])
         self.display_instruction(hf_parsed['instruction'])
@@ -87,7 +94,35 @@ class HotFix(object):
         return hf_key
 
     @staticmethod
-    def retrieve_hotfix(hf_cypher):
+    def retrieve_mirror_hotfix(hf_cypher):
+        """
+            Takes a five-digit hotfix key and retrieve the hotfix from https://download.osmc.tv/hotfixes/.
+            Returns the raw contents at that location as a string.
+        """
+
+        url = 'https://download.osmc.tv/hotfixes/'
+        log(label='Retrieving hotfixes from', message=url)
+
+        raw_result = requests.get(url)
+        raw_text = raw_result.text
+
+        result = re.findall(r'<img.+?>\s*<a href.+?>(.+?)</a>', raw_text)
+        hotfixes = []
+        for filename in result:
+            if filename not in ['Name', 'Parent Directory']:
+                hotfixes.append(filename)
+
+        raw_text = ''
+        if hf_cypher in hotfixes:
+            raw_result = requests.get(url + hf_cypher)
+            raw_text = raw_result.text
+
+        log(label='Mirror HotFix Result', message=raw_text)
+
+        return raw_text
+
+    @staticmethod
+    def retrieve_paste_hotfix(hf_cypher):
         """
             Takes a five-digit hotfix key and retrieve the hotfix from paste.osmc.io.
             Returns the raw contents at that location as a string.
@@ -98,7 +133,7 @@ class HotFix(object):
         raw_result = requests.get(url)
         raw_text = raw_result.text
 
-        log(label='HotFix Result', message=raw_text)
+        log(label='Pastebin HotFix Result', message=raw_text)
         return raw_text
 
     @staticmethod
@@ -182,15 +217,16 @@ class HotFix(object):
             *** YET TO BE IMPLEMENTED
         """
 
-    def confirm_instruction(self):
+    def confirm_instruction(self, mirror=False):
         """
             Asks the user to confirm that they wish to apply the instruction.
             Returns TRUE, only if user clicks Yes.
         """
-        user_confirmation = DIALOG.yesno(self.lang(32116),
-                                         '[CR]'.join([self.lang(32117),
-                                                      self.lang(32118),
-                                                      self.lang(32119)]))
+        strings = [self.lang(32117), self.lang(32118), self.lang(32119)]
+        if mirror:
+            strings = [self.lang(32117), self.lang(32119)]
+
+        user_confirmation = DIALOG.yesno(self.lang(32116), '[CR]'.join(strings))
 
         return user_confirmation
 
