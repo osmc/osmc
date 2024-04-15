@@ -671,40 +671,6 @@ MASTER_SETTINGS = {
         "already_set": False,
         "setting_stub": "config_hdmi_boost=%s",
     },
-    "decode_MPG2": {
-        "default": {
-            "function": None,
-            "value": ""
-        },
-        "config_get_patterns": [
-            {
-                "identify": r"\s*decode_MPG2\s*=\s*",
-                "extract": r"\s*decode_MPG2\s*=\s*(\w+)"
-            }
-        ],
-        "config_set": generic_passthrough_config_set,
-        "config_validation": blank_check_validation,
-        "kodi_set": generic_passthrough_kodi_set,
-        "already_set": False,
-        "setting_stub": "decode_MPG2=%s",
-    },
-    "decode_WVC1": {
-        "default": {
-            "function": None,
-            "value": ""
-        },
-        "config_get_patterns": [
-            {
-                "identify": r"\s*decode_WVC1\s*=\s*",
-                "extract": r"\s*decode_WVC1\s*=\s*(\w+)"
-            }
-        ],
-        "config_set": generic_passthrough_config_set,
-        "config_validation": blank_check_validation,
-        "kodi_set": generic_passthrough_kodi_set,
-        "already_set": False,
-        "setting_stub": "decode_WVC1=%s",
-    },
     "display_rotate": {
         "default": {
             "function": None,

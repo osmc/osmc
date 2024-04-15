@@ -110,15 +110,9 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
         return latest_settings
 
     def populate_misc_info(self):
-        # grab the Pi serial number and check to see whether the codec licences are enabled
-        mpg = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "MPG2"])
-        wvc = subprocess.check_output(["/opt/vc/bin/vcgencmd", "codec_enabled", "WVC1"])
+        # grab the Pi serial number
         serial_raw = subprocess.check_output(["cat", "/proc/cpuinfo"])
 
-        if isinstance(mpg, (bytes, bytearray)):
-            mpg = mpg.decode('utf-8', 'ignore')
-        if isinstance(wvc, (bytes, bytearray)):
-            wvc = wvc.decode('utf-8', 'ignore')
         if isinstance(serial_raw, (bytes, bytearray)):
             serial_raw = serial_raw.decode('utf-8', 'ignore')
 
@@ -127,7 +121,6 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
             .replace(':', '').replace(' ', '').replace('\t', '')
 
         # load the values into the settings gui
-        self.me.setSetting('codec_check', mpg.replace('\n', '') + ', ' + wvc.replace('\n', ''))
         self.me.setSetting('serial', serial)
 
     def clean_user_config(self):
