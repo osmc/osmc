@@ -503,7 +503,10 @@ class OSMCBackup(object):
 
                     try:
                         new_path = os.path.relpath(name, new_root)
-                        tar.add(name, arcname=new_path)
+                        if os.path.isdir(name) or os.path.isfile(name):
+                            tar.add(name, arcname=new_path)
+                        else:
+                            log('Skipping %s, does not exist' % name)
                     except:
                         log('%s failed to backup to tarball' % name)
                         continue
@@ -523,11 +526,32 @@ class OSMCBackup(object):
             log('remote tarball name: %s' % remote_tarball_name)
             log('remote tarball exists: %s' % os.path.isfile(remote_tarball_name))
 
-            success = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+            log('Copying {local} to {remote} using shutil.copyfile'
+                .format(local=local_tarball_name, remote=remote_tarball_name))
+            shutil.copyfile(local_tarball_name, remote_tarball_name)
+            xbmc.sleep(300)
+            success = os.path.isfile(remote_tarball_name)
+
             if not success:
+                log('Failed to copy {local} to {remote} using shutil.copyfile'
+                    .format(local=local_tarball_name, remote=remote_tarball_name))
+                log('Copying {local} to {remote} using xbmcvfs.copy'
+                    .format(local=local_tarball_name, remote=remote_tarball_name))
+                _ = xbmcvfs.copy(local_tarball_name, remote_tarball_name)
+                xbmc.sleep(300)
+                success = os.path.isfile(remote_tarball_name)
+
+            if not success:
+                log('Failed to copy {local} to {remote} using xbmcvfs.copy'
+                    .format(local=local_tarball_name, remote=remote_tarball_name))
+                log('Copying {local} to {remote} using subprocess.Popen'
+                    .format(local=local_tarball_name, remote=remote_tarball_name))
                 subprocess.Popen(['cp', local_tarball_name, remote_tarball_name])
                 xbmc.sleep(300)
                 success = os.path.isfile(remote_tarball_name)
+                if not success:
+                    log('Failed to copy {local} to {remote} using subprocess.Popen'
+                        .format(local=local_tarball_name, remote=remote_tarball_name))
 
             if success:
                 log('Backup file successfully transferred')
