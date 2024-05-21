@@ -1339,7 +1339,7 @@ index 0dbb4b9fe5..a2902fa36c 100644
    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
  
 diff --git a/xbmc/application/ApplicationPowerHandling.cpp b/xbmc/application/ApplicationPowerHandling.cpp
-index ea182d554e..d9ac5021fc 100644
+index ea182d554e..01ba9059ef 100644
 --- a/xbmc/application/ApplicationPowerHandling.cpp
 +++ b/xbmc/application/ApplicationPowerHandling.cpp
 @@ -16,6 +16,7 @@
@@ -1374,7 +1374,7 @@ index ea182d554e..d9ac5021fc 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -228,6 +237,66 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
+@@ -228,6 +237,57 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
      return false;
  }
  
@@ -1402,15 +1402,6 @@ index ea182d554e..d9ac5021fc 100644
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/phy", sysfs_toggle);
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to {}", sysfs_toggle);
 +  SysfsUtils::SetInt("/sys/class/leds/standby/brightness", ! sysfs_toggle);
-+  std::string cpu_governor = "powersave";
-+  if (m_bVeroStandby)
-+        cpu_governor = "ondemand";
-+  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- governor will now be {}", cpu_governor);
-+  for (int i = 0; i < 4; i++) {
-+	std::stringstream ss_govpath;
-+	ss_govpath << "/sys/devices/system/cpu/cpu" << i << "/cpufreq/scaling_governor";
-+	SysfsUtils::SetString(ss_govpath.str(), cpu_governor);
-+  }
 +  std::string hpdlock = "hpd_lock1";
 +  if (m_bVeroStandby && ! CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
 +	hpdlock = "hpd_lock0";
@@ -3000,10 +2991,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..f3c5e7d225
+index 0000000000..bafdeffaae
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1309 @@
+@@ -0,0 +1,1332 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3027,6 +3018,7 @@ index 0000000000..f3c5e7d225
 +#include "utils/SysfsUtils.h"
 +#include "utils/AMLUtils.h"
 +#include "utils/StringUtils.h"
++#include "utils/MathUtils.h"
 +#include "settings/Settings.h"
 +#include "settings/DisplaySettings.h"
 +#include "settings/SettingsComponent.h"
@@ -3065,6 +3057,8 @@ index 0000000000..f3c5e7d225
 +
 +// max level for the decoder input queue
 +static const float maxDecoderInputLevel = 0.7f;
++
++static const int drainRepeatCount = 20;
 +
 +/*************************************************************************/
 +
@@ -3933,6 +3927,7 @@ index 0000000000..f3c5e7d225
 +void AMLInsecureVideoCodec::setDrain(bool drain)
 +{
 +	m_drain = drain;
++	m_drainRepeatCount = m_drain ? drainRepeatCount : 0;
 +}
 +
 +bool AMLInsecureVideoCodec::dequeueBuffer()
@@ -3994,10 +3989,25 @@ index 0000000000..f3c5e7d225
 +		return CDVDVideoCodec::VC_ERROR;
 +	}
 +
++	if (m_drain) {
++		if (dequeueBuffer()) {
++			// we're draining, so just drop what we've got
++			releaseFrame(m_bufferIndex, true);
++		}
++
++		// give decoder some time to settle
++		std::this_thread::sleep_for(5ms);
++
++		// m_drainRepeatCount tells us indirectly how long we want to wait until everything's squeezed
++		// out of the decoder. Since we give the decoder 5 ms per try, m_drainRepeatCount refers
++		// to a time period (m_drainRepeatCount * 5 ms).
++		return m_drainRepeatCount-- > 0 ? CDVDVideoCodec::VC_NONE : CDVDVideoCodec::VC_EOF;
++	}
++
 +	float level = m_decInputQueue->fillLevel();
 +	unsigned waitingFrameCount = m_decInputQueue->frameCount();
 +
-+	if (!m_drain && waitingFrameCount < 5 && level < maxDecoderInputLevel) {
++	if (waitingFrameCount < 5 && level < maxDecoderInputLevel) {
 +		return CDVDVideoCodec::VC_BUFFER;
 +	}
 +
@@ -4007,16 +4017,20 @@ index 0000000000..f3c5e7d225
 +	m_filling = (waitingFrameCount < 10 && level < maxDecoderInputLevel) || m_libamcodec->isVCodecBuffering();
 +
 +	if (!dequeueBuffer()) {
-+		if (m_drain) {
-+			return m_input_queue_length > 0 ? CDVDVideoCodec::VC_NONE : CDVDVideoCodec::VC_EOF;
-+		}
-+
 +		return m_filling ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
 +	}
 +
 +	pVideoPicture->iFlags = 0;
 +
 +	double duration = static_cast<double>((m_am_private->video_rate * DVD_TIME_BASE) / UNIT_FREQ);
++
++	float dec_vr = (float) m_am_private->video_rate;
++	float vr = (float) getVideoRate(m_hints);
++
++	if (!m_hints.interlaced && MathUtils::FloatEquals(vr / dec_vr, 2.f, 0.01f)) {
++		// the kernel refresh rate was set to double video rate
++		duration *= 2.0;
++	}
 +
 +	if (m_last_pts == DVD_NOPTS_VALUE) {
 +		pVideoPicture->iDuration = duration;
@@ -4315,10 +4329,10 @@ index 0000000000..f3c5e7d225
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
 new file mode 100644
-index 0000000000..827e0e69ce
+index 0000000000..0cb95c1bcc
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.h
-@@ -0,0 +1,151 @@
+@@ -0,0 +1,152 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4390,6 +4404,7 @@ index 0000000000..827e0e69ce
 +	std::atomic<int>	 m_input_queue_length;
 +
 +	bool			 m_drain = false;
++	int				 m_drainRepeatCount;
 +	CRect			 m_dst_rect;
 +	CRect			 m_display_rect;
 +	float			 m_zoom = -1.0f;
