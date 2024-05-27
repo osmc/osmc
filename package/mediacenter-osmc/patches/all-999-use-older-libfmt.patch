@@ -1,0 +1,74 @@
+From 6150bd18348560cf459bccbfa2dd82b4c544b8b1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 25 Oct 2023 14:48:51 +0100
+Subject: [PATCH] Revert upstream commit
+ 1d5f8fec4e92cc4b3ebeeb6c61728dbdab6e20dd so we can use Debian libfmt for now
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/URL.cpp | 12 +++++-------
+ xbmc/URL.h   |  2 +-
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/xbmc/URL.cpp b/xbmc/URL.cpp
+index 99b661e36f..66688d3342 100644
+--- a/xbmc/URL.cpp
++++ b/xbmc/URL.cpp
+@@ -21,13 +21,10 @@
+ #endif
+ 
+ #include <charconv>
+-#include <iterator>
+ #include <string>
+ #include <system_error>
+ #include <vector>
+ 
+-#include <fmt/xchar.h>
+-
+ using namespace ADDON;
+ 
+ CURL::~CURL() = default;
+@@ -687,22 +684,23 @@ std::string CURL::Decode(std::string_view strURLData)
+   return strResult;
+ }
+ 
+-std::string CURL::Encode(std::string_view strURLData)
++std::string CURL::Encode(const std::string& strURLData)
+ {
+   std::string strResult;
+ 
+   /* wonder what a good value is here is, depends on how often it occurs */
+   strResult.reserve( strURLData.length() * 2 );
+ 
+-  for (auto kar : strURLData)
++  for (size_t i = 0; i < strURLData.size(); ++i)
+   {
++    const char kar = strURLData[i];
++
+     // Don't URL encode "-_.!()" according to RFC1738
+     //! @todo Update it to "-_.~" after Gotham according to RFC3986
+     if (StringUtils::isasciialphanum(kar) || kar == '-' || kar == '.' || kar == '_' || kar == '!' || kar == '(' || kar == ')')
+       strResult.push_back(kar);
+     else
+-      fmt::format_to(std::back_insert_iterator(strResult), "%{:02x}",
+-                     (unsigned int)((unsigned char)kar));
++      strResult += StringUtils::Format("%{:02x}", (unsigned int)((unsigned char)kar));
+   }
+ 
+   return strResult;
+diff --git a/xbmc/URL.h b/xbmc/URL.h
+index ae84335cc7..4dd451a5bb 100644
+--- a/xbmc/URL.h
++++ b/xbmc/URL.h
+@@ -125,7 +125,7 @@ public:
+   static bool IsFileOnly(const std::string &url); ///< return true if there are no directories in the url.
+   static bool IsFullPath(const std::string &url); ///< return true if the url includes the full path
+   static std::string Decode(std::string_view strURLData);
+-  static std::string Encode(std::string_view strURLData);
++  static std::string Encode(const std::string& strURLData);
+ 
+   /*! \brief Check whether a URL is a given URL scheme.
+    Comparison is case-insensitive as per RFC1738
+-- 
+2.34.1
+

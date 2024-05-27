@@ -1,4 +1,4 @@
-From 29a99b97d6eb870b4a7a6352e13b89e3a1abd1ab Mon Sep 17 00:00:00 2001
+From fd2504d6ed58bbfccc24f5d2ed76fe3bcc57b476 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 18:05:25 +0100
 Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
@@ -6,37 +6,38 @@ Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/platform/posix/PosixTimezone.cpp | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ xbmc/platform/posix/PosixTimezone.cpp | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/xbmc/platform/posix/PosixTimezone.cpp b/xbmc/platform/posix/PosixTimezone.cpp
-index 6f276a37b2..50f00acebb 100644
+index e76fd722e9..26f24f79e9 100644
 --- a/xbmc/platform/posix/PosixTimezone.cpp
 +++ b/xbmc/platform/posix/PosixTimezone.cpp
-@@ -193,6 +193,23 @@ void CPosixTimezone::SetTimezone(const std::string& timezoneName)
-     sprintf(env_var, "TZ=:%s", timezoneName.c_str());
+@@ -192,6 +192,24 @@ void CPosixTimezone::SetTimezone(const std::string& timezoneName)
+     snprintf(env_var, sizeof(env_var), "TZ=:%s", timezoneName.c_str());
      putenv(env_var);
      tzset();
 +    if (timezoneName.empty())
-+	return;
++       return;
 +    /* Keep /etc/timezone in sync */
 +    FILE *fp = fopen("/tmp/timezone", "w");
 +    if (fp)
 +    {
-+		fprintf(fp, "%s\n", timezoneName.c_str());
-+		fclose(fp);
-+		int res = system("/usr/bin/sudo /bin/mv /tmp/timezone /etc/timezone"); /* We need this to update a root owned file */
-+		if (res == 0)
-+		{
-+		  char *command;
-+		  asprintf(&command, "%s%s%s", "/usr/bin/sudo /bin/cp /usr/share/zoneinfo/", timezoneName.c_str(), " /etc/localtime.dpkg-new");
-+		  system(command);
-+		  system("/usr/bin/sudo /bin/mv /etc/localtime.dpkg-new /etc/localtime");
-+		}
++               fprintf(fp, "%s\n", timezoneName.c_str());
++               fclose(fp);
++               int res = system("/usr/bin/sudo /bin/mv /tmp/timezone /etc/timezone"); /* We need this to update a root owned file */
++               if (res == 0)
++               {
++                 char *command;
++                 asprintf(&command, "%s%s%s", "/usr/bin/sudo /bin/cp /usr/share/zoneinfo/", timezoneName.c_str(), " /etc/localtime.dpkg-new");
++                 system(command);
++                 system("/usr/bin/sudo /bin/mv /etc/localtime.dpkg-new /etc/localtime");
++               }
 +    }
++
    }
  }
  
 -- 
-2.25.1
+2.34.1
 

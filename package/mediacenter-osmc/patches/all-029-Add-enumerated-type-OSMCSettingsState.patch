@@ -1,4 +1,4 @@
-From 5daee67ba49c36cc77ccc26fe7d5b1eb490b8376 Mon Sep 17 00:00:00 2001
+From b91cfe1fb0cefeb39464c2d63d001c0177f7aa46 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 20 May 2016 17:18:13 +0100
 Subject: [PATCH] Add enumerated type OSMCSettingsState
@@ -10,32 +10,32 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index 027b6260ef..53c899f0fc 100644
+index c14e8400b5..1a6bc37f65 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -227,6 +227,7 @@ CApplication::CApplication(void)
+@@ -215,6 +215,7 @@ CApplication::CApplication(void)
      m_Autorun(new CAutorun()),
  #endif
      m_pInertialScrollingHandler(new CInertialScrollingHandler()),
 +    m_eOSMCWalkthroughState(OSMC_WALKTHROUGH_NOTRUNNING),
-     m_WaitingExternalCalls(0)
- {
-   TiXmlBase::SetCondenseWhiteSpace(false);
-@@ -2217,6 +2218,12 @@ private:
+     m_WaitingExternalCalls(0),
+     m_itemCurrentFile(std::make_shared<CFileItem>()),
+     m_playerEvent(true, true)
+@@ -2236,6 +2237,12 @@ private:
  };
  } // namespace
  
 +void CApplication::SetOSMCWalkthroughState(OSMCWalkthroughState state)
 +{
 + m_eOSMCWalkthroughState = state;
-+ CServiceBroker::GetRepositoryUpdater().ScheduleUpdate();
++ CServiceBroker::GetRepositoryUpdater().ScheduleUpdate(CRepositoryUpdater::UpdateScheduleType::First);
 +}
 +
  bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)
  {
    // if the item is a plugin we need to resolve the plugin paths
 diff --git a/xbmc/application/Application.h b/xbmc/application/Application.h
-index 45df227ac5..8a2a39751a 100644
+index ceddd3effa..fd6d0291c2 100644
 --- a/xbmc/application/Application.h
 +++ b/xbmc/application/Application.h
 @@ -114,6 +114,18 @@ public:
@@ -58,5 +58,5 @@ index 45df227ac5..8a2a39751a 100644
    CFileItem& CurrentFileItem();
    std::shared_ptr<CFileItem> CurrentFileItemPtr();
 -- 
-2.25.1
+2.34.1
 

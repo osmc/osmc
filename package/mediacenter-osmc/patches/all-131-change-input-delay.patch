@@ -1,4 +1,4 @@
-From 49e0d3b3278ad79332512363b54b771ed56f735c Mon Sep 17 00:00:00 2001
+From b52bba249cdc311a9c09131c6ecd9ef19d15842c Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 29 Nov 2022 18:25:00 +0000
 Subject: [PATCH] LibInputKeyboard: change repeat delay
@@ -9,18 +9,18 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/xbmc/platform/linux/input/LibInputKeyboard.cpp b/xbmc/platform/linux/input/LibInputKeyboard.cpp
-index 657588adce..93e7e7ea9a 100644
+index 952528d6b6..552a68b851 100644
 --- a/xbmc/platform/linux/input/LibInputKeyboard.cpp
 +++ b/xbmc/platform/linux/input/LibInputKeyboard.cpp
-@@ -28,7 +28,7 @@
+@@ -31,7 +31,7 @@
  
  namespace
  {
--constexpr int REPEAT_DELAY = 400;
-+constexpr int REPEAT_DELAY = 750;
- constexpr int REPEAT_RATE = 80;
+-constexpr unsigned int REPEAT_DELAY = 400;
++constexpr unsigned int REPEAT_DELAY = 750;
+ constexpr unsigned int REPEAT_RATE = 80;
  
- static const std::map<xkb_keysym_t, XBMCKey> xkbMap =
+ constexpr auto xkbMap = make_map<xkb_keysym_t, XBMCKey>({
 -- 
-2.25.1
+2.34.1
 

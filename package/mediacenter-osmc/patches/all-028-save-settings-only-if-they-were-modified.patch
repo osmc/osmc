@@ -1,4 +1,4 @@
-From 1ed01668166a5185119edb5f0cc3edb5b26331a2 Mon Sep 17 00:00:00 2001
+From 6f15dd37e64d1489e7e626c392c880a43397742a Mon Sep 17 00:00:00 2001
 From: Alex Deryskyba <alex@codesnake.com>
 Date: Sun, 19 Oct 2014 16:20:33 +0300
 Subject: [PATCH] Save settings only if they were modified after the last save
@@ -19,15 +19,14 @@ With this fix the settings will be written at exit only once, minimizing the ris
  1 file changed, 14 insertions(+)
 
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index b403b63bdf..c5486af7b8 100644
+index 7f30770710..7547d5bacd 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -55,12 +55,15 @@
- #include "utils/Variant.h"
+@@ -56,11 +56,14 @@
  #include "utils/XBMCTinyXML.h"
  #include "utils/log.h"
-+#include "utils/Digest.h"
  #include "view/ViewStateSettings.h"
++#include "utils/Digest.h"
 +#include "Util.h"
  
  #define SETTINGS_XML_FOLDER "special://xbmc/system/settings/"
@@ -36,9 +35,9 @@ index b403b63bdf..c5486af7b8 100644
  using namespace XFILE;
 +using KODI::UTILITY::CDigest;
  
- //! @todo: remove in c++17
- constexpr const char* CSettings::SETTING_LOOKANDFEEL_SKIN;
-@@ -557,6 +560,17 @@ bool CSettings::Save(const std::string &file)
+ bool CSettings::Initialize()
+ {
+@@ -166,6 +169,17 @@ bool CSettings::Save(const std::string &file)
    if (!Save(root))
      return false;
  
@@ -57,5 +56,5 @@ index b403b63bdf..c5486af7b8 100644
  }
  
 -- 
-2.25.1
+2.34.1
 

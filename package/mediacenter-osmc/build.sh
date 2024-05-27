@@ -7,11 +7,11 @@
 
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/4b95737efaddf7c869736e539318f18433413ff1.tar.gz" "$(pwd)/src"
-API_VERSION="20"
+pull_source "https://github.com/xbmc/xbmc/archive/60c450005472e6d38929bb28c07d00589102818d.tar.gz" "$(pwd)/src"
+API_VERSION="21"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
-API_VERSION="21"
+API_VERSION="22"
 fi
 if [ $? != 0 ]; then echo -e "Error fetching Kodi source" && exit 1; fi
 # Build in native environment
@@ -73,6 +73,7 @@ then
 	handle_dep "libavahi-client-dev"
 	handle_dep "libssl-dev" # We need this as well as libcurl4-openssl-dev because openssl libs are only suggestions
 	handle_dep "libtinyxml-dev"
+	handle_dep "libtinyxml2-dev"
 	handle_dep "libtool"
 	handle_dep "libudev-dev"
 	handle_dep "libvorbis-dev"
@@ -110,6 +111,7 @@ then
 	handle_dep "libspdlog-dev"
 	handle_dep "libfmt-dev"
 	handle_dep "libudfread-dev"
+	handle_dep "libdisplay-info-dev"
 	if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ]
 	then
 		handle_dep "rbp2-libcec-dev-osmc"
@@ -244,7 +246,7 @@ then
             -DCMAKE_PREFIX_PATH=/opt/vero3 \
             -DCMAKE_INCLUDE_PATH=/opt/vero3/include \
             -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
-            -DOPENGLES_gl_LIBRARY=/opt/vero3/lib \
+            -DOPENGLES_gl_LIBRARY=/opt/vero3/lib/libEGL.so \
             -DENABLE_AML=ON \
             -DAPP_RENDER_SYSTEM=gles \
             -DASS_INCLUDE_DIR=/usr/osmc/lib \
@@ -285,7 +287,7 @@ then
             -DCMAKE_PREFIX_PATH=/opt/vero5 \
             -DCMAKE_INCLUDE_PATH=/opt/vero5/include \
             -DCMAKE_LIBRARY_PATH=/usr/osmc/lib \
-            -DOPENGLES_gl_LIBRARY=/opt/vero5/lib \
+            -DOPENGLES_gl_LIBRARY=/opt/vero5/lib/libEGL.so \
             -DENABLE_AML=ON \
             -DAPP_RENDER_SYSTEM=gles \
             -DASS_INCLUDE_DIR=/usr/osmc/lib \
@@ -296,7 +298,7 @@ then
             -DENABLE_OPTICAL=1 \
             -DENABLE_DVDCSS=1 \
             -DWITH_ARCH=arm \
-            -DWITH_CPU="cortex-a53" \
+            -DWITH_CPU="cortex-a55" \
             -DCORE_PLATFORM_NAME=aml \
             -DCORE_SYSTEM_NAME=linux \
             -DENABLE_APP_AUTONAME=OFF \
@@ -346,21 +348,21 @@ then
 	then
 	   ADDONS_TO_BUILD="${ALL}"
            echo "set(APP_RENDER_SYSTEM gles)" >> ../Toolchain.mk
-           echo "set(OPENGLES_gl_LIBRARY /usr/osmc/lib)" >> ../Toolchain.mk
+           echo "set(OPENGLES_gl_LIBRARY /usr/osmc/lib/libEGL.so)" >> ../Toolchain.mk
            echo "set(OPENGLES_INCLUDE_DIR /usr/osmc/include)" >> ../Toolchain.mk
 	fi
 	if [ "$1" == "vero3" ]
 	then
 	   ADDONS_TO_BUILD="${ALL}"
            echo "set(APP_RENDER_SYSTEM gles)" >> ../Toolchain.mk
-           echo "set(OPENGLES_gl_LIBRARY /opt/vero3/lib)" >> ../Toolchain.mk
+           echo "set(OPENGLES_gl_LIBRARY /opt/vero3/lib/libEGL.so)" >> ../Toolchain.mk
            echo "set(OPENGLES_INCLUDE_DIR /opt/vero3/include)" >> ../Toolchain.mk
 	fi
         if [ "$1" == "vero5" ]
         then
            ADDONS_TO_BUILD="${ALL}"
            echo "set(APP_RENDER_SYSTEM gles)" >> ../Toolchain.mk
-           echo "set(OPENGLES_gl_LIBRARY /opt/vero5/lib)" >> ../Toolchain.mk
+           echo "set(OPENGLES_gl_LIBRARY /opt/vero5/lib/libEGL.so)" >> ../Toolchain.mk
            echo "set(OPENGLES_INCLUDE_DIR /opt/vero5/include)" >> ../Toolchain.mk
         fi
         cmake -DOVERRIDE_PATHS=1 -DCMAKE_INSTALL_PREFIX=${out}/usr/ -DBUILD_DIR=$(pwd) -DADDONS_TO_BUILD="${ADDONS_TO_BUILD}" -DCMAKE_TOOLCHAIN_FILE=../Toolchain.mk ../
@@ -401,7 +403,7 @@ then
 	mkdir -p files-debug/usr/lib/kodi
 	cp -ar ${out}/usr/lib/kodi/kodi.bin files-debug/usr/lib/kodi/kodi.bin
 	strip -s ${out}/usr/lib/kodi/kodi.bin
-	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7, libudfread0, libspdlog1"
+	COMMON_DEPENDS="niceprioritypolicy-osmc, mediacenter-send-osmc, libssh-4, libavahi-client3, python3, python-is-python3, python3-pil, python3-unidecode, libpython3.9, libsmbclient, samba-common-bin, libjpeg62-turbo, libsqlite3-0, libtinyxml2.6.2v5, libtinyxml2-8, libmad0, libmicrohttpd12, libyajl2, libmariadb3, libasound2, libxml2, liblzo2-2, libxslt1.1, libpng16-16, libsamplerate0, libtag1v5-vanilla, libfribidi0, libgif7, libcdio19, libpcrecpp0v5, libfreetype6, libvorbis0a, libvorbisenc2, libcurl4, libssl1.1, libplist3, avahi-daemon, policykit-1, mediacenter-addon-osmc (>= 3.0.39), mediacenter-skin-osmc, libcrossguid0, libcap2-bin, libfstrcmp0, libxkbcommon0, libinput10, xz-utils, libiso9660-11, libnss3, libnspr4, libnfs13, libass9, libunistring2, libatomic1, libfmt7, libudfread0, libspdlog1, libdisplay-info1"
 	test "$1" == rbp2 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2" >> files/DEBIAN/control
 	test "$1" == rbp4 && echo "Depends: ${COMMON_DEPENDS}, rbp2-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, rbp-userland-osmc, armv7-splash-osmc, rbp2-mesa-osmc, libdrm2" >> files/DEBIAN/control
 	test "$1" == vero3 && echo "Depends: ${COMMON_DEPENDS}, vero3-libcec-osmc, armv7-librtmp-osmc, armv7-libshairplay-osmc, armv7-libbluray-osmc, armv7-libsqlite-osmc, vero3-userland-osmc, armv7-splash-osmc, libamcodec-osmc" >> files/DEBIAN/control

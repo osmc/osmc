@@ -1,4 +1,4 @@
-From accfcca8d07940a8034c75e3b259a3acae8f2717 Mon Sep 17 00:00:00 2001
+From db5b48c833ccae594b01448d724c7cce79f68460 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 7 Feb 2017 17:49:18 +0000
 Subject: [PATCH] Don't notify when /boot is mounted. We do this when /boot is
@@ -6,22 +6,24 @@ Subject: [PATCH] Don't notify when /boot is mounted. We do this when /boot is
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/storage/MediaManager.cpp | 2 ++
- 1 file changed, 2 insertions(+)
+ xbmc/storage/MediaManager.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/xbmc/storage/MediaManager.cpp b/xbmc/storage/MediaManager.cpp
-index a1efbd933a..442f8366a8 100644
+index 047641e1de..dad5da5528 100644
 --- a/xbmc/storage/MediaManager.cpp
 +++ b/xbmc/storage/MediaManager.cpp
-@@ -695,6 +695,8 @@ std::vector<std::string> CMediaManager::GetDiskUsage()
+@@ -695,6 +695,10 @@ std::vector<std::string> CMediaManager::GetDiskUsage()
  
  void CMediaManager::OnStorageAdded(const MEDIA_DETECT::STORAGE::StorageDevice& device)
  {
++
 +if (device.path == "/boot")
 +  return;
- #ifdef HAS_DVD_DRIVE
++
+ #ifdef HAS_OPTICAL_DRIVE
    const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 -- 
-2.25.1
+2.34.1
 

@@ -1,4 +1,4 @@
-From f0e74c06cfd617d88f2923d5c54536116523f9f8 Mon Sep 17 00:00:00 2001
+From 4e33fd0dc92fff2f0b26ec9078c6e48018c5311f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 20 Sep 2015 14:40:24 +0100
 Subject: [PATCH] Ensure that Kodi's 'services.devicename' reflects
@@ -11,15 +11,23 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/guilib/guiinfo/SystemGUIInfo.cpp | 10 ++++++++--
+ xbmc/guilib/guiinfo/SystemGUIInfo.cpp | 11 +++++++++--
  xbmc/network/NetworkServices.cpp      | 18 ++++++++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-index bc01047b3b..14f41b17f6 100644
+index d6a428fab6..251087e30c 100644
 --- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 +++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-@@ -143,6 +143,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
+@@ -42,6 +42,7 @@
+ #include "utils/TimeUtils.h"
+ #include "windowing/WinSystem.h"
+ #include "windows/GUIMediaWindow.h"
++#include "network/Network.h"
+ 
+ using namespace KODI::GUILIB;
+ using namespace KODI::GUILIB::GUIINFO;
+@@ -109,6 +110,7 @@ bool CSystemGUIInfo::InitCurrentItem(CFileItem *item)
  
  bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int contextWindow, const CGUIInfo &info, std::string *fallback) const
  {
@@ -27,7 +35,7 @@ index bc01047b3b..14f41b17f6 100644
    switch (info.m_info)
    {
      ///////////////////////////////////////////////////////////////////////////////////////////////
-@@ -303,8 +304,13 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+@@ -274,8 +276,13 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
        value = g_langInfo.GetTemperatureUnitString();
        return true;
      case SYSTEM_FRIENDLY_NAME:
@@ -44,7 +52,7 @@ index bc01047b3b..14f41b17f6 100644
      {
        int iStereoMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE);
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index 40094335b9..c449de6947 100644
+index 1d137360ee..8138da53a1 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
 @@ -144,6 +144,7 @@ CNetworkServices::CNetworkServices()
@@ -80,5 +88,5 @@ index 40094335b9..c449de6947 100644
  
  bool CNetworkServices::OnSettingUpdate(const std::shared_ptr<CSetting>& setting,
 -- 
-2.25.1
+2.34.1
 

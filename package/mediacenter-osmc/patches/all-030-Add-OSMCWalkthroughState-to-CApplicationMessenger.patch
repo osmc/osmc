@@ -1,4 +1,4 @@
-From b9b74b7af0f2aa839715f2c2274ade4f1bc905bf Mon Sep 17 00:00:00 2001
+From 0e3942b6039d18faa0d7c3afd04ba78a16b48ae3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 23 Aug 2015 17:49:02 +0100
 Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
@@ -6,14 +6,14 @@ Subject: [PATCH] Add OSMCWalkthroughState to CApplicationMessenger
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
  xbmc/application/Application.cpp      | 17 +++++++++++++++++
- xbmc/messaging/ApplicationMessenger.h |  1 +
- 2 files changed, 18 insertions(+)
+ xbmc/messaging/ApplicationMessenger.h |  2 ++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index d0e29d1999..e1a1c234a4 100644
+index 1a6bc37f65..1fff339da6 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1576,6 +1576,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+@@ -1568,6 +1568,23 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
    }
    break;
  
@@ -38,17 +38,18 @@ index d0e29d1999..e1a1c234a4 100644
      m_ServiceManager->GetNetwork().NetworkMessage(static_cast<CNetworkBase::EMESSAGE>(pMsg->param1),
                                                    pMsg->param2);
 diff --git a/xbmc/messaging/ApplicationMessenger.h b/xbmc/messaging/ApplicationMessenger.h
-index 8f15ef9f16..d09549e215 100644
+index 5d15b5bbf5..b8e731c190 100644
 --- a/xbmc/messaging/ApplicationMessenger.h
 +++ b/xbmc/messaging/ApplicationMessenger.h
-@@ -82,6 +82,7 @@
- #define TMSG_RENDERER_PREINIT             TMSG_MASK_APPLICATION + 31
- #define TMSG_RENDERER_UNINIT              TMSG_MASK_APPLICATION + 32
- #define TMSG_EVENT                        TMSG_MASK_APPLICATION + 33
-+#define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 34
+@@ -91,6 +91,8 @@
+ #define TMSG_SET_VOLUME                   TMSG_MASK_APPLICATION + 36
+ #define TMSG_SET_MUTE                     TMSG_MASK_APPLICATION + 37
  
- /// @brief Called from the player when its current item is updated
- #define TMSG_UPDATE_PLAYER_ITEM TMSG_MASK_APPLICATION + 35
++#define TMSG_SETOSMCWALKTHROUGHSTATE      TMSG_MASK_APPLICATION + 38
++
+ #define TMSG_GUI_INFOLABEL                TMSG_MASK_GUIINFOMANAGER + 0
+ #define TMSG_GUI_INFOBOOL                 TMSG_MASK_GUIINFOMANAGER + 1
+ #define TMSG_UPDATE_CURRENT_ITEM          TMSG_MASK_GUIINFOMANAGER + 2
 -- 
 2.34.1
 
