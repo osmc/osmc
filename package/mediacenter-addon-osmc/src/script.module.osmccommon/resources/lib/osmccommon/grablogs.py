@@ -1089,7 +1089,7 @@ class Main(object):
 
             else:
 
-                self.url = UPLOAD_LOC + '/ %s' % key
+                self.url = UPLOAD_LOC + '/%s' % key
 
                 if xbmc:
 
