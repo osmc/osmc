@@ -528,9 +528,12 @@ class OSMCBackup(object):
 
             log('Copying {local} to {remote} using shutil.copyfile'
                 .format(local=local_tarball_name, remote=remote_tarball_name))
-            shutil.copyfile(local_tarball_name, remote_tarball_name)
-            xbmc.sleep(300)
-            success = os.path.isfile(remote_tarball_name)
+            try:
+                shutil.copyfile(local_tarball_name, remote_tarball_name)
+                xbmc.sleep(300)
+                success = os.path.isfile(remote_tarball_name)
+            except FileNotFoundError:  # smb:// target will raise FileNotFoundError
+                success = False
 
             if not success:
                 log('Failed to copy {local} to {remote} using shutil.copyfile'
